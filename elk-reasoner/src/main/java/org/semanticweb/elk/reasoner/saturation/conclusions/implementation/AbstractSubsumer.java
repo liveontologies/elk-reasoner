@@ -41,7 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SubsumerDecomposi
  *            the type of the subsumer {@link IndexedClassExpression}
  */
 public abstract class AbstractSubsumer<S extends IndexedClassExpression>
-		extends AbstractConclusion implements Subsumer<S> {
+		extends AbstractConclusion implements Subsumer {
 
 	/**
 	 * the implied {@code IndexedClassExpression} represented by this

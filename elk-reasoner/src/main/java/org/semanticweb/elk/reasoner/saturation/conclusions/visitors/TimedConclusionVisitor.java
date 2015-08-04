@@ -53,7 +53,7 @@ public class TimedConclusionVisitor<I, O> implements ConclusionVisitor<I, O> {
 	}
 
 	@Override
-	public O visit(ComposedSubsumer<?> conclusion, I input) {
+	public O visit(ComposedSubsumer conclusion, I input) {
 		timer_.timeComposedSubsumers -= CachedTimeThread.getCurrentTimeMillis();
 		O result = processor_.visit(conclusion, input);
 		timer_.timeComposedSubsumers += CachedTimeThread.getCurrentTimeMillis();
@@ -79,7 +79,7 @@ public class TimedConclusionVisitor<I, O> implements ConclusionVisitor<I, O> {
 	}
 
 	@Override
-	public O visit(DecomposedSubsumer<?> conclusion, I input) {
+	public O visit(DecomposedSubsumer conclusion, I input) {
 		timer_.timeDecomposedSubsumers -= CachedTimeThread
 				.getCurrentTimeMillis();
 		O result = processor_.visit(conclusion, input);

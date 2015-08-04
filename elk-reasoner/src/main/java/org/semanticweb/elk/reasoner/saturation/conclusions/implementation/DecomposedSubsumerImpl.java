@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVi
  *            the type of the subsumer {@link IndexedClassExpression}
  */
 public class DecomposedSubsumerImpl<S extends IndexedClassExpression> extends
-		AbstractSubsumer<S> implements DecomposedSubsumer<S> {
+		AbstractSubsumer<S> implements DecomposedSubsumer {
 
 	public DecomposedSubsumerImpl(IndexedContextRoot root, S subsumer) {
 		super(root, subsumer);

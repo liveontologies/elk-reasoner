@@ -53,7 +53,7 @@ public abstract class AbstractConclusionVisitor<I, O> extends
 	}
 
 	@Override
-	public O visit(ComposedSubsumer<?> conclusion, I input) {
+	public O visit(ComposedSubsumer conclusion, I input) {
 		return defaultVisit(conclusion, input);
 	}
 
@@ -68,7 +68,7 @@ public abstract class AbstractConclusionVisitor<I, O> extends
 	}
 
 	@Override
-	public O visit(DecomposedSubsumer<?> conclusion, I input) {
+	public O visit(DecomposedSubsumer conclusion, I input) {
 		return defaultVisit(conclusion, input);
 	}
 

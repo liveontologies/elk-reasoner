@@ -29,7 +29,8 @@ import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedConjunction;
-import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedConjunction;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedFirstConjunct;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedSecondConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.AbstractClassInferenceVisitor;
@@ -68,7 +69,7 @@ public class IgnoreSecondaryRootInferencesReader extends DelegatingTraceReader {
 					}
 
 					@Override
-					public Boolean visit(SubClassOfSubsumer<?> conclusion,
+					public Boolean visit(SubClassOfSubsumer conclusion,
 							IndexedContextRoot contextRoot) {
 						if (conclusion.getExpression() != contextRoot) {
 							defaultTracedVisit(conclusion, contextRoot);
@@ -88,7 +89,7 @@ public class IgnoreSecondaryRootInferencesReader extends DelegatingTraceReader {
 					}
 
 					@Override
-					public Boolean visit(DecomposedConjunction conclusion,
+					public Boolean visit(DecomposedFirstConjunct conclusion,
 							IndexedContextRoot contextRoot) {
 						if (conclusion.getExpression() != contextRoot) {
 							defaultTracedVisit(conclusion, contextRoot);
@@ -96,6 +97,17 @@ public class IgnoreSecondaryRootInferencesReader extends DelegatingTraceReader {
 
 						return true;
 					}
+					
+					@Override
+					public Boolean visit(DecomposedSecondConjunct conclusion,
+							IndexedContextRoot contextRoot) {
+						if (conclusion.getExpression() != contextRoot) {
+							defaultTracedVisit(conclusion, contextRoot);
+						}
+
+						return true;
+					}
+
 
 					@Override
 					public Boolean visit(PropagatedSubsumer conclusion,

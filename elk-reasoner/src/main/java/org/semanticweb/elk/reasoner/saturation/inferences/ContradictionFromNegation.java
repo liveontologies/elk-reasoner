@@ -42,13 +42,15 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.Contradiction
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ContradictionFromNegation extends
-		AbstractContradictionFromSubsumerInference<IndexedObjectComplementOf>
+public class ContradictionFromNegation extends AbstractContradictionInference
 		implements ContradictionInference {
 
-	public ContradictionFromNegation(IndexedContextRoot inferenceRoot,
-			IndexedObjectComplementOf premiseSubsumer) {
-		super(inferenceRoot, premiseSubsumer);
+	private final IndexedObjectComplementOf negation_;
+
+	public ContradictionFromNegation(IndexedContextRoot root,
+			IndexedObjectComplementOf negatedSubsumer) {
+		super(root);
+		this.negation_ = negatedSubsumer;
 	}
 
 	@Override
@@ -56,14 +58,20 @@ public class ContradictionFromNegation extends
 		return visitor.visit(this, input);
 	}
 
-	public Subsumer<IndexedClassExpression> getPositivePremise() {
+	public Subsumer getPremise() {
 		return new DecomposedSubsumerImpl<IndexedClassExpression>(
-				getInferenceRoot(), getPremiseSubsumer().getNegated());
+				getInferenceRoot(), negation_.getNegated());
+	}
+
+	public Subsumer getNegatedPremise() {
+		return new DecomposedSubsumerImpl<IndexedObjectComplementOf>(
+				getInferenceRoot(), negation_);
 	}
 
 	@Override
 	public String toString() {
-		return "Contradiction from Not " + getPremiseSubsumer();
+		return "Contradiction from " + negation_.getNegated() + " and "
+				+ negation_;
 	}
 
 	@Override

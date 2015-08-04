@@ -98,16 +98,16 @@ public class ForwardLinkImpl<R extends IndexedPropertyChain> extends
 	// TODO: find a better place for the following methods
 
 	public static void produceDecomposedExistentialLink(
-			ConclusionProducer producer, IndexedContextRoot source,
-			IndexedObjectSomeValuesFrom existential) {
-		SaturatedPropertyChain propertySaturation = existential.getProperty()
+			ConclusionProducer producer, IndexedContextRoot root,
+			IndexedObjectSomeValuesFrom subsumer) {
+		SaturatedPropertyChain propertySaturation = subsumer.getProperty()
 				.getSaturated();
 		if (propertySaturation.getCompositionsByLeftSubProperty().isEmpty()) {
-			producer.produce(new DecomposedExistentialBackwardLink(source,
-					existential));
+			producer.produce(new DecomposedExistentialBackwardLink(root,
+					subsumer));
 		} else {
-			producer.produce(new DecomposedExistentialForwardLink(source,
-					existential));
+			producer.produce(new DecomposedExistentialForwardLink(root,
+					subsumer));
 		}
 	}
 

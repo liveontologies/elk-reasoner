@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
+
 /*
  * #%L
  * ELK Reasoner
@@ -21,19 +22,14 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-
 /**
  * A {@link Subsumer} created by decomposition rules.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  * 
- * @param <S>
- *            the type of the subsumer {@link IndexedClassExpression}
  */
-public interface DecomposedSubsumer<S extends IndexedClassExpression> extends
-		Subsumer<S> {
+public interface DecomposedSubsumer extends Subsumer {
 
 	public static final String NAME = "Decomposed Subsumer";
 

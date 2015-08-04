@@ -65,7 +65,7 @@ public class SideConditionLookup {
 		}
 
 		@Override
-		public ElkAxiom visit(SubClassOfSubsumer<?> inference, Void ignored) {
+		public ElkAxiom visit(SubClassOfSubsumer inference, Void ignored) {
 			return inference.getReason();
 		}
 

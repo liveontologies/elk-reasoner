@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
+
 /*
  * #%L
  * ELK Reasoner
@@ -50,7 +51,7 @@ public abstract class AbstractRuleApplicationConclusionVisitor extends
 		this.producer = producer;
 	}
 
-	void applyCompositionRules(Subsumer<?> conclusion, ContextPremises premises) {
+	void applyCompositionRules(Subsumer conclusion, ContextPremises premises) {
 		IndexedClassExpression subsumer = conclusion.getExpression();
 		LinkedSubsumerRule compositionRule = subsumer.getCompositionRuleHead();
 		while (compositionRule != null) {
@@ -60,8 +61,7 @@ public abstract class AbstractRuleApplicationConclusionVisitor extends
 		}
 	}
 
-	void applyDecompositionRules(Subsumer<?> conclusion,
-			ContextPremises premises) {
+	void applyDecompositionRules(Subsumer conclusion, ContextPremises premises) {
 		conclusion.getExpression().accept(
 				new SubsumerDecompositionVisitor(ruleAppVisitor, premises,
 						producer));

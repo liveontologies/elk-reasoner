@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.factories;
+
 /*
  * #%L
  * ELK Reasoner
@@ -35,10 +36,11 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class RecursiveContextTracingJob extends ContextTracingJob {
+public class RecursiveContextTracingJob extends
+		ContextTracingJob<IndexedContextRoot> {
 
 	private final Conclusion target_;
-	
+
 	public RecursiveContextTracingJob(IndexedContextRoot input, Conclusion t) {
 		super(input);
 		target_ = t;

@@ -47,9 +47,6 @@ public class DecomposedExistentialBackwardLink extends
 
 	private final IndexedObjectSomeValuesFrom existential_;
 
-	/**
-	 * 
-	 */
 	public DecomposedExistentialBackwardLink(IndexedContextRoot inferenceRoot,
 			IndexedObjectSomeValuesFrom subsumer) {
 		super(IndexedObjectSomeValuesFrom.Helper.getTarget(subsumer), subsumer
@@ -58,7 +55,11 @@ public class DecomposedExistentialBackwardLink extends
 		inferenceRoot_ = inferenceRoot;
 	}
 
-	public Subsumer<IndexedObjectSomeValuesFrom> getExistential() {
+	public IndexedObjectSomeValuesFrom getDecomposedExistential() {
+		return this.existential_;
+	}
+	
+	public Subsumer getPremise() {
 		return new DecomposedSubsumerImpl<IndexedObjectSomeValuesFrom>(
 				getInferenceRoot(), existential_);
 	}

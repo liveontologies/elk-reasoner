@@ -40,9 +40,10 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromDisjo
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromInconsistentDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromNegation;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromOwlNothing;
-import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedConjunction;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedFirstConjunct;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedSecondConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjunctionComposition;
 import org.semanticweb.elk.reasoner.saturation.inferences.GeneratedPropagation;
@@ -53,11 +54,11 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ReflexiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ComposedReflexivePropertyChain;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.PropertyChainInitialization;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ComposedReflexivePropertyChain;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ReflexiveToldSubObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.RightReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldReflexiveProperty;
@@ -98,12 +99,12 @@ public class ClassInferencePremiseVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(InitializationSubsumer<?> conclusion, I input) {
+	public O visit(InitializationSubsumer conclusion, I input) {
 		return null;
 	}
 
 	@Override
-	public O visit(SubClassOfSubsumer<?> conclusion, I input) {
+	public O visit(SubClassOfSubsumer conclusion, I input) {
 		conclusion.getPremise().accept(classPremiseVisitor_, input);
 		return null;
 	}
@@ -116,8 +117,14 @@ public class ClassInferencePremiseVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(DecomposedConjunction conclusion, I input) {
-		conclusion.getConjunction().accept(classPremiseVisitor_, input);
+	public O visit(DecomposedFirstConjunct conclusion, I input) {
+		conclusion.getPremise().accept(classPremiseVisitor_, input);
+		return null;
+	}
+
+	@Override
+	public O visit(DecomposedSecondConjunct conclusion, I input) {
+		conclusion.getPremise().accept(classPremiseVisitor_, input);
 		return null;
 	}
 
@@ -129,7 +136,7 @@ public class ClassInferencePremiseVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(ReflexiveSubsumer<?> conclusion, I input) {
+	public O visit(ReflexiveSubsumer conclusion, I input) {
 		conclusion.getReflexivityPremise().accept(propertyPremiseVisitor_,
 				input);
 		return null;
@@ -171,7 +178,7 @@ public class ClassInferencePremiseVisitor<I, O> implements
 
 	@Override
 	public O visit(DecomposedExistentialBackwardLink conclusion, I input) {
-		conclusion.getExistential().accept(classPremiseVisitor_, input);
+		conclusion.getPremise().accept(classPremiseVisitor_, input);
 		return null;
 	}
 
@@ -208,7 +215,7 @@ public class ClassInferencePremiseVisitor<I, O> implements
 	@Override
 	public O visit(ContradictionFromNegation conclusion, I input) {
 		conclusion.getPremise().accept(classPremiseVisitor_, input);
-		conclusion.getPositivePremise().accept(classPremiseVisitor_, input);
+		conclusion.getNegatedPremise().accept(classPremiseVisitor_, input);
 		return null;
 	}
 

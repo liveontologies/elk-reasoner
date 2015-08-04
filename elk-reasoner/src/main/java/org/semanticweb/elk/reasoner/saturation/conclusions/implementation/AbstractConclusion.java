@@ -29,6 +29,8 @@ import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 
 /**
+ * A skeleton for implementation of {@link Conclusion}s.
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de

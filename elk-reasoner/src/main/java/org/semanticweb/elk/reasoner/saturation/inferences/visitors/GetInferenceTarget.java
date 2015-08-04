@@ -35,8 +35,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.ReversedForwardLink;
 
 /**
- * Given an {@link ClassInference}, returns the root of the context to which this
- * inference should be produced.
+ * Given an {@link ClassInference}, returns the root of the context to which
+ * this inference should be produced.
  * 
  * @author Pavel Klinov
  * 
@@ -75,6 +75,6 @@ public class GetInferenceTarget extends
 	public IndexedContextRoot visit(
 			DecomposedExistentialBackwardLink conclusion, Context premiseContext) {
 		return IndexedObjectSomeValuesFrom.Helper.getTarget(conclusion
-				.getExistential().getExpression());
+				.getDecomposedExistential());
 	}
 }

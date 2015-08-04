@@ -39,16 +39,17 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.SubsumerInfer
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class SubClassOfSubsumer<S extends IndexedClassExpression> extends
-		AbstractDecomposedSubsumerInference<S> implements SubsumerInference<S> {
+public class SubClassOfSubsumer extends
+		AbstractDecomposedSubsumerInference<IndexedClassExpression> implements
+		SubsumerInference<IndexedClassExpression> {
 
 	private final IndexedClassExpression premiseSubsumer_;
 
 	private final ElkAxiom reason_;
 
 	public SubClassOfSubsumer(IndexedContextRoot inferenceRoot,
-			IndexedClassExpression premiseSubsumer, S conclusion,
-			ElkAxiom reason) {
+			IndexedClassExpression premiseSubsumer,
+			IndexedClassExpression conclusion, ElkAxiom reason) {
 		super(inferenceRoot, conclusion);
 		this.premiseSubsumer_ = premiseSubsumer;
 		this.reason_ = reason;
@@ -59,7 +60,7 @@ public class SubClassOfSubsumer<S extends IndexedClassExpression> extends
 		return getConclusionRoot();
 	}
 
-	public Subsumer<?> getPremise() {
+	public Subsumer getPremise() {
 		return new DecomposedSubsumerImpl<IndexedClassExpression>(
 				getInferenceRoot(), premiseSubsumer_);
 	}
@@ -74,8 +75,7 @@ public class SubClassOfSubsumer<S extends IndexedClassExpression> extends
 	}
 
 	@Override
-	public <I, O> O accept(SubsumerInferenceVisitor<I, O> visitor,
-			I parameter) {
+	public <I, O> O accept(SubsumerInferenceVisitor<I, O> visitor, I parameter) {
 		return visitor.visit(this, parameter);
 	}
 

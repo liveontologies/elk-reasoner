@@ -55,7 +55,7 @@ public class ConclusionSourceContextUnsaturationVisitor extends
 		return true;
 	}
 
-	Boolean defaultVisit(Subsumer<?> conclusion, Context context) {
+	Boolean defaultVisit(Subsumer conclusion, Context context) {
 		// if the subsumer does not occur in the ontology anymore, it cannot be
 		// re-derived, and thus, the context should not be modified
 		// TODO: extend this check to other types of conclusions
@@ -65,12 +65,12 @@ public class ConclusionSourceContextUnsaturationVisitor extends
 	}
 
 	@Override
-	public Boolean visit(ComposedSubsumer<?> conclusion, Context context) {
+	public Boolean visit(ComposedSubsumer conclusion, Context context) {
 		return defaultVisit(conclusion, context);
 	}
 
 	@Override
-	public Boolean visit(DecomposedSubsumer<?> conclusion, Context context) {
+	public Boolean visit(DecomposedSubsumer conclusion, Context context) {
 		return defaultVisit(conclusion, context);
 	}
 }

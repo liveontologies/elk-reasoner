@@ -25,16 +25,19 @@ package org.semanticweb.elk.reasoner.saturation.tracing.factories;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.ExtendedContext;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.MainContextFactory;
 import org.semanticweb.elk.reasoner.saturation.MapSaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.SubContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInitializingInsertionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionOccurrenceCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.HybridLocalRuleApplicationConclusionVisitor;
@@ -45,7 +48,10 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.AbstractRuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.WorkerLocalTodo;
 import org.semanticweb.elk.reasoner.saturation.tracing.ClassInferenceProducer;
+import org.semanticweb.elk.util.concurrent.computation.DelegatingInputProcessor;
+import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
  * A {@link RuleApplicationFactory} that applies redundant and non-redundant
@@ -95,14 +101,40 @@ public class ContextTracingRuleApplicationFactory extends
 				// if the conclusion was indeed derived, save its inference
 				new InferenceProducingVisitor(),
 				// insert the conclusion into the local context copies
-				new ConclusionInitializingInsertionVisitor(localWriter),
-//				new ConclusionInsertionVisitor(localWriter),
+				// new ConclusionInitializingInsertionVisitor(localWriter),
+				new ConclusionInsertionVisitor(localWriter),
 				// if the conclusion is new, apply local (non-redundant +
 				// redundnat) rules and produce conclusions to the active
 				// (local) saturation state
 				new HybridLocalRuleApplicationConclusionVisitor(
 						mainSaturationState_, ruleVisitor, ruleVisitor,
 						localWriter, localWriter));
+	}
+
+	@Override
+	protected InputProcessor<RuleApplicationInput> getEngine(
+			ConclusionVisitor<? super Context, Boolean> conclusionProcessor,
+			final SaturationStateWriter<? extends ExtendedContext> saturationStateWriter,
+			WorkerLocalTodo localTodo, SaturationStatistics localStatistics) {
+		final InputProcessor<RuleApplicationInput> defaultEngine = super
+				.getEngine(conclusionProcessor, saturationStateWriter,
+						localTodo, localStatistics);
+		return new DelegatingInputProcessor<RuleApplicationInput>(defaultEngine) {
+			@Override
+			public void submit(RuleApplicationInput job) {
+				defaultEngine.submit(job);
+				// additionally initialize all sub-contexts present in the main
+				// saturation state
+				IndexedContextRoot root = job.getRoot();
+				Context mainContext = mainSaturationState_.getContext(root);
+				for (IndexedObjectProperty subRoot : mainContext
+						.getSubContextPremisesByObjectProperty().keySet()) {
+					saturationStateWriter
+							.produce(new SubContextInitializationImpl(root,
+									subRoot));
+				}
+			}
+		};
 	}
 
 	/**

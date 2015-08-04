@@ -25,12 +25,13 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * A {@link Conclusion} that can be used in inferences that are assigned with a
- * {@link IndexedObjectProperty} sub-root {@link SubConclusion#getSubRoot()} in
- * addition to the {@link IndexedClassExpression} root
- * {@link Conclusion#getConclusionRoot()} .
+ * {@link IndexedObjectProperty} sub-root
+ * {@link SubConclusion#getConclusionSubRoot()} in addition to the
+ * {@link IndexedClassExpression} root {@link Conclusion#getConclusionRoot()} .
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -42,7 +43,26 @@ public interface SubConclusion extends Conclusion {
 	 *         with which this {@link SubConclusion} can be used. All premises
 	 *         of such inferences must return the same {#getSubRoot()}
 	 */
-	public IndexedObjectProperty getSubRoot();
+	public IndexedObjectProperty getConclusionSubRoot();
+
+	/**
+	 * 
+	 * @return The {@link IndexedObjectProperty} of the {@link Context} from
+	 *         which this {@link SubConclusion} originate. This value may be
+	 *         different from {@link #getConclusionSubRoot()} and can be
+	 *         {@code null}. Specifically, if this value is not {@code null}
+	 *         then this {@link SubConclusion} is guaranteed to be derived from
+	 *         {@link SubContextInitialization} with the values
+	 *         {@link #getConclusionRoot()} and {@link #getConclusionSubRoot()}
+	 *         equal respectively to this {@link #getOriginRoot()} and
+	 *         {@link #getOriginSubRoot()}. If this value is {@code null}, this
+	 *         conclusion is guaranteed to be derived from
+	 *         {@link ContextInitialization} with the value
+	 *         {@link #getConclusionRoot()} equal to this
+	 *         {@link #getOriginRoot()}.
+	 * @see #getOriginRoot()
+	 */
+	public IndexedObjectProperty getOriginSubRoot();
 
 	public <I, O> O accept(SubConclusionVisitor<I, O> visitor, I input);
 

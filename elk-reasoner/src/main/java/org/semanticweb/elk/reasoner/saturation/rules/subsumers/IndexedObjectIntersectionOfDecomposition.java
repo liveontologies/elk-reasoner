@@ -25,7 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedConjunction;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedFirstConjunct;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedSecondConjunct;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 
 /**
@@ -63,10 +64,8 @@ public class IndexedObjectIntersectionOfDecomposition extends
 		// producer.produce(premises.getRoot(), new
 		// DecomposedSubsumer(premise.getSecondConjunct()));
 
-		producer.produce(new DecomposedConjunction(premises.getRoot(), premise,
-				premise.getFirstConjunct()));
-		producer.produce(new DecomposedConjunction(premises.getRoot(), premise,
-				premise.getSecondConjunct()));
+		producer.produce(new DecomposedFirstConjunct(premises.getRoot(), premise));
+		producer.produce(new DecomposedSecondConjunct(premises.getRoot(), premise));
 	}
 
 	@Override

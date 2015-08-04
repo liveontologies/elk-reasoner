@@ -36,10 +36,12 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.SubsumerInfer
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class InitializationSubsumer<S extends IndexedClassExpression> extends
-		AbstractDecomposedSubsumerInference<S> implements SubsumerInference<S> {
+public class InitializationSubsumer extends
+		AbstractDecomposedSubsumerInference<IndexedClassExpression> implements
+		SubsumerInference<IndexedClassExpression> {
 
-	public InitializationSubsumer(IndexedContextRoot inferenceRoot, S subsumer) {
+	public InitializationSubsumer(IndexedContextRoot inferenceRoot,
+			IndexedClassExpression subsumer) {
 		super(inferenceRoot, subsumer);
 	}
 

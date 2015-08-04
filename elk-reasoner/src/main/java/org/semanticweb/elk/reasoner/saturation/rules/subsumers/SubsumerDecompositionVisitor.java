@@ -109,7 +109,7 @@ public class SubsumerDecompositionVisitor implements
 
 	@Override
 	public Void visit(IndexedDataHasValue element) {
-		// TODO Auto-generated method stub
+		// not supported
 		return null;
 	}
 

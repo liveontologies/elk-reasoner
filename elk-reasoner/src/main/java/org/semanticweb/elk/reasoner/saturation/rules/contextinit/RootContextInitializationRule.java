@@ -99,20 +99,20 @@ public class RootContextInitializationRule extends
 		root.accept(new NoOpIndexedContextRootVisitor<Void>() {
 			@Override
 			protected Void defaultVisit(IndexedClassExpression element) {
-				producer.produce(new InitializationSubsumer<IndexedClassExpression>(
-						premises.getRoot(), element));
+				producer.produce(new InitializationSubsumer(premises.getRoot(),
+						element));
 				return null;
 			}
 
 			@Override
 			public Void visit(IndexedRangeFiller element) {
-				producer.produce(new InitializationSubsumer<IndexedClassExpression>(
-						premises.getRoot(), element.getFiller()));
+				producer.produce(new InitializationSubsumer(premises.getRoot(),
+						element.getFiller()));
 				for (IndexedClassExpression range : element.getProperty()
 						.getSaturated().getRanges()) {
 					// TODO: introduce a specific inference
-					producer.produce(new InitializationSubsumer<IndexedClassExpression>(
-							premises.getRoot(), range));
+					producer.produce(new InitializationSubsumer(premises
+							.getRoot(), range));
 				}
 				return null;
 			}

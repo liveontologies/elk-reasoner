@@ -48,9 +48,6 @@ public class DecomposedExistentialForwardLink extends AbstractConclusion
 
 	private final IndexedObjectSomeValuesFrom existential_;
 
-	/**
-	 * 
-	 */
 	public DecomposedExistentialForwardLink(IndexedContextRoot inferenceRoot,
 			IndexedObjectSomeValuesFrom subsumer) {
 		super(inferenceRoot);
@@ -67,7 +64,7 @@ public class DecomposedExistentialForwardLink extends AbstractConclusion
 		return IndexedObjectSomeValuesFrom.Helper.getTarget(existential_);
 	}
 
-	public Subsumer<IndexedObjectSomeValuesFrom> getExistential() {
+	public Subsumer getExistential() {
 		return new DecomposedSubsumerImpl<IndexedObjectSomeValuesFrom>(
 				getInferenceRoot(), existential_);
 	}

@@ -31,6 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Decomposed
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
@@ -52,9 +53,11 @@ import org.slf4j.LoggerFactory;
  * {@link Conclusion}s using the provided {@link RuleVisitor} to track rule
  * applications and {@link ConclusionProducer} to output the {@link Conclusion}s
  * of the applied rules. A rule is local if it produces only {@link Conclusion}s
- * that logically belong to the same root as the {@link Conclusion} to which it
- * applies. The methods always return {@link true}.
+ * that have the same origin root and sub-root as the {@link Conclusion} to
+ * which it applies. The methods always return {@link true}.
  * 
+ * @see Conclusion#getOriginRoot()
+ * @see SubConclusion#getOriginSubRoot()
  * @see RedundantRuleApplicationConclusionVisitor
  * 
  * @author "Yevgeny Kazakov"
@@ -101,6 +104,7 @@ public class NonRedundantLocalRuleApplicationConclusionVisitor extends
 
 	@Override
 	public Boolean visit(Propagation subConclusion, ContextPremises premises) {
+		// no local rules
 		// propagate over reflexive backward links
 		ruleAppVisitor.visit(ReflexivePropagationRule.getInstance(),
 				subConclusion, premises, producer);
@@ -111,14 +115,14 @@ public class NonRedundantLocalRuleApplicationConclusionVisitor extends
 	public Boolean visit(SubContextInitialization subConclusion,
 			ContextPremises premises) {
 		LOGGER_.trace("{}::{} applying sub-concept init rules:",
-				premises.getRoot(), subConclusion.getSubRoot());
+				premises.getRoot(), subConclusion.getConclusionSubRoot());
 		PropagationInitializationRule.getInstance().accept(ruleAppVisitor,
 				subConclusion, premises, producer);
 		return true;
 	}
 
 	@Override
-	public Boolean visit(ComposedSubsumer<?> conclusion,
+	public Boolean visit(ComposedSubsumer conclusion,
 			ContextPremises premises) {
 		applyCompositionRules(conclusion, premises);
 		return true;
@@ -145,7 +149,7 @@ public class NonRedundantLocalRuleApplicationConclusionVisitor extends
 	}
 
 	@Override
-	public Boolean visit(DecomposedSubsumer<?> conclusion,
+	public Boolean visit(DecomposedSubsumer conclusion,
 			ContextPremises premises) {
 		applyCompositionRules(conclusion, premises);
 		applyDecompositionRules(conclusion, premises);
@@ -155,7 +159,7 @@ public class NonRedundantLocalRuleApplicationConclusionVisitor extends
 	@Override
 	public Boolean visit(DisjointSubsumer conclusion, ContextPremises premises) {
 		ruleAppVisitor.visit(CONTRADICTION_COMPOSITION_RULE_, conclusion,
-					premises, producer);
+				premises, producer);
 		return true;
 	}
 

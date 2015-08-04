@@ -88,7 +88,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromDisjo
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromInconsistentDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromNegation;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromOwlNothing;
-import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedConjunction;
+import org.semanticweb.elk.reasoner.saturation.inferences.AbstractDecomposedConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
@@ -227,11 +227,11 @@ public class SingleInferenceMapper {
 		}
 
 		@Override
-		public Inference visit(DecomposedConjunction inference,
+		public Inference visit(AbstractDecomposedConjunct inference,
 				Void parameter) {
 			IndexedClassExpression conclusion = inference.getExpression();
 			IndexedObjectIntersectionOf conjunction = inference
-					.getConjunction().getExpression();
+					.getPremise().getExpression();
 			ElkClassExpression sub = Deindexer.deindex(inference.getConclusionRoot());
 			ElkClassExpression other = Deindexer
 					.deindex(conclusion == conjunction.getFirstConjunct() ? conjunction
@@ -453,7 +453,7 @@ public class SingleInferenceMapper {
 		@Override
 		public Inference visit(ContradictionFromNegation inference, Void parameter) {
 			ElkClassExpression c = Deindexer.deindex(inference.getConclusionRoot());
-			ElkClassExpression d = Deindexer.deindex(inference.getPositivePremise().getExpression());
+			ElkClassExpression d = Deindexer.deindex(inference.getOtherPremise().getExpression());
 			
 			return new NegationContradiction(c, d, factory_, exprFactory_);
 		}

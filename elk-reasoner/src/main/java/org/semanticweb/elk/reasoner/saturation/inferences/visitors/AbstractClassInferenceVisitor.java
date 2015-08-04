@@ -33,9 +33,10 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromDisjo
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromInconsistentDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromNegation;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromOwlNothing;
-import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedConjunction;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedFirstConjunct;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedSecondConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjunctionComposition;
 import org.semanticweb.elk.reasoner.saturation.inferences.GeneratedPropagation;
@@ -75,7 +76,12 @@ public abstract class AbstractClassInferenceVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(DecomposedConjunction conclusion, I input) {
+	public O visit(DecomposedFirstConjunct conclusion, I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(DecomposedSecondConjunct conclusion, I input) {
 		return defaultTracedVisit(conclusion, input);
 	}
 
@@ -90,7 +96,7 @@ public abstract class AbstractClassInferenceVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(InitializationSubsumer<?> conclusion, I input) {
+	public O visit(InitializationSubsumer conclusion, I input) {
 		return defaultTracedVisit(conclusion, input);
 	}
 
@@ -100,7 +106,7 @@ public abstract class AbstractClassInferenceVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(ReflexiveSubsumer<?> conclusion, I input) {
+	public O visit(ReflexiveSubsumer conclusion, I input) {
 		return defaultTracedVisit(conclusion, input);
 	}
 
@@ -115,7 +121,7 @@ public abstract class AbstractClassInferenceVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(SubClassOfSubsumer<?> conclusion, I input) {
+	public O visit(SubClassOfSubsumer conclusion, I input) {
 		return defaultTracedVisit(conclusion, input);
 	}
 

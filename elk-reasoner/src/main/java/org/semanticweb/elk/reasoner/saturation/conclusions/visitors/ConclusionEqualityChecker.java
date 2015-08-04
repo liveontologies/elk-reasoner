@@ -56,16 +56,16 @@ public class ConclusionEqualityChecker implements ConclusionVisitor<Conclusion, 
 	}
 	
 	@Override
-	public Boolean visit(ComposedSubsumer<?> negSCE, Conclusion other) {
+	public Boolean visit(ComposedSubsumer negSCE, Conclusion other) {
 		return other.accept(new BaseBooleanConclusionVisitor<IndexedClassExpression>(){
 
 			@Override
-			public Boolean visit(ComposedSubsumer<?> subsumer, IndexedClassExpression ice) {
+			public Boolean visit(ComposedSubsumer subsumer, IndexedClassExpression ice) {
 				return subsumer.getExpression() == ice;
 			}
 
 			@Override
-			public Boolean visit(DecomposedSubsumer<?> subsumer, IndexedClassExpression ice) {
+			public Boolean visit(DecomposedSubsumer subsumer, IndexedClassExpression ice) {
 				return subsumer.getExpression() == ice;
 			}
 			
@@ -74,16 +74,16 @@ public class ConclusionEqualityChecker implements ConclusionVisitor<Conclusion, 
 	}
 
 	@Override
-	public Boolean visit(DecomposedSubsumer<?> posSCE, Conclusion other) {
+	public Boolean visit(DecomposedSubsumer posSCE, Conclusion other) {
 		return other.accept(new BaseBooleanConclusionVisitor<IndexedClassExpression>(){
 
 			@Override
-			public Boolean visit(ComposedSubsumer<?> subsumer, IndexedClassExpression ice) {
+			public Boolean visit(ComposedSubsumer subsumer, IndexedClassExpression ice) {
 				return subsumer.getExpression() == ice;
 			}
 
 			@Override
-			public Boolean visit(DecomposedSubsumer<?> subsumer, IndexedClassExpression ice) {
+			public Boolean visit(DecomposedSubsumer subsumer, IndexedClassExpression ice) {
 				return subsumer.getExpression() == ice;
 			}
 			

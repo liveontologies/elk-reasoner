@@ -119,9 +119,8 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		for (int i = 0; i < toldSubsumers_.size(); i++) {
-			producer.produce(new SubClassOfSubsumer<IndexedClassExpression>(
-					premises.getRoot(), premise, toldSubsumers_.get(i),
-					reasons_.get(i)));
+			producer.produce(new SubClassOfSubsumer(premises.getRoot(),
+					premise, toldSubsumers_.get(i), reasons_.get(i)));
 		}
 	}
 

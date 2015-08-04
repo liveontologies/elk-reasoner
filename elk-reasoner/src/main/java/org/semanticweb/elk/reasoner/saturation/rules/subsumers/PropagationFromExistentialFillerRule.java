@@ -138,8 +138,8 @@ public class PropagationFromExistentialFillerRule extends
 				if (subContextMap.get(property).isInitialized()) {
 					// propagation introduction is a binary rule where the
 					// sub-context being initialized is a premise
-					producer.produce(new GeneratedPropagation(premises.getRoot(),
-							property, e));
+					producer.produce(new GeneratedPropagation(premises
+							.getRoot(), property, e));
 				}
 			}
 
@@ -148,8 +148,7 @@ public class PropagationFromExistentialFillerRule extends
 			if (saturation.isDerivedReflexive()) {
 				// producer.produce(premises.getRoot(), new
 				// ComposedSubsumer(e));
-				producer.produce(new ReflexiveSubsumer<IndexedObjectSomeValuesFrom>(
-						premises.getRoot(), e));
+				producer.produce(new ReflexiveSubsumer(premises.getRoot(), e));
 			}
 		}
 	}

@@ -22,9 +22,9 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.HybridContextPremises;
@@ -33,20 +33,22 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
  * A {@link ConclusionVisitor} that applies local rules (rules producing only
- * {@link Conclusion}s with the same source as for the premise) for visited
- * {@link Conclusion}s using the provided {@link RuleVisitor}s and
- * {@link ConclusionProducer}s for respectively non-redundant and redundant rule
- * applications.
+ * {@link Conclusion}s with the same origin root and sub-root as for the
+ * premise) for visited {@link Conclusion}s using the provided
+ * {@link RuleVisitor}s and {@link ConclusionProducer}s for respectively
+ * non-redundant and redundant rule applications.
  * 
  * When applying local rules, to the visited {@link Conclusion}, local premises
- * (premises with the same source as the {@link Conclusion}) are taken from the
- * local {@link Context} and other premises from the corresponding
- * {@link Context} in the main saturation state. This is done to ensure that
- * every rule is applied at most once and no inference is lost when processing
- * only local {@link Conclusion}s.
+ * (premises with the same origin root and sub-root as the {@link Conclusion})
+ * are taken from the local {@link Context} and other premises from the
+ * corresponding {@link Context} in the main saturation state. This is done to
+ * ensure that every rule is applied at most once and no inference is lost when
+ * processing only local {@link Conclusion}s.
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @see Conclusion#getOriginRoot()
+ * @see SubConclusion#getOriginSubRoot()
  * @see NonRedundantLocalRuleApplicationConclusionVisitor
  * @see RedundantLocalRuleApplicationConclusionVisitor
  */
@@ -89,12 +91,12 @@ public class HybridLocalRuleApplicationConclusionVisitor extends
 	}
 
 	private ContextPremises getPremises(Conclusion conclusion, Context input) {
-		IndexedContextRoot root = input.getRoot();
-		ContextPremises mainPremises = mainState_.getContext(root);
-		if (conclusion.getOriginRoot() != root)
+		ContextPremises mainPremises = mainState_.getContext(input.getRoot());
+		if (conclusion instanceof SubConclusion) {
 			// there are currently no rules which can use other context premises
 			// with the same source, so we can just take all main premises
 			return mainPremises;
+		}
 		// else
 		return new HybridContextPremises(input, mainPremises);
 	}

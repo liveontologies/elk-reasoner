@@ -33,15 +33,13 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  * 
- * @param <S>
- *            the type of the subsumer {@link IndexedClassExpression}
  */
-public interface Subsumer<S extends IndexedClassExpression> extends Conclusion {
+public interface Subsumer extends Conclusion {
 
 	/**
 	 * @return the {@code IndexedClassExpression} represented by this
 	 *         {@link Subsumer}
 	 */
-	public S getExpression();
+	public IndexedClassExpression getExpression();
 
 }

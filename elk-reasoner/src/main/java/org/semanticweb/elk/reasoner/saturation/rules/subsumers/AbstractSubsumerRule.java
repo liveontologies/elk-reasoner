@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
+
 /*
  * #%L
  * ELK Reasoner
@@ -32,12 +33,12 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  * @author "Yevgeny Kazakov"
  * 
  */
-abstract class AbstractSubsumerRule<P extends IndexedClassExpression>
-		implements SubsumerRule<P> {
+abstract class AbstractSubsumerRule<S extends IndexedClassExpression>
+		implements SubsumerRule<S> {
 
 	@Override
-	public void accept(RuleVisitor visitor, P premise, ContextPremises premises,
-			ConclusionProducer producer) {
+	public void accept(RuleVisitor visitor, S premise,
+			ContextPremises premises, ConclusionProducer producer) {
 		accept((SubsumerRuleVisitor) visitor, premise, premises, producer);
 	}
 

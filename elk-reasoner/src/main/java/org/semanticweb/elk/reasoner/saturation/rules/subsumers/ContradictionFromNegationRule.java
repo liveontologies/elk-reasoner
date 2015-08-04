@@ -37,7 +37,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
  * A {@link ChainableSubsumerRule} producing {@link Contradiction} when
- * processing the negated {@link IndexedClassExpression} of an
+ * processing an {@link IndexedClassExpression} that is the negation of
  * {@link IndexedObjectComplementOf} that is contained in the {@code Context} .
  * 
  * @see IndexedObjectComplementOf#getNegated()

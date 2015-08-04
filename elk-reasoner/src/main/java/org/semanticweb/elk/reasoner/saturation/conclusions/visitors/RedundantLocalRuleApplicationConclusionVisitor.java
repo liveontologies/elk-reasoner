@@ -58,7 +58,7 @@ public class RedundantLocalRuleApplicationConclusionVisitor extends
 	}
 
 	@Override
-	public Boolean visit(ComposedSubsumer<?> conclusion,
+	public Boolean visit(ComposedSubsumer conclusion,
 			ContextPremises premises) {
 		// if subsumer was composed, it is not necessary to decompose it
 		applyDecompositionRules(conclusion, premises);

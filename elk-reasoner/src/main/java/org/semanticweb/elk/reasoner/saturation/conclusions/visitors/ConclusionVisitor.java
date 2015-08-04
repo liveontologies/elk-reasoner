@@ -49,13 +49,13 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLin
  */
 public interface ConclusionVisitor<I, O> extends SubConclusionVisitor<I, O> {
 
-	public O visit(ComposedSubsumer<?> conclusion, I input);
+	public O visit(ComposedSubsumer conclusion, I input);
 
 	public O visit(ContextInitialization conclusion, I input);
 
 	public O visit(Contradiction conclusion, I input);
 
-	public O visit(DecomposedSubsumer<?> conclusion, I input);
+	public O visit(DecomposedSubsumer conclusion, I input);
 
 	public O visit(DisjointSubsumer conclusion, I input);
 

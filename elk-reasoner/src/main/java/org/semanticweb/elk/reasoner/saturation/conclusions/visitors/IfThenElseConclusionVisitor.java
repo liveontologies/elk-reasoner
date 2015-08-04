@@ -87,7 +87,7 @@ public class IfThenElseConclusionVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(ComposedSubsumer<?> conclusion, I input) {
+	public O visit(ComposedSubsumer conclusion, I input) {
 		return check_.visit(conclusion, input) ? doTrue_.visit(conclusion,
 				input) : doFalse_.visit(conclusion, input);
 	}
@@ -105,7 +105,7 @@ public class IfThenElseConclusionVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(DecomposedSubsumer<?> conclusion, I input) {
+	public O visit(DecomposedSubsumer conclusion, I input) {
 		return check_.visit(conclusion, input) ? doTrue_.visit(conclusion,
 				input) : doFalse_.visit(conclusion, input);
 	}

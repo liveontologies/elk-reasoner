@@ -61,7 +61,6 @@ import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldSubProp
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
-import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
@@ -150,7 +149,7 @@ public class TracingTest {
 			
 			// axioms used as side conditions of this rule, should be able to look them up
 			@Override
-			public Boolean visit(SubClassOfSubsumer<?> inference, IndexedContextRoot root) {
+			public Boolean visit(SubClassOfSubsumer inference, IndexedContextRoot root) {
 				ElkAxiom axiom = new SideConditionLookup().lookup(inference);
 				
 				assertNotNull("Failed to look up the ontology axiom for the subsumption inference " + inference, axiom);

@@ -43,26 +43,24 @@ import org.slf4j.LoggerFactory;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class PropagationImpl extends AbstractConclusion implements Propagation {
+public class PropagationImpl extends AbstractSubConclusion implements
+		Propagation {
 
 	// logger for this class
 	static final Logger LOGGER_ = LoggerFactory
 			.getLogger(PropagationImpl.class);
 
-	private final IndexedObjectProperty relation_;
-
 	private final IndexedObjectSomeValuesFrom carry_;
 
 	public PropagationImpl(IndexedContextRoot root,
 			IndexedObjectProperty relation, IndexedObjectSomeValuesFrom carry) {
-		super(root);
-		relation_ = relation;
+		super(root, relation);
 		carry_ = carry;
 	}
 
 	@Override
 	public String toString() {
-		return "Propagation " + relation_ + "->" + carry_;
+		return "Propagation " + getConclusionSubRoot() + "->" + carry_;
 	}
 
 	@Override
@@ -76,13 +74,8 @@ public class PropagationImpl extends AbstractConclusion implements Propagation {
 	}
 
 	@Override
-	public IndexedObjectProperty getSubRoot() {
-		return relation_;
-	}
-
-	@Override
 	public IndexedObjectProperty getRelation() {
-		return this.relation_;
+		return getConclusionSubRoot();
 	}
 
 	@Override

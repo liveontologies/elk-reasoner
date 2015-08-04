@@ -27,25 +27,18 @@ import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 
 /**
  * An implementation of {@link SubContextInitialization}
  * 
  * @author "Yevgeny Kazakov"
  */
-public class SubContextInitializationImpl extends AbstractConclusion implements
-		SubContextInitialization {
-
-	/**
-	 * the sub-root of the {@link SubContext} that should be initialized
-	 */
-	private final IndexedObjectProperty subRoot_;
+public class SubContextInitializationImpl extends AbstractSubConclusion
+		implements SubContextInitialization {
 
 	public SubContextInitializationImpl(IndexedContextRoot root,
 			IndexedObjectProperty subRoot) {
-		super(root);
-		this.subRoot_ = subRoot;
+		super(root, subRoot);
 	}
 
 	@Override
@@ -59,13 +52,8 @@ public class SubContextInitializationImpl extends AbstractConclusion implements
 	}
 
 	@Override
-	public IndexedObjectProperty getSubRoot() {
-		return subRoot_;
-	}
-
-	@Override
 	public String toString() {
-		return "SubInit(" + subRoot_ + ")";
+		return "SubInit(" + getConclusionSubRoot() + ")";
 	}
 
 }

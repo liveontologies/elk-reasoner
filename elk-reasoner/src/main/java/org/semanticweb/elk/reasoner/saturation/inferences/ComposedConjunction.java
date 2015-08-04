@@ -56,12 +56,12 @@ public class ComposedConjunction extends
 		return getConclusionRoot();
 	}
 
-	public Subsumer<IndexedClassExpression> getFirstConjunct() {
+	public Subsumer getFirstConjunct() {
 		return new ComposedSubsumerImpl<IndexedClassExpression>(
 				getInferenceRoot(), getExpression().getFirstConjunct());
 	}
 
-	public Subsumer<IndexedClassExpression> getSecondConjunct() {
+	public Subsumer getSecondConjunct() {
 		return new ComposedSubsumerImpl<IndexedClassExpression>(
 				getInferenceRoot(), getExpression().getSecondConjunct());
 	}

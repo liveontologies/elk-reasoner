@@ -46,12 +46,12 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 public class ConclusionHashGenerator implements ConclusionVisitor<Void, Integer> {
 
 	@Override
-	public Integer visit(ComposedSubsumer<?> negSCE, Void context) {
+	public Integer visit(ComposedSubsumer negSCE, Void context) {
 		return negSCE.getExpression().hashCode();
 	}
 
 	@Override
-	public Integer visit(DecomposedSubsumer<?> posSCE, Void context) {
+	public Integer visit(DecomposedSubsumer posSCE, Void context) {
 		return posSCE.getExpression().hashCode();
 	}
 
@@ -76,7 +76,7 @@ public class ConclusionHashGenerator implements ConclusionVisitor<Void, Integer>
 
 	@Override
 	public Integer visit(SubContextInitialization subConclusion, Void input) {
-		return subConclusion.getSubRoot().hashCode();
+		return subConclusion.getConclusionSubRoot().hashCode();
 	}
 
 	@Override

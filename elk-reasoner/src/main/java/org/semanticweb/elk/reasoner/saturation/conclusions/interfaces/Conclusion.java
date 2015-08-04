@@ -49,10 +49,11 @@ public interface Conclusion {
 	/**
 	 * 
 	 * @return The {@link IndexedContextRoot} of the {@link Context} from which
-	 *         this {@link Conclusion} originate, that is, if to start deriving
-	 *         conclusions with this root, it will be derived; this value cannot
-	 *         be {@code null}. This value be different from
-	 *         {@link #getConclusionRoot()}
+	 *         this {@link Conclusion} originate. This value may be different
+	 *         from {@link #getConclusionRoot()} but cannot be {@code null}.
+	 *         Specifically, this {@link Conclusion} is guaranteed to be derived
+	 *         from {@link ContextInitialization} with the value
+	 *         {@link #getConclusionRoot()} equal to this value.
 	 */
 	public IndexedContextRoot getOriginRoot();
 

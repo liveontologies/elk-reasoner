@@ -69,7 +69,7 @@ public class PreprocessedConclusionVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(ComposedSubsumer<?> conclusion, I input) {
+	public O visit(ComposedSubsumer conclusion, I input) {
 		preprocessor_.visit(conclusion, input);
 		return visitor_.visit(conclusion, input);
 	}
@@ -87,7 +87,7 @@ public class PreprocessedConclusionVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(DecomposedSubsumer<?> conclusion, I input) {
+	public O visit(DecomposedSubsumer conclusion, I input) {
 		preprocessor_.visit(conclusion, input);
 		return visitor_.visit(conclusion, input);
 	}

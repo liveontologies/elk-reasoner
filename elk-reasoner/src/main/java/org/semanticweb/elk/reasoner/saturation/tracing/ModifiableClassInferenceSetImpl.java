@@ -58,9 +58,10 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromIncon
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromNegation;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromOwlNothing;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedConjunction;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedFirstConjunct;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedSecondConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjunctionComposition;
@@ -176,7 +177,7 @@ public class ModifiableClassInferenceSetImpl implements
 	}
 
 	private Iterable<? extends SubsumerInference<?>> getInferences(
-			Subsumer<?> conclusion) {
+			Subsumer conclusion) {
 		if (subsumerInferenceMap_ == null)
 			return Collections.emptyList();
 		return emptyIfNull(subsumerInferenceMap_
@@ -241,14 +242,14 @@ public class ModifiableClassInferenceSetImpl implements
 			ClassInferenceVisitor<ModifiableClassInferenceSetImpl, Void> {
 
 		@Override
-		public Void visit(InitializationSubsumer<?> inference,
+		public Void visit(InitializationSubsumer inference,
 				ModifiableClassInferenceSetImpl input) {
 			input.addInference(inference);
 			return null;
 		}
 
 		@Override
-		public Void visit(SubClassOfSubsumer<?> inference,
+		public Void visit(SubClassOfSubsumer inference,
 				ModifiableClassInferenceSetImpl input) {
 			input.addInference(inference);
 			return null;
@@ -262,7 +263,14 @@ public class ModifiableClassInferenceSetImpl implements
 		}
 
 		@Override
-		public Void visit(DecomposedConjunction inference,
+		public Void visit(DecomposedFirstConjunct inference,
+				ModifiableClassInferenceSetImpl input) {
+			input.addInference(inference);
+			return null;
+		}
+		
+		@Override
+		public Void visit(DecomposedSecondConjunct inference,
 				ModifiableClassInferenceSetImpl input) {
 			input.addInference(inference);
 			return null;
@@ -276,7 +284,7 @@ public class ModifiableClassInferenceSetImpl implements
 		}
 
 		@Override
-		public Void visit(ReflexiveSubsumer<?> inference,
+		public Void visit(ReflexiveSubsumer inference,
 				ModifiableClassInferenceSetImpl input) {
 			input.addInference(inference);
 			return null;
@@ -410,7 +418,7 @@ public class ModifiableClassInferenceSetImpl implements
 
 		@Override
 		public Iterable<? extends ClassInference> visit(
-				ComposedSubsumer<?> conclusion,
+				ComposedSubsumer conclusion,
 				ModifiableClassInferenceSetImpl input) {
 			return input.getInferences(conclusion);
 		}
@@ -431,7 +439,7 @@ public class ModifiableClassInferenceSetImpl implements
 
 		@Override
 		public Iterable<? extends ClassInference> visit(
-				DecomposedSubsumer<?> conclusion,
+				DecomposedSubsumer conclusion,
 				ModifiableClassInferenceSetImpl input) {
 			return input.getInferences(conclusion);
 		}

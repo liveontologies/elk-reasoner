@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusio
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  */
-public class BackwardLinkImpl extends AbstractConclusion implements
+public class BackwardLinkImpl extends AbstractSubConclusion implements
 		BackwardLink {
 
 	/**
@@ -43,16 +43,9 @@ public class BackwardLinkImpl extends AbstractConclusion implements
 	 */
 	private final IndexedContextRoot origin_;
 
-	/**
-	 * the {@link IndexedObjectProperty} in the existential restriction
-	 * corresponding to this link
-	 */
-	private final IndexedObjectProperty backwardRelation_;
-
 	public BackwardLinkImpl(IndexedContextRoot root,
 			IndexedObjectProperty relation, IndexedContextRoot source) {
-		super(root);
-		this.backwardRelation_ = relation;
+		super(root, relation);
 		this.origin_ = source;
 	}
 
@@ -62,18 +55,18 @@ public class BackwardLinkImpl extends AbstractConclusion implements
 	}
 
 	@Override
-	public IndexedObjectProperty getSubRoot() {
-		return backwardRelation_;
+	public IndexedObjectProperty getOriginSubRoot() {
+		return null;
 	}
 
 	@Override
 	public IndexedObjectProperty getBackwardRelation() {
-		return backwardRelation_;
+		return getConclusionSubRoot();
 	}
 
 	@Override
 	public String toString() {
-		return (backwardRelation_ + "<-" + origin_);
+		return (getBackwardRelation() + "<-" + origin_);
 	}
 
 	@Override

@@ -8,8 +8,13 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.Contradiction
 public abstract class AbstractContradictionInference extends ContradictionImpl
 		implements ContradictionInference {
 
-	protected AbstractContradictionInference(IndexedContextRoot root) {
-		super(root);
+	protected AbstractContradictionInference(IndexedContextRoot conclusionRoot) {
+		super(conclusionRoot);
+	}
+
+	@Override
+	public IndexedContextRoot getInferenceRoot() {
+		return getConclusionRoot();
 	}
 
 	@Override

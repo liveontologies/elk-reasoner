@@ -31,29 +31,28 @@ import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.SubsumerInferenceVisitor;
 
 /**
  * A {@link DecomposedSubsumer} obtained from a conjunct of an
- * {@link IndexedObjectIntersectionOf}.
+ * {@link IndexedObjectIntersectionOf} {@link Subsumer}.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class DecomposedConjunction extends
+public abstract class AbstractDecomposedConjunct extends
 		AbstractDecomposedSubsumerInference<IndexedClassExpression> {
 
 	private final IndexedObjectIntersectionOf conjunction_;
 
-	public DecomposedConjunction(IndexedContextRoot inferenceRoot,
-			IndexedObjectIntersectionOf conjunction,
-			IndexedClassExpression expression) {
-		super(inferenceRoot, expression);
-		conjunction_ = conjunction;
+	public AbstractDecomposedConjunct(IndexedContextRoot root,
+			IndexedObjectIntersectionOf premiseSubsumer,
+			IndexedClassExpression conclusionSubsumer) {
+		super(root, conclusionSubsumer);
+		conjunction_ = premiseSubsumer;
 	}
 
-	public Subsumer<IndexedObjectIntersectionOf> getConjunction() {
+	public Subsumer getPremise() {
 		return new DecomposedSubsumerImpl<IndexedObjectIntersectionOf>(
 				getInferenceRoot(), conjunction_);
 	}
@@ -66,11 +65,6 @@ public class DecomposedConjunction extends
 	@Override
 	public String toString() {
 		return super.toString() + " (conjunction-)";
-	}
-
-	@Override
-	public <I, O> O accept(SubsumerInferenceVisitor<I, O> visitor, I parameter) {
-		return visitor.visit(this, parameter);
 	}
 
 }

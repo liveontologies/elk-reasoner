@@ -44,9 +44,9 @@ abstract class AbstractContradictionFromSubsumerInference<S extends IndexedClass
 
 	private final S premiseSubsumer_;
 
-	AbstractContradictionFromSubsumerInference(
-			IndexedContextRoot inferenceRoot, S premiseSubsumer) {
-		super(inferenceRoot);
+	AbstractContradictionFromSubsumerInference(IndexedContextRoot root,
+			S premiseSubsumer) {
+		super(root);
 		this.premiseSubsumer_ = premiseSubsumer;
 	}
 
@@ -55,7 +55,7 @@ abstract class AbstractContradictionFromSubsumerInference<S extends IndexedClass
 		return getConclusionRoot();
 	}
 
-	public Subsumer<S> getPremise() {
+	public Subsumer getPremise() {
 		return new DecomposedSubsumerImpl<S>(getInferenceRoot(),
 				premiseSubsumer_);
 	}

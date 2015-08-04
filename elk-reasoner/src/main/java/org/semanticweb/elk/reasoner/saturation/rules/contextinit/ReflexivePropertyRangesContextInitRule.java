@@ -128,7 +128,7 @@ public class ReflexivePropertyRangesContextInitRule extends
 					.getRanges()) {
 				producer.produce(
 				// TODO: introduce a specific inference
-				new InitializationSubsumer<IndexedClassExpression>(premises
+				new InitializationSubsumer(premises
 						.getRoot(), range));
 			}
 		}

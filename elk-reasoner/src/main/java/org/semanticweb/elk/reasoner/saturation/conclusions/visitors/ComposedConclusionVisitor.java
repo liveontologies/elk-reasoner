@@ -80,7 +80,7 @@ public class ComposedConclusionVisitor<I> implements
 	}
 
 	@Override
-	public Boolean visit(ComposedSubsumer<?> conclusion, I input) {
+	public Boolean visit(ComposedSubsumer conclusion, I input) {
 		for (int i = 0; i < visitors_.length; i++) {
 			if (!visitors_[i].visit(conclusion, input))
 				return false;
@@ -107,7 +107,7 @@ public class ComposedConclusionVisitor<I> implements
 	}
 
 	@Override
-	public Boolean visit(DecomposedSubsumer<?> conclusion, I input) {
+	public Boolean visit(DecomposedSubsumer conclusion, I input) {
 		for (int i = 0; i < visitors_.length; i++) {
 			if (!visitors_[i].visit(conclusion, input))
 				return false;

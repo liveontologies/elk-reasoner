@@ -85,7 +85,7 @@ public class TracingTestUtils {
 
 		@Override
 		public void notifyUntraced(Conclusion conclusion) {
-			fail("Conclusion " + conclusion + " was not traced");
+			fail(conclusion.getConclusionRoot() + ": " + conclusion + ": conclusion was not traced");
 		}
 
 		@Override

@@ -40,13 +40,15 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.SubsumerInfer
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ReflexiveSubsumer<S extends IndexedObjectSomeValuesFrom> extends
-		AbstractComposedSubsumerInference<S> implements SubsumerInference<S> {
+public class ReflexiveSubsumer extends
+		AbstractComposedSubsumerInference<IndexedObjectSomeValuesFrom>
+		implements SubsumerInference<IndexedObjectSomeValuesFrom> {
 
 	/**
 	 * @param superClassExpression
 	 */
-	public ReflexiveSubsumer(IndexedContextRoot inferenceRoot, S existential) {
+	public ReflexiveSubsumer(IndexedContextRoot inferenceRoot,
+			IndexedObjectSomeValuesFrom existential) {
 		super(inferenceRoot, existential);
 	}
 

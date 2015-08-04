@@ -104,7 +104,7 @@ public class OwlThingContextInitRule extends AbstractChainableContextInitRule {
 			ConclusionProducer producer) {
 		// producer.produce(premises.getRoot(), new
 		// DecomposedSubsumer(owlThing_));
-		producer.produce(new InitializationSubsumer<IndexedClassExpression>(
+		producer.produce(new InitializationSubsumer(
 				premises.getRoot(), owlThing_));
 	}
 

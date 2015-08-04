@@ -60,7 +60,7 @@ public class GeneratedPropagation extends AbstractPropagationInference
 		return getConclusionRoot();
 	}
 
-	public Subsumer<?> getPremise() {
+	public Subsumer getPremise() {
 		return new DecomposedSubsumerImpl<IndexedClassExpression>(
 				getInferenceRoot(), getCarry().getFiller());
 	}

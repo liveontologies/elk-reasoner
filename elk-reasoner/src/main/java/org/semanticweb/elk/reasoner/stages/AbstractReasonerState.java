@@ -568,10 +568,10 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 *---------------------------------------------------*/
 
 	private void toTrace(Conclusion conclusion) {
-		if (traceState.getInferencesForOrigin(conclusion.getOriginRoot()) != null)
-			// already traced
-			return;
-		// else
+//		if (traceState.getInferencesForOrigin(conclusion.getOriginRoot()) != null)
+//			// already traced
+//			return;
+//		// else
 		stageManager.inferenceTracingStage.invalidate();
 		traceState.addToTrace(conclusion);
 	}

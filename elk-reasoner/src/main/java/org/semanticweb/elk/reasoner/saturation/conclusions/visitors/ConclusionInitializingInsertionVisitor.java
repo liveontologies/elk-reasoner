@@ -71,7 +71,7 @@ public class ConclusionInitializingInsertionVisitor extends
 			producer_.produce(contextInitConclusion);
 		if (conclusion instanceof SubConclusion) {
 			IndexedObjectProperty subRoot = ((SubConclusion) conclusion)
-					.getSubRoot();
+					.getConclusionSubRoot();
 			SubConclusion subContextInit = new SubContextInitializationImpl(
 					root, subRoot);
 			if (!context.containsConclusion(subContextInit))
