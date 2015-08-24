@@ -45,8 +45,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.Contradict
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.BackwardLinkFromForwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
-import org.semanticweb.elk.reasoner.saturation.rules.propagations.NonReflexivePropagationRule;
-import org.semanticweb.elk.reasoner.saturation.rules.propagations.ReflexivePropagationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.propagations.SubsumerPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
@@ -62,190 +61,181 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSub
 
 /**
  * A skeleton for implementation of {@link RuleVisitor}s using a common
- * (default) methods
+ * (default) method
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <O>
+ *            the type of output parameter with which this visitor works
  */
-public abstract class AbstractRuleVisitor implements RuleVisitor {
+public abstract class AbstractRuleVisitor<O> implements RuleVisitor<O> {
 
-	abstract <P> void defaultVisit(Rule<P> rule, P premise,
+	abstract <P> O defaultVisit(Rule<P> rule, P premise,
 			ContextPremises premises, ConclusionProducer producer);
 
 	@Override
-	public void visit(BackwardLinkChainFromBackwardLinkRule rule,
+	public O visit(BackwardLinkChainFromBackwardLinkRule rule,
 			BackwardLink premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
+		return defaultVisit(rule, premise, premises, producer);
 	}
 
 	@Override
-	public void visit(BackwardLinkFromForwardLinkRule rule,
-			ForwardLink premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
-	}
-
-	@Override
-	public void visit(ContradictionCompositionRule rule,
-			DisjointSubsumer premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
-
-	}
-
-	@Override
-	public void visit(ContradictionFromDisjointnessRule rule,
-			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
-	}
-
-	@Override
-	public void visit(ContradictionFromNegationRule rule,
-			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
-	}
-
-	@Override
-	public void visit(ContradictionFromOwlNothingRule rule,
-			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
-	}
-
-	@Override
-	public void visit(ContradictionOverBackwardLinkRule rule,
-			BackwardLink premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
-	}
-
-	@Override
-	public void visit(ContradictionPropagationRule rule, Contradiction premise,
+	public O visit(BackwardLinkFromForwardLinkRule rule, ForwardLink premise,
 			ContextPremises premises, ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(ContradictionCompositionRule rule, DisjointSubsumer premise,
+			ContextPremises premises, ConclusionProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
 
 	}
 
 	@Override
-	public void visit(DisjointSubsumerFromMemberRule rule,
+	public O visit(ContradictionFromDisjointnessRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
+		return defaultVisit(rule, premise, premises, producer);
 	}
 
 	@Override
-	public void visit(IndexedObjectComplementOfDecomposition rule,
+	public O visit(ContradictionFromNegationRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(ContradictionFromOwlNothingRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(ContradictionOverBackwardLinkRule rule,
+			BackwardLink premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(ContradictionPropagationRule rule, Contradiction premise,
+			ContextPremises premises, ConclusionProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+
+	}
+
+	@Override
+	public O visit(DisjointSubsumerFromMemberRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(IndexedObjectComplementOfDecomposition rule,
 			IndexedObjectComplementOf premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
+		return defaultVisit(rule, premise, premises, producer);
 	}
 
 	@Override
-	public void visit(IndexedObjectIntersectionOfDecomposition rule,
+	public O visit(IndexedObjectIntersectionOfDecomposition rule,
 			IndexedObjectIntersectionOf premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
+		return defaultVisit(rule, premise, premises, producer);
 	}
 
 	@Override
-	public void visit(IndexedObjectSomeValuesFromDecomposition rule,
+	public O visit(IndexedObjectSomeValuesFromDecomposition rule,
 			IndexedObjectSomeValuesFrom premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
+		return defaultVisit(rule, premise, premises, producer);
 	}
 
 	@Override
-	public void visit(NonReflexiveBackwardLinkCompositionRule rule,
+	public O visit(NonReflexiveBackwardLinkCompositionRule rule,
 			ForwardLink premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
+		return defaultVisit(rule, premise, premises, producer);
 	}
 
 	@Override
-	public void visit(NonReflexivePropagationRule rule, Propagation premise,
+	public O visit(ObjectIntersectionFromConjunctRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(ObjectUnionFromDisjunctRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(OwlThingContextInitRule rule, ContextInitialization premise,
 			ContextPremises premises, ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
-
+		return defaultVisit(rule, premise, premises, producer);
 	}
 
 	@Override
-	public void visit(ObjectIntersectionFromConjunctRule rule,
+	public O visit(PropagationFromExistentialFillerRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
+		return defaultVisit(rule, premise, premises, producer);
 	}
 
 	@Override
-	public void visit(ObjectUnionFromDisjunctRule rule,
-			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
-	}
-
-	@Override
-	public void visit(OwlThingContextInitRule rule,
-			ContextInitialization premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
-	}
-
-	@Override
-	public void visit(PropagationFromExistentialFillerRule rule,
-			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
-	}
-
-	@Override
-	public void visit(PropagationInitializationRule rule,
+	public O visit(PropagationInitializationRule rule,
 			SubContextInitialization premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
+		return defaultVisit(rule, premise, premises, producer);
 	}
 
 	@Override
-	public void visit(ReflexiveBackwardLinkCompositionRule rule,
+	public O visit(ReflexiveBackwardLinkCompositionRule rule,
 			ForwardLink premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
+		return defaultVisit(rule, premise, premises, producer);
 
 	}
 
 	@Override
-	public void visit(ReflexivePropagationRule rule, Propagation premise,
-			ContextPremises premises, ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
-
-	}
-
-	@Override
-	public void visit(ReflexivePropertyRangesContextInitRule rule,
+	public O visit(ReflexivePropertyRangesContextInitRule rule,
 			ContextInitialization premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
+		return defaultVisit(rule, premise, premises, producer);
 	}
 
 	@Override
-	public void visit(RootContextInitializationRule rule,
+	public O visit(RootContextInitializationRule rule,
 			ContextInitialization premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
+		return defaultVisit(rule, premise, premises, producer);
 	}
 
 	@Override
-	public void visit(SubsumerBackwardLinkRule rule, BackwardLink premise,
+	public O visit(SubsumerBackwardLinkRule rule, BackwardLink premise,
 			ContextPremises premises, ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
+		return defaultVisit(rule, premise, premises, producer);
 	}
 
 	@Override
-	public void visit(SuperClassFromSubClassRule rule,
+	public O visit(SubsumerPropagationRule rule, Propagation premise,
+			ContextPremises premises, ConclusionProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(SuperClassFromSubClassRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		defaultVisit(rule, premise, premises, producer);
+		return defaultVisit(rule, premise, premises, producer);
 	}
 
 }

@@ -40,7 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConc
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionOccurrenceCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.HybridLocalRuleApplicationConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalRuleApplicationConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalizedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
@@ -87,7 +87,7 @@ public class ContextTracingRuleApplicationFactory extends
 	@Override
 	@SuppressWarnings("unchecked")
 	protected ConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
-			RuleVisitor ruleVisitor,
+			RuleVisitor<?> ruleVisitor,
 			// this writer will block cyclic inferences
 			SaturationStateWriter<? extends ExtendedContext> localWriter,
 			SaturationStatistics localStatistics) {
@@ -101,12 +101,11 @@ public class ContextTracingRuleApplicationFactory extends
 				// if the conclusion was indeed derived, save its inference
 				new InferenceProducingVisitor(),
 				// insert the conclusion into the local context copies
-				// new ConclusionInitializingInsertionVisitor(localWriter),
 				new ConclusionInsertionVisitor(localWriter),
 				// if the conclusion is new, apply local (non-redundant +
-				// redundnat) rules and produce conclusions to the active
+				// redundant) rules and produce conclusions to the active
 				// (local) saturation state
-				new HybridLocalRuleApplicationConclusionVisitor(
+				new LocalRuleApplicationConclusionVisitor(
 						mainSaturationState_, ruleVisitor, ruleVisitor,
 						localWriter, localWriter));
 	}

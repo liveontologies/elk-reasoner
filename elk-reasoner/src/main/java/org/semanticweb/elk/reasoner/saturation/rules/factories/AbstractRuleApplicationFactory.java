@@ -130,7 +130,7 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 	 * @return
 	 */
 	protected abstract ConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
-			RuleVisitor ruleVisitor, SaturationStateWriter<? extends C> writer,
+			RuleVisitor<?> ruleVisitor, SaturationStateWriter<? extends C> writer,
 			SaturationStatistics localStatistics);
 
 	@Override
@@ -152,7 +152,7 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 		writer = SaturationUtils.<C> getStatsAwareWriter(optimizedWriter,
 				localStatistics);
 		writer = getFinalWriter(writer);
-		RuleVisitor ruleVisitor = SaturationUtils
+		RuleVisitor<?> ruleVisitor = SaturationUtils
 				.getStatsAwareRuleVisitor(localStatistics.getRuleStatistics());
 		return getEngine(
 				getConclusionProcessor(ruleVisitor, writer, localStatistics),

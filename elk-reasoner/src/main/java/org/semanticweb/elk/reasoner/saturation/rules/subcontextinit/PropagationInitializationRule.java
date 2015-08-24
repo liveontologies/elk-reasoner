@@ -52,17 +52,22 @@ public class PropagationInitializationRule extends AbstractSubContextInitRule {
 	}
 
 	@Override
-	public void accept(SubContextInitRuleVisitor visitor,
-			SubContextInitialization premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		visitor.visit(this, premise, premises, producer);
-	}
-
-	@Override
 	public void apply(SubContextInitialization premise,
 			ContextPremises premises, ConclusionProducer producer) {
 		IndexedObjectSomeValuesFrom.Helper.generatePropagations(
 				premise.getConclusionSubRoot(), premises, producer);
+	}
+
+	@Override
+	public boolean isLocal() {
+		return true;
+	}
+
+	@Override
+	public void accept(SubContextInitRuleVisitor<?> visitor,
+			SubContextInitialization premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		visitor.visit(this, premise, premises, producer);
 	}
 
 }

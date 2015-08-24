@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
+
 /*
  * #%L
  * ELK Reasoner
@@ -32,9 +33,10 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
  */
 public interface RuleApplicationVisitorFactory {
 
-	public AbstractRuleApplicationConclusionVisitor create(RuleVisitor ruleVisitor, ConclusionProducer producer);
+	public AbstractRuleApplicationConclusionVisitor create(
+			RuleVisitor<?> ruleVisitor, ConclusionProducer producer);
 }

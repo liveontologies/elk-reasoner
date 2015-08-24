@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 
 /**
  * A {@link Conclusion} that can be used in inferences that are assigned with a
@@ -47,11 +47,12 @@ public interface SubConclusion extends Conclusion {
 
 	/**
 	 * 
-	 * @return The {@link IndexedObjectProperty} of the {@link Context} from
-	 *         which this {@link SubConclusion} originate. This value may be
-	 *         different from {@link #getConclusionSubRoot()} and can be
-	 *         {@code null}. Specifically, if this value is not {@code null}
-	 *         then this {@link SubConclusion} is guaranteed to be derived from
+	 * @return The {@link IndexedObjectProperty} identifying the
+	 *         {@link SubContext} from which this {@link SubConclusion}
+	 *         originate. This value may be different from
+	 *         {@link #getConclusionSubRoot()} and can be {@code null}.
+	 *         Specifically, if this value is not {@code null} then this
+	 *         {@link SubConclusion} is guaranteed to be derived from
 	 *         {@link SubContextInitialization} with the values
 	 *         {@link #getConclusionRoot()} and {@link #getConclusionSubRoot()}
 	 *         equal respectively to this {@link #getOriginRoot()} and

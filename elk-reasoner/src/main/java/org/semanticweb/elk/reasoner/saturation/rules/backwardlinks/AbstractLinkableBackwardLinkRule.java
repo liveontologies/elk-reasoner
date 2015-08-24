@@ -43,15 +43,17 @@ abstract class AbstractLinkableBackwardLinkRule extends
 	}
 
 	@Override
-	public void accept(RuleVisitor visitor, BackwardLink premise,
+	public void accept(RuleVisitor<?> visitor, BackwardLink premise,
 			ContextPremises premises, ConclusionProducer producer) {
-		accept((BackwardLinkRuleVisitor) visitor, premise, premises, producer);
+		accept((BackwardLinkRuleVisitor<?>) visitor, premise, premises,
+				producer);
 	}
 
 	@Override
-	public void accept(BackwardLinkRuleVisitor visitor, BackwardLink premise,
-			ContextPremises premises, ConclusionProducer producer) {
-		accept((LinkedBackwardLinkRuleVisitor) visitor, premise, premises,
+	public void accept(BackwardLinkRuleVisitor<?> visitor,
+			BackwardLink premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		accept((LinkedBackwardLinkRuleVisitor<?>) visitor, premise, premises,
 				producer);
 	}
 

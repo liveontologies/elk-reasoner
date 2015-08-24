@@ -38,7 +38,7 @@ import org.semanticweb.elk.util.collections.chains.Link;
 public interface LinkedContextInitRule extends ContextInitRule,
 		Link<LinkedContextInitRule> {
 
-	public void accept(LinkedContextInitRuleVisitor visitor,
+	public void accept(LinkedContextInitRuleVisitor<?> visitor,
 			ContextInitialization premise, ContextPremises premises,
 			ConclusionProducer producer);
 

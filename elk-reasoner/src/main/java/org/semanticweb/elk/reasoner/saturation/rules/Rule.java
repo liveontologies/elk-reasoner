@@ -1,8 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
 
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 
 /*
@@ -28,10 +27,11 @@ import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
  */
 
 /**
- * A rule that can be applied to a given {@link Conclusion} together with other
+ * A rule that can be applied to a given premise (either a {@link Conclusion} or
+ * an object representing a {@link Conclusion}) together with other
  * {@link Conclusion}s stored in within {@link ContextPremises}. The rule
- * produces other {@link Conclusion}s using the given
- * {@link SaturationStateWriter}.
+ * produces other {@link Conclusion}s using the given {@link ConclusionProducer}
+ * .
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -46,15 +46,17 @@ public interface Rule<P> {
 	public String getName();
 
 	/**
-	 * Applying the rule to the given premise within the given {@link Context}
-	 * and producing {@link Conclusion}s using the given
-	 * {@link SaturationStateWriter}
+	 * Apply the rule to the given premise representing a {@link Conclusion} and
+	 * other {@link Conclusion}s stored in within the given
+	 * {@link ContextPremises} and produce {@link Conclusion}s using the given
+	 * {@link ConclusionProducer}
 	 * 
 	 * @param premise
-	 *            the element to which the rule is applied
+	 *            the element to which the rule is applied, it represents a
+	 *            {@link Conclusion}
 	 * @param premises
-	 *            the {@link Context} from which other matching premises of the
-	 *            rule are taken
+	 *            the {@link ContextPremises} from which other matching premises
+	 *            of the rule are taken
 	 * @param producer
 	 *            the {@link ConclusionProducer} using which {@link Conclusion}s
 	 *            of the inferences are produced
@@ -63,7 +65,27 @@ public interface Rule<P> {
 	public void apply(P premise, ContextPremises premises,
 			ConclusionProducer producer);
 
-	public void accept(RuleVisitor visitor, P premise,
+	/**
+	 * @return {@code true} if this {@link Rule} produces only
+	 *         {@link Conclusion}s with the same origin root and sub-root as the
+	 *         {@link Conclusion} (or its representation) to which the rule is
+	 *         applied. Specifically, if applied for a {@link Conclusion} the
+	 *         rule can produce only {@link Conclusion}s with the same value of
+	 *         {@link Conclusion#getOriginRoot()}. Additionally, if applied to a
+	 *         {@link SubConclusion} the rule can produce only
+	 *         {@link SubConclusion} with the same values of
+	 *         {@link SubConclusion#getOriginSubRoot()} or a {@link Conclusion}
+	 *         if this value is {@code null}. Returns {@code false} if this
+	 *         {@link Rule} produces only {@link Conclusion}s with the different
+	 *         origin root or sub-root as the {@link Conclusion} (or its
+	 *         representation) to which the rule is applied.
+	 * 
+	 * @see Conclusion#getOriginRoot()
+	 * @see SubConclusion#getConclusionRoot()
+	 */
+	public boolean isLocal();
+
+	public void accept(RuleVisitor<?> visitor, P premise,
 			ContextPremises premises, ConclusionProducer producer);
 
 }

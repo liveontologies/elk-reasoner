@@ -22,34 +22,37 @@ package org.semanticweb.elk.reasoner.saturation.rules.propagations;
  * #L%
  */
 
-import java.util.Set;
+import java.util.Map;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
+import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 
 /**
- * A {@link PropagationRule} producing {@link Subsumer}s in the {@link Context}s
- * in which the rule applies propagated over reflexive backward links stored in
- * this {@link Context}
+ * A {@link PropagationRule} producing {@link Subsumer}s in the source
+ * {@link Context}s of relevant non-reflexive {@link BackwardLink}s stored in
+ * the {@link ContextPremises} with which this rule applies.
  * 
- * @see Context#getLocalReflexiveObjectProperties()
- * @see NonReflexivePropagationRule
+ * @see Context#getBackwardLinksByObjectProperty()
+ * @see ReflexivePropagationRule
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ReflexivePropagationRule extends AbstractPropagationRule {
+public class SubsumerPropagationRule extends AbstractPropagationRule {
 
-	public static final String NAME = "Reflexive Propagation";
+	public static final String NAME = "Propagation";
 
-	private static final ReflexivePropagationRule INSTANCE_ = new ReflexivePropagationRule();
+	private static final SubsumerPropagationRule INSTANCE_ = new SubsumerPropagationRule();
 
-	public static final ReflexivePropagationRule getInstance() {
+	public static final SubsumerPropagationRule getInstance() {
 		return INSTANCE_;
 	}
 
@@ -61,17 +64,25 @@ public class ReflexivePropagationRule extends AbstractPropagationRule {
 	@Override
 	public void apply(Propagation premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		final Set<IndexedObjectProperty> reflexive = premises
-				.getLocalReflexiveObjectProperties();
-		if (reflexive.contains(premise.getRelation())) {
-			// producer.produce(premises.getRoot(), new
-			// ComposedSubsumer(premise.getCarry()));
+		final Map<IndexedObjectProperty, ? extends SubContextPremises> subContextMap = premises
+				.getSubContextPremisesByObjectProperty();
+		IndexedObjectProperty subRoot = premise.getConclusionSubRoot();
+		SubContextPremises targets = subContextMap.get(subRoot);
+		for (IndexedContextRoot target : targets.getLinkedRoots()) {
+			producer.produce(new PropagatedSubsumer(premise, target));
+		}
+		if (premises.getLocalReflexiveObjectProperties().contains(subRoot)) {
 			producer.produce(new PropagatedSubsumer(premise, premises.getRoot()));
 		}
 	}
 
 	@Override
-	public void accept(PropagationRuleVisitor visitor, Propagation premise,
+	public boolean isLocal() {
+		return false;
+	}
+
+	@Override
+	public void accept(PropagationRuleVisitor<?> visitor, Propagation premise,
 			ContextPremises premises, ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}

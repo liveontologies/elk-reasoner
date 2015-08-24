@@ -31,17 +31,18 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <O>
+ *            the type of output parameter with which this visitor works
  */
-public interface ForwardLinkRuleVisitor {
+public interface ForwardLinkRuleVisitor<O> {
 
-	void visit(BackwardLinkFromForwardLinkRule rule, ForwardLink premise,
+	O visit(BackwardLinkFromForwardLinkRule rule, ForwardLink premise,
 			ContextPremises premises, ConclusionProducer producer);
 
-	void visit(ReflexiveBackwardLinkCompositionRule rule, ForwardLink premise,
+	O visit(ReflexiveBackwardLinkCompositionRule rule, ForwardLink premise,
 			ContextPremises premises, ConclusionProducer producer);
 
-	void visit(NonReflexiveBackwardLinkCompositionRule rule,
-			ForwardLink premise, ContextPremises premises,
-			ConclusionProducer producer);
+	O visit(NonReflexiveBackwardLinkCompositionRule rule, ForwardLink premise,
+			ContextPremises premises, ConclusionProducer producer);
 
 }

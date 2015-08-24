@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.Rule;
  */
 public interface ContextInitRule extends Rule<ContextInitialization> {
 
-	public void accept(ContextInitRuleVisitor visitor,
+	public void accept(ContextInitRuleVisitor<?> visitor,
 			ContextInitialization premise, ContextPremises premises,
 			ConclusionProducer producer);
 

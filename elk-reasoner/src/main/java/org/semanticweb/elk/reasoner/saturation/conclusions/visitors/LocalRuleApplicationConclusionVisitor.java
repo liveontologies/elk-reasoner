@@ -29,7 +29,9 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.HybridContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitors;
 
 /**
  * A {@link ConclusionVisitor} that applies local rules (rules producing only
@@ -47,12 +49,11 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @see Conclusion#getOriginRoot()
- * @see SubConclusion#getOriginSubRoot()
- * @see NonRedundantLocalRuleApplicationConclusionVisitor
- * @see RedundantLocalRuleApplicationConclusionVisitor
+ * @see Rule#isLocal()
+ * @see NonRedundantRuleApplicationConclusionVisitor
+ * @see RedundantRuleApplicationConclusionVisitor
  */
-public class HybridLocalRuleApplicationConclusionVisitor extends
+public class LocalRuleApplicationConclusionVisitor extends
 		AbstractConclusionVisitor<Context, Boolean> {
 
 	/**
@@ -70,16 +71,17 @@ public class HybridLocalRuleApplicationConclusionVisitor extends
 	 */
 	private final SaturationState<?> mainState_;
 
-	public HybridLocalRuleApplicationConclusionVisitor(
-			SaturationState<?> mainState, RuleVisitor nonRedundantRuleVisitor,
-			RuleVisitor redundantRuleVisitor,
+	public LocalRuleApplicationConclusionVisitor(SaturationState<?> mainState,
+			RuleVisitor<?> nonRedundantRuleVisitor,
+			RuleVisitor<?> redundantRuleVisitor,
 			ConclusionProducer nonRedundantProducer,
 			ConclusionProducer redundantProducer) {
 		this.mainState_ = mainState;
-		this.nonRedundantLocalRuleApplicator_ = new NonRedundantLocalRuleApplicationConclusionVisitor(
-				nonRedundantRuleVisitor, nonRedundantProducer);
-		this.redundantLocalRuleApplicator_ = new RedundantLocalRuleApplicationConclusionVisitor(
-				redundantRuleVisitor, redundantProducer);
+		this.nonRedundantLocalRuleApplicator_ = new NonRedundantRuleApplicationConclusionVisitor(
+				RuleVisitors.localize(nonRedundantRuleVisitor),
+				nonRedundantProducer);
+		this.redundantLocalRuleApplicator_ = new RedundantRuleApplicationConclusionVisitor(
+				RuleVisitors.localize(redundantRuleVisitor), redundantProducer);
 	}
 
 	@Override
@@ -90,14 +92,23 @@ public class HybridLocalRuleApplicationConclusionVisitor extends
 		return true;
 	}
 
+	/**
+	 * @param conclusion
+	 * @param input
+	 * @return the {@link ContextPremises} that should be used in rules with the
+	 *         given {@link Conclusion}. That effectively comprises of all local
+	 *         premises (premises with the same origin root and sub-root as the
+	 *         given {@link Conclusion}) of the local saturation state and
+	 *         non-local premises of the main saturation state.
+	 */
 	private ContextPremises getPremises(Conclusion conclusion, Context input) {
 		ContextPremises mainPremises = mainState_.getContext(input.getRoot());
 		if (conclusion instanceof SubConclusion) {
-			// there are currently no rules which can use other context premises
-			// with the same source, so we can just take all main premises
+			// this conclusion is not local for the context; it can be used
+			// in rules only with conclusions that are local for the context
 			return mainPremises;
 		}
-		// else
+		// else conclusion must be local for the context
 		return new HybridContextPremises(input, mainPremises);
 	}
 }

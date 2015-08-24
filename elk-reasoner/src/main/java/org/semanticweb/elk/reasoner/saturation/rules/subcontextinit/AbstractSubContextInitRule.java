@@ -35,9 +35,11 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 abstract class AbstractSubContextInitRule implements SubContextInitRule {
 
 	@Override
-	public void accept(RuleVisitor visitor, SubContextInitialization premise,
-			ContextPremises premises, ConclusionProducer producer) {
-		accept((SubContextInitRuleVisitor) visitor, premise, premises, producer);
+	public void accept(RuleVisitor<?> visitor,
+			SubContextInitialization premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		accept((SubContextInitRuleVisitor<?>) visitor, premise, premises,
+				producer);
 	}
 
 }

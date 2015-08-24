@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.propagations;
+
 /*
  * #%L
  * ELK Reasoner
@@ -31,13 +32,12 @@ import org.semanticweb.elk.reasoner.saturation.rules.contradiction.Contradiction
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <O>
+ *            the type of output parameter with which this visitor works
  */
-public interface PropagationRuleVisitor {
+public interface PropagationRuleVisitor<O> {
 
-	void visit(ReflexivePropagationRule rule, Propagation premise,
-			ContextPremises premises, ConclusionProducer producer);
-
-	void visit(NonReflexivePropagationRule rule, Propagation premise,
+	O visit(SubsumerPropagationRule rule, Propagation premise,
 			ContextPremises premises, ConclusionProducer producer);
 
 }

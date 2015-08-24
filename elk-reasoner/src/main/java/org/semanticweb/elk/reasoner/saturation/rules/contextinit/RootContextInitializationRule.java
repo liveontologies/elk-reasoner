@@ -40,7 +40,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
  * A {@link ChainableContextInitRule} that produces a {@link Subsumer} for the
- * root of the given {@link Context}
+ * root of the given {@link Context}.
  * 
  * @see Context#getRoot()
  * 
@@ -121,6 +121,11 @@ public class RootContextInitializationRule extends
 	}
 
 	@Override
+	public boolean isLocal() {
+		return true;
+	}
+
+	@Override
 	public boolean addTo(Chain<ChainableContextInitRule> ruleChain) {
 		RootContextInitializationRule rule = ruleChain.find(MATCHER_);
 		if (rule == null) {
@@ -135,7 +140,7 @@ public class RootContextInitializationRule extends
 	}
 
 	@Override
-	public void accept(LinkedContextInitRuleVisitor visitor,
+	public void accept(LinkedContextInitRuleVisitor<?> visitor,
 			ContextInitialization premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);

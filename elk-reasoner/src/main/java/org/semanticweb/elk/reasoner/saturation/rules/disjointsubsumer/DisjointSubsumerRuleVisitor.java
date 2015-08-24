@@ -32,10 +32,12 @@ import org.semanticweb.elk.reasoner.saturation.rules.contradiction.Contradiction
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <O>
+ *            the type of output parameter with which this visitor works
  */
-public interface DisjointSubsumerRuleVisitor {
+public interface DisjointSubsumerRuleVisitor<O> {
 
-	void visit(ContradictionCompositionRule rule, DisjointSubsumer premise,
+	O visit(ContradictionCompositionRule rule, DisjointSubsumer premise,
 			ContextPremises premises, ConclusionProducer producer);
 
 }

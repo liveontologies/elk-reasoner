@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionOccurrenceCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.HybridLocalRuleApplicationConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalRuleApplicationConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalizedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.CombinedConclusionProducer;
@@ -81,7 +81,7 @@ public class RuleApplicationAdditionPruningFactory extends
 	@Override
 	@SuppressWarnings("unchecked")
 	protected ConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
-			RuleVisitor ruleVisitor,
+			RuleVisitor<?> ruleVisitor,
 			SaturationStateWriter<? extends ExtendedContext> localWriter,
 			SaturationStatistics localStatistics) {
 		return SaturationUtils
@@ -102,7 +102,7 @@ public class RuleApplicationAdditionPruningFactory extends
 						SaturationUtils
 								.getUsedConclusionCountingVisitor(localStatistics),
 						// and apply rules locally
-						new HybridLocalRuleApplicationConclusionVisitor(
+						new LocalRuleApplicationConclusionVisitor(
 								mainSaturationState_, ruleVisitor, ruleVisitor,
 								// the conclusions of non-redundant rules are
 								// produced within both main and tracing
@@ -112,7 +112,7 @@ public class RuleApplicationAdditionPruningFactory extends
 												.getContextCreatingWriter(),
 										localWriter),
 								// whereas the conclusion of redundant rules are
-								// needed only for tracking
+								// needed only for tracing
 								localWriter)
 
 				);

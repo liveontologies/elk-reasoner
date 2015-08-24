@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.backwardlinks;
+
 /*
  * #%L
  * ELK Reasoner
@@ -37,7 +38,8 @@ import org.semanticweb.elk.util.collections.chains.Link;
 public interface LinkedBackwardLinkRule extends BackwardLinkRule,
 		Link<LinkedBackwardLinkRule> {
 
-	public void accept(LinkedBackwardLinkRuleVisitor visitor,
-			BackwardLink premise, ContextPremises premises, ConclusionProducer producer);
+	public void accept(LinkedBackwardLinkRuleVisitor<?> visitor,
+			BackwardLink premise, ContextPremises premises,
+			ConclusionProducer producer);
 
 }

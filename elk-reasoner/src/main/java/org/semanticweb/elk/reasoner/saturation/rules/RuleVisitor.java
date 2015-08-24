@@ -43,12 +43,15 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SubsumerRuleVisit
  *         pavel.klinov@uni-ulm.de
  * 
  * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the type of output parameter with which this visitor works
  */
-public interface RuleVisitor extends SubsumerRuleVisitor,
-		BackwardLinkRuleVisitor, ContextInitRuleVisitor,
-		SubContextInitRuleVisitor, ContradictionRuleVisitor,
-		DisjointSubsumerRuleVisitor, ForwardLinkRuleVisitor,
-		PropagationRuleVisitor {
+public interface RuleVisitor<O> extends SubsumerRuleVisitor<O>,
+		BackwardLinkRuleVisitor<O>, ContextInitRuleVisitor<O>,
+		SubContextInitRuleVisitor<O>, ContradictionRuleVisitor<O>,
+		DisjointSubsumerRuleVisitor<O>, ForwardLinkRuleVisitor<O>,
+		PropagationRuleVisitor<O> {
 
 	// nothing else
 }

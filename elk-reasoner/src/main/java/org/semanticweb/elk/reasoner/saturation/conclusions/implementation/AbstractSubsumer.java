@@ -66,7 +66,7 @@ public abstract class AbstractSubsumer<S extends IndexedClassExpression>
 		return "Subsumer(" + expression_.toString() + ")";
 	}
 
-	void applyCompositionRules(RuleVisitor ruleAppVisitor,
+	void applyCompositionRules(RuleVisitor<?> ruleAppVisitor,
 			ContextPremises premises, ConclusionProducer producer) {
 		LinkedSubsumerRule compositionRule = expression_
 				.getCompositionRuleHead();
@@ -77,7 +77,7 @@ public abstract class AbstractSubsumer<S extends IndexedClassExpression>
 		}
 	}
 
-	void applyDecompositionRules(RuleVisitor ruleAppVisitor,
+	void applyDecompositionRules(RuleVisitor<?> ruleAppVisitor,
 			ContextPremises premises, ConclusionProducer producer) {
 		expression_.accept(new SubsumerDecompositionVisitor(ruleAppVisitor,
 				premises, producer));

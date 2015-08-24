@@ -104,8 +104,13 @@ public class OwlThingContextInitRule extends AbstractChainableContextInitRule {
 			ConclusionProducer producer) {
 		// producer.produce(premises.getRoot(), new
 		// DecomposedSubsumer(owlThing_));
-		producer.produce(new InitializationSubsumer(
-				premises.getRoot(), owlThing_));
+		producer.produce(new InitializationSubsumer(premises.getRoot(),
+				owlThing_));
+	}
+
+	@Override
+	public boolean isLocal() {
+		return true;
 	}
 
 	@Override
@@ -125,7 +130,7 @@ public class OwlThingContextInitRule extends AbstractChainableContextInitRule {
 	}
 
 	@Override
-	public void accept(LinkedContextInitRuleVisitor visitor,
+	public void accept(LinkedContextInitRuleVisitor<?> visitor,
 			ContextInitialization premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);

@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
+
 /*
  * #%L
  * ELK Reasoner
@@ -39,7 +40,7 @@ public class RedundantRuleApplicationVisitorFactory implements
 
 	@Override
 	public AbstractRuleApplicationConclusionVisitor create(
-			RuleVisitor ruleVisitor, ConclusionProducer producer) {
+			RuleVisitor<?> ruleVisitor, ConclusionProducer producer) {
 		return new RedundantRuleApplicationConclusionVisitor(ruleVisitor,
 				producer);
 	}

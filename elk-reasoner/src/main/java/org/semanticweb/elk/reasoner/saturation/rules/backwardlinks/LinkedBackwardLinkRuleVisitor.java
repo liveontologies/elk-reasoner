@@ -30,14 +30,16 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
  * A visitor pattern for {@link LinkedBackwardLinkRule}s
  * 
  * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the type of output parameter with which this visitor works
  */
-public interface LinkedBackwardLinkRuleVisitor {
+public interface LinkedBackwardLinkRuleVisitor<O> {
 
-	void visit(ContradictionOverBackwardLinkRule rule, BackwardLink premise,
+	O visit(ContradictionOverBackwardLinkRule rule, BackwardLink premise,
 			ContextPremises premises, ConclusionProducer producer);
 
-	void visit(BackwardLinkChainFromBackwardLinkRule rule,
-			BackwardLink premise, ContextPremises premises,
-			ConclusionProducer producer);
+	O visit(BackwardLinkChainFromBackwardLinkRule rule, BackwardLink premise,
+			ContextPremises premises, ConclusionProducer producer);
 
 }

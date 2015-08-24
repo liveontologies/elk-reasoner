@@ -35,9 +35,9 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 abstract class AbstractBackwardLinkRule implements BackwardLinkRule {
 
 	@Override
-	public void accept(RuleVisitor visitor, BackwardLink premise,
+	public void accept(RuleVisitor<?> visitor, BackwardLink premise,
 			ContextPremises premises, ConclusionProducer producer) {
-		accept((BackwardLinkRuleVisitor) visitor, premise, premises, producer);
+		accept((BackwardLinkRuleVisitor<?>) visitor, premise, premises, producer);
 	}
 
 }

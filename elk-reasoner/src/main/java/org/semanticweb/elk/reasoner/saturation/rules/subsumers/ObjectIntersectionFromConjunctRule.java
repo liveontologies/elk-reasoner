@@ -153,12 +153,14 @@ public class ObjectIntersectionFromConjunctRule extends
 			ConclusionProducer producer) {
 		for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
 				conjunctionsByConjunct_.keySet(), premises.getSubsumers())) {
-			// producer.produce(premises.getRoot(), new
-			// ComposedSubsumer(conjunctionsByConjunct_.get(common)));
 			producer.produce(new ComposedConjunction(premises.getRoot(),
 					conjunctionsByConjunct_.get(common)));
 		}
+	}
 
+	@Override
+	public boolean isLocal() {
+		return true;
 	}
 
 	@Override
@@ -229,7 +231,7 @@ public class ObjectIntersectionFromConjunctRule extends
 	}
 
 	@Override
-	public void accept(LinkedSubsumerRuleVisitor visitor,
+	public void accept(LinkedSubsumerRuleVisitor<?> visitor,
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);

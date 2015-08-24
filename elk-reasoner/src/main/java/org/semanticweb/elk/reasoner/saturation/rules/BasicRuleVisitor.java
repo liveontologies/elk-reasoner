@@ -40,16 +40,17 @@ import org.slf4j.LoggerFactory;
  *         pavel.klinov@uni-ulm.de
  * @author "Yevgeny Kazakov"
  */
-public class BasicRuleVisitor extends AbstractRuleVisitor {
+public class BasicRuleVisitor extends AbstractRuleVisitor<Void> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(BasicRuleVisitor.class);
 
 	@Override
-	<P> void defaultVisit(Rule<P> rule, P premise, ContextPremises premises,
+	<P> Void defaultVisit(Rule<P> rule, P premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		LOGGER_.trace("{}: process {} by {}", premises, premise, rule.getName());
 		rule.apply(premise, premises, producer);
+		return null;
 	}
 }

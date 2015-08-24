@@ -22,6 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
@@ -29,26 +30,36 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
  * A {@link ConclusionVisitor} that applies all redundant rules for the visited
- * {@link Conclusion}s using the provided {@link RuleVisitor} to track rule
- * applications and {@link ConclusionProducer} to output the {@link Conclusion}s
- * of the applied rules. A rule is redundant if its application is not necessary
- * for completeness. Redundancy of a rule depends on other
- * {@link ContextPremises}: a non-redundant rule might become redundant when
- * other {@link ContextPremises} are added. The methods always return {@link
- * true}.
+ * {@link Conclusion}s using the provided {@link RuleVisitor} to apply rules and
+ * {@link ConclusionProducer} to output the {@link Conclusion}s of the applied
+ * rules. A rule is redundant if its application is not necessary for
+ * completeness. Redundancy of a rule depends on other {@link ContextPremises}:
+ * a non-redundant rule might become redundant when other
+ * {@link ContextPremises} are added. The methods always return {@link true}.
  * 
  * @see NonRedundantRuleApplicationConclusionVisitor
  * 
  * @author "Yevgeny Kazakov"
  */
 public class RedundantRuleApplicationConclusionVisitor extends
-		RedundantLocalRuleApplicationConclusionVisitor {
+		AbstractRuleApplicationConclusionVisitor {
 
 	public RedundantRuleApplicationConclusionVisitor(
-			RuleVisitor ruleAppVisitor, ConclusionProducer producer) {
+			RuleVisitor<?> ruleAppVisitor, ConclusionProducer producer) {
 		super(ruleAppVisitor, producer);
 	}
 
-	// at the moment all redundant rules are local
+	@Override
+	protected Boolean defaultVisit(Conclusion conclusion, ContextPremises input) {
+		// no redundant rules by default
+		return true;
+	}
+
+	@Override
+	public Boolean visit(ComposedSubsumer conclusion, ContextPremises premises) {
+		// if subsumer was composed, it is not necessary to decompose it
+		applyDecompositionRules(conclusion, premises);
+		return true;
+	}
 
 }

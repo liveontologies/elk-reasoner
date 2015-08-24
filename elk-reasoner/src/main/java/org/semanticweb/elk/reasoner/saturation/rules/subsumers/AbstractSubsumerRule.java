@@ -37,9 +37,9 @@ abstract class AbstractSubsumerRule<S extends IndexedClassExpression>
 		implements SubsumerRule<S> {
 
 	@Override
-	public void accept(RuleVisitor visitor, S premise,
+	public void accept(RuleVisitor<?> visitor, S premise,
 			ContextPremises premises, ConclusionProducer producer) {
-		accept((SubsumerRuleVisitor) visitor, premise, premises, producer);
+		accept((SubsumerRuleVisitor<?>) visitor, premise, premises, producer);
 	}
 
 }

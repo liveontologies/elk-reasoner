@@ -35,7 +35,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 /**
  * A {@link LinkableBackwardLinkRule} applied when processing
  * {@link BackwardLink} that produces {@link Contradiction} in the context
- * linked by this {@link BackwardLink}
+ * linked by this {@link BackwardLink}.
  */
 public class ContradictionOverBackwardLinkRule extends
 		AbstractLinkableBackwardLinkRule {
@@ -78,7 +78,12 @@ public class ContradictionOverBackwardLinkRule extends
 	}
 
 	@Override
-	public void accept(LinkedBackwardLinkRuleVisitor visitor,
+	public boolean isLocal() {
+		return true;
+	}
+
+	@Override
+	public void accept(LinkedBackwardLinkRuleVisitor<?> visitor,
 			BackwardLink premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);

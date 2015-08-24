@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
+
 /*
  * #%L
  * ELK Reasoner
@@ -32,18 +33,20 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <O>
+ *            the type of output parameter with which this visitor works
  */
-public interface SubsumerDecompositionRuleVisitor {
+public interface SubsumerDecompositionRuleVisitor<O> {
 
-	void visit(IndexedObjectComplementOfDecomposition rule,
+	O visit(IndexedObjectComplementOfDecomposition rule,
 			IndexedObjectComplementOf premise, ContextPremises premises,
 			ConclusionProducer producer);
 
-	void visit(IndexedObjectIntersectionOfDecomposition rule,
+	O visit(IndexedObjectIntersectionOfDecomposition rule,
 			IndexedObjectIntersectionOf premise, ContextPremises premises,
 			ConclusionProducer producer);
 
-	void visit(IndexedObjectSomeValuesFromDecomposition rule,
+	O visit(IndexedObjectSomeValuesFromDecomposition rule,
 			IndexedObjectSomeValuesFrom premise, ContextPremises premises,
 			ConclusionProducer producer);
 

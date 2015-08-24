@@ -61,7 +61,12 @@ public class ContradictionCompositionRule extends AbstractDisjointSubsumerRule {
 	}
 
 	@Override
-	public void accept(DisjointSubsumerRuleVisitor visitor,
+	public boolean isLocal() {
+		return true;
+	}
+
+	@Override
+	public void accept(DisjointSubsumerRuleVisitor<?> visitor,
 			DisjointSubsumer premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);

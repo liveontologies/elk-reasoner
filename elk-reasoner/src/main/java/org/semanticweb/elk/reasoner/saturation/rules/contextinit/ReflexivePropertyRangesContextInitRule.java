@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedReflexiveObjectPropertyAxiom;
@@ -45,7 +46,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A {@link ChainableContextInitRule} that produces {@link Subsumer}s for ranges
  * of told-reflexive properties. It should be applied only if there exists at
- * least one ReflexiveObjectProperty axiom in the ontology.
+ * least one {@link ElkReflexiveObjectPropertyAxiom} in the ontology.
  */
 public class ReflexivePropertyRangesContextInitRule extends
 		AbstractChainableContextInitRule {
@@ -128,10 +129,14 @@ public class ReflexivePropertyRangesContextInitRule extends
 					.getRanges()) {
 				producer.produce(
 				// TODO: introduce a specific inference
-				new InitializationSubsumer(premises
-						.getRoot(), range));
+				new InitializationSubsumer(premises.getRoot(), range));
 			}
 		}
+	}
+
+	@Override
+	public boolean isLocal() {
+		return true;
 	}
 
 	@Override
@@ -213,7 +218,7 @@ public class ReflexivePropertyRangesContextInitRule extends
 	}
 
 	@Override
-	public void accept(LinkedContextInitRuleVisitor visitor,
+	public void accept(LinkedContextInitRuleVisitor<?> visitor,
 			ContextInitialization premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);

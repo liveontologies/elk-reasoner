@@ -67,7 +67,12 @@ public class IndexedObjectSomeValuesFromDecomposition extends
 	}
 
 	@Override
-	public void accept(SubsumerDecompositionRuleVisitor visitor,
+	public boolean isLocal() {
+		return true;
+	}
+
+	@Override
+	public void accept(SubsumerDecompositionRuleVisitor<?> visitor,
 			IndexedObjectSomeValuesFrom premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);

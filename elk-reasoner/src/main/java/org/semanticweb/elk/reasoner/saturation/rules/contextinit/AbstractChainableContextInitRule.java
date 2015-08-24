@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.contextinit;
+
 /*
  * #%L
  * ELK Reasoner
@@ -43,16 +44,16 @@ abstract class AbstractChainableContextInitRule extends
 	}
 
 	@Override
-	public void accept(RuleVisitor visitor, ContextInitialization premise,
+	public void accept(RuleVisitor<?> visitor, ContextInitialization premise,
 			ContextPremises premises, ConclusionProducer producer) {
-		accept((ContextInitRuleVisitor) visitor, premise, premises, producer);
+		accept((ContextInitRuleVisitor<?>) visitor, premise, premises, producer);
 	}
 
 	@Override
-	public void accept(ContextInitRuleVisitor visitor,
+	public void accept(ContextInitRuleVisitor<?> visitor,
 			ContextInitialization premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		accept((LinkedContextInitRuleVisitor) visitor, premise, premises,
+		accept((LinkedContextInitRuleVisitor<?>) visitor, premise, premises,
 				producer);
 	}
 }

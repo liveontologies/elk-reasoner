@@ -36,18 +36,18 @@ import org.slf4j.LoggerFactory;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class DummyRuleVisitor extends AbstractRuleVisitor {
+public class DummyRuleVisitor extends AbstractRuleVisitor<Void> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(DummyRuleVisitor.class);
 
 	@Override
-	<P> void defaultVisit(Rule<P> rule, P premise, ContextPremises premises,
+	<P> Void defaultVisit(Rule<P> rule, P premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		LOGGER_.trace("ignore {} by {} in {}", premise, rule.getName(),
 				premises);
-		// do nothing
+		return null;
 	}
 
 }

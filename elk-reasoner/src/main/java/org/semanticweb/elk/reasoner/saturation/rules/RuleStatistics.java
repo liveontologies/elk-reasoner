@@ -11,8 +11,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.Contradict
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.BackwardLinkFromForwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
-import org.semanticweb.elk.reasoner.saturation.rules.propagations.NonReflexivePropagationRule;
-import org.semanticweb.elk.reasoner.saturation.rules.propagations.ReflexivePropagationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.propagations.SubsumerPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
@@ -64,28 +63,19 @@ public class RuleStatistics extends AbstractStatistics {
 	public final RuleCounter ruleCounter = new RuleCounter();
 	public final RuleApplicationTimer ruleTimer = new RuleApplicationTimer();
 
-	/**
-	 * Reset all timers to zero.
-	 */
-	@Override
-	public void reset() {
-		super.reset();
-		ruleCounter.reset();
-		ruleTimer.reset();
-	}
-
 	public synchronized void add(RuleStatistics stats) {
 		super.add(stats);
 		ruleCounter.add(stats.ruleCounter);
 		ruleTimer.add(stats.ruleTimer);
 	}
 
-	void print(StatisticsPrinter printer, String name, long count, long time) {
-		if (count == 0)
-			return;
+	public long getTotalRuleAppCount() {
+		return ruleCounter.getTotalRuleAppCount();
+	}
 
-		printer.print(name, count, time / getNumberOfMeasurements());
-
+	public double getTotalRuleTime() {
+		return getNumberOfMeasurements() == 0 ? 0 : 1d
+				* ruleTimer.getTotalRuleAppTime() / getNumberOfMeasurements();
 	}
 
 	public void print(Logger logger) {
@@ -156,9 +146,9 @@ public class RuleStatistics extends AbstractStatistics {
 				ruleCounter.countIndexedObjectSomeValuesFromDecomposition,
 				ruleTimer.timeIndexedObjectSomeValuesFromDecomposition);
 
-		print(printer, NonReflexivePropagationRule.NAME,
-				ruleCounter.countNonReflexivePropagationRule,
-				ruleTimer.timeNonReflexivePropagationRule);
+		print(printer, SubsumerPropagationRule.NAME,
+				ruleCounter.countSubsumerPropagationRule,
+				ruleTimer.timeSubsumerPropagationRule);
 
 		print(printer, ObjectIntersectionFromConjunctRule.NAME,
 				ruleCounter.countObjectIntersectionFromConjunctRule,
@@ -179,10 +169,6 @@ public class RuleStatistics extends AbstractStatistics {
 		print(printer, PropagationFromExistentialFillerRule.NAME,
 				ruleCounter.countPropagationFromExistentialFillerRule,
 				ruleTimer.timePropagationFromExistentialFillerRule);
-
-		print(printer, ReflexivePropagationRule.NAME,
-				ruleCounter.countReflexivePropagationRule,
-				ruleTimer.timeReflexivePropagationRule);
 
 		print(printer, RootContextInitializationRule.NAME,
 				ruleCounter.countRootContextInitializationRule,
@@ -212,12 +198,21 @@ public class RuleStatistics extends AbstractStatistics {
 		printer.printSeparator();
 	}
 
-	public long getTotalRuleAppCount() {
-		return ruleCounter.getTotalRuleAppCount();
+	void print(StatisticsPrinter printer, String name, long count, long time) {
+		if (count == 0)
+			return;
+
+		printer.print(name, count, time / getNumberOfMeasurements());
+
 	}
 
-	public double getTotalRuleTime() {
-		return getNumberOfMeasurements() == 0 ? 0 : 1d
-				* ruleTimer.getTotalRuleAppTime() / getNumberOfMeasurements();
+	/**
+	 * Reset all timers to zero.
+	 */
+	@Override
+	public void reset() {
+		super.reset();
+		ruleCounter.reset();
+		ruleTimer.reset();
 	}
 }

@@ -39,7 +39,7 @@ public class NonRedundantRuleApplicationVisitorFactory implements
 
 	@Override
 	public AbstractRuleApplicationConclusionVisitor create(
-			RuleVisitor ruleVisitor, ConclusionProducer producer) {
+			RuleVisitor<?> ruleVisitor, ConclusionProducer producer) {
 		return new NonRedundantRuleApplicationConclusionVisitor(ruleVisitor,
 				producer);
 	}

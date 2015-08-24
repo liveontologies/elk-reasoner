@@ -40,7 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 public interface SubsumerDecompositionRule<P extends IndexedClassExpression>
 		extends SubsumerRule<P> {
 
-	public void accept(SubsumerDecompositionRuleVisitor visitor, P premise,
+	public void accept(SubsumerDecompositionRuleVisitor<?> visitor, P premise,
 			ContextPremises premises, ConclusionProducer producer);
 
 }

@@ -37,7 +37,7 @@ public abstract class AbstractRuleApplicationConclusionVisitor extends
 	/**
 	 * {@link RuleVisitor} to track rule applications
 	 */
-	final RuleVisitor ruleAppVisitor;
+	final RuleVisitor<?> ruleAppVisitor;
 
 	/**
 	 * {@link ConclusionProducer} to produce the {@link Conclusion}s of the
@@ -45,7 +45,7 @@ public abstract class AbstractRuleApplicationConclusionVisitor extends
 	 */
 	final ConclusionProducer producer;
 
-	AbstractRuleApplicationConclusionVisitor(RuleVisitor ruleAppVisitor,
+	AbstractRuleApplicationConclusionVisitor(RuleVisitor<?> ruleAppVisitor,
 			ConclusionProducer producer) {
 		this.ruleAppVisitor = ruleAppVisitor;
 		this.producer = producer;

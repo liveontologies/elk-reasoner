@@ -157,6 +157,11 @@ public class ContradictionFromDisjointnessRule extends
 	}
 
 	@Override
+	public boolean isLocal() {
+		return true;
+	}
+
+	@Override
 	public boolean addTo(Chain<ChainableSubsumerRule> ruleChain) {
 		if (isEmpty())
 			return true;
@@ -253,7 +258,7 @@ public class ContradictionFromDisjointnessRule extends
 	}
 
 	@Override
-	public void accept(LinkedSubsumerRuleVisitor visitor,
+	public void accept(LinkedSubsumerRuleVisitor<?> visitor,
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);

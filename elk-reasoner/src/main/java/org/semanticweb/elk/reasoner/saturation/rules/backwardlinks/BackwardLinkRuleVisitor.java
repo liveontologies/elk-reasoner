@@ -31,10 +31,13 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <O>
+ *            the type of output parameter with which this visitor works
  */
-public interface BackwardLinkRuleVisitor extends LinkedBackwardLinkRuleVisitor {
+public interface BackwardLinkRuleVisitor<O> extends
+		LinkedBackwardLinkRuleVisitor<O> {
 
-	void visit(SubsumerBackwardLinkRule rule, BackwardLink premise,
+	O visit(SubsumerBackwardLinkRule rule, BackwardLink premise,
 			ContextPremises premises, ConclusionProducer producer);
 
 }

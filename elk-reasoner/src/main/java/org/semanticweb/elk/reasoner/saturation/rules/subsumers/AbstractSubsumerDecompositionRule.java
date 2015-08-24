@@ -30,10 +30,10 @@ abstract class AbstractSubsumerDecompositionRule<S extends IndexedClassExpressio
 		extends AbstractSubsumerRule<S> implements SubsumerDecompositionRule<S> {
 
 	@Override
-	public void accept(SubsumerRuleVisitor visitor, S premise,
+	public void accept(SubsumerRuleVisitor<?> visitor, S premise,
 			ContextPremises premises, ConclusionProducer producer) {
-		accept((SubsumerDecompositionRuleVisitor) visitor, premise, premises,
-				producer);
+		accept((SubsumerDecompositionRuleVisitor<?>) visitor, premise,
+				premises, producer);
 
 	}
 

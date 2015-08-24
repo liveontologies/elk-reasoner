@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
+
 /*
  * #%L
  * ELK Reasoner
@@ -42,16 +43,17 @@ abstract class AbstractChainableSubsumerRule extends
 	}
 
 	@Override
-	public void accept(RuleVisitor visitor, IndexedClassExpression premise,
+	public void accept(RuleVisitor<?> visitor, IndexedClassExpression premise,
 			ContextPremises premises, ConclusionProducer producer) {
-		accept((SubsumerRuleVisitor) visitor, premise, premises, producer);
+		accept((SubsumerRuleVisitor<?>) visitor, premise, premises, producer);
 	}
 
 	@Override
-	public void accept(SubsumerRuleVisitor visitor,
+	public void accept(SubsumerRuleVisitor<?> visitor,
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		accept((LinkedSubsumerRuleVisitor) visitor, premise, premises, producer);
+		accept((LinkedSubsumerRuleVisitor<?>) visitor, premise, premises,
+				producer);
 	}
 
 }

@@ -36,7 +36,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.Rule;
  */
 public interface ContradictionRule extends Rule<Contradiction> {
 
-	public void accept(ContradictionRuleVisitor visitor, Contradiction premise,
-			ContextPremises premises, ConclusionProducer producer);
+	public void accept(ContradictionRuleVisitor<?> visitor,
+			Contradiction premise, ContextPremises premises,
+			ConclusionProducer producer);
 
 }

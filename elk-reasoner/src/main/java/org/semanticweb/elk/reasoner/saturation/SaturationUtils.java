@@ -37,10 +37,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.TimedConclus
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextStatistics;
 import org.semanticweb.elk.reasoner.saturation.rules.BasicRuleVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationTimerVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleCounterVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,19 +72,19 @@ public class SaturationUtils {
 	public static final boolean COLLECT_PROCESSING_TIMES = LOGGER_
 			.isDebugEnabled();
 
-	public static RuleVisitor getStatsAwareRuleVisitor(
+	public static RuleVisitor<?> getStatsAwareRuleVisitor(
 			RuleStatistics localStatistics) {
-		RuleVisitor ruleAppVisitor = new BasicRuleVisitor();
+		RuleVisitor<?> ruleAppVisitor = new BasicRuleVisitor();
 
 		if (COLLECT_RULE_COUNTS) {
-			ruleAppVisitor = new RuleCounterVisitor(ruleAppVisitor,
+			ruleAppVisitor = RuleVisitors.countingVisitor(ruleAppVisitor,
 					localStatistics.ruleCounter);
 		}
 
 		if (COLLECT_RULE_TIMES) {
 			localStatistics.startMeasurements();
 
-			ruleAppVisitor = new RuleApplicationTimerVisitor(ruleAppVisitor,
+			ruleAppVisitor = RuleVisitors.timedVisitor(ruleAppVisitor,
 					localStatistics.ruleTimer);
 		}
 

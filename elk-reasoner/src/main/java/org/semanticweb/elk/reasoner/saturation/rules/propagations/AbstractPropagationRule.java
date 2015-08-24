@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.propagations;
+
 /*
  * #%L
  * ELK Reasoner
@@ -35,9 +36,9 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 public abstract class AbstractPropagationRule implements PropagationRule {
 
 	@Override
-	public void accept(RuleVisitor visitor, Propagation premise,
+	public void accept(RuleVisitor<?> visitor, Propagation premise,
 			ContextPremises premises, ConclusionProducer producer) {
-		accept((PropagationRuleVisitor) visitor, premise, premises, producer);
+		accept((PropagationRuleVisitor<?>) visitor, premise, premises, producer);
 	}
 
 }

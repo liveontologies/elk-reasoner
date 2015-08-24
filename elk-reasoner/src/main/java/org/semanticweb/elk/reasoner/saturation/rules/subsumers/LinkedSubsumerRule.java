@@ -38,7 +38,7 @@ import org.semanticweb.elk.util.collections.chains.Link;
 public interface LinkedSubsumerRule extends
 		SubsumerRule<IndexedClassExpression>, Link<LinkedSubsumerRule> {
 
-	public void accept(LinkedSubsumerRuleVisitor visitor,
+	public void accept(LinkedSubsumerRuleVisitor<?> visitor,
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer);
 

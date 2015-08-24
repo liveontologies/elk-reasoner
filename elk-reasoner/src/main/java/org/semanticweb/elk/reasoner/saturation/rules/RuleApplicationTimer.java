@@ -33,8 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.Contradict
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.BackwardLinkFromForwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
-import org.semanticweb.elk.reasoner.saturation.rules.propagations.NonReflexivePropagationRule;
-import org.semanticweb.elk.reasoner.saturation.rules.propagations.ReflexivePropagationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.propagations.SubsumerPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
@@ -124,11 +123,6 @@ public class RuleApplicationTimer {
 	long timeNonReflexiveBackwardLinkCompositionRule;
 
 	/**
-	 * timer for {@link NonReflexivePropagationRule}
-	 */
-	long timeNonReflexivePropagationRule;
-
-	/**
 	 * timer for {@link ObjectIntersectionFromConjunctRule}
 	 */
 	long timeObjectIntersectionFromConjunctRule;
@@ -159,9 +153,9 @@ public class RuleApplicationTimer {
 	long timeReflexiveBackwardLinkCompositionRule;
 
 	/**
-	 * timer for {@link ReflexivePropagationRule}
+	 * timer for {@link ReflexivePropertyRangesContextInitRule}
 	 */
-	long timeReflexivePropagationRule;
+	long timeReflexivePropertyRangesContextInitRule;
 
 	/**
 	 * timer for {@link RootContextInitializationRule}
@@ -174,14 +168,14 @@ public class RuleApplicationTimer {
 	long timeSubsumerBackwardLinkRule;
 
 	/**
+	 * timer for {@link SubsumerPropagationRule}
+	 */
+	long timeSubsumerPropagationRule;
+
+	/**
 	 * timer for {@link SuperClassFromSubClassRule}
 	 */
 	long timeSuperClassFromSubClassRule;
-
-	/**
-	 * timer for {@link ReflexivePropertyRangesContextInitRule}
-	 */
-	long timeReflexivePropertyRangesContextInitRule;
 
 	/**
 	 * Add the values the corresponding values of the given timer
@@ -209,8 +203,7 @@ public class RuleApplicationTimer {
 		timeIndexedObjectSomeValuesFromDecomposition += timer.timeIndexedObjectSomeValuesFromDecomposition;
 		timeIndexedObjectComplementOfDecomposition += timer.timeIndexedObjectComplementOfDecomposition;
 		timeContradictionFromOwlNothingRule += timer.timeContradictionFromOwlNothingRule;
-		timeNonReflexivePropagationRule += timer.timeNonReflexivePropagationRule;
-		timeReflexivePropagationRule += timer.timeReflexivePropagationRule;
+		timeSubsumerPropagationRule += timer.timeSubsumerPropagationRule;
 		timePropagationInitializationRule += timer.timePropagationInitializationRule;
 		timeBackwardLinkFromForwardLinkRule += timer.timeBackwardLinkFromForwardLinkRule;
 		timeReflexivePropertyRangesContextInitRule += timer.timeReflexivePropertyRangesContextInitRule;
@@ -236,8 +229,7 @@ public class RuleApplicationTimer {
 				+ timeIndexedObjectSomeValuesFromDecomposition
 				+ timeIndexedObjectComplementOfDecomposition
 				+ timeContradictionFromOwlNothingRule
-				+ timeNonReflexivePropagationRule
-				+ timeReflexivePropagationRule
+				+ timeSubsumerPropagationRule
 				+ timePropagationInitializationRule
 				+ timeBackwardLinkFromForwardLinkRule
 				+ timeReflexivePropertyRangesContextInitRule;
@@ -267,8 +259,7 @@ public class RuleApplicationTimer {
 		timeIndexedObjectSomeValuesFromDecomposition = 0;
 		timeIndexedObjectComplementOfDecomposition = 0;
 		timeContradictionFromOwlNothingRule = 0;
-		timeNonReflexivePropagationRule = 0;
-		timeReflexivePropagationRule = 0;
+		timeSubsumerPropagationRule = 0;
 		timePropagationInitializationRule = 0;
 		timeBackwardLinkFromForwardLinkRule = 0;
 		timeReflexivePropertyRangesContextInitRule = 0;

@@ -30,18 +30,20 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
  * A visitor pattern for {@link LinkedContextInitRule}s
  * 
  * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the type of output parameter with which this visitor works
  */
-public interface LinkedContextInitRuleVisitor {
+public interface LinkedContextInitRuleVisitor<O> {
 
-	public void visit(OwlThingContextInitRule rule,
+	public O visit(OwlThingContextInitRule rule, ContextInitialization premise,
+			ContextPremises premises, ConclusionProducer producer);
+
+	public O visit(RootContextInitializationRule rule,
 			ContextInitialization premise, ContextPremises premises,
 			ConclusionProducer producer);
 
-	public void visit(RootContextInitializationRule rule,
-			ContextInitialization premise, ContextPremises premises,
-			ConclusionProducer producer);
-
-	public void visit(ReflexivePropertyRangesContextInitRule rule,
+	public O visit(ReflexivePropertyRangesContextInitRule rule,
 			ContextInitialization premise, ContextPremises premises,
 			ConclusionProducer producer);
 

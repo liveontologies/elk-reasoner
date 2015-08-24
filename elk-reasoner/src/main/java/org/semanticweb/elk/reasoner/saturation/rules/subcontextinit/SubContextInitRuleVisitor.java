@@ -31,10 +31,12 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <O>
+ *            the type of output parameter with which this visitor works
  */
-public interface SubContextInitRuleVisitor {
+public interface SubContextInitRuleVisitor<O> {
 
-	public void visit(PropagationInitializationRule rule,
+	public O visit(PropagationInitializationRule rule,
 			SubContextInitialization premise, ContextPremises premises,
 			ConclusionProducer producer);
 

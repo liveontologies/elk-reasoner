@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.forwardlink;
+
 /*
  * #%L
  * ELK Reasoner
@@ -35,9 +36,9 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 public abstract class AbstractForwardLinkRule implements ForwardLinkRule {
 
 	@Override
-	public void accept(RuleVisitor visitor, ForwardLink premise,
+	public void accept(RuleVisitor<?> visitor, ForwardLink premise,
 			ContextPremises premises, ConclusionProducer producer) {
-		accept((ForwardLinkRuleVisitor) visitor, premise, premises, producer);
+		accept((ForwardLinkRuleVisitor<?>) visitor, premise, premises, producer);
 	}
 
 }

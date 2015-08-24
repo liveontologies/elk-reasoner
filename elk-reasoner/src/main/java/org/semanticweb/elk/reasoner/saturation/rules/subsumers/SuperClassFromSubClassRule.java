@@ -125,6 +125,11 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 	}
 
 	@Override
+	public boolean isLocal() {
+		return true;
+	}
+
+	@Override
 	public boolean addTo(Chain<ChainableSubsumerRule> ruleChain) {
 		if (isEmpty())
 			return true;
@@ -223,7 +228,7 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 	}
 
 	@Override
-	public void accept(LinkedSubsumerRuleVisitor visitor,
+	public void accept(LinkedSubsumerRuleVisitor<?> visitor,
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);

@@ -76,7 +76,12 @@ public class BackwardLinkFromForwardLinkRule extends AbstractForwardLinkRule {
 	}
 
 	@Override
-	public void accept(ForwardLinkRuleVisitor visitor, ForwardLink premise,
+	public boolean isLocal() {
+		return true;
+	}
+
+	@Override
+	public void accept(ForwardLinkRuleVisitor<?> visitor, ForwardLink premise,
 			ContextPremises premises, ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}

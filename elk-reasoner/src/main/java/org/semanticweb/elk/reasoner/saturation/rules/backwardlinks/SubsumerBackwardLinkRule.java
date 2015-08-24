@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 /**
  * A {@link BackwardLinkRule} producing {@link Subsumer}s when processing
  * {@link BackwardLink}s that are propagated over them using {@link Propagation}
- * s contained in the corresponding {@link SubContext}
+ * s contained in the corresponding {@link SubContext}.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -65,8 +65,14 @@ public class SubsumerBackwardLinkRule extends AbstractBackwardLinkRule {
 	}
 
 	@Override
-	public void accept(BackwardLinkRuleVisitor visitor, BackwardLink premise,
-			ContextPremises premises, ConclusionProducer producer) {
+	public boolean isLocal() {
+		return true;
+	}
+
+	@Override
+	public void accept(BackwardLinkRuleVisitor<?> visitor,
+			BackwardLink premise, ContextPremises premises,
+			ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}
 

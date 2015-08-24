@@ -48,7 +48,7 @@ public class SubsumerDecompositionVisitor implements
 	/**
 	 * the rule visitor used when applying decomposition rules
 	 */
-	private final SubsumerDecompositionRuleVisitor ruleVisitor_;
+	private final SubsumerDecompositionRuleVisitor<?> ruleVisitor_;
 
 	/**
 	 * the {@link ContextPremises} with which the rules are applied
@@ -61,7 +61,7 @@ public class SubsumerDecompositionVisitor implements
 	private final ConclusionProducer producer_;
 
 	public SubsumerDecompositionVisitor(
-			SubsumerDecompositionRuleVisitor ruleVisitor,
+			SubsumerDecompositionRuleVisitor<?> ruleVisitor,
 			ContextPremises premises, ConclusionProducer producer) {
 		this.ruleVisitor_ = ruleVisitor;
 		this.premises_ = premises;

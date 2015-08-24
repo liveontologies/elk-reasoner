@@ -36,9 +36,10 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 abstract class AbstractContradictionRule implements ContradictionRule {
 
 	@Override
-	public void accept(RuleVisitor visitor, Contradiction premise,
+	public void accept(RuleVisitor<?> visitor, Contradiction premise,
 			ContextPremises premises, ConclusionProducer producer) {
-		accept((ContradictionRuleVisitor) visitor, premise, premises, producer);
+		accept((ContradictionRuleVisitor<?>) visitor, premise, premises,
+				producer);
 	}
 
 }

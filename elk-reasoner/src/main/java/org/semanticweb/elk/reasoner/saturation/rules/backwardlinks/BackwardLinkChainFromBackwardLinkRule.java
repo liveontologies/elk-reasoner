@@ -43,9 +43,10 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
  * A {@link LinkableBackwardLinkRule} applied when processing a
- * {@link BackwardLink} producing {@link BackwardLink}s resulted by composing
- * the processed {@link BackwardLink} with the {@link ForwardLink}s contained in
- * the {@link ContextPremises} using property chain axioms
+ * {@link BackwardLink} producing {@link BackwardLink}s or {@link ForwardLink}s
+ * resulted by composing the processed {@link BackwardLink} with the
+ * {@link ForwardLink}s contained in the {@link ContextPremises} using property
+ * chain axioms.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -122,7 +123,7 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 		return rule == null ? false : rule.forwardLinksByObjectProperty_
 				.contains(link.getForwardChain(), link.getTarget());
 	}
-	
+
 	@Deprecated
 	public Multimap<IndexedPropertyChain, IndexedContextRoot> getForwardLinksByObjectProperty() {
 		return forwardLinksByObjectProperty_;
@@ -164,7 +165,12 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 	}
 
 	@Override
-	public void accept(LinkedBackwardLinkRuleVisitor visitor,
+	public boolean isLocal() {
+		return true;
+	}
+
+	@Override
+	public void accept(LinkedBackwardLinkRuleVisitor<?> visitor,
 			BackwardLink premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);

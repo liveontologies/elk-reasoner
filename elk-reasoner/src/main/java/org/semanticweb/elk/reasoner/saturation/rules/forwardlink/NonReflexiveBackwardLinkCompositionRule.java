@@ -39,7 +39,7 @@ import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
 
 /**
- * A {@link ForwardLinkRule} applied when processing this {@link ForwardLink}
+ * A {@link ForwardLinkRule} applied when processing a {@link ForwardLink}
  * producing {@link BackwardLink}s resulted by composition of this
  * {@link ForwardLink} with existing non-reflexive {@link BackwardLink}s using
  * property chain axioms
@@ -85,8 +85,8 @@ public class NonReflexiveBackwardLinkCompositionRule extends
 	public void apply(ForwardLink premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		/* compose the link with all non-reflexive backward links */
-		SaturatedPropertyChain linkSaturation = this.forwardLink_.getForwardChain()
-				.getSaturated();
+		SaturatedPropertyChain linkSaturation = this.forwardLink_
+				.getForwardChain().getSaturated();
 		final Multimap<IndexedObjectProperty, IndexedComplexPropertyChain> comps = linkSaturation
 				.getCompositionsByLeftSubProperty();
 		final Map<IndexedObjectProperty, ? extends SubContextPremises> subContextMap = premises
@@ -101,8 +101,7 @@ public class NonReflexiveBackwardLinkCompositionRule extends
 					.get(backwardRelation);
 
 			for (IndexedComplexPropertyChain composition : compositions)
-				for (IndexedContextRoot source : subPremises
-						.getLinkedRoots()) {
+				for (IndexedContextRoot source : subPremises.getLinkedRoots()) {
 					ForwardLinkImpl.produceComposedLink(producer, source,
 							backwardRelation, premises.getRoot(),
 							forwardLink_.getForwardChain(),
@@ -112,7 +111,12 @@ public class NonReflexiveBackwardLinkCompositionRule extends
 	}
 
 	@Override
-	public void accept(ForwardLinkRuleVisitor visitor, ForwardLink premise,
+	public boolean isLocal() {
+		return false;
+	}
+
+	@Override
+	public void accept(ForwardLinkRuleVisitor<?> visitor, ForwardLink premise,
 			ContextPremises premises, ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}

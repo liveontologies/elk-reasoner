@@ -133,11 +133,7 @@ public class PropagationFromExistentialFillerRule extends
 			for (IndexedObjectProperty property : new LazySetIntersection<IndexedObjectProperty>(
 					candidatePropagationProperties,
 					saturation.getSubProperties())) {
-				// producer.produce(premises.getRoot(), new
-				// Propagation(property, e));
 				if (subContextMap.get(property).isInitialized()) {
-					// propagation introduction is a binary rule where the
-					// sub-context being initialized is a premise
 					producer.produce(new GeneratedPropagation(premises
 							.getRoot(), property, e));
 				}
@@ -146,11 +142,14 @@ public class PropagationFromExistentialFillerRule extends
 			// TODO: create a composition rule to deal with reflexivity
 			// propagating to the this context if relation is reflexive
 			if (saturation.isDerivedReflexive()) {
-				// producer.produce(premises.getRoot(), new
-				// ComposedSubsumer(e));
 				producer.produce(new ReflexiveSubsumer(premises.getRoot(), e));
 			}
 		}
+	}
+
+	@Override
+	public boolean isLocal() {
+		return false;
 	}
 
 	@Override
@@ -197,7 +196,7 @@ public class PropagationFromExistentialFillerRule extends
 	}
 
 	@Override
-	public void accept(LinkedSubsumerRuleVisitor visitor,
+	public void accept(LinkedSubsumerRuleVisitor<?> visitor,
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);

@@ -30,37 +30,38 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
  * A visitor pattern for {@link LinkedSubsumerRule}s
  * 
  * @author "Yevgeny Kazakov"
+ *
+ * @param <O>
+ *            the type of output parameter with which this visitor works
  */
-public interface LinkedSubsumerRuleVisitor {
+public interface LinkedSubsumerRuleVisitor<O> {
 
-	void visit(ContradictionFromDisjointnessRule rule,
+	O visit(ContradictionFromDisjointnessRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer);
 
-	void visit(ContradictionFromNegationRule rule,
+	O visit(ContradictionFromNegationRule rule, IndexedClassExpression premise,
+			ContextPremises premises, ConclusionProducer producer);
+
+	O visit(ContradictionFromOwlNothingRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer);
 
-	void visit(ContradictionFromOwlNothingRule rule,
+	O visit(DisjointSubsumerFromMemberRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer);
 
-	void visit(DisjointSubsumerFromMemberRule rule,
+	O visit(ObjectIntersectionFromConjunctRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer);
 
-	void visit(ObjectIntersectionFromConjunctRule rule,
+	O visit(ObjectUnionFromDisjunctRule rule, IndexedClassExpression premise,
+			ContextPremises premises, ConclusionProducer producer);
+
+	O visit(PropagationFromExistentialFillerRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer);
 
-	void visit(ObjectUnionFromDisjunctRule rule,
-			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer);
-
-	void visit(PropagationFromExistentialFillerRule rule,
-			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer);
-
-	void visit(SuperClassFromSubClassRule rule, IndexedClassExpression premise,
+	O visit(SuperClassFromSubClassRule rule, IndexedClassExpression premise,
 			ContextPremises premises, ConclusionProducer producer);
 }

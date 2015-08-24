@@ -31,10 +31,12 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <O>
+ *            the type of output parameter with which this visitor works
  */
-public interface ContradictionRuleVisitor {
+public interface ContradictionRuleVisitor<O> {
 
-	void visit(ContradictionPropagationRule rule, Contradiction premise,
+	O visit(ContradictionPropagationRule rule, Contradiction premise,
 			ContextPremises premises, ConclusionProducer producer);
 
 }

@@ -151,7 +151,7 @@ public class DisjointSubsumerFromMemberRule extends
 	}
 
 	@Override
-	public void accept(LinkedSubsumerRuleVisitor visitor,
+	public void accept(LinkedSubsumerRuleVisitor<?> visitor,
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
@@ -164,6 +164,11 @@ public class DisjointSubsumerFromMemberRule extends
 			producer.produce(new DisjointSubsumerFromSubsumer(premises
 					.getRoot(), member, axioms_.get(i), reasons_.get(i)));
 		}
+	}
+
+	@Override
+	public boolean isLocal() {
+		return true;
 	}
 
 	@Override

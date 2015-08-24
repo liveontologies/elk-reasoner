@@ -73,7 +73,7 @@ public class RuleApplicationAdditionFactory<I extends RuleApplicationInput> exte
 	@Override
 	@SuppressWarnings("unchecked")
 	protected ConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
-			RuleVisitor ruleVisitor,
+			RuleVisitor<?> ruleVisitor,
 			SaturationStateWriter<? extends Context> writer,
 			SaturationStatistics localStatistics) {
 		return SaturationUtils

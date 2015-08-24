@@ -38,7 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.Rule;
  */
 public interface SubsumerRule<S extends IndexedClassExpression> extends Rule<S> {
 
-	public void accept(SubsumerRuleVisitor visitor, S subsumer,
+	public void accept(SubsumerRuleVisitor<?> visitor, S subsumer,
 			ContextPremises premises, ConclusionProducer producer);
 
 }

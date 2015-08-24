@@ -32,12 +32,12 @@ import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedRangeFiller;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedRangeFiller;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedContextRootVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.NoOpIndexedContextRootVisitor;
@@ -67,8 +67,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.Contradict
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.BackwardLinkFromForwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
-import org.semanticweb.elk.reasoner.saturation.rules.propagations.NonReflexivePropagationRule;
-import org.semanticweb.elk.reasoner.saturation.rules.propagations.ReflexivePropagationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.propagations.SubsumerPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
@@ -283,10 +282,10 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 	/**
 	 * 
 	 */
-	private class ContextRuleValidator implements RuleVisitor {
+	private class ContextRuleValidator implements RuleVisitor<Void> {
 
 		@Override
-		public void visit(BackwardLinkChainFromBackwardLinkRule rule,
+		public Void visit(BackwardLinkChainFromBackwardLinkRule rule,
 				BackwardLink premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			for (IndexedPropertyChain prop : rule
@@ -296,57 +295,61 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 					target.accept(rootValidator_);
 				}
 			}
+			return null;
 		}
 
 		@Override
-		public void visit(ContradictionCompositionRule rule,
+		public Void visit(ContradictionCompositionRule rule,
 				DisjointSubsumer premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
-
+			return null;
 		}
 
 		@Override
-		public void visit(
+		public Void visit(
 				ContradictionFromDisjointnessRule thisContradictionRule,
 				IndexedClassExpression premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
+			return null;
 		}
 
 		@Override
-		public void visit(ContradictionFromNegationRule rule,
+		public Void visit(ContradictionFromNegationRule rule,
 				IndexedClassExpression premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			iceValidator_.checkNew(rule.getNegation());
-
+			return null;
 		}
 
 		@Override
-		public void visit(ContradictionFromOwlNothingRule rule,
+		public Void visit(ContradictionFromOwlNothingRule rule,
 				IndexedClassExpression premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
-
+			return null;
 		}
 
 		@Override
-		public void visit(
+		public Void visit(
 				ContradictionOverBackwardLinkRule bottomBackwardLinkRule,
 				BackwardLink premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
+			return null;
 		}
 
 		@Override
-		public void visit(ContradictionPropagationRule rule,
+		public Void visit(ContradictionPropagationRule rule,
 				Contradiction premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
+			return null;
 		}
 
 		@Override
-		public void visit(DisjointSubsumerFromMemberRule rule,
+		public Void visit(DisjointSubsumerFromMemberRule rule,
 				IndexedClassExpression premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			for (IndexedDisjointClassesAxiom axiom : rule
@@ -359,50 +362,50 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 					iceValidator_.checkNew(ice);
 				}
 			}
-
+			return null;
 		}
 
 		@Override
-		public void visit(IndexedObjectComplementOfDecomposition rule,
+		public Void visit(IndexedObjectComplementOfDecomposition rule,
 				IndexedObjectComplementOf premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
-
+			return null;
 		}
 
 		@Override
-		public void visit(IndexedObjectIntersectionOfDecomposition rule,
+		public Void visit(IndexedObjectIntersectionOfDecomposition rule,
 				IndexedObjectIntersectionOf premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
-
+			return null;
 		}
 
 		@Override
-		public void visit(IndexedObjectSomeValuesFromDecomposition rule,
+		public Void visit(IndexedObjectSomeValuesFromDecomposition rule,
 				IndexedObjectSomeValuesFrom premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
-
+			return null;
 		}
 
 		@Override
-		public void visit(NonReflexiveBackwardLinkCompositionRule rule,
+		public Void visit(NonReflexiveBackwardLinkCompositionRule rule,
 				ForwardLink premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
+			return null;
 		}
 
 		@Override
-		public void visit(NonReflexivePropagationRule rule,
-				Propagation premise, ContextPremises premises,
-				ConclusionProducer producer) {
+		public Void visit(SubsumerPropagationRule rule, Propagation premise,
+				ContextPremises premises, ConclusionProducer producer) {
 			// nothing is stored in the rule
-
+			return null;
 		}
 
 		@Override
-		public void visit(ObjectIntersectionFromConjunctRule rule,
+		public Void visit(ObjectIntersectionFromConjunctRule rule,
 				IndexedClassExpression premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			for (Map.Entry<IndexedClassExpression, IndexedObjectIntersectionOf> entry : rule
@@ -410,93 +413,95 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 				iceValidator_.checkNew(entry.getKey());
 				iceValidator_.checkNew(entry.getValue());
 			}
+			return null;
 		}
 
 		@Override
-		public void visit(ObjectUnionFromDisjunctRule rule,
+		public Void visit(ObjectUnionFromDisjunctRule rule,
 				IndexedClassExpression premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			for (IndexedClassExpression ice : rule.getDisjunctions()) {
 				iceValidator_.checkNew(ice);
 			}
+			return null;
 		}
 
 		@Override
-		public void visit(OwlThingContextInitRule rule,
+		public Void visit(OwlThingContextInitRule rule,
 				ContextInitialization premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
+			return null;
 		}
 
 		@Override
-		public void visit(PropagationFromExistentialFillerRule rule,
+		public Void visit(PropagationFromExistentialFillerRule rule,
 				IndexedClassExpression premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			for (IndexedClassExpression ice : rule.getNegativeExistentials()) {
 				iceValidator_.checkNew(ice);
 			}
+			return null;
 		}
 
 		@Override
-		public void visit(ReflexiveBackwardLinkCompositionRule rule,
+		public Void visit(ReflexiveBackwardLinkCompositionRule rule,
 				ForwardLink premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
-
+			return null;
 		}
 
 		@Override
-		public void visit(ReflexivePropagationRule rule, Propagation premise,
-				ContextPremises premises, ConclusionProducer producer) {
-			// nothing is stored in the rule
-
-		}
-
-		@Override
-		public void visit(RootContextInitializationRule rule,
+		public Void visit(RootContextInitializationRule rule,
 				ContextInitialization premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
+			return null;
 		}
 
 		@Override
-		public void visit(SubsumerBackwardLinkRule rule, BackwardLink premise,
+		public Void visit(SubsumerBackwardLinkRule rule, BackwardLink premise,
 				ContextPremises premises, ConclusionProducer producer) {
 			// nothing is stored in the rule
+			return null;
 		}
 
 		@Override
-		public void visit(SuperClassFromSubClassRule rule,
+		public Void visit(SuperClassFromSubClassRule rule,
 				IndexedClassExpression premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			for (IndexedClassExpression ice : rule.getToldSubsumers()) {
 				iceValidator_.checkNew(ice);
 			}
-
+			return null;
 		}
 
 		@Override
-		public void visit(PropagationInitializationRule rule,
+		public Void visit(PropagationInitializationRule rule,
 				SubContextInitialization premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
+			return null;
 		}
 
 		@Override
-		public void visit(BackwardLinkFromForwardLinkRule rule,
+		public Void visit(BackwardLinkFromForwardLinkRule rule,
 				ForwardLink premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
+			return null;
 		}
 
 		@Override
-		public void visit(ReflexivePropertyRangesContextInitRule rule,
+		public Void visit(ReflexivePropertyRangesContextInitRule rule,
 				ContextInitialization premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			for (IndexedObjectProperty reflexive : rule
 					.getToldReflexiveProperties()) {
 				iopValidator_.checkNew(reflexive);
 			}
+			return null;
 		}
 	}
 

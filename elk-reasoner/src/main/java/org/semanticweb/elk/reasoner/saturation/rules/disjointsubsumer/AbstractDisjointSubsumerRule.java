@@ -36,9 +36,9 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 abstract class AbstractDisjointSubsumerRule implements DisjointSubsumerRule {
 
 	@Override
-	public void accept(RuleVisitor visitor, DisjointSubsumer premise,
+	public void accept(RuleVisitor<?> visitor, DisjointSubsumer premise,
 			ContextPremises premises, ConclusionProducer producer) {
-		accept((DisjointSubsumerRuleVisitor) visitor, premise, premises,
+		accept((DisjointSubsumerRuleVisitor<?>) visitor, premise, premises,
 				producer);
 	}
 

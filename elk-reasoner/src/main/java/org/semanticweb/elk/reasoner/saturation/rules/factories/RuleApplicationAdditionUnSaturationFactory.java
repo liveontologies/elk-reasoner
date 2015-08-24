@@ -53,7 +53,7 @@ public class RuleApplicationAdditionUnSaturationFactory extends
 	@Override
 	@SuppressWarnings("unchecked")
 	protected ConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
-			RuleVisitor ruleVisitor,
+			RuleVisitor<?> ruleVisitor,
 			SaturationStateWriter<? extends Context> writer,
 			SaturationStatistics localStatistics) {
 		// the visitor used for inserting conclusion

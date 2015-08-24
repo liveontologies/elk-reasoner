@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.Rule;
  */
 public interface DisjointSubsumerRule extends Rule<DisjointSubsumer> {
 
-	public void accept(DisjointSubsumerRuleVisitor visitor,
+	public void accept(DisjointSubsumerRuleVisitor<?> visitor,
 			DisjointSubsumer premise, ContextPremises premises,
 			ConclusionProducer producer);
 

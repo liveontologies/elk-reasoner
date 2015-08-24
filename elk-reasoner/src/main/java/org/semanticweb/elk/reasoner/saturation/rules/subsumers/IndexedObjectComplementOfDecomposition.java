@@ -57,13 +57,6 @@ public class IndexedObjectComplementOfDecomposition extends
 	}
 
 	@Override
-	public void accept(SubsumerDecompositionRuleVisitor visitor,
-			IndexedObjectComplementOf premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		visitor.visit(this, premise, premises, producer);
-	}
-
-	@Override
 	public void apply(IndexedObjectComplementOf premise,
 			ContextPremises premises, ConclusionProducer producer) {
 		if (premises.getSubsumers().contains(premise.getNegated())) {
@@ -71,4 +64,17 @@ public class IndexedObjectComplementOfDecomposition extends
 					premise));
 		}
 	}
+
+	@Override
+	public boolean isLocal() {
+		return true;
+	}
+
+	@Override
+	public void accept(SubsumerDecompositionRuleVisitor<?> visitor,
+			IndexedObjectComplementOf premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		visitor.visit(this, premise, premises, producer);
+	}
+
 }

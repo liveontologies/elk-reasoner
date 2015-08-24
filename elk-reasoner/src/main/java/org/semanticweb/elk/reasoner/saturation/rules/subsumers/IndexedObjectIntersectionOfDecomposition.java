@@ -59,17 +59,19 @@ public class IndexedObjectIntersectionOfDecomposition extends
 	@Override
 	public void apply(IndexedObjectIntersectionOf premise,
 			ContextPremises premises, ConclusionProducer producer) {
-		// producer.produce(premises.getRoot(), new
-		// DecomposedSubsumer(premise.getFirstConjunct()));
-		// producer.produce(premises.getRoot(), new
-		// DecomposedSubsumer(premise.getSecondConjunct()));
-
-		producer.produce(new DecomposedFirstConjunct(premises.getRoot(), premise));
-		producer.produce(new DecomposedSecondConjunct(premises.getRoot(), premise));
+		producer.produce(new DecomposedFirstConjunct(premises.getRoot(),
+				premise));
+		producer.produce(new DecomposedSecondConjunct(premises.getRoot(),
+				premise));
 	}
 
 	@Override
-	public void accept(SubsumerDecompositionRuleVisitor visitor,
+	public boolean isLocal() {
+		return true;
+	}
+
+	@Override
+	public void accept(SubsumerDecompositionRuleVisitor<?> visitor,
 			IndexedObjectIntersectionOf premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);

@@ -131,7 +131,7 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 	}
 
 	@Override
-	public void accept(LinkedSubsumerRuleVisitor visitor,
+	public void accept(LinkedSubsumerRuleVisitor<?> visitor,
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
@@ -149,6 +149,11 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 			producer.produce(new DisjunctionComposition(premises.getRoot(),
 					premise, disjunction));
 		}
+	}
+
+	@Override
+	public boolean isLocal() {
+		return true;
 	}
 
 	@Override

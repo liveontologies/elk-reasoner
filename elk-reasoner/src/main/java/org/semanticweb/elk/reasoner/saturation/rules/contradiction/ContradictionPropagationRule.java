@@ -35,8 +35,10 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 
 /**
  * A {@link ContradictionRule} applied when processing {@link Contradiction}
- * producing {@link Contradiction} in all contexts linked by
- * {@link BackwardLink}s in a {@code Context}
+ * producing {@link Contradiction} in all contexts linked by non-reflexive
+ * {@link BackwardLink}s in the {@code ContextPremises} (i.e.,
+ * {@link BackwardLink}s such that {@link BackwardLink#getOriginRoot()} is
+ * different from {@link ContextPremises#getRoot()}.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -70,15 +72,21 @@ public class ContradictionPropagationRule extends AbstractContradictionRule {
 			for (IndexedContextRoot target : subPremises.get(propRelation)
 					.getLinkedRoots()) {
 				// producer.produce(target, premise);
-				producer.produce(new PropagatedContradiction(premises.getRoot(),
-						propRelation, target));
+				producer.produce(new PropagatedContradiction(
+						premises.getRoot(), propRelation, target));
 			}
 		}
 	}
 
 	@Override
-	public void accept(ContradictionRuleVisitor visitor, Contradiction premise,
-			ContextPremises premises, ConclusionProducer producer) {
+	public boolean isLocal() {
+		return false;
+	}
+
+	@Override
+	public void accept(ContradictionRuleVisitor<?> visitor,
+			Contradiction premise, ContextPremises premises,
+			ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}
 
