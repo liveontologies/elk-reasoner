@@ -26,6 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
@@ -98,6 +99,13 @@ public class SubsumerDecompositionVisitor implements
 	public Void visit(IndexedObjectSomeValuesFrom element) {
 		IndexedObjectSomeValuesFromDecomposition.getInstance().accept(
 				ruleVisitor_, element, premises_, producer_);
+		return null;
+	}
+
+	@Override
+	public Void visit(IndexedObjectHasSelf element) {
+		IndexedObjectHasSelfDecomposition.getInstance().accept(ruleVisitor_,
+				element, premises_, producer_);
 		return null;
 	}
 

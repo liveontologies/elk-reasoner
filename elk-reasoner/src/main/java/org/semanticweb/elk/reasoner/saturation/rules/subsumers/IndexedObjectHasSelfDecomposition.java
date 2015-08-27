@@ -22,31 +22,29 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
+import org.semanticweb.elk.reasoner.saturation.inferences.ObjectHasSelfPropertyRangeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 
 /**
  * A {@link SubsumerDecompositionRule} that processes
- * {@link IndexedObjectSomeValuesFrom} and produces the corresponding
- * {@link ForwardLink} or {@link BackwardLink} for the context corresponding to
- * its filler (or range filler).
- * 
- * @see IndexedObjectSomeValuesFrom#getFiller()
- * @see IndexedObjectSomeValuesFrom#getRangeFiller()
+ * {@link IndexedObjectHasSelf} and produces the corresponding reflexive
+ * {@link ForwardLink} or {@link BackwardLink}.
  * 
  * @author "Yevgeny Kazakov"
  */
-public class IndexedObjectSomeValuesFromDecomposition extends
-		AbstractSubsumerDecompositionRule<IndexedObjectSomeValuesFrom> {
+public class IndexedObjectHasSelfDecomposition extends
+		AbstractSubsumerDecompositionRule<IndexedObjectHasSelf> {
 
-	public static final String NAME = "IndexedObjectSomeValuesFrom Decomposition";
+	public static final String NAME = "IndexedObjectHasSelf Decomposition";
 
-	private static SubsumerDecompositionRule<IndexedObjectSomeValuesFrom> INSTANCE_ = new IndexedObjectSomeValuesFromDecomposition();
+	private static SubsumerDecompositionRule<IndexedObjectHasSelf> INSTANCE_ = new IndexedObjectHasSelfDecomposition();
 
-	public static SubsumerDecompositionRule<IndexedObjectSomeValuesFrom> getInstance() {
+	public static SubsumerDecompositionRule<IndexedObjectHasSelf> getInstance() {
 		return INSTANCE_;
 	}
 
@@ -56,10 +54,15 @@ public class IndexedObjectSomeValuesFromDecomposition extends
 	}
 
 	@Override
-	public void apply(IndexedObjectSomeValuesFrom premise,
-			ContextPremises premises, ConclusionProducer producer) {
-		IndexedObjectSomeValuesFrom.Helper.produceDecomposedExistentialLink(
-				producer, premises.getRoot(), premise);
+	public void apply(IndexedObjectHasSelf premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		IndexedObjectHasSelf.Helper.produceDecomposedExistentialLink(producer,
+				premises.getRoot(), premise);
+		for (IndexedClassExpression range : premise.getProperty()
+				.getSaturated().getRanges()) {
+			producer.produce(new ObjectHasSelfPropertyRangeSubsumer(premises
+					.getRoot(), premise, range));
+		}
 	}
 
 	@Override
@@ -69,7 +72,7 @@ public class IndexedObjectSomeValuesFromDecomposition extends
 
 	@Override
 	public void accept(SubsumerDecompositionRuleVisitor<?> visitor,
-			IndexedObjectSomeValuesFrom premise, ContextPremises premises,
+			IndexedObjectHasSelf premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}

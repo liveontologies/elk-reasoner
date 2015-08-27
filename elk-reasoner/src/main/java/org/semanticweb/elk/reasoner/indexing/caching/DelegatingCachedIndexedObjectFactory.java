@@ -138,6 +138,12 @@ public class DelegatingCachedIndexedObjectFactory implements
 	}
 
 	@Override
+	public final CachedIndexedObjectHasSelf getIndexedObjectHasSelf(
+			ModifiableIndexedObjectProperty property) {
+		return filter(baseFactory_.getIndexedObjectHasSelf(property));
+	}
+
+	@Override
 	public final CachedIndexedObjectUnionOf getIndexedObjectUnionOf(
 			List<? extends ModifiableIndexedClassExpression> disjuncts) {
 		return filter(baseFactory_.getIndexedObjectUnionOf(disjuncts));

@@ -27,6 +27,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
@@ -52,12 +53,22 @@ public class NoOpIndexedClassExpressionVisitor<O> implements
 	}
 
 	@Override
+	public O visit(IndexedDataHasValue element) {
+		return defaultVisit(element);
+	}
+
+	@Override
 	public O visit(IndexedIndividual element) {
 		return defaultVisit(element);
 	}
 
 	@Override
 	public O visit(IndexedObjectComplementOf element) {
+		return defaultVisit(element);
+	}
+
+	@Override
+	public O visit(IndexedObjectHasSelf element) {
 		return defaultVisit(element);
 	}
 
@@ -73,11 +84,6 @@ public class NoOpIndexedClassExpressionVisitor<O> implements
 
 	@Override
 	public O visit(IndexedObjectUnionOf element) {
-		return defaultVisit(element);
-	}
-
-	@Override
-	public O visit(IndexedDataHasValue element) {
 		return defaultVisit(element);
 	}
 

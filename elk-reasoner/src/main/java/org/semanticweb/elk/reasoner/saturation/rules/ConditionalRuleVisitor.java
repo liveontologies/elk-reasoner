@@ -2,6 +2,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
@@ -30,6 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFrom
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectHasSelfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSomeValuesFromDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
@@ -50,14 +52,42 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSub
  */
 public class ConditionalRuleVisitor<O> implements RuleVisitor<O> {
 
-	private final RuleVisitor<O> visitor_;
-
 	private final RuleVisitor<Boolean> condition_;
+
+	private final RuleVisitor<O> visitor_;
 
 	public ConditionalRuleVisitor(RuleVisitor<O> visitor,
 			RuleVisitor<Boolean> condition) {
 		this.visitor_ = visitor;
 		this.condition_ = condition;
+	}
+
+	@Override
+	public O visit(BackwardLinkChainFromBackwardLinkRule rule,
+			BackwardLink premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		if (condition_.visit(rule, premise, premises, producer))
+			return visitor_.visit(rule, premise, premises, producer);
+		// else
+		return null;
+	}
+
+	@Override
+	public O visit(BackwardLinkFromForwardLinkRule rule, ForwardLink premise,
+			ContextPremises premises, ConclusionProducer producer) {
+		if (condition_.visit(rule, premise, premises, producer))
+			return visitor_.visit(rule, premise, premises, producer);
+		// else
+		return null;
+	}
+
+	@Override
+	public O visit(ContradictionCompositionRule rule, DisjointSubsumer premise,
+			ContextPremises premises, ConclusionProducer producer) {
+		if (condition_.visit(rule, premise, premises, producer))
+			return visitor_.visit(rule, premise, premises, producer);
+		// else
+		return null;
 	}
 
 	@Override
@@ -91,47 +121,26 @@ public class ConditionalRuleVisitor<O> implements RuleVisitor<O> {
 	}
 
 	@Override
+	public O visit(ContradictionOverBackwardLinkRule rule,
+			BackwardLink premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		if (condition_.visit(rule, premise, premises, producer))
+			return visitor_.visit(rule, premise, premises, producer);
+		// else
+		return null;
+	}
+
+	@Override
+	public O visit(ContradictionPropagationRule rule, Contradiction premise,
+			ContextPremises premises, ConclusionProducer producer) {
+		if (condition_.visit(rule, premise, premises, producer))
+			return visitor_.visit(rule, premise, premises, producer);
+		// else
+		return null;
+	}
+
+	@Override
 	public O visit(DisjointSubsumerFromMemberRule rule,
-			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		if (condition_.visit(rule, premise, premises, producer))
-			return visitor_.visit(rule, premise, premises, producer);
-		// else
-		return null;
-	}
-
-	@Override
-	public O visit(ObjectIntersectionFromConjunctRule rule,
-			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		if (condition_.visit(rule, premise, premises, producer))
-			return visitor_.visit(rule, premise, premises, producer);
-		// else
-		return null;
-	}
-
-	@Override
-	public O visit(ObjectUnionFromDisjunctRule rule,
-			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		if (condition_.visit(rule, premise, premises, producer))
-			return visitor_.visit(rule, premise, premises, producer);
-		// else
-		return null;
-	}
-
-	@Override
-	public O visit(PropagationFromExistentialFillerRule rule,
-			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		if (condition_.visit(rule, premise, premises, producer))
-			return visitor_.visit(rule, premise, premises, producer);
-		// else
-		return null;
-	}
-
-	@Override
-	public O visit(SuperClassFromSubClassRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		if (condition_.visit(rule, premise, premises, producer))
@@ -143,6 +152,16 @@ public class ConditionalRuleVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(IndexedObjectComplementOfDecomposition rule,
 			IndexedObjectComplementOf premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		if (condition_.visit(rule, premise, premises, producer))
+			return visitor_.visit(rule, premise, premises, producer);
+		// else
+		return null;
+	}
+
+	@Override
+	public O visit(IndexedObjectHasSelfDecomposition rule,
+			IndexedObjectHasSelf premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		if (condition_.visit(rule, premise, premises, producer))
 			return visitor_.visit(rule, premise, premises, producer);
@@ -171,17 +190,8 @@ public class ConditionalRuleVisitor<O> implements RuleVisitor<O> {
 	}
 
 	@Override
-	public O visit(SubsumerBackwardLinkRule rule, BackwardLink premise,
-			ContextPremises premises, ConclusionProducer producer) {
-		if (condition_.visit(rule, premise, premises, producer))
-			return visitor_.visit(rule, premise, premises, producer);
-		// else
-		return null;
-	}
-
-	@Override
-	public O visit(ContradictionOverBackwardLinkRule rule,
-			BackwardLink premise, ContextPremises premises,
+	public O visit(NonReflexiveBackwardLinkCompositionRule rule,
+			ForwardLink premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		if (condition_.visit(rule, premise, premises, producer))
 			return visitor_.visit(rule, premise, premises, producer);
@@ -190,8 +200,18 @@ public class ConditionalRuleVisitor<O> implements RuleVisitor<O> {
 	}
 
 	@Override
-	public O visit(BackwardLinkChainFromBackwardLinkRule rule,
-			BackwardLink premise, ContextPremises premises,
+	public O visit(ObjectIntersectionFromConjunctRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		if (condition_.visit(rule, premise, premises, producer))
+			return visitor_.visit(rule, premise, premises, producer);
+		// else
+		return null;
+	}
+
+	@Override
+	public O visit(ObjectUnionFromDisjunctRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		if (condition_.visit(rule, premise, premises, producer))
 			return visitor_.visit(rule, premise, premises, producer);
@@ -209,18 +229,8 @@ public class ConditionalRuleVisitor<O> implements RuleVisitor<O> {
 	}
 
 	@Override
-	public O visit(RootContextInitializationRule rule,
-			ContextInitialization premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		if (condition_.visit(rule, premise, premises, producer))
-			return visitor_.visit(rule, premise, premises, producer);
-		// else
-		return null;
-	}
-
-	@Override
-	public O visit(ReflexivePropertyRangesContextInitRule rule,
-			ContextInitialization premise, ContextPremises premises,
+	public O visit(PropagationFromExistentialFillerRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		if (condition_.visit(rule, premise, premises, producer))
 			return visitor_.visit(rule, premise, premises, producer);
@@ -239,33 +249,6 @@ public class ConditionalRuleVisitor<O> implements RuleVisitor<O> {
 	}
 
 	@Override
-	public O visit(ContradictionPropagationRule rule, Contradiction premise,
-			ContextPremises premises, ConclusionProducer producer) {
-		if (condition_.visit(rule, premise, premises, producer))
-			return visitor_.visit(rule, premise, premises, producer);
-		// else
-		return null;
-	}
-
-	@Override
-	public O visit(ContradictionCompositionRule rule, DisjointSubsumer premise,
-			ContextPremises premises, ConclusionProducer producer) {
-		if (condition_.visit(rule, premise, premises, producer))
-			return visitor_.visit(rule, premise, premises, producer);
-		// else
-		return null;
-	}
-
-	@Override
-	public O visit(BackwardLinkFromForwardLinkRule rule, ForwardLink premise,
-			ContextPremises premises, ConclusionProducer producer) {
-		if (condition_.visit(rule, premise, premises, producer))
-			return visitor_.visit(rule, premise, premises, producer);
-		// else
-		return null;
-	}
-
-	@Override
 	public O visit(ReflexiveBackwardLinkCompositionRule rule,
 			ForwardLink premise, ContextPremises premises,
 			ConclusionProducer producer) {
@@ -276,9 +259,28 @@ public class ConditionalRuleVisitor<O> implements RuleVisitor<O> {
 	}
 
 	@Override
-	public O visit(NonReflexiveBackwardLinkCompositionRule rule,
-			ForwardLink premise, ContextPremises premises,
+	public O visit(ReflexivePropertyRangesContextInitRule rule,
+			ContextInitialization premise, ContextPremises premises,
 			ConclusionProducer producer) {
+		if (condition_.visit(rule, premise, premises, producer))
+			return visitor_.visit(rule, premise, premises, producer);
+		// else
+		return null;
+	}
+
+	@Override
+	public O visit(RootContextInitializationRule rule,
+			ContextInitialization premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		if (condition_.visit(rule, premise, premises, producer))
+			return visitor_.visit(rule, premise, premises, producer);
+		// else
+		return null;
+	}
+
+	@Override
+	public O visit(SubsumerBackwardLinkRule rule, BackwardLink premise,
+			ContextPremises premises, ConclusionProducer producer) {
 		if (condition_.visit(rule, premise, premises, producer))
 			return visitor_.visit(rule, premise, premises, producer);
 		// else
@@ -288,6 +290,16 @@ public class ConditionalRuleVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(SubsumerPropagationRule rule, Propagation premise,
 			ContextPremises premises, ConclusionProducer producer) {
+		if (condition_.visit(rule, premise, premises, producer))
+			return visitor_.visit(rule, premise, premises, producer);
+		// else
+		return null;
+	}
+
+	@Override
+	public O visit(SuperClassFromSubClassRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ConclusionProducer producer) {
 		if (condition_.visit(rule, premise, premises, producer))
 			return visitor_.visit(rule, premise, premises, producer);
 		// else

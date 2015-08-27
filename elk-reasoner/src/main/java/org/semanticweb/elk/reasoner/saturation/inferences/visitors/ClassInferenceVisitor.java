@@ -47,6 +47,7 @@ public interface ClassInferenceVisitor<I, O> extends
 		protected Void defaultTracedVisit(ClassInference conclusion, Void input) {
 			return null;
 		}
+
 	};
 
 }

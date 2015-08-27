@@ -27,8 +27,8 @@ import java.util.Map;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
@@ -102,7 +102,7 @@ public class NonReflexiveBackwardLinkCompositionRule extends
 
 			for (IndexedComplexPropertyChain composition : compositions)
 				for (IndexedContextRoot source : subPremises.getLinkedRoots()) {
-					ForwardLinkImpl.produceComposedLink(producer, source,
+					IndexedObjectSomeValuesFrom.Helper.produceComposedLink(producer, source,
 							backwardRelation, premises.getRoot(),
 							forwardLink_.getForwardChain(),
 							forwardLink_.getTarget(), composition);

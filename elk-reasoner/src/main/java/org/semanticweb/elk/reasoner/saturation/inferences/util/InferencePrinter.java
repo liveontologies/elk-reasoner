@@ -38,11 +38,14 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromOwlNo
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedFirstConjunct;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedReflexiveBackwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedReflexiveForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedSecondConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjunctionComposition;
 import org.semanticweb.elk.reasoner.saturation.inferences.GeneratedPropagation;
 import org.semanticweb.elk.reasoner.saturation.inferences.InitializationSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.ObjectHasSelfPropertyRangeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedContradiction;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.ReflexiveSubsumer;
@@ -147,7 +150,17 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>,
 	}
 
 	@Override
+	public String visit(DecomposedReflexiveBackwardLink conclusion, Void input) {
+		return "Creating forward link from " + conclusion.getPremise();
+	}
+
+	@Override
 	public String visit(DecomposedExistentialForwardLink conclusion, Void input) {
+		return "Creating forward link from " + conclusion.getExistential();
+	}
+
+	@Override
+	public String visit(DecomposedReflexiveForwardLink conclusion, Void input) {
 		return "Creating forward link from " + conclusion.getExistential();
 	}
 
@@ -240,6 +253,11 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>,
 		return "Told sub-chain: " + inference.getSubPropertyChain() + " => "
 				+ inference.getSuperPropertyChain() + ", premise: "
 				+ inference.getPremise();
+	}
+
+	@Override
+	public String visit(ObjectHasSelfPropertyRangeSubsumer inference, Void input) {
+		return "Property range of " + inference.getPremise();
 	}
 
 }

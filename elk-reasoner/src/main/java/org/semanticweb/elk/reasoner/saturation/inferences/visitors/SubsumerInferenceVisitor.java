@@ -6,6 +6,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedSecondConjun
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjunctionComposition;
 import org.semanticweb.elk.reasoner.saturation.inferences.InitializationSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.ObjectHasSelfPropertyRangeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.ReflexiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
 
@@ -26,5 +27,7 @@ public interface SubsumerInferenceVisitor<I, O> {
 	public O visit(ReflexiveSubsumer inference, I input);
 
 	public O visit(SubClassOfSubsumer inference, I input);
+
+	public O visit(ObjectHasSelfPropertyRangeSubsumer inference, I input);
 
 }

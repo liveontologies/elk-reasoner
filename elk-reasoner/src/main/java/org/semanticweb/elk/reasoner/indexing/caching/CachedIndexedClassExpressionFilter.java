@@ -44,6 +44,8 @@ public interface CachedIndexedClassExpressionFilter {
 	public CachedIndexedObjectSomeValuesFrom filter(
 			CachedIndexedObjectSomeValuesFrom element);
 
+	public CachedIndexedObjectHasSelf filter(CachedIndexedObjectHasSelf element);
+
 	public CachedIndexedObjectUnionOf filter(CachedIndexedObjectUnionOf element);
 
 	public CachedIndexedDataHasValue filter(CachedIndexedDataHasValue element);

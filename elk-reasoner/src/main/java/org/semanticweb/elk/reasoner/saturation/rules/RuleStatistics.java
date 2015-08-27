@@ -146,6 +146,10 @@ public class RuleStatistics extends AbstractStatistics {
 				ruleCounter.countIndexedObjectSomeValuesFromDecomposition,
 				ruleTimer.timeIndexedObjectSomeValuesFromDecomposition);
 
+		print(printer, IndexedObjectComplementOfDecomposition.NAME,
+				ruleCounter.countIndexedObjectHasSelfDecomposition,
+				ruleTimer.timeIndexedObjectHasSelfDecomposition);
+
 		print(printer, SubsumerPropagationRule.NAME,
 				ruleCounter.countSubsumerPropagationRule,
 				ruleTimer.timeSubsumerPropagationRule);

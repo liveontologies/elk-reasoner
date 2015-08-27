@@ -40,6 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFrom
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectHasSelfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSomeValuesFromDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
@@ -105,6 +106,11 @@ public class RuleCounter {
 	 * counter for {@link IndexedObjectComplementOfDecomposition}
 	 */
 	long countIndexedObjectComplementOfDecomposition;
+
+	/**
+	 * counter for {@link IndexedObjectHasSelfDecomposition}
+	 */
+	long countIndexedObjectHasSelfDecomposition;
 
 	/**
 	 * counter for {@link IndexedObjectIntersectionOfDecomposition}
@@ -200,6 +206,7 @@ public class RuleCounter {
 		countIndexedObjectIntersectionOfDecomposition += counter.countIndexedObjectIntersectionOfDecomposition;
 		countIndexedObjectSomeValuesFromDecomposition += counter.countIndexedObjectSomeValuesFromDecomposition;
 		countIndexedObjectComplementOfDecomposition += counter.countIndexedObjectComplementOfDecomposition;
+		countIndexedObjectHasSelfDecomposition += counter.countIndexedObjectHasSelfDecomposition;
 		countContradictionFromOwlNothingRule += counter.countContradictionFromOwlNothingRule;
 		countSubsumerPropagationRule += counter.countSubsumerPropagationRule;
 		countReflexiveBackwardLinkCompositionRule += counter.countReflexiveBackwardLinkCompositionRule;
@@ -228,6 +235,7 @@ public class RuleCounter {
 				+ countIndexedObjectIntersectionOfDecomposition
 				+ countIndexedObjectSomeValuesFromDecomposition
 				+ countIndexedObjectComplementOfDecomposition
+				+ countIndexedObjectHasSelfDecomposition
 				+ countContradictionFromOwlNothingRule
 				+ countSubsumerPropagationRule
 				+ countPropagationInitializationRule
@@ -258,6 +266,7 @@ public class RuleCounter {
 		countIndexedObjectIntersectionOfDecomposition = 0;
 		countIndexedObjectSomeValuesFromDecomposition = 0;
 		countIndexedObjectComplementOfDecomposition = 0;
+		countIndexedObjectHasSelfDecomposition = 0;
 		countContradictionFromOwlNothingRule = 0;
 		countSubsumerPropagationRule = 0;
 		countPropagationInitializationRule = 0;

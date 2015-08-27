@@ -185,6 +185,12 @@ public class ModifiableIndexedObjectCacheImpl implements
 		}
 
 		@Override
+		public CachedIndexedObjectHasSelf filter(
+				CachedIndexedObjectHasSelf element) {
+			return cachedComplexClassExpressions_.findStructural(element);
+		}
+
+		@Override
 		public CachedIndexedObjectUnionOf filter(
 				CachedIndexedObjectUnionOf element) {
 			return cachedComplexClassExpressions_.findStructural(element);
@@ -247,6 +253,13 @@ public class ModifiableIndexedObjectCacheImpl implements
 		@Override
 		public CachedIndexedObjectSomeValuesFrom filter(
 				CachedIndexedObjectSomeValuesFrom element) {
+			cachedComplexClassExpressions_.addStructural(element);
+			return null;
+		}
+
+		@Override
+		public CachedIndexedObjectHasSelf filter(
+				CachedIndexedObjectHasSelf element) {
 			cachedComplexClassExpressions_.addStructural(element);
 			return null;
 		}
@@ -315,6 +328,12 @@ public class ModifiableIndexedObjectCacheImpl implements
 		@Override
 		public CachedIndexedObjectSomeValuesFrom filter(
 				CachedIndexedObjectSomeValuesFrom element) {
+			return cachedComplexClassExpressions_.removeStructural(element);
+		}
+
+		@Override
+		public CachedIndexedObjectHasSelf filter(
+				CachedIndexedObjectHasSelf element) {
 			return cachedComplexClassExpressions_.removeStructural(element);
 		}
 

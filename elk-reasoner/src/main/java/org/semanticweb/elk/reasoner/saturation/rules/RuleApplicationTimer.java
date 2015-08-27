@@ -40,6 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFrom
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectHasSelfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSomeValuesFromDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
@@ -106,6 +107,11 @@ public class RuleApplicationTimer {
 	 * timer for {@link IndexedObjectComplementOfDecomposition}
 	 */
 	long timeIndexedObjectComplementOfDecomposition;
+
+	/**
+	 * timer for {@link IndexedObjectHasSelfDecomposition}
+	 */
+	long timeIndexedObjectHasSelfDecomposition;
 
 	/**
 	 * time for {@link IndexedObjectIntersectionOfDecomposition}
@@ -202,6 +208,7 @@ public class RuleApplicationTimer {
 		timeIndexedObjectIntersectionOfDecomposition += timer.timeIndexedObjectIntersectionOfDecomposition;
 		timeIndexedObjectSomeValuesFromDecomposition += timer.timeIndexedObjectSomeValuesFromDecomposition;
 		timeIndexedObjectComplementOfDecomposition += timer.timeIndexedObjectComplementOfDecomposition;
+		timeIndexedObjectHasSelfDecomposition += timer.timeIndexedObjectHasSelfDecomposition;
 		timeContradictionFromOwlNothingRule += timer.timeContradictionFromOwlNothingRule;
 		timeSubsumerPropagationRule += timer.timeSubsumerPropagationRule;
 		timePropagationInitializationRule += timer.timePropagationInitializationRule;
@@ -228,6 +235,7 @@ public class RuleApplicationTimer {
 				+ timeIndexedObjectIntersectionOfDecomposition
 				+ timeIndexedObjectSomeValuesFromDecomposition
 				+ timeIndexedObjectComplementOfDecomposition
+				+ timeIndexedObjectHasSelfDecomposition
 				+ timeContradictionFromOwlNothingRule
 				+ timeSubsumerPropagationRule
 				+ timePropagationInitializationRule
@@ -258,6 +266,7 @@ public class RuleApplicationTimer {
 		timeIndexedObjectIntersectionOfDecomposition = 0;
 		timeIndexedObjectSomeValuesFromDecomposition = 0;
 		timeIndexedObjectComplementOfDecomposition = 0;
+		timeIndexedObjectHasSelfDecomposition = 0;
 		timeContradictionFromOwlNothingRule = 0;
 		timeSubsumerPropagationRule = 0;
 		timePropagationInitializationRule = 0;

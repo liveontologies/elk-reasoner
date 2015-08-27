@@ -25,9 +25,9 @@ package org.semanticweb.elk.reasoner.saturation.rules.backwardlinks;
 import java.util.Collection;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -156,10 +156,10 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 
 			for (IndexedComplexPropertyChain composition : compositions)
 				for (IndexedContextRoot forwardTarget : forwardTargets)
-					ForwardLinkImpl.produceComposedLink(producer,
-							link.getOriginRoot(), link.getBackwardRelation(),
-							premises.getRoot(), forwardRelation, forwardTarget,
-							composition);
+					IndexedObjectSomeValuesFrom.Helper.produceComposedLink(
+							producer, link.getOriginRoot(),
+							link.getBackwardRelation(), premises.getRoot(),
+							forwardRelation, forwardTarget, composition);
 		}
 
 	}

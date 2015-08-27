@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
@@ -52,6 +53,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFrom
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectHasSelfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSomeValuesFromDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
@@ -161,6 +163,14 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 			IndexedObjectComplementOf premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		counter_.countIndexedObjectComplementOfDecomposition++;
+		return visitor_.visit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(IndexedObjectHasSelfDecomposition rule,
+			IndexedObjectHasSelf premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		counter_.countIndexedObjectHasSelfDecomposition++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
 

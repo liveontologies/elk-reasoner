@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
@@ -52,6 +53,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFrom
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectHasSelfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSomeValuesFromDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
@@ -365,6 +367,18 @@ class RuleApplicationTimerVisitor<O> implements RuleVisitor<O> {
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		timer_.timeSuperClassFromSubClassRule -= CachedTimeThread
+				.getCurrentTimeMillis();
+		O result = visitor_.visit(rule, premise, premises, producer);
+		timer_.timeSuperClassFromSubClassRule += CachedTimeThread
+				.getCurrentTimeMillis();
+		return result;
+	}
+
+	@Override
+	public O visit(IndexedObjectHasSelfDecomposition rule,
+			IndexedObjectHasSelf premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		timer_.timeIndexedObjectHasSelfDecomposition -= CachedTimeThread
 				.getCurrentTimeMillis();
 		O result = visitor_.visit(rule, premise, premises, producer);
 		timer_.timeSuperClassFromSubClassRule += CachedTimeThread

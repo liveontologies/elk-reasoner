@@ -1,14 +1,12 @@
 package org.semanticweb.elk.reasoner.indexing.factories;
 
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
-
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,20 +22,18 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassEx
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectHasSelf;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
+
 /**
- * A factory for creating instances of {@link ModifiableIndexedClassExpression}
+ * A factory for creating instances of {@link ModifiableIndexedObjectHasSelf}
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface ModifiableIndexedClassExpressionFactory extends
-		ModifiableIndexedClassFactory, ModifiableIndexedIndividualFactory,
-		ModifiableIndexedObjectComplementOfFactory,
-		ModifiableIndexedObjectIntersectionOfFactory,
-		ModifiableIndexedObjectSomeValuesFromFactory,
-		ModifiableIndexedObjectHasSelfFactory,
-		ModifiableIndexedObjectUnionOfFactory,
-		ModifiableIndexedDataHasValueFactory {
+public interface ModifiableIndexedObjectHasSelfFactory {
 
-	// combined interface
+	public ModifiableIndexedObjectHasSelf getIndexedObjectHasSelf(
+			ModifiableIndexedObjectProperty property);
+
 }

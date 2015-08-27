@@ -36,6 +36,7 @@ import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedDisjointClasse
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectFactory;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectSomeValuesFrom;
@@ -124,6 +125,12 @@ public class ModifiableIndexedObjectFactoryImpl implements
 			ModifiableIndexedObjectProperty property,
 			ModifiableIndexedClassExpression filler) {
 		return new CachedIndexedObjectSomeValuesFromImpl(property, filler);
+	}
+
+	@Override
+	public CachedIndexedObjectHasSelf getIndexedObjectHasSelf(
+			ModifiableIndexedObjectProperty property) {
+		return new CachedIndexedObjectHasSelfImpl(property);
 	}
 
 	@Override

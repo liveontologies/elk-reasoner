@@ -72,6 +72,9 @@ public interface CachedIndexedObjectFactory {
 			ModifiableIndexedObjectProperty property,
 			ModifiableIndexedClassExpression filler);
 
+	public CachedIndexedObjectHasSelf getIndexedObjectHasSelf(
+			ModifiableIndexedObjectProperty property);
+
 	public CachedIndexedObjectUnionOf getIndexedObjectUnionOf(
 			List<? extends ModifiableIndexedClassExpression> disjuncts);
 

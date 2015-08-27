@@ -43,11 +43,14 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromOwlNo
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedFirstConjunct;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedReflexiveBackwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedReflexiveForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedSecondConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjunctionComposition;
 import org.semanticweb.elk.reasoner.saturation.inferences.GeneratedPropagation;
 import org.semanticweb.elk.reasoner.saturation.inferences.InitializationSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.ObjectHasSelfPropertyRangeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedContradiction;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.ReflexiveSubsumer;
@@ -189,6 +192,18 @@ public class ClassInferencePremiseVisitor<I, O> implements
 	}
 
 	@Override
+	public O visit(DecomposedReflexiveBackwardLink conclusion, I input) {
+		conclusion.getPremise().accept(classPremiseVisitor_, input);
+		return null;
+	}
+
+	@Override
+	public O visit(DecomposedReflexiveForwardLink conclusion, I input) {
+		conclusion.getExistential().accept(classPremiseVisitor_, input);
+		return null;
+	}
+
+	@Override
 	public O visit(GeneratedPropagation conclusion, I input) {
 		conclusion.getPremise().accept(classPremiseVisitor_, input);
 		conclusion.getSubPropertyPremise().accept(propertyPremiseVisitor_,
@@ -288,6 +303,13 @@ public class ClassInferencePremiseVisitor<I, O> implements
 	@Override
 	public O visit(ToldSubProperty inference, I input) {
 		inference.getPremise().accept(propertyPremiseVisitor_, input);
+		return null;
+	}
+
+	@Override
+	public O visit(ObjectHasSelfPropertyRangeSubsumer inference, I input) {
+		inference.getPremise().accept(classPremiseVisitor_, input);
+		// TODO: process the property range premise
 		return null;
 	}
 

@@ -61,6 +61,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionInference
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedFirstConjunct;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedReflexiveBackwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedReflexiveForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedSecondConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerInference;
@@ -68,6 +70,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.DisjunctionComposition
 import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.GeneratedPropagation;
 import org.semanticweb.elk.reasoner.saturation.inferences.InitializationSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.ObjectHasSelfPropertyRangeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedContradiction;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagationInference;
@@ -268,7 +271,7 @@ public class ModifiableClassInferenceSetImpl implements
 			input.addInference(inference);
 			return null;
 		}
-		
+
 		@Override
 		public Void visit(DecomposedSecondConjunct inference,
 				ModifiableClassInferenceSetImpl input) {
@@ -333,6 +336,20 @@ public class ModifiableClassInferenceSetImpl implements
 		}
 
 		@Override
+		public Void visit(DecomposedReflexiveBackwardLink inference,
+				ModifiableClassInferenceSetImpl input) {
+			input.addInference(inference);
+			return null;
+		}
+
+		@Override
+		public Void visit(DecomposedReflexiveForwardLink inference,
+				ModifiableClassInferenceSetImpl input) {
+			input.addInference(inference);
+			return null;
+		}
+
+		@Override
 		public Void visit(GeneratedPropagation inference,
 				ModifiableClassInferenceSetImpl input) {
 			input.addInference(inference);
@@ -384,6 +401,13 @@ public class ModifiableClassInferenceSetImpl implements
 
 		@Override
 		public Void visit(DisjunctionComposition inference,
+				ModifiableClassInferenceSetImpl input) {
+			input.addInference(inference);
+			return null;
+		}
+
+		@Override
+		public Void visit(ObjectHasSelfPropertyRangeSubsumer inference,
 				ModifiableClassInferenceSetImpl input) {
 			input.addInference(inference);
 			return null;

@@ -22,6 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import java.util.ArrayList;
+
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
@@ -29,6 +32,10 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFro
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialBackwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialForwardLink;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
@@ -104,6 +111,47 @@ public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				return existential.getFiller();
 			// else we also need to take the property into account
 			return existential.getRangeFiller();
+		}
+
+		public static void produceDecomposedExistentialLink(
+				ConclusionProducer producer, IndexedContextRoot root,
+				IndexedObjectSomeValuesFrom subsumer) {
+			SaturatedPropertyChain propertySaturation = subsumer.getProperty()
+					.getSaturated();
+			if (propertySaturation.getCompositionsByLeftSubProperty().isEmpty()) {
+				producer.produce(new DecomposedExistentialBackwardLink(root,
+						subsumer));
+			} else {
+				producer.produce(new DecomposedExistentialForwardLink(root,
+						subsumer));
+			}
+		}
+
+		public static void produceComposedLink(ConclusionProducer producer,
+				IndexedContextRoot source,
+				IndexedObjectProperty backwardRelation,
+				IndexedContextRoot inferenceRoot,
+				IndexedPropertyChain forwardRelation,
+				IndexedContextRoot target,
+				IndexedComplexPropertyChain composition) {
+
+			if (composition.getSaturated().getCompositionsByLeftSubProperty()
+					.isEmpty()) {
+				ArrayList<IndexedObjectProperty> toldSuperProperties = composition
+						.getToldSuperProperties();
+				ArrayList<ElkAxiom> toldSuperPropertiesReasons = composition
+						.getToldSuperPropertiesReasons();
+				for (int i = 0; i < toldSuperProperties.size(); i++) {
+					producer.produce(new ComposedBackwardLink(source,
+							backwardRelation, inferenceRoot, forwardRelation,
+							target, composition, toldSuperProperties.get(i),
+							toldSuperPropertiesReasons.get(i)));
+				}
+			} else {
+				producer.produce(new ComposedForwardLink(source,
+						backwardRelation, inferenceRoot, forwardRelation,
+						target, composition));
+			}
 		}
 
 	}

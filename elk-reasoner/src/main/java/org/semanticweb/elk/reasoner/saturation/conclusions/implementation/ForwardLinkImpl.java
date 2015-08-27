@@ -22,22 +22,10 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
-import java.util.ArrayList;
-
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.ComposedForwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialBackwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialForwardLink;
-import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,43 +83,4 @@ public class ForwardLinkImpl<R extends IndexedPropertyChain> extends
 		return forwardChain_ + "->" + target_;
 	}
 
-	// TODO: find a better place for the following methods
-
-	public static void produceDecomposedExistentialLink(
-			ConclusionProducer producer, IndexedContextRoot root,
-			IndexedObjectSomeValuesFrom subsumer) {
-		SaturatedPropertyChain propertySaturation = subsumer.getProperty()
-				.getSaturated();
-		if (propertySaturation.getCompositionsByLeftSubProperty().isEmpty()) {
-			producer.produce(new DecomposedExistentialBackwardLink(root,
-					subsumer));
-		} else {
-			producer.produce(new DecomposedExistentialForwardLink(root,
-					subsumer));
-		}
-	}
-
-	public static void produceComposedLink(ConclusionProducer producer,
-			IndexedContextRoot source, IndexedObjectProperty backwardRelation,
-			IndexedContextRoot inferenceRoot,
-			IndexedPropertyChain forwardRelation, IndexedContextRoot target,
-			IndexedComplexPropertyChain composition) {
-
-		if (composition.getSaturated().getCompositionsByLeftSubProperty()
-				.isEmpty()) {
-			ArrayList<IndexedObjectProperty> toldSuperProperties = composition
-					.getToldSuperProperties();
-			ArrayList<ElkAxiom> toldSuperPropertiesReasons = composition
-					.getToldSuperPropertiesReasons();
-			for (int i = 0; i < toldSuperProperties.size(); i++) {
-				producer.produce(new ComposedBackwardLink(source,
-						backwardRelation, inferenceRoot, forwardRelation,
-						target, composition, toldSuperProperties.get(i),
-						toldSuperPropertiesReasons.get(i)));
-			}
-		} else {
-			producer.produce(new ComposedForwardLink(source, backwardRelation,
-					inferenceRoot, forwardRelation, target, composition));
-		}
-	}
 }

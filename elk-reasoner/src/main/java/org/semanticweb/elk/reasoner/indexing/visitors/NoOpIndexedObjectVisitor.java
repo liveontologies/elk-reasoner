@@ -27,15 +27,16 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyCha
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDeclarationAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedRangeFiller;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectPropertyRangeAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedRangeFiller;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubObjectPropertyOfAxiom;
@@ -69,6 +70,11 @@ public class NoOpIndexedObjectVisitor<O> implements IndexedObjectVisitor<O> {
 		return defaultVisit(element);
 	}
 
+	@Override
+	public O visit(IndexedObjectHasSelf element) {
+		return defaultVisit(element);
+	}
+	
 	@Override
 	public O visit(IndexedObjectIntersectionOf element) {
 		return defaultVisit(element);
@@ -132,6 +138,6 @@ public class NoOpIndexedObjectVisitor<O> implements IndexedObjectVisitor<O> {
 	@Override
 	public O visit(IndexedDeclarationAxiom axiom) {
 		return defaultVisit(axiom);
-	}
+	}	
 
 }

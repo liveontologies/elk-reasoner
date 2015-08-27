@@ -34,10 +34,10 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
  *            the type of the output of this visitor
  */
 public interface IndexedClassExpressionVisitor<O> extends
-		IndexedClassEntityVisitor<O>, IndexedObjectComplementOfVisitor<O>,
+		IndexedClassEntityVisitor<O>, IndexedDataHasValueVisitor<O>,
+		IndexedObjectComplementOfVisitor<O>, IndexedObjectHasSelfVisitor<O>,
 		IndexedObjectIntersectionOfVisitor<O>,
-		IndexedObjectSomeValuesFromVisitor<O>, IndexedObjectUnionOfVisitor<O>,
-		IndexedDataHasValueVisitor<O> {
+		IndexedObjectSomeValuesFromVisitor<O>, IndexedObjectUnionOfVisitor<O> {
 
 	// nothing else
 }

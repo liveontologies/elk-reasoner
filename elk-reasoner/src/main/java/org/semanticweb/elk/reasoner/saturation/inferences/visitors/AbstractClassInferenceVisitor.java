@@ -36,11 +36,14 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromOwlNo
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedFirstConjunct;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedReflexiveBackwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedReflexiveForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedSecondConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjunctionComposition;
 import org.semanticweb.elk.reasoner.saturation.inferences.GeneratedPropagation;
 import org.semanticweb.elk.reasoner.saturation.inferences.InitializationSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.ObjectHasSelfPropertyRangeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedContradiction;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.ReflexiveSubsumer;
@@ -76,12 +79,23 @@ public abstract class AbstractClassInferenceVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(DecomposedFirstConjunct conclusion, I input) {
+	public O visit(ContradictionFromDisjointSubsumers conclusion, I input) {
 		return defaultTracedVisit(conclusion, input);
 	}
 
 	@Override
-	public O visit(DecomposedSecondConjunct conclusion, I input) {
+	public O visit(ContradictionFromInconsistentDisjointnessAxiom conclusion,
+			I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(ContradictionFromNegation conclusion, I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(ContradictionFromOwlNothing conclusion, I input) {
 		return defaultTracedVisit(conclusion, input);
 	}
 
@@ -96,7 +110,52 @@ public abstract class AbstractClassInferenceVisitor<I, O> implements
 	}
 
 	@Override
+	public O visit(DecomposedFirstConjunct conclusion, I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(DecomposedReflexiveBackwardLink conclusion, I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(DecomposedReflexiveForwardLink conclusion, I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(DecomposedSecondConjunct conclusion, I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(DisjointSubsumerFromSubsumer conclusion, I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(DisjunctionComposition conclusion, I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(GeneratedPropagation conclusion, I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+
+	@Override
 	public O visit(InitializationSubsumer conclusion, I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(ObjectHasSelfPropertyRangeSubsumer conclusion, I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(PropagatedContradiction conclusion, I input) {
 		return defaultTracedVisit(conclusion, input);
 	}
 
@@ -116,53 +175,12 @@ public abstract class AbstractClassInferenceVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(SuperReversedForwardLink conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
-	}
-
-	@Override
 	public O visit(SubClassOfSubsumer conclusion, I input) {
 		return defaultTracedVisit(conclusion, input);
 	}
 
 	@Override
-	public O visit(GeneratedPropagation conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
-	}
-
-	@Override
-	public O visit(ContradictionFromInconsistentDisjointnessAxiom conclusion,
-			I input) {
-		return defaultTracedVisit(conclusion, input);
-	}
-
-	@Override
-	public O visit(ContradictionFromDisjointSubsumers conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
-	}
-
-	@Override
-	public O visit(ContradictionFromNegation conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
-	}
-
-	@Override
-	public O visit(ContradictionFromOwlNothing conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
-	}
-
-	@Override
-	public O visit(PropagatedContradiction conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
-	}
-
-	@Override
-	public O visit(DisjointSubsumerFromSubsumer conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
-	}
-
-	@Override
-	public O visit(DisjunctionComposition conclusion, I input) {
+	public O visit(SuperReversedForwardLink conclusion, I input) {
 		return defaultTracedVisit(conclusion, input);
 	}
 
