@@ -31,7 +31,7 @@ import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputationWith
 
 /**
  * A {@link ReasonerComputationWithInputs} that computes relevant sub-properties
- * anc composition maps
+ * and composition maps
  * 
  * @author Yevgeny Kazakov
  * 

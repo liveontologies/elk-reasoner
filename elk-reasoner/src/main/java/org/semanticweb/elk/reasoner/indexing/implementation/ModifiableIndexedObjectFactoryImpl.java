@@ -48,7 +48,6 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedEntity;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectPropertyRangeAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedSubObjectPropertyOfAxiom;
 
@@ -137,12 +136,6 @@ public class ModifiableIndexedObjectFactoryImpl implements
 	public CachedIndexedObjectUnionOf getIndexedObjectUnionOf(
 			List<? extends ModifiableIndexedClassExpression> disjuncts) {
 		return new CachedIndexedObjectUnionOfImpl(disjuncts);
-	}
-
-	@Override
-	public ModifiableIndexedReflexiveObjectPropertyAxiom getIndexedReflexiveObjectPropertyAxiom(
-			ModifiableIndexedObjectProperty property, ElkAxiom reason) {
-		return new ModifiableIndexedReflexiveObjectPropertyAxiomImpl(property);
 	}
 
 	@Override

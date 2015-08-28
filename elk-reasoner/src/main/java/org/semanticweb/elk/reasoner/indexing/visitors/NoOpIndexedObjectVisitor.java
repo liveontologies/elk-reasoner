@@ -37,7 +37,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectPropertyRang
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedRangeFiller;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubObjectPropertyOfAxiom;
 
@@ -74,7 +73,7 @@ public class NoOpIndexedObjectVisitor<O> implements IndexedObjectVisitor<O> {
 	public O visit(IndexedObjectHasSelf element) {
 		return defaultVisit(element);
 	}
-	
+
 	@Override
 	public O visit(IndexedObjectIntersectionOf element) {
 		return defaultVisit(element);
@@ -126,11 +125,6 @@ public class NoOpIndexedObjectVisitor<O> implements IndexedObjectVisitor<O> {
 	}
 
 	@Override
-	public O visit(IndexedReflexiveObjectPropertyAxiom axiom) {
-		return defaultVisit(axiom);
-	}
-
-	@Override
 	public O visit(IndexedDisjointClassesAxiom axiom) {
 		return defaultVisit(axiom);
 	}
@@ -138,6 +132,6 @@ public class NoOpIndexedObjectVisitor<O> implements IndexedObjectVisitor<O> {
 	@Override
 	public O visit(IndexedDeclarationAxiom axiom) {
 		return defaultVisit(axiom);
-	}	
+	}
 
 }

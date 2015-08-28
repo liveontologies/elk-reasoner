@@ -39,7 +39,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.BackwardLinkC
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ContradictionOverBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
-import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ReflexivePropertyRangesContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradictionCompositionRule;
@@ -311,18 +310,6 @@ class RuleApplicationTimerVisitor<O> implements RuleVisitor<O> {
 				.getCurrentTimeMillis();
 		O result = visitor_.visit(rule, premise, premises, producer);
 		timer_.timeReflexiveBackwardLinkCompositionRule += CachedTimeThread
-				.getCurrentTimeMillis();
-		return result;
-	}
-
-	@Override
-	public O visit(ReflexivePropertyRangesContextInitRule rule,
-			ContextInitialization premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		timer_.timeReflexivePropertyRangesContextInitRule -= CachedTimeThread
-				.getCurrentTimeMillis();
-		O result = visitor_.visit(rule, premise, premises, producer);
-		timer_.timeReflexivePropertyRangesContextInitRule += CachedTimeThread
 				.getCurrentTimeMillis();
 		return result;
 	}

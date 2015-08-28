@@ -31,25 +31,18 @@ package org.semanticweb.elk.reasoner.stages;
  */
 public class ReasonerStageManager {
 
-	final AbstractReasonerStage axiomLoadingStage,
-			propertyInitializationStage,
-			propertyReflexivityComputationStage,
+	final AbstractReasonerStage axiomLoadingStage, propertyInitializationStage,
 			propertyHierarchyCompositionComputationStage,
-			contextInitializationStage,
-			consistencyCheckingStage,
-			classSaturationStage,
-			classTaxonomyComputationStage,
-			incrementalCompletionStage,
-			incrementalDeletionInitializationStage,
-			incrementalDeletionStage,
-			incrementalContextGapFillingStage,
+			contextInitializationStage, consistencyCheckingStage,
+			classSaturationStage, classTaxonomyComputationStage,
+			incrementalCompletionStage, incrementalDeletionInitializationStage,
+			incrementalDeletionStage, incrementalContextGapFillingStage,
 			incrementalAdditionInitializationStage, incrementalAdditionStage,
 			incrementalConsistencyCheckingStage,
 			incrementalTaxonomyCleaningStage,
 			incrementalClassTaxonomyComputationStage,
 			instanceTaxonomyComputationStage,
-			incrementalInstanceTaxonomyComputationStage,
-			inferenceTracingStage;
+			incrementalInstanceTaxonomyComputationStage, inferenceTracingStage;
 
 	ReasonerStageManager(AbstractReasonerState reasoner) {
 
@@ -62,11 +55,8 @@ public class ReasonerStageManager {
 		this.propertyInitializationStage = new PropertyInitializationStage(
 				reasoner);
 
-		this.propertyReflexivityComputationStage = new PropertyReflexivityComputationStage(
-				reasoner, propertyInitializationStage);
-
 		this.propertyHierarchyCompositionComputationStage = new PropertyHierarchyCompositionComputationStage(
-				reasoner, propertyReflexivityComputationStage);
+				reasoner, propertyInitializationStage);
 
 		this.contextInitializationStage = new ContextAssignmentResetStage(
 				reasoner, axiomLoadingStage,
@@ -116,9 +106,10 @@ public class ReasonerStageManager {
 
 		this.incrementalInstanceTaxonomyComputationStage = new IncrementalInstanceTaxonomyComputationStage(
 				reasoner, incrementalClassTaxonomyComputationStage);
-		
+
 		/* Tracing stages */
-		
-		this.inferenceTracingStage = new InferenceTracingStage(reasoner, classTaxonomyComputationStage);
+
+		this.inferenceTracingStage = new InferenceTracingStage(reasoner,
+				classTaxonomyComputationStage);
 	}
 }

@@ -17,7 +17,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.BackwardLinkC
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ContradictionOverBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
-import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ReflexivePropertyRangesContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradictionCompositionRule;
@@ -188,13 +187,6 @@ public class DelegatingRuleVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(ReflexiveBackwardLinkCompositionRule rule,
 			ForwardLink premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		return visitor_.visit(rule, premise, premises, producer);
-	}
-
-	@Override
-	public O visit(ReflexivePropertyRangesContextInitRule rule,
-			ContextInitialization premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		return visitor_.visit(rule, premise, premises, producer);
 	}

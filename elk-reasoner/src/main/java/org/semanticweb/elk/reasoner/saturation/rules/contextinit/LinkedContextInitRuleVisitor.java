@@ -43,8 +43,4 @@ public interface LinkedContextInitRuleVisitor<O> {
 			ContextInitialization premise, ContextPremises premises,
 			ConclusionProducer producer);
 
-	public O visit(ReflexivePropertyRangesContextInitRule rule,
-			ContextInitialization premise, ContextPremises premises,
-			ConclusionProducer producer);
-
 }

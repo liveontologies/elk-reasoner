@@ -31,7 +31,6 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectPropertyRangeAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
@@ -66,13 +65,6 @@ public class UpdatingModifiableIndexedObjectFactory extends
 			ModifiableIndexedEntity entity, ElkAxiom reason) {
 		return update(baseFactory_.getIndexedDeclarationAxiom(entity, reason),
 				reason);
-	}
-
-	@Override
-	public final ModifiableIndexedReflexiveObjectPropertyAxiom getIndexedReflexiveObjectPropertyAxiom(
-			ModifiableIndexedObjectProperty property, ElkAxiom reason) {
-		return update(baseFactory_.getIndexedReflexiveObjectPropertyAxiom(
-				property, reason), reason);
 	}
 
 	@Override

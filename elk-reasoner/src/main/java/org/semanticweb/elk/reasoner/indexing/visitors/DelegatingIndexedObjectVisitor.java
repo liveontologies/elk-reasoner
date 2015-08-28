@@ -36,7 +36,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectPropertyRang
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedRangeFiller;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubObjectPropertyOfAxiom;
 
@@ -136,11 +135,6 @@ public class DelegatingIndexedObjectVisitor<O> implements
 
 	@Override
 	public O visit(IndexedObjectPropertyRangeAxiom axiom) {
-		return axiomVisitor_.visit(axiom);
-	}
-
-	@Override
-	public O visit(IndexedReflexiveObjectPropertyAxiom axiom) {
 		return axiomVisitor_.visit(axiom);
 	}
 

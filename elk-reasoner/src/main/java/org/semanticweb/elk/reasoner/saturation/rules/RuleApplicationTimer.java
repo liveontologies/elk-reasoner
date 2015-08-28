@@ -26,7 +26,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.BackwardLinkC
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ContradictionOverBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
-import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ReflexivePropertyRangesContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradictionCompositionRule;
@@ -159,11 +158,6 @@ public class RuleApplicationTimer {
 	long timeReflexiveBackwardLinkCompositionRule;
 
 	/**
-	 * timer for {@link ReflexivePropertyRangesContextInitRule}
-	 */
-	long timeReflexivePropertyRangesContextInitRule;
-
-	/**
 	 * timer for {@link RootContextInitializationRule}
 	 */
 	long timeRootContextInitializationRule;
@@ -213,7 +207,6 @@ public class RuleApplicationTimer {
 		timeSubsumerPropagationRule += timer.timeSubsumerPropagationRule;
 		timePropagationInitializationRule += timer.timePropagationInitializationRule;
 		timeBackwardLinkFromForwardLinkRule += timer.timeBackwardLinkFromForwardLinkRule;
-		timeReflexivePropertyRangesContextInitRule += timer.timeReflexivePropertyRangesContextInitRule;
 	}
 
 	public long getTotalRuleAppTime() {
@@ -239,8 +232,7 @@ public class RuleApplicationTimer {
 				+ timeContradictionFromOwlNothingRule
 				+ timeSubsumerPropagationRule
 				+ timePropagationInitializationRule
-				+ timeBackwardLinkFromForwardLinkRule
-				+ timeReflexivePropertyRangesContextInitRule;
+				+ timeBackwardLinkFromForwardLinkRule;
 	}
 
 	/**
@@ -271,7 +263,6 @@ public class RuleApplicationTimer {
 		timeSubsumerPropagationRule = 0;
 		timePropagationInitializationRule = 0;
 		timeBackwardLinkFromForwardLinkRule = 0;
-		timeReflexivePropertyRangesContextInitRule = 0;
 	}
 
 }

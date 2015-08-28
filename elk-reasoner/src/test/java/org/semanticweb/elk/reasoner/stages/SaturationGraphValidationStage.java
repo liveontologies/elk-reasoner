@@ -33,6 +33,7 @@ import java.util.Set;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
@@ -60,7 +61,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.Contradiction
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
-import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ReflexivePropertyRangesContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradictionCompositionRule;
@@ -74,6 +74,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFrom
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectHasSelfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSomeValuesFromDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
@@ -390,6 +391,14 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		}
 
 		@Override
+		public Void visit(IndexedObjectHasSelfDecomposition rule,
+				IndexedObjectHasSelf premise, ContextPremises premises,
+				ConclusionProducer producer) {
+			// nothing is stored in the rule
+			return null;
+		}
+
+		@Override
 		public Void visit(NonReflexiveBackwardLinkCompositionRule rule,
 				ForwardLink premise, ContextPremises premises,
 				ConclusionProducer producer) {
@@ -493,16 +502,6 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			return null;
 		}
 
-		@Override
-		public Void visit(ReflexivePropertyRangesContextInitRule rule,
-				ContextInitialization premise, ContextPremises premises,
-				ConclusionProducer producer) {
-			for (IndexedObjectProperty reflexive : rule
-					.getToldReflexiveProperties()) {
-				iopValidator_.checkNew(reflexive);
-			}
-			return null;
-		}
 	}
 
 	/**

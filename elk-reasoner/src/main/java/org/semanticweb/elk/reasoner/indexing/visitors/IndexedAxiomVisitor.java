@@ -37,7 +37,6 @@ public interface IndexedAxiomVisitor<O> extends
 		IndexedSubClassOfAxiomVisitor<O>,
 		IndexedSubObjectPropertyOfAxiomVisitor<O>,
 		IndexedObjectPropertyRangeAxiomVisitor<O>,
-		IndexedReflexiveObjectPropertyAxiomVisitor<O>,
 		IndexedDeclarationAxiomVisitor<O> {
 
 	// combined visitor

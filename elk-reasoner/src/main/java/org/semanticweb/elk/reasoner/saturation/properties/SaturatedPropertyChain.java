@@ -53,11 +53,6 @@ public class SaturatedPropertyChain {
 	final IndexedPropertyChain root;
 
 	/**
-	 * {@code true} if {@link #root} is derived reflexive
-	 */
-	private volatile boolean isDerivedReflexive_ = false;
-
-	/**
 	 * the {@code IndexedObjectProperty}s which are subsumed by {@link #root}
 	 */
 	Set<IndexedObjectProperty> derivedSubProperties;
@@ -117,12 +112,11 @@ public class SaturatedPropertyChain {
 	 * Clear all derived information for this {@link SaturatedPropertyChain}
 	 */
 	public void clear() {
-		isDerivedReflexive_ = false;
 		derivedSubProperties = null;
 		derivedSubProperyChains = null;
 		derivedSubPropertiesComputed = false;
 		derivedRanges = null;
-		derivedRangesComputed = false;		
+		derivedRangesComputed = false;
 		leftSubComposableSubPropertiesByRightProperties = null;
 		leftSubComposableSubPropertiesByRightPropertiesComputed = false;
 		compositionsByLeftSubProperty = null;
@@ -135,8 +129,7 @@ public class SaturatedPropertyChain {
 	 *         after applying {@link #clear()}
 	 */
 	public boolean isClear() {
-		return isDerivedReflexive_ == false && derivedSubProperties == null
-				&& derivedSubProperyChains == null
+		return derivedSubProperties == null && derivedSubProperyChains == null
 				&& leftSubComposableSubPropertiesByRightProperties == null
 				&& compositionsByLeftSubProperty == null
 				&& compositionsByRightSubProperty == null;
@@ -178,13 +171,6 @@ public class SaturatedPropertyChain {
 	}
 
 	/**
-	 * @return {@code true} if this property was derived to be reflexive.
-	 */
-	public boolean isDerivedReflexive() {
-		return isDerivedReflexive_;
-	}
-
-	/**
 	 * @return A {@link Multimap} from R to S such that ObjectPropertyChain(R,
 	 *         root) is a subrole of S
 	 */
@@ -207,19 +193,6 @@ public class SaturatedPropertyChain {
 	/* Functions that modify the saturation */
 
 	/**
-	 * Sets this property as reflexive
-	 * 
-	 * @return {@code true} if the reflexivity status of the property has
-	 *         changed
-	 */
-	synchronized boolean setReflexive() {
-		if (isDerivedReflexive_)
-			return false;
-		isDerivedReflexive_ = true;
-		return true;
-	}
-
-	/**
 	 * Prints differences with other {@link SaturatedPropertyChain}
 	 * 
 	 * @param other
@@ -234,11 +207,6 @@ public class SaturatedPropertyChain {
 		if (this.root != other.root)
 			writer.append("this root: " + root + "; other root: " + other.root
 					+ "\n");
-		// comparing reflexivity flags
-		if (this.isDerivedReflexive_ != other.isDerivedReflexive_)
-			writer.append(root + ": this reflexive: "
-					+ this.isDerivedReflexive_ + "; other relfexive: "
-					+ other.isDerivedReflexive_ + "\n");
 		// comparing derived sub-properties
 		Operations.dumpDiff(this.getSubPropertyChains(),
 				other.getSubPropertyChains(), writer, root

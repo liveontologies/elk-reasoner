@@ -31,7 +31,6 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
-import org.semanticweb.elk.reasoner.saturation.tracing.factories.RuleApplicationFactoryWithTracing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,15 +75,15 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 			ruleAppVisitorFactory = new NonRedundantRuleApplicationVisitorFactory();
 		}
 
-//		if (reasoner.FULL_TRACING) {
-//			reasoner.resetTraceState();
-//			ruleFactory = new RuleApplicationFactoryWithTracing(
-//					reasoner.saturationState, reasoner.traceState
-//							.getTraceStore().getWriter(), ruleAppVisitorFactory);
-//		} else {
-			ruleFactory = new RuleApplicationAdditionFactory<RuleApplicationInput>(
-					reasoner.saturationState, ruleAppVisitorFactory);
-//		}
+		// if (reasoner.FULL_TRACING) {
+		// reasoner.resetTraceState();
+		// ruleFactory = new RuleApplicationFactoryWithTracing(
+		// reasoner.saturationState, reasoner.traceState
+		// .getTraceStore().getWriter(), ruleAppVisitorFactory);
+		// } else {
+		ruleFactory = new RuleApplicationAdditionFactory<RuleApplicationInput>(
+				reasoner.saturationState, ruleAppVisitorFactory);
+		// }
 
 		this.computation_ = new ClassExpressionSaturation<IndexedClass>(
 				reasoner.ontologyIndex.getClasses(),
@@ -115,7 +114,7 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 		if (computation_ != null)
 			computation_.printStatistics();
 	}
-	
+
 	@Override
 	public void setInterrupt(boolean flag) {
 		super.setInterrupt(flag);

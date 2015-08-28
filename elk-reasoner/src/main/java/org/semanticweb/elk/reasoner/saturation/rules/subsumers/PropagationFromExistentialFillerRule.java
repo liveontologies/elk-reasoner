@@ -39,7 +39,6 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.GeneratedPropagation;
-import org.semanticweb.elk.reasoner.saturation.inferences.ReflexiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
@@ -117,12 +116,9 @@ public class PropagationFromExistentialFillerRule extends
 				premises.getLocalReflexiveObjectProperties(),
 				subContextMap.keySet());
 
-		// TODO: deal with reflexive roles using another
-		// rule and uncomment this
-
-		// if (candidatePropagationProperties.isEmpty()) {
-		// return;
-		// }
+		if (candidatePropagationProperties.isEmpty()) {
+			return;
+		}
 
 		for (IndexedObjectSomeValuesFrom e : negExistentials_) {
 			IndexedObjectProperty relation = e.getProperty();
@@ -137,12 +133,6 @@ public class PropagationFromExistentialFillerRule extends
 					producer.produce(new GeneratedPropagation(premises
 							.getRoot(), property, e));
 				}
-			}
-
-			// TODO: create a composition rule to deal with reflexivity
-			// propagating to the this context if relation is reflexive
-			if (saturation.isDerivedReflexive()) {
-				producer.produce(new ReflexiveSubsumer(premises.getRoot(), e));
 			}
 		}
 	}

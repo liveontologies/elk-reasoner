@@ -31,11 +31,8 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.PropertyChainInitialization;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.RightReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldSubProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.ObjectPropertyInferenceProducer;
@@ -53,16 +50,18 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  * 
  */
-class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
+class SubPropertyExplorer {
 
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(SubPropertyExplorer.class);
 
-	final private IndexedPropertyChain superChain_;
-
 	/**
-	 * the set that will be closed under sub-properties
+	 * The element for which the sub-property (chains) are computed
+	 */
+	final private IndexedPropertyChain superChain_;
+	/**
+	 * the set that will be closed under told sub-properties
 	 */
 	final private Set<IndexedPropertyChain> subPropertyChains_;
 	/**
@@ -74,7 +73,7 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 	 * the sub-properties for which the told sub-properties may not be yet
 	 * expanded
 	 */
-	final private Queue<IndexedPropertyChain> toDoSubPropertyChains_ = new LinkedList<IndexedPropertyChain>();
+	final private Queue<IndexedObjectProperty> toDoSubProperties_ = new LinkedList<IndexedObjectProperty>();
 	/**
 	 * used to record sub-property inferences
 	 */
@@ -91,45 +90,15 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 		toDo(new PropertyChainInitialization(element));
 	}
 
-	@Override
-	public Void visit(IndexedObjectProperty element) {
-		ArrayList<IndexedPropertyChain> toldSubChains = element
-				.getToldSubChains();
-		ArrayList<ElkAxiom> reasons = element.getToldSubChainsReasons();
-		for (int i = 0; i < toldSubChains.size(); i++) {
-			IndexedPropertyChain sub = toldSubChains.get(i);
-			ElkAxiom reason = reasons.get(i);
-			toDo(new ToldSubProperty(sub, element, superChain_, reason));
-		}
-
-		return null;
-	}
-
-	@Override
-	public Void visit(IndexedComplexPropertyChain element) {
-		IndexedObjectProperty left = element.getFirstProperty();
-		IndexedPropertyChain right = element.getSuffixChain();
-		SaturatedPropertyChain leftSaturation = left.getSaturated();
-		SaturatedPropertyChain rightSaturation = right.getSaturated();
-		if (leftSaturation != null && leftSaturation.isDerivedReflexive()) {
-			toDo(new LeftReflexiveSubPropertyChainInference(element,
-					superChain_));
-		}
-		if (rightSaturation != null && rightSaturation.isDerivedReflexive()) {
-			toDo(new RightReflexiveSubPropertyChainInference(element,
-					superChain_));
-		}
-		return null;
-	}
-
 	private void toDo(SubPropertyChainInference<?, ?> inference) {
 		LOGGER_.trace("{}: new inference", inference);
 		inferenceProducer_.produce(inference);
-		IndexedPropertyChain subProperty = inference.getSubPropertyChain();
-		if (subPropertyChains_.add(subProperty)) {
-			toDoSubPropertyChains_.add(subProperty);
-			if (subProperty instanceof IndexedObjectProperty) {
-				subProperties_.add((IndexedObjectProperty) subProperty);
+		IndexedPropertyChain subChain = inference.getSubPropertyChain();
+		if (subPropertyChains_.add(subChain)) {
+			if (subChain instanceof IndexedObjectProperty) {
+				IndexedObjectProperty subProperty = (IndexedObjectProperty) subChain;
+				subProperties_.add(subProperty);
+				toDoSubProperties_.add(subProperty);
 			}
 		}
 
@@ -137,10 +106,17 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 
 	private void process() {
 		for (;;) {
-			IndexedPropertyChain next = toDoSubPropertyChains_.poll();
+			IndexedObjectProperty next = toDoSubProperties_.poll();
 			if (next == null)
 				break;
-			next.accept(this);
+			ArrayList<IndexedPropertyChain> toldSubChains = next
+					.getToldSubChains();
+			ArrayList<ElkAxiom> reasons = next.getToldSubChainsReasons();
+			for (int i = 0; i < toldSubChains.size(); i++) {
+				IndexedPropertyChain sub = toldSubChains.get(i);
+				ElkAxiom reason = reasons.get(i);
+				toDo(new ToldSubProperty(sub, next, superChain_, reason));
+			}
 		}
 	}
 
@@ -186,7 +162,7 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 	 * {@link IndexedPropertyChain}, if not computing before, recording all
 	 * {@link ObjectPropertyInference}s using the provided
 	 * {@link ObjectPropertyInferenceProducer}. It is ensured that all
-	 * {@link ObjectPropertyInference}s are applied only ones even if the method
+	 * {@link ObjectPropertyInference}s are applied only once even if the method
 	 * is called multiple times.
 	 * 
 	 * @param element
@@ -210,7 +186,7 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 	 * {@link IndexedPropertyChain}, if not computing before, recording all
 	 * {@link ObjectPropertyInference}s using the provided
 	 * {@link ObjectPropertyInferenceProducer}. It is ensured that all
-	 * {@link ObjectPropertyInference}s are applied only ones even if the method
+	 * {@link ObjectPropertyInference}s are applied only once even if the method
 	 * is called multiple times.
 	 * 
 	 * @param element
@@ -236,7 +212,7 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 	 * {@link ObjectPropertyInferenceProducer} is used to record all
 	 * {@link ObjectPropertyInference}s that are applied in this computation of
 	 * sub-{@link IndexedPropertyChain}s involved. It is ensured that the
-	 * computation is performed only ones.
+	 * computation is performed only once.
 	 * 
 	 * @param element
 	 *            a given {@link IndexedObjectProperty}

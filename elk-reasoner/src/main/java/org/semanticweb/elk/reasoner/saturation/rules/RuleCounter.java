@@ -26,7 +26,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.BackwardLinkC
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ContradictionOverBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
-import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ReflexivePropertyRangesContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradictionCompositionRule;
@@ -158,11 +157,6 @@ public class RuleCounter {
 	long countReflexiveBackwardLinkCompositionRule;
 
 	/**
-	 * counter for {@link ReflexivePropertyRangesContextInitRule};
-	 */
-	long countReflexivePropertyRangesContextInitRule;
-
-	/**
 	 * counter for {@link RootContextInitializationRule}
 	 */
 	long countRootContextInitializationRule;
@@ -212,7 +206,6 @@ public class RuleCounter {
 		countReflexiveBackwardLinkCompositionRule += counter.countReflexiveBackwardLinkCompositionRule;
 		countPropagationInitializationRule += counter.countPropagationInitializationRule;
 		countBackwardLinkFromForwardLinkRule += counter.countBackwardLinkFromForwardLinkRule;
-		countReflexivePropertyRangesContextInitRule += counter.countReflexivePropertyRangesContextInitRule;
 	}
 
 	public long getTotalRuleAppCount() {
@@ -239,8 +232,7 @@ public class RuleCounter {
 				+ countContradictionFromOwlNothingRule
 				+ countSubsumerPropagationRule
 				+ countPropagationInitializationRule
-				+ countBackwardLinkFromForwardLinkRule
-				+ countReflexivePropertyRangesContextInitRule;
+				+ countBackwardLinkFromForwardLinkRule;
 	}
 
 	/**
@@ -271,6 +263,5 @@ public class RuleCounter {
 		countSubsumerPropagationRule = 0;
 		countPropagationInitializationRule = 0;
 		countBackwardLinkFromForwardLinkRule = 0;
-		countReflexivePropertyRangesContextInitRule = 0;
 	}
 }
