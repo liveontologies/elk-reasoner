@@ -31,20 +31,12 @@ import java.util.Map;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectPropertyConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ComposedReflexivePropertyChain;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.PropertyChainInitialization;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ReflexivePropertyChain;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ReflexivePropertyChainImpl;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ReflexivePropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ReflexiveToldSubObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.RightReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldReflexiveProperty;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldSubProperty;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.HashListMultimap;
@@ -68,8 +60,6 @@ public class ModifiableObjectPropertyInferenceSetImpl implements
 
 	private final ObjectPropertyConclusionVisitor<ModifiableObjectPropertyInferenceSetImpl, Iterable<? extends ObjectPropertyInference>> INFERENCE_READER_ = new InferenceReader();
 
-	private Multimap<IndexedPropertyChain, ReflexivePropertyChainInference<?>> reflexivePropertyChainInferences_;
-
 	private Map<IndexedPropertyChain, Multimap<IndexedPropertyChain, SubPropertyChainInference<?, ?>>> subPropertyChainInferences_;
 
 	@Override
@@ -81,6 +71,11 @@ public class ModifiableObjectPropertyInferenceSetImpl implements
 	@Override
 	public synchronized void add(ObjectPropertyInference inference) {
 		inference.accept(INFERENCE_INSERTER_, this);
+	}
+
+	@Override
+	public void clear() {
+		subPropertyChainInferences_.clear();
 	}
 
 	// TODO: move the static methods to a better location for sharing
@@ -103,22 +98,6 @@ public class ModifiableObjectPropertyInferenceSetImpl implements
 		Multimap<K2, V> traces = map.get(key);
 		return (traces == null) ? Collections.<V> emptyList()
 				: emptyIfNull(traces.get(value));
-	}
-
-	private synchronized void addInference(
-			ReflexivePropertyChainInference<?> inference) {
-		if (reflexivePropertyChainInferences_ == null)
-			reflexivePropertyChainInferences_ = new HashListMultimap<IndexedPropertyChain, ReflexivePropertyChainInference<?>>();
-		reflexivePropertyChainInferences_.add(inference.getPropertyChain(),
-				inference);
-	}
-
-	private Iterable<? extends ReflexivePropertyChainInference<?>> getInferences(
-			ReflexivePropertyChain<?> conclusion) {
-		if (reflexivePropertyChainInferences_ == null)
-			return Collections.emptyList();
-		return emptyIfNull(reflexivePropertyChainInferences_.get(conclusion
-				.getPropertyChain()));
 	}
 
 	private synchronized void addInference(
@@ -156,41 +135,6 @@ public class ModifiableObjectPropertyInferenceSetImpl implements
 		}
 
 		@Override
-		public Void visit(ToldReflexiveProperty inference,
-				ModifiableObjectPropertyInferenceSetImpl input) {
-			input.addInference(inference);
-			return null;
-		}
-
-		@Override
-		public Void visit(ReflexiveToldSubObjectProperty inference,
-				ModifiableObjectPropertyInferenceSetImpl input) {
-			input.addInference(inference);
-			return null;
-		}
-
-		@Override
-		public Void visit(ComposedReflexivePropertyChain inference,
-				ModifiableObjectPropertyInferenceSetImpl input) {
-			input.addInference(inference);
-			return null;
-		}
-
-		@Override
-		public Void visit(LeftReflexiveSubPropertyChainInference inference,
-				ModifiableObjectPropertyInferenceSetImpl input) {
-			input.addInference(inference);
-			return null;
-		}
-
-		@Override
-		public Void visit(RightReflexiveSubPropertyChainInference inference,
-				ModifiableObjectPropertyInferenceSetImpl input) {
-			input.addInference(inference);
-			return null;
-		}
-
-		@Override
 		public Void visit(ToldSubProperty inference,
 				ModifiableObjectPropertyInferenceSetImpl input) {
 			input.addInference(inference);
@@ -213,13 +157,6 @@ public class ModifiableObjectPropertyInferenceSetImpl implements
 		@Override
 		public Iterable<? extends ObjectPropertyInference> visit(
 				SubPropertyChainImpl<?, ?> conclusion,
-				ModifiableObjectPropertyInferenceSetImpl input) {
-			return input.getInferences(conclusion);
-		}
-
-		@Override
-		public Iterable<? extends ObjectPropertyInference> visit(
-				ReflexivePropertyChainImpl<?> conclusion,
 				ModifiableObjectPropertyInferenceSetImpl input) {
 			return input.getInferences(conclusion);
 		}

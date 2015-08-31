@@ -74,7 +74,6 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ObjectHasSelfPropertyR
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedContradiction;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagationInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.ReflexiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubsumerInference;
@@ -281,13 +280,6 @@ public class ModifiableClassInferenceSetImpl implements
 
 		@Override
 		public Void visit(PropagatedSubsumer inference,
-				ModifiableClassInferenceSetImpl input) {
-			input.addInference(inference);
-			return null;
-		}
-
-		@Override
-		public Void visit(ReflexiveSubsumer inference,
 				ModifiableClassInferenceSetImpl input) {
 			input.addInference(inference);
 			return null;

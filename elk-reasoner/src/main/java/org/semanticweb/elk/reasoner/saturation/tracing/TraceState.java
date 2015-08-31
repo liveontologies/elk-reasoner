@@ -44,6 +44,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPrope
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * 
+ * @author "Yevgeny Kazakov"
  */
 public class TraceState implements InferenceSet,
 		ModifiableClassInferenceTracingState, ObjectPropertyInferenceProducer {
@@ -64,6 +66,14 @@ public class TraceState implements InferenceSet,
 
 	public void clearToTrace() {
 		toTrace_.clear();
+	}
+
+	public void clearClassInferences() {
+		classInferenceMap_.clear();
+	}
+
+	public void clearPropertyInferences() {
+		objectPropertyInferenceSet_.clear();
 	}
 
 	@Override

@@ -50,15 +50,13 @@ public class ReasonerStateAccessor {
 	
 	public static void cleanClassTraces(AbstractReasonerState reasoner) {
 		if (reasoner.getTraceState() != null) {
-			reasoner.getTraceState().clearClassTraces();
-			reasoner.getTraceState().clearTracingMap();
+			reasoner.getTraceState().clearClassInferences();
 		}
 	}
 	
 	public static void cleanObjectPropertyTraces(AbstractReasonerState reasoner) {
 		if (reasoner.getTraceState() != null) {
-			reasoner.getTraceState().getTraceStore().cleanObjectPropertyInferences();
-			reasoner.getTraceState().clearTracingMap();
+			reasoner.getTraceState().clearPropertyInferences();
 		}
 	}
 	

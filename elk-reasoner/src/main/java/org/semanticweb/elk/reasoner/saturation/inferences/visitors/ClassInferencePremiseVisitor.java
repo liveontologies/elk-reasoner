@@ -53,18 +53,12 @@ import org.semanticweb.elk.reasoner.saturation.inferences.InitializationSubsumer
 import org.semanticweb.elk.reasoner.saturation.inferences.ObjectHasSelfPropertyRangeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedContradiction;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.inferences.ReflexiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ComposedReflexivePropertyChain;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.PropertyChainInitialization;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ReflexiveToldSubObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.RightReflexiveSubPropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldReflexiveProperty;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldSubProperty;
 
 /**
@@ -135,13 +129,6 @@ public class ClassInferencePremiseVisitor<I, O> implements
 	public O visit(PropagatedSubsumer conclusion, I input) {
 		conclusion.getBackwardLink().accept(classPremiseVisitor_, input);
 		conclusion.getPropagation().accept(classPremiseVisitor_, input);
-		return null;
-	}
-
-	@Override
-	public O visit(ReflexiveSubsumer conclusion, I input) {
-		conclusion.getReflexivityPremise().accept(propertyPremiseVisitor_,
-				input);
 		return null;
 	}
 
@@ -263,40 +250,6 @@ public class ClassInferencePremiseVisitor<I, O> implements
 	@Override
 	public O visit(PropertyChainInitialization conclusion, I input) {
 		// no premises
-		return null;
-	}
-
-	@Override
-	public O visit(ToldReflexiveProperty inference, I input) {
-		inference.getPropertyInitialization().accept(propertyPremiseVisitor_,
-				input);
-		return null;
-	}
-
-	@Override
-	public O visit(ReflexiveToldSubObjectProperty inference, I input) {
-		inference.getSubProperty().accept(propertyPremiseVisitor_, input);
-		return null;
-	}
-
-	@Override
-	public O visit(ComposedReflexivePropertyChain inference, I input) {
-		inference.getLeftReflexiveProperty().accept(propertyPremiseVisitor_,
-				input);
-		inference.getRightReflexivePropertyChain().accept(
-				propertyPremiseVisitor_, input);
-		return null;
-	}
-
-	@Override
-	public O visit(LeftReflexiveSubPropertyChainInference inference, I input) {
-		inference.getReflexivePremise().accept(propertyPremiseVisitor_, input);
-		return null;
-	}
-
-	@Override
-	public O visit(RightReflexiveSubPropertyChainInference inference, I input) {
-		inference.getReflexivePremise().accept(propertyPremiseVisitor_, input);
 		return null;
 	}
 

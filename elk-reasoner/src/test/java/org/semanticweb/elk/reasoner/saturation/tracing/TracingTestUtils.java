@@ -34,7 +34,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.MutableBoolean;
-import org.semanticweb.elk.MutableInteger;
 import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
@@ -45,13 +44,10 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionEqualityChecker;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.AbstractObjectPropertyInferenceVisitor;
@@ -59,13 +55,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPrope
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.AbstractClassInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferencePremiseVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.GetInferenceTarget;
-import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
-import org.semanticweb.elk.util.collections.HashListMultimap;
-import org.semanticweb.elk.util.collections.Multimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +76,8 @@ public class TracingTestUtils {
 
 		@Override
 		public void notifyUntraced(Conclusion conclusion) {
-			fail(conclusion.getConclusionRoot() + ": " + conclusion + ": conclusion was not traced");
+			fail(conclusion.getConclusionRoot() + ": " + conclusion
+					+ ": conclusion was not traced");
 		}
 
 		@Override
@@ -162,27 +154,6 @@ public class TracingTestUtils {
 		explorer.accept(contradiction, counter);
 	}
 
-	public static void checkTracingMinimality(ElkClassExpression sub,
-			ElkClassExpression sup, Reasoner reasoner) {
-		IndexedClassExpression subsumee = ReasonerStateAccessor.transform(
-				reasoner, sub);
-		Conclusion subsumer = getConclusionToTrace(
-				ReasonerStateAccessor.getContext(reasoner, subsumee),
-				ReasonerStateAccessor.transform(reasoner, sup));
-		TracedContextsCollector collector = new TracedContextsCollector();
-		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
-
-		new TestTraceUnwinder(traceState, UNTRACED_LISTENER).accept(subsumer,
-				collector);
-
-		for (Context traced : traceState.getTracedContexts()) {
-			IndexedContextRoot root = traced.getRoot();
-
-			assertTrue(root + " has been traced for no good reason", collector
-					.getTracedRoots().contains(traced.getRoot()));
-		}
-	}
-
 	/*
 	 * checking that the number of inferences for the given class subsumption is
 	 * as expected
@@ -194,26 +165,12 @@ public class TracingTestUtils {
 		Conclusion conclusion = getConclusionToTrace(
 				ReasonerStateAccessor.getContext(reasoner, subsumee),
 				ReasonerStateAccessor.transform(reasoner, sup));
-		final AtomicInteger inferenceCount = new AtomicInteger(0);
-		ClassInferenceVisitor<IndexedContextRoot, Boolean> counter = new AbstractClassInferenceVisitor<IndexedContextRoot, Boolean>() {
-
-			@Override
-			protected Boolean defaultTracedVisit(ClassInference inference,
-					IndexedContextRoot root) {
-
-				LOGGER_.trace("{}: traced inference {}", subsumee, inference);
-
-				inferenceCount.incrementAndGet();
-
-				return true;
-			}
-
-		};
-
-		ReasonerStateAccessor.getTraceState(reasoner).getTraceStore()
-				.getReader().accept(conclusion, counter);
-
-		assertEquals(expected, inferenceCount.get());
+		int actual = 0;
+		for (ClassInference ignore : ReasonerStateAccessor.getTraceState(
+				reasoner).getClassInferences(conclusion)) {
+			actual++;
+		}
+		assertEquals(expected, actual);
 	}
 
 	/*
@@ -228,24 +185,13 @@ public class TracingTestUtils {
 				reasoner, sup);
 		ObjectPropertyConclusion conclusion = new SubObjectProperty(subsumee,
 				subsumer);
-		final AtomicInteger inferenceCount = new AtomicInteger(0);
-		ObjectPropertyInferenceVisitor<Void, Boolean> counter = new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
-
-			@Override
-			protected Boolean defaultTracedVisit(
-					ObjectPropertyInference inference, Void input) {
-				LOGGER_.trace("{}: traced inference {}", subsumee, inference);
-
-				inferenceCount.incrementAndGet();
-				return null;
-			}
-
-		};
-
-		ReasonerStateAccessor.getTraceState(reasoner).getTraceStore()
-				.getReader().accept(conclusion, counter);
-
-		assertEquals(expected, inferenceCount.get());
+		int actual = 0;
+		for (ObjectPropertyInference ignore : ReasonerStateAccessor
+				.getTraceState(reasoner)
+				.getObjectPropertyInferences(conclusion)) {
+			actual++;
+		}
+		assertEquals(expected, actual);
 	}
 
 	/*
@@ -316,7 +262,7 @@ public class TracingTestUtils {
 		Conclusion conclusion = getConclusionToTrace(
 				ReasonerStateAccessor.getContext(reasoner, subsumee),
 				ReasonerStateAccessor.transform(reasoner, sup));
-		ClassInferenceVisitor<IndexedContextRoot, ?> sideConditionVisitor = SideConditions
+		ClassInferenceVisitor<Void, ?> sideConditionVisitor = SideConditions
 				.getClassSideConditionVisitor(new AbstractElkAxiomVisitor<Void>() {
 
 					@Override
@@ -327,8 +273,10 @@ public class TracingTestUtils {
 
 				});
 
-		ReasonerStateAccessor.getTraceState(reasoner).getTraceStore()
-				.getReader().accept(conclusion, sideConditionVisitor);
+		for (ClassInference inference : ReasonerStateAccessor.getTraceState(
+				reasoner).getClassInferences(conclusion)) {
+			inference.accept(sideConditionVisitor, null);
+		}
 
 		return sideConditions;
 	}
@@ -390,157 +338,6 @@ public class TracingTestUtils {
 		reasoner.explainInconsistency();
 		traceUnwinder.accept(new ContradictionImpl(entity),
 				classInferenceVisitor, propertyInferenceVisitor);
-	}
-
-	public static int checkInferenceAcyclicity(Reasoner reasoner) {
-		final AtomicInteger conclusionCount = new AtomicInteger(0);
-		final TraceState traceState = ReasonerStateAccessor
-				.getTraceState(reasoner);
-		final TraceStore.Reader traceReader = traceState.getTraceStore()
-				.getReader();
-		final SaturationState<TracedContext> tracingState = traceState
-				.getSaturationState();
-		final MutableInteger counter = new MutableInteger(0);
-
-		for (final IndexedContextRoot root : traceReader.getContextRoots()) {
-
-			traceReader
-					.visitInferences(
-							root,
-							new AbstractClassInferenceVisitor<IndexedContextRoot, Void>() {
-
-								@Override
-								protected Void defaultTracedVisit(
-										ClassInference inference,
-										IndexedContextRoot ignored) {
-									counter.increment();
-
-									if (isInferenceCyclic(inference, root,
-											traceReader)) {
-										// isInferenceCyclic(inference, root,
-										// traceReader);
-										fail(inference + " saved in " + root
-												+ " is cyclic ");
-									}
-
-									return null;
-								}
-
-							});
-		}
-
-		// now check if some blocked inferences are, in fact, acyclic
-		counter.set(0);
-
-		for (Context cxt : tracingState.getContexts()) {
-			TracedContext context = (TracedContext) cxt;
-
-			for (Conclusion premise : context.getBlockedInferences().keySet()) {
-				for (ClassInference blocked : context.getBlockedInferences()
-						.get(premise)) {
-
-					IndexedContextRoot targetRoot = blocked.accept(
-							new GetInferenceTarget(), context);
-
-					counter.increment();
-					if (!isInferenceCyclic(blocked, targetRoot, traceReader)) {
-						isInferenceCyclic(blocked, targetRoot, traceReader);
-
-						fail(blocked + " blocked in " + context
-								+ " by the premise " + premise + " is acyclic");
-					}
-				}
-			}
-		}
-
-		return conclusionCount.get();
-	}
-
-	// the most straightforward (and slow) implementation
-	public static boolean isInferenceCyclic(final ClassInference inference,
-			final IndexedContextRoot inferenceTargetRoot,
-			final TraceStore.Reader traceReader) {
-		// first, create a map of premises to their inferences
-		final Multimap<Conclusion, ClassInference> premiseInferenceMap = new HashListMultimap<Conclusion, ClassInference>();
-		final IndexedContextRoot inferenceContextRoot = inference
-				.getInferenceRoot();
-
-		inference.accept(new ClassInferencePremiseVisitor<Void, Void>(
-				new AbstractConclusionVisitor<Void, Void>() {
-					@Override
-					protected Void defaultVisit(final Conclusion premise,
-							Void ignored) {
-
-						traceReader
-								.accept(premise,
-										new AbstractClassInferenceVisitor<IndexedContextRoot, Void>() {
-
-											@Override
-											protected Void defaultTracedVisit(
-													ClassInference premiseInference,
-													IndexedContextRoot ignored) {
-
-												premiseInferenceMap.add(
-														premise,
-														premiseInference);
-
-												return null;
-											}
-
-										});
-
-						return null;
-					}
-				}), null);
-
-		// now, let's see if there's an alternative inference for every premise
-		for (Conclusion premise : premiseInferenceMap.keySet()) {
-			final MutableBoolean isPremiseCyclic = new MutableBoolean(true);
-
-			for (ClassInference premiseInference : premiseInferenceMap
-					.get(premise)) {
-				final MutableBoolean isPremiseInferenceCyclic = new MutableBoolean(
-						false);
-				// does it use the given conclusion as a premise?
-				if (premiseInference.getInferenceRoot() == inferenceTargetRoot) {
-
-					premiseInference
-							.accept(new ClassInferencePremiseVisitor<Void, Void>(
-									new AbstractConclusionVisitor<Void, Void>() {
-										@Override
-										protected Void defaultVisit(
-												Conclusion premiseOfPremise,
-												Void ignored) {
-
-											if (premiseOfPremise
-													.accept(new ConclusionEqualityChecker(),
-															inference)) {
-												// ok, this inference
-												// uses the given
-												// conclusion
-												isPremiseInferenceCyclic
-														.set(true);
-											}
-
-											return null;
-										}
-									}), null);
-				} else {
-					// ok, the premise was inferred in a context different from
-					// where the current inference was made.
-				}
-				// the premise is inferred only through the given conclusion
-				// (i.e. is cyclic) iff ALL its inferences use the the given
-				// conclusion
-				isPremiseCyclic.and(isPremiseInferenceCyclic.get());
-			}
-
-			if (isPremiseCyclic.get()) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	// //////////////////////////////////////////////////////////////////////

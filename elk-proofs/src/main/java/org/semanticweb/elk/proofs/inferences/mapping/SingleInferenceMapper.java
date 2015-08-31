@@ -65,7 +65,6 @@ import org.semanticweb.elk.proofs.inferences.classes.ExistentialComposition;
 import org.semanticweb.elk.proofs.inferences.classes.ExistentialLemmaChainComposition;
 import org.semanticweb.elk.proofs.inferences.classes.InconsistentDisjointness;
 import org.semanticweb.elk.proofs.inferences.classes.NegationContradiction;
-import org.semanticweb.elk.proofs.inferences.classes.ReflexiveExistentialComposition;
 import org.semanticweb.elk.proofs.inferences.properties.ReflexiveComposition;
 import org.semanticweb.elk.proofs.inferences.properties.ReflexivityViaSubsumption;
 import org.semanticweb.elk.proofs.inferences.properties.SubPropertyChainAxiom;
@@ -80,6 +79,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.AbstractDecomposedConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedConjunction;
@@ -88,7 +88,6 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromDisjo
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromInconsistentDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromNegation;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromOwlNothing;
-import org.semanticweb.elk.reasoner.saturation.inferences.AbstractDecomposedConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
@@ -96,19 +95,13 @@ import org.semanticweb.elk.reasoner.saturation.inferences.GeneratedPropagation;
 import org.semanticweb.elk.reasoner.saturation.inferences.InitializationSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedContradiction;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.inferences.ReflexiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.PropertyChainInitialization;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ComposedReflexivePropertyChain;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ReflexiveToldSubObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.RightReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainImpl;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldReflexiveProperty;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldSubProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.SideConditionLookup;
 
@@ -258,19 +251,6 @@ public class SingleInferenceMapper {
 					exprFactory_.create(factory_.getSubClassOfAxiom(d, e)),
 					exprFactory_.create(factory_.getSubClassOfAxiom(c, rSomeD)),
 					exprFactory_.create(factory_.getSubObjectPropertyOfAxiom(r, s)));
-		}
-
-		@Override
-		public Inference visit(ReflexiveSubsumer<?> inference, Void parameter) {
-			ElkClassExpression sub = Deindexer.deindex(inference.getConclusionRoot());
-			ElkClassExpression sup = Deindexer.deindex(inference.getExpression());
-			ElkSubClassOfAxiom conclusion = factory_.getSubClassOfAxiom(sub, sup);
-			ElkObjectProperty property = inference.getReflexivityPremise()
-					.getPropertyChain().getElkEntity();
-
-			return new ReflexiveExistentialComposition(
-					exprFactory_.create(conclusion),
-					exprFactory_.create(factory_.getReflexiveObjectPropertyAxiom(property)));
 		}
 		
 		// creates two complex premises (which can be lemmas or axioms) of the existential inference via composition

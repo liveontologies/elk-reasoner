@@ -55,8 +55,6 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLi
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.AbstractObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ReflexiveToldSubObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldReflexiveProperty;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldSubProperty;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
@@ -189,25 +187,6 @@ public class TracingTest {
 			@Override
 			protected Boolean defaultTracedVisit(
 					ObjectPropertyInference inference, Void input) {
-				return true;
-			}
-
-			@Override
-			public Boolean visit(ToldReflexiveProperty inference,
-					Void input) {
-				ElkAxiom axiom = new SideConditionLookup().lookup(inference);
-				
-				assertNotNull("Failed to look up the axiom for the reflexivity inference " + inference, axiom);
-				return true;
-			}
-
-			@Override
-			public Boolean visit(
-					ReflexiveToldSubObjectProperty inference,
-					Void input) {
-				ElkAxiom axiom = new SideConditionLookup().lookup(inference);
-				
-				assertNotNull("Failed to look up the subsumption axiom for the reflexivity inference " + inference, axiom);
 				return true;
 			}
 

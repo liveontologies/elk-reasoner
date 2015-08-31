@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.saturation.inferences.properties;
  * #L%
  */
 
-
 /**
  * A skeleton implementation of {@link ObjectPropertyInferenceVisitor}.
  * 
@@ -36,7 +35,8 @@ package org.semanticweb.elk.reasoner.saturation.inferences.properties;
 public abstract class AbstractObjectPropertyInferenceVisitor<I, O> implements
 		ObjectPropertyInferenceVisitor<I, O> {
 
-	protected abstract O defaultTracedVisit(ObjectPropertyInference inference, I input);
+	protected abstract O defaultTracedVisit(ObjectPropertyInference inference,
+			I input);
 
 	@Override
 	public O visit(PropertyChainInitialization inference, I input) {
@@ -44,34 +44,9 @@ public abstract class AbstractObjectPropertyInferenceVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(ToldReflexiveProperty inference, I input) {
-		return defaultTracedVisit(inference, input);
-	}
-
-	@Override
-	public O visit(ReflexiveToldSubObjectProperty inference, I input) {
-		return defaultTracedVisit(inference, input);
-	}
-
-	@Override
-	public O visit(ComposedReflexivePropertyChain inference, I input) {
-		return defaultTracedVisit(inference, input);
-	}
-
-	@Override
-	public O visit(LeftReflexiveSubPropertyChainInference inference, I input) {
-		return defaultTracedVisit(inference, input);
-	}
-
-	@Override
-	public O visit(RightReflexiveSubPropertyChainInference inference, I input) {
-		return defaultTracedVisit(inference, input);
-	}
-	
-	@Override
 	public O visit(ToldSubProperty inference, I input) {
 		return defaultTracedVisit(inference, input);
 
 	}
-	
+
 }

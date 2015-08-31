@@ -31,7 +31,6 @@ package org.semanticweb.elk.reasoner.saturation.inferences.properties;
  *         pavel.klinov@uni-ulm.de
  */
 public interface ObjectPropertyInferenceVisitor<I, O> extends
-		ReflexivePropertyChainInferenceVisitor<I, O>,
 		SubPropertyChainInferenceVisitor<I, O> {
 
 	public static ObjectPropertyInferenceVisitor<?, ?> DUMMY = new AbstractObjectPropertyInferenceVisitor<Void, Void>() {

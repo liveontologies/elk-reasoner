@@ -48,10 +48,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.AbstractObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ComposedReflexivePropertyChain;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ReflexiveToldSubObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldSubProperty;
@@ -240,107 +237,5 @@ public class PropertyInferenceTracingTest {
 
 				});		
 	}	
-
-	@Test
-	public void testReflexivePropertyInferences() throws Exception {
-		Reasoner reasoner = TestReasonerUtils.loadAndClassify("tracing/ReflexivePropertyChains.owl");
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
-		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
-		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
-		ElkObjectProperty h = factory.getObjectProperty(new ElkFullIri("http://example.org/H"));
-		ElkObjectProperty s = factory.getObjectProperty(new ElkFullIri("http://example.org/S"));
-		ElkObjectProperty rr = factory.getObjectProperty(new ElkFullIri("http://example.org/RR"));
-		ElkSubObjectPropertyExpression srr = factory.getObjectPropertyChain(Arrays.asList(s, rr));
-		final IndexedObjectProperty hIndexed = ReasonerStateAccessor.transform(reasoner, h);
-		final IndexedObjectProperty sIndexed = ReasonerStateAccessor.transform(reasoner, s);
-		final IndexedPropertyChain rrIndexed = ReasonerStateAccessor.transform(reasoner, rr);
-		final IndexedPropertyChain srrIndexed = ReasonerStateAccessor.transform(reasoner, srr);
-		
-		reasoner.explainSubsumption(a, b);
-		TracingTestUtils.checkTracingCompleteness(a, b, reasoner);
-		// H must be reflexive
-		TracingTestUtils.checkConditionOverUsedInferences(a, b, reasoner, 
-				TracingTestUtils.DUMMY_CLASS_INFERENCE_CHECKER, 
-				new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
-
-					@Override
-					protected Boolean defaultTracedVisit(ObjectPropertyInference inference, Void input) {
-						return false;
-					}
-
-					@Override
-					public Boolean visit(ReflexiveToldSubObjectProperty inference, Void input) {
-						// H must be entailed as reflexive because S is reflexive
-						return inference.getPropertyChain().equals(hIndexed) &&
-								inference.getSubProperty().getPropertyChain().equals(sIndexed);
-					}
-				});
-		// S o RR must be reflexive
-		TracingTestUtils.checkConditionOverUsedInferences(a, b, reasoner, 
-				TracingTestUtils.DUMMY_CLASS_INFERENCE_CHECKER, 
-				new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
-
-					@Override
-					protected Boolean defaultTracedVisit(
-							ObjectPropertyInference inference, Void input) {
-						return false;
-					}
-
-					@Override
-					public Boolean visit(ComposedReflexivePropertyChain inference, Void input) {
-						// S o RR must be entailed as reflexive because S and RR are reflexive
-						return inference.getPropertyChain().equals(srrIndexed) &&
-								inference.getLeftReflexiveProperty().getPropertyChain().equals(sIndexed) &&
-								inference.getRightReflexivePropertyChain().getPropertyChain().equals(rrIndexed);
-					}
-				});		
-	}
-	
-	@Test
-	public void testReflexivePropertyChains() throws Exception {
-		Reasoner reasoner = TestReasonerUtils.loadAndClassify("tracing/ReflexivityAndPropertyChains.owl");
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
-		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
-		ElkClass d = factory.getClass(new ElkFullIri("http://example.org/D"));
-		ElkObjectProperty h = factory.getObjectProperty(new ElkFullIri("http://example.org/H"));
-		ElkObjectProperty s = factory.getObjectProperty(new ElkFullIri("http://example.org/S"));
-		ElkObjectProperty sh = factory.getObjectProperty(new ElkFullIri("http://example.org/SH"));
-		final IndexedObjectProperty hIndexed = ReasonerStateAccessor.transform(reasoner, h);
-		final IndexedObjectProperty sIndexed = ReasonerStateAccessor.transform(reasoner, s);
-		final IndexedPropertyChain shIndexed = ReasonerStateAccessor.transform(reasoner, sh);
-		
-		reasoner.explainSubsumption(a, d);
-		TracingTestUtils.checkTracingCompleteness(a, d, reasoner);
-		// looking for the inference that H is a sub-property of SH (because S is entailed as reflexive)
-		TracingTestUtils.checkConditionOverUsedInferences(a, d, reasoner, 
-				TracingTestUtils.DUMMY_CLASS_INFERENCE_CHECKER, 
-				new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
-
-					@Override
-					protected Boolean defaultTracedVisit(ObjectPropertyInference inference, Void input) {
-						return false;
-					}
-
-					@Override
-					public Boolean visit(LeftReflexiveSubPropertyChainInference inference, Void input) {
-						return inference.getSubPropertyChain().equals(hIndexed) &&
-								inference.getSuperPropertyChain().equals(shIndexed) &&
-								inference.getReflexivePremise().getPropertyChain().equals(sIndexed);
-					}
-				});
-	
-	}		
-	
-	@Test
-	public void testReflexivePropertyChains2() throws Exception {
-		Reasoner reasoner = TestReasonerUtils.loadAndClassify("tracing/ReflexiveRole.owl");
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
-		ElkClass c1 = factory.getClass(new ElkFullIri("http://example.org/C1"));
-		ElkClass f = factory.getClass(new ElkFullIri("http://example.org/F"));
-
-		reasoner.explainSubsumption(c1, f);
-		TracingTestUtils.checkTracingCompleteness(c1, f, reasoner);
-
-	}	
-	
+			
 }

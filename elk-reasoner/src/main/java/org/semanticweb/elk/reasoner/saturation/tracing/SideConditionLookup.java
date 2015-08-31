@@ -37,8 +37,6 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLi
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.AbstractObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ReflexiveToldSubObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldReflexiveProperty;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldSubProperty;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
@@ -106,17 +104,6 @@ public class SideConditionLookup {
 				ObjectPropertyInference inference, Void input) {
 			// no side conditions by default
 			return null;
-		}
-
-		@Override
-		public ElkAxiom visit(ToldReflexiveProperty inference, Void input) {
-			return inference.getReason();
-		}
-
-		@Override
-		public ElkAxiom visit(ReflexiveToldSubObjectProperty inference,
-				Void input) {
-			return inference.getReason();
 		}
 
 		@Override

@@ -46,7 +46,6 @@ import org.semanticweb.elk.reasoner.saturation.inferences.InitializationSubsumer
 import org.semanticweb.elk.reasoner.saturation.inferences.ObjectHasSelfPropertyRangeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedContradiction;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.inferences.ReflexiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
@@ -161,11 +160,6 @@ public abstract class AbstractClassInferenceVisitor<I, O> implements
 
 	@Override
 	public O visit(PropagatedSubsumer conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
-	}
-
-	@Override
-	public O visit(ReflexiveSubsumer conclusion, I input) {
 		return defaultTracedVisit(conclusion, input);
 	}
 

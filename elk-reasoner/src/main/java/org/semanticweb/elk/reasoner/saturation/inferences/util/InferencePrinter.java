@@ -48,17 +48,11 @@ import org.semanticweb.elk.reasoner.saturation.inferences.InitializationSubsumer
 import org.semanticweb.elk.reasoner.saturation.inferences.ObjectHasSelfPropertyRangeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedContradiction;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.inferences.ReflexiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ComposedReflexivePropertyChain;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.PropertyChainInitialization;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ReflexiveToldSubObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.RightReflexiveSubPropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldReflexiveProperty;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldSubProperty;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
 
@@ -110,12 +104,6 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>,
 	public String visit(PropagatedSubsumer conclusion, Void parameter) {
 		return "Existential inference from " + conclusion.getPropagation()
 				+ " and " + conclusion.getBackwardLink();
-	}
-
-	@Override
-	public String visit(ReflexiveSubsumer conclusion, Void parameter) {
-		return "Reflexive inference: owl:Thing => " + conclusion.getRelation()
-				+ " some owl:Thing";
 	}
 
 	@Override
@@ -214,38 +202,6 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>,
 	@Override
 	public String visit(PropertyChainInitialization inference, Void input) {
 		return "Initialization (" + inference.getPropertyChain() + ")";
-	}
-
-	@Override
-	public String visit(ToldReflexiveProperty inference, Void input) {
-		return "Told reflexive property " + inference.getPropertyChain();
-	}
-
-	@Override
-	public String visit(ReflexiveToldSubObjectProperty inference, Void input) {
-		return inference.getPropertyChain()
-				+ "is reflexive because its told sub-property "
-				+ inference.getSubProperty() + " is reflexive";
-	}
-
-	@Override
-	public String visit(ComposedReflexivePropertyChain inference, Void input) {
-		return inference.getPropertyChain()
-				+ "is reflexive because of composition of reflexive chains";
-	}
-
-	@Override
-	public String visit(LeftReflexiveSubPropertyChainInference inference,
-			Void input) {
-		return "Left part of " + inference.getSuperPropertyChain()
-				+ " is reflexive";
-	}
-
-	@Override
-	public String visit(RightReflexiveSubPropertyChainInference inference,
-			Void input) {
-		return "Right part of " + inference.getSuperPropertyChain()
-				+ " is reflexive";
 	}
 
 	@Override
