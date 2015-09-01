@@ -22,6 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectHasSelf;
@@ -47,10 +48,13 @@ import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBac
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.SubsumerPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ComposedFromDecomposedSubsumerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassFromDefinitionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectHasSelfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
@@ -96,6 +100,16 @@ public class ConditionalRuleVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(BackwardLinkFromForwardLinkRule rule, ForwardLink premise,
 			ContextPremises premises, ConclusionProducer producer) {
+		if (condition_.visit(rule, premise, premises, producer))
+			return visitor_.visit(rule, premise, premises, producer);
+		// else
+		return null;
+	}
+
+	@Override
+	public O visit(ComposedFromDecomposedSubsumerRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ConclusionProducer producer) {
 		if (condition_.visit(rule, premise, premises, producer))
 			return visitor_.visit(rule, premise, premises, producer);
 		// else
@@ -162,6 +176,25 @@ public class ConditionalRuleVisitor<O> implements RuleVisitor<O> {
 
 	@Override
 	public O visit(DisjointSubsumerFromMemberRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		if (condition_.visit(rule, premise, premises, producer))
+			return visitor_.visit(rule, premise, premises, producer);
+		// else
+		return null;
+	}
+
+	@Override
+	public O visit(IndexedClassDecomposition rule, IndexedClass premise,
+			ContextPremises premises, ConclusionProducer producer) {
+		if (condition_.visit(rule, premise, premises, producer))
+			return visitor_.visit(rule, premise, premises, producer);
+		// else
+		return null;
+	}
+
+	@Override
+	public O visit(IndexedClassFromDefinitionRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		if (condition_.visit(rule, premise, premises, producer))

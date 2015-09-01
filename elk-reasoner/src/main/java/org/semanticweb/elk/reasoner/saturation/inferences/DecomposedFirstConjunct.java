@@ -30,7 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.SubsumerInfer
 
 /**
  * 
- * A {@link DecomposedSubsumer} obtained from a the first conjunct of an
+ * A {@link DecomposedSubsumer} obtained from the first conjunct of an
  * {@link IndexedObjectIntersectionOf} {@link Subsumer}.
  * 
  * @author "Yevgeny Kazakov"

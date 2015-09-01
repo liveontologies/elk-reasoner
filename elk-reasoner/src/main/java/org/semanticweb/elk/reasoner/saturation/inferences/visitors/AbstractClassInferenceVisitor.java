@@ -28,11 +28,16 @@ package org.semanticweb.elk.reasoner.saturation.inferences.visitors;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedConjunction;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDecomposition;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDefinition;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDisjunction;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedExistential;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromDisjointSubsumers;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromInconsistentDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromNegation;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromOwlNothing;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedDefinition;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedFirstConjunct;
@@ -40,12 +45,10 @@ import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedReflexiveBac
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedReflexiveForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedSecondConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
-import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDisjunction;
 import org.semanticweb.elk.reasoner.saturation.inferences.GeneratedPropagation;
 import org.semanticweb.elk.reasoner.saturation.inferences.InitializationSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.ObjectHasSelfPropertyRangeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedContradiction;
-import org.semanticweb.elk.reasoner.saturation.inferences.ComposedExistential;
 import org.semanticweb.elk.reasoner.saturation.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
@@ -73,6 +76,26 @@ public abstract class AbstractClassInferenceVisitor<I, O> implements
 	}
 
 	@Override
+	public O visit(ComposedDecomposition conclusion, I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(ComposedDefinition conclusion, I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(ComposedDisjunction conclusion, I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(ComposedExistential conclusion, I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+
+	@Override
 	public O visit(ComposedForwardLink conclusion, I input) {
 		return defaultTracedVisit(conclusion, input);
 	}
@@ -95,6 +118,11 @@ public abstract class AbstractClassInferenceVisitor<I, O> implements
 
 	@Override
 	public O visit(ContradictionFromOwlNothing conclusion, I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(DecomposedDefinition conclusion, I input) {
 		return defaultTracedVisit(conclusion, input);
 	}
 
@@ -134,11 +162,6 @@ public abstract class AbstractClassInferenceVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(ComposedDisjunction conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
-	}
-
-	@Override
 	public O visit(GeneratedPropagation conclusion, I input) {
 		return defaultTracedVisit(conclusion, input);
 	}
@@ -155,11 +178,6 @@ public abstract class AbstractClassInferenceVisitor<I, O> implements
 
 	@Override
 	public O visit(PropagatedContradiction conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
-	}
-
-	@Override
-	public O visit(ComposedExistential conclusion, I input) {
 		return defaultTracedVisit(conclusion, input);
 	}
 

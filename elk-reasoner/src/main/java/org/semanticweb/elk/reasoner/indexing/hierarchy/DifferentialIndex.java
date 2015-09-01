@@ -30,6 +30,8 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObject;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedEntityVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
@@ -103,6 +105,9 @@ public class DifferentialIndex extends DirectIndex {
 	private Map<ModifiableIndexedClassExpression, ChainableSubsumerRule> addedContextRuleHeadByClassExpressions_,
 			removedContextRuleHeadByClassExpressions_;
 
+	private Map<ModifiableIndexedClass, ModifiableIndexedClassExpression> addedDefinitions_,
+			removedDefinitions_;
+
 	public DifferentialIndex() {
 		init();
 	}
@@ -137,12 +142,16 @@ public class DifferentialIndex extends DirectIndex {
 		this.addedContextInitRules_ = null;
 		this.addedContextRuleHeadByClassExpressions_ = new ArrayHashMap<ModifiableIndexedClassExpression, ChainableSubsumerRule>(
 				32);
+		this.addedDefinitions_ = new ArrayHashMap<ModifiableIndexedClass, ModifiableIndexedClassExpression>(
+				32);
 	}
 
 	public void initDeletions() {
 		this.removedContextInitRules_ = null;
 		this.todoDeletions_ = new ArrayHashSet<CachedIndexedObject<?>>(1024);
 		this.removedContextRuleHeadByClassExpressions_ = new ArrayHashMap<ModifiableIndexedClassExpression, ChainableSubsumerRule>(
+				32);
+		this.removedDefinitions_ = new ArrayHashMap<ModifiableIndexedClass, ModifiableIndexedClassExpression>(
 				32);
 	}
 
@@ -273,6 +282,49 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	@Override
+	public boolean tryAddDefinition(ModifiableIndexedClass target,
+			ModifiableIndexedClassExpression definition) {
+		if (!incrementalMode)
+			return super.tryAddDefinition(target, definition);
+		// for incremental mode:
+		IndexedClassExpression removedDefintion = removedDefinitions_
+				.get(target);
+		if (target.getDefinition() != removedDefintion
+				|| addedDefinitions_.get(target) != null) {
+			// the existing definition was not removed or some definition has
+			// been added
+			return false;
+		}
+		// else removing
+		if (removedDefintion == definition) {
+			removedDefinitions_.remove(target);
+			target.setDefinition(definition);
+		} else
+			addedDefinitions_.put(target, definition);
+		return true;
+	}
+
+	@Override
+	public boolean tryRemoveDefinition(ModifiableIndexedClass target,
+			ModifiableIndexedClassExpression definition) {
+		if (!incrementalMode)
+			return super.tryRemoveDefinition(target, definition);
+		// for incremental mode:
+		IndexedClassExpression addedDefintion = addedDefinitions_.get(target);
+		if (addedDefintion == definition) {
+			addedDefinitions_.remove(target);
+			return true;
+		}
+		// else
+		if (addedDefintion != null || target.getDefinition() != definition)
+			return false;
+		// else
+		target.removeDefinition();
+		removedDefinitions_.put(target, definition);
+		return true;
+	}
+
+	@Override
 	public boolean addContextInitRule(ChainableContextInitRule newRule) {
 		if (!incrementalMode) {
 			return super.addContextInitRule(newRule);
@@ -341,6 +393,20 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	/**
+	 * @return the added definitions for {@link IndexedClass}es
+	 */
+	public Map<? extends IndexedClass, ? extends IndexedClassExpression> getAddedDefinitions() {
+		return this.addedDefinitions_;
+	}
+
+	/**
+	 * @return the removed definitions for {@link IndexedClass}es
+	 */
+	public Map<? extends IndexedClass, ? extends IndexedClassExpression> getRemovedDefinitions() {
+		return this.removedDefinitions_;
+	}
+
+	/**
 	 * @return the {@link ElkClass} added during the last incremental session
 	 */
 	public Collection<ElkClass> getAddedClasses() {
@@ -396,7 +462,7 @@ public class DifferentialIndex extends DirectIndex {
 		Chain<ChainableSubsumerRule> classExpressionRuleChain;
 		for (ModifiableIndexedClassExpression target : addedContextRuleHeadByClassExpressions_
 				.keySet()) {
-			LOGGER_.trace("Committing context rule additions for {}", target);
+			LOGGER_.trace("{}: committing context rule additions", target);
 
 			nextClassExpressionRule = addedContextRuleHeadByClassExpressions_
 					.get(target);
@@ -405,6 +471,14 @@ public class DifferentialIndex extends DirectIndex {
 				nextClassExpressionRule.addTo(classExpressionRuleChain);
 				nextClassExpressionRule = nextClassExpressionRule.next();
 			}
+		}
+		for (ModifiableIndexedClass target : addedDefinitions_.keySet()) {
+			ModifiableIndexedClassExpression definition = addedDefinitions_
+					.get(target);
+			LOGGER_.trace("{}: committing definition addition {}", target,
+					definition);
+			if (!target.setDefinition(definition))
+				throw new ElkUnexpectedIndexingException(target);
 		}
 		initAdditions();
 	}

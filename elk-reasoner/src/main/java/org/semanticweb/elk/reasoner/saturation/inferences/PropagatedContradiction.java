@@ -41,8 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.Contradiction
  *
  *         pavel.klinov@uni-ulm.de
  */
-public class PropagatedContradiction extends AbstractContradictionInference
-		implements ContradictionInference {
+public class PropagatedContradiction extends AbstractContradictionInference {
 
 	private final IndexedObjectProperty premiseRelation_;
 

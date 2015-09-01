@@ -70,7 +70,7 @@ class TimedContextCollectionProcessor extends
 		for (Context context : contexts) {
 			contextProcessor_.process(context);
 			contextCount++;
-			subsumerCount += context.getSubsumers().size();
+			subsumerCount += context.getComposedSubsumers().size();
 		}
 
 		localStats_.changeInitContextCollectionProcessingTime += (CachedTimeThread

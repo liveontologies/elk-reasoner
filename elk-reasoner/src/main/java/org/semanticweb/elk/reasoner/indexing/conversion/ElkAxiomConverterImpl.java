@@ -314,7 +314,7 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 
 	@Override
 	public Void visit(ElkEquivalentClassesAxiom axiom) {
-		// reduces equivalence to sub-class axioms
+		// reduces equivalence to class definitions or sub-class axioms
 		ModifiableIndexedClassExpression first = null;
 		for (ElkClassExpression c : axiom.getClassExpressions()) {
 			if (first == null)
@@ -322,8 +322,19 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 			else {
 				ModifiableIndexedClassExpression other = c
 						.accept(dualConverter_);
-				axiomFactory_.getIndexedSubClassOfAxiom(first, other, axiom);
-				axiomFactory_.getIndexedSubClassOfAxiom(other, first, axiom);
+				if (first instanceof ModifiableIndexedClass)
+					axiomFactory_.getIndexedDefinitionAxiom(
+							(ModifiableIndexedClass) first, other, axiom);
+				else if (other instanceof ModifiableIndexedClass)
+					axiomFactory_.getIndexedDefinitionAxiom(
+							(ModifiableIndexedClass) other, first, axiom);
+				else {
+					// index as two subsumptions
+					axiomFactory_
+							.getIndexedSubClassOfAxiom(first, other, axiom);
+					axiomFactory_
+							.getIndexedSubClassOfAxiom(other, first, axiom);
+				}
 			}
 		}
 		return null;

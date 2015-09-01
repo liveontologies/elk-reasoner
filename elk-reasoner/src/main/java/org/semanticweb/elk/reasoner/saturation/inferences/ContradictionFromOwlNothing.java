@@ -39,8 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.Contradiction
  *         pavel.klinov@uni-ulm.de
  */
 public class ContradictionFromOwlNothing extends
-		AbstractContradictionFromSubsumerInference<IndexedClass> implements
-		ContradictionInference {
+		AbstractContradictionFromSubsumerInference<IndexedClass> {
 
 	public ContradictionFromOwlNothing(IndexedContextRoot inferenceRoot,
 			IndexedClass premiseSubsumer) {

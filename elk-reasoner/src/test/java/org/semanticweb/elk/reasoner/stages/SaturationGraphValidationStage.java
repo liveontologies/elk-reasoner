@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
@@ -69,10 +70,13 @@ import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBac
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.SubsumerPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ComposedFromDecomposedSubsumerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassFromDefinitionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectHasSelfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
@@ -502,6 +506,31 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			return null;
 		}
 
+		@Override
+		public Void visit(ComposedFromDecomposedSubsumerRule rule,
+				IndexedClassExpression premise, ContextPremises premises,
+				ConclusionProducer producer) {
+			// nothing is stored in the rule
+			return null;
+		}
+
+		@Override
+		public Void visit(IndexedClassDecomposition rule, IndexedClass premise,
+				ContextPremises premises, ConclusionProducer producer) {
+			// nothing is stored in the rule
+			return null;
+		}
+
+		@Override
+		public Void visit(IndexedClassFromDefinitionRule rule,
+				IndexedClassExpression premise, ContextPremises premises,
+				ConclusionProducer producer) {
+			for (IndexedClassExpression ice : rule.getDefinedClasses()) {
+				iceValidator_.checkNew(ice);
+			}
+			return null;
+		}
+
 	}
 
 	/**
@@ -549,8 +578,13 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 				LOGGER_.error("Invalid root for " + context);
 
 			// validating subsumers recursively
-			for (IndexedClassExpression subsumer : context.getSubsumers()) {
-				iceValidator_.checkNew(subsumer);
+			for (IndexedClassExpression composedSubsumer : context
+					.getComposedSubsumers()) {
+				iceValidator_.checkNew(composedSubsumer);
+			}
+			for (IndexedClassExpression decomposedSubsumer : context
+					.getDecomposedSubsumers()) {
+				iceValidator_.checkNew(decomposedSubsumer);
 			}
 
 			// validating sub-contexts

@@ -80,7 +80,7 @@ public class ContradictionFromNegationRule extends
 		return NAME;
 	}
 
-	// TODO: hide this method
+	@Deprecated
 	public IndexedClassExpression getNegation() {
 		return negation_;
 	}
@@ -88,7 +88,8 @@ public class ContradictionFromNegationRule extends
 	@Override
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		if (negation_ != null && premises.getSubsumers().contains(negation_)) {
+		if (negation_ != null
+				&& premises.getDecomposedSubsumers().contains(negation_)) {
 			producer.produce(new ContradictionFromNegation(premises.getRoot(),
 					negation_));
 		}

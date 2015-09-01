@@ -152,7 +152,8 @@ public class ObjectIntersectionFromConjunctRule extends
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
-				conjunctionsByConjunct_.keySet(), premises.getSubsumers())) {
+				conjunctionsByConjunct_.keySet(),
+				premises.getComposedSubsumers())) {
 			producer.produce(new ComposedConjunction(premises.getRoot(),
 					conjunctionsByConjunct_.get(common)));
 		}

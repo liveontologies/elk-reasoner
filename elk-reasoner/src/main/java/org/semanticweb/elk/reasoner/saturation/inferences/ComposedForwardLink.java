@@ -47,8 +47,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ForwardLinkIn
  *            The type of the forward relation
  */
 public class ComposedForwardLink extends
-		AbstractForwardLinkInference<IndexedComplexPropertyChain> implements
-		ForwardLinkInference {
+		AbstractForwardLinkInference<IndexedComplexPropertyChain> {
 
 	private final IndexedObjectProperty backwardRelation_;
 

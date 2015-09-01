@@ -53,6 +53,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.Contradiction
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.collections.ArraySlicedSet;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.concurrent.collections.ActivationStack;
@@ -102,7 +103,8 @@ public class ContextImpl implements ExtendedContext {
 	private Map<IndexedDisjointClassesAxiom, IndexedClassExpression[]> disjointnessAxioms_;
 
 	/**
-	 * {@code true} if {@code owl:Nothing} is stored in {@link #subsumers_}
+	 * {@code true} if {@code owl:Nothing} is stored in
+	 * {@link #composedSubsumers_}
 	 */
 	private volatile boolean isInconsistent_ = false;
 
@@ -113,17 +115,33 @@ public class ContextImpl implements ExtendedContext {
 	private volatile boolean isSaturated_ = true;
 
 	/**
-	 * the {@link IndexedContextRoot} for which the {@link #subsumers_} are
-	 * computed
+	 * <<<<<<< HEAD the {@link IndexedContextRoot} for which the
+	 * {@link #subsumers_} are computed ======= the root
+	 * {@link IndexedClassExpression} for which the {@link #composedSubsumers_}
+	 * are computed >>>>>>> refs/heads/feature/deterministic-rules
 	 * 
 	 */
 	private final IndexedContextRoot root_;
 
 	/**
 	 * the derived {@link IndexedClassExpression}s that are subsumers (i.e,
-	 * super-classes) of {@link #root_}
+	 * super-classes) of {@link #root_}; this set is sliced on
+	 * {@link IndexedClassExpression}s that are obtained by composition rules,
+	 * and those obtained by decomposition rules
 	 */
-	private final Set<IndexedClassExpression> subsumers_;
+	private final ArraySlicedSet<IndexedClassExpression> subsumers_;
+
+	/**
+	 * the identifier of the slice of {@link #subsumers_} obtained by
+	 * composition rules
+	 */
+	private final static int COMPOSED_SUBSUMERS_SLICE_ = 0;
+
+	/**
+	 * the identifier of the slice of {@link #subsumers_} obtained by
+	 * decomposition rules
+	 */
+	private final static int DECOMPOSED_SUBSUMERS_SLICE_ = 1;
 
 	/**
 	 * the queue of unprocessed {@code Conclusion}s of this {@link Context}
@@ -145,7 +163,7 @@ public class ContextImpl implements ExtendedContext {
 	public ContextImpl(IndexedContextRoot root) {
 		this.root_ = root;
 		this.toDo_ = new SynchronizedArrayListActivationStack<Conclusion>();
-		this.subsumers_ = new ArrayHashSet<IndexedClassExpression>(13);
+		this.subsumers_ = new ArraySlicedSet<IndexedClassExpression>(13);
 	}
 
 	@Override
@@ -230,8 +248,13 @@ public class ContextImpl implements ExtendedContext {
 	}
 
 	@Override
-	public Set<IndexedClassExpression> getSubsumers() {
-		return subsumers_;
+	public Set<IndexedClassExpression> getComposedSubsumers() {
+		return subsumers_.getSlice(COMPOSED_SUBSUMERS_SLICE_);
+	}
+
+	@Override
+	public Set<IndexedClassExpression> getDecomposedSubsumers() {
+		return subsumers_.getSlice(DECOMPOSED_SUBSUMERS_SLICE_);
 	}
 
 	/*
@@ -300,10 +323,6 @@ public class ContextImpl implements ExtendedContext {
 	private static class ConclusionInserter implements
 			ConclusionVisitor<ContextImpl, Boolean> {
 
-		static Boolean visit(Subsumer conclusion, ContextImpl input) {
-			return input.subsumers_.add(conclusion.getExpression());
-		}
-
 		@Override
 		public Boolean visit(BackwardLink subConclusion, ContextImpl input) {
 			IndexedObjectProperty relation = subConclusion
@@ -324,7 +343,14 @@ public class ContextImpl implements ExtendedContext {
 
 		@Override
 		public Boolean visit(ComposedSubsumer conclusion, ContextImpl input) {
-			return visit((Subsumer) conclusion, input);
+			return input.subsumers_.add(COMPOSED_SUBSUMERS_SLICE_,
+					conclusion.getExpression());
+		}
+
+		@Override
+		public Boolean visit(DecomposedSubsumer conclusion, ContextImpl input) {
+			return input.subsumers_.add(DECOMPOSED_SUBSUMERS_SLICE_,
+					conclusion.getExpression());
 		}
 
 		@Override
@@ -343,11 +369,6 @@ public class ContextImpl implements ExtendedContext {
 			input.isInconsistent_ = true;
 			ContradictionOverBackwardLinkRule.addTo(input);
 			return before != input.isInconsistent_;
-		}
-
-		@Override
-		public Boolean visit(DecomposedSubsumer conclusion, ContextImpl input) {
-			return visit((Subsumer) conclusion, input);
 		}
 
 		@Override
@@ -429,13 +450,16 @@ public class ContextImpl implements ExtendedContext {
 			return changed;
 		}
 
-		static boolean visit(Subsumer conclusion, ContextImpl input) {
-			return input.subsumers_.remove(conclusion.getExpression());
+		@Override
+		public Boolean visit(ComposedSubsumer conclusion, ContextImpl input) {
+			return input.subsumers_.remove(COMPOSED_SUBSUMERS_SLICE_,
+					conclusion.getExpression());
 		}
 
 		@Override
-		public Boolean visit(ComposedSubsumer conclusion, ContextImpl input) {
-			return visit((Subsumer) conclusion, input);
+		public Boolean visit(DecomposedSubsumer conclusion, ContextImpl input) {
+			return input.subsumers_.remove(DECOMPOSED_SUBSUMERS_SLICE_,
+					conclusion.getExpression());
 		}
 
 		@Override
@@ -454,11 +478,6 @@ public class ContextImpl implements ExtendedContext {
 			input.isInconsistent_ = false;
 			ContradictionOverBackwardLinkRule.removeFrom(input);
 			return before != input.isInconsistent_;
-		}
-
-		@Override
-		public Boolean visit(DecomposedSubsumer conclusion, ContextImpl input) {
-			return visit((Subsumer) conclusion, input);
 		}
 
 		@Override
@@ -529,10 +548,6 @@ public class ContextImpl implements ExtendedContext {
 	private static class ConclusionOccurrenceChecker implements
 			ConclusionVisitor<ContextImpl, Boolean> {
 
-		static boolean visit(Subsumer conclusion, ContextImpl input) {
-			return input.subsumers_.contains(conclusion.getExpression());
-		}
-
 		@Override
 		public Boolean visit(BackwardLink subConclusion, ContextImpl input) {
 			if (subConclusion.getOriginRoot() == input.root_) {
@@ -550,7 +565,14 @@ public class ContextImpl implements ExtendedContext {
 
 		@Override
 		public Boolean visit(ComposedSubsumer conclusion, ContextImpl input) {
-			return visit((Subsumer) conclusion, input);
+			return input.subsumers_.contains(COMPOSED_SUBSUMERS_SLICE_,
+					conclusion.getExpression());
+		}
+
+		@Override
+		public Boolean visit(DecomposedSubsumer conclusion, ContextImpl input) {
+			return input.subsumers_.contains(DECOMPOSED_SUBSUMERS_SLICE_,
+					conclusion.getExpression());
 		}
 
 		@Override
@@ -561,11 +583,6 @@ public class ContextImpl implements ExtendedContext {
 		@Override
 		public Boolean visit(Contradiction conclusion, ContextImpl input) {
 			return input.isInconsistent_;
-		}
-
-		@Override
-		public Boolean visit(DecomposedSubsumer conclusion, ContextImpl input) {
-			return visit((Subsumer) conclusion, input);
 		}
 
 		@Override

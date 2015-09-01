@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDeclarationAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDefinitionAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectPropertyRangeAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
@@ -44,17 +45,12 @@ public class NoOpIndexedAxiomVisitor<O> implements IndexedAxiomVisitor<O> {
 	}
 
 	@Override
-	public O visit(IndexedSubClassOfAxiom axiom) {
+	public O visit(IndexedDeclarationAxiom axiom) {
 		return defaultVisit(axiom);
 	}
 
 	@Override
-	public O visit(IndexedSubObjectPropertyOfAxiom axiom) {
-		return defaultVisit(axiom);
-	}
-
-	@Override
-	public O visit(IndexedObjectPropertyRangeAxiom axiom) {
+	public O visit(IndexedDefinitionAxiom axiom) {
 		return defaultVisit(axiom);
 	}
 
@@ -64,7 +60,17 @@ public class NoOpIndexedAxiomVisitor<O> implements IndexedAxiomVisitor<O> {
 	}
 
 	@Override
-	public O visit(IndexedDeclarationAxiom axiom) {
+	public O visit(IndexedObjectPropertyRangeAxiom axiom) {
+		return defaultVisit(axiom);
+	}
+
+	@Override
+	public O visit(IndexedSubClassOfAxiom axiom) {
+		return defaultVisit(axiom);
+	}
+
+	@Override
+	public O visit(IndexedSubObjectPropertyOfAxiom axiom) {
 		return defaultVisit(axiom);
 	}
 

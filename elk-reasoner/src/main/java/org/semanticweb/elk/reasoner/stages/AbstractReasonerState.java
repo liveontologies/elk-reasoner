@@ -55,8 +55,8 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.ClassInferenceSet;
@@ -629,7 +629,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			return new ContradictionImpl(subsumee);
 		}
 		// else
-		return new DecomposedSubsumerImpl(subsumee, subsumer);
+		return new ComposedSubsumerImpl<IndexedClassExpression>(subsumee, subsumer);
 	}
 
 	@Deprecated

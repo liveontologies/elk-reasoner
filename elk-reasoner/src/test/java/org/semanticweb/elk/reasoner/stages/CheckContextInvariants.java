@@ -60,7 +60,7 @@ public class CheckContextInvariants extends BasePostProcessingStage {
 	public void execute() throws ElkException {
 		// check roots for all contexts now
 		for (Context context : reasoner_.saturationState.getContexts()) {
-			if (!context.getSubsumers().contains(context.getRoot())) {
+			if (!context.getComposedSubsumers().contains(context.getRoot())) {
 				LOGGER_.error(context.getRoot() + (context.isSaturated() ? " [saturated]" : " [modified]") + ": not a subsumer of itself");
 			}
 			

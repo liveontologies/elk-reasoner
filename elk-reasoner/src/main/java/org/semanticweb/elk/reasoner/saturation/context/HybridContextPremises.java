@@ -69,9 +69,15 @@ public class HybridContextPremises implements ContextPremises {
 	}
 
 	@Override
-	public Set<IndexedClassExpression> getSubsumers() {
+	public Set<IndexedClassExpression> getComposedSubsumers() {
 		// local
-		return localPremises_.getSubsumers();
+		return localPremises_.getComposedSubsumers();
+	}
+
+	@Override
+	public Set<IndexedClassExpression> getDecomposedSubsumers() {
+		// local
+		return localPremises_.getDecomposedSubsumers();
 	}
 
 	@Override

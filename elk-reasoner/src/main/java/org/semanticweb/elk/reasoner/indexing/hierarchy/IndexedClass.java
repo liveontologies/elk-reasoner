@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
 
 /**
@@ -36,6 +37,17 @@ public interface IndexedClass extends IndexedClassEntity {
 
 	@Override
 	public ElkClass getElkEntity();
+
+	/**
+	 * @return The {@link IndexedClassExpression} corresponding to an
+	 *         {@link ElkClassExpression} defined equivalent to the enclosed
+	 *         {@link ElkClass} in the ontology. There can be several such
+	 *         equivalent {@link ElkClassExpression}s in the ontology, but at
+	 *         most one of them should be chosen as the definition; the value
+	 *         can be {@code null} if there are no such equivalent
+	 *         {@link ElkClassExpression}s.
+	 */
+	public IndexedClassExpression getDefinition();
 
 	public <O> O accept(IndexedClassVisitor<O> visitor);
 

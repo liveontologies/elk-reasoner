@@ -58,11 +58,18 @@ public interface ContextPremises {
 	public IndexedContextRoot getRoot();
 
 	/**
-	 * @return the object representing all derived (implied)
-	 *         {@link IndexedClassExpression}s that subsume the root
-	 *         {@link IndexedClassExpression}
+	 * @return the set of all subsumers (implied) {@link IndexedClassExpression}
+	 *         s that subsume the root {@link IndexedClassExpression} created by
+	 *         composition rules
 	 */
-	public Set<IndexedClassExpression> getSubsumers();
+	public Set<IndexedClassExpression> getComposedSubsumers();
+
+	/**
+	 * @return the set of all subsumers (implied) {@link IndexedClassExpression}
+	 *         s that subsume the root {@link IndexedClassExpression} created by
+	 *         decomposition rules
+	 */
+	public Set<IndexedClassExpression> getDecomposedSubsumers();
 
 	/**
 	 * @return the {@link Map} storing {@link SubContextPremises} for the

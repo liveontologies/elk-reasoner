@@ -26,6 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDeclarationAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDefinitionAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
@@ -60,6 +61,31 @@ public class NoOpIndexedObjectVisitor<O> implements IndexedObjectVisitor<O> {
 	}
 
 	@Override
+	public O visit(IndexedComplexPropertyChain element) {
+		return defaultVisit(element);
+	}
+
+	@Override
+	public O visit(IndexedDataHasValue element) {
+		return defaultVisit(element);
+	}
+
+	@Override
+	public O visit(IndexedDeclarationAxiom axiom) {
+		return defaultVisit(axiom);
+	}
+
+	@Override
+	public O visit(IndexedDefinitionAxiom axiom) {
+		return defaultVisit(axiom);
+	}
+
+	@Override
+	public O visit(IndexedDisjointClassesAxiom axiom) {
+		return defaultVisit(axiom);
+	}
+
+	@Override
 	public O visit(IndexedIndividual element) {
 		return defaultVisit(element);
 	}
@@ -80,27 +106,22 @@ public class NoOpIndexedObjectVisitor<O> implements IndexedObjectVisitor<O> {
 	}
 
 	@Override
+	public O visit(IndexedObjectProperty element) {
+		return defaultVisit(element);
+	}
+
+	@Override
+	public O visit(IndexedObjectPropertyRangeAxiom axiom) {
+		return defaultVisit(axiom);
+	}
+
+	@Override
 	public O visit(IndexedObjectSomeValuesFrom element) {
 		return defaultVisit(element);
 	}
 
 	@Override
 	public O visit(IndexedObjectUnionOf element) {
-		return defaultVisit(element);
-	}
-
-	@Override
-	public O visit(IndexedDataHasValue element) {
-		return defaultVisit(element);
-	}
-
-	@Override
-	public O visit(IndexedObjectProperty element) {
-		return defaultVisit(element);
-	}
-
-	@Override
-	public O visit(IndexedComplexPropertyChain element) {
 		return defaultVisit(element);
 	}
 
@@ -116,21 +137,6 @@ public class NoOpIndexedObjectVisitor<O> implements IndexedObjectVisitor<O> {
 
 	@Override
 	public O visit(IndexedSubObjectPropertyOfAxiom axiom) {
-		return defaultVisit(axiom);
-	}
-
-	@Override
-	public O visit(IndexedObjectPropertyRangeAxiom axiom) {
-		return defaultVisit(axiom);
-	}
-
-	@Override
-	public O visit(IndexedDisjointClassesAxiom axiom) {
-		return defaultVisit(axiom);
-	}
-
-	@Override
-	public O visit(IndexedDeclarationAxiom axiom) {
 		return defaultVisit(axiom);
 	}
 

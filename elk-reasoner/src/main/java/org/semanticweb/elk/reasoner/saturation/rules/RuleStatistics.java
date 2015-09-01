@@ -12,10 +12,13 @@ import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBac
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.SubsumerPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ComposedFromDecomposedSubsumerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassFromDefinitionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSomeValuesFromDecomposition;
@@ -105,6 +108,10 @@ public class RuleStatistics extends AbstractStatistics {
 				ruleCounter.countNonReflexiveBackwardLinkCompositionRule,
 				ruleTimer.timeNonReflexiveBackwardLinkCompositionRule);
 
+		print(printer, ComposedFromDecomposedSubsumerRule.NAME,
+				ruleCounter.countComposedFromDecomposedSubsumerRule,
+				ruleTimer.timeComposedFromDecomposedSubsumerRule);
+
 		print(printer, ContradictionCompositionRule.NAME,
 				ruleCounter.countContradicitonCompositionRule,
 				ruleTimer.timeContradicitonCompositionRule);
@@ -132,6 +139,10 @@ public class RuleStatistics extends AbstractStatistics {
 		print(printer, DisjointSubsumerFromMemberRule.NAME,
 				ruleCounter.countDisjointSubsumerFromMemberRule,
 				ruleTimer.timeDisjointSubsumerFromMemberRule);
+
+		print(printer, IndexedClassDecomposition.NAME,
+				ruleCounter.countIndexedClassDecomposition,
+				ruleTimer.timeIndexedClassDecomposition);
 
 		print(printer, IndexedObjectComplementOfDecomposition.NAME,
 				ruleCounter.countIndexedObjectComplementOfDecomposition,
@@ -180,6 +191,10 @@ public class RuleStatistics extends AbstractStatistics {
 		print(printer, SuperClassFromSubClassRule.NAME,
 				ruleCounter.countSuperClassFromSubClassRule,
 				ruleTimer.timeSuperClassFromSubClassRule);
+
+		print(printer, IndexedClassFromDefinitionRule.NAME,
+				ruleCounter.countIndexedClassFromDefinitionRule,
+				ruleTimer.timeIndexedClassFromDefinitionRule);
 
 		print(printer, ReflexiveBackwardLinkCompositionRule.NAME,
 				ruleCounter.countReflexiveBackwardLinkCompositionRule,

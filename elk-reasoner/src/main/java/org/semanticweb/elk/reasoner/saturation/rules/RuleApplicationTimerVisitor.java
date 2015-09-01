@@ -22,6 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectHasSelf;
@@ -47,10 +48,13 @@ import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBac
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.SubsumerPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ComposedFromDecomposedSubsumerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassFromDefinitionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectHasSelfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
@@ -109,6 +113,18 @@ class RuleApplicationTimerVisitor<O> implements RuleVisitor<O> {
 				.getCurrentTimeMillis();
 		O result = visitor_.visit(rule, premise, premises, producer);
 		timer_.timeBackwardLinkFromForwardLinkRule += CachedTimeThread
+				.getCurrentTimeMillis();
+		return result;
+	}
+
+	@Override
+	public O visit(ComposedFromDecomposedSubsumerRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		timer_.timeComposedFromDecomposedSubsumerRule -= CachedTimeThread
+				.getCurrentTimeMillis();
+		O result = visitor_.visit(rule, premise, premises, producer);
+		timer_.timeComposedFromDecomposedSubsumerRule += CachedTimeThread
 				.getCurrentTimeMillis();
 		return result;
 	}
@@ -196,6 +212,29 @@ class RuleApplicationTimerVisitor<O> implements RuleVisitor<O> {
 	}
 
 	@Override
+	public O visit(IndexedClassDecomposition rule, IndexedClass premise,
+			ContextPremises premises, ConclusionProducer producer) {
+		timer_.timeIndexedClassDecomposition -= CachedTimeThread
+				.getCurrentTimeMillis();
+		O result = visitor_.visit(rule, premise, premises, producer);
+		timer_.timeIndexedClassDecomposition += CachedTimeThread
+				.getCurrentTimeMillis();
+		return result;
+	}
+
+	@Override
+	public O visit(IndexedClassFromDefinitionRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		timer_.timeIndexedClassFromDefinitionRule -= CachedTimeThread
+				.getCurrentTimeMillis();
+		O result = visitor_.visit(rule, premise, premises, producer);
+		timer_.timeIndexedClassFromDefinitionRule += CachedTimeThread
+				.getCurrentTimeMillis();
+		return result;
+	}
+
+	@Override
 	public O visit(IndexedObjectComplementOfDecomposition rule,
 			IndexedObjectComplementOf premise, ContextPremises premises,
 			ConclusionProducer producer) {
@@ -203,6 +242,18 @@ class RuleApplicationTimerVisitor<O> implements RuleVisitor<O> {
 				.getCurrentTimeMillis();
 		O result = visitor_.visit(rule, premise, premises, producer);
 		timer_.timeIndexedObjectComplementOfDecomposition += CachedTimeThread
+				.getCurrentTimeMillis();
+		return result;
+	}
+
+	@Override
+	public O visit(IndexedObjectHasSelfDecomposition rule,
+			IndexedObjectHasSelf premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		timer_.timeIndexedObjectHasSelfDecomposition -= CachedTimeThread
+				.getCurrentTimeMillis();
+		O result = visitor_.visit(rule, premise, premises, producer);
+		timer_.timeSuperClassFromSubClassRule += CachedTimeThread
 				.getCurrentTimeMillis();
 		return result;
 	}
@@ -354,18 +405,6 @@ class RuleApplicationTimerVisitor<O> implements RuleVisitor<O> {
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		timer_.timeSuperClassFromSubClassRule -= CachedTimeThread
-				.getCurrentTimeMillis();
-		O result = visitor_.visit(rule, premise, premises, producer);
-		timer_.timeSuperClassFromSubClassRule += CachedTimeThread
-				.getCurrentTimeMillis();
-		return result;
-	}
-
-	@Override
-	public O visit(IndexedObjectHasSelfDecomposition rule,
-			IndexedObjectHasSelf premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		timer_.timeIndexedObjectHasSelfDecomposition -= CachedTimeThread
 				.getCurrentTimeMillis();
 		O result = visitor_.visit(rule, premise, premises, producer);
 		timer_.timeSuperClassFromSubClassRule += CachedTimeThread

@@ -29,6 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.caching.ModifiableIndexedObjectCach
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ChainableContextInitRule;
@@ -139,6 +140,23 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl implements
 	@Override
 	public boolean hasPositivelyOwlNothing() {
 		return positiveOwlNothingOccurrenceNo_ > 0;
+	}
+
+	@Override
+	public boolean tryAddDefinition(ModifiableIndexedClass target,
+			ModifiableIndexedClassExpression definition) {
+		return target.setDefinition(definition);
+	}
+
+	@Override
+	public boolean tryRemoveDefinition(ModifiableIndexedClass target,
+			ModifiableIndexedClassExpression definition) {
+		if (target.getDefinition() != definition)
+			// it was not defined by this definition
+			return false;
+		// else
+		target.removeDefinition();
+		return true;
 	}
 
 	@Override

@@ -41,7 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
@@ -68,13 +68,16 @@ public class IncrementalDeletionInitializationStage extends
 
 		DifferentialIndex diffIndex = reasoner.ontologyIndex;
 		LinkedContextInitRule changedInitRules = null;
-		Map<? extends IndexedClassExpression, ChainableSubsumerRule> changedRulesByCE = null;
+		Map<? extends IndexedClassExpression, ? extends LinkedSubsumerRule> changedRulesByCE = null;
+		Map<? extends IndexedClass, ? extends IndexedClassExpression> changedDefinitions = null;
 		Collection<ArrayList<Context>> inputs = Collections.emptyList();
 
 		changedInitRules = diffIndex.getRemovedContextInitRules();
 		changedRulesByCE = diffIndex.getRemovedContextRulesByClassExpressions();
+		changedDefinitions = diffIndex.getRemovedDefinitions();
 
-		if (changedInitRules != null || !changedRulesByCE.isEmpty()) {
+		if (changedInitRules != null || !changedRulesByCE.isEmpty()
+				|| !changedDefinitions.isEmpty()) {
 
 			inputs = Operations.split(reasoner.saturationState.getContexts(),
 					8 * workerNo);
@@ -83,9 +86,9 @@ public class IncrementalDeletionInitializationStage extends
 		// System.err.println(changedRulesByCE.keySet().size());
 
 		this.initialization = new IncrementalChangesInitialization(inputs,
-				changedInitRules, changedRulesByCE, reasoner.saturationState,
-				reasoner.getProcessExecutor(), stageStatistics_, workerNo,
-				reasoner.getProgressMonitor());
+				changedInitRules, changedRulesByCE, changedDefinitions,
+				reasoner.saturationState, reasoner.getProcessExecutor(),
+				stageStatistics_, workerNo, reasoner.getProgressMonitor());
 
 		return true;
 	}

@@ -26,6 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDeclarationAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDefinitionAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
@@ -52,10 +53,10 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubObjectPropertyO
 public class DelegatingIndexedObjectVisitor<O> implements
 		IndexedObjectVisitor<O> {
 
-	private final IndexedClassExpressionVisitor<O> classExpressionVisitor_;
-	private final IndexedPropertyChainVisitor<O> propertyChainVisitor_;
 	private final IndexedAxiomVisitor<O> axiomVisitor_;
+	private final IndexedClassExpressionVisitor<O> classExpressionVisitor_;
 	private final IndexedFillerVisitor<O> fillerVisitor_;
+	private final IndexedPropertyChainVisitor<O> propertyChainVisitor_;
 
 	public DelegatingIndexedObjectVisitor(
 			IndexedClassExpressionVisitor<O> classExpressionVisitor,
@@ -71,6 +72,31 @@ public class DelegatingIndexedObjectVisitor<O> implements
 	@Override
 	public O visit(IndexedClass element) {
 		return classExpressionVisitor_.visit(element);
+	}
+
+	@Override
+	public O visit(IndexedComplexPropertyChain element) {
+		return propertyChainVisitor_.visit(element);
+	}
+
+	@Override
+	public O visit(IndexedDataHasValue element) {
+		return classExpressionVisitor_.visit(element);
+	}
+
+	@Override
+	public O visit(IndexedDeclarationAxiom axiom) {
+		return axiomVisitor_.visit(axiom);
+	}
+
+	@Override
+	public O visit(IndexedDefinitionAxiom axiom) {
+		return axiomVisitor_.visit(axiom);
+	}
+
+	@Override
+	public O visit(IndexedDisjointClassesAxiom axiom) {
+		return axiomVisitor_.visit(axiom);
 	}
 
 	@Override
@@ -94,6 +120,16 @@ public class DelegatingIndexedObjectVisitor<O> implements
 	}
 
 	@Override
+	public O visit(IndexedObjectProperty element) {
+		return propertyChainVisitor_.visit(element);
+	}
+
+	@Override
+	public O visit(IndexedObjectPropertyRangeAxiom axiom) {
+		return axiomVisitor_.visit(axiom);
+	}
+
+	@Override
 	public O visit(IndexedObjectSomeValuesFrom element) {
 		return classExpressionVisitor_.visit(element);
 	}
@@ -101,21 +137,6 @@ public class DelegatingIndexedObjectVisitor<O> implements
 	@Override
 	public O visit(IndexedObjectUnionOf element) {
 		return classExpressionVisitor_.visit(element);
-	}
-
-	@Override
-	public O visit(IndexedDataHasValue element) {
-		return classExpressionVisitor_.visit(element);
-	}
-
-	@Override
-	public O visit(IndexedObjectProperty element) {
-		return propertyChainVisitor_.visit(element);
-	}
-
-	@Override
-	public O visit(IndexedComplexPropertyChain element) {
-		return propertyChainVisitor_.visit(element);
 	}
 
 	@Override
@@ -130,21 +151,6 @@ public class DelegatingIndexedObjectVisitor<O> implements
 
 	@Override
 	public O visit(IndexedSubObjectPropertyOfAxiom axiom) {
-		return axiomVisitor_.visit(axiom);
-	}
-
-	@Override
-	public O visit(IndexedObjectPropertyRangeAxiom axiom) {
-		return axiomVisitor_.visit(axiom);
-	}
-
-	@Override
-	public O visit(IndexedDisjointClassesAxiom axiom) {
-		return axiomVisitor_.visit(axiom);
-	}
-
-	@Override
-	public O visit(IndexedDeclarationAxiom axiom) {
 		return axiomVisitor_.visit(axiom);
 	}
 

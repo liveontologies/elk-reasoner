@@ -52,7 +52,7 @@ public class EnumerateContextsStage extends BasePostProcessingStage {
 		int cnt = 0;
 
 		for (Context context : reasoner_.saturationState.getContexts()) {
-			cnt += context.getSubsumers().size();
+			cnt += context.getComposedSubsumers().size();
 		}
 
 		cnt = 2 * cnt - cnt;

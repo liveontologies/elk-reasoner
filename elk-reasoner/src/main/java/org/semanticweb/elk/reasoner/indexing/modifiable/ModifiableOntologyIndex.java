@@ -161,4 +161,41 @@ public interface ModifiableOntologyIndex extends OntologyIndex,
 	 * @see #hasPositivelyOwlNothing()
 	 */
 	public boolean updatePositiveOwlNothingOccurrenceNo(int increment);
+
+	/**
+	 * Tries to set the given {@link IndexedClassExpression} as definition for
+	 * the given target {@link ModifiableIndexedClass}. There can be at most one
+	 * definition set for each {@link ModifiableIndexedClass}.
+	 * 
+	 * @param target
+	 *            the {@link ModifiableIndexedClass} for which to add a new
+	 *            definition
+	 * @param definition
+	 *            the {@link ModifiableIndexedClassExpression} to be added as
+	 *            the definition
+	 * @return {@code true} if the definition was set and {@code false} if this
+	 *         operation was not successful
+	 */
+	public boolean tryAddDefinition(ModifiableIndexedClass target,
+			ModifiableIndexedClassExpression definition);
+
+	/**
+	 * Tries to remove the given {@link IndexedClassExpression} from the
+	 * definition of the given target {@link ModifiableIndexedClass}. The
+	 * definition is removed if it is set for exactly the given
+	 * {@link IndexedClassExpression}
+	 * 
+	 * @param target
+	 *            the {@link ModifiableIndexedClass} for which to remove the
+	 *            definition
+	 * @param definition
+	 *            the {@link ModifiableIndexedClassExpression} that was defined
+	 *            for the given {@link ModifiableIndexedClass} and should be now
+	 *            removed
+	 * @return {@code true} if the definition was removed and {@code false} if
+	 *         this operation was not successful
+	 */
+	public boolean tryRemoveDefinition(ModifiableIndexedClass target,
+			ModifiableIndexedClassExpression definition);
+
 }

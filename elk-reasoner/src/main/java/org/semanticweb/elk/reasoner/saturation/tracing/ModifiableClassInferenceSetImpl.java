@@ -51,6 +51,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedConjunction;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDecomposition;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDefinition;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDisjunction;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedExistential;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedForwardLink;
@@ -60,6 +62,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromIncon
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromNegation;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromOwlNothing;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedDefinition;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedFirstConjunct;
@@ -416,6 +419,27 @@ public class ModifiableClassInferenceSetImpl implements
 
 		@Override
 		public Void visit(ObjectHasSelfPropertyRangeSubsumer inference,
+				ModifiableClassInferenceSetImpl input) {
+			input.addInference(inference);
+			return null;
+		}
+
+		@Override
+		public Void visit(ComposedDecomposition inference,
+				ModifiableClassInferenceSetImpl input) {
+			input.addInference(inference);
+			return null;
+		}
+
+		@Override
+		public Void visit(ComposedDefinition inference,
+				ModifiableClassInferenceSetImpl input) {
+			input.addInference(inference);
+			return null;
+		}
+
+		@Override
+		public Void visit(DecomposedDefinition inference,
 				ModifiableClassInferenceSetImpl input) {
 			input.addInference(inference);
 			return null;

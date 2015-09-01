@@ -42,8 +42,10 @@ import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectProperty
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.factories.ModifiableIndexedObjectFactory;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDeclarationAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDefinitionAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedEntity;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectPropertyRangeAxiom;
@@ -85,6 +87,14 @@ public class ModifiableIndexedObjectFactoryImpl implements
 	public ModifiableIndexedDeclarationAxiom getIndexedDeclarationAxiom(
 			ModifiableIndexedEntity entity, ElkAxiom reason) {
 		return new ModifiableIndexedDeclarationAxiomImpl(entity);
+	}
+
+	@Override
+	public ModifiableIndexedDefinitionAxiom getIndexedDefinitionAxiom(
+			ModifiableIndexedClass definedClass,
+			ModifiableIndexedClassExpression definition, ElkAxiom reason) {
+		return new ModifiableIndexedDefinitionAxiomImpl(definedClass,
+				definition);
 	}
 
 	@Override

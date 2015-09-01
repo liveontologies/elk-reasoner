@@ -83,7 +83,7 @@ class TransitiveReductionState<R extends IndexedClassExpression, J extends Trans
 		this.rootEquivalent = new ArrayList<ElkClass>(1);
 		this.prunedSubsumers = new ArrayHashSet<IndexedClass>(8);
 		Set<IndexedClassExpression> subsumers = saturationState.getContext(
-				initiatorJob.getInput()).getSubsumers();
+				initiatorJob.getInput()).getComposedSubsumers();
 		this.subsumerIterator = subsumers.iterator();
 		this.subsumerCount = subsumers.size();
 	}

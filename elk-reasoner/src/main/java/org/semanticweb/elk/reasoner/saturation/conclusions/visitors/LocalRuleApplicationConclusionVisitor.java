@@ -88,7 +88,7 @@ public class LocalRuleApplicationConclusionVisitor extends
 	protected Boolean defaultVisit(Conclusion conclusion, Context input) {
 		ContextPremises premises = getPremises(conclusion, input);
 		conclusion.accept(nonRedundantLocalRuleApplicator_, premises);
-		conclusion.accept(redundantLocalRuleApplicator_, premises);
+//		conclusion.accept(redundantLocalRuleApplicator_, premises);
 		return true;
 	}
 

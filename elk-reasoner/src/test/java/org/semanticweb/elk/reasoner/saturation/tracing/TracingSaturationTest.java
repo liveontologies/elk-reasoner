@@ -88,7 +88,7 @@ public class TracingSaturationTest {
 				PredefinedElkClass.OWL_NOTHING, reasoner);
 	}
 
-	@Test @Ignore
+	@Test
 	public void testDuplicateInferenceOfConjunction() throws Exception {
 		Reasoner reasoner = TestReasonerUtils
 				.loadAndClassify("tracing/DuplicateConjunction.owl");
@@ -213,9 +213,8 @@ public class TracingSaturationTest {
 		TracingTestUtils.checkTracingCompleteness(a, rSomeC, reasoner);
 	}
 
-	/*
-	 */
-	@Test @Ignore
+	@Test
+	@Ignore
 	public void testAvoidTracingDueToCyclicInferences() throws Exception {
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		Reasoner reasoner = TestReasonerUtils

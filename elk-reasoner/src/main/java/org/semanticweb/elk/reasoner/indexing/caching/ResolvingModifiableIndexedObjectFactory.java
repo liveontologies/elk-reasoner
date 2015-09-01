@@ -26,8 +26,10 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.factories.ModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.implementation.ModifiableIndexedObjectFactoryImpl;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDeclarationAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDefinitionAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedEntity;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectPropertyRangeAxiom;
@@ -79,6 +81,14 @@ public class ResolvingModifiableIndexedObjectFactory extends
 			ModifiableIndexedClassExpression superClass, ElkAxiom reason) {
 		return filter(baseFactory_.getIndexedSubClassOfAxiom(subClass,
 				superClass, reason));
+	}
+
+	@Override
+	public ModifiableIndexedDefinitionAxiom getIndexedDefinitionAxiom(
+			ModifiableIndexedClass definedClass,
+			ModifiableIndexedClassExpression definition, ElkAxiom reason) {
+		return filter(baseFactory_.getIndexedDefinitionAxiom(definedClass,
+				definition, reason));
 	}
 
 	@Override

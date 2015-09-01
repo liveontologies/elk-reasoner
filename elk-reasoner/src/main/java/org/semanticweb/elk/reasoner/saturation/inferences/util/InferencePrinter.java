@@ -30,11 +30,14 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLin
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedConjunction;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDecomposition;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDefinition;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromDisjointSubsumers;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromInconsistentDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromNegation;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromOwlNothing;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedDefinition;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedFirstConjunct;
@@ -214,6 +217,23 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>,
 	@Override
 	public String visit(ObjectHasSelfPropertyRangeSubsumer inference, Void input) {
 		return "Property range of " + inference.getPremise();
+	}
+
+	@Override
+	public String visit(ComposedDecomposition inference, Void input) {
+		return "Composed decomposition " + inference.getExpression();
+	}
+
+	@Override
+	public String visit(ComposedDefinition inference, Void input) {
+		return "Composed definition " + inference.getExpression() + " from "
+				+ inference.getPremise();
+	}
+
+	@Override
+	public String visit(DecomposedDefinition inference, Void input) {
+		return "Decomposed definition " + inference.getExpression() + " of "
+				+ inference.getPremise();
 	}
 
 }

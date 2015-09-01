@@ -88,7 +88,7 @@ public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		 */
 		public static void generatePropagations(IndexedObjectProperty property,
 				ContextPremises premises, ConclusionProducer producer) {
-			for (IndexedClassExpression ice : premises.getSubsumers()) {
+			for (IndexedClassExpression ice : premises.getComposedSubsumers()) {
 				PropagationFromExistentialFillerRule.applyForProperty(
 						ice.getCompositionRuleHead(), property, premises,
 						producer);

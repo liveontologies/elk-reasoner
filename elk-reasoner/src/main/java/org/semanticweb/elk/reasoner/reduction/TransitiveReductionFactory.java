@@ -365,7 +365,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				TransitiveReductionState<R, J> state, IndexedClass candidate) {
 
 			Set<IndexedClassExpression> candidateSubsumers = saturationState_
-					.getContext(candidate).getSubsumers();
+					.getContext(candidate).getComposedSubsumers();
 
 			/*
 			 * Check if subsumer is equivalent to the root
@@ -397,7 +397,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 					IndexedClass prunedSubsumer = iteratorPrunedSubsumers
 							.next();
 					Set<IndexedClassExpression> prunedSubsumerSubsumers = saturationState_
-							.getContext(prunedSubsumer).getSubsumers();
+							.getContext(prunedSubsumer).getComposedSubsumers();
 					if (candidateSubsumersSize > prunedSubsumerSubsumers.size()) {
 						if (candidateSubsumers.contains(prunedSubsumer)) {
 							/* candidate strictly subsumes the pruned subsumer */
@@ -419,7 +419,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 						continue;
 					IndexedClass prunedSubsumer = (IndexedClass) candidateSubsumer;
 					Set<IndexedClassExpression> prunedSubsumerSubsumers = saturationState_
-							.getContext(prunedSubsumer).getSubsumers();
+							.getContext(prunedSubsumer).getComposedSubsumers();
 					if (candidateSubsumersSize > prunedSubsumerSubsumers.size()) {
 						/* candidate strictly subsumes the pruned subsumer */
 						state.prunedSubsumers.remove(prunedSubsumer);
@@ -468,7 +468,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			 * previous subsumers in this order.
 			 */
 			for (IndexedClassExpression subsumer : saturationState_.getContext(
-					root).getSubsumers()) {
+					root).getComposedSubsumers()) {
 				if (!(subsumer instanceof IndexedClass)
 						|| !state.prunedSubsumers.contains(subsumer))
 					continue;
@@ -481,7 +481,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				 * pruned subsumers and find those that are equivalent to it.
 				 */
 				Set<IndexedClassExpression> candidateSubsumers = saturationState_
-						.getContext(candidate).getSubsumers();
+						.getContext(candidate).getComposedSubsumers();
 				int candidateSubsumersSize = candidateSubsumers.size();
 				List<ElkClass> candidateEquivalent = new ArrayList<ElkClass>(1);
 				/* pruning other pruned subsumers */
@@ -496,7 +496,8 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 						IndexedClass prunedSubsumer = iteratorPrunedSubsumers
 								.next();
 						Set<IndexedClassExpression> prunedSubsumerSubsumers = saturationState_
-								.getContext(prunedSubsumer).getSubsumers();
+								.getContext(prunedSubsumer)
+								.getComposedSubsumers();
 						if (candidateSubsumersSize >= prunedSubsumerSubsumers
 								.size()
 								&& candidateSubsumers.contains(prunedSubsumer)) {
@@ -526,7 +527,8 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 						 * computed
 						 */
 						Set<IndexedClassExpression> prunedSubsumerSubsumers = saturationState_
-								.getContext(prunedSubsumer).getSubsumers();
+								.getContext(prunedSubsumer)
+								.getComposedSubsumers();
 						if (candidateSubsumersSize >= prunedSubsumerSubsumers
 								.size()) {
 							/* candidate subsumes the pruned subsumer */

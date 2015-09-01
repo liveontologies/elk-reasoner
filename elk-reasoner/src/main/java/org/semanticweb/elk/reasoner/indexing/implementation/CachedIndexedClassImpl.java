@@ -27,6 +27,8 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpressionFilter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
@@ -50,6 +52,12 @@ final class CachedIndexedClassImpl extends
 	 */
 	private final ElkClass elkClass_;
 
+	/**
+	 * The equivalent {@link ModifiableIndexedClassExpression} if there exists
+	 * one or {@code null} otherwise
+	 */
+	private ModifiableIndexedClassExpression definition_;
+
 	CachedIndexedClassImpl(ElkClass entity) {
 		super(CachedIndexedClass.Helper.structuralHashCode(entity));
 		elkClass_ = entity;
@@ -58,6 +66,25 @@ final class CachedIndexedClassImpl extends
 	@Override
 	public final ElkClass getElkEntity() {
 		return elkClass_;
+	}
+
+	@Override
+	public IndexedClassExpression getDefinition() {
+		return this.definition_;
+	}
+
+	@Override
+	public boolean setDefinition(ModifiableIndexedClassExpression definition) {
+		if (definition_ != null)
+			return false;
+		// else
+		this.definition_ = definition;
+		return true;
+	}
+
+	@Override
+	public void removeDefinition() {
+		this.definition_ = null;
 	}
 
 	@Override

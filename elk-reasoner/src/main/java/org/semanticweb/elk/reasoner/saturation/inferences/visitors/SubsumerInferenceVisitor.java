@@ -23,30 +23,39 @@ package org.semanticweb.elk.reasoner.saturation.inferences.visitors;
  */
 
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedConjunction;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDecomposition;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDefinition;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDisjunction;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedExistential;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedDefinition;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedFirstConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedSecondConjunct;
-import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDisjunction;
 import org.semanticweb.elk.reasoner.saturation.inferences.InitializationSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.ObjectHasSelfPropertyRangeSubsumer;
-import org.semanticweb.elk.reasoner.saturation.inferences.ComposedExistential;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
 
 public interface SubsumerInferenceVisitor<I, O> {
 
 	public O visit(ComposedConjunction inference, I input);
 
+	public O visit(ComposedDecomposition inference, I input);
+
+	public O visit(ComposedDefinition inference, I input);
+
+	public O visit(ComposedDisjunction inference, I input);
+
+	public O visit(ComposedExistential inference, I input);
+
+	public O visit(DecomposedDefinition inference, I input);
+
 	public O visit(DecomposedFirstConjunct inference, I input);
 
 	public O visit(DecomposedSecondConjunct inference, I input);
 
-	public O visit(ComposedDisjunction inference, I input);
-
 	public O visit(InitializationSubsumer inference, I input);
 
-	public O visit(ComposedExistential inference, I input);
+	public O visit(ObjectHasSelfPropertyRangeSubsumer inference, I input);
 
 	public O visit(SubClassOfSubsumer inference, I input);
-
-	public O visit(ObjectHasSelfPropertyRangeSubsumer inference, I input);
 
 }

@@ -34,6 +34,23 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 public interface ModifiableIndexedClass extends ModifiableIndexedClassEntity,
 		IndexedClass {
 
-	// nothing specific to modify
+	/**
+	 * Set the given {@link ModifiableIndexedClassExpression} as a definition of
+	 * this {@link IndexedClass} if is not defined
+	 * 
+	 * @param definition
+	 *            the new definition for this {@link IndexedClass}
+	 * @return {@code true} if this operation is successful or {@code false}
+	 *         otherwise; the letter is returned if this {@link IndexedClass}
+	 *         was already defined ({@link #getDefinition()} returns
+	 *         {@code null})
+	 */
+	boolean setDefinition(ModifiableIndexedClassExpression definition);
+
+	/**
+	 * Removes the definition for this {@link IndexedClass}; after calling this
+	 * method, {@link #getDefinition()} returns {@code null}
+	 */
+	void removeDefinition();
 
 }

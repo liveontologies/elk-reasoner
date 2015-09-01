@@ -67,11 +67,11 @@ public class CheckCleaningStage extends BasePostProcessingStage {
 		for (Context context : reasoner_.saturationState
 				.getNotSaturatedContexts()) {
 			cleanedContexts.add(context);
-			if (!context.getSubsumers().isEmpty()) {
+			if (!context.getComposedSubsumers().isEmpty()) {
 				LOGGER_.error(
 						"{}: context not cleaned: there are {} subsumers: {}",
-						context, context.getSubsumers().size(),
-						context.getSubsumers());
+						context, context.getComposedSubsumers().size(),
+						context.getComposedSubsumers());
 			}
 			if (!context.getLocalReflexiveObjectProperties().isEmpty()) {
 				LOGGER_.error(

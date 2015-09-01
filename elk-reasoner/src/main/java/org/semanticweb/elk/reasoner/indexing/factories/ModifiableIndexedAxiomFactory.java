@@ -32,6 +32,7 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedAxiom;
  */
 public interface ModifiableIndexedAxiomFactory extends
 		ModifiableIndexedSubClassOfAxiomFactory,
+		ModifiableIndexedDefinitionAxiomFactory,
 		ModifiableIndexedSubObjectPropertyOfAxiomFactory,
 		ModifiableIndexedObjectPropertyRangeAxiomFactory,
 		ModifiableIndexedDisjointClassesAxiomFactory,
