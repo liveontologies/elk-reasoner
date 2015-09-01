@@ -30,16 +30,15 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInitializingInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextNotSaturatedCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.NonRedundantRuleApplicationVisitorFactory;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.RuleApplicationVisitorFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.RuleApplicationConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
  * A {@link RuleApplicationFactory} that adds the produced {@link Conclusion}s
  * to the respective {@link Context} (creating new if necessary) and applies
- * non-redundant rules, which in turn produce new {@link Conclusion}s for which
- * this process repeats if they have not been processed already. This
+ * rules, which in turn produce new {@link Conclusion}s for which this process
+ * repeats if they have not been processed already. This
  * {@link RuleApplicationFactory} should not produce {@link Conclusion}s for
  * which the source {@link Context} is already saturated.
  * 
@@ -49,27 +48,13 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  * @author Pavel Klinov
  * 
  */
-public class RuleApplicationAdditionFactory<I extends RuleApplicationInput> extends
-		AbstractRuleApplicationFactory<Context, I> {
+public class RuleApplicationAdditionFactory<I extends RuleApplicationInput>
+		extends AbstractRuleApplicationFactory<Context, I> {
 
-	private final RuleApplicationVisitorFactory ruleAppVisitorFactory_;
-	
-	public RuleApplicationAdditionFactory(
-			SaturationState<?> saturationState) {
-		// this factory applies non-redundant rules by default
-		this(saturationState, new NonRedundantRuleApplicationVisitorFactory());
-	}
-	
-	public RuleApplicationAdditionFactory(
-			SaturationState<?> saturationState, RuleApplicationVisitorFactory factory) {
+	public RuleApplicationAdditionFactory(SaturationState<?> saturationState) {
 		super(saturationState);
-		ruleAppVisitorFactory_ = factory;
 	}
 
-	protected final RuleApplicationVisitorFactory getRuleApplicationVisitorFactory() {
-		return ruleAppVisitorFactory_;
-	}
-	
 	@Override
 	@SuppressWarnings("unchecked")
 	protected ConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
@@ -90,7 +75,8 @@ public class RuleApplicationAdditionFactory<I extends RuleApplicationInput> exte
 						// count conclusions used in the rules, if necessary
 						SaturationUtils
 								.getUsedConclusionCountingVisitor(localStatistics),
-						// and apply all non-redundant rules
-						ruleAppVisitorFactory_.create(ruleVisitor, writer));
+						// and apply all rules
+						new RuleApplicationConclusionVisitor(ruleVisitor,
+								writer));
 	}
 }

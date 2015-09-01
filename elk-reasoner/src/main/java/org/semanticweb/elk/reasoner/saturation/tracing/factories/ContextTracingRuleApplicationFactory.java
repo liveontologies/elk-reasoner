@@ -54,12 +54,11 @@ import org.semanticweb.elk.util.concurrent.computation.DelegatingInputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
- * A {@link RuleApplicationFactory} that applies redundant and non-redundant
- * rules to {@link Conclusion}s currently stored in the {@link Context}s of the
- * main {@link SaturationState}. This {@link SaturationState} is not modified.
- * The inferences producing the {@link Conclusion}s in this
- * {@link SaturationState} are produced using the supplied
- * {@link ClassInferenceProducer}.
+ * A {@link RuleApplicationFactory} that applies inference rules to
+ * {@link Conclusion}s currently stored in the {@link Context}s of the main
+ * {@link SaturationState}. This {@link SaturationState} is not modified. The
+ * inferences producing the {@link Conclusion}s in this {@link SaturationState}
+ * are produced using the supplied {@link ClassInferenceProducer}.
  * 
  * @author Pavel Klinov
  * 
@@ -102,12 +101,10 @@ public class ContextTracingRuleApplicationFactory extends
 				new InferenceProducingVisitor(),
 				// insert the conclusion into the local context copies
 				new ConclusionInsertionVisitor(localWriter),
-				// if the conclusion is new, apply local (non-redundant +
-				// redundant) rules and produce conclusions to the active
-				// (local) saturation state
-				new LocalRuleApplicationConclusionVisitor(
-						mainSaturationState_, ruleVisitor, ruleVisitor,
-						localWriter, localWriter));
+				// if the conclusion is new, apply local rules and produce
+				// conclusions to the active (local) saturation state
+				new LocalRuleApplicationConclusionVisitor(mainSaturationState_,
+						ruleVisitor, localWriter));
 	}
 
 	@Override

@@ -49,36 +49,34 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link ConclusionVisitor} that applies non-redundant rules for the visited
+ * A {@link ConclusionVisitor} that applies inference rules for the visited
  * {@link Conclusion}s using the provided {@link RuleVisitor} to apply rules and
  * {@link ConclusionProducer} to output the {@link Conclusion}s of the applied
  * rules. The methods always return {@link true}.
  * 
- * @see RedundantRuleApplicationConclusionVisitor
- * 
  * @author "Yevgeny Kazakov"
  */
-public class NonRedundantRuleApplicationConclusionVisitor extends
+public class RuleApplicationConclusionVisitor extends
 		AbstractRuleApplicationConclusionVisitor {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(NonRedundantRuleApplicationConclusionVisitor.class);
+			.getLogger(RuleApplicationConclusionVisitor.class);
 
 	/**
 	 * cached rules for frequent use
 	 */
 	private static ContradictionCompositionRule CONTRADICTION_COMPOSITION_RULE_ = new ContradictionCompositionRule();
 
-	public NonRedundantRuleApplicationConclusionVisitor(
-			RuleVisitor<?> ruleAppVisitor, ConclusionProducer producer) {
+	public RuleApplicationConclusionVisitor(RuleVisitor<?> ruleAppVisitor,
+			ConclusionProducer producer) {
 		super(ruleAppVisitor, producer);
 	}
 
 	@Override
 	protected Boolean defaultVisit(Conclusion conclusion, ContextPremises input) {
 		// all methods should be explicitly implemented
-		throw new RuntimeException("Non-redundant rules for " + conclusion
+		throw new RuntimeException("Rules for " + conclusion
 				+ " not implemented!");
 	}
 

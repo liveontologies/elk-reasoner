@@ -37,8 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitors;
  * A {@link ConclusionVisitor} that applies local rules (rules producing only
  * {@link Conclusion}s with the same origin root and sub-root as for the
  * premise) for visited {@link Conclusion}s using the provided
- * {@link RuleVisitor}s and {@link ConclusionProducer}s for respectively
- * non-redundant and redundant rule applications.
+ * {@link RuleVisitor} and {@link ConclusionProducer}.
  * 
  * When applying local rules, to the visited {@link Conclusion}, local premises
  * (premises with the same origin root and sub-root as the {@link Conclusion})
@@ -50,21 +49,15 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitors;
  * @author "Yevgeny Kazakov"
  * 
  * @see Rule#isLocal()
- * @see NonRedundantRuleApplicationConclusionVisitor
- * @see RedundantRuleApplicationConclusionVisitor
+ * @see RuleApplicationConclusionVisitor
  */
 public class LocalRuleApplicationConclusionVisitor extends
 		AbstractConclusionVisitor<Context, Boolean> {
 
 	/**
-	 * {@link ConclusionVisitor} applying non-redundant local rules
+	 * {@link ConclusionVisitor} applying local rules
 	 */
-	private final ConclusionVisitor<? super ContextPremises, Boolean> nonRedundantLocalRuleApplicator_;
-
-	/**
-	 * {@link ConclusionVisitor} applying redundant local rules
-	 */
-	private final ConclusionVisitor<? super ContextPremises, Boolean> redundantLocalRuleApplicator_;
+	private final ConclusionVisitor<? super ContextPremises, Boolean> localRuleApplicator_;
 
 	/**
 	 * the main {@link SaturationState} to take the non-local premises from
@@ -72,23 +65,16 @@ public class LocalRuleApplicationConclusionVisitor extends
 	private final SaturationState<?> mainState_;
 
 	public LocalRuleApplicationConclusionVisitor(SaturationState<?> mainState,
-			RuleVisitor<?> nonRedundantRuleVisitor,
-			RuleVisitor<?> redundantRuleVisitor,
-			ConclusionProducer nonRedundantProducer,
-			ConclusionProducer redundantProducer) {
+			RuleVisitor<?> ruleVisitor, ConclusionProducer conclusionProducer) {
 		this.mainState_ = mainState;
-		this.nonRedundantLocalRuleApplicator_ = new NonRedundantRuleApplicationConclusionVisitor(
-				RuleVisitors.localize(nonRedundantRuleVisitor),
-				nonRedundantProducer);
-		this.redundantLocalRuleApplicator_ = new RedundantRuleApplicationConclusionVisitor(
-				RuleVisitors.localize(redundantRuleVisitor), redundantProducer);
+		this.localRuleApplicator_ = new RuleApplicationConclusionVisitor(
+				RuleVisitors.localize(ruleVisitor), conclusionProducer);
 	}
 
 	@Override
 	protected Boolean defaultVisit(Conclusion conclusion, Context input) {
 		ContextPremises premises = getPremises(conclusion, input);
-		conclusion.accept(nonRedundantLocalRuleApplicator_, premises);
-//		conclusion.accept(redundantLocalRuleApplicator_, premises);
+		conclusion.accept(localRuleApplicator_, premises);
 		return true;
 	}
 

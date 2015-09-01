@@ -24,9 +24,6 @@ package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.NonRedundantRuleApplicationVisitorFactory;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.RedundantRuleApplicationVisitorFactory;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.RuleApplicationVisitorFactory;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
@@ -67,23 +64,9 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 			return false;
 
 		RuleApplicationFactory<Context, RuleApplicationInput> ruleFactory = null;
-		RuleApplicationVisitorFactory ruleAppVisitorFactory = null;
 
-		if (reasoner.REDUNDANT_RULES) {
-			ruleAppVisitorFactory = new RedundantRuleApplicationVisitorFactory();
-		} else {
-			ruleAppVisitorFactory = new NonRedundantRuleApplicationVisitorFactory();
-		}
-
-		// if (reasoner.FULL_TRACING) {
-		// reasoner.resetTraceState();
-		// ruleFactory = new RuleApplicationFactoryWithTracing(
-		// reasoner.saturationState, reasoner.traceState
-		// .getTraceStore().getWriter(), ruleAppVisitorFactory);
-		// } else {
 		ruleFactory = new RuleApplicationAdditionFactory<RuleApplicationInput>(
-				reasoner.saturationState, ruleAppVisitorFactory);
-		// }
+				reasoner.saturationState);
 
 		this.computation_ = new ClassExpressionSaturation<IndexedClass>(
 				reasoner.ontologyIndex.getClasses(),

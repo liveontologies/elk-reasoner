@@ -37,17 +37,16 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionDe
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionOccurrenceCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextUnsaturationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.NonRedundantRuleApplicationConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.RedundantRuleApplicationConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.RuleApplicationConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
  * A {@link RuleApplicationFactory} that deletes the produced {@link Conclusion}
- * s from the respective {@link Context} and applies all (redundant and
- * non-redundant) rules, which in turn produce {@link Conclusion} s for which
- * this process repeats if they have not been processed already. This
- * {@link RuleApplicationFactory} never creates new {@link Context}s.
+ * s from the respective {@link Context} and applies rules, which in turn
+ * produce {@link Conclusion} s for which this process repeats if they have not
+ * been processed already. This {@link RuleApplicationFactory} never creates new
+ * {@link Context}s.
  * 
  * @author Pavel Klinov
  * 
@@ -56,7 +55,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  * @author "Yevgeny Kazakov"
  */
 public class RuleApplicationDeletionFactory extends
-		AbstractRuleApplicationFactory<Context, RuleApplicationInput>  {
+		AbstractRuleApplicationFactory<Context, RuleApplicationInput> {
 
 	public RuleApplicationDeletionFactory(
 			SaturationState<? extends Context> saturationState) {
@@ -96,12 +95,9 @@ public class RuleApplicationDeletionFactory extends
 						// count conclusions used in the rules, if necessary
 						SaturationUtils
 								.getUsedConclusionCountingVisitor(localStatistics),
-						// apply non-redundant rules
-						new NonRedundantRuleApplicationConclusionVisitor(
-								ruleVisitor, writer),
-						// apply redundant rules
-						new RedundantRuleApplicationConclusionVisitor(
-								ruleVisitor, writer),
+						// apply rules
+						new RuleApplicationConclusionVisitor(ruleVisitor,
+								writer),
 						// after processing, delete the conclusion
 						new ConclusionDeletionVisitor(),
 						// and mark the source context of the conclusion as

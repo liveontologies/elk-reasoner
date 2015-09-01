@@ -97,12 +97,6 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 */
 	final boolean FULL_TRACING = false;
 	/**
-	 * If true, all rules, redundant and non-redundant, will be applied during
-	 * the class expression saturation stage. Otherwise, only non-redundant
-	 * rules will be applied.
-	 */
-	final boolean REDUNDANT_RULES = false;
-	/**
 	 * If true, the reasoner will bind asserted axioms to the inference rules
 	 * which use them as side conditions. As a result, it'll be possible to
 	 * access the axioms when exploring traced inferences. It will cause a
@@ -629,7 +623,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			return new ContradictionImpl(subsumee);
 		}
 		// else
-		return new ComposedSubsumerImpl<IndexedClassExpression>(subsumee, subsumer);
+		return new ComposedSubsumerImpl<IndexedClassExpression>(subsumee,
+				subsumer);
 	}
 
 	@Deprecated

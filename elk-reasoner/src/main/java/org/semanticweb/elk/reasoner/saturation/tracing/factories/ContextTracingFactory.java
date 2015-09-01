@@ -49,9 +49,9 @@ import org.slf4j.LoggerFactory;
  * conclusions in a given {@link SaturationState}. The engines accept instances
  * of {@link ContextTracingJob} with the input {@link IndexedContextRoot}
  * origin; when this job is processed, its output will contain all inferences
- * (both redundant and non-redundant) with the given origin that are applicable
- * to {@link Conclusion}s stored in the {@link SaturationState} and produce
- * {@link Conclusion}s present in the {@link SaturationState}.
+ * with the given origin that are applicable to {@link Conclusion}s stored in
+ * the {@link SaturationState} and produce {@link Conclusion}s present in the
+ * {@link SaturationState}.
  * 
  * As usual, to this engine factory it is possible to attach a
  * {@link ContextTracingListener} using which one can perform actions upon

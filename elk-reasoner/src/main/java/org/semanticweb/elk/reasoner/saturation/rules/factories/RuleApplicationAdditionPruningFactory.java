@@ -43,14 +43,13 @@ import org.semanticweb.elk.reasoner.saturation.rules.CombinedConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
- * A {@link RuleApplicationFactory} that applies non-redundant rules to
- * {@link Conclusion}s currently stored in the {@link Context}s of the
- * {@link SaturationState}. The produced {@link Conclusion}s are buffered within
- * the queue of the respective {@link Context} and can be later obtained by
- * {@link Context#takeToDo()}. The content of the {@link Context}s is otherwise
- * not modified. To make sure that all rules are applied, the {@link Conclusion}
- * s stored in {@link Context}s should be reachable from such {@link Context}s
- * by applying all (redundant and non-redundant) rules.
+ * A {@link RuleApplicationFactory} that applies rules to {@link Conclusion}s
+ * currently stored in the {@link Context}s of the {@link SaturationState}. The
+ * produced {@link Conclusion}s are buffered within the queue of the respective
+ * {@link Context} and can be later obtained by {@link Context#takeToDo()}. The
+ * content of the {@link Context}s is otherwise not modified. To make sure that
+ * all rules are applied, the {@link Conclusion}s stored in {@link Context}s
+ * should be reachable from such {@link Context}s by applying the rules.
  * 
  * @author "Yevgeny Kazakov"
  * @author Pavel Klinov
@@ -67,10 +66,10 @@ public class RuleApplicationAdditionPruningFactory extends
 		/**
 		 * We use a "local" {@link SaturationState} to iterate over
 		 * {@link Conclusion}s stored within {@link Context}s of the main
-		 * {@link SaturationState}. Iteration is done by applying all (redundant
-		 * and non-redundant) rules. We create (local) copies of the
-		 * {@link Context} s in the main {@link SaturationState} to keep track
-		 * of {@link Context}s to which the rules are already applied.
+		 * {@link SaturationState}. Iteration is done by applying all rules. We
+		 * create (local) copies of the {@link Context}s in the main
+		 * {@link SaturationState} to keep track of {@link Context}s to which
+		 * the rules are already applied.
 		 */
 		super(new MapSaturationState<ExtendedContext>(
 				mainSaturationState.getOntologyIndex(),
@@ -103,18 +102,12 @@ public class RuleApplicationAdditionPruningFactory extends
 								.getUsedConclusionCountingVisitor(localStatistics),
 						// and apply rules locally
 						new LocalRuleApplicationConclusionVisitor(
-								mainSaturationState_, ruleVisitor, ruleVisitor,
-								// the conclusions of non-redundant rules are
-								// produced within both main and tracing
-								// saturation states
+								mainSaturationState_, ruleVisitor,
+								// the conclusions are produced in both main and
+								// tracing saturation states
 								new CombinedConclusionProducer(
 										mainSaturationState_
 												.getContextCreatingWriter(),
-										localWriter),
-								// whereas the conclusion of redundant rules are
-								// needed only for tracing
-								localWriter)
-
-				);
+										localWriter)));
 	}
 }
