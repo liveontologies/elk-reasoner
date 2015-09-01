@@ -34,11 +34,11 @@ import java.util.Set;
 
 /**
  * A compact representation of several sets (called "slices") that can share
- * many elements. The representation is backed by arrays that stores the
- * elements and numerical masks encode to which sets those elements belong to.
- * The membership is checked using hash values of elements with linear probing
- * to resolve hash collisions: see [1] p.526. Parts of the code are inspired by
- * the implementation of {@link java.util.HashMap}.
+ * many elements. The representation is backed by arrays that store the elements
+ * and numerical masks that encode to which sets those elements belong to. The
+ * membership is checked using hash values of elements with linear probing to
+ * resolve hash collisions: see [1] p.526. Parts of the code are inspired by the
+ * implementation of {@link java.util.HashMap}.
  * 
  * [1] Donald E. Knuth, The Art of Computer Programming, Volume 3, Sorting and
  * Searching, Second Edition
@@ -93,7 +93,7 @@ public class ArraySlicedSet<E> {
 	public ArraySlicedSet(int slices, int initialCapacity) {
 		if (slices <= 0 || slices > MAX_SLICES)
 			throw new IllegalArgumentException(
-					"The nuber of slices should be between 0 and " + MAX_SLICES
+					"The nuber of slices should be between 1 and " + MAX_SLICES
 							+ ": " + slices);
 		int capacity = LinearProbing.getInitialCapacity(initialCapacity);
 		this.data = (E[]) new Object[capacity];
@@ -128,6 +128,7 @@ public class ArraySlicedSet<E> {
 	 * (as bits).
 	 * 
 	 * @param sl
+	 *            the logarithm of the number of slices
 	 * @param capacity
 	 * @return
 	 */

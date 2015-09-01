@@ -115,11 +115,8 @@ public class ContextImpl implements ExtendedContext {
 	private volatile boolean isSaturated_ = true;
 
 	/**
-	 * <<<<<<< HEAD the {@link IndexedContextRoot} for which the
-	 * {@link #subsumers_} are computed ======= the root
-	 * {@link IndexedClassExpression} for which the {@link #composedSubsumers_}
-	 * are computed >>>>>>> refs/heads/feature/deterministic-rules
-	 * 
+	 * the {@link IndexedContextRoot} for which the {@link #composedSubsumers_}
+	 * are computed
 	 */
 	private final IndexedContextRoot root_;
 
@@ -135,13 +132,13 @@ public class ContextImpl implements ExtendedContext {
 	 * the identifier of the slice of {@link #subsumers_} obtained by
 	 * composition rules
 	 */
-	private final static int COMPOSED_SUBSUMERS_SLICE_ = 0;
+	private final static int COMPOSED_SUBSUMERS_SLICE_ID_ = 0;
 
 	/**
 	 * the identifier of the slice of {@link #subsumers_} obtained by
 	 * decomposition rules
 	 */
-	private final static int DECOMPOSED_SUBSUMERS_SLICE_ = 1;
+	private final static int DECOMPOSED_SUBSUMERS_SLICE_ID_ = 1;
 
 	/**
 	 * the queue of unprocessed {@code Conclusion}s of this {@link Context}
@@ -163,7 +160,7 @@ public class ContextImpl implements ExtendedContext {
 	public ContextImpl(IndexedContextRoot root) {
 		this.root_ = root;
 		this.toDo_ = new SynchronizedArrayListActivationStack<Conclusion>();
-		this.subsumers_ = new ArraySlicedSet<IndexedClassExpression>(13);
+		this.subsumers_ = new ArraySlicedSet<IndexedClassExpression>(2);
 	}
 
 	@Override
@@ -249,12 +246,12 @@ public class ContextImpl implements ExtendedContext {
 
 	@Override
 	public Set<IndexedClassExpression> getComposedSubsumers() {
-		return subsumers_.getSlice(COMPOSED_SUBSUMERS_SLICE_);
+		return subsumers_.getSlice(COMPOSED_SUBSUMERS_SLICE_ID_);
 	}
 
 	@Override
 	public Set<IndexedClassExpression> getDecomposedSubsumers() {
-		return subsumers_.getSlice(DECOMPOSED_SUBSUMERS_SLICE_);
+		return subsumers_.getSlice(DECOMPOSED_SUBSUMERS_SLICE_ID_);
 	}
 
 	/*
@@ -343,13 +340,13 @@ public class ContextImpl implements ExtendedContext {
 
 		@Override
 		public Boolean visit(ComposedSubsumer conclusion, ContextImpl input) {
-			return input.subsumers_.add(COMPOSED_SUBSUMERS_SLICE_,
+			return input.subsumers_.add(COMPOSED_SUBSUMERS_SLICE_ID_,
 					conclusion.getExpression());
 		}
 
 		@Override
 		public Boolean visit(DecomposedSubsumer conclusion, ContextImpl input) {
-			return input.subsumers_.add(DECOMPOSED_SUBSUMERS_SLICE_,
+			return input.subsumers_.add(DECOMPOSED_SUBSUMERS_SLICE_ID_,
 					conclusion.getExpression());
 		}
 
@@ -452,13 +449,13 @@ public class ContextImpl implements ExtendedContext {
 
 		@Override
 		public Boolean visit(ComposedSubsumer conclusion, ContextImpl input) {
-			return input.subsumers_.remove(COMPOSED_SUBSUMERS_SLICE_,
+			return input.subsumers_.remove(COMPOSED_SUBSUMERS_SLICE_ID_,
 					conclusion.getExpression());
 		}
 
 		@Override
 		public Boolean visit(DecomposedSubsumer conclusion, ContextImpl input) {
-			return input.subsumers_.remove(DECOMPOSED_SUBSUMERS_SLICE_,
+			return input.subsumers_.remove(DECOMPOSED_SUBSUMERS_SLICE_ID_,
 					conclusion.getExpression());
 		}
 
@@ -565,13 +562,13 @@ public class ContextImpl implements ExtendedContext {
 
 		@Override
 		public Boolean visit(ComposedSubsumer conclusion, ContextImpl input) {
-			return input.subsumers_.contains(COMPOSED_SUBSUMERS_SLICE_,
+			return input.subsumers_.contains(COMPOSED_SUBSUMERS_SLICE_ID_,
 					conclusion.getExpression());
 		}
 
 		@Override
 		public Boolean visit(DecomposedSubsumer conclusion, ContextImpl input) {
-			return input.subsumers_.contains(DECOMPOSED_SUBSUMERS_SLICE_,
+			return input.subsumers_.contains(DECOMPOSED_SUBSUMERS_SLICE_ID_,
 					conclusion.getExpression());
 		}
 

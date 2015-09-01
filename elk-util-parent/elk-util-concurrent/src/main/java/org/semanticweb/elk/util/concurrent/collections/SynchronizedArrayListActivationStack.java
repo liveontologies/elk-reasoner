@@ -25,10 +25,8 @@ package org.semanticweb.elk.util.concurrent.collections;
 import java.util.ArrayList;
 
 /**
- * A thread-safe implementation of stack based on the non-blocking Treiber's
- * Algorithm (Treiber, 1986). The implementation allows to check when the pushed
- * element is the first element in the stack. This stack does not allow storing
- * {@code null} values.
+ * A simple implementation of {@link ActivationStack} using an {@link ArrayList}
+ * for storing elements; addition and removal of elements are synchronized.
  * 
  * @author "Yevgeny Kazakov"
  * 
