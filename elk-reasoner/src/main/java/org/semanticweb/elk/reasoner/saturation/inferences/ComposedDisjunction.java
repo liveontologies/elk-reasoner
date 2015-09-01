@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.SubsumerInferenceVisitor;
 
 /**
@@ -39,12 +39,12 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.SubsumerInfer
  *
  *         pavel.klinov@uni-ulm.de
  */
-public class DisjunctionComposition extends
+public class ComposedDisjunction extends
 		AbstractComposedSubsumerInference<IndexedObjectUnionOf> {
 
 	private final IndexedClassExpression disjunct_;
 
-	public DisjunctionComposition(IndexedContextRoot inferenceRoot,
+	public ComposedDisjunction(IndexedContextRoot inferenceRoot,
 			IndexedClassExpression premise, IndexedObjectUnionOf disjunction) {
 		super(inferenceRoot, disjunction);
 		disjunct_ = premise;
@@ -55,9 +55,8 @@ public class DisjunctionComposition extends
 		return getConclusionRoot();
 	}
 
-	public Subsumer getPremise() {
-		return new DecomposedSubsumerImpl<IndexedClassExpression>(
-				getInferenceRoot(), disjunct_);
+	public DecomposedSubsumer getPremise() {
+		return new DecomposedSubsumerImpl(getInferenceRoot(), disjunct_);
 	}
 
 	@Override

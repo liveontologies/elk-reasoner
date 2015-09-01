@@ -42,12 +42,12 @@ import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedReflexiveBac
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedReflexiveForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedSecondConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
-import org.semanticweb.elk.reasoner.saturation.inferences.DisjunctionComposition;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDisjunction;
 import org.semanticweb.elk.reasoner.saturation.inferences.GeneratedPropagation;
 import org.semanticweb.elk.reasoner.saturation.inferences.InitializationSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.ObjectHasSelfPropertyRangeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedContradiction;
-import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedExistential;
 import org.semanticweb.elk.reasoner.saturation.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
@@ -101,7 +101,7 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>,
 	}
 
 	@Override
-	public String visit(PropagatedSubsumer conclusion, Void parameter) {
+	public String visit(ComposedExistential conclusion, Void parameter) {
 		return "Existential inference from " + conclusion.getPropagation()
 				+ " and " + conclusion.getBackwardLink();
 	}
@@ -194,7 +194,7 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>,
 	}
 
 	@Override
-	public String visit(DisjunctionComposition conclusion, Void input) {
+	public String visit(ComposedDisjunction conclusion, Void input) {
 		return "Composed disjunction " + conclusion.getExpression() + " from "
 				+ conclusion.getPremise();
 	}

@@ -46,13 +46,15 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSu
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedConjunction;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDisjunction;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedExistential;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedSubsumerInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromDisjointSubsumers;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromInconsistentDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromNegation;
@@ -64,19 +66,17 @@ import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedFirstConjunc
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedReflexiveBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedReflexiveForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedSecondConjunct;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedSubsumerInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.DisjunctionComposition;
 import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.GeneratedPropagation;
 import org.semanticweb.elk.reasoner.saturation.inferences.InitializationSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.ObjectHasSelfPropertyRangeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedContradiction;
-import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagationInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubsumerInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
@@ -108,7 +108,9 @@ public class ModifiableClassInferenceSetImpl implements
 
 	private Map<IndexedClassExpression, Multimap<IndexedDisjointClassesAxiom, DisjointSubsumerInference>> disjointSubsumerInferenceMap_;
 
-	private Multimap<IndexedClassExpression, SubsumerInference<?>> subsumerInferenceMap_;
+	private Multimap<IndexedClassExpression, ComposedSubsumerInference<?>> composedSubsumerInferenceMap_;
+
+	private Multimap<IndexedClassExpression, DecomposedSubsumerInference> decomposedSubsumerInferenceMap_;
 
 	private Map<IndexedPropertyChain, Multimap<IndexedContextRoot, BackwardLinkInference>> backwardLinkInferenceMap_;
 
@@ -172,18 +174,32 @@ public class ModifiableClassInferenceSetImpl implements
 		return emptyIfNull(contradictionInferences_);
 	}
 
-	private void addInference(SubsumerInference<?> inf) {
-		if (subsumerInferenceMap_ == null)
-			subsumerInferenceMap_ = new HashListMultimap<IndexedClassExpression, SubsumerInference<?>>();
-		subsumerInferenceMap_.add(inf.getExpression(), inf);
+	private void addInference(ComposedSubsumerInference<?> inf) {
+		if (composedSubsumerInferenceMap_ == null)
+			composedSubsumerInferenceMap_ = new HashListMultimap<IndexedClassExpression, ComposedSubsumerInference<?>>();
+		composedSubsumerInferenceMap_.add(inf.getExpression(), inf);
 	}
 
-	private Iterable<? extends SubsumerInference<?>> getInferences(
-			Subsumer conclusion) {
-		if (subsumerInferenceMap_ == null)
+	private Iterable<? extends ComposedSubsumerInference<?>> getInferences(
+			ComposedSubsumer conclusion) {
+		if (composedSubsumerInferenceMap_ == null)
 			return Collections.emptyList();
-		return emptyIfNull(subsumerInferenceMap_
-				.get(conclusion.getExpression()));
+		return emptyIfNull(composedSubsumerInferenceMap_.get(conclusion
+				.getExpression()));
+	}
+
+	private void addInference(DecomposedSubsumerInference inf) {
+		if (decomposedSubsumerInferenceMap_ == null)
+			decomposedSubsumerInferenceMap_ = new HashListMultimap<IndexedClassExpression, DecomposedSubsumerInference>();
+		decomposedSubsumerInferenceMap_.add(inf.getExpression(), inf);
+	}
+
+	private Iterable<? extends DecomposedSubsumerInference> getInferences(
+			DecomposedSubsumer conclusion) {
+		if (decomposedSubsumerInferenceMap_ == null)
+			return Collections.emptyList();
+		return emptyIfNull(decomposedSubsumerInferenceMap_.get(conclusion
+				.getExpression()));
 	}
 
 	private void addInference(BackwardLinkInference inference) {
@@ -279,7 +295,7 @@ public class ModifiableClassInferenceSetImpl implements
 		}
 
 		@Override
-		public Void visit(PropagatedSubsumer inference,
+		public Void visit(ComposedExistential inference,
 				ModifiableClassInferenceSetImpl input) {
 			input.addInference(inference);
 			return null;
@@ -392,7 +408,7 @@ public class ModifiableClassInferenceSetImpl implements
 		}
 
 		@Override
-		public Void visit(DisjunctionComposition inference,
+		public Void visit(ComposedDisjunction inference,
 				ModifiableClassInferenceSetImpl input) {
 			input.addInference(inference);
 			return null;

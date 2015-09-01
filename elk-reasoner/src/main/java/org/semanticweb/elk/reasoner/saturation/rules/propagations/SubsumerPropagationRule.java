@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedExistential;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 
 /**
@@ -69,10 +69,10 @@ public class SubsumerPropagationRule extends AbstractPropagationRule {
 		IndexedObjectProperty subRoot = premise.getConclusionSubRoot();
 		SubContextPremises targets = subContextMap.get(subRoot);
 		for (IndexedContextRoot target : targets.getLinkedRoots()) {
-			producer.produce(new PropagatedSubsumer(premise, target));
+			producer.produce(new ComposedExistential(premise, target));
 		}
 		if (premises.getLocalReflexiveObjectProperties().contains(subRoot)) {
-			producer.produce(new PropagatedSubsumer(premise, premises.getRoot()));
+			producer.produce(new ComposedExistential(premise, premises.getRoot()));
 		}
 	}
 

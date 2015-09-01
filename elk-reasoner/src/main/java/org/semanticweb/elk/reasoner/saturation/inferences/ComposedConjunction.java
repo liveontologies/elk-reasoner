@@ -30,7 +30,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersection
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.SubsumerInferenceVisitor;
 
 /**
@@ -56,12 +55,12 @@ public class ComposedConjunction extends
 		return getConclusionRoot();
 	}
 
-	public Subsumer getFirstConjunct() {
+	public ComposedSubsumer getFirstConjunct() {
 		return new ComposedSubsumerImpl<IndexedClassExpression>(
 				getInferenceRoot(), getExpression().getFirstConjunct());
 	}
 
-	public Subsumer getSecondConjunct() {
+	public ComposedSubsumer getSecondConjunct() {
 		return new ComposedSubsumerImpl<IndexedClassExpression>(
 				getInferenceRoot(), getExpression().getSecondConjunct());
 	}

@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenc
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.SubsumerInferenceVisitor;
 
 public abstract class AbstractComposedSubsumerInference<S extends IndexedClassExpression>
-		extends ComposedSubsumerImpl<S> implements SubsumerInference<S> {
+		extends ComposedSubsumerImpl<S> implements ComposedSubsumerInference<S> {
 
 	public AbstractComposedSubsumerInference(IndexedContextRoot root, S subsumer) {
 		super(root, subsumer);

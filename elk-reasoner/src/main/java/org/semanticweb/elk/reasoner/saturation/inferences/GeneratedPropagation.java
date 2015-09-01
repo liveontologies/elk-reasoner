@@ -25,13 +25,12 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.PropagationInferenceVisitor;
 
@@ -60,9 +59,9 @@ public class GeneratedPropagation extends AbstractPropagationInference
 		return getConclusionRoot();
 	}
 
-	public Subsumer getPremise() {
-		return new DecomposedSubsumerImpl<IndexedClassExpression>(
-				getInferenceRoot(), getCarry().getFiller());
+	public DecomposedSubsumer getPremise() {
+		return new DecomposedSubsumerImpl(getInferenceRoot(), getCarry()
+				.getFiller());
 	}
 
 	public SubObjectProperty getSubPropertyPremise() {

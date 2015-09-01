@@ -28,7 +28,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagatio
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.SubContext;
-import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedExistential;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 
 /**
@@ -60,7 +60,7 @@ public class SubsumerBackwardLinkRule extends AbstractBackwardLinkRule {
 
 		for (IndexedObjectSomeValuesFrom carry : premises
 				.getPropagatedSubsumers(premise.getBackwardRelation())) {
-			producer.produce(new PropagatedSubsumer(premise, carry));
+			producer.produce(new ComposedExistential(premise, carry));
 		}
 	}
 

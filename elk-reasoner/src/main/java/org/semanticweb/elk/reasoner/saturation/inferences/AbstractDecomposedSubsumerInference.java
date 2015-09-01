@@ -28,11 +28,11 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Decomp
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.SubsumerInferenceVisitor;
 
-public abstract class AbstractDecomposedSubsumerInference<S extends IndexedClassExpression>
-		extends DecomposedSubsumerImpl<S> implements SubsumerInference<S> {
+public abstract class AbstractDecomposedSubsumerInference extends
+		DecomposedSubsumerImpl implements DecomposedSubsumerInference {
 
 	public AbstractDecomposedSubsumerInference(IndexedContextRoot root,
-			S subsumer) {
+			IndexedClassExpression subsumer) {
 		super(root, subsumer);
 	}
 

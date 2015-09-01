@@ -568,10 +568,11 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 *---------------------------------------------------*/
 
 	private void toTrace(Conclusion conclusion) {
-//		if (traceState.getInferencesForOrigin(conclusion.getOriginRoot()) != null)
-//			// already traced
-//			return;
-//		// else
+		// if (traceState.getInferencesForOrigin(conclusion.getOriginRoot()) !=
+		// null)
+		// // already traced
+		// return;
+		// // else
 		stageManager.inferenceTracingStage.invalidate();
 		traceState.addToTrace(conclusion);
 	}
@@ -628,8 +629,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			return new ContradictionImpl(subsumee);
 		}
 		// else
-		return new DecomposedSubsumerImpl<IndexedClassExpression>(subsumee,
-				subsumer);
+		return new DecomposedSubsumerImpl(subsumee, subsumer);
 	}
 
 	@Deprecated

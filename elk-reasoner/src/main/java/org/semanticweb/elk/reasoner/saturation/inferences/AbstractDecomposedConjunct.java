@@ -41,7 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
  *         pavel.klinov@uni-ulm.de
  */
 public abstract class AbstractDecomposedConjunct extends
-		AbstractDecomposedSubsumerInference<IndexedClassExpression> {
+		AbstractDecomposedSubsumerInference {
 
 	private final IndexedObjectIntersectionOf conjunction_;
 
@@ -53,8 +53,7 @@ public abstract class AbstractDecomposedConjunct extends
 	}
 
 	public Subsumer getPremise() {
-		return new DecomposedSubsumerImpl<IndexedObjectIntersectionOf>(
-				getInferenceRoot(), conjunction_);
+		return new DecomposedSubsumerImpl(getInferenceRoot(), conjunction_);
 	}
 
 	@Override

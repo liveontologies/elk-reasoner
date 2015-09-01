@@ -95,8 +95,7 @@ public class TracingTestUtils {
 				return contradiction;
 			}
 
-			return new DecomposedSubsumerImpl<IndexedClassExpression>(root,
-					subsumer);
+			return new DecomposedSubsumerImpl(root, subsumer);
 		}
 
 		throw new IllegalArgumentException("Context may not be null");

@@ -25,12 +25,11 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ContradictionInferenceVisitor;
 
@@ -58,14 +57,13 @@ public class ContradictionFromNegation extends AbstractContradictionInference
 		return visitor.visit(this, input);
 	}
 
-	public Subsumer getPremise() {
-		return new DecomposedSubsumerImpl<IndexedClassExpression>(
-				getInferenceRoot(), negation_.getNegated());
+	public DecomposedSubsumer getPremise() {
+		return new DecomposedSubsumerImpl(getInferenceRoot(),
+				negation_.getNegated());
 	}
 
-	public Subsumer getNegatedPremise() {
-		return new DecomposedSubsumerImpl<IndexedObjectComplementOf>(
-				getInferenceRoot(), negation_);
+	public DecomposedSubsumer getNegatedPremise() {
+		return new DecomposedSubsumerImpl(getInferenceRoot(), negation_);
 	}
 
 	@Override

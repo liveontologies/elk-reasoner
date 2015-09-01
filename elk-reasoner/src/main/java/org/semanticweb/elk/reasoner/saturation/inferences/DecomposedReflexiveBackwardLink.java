@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.BackwardLinkInferenceVisitor;
 
 /**
@@ -56,9 +56,8 @@ public class DecomposedReflexiveBackwardLink extends
 		return this.existential_;
 	}
 
-	public Subsumer getPremise() {
-		return new DecomposedSubsumerImpl<IndexedObjectHasSelf>(
-				getInferenceRoot(), existential_);
+	public DecomposedSubsumer getPremise() {
+		return new DecomposedSubsumerImpl(getInferenceRoot(), existential_);
 	}
 
 	@Override

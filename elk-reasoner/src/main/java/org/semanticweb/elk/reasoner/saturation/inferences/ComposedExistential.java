@@ -42,21 +42,21 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.SubsumerInfer
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class PropagatedSubsumer extends
+public class ComposedExistential extends
 		AbstractComposedSubsumerInference<IndexedObjectSomeValuesFrom> {
 
 	private final IndexedObjectProperty propagationRelation_;
 
 	private final IndexedContextRoot inferenceRoot_;
 
-	public PropagatedSubsumer(Propagation premise,
+	public ComposedExistential(Propagation premise,
 			IndexedContextRoot conclusionRoot) {
 		super(conclusionRoot, premise.getCarry());
 		inferenceRoot_ = premise.getConclusionRoot();
 		propagationRelation_ = premise.getRelation();
 	}
 
-	public PropagatedSubsumer(BackwardLink premise,
+	public ComposedExistential(BackwardLink premise,
 			IndexedObjectSomeValuesFrom carry) {
 		super(premise.getOriginRoot(), carry);
 		inferenceRoot_ = premise.getConclusionRoot();

@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialBackwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedExistential;
 import org.semanticweb.elk.reasoner.saturation.inferences.ReversedForwardLink;
 
 /**
@@ -54,7 +54,7 @@ public class GetInferenceTarget extends
 	}
 
 	@Override
-	public IndexedContextRoot visit(PropagatedSubsumer conclusion,
+	public IndexedContextRoot visit(ComposedExistential conclusion,
 			Context premiseContext) {
 		return conclusion.getBackwardLink().getOriginRoot();
 	}

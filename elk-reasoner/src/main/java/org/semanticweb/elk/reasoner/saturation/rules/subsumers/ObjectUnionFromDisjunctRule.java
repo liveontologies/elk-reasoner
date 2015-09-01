@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectU
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.DisjunctionComposition;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDisjunction;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.Chain;
@@ -146,7 +146,7 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		for (IndexedObjectUnionOf disjunction : disjunctions_) {
-			producer.produce(new DisjunctionComposition(premises.getRoot(),
+			producer.produce(new ComposedDisjunction(premises.getRoot(),
 					premise, disjunction));
 		}
 	}

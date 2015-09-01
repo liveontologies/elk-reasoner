@@ -47,12 +47,12 @@ import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedReflexiveBac
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedReflexiveForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedSecondConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
-import org.semanticweb.elk.reasoner.saturation.inferences.DisjunctionComposition;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDisjunction;
 import org.semanticweb.elk.reasoner.saturation.inferences.GeneratedPropagation;
 import org.semanticweb.elk.reasoner.saturation.inferences.InitializationSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.ObjectHasSelfPropertyRangeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedContradiction;
-import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedExistential;
 import org.semanticweb.elk.reasoner.saturation.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
@@ -126,7 +126,7 @@ public class ClassInferencePremiseVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(PropagatedSubsumer conclusion, I input) {
+	public O visit(ComposedExistential conclusion, I input) {
 		conclusion.getBackwardLink().accept(classPremiseVisitor_, input);
 		conclusion.getPropagation().accept(classPremiseVisitor_, input);
 		return null;
@@ -242,7 +242,7 @@ public class ClassInferencePremiseVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(DisjunctionComposition conclusion, I input) {
+	public O visit(ComposedDisjunction conclusion, I input) {
 		conclusion.getPremise().accept(classPremiseVisitor_, input);
 		return null;
 	}

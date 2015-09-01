@@ -30,8 +30,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.AbstractConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ForwardLinkInferenceVisitor;
@@ -64,9 +64,8 @@ public class DecomposedExistentialForwardLink extends AbstractConclusion
 		return IndexedObjectSomeValuesFrom.Helper.getTarget(existential_);
 	}
 
-	public Subsumer getExistential() {
-		return new DecomposedSubsumerImpl<IndexedObjectSomeValuesFrom>(
-				getInferenceRoot(), existential_);
+	public DecomposedSubsumer getExistential() {
+		return new DecomposedSubsumerImpl(getInferenceRoot(), existential_);
 	}
 
 	@Override

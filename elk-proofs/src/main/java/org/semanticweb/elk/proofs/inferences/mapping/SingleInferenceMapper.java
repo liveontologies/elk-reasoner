@@ -94,7 +94,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSu
 import org.semanticweb.elk.reasoner.saturation.inferences.GeneratedPropagation;
 import org.semanticweb.elk.reasoner.saturation.inferences.InitializationSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedContradiction;
-import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedExistential;
 import org.semanticweb.elk.reasoner.saturation.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
@@ -236,7 +236,7 @@ public class SingleInferenceMapper {
 		}
 
 		@Override
-		public Inference visit(PropagatedSubsumer inference, Void parameter) {
+		public Inference visit(ComposedExistential inference, Void parameter) {
 			// the left premise is an axiom with a simple existential on the right
 			ElkClassExpression c = Deindexer.deindex(inference.getConclusionRoot());
 			ElkObjectProperty r = Deindexer.deindex(inference.getBackwardLink().getBackwardRelation());
@@ -467,7 +467,7 @@ public class SingleInferenceMapper {
 
 		@Override
 		public Inference visit(
-				org.semanticweb.elk.reasoner.saturation.inferences.DisjunctionComposition inference,
+				org.semanticweb.elk.reasoner.saturation.inferences.ComposedDisjunction inference,
 				Void parameter) {
 			ElkClassExpression c = Deindexer.deindex(inference.getConclusionRoot());
 			ElkClassExpression d = Deindexer.deindex(inference.getPremise().getExpression());
