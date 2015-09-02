@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.SubsumerInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.visitors.DecomposedSubsumerInferenceVisitor;
 
 /**
  * A {@link SubsumerInference} that applies to an {@link IndexedObjectHasSelf}
@@ -69,7 +69,8 @@ public class ObjectHasSelfPropertyRangeSubsumer extends
 	}
 
 	@Override
-	public <I, O> O accept(SubsumerInferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O accept(DecomposedSubsumerInferenceVisitor<I, O> visitor,
+			I parameter) {
 		return visitor.visit(this, parameter);
 	}
 

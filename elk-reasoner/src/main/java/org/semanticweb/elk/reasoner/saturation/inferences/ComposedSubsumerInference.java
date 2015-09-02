@@ -23,10 +23,12 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ComposedSubsumerInferenceVisitor;
 
 public interface ComposedSubsumerInference<S extends IndexedClassExpression>
 		extends SubsumerInference<S> {
 
-	// nothing specific
+	public <I, O> O accept(ComposedSubsumerInferenceVisitor<I, O> visitor,
+			I input);
 
 }

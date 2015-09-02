@@ -30,7 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.SubsumerInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ComposedSubsumerInferenceVisitor;
 
 /**
  * A {@link ComposedSubsumer} for {@link IndexedClassExpression} obtained from
@@ -64,7 +64,8 @@ public class ComposedDecomposition extends
 	}
 
 	@Override
-	public <I, O> O accept(SubsumerInferenceVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(ComposedSubsumerInferenceVisitor<I, O> visitor,
+			I input) {
 		return visitor.visit(this, input);
 	}
 

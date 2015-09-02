@@ -26,7 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.SubsumerInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ComposedSubsumerInferenceVisitor;
 
 public abstract class AbstractComposedSubsumerInference<S extends IndexedClassExpression>
 		extends ComposedSubsumerImpl<S> implements ComposedSubsumerInference<S> {
@@ -37,7 +37,7 @@ public abstract class AbstractComposedSubsumerInference<S extends IndexedClassEx
 
 	@Override
 	public <I, O> O accept(ClassInferenceVisitor<I, O> visitor, I parameter) {
-		return accept((SubsumerInferenceVisitor<I, O>) visitor, parameter);
+		return accept((ComposedSubsumerInferenceVisitor<I, O>) visitor, parameter);
 	}
 
 }

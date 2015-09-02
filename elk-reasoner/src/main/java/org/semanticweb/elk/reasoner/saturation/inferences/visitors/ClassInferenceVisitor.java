@@ -39,7 +39,8 @@ public interface ClassInferenceVisitor<I, O> extends
 		ContradictionInferenceVisitor<I, O>,
 		DisjointSubsumerInferenceVisitor<I, O>,
 		ForwardLinkInferenceVisitor<I, O>, PropagationInferenceVisitor<I, O>,
-		SubsumerInferenceVisitor<I, O> {
+		ComposedSubsumerInferenceVisitor<I, O>,
+		DecomposedSubsumerInferenceVisitor<I, O> {
 
 	public static final ClassInferenceVisitor<?, ?> DUMMY = new AbstractClassInferenceVisitor<Void, Void>() {
 

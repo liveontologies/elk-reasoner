@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Backwa
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.SubsumerInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ComposedSubsumerInferenceVisitor;
 
 /**
  * Represents an existential composition inference from a {@link BackwardLink}
@@ -84,7 +84,8 @@ public class ComposedExistential extends
 	}
 
 	@Override
-	public <I, O> O accept(SubsumerInferenceVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(ComposedSubsumerInferenceVisitor<I, O> visitor,
+			I input) {
 		return visitor.visit(this, input);
 	}
 

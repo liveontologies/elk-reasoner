@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDefinitionAxiom;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.SubsumerInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ComposedSubsumerInferenceVisitor;
 
 /**
  * A {@link ComposedSubsumer} for {@link IndexedClass} obtained from its unique
@@ -71,7 +71,8 @@ public class ComposedDefinition extends
 	}
 
 	@Override
-	public <I, O> O accept(SubsumerInferenceVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(ComposedSubsumerInferenceVisitor<I, O> visitor,
+			I input) {
 		return visitor.visit(this, input);
 	}
 

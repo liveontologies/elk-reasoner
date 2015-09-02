@@ -30,7 +30,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.SubsumerInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.visitors.DecomposedSubsumerInferenceVisitor;
 
 /**
  * Represents a subsumption inference.
@@ -73,7 +73,8 @@ public class SubClassOfSubsumer extends AbstractDecomposedSubsumerInference {
 	}
 
 	@Override
-	public <I, O> O accept(SubsumerInferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O accept(DecomposedSubsumerInferenceVisitor<I, O> visitor,
+			I parameter) {
 		return visitor.visit(this, parameter);
 	}
 

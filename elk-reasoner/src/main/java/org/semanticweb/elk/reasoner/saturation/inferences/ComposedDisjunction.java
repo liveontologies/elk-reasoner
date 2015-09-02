@@ -30,7 +30,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.SubsumerInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ComposedSubsumerInferenceVisitor;
 
 /**
  * Represents a {@link IndexedObjectUnionOf} derived for a disjunct.
@@ -61,7 +61,8 @@ public class ComposedDisjunction extends
 	}
 
 	@Override
-	public <I, O> O accept(SubsumerInferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O accept(ComposedSubsumerInferenceVisitor<I, O> visitor,
+			I parameter) {
 		return visitor.visit(this, parameter);
 	}
 

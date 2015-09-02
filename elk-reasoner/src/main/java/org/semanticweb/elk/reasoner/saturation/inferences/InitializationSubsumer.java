@@ -27,7 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.SubsumerInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.visitors.DecomposedSubsumerInferenceVisitor;
 
 /**
  * Represents an initialization inference of the form A => A or A => owl:Thing.
@@ -54,7 +54,8 @@ public class InitializationSubsumer extends AbstractDecomposedSubsumerInference 
 	}
 
 	@Override
-	public <I, O> O accept(SubsumerInferenceVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(DecomposedSubsumerInferenceVisitor<I, O> visitor,
+			I input) {
 		return visitor.visit(this, input);
 	}
 }
