@@ -22,6 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * #L%
  */
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDefinitionAxiom;
@@ -43,14 +44,21 @@ public class DecomposedDefinition extends AbstractDecomposedSubsumerInference {
 
 	private final IndexedClass defined_;
 
+	private final ElkAxiom reason_;
+
 	public DecomposedDefinition(IndexedContextRoot root, IndexedClass defined,
-			IndexedClassExpression definition) {
+			IndexedClassExpression definition, ElkAxiom reason) {
 		super(root, definition);
 		this.defined_ = defined;
+		this.reason_ = reason;
 	}
 
 	public DecomposedSubsumer getPremise() {
 		return new DecomposedSubsumerImpl(getInferenceRoot(), defined_);
+	}
+
+	public ElkAxiom getReason() {
+		return this.reason_;
 	}
 
 	@Override

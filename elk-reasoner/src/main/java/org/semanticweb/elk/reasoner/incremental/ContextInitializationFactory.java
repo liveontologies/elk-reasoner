@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
@@ -76,6 +77,7 @@ class ContextInitializationFactory extends SimpleInterrupter
 			LinkedContextInitRule changedGlobalRuleHead,
 			Map<? extends IndexedClassExpression, ? extends LinkedSubsumerRule> changedCompositionRules,
 			final Map<? extends IndexedClass, ? extends IndexedClassExpression> changedDefinitions,
+			final Map<? extends IndexedClass, ? extends ElkAxiom> changedDefinitionReasons,
 			SaturationStatistics stageStats) {
 
 		saturationState_ = state;
@@ -92,10 +94,16 @@ class ContextInitializationFactory extends SimpleInterrupter
 		classDecomposition_ = new IndexedClassDecomposition() {
 			private final Map<? extends IndexedClass, ? extends IndexedClassExpression> changedDefinitions_ = changedDefinitions;
 
+			private final Map<? extends IndexedClass, ? extends ElkAxiom> changedDefinitionReasons_ = changedDefinitionReasons;
+
 			@Override
 			protected IndexedClassExpression getDefinition(IndexedClass premise) {
-				// get the premise from the changed definitions
 				return changedDefinitions_.get(premise);
+			}
+
+			@Override
+			protected ElkAxiom getDefinitionReason(IndexedClass premise) {
+				return changedDefinitionReasons_.get(premise);
 			}
 		};
 	}

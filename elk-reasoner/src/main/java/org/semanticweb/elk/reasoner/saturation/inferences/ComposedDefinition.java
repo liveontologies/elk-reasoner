@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * #L%
  */
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDefinitionAxiom;
@@ -45,14 +46,18 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ComposedSubsu
 public class ComposedDefinition extends
 		AbstractComposedSubsumerInference<IndexedClass> {
 
-	IndexedClassExpression definition_;
+	private final IndexedClassExpression definition_;
+
+	private final ElkAxiom reason_;
 
 	/**
 	 */
 	public ComposedDefinition(IndexedContextRoot inferenceRoot,
-			IndexedClass defined, IndexedClassExpression definition) {
+			IndexedClass defined, IndexedClassExpression definition,
+			ElkAxiom reason) {
 		super(inferenceRoot, defined);
 		this.definition_ = definition;
+		this.reason_ = reason;
 	}
 
 	@Override
@@ -63,6 +68,10 @@ public class ComposedDefinition extends
 	public ComposedSubsumer getPremise() {
 		return new ComposedSubsumerImpl<IndexedClassExpression>(
 				getInferenceRoot(), definition_);
+	}
+
+	public ElkAxiom getReason() {
+		return this.reason_;
 	}
 
 	@Override

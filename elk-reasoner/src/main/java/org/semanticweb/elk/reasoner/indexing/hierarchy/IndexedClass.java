@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
@@ -48,6 +49,13 @@ public interface IndexedClass extends IndexedClassEntity {
 	 *         {@link ElkClassExpression}s.
 	 */
 	public IndexedClassExpression getDefinition();
+
+	/**
+	 * @return the {@link ElkAxiom} from which the definition of this
+	 *         {@link IndexedClass} originates or {@code null} if this
+	 *         {@link IndexedClass} is not defined.
+	 */
+	public ElkAxiom getDefinitionReason();
 
 	public <O> O accept(IndexedClassVisitor<O> visitor);
 

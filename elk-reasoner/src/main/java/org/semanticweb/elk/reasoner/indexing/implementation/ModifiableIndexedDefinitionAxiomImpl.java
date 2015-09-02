@@ -68,8 +68,9 @@ public class ModifiableIndexedDefinitionAxiomImpl extends
 
 	@Override
 	public boolean addOccurrence(ModifiableOntologyIndex index, ElkAxiom reason) {
-		if (IndexedClassDecomposition.tryAddRuleFor(this, index))
-			return IndexedClassFromDefinitionRule.addRuleFor(this, index, reason);
+		if (IndexedClassDecomposition.tryAddRuleFor(this, index, reason))
+			return IndexedClassFromDefinitionRule.addRuleFor(this, index,
+					reason);
 		// else
 		return SuperClassFromSubClassRule.addRulesFor(this, index, reason);
 	}
@@ -77,8 +78,9 @@ public class ModifiableIndexedDefinitionAxiomImpl extends
 	@Override
 	public boolean removeOccurrence(ModifiableOntologyIndex index,
 			ElkAxiom reason) {
-		if (IndexedClassDecomposition.tryRemoveRuleFor(this, index))
-			return IndexedClassFromDefinitionRule.removeRuleFor(this, index, reason);
+		if (IndexedClassDecomposition.tryRemoveRuleFor(this, index, reason))
+			return IndexedClassFromDefinitionRule.removeRuleFor(this, index,
+					reason);
 		// else
 		return SuperClassFromSubClassRule.removeRulesFor(this, index, reason);
 	}

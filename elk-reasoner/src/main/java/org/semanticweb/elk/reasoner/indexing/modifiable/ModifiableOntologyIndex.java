@@ -173,11 +173,14 @@ public interface ModifiableOntologyIndex extends OntologyIndex,
 	 * @param definition
 	 *            the {@link ModifiableIndexedClassExpression} to be added as
 	 *            the definition
+	 * @param reason
+	 *            the {@link ElkAxiom} from which the added definition
+	 *            originates
 	 * @return {@code true} if the definition was set and {@code false} if this
 	 *         operation was not successful
 	 */
 	public boolean tryAddDefinition(ModifiableIndexedClass target,
-			ModifiableIndexedClassExpression definition);
+			ModifiableIndexedClassExpression definition, ElkAxiom reason);
 
 	/**
 	 * Tries to remove the given {@link IndexedClassExpression} from the
@@ -192,10 +195,13 @@ public interface ModifiableOntologyIndex extends OntologyIndex,
 	 *            the {@link ModifiableIndexedClassExpression} that was defined
 	 *            for the given {@link ModifiableIndexedClass} and should be now
 	 *            removed
+	 * @param reason
+	 *            the {@link ElkAxiom} from which the removed definition
+	 *            originates
 	 * @return {@code true} if the definition was removed and {@code false} if
 	 *         this operation was not successful
 	 */
 	public boolean tryRemoveDefinition(ModifiableIndexedClass target,
-			ModifiableIndexedClassExpression definition);
+			ModifiableIndexedClassExpression definition, ElkAxiom reason);
 
 }

@@ -214,9 +214,9 @@ public class SingleInferenceMapper {
 		public Inference visit(ComposedConjunction inference,
 				Void parameter) {
 			return new ConjunctionComposition(Deindexer.deindex(inference.getConclusionRoot()),
-					Deindexer.deindex(inference.getFirstConjunct()
+					Deindexer.deindex(inference.getFirstPremise()
 							.getExpression()), Deindexer.deindex(inference
-							.getSecondConjunct().getExpression()), factory_, exprFactory_);
+							.getSecondPremise().getExpression()), factory_, exprFactory_);
 		}
 
 		@Override

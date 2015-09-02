@@ -144,14 +144,15 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl implements
 
 	@Override
 	public boolean tryAddDefinition(ModifiableIndexedClass target,
-			ModifiableIndexedClassExpression definition) {
-		return target.setDefinition(definition);
+			ModifiableIndexedClassExpression definition, ElkAxiom reason) {
+		return target.setDefinition(definition, reason);
 	}
 
 	@Override
 	public boolean tryRemoveDefinition(ModifiableIndexedClass target,
-			ModifiableIndexedClassExpression definition) {
-		if (target.getDefinition() != definition)
+			ModifiableIndexedClassExpression definition, ElkAxiom reason) {
+		if (target.getDefinition() != definition
+				|| !target.getDefinitionReason().equals(reason))
 			// it was not defined by this definition
 			return false;
 		// else

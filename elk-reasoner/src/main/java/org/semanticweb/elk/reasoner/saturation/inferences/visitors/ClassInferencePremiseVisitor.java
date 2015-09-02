@@ -111,8 +111,8 @@ public class ClassInferencePremiseVisitor<I, O> implements
 
 	@Override
 	public O visit(ComposedConjunction conclusion, I input) {
-		conclusion.getFirstConjunct().accept(classPremiseVisitor_, input);
-		conclusion.getSecondConjunct().accept(classPremiseVisitor_, input);
+		conclusion.getFirstPremise().accept(classPremiseVisitor_, input);
+		conclusion.getSecondPremise().accept(classPremiseVisitor_, input);
 		return null;
 	}
 

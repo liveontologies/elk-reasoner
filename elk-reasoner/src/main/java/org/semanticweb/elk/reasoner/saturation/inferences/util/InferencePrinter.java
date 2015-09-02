@@ -86,8 +86,8 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>,
 
 	@Override
 	public String visit(ComposedConjunction conclusion, Void parameter) {
-		return "Conjuncting " + conclusion.getFirstConjunct() + " and "
-				+ conclusion.getSecondConjunct();
+		return "Conjuncting " + conclusion.getFirstPremise() + " and "
+				+ conclusion.getSecondPremise();
 
 	}
 

@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.incremental.IncrementalChangesInitialization;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
@@ -70,11 +71,13 @@ public class IncrementalDeletionInitializationStage extends
 		LinkedContextInitRule changedInitRules = null;
 		Map<? extends IndexedClassExpression, ? extends LinkedSubsumerRule> changedRulesByCE = null;
 		Map<? extends IndexedClass, ? extends IndexedClassExpression> changedDefinitions = null;
+		Map<? extends IndexedClass, ? extends ElkAxiom> changedDefinitionReasons = null;
 		Collection<ArrayList<Context>> inputs = Collections.emptyList();
 
 		changedInitRules = diffIndex.getRemovedContextInitRules();
 		changedRulesByCE = diffIndex.getRemovedContextRulesByClassExpressions();
 		changedDefinitions = diffIndex.getRemovedDefinitions();
+		changedDefinitionReasons = diffIndex.getRemovedDefinitionReasons();
 
 		if (changedInitRules != null || !changedRulesByCE.isEmpty()
 				|| !changedDefinitions.isEmpty()) {
@@ -87,8 +90,9 @@ public class IncrementalDeletionInitializationStage extends
 
 		this.initialization = new IncrementalChangesInitialization(inputs,
 				changedInitRules, changedRulesByCE, changedDefinitions,
-				reasoner.saturationState, reasoner.getProcessExecutor(),
-				stageStatistics_, workerNo, reasoner.getProgressMonitor());
+				changedDefinitionReasons, reasoner.saturationState,
+				reasoner.getProcessExecutor(), stageStatistics_, workerNo,
+				reasoner.getProgressMonitor());
 
 		return true;
 	}

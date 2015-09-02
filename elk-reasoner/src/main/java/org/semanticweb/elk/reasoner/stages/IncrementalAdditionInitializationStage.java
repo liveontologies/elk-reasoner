@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
@@ -80,6 +81,7 @@ public class IncrementalAdditionInitializationStage extends
 		LinkedContextInitRule changedInitRules = null;
 		Map<? extends IndexedClassExpression, ? extends LinkedSubsumerRule> changedRulesByCE = null;
 		Map<? extends IndexedClass, ? extends IndexedClassExpression> changedDefinitions = null;
+		Map<? extends IndexedClass, ? extends ElkAxiom> changedDefinitionReasons = null;
 		Collection<ArrayList<Context>> inputs = Collections.emptyList();
 		ContextCreationListener contextCreationListener = SaturationUtils
 				.addStatsToContextCreationListener(
@@ -151,6 +153,7 @@ public class IncrementalAdditionInitializationStage extends
 		changedInitRules = diffIndex.getAddedContextInitRules();
 		changedRulesByCE = diffIndex.getAddedContextRulesByClassExpressions();
 		changedDefinitions = diffIndex.getAddedDefinitions();
+		changedDefinitionReasons = diffIndex.getAddedDefinitionReasons();
 
 		if (changedInitRules != null || !changedRulesByCE.isEmpty()
 				|| !changedDefinitions.isEmpty()) {
@@ -160,8 +163,9 @@ public class IncrementalAdditionInitializationStage extends
 
 		this.initialization = new IncrementalChangesInitialization(inputs,
 				changedInitRules, changedRulesByCE, changedDefinitions,
-				reasoner.saturationState, reasoner.getProcessExecutor(),
-				stageStatistics_, workerNo, reasoner.getProgressMonitor());
+				changedDefinitionReasons, reasoner.saturationState,
+				reasoner.getProcessExecutor(), stageStatistics_, workerNo,
+				reasoner.getProgressMonitor());
 
 		return true;
 	}

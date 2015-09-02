@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.implementation;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClass;
@@ -58,6 +59,11 @@ final class CachedIndexedClassImpl extends
 	 */
 	private ModifiableIndexedClassExpression definition_;
 
+	/**
+	 * The {@link ElkAxiom} from which {@link #definition_} originates
+	 */
+	private ElkAxiom definitionReason_;
+
 	CachedIndexedClassImpl(ElkClass entity) {
 		super(CachedIndexedClass.Helper.structuralHashCode(entity));
 		elkClass_ = entity;
@@ -74,11 +80,18 @@ final class CachedIndexedClassImpl extends
 	}
 
 	@Override
-	public boolean setDefinition(ModifiableIndexedClassExpression definition) {
+	public ElkAxiom getDefinitionReason() {
+		return this.definitionReason_;
+	}
+
+	@Override
+	public boolean setDefinition(ModifiableIndexedClassExpression definition,
+			ElkAxiom reason) {
 		if (definition_ != null)
 			return false;
 		// else
 		this.definition_ = definition;
+		this.definitionReason_ = reason;
 		return true;
 	}
 

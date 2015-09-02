@@ -22,6 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
  * #L%
  */
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClass;
@@ -59,23 +60,27 @@ public class IndexedClassDecomposition extends
 	}
 
 	public static boolean tryAddRuleFor(ModifiableIndexedDefinitionAxiom axiom,
-			ModifiableOntologyIndex index) {
+			ModifiableOntologyIndex index, ElkAxiom reason) {
 		ModifiableIndexedClass definedClass = axiom.getDefinedClass();
 		ModifiableIndexedClassExpression definition = axiom.getDefinition();
-		boolean success = index.tryAddDefinition(definedClass, definition);
+		boolean success = index.tryAddDefinition(definedClass, definition,
+				reason);
 		if (success)
-			LOGGER_.trace("{}: added definition {}", definedClass, definition);
+			LOGGER_.trace("{}: added definition {} from {}", definedClass,
+					definition, reason);
 		return success;
 	}
 
 	public static boolean tryRemoveRuleFor(
 			ModifiableIndexedDefinitionAxiom axiom,
-			ModifiableOntologyIndex index) {
+			ModifiableOntologyIndex index, ElkAxiom reason) {
 		ModifiableIndexedClass definedClass = axiom.getDefinedClass();
 		ModifiableIndexedClassExpression definition = axiom.getDefinition();
-		boolean success = index.tryRemoveDefinition(definedClass, definition);
+		boolean success = index.tryRemoveDefinition(definedClass, definition,
+				reason);
 		if (success)
-			LOGGER_.trace("{}: removed definition {}", definedClass, definition);
+			LOGGER_.trace("{}: removed definition {} from {}", definedClass,
+					definition, reason);
 		return success;
 	}
 
@@ -86,7 +91,7 @@ public class IndexedClassDecomposition extends
 		if (definedExpression == null)
 			return;
 		producer.produce(new DecomposedDefinition(premises.getRoot(), premise,
-				definedExpression));
+				definedExpression, getDefinitionReason(premise)));
 	}
 
 	@Override
@@ -107,6 +112,13 @@ public class IndexedClassDecomposition extends
 		// by default take from the premise, but it may be overridden, e.g., for
 		// incremental reasoning
 		return premise.getDefinition();
+	}
+
+	@SuppressWarnings("static-method")
+	protected ElkAxiom getDefinitionReason(IndexedClass premise) {
+		// by default take from the premise, but it may be overridden, e.g., for
+		// incremental reasoning
+		return premise.getDefinitionReason();
 	}
 
 }

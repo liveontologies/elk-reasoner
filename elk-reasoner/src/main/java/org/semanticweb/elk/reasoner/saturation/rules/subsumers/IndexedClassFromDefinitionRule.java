@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
@@ -58,7 +57,7 @@ public class IndexedClassFromDefinitionRule extends
 
 	public static final String NAME = "Defined Class Introduction";
 
-	private final List<IndexedClass> definedClasses_;
+	private final ArrayList<IndexedClass> definedClasses_;
 
 	private final ArrayList<ElkAxiom> reasons_;
 
@@ -101,9 +100,9 @@ public class IndexedClassFromDefinitionRule extends
 	@Override
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		for (IndexedClass defined : definedClasses_) {
+		for (int i = 0; i < definedClasses_.size(); i++) {
 			producer.produce(new ComposedDefinition(premises.getRoot(),
-					defined, premise));
+					definedClasses_.get(i), premise, reasons_.get(i)));
 		}
 	}
 
@@ -114,45 +113,100 @@ public class IndexedClassFromDefinitionRule extends
 
 	@Override
 	public boolean addTo(Chain<ChainableSubsumerRule> ruleChain) {
+		if (isEmpty())
+			return true;
 		IndexedClassFromDefinitionRule rule = ruleChain.getCreate(
 				IndexedClassFromDefinitionRule.MATCHER_,
 				IndexedClassFromDefinitionRule.FACTORY_);
-		boolean changed = false;
-
-		for (IndexedClass defined : definedClasses_) {
-			LOGGER_.trace("Adding {} to {}", defined, NAME);
-
-			changed |= rule.addDefinedClass(defined);
+		boolean success = true;
+		int added = 0;
+		for (int i = 0; i < definedClasses_.size(); i++) {
+			IndexedClass defined = definedClasses_.get(i);
+			ElkAxiom reason = reasons_.get(i);
+			LOGGER_.trace("{}: adding to {} reason: {}", defined, NAME, reason);
+			if (rule.definedClasses_.add(defined)) {
+				rule.reasons_.add(reason);
+				added++;
+			} else {
+				success = false;
+				break;
+			}
 		}
-
-		return changed;
-
+		if (success) {
+			return true;
+		}
+		// else revert all changes
+		for (int i = 0; i < definedClasses_.size(); i++) {
+			if (added == 0)
+				break;
+			added--;
+			IndexedClass defined = definedClasses_.get(i);
+			ElkAxiom reason = reasons_.get(i);
+			LOGGER_.trace("{}: removing from {} reason: {}", defined, NAME,
+					reason);
+			int j = rule.indexOf(defined, reason);
+			rule.definedClasses_.remove(j);
+			rule.reasons_.remove(j);
+		}
+		return false;
 	}
 
 	@Override
 	public boolean removeFrom(Chain<ChainableSubsumerRule> ruleChain) {
+		if (isEmpty())
+			return true;
 		IndexedClassFromDefinitionRule rule = ruleChain
 				.find(IndexedClassFromDefinitionRule.MATCHER_);
-		boolean changed = false;
-
-		if (rule != null) {
-			for (IndexedClass defined : definedClasses_) {
-				LOGGER_.trace("Removing {} from {}", defined, NAME);
-
-				changed |= rule.removeDefinedClass(defined);
-			}
-
-			if (rule.isEmpty()) {
-				ruleChain.remove(IndexedClassFromDefinitionRule.MATCHER_);
-
-				LOGGER_.trace("{}: removed ", NAME);
-
-				return true;
+		if (rule == null)
+			return false;
+		// else
+		boolean success = true;
+		int removed = 0;
+		for (int i = 0; i < definedClasses_.size(); i++) {
+			IndexedClass defined = definedClasses_.get(i);
+			ElkAxiom reason = reasons_.get(i);
+			LOGGER_.trace("{}: removing from {} reason: {}", defined, NAME,
+					reason);
+			int j = rule.indexOf(defined, reason);
+			if (j >= 0) {
+				rule.definedClasses_.remove(j);
+				rule.reasons_.remove(j);
+				removed++;
+			} else {
+				success = false;
+				break;
 			}
 		}
+		if (success) {
+			if (rule.isEmpty()) {
+				ruleChain.remove(IndexedClassFromDefinitionRule.MATCHER_);
+				LOGGER_.trace("{}: removed ", NAME);
+			}
+			return true;
+		}
+		// else revert all changes
+		for (int i = 0; i < definedClasses_.size(); i++) {
+			if (removed == 0)
+				break;
+			removed--;
+			IndexedClass defined = definedClasses_.get(i);
+			ElkAxiom reason = reasons_.get(i);
+			LOGGER_.trace("{}: adding to {} reason: {} [revert]", defined,
+					NAME, reason);
+			rule.definedClasses_.add(defined);
+			rule.reasons_.add(reason);
+		}
+		return false;
+	}
 
-		return changed;
-
+	private int indexOf(IndexedClass defined, ElkAxiom reason) {
+		for (int i = 0; i < definedClasses_.size(); i++) {
+			if (definedClasses_.get(i).equals(defined)
+					&& reasons_.get(i).equals(reason))
+				return i;
+		}
+		// else not found
+		return -1;
 	}
 
 	@Override

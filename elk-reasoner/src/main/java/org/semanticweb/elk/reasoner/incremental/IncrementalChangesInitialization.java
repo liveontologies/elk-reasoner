@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
@@ -59,11 +60,13 @@ public class IncrementalChangesInitialization
 			LinkedContextInitRule changedInitRules,
 			Map<? extends IndexedClassExpression, ? extends LinkedSubsumerRule> changedCompositionRules,
 			Map<? extends IndexedClass, ? extends IndexedClassExpression> changedDefinitions,
+			Map<? extends IndexedClass, ? extends ElkAxiom> changedDefinitionReasons,
 			SaturationState<?> state, ComputationExecutor executor,
 			SaturationStatistics stageStats, int maxWorkers,
 			ProgressMonitor progressMonitor) {
 		super(inputs, new ContextInitializationFactory(state, changedInitRules,
-				changedCompositionRules, changedDefinitions, stageStats),
-				executor, maxWorkers, progressMonitor);
+				changedCompositionRules, changedDefinitions,
+				changedDefinitionReasons, stageStats), executor, maxWorkers,
+				progressMonitor);
 	}
 }

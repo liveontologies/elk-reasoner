@@ -22,6 +22,7 @@ package org.semanticweb.elk.reasoner.indexing.modifiable;
  * #L%
  */
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 
 /**
@@ -40,12 +41,15 @@ public interface ModifiableIndexedClass extends ModifiableIndexedClassEntity,
 	 * 
 	 * @param definition
 	 *            the new definition for this {@link IndexedClass}
+	 * @param reason
+	 *            the {@link ElkAxiom} from which the definition originates
 	 * @return {@code true} if this operation is successful or {@code false}
 	 *         otherwise; the letter is returned if this {@link IndexedClass}
 	 *         was already defined ({@link #getDefinition()} returns
 	 *         {@code null})
 	 */
-	boolean setDefinition(ModifiableIndexedClassExpression definition);
+	boolean setDefinition(ModifiableIndexedClassExpression definition,
+			ElkAxiom reason);
 
 	/**
 	 * Removes the definition for this {@link IndexedClass}; after calling this

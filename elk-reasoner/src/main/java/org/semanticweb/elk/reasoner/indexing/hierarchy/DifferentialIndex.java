@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
@@ -108,6 +109,9 @@ public class DifferentialIndex extends DirectIndex {
 	private Map<ModifiableIndexedClass, ModifiableIndexedClassExpression> addedDefinitions_,
 			removedDefinitions_;
 
+	private Map<ModifiableIndexedClass, ElkAxiom> addedDefinitionReasons_,
+			removedDefinitionReasons_;
+
 	public DifferentialIndex() {
 		init();
 	}
@@ -144,6 +148,8 @@ public class DifferentialIndex extends DirectIndex {
 				32);
 		this.addedDefinitions_ = new ArrayHashMap<ModifiableIndexedClass, ModifiableIndexedClassExpression>(
 				32);
+		this.addedDefinitionReasons_ = new ArrayHashMap<ModifiableIndexedClass, ElkAxiom>(
+				32);
 	}
 
 	public void initDeletions() {
@@ -152,6 +158,8 @@ public class DifferentialIndex extends DirectIndex {
 		this.removedContextRuleHeadByClassExpressions_ = new ArrayHashMap<ModifiableIndexedClassExpression, ChainableSubsumerRule>(
 				32);
 		this.removedDefinitions_ = new ArrayHashMap<ModifiableIndexedClass, ModifiableIndexedClassExpression>(
+				32);
+		this.removedDefinitionReasons_ = new ArrayHashMap<ModifiableIndexedClass, ElkAxiom>(
 				32);
 	}
 
@@ -283,11 +291,13 @@ public class DifferentialIndex extends DirectIndex {
 
 	@Override
 	public boolean tryAddDefinition(ModifiableIndexedClass target,
-			ModifiableIndexedClassExpression definition) {
+			ModifiableIndexedClassExpression definition, ElkAxiom reason) {
 		if (!incrementalMode)
-			return super.tryAddDefinition(target, definition);
+			return super.tryAddDefinition(target, definition, reason);
 		// for incremental mode:
 		IndexedClassExpression removedDefintion = removedDefinitions_
+				.get(target);
+		ElkAxiom removedDefinitionReason = removedDefinitionReasons_
 				.get(target);
 		if (target.getDefinition() != removedDefintion
 				|| addedDefinitions_.get(target) != null) {
@@ -296,31 +306,40 @@ public class DifferentialIndex extends DirectIndex {
 			return false;
 		}
 		// else removing
-		if (removedDefintion == definition) {
+		if (removedDefintion == definition
+				&& removedDefinitionReason.equals(reason)) {
 			removedDefinitions_.remove(target);
-			target.setDefinition(definition);
-		} else
+			removedDefinitionReasons_.remove(target);
+			target.setDefinition(definition, reason);
+		} else {
 			addedDefinitions_.put(target, definition);
+			addedDefinitionReasons_.put(target, reason);
+		}
 		return true;
 	}
 
 	@Override
 	public boolean tryRemoveDefinition(ModifiableIndexedClass target,
-			ModifiableIndexedClassExpression definition) {
+			ModifiableIndexedClassExpression definition, ElkAxiom reason) {
 		if (!incrementalMode)
-			return super.tryRemoveDefinition(target, definition);
+			return super.tryRemoveDefinition(target, definition, reason);
 		// for incremental mode:
-		IndexedClassExpression addedDefintion = addedDefinitions_.get(target);
-		if (addedDefintion == definition) {
+		IndexedClassExpression addedDefinition = addedDefinitions_.get(target);
+		ElkAxiom addedDefinitionReason = addedDefinitionReasons_.get(target);
+		if (addedDefinition == definition
+				&& addedDefinitionReason.equals(reason)) {
 			addedDefinitions_.remove(target);
+			addedDefinitionReasons_.remove(target);
 			return true;
 		}
 		// else
-		if (addedDefintion != null || target.getDefinition() != definition)
+		if (addedDefinition != null || target.getDefinition() != definition
+				|| !target.getDefinitionReason().equals(reason))
 			return false;
 		// else
 		target.removeDefinition();
 		removedDefinitions_.put(target, definition);
+		removedDefinitionReasons_.put(target, reason);
 		return true;
 	}
 
@@ -400,10 +419,26 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	/**
+	 * @return the {@link ElkAxiom}s from which the added definitions for the
+	 *         corresponding {@link IndexedClass}es originate
+	 */
+	public Map<? extends IndexedClass, ? extends ElkAxiom> getAddedDefinitionReasons() {
+		return this.addedDefinitionReasons_;
+	}
+
+	/**
 	 * @return the removed definitions for {@link IndexedClass}es
 	 */
 	public Map<? extends IndexedClass, ? extends IndexedClassExpression> getRemovedDefinitions() {
 		return this.removedDefinitions_;
+	}
+
+	/**
+	 * @return the {@link ElkAxiom}s from which the removed definitions for the
+	 *         corresponding {@link IndexedClass}es originate
+	 */
+	public Map<? extends IndexedClass, ? extends ElkAxiom> getRemovedDefinitionReasons() {
+		return this.removedDefinitionReasons_;
 	}
 
 	/**
@@ -475,9 +510,10 @@ public class DifferentialIndex extends DirectIndex {
 		for (ModifiableIndexedClass target : addedDefinitions_.keySet()) {
 			ModifiableIndexedClassExpression definition = addedDefinitions_
 					.get(target);
+			ElkAxiom reason = addedDefinitionReasons_.get(target);
 			LOGGER_.trace("{}: committing definition addition {}", target,
 					definition);
-			if (!target.setDefinition(definition))
+			if (!target.setDefinition(definition, reason))
 				throw new ElkUnexpectedIndexingException(target);
 		}
 		initAdditions();
