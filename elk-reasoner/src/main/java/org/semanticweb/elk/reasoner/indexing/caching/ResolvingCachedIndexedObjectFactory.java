@@ -25,11 +25,10 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
  */
 
 /**
- * A {@link CachedIndexedObjectFactory} which uses a given
- * {@link ModifiableIndexedObjectCache} to reuse the objects previously created
- * by this factory. An object in the {@link ModifiableIndexedObjectCache} is
- * reused (returned by the factory) if it is structurally equivalent to the one
- * being constructed.
+ * A {@link CachedIndexedObjectFactory} which can only create object present in
+ * the provided {@link ModifiableIndexedObjectCache}. If there is no
+ * structurally equivalent object to the one that should be constructed,
+ * {@code null} is returned.
  * 
  * @author "Yevgeny Kazakov"
  *
