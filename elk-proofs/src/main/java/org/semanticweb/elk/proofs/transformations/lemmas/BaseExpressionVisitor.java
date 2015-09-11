@@ -24,8 +24,8 @@ package org.semanticweb.elk.proofs.transformations.lemmas;
  * #L%
  */
 
-import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.visitors.NoOpElkAxiomVisitor;
 import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
@@ -40,7 +40,7 @@ import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class BaseExpressionVisitor<I, O> extends AbstractElkAxiomVisitor<O> implements ExpressionVisitor<I, O>, ElkLemmaVisitor<I, O> {
+public class BaseExpressionVisitor<I, O> extends NoOpElkAxiomVisitor<O> implements ExpressionVisitor<I, O>, ElkLemmaVisitor<I, O> {
 
 	protected AxiomExpression<? extends ElkAxiom> axiomExpression;
 	

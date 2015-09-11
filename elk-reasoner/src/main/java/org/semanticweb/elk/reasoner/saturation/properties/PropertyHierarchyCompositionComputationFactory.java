@@ -124,8 +124,6 @@ public class PropertyHierarchyCompositionComputationFactory extends
 				return null;
 			Set<IndexedPropertyChain> rightSubProperties = SubPropertyExplorer
 					.getSubPropertyChains(right, inferenceProducer_);
-			if (rightSubProperties.isEmpty())
-				return null;
 
 			for (IndexedPropertyChain rightSubPropertyChain : rightSubProperties) {
 

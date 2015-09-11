@@ -39,6 +39,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.BackwardLinkI
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * 
+ * @author "Yevgeny Kazakov"
  */
 public class DecomposedExistentialBackwardLink extends
 		AbstractBackwardLinkInference {
@@ -55,17 +57,17 @@ public class DecomposedExistentialBackwardLink extends
 		inferenceRoot_ = inferenceRoot;
 	}
 
+	@Override
+	public IndexedContextRoot getInferenceRoot() {
+		return inferenceRoot_;
+	}
+
 	public IndexedObjectSomeValuesFrom getDecomposedExistential() {
 		return this.existential_;
 	}
 
 	public DecomposedSubsumer getPremise() {
 		return new DecomposedSubsumerImpl(getInferenceRoot(), existential_);
-	}
-
-	@Override
-	public IndexedContextRoot getInferenceRoot() {
-		return inferenceRoot_;
 	}
 
 	@Override

@@ -56,19 +56,19 @@ public class GetInferenceTarget extends
 	@Override
 	public IndexedContextRoot visit(ComposedExistential conclusion,
 			Context premiseContext) {
-		return conclusion.getBackwardLink().getOriginRoot();
+		return conclusion.getFirstPremise().getOriginRoot();
 	}
 
 	@Override
 	public IndexedContextRoot visit(ComposedBackwardLink conclusion,
 			Context premiseContext) {
-		return conclusion.getForwardLink().getTarget();
+		return conclusion.getThirdPremise().getTarget();
 	}
 
 	@Override
 	public IndexedContextRoot visit(ReversedForwardLink conclusion,
 			Context premiseContext) {
-		return conclusion.getPremise().getTarget();
+		return conclusion.getFirstPremise().getTarget();
 	}
 
 	@Override

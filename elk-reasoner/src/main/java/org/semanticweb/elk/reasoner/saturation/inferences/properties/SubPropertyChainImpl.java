@@ -37,25 +37,23 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectProper
  * 
  * @author "Yevgeny Kazakov"
  */
-public class SubPropertyChainImpl<R extends IndexedPropertyChain, S extends IndexedPropertyChain>
-		implements SubPropertyChain<R, S> {
+public class SubPropertyChainImpl implements SubPropertyChain {
 
-	private final R subChain_;
+	private final IndexedPropertyChain subChain_, superChain_;
 
-	private final S superChain_;
-
-	public SubPropertyChainImpl(R subChain, S superChain) {
+	public SubPropertyChainImpl(IndexedPropertyChain subChain,
+			IndexedPropertyChain superChain) {
 		subChain_ = subChain;
 		superChain_ = superChain;
 	}
 
 	@Override
-	public R getSubPropertyChain() {
+	public IndexedPropertyChain getSubChain() {
 		return subChain_;
 	}
 
 	@Override
-	public S getSuperPropertyChain() {
+	public IndexedPropertyChain getSuperChain() {
 		return superChain_;
 	}
 

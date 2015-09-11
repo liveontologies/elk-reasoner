@@ -39,12 +39,12 @@ public abstract class AbstractObjectPropertyInferenceVisitor<I, O> implements
 			I input);
 
 	@Override
-	public O visit(PropertyChainInitialization inference, I input) {
+	public O visit(SubPropertyChainInit inference, I input) {
 		return defaultTracedVisit(inference, input);
 	}
 
 	@Override
-	public O visit(ToldSubProperty inference, I input) {
+	public O visit(SubPropertyChainExpanded inference, I input) {
 		return defaultTracedVisit(inference, input);
 
 	}

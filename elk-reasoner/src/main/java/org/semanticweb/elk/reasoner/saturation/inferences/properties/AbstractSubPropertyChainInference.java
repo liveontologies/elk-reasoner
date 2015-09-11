@@ -24,11 +24,11 @@ package org.semanticweb.elk.reasoner.saturation.inferences.properties;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 
-public abstract class AbstractSubPropertyChainInference<R extends IndexedPropertyChain, S extends IndexedPropertyChain>
-		extends SubPropertyChainImpl<R, S> implements
-		SubPropertyChainInference<R, S> {
+public abstract class AbstractSubPropertyChainInference extends
+		SubPropertyChainImpl implements SubPropertyChainInference {
 
-	public AbstractSubPropertyChainInference(R subChain, S superChain) {
+	public AbstractSubPropertyChainInference(IndexedPropertyChain subChain,
+			IndexedPropertyChain superChain) {
 		super(subChain, superChain);
 	}
 

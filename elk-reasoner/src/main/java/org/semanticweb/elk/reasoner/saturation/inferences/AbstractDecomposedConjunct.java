@@ -52,7 +52,7 @@ public abstract class AbstractDecomposedConjunct extends
 		conjunction_ = premiseSubsumer;
 	}
 
-	public Subsumer getPremise() {
+	public DecomposedSubsumer getPremise() {
 		return new DecomposedSubsumerImpl(getInferenceRoot(), conjunction_);
 	}
 

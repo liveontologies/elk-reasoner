@@ -26,7 +26,6 @@ package org.semanticweb.elk.proofs.expressions.entries;
 
 import java.util.List;
 
-import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
@@ -48,6 +47,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.visitors.AbstractElkObjectVisitor;
+import org.semanticweb.elk.owl.visitors.NoOpElkAxiomVisitor;
 import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
@@ -126,7 +126,7 @@ public class StructuralEquivalenceHasher implements ExpressionHasher {
 		
 	}
 	
-	private static class AxiomHasher extends AbstractElkAxiomVisitor<Integer> {
+	private static class AxiomHasher extends NoOpElkAxiomVisitor<Integer> {
 
 		static int hashCode(ElkAxiom ax) {
 			return AxiomCanonicalizer.canonicalize(ax).accept(new AxiomHasher());

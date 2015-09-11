@@ -32,6 +32,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedConjunction;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDecomposition;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDefinition;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDisjunction;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedExistential;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromDisjointSubsumers;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromInconsistentDisjointnessAxiom;
@@ -45,18 +47,16 @@ import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedReflexiveBac
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedReflexiveForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedSecondConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
-import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDisjunction;
 import org.semanticweb.elk.reasoner.saturation.inferences.GeneratedPropagation;
 import org.semanticweb.elk.reasoner.saturation.inferences.InitializationSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.ObjectHasSelfPropertyRangeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedContradiction;
-import org.semanticweb.elk.reasoner.saturation.inferences.ComposedExistential;
 import org.semanticweb.elk.reasoner.saturation.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.PropertyChainInitialization;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldSubProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainInit;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainExpanded;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
 
 /**
@@ -105,32 +105,32 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>,
 
 	@Override
 	public String visit(ComposedExistential conclusion, Void parameter) {
-		return "Existential inference from " + conclusion.getPropagation()
-				+ " and " + conclusion.getBackwardLink();
+		return "Existential inference from " + conclusion.getSecondPremise()
+				+ " and " + conclusion.getFirstPremise();
 	}
 
 	@Override
 	public String visit(ComposedBackwardLink conclusion, Void parameter) {
-		BackwardLink bwLink = conclusion.getBackwardLink();
-		ForwardLink fwLink = conclusion.getForwardLink();
+		BackwardLink bwLink = conclusion.getFirstPremise();
+		ForwardLink fwLink = conclusion.getThirdPremise();
 		return "Composed backward link from " + bwLink + " and " + fwLink;
 	}
 
 	@Override
 	public String visit(ComposedForwardLink conclusion, Void input) {
-		BackwardLink bwLink = conclusion.getBackwardLink();
-		ForwardLink fwLink = conclusion.getForwardLink();
+		BackwardLink bwLink = conclusion.getFirstPremise();
+		ForwardLink fwLink = conclusion.getThirdPremise();
 		return "Composed forward link from " + bwLink + " and " + fwLink;
 	}
 
 	@Override
 	public String visit(ReversedForwardLink conclusion, Void parameter) {
-		return "Reversing forward link " + conclusion.getPremise();
+		return "Reversing forward link " + conclusion.getFirstPremise();
 	}
 
 	@Override
 	public String visit(SuperReversedForwardLink conclusion, Void input) {
-		return "Reversing forward link " + conclusion.getPremise()
+		return "Reversing forward link " + conclusion.getFirstPremise()
 				+ " and unfolding under " + conclusion.getReason();
 	}
 
@@ -147,7 +147,7 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>,
 
 	@Override
 	public String visit(DecomposedExistentialForwardLink conclusion, Void input) {
-		return "Creating forward link from " + conclusion.getExistential();
+		return "Creating forward link from " + conclusion.getPremise();
 	}
 
 	@Override
@@ -157,7 +157,7 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>,
 
 	@Override
 	public String visit(GeneratedPropagation conclusion, Void parameter) {
-		return "Creating propagation from " + conclusion.getPremise();
+		return "Creating propagation from " + conclusion.getFirstPremise();
 	}
 
 	@Override
@@ -203,14 +203,15 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>,
 	}
 
 	@Override
-	public String visit(PropertyChainInitialization inference, Void input) {
-		return "Initialization (" + inference.getPropertyChain() + ")";
+	public String visit(SubPropertyChainInit inference, Void input) {
+		return "Initialization (" + inference.getChain() + " => "
+				+ inference.getSuperChain() + ")";
 	}
 
 	@Override
-	public String visit(ToldSubProperty inference, Void input) {
-		return "Told sub-chain: " + inference.getSubPropertyChain() + " => "
-				+ inference.getSuperPropertyChain() + ", premise: "
+	public String visit(SubPropertyChainExpanded inference, Void input) {
+		return "Told sub-chain: " + inference.getSubChain() + " => "
+				+ inference.getSuperChain() + ", premise: "
 				+ inference.getPremise();
 	}
 

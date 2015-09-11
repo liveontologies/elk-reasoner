@@ -41,6 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ComposedSubsu
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author "Yevgeny Kazakov"
  */
 public class ComposedExistential extends
 		AbstractComposedSubsumerInference<IndexedObjectSomeValuesFrom> {
@@ -63,19 +64,23 @@ public class ComposedExistential extends
 		propagationRelation_ = premise.getBackwardRelation();
 	}
 
+	public IndexedObjectProperty getPropagationRelation() {
+		return propagationRelation_;
+	}
+
 	@Override
 	public IndexedContextRoot getInferenceRoot() {
 		return inferenceRoot_;
 	}
 
-	public Propagation getPropagation() {
-		return new PropagationImpl(getInferenceRoot(), propagationRelation_,
-				getExpression());
-	}
-
-	public BackwardLink getBackwardLink() {
+	public BackwardLink getFirstPremise() {
 		return new BackwardLinkImpl(getInferenceRoot(), propagationRelation_,
 				getConclusionRoot());
+	}
+
+	public Propagation getSecondPremise() {
+		return new PropagationImpl(getInferenceRoot(), propagationRelation_,
+				getExpression());
 	}
 
 	@Override

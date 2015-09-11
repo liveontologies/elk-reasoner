@@ -61,8 +61,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.PropertyChainInitialization;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldSubProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainExpanded;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainInit;
 
 /**
  * Visits all premises for the given {@link ClassInference} or
@@ -130,42 +130,38 @@ public class ClassInferencePremiseVisitor<I, O> implements
 
 	@Override
 	public O visit(ComposedExistential conclusion, I input) {
-		conclusion.getBackwardLink().accept(classPremiseVisitor_, input);
-		conclusion.getPropagation().accept(classPremiseVisitor_, input);
+		conclusion.getFirstPremise().accept(classPremiseVisitor_, input);
+		conclusion.getSecondPremise().accept(classPremiseVisitor_, input);
 		return null;
 	}
 
 	@Override
 	public O visit(ComposedBackwardLink conclusion, I input) {
-		conclusion.getBackwardLink().accept(classPremiseVisitor_, input);
-		conclusion.getForwardLink().accept(classPremiseVisitor_, input);
-		conclusion.getLeftSubObjectProperty().accept(propertyPremiseVisitor_,
-				input);
-		conclusion.getRightSubObjectPropertyChain().accept(
-				propertyPremiseVisitor_, input);
+		conclusion.getFirstPremise().accept(classPremiseVisitor_, input);
+		conclusion.getSecondPremise().accept(propertyPremiseVisitor_, input);
+		conclusion.getThirdPremise().accept(classPremiseVisitor_, input);
+		conclusion.getFourthPremise().accept(propertyPremiseVisitor_, input);
 		return null;
 	}
 
 	@Override
 	public O visit(ComposedForwardLink conclusion, I input) {
-		conclusion.getBackwardLink().accept(classPremiseVisitor_, input);
-		conclusion.getForwardLink().accept(classPremiseVisitor_, input);
-		conclusion.getLeftSubObjectProperty().accept(propertyPremiseVisitor_,
-				input);
-		conclusion.getRightSubObjectPropertyChain().accept(
-				propertyPremiseVisitor_, input);
+		conclusion.getFirstPremise().accept(classPremiseVisitor_, input);
+		conclusion.getSecondPremise().accept(propertyPremiseVisitor_, input);
+		conclusion.getThirdPremise().accept(classPremiseVisitor_, input);
+		conclusion.getFourthPremise().accept(propertyPremiseVisitor_, input);
 		return null;
 	}
 
 	@Override
 	public O visit(ReversedForwardLink conclusion, I input) {
-		conclusion.getPremise().accept(classPremiseVisitor_, input);
+		conclusion.getFirstPremise().accept(classPremiseVisitor_, input);
 		return null;
 	}
 
 	@Override
 	public O visit(SuperReversedForwardLink conclusion, I input) {
-		conclusion.getPremise().accept(classPremiseVisitor_, input);
+		conclusion.getFirstPremise().accept(classPremiseVisitor_, input);
 		return null;
 	}
 
@@ -177,7 +173,7 @@ public class ClassInferencePremiseVisitor<I, O> implements
 
 	@Override
 	public O visit(DecomposedExistentialForwardLink conclusion, I input) {
-		conclusion.getExistential().accept(classPremiseVisitor_, input);
+		conclusion.getPremise().accept(classPremiseVisitor_, input);
 		return null;
 	}
 
@@ -195,9 +191,8 @@ public class ClassInferencePremiseVisitor<I, O> implements
 
 	@Override
 	public O visit(GeneratedPropagation conclusion, I input) {
-		conclusion.getPremise().accept(classPremiseVisitor_, input);
-		conclusion.getSubPropertyPremise().accept(propertyPremiseVisitor_,
-				input);
+		conclusion.getFirstPremise().accept(classPremiseVisitor_, input);
+		conclusion.getSecondPremise().accept(propertyPremiseVisitor_, input);
 		return null;
 	}
 
@@ -269,13 +264,13 @@ public class ClassInferencePremiseVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(PropertyChainInitialization conclusion, I input) {
+	public O visit(SubPropertyChainInit conclusion, I input) {
 		// no premises
 		return null;
 	}
 
 	@Override
-	public O visit(ToldSubProperty inference, I input) {
+	public O visit(SubPropertyChainExpanded inference, I input) {
 		inference.getPremise().accept(propertyPremiseVisitor_, input);
 		return null;
 	}

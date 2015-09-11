@@ -33,11 +33,10 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectProp
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectPropertyConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.PropertyChainInitialization;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainImpl;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainExpanded;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldSubProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainInit;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -60,7 +59,7 @@ public class ModifiableObjectPropertyInferenceSetImpl implements
 
 	private final ObjectPropertyConclusionVisitor<ModifiableObjectPropertyInferenceSetImpl, Iterable<? extends ObjectPropertyInference>> INFERENCE_READER_ = new InferenceReader();
 
-	private Map<IndexedPropertyChain, Multimap<IndexedPropertyChain, SubPropertyChainInference<?, ?>>> subPropertyChainInferences_;
+	private Map<IndexedPropertyChain, Multimap<IndexedPropertyChain, SubPropertyChainInference>> subPropertyChainInferences_;
 
 	@Override
 	public Iterable<? extends ObjectPropertyInference> getObjectPropertyInferences(
@@ -100,21 +99,19 @@ public class ModifiableObjectPropertyInferenceSetImpl implements
 				: emptyIfNull(traces.get(value));
 	}
 
-	private synchronized void addInference(
-			SubPropertyChainInference<?, ?> inference) {
+	private synchronized void addInference(SubPropertyChainInference inference) {
 		if (subPropertyChainInferences_ == null)
-			subPropertyChainInferences_ = new ArrayHashMap<IndexedPropertyChain, Multimap<IndexedPropertyChain, SubPropertyChainInference<?, ?>>>();
-		addValue(subPropertyChainInferences_, inference.getSubPropertyChain(),
-				inference.getSuperPropertyChain(), inference);
+			subPropertyChainInferences_ = new ArrayHashMap<IndexedPropertyChain, Multimap<IndexedPropertyChain, SubPropertyChainInference>>();
+		addValue(subPropertyChainInferences_, inference.getSubChain(),
+				inference.getSuperChain(), inference);
 	}
 
-	private Iterable<? extends SubPropertyChainInference<?, ?>> getInferences(
-			SubPropertyChain<?, ?> conclusion) {
+	private Iterable<? extends SubPropertyChainInference> getInferences(
+			SubPropertyChain conclusion) {
 		if (subPropertyChainInferences_ == null)
 			return Collections.emptyList();
-		return getValues(subPropertyChainInferences_,
-				conclusion.getSubPropertyChain(),
-				conclusion.getSuperPropertyChain());
+		return getValues(subPropertyChainInferences_, conclusion.getSubChain(),
+				conclusion.getSuperChain());
 	}
 
 	/**
@@ -128,14 +125,14 @@ public class ModifiableObjectPropertyInferenceSetImpl implements
 			ObjectPropertyInferenceVisitor<ModifiableObjectPropertyInferenceSetImpl, Void> {
 
 		@Override
-		public Void visit(PropertyChainInitialization inference,
+		public Void visit(SubPropertyChainInit inference,
 				ModifiableObjectPropertyInferenceSetImpl input) {
 			input.addInference(inference);
 			return null;
 		}
 
 		@Override
-		public Void visit(ToldSubProperty inference,
+		public Void visit(SubPropertyChainExpanded inference,
 				ModifiableObjectPropertyInferenceSetImpl input) {
 			input.addInference(inference);
 			return null;
@@ -156,7 +153,7 @@ public class ModifiableObjectPropertyInferenceSetImpl implements
 
 		@Override
 		public Iterable<? extends ObjectPropertyInference> visit(
-				SubPropertyChainImpl<?, ?> conclusion,
+				SubPropertyChain conclusion,
 				ModifiableObjectPropertyInferenceSetImpl input) {
 			return input.getInferences(conclusion);
 		}

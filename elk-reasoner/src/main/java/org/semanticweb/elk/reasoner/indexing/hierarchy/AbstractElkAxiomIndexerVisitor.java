@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.Arrays;
 import java.util.List;
 
-import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
@@ -50,6 +49,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
+import org.semanticweb.elk.owl.visitors.NoOpElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
 
 /**
@@ -62,7 +62,7 @@ import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedEx
  * 
  */
 public abstract class AbstractElkAxiomIndexerVisitor extends
-		AbstractElkAxiomVisitor<Void> implements ElkAxiomIndexer {
+		NoOpElkAxiomVisitor<Void> implements ElkAxiomIndexer {
 
 	/**
 	 * Object factory that is used internally to replace some syntactic

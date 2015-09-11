@@ -34,11 +34,11 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.MutableBoolean;
-import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.visitors.NoOpElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -53,7 +53,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.AbstractObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
@@ -95,7 +95,8 @@ public class TracingTestUtils {
 				return contradiction;
 			}
 
-			return new ComposedSubsumerImpl<IndexedClassExpression>(root, subsumer);
+			return new ComposedSubsumerImpl<IndexedClassExpression>(root,
+					subsumer);
 		}
 
 		throw new IllegalArgumentException("Context may not be null");
@@ -182,8 +183,8 @@ public class TracingTestUtils {
 				reasoner, sub);
 		final IndexedObjectProperty subsumer = ReasonerStateAccessor.transform(
 				reasoner, sup);
-		ObjectPropertyConclusion conclusion = new SubObjectProperty(subsumee,
-				subsumer);
+		ObjectPropertyConclusion conclusion = new SubPropertyChainImpl(
+				subsumee, subsumer);
 		int actual = 0;
 		for (ObjectPropertyInference ignore : ReasonerStateAccessor
 				.getTraceState(reasoner)
@@ -262,7 +263,7 @@ public class TracingTestUtils {
 				ReasonerStateAccessor.getContext(reasoner, subsumee),
 				ReasonerStateAccessor.transform(reasoner, sup));
 		ClassInferenceVisitor<Void, ?> sideConditionVisitor = SideConditions
-				.getClassSideConditionVisitor(new AbstractElkAxiomVisitor<Void>() {
+				.getClassSideConditionVisitor(new NoOpElkAxiomVisitor<Void>() {
 
 					@Override
 					protected Void defaultLogicalVisit(ElkAxiom axiom) {

@@ -32,11 +32,10 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectProp
  *
  *         pavel.klinov@uni-ulm.de
  */
-public interface SubPropertyChain<R extends IndexedPropertyChain, S extends IndexedPropertyChain>
-		extends ObjectPropertyConclusion {
+public interface SubPropertyChain extends ObjectPropertyConclusion {
 
-	public R getSubPropertyChain();
+	public IndexedPropertyChain getSubChain();
 
-	public S getSuperPropertyChain();
+	public IndexedPropertyChain getSuperChain();
 
 }

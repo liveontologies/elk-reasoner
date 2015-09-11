@@ -32,7 +32,8 @@ import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.PropagationInferenceVisitor;
 
 /**
@@ -59,13 +60,13 @@ public class GeneratedPropagation extends AbstractPropagationInference {
 		return getConclusionRoot();
 	}
 
-	public ComposedSubsumer getPremise() {
+	public ComposedSubsumer getFirstPremise() {
 		return new ComposedSubsumerImpl<IndexedClassExpression>(
 				getInferenceRoot(), getCarry().getFiller());
 	}
 
-	public SubObjectProperty getSubPropertyPremise() {
-		return new SubObjectProperty(getRelation(), getCarry().getProperty());
+	public SubPropertyChain getSecondPremise() {
+		return new SubPropertyChainImpl(getRelation(), getCarry().getProperty());
 	}
 
 	@Override

@@ -28,7 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
@@ -53,6 +52,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.AbstractElkObjectVisitor;
+import org.semanticweb.elk.owl.visitors.NoOpElkAxiomVisitor;
 import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
@@ -181,7 +181,7 @@ public class StructuralEquivalenceChecker implements ExpressionEqualityChecker, 
 		
 	}
 	
-	private static class DefaultAxiomChecker extends AbstractElkAxiomVisitor<Boolean> {
+	private static class DefaultAxiomChecker extends NoOpElkAxiomVisitor<Boolean> {
 		@Override
 		protected Boolean defaultLogicalVisit(ElkAxiom axiom) {
 			return Boolean.FALSE;

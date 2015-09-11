@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Backwa
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ForwardLinkInferenceVisitor;
 
@@ -71,28 +71,28 @@ public class ComposedForwardLink extends
 		return inferenceRoot_;
 	}
 
-	public BackwardLink getBackwardLink() {
+	public BackwardLink getFirstPremise() {
 		return new BackwardLinkImpl(getInferenceRoot(), backwardRelation_,
 				getConclusionRoot());
 	}
 
-	public ForwardLink getForwardLink() {
+	public SubPropertyChain getSecondPremise() {
+		return new SubPropertyChainImpl(backwardRelation_, getComposition()
+				.getFirstProperty());
+	}
+
+	public ForwardLink getThirdPremise() {
 		return new ForwardLinkImpl<IndexedPropertyChain>(getInferenceRoot(),
 				forwardChain_, getTarget());
 	}
 
+	public SubPropertyChain getFourthPremise() {
+		return new SubPropertyChainImpl(forwardChain_, getComposition()
+				.getSuffixChain());
+	}
+
 	private IndexedComplexPropertyChain getComposition() {
 		return getForwardChain();
-	}
-
-	public SubObjectProperty getLeftSubObjectProperty() {
-		return new SubObjectProperty(backwardRelation_, getComposition()
-				.getFirstProperty());
-	}
-
-	public SubPropertyChainImpl<?, ?> getRightSubObjectPropertyChain() {
-		return new SubPropertyChainImpl<IndexedPropertyChain, IndexedPropertyChain>(
-				forwardChain_, getComposition().getSuffixChain());
 	}
 
 	@Override

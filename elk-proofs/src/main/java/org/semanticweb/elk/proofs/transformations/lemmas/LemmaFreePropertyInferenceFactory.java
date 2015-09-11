@@ -71,12 +71,12 @@ class LemmaFreePropertyInferenceFactory extends AbstractObjectPropertyInferenceV
 
 	@Override
 	public Inference visit(LeftReflexiveSubPropertyChainInference inference, AxiomExpression<ElkSubObjectPropertyOfAxiom> premise) {
-		return new ReflexivityElimination(expr_, premise, createReflexivityPremise(inference.getReflexivePremise().getPropertyChain()));
+		return new ReflexivityElimination(expr_, premise, createReflexivityPremise(inference.getReflexivePremise().getRelation()));
 	}
 
 	@Override
 	public Inference visit(final RightReflexiveSubPropertyChainInference inference, final AxiomExpression<ElkSubObjectPropertyOfAxiom> premise) {
-		return inference.getReflexivePremise().getPropertyChain().accept(new IndexedPropertyChainVisitor<Inference>() {
+		return inference.getReflexivePremise().getRelation().accept(new IndexedPropertyChainVisitor<Inference>() {
 
 			@Override
 			public Inference visit(IndexedObjectProperty iop) {
@@ -93,8 +93,8 @@ class LemmaFreePropertyInferenceFactory extends AbstractObjectPropertyInferenceV
 	@Override
 	public Inference visit(ToldSubProperty inference, AxiomExpression<ElkSubObjectPropertyOfAxiom> premise) {
 		// using only told hierarchy here
-		if (inference.getSuperPropertyChain() instanceof IndexedObjectProperty && inference.getSubPropertyChain().getToldSuperProperties().contains(inference.getSuperPropertyChain())) {
-			return createSubChainInference(inference.getSubPropertyChain(), (IndexedObjectProperty) inference.getSuperPropertyChain(), premise);	
+		if (inference.getSuperChain() instanceof IndexedObjectProperty && inference.getSubChain().getToldSuperProperties().contains(inference.getSuperChain())) {
+			return createSubChainInference(inference.getSubChain(), (IndexedObjectProperty) inference.getSuperChain(), premise);	
 		}
 
 		return null;

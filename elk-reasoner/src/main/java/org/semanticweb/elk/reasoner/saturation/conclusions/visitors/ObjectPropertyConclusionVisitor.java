@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainImpl;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChain;
 
 /**
  * @author Pavel Klinov
@@ -34,12 +34,12 @@ import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubProperty
  */
 public interface ObjectPropertyConclusionVisitor<I, O> {
 
-	public O visit(SubPropertyChainImpl<?, ?> conclusion, I input);
+	public O visit(SubPropertyChain conclusion, I input);
 
 	public static ObjectPropertyConclusionVisitor<?, ?> DUMMY = new ObjectPropertyConclusionVisitor<Void, Void>() {
 
 		@Override
-		public Void visit(SubPropertyChainImpl<?, ?> conclusion, Void input) {
+		public Void visit(SubPropertyChain conclusion, Void input) {
 			// no-op
 			return null;
 		}

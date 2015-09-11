@@ -65,13 +65,17 @@ public class ComposedDefinition extends
 		return getConclusionRoot();
 	}
 
-	public ComposedSubsumer getPremise() {
-		return new ComposedSubsumerImpl<IndexedClassExpression>(
-				getInferenceRoot(), definition_);
+	public IndexedClassExpression getDefinition() {
+		return this.definition_;
 	}
 
 	public ElkAxiom getReason() {
 		return this.reason_;
+	}
+
+	public ComposedSubsumer getPremise() {
+		return new ComposedSubsumerImpl<IndexedClassExpression>(
+				getInferenceRoot(), definition_);
 	}
 
 	@Override

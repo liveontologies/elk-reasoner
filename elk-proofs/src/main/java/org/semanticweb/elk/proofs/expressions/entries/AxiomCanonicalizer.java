@@ -24,11 +24,11 @@ package org.semanticweb.elk.proofs.expressions.entries;
  * #L%
  */
 
-import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.visitors.NoOpElkAxiomVisitor;
 
 /**
  * Transforms axiom to a canonical form for structural equivalence checking and structural hashing.
@@ -37,7 +37,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-class AxiomCanonicalizer extends AbstractElkAxiomVisitor<ElkAxiom> {
+class AxiomCanonicalizer extends NoOpElkAxiomVisitor<ElkAxiom> {
 
 	private static AxiomCanonicalizer INSTANCE_ = new AxiomCanonicalizer(new ElkObjectFactoryImpl());
 	

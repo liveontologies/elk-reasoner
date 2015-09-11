@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences.properties;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 
 /**
@@ -32,38 +33,37 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
  * @author Pavel Klinov
  *
  *         pavel.klinov@uni-ulm.de
+ * @author "Yevgeny Kazakov"
  */
-public class PropertyChainInitialization
-		extends
-		AbstractSubPropertyChainInference<IndexedPropertyChain, IndexedPropertyChain> {
+public class SubPropertyChainInit extends AbstractSubPropertyChainInference {
 
-	public PropertyChainInitialization(IndexedPropertyChain prop) {
-		super(prop, prop);
+	public SubPropertyChainInit(IndexedPropertyChain chain) {
+		super(chain, chain);
 	}
 
-	public IndexedPropertyChain getPropertyChain() {
-		return super.getSubPropertyChain();
+	public IndexedPropertyChain getChain() {
+		return super.getSubChain();
 	}
 
 	@Override
 	public String toString() {
-		return "Initialization( " + getPropertyChain() + " )";
+		return "Init sub-chain: " + getSubChain() + " => " + getSuperChain();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof PropertyChainInitialization)) {
+		if (obj == null || !(obj instanceof SubPropertyChainInit)) {
 			return false;
 		}
 
-		PropertyChainInitialization inf = (PropertyChainInitialization) obj;
+		SubPropertyChainInit inf = (SubPropertyChainInit) obj;
 
-		return getPropertyChain().equals(inf.getPropertyChain());
+		return getChain().equals(inf.getChain());
 	}
 
 	@Override
 	public int hashCode() {
-		return getPropertyChain().hashCode();
+		return getChain().hashCode();
 	}
 
 	@Override

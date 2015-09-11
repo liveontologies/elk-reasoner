@@ -31,6 +31,8 @@ import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.BackwardLinkInferenceVisitor;
 
 /**
@@ -53,18 +55,27 @@ public class ReversedForwardLink extends AbstractBackwardLinkInference {
 		this.forwardChain_ = premise.getForwardChain();
 	}
 
+	public IndexedPropertyChain getForwardChain() {
+		return forwardChain_;
+	}
+
 	@Override
 	public IndexedContextRoot getInferenceRoot() {
 		return getOriginRoot();
 	}
 
-	public ForwardLink getPremise() {
+	public ForwardLink getFirstPremise() {
 		return new ForwardLinkImpl<IndexedPropertyChain>(getInferenceRoot(),
 				forwardChain_, getConclusionRoot());
 	}
 
+	public SubPropertyChain getSecondPremise() {
+		return new SubPropertyChainImpl(forwardChain_, getBackwardRelation());
+	}
+
 	@Override
-	public <I, O> O accept(BackwardLinkInferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O accept(BackwardLinkInferenceVisitor<I, O> visitor,
+			I parameter) {
 		return visitor.visit(this, parameter);
 	}
 

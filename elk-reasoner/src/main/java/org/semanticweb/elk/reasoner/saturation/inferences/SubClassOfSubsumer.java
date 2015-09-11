@@ -53,6 +53,14 @@ public class SubClassOfSubsumer extends AbstractDecomposedSubsumerInference {
 		this.reason_ = reason;
 	}
 
+	public IndexedClassExpression getPremiseSubsumer() {
+		return this.premiseSubsumer_;
+	}
+
+	public ElkAxiom getReason() {
+		return this.reason_;
+	}
+
 	@Override
 	public IndexedContextRoot getInferenceRoot() {
 		return getConclusionRoot();
@@ -61,10 +69,6 @@ public class SubClassOfSubsumer extends AbstractDecomposedSubsumerInference {
 	public ComposedSubsumer getPremise() {
 		return new ComposedSubsumerImpl<IndexedClassExpression>(
 				getInferenceRoot(), premiseSubsumer_);
-	}
-
-	public ElkAxiom getReason() {
-		return this.reason_;
 	}
 
 	@Override

@@ -53,12 +53,16 @@ public class DecomposedDefinition extends AbstractDecomposedSubsumerInference {
 		this.reason_ = reason;
 	}
 
-	public DecomposedSubsumer getPremise() {
-		return new DecomposedSubsumerImpl(getInferenceRoot(), defined_);
+	public IndexedClass getDefined() {
+		return this.defined_;
 	}
 
 	public ElkAxiom getReason() {
 		return this.reason_;
+	}
+
+	public DecomposedSubsumer getPremise() {
+		return new DecomposedSubsumerImpl(getInferenceRoot(), defined_);
 	}
 
 	@Override

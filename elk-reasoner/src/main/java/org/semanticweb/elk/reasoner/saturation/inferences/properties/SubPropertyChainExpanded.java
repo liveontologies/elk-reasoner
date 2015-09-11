@@ -26,7 +26,6 @@ package org.semanticweb.elk.reasoner.saturation.inferences.properties;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -40,32 +39,29 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  *         pavel.klinov@uni-ulm.de
  * @author "Yevgeny Kazakov"
  */
-public class ToldSubProperty
-		extends
-		AbstractSubPropertyChainInference<IndexedPropertyChain, IndexedPropertyChain> {
+public class SubPropertyChainExpanded extends AbstractSubPropertyChainInference {
 
 	/**
 	 * The inferred sub-property of the super-chain for which the inference is
 	 * performed by unfolding under told sub-chain of this property
 	 */
-	private final IndexedObjectProperty premise_;
+	private final IndexedPropertyChain middleChain_;
 
 	/**
 	 * The {@link ElkAxiom} responsible for the told sub-chain of the premise
 	 */
 	private final ElkAxiom reason_;
 
-	public ToldSubProperty(IndexedPropertyChain subChain,
-			IndexedObjectProperty premise, IndexedPropertyChain superChain,
+	public SubPropertyChainExpanded(IndexedPropertyChain firstChain,
+			IndexedPropertyChain secondChain, IndexedPropertyChain thirdChain,
 			ElkAxiom reason) {
-		super(subChain, superChain);
-		this.premise_ = premise;
+		super(firstChain, thirdChain);
+		this.middleChain_ = secondChain;
 		this.reason_ = reason;
 	}
 
-	public SubPropertyChainImpl<IndexedObjectProperty, IndexedPropertyChain> getPremise() {
-		return new SubPropertyChainImpl<IndexedObjectProperty, IndexedPropertyChain>(
-				premise_, getSuperPropertyChain());
+	public SubPropertyChain getPremise() {
+		return new SubPropertyChainImpl(middleChain_, getSuperChain());
 	}
 
 	public ElkAxiom getReason() {
@@ -74,29 +70,28 @@ public class ToldSubProperty
 
 	@Override
 	public String toString() {
-		return "Told sub-chain: " + getSubPropertyChain() + " => "
-				+ getSuperPropertyChain() + ", premise: " + premise_ + " => "
-				+ getSuperPropertyChain();
+		return "Expanded sub-chain: " + getSubChain() + " => "
+				+ getSuperChain() + ", premise: " + middleChain_ + " => "
+				+ getSuperChain() + ", reason: " + reason_;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof ToldSubProperty)) {
+		if (obj == null || !(obj instanceof SubPropertyChainExpanded)) {
 			return false;
 		}
 
-		ToldSubProperty inf = (ToldSubProperty) obj;
+		SubPropertyChainExpanded inf = (SubPropertyChainExpanded) obj;
 
-		return premise_.equals(inf.premise_)
-				&& getSubPropertyChain().equals(inf.getSubPropertyChain())
-				&& getSuperPropertyChain().equals(inf.getSuperPropertyChain());
+		return middleChain_.equals(inf.middleChain_)
+				&& getSubChain().equals(inf.getSubChain())
+				&& getSuperChain().equals(inf.getSuperChain());
 	}
 
 	@Override
 	public int hashCode() {
-		return HashGenerator.combineListHash(premise_.hashCode(),
-				getSubPropertyChain().hashCode(), getSuperPropertyChain()
-						.hashCode());
+		return HashGenerator.combineListHash(middleChain_.hashCode(),
+				getSubChain().hashCode(), getSuperChain().hashCode());
 	}
 
 	@Override

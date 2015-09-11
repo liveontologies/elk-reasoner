@@ -56,7 +56,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLi
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.AbstractObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldSubProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainExpanded;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
@@ -194,7 +194,7 @@ public class TracingTest {
 
 			@Override
 			public Boolean visit(
-					ToldSubProperty inference,
+					SubPropertyChainExpanded inference,
 					Void input) {
 				ElkAxiom axiom = new SideConditionLookup().lookup(inference);
 				

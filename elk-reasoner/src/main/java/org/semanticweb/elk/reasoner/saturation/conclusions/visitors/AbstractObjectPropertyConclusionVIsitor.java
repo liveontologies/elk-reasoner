@@ -26,7 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainImpl;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChain;
 
 /**
  * @author Pavel Klinov
@@ -40,7 +40,7 @@ public abstract class AbstractObjectPropertyConclusionVIsitor<I, O> implements
 			I input);
 
 	@Override
-	public O visit(SubPropertyChainImpl<?, ?> conclusion, I input) {
+	public O visit(SubPropertyChain conclusion, I input) {
 		return defaultVisit(conclusion, input);
 	}
 

@@ -52,17 +52,17 @@ public class DecomposedReflexiveBackwardLink extends
 		inferenceRoot_ = inferenceRoot;
 	}
 
+	@Override
+	public IndexedContextRoot getInferenceRoot() {
+		return inferenceRoot_;
+	}
+
 	public IndexedObjectHasSelf getDecomposedExistential() {
 		return this.existential_;
 	}
 
 	public DecomposedSubsumer getPremise() {
 		return new DecomposedSubsumerImpl(getInferenceRoot(), existential_);
-	}
-
-	@Override
-	public IndexedContextRoot getInferenceRoot() {
-		return inferenceRoot_;
 	}
 
 	@Override

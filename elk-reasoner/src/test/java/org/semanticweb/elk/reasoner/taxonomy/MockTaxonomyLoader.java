@@ -31,7 +31,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
@@ -52,6 +51,7 @@ import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.owl.visitors.AbstractElkEntityVisitor;
+import org.semanticweb.elk.owl.visitors.NoOpElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.taxonomy.MockInstanceTaxonomy.MutableTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
@@ -114,7 +114,7 @@ public class MockTaxonomyLoader {
 		}
 	}
 
-	static class TaxonomyInserter extends AbstractElkAxiomVisitor<Void>
+	static class TaxonomyInserter extends NoOpElkAxiomVisitor<Void>
 			implements Owl2ParserAxiomProcessor {
 
 		boolean createNodes = false;

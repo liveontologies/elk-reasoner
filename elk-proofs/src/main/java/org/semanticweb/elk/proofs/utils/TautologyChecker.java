@@ -21,11 +21,11 @@ package org.semanticweb.elk.proofs.utils;
  * #L%
  */
 
-import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.owl.visitors.NoOpElkAxiomVisitor;
 import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
@@ -43,7 +43,7 @@ import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
  * pavel.klinov@uni-ulm.de
  */
 public class TautologyChecker extends
-		AbstractElkAxiomVisitor<Boolean> implements
+		NoOpElkAxiomVisitor<Boolean> implements
 		ExpressionVisitor<Void, Boolean>, ElkLemmaVisitor<Void, Boolean> {
 
 	@Override

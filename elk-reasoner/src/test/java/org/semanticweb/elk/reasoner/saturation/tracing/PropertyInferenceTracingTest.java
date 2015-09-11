@@ -49,9 +49,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.AbstractObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainImpl;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldSubProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainExpanded;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 import org.slf4j.Logger;
@@ -103,12 +102,12 @@ public class PropertyInferenceTracingTest {
 					}
 
 					@Override
-					public Boolean visit(ToldSubProperty inference,
+					public Boolean visit(SubPropertyChainExpanded inference,
 							Void input) {
 						// checking that S -> HH is in the trace (i.e. is used)
-						return inference.getSubPropertyChain().equals(s) && 
-								inference.getSuperPropertyChain().equals(hh) &&
-								inference.getPremise().getSubPropertyChain().equals(r);
+						return inference.getSubChain().equals(s) && 
+								inference.getSuperChain().equals(hh) &&
+								inference.getPremise().getSubChain().equals(r);
 					}
 			
 				});
@@ -161,14 +160,14 @@ public class PropertyInferenceTracingTest {
 					public Boolean visit(ComposedForwardLink conclusion,
 							IndexedContextRoot input) {
 						// looking for the composition S o H -> SS o HH
-						SubObjectProperty left = conclusion.getLeftSubObjectProperty();
-						SubPropertyChainImpl<?,?> right = conclusion.getRightSubObjectPropertyChain();
+						SubPropertyChain left = conclusion.getSecondPremise();
+						SubPropertyChain right = conclusion.getFourthPremise();
 						
 							return conclusion.getTarget().equals(dIndexed) &&
-									left.getSubPropertyChain().equals(sIndexed) &&
-									left.getSuperPropertyChain().equals(ssIndexed) &&
-									right.getSubPropertyChain().equals(hIndexed) &&
-									right.getSuperPropertyChain().equals(hhIndexed) &&
+									left.getSubChain().equals(sIndexed) &&
+									left.getSuperChain().equals(ssIndexed) &&
+									right.getSubChain().equals(hIndexed) &&
+									right.getSuperChain().equals(hhIndexed) &&
 									conclusion.getForwardChain().equals(sshhIndexed);
 					}
 			
@@ -188,10 +187,10 @@ public class PropertyInferenceTracingTest {
 					}
 
 					@Override
-					public Boolean visit(ToldSubProperty inference,
+					public Boolean visit(SubPropertyChainExpanded inference,
 							Void input) {
-						return inference.getSubPropertyChain().equals(sIndexed) &&
-								inference.getSuperPropertyChain().equals(ssIndexed);
+						return inference.getSubChain().equals(sIndexed) &&
+								inference.getSuperChain().equals(ssIndexed);
 					}
 					
 				});
@@ -212,10 +211,10 @@ public class PropertyInferenceTracingTest {
 						// check that we use the inference that A <-R- B and B -SS o HH-> D imply A <-T- D  
 						return backwardLink.getBackwardRelation().equals(tIndexed) &&
 								backwardLink.getOriginRoot().equals(aIndexed) &&
-								backwardLink.getBackwardLink().getOriginRoot().equals(aIndexed) &&
-								backwardLink.getBackwardLink().getBackwardRelation().equals(rIndexed) &&
-								backwardLink.getForwardLink().getTarget().equals(dIndexed) &&
-								backwardLink.getForwardLink().getForwardChain().equals(sshhIndexed) &&
+								backwardLink.getFirstPremise().getOriginRoot().equals(aIndexed) &&
+								backwardLink.getFirstPremise().getBackwardRelation().equals(rIndexed) &&
+								backwardLink.getThirdPremise().getTarget().equals(dIndexed) &&
+								backwardLink.getThirdPremise().getForwardChain().equals(sshhIndexed) &&
 								backwardLink.getBackwardRelation().equals(tIndexed);
 					}
 
@@ -229,10 +228,10 @@ public class PropertyInferenceTracingTest {
 					}
 
 					@Override
-					public Boolean visit(ToldSubProperty inference,
+					public Boolean visit(SubPropertyChainExpanded inference,
 							Void input) {
-						return inference.getSubPropertyChain().equals(rIndexed) &&
-								inference.getSuperPropertyChain().equals(rrIndexed);
+						return inference.getSubChain().equals(rIndexed) &&
+								inference.getSuperChain().equals(rrIndexed);
 					}
 
 				});		

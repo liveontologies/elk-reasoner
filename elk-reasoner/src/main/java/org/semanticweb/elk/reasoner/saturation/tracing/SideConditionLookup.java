@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLi
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.AbstractObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldSubProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainExpanded;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
 
@@ -107,7 +107,7 @@ public class SideConditionLookup {
 		}
 
 		@Override
-		public ElkAxiom visit(ToldSubProperty inference, Void input) {
+		public ElkAxiom visit(SubPropertyChainExpanded inference, Void input) {
 			return inference.getReason();
 		}
 
