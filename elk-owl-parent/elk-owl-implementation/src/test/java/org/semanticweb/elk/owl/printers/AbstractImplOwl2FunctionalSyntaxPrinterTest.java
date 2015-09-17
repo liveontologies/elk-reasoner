@@ -29,7 +29,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
-import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
@@ -52,7 +51,7 @@ public abstract class AbstractImplOwl2FunctionalSyntaxPrinterTest extends
 		ModelOwl2FunctionalSyntaxPrinterTest {
 
 	@Override
-	protected Set<? extends ElkObject> getOriginalElkObjects(List<ElkPrefix> prefixes) {
+	protected List<? extends ElkObject> getOriginalElkObjects(List<ElkPrefix> prefixes) {
 		InputStream input = getClass().getClassLoader().getResourceAsStream(
 				"owl2primer.owl");
 
@@ -62,14 +61,14 @@ public abstract class AbstractImplOwl2FunctionalSyntaxPrinterTest extends
 	}
 
 	@Override
-	protected Set<? extends ElkObject> loadPrintedElkObjects(String input, List<ElkPrefix> prefixes) {
+	protected List<? extends ElkObject> loadPrintedElkObjects(String input, List<ElkPrefix> prefixes) {
 		String ontology = " Ontology(<http://example.com/owl/> \n" + input
 				+ "\n)";
 
 		return parseAxioms(new StringReader(ontology), prefixes, true);
 	}
 
-	protected Set<? extends ElkObject> parseAxioms(Reader reader, final List<ElkPrefix> prefixes,
+	protected List<? extends ElkObject> parseAxioms(Reader reader, final List<ElkPrefix> prefixes,
 			boolean addDefaultDecl) {
 		final Owl2Parser parser = instantiateParser(reader);
 		ElkTestAxiomProcessor counter = new ElkTestAxiomProcessor();

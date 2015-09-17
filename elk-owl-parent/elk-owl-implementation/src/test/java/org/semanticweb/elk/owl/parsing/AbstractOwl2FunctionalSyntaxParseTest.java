@@ -37,9 +37,9 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.junit.Test;
 import org.semanticweb.elk.owl.implementation.ElkDataPropertyListRestrictionQualifiedImpl;
@@ -138,9 +138,9 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 			throws IOException {
 		boolean error = false;
 		// parsed without errors, check the output
-		for (Iterator<Entry<Class<?>, Set<ElkAxiom>>> actualEntryIter = processor
+		for (Iterator<Entry<Class<?>, List<ElkAxiom>>> actualEntryIter = processor
 				.getAxiomMapEntries().iterator(); actualEntryIter.hasNext();) {
-			Map.Entry<Class<?>, Set<ElkAxiom>> actualEntry = actualEntryIter
+			Map.Entry<Class<?>, List<ElkAxiom>> actualEntry = actualEntryIter
 					.next();
 			// check that the parser created the right number of axioms of each
 			// type
@@ -190,7 +190,7 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 		return count;
 	}
 
-	private static void dumpAxioms(Set<ElkAxiom> axioms) throws IOException {
+	private static void dumpAxioms(Iterable<? extends ElkAxiom> axioms) throws IOException {
 		StringBuilder builder = new StringBuilder();
 
 		for (ElkAxiom axiom : axioms) {
@@ -338,7 +338,7 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 				+ ")\n" + ")";
 
 		ElkTestAxiomProcessor counter = parseOntology(input);
-		Set<ElkAxiom> axioms = counter
+		List<ElkAxiom> axioms = counter
 				.getAxiomsForType(ElkSubClassOfAxiom.class);
 
 		assertEquals(2, axioms.size());

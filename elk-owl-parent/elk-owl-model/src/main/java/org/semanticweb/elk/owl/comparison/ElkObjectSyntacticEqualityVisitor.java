@@ -119,7 +119,8 @@ public class ElkObjectSyntacticEqualityVisitor implements
 	}
 
 	public static boolean equals(ElkObject first, Object second) {
-		return first.accept(new ElkObjectSyntacticEqualityVisitor(second)) == second;
+		return first == null ? second == null
+				: first.accept(new ElkObjectSyntacticEqualityVisitor(second)) == second;
 	}
 
 	private static boolean equals(List<? extends ElkObject> first,

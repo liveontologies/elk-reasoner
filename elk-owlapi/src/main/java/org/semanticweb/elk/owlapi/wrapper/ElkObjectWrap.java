@@ -25,7 +25,10 @@
  */
 package org.semanticweb.elk.owlapi.wrapper;
 
+import org.semanticweb.elk.owl.comparison.ElkObjectSyntacticEqualityVisitor;
+import org.semanticweb.elk.owl.comparison.ElkObjectSyntacticHasherVisitor;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.owlapi.model.OWLObject;
 
 /**
@@ -55,24 +58,18 @@ public abstract class ElkObjectWrap<T extends OWLObject> implements ElkObject {
 	}
 
 	@Override
-	public final int hashCode() {
-		return owlObject.hashCode();
+	public int hashCode() {
+		return ElkObjectSyntacticHasherVisitor.hashCode(this);
 	}
 
 	@Override
-	public final boolean equals(Object other) {
-		if (other == this)
-			return true;
-		if (other instanceof ElkObjectWrap<?>) {
-			ElkObjectWrap<?> otherWrap = (ElkObjectWrap<?>) other;
-			return (owlObject.equals(otherWrap.owlObject));
-		}
-		// else
-		return false;
+	public boolean equals(Object other) {
+		return ElkObjectSyntacticEqualityVisitor.equals(this, other);
 	}
-	
+
 	@Override
 	public String toString() {
-		return owlObject.toString();
+		return OwlFunctionalStylePrinter.toString(this);
 	}
+
 }

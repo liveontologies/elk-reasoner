@@ -73,6 +73,7 @@ import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNegativeDataPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkNegativeObjectPropertyAssertionAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityQualified;
@@ -110,7 +111,13 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkObjectSyntacticHasherVisitor implements
 		ElkObjectVisitor<Integer> {
 
-	static int combinedHashCode(Object... objects) {
+	private static ElkObjectVisitor<Integer> HASHER_VISITOR_ = new ElkObjectSyntacticHasherVisitor();
+
+	public static int hashCode(ElkObject object) {
+		return object == null ? 0 : object.accept(HASHER_VISITOR_);
+	}
+
+	private static int combinedHashCode(Object... objects) {
 		return Arrays.deepHashCode(objects);
 	}
 
