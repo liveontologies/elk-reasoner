@@ -61,11 +61,6 @@ public abstract class AbstractSubsumer<S extends IndexedClassExpression>
 		return expression_;
 	}
 
-	@Override
-	public String toString() {
-		return "Subsumer(" + expression_.toString() + ")";
-	}
-
 	void applyCompositionRules(RuleVisitor<?> ruleAppVisitor,
 			ContextPremises premises, ConclusionProducer producer) {
 		LinkedSubsumerRule compositionRule = expression_

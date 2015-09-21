@@ -22,11 +22,15 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.SubPropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.inferences.visitors.BackwardLinkInferenceVisitor;
 
 /**
  * A {@link BackwardLink} that is obtained by reversing a given
@@ -35,27 +39,41 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenc
  * @author "Yevgeny Kazakov"
  * 
  */
-public class SuperReversedForwardLink extends ReversedForwardLink {
+public class SuperReversedForwardLink extends AbstractBackwardLinkInference {
 
 	/**
-	 * The {@link ElkAxiom} responsible for relation to be a super-property of
-	 * the role chain from the forward link
+	 * The sub chain of the property of this link that occurs in the premise
+	 * forward link
 	 */
-	private final ElkAxiom reason_;
+	private final IndexedPropertyChain subChain_;
 
-	public SuperReversedForwardLink(IndexedObjectProperty relation,
-			ForwardLink forwardLink, ElkAxiom reason) {
-		super(forwardLink, relation);
-		this.reason_ = reason;
-	}
-
-	public ElkAxiom getReason() {
-		return this.reason_;
+	public SuperReversedForwardLink(ForwardLink premise,
+			IndexedObjectProperty superProperty) {
+		super(premise.getTarget(), superProperty, premise.getConclusionRoot());
+		this.subChain_ = premise.getForwardChain();
 	}
 
 	@Override
-	public <I, O> O accept(ClassInferenceVisitor<I, O> visitor, I parameter) {
-		return visitor.visit(this, parameter);
+	public IndexedContextRoot getInferenceRoot() {
+		return getOriginRoot();
+	}
+
+	public IndexedPropertyChain getSubChain() {
+		return this.subChain_;
+	}
+
+	public ForwardLink getFirstPremise() {
+		return new ForwardLinkImpl<IndexedPropertyChain>(getInferenceRoot(),
+				subChain_, getConclusionRoot());
+	}
+
+	public SubPropertyChain getSecondPremise() {
+		return new SubPropertyChainImpl(subChain_, getBackwardRelation());
+	}
+
+	@Override
+	public <I, O> O accept(BackwardLinkInferenceVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
 
 }

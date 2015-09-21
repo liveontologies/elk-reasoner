@@ -49,8 +49,4 @@ public class ComposedSubsumerImpl<S extends IndexedClassExpression> extends
 		return visitor.visit(this, input);
 	}
 
-	@Override
-	public String toString() {
-		return "Composed" + super.toString();
-	}
 }

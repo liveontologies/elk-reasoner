@@ -110,8 +110,12 @@ public class ProofUnwindingFactory<C extends Conclusion, J extends ProofUnwindin
 		Conclusion next;
 		for (;;) {
 			next = unwindingState.todoConclusions.poll();
-			if (next != null)
-				break;
+			if (next != null) {
+				if (unwindingState.processedConclusions.add(next))
+					break;
+				// else
+				continue;
+			}
 			// else
 			ClassInference nextInference = unwindingState.todoInferences.poll();
 			if (nextInference == null) {
@@ -122,11 +126,8 @@ public class ProofUnwindingFactory<C extends Conclusion, J extends ProofUnwindin
 				return;
 			}
 			// else
-			if (unwindingState.processedInferences.add(nextInference)) {
-				nextInference.accept(
-						ProofUnwindingState.PREMISE_INSERTION_VISITOR,
-						unwindingState);
-			}
+			nextInference.accept(ProofUnwindingState.PREMISE_INSERTION_VISITOR,
+					unwindingState);
 		}
 		jobsToDo_.add(new ContextTracingJobForProofUnwinding<C, J>(next,
 				unwindingState));

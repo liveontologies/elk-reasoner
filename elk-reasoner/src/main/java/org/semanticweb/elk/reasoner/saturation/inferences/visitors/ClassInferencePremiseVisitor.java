@@ -155,13 +155,14 @@ public class ClassInferencePremiseVisitor<I, O> implements
 
 	@Override
 	public O visit(ReversedForwardLink conclusion, I input) {
-		conclusion.getFirstPremise().accept(classPremiseVisitor_, input);
+		conclusion.getPremise().accept(classPremiseVisitor_, input);
 		return null;
 	}
 
 	@Override
 	public O visit(SuperReversedForwardLink conclusion, I input) {
 		conclusion.getFirstPremise().accept(classPremiseVisitor_, input);
+		conclusion.getSecondPremise().accept(propertyPremiseVisitor_, input);
 		return null;
 	}
 
@@ -185,7 +186,7 @@ public class ClassInferencePremiseVisitor<I, O> implements
 
 	@Override
 	public O visit(DecomposedReflexiveForwardLink conclusion, I input) {
-		conclusion.getExistential().accept(classPremiseVisitor_, input);
+		conclusion.getPremise().accept(classPremiseVisitor_, input);
 		return null;
 	}
 

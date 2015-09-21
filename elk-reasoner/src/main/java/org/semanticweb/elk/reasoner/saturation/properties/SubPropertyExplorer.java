@@ -249,6 +249,7 @@ class SubPropertyExplorer {
 							subProperties, leftSubProperties);
 					if (commonSubProperties.isEmpty())
 						continue;
+					// else
 					for (IndexedObjectProperty rightSubProperty : getSubProperties(
 							composition.getSuffixChain(), inferenceProducer))
 						for (IndexedObjectProperty commonLeft : commonSubProperties)

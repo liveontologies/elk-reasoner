@@ -27,6 +27,9 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ConclusionEquality;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ConclusionHash;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ConclusionPrinter;
 
 /**
  * A skeleton for implementation of {@link Conclusion}s.
@@ -51,6 +54,21 @@ public abstract class AbstractConclusion implements Conclusion {
 	@Override
 	public IndexedContextRoot getOriginRoot() {
 		return this.root_;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return ConclusionEquality.equals(this, o);
+	}
+
+	@Override
+	public int hashCode() {
+		return ConclusionHash.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return ConclusionPrinter.toString(this);
 	}
 
 }

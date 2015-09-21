@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.inferences.properties;
+package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
 /*
  * #%L
@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences.properties;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectPropertyConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChain;
 
 /**
  * An implementation of {@link SubPropertyChain}
@@ -37,7 +38,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectProper
  * 
  * @author "Yevgeny Kazakov"
  */
-public class SubPropertyChainImpl implements SubPropertyChain {
+public class SubPropertyChainImpl extends AbstractObjectPropertyConclusion
+		implements SubPropertyChain {
 
 	private final IndexedPropertyChain subChain_, superChain_;
 
@@ -55,11 +57,6 @@ public class SubPropertyChainImpl implements SubPropertyChain {
 	@Override
 	public IndexedPropertyChain getSuperChain() {
 		return superChain_;
-	}
-
-	@Override
-	public String toString() {
-		return "SubPropertyChain(" + subChain_ + " " + superChain_ + ")";
 	}
 
 	@Override

@@ -23,7 +23,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.owl;
+package org.semanticweb.elk.owl.visitors;
 
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationPropertyDomainAxiom;
@@ -67,16 +67,18 @@ import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 
 /**
- * Does nothing, simply helps subclasses to focus on methods they want to
- * implement
+ * An {@link ElkAxiomVisitor} that always returns {@code null}.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
  * @param <O>
  *            the type of the visitor output
  */
-public abstract class AbstractElkAxiomVisitor<O> implements ElkAxiomVisitor<O> {
+public class NoOpElkAxiomVisitor<O> implements ElkAxiomVisitor<O> {
 
 	/**
 	 * Invoked to visit every logical axiom
@@ -318,5 +320,5 @@ public abstract class AbstractElkAxiomVisitor<O> implements ElkAxiomVisitor<O> {
 	public O visit(ElkSWRLRule rule) {
 		return defaultLogicalVisit(rule);
 	}
-	
+
 }

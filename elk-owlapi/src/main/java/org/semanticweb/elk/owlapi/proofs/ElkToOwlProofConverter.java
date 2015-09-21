@@ -27,7 +27,6 @@ package org.semanticweb.elk.owlapi.proofs;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -45,6 +44,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
+import org.semanticweb.elk.owl.visitors.NoOpElkAxiomVisitor;
 import org.semanticweb.elk.owlapi.wrapper.ElkAxiomWrap;
 import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.Expression;
@@ -96,7 +96,7 @@ public class ElkToOwlProofConverter {
 	public static OWLAxiom convert(ElkAxiom axiom) {
 		final OWLDataFactory factory = OWLManager.getOWLDataFactory();
 
-		return axiom.accept(new AbstractElkAxiomVisitor<OWLAxiom>() {
+		return axiom.accept(new NoOpElkAxiomVisitor<OWLAxiom>() {
 
 			@Override
 			protected OWLAxiom defaultLogicalVisit(ElkAxiom axiom) {

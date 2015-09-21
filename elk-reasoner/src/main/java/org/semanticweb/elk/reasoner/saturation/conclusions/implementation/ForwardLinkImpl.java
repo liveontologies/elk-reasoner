@@ -78,9 +78,4 @@ public class ForwardLinkImpl<R extends IndexedPropertyChain> extends
 		return visitor.visit(this, input);
 	}
 
-	@Override
-	public String toString() {
-		return forwardChain_ + "->" + target_;
-	}
-
 }

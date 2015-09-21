@@ -67,7 +67,7 @@ public interface IndexedPropertyChain extends IndexedObject {
 
 	/**
 	 * @return All {@link IndexedComplexPropertyChain}s in which this
-	 *         {@link IndexedPropertyChain} is a right property
+	 *         {@link IndexedPropertyChain} is a suffix
 	 * 
 	 * @see IndexedComplexPropertyChain#getSuffixChain()
 	 */

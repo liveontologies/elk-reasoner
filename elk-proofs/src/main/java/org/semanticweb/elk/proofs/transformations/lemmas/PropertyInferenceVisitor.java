@@ -67,12 +67,12 @@ abstract class PropertyInferenceVisitor extends AbstractObjectPropertyInferenceV
 
 	@Override
 	public Inference visit(LeftReflexiveSubPropertyChainInference inference, AxiomExpression<ElkSubObjectPropertyOfAxiom> premise) {
-		return createReflexivityEliminationInference(createReflexivityPremise(inference.getReflexivePremise().getRelation()));
+		return createReflexivityEliminationInference(createReflexivityPremise(inference.getReflexivePremise().getFullChain()));
 	}
 
 	@Override
 	public Inference visit(final RightReflexiveSubPropertyChainInference inference, final AxiomExpression<ElkSubObjectPropertyOfAxiom> premise) {
-		return inference.getReflexivePremise().getRelation().accept(new IndexedPropertyChainVisitor<Inference>() {
+		return inference.getReflexivePremise().getFullChain().accept(new IndexedPropertyChainVisitor<Inference>() {
 
 			@Override
 			public Inference visit(IndexedObjectProperty iop) {
@@ -89,8 +89,8 @@ abstract class PropertyInferenceVisitor extends AbstractObjectPropertyInferenceV
 	@Override
 	public Inference visit(ToldSubProperty inference, AxiomExpression<ElkSubObjectPropertyOfAxiom> premise) {
 		// using only told hierarchy here
-		if (inference.getSuperChain() instanceof IndexedObjectProperty && 
-				inference.getSubChain().getToldSuperProperties().contains(inference.getSuperChain())) {
+		if (inference.getFullSuperChain() instanceof IndexedObjectProperty && 
+				inference.getFullSubChain().getToldSuperProperties().contains(inference.getFullSuperChain())) {
 			ElkSubObjectPropertyOfAxiom axiom = (ElkSubObjectPropertyOfAxiom) new SideConditionLookup().lookup(inference);
 			
 			return createSubChainInference(exprFactory_.createAsserted(axiom));

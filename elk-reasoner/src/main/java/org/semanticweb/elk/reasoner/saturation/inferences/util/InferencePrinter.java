@@ -125,13 +125,13 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>,
 
 	@Override
 	public String visit(ReversedForwardLink conclusion, Void parameter) {
-		return "Reversing forward link " + conclusion.getFirstPremise();
+		return "Reversing forward link " + conclusion.getPremise();
 	}
 
 	@Override
 	public String visit(SuperReversedForwardLink conclusion, Void input) {
 		return "Reversing forward link " + conclusion.getFirstPremise()
-				+ " and unfolding under " + conclusion.getReason();
+				+ " and unfolding under " + conclusion.getSecondPremise();
 	}
 
 	@Override
@@ -152,7 +152,7 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>,
 
 	@Override
 	public String visit(DecomposedReflexiveForwardLink conclusion, Void input) {
-		return "Creating forward link from " + conclusion.getExistential();
+		return "Creating forward link from " + conclusion.getPremise();
 	}
 
 	@Override

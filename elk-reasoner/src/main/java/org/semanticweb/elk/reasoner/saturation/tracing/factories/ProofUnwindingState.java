@@ -43,7 +43,7 @@ class ProofUnwindingState<I extends Conclusion, J extends ProofUnwindingJob<I>> 
 
 	final J initiatorJob;
 
-	final Set<ClassInference> processedInferences;
+	final Set<Conclusion> processedConclusions;
 
 	final Queue<Conclusion> todoConclusions;
 
@@ -51,7 +51,7 @@ class ProofUnwindingState<I extends Conclusion, J extends ProofUnwindingJob<I>> 
 
 	ProofUnwindingState(J initiatorJob) {
 		this.initiatorJob = initiatorJob;
-		this.processedInferences = new ArrayHashSet<ClassInference>();
+		this.processedConclusions = new ArrayHashSet<Conclusion>();
 		this.todoInferences = new LinkedList<ClassInference>();
 		this.todoConclusions = new LinkedList<Conclusion>();
 		todoConclusions.add(initiatorJob.getInput());

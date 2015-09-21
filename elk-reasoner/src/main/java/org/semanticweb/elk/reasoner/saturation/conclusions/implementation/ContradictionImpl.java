@@ -52,9 +52,4 @@ public class ContradictionImpl extends AbstractConclusion implements
 		return visitor.visit(this, input);
 	}
 
-	@Override
-	public String toString() {
-		return "Contradiction";
-	}
-
 }

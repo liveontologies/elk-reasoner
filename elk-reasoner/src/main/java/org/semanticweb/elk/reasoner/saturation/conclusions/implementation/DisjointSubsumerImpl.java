@@ -76,9 +76,4 @@ public class DisjointSubsumerImpl extends AbstractConclusion implements
 		return visitor.visit(this, input);
 	}
 
-	@Override
-	public String toString() {
-		return axiom_.toString() + ":" + member_.toString();
-	}
-
 }

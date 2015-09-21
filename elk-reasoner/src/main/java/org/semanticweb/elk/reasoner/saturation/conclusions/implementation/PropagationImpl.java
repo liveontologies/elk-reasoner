@@ -59,11 +59,6 @@ public class PropagationImpl extends AbstractSubConclusion implements
 	}
 
 	@Override
-	public String toString() {
-		return "Propagation " + getConclusionSubRoot() + "->" + carry_;
-	}
-
-	@Override
 	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
 		return accept((SubConclusionVisitor<I, O>) visitor, input);
 	}

@@ -1,3 +1,6 @@
+/**
+ * 
+ */
 package org.semanticweb.elk.reasoner.saturation.tracing;
 
 /*
@@ -6,7 +9,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +25,26 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
 
-public interface ModifiableClassInferenceSet extends ClassInferenceSet {
+/**
+ * An implementation for {@link ModifiableObjectPropertyInferenceSet}. Insertion
+ * of inferences is synchronized. Inferences should not be read while insertion
+ * is in place.
+ * 
+ * @author "Yevgeny Kazakov"
+ */
+public class SynchronizedModifiableObjectPropertyInferenceSet extends
+		ModifiableObjectPropertyInferenceSetImpl {
 
-	void add(ClassInference inference);
+	@Override
+	public synchronized void add(ObjectPropertyInference inference) {
+		super.add(inference);
+	}
 
-	public void clear();
+	@Override
+	public synchronized void clear() {
+		super.clear();
+	}
 
 }

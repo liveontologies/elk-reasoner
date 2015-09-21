@@ -25,137 +25,60 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
-import java.util.Collections;
-import java.util.Map;
-
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectPropertyConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusionEquality;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusionHash;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainExpanded;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainInit;
-import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 
 /**
- * An implementation of a {@link ModifiableObjectPropertyInferenceSet}.
- * Insertion of inferences is synchronized. Inferences should not be read while
- * insertion is in place.
- * 
- * @author Pavel Klinov
- *
- *         pavel.klinov@uni-ulm.de
+ * An implementation for {@link ModifiableObjectPropertyInferenceSet}.
  * 
  * @author "Yevgeny Kazakov"
  */
 public class ModifiableObjectPropertyInferenceSetImpl implements
 		ModifiableObjectPropertyInferenceSet {
 
-	private final ObjectPropertyInferenceVisitor<ModifiableObjectPropertyInferenceSetImpl, Void> INFERENCE_INSERTER_ = new InferenceInserter();
-
-	private final ObjectPropertyConclusionVisitor<ModifiableObjectPropertyInferenceSetImpl, Iterable<? extends ObjectPropertyInference>> INFERENCE_READER_ = new InferenceReader();
-
-	private Map<IndexedPropertyChain, Multimap<IndexedPropertyChain, SubPropertyChainInference>> subPropertyChainInferences_;
+	private final Multimap<Key, ObjectPropertyInference> inferenceMap_ = new HashListMultimap<Key, ObjectPropertyInference>();
 
 	@Override
-	public Iterable<? extends ObjectPropertyInference> getObjectPropertyInferences(
-			ObjectPropertyConclusion conclusion) {
-		return conclusion.accept(INFERENCE_READER_, this);
-	}
-
-	@Override
-	public synchronized void add(ObjectPropertyInference inference) {
-		inference.accept(INFERENCE_INSERTER_, this);
+	public void add(ObjectPropertyInference inference) {
+		inferenceMap_.add(new Key(inference), inference);
 	}
 
 	@Override
 	public void clear() {
-		subPropertyChainInferences_.clear();
+		inferenceMap_.clear();
 	}
 
-	// TODO: move the static methods to a better location for sharing
-	static <K1, K2, V> void addValue(Map<K1, Multimap<K2, V>> nestedMap,
-			K1 key1, K2 key2, V value) {
-		Multimap<K2, V> traces = nestedMap.get(key1);
-		if (traces == null) {
-			traces = new HashListMultimap<K2, V>();
-			nestedMap.put(key1, traces);
-		}
-		traces.add(key2, value);
+	@Override
+	public Iterable<? extends ObjectPropertyInference> getObjectPropertyInferences(
+			ObjectPropertyConclusion conclusion) {
+		return inferenceMap_.get(new Key(conclusion));
 	}
 
-	static <V> Iterable<V> emptyIfNull(Iterable<V> items) {
-		return (items == null) ? Collections.<V> emptyList() : items;
-	}
+	static class Key {
 
-	static <K1, K2, V> Iterable<V> getValues(Map<K1, Multimap<K2, V>> map,
-			K1 key, K2 value) {
-		Multimap<K2, V> traces = map.get(key);
-		return (traces == null) ? Collections.<V> emptyList()
-				: emptyIfNull(traces.get(value));
-	}
+		private final ObjectPropertyConclusion conclusion_;
 
-	private synchronized void addInference(SubPropertyChainInference inference) {
-		if (subPropertyChainInferences_ == null)
-			subPropertyChainInferences_ = new ArrayHashMap<IndexedPropertyChain, Multimap<IndexedPropertyChain, SubPropertyChainInference>>();
-		addValue(subPropertyChainInferences_, inference.getSubChain(),
-				inference.getSuperChain(), inference);
-	}
-
-	private Iterable<? extends SubPropertyChainInference> getInferences(
-			SubPropertyChain conclusion) {
-		if (subPropertyChainInferences_ == null)
-			return Collections.emptyList();
-		return getValues(subPropertyChainInferences_, conclusion.getSubChain(),
-				conclusion.getSuperChain());
-	}
-
-	/**
-	 * Writes inferences.
-	 * 
-	 * @author Pavel Klinov pavel.klinov@uni-ulm.de
-	 *
-	 */
-	private static class InferenceInserter
-			implements
-			ObjectPropertyInferenceVisitor<ModifiableObjectPropertyInferenceSetImpl, Void> {
-
-		@Override
-		public Void visit(SubPropertyChainInit inference,
-				ModifiableObjectPropertyInferenceSetImpl input) {
-			input.addInference(inference);
-			return null;
+		Key(ObjectPropertyConclusion conclusion) {
+			this.conclusion_ = conclusion;
 		}
 
 		@Override
-		public Void visit(SubPropertyChainExpanded inference,
-				ModifiableObjectPropertyInferenceSetImpl input) {
-			input.addInference(inference);
-			return null;
+		public int hashCode() {
+			return ObjectPropertyConclusionHash.hashCode(conclusion_);
 		}
 
-	}
-
-	/**
-	 * Reads inferences
-	 * 
-	 * 
-	 * @author Pavel Klinov pavel.klinov@uni-ulm.de
-	 *
-	 */
-	private static class InferenceReader
-			implements
-			ObjectPropertyConclusionVisitor<ModifiableObjectPropertyInferenceSetImpl, Iterable<? extends ObjectPropertyInference>> {
-
 		@Override
-		public Iterable<? extends ObjectPropertyInference> visit(
-				SubPropertyChain conclusion,
-				ModifiableObjectPropertyInferenceSetImpl input) {
-			return input.getInferences(conclusion);
+		public boolean equals(Object other) {
+			if (other instanceof Key) {
+				return ObjectPropertyConclusionEquality.equals(conclusion_,
+						((Key) other).conclusion_);
+			}
+			// else
+			return false;
 		}
 
 	}

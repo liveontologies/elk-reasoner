@@ -65,11 +65,6 @@ public class BackwardLinkImpl extends AbstractSubConclusion implements
 	}
 
 	@Override
-	public String toString() {
-		return (getBackwardRelation() + "<-" + origin_);
-	}
-
-	@Override
 	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
 		return accept((SubConclusionVisitor<I, O>) visitor, input);
 	}

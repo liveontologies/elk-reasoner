@@ -64,7 +64,7 @@ public class DecomposedReflexiveForwardLink extends AbstractConclusion
 		return getInferenceRoot();
 	}
 
-	public DecomposedSubsumer getExistential() {
+	public DecomposedSubsumer getPremise() {
 		return new DecomposedSubsumerImpl(getInferenceRoot(), existential_);
 	}
 

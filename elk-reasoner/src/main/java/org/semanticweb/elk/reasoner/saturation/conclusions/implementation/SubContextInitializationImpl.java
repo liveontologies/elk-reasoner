@@ -51,9 +51,4 @@ public class SubContextInitializationImpl extends AbstractSubConclusion
 		return visitor.visit(this, input);
 	}
 
-	@Override
-	public String toString() {
-		return "SubInit(" + getConclusionSubRoot() + ")";
-	}
-
 }

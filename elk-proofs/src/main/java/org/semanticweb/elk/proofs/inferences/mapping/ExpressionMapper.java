@@ -60,9 +60,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Backwa
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.SubPropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ReflexivePropertyChainImpl;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldReflexiveProperty;
 
 /**

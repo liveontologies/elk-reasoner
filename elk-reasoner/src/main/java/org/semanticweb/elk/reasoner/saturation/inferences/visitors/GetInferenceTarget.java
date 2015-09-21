@@ -68,7 +68,7 @@ public class GetInferenceTarget extends
 	@Override
 	public IndexedContextRoot visit(ReversedForwardLink conclusion,
 			Context premiseContext) {
-		return conclusion.getFirstPremise().getTarget();
+		return conclusion.getPremise().getTarget();
 	}
 
 	@Override

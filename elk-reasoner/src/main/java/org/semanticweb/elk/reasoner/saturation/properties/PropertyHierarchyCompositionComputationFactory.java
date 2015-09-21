@@ -137,7 +137,7 @@ public class PropertyHierarchyCompositionComputationFactory extends
 				AbstractHashMultimap<IndexedObjectProperty, IndexedComplexPropertyChain> compositionsByLeft = rightSaturation.compositionsByLeftSubProperty;
 
 				// computing left properties for which composition with the
-				// current right sub-property is redundant
+				// current right sub-property chain is redundant
 				Collection<IndexedObjectProperty> redundantLeftProperties = Collections
 						.emptySet();
 

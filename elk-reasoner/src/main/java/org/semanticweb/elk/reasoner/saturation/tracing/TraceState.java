@@ -54,7 +54,7 @@ public class TraceState implements InferenceSet,
 
 	private final ConcurrentHashMap<IndexedContextRoot, ClassInferenceSet> classInferenceMap_ = new ConcurrentHashMap<IndexedContextRoot, ClassInferenceSet>();
 
-	private final ModifiableObjectPropertyInferenceSet objectPropertyInferenceSet_ = new ModifiableObjectPropertyInferenceSetImpl();
+	private final ModifiableObjectPropertyInferenceSet objectPropertyInferenceSet_ = new SynchronizedModifiableObjectPropertyInferenceSet();
 
 	public Collection<? extends Conclusion> getToTrace() {
 		return toTrace_;
@@ -89,8 +89,7 @@ public class TraceState implements InferenceSet,
 		ClassInferenceSet result = classInferenceMap_.get(inferenceOriginRoot);
 		if (result != null)
 			return result;
-		ModifiableClassInferenceSet newSet = new ModifiableClassInferenceSetImpl(
-				inferenceOriginRoot);
+		ModifiableClassInferenceSet newSet = new ModifiableClassInferenceSetImpl();
 		// TODO: filter cyclic inferences
 		for (ClassInference inference : classInferences) {
 			newSet.add(inference);

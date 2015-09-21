@@ -54,6 +54,10 @@ public class DecomposedExistentialForwardLink extends AbstractConclusion
 		existential_ = subsumer;
 	}
 
+	public IndexedObjectSomeValuesFrom getExistential() {
+		return this.existential_;
+	}
+
 	@Override
 	public IndexedPropertyChain getForwardChain() {
 		return existential_.getProperty();

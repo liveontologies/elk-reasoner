@@ -47,9 +47,4 @@ public class DecomposedSubsumerImpl extends
 		return visitor.visit(this, input);
 	}
 
-	@Override
-	public String toString() {
-		return "Decomposed" + super.toString();
-	}
-
 }

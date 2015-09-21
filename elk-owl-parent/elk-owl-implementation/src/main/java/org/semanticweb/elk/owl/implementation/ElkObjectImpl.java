@@ -25,8 +25,8 @@
  */
 package org.semanticweb.elk.owl.implementation;
 
-import org.semanticweb.elk.owl.comparison.ElkObjectSyntacticEqualityVisitor;
-import org.semanticweb.elk.owl.comparison.ElkObjectSyntacticHasherVisitor;
+import org.semanticweb.elk.owl.comparison.ElkObjectEquality;
+import org.semanticweb.elk.owl.comparison.ElkObjectHash;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 
@@ -41,12 +41,12 @@ public abstract class ElkObjectImpl implements ElkObject {
 
 	@Override
 	public int hashCode() {
-		return ElkObjectSyntacticHasherVisitor.hashCode(this);
+		return ElkObjectHash.hashCode(this);
 	}
 
 	@Override
 	public boolean equals(Object other) {
-		return ElkObjectSyntacticEqualityVisitor.equals(this, other);
+		return ElkObjectEquality.equals(this, other);
 	}
 
 	@Override
