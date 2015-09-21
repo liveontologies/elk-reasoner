@@ -109,18 +109,26 @@ import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
-public class ElkObjectSyntacticEqualityVisitor implements
-		ElkObjectVisitor<ElkObject> {
+/**
+ * Static methods for computing syntactic equality between {@link ElkObject}s.
+ * Two {@link ElkObject}s are syntactically equal if all their corresponding
+ * values are syntactically equal.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @see ElkObjectHash
+ */
+public class ElkObjectEquality implements ElkObjectVisitor<ElkObject> {
 
 	private final Object object_;
 
-	ElkObjectSyntacticEqualityVisitor(Object object) {
+	private ElkObjectEquality(Object object) {
 		this.object_ = object;
 	}
 
 	public static boolean equals(ElkObject first, Object second) {
-		return first == null ? second == null
-				: first.accept(new ElkObjectSyntacticEqualityVisitor(second)) == second;
+		return first == null ? second == null : first
+				.accept(new ElkObjectEquality(second)) == second;
 	}
 
 	private static boolean equals(List<? extends ElkObject> first,
