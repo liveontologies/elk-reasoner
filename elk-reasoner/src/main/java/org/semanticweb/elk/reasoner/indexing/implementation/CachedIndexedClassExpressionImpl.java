@@ -74,25 +74,6 @@ abstract class CachedIndexedClassExpressionImpl<T extends CachedIndexedClassExpr
 	}
 
 	@Override
-	public final int compareTo(ModifiableIndexedClassExpression o) {
-		if (this == o)
-			return 0;
-		// else
-		int thisHash = hashCode();
-		int otherHash = o.hashCode();
-		if (thisHash == otherHash) {
-			/*
-			 * hash code collision for different elements should happen very
-			 * rarely; in this case we rely on the unique string representation
-			 * of indexed objects to compare them
-			 */
-			return this.toString().compareTo(o.toString());
-		}
-		// else
-		return (thisHash < otherHash ? -1 : 1);
-	}
-
-	@Override
 	public final LinkedSubsumerRule getCompositionRuleHead() {
 		return compositionRuleHead;
 	}

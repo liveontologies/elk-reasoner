@@ -45,7 +45,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComp
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectHasSelfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSomeValuesFromDecomposition;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromFirstConjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromSecondConjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
@@ -145,9 +146,14 @@ public class RuleCounter {
 	long countNonReflexiveBackwardLinkCompositionRule;
 
 	/**
-	 * counter for {@link ObjectIntersectionFromConjunctRule}
+	 * counter for {@link ObjectIntersectionFromFirstConjunctRule}
 	 */
-	long countObjectIntersectionFromConjunctRule;
+	long countObjectIntersectionFromFirstConjunctRule;
+
+	/**
+	 * counter for {@link ObjectIntersectionFromSecondConjunctRule}
+	 */
+	long countObjectIntersectionFromSecondConjunctRule;
 
 	/**
 	 * counter for {@link ObjectUnionFromDisjunctRule}
@@ -205,7 +211,8 @@ public class RuleCounter {
 		countDisjointSubsumerFromMemberRule += counter.countDisjointSubsumerFromMemberRule;
 		countContradictionFromDisjointnessRule += counter.countContradictionFromDisjointnessRule;
 		countContradictionFromNegationRule += counter.countContradictionFromNegationRule;
-		countObjectIntersectionFromConjunctRule += counter.countObjectIntersectionFromConjunctRule;
+		countObjectIntersectionFromFirstConjunctRule += counter.countObjectIntersectionFromFirstConjunctRule;
+		countObjectIntersectionFromSecondConjunctRule += counter.countObjectIntersectionFromSecondConjunctRule;
 		countSuperClassFromSubClassRule += counter.countSuperClassFromSubClassRule;
 		countPropagationFromExistentialFillerRule += counter.countPropagationFromExistentialFillerRule;
 		countObjectUnionFromDisjunctRule += counter.countObjectUnionFromDisjunctRule;
@@ -235,7 +242,8 @@ public class RuleCounter {
 				+ countDisjointSubsumerFromMemberRule
 				+ countContradictionFromDisjointnessRule
 				+ countContradictionFromNegationRule
-				+ countObjectIntersectionFromConjunctRule
+				+ countObjectIntersectionFromFirstConjunctRule
+				+ countObjectIntersectionFromSecondConjunctRule
 				+ countSuperClassFromSubClassRule
 				+ countPropagationFromExistentialFillerRule
 				+ countObjectUnionFromDisjunctRule
@@ -268,7 +276,8 @@ public class RuleCounter {
 		countDisjointSubsumerFromMemberRule = 0;
 		countContradictionFromDisjointnessRule = 0;
 		countContradictionFromNegationRule = 0;
-		countObjectIntersectionFromConjunctRule = 0;
+		countObjectIntersectionFromFirstConjunctRule = 0;
+		countObjectIntersectionFromSecondConjunctRule = 0;
 		countSuperClassFromSubClassRule = 0;
 		countPropagationFromExistentialFillerRule = 0;
 		countObjectUnionFromDisjunctRule = 0;

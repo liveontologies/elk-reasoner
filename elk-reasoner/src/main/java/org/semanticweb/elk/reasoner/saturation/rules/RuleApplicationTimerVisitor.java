@@ -59,7 +59,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComp
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectHasSelfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSomeValuesFromDecomposition;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromFirstConjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromSecondConjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
@@ -295,13 +296,25 @@ class RuleApplicationTimerVisitor<O> implements RuleVisitor<O> {
 	}
 
 	@Override
-	public O visit(ObjectIntersectionFromConjunctRule rule,
+	public O visit(ObjectIntersectionFromFirstConjunctRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		timer_.timeObjectIntersectionFromConjunctRule -= CachedTimeThread
+		timer_.timeObjectIntersectionFromFirstConjunctRule -= CachedTimeThread
 				.getCurrentTimeMillis();
 		O result = visitor_.visit(rule, premise, premises, producer);
-		timer_.timeObjectIntersectionFromConjunctRule += CachedTimeThread
+		timer_.timeObjectIntersectionFromFirstConjunctRule += CachedTimeThread
+				.getCurrentTimeMillis();
+		return result;
+	}
+
+	@Override
+	public O visit(ObjectIntersectionFromSecondConjunctRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		timer_.timeObjectIntersectionFromSecondConjunctRule -= CachedTimeThread
+				.getCurrentTimeMillis();
+		O result = visitor_.visit(rule, premise, premises, producer);
+		timer_.timeObjectIntersectionFromSecondConjunctRule += CachedTimeThread
 				.getCurrentTimeMillis();
 		return result;
 	}

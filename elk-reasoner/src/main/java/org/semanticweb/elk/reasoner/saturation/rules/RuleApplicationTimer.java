@@ -45,7 +45,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComp
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectHasSelfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSomeValuesFromDecomposition;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromFirstConjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromSecondConjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
@@ -146,9 +147,14 @@ public class RuleApplicationTimer {
 	long timeNonReflexiveBackwardLinkCompositionRule;
 
 	/**
-	 * timer for {@link ObjectIntersectionFromConjunctRule}
+	 * timer for {@link ObjectIntersectionFromFirstConjunctRule}
 	 */
-	long timeObjectIntersectionFromConjunctRule;
+	long timeObjectIntersectionFromFirstConjunctRule;
+
+	/**
+	 * timer for {@link ObjectIntersectionFromSecondConjunctRule}
+	 */
+	long timeObjectIntersectionFromSecondConjunctRule;
 
 	/**
 	 * timer for {@link ObjectUnionFromDisjunctRule}
@@ -206,7 +212,8 @@ public class RuleApplicationTimer {
 		timeDisjointSubsumerFromMemberRule += timer.timeDisjointSubsumerFromMemberRule;
 		timeContradictionFromDisjointnessRule += timer.timeContradictionFromDisjointnessRule;
 		timeContradictionFromNegationRule += timer.timeContradictionFromNegationRule;
-		timeObjectIntersectionFromConjunctRule += timer.timeObjectIntersectionFromConjunctRule;
+		timeObjectIntersectionFromFirstConjunctRule += timer.timeObjectIntersectionFromFirstConjunctRule;
+		timeObjectIntersectionFromSecondConjunctRule += timer.timeObjectIntersectionFromSecondConjunctRule;
 		timeSuperClassFromSubClassRule += timer.timeSuperClassFromSubClassRule;
 		timePropagationFromExistentialFillerRule += timer.timePropagationFromExistentialFillerRule;
 		timeObjectUnionFromDisjunctRule += timer.timeObjectUnionFromDisjunctRule;
@@ -235,7 +242,8 @@ public class RuleApplicationTimer {
 				+ timeDisjointSubsumerFromMemberRule
 				+ timeContradictionFromDisjointnessRule
 				+ timeContradictionFromNegationRule
-				+ timeObjectIntersectionFromConjunctRule
+				+ timeObjectIntersectionFromFirstConjunctRule
+				+ timeObjectIntersectionFromSecondConjunctRule
 				+ timeSuperClassFromSubClassRule
 				+ timePropagationFromExistentialFillerRule
 				+ timeObjectUnionFromDisjunctRule
@@ -268,7 +276,8 @@ public class RuleApplicationTimer {
 		timeDisjointSubsumerFromMemberRule = 0;
 		timeContradictionFromDisjointnessRule = 0;
 		timeContradictionFromNegationRule = 0;
-		timeObjectIntersectionFromConjunctRule = 0;
+		timeObjectIntersectionFromFirstConjunctRule = 0;
+		timeObjectIntersectionFromSecondConjunctRule = 0;
 		timeSuperClassFromSubClassRule = 0;
 		timePropagationFromExistentialFillerRule = 0;
 		timeObjectUnionFromDisjunctRule = 0;

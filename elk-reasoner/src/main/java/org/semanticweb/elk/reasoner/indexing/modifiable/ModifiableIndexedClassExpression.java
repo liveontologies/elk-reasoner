@@ -34,8 +34,7 @@ import org.semanticweb.elk.util.collections.chains.Chain;
  *
  */
 public interface ModifiableIndexedClassExpression extends
-		ModifiableIndexedSubObject, IndexedClassExpression,
-		Comparable<ModifiableIndexedClassExpression> {
+		ModifiableIndexedSubObject, IndexedClassExpression {
 
 	/**
 	 * @return the {@link Chain} view of all composition rules assigned to this

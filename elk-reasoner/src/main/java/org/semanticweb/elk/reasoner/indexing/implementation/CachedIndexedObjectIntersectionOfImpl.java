@@ -24,13 +24,13 @@ package org.semanticweb.elk.reasoner.indexing.implementation;
 
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpressionFilter;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromFirstConjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromSecondConjunctRule;
 
 /**
  * Implements {@link CachedIndexedObjectIntersectionOf}
@@ -42,44 +42,16 @@ class CachedIndexedObjectIntersectionOfImpl
 		CachedIndexedComplexClassExpressionImpl<CachedIndexedObjectIntersectionOf>
 		implements CachedIndexedObjectIntersectionOf {
 
-	/**
-	 * The conjunction has only two conjuncts. To ensure uniqueness of a
-	 * conjunction for the conjuncts, the conjuncts are sorted according to the
-	 * comparator of {@link IndexedClassExpression}. This is required for
-	 * correct construction of {@link ObjectIntersectionFromConjunctRule}
-	 * because conjunctions (A & B) and (B & A) result in the same rules.
-	 */
 	private final ModifiableIndexedClassExpression firstConjunct_,
 			secondConjunct_;
 
 	CachedIndexedObjectIntersectionOfImpl(
-			ModifiableIndexedClassExpression conjunctA,
-			ModifiableIndexedClassExpression conjunctB) {
-		this(new Initializer(conjunctA, conjunctB));
-	}
-
-	private CachedIndexedObjectIntersectionOfImpl(Initializer init) {
+			ModifiableIndexedClassExpression firstConjunct,
+			ModifiableIndexedClassExpression secondConjunct) {
 		super(CachedIndexedObjectIntersectionOf.Helper.structuralHashCode(
-				init.firstConjunct_, init.secondConjunct_));
-		this.firstConjunct_ = init.firstConjunct_;
-		this.secondConjunct_ = init.secondConjunct_;
-	}
-
-	private static class Initializer {
-		private final ModifiableIndexedClassExpression firstConjunct_,
-				secondConjunct_;
-
-		Initializer(ModifiableIndexedClassExpression conjunctA,
-				ModifiableIndexedClassExpression conjunctB) {
-			if (conjunctA.compareTo(conjunctB) < 0) {
-				this.firstConjunct_ = conjunctA;
-				this.secondConjunct_ = conjunctB;
-			} else {
-				this.firstConjunct_ = conjunctB;
-				this.secondConjunct_ = conjunctA;
-			}
-		}
-
+				firstConjunct, secondConjunct));
+		this.firstConjunct_ = firstConjunct;
+		this.secondConjunct_ = secondConjunct;
 	}
 
 	@Override
@@ -103,7 +75,15 @@ class CachedIndexedObjectIntersectionOfImpl
 			OccurrenceIncrement increment) {
 
 		if (negativeOccurrenceNo == 0 && increment.negativeIncrement > 0) {
-			if (!ObjectIntersectionFromConjunctRule.addRulesFor(this, index)) {
+			if (!ObjectIntersectionFromFirstConjunctRule.addRulesFor(this,
+					index)) {
+				return false;
+			}
+			if (!ObjectIntersectionFromSecondConjunctRule.addRulesFor(this,
+					index)) {
+				// revert all changes
+				ObjectIntersectionFromFirstConjunctRule.removeRulesFor(this,
+						index);
 				return false;
 			}
 		}
@@ -114,8 +94,18 @@ class CachedIndexedObjectIntersectionOfImpl
 		checkOccurrenceNumbers();
 
 		if (negativeOccurrenceNo == 0 && increment.negativeIncrement < 0) {
-			if (!ObjectIntersectionFromConjunctRule.removeRulesFor(this, index)) {
+			if (!ObjectIntersectionFromFirstConjunctRule.removeRulesFor(this,
+					index)) {
 				// revert all changes
+				positiveOccurrenceNo -= increment.positiveIncrement;
+				negativeOccurrenceNo -= increment.negativeIncrement;
+				return false;
+			}
+			if (!ObjectIntersectionFromSecondConjunctRule.removeRulesFor(this,
+					index)) {
+				// revert all changes
+				ObjectIntersectionFromFirstConjunctRule
+						.addRulesFor(this, index);
 				positiveOccurrenceNo -= increment.positiveIncrement;
 				negativeOccurrenceNo -= increment.negativeIncrement;
 				return false;

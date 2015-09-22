@@ -55,7 +55,11 @@ public interface LinkedSubsumerRuleVisitor<O> {
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer);
 
-	O visit(ObjectIntersectionFromConjunctRule rule,
+	O visit(ObjectIntersectionFromFirstConjunctRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ConclusionProducer producer);
+
+	O visit(ObjectIntersectionFromSecondConjunctRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer);
 

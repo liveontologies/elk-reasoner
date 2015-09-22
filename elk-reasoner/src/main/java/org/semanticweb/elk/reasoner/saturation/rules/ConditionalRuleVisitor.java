@@ -59,7 +59,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComp
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectHasSelfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSomeValuesFromDecomposition;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromFirstConjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromSecondConjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
@@ -254,7 +255,17 @@ public class ConditionalRuleVisitor<O> implements RuleVisitor<O> {
 	}
 
 	@Override
-	public O visit(ObjectIntersectionFromConjunctRule rule,
+	public O visit(ObjectIntersectionFromFirstConjunctRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		if (condition_.visit(rule, premise, premises, producer))
+			return visitor_.visit(rule, premise, premises, producer);
+		// else
+		return null;
+	}
+
+	@Override
+	public O visit(ObjectIntersectionFromSecondConjunctRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		if (condition_.visit(rule, premise, premises, producer))

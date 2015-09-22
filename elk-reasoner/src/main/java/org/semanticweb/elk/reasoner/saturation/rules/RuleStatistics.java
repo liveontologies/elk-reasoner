@@ -22,7 +22,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassFromD
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSomeValuesFromDecomposition;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromFirstConjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromSecondConjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
@@ -164,9 +165,13 @@ public class RuleStatistics extends AbstractStatistics {
 				ruleCounter.countSubsumerPropagationRule,
 				ruleTimer.timeSubsumerPropagationRule);
 
-		print(printer, ObjectIntersectionFromConjunctRule.NAME,
-				ruleCounter.countObjectIntersectionFromConjunctRule,
-				ruleTimer.timeObjectIntersectionFromConjunctRule);
+		print(printer, ObjectIntersectionFromFirstConjunctRule.NAME,
+				ruleCounter.countObjectIntersectionFromFirstConjunctRule,
+				ruleTimer.timeObjectIntersectionFromFirstConjunctRule);
+
+		print(printer, ObjectIntersectionFromSecondConjunctRule.NAME,
+				ruleCounter.countObjectIntersectionFromSecondConjunctRule,
+				ruleTimer.timeObjectIntersectionFromSecondConjunctRule);
 
 		print(printer, ObjectUnionFromDisjunctRule.NAME,
 				ruleCounter.countObjectUnionFromDisjunctRule,

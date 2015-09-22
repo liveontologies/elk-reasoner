@@ -70,6 +70,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBac
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.SubsumerPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.AbstractObjectIntersectionFromConjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ComposedFromDecomposedSubsumerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
@@ -82,7 +83,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectHasS
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSomeValuesFromDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromFirstConjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromSecondConjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
@@ -417,15 +419,28 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			return null;
 		}
 
-		@Override
-		public Void visit(ObjectIntersectionFromConjunctRule rule,
-				IndexedClassExpression premise, ContextPremises premises,
-				ConclusionProducer producer) {
+		void validate(AbstractObjectIntersectionFromConjunctRule rule) {
 			for (Map.Entry<IndexedClassExpression, IndexedObjectIntersectionOf> entry : rule
 					.getConjunctionsByConjunct().entrySet()) {
 				iceValidator_.checkNew(entry.getKey());
 				iceValidator_.checkNew(entry.getValue());
 			}
+
+		}
+
+		@Override
+		public Void visit(ObjectIntersectionFromFirstConjunctRule rule,
+				IndexedClassExpression premise, ContextPremises premises,
+				ConclusionProducer producer) {
+			validate(rule);
+			return null;
+		}
+
+		@Override
+		public Void visit(ObjectIntersectionFromSecondConjunctRule rule,
+				IndexedClassExpression premise, ContextPremises premises,
+				ConclusionProducer producer) {
+			validate(rule);
 			return null;
 		}
 
