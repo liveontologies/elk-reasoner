@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.util.collections;
+
 /*
  * #%L
  * ELK Utilities Collections
@@ -31,25 +32,38 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
+ * Represents a {@link Collection} view consisting of elements from a given
+ * {@link Collection} without elements from the given {@link Set}. The given
+ * {@link Collection} and {@link Set} are not modified as a result of this
+ * operation. The resulting {@link Collection} does not support addition or
+ * removal of elements; if attempted, an {@link UnsupportedOperationException}
+ * will be thrown.
+ * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ * @param <E>
+ *            the type of elements in the collection
  */
-public class LazyCollectionMinusSet<I> extends AbstractCollection<I> {
+public class LazyCollectionMinusSet<E> extends AbstractCollection<E> {
 
-	private final Collection<I> collection_;
-	private final Set<I> set_;
-	
-	public LazyCollectionMinusSet(final Collection<I> collection, final Set<I> set) {
+	private final Collection<? extends E> collection_;
+	private final Set<? extends E> set_;
+
+	public LazyCollectionMinusSet(final Collection<? extends E> collection,
+			final Set<? extends E> set) {
 		collection_ = collection;
 		set_ = set;
 	}
-	
+
 	@Override
 	public boolean isEmpty() {
 		return set_.containsAll(collection_);
 	}
-	
+
 	@Override
 	public boolean contains(Object o) {
 		return collection_.contains(o) && !set_.contains(o);
@@ -59,45 +73,42 @@ public class LazyCollectionMinusSet<I> extends AbstractCollection<I> {
 	public boolean remove(Object o) {
 		throw new UnsupportedOperationException();
 	}
-	
 
 	@Override
-	public Iterator<I> iterator() {
-		return new Iterator<I>() {
+	public Iterator<E> iterator() {
+		return new Iterator<E>() {
 
-			private final Iterator<I> iter_ = collection_.iterator();
-			private I next_ = null;
-			
+			private final Iterator<? extends E> iter_ = collection_.iterator();
+			private E next_ = null;
+
 			@Override
 			public boolean hasNext() {
-				
+
 				while (next_ == null && iter_.hasNext()) {
-					I elem = iter_.next();
-					
+					E elem = iter_.next();
+
 					next_ = set_.contains(elem) ? null : elem;
 				}
-				
+
 				return next_ != null;
 			}
 
 			@Override
-			public I next() {
+			public E next() {
 				if (next_ != null) {
 					return giveAway();
-				}
-				else if (hasNext()) {
+				} else if (hasNext()) {
 					return giveAway();
-				}
-				else {
+				} else {
 					throw new NoSuchElementException();
 				}
 			}
-			
-			private I giveAway() {
-				I elem = next_;
-				
+
+			private E giveAway() {
+				E elem = next_;
+
 				next_ = null;
-				
+
 				return elem;
 			}
 
@@ -105,7 +116,7 @@ public class LazyCollectionMinusSet<I> extends AbstractCollection<I> {
 			public void remove() {
 				throw new UnsupportedOperationException();
 			}
-			
+
 		};
 	}
 

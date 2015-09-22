@@ -56,8 +56,8 @@ import java.util.Set;
  */
 public class LazySetIntersection<E> extends AbstractSet<E> {
 
-	final Set<E> smallSet;
-	final Set<E> largeSet;
+	final Set<? extends E> smallSet;
+	final Set<? extends E> largeSet;
 
 	/**
 	 * Returns a new {@link Set} view for intersection of two input sets.
@@ -67,7 +67,7 @@ public class LazySetIntersection<E> extends AbstractSet<E> {
 	 * @param secondSet
 	 *            the second set of the intersection
 	 */
-	public LazySetIntersection(Set<E> firstSet, Set<E> secondSet) {
+	public LazySetIntersection(Set<? extends E> firstSet, Set<? extends E> secondSet) {
 		if (firstSet.size() < secondSet.size()) {
 			this.smallSet = firstSet;
 			this.largeSet = secondSet;
@@ -113,12 +113,12 @@ public class LazySetIntersection<E> extends AbstractSet<E> {
 	}
 
 	static class SetIntersectionIterator<E> implements Iterator<E> {
-		final Iterator<E> elementIterator;
-		final Set<E> elementChecker;
+		final Iterator<? extends E> elementIterator;
+		final Set<? extends E> elementChecker;
 		// reference to the next element
 		E next;
 
-		SetIntersectionIterator(Set<E> iteratingSet, Set<E> checkingSet) {
+		SetIntersectionIterator(Set<? extends E> iteratingSet, Set<? extends E> checkingSet) {
 			this.elementIterator = iteratingSet.iterator();
 			this.elementChecker = checkingSet;
 			seekNext();
@@ -155,13 +155,13 @@ public class LazySetIntersection<E> extends AbstractSet<E> {
 
 	static class RawSetIntersectionIterator<E> implements Iterator<E> {
 		final E[] rawElements;
-		final Set<E> elementChecker;
+		final Set<? extends E> elementChecker;
 		// current position within randomAccessSet
 		int pos = 0;
 		// reference to the next element
 		E next;
 
-		RawSetIntersectionIterator(E[] rawElements, Set<E> checkingSet) {
+		RawSetIntersectionIterator(E[] rawElements, Set<? extends E> checkingSet) {
 			this.rawElements = rawElements;
 			this.elementChecker = checkingSet;
 			seekNext();
