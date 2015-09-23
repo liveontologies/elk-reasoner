@@ -111,7 +111,7 @@ public class ConclusionCounter {
 		return countBackwardLinks;
 	}
 
-	public long getCountBottoms() {
+	public long getCountContradictions() {
 		return countContradictions;
 	}
 

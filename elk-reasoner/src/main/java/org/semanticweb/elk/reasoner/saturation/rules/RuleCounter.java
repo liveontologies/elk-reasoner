@@ -78,7 +78,7 @@ public class RuleCounter {
 	/**
 	 * counter for {@link ContradictionCompositionRule}
 	 */
-	long countContradicitonCompositionRule;
+	long countContradictionCompositionRule;
 
 	/**
 	 * counter for {@link ContradictionFromDisjointnessRule}
@@ -113,7 +113,7 @@ public class RuleCounter {
 	/**
 	 * counter for {@link IndexedClassDecompositionRule}
 	 */
-	long countIndexedClassDecomposition;
+	long countIndexedClassDecompositionRule;
 
 	/**
 	 * counter for {@link IndexedClassFromDefinitionRule}
@@ -220,7 +220,7 @@ public class RuleCounter {
 		countSubsumerBackwardLinkRule += counter.countSubsumerBackwardLinkRule;
 		countContradictionOverBackwardLinkRule += counter.countContradictionOverBackwardLinkRule;
 		countContradictionPropagationRule += counter.countContradictionPropagationRule;
-		countContradicitonCompositionRule += counter.countContradicitonCompositionRule;
+		countContradictionCompositionRule += counter.countContradictionCompositionRule;
 		countNonReflexiveBackwardLinkCompositionRule += counter.countNonReflexiveBackwardLinkCompositionRule;
 		countIndexedObjectIntersectionOfDecomposition += counter.countIndexedObjectIntersectionOfDecomposition;
 		countIndexedObjectSomeValuesFromDecomposition += counter.countIndexedObjectSomeValuesFromDecomposition;
@@ -232,7 +232,7 @@ public class RuleCounter {
 		countPropagationInitializationRule += counter.countPropagationInitializationRule;
 		countBackwardLinkFromForwardLinkRule += counter.countBackwardLinkFromForwardLinkRule;
 		countComposedFromDecomposedSubsumerRule += counter.countComposedFromDecomposedSubsumerRule;
-		countIndexedClassDecomposition += counter.countIndexedClassDecomposition;
+		countIndexedClassDecompositionRule += counter.countIndexedClassDecompositionRule;
 		countIndexedClassFromDefinitionRule += counter.countIndexedClassFromDefinitionRule;
 	}
 
@@ -251,7 +251,7 @@ public class RuleCounter {
 				+ countSubsumerBackwardLinkRule
 				+ countContradictionOverBackwardLinkRule
 				+ countContradictionPropagationRule
-				+ countContradicitonCompositionRule
+				+ countContradictionCompositionRule
 				+ countNonReflexiveBackwardLinkCompositionRule
 				+ countReflexiveBackwardLinkCompositionRule
 				+ countIndexedObjectIntersectionOfDecomposition
@@ -263,7 +263,7 @@ public class RuleCounter {
 				+ countPropagationInitializationRule
 				+ countBackwardLinkFromForwardLinkRule
 				+ countComposedFromDecomposedSubsumerRule
-				+ countIndexedClassDecomposition
+				+ countIndexedClassDecompositionRule
 				+ countIndexedClassFromDefinitionRule;
 	}
 
@@ -285,7 +285,7 @@ public class RuleCounter {
 		countSubsumerBackwardLinkRule = 0;
 		countContradictionOverBackwardLinkRule = 0;
 		countContradictionPropagationRule = 0;
-		countContradicitonCompositionRule = 0;
+		countContradictionCompositionRule = 0;
 		countNonReflexiveBackwardLinkCompositionRule = 0;
 		countReflexiveBackwardLinkCompositionRule = 0;
 		countIndexedObjectIntersectionOfDecomposition = 0;
@@ -297,7 +297,7 @@ public class RuleCounter {
 		countPropagationInitializationRule = 0;
 		countBackwardLinkFromForwardLinkRule = 0;
 		countComposedFromDecomposedSubsumerRule = 0;
-		countIndexedClassDecomposition = 0;
+		countIndexedClassDecompositionRule = 0;
 		countIndexedClassFromDefinitionRule = 0;
 	}
 }

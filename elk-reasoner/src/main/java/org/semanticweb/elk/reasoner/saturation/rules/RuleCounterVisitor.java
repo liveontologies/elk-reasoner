@@ -120,7 +120,7 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(ContradictionCompositionRule rule, DisjointSubsumer premise,
 			ContextPremises premises, ConclusionProducer producer) {
-		counter_.countContradicitonCompositionRule++;
+		counter_.countContradictionCompositionRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
 
@@ -174,7 +174,7 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(IndexedClassDecompositionRule rule, IndexedClass premise,
 			ContextPremises premises, ConclusionProducer producer) {
-		counter_.countIndexedClassDecomposition++;
+		counter_.countIndexedClassDecompositionRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
 

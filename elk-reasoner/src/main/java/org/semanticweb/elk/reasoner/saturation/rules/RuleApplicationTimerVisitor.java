@@ -134,10 +134,10 @@ class RuleApplicationTimerVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(ContradictionCompositionRule rule, DisjointSubsumer premise,
 			ContextPremises premises, ConclusionProducer producer) {
-		timer_.timeContradicitonCompositionRule -= CachedTimeThread
+		timer_.timeContradictionCompositionRule -= CachedTimeThread
 				.getCurrentTimeMillis();
 		O result = visitor_.visit(rule, premise, premises, producer);
-		timer_.timeContradicitonCompositionRule += CachedTimeThread
+		timer_.timeContradictionCompositionRule += CachedTimeThread
 				.getCurrentTimeMillis();
 		return result;
 	}
@@ -216,10 +216,10 @@ class RuleApplicationTimerVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(IndexedClassDecompositionRule rule, IndexedClass premise,
 			ContextPremises premises, ConclusionProducer producer) {
-		timer_.timeIndexedClassDecomposition -= CachedTimeThread
+		timer_.timeIndexedClassDecompositionRule -= CachedTimeThread
 				.getCurrentTimeMillis();
 		O result = visitor_.visit(rule, premise, premises, producer);
-		timer_.timeIndexedClassDecomposition += CachedTimeThread
+		timer_.timeIndexedClassDecompositionRule += CachedTimeThread
 				.getCurrentTimeMillis();
 		return result;
 	}
@@ -255,7 +255,7 @@ class RuleApplicationTimerVisitor<O> implements RuleVisitor<O> {
 		timer_.timeIndexedObjectHasSelfDecomposition -= CachedTimeThread
 				.getCurrentTimeMillis();
 		O result = visitor_.visit(rule, premise, premises, producer);
-		timer_.timeSuperClassFromSubClassRule += CachedTimeThread
+		timer_.timeIndexedObjectHasSelfDecomposition += CachedTimeThread
 				.getCurrentTimeMillis();
 		return result;
 	}

@@ -79,7 +79,7 @@ public class RuleApplicationTimer {
 	/**
 	 * time for {@link ContradictionCompositionRule}
 	 */
-	long timeContradicitonCompositionRule;
+	long timeContradictionCompositionRule;
 
 	/**
 	 * timer for {@link ContradictionFromDisjointnessRule}
@@ -114,7 +114,7 @@ public class RuleApplicationTimer {
 	/**
 	 * timer for {@link IndexedClassDecompositionRule}
 	 */
-	long timeIndexedClassDecomposition;
+	long timeIndexedClassDecompositionRule;
 
 	/**
 	 * timer for {@link IndexedClassFromDefinitionRule}
@@ -223,7 +223,7 @@ public class RuleApplicationTimer {
 		timeSubsumerBackwardLinkRule += timer.timeSubsumerBackwardLinkRule;
 		timeContradictionOverBackwardLinkRule += timer.timeContradictionOverBackwardLinkRule;
 		timeContradictionPropagationRule += timer.timeContradictionPropagationRule;
-		timeContradicitonCompositionRule += timer.timeContradicitonCompositionRule;
+		timeContradictionCompositionRule += timer.timeContradictionCompositionRule;
 		timeIndexedObjectIntersectionOfDecomposition += timer.timeIndexedObjectIntersectionOfDecomposition;
 		timeIndexedObjectSomeValuesFromDecomposition += timer.timeIndexedObjectSomeValuesFromDecomposition;
 		timeIndexedObjectComplementOfDecomposition += timer.timeIndexedObjectComplementOfDecomposition;
@@ -233,7 +233,7 @@ public class RuleApplicationTimer {
 		timePropagationInitializationRule += timer.timePropagationInitializationRule;
 		timeBackwardLinkFromForwardLinkRule += timer.timeBackwardLinkFromForwardLinkRule;
 		timeComposedFromDecomposedSubsumerRule += timer.timeComposedFromDecomposedSubsumerRule;
-		timeIndexedClassDecomposition += timer.timeIndexedClassDecomposition;
+		timeIndexedClassDecompositionRule += timer.timeIndexedClassDecompositionRule;
 		timeIndexedClassFromDefinitionRule += timer.timeIndexedClassFromDefinitionRule;
 	}
 
@@ -251,7 +251,7 @@ public class RuleApplicationTimer {
 				+ timeSubsumerBackwardLinkRule
 				+ timeContradictionOverBackwardLinkRule
 				+ timeContradictionPropagationRule
-				+ timeContradicitonCompositionRule
+				+ timeContradictionCompositionRule
 				+ timeNonReflexiveBackwardLinkCompositionRule
 				+ timeReflexiveBackwardLinkCompositionRule
 				+ timeIndexedObjectIntersectionOfDecomposition
@@ -263,7 +263,7 @@ public class RuleApplicationTimer {
 				+ timePropagationInitializationRule
 				+ timeBackwardLinkFromForwardLinkRule
 				+ timeComposedFromDecomposedSubsumerRule
-				+ timeIndexedClassDecomposition
+				+ timeIndexedClassDecompositionRule
 				+ timeIndexedClassFromDefinitionRule;
 	}
 
@@ -285,7 +285,7 @@ public class RuleApplicationTimer {
 		timeSubsumerBackwardLinkRule = 0;
 		timeContradictionOverBackwardLinkRule = 0;
 		timeContradictionPropagationRule = 0;
-		timeContradicitonCompositionRule = 0;
+		timeContradictionCompositionRule = 0;
 		timeNonReflexiveBackwardLinkCompositionRule = 0;
 		timeReflexiveBackwardLinkCompositionRule = 0;
 		timeIndexedObjectIntersectionOfDecomposition = 0;
@@ -297,7 +297,7 @@ public class RuleApplicationTimer {
 		timePropagationInitializationRule = 0;
 		timeBackwardLinkFromForwardLinkRule = 0;
 		timeComposedFromDecomposedSubsumerRule = 0;
-		timeIndexedClassDecomposition = 0;
+		timeIndexedClassDecompositionRule = 0;
 		timeIndexedClassFromDefinitionRule = 0;
 	}
 

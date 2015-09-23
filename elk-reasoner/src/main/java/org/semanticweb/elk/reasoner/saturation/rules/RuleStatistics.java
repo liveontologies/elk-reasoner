@@ -20,6 +20,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerF
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassFromDefinitionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectHasSelfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSomeValuesFromDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromFirstConjunctRule;
@@ -114,8 +115,8 @@ public class RuleStatistics extends AbstractStatistics {
 				ruleTimer.timeComposedFromDecomposedSubsumerRule);
 
 		print(printer, ContradictionCompositionRule.NAME,
-				ruleCounter.countContradicitonCompositionRule,
-				ruleTimer.timeContradicitonCompositionRule);
+				ruleCounter.countContradictionCompositionRule,
+				ruleTimer.timeContradictionCompositionRule);
 
 		print(printer, ContradictionFromDisjointnessRule.NAME,
 				ruleCounter.countContradictionFromDisjointnessRule,
@@ -142,8 +143,8 @@ public class RuleStatistics extends AbstractStatistics {
 				ruleTimer.timeDisjointSubsumerFromMemberRule);
 
 		print(printer, IndexedClassDecompositionRule.NAME,
-				ruleCounter.countIndexedClassDecomposition,
-				ruleTimer.timeIndexedClassDecomposition);
+				ruleCounter.countIndexedClassDecompositionRule,
+				ruleTimer.timeIndexedClassDecompositionRule);
 
 		print(printer, IndexedObjectComplementOfDecomposition.NAME,
 				ruleCounter.countIndexedObjectComplementOfDecomposition,
@@ -157,7 +158,7 @@ public class RuleStatistics extends AbstractStatistics {
 				ruleCounter.countIndexedObjectSomeValuesFromDecomposition,
 				ruleTimer.timeIndexedObjectSomeValuesFromDecomposition);
 
-		print(printer, IndexedObjectComplementOfDecomposition.NAME,
+		print(printer, IndexedObjectHasSelfDecomposition.NAME,
 				ruleCounter.countIndexedObjectHasSelfDecomposition,
 				ruleTimer.timeIndexedObjectHasSelfDecomposition);
 
