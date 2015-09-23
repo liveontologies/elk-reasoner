@@ -49,6 +49,12 @@ public class OccurrenceIncrement {
 		this.negativeIncrement = negativeIncrement;
 	}
 
+	@Override
+	public String toString() {
+		return "[" + totalIncrement + ": " + positiveIncrement + "(pos), "
+				+ negativeIncrement + "(neg)]";
+	}
+
 	/**
 	 * @param increment
 	 *            the number of neutral occurrences changed
