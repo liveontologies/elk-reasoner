@@ -56,7 +56,7 @@ public interface Context extends ConclusionSet, ContextPremises {
 	 *         {@link Chain} interface without without worrying about
 	 *         {@code null} values.
 	 */
-	public Chain<LinkableBackwardLinkRule> getBackwardLinkRuleChain();
+	Chain<LinkableBackwardLinkRule> getBackwardLinkRuleChain();
 
 	/**
 	 * Adds the given {@link Conclusion} to be processed within this
@@ -74,7 +74,7 @@ public interface Context extends ConclusionSet, ContextPremises {
 	 *         conclusion for this context
 	 * @see #takeToDo()
 	 */
-	public boolean addToDo(Conclusion conclusion);
+	boolean addToDo(Conclusion conclusion);
 
 	/**
 	 * Removes and returns one of the unprocessed {@link Conclusion}s of this
@@ -85,7 +85,7 @@ public interface Context extends ConclusionSet, ContextPremises {
 	 *         one, or {@code null} if there is no such {@link Conclusion}
 	 * @see #addToDo(Conclusion)
 	 */
-	public Conclusion takeToDo();
+	Conclusion takeToDo();
 
 	/**
 	 * @return {@code true} if all {@link Conclusion}s for this {@link Context},
@@ -93,8 +93,8 @@ public interface Context extends ConclusionSet, ContextPremises {
 	 *         {@link Conclusion#getSourceRoot(IndexedClassExpression)}, except
 	 *         for {@link SubConclusion}s are already computed.
 	 */
-	public boolean isSaturated();
-	
-	public boolean isInitialized();
+	boolean isSaturated();
+
+	boolean isInitialized();
 
 }

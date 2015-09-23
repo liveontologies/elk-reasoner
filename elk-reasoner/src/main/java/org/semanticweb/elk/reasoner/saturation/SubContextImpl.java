@@ -46,7 +46,12 @@ public class SubContextImpl extends ArrayHashSet<IndexedContextRoot> implements
 	/**
 	 * {@code true} if this {@link SubContext} was initialized
 	 */
-	boolean isInitialized_ = false;
+	private boolean isInitialized_ = false;
+
+	/**
+	 * the number of {@link SubConclusion}s contained in this {@link SubContext}
+	 */
+	private int size_ = 0;
 
 	public SubContextImpl() {
 		// represents the set of roots linked by the stored backward links
@@ -68,12 +73,18 @@ public class SubContextImpl extends ArrayHashSet<IndexedContextRoot> implements
 
 	@Override
 	public boolean addSubConclusion(SubConclusion conclusion) {
-		return conclusion.accept(SUB_CONCLUSION_INSERTER_, this);
+		boolean success = conclusion.accept(SUB_CONCLUSION_INSERTER_, this);
+		if (success)
+			size_++;
+		return success;
 	}
 
 	@Override
 	public boolean removeSubConclusion(SubConclusion conclusion) {
-		return conclusion.accept(SUB_CONCLUSION_DELETOR_, this);
+		boolean success = conclusion.accept(SUB_CONCLUSION_DELETOR_, this);
+		if (success)
+			size_--;
+		return success;
 	}
 
 	@Override
@@ -84,6 +95,11 @@ public class SubContextImpl extends ArrayHashSet<IndexedContextRoot> implements
 	@Override
 	public boolean isInitialized() {
 		return isInitialized_;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return size_ == 0;
 	}
 
 	public static class SubConclusionInserter implements

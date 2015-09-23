@@ -27,7 +27,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInitializingInsertionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ContextInitializingConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextNotSaturatedCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.RuleApplicationConclusionVisitor;
@@ -67,7 +67,7 @@ public class RuleApplicationAdditionFactory<I extends RuleApplicationInput>
 						SaturationUtils
 								.getProcessedConclusionCountingVisitor(localStatistics),
 						// insert conclusions initializing contexts if necessary
-						new ConclusionInitializingInsertionVisitor(writer),
+						new ContextInitializingConclusionInsertionVisitor(writer),
 						// if new, check that the source of the conclusion is
 						// not saturated (this is only needed for debugging)
 						new ConclusionSourceContextNotSaturatedCheckingVisitor(

@@ -22,7 +22,9 @@ package org.semanticweb.elk.reasoner.saturation.context;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubConclusion;
 
 /**
  * An object containing {@link Conclusion}s. Every {@link Conclusion} is stored
@@ -41,7 +43,7 @@ public interface ConclusionSet {
 	 * @return {@code true} if this {@link ConclusionSet} has changed as a
 	 *         result of this operation and {@link false} otherwise
 	 */
-	public boolean addConclusion(Conclusion conclusion);
+	boolean addConclusion(Conclusion conclusion);
 
 	/**
 	 * Removes the given {@link Conclusion} from this {@link ConclusionSet}
@@ -51,7 +53,7 @@ public interface ConclusionSet {
 	 * @return {@code true} if this {@link ConclusionSet} has changed as a
 	 *         result of this operation and {@link false} otherwise
 	 */
-	public boolean removeConclusion(Conclusion conclusion);
+	boolean removeConclusion(Conclusion conclusion);
 
 	/**
 	 * Checks if the given {@link Conclusion} is contained in this
@@ -62,6 +64,23 @@ public interface ConclusionSet {
 	 * @return {@code true} if {@link Conclusion} is contained in this
 	 *         {@link ConclusionSet} and {@code false} otherwise
 	 */
-	public boolean containsConclusion(Conclusion conclusion);
+	boolean containsConclusion(Conclusion conclusion);
+
+	/**
+	 * @return {@code true} if this {@link ConclusionSet} does not contain any
+	 *         {@link Conclusion}. In this case,
+	 *         {@link #containsConclusion(Conclusion)} returns {@code false} for
+	 *         every input.
+	 */
+	boolean isEmpty();
+
+	/**
+	 * @return {@code true} if the {@link SubConclusionSet} corresponding to the
+	 *         given subRoot {@link IndexedObjectProperty} does not contain any
+	 *         {@link SubConclusion}.
+	 * 
+	 * @see SubConclusionSet#isEmpty()
+	 */
+	boolean isEmpty(IndexedObjectProperty subRoot);
 
 }

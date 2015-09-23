@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.context;
+
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.context;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubConclusion;
 
 public interface SubConclusionSet {
@@ -34,7 +36,7 @@ public interface SubConclusionSet {
 	 * @return {@code true} if this {@link SubConclusion} has changed as a
 	 *         result of this operation and {@link false} otherwise
 	 */
-	public boolean addSubConclusion(SubConclusion conclusion);
+	boolean addSubConclusion(SubConclusion conclusion);
 
 	/**
 	 * Removes the given {@link SubConclusion} from this
@@ -45,7 +47,7 @@ public interface SubConclusionSet {
 	 * @return {@code true} if this {@link SubConclusion} has changed as a
 	 *         result of this operation and {@link false} otherwise
 	 */
-	public boolean removeSubConclusion(SubConclusion conclusion);
+	boolean removeSubConclusion(SubConclusion conclusion);
 
 	/**
 	 * Checks if the given {@link SubConclusion} is contained in this
@@ -56,6 +58,14 @@ public interface SubConclusionSet {
 	 * @return {@code true} if {@link SubConclusion} is contained in this
 	 *         {@link SubConclusionSet} and {@code false} otherwise
 	 */
-	public boolean containsSubConclusion(SubConclusion conclusion);
+	boolean containsSubConclusion(SubConclusion conclusion);
+
+	/**
+	 * @return {@code true} if this {@link SubConclusionSet} does not contain
+	 *         any {@link SubConclusion}. In this case,
+	 *         {@link #containsSubConclusion(Conclusion)} returns {@code false}
+	 *         for every input.
+	 */
+	boolean isEmpty();
 
 }

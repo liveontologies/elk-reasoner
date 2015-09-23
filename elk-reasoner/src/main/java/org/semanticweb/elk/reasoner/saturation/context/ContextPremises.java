@@ -55,21 +55,21 @@ public interface ContextPremises {
 	 *         as the key for {@link ContextPremises} and can never been
 	 *         {@code null}.
 	 */
-	public IndexedContextRoot getRoot();
+	IndexedContextRoot getRoot();
 
 	/**
 	 * @return the set of all subsumers (implied) {@link IndexedClassExpression}
 	 *         s that subsume the root {@link IndexedClassExpression} created by
 	 *         composition rules
 	 */
-	public Set<IndexedClassExpression> getComposedSubsumers();
+	Set<IndexedClassExpression> getComposedSubsumers();
 
 	/**
 	 * @return the set of all subsumers (implied) {@link IndexedClassExpression}
 	 *         s that subsume the root {@link IndexedClassExpression} created by
 	 *         decomposition rules
 	 */
-	public Set<IndexedClassExpression> getDecomposedSubsumers();
+	Set<IndexedClassExpression> getDecomposedSubsumers();
 
 	/**
 	 * @return the {@link Map} storing {@link SubContextPremises} for the
@@ -80,7 +80,7 @@ public interface ContextPremises {
 	 *         to the root {@link IndexedClassExpression}
 	 * @see SubContextPremises
 	 */
-	public Map<IndexedObjectProperty, ? extends SubContextPremises> getSubContextPremisesByObjectProperty();
+	Map<IndexedObjectProperty, ? extends SubContextPremises> getSubContextPremisesByObjectProperty();
 
 	/**
 	 * @return the {@link IndexedObjectProperty}s representing all derived
@@ -91,7 +91,7 @@ public interface ContextPremises {
 	 *         and concurrent access should be properly synchronized. It is
 	 *         never {@code null}.
 	 */
-	public Set<IndexedObjectProperty> getLocalReflexiveObjectProperties();
+	Set<IndexedObjectProperty> getLocalReflexiveObjectProperties();
 
 	/**
 	 * @return the first backward link rule assigned to this
@@ -100,7 +100,7 @@ public interface ContextPremises {
 	 *         {@link LinkRule#next()}; this method should be used to access the
 	 *         rules without modifying them.
 	 */
-	public LinkableBackwardLinkRule getBackwardLinkRuleHead();
+	LinkableBackwardLinkRule getBackwardLinkRuleHead();
 
 	/**
 	 * @param axiom
@@ -111,9 +111,9 @@ public interface ContextPremises {
 	 *         {@link IndexedDisjointClassesAxiom}s in which they occur as
 	 *         members
 	 */
-	public IndexedClassExpression[] getDisjointSubsumers(
+	IndexedClassExpression[] getDisjointSubsumers(
 			IndexedDisjointClassesAxiom axiom);
 
-	public Iterable<? extends IndexedObjectSomeValuesFrom> getPropagatedSubsumers(
+	Iterable<? extends IndexedObjectSomeValuesFrom> getPropagatedSubsumers(
 			IndexedPropertyChain subRoot);
 }

@@ -143,7 +143,7 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 	public ContextCreatingSaturationStateWriter<EC> getContextCreatingWriter(
 			ContextCreationListener contextCreationListener,
 			ContextModificationListener contextModificationListener) {
-		return new AbstractContextCreatingWriter(contextCreationListener,
+		return new ContextCreatingWriter(contextCreationListener,
 				contextModificationListener);
 	}
 
@@ -246,13 +246,12 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 	 *         pavel.klinov@uni-ulm.de
 	 * @author "Yevgeny Kazakov"
 	 */
-	protected class AbstractContextCreatingWriter extends
-			ContextModifyingWriter implements
-			ContextCreatingSaturationStateWriter<EC> {
+	protected class ContextCreatingWriter extends ContextModifyingWriter
+			implements ContextCreatingSaturationStateWriter<EC> {
 
 		private final ContextCreationListener contextCreationListener_;
 
-		protected AbstractContextCreatingWriter(
+		protected ContextCreatingWriter(
 				ContextCreationListener contextCreationListener,
 				ContextModificationListener contextModificationListener) {
 			super(contextModificationListener);
@@ -260,14 +259,15 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 			this.contextCreationListener_ = contextCreationListener;
 		}
 
-		protected AbstractContextCreatingWriter() {
+		protected ContextCreatingWriter() {
 			super(ContextModificationListener.DUMMY);
 			this.contextCreationListener_ = ContextCreationListener.DUMMY;
 		}
 
 		@Override
 		public void produce(Conclusion conclusion) {
-			produce(getCreateContext(conclusion.getConclusionRoot()), conclusion);
+			produce(getCreateContext(conclusion.getConclusionRoot()),
+					conclusion);
 		}
 
 		@Override

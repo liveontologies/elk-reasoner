@@ -152,6 +152,11 @@ public class ContextImpl implements ExtendedContext {
 	private volatile boolean isInitialized_ = false;
 
 	/**
+	 * the number of {@link Conclusion}s contained in this {@code ConclusionSet}
+	 */
+	private int size = 0;
+
+	/**
 	 * Construct a new {@link Context} for the given {@link IndexedContextRoot}.
 	 * Initially, the context is not active.
 	 * 
@@ -165,17 +170,38 @@ public class ContextImpl implements ExtendedContext {
 
 	@Override
 	public boolean addConclusion(Conclusion conclusion) {
-		return conclusion.accept(CONCLUSION_INSERTER_, this);
+		boolean success = conclusion.accept(CONCLUSION_INSERTER_, this);
+		if (success)
+			size++;
+		return success;
 	}
 
 	@Override
 	public boolean removeConclusion(Conclusion conclusion) {
-		return conclusion.accept(CONCLUSION_DELETER_, this);
+		boolean success = conclusion.accept(CONCLUSION_DELETER_, this);
+		if (success)
+			size--;
+		return success;
 	}
 
 	@Override
 	public boolean containsConclusion(Conclusion conclusion) {
 		return conclusion.accept(CONCLUSION_OCCURRENCE_CHECKER_, this);
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return size == 0;
+
+	}
+
+	@Override
+	public boolean isEmpty(IndexedObjectProperty subRoot) {
+		if (subContextsByObjectProperty_ == null)
+			return true;
+		// else
+		SubContext subContext = subContextsByObjectProperty_.get(subRoot);
+		return subContext == null || subContext.isEmpty();
 	}
 
 	@Override

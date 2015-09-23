@@ -37,14 +37,13 @@ import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 
 /**
- * A {@link ConclusionInsertionVisitor} that additionally initializes
- * {@link Context}s and {@link SubContext}s to which {@link Conclusion}s are
- * inserted.
+ * A {@link ConclusionInsertionVisitor} that initializes the {@link Context} and
+ * the {@link SubContext} if it is the first conclusion inserted there.
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ConclusionInitializingInsertionVisitor extends
+public class ContextInitializingConclusionInsertionVisitor extends
 		ConclusionInsertionVisitor {
 
 	/**
@@ -55,7 +54,7 @@ public class ConclusionInitializingInsertionVisitor extends
 
 	private final OntologyIndex index_;
 
-	public ConclusionInitializingInsertionVisitor(
+	public ContextInitializingConclusionInsertionVisitor(
 			SaturationStateWriter<?> writer) {
 		super(writer);
 		this.producer_ = writer;
@@ -65,17 +64,16 @@ public class ConclusionInitializingInsertionVisitor extends
 	@Override
 	protected Boolean defaultVisit(Conclusion conclusion, Context context) {
 		IndexedContextRoot root = context.getRoot();
-		Conclusion contextInitConclusion = new ContextInitializationImpl(root,
-				index_);
-		if (!context.containsConclusion(contextInitConclusion))
-			producer_.produce(contextInitConclusion);
+		if (context.isEmpty()) {
+			producer_.produce(new ContextInitializationImpl(root, index_));
+		}
 		if (conclusion instanceof SubConclusion) {
 			IndexedObjectProperty subRoot = ((SubConclusion) conclusion)
 					.getConclusionSubRoot();
-			SubConclusion subContextInit = new SubContextInitializationImpl(
-					root, subRoot);
-			if (!context.containsConclusion(subContextInit))
-				producer_.produce(subContextInit);
+			if (context.isEmpty(subRoot)) {
+				producer_.produce(new SubContextInitializationImpl(root,
+						subRoot));
+			}
 		}
 		return super.defaultVisit(conclusion, context);
 	}
