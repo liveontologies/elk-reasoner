@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
@@ -42,10 +42,10 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 public interface SubsumerDecompositionRuleVisitor<O> {
 
 	O visit(ComposedFromDecomposedSubsumerRule rule,
-			IndexedClassExpression premise, ContextPremises premises,
+			IndexedClassEntity premise, ContextPremises premises,
 			ConclusionProducer producer);
 
-	O visit(IndexedClassDecomposition rule, IndexedClass premise,
+	O visit(IndexedClassDecompositionRule rule, IndexedClass premise,
 			ContextPremises premises, ConclusionProducer producer);
 
 	O visit(IndexedObjectComplementOfDecomposition rule,

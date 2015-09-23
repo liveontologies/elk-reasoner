@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectHasSelf;
@@ -53,7 +54,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFrom
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassFromDefinitionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectHasSelfDecomposition;
@@ -94,7 +95,7 @@ public abstract class AbstractRuleVisitor<O> implements RuleVisitor<O> {
 
 	@Override
 	public O visit(ComposedFromDecomposedSubsumerRule rule,
-			IndexedClassExpression premise, ContextPremises premises,
+			IndexedClassEntity premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		return defaultVisit(rule, premise, premises, producer);
 	}
@@ -149,7 +150,7 @@ public abstract class AbstractRuleVisitor<O> implements RuleVisitor<O> {
 	}
 
 	@Override
-	public O visit(IndexedClassDecomposition rule, IndexedClass premise,
+	public O visit(IndexedClassDecompositionRule rule, IndexedClass premise,
 			ContextPremises premises, ConclusionProducer producer) {
 		return defaultVisit(rule, premise, premises, producer);
 	}

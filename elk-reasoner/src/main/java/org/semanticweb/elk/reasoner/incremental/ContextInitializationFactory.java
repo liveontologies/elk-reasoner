@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SubsumerDecompositionRule;
 import org.semanticweb.elk.util.concurrent.computation.BaseInputProcessor;
@@ -91,7 +91,7 @@ class ContextInitializationFactory extends SimpleInterrupter
 		changedGlobalRuleHead_ = changedGlobalRuleHead;
 		stageStatistics_ = stageStats;
 
-		classDecomposition_ = new IndexedClassDecomposition() {
+		classDecomposition_ = new IndexedClassDecompositionRule() {
 			private final Map<? extends IndexedClass, ? extends IndexedClassExpression> changedDefinitions_ = changedDefinitions;
 
 			private final Map<? extends IndexedClass, ? extends ElkAxiom> changedDefinitionReasons_ = changedDefinitionReasons;

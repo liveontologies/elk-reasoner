@@ -45,18 +45,24 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class IndexedClassDecomposition extends
+public class IndexedClassDecompositionRule extends
 		AbstractSubsumerDecompositionRule<IndexedClass> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(IndexedClassDecomposition.class);
+			.getLogger(IndexedClassDecompositionRule.class);
+
+	private static final IndexedClassDecompositionRule INSTANCE_ = new IndexedClassDecompositionRule();
 
 	public static final String NAME = "Definition Expansion";
 
 	@Override
 	public String getName() {
 		return NAME;
+	}
+
+	public static SubsumerDecompositionRule<IndexedClass> getInstance() {
+		return INSTANCE_;
 	}
 
 	public static boolean tryAddRuleFor(ModifiableIndexedDefinitionAxiom axiom,

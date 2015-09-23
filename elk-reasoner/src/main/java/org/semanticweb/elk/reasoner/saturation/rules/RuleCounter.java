@@ -39,7 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFrom
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassFromDefinitionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectHasSelfDecomposition;
@@ -111,7 +111,7 @@ public class RuleCounter {
 	long countDisjointSubsumerFromMemberRule;
 
 	/**
-	 * counter for {@link IndexedClassDecomposition}
+	 * counter for {@link IndexedClassDecompositionRule}
 	 */
 	long countIndexedClassDecomposition;
 

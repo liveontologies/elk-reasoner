@@ -66,8 +66,8 @@ public abstract class AbstractRuleApplicationConclusionVisitor extends
 		IndexedClassExpression subsumer = conclusion.getExpression();
 		subsumer.accept(new SubsumerDecompositionVisitor(ruleAppVisitor,
 				premises, producer));
-		ComposedFromDecomposedSubsumerRule.getInstance().accept(ruleAppVisitor,
-				subsumer, premises, producer);
+//		ComposedFromDecomposedSubsumerRule.getInstance().accept(ruleAppVisitor,
+//				subsumer, premises, producer);
 	}
 
 }

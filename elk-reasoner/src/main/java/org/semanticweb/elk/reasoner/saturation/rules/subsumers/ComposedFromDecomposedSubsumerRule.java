@@ -22,24 +22,23 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
  * 
- * A {@link SubsumerRule} producing {@link ComposedSubsumer} when processing a
- * {@link DecomposedSubsumer}
+ * A {@link SubsumerDecompositionRule} producing {@link ComposedSubsumer} when
+ * processing a {@link DecomposedSubsumer} for {@link IndexedClassEntity}
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ComposedFromDecomposedSubsumerRule implements
-		SubsumerRule<IndexedClassExpression> {
+public class ComposedFromDecomposedSubsumerRule extends
+		AbstractSubsumerDecompositionRule<IndexedClassEntity> {
 
 	private static final ComposedFromDecomposedSubsumerRule INSTANCE_ = new ComposedFromDecomposedSubsumerRule();
 
@@ -50,12 +49,12 @@ public class ComposedFromDecomposedSubsumerRule implements
 		return NAME;
 	}
 
-	public static SubsumerRule<IndexedClassExpression> getInstance() {
+	public static SubsumerDecompositionRule<IndexedClassEntity> getInstance() {
 		return INSTANCE_;
 	}
 
 	@Override
-	public void apply(IndexedClassExpression premise, ContextPremises premises,
+	public void apply(IndexedClassEntity premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		producer.produce(new ComposedDecomposition(premises.getRoot(), premise));
 	}
@@ -66,16 +65,10 @@ public class ComposedFromDecomposedSubsumerRule implements
 	}
 
 	@Override
-	public void accept(RuleVisitor<?> visitor, IndexedClassExpression premise,
-			ContextPremises premises, ConclusionProducer producer) {
-		visitor.visit(this, premise, premises, producer);
-	}
-
-	@Override
-	public void accept(SubsumerRuleVisitor<?> visitor,
-			IndexedClassExpression premise, ContextPremises premises,
+	public void accept(SubsumerDecompositionRuleVisitor<?> visitor,
+			IndexedClassEntity premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		accept((RuleVisitor<?>) visitor, premise, premises, producer);
+		visitor.visit(this, premise, premises, producer);
 	}
 
 }

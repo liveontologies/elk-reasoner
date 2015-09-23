@@ -28,7 +28,7 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassEx
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDefinitionAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassFromDefinitionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
 import org.slf4j.Logger;
@@ -68,7 +68,7 @@ public class ModifiableIndexedDefinitionAxiomImpl extends
 
 	@Override
 	public boolean addOccurrence(ModifiableOntologyIndex index, ElkAxiom reason) {
-		if (IndexedClassDecomposition.tryAddRuleFor(this, index, reason))
+		if (IndexedClassDecompositionRule.tryAddRuleFor(this, index, reason))
 			return IndexedClassFromDefinitionRule.addRuleFor(this, index,
 					reason);
 		// else
@@ -78,7 +78,7 @@ public class ModifiableIndexedDefinitionAxiomImpl extends
 	@Override
 	public boolean removeOccurrence(ModifiableOntologyIndex index,
 			ElkAxiom reason) {
-		if (IndexedClassDecomposition.tryRemoveRuleFor(this, index, reason))
+		if (IndexedClassDecompositionRule.tryRemoveRuleFor(this, index, reason))
 			return IndexedClassFromDefinitionRule.removeRuleFor(this, index,
 					reason);
 		// else
