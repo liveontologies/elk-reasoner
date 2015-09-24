@@ -45,8 +45,6 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.BackwardLinkI
 public class DecomposedExistentialBackwardLink extends
 		AbstractBackwardLinkInference {
 
-	private final IndexedContextRoot inferenceRoot_;
-
 	private final IndexedObjectSomeValuesFrom existential_;
 
 	public DecomposedExistentialBackwardLink(IndexedContextRoot inferenceRoot,
@@ -54,12 +52,11 @@ public class DecomposedExistentialBackwardLink extends
 		super(IndexedObjectSomeValuesFrom.Helper.getTarget(subsumer), subsumer
 				.getProperty(), inferenceRoot);
 		existential_ = subsumer;
-		inferenceRoot_ = inferenceRoot;
 	}
 
 	@Override
 	public IndexedContextRoot getInferenceRoot() {
-		return inferenceRoot_;
+		return getOriginRoot();
 	}
 
 	public IndexedObjectSomeValuesFrom getDecomposedExistential() {
