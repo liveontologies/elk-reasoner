@@ -29,6 +29,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 
@@ -46,33 +47,35 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 public abstract class AbstractElkEntityVisitor<O> implements
 		ElkEntityVisitor<O> {
 
+	protected abstract O defaultVisit(ElkEntity entity);
+
 	@Override
-	public O visit(ElkAnnotationProperty elkAnnotationProperty) {
-		return null;
+	public O visit(ElkAnnotationProperty entity) {
+		return defaultVisit(entity);
 	}
 
 	@Override
-	public O visit(ElkClass elkClass) {
-		return null;
+	public O visit(ElkClass entity) {
+		return defaultVisit(entity);
 	}
 
 	@Override
-	public O visit(ElkDataProperty elkDataProperty) {
-		return null;
+	public O visit(ElkDataProperty entity) {
+		return defaultVisit(entity);
 	}
 
 	@Override
-	public O visit(ElkDatatype elkDatatype) {
-		return null;
+	public O visit(ElkDatatype entity) {
+		return defaultVisit(entity);
 	}
 
 	@Override
-	public O visit(ElkNamedIndividual elkNamedIndividual) {
-		return null;
+	public O visit(ElkNamedIndividual entity) {
+		return defaultVisit(entity);
 	}
 
 	@Override
-	public O visit(ElkObjectProperty elkObjectProperty) {
-		return null;
+	public O visit(ElkObjectProperty entity) {
+		return defaultVisit(entity);
 	}
 }

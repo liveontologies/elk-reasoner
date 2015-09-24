@@ -50,7 +50,7 @@ import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.util.Comparators;
-import org.semanticweb.elk.owl.visitors.AbstractElkEntityVisitor;
+import org.semanticweb.elk.owl.visitors.DummyElkEntityVisitor;
 import org.semanticweb.elk.owl.visitors.NoOpElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.taxonomy.MockInstanceTaxonomy.MutableTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
@@ -114,8 +114,8 @@ public class MockTaxonomyLoader {
 		}
 	}
 
-	static class TaxonomyInserter extends NoOpElkAxiomVisitor<Void>
-			implements Owl2ParserAxiomProcessor {
+	static class TaxonomyInserter extends NoOpElkAxiomVisitor<Void> implements
+			Owl2ParserAxiomProcessor {
 
 		boolean createNodes = false;
 		final MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy;
@@ -193,7 +193,7 @@ public class MockTaxonomyLoader {
 			ElkEntity entity = elkDeclarationAxiom.getEntity();
 			// support two sorts of declarations: classes and named
 			// individuals
-			entity.accept(new AbstractElkEntityVisitor<Object>() {
+			entity.accept(new DummyElkEntityVisitor<Object>() {
 
 				@Override
 				public Object visit(ElkClass elkClass) {
