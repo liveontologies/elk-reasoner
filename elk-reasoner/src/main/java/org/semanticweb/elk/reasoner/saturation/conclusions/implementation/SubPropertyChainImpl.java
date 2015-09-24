@@ -26,8 +26,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectPropertyConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChain;
 
 /**
  * An implementation of {@link SubPropertyChain}

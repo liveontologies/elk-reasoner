@@ -115,7 +115,8 @@ class SubPropertyExplorer {
 			for (int i = 0; i < toldSubChains.size(); i++) {
 				IndexedPropertyChain sub = toldSubChains.get(i);
 				ElkAxiom reason = reasons.get(i);
-				toDo(new SubPropertyChainExpanded(sub, next, input_, reason));
+				toDo(new SubPropertyChainExpanded(sub, next,
+						(IndexedObjectProperty) input_, reason));
 			}
 		}
 	}

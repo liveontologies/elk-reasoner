@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectPropertyConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 import org.semanticweb.elk.util.hashing.Hasher;
 

@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Forwar
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.SubPropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.BackwardLinkInferenceVisitor;
 
 /**

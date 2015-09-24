@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectPropertyConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChain;
 
 public class ObjectPropertyConclusionPrinter implements
 		ObjectPropertyConclusionVisitor<Void, String> {

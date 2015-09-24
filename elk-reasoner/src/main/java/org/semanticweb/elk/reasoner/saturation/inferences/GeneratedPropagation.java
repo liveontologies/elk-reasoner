@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Compos
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.SubPropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.PropagationInferenceVisitor;
 
 /**

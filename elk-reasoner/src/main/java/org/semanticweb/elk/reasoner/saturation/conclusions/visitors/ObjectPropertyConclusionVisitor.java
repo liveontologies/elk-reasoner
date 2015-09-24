@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubPropertyChain;
 
 /**
  * @author Pavel Klinov

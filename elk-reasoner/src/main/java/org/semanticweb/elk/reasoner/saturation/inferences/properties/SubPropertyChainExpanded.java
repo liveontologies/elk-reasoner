@@ -26,8 +26,10 @@ package org.semanticweb.elk.reasoner.saturation.inferences.properties;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.SubPropertyChainImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubPropertyChain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
@@ -46,7 +48,7 @@ public class SubPropertyChainExpanded extends AbstractSubPropertyChainInference 
 	 * The inferred sub-property of the super-chain for which the inference is
 	 * performed by unfolding under told sub-chain of this property
 	 */
-	private final IndexedPropertyChain middleChain_;
+	private final IndexedObjectProperty middleChain_;
 
 	/**
 	 * The {@link ElkAxiom} responsible for the told sub-chain of the premise
@@ -54,19 +56,23 @@ public class SubPropertyChainExpanded extends AbstractSubPropertyChainInference 
 	private final ElkAxiom reason_;
 
 	public SubPropertyChainExpanded(IndexedPropertyChain firstChain,
-			IndexedPropertyChain secondChain, IndexedPropertyChain thirdChain,
-			ElkAxiom reason) {
+			IndexedObjectProperty secondChain,
+			IndexedObjectProperty thirdChain, ElkAxiom reason) {
 		super(firstChain, thirdChain);
 		this.middleChain_ = secondChain;
 		this.reason_ = reason;
 	}
 
-	public SubPropertyChain getPremise() {
-		return new SubPropertyChainImpl(middleChain_, getSuperChain());
+	public IndexedObjectProperty getToldSuperProperty() {
+		return middleChain_;
 	}
 
 	public ElkAxiom getReason() {
 		return this.reason_;
+	}
+
+	public SubPropertyChain getPremise() {
+		return new SubPropertyChainImpl(middleChain_, getSuperChain());
 	}
 
 	@Override
