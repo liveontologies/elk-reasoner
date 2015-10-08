@@ -48,7 +48,7 @@ public class SynchronizedArrayListActivationStack<E> implements
 					"Elements in the stack cannot be null");
 		boolean result = false;
 		if (elements_ == null) {
-			elements_ = new ArrayList<E>(16);
+			elements_ = new ArrayList<E>(4);
 			result = true;
 		}
 		elements_.add(element);
