@@ -126,7 +126,7 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 	}
 
 	@Override
-	public String getName() {
+	public String toString() {
 		return NAME;
 	}
 

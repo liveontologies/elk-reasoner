@@ -45,8 +45,7 @@ public class DummyRuleVisitor extends AbstractRuleVisitor<Void> {
 	@Override
 	<P> Void defaultVisit(Rule<P> rule, P premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		LOGGER_.trace("ignore {} by {} in {}", premise, rule.getName(),
-				premises);
+		LOGGER_.trace("ignore {} by {} in {}", premise, rule, premises);
 		return null;
 	}
 

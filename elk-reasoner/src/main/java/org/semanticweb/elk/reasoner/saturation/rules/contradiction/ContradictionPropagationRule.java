@@ -58,7 +58,7 @@ public class ContradictionPropagationRule extends AbstractContradictionRule {
 	}
 
 	@Override
-	public String getName() {
+	public String toString() {
 		return NAME;
 	}
 

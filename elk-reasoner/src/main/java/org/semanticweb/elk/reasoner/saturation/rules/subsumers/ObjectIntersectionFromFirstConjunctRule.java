@@ -60,7 +60,7 @@ public class ObjectIntersectionFromFirstConjunctRule extends
 	}
 
 	@Override
-	public String getName() {
+	public String toString() {
 		return NAME;
 	}
 

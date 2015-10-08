@@ -41,11 +41,6 @@ import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 public interface Rule<P> {
 
 	/**
-	 * @return the name of this rule
-	 */
-	public String getName();
-
-	/**
 	 * Apply the rule to the given premise representing a {@link Conclusion} and
 	 * other {@link Conclusion}s stored in within the given
 	 * {@link ContextPremises} and produce {@link Conclusion}s using the given

@@ -138,9 +138,8 @@ class ContextInitializationFactory extends SimpleInterrupter
 				// conclusion
 				LinkedContextInitRule nextGlobalRule = changedGlobalRuleHead_;
 				while (nextGlobalRule != null) {
-					if (LOGGER_.isTraceEnabled())
-						LOGGER_.trace(context + ": applying rule "
-								+ nextGlobalRule.getName());
+					LOGGER_.trace("{}: applying rule {}", context,
+							nextGlobalRule);
 					nextGlobalRule.accept(ruleAppVisitor, null, context,
 							saturationStateWriter);
 					nextGlobalRule = nextGlobalRule.next();

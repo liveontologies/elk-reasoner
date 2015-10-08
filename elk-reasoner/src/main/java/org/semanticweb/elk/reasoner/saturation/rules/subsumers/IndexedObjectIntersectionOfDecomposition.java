@@ -52,7 +52,7 @@ public class IndexedObjectIntersectionOfDecomposition extends
 	}
 
 	@Override
-	public String getName() {
+	public String toString() {
 		return NAME;
 	}
 

@@ -49,9 +49,9 @@ public class BasicRuleVisitor extends AbstractRuleVisitor<Void> {
 	@Override
 	<P> Void defaultVisit(Rule<P> rule, P premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		LOGGER_.trace("{}: process {} by {}", premises, premise, rule.getName());
+		LOGGER_.trace("{}: process {} by {}", premises, premise, rule);
 		rule.apply(premise, premises, producer);
 		return null;
 	}
-	
+
 }

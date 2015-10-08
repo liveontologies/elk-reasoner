@@ -50,7 +50,7 @@ public class BackwardLinkFromForwardLinkRule extends AbstractForwardLinkRule {
 	}
 
 	@Override
-	public String getName() {
+	public String toString() {
 		return NAME;
 	}
 

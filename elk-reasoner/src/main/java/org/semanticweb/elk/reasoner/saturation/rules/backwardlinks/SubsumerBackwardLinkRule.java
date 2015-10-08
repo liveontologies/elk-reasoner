@@ -50,7 +50,7 @@ public class SubsumerBackwardLinkRule extends AbstractBackwardLinkRule {
 	}
 
 	@Override
-	public String getName() {
+	public String toString() {
 		return NAME;
 	}
 

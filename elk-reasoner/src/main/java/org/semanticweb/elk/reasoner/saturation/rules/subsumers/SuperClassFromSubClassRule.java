@@ -150,7 +150,7 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 	}
 
 	@Override
-	public String getName() {
+	public String toString() {
 		return NAME;
 	}
 
@@ -278,11 +278,6 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 	 */
 	protected boolean isEmpty() {
 		return toldSubsumers_.isEmpty();
-	}
-
-	@Override
-	public String toString() {
-		return getName() + ": " + toldSubsumers_;
 	}
 
 	private static final Matcher<ChainableSubsumerRule, SuperClassFromSubClassRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableSubsumerRule, SuperClassFromSubClassRule>(

@@ -88,7 +88,7 @@ public class IndexedClassFromDefinitionRule extends
 	}
 
 	@Override
-	public String getName() {
+	public String toString() {
 		return NAME;
 	}
 
@@ -229,11 +229,6 @@ public class IndexedClassFromDefinitionRule extends
 	 */
 	private boolean isEmpty() {
 		return definedClasses_.isEmpty();
-	}
-
-	@Override
-	public String toString() {
-		return getName() + ": " + definedClasses_;
 	}
 
 	private static final Matcher<ChainableSubsumerRule, IndexedClassFromDefinitionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableSubsumerRule, IndexedClassFromDefinitionRule>(

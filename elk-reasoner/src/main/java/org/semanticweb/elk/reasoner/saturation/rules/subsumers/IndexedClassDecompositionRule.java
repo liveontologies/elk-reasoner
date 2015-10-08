@@ -57,7 +57,7 @@ public class IndexedClassDecompositionRule extends
 	public static final String NAME = "Definition Expansion";
 
 	@Override
-	public String getName() {
+	public String toString() {
 		return NAME;
 	}
 

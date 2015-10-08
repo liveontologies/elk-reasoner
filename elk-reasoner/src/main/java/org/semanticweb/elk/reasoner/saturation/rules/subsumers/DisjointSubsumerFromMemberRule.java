@@ -146,7 +146,7 @@ public class DisjointSubsumerFromMemberRule extends
 	}
 
 	@Override
-	public String getName() {
+	public String toString() {
 		return NAME;
 	}
 

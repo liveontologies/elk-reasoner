@@ -126,7 +126,7 @@ public class RuleApplicationConclusionVisitor extends
 		LinkedContextInitRule rule = conclusion.getContextInitRuleHead();
 		LOGGER_.trace("applying init rules:");
 		while (rule != null) {
-			LOGGER_.trace("init rule: {}", rule.getName());
+			LOGGER_.trace("init rule: {}", rule);
 			rule.accept(ruleAppVisitor, conclusion, premises, producer);
 			rule = rule.next();
 		}

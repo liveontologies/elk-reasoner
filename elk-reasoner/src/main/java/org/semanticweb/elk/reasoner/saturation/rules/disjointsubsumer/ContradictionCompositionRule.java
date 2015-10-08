@@ -42,7 +42,7 @@ public class ContradictionCompositionRule extends AbstractDisjointSubsumerRule {
 	public static final String NAME = "Contradiction by Disjointness Axiom";
 
 	@Override
-	public String getName() {
+	public String toString() {
 		return NAME;
 	}
 

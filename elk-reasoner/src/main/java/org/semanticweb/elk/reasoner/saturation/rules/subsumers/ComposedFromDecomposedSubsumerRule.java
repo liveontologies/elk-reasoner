@@ -45,7 +45,7 @@ public class ComposedFromDecomposedSubsumerRule extends
 	public static final String NAME = "Composed from Decomposed Subsumer";
 
 	@Override
-	public String getName() {
+	public String toString() {
 		return NAME;
 	}
 

@@ -95,7 +95,7 @@ public class OwlThingContextInitRule extends AbstractChainableContextInitRule {
 	}
 
 	@Override
-	public String getName() {
+	public String toString() {
 		return NAME;
 	}
 

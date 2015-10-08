@@ -77,7 +77,7 @@ public class NonReflexiveBackwardLinkCompositionRule extends
 	}
 
 	@Override
-	public String getName() {
+	public String toString() {
 		return NAME;
 	}
 
