@@ -75,6 +75,7 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 			return false;
 		reasoner.ruleAndConclusionStats.add(cleaning_
 				.getRuleAndConclusionStatistics());
+		this.cleaning_ = null;
 		return true;
 	}
 

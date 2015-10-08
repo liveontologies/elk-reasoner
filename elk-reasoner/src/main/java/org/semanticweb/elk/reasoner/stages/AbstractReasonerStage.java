@@ -138,7 +138,7 @@ abstract class AbstractReasonerStage extends SimpleInterrupter implements
 		this.isCompleted = true;
 		this.workerNo = 0;
 		this.progressMonitor = null;
-		this.initialized = false;
+		this.initialized = false;		
 		return true;
 	}
 

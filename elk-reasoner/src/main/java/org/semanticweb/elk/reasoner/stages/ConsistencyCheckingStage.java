@@ -71,6 +71,7 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 		reasoner.inconsistentEntity = computation.getInconsistentEntity();
 		reasoner.ruleAndConclusionStats.add(computation
 				.getRuleAndConclusionStatistics());
+		this.computation = null;
 
 		// FIXME Obviously needed a better clean-up after inconsistency
 		if (reasoner.inconsistentEntity != null) {

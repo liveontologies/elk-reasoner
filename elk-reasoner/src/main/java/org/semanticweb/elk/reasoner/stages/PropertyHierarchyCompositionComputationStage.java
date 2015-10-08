@@ -73,6 +73,7 @@ public class PropertyHierarchyCompositionComputationStage extends
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
+		this.computation_ = null;
 		return true;
 	}
 

@@ -89,7 +89,7 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		todo_ = null;
+		this.todo_ = null;
 		return true;
 	}
 

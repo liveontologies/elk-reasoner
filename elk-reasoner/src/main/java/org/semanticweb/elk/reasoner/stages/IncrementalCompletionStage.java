@@ -82,7 +82,7 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 			return false;
 		reasoner.ruleAndConclusionStats.add(completion_
 				.getRuleAndConclusionStatistics());
-		completion_ = null;
+		this.completion_ = null;
 		return true;
 	}
 

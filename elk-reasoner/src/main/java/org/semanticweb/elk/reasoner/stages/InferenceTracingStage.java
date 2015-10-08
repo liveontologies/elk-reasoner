@@ -45,7 +45,7 @@ import org.semanticweb.elk.util.collections.Operations.Transformation;
  */
 public class InferenceTracingStage extends AbstractReasonerStage {
 
-	private RecursiveTracingComputation computation_;
+	private RecursiveTracingComputation computation_ = null;
 
 	public InferenceTracingStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
@@ -93,8 +93,12 @@ public class InferenceTracingStage extends AbstractReasonerStage {
 
 	@Override
 	public boolean postExecute() {
+		if (!super.postExecute()) {
+			return false;
+		}
 		reasoner.traceState.clearToTrace();
-		return super.postExecute();
+		this.computation_ = null;
+		return true;
 	}
 
 }

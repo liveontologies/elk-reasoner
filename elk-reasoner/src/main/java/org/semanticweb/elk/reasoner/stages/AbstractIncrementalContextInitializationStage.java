@@ -49,7 +49,7 @@ abstract class AbstractIncrementalContextInitializationStage extends
 	static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractIncrementalContextInitializationStage.class);
 
-	protected final SaturationStatistics stageStatistics_ = new SaturationStatistics();
+	protected SaturationStatistics stageStatistics_ = null;
 
 	/**
 	 * The counter for deleted contexts
@@ -65,7 +65,7 @@ abstract class AbstractIncrementalContextInitializationStage extends
 	 */
 	protected Iterator<IndexedContextRoot> todo = null;
 
-	private SaturationStateWriter<?> writer_;
+	private SaturationStateWriter<?> writer_ = null;
 
 	public AbstractIncrementalContextInitializationStage(
 			AbstractReasonerState reasoner, AbstractReasonerStage... preStages) {
@@ -81,6 +81,7 @@ abstract class AbstractIncrementalContextInitializationStage extends
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
+		this.stageStatistics_ = new SaturationStatistics();
 		this.writer_ = SaturationUtils.getStatsAwareWriter(
 				reasoner.saturationState.getContextCreatingWriter(),
 				stageStatistics_);
@@ -114,6 +115,9 @@ abstract class AbstractIncrementalContextInitializationStage extends
 		if (!super.postExecute())
 			return false;
 		reasoner.ruleAndConclusionStats.add(stageStatistics_);
+		this.stageStatistics_ = null;
+		this.todo = null;
+		this.writer_ = null;
 		return true;
 	}
 

@@ -49,7 +49,25 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AxiomLoadingStage.class);
 
+	/**
+	 * After loading how many axioms recommend garbage collection
+	 */
+	private static final int GC_THRESHOLD_ = 10000;
+
+	/**
+	 * the {@link AxiomLoader} using which the axioms are loaded
+	 */
 	private volatile AxiomLoader loader_;
+
+	/**
+	 * counts how many axioms were loaded
+	 */
+	private int axiomCounter_;
+
+	/**
+	 * the {@link ElkAxiomProcessor}s using which the axioms are inserted and
+	 * deleted
+	 */
 	private ElkAxiomProcessor axiomInsertionProcessor_,
 			axiomDeletionProcessor_;
 
@@ -67,6 +85,7 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
+		axiomCounter_ = 0;
 		loader_ = reasoner.getAxiomLoader();
 		if (loader_ == null || loader_.isLoadingFinished()) {
 			return true;
@@ -85,8 +104,8 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 		 * if some axiom change can't be incorporated incrementally
 		 */
 		/**
-		 * The listener used to detect if the axiom has an impact on the role
-		 * hierarchy
+		 * The listener used to count axioms and detect if the axiom cannot be
+		 * loaded incrementally
 		 */
 		NonIncrementalChangeListener<ElkAxiom> listener = new NonIncrementalChangeListener<ElkAxiom>() {
 
@@ -94,6 +113,7 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 
 			@Override
 			public void notify(ElkAxiom axiom) {
+				axiomCounter_++;
 				if (resetDone)
 					return;
 				if (LOGGER_.isDebugEnabled()) {
@@ -126,6 +146,13 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
+		this.loader_ = null;
+		this.axiomInsertionProcessor_ = null;
+		this.axiomDeletionProcessor_ = null;
+		if (axiomCounter_ > GC_THRESHOLD_) {
+			// recommend garbage collection
+			System.gc();
+		}
 		return true;
 	}
 

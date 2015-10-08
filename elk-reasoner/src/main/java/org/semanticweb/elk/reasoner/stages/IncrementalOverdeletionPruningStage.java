@@ -47,7 +47,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationIn
  */
 public class IncrementalOverdeletionPruningStage extends AbstractReasonerStage {
 
-	private ClassExpressionSaturation<IndexedContextRoot> completion_;
+	private ClassExpressionSaturation<IndexedContextRoot> completion_ = null;
 
 	public IncrementalOverdeletionPruningStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
@@ -96,6 +96,7 @@ public class IncrementalOverdeletionPruningStage extends AbstractReasonerStage {
 		}
 		reasoner.ruleAndConclusionStats.add(completion_
 				.getRuleAndConclusionStatistics());
+		this.completion_ = null;
 		return true;
 	}
 
