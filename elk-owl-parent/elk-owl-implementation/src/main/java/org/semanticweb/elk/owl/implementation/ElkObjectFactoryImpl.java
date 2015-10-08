@@ -115,6 +115,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.managers.DummyElkObjectRecycler;
+import org.semanticweb.elk.owl.managers.ElkEntityRecycler;
 import org.semanticweb.elk.owl.managers.ElkObjectRecycler;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIris;
@@ -149,7 +150,7 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	 * {@link DummyElkObjectRecycler} for recycling {@link ElkObject}s.
 	 */
 	public ElkObjectFactoryImpl() {
-		this(new DummyElkObjectRecycler());
+		this(new ElkEntityRecycler());
 	}
 
 	/**
