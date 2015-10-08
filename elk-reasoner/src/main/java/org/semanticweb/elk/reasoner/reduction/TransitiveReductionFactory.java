@@ -145,8 +145,9 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		this.jobsWithSaturatedRoot_ = new ConcurrentLinkedQueue<J>();
 		this.saturationState_ = saturationState;
 		this.saturationFactory_ = new ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>(
-				new RuleApplicationAdditionFactory<RuleApplicationInput>(saturationState),
-				maxWorkers, new ThisClassExpressionSaturationListener());
+				new RuleApplicationAdditionFactory<RuleApplicationInput>(
+						saturationState), maxWorkers,
+				new ThisClassExpressionSaturationListener());
 		this.owlThing_ = saturationState.getOntologyIndex().getOwlThing();
 		this.defaultTopOutput_ = new ArrayList<ElkClass>(1);
 		defaultTopOutput_.add(PredefinedElkClass.OWL_THING);
@@ -156,7 +157,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	public Engine getEngine() {
 		return new Engine();
 	}
-	
+
 	@Override
 	public void setInterrupt(boolean flag) {
 		super.setInterrupt(flag);
@@ -543,8 +544,10 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 					}
 				}
 				output.directSubsumers.put(candidate, candidateEquivalent);
-				LOGGER_.trace("{}: new direct subsumer {} [{}]", root,
-						candidate, candidateEquivalent);
+				if (LOGGER_.isTraceEnabled()) {
+					LOGGER_.trace("{}: new direct subsumer {} [{}]", root,
+							candidate, candidateEquivalent);
+				}
 			}
 			if (!state.prunedSubsumers.isEmpty())
 				LOGGER_.error("{}: pruned subsumers not removed: {}", root,

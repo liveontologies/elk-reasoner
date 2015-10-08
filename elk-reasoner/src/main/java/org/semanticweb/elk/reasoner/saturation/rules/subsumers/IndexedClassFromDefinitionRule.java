@@ -123,7 +123,10 @@ public class IndexedClassFromDefinitionRule extends
 		for (int i = 0; i < definedClasses_.size(); i++) {
 			IndexedClass defined = definedClasses_.get(i);
 			ElkAxiom reason = reasons_.get(i);
-			LOGGER_.trace("{}: adding to {} reason: {}", defined, NAME, reason);
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("{}: adding to {} reason: {}", defined, NAME,
+						reason);
+			}
 			if (rule.definedClasses_.add(defined)) {
 				rule.reasons_.add(reason);
 				added++;
@@ -142,8 +145,10 @@ public class IndexedClassFromDefinitionRule extends
 			added--;
 			IndexedClass defined = definedClasses_.get(i);
 			ElkAxiom reason = reasons_.get(i);
-			LOGGER_.trace("{}: removing from {} reason: {}", defined, NAME,
-					reason);
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("{}: removing from {} reason: {}", defined, NAME,
+						reason);
+			}
 			int j = rule.indexOf(defined, reason);
 			rule.definedClasses_.remove(j);
 			rule.reasons_.remove(j);
@@ -165,8 +170,10 @@ public class IndexedClassFromDefinitionRule extends
 		for (int i = 0; i < definedClasses_.size(); i++) {
 			IndexedClass defined = definedClasses_.get(i);
 			ElkAxiom reason = reasons_.get(i);
-			LOGGER_.trace("{}: removing from {} reason: {}", defined, NAME,
-					reason);
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("{}: removing from {} reason: {}", defined, NAME,
+						reason);
+			}
 			int j = rule.indexOf(defined, reason);
 			if (j >= 0) {
 				rule.definedClasses_.remove(j);
@@ -191,8 +198,10 @@ public class IndexedClassFromDefinitionRule extends
 			removed--;
 			IndexedClass defined = definedClasses_.get(i);
 			ElkAxiom reason = reasons_.get(i);
-			LOGGER_.trace("{}: adding to {} reason: {} [revert]", defined,
-					NAME, reason);
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("{}: adding to {} reason: {} [revert]", defined,
+						NAME, reason);
+			}
 			rule.definedClasses_.add(defined);
 			rule.reasons_.add(reason);
 		}

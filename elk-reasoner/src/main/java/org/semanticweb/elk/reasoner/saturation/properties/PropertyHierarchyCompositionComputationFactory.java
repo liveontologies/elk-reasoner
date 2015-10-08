@@ -159,14 +159,19 @@ public class PropertyHierarchyCompositionComputationFactory extends
 					boolean newRecord = false;
 
 					if (redundantLeftProperties.contains(leftSubProperty)) {
-						LOGGER_.trace(
-								"{} o {} => {}: composition is redundant",
-								leftSubProperty, rightSubPropertyChain, element);
+						if (LOGGER_.isTraceEnabled()) {
+							LOGGER_.trace(
+									"{} o {} => {}: composition is redundant",
+									leftSubProperty, rightSubPropertyChain,
+									element);
+						}
 						continue;
 					}
 
-					LOGGER_.trace("{} o {} => {}: new composition",
-							leftSubProperty, rightSubPropertyChain, element);
+					if (LOGGER_.isTraceEnabled()) {
+						LOGGER_.trace("{} o {} => {}: new composition",
+								leftSubProperty, rightSubPropertyChain, element);
+					}
 
 					Collection<IndexedComplexPropertyChain> compositionsSoFar;
 					synchronized (compositionsByLeft) {

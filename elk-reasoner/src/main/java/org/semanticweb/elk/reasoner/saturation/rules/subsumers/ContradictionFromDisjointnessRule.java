@@ -172,7 +172,10 @@ public class ContradictionFromDisjointnessRule extends
 		for (int i = 0; i < axioms_.size(); i++) {
 			IndexedDisjointClassesAxiom axiom = axioms_.get(i);
 			ElkAxiom reason = reasons_.get(i);
-			LOGGER_.trace("{}: adding to {} reason: {}", axiom, NAME, reason);
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("{}: adding to {} reason: {}", axiom, this,
+						reason);
+			}
 			if (rule.axioms_.add(axiom)) {
 				rule.reasons_.add(reason);
 				added++;
@@ -191,8 +194,10 @@ public class ContradictionFromDisjointnessRule extends
 			added--;
 			IndexedDisjointClassesAxiom axiom = axioms_.get(i);
 			ElkAxiom reason = reasons_.get(i);
-			LOGGER_.trace("{}: removing from {} reason: {}", axiom, NAME,
-					reason);
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("{}: removing from {} reason: {}", axiom, NAME,
+						reason);
+			}
 			int j = rule.indexOf(axiom, reason);
 			rule.axioms_.remove(j);
 			rule.reasons_.remove(j);
@@ -214,8 +219,10 @@ public class ContradictionFromDisjointnessRule extends
 		for (int i = 0; i < axioms_.size(); i++) {
 			IndexedDisjointClassesAxiom axiom = axioms_.get(i);
 			ElkAxiom reason = reasons_.get(i);
-			LOGGER_.trace("{}: removing from {} reason: {}", axiom, NAME,
-					reason);
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("{}: removing from {} reason: {}", axiom, NAME,
+						reason);
+			}
 			int j = rule.indexOf(axiom, reason);
 			if (j >= 0) {
 				rule.axioms_.remove(j);
@@ -240,8 +247,10 @@ public class ContradictionFromDisjointnessRule extends
 			removed--;
 			IndexedDisjointClassesAxiom axiom = axioms_.get(i);
 			ElkAxiom reason = reasons_.get(i);
-			LOGGER_.trace("{}: adding to {} reason: {} [revert]", axiom, NAME,
-					reason);
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("{}: adding to {} reason: {} [revert]", axiom,
+						NAME, reason);
+			}
 			rule.axioms_.add(axiom);
 			rule.reasons_.add(reason);
 		}

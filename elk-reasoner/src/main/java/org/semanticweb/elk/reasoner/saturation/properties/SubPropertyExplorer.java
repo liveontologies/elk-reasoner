@@ -127,8 +127,10 @@ class SubPropertyExplorer {
 			ObjectPropertyInferenceProducer inferenceProducer) {
 		new SubPropertyExplorer(input, currentSubPropertyChains,
 				currentSubProperties, inferenceProducer).process();
-		LOGGER_.trace("{} sub-property chains: {}, sub-properties: {}", input,
-				currentSubPropertyChains, currentSubProperties);
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("{} sub-property chains: {}, sub-properties: {}",
+					input, currentSubPropertyChains, currentSubProperties);
+		}
 	}
 
 	private static SaturatedPropertyChain computeSubProperties(

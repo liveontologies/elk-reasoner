@@ -92,8 +92,10 @@ public class RangeExplorer {
 			Set<IndexedClassExpression> currentRanges) {
 		new RangeExplorer(property, currentSuperProperties, currentRanges)
 				.process();
-		LOGGER_.trace("{} super-properties: {}, ranges: {}", property,
-				currentSuperProperties, currentRanges);
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("{} super-properties: {}, ranges: {}", property,
+					currentSuperProperties, currentRanges);
+		}
 	}
 
 	private static SaturatedPropertyChain computeRanges(

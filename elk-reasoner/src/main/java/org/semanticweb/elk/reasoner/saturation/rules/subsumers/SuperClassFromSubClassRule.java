@@ -180,7 +180,10 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 		for (int i = 0; i < toldSubsumers_.size(); i++) {
 			IndexedClassExpression subsumer = toldSubsumers_.get(i);
 			ElkAxiom reason = reasons_.get(i);
-			LOGGER_.trace("{}: adding to {} reason: {}", subsumer, NAME, reason);
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("{}: adding to {} reason: {}", subsumer, NAME,
+						reason);
+			}
 			if (rule.toldSubsumers_.add(subsumer)) {
 				rule.reasons_.add(reason);
 				added++;
@@ -199,8 +202,10 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 			added--;
 			IndexedClassExpression subsumer = toldSubsumers_.get(i);
 			ElkAxiom reason = reasons_.get(i);
-			LOGGER_.trace("{}: removing from {} reason: {}", subsumer, NAME,
-					reason);
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("{}: removing from {} reason: {}", subsumer,
+						NAME, reason);
+			}
 			int j = rule.indexOf(subsumer, reason);
 			rule.toldSubsumers_.remove(j);
 			rule.reasons_.remove(j);
@@ -222,8 +227,10 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 		for (int i = 0; i < toldSubsumers_.size(); i++) {
 			IndexedClassExpression subsumer = toldSubsumers_.get(i);
 			ElkAxiom reason = reasons_.get(i);
-			LOGGER_.trace("{}: removing from {} reason: {}", subsumer, NAME,
-					reason);
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("{}: removing from {} reason: {}", subsumer,
+						NAME, reason);
+			}
 			int j = rule.indexOf(subsumer, reason);
 			if (j >= 0) {
 				rule.toldSubsumers_.remove(j);
@@ -248,8 +255,10 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 			removed--;
 			IndexedClassExpression subsumer = toldSubsumers_.get(i);
 			ElkAxiom reason = reasons_.get(i);
-			LOGGER_.trace("{}: adding to {} reason: {} [revert]", subsumer,
-					NAME, reason);
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("{}: adding to {} reason: {} [revert]", subsumer,
+						NAME, reason);
+			}
 			rule.toldSubsumers_.add(subsumer);
 			rule.reasons_.add(reason);
 		}

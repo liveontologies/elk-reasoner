@@ -51,8 +51,10 @@ public class ConclusionOccurrenceCheckingVisitor extends
 	@Override
 	protected Boolean defaultVisit(Conclusion conclusion, ConclusionSet context) {
 		boolean result = context.containsConclusion(conclusion);
-		LOGGER_.trace("{}: check occurrence of {}: {}", context, conclusion,
-				result ? "success" : "failure");
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("{}: check occurrence of {}: {}", context,
+					conclusion, result ? "success" : "failure");
+		}
 		return result;
 	}
 

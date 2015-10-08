@@ -51,8 +51,10 @@ public class ConclusionDeletionVisitor extends
 	protected Boolean defaultVisit(Conclusion conclusion,
 			ConclusionSet conclusions) {
 		boolean result = conclusions.removeConclusion(conclusion);
-		LOGGER_.trace("{}: deleting {}: {}", conclusions, conclusion,
-				result ? "success" : "failure");
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("{}: deleting {}: {}", conclusions, conclusion,
+					result ? "success" : "failure");
+		}
 		return result;
 	}
 

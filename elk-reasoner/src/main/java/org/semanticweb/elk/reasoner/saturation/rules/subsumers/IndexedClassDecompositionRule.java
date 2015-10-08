@@ -71,9 +71,10 @@ public class IndexedClassDecompositionRule extends
 		ModifiableIndexedClassExpression definition = axiom.getDefinition();
 		boolean success = index.tryAddDefinition(definedClass, definition,
 				reason);
-		if (success)
+		if (success & LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace("{}: added definition {} from {}", definedClass,
 					definition, reason);
+		}
 		return success;
 	}
 
@@ -84,9 +85,10 @@ public class IndexedClassDecompositionRule extends
 		ModifiableIndexedClassExpression definition = axiom.getDefinition();
 		boolean success = index.tryRemoveDefinition(definedClass, definition,
 				reason);
-		if (success)
+		if (success & LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace("{}: removed definition {} from {}", definedClass,
 					definition, reason);
+		}
 		return success;
 	}
 
