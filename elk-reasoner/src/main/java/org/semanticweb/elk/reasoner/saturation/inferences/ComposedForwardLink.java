@@ -26,9 +26,9 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.SubPropertyChainImpl;
@@ -38,8 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubPropert
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ForwardLinkInferenceVisitor;
 
 /**
- * A {@link ForwardLink} obtained by composition of a {@link BackwardLink} with
- * a {@link ForwardLink}
+ * A {@link ForwardLink} produced by a {@link LinkComposition} inference
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -47,7 +46,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ForwardLinkIn
  *            The type of the forward relation
  */
 public class ComposedForwardLink extends
-		AbstractForwardLinkInference<IndexedComplexPropertyChain> {
+		AbstractForwardLinkInference<IndexedComplexPropertyChain> implements
+		LinkComposition {
 
 	private final IndexedObjectProperty backwardRelation_;
 
@@ -67,32 +67,47 @@ public class ComposedForwardLink extends
 	}
 
 	@Override
+	public IndexedObjectProperty getPremiseBackwardRelation() {
+		return backwardRelation_;
+	}
+
+	@Override
+	public IndexedPropertyChain getPremiseForwardChain() {
+		return forwardChain_;
+	}
+
+	@Override
+	public IndexedComplexPropertyChain getComposition() {
+		return getForwardChain();
+	}
+
+	@Override
 	public IndexedContextRoot getInferenceRoot() {
 		return inferenceRoot_;
 	}
 
+	@Override
 	public BackwardLink getFirstPremise() {
 		return new BackwardLinkImpl(getInferenceRoot(), backwardRelation_,
 				getConclusionRoot());
 	}
 
+	@Override
 	public SubPropertyChain getSecondPremise() {
 		return new SubPropertyChainImpl(backwardRelation_, getComposition()
 				.getFirstProperty());
 	}
 
+	@Override
 	public ForwardLink getThirdPremise() {
 		return new ForwardLinkImpl<IndexedPropertyChain>(getInferenceRoot(),
 				forwardChain_, getTarget());
 	}
 
+	@Override
 	public SubPropertyChain getFourthPremise() {
 		return new SubPropertyChainImpl(forwardChain_, getComposition()
 				.getSuffixChain());
-	}
-
-	private IndexedComplexPropertyChain getComposition() {
-		return getForwardChain();
 	}
 
 	@Override

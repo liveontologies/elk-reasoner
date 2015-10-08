@@ -28,8 +28,8 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Collection;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
-import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.context.ContextRootCollection;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionPruningFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;

@@ -27,9 +27,9 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.SubPropertyChainImpl;
@@ -48,7 +48,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.BackwardLinkI
  * 
  * @author "Yevgeny Kazakov"
  */
-public class ComposedBackwardLink extends AbstractBackwardLinkInference {
+public class ComposedBackwardLink extends AbstractBackwardLinkInference
+		implements LinkComposition {
 
 	private final IndexedContextRoot inferenceRoot_;
 
@@ -82,37 +83,40 @@ public class ComposedBackwardLink extends AbstractBackwardLinkInference {
 		return inferenceRoot_;
 	}
 
+	@Override
 	public IndexedObjectProperty getPremiseBackwardRelation() {
 		return backwardRelation_;
 	}
 
+	@Override
 	public IndexedPropertyChain getPremiseForwardChain() {
 		return forwardChain_;
 	}
 
+	@Override
 	public IndexedComplexPropertyChain getComposition() {
 		return composition_;
 	}
 
-	public ElkAxiom getReason() {
-		return reason_;
-	}
-
+	@Override
 	public BackwardLink getFirstPremise() {
 		return new BackwardLinkImpl(getInferenceRoot(), backwardRelation_,
 				getOriginRoot());
 	}
 
+	@Override
 	public SubPropertyChain getSecondPremise() {
 		return new SubPropertyChainImpl(backwardRelation_,
 				composition_.getFirstProperty());
 	}
 
+	@Override
 	public ForwardLink getThirdPremise() {
 		return new ForwardLinkImpl<IndexedPropertyChain>(getInferenceRoot(),
 				forwardChain_, getConclusionRoot());
 	}
 
+	@Override
 	public SubPropertyChain getFourthPremise() {
 		return new SubPropertyChainImpl(forwardChain_,
 				composition_.getSuffixChain());
@@ -120,6 +124,13 @@ public class ComposedBackwardLink extends AbstractBackwardLinkInference {
 
 	public SubPropertyChain getFifthPremise() {
 		return new SubPropertyChainImpl(composition_, getBackwardRelation());
+	}
+
+	/**
+	 * @return the {@link ElkAxiom} responsible for the fifth premise
+	 */
+	public ElkAxiom getReason() {
+		return reason_;
 	}
 
 	@Override

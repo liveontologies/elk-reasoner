@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectP
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedBinaryPropertyChainVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedComplexPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitorEx;
 
@@ -135,7 +135,7 @@ final class CachedIndexedComplexPropertyChainImpl
 		return visitor.visit(this);
 	}
 
-	public final <O> O accept(IndexedBinaryPropertyChainVisitor<O> visitor) {
+	public final <O> O accept(IndexedComplexPropertyChainVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

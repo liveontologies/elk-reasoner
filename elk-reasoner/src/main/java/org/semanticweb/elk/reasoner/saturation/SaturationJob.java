@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.saturation;
 
 import org.semanticweb.elk.reasoner.ReasonerJob;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 public class SaturationJob<I extends IndexedContextRoot> extends

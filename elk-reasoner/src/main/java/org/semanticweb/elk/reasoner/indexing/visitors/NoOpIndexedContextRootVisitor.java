@@ -23,8 +23,8 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedRangeFiller;
-import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 
 /**
  * An {@link IndexedContextRootVisitor} that always returns {@code null}.

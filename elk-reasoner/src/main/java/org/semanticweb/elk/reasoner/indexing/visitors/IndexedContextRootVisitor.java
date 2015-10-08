@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 
 /**
  * Visitor pattern interface for instances of {@link IndexedContextRoot}.

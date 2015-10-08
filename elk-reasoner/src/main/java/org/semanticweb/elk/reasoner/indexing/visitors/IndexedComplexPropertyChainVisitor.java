@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyCha
  * @param <O>
  *            the type of the output of this visitor
  */
-public interface IndexedBinaryPropertyChainVisitor<O> {
+public interface IndexedComplexPropertyChainVisitor<O> {
 
 	O visit(IndexedComplexPropertyChain element);
 

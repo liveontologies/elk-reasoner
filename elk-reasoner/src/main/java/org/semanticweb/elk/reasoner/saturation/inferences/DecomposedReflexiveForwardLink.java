@@ -25,9 +25,9 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.AbstractConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
@@ -52,6 +52,10 @@ public class DecomposedReflexiveForwardLink extends AbstractConclusion
 			IndexedObjectHasSelf subsumer) {
 		super(inferenceRoot);
 		existential_ = subsumer;
+	}
+
+	public IndexedObjectHasSelf getDecomposedExistential() {
+		return this.existential_;
 	}
 
 	@Override

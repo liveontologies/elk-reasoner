@@ -25,9 +25,9 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.AbstractConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
@@ -54,7 +54,7 @@ public class DecomposedExistentialForwardLink extends AbstractConclusion
 		existential_ = subsumer;
 	}
 
-	public IndexedObjectSomeValuesFrom getExistential() {
+	public IndexedObjectSomeValuesFrom getDecomposedExistential() {
 		return this.existential_;
 	}
 

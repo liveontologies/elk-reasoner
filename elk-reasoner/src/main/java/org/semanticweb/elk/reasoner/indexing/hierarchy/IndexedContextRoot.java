@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation;
+package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 /*
  * #%L
@@ -22,8 +22,8 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedContextRootVisitor;
+import org.semanticweb.elk.reasoner.saturation.ExtendedContext;
 
 public interface IndexedContextRoot extends IndexedObject {
 

@@ -1,4 +1,6 @@
 package org.semanticweb.elk.reasoner.saturation;
+
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 /*
  * #%L
  * ELK Reasoner
