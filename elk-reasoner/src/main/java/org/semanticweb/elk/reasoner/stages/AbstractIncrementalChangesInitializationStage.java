@@ -38,7 +38,7 @@ abstract class AbstractIncrementalChangesInitializationStage extends
 
 	protected IncrementalChangesInitialization initialization = null;
 
-	protected SaturationStatistics stageStatistics_ = null;
+	protected SaturationStatistics stageStatistics = null;
 
 	public AbstractIncrementalChangesInitializationStage(
 			AbstractReasonerState reasoner, AbstractReasonerStage... preStages) {
@@ -63,7 +63,7 @@ abstract class AbstractIncrementalChangesInitializationStage extends
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-		this.stageStatistics_ = new SaturationStatistics();
+		this.stageStatistics = new SaturationStatistics();
 		return true;
 	}
 
@@ -72,8 +72,8 @@ abstract class AbstractIncrementalChangesInitializationStage extends
 		if (!super.postExecute())
 			return false;
 
-		reasoner.ruleAndConclusionStats.add(stageStatistics_);
-		this.stageStatistics_ = null;
+		reasoner.ruleAndConclusionStats.add(stageStatistics);
+		this.stageStatistics = null;
 		this.initialization = null;
 
 		return true;

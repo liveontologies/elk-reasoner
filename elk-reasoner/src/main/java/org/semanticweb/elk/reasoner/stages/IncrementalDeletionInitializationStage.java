@@ -38,7 +38,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.NoOpIndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
@@ -49,11 +48,9 @@ import org.semanticweb.elk.util.collections.Operations;
  * 
  * 
  */
-public class IncrementalDeletionInitializationStage extends
-		AbstractIncrementalChangesInitializationStage {
+public class IncrementalDeletionInitializationStage extends AbstractIncrementalChangesInitializationStage {
 
-	public IncrementalDeletionInitializationStage(
-			AbstractReasonerState reasoner, AbstractReasonerStage... preStages) {
+	public IncrementalDeletionInitializationStage(AbstractReasonerState reasoner, AbstractReasonerStage... preStages) {
 		super(reasoner, preStages);
 	}
 
@@ -79,20 +76,16 @@ public class IncrementalDeletionInitializationStage extends
 		changedDefinitions = diffIndex.getRemovedDefinitions();
 		changedDefinitionReasons = diffIndex.getRemovedDefinitionReasons();
 
-		if (changedInitRules != null || !changedRulesByCE.isEmpty()
-				|| !changedDefinitions.isEmpty()) {
+		if (changedInitRules != null || !changedRulesByCE.isEmpty() || !changedDefinitions.isEmpty()) {
 
-			inputs = Operations.split(reasoner.saturationState.getContexts(),
-					8 * workerNo);
+			inputs = Operations.split(reasoner.saturationState.getContexts(), 8 * workerNo);
 		}
 
 		// System.err.println(changedRulesByCE.keySet().size());
 
-		this.initialization = new IncrementalChangesInitialization(inputs,
-				changedInitRules, changedRulesByCE, changedDefinitions,
-				changedDefinitionReasons, reasoner.saturationState,
-				reasoner.getProcessExecutor(), stageStatistics_, workerNo,
-				reasoner.getProgressMonitor());
+		this.initialization = new IncrementalChangesInitialization(inputs, changedInitRules, changedRulesByCE,
+				changedDefinitions, changedDefinitionReasons, reasoner.saturationState, reasoner.getProcessExecutor(),
+				stageStatistics, workerNo, reasoner.getProgressMonitor());
 
 		return true;
 	}
@@ -103,14 +96,9 @@ public class IncrementalDeletionInitializationStage extends
 			return false;
 		this.initialization = null;
 		// initializing contexts which will be removed
-		final SaturationStateWriter<?> satStateWriter = SaturationUtils
-				.getStatsAwareWriter(
-						reasoner.saturationState.getContextCreatingWriter(),
-						stageStatistics_);
-		final ClassTaxonomyState.Writer taxStateWriter = reasoner.classTaxonomyState
-				.getWriter();
-		final InstanceTaxonomyState.Writer instanceTaxStateWriter = reasoner.instanceTaxonomyState
-				.getWriter();
+		final SaturationStateWriter<?> satStateWriter = reasoner.saturationState.getContextCreatingWriter();
+		final ClassTaxonomyState.Writer taxStateWriter = reasoner.classTaxonomyState.getWriter();
+		final InstanceTaxonomyState.Writer instanceTaxStateWriter = reasoner.instanceTaxonomyState.getWriter();
 		final IndexedClassExpressionVisitor<Object> entityRemovalVisitor = new NoOpIndexedClassExpressionVisitor<Object>() {
 
 			@Override
@@ -128,12 +116,10 @@ public class IncrementalDeletionInitializationStage extends
 
 		OntologyIndex index = reasoner.saturationState.getOntologyIndex();
 
-		for (IndexedClassExpression ice : reasoner.ontologyIndex
-				.getRemovedClassExpressions()) {
+		for (IndexedClassExpression ice : reasoner.ontologyIndex.getRemovedClassExpressions()) {
 
 			if (reasoner.saturationState.getContext(ice) != null) {
-				satStateWriter
-						.produce(new ContextInitializationImpl(ice, index));
+				satStateWriter.produce(new ContextInitializationImpl(ice, index));
 				// mark removed classes
 				ice.accept(entityRemovalVisitor);
 			}
