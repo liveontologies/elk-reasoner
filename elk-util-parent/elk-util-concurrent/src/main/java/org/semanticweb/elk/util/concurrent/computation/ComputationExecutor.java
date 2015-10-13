@@ -22,115 +22,206 @@
  */
 package org.semanticweb.elk.util.concurrent.computation;
 
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * A custom {@link ExecutorService} for starting a several copies of runnable
- * tasks, and waiting for it computation; it allows to interrupt all running
- * tasks without shutting down the {@link ExecutorService}. If terminated, the
- * tasks can be started again.
+ * A simple executor for starting a several copies of runnable tasks in
+ * parallel, and waiting for it computation. New tasks can be started only if
+ * all copies of the previous tasks were finished. All tasks run in a thread
+ * pool of the given size. The threads in this pool are created on demand; its
+ * size can be changed and idle threads can be terminated after a timeout.
  * 
  * @author "Yevgeny Kazakov"
- * 
  */
-public class ComputationExecutor extends ThreadPoolExecutor {
+public class ComputationExecutor {
 
 	/**
-	 * the thread group used for executor
+	 * a common prefix for the names of the threads created by this
+	 * {@link ComputationExecutor}
 	 */
-	private final ComputationThreadGroup threadGroup;
+	private final String threadPoolName_;
 
 	/**
-	 * the latch indicating that all jobs are done
+	 * the latch indicating that job processing is done
 	 */
-	CountDownLatch done;
+	private CountDownLatch jobsDone_;
 
 	/**
 	 * {@code true} if new tasks can be started to be executed; this can happen
 	 * only if no tasks are running in this executor
 	 */
-	volatile boolean canStart = true;
+	private boolean jobsAccepted_ = true;
 
 	/**
-	 * To report uncaught exceptions thrown by the workers
+	 * To report uncaught exceptions thrown in the worker threads
 	 */
-	ComputationRuntimeException exception;
+	private ComputationRuntimeException exception_;
 
 	/**
-	 * Create a {@link ComputationExecutor} with a given maximal number of
-	 * threads and the given thread group
-	 * 
-	 * @param threadCount
-	 * @param threadGroup
+	 * {@code true} if shutdown is requested
 	 */
-	public ComputationExecutor(int threadCount,
-			final ComputationThreadGroup threadGroup) {
-		super(threadCount, threadCount, 0, TimeUnit.SECONDS,
-				new ArrayBlockingQueue<Runnable>(threadCount),
-				new ThreadFactory() {
-					@Override
-					public Thread newThread(Runnable r) {
-						Thread result = new Thread(threadGroup, r,
-								threadGroup.getName() + "-thread-"
-										+ threadGroup.getNextThreadId());
-						/*
-						 * Worker threads don't do any sort of IO and shouldn't
-						 * require any clean-up. So they can be safely abandoned
-						 * when JVM exits.
-						 */
-						result.setDaemon(true);
-						
-						return result;
-					}
-				});
-		this.threadGroup = threadGroup;
-		this.exception = null;
-	}
+	private boolean shutdown_ = false;
 
 	/**
-	 * Create a {@link ComputationExecutor} with a given maximal number of
-	 * threads and the the given name which is used to identify threads
+	 * the thread from which jobs are submitted
+	 */
+	private final Thread executorThread_;
+
+	/**
+	 * the last job submitted for the execution
+	 */
+	private Runnable nextJob_;
+
+	/**
+	 * the number of worker instances required to execute the last job
+	 */
+	private int nextJobNoInstances_;
+
+	/**
+	 * the number of jobs submitted so far
+	 */
+	private int submittedJobCount_ = 0;
+
+	/**
+	 * the threads in which the jobs are processed
+	 */
+	private Thread[] workerThreads_;
+
+	/**
+	 * used for synchronization between the executor and the workers
+	 */
+	private final ReentrantLock lock_;
+
+	/**
+	 * to signal that the {@link #nextJob_} can run by a worker
+	 */
+	private final Condition canRun_;
+
+	/**
+	 * {@code true} if idle threads can be terminated after the timeout
+	 */
+	private boolean timeOutEnabled_ = false;
+
+	/**
+	 * how long an idle worker thread should wait before termination if timeout
+	 * is enabled
+	 */
+	private long timeout_ = 0L; // in nanoseconds
+
+	/**
+	 * Create a {@link ComputationExecutor} with a given number of threads and a
+	 * name which is used to identify threads
 	 * 
-	 * @param threadCount
+	 * @param poolSize
 	 * @param name
 	 */
-	public ComputationExecutor(int threadCount, String name) {
-		this(threadCount, new ComputationThreadGroup(name));
+	public ComputationExecutor(int poolSize, String name) {
+		this.executorThread_ = Thread.currentThread();
+		this.workerThreads_ = new Thread[poolSize];
+		this.threadPoolName_ = name;
+		this.exception_ = null;
+		this.lock_ = new ReentrantLock();
+		this.canRun_ = lock_.newCondition();
 	}
 
 	/**
-	 * Starts a several copies of jobs. The jobs cannot be started again until
-	 * the method {@link #waitDone()} is called
+	 * Create a {@link ComputationExecutor} with a given number of threads, a
+	 * name which is used to identify threads, and the timeout after which idle
+	 * threads should be terminated
+	 * 
+	 * @param poolSize
+	 * @param name
+	 * @param timeout
+	 * @param unit
+	 */
+	public ComputationExecutor(int poolSize, String name, long timeout,
+			TimeUnit unit) {
+		this(poolSize, name);
+		this.timeOutEnabled_ = true;
+		this.timeout_ = unit.toNanos(timeout);
+	}
+
+	/**
+	 * Sets the maximal number of threads used by this
+	 * {@link ComputationExecutor}.
+	 * 
+	 * @param threadCount
+	 */
+	public synchronized boolean setPoolSize(int threadCount) {
+		if (!jobsAccepted_)
+			return false;
+		Thread[] oldWorkerThreads = workerThreads_;
+		workerThreads_ = Arrays.copyOf(oldWorkerThreads, threadCount);
+		interrupt(oldWorkerThreads, threadCount);
+		return true;
+	}
+
+	/**
+	 * Starts a several copies of jobs. After that new jobs will not be accepted
+	 * until the method {@link #waitDone()} is called
 	 * 
 	 * @param job
-	 * @param noCopies
-	 * @return {@code true} if the jobs have been started
+	 *            the job to be executed
+	 * @param noInstances
+	 *            in how many threads this job should be executed in parallel
+	 * @return {@code true} if the jobs have been started or {@code false} if
+	 *         the job was not accepted; a job may not be accepted if the
+	 *         previous jobs were not finished or the number of instances
+	 *         exceeds the current worker pool
 	 */
-	public synchronized boolean start(Runnable job, int noCopies) {
-		if (!canStart)
+	public synchronized boolean start(Runnable job, int noInstances) {
+		if (!jobsAccepted_)
 			return false;
-		this.done = new CountDownLatch(noCopies);
-		Worker worker = new Worker(job, done, Thread.currentThread());
-		for (int i = 0; i < noCopies; i++) {
-			execute(worker);
+		jobsAccepted_ = false;
+		int processedJobeCount = submittedJobCount_;
+		// setting up the fields shared with the workers
+		this.nextJob_ = job;
+		this.jobsDone_ = new CountDownLatch(noInstances);
+		this.nextJobNoInstances_ = noInstances;
+		this.submittedJobCount_++;
+		// waking up idle workers
+		lock_.lock();
+		try {
+			canRun_.signalAll();
+		} finally {
+			lock_.unlock();
 		}
-		canStart = false;
+		// creating missing workers
+		for (int i = 0; i < noInstances; i++) {
+			Thread workerThread = workerThreads_[i];
+			if (workerThread == null) {
+				workerThread = new Thread(new Worker(i, processedJobeCount),
+						threadPoolName_ + "-thread-" + (i + 1));
+				workerThreads_[i] = workerThread;
+				workerThread.start();
+			}
+		}
 		checkException();
 		return true;
 	}
 
 	/**
-	 * Interrupting all threads of this executor (used to wake up waiting
-	 * threads if something needs to be notified)
+	 * interrupting threads starting from the given number
 	 */
-	public void interrupt() {
+	void interrupt(Thread[] threads, int first) {
 		checkException();
-		threadGroup.interrupt();
+		for (int i = first; i < threads.length; i++) {
+			Thread workerThread = threads[i];
+			if (workerThread == null)
+				continue;
+			workerThread.interrupt();
+		}
+	}
+
+	/**
+	 * interrupting all worker threads of this executor
+	 */
+	void interrupt() {
+		interrupt(workerThreads_, 0);
 	}
 
 	/**
@@ -141,12 +232,20 @@ public class ComputationExecutor extends ThreadPoolExecutor {
 	 */
 	public synchronized void waitDone() throws InterruptedException {
 		try {
-			done.await();
+			jobsDone_.await();
 		} catch (InterruptedException e) {
 			checkException();
 			throw e;
 		}
-		canStart = true;
+		jobsAccepted_ = true;
+	}
+
+	public synchronized boolean shutdown(long timeout, TimeUnit unit)
+			throws InterruptedException {
+		waitDone();
+		shutdown_ = true;
+		interrupt();
+		return true;
 	}
 
 	/**
@@ -157,8 +256,8 @@ public class ComputationExecutor extends ThreadPoolExecutor {
 	 *             if there was an exception in some of the worker thread
 	 */
 	private void checkException() throws ComputationRuntimeException {
-		if (exception != null)
-			throw exception;
+		if (exception_ != null)
+			throw exception_;
 	}
 
 	/**
@@ -170,40 +269,82 @@ public class ComputationExecutor extends ThreadPoolExecutor {
 	 */
 	private class Worker implements Runnable {
 
-		protected final Runnable job;
-		protected final CountDownLatch done;
-		protected final Thread executorThread;
+		/**
+		 * the identifier of the worker
+		 */
+		private final int workerId_;
 
-		Worker(Runnable job, CountDownLatch done, Thread executorThread) {
-			this.job = job;
-			this.done = done;
-			this.executorThread = executorThread;
+		/**
+		 * incremented when the worker has processed a job
+		 */
+		private int processedJobCount_;
+
+		Worker(int workerId, int startJobId) {
+			this.workerId_ = workerId;
+			this.processedJobCount_ = startJobId;
 		}
 
 		@Override
 		public void run() {
 			for (;;) {
 				try {
-					job.run();
-					
+					lock_.lockInterruptibly();
+					try {
+						long nanos = timeout_;
+						while (processedJobCount_ == submittedJobCount_) {
+							// waiting until the next job is submitted or
+							// timeout occurs
+							if (timeOutEnabled_) {
+								if (nanos <= 0) {
+									dispose();
+									return;
+								}
+								nanos = canRun_.awaitNanos(nanos);
+							} else {
+								canRun_.await();
+							}
+						}
+					} finally {
+						lock_.unlock();
+					}
+					if (workerId_ >= workerThreads_.length) {
+						// this worker is not needed anymore
+						return;
+					}
+					if (workerId_ < nextJobNoInstances_) {
+						nextJob_.run();
+					}
+					processedJobCount_++;
+				} catch (InterruptedException e) {
+					if (shutdown_) {
+						dispose();
+					} else if (workerId_ < workerThreads_.length) {
+						handleUnexpectedException(e);
+					}
 					return;
 				} catch (Throwable e) {
 					handleUnexpectedException(e);
 				} finally {
-					done.countDown();
-					/*
-					 * clear the interrupt status so that this thread can be
-					 * reused for other jobs
-					 */
-					Thread.interrupted();
+					jobsDone_.countDown();
 				}
 			}
 		}
-		
+
 		private void handleUnexpectedException(Throwable e) {
-			exception = new ComputationRuntimeException(
+			exception_ = new ComputationRuntimeException(
 					"Uncaught exception in a worker thread:", e);
-			executorThread.interrupt();
+			executorThread_.interrupt();
+			dispose();
+		}
+
+		/**
+		 * remove references for the thread of this worker
+		 */
+		private void dispose() {
+			Thread[] currentWorkerThreads = workerThreads_;
+			if (workerId_ < currentWorkerThreads.length) {
+				currentWorkerThreads[workerId_] = null;
+			}
 		}
 	}
 

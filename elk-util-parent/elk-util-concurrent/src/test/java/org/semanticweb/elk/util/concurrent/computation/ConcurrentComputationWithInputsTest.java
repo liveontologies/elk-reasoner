@@ -25,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
@@ -43,7 +44,7 @@ public class ConcurrentComputationWithInputsTest {
 	void setup(int round) {
 		int workers = round + 1;
 		ComputationExecutor executor = new ComputationExecutor(workers,
-				"test-worker");
+				"test-worker", 1, TimeUnit.SECONDS);
 		factory_ = new TestInputProcessorFactory(MAX_INPUT, workers);
 		computation_ = new ConcurrentComputationWithInputs<Integer, TestInputProcessorFactory>(
 				factory_, executor, workers, workers);
