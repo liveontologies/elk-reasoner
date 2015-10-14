@@ -69,9 +69,7 @@ public class ReasonerFactory {
 	@SuppressWarnings("static-method")
 	public Reasoner createReasoner(AxiomLoader axiomLoader,
 			ReasonerStageExecutor stageExecutor, ReasonerConfiguration config) {
-		Reasoner reasoner = new Reasoner(axiomLoader, stageExecutor);
-
-		reasoner.setConfigurationOptions(config);
+		Reasoner reasoner = new Reasoner(axiomLoader, stageExecutor, config);
 
 		return reasoner;
 	}

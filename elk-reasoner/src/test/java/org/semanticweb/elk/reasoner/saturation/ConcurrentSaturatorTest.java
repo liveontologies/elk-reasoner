@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.saturation;
 
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
 
@@ -71,7 +72,8 @@ public class ConcurrentSaturatorTest extends TestCase {
 				"S"));
 
 		ModifiableOntologyIndex index = new DirectIndex();
-		ComputationExecutor executor = new ComputationExecutor(16, "test");
+		ComputationExecutor executor = new ComputationExecutor(16, "test", 0,
+				TimeUnit.NANOSECONDS);
 
 		final ElkAxiomProcessor inserter = new ChangeIndexingProcessor(
 				new ElkAxiomConverterImpl(index, 1),
@@ -121,7 +123,8 @@ public class ConcurrentSaturatorTest extends TestCase {
 		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
 
 		final ModifiableOntologyIndex index = new DirectIndex();
-		ComputationExecutor executor = new ComputationExecutor(16, "test");
+		ComputationExecutor executor = new ComputationExecutor(16, "test", 0,
+				TimeUnit.NANOSECONDS);
 		final ElkAxiomProcessor inserter = new ChangeIndexingProcessor(
 				new ElkAxiomConverterImpl(index, 1),
 				ChangeIndexingProcessor.ADDITION);

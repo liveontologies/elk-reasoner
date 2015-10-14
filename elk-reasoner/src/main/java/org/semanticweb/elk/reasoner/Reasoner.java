@@ -84,7 +84,7 @@ public class Reasoner extends AbstractReasonerState {
 	/**
 	 * the executor used for concurrent tasks
 	 */
-	private volatile ComputationExecutor executor_;
+	private final ComputationExecutor executor_;
 	/**
 	 * Number of workers for concurrent jobs.
 	 */
@@ -108,12 +108,15 @@ public class Reasoner extends AbstractReasonerState {
 	 * {@link ReasonerFactory}.
 	 * */
 	protected Reasoner(AxiomLoader axiomLoader,
-			ReasonerStageExecutor stageExecutor) {
+			ReasonerStageExecutor stageExecutor, ReasonerConfiguration config) {
 		super(axiomLoader);
 
 		this.stageExecutor_ = stageExecutor;
 		this.progressMonitor = new DummyProgressMonitor();
 		this.allowFreshEntities = true;
+		setConfigurationOptions(config);
+		this.executor_ = new ComputationExecutor(workerNo_, "elk-reasoner", 1,
+				TimeUnit.SECONDS);
 
 		LOGGER_.info("ELK reasoner was created");
 	}
@@ -173,7 +176,7 @@ public class Reasoner extends AbstractReasonerState {
 	 */
 	public synchronized void setConfigurationOptions(
 			ReasonerConfiguration config) {
-		int newWorkerNo = config
+		this.workerNo_ = config
 				.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS);
 
 		setAllowIncrementalMode(config
@@ -181,19 +184,13 @@ public class Reasoner extends AbstractReasonerState {
 		setAllowIncrementalTaxonomy(config
 				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_TAXONOMY));
 
-		if (newWorkerNo > workerNo_) {
-			// need to re-create the executor since it may have already created
-			// a pool with a fixed number of threads
-			executor_ = null;
+		if (executor_ != null) {// could be null during initialization
+			executor_.setPoolSize(workerNo_);
 		}
-
-		workerNo_ = newWorkerNo;
 	}
 
 	@Override
 	protected ComputationExecutor getProcessExecutor() {
-		if (executor_ == null)
-			executor_ = new ComputationExecutor(workerNo_, "elk-reasoner");
 		return executor_;
 	}
 
@@ -220,12 +217,7 @@ public class Reasoner extends AbstractReasonerState {
 	 */
 	public synchronized boolean shutdown(long timeout, TimeUnit unit)
 			throws InterruptedException {
-		if (executor_ == null)
-			return true;
-		executor_.shutdown();
-		executor_.awaitTermination(timeout, unit);
-		boolean success = executor_.isShutdown();
-		executor_ = null;
+		boolean success = executor_.shutdown(timeout, unit);
 		if (success) {
 			LOGGER_.info("ELK reasoner has shut down");
 		} else {
