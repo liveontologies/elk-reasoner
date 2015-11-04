@@ -422,21 +422,20 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 		List<? extends ElkClassExpression> disjoint = axiom
 				.getClassExpressions();
 		indexDisjointClasses(disjoint, axiom);
-		ModifiableIndexedClassExpression defined;
+		ModifiableIndexedClass defined;
 		ModifiableIndexedClassExpression member;
 		int size = disjoint.size();
 		switch (size) {
 		case 0:
-			defined = axiom.getDefinedClass().accept(positiveConverter_);
+			defined = (ModifiableIndexedClass) axiom.getDefinedClass().accept(positiveConverter_);
 			member = negativeFactory_
 					.getIndexedClass(PredefinedElkClass.OWL_THING);
 			axiomFactory_.getIndexedSubClassOfAxiom(member, defined, axiom);
 			break;
 		case 1:
-			defined = axiom.getDefinedClass().accept(dualConverter_);
+			defined = (ModifiableIndexedClass) axiom.getDefinedClass().accept(dualConverter_);
 			member = disjoint.iterator().next().accept(dualConverter_);
-			axiomFactory_.getIndexedSubClassOfAxiom(member, defined, axiom);
-			axiomFactory_.getIndexedSubClassOfAxiom(defined, member, axiom);
+			axiomFactory_.getIndexedDefinitionAxiom(defined, member, axiom); 
 			break;
 		default:
 			// indexing only one direction of the equivalence
@@ -446,7 +445,7 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 								"reasoner.indexing.disjointUnion",
 								"ELK supports DisjointUnion only partially. Reasoning might be incomplete!");
 			}
-			defined = axiom.getDefinedClass().accept(positiveConverter_);
+			defined = (ModifiableIndexedClass) axiom.getDefinedClass().accept(positiveConverter_);
 			for (ElkClassExpression c : disjoint) {
 				member = c.accept(negativeConverter_);
 				axiomFactory_.getIndexedSubClassOfAxiom(member, defined, axiom);
