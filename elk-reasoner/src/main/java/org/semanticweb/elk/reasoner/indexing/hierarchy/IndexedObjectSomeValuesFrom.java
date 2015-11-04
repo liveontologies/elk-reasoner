@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -117,12 +117,13 @@ public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				IndexedObjectSomeValuesFrom subsumer) {
 			SaturatedPropertyChain propertySaturation = subsumer.getProperty()
 					.getSaturated();
-			if (propertySaturation.getCompositionsByLeftSubProperty().isEmpty()) {
-				producer.produce(new DecomposedExistentialBackwardLink(root,
-						subsumer));
+			if (propertySaturation.getCompositionsByLeftSubProperty()
+					.isEmpty()) {
+				producer.produce(
+						new DecomposedExistentialBackwardLink(root, subsumer));
 			} else {
-				producer.produce(new DecomposedExistentialForwardLink(root,
-						subsumer));
+				producer.produce(
+						new DecomposedExistentialForwardLink(root, subsumer));
 			}
 		}
 
@@ -130,15 +131,14 @@ public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				IndexedContextRoot source,
 				IndexedObjectProperty backwardRelation,
 				IndexedContextRoot inferenceRoot,
-				IndexedPropertyChain forwardRelation,
-				IndexedContextRoot target,
+				IndexedPropertyChain forwardRelation, IndexedContextRoot target,
 				IndexedComplexPropertyChain composition) {
 
 			if (composition.getSaturated().getCompositionsByLeftSubProperty()
 					.isEmpty()) {
-				ArrayList<IndexedObjectProperty> toldSuperProperties = composition
+				List<IndexedObjectProperty> toldSuperProperties = composition
 						.getToldSuperProperties();
-				ArrayList<ElkAxiom> toldSuperPropertiesReasons = composition
+				List<ElkAxiom> toldSuperPropertiesReasons = composition
 						.getToldSuperPropertiesReasons();
 				for (int i = 0; i < toldSuperProperties.size(); i++) {
 					producer.produce(new ComposedBackwardLink(source,

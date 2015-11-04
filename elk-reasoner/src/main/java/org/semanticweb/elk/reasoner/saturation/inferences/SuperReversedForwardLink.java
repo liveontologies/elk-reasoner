@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.inferences;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+
 /*
  * #%L
  * ELK Reasoner
@@ -47,10 +49,17 @@ public class SuperReversedForwardLink extends AbstractBackwardLinkInference {
 	 */
 	private final IndexedPropertyChain subChain_;
 
+	/**
+	 * The {@link ElkAxiom} that yields the inclusion between {@link #subChain_}
+	 * and backward relation
+	 */
+	private final ElkAxiom reason_;
+
 	public SuperReversedForwardLink(ForwardLink premise,
-			IndexedObjectProperty superProperty) {
+			IndexedObjectProperty superProperty, ElkAxiom reason) {
 		super(premise.getTarget(), superProperty, premise.getConclusionRoot());
 		this.subChain_ = premise.getForwardChain();
+		this.reason_ = reason;
 	}
 
 	@Override
@@ -60,6 +69,10 @@ public class SuperReversedForwardLink extends AbstractBackwardLinkInference {
 
 	public IndexedPropertyChain getSubChain() {
 		return this.subChain_;
+	}
+	
+	public ElkAxiom getReason() {
+		return this.reason_;
 	}
 
 	public ForwardLink getFirstPremise() {
@@ -72,7 +85,8 @@ public class SuperReversedForwardLink extends AbstractBackwardLinkInference {
 	}
 
 	@Override
-	public <I, O> O accept(BackwardLinkInferenceVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(BackwardLinkInferenceVisitor<I, O> visitor,
+			I input) {
 		return visitor.visit(this, input);
 	}
 

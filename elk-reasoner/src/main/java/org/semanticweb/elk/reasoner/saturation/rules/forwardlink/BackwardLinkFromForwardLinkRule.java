@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.forwardlink;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,9 @@ package org.semanticweb.elk.reasoner.saturation.rules.forwardlink;
  * #L%
  */
 
-import java.util.ArrayList;
+import java.util.List;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
@@ -61,11 +62,13 @@ public class BackwardLinkFromForwardLinkRule extends AbstractForwardLinkRule {
 		if (relation instanceof IndexedObjectProperty) {
 			producer.produce(new ReversedForwardLink(premise));
 		} else {
-			ArrayList<IndexedObjectProperty> superProperties = relation
+			List<IndexedObjectProperty> superProperties = relation
 					.getToldSuperProperties();
+			List<ElkAxiom> superPropertiesReasons = relation
+					.getToldSuperPropertiesReasons();
 			for (int i = 0; i < superProperties.size(); i++) {
 				producer.produce(new SuperReversedForwardLink(premise,
-						superProperties.get(i)));
+						superProperties.get(i), superPropertiesReasons.get(i)));
 			}
 		}
 	}

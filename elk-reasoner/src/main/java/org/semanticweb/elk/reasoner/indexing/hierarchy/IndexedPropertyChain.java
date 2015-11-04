@@ -23,8 +23,8 @@
 
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
@@ -55,7 +55,7 @@ public interface IndexedPropertyChain extends IndexedObject {
 	 * @see ElkSubObjectPropertyOfAxiom#getSuperObjectPropertyExpression()
 	 * @see IndexedObjectProperty#getToldSubChains()
 	 */
-	public ArrayList<IndexedObjectProperty> getToldSuperProperties();
+	public List<IndexedObjectProperty> getToldSuperProperties();
 
 	/**
 	 * @return The {@link ElkAxiom}s responsible for the respective told super
@@ -63,7 +63,7 @@ public interface IndexedPropertyChain extends IndexedObject {
 	 * 
 	 * @see IndexedObjectProperty#getToldSubChainsReasons()
 	 */
-	public ArrayList<ElkAxiom> getToldSuperPropertiesReasons();
+	public List<ElkAxiom> getToldSuperPropertiesReasons();
 
 	/**
 	 * @return All {@link IndexedComplexPropertyChain}s in which this
