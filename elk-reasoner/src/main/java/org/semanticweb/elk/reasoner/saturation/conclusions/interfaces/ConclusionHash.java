@@ -54,6 +54,10 @@ public class ConclusionHash implements ConclusionVisitor<Void, Integer>,
 	private static int hashCode(ElkObject elkObject) {
 		return ElkObjectHash.hashCode(elkObject);
 	}
+	
+	private static int hashCode(int n) {
+		return n;
+	}
 
 	public static int hashCode(Conclusion conclusion) {
 		return conclusion == null ? 0 : conclusion.accept(INSTANCE_, null);
@@ -118,7 +122,7 @@ public class ConclusionHash implements ConclusionVisitor<Void, Integer>,
 		return combinedHashCode(hashCode(DisjointSubsumer.class),
 				hashCode(conclusion.getConclusionRoot()),
 				hashCode(conclusion.getAxiom()),
-				hashCode(conclusion.getMember()),
+				hashCode(conclusion.getPosition()),
 				hashCode(conclusion.getReason()));
 	}
 

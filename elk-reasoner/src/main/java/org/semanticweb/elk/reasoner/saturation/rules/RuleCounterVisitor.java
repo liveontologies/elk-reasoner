@@ -50,7 +50,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwa
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.SubsumerPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ComposedFromDecomposedSubsumerRule;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
@@ -121,14 +120,6 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 	public O visit(ContradictionCompositionRule rule, DisjointSubsumer premise,
 			ContextPremises premises, ConclusionProducer producer) {
 		counter_.countContradictionCompositionRule++;
-		return visitor_.visit(rule, premise, premises, producer);
-	}
-
-	@Override
-	public O visit(ContradictionFromDisjointnessRule rule,
-			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		counter_.countContradictionFromDisjointnessRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
 

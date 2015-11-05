@@ -35,7 +35,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwa
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.SubsumerPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ComposedFromDecomposedSubsumerRule;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
@@ -79,11 +78,6 @@ public class RuleCounter {
 	 * counter for {@link ContradictionCompositionRule}
 	 */
 	long countContradictionCompositionRule;
-
-	/**
-	 * counter for {@link ContradictionFromDisjointnessRule}
-	 */
-	long countContradictionFromDisjointnessRule;
 
 	/**
 	 * counter for {@link ContradictionFromNegationRule}
@@ -209,7 +203,6 @@ public class RuleCounter {
 		countOwlThingContextInitRule += counter.countOwlThingContextInitRule;
 		countRootContextInitializationRule += counter.countRootContextInitializationRule;
 		countDisjointSubsumerFromMemberRule += counter.countDisjointSubsumerFromMemberRule;
-		countContradictionFromDisjointnessRule += counter.countContradictionFromDisjointnessRule;
 		countContradictionFromNegationRule += counter.countContradictionFromNegationRule;
 		countObjectIntersectionFromFirstConjunctRule += counter.countObjectIntersectionFromFirstConjunctRule;
 		countObjectIntersectionFromSecondConjunctRule += counter.countObjectIntersectionFromSecondConjunctRule;
@@ -240,7 +233,6 @@ public class RuleCounter {
 		return countOwlThingContextInitRule
 				+ countRootContextInitializationRule
 				+ countDisjointSubsumerFromMemberRule
-				+ countContradictionFromDisjointnessRule
 				+ countContradictionFromNegationRule
 				+ countObjectIntersectionFromFirstConjunctRule
 				+ countObjectIntersectionFromSecondConjunctRule
@@ -274,7 +266,6 @@ public class RuleCounter {
 		countOwlThingContextInitRule = 0;
 		countRootContextInitializationRule = 0;
 		countDisjointSubsumerFromMemberRule = 0;
-		countContradictionFromDisjointnessRule = 0;
 		countContradictionFromNegationRule = 0;
 		countObjectIntersectionFromFirstConjunctRule = 0;
 		countObjectIntersectionFromSecondConjunctRule = 0;

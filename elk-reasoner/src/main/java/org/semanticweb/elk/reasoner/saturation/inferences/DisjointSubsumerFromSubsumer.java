@@ -46,9 +46,8 @@ public class DisjointSubsumerFromSubsumer extends
 		AbstractDisjointSubsumerInference {
 
 	public DisjointSubsumerFromSubsumer(IndexedContextRoot inferenceRoot,
-			IndexedClassExpression member, IndexedDisjointClassesAxiom axiom,
-			ElkAxiom reason) {
-		super(inferenceRoot, member, axiom, reason);
+			IndexedDisjointClassesAxiom axiom, int position, ElkAxiom reason) {
+		super(inferenceRoot, axiom, position, reason);
 	}
 
 	@Override
@@ -58,7 +57,7 @@ public class DisjointSubsumerFromSubsumer extends
 
 	public ComposedSubsumer getPremise() {
 		return new ComposedSubsumerImpl<IndexedClassExpression>(
-				getInferenceRoot(), getMember());
+				getInferenceRoot(), getAxiom().getMembers().get(getPosition()));
 	}
 
 	@Override

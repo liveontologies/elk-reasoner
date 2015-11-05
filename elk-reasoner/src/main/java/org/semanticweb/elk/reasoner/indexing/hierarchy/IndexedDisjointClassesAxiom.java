@@ -22,9 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.Set;
+import java.util.List;
 
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 
 /**
@@ -38,22 +37,12 @@ import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 public interface IndexedDisjointClassesAxiom extends IndexedAxiom {
 
 	/**
-	 * @return {@link IndexedClassExpression}s corresponding to
-	 *         {@link ElkClassExpression}s that occur at least twice in this
+	 * @return {@link IndexedClassExpression}s occurring in this
 	 *         {@link IndexedDisjointClassesAxiom}
 	 * 
 	 * @see ElkDisjointClassesAxiom#getClassExpressions()
 	 */
-	public Set<? extends IndexedClassExpression> getInconsistentMembers();
-
-	/**
-	 * @return {@link IndexedClassExpression}s corresponding to
-	 *         {@link ElkClassExpression}s that occur exactly once in this
-	 *         {@link IndexedDisjointClassesAxiom}
-	 * 
-	 * @see ElkDisjointClassesAxiom#getClassExpressions()
-	 */
-	public Set<? extends IndexedClassExpression> getDisjointMembers();
+	public List<? extends IndexedClassExpression> getMembers();
 
 	/**
 	 * @return {@code true} if this {@link IndexedDisjointClassesAxiom} occurs

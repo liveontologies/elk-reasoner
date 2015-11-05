@@ -22,9 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.implementation;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedDisjointClassesAxiom;
@@ -34,9 +32,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxi
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 /**
  * Implements {@link CachedIndexedDisjointClassesAxiom}
@@ -48,17 +44,12 @@ class CachedIndexedDisjointClassesAxiomImpl extends
 		CachedIndexedDisjointClassesAxiom {
 
 	/**
-	 * {@link IndexedClassExpression}s that have at least two equal occurrences
-	 * (according to the {@link Object#equals(Object)} method) in this
-	 * {@link IndexedDisjointClassesAxiom}
+	 * the {@link IndexedClassExpression}s stated to be disjoint. Note that the
+	 * same can appear two times in this list, in which case it should be
+	 * inconsistent (disjoint with itself)
 	 */
-	private final Set<ModifiableIndexedClassExpression> inconsistentMembers_;
-	/**
-	 * {@link IndexedClassExpression}s that occur exactly once in this
-	 * {@link IndexedDisjointClassesAxiom}
-	 */
-	private final Set<ModifiableIndexedClassExpression> disjointMembers_;
-
+	private final List<? extends ModifiableIndexedClassExpression> members_;
+	
 	/**
 	 * This counts how often this {@link IndexedDisjointClassesAxiom} occurs in
 	 * the ontology.
@@ -67,49 +58,18 @@ class CachedIndexedDisjointClassesAxiomImpl extends
 
 	CachedIndexedDisjointClassesAxiomImpl(
 			List<? extends ModifiableIndexedClassExpression> members) {
-		this(new Initializer(members));
+		super(CachedIndexedDisjointClassesAxiom.Helper.structuralHashCode(members));
+		this.members_ = members;
 	}
-
-	private CachedIndexedDisjointClassesAxiomImpl(Initializer init) {
-		super(CachedIndexedDisjointClassesAxiom.Helper.structuralHashCode(
-				init.inconsistentMembers_, init.disjointMembers_));
-		this.inconsistentMembers_ = init.inconsistentMembers_;
-		this.disjointMembers_ = init.disjointMembers_;
-	}
-
-	private static class Initializer {
-		private final Set<ModifiableIndexedClassExpression> inconsistentMembers_;
-		private final Set<ModifiableIndexedClassExpression> disjointMembers_;
-
-		Initializer(List<? extends ModifiableIndexedClassExpression> members) {
-			inconsistentMembers_ = new ArrayHashSet<ModifiableIndexedClassExpression>(
-					1);
-			disjointMembers_ = new ArrayHashSet<ModifiableIndexedClassExpression>(
-					2);
-			for (ModifiableIndexedClassExpression member : members) {
-				if (inconsistentMembers_.contains(member))
-					continue;
-				if (!disjointMembers_.add(member)) {
-					disjointMembers_.remove(member);
-					inconsistentMembers_.add(member);
-				}
-			}
-		}
-	}
-
+	
 	@Override
 	public final boolean occurs() {
 		return totalOccurrenceNo_ > 0;
 	}
 
 	@Override
-	public final Set<ModifiableIndexedClassExpression> getInconsistentMembers() {
-		return inconsistentMembers_;
-	}
-
-	@Override
-	public final Set<ModifiableIndexedClassExpression> getDisjointMembers() {
-		return disjointMembers_;
+	public final List<? extends ModifiableIndexedClassExpression> getMembers() {
+		return members_;
 	}
 
 	@Override
@@ -120,19 +80,12 @@ class CachedIndexedDisjointClassesAxiomImpl extends
 
 	@Override
 	public boolean addOccurrence(ModifiableOntologyIndex index, ElkAxiom reason) {
-		if (!ContradictionFromDisjointnessRule.addRulesFor(this, index, reason))
-			return false;
 		if (!DisjointSubsumerFromMemberRule.addRulesFor(this, index, reason)) {
-			// revert the changes
-			ContradictionFromDisjointnessRule.removeRulesFor(this, index,
-					reason);
 			return false;
 		}
 		if (!index.updatePositiveOwlNothingOccurrenceNo(1)) {
 			// revert the changes
 			DisjointSubsumerFromMemberRule.removeRulesFor(this, index, reason);
-			ContradictionFromDisjointnessRule.removeRulesFor(this, index,
-					reason);
 			return false;
 		}
 		totalOccurrenceNo_++;
@@ -153,16 +106,8 @@ class CachedIndexedDisjointClassesAxiomImpl extends
 			totalOccurrenceNo_++;
 			return false;
 		}
-		if (!ContradictionFromDisjointnessRule.removeRulesFor(this, index,
-				reason)) {
-			// revert the changes
-			index.updatePositiveOwlNothingOccurrenceNo(1);
-			totalOccurrenceNo_++;
-			return false;
-		}
 		if (!DisjointSubsumerFromMemberRule.removeRulesFor(this, index, reason)) {
 			// revert the changes
-			ContradictionFromDisjointnessRule.addRulesFor(this, index, reason);
 			index.updatePositiveOwlNothingOccurrenceNo(1);
 			totalOccurrenceNo_++;
 			return false;
@@ -172,14 +117,7 @@ class CachedIndexedDisjointClassesAxiomImpl extends
 
 	@Override
 	public final String toStringStructural() {
-		List<IndexedClassExpression> members = new LinkedList<IndexedClassExpression>();
-		for (IndexedClassExpression inconsistentMember : inconsistentMembers_) {
-			// each inconsistent member is added two times
-			members.add(inconsistentMember);
-			members.add(inconsistentMember);
-		}
-		members.addAll(disjointMembers_);
-		return "DisjointClasses(" + members + ")";
+		return "DisjointClasses(" + members_ + ")";
 	}
 
 	@Override

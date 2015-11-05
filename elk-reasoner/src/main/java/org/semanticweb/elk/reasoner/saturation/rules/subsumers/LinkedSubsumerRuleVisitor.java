@@ -36,10 +36,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
  */
 public interface LinkedSubsumerRuleVisitor<O> {
 
-	O visit(ContradictionFromDisjointnessRule rule,
-			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer);
-
 	O visit(ContradictionFromNegationRule rule, IndexedClassExpression premise,
 			ContextPremises premises, ConclusionProducer producer);
 

@@ -106,10 +106,10 @@ public class HybridContextPremises implements ContextPremises {
 	}
 
 	@Override
-	public IndexedClassExpression[] getDisjointSubsumers(
+	public Set<? extends Integer> getSubsumerPositions(
 			IndexedDisjointClassesAxiom axiom) {
 		// local
-		return localPremises_.getDisjointSubsumers(axiom);
+		return localPremises_.getSubsumerPositions(axiom);
 	}
 
 	@Override

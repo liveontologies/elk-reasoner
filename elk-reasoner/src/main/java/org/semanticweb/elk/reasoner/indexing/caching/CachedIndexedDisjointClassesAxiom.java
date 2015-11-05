@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.indexing.caching;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.indexing.caching;
  * #L%
  */
 
-import java.util.Set;
+import java.util.List;
 
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDisjointClassesAxiom;
@@ -43,11 +43,9 @@ public interface CachedIndexedDisjointClassesAxiom extends
 	static class Helper extends CachedIndexedObject.Helper {
 
 		public static int structuralHashCode(
-				Set<? extends ModifiableIndexedClassExpression> inconsistentMembers,
-				Set<? extends ModifiableIndexedClassExpression> disjointMembers) {
+				List<? extends ModifiableIndexedClassExpression> members) {
 			return combinedHashCode(CachedIndexedDisjointClassesAxiom.class,
-					combinedHashCode(inconsistentMembers),
-					combinedHashCode(disjointMembers));
+					combinedHashCode(members));
 		}
 
 		public static CachedIndexedDisjointClassesAxiom structuralEquals(
@@ -57,10 +55,7 @@ public interface CachedIndexedDisjointClassesAxiom extends
 			}
 			if (second instanceof CachedIndexedDisjointClassesAxiom) {
 				CachedIndexedDisjointClassesAxiom secondEntry = (CachedIndexedDisjointClassesAxiom) second;
-				if (first.getDisjointMembers().equals(
-						secondEntry.getDisjointMembers())
-						&& first.getInconsistentMembers().equals(
-								secondEntry.getInconsistentMembers()))
+				if (first.getMembers().equals(secondEntry.getMembers()))
 					return secondEntry;
 			}
 			// else

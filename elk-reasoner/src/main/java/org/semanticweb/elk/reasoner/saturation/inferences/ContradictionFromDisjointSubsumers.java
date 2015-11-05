@@ -26,7 +26,6 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DisjointSubsumerImpl;
@@ -53,20 +52,22 @@ public class ContradictionFromDisjointSubsumers extends
 	private final IndexedDisjointClassesAxiom axiom_;
 
 	/**
+	 * The positions of subsumers that violate the disjointness axiom;
+	 * these positions must be different
+	 */
+	private final Integer firstPosition_, secondPosition_;
+	
+	/**
 	 * The original {@link ElkAxiom} due to which this axiom was indexed
 	 */
-	private final ElkAxiom reason_;
-
-	/**
-	 * The two members that violate the disjointness axiom
-	 */
-	private final IndexedClassExpression[] disjointSubsumers_;
+	private final ElkAxiom reason_;	
 
 	public ContradictionFromDisjointSubsumers(DisjointSubsumer premise,
-			IndexedClassExpression[] disjointSubsumers) {
+			Integer otherPos) {
 		super(premise.getConclusionRoot());
 		this.axiom_ = premise.getAxiom();
-		this.disjointSubsumers_ = disjointSubsumers;
+		this.firstPosition_ = premise.getPosition();
+		this.secondPosition_ = otherPos;
 		this.reason_ = premise.getReason();
 	}
 
@@ -76,11 +77,11 @@ public class ContradictionFromDisjointSubsumers extends
 	}
 
 	public DisjointSubsumer[] getPremises() {
-		return new DisjointSubsumer[] {
-				new DisjointSubsumerImpl(getInferenceRoot(),
-						disjointSubsumers_[0], axiom_, reason_),
-				new DisjointSubsumerImpl(getInferenceRoot(),
-						disjointSubsumers_[1], axiom_, reason_) };
+		return new DisjointSubsumer[]{
+				new DisjointSubsumerImpl(getInferenceRoot(), axiom_,
+						firstPosition_, reason_),
+				new DisjointSubsumerImpl(getInferenceRoot(), axiom_,
+						secondPosition_, reason_)};
 	}
 
 	public ElkAxiom getReason() {
@@ -89,8 +90,8 @@ public class ContradictionFromDisjointSubsumers extends
 
 	@Override
 	public String toString() {
-		return "Contradiction from disjoint subsumer " + disjointSubsumers_[1]
-				+ " using " + disjointSubsumers_[0] + " due to " + reason_;
+		return "Contradiction from disjoint subsumer " + axiom_.getMembers().get(firstPosition_)
+				+ " using " + axiom_.getMembers().get(secondPosition_) + " due to " + reason_;
 	}
 
 	@Override

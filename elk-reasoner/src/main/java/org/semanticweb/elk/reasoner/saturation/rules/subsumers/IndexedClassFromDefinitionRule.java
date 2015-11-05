@@ -92,7 +92,7 @@ public class IndexedClassFromDefinitionRule extends
 		return NAME;
 	}
 
-	// TODO: hide this method
+	@Deprecated
 	public Collection<IndexedClass> getDefinedClasses() {
 		return definedClasses_;
 	}

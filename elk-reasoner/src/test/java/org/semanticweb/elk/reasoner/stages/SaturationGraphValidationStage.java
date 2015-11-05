@@ -73,7 +73,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.propagations.SubsumerPropag
 import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.AbstractObjectIntersectionFromConjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ComposedFromDecomposedSubsumerRule;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
@@ -315,15 +314,6 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		}
 
 		@Override
-		public Void visit(
-				ContradictionFromDisjointnessRule thisContradictionRule,
-				IndexedClassExpression premise, ContextPremises premises,
-				ConclusionProducer producer) {
-			// nothing is stored in the rule
-			return null;
-		}
-
-		@Override
 		public Void visit(ContradictionFromNegationRule rule,
 				IndexedClassExpression premise, ContextPremises premises,
 				ConclusionProducer producer) {
@@ -366,7 +356,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 					LOGGER_.error("Dead disjointness axiom: " + axiom);
 				}
 
-				for (IndexedClassExpression ice : axiom.getDisjointMembers()) {
+				for (IndexedClassExpression ice : axiom.getMembers()) {
 					iceValidator_.checkNew(ice);
 				}
 			}

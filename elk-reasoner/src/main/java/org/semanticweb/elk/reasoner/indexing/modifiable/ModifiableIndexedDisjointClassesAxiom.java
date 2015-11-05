@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.indexing.modifiable;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.indexing.modifiable;
  * #L%
  */
 
-import java.util.Set;
+import java.util.List;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 
@@ -37,9 +37,6 @@ public interface ModifiableIndexedDisjointClassesAxiom extends
 		IndexedDisjointClassesAxiom {
 
 	@Override
-	public Set<? extends ModifiableIndexedClassExpression> getInconsistentMembers();
-
-	@Override
-	public Set<? extends ModifiableIndexedClassExpression> getDisjointMembers();
+	public List<? extends ModifiableIndexedClassExpression> getMembers();
 
 }

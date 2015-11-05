@@ -47,6 +47,10 @@ public class ConclusionEquality implements ConclusionVisitor<Void, Conclusion> {
 	private static boolean equals(ElkObject first, ElkObject second) {
 		return (ElkObjectEquality.equals(first, second));
 	}
+	
+	private static boolean equals(int first, int second) {
+		return first == second;
+	}
 
 	@Override
 	public BackwardLink visit(BackwardLink subConclusion, Void input) {
@@ -163,7 +167,7 @@ public class ConclusionEquality implements ConclusionVisitor<Void, Conclusion> {
 			if (equals(result.getConclusionRoot(),
 					conclusion.getConclusionRoot())
 					&& equals(result.getAxiom(), conclusion.getAxiom())
-					&& equals(result.getMember(), conclusion.getMember())
+					&& equals(result.getPosition(), conclusion.getPosition())
 					&& equals(result.getReason(), conclusion.getReason()))
 				return result;
 		}

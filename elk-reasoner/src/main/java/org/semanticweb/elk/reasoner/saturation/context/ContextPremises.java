@@ -104,15 +104,13 @@ public interface ContextPremises {
 
 	/**
 	 * @param axiom
-	 *            the {@link IndexedDisjointClassesAxiom} whose members could be
-	 *            subsumers in this {@link ContextPremises}.
+	 *            an {@link IndexedDisjointClassesAxiom}
 	 * 
-	 * @return the derived {@link IndexedClassExpression} subsumers by
-	 *         {@link IndexedDisjointClassesAxiom}s in which they occur as
-	 *         members
+	 * @return the positions in the {@link IndexedDisjointClassesAxiom}
+	 *         corresponding to the subsumer {@link IndexedClassExpression}
+	 *         occurring in this {@link ContextPremises}
 	 */
-	IndexedClassExpression[] getDisjointSubsumers(
-			IndexedDisjointClassesAxiom axiom);
+	Set<? extends Integer> getSubsumerPositions(IndexedDisjointClassesAxiom axiom);
 
 	Iterable<? extends IndexedObjectSomeValuesFrom> getPropagatedSubsumers(
 			IndexedPropertyChain subRoot);

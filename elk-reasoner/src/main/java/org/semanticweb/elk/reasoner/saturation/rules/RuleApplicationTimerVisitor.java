@@ -50,7 +50,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwa
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.SubsumerPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ComposedFromDecomposedSubsumerRule;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
@@ -138,18 +137,6 @@ class RuleApplicationTimerVisitor<O> implements RuleVisitor<O> {
 				.getCurrentTimeMillis();
 		O result = visitor_.visit(rule, premise, premises, producer);
 		timer_.timeContradictionCompositionRule += CachedTimeThread
-				.getCurrentTimeMillis();
-		return result;
-	}
-
-	@Override
-	public O visit(ContradictionFromDisjointnessRule rule,
-			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		timer_.timeContradictionFromDisjointnessRule -= CachedTimeThread
-				.getCurrentTimeMillis();
-		O result = visitor_.visit(rule, premise, premises, producer);
-		timer_.timeContradictionFromDisjointnessRule += CachedTimeThread
 				.getCurrentTimeMillis();
 		return result;
 	}

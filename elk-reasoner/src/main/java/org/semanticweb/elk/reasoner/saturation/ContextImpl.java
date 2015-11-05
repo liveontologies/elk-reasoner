@@ -97,10 +97,10 @@ public class ContextImpl implements ExtendedContext {
 	private Map<IndexedObjectProperty, SubContext> subContextsByObjectProperty_ = null;
 
 	/**
-	 * the derived {@link IndexedClassExpression} subsumers by
-	 * {@link IndexedDisjointClassesAxiom}s in which they occur as members
+	 * the map from {@link IndexedDisjointClassesAxiom}s to the positions
+	 * corresponding to the derived {@link IndexedClassExpression} subsumers
 	 */
-	private Map<IndexedDisjointClassesAxiom, IndexedClassExpression[]> disjointnessAxioms_;
+	private Map<IndexedDisjointClassesAxiom, Set<Integer>> disjointnessAxioms_;
 
 	/**
 	 * {@code true} if {@code owl:Nothing} is stored in
@@ -276,14 +276,14 @@ public class ContextImpl implements ExtendedContext {
 	/*
 	 * @Override public boolean isInconsistForDisjointnessAxiom(
 	 * IndexedDisjointnessAxiom axiom) { if (disjointnessAxioms_ == null) return
-	 * false; IndexedClassExpression[] members = disjointnessAxioms_.get(axiom);
-	 * if (members == null) return false; // check if both members are not null;
-	 * this is always when the second // member is not null return (members[1]
+	 * false; IndexedClassExpression[] positions = disjointnessAxioms_.get(axiom);
+	 * if (positions == null) return false; // check if both positions are not null;
+	 * this is always when the second // position is not null return (positions[1]
 	 * != null); }
 	 */
 
 	@Override
-	public IndexedClassExpression[] getDisjointSubsumers(
+	public Set<? extends Integer> getSubsumerPositions(
 			IndexedDisjointClassesAxiom axiom) {
 		if (disjointnessAxioms_ == null) {
 			return null;
@@ -388,31 +388,22 @@ public class ContextImpl implements ExtendedContext {
 		@Override
 		public Boolean visit(DisjointSubsumer conclusion, ContextImpl input) {
 			if (input.disjointnessAxioms_ == null) {
-				input.disjointnessAxioms_ = new ArrayHashMap<IndexedDisjointClassesAxiom, IndexedClassExpression[]>();
+				input.disjointnessAxioms_ = new ArrayHashMap<IndexedDisjointClassesAxiom, Set<Integer>>();
 			}
 			IndexedDisjointClassesAxiom axiom = conclusion.getAxiom();
-			IndexedClassExpression member = conclusion.getMember();
-			IndexedClassExpression[] members = input.disjointnessAxioms_
+			int position = conclusion.getPosition();
+			Set<Integer> positions = input.disjointnessAxioms_
 					.get(axiom);
-			if (members == null) {
-				// at most two members are stored; it is sufficient to detect
-				// inconsistency
-				members = new IndexedClassExpression[2];
-				input.disjointnessAxioms_.put(axiom, members);
+			if (positions == null) {
+				positions = new ArrayHashSet<Integer>(2);
+				input.disjointnessAxioms_.put(axiom, positions);
 			}
-			if (members[0] == null) {
-				members[0] = member;
-				return true;
-			}
-			if (members[0] == member) {
+			if (positions.contains(position)) {
 				return false;
 			}
-			if (members[1] == null) {
-				members[1] = member;
-				return true;
-			}
 			// else
-			return false;
+			positions.add(position);
+			return true;
 		}
 
 		@Override
@@ -499,34 +490,13 @@ public class ContextImpl implements ExtendedContext {
 				return false;
 			}
 			IndexedDisjointClassesAxiom axiom = conclusion.getAxiom();
-			IndexedClassExpression member = conclusion.getMember();
-			IndexedClassExpression[] members = input.disjointnessAxioms_
-					.get(axiom);
-			if (members == null)
+			int position = conclusion.getPosition();
+			Set<Integer> positions = input.disjointnessAxioms_.get(axiom);
+			if (positions == null) {
 				return false;
-			if (members[0] == null)
-				return false;
-			if (members[0] == member) {
-				if (members[1] == null) {
-					// delete the record
-					input.disjointnessAxioms_.remove(axiom);
-					if (input.disjointnessAxioms_.isEmpty())
-						input.disjointnessAxioms_ = null;
-				} else {
-					// shift
-					members[0] = members[1];
-					members[1] = null;
-				}
-				return true;
-			}
-			if (members[1] == null)
-				return false;
-			if (members[1] == member) {
-				members[1] = null;
-				return true;
-			}
+			}	
 			// else
-			return false;
+			return (positions.remove(position));
 		}
 
 		@Override
@@ -604,12 +574,13 @@ public class ContextImpl implements ExtendedContext {
 				return false;
 			}
 			IndexedDisjointClassesAxiom axiom = conclusion.getAxiom();
-			IndexedClassExpression member = conclusion.getMember();
-			IndexedClassExpression[] members = input.disjointnessAxioms_
-					.get(axiom);
-			if (members == null)
+			int position = conclusion.getPosition();
+			Set<Integer> positions = input.disjointnessAxioms_.get(axiom);
+			if (positions == null) {
 				return false;
-			return (members[0] == member || members[1] == member);
+			}
+			// else
+			return positions.contains(position);
 		}
 
 		@Override

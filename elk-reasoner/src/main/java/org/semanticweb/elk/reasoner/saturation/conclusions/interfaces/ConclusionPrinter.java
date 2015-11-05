@@ -81,8 +81,8 @@ public class ConclusionPrinter implements ConclusionVisitor<Void, String> {
 	@Override
 	public String visit(DisjointSubsumer conclusion, Void input) {
 		return "DisjointSubsumer(" + conclusion.getConclusionRoot() + ":"
-				+ conclusion.getAxiom().toString() + ":"
-				+ conclusion.getMember().toString() + "["
+				+ conclusion.getAxiom() + ":"
+				+ conclusion.getPosition() + "["
 				+ conclusion.getReason() + "])";
 	}
 

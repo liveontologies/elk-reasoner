@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
  */
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -62,27 +63,35 @@ public class DisjointSubsumerFromMemberRule extends
 	public static final String NAME = "DisjointClasses Introduction";
 
 	/**
-	 * Set of relevant {@link IndexedDisjointClassesAxiom}s in which the member,
+	 * The {@link IndexedDisjointClassesAxiom}s in which the member,
 	 * for which this rule is registered, appears.
 	 */
-	private final ArrayList<IndexedDisjointClassesAxiom> axioms_;
+	private final List<IndexedDisjointClassesAxiom> axioms_;
+	
+	/**
+	 * The position in the member list of the respective
+	 * {@link IndexedDisjointClassesAxiom} in which it appears 
+	 */
+	private final List<Integer> positions_;
 
 	/**
 	 * The {@link ElkAxiom} that are responsible for the respective inconsistent
 	 * axiom
 	 */
-	private final ArrayList<ElkAxiom> reasons_;
+	private final List<ElkAxiom> reasons_;
 
 	private DisjointSubsumerFromMemberRule(ChainableSubsumerRule tail) {
 		super(tail);
 		this.axioms_ = new ArrayList<IndexedDisjointClassesAxiom>(1);
+		this.positions_ = new ArrayList<Integer>(1);
 		this.reasons_ = new ArrayList<ElkAxiom>(1);
 	}
 
 	private DisjointSubsumerFromMemberRule(IndexedDisjointClassesAxiom axiom,
-			ElkAxiom reason) {
+			int position, ElkAxiom reason) {
 		this((ChainableSubsumerRule) null);
 		axioms_.add(axiom);
+		positions_.add(position);
 		reasons_.add(reason);
 	}
 
@@ -91,9 +100,12 @@ public class DisjointSubsumerFromMemberRule extends
 			ModifiableOntologyIndex index, ElkAxiom reason) {
 		boolean success = true;
 		int added = 0;
-		for (ModifiableIndexedClassExpression ice : axiom.getDisjointMembers()) {
+		List<? extends ModifiableIndexedClassExpression> members =
+				axiom.getMembers();
+		for (int pos = 0; pos < members.size(); pos++) {
+			ModifiableIndexedClassExpression ice = members.get(pos); 
 			if (index.add(ice,
-					new DisjointSubsumerFromMemberRule(axiom, reason))) {
+					new DisjointSubsumerFromMemberRule(axiom, pos, reason))) {
 				added++;
 			} else {
 				success = false;
@@ -103,12 +115,13 @@ public class DisjointSubsumerFromMemberRule extends
 		if (success)
 			return true;
 		// else revert the changes made
-		for (ModifiableIndexedClassExpression ice : axiom.getDisjointMembers()) {
+		for (int pos = 0; pos < members.size(); pos++) {
+			ModifiableIndexedClassExpression ice = members.get(pos);
 			if (added == 0)
 				break;
 			// else
 			added--;
-			index.remove(ice, new DisjointSubsumerFromMemberRule(axiom, reason));
+			index.remove(ice, new DisjointSubsumerFromMemberRule(axiom, pos, reason));
 		}
 		return false;
 	}
@@ -118,8 +131,11 @@ public class DisjointSubsumerFromMemberRule extends
 			ModifiableOntologyIndex index, ElkAxiom reason) {
 		boolean success = true;
 		int removed = 0;
-		for (ModifiableIndexedClassExpression ice : axiom.getDisjointMembers()) {
-			if (index.remove(ice, new DisjointSubsumerFromMemberRule(axiom,
+		List<? extends ModifiableIndexedClassExpression> members =
+				axiom.getMembers();
+		for (int pos = 0; pos < members.size(); pos++) {
+			ModifiableIndexedClassExpression ice = members.get(pos);
+			if (index.remove(ice, new DisjointSubsumerFromMemberRule(axiom, pos,
 					reason))) {
 				removed++;
 			} else {
@@ -130,18 +146,19 @@ public class DisjointSubsumerFromMemberRule extends
 		if (success)
 			return true;
 		// else revert the changes made
-		for (ModifiableIndexedClassExpression ice : axiom.getDisjointMembers()) {
+		for (int pos = 0; pos < members.size(); pos++) {
+			ModifiableIndexedClassExpression ice = members.get(pos);
 			if (removed == 0)
 				break;
 			// else
 			removed--;
-			index.add(ice, new DisjointSubsumerFromMemberRule(axiom, reason));
+			index.add(ice, new DisjointSubsumerFromMemberRule(axiom, pos, reason));
 		}
 		return false;
 	}
 
-	// TODO: hide this method
-	public ArrayList<IndexedDisjointClassesAxiom> getDisjointnessAxioms() {
+	@Deprecated
+	public List<IndexedDisjointClassesAxiom> getDisjointnessAxioms() {
 		return axioms_;
 	}
 
@@ -161,8 +178,9 @@ public class DisjointSubsumerFromMemberRule extends
 	public void apply(IndexedClassExpression member, ContextPremises premises,
 			ConclusionProducer producer) {
 		for (int i = 0; i < axioms_.size(); i++) {
-			producer.produce(new DisjointSubsumerFromSubsumer(premises
-					.getRoot(), member, axioms_.get(i), reasons_.get(i)));
+			producer.produce(new DisjointSubsumerFromSubsumer(
+					premises.getRoot(), axioms_.get(i), positions_.get(i),
+					reasons_.get(i)));
 		}
 	}
 
@@ -181,12 +199,14 @@ public class DisjointSubsumerFromMemberRule extends
 		int added = 0;
 		for (int i = 0; i < axioms_.size(); i++) {
 			IndexedDisjointClassesAxiom axiom = axioms_.get(i);
+			int position = positions_.get(i);
 			ElkAxiom reason = reasons_.get(i);
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("{}: adding to {} reason: {}", axiom, NAME,
 						reason);
 			}
 			if (rule.axioms_.add(axiom)) {
+				rule.positions_.add(position);
 				rule.reasons_.add(reason);
 				added++;
 			} else {
@@ -210,6 +230,7 @@ public class DisjointSubsumerFromMemberRule extends
 			}
 			int j = rule.indexOf(axiom, reason);
 			rule.axioms_.remove(j);
+			rule.positions_.remove(j);
 			rule.reasons_.remove(j);
 		}
 		return false;
@@ -235,6 +256,7 @@ public class DisjointSubsumerFromMemberRule extends
 			int j = rule.indexOf(axiom, reason);
 			if (j >= 0) {
 				rule.axioms_.remove(j);
+				rule.positions_.remove(j);
 				rule.reasons_.remove(j);
 				removed++;
 			} else {
@@ -255,12 +277,14 @@ public class DisjointSubsumerFromMemberRule extends
 				break;
 			removed--;
 			IndexedDisjointClassesAxiom axiom = axioms_.get(i);
+			int position = positions_.get(i);
 			ElkAxiom reason = reasons_.get(i);
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("{}: adding to {} reason: {} [revert]", axiom,
 						NAME, reason);
 			}
 			rule.axioms_.add(axiom);
+			rule.positions_.add(position);
 			rule.reasons_.add(reason);
 		}
 		return false;

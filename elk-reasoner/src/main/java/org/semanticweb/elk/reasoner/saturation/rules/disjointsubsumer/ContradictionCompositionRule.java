@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,8 @@ package org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import java.util.Set;
+
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
@@ -49,14 +50,20 @@ public class ContradictionCompositionRule extends AbstractDisjointSubsumerRule {
 	@Override
 	public void apply(DisjointSubsumer premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		IndexedDisjointClassesAxiom axiom = premise.getAxiom();
-		IndexedClassExpression[] disjointSubsumers = premises
-				.getDisjointSubsumers(axiom); // should not be null
+		IndexedDisjointClassesAxiom axiom = premise.getAxiom();		
+		Set<? extends Integer> disjointSubsumerPositions = premises
+				.getSubsumerPositions(axiom); // should not be null
 
-		if (disjointSubsumers[1] != null) {
-			// two disjoint members were derived
-			producer.produce(new ContradictionFromDisjointSubsumers(premise,
-					disjointSubsumers));
+		if (disjointSubsumerPositions.size() > 1) {
+			// at least two disjoint members were derived
+			int lastPos = premise.getPosition();
+			for (int otherPos : disjointSubsumerPositions) {
+				if (otherPos != lastPos) {
+					producer.produce(new ContradictionFromDisjointSubsumers(
+							premise, otherPos));
+				}
+			}
+			
 		}
 	}
 

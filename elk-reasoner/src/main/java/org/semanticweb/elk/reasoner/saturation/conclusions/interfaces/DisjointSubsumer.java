@@ -44,16 +44,16 @@ public interface DisjointSubsumer extends Conclusion {
 	public static final String NAME = "Disjoint Subsumer";
 
 	/**
-	 * @return the member of an {@link IndexedDisjointClassesAxiom} that was
-	 *         derived as a subsumer
-	 */
-	public IndexedClassExpression getMember();
-
-	/**
 	 * @return the {@link IndexedDisjointClassesAxiom} to which the member
 	 *         belongs
 	 */
 	public IndexedDisjointClassesAxiom getAxiom();
+	
+	/**
+	 * @return the position of the {@link IndexedDisjointClassesAxiom} at which
+	 * 	       the member occurs
+	 */
+	public int getPosition();
 
 	/**
 	 * @return the {@link ElkAxiom} that is responsible for the

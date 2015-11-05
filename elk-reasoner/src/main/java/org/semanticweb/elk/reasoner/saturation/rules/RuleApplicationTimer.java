@@ -35,7 +35,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwa
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.SubsumerPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ComposedFromDecomposedSubsumerRule;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
@@ -80,11 +79,6 @@ public class RuleApplicationTimer {
 	 * time for {@link ContradictionCompositionRule}
 	 */
 	long timeContradictionCompositionRule;
-
-	/**
-	 * timer for {@link ContradictionFromDisjointnessRule}
-	 */
-	long timeContradictionFromDisjointnessRule;
 
 	/**
 	 * timer for {@link ContradictionFromNegationRule}
@@ -210,7 +204,6 @@ public class RuleApplicationTimer {
 		timeOwlThingContextInitRule += timer.timeOwlThingContextInitRule;
 		timeRootContextInitializationRule += timer.timeRootContextInitializationRule;
 		timeDisjointSubsumerFromMemberRule += timer.timeDisjointSubsumerFromMemberRule;
-		timeContradictionFromDisjointnessRule += timer.timeContradictionFromDisjointnessRule;
 		timeContradictionFromNegationRule += timer.timeContradictionFromNegationRule;
 		timeObjectIntersectionFromFirstConjunctRule += timer.timeObjectIntersectionFromFirstConjunctRule;
 		timeObjectIntersectionFromSecondConjunctRule += timer.timeObjectIntersectionFromSecondConjunctRule;
@@ -240,7 +233,6 @@ public class RuleApplicationTimer {
 	public long getTotalRuleAppTime() {
 		return timeOwlThingContextInitRule + timeRootContextInitializationRule
 				+ timeDisjointSubsumerFromMemberRule
-				+ timeContradictionFromDisjointnessRule
 				+ timeContradictionFromNegationRule
 				+ timeObjectIntersectionFromFirstConjunctRule
 				+ timeObjectIntersectionFromSecondConjunctRule
@@ -274,7 +266,6 @@ public class RuleApplicationTimer {
 		timeOwlThingContextInitRule = 0;
 		timeRootContextInitializationRule = 0;
 		timeDisjointSubsumerFromMemberRule = 0;
-		timeContradictionFromDisjointnessRule = 0;
 		timeContradictionFromNegationRule = 0;
 		timeObjectIntersectionFromFirstConjunctRule = 0;
 		timeObjectIntersectionFromSecondConjunctRule = 0;

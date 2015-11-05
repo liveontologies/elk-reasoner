@@ -137,7 +137,7 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 		visitor.visit(this, premise, premises, producer);
 	}
 
-	// TODO: hide this method
+	@Deprecated
 	public Set<IndexedObjectUnionOf> getDisjunctions() {
 		return disjunctions_;
 	}
