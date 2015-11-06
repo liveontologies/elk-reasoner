@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DisjointSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.DisjointSubsumerInferenceVisitor;
@@ -33,9 +33,9 @@ public abstract class AbstractDisjointSubsumerInference extends
 		DisjointSubsumerImpl implements DisjointSubsumerInference {
 
 	public AbstractDisjointSubsumerInference(IndexedContextRoot root,
-			IndexedDisjointClassesAxiom axiom, int position,
+			IndexedClassExpressionList disjoint, int position,
 			ElkAxiom reason) {
-		super(root, axiom, position, reason);
+		super(root, disjoint, position, reason);
 	}
 
 	@Override

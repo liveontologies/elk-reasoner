@@ -86,7 +86,7 @@ public class ConclusionHashGenerator implements ConclusionVisitor<Void, Integer>
 
 	@Override
 	public Integer visit(DisjointSubsumer conclusion, Void input) {
-		return HashGenerator.combineListHash(conclusion.getAxiom().hashCode(), conclusion.getPosition());
+		return HashGenerator.combineListHash(conclusion.getDisjointExpressions().hashCode(), conclusion.getPosition());
 	}
 
 	

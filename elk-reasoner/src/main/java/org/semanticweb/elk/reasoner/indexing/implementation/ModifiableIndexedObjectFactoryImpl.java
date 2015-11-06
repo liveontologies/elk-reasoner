@@ -32,7 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedDataHasValue;
-import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectFactory;
@@ -46,6 +46,8 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDeclarationAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpressionList;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedEntity;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectPropertyRangeAxiom;
@@ -65,16 +67,22 @@ public class ModifiableIndexedObjectFactoryImpl implements
 		ModifiableIndexedObjectFactory, CachedIndexedObjectFactory {
 
 	@Override
+	public CachedIndexedClass getIndexedClass(ElkClass elkClass) {
+		return new CachedIndexedClassImpl(elkClass);
+	}
+
+	@Override
+	public CachedIndexedClassExpressionList getIndexedClassExpressionList(
+			List<? extends ModifiableIndexedClassExpression> elements) {
+		return new CachedIndexedClassExpressionListImpl(elements);
+	}
+
+	@Override
 	public CachedIndexedComplexPropertyChain getIndexedComplexPropertyChain(
 			ModifiableIndexedObjectProperty leftProperty,
 			ModifiableIndexedPropertyChain rightProperty) {
 		return new CachedIndexedComplexPropertyChainImpl(leftProperty,
 				rightProperty);
-	}
-
-	@Override
-	public CachedIndexedClass getIndexedClass(ElkClass elkClass) {
-		return new CachedIndexedClassImpl(elkClass);
 	}
 
 	@Override
@@ -97,11 +105,12 @@ public class ModifiableIndexedObjectFactoryImpl implements
 				definition);
 	}
 
+	
 	@Override
-	public CachedIndexedDisjointClassesAxiom getIndexedDisjointClassesAxiom(
-			List<? extends ModifiableIndexedClassExpression> members,
+	public ModifiableIndexedDisjointClassesAxiom getIndexedDisjointClassesAxiom(
+			ModifiableIndexedClassExpressionList members,
 			ElkAxiom reason) {
-		return new CachedIndexedDisjointClassesAxiomImpl(members);
+		return new ModifiableIndexedDisjointClassesAxiomImpl(members);
 	}
 
 	@Override
@@ -114,6 +123,12 @@ public class ModifiableIndexedObjectFactoryImpl implements
 	public CachedIndexedObjectComplementOf getIndexedObjectComplementOf(
 			ModifiableIndexedClassExpression negated) {
 		return new CachedIndexedObjectComplementOfImpl(negated);
+	}
+
+	@Override
+	public CachedIndexedObjectHasSelf getIndexedObjectHasSelf(
+			ModifiableIndexedObjectProperty property) {
+		return new CachedIndexedObjectHasSelfImpl(property);
 	}
 
 	@Override
@@ -130,16 +145,18 @@ public class ModifiableIndexedObjectFactoryImpl implements
 	}
 
 	@Override
+	public ModifiableIndexedObjectPropertyRangeAxiom getIndexedObjectPropertyRangeAxiom(
+			ModifiableIndexedObjectProperty property,
+			ModifiableIndexedClassExpression range, ElkAxiom reason) {
+		return new ModifiableIndexedObjectPropertyRangeAxiomImpl(property,
+				range);
+	}
+
+	@Override
 	public CachedIndexedObjectSomeValuesFrom getIndexedObjectSomeValuesFrom(
 			ModifiableIndexedObjectProperty property,
 			ModifiableIndexedClassExpression filler) {
 		return new CachedIndexedObjectSomeValuesFromImpl(property, filler);
-	}
-
-	@Override
-	public CachedIndexedObjectHasSelf getIndexedObjectHasSelf(
-			ModifiableIndexedObjectProperty property) {
-		return new CachedIndexedObjectHasSelfImpl(property);
 	}
 
 	@Override
@@ -161,14 +178,6 @@ public class ModifiableIndexedObjectFactoryImpl implements
 			ModifiableIndexedObjectProperty superProperty, ElkAxiom reason) {
 		return new ModifiableIndexedSubObjectPropertyOfAxiomImpl(
 				subPropertyChain, superProperty);
-	}
-
-	@Override
-	public ModifiableIndexedObjectPropertyRangeAxiom getIndexedObjectPropertyRangeAxiom(
-			ModifiableIndexedObjectProperty property,
-			ModifiableIndexedClassExpression range, ElkAxiom reason) {
-		return new ModifiableIndexedObjectPropertyRangeAxiomImpl(property,
-				range);
 	}
 
 }

@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.indexing.caching;
 
 import java.util.List;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
@@ -42,24 +41,26 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropert
  */
 public interface CachedIndexedObjectFactory {
 
+	public CachedIndexedClass getIndexedClass(ElkClass elkClass);
+
+	public CachedIndexedClassExpressionList getIndexedClassExpressionList(
+			List<? extends ModifiableIndexedClassExpression> members);
+
 	public CachedIndexedComplexPropertyChain getIndexedComplexPropertyChain(
 			ModifiableIndexedObjectProperty leftProperty,
 			ModifiableIndexedPropertyChain rightProperty);
 
-	public CachedIndexedClass getIndexedClass(ElkClass elkClass);
-
 	public CachedIndexedDataHasValue getIndexedDataHasValue(
 			ElkDataHasValue elkDataHasValue);
-
-	public CachedIndexedDisjointClassesAxiom getIndexedDisjointClassesAxiom(
-			List<? extends ModifiableIndexedClassExpression> members,
-			ElkAxiom reason);
 
 	public CachedIndexedIndividual getIndexedIndividual(
 			ElkNamedIndividual elkNamedIndividual);
 
 	public CachedIndexedObjectComplementOf getIndexedObjectComplementOf(
 			ModifiableIndexedClassExpression negated);
+
+	public CachedIndexedObjectHasSelf getIndexedObjectHasSelf(
+			ModifiableIndexedObjectProperty property);
 
 	public CachedIndexedObjectIntersectionOf getIndexedObjectIntersectionOf(
 			ModifiableIndexedClassExpression conjunctA,
@@ -71,9 +72,6 @@ public interface CachedIndexedObjectFactory {
 	public CachedIndexedObjectSomeValuesFrom getIndexedObjectSomeValuesFrom(
 			ModifiableIndexedObjectProperty property,
 			ModifiableIndexedClassExpression filler);
-
-	public CachedIndexedObjectHasSelf getIndexedObjectHasSelf(
-			ModifiableIndexedObjectProperty property);
 
 	public CachedIndexedObjectUnionOf getIndexedObjectUnionOf(
 			List<? extends ModifiableIndexedClassExpression> disjuncts);

@@ -54,7 +54,7 @@ public class ModifiableIndexedObjectCacheImpl implements
 
 	private final EntryCollection<CachedIndexedComplexPropertyChain> cachedBinaryPropertyChains_;
 
-	private final EntryCollection<CachedIndexedAxiom<?>> cachedAxioms_;
+	private final EntryCollection<CachedIndexedClassExpressionList> cachedClassExpressionLists_;
 
 	private final EntryCollection<CachedIndexedClass> cachedClasses_;
 
@@ -72,7 +72,7 @@ public class ModifiableIndexedObjectCacheImpl implements
 				initialSize);
 		this.cachedBinaryPropertyChains_ = new EntryCollection<CachedIndexedComplexPropertyChain>(
 				initialSize);
-		this.cachedAxioms_ = new EntryCollection<CachedIndexedAxiom<?>>(
+		this.cachedClassExpressionLists_ = new EntryCollection<CachedIndexedClassExpressionList>(
 				initialSize);
 		this.cachedClasses_ = new EntryCollection<CachedIndexedClass>(
 				initialSize);
@@ -215,9 +215,9 @@ public class ModifiableIndexedObjectCacheImpl implements
 		}
 
 		@Override
-		public CachedIndexedDisjointClassesAxiom filter(
-				CachedIndexedDisjointClassesAxiom element) {
-			return cachedAxioms_.findStructural(element);
+		public CachedIndexedClassExpressionList filter(
+				CachedIndexedClassExpressionList element) {
+			return cachedClassExpressionLists_.findStructural(element);
 		}
 
 	}
@@ -293,9 +293,9 @@ public class ModifiableIndexedObjectCacheImpl implements
 		}
 
 		@Override
-		public CachedIndexedDisjointClassesAxiom filter(
-				CachedIndexedDisjointClassesAxiom element) {
-			cachedAxioms_.addStructural(element);
+		public CachedIndexedClassExpressionList filter(
+				CachedIndexedClassExpressionList element) {
+			cachedClassExpressionLists_.addStructural(element);
 			return null;
 		}
 
@@ -362,9 +362,9 @@ public class ModifiableIndexedObjectCacheImpl implements
 		}
 
 		@Override
-		public CachedIndexedDisjointClassesAxiom filter(
-				CachedIndexedDisjointClassesAxiom element) {
-			return cachedAxioms_.removeStructural(element);
+		public CachedIndexedClassExpressionList filter(
+				CachedIndexedClassExpressionList element) {
+			return cachedClassExpressionLists_.removeStructural(element);
 		}
 
 	}

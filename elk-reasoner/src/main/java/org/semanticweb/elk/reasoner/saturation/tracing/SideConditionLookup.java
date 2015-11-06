@@ -30,7 +30,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromDisjointSubsumers;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromInconsistentDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.AbstractObjectPropertyInferenceVisitor;
@@ -73,13 +72,6 @@ public class SideConditionLookup {
 
 		@Override
 		public ElkAxiom visit(ContradictionFromDisjointSubsumers inference,
-				Void input) {
-			return inference.getReason();
-		}
-
-		@Override
-		public ElkAxiom visit(
-				ContradictionFromInconsistentDisjointnessAxiom inference,
 				Void input) {
 			return inference.getReason();
 		}

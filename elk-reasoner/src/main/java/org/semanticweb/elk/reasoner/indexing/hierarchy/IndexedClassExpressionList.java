@@ -1,12 +1,9 @@
-package org.semanticweb.elk.reasoner.indexing.factories;
-
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObject;
-
 /*
  * #%L
  * ELK Reasoner
- * $Id:$
- * $HeadURL:$
+ * 
+ * $Id$
+ * $HeadURL$
  * %%
  * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
@@ -23,18 +20,30 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObject;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.indexing.hierarchy;
+
+import java.util.List;
+
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 
 /**
- * A factory for creating instances of {@link ModifiableIndexedObject}
+ * Represents a list of {@link ElkClassExpression}s.
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface ModifiableIndexedObjectFactory extends
-		ModifiableIndexedClassExpressionFactory,
-		ModifiableIndexedPropertyChainFactory, ModifiableIndexedAxiomFactory,
-		ModifiableIndexedClassExpressionListFactory,
-		ModifiableIndexedEntityFactory {
+public interface IndexedClassExpressionList extends IndexedObject {
 
-	// combined interface
+	/**
+	 * @return {@link IndexedClassExpression}s occurring in this
+	 *         {@link IndexedClassExpressionList}
+	 */
+	public List<? extends IndexedClassExpression> getElements();
+
+	/**
+	 * @return {@code true} if this {@link IndexedClassExpressionList} occurs in
+	 *         the ontology
+	 */
+	public boolean occurs();
+
 }

@@ -42,9 +42,9 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
 public class UpdatingCachedIndexedObjectFactory extends
 		DelegatingCachedIndexedObjectFactory {
 
-	private final ModifiableOntologyIndex index_;
-
 	private final OccurrenceIncrement increment_;
+
+	private final ModifiableOntologyIndex index_;
 
 	public UpdatingCachedIndexedObjectFactory(
 			CachedIndexedObjectFactory baseFactory,
@@ -52,6 +52,35 @@ public class UpdatingCachedIndexedObjectFactory extends
 		super(baseFactory);
 		this.index_ = index;
 		this.increment_ = increment;
+	}
+
+	@Override
+	<T extends CachedIndexedSubObject<T>> T filter(T input) {
+		T result = resolve(input);
+		update(result);
+		if (!result.occurs()) {
+			index_.remove(result);
+		}
+		return result;
+	}
+
+	<T extends CachedIndexedObject<T>> T resolve(T input) {
+		T result = index_.resolve(input);
+		if (result == null) {
+			result = input;
+		}
+		if (!result.occurs()) {
+			index_.add(result);
+		}
+		return result;
+	}
+
+	<T extends ModifiableIndexedSubObject> T update(T input) {
+		if (!input.updateOccurrenceNumbers(index_, increment_))
+			throw new ElkIndexingException(input.toString()
+					+ ": cannot update in Index for " + increment_
+					+ " occurrences!");
+		return input;
 	}
 
 	<T extends ModifiableIndexedAxiom> T update(T input, ElkAxiom reason) {
@@ -70,45 +99,6 @@ public class UpdatingCachedIndexedObjectFactory extends
 			}
 		}
 		return input;
-	}
-
-	<T extends ModifiableIndexedSubObject> T update(T input) {
-		if (!input.updateOccurrenceNumbers(index_, increment_))
-			throw new ElkIndexingException(input.toString()
-					+ ": cannot update in Index for " + increment_
-					+ " occurrences!");
-		return input;
-	}
-
-	<T extends CachedIndexedObject<T>> T resolve(T input) {
-		T result = index_.resolve(input);
-		if (result == null) {
-			result = input;
-		}
-		if (!result.occurs()) {
-			index_.add(result);
-		}
-		return result;
-	}
-
-	@Override
-	<T extends CachedIndexedAxiom<T>> T filter(T input, ElkAxiom reason) {
-		T result = resolve(input);
-		update(result, reason);
-		if (!result.occurs()) {
-			index_.remove(result);
-		}
-		return result;
-	}
-
-	@Override
-	<T extends CachedIndexedSubObject<T>> T filter(T input) {
-		T result = resolve(input);
-		update(result);
-		if (!result.occurs()) {
-			index_.remove(result);
-		}
-		return result;
 	}
 
 }

@@ -24,14 +24,14 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
 
 /**
  * A {@code Conclusion} representing that some {@link IndexedClassExpression}
- * member of an {@link IndexedDisjointClassesAxiom} was derived as a subsumer in
+ * member of an {@link IndexedClassExpressionList} was derived as a subsumer in
  * the root.
  * 
- * @see IndexedDisjointClassesAxiom#getDisjointMembers()
+ * @see IndexedClassExpressionList#getDisjointMembers()
  * 
  * @author Pavel Klinov
  * 
@@ -44,20 +44,20 @@ public interface DisjointSubsumer extends Conclusion {
 	public static final String NAME = "Disjoint Subsumer";
 
 	/**
-	 * @return the {@link IndexedDisjointClassesAxiom} to which the member
+	 * @return the {@link IndexedClassExpressionList} to which the member
 	 *         belongs
 	 */
-	public IndexedDisjointClassesAxiom getAxiom();
+	public IndexedClassExpressionList getDisjointExpressions();
 	
 	/**
-	 * @return the position of the {@link IndexedDisjointClassesAxiom} at which
+	 * @return the position of the {@link IndexedClassExpressionList} at which
 	 * 	       the member occurs
 	 */
 	public int getPosition();
 
 	/**
 	 * @return the {@link ElkAxiom} that is responsible for the
-	 *         {@link IndexedDisjointClassesAxiom}
+	 *         {@link IndexedClassExpressionList}
 	 */
 	public ElkAxiom getReason();
 

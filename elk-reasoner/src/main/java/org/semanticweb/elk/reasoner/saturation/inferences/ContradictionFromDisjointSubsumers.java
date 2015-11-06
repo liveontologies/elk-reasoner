@@ -27,7 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DisjointSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.Contradiction
 
 /**
  * Represents a {@link Contradiction} as the result of processing a
- * {@link Subsumer} which occurs in the same {@link IndexedDisjointClassesAxiom}
+ * {@link Subsumer} which occurs in the same {@link IndexedClassExpressionList}
  * as some previously derived subsumer.
  * 
  * @author Pavel Klinov
@@ -49,7 +49,7 @@ public class ContradictionFromDisjointSubsumers extends
 	/**
 	 * The axiom which causes the contradiction
 	 */
-	private final IndexedDisjointClassesAxiom axiom_;
+	private final IndexedClassExpressionList disjointExpressions_;
 
 	/**
 	 * The positions of subsumers that violate the disjointness axiom;
@@ -65,7 +65,7 @@ public class ContradictionFromDisjointSubsumers extends
 	public ContradictionFromDisjointSubsumers(DisjointSubsumer premise,
 			Integer otherPos) {
 		super(premise.getConclusionRoot());
-		this.axiom_ = premise.getAxiom();
+		this.disjointExpressions_ = premise.getDisjointExpressions();
 		this.firstPosition_ = premise.getPosition();
 		this.secondPosition_ = otherPos;
 		this.reason_ = premise.getReason();
@@ -78,9 +78,9 @@ public class ContradictionFromDisjointSubsumers extends
 
 	public DisjointSubsumer[] getPremises() {
 		return new DisjointSubsumer[]{
-				new DisjointSubsumerImpl(getInferenceRoot(), axiom_,
+				new DisjointSubsumerImpl(getInferenceRoot(), disjointExpressions_,
 						firstPosition_, reason_),
-				new DisjointSubsumerImpl(getInferenceRoot(), axiom_,
+				new DisjointSubsumerImpl(getInferenceRoot(), disjointExpressions_,
 						secondPosition_, reason_)};
 	}
 
@@ -90,8 +90,8 @@ public class ContradictionFromDisjointSubsumers extends
 
 	@Override
 	public String toString() {
-		return "Contradiction from disjoint subsumer " + axiom_.getMembers().get(firstPosition_)
-				+ " using " + axiom_.getMembers().get(secondPosition_) + " due to " + reason_;
+		return "Contradiction from disjoint subsumer " + disjointExpressions_.getElements().get(firstPosition_)
+				+ " using " + disjointExpressions_.getElements().get(secondPosition_) + " due to " + reason_;
 	}
 
 	@Override

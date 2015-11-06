@@ -41,7 +41,6 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDisjunction;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedExistential;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromDisjointSubsumers;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromInconsistentDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromNegation;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromOwlNothing;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedDefinition;
@@ -194,13 +193,6 @@ public class ClassInferencePremiseVisitor<I, O> implements
 	public O visit(GeneratedPropagation conclusion, I input) {
 		conclusion.getFirstPremise().accept(classPremiseVisitor_, input);
 		conclusion.getSecondPremise().accept(propertyPremiseVisitor_, input);
-		return null;
-	}
-
-	@Override
-	public O visit(ContradictionFromInconsistentDisjointnessAxiom conclusion,
-			I input) {
-		conclusion.getPremise().accept(classPremiseVisitor_, input);
 		return null;
 	}
 

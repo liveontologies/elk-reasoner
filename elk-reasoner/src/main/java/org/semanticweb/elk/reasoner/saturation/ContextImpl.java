@@ -28,7 +28,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -97,10 +97,10 @@ public class ContextImpl implements ExtendedContext {
 	private Map<IndexedObjectProperty, SubContext> subContextsByObjectProperty_ = null;
 
 	/**
-	 * the map from {@link IndexedDisjointClassesAxiom}s to the positions
+	 * the map from {@link IndexedClassExpressionList}s to the positions
 	 * corresponding to the derived {@link IndexedClassExpression} subsumers
 	 */
-	private Map<IndexedDisjointClassesAxiom, Set<Integer>> disjointnessAxioms_;
+	private Map<IndexedClassExpressionList, Set<Integer>> disjointnessAxioms_;
 
 	/**
 	 * {@code true} if {@code owl:Nothing} is stored in
@@ -284,12 +284,12 @@ public class ContextImpl implements ExtendedContext {
 
 	@Override
 	public Set<? extends Integer> getSubsumerPositions(
-			IndexedDisjointClassesAxiom axiom) {
+			IndexedClassExpressionList disjoint) {
 		if (disjointnessAxioms_ == null) {
 			return null;
 		}
 
-		return disjointnessAxioms_.get(axiom);
+		return disjointnessAxioms_.get(disjoint);
 	}
 
 	@Override
@@ -388,15 +388,15 @@ public class ContextImpl implements ExtendedContext {
 		@Override
 		public Boolean visit(DisjointSubsumer conclusion, ContextImpl input) {
 			if (input.disjointnessAxioms_ == null) {
-				input.disjointnessAxioms_ = new ArrayHashMap<IndexedDisjointClassesAxiom, Set<Integer>>();
+				input.disjointnessAxioms_ = new ArrayHashMap<IndexedClassExpressionList, Set<Integer>>();
 			}
-			IndexedDisjointClassesAxiom axiom = conclusion.getAxiom();
+			IndexedClassExpressionList disjoint = conclusion.getDisjointExpressions();
 			int position = conclusion.getPosition();
 			Set<Integer> positions = input.disjointnessAxioms_
-					.get(axiom);
+					.get(disjoint);
 			if (positions == null) {
 				positions = new ArrayHashSet<Integer>(2);
-				input.disjointnessAxioms_.put(axiom, positions);
+				input.disjointnessAxioms_.put(disjoint, positions);
 			}
 			if (positions.contains(position)) {
 				return false;
@@ -489,9 +489,9 @@ public class ContextImpl implements ExtendedContext {
 			if (input.disjointnessAxioms_ == null) {
 				return false;
 			}
-			IndexedDisjointClassesAxiom axiom = conclusion.getAxiom();
+			IndexedClassExpressionList disjoint = conclusion.getDisjointExpressions();
 			int position = conclusion.getPosition();
-			Set<Integer> positions = input.disjointnessAxioms_.get(axiom);
+			Set<Integer> positions = input.disjointnessAxioms_.get(disjoint);
 			if (positions == null) {
 				return false;
 			}	
@@ -573,9 +573,9 @@ public class ContextImpl implements ExtendedContext {
 			if (input.disjointnessAxioms_ == null) {
 				return false;
 			}
-			IndexedDisjointClassesAxiom axiom = conclusion.getAxiom();
+			IndexedClassExpressionList disjoint = conclusion.getDisjointExpressions();
 			int position = conclusion.getPosition();
-			Set<Integer> positions = input.disjointnessAxioms_.get(axiom);
+			Set<Integer> positions = input.disjointnessAxioms_.get(disjoint);
 			if (positions == null) {
 				return false;
 			}

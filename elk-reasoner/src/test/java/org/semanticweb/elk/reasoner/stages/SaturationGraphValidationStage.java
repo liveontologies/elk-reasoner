@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
@@ -350,13 +350,13 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		public Void visit(DisjointSubsumerFromMemberRule rule,
 				IndexedClassExpression premise, ContextPremises premises,
 				ConclusionProducer producer) {
-			for (IndexedDisjointClassesAxiom axiom : rule
+			for (IndexedClassExpressionList disjoint : rule
 					.getDisjointnessAxioms()) {
-				if (!axiom.occurs()) {
-					LOGGER_.error("Dead disjointness axiom: " + axiom);
+				if (!disjoint.occurs()) {
+					LOGGER_.error("Dead disjointness axiom: " + disjoint);
 				}
 
-				for (IndexedClassExpression ice : axiom.getMembers()) {
+				for (IndexedClassExpression ice : disjoint.getElements()) {
 					iceValidator_.checkNew(ice);
 				}
 			}

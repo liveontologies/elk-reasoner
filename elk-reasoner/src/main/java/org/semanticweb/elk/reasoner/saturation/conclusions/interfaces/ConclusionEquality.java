@@ -166,7 +166,7 @@ public class ConclusionEquality implements ConclusionVisitor<Void, Conclusion> {
 			DisjointSubsumer result = (DisjointSubsumer) object_;
 			if (equals(result.getConclusionRoot(),
 					conclusion.getConclusionRoot())
-					&& equals(result.getAxiom(), conclusion.getAxiom())
+					&& equals(result.getDisjointExpressions(), conclusion.getDisjointExpressions())
 					&& equals(result.getPosition(), conclusion.getPosition())
 					&& equals(result.getReason(), conclusion.getReason()))
 				return result;

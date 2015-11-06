@@ -23,13 +23,13 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDefinitionAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 
 public interface IndexedAxiomFilter extends
 		IndexedSubClassOfAxiomVisitor<IndexedSubClassOfAxiom>,
 		IndexedDefinitionAxiomVisitor<IndexedDefinitionAxiom>,
-		IndexedDisjointClassesAxiomVisitor<IndexedDisjointClassesAxiom> {
+		IndexedDisjointClassesAxiomVisitor<IndexedClassExpressionList> {
 
 	// nothing else
 

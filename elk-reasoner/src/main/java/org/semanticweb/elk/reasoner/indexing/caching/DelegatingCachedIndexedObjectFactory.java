@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.indexing.caching;
 
 import java.util.List;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
@@ -51,19 +50,6 @@ public class DelegatingCachedIndexedObjectFactory implements
 	}
 
 	/**
-	 * Filters the axioms created by the factory; can be overridden in
-	 * subclasses
-	 * 
-	 * @param input
-	 * @param reason
-	 * @return
-	 */
-	@SuppressWarnings({ "static-method" })
-	<T extends CachedIndexedAxiom<T>> T filter(T input, ElkAxiom reason) {
-		return input;
-	}
-
-	/**
 	 * Filters the sub-objects created by the factory; can be overridden in
 	 * subclasses
 	 * 
@@ -76,6 +62,17 @@ public class DelegatingCachedIndexedObjectFactory implements
 	}
 
 	@Override
+	public final CachedIndexedClass getIndexedClass(ElkClass elkClass) {
+		return filter(baseFactory_.getIndexedClass(elkClass));
+	}
+
+	@Override
+	public final CachedIndexedClassExpressionList getIndexedClassExpressionList(
+			List<? extends ModifiableIndexedClassExpression> members) {
+		return filter(baseFactory_.getIndexedClassExpressionList(members));
+	}
+
+	@Override
 	public final CachedIndexedComplexPropertyChain getIndexedComplexPropertyChain(
 			ModifiableIndexedObjectProperty leftProperty,
 			ModifiableIndexedPropertyChain rightProperty) {
@@ -84,23 +81,9 @@ public class DelegatingCachedIndexedObjectFactory implements
 	}
 
 	@Override
-	public final CachedIndexedClass getIndexedClass(ElkClass elkClass) {
-		return filter(baseFactory_.getIndexedClass(elkClass));
-	}
-
-	@Override
 	public final CachedIndexedDataHasValue getIndexedDataHasValue(
 			ElkDataHasValue elkDataHasValue) {
 		return filter(baseFactory_.getIndexedDataHasValue(elkDataHasValue));
-	}
-
-	@Override
-	public final CachedIndexedDisjointClassesAxiom getIndexedDisjointClassesAxiom(
-			List<? extends ModifiableIndexedClassExpression> members,
-			ElkAxiom reason) {
-		return filter(
-				baseFactory_.getIndexedDisjointClassesAxiom(members, reason),
-				reason);
 	}
 
 	@Override
@@ -113,6 +96,12 @@ public class DelegatingCachedIndexedObjectFactory implements
 	public final CachedIndexedObjectComplementOf getIndexedObjectComplementOf(
 			ModifiableIndexedClassExpression negated) {
 		return filter(baseFactory_.getIndexedObjectComplementOf(negated));
+	}
+
+	@Override
+	public final CachedIndexedObjectHasSelf getIndexedObjectHasSelf(
+			ModifiableIndexedObjectProperty property) {
+		return filter(baseFactory_.getIndexedObjectHasSelf(property));
 	}
 
 	@Override
@@ -135,12 +124,6 @@ public class DelegatingCachedIndexedObjectFactory implements
 			ModifiableIndexedClassExpression filler) {
 		return filter(baseFactory_.getIndexedObjectSomeValuesFrom(property,
 				filler));
-	}
-
-	@Override
-	public final CachedIndexedObjectHasSelf getIndexedObjectHasSelf(
-			ModifiableIndexedObjectProperty property) {
-		return filter(baseFactory_.getIndexedObjectHasSelf(property));
 	}
 
 	@Override

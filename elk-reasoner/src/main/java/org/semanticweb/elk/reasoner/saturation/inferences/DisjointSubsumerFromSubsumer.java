@@ -28,7 +28,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
@@ -46,8 +46,8 @@ public class DisjointSubsumerFromSubsumer extends
 		AbstractDisjointSubsumerInference {
 
 	public DisjointSubsumerFromSubsumer(IndexedContextRoot inferenceRoot,
-			IndexedDisjointClassesAxiom axiom, int position, ElkAxiom reason) {
-		super(inferenceRoot, axiom, position, reason);
+			IndexedClassExpressionList disjoint, int position, ElkAxiom reason) {
+		super(inferenceRoot, disjoint, position, reason);
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class DisjointSubsumerFromSubsumer extends
 
 	public ComposedSubsumer getPremise() {
 		return new ComposedSubsumerImpl<IndexedClassExpression>(
-				getInferenceRoot(), getAxiom().getMembers().get(getPosition()));
+				getInferenceRoot(), getDisjointExpressions().getElements().get(getPosition()));
 	}
 
 	@Override

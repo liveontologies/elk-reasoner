@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.indexing.caching;
+package org.semanticweb.elk.reasoner.indexing.visitors;
 
 /*
  * #%L
@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.indexing.caching;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,20 +22,20 @@ package org.semanticweb.elk.reasoner.indexing.caching;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedAxiom;
-import org.semanticweb.elk.util.collections.entryset.Entry;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 
 /**
- * A {@link ModifiableIndexedAxiom} that can be used for memoization (caching).
+ * Visitor pattern interface for instances of
+ * {@link IndexedDisjointClassesAxiom}.
  * 
  * @author "Yevgeny Kazakov"
- *
- * @param <T>
- *            the type of the {@link CachedIndexedAxiom}
+ * 
+ * @param <O>
+ *            the type of the output of this visitor
  */
-public interface CachedIndexedAxiom<T extends CachedIndexedAxiom<T>> extends
-		ModifiableIndexedAxiom, CachedIndexedObject<T>,
-		Entry<T, CachedIndexedAxiom<?>> {
+public interface IndexedClassExpressionListVisitor<O> {
 
-	// no further specific methods
+	O visit(IndexedClassExpressionList element);
+
 }

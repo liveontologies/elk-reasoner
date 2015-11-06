@@ -382,7 +382,8 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 					members.size());
 			for (ElkClassExpression member : members)
 				indexedMembers.add(member.accept(negativeConverter_));
-			axiomFactory_.getIndexedDisjointClassesAxiom(indexedMembers, axiom);
+			axiomFactory_.getIndexedDisjointClassesAxiom(
+					positiveFactory_.getIndexedClassExpressionList(indexedMembers), axiom);
 			return;
 		}
 		/*
@@ -468,7 +469,8 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 					members.size());
 			for (ElkIndividual member : members)
 				indexedMembers.add(member.accept(negativeConverter_));
-			axiomFactory_.getIndexedDisjointClassesAxiom(indexedMembers, axiom);
+			axiomFactory_.getIndexedDisjointClassesAxiom(positiveFactory_
+					.getIndexedClassExpressionList(indexedMembers), axiom);
 			return null;
 		}
 		/*

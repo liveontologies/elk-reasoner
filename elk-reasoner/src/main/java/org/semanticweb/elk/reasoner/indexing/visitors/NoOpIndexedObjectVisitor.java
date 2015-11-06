@@ -27,6 +27,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyCha
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDeclarationAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
@@ -83,6 +84,11 @@ public class NoOpIndexedObjectVisitor<O> implements IndexedObjectVisitor<O> {
 	@Override
 	public O visit(IndexedDisjointClassesAxiom axiom) {
 		return defaultVisit(axiom);
+	}
+
+	@Override
+	public O visit(IndexedClassExpressionList element) {
+		return defaultVisit(element);
 	}
 
 	@Override

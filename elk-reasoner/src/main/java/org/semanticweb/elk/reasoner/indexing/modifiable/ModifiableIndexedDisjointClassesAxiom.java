@@ -1,12 +1,14 @@
 package org.semanticweb.elk.reasoner.indexing.modifiable;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
+
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,21 +24,21 @@ package org.semanticweb.elk.reasoner.indexing.modifiable;
  * #L%
  */
 
-import java.util.List;
-
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 
 /**
- * An {@link IndexedDisjointClassesAxiom} that can be modified as a result of
+ * An {@link IndexedSubClassOfAxiom} that can be modified as a result of
  * updating the {@link ModifiableOntologyIndex} where this object is stored.
  * 
  * @author "Yevgeny Kazakov"
  *
  */
-public interface ModifiableIndexedDisjointClassesAxiom extends
-		IndexedDisjointClassesAxiom {
+public interface ModifiableIndexedDisjointClassesAxiom
+		extends
+			ModifiableIndexedAxiom,
+			IndexedDisjointClassesAxiom {
 
 	@Override
-	public List<? extends ModifiableIndexedClassExpression> getMembers();
+	public ModifiableIndexedClassExpressionList getMembers();
 
 }

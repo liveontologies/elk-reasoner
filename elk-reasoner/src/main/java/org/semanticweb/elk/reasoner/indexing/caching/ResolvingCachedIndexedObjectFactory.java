@@ -1,7 +1,5 @@
 package org.semanticweb.elk.reasoner.indexing.caching;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-
 /*
  * #%L
  * ELK Reasoner
@@ -43,11 +41,6 @@ public class ResolvingCachedIndexedObjectFactory extends
 			ModifiableIndexedObjectCache cache) {
 		super(baseFactory);
 		this.cache_ = cache;
-	}
-
-	@Override
-	<T extends CachedIndexedAxiom<T>> T filter(T input, ElkAxiom reason) {
-		return cache_.resolve(input);
 	}
 
 	@Override

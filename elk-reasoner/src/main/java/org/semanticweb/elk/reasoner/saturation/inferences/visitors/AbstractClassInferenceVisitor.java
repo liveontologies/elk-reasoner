@@ -34,7 +34,6 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDisjunction;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedExistential;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromDisjointSubsumers;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromInconsistentDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromNegation;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromOwlNothing;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedDefinition;
@@ -102,12 +101,6 @@ public abstract class AbstractClassInferenceVisitor<I, O> implements
 
 	@Override
 	public O visit(ContradictionFromDisjointSubsumers conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
-	}
-
-	@Override
-	public O visit(ContradictionFromInconsistentDisjointnessAxiom conclusion,
-			I input) {
 		return defaultTracedVisit(conclusion, input);
 	}
 

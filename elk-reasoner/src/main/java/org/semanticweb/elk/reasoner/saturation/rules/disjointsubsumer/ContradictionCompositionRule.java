@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer;
 
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
@@ -50,9 +50,9 @@ public class ContradictionCompositionRule extends AbstractDisjointSubsumerRule {
 	@Override
 	public void apply(DisjointSubsumer premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		IndexedDisjointClassesAxiom axiom = premise.getAxiom();		
+		IndexedClassExpressionList disjoint = premise.getDisjointExpressions();		
 		Set<? extends Integer> disjointSubsumerPositions = premises
-				.getSubsumerPositions(axiom); // should not be null
+				.getSubsumerPositions(disjoint); // should not be null
 
 		if (disjointSubsumerPositions.size() > 1) {
 			// at least two disjoint members were derived

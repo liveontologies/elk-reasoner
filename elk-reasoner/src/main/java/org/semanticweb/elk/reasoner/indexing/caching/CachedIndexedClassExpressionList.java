@@ -25,37 +25,40 @@ package org.semanticweb.elk.reasoner.indexing.caching;
 import java.util.List;
 
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpressionList;
+import org.semanticweb.elk.util.collections.entryset.Entry;
 
 /**
- * A {@link ModifiableIndexedDisjointClassesAxiom} that can be used for
+ * A {@link ModifiableIndexedClassExpressionList} that can be used for
  * memoization (caching).
  * 
  * @author "Yevgeny Kazakov"
  *
  * @param <T>
- *            the type of the {@link CachedIndexedDisjointClassesAxiom}
+ *            the type of the {@link CachedIndexedClassExpressionList}
  */
-public interface CachedIndexedDisjointClassesAxiom extends
-		ModifiableIndexedDisjointClassesAxiom,
-		CachedIndexedAxiom<CachedIndexedDisjointClassesAxiom> {
+public interface CachedIndexedClassExpressionList
+		extends
+			ModifiableIndexedClassExpressionList,
+			CachedIndexedSubObject<CachedIndexedClassExpressionList>,
+			Entry<CachedIndexedClassExpressionList, CachedIndexedClassExpressionList> {
 
 	static class Helper extends CachedIndexedObject.Helper {
 
 		public static int structuralHashCode(
 				List<? extends ModifiableIndexedClassExpression> members) {
-			return combinedHashCode(CachedIndexedDisjointClassesAxiom.class,
+			return combinedHashCode(CachedIndexedClassExpressionList.class,
 					combinedHashCode(members));
 		}
 
-		public static CachedIndexedDisjointClassesAxiom structuralEquals(
-				CachedIndexedDisjointClassesAxiom first, Object second) {
+		public static CachedIndexedClassExpressionList structuralEquals(
+				CachedIndexedClassExpressionList first, Object second) {
 			if (first == second) {
 				return first;
 			}
-			if (second instanceof CachedIndexedDisjointClassesAxiom) {
-				CachedIndexedDisjointClassesAxiom secondEntry = (CachedIndexedDisjointClassesAxiom) second;
-				if (first.getMembers().equals(secondEntry.getMembers()))
+			if (second instanceof CachedIndexedClassExpressionList) {
+				CachedIndexedClassExpressionList secondEntry = (CachedIndexedClassExpressionList) second;
+				if (first.getElements().equals(secondEntry.getElements()))
 					return secondEntry;
 			}
 			// else

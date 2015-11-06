@@ -121,7 +121,7 @@ public class ConclusionHash implements ConclusionVisitor<Void, Integer>,
 	public Integer visit(DisjointSubsumer conclusion, Void input) {
 		return combinedHashCode(hashCode(DisjointSubsumer.class),
 				hashCode(conclusion.getConclusionRoot()),
-				hashCode(conclusion.getAxiom()),
+				hashCode(conclusion.getDisjointExpressions()),
 				hashCode(conclusion.getPosition()),
 				hashCode(conclusion.getReason()));
 	}

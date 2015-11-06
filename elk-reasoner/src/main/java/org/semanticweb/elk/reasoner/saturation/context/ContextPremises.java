@@ -27,7 +27,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -103,14 +103,14 @@ public interface ContextPremises {
 	LinkableBackwardLinkRule getBackwardLinkRuleHead();
 
 	/**
-	 * @param axiom
-	 *            an {@link IndexedDisjointClassesAxiom}
+	 * @param disjoint
+	 *            an {@link IndexedClassExpressionList}
 	 * 
-	 * @return the positions in the {@link IndexedDisjointClassesAxiom}
-	 *         corresponding to the subsumer {@link IndexedClassExpression}
+	 * @return the positions in the {@link IndexedClassExpressionList}
+	 *         corresponding to the {@link IndexedClassExpression} subsumers
 	 *         occurring in this {@link ContextPremises}
 	 */
-	Set<? extends Integer> getSubsumerPositions(IndexedDisjointClassesAxiom axiom);
+	Set<? extends Integer> getSubsumerPositions(IndexedClassExpressionList disjoint);
 
 	Iterable<? extends IndexedObjectSomeValuesFrom> getPropagatedSubsumers(
 			IndexedPropertyChain subRoot);

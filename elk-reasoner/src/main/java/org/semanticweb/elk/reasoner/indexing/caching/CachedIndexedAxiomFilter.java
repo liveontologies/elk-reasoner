@@ -31,7 +31,7 @@ package org.semanticweb.elk.reasoner.indexing.caching;
  */
 public interface CachedIndexedAxiomFilter {
 
-	public CachedIndexedDisjointClassesAxiom filter(
-			CachedIndexedDisjointClassesAxiom element);
+	public CachedIndexedClassExpressionList filter(
+			CachedIndexedClassExpressionList element);
 
 }

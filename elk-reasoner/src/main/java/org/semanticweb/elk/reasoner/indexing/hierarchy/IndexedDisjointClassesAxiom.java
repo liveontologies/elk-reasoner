@@ -1,11 +1,12 @@
+package org.semanticweb.elk.reasoner.indexing.hierarchy;
+
 /*
  * #%L
  * ELK Reasoner
- * 
- * $Id$
- * $HeadURL$
+ * $Id:$
+ * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,34 +21,24 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing.hierarchy;
-
-import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 
 /**
  * Represents occurrences of an {@link ElkDisjointClassesAxiom} in an ontology.
  * 
- * @author Frantisek Simancik
- * @author Pavel Klinov
  * @author "Yevgeny Kazakov"
- * 
+ *
  */
 public interface IndexedDisjointClassesAxiom extends IndexedAxiom {
 
 	/**
-	 * @return {@link IndexedClassExpression}s occurring in this
+	 * @return the {@link IndexedClassExpressionList} representing the members
+	 *         of the {@link ElkDisjointClassesAxiom} represented by this
 	 *         {@link IndexedDisjointClassesAxiom}
 	 * 
 	 * @see ElkDisjointClassesAxiom#getClassExpressions()
 	 */
-	public List<? extends IndexedClassExpression> getMembers();
-
-	/**
-	 * @return {@code true} if this {@link IndexedDisjointClassesAxiom} occurs
-	 *         in the ontology
-	 */
-	public boolean occurs();
+	public IndexedClassExpressionList getMembers();
 
 }

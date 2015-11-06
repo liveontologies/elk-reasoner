@@ -22,60 +22,41 @@
  */
 package org.semanticweb.elk.reasoner.indexing.implementation;
 
-import java.util.List;
-
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedDisjointClassesAxiom;
-import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectFilter;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpressionList;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
 
 /**
- * Implements {@link CachedIndexedDisjointClassesAxiom}
+ * Implements {@link CachedIndexedClassExpressionList}
  * 
  * @author "Yevgeny Kazakov"
  */
-class CachedIndexedDisjointClassesAxiomImpl extends
-		CachedIndexedAxiomImpl<CachedIndexedDisjointClassesAxiom> implements
-		CachedIndexedDisjointClassesAxiom {
+class ModifiableIndexedDisjointClassesAxiomImpl
+		extends
+			ModifiableIndexedAxiomImpl
+		implements
+			ModifiableIndexedDisjointClassesAxiom {
 
 	/**
-	 * the {@link IndexedClassExpression}s stated to be disjoint. Note that the
-	 * same can appear two times in this list, in which case it should be
+	 * the {@link IndexedClassExpression}s stated to be disjoint. Note that
+	 * same may appear two times in this list, in which case they should be
 	 * inconsistent (disjoint with itself)
 	 */
-	private final List<? extends ModifiableIndexedClassExpression> members_;
+	private final ModifiableIndexedClassExpressionList members_;
 	
-	/**
-	 * This counts how often this {@link IndexedDisjointClassesAxiom} occurs in
-	 * the ontology.
-	 */
-	int totalOccurrenceNo_ = 0;
-
-	CachedIndexedDisjointClassesAxiomImpl(
-			List<? extends ModifiableIndexedClassExpression> members) {
-		super(CachedIndexedDisjointClassesAxiom.Helper.structuralHashCode(members));
+	ModifiableIndexedDisjointClassesAxiomImpl(
+			ModifiableIndexedClassExpressionList members) {
 		this.members_ = members;
 	}
 	
 	@Override
-	public final boolean occurs() {
-		return totalOccurrenceNo_ > 0;
-	}
-
-	@Override
-	public final List<? extends ModifiableIndexedClassExpression> getMembers() {
+	public final ModifiableIndexedClassExpressionList getMembers() {
 		return members_;
-	}
-
-	@Override
-	public final CachedIndexedDisjointClassesAxiom structuralEquals(Object other) {
-		return CachedIndexedDisjointClassesAxiom.Helper.structuralEquals(this,
-				other);
 	}
 
 	@Override
@@ -88,28 +69,18 @@ class CachedIndexedDisjointClassesAxiomImpl extends
 			DisjointSubsumerFromMemberRule.removeRulesFor(this, index, reason);
 			return false;
 		}
-		totalOccurrenceNo_++;
 		return true;
 	}
 
 	@Override
 	public boolean removeOccurrence(ModifiableOntologyIndex index,
 			ElkAxiom reason) {
-		totalOccurrenceNo_--;
-		if (totalOccurrenceNo_ < 0) {
-			// revert the change
-			totalOccurrenceNo_++;
-			return false;
-		}
 		if (!index.updatePositiveOwlNothingOccurrenceNo(-1)) {
-			// revert the changes
-			totalOccurrenceNo_++;
 			return false;
 		}
 		if (!DisjointSubsumerFromMemberRule.removeRulesFor(this, index, reason)) {
 			// revert the changes
 			index.updatePositiveOwlNothingOccurrenceNo(1);
-			totalOccurrenceNo_++;
 			return false;
 		}
 		return true;
@@ -123,12 +94,6 @@ class CachedIndexedDisjointClassesAxiomImpl extends
 	@Override
 	public final <O> O accept(IndexedAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
-	}
-
-	@Override
-	public CachedIndexedDisjointClassesAxiom accept(
-			CachedIndexedObjectFilter filter) {
-		return filter.filter(this);
 	}
 
 }

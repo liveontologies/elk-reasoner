@@ -1,14 +1,12 @@
 package org.semanticweb.elk.reasoner.indexing.factories;
 
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObject;
-
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,17 +22,21 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObject;
  * #L%
  */
 
+import java.util.List;
+
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpressionList;
+
 /**
- * A factory for creating instances of {@link ModifiableIndexedObject}
+ * A factory for creating instances of
+ * {@link ModifiableIndexedClassExpressionList}
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface ModifiableIndexedObjectFactory extends
-		ModifiableIndexedClassExpressionFactory,
-		ModifiableIndexedPropertyChainFactory, ModifiableIndexedAxiomFactory,
-		ModifiableIndexedClassExpressionListFactory,
-		ModifiableIndexedEntityFactory {
+public interface ModifiableIndexedClassExpressionListFactory {
 
-	// combined interface
+	public ModifiableIndexedClassExpressionList getIndexedClassExpressionList(
+			List<? extends ModifiableIndexedClassExpression> members);
+
 }

@@ -36,7 +36,6 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDisjunction;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedExistential;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromDisjointSubsumers;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromInconsistentDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromNegation;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromOwlNothing;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedDefinition;
@@ -55,8 +54,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainInit;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainExpanded;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainInit;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
 
 /**
@@ -158,14 +157,6 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>,
 	@Override
 	public String visit(GeneratedPropagation conclusion, Void parameter) {
 		return "Creating propagation from " + conclusion.getFirstPremise();
-	}
-
-	@Override
-	public String visit(
-			ContradictionFromInconsistentDisjointnessAxiom conclusion,
-			Void input) {
-		return "Contradiction since " + conclusion.getPremise()
-				+ " is disjoint with itself";
 	}
 
 	@Override
