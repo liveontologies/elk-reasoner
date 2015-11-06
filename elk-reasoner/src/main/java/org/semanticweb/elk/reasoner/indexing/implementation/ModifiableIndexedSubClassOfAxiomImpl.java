@@ -40,8 +40,10 @@ class ModifiableIndexedSubClassOfAxiomImpl extends ModifiableIndexedAxiomImpl
 	private final ModifiableIndexedClassExpression subClass_, superClass_;
 
 	ModifiableIndexedSubClassOfAxiomImpl(
+			ElkAxiom originalAxiom,
 			ModifiableIndexedClassExpression subClass,
 			ModifiableIndexedClassExpression superClass) {
+		super(originalAxiom);
 		this.subClass_ = subClass;
 		this.superClass_ = superClass;
 	}
@@ -62,14 +64,13 @@ class ModifiableIndexedSubClassOfAxiomImpl extends ModifiableIndexedAxiomImpl
 	}
 
 	@Override
-	public boolean addOccurrence(ModifiableOntologyIndex index, ElkAxiom reason) {
-		return SuperClassFromSubClassRule.addRuleFor(this, index, reason);
+	public boolean addOccurrence(ModifiableOntologyIndex index) {
+		return SuperClassFromSubClassRule.addRuleFor(this, index, getOriginalAxiom());
 	}
 
 	@Override
-	public boolean removeOccurrence(ModifiableOntologyIndex index,
-			ElkAxiom reason) {
-		return SuperClassFromSubClassRule.removeRuleFor(this, index, reason);
+	public boolean removeOccurrence(ModifiableOntologyIndex index) {
+		return SuperClassFromSubClassRule.removeRuleFor(this, index, getOriginalAxiom());
 	}
 
 	@Override

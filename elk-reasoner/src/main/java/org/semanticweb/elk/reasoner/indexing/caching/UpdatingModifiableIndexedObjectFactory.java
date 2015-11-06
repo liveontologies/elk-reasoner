@@ -26,9 +26,9 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.factories.ModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDeclarationAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDefinitionAxiom;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedEntity;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObject;
@@ -66,49 +66,48 @@ public class UpdatingModifiableIndexedObjectFactory extends
 
 	@Override
 	public final ModifiableIndexedDeclarationAxiom getIndexedDeclarationAxiom(
-			ModifiableIndexedEntity entity, ElkAxiom reason) {
-		return update(baseFactory_.getIndexedDeclarationAxiom(entity, reason),
-				reason);
+			ElkAxiom originalAxiom, ModifiableIndexedEntity entity) {
+		return update(baseFactory_.getIndexedDeclarationAxiom(originalAxiom, entity));
 	}
 
 	@Override
 	public ModifiableIndexedDefinitionAxiom getIndexedDefinitionAxiom(
-			ModifiableIndexedClass definedClass,
-			ModifiableIndexedClassExpression definition, ElkAxiom reason) {
-		return update(baseFactory_.getIndexedDefinitionAxiom(definedClass,
-				definition, reason), reason);
+			ElkAxiom originalAxiom,
+			ModifiableIndexedClass definedClass, ModifiableIndexedClassExpression definition) {
+		return update(baseFactory_.getIndexedDefinitionAxiom(originalAxiom,
+				definedClass, definition));
 	}
 
 	@Override
 	public ModifiableIndexedDisjointClassesAxiom getIndexedDisjointClassesAxiom(
-			ModifiableIndexedClassExpressionList disjointClasses,
-			ElkAxiom reason) {
+			ElkAxiom originalAxiom,
+			ModifiableIndexedClassExpressionList disjointClasses) {
 		return update(baseFactory_.getIndexedDisjointClassesAxiom(
-				disjointClasses, reason), reason);
+				originalAxiom, disjointClasses));
 	}
 
 	@Override
 	public ModifiableIndexedObjectPropertyRangeAxiom getIndexedObjectPropertyRangeAxiom(
-			ModifiableIndexedObjectProperty property,
-			ModifiableIndexedClassExpression range, ElkAxiom reason) {
-		return update(baseFactory_.getIndexedObjectPropertyRangeAxiom(property,
-				range, reason), reason);
+			ElkAxiom originalAxiom,
+			ModifiableIndexedObjectProperty property, ModifiableIndexedClassExpression range) {
+		return update(baseFactory_.getIndexedObjectPropertyRangeAxiom(originalAxiom,
+				property, range));
 	}
 
 	@Override
 	public final ModifiableIndexedSubClassOfAxiom getIndexedSubClassOfAxiom(
-			ModifiableIndexedClassExpression subClass,
-			ModifiableIndexedClassExpression superClass, ElkAxiom reason) {
-		return update(baseFactory_.getIndexedSubClassOfAxiom(subClass,
-				superClass, reason), reason);
+			ElkAxiom originalAxiom,
+			ModifiableIndexedClassExpression subClass, ModifiableIndexedClassExpression superClass) {
+		return update(baseFactory_.getIndexedSubClassOfAxiom(originalAxiom,
+				subClass, superClass));
 	}
 
 	@Override
 	public final ModifiableIndexedSubObjectPropertyOfAxiom getIndexedSubObjectPropertyOfAxiom(
-			ModifiableIndexedPropertyChain subPropertyChain,
-			ModifiableIndexedObjectProperty superProperty, ElkAxiom reason) {
+			ElkAxiom originalAxiom,
+			ModifiableIndexedPropertyChain subPropertyChain, ModifiableIndexedObjectProperty superProperty) {
 		return update(baseFactory_.getIndexedSubObjectPropertyOfAxiom(
-				subPropertyChain, superProperty, reason), reason);
+				originalAxiom, subPropertyChain, superProperty));
 	}
 
 }

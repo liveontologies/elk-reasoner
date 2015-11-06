@@ -73,47 +73,47 @@ public class ResolvingModifiableIndexedObjectFactory extends
 
 	@Override
 	public final ModifiableIndexedDeclarationAxiom getIndexedDeclarationAxiom(
-			ModifiableIndexedEntity entity, ElkAxiom reason) {
-		return filter(baseFactory_.getIndexedDeclarationAxiom(entity, reason));
+			ElkAxiom originalAxiom, ModifiableIndexedEntity entity) {
+		return filter(baseFactory_.getIndexedDeclarationAxiom(originalAxiom, entity));
 	}
 
 	@Override
 	public ModifiableIndexedDefinitionAxiom getIndexedDefinitionAxiom(
-			ModifiableIndexedClass definedClass,
-			ModifiableIndexedClassExpression definition, ElkAxiom reason) {
-		return filter(baseFactory_.getIndexedDefinitionAxiom(definedClass,
-				definition, reason));
+			ElkAxiom originalAxiom,
+			ModifiableIndexedClass definedClass, ModifiableIndexedClassExpression definition) {
+		return filter(baseFactory_.getIndexedDefinitionAxiom(originalAxiom,
+				definedClass, definition));
 	}
 
 	@Override
 	public ModifiableIndexedDisjointClassesAxiom getIndexedDisjointClassesAxiom(
-			ModifiableIndexedClassExpressionList disjointClasses,
-			ElkAxiom reason) {
-		return filter(baseFactory_.getIndexedDisjointClassesAxiom(disjointClasses, reason));
+			ElkAxiom originalAxiom,
+			ModifiableIndexedClassExpressionList disjointClasses) {
+		return filter(baseFactory_.getIndexedDisjointClassesAxiom(originalAxiom, disjointClasses));
 	}
 
 	@Override
 	public ModifiableIndexedObjectPropertyRangeAxiom getIndexedObjectPropertyRangeAxiom(
-			ModifiableIndexedObjectProperty property,
-			ModifiableIndexedClassExpression range, ElkAxiom reason) {
-		return filter(baseFactory_.getIndexedObjectPropertyRangeAxiom(property,
-				range, reason));
+			ElkAxiom originalAxiom,
+			ModifiableIndexedObjectProperty property, ModifiableIndexedClassExpression range) {
+		return filter(baseFactory_.getIndexedObjectPropertyRangeAxiom(originalAxiom,
+				property, range));
 	}
 
 	@Override
 	public final ModifiableIndexedSubClassOfAxiom getIndexedSubClassOfAxiom(
-			ModifiableIndexedClassExpression subClass,
-			ModifiableIndexedClassExpression superClass, ElkAxiom reason) {
-		return filter(baseFactory_.getIndexedSubClassOfAxiom(subClass,
-				superClass, reason));
+			ElkAxiom originalAxiom,
+			ModifiableIndexedClassExpression subClass, ModifiableIndexedClassExpression superClass) {
+		return filter(baseFactory_.getIndexedSubClassOfAxiom(originalAxiom,
+				subClass, superClass));
 	}
 
 	@Override
 	public final ModifiableIndexedSubObjectPropertyOfAxiom getIndexedSubObjectPropertyOfAxiom(
-			ModifiableIndexedPropertyChain subPropertyChain,
-			ModifiableIndexedObjectProperty superProperty, ElkAxiom reason) {
+			ElkAxiom originalAxiom,
+			ModifiableIndexedPropertyChain subPropertyChain, ModifiableIndexedObjectProperty superProperty) {
 		return filter(baseFactory_.getIndexedSubObjectPropertyOfAxiom(
-				subPropertyChain, superProperty, reason));
+				originalAxiom, subPropertyChain, superProperty));
 	}	
 
 }

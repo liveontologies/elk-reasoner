@@ -35,6 +35,6 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedEntity;
 public interface ModifiableIndexedDeclarationAxiomFactory {
 
 	public ModifiableIndexedDeclarationAxiom getIndexedDeclarationAxiom(
-			ModifiableIndexedEntity entity, ElkAxiom reason);
+			ElkAxiom originalAxiom, ModifiableIndexedEntity entity);
 
 }

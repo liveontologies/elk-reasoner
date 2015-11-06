@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedSubClas
 public interface ModifiableIndexedSubClassOfAxiomFactory {
 
 	public ModifiableIndexedSubClassOfAxiom getIndexedSubClassOfAxiom(
-			ModifiableIndexedClassExpression subClass,
-			ModifiableIndexedClassExpression superClass, ElkAxiom reason);
+			ElkAxiom originalAxiom,
+			ModifiableIndexedClassExpression subClass, ModifiableIndexedClassExpression superClass);
 
 }

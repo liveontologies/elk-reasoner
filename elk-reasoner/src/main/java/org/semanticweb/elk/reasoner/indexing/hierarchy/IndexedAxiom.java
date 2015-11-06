@@ -34,6 +34,12 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
  */
 public interface IndexedAxiom extends IndexedObject {
 
+	/**
+	 * @return the {@link ElkAxiom} from which this {@link IndexedAxiom}
+	 *         originates
+	 */
+	public ElkAxiom getOriginalAxiom();
+
 	public <O> O accept(IndexedAxiomVisitor<O> visitor);
 
 }

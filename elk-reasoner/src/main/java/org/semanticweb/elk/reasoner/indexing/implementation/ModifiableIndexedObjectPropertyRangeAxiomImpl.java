@@ -43,8 +43,10 @@ class ModifiableIndexedObjectPropertyRangeAxiomImpl extends
 	private final ModifiableIndexedClassExpression range_;
 
 	ModifiableIndexedObjectPropertyRangeAxiomImpl(
+			ElkAxiom originalAxiom,
 			ModifiableIndexedObjectProperty property,
 			ModifiableIndexedClassExpression range) {
+		super(originalAxiom);
 		this.property_ = property;
 		this.range_ = range;
 	}
@@ -66,14 +68,13 @@ class ModifiableIndexedObjectPropertyRangeAxiomImpl extends
 	}
 
 	@Override
-	public boolean addOccurrence(ModifiableOntologyIndex index, ElkAxiom reason) {
-		return property_.addToldRange(range_, reason);
+	public boolean addOccurrence(ModifiableOntologyIndex index) {		
+		return property_.addToldRange(range_, getOriginalAxiom());
 	}
 
 	@Override
-	public boolean removeOccurrence(ModifiableOntologyIndex index,
-			ElkAxiom reason) {
-		return property_.removeToldRange(range_, reason);
+	public boolean removeOccurrence(ModifiableOntologyIndex index) {
+		return property_.removeToldRange(range_, getOriginalAxiom());
 	}
 
 	@Override

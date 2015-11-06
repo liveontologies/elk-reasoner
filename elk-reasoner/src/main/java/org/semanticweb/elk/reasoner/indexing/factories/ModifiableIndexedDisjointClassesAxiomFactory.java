@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDisjoin
 public interface ModifiableIndexedDisjointClassesAxiomFactory {
 		
 	public ModifiableIndexedDisjointClassesAxiom getIndexedDisjointClassesAxiom(
-			ModifiableIndexedClassExpressionList disjointClasses,
-			ElkAxiom reason);
+			ElkAxiom originalAxiom,
+			ModifiableIndexedClassExpressionList disjointClasses);
 
 }

@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.implementation;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
@@ -33,7 +34,19 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
  *
  */
 abstract class ModifiableIndexedAxiomImpl extends ModifiableIndexedObjectImpl
-		implements ModifiableIndexedAxiom {
+		implements
+			ModifiableIndexedAxiom {
+
+	private final ElkAxiom originalAxiom_;
+
+	ModifiableIndexedAxiomImpl(ElkAxiom originalAxiom) {
+		this.originalAxiom_ = originalAxiom;
+	}
+
+	@Override
+	public ElkAxiom getOriginalAxiom() {
+		return originalAxiom_;
+	}
 
 	@Override
 	public final <O> O accept(IndexedObjectVisitor<O> visitor) {

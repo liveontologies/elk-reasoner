@@ -45,8 +45,10 @@ class ModifiableIndexedSubObjectPropertyOfAxiomImpl extends
 	private final ModifiableIndexedObjectProperty superProperty_;
 
 	ModifiableIndexedSubObjectPropertyOfAxiomImpl(
+			ElkAxiom originalAxiom,
 			ModifiableIndexedPropertyChain subPropertyChain,
 			ModifiableIndexedObjectProperty superProperty) {
+		super(originalAxiom);
 		this.subPropertyChain_ = subPropertyChain;
 		this.superProperty_ = superProperty;
 	}
@@ -68,7 +70,8 @@ class ModifiableIndexedSubObjectPropertyOfAxiomImpl extends
 	}
 
 	@Override
-	public boolean addOccurrence(ModifiableOntologyIndex index, ElkAxiom reason) {
+	public boolean addOccurrence(ModifiableOntologyIndex index) {
+		ElkAxiom reason = getOriginalAxiom();
 		if (!subPropertyChain_.addToldSuperObjectProperty(superProperty_,
 				reason))
 			return false;
@@ -84,8 +87,8 @@ class ModifiableIndexedSubObjectPropertyOfAxiomImpl extends
 	}
 
 	@Override
-	public boolean removeOccurrence(ModifiableOntologyIndex index,
-			ElkAxiom reason) {
+	public boolean removeOccurrence(ModifiableOntologyIndex index) {
+		ElkAxiom reason = getOriginalAxiom();
 		if (!subPropertyChain_.removeToldSuperObjectProperty(superProperty_,
 				reason))
 			return false;

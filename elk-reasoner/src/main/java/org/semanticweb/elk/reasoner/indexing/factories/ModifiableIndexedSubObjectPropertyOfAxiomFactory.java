@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedSubObje
 public interface ModifiableIndexedSubObjectPropertyOfAxiomFactory {
 
 	public ModifiableIndexedSubObjectPropertyOfAxiom getIndexedSubObjectPropertyOfAxiom(
-			ModifiableIndexedPropertyChain subPropertyChain,
-			ModifiableIndexedObjectProperty superProperty, ElkAxiom reason);
+			ElkAxiom originalAxiom,
+			ModifiableIndexedPropertyChain subPropertyChain, ModifiableIndexedObjectProperty superProperty);
 
 }

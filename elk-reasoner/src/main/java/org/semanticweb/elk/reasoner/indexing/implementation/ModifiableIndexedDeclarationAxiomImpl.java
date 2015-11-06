@@ -39,7 +39,8 @@ class ModifiableIndexedDeclarationAxiomImpl extends ModifiableIndexedAxiomImpl
 
 	private final ModifiableIndexedEntity entity_;
 
-	ModifiableIndexedDeclarationAxiomImpl(ModifiableIndexedEntity entity) {
+	ModifiableIndexedDeclarationAxiomImpl(ElkAxiom originalAxiom, ModifiableIndexedEntity entity) {
+		super(originalAxiom);
 		this.entity_ = entity;
 	}
 
@@ -60,13 +61,12 @@ class ModifiableIndexedDeclarationAxiomImpl extends ModifiableIndexedAxiomImpl
 	 */
 
 	@Override
-	public boolean addOccurrence(ModifiableOntologyIndex index, ElkAxiom reason) {
+	public boolean addOccurrence(ModifiableOntologyIndex index) {
 		return true;
 	}
 
 	@Override
-	public boolean removeOccurrence(ModifiableOntologyIndex index,
-			ElkAxiom reason) {
+	public boolean removeOccurrence(ModifiableOntologyIndex index) {
 		return true;
 	}
 

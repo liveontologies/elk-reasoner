@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectP
 public interface ModifiableIndexedObjectPropertyRangeAxiomFactory {
 
 	public ModifiableIndexedObjectPropertyRangeAxiom getIndexedObjectPropertyRangeAxiom(
-			ModifiableIndexedObjectProperty property,
-			ModifiableIndexedClassExpression range, ElkAxiom reason);
+			ElkAxiom originalAxiom,
+			ModifiableIndexedObjectProperty property, ModifiableIndexedClassExpression range);
 
 }

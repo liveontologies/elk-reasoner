@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDefinit
 public interface ModifiableIndexedDefinitionAxiomFactory {
 
 	public ModifiableIndexedDefinitionAxiom getIndexedDefinitionAxiom(
-			ModifiableIndexedClass definedClass,
-			ModifiableIndexedClassExpression definition, ElkAxiom reason);
+			ElkAxiom originalAxiom,
+			ModifiableIndexedClass definedClass, ModifiableIndexedClassExpression definition);
 
 }

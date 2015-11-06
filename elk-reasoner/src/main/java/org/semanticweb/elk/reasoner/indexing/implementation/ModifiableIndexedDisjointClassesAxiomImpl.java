@@ -49,8 +49,9 @@ class ModifiableIndexedDisjointClassesAxiomImpl
 	 */
 	private final ModifiableIndexedClassExpressionList members_;
 	
-	ModifiableIndexedDisjointClassesAxiomImpl(
+	ModifiableIndexedDisjointClassesAxiomImpl(ElkAxiom originalAxiom,
 			ModifiableIndexedClassExpressionList members) {
+		super(originalAxiom);
 		this.members_ = members;
 	}
 	
@@ -60,25 +61,24 @@ class ModifiableIndexedDisjointClassesAxiomImpl
 	}
 
 	@Override
-	public boolean addOccurrence(ModifiableOntologyIndex index, ElkAxiom reason) {
-		if (!DisjointSubsumerFromMemberRule.addRulesFor(this, index, reason)) {
-			return false;
-		}
+	public boolean addOccurrence(ModifiableOntologyIndex index) {		
 		if (!index.updatePositiveOwlNothingOccurrenceNo(1)) {
-			// revert the changes
-			DisjointSubsumerFromMemberRule.removeRulesFor(this, index, reason);
 			return false;
 		}
+		if (!DisjointSubsumerFromMemberRule.addRulesFor(this, index, getOriginalAxiom())) {
+			// revert the changes
+			index.updatePositiveOwlNothingOccurrenceNo(-1);
+			return false;
+		}		
 		return true;
 	}
 
 	@Override
-	public boolean removeOccurrence(ModifiableOntologyIndex index,
-			ElkAxiom reason) {
+	public boolean removeOccurrence(ModifiableOntologyIndex index) {
 		if (!index.updatePositiveOwlNothingOccurrenceNo(-1)) {
 			return false;
 		}
-		if (!DisjointSubsumerFromMemberRule.removeRulesFor(this, index, reason)) {
+		if (!DisjointSubsumerFromMemberRule.removeRulesFor(this, index, getOriginalAxiom())) {
 			// revert the changes
 			index.updatePositiveOwlNothingOccurrenceNo(1);
 			return false;

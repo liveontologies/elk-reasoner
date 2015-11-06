@@ -34,8 +34,11 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSub
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ModifiableIndexedDefinitionAxiomImpl extends
-		ModifiableIndexedAxiomImpl implements ModifiableIndexedDefinitionAxiom {
+public class ModifiableIndexedDefinitionAxiomImpl
+		extends
+			ModifiableIndexedAxiomImpl
+		implements
+			ModifiableIndexedDefinitionAxiom {
 
 	static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ModifiableIndexedDefinitionAxiomImpl.class);
@@ -43,9 +46,10 @@ public class ModifiableIndexedDefinitionAxiomImpl extends
 	private final ModifiableIndexedClass definedClass_;
 	private final ModifiableIndexedClassExpression definition_;
 
-	protected ModifiableIndexedDefinitionAxiomImpl(
+	protected ModifiableIndexedDefinitionAxiomImpl(ElkAxiom originalAxiom,
 			ModifiableIndexedClass definedClass,
 			ModifiableIndexedClassExpression definition) {
+		super(originalAxiom);
 		this.definedClass_ = definedClass;
 		this.definition_ = definition;
 	}
@@ -67,7 +71,8 @@ public class ModifiableIndexedDefinitionAxiomImpl extends
 	}
 
 	@Override
-	public boolean addOccurrence(ModifiableOntologyIndex index, ElkAxiom reason) {
+	public boolean addOccurrence(ModifiableOntologyIndex index) {
+		ElkAxiom reason = getOriginalAxiom();
 		if (IndexedClassDecompositionRule.tryAddRuleFor(this, index, reason))
 			return IndexedClassFromDefinitionRule.addRuleFor(this, index,
 					reason);
@@ -76,8 +81,8 @@ public class ModifiableIndexedDefinitionAxiomImpl extends
 	}
 
 	@Override
-	public boolean removeOccurrence(ModifiableOntologyIndex index,
-			ElkAxiom reason) {
+	public boolean removeOccurrence(ModifiableOntologyIndex index) {
+		ElkAxiom reason = getOriginalAxiom();
 		if (IndexedClassDecompositionRule.tryRemoveRuleFor(this, index, reason))
 			return IndexedClassFromDefinitionRule.removeRuleFor(this, index,
 					reason);
