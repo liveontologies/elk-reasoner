@@ -1,5 +1,6 @@
 package org.semanticweb.elk.reasoner.indexing.factories;
 
+import org.semanticweb.elk.reasoner.indexing.inferences.ModifiableIndexedAxiomInferenceFactory;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObject;
 
 /*
@@ -32,9 +33,10 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObject;
  */
 public interface ModifiableIndexedObjectFactory extends
 		ModifiableIndexedClassExpressionFactory,
-		ModifiableIndexedPropertyChainFactory, ModifiableIndexedAxiomFactory,
+		ModifiableIndexedPropertyChainFactory, 
 		ModifiableIndexedClassExpressionListFactory,
-		ModifiableIndexedEntityFactory {
+		ModifiableIndexedEntityFactory,
+		ModifiableIndexedAxiomInferenceFactory {
 
 	// combined interface
 }

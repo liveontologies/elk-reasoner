@@ -36,6 +36,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDisjointUnionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
@@ -59,10 +60,14 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
 import org.semanticweb.elk.reasoner.indexing.implementation.ModifiableIndexedObjectFactoryImpl;
+import org.semanticweb.elk.reasoner.indexing.inferences.ModifiableIndexedAxiomInferenceFactory;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpressionList;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObject;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
@@ -71,8 +76,6 @@ import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-//TODO: reduce the boilerplate, especially for equivalence and disjointness axioms
 
 /**
  * An implementation of {@link ElkAxiomConverter} that converts {@link ElkAxiom}
@@ -91,9 +94,9 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 			.getLogger(ElkAxiomConverterImpl.class);
 
 	/**
-	 * The factory to create axioms
+	 * The factory to convert axioms
 	 */
-	private final ModifiableIndexedAxiomFactory axiomFactory_;
+	private final ModifiableIndexedAxiomInferenceFactory axiomFactory_;
 
 	/**
 	 * The factories to create objects of respectively positive and negative
@@ -107,14 +110,14 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 
 	private final ElkEntityConverter entityConverter_;
 
-	ElkAxiomConverterImpl(ModifiableIndexedAxiomFactory factory,
+	ElkAxiomConverterImpl(ModifiableIndexedAxiomInferenceFactory axiomFactory,
 			ModifiableIndexedObjectFactory positiveFactory,
 			ModifiableIndexedObjectFactory negativeFactory,
 			ElkPolarityExpressionConverter positiveConverter,
 			ElkPolarityExpressionConverter negativeConverter,
 			ElkPolarityExpressionConverter dualConverter,
 			ElkEntityConverter entityConverter) {
-		this.axiomFactory_ = factory;
+		this.axiomFactory_ = axiomFactory;
 		this.positiveFactory_ = positiveFactory;
 		this.negativeFactory_ = negativeFactory;
 		this.positiveConverter_ = positiveConverter;
@@ -246,38 +249,37 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	public Void visit(ElkObjectPropertyDomainAxiom axiom) {
 		ModifiableIndexedClass indexedOwlThing = negativeFactory_
 				.getIndexedClass(PredefinedElkClass.OWL_THING);
-		axiomFactory_.getIndexedSubClassOfAxiom(axiom,
-				negativeFactory_
-						.getIndexedObjectSomeValuesFrom(
-								axiom.getProperty().accept(negativeConverter_),
-								indexedOwlThing), axiom.getDomain().accept(positiveConverter_));
+		axiomFactory_.getElkObjectPropertyDomainAxiomConversion(axiom,
+				negativeFactory_.getIndexedObjectSomeValuesFrom(
+						axiom.getProperty().accept(negativeConverter_),
+						indexedOwlThing),
+				axiom.getDomain().accept(positiveConverter_));
 		return null;
 	}
 
 	@Override
 	public Void visit(ElkObjectPropertyRangeAxiom axiom) {
-		axiomFactory_.getIndexedObjectPropertyRangeAxiom(axiom,
-				axiom.getProperty()
-						.accept(negativeConverter_), axiom.getRange().accept(positiveConverter_));
+		axiomFactory_.getElkObjectPropertyRangeAxiomConversion(axiom,
+				axiom.getProperty().accept(negativeConverter_),
+				axiom.getRange().accept(positiveConverter_));
 		return null;
 	}
 
 	@Override
 	public Void visit(ElkReflexiveObjectPropertyAxiom axiom) {
-		ModifiableIndexedClass indexedOwlThing = negativeFactory_
-				.getIndexedClass(PredefinedElkClass.OWL_THING);
-		axiomFactory_.getIndexedSubClassOfAxiom(axiom,
-				indexedOwlThing, positiveFactory_.getIndexedObjectHasSelf(axiom.getProperty()
-								.accept(positiveConverter_)));
+		axiomFactory_.getElkReflexiveObjectPropertyAxiomConversion(axiom,
+				negativeFactory_.getIndexedClass(PredefinedElkClass.OWL_THING),
+				positiveFactory_.getIndexedObjectHasSelf(
+						axiom.getProperty().accept(positiveConverter_)));
 		return null;
 	}
 
 	@Override
 	public Void visit(ElkSubObjectPropertyOfAxiom axiom) {
-		axiomFactory_.getIndexedSubObjectPropertyOfAxiom(axiom, axiom
-						.getSubObjectPropertyExpression().accept(this),
-				axiom
-				.getSuperObjectPropertyExpression().accept(positiveConverter_));
+		axiomFactory_.getElkSubObjectPropertyOfAxiomConversion(axiom,
+				axiom.getSubObjectPropertyExpression().accept(this),
+				axiom.getSuperObjectPropertyExpression()
+						.accept(positiveConverter_));
 		return null;
 	}
 
@@ -285,17 +287,19 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	public Void visit(ElkEquivalentObjectPropertiesAxiom axiom) {
 		// reduces equivalence to sub-property axioms
 		ModifiableIndexedObjectProperty first = null;
-		for (ElkObjectPropertyExpression pe : axiom
-				.getObjectPropertyExpressions()) {
+		List<? extends ElkObjectPropertyExpression> members = axiom
+				.getObjectPropertyExpressions();
+		for (int pos = 0; pos < members.size(); pos++) {
+			ElkObjectPropertyExpression pe = members.get(pos);
 			if (first == null)
 				first = pe.accept(dualConverter_);
 			else {
 				ModifiableIndexedObjectProperty other = pe
 						.accept(dualConverter_);
-				axiomFactory_.getIndexedSubObjectPropertyOfAxiom(axiom, first,
-						other);
-				axiomFactory_.getIndexedSubObjectPropertyOfAxiom(axiom, other,
-						first);
+				axiomFactory_.getElkEquivalentObjectPropertiesAxiomConversion(
+						axiom, 0, pos, first, other);
+				axiomFactory_.getElkEquivalentObjectPropertiesAxiomConversion(
+						axiom, pos, 0, other, first);
 			}
 		}
 		return null;
@@ -303,12 +307,10 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 
 	@Override
 	public Void visit(ElkTransitiveObjectPropertyAxiom axiom) {
-		ModifiableIndexedObjectProperty p = axiom.getProperty().accept(
-				dualConverter_);
-		axiomFactory_
-				.getIndexedSubObjectPropertyOfAxiom(
-						axiom,
-						negativeFactory_.getIndexedComplexPropertyChain(p, p), p);
+		ModifiableIndexedObjectProperty p = axiom.getProperty()
+				.accept(dualConverter_);
+		axiomFactory_.getElkTransitiveObjectPropertyAxiomConversion(axiom,
+				negativeFactory_.getIndexedComplexPropertyChain(p, p), p);
 		return null;
 	}
 
@@ -316,24 +318,33 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	public Void visit(ElkEquivalentClassesAxiom axiom) {
 		// reduces equivalence to class definitions or sub-class axioms
 		ModifiableIndexedClassExpression first = null;
-		for (ElkClassExpression c : axiom.getClassExpressions()) {
+		List<? extends ElkClassExpression> members = axiom
+				.getClassExpressions();
+		for (int pos = 0; pos < members.size(); pos++) {
+			ElkClassExpression c = members.get(pos);
 			if (first == null)
 				first = c.accept(dualConverter_);
 			else {
 				ModifiableIndexedClassExpression other = c
 						.accept(dualConverter_);
-				if (first instanceof ModifiableIndexedClass)
-					axiomFactory_.getIndexedDefinitionAxiom(
-							axiom, (ModifiableIndexedClass) first, other);
-				else if (other instanceof ModifiableIndexedClass)
-					axiomFactory_.getIndexedDefinitionAxiom(
-							axiom, (ModifiableIndexedClass) other, first);
-				else {
+				if (first instanceof ModifiableIndexedClass) {
+					axiomFactory_
+							.getElkEquivalentClassesAxiomDefinitionConversion(
+									axiom, 0, pos,
+									(ModifiableIndexedClass) first, other);
+				} else if (other instanceof ModifiableIndexedClass) {
+					axiomFactory_
+							.getElkEquivalentClassesAxiomDefinitionConversion(
+									axiom, pos, 0,
+									(ModifiableIndexedClass) other, first);
+				} else {
 					// index as two subsumptions
 					axiomFactory_
-							.getIndexedSubClassOfAxiom(axiom, first, other);
+							.getElkEquivalentClassesAxiomSubClassConversion(
+									axiom, 0, pos, first, other);
 					axiomFactory_
-							.getIndexedSubClassOfAxiom(axiom, other, first);
+							.getElkEquivalentClassesAxiomSubClassConversion(
+									axiom, pos, 0, other, first);
 				}
 			}
 		}
@@ -343,15 +354,19 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	@Override
 	public Void visit(ElkSameIndividualAxiom axiom) {
 		// reduces equivalence to sub-class axioms
-		ModifiableIndexedClassExpression first = null;
-		for (ElkIndividual ind : axiom.getIndividuals()) {
-			if (first == null)
+		ModifiableIndexedIndividual first = null;
+		List<? extends ElkIndividual> members = axiom.getIndividuals();
+		for (int pos = 0; pos < members.size(); pos++) {
+			ElkIndividual ind = members.get(pos);
+			if (first == null) {
 				first = ind.accept(dualConverter_);
-			else {
-				ModifiableIndexedClassExpression other = ind
+			} else {
+				ModifiableIndexedIndividual other = ind
 						.accept(dualConverter_);
-				axiomFactory_.getIndexedSubClassOfAxiom(axiom, first, other);
-				axiomFactory_.getIndexedSubClassOfAxiom(axiom, other, first);
+				axiomFactory_.getElkSameIndividualAxiomConversion(axiom, 0,
+						pos, first, other);
+				axiomFactory_.getElkSameIndividualAxiomConversion(axiom, pos,
+						0, other, first);
 			}
 		}
 		return null;
@@ -359,9 +374,9 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 
 	@Override
 	public Void visit(ElkSubClassOfAxiom axiom) {
-		axiomFactory_.getIndexedSubClassOfAxiom(axiom, axiom.getSubClassExpression()
-						.accept(negativeConverter_), axiom.getSuperClassExpression()
-				.accept(positiveConverter_));
+		axiomFactory_.getElkSubClassOfAxiomConversion(axiom,
+				axiom.getSubClassExpression().accept(negativeConverter_),
+				axiom.getSuperClassExpression().accept(positiveConverter_));
 		return null;
 	}
 
@@ -371,159 +386,233 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	 */
 	private final static int DISJOINT_AXIOM_BINARIZATION_THRESHOLD = 2;
 
-	private void indexDisjointClasses(
-			List<? extends ElkClassExpression> members, ElkAxiom axiom) {
+	private interface DisjointnessIndexer<A extends ElkAxiom, M extends ElkObject> {
+
+		ModifiableIndexedClassExpression convert(M member);
+
+		void indexNary(A axiom, ModifiableIndexedClassExpressionList members);
+
+		void indexBinary(A axiom, int firstMemberPosition,
+				int secondMemberPosition,
+				ModifiableIndexedObjectIntersectionOf memberConunction,
+				ModifiableIndexedClass bottom);
+	}
+
+	private <A extends ElkAxiom, M extends ElkObject> void indexDisjointMembers(
+			DisjointnessIndexer<A, M> indexer, A axiom,
+			List<? extends M> members) {
 		/*
-		 * if the axiom contains sufficiently many disjoint classes, convert it
-		 * natively
+		 * for many disjoint members, convert natively
 		 */
 		if (members.size() > DISJOINT_AXIOM_BINARIZATION_THRESHOLD) {
 			List<ModifiableIndexedClassExpression> indexedMembers = new ArrayList<ModifiableIndexedClassExpression>(
 					members.size());
-			for (ElkClassExpression member : members)
-				indexedMembers.add(member.accept(negativeConverter_));
-			axiomFactory_.getIndexedDisjointClassesAxiom(
-					axiom, positiveFactory_.getIndexedClassExpressionList(indexedMembers));
+			for (M member : members)
+				indexedMembers.add(indexer.convert(member));
+			indexer.indexNary(axiom, positiveFactory_
+					.getIndexedClassExpressionList(indexedMembers));
 			return;
 		}
 		/*
-		 * otherwise create a binary disjointness axiom for all pairs (member,
-		 * otherMember) where otherMember occurs after member in members
+		 * otherwise create a binary disjointness axioms for all pairs (first,
+		 * second) where second occurs after first in members
 		 */
 		ModifiableIndexedClass indexedOwlNothing = positiveFactory_
 				.getIndexedClass(PredefinedElkClass.OWL_NOTHING);
-		for (final ElkClassExpression member : members) {
-			ModifiableIndexedClassExpression indexedMember = member
-					.accept(negativeConverter_);
+		for (int firstPos = 0; firstPos < members.size(); firstPos++) {
+			M first = members.get(firstPos);
+			ModifiableIndexedClassExpression firstIndexed = indexer
+					.convert(first);
 			boolean selfFound = false;
-			for (ElkClassExpression otherMember : members) {
+			for (int secondPos = 0; secondPos < members.size(); secondPos++) {
+				M second = members.get(secondPos);
 				if (!selfFound) {
-					if (otherMember == member)
+					if (second == first)
 						selfFound = true;
 					continue;
 				}
-				// else otherMember appears after member
-				ModifiableIndexedClassExpression indexedOtherMember = otherMember
-						.accept(negativeConverter_);
-				axiomFactory_.getIndexedSubClassOfAxiom(axiom, negativeFactory_
-										.getIndexedObjectIntersectionOf(indexedMember,
-												indexedOtherMember), indexedOwlNothing);
+				// else second appears after first
+				ModifiableIndexedClassExpression secondIndexed = indexer
+						.convert(second);
+				indexer.indexBinary(axiom, firstPos, secondPos,
+						negativeFactory_.getIndexedObjectIntersectionOf(
+								firstIndexed, secondIndexed),
+						indexedOwlNothing);
 			}
 		}
 	}
 
+	private class ElkDisjointClassesAxiomDisjointnessIndexer
+			implements
+				DisjointnessIndexer<ElkDisjointClassesAxiom, ElkClassExpression> {
+
+		@Override
+		public ModifiableIndexedClassExpression convert(
+				ElkClassExpression member) {
+			return member.accept(negativeConverter_);
+		}
+
+		@Override
+		public void indexNary(ElkDisjointClassesAxiom axiom,
+				ModifiableIndexedClassExpressionList members) {
+			axiomFactory_.getElkDisjointClassesAxiomNaryConversion(axiom,
+					members);
+		}
+
+		@Override
+		public void indexBinary(ElkDisjointClassesAxiom axiom,
+				int firstMemberPosition, int secondMemberPosition,
+				ModifiableIndexedObjectIntersectionOf memberConunction,
+				ModifiableIndexedClass bottom) {
+			axiomFactory_.getElkDisjointClassesAxiomBinaryConversion(axiom,
+					firstMemberPosition, secondMemberPosition, memberConunction,
+					bottom);
+		}
+	}
+
+	private final ElkDisjointClassesAxiomDisjointnessIndexer elkDisjointClassesAxiomDisjointnessIndexer = new ElkDisjointClassesAxiomDisjointnessIndexer();
+
 	@Override
 	public Void visit(ElkDisjointClassesAxiom axiom) {
-		indexDisjointClasses(axiom.getClassExpressions(), axiom);
+		indexDisjointMembers(elkDisjointClassesAxiomDisjointnessIndexer, axiom,
+				axiom.getClassExpressions());
 		return null;
 	}
+
+	private class ElkDisjointUnionAxiomDisjointnessIndexer
+			implements
+				DisjointnessIndexer<ElkDisjointUnionAxiom, ElkClassExpression> {
+
+		@Override
+		public ModifiableIndexedClassExpression convert(
+				ElkClassExpression member) {
+			return member.accept(negativeConverter_);
+		}
+
+		@Override
+		public void indexNary(ElkDisjointUnionAxiom axiom,
+				ModifiableIndexedClassExpressionList members) {
+			axiomFactory_.getElkDisjointUnionAxiomNaryConversion(axiom,
+					members);
+		}
+
+		@Override
+		public void indexBinary(ElkDisjointUnionAxiom axiom,
+				int firstMemberPosition, int secondMemberPosition,
+				ModifiableIndexedObjectIntersectionOf memberConunction,
+				ModifiableIndexedClass bottom) {
+			axiomFactory_.getElkDisjointUnionAxiomBinaryConversion(axiom,
+					firstMemberPosition, secondMemberPosition, memberConunction,
+					bottom);
+		}
+
+	}
+
+	private final ElkDisjointUnionAxiomDisjointnessIndexer elkDisjointUnionAxiomDisjointnessIndexer = new ElkDisjointUnionAxiomDisjointnessIndexer();
 
 	@Override
 	public Void visit(ElkDisjointUnionAxiom axiom) {
 		List<? extends ElkClassExpression> disjoint = axiom
 				.getClassExpressions();
-		indexDisjointClasses(disjoint, axiom);
+		indexDisjointMembers(elkDisjointUnionAxiomDisjointnessIndexer, axiom,
+				disjoint);
 		ModifiableIndexedClass defined;
 		ModifiableIndexedClassExpression member;
 		int size = disjoint.size();
 		switch (size) {
-		case 0:
-			defined = (ModifiableIndexedClass) axiom.getDefinedClass().accept(positiveConverter_);
-			member = negativeFactory_
-					.getIndexedClass(PredefinedElkClass.OWL_THING);
-			axiomFactory_.getIndexedSubClassOfAxiom(axiom, member, defined);
-			break;
-		case 1:
-			defined = (ModifiableIndexedClass) axiom.getDefinedClass().accept(dualConverter_);
-			member = disjoint.iterator().next().accept(dualConverter_);
-			axiomFactory_.getIndexedDefinitionAxiom(axiom, defined, member); 
-			break;
-		default:
-			// indexing only one direction of the equivalence
-			if (LOGGER_.isWarnEnabled()) {
-				LoggerWrap
-						.log(LOGGER_, LogLevel.WARN,
-								"reasoner.indexing.disjointUnion",
-								"ELK supports DisjointUnion only partially. Reasoning might be incomplete!");
-			}
-			defined = (ModifiableIndexedClass) axiom.getDefinedClass().accept(positiveConverter_);
-			for (ElkClassExpression c : disjoint) {
-				member = c.accept(negativeConverter_);
-				axiomFactory_.getIndexedSubClassOfAxiom(axiom, member, defined);
-			}
-			break;
+			case 0 :
+				defined = (ModifiableIndexedClass) axiom.getDefinedClass()
+						.accept(positiveConverter_);
+				member = negativeFactory_
+						.getIndexedClass(PredefinedElkClass.OWL_THING);
+				axiomFactory_.getElkDisjointUnionAxiomSubClassConversion(axiom,
+						0, member, defined);
+				break;
+			case 1 :
+				defined = (ModifiableIndexedClass) axiom.getDefinedClass()
+						.accept(dualConverter_);
+				member = disjoint.iterator().next().accept(dualConverter_);
+				axiomFactory_.getElkDisjointUnionAxiomDefinitionConversion(
+						axiom, defined, member);
+				break;
+			default :
+				// indexing only one direction of the equivalence
+				if (LOGGER_.isWarnEnabled()) {
+					LoggerWrap.log(LOGGER_, LogLevel.WARN,
+							"reasoner.indexing.disjointUnion",
+							"ELK supports DisjointUnion only partially. Reasoning might be incomplete!");
+				}
+				defined = (ModifiableIndexedClass) axiom.getDefinedClass()
+						.accept(positiveConverter_);
+				for (int pos = 0; pos < size; pos++) {
+					ElkClassExpression c = disjoint.get(pos);
+					member = c.accept(negativeConverter_);
+					axiomFactory_.getElkDisjointUnionAxiomSubClassConversion(
+							axiom, pos, member, defined);
+				}
+				break;
 		}
 		return null;
-
 	}
+
+	private class ElkDifferentIndividualsAxiomDisjointnessIndexer
+			implements
+				DisjointnessIndexer<ElkDifferentIndividualsAxiom, ElkIndividual> {
+
+		@Override
+		public ModifiableIndexedClassExpression convert(ElkIndividual member) {
+			return member.accept(negativeConverter_);
+		}
+
+		@Override
+		public void indexNary(ElkDifferentIndividualsAxiom axiom,
+				ModifiableIndexedClassExpressionList members) {
+			axiomFactory_.getElkDifferentIndividualsAxiomNaryConversion(axiom,
+					members);
+		}
+
+		@Override
+		public void indexBinary(ElkDifferentIndividualsAxiom axiom,
+				int firstMemberPosition, int secondMemberPosition,
+				ModifiableIndexedObjectIntersectionOf memberConunction,
+				ModifiableIndexedClass bottom) {
+			axiomFactory_.getElkDifferentIndividualsAxiomBinaryConversion(axiom,
+					firstMemberPosition, secondMemberPosition, memberConunction,
+					bottom);
+		}
+	}
+
+	private final ElkDifferentIndividualsAxiomDisjointnessIndexer elkDifferentIndividualsAxiomDisjointnessIndexer = new ElkDifferentIndividualsAxiomDisjointnessIndexer();
 
 	@Override
 	public Void visit(ElkDifferentIndividualsAxiom axiom) {
-		List<? extends ElkIndividual> members = axiom.getIndividuals();
-		/*
-		 * if the axiom contains sufficiently many disjoint classes, convert it
-		 * natively
-		 */
-		if (members.size() > DISJOINT_AXIOM_BINARIZATION_THRESHOLD) {
-			List<ModifiableIndexedClassExpression> indexedMembers = new ArrayList<ModifiableIndexedClassExpression>(
-					members.size());
-			for (ElkIndividual member : members)
-				indexedMembers.add(member.accept(negativeConverter_));
-			axiomFactory_.getIndexedDisjointClassesAxiom(axiom, positiveFactory_
-							.getIndexedClassExpressionList(indexedMembers));
-			return null;
-		}
-		/*
-		 * otherwise create a binary disjointness axiom for all pairs (member,
-		 * otherMember) where otherMember occurs after member in members
-		 */
-		ModifiableIndexedClass indexedOwlNothing = positiveFactory_
-				.getIndexedClass(PredefinedElkClass.OWL_NOTHING);
-		for (final ElkIndividual member : members) {
-			ModifiableIndexedClassExpression indexedMember = member
-					.accept(negativeConverter_);
-			boolean selfFound = false;
-			for (ElkIndividual otherMember : members) {
-				if (!selfFound) {
-					if (otherMember == member)
-						selfFound = true;
-					continue;
-				}
-				// else otherMember appears after member
-				ModifiableIndexedClassExpression indexedOtherMember = otherMember
-						.accept(negativeConverter_);
-				axiomFactory_.getIndexedSubClassOfAxiom(axiom, negativeFactory_
-										.getIndexedObjectIntersectionOf(indexedMember,
-												indexedOtherMember), indexedOwlNothing);
-			}
-		}
+		indexDisjointMembers(elkDifferentIndividualsAxiomDisjointnessIndexer,
+				axiom, axiom.getIndividuals());
 		return null;
 	}
 
 	@Override
 	public Void visit(ElkClassAssertionAxiom axiom) {
-		axiomFactory_
-				.getIndexedSubClassOfAxiom(
-						axiom, axiom.getIndividual().accept(negativeConverter_), axiom
-										.getClassExpression()
-										.accept(positiveConverter_));
+		axiomFactory_.getElkClassAssertionAxiomConversion(axiom,
+				axiom.getIndividual().accept(negativeConverter_),
+				axiom.getClassExpression().accept(positiveConverter_));
 		return null;
 	}
 
 	@Override
 	public Void visit(ElkObjectPropertyAssertionAxiom axiom) {
-		axiomFactory_.getIndexedSubClassOfAxiom(
-				axiom, axiom.getSubject().accept(negativeConverter_), positiveFactory_
-										.getIndexedObjectSomeValuesFrom(axiom.getProperty()
-												.accept(positiveConverter_), axiom.getObject()
-												.accept(positiveConverter_)));
+		axiomFactory_.getElkObjectPropertyAssertionAxiomConversion(axiom,
+				axiom.getSubject().accept(negativeConverter_),
+				positiveFactory_.getIndexedObjectSomeValuesFrom(
+						axiom.getProperty().accept(positiveConverter_),
+						axiom.getObject().accept(positiveConverter_)));
 		return null;
 	}
 
 	@Override
 	public Void visit(ElkDeclarationAxiom axiom) {
-		axiomFactory_.getIndexedDeclarationAxiom(
-				axiom, axiom.getEntity().accept(entityConverter_));
+		axiomFactory_.getElkDeclarationAxiomConversion(axiom,
+				axiom.getEntity().accept(entityConverter_));
 		return null;
 	}
 
@@ -538,12 +627,12 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 		ModifiableIndexedPropertyChain result = null;
 		// iterating over the chain backwards
 		ListIterator<? extends ElkObjectPropertyExpression> iterator = elkObjectPropertyChain
-				.getObjectPropertyExpressions().listIterator(
-						elkObjectPropertyChain.getObjectPropertyExpressions()
-								.size());
+				.getObjectPropertyExpressions()
+				.listIterator(elkObjectPropertyChain
+						.getObjectPropertyExpressions().size());
 		while (iterator.hasPrevious()) {
-			ModifiableIndexedObjectProperty iop = iterator.previous().accept(
-					negativeConverter_);
+			ModifiableIndexedObjectProperty iop = iterator.previous()
+					.accept(negativeConverter_);
 			if (result == null) {
 				result = iop;
 				continue;

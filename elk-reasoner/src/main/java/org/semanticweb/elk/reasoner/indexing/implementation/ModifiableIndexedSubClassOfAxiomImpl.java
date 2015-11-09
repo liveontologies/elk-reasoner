@@ -33,14 +33,17 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSub
  * Implements {@link ModifiableIndexedSubClassOfAxiom}
  * 
  * @author "Yevgeny Kazakov"
+ * 
+ * @param <A>
+ *            the type of the {@link ElkAxiom} from which this axiom originates
  */
-class ModifiableIndexedSubClassOfAxiomImpl extends ModifiableIndexedAxiomImpl
+class ModifiableIndexedSubClassOfAxiomImpl<A extends ElkAxiom> extends ModifiableIndexedAxiomImpl<A>
 		implements ModifiableIndexedSubClassOfAxiom {
 
 	private final ModifiableIndexedClassExpression subClass_, superClass_;
 
 	ModifiableIndexedSubClassOfAxiomImpl(
-			ElkAxiom originalAxiom,
+			A originalAxiom,
 			ModifiableIndexedClassExpression subClass,
 			ModifiableIndexedClassExpression superClass) {
 		super(originalAxiom);

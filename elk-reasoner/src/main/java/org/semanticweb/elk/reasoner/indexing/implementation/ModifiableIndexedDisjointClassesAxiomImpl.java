@@ -35,10 +35,13 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerF
  * Implements {@link CachedIndexedClassExpressionList}
  * 
  * @author "Yevgeny Kazakov"
+ * 
+ * @param <A>
+ *            the type of the {@link ElkAxiom} from which this axiom originates
  */
-class ModifiableIndexedDisjointClassesAxiomImpl
+public class ModifiableIndexedDisjointClassesAxiomImpl<A extends ElkAxiom>
 		extends
-			ModifiableIndexedAxiomImpl
+			ModifiableIndexedAxiomImpl<A>
 		implements
 			ModifiableIndexedDisjointClassesAxiom {
 
@@ -49,7 +52,7 @@ class ModifiableIndexedDisjointClassesAxiomImpl
 	 */
 	private final ModifiableIndexedClassExpressionList members_;
 	
-	ModifiableIndexedDisjointClassesAxiomImpl(ElkAxiom originalAxiom,
+	protected ModifiableIndexedDisjointClassesAxiomImpl(A originalAxiom,
 			ModifiableIndexedClassExpressionList members) {
 		super(originalAxiom);
 		this.members_ = members;

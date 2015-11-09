@@ -33,9 +33,12 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
  * Implements {@link ModifiableIndexedObjectPropertyRangeAxiom}
  * 
  * @author "Yevgeny Kazakov"
+ * 
+ * @param <A>
+ *            the type of the {@link ElkAxiom} from which this axiom originates
  */
-class ModifiableIndexedObjectPropertyRangeAxiomImpl extends
-		ModifiableIndexedAxiomImpl implements
+class ModifiableIndexedObjectPropertyRangeAxiomImpl<A extends ElkAxiom> extends
+		ModifiableIndexedAxiomImpl<A> implements
 		ModifiableIndexedObjectPropertyRangeAxiom {
 
 	private final ModifiableIndexedObjectProperty property_;
@@ -43,7 +46,7 @@ class ModifiableIndexedObjectPropertyRangeAxiomImpl extends
 	private final ModifiableIndexedClassExpression range_;
 
 	ModifiableIndexedObjectPropertyRangeAxiomImpl(
-			ElkAxiom originalAxiom,
+			A originalAxiom,
 			ModifiableIndexedObjectProperty property,
 			ModifiableIndexedClassExpression range) {
 		super(originalAxiom);

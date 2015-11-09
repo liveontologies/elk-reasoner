@@ -35,9 +35,11 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <A>
+ *            the type of the {@link ElkAxiom} from which this axiom originates
  */
-class ModifiableIndexedSubObjectPropertyOfAxiomImpl extends
-		ModifiableIndexedAxiomImpl implements
+class ModifiableIndexedSubObjectPropertyOfAxiomImpl<A extends ElkAxiom> extends
+		ModifiableIndexedAxiomImpl<A> implements
 		ModifiableIndexedSubObjectPropertyOfAxiom {
 
 	private final ModifiableIndexedPropertyChain subPropertyChain_;
@@ -45,7 +47,7 @@ class ModifiableIndexedSubObjectPropertyOfAxiomImpl extends
 	private final ModifiableIndexedObjectProperty superProperty_;
 
 	ModifiableIndexedSubObjectPropertyOfAxiomImpl(
-			ElkAxiom originalAxiom,
+			A originalAxiom,
 			ModifiableIndexedPropertyChain subPropertyChain,
 			ModifiableIndexedObjectProperty superProperty) {
 		super(originalAxiom);

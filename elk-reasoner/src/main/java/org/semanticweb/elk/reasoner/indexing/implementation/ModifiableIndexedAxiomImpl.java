@@ -32,19 +32,22 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
  * 
  * @author "Yevgeny Kazakov"
  *
+ * @param <A>
+ *            the type of the {@link ElkAxiom} from which this axiom originates
  */
-abstract class ModifiableIndexedAxiomImpl extends ModifiableIndexedObjectImpl
-		implements
-			ModifiableIndexedAxiom {
+abstract class ModifiableIndexedAxiomImpl<A extends ElkAxiom>
+		extends
+			ModifiableIndexedObjectImpl
+		implements ModifiableIndexedAxiom {
 
-	private final ElkAxiom originalAxiom_;
+	private final A originalAxiom_;
 
-	ModifiableIndexedAxiomImpl(ElkAxiom originalAxiom) {
+	ModifiableIndexedAxiomImpl(A originalAxiom) {
 		this.originalAxiom_ = originalAxiom;
 	}
 
 	@Override
-	public ElkAxiom getOriginalAxiom() {
+	public A getOriginalAxiom() {
 		return originalAxiom_;
 	}
 

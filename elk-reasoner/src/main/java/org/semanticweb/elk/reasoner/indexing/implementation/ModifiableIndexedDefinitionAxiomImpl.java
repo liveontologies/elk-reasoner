@@ -34,9 +34,9 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSub
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ModifiableIndexedDefinitionAxiomImpl
+public class ModifiableIndexedDefinitionAxiomImpl<A extends ElkAxiom>
 		extends
-			ModifiableIndexedAxiomImpl
+			ModifiableIndexedAxiomImpl<A>
 		implements
 			ModifiableIndexedDefinitionAxiom {
 
@@ -46,7 +46,7 @@ public class ModifiableIndexedDefinitionAxiomImpl
 	private final ModifiableIndexedClass definedClass_;
 	private final ModifiableIndexedClassExpression definition_;
 
-	protected ModifiableIndexedDefinitionAxiomImpl(ElkAxiom originalAxiom,
+	protected ModifiableIndexedDefinitionAxiomImpl(A originalAxiom,
 			ModifiableIndexedClass definedClass,
 			ModifiableIndexedClassExpression definition) {
 		super(originalAxiom);
