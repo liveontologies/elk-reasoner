@@ -23,21 +23,20 @@ package org.semanticweb.elk.reasoner.indexing.factories;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDefinitionAxiom;
 
 /**
- * A factory for creating instances of
- * {@link ModifiableIndexedSubObjectPropertyOfAxiom}
+ * A factory for creating instances of {@link IndexedDefinitionAxiom}
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface ModifiableIndexedSubObjectPropertyOfAxiomFactory {
+public interface IndexedDefinitionAxiomFactory {
 
-	public ModifiableIndexedSubObjectPropertyOfAxiom getIndexedSubObjectPropertyOfAxiom(
-			ElkAxiom originalAxiom,
-			ModifiableIndexedPropertyChain subPropertyChain, ModifiableIndexedObjectProperty superProperty);
+	public IndexedDefinitionAxiom getIndexedDefinitionAxiom(
+			ElkAxiom originalAxiom, IndexedClass definedClass,
+			IndexedClassExpression definition);
 
 }

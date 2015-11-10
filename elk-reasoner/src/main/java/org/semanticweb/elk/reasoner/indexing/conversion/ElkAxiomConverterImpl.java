@@ -54,7 +54,6 @@ import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.caching.ModifiableIndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.caching.ResolvingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.caching.UpdatingModifiableIndexedObjectFactory;
-import org.semanticweb.elk.reasoner.indexing.factories.ModifiableIndexedAxiomFactory;
 import org.semanticweb.elk.reasoner.indexing.factories.ModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -80,8 +79,8 @@ import org.slf4j.LoggerFactory;
 /**
  * An implementation of {@link ElkAxiomConverter} that converts {@link ElkAxiom}
  * s to {@link ModifiableIndexedAxiom}s using a
- * {@link ModifiableIndexedAxiomFactory} in addition to converters and factories
- * for other types of {@link IndexedObject}s.
+ * {@link ModifiableIndexedAxiomInferenceFactory} in addition to converters and
+ * factories for other types of {@link IndexedObject}s.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"

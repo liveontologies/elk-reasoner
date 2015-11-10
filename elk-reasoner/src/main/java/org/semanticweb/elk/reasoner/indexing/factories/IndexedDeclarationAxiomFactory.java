@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.indexing.factories;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,20 +23,18 @@ package org.semanticweb.elk.reasoner.indexing.factories;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpressionList;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDeclarationAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedEntity;
 
 /**
- * A factory for creating instances of
- * {@link ModifiableIndexedClassExpressionList}
+ * A factory for creating instances of {@link IndexedDeclarationAxiom}
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface ModifiableIndexedDisjointClassesAxiomFactory {
-		
-	public ModifiableIndexedDisjointClassesAxiom getIndexedDisjointClassesAxiom(
-			ElkAxiom originalAxiom,
-			ModifiableIndexedClassExpressionList disjointClasses);
+public interface IndexedDeclarationAxiomFactory {
+
+	public IndexedDeclarationAxiom getIndexedDeclarationAxiom(
+			ElkAxiom originalAxiom, IndexedEntity entity);
 
 }

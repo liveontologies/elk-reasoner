@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.indexing.factories;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,21 +23,18 @@ package org.semanticweb.elk.reasoner.indexing.factories;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectPropertyRangeAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 
 /**
- * A factory for creating instances of
- * {@link ModifiableIndexedObjectPropertyRangeAxiom}
+ * A factory for creating instances of {@link IndexedClassExpressionList}
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface ModifiableIndexedObjectPropertyRangeAxiomFactory {
+public interface IndexedDisjointClassesAxiomFactory {
 
-	public ModifiableIndexedObjectPropertyRangeAxiom getIndexedObjectPropertyRangeAxiom(
-			ElkAxiom originalAxiom,
-			ModifiableIndexedObjectProperty property, ModifiableIndexedClassExpression range);
+	public IndexedDisjointClassesAxiom getIndexedDisjointClassesAxiom(
+			ElkAxiom originalAxiom, IndexedClassExpressionList disjointClasses);
 
 }
