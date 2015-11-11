@@ -26,8 +26,10 @@ package org.semanticweb.elk.reasoner.saturation.inferences.properties;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.reasoner.indexing.factories.IndexedSubObjectPropertyOfAxiomFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.SubPropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubPropertyChain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
@@ -73,6 +75,12 @@ public class SubPropertyChainExpanded extends AbstractSubPropertyChainInference 
 
 	public SubPropertyChain getPremise() {
 		return new SubPropertyChainImpl(middleChain_, getSuperChain());
+	}
+	
+	public IndexedSubObjectPropertyOfAxiom getSideCondition(
+			IndexedSubObjectPropertyOfAxiomFactory factory) {
+		return factory.getIndexedSubObjectPropertyOfAxiom(reason_,
+				getSubChain(), middleChain_);
 	}
 
 	@Override

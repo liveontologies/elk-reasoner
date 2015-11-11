@@ -26,10 +26,12 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.reasoner.indexing.factories.IndexedSubObjectPropertyOfAxiomFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.SubPropertyChainImpl;
@@ -97,6 +99,13 @@ public class ComposedBackwardLink extends AbstractBackwardLinkInference
 	public IndexedComplexPropertyChain getComposition() {
 		return composition_;
 	}
+	
+	/**
+	 * @return the {@link ElkAxiom} responsible for the fifth premise
+	 */
+	public ElkAxiom getReason() {
+		return reason_;
+	}
 
 	@Override
 	public BackwardLink getFirstPremise() {
@@ -122,17 +131,16 @@ public class ComposedBackwardLink extends AbstractBackwardLinkInference
 				composition_.getSuffixChain());
 	}
 
+	public IndexedSubObjectPropertyOfAxiom getSideCondition(
+			IndexedSubObjectPropertyOfAxiomFactory factory) {
+		return factory.getIndexedSubObjectPropertyOfAxiom(reason_, composition_,
+				backwardRelation_);
+	}
+	
 	public SubPropertyChain getFifthPremise() {
 		return new SubPropertyChainImpl(composition_, getBackwardRelation());
 	}
-
-	/**
-	 * @return the {@link ElkAxiom} responsible for the fifth premise
-	 */
-	public ElkAxiom getReason() {
-		return reason_;
-	}
-
+	
 	@Override
 	public String toString() {
 		return super.toString() + " (composition)";

@@ -26,7 +26,6 @@ package org.semanticweb.elk.reasoner.saturation.inferences.visitors;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
@@ -198,9 +197,8 @@ public class ClassInferencePremiseVisitor<I, O> implements
 
 	@Override
 	public O visit(ContradictionFromDisjointSubsumers conclusion, I input) {
-		for (DisjointSubsumer subsumer : conclusion.getPremises()) {
-			subsumer.accept(classPremiseVisitor_, input);
-		}
+		conclusion.getFirstPremise().accept(classPremiseVisitor_, input);
+		conclusion.getSecondPremise().accept(classPremiseVisitor_, input);		
 
 		return null;
 	}

@@ -26,8 +26,11 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.factories.IndexedDisjointClassesAxiomFactory;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DisjointSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
@@ -47,7 +50,7 @@ public class ContradictionFromDisjointSubsumers extends
 		AbstractContradictionInference {
 
 	/**
-	 * The axiom which causes the contradiction
+	 * The disjoint {@link IndexedClassExpression}s that cause the contradiction
 	 */
 	private final IndexedClassExpressionList disjointExpressions_;
 
@@ -71,23 +74,31 @@ public class ContradictionFromDisjointSubsumers extends
 		this.reason_ = premise.getReason();
 	}
 
+	public ElkAxiom getReason() {
+		return reason_;
+	}
+	
 	@Override
 	public IndexedContextRoot getInferenceRoot() {
 		return getConclusionRoot();
 	}
-
-	public DisjointSubsumer[] getPremises() {
-		return new DisjointSubsumer[]{
-				new DisjointSubsumerImpl(getInferenceRoot(), disjointExpressions_,
-						firstPosition_, reason_),
-				new DisjointSubsumerImpl(getInferenceRoot(), disjointExpressions_,
-						secondPosition_, reason_)};
+	
+	public DisjointSubsumer getFirstPremise() {
+		return new DisjointSubsumerImpl(getInferenceRoot(),
+				disjointExpressions_, firstPosition_, reason_);
 	}
-
-	public ElkAxiom getReason() {
-		return reason_;
+	
+	public DisjointSubsumer getSecondPremise() {
+		return new DisjointSubsumerImpl(getInferenceRoot(),
+				disjointExpressions_, secondPosition_, reason_);
 	}
-
+	
+	public IndexedDisjointClassesAxiom getSideCondition(
+			IndexedDisjointClassesAxiomFactory factory) {
+		return factory.getIndexedDisjointClassesAxiom(reason_,
+				disjointExpressions_);
+	}
+	
 	@Override
 	public String toString() {
 		return "Contradiction from disjoint subsumer " + disjointExpressions_.getElements().get(firstPosition_)

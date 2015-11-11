@@ -26,8 +26,10 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.reasoner.indexing.factories.IndexedSubClassOfAxiomFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.DecomposedSubsumerInferenceVisitor;
@@ -56,19 +58,25 @@ public class SubClassOfSubsumer extends AbstractDecomposedSubsumerInference {
 	public IndexedClassExpression getPremiseSubsumer() {
 		return this.premiseSubsumer_;
 	}
-
+	
 	public ElkAxiom getReason() {
-		return this.reason_;
+		return reason_;
 	}
 
 	@Override
 	public IndexedContextRoot getInferenceRoot() {
 		return getConclusionRoot();
 	}
-
+	
 	public ComposedSubsumer getPremise() {
 		return new ComposedSubsumerImpl<IndexedClassExpression>(
 				getInferenceRoot(), premiseSubsumer_);
+	}
+	
+	public IndexedSubClassOfAxiom getSideCondition(
+			IndexedSubClassOfAxiomFactory factory) {
+		return factory.getIndexedSubClassOfAxiom(reason_, premiseSubsumer_,
+				getExpression());
 	}
 
 	@Override

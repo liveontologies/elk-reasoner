@@ -26,6 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.reasoner.indexing.factories.IndexedDefinitionAxiomFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
@@ -76,6 +77,12 @@ public class ComposedDefinition extends
 	public ComposedSubsumer getPremise() {
 		return new ComposedSubsumerImpl<IndexedClassExpression>(
 				getInferenceRoot(), definition_);
+	}
+	
+	public IndexedDefinitionAxiom getSideCondition(
+			IndexedDefinitionAxiomFactory factory) {
+		return factory.getIndexedDefinitionAxiom(reason_, getExpression(),
+				definition_);
 	}
 
 	@Override

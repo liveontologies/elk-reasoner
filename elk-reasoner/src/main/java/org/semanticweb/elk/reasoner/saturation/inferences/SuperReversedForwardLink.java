@@ -1,6 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.reasoner.indexing.factories.IndexedSubObjectPropertyOfAxiomFactory;
 
 /*
  * #%L
@@ -27,6 +28,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.SubPropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
@@ -78,6 +80,12 @@ public class SuperReversedForwardLink extends AbstractBackwardLinkInference {
 	public ForwardLink getFirstPremise() {
 		return new ForwardLinkImpl<IndexedPropertyChain>(getInferenceRoot(),
 				subChain_, getConclusionRoot());
+	}
+	
+	public IndexedSubObjectPropertyOfAxiom getSideCondition(
+			IndexedSubObjectPropertyOfAxiomFactory factory) {
+		return factory.getIndexedSubObjectPropertyOfAxiom(reason_, subChain_,
+				getBackwardRelation());
 	}
 
 	public SubPropertyChain getSecondPremise() {
