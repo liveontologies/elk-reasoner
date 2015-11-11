@@ -9,7 +9,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
@@ -33,19 +33,19 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Decomposed
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ComposedSubsumerInferenceVisitor;
 
 /**
- * A {@link ComposedSubsumer} for {@link IndexedClassExpression} obtained from
+ * A {@link ComposedSubsumer} for {@link IndexedClassEntity} obtained from
  * the corresponding {@link DecomposedSubsumer}.
  * 
  * @author "Yevgeny Kazakov"
  *
  */
 public class ComposedDecomposition extends
-		AbstractComposedSubsumerInference<IndexedClassExpression> {
+		AbstractComposedSubsumerInference<IndexedClassEntity> {
 
 	/**
 	 */
 	public ComposedDecomposition(IndexedContextRoot inferenceRoot,
-			IndexedClassExpression subsumer) {
+			IndexedClassEntity subsumer) {
 		super(inferenceRoot, subsumer);
 	}
 
