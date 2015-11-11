@@ -29,9 +29,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyCha
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ForwardLinkInferenceVisitor;
 
 /**

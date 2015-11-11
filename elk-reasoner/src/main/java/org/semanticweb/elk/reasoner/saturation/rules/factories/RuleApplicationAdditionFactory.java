@@ -26,10 +26,10 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionSourceContextNotSaturatedCheckingVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ContextInitializingClassConclusionInsertionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.RuleApplicationClassConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionSourceContextNotSaturatedCheckingVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ContextInitializingClassConclusionInsertionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.RuleApplicationClassConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 

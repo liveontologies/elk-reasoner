@@ -1,6 +1,6 @@
 package org.semanticweb.elk.reasoner.saturation.inferences.properties;
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 
 /*
  * #%L

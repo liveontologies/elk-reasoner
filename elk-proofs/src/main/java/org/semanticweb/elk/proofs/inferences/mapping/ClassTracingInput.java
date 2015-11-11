@@ -24,7 +24,7 @@ package org.semanticweb.elk.proofs.inferences.mapping;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 
 /**
  * @author Pavel Klinov

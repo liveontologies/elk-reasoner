@@ -31,9 +31,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ContradictionInferenceVisitor;
 
 /**

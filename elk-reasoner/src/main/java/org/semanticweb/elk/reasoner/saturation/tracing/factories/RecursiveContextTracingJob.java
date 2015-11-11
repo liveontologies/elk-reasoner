@@ -26,7 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.factories;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 
 /**
  * An extension that stores the target {@link ClassConclusion}, should be used for

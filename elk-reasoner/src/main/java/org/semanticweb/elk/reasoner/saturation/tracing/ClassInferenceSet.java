@@ -27,7 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import java.util.Collections;
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 
 /**

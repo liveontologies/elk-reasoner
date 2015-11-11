@@ -29,7 +29,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagationImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedForwardLink;

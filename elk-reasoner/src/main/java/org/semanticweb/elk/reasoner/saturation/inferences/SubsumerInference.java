@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.Subsumer;
 
 public interface SubsumerInference<S extends IndexedClassExpression> extends
 		Subsumer, ClassInference {

@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DisjointSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.DisjointSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.DisjointSubsumerInferenceVisitor;
 

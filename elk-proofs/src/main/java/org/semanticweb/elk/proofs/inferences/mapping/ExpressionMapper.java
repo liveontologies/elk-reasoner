@@ -56,12 +56,12 @@ import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionCon
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.SubPropertyChainImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.BackwardLinkImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ContradictionImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.DecomposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ForwardLinkImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SubPropertyChainImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ReflexivePropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldReflexiveProperty;
 

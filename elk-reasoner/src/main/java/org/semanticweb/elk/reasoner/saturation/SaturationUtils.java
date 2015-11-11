@@ -27,13 +27,13 @@ package org.semanticweb.elk.reasoner.saturation;
 
 import java.util.Arrays;
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionCounter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedClassConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.CountingClassConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.PreprocessedConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.TimedClassConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionCounter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ComposedClassConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ConclusionStatistics;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.CountingClassConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.PreprocessedConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.TimedClassConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextStatistics;
 import org.semanticweb.elk.reasoner.saturation.rules.BasicRuleVisitor;

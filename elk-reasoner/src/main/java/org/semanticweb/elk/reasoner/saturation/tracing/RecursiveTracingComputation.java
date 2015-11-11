@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.factories.ProofUnwindingFactory;
 import org.semanticweb.elk.reasoner.saturation.tracing.factories.ProofUnwindingJob;
 import org.semanticweb.elk.reasoner.saturation.tracing.factories.ProofUnwindingListener;

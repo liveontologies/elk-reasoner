@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.factories;
  */
 
 import org.semanticweb.elk.reasoner.ReasonerJob;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 
 public class ProofUnwindingJob<I extends ClassConclusion> extends
 		ReasonerJob<I, Void> {

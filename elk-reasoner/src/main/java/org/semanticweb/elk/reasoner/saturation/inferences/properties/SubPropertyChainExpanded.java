@@ -30,7 +30,7 @@ import org.semanticweb.elk.reasoner.indexing.factories.IndexedSubObjectPropertyO
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubObjectPropertyOfAxiom;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**

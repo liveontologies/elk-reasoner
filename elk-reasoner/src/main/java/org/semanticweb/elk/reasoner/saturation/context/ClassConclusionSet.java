@@ -23,8 +23,8 @@ package org.semanticweb.elk.reasoner.saturation.context;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassConclusion;
 
 /**
  * An object containing {@link ClassConclusion}s. Every {@link ClassConclusion} is stored

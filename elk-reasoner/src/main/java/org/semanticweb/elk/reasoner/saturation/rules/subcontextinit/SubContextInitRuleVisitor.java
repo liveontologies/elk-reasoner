@@ -1,6 +1,6 @@
 package org.semanticweb.elk.reasoner.saturation.rules.subcontextinit;
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 

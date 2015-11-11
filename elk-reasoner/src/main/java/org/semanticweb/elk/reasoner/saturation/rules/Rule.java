@@ -1,7 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 
 /*
