@@ -36,7 +36,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConcl
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionDeletionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionOccurrenceCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionSourceContextUnsaturationVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.RuleApplicationClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
@@ -81,7 +80,7 @@ public class RuleApplicationDeletionFactory extends
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected ClassConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
+	protected ClassConclusion.Visitor<? super Context, Boolean> getConclusionProcessor(
 			RuleVisitor<?> ruleVisitor,
 			SaturationStateWriter<? extends Context> writer,
 			SaturationStatistics localStatistics) {

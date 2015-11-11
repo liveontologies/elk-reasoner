@@ -1,7 +1,6 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
@@ -50,16 +49,16 @@ public interface ClassConclusion extends Conclusion {
 	/**
 	 * 
 	 * @return The {@link IndexedContextRoot} of the {@link Context} from which
-	 *         this {@link ClassConclusion} originate. This value may be different
-	 *         from {@link #getConclusionRoot()} but cannot be {@code null}.
-	 *         Specifically, this {@link ClassConclusion} is guaranteed to be derived
-	 *         from {@link ContextInitialization} with the value
-	 *         {@link #getConclusionRoot()} equal to this value.
+	 *         this {@link ClassConclusion} originate. This value may be
+	 *         different from {@link #getConclusionRoot()} but cannot be
+	 *         {@code null}. Specifically, this {@link ClassConclusion} is
+	 *         guaranteed to be derived from {@link ContextInitialization} with
+	 *         the value {@link #getConclusionRoot()} equal to this value.
 	 */
 	public IndexedContextRoot getOriginRoot();
 
-	public <I, O> O accept(ClassConclusionVisitor<I, O> visitor, I input);
-	
+	public <I, O> O accept(Visitor<I, O> visitor, I input);
+
 	/**
 	 * A factory for creating instances
 	 * 
@@ -75,6 +74,30 @@ public interface ClassConclusion extends Conclusion {
 				ForwardLink.Factory,
 				SubClassConclusion.Factory,
 				Subsumer.Factory {
+
+		// combined interface
+
+	}
+
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <I>
+	 *            the type of the input
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<I, O>
+			extends
+				ContextInitialization.Visitor<I, O>,
+				Contradiction.Visitor<I, O>,
+				DisjointSubsumer.Visitor<I, O>,
+				InitializationConclusion.Visitor<I, O>,
+				ForwardLink.Visitor<I, O>,
+				SubClassConclusion.Visitor<I, O>,
+				Subsumer.Visitor<I, O> {
 
 		// combined interface
 

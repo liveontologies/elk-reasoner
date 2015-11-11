@@ -27,7 +27,6 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
@@ -55,7 +54,7 @@ public class BasicRuleEngine<I extends RuleApplicationInput> extends
 	private final SaturationStateWriter<?> writer_;
 
 	protected BasicRuleEngine(OntologyIndex index,
-			ClassConclusionVisitor<? super Context, Boolean> conclusionProcessor,
+			ClassConclusion.Visitor<? super Context, Boolean> conclusionProcessor,
 			WorkerLocalTodo localTodo, Interrupter interrupter,
 			SaturationStateWriter<?> writer,
 			SaturationStatistics aggregatedStatistics,

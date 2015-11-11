@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagatio
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 
 /**
- * A {@link ClassConclusionVisitor} that increments the corresponding counters of the
+ * A {@link ClassConclusion.Visitor} that increments the corresponding counters of the
  * given {@link ClassConclusionCounter} when visiting {@link ClassConclusion}s
  * 
  * @author "Yevgeny Kazakov"
@@ -42,7 +42,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContext
  * @param <I>
  */
 public class CountingClassConclusionVisitor<I> implements
-		ClassConclusionVisitor<I, Boolean> {
+		ClassConclusion.Visitor<I, Boolean> {
 
 	private final ClassConclusionCounter counter_;
 

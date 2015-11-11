@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
@@ -76,6 +77,11 @@ public abstract class AbstractSubsumer<S extends IndexedClassExpression>
 			ContextPremises premises, ClassConclusionProducer producer) {
 		expression_.accept(new SubsumerDecompositionVisitor(ruleAppVisitor,
 				premises, producer));
+	}
+	
+	@Override
+	public <I, O> O accept(ClassConclusion.Visitor<I, O> visitor, I input) {
+		return accept((Subsumer.Visitor<I, O>) visitor, input);
 	}
 
 }

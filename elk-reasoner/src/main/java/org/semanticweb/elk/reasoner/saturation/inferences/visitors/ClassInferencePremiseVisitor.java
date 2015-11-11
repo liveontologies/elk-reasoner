@@ -30,10 +30,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Conclu
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyObjectPropertyConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectPropertyConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedConjunction;
@@ -77,27 +75,27 @@ import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubProperty
 public class ClassInferencePremiseVisitor<I, O> implements
 		ClassInferenceVisitor<I, O>, ObjectPropertyInferenceVisitor<I, O> {
 
-	private final ClassConclusionVisitor<I, O> classPremiseVisitor_;
+	private final ClassConclusion.Visitor<I, O> classPremiseVisitor_;
 
-	private final ObjectPropertyConclusionVisitor<I, O> propertyPremiseVisitor_;
+	private final ObjectPropertyConclusion.Visitor<I, O> propertyPremiseVisitor_;
 	
 	private final Conclusion.Factory factory_ = new ConclusionBaseFactory();
 
 	public ClassInferencePremiseVisitor(
-			ClassConclusionVisitor<I, O> classPremiseVisitor,
-			ObjectPropertyConclusionVisitor<I, O> propertyPremiseVisitor) {
+			ClassConclusion.Visitor<I, O> classPremiseVisitor,
+			ObjectPropertyConclusion.Visitor<I, O> propertyPremiseVisitor) {
 		classPremiseVisitor_ = classPremiseVisitor;
 		propertyPremiseVisitor_ = propertyPremiseVisitor;
 	}
 
 	public ClassInferencePremiseVisitor(
-			ClassConclusionVisitor<I, O> classPremiseVisitor) {
+			ClassConclusion.Visitor<I, O> classPremiseVisitor) {
 		this(classPremiseVisitor,
 				new DummyObjectPropertyConclusionVisitor<I, O>());
 	}
 
 	public ClassInferencePremiseVisitor(
-			ObjectPropertyConclusionVisitor<I, O> propertyPremiseVisitor) {
+			ObjectPropertyConclusion.Visitor<I, O> propertyPremiseVisitor) {
 		this(new DummyClassConclusionVisitor<I, O>(), propertyPremiseVisitor);
 	}
 

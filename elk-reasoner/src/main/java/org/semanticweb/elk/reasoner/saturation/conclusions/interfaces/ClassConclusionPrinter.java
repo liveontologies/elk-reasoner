@@ -22,9 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
-
-public class ClassConclusionPrinter implements ClassConclusionVisitor<Void, String> {
+public class ClassConclusionPrinter implements ClassConclusion.Visitor<Void, String> {
 
 	private static ClassConclusionPrinter INSTANCE_ = new ClassConclusionPrinter();
 

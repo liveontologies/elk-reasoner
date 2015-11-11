@@ -49,7 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link ClassConclusionVisitor} that applies inference rules for the visited
+ * A {@link ClassConclusion.Visitor} that applies inference rules for the visited
  * {@link ClassConclusion}s using the provided {@link RuleVisitor} to apply rules and
  * {@link ClassConclusionProducer} to output the {@link ClassConclusion}s of the applied
  * rules. The methods always return {@link true}.

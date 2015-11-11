@@ -43,7 +43,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ClassConclusionHashGenerator implements ClassConclusionVisitor<Void, Integer> {
+public class ClassConclusionHashGenerator implements ClassConclusion.Visitor<Void, Integer> {
 
 	@Override
 	public Integer visit(ComposedSubsumer negSCE, Void context) {

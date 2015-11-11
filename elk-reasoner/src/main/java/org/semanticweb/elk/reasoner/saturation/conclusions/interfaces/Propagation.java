@@ -56,6 +56,8 @@ public interface Propagation extends SubClassConclusion {
 	 */
 	public IndexedObjectSomeValuesFrom getCarry();
 	
+	public <I, O> O accept(Visitor<I, O> visitor, I input);
+	
 	/**
 	 * A factory for creating instances
 	 * 
@@ -69,5 +71,22 @@ public interface Propagation extends SubClassConclusion {
 				IndexedObjectSomeValuesFrom carry);
 
 	}
+	
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <I>
+	 *            the type of the input
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<I, O> {
+
+		public O visit(Propagation conclusion, I input);
+
+	}
+
 
 }

@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLin
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubClassConclusion;
 
 /**
- * A skeleton for implementation of {@link ClassConclusionVisitor}s using a common
+ * A skeleton for implementation of {@link ClassConclusion.Visitor}s using a common
  * (default) method
  * 
  * @author "Yevgeny Kazakov"
@@ -44,7 +44,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubClassCo
  *            the type of output parameter with which this visitor works
  */
 public abstract class AbstractClassConclusionVisitor<I, O> extends
-		AbstractSubConclusionVisitor<I, O> implements ClassConclusionVisitor<I, O> {
+		AbstractSubClassConclusionVisitor<I, O> implements ClassConclusion.Visitor<I, O> {
 
 	protected abstract O defaultVisit(ClassConclusion conclusion, I input);
 

@@ -34,39 +34,39 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagatio
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 
 /**
- * A {@link ClassConclusionVisitor} that composes several given
- * {@link ClassConclusionVisitor}s. The visit method of the composed visitor returns
- * calls the original {@link ClassConclusionVisitor}s in the specified order and
+ * A {@link ClassConclusion.Visitor} that composes several given
+ * {@link ClassConclusion.Visitor}s. The visit method of the composed visitor returns
+ * calls the original {@link ClassConclusion.Visitor}s in the specified order and
  * returns {@link true} for the {@link ClassConclusion} if and only all of the
- * {@link ClassConclusionVisitor}s return {@code true}. The result is evaluated
- * lazily, i.e., if some {@link ClassConclusionVisitor} returns {@code false}, the
- * subsequent {@link ClassConclusionVisitor}s are not called.
+ * {@link ClassConclusion.Visitor}s return {@code true}. The result is evaluated
+ * lazily, i.e., if some {@link ClassConclusion.Visitor} returns {@code false}, the
+ * subsequent {@link ClassConclusion.Visitor}s are not called.
  * 
  * @author "Yevgeny Kazakov"
  */
 public class ComposedClassConclusionVisitor<I> implements
-		ClassConclusionVisitor<I, Boolean> {
+		ClassConclusion.Visitor<I, Boolean> {
 
 	/**
-	 * The original {@link ClassConclusionVisitor}s to be called in the specified
+	 * The original {@link ClassConclusion.Visitor}s to be called in the specified
 	 * order
 	 */
-	final private ClassConclusionVisitor<? super I, Boolean>[] visitors_;
+	final private ClassConclusion.Visitor<? super I, Boolean>[] visitors_;
 
 	/**
-	 * Creates a new {@link ClassConclusionVisitor} that combines several given
-	 * {@link ClassConclusionVisitor}s. The visit method of the combined visitor
-	 * returns calls the original {@link ClassConclusionVisitor}s in the specified
+	 * Creates a new {@link ClassConclusion.Visitor} that combines several given
+	 * {@link ClassConclusion.Visitor}s. The visit method of the combined visitor
+	 * returns calls the original {@link ClassConclusion.Visitor}s in the specified
 	 * order and returns {@link true} for the {@link ClassConclusion} if and only all
-	 * of the {@link ClassConclusionVisitor}s return {@code true}. The result is
-	 * evaluated lazily, i.e., if some {@link ClassConclusionVisitor} returns
-	 * {@code false}, the subsequent {@link ClassConclusionVisitor}s are not called.
+	 * of the {@link ClassConclusion.Visitor}s return {@code true}. The result is
+	 * evaluated lazily, i.e., if some {@link ClassConclusion.Visitor} returns
+	 * {@code false}, the subsequent {@link ClassConclusion.Visitor}s are not called.
 	 * 
 	 * @param visitors
-	 *            the {@link ClassConclusionVisitor} to be composed
+	 *            the {@link ClassConclusion.Visitor} to be composed
 	 */
 	public ComposedClassConclusionVisitor(
-			ClassConclusionVisitor<? super I, Boolean>... visitors) {
+			ClassConclusion.Visitor<? super I, Boolean>... visitors) {
 		this.visitors_ = visitors;
 	}
 

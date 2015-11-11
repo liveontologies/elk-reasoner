@@ -31,6 +31,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  */
 public interface Conclusion {
 
+	public <I, O> O accept(Visitor<I, O> visitor, I input);
+	
 	/**
 	 * A factory for creating instances
 	 * 
@@ -41,6 +43,25 @@ public interface Conclusion {
 			extends
 				ClassConclusion.Factory,
 				ObjectPropertyConclusion.Factory {
+
+		// combined interface
+
+	}
+
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <I>
+	 *            the type of the input
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<I, O>
+			extends
+				ClassConclusion.Visitor<I, O>,
+				ObjectPropertyConclusion.Visitor<I, O> {
 
 		// combined interface
 

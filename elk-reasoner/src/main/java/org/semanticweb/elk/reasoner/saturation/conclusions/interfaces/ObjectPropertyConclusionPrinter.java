@@ -22,10 +22,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectPropertyConclusionVisitor;
-
 public class ObjectPropertyConclusionPrinter implements
-		ObjectPropertyConclusionVisitor<Void, String> {
+		ObjectPropertyConclusion.Visitor<Void, String> {
 
 	private static ObjectPropertyConclusionPrinter INSTANCE_ = new ObjectPropertyConclusionPrinter();
 

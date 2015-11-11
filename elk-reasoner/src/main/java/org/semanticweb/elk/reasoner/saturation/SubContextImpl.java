@@ -31,16 +31,15 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLi
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 public class SubContextImpl extends ArrayHashSet<IndexedContextRoot> implements
 		SubContext {
 
-	private static final SubConclusionVisitor<SubContextImpl, Boolean> SUB_CONCLUSION_INSERTER_ = new SubConclusionInserter();
-	private static final SubConclusionVisitor<SubContextImpl, Boolean> SUB_CONCLUSION_DELETOR_ = new SubConclusionDeletor();
-	private static final SubConclusionVisitor<SubContextImpl, Boolean> SUB_CONCLUSION_OCCURRENCE_CHECKER_ = new SubConclusionOccurrenceChecker();
+	private static final SubClassConclusion.Visitor<SubContextImpl, Boolean> SUB_CONCLUSION_INSERTER_ = new SubConclusionInserter();
+	private static final SubClassConclusion.Visitor<SubContextImpl, Boolean> SUB_CONCLUSION_DELETOR_ = new SubConclusionDeletor();
+	private static final SubClassConclusion.Visitor<SubContextImpl, Boolean> SUB_CONCLUSION_OCCURRENCE_CHECKER_ = new SubConclusionOccurrenceChecker();
 
 	Set<IndexedObjectSomeValuesFrom> propagatedSubsumers_;
 
@@ -104,7 +103,7 @@ public class SubContextImpl extends ArrayHashSet<IndexedContextRoot> implements
 	}
 
 	public static class SubConclusionInserter implements
-			SubConclusionVisitor<SubContextImpl, Boolean> {
+			SubClassConclusion.Visitor<SubContextImpl, Boolean> {
 
 		@Override
 		public Boolean visit(BackwardLink subConclusion, SubContextImpl input) {
@@ -132,7 +131,7 @@ public class SubContextImpl extends ArrayHashSet<IndexedContextRoot> implements
 	}
 
 	public static class SubConclusionDeletor implements
-			SubConclusionVisitor<SubContextImpl, Boolean> {
+			SubClassConclusion.Visitor<SubContextImpl, Boolean> {
 
 		@Override
 		public Boolean visit(BackwardLink subConclusion, SubContextImpl input) {
@@ -160,7 +159,7 @@ public class SubContextImpl extends ArrayHashSet<IndexedContextRoot> implements
 	}
 
 	public static class SubConclusionOccurrenceChecker implements
-			SubConclusionVisitor<SubContextImpl, Boolean> {
+			SubClassConclusion.Visitor<SubContextImpl, Boolean> {
 
 		@Override
 		public Boolean visit(BackwardLink subConclusion, SubContextImpl input) {

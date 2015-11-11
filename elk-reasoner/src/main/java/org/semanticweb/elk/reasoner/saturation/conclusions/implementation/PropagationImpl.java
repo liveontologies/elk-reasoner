@@ -29,8 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubClassConclusion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,8 +42,9 @@ import org.slf4j.LoggerFactory;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class PropagationImpl extends AbstractSubClassConclusion implements
-		Propagation {
+public class PropagationImpl extends AbstractSubClassConclusion
+		implements
+			Propagation {
 
 	// logger for this class
 	static final Logger LOGGER_ = LoggerFactory
@@ -59,16 +59,6 @@ public class PropagationImpl extends AbstractSubClassConclusion implements
 	}
 
 	@Override
-	public <I, O> O accept(ClassConclusionVisitor<I, O> visitor, I input) {
-		return accept((SubConclusionVisitor<I, O>) visitor, input);
-	}
-
-	@Override
-	public <I, O> O accept(SubConclusionVisitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
-	}
-
-	@Override
 	public IndexedObjectProperty getRelation() {
 		return getConclusionSubRoot();
 	}
@@ -76,6 +66,16 @@ public class PropagationImpl extends AbstractSubClassConclusion implements
 	@Override
 	public IndexedObjectSomeValuesFrom getCarry() {
 		return this.carry_;
+	}	
+
+	@Override
+	public <I, O> O accept(SubClassConclusion.Visitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
+	}
+
+	@Override
+	public <I, O> O accept(Propagation.Visitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
 
 }

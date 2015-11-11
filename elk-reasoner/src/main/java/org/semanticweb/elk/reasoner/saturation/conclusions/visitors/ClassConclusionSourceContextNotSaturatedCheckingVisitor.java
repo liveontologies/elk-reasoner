@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link ClassConclusionVisitor} that checks if the source {@link Context} of the
+ * A {@link ClassConclusion.Visitor} that checks if the source {@link Context} of the
  * {@link ClassConclusion} is not saturated, and reports an error otherwise. Should
  * be used for debugging.
  * 

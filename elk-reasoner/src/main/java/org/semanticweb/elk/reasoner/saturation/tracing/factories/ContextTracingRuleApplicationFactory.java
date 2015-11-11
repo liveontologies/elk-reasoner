@@ -40,7 +40,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContext
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionOccurrenceCheckingVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalRuleApplicationClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalizedClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -89,7 +88,7 @@ public class ContextTracingRuleApplicationFactory extends
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected ClassConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
+	protected ClassConclusion.Visitor<? super Context, Boolean> getConclusionProcessor(
 			RuleVisitor<?> ruleVisitor,
 			// this writer will block cyclic inferences
 			SaturationStateWriter<? extends ExtendedContext> localWriter,
@@ -113,7 +112,7 @@ public class ContextTracingRuleApplicationFactory extends
 
 	@Override
 	protected InputProcessor<RuleApplicationInput> getEngine(
-			ClassConclusionVisitor<? super Context, Boolean> conclusionProcessor,
+			ClassConclusion.Visitor<? super Context, Boolean> conclusionProcessor,
 			final SaturationStateWriter<? extends ExtendedContext> saturationStateWriter,
 			WorkerLocalTodo localTodo, SaturationStatistics localStatistics) {
 		final InputProcessor<RuleApplicationInput> defaultEngine = super

@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.saturation;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionCounter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.CountingClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
@@ -41,7 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 public class CountingSaturationStateWriter<C extends Context> extends
 		SaturationStateWriterWrap<C> {
 
-	private final ClassConclusionVisitor<Void, ?> countingVisitor_;
+	private final ClassConclusion.Visitor<Void, ?> countingVisitor_;
 
 	public CountingSaturationStateWriter(SaturationStateWriter<C> writer,
 			ClassConclusionCounter counter) {

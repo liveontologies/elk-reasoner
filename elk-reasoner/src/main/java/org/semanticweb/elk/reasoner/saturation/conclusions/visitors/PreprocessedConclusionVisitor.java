@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
@@ -33,9 +34,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagatio
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 
 /**
- * A {@link ClassConclusionVisitor} that runs a special preprocessor
- * {@link ClassConclusionVisitor} before every call of the provided
- * {@link ClassConclusionVisitor}. The returned result is taken from the letter.
+ * A {@link ClassConclusion.Visitor} that runs a special preprocessor
+ * {@link ClassConclusion.Visitor} before every call of the provided
+ * {@link ClassConclusion.Visitor}. The returned result is taken from the letter.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -45,19 +46,19 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContext
  *            the type of output parameter with which this visitor works
  */
 public class PreprocessedConclusionVisitor<I, O> implements
-		ClassConclusionVisitor<I, O> {
+		ClassConclusion.Visitor<I, O> {
 
 	/**
-	 * a {@link ClassConclusionVisitor} that is called first
+	 * a {@link ClassConclusion.Visitor} that is called first
 	 */
-	final private ClassConclusionVisitor<I, ?> preprocessor_;
+	final private ClassConclusion.Visitor<I, ?> preprocessor_;
 	/**
-	 * a {@link ClassConclusionVisitor} that is called next and returns the output
+	 * a {@link ClassConclusion.Visitor} that is called next and returns the output
 	 */
-	final private ClassConclusionVisitor<? super I, O> visitor_;
+	final private ClassConclusion.Visitor<? super I, O> visitor_;
 
-	public PreprocessedConclusionVisitor(ClassConclusionVisitor<I, ?> preprocessor,
-			ClassConclusionVisitor<? super I, O> visitor) {
+	public PreprocessedConclusionVisitor(ClassConclusion.Visitor<I, ?> preprocessor,
+			ClassConclusion.Visitor<? super I, O> visitor) {
 		this.preprocessor_ = preprocessor;
 		this.visitor_ = visitor;
 	}

@@ -28,7 +28,6 @@ import java.util.Set;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractClassConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferencePremiseVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
@@ -36,7 +35,7 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 class ProofUnwindingState<I extends ClassConclusion, J extends ProofUnwindingJob<I>> {
 
-	public final static ClassConclusionVisitor<ProofUnwindingState<?, ?>, Void> CONCLUSION_INSERTION_VISITOR = new ConclusionInsertionVisitor();
+	public final static ClassConclusion.Visitor<ProofUnwindingState<?, ?>, Void> CONCLUSION_INSERTION_VISITOR = new ConclusionInsertionVisitor();
 
 	public final static ClassInferenceVisitor<ProofUnwindingState<?, ?>, Void> PREMISE_INSERTION_VISITOR = new ClassInferencePremiseVisitor<ProofUnwindingState<?, ?>, Void>(
 			CONCLUSION_INSERTION_VISITOR);

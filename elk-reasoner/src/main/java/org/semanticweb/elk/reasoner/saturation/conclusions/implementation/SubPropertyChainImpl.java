@@ -26,8 +26,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectPropertyConclusionVisitor;
 
 /**
  * An implementation of {@link SubPropertyChain}
@@ -60,8 +60,13 @@ public class SubPropertyChainImpl extends AbstractObjectPropertyConclusion
 	}
 
 	@Override
-	public <I, O> O accept(ObjectPropertyConclusionVisitor<I, O> visitor,
+	public <I, O> O accept(ObjectPropertyConclusion.Visitor<I, O> visitor,
 			I input) {
+		return visitor.visit(this, input);
+	}
+
+	@Override
+	public <I, O> O accept(SubPropertyChain.Visitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
 

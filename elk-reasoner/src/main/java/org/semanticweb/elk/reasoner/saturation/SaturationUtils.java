@@ -27,13 +27,13 @@ package org.semanticweb.elk.reasoner.saturation;
 
 import java.util.Arrays;
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedClassConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionCounter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.CountingClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.PreprocessedConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.TimedConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.TimedClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextStatistics;
 import org.semanticweb.elk.reasoner.saturation.rules.BasicRuleVisitor;
@@ -109,13 +109,13 @@ public class SaturationUtils {
 
 	/**
 	 * @param visitors
-	 * @return A {@link ClassConclusionVisitor} that applies the given
-	 *         {@link ClassConclusionVisitor}s consequently until one of them returns
-	 *         {@code false}. {@link ClassConclusionVisitor}s that are {@code null}
+	 * @return A {@link ClassConclusion.Visitor} that applies the given
+	 *         {@link ClassConclusion.Visitor}s consequently until one of them returns
+	 *         {@code false}. {@link ClassConclusion.Visitor}s that are {@code null}
 	 *         are ignored.
 	 */
-	public static <I> ClassConclusionVisitor<? super I, Boolean> compose(
-			ClassConclusionVisitor<? super I, Boolean>... visitors) {
+	public static <I> ClassConclusion.Visitor<? super I, Boolean> compose(
+			ClassConclusion.Visitor<? super I, Boolean>... visitors) {
 		return new ComposedClassConclusionVisitor<I>(removeNulls(visitors));
 
 	}
@@ -138,7 +138,7 @@ public class SaturationUtils {
 		return Arrays.copyOf(input, pos);
 	}
 
-	public static ClassConclusionVisitor<? super Context, Boolean> getCountingConclusionVisitor(
+	public static ClassConclusion.Visitor<? super Context, Boolean> getCountingConclusionVisitor(
 			ClassConclusionCounter counter) {
 		if (!COLLECT_CONCLUSION_COUNTS)
 			return null;
@@ -146,21 +146,21 @@ public class SaturationUtils {
 		return new CountingClassConclusionVisitor<Context>(counter);
 	}
 
-	public static ClassConclusionVisitor<? super Context, Boolean> getProcessedConclusionCountingVisitor(
+	public static ClassConclusion.Visitor<? super Context, Boolean> getProcessedConclusionCountingVisitor(
 			SaturationStatistics statistics) {
 		return getCountingConclusionVisitor(statistics
 				.getConclusionStatistics().getProcessedConclusionCounts());
 	}
 
-	public static ClassConclusionVisitor<? super Context, Boolean> getUsedConclusionCountingVisitor(
+	public static ClassConclusion.Visitor<? super Context, Boolean> getUsedConclusionCountingVisitor(
 			SaturationStatistics statistics) {
 		statistics.getConclusionStatistics().startMeasurements();
 		return getCountingConclusionVisitor(statistics
 				.getConclusionStatistics().getUsedConclusionCounts());
 	}
 
-	public static ClassConclusionVisitor<? super Context, Boolean> getUsedConclusionCountingProcessor(
-			ClassConclusionVisitor<? super Context, Boolean> ruleProcessor,
+	public static ClassConclusion.Visitor<? super Context, Boolean> getUsedConclusionCountingProcessor(
+			ClassConclusion.Visitor<? super Context, Boolean> ruleProcessor,
 			SaturationStatistics localStatistics) {
 		if (COLLECT_CONCLUSION_COUNTS) {
 			return new PreprocessedConclusionVisitor<Context, Boolean>(
@@ -171,13 +171,13 @@ public class SaturationUtils {
 		return ruleProcessor;
 	}
 
-	public static <O> ClassConclusionVisitor<? super Context, O> getTimedConclusionVisitor(
-			ClassConclusionVisitor<? super Context, O> conclusionVisitor,
+	public static <O> ClassConclusion.Visitor<? super Context, O> getTimedConclusionVisitor(
+			ClassConclusion.Visitor<? super Context, O> conclusionVisitor,
 			SaturationStatistics localStatistics) {
 
 		ConclusionStatistics stats = localStatistics.getConclusionStatistics();
 		if (COLLECT_CONCLUSION_TIMES) {
-			return new TimedConclusionVisitor<Context, O>(
+			return new TimedClassConclusionVisitor<Context, O>(
 					stats.getConclusionTimers(), conclusionVisitor);
 		}
 		return conclusionVisitor;

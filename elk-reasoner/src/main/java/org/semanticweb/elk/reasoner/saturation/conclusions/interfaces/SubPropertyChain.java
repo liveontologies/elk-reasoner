@@ -37,6 +37,8 @@ public interface SubPropertyChain extends ObjectPropertyConclusion {
 
 	public IndexedPropertyChain getSuperChain();
 
+	public <I, O> O accept(Visitor<I, O> visitor, I input);
+	
 	/**
 	 * A factory for creating instances
 	 * 
@@ -49,5 +51,21 @@ public interface SubPropertyChain extends ObjectPropertyConclusion {
 				IndexedPropertyChain superChain);
 
 	}
-	
+
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <I>
+	 *            the type of the input
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<I, O> {
+
+		public O visit(SubPropertyChain conclusion, I input);
+
+	}
+
 }

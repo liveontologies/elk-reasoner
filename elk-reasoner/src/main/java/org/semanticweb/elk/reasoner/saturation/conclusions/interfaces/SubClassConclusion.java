@@ -24,14 +24,14 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 
 /**
- * A {@link ClassConclusion} that can be used in inferences that are assigned with a
- * {@link IndexedObjectProperty} sub-root
+ * A {@link ClassConclusion} that can be used in inferences that are assigned
+ * with a {@link IndexedObjectProperty} sub-root
  * {@link SubClassConclusion#getConclusionSubRoot()} in addition to the
- * {@link IndexedClassExpression} root {@link ClassConclusion#getConclusionRoot()} .
+ * {@link IndexedClassExpression} root
+ * {@link ClassConclusion#getConclusionRoot()} .
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -40,8 +40,8 @@ public interface SubClassConclusion extends ClassConclusion {
 
 	/**
 	 * @return the {@link IndexedObjectProperty} associated with the inferences
-	 *         with which this {@link SubClassConclusion} can be used. All premises
-	 *         of such inferences must return the same {#getSubRoot()}
+	 *         with which this {@link SubClassConclusion} can be used. All
+	 *         premises of such inferences must return the same {#getSubRoot()}
 	 */
 	public IndexedObjectProperty getConclusionSubRoot();
 
@@ -65,8 +65,8 @@ public interface SubClassConclusion extends ClassConclusion {
 	 */
 	public IndexedObjectProperty getOriginSubRoot();
 
-	public <I, O> O accept(SubConclusionVisitor<I, O> visitor, I input);
-	
+	public <I, O> O accept(Visitor<I, O> visitor, I input);
+
 	/**
 	 * A factory for creating instances
 	 * 
@@ -78,6 +78,26 @@ public interface SubClassConclusion extends ClassConclusion {
 				BackwardLink.Factory,
 				Propagation.Factory,
 				SubContextInitialization.Factory {
+
+		// combined interface
+
+	}
+
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <I>
+	 *            the type of the input
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<I, O>
+			extends
+			BackwardLink.Visitor<I, O>,
+			Propagation.Visitor<I, O>,
+				SubContextInitialization.Visitor<I, O> {
 
 		// combined interface
 

@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link ClassConclusionVisitor} that adds the visited {@link ClassConclusion} into the
+ * A {@link ClassConclusion.Visitor} that adds the visited {@link ClassConclusion} into the
  * given {@link Context}. The visit method returns {@link true} if the
  * {@link Context} was modified as the result of this operation, i.e., the
  * {@link ClassConclusion} was not contained in the {@link Context}. Additionally,

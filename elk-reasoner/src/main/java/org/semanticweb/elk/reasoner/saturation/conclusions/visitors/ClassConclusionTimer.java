@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContext
 
 /**
  * An object which can be used to measure the time spent on processing
- * {@link ClassConclusion}s using {@link ClassConclusionVisitor}.
+ * {@link ClassConclusion}s using {@link ClassConclusion.Visitor}.
  * 
  * @author "Yevgeny Kazakov"
  * 

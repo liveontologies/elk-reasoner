@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitors;
 
 /**
- * A {@link ClassConclusionVisitor} that applies local rules (rules producing only
+ * A {@link ClassConclusion.Visitor} that applies local rules (rules producing only
  * {@link ClassConclusion}s with the same origin root and sub-root as for the
  * premise) for visited {@link ClassConclusion}s using the provided
  * {@link RuleVisitor} and {@link ClassConclusionProducer}.
@@ -49,15 +49,15 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitors;
  * @author "Yevgeny Kazakov"
  * 
  * @see Rule#isLocal()
- * @see RuleApplicationClassConclusionVisitor
+ * @see RuleApplicationClassConclusion.Visitor
  */
 public class LocalRuleApplicationClassConclusionVisitor extends
 		AbstractClassConclusionVisitor<Context, Boolean> {
 
 	/**
-	 * {@link ClassConclusionVisitor} applying local rules
+	 * {@link ClassConclusion.Visitor} applying local rules
 	 */
-	private final ClassConclusionVisitor<? super ContextPremises, Boolean> localRuleApplicator_;
+	private final ClassConclusion.Visitor<? super ContextPremises, Boolean> localRuleApplicator_;
 
 	/**
 	 * the main {@link SaturationState} to take the non-local premises from

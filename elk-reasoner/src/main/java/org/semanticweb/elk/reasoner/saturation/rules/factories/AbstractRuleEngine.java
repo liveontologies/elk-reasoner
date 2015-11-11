@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.Interrupter;
@@ -32,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * An engine to concurrently processing pending {@link ClassConclusion}s within the
- * corresponding {@link Context}s using a supplied {@link ClassConclusionVisitor}.
+ * corresponding {@link Context}s using a supplied {@link ClassConclusion.Visitor}.
  * The {@link ClassConclusion}s are retrieved by {@link Context#takeToDo()}.
  * 
  * @author "Yevgeny Kazakov"
@@ -49,7 +48,7 @@ public abstract class AbstractRuleEngine<I extends RuleApplicationInput>
 	 * Specifies what to do with {@link ClassConclusion}s within the processed
 	 * {@link Context}
 	 */
-	private final ClassConclusionVisitor<? super Context, ?> conclusionProcessor_;
+	private final ClassConclusion.Visitor<? super Context, ?> conclusionProcessor_;
 
 	/**
 	 * Accumulates the produced {@link ClassConclusion}s that should be processed
@@ -64,7 +63,7 @@ public abstract class AbstractRuleEngine<I extends RuleApplicationInput>
 	private final Interrupter interrupter_;
 
 	public AbstractRuleEngine(
-			ClassConclusionVisitor<? super Context, ?> conclusionProcessor,
+			ClassConclusion.Visitor<? super Context, ?> conclusionProcessor,
 			WorkerLocalTodo localizedProducer, Interrupter interrupter) {
 		this.conclusionProcessor_ = conclusionProcessor;
 		this.workerLocalTodo_ = localizedProducer;

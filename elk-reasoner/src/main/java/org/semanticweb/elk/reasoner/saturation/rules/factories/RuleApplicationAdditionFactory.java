@@ -27,9 +27,8 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ContextInitializingClassConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionSourceContextNotSaturatedCheckingVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ContextInitializingClassConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.RuleApplicationClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
@@ -57,7 +56,7 @@ public class RuleApplicationAdditionFactory<I extends RuleApplicationInput>
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected ClassConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
+	protected ClassConclusion.Visitor<? super Context, Boolean> getConclusionProcessor(
 			RuleVisitor<?> ruleVisitor,
 			SaturationStateWriter<? extends Context> writer,
 			SaturationStatistics localStatistics) {

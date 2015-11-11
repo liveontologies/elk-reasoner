@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
- * A {@link ClassConclusionVisitor} that marks the source {@link Context} of the
+ * A {@link ClassConclusion.Visitor} that marks the source {@link Context} of the
  * {@link ClassConclusion} as not saturated if the {@link ClassConclusion} can potentially
  * be re-derived. The visit method returns always {@link true}.
  * 

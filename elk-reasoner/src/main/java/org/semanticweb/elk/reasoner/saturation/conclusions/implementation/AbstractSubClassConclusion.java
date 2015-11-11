@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubClassConclusion;
 
 /**
@@ -53,4 +54,9 @@ public abstract class AbstractSubClassConclusion extends AbstractClassConclusion
 		return this.subRoot_;
 	}
 
+	@Override
+	public <I, O> O accept(ClassConclusion.Visitor<I, O> visitor, I input) {
+		return accept((SubClassConclusion.Visitor<I, O>) visitor, input);
+	}
+	
 }

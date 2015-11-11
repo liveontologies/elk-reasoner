@@ -24,9 +24,6 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectPropertyConclusionVisitor;
-
-
 /**
  * The interface for objects representing object property inferences. Used
  * primarily for tracing.
@@ -37,8 +34,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectProper
  */
 public interface ObjectPropertyConclusion {
 
-	public <I, O> O accept(ObjectPropertyConclusionVisitor<I, O> visitor, I input);
-	
+	public <I, O> O accept(Visitor<I, O> visitor, I input);
+
 	/**
 	 * A factory for creating instances
 	 * 
@@ -46,6 +43,22 @@ public interface ObjectPropertyConclusion {
 	 *
 	 */
 	interface Factory extends SubPropertyChain.Factory {
+
+		// combined interface
+
+	}
+
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <I>
+	 *            the type of the input
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<I, O> extends SubPropertyChain.Visitor<I, O> {
 
 		// combined interface
 

@@ -25,8 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubClassConclusion;
 
 /**
  * An implementation of {@link BackwardLink}
@@ -65,12 +65,17 @@ public class BackwardLinkImpl extends AbstractSubClassConclusion implements
 	}
 
 	@Override
-	public <I, O> O accept(ClassConclusionVisitor<I, O> visitor, I input) {
-		return accept((SubConclusionVisitor<I, O>) visitor, input);
+	public <I, O> O accept(ClassConclusion.Visitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
 
 	@Override
-	public <I, O> O accept(SubConclusionVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(SubClassConclusion.Visitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
+	}	
+
+	@Override
+	public <I, O> O accept(BackwardLink.Visitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
 

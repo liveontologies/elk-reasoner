@@ -28,7 +28,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubClassCo
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 
 /**
- * A skeleton for implementation of {@link SubConclusionVisitor}s using a common
+ * A skeleton for implementation of {@link SubClassConclusion.Visitor}s using a common
  * (default) method
  * 
  * @author "Yevgeny Kazakov"
@@ -38,8 +38,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContext
  * @param <O>
  *            the type of output parameter with which this visitor works
  */
-public abstract class AbstractSubConclusionVisitor<I, O> implements
-		SubConclusionVisitor<I, O> {
+public abstract class AbstractSubClassConclusionVisitor<I, O> implements
+		SubClassConclusion.Visitor<I, O> {
 
 	abstract O defaultVisit(SubClassConclusion subConclusion, I input);
 

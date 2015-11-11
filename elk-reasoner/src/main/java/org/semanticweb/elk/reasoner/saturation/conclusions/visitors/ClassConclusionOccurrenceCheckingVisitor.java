@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link ClassConclusionVisitor} that checks if visited {@link ClassConclusion} is
+ * A {@link ClassConclusion.Visitor} that checks if visited {@link ClassConclusion} is
  * contained the given {@link ClassConclusionSet}. The visit method returns {@link
  * true} if the {@link ClassConclusionSet} is occurs in the {@link ClassConclusionSet} and
  * {@link false} otherwise.

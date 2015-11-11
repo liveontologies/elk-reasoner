@@ -25,10 +25,11 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
 /**
- * A {@link ClassConclusion} representing a subsumer {@link IndexedClassExpression}
- * of the root. Intuitively, if a subclass axiom {@code SubClassOf(:A :B)} is
- * derived by inference rules, then this axiom corresponds to a {@link Subsumer}
- * with root {@code :A} and expression {@code :B}.
+ * A {@link ClassConclusion} representing a subsumer
+ * {@link IndexedClassExpression} of the root. Intuitively, if a subclass axiom
+ * {@code SubClassOf(:A :B)} is derived by inference rules, then this axiom
+ * corresponds to a {@link Subsumer} with root {@code :A} and expression
+ * {@code :B}.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
@@ -41,6 +42,8 @@ public interface Subsumer extends ClassConclusion {
 	 *         {@link Subsumer}
 	 */
 	public IndexedClassExpression getExpression();
+
+	public <I, O> O accept(Visitor<I, O> visitor, I input);
 	
 	/**
 	 * A factory for creating instances
@@ -48,11 +51,32 @@ public interface Subsumer extends ClassConclusion {
 	 * @author Yevgeny Kazakov
 	 *
 	 */
-	interface Factory extends ComposedSubsumer.Factory, DecomposedSubsumer.Factory {
+	interface Factory
+			extends
+				ComposedSubsumer.Factory,
+				DecomposedSubsumer.Factory {
 
 		// combined interface
 
 	}
-	
+
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <I>
+	 *            the type of the input
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<I, O>
+			extends
+				ComposedSubsumer.Visitor<I, O>,
+				DecomposedSubsumer.Visitor<I, O> {
+
+		// combined interface
+
+	}
 
 }

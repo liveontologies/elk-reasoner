@@ -52,6 +52,8 @@ public interface ForwardLink extends ClassConclusion {
 	 */
 	public IndexedContextRoot getTarget();
 	
+	public <I, O> O accept(Visitor<I, O> visitor, I input);
+	
 	/**
 	 * A factory for creating instances
 	 * 
@@ -64,6 +66,23 @@ public interface ForwardLink extends ClassConclusion {
 				IndexedPropertyChain forwardChain, IndexedContextRoot target);
 
 	}
+	
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <I>
+	 *            the type of the input
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<I, O> {
+
+		public O visit(ForwardLink conclusion, I input);
+
+	}
+
 
 
 }

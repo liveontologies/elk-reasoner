@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConcl
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusionEquality;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusionHash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusionPrinter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 
 /**
  * A skeleton for implementation of {@link ClassConclusion}.
@@ -69,6 +70,11 @@ public abstract class AbstractClassConclusion implements ClassConclusion {
 	@Override
 	public String toString() {
 		return ClassConclusionPrinter.toString(this);
+	}
+	
+	@Override
+	public <I, O> O accept(Conclusion.Visitor<I, O> visitor, I input) {
+		return accept((ClassConclusion.Visitor<I, O>) visitor, input);
 	}
 
 }

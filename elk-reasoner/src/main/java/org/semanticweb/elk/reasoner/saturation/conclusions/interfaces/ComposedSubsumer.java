@@ -35,6 +35,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 public interface ComposedSubsumer extends Subsumer {
 
 	public static final String NAME = "Composed Subsumer";
+
+	public <I, O> O accept(Visitor<I, O> visitor, I input);
 	
 	/**
 	 * A factory for creating instances
@@ -46,6 +48,22 @@ public interface ComposedSubsumer extends Subsumer {
 
 		ComposedSubsumer getComposedSubsumer(IndexedContextRoot root,
 				IndexedClassExpression subsumer);
+
+	}
+
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <I>
+	 *            the type of the input
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<I, O> {
+
+		public O visit(ComposedSubsumer conclusion, I input);
 
 	}
 

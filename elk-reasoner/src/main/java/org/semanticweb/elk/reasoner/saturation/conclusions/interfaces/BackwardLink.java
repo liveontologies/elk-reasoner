@@ -58,6 +58,8 @@ public interface BackwardLink extends SubClassConclusion {
 	 */
 	@Override
 	public IndexedContextRoot getOriginRoot();
+	
+	public <I, O> O accept(Visitor<I, O> visitor, I input);
 
 	/**
 	 * A factory for creating instances
@@ -69,6 +71,22 @@ public interface BackwardLink extends SubClassConclusion {
 
 		BackwardLink getBackwardLink(IndexedContextRoot root,
 				IndexedObjectProperty relation, IndexedContextRoot source);
+
+	}
+	
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <I>
+	 *            the type of the input
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<I, O> {
+
+		public O visit(BackwardLink conclusion, I input);
 
 	}
 

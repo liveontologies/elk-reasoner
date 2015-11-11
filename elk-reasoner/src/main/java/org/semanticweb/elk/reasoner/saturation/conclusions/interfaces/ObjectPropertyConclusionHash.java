@@ -23,15 +23,14 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectPropertyConclusionVisitor;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 import org.semanticweb.elk.util.hashing.Hasher;
 
 public class ObjectPropertyConclusionHash implements
-		ObjectPropertyConclusionVisitor<Void, Integer>,
+		ObjectPropertyConclusion.Visitor<Void, Integer>,
 		Hasher<ObjectPropertyConclusion> {
 
-	private static final ObjectPropertyConclusionVisitor<Void, Integer> INSTANCE_ = new ObjectPropertyConclusionHash();
+	private static final ObjectPropertyConclusion.Visitor<Void, Integer> INSTANCE_ = new ObjectPropertyConclusionHash();
 
 	private static int combinedHashCode(int... hashes) {
 		return HashGenerator.combineListHash(hashes);

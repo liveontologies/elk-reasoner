@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubPropert
  *         pavel.klinov@uni-ulm.de
  */
 public abstract class AbstractObjectPropertyConclusionVIsitor<I, O> implements
-		ObjectPropertyConclusionVisitor<I, O> {
+		ObjectPropertyConclusion.Visitor<I, O> {
 
 	protected abstract O defaultVisit(ObjectPropertyConclusion conclusion,
 			I input);

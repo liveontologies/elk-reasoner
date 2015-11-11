@@ -29,9 +29,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.AbstractClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ForwardLinkInferenceVisitor;
 
@@ -82,7 +82,12 @@ public class DecomposedExistentialForwardLink extends AbstractClassConclusion
 	}
 
 	@Override
-	public <I, O> O accept(ClassConclusionVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(ClassConclusion.Visitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
+	}
+	
+	@Override
+	public <I, O> O accept(ForwardLink.Visitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
 

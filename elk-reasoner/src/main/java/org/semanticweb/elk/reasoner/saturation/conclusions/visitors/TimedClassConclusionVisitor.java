@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
@@ -33,13 +34,13 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagatio
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
-public class TimedConclusionVisitor<I, O> implements ClassConclusionVisitor<I, O> {
+public class TimedClassConclusionVisitor<I, O> implements ClassConclusion.Visitor<I, O> {
 
-	private final ClassConclusionVisitor<? super I, O> processor_;
+	private final ClassConclusion.Visitor<? super I, O> processor_;
 	private final ClassConclusionTimer timer_;
 
-	public TimedConclusionVisitor(ClassConclusionTimer timer,
-			ClassConclusionVisitor<? super I, O> processor) {
+	public TimedClassConclusionVisitor(ClassConclusionTimer timer,
+			ClassConclusion.Visitor<? super I, O> processor) {
 		this.timer_ = timer;
 		this.processor_ = processor;
 	}

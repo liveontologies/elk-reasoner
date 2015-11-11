@@ -25,11 +25,10 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 import org.semanticweb.elk.owl.comparison.ElkObjectHash;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 import org.semanticweb.elk.util.hashing.Hasher;
 
-public class ClassConclusionHash implements ClassConclusionVisitor<Void, Integer>,
+public class ClassConclusionHash implements ClassConclusion.Visitor<Void, Integer>,
 		Hasher<ClassConclusion> {
 
 	private static final ClassConclusionHash INSTANCE_ = new ClassConclusionHash();

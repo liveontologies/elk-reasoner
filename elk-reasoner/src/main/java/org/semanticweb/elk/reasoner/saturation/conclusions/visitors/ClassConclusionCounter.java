@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContext
 
 /**
  * An object which can be used to count {@link ClassConclusion}s. The fields of the
- * counter correspond to the methods of {@link ClassConclusionVisitor}.
+ * counter correspond to the methods of {@link ClassConclusion.Visitor}.
  * 
  * @author "Yevgeny Kazakov"
  */

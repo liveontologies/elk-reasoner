@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
  */
 
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextStatistics;
 import org.semanticweb.elk.util.concurrent.computation.Interrupter;
@@ -60,7 +60,7 @@ public abstract class AbstractRuleEngineWithStatistics<I extends RuleApplication
 	protected final ContextStatistics localContextStatistics;
 
 	public AbstractRuleEngineWithStatistics(
-			ClassConclusionVisitor<? super Context, ?> conclusionProcessor,
+			ClassConclusion.Visitor<? super Context, ?> conclusionProcessor,
 			WorkerLocalTodo localTodo, Interrupter interrupter,
 			SaturationStatistics aggregatedStats,
 			SaturationStatistics localStatistics) {

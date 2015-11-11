@@ -23,10 +23,9 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectPropertyConclusionVisitor;
 
 public class ObjectPropertyConclusionEquality implements
-		ObjectPropertyConclusionVisitor<Void, ObjectPropertyConclusion> {
+		ObjectPropertyConclusion.Visitor<Void, ObjectPropertyConclusion> {
 
 	private final Object object_;
 

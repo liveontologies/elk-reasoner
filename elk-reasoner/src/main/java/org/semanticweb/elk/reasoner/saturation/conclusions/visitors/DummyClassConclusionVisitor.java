@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 
 /**
- * A {@link ClassConclusionVisitor} that does nothing
+ * A {@link ClassConclusion.Visitor} that does nothing
  * 
  * @author Pavel Klinov
  * 

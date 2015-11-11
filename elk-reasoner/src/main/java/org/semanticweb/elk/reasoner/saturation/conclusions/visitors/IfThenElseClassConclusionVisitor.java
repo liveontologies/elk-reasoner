@@ -34,47 +34,47 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagatio
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 
 /**
- * A {@link ClassConclusionVisitor} that implements an if-then-else statement over
- * the three given {@link ClassConclusionVisitor}s. If the visit method of the first
- * (Boolean) {@link ClassConclusionVisitor} returns {@code true} for the given
- * {@link ClassConclusion}, the second {@link ClassConclusionVisitor} is called on this
- * {@link ClassConclusion}, and otherwise the third {@link ClassConclusionVisitor} is
+ * A {@link ClassConclusion.Visitor} that implements an if-then-else statement over
+ * the three given {@link ClassConclusion.Visitor}s. If the visit method of the first
+ * (Boolean) {@link ClassConclusion.Visitor} returns {@code true} for the given
+ * {@link ClassConclusion}, the second {@link ClassConclusion.Visitor} is called on this
+ * {@link ClassConclusion}, and otherwise the third {@link ClassConclusion.Visitor} is
  * called on this {@link ClassConclusion}.
  * 
  * @author "Yevgeny Kazakov"
  */
 public class IfThenElseClassConclusionVisitor<I, O> implements
-		ClassConclusionVisitor<I, O> {
+		ClassConclusion.Visitor<I, O> {
 
-	final private ClassConclusionVisitor<? super I, Boolean> check_;
+	final private ClassConclusion.Visitor<? super I, Boolean> check_;
 
-	final private ClassConclusionVisitor<? super I, O> doFalse_;
+	final private ClassConclusion.Visitor<? super I, O> doFalse_;
 
-	final private ClassConclusionVisitor<? super I, O> doTrue_;
+	final private ClassConclusion.Visitor<? super I, O> doTrue_;
 
 	/**
-	 * Creates a new {@link ClassConclusionVisitor} that implements an if-then-else
-	 * statement over the three given {@link ClassConclusionVisitor}s. If the visit
-	 * method of the first (Boolean) {@link ClassConclusionVisitor} returns
+	 * Creates a new {@link ClassConclusion.Visitor} that implements an if-then-else
+	 * statement over the three given {@link ClassConclusion.Visitor}s. If the visit
+	 * method of the first (Boolean) {@link ClassConclusion.Visitor} returns
 	 * {@code true} for the given {@link ClassConclusion}, the second
-	 * {@link ClassConclusionVisitor} is called on this {@link ClassConclusion}, and
-	 * otherwise the third {@link ClassConclusionVisitor} is called on this
+	 * {@link ClassConclusion.Visitor} is called on this {@link ClassConclusion}, and
+	 * otherwise the third {@link ClassConclusion.Visitor} is called on this
 	 * {@link ClassConclusion}.
 	 * 
 	 * @param check
-	 *            The {@link ClassConclusionVisitor} that is used to evaluated a
+	 *            The {@link ClassConclusion.Visitor} that is used to evaluated a
 	 *            condition
 	 * @param doTrue
-	 *            The {@link ClassConclusionVisitor} that is called when the
+	 *            The {@link ClassConclusion.Visitor} that is called when the
 	 *            condition is evaluated {@code true}
 	 * @param doFalse
-	 *            The {@link ClassConclusionVisitor} that is called when the
+	 *            The {@link ClassConclusion.Visitor} that is called when the
 	 *            condition is evaluated {@code false}
 	 */
 	public IfThenElseClassConclusionVisitor(
-			ClassConclusionVisitor<? super I, Boolean> check,
-			ClassConclusionVisitor<? super I, O> doTrue,
-			ClassConclusionVisitor<? super I, O> doFalse) {
+			ClassConclusion.Visitor<? super I, Boolean> check,
+			ClassConclusion.Visitor<? super I, O> doTrue,
+			ClassConclusion.Visitor<? super I, O> doFalse) {
 		this.check_ = check;
 		this.doTrue_ = doTrue;
 		this.doFalse_ = doFalse;

@@ -29,9 +29,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link ClassConclusionVisitor} that localizes the input {@link Context} within
+ * A {@link ClassConclusion.Visitor} that localizes the input {@link Context} within
  * the given {@link SaturationState} and passes it to the given internal
- * {@link ClassConclusionVisitor}. Localization means that the {@link Context} is
+ * {@link ClassConclusion.Visitor}. Localization means that the {@link Context} is
  * converted to the corresponding {@link Context} within the given
  * {@link SaturationState} (i.e., with the same root). If the localized context
  * does not exist, the visitor returns {@code false}.
@@ -46,9 +46,9 @@ public class LocalizedClassConclusionVisitor extends
 			.getLogger(LocalizedClassConclusionVisitor.class);
 
 	/**
-	 * the {@link ClassConclusionVisitor} to be localized
+	 * the {@link ClassConclusion.Visitor} to be localized
 	 */
-	ClassConclusionVisitor<? super Context, Boolean> visitor_;
+	ClassConclusion.Visitor<? super Context, Boolean> visitor_;
 
 	/**
 	 * the {@link SaturationState} used to localize {@link Context}s
@@ -56,7 +56,7 @@ public class LocalizedClassConclusionVisitor extends
 	SaturationState<?> state_;
 
 	public LocalizedClassConclusionVisitor(
-			ClassConclusionVisitor<? super Context, Boolean> visitor,
+			ClassConclusion.Visitor<? super Context, Boolean> visitor,
 			SaturationState<?> state) {
 		this.visitor_ = visitor;
 		this.state_ = state;

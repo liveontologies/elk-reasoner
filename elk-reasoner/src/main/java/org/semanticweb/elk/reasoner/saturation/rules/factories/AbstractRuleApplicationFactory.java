@@ -30,7 +30,6 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -77,7 +76,7 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 	 *         {@link SaturationStatistics} accordingly
 	 */
 	protected InputProcessor<I> getEngine(
-			ClassConclusionVisitor<? super Context, Boolean> conclusionProcessor,
+			ClassConclusion.Visitor<? super Context, Boolean> conclusionProcessor,
 			SaturationStateWriter<? extends C> saturationStateWriter,
 			WorkerLocalTodo localTodo, SaturationStatistics localStatistics) {
 		conclusionProcessor = SaturationUtils.getTimedConclusionVisitor(
@@ -121,7 +120,7 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 	}
 
 	/**
-	 * An instance of {@link ClassConclusionVisitor} that processes
+	 * An instance of {@link ClassConclusion.Visitor} that processes
 	 * {@link ClassConclusion}s within {@link Context} by an individual worker.
 	 * 
 	 * @param ruleVisitor
@@ -129,7 +128,7 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 	 * @param localStatistics
 	 * @return
 	 */
-	protected abstract ClassConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
+	protected abstract ClassConclusion.Visitor<? super Context, Boolean> getConclusionProcessor(
 			RuleVisitor<?> ruleVisitor, SaturationStateWriter<? extends C> writer,
 			SaturationStatistics localStatistics);
 

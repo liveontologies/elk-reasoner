@@ -49,10 +49,10 @@ public interface DisjointSubsumer extends ClassConclusion {
 	 *         belongs
 	 */
 	public IndexedClassExpressionList getDisjointExpressions();
-	
+
 	/**
 	 * @return the position of the {@link IndexedClassExpressionList} at which
-	 * 	       the member occurs
+	 *         the member occurs
 	 */
 	public int getPosition();
 
@@ -61,6 +61,8 @@ public interface DisjointSubsumer extends ClassConclusion {
 	 *         {@link IndexedClassExpressionList}
 	 */
 	public ElkAxiom getReason();
+
+	public <I, O> O accept(Visitor<I, O> visitor, I input);
 	
 	/**
 	 * A factory for creating instances
@@ -76,5 +78,20 @@ public interface DisjointSubsumer extends ClassConclusion {
 
 	}
 
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <I>
+	 *            the type of the input
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<I, O> {
+
+		public O visit(DisjointSubsumer conclusion, I input);
+
+	}
 
 }

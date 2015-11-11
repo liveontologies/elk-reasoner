@@ -45,7 +45,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContext
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ClassConclusionEqualityChecker implements ClassConclusionVisitor<ClassConclusion, Boolean> {
+public class ClassConclusionEqualityChecker implements ClassConclusion.Visitor<ClassConclusion, Boolean> {
 
 	public static boolean equal(ClassConclusion first, ClassConclusion second) {
 		if (first.getOriginRoot() != second.getOriginRoot()) {

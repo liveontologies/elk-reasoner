@@ -27,16 +27,16 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
@@ -45,7 +45,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLin
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
@@ -71,9 +70,9 @@ import org.semanticweb.elk.util.concurrent.collections.SynchronizedArrayListActi
  */
 public class ContextImpl implements ExtendedContext {
 
-	private static final ClassConclusionVisitor<ContextImpl, Boolean> CONCLUSION_INSERTER_ = new ConclusionInserter();
-	private static final ClassConclusionVisitor<ContextImpl, Boolean> CONCLUSION_DELETER_ = new ConclusionDeleter();
-	private static final ClassConclusionVisitor<ContextImpl, Boolean> CONCLUSION_OCCURRENCE_CHECKER_ = new ConclusionOccurrenceChecker();
+	private static final ClassConclusion.Visitor<ContextImpl, Boolean> CONCLUSION_INSERTER_ = new ConclusionInserter();
+	private static final ClassConclusion.Visitor<ContextImpl, Boolean> CONCLUSION_DELETER_ = new ConclusionDeleter();
+	private static final ClassConclusion.Visitor<ContextImpl, Boolean> CONCLUSION_OCCURRENCE_CHECKER_ = new ConclusionOccurrenceChecker();
 
 	/**
 	 * the rules that should be applied to each derived {@link BackwardLinkImpl}
@@ -337,7 +336,7 @@ public class ContextImpl implements ExtendedContext {
 	}
 
 	private static class ConclusionInserter implements
-			ClassConclusionVisitor<ContextImpl, Boolean> {
+			ClassConclusion.Visitor<ContextImpl, Boolean> {
 
 		@Override
 		public Boolean visit(BackwardLink subConclusion, ContextImpl input) {
@@ -429,7 +428,7 @@ public class ContextImpl implements ExtendedContext {
 	}
 
 	private static class ConclusionDeleter implements
-			ClassConclusionVisitor<ContextImpl, Boolean> {
+			ClassConclusion.Visitor<ContextImpl, Boolean> {
 
 		@Override
 		public Boolean visit(BackwardLink subConclusion, ContextImpl input) {
@@ -529,7 +528,7 @@ public class ContextImpl implements ExtendedContext {
 	}
 
 	private static class ConclusionOccurrenceChecker implements
-			ClassConclusionVisitor<ContextImpl, Boolean> {
+			ClassConclusion.Visitor<ContextImpl, Boolean> {
 
 		@Override
 		public Boolean visit(BackwardLink subConclusion, ContextImpl input) {

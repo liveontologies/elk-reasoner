@@ -42,6 +42,8 @@ public interface ContextInitialization extends ClassConclusion {
 	 * @return the rules that should be applied for context initializations
 	 */
 	public LinkedContextInitRule getContextInitRuleHead();
+
+	public <I, O> O accept(Visitor<I, O> visitor, I input);
 	
 	/**
 	 * A factory for creating instances
@@ -53,6 +55,22 @@ public interface ContextInitialization extends ClassConclusion {
 
 		ContextInitialization getContextInitialization(IndexedContextRoot root,
 				OntologyIndex ontologyIndex);
+
+	}
+
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <I>
+	 *            the type of the input
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<I, O> {
+
+		public O visit(ContextInitialization conclusion, I input);
 
 	}
 
