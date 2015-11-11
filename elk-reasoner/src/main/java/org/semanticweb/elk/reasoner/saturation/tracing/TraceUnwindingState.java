@@ -26,7 +26,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
@@ -35,7 +35,7 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 /**
  * The state of the recursive trace unwinding procedure for some
- * {@link Conclusion} in some {@link Context} identified by its root.
+ * {@link ClassConclusion} in some {@link Context} identified by its root.
  * 
  * This state is not thread-safe.
  * 
@@ -45,7 +45,7 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  */
 public class TraceUnwindingState {
 
-	private final Queue<Conclusion> classConclusionsToUnwind_;
+	private final Queue<ClassConclusion> classConclusionsToUnwind_;
 
 	private final Queue<ObjectPropertyConclusion> propertyConclusionsToUnwind_;
 
@@ -54,13 +54,13 @@ public class TraceUnwindingState {
 	private final Set<ObjectPropertyInference> processedPropertyInferences_;
 
 	public TraceUnwindingState() {
-		classConclusionsToUnwind_ = new LinkedList<Conclusion>();
+		classConclusionsToUnwind_ = new LinkedList<ClassConclusion>();
 		propertyConclusionsToUnwind_ = new LinkedList<ObjectPropertyConclusion>();
 		processedClassInferences_ = new ArrayHashSet<ClassInference>();
 		processedPropertyInferences_ = new ArrayHashSet<ObjectPropertyInference>();
 	}
 
-	public void addToClassUnwindingQueue(Conclusion conclusion) {
+	public void addToClassUnwindingQueue(ClassConclusion conclusion) {
 		classConclusionsToUnwind_.add(conclusion);
 	}
 
@@ -68,7 +68,7 @@ public class TraceUnwindingState {
 		propertyConclusionsToUnwind_.add(conclusion);
 	}
 
-	public Conclusion pollFromClassUnwindingQueue() {
+	public ClassConclusion pollFromClassUnwindingQueue() {
 		return classConclusionsToUnwind_.poll();
 	}
 

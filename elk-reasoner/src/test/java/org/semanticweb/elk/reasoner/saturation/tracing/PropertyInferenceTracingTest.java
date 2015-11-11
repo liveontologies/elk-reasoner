@@ -44,6 +44,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ConclusionBaseFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
@@ -64,6 +66,8 @@ import org.slf4j.LoggerFactory;
 public class PropertyInferenceTracingTest {
 	
 	private static final Logger LOGGER_ = LoggerFactory.getLogger(PropertyInferenceTracingTest.class);
+
+	private static final Conclusion.Factory FACTORY_ = new ConclusionBaseFactory();
 	
 	@Rule public TestName testName = new TestName();
 
@@ -107,7 +111,7 @@ public class PropertyInferenceTracingTest {
 						// checking that S -> HH is in the trace (i.e. is used)
 						return inference.getSubChain().equals(s) && 
 								inference.getSuperChain().equals(hh) &&
-								inference.getPremise().getSubChain().equals(r);
+								inference.getPremise(FACTORY_).getSubChain().equals(r);
 					}
 			
 				});
@@ -160,8 +164,8 @@ public class PropertyInferenceTracingTest {
 					public Boolean visit(ComposedForwardLink conclusion,
 							IndexedContextRoot input) {
 						// looking for the composition S o H -> SS o HH
-						SubPropertyChain left = conclusion.getSecondPremise();
-						SubPropertyChain right = conclusion.getFourthPremise();
+						SubPropertyChain left = conclusion.getSecondPremise(FACTORY_);
+						SubPropertyChain right = conclusion.getFourthPremise(FACTORY_);
 						
 							return conclusion.getTarget().equals(dIndexed) &&
 									left.getSubChain().equals(sIndexed) &&
@@ -211,10 +215,10 @@ public class PropertyInferenceTracingTest {
 						// check that we use the inference that A <-R- B and B -SS o HH-> D imply A <-T- D  
 						return backwardLink.getBackwardRelation().equals(tIndexed) &&
 								backwardLink.getOriginRoot().equals(aIndexed) &&
-								backwardLink.getFirstPremise().getOriginRoot().equals(aIndexed) &&
-								backwardLink.getFirstPremise().getBackwardRelation().equals(rIndexed) &&
-								backwardLink.getThirdPremise().getTarget().equals(dIndexed) &&
-								backwardLink.getThirdPremise().getForwardChain().equals(sshhIndexed) &&
+								backwardLink.getFirstPremise(FACTORY_).getOriginRoot().equals(aIndexed) &&
+								backwardLink.getFirstPremise(FACTORY_).getBackwardRelation().equals(rIndexed) &&
+								backwardLink.getThirdPremise(FACTORY_).getTarget().equals(dIndexed) &&
+								backwardLink.getThirdPremise(FACTORY_).getForwardChain().equals(sshhIndexed) &&
 								backwardLink.getBackwardRelation().equals(tIndexed);
 					}
 

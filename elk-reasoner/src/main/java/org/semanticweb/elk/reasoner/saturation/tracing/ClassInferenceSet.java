@@ -27,12 +27,12 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import java.util.Collections;
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 
 /**
  * An object containing {@link ClassInference}s, which can be used to retrieve
- * inferences producing a given {@link Conclusion}.
+ * inferences producing a given {@link ClassConclusion}.
  * 
  * @author Pavel Klinov
  *
@@ -45,19 +45,19 @@ public interface ClassInferenceSet {
 
 	/**
 	 * @param conclusion
-	 *            the {@link Conclusion} for which return {@link ClassInference}
+	 *            the {@link ClassConclusion} for which return {@link ClassInference}
 	 *            s
 	 * @return the {@link ClassInference}s producing the given
-	 *         {@link Conclusion}
+	 *         {@link ClassConclusion}
 	 */
 	public Iterable<? extends ClassInference> getClassInferences(
-			Conclusion conclusion);
+			ClassConclusion conclusion);
 
 	public final static ClassInferenceSet EMPTY = new ClassInferenceSet() {
 
 		@Override
 		public Iterable<? extends ClassInference> getClassInferences(
-				Conclusion conclusion) {
+				ClassConclusion conclusion) {
 			return Collections.emptyList();
 		}
 

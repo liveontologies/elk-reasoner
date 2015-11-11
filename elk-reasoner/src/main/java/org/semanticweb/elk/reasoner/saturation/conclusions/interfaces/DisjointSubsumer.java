@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 
 /**
  * A {@code Conclusion} representing that some {@link IndexedClassExpression}
@@ -39,7 +40,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionLis
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface DisjointSubsumer extends Conclusion {
+public interface DisjointSubsumer extends ClassConclusion {
 
 	public static final String NAME = "Disjoint Subsumer";
 
@@ -60,5 +61,20 @@ public interface DisjointSubsumer extends Conclusion {
 	 *         {@link IndexedClassExpressionList}
 	 */
 	public ElkAxiom getReason();
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		DisjointSubsumer getDisjointSubsumer(IndexedContextRoot root,
+				IndexedClassExpressionList disjointExpressions, int position,
+				ElkAxiom reason);
+
+	}
+
 
 }

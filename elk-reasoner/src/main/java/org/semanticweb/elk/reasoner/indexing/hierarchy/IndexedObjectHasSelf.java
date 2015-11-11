@@ -28,7 +28,7 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectHasSelfVisito
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedReflexiveBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedReflexiveForwardLink;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 
 /**
  * Represents occurrences of an {@link ElkObjectHasSelf} in an ontology.
@@ -52,7 +52,7 @@ public interface IndexedObjectHasSelf extends IndexedClassExpression {
 	class Helper {
 
 		public static void produceDecomposedExistentialLink(
-				ConclusionProducer producer, IndexedContextRoot root,
+				ClassConclusionProducer producer, IndexedContextRoot root,
 				IndexedObjectHasSelf subsumer) {
 			SaturatedPropertyChain propertySaturation = subsumer.getProperty()
 					.getSaturated();

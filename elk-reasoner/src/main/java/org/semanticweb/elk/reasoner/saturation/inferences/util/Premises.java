@@ -26,8 +26,8 @@ package org.semanticweb.elk.reasoner.saturation.inferences.util;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferencePremiseVisitor;
 import org.semanticweb.elk.util.collections.Condition;
@@ -49,12 +49,12 @@ public class Premises {
 	 * @param condition
 	 * @return
 	 */
-	public static Conclusion find(ClassInference inference, final Condition<Conclusion> premiseCondition) {
-		final AtomicReference<Conclusion> found = new AtomicReference<Conclusion>();
+	public static ClassConclusion find(ClassInference inference, final Condition<ClassConclusion> premiseCondition) {
+		final AtomicReference<ClassConclusion> found = new AtomicReference<ClassConclusion>();
 		
-		inference.accept(new ClassInferencePremiseVisitor<Void, Void>(new AbstractConclusionVisitor<Void, Void>() {
+		inference.accept(new ClassInferencePremiseVisitor<Void, Void>(new AbstractClassConclusionVisitor<Void, Void>() {
 			@Override
-			protected Void defaultVisit(Conclusion premise, Void cxt) {
+			protected Void defaultVisit(ClassConclusion premise, Void cxt) {
 				if (found.get() == null && premiseCondition.holds(premise)) {
 					found.set(premise);
 				}

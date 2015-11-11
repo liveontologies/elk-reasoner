@@ -24,14 +24,15 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ConclusionBaseFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
- * An {@link AbstractRuleEngine} which produces {@link Conclusion}s and
+ * An {@link AbstractRuleEngine} which produces {@link ClassConclusion}s and
  * retrieves active {@link Context}s using the provided
  * {@link SaturationStateWriter}
  * 
@@ -43,13 +44,18 @@ public class BasicRuleEngine<I extends RuleApplicationInput> extends
 	private final OntologyIndex index_;
 
 	/**
-	 * a {@link SaturationStateWriter} to produce new {@link Conclusion}s and
+	 * The factory for creating {@link ContextInitialization}s
+	 */
+	private final ContextInitialization.Factory factory_;
+	
+	/**
+	 * a {@link SaturationStateWriter} to produce new {@link ClassConclusion}s and
 	 * query for active {@link Context}s
 	 */
 	private final SaturationStateWriter<?> writer_;
 
 	protected BasicRuleEngine(OntologyIndex index,
-			ConclusionVisitor<? super Context, Boolean> conclusionProcessor,
+			ClassConclusionVisitor<? super Context, Boolean> conclusionProcessor,
 			WorkerLocalTodo localTodo, Interrupter interrupter,
 			SaturationStateWriter<?> writer,
 			SaturationStatistics aggregatedStatistics,
@@ -57,12 +63,13 @@ public class BasicRuleEngine<I extends RuleApplicationInput> extends
 		super(conclusionProcessor, localTodo, interrupter,
 				aggregatedStatistics, localStatistics);
 		this.index_ = index;
+		this.factory_ = new ConclusionBaseFactory();
 		this.writer_ = writer;
 	}
 
 	@Override
 	public void submit(RuleApplicationInput job) {
-		writer_.produce(new ContextInitializationImpl(job.getRoot(), index_));
+		writer_.produce(factory_.getContextInitialization(job.getRoot(), index_));
 	}
 
 	@Override

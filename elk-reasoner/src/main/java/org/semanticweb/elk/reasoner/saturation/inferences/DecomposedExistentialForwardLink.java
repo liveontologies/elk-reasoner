@@ -28,11 +28,10 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.AbstractConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.AbstractClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ForwardLinkInferenceVisitor;
 
@@ -43,7 +42,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ForwardLinkIn
  * @author "Yevgeny Kazakov"
  * 
  */
-public class DecomposedExistentialForwardLink extends AbstractConclusion
+public class DecomposedExistentialForwardLink extends AbstractClassConclusion
 		implements ForwardLinkInference {
 
 	private final IndexedObjectSomeValuesFrom existential_;
@@ -68,8 +67,8 @@ public class DecomposedExistentialForwardLink extends AbstractConclusion
 		return IndexedObjectSomeValuesFrom.Helper.getTarget(existential_);
 	}
 
-	public DecomposedSubsumer getPremise() {
-		return new DecomposedSubsumerImpl(getInferenceRoot(), existential_);
+	public DecomposedSubsumer getPremise(DecomposedSubsumer.Factory factory) {
+		return factory.getDecomposedSubsumer(getInferenceRoot(), existential_);
 	}
 
 	@Override
@@ -83,7 +82,7 @@ public class DecomposedExistentialForwardLink extends AbstractConclusion
 	}
 
 	@Override
-	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(ClassConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
 

@@ -43,7 +43,7 @@ public class SubPropertyChainImpl extends AbstractObjectPropertyConclusion
 
 	private final IndexedPropertyChain subChain_, superChain_;
 
-	public SubPropertyChainImpl(IndexedPropertyChain subChain,
+	protected SubPropertyChainImpl(IndexedPropertyChain subChain,
 			IndexedPropertyChain superChain) {
 		subChain_ = subChain;
 		superChain_ = superChain;

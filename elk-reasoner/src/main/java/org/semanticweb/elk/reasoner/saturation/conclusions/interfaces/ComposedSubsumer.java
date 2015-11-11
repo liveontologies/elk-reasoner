@@ -1,5 +1,8 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
+
 /*
  * #%L
  * ELK Reasoner
@@ -32,5 +35,18 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 public interface ComposedSubsumer extends Subsumer {
 
 	public static final String NAME = "Composed Subsumer";
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		ComposedSubsumer getComposedSubsumer(IndexedContextRoot root,
+				IndexedClassExpression subsumer);
+
+	}
 
 }

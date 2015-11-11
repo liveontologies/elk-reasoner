@@ -32,8 +32,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ConclusionBaseFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +67,8 @@ abstract class AbstractIncrementalContextInitializationStage extends
 	protected Iterator<IndexedContextRoot> todo = null;
 
 	private SaturationStateWriter<?> writer_ = null;
+	
+	private ContextInitialization.Factory factory_ = new ConclusionBaseFactory();
 
 	public AbstractIncrementalContextInitializationStage(
 			AbstractReasonerState reasoner, AbstractReasonerStage... preStages) {
@@ -97,7 +100,7 @@ abstract class AbstractIncrementalContextInitializationStage extends
 				break;
 			IndexedContextRoot root = todo.next();
 
-			Conclusion init = new ContextInitializationImpl(root,
+			ClassConclusion init = factory_.getContextInitialization(root,
 					reasoner.saturationState.getOntologyIndex());
 
 			if (reasoner.saturationState.getContext(root) != null) {

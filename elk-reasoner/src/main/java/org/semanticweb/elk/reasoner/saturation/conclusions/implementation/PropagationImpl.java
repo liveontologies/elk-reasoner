@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusionVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class PropagationImpl extends AbstractSubConclusion implements
+public class PropagationImpl extends AbstractSubClassConclusion implements
 		Propagation {
 
 	// logger for this class
@@ -52,14 +52,14 @@ public class PropagationImpl extends AbstractSubConclusion implements
 
 	private final IndexedObjectSomeValuesFrom carry_;
 
-	public PropagationImpl(IndexedContextRoot root,
+	protected PropagationImpl(IndexedContextRoot root,
 			IndexedObjectProperty relation, IndexedObjectSomeValuesFrom carry) {
 		super(root, relation);
 		carry_ = carry;
 	}
 
 	@Override
-	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(ClassConclusionVisitor<I, O> visitor, I input) {
 		return accept((SubConclusionVisitor<I, O>) visitor, input);
 	}
 

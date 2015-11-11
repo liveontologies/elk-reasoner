@@ -28,7 +28,6 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 
@@ -52,8 +51,8 @@ public abstract class AbstractDecomposedConjunct extends
 		conjunction_ = premiseSubsumer;
 	}
 
-	public DecomposedSubsumer getPremise() {
-		return new DecomposedSubsumerImpl(getInferenceRoot(), conjunction_);
+	public DecomposedSubsumer getPremise(DecomposedSubsumer.Factory factory) {
+		return factory.getDecomposedSubsumer(getInferenceRoot(), conjunction_);
 	}
 
 	@Override

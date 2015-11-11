@@ -45,22 +45,22 @@ public class ConclusionStatistics extends AbstractStatistics {
 	/**
 	 * Number of conclusions put to the todo queue
 	 */
-	private final ConclusionCounter producedConclusionCounts_;
+	private final ClassConclusionCounter producedConclusionCounts_;
 	/**
 	 * Number of conclusions taken from the todo queue and processed
 	 */
-	private final ConclusionCounter processedConclusionCounts_;
+	private final ClassConclusionCounter processedConclusionCounts_;
 	/**
 	 * Number of unique conclusions saved to contexts
 	 */
-	private final ConclusionCounter usedConclusionCounts_;
+	private final ClassConclusionCounter usedConclusionCounts_;
 
-	private final ConclusionTimer conclusionProcessingTimer_;
+	private final ClassConclusionTimer conclusionProcessingTimer_;
 
-	public ConclusionStatistics(ConclusionCounter producedConclusionCounter,
-			ConclusionCounter processedConclusionCounts,
-			ConclusionCounter usedConclusionCounts,
-			ConclusionTimer conclusionTimers) {
+	public ConclusionStatistics(ClassConclusionCounter producedConclusionCounter,
+			ClassConclusionCounter processedConclusionCounts,
+			ClassConclusionCounter usedConclusionCounts,
+			ClassConclusionTimer conclusionTimers) {
 		this.producedConclusionCounts_ = producedConclusionCounter;
 		this.processedConclusionCounts_ = processedConclusionCounts;
 		this.usedConclusionCounts_ = usedConclusionCounts;
@@ -68,23 +68,23 @@ public class ConclusionStatistics extends AbstractStatistics {
 	}
 
 	public ConclusionStatistics() {
-		this(new ConclusionCounter(), new ConclusionCounter(),
-				new ConclusionCounter(), new ConclusionTimer());
+		this(new ClassConclusionCounter(), new ClassConclusionCounter(),
+				new ClassConclusionCounter(), new ClassConclusionTimer());
 	}
 
-	public ConclusionCounter getProducedConclusionCounts() {
+	public ClassConclusionCounter getProducedConclusionCounts() {
 		return producedConclusionCounts_;
 	}
 
-	public ConclusionCounter getProcessedConclusionCounts() {
+	public ClassConclusionCounter getProcessedConclusionCounts() {
 		return processedConclusionCounts_;
 	}
 
-	public ConclusionCounter getUsedConclusionCounts() {
+	public ClassConclusionCounter getUsedConclusionCounts() {
 		return usedConclusionCounts_;
 	}
 
-	public ConclusionTimer getConclusionTimers() {
+	public ClassConclusionTimer getConclusionTimers() {
 		return conclusionProcessingTimer_;
 	}
 

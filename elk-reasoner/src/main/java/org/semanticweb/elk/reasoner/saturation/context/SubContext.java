@@ -5,7 +5,7 @@ import java.util.Set;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 
 /*
@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagatio
 
 /**
  * The object representing an elementary unit of computations for
- * {@link Conclusion}s that can be used as premises of inferences associated
+ * {@link ClassConclusion}s that can be used as premises of inferences associated
  * with the same {@link IndexedPropertyChain} sub-root in addition to the same
  * {@link IndexedClassExpression} root. Each {@link SubContext} is accessible
  * from the respective {@link Context} for the corresponding
@@ -40,7 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagatio
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface SubContext extends SubContextPremises, SubConclusionSet {
+public interface SubContext extends SubContextPremises, SubClassConclusionSet {
 
 	/**
 	 * @return the representation of all derived {@link Propagation}s with

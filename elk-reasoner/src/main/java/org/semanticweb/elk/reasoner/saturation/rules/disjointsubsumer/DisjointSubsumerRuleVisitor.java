@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionRule;
 
 /**
@@ -38,6 +38,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.contradiction.Contradiction
 public interface DisjointSubsumerRuleVisitor<O> {
 
 	O visit(ContradictionCompositionRule rule, DisjointSubsumer premise,
-			ContextPremises premises, ConclusionProducer producer);
+			ContextPremises premises, ClassConclusionProducer producer);
 
 }

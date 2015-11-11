@@ -33,13 +33,13 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagatio
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
-public class TimedConclusionVisitor<I, O> implements ConclusionVisitor<I, O> {
+public class TimedConclusionVisitor<I, O> implements ClassConclusionVisitor<I, O> {
 
-	private final ConclusionVisitor<? super I, O> processor_;
-	private final ConclusionTimer timer_;
+	private final ClassConclusionVisitor<? super I, O> processor_;
+	private final ClassConclusionTimer timer_;
 
-	public TimedConclusionVisitor(ConclusionTimer timer,
-			ConclusionVisitor<? super I, O> processor) {
+	public TimedConclusionVisitor(ClassConclusionTimer timer,
+			ClassConclusionVisitor<? super I, O> processor) {
 		this.timer_ = timer;
 		this.processor_ = processor;
 	}

@@ -33,9 +33,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagatio
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 
 /**
- * A {@link ConclusionVisitor} that runs a special preprocessor
- * {@link ConclusionVisitor} before every call of the provided
- * {@link ConclusionVisitor}. The returned result is taken from the letter.
+ * A {@link ClassConclusionVisitor} that runs a special preprocessor
+ * {@link ClassConclusionVisitor} before every call of the provided
+ * {@link ClassConclusionVisitor}. The returned result is taken from the letter.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -45,19 +45,19 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContext
  *            the type of output parameter with which this visitor works
  */
 public class PreprocessedConclusionVisitor<I, O> implements
-		ConclusionVisitor<I, O> {
+		ClassConclusionVisitor<I, O> {
 
 	/**
-	 * a {@link ConclusionVisitor} that is called first
+	 * a {@link ClassConclusionVisitor} that is called first
 	 */
-	final private ConclusionVisitor<I, ?> preprocessor_;
+	final private ClassConclusionVisitor<I, ?> preprocessor_;
 	/**
-	 * a {@link ConclusionVisitor} that is called next and returns the output
+	 * a {@link ClassConclusionVisitor} that is called next and returns the output
 	 */
-	final private ConclusionVisitor<? super I, O> visitor_;
+	final private ClassConclusionVisitor<? super I, O> visitor_;
 
-	public PreprocessedConclusionVisitor(ConclusionVisitor<I, ?> preprocessor,
-			ConclusionVisitor<? super I, O> visitor) {
+	public PreprocessedConclusionVisitor(ClassConclusionVisitor<I, ?> preprocessor,
+			ClassConclusionVisitor<? super I, O> visitor) {
 		this.preprocessor_ = preprocessor;
 		this.visitor_ = visitor;
 	}

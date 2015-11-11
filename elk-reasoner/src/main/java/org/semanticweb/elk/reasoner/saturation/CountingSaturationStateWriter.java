@@ -22,36 +22,35 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionCounter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.CountingConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionCounter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.CountingClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 
 /**
  * A {@link SaturationStateWriter} that mirrors all operations of the provided
  * internal {@link SaturationStateWriter} and additionally counts the number of
- * produced {@link Conclusion}s using a provided {@link ConclusionCounter}
+ * produced {@link ClassConclusion}s using a provided {@link ClassConclusionCounter}
  * 
- * @see ConclusionProducer#produce(Context, Conclusion)
- * @see ConclusionProducer#produce(IndexedContextRoot, Conclusion)
+ * @see ClassConclusionProducer#produce(ClassConclusion)
  * 
  * @author "Yevgeny Kazakov"
  */
 public class CountingSaturationStateWriter<C extends Context> extends
 		SaturationStateWriterWrap<C> {
 
-	private final ConclusionVisitor<Void, ?> countingVisitor_;
+	private final ClassConclusionVisitor<Void, ?> countingVisitor_;
 
 	public CountingSaturationStateWriter(SaturationStateWriter<C> writer,
-			ConclusionCounter counter) {
+			ClassConclusionCounter counter) {
 		super(writer);
-		this.countingVisitor_ = new CountingConclusionVisitor<Void>(counter);
+		this.countingVisitor_ = new CountingClassConclusionVisitor<Void>(counter);
 	}
 
 	@Override
-	public void produce(Conclusion conclusion) {
+	public void produce(ClassConclusion conclusion) {
 		mainWriter.produce(conclusion);
 		conclusion.accept(countingVisitor_, null);
 	}

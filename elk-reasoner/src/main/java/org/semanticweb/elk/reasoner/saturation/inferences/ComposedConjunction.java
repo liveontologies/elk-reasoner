@@ -9,7 +9,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ComposedSubsumerInferenceVisitor;
 
@@ -55,14 +53,14 @@ public class ComposedConjunction extends
 		return getConclusionRoot();
 	}
 
-	public ComposedSubsumer getFirstPremise() {
-		return new ComposedSubsumerImpl<IndexedClassExpression>(
-				getInferenceRoot(), getExpression().getFirstConjunct());
+	public ComposedSubsumer getFirstPremise(ComposedSubsumer.Factory factory) {
+		return factory.getComposedSubsumer(getInferenceRoot(),
+				getExpression().getFirstConjunct());
 	}
 
-	public ComposedSubsumer getSecondPremise() {
-		return new ComposedSubsumerImpl<IndexedClassExpression>(
-				getInferenceRoot(), getExpression().getSecondConjunct());
+	public ComposedSubsumer getSecondPremise(ComposedSubsumer.Factory factory) {
+		return factory.getComposedSubsumer(getInferenceRoot(),
+				getExpression().getSecondConjunct());
 	}
 
 	@Override

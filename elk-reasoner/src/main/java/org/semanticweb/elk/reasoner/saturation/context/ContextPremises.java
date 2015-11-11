@@ -31,16 +31,16 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionLis
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
 
 /**
- * A representation for a set of {@link Conclusion}s that can be used as
+ * A representation for a set of {@link ClassConclusion}s that can be used as
  * premises of inference rules associated with a given
  * {@link IndexedContextRoot} that can be obtained using {@link #getRoot()}.
- * Whenever a {@link Conclusion} can participate in an inference with this root,
+ * Whenever a {@link ClassConclusion} can participate in an inference with this root,
  * it should be saved in the {@link ContextPremises} with the corresponding
  * root.
  * 
@@ -50,7 +50,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackw
 public interface ContextPremises {
 
 	/**
-	 * @return the {@link IndexedContextRoot} for which the {@link Conclusion}s
+	 * @return the {@link IndexedContextRoot} for which the {@link ClassConclusion}s
 	 *         stored in this {@link ContextPremises} are assigned. This serves
 	 *         as the key for {@link ContextPremises} and can never been
 	 *         {@code null}.
@@ -74,7 +74,7 @@ public interface ContextPremises {
 	/**
 	 * @return the {@link Map} storing {@link SubContextPremises} for the
 	 *         corresponding {@link IndexedPropertyChain}s. The
-	 *         {@link SubContextPremises} store {@link Conclusion}s that can be
+	 *         {@link SubContextPremises} store {@link ClassConclusion}s that can be
 	 *         used as premises of rules that are associated with the
 	 *         corresponding sub-root {@link IndexedObjectProperty} in addition
 	 *         to the root {@link IndexedClassExpression}

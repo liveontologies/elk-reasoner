@@ -26,7 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SubsumerDecompositionVisitor;
@@ -41,7 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SubsumerDecomposi
  *            the type of the subsumer {@link IndexedClassExpression}
  */
 public abstract class AbstractSubsumer<S extends IndexedClassExpression>
-		extends AbstractConclusion implements Subsumer {
+		extends AbstractClassConclusion implements Subsumer {
 
 	/**
 	 * the implied {@code IndexedClassExpression} represented by this
@@ -49,7 +49,7 @@ public abstract class AbstractSubsumer<S extends IndexedClassExpression>
 	 */
 	private final S expression_;
 
-	public AbstractSubsumer(IndexedContextRoot root, S expression) {
+	protected AbstractSubsumer(IndexedContextRoot root, S expression) {
 		super(root);
 		if (expression == null)
 			throw new NullPointerException("Subsumer cannot be null!");
@@ -62,7 +62,7 @@ public abstract class AbstractSubsumer<S extends IndexedClassExpression>
 	}
 
 	void applyCompositionRules(RuleVisitor<?> ruleAppVisitor,
-			ContextPremises premises, ConclusionProducer producer) {
+			ContextPremises premises, ClassConclusionProducer producer) {
 		LinkedSubsumerRule compositionRule = expression_
 				.getCompositionRuleHead();
 		while (compositionRule != null) {
@@ -73,7 +73,7 @@ public abstract class AbstractSubsumer<S extends IndexedClassExpression>
 	}
 
 	void applyDecompositionRules(RuleVisitor<?> ruleAppVisitor,
-			ContextPremises premises, ConclusionProducer producer) {
+			ContextPremises premises, ClassConclusionProducer producer) {
 		expression_.accept(new SubsumerDecompositionVisitor(ruleAppVisitor,
 				premises, producer));
 	}

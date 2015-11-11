@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -44,7 +44,7 @@ public class ContextExistenceCheckingWriter<C extends Context> extends
 	}
 
 	@Override
-	public void produce(Conclusion conclusion) {
+	public void produce(ClassConclusion conclusion) {
 		Context context = state_.getContext(conclusion.getConclusionRoot());
 
 		if (context != null) {

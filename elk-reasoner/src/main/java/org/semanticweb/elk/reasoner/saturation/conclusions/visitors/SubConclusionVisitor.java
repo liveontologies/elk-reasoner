@@ -27,11 +27,11 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 
 /**
- * A visitor pattern for {@link SubConclusion}s together with additional input
+ * A visitor pattern for {@link SubClassConclusion}s together with additional input
  * and output parameters
  * 
  * @author "Yevgeny Kazakov"

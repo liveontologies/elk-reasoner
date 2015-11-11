@@ -21,12 +21,13 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagationImpl;
 
 /**
- * A {@link SubConclusion} representing that a filler of
+ * A {@link SubClassConclusion} representing that a filler of
  * {@link IndexedObjectSomeValuesFrom} has been derived as a subsumer, and
  * therefore {@link IndexedObjectSomeValuesFrom} should be propagated to all
  * predecessors over the sub-property of the property of this
@@ -38,7 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Propag
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface Propagation extends SubConclusion {
+public interface Propagation extends SubClassConclusion {
 
 	public static final String NAME = "Propagation";
 
@@ -54,4 +55,19 @@ public interface Propagation extends SubConclusion {
 	 *         this {@link PropagationImpl}
 	 */
 	public IndexedObjectSomeValuesFrom getCarry();
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		Propagation getPropagation(IndexedContextRoot root,
+				IndexedObjectProperty relation,
+				IndexedObjectSomeValuesFrom carry);
+
+	}
+
 }

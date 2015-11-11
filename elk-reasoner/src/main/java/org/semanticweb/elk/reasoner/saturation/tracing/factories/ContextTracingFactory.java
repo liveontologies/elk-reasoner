@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.ClassInferenceProducer;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -49,8 +49,8 @@ import org.slf4j.LoggerFactory;
  * conclusions in a given {@link SaturationState}. The engines accept instances
  * of {@link ContextTracingJob} with the input {@link IndexedContextRoot}
  * origin; when this job is processed, its output will contain all inferences
- * with the given origin that are applicable to {@link Conclusion}s stored in
- * the {@link SaturationState} and produce {@link Conclusion}s present in the
+ * with the given origin that are applicable to {@link ClassConclusion}s stored in
+ * the {@link SaturationState} and produce {@link ClassConclusion}s present in the
  * {@link SaturationState}.
  * 
  * As usual, to this engine factory it is possible to attach a

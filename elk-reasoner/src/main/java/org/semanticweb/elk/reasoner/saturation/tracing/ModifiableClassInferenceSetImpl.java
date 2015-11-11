@@ -25,9 +25,9 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ConclusionEquality;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ConclusionHash;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusionEquality;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusionHash;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -49,7 +49,7 @@ public class ModifiableClassInferenceSetImpl implements
 
 	@Override
 	public Iterable<? extends ClassInference> getClassInferences(
-			Conclusion conclusion) {
+			ClassConclusion conclusion) {
 		return inferenceMap_.get(new Key(conclusion));
 	}
 
@@ -60,21 +60,21 @@ public class ModifiableClassInferenceSetImpl implements
 
 	static class Key {
 
-		private final Conclusion conclusion_;
+		private final ClassConclusion conclusion_;
 
-		Key(Conclusion conclusion) {
+		Key(ClassConclusion conclusion) {
 			this.conclusion_ = conclusion;
 		}
 
 		@Override
 		public int hashCode() {
-			return ConclusionHash.hashCode(conclusion_);
+			return ClassConclusionHash.hashCode(conclusion_);
 		}
 
 		@Override
 		public boolean equals(Object other) {
 			if (other instanceof Key) {
-				return ConclusionEquality.equals(conclusion_,
+				return ClassConclusionEquality.equals(conclusion_,
 						((Key) other).conclusion_);
 			}
 			// else

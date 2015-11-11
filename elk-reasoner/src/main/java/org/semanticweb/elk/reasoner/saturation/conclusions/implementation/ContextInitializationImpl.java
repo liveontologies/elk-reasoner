@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 
 /**
@@ -33,21 +33,21 @@ import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextIn
  * 
  * @author "Yevgeny Kazakov"
  */
-public class ContextInitializationImpl extends AbstractConclusion implements
+public class ContextInitializationImpl extends AbstractClassConclusion implements
 		ContextInitialization {
 
 	// actually we just need only context initialization rules,
 	// but they can change after creating this object
 	private final OntologyIndex ontologyIndex_;
 
-	public ContextInitializationImpl(IndexedContextRoot root,
+	protected ContextInitializationImpl(IndexedContextRoot root,
 			OntologyIndex ontologyIndex) {
 		super(root);
 		this.ontologyIndex_ = ontologyIndex;
 	}
 
 	@Override
-	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(ClassConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
 

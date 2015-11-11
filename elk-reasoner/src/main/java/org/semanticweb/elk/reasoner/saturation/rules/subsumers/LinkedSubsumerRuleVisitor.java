@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 
 /**
  * A visitor pattern for {@link LinkedSubsumerRule}s
@@ -37,35 +37,35 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 public interface LinkedSubsumerRuleVisitor<O> {
 
 	O visit(ContradictionFromNegationRule rule, IndexedClassExpression premise,
-			ContextPremises premises, ConclusionProducer producer);
+			ContextPremises premises, ClassConclusionProducer producer);
 
 	O visit(ContradictionFromOwlNothingRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer);
+			ClassConclusionProducer producer);
 
 	O visit(DisjointSubsumerFromMemberRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer);
+			ClassConclusionProducer producer);
 
 	O visit(IndexedClassFromDefinitionRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer);
+			ClassConclusionProducer producer);
 
 	O visit(ObjectIntersectionFromFirstConjunctRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer);
+			ClassConclusionProducer producer);
 
 	O visit(ObjectIntersectionFromSecondConjunctRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer);
+			ClassConclusionProducer producer);
 
 	O visit(ObjectUnionFromDisjunctRule rule, IndexedClassExpression premise,
-			ContextPremises premises, ConclusionProducer producer);
+			ContextPremises premises, ClassConclusionProducer producer);
 
 	O visit(PropagationFromExistentialFillerRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer);
+			ClassConclusionProducer producer);
 
 	O visit(SuperClassFromSubClassRule rule, IndexedClassExpression premise,
-			ContextPremises premises, ConclusionProducer producer);
+			ContextPremises premises, ClassConclusionProducer producer);
 }

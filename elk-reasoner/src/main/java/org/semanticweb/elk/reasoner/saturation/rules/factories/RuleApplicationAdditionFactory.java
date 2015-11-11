@@ -26,20 +26,20 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ContextInitializingConclusionInsertionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextNotSaturatedCheckingVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.RuleApplicationConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ContextInitializingClassConclusionInsertionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionSourceContextNotSaturatedCheckingVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.RuleApplicationClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
- * A {@link RuleApplicationFactory} that adds the produced {@link Conclusion}s
+ * A {@link RuleApplicationFactory} that adds the produced {@link ClassConclusion}s
  * to the respective {@link Context} (creating new if necessary) and applies
- * rules, which in turn produce new {@link Conclusion}s for which this process
+ * rules, which in turn produce new {@link ClassConclusion}s for which this process
  * repeats if they have not been processed already. This
- * {@link RuleApplicationFactory} should not produce {@link Conclusion}s for
+ * {@link RuleApplicationFactory} should not produce {@link ClassConclusion}s for
  * which the source {@link Context} is already saturated.
  * 
  * @author Frantisek Simancik
@@ -57,7 +57,7 @@ public class RuleApplicationAdditionFactory<I extends RuleApplicationInput>
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected ConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
+	protected ClassConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
 			RuleVisitor<?> ruleVisitor,
 			SaturationStateWriter<? extends Context> writer,
 			SaturationStatistics localStatistics) {
@@ -67,16 +67,16 @@ public class RuleApplicationAdditionFactory<I extends RuleApplicationInput>
 						SaturationUtils
 								.getProcessedConclusionCountingVisitor(localStatistics),
 						// insert conclusions initializing contexts if necessary
-						new ContextInitializingConclusionInsertionVisitor(writer),
+						new ContextInitializingClassConclusionInsertionVisitor(writer),
 						// if new, check that the source of the conclusion is
 						// not saturated (this is only needed for debugging)
-						new ConclusionSourceContextNotSaturatedCheckingVisitor(
+						new ClassConclusionSourceContextNotSaturatedCheckingVisitor(
 								getSaturationState()),
 						// count conclusions used in the rules, if necessary
 						SaturationUtils
 								.getUsedConclusionCountingVisitor(localStatistics),
 						// and apply all rules
-						new RuleApplicationConclusionVisitor(ruleVisitor,
+						new RuleApplicationClassConclusionVisitor(ruleVisitor,
 								writer));
 	}
 }

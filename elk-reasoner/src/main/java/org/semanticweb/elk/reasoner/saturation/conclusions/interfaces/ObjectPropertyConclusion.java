@@ -38,5 +38,17 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectProper
 public interface ObjectPropertyConclusion {
 
 	public <I, O> O accept(ObjectPropertyConclusionVisitor<I, O> visitor, I input);
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory extends SubPropertyChain.Factory {
+
+		// combined interface
+
+	}
 
 }

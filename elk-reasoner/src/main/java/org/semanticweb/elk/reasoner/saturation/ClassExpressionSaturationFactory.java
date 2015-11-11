@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
@@ -179,7 +179,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 * number of unprocessed contexts.
 	 * 
 	 * @param ruleAppFactory
-	 *            specifies how the rules are applied to new {@link Conclusion}s
+	 *            specifies how the rules are applied to new {@link ClassConclusion}s
 	 * @param maxWorkers
 	 *            the maximum number of workers that can use this factory
 	 * @param listener

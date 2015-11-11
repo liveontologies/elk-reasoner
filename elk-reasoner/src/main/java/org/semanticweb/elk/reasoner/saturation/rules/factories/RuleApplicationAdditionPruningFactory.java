@@ -32,23 +32,23 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionOccurrenceCheckingVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalRuleApplicationConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalizedConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionInsertionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionOccurrenceCheckingVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalRuleApplicationClassConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalizedClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.CombinedConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
- * A {@link RuleApplicationFactory} that applies rules to {@link Conclusion}s
+ * A {@link RuleApplicationFactory} that applies rules to {@link ClassConclusion}s
  * currently stored in the {@link Context}s of the {@link SaturationState}. The
- * produced {@link Conclusion}s are buffered within the queue of the respective
+ * produced {@link ClassConclusion}s are buffered within the queue of the respective
  * {@link Context} and can be later obtained by {@link Context#takeToDo()}. The
  * content of the {@link Context}s is otherwise not modified. To make sure that
- * all rules are applied, the {@link Conclusion}s stored in {@link Context}s
+ * all rules are applied, the {@link ClassConclusion}s stored in {@link Context}s
  * should be reachable from such {@link Context}s by applying the rules.
  * 
  * @author "Yevgeny Kazakov"
@@ -79,7 +79,7 @@ public class RuleApplicationAdditionPruningFactory extends
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected ConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
+	protected ClassConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
 			RuleVisitor<?> ruleVisitor,
 			SaturationStateWriter<? extends ExtendedContext> localWriter,
 			SaturationStatistics localStatistics) {
@@ -90,18 +90,18 @@ public class RuleApplicationAdditionPruningFactory extends
 								.getProcessedConclusionCountingVisitor(localStatistics),
 						// checking the conclusion against the main saturation
 						// state
-						new LocalizedConclusionVisitor(
+						new LocalizedClassConclusionVisitor(
 								// conclusion already occurs there
-								new ConclusionOccurrenceCheckingVisitor(),
+								new ClassConclusionOccurrenceCheckingVisitor(),
 								mainSaturationState_),
 						// if all fine, insert the conclusion to the local
 						// context copies
-						new ConclusionInsertionVisitor(localWriter),
+						new ClassConclusionInsertionVisitor(localWriter),
 						// count conclusions used in the rules, if necessary
 						SaturationUtils
 								.getUsedConclusionCountingVisitor(localStatistics),
 						// and apply rules locally
-						new LocalRuleApplicationConclusionVisitor(
+						new LocalRuleApplicationClassConclusionVisitor(
 								mainSaturationState_, ruleVisitor,
 								// the conclusions are produced in both main and
 								// tracing saturation states

@@ -23,8 +23,8 @@ package org.semanticweb.elk.reasoner.saturation;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 
@@ -39,8 +39,8 @@ public interface ExtendedContext extends Context {
 
 	/**
 	 * Marks this {@code Context} as saturated. This means that all
-	 * {@link Conclusion}s for this {@link Context} except for
-	 * {@link SubConclusion}s for its {@link SubContext}s, are already computed.
+	 * {@link ClassConclusion}s for this {@link Context} except for
+	 * {@link SubClassConclusion}s for its {@link SubContext}s, are already computed.
 	 * This method could be used from multiple threads producing consistent
 	 * result (if the flag is changed concurrently by two workers, only one of
 	 * them returns the previous value).
@@ -48,7 +48,7 @@ public interface ExtendedContext extends Context {
 	 * @return the previous value of the saturation state for this
 	 *         {@link Context}
 	 * 
-	 * @see Conclusion#getSourceRoot(IndexedClassExpression)
+	 * @see ClassConclusion#getSourceRoot(IndexedClassExpression)
 	 */
 	boolean setSaturated(boolean saturated);
 

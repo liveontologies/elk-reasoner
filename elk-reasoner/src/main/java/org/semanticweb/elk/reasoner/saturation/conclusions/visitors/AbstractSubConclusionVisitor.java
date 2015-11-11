@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 
 /**
@@ -41,7 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContext
 public abstract class AbstractSubConclusionVisitor<I, O> implements
 		SubConclusionVisitor<I, O> {
 
-	abstract O defaultVisit(SubConclusion subConclusion, I input);
+	abstract O defaultVisit(SubClassConclusion subConclusion, I input);
 
 	@Override
 	public O visit(BackwardLink subConclusion, I input) {

@@ -40,7 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.GeneratedPropagation;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.LazySetUnion;
 import org.semanticweb.elk.util.collections.chains.Chain;
@@ -108,7 +108,7 @@ public class PropagationFromExistentialFillerRule extends
 
 	@Override
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 
 		final Map<IndexedObjectProperty, ? extends SubContextPremises> subContextMap = premises
 				.getSubContextPremisesByObjectProperty();
@@ -188,7 +188,7 @@ public class PropagationFromExistentialFillerRule extends
 	@Override
 	public void accept(LinkedSubsumerRuleVisitor<?> visitor,
 			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}
 
@@ -208,7 +208,7 @@ public class PropagationFromExistentialFillerRule extends
 	 * @param producer
 	 */
 	void applyForProperty(IndexedObjectProperty property,
-			ContextPremises premises, ConclusionProducer producer) {
+			ContextPremises premises, ClassConclusionProducer producer) {
 
 		for (IndexedObjectSomeValuesFrom e : negExistentials_) {
 			if (e.getProperty().getSaturated().getSubPropertyChains()
@@ -222,7 +222,7 @@ public class PropagationFromExistentialFillerRule extends
 
 	public static void applyForProperty(LinkedSubsumerRule rule,
 			IndexedObjectProperty property, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		for (;;) {
 			if (rule == null)
 				return;

@@ -26,7 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 
 /**
- * A {@link Conclusion} representing derived existential restriction for the
+ * A {@link ClassConclusion} representing derived existential restriction for the
  * root. Intuitively, if a subclass axiom
  * {@code SubClassOf(:A ObjectSomeValuesFrom(:r :B))} is derived by inference
  * rules, then a {@link ForwardLink} with the root {@code :A}, relation
@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface ForwardLink extends Conclusion {
+public interface ForwardLink extends ClassConclusion {
 
 	public static final String NAME = "Forward Link";
 
@@ -51,5 +51,19 @@ public interface ForwardLink extends Conclusion {
 	 *         existential restriction corresponding to this {@link ForwardLink}
 	 */
 	public IndexedContextRoot getTarget();
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		ForwardLink getForwardLink(IndexedContextRoot root,
+				IndexedPropertyChain forwardChain, IndexedContextRoot target);
+
+	}
+
 
 }

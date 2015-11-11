@@ -1,18 +1,12 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.Rule;
-
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,34 +23,27 @@ import org.semanticweb.elk.reasoner.saturation.rules.Rule;
  */
 
 /**
- * A general type of conclusions, produced by inference rules and used as
- * premises of inference rules. The rules can be applied to {@link Conclusion}s
- * together with other {@link Conclusion}s stored in {@link ContextPremises}.
+ * Objects that can be produced by inference rules and later used as premises of
+ * inference rules
  * 
- * @see Rule
- * 
- * @author "Yevgeny Kazakov"
- * 
+ * @author Yevgeny Kazakov
+ *
  */
 public interface Conclusion {
 
 	/**
-	 * @return The root of the {@link Context} in which this conclusion should
-	 *         participate in inferences; it cannot be {@code null}.
-	 */
-	public IndexedContextRoot getConclusionRoot();
-
-	/**
+	 * A factory for creating instances
 	 * 
-	 * @return The {@link IndexedContextRoot} of the {@link Context} from which
-	 *         this {@link Conclusion} originate. This value may be different
-	 *         from {@link #getConclusionRoot()} but cannot be {@code null}.
-	 *         Specifically, this {@link Conclusion} is guaranteed to be derived
-	 *         from {@link ContextInitialization} with the value
-	 *         {@link #getConclusionRoot()} equal to this value.
+	 * @author Yevgeny Kazakov
+	 *
 	 */
-	public IndexedContextRoot getOriginRoot();
+	interface Factory
+			extends
+				ClassConclusion.Factory,
+				ObjectPropertyConclusion.Factory {
 
-	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input);
+		// combined interface
+
+	}
 
 }

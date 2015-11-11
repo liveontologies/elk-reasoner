@@ -31,8 +31,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionLis
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
 
 /**
@@ -40,12 +40,12 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackw
  * objects with the same root. Local premises are taken from the first object,
  * whereas non-local premises from the second. A premise is local if it could be
  * derived starting from the root, i.e., its origin is the root of the
- * {@link ContextPremises} and sub-root origin (if it is a {@link SubConclusion}
+ * {@link ContextPremises} and sub-root origin (if it is a {@link SubClassConclusion}
  * ) is {@code null}.
  * 
  * @see ContextPremises#getRoot()
- * @see Conclusion#getOriginRoot()
- * @see SubConclusion#getOriginSubRoot()
+ * @see ClassConclusion#getOriginRoot()
+ * @see SubClassConclusion#getOriginSubRoot()
  * 
  * @author "Yevgeny Kazakov"
  * 

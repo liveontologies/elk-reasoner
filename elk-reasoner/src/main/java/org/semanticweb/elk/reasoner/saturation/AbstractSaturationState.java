@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -192,7 +192,7 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 			return activeContexts_.poll();
 		}
 
-		void produce(Context context, Conclusion conclusion) {
+		void produce(Context context, ClassConclusion conclusion) {
 			LOGGER_.trace("{}: produced conclusion {}", context, conclusion);
 			if (context.addToDo(conclusion)) {
 				LOGGER_.trace("{}: activated", context);
@@ -202,7 +202,7 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 		}
 
 		@Override
-		public void produce(Conclusion conclusion) {
+		public void produce(ClassConclusion conclusion) {
 			// TODO: what if NPE?
 			produce(getContext(conclusion.getConclusionRoot()), conclusion);
 		}
@@ -266,7 +266,7 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 		}
 
 		@Override
-		public void produce(Conclusion conclusion) {
+		public void produce(ClassConclusion conclusion) {
 			produce(getCreateContext(conclusion.getConclusionRoot()),
 					conclusion);
 		}

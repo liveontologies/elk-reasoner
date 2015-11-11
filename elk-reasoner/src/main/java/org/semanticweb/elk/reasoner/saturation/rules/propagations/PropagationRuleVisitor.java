@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.propagations;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionRule;
 
 /**
@@ -38,6 +38,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.contradiction.Contradiction
 public interface PropagationRuleVisitor<O> {
 
 	O visit(SubsumerPropagationRule rule, Propagation premise,
-			ContextPremises premises, ConclusionProducer producer);
+			ContextPremises premises, ClassConclusionProducer producer);
 
 }

@@ -26,10 +26,10 @@ package org.semanticweb.elk.reasoner.saturation.tracing.factories;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 
 /**
- * An extension that stores the target {@link Conclusion}, should be used for
+ * An extension that stores the target {@link ClassConclusion}, should be used for
  * recursive context tracing.
  * 
  * @author Pavel Klinov
@@ -39,14 +39,14 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
 public class RecursiveContextTracingJob extends
 		ContextTracingJob<IndexedContextRoot> {
 
-	private final Conclusion target_;
+	private final ClassConclusion target_;
 
-	public RecursiveContextTracingJob(IndexedContextRoot input, Conclusion t) {
+	public RecursiveContextTracingJob(IndexedContextRoot input, ClassConclusion t) {
 		super(input);
 		target_ = t;
 	}
 
-	public Conclusion getTarget() {
+	public ClassConclusion getTarget() {
 		return target_;
 	}
 }

@@ -37,7 +37,8 @@ import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener
 import org.semanticweb.elk.reasoner.saturation.SaturationJob;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ConclusionBaseFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
 import org.semanticweb.elk.util.collections.Operations;
@@ -233,6 +234,8 @@ public class ConsistencyChecking
 			ClassExpressionSaturationListener<SaturationJob<IndexedClassEntity>> {
 
 		private final ConsistencyMonitor consistenceMonitor;
+		
+		private final Contradiction.Factory factory_ = new ConclusionBaseFactory();
 
 		ThisClassExpressionSaturationListener(
 				ConsistencyMonitor consistenceMonitor) {
@@ -242,7 +245,7 @@ public class ConsistencyChecking
 		@Override
 		public void notifyFinished(SaturationJob<IndexedClassEntity> job) {
 			boolean inconsistent = job.getOutput().containsConclusion(
-					new ContradictionImpl(job.getInput()));
+					factory_.getContradiction(job.getInput()));
 
 			if (inconsistent)
 				consistenceMonitor.setInconsistent(job.getInput());

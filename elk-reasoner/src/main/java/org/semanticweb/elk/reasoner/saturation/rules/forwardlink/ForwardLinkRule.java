@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.forwardlink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 
 /**
@@ -37,6 +37,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 public interface ForwardLinkRule extends Rule<ForwardLink> {
 
 	public void accept(ForwardLinkRuleVisitor<?> visitor, ForwardLink premise,
-			ContextPremises premises, ConclusionProducer producer);
+			ContextPremises premises, ClassConclusionProducer producer);
 
 }

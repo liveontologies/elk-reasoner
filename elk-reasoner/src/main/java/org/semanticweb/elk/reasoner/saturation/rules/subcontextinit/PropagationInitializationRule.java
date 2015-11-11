@@ -27,7 +27,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagatio
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.SubContext;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 
 /**
  * 
@@ -53,7 +53,7 @@ public class PropagationInitializationRule extends AbstractSubContextInitRule {
 
 	@Override
 	public void apply(SubContextInitialization premise,
-			ContextPremises premises, ConclusionProducer producer) {
+			ContextPremises premises, ClassConclusionProducer producer) {
 		IndexedObjectSomeValuesFrom.Helper.generatePropagations(
 				premise.getConclusionSubRoot(), premises, producer);
 	}
@@ -66,7 +66,7 @@ public class PropagationInitializationRule extends AbstractSubContextInitRule {
 	@Override
 	public void accept(SubContextInitRuleVisitor<?> visitor,
 			SubContextInitialization premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}
 

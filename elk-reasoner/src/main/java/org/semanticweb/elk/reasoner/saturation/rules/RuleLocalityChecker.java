@@ -37,7 +37,7 @@ public class RuleLocalityChecker extends AbstractRuleVisitor<Boolean> {
 
 	@Override
 	<P> Boolean defaultVisit(Rule<P> rule, P premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		return rule.isLocal();
 	}
 

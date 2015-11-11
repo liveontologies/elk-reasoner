@@ -26,7 +26,7 @@ import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.Interrupter;
@@ -35,9 +35,9 @@ import org.semanticweb.elk.util.concurrent.computation.Interrupter;
  * A common interface for factories for worker engines that process a
  * {@link SaturationState} in parallel. Each engine has an exclusive read-write
  * access to the {@link Context} of the {@link SaturationState} in which the
- * current {@link Conclusion} is processed, so it can modify this
- * {@link Context} and apply the rules using {@link Conclusion}s saved in the
- * {@link Context}, which can possibly produce {@link Conclusion}s for other
+ * current {@link ClassConclusion} is processed, so it can modify this
+ * {@link Context} and apply the rules using {@link ClassConclusion}s saved in the
+ * {@link Context}, which can possibly produce {@link ClassConclusion}s for other
  * {@link Context}s.
  * 
  * @author "Yevgeny Kazakov"
@@ -53,9 +53,9 @@ public interface RuleApplicationFactory<C extends Context, I extends RuleApplica
 
 	/**
 	 * Create a new {@link InputProcessor} that concurrently processes
-	 * {@link Conclusion}s within {@link Context}s of the
+	 * {@link ClassConclusion}s within {@link Context}s of the
 	 * {@link SaturationState} by applying inference rules. The input
-	 * {@link Conclusion}s can be created using {@link RuleApplicationInput}s
+	 * {@link ClassConclusion}s can be created using {@link RuleApplicationInput}s
 	 * submitted using this {@link InputProcessor}, or they may be taken from
 	 * the {@link Context}s of the {@link SaturationState} using
 	 * {@link Context#takeToDo()}. Since the {@link SaturationState} is shared

@@ -1,5 +1,8 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
+
 /*
  * #%L
  * ELK Reasoner
@@ -31,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextIn
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface ContextInitialization extends Conclusion {
+public interface ContextInitialization extends ClassConclusion {
 
 	public static final String NAME = "Context Initialization";
 
@@ -39,5 +42,18 @@ public interface ContextInitialization extends Conclusion {
 	 * @return the rules that should be applied for context initializations
 	 */
 	public LinkedContextInitRule getContextInitRuleHead();
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		ContextInitialization getContextInitialization(IndexedContextRoot root,
+				OntologyIndex ontologyIndex);
+
+	}
 
 }

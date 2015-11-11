@@ -26,7 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
 
@@ -38,7 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenc
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public interface ClassInference extends Conclusion {
+public interface ClassInference extends ClassConclusion {
 
 	/**
 	 * @return the {@link IndexedContextRoot} of the {@link Context} where this

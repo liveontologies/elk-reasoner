@@ -28,7 +28,7 @@ package org.semanticweb.elk.proofs.inferences.mapping;
 import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.AbstractObjectPropertyInferenceVisitor;
@@ -83,7 +83,7 @@ public class InferenceMapper {
 	}
 
 	// class and object property inferences
-	public void map(final Conclusion conclusion,
+	public void map(final ClassConclusion conclusion,
 			final InferenceVisitor<?, ?> visitor) {
 		final SingleInferenceMapper singleMapper = new SingleInferenceMapper(
 				exprFactory_);

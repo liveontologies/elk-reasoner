@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromNegation;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
@@ -87,7 +87,7 @@ public class ContradictionFromNegationRule extends
 
 	@Override
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		if (negation_ != null
 				&& premises.getDecomposedSubsumers().contains(negation_)) {
 			producer.produce(new ContradictionFromNegation(premises.getRoot(),
@@ -137,7 +137,7 @@ public class ContradictionFromNegationRule extends
 	@Override
 	public void accept(LinkedSubsumerRuleVisitor<?> visitor,
 			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}
 

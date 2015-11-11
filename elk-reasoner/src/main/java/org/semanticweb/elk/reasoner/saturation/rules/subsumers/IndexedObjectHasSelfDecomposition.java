@@ -28,7 +28,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLi
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.ObjectHasSelfPropertyRangeSubsumer;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 
 /**
  * A {@link SubsumerDecompositionRule} that processes
@@ -55,7 +55,7 @@ public class IndexedObjectHasSelfDecomposition extends
 
 	@Override
 	public void apply(IndexedObjectHasSelf premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		IndexedObjectHasSelf.Helper.produceDecomposedExistentialLink(producer,
 				premises.getRoot(), premise);
 		for (IndexedClassExpression range : premise.getProperty()
@@ -73,7 +73,7 @@ public class IndexedObjectHasSelfDecomposition extends
 	@Override
 	public void accept(SubsumerDecompositionRuleVisitor<?> visitor,
 			IndexedObjectHasSelf premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}
 

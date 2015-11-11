@@ -37,4 +37,17 @@ public interface SubPropertyChain extends ObjectPropertyConclusion {
 
 	public IndexedPropertyChain getSuperChain();
 
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		SubPropertyChain getSubPropertyChain(IndexedPropertyChain subChain,
+				IndexedPropertyChain superChain);
+
+	}
+	
 }

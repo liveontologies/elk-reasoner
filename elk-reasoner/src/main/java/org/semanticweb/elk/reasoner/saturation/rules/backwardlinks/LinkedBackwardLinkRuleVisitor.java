@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.backwardlinks;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 
 /**
  * A visitor pattern for {@link LinkedBackwardLinkRule}s
@@ -37,9 +37,9 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 public interface LinkedBackwardLinkRuleVisitor<O> {
 
 	O visit(ContradictionOverBackwardLinkRule rule, BackwardLink premise,
-			ContextPremises premises, ConclusionProducer producer);
+			ContextPremises premises, ClassConclusionProducer producer);
 
 	O visit(BackwardLinkChainFromBackwardLinkRule rule, BackwardLink premise,
-			ContextPremises premises, ConclusionProducer producer);
+			ContextPremises premises, ClassConclusionProducer producer);
 
 }

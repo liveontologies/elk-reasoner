@@ -29,8 +29,8 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -70,14 +70,14 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 	 * @param conclusionProcessor
 	 * @param saturationStateWriter
 	 * @param localStatistics
-	 * @return an {@link InputProcessor} that processes {@link Conclusion}s in
+	 * @return an {@link InputProcessor} that processes {@link ClassConclusion}s in
 	 *         {@link Context}s within an individual worker thread for the input
 	 *         root {@link IndexedClassExpression} using the supplied
 	 *         {@link SaturationStateWriter} and updates the supplied local
 	 *         {@link SaturationStatistics} accordingly
 	 */
 	protected InputProcessor<I> getEngine(
-			ConclusionVisitor<? super Context, Boolean> conclusionProcessor,
+			ClassConclusionVisitor<? super Context, Boolean> conclusionProcessor,
 			SaturationStateWriter<? extends C> saturationStateWriter,
 			WorkerLocalTodo localTodo, SaturationStatistics localStatistics) {
 		conclusionProcessor = SaturationUtils.getTimedConclusionVisitor(
@@ -121,15 +121,15 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 	}
 
 	/**
-	 * An instance of {@link ConclusionVisitor} that processes
-	 * {@link Conclusion}s within {@link Context} by an individual worker.
+	 * An instance of {@link ClassConclusionVisitor} that processes
+	 * {@link ClassConclusion}s within {@link Context} by an individual worker.
 	 * 
 	 * @param ruleVisitor
 	 * @param writer
 	 * @param localStatistics
 	 * @return
 	 */
-	protected abstract ConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
+	protected abstract ClassConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
 			RuleVisitor<?> ruleVisitor, SaturationStateWriter<? extends C> writer,
 			SaturationStatistics localStatistics);
 

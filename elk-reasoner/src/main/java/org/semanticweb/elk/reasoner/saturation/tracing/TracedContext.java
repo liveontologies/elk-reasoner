@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.ContextImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -53,15 +53,15 @@ public class TracedContext extends ContextImpl {
 	 * derived through the inference I, then we store C -> I when we derive
 	 * I from C.
 	 */
-	private Multimap<Conclusion, ClassInference> blockedInferences_;
+	private Multimap<ClassConclusion, ClassInference> blockedInferences_;
 
 	public TracedContext(IndexedContextRoot root) {
 		super(root);
 	}
 
-	public Multimap<Conclusion, ClassInference> getBlockedInferences() {
+	public Multimap<ClassConclusion, ClassInference> getBlockedInferences() {
 		if (blockedInferences_ == null) {
-			blockedInferences_ = new HashListMultimap<Conclusion, ClassInference>();
+			blockedInferences_ = new HashListMultimap<ClassConclusion, ClassInference>();
 		}
 
 		return blockedInferences_;

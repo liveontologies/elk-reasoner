@@ -38,7 +38,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.NoOpIndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ConclusionBaseFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
@@ -115,11 +116,13 @@ public class IncrementalDeletionInitializationStage extends AbstractIncrementalC
 		};
 
 		OntologyIndex index = reasoner.saturationState.getOntologyIndex();
+		
+		ContextInitialization.Factory factory = new ConclusionBaseFactory();
 
 		for (IndexedClassExpression ice : reasoner.ontologyIndex.getRemovedClassExpressions()) {
 
 			if (reasoner.saturationState.getContext(ice) != null) {
-				satStateWriter.produce(new ContextInitializationImpl(ice, index));
+				satStateWriter.produce(factory.getContextInitialization(ice, index));
 				// mark removed classes
 				ice.accept(entityRemovalVisitor);
 			}

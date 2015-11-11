@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLi
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
 
@@ -84,7 +84,7 @@ public class ReflexiveBackwardLinkCompositionRule extends
 
 	@Override
 	public void apply(ForwardLink premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		/* compose the link with all reflexive backward links */
 		SaturatedPropertyChain linkSaturation = this.forwardLink_
 				.getForwardChain().getSaturated();
@@ -114,7 +114,7 @@ public class ReflexiveBackwardLinkCompositionRule extends
 
 	@Override
 	public void accept(ForwardLinkRuleVisitor<?> visitor, ForwardLink premise,
-			ContextPremises premises, ConclusionProducer producer) {
+			ContextPremises premises, ClassConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}
 

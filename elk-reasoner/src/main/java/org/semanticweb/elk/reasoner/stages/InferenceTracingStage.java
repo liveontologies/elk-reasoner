@@ -28,7 +28,7 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Collection;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTracingComputation;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
 import org.semanticweb.elk.reasoner.saturation.tracing.factories.ProofUnwindingJob;
@@ -69,13 +69,13 @@ public class InferenceTracingStage extends AbstractReasonerStage {
 			return false;
 		}
 
-		Collection<ProofUnwindingJob<Conclusion>> inputs = Operations
+		Collection<ProofUnwindingJob<ClassConclusion>> inputs = Operations
 				.map(reasoner.traceState.getToTrace(),
-						new Transformation<Conclusion, ProofUnwindingJob<Conclusion>>() {
+						new Transformation<ClassConclusion, ProofUnwindingJob<ClassConclusion>>() {
 							@Override
-							public ProofUnwindingJob<Conclusion> transform(
-									Conclusion conclusion) {
-								return new ProofUnwindingJob<Conclusion>(
+							public ProofUnwindingJob<ClassConclusion> transform(
+									ClassConclusion conclusion) {
+								return new ProofUnwindingJob<ClassConclusion>(
 										conclusion);
 							}
 						});

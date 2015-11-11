@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradict
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedContradiction;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 
 /**
  * A {@link ContradictionRule} applied when processing {@link Contradiction}
@@ -64,7 +64,7 @@ public class ContradictionPropagationRule extends AbstractContradictionRule {
 
 	@Override
 	public void apply(Contradiction premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		final Map<IndexedObjectProperty, ? extends SubContextPremises> subPremises = premises
 				.getSubContextPremisesByObjectProperty();
 		// no need to propagate over reflexive links
@@ -86,7 +86,7 @@ public class ContradictionPropagationRule extends AbstractContradictionRule {
 	@Override
 	public void accept(ContradictionRuleVisitor<?> visitor,
 			Contradiction premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}
 

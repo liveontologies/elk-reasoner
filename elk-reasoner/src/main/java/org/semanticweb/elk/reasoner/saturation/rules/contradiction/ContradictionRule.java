@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 
 /**
@@ -38,6 +38,6 @@ public interface ContradictionRule extends Rule<Contradiction> {
 
 	public void accept(ContradictionRuleVisitor<?> visitor,
 			Contradiction premise, ContextPremises premises,
-			ConclusionProducer producer);
+			ClassConclusionProducer producer);
 
 }

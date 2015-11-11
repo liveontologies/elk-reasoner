@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedExistential;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 
 /**
  * A {@link PropagationRule} producing {@link Subsumer}s in the source
@@ -63,7 +63,7 @@ public class SubsumerPropagationRule extends AbstractPropagationRule {
 
 	@Override
 	public void apply(Propagation premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		final Map<IndexedObjectProperty, ? extends SubContextPremises> subContextMap = premises
 				.getSubContextPremisesByObjectProperty();
 		IndexedObjectProperty subRoot = premise.getConclusionSubRoot();
@@ -83,7 +83,7 @@ public class SubsumerPropagationRule extends AbstractPropagationRule {
 
 	@Override
 	public void accept(PropagationRuleVisitor<?> visitor, Propagation premise,
-			ContextPremises premises, ConclusionProducer producer) {
+			ContextPremises premises, ClassConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}
 

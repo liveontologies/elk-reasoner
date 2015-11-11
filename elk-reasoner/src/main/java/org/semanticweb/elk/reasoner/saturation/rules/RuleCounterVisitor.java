@@ -95,7 +95,7 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(BackwardLinkChainFromBackwardLinkRule rule,
 			BackwardLink premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		counter_.countBackwardLinkChainFromBackwardLinkRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 
@@ -103,7 +103,7 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 
 	@Override
 	public O visit(BackwardLinkFromForwardLinkRule rule, ForwardLink premise,
-			ContextPremises premises, ConclusionProducer producer) {
+			ContextPremises premises, ClassConclusionProducer producer) {
 		counter_.countBackwardLinkFromForwardLinkRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
@@ -111,14 +111,14 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(ComposedFromDecomposedSubsumerRule rule,
 			IndexedClassEntity premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		counter_.countComposedFromDecomposedSubsumerRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
 
 	@Override
 	public O visit(ContradictionCompositionRule rule, DisjointSubsumer premise,
-			ContextPremises premises, ConclusionProducer producer) {
+			ContextPremises premises, ClassConclusionProducer producer) {
 		counter_.countContradictionCompositionRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
@@ -126,7 +126,7 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(ContradictionFromNegationRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		counter_.countContradictionFromNegationRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
@@ -134,7 +134,7 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(ContradictionFromOwlNothingRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		counter_.countContradictionFromOwlNothingRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
@@ -142,14 +142,14 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(ContradictionOverBackwardLinkRule rule,
 			BackwardLink premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		counter_.countContradictionOverBackwardLinkRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
 
 	@Override
 	public O visit(ContradictionPropagationRule rule, Contradiction premise,
-			ContextPremises premises, ConclusionProducer producer) {
+			ContextPremises premises, ClassConclusionProducer producer) {
 		counter_.countContradictionPropagationRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
@@ -157,14 +157,14 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(DisjointSubsumerFromMemberRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		counter_.countDisjointSubsumerFromMemberRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
 
 	@Override
 	public O visit(IndexedClassDecompositionRule rule, IndexedClass premise,
-			ContextPremises premises, ConclusionProducer producer) {
+			ContextPremises premises, ClassConclusionProducer producer) {
 		counter_.countIndexedClassDecompositionRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
@@ -172,7 +172,7 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(IndexedClassFromDefinitionRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		counter_.countIndexedClassFromDefinitionRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
@@ -180,7 +180,7 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(IndexedObjectComplementOfDecomposition rule,
 			IndexedObjectComplementOf premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		counter_.countIndexedObjectComplementOfDecomposition++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
@@ -188,7 +188,7 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(IndexedObjectHasSelfDecomposition rule,
 			IndexedObjectHasSelf premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		counter_.countIndexedObjectHasSelfDecomposition++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
@@ -196,7 +196,7 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(IndexedObjectIntersectionOfDecomposition rule,
 			IndexedObjectIntersectionOf premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		counter_.countIndexedObjectIntersectionOfDecomposition++;
 		return visitor_.visit(rule, premise, premises, producer);
 
@@ -205,7 +205,7 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(IndexedObjectSomeValuesFromDecomposition rule,
 			IndexedObjectSomeValuesFrom premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		counter_.countIndexedObjectSomeValuesFromDecomposition++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
@@ -213,7 +213,7 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(NonReflexiveBackwardLinkCompositionRule rule,
 			ForwardLink premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		counter_.countNonReflexiveBackwardLinkCompositionRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
@@ -221,7 +221,7 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(ObjectIntersectionFromFirstConjunctRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		counter_.countObjectIntersectionFromFirstConjunctRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
@@ -229,7 +229,7 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(ObjectIntersectionFromSecondConjunctRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		counter_.countObjectIntersectionFromSecondConjunctRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
@@ -237,14 +237,14 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(ObjectUnionFromDisjunctRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		counter_.countObjectUnionFromDisjunctRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
 
 	@Override
 	public O visit(OwlThingContextInitRule rule, ContextInitialization premise,
-			ContextPremises premises, ConclusionProducer producer) {
+			ContextPremises premises, ClassConclusionProducer producer) {
 		counter_.countOwlThingContextInitRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
@@ -252,7 +252,7 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(PropagationFromExistentialFillerRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		counter_.countPropagationFromExistentialFillerRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
@@ -260,7 +260,7 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(PropagationInitializationRule rule,
 			SubContextInitialization premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		counter_.countPropagationInitializationRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
@@ -268,7 +268,7 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(ReflexiveBackwardLinkCompositionRule rule,
 			ForwardLink premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		counter_.countReflexiveBackwardLinkCompositionRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
@@ -276,21 +276,21 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(RootContextInitializationRule rule,
 			ContextInitialization premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		counter_.countRootContextInitializationRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
 
 	@Override
 	public O visit(SubsumerBackwardLinkRule rule, BackwardLink premise,
-			ContextPremises premises, ConclusionProducer producer) {
+			ContextPremises premises, ClassConclusionProducer producer) {
 		counter_.countSubsumerBackwardLinkRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
 
 	@Override
 	public O visit(SubsumerPropagationRule rule, Propagation premise,
-			ContextPremises premises, ConclusionProducer producer) {
+			ContextPremises premises, ClassConclusionProducer producer) {
 		counter_.countSubsumerPropagationRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}
@@ -298,7 +298,7 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 	@Override
 	public O visit(SuperClassFromSubClassRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		counter_.countSuperClassFromSubClassRule++;
 		return visitor_.visit(rule, premise, premises, producer);
 	}

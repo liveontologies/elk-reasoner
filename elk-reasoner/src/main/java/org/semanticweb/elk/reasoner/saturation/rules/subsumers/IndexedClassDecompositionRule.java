@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedDefinition;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +94,7 @@ public class IndexedClassDecompositionRule extends
 
 	@Override
 	public void apply(IndexedClass premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		IndexedClassExpression definedExpression = getDefinition(premise);
 		if (definedExpression == null)
 			return;
@@ -110,7 +110,7 @@ public class IndexedClassDecompositionRule extends
 	@Override
 	public void accept(SubsumerDecompositionRuleVisitor<?> visitor,
 			IndexedClass premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 
 	}

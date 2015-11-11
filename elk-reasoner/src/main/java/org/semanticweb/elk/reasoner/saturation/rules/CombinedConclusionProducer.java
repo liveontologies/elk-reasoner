@@ -22,30 +22,30 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 
 /**
- * A {@link ConclusionProducer} that combines two given
- * {@link ConclusionProducer}: all methods are executed first for the first
- * {@link ConclusionProducer} and then for the second.
+ * A {@link ClassConclusionProducer} that combines two given
+ * {@link ClassConclusionProducer}: all methods are executed first for the first
+ * {@link ClassConclusionProducer} and then for the second.
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class CombinedConclusionProducer implements ConclusionProducer {
+public class CombinedConclusionProducer implements ClassConclusionProducer {
 
-	private final ConclusionProducer firstProducer_;
+	private final ClassConclusionProducer firstProducer_;
 
-	private final ConclusionProducer secondProducer_;
+	private final ClassConclusionProducer secondProducer_;
 
-	public CombinedConclusionProducer(ConclusionProducer firstProducer,
-			ConclusionProducer secondProducer) {
+	public CombinedConclusionProducer(ClassConclusionProducer firstProducer,
+			ClassConclusionProducer secondProducer) {
 		this.firstProducer_ = firstProducer;
 		this.secondProducer_ = secondProducer;
 	}
 
 	@Override
-	public void produce(Conclusion conclusion) {
+	public void produce(ClassConclusion conclusion) {
 		firstProducer_.produce(conclusion);
 		secondProducer_.produce(conclusion);
 	}

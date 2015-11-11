@@ -21,16 +21,32 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 
 /**
- * A {@code Conclusion} indicating that a {@link SubContext} of a
+ * A {@code SubConclusion} indicating that a {@link SubContext} of a
  * {@link Context} where it is stored should be initialized.
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface SubContextInitialization extends SubConclusion {
+public interface SubContextInitialization extends SubClassConclusion {
 
 	public static final String NAME = "Sub-Context Initialization";
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		SubContextInitialization getSubContextInitialization(
+				IndexedContextRoot root, IndexedObjectProperty subRoot);
+
+	}
+
 }

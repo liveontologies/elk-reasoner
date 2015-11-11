@@ -37,7 +37,8 @@ import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ConclusionBaseFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
@@ -125,6 +126,11 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	 * no (direct) subsumers
 	 */
 	private final List<ElkClass> defaultTopOutput_;
+	
+	/**
+	 * A factory for creating contradiction conclusions; used for checking unsatisfiable contexts
+	 */
+	private final Contradiction.Factory factory_ = new ConclusionBaseFactory();
 
 	/**
 	 * Creating a new transitive reduction engine for the input ontology index
@@ -253,7 +259,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			/*
 			 * If saturation is unsatisfiable, return the unsatisfiable output.
 			 */
-			if (saturation.containsConclusion(new ContradictionImpl(root))) {
+			if (saturation.containsConclusion(factory_.getContradiction(root))) {
 				LOGGER_.trace(
 						"{}: transitive reduction finished: inconsistent", root);
 

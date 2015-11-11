@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.SubContext;
@@ -50,7 +50,7 @@ public class SubContextImpl extends ArrayHashSet<IndexedContextRoot> implements
 	private boolean isInitialized_ = false;
 
 	/**
-	 * the number of {@link SubConclusion}s contained in this {@link SubContext}
+	 * the number of {@link SubClassConclusion}s contained in this {@link SubContext}
 	 */
 	private int size_ = 0;
 
@@ -73,7 +73,7 @@ public class SubContextImpl extends ArrayHashSet<IndexedContextRoot> implements
 	}
 
 	@Override
-	public boolean addSubConclusion(SubConclusion conclusion) {
+	public boolean addSubConclusion(SubClassConclusion conclusion) {
 		boolean success = conclusion.accept(SUB_CONCLUSION_INSERTER_, this);
 		if (success)
 			size_++;
@@ -81,7 +81,7 @@ public class SubContextImpl extends ArrayHashSet<IndexedContextRoot> implements
 	}
 
 	@Override
-	public boolean removeSubConclusion(SubConclusion conclusion) {
+	public boolean removeSubConclusion(SubClassConclusion conclusion) {
 		boolean success = conclusion.accept(SUB_CONCLUSION_DELETOR_, this);
 		if (success)
 			size_--;
@@ -89,7 +89,7 @@ public class SubContextImpl extends ArrayHashSet<IndexedContextRoot> implements
 	}
 
 	@Override
-	public boolean containsSubConclusion(SubConclusion conclusion) {
+	public boolean containsSubConclusion(SubClassConclusion conclusion) {
 		return conclusion.accept(SUB_CONCLUSION_OCCURRENCE_CHECKER_, this);
 	}
 

@@ -61,7 +61,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Contra
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.SubPropertyChainImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ReflexivePropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldReflexiveProperty;
 
@@ -115,11 +115,11 @@ public class ExpressionMapper {
 		@Override
 		public Iterable<TracingInput> visit(final ElkSubClassOfLemma lemma,
 				Void input) {
-			Conclusion subsumption = lemma.getSuperClass().accept(
-					new ElkComplexClassExpressionVisitor<Void, Conclusion>() {
+			ClassConclusion subsumption = lemma.getSuperClass().accept(
+					new ElkComplexClassExpressionVisitor<Void, ClassConclusion>() {
 
 						@Override
-						public Conclusion visit(
+						public ClassConclusion visit(
 								ElkComplexObjectSomeValuesFrom ce, Void input) {
 							// a forward link
 							IndexedPropertyChain chain = ce.getPropertyChain()
@@ -220,7 +220,7 @@ public class ExpressionMapper {
 			IndexedClassExpression subsumer = ax.getClassExpression().accept(
 					converter_);
 
-			Conclusion conclusion = isNothing(ax.getClassExpression()) ? new ContradictionImpl(
+			ClassConclusion conclusion = isNothing(ax.getClassExpression()) ? new ContradictionImpl(
 					subsumee)
 					: new DecomposedSubsumerImpl<IndexedClassExpression>(
 							subsumee, subsumer);

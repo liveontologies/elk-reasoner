@@ -26,10 +26,8 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.DisjointSubsumerInferenceVisitor;
@@ -55,9 +53,9 @@ public class DisjointSubsumerFromSubsumer extends
 		return getConclusionRoot();
 	}
 
-	public ComposedSubsumer getPremise() {
-		return new ComposedSubsumerImpl<IndexedClassExpression>(
-				getInferenceRoot(), getDisjointExpressions().getElements().get(getPosition()));
+	public ComposedSubsumer getPremise(ComposedSubsumer.Factory factory) {
+		return factory.getComposedSubsumer(getInferenceRoot(),
+				getDisjointExpressions().getElements().get(getPosition()));
 	}
 
 	@Override

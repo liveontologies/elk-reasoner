@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.contradiction;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 
 /**
  * A visitor pattern for {@link ContradictionRule}s
@@ -37,6 +37,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 public interface ContradictionRuleVisitor<O> {
 
 	O visit(ContradictionPropagationRule rule, Contradiction premise,
-			ContextPremises premises, ConclusionProducer producer);
+			ContextPremises premises, ClassConclusionProducer producer);
 
 }

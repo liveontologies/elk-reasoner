@@ -31,7 +31,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDefinitionAxiom;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ComposedSubsumerInferenceVisitor;
 
@@ -44,8 +43,9 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ComposedSubsu
  * @see IndexedDefinitionAxiom
  *
  */
-public class ComposedDefinition extends
-		AbstractComposedSubsumerInference<IndexedClass> {
+public class ComposedDefinition
+		extends
+			AbstractComposedSubsumerInference<IndexedClass> {
 
 	private final IndexedClassExpression definition_;
 
@@ -74,11 +74,10 @@ public class ComposedDefinition extends
 		return this.reason_;
 	}
 
-	public ComposedSubsumer getPremise() {
-		return new ComposedSubsumerImpl<IndexedClassExpression>(
-				getInferenceRoot(), definition_);
+	public ComposedSubsumer getPremise(ComposedSubsumer.Factory factory) {
+		return factory.getComposedSubsumer(getInferenceRoot(), definition_);
 	}
-	
+
 	public IndexedDefinitionAxiom getSideCondition(
 			IndexedDefinitionAxiomFactory factory) {
 		return factory.getIndexedDefinitionAxiom(reason_, getExpression(),

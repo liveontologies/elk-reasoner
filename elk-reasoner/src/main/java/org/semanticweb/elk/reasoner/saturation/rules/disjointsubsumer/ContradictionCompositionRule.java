@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradict
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromDisjointSubsumers;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 
 /**
  * A {@link DisjointSubsumerRule} applied when processing a
@@ -49,7 +49,7 @@ public class ContradictionCompositionRule extends AbstractDisjointSubsumerRule {
 
 	@Override
 	public void apply(DisjointSubsumer premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		IndexedClassExpressionList disjoint = premise.getDisjointExpressions();		
 		Set<? extends Integer> disjointSubsumerPositions = premises
 				.getSubsumerPositions(disjoint); // should not be null
@@ -75,7 +75,7 @@ public class ContradictionCompositionRule extends AbstractDisjointSubsumerRule {
 	@Override
 	public void accept(DisjointSubsumerRuleVisitor<?> visitor,
 			DisjointSubsumer premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}
 

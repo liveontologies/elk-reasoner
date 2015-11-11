@@ -28,11 +28,11 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 
 /**
- * A finer representation for a set of {@link Conclusion}s that can be used as
+ * A finer representation for a set of {@link ClassConclusion}s that can be used as
  * premises of inference rules associated with the same sub-root
  * {@link IndexedPropertyChain} in addition to the same root
  * {@link IndexedClassExpression}. Each {@link SubContextPremises} is stored

@@ -32,9 +32,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubObjectPropertyOfAxiom;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.SubPropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubPropertyChain;
@@ -108,26 +105,26 @@ public class ComposedBackwardLink extends AbstractBackwardLinkInference
 	}
 
 	@Override
-	public BackwardLink getFirstPremise() {
-		return new BackwardLinkImpl(getInferenceRoot(), backwardRelation_,
+	public BackwardLink getFirstPremise(BackwardLink.Factory factory) {
+		return factory.getBackwardLink(getInferenceRoot(), backwardRelation_,
 				getOriginRoot());
 	}
 
 	@Override
-	public SubPropertyChain getSecondPremise() {
-		return new SubPropertyChainImpl(backwardRelation_,
+	public SubPropertyChain getSecondPremise(SubPropertyChain.Factory factory) {
+		return factory.getSubPropertyChain(backwardRelation_,
 				composition_.getFirstProperty());
 	}
 
 	@Override
-	public ForwardLink getThirdPremise() {
-		return new ForwardLinkImpl<IndexedPropertyChain>(getInferenceRoot(),
-				forwardChain_, getConclusionRoot());
+	public ForwardLink getThirdPremise(ForwardLink.Factory factory) {
+		return factory.getForwardLink(getInferenceRoot(), forwardChain_,
+				getConclusionRoot());
 	}
 
 	@Override
-	public SubPropertyChain getFourthPremise() {
-		return new SubPropertyChainImpl(forwardChain_,
+	public SubPropertyChain getFourthPremise(SubPropertyChain.Factory factory) {
+		return factory.getSubPropertyChain(forwardChain_,
 				composition_.getSuffixChain());
 	}
 
@@ -137,8 +134,8 @@ public class ComposedBackwardLink extends AbstractBackwardLinkInference
 				backwardRelation_);
 	}
 	
-	public SubPropertyChain getFifthPremise() {
-		return new SubPropertyChainImpl(composition_, getBackwardRelation());
+	public SubPropertyChain getFifthPremise(SubPropertyChain.Factory factory) {
+		return factory.getSubPropertyChain(composition_, getBackwardRelation());
 	}
 	
 	@Override

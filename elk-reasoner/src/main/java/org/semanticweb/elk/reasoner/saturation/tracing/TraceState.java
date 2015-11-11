@@ -32,7 +32,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
@@ -50,17 +50,17 @@ import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPrope
 public class TraceState implements InferenceSet,
 		ModifiableClassInferenceTracingState, ObjectPropertyInferenceProducer {
 
-	private final Queue<Conclusion> toTrace_ = new LinkedList<Conclusion>();
+	private final Queue<ClassConclusion> toTrace_ = new LinkedList<ClassConclusion>();
 
 	private final ConcurrentHashMap<IndexedContextRoot, ClassInferenceSet> classInferenceMap_ = new ConcurrentHashMap<IndexedContextRoot, ClassInferenceSet>();
 
 	private final ModifiableObjectPropertyInferenceSet objectPropertyInferenceSet_ = new SynchronizedModifiableObjectPropertyInferenceSet();
 
-	public Collection<? extends Conclusion> getToTrace() {
+	public Collection<? extends ClassConclusion> getToTrace() {
 		return toTrace_;
 	}
 
-	public void addToTrace(Conclusion conclusion) {
+	public void addToTrace(ClassConclusion conclusion) {
 		toTrace_.add(conclusion);
 	}
 
@@ -103,7 +103,7 @@ public class TraceState implements InferenceSet,
 
 	@Override
 	public Iterable<? extends ClassInference> getClassInferences(
-			Conclusion conclusion) {
+			ClassConclusion conclusion) {
 		IndexedContextRoot originRoot = conclusion.getOriginRoot();
 		ClassInferenceSet inferences = classInferenceMap_.get(originRoot);
 		if (inferences == null)

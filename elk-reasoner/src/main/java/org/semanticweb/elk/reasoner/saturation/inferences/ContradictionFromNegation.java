@@ -9,7 +9,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,15 +25,12 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ContradictionInferenceVisitor;
 
 /**
@@ -55,17 +52,17 @@ public class ContradictionFromNegation extends AbstractContradictionInference {
 	}
 
 	@Override
-	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(ClassConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
 
-	public ComposedSubsumer getPremise() {
-		return new ComposedSubsumerImpl<IndexedClassExpression>(
-				getInferenceRoot(), negation_.getNegated());
+	public ComposedSubsumer getPremise(ComposedSubsumer.Factory factory) {
+		return factory.getComposedSubsumer(getInferenceRoot(),
+				negation_.getNegated());
 	}
 
-	public DecomposedSubsumer getNegatedPremise() {
-		return new DecomposedSubsumerImpl(getInferenceRoot(), negation_);
+	public DecomposedSubsumer getNegatedPremise(DecomposedSubsumer.Factory factory) {
+		return factory.getDecomposedSubsumer(getInferenceRoot(), negation_);
 	}
 
 	@Override

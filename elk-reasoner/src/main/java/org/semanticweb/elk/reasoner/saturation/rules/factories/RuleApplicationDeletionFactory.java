@@ -32,19 +32,19 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionDeletionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionOccurrenceCheckingVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextUnsaturationVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.RuleApplicationConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionDeletionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionOccurrenceCheckingVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionSourceContextUnsaturationVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.RuleApplicationClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
- * A {@link RuleApplicationFactory} that deletes the produced {@link Conclusion}
+ * A {@link RuleApplicationFactory} that deletes the produced {@link ClassConclusion}
  * s from the respective {@link Context} and applies rules, which in turn
- * produce {@link Conclusion} s for which this process repeats if they have not
+ * produce {@link ClassConclusion} s for which this process repeats if they have not
  * been processed already. This {@link RuleApplicationFactory} never creates new
  * {@link Context}s.
  * 
@@ -81,7 +81,7 @@ public class RuleApplicationDeletionFactory extends
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected ConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
+	protected ClassConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
 			RuleVisitor<?> ruleVisitor,
 			SaturationStateWriter<? extends Context> writer,
 			SaturationStatistics localStatistics) {
@@ -91,17 +91,17 @@ public class RuleApplicationDeletionFactory extends
 						SaturationUtils
 								.getProcessedConclusionCountingVisitor(localStatistics),
 						// check if conclusion occurs in the context and proceed
-						new ConclusionOccurrenceCheckingVisitor(),
+						new ClassConclusionOccurrenceCheckingVisitor(),
 						// count conclusions used in the rules, if necessary
 						SaturationUtils
 								.getUsedConclusionCountingVisitor(localStatistics),
 						// apply rules
-						new RuleApplicationConclusionVisitor(ruleVisitor,
+						new RuleApplicationClassConclusionVisitor(ruleVisitor,
 								writer),
 						// after processing, delete the conclusion
-						new ConclusionDeletionVisitor(),
+						new ClassConclusionDeletionVisitor(),
 						// and mark the source context of the conclusion as
 						// non-saturated
-						new ConclusionSourceContextUnsaturationVisitor(writer));
+						new ClassConclusionSourceContextUnsaturationVisitor(writer));
 	}
 }

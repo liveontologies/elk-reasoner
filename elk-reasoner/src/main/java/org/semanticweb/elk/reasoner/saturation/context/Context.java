@@ -23,30 +23,30 @@ package org.semanticweb.elk.reasoner.saturation.context;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 import org.semanticweb.elk.util.collections.chains.Chain;
 
 /**
  * An object representing an elementary unit of computation for
- * {@link Conclusion}s that can be used as premises of inferences associated
+ * {@link ClassConclusion}s that can be used as premises of inferences associated
  * with the {@link IndexedClassExpression}, stored as a <em>root</em> of this
  * {@link Context} ({@link Context#getRoot()}). The computation is organized in
- * a saturation process where all {@link Conclusion}s to which inferences should
+ * a saturation process where all {@link ClassConclusion}s to which inferences should
  * be applied are added to the "todo" queue using
- * {@link #addConclusion(Conclusion)} and when the rules are applied, they are
+ * {@link #addConclusion(ClassConclusion)} and when the rules are applied, they are
  * repeatedly taken from this queue using {@link #takeToDo()}. The object
- * provides some methods in addition to {@link ConclusionSet} to store, test and
- * remove information for {@link Conclusion}s in this {@link Context}, and some
+ * provides some methods in addition to {@link ClassConclusionSet} to store, test and
+ * remove information for {@link ClassConclusion}s in this {@link Context}, and some
  * bookkeeping methods for the saturation process.
  * 
  * @author "Yevgeny Kazakov"
  * @see RuleApplicationAdditionFactory
  * 
  */
-public interface Context extends ConclusionSet, ContextPremises {
+public interface Context extends ClassConclusionSet, ContextPremises {
 
 	/**
 	 * @return the {@link Chain} view of all backward link rules assigned to
@@ -59,7 +59,7 @@ public interface Context extends ConclusionSet, ContextPremises {
 	Chain<LinkableBackwardLinkRule> getBackwardLinkRuleChain();
 
 	/**
-	 * Adds the given {@link Conclusion} to be processed within this
+	 * Adds the given {@link ClassConclusion} to be processed within this
 	 * {@link Context}. The method returns {@code true} when this is the first
 	 * unprocessed conclusion added to the context after it is being created or
 	 * cleared (that is, {@link #takeToDo()} has returned {@code null}). If
@@ -68,30 +68,30 @@ public interface Context extends ConclusionSet, ContextPremises {
 	 * unless {@link #takeToDo()} is called as well.
 	 * 
 	 * @param conclusion
-	 *            the {@link Conclusion} added to be processed within this
+	 *            the {@link ClassConclusion} added to be processed within this
 	 *            {@link Context}
 	 * @return {@code true} when the added conclusion is the first unprocessed
 	 *         conclusion for this context
 	 * @see #takeToDo()
 	 */
-	boolean addToDo(Conclusion conclusion);
+	boolean addToDo(ClassConclusion conclusion);
 
 	/**
-	 * Removes and returns one of the unprocessed {@link Conclusion}s of this
+	 * Removes and returns one of the unprocessed {@link ClassConclusion}s of this
 	 * context. This method is thread safe and can be used concurrently with the
-	 * method {@link #addToDo(Conclusion)}.
+	 * method {@link #addToDo(ClassConclusion)}.
 	 * 
-	 * @return some unprocessed {@link Conclusion} of this context, if there is
-	 *         one, or {@code null} if there is no such {@link Conclusion}
-	 * @see #addToDo(Conclusion)
+	 * @return some unprocessed {@link ClassConclusion} of this context, if there is
+	 *         one, or {@code null} if there is no such {@link ClassConclusion}
+	 * @see #addToDo(ClassConclusion)
 	 */
-	Conclusion takeToDo();
+	ClassConclusion takeToDo();
 
 	/**
-	 * @return {@code true} if all {@link Conclusion}s for this {@link Context},
+	 * @return {@code true} if all {@link ClassConclusion}s for this {@link Context},
 	 *         as determined by the function
-	 *         {@link Conclusion#getSourceRoot(IndexedClassExpression)}, except
-	 *         for {@link SubConclusion}s are already computed.
+	 *         {@link ClassConclusion#getSourceRoot(IndexedClassExpression)}, except
+	 *         for {@link SubClassConclusion}s are already computed.
 	 */
 	boolean isSaturated();
 

@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
 
 /**
  * An implementation of {@link DecomposedSubsumer}.
@@ -37,13 +37,13 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVi
 public class DecomposedSubsumerImpl extends
 		AbstractSubsumer<IndexedClassExpression> implements DecomposedSubsumer {
 
-	public DecomposedSubsumerImpl(IndexedContextRoot root,
+	protected DecomposedSubsumerImpl(IndexedContextRoot root,
 			IndexedClassExpression subsumer) {
 		super(root, subsumer);
 	}
 
 	@Override
-	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(ClassConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
 

@@ -27,8 +27,6 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ContradictionInferenceVisitor;
@@ -64,13 +62,14 @@ public class PropagatedContradiction extends AbstractContradictionInference {
 		return inferenceRoot_;
 	}
 
-	public BackwardLink getLinkPremise() {
-		return new BackwardLinkImpl(getInferenceRoot(), premiseRelation_,
+	public BackwardLink getLinkPremise(BackwardLink.Factory factory) {
+		return factory.getBackwardLink(getInferenceRoot(), premiseRelation_,
 				getConclusionRoot());
 	}
 
-	public Contradiction getContradictionPremise() {
-		return new ContradictionImpl(getInferenceRoot());
+	public Contradiction getContradictionPremise(
+			Contradiction.Factory factory) {
+		return factory.getContradiction(getInferenceRoot());
 	}
 
 	@Override

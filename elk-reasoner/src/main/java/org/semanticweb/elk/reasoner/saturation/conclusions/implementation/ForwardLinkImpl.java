@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  *            The type of the forward relation
  */
 public class ForwardLinkImpl<R extends IndexedPropertyChain> extends
-		AbstractConclusion implements ForwardLink {
+		AbstractClassConclusion implements ForwardLink {
 
 	static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ForwardLinkImpl.class);
@@ -56,10 +56,10 @@ public class ForwardLinkImpl<R extends IndexedPropertyChain> extends
 	 */
 	final IndexedContextRoot target_;
 
-	public ForwardLinkImpl(IndexedContextRoot root, R relation,
+	protected ForwardLinkImpl(IndexedContextRoot root, R forwardChain,
 			IndexedContextRoot target) {
 		super(root);
-		this.forwardChain_ = relation;
+		this.forwardChain_ = forwardChain;
 		this.target_ = target;
 	}
 
@@ -74,7 +74,7 @@ public class ForwardLinkImpl<R extends IndexedPropertyChain> extends
 	}
 
 	@Override
-	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(ClassConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
 

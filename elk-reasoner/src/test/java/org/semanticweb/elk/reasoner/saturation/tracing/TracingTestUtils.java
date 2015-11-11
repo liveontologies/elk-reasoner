@@ -44,9 +44,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.SubPropertyChainImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ConclusionBaseFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -75,7 +74,7 @@ public class TracingTestUtils {
 	private static final UntracedConclusionListener UNTRACED_LISTENER = new UntracedConclusionListener() {
 
 		@Override
-		public void notifyUntraced(Conclusion conclusion) {
+		public void notifyUntraced(ClassConclusion conclusion) {
 			fail(conclusion.getConclusionRoot() + ": " + conclusion
 					+ ": conclusion was not traced");
 		}
@@ -85,18 +84,19 @@ public class TracingTestUtils {
 			fail("Property conclusion " + conclusion + " was not traced");
 		}
 	};
+	
+	private static final Conclusion.Factory FACTORY_ = new ConclusionBaseFactory();
 
-	static Conclusion getConclusionToTrace(Context context,
+	static ClassConclusion getConclusionToTrace(Context context,
 			IndexedClassExpression subsumer) {
 		if (context != null) {
 			IndexedContextRoot root = context.getRoot();
-			Conclusion contradiction = new ContradictionImpl(root);
+			ClassConclusion contradiction = FACTORY_.getContradiction(root);
 			if (context.containsConclusion(contradiction)) {
 				return contradiction;
 			}
 
-			return new ComposedSubsumerImpl<IndexedClassExpression>(root,
-					subsumer);
+			return FACTORY_.getComposedSubsumer(root, subsumer);
 		}
 
 		throw new IllegalArgumentException("Context may not be null");
@@ -106,7 +106,7 @@ public class TracingTestUtils {
 			ElkClassExpression sup, Reasoner reasoner) {
 		IndexedClassExpression subsumee = ReasonerStateAccessor.transform(
 				reasoner, sub);
-		Conclusion subsumer = getConclusionToTrace(
+		ClassConclusion subsumer = getConclusionToTrace(
 				ReasonerStateAccessor.getContext(reasoner, subsumee),
 				ReasonerStateAccessor.transform(reasoner, sup));
 		final AtomicInteger conclusionCount = new AtomicInteger(0);
@@ -150,7 +150,7 @@ public class TracingTestUtils {
 		TestTraceUnwinder explorer = new TestTraceUnwinder(traceState,
 				UNTRACED_LISTENER);
 
-		Conclusion contradiction = new ContradictionImpl(entity);
+		ClassConclusion contradiction = FACTORY_.getContradiction(entity);
 		explorer.accept(contradiction, counter);
 	}
 
@@ -162,7 +162,7 @@ public class TracingTestUtils {
 			ElkClassExpression sup, Reasoner reasoner, int expected) {
 		final IndexedClassExpression subsumee = ReasonerStateAccessor
 				.transform(reasoner, sub);
-		Conclusion conclusion = getConclusionToTrace(
+		ClassConclusion conclusion = getConclusionToTrace(
 				ReasonerStateAccessor.getContext(reasoner, subsumee),
 				ReasonerStateAccessor.transform(reasoner, sup));
 		int actual = 0;
@@ -183,7 +183,7 @@ public class TracingTestUtils {
 				reasoner, sub);
 		final IndexedObjectProperty subsumer = ReasonerStateAccessor.transform(
 				reasoner, sup);
-		ObjectPropertyConclusion conclusion = new SubPropertyChainImpl(
+		ObjectPropertyConclusion conclusion = FACTORY_.getSubPropertyChain(
 				subsumee, subsumer);
 		int actual = 0;
 		for (ObjectPropertyInference ignore : ReasonerStateAccessor
@@ -208,7 +208,7 @@ public class TracingTestUtils {
 			final ObjectPropertyInferenceVisitor<Void, Boolean> propertyInferenceVisitor) {
 		final IndexedClassExpression subsumee = ReasonerStateAccessor
 				.transform(reasoner, sub);
-		Conclusion conclusion = getConclusionToTrace(
+		ClassConclusion conclusion = getConclusionToTrace(
 				ReasonerStateAccessor.getContext(reasoner, subsumee),
 				ReasonerStateAccessor.transform(reasoner, sup));
 		final MutableBoolean classInferenceCondition = new MutableBoolean(false);
@@ -259,7 +259,7 @@ public class TracingTestUtils {
 		final Set<ElkAxiom> sideConditions = new HashSet<ElkAxiom>();
 		final IndexedClassExpression subsumee = ReasonerStateAccessor
 				.transform(reasoner, sub);
-		Conclusion conclusion = getConclusionToTrace(
+		ClassConclusion conclusion = getConclusionToTrace(
 				ReasonerStateAccessor.getContext(reasoner, subsumee),
 				ReasonerStateAccessor.transform(reasoner, sup));
 		ClassInferenceVisitor<Void, ?> sideConditionVisitor = SideConditions
@@ -287,7 +287,7 @@ public class TracingTestUtils {
 			throws ElkException {
 		final IndexedClassExpression subsumee = ReasonerStateAccessor
 				.transform(reasoner, sub);
-		Conclusion conclusion = getConclusionToTrace(
+		ClassConclusion conclusion = getConclusionToTrace(
 				ReasonerStateAccessor.getContext(reasoner, subsumee),
 				ReasonerStateAccessor.transform(reasoner, sup));
 		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(
@@ -307,7 +307,7 @@ public class TracingTestUtils {
 			throws ElkException {
 		final IndexedClassExpression subsumee = ReasonerStateAccessor
 				.transform(reasoner, sub);
-		Conclusion conclusion = getConclusionToTrace(
+		ClassConclusion conclusion = getConclusionToTrace(
 				ReasonerStateAccessor.getContext(reasoner, subsumee),
 				ReasonerStateAccessor.transform(reasoner, sup));
 		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(
@@ -336,7 +336,7 @@ public class TracingTestUtils {
 				UNTRACED_LISTENER);
 
 		reasoner.explainInconsistency();
-		traceUnwinder.accept(new ContradictionImpl(entity),
+		traceUnwinder.accept(FACTORY_.getContradiction(entity),
 				classInferenceVisitor, propertyInferenceVisitor);
 	}
 

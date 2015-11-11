@@ -28,7 +28,6 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectHasSelf;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.DecomposedSubsumerInferenceVisitor;
@@ -59,8 +58,9 @@ public class ObjectHasSelfPropertyRangeSubsumer extends
 		return getConclusionRoot();
 	}
 
-	public DecomposedSubsumer getPremise() {
-		return new DecomposedSubsumerImpl(getInferenceRoot(), premiseSubsumer_);
+	public DecomposedSubsumer getPremise(DecomposedSubsumer.Factory factory) {
+		return factory.getDecomposedSubsumer(getInferenceRoot(),
+				premiseSubsumer_);
 	}
 
 	@Override

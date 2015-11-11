@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ComposedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialForwardLink;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
 
 /**
@@ -86,7 +86,7 @@ public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		 * @param producer
 		 */
 		public static void generatePropagations(IndexedObjectProperty property,
-				ContextPremises premises, ConclusionProducer producer) {
+				ContextPremises premises, ClassConclusionProducer producer) {
 			for (IndexedClassExpression ice : premises.getComposedSubsumers()) {
 				PropagationFromExistentialFillerRule.applyForProperty(
 						ice.getCompositionRuleHead(), property, premises,
@@ -113,7 +113,7 @@ public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		}
 
 		public static void produceDecomposedExistentialLink(
-				ConclusionProducer producer, IndexedContextRoot root,
+				ClassConclusionProducer producer, IndexedContextRoot root,
 				IndexedObjectSomeValuesFrom subsumer) {
 			SaturatedPropertyChain propertySaturation = subsumer.getProperty()
 					.getSaturated();
@@ -127,7 +127,7 @@ public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			}
 		}
 
-		public static void produceComposedLink(ConclusionProducer producer,
+		public static void produceComposedLink(ClassConclusionProducer producer,
 				IndexedContextRoot source,
 				IndexedObjectProperty backwardRelation,
 				IndexedContextRoot inferenceRoot,

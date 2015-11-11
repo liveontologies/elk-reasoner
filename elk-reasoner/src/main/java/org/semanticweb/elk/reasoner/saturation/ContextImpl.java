@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Backwa
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
@@ -45,7 +45,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLin
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
@@ -71,9 +71,9 @@ import org.semanticweb.elk.util.concurrent.collections.SynchronizedArrayListActi
  */
 public class ContextImpl implements ExtendedContext {
 
-	private static final ConclusionVisitor<ContextImpl, Boolean> CONCLUSION_INSERTER_ = new ConclusionInserter();
-	private static final ConclusionVisitor<ContextImpl, Boolean> CONCLUSION_DELETER_ = new ConclusionDeleter();
-	private static final ConclusionVisitor<ContextImpl, Boolean> CONCLUSION_OCCURRENCE_CHECKER_ = new ConclusionOccurrenceChecker();
+	private static final ClassConclusionVisitor<ContextImpl, Boolean> CONCLUSION_INSERTER_ = new ConclusionInserter();
+	private static final ClassConclusionVisitor<ContextImpl, Boolean> CONCLUSION_DELETER_ = new ConclusionDeleter();
+	private static final ClassConclusionVisitor<ContextImpl, Boolean> CONCLUSION_OCCURRENCE_CHECKER_ = new ConclusionOccurrenceChecker();
 
 	/**
 	 * the rules that should be applied to each derived {@link BackwardLinkImpl}
@@ -135,7 +135,7 @@ public class ContextImpl implements ExtendedContext {
 	/**
 	 * the queue of unprocessed {@code Conclusion}s of this {@link Context}
 	 */
-	private final ActivationStack<Conclusion> toDo_;
+	private final ActivationStack<ClassConclusion> toDo_;
 
 	/**
 	 * {@code true} if this {@link Context} is initialized, i.e., contains
@@ -144,7 +144,7 @@ public class ContextImpl implements ExtendedContext {
 	private volatile boolean isInitialized_ = false;
 
 	/**
-	 * the number of {@link Conclusion}s contained in this {@code ConclusionSet}
+	 * the number of {@link ClassConclusion}s contained in this {@code ConclusionSet}
 	 */
 	private int size = 0;
 
@@ -156,13 +156,13 @@ public class ContextImpl implements ExtendedContext {
 	 */
 	public ContextImpl(IndexedContextRoot root) {
 		this.root_ = root;
-		this.toDo_ = new SynchronizedArrayListActivationStack<Conclusion>();
+		this.toDo_ = new SynchronizedArrayListActivationStack<ClassConclusion>();
 		this.composedSubsumers_ = new ArrayHashSet<IndexedClassExpression>(16);
 		this.decomposedSubsumers_ = new ArrayHashSet<IndexedClassExpression>(8);
 	}
 
 	@Override
-	public boolean addConclusion(Conclusion conclusion) {
+	public boolean addConclusion(ClassConclusion conclusion) {
 		boolean success = conclusion.accept(CONCLUSION_INSERTER_, this);
 		if (success)
 			size++;
@@ -170,7 +170,7 @@ public class ContextImpl implements ExtendedContext {
 	}
 
 	@Override
-	public boolean removeConclusion(Conclusion conclusion) {
+	public boolean removeConclusion(ClassConclusion conclusion) {
 		boolean success = conclusion.accept(CONCLUSION_DELETER_, this);
 		if (success)
 			size--;
@@ -178,7 +178,7 @@ public class ContextImpl implements ExtendedContext {
 	}
 
 	@Override
-	public boolean containsConclusion(Conclusion conclusion) {
+	public boolean containsConclusion(ClassConclusion conclusion) {
 		return conclusion.accept(CONCLUSION_OCCURRENCE_CHECKER_, this);
 	}
 
@@ -198,7 +198,7 @@ public class ContextImpl implements ExtendedContext {
 	}
 
 	@Override
-	public boolean addToDo(Conclusion conclusion) {
+	public boolean addToDo(ClassConclusion conclusion) {
 		return toDo_.push(conclusion);
 	}
 
@@ -303,7 +303,7 @@ public class ContextImpl implements ExtendedContext {
 	}
 
 	@Override
-	public Conclusion takeToDo() {
+	public ClassConclusion takeToDo() {
 		return toDo_.pop();
 	}
 
@@ -337,7 +337,7 @@ public class ContextImpl implements ExtendedContext {
 	}
 
 	private static class ConclusionInserter implements
-			ConclusionVisitor<ContextImpl, Boolean> {
+			ClassConclusionVisitor<ContextImpl, Boolean> {
 
 		@Override
 		public Boolean visit(BackwardLink subConclusion, ContextImpl input) {
@@ -429,7 +429,7 @@ public class ContextImpl implements ExtendedContext {
 	}
 
 	private static class ConclusionDeleter implements
-			ConclusionVisitor<ContextImpl, Boolean> {
+			ClassConclusionVisitor<ContextImpl, Boolean> {
 
 		@Override
 		public Boolean visit(BackwardLink subConclusion, ContextImpl input) {
@@ -529,7 +529,7 @@ public class ContextImpl implements ExtendedContext {
 	}
 
 	private static class ConclusionOccurrenceChecker implements
-			ConclusionVisitor<ContextImpl, Boolean> {
+			ClassConclusionVisitor<ContextImpl, Boolean> {
 
 		@Override
 		public Boolean visit(BackwardLink subConclusion, ContextImpl input) {

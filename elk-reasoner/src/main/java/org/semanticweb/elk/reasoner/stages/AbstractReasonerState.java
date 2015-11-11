@@ -55,8 +55,8 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ConclusionBaseFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.ClassInferenceSet;
@@ -156,6 +156,11 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 * Keeps relevant information about tracing
 	 */
 	TraceState traceState;
+	
+	/**
+	 * creates conclusions for tracing
+	 */
+	private final Conclusion.Factory factory_ = new ConclusionBaseFactory();
 
 	private final ElkPolarityExpressionConverter expressionConverter_;
 
@@ -561,7 +566,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 * TRACING METHODS
 	 *---------------------------------------------------*/
 
-	private void toTrace(Conclusion conclusion) {
+	private void toTrace(ClassConclusion conclusion) {
 		// if (traceState.getInferencesForOrigin(conclusion.getOriginRoot()) !=
 		// null)
 		// // already traced
@@ -599,7 +604,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		if (!isInconsistent()) {
 			throw new IllegalStateException("The ontology is consistent");
 		}
-		toTrace(new ContradictionImpl(inconsistentEntity));
+		toTrace(factory_.getContradiction(inconsistentEntity));
 		getStageExecutor().complete(stageManager.inferenceTracingStage);
 		return inconsistentEntity.getElkEntity();
 	}
@@ -608,7 +613,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		Context subsumeeContext = saturationState.getContext(subsumee);
 
 		if (subsumeeContext != null) {
-			return !subsumeeContext.containsConclusion(new ContradictionImpl(
+			return !subsumeeContext.containsConclusion(factory_.getContradiction(
 					subsumee));
 		}
 		// shouldn't happen if we suppport only named classes or abbreviate
@@ -616,15 +621,14 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		return true;
 	}
 
-	private Conclusion convertTraceTarget(IndexedClassExpression subsumee,
+	private ClassConclusion convertTraceTarget(IndexedClassExpression subsumee,
 			IndexedClassExpression subsumer) {
 		if (!isSatisfiable(subsumee)) {
 			// the subsumee is unsatisfiable so we explain the unsatisfiability
-			return new ContradictionImpl(subsumee);
+			return factory_.getContradiction(subsumee);
 		}
 		// else
-		return new ComposedSubsumerImpl<IndexedClassExpression>(subsumee,
-				subsumer);
+		return factory_.getComposedSubsumer(subsumee, subsumer);
 	}
 
 	@Deprecated

@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.saturation;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -46,7 +46,7 @@ public class SaturationStateWriterWrap<C extends Context> implements
 	}
 
 	@Override
-	public void produce(Conclusion conclusion) {
+	public void produce(ClassConclusion conclusion) {
 		mainWriter.produce(conclusion);
 	}
 

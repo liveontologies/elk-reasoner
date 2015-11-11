@@ -26,9 +26,9 @@ package org.semanticweb.elk.reasoner.saturation;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 
 /**
  * An object that can modify the respective {@link SaturationState}.
@@ -39,7 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
  * @author "Yevgeny Kazakov"
  */
 public interface SaturationStateWriter<C extends Context> extends
-		ConclusionProducer {
+		ClassConclusionProducer {
 
 	/**
 	 * @return the {@link SaturationState} modified by this
@@ -50,10 +50,10 @@ public interface SaturationStateWriter<C extends Context> extends
 	/**
 	 * Removes and returns the next active {@link Context} of the
 	 * {@link SaturationState}, i.e., the one which has at least one unprocessed
-	 * {@link Conclusion}
+	 * {@link ClassConclusion}
 	 * 
 	 * @return the next {@link Context} of the {@link SaturationState} with
-	 *         unprocessed {@link Conclusion} if there exists one, or
+	 *         unprocessed {@link ClassConclusion} if there exists one, or
 	 *         {@code null} if not
 	 * 
 	 * @see Context#takeToDo()

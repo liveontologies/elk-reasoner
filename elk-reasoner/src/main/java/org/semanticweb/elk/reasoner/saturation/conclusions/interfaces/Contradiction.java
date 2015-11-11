@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
+
 /*
  * #%L
  * ELK Reasoner
@@ -23,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  */
 
 /**
- * A {@link Conclusion} representing an inconsistency derived for the root.
+ * A {@link ClassConclusion} representing an inconsistency derived for the root.
  * 
  * @author Pavel Klinov
  * 
@@ -31,8 +33,20 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface Contradiction extends Conclusion {
+public interface Contradiction extends ClassConclusion {
 
 	public static final String NAME = "Contradiction";
 
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		Contradiction getContradiction(IndexedContextRoot root);
+
+	}
+	
 }

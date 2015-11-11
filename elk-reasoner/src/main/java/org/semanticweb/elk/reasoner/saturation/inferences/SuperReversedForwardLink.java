@@ -29,8 +29,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubObjectPropertyOfAxiom;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.SubPropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubPropertyChain;
@@ -77,9 +75,9 @@ public class SuperReversedForwardLink extends AbstractBackwardLinkInference {
 		return this.reason_;
 	}
 
-	public ForwardLink getFirstPremise() {
-		return new ForwardLinkImpl<IndexedPropertyChain>(getInferenceRoot(),
-				subChain_, getConclusionRoot());
+	public ForwardLink getFirstPremise(ForwardLink.Factory factory) {
+		return factory.getForwardLink(getInferenceRoot(), subChain_,
+				getConclusionRoot());
 	}
 	
 	public IndexedSubObjectPropertyOfAxiom getSideCondition(
@@ -88,8 +86,8 @@ public class SuperReversedForwardLink extends AbstractBackwardLinkInference {
 				getBackwardRelation());
 	}
 
-	public SubPropertyChain getSecondPremise() {
-		return new SubPropertyChainImpl(subChain_, getBackwardRelation());
+	public SubPropertyChain getSecondPremise(SubPropertyChain.Factory factory) {
+		return factory.getSubPropertyChain(subChain_, getBackwardRelation());
 	}
 
 	@Override

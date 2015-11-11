@@ -27,7 +27,6 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ComposedSubsumerInferenceVisitor;
@@ -54,8 +53,8 @@ public class ComposedDecomposition extends
 		return getConclusionRoot();
 	}
 
-	public DecomposedSubsumer getPremise() {
-		return new DecomposedSubsumerImpl(getInferenceRoot(), getExpression());
+	public DecomposedSubsumer getPremise(DecomposedSubsumer.Factory factory) {
+		return factory.getDecomposedSubsumer(getInferenceRoot(), getExpression());
 	}
 
 	@Override

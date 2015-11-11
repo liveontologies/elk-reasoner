@@ -22,15 +22,15 @@ package org.semanticweb.elk.reasoner.saturation.tracing.factories;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 
-public interface ProofUnwindingListener<C extends Conclusion, J extends ProofUnwindingJob<C>> {
+public interface ProofUnwindingListener<C extends ClassConclusion, J extends ProofUnwindingJob<C>> {
 
 	public void notifyFinished(J job);
 
 	public static class Helper {
 
-		public static <C extends Conclusion, J extends ProofUnwindingJob<C>> ProofUnwindingListener<C, J> dummyListener() {
+		public static <C extends ClassConclusion, J extends ProofUnwindingJob<C>> ProofUnwindingListener<C, J> dummyListener() {
 			return new ProofUnwindingListener<C, J>() {
 
 				@Override

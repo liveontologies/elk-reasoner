@@ -27,11 +27,13 @@ package org.semanticweb.elk.reasoner.saturation.inferences.visitors;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ConclusionBaseFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedExistential;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.ReversedForwardLink;
 
 /**
@@ -45,6 +47,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ReversedForwardLink;
 public class GetInferenceTarget extends
 		AbstractClassInferenceVisitor<Context, IndexedContextRoot> {
 
+	private final Conclusion.Factory factory_ = new ConclusionBaseFactory();
+	
 	@Override
 	protected IndexedContextRoot defaultTracedVisit(ClassInference conclusion,
 			Context premiseContext) {
@@ -56,19 +60,19 @@ public class GetInferenceTarget extends
 	@Override
 	public IndexedContextRoot visit(ComposedExistential conclusion,
 			Context premiseContext) {
-		return conclusion.getFirstPremise().getOriginRoot();
+		return conclusion.getFirstPremise(factory_).getOriginRoot();
 	}
 
 	@Override
 	public IndexedContextRoot visit(ComposedBackwardLink conclusion,
 			Context premiseContext) {
-		return conclusion.getThirdPremise().getTarget();
+		return conclusion.getThirdPremise(factory_).getTarget();
 	}
 
 	@Override
 	public IndexedContextRoot visit(ReversedForwardLink conclusion,
 			Context premiseContext) {
-		return conclusion.getPremise().getTarget();
+		return conclusion.getPremise(factory_).getTarget();
 	}
 
 	@Override

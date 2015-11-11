@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 
@@ -44,14 +44,14 @@ abstract class AbstractChainableSubsumerRule extends
 
 	@Override
 	public void accept(RuleVisitor<?> visitor, IndexedClassExpression premise,
-			ContextPremises premises, ConclusionProducer producer) {
+			ContextPremises premises, ClassConclusionProducer producer) {
 		accept((SubsumerRuleVisitor<?>) visitor, premise, premises, producer);
 	}
 
 	@Override
 	public void accept(SubsumerRuleVisitor<?> visitor,
 			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		accept((LinkedSubsumerRuleVisitor<?>) visitor, premise, premises,
 				producer);
 	}

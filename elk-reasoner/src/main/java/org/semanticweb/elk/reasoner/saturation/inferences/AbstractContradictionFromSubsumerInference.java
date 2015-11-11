@@ -27,7 +27,6 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
@@ -56,9 +55,9 @@ abstract class AbstractContradictionFromSubsumerInference<S extends IndexedClass
 		return getConclusionRoot();
 	}
 
-	public ComposedSubsumer getPremise() {
-		return new ComposedSubsumerImpl<IndexedClassExpression>(
-				getInferenceRoot(), premiseSubsumer_);
+	public ComposedSubsumer getPremise(ComposedSubsumer.Factory factory) {
+		return factory.getComposedSubsumer(getInferenceRoot(),
+				premiseSubsumer_);
 	}
 
 	protected S getPremiseSubsumer() {

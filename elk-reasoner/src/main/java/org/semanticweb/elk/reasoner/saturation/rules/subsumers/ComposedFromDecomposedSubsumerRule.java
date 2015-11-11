@@ -27,7 +27,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSu
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDecomposition;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 
 /**
  * 
@@ -55,7 +55,7 @@ public class ComposedFromDecomposedSubsumerRule extends
 
 	@Override
 	public void apply(IndexedClassEntity premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		producer.produce(new ComposedDecomposition(premises.getRoot(), premise));
 	}
 
@@ -67,7 +67,7 @@ public class ComposedFromDecomposedSubsumerRule extends
 	@Override
 	public void accept(SubsumerDecompositionRuleVisitor<?> visitor,
 			IndexedClassEntity premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}
 

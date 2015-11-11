@@ -27,7 +27,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradict
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedContradiction;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
@@ -73,7 +73,7 @@ public class ContradictionOverBackwardLinkRule extends
 
 	@Override
 	public void apply(BackwardLink premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		producer.produce(new PropagatedContradiction(premise));
 	}
 
@@ -85,7 +85,7 @@ public class ContradictionOverBackwardLinkRule extends
 	@Override
 	public void accept(LinkedBackwardLinkRuleVisitor<?> visitor,
 			BackwardLink premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}
 

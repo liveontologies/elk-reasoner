@@ -28,7 +28,7 @@ package org.semanticweb.elk.reasoner.stages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -64,7 +64,7 @@ public class CheckContextInvariants extends BasePostProcessingStage {
 				LOGGER_.error(context.getRoot() + (context.isSaturated() ? " [saturated]" : " [modified]") + ": not a subsumer of itself");
 			}
 			
-			Conclusion conclusion = context.takeToDo(); 
+			ClassConclusion conclusion = context.takeToDo(); 
 			
 			if (conclusion != null) {
 				LOGGER_.error(context.getRoot() + ": non-empty TODO: " + conclusion);

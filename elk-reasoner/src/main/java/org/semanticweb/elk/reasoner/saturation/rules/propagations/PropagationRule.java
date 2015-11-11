@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.propagations;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 
 /**
@@ -37,6 +37,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 public interface PropagationRule extends Rule<Propagation> {
 
 	public void accept(PropagationRuleVisitor<?> visitor, Propagation premise,
-			ContextPremises premises, ConclusionProducer producer);
+			ContextPremises premises, ClassConclusionProducer producer);
 
 }

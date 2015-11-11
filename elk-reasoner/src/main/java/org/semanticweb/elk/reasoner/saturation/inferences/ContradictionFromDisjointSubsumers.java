@@ -31,7 +31,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DisjointSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
@@ -83,13 +82,13 @@ public class ContradictionFromDisjointSubsumers extends
 		return getConclusionRoot();
 	}
 	
-	public DisjointSubsumer getFirstPremise() {
-		return new DisjointSubsumerImpl(getInferenceRoot(),
+	public DisjointSubsumer getFirstPremise(DisjointSubsumer.Factory factory) {
+		return factory.getDisjointSubsumer(getInferenceRoot(),
 				disjointExpressions_, firstPosition_, reason_);
 	}
 	
-	public DisjointSubsumer getSecondPremise() {
-		return new DisjointSubsumerImpl(getInferenceRoot(),
+	public DisjointSubsumer getSecondPremise(DisjointSubsumer.Factory factory) {
+		return factory.getDisjointSubsumer(getInferenceRoot(),
 				disjointExpressions_, secondPosition_, reason_);
 	}
 	

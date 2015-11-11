@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.ClassInferenceSet;
 import org.semanticweb.elk.reasoner.saturation.tracing.ModifiableClassInferenceTracingState;
@@ -44,9 +44,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The factory for engines that concurrently perform unwinding of proofs for
- * {@link Conclusion}s. The {@link Conclusion}s are submitted as the input of
+ * {@link ClassConclusion}s. The {@link ClassConclusion}s are submitted as the input of
  * the {@link ProofUnwindingJob}, and the engines of the factory compute all
- * {@link ClassInference}s that derive these {@link Conclusion}s and,
+ * {@link ClassInference}s that derive these {@link ClassConclusion}s and,
  * recursively, all premises of such inferences. The computed
  * {@link ClassInference}s are saved in the
  * {@link ModifiableClassInferenceTracingState} given in the input of this
@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class ProofUnwindingFactory<C extends Conclusion, J extends ProofUnwindingJob<C>>
+public class ProofUnwindingFactory<C extends ClassConclusion, J extends ProofUnwindingJob<C>>
 		extends SimpleInterrupter implements
 		InputProcessorFactory<J, ProofUnwindingFactory<C, J>.Engine> {
 
@@ -107,7 +107,7 @@ public class ProofUnwindingFactory<C extends Conclusion, J extends ProofUnwindin
 	}
 
 	private void continueUnwinding(ProofUnwindingState<C, J> unwindingState) {
-		Conclusion next;
+		ClassConclusion next;
 		for (;;) {
 			next = unwindingState.todoConclusions.poll();
 			if (next != null) {

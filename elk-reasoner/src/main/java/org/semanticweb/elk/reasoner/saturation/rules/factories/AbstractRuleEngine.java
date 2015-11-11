@@ -22,8 +22,8 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.Interrupter;
@@ -31,9 +31,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An engine to concurrently processing pending {@link Conclusion}s within the
- * corresponding {@link Context}s using a supplied {@link ConclusionVisitor}.
- * The {@link Conclusion}s are retrieved by {@link Context#takeToDo()}.
+ * An engine to concurrently processing pending {@link ClassConclusion}s within the
+ * corresponding {@link Context}s using a supplied {@link ClassConclusionVisitor}.
+ * The {@link ClassConclusion}s are retrieved by {@link Context#takeToDo()}.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -46,13 +46,13 @@ public abstract class AbstractRuleEngine<I extends RuleApplicationInput>
 			.getLogger(AbstractRuleEngine.class);
 
 	/**
-	 * Specifies what to do with {@link Conclusion}s within the processed
+	 * Specifies what to do with {@link ClassConclusion}s within the processed
 	 * {@link Context}
 	 */
-	private final ConclusionVisitor<? super Context, ?> conclusionProcessor_;
+	private final ClassConclusionVisitor<? super Context, ?> conclusionProcessor_;
 
 	/**
-	 * Accumulates the produced {@link Conclusion}s that should be processed
+	 * Accumulates the produced {@link ClassConclusion}s that should be processed
 	 * within the same {@link Context} in which they were produced; this should
 	 * always be emptied before continuing to the next {@link Context}
 	 */
@@ -64,7 +64,7 @@ public abstract class AbstractRuleEngine<I extends RuleApplicationInput>
 	private final Interrupter interrupter_;
 
 	public AbstractRuleEngine(
-			ConclusionVisitor<? super Context, ?> conclusionProcessor,
+			ClassConclusionVisitor<? super Context, ?> conclusionProcessor,
 			WorkerLocalTodo localizedProducer, Interrupter interrupter) {
 		this.conclusionProcessor_ = conclusionProcessor;
 		this.workerLocalTodo_ = localizedProducer;
@@ -102,7 +102,7 @@ public abstract class AbstractRuleEngine<I extends RuleApplicationInput>
 		// at this point workerLocalTodo_ must be empty
 		workerLocalTodo_.setActiveRoot(context.getRoot());
 		for (;;) {
-			Conclusion conclusion = workerLocalTodo_.poll();
+			ClassConclusion conclusion = workerLocalTodo_.poll();
 			if (conclusion == null) {
 				conclusion = context.takeToDo();
 				if (conclusion == null)
@@ -115,7 +115,7 @@ public abstract class AbstractRuleEngine<I extends RuleApplicationInput>
 
 	/**
 	 * Removes and returns the next active {@link Context} that has unprocessed
-	 * {@link Conclusion}s. The letter can be retrieved using
+	 * {@link ClassConclusion}s. The letter can be retrieved using
 	 * {@link #getNextConclusion(Context)}
 	 * 
 	 * @return the next active {@link Context} to be processed by this

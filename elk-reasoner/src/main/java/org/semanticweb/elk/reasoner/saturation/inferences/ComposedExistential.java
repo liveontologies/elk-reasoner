@@ -28,8 +28,6 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ComposedSubsumerInferenceVisitor;
@@ -73,13 +71,13 @@ public class ComposedExistential extends
 		return inferenceRoot_;
 	}
 
-	public BackwardLink getFirstPremise() {
-		return new BackwardLinkImpl(getInferenceRoot(), propagationRelation_,
+	public BackwardLink getFirstPremise(BackwardLink.Factory factory) {
+		return factory.getBackwardLink(getInferenceRoot(), propagationRelation_,
 				getConclusionRoot());
 	}
 
-	public Propagation getSecondPremise() {
-		return new PropagationImpl(getInferenceRoot(), propagationRelation_,
+	public Propagation getSecondPremise(Propagation.Factory factory) {
+		return factory.getPropagation(getInferenceRoot(), propagationRelation_,
 				getExpression());
 	}
 

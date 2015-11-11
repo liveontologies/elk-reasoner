@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDefinition;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
@@ -99,7 +99,7 @@ public class IndexedClassFromDefinitionRule extends
 
 	@Override
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		for (int i = 0; i < definedClasses_.size(); i++) {
 			producer.produce(new ComposedDefinition(premises.getRoot(),
 					definedClasses_.get(i), premise, reasons_.get(i)));
@@ -221,7 +221,7 @@ public class IndexedClassFromDefinitionRule extends
 	@Override
 	public void accept(LinkedSubsumerRuleVisitor<?> visitor,
 			IndexedClassExpression premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}
 

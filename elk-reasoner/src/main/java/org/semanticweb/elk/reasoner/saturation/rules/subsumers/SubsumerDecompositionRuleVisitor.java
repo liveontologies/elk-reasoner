@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 
 /**
  * A visitor pattern for {@link SubsumerDecompositionRule}s
@@ -43,25 +43,25 @@ public interface SubsumerDecompositionRuleVisitor<O> {
 
 	O visit(ComposedFromDecomposedSubsumerRule rule,
 			IndexedClassEntity premise, ContextPremises premises,
-			ConclusionProducer producer);
+			ClassConclusionProducer producer);
 
 	O visit(IndexedClassDecompositionRule rule, IndexedClass premise,
-			ContextPremises premises, ConclusionProducer producer);
+			ContextPremises premises, ClassConclusionProducer producer);
 
 	O visit(IndexedObjectComplementOfDecomposition rule,
 			IndexedObjectComplementOf premise, ContextPremises premises,
-			ConclusionProducer producer);
+			ClassConclusionProducer producer);
 
 	O visit(IndexedObjectHasSelfDecomposition rule,
 			IndexedObjectHasSelf premise, ContextPremises premises,
-			ConclusionProducer producer);
+			ClassConclusionProducer producer);
 
 	O visit(IndexedObjectIntersectionOfDecomposition rule,
 			IndexedObjectIntersectionOf premise, ContextPremises premises,
-			ConclusionProducer producer);
+			ClassConclusionProducer producer);
 
 	O visit(IndexedObjectSomeValuesFromDecomposition rule,
 			IndexedObjectSomeValuesFrom premise, ContextPremises premises,
-			ConclusionProducer producer);
+			ClassConclusionProducer producer);
 
 }

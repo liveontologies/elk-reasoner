@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextIni
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.InitializationSubsumer;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
@@ -101,7 +101,7 @@ public class OwlThingContextInitRule extends AbstractChainableContextInitRule {
 
 	@Override
 	public void apply(ContextInitialization premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		// producer.produce(premises.getRoot(), new
 		// DecomposedSubsumer(owlThing_));
 		producer.produce(new InitializationSubsumer(premises.getRoot(),
@@ -132,7 +132,7 @@ public class OwlThingContextInitRule extends AbstractChainableContextInitRule {
 	@Override
 	public void accept(LinkedContextInitRuleVisitor<?> visitor,
 			ContextInitialization premise, ContextPremises premises,
-			ConclusionProducer producer) {
+			ClassConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}
 

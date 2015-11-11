@@ -29,7 +29,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ClassConclusionVisitor;
 
 /**
  * An implementation of {@link DisjointSubsumer}
@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVi
  * @author "Yevgeny Kazakov"
  * 
  */
-public class DisjointSubsumerImpl extends AbstractConclusion implements
+public class DisjointSubsumerImpl extends AbstractClassConclusion implements
 		DisjointSubsumer {
 
 	private final IndexedClassExpressionList disjointExpressions_;
@@ -46,7 +46,7 @@ public class DisjointSubsumerImpl extends AbstractConclusion implements
 
 	private final ElkAxiom reason_;
 
-	public DisjointSubsumerImpl(IndexedContextRoot root,
+	protected DisjointSubsumerImpl(IndexedContextRoot root,
 			IndexedClassExpressionList disjointExpressions, int position, ElkAxiom reason) {
 		super(root);
 		this.disjointExpressions_ = disjointExpressions;
@@ -70,7 +70,7 @@ public class DisjointSubsumerImpl extends AbstractConclusion implements
 	}
 
 	@Override
-	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(ClassConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
 

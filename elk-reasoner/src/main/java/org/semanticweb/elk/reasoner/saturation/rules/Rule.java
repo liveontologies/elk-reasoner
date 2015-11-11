@@ -1,7 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 
 /*
@@ -27,10 +27,10 @@ import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
  */
 
 /**
- * A rule that can be applied to a given premise (either a {@link Conclusion} or
- * an object representing a {@link Conclusion}) together with other
- * {@link Conclusion}s stored in within {@link ContextPremises}. The rule
- * produces other {@link Conclusion}s using the given {@link ConclusionProducer}
+ * A rule that can be applied to a given premise (either a {@link ClassConclusion} or
+ * an object representing a {@link ClassConclusion}) together with other
+ * {@link ClassConclusion}s stored in within {@link ContextPremises}. The rule
+ * produces other {@link ClassConclusion}s using the given {@link ClassConclusionProducer}
  * .
  * 
  * @author "Yevgeny Kazakov"
@@ -41,46 +41,46 @@ import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 public interface Rule<P> {
 
 	/**
-	 * Apply the rule to the given premise representing a {@link Conclusion} and
-	 * other {@link Conclusion}s stored in within the given
-	 * {@link ContextPremises} and produce {@link Conclusion}s using the given
-	 * {@link ConclusionProducer}
+	 * Apply the rule to the given premise representing a {@link ClassConclusion} and
+	 * other {@link ClassConclusion}s stored in within the given
+	 * {@link ContextPremises} and produce {@link ClassConclusion}s using the given
+	 * {@link ClassConclusionProducer}
 	 * 
 	 * @param premise
 	 *            the element to which the rule is applied, it represents a
-	 *            {@link Conclusion}
+	 *            {@link ClassConclusion}
 	 * @param premises
 	 *            the {@link ContextPremises} from which other matching premises
 	 *            of the rule are taken
 	 * @param producer
-	 *            the {@link ConclusionProducer} using which {@link Conclusion}s
+	 *            the {@link ClassConclusionProducer} using which {@link ClassConclusion}s
 	 *            of the inferences are produced
 	 * 
 	 */
 	public void apply(P premise, ContextPremises premises,
-			ConclusionProducer producer);
+			ClassConclusionProducer producer);
 
 	/**
 	 * @return {@code true} if this {@link Rule} produces only
-	 *         {@link Conclusion}s with the same origin root and sub-root as the
-	 *         {@link Conclusion} (or its representation) to which the rule is
-	 *         applied. Specifically, if applied for a {@link Conclusion} the
-	 *         rule can produce only {@link Conclusion}s with the same value of
-	 *         {@link Conclusion#getOriginRoot()}. Additionally, if applied to a
-	 *         {@link SubConclusion} the rule can produce only
-	 *         {@link SubConclusion} with the same values of
-	 *         {@link SubConclusion#getOriginSubRoot()} or a {@link Conclusion}
+	 *         {@link ClassConclusion}s with the same origin root and sub-root as the
+	 *         {@link ClassConclusion} (or its representation) to which the rule is
+	 *         applied. Specifically, if applied for a {@link ClassConclusion} the
+	 *         rule can produce only {@link ClassConclusion}s with the same value of
+	 *         {@link ClassConclusion#getOriginRoot()}. Additionally, if applied to a
+	 *         {@link SubClassConclusion} the rule can produce only
+	 *         {@link SubClassConclusion} with the same values of
+	 *         {@link SubClassConclusion#getOriginSubRoot()} or a {@link ClassConclusion}
 	 *         if this value is {@code null}. Returns {@code false} if this
-	 *         {@link Rule} produces only {@link Conclusion}s with the different
-	 *         origin root or sub-root as the {@link Conclusion} (or its
+	 *         {@link Rule} produces only {@link ClassConclusion}s with the different
+	 *         origin root or sub-root as the {@link ClassConclusion} (or its
 	 *         representation) to which the rule is applied.
 	 * 
-	 * @see Conclusion#getOriginRoot()
-	 * @see SubConclusion#getConclusionRoot()
+	 * @see ClassConclusion#getOriginRoot()
+	 * @see SubClassConclusion#getConclusionRoot()
 	 */
 	public boolean isLocal();
 
 	public void accept(RuleVisitor<?> visitor, P premise,
-			ContextPremises premises, ConclusionProducer producer);
+			ContextPremises premises, ClassConclusionProducer producer);
 
 }

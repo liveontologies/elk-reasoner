@@ -27,7 +27,6 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectHasSelf;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.BackwardLinkInferenceVisitor;
@@ -58,8 +57,8 @@ public class DecomposedReflexiveBackwardLink extends
 		return this.existential_;
 	}
 
-	public DecomposedSubsumer getPremise() {
-		return new DecomposedSubsumerImpl(getInferenceRoot(), existential_);
+	public DecomposedSubsumer getPremise(DecomposedSubsumer.Factory factory) {
+		return factory.getDecomposedSubsumer(getInferenceRoot(), existential_);
 	}
 
 	@Override

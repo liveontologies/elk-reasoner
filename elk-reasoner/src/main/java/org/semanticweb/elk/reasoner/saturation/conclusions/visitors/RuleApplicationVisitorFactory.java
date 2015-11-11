@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
@@ -37,6 +37,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  */
 public interface RuleApplicationVisitorFactory {
 
-	public AbstractRuleApplicationConclusionVisitor create(
-			RuleVisitor<?> ruleVisitor, ConclusionProducer producer);
+	public AbstractRuleApplicationClassConclusionVisitor create(
+			RuleVisitor<?> ruleVisitor, ClassConclusionProducer producer);
 }

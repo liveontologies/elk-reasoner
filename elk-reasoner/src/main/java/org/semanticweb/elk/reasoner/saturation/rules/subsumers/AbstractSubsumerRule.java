@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
@@ -38,7 +38,7 @@ abstract class AbstractSubsumerRule<S extends IndexedClassExpression>
 
 	@Override
 	public void accept(RuleVisitor<?> visitor, S premise,
-			ContextPremises premises, ConclusionProducer producer) {
+			ContextPremises premises, ClassConclusionProducer producer) {
 		accept((SubsumerRuleVisitor<?>) visitor, premise, premises, producer);
 	}
 

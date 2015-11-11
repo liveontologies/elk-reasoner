@@ -29,9 +29,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyCha
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.SubPropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubPropertyChain;
@@ -87,27 +84,27 @@ public class ComposedForwardLink extends
 	}
 
 	@Override
-	public BackwardLink getFirstPremise() {
-		return new BackwardLinkImpl(getInferenceRoot(), backwardRelation_,
+	public BackwardLink getFirstPremise(BackwardLink.Factory factory) {
+		return factory.getBackwardLink(getInferenceRoot(), backwardRelation_,
 				getConclusionRoot());
 	}
 
 	@Override
-	public SubPropertyChain getSecondPremise() {
-		return new SubPropertyChainImpl(backwardRelation_, getComposition()
+	public SubPropertyChain getSecondPremise(SubPropertyChain.Factory factory) {
+		return factory.getSubPropertyChain(backwardRelation_, getComposition()
 				.getFirstProperty());
 	}
 
 	@Override
-	public ForwardLink getThirdPremise() {
-		return new ForwardLinkImpl<IndexedPropertyChain>(getInferenceRoot(),
-				forwardChain_, getTarget());
+	public ForwardLink getThirdPremise(ForwardLink.Factory factory) {
+		return factory.getForwardLink(getInferenceRoot(), forwardChain_,
+				getTarget());
 	}
 
 	@Override
-	public SubPropertyChain getFourthPremise() {
-		return new SubPropertyChainImpl(forwardChain_, getComposition()
-				.getSuffixChain());
+	public SubPropertyChain getFourthPremise(SubPropertyChain.Factory factory) {
+		return factory.getSubPropertyChain(forwardChain_,
+				getComposition().getSuffixChain());
 	}
 
 	@Override
