@@ -80,29 +80,25 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SubPropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecomposedConjunct;
-import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkComposition;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkComposition;
+import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversed;
+import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversedExpanded;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfDisjointSubsumers;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromInconsistentDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfObjectComplementOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfOwlNothing;
-import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkOfObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
-import org.semanticweb.elk.reasoner.saturation.inferences.PropagationGenerated;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionTautology;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionPropagated;
+import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkComposition;
+import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkOfObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.inferences.PropagationGenerated;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversed;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecomposedConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSubClassOf;
-import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.PropertyChainInitialization;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldSubProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionTautology;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.SideConditionLookup;
 
 /**
@@ -189,8 +185,8 @@ public class SingleInferenceMapper {
 	 */
 	private class MappingVisitor
 			implements
-			org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor<Void, Inference>,
-			org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor<Void, Inference> {
+			ClassInference.Visitor<Void, Inference>,
+			ObjectPropertyInference.Visitor<Void, Inference> {
 
 		@Override
 		public Inference visit(SubClassInclusionTautology<?> inference,
@@ -357,7 +353,7 @@ public class SingleInferenceMapper {
 		}
 		
 		@Override
-		public Inference visit(SuperReversedForwardLink inference, Void parameter) {
+		public Inference visit(BackwardLinkReversedExpanded inference, Void parameter) {
 			// skipping tautology
 			//return SingleInferenceMapper.STOP;
 			

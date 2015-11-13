@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.inferences.properties;
+package org.semanticweb.elk.reasoner.saturation.properties.inferences;
 
 /*
  * #%L
@@ -9,7 +9,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences.properties;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,22 +25,31 @@ package org.semanticweb.elk.reasoner.saturation.inferences.properties;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
+
 /**
+ * The root of all inferences on properties.
+ * 
  * @author Pavel Klinov
  *
  *         pavel.klinov@uni-ulm.de
  */
-public interface ObjectPropertyInferenceVisitor<I, O> extends
-		SubPropertyChainInferenceVisitor<I, O> {
+public interface ObjectPropertyInference extends ObjectPropertyConclusion {
 
-	public static ObjectPropertyInferenceVisitor<?, ?> DUMMY = new AbstractObjectPropertyInferenceVisitor<Void, Void>() {
-
-		@Override
-		protected Void defaultTracedVisit(ObjectPropertyInference inference,
-				Void input) {
-			// no-op
-			return null;
-		}
-
-	};
+	public <I, O> O accept(Visitor<I, O> visitor, I input);
+	
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O>
+			extends
+				SubPropertyChainInference.Visitor<I, O> {
+		
+		// combined interface
+		
+	}
+	
 }

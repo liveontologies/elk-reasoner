@@ -27,12 +27,10 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.AbstractObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.AbstractClassInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.AbstractObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 
 /**
  * A utility class to create inference visitors which look up side conditions
@@ -45,7 +43,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenc
  */
 public class SideConditions {
 
-	public static <O> ClassInferenceVisitor<Void, O> getClassSideConditionVisitor(
+	public static <O> ClassInference.Visitor<Void, O> getClassSideConditionVisitor(
 			final ElkAxiomVisitor<O> visitor) {
 		return new AbstractClassInferenceVisitor<Void, O>() {
 
@@ -65,7 +63,7 @@ public class SideConditions {
 		};
 	}
 
-	public static <O> ObjectPropertyInferenceVisitor<Void, O> getPropertySideConditionVisitor(
+	public static <O> ObjectPropertyInference.Visitor<Void, O> getPropertySideConditionVisitor(
 			final ElkAxiomVisitor<O> visitor) {
 		return new AbstractObjectPropertyInferenceVisitor<Void, O>() {
 

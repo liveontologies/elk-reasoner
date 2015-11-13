@@ -35,11 +35,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.classes.AbstractObjec
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.AbstractObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferencePremiseVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInferencePremiseVisitor;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.AbstractObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 
 /**
  * Recursively visits inferences which were used to produce a given conclusion.
@@ -68,7 +66,7 @@ public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 	// visit only class inferences
 	public void accept(
 			final ClassConclusion conclusion,
-			final ClassInferenceVisitor<IndexedContextRoot, Boolean> inferenceVisitor) {
+			final ClassInference.Visitor<IndexedContextRoot, Boolean> inferenceVisitor) {
 		accept(conclusion, inferenceVisitor,
 				new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
 
@@ -84,7 +82,7 @@ public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 	// unwind only property conclusions
 	@Override
 	public void accept(ObjectPropertyConclusion conclusion,
-			final ObjectPropertyInferenceVisitor<?, Boolean> inferenceVisitor) {
+			final ObjectPropertyInference.Visitor<?, Boolean> inferenceVisitor) {
 		final Set<ObjectPropertyInference> seenInferences = new HashSet<ObjectPropertyInference>();
 
 		addToQueue(conclusion, seenInferences);
@@ -93,7 +91,7 @@ public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 	}
 
 	private void unwindPropertyConclusions(
-			final ObjectPropertyInferenceVisitor<?, Boolean> inferenceVisitor) {
+			final ObjectPropertyInference.Visitor<?, Boolean> inferenceVisitor) {
 		final Set<ObjectPropertyInference> seenInferences = new HashSet<ObjectPropertyInference>();
 
 		// this visitor visits all premises and putting them into the todo queue
@@ -133,8 +131,8 @@ public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 	@Override
 	public void accept(
 			final ClassConclusion conclusion,
-			final ClassInferenceVisitor<?, Boolean> inferenceVisitor,
-			final ObjectPropertyInferenceVisitor<?, Boolean> propertyInferenceVisitor) {
+			final ClassInference.Visitor<?, Boolean> inferenceVisitor,
+			final ObjectPropertyInference.Visitor<?, Boolean> propertyInferenceVisitor) {
 		final Set<ClassInference> seenInferences = new HashSet<ClassInference>();
 		final Set<ObjectPropertyInference> seenPropertyInferences = new HashSet<ObjectPropertyInference>();
 		// should be empty anyways

@@ -25,10 +25,29 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 
-public interface SubClassInclusionInference<S extends IndexedClassExpression> extends
-		SubClassInclusion, ClassInference {
+public interface SubClassInclusionInference<S extends IndexedClassExpression>
+		extends
+			SubClassInclusion,
+			ClassInference {
 
 	@Override
 	public S getSuperExpression();
+
+	public <I, O> O accept(Visitor<I, O> visitor, I input);
+
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O>
+			extends
+				SubClassInclusionComposedInference.Visitor<I, O>,
+				SubClassInclusionDecomposedInference.Visitor<I, O> {
+
+		// combined interface
+
+	}
 
 }

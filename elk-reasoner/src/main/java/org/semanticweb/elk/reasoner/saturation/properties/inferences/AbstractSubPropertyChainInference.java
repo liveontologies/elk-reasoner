@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation.inferences.visitors;
+package org.semanticweb.elk.reasoner.saturation.properties.inferences;
 
 /*
  * #%L
@@ -22,10 +22,20 @@ package org.semanticweb.elk.reasoner.saturation.inferences.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SubPropertyChainImpl;
 
-public interface DisjointSubsumerInferenceVisitor<I, O> {
+public abstract class AbstractSubPropertyChainInference extends
+		SubPropertyChainImpl implements SubPropertyChainInference {
 
-	public O visit(DisjointSubsumerFromSubsumer inference, I input);
+	public AbstractSubPropertyChainInference(IndexedPropertyChain subChain,
+			IndexedPropertyChain superChain) {
+		super(subChain, superChain);
+	}
+
+	@Override
+	public <I, O> O accept(ObjectPropertyInference.Visitor<I, O> visitor, I input) {
+		return accept((SubPropertyChainInference.Visitor<I, O>) visitor, input);
+	}
 
 }

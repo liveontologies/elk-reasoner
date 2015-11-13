@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 
 /**
  * 

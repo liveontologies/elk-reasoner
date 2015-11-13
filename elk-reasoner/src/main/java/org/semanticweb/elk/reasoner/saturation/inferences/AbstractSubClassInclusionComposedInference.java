@@ -25,14 +25,12 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SubClassInclusionComposedImpl;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ComposedSubClassInclusionInferenceVisitor;
 
 public abstract class AbstractSubClassInclusionComposedInference<S extends IndexedClassExpression>
 		extends
 			SubClassInclusionComposedImpl<S>
 		implements
-			ComposedSubClassInclusionInference<S> {
+			SubClassInclusionComposedInference<S> {
 
 	public AbstractSubClassInclusionComposedInference(IndexedContextRoot root,
 			S subsumer) {
@@ -40,9 +38,18 @@ public abstract class AbstractSubClassInclusionComposedInference<S extends Index
 	}
 
 	@Override
-	public <I, O> O accept(ClassInferenceVisitor<I, O> visitor, I parameter) {
-		return accept((ComposedSubClassInclusionInferenceVisitor<I, O>) visitor,
-				parameter);
+	public <I, O> O accept(ClassInference.Visitor<I, O> visitor, I input) {
+		return accept(
+				(SubClassInclusionComposedInference.Visitor<I, O>) visitor,
+				input);
+	}
+
+	@Override
+	public <I, O> O accept(SubClassInclusionInference.Visitor<I, O> visitor,
+			I input) {
+		return accept(
+				(SubClassInclusionComposedInference.Visitor<I, O>) visitor,
+				input);
 	}
 
 }

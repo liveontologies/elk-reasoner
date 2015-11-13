@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversed;
-import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversedExpanded;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 
 /**
@@ -67,7 +67,7 @@ public class BackwardLinkFromForwardLinkRule extends AbstractForwardLinkRule {
 			List<ElkAxiom> superPropertiesReasons = relation
 					.getToldSuperPropertiesReasons();
 			for (int i = 0; i < superProperties.size(); i++) {
-				producer.produce(new SuperReversedForwardLink(premise,
+				producer.produce(new BackwardLinkReversedExpanded(premise,
 						superProperties.get(i), superPropertiesReasons.get(i)));
 			}
 		}

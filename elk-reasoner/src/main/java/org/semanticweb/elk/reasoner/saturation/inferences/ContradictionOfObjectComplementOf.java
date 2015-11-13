@@ -28,10 +28,9 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ContradictionInferenceVisitor;
 
 /**
  * A {@link Contradiction} obtained from two {@link SubClassInclusionComposed} premises
@@ -76,8 +75,20 @@ public class ContradictionOfObjectComplementOf extends AbstractContradictionInfe
 	}
 
 	@Override
-	public <I, O> O accept(ContradictionInferenceVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(ContradictionInference.Visitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
+	}
+	
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O> {
+		
+		public O visit(ContradictionOfObjectComplementOf inference, I input);
+		
 	}
 
 }

@@ -29,7 +29,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDefinitionAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.DecomposedSubClassInclusionInferenceVisitor;
 
 /**
  * A {@link SubClassInclusionDecomposed} obtained from a
@@ -49,8 +48,9 @@ public class SubClassInclusionExpandedDefinition
 
 	private final ElkAxiom reason_;
 
-	public SubClassInclusionExpandedDefinition(IndexedContextRoot root, IndexedClass defined,
-			IndexedClassExpression definition, ElkAxiom reason) {
+	public SubClassInclusionExpandedDefinition(IndexedContextRoot root,
+			IndexedClass defined, IndexedClassExpression definition,
+			ElkAxiom reason) {
 		super(root, definition);
 		this.defined_ = defined;
 		this.reason_ = reason;
@@ -88,9 +88,21 @@ public class SubClassInclusionExpandedDefinition
 
 	@Override
 	public <I, O> O accept(
-			DecomposedSubClassInclusionInferenceVisitor<I, O> visitor,
+			SubClassInclusionDecomposedInference.Visitor<I, O> visitor,
 			I parameter) {
 		return visitor.visit(this, parameter);
+	}
+
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O> {
+
+		public O visit(SubClassInclusionExpandedDefinition inference, I input);
+
 	}
 
 }

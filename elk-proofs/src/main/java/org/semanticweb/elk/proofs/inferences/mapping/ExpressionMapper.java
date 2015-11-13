@@ -62,8 +62,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SubClassInclu
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SubPropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ReflexivePropertyChainImpl;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldReflexiveProperty;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.ReflexivePropertyChainImpl;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.ToldReflexiveProperty;
 
 /**
  * Converts {@link Expression}s to instances of {@link TracingInput} which can

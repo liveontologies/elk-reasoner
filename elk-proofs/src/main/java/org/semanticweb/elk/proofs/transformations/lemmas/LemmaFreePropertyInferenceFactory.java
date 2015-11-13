@@ -37,11 +37,11 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyCha
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.AbstractObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.LeftReflexiveSubPropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.RightReflexiveSubPropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldSubProperty;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.AbstractObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.LeftReflexiveSubPropertyChainInference;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.RightReflexiveSubPropertyChainInference;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.ToldSubProperty;
 
 /**
  * 

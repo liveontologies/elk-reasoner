@@ -30,7 +30,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionLis
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.DisjointSubsumerInferenceVisitor;
 
 /**
  * A {@link DisjointSubsumer} obtained from a {@link SubClassInclusionComposed}
@@ -59,9 +58,21 @@ public class DisjointSubsumerFromSubsumer extends
 	}
 
 	@Override
-	public <I, O> O accept(DisjointSubsumerInferenceVisitor<I, O> visitor,
+	public <I, O> O accept(DisjointSubsumerInference.Visitor<I, O> visitor,
 			I input) {
 		return visitor.visit(this, input);
+	}
+	
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O> {
+		
+		public O visit(DisjointSubsumerFromSubsumer inference, I input);
+		
 	}
 
 }

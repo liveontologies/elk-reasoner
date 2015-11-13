@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ContradictionInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 
 /**
  * A {@link Contradiction} obtained from {@link SubClassInclusionComposed} with
@@ -58,8 +58,20 @@ public class ContradictionOfOwlNothing extends
 	}
 
 	@Override
-	public <I, O> O accept(ContradictionInferenceVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(ContradictionInference.Visitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
+	}
+	
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O> {
+		
+		public O visit(ContradictionOfOwlNothing inference, I input);
+		
 	}
 
 }

@@ -29,7 +29,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ContradictionInferenceVisitor;
 
 /**
  * A {@link Contradiction} obtained by propagation of a {@link Contradiction}
@@ -78,8 +77,20 @@ public class ContradictionPropagated extends AbstractContradictionInference {
 	}
 
 	@Override
-	public <I, O> O accept(ContradictionInferenceVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(ContradictionInference.Visitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
+	}
+
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O> {
+		
+		public O visit(ContradictionPropagated inference, I input);
+		
 	}
 
 }

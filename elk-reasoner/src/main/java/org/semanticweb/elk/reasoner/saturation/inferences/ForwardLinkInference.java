@@ -23,10 +23,25 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ForwardLinkInferenceVisitor;
 
 public interface ForwardLinkInference extends ForwardLink, ClassInference {
 
-	public <I, O> O accept(ForwardLinkInferenceVisitor<I, O> visitor, I input);
+	public <I, O> O accept(Visitor<I, O> visitor, I input);
+
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O>
+			extends
+				ForwardLinkComposition.Visitor<I, O>,
+				ForwardLinkOfObjectHasSelf.Visitor<I, O>,
+				ForwardLinkOfObjectSomeValuesFrom.Visitor<I, O> {
+
+		// combined interface
+
+	}
 
 }

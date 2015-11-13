@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.inferences.util;
+package org.semanticweb.elk.reasoner.saturation.inferences;
 
 /*
  * #%L
@@ -29,36 +29,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ConclusionBas
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkComposition;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedEntity;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedDefinedClass;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectUnionOf;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkComposition;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfDisjointSubsumers;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfObjectComplementOf;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfOwlNothing;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedDefinition;
-import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkOfObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecomposedFirstConjunct;
-import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectHasSelf;
-import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkOfObjectHasSelf;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecomposedSecondConjunct;
-import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
-import org.semanticweb.elk.reasoner.saturation.inferences.PropagationGenerated;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionTautology;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionObjectHasSelfPropertyRange;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionPropagated;
-import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversed;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSubClassOf;
-import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainExpandedSubObjectPropertyOf;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainTautology;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainExpandedSubObjectPropertyOf;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainTautology;
 
 /**
  * A utility to pretty-print {@link ClassInference}s.
@@ -69,8 +42,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenc
  */
 public class InferencePrinter
 		implements
-			ClassInferenceVisitor<Void, String>,
-			ObjectPropertyInferenceVisitor<Void, String> {
+			ClassInference.Visitor<Void, String>,
+			ObjectPropertyInference.Visitor<Void, String> {
 
 	private static InferencePrinter DEFAULT_PRINTER_ = new InferencePrinter(
 			new ConclusionBaseFactory());
@@ -142,7 +115,7 @@ public class InferencePrinter
 	}
 
 	@Override
-	public String visit(SuperReversedForwardLink conclusion, Void input) {
+	public String visit(BackwardLinkReversedExpanded conclusion, Void input) {
 		return "Reversing forward link " + conclusion.getFirstPremise(factory_)
 				+ " and unfolding under "
 				+ conclusion.getSecondPremise(factory_);

@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 
 public interface ModifiableObjectPropertyInferenceSet extends
 		ObjectPropertyInferenceSet {

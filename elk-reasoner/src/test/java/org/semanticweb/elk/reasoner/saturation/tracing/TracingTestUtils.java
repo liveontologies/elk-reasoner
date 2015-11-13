@@ -49,12 +49,10 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.inferences.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.AbstractObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.AbstractClassInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.AbstractObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,7 +109,7 @@ public class TracingTestUtils {
 				ReasonerStateAccessor.transform(reasoner, sup));
 		final AtomicInteger conclusionCount = new AtomicInteger(0);
 		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
-		ClassInferenceVisitor<IndexedContextRoot, Boolean> counter = new AbstractClassInferenceVisitor<IndexedContextRoot, Boolean>() {
+		ClassInference.Visitor<IndexedContextRoot, Boolean> counter = new AbstractClassInferenceVisitor<IndexedContextRoot, Boolean>() {
 
 			@Override
 			protected Boolean defaultTracedVisit(ClassInference conclusion,
@@ -137,7 +135,7 @@ public class TracingTestUtils {
 
 		final AtomicInteger conclusionCount = new AtomicInteger(0);
 		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
-		ClassInferenceVisitor<IndexedContextRoot, Boolean> counter = new AbstractClassInferenceVisitor<IndexedContextRoot, Boolean>() {
+		ClassInference.Visitor<IndexedContextRoot, Boolean> counter = new AbstractClassInferenceVisitor<IndexedContextRoot, Boolean>() {
 
 			@Override
 			protected Boolean defaultTracedVisit(ClassInference conclusion,
@@ -204,8 +202,8 @@ public class TracingTestUtils {
 			ElkClassExpression sub,
 			ElkClassExpression sup,
 			Reasoner reasoner,
-			final ClassInferenceVisitor<IndexedContextRoot, Boolean> classInferenceVisitor,
-			final ObjectPropertyInferenceVisitor<Void, Boolean> propertyInferenceVisitor) {
+			final ClassInference.Visitor<IndexedContextRoot, Boolean> classInferenceVisitor,
+			final ObjectPropertyInference.Visitor<Void, Boolean> propertyInferenceVisitor) {
 		final IndexedClassExpression subsumee = ReasonerStateAccessor
 				.transform(reasoner, sub);
 		ClassConclusion conclusion = getConclusionToTrace(
@@ -262,7 +260,7 @@ public class TracingTestUtils {
 		ClassConclusion conclusion = getConclusionToTrace(
 				ReasonerStateAccessor.getContext(reasoner, subsumee),
 				ReasonerStateAccessor.transform(reasoner, sup));
-		ClassInferenceVisitor<Void, ?> sideConditionVisitor = SideConditions
+		ClassInference.Visitor<Void, ?> sideConditionVisitor = SideConditions
 				.getClassSideConditionVisitor(new NoOpElkAxiomVisitor<Void>() {
 
 					@Override
@@ -283,7 +281,7 @@ public class TracingTestUtils {
 
 	public static void visitClassInferences(ElkClassExpression sub,
 			ElkClassExpression sup, Reasoner reasoner,
-			ClassInferenceVisitor<IndexedContextRoot, Boolean> visitor)
+			ClassInference.Visitor<IndexedContextRoot, Boolean> visitor)
 			throws ElkException {
 		final IndexedClassExpression subsumee = ReasonerStateAccessor
 				.transform(reasoner, sub);
@@ -302,8 +300,8 @@ public class TracingTestUtils {
 			ElkClassExpression sub,
 			ElkClassExpression sup,
 			Reasoner reasoner,
-			final ClassInferenceVisitor<IndexedContextRoot, Boolean> classInferenceVisitor,
-			final ObjectPropertyInferenceVisitor<?, Boolean> propertyInferenceVisitor)
+			final ClassInference.Visitor<IndexedContextRoot, Boolean> classInferenceVisitor,
+			final ObjectPropertyInference.Visitor<?, Boolean> propertyInferenceVisitor)
 			throws ElkException {
 		final IndexedClassExpression subsumee = ReasonerStateAccessor
 				.transform(reasoner, sub);
@@ -321,8 +319,8 @@ public class TracingTestUtils {
 
 	public static void visitInferencesForInconsistency(
 			Reasoner reasoner,
-			final ClassInferenceVisitor<IndexedContextRoot, Boolean> classInferenceVisitor,
-			final ObjectPropertyInferenceVisitor<?, Boolean> propertyInferenceVisitor)
+			final ClassInference.Visitor<IndexedContextRoot, Boolean> classInferenceVisitor,
+			final ObjectPropertyInference.Visitor<?, Boolean> propertyInferenceVisitor)
 			throws ElkException {
 		IndexedClassEntity entity = ReasonerStateAccessor
 				.getInconsistentEntity(reasoner);

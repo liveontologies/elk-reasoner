@@ -29,9 +29,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ComposedSubClassInclusionInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 
 /**
  * A {@link SubClassInclusionComposed} with {@link IndexedObjectSomeValuesFrom}
@@ -91,8 +90,20 @@ public class SubClassInclusionComposedObjectSomeValuesFrom
 
 	@Override
 	public <I, O> O accept(
-			ComposedSubClassInclusionInferenceVisitor<I, O> visitor, I input) {
+			SubClassInclusionComposedInference.Visitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
+	}
+	
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O> {
+		
+		public O visit(SubClassInclusionComposedObjectSomeValuesFrom inference, I input);
+		
 	}
 
 }

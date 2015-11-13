@@ -27,8 +27,8 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 
 /**
  * A generic interface for objects which recursively unwind previously stored
@@ -45,12 +45,12 @@ public interface TraceUnwinder<O> {
 	 * class trace unwinding involves both class and property inferences.
 	 */
 	public void accept(ClassConclusion conclusion,
-			ClassInferenceVisitor<?, O> inferenceVisitor,
-			ObjectPropertyInferenceVisitor<?, O> propertyInferenceVisitor);
+			ClassInference.Visitor<?, O> inferenceVisitor,
+			ObjectPropertyInference.Visitor<?, O> propertyInferenceVisitor);
 
 	/*
 	 * unwinds only object property inferences.
 	 */
 	public void accept(ObjectPropertyConclusion conclusion,
-			ObjectPropertyInferenceVisitor<?, O> inferenceVisitor);
+			ObjectPropertyInference.Visitor<?, O> inferenceVisitor);
 }

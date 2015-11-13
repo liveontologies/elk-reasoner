@@ -24,14 +24,31 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.DecomposedSubClassInclusionInferenceVisitor;
 
 public interface SubClassInclusionDecomposedInference
 		extends
 			SubClassInclusionDecomposed,
 			SubClassInclusionInference<IndexedClassExpression> {
 
-	public <I, O> O accept(
-			DecomposedSubClassInclusionInferenceVisitor<I, O> visitor, I input);
+	public <I, O> O accept(Visitor<I, O> visitor, I input);
+
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O>
+			extends
+				SubClassInclusionDecomposedFirstConjunct.Visitor<I, O>,
+				SubClassInclusionDecomposedSecondConjunct.Visitor<I, O>,
+				SubClassInclusionExpandedDefinition.Visitor<I, O>,
+				SubClassInclusionExpandedSubClassOf.Visitor<I, O>,
+				SubClassInclusionObjectHasSelfPropertyRange.Visitor<I, O>,
+				SubClassInclusionTautology.Visitor<I, O> {
+
+		// combined interface
+
+	}
 
 }

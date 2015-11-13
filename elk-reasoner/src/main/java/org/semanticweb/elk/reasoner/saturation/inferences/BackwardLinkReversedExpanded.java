@@ -32,7 +32,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubObjectPropertyO
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.BackwardLinkInferenceVisitor;
 
 /**
  * A {@link BackwardLink} obtained from a {@link ForwardLink} with chain
@@ -93,9 +92,21 @@ public class BackwardLinkReversedExpanded extends AbstractBackwardLinkInference 
 	}
 
 	@Override
-	public <I, O> O accept(BackwardLinkInferenceVisitor<I, O> visitor,
+	public <I, O> O accept(BackwardLinkInference.Visitor<I, O> visitor,
 			I input) {
 		return visitor.visit(this, input);
+	}
+	
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O> {
+		
+		public O visit(BackwardLinkReversedExpanded inference, I input);
+		
 	}
 
 }

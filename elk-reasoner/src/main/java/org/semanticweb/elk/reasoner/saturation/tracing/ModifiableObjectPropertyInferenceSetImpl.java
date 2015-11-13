@@ -28,7 +28,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusionEquality;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusionHash;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 

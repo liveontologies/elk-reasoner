@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.DecomposedSubClassInclusionInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 
 /**
  * A {@link SubClassInclusionDecomposed} obtained from a
@@ -92,9 +92,21 @@ public class SubClassInclusionExpandedSubClassOf
 
 	@Override
 	public <I, O> O accept(
-			DecomposedSubClassInclusionInferenceVisitor<I, O> visitor,
+			SubClassInclusionDecomposedInference.Visitor<I, O> visitor,
 			I parameter) {
 		return visitor.visit(this, parameter);
 	}
 
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O> {
+		
+		public O visit(SubClassInclusionExpandedSubClassOf inference, I input);
+		
+	}
+	
 }

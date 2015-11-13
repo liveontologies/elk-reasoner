@@ -32,8 +32,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.classes.AbstractClass
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ForwardLinkInferenceVisitor;
 
 /**
  * A {@link ForwardLink} obtained from a {@link SubClassInclusionDecomposed}
@@ -92,13 +90,25 @@ public class ForwardLinkOfObjectHasSelf extends AbstractClassConclusion
 	}
 
 	@Override
-	public <I, O> O accept(ClassInferenceVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(ClassInference.Visitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
 
 	@Override
-	public <I, O> O accept(ForwardLinkInferenceVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(ForwardLinkInference.Visitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
-	}	
+	}
+	
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O> {
+		
+		public O visit(ForwardLinkOfObjectHasSelf inference, I input);
+		
+	}
 
 }

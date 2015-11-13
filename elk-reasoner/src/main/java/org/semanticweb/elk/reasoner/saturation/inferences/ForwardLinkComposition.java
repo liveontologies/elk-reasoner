@@ -32,7 +32,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ForwardLinkInferenceVisitor;
 
 /**
  * A {@link ForwardLink} obtained by composing a {@link BackwardLink} and
@@ -111,8 +110,25 @@ public class ForwardLinkComposition extends
 	}
 
 	@Override
-	public <I, O> O accept(ForwardLinkInferenceVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(ForwardLinkInference.Visitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
+	}
+	
+	@Override
+	public <I, O> O accept(LinkComposition.Visitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
 
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O> {
+		
+		public O visit(ForwardLinkComposition inference, I input);
+		
+	}	
+	
 }

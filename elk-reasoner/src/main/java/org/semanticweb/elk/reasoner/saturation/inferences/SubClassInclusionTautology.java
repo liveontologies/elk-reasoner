@@ -28,7 +28,6 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.DecomposedSubClassInclusionInferenceVisitor;
 
 /**
  * {@link SubClassInclusionDecomposed} representing a tautology {@code A ⊑ A}
@@ -60,8 +59,21 @@ public class SubClassInclusionTautology
 
 	@Override
 	public <I, O> O accept(
-			DecomposedSubClassInclusionInferenceVisitor<I, O> visitor,
+			SubClassInclusionDecomposedInference.Visitor<I, O> visitor,
 			I input) {
 		return visitor.visit(this, input);
 	}
+	
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O> {
+		
+		public O visit(SubClassInclusionTautology inference, I input);
+		
+	}
+
 }

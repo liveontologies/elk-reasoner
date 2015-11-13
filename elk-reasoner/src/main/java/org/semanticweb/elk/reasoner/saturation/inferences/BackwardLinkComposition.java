@@ -35,16 +35,16 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubObjectPropertyO
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.BackwardLinkInferenceVisitor;
 
 /**
  * A {@link BackwardLink} obtained by composing a {@link BackwardLink} and
  * {@link ForwardLink} using {@link SubPropertyChain} premises.
  * 
- * @author "Yevgeny Kazakov" 
+ * @author "Yevgeny Kazakov"
  */
 public class BackwardLinkComposition extends AbstractBackwardLinkInference
-		implements LinkComposition {
+		implements
+			LinkComposition {
 
 	private final IndexedContextRoot inferenceRoot_;
 
@@ -61,8 +61,8 @@ public class BackwardLinkComposition extends AbstractBackwardLinkInference
 
 	public BackwardLinkComposition(IndexedContextRoot originRoot,
 			IndexedObjectProperty backwardRelation,
-			IndexedContextRoot inferenceRoot,
-			IndexedPropertyChain forwardChain, IndexedContextRoot targetRoot,
+			IndexedContextRoot inferenceRoot, IndexedPropertyChain forwardChain,
+			IndexedContextRoot targetRoot,
 			IndexedComplexPropertyChain composition,
 			IndexedObjectProperty compositionSuperProperty, ElkAxiom reason) {
 		super(targetRoot, compositionSuperProperty, originRoot);
@@ -92,7 +92,7 @@ public class BackwardLinkComposition extends AbstractBackwardLinkInference
 	public IndexedComplexPropertyChain getComposition() {
 		return composition_;
 	}
-	
+
 	/**
 	 * @return the {@link ElkAxiom} responsible for the fifth premise
 	 */
@@ -129,19 +129,37 @@ public class BackwardLinkComposition extends AbstractBackwardLinkInference
 		return factory.getIndexedSubObjectPropertyOfAxiom(reason_, composition_,
 				backwardRelation_);
 	}
-	
+
 	public SubPropertyChain getFifthPremise(SubPropertyChain.Factory factory) {
 		return factory.getSubPropertyChain(composition_, getBackwardRelation());
 	}
-	
+
 	@Override
 	public String toString() {
 		return super.toString() + " (composition)";
 	}
 
 	@Override
-	public <I, O> O accept(BackwardLinkInferenceVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(BackwardLinkInference.Visitor<I, O> visitor,
+			I input) {
 		return visitor.visit(this, input);
+	}
+
+	@Override
+	public <I, O> O accept(LinkComposition.Visitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
+	}
+
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O> {
+
+		public O visit(BackwardLinkComposition inference, I input);
+
 	}
 
 }

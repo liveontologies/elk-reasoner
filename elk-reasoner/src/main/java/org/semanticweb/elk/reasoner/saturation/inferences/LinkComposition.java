@@ -98,4 +98,21 @@ public interface LinkComposition extends ClassInference {
 	 */
 	public SubPropertyChain getFourthPremise(SubPropertyChain.Factory factory);
 
+	public <I, O> O accept(Visitor<I, O> visitor, I input);
+
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O>
+			extends
+				BackwardLinkComposition.Visitor<I, O>,
+				ForwardLinkComposition.Visitor<I, O> {
+
+		// combined interface
+
+	}
+
 }

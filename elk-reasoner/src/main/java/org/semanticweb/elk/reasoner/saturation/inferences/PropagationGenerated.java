@@ -28,10 +28,9 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.PropagationInferenceVisitor;
 
 /**
  * A {@link Propagation} of a {@link IndexedObjectSomeValuesFrom} carry
@@ -61,7 +60,8 @@ public class PropagationGenerated extends AbstractPropagationInference {
 		return getConclusionRoot();
 	}
 
-	public SubClassInclusionComposed getFirstPremise(SubClassInclusionComposed.Factory factory) {
+	public SubClassInclusionComposed getFirstPremise(
+			SubClassInclusionComposed.Factory factory) {
 		return factory.getComposedSubClassInclusion(getInferenceRoot(),
 				getCarry().getFiller());
 	}
@@ -72,9 +72,21 @@ public class PropagationGenerated extends AbstractPropagationInference {
 	}
 
 	@Override
-	public <I, O> O accept(PropagationInferenceVisitor<I, O> visitor,
+	public <I, O> O accept(PropagationInference.Visitor<I, O> visitor,
 			I parameter) {
 		return visitor.visit(this, parameter);
+	}
+
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O> {
+
+		public O visit(PropagationGenerated inference, I input);
+
 	}
 
 }

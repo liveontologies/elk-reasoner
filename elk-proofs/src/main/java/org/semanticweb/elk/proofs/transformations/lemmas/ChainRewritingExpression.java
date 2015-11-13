@@ -44,8 +44,8 @@ import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionCon
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.util.TracingUtils;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
 import org.semanticweb.elk.util.collections.Multimap;
 

@@ -32,7 +32,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDefinitionAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ComposedSubClassInclusionInferenceVisitor;
 
 /**
  * A {@link SubClassInclusionComposed} with {@link IndexedClass} super-class
@@ -94,8 +93,20 @@ public class SubClassInclusionComposedDefinedClass
 
 	@Override
 	public <I, O> O accept(
-			ComposedSubClassInclusionInferenceVisitor<I, O> visitor, I input) {
+			SubClassInclusionComposedInference.Visitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
-
+	
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O> {
+		
+		public O visit(SubClassInclusionComposedDefinedClass inference, I input);
+		
+	}
+	
 }

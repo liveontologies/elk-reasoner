@@ -26,8 +26,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.PropagationImpl;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.PropagationInferenceVisitor;
 
 public abstract class AbstractPropagationInference extends PropagationImpl
 		implements PropagationInference {
@@ -38,8 +36,8 @@ public abstract class AbstractPropagationInference extends PropagationImpl
 	}
 
 	@Override
-	public <I, O> O accept(ClassInferenceVisitor<I, O> visitor, I parameter) {
-		return accept((PropagationInferenceVisitor<I, O>) visitor, parameter);
+	public <I, O> O accept(ClassInference.Visitor<I, O> visitor, I parameter) {
+		return accept((PropagationInference.Visitor<I, O>) visitor, parameter);
 	}
 
 }

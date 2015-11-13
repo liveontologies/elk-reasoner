@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.inferences.properties;
+package org.semanticweb.elk.reasoner.saturation.properties.inferences;
 
 /*
  * #%L
@@ -108,8 +108,22 @@ public class SubPropertyChainExpandedSubObjectPropertyOf extends AbstractSubProp
 	}
 
 	@Override
-	public <I, O> O accept(SubPropertyChainInferenceVisitor<I, O> visitor,
+	public <I, O> O accept(SubPropertyChainInference.Visitor<I, O> visitor,
 			I input) {
 		return visitor.visit(this, input);
 	}
+	
+	
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O> {
+		
+		public O visit(SubPropertyChainExpandedSubObjectPropertyOf inference, I input);
+		
+	}
+	
 }

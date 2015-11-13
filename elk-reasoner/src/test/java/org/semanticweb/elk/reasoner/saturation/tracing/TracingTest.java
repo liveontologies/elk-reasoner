@@ -48,17 +48,15 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkComposition;
+import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversedExpanded;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSubClassOf;
-import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.AbstractObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainExpandedSubObjectPropertyOf;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.AbstractClassInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.AbstractObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainExpandedSubObjectPropertyOf;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
@@ -139,7 +137,7 @@ public class TracingTest {
 	}	
 	
 	// FIXME: this test is not necessary as side conditions are not null by construction
-	private ClassInferenceVisitor<IndexedContextRoot, Boolean> getClassInferenceCheckerForAxiomBinding() {
+	private ClassInference.Visitor<IndexedContextRoot, Boolean> getClassInferenceCheckerForAxiomBinding() {
 		return new AbstractClassInferenceVisitor<IndexedContextRoot, Boolean>() {
 
 			@Override
@@ -173,7 +171,7 @@ public class TracingTest {
 			}
 
 			@Override
-			public Boolean visit(SuperReversedForwardLink inference, IndexedContextRoot root) {
+			public Boolean visit(BackwardLinkReversedExpanded inference, IndexedContextRoot root) {
 				ElkAxiom axiom = new SideConditionLookup().lookup(inference);
 				
 				assertNotNull("Failed to look up the property axiom for the composition infrence " + inference, axiom);
@@ -183,7 +181,7 @@ public class TracingTest {
 		};
 	}
 	
-	private ObjectPropertyInferenceVisitor<?, Boolean> getPropertyInferenceCheckerForAxiomBinding() {
+	private ObjectPropertyInference.Visitor<?, Boolean> getPropertyInferenceCheckerForAxiomBinding() {
 		return new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
 
 			@Override

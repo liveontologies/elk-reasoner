@@ -28,7 +28,6 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
 
 /**
  * Represents an inference as an extended conclusion. All premises can be
@@ -46,6 +45,26 @@ public interface ClassInference extends ClassConclusion {
 	 */
 	public IndexedContextRoot getInferenceRoot();
 
-	public <I, O> O accept(ClassInferenceVisitor<I, O> visitor, I input);
+	public <I, O> O accept(Visitor<I, O> visitor, I input);
+
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O>
+			extends
+				BackwardLinkInference.Visitor<I, O>,
+				ContradictionInference.Visitor<I, O>,
+				DisjointSubsumerInference.Visitor<I, O>,
+				ForwardLinkInference.Visitor<I, O>,
+				LinkComposition.Visitor<I, O>,
+				PropagationInference.Visitor<I, O>,
+				SubClassInclusionInference.Visitor<I, O> {
+
+		// combined interface
+
+	}
 
 }

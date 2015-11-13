@@ -29,7 +29,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ComposedSubClassInclusionInferenceVisitor;
 
 /**
  * A {@link SubClassInclusionComposed} with {@link IndexedObjectUnionOf}
@@ -70,9 +69,21 @@ public class SubClassInclusionComposedObjectUnionOf
 
 	@Override
 	public <I, O> O accept(
-			ComposedSubClassInclusionInferenceVisitor<I, O> visitor,
+			SubClassInclusionComposedInference.Visitor<I, O> visitor,
 			I parameter) {
 		return visitor.visit(this, parameter);
+	}
+	
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O> {
+		
+		public O visit(SubClassInclusionComposedObjectUnionOf inference, I input);
+		
 	}
 
 }

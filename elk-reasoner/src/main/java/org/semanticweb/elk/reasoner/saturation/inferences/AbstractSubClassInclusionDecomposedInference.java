@@ -25,8 +25,6 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SubClassInclusionDecomposedImpl;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.DecomposedSubClassInclusionInferenceVisitor;
 
 public abstract class AbstractSubClassInclusionDecomposedInference
 		extends
@@ -40,10 +38,18 @@ public abstract class AbstractSubClassInclusionDecomposedInference
 	}
 
 	@Override
-	public <I, O> O accept(ClassInferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O accept(ClassInference.Visitor<I, O> visitor, I input) {
 		return accept(
-				(DecomposedSubClassInclusionInferenceVisitor<I, O>) visitor,
-				parameter);
+				(SubClassInclusionDecomposedInference.Visitor<I, O>) visitor,
+				input);
+	}
+
+	@Override
+	public <I, O> O accept(SubClassInclusionInference.Visitor<I, O> visitor,
+			I input) {
+		return accept(
+				(SubClassInclusionDecomposedInference.Visitor<I, O>) visitor,
+				input);
 	}
 
 }

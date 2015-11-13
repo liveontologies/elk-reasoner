@@ -1,12 +1,14 @@
-package org.semanticweb.elk.reasoner.saturation.inferences.visitors;
-
+/**
+ * 
+ */
+package org.semanticweb.elk.reasoner.saturation.properties.inferences;
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +24,18 @@ package org.semanticweb.elk.reasoner.saturation.inferences.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.inferences.PropagationGenerated;
 
-public interface PropagationInferenceVisitor<I, O> {
+/**
+ * @author Pavel Klinov
+ *
+ * pavel.klinov@uni-ulm.de
+ */
+public class DummyObjectPropertyInferenceVisitor<I, O> extends AbstractObjectPropertyInferenceVisitor<I, O> {
 
-	public O visit(PropagationGenerated inference, I input);
+	@Override
+	protected O defaultTracedVisit(ObjectPropertyInference inference, I input) {
+		// no-op
+		return null;
+	}
 
 }

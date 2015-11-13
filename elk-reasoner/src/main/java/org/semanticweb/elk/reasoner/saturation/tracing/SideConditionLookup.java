@@ -27,17 +27,15 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
-import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkComposition;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfDisjointSubsumers;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSubClassOf;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.AbstractObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainExpandedSubObjectPropertyOf;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.AbstractClassInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.AbstractObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainExpandedSubObjectPropertyOf;
 
 /**
  * Given a {@link ClassInference} or a {@link ObjectPropertyInference} tries to
@@ -51,7 +49,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenc
  */
 public class SideConditionLookup {
 
-	private ClassInferenceVisitor<Void, ElkAxiom> classAxiomGetter = new AbstractClassInferenceVisitor<Void, ElkAxiom>() {
+	private ClassInference.Visitor<Void, ElkAxiom> classAxiomGetter = new AbstractClassInferenceVisitor<Void, ElkAxiom>() {
 
 		@Override
 		protected ElkAxiom defaultTracedVisit(ClassInference conclusion,
@@ -83,7 +81,7 @@ public class SideConditionLookup {
 
 	};
 
-	private ObjectPropertyInferenceVisitor<Void, ElkAxiom> propertyAxiomGetter = new AbstractObjectPropertyInferenceVisitor<Void, ElkAxiom>() {
+	private ObjectPropertyInference.Visitor<Void, ElkAxiom> propertyAxiomGetter = new AbstractObjectPropertyInferenceVisitor<Void, ElkAxiom>() {
 
 		@Override
 		protected ElkObjectPropertyAxiom defaultTracedVisit(

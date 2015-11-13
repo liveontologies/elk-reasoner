@@ -23,10 +23,26 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ContradictionInferenceVisitor;
 
 public interface ContradictionInference extends Contradiction, ClassInference {
 
-	public <I, O> O accept(ContradictionInferenceVisitor<I, O> visitor, I input);
+	public <I, O> O accept(Visitor<I, O> visitor, I input);
+
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O>
+			extends
+				ContradictionOfOwlNothing.Visitor<I, O>,
+				ContradictionOfDisjointSubsumers.Visitor<I, O>,
+				ContradictionOfObjectComplementOf.Visitor<I, O>,
+				ContradictionPropagated.Visitor<I, O> {
+
+		// combined interface
+
+	}
 
 }

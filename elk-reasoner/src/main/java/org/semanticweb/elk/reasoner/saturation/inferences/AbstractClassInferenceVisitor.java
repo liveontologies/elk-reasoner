@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.inferences.visitors;
+package org.semanticweb.elk.reasoner.saturation.inferences;
 
 /*
  * #%L
@@ -9,7 +9,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences.visitors;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,42 +25,15 @@ package org.semanticweb.elk.reasoner.saturation.inferences.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkComposition;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedEntity;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedDefinedClass;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectUnionOf;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkComposition;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfDisjointSubsumers;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfObjectComplementOf;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfOwlNothing;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedDefinition;
-import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkOfObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecomposedFirstConjunct;
-import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectHasSelf;
-import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkOfObjectHasSelf;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecomposedSecondConjunct;
-import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
-import org.semanticweb.elk.reasoner.saturation.inferences.PropagationGenerated;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionTautology;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionObjectHasSelfPropertyRange;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionPropagated;
-import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversed;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSubClassOf;
-import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
-
 /**
- * A skeleton implementation of {@link ClassInferenceVisitor}.
+ * A skeleton implementation of {@link ClassInference.Visitor}.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
 public abstract class AbstractClassInferenceVisitor<I, O> implements
-		ClassInferenceVisitor<I, O> {
+		ClassInference.Visitor<I, O> {
 
 	protected abstract O defaultTracedVisit(ClassInference conclusion, I input);
 
@@ -185,7 +158,7 @@ public abstract class AbstractClassInferenceVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(SuperReversedForwardLink conclusion, I input) {
+	public O visit(BackwardLinkReversedExpanded conclusion, I input) {
 		return defaultTracedVisit(conclusion, input);
 	}
 

@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.DecomposedSubClassInclusionInferenceVisitor;
 
 /**
  * 
@@ -45,9 +44,21 @@ public class SubClassInclusionDecomposedSecondConjunct extends SubClassInclusion
 	}
 
 	@Override
-	public <I, O> O accept(DecomposedSubClassInclusionInferenceVisitor<I, O> visitor,
+	public <I, O> O accept(SubClassInclusionDecomposedInference.Visitor<I, O> visitor,
 			I parameter) {
 		return visitor.visit(this, parameter);
+	}
+	
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O> {
+		
+		public O visit(SubClassInclusionDecomposedSecondConjunct inference, I input);
+		
 	}
 
 }

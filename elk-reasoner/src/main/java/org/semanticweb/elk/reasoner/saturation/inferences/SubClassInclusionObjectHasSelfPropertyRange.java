@@ -30,7 +30,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.DecomposedSubClassInclusionInferenceVisitor;
 
 /**
  * A {@link ClassInclusionDecomposed} obtained from a
@@ -70,9 +69,21 @@ public class SubClassInclusionObjectHasSelfPropertyRange extends
 	}
 
 	@Override
-	public <I, O> O accept(DecomposedSubClassInclusionInferenceVisitor<I, O> visitor,
+	public <I, O> O accept(SubClassInclusionDecomposedInference.Visitor<I, O> visitor,
 			I parameter) {
 		return visitor.visit(this, parameter);
+	}
+	
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O> {
+		
+		public O visit(SubClassInclusionObjectHasSelfPropertyRange inference, I input);
+		
 	}
 
 }

@@ -1,7 +1,6 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.saturation.inferences.properties;
+package org.semanticweb.elk.reasoner.saturation.properties.inferences;
+
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 
 /*
  * #%L
@@ -25,16 +24,26 @@ package org.semanticweb.elk.reasoner.saturation.inferences.properties;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
+public interface SubPropertyChainInference extends SubPropertyChain,
+		ObjectPropertyInference {
 
-/**
- * The root of all inferences on properties.
- * 
- * @author Pavel Klinov
- *
- *         pavel.klinov@uni-ulm.de
- */
-public interface ObjectPropertyInference extends ObjectPropertyConclusion {
+	public <I, O> O accept(Visitor<I, O> visitor, I input);
+	
 
-	public <I, O> O accept(ObjectPropertyInferenceVisitor<I, O> visitor, I input);
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O>
+			extends
+				SubPropertyChainExpandedSubObjectPropertyOf.Visitor<I, O>,
+				SubPropertyChainTautology.Visitor<I, O> {
+		
+		// combined interface
+		
+	}
+	
+
 }

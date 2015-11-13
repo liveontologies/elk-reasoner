@@ -33,7 +33,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ContradictionInferenceVisitor;
 
 /**
  * A {@link Contradiction} obtained from two {@link DisjointSubsumer} premises
@@ -107,8 +106,20 @@ public class ContradictionOfDisjointSubsumers extends
 	}
 
 	@Override
-	public <I, O> O accept(ContradictionInferenceVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(ContradictionInference.Visitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
+	}
+	
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O> {
+		
+		public O visit(ContradictionOfDisjointSubsumers inference, I input);
+		
 	}
 
 }

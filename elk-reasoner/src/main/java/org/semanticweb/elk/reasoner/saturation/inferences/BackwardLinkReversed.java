@@ -29,7 +29,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.BackwardLinkInferenceVisitor;
 
 /**
  * A {@link BackwardLink} obtained from a {@link ForwardLink} with
@@ -61,9 +60,21 @@ public class BackwardLinkReversed extends AbstractBackwardLinkInference {
 	}
 
 	@Override
-	public <I, O> O accept(BackwardLinkInferenceVisitor<I, O> visitor,
+	public <I, O> O accept(BackwardLinkInference.Visitor<I, O> visitor,
 			I parameter) {
 		return visitor.visit(this, parameter);
+	}
+	
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O> {
+		
+		public O visit(BackwardLinkReversed inference, I input);
+		
 	}
 
 }

@@ -29,7 +29,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
-import org.semanticweb.elk.reasoner.saturation.inferences.visitors.BackwardLinkInferenceVisitor;
 
 /**
  * A {@link BackwardLink} obtained from a {@link SubClassInclusionDecomposed}
@@ -72,8 +71,20 @@ public class BackwardLinkOfObjectSomeValuesFrom extends
 	}
 
 	@Override
-	public <I, O> O accept(BackwardLinkInferenceVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(BackwardLinkInference.Visitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
+	}
+	
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O> {
+		
+		public O visit(BackwardLinkOfObjectSomeValuesFrom inference, I input);
+		
 	}
 
 }

@@ -1,7 +1,8 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.inferences.properties;
+package org.semanticweb.elk.reasoner.saturation.properties.inferences;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,18 +25,28 @@ package org.semanticweb.elk.reasoner.saturation.inferences.properties;
  * #L%
  */
 
-
 /**
+ * A skeleton implementation of {@link ObjectPropertyInference.Visitor}.
+ * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-public class DummyObjectPropertyInferenceVisitor<I, O> extends AbstractObjectPropertyInferenceVisitor<I, O> {
+public abstract class AbstractObjectPropertyInferenceVisitor<I, O> implements
+		ObjectPropertyInference.Visitor<I, O> {
+
+	protected abstract O defaultTracedVisit(ObjectPropertyInference inference,
+			I input);
 
 	@Override
-	protected O defaultTracedVisit(ObjectPropertyInference inference, I input) {
-		// no-op
-		return null;
+	public O visit(SubPropertyChainTautology inference, I input) {
+		return defaultTracedVisit(inference, input);
+	}
+
+	@Override
+	public O visit(SubPropertyChainExpandedSubObjectPropertyOf inference, I input) {
+		return defaultTracedVisit(inference, input);
+
 	}
 
 }

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.inferences.properties;
+package org.semanticweb.elk.reasoner.saturation.properties.inferences;
 
 /*
  * #%L
@@ -26,6 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences.properties;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 
 /**
  * {@link SubPropertyChain} representing a tautology {@code r1 ○ ... ○ rn  ⊑ r1 ○ ... ○ rn}
@@ -67,9 +68,21 @@ public class SubPropertyChainTautology extends AbstractSubPropertyChainInference
 	}
 
 	@Override
-	public <I, O> O accept(SubPropertyChainInferenceVisitor<I, O> visitor,
+	public <I, O> O accept(SubPropertyChainInference.Visitor<I, O> visitor,
 			I input) {
 		return visitor.visit(this, input);
+	}
+	
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<I, O> {
+		
+		public O visit(SubPropertyChainTautology inference, I input);
+		
 	}
 
 }
