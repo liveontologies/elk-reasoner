@@ -26,7 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromNegation;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfObjectComplementOf;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 
 /**
@@ -60,7 +60,7 @@ public class IndexedObjectComplementOfDecomposition extends
 	public void apply(IndexedObjectComplementOf premise,
 			ContextPremises premises, ClassConclusionProducer producer) {
 		if (premises.getComposedSubsumers().contains(premise.getNegated())) {
-			producer.produce(new ContradictionFromNegation(premises.getRoot(),
+			producer.produce(new ContradictionOfObjectComplementOf(premises.getRoot(),
 					premise));
 		}
 	}

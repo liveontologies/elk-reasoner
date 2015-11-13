@@ -628,7 +628,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			return factory_.getContradiction(subsumee);
 		}
 		// else
-		return factory_.getComposedSubsumer(subsumee, subsumer);
+		return factory_.getComposedSubClassInclusion(subsumee, subsumer);
 	}
 
 	@Deprecated

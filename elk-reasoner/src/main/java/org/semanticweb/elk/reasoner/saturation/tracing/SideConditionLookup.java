@@ -28,14 +28,14 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromDisjointSubsumers;
+import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkComposition;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfDisjointSubsumers;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSubClassOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.AbstractObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainExpanded;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainExpandedSubObjectPropertyOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
 
@@ -61,7 +61,7 @@ public class SideConditionLookup {
 		}
 
 		@Override
-		public ElkAxiom visit(SubClassOfSubsumer inference, Void ignored) {
+		public ElkAxiom visit(SubClassInclusionExpandedSubClassOf inference, Void ignored) {
 			return inference.getReason();
 		}
 
@@ -71,13 +71,13 @@ public class SideConditionLookup {
 		}
 
 		@Override
-		public ElkAxiom visit(ContradictionFromDisjointSubsumers inference,
+		public ElkAxiom visit(ContradictionOfDisjointSubsumers inference,
 				Void input) {
 			return inference.getReason();
 		}
 
 		@Override
-		public ElkAxiom visit(ComposedBackwardLink inference, Void input) {
+		public ElkAxiom visit(BackwardLinkComposition inference, Void input) {
 			return inference.getReason();
 		}
 
@@ -93,7 +93,7 @@ public class SideConditionLookup {
 		}
 
 		@Override
-		public ElkAxiom visit(SubPropertyChainExpanded inference, Void input) {
+		public ElkAxiom visit(SubPropertyChainExpandedSubObjectPropertyOf inference, Void input) {
 			return inference.getReason();
 		}
 

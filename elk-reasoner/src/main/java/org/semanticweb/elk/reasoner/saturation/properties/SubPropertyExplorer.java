@@ -32,9 +32,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyCha
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainExpanded;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainExpandedSubObjectPropertyOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainInit;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainTautology;
 import org.semanticweb.elk.reasoner.saturation.tracing.ObjectPropertyInferenceProducer;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
@@ -87,7 +87,7 @@ class SubPropertyExplorer {
 		this.subPropertyChains_ = subPropertyChains;
 		this.subProperties_ = subProperties;
 		this.inferenceProducer_ = inferenceProducer;
-		toDo(new SubPropertyChainInit(input));
+		toDo(new SubPropertyChainTautology(input));
 	}
 
 	private void toDo(SubPropertyChainInference inference) {
@@ -115,7 +115,7 @@ class SubPropertyExplorer {
 			for (int i = 0; i < toldSubChains.size(); i++) {
 				IndexedPropertyChain sub = toldSubChains.get(i);
 				ElkAxiom reason = reasons.get(i);
-				toDo(new SubPropertyChainExpanded(sub, next,
+				toDo(new SubPropertyChainExpandedSubObjectPropertyOf(sub, next,
 						(IndexedObjectProperty) input_, reason));
 			}
 		}

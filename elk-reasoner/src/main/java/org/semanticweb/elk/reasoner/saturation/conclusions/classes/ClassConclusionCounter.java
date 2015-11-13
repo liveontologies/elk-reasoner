@@ -24,10 +24,10 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -67,12 +67,12 @@ public class ClassConclusionCounter {
 	long countForwardLinks;
 
 	/**
-	 * counter for {@link DecomposedSubsumer}s
+	 * counter for {@link SubClassInclusionDecomposed}s
 	 */
 	long countDecomposedSubsumers;
 
 	/**
-	 * counter for {@link ComposedSubsumer}s
+	 * counter for {@link SubClassInclusionComposed}s
 	 */
 	long countComposedSubsumers;
 

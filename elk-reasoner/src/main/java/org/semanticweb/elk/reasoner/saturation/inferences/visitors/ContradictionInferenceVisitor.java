@@ -22,19 +22,19 @@ package org.semanticweb.elk.reasoner.saturation.inferences.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromDisjointSubsumers;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromNegation;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromOwlNothing;
-import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedContradiction;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfDisjointSubsumers;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfObjectComplementOf;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfOwlNothing;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionPropagated;
 
 public interface ContradictionInferenceVisitor<I, O> {
 
-	public O visit(ContradictionFromDisjointSubsumers inference, I input);
+	public O visit(ContradictionOfDisjointSubsumers inference, I input);
 
-	public O visit(ContradictionFromNegation inference, I input);
+	public O visit(ContradictionOfObjectComplementOf inference, I input);
 
-	public O visit(ContradictionFromOwlNothing inference, I input);
+	public O visit(ContradictionOfOwlNothing inference, I input);
 
-	public O visit(PropagatedContradiction inference, I input);
+	public O visit(ContradictionPropagated inference, I input);
 
 }

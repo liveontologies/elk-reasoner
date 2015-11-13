@@ -73,7 +73,7 @@ public interface ClassConclusion extends Conclusion {
 				InitializationConclusion.Factory,
 				ForwardLink.Factory,
 				SubClassConclusion.Factory,
-				Subsumer.Factory {
+				SubClassInclusion.Factory {
 
 		// combined interface
 
@@ -97,7 +97,7 @@ public interface ClassConclusion extends Conclusion {
 				InitializationConclusion.Visitor<I, O>,
 				ForwardLink.Visitor<I, O>,
 				SubClassConclusion.Visitor<I, O>,
-				Subsumer.Visitor<I, O> {
+				SubClassInclusion.Visitor<I, O> {
 
 		// combined interface
 

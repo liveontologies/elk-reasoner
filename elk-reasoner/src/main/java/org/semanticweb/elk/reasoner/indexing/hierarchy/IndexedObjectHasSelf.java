@@ -25,8 +25,8 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectHasSelfVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedReflexiveBackwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedReflexiveForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectHasSelf;
+import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkOfObjectHasSelf;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 
@@ -57,10 +57,10 @@ public interface IndexedObjectHasSelf extends IndexedClassExpression {
 			SaturatedPropertyChain propertySaturation = subsumer.getProperty()
 					.getSaturated();
 			if (propertySaturation.getCompositionsByLeftSubProperty().isEmpty()) {
-				producer.produce(new DecomposedReflexiveBackwardLink(root,
+				producer.produce(new BackwardLinkOfObjectHasSelf(root,
 						subsumer));
 			} else {
-				producer.produce(new DecomposedReflexiveForwardLink(root,
+				producer.produce(new ForwardLinkOfObjectHasSelf(root,
 						subsumer));
 			}
 		}

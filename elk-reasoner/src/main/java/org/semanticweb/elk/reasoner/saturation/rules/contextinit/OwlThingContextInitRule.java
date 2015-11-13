@@ -26,9 +26,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.InitializationSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionTautology;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
@@ -38,7 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link ChainableContextInitRule} that produces {@link Subsumer}
+ * A {@link ChainableContextInitRule} that produces {@link SubClassInclusion}
  * {@code owl:Thing} in a context. It should be applied only if
  * {@code owl:Thing} occurs negatively in the ontology.
  */
@@ -104,7 +104,7 @@ public class OwlThingContextInitRule extends AbstractChainableContextInitRule {
 			ClassConclusionProducer producer) {
 		// producer.produce(premises.getRoot(), new
 		// DecomposedSubsumer(owlThing_));
-		producer.produce(new InitializationSubsumer(premises.getRoot(),
+		producer.produce(new SubClassInclusionTautology(premises.getRoot(),
 				owlThing_));
 	}
 

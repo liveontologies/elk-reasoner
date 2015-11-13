@@ -24,8 +24,8 @@ package org.semanticweb.elk.reasoner.saturation.inferences.properties;
 
 public interface SubPropertyChainInferenceVisitor<I, O> {
 
-	public O visit(SubPropertyChainInit inference, I input);
+	public O visit(SubPropertyChainTautology inference, I input);
 
-	public O visit(SubPropertyChainExpanded inference, I input);
+	public O visit(SubPropertyChainExpandedSubObjectPropertyOf inference, I input);
 
 }

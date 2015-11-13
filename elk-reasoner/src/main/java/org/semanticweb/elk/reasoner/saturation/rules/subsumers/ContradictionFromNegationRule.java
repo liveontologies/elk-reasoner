@@ -28,7 +28,7 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectC
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromNegation;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfObjectComplementOf;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
@@ -90,7 +90,7 @@ public class ContradictionFromNegationRule extends
 			ClassConclusionProducer producer) {
 		if (negation_ != null
 				&& premises.getDecomposedSubsumers().contains(negation_)) {
-			producer.produce(new ContradictionFromNegation(premises.getRoot(),
+			producer.produce(new ContradictionOfObjectComplementOf(premises.getRoot(),
 					negation_));
 		}
 	}

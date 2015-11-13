@@ -22,10 +22,10 @@ package org.semanticweb.elk.reasoner.saturation.inferences.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.inferences.GeneratedPropagation;
+import org.semanticweb.elk.reasoner.saturation.inferences.PropagationGenerated;
 
 public interface PropagationInferenceVisitor<I, O> {
 
-	public O visit(GeneratedPropagation inference, I input);
+	public O visit(PropagationGenerated inference, I input);
 
 }

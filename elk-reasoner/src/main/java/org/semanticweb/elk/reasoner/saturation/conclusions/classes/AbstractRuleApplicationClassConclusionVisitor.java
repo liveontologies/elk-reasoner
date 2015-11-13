@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
@@ -51,8 +51,8 @@ public abstract class AbstractRuleApplicationClassConclusionVisitor extends
 		this.producer = producer;
 	}
 
-	void applyCompositionRules(Subsumer conclusion, ContextPremises premises) {
-		IndexedClassExpression subsumer = conclusion.getExpression();
+	void applyCompositionRules(SubClassInclusion conclusion, ContextPremises premises) {
+		IndexedClassExpression subsumer = conclusion.getSuperExpression();
 		LinkedSubsumerRule compositionRule = subsumer.getCompositionRuleHead();
 		while (compositionRule != null) {
 			compositionRule
@@ -61,12 +61,10 @@ public abstract class AbstractRuleApplicationClassConclusionVisitor extends
 		}
 	}
 
-	void applyDecompositionRules(Subsumer conclusion, ContextPremises premises) {
-		IndexedClassExpression subsumer = conclusion.getExpression();
+	void applyDecompositionRules(SubClassInclusion conclusion, ContextPremises premises) {
+		IndexedClassExpression subsumer = conclusion.getSuperExpression();
 		subsumer.accept(new SubsumerDecompositionVisitor(ruleAppVisitor,
 				premises, producer));
-//		ComposedFromDecomposedSubsumerRule.getInstance().accept(ruleAppVisitor,
-//				subsumer, premises, producer);
 	}
 
 }

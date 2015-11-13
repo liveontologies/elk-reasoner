@@ -28,10 +28,10 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedRangeFiller;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.visitors.NoOpIndexedContextRootVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.InitializationSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionTautology;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
@@ -39,7 +39,7 @@ import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
- * A {@link ChainableContextInitRule} that produces a {@link Subsumer} for the
+ * A {@link ChainableContextInitRule} that produces a {@link SubClassInclusion} for the
  * root of the given {@link Context}.
  * 
  * @see Context#getRoot()
@@ -99,19 +99,19 @@ public class RootContextInitializationRule extends
 		root.accept(new NoOpIndexedContextRootVisitor<Void>() {
 			@Override
 			protected Void defaultVisit(IndexedClassExpression element) {
-				producer.produce(new InitializationSubsumer(premises.getRoot(),
+				producer.produce(new SubClassInclusionTautology(premises.getRoot(),
 						element));
 				return null;
 			}
 
 			@Override
 			public Void visit(IndexedRangeFiller element) {
-				producer.produce(new InitializationSubsumer(premises.getRoot(),
+				producer.produce(new SubClassInclusionTautology(premises.getRoot(),
 						element.getFiller()));
 				for (IndexedClassExpression range : element.getProperty()
 						.getSaturated().getRanges()) {
 					// TODO: introduce a specific inference
-					producer.produce(new InitializationSubsumer(premises
+					producer.produce(new SubClassInclusionTautology(premises
 							.getRoot(), range));
 				}
 				return null;

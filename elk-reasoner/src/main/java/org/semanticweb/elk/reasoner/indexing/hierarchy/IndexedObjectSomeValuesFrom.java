@@ -31,10 +31,10 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.ComposedForwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialBackwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkComposition;
+import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkComposition;
+import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkOfObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
@@ -120,10 +120,10 @@ public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			if (propertySaturation.getCompositionsByLeftSubProperty()
 					.isEmpty()) {
 				producer.produce(
-						new DecomposedExistentialBackwardLink(root, subsumer));
+						new BackwardLinkOfObjectSomeValuesFrom(root, subsumer));
 			} else {
 				producer.produce(
-						new DecomposedExistentialForwardLink(root, subsumer));
+						new ForwardLinkOfObjectSomeValuesFrom(root, subsumer));
 			}
 		}
 
@@ -141,13 +141,13 @@ public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				List<ElkAxiom> toldSuperPropertiesReasons = composition
 						.getToldSuperPropertiesReasons();
 				for (int i = 0; i < toldSuperProperties.size(); i++) {
-					producer.produce(new ComposedBackwardLink(source,
+					producer.produce(new BackwardLinkComposition(source,
 							backwardRelation, inferenceRoot, forwardRelation,
 							target, composition, toldSuperProperties.get(i),
 							toldSuperPropertiesReasons.get(i)));
 				}
 			} else {
-				producer.produce(new ComposedForwardLink(source,
+				producer.produce(new ForwardLinkComposition(source,
 						backwardRelation, inferenceRoot, forwardRelation,
 						target, composition));
 			}

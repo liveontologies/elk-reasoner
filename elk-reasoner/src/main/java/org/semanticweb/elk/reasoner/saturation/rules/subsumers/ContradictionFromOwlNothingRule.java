@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromOwlNothing;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfOwlNothing;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
@@ -82,7 +82,7 @@ public class ContradictionFromOwlNothingRule extends
 	@Override
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ClassConclusionProducer producer) {
-		producer.produce(new ContradictionFromOwlNothing(premises.getRoot(),
+		producer.produce(new ContradictionOfOwlNothing(premises.getRoot(),
 				(IndexedClass) premise));
 	}
 

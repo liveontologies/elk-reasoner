@@ -30,7 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedContradiction;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionPropagated;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 
 /**
@@ -72,7 +72,7 @@ public class ContradictionPropagationRule extends AbstractContradictionRule {
 			for (IndexedContextRoot target : subPremises.get(propRelation)
 					.getLinkedRoots()) {
 				// producer.produce(target, premise);
-				producer.produce(new PropagatedContradiction(
+				producer.produce(new ContradictionPropagated(
 						premises.getRoot(), propRelation, target));
 			}
 		}

@@ -33,9 +33,9 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDefinitionAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSubClassOf;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * 
- * A {@link ChainableSubsumerRule} producing {@link Subsumer} for the super
+ * A {@link ChainableSubsumerRule} producing {@link SubClassInclusion} for the super
  * class of {@link IndexedSubClassOfAxiom} when processing its sub class
  * {@link IndexedClassExpression}
  * 
@@ -158,7 +158,7 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ClassConclusionProducer producer) {
 		for (int i = 0; i < toldSubsumers_.size(); i++) {
-			producer.produce(new SubClassOfSubsumer(premises.getRoot(),
+			producer.produce(new SubClassInclusionExpandedSubClassOf(premises.getRoot(),
 					premise, toldSubsumers_.get(i), reasons_.get(i)));
 		}
 	}

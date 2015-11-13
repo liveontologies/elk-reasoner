@@ -30,7 +30,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.ReversedForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversed;
 import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 
@@ -60,7 +60,7 @@ public class BackwardLinkFromForwardLinkRule extends AbstractForwardLinkRule {
 			ClassConclusionProducer producer) {
 		IndexedPropertyChain relation = premise.getForwardChain();
 		if (relation instanceof IndexedObjectProperty) {
-			producer.produce(new ReversedForwardLink(premise));
+			producer.produce(new BackwardLinkReversed(premise));
 		} else {
 			List<IndexedObjectProperty> superProperties = relation
 					.getToldSuperProperties();

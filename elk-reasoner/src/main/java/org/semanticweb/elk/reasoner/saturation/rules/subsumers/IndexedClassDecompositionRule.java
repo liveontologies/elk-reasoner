@@ -29,16 +29,16 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDefinitionAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedDefinition;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedDefinition;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * A {@link SubsumerDecompositionRule} that processes an {@link IndexedClass}
- * and produces {@link Subsumer}s for its definition
+ * and produces {@link SubClassInclusion}s for its definition
  * 
  * @see IndexedClass#getDefinition()
  * 
@@ -98,7 +98,7 @@ public class IndexedClassDecompositionRule extends
 		IndexedClassExpression definedExpression = getDefinition(premise);
 		if (definedExpression == null)
 			return;
-		producer.produce(new DecomposedDefinition(premises.getRoot(), premise,
+		producer.produce(new SubClassInclusionExpandedDefinition(premises.getRoot(), premise,
 				definedExpression, getDefinitionReason(premise)));
 	}
 

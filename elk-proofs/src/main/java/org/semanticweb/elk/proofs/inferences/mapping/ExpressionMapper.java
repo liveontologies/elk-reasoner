@@ -58,7 +58,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.BackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ContradictionImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.DecomposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SubClassInclusionDecomposedImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SubPropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
@@ -176,7 +176,7 @@ public class ExpressionMapper {
 			IndexedClassExpression subsumer = sup.accept(converter_);
 			if (subsumer != null) {
 				result.add(new ClassTracingInput(
-						new DecomposedSubsumerImpl<IndexedClassExpression>(
+						new SubClassInclusionDecomposedImpl<IndexedClassExpression>(
 								subsumee, subsumer)));
 			}
 
@@ -222,7 +222,7 @@ public class ExpressionMapper {
 
 			ClassConclusion conclusion = isNothing(ax.getClassExpression()) ? new ContradictionImpl(
 					subsumee)
-					: new DecomposedSubsumerImpl<IndexedClassExpression>(
+					: new SubClassInclusionDecomposedImpl<IndexedClassExpression>(
 							subsumee, subsumer);
 			TracingInput input = new ClassTracingInput(conclusion);
 

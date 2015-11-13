@@ -26,10 +26,10 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -46,13 +46,13 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 public class ClassConclusionHashGenerator implements ClassConclusion.Visitor<Void, Integer> {
 
 	@Override
-	public Integer visit(ComposedSubsumer negSCE, Void context) {
-		return negSCE.getExpression().hashCode();
+	public Integer visit(SubClassInclusionComposed negSCE, Void context) {
+		return negSCE.getSuperExpression().hashCode();
 	}
 
 	@Override
-	public Integer visit(DecomposedSubsumer posSCE, Void context) {
-		return posSCE.getExpression().hashCode();
+	public Integer visit(SubClassInclusionDecomposed posSCE, Void context) {
+		return posSCE.getSuperExpression().hashCode();
 	}
 
 	@Override

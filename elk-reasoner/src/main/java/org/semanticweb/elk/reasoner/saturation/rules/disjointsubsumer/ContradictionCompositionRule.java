@@ -28,7 +28,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionLis
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromDisjointSubsumers;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfDisjointSubsumers;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 
 /**
@@ -59,7 +59,7 @@ public class ContradictionCompositionRule extends AbstractDisjointSubsumerRule {
 			int lastPos = premise.getPosition();
 			for (int otherPos : disjointSubsumerPositions) {
 				if (otherPos != lastPos) {
-					producer.produce(new ContradictionFromDisjointSubsumers(
+					producer.produce(new ContradictionOfDisjointSubsumers(
 							premise, otherPos));
 				}
 			}

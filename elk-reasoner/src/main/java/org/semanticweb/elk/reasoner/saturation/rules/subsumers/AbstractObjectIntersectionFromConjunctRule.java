@@ -26,16 +26,16 @@ import java.util.Map;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.ComposedConjunction;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 
 /**
- * A skeleton for a {@link ChainableSubsumerRule} that produces {@link Subsumer}
+ * A skeleton for a {@link ChainableSubsumerRule} that produces {@link SubClassInclusion}
  * for an {@link IndexedObjectIntersectionOf} when processing one of its
  * conjunct {@link IndexedClassExpression} and when the other conjunct is
  * contained in the {@link Context}
@@ -70,7 +70,7 @@ public abstract class AbstractObjectIntersectionFromConjunctRule extends
 		for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
 				conjunctionsByConjunct_.keySet(),
 				premises.getComposedSubsumers())) {
-			producer.produce(new ComposedConjunction(premises.getRoot(),
+			producer.produce(new SubClassInclusionComposedObjectIntersectionOf(premises.getRoot(),
 					conjunctionsByConjunct_.get(common)));
 		}
 	}

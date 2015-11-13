@@ -25,9 +25,9 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -55,22 +55,23 @@ public class ClassConclusionSourceContextUnsaturationVisitor extends
 		return true;
 	}
 
-	Boolean defaultVisit(Subsumer conclusion, Context context) {
-		// if the subsumer does not occur in the ontology anymore, it cannot be
+	Boolean defaultVisit(SubClassInclusion conclusion, Context context) {
+		// if the super-class does not occur in the ontology anymore, it cannot be
 		// re-derived, and thus, the context should not be modified
 		// TODO: extend this check to other types of conclusions
-		if (conclusion.getExpression().occurs())
+		if (conclusion.getSuperExpression().occurs()) {
 			return defaultVisit((ClassConclusion) conclusion, context);
+		}	
 		return true;
 	}
 
 	@Override
-	public Boolean visit(ComposedSubsumer conclusion, Context context) {
+	public Boolean visit(SubClassInclusionComposed conclusion, Context context) {
 		return defaultVisit(conclusion, context);
 	}
 
 	@Override
-	public Boolean visit(DecomposedSubsumer conclusion, Context context) {
+	public Boolean visit(SubClassInclusionDecomposed conclusion, Context context) {
 		return defaultVisit(conclusion, context);
 	}
 }

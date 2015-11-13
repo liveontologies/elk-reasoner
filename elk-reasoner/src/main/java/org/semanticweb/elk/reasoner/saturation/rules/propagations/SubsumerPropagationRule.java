@@ -28,15 +28,15 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.ComposedExistential;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 
 /**
- * A {@link PropagationRule} producing {@link Subsumer}s in the source
+ * A {@link PropagationRule} producing {@link SubClassInclusion}s in the source
  * {@link Context}s of relevant non-reflexive {@link BackwardLink}s stored in
  * the {@link ContextPremises} with which this rule applies.
  * 
@@ -69,10 +69,10 @@ public class SubsumerPropagationRule extends AbstractPropagationRule {
 		IndexedObjectProperty subRoot = premise.getConclusionSubRoot();
 		SubContextPremises targets = subContextMap.get(subRoot);
 		for (IndexedContextRoot target : targets.getLinkedRoots()) {
-			producer.produce(new ComposedExistential(premise, target));
+			producer.produce(new SubClassInclusionComposedObjectSomeValuesFrom(premise, target));
 		}
 		if (premises.getLocalReflexiveObjectProperties().contains(subRoot)) {
-			producer.produce(new ComposedExistential(premise, premises.getRoot()));
+			producer.produce(new SubClassInclusionComposedObjectSomeValuesFrom(premise, premises.getRoot()));
 		}
 	}
 

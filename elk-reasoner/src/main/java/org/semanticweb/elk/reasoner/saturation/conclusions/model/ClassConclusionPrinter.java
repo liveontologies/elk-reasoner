@@ -55,9 +55,9 @@ public class ClassConclusionPrinter implements ClassConclusion.Visitor<Void, Str
 	}
 
 	@Override
-	public String visit(ComposedSubsumer conclusion, Void input) {
+	public String visit(SubClassInclusionComposed conclusion, Void input) {
 		return "Subsumption+(" + conclusion.getConclusionRoot() + " "
-				+ conclusion.getExpression() + ")";
+				+ conclusion.getSuperExpression() + ")";
 	}
 
 	@Override
@@ -71,9 +71,9 @@ public class ClassConclusionPrinter implements ClassConclusion.Visitor<Void, Str
 	}
 
 	@Override
-	public String visit(DecomposedSubsumer conclusion, Void input) {
+	public String visit(SubClassInclusionDecomposed conclusion, Void input) {
 		return "Subsumption-(" + conclusion.getConclusionRoot() + " "
-				+ conclusion.getExpression() + ")";
+				+ conclusion.getSuperExpression() + ")";
 	}
 
 	@Override

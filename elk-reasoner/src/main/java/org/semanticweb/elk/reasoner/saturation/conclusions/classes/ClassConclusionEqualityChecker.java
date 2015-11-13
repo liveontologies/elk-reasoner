@@ -27,10 +27,10 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -56,38 +56,38 @@ public class ClassConclusionEqualityChecker implements ClassConclusion.Visitor<C
 	}
 	
 	@Override
-	public Boolean visit(ComposedSubsumer negSCE, ClassConclusion other) {
+	public Boolean visit(SubClassInclusionComposed negSCE, ClassConclusion other) {
 		return other.accept(new BaseBooleanClassConclusionVisitor<IndexedClassExpression>(){
 
 			@Override
-			public Boolean visit(ComposedSubsumer subsumer, IndexedClassExpression ice) {
-				return subsumer.getExpression() == ice;
+			public Boolean visit(SubClassInclusionComposed subsumer, IndexedClassExpression ice) {
+				return subsumer.getSuperExpression() == ice;
 			}
 
 			@Override
-			public Boolean visit(DecomposedSubsumer subsumer, IndexedClassExpression ice) {
-				return subsumer.getExpression() == ice;
+			public Boolean visit(SubClassInclusionDecomposed subsumer, IndexedClassExpression ice) {
+				return subsumer.getSuperExpression() == ice;
 			}
 			
 			
-		}, negSCE.getExpression());
+		}, negSCE.getSuperExpression());
 	}
 
 	@Override
-	public Boolean visit(DecomposedSubsumer posSCE, ClassConclusion other) {
+	public Boolean visit(SubClassInclusionDecomposed posSCE, ClassConclusion other) {
 		return other.accept(new BaseBooleanClassConclusionVisitor<IndexedClassExpression>(){
 
 			@Override
-			public Boolean visit(ComposedSubsumer subsumer, IndexedClassExpression ice) {
-				return subsumer.getExpression() == ice;
+			public Boolean visit(SubClassInclusionComposed subsumer, IndexedClassExpression ice) {
+				return subsumer.getSuperExpression() == ice;
 			}
 
 			@Override
-			public Boolean visit(DecomposedSubsumer subsumer, IndexedClassExpression ice) {
-				return subsumer.getExpression() == ice;
+			public Boolean visit(SubClassInclusionDecomposed subsumer, IndexedClassExpression ice) {
+				return subsumer.getSuperExpression() == ice;
 			}
 			
-		}, posSCE.getExpression());
+		}, posSCE.getSuperExpression());
 	}
 
 	@Override

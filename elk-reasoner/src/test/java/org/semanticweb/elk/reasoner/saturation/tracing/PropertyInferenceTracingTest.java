@@ -48,11 +48,11 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ConclusionBas
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.ComposedForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkComposition;
+import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkComposition;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.AbstractObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainExpanded;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainExpandedSubObjectPropertyOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 import org.slf4j.Logger;
@@ -106,7 +106,7 @@ public class PropertyInferenceTracingTest {
 					}
 
 					@Override
-					public Boolean visit(SubPropertyChainExpanded inference,
+					public Boolean visit(SubPropertyChainExpandedSubObjectPropertyOf inference,
 							Void input) {
 						// checking that S -> HH is in the trace (i.e. is used)
 						return inference.getSubChain().equals(s) && 
@@ -161,7 +161,7 @@ public class PropertyInferenceTracingTest {
 					}
 
 					@Override
-					public Boolean visit(ComposedForwardLink conclusion,
+					public Boolean visit(ForwardLinkComposition conclusion,
 							IndexedContextRoot input) {
 						// looking for the composition S o H -> SS o HH
 						SubPropertyChain left = conclusion.getSecondPremise(FACTORY_);
@@ -191,7 +191,7 @@ public class PropertyInferenceTracingTest {
 					}
 
 					@Override
-					public Boolean visit(SubPropertyChainExpanded inference,
+					public Boolean visit(SubPropertyChainExpandedSubObjectPropertyOf inference,
 							Void input) {
 						return inference.getSubChain().equals(sIndexed) &&
 								inference.getSuperChain().equals(ssIndexed);
@@ -210,7 +210,7 @@ public class PropertyInferenceTracingTest {
 					}
 
 					@Override
-					public Boolean visit(ComposedBackwardLink backwardLink,
+					public Boolean visit(BackwardLinkComposition backwardLink,
 							IndexedContextRoot input) {
 						// check that we use the inference that A <-R- B and B -SS o HH-> D imply A <-T- D  
 						return backwardLink.getBackwardRelation().equals(tIndexed) &&
@@ -232,7 +232,7 @@ public class PropertyInferenceTracingTest {
 					}
 
 					@Override
-					public Boolean visit(SubPropertyChainExpanded inference,
+					public Boolean visit(SubPropertyChainExpandedSubObjectPropertyOf inference,
 							Void input) {
 						return inference.getSubChain().equals(rIndexed) &&
 								inference.getSuperChain().equals(rrIndexed);

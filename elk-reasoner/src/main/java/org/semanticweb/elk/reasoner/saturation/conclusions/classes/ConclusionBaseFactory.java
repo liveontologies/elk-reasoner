@@ -31,11 +31,11 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFr
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -89,15 +89,18 @@ public class ConclusionBaseFactory implements Conclusion.Factory {
 	}
 
 	@Override
-	public ComposedSubsumer getComposedSubsumer(IndexedContextRoot root,
-			IndexedClassExpression subsumer) {
-		return new ComposedSubsumerImpl<IndexedClassExpression>(root, subsumer);
+	public SubClassInclusionComposed getComposedSubClassInclusion(
+			IndexedContextRoot subExpression,
+			IndexedClassExpression superExpression) {
+		return new SubClassInclusionComposedImpl<IndexedClassExpression>(subExpression,
+				superExpression);
 	}
 
 	@Override
-	public DecomposedSubsumer getDecomposedSubsumer(IndexedContextRoot root,
-			IndexedClassExpression subsumer) {
-		return new DecomposedSubsumerImpl(root, subsumer);
+	public SubClassInclusionDecomposed getDecomposedSubClassInclusion(
+			IndexedContextRoot subExpression,
+			IndexedClassExpression superExpression) {
+		return new SubClassInclusionDecomposedImpl(subExpression, superExpression);
 	}
 
 	@Override

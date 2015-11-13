@@ -49,14 +49,14 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkComposition;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSubClassOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.AbstractObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainExpanded;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainExpandedSubObjectPropertyOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
@@ -149,7 +149,7 @@ public class TracingTest {
 			
 			// axioms used as side conditions of this rule, should be able to look them up
 			@Override
-			public Boolean visit(SubClassOfSubsumer inference, IndexedContextRoot root) {
+			public Boolean visit(SubClassInclusionExpandedSubClassOf inference, IndexedContextRoot root) {
 				ElkAxiom axiom = new SideConditionLookup().lookup(inference);
 				
 				assertNotNull("Failed to look up the ontology axiom for the subsumption inference " + inference, axiom);
@@ -165,7 +165,7 @@ public class TracingTest {
 			}
 			
 			@Override
-			public Boolean visit(ComposedBackwardLink inference, IndexedContextRoot root) {
+			public Boolean visit(BackwardLinkComposition inference, IndexedContextRoot root) {
 				ElkAxiom axiom = new SideConditionLookup().lookup(inference);
 				
 				assertNotNull("Failed to look up the property axiom for the composition infrence " + inference, axiom);
@@ -194,7 +194,7 @@ public class TracingTest {
 
 			@Override
 			public Boolean visit(
-					SubPropertyChainExpanded inference,
+					SubPropertyChainExpandedSubObjectPropertyOf inference,
 					Void input) {
 				ElkAxiom axiom = new SideConditionLookup().lookup(inference);
 				

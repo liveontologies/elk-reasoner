@@ -91,10 +91,10 @@ public class ClassConclusionHash implements ClassConclusion.Visitor<Void, Intege
 	}
 
 	@Override
-	public Integer visit(ComposedSubsumer conclusion, Void input) {
-		return combinedHashCode(hashCode(ComposedSubsumer.class),
+	public Integer visit(SubClassInclusionComposed conclusion, Void input) {
+		return combinedHashCode(hashCode(SubClassInclusionComposed.class),
 				hashCode(conclusion.getConclusionRoot()),
-				hashCode(conclusion.getExpression()));
+				hashCode(conclusion.getSuperExpression()));
 	}
 
 	@Override
@@ -110,10 +110,10 @@ public class ClassConclusionHash implements ClassConclusion.Visitor<Void, Intege
 	}
 
 	@Override
-	public Integer visit(DecomposedSubsumer conclusion, Void input) {
-		return combinedHashCode(hashCode(DecomposedSubsumer.class),
+	public Integer visit(SubClassInclusionDecomposed conclusion, Void input) {
+		return combinedHashCode(hashCode(SubClassInclusionDecomposed.class),
 				hashCode(conclusion.getConclusionRoot()),
-				hashCode(conclusion.getExpression()));
+				hashCode(conclusion.getSuperExpression()));
 	}
 
 	@Override

@@ -31,10 +31,10 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ConclusionBas
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.ComposedExistential;
-import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialBackwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.ReversedForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkComposition;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversed;
 
 /**
  * Given an {@link ClassInference}, returns the root of the context to which
@@ -58,26 +58,26 @@ public class GetInferenceTarget extends
 	}
 
 	@Override
-	public IndexedContextRoot visit(ComposedExistential conclusion,
+	public IndexedContextRoot visit(SubClassInclusionComposedObjectSomeValuesFrom conclusion,
 			Context premiseContext) {
 		return conclusion.getFirstPremise(factory_).getOriginRoot();
 	}
 
 	@Override
-	public IndexedContextRoot visit(ComposedBackwardLink conclusion,
+	public IndexedContextRoot visit(BackwardLinkComposition conclusion,
 			Context premiseContext) {
 		return conclusion.getThirdPremise(factory_).getTarget();
 	}
 
 	@Override
-	public IndexedContextRoot visit(ReversedForwardLink conclusion,
+	public IndexedContextRoot visit(BackwardLinkReversed conclusion,
 			Context premiseContext) {
 		return conclusion.getPremise(factory_).getTarget();
 	}
 
 	@Override
 	public IndexedContextRoot visit(
-			DecomposedExistentialBackwardLink conclusion, Context premiseContext) {
+			BackwardLinkOfObjectSomeValuesFrom conclusion, Context premiseContext) {
 		return IndexedObjectSomeValuesFrom.Helper.getTarget(conclusion
 				.getDecomposedExistential());
 	}

@@ -36,15 +36,15 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.classes.BackwardLinkI
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
@@ -109,7 +109,8 @@ public class ContextImpl implements ExtendedContext {
 
 	/**
 	 * {@code true} if it is not initialized or otherwise all derived
-	 * {@link Subsumer}s of {@link #root_} have been computed.
+	 * {@link SubClassInclusion}s for {@link #root_} have been computed.
+	 * @see SubClassInclusion#getConclusionRoot()
 	 */
 	private volatile boolean isSaturated_ = true;
 
@@ -357,13 +358,13 @@ public class ContextImpl implements ExtendedContext {
 		}
 
 		@Override
-		public Boolean visit(ComposedSubsumer conclusion, ContextImpl input) {
-			return input.composedSubsumers_.add(conclusion.getExpression());
+		public Boolean visit(SubClassInclusionComposed conclusion, ContextImpl input) {
+			return input.composedSubsumers_.add(conclusion.getSuperExpression());
 		}
 
 		@Override
-		public Boolean visit(DecomposedSubsumer conclusion, ContextImpl input) {
-			return input.decomposedSubsumers_.add(conclusion.getExpression());
+		public Boolean visit(SubClassInclusionDecomposed conclusion, ContextImpl input) {
+			return input.decomposedSubsumers_.add(conclusion.getSuperExpression());
 		}
 
 		@Override
@@ -455,14 +456,14 @@ public class ContextImpl implements ExtendedContext {
 		}
 
 		@Override
-		public Boolean visit(ComposedSubsumer conclusion, ContextImpl input) {
-			return input.composedSubsumers_.remove(conclusion.getExpression());
+		public Boolean visit(SubClassInclusionComposed conclusion, ContextImpl input) {
+			return input.composedSubsumers_.remove(conclusion.getSuperExpression());
 		}
 
 		@Override
-		public Boolean visit(DecomposedSubsumer conclusion, ContextImpl input) {
+		public Boolean visit(SubClassInclusionDecomposed conclusion, ContextImpl input) {
 			return input.decomposedSubsumers_
-					.remove(conclusion.getExpression());
+					.remove(conclusion.getSuperExpression());
 		}
 
 		@Override
@@ -546,15 +547,15 @@ public class ContextImpl implements ExtendedContext {
 		}
 
 		@Override
-		public Boolean visit(ComposedSubsumer conclusion, ContextImpl input) {
+		public Boolean visit(SubClassInclusionComposed conclusion, ContextImpl input) {
 			return input.composedSubsumers_
-					.contains(conclusion.getExpression());
+					.contains(conclusion.getSuperExpression());
 		}
 
 		@Override
-		public Boolean visit(DecomposedSubsumer conclusion, ContextImpl input) {
+		public Boolean visit(SubClassInclusionDecomposed conclusion, ContextImpl input) {
 			return input.decomposedSubsumers_.contains(conclusion
-					.getExpression());
+					.getSuperExpression());
 		}
 
 		@Override

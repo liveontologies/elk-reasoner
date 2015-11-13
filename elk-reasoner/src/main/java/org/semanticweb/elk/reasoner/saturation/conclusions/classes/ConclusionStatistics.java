@@ -1,10 +1,10 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -180,13 +180,13 @@ public class ConclusionStatistics extends AbstractStatistics {
 				producedConclusionCounts_.countForwardLinks,
 				conclusionProcessingTimer_.timeForwardLinks);
 
-		print(printer, DecomposedSubsumer.NAME,
+		print(printer, SubClassInclusionDecomposed.NAME,
 				processedConclusionCounts_.countDecomposedSubsumers,
 				usedConclusionCounts_.countDecomposedSubsumers,
 				producedConclusionCounts_.countDecomposedSubsumers,
 				conclusionProcessingTimer_.timeDecomposedSubsumers);
 
-		print(printer, ComposedSubsumer.NAME,
+		print(printer, SubClassInclusionComposed.NAME,
 				processedConclusionCounts_.countComposedSubsumers,
 				usedConclusionCounts_.countComposedSubsumers,
 				producedConclusionCounts_.countComposedSubsumers,

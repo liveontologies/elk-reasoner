@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
 
 /**
  * A common interface for inferences composing {@link BackwardLink} and
- * {@link ForwardLink}.
+ * {@link ForwardLink} using {@link SubPropertyChain} premises.
  * 
  * @author "Yevgeny Kazakov"
  *

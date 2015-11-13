@@ -27,7 +27,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.ObjectHasSelfPropertyRangeSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionObjectHasSelfPropertyRange;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 
 /**
@@ -60,7 +60,7 @@ public class IndexedObjectHasSelfDecomposition extends
 				premises.getRoot(), premise);
 		for (IndexedClassExpression range : premise.getProperty()
 				.getSaturated().getRanges()) {
-			producer.produce(new ObjectHasSelfPropertyRangeSubsumer(premises
+			producer.produce(new SubClassInclusionObjectHasSelfPropertyRange(premises
 					.getRoot(), premise, range));
 		}
 	}

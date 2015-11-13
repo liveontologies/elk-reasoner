@@ -101,15 +101,15 @@ public class ClassConclusionEquality implements ClassConclusion.Visitor<Void, Cl
 	}
 
 	@Override
-	public ComposedSubsumer visit(ComposedSubsumer conclusion, Void input) {
+	public SubClassInclusionComposed visit(SubClassInclusionComposed conclusion, Void input) {
 		if (object_ == conclusion)
 			return conclusion;
-		if (object_ instanceof ComposedSubsumer) {
-			ComposedSubsumer result = (ComposedSubsumer) object_;
+		if (object_ instanceof SubClassInclusionComposed) {
+			SubClassInclusionComposed result = (SubClassInclusionComposed) object_;
 			if (equals(result.getConclusionRoot(),
 					conclusion.getConclusionRoot())
-					&& equals(result.getExpression(),
-							conclusion.getExpression()))
+					&& equals(result.getSuperExpression(),
+							conclusion.getSuperExpression()))
 				return result;
 		}
 		return null;
@@ -143,15 +143,15 @@ public class ClassConclusionEquality implements ClassConclusion.Visitor<Void, Cl
 	}
 
 	@Override
-	public DecomposedSubsumer visit(DecomposedSubsumer conclusion, Void input) {
+	public SubClassInclusionDecomposed visit(SubClassInclusionDecomposed conclusion, Void input) {
 		if (object_ == conclusion)
 			return conclusion;
-		if (object_ instanceof DecomposedSubsumer) {
-			DecomposedSubsumer result = (DecomposedSubsumer) object_;
+		if (object_ instanceof SubClassInclusionDecomposed) {
+			SubClassInclusionDecomposed result = (SubClassInclusionDecomposed) object_;
 			if (equals(result.getConclusionRoot(),
 					conclusion.getConclusionRoot())
-					&& equals(result.getExpression(),
-							conclusion.getExpression()))
+					&& equals(result.getSuperExpression(),
+							conclusion.getSuperExpression()))
 				return result;
 		}
 		return null;

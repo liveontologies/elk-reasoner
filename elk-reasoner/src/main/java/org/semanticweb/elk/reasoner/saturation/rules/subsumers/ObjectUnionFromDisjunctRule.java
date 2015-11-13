@@ -29,9 +29,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.ComposedDisjunction;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectUnionOf;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.Chain;
@@ -40,7 +40,7 @@ import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
- * A {@link ChainableSubsumerRule} producing {@link Subsumer} for an
+ * A {@link ChainableSubsumerRule} producing {@link SubClassInclusion} for an
  * {@link IndexedObjectUnionOf} when processing one of its disjunct
  * {@link IndexedClassExpression}
  * 
@@ -146,7 +146,7 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ClassConclusionProducer producer) {
 		for (IndexedObjectUnionOf disjunction : disjunctions_) {
-			producer.produce(new ComposedDisjunction(premises.getRoot(),
+			producer.produce(new SubClassInclusionComposedObjectUnionOf(premises.getRoot(),
 					premise, disjunction));
 		}
 	}

@@ -80,24 +80,24 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SubPropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.AbstractDecomposedConjunct;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecomposedConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.ComposedConjunction;
-import org.semanticweb.elk.reasoner.saturation.inferences.ComposedForwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromDisjointSubsumers;
+import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkComposition;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectIntersectionOf;
+import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkComposition;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfDisjointSubsumers;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromInconsistentDisjointnessAxiom;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromNegation;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromOwlNothing;
-import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialBackwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfObjectComplementOf;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfOwlNothing;
+import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkOfObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
-import org.semanticweb.elk.reasoner.saturation.inferences.GeneratedPropagation;
-import org.semanticweb.elk.reasoner.saturation.inferences.InitializationSubsumer;
-import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedContradiction;
-import org.semanticweb.elk.reasoner.saturation.inferences.ComposedExistential;
-import org.semanticweb.elk.reasoner.saturation.inferences.ReversedForwardLink;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.PropagationGenerated;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionTautology;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionPropagated;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversed;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSubClassOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.properties.PropertyChainInitialization;
@@ -193,38 +193,38 @@ public class SingleInferenceMapper {
 			org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor<Void, Inference> {
 
 		@Override
-		public Inference visit(InitializationSubsumer<?> inference,
+		public Inference visit(SubClassInclusionTautology<?> inference,
 				Void parameter) {
 			// don't map init inferences
 			return SingleInferenceMapper.STOP;
 		}
 
 		@Override
-		public Inference visit(SubClassOfSubsumer<?> inference,
+		public Inference visit(SubClassInclusionExpandedSubClassOf<?> inference,
 				Void parameter) {
 			ElkAxiom sideCondition = sideConditionLookup_.lookup(inference);
 			
 			return new ClassSubsumption(sideCondition, Deindexer.deindex(inference.getConclusionRoot()),
-					Deindexer.deindex(inference.getExpression()),
-					Deindexer.deindex(inference.getPremise().getExpression()),
+					Deindexer.deindex(inference.getSuperExpression()),
+					Deindexer.deindex(inference.getPremise().getSuperExpression()),
 					factory_, exprFactory_);
 		}
 
 		@Override
-		public Inference visit(ComposedConjunction inference,
+		public Inference visit(SubClassInclusionComposedObjectIntersectionOf inference,
 				Void parameter) {
 			return new ConjunctionComposition(Deindexer.deindex(inference.getConclusionRoot()),
 					Deindexer.deindex(inference.getFirstPremise()
-							.getExpression()), Deindexer.deindex(inference
-							.getSecondPremise().getExpression()), factory_, exprFactory_);
+							.getSuperExpression()), Deindexer.deindex(inference
+							.getSecondPremise().getSuperExpression()), factory_, exprFactory_);
 		}
 
 		@Override
-		public Inference visit(AbstractDecomposedConjunct inference,
+		public Inference visit(SubClassInclusionDecomposedConjunct inference,
 				Void parameter) {
-			IndexedClassExpression conclusion = inference.getExpression();
+			IndexedClassExpression conclusion = inference.getSuperExpression();
 			IndexedObjectIntersectionOf conjunction = inference
-					.getPremise().getExpression();
+					.getPremise().getSuperExpression();
 			ElkClassExpression sub = Deindexer.deindex(inference.getConclusionRoot());
 			ElkClassExpression other = Deindexer
 					.deindex(conclusion == conjunction.getFirstConjunct() ? conjunction
@@ -236,13 +236,13 @@ public class SingleInferenceMapper {
 		}
 
 		@Override
-		public Inference visit(ComposedExistential inference, Void parameter) {
+		public Inference visit(SubClassInclusionComposedObjectSomeValuesFrom inference, Void parameter) {
 			// the left premise is an axiom with a simple existential on the right
 			ElkClassExpression c = Deindexer.deindex(inference.getConclusionRoot());
 			ElkObjectProperty r = Deindexer.deindex(inference.getFirstPremise().getBackwardRelation());
 			ElkClassExpression d = Deindexer.deindex(inference.getInferenceRoot());
-			ElkObjectProperty s = Deindexer.deindex(inference.getExpression().getProperty());
-			ElkClassExpression e = Deindexer.deindex(inference.getExpression().getFiller());
+			ElkObjectProperty s = Deindexer.deindex(inference.getSuperExpression().getProperty());
+			ElkClassExpression e = Deindexer.deindex(inference.getSuperExpression().getFiller());
 			ElkObjectSomeValuesFrom rSomeD = factory_.getObjectSomeValuesFrom(r, d);
 			ElkObjectSomeValuesFrom sSomeE = factory_.getObjectSomeValuesFrom(s, e);
 			
@@ -296,7 +296,7 @@ public class SingleInferenceMapper {
 		}
 		
 		@Override
-		public Inference visit(ComposedBackwardLink inference, 	Void parameter) {
+		public Inference visit(BackwardLinkComposition inference, 	Void parameter) {
 			SubObjectProperty leftPropertyPremise = inference.getSecondPremise();
 			SubPropertyChainImpl<?,?> rightChainPremise = inference.getRightSubObjectPropertyChain();			
 			ElkObjectProperty r = Deindexer.deindex(leftPropertyPremise.getFullSubChain());
@@ -325,7 +325,7 @@ public class SingleInferenceMapper {
 		}
 
 		@Override
-		public Inference visit(ComposedForwardLink inference, Void parameter) {
+		public Inference visit(ForwardLinkComposition inference, Void parameter) {
 			SubObjectProperty leftPropertyPremise = inference.getLeftSubObjectProperty();
 			SubPropertyChainImpl<?,?> rightChainPremise = inference.getRightSubObjectPropertyChain();			
 			ElkObjectProperty r = Deindexer.deindex(leftPropertyPremise.getFullSubChain());
@@ -350,7 +350,7 @@ public class SingleInferenceMapper {
 		}
 
 		@Override
-		public Inference visit(ReversedForwardLink conclusion,
+		public Inference visit(BackwardLinkReversed conclusion,
 				Void parameter) {
 			// tautological inference
 			return SingleInferenceMapper.STOP;
@@ -393,19 +393,19 @@ public class SingleInferenceMapper {
 		}
 		
 		@Override
-		public Inference visit(DecomposedExistentialBackwardLink inference, Void parameter) {
+		public Inference visit(BackwardLinkOfObjectSomeValuesFrom inference, Void parameter) {
 			// not a self-contained user inference
 			return SingleInferenceMapper.STOP;
 		}
 
 		@Override
-		public Inference visit(DecomposedExistentialForwardLink inference, Void parameter) {
+		public Inference visit(ForwardLinkOfObjectSomeValuesFrom inference, Void parameter) {
 			// not a self-contained user inference
 			return SingleInferenceMapper.STOP;
 		}
 
 		@Override
-		public Inference visit(GeneratedPropagation inference, Void parameter) {
+		public Inference visit(PropagationGenerated inference, Void parameter) {
 			// not a self-contained user inference
 			return SingleInferenceMapper.STOP;
 		}
@@ -415,13 +415,13 @@ public class SingleInferenceMapper {
 				ContradictionFromInconsistentDisjointnessAxiom inference, Void parameter) {
 			ElkDisjointClassesAxiom sideCondition = (ElkDisjointClassesAxiom) sideConditionLookup_.lookup(inference);
 			ElkClassExpression c = Deindexer.deindex(inference.getConclusionRoot());
-			ElkClassExpression d = Deindexer.deindex(inference.getPremise().getExpression());
+			ElkClassExpression d = Deindexer.deindex(inference.getPremise().getSuperExpression());
 			
 			return new InconsistentDisjointness(c, d, sideCondition, factory_, exprFactory_);
 		}
 
 		@Override
-		public Inference visit(ContradictionFromDisjointSubsumers inference, Void parameter) {
+		public Inference visit(ContradictionOfDisjointSubsumers inference, Void parameter) {
 			ElkDisjointClassesAxiom sideCondition = (ElkDisjointClassesAxiom) sideConditionLookup_.lookup(inference);
 			ElkClassExpression c = Deindexer.deindex(inference.getConclusionRoot());
 			ElkClassExpression d = Deindexer.deindex(inference.getPremises()[0].getMember());
@@ -431,21 +431,21 @@ public class SingleInferenceMapper {
 		}
 
 		@Override
-		public Inference visit(ContradictionFromNegation inference, Void parameter) {
+		public Inference visit(ContradictionOfObjectComplementOf inference, Void parameter) {
 			ElkClassExpression c = Deindexer.deindex(inference.getConclusionRoot());
-			ElkClassExpression d = Deindexer.deindex(inference.getOtherPremise().getExpression());
+			ElkClassExpression d = Deindexer.deindex(inference.getOtherPremise().getSuperExpression());
 			
 			return new NegationContradiction(c, d, factory_, exprFactory_);
 		}
 
 		@Override
-		public Inference visit(ContradictionFromOwlNothing inference, Void parameter) {
+		public Inference visit(ContradictionOfOwlNothing inference, Void parameter) {
 			// not a self-contained user inference but we need to see inferences for owl:Nothing and map those.
 			return SingleInferenceMapper.CONTINUE;
 		}
 
 		@Override
-		public Inference visit(PropagatedContradiction inference, Void parameter) {
+		public Inference visit(ContradictionPropagated inference, Void parameter) {
 			// the left premise is an axiom with a simple existential on the right
 			ElkClassExpression c = Deindexer.deindex(inference.getConclusionRoot());
 			ElkObjectProperty r = Deindexer.deindex(inference.getLinkPremise().getBackwardRelation());
@@ -467,11 +467,11 @@ public class SingleInferenceMapper {
 
 		@Override
 		public Inference visit(
-				org.semanticweb.elk.reasoner.saturation.inferences.ComposedDisjunction inference,
+				org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectUnionOf inference,
 				Void parameter) {
 			ElkClassExpression c = Deindexer.deindex(inference.getConclusionRoot());
-			ElkClassExpression d = Deindexer.deindex(inference.getPremise().getExpression());
-			ElkObjectUnionOf dOrE = (ElkObjectUnionOf) Deindexer.deindex(inference.getExpression());
+			ElkClassExpression d = Deindexer.deindex(inference.getPremise().getSuperExpression());
+			ElkObjectUnionOf dOrE = (ElkObjectUnionOf) Deindexer.deindex(inference.getSuperExpression());
 			
 			return new DisjunctionComposition(c, dOrE, d, factory_, exprFactory_);
 		}

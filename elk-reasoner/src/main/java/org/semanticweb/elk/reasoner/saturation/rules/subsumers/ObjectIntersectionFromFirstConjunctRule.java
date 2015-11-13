@@ -26,7 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
@@ -36,7 +36,7 @@ import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
- * A {@link ChainableSubsumerRule} that produces {@link Subsumer} for an
+ * A {@link ChainableSubsumerRule} that produces {@link SubClassInclusion} for an
  * {@link IndexedObjectIntersectionOf} when processing its second conjunct
  * {@link IndexedClassExpression} and when the first conjunct is contained in
  * the {@link Context}

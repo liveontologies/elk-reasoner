@@ -34,11 +34,11 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectS
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.GeneratedPropagation;
+import org.semanticweb.elk.reasoner.saturation.inferences.PropagationGenerated;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
@@ -50,7 +50,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
  * A {@link ChainableSubsumerRule} producing {@link Propagation} of a
- * {@link Subsumer} {@link IndexedObjectSomeValuesFrom} over
+ * {@link SubClassInclusion} {@link IndexedObjectSomeValuesFrom} over
  * {@link BackwardLink}s when the {@link IndexedClassExpression} filler of this
  * {@link IndexedObjectSomeValuesFrom} provided it can be used with at least one
  * {@link BackwardLink} in this {@link Context}
@@ -130,7 +130,7 @@ public class PropagationFromExistentialFillerRule extends
 					candidatePropagationProperties,
 					saturation.getSubProperties())) {
 				if (subContextMap.get(property).isInitialized()) {
-					producer.produce(new GeneratedPropagation(premises
+					producer.produce(new PropagationGenerated(premises
 							.getRoot(), property, e));
 				}
 			}
@@ -213,7 +213,7 @@ public class PropagationFromExistentialFillerRule extends
 		for (IndexedObjectSomeValuesFrom e : negExistentials_) {
 			if (e.getProperty().getSaturated().getSubPropertyChains()
 					.contains(property)) {
-				producer.produce(new GeneratedPropagation(premises.getRoot(),
+				producer.produce(new PropagationGenerated(premises.getRoot(),
 						property, e));
 			}
 		}
