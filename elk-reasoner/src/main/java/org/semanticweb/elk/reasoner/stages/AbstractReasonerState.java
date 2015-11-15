@@ -57,7 +57,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.ClassInferenceSet;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
@@ -160,7 +160,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	/**
 	 * creates conclusions for tracing
 	 */
-	private final Conclusion.Factory factory_ = new ConclusionBaseFactory();
+	private final SaturationConclusion.Factory factory_ = new ConclusionBaseFactory();
 
 	private final ElkPolarityExpressionConverter expressionConverter_;
 

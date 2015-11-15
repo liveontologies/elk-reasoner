@@ -27,7 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainExpandedSubObjectPropertyOf;
@@ -48,9 +48,9 @@ public class InferencePrinter
 	private static InferencePrinter DEFAULT_PRINTER_ = new InferencePrinter(
 			new ConclusionBaseFactory());
 
-	private final Conclusion.Factory factory_;
+	private final SaturationConclusion.Factory factory_;
 
-	public InferencePrinter(Conclusion.Factory factory) {
+	public InferencePrinter(SaturationConclusion.Factory factory) {
 		this.factory_ = factory;
 	}
 

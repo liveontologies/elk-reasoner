@@ -27,7 +27,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ForwardLinkImpl;
 
 public abstract class AbstractForwardLinkInference<R extends IndexedPropertyChain>
-		extends ForwardLinkImpl<R> implements ForwardLinkInference {
+		extends
+			ForwardLinkImpl<R>
+		implements ForwardLinkInference {
 
 	public AbstractForwardLinkInference(IndexedContextRoot root, R relation,
 			IndexedContextRoot target) {
@@ -35,8 +37,13 @@ public abstract class AbstractForwardLinkInference<R extends IndexedPropertyChai
 	}
 
 	@Override
-	public <I, O> O accept(ClassInference.Visitor<I, O> visitor, I parameter) {
-		return accept((ForwardLinkInference.Visitor<I, O>) visitor, parameter);
+	public <I, O> O accept(SaturationInference.Visitor<I, O> visitor, I input) {
+		return accept((ForwardLinkInference.Visitor<I, O>) visitor, input);
+	}
+	
+	@Override
+	public <I, O> O accept(ClassInference.Visitor<I, O> visitor, I input) {
+		return accept((ForwardLinkInference.Visitor<I, O>) visitor, input);
 	}
 
 }

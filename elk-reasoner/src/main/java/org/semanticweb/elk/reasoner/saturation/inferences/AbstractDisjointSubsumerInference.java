@@ -27,8 +27,10 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionLis
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.DisjointSubsumerImpl;
 
-public abstract class AbstractDisjointSubsumerInference extends
-		DisjointSubsumerImpl implements DisjointSubsumerInference {
+public abstract class AbstractDisjointSubsumerInference
+		extends
+			DisjointSubsumerImpl
+		implements DisjointSubsumerInference {
 
 	public AbstractDisjointSubsumerInference(IndexedContextRoot root,
 			IndexedClassExpressionList disjoint, int position,
@@ -37,9 +39,13 @@ public abstract class AbstractDisjointSubsumerInference extends
 	}
 
 	@Override
-	public <I, O> O accept(ClassInference.Visitor<I, O> visitor, I parameter) {
-		return accept((DisjointSubsumerInference.Visitor<I, O>) visitor,
-				parameter);
+	public <I, O> O accept(SaturationInference.Visitor<I, O> visitor, I input) {
+		return accept((DisjointSubsumerInference.Visitor<I, O>) visitor, input);
+	}
+	
+	@Override
+	public <I, O> O accept(ClassInference.Visitor<I, O> visitor, I input) {
+		return accept((DisjointSubsumerInference.Visitor<I, O>) visitor, input);
 	}
 
 }

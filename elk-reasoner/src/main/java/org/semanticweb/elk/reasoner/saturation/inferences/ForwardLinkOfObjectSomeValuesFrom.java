@@ -91,10 +91,15 @@ public class ForwardLinkOfObjectSomeValuesFrom extends AbstractClassConclusion
 	}
 
 	@Override
+	public <I, O> O accept(SaturationInference.Visitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
+	}
+	
+	@Override
 	public <I, O> O accept(ClassInference.Visitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
-
+	
 	@Override
 	public <I, O> O accept(ForwardLinkInference.Visitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);

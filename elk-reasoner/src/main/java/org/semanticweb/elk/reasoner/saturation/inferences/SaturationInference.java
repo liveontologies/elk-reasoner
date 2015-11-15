@@ -1,7 +1,4 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.saturation.properties.inferences;
+package org.semanticweb.elk.reasoner.saturation.inferences;
 
 /*
  * #%L
@@ -25,17 +22,16 @@ package org.semanticweb.elk.reasoner.saturation.properties.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
-import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 
 /**
- * The root of all inferences on properties.
+ * A {@link SaturationConclusion} obtained by an inference rule
  * 
- * @author Pavel Klinov
+ * @author Yevgeny Kazakov
  *
- *         pavel.klinov@uni-ulm.de
  */
-public interface ObjectPropertyInference extends ObjectPropertyConclusion, SaturationInference {
+public interface SaturationInference extends SaturationConclusion {
 
 	public <I, O> O accept(Visitor<I, O> visitor, I input);
 	
@@ -47,10 +43,11 @@ public interface ObjectPropertyInference extends ObjectPropertyConclusion, Satur
 	 */
 	public static interface Visitor<I, O>
 			extends
-				SubPropertyChainInference.Visitor<I, O> {
-		
+				ClassInference.Visitor<I, O>,
+				ObjectPropertyInference.Visitor<I, O> {
+
 		// combined interface
-		
+
 	}
-	
+
 }

@@ -27,7 +27,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.BackwardLinkImpl;
 
 public abstract class AbstractBackwardLinkInference extends BackwardLinkImpl
-		implements BackwardLinkInference {
+		implements
+			BackwardLinkInference {
 
 	public AbstractBackwardLinkInference(IndexedContextRoot root,
 			IndexedObjectProperty relation, IndexedContextRoot source) {
@@ -35,8 +36,13 @@ public abstract class AbstractBackwardLinkInference extends BackwardLinkImpl
 	}
 
 	@Override
-	public <I, O> O accept(ClassInference.Visitor<I, O> visitor, I parameter) {
-		return accept((BackwardLinkInference.Visitor<I, O>) visitor, parameter);
+	public <I, O> O accept(SaturationInference.Visitor<I, O> visitor, I input) {
+		return accept((BackwardLinkInference.Visitor<I, O>) visitor, input);
 	}
+	
+	@Override
+	public <I, O> O accept(ClassInference.Visitor<I, O> visitor, I input) {
+		return accept((BackwardLinkInference.Visitor<I, O>) visitor, input);
+	}	
 
 }

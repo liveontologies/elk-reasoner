@@ -28,7 +28,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ConclusionBaseFactory;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -42,7 +42,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public class GetInferenceTarget extends
 		AbstractClassInferenceVisitor<Context, IndexedContextRoot> {
 
-	private final Conclusion.Factory factory_ = new ConclusionBaseFactory();
+	private final SaturationConclusion.Factory factory_ = new ConclusionBaseFactory();
 	
 	@Override
 	protected IndexedContextRoot defaultTracedVisit(ClassInference conclusion,

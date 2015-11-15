@@ -32,7 +32,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.model;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public interface ObjectPropertyConclusion {
+public interface ObjectPropertyConclusion extends SaturationConclusion {
 
 	public <I, O> O accept(Visitor<I, O> visitor, I input);
 

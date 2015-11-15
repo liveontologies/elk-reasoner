@@ -46,7 +46,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.inferences.AbstractClassInferenceVisitor;
@@ -83,7 +83,7 @@ public class TracingTestUtils {
 		}
 	};
 	
-	private static final Conclusion.Factory FACTORY_ = new ConclusionBaseFactory();
+	private static final SaturationConclusion.Factory FACTORY_ = new ConclusionBaseFactory();
 
 	static ClassConclusion getConclusionToTrace(Context context,
 			IndexedClassExpression subsumer) {

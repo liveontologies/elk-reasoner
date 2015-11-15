@@ -36,6 +36,13 @@ public abstract class AbstractSubClassInclusionComposedInference<S extends Index
 			S subsumer) {
 		super(root, subsumer);
 	}
+	
+	@Override
+	public <I, O> O accept(SaturationInference.Visitor<I, O> visitor, I input) {
+		return accept(
+				(SubClassInclusionComposedInference.Visitor<I, O>) visitor,
+				input);
+	}
 
 	@Override
 	public <I, O> O accept(ClassInference.Visitor<I, O> visitor, I input) {

@@ -26,9 +26,11 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ContradictionImpl;
 
 public abstract class AbstractContradictionInference extends ContradictionImpl
-		implements ContradictionInference {
+		implements
+			ContradictionInference {
 
-	protected AbstractContradictionInference(IndexedContextRoot conclusionRoot) {
+	protected AbstractContradictionInference(
+			IndexedContextRoot conclusionRoot) {
 		super(conclusionRoot);
 	}
 
@@ -38,8 +40,13 @@ public abstract class AbstractContradictionInference extends ContradictionImpl
 	}
 
 	@Override
-	public <I, O> O accept(ClassInference.Visitor<I, O> visitor, I parameter) {
-		return accept((ContradictionInference.Visitor<I, O>) visitor, parameter);
+	public <I, O> O accept(SaturationInference.Visitor<I, O> visitor, I input) {
+		return accept((ContradictionInference.Visitor<I, O>) visitor, input);
 	}
-
+	
+	@Override
+	public <I, O> O accept(ClassInference.Visitor<I, O> visitor, I input) {
+		return accept((ContradictionInference.Visitor<I, O>) visitor, input);
+	}
+	
 }

@@ -29,14 +29,16 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyC
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusionEquality;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusionHash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusionPrinter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 
 /**
  * A skeleton for implementation of {@link ObjectPropertyConclusion}s.
  * 
  * @author "Yevgeny Kazakov"
  */
-public abstract class AbstractObjectPropertyConclusion implements
-		ObjectPropertyConclusion {
+public abstract class AbstractObjectPropertyConclusion
+		implements
+			ObjectPropertyConclusion {
 
 	@Override
 	public boolean equals(Object o) {
@@ -51,6 +53,12 @@ public abstract class AbstractObjectPropertyConclusion implements
 	@Override
 	public String toString() {
 		return ObjectPropertyConclusionPrinter.toString(this);
+	}
+
+	@Override
+	public <I, O> O accept(SaturationConclusion.Visitor<I, O> visitor,
+			I input) {
+		return accept((ObjectPropertyConclusion.Visitor<I, O>) visitor, input);
 	}
 
 }

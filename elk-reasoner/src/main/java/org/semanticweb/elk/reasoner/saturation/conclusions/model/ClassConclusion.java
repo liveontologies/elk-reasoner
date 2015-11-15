@@ -38,7 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.Rule;
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface ClassConclusion extends Conclusion {
+public interface ClassConclusion extends SaturationConclusion {
 
 	/**
 	 * @return The root of the {@link Context} in which this conclusion should

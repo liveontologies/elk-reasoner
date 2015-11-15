@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ConclusionBas
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.DummyClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.DummyObjectPropertyConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainExpandedSubObjectPropertyOf;
@@ -51,7 +51,7 @@ public class ClassInferencePremiseVisitor<I, O> implements
 
 	private final ObjectPropertyConclusion.Visitor<I, O> propertyPremiseVisitor_;
 	
-	private final Conclusion.Factory factory_ = new ConclusionBaseFactory();
+	private final SaturationConclusion.Factory factory_ = new ConclusionBaseFactory();
 
 	public ClassInferencePremiseVisitor(
 			ClassConclusion.Visitor<I, O> classPremiseVisitor,

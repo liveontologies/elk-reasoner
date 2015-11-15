@@ -30,7 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusionEquality;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusionHash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusionPrinter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 
 /**
  * A skeleton for implementation of {@link ClassConclusion}.
@@ -73,7 +73,7 @@ public abstract class AbstractClassConclusion implements ClassConclusion {
 	}
 	
 	@Override
-	public <I, O> O accept(Conclusion.Visitor<I, O> visitor, I input) {
+	public <I, O> O accept(SaturationConclusion.Visitor<I, O> visitor, I input) {
 		return accept((ClassConclusion.Visitor<I, O>) visitor, input);
 	}
 

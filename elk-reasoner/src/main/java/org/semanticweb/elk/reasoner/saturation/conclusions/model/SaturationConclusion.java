@@ -29,7 +29,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.model;
  * @author Yevgeny Kazakov
  *
  */
-public interface Conclusion {
+public interface SaturationConclusion {
 
 	public <I, O> O accept(Visitor<I, O> visitor, I input);
 	

@@ -45,7 +45,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ConclusionBaseFactory;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.AbstractClassInferenceVisitor;
@@ -67,7 +67,7 @@ public class PropertyInferenceTracingTest {
 	
 	private static final Logger LOGGER_ = LoggerFactory.getLogger(PropertyInferenceTracingTest.class);
 
-	private static final Conclusion.Factory FACTORY_ = new ConclusionBaseFactory();
+	private static final SaturationConclusion.Factory FACTORY_ = new ConclusionBaseFactory();
 	
 	@Rule public TestName testName = new TestName();
 

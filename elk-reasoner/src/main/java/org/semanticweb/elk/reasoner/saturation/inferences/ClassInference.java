@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public interface ClassInference extends ClassConclusion {
+public interface ClassInference extends ClassConclusion, SaturationInference {
 
 	/**
 	 * @return the {@link IndexedContextRoot} of the {@link Context} where this
