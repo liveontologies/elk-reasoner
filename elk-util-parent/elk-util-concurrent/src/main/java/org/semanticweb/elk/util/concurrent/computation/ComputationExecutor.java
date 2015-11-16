@@ -48,7 +48,7 @@ public class ComputationExecutor {
 	/**
 	 * the latch indicating that job processing is done
 	 */
-	private CountDownLatch jobsDone_;
+	private CountDownLatch jobDone_;
 
 	/**
 	 * {@code true} if new tasks can be started to be executed; this can happen
@@ -180,7 +180,7 @@ public class ComputationExecutor {
 		int processedJobeCount = submittedJobCount_;
 		// setting up the fields shared with the workers
 		this.nextJob_ = job;
-		this.jobsDone_ = new CountDownLatch(noInstances);
+		this.jobDone_ = new CountDownLatch(noInstances);
 		this.nextJobNoInstances_ = noInstances;
 		this.submittedJobCount_++;
 		// waking up idle workers
@@ -232,7 +232,7 @@ public class ComputationExecutor {
 	 */
 	public synchronized void waitDone() throws InterruptedException {
 		try {
-			jobsDone_.await();
+			jobDone_.await();
 		} catch (InterruptedException e) {
 			checkException();
 			throw e;
@@ -286,46 +286,47 @@ public class ComputationExecutor {
 
 		@Override
 		public void run() {
-			for (;;) {
+			for (;;) {	
+				// waiting until the next job is submitted or
+				// timeout occurs
 				try {
 					lock_.lockInterruptibly();
-					try {
-						long nanos = timeout_;
-						while (processedJobCount_ == submittedJobCount_) {
-							// waiting until the next job is submitted or
-							// timeout occurs
-							if (timeOutEnabled_) {
-								if (nanos <= 0) {
-									dispose();
-									return;
-								}
-								nanos = canRun_.awaitNanos(nanos);
-							} else {
-								canRun_.await();
+					long nanos = timeout_;
+					while (processedJobCount_ == submittedJobCount_) {						
+						if (timeOutEnabled_) {
+							if (nanos <= 0) {
+								dispose();
+								return;
 							}
+							nanos = canRun_.awaitNanos(nanos);
+						} else {
+							canRun_.await();
 						}
-					} finally {
-						lock_.unlock();
 					}
-					if (workerId_ >= workerThreads_.length) {
-						// this worker is not needed anymore
-						return;
-					}
-					if (workerId_ < nextJobNoInstances_) {
-						nextJob_.run();
-					}
-					processedJobCount_++;
 				} catch (InterruptedException e) {
 					if (shutdown_) {
 						dispose();
 					} else if (workerId_ < workerThreads_.length) {
 						handleUnexpectedException(e);
 					}
+					return;				
+				} finally {
+					lock_.unlock();
+				}
+				if (workerId_ >= workerThreads_.length) {
+					// this worker is not needed anymore
 					return;
+				}
+				// processing the next job
+				try {					
+					if (workerId_ < nextJobNoInstances_) {
+						nextJob_.run();
+					}
+					processedJobCount_++;
 				} catch (Throwable e) {
 					handleUnexpectedException(e);
 				} finally {
-					jobsDone_.countDown();
+					jobDone_.countDown();
 				}
 			}
 		}
