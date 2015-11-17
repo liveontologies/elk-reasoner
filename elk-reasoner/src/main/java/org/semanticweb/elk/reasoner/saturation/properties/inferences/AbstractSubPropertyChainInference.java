@@ -35,13 +35,13 @@ public abstract class AbstractSubPropertyChainInference extends
 	}
 
 	@Override
-	public <I, O> O accept(SaturationInference.Visitor<I, O> visitor, I input) {
-		return accept((SubPropertyChainInference.Visitor<I, O>) visitor, input);
+	public <O> O accept(SaturationInference.Visitor<O> visitor) {
+		return accept((SubPropertyChainInference.Visitor<O>) visitor);
 	}
 	
 	@Override
-	public <I, O> O accept(ObjectPropertyInference.Visitor<I, O> visitor, I input) {
-		return accept((SubPropertyChainInference.Visitor<I, O>) visitor, input);
+	public <O> O accept(ObjectPropertyInference.Visitor<O> visitor) {
+		return accept((SubPropertyChainInference.Visitor<O>) visitor);
 	}
 
 }

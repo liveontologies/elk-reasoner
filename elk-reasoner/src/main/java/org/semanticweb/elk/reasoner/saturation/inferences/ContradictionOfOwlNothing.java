@@ -58,8 +58,8 @@ public class ContradictionOfOwlNothing extends
 	}
 
 	@Override
-	public <I, O> O accept(ContradictionInference.Visitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(ContradictionInference.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 	
 	/**
@@ -68,9 +68,9 @@ public class ContradictionOfOwlNothing extends
 	 * @author Yevgeny Kazakov
 	 *
 	 */
-	public static interface Visitor<I, O> {
+	public static interface Visitor<O> {
 		
-		public O visit(ContradictionOfOwlNothing inference, I input);
+		public O visit(ContradictionOfOwlNothing inference);
 		
 	}
 

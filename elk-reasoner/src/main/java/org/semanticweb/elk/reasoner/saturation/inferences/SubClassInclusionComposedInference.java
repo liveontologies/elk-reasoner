@@ -30,7 +30,7 @@ public interface SubClassInclusionComposedInference<S extends IndexedClassExpres
 			SubClassInclusionComposed,
 			SubClassInclusionInference<S> {
 
-	public <I, O> O accept(Visitor<I, O> visitor, I input);
+	public <O> O accept(Visitor<O> visitor);
 
 	/**
 	 * Visitor pattern for instances
@@ -38,13 +38,13 @@ public interface SubClassInclusionComposedInference<S extends IndexedClassExpres
 	 * @author Yevgeny Kazakov
 	 *
 	 */
-	public static interface Visitor<I, O>
+	public static interface Visitor<O>
 			extends
-				SubClassInclusionComposedDefinedClass.Visitor<I, O>,
-				SubClassInclusionComposedEntity.Visitor<I, O>,
-				SubClassInclusionComposedObjectIntersectionOf.Visitor<I, O>,
-				SubClassInclusionComposedObjectSomeValuesFrom.Visitor<I, O>,
-				SubClassInclusionComposedObjectUnionOf.Visitor<I, O> {
+				SubClassInclusionComposedDefinedClass.Visitor<O>,
+				SubClassInclusionComposedEntity.Visitor<O>,
+				SubClassInclusionComposedObjectIntersectionOf.Visitor<O>,
+				SubClassInclusionComposedObjectSomeValuesFrom.Visitor<O>,
+				SubClassInclusionComposedObjectUnionOf.Visitor<O> {
 
 		// combined interface
 

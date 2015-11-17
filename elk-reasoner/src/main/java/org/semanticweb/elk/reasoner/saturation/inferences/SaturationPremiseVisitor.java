@@ -38,9 +38,9 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubProperty
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class SaturationPremiseVisitor<I, O>
+public class SaturationPremiseVisitor<O>
 		implements
-			SaturationInference.Visitor<I, O> {
+			SaturationInference.Visitor<O> {
 
 	private final SaturationConclusion.Visitor<O> premiseVisitor_;
 
@@ -52,48 +52,44 @@ public class SaturationPremiseVisitor<I, O>
 	}
 
 	@Override
-	public O visit(SubClassInclusionTautology conclusion, I input) {
+	public O visit(SubClassInclusionTautology conclusion) {
 		return null;
 	}
 
 	@Override
-	public O visit(SubClassInclusionExpandedSubClassOf conclusion, I input) {
+	public O visit(SubClassInclusionExpandedSubClassOf conclusion) {
 		conclusion.getPremise(factory_).accept(premiseVisitor_);
 		return null;
 	}
 
 	@Override
-	public O visit(SubClassInclusionComposedObjectIntersectionOf conclusion,
-			I input) {
+	public O visit(SubClassInclusionComposedObjectIntersectionOf conclusion) {
 		conclusion.getFirstPremise(factory_).accept(premiseVisitor_);
 		conclusion.getSecondPremise(factory_).accept(premiseVisitor_);
 		return null;
 	}
 
 	@Override
-	public O visit(SubClassInclusionDecomposedFirstConjunct conclusion,
-			I input) {
+	public O visit(SubClassInclusionDecomposedFirstConjunct conclusion) {
 		conclusion.getPremise(factory_).accept(premiseVisitor_);
 		return null;
 	}
 
 	@Override
-	public O visit(SubClassInclusionDecomposedSecondConjunct conclusion,
-			I input) {
+	public O visit(SubClassInclusionDecomposedSecondConjunct conclusion) {
 		conclusion.getPremise(factory_).accept(premiseVisitor_);
 		return null;
 	}
 
 	@Override
-	public O visit(SubClassInclusionComposedObjectSomeValuesFrom conclusion,
-			I input) {
+	public O visit(SubClassInclusionComposedObjectSomeValuesFrom conclusion) {
 		conclusion.getFirstPremise(factory_).accept(premiseVisitor_);
 		conclusion.getSecondPremise(factory_).accept(premiseVisitor_);
 		return null;
 	}
 
 	@Override
-	public O visit(BackwardLinkComposition conclusion, I input) {
+	public O visit(BackwardLinkComposition conclusion) {
 		conclusion.getFirstPremise(factory_).accept(premiseVisitor_);
 		conclusion.getSecondPremise(factory_).accept(premiseVisitor_);
 		conclusion.getThirdPremise(factory_).accept(premiseVisitor_);
@@ -102,7 +98,7 @@ public class SaturationPremiseVisitor<I, O>
 	}
 
 	@Override
-	public O visit(ForwardLinkComposition conclusion, I input) {
+	public O visit(ForwardLinkComposition conclusion) {
 		conclusion.getFirstPremise(factory_).accept(premiseVisitor_);
 		conclusion.getSecondPremise(factory_).accept(premiseVisitor_);
 		conclusion.getThirdPremise(factory_).accept(premiseVisitor_);
@@ -111,51 +107,51 @@ public class SaturationPremiseVisitor<I, O>
 	}
 
 	@Override
-	public O visit(BackwardLinkReversed conclusion, I input) {
+	public O visit(BackwardLinkReversed conclusion) {
 		conclusion.getPremise(factory_).accept(premiseVisitor_);
 		return null;
 	}
 
 	@Override
-	public O visit(BackwardLinkReversedExpanded conclusion, I input) {
+	public O visit(BackwardLinkReversedExpanded conclusion) {
 		conclusion.getFirstPremise(factory_).accept(premiseVisitor_);
 		conclusion.getSecondPremise(factory_).accept(premiseVisitor_);
 		return null;
 	}
 
 	@Override
-	public O visit(BackwardLinkOfObjectSomeValuesFrom conclusion, I input) {
+	public O visit(BackwardLinkOfObjectSomeValuesFrom conclusion) {
 		conclusion.getPremise(factory_).accept(premiseVisitor_);
 		return null;
 	}
 
 	@Override
-	public O visit(ForwardLinkOfObjectSomeValuesFrom conclusion, I input) {
+	public O visit(ForwardLinkOfObjectSomeValuesFrom conclusion) {
 		conclusion.getPremise(factory_).accept(premiseVisitor_);
 		return null;
 	}
 
 	@Override
-	public O visit(BackwardLinkOfObjectHasSelf conclusion, I input) {
+	public O visit(BackwardLinkOfObjectHasSelf conclusion) {
 		conclusion.getPremise(factory_).accept(premiseVisitor_);
 		return null;
 	}
 
 	@Override
-	public O visit(ForwardLinkOfObjectHasSelf conclusion, I input) {
+	public O visit(ForwardLinkOfObjectHasSelf conclusion) {
 		conclusion.getPremise(factory_).accept(premiseVisitor_);
 		return null;
 	}
 
 	@Override
-	public O visit(PropagationGenerated conclusion, I input) {
+	public O visit(PropagationGenerated conclusion) {
 		conclusion.getFirstPremise(factory_).accept(premiseVisitor_);
 		conclusion.getSecondPremise(factory_).accept(premiseVisitor_);
 		return null;
 	}
 
 	@Override
-	public O visit(ContradictionOfDisjointSubsumers conclusion, I input) {
+	public O visit(ContradictionOfDisjointSubsumers conclusion) {
 		conclusion.getFirstPremise(factory_).accept(premiseVisitor_);
 		conclusion.getSecondPremise(factory_).accept(premiseVisitor_);
 
@@ -163,71 +159,69 @@ public class SaturationPremiseVisitor<I, O>
 	}
 
 	@Override
-	public O visit(ContradictionOfObjectComplementOf conclusion, I input) {
+	public O visit(ContradictionOfObjectComplementOf conclusion) {
 		conclusion.getFirstPremise(factory_).accept(premiseVisitor_);
 		conclusion.getSecondPremise(factory_).accept(premiseVisitor_);
 		return null;
 	}
 
 	@Override
-	public O visit(ContradictionOfOwlNothing conclusion, I input) {
+	public O visit(ContradictionOfOwlNothing conclusion) {
 		conclusion.getPremise(factory_).accept(premiseVisitor_);
 		return null;
 	}
 
 	@Override
-	public O visit(ContradictionPropagated conclusion, I input) {
+	public O visit(ContradictionPropagated conclusion) {
 		conclusion.getFirstPremise(factory_).accept(premiseVisitor_);
 		conclusion.getSecondPremise(factory_).accept(premiseVisitor_);
 		return null;
 	}
 
 	@Override
-	public O visit(DisjointSubsumerFromSubsumer conclusion, I input) {
+	public O visit(DisjointSubsumerFromSubsumer conclusion) {
 		conclusion.getPremise(factory_).accept(premiseVisitor_);
 		return null;
 	}
 
 	@Override
-	public O visit(SubClassInclusionComposedObjectUnionOf conclusion, I input) {
+	public O visit(SubClassInclusionComposedObjectUnionOf conclusion) {
 		conclusion.getPremise(factory_).accept(premiseVisitor_);
 		return null;
 	}
 
 	@Override
-	public O visit(SubClassInclusionComposedEntity inference, I input) {
+	public O visit(SubClassInclusionComposedEntity inference) {
 		inference.getPremise(factory_).accept(premiseVisitor_);
 		return null;
 	}
 
 	@Override
-	public O visit(SubClassInclusionComposedDefinedClass inference, I input) {
+	public O visit(SubClassInclusionComposedDefinedClass inference) {
 		inference.getPremise(factory_).accept(premiseVisitor_);
 		return null;
 	}
 
 	@Override
-	public O visit(SubClassInclusionExpandedDefinition inference, I input) {
+	public O visit(SubClassInclusionExpandedDefinition inference) {
 		inference.getPremise(factory_).accept(premiseVisitor_);
 		return null;
 	}
 
 	@Override
-	public O visit(SubPropertyChainTautology conclusion, I input) {
+	public O visit(SubPropertyChainTautology conclusion) {
 		// no premises
 		return null;
 	}
 
 	@Override
-	public O visit(SubPropertyChainExpandedSubObjectPropertyOf inference,
-			I input) {
+	public O visit(SubPropertyChainExpandedSubObjectPropertyOf inference) {
 		inference.getPremise(factory_).accept(premiseVisitor_);
 		return null;
 	}
 
 	@Override
-	public O visit(SubClassInclusionObjectHasSelfPropertyRange inference,
-			I input) {
+	public O visit(SubClassInclusionObjectHasSelfPropertyRange inference) {
 		inference.getPremise(factory_).accept(premiseVisitor_);
 		// TODO: process the property range premise
 		return null;

@@ -71,8 +71,8 @@ public class BackwardLinkOfObjectSomeValuesFrom extends
 	}
 
 	@Override
-	public <I, O> O accept(BackwardLinkInference.Visitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(BackwardLinkInference.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 	
 	/**
@@ -81,9 +81,9 @@ public class BackwardLinkOfObjectSomeValuesFrom extends
 	 * @author Yevgeny Kazakov
 	 *
 	 */
-	public static interface Visitor<I, O> {
+	public static interface Visitor<O> {
 		
-		public O visit(BackwardLinkOfObjectSomeValuesFrom inference, I input);
+		public O visit(BackwardLinkOfObjectSomeValuesFrom inference);
 		
 	}
 

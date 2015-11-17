@@ -69,9 +69,8 @@ public class SubClassInclusionObjectHasSelfPropertyRange extends
 	}
 
 	@Override
-	public <I, O> O accept(SubClassInclusionDecomposedInference.Visitor<I, O> visitor,
-			I parameter) {
-		return visitor.visit(this, parameter);
+	public <O> O accept(SubClassInclusionDecomposedInference.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 	
 	/**
@@ -80,9 +79,9 @@ public class SubClassInclusionObjectHasSelfPropertyRange extends
 	 * @author Yevgeny Kazakov
 	 *
 	 */
-	public static interface Visitor<I, O> {
+	public static interface Visitor<O> {
 		
-		public O visit(SubClassInclusionObjectHasSelfPropertyRange inference, I input);
+		public O visit(SubClassInclusionObjectHasSelfPropertyRange inference);
 		
 	}
 

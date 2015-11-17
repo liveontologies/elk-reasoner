@@ -27,7 +27,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
 public interface SubPropertyChainInference extends SubPropertyChain,
 		ObjectPropertyInference {
 
-	public <I, O> O accept(Visitor<I, O> visitor, I input);
+	public <O> O accept(Visitor<O> visitor);
 	
 
 	/**
@@ -36,10 +36,10 @@ public interface SubPropertyChainInference extends SubPropertyChain,
 	 * @author Yevgeny Kazakov
 	 *
 	 */
-	public static interface Visitor<I, O>
+	public static interface Visitor<O>
 			extends
-				SubPropertyChainExpandedSubObjectPropertyOf.Visitor<I, O>,
-				SubPropertyChainTautology.Visitor<I, O> {
+				SubPropertyChainExpandedSubObjectPropertyOf.Visitor<O>,
+				SubPropertyChainTautology.Visitor<O> {
 		
 		// combined interface
 		

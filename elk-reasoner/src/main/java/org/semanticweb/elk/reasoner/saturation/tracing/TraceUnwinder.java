@@ -45,12 +45,12 @@ public interface TraceUnwinder<O> {
 	 * class trace unwinding involves both class and property inferences.
 	 */
 	public void accept(ClassConclusion conclusion,
-			ClassInference.Visitor<?, O> inferenceVisitor,
-			ObjectPropertyInference.Visitor<?, O> propertyInferenceVisitor);
+			ClassInference.Visitor<O> inferenceVisitor,
+			ObjectPropertyInference.Visitor<O> propertyInferenceVisitor);
 
 	/*
 	 * unwinds only object property inferences.
 	 */
 	public void accept(ObjectPropertyConclusion conclusion,
-			ObjectPropertyInference.Visitor<?, O> inferenceVisitor);
+			ObjectPropertyInference.Visitor<O> inferenceVisitor);
 }

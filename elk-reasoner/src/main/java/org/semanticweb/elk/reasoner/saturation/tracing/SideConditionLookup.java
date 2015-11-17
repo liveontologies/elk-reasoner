@@ -49,60 +49,58 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubProperty
  */
 public class SideConditionLookup {
 
-	private ClassInference.Visitor<Void, ElkAxiom> classAxiomGetter = new AbstractClassInferenceVisitor<Void, ElkAxiom>() {
+	private ClassInference.Visitor<ElkAxiom> classAxiomGetter = new AbstractClassInferenceVisitor<ElkAxiom>() {
 
 		@Override
-		protected ElkAxiom defaultTracedVisit(ClassInference conclusion,
-				Void ignored) {
+		protected ElkAxiom defaultTracedVisit(ClassInference conclusion) {
 			// by default rules aren't bound to axioms, only some are
 			return null;
 		}
 
 		@Override
-		public ElkAxiom visit(SubClassInclusionExpandedSubClassOf inference, Void ignored) {
+		public ElkAxiom visit(SubClassInclusionExpandedSubClassOf inference) {
 			return inference.getReason();
 		}
 
 		@Override
-		public ElkAxiom visit(DisjointSubsumerFromSubsumer inference, Void input) {
+		public ElkAxiom visit(DisjointSubsumerFromSubsumer inference) {
 			return inference.getReason();
 		}
 
 		@Override
-		public ElkAxiom visit(ContradictionOfDisjointSubsumers inference,
-				Void input) {
+		public ElkAxiom visit(ContradictionOfDisjointSubsumers inference) {
 			return inference.getReason();
 		}
 
 		@Override
-		public ElkAxiom visit(BackwardLinkComposition inference, Void input) {
+		public ElkAxiom visit(BackwardLinkComposition inference) {
 			return inference.getReason();
 		}
 
 	};
 
-	private ObjectPropertyInference.Visitor<Void, ElkAxiom> propertyAxiomGetter = new AbstractObjectPropertyInferenceVisitor<Void, ElkAxiom>() {
+	private ObjectPropertyInference.Visitor<ElkAxiom> propertyAxiomGetter = new AbstractObjectPropertyInferenceVisitor<ElkAxiom>() {
 
 		@Override
 		protected ElkObjectPropertyAxiom defaultTracedVisit(
-				ObjectPropertyInference inference, Void input) {
+				ObjectPropertyInference inference) {
 			// no side conditions by default
 			return null;
 		}
 
 		@Override
-		public ElkAxiom visit(SubPropertyChainExpandedSubObjectPropertyOf inference, Void input) {
+		public ElkAxiom visit(SubPropertyChainExpandedSubObjectPropertyOf inference) {
 			return inference.getReason();
 		}
 
 	};
 
 	public ElkAxiom lookup(ClassInference inference) {
-		return inference.accept(classAxiomGetter, null);
+		return inference.accept(classAxiomGetter);
 	}
 
 	public ElkAxiom lookup(ObjectPropertyInference inference) {
-		return inference.accept(propertyAxiomGetter, null);
+		return inference.accept(propertyAxiomGetter);
 	}
 
 }

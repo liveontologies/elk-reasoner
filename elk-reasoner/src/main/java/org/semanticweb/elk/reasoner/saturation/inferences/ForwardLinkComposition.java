@@ -110,13 +110,13 @@ public class ForwardLinkComposition extends
 	}
 
 	@Override
-	public <I, O> O accept(ForwardLinkInference.Visitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(ForwardLinkInference.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 	
 	@Override
-	public <I, O> O accept(LinkComposition.Visitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(LinkComposition.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 	/**
@@ -125,9 +125,9 @@ public class ForwardLinkComposition extends
 	 * @author Yevgeny Kazakov
 	 *
 	 */
-	public static interface Visitor<I, O> {
+	public static interface Visitor<O> {
 		
-		public O visit(ForwardLinkComposition inference, I input);
+		public O visit(ForwardLinkComposition inference);
 		
 	}	
 	

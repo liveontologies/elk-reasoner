@@ -39,12 +39,12 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class TracedContextsCollector extends AbstractClassInferenceVisitor<IndexedContextRoot, Boolean> {
+public class TracedContextsCollector extends AbstractClassInferenceVisitor<Boolean> {
 
 	private final Set<IndexedContextRoot> tracedRoots_ = new HashSet<IndexedContextRoot>();
 	
 	@Override
-	protected Boolean defaultTracedVisit(ClassInference conclusion, IndexedContextRoot root) {
+	protected Boolean defaultTracedVisit(ClassInference conclusion) {
 		tracedRoots_.add(conclusion.getOriginRoot());
 		
 		return true;

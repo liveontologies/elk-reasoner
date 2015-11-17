@@ -75,8 +75,8 @@ public class ContradictionOfObjectComplementOf extends AbstractContradictionInfe
 	}
 
 	@Override
-	public <I, O> O accept(ContradictionInference.Visitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(ContradictionInference.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 	
 	/**
@@ -85,9 +85,9 @@ public class ContradictionOfObjectComplementOf extends AbstractContradictionInfe
 	 * @author Yevgeny Kazakov
 	 *
 	 */
-	public static interface Visitor<I, O> {
+	public static interface Visitor<O> {
 		
-		public O visit(ContradictionOfObjectComplementOf inference, I input);
+		public O visit(ContradictionOfObjectComplementOf inference);
 		
 	}
 

@@ -92,9 +92,9 @@ public class SubClassInclusionComposedDefinedClass
 	}
 
 	@Override
-	public <I, O> O accept(
-			SubClassInclusionComposedInference.Visitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(
+			SubClassInclusionComposedInference.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 	
 	/**
@@ -103,9 +103,9 @@ public class SubClassInclusionComposedDefinedClass
 	 * @author Yevgeny Kazakov
 	 *
 	 */
-	public static interface Visitor<I, O> {
+	public static interface Visitor<O> {
 		
-		public O visit(SubClassInclusionComposedDefinedClass inference, I input);
+		public O visit(SubClassInclusionComposedDefinedClass inference);
 		
 	}
 	

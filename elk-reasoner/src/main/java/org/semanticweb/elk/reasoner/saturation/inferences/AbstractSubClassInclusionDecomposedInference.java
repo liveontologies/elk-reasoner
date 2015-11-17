@@ -38,25 +38,21 @@ public abstract class AbstractSubClassInclusionDecomposedInference
 	}
 
 	@Override
-	public <I, O> O accept(SaturationInference.Visitor<I, O> visitor, I input) {
+	public <O> O accept(SaturationInference.Visitor<O> visitor) {
 		return accept(
-				(SubClassInclusionDecomposedInference.Visitor<I, O>) visitor,
-				input);
-	}
-	
-	@Override
-	public <I, O> O accept(ClassInference.Visitor<I, O> visitor, I input) {
-		return accept(
-				(SubClassInclusionDecomposedInference.Visitor<I, O>) visitor,
-				input);
+				(SubClassInclusionDecomposedInference.Visitor<O>) visitor);
 	}
 
 	@Override
-	public <I, O> O accept(SubClassInclusionInference.Visitor<I, O> visitor,
-			I input) {
+	public <O> O accept(ClassInference.Visitor<O> visitor) {
 		return accept(
-				(SubClassInclusionDecomposedInference.Visitor<I, O>) visitor,
-				input);
+				(SubClassInclusionDecomposedInference.Visitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(SubClassInclusionInference.Visitor<O> visitor) {
+		return accept(
+				(SubClassInclusionDecomposedInference.Visitor<O>) visitor);
 	}
 
 }

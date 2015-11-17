@@ -68,10 +68,9 @@ public class SubClassInclusionComposedObjectUnionOf
 	}
 
 	@Override
-	public <I, O> O accept(
-			SubClassInclusionComposedInference.Visitor<I, O> visitor,
-			I parameter) {
-		return visitor.visit(this, parameter);
+	public <O> O accept(
+			SubClassInclusionComposedInference.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 	
 	/**
@@ -80,9 +79,9 @@ public class SubClassInclusionComposedObjectUnionOf
 	 * @author Yevgeny Kazakov
 	 *
 	 */
-	public static interface Visitor<I, O> {
+	public static interface Visitor<O> {
 		
-		public O visit(SubClassInclusionComposedObjectUnionOf inference, I input);
+		public O visit(SubClassInclusionComposedObjectUnionOf inference);
 		
 	}
 

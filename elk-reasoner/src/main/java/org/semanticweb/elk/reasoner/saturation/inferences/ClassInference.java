@@ -45,7 +45,7 @@ public interface ClassInference extends ClassConclusion, SaturationInference {
 	 */
 	public IndexedContextRoot getInferenceRoot();
 
-	public <I, O> O accept(Visitor<I, O> visitor, I input);
+	public <O> O accept(Visitor<O> visitor);
 
 	/**
 	 * Visitor pattern for instances
@@ -53,15 +53,15 @@ public interface ClassInference extends ClassConclusion, SaturationInference {
 	 * @author Yevgeny Kazakov
 	 *
 	 */
-	public static interface Visitor<I, O>
+	public static interface Visitor<O>
 			extends
-				BackwardLinkInference.Visitor<I, O>,
-				ContradictionInference.Visitor<I, O>,
-				DisjointSubsumerInference.Visitor<I, O>,
-				ForwardLinkInference.Visitor<I, O>,
-				LinkComposition.Visitor<I, O>,
-				PropagationInference.Visitor<I, O>,
-				SubClassInclusionInference.Visitor<I, O> {
+				BackwardLinkInference.Visitor<O>,
+				ContradictionInference.Visitor<O>,
+				DisjointSubsumerInference.Visitor<O>,
+				ForwardLinkInference.Visitor<O>,
+				LinkComposition.Visitor<O>,
+				PropagationInference.Visitor<O>,
+				SubClassInclusionInference.Visitor<O> {
 
 		// combined interface
 

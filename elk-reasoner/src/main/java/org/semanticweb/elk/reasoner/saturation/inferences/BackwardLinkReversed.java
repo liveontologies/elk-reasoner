@@ -60,9 +60,8 @@ public class BackwardLinkReversed extends AbstractBackwardLinkInference {
 	}
 
 	@Override
-	public <I, O> O accept(BackwardLinkInference.Visitor<I, O> visitor,
-			I parameter) {
-		return visitor.visit(this, parameter);
+	public <O> O accept(BackwardLinkInference.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 	
 	/**
@@ -71,9 +70,9 @@ public class BackwardLinkReversed extends AbstractBackwardLinkInference {
 	 * @author Yevgeny Kazakov
 	 *
 	 */
-	public static interface Visitor<I, O> {
+	public static interface Visitor<O> {
 		
-		public O visit(BackwardLinkReversed inference, I input);
+		public O visit(BackwardLinkReversed inference);
 		
 	}
 

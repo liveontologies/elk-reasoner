@@ -72,9 +72,8 @@ public class PropagationGenerated extends AbstractPropagationInference {
 	}
 
 	@Override
-	public <I, O> O accept(PropagationInference.Visitor<I, O> visitor,
-			I parameter) {
-		return visitor.visit(this, parameter);
+	public <O> O accept(PropagationInference.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 	/**
@@ -83,9 +82,9 @@ public class PropagationGenerated extends AbstractPropagationInference {
 	 * @author Yevgeny Kazakov
 	 *
 	 */
-	public static interface Visitor<I, O> {
+	public static interface Visitor<O> {
 
-		public O visit(PropagationGenerated inference, I input);
+		public O visit(PropagationGenerated inference);
 
 	}
 

@@ -32,134 +32,134 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public abstract class AbstractClassInferenceVisitor<I, O> implements
-		ClassInference.Visitor<I, O> {
+public abstract class AbstractClassInferenceVisitor<O> implements
+		ClassInference.Visitor<O> {
 
-	protected abstract O defaultTracedVisit(ClassInference conclusion, I input);
+	protected abstract O defaultTracedVisit(ClassInference conclusion);
 
 	@Override
-	public O visit(BackwardLinkComposition conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(BackwardLinkComposition conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 	@Override
-	public O visit(SubClassInclusionComposedObjectIntersectionOf conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(SubClassInclusionComposedObjectIntersectionOf conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 	@Override
-	public O visit(SubClassInclusionComposedEntity conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(SubClassInclusionComposedEntity conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 	@Override
-	public O visit(SubClassInclusionComposedDefinedClass conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(SubClassInclusionComposedDefinedClass conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 	@Override
-	public O visit(SubClassInclusionComposedObjectUnionOf conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(SubClassInclusionComposedObjectUnionOf conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 	@Override
-	public O visit(SubClassInclusionComposedObjectSomeValuesFrom conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(SubClassInclusionComposedObjectSomeValuesFrom conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 	@Override
-	public O visit(ForwardLinkComposition conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(ForwardLinkComposition conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 	@Override
-	public O visit(ContradictionOfDisjointSubsumers conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(ContradictionOfDisjointSubsumers conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 	@Override
-	public O visit(ContradictionOfObjectComplementOf conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(ContradictionOfObjectComplementOf conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 	@Override
-	public O visit(ContradictionOfOwlNothing conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(ContradictionOfOwlNothing conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 	@Override
-	public O visit(SubClassInclusionExpandedDefinition conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(SubClassInclusionExpandedDefinition conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 	@Override
-	public O visit(BackwardLinkOfObjectSomeValuesFrom conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(BackwardLinkOfObjectSomeValuesFrom conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 	@Override
-	public O visit(ForwardLinkOfObjectSomeValuesFrom conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(ForwardLinkOfObjectSomeValuesFrom conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 	@Override
-	public O visit(SubClassInclusionDecomposedFirstConjunct conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(SubClassInclusionDecomposedFirstConjunct conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 	@Override
-	public O visit(BackwardLinkOfObjectHasSelf conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(BackwardLinkOfObjectHasSelf conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 	@Override
-	public O visit(ForwardLinkOfObjectHasSelf conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(ForwardLinkOfObjectHasSelf conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 	@Override
-	public O visit(SubClassInclusionDecomposedSecondConjunct conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(SubClassInclusionDecomposedSecondConjunct conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 	@Override
-	public O visit(DisjointSubsumerFromSubsumer conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(DisjointSubsumerFromSubsumer conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 	@Override
-	public O visit(PropagationGenerated conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(PropagationGenerated conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 	@Override
-	public O visit(SubClassInclusionTautology conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(SubClassInclusionTautology conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 	@Override
-	public O visit(SubClassInclusionObjectHasSelfPropertyRange conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(SubClassInclusionObjectHasSelfPropertyRange conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 	@Override
-	public O visit(ContradictionPropagated conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(ContradictionPropagated conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 	@Override
-	public O visit(BackwardLinkReversed conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(BackwardLinkReversed conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 	@Override
-	public O visit(SubClassInclusionExpandedSubClassOf conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(SubClassInclusionExpandedSubClassOf conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 	@Override
-	public O visit(BackwardLinkReversedExpanded conclusion, I input) {
-		return defaultTracedVisit(conclusion, input);
+	public O visit(BackwardLinkReversedExpanded conclusion) {
+		return defaultTracedVisit(conclusion);
 	}
 
 }

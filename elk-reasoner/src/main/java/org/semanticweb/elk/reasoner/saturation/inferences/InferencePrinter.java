@@ -27,8 +27,8 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainExpandedSubObjectPropertyOf;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainTautology;
@@ -42,8 +42,8 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubProperty
  */
 public class InferencePrinter
 		implements
-			ClassInference.Visitor<Void, String>,
-			ObjectPropertyInference.Visitor<Void, String> {
+			ClassInference.Visitor<String>,
+			ObjectPropertyInference.Visitor<String> {
 
 	private static InferencePrinter DEFAULT_PRINTER_ = new InferencePrinter(
 			new ConclusionBaseFactory());
@@ -55,168 +55,163 @@ public class InferencePrinter
 	}
 
 	public static String print(ClassInference conclusion) {
-		return conclusion.accept(DEFAULT_PRINTER_, null);
+		return conclusion.accept(DEFAULT_PRINTER_);
 	}
 
 	@Override
-	public String visit(SubClassInclusionTautology conclusion, Void parameter) {
+	public String visit(SubClassInclusionTautology conclusion) {
 		return "Root Initialization";
 	}
 
 	@Override
-	public String visit(SubClassInclusionExpandedSubClassOf conclusion, Void parameter) {
+	public String visit(SubClassInclusionExpandedSubClassOf conclusion) {
 		return "SubClassOf( " + conclusion.getPremise(factory_) + " "
 				+ conclusion.getSuperExpression() + " )";
 	}
 
 	@Override
-	public String visit(SubClassInclusionComposedObjectIntersectionOf conclusion, Void parameter) {
+	public String visit(SubClassInclusionComposedObjectIntersectionOf conclusion) {
 		return "Conjuncting " + conclusion.getFirstPremise(factory_) + " and "
 				+ conclusion.getSecondPremise(factory_);
 
 	}
 
 	@Override
-	public String visit(SubClassInclusionDecomposedFirstConjunct conclusion, Void parameter) {
+	public String visit(SubClassInclusionDecomposedFirstConjunct conclusion) {
 		return "Decomposing " + conclusion.getPremise(factory_);
 
 	}
 
 	@Override
-	public String visit(SubClassInclusionDecomposedSecondConjunct conclusion, Void parameter) {
+	public String visit(SubClassInclusionDecomposedSecondConjunct conclusion) {
 		return "Decomposing " + conclusion.getPremise(factory_);
 
 	}
 
 	@Override
-	public String visit(SubClassInclusionComposedObjectSomeValuesFrom conclusion, Void parameter) {
+	public String visit(SubClassInclusionComposedObjectSomeValuesFrom conclusion) {
 		return "Existential inference from "
 				+ conclusion.getSecondPremise(factory_) + " and "
 				+ conclusion.getFirstPremise(factory_);
 	}
 
 	@Override
-	public String visit(BackwardLinkComposition conclusion, Void parameter) {
+	public String visit(BackwardLinkComposition conclusion) {
 		BackwardLink bwLink = conclusion.getFirstPremise(factory_);
 		ForwardLink fwLink = conclusion.getThirdPremise(factory_);
 		return "Composed backward link from " + bwLink + " and " + fwLink;
 	}
 
 	@Override
-	public String visit(ForwardLinkComposition conclusion, Void input) {
+	public String visit(ForwardLinkComposition conclusion) {
 		BackwardLink bwLink = conclusion.getFirstPremise(factory_);
 		ForwardLink fwLink = conclusion.getThirdPremise(factory_);
 		return "Composed forward link from " + bwLink + " and " + fwLink;
 	}
 
 	@Override
-	public String visit(BackwardLinkReversed conclusion, Void parameter) {
+	public String visit(BackwardLinkReversed conclusion) {
 		return "Reversing forward link " + conclusion.getPremise(factory_);
 	}
 
 	@Override
-	public String visit(BackwardLinkReversedExpanded conclusion, Void input) {
+	public String visit(BackwardLinkReversedExpanded conclusion) {
 		return "Reversing forward link " + conclusion.getFirstPremise(factory_)
 				+ " and unfolding under "
 				+ conclusion.getSecondPremise(factory_);
 	}
 
 	@Override
-	public String visit(BackwardLinkOfObjectSomeValuesFrom conclusion,
-			Void parameter) {
+	public String visit(BackwardLinkOfObjectSomeValuesFrom conclusion) {
 		return "Creating backward link from " + conclusion.getPremise(factory_);
 	}
 
 	@Override
-	public String visit(BackwardLinkOfObjectHasSelf conclusion,
-			Void input) {
+	public String visit(BackwardLinkOfObjectHasSelf conclusion) {
 		return "Creating forward link from " + conclusion.getPremise(factory_);
 	}
 
 	@Override
-	public String visit(ForwardLinkOfObjectSomeValuesFrom conclusion,
-			Void input) {
+	public String visit(ForwardLinkOfObjectSomeValuesFrom conclusion) {
 		return "Creating forward link from " + conclusion.getPremise(factory_);
 	}
 
 	@Override
-	public String visit(ForwardLinkOfObjectHasSelf conclusion, Void input) {
+	public String visit(ForwardLinkOfObjectHasSelf conclusion) {
 		return "Creating forward link from " + conclusion.getPremise(factory_);
 	}
 
 	@Override
-	public String visit(PropagationGenerated conclusion, Void parameter) {
+	public String visit(PropagationGenerated conclusion) {
 		return "Creating propagation from "
 				+ conclusion.getFirstPremise(factory_);
 	}
 
 	@Override
-	public String visit(ContradictionOfDisjointSubsumers conclusion,
-			Void input) {
+	public String visit(ContradictionOfDisjointSubsumers conclusion) {
 		return conclusion.toString();
 	}
 
 	@Override
-	public String visit(ContradictionOfObjectComplementOf conclusion, Void input) {
+	public String visit(ContradictionOfObjectComplementOf conclusion) {
 		return "Contradiction due to derived " + conclusion.getFirstPremise(factory_)
 				+ " and " + conclusion.getSecondPremise(factory_);
 	}
 
 	@Override
-	public String visit(ContradictionOfOwlNothing conclusion, Void input) {
+	public String visit(ContradictionOfOwlNothing conclusion) {
 		return conclusion.toString();
 	}
 
 	@Override
-	public String visit(ContradictionPropagated conclusion, Void input) {
+	public String visit(ContradictionPropagated conclusion) {
 		return "Contradiction propagated over "
 				+ conclusion.getFirstPremise(factory_);
 	}
 
 	@Override
-	public String visit(DisjointSubsumerFromSubsumer conclusion, Void input) {
+	public String visit(DisjointSubsumerFromSubsumer conclusion) {
 		return "Disjoint subsumer " + conclusion + " derived from "
 				+ conclusion.getPremise(factory_);
 	}
 
 	@Override
-	public String visit(SubClassInclusionComposedObjectUnionOf conclusion, Void input) {
+	public String visit(SubClassInclusionComposedObjectUnionOf conclusion) {
 		return "Composed disjunction " + conclusion.getSuperExpression() + " from "
 				+ conclusion.getPremise(factory_);
 	}
 
 	@Override
-	public String visit(SubPropertyChainTautology inference, Void input) {
+	public String visit(SubPropertyChainTautology inference) {
 		return "Initialization (" + inference.getChain() + " => "
 				+ inference.getSuperChain() + ")";
 	}
 
 	@Override
-	public String visit(SubPropertyChainExpandedSubObjectPropertyOf inference, Void input) {
+	public String visit(SubPropertyChainExpandedSubObjectPropertyOf inference) {
 		return "Told sub-chain: " + inference.getSubChain() + " => "
 				+ inference.getSuperChain() + ", premise: "
 				+ inference.getPremise(factory_);
 	}
 
 	@Override
-	public String visit(SubClassInclusionObjectHasSelfPropertyRange inference,
-			Void input) {
+	public String visit(SubClassInclusionObjectHasSelfPropertyRange inference) {
 		return "Property range of " + inference.getPremise(factory_);
 	}
 
 	@Override
-	public String visit(SubClassInclusionComposedEntity inference, Void input) {
+	public String visit(SubClassInclusionComposedEntity inference) {
 		return "Composed decomposition " + inference.getSuperExpression();
 	}
 
 	@Override
-	public String visit(SubClassInclusionComposedDefinedClass inference, Void input) {
+	public String visit(SubClassInclusionComposedDefinedClass inference) {
 		return "Composed definition " + inference.getSuperExpression() + " from "
 				+ inference.getPremise(factory_);
 	}
 
 	@Override
-	public String visit(SubClassInclusionExpandedDefinition inference, Void input) {
+	public String visit(SubClassInclusionExpandedDefinition inference) {
 		return "Decomposed definition " + inference.getSuperExpression() + " of "
 				+ inference.getPremise(factory_);
 	}

@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.DummySaturationConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
@@ -65,13 +64,13 @@ public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 	// visit only class inferences
 	public void accept(
 			final ClassConclusion conclusion,
-			final ClassInference.Visitor<IndexedContextRoot, Boolean> inferenceVisitor) {
+			final ClassInference.Visitor<Boolean> inferenceVisitor) {
 		accept(conclusion, inferenceVisitor,
-				new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
+				new AbstractObjectPropertyInferenceVisitor<Boolean>() {
 
 					@Override
 					protected Boolean defaultTracedVisit(
-							ObjectPropertyInference inference, Void input) {
+							ObjectPropertyInference inference) {
 						return true;
 					}
 
@@ -81,7 +80,7 @@ public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 	// unwind only property conclusions
 	@Override
 	public void accept(ObjectPropertyConclusion conclusion,
-			final ObjectPropertyInference.Visitor<?, Boolean> inferenceVisitor) {
+			final ObjectPropertyInference.Visitor<Boolean> inferenceVisitor) {
 		final Set<ObjectPropertyInference> seenInferences = new HashSet<ObjectPropertyInference>();
 
 		addToQueue(conclusion, seenInferences);
@@ -90,11 +89,11 @@ public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 	}
 
 	private void unwindPropertyConclusions(
-			final ObjectPropertyInference.Visitor<?, Boolean> inferenceVisitor) {
+			final ObjectPropertyInference.Visitor<Boolean> inferenceVisitor) {
 		final Set<ObjectPropertyInference> seenInferences = new HashSet<ObjectPropertyInference>();
 
 		// this visitor visits all premises and putting them into the todo queue
-		SaturationPremiseVisitor<Void, ?> unwinder = new SaturationPremiseVisitor<Void, Void>(
+		SaturationPremiseVisitor<?> unwinder = new SaturationPremiseVisitor<Void>(
 				new DummySaturationConclusionVisitor<Void>() {
 					@Override
 					protected Void defaultVisit(
@@ -111,9 +110,9 @@ public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 				break;
 			}
 
-			if (next.accept(inferenceVisitor, null)) {
+			if (next.accept(inferenceVisitor)) {
 				// unwind premises unless we're told to stop the recursion
-				next.accept(unwinder, null);
+				next.accept(unwinder);
 			}
 		}
 	}
@@ -130,15 +129,15 @@ public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 	@Override
 	public void accept(
 			final ClassConclusion conclusion,
-			final ClassInference.Visitor<?, Boolean> inferenceVisitor,
-			final ObjectPropertyInference.Visitor<?, Boolean> propertyInferenceVisitor) {
+			final ClassInference.Visitor<Boolean> inferenceVisitor,
+			final ObjectPropertyInference.Visitor<Boolean> propertyInferenceVisitor) {
 		final Set<ClassInference> seenInferences = new HashSet<ClassInference>();
 		final Set<ObjectPropertyInference> seenPropertyInferences = new HashSet<ObjectPropertyInference>();
 		// should be empty anyways
 		classInferencesToDo_.clear();
 		addToQueue(conclusion, seenInferences);
 		// this visitor visits all premises and putting them into the todo queue
-		SaturationPremiseVisitor<Void, ?> premiseVisitor = new SaturationPremiseVisitor<Void, Void>(
+		SaturationPremiseVisitor<?> premiseVisitor = new SaturationPremiseVisitor<Void>(
 				new DummySaturationConclusionVisitor<Void>() {
 					@Override
 					protected Void defaultVisit(ClassConclusion premise) {
@@ -166,9 +165,9 @@ public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 				break;
 			}
 			// user visitor
-			if (next.inference.accept(inferenceVisitor, null)) {
+			if (next.inference.accept(inferenceVisitor)) {
 				// visiting premises
-				next.inference.accept(premiseVisitor, null);
+				next.inference.accept(premiseVisitor);
 			}
 		}
 

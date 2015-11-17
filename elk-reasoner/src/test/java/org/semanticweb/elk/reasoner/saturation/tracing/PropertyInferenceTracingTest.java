@@ -41,15 +41,14 @@ import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkComposition;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkComposition;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.AbstractObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
@@ -97,17 +96,16 @@ public class PropertyInferenceTracingTest {
 		// check that the inference S -> HH has been traced and used during unwinding
 		TracingTestUtils.checkConditionOverUsedInferences(a, d, reasoner, 
 				TracingTestUtils.DUMMY_CLASS_INFERENCE_CHECKER, 
-				new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
+				new AbstractObjectPropertyInferenceVisitor<Boolean>() {
 
 					@Override
 					protected Boolean defaultTracedVisit(
-							ObjectPropertyInference inference, Void input) {
+							ObjectPropertyInference inference) {
 						return false;
 					}
 
 					@Override
-					public Boolean visit(SubPropertyChainExpandedSubObjectPropertyOf inference,
-							Void input) {
+					public Boolean visit(SubPropertyChainExpandedSubObjectPropertyOf inference) {
 						// checking that S -> HH is in the trace (i.e. is used)
 						return inference.getSubChain().equals(s) && 
 								inference.getSuperChain().equals(hh) &&
@@ -151,18 +149,16 @@ public class PropertyInferenceTracingTest {
 		TracingTestUtils.checkTracingCompleteness(b, e, reasoner); // b might be not traced because it is a filler
 		// checking that S o H -> SS o HH is there
 		TracingTestUtils.checkConditionOverUsedInferences(a, e, reasoner, 
-				new AbstractClassInferenceVisitor<IndexedContextRoot, Boolean>() {
+				new AbstractClassInferenceVisitor<Boolean>() {
 
 					@Override
 					protected Boolean defaultTracedVisit(
-							ClassInference conclusion,
-							IndexedContextRoot input) {
+							ClassInference conclusion) {
 						return false;
 					}
 
 					@Override
-					public Boolean visit(ForwardLinkComposition conclusion,
-							IndexedContextRoot input) {
+					public Boolean visit(ForwardLinkComposition conclusion) {
 						// looking for the composition S o H -> SS o HH
 						SubPropertyChain left = conclusion.getSecondPremise(FACTORY_);
 						SubPropertyChain right = conclusion.getFourthPremise(FACTORY_);
@@ -182,17 +178,16 @@ public class PropertyInferenceTracingTest {
 		// checking that S -> SS inference is there
 		TracingTestUtils.checkConditionOverUsedInferences(a, e, reasoner,
 				TracingTestUtils.DUMMY_CLASS_INFERENCE_CHECKER,
-				new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
+				new AbstractObjectPropertyInferenceVisitor<Boolean>() {
 
 					@Override
 					protected Boolean defaultTracedVisit(
-							ObjectPropertyInference inference, Void input) {
+							ObjectPropertyInference inference) {
 						return false;
 					}
 
 					@Override
-					public Boolean visit(SubPropertyChainExpandedSubObjectPropertyOf inference,
-							Void input) {
+					public Boolean visit(SubPropertyChainExpandedSubObjectPropertyOf inference) {
 						return inference.getSubChain().equals(sIndexed) &&
 								inference.getSuperChain().equals(ssIndexed);
 					}
@@ -201,17 +196,15 @@ public class PropertyInferenceTracingTest {
 		
 		// checking that the axiom RR o SS o HH -> T is used 
 		TracingTestUtils.checkConditionOverUsedInferences(a, e, reasoner, 
-				new AbstractClassInferenceVisitor<IndexedContextRoot, Boolean>() {
+				new AbstractClassInferenceVisitor<Boolean>() {
 
 					@Override
-					protected Boolean defaultTracedVisit(ClassInference conclusion,
-							IndexedContextRoot input) {
+					protected Boolean defaultTracedVisit(ClassInference conclusion) {
 						return false;
 					}
 
 					@Override
-					public Boolean visit(BackwardLinkComposition backwardLink,
-							IndexedContextRoot input) {
+					public Boolean visit(BackwardLinkComposition backwardLink) {
 						// check that we use the inference that A <-R- B and B -SS o HH-> D imply A <-T- D  
 						return backwardLink.getBackwardRelation().equals(tIndexed) &&
 								backwardLink.getOriginRoot().equals(aIndexed) &&
@@ -223,17 +216,16 @@ public class PropertyInferenceTracingTest {
 					}
 
 				}, 
-				new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
+				new AbstractObjectPropertyInferenceVisitor<Boolean>() {
 
 					@Override
 					protected Boolean defaultTracedVisit(
-							ObjectPropertyInference inference, Void input) {
+							ObjectPropertyInference inference) {
 						return false;
 					}
 
 					@Override
-					public Boolean visit(SubPropertyChainExpandedSubObjectPropertyOf inference,
-							Void input) {
+					public Boolean visit(SubPropertyChainExpandedSubObjectPropertyOf inference) {
 						return inference.getSubChain().equals(rIndexed) &&
 								inference.getSuperChain().equals(rrIndexed);
 					}

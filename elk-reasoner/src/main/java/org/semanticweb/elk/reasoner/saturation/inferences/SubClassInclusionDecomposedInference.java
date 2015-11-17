@@ -30,7 +30,7 @@ public interface SubClassInclusionDecomposedInference
 			SubClassInclusionDecomposed,
 			SubClassInclusionInference<IndexedClassExpression> {
 
-	public <I, O> O accept(Visitor<I, O> visitor, I input);
+	public <O> O accept(Visitor<O> visitor);
 
 	/**
 	 * Visitor pattern for instances
@@ -38,14 +38,14 @@ public interface SubClassInclusionDecomposedInference
 	 * @author Yevgeny Kazakov
 	 *
 	 */
-	public static interface Visitor<I, O>
+	public static interface Visitor<O>
 			extends
-				SubClassInclusionDecomposedFirstConjunct.Visitor<I, O>,
-				SubClassInclusionDecomposedSecondConjunct.Visitor<I, O>,
-				SubClassInclusionExpandedDefinition.Visitor<I, O>,
-				SubClassInclusionExpandedSubClassOf.Visitor<I, O>,
-				SubClassInclusionObjectHasSelfPropertyRange.Visitor<I, O>,
-				SubClassInclusionTautology.Visitor<I, O> {
+				SubClassInclusionDecomposedFirstConjunct.Visitor<O>,
+				SubClassInclusionDecomposedSecondConjunct.Visitor<O>,
+				SubClassInclusionExpandedDefinition.Visitor<O>,
+				SubClassInclusionExpandedSubClassOf.Visitor<O>,
+				SubClassInclusionObjectHasSelfPropertyRange.Visitor<O>,
+				SubClassInclusionTautology.Visitor<O> {
 
 		// combined interface
 

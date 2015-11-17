@@ -33,7 +33,7 @@ public interface SubClassInclusionInference<S extends IndexedClassExpression>
 	@Override
 	public S getSuperExpression();
 
-	public <I, O> O accept(Visitor<I, O> visitor, I input);
+	public <O> O accept(Visitor<O> visitor);
 
 	/**
 	 * Visitor pattern for instances
@@ -41,10 +41,10 @@ public interface SubClassInclusionInference<S extends IndexedClassExpression>
 	 * @author Yevgeny Kazakov
 	 *
 	 */
-	public static interface Visitor<I, O>
+	public static interface Visitor<O>
 			extends
-				SubClassInclusionComposedInference.Visitor<I, O>,
-				SubClassInclusionDecomposedInference.Visitor<I, O> {
+				SubClassInclusionComposedInference.Visitor<O>,
+				SubClassInclusionDecomposedInference.Visitor<O> {
 
 		// combined interface
 

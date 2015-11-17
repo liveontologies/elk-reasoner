@@ -39,14 +39,14 @@ public interface ObjectPropertyInferenceStore {
 
 	public boolean addInference(ObjectPropertyInference inference);
 	
-	public void visitInferences(ObjectPropertyConclusion conclusion, ObjectPropertyInference.Visitor<?, ?> visitor);
+	public void visitInferences(ObjectPropertyConclusion conclusion, ObjectPropertyInference.Visitor<?> visitor);
 	/**
 	 * TODO
 	 * 
 	 * @param ipc
 	 * @param visitor
 	 */
-	public void visitInferences(IndexedPropertyChain ipc, ObjectPropertyInference.Visitor<?, ?> visitor);
+	public void visitInferences(IndexedPropertyChain ipc, ObjectPropertyInference.Visitor<?> visitor);
 	
 	public void clear();
 }

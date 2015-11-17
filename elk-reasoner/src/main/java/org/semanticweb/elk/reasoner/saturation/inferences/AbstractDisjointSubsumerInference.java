@@ -39,13 +39,13 @@ public abstract class AbstractDisjointSubsumerInference
 	}
 
 	@Override
-	public <I, O> O accept(SaturationInference.Visitor<I, O> visitor, I input) {
-		return accept((DisjointSubsumerInference.Visitor<I, O>) visitor, input);
+	public <O> O accept(SaturationInference.Visitor<O> visitor) {
+		return accept((DisjointSubsumerInference.Visitor<O>) visitor);
 	}
 	
 	@Override
-	public <I, O> O accept(ClassInference.Visitor<I, O> visitor, I input) {
-		return accept((DisjointSubsumerInference.Visitor<I, O>) visitor, input);
+	public <O> O accept(ClassInference.Visitor<O> visitor) {
+		return accept((DisjointSubsumerInference.Visitor<O>) visitor);
 	}
 
 }

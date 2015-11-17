@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
  */
 public interface ObjectPropertyInference extends ObjectPropertyConclusion, SaturationInference {
 
-	public <I, O> O accept(Visitor<I, O> visitor, I input);
+	public <O> O accept(Visitor<O> visitor);
 	
 	/**
 	 * Visitor pattern for instances
@@ -45,9 +45,9 @@ public interface ObjectPropertyInference extends ObjectPropertyConclusion, Satur
 	 * @author Yevgeny Kazakov
 	 *
 	 */
-	public static interface Visitor<I, O>
+	public static interface Visitor<O>
 			extends
-				SubPropertyChainInference.Visitor<I, O> {
+				SubPropertyChainInference.Visitor<O> {
 		
 		// combined interface
 		

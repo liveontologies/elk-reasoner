@@ -26,7 +26,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 
 public interface BackwardLinkInference extends BackwardLink, ClassInference {
 
-	public <I, O> O accept(Visitor<I, O> visitor, I input);
+	public <O> O accept(Visitor<O> visitor);
 
 	/**
 	 * Visitor pattern for instances
@@ -34,13 +34,13 @@ public interface BackwardLinkInference extends BackwardLink, ClassInference {
 	 * @author Yevgeny Kazakov
 	 *
 	 */
-	public static interface Visitor<I, O>
+	public static interface Visitor<O>
 			extends
-				BackwardLinkComposition.Visitor<I, O>,
-				BackwardLinkOfObjectHasSelf.Visitor<I, O>,
-				BackwardLinkOfObjectSomeValuesFrom.Visitor<I, O>,
-				BackwardLinkReversed.Visitor<I, O>,
-				BackwardLinkReversedExpanded.Visitor<I, O> {
+				BackwardLinkComposition.Visitor<O>,
+				BackwardLinkOfObjectHasSelf.Visitor<O>,
+				BackwardLinkOfObjectSomeValuesFrom.Visitor<O>,
+				BackwardLinkReversed.Visitor<O>,
+				BackwardLinkReversedExpanded.Visitor<O> {
 
 		// combined interface
 

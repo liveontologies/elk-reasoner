@@ -37,13 +37,13 @@ public abstract class AbstractForwardLinkInference<R extends IndexedPropertyChai
 	}
 
 	@Override
-	public <I, O> O accept(SaturationInference.Visitor<I, O> visitor, I input) {
-		return accept((ForwardLinkInference.Visitor<I, O>) visitor, input);
+	public <O> O accept(SaturationInference.Visitor<O> visitor) {
+		return accept((ForwardLinkInference.Visitor<O>) visitor);
 	}
 	
 	@Override
-	public <I, O> O accept(ClassInference.Visitor<I, O> visitor, I input) {
-		return accept((ForwardLinkInference.Visitor<I, O>) visitor, input);
+	public <O> O accept(ClassInference.Visitor<O> visitor) {
+		return accept((ForwardLinkInference.Visitor<O>) visitor);
 	}
 
 }

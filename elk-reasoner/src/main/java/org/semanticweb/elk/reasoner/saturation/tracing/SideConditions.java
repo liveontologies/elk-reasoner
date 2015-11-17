@@ -43,13 +43,12 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPrope
  */
 public class SideConditions {
 
-	public static <O> ClassInference.Visitor<Void, O> getClassSideConditionVisitor(
+	public static <O> ClassInference.Visitor<O> getClassSideConditionVisitor(
 			final ElkAxiomVisitor<O> visitor) {
-		return new AbstractClassInferenceVisitor<Void, O>() {
+		return new AbstractClassInferenceVisitor<O>() {
 
 			@Override
-			protected O defaultTracedVisit(ClassInference conclusion,
-					Void ignore) {
+			protected O defaultTracedVisit(ClassInference conclusion) {
 				ElkAxiom sideCondition = new SideConditionLookup()
 						.lookup(conclusion);
 
@@ -63,13 +62,12 @@ public class SideConditions {
 		};
 	}
 
-	public static <O> ObjectPropertyInference.Visitor<Void, O> getPropertySideConditionVisitor(
+	public static <O> ObjectPropertyInference.Visitor<O> getPropertySideConditionVisitor(
 			final ElkAxiomVisitor<O> visitor) {
-		return new AbstractObjectPropertyInferenceVisitor<Void, O>() {
+		return new AbstractObjectPropertyInferenceVisitor<O>() {
 
 			@Override
-			protected O defaultTracedVisit(ObjectPropertyInference conclusion,
-					Void input) {
+			protected O defaultTracedVisit(ObjectPropertyInference conclusion) {
 				ElkAxiom sideCondition = new SideConditionLookup()
 						.lookup(conclusion);
 

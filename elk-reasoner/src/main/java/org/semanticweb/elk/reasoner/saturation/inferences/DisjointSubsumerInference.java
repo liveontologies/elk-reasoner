@@ -29,7 +29,7 @@ public interface DisjointSubsumerInference
 			DisjointSubsumer,
 			ClassInference {
 
-	public <I, O> O accept(Visitor<I, O> visitor, I input);
+	public <O> O accept(Visitor<O> visitor);
 
 	/**
 	 * Visitor pattern for instances
@@ -37,9 +37,9 @@ public interface DisjointSubsumerInference
 	 * @author Yevgeny Kazakov
 	 *
 	 */
-	public static interface Visitor<I, O>
+	public static interface Visitor<O>
 			extends
-				DisjointSubsumerFromSubsumer.Visitor<I, O> {
+				DisjointSubsumerFromSubsumer.Visitor<O> {
 
 		// combined interface
 

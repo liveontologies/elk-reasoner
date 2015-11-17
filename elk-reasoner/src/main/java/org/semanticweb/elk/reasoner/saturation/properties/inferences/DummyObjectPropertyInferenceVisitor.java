@@ -30,10 +30,10 @@ package org.semanticweb.elk.reasoner.saturation.properties.inferences;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class DummyObjectPropertyInferenceVisitor<I, O> extends AbstractObjectPropertyInferenceVisitor<I, O> {
+public class DummyObjectPropertyInferenceVisitor<O> extends AbstractObjectPropertyInferenceVisitor<O> {
 
 	@Override
-	protected O defaultTracedVisit(ObjectPropertyInference inference, I input) {
+	protected O defaultTracedVisit(ObjectPropertyInference inference) {
 		// no-op
 		return null;
 	}

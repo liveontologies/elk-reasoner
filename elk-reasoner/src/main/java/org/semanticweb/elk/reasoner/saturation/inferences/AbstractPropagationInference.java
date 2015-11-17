@@ -36,13 +36,13 @@ public abstract class AbstractPropagationInference extends PropagationImpl
 	}
 
 	@Override
-	public <I, O> O accept(SaturationInference.Visitor<I, O> visitor, I input) {
-		return accept((PropagationInference.Visitor<I, O>) visitor, input);
+	public <O> O accept(SaturationInference.Visitor<O> visitor) {
+		return accept((PropagationInference.Visitor<O>) visitor);
 	}
 	
 	@Override
-	public <I, O> O accept(ClassInference.Visitor<I, O> visitor, I input) {
-		return accept((PropagationInference.Visitor<I, O>) visitor, input);
+	public <O> O accept(ClassInference.Visitor<O> visitor) {
+		return accept((PropagationInference.Visitor<O>) visitor);
 	}
 	
 

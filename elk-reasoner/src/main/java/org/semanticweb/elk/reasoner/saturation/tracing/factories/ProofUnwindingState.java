@@ -43,7 +43,7 @@ class ProofUnwindingState<I extends ClassConclusion, J extends ProofUnwindingJob
 
 	final Queue<ClassInference> todoInferences;
 	
-	private final SaturationInference.Visitor<Void, Void> inferencePremiseInsertionVisitor = new SaturationPremiseVisitor<Void, Void>(
+	private final SaturationInference.Visitor<Void> inferencePremiseInsertionVisitor = new SaturationPremiseVisitor<Void>(
 			new DummySaturationConclusionVisitor<Void>() {
 				@Override
 				protected Void defaultVisit(ClassConclusion conclusion) {
@@ -61,7 +61,7 @@ class ProofUnwindingState<I extends ClassConclusion, J extends ProofUnwindingJob
 	}
 		
 	void addInference(ClassInference inference) {
-		inference.accept(inferencePremiseInsertionVisitor, null);
+		inference.accept(inferencePremiseInsertionVisitor);
 	}
 	
 }

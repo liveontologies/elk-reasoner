@@ -90,18 +90,18 @@ public class ForwardLinkOfObjectHasSelf extends AbstractClassConclusion
 	}
 	
 	@Override
-	public <I, O> O accept(SaturationInference.Visitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(SaturationInference.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 	
 	@Override
-	public <I, O> O accept(ClassInference.Visitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(ClassInference.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 	@Override
-	public <I, O> O accept(ForwardLinkInference.Visitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(ForwardLinkInference.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 	
 	/**
@@ -110,9 +110,9 @@ public class ForwardLinkOfObjectHasSelf extends AbstractClassConclusion
 	 * @author Yevgeny Kazakov
 	 *
 	 */
-	public static interface Visitor<I, O> {
+	public static interface Visitor<O> {
 		
-		public O visit(ForwardLinkOfObjectHasSelf inference, I input);
+		public O visit(ForwardLinkOfObjectHasSelf inference);
 		
 	}
 
