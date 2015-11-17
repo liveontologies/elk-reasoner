@@ -28,7 +28,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 import org.semanticweb.elk.util.hashing.Hasher;
 
-public class ClassConclusionHash implements ClassConclusion.Visitor<Void, Integer>,
+public class ClassConclusionHash implements ClassConclusion.Visitor<Integer>,
 		Hasher<ClassConclusion> {
 
 	private static final ClassConclusionHash INSTANCE_ = new ClassConclusionHash();
@@ -59,7 +59,7 @@ public class ClassConclusionHash implements ClassConclusion.Visitor<Void, Intege
 	}
 
 	public static int hashCode(ClassConclusion conclusion) {
-		return conclusion == null ? 0 : conclusion.accept(INSTANCE_, null);
+		return conclusion == null ? 0 : conclusion.accept(INSTANCE_);
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class ClassConclusionHash implements ClassConclusion.Visitor<Void, Intege
 	}
 
 	@Override
-	public Integer visit(BackwardLink subConclusion, Void input) {
+	public Integer visit(BackwardLink subConclusion) {
 		return combinedHashCode(hashCode(BackwardLink.class),
 				hashCode(subConclusion.getConclusionRoot()),
 				hashCode(subConclusion.getConclusionSubRoot()),
@@ -76,7 +76,7 @@ public class ClassConclusionHash implements ClassConclusion.Visitor<Void, Intege
 	}
 
 	@Override
-	public Integer visit(Propagation subConclusion, Void input) {
+	public Integer visit(Propagation subConclusion) {
 		return combinedHashCode(hashCode(Propagation.class),
 				hashCode(subConclusion.getConclusionRoot()),
 				hashCode(subConclusion.getConclusionSubRoot()),
@@ -84,40 +84,40 @@ public class ClassConclusionHash implements ClassConclusion.Visitor<Void, Intege
 	}
 
 	@Override
-	public Integer visit(SubContextInitialization subConclusion, Void input) {
+	public Integer visit(SubContextInitialization subConclusion) {
 		return combinedHashCode(hashCode(SubContextInitialization.class),
 				hashCode(subConclusion.getConclusionRoot()),
 				hashCode(subConclusion.getConclusionSubRoot()));
 	}
 
 	@Override
-	public Integer visit(SubClassInclusionComposed conclusion, Void input) {
+	public Integer visit(SubClassInclusionComposed conclusion) {
 		return combinedHashCode(hashCode(SubClassInclusionComposed.class),
 				hashCode(conclusion.getConclusionRoot()),
 				hashCode(conclusion.getSuperExpression()));
 	}
 
 	@Override
-	public Integer visit(ContextInitialization conclusion, Void input) {
+	public Integer visit(ContextInitialization conclusion) {
 		return combinedHashCode(hashCode(ContextInitialization.class),
 				hashCode(conclusion.getConclusionRoot()));
 	}
 
 	@Override
-	public Integer visit(Contradiction conclusion, Void input) {
+	public Integer visit(Contradiction conclusion) {
 		return combinedHashCode(hashCode(Contradiction.class),
 				hashCode(conclusion.getConclusionRoot()));
 	}
 
 	@Override
-	public Integer visit(SubClassInclusionDecomposed conclusion, Void input) {
+	public Integer visit(SubClassInclusionDecomposed conclusion) {
 		return combinedHashCode(hashCode(SubClassInclusionDecomposed.class),
 				hashCode(conclusion.getConclusionRoot()),
 				hashCode(conclusion.getSuperExpression()));
 	}
 
 	@Override
-	public Integer visit(DisjointSubsumer conclusion, Void input) {
+	public Integer visit(DisjointSubsumer conclusion) {
 		return combinedHashCode(hashCode(DisjointSubsumer.class),
 				hashCode(conclusion.getConclusionRoot()),
 				hashCode(conclusion.getDisjointExpressions()),
@@ -126,7 +126,7 @@ public class ClassConclusionHash implements ClassConclusion.Visitor<Void, Intege
 	}
 
 	@Override
-	public Integer visit(ForwardLink conclusion, Void input) {
+	public Integer visit(ForwardLink conclusion) {
 		return combinedHashCode(hashCode(ForwardLink.class),
 				hashCode(conclusion.getConclusionRoot()),
 				hashCode(conclusion.getForwardChain()),

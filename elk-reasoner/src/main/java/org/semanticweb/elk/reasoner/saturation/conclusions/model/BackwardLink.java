@@ -29,8 +29,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.BackwardLinkImpl;
 
 /**
- * A {@link ClassConclusion} representing derived existential restrictions from a
- * source {@link IndexedClassExpression} to this target
+ * A {@link ClassConclusion} representing derived existential restrictions from
+ * a source {@link IndexedClassExpression} to this target
  * {@link IndexedClassExpression}. Intuitively, if a subclass axiom
  * {@code SubClassOf(:A ObjectSomeValuesFrom(:r :B))} is derived by inference
  * rules, then a {@link BackwardLinkImpl} with the source {@code :A} and the
@@ -58,8 +58,8 @@ public interface BackwardLink extends SubClassConclusion {
 	 */
 	@Override
 	public IndexedContextRoot getOriginRoot();
-	
-	public <I, O> O accept(Visitor<I, O> visitor, I input);
+
+	public <O> O accept(Visitor<O> visitor);
 
 	/**
 	 * A factory for creating instances
@@ -73,20 +73,18 @@ public interface BackwardLink extends SubClassConclusion {
 				IndexedObjectProperty relation, IndexedContextRoot source);
 
 	}
-	
+
 	/**
 	 * The visitor pattern for instances
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
-	 * @param <I>
-	 *            the type of the input
 	 * @param <O>
 	 *            the type of the output
 	 */
-	interface Visitor<I, O> {
+	interface Visitor<O> {
 
-		public O visit(BackwardLink conclusion, I input);
+		public O visit(BackwardLink conclusion);
 
 	}
 

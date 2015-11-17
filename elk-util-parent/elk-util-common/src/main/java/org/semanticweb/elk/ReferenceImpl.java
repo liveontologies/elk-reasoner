@@ -1,14 +1,12 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
+package org.semanticweb.elk;
+
 /*
  * #%L
- * ELK Reasoner
+ * ELK Common Utilities
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,19 +22,26 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
-
 /**
- * @author Pavel Klinov
+ * A simple implementation of {@link ModifiableReference}
+ * 
+ * @author Yevgeny Kazakov
  *
- * pavel.klinov@uni-ulm.de
+ * @param <O>
+ *            the type of the value of this {@link Reference}
  */
-public class DummyObjectPropertyConclusionVisitor<O> extends
-		AbstractObjectPropertyConclusionVIsitor<O> {
+public class ReferenceImpl<O> implements ModifiableReference<O> {
+
+	private O object_;
 
 	@Override
-	protected O defaultVisit(ObjectPropertyConclusion conclusion) {
-		return null;
+	public O get() {
+		return object_;
+	}
+
+	@Override
+	public void set(O object) {
+		this.object_ = object;
 	}
 
 }

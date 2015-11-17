@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
+import org.semanticweb.elk.Reference;
+
 /*
  * #%L
  * ELK Reasoner
@@ -28,9 +30,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link ClassConclusion.Visitor} that checks if visited {@link ClassConclusion} is
- * contained the given {@link ClassConclusionSet}. The visit method returns {@link
- * true} if the {@link ClassConclusionSet} is occurs in the {@link ClassConclusionSet} and
+ * A {@link ClassConclusion.Visitor} that checks if visited
+ * {@link ClassConclusion} is contained the {@link ClassConclusionSet} value of
+ * the given {@link Reference}. The visit method returns {@link true} if the
+ * {@link ClassConclusion} occurs in the {@link ClassConclusionSet} and
  * {@link false} otherwise.
  * 
  * @see ClassConclusionInsertionVisitor
@@ -40,19 +43,28 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  */
 public class ClassConclusionOccurrenceCheckingVisitor extends
-		AbstractClassConclusionVisitor<ClassConclusionSet, Boolean> {
+		AbstractClassConclusionVisitor<Boolean> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ClassConclusionOccurrenceCheckingVisitor.class);
+	
+	private final Reference<? extends ClassConclusionSet> conclusionsRef_;
+	
+	public ClassConclusionOccurrenceCheckingVisitor(Reference<? extends ClassConclusionSet> conclusions) {
+		this.conclusionsRef_ = conclusions;
+	}
 
 	// TODO: make this by combining the visitor in order to avoid overheads when
 	// logging is switched off
 	@Override
-	protected Boolean defaultVisit(ClassConclusion conclusion, ClassConclusionSet context) {
-		boolean result = context.containsConclusion(conclusion);
+	protected Boolean defaultVisit(ClassConclusion conclusion) {
+		ClassConclusionSet conclusions = conclusionsRef_.get();		
+		boolean result = conclusions == null
+				? false
+				: conclusions.containsConclusion(conclusion);
 		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("{}: check occurrence of {}: {}", context,
+			LOGGER_.trace("{}: check occurrence of {}: {}", conclusions,
 					conclusion, result ? "success" : "failure");
 		}
 		return result;

@@ -55,8 +55,8 @@ public abstract class AbstractSubClassConclusion extends AbstractClassConclusion
 	}
 
 	@Override
-	public <I, O> O accept(ClassConclusion.Visitor<I, O> visitor, I input) {
-		return accept((SubClassConclusion.Visitor<I, O>) visitor, input);
+	public <O> O accept(ClassConclusion.Visitor<O> visitor) {
+		return accept((SubClassConclusion.Visitor<O>) visitor);
 	}
 	
 }

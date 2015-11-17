@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
+import org.semanticweb.elk.Reference;
+
 /*
  * #%L
  * ELK Reasoner
@@ -36,8 +38,10 @@ import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 
 /**
- * A {@link ClassConclusionInsertionVisitor} that initializes the {@link Context} and
- * the {@link SubContext} if it is the first conclusion inserted there.
+ * A {@link ClassConclusionInsertionVisitor} that initializes the
+ * {@link Context} provided in the {@link Reference} and its corresponding
+ * {@link SubContext} if the visited {@link ClassConclusion} is the first one
+ * inserted there.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -57,22 +61,23 @@ public class ContextInitializingClassConclusionInsertionVisitor
 	private final InitializationConclusion.Factory factory_;
 
 	public ContextInitializingClassConclusionInsertionVisitor(
+			Reference<Context> contextRef,
 			InitializationConclusion.Factory factory,
 			SaturationStateWriter<?> writer) {
-		super(writer);
+		super(contextRef, writer);
 		this.producer_ = writer;
 		this.index_ = writer.getSaturationState().getOntologyIndex();
 		this.factory_ = factory;
 	}
-	
+
 	public ContextInitializingClassConclusionInsertionVisitor(
-			SaturationStateWriter<?> writer) {
-		this(new ConclusionBaseFactory(), writer);
+			Reference<Context> contextRef, SaturationStateWriter<?> writer) {
+		this(contextRef, new ConclusionBaseFactory(), writer);
 	}
 
 	@Override
-	protected Boolean defaultVisit(ClassConclusion conclusion,
-			Context context) {
+	protected Boolean defaultVisit(ClassConclusion conclusion) {
+		Context context = get();
 		IndexedContextRoot root = context.getRoot();
 		if (context.isEmpty()) {
 			producer_.produce(factory_.getContextInitialization(root, index_));
@@ -85,6 +90,6 @@ public class ContextInitializingClassConclusionInsertionVisitor
 						factory_.getSubContextInitialization(root, subRoot));
 			}
 		}
-		return super.defaultVisit(conclusion, context);
+		return super.defaultVisit(conclusion);
 	}
 }

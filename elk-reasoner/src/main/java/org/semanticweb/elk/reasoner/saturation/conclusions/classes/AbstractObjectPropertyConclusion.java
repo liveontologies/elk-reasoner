@@ -56,9 +56,8 @@ public abstract class AbstractObjectPropertyConclusion
 	}
 
 	@Override
-	public <I, O> O accept(SaturationConclusion.Visitor<I, O> visitor,
-			I input) {
-		return accept((ObjectPropertyConclusion.Visitor<I, O>) visitor, input);
+	public <O> O accept(SaturationConclusion.Visitor<O> visitor) {
+		return accept((ObjectPropertyConclusion.Visitor<O>) visitor);
 	}
 
 }

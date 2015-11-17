@@ -70,13 +70,13 @@ public class DisjointSubsumerImpl extends AbstractClassConclusion implements
 	}
 
 	@Override
-	public <I, O> O accept(ClassConclusion.Visitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(ClassConclusion.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 	@Override
-	public <I, O> O accept(DisjointSubsumer.Visitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(DisjointSubsumer.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 }

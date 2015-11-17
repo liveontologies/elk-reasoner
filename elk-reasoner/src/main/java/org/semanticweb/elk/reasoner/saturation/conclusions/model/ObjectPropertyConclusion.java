@@ -34,7 +34,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.model;
  */
 public interface ObjectPropertyConclusion extends SaturationConclusion {
 
-	public <I, O> O accept(Visitor<I, O> visitor, I input);
+	public <O> O accept(Visitor<O> visitor);
 
 	/**
 	 * A factory for creating instances
@@ -53,12 +53,10 @@ public interface ObjectPropertyConclusion extends SaturationConclusion {
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
-	 * @param <I>
-	 *            the type of the input
 	 * @param <O>
 	 *            the type of the output
 	 */
-	interface Visitor<I, O> extends SubPropertyChain.Visitor<I, O> {
+	interface Visitor<O> extends SubPropertyChain.Visitor<O> {
 
 		// combined interface
 

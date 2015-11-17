@@ -48,13 +48,13 @@ public class ContradictionImpl extends AbstractClassConclusion implements
 			.getLogger(ContradictionImpl.class);
 
 	@Override
-	public <I, O> O accept(ClassConclusion.Visitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(ClassConclusion.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 	@Override
-	public <I, O> O accept(Contradiction.Visitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(Contradiction.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 }

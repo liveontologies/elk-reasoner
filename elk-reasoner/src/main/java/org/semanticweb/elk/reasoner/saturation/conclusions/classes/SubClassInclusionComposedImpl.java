@@ -47,14 +47,13 @@ public class SubClassInclusionComposedImpl<S extends IndexedClassExpression>
 	}
 
 	@Override
-	public <I, O> O accept(SubClassInclusion.Visitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(SubClassInclusion.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 	@Override
-	public <I, O> O accept(SubClassInclusionComposed.Visitor<I, O> visitor,
-			I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(SubClassInclusionComposed.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 }

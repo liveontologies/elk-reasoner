@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
+import org.semanticweb.elk.Reference;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,13 +26,13 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
@@ -68,20 +70,25 @@ public class RuleApplicationClassConclusionVisitor extends
 	 */
 	private static ContradictionCompositionRule CONTRADICTION_COMPOSITION_RULE_ = new ContradictionCompositionRule();
 
-	public RuleApplicationClassConclusionVisitor(RuleVisitor<?> ruleAppVisitor,
+	
+	
+	public RuleApplicationClassConclusionVisitor(
+			Reference<? extends ContextPremises> premisesRef,
+			RuleVisitor<?> ruleAppVisitor,
 			ClassConclusionProducer producer) {
-		super(ruleAppVisitor, producer);
+		super(premisesRef, ruleAppVisitor, producer);
 	}
 
 	@Override
-	protected Boolean defaultVisit(ClassConclusion conclusion, ContextPremises input) {
+	protected Boolean defaultVisit(ClassConclusion conclusion) {
 		// all methods should be explicitly implemented
 		throw new RuntimeException("Rules for " + conclusion
 				+ " not implemented!");
 	}
 
 	@Override
-	public Boolean visit(BackwardLink subConclusion, ContextPremises premises) {
+	public Boolean visit(BackwardLink subConclusion) {
+		ContextPremises premises = get();
 		ruleAppVisitor.visit(SubsumerBackwardLinkRule.getInstance(),
 				subConclusion, premises, producer);
 
@@ -97,64 +104,66 @@ public class RuleApplicationClassConclusionVisitor extends
 	}
 
 	@Override
-	public Boolean visit(Propagation subConclusion, ContextPremises premises) {
+	public Boolean visit(Propagation subConclusion) {
 		// propagate over non-reflexive backward links
 		ruleAppVisitor.visit(SubsumerPropagationRule.getInstance(),
-				subConclusion, premises, producer);
+				subConclusion, get(), producer);
 		return true;
 	}
 
 	@Override
-	public Boolean visit(SubContextInitialization subConclusion,
-			ContextPremises premises) {
-		LOGGER_.trace("{}::{} applying sub-concept init rules:",
-				premises.getRoot(), subConclusion.getConclusionSubRoot());
+	public Boolean visit(SubContextInitialization subConclusion) {
+		ContextPremises premises = get();
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("{}::{} applying sub-concept init rules:",
+					premises.getRoot(), subConclusion.getConclusionSubRoot());
+		}
 		PropagationInitializationRule.getInstance().accept(ruleAppVisitor,
 				subConclusion, premises, producer);
 		return true;
 	}
 
 	@Override
-	public Boolean visit(SubClassInclusionComposed conclusion, ContextPremises premises) {
-		applyCompositionRules(conclusion, premises);
+	public Boolean visit(SubClassInclusionComposed conclusion) {
+		applyCompositionRules(conclusion);
 		return true;
 	}
 
 	@Override
-	public Boolean visit(ContextInitialization conclusion,
-			ContextPremises premises) {
+	public Boolean visit(ContextInitialization conclusion) {
 		LinkedContextInitRule rule = conclusion.getContextInitRuleHead();
 		LOGGER_.trace("applying init rules:");
 		while (rule != null) {
 			LOGGER_.trace("init rule: {}", rule);
-			rule.accept(ruleAppVisitor, conclusion, premises, producer);
+			rule.accept(ruleAppVisitor, conclusion, get(), producer);
 			rule = rule.next();
 		}
 		return true;
 	}
 
 	@Override
-	public Boolean visit(Contradiction conclusion, ContextPremises premises) {
+	public Boolean visit(Contradiction conclusion) {
 		ruleAppVisitor.visit(ContradictionPropagationRule.getInstance(),
-				conclusion, premises, producer);
+				conclusion, get(), producer);
 		return true;
 	}
 
 	@Override
-	public Boolean visit(SubClassInclusionDecomposed conclusion, ContextPremises premises) {
-		applyDecompositionRules(conclusion, premises);
+	public Boolean visit(SubClassInclusionDecomposed conclusion) {
+		applyDecompositionRules(conclusion);
 		return true;
 	}
 
 	@Override
-	public Boolean visit(DisjointSubsumer conclusion, ContextPremises premises) {
+	public Boolean visit(DisjointSubsumer conclusion) {
 		ruleAppVisitor.visit(CONTRADICTION_COMPOSITION_RULE_, conclusion,
-				premises, producer);
+				get(), producer);
 		return true;
 	}
 
 	@Override
-	public Boolean visit(ForwardLink conclusion, ContextPremises premises) {
+	public Boolean visit(ForwardLink conclusion) {
+		ContextPremises premises = get();
 		// generate backward links
 		ruleAppVisitor.visit(BackwardLinkFromForwardLinkRule.getInstance(),
 				conclusion, premises, producer);

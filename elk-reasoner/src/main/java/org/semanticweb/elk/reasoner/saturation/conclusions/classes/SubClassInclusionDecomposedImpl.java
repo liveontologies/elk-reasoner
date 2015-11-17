@@ -24,8 +24,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 
 /**
  * An implementation of {@link SubClassInclusionDecomposed}.
@@ -46,14 +46,13 @@ public class SubClassInclusionDecomposedImpl
 	}
 
 	@Override
-	public <I, O> O accept(SubClassInclusion.Visitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(SubClassInclusion.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 	@Override
-	public <I, O> O accept(SubClassInclusionDecomposed.Visitor<I, O> visitor,
-			I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(SubClassInclusionDecomposed.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 }

@@ -126,8 +126,7 @@ public class ProofUnwindingFactory<C extends ClassConclusion, J extends ProofUnw
 				return;
 			}
 			// else
-			nextInference.accept(ProofUnwindingState.PREMISE_INSERTION_VISITOR,
-					unwindingState);
+			unwindingState.addInference(nextInference);
 		}
 		jobsToDo_.add(new ContextTracingJobForProofUnwinding<C, J>(next,
 				unwindingState));

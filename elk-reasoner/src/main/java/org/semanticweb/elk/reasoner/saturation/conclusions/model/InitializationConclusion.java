@@ -34,8 +34,8 @@ import org.semanticweb.elk.reasoner.saturation.context.SubContext;
  */
 public interface InitializationConclusion extends ClassConclusion {
 
-	public <I, O> O accept(Visitor<I, O> visitor, I input);
-	
+	public <O> O accept(Visitor<O> visitor);
+
 	/**
 	 * A factory for creating instances
 	 * 
@@ -50,25 +50,22 @@ public interface InitializationConclusion extends ClassConclusion {
 		// combined interface
 
 	}
-	
+
 	/**
 	 * The visitor pattern for instances
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
-	 * @param <I>
-	 *            the type of the input
 	 * @param <O>
 	 *            the type of the output
 	 */
-	interface Visitor<I, O>
+	interface Visitor<O>
 			extends
-			ContextInitialization.Visitor<I, O>,
-				SubContextInitialization.Visitor<I, O> {
+				ContextInitialization.Visitor<O>,
+				SubContextInitialization.Visitor<O> {
 
 		// combined interface
 
 	}
-
 
 }

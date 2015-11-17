@@ -35,9 +35,9 @@ import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 public interface SubContextInitialization extends SubClassConclusion {
 
 	public static final String NAME = "Sub-Context Initialization";
-	
-	public <I, O> O accept(Visitor<I, O> visitor, I input);
-	
+
+	public <O> O accept(Visitor<O> visitor);
+
 	/**
 	 * A factory for creating instances
 	 * 
@@ -50,22 +50,19 @@ public interface SubContextInitialization extends SubClassConclusion {
 				IndexedContextRoot root, IndexedObjectProperty subRoot);
 
 	}
-	
+
 	/**
 	 * The visitor pattern for instances
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
-	 * @param <I>
-	 *            the type of the input
 	 * @param <O>
 	 *            the type of the output
 	 */
-	interface Visitor<I, O> {
+	interface Visitor<O> {
 
-		public O visit(SubContextInitialization conclusion, I input);
+		public O visit(SubContextInitialization conclusion);
 
 	}
-
 
 }

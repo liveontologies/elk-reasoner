@@ -37,10 +37,6 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
 public class SubContextImpl extends ArrayHashSet<IndexedContextRoot> implements
 		SubContext {
 
-	private static final SubClassConclusion.Visitor<SubContextImpl, Boolean> SUB_CONCLUSION_INSERTER_ = new SubConclusionInserter();
-	private static final SubClassConclusion.Visitor<SubContextImpl, Boolean> SUB_CONCLUSION_DELETOR_ = new SubConclusionDeletor();
-	private static final SubClassConclusion.Visitor<SubContextImpl, Boolean> SUB_CONCLUSION_OCCURRENCE_CHECKER_ = new SubConclusionOccurrenceChecker();
-
 	Set<IndexedObjectSomeValuesFrom> propagatedSubsumers_;
 
 	/**
@@ -73,7 +69,7 @@ public class SubContextImpl extends ArrayHashSet<IndexedContextRoot> implements
 
 	@Override
 	public boolean addSubConclusion(SubClassConclusion conclusion) {
-		boolean success = conclusion.accept(SUB_CONCLUSION_INSERTER_, this);
+		boolean success = conclusion.accept(new SubConclusionInserter());
 		if (success)
 			size_++;
 		return success;
@@ -81,7 +77,7 @@ public class SubContextImpl extends ArrayHashSet<IndexedContextRoot> implements
 
 	@Override
 	public boolean removeSubConclusion(SubClassConclusion conclusion) {
-		boolean success = conclusion.accept(SUB_CONCLUSION_DELETOR_, this);
+		boolean success = conclusion.accept(new SubConclusionDeletor());
 		if (success)
 			size_--;
 		return success;
@@ -89,7 +85,7 @@ public class SubContextImpl extends ArrayHashSet<IndexedContextRoot> implements
 
 	@Override
 	public boolean containsSubConclusion(SubClassConclusion conclusion) {
-		return conclusion.accept(SUB_CONCLUSION_OCCURRENCE_CHECKER_, this);
+		return conclusion.accept(new SubConclusionOccurrenceChecker());
 	}
 
 	@Override
@@ -102,83 +98,80 @@ public class SubContextImpl extends ArrayHashSet<IndexedContextRoot> implements
 		return size_ == 0;
 	}
 
-	public static class SubConclusionInserter implements
-			SubClassConclusion.Visitor<SubContextImpl, Boolean> {
+	public class SubConclusionInserter implements
+			SubClassConclusion.Visitor<Boolean> {
 
 		@Override
-		public Boolean visit(BackwardLink subConclusion, SubContextImpl input) {
-			return input.add(subConclusion.getOriginRoot());
+		public Boolean visit(BackwardLink subConclusion) {
+			return add(subConclusion.getOriginRoot());
 		}
 
 		@Override
-		public Boolean visit(Propagation subConclusion, SubContextImpl input) {
-			if (input.propagatedSubsumers_ == null)
-				input.propagatedSubsumers_ = new ArrayHashSet<IndexedObjectSomeValuesFrom>(
+		public Boolean visit(Propagation subConclusion) {
+			if (propagatedSubsumers_ == null)
+				propagatedSubsumers_ = new ArrayHashSet<IndexedObjectSomeValuesFrom>(
 						3);
-			return input.propagatedSubsumers_.add(subConclusion.getCarry());
+			return propagatedSubsumers_.add(subConclusion.getCarry());
 		}
 
 		@Override
-		public Boolean visit(SubContextInitialization subConclusion,
-				SubContextImpl input) {
-			if (input.isInitialized_)
+		public Boolean visit(SubContextInitialization subConclusion) {
+			if (isInitialized_)
 				// already initialized
 				return false;
 			// else
-			input.isInitialized_ = true;
+			isInitialized_ = true;
 			return true;
 		}
 	}
 
-	public static class SubConclusionDeletor implements
-			SubClassConclusion.Visitor<SubContextImpl, Boolean> {
+	public class SubConclusionDeletor implements
+			SubClassConclusion.Visitor<Boolean> {
 
 		@Override
-		public Boolean visit(BackwardLink subConclusion, SubContextImpl input) {
-			return input.remove(subConclusion.getOriginRoot());
+		public Boolean visit(BackwardLink subConclusion) {
+			return remove(subConclusion.getOriginRoot());
 		}
 
 		@Override
-		public Boolean visit(Propagation subConclusion, SubContextImpl input) {
-			if (input.propagatedSubsumers_ == null)
+		public Boolean visit(Propagation subConclusion) {
+			if (propagatedSubsumers_ == null)
 				return false;
 			// else
-			return input.propagatedSubsumers_.remove(subConclusion.getCarry());
+			return propagatedSubsumers_.remove(subConclusion.getCarry());
 		}
 
 		@Override
-		public Boolean visit(SubContextInitialization subConclusion,
-				SubContextImpl input) {
-			if (!input.isInitialized_)
+		public Boolean visit(SubContextInitialization subConclusion) {
+			if (!isInitialized_)
 				// already not initialized
 				return false;
 			// else
-			input.isInitialized_ = false;
+			isInitialized_ = false;
 			return true;
 		}
 	}
 
-	public static class SubConclusionOccurrenceChecker implements
-			SubClassConclusion.Visitor<SubContextImpl, Boolean> {
+	public class SubConclusionOccurrenceChecker implements
+			SubClassConclusion.Visitor<Boolean> {
 
 		@Override
-		public Boolean visit(BackwardLink subConclusion, SubContextImpl input) {
-			return input.contains(subConclusion.getOriginRoot());
+		public Boolean visit(BackwardLink subConclusion) {
+			return contains(subConclusion.getOriginRoot());
 		}
 
 		@Override
-		public Boolean visit(Propagation subConclusion, SubContextImpl input) {
-			if (input.propagatedSubsumers_ == null)
+		public Boolean visit(Propagation subConclusion) {
+			if (propagatedSubsumers_ == null)
 				return false;
 			// else
-			return input.propagatedSubsumers_
+			return propagatedSubsumers_
 					.contains(subConclusion.getCarry());
 		}
 
 		@Override
-		public Boolean visit(SubContextInitialization subConclusion,
-				SubContextImpl input) {
-			return input.isInitialized_;
+		public Boolean visit(SubContextInitialization subConclusion) {
+			return isInitialized_;
 		}
 	}
 

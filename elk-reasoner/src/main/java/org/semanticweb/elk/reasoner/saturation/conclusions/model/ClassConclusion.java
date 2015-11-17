@@ -57,7 +57,7 @@ public interface ClassConclusion extends SaturationConclusion {
 	 */
 	public IndexedContextRoot getOriginRoot();
 
-	public <I, O> O accept(Visitor<I, O> visitor, I input);
+	public <O> O accept(Visitor<O> visitor);
 
 	/**
 	 * A factory for creating instances
@@ -84,20 +84,18 @@ public interface ClassConclusion extends SaturationConclusion {
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
-	 * @param <I>
-	 *            the type of the input
 	 * @param <O>
 	 *            the type of the output
 	 */
-	interface Visitor<I, O>
+	interface Visitor<O>
 			extends
-				ContextInitialization.Visitor<I, O>,
-				Contradiction.Visitor<I, O>,
-				DisjointSubsumer.Visitor<I, O>,
-				InitializationConclusion.Visitor<I, O>,
-				ForwardLink.Visitor<I, O>,
-				SubClassConclusion.Visitor<I, O>,
-				SubClassInclusion.Visitor<I, O> {
+				ContextInitialization.Visitor<O>,
+				Contradiction.Visitor<O>,
+				DisjointSubsumer.Visitor<O>,
+				InitializationConclusion.Visitor<O>,
+				ForwardLink.Visitor<O>,
+				SubClassConclusion.Visitor<O>,
+				SubClassInclusion.Visitor<O> {
 
 		// combined interface
 

@@ -58,7 +58,7 @@ public interface SubClassInclusion extends ClassConclusion {
 	 */
 	public IndexedClassExpression getSuperExpression();
 
-	public <I, O> O accept(Visitor<I, O> visitor, I input);
+	public <O> O accept(Visitor<O> visitor);
 
 	/**
 	 * A factory for creating instances
@@ -80,15 +80,13 @@ public interface SubClassInclusion extends ClassConclusion {
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
-	 * @param <I>
-	 *            the type of the input
 	 * @param <O>
 	 *            the type of the output
 	 */
-	interface Visitor<I, O>
+	interface Visitor<O>
 			extends
-				SubClassInclusionComposed.Visitor<I, O>,
-				SubClassInclusionDecomposed.Visitor<I, O> {
+				SubClassInclusionComposed.Visitor<O>,
+				SubClassInclusionDecomposed.Visitor<O> {
 
 		// combined interface
 

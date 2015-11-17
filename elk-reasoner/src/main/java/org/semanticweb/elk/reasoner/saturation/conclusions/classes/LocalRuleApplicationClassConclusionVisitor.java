@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
+import org.semanticweb.elk.Reference;
+
 /*
  * #%L
  * ELK Reasoner
@@ -34,67 +36,99 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitors;
 
 /**
- * A {@link ClassConclusion.Visitor} that applies local rules (rules producing only
- * {@link ClassConclusion}s with the same origin root and sub-root as for the
- * premise) for visited {@link ClassConclusion}s using the provided
+ * A {@link ClassConclusion.Visitor} that applies local rules (rules producing
+ * only {@link ClassConclusion}s with the same origin root and sub-root as for
+ * the premise) for visited {@link ClassConclusion}s using the provided
  * {@link RuleVisitor} and {@link ClassConclusionProducer}.
  * 
- * When applying local rules, to the visited {@link ClassConclusion}, local premises
- * (premises with the same origin root and sub-root as the {@link ClassConclusion})
- * are taken from the local {@link Context} and other premises from the
- * corresponding {@link Context} in the main saturation state. This is done to
- * ensure that every rule is applied at most once and no inference is lost when
- * processing only local {@link ClassConclusion}s.
+ * When applying local rules, to the visited {@link ClassConclusion}, local
+ * premises (premises with the same origin root and sub-root as the
+ * {@link ClassConclusion}) are taken from the local {@link Context} of
+ * {@link Reference} and other premises from the corresponding {@link Context}
+ * in the main saturation state. This is done to ensure that every rule is
+ * applied at most once and no inference is lost when processing only local
+ * {@link ClassConclusion}s.
  * 
  * @author "Yevgeny Kazakov"
  * 
  * @see Rule#isLocal()
  * @see RuleApplicationClassConclusion.Visitor
  */
-public class LocalRuleApplicationClassConclusionVisitor extends
-		AbstractClassConclusionVisitor<Context, Boolean> {
+public class LocalRuleApplicationClassConclusionVisitor
+		extends
+			AbstractClassConclusionVisitor<Boolean> {
 
+	private final HybrridContextPremises hybridPremisesRef_;
+	
 	/**
 	 * {@link ClassConclusion.Visitor} applying local rules
 	 */
-	private final ClassConclusion.Visitor<? super ContextPremises, Boolean> localRuleApplicator_;
+	private final ClassConclusion.Visitor<Boolean> localRuleApplicator_;
 
-	/**
-	 * the main {@link SaturationState} to take the non-local premises from
-	 */
-	private final SaturationState<?> mainState_;
-
-	public LocalRuleApplicationClassConclusionVisitor(SaturationState<?> mainState,
-			RuleVisitor<?> ruleVisitor, ClassConclusionProducer conclusionProducer) {
-		this.mainState_ = mainState;
+	public LocalRuleApplicationClassConclusionVisitor(
+			SaturationState<?> mainState,
+			Reference<? extends ContextPremises> localPremisesRef,
+			RuleVisitor<?> ruleVisitor,
+			ClassConclusionProducer conclusionProducer) {
+		this.hybridPremisesRef_ = new HybrridContextPremises(localPremisesRef, mainState);
 		this.localRuleApplicator_ = new RuleApplicationClassConclusionVisitor(
-				RuleVisitors.localize(ruleVisitor), conclusionProducer);
+				hybridPremisesRef_, RuleVisitors.localize(ruleVisitor),
+				conclusionProducer);
 	}
 
 	@Override
-	protected Boolean defaultVisit(ClassConclusion conclusion, Context input) {
-		ContextPremises premises = getPremises(conclusion, input);
-		conclusion.accept(localRuleApplicator_, premises);
+	protected Boolean defaultVisit(ClassConclusion conclusion) {
+		hybridPremisesRef_.setConclusion(conclusion);
+		conclusion.accept(localRuleApplicator_);
 		return true;
 	}
 
+
+	
 	/**
-	 * @param conclusion
-	 * @param input
-	 * @return the {@link ContextPremises} that should be used in rules with the
-	 *         given {@link ClassConclusion}. That effectively comprises of all local
-	 *         premises (premises with the same origin root and sub-root as the
-	 *         given {@link ClassConclusion}) of the local saturation state and
-	 *         non-local premises of the main saturation state.
+	 * A {@link Reference} to {@link ContextPremises} that should be used in
+	 * rules with the given {@link ClassConclusion}. That effectively comprises
+	 * of all local premises (premises with the same origin root and sub-root as
+	 * the given {@link ClassConclusion}) of the local saturation state and
+	 * non-local premises of the main saturation state.
+	 * 
+	 * @author Yevgeny Kazakov
 	 */
-	private ContextPremises getPremises(ClassConclusion conclusion, Context input) {
-		ContextPremises mainPremises = mainState_.getContext(input.getRoot());
-		if (conclusion instanceof SubClassConclusion) {
-			// this conclusion is not local for the context; it can be used
-			// in rules only with conclusions that are local for the context
-			return mainPremises;
+	private static class HybrridContextPremises
+			implements
+				Reference<ContextPremises> {
+
+		private ClassConclusion conclusion_;
+
+		private final Reference<? extends ContextPremises> localPremisesRef_;
+
+		private final SaturationState<?> mainState_;
+
+		HybrridContextPremises(
+				Reference<? extends ContextPremises> localPremisesRef,
+				SaturationState<?> mainState) {
+			this.localPremisesRef_ = localPremisesRef;
+			this.mainState_ = mainState;
 		}
-		// else conclusion must be local for the context
-		return new HybridContextPremises(input, mainPremises);
+
+		void setConclusion(ClassConclusion conclusion) {
+			this.conclusion_ = conclusion;
+		}
+		
+		@Override
+		public ContextPremises get() {
+			ContextPremises localPremises = localPremisesRef_.get();
+			ContextPremises mainPremises = mainState_
+					.getContext(localPremises.getRoot());
+			if (conclusion_ instanceof SubClassConclusion) {
+				// this conclusion is not local for the context; it can be used
+				// in rules only with conclusions that are local for the context
+				return mainPremises;
+			}
+			// else conclusion must be local for the context
+			return new HybridContextPremises(localPremises, mainPremises);
+		}
+
 	}
+
 }

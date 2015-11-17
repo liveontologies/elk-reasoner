@@ -36,7 +36,7 @@ public interface SubClassInclusionDecomposed extends SubClassInclusion {
 
 	public static final String NAME = "Decomposed Subsumer";
 
-	public <I, O> O accept(Visitor<I, O> visitor, I input);
+	public <O> O accept(Visitor<O> visitor);
 
 	/**
 	 * A factory for creating instances
@@ -57,14 +57,12 @@ public interface SubClassInclusionDecomposed extends SubClassInclusion {
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
-	 * @param <I>
-	 *            the type of the input
 	 * @param <O>
 	 *            the type of the output
 	 */
-	interface Visitor<I, O> {
+	interface Visitor<O> {
 
-		public O visit(SubClassInclusionDecomposed conclusion, I input);
+		public O visit(SubClassInclusionDecomposed conclusion);
 
 	}
 

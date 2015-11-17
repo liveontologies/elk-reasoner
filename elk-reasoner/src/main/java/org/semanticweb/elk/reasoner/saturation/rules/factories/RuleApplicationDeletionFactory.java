@@ -3,6 +3,8 @@
  */
 package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
+import org.semanticweb.elk.Reference;
+
 /*
  * #%L
  * ELK Reasoner
@@ -34,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionDeletionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionOccurrenceCheckingVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionSourceContextUnsaturationVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionOriginContextUnsaturationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.RuleApplicationClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -80,7 +82,8 @@ public class RuleApplicationDeletionFactory extends
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected ClassConclusion.Visitor<? super Context, Boolean> getConclusionProcessor(
+	protected ClassConclusion.Visitor<Boolean> getConclusionProcessor(
+			Reference<Context> activeContext,
 			RuleVisitor<?> ruleVisitor,
 			SaturationStateWriter<? extends Context> writer,
 			SaturationStatistics localStatistics) {
@@ -90,17 +93,17 @@ public class RuleApplicationDeletionFactory extends
 						SaturationUtils
 								.getProcessedConclusionCountingVisitor(localStatistics),
 						// check if conclusion occurs in the context and proceed
-						new ClassConclusionOccurrenceCheckingVisitor(),
+						new ClassConclusionOccurrenceCheckingVisitor(activeContext),
 						// count conclusions used in the rules, if necessary
 						SaturationUtils
 								.getUsedConclusionCountingVisitor(localStatistics),
 						// apply rules
-						new RuleApplicationClassConclusionVisitor(ruleVisitor,
-								writer),
+						new RuleApplicationClassConclusionVisitor(activeContext,
+								ruleVisitor, writer),
 						// after processing, delete the conclusion
-						new ClassConclusionDeletionVisitor(),
+						new ClassConclusionDeletionVisitor(activeContext),
 						// and mark the source context of the conclusion as
 						// non-saturated
-						new ClassConclusionSourceContextUnsaturationVisitor(writer));
+						new ClassConclusionOriginContextUnsaturationVisitor(writer));
 	}
 }

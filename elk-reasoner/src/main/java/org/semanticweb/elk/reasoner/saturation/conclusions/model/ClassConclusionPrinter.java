@@ -22,12 +22,12 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.model;
  * #L%
  */
 
-public class ClassConclusionPrinter implements ClassConclusion.Visitor<Void, String> {
+public class ClassConclusionPrinter implements ClassConclusion.Visitor<String> {
 
 	private static ClassConclusionPrinter INSTANCE_ = new ClassConclusionPrinter();
 
 	public static String toString(ClassConclusion conclusion) {
-		return conclusion.accept(INSTANCE_, null);
+		return conclusion.accept(INSTANCE_);
 	}
 
 	private ClassConclusionPrinter() {
@@ -35,49 +35,49 @@ public class ClassConclusionPrinter implements ClassConclusion.Visitor<Void, Str
 	}
 
 	@Override
-	public String visit(BackwardLink subConclusion, Void input) {
+	public String visit(BackwardLink subConclusion) {
 		return "BackwardLink(" + subConclusion.getConclusionRoot() + ":"
 				+ subConclusion.getConclusionSubRoot() + ":"
 				+ subConclusion.getOriginRoot() + ")";
 	}
 
 	@Override
-	public String visit(Propagation subConclusion, Void input) {
+	public String visit(Propagation subConclusion) {
 		return "Propagation(" + subConclusion.getConclusionRoot() + ":"
 				+ subConclusion.getConclusionSubRoot() + ":"
 				+ subConclusion.getCarry() + ")";
 	}
 
 	@Override
-	public String visit(SubContextInitialization subConclusion, Void input) {
+	public String visit(SubContextInitialization subConclusion) {
 		return "SubInit(" + subConclusion.getConclusionRoot() + ":"
 				+ subConclusion.getConclusionSubRoot() + ")";
 	}
 
 	@Override
-	public String visit(SubClassInclusionComposed conclusion, Void input) {
+	public String visit(SubClassInclusionComposed conclusion) {
 		return "Subsumption+(" + conclusion.getConclusionRoot() + " "
 				+ conclusion.getSuperExpression() + ")";
 	}
 
 	@Override
-	public String visit(ContextInitialization conclusion, Void input) {
+	public String visit(ContextInitialization conclusion) {
 		return "Init(" + conclusion.getConclusionRoot() + ")";
 	}
 
 	@Override
-	public String visit(Contradiction conclusion, Void input) {
+	public String visit(Contradiction conclusion) {
 		return "Contradiction(" + conclusion.getConclusionRoot() + ")";
 	}
 
 	@Override
-	public String visit(SubClassInclusionDecomposed conclusion, Void input) {
+	public String visit(SubClassInclusionDecomposed conclusion) {
 		return "Subsumption-(" + conclusion.getConclusionRoot() + " "
 				+ conclusion.getSuperExpression() + ")";
 	}
 
 	@Override
-	public String visit(DisjointSubsumer conclusion, Void input) {
+	public String visit(DisjointSubsumer conclusion) {
 		return "DisjointSubsumer(" + conclusion.getConclusionRoot() + ":"
 				+ conclusion.getDisjointExpressions() + ":"
 				+ conclusion.getPosition() + "["
@@ -85,7 +85,7 @@ public class ClassConclusionPrinter implements ClassConclusion.Visitor<Void, Str
 	}
 
 	@Override
-	public String visit(ForwardLink conclusion, Void input) {
+	public String visit(ForwardLink conclusion) {
 		return "ForwardLink(" + conclusion.getConclusionRoot() + ":"
 				+ conclusion.getForwardChain() + "->" + conclusion.getTarget()
 				+ ")";

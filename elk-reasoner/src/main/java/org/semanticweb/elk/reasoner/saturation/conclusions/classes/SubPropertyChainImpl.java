@@ -60,14 +60,13 @@ public class SubPropertyChainImpl extends AbstractObjectPropertyConclusion
 	}
 
 	@Override
-	public <I, O> O accept(ObjectPropertyConclusion.Visitor<I, O> visitor,
-			I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(ObjectPropertyConclusion.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 	@Override
-	public <I, O> O accept(SubPropertyChain.Visitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(SubPropertyChain.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 }

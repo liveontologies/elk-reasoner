@@ -73,8 +73,8 @@ public abstract class AbstractClassConclusion implements ClassConclusion {
 	}
 	
 	@Override
-	public <I, O> O accept(SaturationConclusion.Visitor<I, O> visitor, I input) {
-		return accept((ClassConclusion.Visitor<I, O>) visitor, input);
+	public <O> O accept(SaturationConclusion.Visitor<O> visitor) {
+		return accept((ClassConclusion.Visitor<O>) visitor);
 	}
 
 }

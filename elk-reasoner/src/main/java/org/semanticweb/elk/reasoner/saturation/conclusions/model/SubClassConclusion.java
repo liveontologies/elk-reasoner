@@ -65,7 +65,7 @@ public interface SubClassConclusion extends ClassConclusion {
 	 */
 	public IndexedObjectProperty getOriginSubRoot();
 
-	public <I, O> O accept(Visitor<I, O> visitor, I input);
+	public <O> O accept(Visitor<O> visitor);
 
 	/**
 	 * A factory for creating instances
@@ -88,16 +88,14 @@ public interface SubClassConclusion extends ClassConclusion {
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
-	 * @param <I>
-	 *            the type of the input
 	 * @param <O>
 	 *            the type of the output
 	 */
-	interface Visitor<I, O>
+	interface Visitor<O>
 			extends
-			BackwardLink.Visitor<I, O>,
-			Propagation.Visitor<I, O>,
-				SubContextInitialization.Visitor<I, O> {
+				BackwardLink.Visitor<O>,
+				Propagation.Visitor<O>,
+				SubContextInitialization.Visitor<O> {
 
 		// combined interface
 

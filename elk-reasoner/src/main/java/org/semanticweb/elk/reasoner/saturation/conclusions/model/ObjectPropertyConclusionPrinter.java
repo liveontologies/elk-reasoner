@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.model;
  */
 
 public class ObjectPropertyConclusionPrinter implements
-		ObjectPropertyConclusion.Visitor<Void, String> {
+		ObjectPropertyConclusion.Visitor<String> {
 
 	private static ObjectPropertyConclusionPrinter INSTANCE_ = new ObjectPropertyConclusionPrinter();
 
@@ -32,11 +32,11 @@ public class ObjectPropertyConclusionPrinter implements
 	}
 
 	public static String toString(ObjectPropertyConclusion conclusion) {
-		return conclusion.accept(INSTANCE_, null);
+		return conclusion.accept(INSTANCE_);
 	}
 
 	@Override
-	public String visit(SubPropertyChain conclusion, Void input) {
+	public String visit(SubPropertyChain conclusion) {
 		return "SubPropertyChain(" + conclusion.getSubChain() + " "
 				+ conclusion.getSuperChain() + ")";
 	}

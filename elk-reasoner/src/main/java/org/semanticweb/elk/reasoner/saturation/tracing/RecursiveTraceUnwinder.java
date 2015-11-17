@@ -30,12 +30,11 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.AbstractClassConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.AbstractObjectPropertyConclusionVIsitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.DummySaturationConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.ClassInferencePremiseVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.SaturationPremiseVisitor;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.AbstractObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 
@@ -95,11 +94,11 @@ public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 		final Set<ObjectPropertyInference> seenInferences = new HashSet<ObjectPropertyInference>();
 
 		// this visitor visits all premises and putting them into the todo queue
-		ClassInferencePremiseVisitor<Void, ?> unwinder = new ClassInferencePremiseVisitor<Void, Void>(
-				new AbstractObjectPropertyConclusionVIsitor<Void, Void>() {
+		SaturationPremiseVisitor<Void, ?> unwinder = new SaturationPremiseVisitor<Void, Void>(
+				new DummySaturationConclusionVisitor<Void>() {
 					@Override
 					protected Void defaultVisit(
-							ObjectPropertyConclusion premise, Void _ignored) {
+							ObjectPropertyConclusion premise) {
 						addToQueue(premise, seenInferences);
 						return null;
 					}
@@ -139,21 +138,20 @@ public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 		classInferencesToDo_.clear();
 		addToQueue(conclusion, seenInferences);
 		// this visitor visits all premises and putting them into the todo queue
-		ClassInferencePremiseVisitor<Void, ?> premiseVisitor = new ClassInferencePremiseVisitor<Void, Void>(
-				new AbstractClassConclusionVisitor<Void, Void>() {
+		SaturationPremiseVisitor<Void, ?> premiseVisitor = new SaturationPremiseVisitor<Void, Void>(
+				new DummySaturationConclusionVisitor<Void>() {
 					@Override
-					protected Void defaultVisit(ClassConclusion premise,
-							Void _ignored) {
+					protected Void defaultVisit(ClassConclusion premise) {
 						// the context passed into this method is the context
 						// where the
 						// inference has been made
 						addToQueue(premise, seenInferences);
 						return null;
 					}
-				}, new AbstractObjectPropertyConclusionVIsitor<Void, Void>() {
+			
 					@Override
 					protected Void defaultVisit(
-							ObjectPropertyConclusion premise, Void _ignored) {
+							ObjectPropertyConclusion premise) {
 						addToQueue(premise, seenPropertyInferences);
 
 						return null;

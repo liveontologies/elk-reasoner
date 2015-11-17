@@ -24,13 +24,13 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
 
 /**
@@ -43,14 +43,14 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextIniti
  * 
  * @author "Yevgeny Kazakov"
  */
-public class IfThenElseClassConclusionVisitor<I, O> implements
-		ClassConclusion.Visitor<I, O> {
+public class IfThenElseClassConclusionVisitor<O> implements
+		ClassConclusion.Visitor<O> {
 
-	final private ClassConclusion.Visitor<? super I, Boolean> check_;
+	final private ClassConclusion.Visitor<Boolean> check_;
 
-	final private ClassConclusion.Visitor<? super I, O> doFalse_;
+	final private ClassConclusion.Visitor<O> doFalse_;
 
-	final private ClassConclusion.Visitor<? super I, O> doTrue_;
+	final private ClassConclusion.Visitor<O> doTrue_;
 
 	/**
 	 * Creates a new {@link ClassConclusion.Visitor} that implements an if-then-else
@@ -72,66 +72,74 @@ public class IfThenElseClassConclusionVisitor<I, O> implements
 	 *            condition is evaluated {@code false}
 	 */
 	public IfThenElseClassConclusionVisitor(
-			ClassConclusion.Visitor<? super I, Boolean> check,
-			ClassConclusion.Visitor<? super I, O> doTrue,
-			ClassConclusion.Visitor<? super I, O> doFalse) {
+			ClassConclusion.Visitor<Boolean> check,
+			ClassConclusion.Visitor<O> doTrue,
+			ClassConclusion.Visitor<O> doFalse) {
 		this.check_ = check;
 		this.doTrue_ = doTrue;
 		this.doFalse_ = doFalse;
 	}
 
 	@Override
-	public O visit(BackwardLink subConclusion, I input) {
-		return check_.visit(subConclusion, input) ? doTrue_.visit(
-				subConclusion, input) : doFalse_.visit(subConclusion, input);
+	public O visit(BackwardLink subConclusion) {
+		return check_.visit(subConclusion) ? doTrue_.visit(
+				subConclusion) : doFalse_.visit(subConclusion);
 	}
 
 	@Override
-	public O visit(SubClassInclusionComposed conclusion, I input) {
-		return check_.visit(conclusion, input) ? doTrue_.visit(conclusion,
-				input) : doFalse_.visit(conclusion, input);
+	public O visit(SubClassInclusionComposed conclusion) {
+		return check_.visit(conclusion)
+				? doTrue_.visit(conclusion)
+				: doFalse_.visit(conclusion);
 	}
 
 	@Override
-	public O visit(ContextInitialization conclusion, I input) {
-		return check_.visit(conclusion, input) ? doTrue_.visit(conclusion,
-				input) : doFalse_.visit(conclusion, input);
+	public O visit(ContextInitialization conclusion) {
+		return check_.visit(conclusion)
+				? doTrue_.visit(conclusion)
+				: doFalse_.visit(conclusion);
 	}
 
 	@Override
-	public O visit(Contradiction conclusion, I input) {
-		return check_.visit(conclusion, input) ? doTrue_.visit(conclusion,
-				input) : doFalse_.visit(conclusion, input);
+	public O visit(Contradiction conclusion) {
+		return check_.visit(conclusion)
+				? doTrue_.visit(conclusion)
+				: doFalse_.visit(conclusion);
 	}
 
 	@Override
-	public O visit(SubClassInclusionDecomposed conclusion, I input) {
-		return check_.visit(conclusion, input) ? doTrue_.visit(conclusion,
-				input) : doFalse_.visit(conclusion, input);
+	public O visit(SubClassInclusionDecomposed conclusion) {
+		return check_.visit(conclusion)
+				? doTrue_.visit(conclusion)
+				: doFalse_.visit(conclusion);
 	}
 
 	@Override
-	public O visit(DisjointSubsumer conclusion, I input) {
-		return check_.visit(conclusion, input) ? doTrue_.visit(conclusion,
-				input) : doFalse_.visit(conclusion, input);
+	public O visit(DisjointSubsumer conclusion) {
+		return check_.visit(conclusion)
+				? doTrue_.visit(conclusion)
+				: doFalse_.visit(conclusion);
 	}
 
 	@Override
-	public O visit(ForwardLink conclusion, I input) {
-		return check_.visit(conclusion, input) ? doTrue_.visit(conclusion,
-				input) : doFalse_.visit(conclusion, input);
+	public O visit(ForwardLink conclusion) {
+		return check_.visit(conclusion)
+				? doTrue_.visit(conclusion)
+				: doFalse_.visit(conclusion);
 	}
 
 	@Override
-	public O visit(Propagation subConclusion, I input) {
-		return check_.visit(subConclusion, input) ? doTrue_.visit(
-				subConclusion, input) : doFalse_.visit(subConclusion, input);
+	public O visit(Propagation subConclusion) {
+		return check_.visit(subConclusion)
+				? doTrue_.visit(subConclusion)
+				: doFalse_.visit(subConclusion);
 	}
 
 	@Override
-	public O visit(SubContextInitialization subConclusion, I input) {
-		return check_.visit(subConclusion, input) ? doTrue_.visit(
-				subConclusion, input) : doFalse_.visit(subConclusion, input);
+	public O visit(SubContextInitialization subConclusion) {
+		return check_.visit(subConclusion)
+				? doTrue_.visit(subConclusion)
+				: doFalse_.visit(subConclusion);
 	}
 
 }

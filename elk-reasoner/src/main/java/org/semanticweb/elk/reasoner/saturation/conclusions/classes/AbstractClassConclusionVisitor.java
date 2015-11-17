@@ -23,13 +23,13 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 
 /**
  * A skeleton for implementation of {@link ClassConclusion.Visitor}s using a common
@@ -37,49 +37,47 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassConclus
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <I>
- *            the type of input parameter with which this visitor works
  * @param <O>
  *            the type of output parameter with which this visitor works
  */
-public abstract class AbstractClassConclusionVisitor<I, O> extends
-		AbstractSubClassConclusionVisitor<I, O> implements ClassConclusion.Visitor<I, O> {
+public abstract class AbstractClassConclusionVisitor<O> extends
+		AbstractSubClassConclusionVisitor<O> implements ClassConclusion.Visitor<O> {
 
-	protected abstract O defaultVisit(ClassConclusion conclusion, I input);
+	protected abstract O defaultVisit(ClassConclusion conclusion);
 
 	@Override
-	O defaultVisit(SubClassConclusion subConclusion, I input) {
-		return defaultVisit((ClassConclusion) subConclusion, input);
+	O defaultVisit(SubClassConclusion subConclusion) {
+		return defaultVisit((ClassConclusion) subConclusion);
 	}
 
 	@Override
-	public O visit(SubClassInclusionComposed conclusion, I input) {
-		return defaultVisit(conclusion, input);
+	public O visit(SubClassInclusionComposed conclusion) {
+		return defaultVisit(conclusion);
 	}
 
 	@Override
-	public O visit(ContextInitialization conclusion, I input) {
-		return defaultVisit(conclusion, input);
+	public O visit(ContextInitialization conclusion) {
+		return defaultVisit(conclusion);
 	}
 
 	@Override
-	public O visit(Contradiction conclusion, I input) {
-		return defaultVisit(conclusion, input);
+	public O visit(Contradiction conclusion) {
+		return defaultVisit(conclusion);
 	}
 
 	@Override
-	public O visit(SubClassInclusionDecomposed conclusion, I input) {
-		return defaultVisit(conclusion, input);
+	public O visit(SubClassInclusionDecomposed conclusion) {
+		return defaultVisit(conclusion);
 	}
 
 	@Override
-	public O visit(DisjointSubsumer conclusion, I input) {
-		return defaultVisit(conclusion, input);
+	public O visit(DisjointSubsumer conclusion) {
+		return defaultVisit(conclusion);
 	}
 
 	@Override
-	public O visit(ForwardLink conclusion, I input) {
-		return defaultVisit(conclusion, input);
+	public O visit(ForwardLink conclusion) {
+		return defaultVisit(conclusion);
 	}
 
 }

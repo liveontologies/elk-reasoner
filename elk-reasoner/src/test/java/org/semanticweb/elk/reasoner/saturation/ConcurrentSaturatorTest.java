@@ -74,6 +74,9 @@ public class ConcurrentSaturatorTest extends TestCase {
 		ModifiableOntologyIndex index = new DirectIndex();
 		ComputationExecutor executor = new ComputationExecutor(16, "test", 0,
 				TimeUnit.NANOSECONDS);
+//		ComputationExecutor executor = new ComputationExecutor(16, "test");
+//		ComputationExecutor executor = new ComputationExecutor(16, "test", 1,
+//				TimeUnit.SECONDS);
 
 		final ElkAxiomProcessor inserter = new ChangeIndexingProcessor(
 				new ElkAxiomConverterImpl(index, 1),

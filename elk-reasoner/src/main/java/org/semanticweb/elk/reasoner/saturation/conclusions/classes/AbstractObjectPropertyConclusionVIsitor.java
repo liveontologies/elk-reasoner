@@ -33,15 +33,14 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
  *
  *         pavel.klinov@uni-ulm.de
  */
-public abstract class AbstractObjectPropertyConclusionVIsitor<I, O> implements
-		ObjectPropertyConclusion.Visitor<I, O> {
+public abstract class AbstractObjectPropertyConclusionVIsitor<O> implements
+		ObjectPropertyConclusion.Visitor<O> {
 
-	protected abstract O defaultVisit(ObjectPropertyConclusion conclusion,
-			I input);
+	protected abstract O defaultVisit(ObjectPropertyConclusion conclusion);
 
 	@Override
-	public O visit(SubPropertyChain conclusion, I input) {
-		return defaultVisit(conclusion, input);
+	public O visit(SubPropertyChain conclusion) {
+		return defaultVisit(conclusion);
 	}
 
 }

@@ -86,8 +86,8 @@ public abstract class AbstractSubClassInclusion<S extends IndexedClassExpression
 	}
 	
 	@Override
-	public <I, O> O accept(ClassConclusion.Visitor<I, O> visitor, I input) {
-		return accept((SubClassInclusion.Visitor<I, O>) visitor, input);
+	public <O> O accept(ClassConclusion.Visitor<O> visitor) {
+		return accept((SubClassInclusion.Visitor<O>) visitor);
 	}
 
 }

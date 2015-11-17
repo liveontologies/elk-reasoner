@@ -27,17 +27,17 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 import org.semanticweb.elk.util.hashing.Hasher;
 
 public class ObjectPropertyConclusionHash implements
-		ObjectPropertyConclusion.Visitor<Void, Integer>,
+		ObjectPropertyConclusion.Visitor<Integer>,
 		Hasher<ObjectPropertyConclusion> {
 
-	private static final ObjectPropertyConclusion.Visitor<Void, Integer> INSTANCE_ = new ObjectPropertyConclusionHash();
+	private static final ObjectPropertyConclusion.Visitor<Integer> INSTANCE_ = new ObjectPropertyConclusionHash();
 
 	private static int combinedHashCode(int... hashes) {
 		return HashGenerator.combineListHash(hashes);
 	}
 
 	public static int hashCode(ObjectPropertyConclusion conclusion) {
-		return conclusion == null ? 0 : conclusion.accept(INSTANCE_, null);
+		return conclusion == null ? 0 : conclusion.accept(INSTANCE_);
 	}
 
 	private static int hashCode(Class<?> c) {
@@ -54,7 +54,7 @@ public class ObjectPropertyConclusionHash implements
 	}
 
 	@Override
-	public Integer visit(SubPropertyChain conclusion, Void input) {
+	public Integer visit(SubPropertyChain conclusion) {
 		return combinedHashCode(hashCode(SubPropertyChain.class),
 				hashCode(conclusion.getSubChain()),
 				hashCode(conclusion.getSuperChain()));

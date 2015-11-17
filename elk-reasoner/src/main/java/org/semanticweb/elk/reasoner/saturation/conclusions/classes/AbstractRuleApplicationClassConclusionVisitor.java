@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
+import org.semanticweb.elk.Reference;
+
 /*
  * #%L
  * ELK Reasoner
@@ -32,8 +34,13 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRul
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SubsumerDecompositionVisitor;
 
 public abstract class AbstractRuleApplicationClassConclusionVisitor extends
-		AbstractClassConclusionVisitor<ContextPremises, Boolean> {
+		AbstractClassConclusionVisitor<Boolean> implements Reference<ContextPremises> {
 
+	/**
+	 * {@link ContextPremises} to which the rules are applied
+	 */
+	private final Reference<? extends ContextPremises> premisesRef_;
+	
 	/**
 	 * {@link RuleVisitor} to track rule applications
 	 */
@@ -45,26 +52,33 @@ public abstract class AbstractRuleApplicationClassConclusionVisitor extends
 	 */
 	final ClassConclusionProducer producer;
 
-	AbstractRuleApplicationClassConclusionVisitor(RuleVisitor<?> ruleAppVisitor,
+	AbstractRuleApplicationClassConclusionVisitor(
+			Reference<? extends ContextPremises> premisesRef,
+			RuleVisitor<?> ruleAppVisitor,
 			ClassConclusionProducer producer) {
+		this.premisesRef_ = premisesRef;
 		this.ruleAppVisitor = ruleAppVisitor;
 		this.producer = producer;
 	}
-
-	void applyCompositionRules(SubClassInclusion conclusion, ContextPremises premises) {
+	
+	@Override
+	public ContextPremises get() {
+		return premisesRef_.get();
+	}
+	
+	void applyCompositionRules(SubClassInclusion conclusion) {
 		IndexedClassExpression subsumer = conclusion.getSuperExpression();
 		LinkedSubsumerRule compositionRule = subsumer.getCompositionRuleHead();
 		while (compositionRule != null) {
-			compositionRule
-					.accept(ruleAppVisitor, subsumer, premises, producer);
+			compositionRule.accept(ruleAppVisitor, subsumer, get(), producer);
 			compositionRule = compositionRule.next();
 		}
 	}
 
-	void applyDecompositionRules(SubClassInclusion conclusion, ContextPremises premises) {
+	void applyDecompositionRules(SubClassInclusion conclusion) {
 		IndexedClassExpression subsumer = conclusion.getSuperExpression();
-		subsumer.accept(new SubsumerDecompositionVisitor(ruleAppVisitor,
-				premises, producer));
+		subsumer.accept(new SubsumerDecompositionVisitor(ruleAppVisitor, get(),
+				producer));
 	}
 
 }

@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
+import org.semanticweb.elk.ModifiableReference;
+
 /*
  * #%L
  * ELK Reasoner
@@ -60,11 +62,12 @@ public abstract class AbstractRuleEngineWithStatistics<I extends RuleApplication
 	protected final ContextStatistics localContextStatistics;
 
 	public AbstractRuleEngineWithStatistics(
-			ClassConclusion.Visitor<? super Context, ?> conclusionProcessor,
+			ModifiableReference<Context> activeContext,
+			ClassConclusion.Visitor<?> conclusionProcessor,
 			WorkerLocalTodo localTodo, Interrupter interrupter,
 			SaturationStatistics aggregatedStats,
 			SaturationStatistics localStatistics) {
-		super(conclusionProcessor, localTodo, interrupter);
+		super(activeContext, conclusionProcessor, localTodo, interrupter);
 		this.aggregatedStats_ = aggregatedStats;
 		this.localStatistics = localStatistics;
 		this.localContextStatistics = localStatistics.getContextStatistics();

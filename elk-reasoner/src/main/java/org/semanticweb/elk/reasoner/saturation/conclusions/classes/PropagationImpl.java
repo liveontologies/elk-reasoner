@@ -69,13 +69,13 @@ public class PropagationImpl extends AbstractSubClassConclusion
 	}	
 
 	@Override
-	public <I, O> O accept(SubClassConclusion.Visitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(SubClassConclusion.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 	@Override
-	public <I, O> O accept(Propagation.Visitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(Propagation.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 }

@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.model;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
 
 public class ObjectPropertyConclusionEquality implements
-		ObjectPropertyConclusion.Visitor<Void, ObjectPropertyConclusion> {
+		ObjectPropertyConclusion.Visitor<ObjectPropertyConclusion> {
 
 	private final Object object_;
 
@@ -35,7 +35,7 @@ public class ObjectPropertyConclusionEquality implements
 
 	public static boolean equals(ObjectPropertyConclusion first, Object second) {
 		return first == null ? second == null : first.accept(
-				new ObjectPropertyConclusionEquality(second), null) == second;
+				new ObjectPropertyConclusionEquality(second)) == second;
 	}
 
 	private static boolean equals(IndexedObject first, IndexedObject second) {
@@ -43,7 +43,7 @@ public class ObjectPropertyConclusionEquality implements
 	}
 
 	@Override
-	public SubPropertyChain visit(SubPropertyChain conclusion, Void input) {
+	public SubPropertyChain visit(SubPropertyChain conclusion) {
 		if (object_ == conclusion)
 			return conclusion;
 		if (object_ instanceof SubPropertyChain) {

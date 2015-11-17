@@ -55,8 +55,8 @@ public class ContradictionOfObjectComplementOf extends AbstractContradictionInfe
 	}
 
 	@Override
-	public <I, O> O accept(ClassConclusion.Visitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(ClassConclusion.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 	public SubClassInclusionComposed getFirstPremise(SubClassInclusionComposed.Factory factory) {

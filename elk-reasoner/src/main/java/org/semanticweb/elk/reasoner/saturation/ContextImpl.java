@@ -36,15 +36,15 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.classes.BackwardLinkI
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
@@ -69,10 +69,6 @@ import org.semanticweb.elk.util.concurrent.collections.SynchronizedArrayListActi
  * 
  */
 public class ContextImpl implements ExtendedContext {
-
-	private static final ClassConclusion.Visitor<ContextImpl, Boolean> CONCLUSION_INSERTER_ = new ConclusionInserter();
-	private static final ClassConclusion.Visitor<ContextImpl, Boolean> CONCLUSION_DELETER_ = new ConclusionDeleter();
-	private static final ClassConclusion.Visitor<ContextImpl, Boolean> CONCLUSION_OCCURRENCE_CHECKER_ = new ConclusionOccurrenceChecker();
 
 	/**
 	 * the rules that should be applied to each derived {@link BackwardLinkImpl}
@@ -163,7 +159,7 @@ public class ContextImpl implements ExtendedContext {
 
 	@Override
 	public boolean addConclusion(ClassConclusion conclusion) {
-		boolean success = conclusion.accept(CONCLUSION_INSERTER_, this);
+		boolean success = conclusion.accept(new ConclusionInserter());
 		if (success)
 			size++;
 		return success;
@@ -171,7 +167,7 @@ public class ContextImpl implements ExtendedContext {
 
 	@Override
 	public boolean removeConclusion(ClassConclusion conclusion) {
-		boolean success = conclusion.accept(CONCLUSION_DELETER_, this);
+		boolean success = conclusion.accept(new ConclusionDeleter());
 		if (success)
 			size--;
 		return success;
@@ -179,7 +175,7 @@ public class ContextImpl implements ExtendedContext {
 
 	@Override
 	public boolean containsConclusion(ClassConclusion conclusion) {
-		return conclusion.accept(CONCLUSION_OCCURRENCE_CHECKER_, this);
+		return conclusion.accept(new ConclusionOccurrenceChecker());
 	}
 
 	@Override
@@ -336,67 +332,68 @@ public class ContextImpl implements ExtendedContext {
 		return subContext.getPropagatedSubsumers();
 	}
 
-	private static class ConclusionInserter implements
-			ClassConclusion.Visitor<ContextImpl, Boolean> {
+	private class ConclusionInserter
+			implements
+				ClassConclusion.Visitor<Boolean> {
 
 		@Override
-		public Boolean visit(BackwardLink subConclusion, ContextImpl input) {
+		public Boolean visit(BackwardLink subConclusion) {
 			IndexedObjectProperty relation = subConclusion
 					.getBackwardRelation();
 			// make sure that relevant context always exists
-			SubContext subContext = input.getCreateSubContext(relation);
-			if (subConclusion.getOriginRoot() == input.root_) {
+			SubContext subContext = getCreateSubContext(relation);
+			if (subConclusion.getOriginRoot() == root_) {
 				// reflexive
-				if (input.reflexiveBackwardLinks_ == null) {
-					input.reflexiveBackwardLinks_ = new ArrayHashSet<IndexedObjectProperty>(
+				if (reflexiveBackwardLinks_ == null) {
+					reflexiveBackwardLinks_ = new ArrayHashSet<IndexedObjectProperty>(
 							3);
 				}
-				return input.reflexiveBackwardLinks_.add(relation);
+				return reflexiveBackwardLinks_.add(relation);
 			}
 			// else non-reflexive
 			return subContext.addSubConclusion(subConclusion);
 		}
 
 		@Override
-		public Boolean visit(SubClassInclusionComposed conclusion, ContextImpl input) {
-			return input.composedSubsumers_.add(conclusion.getSuperExpression());
+		public Boolean visit(SubClassInclusionComposed conclusion) {
+			return composedSubsumers_.add(conclusion.getSuperExpression());
 		}
 
 		@Override
-		public Boolean visit(SubClassInclusionDecomposed conclusion, ContextImpl input) {
-			return input.decomposedSubsumers_.add(conclusion.getSuperExpression());
+		public Boolean visit(SubClassInclusionDecomposed conclusion) {
+			return decomposedSubsumers_.add(conclusion.getSuperExpression());
 		}
 
 		@Override
-		public Boolean visit(ContextInitialization conclusion, ContextImpl input) {
-			if (input.isInitialized_)
+		public Boolean visit(ContextInitialization conclusion) {
+			if (isInitialized_)
 				// nothing changes
 				return false;
 			// else
-			input.isInitialized_ = true;
+			isInitialized_ = true;
 			return true;
 		}
 
 		@Override
-		public Boolean visit(Contradiction conclusion, ContextImpl input) {
-			boolean before = input.isInconsistent_;
-			input.isInconsistent_ = true;
-			ContradictionOverBackwardLinkRule.addTo(input);
-			return before != input.isInconsistent_;
+		public Boolean visit(Contradiction conclusion) {
+			boolean before = isInconsistent_;
+			isInconsistent_ = true;
+			ContradictionOverBackwardLinkRule.addTo(ContextImpl.this);
+			return before != isInconsistent_;
 		}
 
 		@Override
-		public Boolean visit(DisjointSubsumer conclusion, ContextImpl input) {
-			if (input.disjointnessAxioms_ == null) {
-				input.disjointnessAxioms_ = new ArrayHashMap<IndexedClassExpressionList, Set<Integer>>();
+		public Boolean visit(DisjointSubsumer conclusion) {
+			if (disjointnessAxioms_ == null) {
+				disjointnessAxioms_ = new ArrayHashMap<IndexedClassExpressionList, Set<Integer>>();
 			}
 			IndexedClassExpressionList disjoint = conclusion.getDisjointExpressions();
 			int position = conclusion.getPosition();
-			Set<Integer> positions = input.disjointnessAxioms_
+			Set<Integer> positions = disjointnessAxioms_
 					.get(disjoint);
 			if (positions == null) {
 				positions = new ArrayHashSet<Integer>(2);
-				input.disjointnessAxioms_.put(disjoint, positions);
+				disjointnessAxioms_.put(disjoint, positions);
 			}
 			if (positions.contains(position)) {
 				return false;
@@ -407,42 +404,42 @@ public class ContextImpl implements ExtendedContext {
 		}
 
 		@Override
-		public Boolean visit(ForwardLink conclusion, ContextImpl input) {
+		public Boolean visit(ForwardLink conclusion) {
 			return BackwardLinkChainFromBackwardLinkRule.addRuleFor(conclusion,
-					input);
+					ContextImpl.this);
 		}
 
 		@Override
-		public Boolean visit(Propagation subConclusion, ContextImpl input) {
-			return input.getCreateSubContext(subConclusion.getRelation())
+		public Boolean visit(Propagation subConclusion) {
+			return getCreateSubContext(subConclusion.getRelation())
 					.addSubConclusion(subConclusion);
 		}
 
 		@Override
-		public Boolean visit(SubContextInitialization subConclusion,
-				ContextImpl input) {
-			return input.getCreateSubContext(
+		public Boolean visit(SubContextInitialization subConclusion) {
+			return getCreateSubContext(
 					subConclusion.getConclusionSubRoot()).addSubConclusion(
 					subConclusion);
 		}
 
 	}
 
-	private static class ConclusionDeleter implements
-			ClassConclusion.Visitor<ContextImpl, Boolean> {
+	private class ConclusionDeleter
+			implements
+				ClassConclusion.Visitor<Boolean> {
 
 		@Override
-		public Boolean visit(BackwardLink subConclusion, ContextImpl input) {
+		public Boolean visit(BackwardLink subConclusion) {
 			boolean changed = false;
 			IndexedObjectProperty relation = subConclusion
 					.getBackwardRelation();
-			SubContext subContext = input.getCreateSubContext(relation);
-			if (subConclusion.getOriginRoot() == input.root_) {
+			SubContext subContext = getCreateSubContext(relation);
+			if (subConclusion.getOriginRoot() == root_) {
 				// link is reflexive
-				if (input.reflexiveBackwardLinks_ != null) {
-					changed = input.reflexiveBackwardLinks_.remove(relation);
-					if (input.reflexiveBackwardLinks_.isEmpty()) {
-						input.reflexiveBackwardLinks_ = null;
+				if (reflexiveBackwardLinks_ != null) {
+					changed = reflexiveBackwardLinks_.remove(relation);
+					if (reflexiveBackwardLinks_.isEmpty()) {
+						reflexiveBackwardLinks_ = null;
 					}
 				}
 			} else {
@@ -456,42 +453,42 @@ public class ContextImpl implements ExtendedContext {
 		}
 
 		@Override
-		public Boolean visit(SubClassInclusionComposed conclusion, ContextImpl input) {
-			return input.composedSubsumers_.remove(conclusion.getSuperExpression());
+		public Boolean visit(SubClassInclusionComposed conclusion) {
+			return composedSubsumers_.remove(conclusion.getSuperExpression());
 		}
 
 		@Override
-		public Boolean visit(SubClassInclusionDecomposed conclusion, ContextImpl input) {
-			return input.decomposedSubsumers_
+		public Boolean visit(SubClassInclusionDecomposed conclusion) {
+			return decomposedSubsumers_
 					.remove(conclusion.getSuperExpression());
 		}
 
 		@Override
-		public Boolean visit(ContextInitialization conclusion, ContextImpl input) {
-			if (!input.isInitialized_)
+		public Boolean visit(ContextInitialization conclusion) {
+			if (!isInitialized_)
 				// nothing changes
 				return false;
 			// else
-			input.isInitialized_ = false;
+			isInitialized_ = false;
 			return true;
 		}
 
 		@Override
-		public Boolean visit(Contradiction conclusion, ContextImpl input) {
-			boolean before = input.isInconsistent_;
-			input.isInconsistent_ = false;
-			ContradictionOverBackwardLinkRule.removeFrom(input);
-			return before != input.isInconsistent_;
+		public Boolean visit(Contradiction conclusion) {
+			boolean before = isInconsistent_;
+			isInconsistent_ = false;
+			ContradictionOverBackwardLinkRule.removeFrom(ContextImpl.this);
+			return before != isInconsistent_;
 		}
 
 		@Override
-		public Boolean visit(DisjointSubsumer conclusion, ContextImpl input) {
-			if (input.disjointnessAxioms_ == null) {
+		public Boolean visit(DisjointSubsumer conclusion) {
+			if (disjointnessAxioms_ == null) {
 				return false;
 			}
 			IndexedClassExpressionList disjoint = conclusion.getDisjointExpressions();
 			int position = conclusion.getPosition();
-			Set<Integer> positions = input.disjointnessAxioms_.get(disjoint);
+			Set<Integer> positions = disjointnessAxioms_.get(disjoint);
 			if (positions == null) {
 				return false;
 			}	
@@ -500,14 +497,14 @@ public class ContextImpl implements ExtendedContext {
 		}
 
 		@Override
-		public Boolean visit(ForwardLink conclusion, ContextImpl input) {
+		public Boolean visit(ForwardLink conclusion) {
 			return BackwardLinkChainFromBackwardLinkRule.removeRuleFor(
-					conclusion, input);
+					conclusion, ContextImpl.this);
 		}
 
 		@Override
-		public Boolean visit(Propagation subConclusion, ContextImpl input) {
-			SubContext subContext = input.getCreateSubContext(subConclusion
+		public Boolean visit(Propagation subConclusion) {
+			SubContext subContext = getCreateSubContext(subConclusion
 					.getRelation());
 			if (subContext == null)
 				return false;
@@ -516,9 +513,8 @@ public class ContextImpl implements ExtendedContext {
 		}
 
 		@Override
-		public Boolean visit(SubContextInitialization subConclusion,
-				ContextImpl input) {
-			SubContext subContext = input.getCreateSubContext(subConclusion
+		public Boolean visit(SubContextInitialization subConclusion) {
+			SubContext subContext = getCreateSubContext(subConclusion
 					.getConclusionSubRoot());
 			if (subContext == null)
 				return false;
@@ -528,54 +524,54 @@ public class ContextImpl implements ExtendedContext {
 
 	}
 
-	private static class ConclusionOccurrenceChecker implements
-			ClassConclusion.Visitor<ContextImpl, Boolean> {
+	private class ConclusionOccurrenceChecker implements
+			ClassConclusion.Visitor<Boolean> {
 
 		@Override
-		public Boolean visit(BackwardLink subConclusion, ContextImpl input) {
-			if (subConclusion.getOriginRoot() == input.root_) {
+		public Boolean visit(BackwardLink subConclusion) {
+			if (subConclusion.getOriginRoot() == root_) {
 				// reflexive
-				return input.reflexiveBackwardLinks_ != null
-						&& input.reflexiveBackwardLinks_.contains(subConclusion
+				return reflexiveBackwardLinks_ != null
+						&& reflexiveBackwardLinks_.contains(subConclusion
 								.getBackwardRelation());
 			}
 			// else non-reflexive
-			SubContext subContext = input.getCreateSubContext(subConclusion
+			SubContext subContext = getCreateSubContext(subConclusion
 					.getBackwardRelation());
 			return subContext != null
 					&& subContext.containsSubConclusion(subConclusion);
 		}
 
 		@Override
-		public Boolean visit(SubClassInclusionComposed conclusion, ContextImpl input) {
-			return input.composedSubsumers_
+		public Boolean visit(SubClassInclusionComposed conclusion) {
+			return composedSubsumers_
 					.contains(conclusion.getSuperExpression());
 		}
 
 		@Override
-		public Boolean visit(SubClassInclusionDecomposed conclusion, ContextImpl input) {
-			return input.decomposedSubsumers_.contains(conclusion
+		public Boolean visit(SubClassInclusionDecomposed conclusion) {
+			return decomposedSubsumers_.contains(conclusion
 					.getSuperExpression());
 		}
 
 		@Override
-		public Boolean visit(ContextInitialization conclusion, ContextImpl input) {
-			return input.isInitialized_;
+		public Boolean visit(ContextInitialization conclusion) {
+			return isInitialized_;
 		}
 
 		@Override
-		public Boolean visit(Contradiction conclusion, ContextImpl input) {
-			return input.isInconsistent_;
+		public Boolean visit(Contradiction conclusion) {
+			return isInconsistent_;
 		}
 
 		@Override
-		public Boolean visit(DisjointSubsumer conclusion, ContextImpl input) {
-			if (input.disjointnessAxioms_ == null) {
+		public Boolean visit(DisjointSubsumer conclusion) {
+			if (disjointnessAxioms_ == null) {
 				return false;
 			}
 			IndexedClassExpressionList disjoint = conclusion.getDisjointExpressions();
 			int position = conclusion.getPosition();
-			Set<Integer> positions = input.disjointnessAxioms_.get(disjoint);
+			Set<Integer> positions = disjointnessAxioms_.get(disjoint);
 			if (positions == null) {
 				return false;
 			}
@@ -584,14 +580,14 @@ public class ContextImpl implements ExtendedContext {
 		}
 
 		@Override
-		public Boolean visit(ForwardLink conclusion, ContextImpl input) {
+		public Boolean visit(ForwardLink conclusion) {
 			return BackwardLinkChainFromBackwardLinkRule.containsRuleFor(
-					conclusion, input);
+					conclusion, ContextImpl.this);
 		}
 
 		@Override
-		public Boolean visit(Propagation subConclusion, ContextImpl input) {
-			SubContext subContext = input.getCreateSubContext(subConclusion
+		public Boolean visit(Propagation subConclusion) {
+			SubContext subContext = getCreateSubContext(subConclusion
 					.getRelation());
 			if (subContext == null)
 				return false;
@@ -600,9 +596,8 @@ public class ContextImpl implements ExtendedContext {
 		}
 
 		@Override
-		public Boolean visit(SubContextInitialization subConclusion,
-				ContextImpl input) {
-			SubContext subContext = input.getCreateSubContext(subConclusion
+		public Boolean visit(SubContextInitialization subConclusion) {
+			SubContext subContext = getCreateSubContext(subConclusion
 					.getConclusionSubRoot());
 			if (subContext == null)
 				return false;

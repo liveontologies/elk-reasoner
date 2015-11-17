@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
+import org.semanticweb.elk.ModifiableReference;
+
 /*
  * #%L
  * ELK Reasoner
@@ -30,30 +32,38 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An engine to concurrently processing pending {@link ClassConclusion}s within the
- * corresponding {@link Context}s using a supplied {@link ClassConclusion.Visitor}.
- * The {@link ClassConclusion}s are retrieved by {@link Context#takeToDo()}.
+ * An engine to concurrently processing pending {@link ClassConclusion}s within
+ * the corresponding {@link Context}s using a supplied
+ * {@link ClassConclusion.Visitor}. The {@link ClassConclusion}s are retrieved
+ * by {@link Context#takeToDo()}.
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
 public abstract class AbstractRuleEngine<I extends RuleApplicationInput>
-		implements InputProcessor<I> {
+		implements
+			InputProcessor<I> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractRuleEngine.class);
 
 	/**
-	 * Specifies what to do with {@link ClassConclusion}s within the processed
-	 * {@link Context}
+	 * A reference to the current {@link Context} processed by the worker
 	 */
-	private final ClassConclusion.Visitor<? super Context, ?> conclusionProcessor_;
+	private final ModifiableReference<Context> activeContext_;
 
 	/**
-	 * Accumulates the produced {@link ClassConclusion}s that should be processed
-	 * within the same {@link Context} in which they were produced; this should
-	 * always be emptied before continuing to the next {@link Context}
+	 * Specifies how {@link ClassConclusion}s of the {@link Context} should be
+	 * processed
+	 */
+	private final ClassConclusion.Visitor<?> conclusionProcessor_;
+
+	/**
+	 * Accumulates the produced {@link ClassConclusion}s that should be
+	 * processed within the same {@link Context} in which they were produced;
+	 * this should always be emptied before continuing to the next
+	 * {@link Context}
 	 */
 	private final WorkerLocalTodo workerLocalTodo_;
 
@@ -63,8 +73,10 @@ public abstract class AbstractRuleEngine<I extends RuleApplicationInput>
 	private final Interrupter interrupter_;
 
 	public AbstractRuleEngine(
-			ClassConclusion.Visitor<? super Context, ?> conclusionProcessor,
+			ModifiableReference<Context> activeContext,
+			ClassConclusion.Visitor<?> conclusionProcessor,
 			WorkerLocalTodo localizedProducer, Interrupter interrupter) {
+		this.activeContext_ = activeContext;
 		this.conclusionProcessor_ = conclusionProcessor;
 		this.workerLocalTodo_ = localizedProducer;
 		this.interrupter_ = interrupter;
@@ -98,6 +110,7 @@ public abstract class AbstractRuleEngine<I extends RuleApplicationInput>
 	 *            {@link Conclusions}
 	 */
 	void process(Context context) {
+		activeContext_.set(context);
 		// at this point workerLocalTodo_ must be empty
 		workerLocalTodo_.setActiveRoot(context.getRoot());
 		for (;;) {
@@ -108,7 +121,7 @@ public abstract class AbstractRuleEngine<I extends RuleApplicationInput>
 					return;
 			}
 			LOGGER_.trace("{}: processing conclusion {}", context, conclusion);
-			conclusion.accept(conclusionProcessor_, context);
+			conclusion.accept(conclusionProcessor_);
 		}
 	}
 

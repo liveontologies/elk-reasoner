@@ -32,11 +32,11 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class BaseBooleanClassConclusionVisitor<C> extends
-		AbstractClassConclusionVisitor<C, Boolean> {
-
+public class BaseBooleanClassConclusionVisitor extends
+		AbstractClassConclusionVisitor<Boolean> {
+	
 	@Override
-	protected Boolean defaultVisit(ClassConclusion conclusion, C cxt) {
+	protected Boolean defaultVisit(ClassConclusion conclusion) {
 		return Boolean.FALSE;
 	}
 

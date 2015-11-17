@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
+import org.semanticweb.elk.Reference;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassConclusion;
@@ -31,45 +31,56 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link ClassConclusion.Visitor} that checks if the source {@link Context} of the
- * {@link ClassConclusion} is not saturated, and reports an error otherwise. Should
- * be used for debugging.
+ * A {@link ClassConclusion.Visitor} that checks if the {@link Context} for the
+ * origin root f the {@link ClassConclusion} is not saturated, and reports an
+ * error otherwise. Should be used for debugging.
+ * 
+ * @see ClassConclusion#getOriginRoot()
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ClassConclusionSourceContextNotSaturatedCheckingVisitor extends
-		AbstractClassConclusionVisitor<Context, Boolean> {
+public class ClassConclusionOriginContextNotSaturatedCheckingVisitor extends
+		AbstractClassConclusionVisitor<Boolean> implements Reference<Context> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ClassConclusionSourceContextNotSaturatedCheckingVisitor.class);
+			.getLogger(ClassConclusionOriginContextNotSaturatedCheckingVisitor.class);
 
+	private final Reference<Context> contextRef_;
+	
 	private final SaturationState<?> state_;
 
-	public ClassConclusionSourceContextNotSaturatedCheckingVisitor(
+	public ClassConclusionOriginContextNotSaturatedCheckingVisitor(
+			Reference<Context> context,
 			SaturationState<?> state) {
+		this.contextRef_ = context;
 		this.state_ = state;
 	}
 
 	@Override
-	Boolean defaultVisit(SubClassConclusion subConclusion, Context context) {
+	public Context get() {
+		return contextRef_.get();
+	}
+	
+	@Override
+	Boolean defaultVisit(SubClassConclusion subConclusion) {
 		// ignore sub-conclusions
 		return true;
 	}
 
 	@Override
-	protected Boolean defaultVisit(ClassConclusion conclusion, Context context) {
-		IndexedContextRoot sourceRoot = conclusion.getOriginRoot();
-		Context sourceContext = state_.getContext(sourceRoot);
-		if (sourceContext.isInitialized() && sourceContext.isSaturated()) {
+	protected Boolean defaultVisit(ClassConclusion conclusion) {
+		Context originContext = state_.getContext(conclusion.getOriginRoot());
+		if (originContext.isInitialized() && originContext.isSaturated()) {
 			LOGGER_.error(
 					"{}: adding conclusion {} to saturated context {}",
-					context,
+					contextRef_,
 					conclusion,
-					context.containsConclusion(conclusion) ? "(it is already there)"
+					get().containsConclusion(conclusion) ? "(it is already there)"
 							: "");
 		}
 		return true;
 	}
+
 }

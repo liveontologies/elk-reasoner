@@ -21,6 +21,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
+import org.semanticweb.elk.ModifiableReference;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
@@ -54,12 +55,13 @@ public class BasicRuleEngine<I extends RuleApplicationInput> extends
 	private final SaturationStateWriter<?> writer_;
 
 	protected BasicRuleEngine(OntologyIndex index,
-			ClassConclusion.Visitor<? super Context, Boolean> conclusionProcessor,
+			ModifiableReference<Context> activeContext,
+			ClassConclusion.Visitor<Boolean> conclusionProcessor,
 			WorkerLocalTodo localTodo, Interrupter interrupter,
 			SaturationStateWriter<?> writer,
 			SaturationStatistics aggregatedStatistics,
 			SaturationStatistics localStatistics) {
-		super(conclusionProcessor, localTodo, interrupter,
+		super(activeContext, conclusionProcessor, localTodo, interrupter,
 				aggregatedStatistics, localStatistics);
 		this.index_ = index;
 		this.factory_ = new ConclusionBaseFactory();

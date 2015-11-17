@@ -26,18 +26,14 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.AbstractClassConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.DummySaturationConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.ClassInferencePremiseVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.SaturationPremiseVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 class ProofUnwindingState<I extends ClassConclusion, J extends ProofUnwindingJob<I>> {
-
-	public final static ClassConclusion.Visitor<ProofUnwindingState<?, ?>, Void> CONCLUSION_INSERTION_VISITOR = new ConclusionInsertionVisitor();
-
-	public final static ClassInference.Visitor<ProofUnwindingState<?, ?>, Void> PREMISE_INSERTION_VISITOR = new ClassInferencePremiseVisitor<ProofUnwindingState<?, ?>, Void>(
-			CONCLUSION_INSERTION_VISITOR);
 
 	final J initiatorJob;
 
@@ -46,6 +42,15 @@ class ProofUnwindingState<I extends ClassConclusion, J extends ProofUnwindingJob
 	final Queue<ClassConclusion> todoConclusions;
 
 	final Queue<ClassInference> todoInferences;
+	
+	private final SaturationInference.Visitor<Void, Void> inferencePremiseInsertionVisitor = new SaturationPremiseVisitor<Void, Void>(
+			new DummySaturationConclusionVisitor<Void>() {
+				@Override
+				protected Void defaultVisit(ClassConclusion conclusion) {
+					todoConclusions.add(conclusion);
+					return null;
+				}
+			});		
 
 	ProofUnwindingState(J initiatorJob) {
 		this.initiatorJob = initiatorJob;
@@ -54,17 +59,9 @@ class ProofUnwindingState<I extends ClassConclusion, J extends ProofUnwindingJob
 		this.todoConclusions = new LinkedList<ClassConclusion>();
 		todoConclusions.add(initiatorJob.getInput());
 	}
-
-	private static class ConclusionInsertionVisitor extends
-			AbstractClassConclusionVisitor<ProofUnwindingState<?, ?>, Void> {
-
-		@Override
-		protected Void defaultVisit(ClassConclusion conclusion,
-				ProofUnwindingState<?, ?> input) {
-			input.todoConclusions.add(conclusion);
-			return null;
-		}
-
+		
+	void addInference(ClassInference inference) {
+		inference.accept(inferencePremiseInsertionVisitor, null);
 	}
-
+	
 }

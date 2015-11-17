@@ -22,6 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
+import org.semanticweb.elk.ModifiableReference;
+import org.semanticweb.elk.Reference;
+import org.semanticweb.elk.ReferenceImpl;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
@@ -66,6 +69,7 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 	}
 
 	/**
+	 * @param activeContext
 	 * @param conclusionProcessor
 	 * @param saturationStateWriter
 	 * @param localStatistics
@@ -76,14 +80,15 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 	 *         {@link SaturationStatistics} accordingly
 	 */
 	protected InputProcessor<I> getEngine(
-			ClassConclusion.Visitor<? super Context, Boolean> conclusionProcessor,
+			ModifiableReference<Context> activeContext,
+			ClassConclusion.Visitor<Boolean> conclusionProcessor,
 			SaturationStateWriter<? extends C> saturationStateWriter,
 			WorkerLocalTodo localTodo, SaturationStatistics localStatistics) {
 		conclusionProcessor = SaturationUtils.getTimedConclusionVisitor(
 				conclusionProcessor, localStatistics);
 		return new BasicRuleEngine<I>(saturationState_.getOntologyIndex(),
-				conclusionProcessor, localTodo, this, saturationStateWriter,
-				aggregatedStats_, localStatistics);
+				activeContext, conclusionProcessor, localTodo, this, 
+				saturationStateWriter, aggregatedStats_, localStatistics);
 	}
 
 	/**
@@ -123,13 +128,15 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 	 * An instance of {@link ClassConclusion.Visitor} that processes
 	 * {@link ClassConclusion}s within {@link Context} by an individual worker.
 	 * 
+	 * @param activeContext
 	 * @param ruleVisitor
 	 * @param writer
 	 * @param localStatistics
 	 * @return
 	 */
-	protected abstract ClassConclusion.Visitor<? super Context, Boolean> getConclusionProcessor(
-			RuleVisitor<?> ruleVisitor, SaturationStateWriter<? extends C> writer,
+	protected abstract ClassConclusion.Visitor<Boolean> getConclusionProcessor(
+			Reference<Context> activeContext, RuleVisitor<?> ruleVisitor,
+			SaturationStateWriter<? extends C> writer,
 			SaturationStatistics localStatistics);
 
 	@Override
@@ -153,8 +160,10 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 		writer = getFinalWriter(writer);
 		RuleVisitor<?> ruleVisitor = SaturationUtils
 				.getStatsAwareRuleVisitor(localStatistics.getRuleStatistics());
+		ModifiableReference<Context> activeContext = new ReferenceImpl<Context>();
 		return getEngine(
-				getConclusionProcessor(ruleVisitor, writer, localStatistics),
+				activeContext, getConclusionProcessor(activeContext,
+						ruleVisitor, writer, localStatistics),
 				writer, localTodo, localStatistics);
 	}
 

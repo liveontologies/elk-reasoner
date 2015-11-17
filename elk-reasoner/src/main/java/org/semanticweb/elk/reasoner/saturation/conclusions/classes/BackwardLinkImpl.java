@@ -65,18 +65,18 @@ public class BackwardLinkImpl extends AbstractSubClassConclusion implements
 	}
 
 	@Override
-	public <I, O> O accept(ClassConclusion.Visitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(ClassConclusion.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 	@Override
-	public <I, O> O accept(SubClassConclusion.Visitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(SubClassConclusion.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}	
 
 	@Override
-	public <I, O> O accept(BackwardLink.Visitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(BackwardLink.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 }

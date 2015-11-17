@@ -114,9 +114,9 @@ public class SaturationUtils {
 	 *         {@code false}. {@link ClassConclusion.Visitor}s that are {@code null}
 	 *         are ignored.
 	 */
-	public static <I> ClassConclusion.Visitor<? super I, Boolean> compose(
-			ClassConclusion.Visitor<? super I, Boolean>... visitors) {
-		return new ComposedClassConclusionVisitor<I>(removeNulls(visitors));
+	public static ClassConclusion.Visitor<Boolean> compose(
+			ClassConclusion.Visitor<Boolean>... visitors) {
+		return new ComposedClassConclusionVisitor(removeNulls(visitors));
 
 	}
 
@@ -138,46 +138,45 @@ public class SaturationUtils {
 		return Arrays.copyOf(input, pos);
 	}
 
-	public static ClassConclusion.Visitor<? super Context, Boolean> getCountingConclusionVisitor(
-			ClassConclusionCounter counter) {
+	public static ClassConclusion.Visitor<Boolean> getCountingConclusionVisitor(ClassConclusionCounter counter) {
 		if (!COLLECT_CONCLUSION_COUNTS)
 			return null;
 		// else
-		return new CountingClassConclusionVisitor<Context>(counter);
+		return new CountingClassConclusionVisitor(counter);
 	}
 
-	public static ClassConclusion.Visitor<? super Context, Boolean> getProcessedConclusionCountingVisitor(
+	public static ClassConclusion.Visitor<Boolean> getProcessedConclusionCountingVisitor(
 			SaturationStatistics statistics) {
-		return getCountingConclusionVisitor(statistics
-				.getConclusionStatistics().getProcessedConclusionCounts());
+		return getCountingConclusionVisitor(statistics.getConclusionStatistics()
+				.getProcessedConclusionCounts());
 	}
 
-	public static ClassConclusion.Visitor<? super Context, Boolean> getUsedConclusionCountingVisitor(
+	public static ClassConclusion.Visitor<Boolean> getUsedConclusionCountingVisitor(
 			SaturationStatistics statistics) {
 		statistics.getConclusionStatistics().startMeasurements();
 		return getCountingConclusionVisitor(statistics
 				.getConclusionStatistics().getUsedConclusionCounts());
 	}
 
-	public static ClassConclusion.Visitor<? super Context, Boolean> getUsedConclusionCountingProcessor(
-			ClassConclusion.Visitor<? super Context, Boolean> ruleProcessor,
+	public static ClassConclusion.Visitor<Boolean> getUsedConclusionCountingProcessor(
+			ClassConclusion.Visitor<Boolean> ruleProcessor,
 			SaturationStatistics localStatistics) {
 		if (COLLECT_CONCLUSION_COUNTS) {
-			return new PreprocessedConclusionVisitor<Context, Boolean>(
-					new CountingClassConclusionVisitor<Context>(localStatistics
+			return new PreprocessedConclusionVisitor<Boolean>(
+					new CountingClassConclusionVisitor(localStatistics
 							.getConclusionStatistics()
 							.getUsedConclusionCounts()), ruleProcessor);
 		}
 		return ruleProcessor;
 	}
 
-	public static <O> ClassConclusion.Visitor<? super Context, O> getTimedConclusionVisitor(
-			ClassConclusion.Visitor<? super Context, O> conclusionVisitor,
+	public static <O> ClassConclusion.Visitor<O> getTimedConclusionVisitor(
+			ClassConclusion.Visitor<O> conclusionVisitor,
 			SaturationStatistics localStatistics) {
 
 		ConclusionStatistics stats = localStatistics.getConclusionStatistics();
 		if (COLLECT_CONCLUSION_TIMES) {
-			return new TimedClassConclusionVisitor<Context, O>(
+			return new TimedClassConclusionVisitor<O>(
 					stats.getConclusionTimers(), conclusionVisitor);
 		}
 		return conclusionVisitor;

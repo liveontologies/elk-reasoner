@@ -22,11 +22,12 @@
  */
 package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
+import org.semanticweb.elk.Reference;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionSourceContextNotSaturatedCheckingVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionOriginContextNotSaturatedCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ContextInitializingClassConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.RuleApplicationClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
@@ -56,7 +57,8 @@ public class RuleApplicationAdditionFactory<I extends RuleApplicationInput>
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected ClassConclusion.Visitor<? super Context, Boolean> getConclusionProcessor(
+	protected ClassConclusion.Visitor<Boolean> getConclusionProcessor(
+			Reference<Context> activeContext,
 			RuleVisitor<?> ruleVisitor,
 			SaturationStateWriter<? extends Context> writer,
 			SaturationStatistics localStatistics) {
@@ -66,16 +68,16 @@ public class RuleApplicationAdditionFactory<I extends RuleApplicationInput>
 						SaturationUtils
 								.getProcessedConclusionCountingVisitor(localStatistics),
 						// insert conclusions initializing contexts if necessary
-						new ContextInitializingClassConclusionInsertionVisitor(writer),
+						new ContextInitializingClassConclusionInsertionVisitor(activeContext, writer),
 						// if new, check that the source of the conclusion is
 						// not saturated (this is only needed for debugging)
-						new ClassConclusionSourceContextNotSaturatedCheckingVisitor(
+						new ClassConclusionOriginContextNotSaturatedCheckingVisitor(activeContext,
 								getSaturationState()),
 						// count conclusions used in the rules, if necessary
 						SaturationUtils
 								.getUsedConclusionCountingVisitor(localStatistics),
 						// and apply all rules
-						new RuleApplicationClassConclusionVisitor(ruleVisitor,
+						new RuleApplicationClassConclusionVisitor(activeContext, ruleVisitor,
 								writer));
 	}
 }

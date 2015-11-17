@@ -26,7 +26,7 @@ import org.semanticweb.elk.owl.comparison.ElkObjectEquality;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
 
-public class ClassConclusionEquality implements ClassConclusion.Visitor<Void, ClassConclusion> {
+public class ClassConclusionEquality implements ClassConclusion.Visitor<ClassConclusion> {
 
 	private final Object object_;
 
@@ -36,7 +36,7 @@ public class ClassConclusionEquality implements ClassConclusion.Visitor<Void, Cl
 
 	public static boolean equals(ClassConclusion first, Object second) {
 		return first == null ? second == null : first.accept(
-				new ClassConclusionEquality(second), null) == second;
+				new ClassConclusionEquality(second)) == second;
 	}
 
 	private static boolean equals(IndexedObject first, IndexedObject second) {
@@ -52,7 +52,7 @@ public class ClassConclusionEquality implements ClassConclusion.Visitor<Void, Cl
 	}
 
 	@Override
-	public BackwardLink visit(BackwardLink subConclusion, Void input) {
+	public BackwardLink visit(BackwardLink subConclusion) {
 		if (object_ == subConclusion)
 			return subConclusion;
 		if (object_ instanceof BackwardLink) {
@@ -69,7 +69,7 @@ public class ClassConclusionEquality implements ClassConclusion.Visitor<Void, Cl
 	}
 
 	@Override
-	public Propagation visit(Propagation subConclusion, Void input) {
+	public Propagation visit(Propagation subConclusion) {
 		if (object_ == subConclusion)
 			return subConclusion;
 		if (object_ instanceof Propagation) {
@@ -86,7 +86,7 @@ public class ClassConclusionEquality implements ClassConclusion.Visitor<Void, Cl
 
 	@Override
 	public SubContextInitialization visit(
-			SubContextInitialization subConclusion, Void input) {
+			SubContextInitialization subConclusion) {
 		if (object_ == subConclusion)
 			return subConclusion;
 		if (object_ instanceof SubContextInitialization) {
@@ -101,7 +101,7 @@ public class ClassConclusionEquality implements ClassConclusion.Visitor<Void, Cl
 	}
 
 	@Override
-	public SubClassInclusionComposed visit(SubClassInclusionComposed conclusion, Void input) {
+	public SubClassInclusionComposed visit(SubClassInclusionComposed conclusion) {
 		if (object_ == conclusion)
 			return conclusion;
 		if (object_ instanceof SubClassInclusionComposed) {
@@ -116,8 +116,7 @@ public class ClassConclusionEquality implements ClassConclusion.Visitor<Void, Cl
 	}
 
 	@Override
-	public ContextInitialization visit(ContextInitialization conclusion,
-			Void input) {
+	public ContextInitialization visit(ContextInitialization conclusion) {
 		if (object_ == conclusion)
 			return conclusion;
 		if (object_ instanceof ContextInitialization) {
@@ -130,7 +129,7 @@ public class ClassConclusionEquality implements ClassConclusion.Visitor<Void, Cl
 	}
 
 	@Override
-	public Contradiction visit(Contradiction conclusion, Void input) {
+	public Contradiction visit(Contradiction conclusion) {
 		if (object_ == conclusion)
 			return conclusion;
 		if (object_ instanceof Contradiction) {
@@ -143,7 +142,7 @@ public class ClassConclusionEquality implements ClassConclusion.Visitor<Void, Cl
 	}
 
 	@Override
-	public SubClassInclusionDecomposed visit(SubClassInclusionDecomposed conclusion, Void input) {
+	public SubClassInclusionDecomposed visit(SubClassInclusionDecomposed conclusion) {
 		if (object_ == conclusion)
 			return conclusion;
 		if (object_ instanceof SubClassInclusionDecomposed) {
@@ -158,7 +157,7 @@ public class ClassConclusionEquality implements ClassConclusion.Visitor<Void, Cl
 	}
 
 	@Override
-	public DisjointSubsumer visit(DisjointSubsumer conclusion, Void input) {
+	public DisjointSubsumer visit(DisjointSubsumer conclusion) {
 		if (object_ == conclusion)
 			return conclusion;
 		if (object_ instanceof DisjointSubsumer) {
@@ -174,7 +173,7 @@ public class ClassConclusionEquality implements ClassConclusion.Visitor<Void, Cl
 	}
 
 	@Override
-	public ForwardLink visit(ForwardLink conclusion, Void input) {
+	public ForwardLink visit(ForwardLink conclusion) {
 		if (object_ == conclusion)
 			return conclusion;
 		if (object_ instanceof ForwardLink) {

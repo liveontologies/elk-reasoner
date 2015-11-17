@@ -40,18 +40,18 @@ import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 public class CountingSaturationStateWriter<C extends Context> extends
 		SaturationStateWriterWrap<C> {
 
-	private final ClassConclusion.Visitor<Void, ?> countingVisitor_;
+	private final ClassConclusion.Visitor<Boolean> countingVisitor_;
 
 	public CountingSaturationStateWriter(SaturationStateWriter<C> writer,
 			ClassConclusionCounter counter) {
 		super(writer);
-		this.countingVisitor_ = new CountingClassConclusionVisitor<Void>(counter);
+		this.countingVisitor_ = new CountingClassConclusionVisitor(counter);
 	}
 
 	@Override
 	public void produce(ClassConclusion conclusion) {
 		mainWriter.produce(conclusion);
-		conclusion.accept(countingVisitor_, null);
+		conclusion.accept(countingVisitor_);
 	}
 
 }

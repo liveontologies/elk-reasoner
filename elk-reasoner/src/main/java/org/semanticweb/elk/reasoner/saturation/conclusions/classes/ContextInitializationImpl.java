@@ -52,14 +52,13 @@ public class ContextInitializationImpl extends AbstractClassConclusion implement
 	}
 	
 	@Override
-	public <I, O> O accept(ClassConclusion.Visitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(ClassConclusion.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 	@Override
-	public <I, O> O accept(ContextInitialization.Visitor<I, O> visitor,
-			I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(ContextInitialization.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 }
