@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ConclusionBaseFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
@@ -130,7 +130,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	/**
 	 * A factory for creating contradiction conclusions; used for checking unsatisfiable contexts
 	 */
-	private final Contradiction.Factory factory_ = new ConclusionBaseFactory();
+	private final Contradiction.Factory factory_ = new SaturationConclusionBaseFactory();
 
 	/**
 	 * Creating a new transitive reduction engine for the input ontology index

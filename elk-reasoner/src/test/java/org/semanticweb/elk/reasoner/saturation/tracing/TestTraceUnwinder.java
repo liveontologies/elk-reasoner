@@ -25,8 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 
 /**
  * Recursively visits all conclusions which were used to produce a given
@@ -53,12 +52,7 @@ public class TestTraceUnwinder extends RecursiveTraceUnwinder {
 	}
 
 	@Override
-	protected void handleUntraced(ClassConclusion untraced) {
-		listener_.notifyUntraced(untraced);
-	}
-
-	@Override
-	protected void handleUntraced(ObjectPropertyConclusion untraced) {
+	protected void handleUntraced(SaturationConclusion untraced) {
 		listener_.notifyUntraced(untraced);
 	}
 

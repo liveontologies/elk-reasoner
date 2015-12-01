@@ -29,13 +29,10 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.DummySaturationConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
-import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.SaturationPremiseVisitor;
-import org.semanticweb.elk.reasoner.saturation.properties.inferences.AbstractObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
+import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInferencePremiseVisitor;
 
 /**
  * Recursively visits inferences which were used to produce a given conclusion.
@@ -51,74 +48,14 @@ public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 
 	private final InferenceSet inferenceSet_;
 
-	ObjectPropertyInferenceSet objectPropertyInferences_;
-
-	private final LinkedList<InferenceWrapper> classInferencesToDo_ = new LinkedList<InferenceWrapper>();
-
-	private final LinkedList<ObjectPropertyInference> propertyInferencesToDo_ = new LinkedList<ObjectPropertyInference>();
+	private final LinkedList<SaturationInference> innferencesToDo_ = new LinkedList<SaturationInference>();
 
 	public RecursiveTraceUnwinder(InferenceSet inferenceSet) {
 		this.inferenceSet_ = inferenceSet;
 	}
 
-	// visit only class inferences
-	public void accept(
-			final ClassConclusion conclusion,
-			final ClassInference.Visitor<Boolean> inferenceVisitor) {
-		accept(conclusion, inferenceVisitor,
-				new AbstractObjectPropertyInferenceVisitor<Boolean>() {
-
-					@Override
-					protected Boolean defaultTracedVisit(
-							ObjectPropertyInference inference) {
-						return true;
-					}
-
-				});
-	}
-
-	// unwind only property conclusions
-	@Override
-	public void accept(ObjectPropertyConclusion conclusion,
-			final ObjectPropertyInference.Visitor<Boolean> inferenceVisitor) {
-		final Set<ObjectPropertyInference> seenInferences = new HashSet<ObjectPropertyInference>();
-
-		addToQueue(conclusion, seenInferences);
-		// set it off
-		unwindPropertyConclusions(inferenceVisitor);
-	}
-
-	private void unwindPropertyConclusions(
-			final ObjectPropertyInference.Visitor<Boolean> inferenceVisitor) {
-		final Set<ObjectPropertyInference> seenInferences = new HashSet<ObjectPropertyInference>();
-
-		// this visitor visits all premises and putting them into the todo queue
-		SaturationPremiseVisitor<?> unwinder = new SaturationPremiseVisitor<Void>(
-				new DummySaturationConclusionVisitor<Void>() {
-					@Override
-					protected Void defaultVisit(
-							ObjectPropertyConclusion premise) {
-						addToQueue(premise, seenInferences);
-						return null;
-					}
-				});
-
-		for (;;) {
-			final ObjectPropertyInference next = propertyInferencesToDo_.poll();
-
-			if (next == null) {
-				break;
-			}
-
-			if (next.accept(inferenceVisitor)) {
-				// unwind premises unless we're told to stop the recursion
-				next.accept(unwinder);
-			}
-		}
-	}
-
 	/**
-	 * Unwinds both class and property conclusions
+	 * Unwinds saturation conclusions
 	 * 
 	 * @param conclusion
 	 * @param classConclusionVisitor
@@ -127,66 +64,52 @@ public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 	 *            Visitor over all
 	 */
 	@Override
-	public void accept(
-			final ClassConclusion conclusion,
-			final ClassInference.Visitor<Boolean> inferenceVisitor,
-			final ObjectPropertyInference.Visitor<Boolean> propertyInferenceVisitor) {
-		final Set<ClassInference> seenInferences = new HashSet<ClassInference>();
-		final Set<ObjectPropertyInference> seenPropertyInferences = new HashSet<ObjectPropertyInference>();
+	public void accept(final SaturationConclusion conclusion,
+			final SaturationInference.Visitor<Boolean> inferenceVisitor) {
+		final Set<SaturationInference> seenInferences = new HashSet<SaturationInference>();
 		// should be empty anyways
-		classInferencesToDo_.clear();
+		innferencesToDo_.clear();
 		addToQueue(conclusion, seenInferences);
 		// this visitor visits all premises and putting them into the todo queue
-		SaturationPremiseVisitor<?> premiseVisitor = new SaturationPremiseVisitor<Void>(
-				new DummySaturationConclusionVisitor<Void>() {
+		SaturationInferencePremiseVisitor<?> premiseVisitor = new SaturationInferencePremiseVisitor<Void>(
+				new SaturationConclusionBaseFactory() {
 					@Override
-					protected Void defaultVisit(ClassConclusion premise) {
-						// the context passed into this method is the context
-						// where the
-						// inference has been made
-						addToQueue(premise, seenInferences);
-						return null;
+					protected <C extends SaturationConclusion> C filter(
+							C newConclusion) {
+						addToQueue(newConclusion, seenInferences);
+						return newConclusion;
 					}
-			
-					@Override
-					protected Void defaultVisit(
-							ObjectPropertyConclusion premise) {
-						addToQueue(premise, seenPropertyInferences);
 
-						return null;
-					}
 				});
 
 		for (;;) {
 			// take the first element
-			final InferenceWrapper next = classInferencesToDo_.poll();
+			final SaturationInference next = innferencesToDo_.poll();
 
 			if (next == null) {
 				break;
 			}
 			// user visitor
-			if (next.inference.accept(inferenceVisitor)) {
+			if (next.accept(inferenceVisitor)) {
 				// visiting premises
-				next.inference.accept(premiseVisitor);
+				next.accept(premiseVisitor);
 			}
 		}
 
-		// finally, unwind all property traces
-		unwindPropertyConclusions(propertyInferenceVisitor);
 	}
 
-	private void addToQueue(final ClassConclusion conclusion,
-			final Set<ClassInference> seenInferences) {
+	private void addToQueue(final SaturationConclusion conclusion,
+			final Set<SaturationInference> seenInferences) {
 
 		boolean derived = false;
 		// finding all inferences that produced the given conclusion (if we are
 		// here, the inference must have premises, i.e. it's not an
 		// initialization inference)
-		for (ClassInference inference : inferenceSet_
-				.getClassInferences(conclusion)) {
+		for (SaturationInference inference : inferenceSet_
+				.getInferences(conclusion)) {
 			if (!seenInferences.contains(inference)) {
 				seenInferences.add(inference);
-				classInferencesToDo_.addFirst(new InferenceWrapper(inference));
+				innferencesToDo_.addFirst(inference);
 			}
 			derived = true;
 		}
@@ -196,52 +119,9 @@ public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 		}
 	}
 
-	private void addToQueue(final ObjectPropertyConclusion conclusion,
-			final Set<ObjectPropertyInference> seenInferences) {
-
-		boolean derived = false;
-		// finding all inferences that produced the given conclusion (if we are
-		// here, the inference must have premises, i.e. it's not an
-		// initialization inference)
-		for (ObjectPropertyInference inference : inferenceSet_
-				.getObjectPropertyInferences(conclusion)) {
-			if (!seenInferences.contains(inference)) {
-				seenInferences.add(inference);
-				propertyInferencesToDo_.add(inference);
-			}
-			derived = true;
-		}
-
-		if (!derived) {
-			handleUntraced(conclusion);
-		}
-	}
-
-	protected void handleUntraced(ClassConclusion untraced) {
+	protected void handleUntraced(
+			@SuppressWarnings("unused") SaturationConclusion untraced) {
 		// no-op
-	}
-
-	protected void handleUntraced(ObjectPropertyConclusion untraced) {
-		// no-op
-	}
-
-	/*
-	 * Used to propagate context which normally isn't stored inside each traced
-	 * conclusion
-	 */
-	private static class InferenceWrapper {
-
-		final ClassInference inference;
-
-		InferenceWrapper(ClassInference inf) {
-			inference = inf;
-		}
-
-		@Override
-		public String toString() {
-			return inference + " stored in " + inference.getConclusionRoot();
-		}
-
 	}
 
 }

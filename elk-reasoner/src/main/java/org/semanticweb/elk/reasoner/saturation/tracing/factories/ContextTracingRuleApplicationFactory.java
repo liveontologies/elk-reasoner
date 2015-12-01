@@ -40,7 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.AbstractClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionOccurrenceCheckingVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ConclusionBaseFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.LocalRuleApplicationClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.RelativizedContextReference;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
@@ -86,7 +86,7 @@ public class ContextTracingRuleApplicationFactory extends
 				new MainContextFactory()));
 		mainSaturationState_ = mainSaturationState;
 		inferenceProducer_ = inferenceProducer;
-		factory_ = new ConclusionBaseFactory();
+		factory_ = new SaturationConclusionBaseFactory();
 	}
 
 	@Override

@@ -48,7 +48,7 @@ import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ConclusionBaseFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
@@ -98,7 +98,7 @@ public class IncrementalAdditionInitializationStage extends AbstractIncrementalC
 		// used to initialize new contexts
 		OntologyIndex index = reasoner.saturationState.getOntologyIndex();
 		
-		ContextInitialization.Factory factory = new ConclusionBaseFactory();
+		ContextInitialization.Factory factory = new SaturationConclusionBaseFactory();
 
 		for (ElkEntity newEntity : Operations.concat(reasoner.ontologyIndex.getAddedClasses(),
 				reasoner.ontologyIndex.getAddedIndividuals())) {

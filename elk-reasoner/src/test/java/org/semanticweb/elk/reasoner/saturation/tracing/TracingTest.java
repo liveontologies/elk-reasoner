@@ -47,14 +47,11 @@ import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.saturation.inferences.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkComposition;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversedExpanded;
-import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSubClassOf;
-import org.semanticweb.elk.reasoner.saturation.properties.inferences.AbstractObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainExpandedSubObjectPropertyOf;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.testing.ConfigurationUtils;
@@ -136,13 +133,8 @@ public class TracingTest {
 	}	
 	
 	// FIXME: this test is not necessary as side conditions are not null by construction
-	private ClassInference.Visitor<Boolean> getClassInferenceCheckerForAxiomBinding() {
-		return new AbstractClassInferenceVisitor<Boolean>() {
-
-			@Override
-			protected Boolean defaultTracedVisit(ClassInference inference) {
-				return true;
-			}
+	private SaturationInference.Visitor<Boolean> getInferenceCheckerForAxiomBinding() {
+		return new TracingTestUtils.DummySaturationInferenceChecker() {
 			
 			// axioms used as side conditions of this rule, should be able to look them up
 			@Override
@@ -177,18 +169,6 @@ public class TracingTest {
 				return true;
 			}
 			
-		};
-	}
-	
-	private ObjectPropertyInference.Visitor<Boolean> getPropertyInferenceCheckerForAxiomBinding() {
-		return new AbstractObjectPropertyInferenceVisitor<Boolean>() {
-
-			@Override
-			protected Boolean defaultTracedVisit(
-					ObjectPropertyInference inference) {
-				return true;
-			}
-
 			@Override
 			public Boolean visit(
 					SubPropertyChainExpandedSubObjectPropertyOf inference) {
@@ -197,10 +177,10 @@ public class TracingTest {
 				assertNotNull("Failed to look up the axiom for the property subsumption inference " + inference, axiom);
 				return true;
 			}
-
+			
 		};
 	}
-
+	
 	private TracingTestVisitor getAxiomBindingTestVisitor(final Reasoner reasoner) {
 		return new TracingTestVisitor() {
 			
@@ -215,8 +195,7 @@ public class TracingTest {
 							subsumee, 
 							subsumer, 
 							reasoner, 
-							getClassInferenceCheckerForAxiomBinding(), 
-							getPropertyInferenceCheckerForAxiomBinding());
+							getInferenceCheckerForAxiomBinding());
 				} catch (ElkException e) {
 					throw new RuntimeException(e);
 				}
@@ -231,8 +210,7 @@ public class TracingTest {
 					
 					TracingTestUtils.visitInferencesForInconsistency(
 							reasoner, 
-							getClassInferenceCheckerForAxiomBinding(), 
-							getPropertyInferenceCheckerForAxiomBinding());
+							getInferenceCheckerForAxiomBinding());
 				} catch (ElkException e) {
 					throw new RuntimeException(e);
 				}

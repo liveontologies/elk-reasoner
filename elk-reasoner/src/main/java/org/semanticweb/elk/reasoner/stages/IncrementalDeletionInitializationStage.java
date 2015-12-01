@@ -38,7 +38,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.NoOpIndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ConclusionBaseFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
@@ -117,7 +117,7 @@ public class IncrementalDeletionInitializationStage extends AbstractIncrementalC
 
 		OntologyIndex index = reasoner.saturationState.getOntologyIndex();
 		
-		ContextInitialization.Factory factory = new ConclusionBaseFactory();
+		ContextInitialization.Factory factory = new SaturationConclusionBaseFactory();
 
 		for (IndexedClassExpression ice : reasoner.ontologyIndex.getRemovedClassExpressions()) {
 

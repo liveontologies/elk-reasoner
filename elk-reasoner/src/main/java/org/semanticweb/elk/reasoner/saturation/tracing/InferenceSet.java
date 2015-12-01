@@ -22,23 +22,19 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
-import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
+import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
 
 /**
  * 
- * An object containing {@link ClassInference}s and
- * {@link ObjectPropertyInference}s, which can be used to retrieve inferences
- * producing a given {@link ClassConclusion} and {@link ObjectPropertyConclusion}
- * respectively.
+ * An object which can be used to retrieve {@link SaturationInference}s
+ * producing a given {@link SaturationConclusion}.
  * 
  * @author "Yevgeny Kazakov"
- *
  */
-public interface InferenceSet extends ClassInferenceSet,
-		ObjectPropertyInferenceSet {
-	// a simple combination of two interfaces
+public interface InferenceSet {
+
+	public Iterable<? extends SaturationInference> getInferences(
+			SaturationConclusion conclusion);
 
 }

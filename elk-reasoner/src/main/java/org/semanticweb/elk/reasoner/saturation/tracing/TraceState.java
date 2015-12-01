@@ -32,9 +32,12 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.DummySaturationConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 
 /**
@@ -47,8 +50,11 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPrope
  * 
  * @author "Yevgeny Kazakov"
  */
-public class TraceState implements InferenceSet,
-		ModifiableClassInferenceTracingState, ObjectPropertyInferenceProducer {
+public class TraceState
+		implements
+			InferenceSet,
+			ModifiableClassInferenceTracingState,
+			ObjectPropertyInferenceProducer {
 
 	private final Queue<ClassConclusion> toTrace_ = new LinkedList<ClassConclusion>();
 
@@ -102,26 +108,37 @@ public class TraceState implements InferenceSet,
 	}
 
 	@Override
-	public Iterable<? extends ClassInference> getClassInferences(
-			ClassConclusion conclusion) {
-		IndexedContextRoot originRoot = conclusion.getOriginRoot();
-		ClassInferenceSet inferences = classInferenceMap_.get(originRoot);
-		if (inferences == null)
-			return Collections.emptyList();
-		// else
-		return inferences.getClassInferences(conclusion);
-	}
-
-	@Override
 	public void produce(ObjectPropertyInference inference) {
 		objectPropertyInferenceSet_.add(inference);
 	}
 
 	@Override
-	public Iterable<? extends ObjectPropertyInference> getObjectPropertyInferences(
-			ObjectPropertyConclusion conclusion) {
-		return objectPropertyInferenceSet_
-				.getObjectPropertyInferences(conclusion);
+	public Iterable<? extends SaturationInference> getInferences(
+			SaturationConclusion conclusion) {
+		return conclusion.accept(
+				new DummySaturationConclusionVisitor<Iterable<? extends SaturationInference>>() {
+
+					@Override
+					protected Iterable<? extends SaturationInference> defaultVisit(
+							ClassConclusion cncl) {
+						IndexedContextRoot originRoot = cncl.getOriginRoot();
+						ClassInferenceSet inferences = classInferenceMap_
+								.get(originRoot);
+						if (inferences == null)
+							return Collections.emptyList();
+						// else
+						return inferences.getClassInferences(cncl);
+					}
+
+					@Override
+					protected Iterable<? extends SaturationInference> defaultVisit(
+							ObjectPropertyConclusion cncl) {
+						return objectPropertyInferenceSet_
+								.getObjectPropertyInferences(cncl);
+					}
+
+				});
+
 	}
 
 }

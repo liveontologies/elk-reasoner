@@ -31,82 +31,91 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFr
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 
-public class ConclusionBaseFactory implements SaturationConclusion.Factory {
+public class SaturationConclusionBaseFactory
+		implements
+			SaturationConclusion.Factory {
+
+	@SuppressWarnings("static-method")
+	protected <C extends SaturationConclusion> C filter(C newConclusion) {
+		// could be overridden in sub-classes
+		return newConclusion;
+	}
 
 	@Override
 	public ContextInitialization getContextInitialization(
 			IndexedContextRoot root, OntologyIndex ontologyIndex) {
-		return new ContextInitializationImpl(root, ontologyIndex);
+		return filter(new ContextInitializationImpl(root, ontologyIndex));
 	}
 
 	@Override
 	public Contradiction getContradiction(IndexedContextRoot root) {
-		return new ContradictionImpl(root);
+		return filter(new ContradictionImpl(root));
 	}
 
 	@Override
 	public DisjointSubsumer getDisjointSubsumer(IndexedContextRoot root,
 			IndexedClassExpressionList disjointExpressions, int position,
 			ElkAxiom reason) {
-		return new DisjointSubsumerImpl(root, disjointExpressions, position,
-				reason);
+		return filter(new DisjointSubsumerImpl(root, disjointExpressions,
+				position, reason));
 	}
 
 	@Override
 	public ForwardLink getForwardLink(IndexedContextRoot root,
 			IndexedPropertyChain forwardChain, IndexedContextRoot target) {
-		return new ForwardLinkImpl<IndexedPropertyChain>(root, forwardChain,
-				target);
+		return filter(new ForwardLinkImpl<IndexedPropertyChain>(root,
+				forwardChain, target));
 	}
 
 	@Override
 	public BackwardLink getBackwardLink(IndexedContextRoot root,
 			IndexedObjectProperty relation, IndexedContextRoot source) {
-		return new BackwardLinkImpl(root, relation, source);
+		return filter(new BackwardLinkImpl(root, relation, source));
 	}
 
 	@Override
 	public Propagation getPropagation(IndexedContextRoot root,
 			IndexedObjectProperty relation, IndexedObjectSomeValuesFrom carry) {
-		return new PropagationImpl(root, relation, carry);
+		return filter(new PropagationImpl(root, relation, carry));
 	}
 
 	@Override
 	public SubContextInitialization getSubContextInitialization(
 			IndexedContextRoot root, IndexedObjectProperty subRoot) {
-		return new SubContextInitializationImpl(root, subRoot);
+		return filter(new SubContextInitializationImpl(root, subRoot));
 	}
 
 	@Override
 	public SubClassInclusionComposed getComposedSubClassInclusion(
 			IndexedContextRoot subExpression,
 			IndexedClassExpression superExpression) {
-		return new SubClassInclusionComposedImpl<IndexedClassExpression>(subExpression,
-				superExpression);
+		return filter(new SubClassInclusionComposedImpl<IndexedClassExpression>(
+				subExpression, superExpression));
 	}
 
 	@Override
 	public SubClassInclusionDecomposed getDecomposedSubClassInclusion(
 			IndexedContextRoot subExpression,
 			IndexedClassExpression superExpression) {
-		return new SubClassInclusionDecomposedImpl(subExpression, superExpression);
+		return filter(new SubClassInclusionDecomposedImpl(subExpression,
+				superExpression));
 	}
 
 	@Override
 	public SubPropertyChain getSubPropertyChain(IndexedPropertyChain subChain,
 			IndexedPropertyChain superChain) {
-		return new SubPropertyChainImpl(subChain, superChain);
+		return filter(new SubPropertyChainImpl(subChain, superChain));
 	}
 
 }

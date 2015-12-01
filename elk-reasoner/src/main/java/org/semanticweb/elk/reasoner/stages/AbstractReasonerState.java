@@ -55,11 +55,11 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ConclusionBaseFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.tracing.ClassInferenceSet;
+import org.semanticweb.elk.reasoner.saturation.tracing.InferenceSet;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentInstanceTaxonomy;
@@ -160,7 +160,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	/**
 	 * creates conclusions for tracing
 	 */
-	private final SaturationConclusion.Factory factory_ = new ConclusionBaseFactory();
+	private final SaturationConclusion.Factory factory_ = new SaturationConclusionBaseFactory();
 
 	private final ElkPolarityExpressionConverter expressionConverter_;
 
@@ -576,7 +576,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		traceState.addToTrace(conclusion);
 	}
 
-	public ClassInferenceSet explainSubsumption(ElkClassExpression sub,
+	public InferenceSet explainSubsumption(ElkClassExpression sub,
 			ElkClassExpression sup) throws ElkException {
 		if (traceState == null) {
 			resetTraceState();

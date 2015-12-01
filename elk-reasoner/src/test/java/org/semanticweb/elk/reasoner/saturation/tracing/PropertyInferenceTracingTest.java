@@ -9,7 +9,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,15 +43,11 @@ import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ConclusionBaseFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.inferences.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkComposition;
-import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkComposition;
-import org.semanticweb.elk.reasoner.saturation.properties.inferences.AbstractObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainExpandedSubObjectPropertyOf;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 import org.slf4j.Logger;
@@ -66,7 +62,7 @@ public class PropertyInferenceTracingTest {
 	
 	private static final Logger LOGGER_ = LoggerFactory.getLogger(PropertyInferenceTracingTest.class);
 
-	private static final SaturationConclusion.Factory FACTORY_ = new ConclusionBaseFactory();
+	private static final SaturationConclusion.Factory FACTORY_ = new SaturationConclusionBaseFactory();
 	
 	@Rule public TestName testName = new TestName();
 
@@ -94,15 +90,8 @@ public class PropertyInferenceTracingTest {
 
 		TracingTestUtils.checkTracingCompleteness(a, d, reasoner);
 		// check that the inference S -> HH has been traced and used during unwinding
-		TracingTestUtils.checkConditionOverUsedInferences(a, d, reasoner, 
-				TracingTestUtils.DUMMY_CLASS_INFERENCE_CHECKER, 
-				new AbstractObjectPropertyInferenceVisitor<Boolean>() {
-
-					@Override
-					protected Boolean defaultTracedVisit(
-							ObjectPropertyInference inference) {
-						return false;
-					}
+		TracingTestUtils.checkConditionOverUsedInferences(a, d, reasoner,  
+				new TracingTestUtils.DummySaturationInferenceChecker() {
 
 					@Override
 					public Boolean visit(SubPropertyChainExpandedSubObjectPropertyOf inference) {
@@ -149,13 +138,7 @@ public class PropertyInferenceTracingTest {
 		TracingTestUtils.checkTracingCompleteness(b, e, reasoner); // b might be not traced because it is a filler
 		// checking that S o H -> SS o HH is there
 		TracingTestUtils.checkConditionOverUsedInferences(a, e, reasoner, 
-				new AbstractClassInferenceVisitor<Boolean>() {
-
-					@Override
-					protected Boolean defaultTracedVisit(
-							ClassInference conclusion) {
-						return false;
-					}
+				new TracingTestUtils.DummySaturationInferenceChecker() {
 
 					@Override
 					public Boolean visit(ForwardLinkComposition conclusion) {
@@ -171,20 +154,11 @@ public class PropertyInferenceTracingTest {
 									conclusion.getForwardChain().equals(sshhIndexed);
 					}
 			
-				}, 
-				TracingTestUtils.DUMMY_PROPERTY_INFERENCE_CHECKER
-				);
+				});
 		
 		// checking that S -> SS inference is there
 		TracingTestUtils.checkConditionOverUsedInferences(a, e, reasoner,
-				TracingTestUtils.DUMMY_CLASS_INFERENCE_CHECKER,
-				new AbstractObjectPropertyInferenceVisitor<Boolean>() {
-
-					@Override
-					protected Boolean defaultTracedVisit(
-							ObjectPropertyInference inference) {
-						return false;
-					}
+				new TracingTestUtils.DummySaturationInferenceChecker() {					
 
 					@Override
 					public Boolean visit(SubPropertyChainExpandedSubObjectPropertyOf inference) {
@@ -196,12 +170,7 @@ public class PropertyInferenceTracingTest {
 		
 		// checking that the axiom RR o SS o HH -> T is used 
 		TracingTestUtils.checkConditionOverUsedInferences(a, e, reasoner, 
-				new AbstractClassInferenceVisitor<Boolean>() {
-
-					@Override
-					protected Boolean defaultTracedVisit(ClassInference conclusion) {
-						return false;
-					}
+				new TracingTestUtils.DummySaturationInferenceChecker() {
 
 					@Override
 					public Boolean visit(BackwardLinkComposition backwardLink) {
@@ -214,23 +183,18 @@ public class PropertyInferenceTracingTest {
 								backwardLink.getThirdPremise(FACTORY_).getForwardChain().equals(sshhIndexed) &&
 								backwardLink.getBackwardRelation().equals(tIndexed);
 					}
-
-				}, 
-				new AbstractObjectPropertyInferenceVisitor<Boolean>() {
-
-					@Override
-					protected Boolean defaultTracedVisit(
-							ObjectPropertyInference inference) {
-						return false;
-					}
+				});
+		TracingTestUtils.checkConditionOverUsedInferences(a, e, reasoner,
+				new TracingTestUtils.DummySaturationInferenceChecker() {
 
 					@Override
-					public Boolean visit(SubPropertyChainExpandedSubObjectPropertyOf inference) {
-						return inference.getSubChain().equals(rIndexed) &&
-								inference.getSuperChain().equals(rrIndexed);
+					public Boolean visit(
+							SubPropertyChainExpandedSubObjectPropertyOf inference) {
+						return inference.getSubChain().equals(rIndexed)
+								&& inference.getSuperChain().equals(rrIndexed);
 					}
 
-				});		
+				});
 	}	
 			
 }

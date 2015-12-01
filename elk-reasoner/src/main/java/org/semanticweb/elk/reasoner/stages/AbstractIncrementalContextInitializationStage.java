@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ConclusionBaseFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.slf4j.Logger;
@@ -68,7 +68,7 @@ abstract class AbstractIncrementalContextInitializationStage extends
 
 	private SaturationStateWriter<?> writer_ = null;
 	
-	private ContextInitialization.Factory factory_ = new ConclusionBaseFactory();
+	private ContextInitialization.Factory factory_ = new SaturationConclusionBaseFactory();
 
 	public AbstractIncrementalContextInitializationStage(
 			AbstractReasonerState reasoner, AbstractReasonerStage... preStages) {

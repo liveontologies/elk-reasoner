@@ -26,11 +26,12 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.DummySaturationConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.SaturationPremiseVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInferencePremiseVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 class ProofUnwindingState<I extends ClassConclusion, J extends ProofUnwindingJob<I>> {
@@ -42,15 +43,18 @@ class ProofUnwindingState<I extends ClassConclusion, J extends ProofUnwindingJob
 	final Queue<ClassConclusion> todoConclusions;
 
 	final Queue<ClassInference> todoInferences;
-	
-	private final SaturationInference.Visitor<Void> inferencePremiseInsertionVisitor = new SaturationPremiseVisitor<Void>(
-			new DummySaturationConclusionVisitor<Void>() {
+
+	private final SaturationInference.Visitor<Void> inferencePremiseInsertionVisitor = new SaturationInferencePremiseVisitor<Void>(
+			new SaturationConclusionBaseFactory() {
 				@Override
-				protected Void defaultVisit(ClassConclusion conclusion) {
-					todoConclusions.add(conclusion);
-					return null;
+				protected <C extends SaturationConclusion> C filter(
+						C conclusion) {
+					if (conclusion instanceof ClassConclusion) {
+						todoConclusions.add((ClassConclusion) conclusion);
+					}
+					return conclusion;
 				}
-			});		
+			});
 
 	ProofUnwindingState(J initiatorJob) {
 		this.initiatorJob = initiatorJob;
@@ -59,9 +63,9 @@ class ProofUnwindingState<I extends ClassConclusion, J extends ProofUnwindingJob
 		this.todoConclusions = new LinkedList<ClassConclusion>();
 		todoConclusions.add(initiatorJob.getInput());
 	}
-		
-	void addInference(ClassInference inference) {
+
+	void todoInferencePremises(ClassInference inference) {
 		inference.accept(inferencePremiseInsertionVisitor);
 	}
-	
+
 }

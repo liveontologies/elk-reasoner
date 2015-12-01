@@ -72,7 +72,7 @@ public class ContextInitializingClassConclusionInsertionVisitor
 
 	public ContextInitializingClassConclusionInsertionVisitor(
 			Reference<Context> contextRef, SaturationStateWriter<?> writer) {
-		this(contextRef, new ConclusionBaseFactory(), writer);
+		this(contextRef, new SaturationConclusionBaseFactory(), writer);
 	}
 
 	@Override

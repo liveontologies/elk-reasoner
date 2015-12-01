@@ -24,12 +24,11 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 
 /**
  * Gets notifications if there're no inferences stored for a particular
- * {@link ClassConclusion}
+ * {@link SaturationConclusion}
  * 
  * @author Pavel Klinov
  * 
@@ -37,20 +36,13 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyC
  */
 public interface UntracedConclusionListener {
 
-	public void notifyUntraced(ClassConclusion conclusion);
-	
-	public void notifyUntraced(ObjectPropertyConclusion conclusion);
+	public void notifyUntraced(SaturationConclusion conclusion);
 	
 	public static final UntracedConclusionListener DUMMY = new UntracedConclusionListener() {
 
 		@Override
-		public void notifyUntraced(ClassConclusion conclusion) {
+		public void notifyUntraced(SaturationConclusion conclusion) {
 			//no-op			
-		}
-
-		@Override
-		public void notifyUntraced(ObjectPropertyConclusion conclusion) {
-			//no-op
 		}
 		
 	};

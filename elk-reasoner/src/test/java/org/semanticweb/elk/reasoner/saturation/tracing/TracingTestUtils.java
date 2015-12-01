@@ -3,6 +3,9 @@
  */
 package org.semanticweb.elk.reasoner.saturation.tracing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /*
  * #%L
  * ELK Reasoner
@@ -25,8 +28,6 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.HashSet;
@@ -44,15 +45,13 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ConclusionBaseFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.inferences.AbstractClassInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.properties.inferences.AbstractObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.DummySaturationInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,18 +71,13 @@ public class TracingTestUtils {
 	private static final UntracedConclusionListener UNTRACED_LISTENER = new UntracedConclusionListener() {
 
 		@Override
-		public void notifyUntraced(ClassConclusion conclusion) {
-			fail(conclusion.getConclusionRoot() + ": " + conclusion
-					+ ": conclusion was not traced");
+		public void notifyUntraced(SaturationConclusion conclusion) {
+			fail(conclusion + ": conclusion was not traced");
 		}
 
-		@Override
-		public void notifyUntraced(ObjectPropertyConclusion conclusion) {
-			fail("Property conclusion " + conclusion + " was not traced");
-		}
 	};
 	
-	private static final SaturationConclusion.Factory FACTORY_ = new ConclusionBaseFactory();
+	private static final SaturationConclusion.Factory FACTORY_ = new SaturationConclusionBaseFactory();
 
 	static ClassConclusion getConclusionToTrace(Context context,
 			IndexedClassExpression subsumer) {
@@ -109,10 +103,10 @@ public class TracingTestUtils {
 				ReasonerStateAccessor.transform(reasoner, sup));
 		final AtomicInteger conclusionCount = new AtomicInteger(0);
 		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
-		ClassInference.Visitor<Boolean> counter = new AbstractClassInferenceVisitor<Boolean>() {
+		SaturationInference.Visitor<Boolean> counter = new DummySaturationInferenceChecker() {
 
 			@Override
-			protected Boolean defaultTracedVisit(ClassInference conclusion) {
+			protected Boolean defaultVisit(SaturationInference inference) {
 				conclusionCount.incrementAndGet();
 				return true;
 			}
@@ -134,10 +128,10 @@ public class TracingTestUtils {
 
 		final AtomicInteger conclusionCount = new AtomicInteger(0);
 		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
-		ClassInference.Visitor<Boolean> counter = new AbstractClassInferenceVisitor<Boolean>() {
+		SaturationInference.Visitor<Boolean> counter = new DummySaturationInferenceChecker() {
 
 			@Override
-			protected Boolean defaultTracedVisit(ClassInference conclusion) {
+			protected Boolean defaultVisit(SaturationInference inference) {
 				conclusionCount.incrementAndGet();
 				return true;
 			}
@@ -162,8 +156,8 @@ public class TracingTestUtils {
 				ReasonerStateAccessor.getContext(reasoner, subsumee),
 				ReasonerStateAccessor.transform(reasoner, sup));
 		int actual = 0;
-		for (ClassInference ignore : ReasonerStateAccessor.getTraceState(
-				reasoner).getClassInferences(conclusion)) {
+		for (SaturationInference ignore : ReasonerStateAccessor.getTraceState(
+				reasoner).getInferences(conclusion)) {
 			actual++;
 		}
 		assertEquals(expected, actual);
@@ -182,9 +176,9 @@ public class TracingTestUtils {
 		ObjectPropertyConclusion conclusion = FACTORY_.getSubPropertyChain(
 				subsumee, subsumer);
 		int actual = 0;
-		for (ObjectPropertyInference ignore : ReasonerStateAccessor
+		for (SaturationInference ignore : ReasonerStateAccessor
 				.getTraceState(reasoner)
-				.getObjectPropertyInferences(conclusion)) {
+				.getInferences(conclusion)) {
 			actual++;
 		}
 		assertEquals(expected, actual);
@@ -200,50 +194,32 @@ public class TracingTestUtils {
 			ElkClassExpression sub,
 			ElkClassExpression sup,
 			Reasoner reasoner,
-			final ClassInference.Visitor<Boolean> classInferenceVisitor,
-			final ObjectPropertyInference.Visitor<Boolean> propertyInferenceVisitor) {
+			final SaturationInference.Visitor<Boolean> inferenceVisitor) {
 		final IndexedClassExpression subsumee = ReasonerStateAccessor
 				.transform(reasoner, sub);
-		ClassConclusion conclusion = getConclusionToTrace(
+		SaturationConclusion conclusion = getConclusionToTrace(
 				ReasonerStateAccessor.getContext(reasoner, subsumee),
 				ReasonerStateAccessor.transform(reasoner, sup));
-		final MutableBoolean classInferenceCondition = new MutableBoolean(false);
-		final MutableBoolean propertyInferenceCondition = new MutableBoolean(
-				false);
+		final MutableBoolean inferenceCondition = new MutableBoolean(false);
 		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
 
 		new TestTraceUnwinder(traceState, UNTRACED_LISTENER)
 				.accept(conclusion,
-						new AbstractClassInferenceVisitor<Boolean>() {
+						new DummySaturationInferenceChecker() {
 
 							@Override
-							protected Boolean defaultTracedVisit(
-									ClassInference inference) {
-								classInferenceCondition.or(inference.accept(
-										classInferenceVisitor));
-
-								return true;
-							}
-
-						},
-						new AbstractObjectPropertyInferenceVisitor<Boolean>() {
-
-							@Override
-							protected Boolean defaultTracedVisit(
-									ObjectPropertyInference inference) {
-								propertyInferenceCondition.or(inference.accept(
-										propertyInferenceVisitor));
+							protected Boolean defaultVisit(
+									SaturationInference inference) {
+								inferenceCondition.or(inference.accept(
+										inferenceVisitor));
 
 								return true;
 							}
 
 						});
 
-		assertTrue("The condition didn't succeed on any used class inference",
-				classInferenceCondition.get());
-		assertTrue(
-				"The condition didn't succeed on any used property inference",
-				propertyInferenceCondition.get());
+		assertTrue("The condition didn't succeed on any used inference",
+				inferenceCondition.get());		
 	}
 
 	/*
@@ -256,8 +232,8 @@ public class TracingTestUtils {
 		ClassConclusion conclusion = getConclusionToTrace(
 				ReasonerStateAccessor.getContext(reasoner, subsumee),
 				ReasonerStateAccessor.transform(reasoner, sup));
-		ClassInference.Visitor<?> sideConditionVisitor = SideConditions
-				.getClassSideConditionVisitor(new NoOpElkAxiomVisitor<Void>() {
+		SaturationInference.Visitor<?> sideConditionVisitor = 
+				new SideConditionVisitor<Void>(new NoOpElkAxiomVisitor<Void>() {
 
 					@Override
 					protected Void defaultLogicalVisit(ElkAxiom axiom) {
@@ -267,37 +243,19 @@ public class TracingTestUtils {
 
 				});
 
-		for (ClassInference inference : ReasonerStateAccessor.getTraceState(
-				reasoner).getClassInferences(conclusion)) {
+		for (SaturationInference inference : ReasonerStateAccessor.getTraceState(
+				reasoner).getInferences(conclusion)) {
 			inference.accept(sideConditionVisitor);
 		}
 
 		return sideConditions;
 	}
 
-	public static void visitClassInferences(ElkClassExpression sub,
-			ElkClassExpression sup, Reasoner reasoner,
-			ClassInference.Visitor<Boolean> visitor)
-			throws ElkException {
-		final IndexedClassExpression subsumee = ReasonerStateAccessor
-				.transform(reasoner, sub);
-		ClassConclusion conclusion = getConclusionToTrace(
-				ReasonerStateAccessor.getContext(reasoner, subsumee),
-				ReasonerStateAccessor.transform(reasoner, sup));
-		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(
-				ReasonerStateAccessor.getTraceState(reasoner),
-				UNTRACED_LISTENER);
-
-		reasoner.explainSubsumption(sub, sup);
-		traceUnwinder.accept(conclusion, visitor);
-	}
-
 	public static void visitInferences(
 			ElkClassExpression sub,
 			ElkClassExpression sup,
 			Reasoner reasoner,
-			final ClassInference.Visitor<Boolean> classInferenceVisitor,
-			final ObjectPropertyInference.Visitor<Boolean> propertyInferenceVisitor)
+			final SaturationInference.Visitor<Boolean> inferenceVisitor)
 			throws ElkException {
 		final IndexedClassExpression subsumee = ReasonerStateAccessor
 				.transform(reasoner, sub);
@@ -309,14 +267,12 @@ public class TracingTestUtils {
 				UNTRACED_LISTENER);
 
 		reasoner.explainSubsumption(sub, sup);
-		traceUnwinder.accept(conclusion, classInferenceVisitor,
-				propertyInferenceVisitor);
+		traceUnwinder.accept(conclusion, inferenceVisitor);
 	}
 
 	public static void visitInferencesForInconsistency(
 			Reasoner reasoner,
-			final ClassInference.Visitor<Boolean> classInferenceVisitor,
-			final ObjectPropertyInference.Visitor<Boolean> propertyInferenceVisitor)
+			final SaturationInference.Visitor<Boolean> inferenceVisitor)
 			throws ElkException {
 		IndexedClassEntity entity = ReasonerStateAccessor
 				.getInconsistentEntity(reasoner);
@@ -331,27 +287,21 @@ public class TracingTestUtils {
 
 		reasoner.explainInconsistency();
 		traceUnwinder.accept(FACTORY_.getContradiction(entity),
-				classInferenceVisitor, propertyInferenceVisitor);
+				inferenceVisitor);
 	}
 
 	// //////////////////////////////////////////////////////////////////////
 	// some dummy utility visitors
 	// //////////////////////////////////////////////////////////////////////
-	static final AbstractClassInferenceVisitor<Boolean> DUMMY_CLASS_INFERENCE_CHECKER = new AbstractClassInferenceVisitor<Boolean>() {
+	static class DummySaturationInferenceChecker extends DummySaturationInferenceVisitor<Boolean> {
 
 		@Override
-		protected Boolean defaultTracedVisit(ClassInference conclusion) {
+		protected Boolean defaultVisit(SaturationInference inference) {
 			return true;
 		}
 
-	};
-
-	static final AbstractObjectPropertyInferenceVisitor<Boolean> DUMMY_PROPERTY_INFERENCE_CHECKER = new AbstractObjectPropertyInferenceVisitor<Boolean>() {
-
-		@Override
-		protected Boolean defaultTracedVisit(ObjectPropertyInference inference) {
-			return true;
-		}
-	};
-
+	}
+	
+	static final SaturationInference.Visitor<Boolean> DUMMY_SATURATION_INFERENCE_CHECKER = new DummySaturationInferenceChecker();
+	
 }

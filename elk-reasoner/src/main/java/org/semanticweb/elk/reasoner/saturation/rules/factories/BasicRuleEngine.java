@@ -25,7 +25,7 @@ import org.semanticweb.elk.ModifiableReference;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ConclusionBaseFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -64,7 +64,7 @@ public class BasicRuleEngine<I extends RuleApplicationInput> extends
 		super(activeContext, conclusionProcessor, localTodo, interrupter,
 				aggregatedStatistics, localStatistics);
 		this.index_ = index;
-		this.factory_ = new ConclusionBaseFactory();
+		this.factory_ = new SaturationConclusionBaseFactory();
 		this.writer_ = writer;
 	}
 
