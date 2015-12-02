@@ -28,9 +28,9 @@ public interface ModifiableIndexedDefinitionAxiom extends
 		ModifiableIndexedAxiom, IndexedDefinitionAxiom {
 
 	@Override
-	public ModifiableIndexedClass getDefinedClass();
+	ModifiableIndexedClass getDefinedClass();
 
 	@Override
-	public ModifiableIndexedClassExpression getDefinition();
+	ModifiableIndexedClassExpression getDefinition();
 
 }

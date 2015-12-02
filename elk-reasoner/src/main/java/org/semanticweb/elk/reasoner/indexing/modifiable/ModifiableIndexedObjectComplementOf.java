@@ -31,10 +31,25 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf
  * @author "Yevgeny Kazakov"
  *
  */
-public interface ModifiableIndexedObjectComplementOf extends
-		ModifiableIndexedClassExpression, IndexedObjectComplementOf {
+public interface ModifiableIndexedObjectComplementOf
+		extends
+			ModifiableIndexedClassExpression,
+			IndexedObjectComplementOf {
 
 	@Override
-	public ModifiableIndexedClassExpression getNegated();
+	ModifiableIndexedClassExpression getNegated();
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		ModifiableIndexedObjectComplementOf getIndexedObjectComplementOf(
+				ModifiableIndexedClassExpression negated);
+
+	}
 
 }

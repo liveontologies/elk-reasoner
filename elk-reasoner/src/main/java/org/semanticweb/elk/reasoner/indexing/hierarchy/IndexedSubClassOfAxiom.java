@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+
 /*
  * #%L
  * ELK Reasoner
@@ -39,7 +41,7 @@ public interface IndexedSubClassOfAxiom extends IndexedAxiom {
 	 * 
 	 * @see IndexedSubClassOfAxiom#getSubClass()
 	 */
-	public IndexedClassExpression getSubClass();
+	IndexedClassExpression getSubClass();
 
 	/**
 	 * @return the {@link IndexedClassExpression} representing the super class
@@ -48,6 +50,34 @@ public interface IndexedSubClassOfAxiom extends IndexedAxiom {
 	 * 
 	 * @see IndexedSubClassOfAxiom#getSuperClass()
 	 */
-	public IndexedClassExpression getSuperClass();
+	IndexedClassExpression getSuperClass();
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
 
+		public IndexedSubClassOfAxiom getIndexedSubClassOfAxiom(
+				ElkAxiom originalAxiom, IndexedClassExpression subClass,
+				IndexedClassExpression superClass);
+
+	}
+	
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(IndexedSubClassOfAxiom axiom);
+
+	}
+	
 }

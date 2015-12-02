@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.modifiable;
 
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+
 /*
  * #%L
  * ELK Reasoner
@@ -31,9 +33,22 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
  * @author "Yevgeny Kazakov"
  *
  */
-public interface ModifiableIndexedIndividual extends
-		ModifiableIndexedClassEntity, IndexedIndividual {
+public interface ModifiableIndexedIndividual
+		extends
+			ModifiableIndexedClassEntity,
+			IndexedIndividual {
 
-	// nothing specific to modify
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		ModifiableIndexedIndividual getIndexedIndividual(
+				ElkNamedIndividual elkNamedIndividual);
+
+	}
 
 }

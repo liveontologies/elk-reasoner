@@ -37,6 +37,27 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedAxiom;
  */
 public interface IndexedAxiomInference extends IndexedAxiom {
 
-	public <I, O> O accept(IndexedAxiomInferenceVisitor<I, O> visitor, I input);
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O>
+			extends
+				IndexedDisjointClassesAxiomInference.Visitor<O>,
+				IndexedSubClassOfAxiomInference.Visitor<O>,
+				IndexedDefinitionAxiomInference.Visitor<O>,
+				IndexedSubObjectPropertyOfAxiomInference.Visitor<O>,
+				IndexedObjectPropertyRangeAxiomInference.Visitor<O>,
+				IndexedDeclarationAxiomInference.Visitor<O> {
+
+		// combined interface
+
+	}
+	
+	<O> O accept(Visitor<O> visitor);
 
 }

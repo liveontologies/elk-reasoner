@@ -30,8 +30,8 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
 
 /**
- * A {@link CachedIndexedObjectFactory} that constructs objects using another
- * {@link CachedIndexedObjectFactory} and updates the occurrence counts for the
+ * A {@link CachedIndexedObject.Factory} that constructs objects using another
+ * {@link CachedIndexedObject.Factory} and updates the occurrence counts for the
  * constructed objects using the provided {@link OccurrenceIncrement}.
  * 
  * @author "Yevgeny Kazakov"
@@ -46,7 +46,7 @@ public class UpdatingCachedIndexedObjectFactory extends
 	private final ModifiableOntologyIndex index_;
 
 	public UpdatingCachedIndexedObjectFactory(
-			CachedIndexedObjectFactory baseFactory,
+			CachedIndexedObject.Factory baseFactory,
 			ModifiableOntologyIndex index, OccurrenceIncrement increment) {
 		super(baseFactory);
 		this.index_ = index;

@@ -31,13 +31,29 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersection
  * @author "Yevgeny Kazakov"
  *
  */
-public interface ModifiableIndexedObjectIntersectionOf extends
-		ModifiableIndexedClassExpression, IndexedObjectIntersectionOf {
+public interface ModifiableIndexedObjectIntersectionOf
+		extends
+			ModifiableIndexedClassExpression,
+			IndexedObjectIntersectionOf {
 
 	@Override
-	public ModifiableIndexedClassExpression getFirstConjunct();
+	ModifiableIndexedClassExpression getFirstConjunct();
 
 	@Override
-	public ModifiableIndexedClassExpression getSecondConjunct();
+	ModifiableIndexedClassExpression getSecondConjunct();
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		ModifiableIndexedObjectIntersectionOf getIndexedObjectIntersectionOf(
+				ModifiableIndexedClassExpression conjunctA,
+				ModifiableIndexedClassExpression conjunctB);
+
+	}
 
 }

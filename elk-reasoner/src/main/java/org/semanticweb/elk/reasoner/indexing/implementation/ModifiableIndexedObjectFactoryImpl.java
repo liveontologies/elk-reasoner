@@ -48,14 +48,13 @@ import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpressio
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectComplementOf;
-import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectUnionOf;
-import org.semanticweb.elk.reasoner.indexing.factories.ModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.inferences.ModifiableElkClassAssertionAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.inferences.ModifiableElkDeclarationAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.inferences.ModifiableElkDifferentIndividualsAxiomBinaryConversion;
@@ -82,13 +81,14 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassEx
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedEntity;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 
 /**
- * Implements {@link ModifiableIndexedObjectFactory} and
- * {@link CachedIndexedObjectFactory}. The occurrences of the created objects
+ * Implements {@link ModifiableIndexedObject.Factory} and
+ * {@link CachedIndexedObject.Factory}. The occurrences of the created objects
  * are not modified.
  * 
  * @author "Yevgeny Kazakov"
@@ -96,8 +96,8 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropert
  */
 public class ModifiableIndexedObjectFactoryImpl
 		implements
-			ModifiableIndexedObjectFactory,
-			CachedIndexedObjectFactory {
+			ModifiableIndexedObject.Factory,
+			CachedIndexedObject.Factory {
 
 	@Override
 	public CachedIndexedClass getIndexedClass(ElkClass elkClass) {

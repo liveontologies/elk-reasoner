@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 
 /**
  * Represents occurrences of an {@link ElkObject} in an ontology.
@@ -40,6 +39,27 @@ public interface IndexedObject {
 	 */
 	String toStringStructural();
 
-	public <O> O accept(IndexedObjectVisitor<O> visitor);
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O>
+			extends
+				IndexedClassExpression.Visitor<O>,
+				IndexedPropertyChain.Visitor<O>,
+				IndexedAxiom.Visitor<O>,
+				IndexedEntity.Visitor<O>,
+				IndexedClassExpressionList.Visitor<O>,
+				IndexedContextRoot.Visitor<O> {
+
+		// combined interface
+
+	}
+	
+	<O> O accept(Visitor<O> visitor);
 
 }

@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.indexing.visitors;
+package org.semanticweb.elk.reasoner.indexing.implementation;
 
 /*
  * #%L
@@ -27,14 +27,14 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 
 /**
- * An {@link IndexedPropertyChainVisitor} that always returns {@code null}.
+ * An {@link IndexedPropertyChain.Visitor} that always returns {@code null}.
  * 
  * @author "Yevgeny Kazakov"
  *
  * @param <O>
  */
-public class NoOpIndexedPropertyChainVisitor<O> implements
-		IndexedPropertyChainVisitor<O> {
+public class DummyIndexedPropertyChainVisitor<O> implements
+		IndexedPropertyChain.Visitor<O> {
 
 	@SuppressWarnings("unused")
 	protected O defaultVisit(IndexedPropertyChain element) {

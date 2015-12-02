@@ -22,15 +22,14 @@
  */
 package org.semanticweb.elk.reasoner.indexing.implementation;
 
-import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpressionFilter;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedRangeFiller;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
 
 /**
@@ -108,18 +107,13 @@ class CachedIndexedObjectSomeValuesFromImpl
 	}
 
 	@Override
-	public final <O> O accept(IndexedObjectSomeValuesFromVisitor<O> visitor) {
+	public final <O> O accept(IndexedClassExpression.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
 	@Override
-	public final <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
-		return accept((IndexedObjectSomeValuesFromVisitor<O>) visitor);
-	}
-
-	@Override
 	public CachedIndexedObjectSomeValuesFrom accept(
-			CachedIndexedClassExpressionFilter filter) {
+			CachedIndexedClassExpression.Filter filter) {
 		return filter.filter(this);
 	}
 

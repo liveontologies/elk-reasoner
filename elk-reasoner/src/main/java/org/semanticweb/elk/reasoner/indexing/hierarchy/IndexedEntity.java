@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedEntityVisitor;
 
 /**
  * Represents all occurrences of an {@link ElkEntity} in an ontology.
@@ -36,8 +35,25 @@ public interface IndexedEntity extends IndexedObject {
 	/**
 	 * @return The {@link ElkEntity} represented by this {@link IndexedEntity}
 	 */
-	public ElkEntity getElkEntity();
+	ElkEntity getElkEntity();
 
-	public <O> O accept(IndexedEntityVisitor<O> visitor);
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O>
+			extends
+				IndexedClassEntity.Visitor<O>,
+				IndexedObjectProperty.Visitor<O> {
+
+		// combined interface
+
+	}
+	
+	<O> O accept(IndexedEntity.Visitor<O> visitor);
 
 }

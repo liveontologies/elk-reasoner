@@ -37,5 +37,19 @@ public interface ElkSubObjectPropertyOfAxiomConversion
 
 	@Override
 	ElkSubObjectPropertyOfAxiom getOriginalAxiom();
+	
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+		
+		O visit(ElkSubObjectPropertyOfAxiomConversion inference);
+		
+	}
 
 }

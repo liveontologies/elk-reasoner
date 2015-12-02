@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.modifiable;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedAxiom;
+import org.semanticweb.elk.reasoner.indexing.inferences.ModifiableIndexedAxiomInference;
 
 /**
  * An {@link IndexedAxiom} that can be modified as a result of updating the
@@ -61,5 +62,17 @@ public interface ModifiableIndexedAxiom extends ModifiableIndexedObject,
 	 *         logically change as the result of calling this method
 	 */
 	boolean removeOccurrence(ModifiableOntologyIndex index);
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory extends ModifiableIndexedAxiomInference.Factory {
+
+		// combined interface
+
+	}
 
 }

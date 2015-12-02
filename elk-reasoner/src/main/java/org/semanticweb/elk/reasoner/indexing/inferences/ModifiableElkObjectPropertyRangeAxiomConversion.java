@@ -1,5 +1,9 @@
 package org.semanticweb.elk.reasoner.indexing.inferences;
 
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
+
 /*
  * #%L
  * ELK Reasoner
@@ -36,6 +40,19 @@ public interface ModifiableElkObjectPropertyRangeAxiomConversion
 			ElkObjectPropertyRangeAxiomConversion,
 			ModifiableIndexedObjectPropertyRangeAxiomInference {
 
-	// combined interface
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		ModifiableElkObjectPropertyRangeAxiomConversion getElkObjectPropertyRangeAxiomConversion(
+				ElkObjectPropertyRangeAxiom originalAxiom,
+				ModifiableIndexedObjectProperty property,
+				ModifiableIndexedClassExpression range);
+
+	}
 
 }

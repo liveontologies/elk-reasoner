@@ -39,6 +39,31 @@ public interface CachedIndexedObjectProperty extends
 		CachedIndexedPropertyChain<CachedIndexedObjectProperty>,
 		CachedIndexedEntity<CachedIndexedObjectProperty> {
 
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		CachedIndexedObjectProperty getIndexedObjectProperty(
+				ElkObjectProperty elkObjectProperty);
+
+	}
+	
+	/**
+	 * A filter for mapping objects
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Filter {
+
+		CachedIndexedObjectProperty filter(CachedIndexedObjectProperty element);
+
+	}
+	
 	static class Helper extends CachedIndexedObject.Helper {
 
 		public static int structuralHashCode(ElkObjectProperty entity) {

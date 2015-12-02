@@ -39,6 +39,19 @@ public interface ModifiableIndexedClassExpressionList
 			IndexedClassExpressionList {
 
 	@Override
-	public List<? extends ModifiableIndexedClassExpression> getElements();
+	List<? extends ModifiableIndexedClassExpression> getElements();
 
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		ModifiableIndexedClassExpressionList getIndexedClassExpressionList(
+				List<? extends ModifiableIndexedClassExpression> members);
+
+	}
+	
 }

@@ -53,5 +53,19 @@ public interface ElkDisjointUnionAxiomSubClassConversion
 	 * @see IndexedSubClassOfAxiom#getSubClass()
 	 */
 	int getDisjunctPosition();
+	
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+		
+		O visit(ElkDisjointUnionAxiomSubClassConversion inference);
+		
+	}
 
 }

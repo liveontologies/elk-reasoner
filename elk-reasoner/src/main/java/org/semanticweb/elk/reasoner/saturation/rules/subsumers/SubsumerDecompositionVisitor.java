@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
@@ -30,12 +31,11 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 
 /**
- * An {@link IndexedClassExpressionVisitor} applying decomposition rules using a
+ * An {@link IndexedClassExpression.Visitor} applying decomposition rules using a
  * given {@link SubsumerDecompositionRuleVisitor} using given
  * {@link ContextPremises} and producing conclusions using a given
  * {@link ClassConclusionProducer}
@@ -44,7 +44,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
  * 
  */
 public class SubsumerDecompositionVisitor implements
-		IndexedClassExpressionVisitor<Void> {
+		IndexedClassExpression.Visitor<Void> {
 
 	/**
 	 * the rule visitor used when applying decomposition rules

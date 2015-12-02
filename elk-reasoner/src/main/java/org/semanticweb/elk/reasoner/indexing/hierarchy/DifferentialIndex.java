@@ -34,7 +34,6 @@ import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedEntityVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ChainableContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
@@ -86,7 +85,7 @@ public class DifferentialIndex extends DirectIndex {
 	private Set<ElkObjectProperty> addedObjectProperties_,
 			removedObjectProperties_;
 
-	private final IndexedEntityVisitor<Void> entityInsertionListener_ = new EntityInsertionListener(),
+	private final IndexedEntity.Visitor<Void> entityInsertionListener_ = new EntityInsertionListener(),
 			entityDeletionListener_ = new EntityDeletionListener();
 
 	/**
@@ -198,7 +197,7 @@ public class DifferentialIndex extends DirectIndex {
 		todoDeletions_.add(input);
 	}
 
-	private class EntityInsertionListener implements IndexedEntityVisitor<Void> {
+	private class EntityInsertionListener implements IndexedEntity.Visitor<Void> {
 
 		@Override
 		public Void visit(IndexedClass element) {
@@ -226,7 +225,7 @@ public class DifferentialIndex extends DirectIndex {
 
 	}
 
-	private class EntityDeletionListener implements IndexedEntityVisitor<Void> {
+	private class EntityDeletionListener implements IndexedEntity.Visitor<Void> {
 
 		@Override
 		public Void visit(IndexedClass element) {

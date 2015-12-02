@@ -25,12 +25,12 @@ package org.semanticweb.elk.reasoner.indexing.implementation;
 import java.util.List;
 
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpressionList;
-import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectFilter;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 
 /**
  * Implements {@link CachedIndexedClassExpressionList}
@@ -92,12 +92,12 @@ class CachedIndexedClassExpressionListImpl
 
 	@Override
 	public CachedIndexedClassExpressionList accept(
-			CachedIndexedObjectFilter filter) {
+			CachedIndexedObject.Filter filter) {
 		return filter.filter(this);
 	}
 	
 	@Override
-	public <O> O accept(IndexedObjectVisitor<O> visitor) {
+	public <O> O accept(IndexedObject.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

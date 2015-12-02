@@ -26,16 +26,14 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClass;
-import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpressionFilter;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedEntity;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedEntityVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 
@@ -187,27 +185,22 @@ final class CachedIndexedClassImpl extends
 	}
 
 	@Override
-	public final <O> O accept(IndexedClassVisitor<O> visitor) {
+	public final <O> O accept(IndexedClassExpression.Visitor<O> visitor) {
+		return accept((IndexedClassEntity.Visitor<O>) visitor);
+	}
+
+	@Override
+	public final <O> O accept(IndexedEntity.Visitor<O> visitor) {
+		return accept((IndexedClassEntity.Visitor<O>) visitor);
+	}
+
+	@Override
+	public final <O> O accept(IndexedClassEntity.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
 	@Override
-	public final <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
-		return accept((IndexedClassEntityVisitor<O>) visitor);
-	}
-
-	@Override
-	public final <O> O accept(IndexedEntityVisitor<O> visitor) {
-		return accept((IndexedClassEntityVisitor<O>) visitor);
-	}
-
-	@Override
-	public final <O> O accept(IndexedClassEntityVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	public CachedIndexedClass accept(CachedIndexedClassExpressionFilter filter) {
+	public CachedIndexedClass accept(CachedIndexedClassExpression.Filter filter) {
 		return filter.filter(this);
 	}
 

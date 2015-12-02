@@ -76,7 +76,7 @@ class LemmaFreePropertyInferenceFactory extends AbstractObjectPropertyInferenceV
 
 	@Override
 	public Inference visit(final RightReflexiveSubPropertyChainInference inference, final AxiomExpression<ElkSubObjectPropertyOfAxiom> premise) {
-		return inference.getReflexivePremise().getFullChain().accept(new IndexedPropertyChainVisitor<Inference>() {
+		return inference.getReflexivePremise().getFullChain().accept(new IndexedPropertyChain.Visitor<Inference>() {
 
 			@Override
 			public Inference visit(IndexedObjectProperty iop) {

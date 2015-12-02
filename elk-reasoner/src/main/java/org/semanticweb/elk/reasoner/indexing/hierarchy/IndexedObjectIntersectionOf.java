@@ -23,7 +23,6 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
 
 /**
  * Represents occurrences of an {@link ElkObjectIntersectionOf} in an ontology.
@@ -40,14 +39,26 @@ public interface IndexedObjectIntersectionOf extends IndexedClassExpression {
 	/**
 	 * @return the first conjunction of this {@link IndexedObjectIntersectionOf}
 	 */
-	public IndexedClassExpression getFirstConjunct();
+	IndexedClassExpression getFirstConjunct();
 
 	/**
 	 * @return the second conjunction of this
 	 *         {@link IndexedObjectIntersectionOf}
 	 */
-	public IndexedClassExpression getSecondConjunct();
+	IndexedClassExpression getSecondConjunct();
 
-	public <O> O accept(IndexedObjectIntersectionOfVisitor<O> visitor);
-
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+		
+		O visit(IndexedObjectIntersectionOf element);
+		
+	}
+	
 }

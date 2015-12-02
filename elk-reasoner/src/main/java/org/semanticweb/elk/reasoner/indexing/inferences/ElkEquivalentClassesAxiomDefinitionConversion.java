@@ -64,4 +64,18 @@ public interface ElkEquivalentClassesAxiomDefinitionConversion
 	 */
 	int getDefinitionPosition();
 
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+		
+		O visit(ElkEquivalentClassesAxiomDefinitionConversion inference);
+		
+	}
+	
 }

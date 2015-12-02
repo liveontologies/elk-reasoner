@@ -35,9 +35,9 @@ public interface ModifiableIndexedSubClassOfAxiom extends
 		ModifiableIndexedAxiom, IndexedSubClassOfAxiom {
 
 	@Override
-	public ModifiableIndexedClassExpression getSubClass();
+	ModifiableIndexedClassExpression getSubClass();
 
 	@Override
-	public ModifiableIndexedClassExpression getSuperClass();
+	ModifiableIndexedClassExpression getSuperClass();
 
 }

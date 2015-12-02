@@ -23,8 +23,8 @@ package org.semanticweb.elk.reasoner.indexing.implementation;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.inferences.IndexedAxiomInferenceVisitor;
-import org.semanticweb.elk.reasoner.indexing.inferences.IndexedDisjointClassesAxiomInferenceVisitor;
+import org.semanticweb.elk.reasoner.indexing.inferences.IndexedAxiomInference;
+import org.semanticweb.elk.reasoner.indexing.inferences.IndexedDisjointClassesAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.inferences.ModifiableIndexedDisjointClassesAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpressionList;
 
@@ -45,11 +45,9 @@ abstract class ModifiableIndexedDisjointClassesAxiomInferenceImpl<A extends ElkA
 	}
 
 	@Override
-	public <I, O> O accept(IndexedAxiomInferenceVisitor<I, O> visitor,
-			I input) {
+	public <O> O accept(IndexedAxiomInference.Visitor<O> visitor) {
 		return accept(
-				(IndexedDisjointClassesAxiomInferenceVisitor<I, O>) visitor,
-				input);
+				(IndexedDisjointClassesAxiomInference.Visitor<O>) visitor);
 	}
 
 }

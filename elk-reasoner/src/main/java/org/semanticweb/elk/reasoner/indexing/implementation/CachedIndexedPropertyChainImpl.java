@@ -27,19 +27,17 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectFilter;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedPropertyChainFilter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.util.collections.entryset.Entry;
 import org.semanticweb.elk.util.collections.entryset.EntryCollection;
@@ -247,13 +245,13 @@ abstract class CachedIndexedPropertyChainImpl<T extends CachedIndexedPropertyCha
 	}
 
 	@Override
-	public final <O> O accept(IndexedObjectVisitor<O> visitor) {
-		return accept((IndexedPropertyChainVisitor<O>) visitor);
+	public final <O> O accept(IndexedObject.Visitor<O> visitor) {
+		return accept((IndexedPropertyChain.Visitor<O>) visitor);
 	}
 
 	@Override
-	public T accept(CachedIndexedObjectFilter filter) {
-		return accept((CachedIndexedPropertyChainFilter) filter);
+	public T accept(CachedIndexedObject.Filter filter) {
+		return accept((CachedIndexedPropertyChain.Filter) filter);
 	}
 
 }

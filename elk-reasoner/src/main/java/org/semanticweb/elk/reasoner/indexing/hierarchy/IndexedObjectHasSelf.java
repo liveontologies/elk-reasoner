@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectHasSelfVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectHasSelf;
 import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkOfObjectHasSelf;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
@@ -45,9 +44,21 @@ public interface IndexedObjectHasSelf extends IndexedClassExpression {
 	 * 
 	 * @see ElkObjectHasSelf#getProperty()
 	 */
-	public IndexedObjectProperty getProperty();
+	IndexedObjectProperty getProperty();
 
-	public <O> O accept(IndexedObjectHasSelfVisitor<O> visitor);
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+		
+		O visit(IndexedObjectHasSelf element);
+		
+	}	
 
 	class Helper {
 

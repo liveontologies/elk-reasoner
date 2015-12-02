@@ -26,7 +26,6 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.factories.IndexedSubObjectPropertyOfAxiomFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
@@ -125,7 +124,7 @@ public class BackwardLinkComposition extends AbstractBackwardLinkInference
 	}
 
 	public IndexedSubObjectPropertyOfAxiom getSideCondition(
-			IndexedSubObjectPropertyOfAxiomFactory factory) {
+			IndexedSubObjectPropertyOfAxiom.Factory factory) {
 		return factory.getIndexedSubObjectPropertyOfAxiom(reason_, composition_,
 				backwardRelation_);
 	}

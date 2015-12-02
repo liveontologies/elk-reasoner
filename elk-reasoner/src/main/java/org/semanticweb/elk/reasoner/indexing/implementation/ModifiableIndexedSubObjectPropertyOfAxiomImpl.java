@@ -24,11 +24,11 @@ package org.semanticweb.elk.reasoner.indexing.implementation;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
 
 /**
  * Implements {@link ModifiableIndexedSubObjectPropertyOfAxiom}
@@ -107,7 +107,7 @@ class ModifiableIndexedSubObjectPropertyOfAxiomImpl<A extends ElkAxiom> extends
 	}
 
 	@Override
-	public final <O> O accept(IndexedAxiomVisitor<O> visitor) {
+	public final <O> O accept(IndexedAxiom.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

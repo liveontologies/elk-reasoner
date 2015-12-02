@@ -35,8 +35,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.NoOpIndexedClassExpressionVisitor;
+import org.semanticweb.elk.reasoner.indexing.implementation.DummyIndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
@@ -100,7 +99,7 @@ public class IncrementalDeletionInitializationStage extends AbstractIncrementalC
 		final SaturationStateWriter<?> satStateWriter = reasoner.saturationState.getContextCreatingWriter();
 		final ClassTaxonomyState.Writer taxStateWriter = reasoner.classTaxonomyState.getWriter();
 		final InstanceTaxonomyState.Writer instanceTaxStateWriter = reasoner.instanceTaxonomyState.getWriter();
-		final IndexedClassExpressionVisitor<Object> entityRemovalVisitor = new NoOpIndexedClassExpressionVisitor<Object>() {
+		final IndexedClassExpression.Visitor<Object> entityRemovalVisitor = new DummyIndexedClassExpressionVisitor<Object>() {
 
 			@Override
 			public Object visit(IndexedClass element) {

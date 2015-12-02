@@ -22,14 +22,13 @@
  */
 package org.semanticweb.elk.reasoner.indexing.implementation;
 
-import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpressionFilter;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectHasSelfVisitor;
 
 /**
  * Implements {@link CachedIndexedObjectSomeValuesFrom}
@@ -75,18 +74,13 @@ class CachedIndexedObjectHasSelfImpl extends
 	}
 
 	@Override
-	public final <O> O accept(IndexedObjectHasSelfVisitor<O> visitor) {
+	public final <O> O accept(IndexedClassExpression.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
 	@Override
-	public final <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
-		return accept((IndexedObjectHasSelfVisitor<O>) visitor);
-	}
-
-	@Override
 	public CachedIndexedObjectHasSelf accept(
-			CachedIndexedClassExpressionFilter filter) {
+			CachedIndexedClassExpression.Filter filter) {
 		return filter.filter(this);
 	}
 

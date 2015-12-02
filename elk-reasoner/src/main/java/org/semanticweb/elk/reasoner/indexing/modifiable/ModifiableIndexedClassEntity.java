@@ -31,10 +31,25 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
  * @author "Yevgeny Kazakov"
  *
  */
-public interface ModifiableIndexedClassEntity extends
-		ModifiableIndexedClassExpression, ModifiableIndexedEntity,
-		IndexedClassEntity {
+public interface ModifiableIndexedClassEntity
+		extends
+			ModifiableIndexedClassExpression,
+			ModifiableIndexedEntity,
+			IndexedClassEntity {
 
-	// nothing specific to modify
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory
+			extends
+				ModifiableIndexedClass.Factory,
+				ModifiableIndexedIndividual.Factory {
+
+		// combined interface
+
+	}
 
 }

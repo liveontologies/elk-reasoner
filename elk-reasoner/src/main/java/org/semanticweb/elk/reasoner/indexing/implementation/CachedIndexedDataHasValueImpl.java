@@ -25,12 +25,11 @@ package org.semanticweb.elk.reasoner.indexing.implementation;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
-import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpressionFilter;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedDataHasValue;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataHasValueVisitor;
 
 /**
  * Implements {@link CachedIndexedDataHasValue}
@@ -38,9 +37,11 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataHasValueVisitor
  * @author "Yevgeny Kazakov"
  * 
  */
-class CachedIndexedDataHasValueImpl extends
-		CachedIndexedComplexClassExpressionImpl<CachedIndexedDataHasValue>
-		implements CachedIndexedDataHasValue {
+class CachedIndexedDataHasValueImpl
+		extends
+			CachedIndexedComplexClassExpressionImpl<CachedIndexedDataHasValue>
+		implements
+			CachedIndexedDataHasValue {
 
 	private final ElkDataProperty property_;
 
@@ -55,8 +56,8 @@ class CachedIndexedDataHasValueImpl extends
 	}
 
 	CachedIndexedDataHasValueImpl(ElkDataHasValue elkDataHasValue) {
-		this((ElkDataProperty) elkDataHasValue.getProperty(), elkDataHasValue
-				.getFiller());
+		this((ElkDataProperty) elkDataHasValue.getProperty(),
+				elkDataHasValue.getFiller());
 	}
 
 	@Override
@@ -76,7 +77,8 @@ class CachedIndexedDataHasValueImpl extends
 
 	@Override
 	public final boolean updateOccurrenceNumbers(
-			final ModifiableOntologyIndex index, OccurrenceIncrement increment) {
+			final ModifiableOntologyIndex index,
+			OccurrenceIncrement increment) {
 		positiveOccurrenceNo += increment.positiveIncrement;
 		negativeOccurrenceNo += increment.negativeIncrement;
 		return true;
@@ -92,18 +94,13 @@ class CachedIndexedDataHasValueImpl extends
 	}
 
 	@Override
-	public final <O> O accept(IndexedDataHasValueVisitor<O> visitor) {
+	public final <O> O accept(IndexedClassExpression.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
 	@Override
-	public final <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
-		return accept((IndexedDataHasValueVisitor<O>) visitor);
-	}
-
-	@Override
 	public CachedIndexedDataHasValue accept(
-			CachedIndexedClassExpressionFilter filter) {
+			CachedIndexedClassExpression.Filter filter) {
 		return filter.filter(this);
 	}
 

@@ -36,6 +36,39 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassEx
 public interface CachedIndexedClassExpression<T extends CachedIndexedClassExpression<T>>
 		extends CachedIndexedSubObject<T>, ModifiableIndexedClassExpression {
 
-	T accept(CachedIndexedClassExpressionFilter filter);
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory
+			extends				
+				CachedIndexedClassEntity.Factory,
+				CachedIndexedComplexClassExpression.Factory,
+				CachedIndexedIndividual.Factory {
+
+		// combined interface
+
+	}
+	
+	/**
+	 * A filter for mapping objects
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Filter
+			extends
+				CachedIndexedClassEntity.Filter,
+				CachedIndexedComplexClassExpression.Filter,
+				CachedIndexedIndividual.Filter {
+
+		// combined interface
+
+	}
+
+	
+	T accept(Filter filter);
 
 }

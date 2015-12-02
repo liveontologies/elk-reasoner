@@ -25,8 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.rules.contextinit;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedRangeFiller;
+import org.semanticweb.elk.reasoner.indexing.implementation.DummyIndexedContextRootVisitor;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.visitors.NoOpIndexedContextRootVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -96,7 +96,7 @@ public class RootContextInitializationRule extends
 	public void apply(ContextInitialization premise,
 			final ContextPremises premises, final ClassConclusionProducer producer) {
 		IndexedContextRoot root = premises.getRoot();
-		root.accept(new NoOpIndexedContextRootVisitor<Void>() {
+		root.accept(new DummyIndexedContextRootVisitor<Void>() {
 			@Override
 			protected Void defaultVisit(IndexedClassExpression element) {
 				producer.produce(new SubClassInclusionTautology(premises.getRoot(),

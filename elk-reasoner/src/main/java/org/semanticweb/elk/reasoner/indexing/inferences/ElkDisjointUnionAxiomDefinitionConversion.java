@@ -39,5 +39,19 @@ public interface ElkDisjointUnionAxiomDefinitionConversion
 
 	@Override
 	ElkDisjointUnionAxiom getOriginalAxiom();
+	
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+		
+		O visit(ElkDisjointUnionAxiomDefinitionConversion inference);
+		
+	}
 
 }

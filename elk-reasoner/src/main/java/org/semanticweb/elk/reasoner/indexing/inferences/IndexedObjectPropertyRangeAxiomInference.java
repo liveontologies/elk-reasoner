@@ -37,8 +37,22 @@ public interface IndexedObjectPropertyRangeAxiomInference
 			IndexedObjectPropertyRangeAxiom,
 			IndexedAxiomInference {
 
-	public <I, O> O accept(
-			IndexedObjectPropertyRangeAxiomInferenceVisitor<I, O> visitor,
-			I input);
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O>
+			extends
+				ElkObjectPropertyRangeAxiomConversion.Visitor<O> {
+
+		// combined interface
+
+	}
+	
+	<O> O accept(Visitor<O> visitor);
 
 }

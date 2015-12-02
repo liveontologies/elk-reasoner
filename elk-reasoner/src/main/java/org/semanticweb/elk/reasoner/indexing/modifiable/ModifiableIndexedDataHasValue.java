@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.modifiable;
 
+import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
+
 /*
  * #%L
  * ELK Reasoner
@@ -31,9 +33,22 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
  * @author "Yevgeny Kazakov"
  *
  */
-public interface ModifiableIndexedDataHasValue extends
-		ModifiableIndexedClassExpression, IndexedDataHasValue {
+public interface ModifiableIndexedDataHasValue
+		extends
+			ModifiableIndexedClassExpression,
+			IndexedDataHasValue {
 
-	// nothing specific to modify
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		ModifiableIndexedDataHasValue getIndexedDataHasValue(
+				ElkDataHasValue elkDataHasValue);
+
+	}
 
 }

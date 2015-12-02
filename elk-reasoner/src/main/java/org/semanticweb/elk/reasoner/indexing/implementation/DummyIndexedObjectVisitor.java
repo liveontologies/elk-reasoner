@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.indexing.visitors;
+package org.semanticweb.elk.reasoner.indexing.implementation;
 
 /*
  * #%L
@@ -23,11 +23,11 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDeclarationAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDefinitionAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
@@ -43,13 +43,13 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubObjectPropertyOfAxiom;
 
 /**
- * An {@link IndexedObjectVisitor} that always returns {@code null}.
+ * An {@link IndexedObject.Visitor} that always returns {@code null}.
  * 
  * @author "Yevgeny Kazakov"
  *
  * @param <O>
  */
-public class NoOpIndexedObjectVisitor<O> implements IndexedObjectVisitor<O> {
+public class DummyIndexedObjectVisitor<O> implements IndexedObject.Visitor<O> {
 
 	@SuppressWarnings("unused")
 	protected O defaultVisit(IndexedObject element) {

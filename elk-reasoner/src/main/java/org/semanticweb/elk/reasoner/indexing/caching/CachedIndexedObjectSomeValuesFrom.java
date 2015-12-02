@@ -24,6 +24,8 @@ package org.semanticweb.elk.reasoner.indexing.caching;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectSomeValuesFrom;
 
 /**
@@ -39,6 +41,33 @@ public interface CachedIndexedObjectSomeValuesFrom extends
 		ModifiableIndexedObjectSomeValuesFrom,
 		CachedIndexedComplexClassExpression<CachedIndexedObjectSomeValuesFrom> {
 
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		CachedIndexedObjectSomeValuesFrom getIndexedObjectSomeValuesFrom(
+				ModifiableIndexedObjectProperty property,
+				ModifiableIndexedClassExpression filler);
+
+	}
+	
+	/**
+	 * A filter for mapping objects
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Filter {
+
+		CachedIndexedObjectSomeValuesFrom filter(
+				CachedIndexedObjectSomeValuesFrom element);
+
+	}
+	
 	static class Helper extends CachedIndexedObject.Helper {
 
 		public static int structuralHashCode(IndexedObjectProperty property,

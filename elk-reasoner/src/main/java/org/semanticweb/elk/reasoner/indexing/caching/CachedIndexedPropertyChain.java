@@ -36,6 +36,36 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropert
 public interface CachedIndexedPropertyChain<T extends CachedIndexedPropertyChain<T>>
 		extends ModifiableIndexedPropertyChain, CachedIndexedSubObject<T> {
 
-	T accept(CachedIndexedPropertyChainFilter filter);
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory
+			extends
+				CachedIndexedComplexPropertyChain.Factory,
+				CachedIndexedObjectProperty.Factory {
+
+		// combined interface
+
+	}
+	
+	/**
+	 * A filter for mapping objects
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Filter
+			extends
+				CachedIndexedComplexPropertyChain.Filter,
+				CachedIndexedObjectProperty.Filter {
+
+		// combined interface
+
+	}
+	
+	T accept(Filter filter);		
 
 }

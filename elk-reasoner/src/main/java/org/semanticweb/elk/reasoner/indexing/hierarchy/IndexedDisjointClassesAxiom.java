@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+
 /*
  * #%L
  * ELK Reasoner
@@ -31,7 +33,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
  *
  */
 public interface IndexedDisjointClassesAxiom extends IndexedAxiom {
-
+	
 	/**
 	 * @return the {@link IndexedClassExpressionList} representing the members
 	 *         of the {@link ElkDisjointClassesAxiom} represented by this
@@ -39,6 +41,34 @@ public interface IndexedDisjointClassesAxiom extends IndexedAxiom {
 	 * 
 	 * @see ElkDisjointClassesAxiom#getClassExpressions()
 	 */
-	public IndexedClassExpressionList getMembers();
+	IndexedClassExpressionList getMembers();
 
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		IndexedDisjointClassesAxiom getIndexedDisjointClassesAxiom(
+				ElkAxiom originalAxiom, IndexedClassExpressionList disjointClasses);
+
+	}
+
+	
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(IndexedDisjointClassesAxiom axiom);
+
+	}
+	
 }

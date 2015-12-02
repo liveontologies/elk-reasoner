@@ -37,7 +37,6 @@ import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
-import org.semanticweb.elk.reasoner.indexing.factories.ModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.implementation.ModifiableIndexedObjectFactoryImpl;
 import org.semanticweb.elk.reasoner.indexing.inferences.ModifiableElkClassAssertionAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.inferences.ModifiableElkDeclarationAxiomConversion;
@@ -66,12 +65,13 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassEx
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedEntity;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 
 /**
- * A {@link ModifiableIndexedObjectFactory} which can only create object present
+ * A {@link ModifiableIndexedObject.Factory} which can only create object present
  * in the provided {@link ModifiableIndexedObjectCache} or (new) not cacheable
  * objects. If a created object is cacheable and there is no structurally
  * equivalent object in the provided {@link ModifiableIndexedObjectCache},
@@ -84,11 +84,11 @@ public class ResolvingModifiableIndexedObjectFactory
 		extends
 			ResolvingCachedIndexedObjectFactory
 		implements
-			ModifiableIndexedObjectFactory {
+			ModifiableIndexedObject.Factory {
 
-	private final ModifiableIndexedObjectFactory baseFactory_;
+	private final ModifiableIndexedObject.Factory baseFactory_;
 
-	public <F extends CachedIndexedObjectFactory & ModifiableIndexedObjectFactory> ResolvingModifiableIndexedObjectFactory(
+	public <F extends CachedIndexedObject.Factory & ModifiableIndexedObject.Factory> ResolvingModifiableIndexedObjectFactory(
 			F baseFactory, ModifiableIndexedObjectCache cache) {
 		super(baseFactory, cache);
 		this.baseFactory_ = baseFactory;

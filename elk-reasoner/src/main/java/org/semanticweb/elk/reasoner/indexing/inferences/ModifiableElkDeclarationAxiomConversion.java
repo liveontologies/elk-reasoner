@@ -1,5 +1,8 @@
 package org.semanticweb.elk.reasoner.indexing.inferences;
 
+import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedEntity;
+
 /*
  * #%L
  * ELK Reasoner
@@ -36,6 +39,18 @@ public interface ModifiableElkDeclarationAxiomConversion
 			ElkDeclarationAxiomConversion,
 			ModifiableIndexedDeclarationAxiomInference {
 
-	// combined interface
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		ModifiableElkDeclarationAxiomConversion getElkDeclarationAxiomConversion(
+				ElkDeclarationAxiom originalAxiom,
+				ModifiableIndexedEntity entity);
+
+	}
 
 }

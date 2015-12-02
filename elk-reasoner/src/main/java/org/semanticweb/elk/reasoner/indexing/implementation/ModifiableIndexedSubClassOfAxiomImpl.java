@@ -23,10 +23,10 @@
 package org.semanticweb.elk.reasoner.indexing.implementation;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
 
 /**
@@ -77,7 +77,7 @@ class ModifiableIndexedSubClassOfAxiomImpl<A extends ElkAxiom> extends Modifiabl
 	}
 
 	@Override
-	public final <O> O accept(IndexedAxiomVisitor<O> visitor) {
+	public final <O> O accept(IndexedAxiom.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

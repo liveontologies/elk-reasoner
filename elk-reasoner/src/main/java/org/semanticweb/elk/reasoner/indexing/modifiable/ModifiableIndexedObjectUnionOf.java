@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.modifiable;
 
+import java.util.List;
+
 /*
  * #%L
  * ELK Reasoner
@@ -37,6 +39,18 @@ public interface ModifiableIndexedObjectUnionOf extends
 		ModifiableIndexedClassExpression, IndexedObjectUnionOf {
 
 	@Override
-	public Set<? extends ModifiableIndexedClassExpression> getDisjuncts();
+	Set<? extends ModifiableIndexedClassExpression> getDisjuncts();
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
 
+		ModifiableIndexedObjectUnionOf getIndexedObjectUnionOf(
+				List<? extends ModifiableIndexedClassExpression> disjuncts);
+
+	}
 }

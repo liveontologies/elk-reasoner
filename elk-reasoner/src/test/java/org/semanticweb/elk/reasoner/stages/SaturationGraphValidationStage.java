@@ -33,8 +33,8 @@ import java.util.Set;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
@@ -43,8 +43,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFr
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedRangeFiller;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedContextRootVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.NoOpIndexedContextRootVisitor;
+import org.semanticweb.elk.reasoner.indexing.implementation.DummyIndexedContextRootVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
@@ -270,8 +269,8 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 	}
 
 	private class IndexedContextRootValidator extends
-			NoOpIndexedContextRootVisitor<Void> implements
-			IndexedContextRootVisitor<Void> {
+			DummyIndexedContextRootVisitor<Void> implements
+			IndexedContextRoot.Visitor<Void> {
 
 		@Override
 		protected Void defaultVisit(IndexedClassExpression element) {

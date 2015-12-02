@@ -38,5 +38,19 @@ public interface ElkDisjointClassesAxiomNaryConversion
 
 	@Override
 	ElkDisjointClassesAxiom getOriginalAxiom();
+	
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(ElkDisjointClassesAxiomNaryConversion inference);
+
+	}
 
 }

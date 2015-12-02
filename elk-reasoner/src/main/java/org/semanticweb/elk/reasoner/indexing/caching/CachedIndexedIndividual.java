@@ -38,6 +38,31 @@ public interface CachedIndexedIndividual extends ModifiableIndexedIndividual,
 		CachedIndexedClassExpression<CachedIndexedIndividual>,
 		CachedIndexedClassEntity<CachedIndexedIndividual> {
 
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		CachedIndexedIndividual getIndexedIndividual(
+				ElkNamedIndividual elkNamedIndividual);
+
+	}
+	
+	/**
+	 * A filter for mapping objects
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Filter {
+
+		CachedIndexedIndividual filter(CachedIndexedIndividual element);
+
+	}
+	
 	static class Helper extends CachedIndexedObject.Helper {
 
 		public static int structuralHashCode(ElkNamedIndividual entity) {

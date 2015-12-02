@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.indexing.factories;
+package org.semanticweb.elk.reasoner.indexing.implementation;
 
 /*
  * #%L
@@ -22,20 +22,34 @@ package org.semanticweb.elk.reasoner.indexing.factories;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedRangeFiller;
 
 /**
- * A factory for creating instances of {@link IndexedSubClassOfAxiom}
+ * An {@link IndexedContextRoot.Visitor} that always returns {@code null}.
  * 
  * @author "Yevgeny Kazakov"
- * 
+ *
+ * @param <O>
  */
-public interface IndexedSubClassOfAxiomFactory {
+public class DummyIndexedContextRootVisitor<O> extends
+		DummyIndexedClassExpressionVisitor<O> implements
+		IndexedContextRoot.Visitor<O> {
 
-	public IndexedSubClassOfAxiom getIndexedSubClassOfAxiom(
-			ElkAxiom originalAxiom, IndexedClassExpression subClass,
-			IndexedClassExpression superClass);
+	@SuppressWarnings("unused")
+	protected O defaultVisit(IndexedContextRoot element) {
+		return null;
+	}
+
+	@Override
+	protected O defaultVisit(IndexedClassExpression element) {
+		return defaultVisit((IndexedContextRoot) element);
+	}
+
+	@Override
+	public O visit(IndexedRangeFiller element) {
+		return defaultVisit(element);
+	}
 
 }

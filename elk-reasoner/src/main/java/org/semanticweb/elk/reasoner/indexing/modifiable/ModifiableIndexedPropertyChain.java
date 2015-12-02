@@ -93,5 +93,20 @@ public interface ModifiableIndexedPropertyChain extends
 	 *         {@link IndexedPropertyChain} does not change
 	 */
 	boolean removeRightChain(IndexedComplexPropertyChain chain);
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory
+			extends
+				ModifiableIndexedComplexPropertyChain.Factory,
+				ModifiableIndexedObjectProperty.Factory {
+
+		// combined interface
+
+	}
 
 }

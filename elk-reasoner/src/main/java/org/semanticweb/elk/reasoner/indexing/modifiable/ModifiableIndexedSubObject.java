@@ -53,4 +53,15 @@ public interface ModifiableIndexedSubObject extends ModifiableIndexedObject {
 	boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
 			OccurrenceIncrement increment);
 
+	interface Factory
+			extends
+				ModifiableIndexedClassExpression.Factory,
+				ModifiableIndexedClassExpressionList.Factory,
+				ModifiableIndexedEntity.Factory,
+				ModifiableIndexedPropertyChain.Factory {
+
+		// combined interface
+
+	}
+	
 }

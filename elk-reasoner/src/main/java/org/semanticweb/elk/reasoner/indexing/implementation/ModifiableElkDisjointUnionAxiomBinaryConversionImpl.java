@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.implementation;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkDisjointUnionAxiom;
-import org.semanticweb.elk.reasoner.indexing.inferences.IndexedSubClassOfAxiomInferenceVisitor;
+import org.semanticweb.elk.reasoner.indexing.inferences.IndexedSubClassOfAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.inferences.ModifiableElkDisjointUnionAxiomBinaryConversion;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectIntersectionOf;
@@ -62,9 +62,8 @@ class ModifiableElkDisjointUnionAxiomBinaryConversionImpl
 	}
 
 	@Override
-	public <I, O> O accept(IndexedSubClassOfAxiomInferenceVisitor<I, O> visitor,
-			I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(IndexedSubClassOfAxiomInference.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 }

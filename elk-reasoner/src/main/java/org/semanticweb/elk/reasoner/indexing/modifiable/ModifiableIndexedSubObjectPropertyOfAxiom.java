@@ -35,9 +35,9 @@ public interface ModifiableIndexedSubObjectPropertyOfAxiom extends
 		ModifiableIndexedAxiom, IndexedSubObjectPropertyOfAxiom {
 
 	@Override
-	public ModifiableIndexedPropertyChain getSubPropertyChain();
+	ModifiableIndexedPropertyChain getSubPropertyChain();
 
 	@Override
-	public ModifiableIndexedObjectProperty getSuperProperty();
+	ModifiableIndexedObjectProperty getSuperProperty();
 
 }

@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.indexing.implementation;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,12 @@ package org.semanticweb.elk.reasoner.indexing.implementation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpressionFilter;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectComplementOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectComplementOfVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
@@ -112,18 +111,13 @@ class CachedIndexedObjectComplementOfImpl
 	}
 
 	@Override
-	public final <O> O accept(IndexedObjectComplementOfVisitor<O> visitor) {
+	public final <O> O accept(IndexedClassExpression.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
 	@Override
-	public final <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
-		return accept((IndexedObjectComplementOfVisitor<O>) visitor);
-	}
-
-	@Override
 	public CachedIndexedObjectComplementOf accept(
-			CachedIndexedClassExpressionFilter filter) {
+			CachedIndexedClassExpression.Filter filter) {
 		return filter.filter(this);
 	}
 

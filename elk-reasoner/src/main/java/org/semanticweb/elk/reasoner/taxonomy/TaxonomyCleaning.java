@@ -40,7 +40,6 @@ import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.stages.ClassTaxonomyState;
 import org.semanticweb.elk.reasoner.stages.InstanceTaxonomyState;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
@@ -103,7 +102,7 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 	public InputProcessor<IndexedClassEntity> getEngine() {
 		return new InputProcessor<IndexedClassEntity>() {
 			// a simple dispatching visitor
-			private final IndexedClassEntityVisitor<?> submissionVisitor_ = new IndexedClassEntityVisitor<Object>() {
+			private final IndexedClassEntity.Visitor<?> submissionVisitor_ = new IndexedClassEntity.Visitor<Object>() {
 
 				@Override
 				public Object visit(IndexedClass element) {

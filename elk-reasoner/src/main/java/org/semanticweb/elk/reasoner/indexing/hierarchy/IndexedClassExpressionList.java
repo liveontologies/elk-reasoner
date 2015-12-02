@@ -38,12 +38,27 @@ public interface IndexedClassExpressionList extends IndexedObject {
 	 * @return {@link IndexedClassExpression}s occurring in this
 	 *         {@link IndexedClassExpressionList}
 	 */
-	public List<? extends IndexedClassExpression> getElements();
+	List<? extends IndexedClassExpression> getElements();
 
 	/**
 	 * @return {@code true} if this {@link IndexedClassExpressionList} occurs in
 	 *         the ontology
 	 */
-	public boolean occurs();
+	boolean occurs();
+	
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(IndexedClassExpressionList element);
+
+	}
+
 
 }

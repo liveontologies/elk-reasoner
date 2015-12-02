@@ -35,6 +35,43 @@ public interface CachedIndexedComplexClassExpression<T extends CachedIndexedComp
 		extends CachedIndexedClassExpression<T>,
 		Entry<T, CachedIndexedComplexClassExpression<?>> {
 
-	// no further specific methods
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory
+			extends
+				CachedIndexedDataHasValue.Factory,
+				CachedIndexedObjectComplementOf.Factory,
+				CachedIndexedObjectHasSelf.Factory,
+				CachedIndexedObjectIntersectionOf.Factory,
+				CachedIndexedObjectSomeValuesFrom.Factory,
+				CachedIndexedObjectUnionOf.Factory {
+		
+		// combined interface
+
+	}
+	
+	/**
+	 * A filter for mapping objects
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Filter
+			extends
+				CachedIndexedDataHasValue.Filter,
+				CachedIndexedObjectComplementOf.Filter,
+				CachedIndexedObjectHasSelf.Filter,
+				CachedIndexedObjectIntersectionOf.Filter,
+				CachedIndexedObjectSomeValuesFrom.Filter,
+				CachedIndexedObjectUnionOf.Filter {
+
+		// combined interface
+
+	}
+
 
 }

@@ -28,12 +28,11 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkComposition;
-import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkComposition;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkComposition;
 import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkOfObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
@@ -55,7 +54,7 @@ public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	 * 
 	 * @see ElkObjectSomeValuesFrom#getProperty()
 	 */
-	public IndexedObjectProperty getProperty();
+	IndexedObjectProperty getProperty();
 
 	/**
 	 * @return The representation of the {@link ElkClassExpression} that is a
@@ -64,16 +63,28 @@ public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	 * 
 	 * @see ElkObjectSomeValuesFrom#getFiller()
 	 */
-	public IndexedClassExpression getFiller();
+	IndexedClassExpression getFiller();
 
 	/**
 	 * @return The {@link IndexedRangeFiller} corresponding to this
 	 *         {@link IndexedObjectSomeValuesFrom}, i.e., having the same
 	 *         property and filler.
 	 */
-	public IndexedRangeFiller getRangeFiller();
+	IndexedRangeFiller getRangeFiller();
 
-	public <O> O accept(IndexedObjectSomeValuesFromVisitor<O> visitor);
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+		
+		O visit(IndexedObjectSomeValuesFrom element);
+		
+	}
 
 	class Helper {
 

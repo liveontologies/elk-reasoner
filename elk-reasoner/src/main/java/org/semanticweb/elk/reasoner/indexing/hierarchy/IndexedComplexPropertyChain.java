@@ -42,7 +42,7 @@ public interface IndexedComplexPropertyChain extends IndexedPropertyChain {
 	 * 
 	 * @see ElkObjectPropertyChain#getObjectPropertyExpressions()
 	 */
-	public IndexedObjectProperty getFirstProperty();
+	IndexedObjectProperty getFirstProperty();
 
 	/**
 	 * @return {@link IndexedPropertyChain} that represents the sub-chain of the
@@ -51,6 +51,20 @@ public interface IndexedComplexPropertyChain extends IndexedPropertyChain {
 	 * 
 	 * @see ElkObjectPropertyChain#getObjectPropertyExpressions()
 	 */
-	public IndexedPropertyChain getSuffixChain();
+	IndexedPropertyChain getSuffixChain();
+	
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(IndexedComplexPropertyChain element);
+
+	}
 
 }

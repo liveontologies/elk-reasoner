@@ -77,7 +77,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyCha
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SubPropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkComposition;
@@ -367,7 +366,7 @@ public class SingleInferenceMapper {
 			final ElkSubObjectPropertyExpression ss = Deindexer.deindex(premise.getForwardChain());
 			ElkObjectProperty h = Deindexer.deindex(inference.getBackwardRelation());
 			ElkObjectSomeValuesFrom hSomeD = factory_.getObjectSomeValuesFrom(h, d);
-			Expression cSubssSomeC = subChain.accept(new IndexedPropertyChainVisitor<Expression>() {
+			Expression cSubssSomeC = subChain.accept(new IndexedPropertyChain.Visitor<Expression>() {
 
 				@Override
 				public Expression visit(IndexedObjectProperty subProp) {
@@ -499,7 +498,7 @@ public class SingleInferenceMapper {
 		}
 		
 		private ElkSubObjectPropertyExpression deindex(IndexedPropertyChain ipc) {
-			return ipc.accept(new IndexedPropertyChainVisitor<ElkSubObjectPropertyExpression>() {
+			return ipc.accept(new IndexedPropertyChain.Visitor<ElkSubObjectPropertyExpression>() {
 
 				@Override
 				public ElkSubObjectPropertyExpression visit(IndexedObjectProperty property) {
@@ -547,7 +546,7 @@ public class SingleInferenceMapper {
 			final IndexedComplexPropertyChain chainWithReflexivity = inference.getPremiseChain();
 			final IndexedPropertyChain subChain = inference.getFullSubChain();
 			
-			return inference.getFullSuperChain().accept(new IndexedPropertyChainVisitor<Inference>() {
+			return inference.getFullSuperChain().accept(new IndexedPropertyChain.Visitor<Inference>() {
 
 				@Override
 				public Inference visit(IndexedObjectProperty iop) {
@@ -575,7 +574,7 @@ public class SingleInferenceMapper {
 			final IndexedComplexPropertyChain chainWithReflexivity = inference.getPremiseChain();
 			final IndexedObjectProperty subProperty = inference.getFullSubChain();
 			
-			return inference.getFullSuperChain().accept(new IndexedPropertyChainVisitor<Inference>() {
+			return inference.getFullSuperChain().accept(new IndexedPropertyChain.Visitor<Inference>() {
 
 				@Override
 				public Inference visit(IndexedObjectProperty iop) {
@@ -598,8 +597,8 @@ public class SingleInferenceMapper {
 		}
 		
 		// creates a visitor which creates an axiom or a lemma out of a reflexive chain
-		private IndexedPropertyChainVisitor<Expression> reflexiveChainExpressionCreator() {
-			return new IndexedPropertyChainVisitor<Expression>() {
+		private IndexedPropertyChain.Visitor<Expression> reflexiveChainExpressionCreator() {
+			return new IndexedPropertyChain.Visitor<Expression>() {
 
 				@Override
 				public Expression visit(IndexedObjectProperty property) {

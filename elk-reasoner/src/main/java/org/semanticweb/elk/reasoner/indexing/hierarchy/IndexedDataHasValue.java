@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataHasValueVisitor;
 
 /**
  * Represents all occurrences of an {@link ElkDataHasValue} in an ontology.
@@ -43,7 +42,7 @@ public interface IndexedDataHasValue extends IndexedClassExpression {
 	 * 
 	 * 
 	 */
-	public ElkDataProperty getRelation();
+	ElkDataProperty getRelation();
 
 	/**
 	 * @return the {@link ElkLiteral} filler of the the {@link ElkDataHasValue}
@@ -51,8 +50,20 @@ public interface IndexedDataHasValue extends IndexedClassExpression {
 	 * 
 	 * @see ElkDataHasValue#getFiller()
 	 */
-	public ElkLiteral getFiller();
+	ElkLiteral getFiller();
 
-	public <O> O accept(IndexedDataHasValueVisitor<O> visitor);
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+		
+		O visit(IndexedDataHasValue element);
+		
+	}	
 
 }

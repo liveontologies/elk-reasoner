@@ -51,10 +51,36 @@ public interface CachedIndexedObject<T extends CachedIndexedObject<T>> extends
 	boolean occurs();
 
 	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory
+			extends				
+				CachedIndexedSubObject.Factory {
+
+		// combined interface
+
+	}
+	
+	/**
+	 * A filter for mapping objects
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Filter extends CachedIndexedSubObject.Filter {
+
+		// combined interface
+
+	}
+	
+	/**
 	 * @param filter
 	 * @return the result of applying the filter to this object
 	 */
-	T accept(CachedIndexedObjectFilter filter);
+	T accept(Filter filter);
 
 	static class Helper {
 		static int combinedHashCode(Object... objects) {

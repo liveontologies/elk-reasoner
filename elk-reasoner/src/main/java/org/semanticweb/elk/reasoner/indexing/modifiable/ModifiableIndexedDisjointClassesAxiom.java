@@ -39,6 +39,6 @@ public interface ModifiableIndexedDisjointClassesAxiom
 			IndexedDisjointClassesAxiom {
 
 	@Override
-	public ModifiableIndexedClassExpressionList getMembers();
+	ModifiableIndexedClassExpressionList getMembers();
 
 }

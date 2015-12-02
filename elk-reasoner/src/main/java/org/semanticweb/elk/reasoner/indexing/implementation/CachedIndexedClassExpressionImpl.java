@@ -23,14 +23,11 @@
 package org.semanticweb.elk.reasoner.indexing.implementation;
 
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpressionFilter;
-import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectFilter;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedContextRootVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 import org.semanticweb.elk.reasoner.saturation.ExtendedContext;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
@@ -114,18 +111,18 @@ abstract class CachedIndexedClassExpressionImpl<T extends CachedIndexedClassExpr
 	}
 
 	@Override
-	public final <O> O accept(IndexedContextRootVisitor<O> visitor) {
-		return accept((IndexedClassExpressionVisitor<O>) visitor);
+	public final <O> O accept(IndexedContextRoot.Visitor<O> visitor) {
+		return accept((IndexedClassExpression.Visitor<O>) visitor);
 	}
 
 	@Override
-	public final <O> O accept(IndexedObjectVisitor<O> visitor) {
-		return accept((IndexedClassExpressionVisitor<O>) visitor);
+	public final <O> O accept(IndexedObject.Visitor<O> visitor) {
+		return accept((IndexedClassExpression.Visitor<O>) visitor);
 	}
 
 	@Override
-	public T accept(CachedIndexedObjectFilter filter) {
-		return accept((CachedIndexedClassExpressionFilter) filter);
+	public T accept(CachedIndexedObject.Filter filter) {
+		return accept((CachedIndexedClassExpression.Filter) filter);
 	}
 
 }

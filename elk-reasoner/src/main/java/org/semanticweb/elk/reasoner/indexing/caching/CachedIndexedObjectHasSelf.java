@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.indexing.caching;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectHasSelf;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 
 /**
  * A {@link ModifiableIndexedObjectHasSelf} that can be used for memoization
@@ -38,6 +39,31 @@ public interface CachedIndexedObjectHasSelf extends
 		ModifiableIndexedObjectHasSelf,
 		CachedIndexedComplexClassExpression<CachedIndexedObjectHasSelf> {
 
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		CachedIndexedObjectHasSelf getIndexedObjectHasSelf(
+				ModifiableIndexedObjectProperty property);
+
+	}
+	
+	/**
+	 * A filter for mapping objects
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Filter {
+
+		CachedIndexedObjectHasSelf filter(CachedIndexedObjectHasSelf element);
+
+	}
+	
 	static class Helper extends CachedIndexedObject.Helper {
 
 		public static int structuralHashCode(IndexedObjectProperty property) {

@@ -29,16 +29,13 @@ import java.util.Collections;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedPropertyChainFilter;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedEntityVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectPropertyVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitorEx;
 
 /**
  * Implements {@link CachedIndexedObjectProperty}
@@ -252,29 +249,19 @@ final class CachedIndexedObjectPropertyImpl
 		return '<' + getElkEntity().getIri().getFullIriAsString() + '>';
 	}
 
-	public final <O> O accept(IndexedObjectPropertyVisitor<O> visitor) {
+	@Override
+	public final <O> O accept(IndexedEntity.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
 	@Override
-	public final <O> O accept(IndexedEntityVisitor<O> visitor) {
-		return accept((IndexedObjectPropertyVisitor<O>) visitor);
-	}
-
-	@Override
-	public final <O> O accept(IndexedPropertyChainVisitor<O> visitor) {
-		return accept((IndexedObjectPropertyVisitor<O>) visitor);
-	}
-
-	@Override
-	public final <O, P> O accept(IndexedPropertyChainVisitorEx<O, P> visitor,
-			P parameter) {
-		return visitor.visit(this, parameter);
+	public final <O> O accept(IndexedPropertyChain.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 	@Override
 	public CachedIndexedObjectProperty accept(
-			CachedIndexedPropertyChainFilter filter) {
+			CachedIndexedPropertyChain.Filter filter) {
 		return filter.filter(this);
 	}
 

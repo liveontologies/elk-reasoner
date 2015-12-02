@@ -25,6 +25,8 @@ package org.semanticweb.elk.reasoner.indexing.caching;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedComplexPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.util.collections.entryset.Entry;
 
 /**
@@ -42,6 +44,33 @@ public interface CachedIndexedComplexPropertyChain
 		CachedIndexedPropertyChain<CachedIndexedComplexPropertyChain>,
 		Entry<CachedIndexedComplexPropertyChain, CachedIndexedComplexPropertyChain> {
 
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		CachedIndexedComplexPropertyChain getIndexedComplexPropertyChain(
+				ModifiableIndexedObjectProperty leftProperty,
+				ModifiableIndexedPropertyChain rightProperty);
+
+	}
+	
+	/**
+	 * A filter for mapping objects
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Filter {
+		
+		CachedIndexedComplexPropertyChain filter(
+				CachedIndexedComplexPropertyChain element);
+		
+	}
+	
 	static class Helper extends CachedIndexedObject.Helper {
 
 		public static int structuralHashCode(

@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.indexing.visitors;
+package org.semanticweb.elk.reasoner.indexing.implementation;
 
 /*
  * #%L
@@ -31,13 +31,13 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubObjectPropertyOfAxiom;
 
 /**
- * An {@link IndexedAxiomVisitor} that always returns {@code null}.
+ * An {@link IndexedAxiom.Visitor} that always returns {@code null}.
  * 
  * @author "Yevgeny Kazakov"
  *
  * @param <O>
  */
-public class NoOpIndexedAxiomVisitor<O> implements IndexedAxiomVisitor<O> {
+public class DummyIndexedAxiomVisitor<O> implements IndexedAxiom.Visitor<O> {
 
 	@SuppressWarnings("unused")
 	protected O defaultVisit(IndexedAxiom axiom) {

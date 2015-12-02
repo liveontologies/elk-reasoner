@@ -23,8 +23,8 @@ package org.semanticweb.elk.reasoner.indexing.implementation;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.inferences.IndexedAxiomInferenceVisitor;
-import org.semanticweb.elk.reasoner.indexing.inferences.IndexedDeclarationAxiomInferenceVisitor;
+import org.semanticweb.elk.reasoner.indexing.inferences.IndexedAxiomInference;
+import org.semanticweb.elk.reasoner.indexing.inferences.IndexedDeclarationAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.inferences.ModifiableIndexedDeclarationAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedEntity;
 
@@ -40,10 +40,8 @@ abstract class ModifiableIndexedDeclarationAxiomInferenceImpl<A extends ElkAxiom
 	}
 
 	@Override
-	public <I, O> O accept(IndexedAxiomInferenceVisitor<I, O> visitor,
-			I input) {
-		return accept((IndexedDeclarationAxiomInferenceVisitor<I, O>) visitor,
-				input);
+	public <O> O accept(IndexedAxiomInference.Visitor<O> visitor) {
+		return accept((IndexedDeclarationAxiomInference.Visitor<O>) visitor);
 	}
 
 }

@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
 
 /**
  * Represents occurrences of an {@link ElkClass} in an ontology.
@@ -37,7 +36,7 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
 public interface IndexedClass extends IndexedClassEntity {
 
 	@Override
-	public ElkClass getElkEntity();
+	ElkClass getElkEntity();
 
 	/**
 	 * @return The {@link IndexedClassExpression} corresponding to an
@@ -48,15 +47,27 @@ public interface IndexedClass extends IndexedClassEntity {
 	 *         can be {@code null} if there are no such equivalent
 	 *         {@link ElkClassExpression}s.
 	 */
-	public IndexedClassExpression getDefinition();
+	IndexedClassExpression getDefinition();
 
 	/**
 	 * @return the {@link ElkAxiom} from which the definition of this
 	 *         {@link IndexedClass} originates or {@code null} if this
 	 *         {@link IndexedClass} is not defined.
 	 */
-	public ElkAxiom getDefinitionReason();
+	ElkAxiom getDefinitionReason();
 
-	public <O> O accept(IndexedClassVisitor<O> visitor);
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(IndexedClass element);
+
+	}
 
 }

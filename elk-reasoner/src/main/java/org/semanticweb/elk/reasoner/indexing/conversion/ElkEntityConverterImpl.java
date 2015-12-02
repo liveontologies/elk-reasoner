@@ -25,12 +25,11 @@ package org.semanticweb.elk.reasoner.indexing.conversion;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.factories.ModifiableIndexedEntityFactory;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedEntity;
 
 /**
  * An implementation of {@link ElkEntityConverter} that uses a given
- * {@link ModifiableIndexedEntityFactory} for creating instances of
+ * {@link ModifiableIndexedEntity.Factory} for creating instances of
  * {@link ModifiableIndexedEntity}
  * 
  * @author "Yevgeny Kazakov"
@@ -38,9 +37,9 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedEntity;
  */
 class ElkEntityConverterImpl extends FailingElkEntityConverter {
 
-	private final ModifiableIndexedEntityFactory factory_;
+	private final ModifiableIndexedEntity.Factory factory_;
 
-	public ElkEntityConverterImpl(ModifiableIndexedEntityFactory factory) {
+	public ElkEntityConverterImpl(ModifiableIndexedEntity.Factory factory) {
 		this.factory_ = factory;
 	}
 

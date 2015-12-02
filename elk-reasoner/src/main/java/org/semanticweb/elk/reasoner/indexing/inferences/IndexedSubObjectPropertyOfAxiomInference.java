@@ -37,8 +37,24 @@ public interface IndexedSubObjectPropertyOfAxiomInference
 			IndexedSubObjectPropertyOfAxiom,
 			IndexedAxiomInference {
 
-	public <I, O> O accept(
-			IndexedSubObjectPropertyOfAxiomInferenceVisitor<I, O> visitor,
-			I input);
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O>
+			extends
+				ElkEquivalentObjectPropertiesAxiomConversion.Visitor<O>,
+				ElkSubObjectPropertyOfAxiomConversion.Visitor<O>,
+				ElkTransitiveObjectPropertyAxiomConversion.Visitor<O> {
+
+		// combined interface
+
+	}
+	
+	<O> O accept(Visitor<O> visitor);
 
 }

@@ -1,5 +1,6 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 
 /*
@@ -39,6 +40,33 @@ public interface IndexedDeclarationAxiom extends IndexedAxiom {
 	 * 
 	 * @see ElkDeclarationAxiom#getEntity()
 	 */
-	public IndexedEntity getEntity();
+	IndexedEntity getEntity();
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		IndexedDeclarationAxiom getIndexedDeclarationAxiom(
+				ElkAxiom originalAxiom, IndexedEntity entity);
+
+	}
+
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(IndexedDeclarationAxiom axiom);
+
+	}
 
 }

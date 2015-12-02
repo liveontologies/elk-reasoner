@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.implementation;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
-import org.semanticweb.elk.reasoner.indexing.inferences.IndexedDisjointClassesAxiomInferenceVisitor;
+import org.semanticweb.elk.reasoner.indexing.inferences.IndexedDisjointClassesAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.inferences.ModifiableElkDifferentIndividualsAxiomNaryConversion;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpressionList;
 
@@ -45,10 +45,9 @@ class ModifiableElkDifferentIndividualsAxiomNaryConversionImpl
 	}
 
 	@Override
-	public <I, O> O accept(
-			IndexedDisjointClassesAxiomInferenceVisitor<I, O> visitor,
-			I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(
+			IndexedDisjointClassesAxiomInference.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 }

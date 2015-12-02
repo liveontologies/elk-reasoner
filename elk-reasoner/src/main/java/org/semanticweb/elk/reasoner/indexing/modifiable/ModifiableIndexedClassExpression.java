@@ -45,5 +45,26 @@ public interface ModifiableIndexedClassExpression extends
 	 *         values.
 	 */
 	Chain<ChainableSubsumerRule> getCompositionRuleChain();
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory
+			extends
+				ModifiableIndexedClassEntity.Factory,
+				ModifiableIndexedDataHasValue.Factory,
+				ModifiableIndexedIndividual.Factory,
+				ModifiableIndexedObjectComplementOf.Factory,
+				ModifiableIndexedObjectHasSelf.Factory,
+				ModifiableIndexedObjectIntersectionOf.Factory,
+				ModifiableIndexedObjectSomeValuesFrom.Factory,
+				ModifiableIndexedObjectUnionOf.Factory {
+
+		// combined interface
+
+	}
 
 }

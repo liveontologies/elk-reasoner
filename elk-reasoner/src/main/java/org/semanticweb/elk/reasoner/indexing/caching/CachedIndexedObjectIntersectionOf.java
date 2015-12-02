@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.caching;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectIntersectionOf;
 
 /**
@@ -38,6 +39,33 @@ public interface CachedIndexedObjectIntersectionOf extends
 		ModifiableIndexedObjectIntersectionOf,
 		CachedIndexedComplexClassExpression<CachedIndexedObjectIntersectionOf> {
 
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		CachedIndexedObjectIntersectionOf getIndexedObjectIntersectionOf(
+				ModifiableIndexedClassExpression conjunctA,
+				ModifiableIndexedClassExpression conjunctB);
+
+	}
+	
+	/**
+	 * A filter for mapping objects
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Filter {
+
+		CachedIndexedObjectIntersectionOf filter(
+				CachedIndexedObjectIntersectionOf element);
+
+	}
+	
 	static class Helper extends CachedIndexedObject.Helper {
 
 		public static int structuralHashCode(

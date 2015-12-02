@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.implementation;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
-import org.semanticweb.elk.reasoner.indexing.inferences.IndexedSubObjectPropertyOfAxiomInferenceVisitor;
+import org.semanticweb.elk.reasoner.indexing.inferences.IndexedSubObjectPropertyOfAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.inferences.ModifiableElkEquivalentObjectPropertiesAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 
@@ -61,10 +61,9 @@ class ModifiableElkEquivalentObjectPropertiesAxiomConversionImpl
 	}
 
 	@Override
-	public <I, O> O accept(
-			IndexedSubObjectPropertyOfAxiomInferenceVisitor<I, O> visitor,
-			I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(
+			IndexedSubObjectPropertyOfAxiomInference.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 }

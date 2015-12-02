@@ -30,8 +30,6 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitorEx;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 
 /**
@@ -55,7 +53,7 @@ public interface IndexedPropertyChain extends IndexedObject {
 	 * @see ElkSubObjectPropertyOfAxiom#getSuperObjectPropertyExpression()
 	 * @see IndexedObjectProperty#getToldSubChains()
 	 */
-	public List<IndexedObjectProperty> getToldSuperProperties();
+	List<IndexedObjectProperty> getToldSuperProperties();
 
 	/**
 	 * @return The {@link ElkAxiom}s responsible for the respective told super
@@ -63,7 +61,7 @@ public interface IndexedPropertyChain extends IndexedObject {
 	 * 
 	 * @see IndexedObjectProperty#getToldSubChainsReasons()
 	 */
-	public List<ElkAxiom> getToldSuperPropertiesReasons();
+	List<ElkAxiom> getToldSuperPropertiesReasons();
 
 	/**
 	 * @return All {@link IndexedComplexPropertyChain}s in which this
@@ -71,17 +69,31 @@ public interface IndexedPropertyChain extends IndexedObject {
 	 * 
 	 * @see IndexedComplexPropertyChain#getSuffixChain()
 	 */
-	public Collection<IndexedComplexPropertyChain> getRightChains();
+	Collection<IndexedComplexPropertyChain> getRightChains();
 
 	/**
 	 * @return The corresponding {@code SaturatedObjecProperty} assigned to this
 	 *         {@link IndexedPropertyChain}; should never be {@code null}
 	 */
-	public SaturatedPropertyChain getSaturated();
+	SaturatedPropertyChain getSaturated();
 
-	public <O> O accept(IndexedPropertyChainVisitor<O> visitor);
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O>
+			extends
+				IndexedObjectProperty.Visitor<O>,
+				IndexedComplexPropertyChain.Visitor<O> {
 
-	public <O, P> O accept(IndexedPropertyChainVisitorEx<O, P> visitor,
-			P parameter);
+		// combined interface
+
+	}
+	
+	<O> O accept(Visitor<O> visitor);	
 
 }

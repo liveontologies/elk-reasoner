@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedIndividualVisitor;
 
 /**
  * Represents occurrences of an {@link ElkIndividual} in an ontology.
@@ -40,8 +39,20 @@ public interface IndexedIndividual extends IndexedClassEntity {
 	 *         {@link IndexedIndividual}.
 	 */
 	@Override
-	public ElkNamedIndividual getElkEntity();
+	ElkNamedIndividual getElkEntity();
 
-	public <O> O accept(IndexedIndividualVisitor<O> visitor);
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(IndexedIndividual element);
+
+	}
 
 }

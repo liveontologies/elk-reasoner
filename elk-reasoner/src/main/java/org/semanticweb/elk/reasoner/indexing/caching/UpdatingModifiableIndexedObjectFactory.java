@@ -37,7 +37,6 @@ import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
-import org.semanticweb.elk.reasoner.indexing.factories.ModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.inferences.ModifiableElkClassAssertionAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.inferences.ModifiableElkDeclarationAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.inferences.ModifiableElkDifferentIndividualsAxiomBinaryConversion;
@@ -72,8 +71,8 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
 
 /**
- * A {@link ModifiableIndexedObjectFactory} that constructs objects using
- * another {@link ModifiableIndexedObjectFactory} and updates the occurrence
+ * A {@link ModifiableIndexedObject.Factory} that constructs objects using
+ * another {@link ModifiableIndexedObject.Factory} and updates the occurrence
  * counts for the constructed objects using the provided
  * {@link OccurrenceIncrement}.
  * 
@@ -86,11 +85,11 @@ public class UpdatingModifiableIndexedObjectFactory
 		extends
 			UpdatingCachedIndexedObjectFactory
 		implements
-			ModifiableIndexedObjectFactory {
+			ModifiableIndexedObject.Factory {
 
-	private final ModifiableIndexedObjectFactory baseFactory_;
+	private final ModifiableIndexedObject.Factory baseFactory_;
 
-	public <F extends CachedIndexedObjectFactory & ModifiableIndexedObjectFactory> UpdatingModifiableIndexedObjectFactory(
+	public <F extends CachedIndexedObject.Factory & ModifiableIndexedObject.Factory> UpdatingModifiableIndexedObjectFactory(
 			F baseFactory, ModifiableOntologyIndex index,
 			OccurrenceIncrement increment) {
 		super(baseFactory, index, increment);

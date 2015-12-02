@@ -47,7 +47,7 @@ public interface IndexedObjectProperty extends IndexedPropertyChain,
 	 *         {@link IndexedObjectProperty}.
 	 */
 	@Override
-	public ElkObjectProperty getElkEntity();
+	ElkObjectProperty getElkEntity();
 
 	/**
 	 * @return The representations of all {@link ElkSubObjectPropertyExpression}
@@ -59,7 +59,7 @@ public interface IndexedObjectProperty extends IndexedPropertyChain,
 	 * @see ElkSubObjectPropertyOfAxiom#getSuperObjectPropertyExpression()
 	 * @see IndexedPropertyChain#getToldSuperProperties()
 	 */
-	public ArrayList<IndexedPropertyChain> getToldSubChains();
+	ArrayList<IndexedPropertyChain> getToldSubChains();
 
 	/**
 	 * @return The {@link ElkAxiom}s responsible for the respective told sub
@@ -67,7 +67,7 @@ public interface IndexedObjectProperty extends IndexedPropertyChain,
 	 * 
 	 * @see IndexedPropertyChain#getToldSuperPropertiesReasons()
 	 */
-	public ArrayList<ElkAxiom> getToldSubChainsReasons();
+	ArrayList<ElkAxiom> getToldSubChainsReasons();
 
 	/**
 	 * @return The representation of ranges for all
@@ -77,13 +77,13 @@ public interface IndexedObjectProperty extends IndexedPropertyChain,
 	 * @see ElkObjectPropertyRangeAxiom#getRange()
 	 * @see ElkObjectPropertyRangeAxiom#getProperty()
 	 */
-	public ArrayList<IndexedClassExpression> getToldRanges();
+	ArrayList<IndexedClassExpression> getToldRanges();
 
 	/**
 	 * @return The {@link ElkAxiom}s responsible for the respective told ranges
 	 *         returned by {@link #getToldRanges()}
 	 */
-	public ArrayList<ElkAxiom> getToldRangesReasons();
+	ArrayList<ElkAxiom> getToldRangesReasons();
 
 	/**
 	 * @return All {@link IndexedComplexPropertyChain}s in which this
@@ -91,6 +91,21 @@ public interface IndexedObjectProperty extends IndexedPropertyChain,
 	 * 
 	 * @see {@link IndexedComplexPropertyChain#getFirstProperty()}
 	 */
-	public Collection<IndexedComplexPropertyChain> getLeftChains();
+	Collection<IndexedComplexPropertyChain> getLeftChains();
+	
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(IndexedObjectProperty element);
+
+	}
+
 
 }

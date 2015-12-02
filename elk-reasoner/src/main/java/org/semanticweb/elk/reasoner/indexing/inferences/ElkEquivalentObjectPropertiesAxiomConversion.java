@@ -64,5 +64,19 @@ public interface ElkEquivalentObjectPropertiesAxiomConversion
 	 * @see IndexedSubObjectPropertyOfAxiom#getSuperProperty()
 	 */
 	int getSuperPropertyPosition();
+	
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(ElkEquivalentObjectPropertiesAxiomConversion inference);
+
+	}
 
 }

@@ -61,5 +61,19 @@ public interface ElkSameIndividualAxiomConversion
 	 * @see IndexedSubClassOfAxiom#getSuperClass()
 	 */
 	int getSuperIndividualPosition();
+	
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+		
+		O visit(ElkSameIndividualAxiomConversion inference);
+		
+	}
 
 }

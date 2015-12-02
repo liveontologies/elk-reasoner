@@ -26,7 +26,6 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.factories.IndexedSubClassOfAxiomFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
@@ -80,7 +79,7 @@ public class SubClassInclusionExpandedSubClassOf
 	}
 
 	public IndexedSubClassOfAxiom getSideCondition(
-			IndexedSubClassOfAxiomFactory factory) {
+			IndexedSubClassOfAxiom.Factory factory) {
 		return factory.getIndexedSubClassOfAxiom(reason_, premiseSubsumer_,
 				getSuperExpression());
 	}

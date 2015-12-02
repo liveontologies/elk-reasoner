@@ -1,5 +1,8 @@
 package org.semanticweb.elk.reasoner.indexing.inferences;
 
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyDomainAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
+
 /*
  * #%L
  * ELK Reasoner
@@ -36,6 +39,19 @@ public interface ModifiableElkObjectPropertyDomainAxiomConversion
 			ElkObjectPropertyDomainAxiomConversion,
 			ModifiableIndexedSubClassOfAxiomInference {
 
-	// combined interface
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		ModifiableElkObjectPropertyDomainAxiomConversion getElkObjectPropertyDomainAxiomConversion(
+				ElkObjectPropertyDomainAxiom originalAxiom,
+				ModifiableIndexedClassExpression subClass,
+				ModifiableIndexedClassExpression superClass);
+
+	}
 
 }

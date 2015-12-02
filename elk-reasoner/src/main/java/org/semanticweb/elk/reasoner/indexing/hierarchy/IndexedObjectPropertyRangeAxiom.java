@@ -22,6 +22,7 @@
 
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
 
 /**
@@ -40,7 +41,7 @@ public interface IndexedObjectPropertyRangeAxiom extends IndexedAxiom {
 	 * 
 	 * @see ElkObjectPropertyRangeAxiom#getProperty()
 	 */
-	public IndexedObjectProperty getProperty();
+	IndexedObjectProperty getProperty();
 
 	/**
 	 * @return the {@link IndexedClassExpression} representing the range of the
@@ -49,6 +50,34 @@ public interface IndexedObjectPropertyRangeAxiom extends IndexedAxiom {
 	 * 
 	 * @see ElkObjectPropertyRangeAxiom#getRange()
 	 */
-	public IndexedClassExpression getRange();
+	IndexedClassExpression getRange();
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		IndexedObjectPropertyRangeAxiom getIndexedObjectPropertyRangeAxiom(
+				ElkAxiom originalAxiom, IndexedObjectProperty property,
+				IndexedClassExpression range);
+
+	}
+	
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(IndexedObjectPropertyRangeAxiom axiom);
+
+	}
 
 }

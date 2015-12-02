@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.caching;
 
+import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
+
 /*
  * #%L
  * ELK Reasoner
@@ -39,6 +41,31 @@ public interface CachedIndexedDataHasValue extends
 		ModifiableIndexedDataHasValue,
 		CachedIndexedComplexClassExpression<CachedIndexedDataHasValue> {
 
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		CachedIndexedDataHasValue getIndexedDataHasValue(
+				ElkDataHasValue elkDataHasValue);
+
+	}
+	
+	/**
+	 * A filter for mapping objects
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Filter {
+
+		CachedIndexedDataHasValue filter(CachedIndexedDataHasValue element);
+
+	}
+	
 	static class Helper extends CachedIndexedObject.Helper {
 
 		public static int structuralHashCode(ElkDataProperty property,

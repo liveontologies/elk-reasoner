@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedContextRootVisitor;
 import org.semanticweb.elk.reasoner.saturation.ExtendedContext;
 
 public interface IndexedContextRoot extends IndexedObject {
@@ -51,6 +50,24 @@ public interface IndexedContextRoot extends IndexedObject {
 	 */
 	ExtendedContext setContextIfAbsent(ExtendedContext context);
 
-	public <O> O accept(IndexedContextRootVisitor<O> visitor);
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O>
+			extends
+				IndexedClassExpression.Visitor<O>,
+				IndexedRangeFiller.Visitor<O> {
+
+		// combined interface
+
+	}
+
+	
+	<O> O accept(IndexedContextRoot.Visitor<O> visitor);
 
 }

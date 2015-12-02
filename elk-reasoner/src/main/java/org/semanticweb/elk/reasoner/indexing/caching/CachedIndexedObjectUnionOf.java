@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.caching;
 
+import java.util.List;
+
 /*
  * #%L
  * ELK Reasoner
@@ -40,6 +42,31 @@ public interface CachedIndexedObjectUnionOf extends
 		ModifiableIndexedObjectUnionOf,
 		CachedIndexedComplexClassExpression<CachedIndexedObjectUnionOf> {
 
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		CachedIndexedObjectUnionOf getIndexedObjectUnionOf(
+				List<? extends ModifiableIndexedClassExpression> disjuncts);
+
+	}
+	
+	/**
+	 * A filter for mapping objects
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Filter {
+
+		CachedIndexedObjectUnionOf filter(CachedIndexedObjectUnionOf element);
+
+	}
+	
 	static class Helper extends CachedIndexedObject.Helper {
 
 		public static int structuralHashCode(

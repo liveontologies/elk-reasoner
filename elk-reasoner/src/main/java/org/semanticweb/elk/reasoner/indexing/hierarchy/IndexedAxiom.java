@@ -1,7 +1,6 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
 
 /*
  * #%L
@@ -38,8 +37,49 @@ public interface IndexedAxiom extends IndexedObject {
 	 * @return the {@link ElkAxiom} from which this {@link IndexedAxiom}
 	 *         originates
 	 */
-	public ElkAxiom getOriginalAxiom();
+	ElkAxiom getOriginalAxiom();
 
-	public <O> O accept(IndexedAxiomVisitor<O> visitor);
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory
+			extends
+			IndexedDisjointClassesAxiom.Factory,
+			IndexedSubClassOfAxiom.Factory,
+			IndexedDefinitionAxiom.Factory,
+			IndexedSubObjectPropertyOfAxiom.Factory,
+			IndexedObjectPropertyRangeAxiom.Factory,
+			IndexedDeclarationAxiom.Factory {
+
+		// combined interface
+
+	}
+
+	
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O>
+			extends
+				IndexedDisjointClassesAxiom.Visitor<O>,
+				IndexedSubClassOfAxiom.Visitor<O>,
+				IndexedDefinitionAxiom.Visitor<O>,
+				IndexedSubObjectPropertyOfAxiom.Visitor<O>,
+				IndexedObjectPropertyRangeAxiom.Visitor<O>,
+				IndexedDeclarationAxiom.Visitor<O> {
+
+		// combined interface
+
+	}
+
+	<O> O accept(Visitor<O> visitor);
 
 }

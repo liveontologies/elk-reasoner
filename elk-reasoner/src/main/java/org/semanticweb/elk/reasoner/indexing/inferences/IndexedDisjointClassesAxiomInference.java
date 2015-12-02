@@ -36,7 +36,24 @@ public interface IndexedDisjointClassesAxiomInference
 			IndexedDisjointClassesAxiom,
 			IndexedAxiomInference {
 
-	public <I, O> O accept(
-			IndexedDisjointClassesAxiomInferenceVisitor<I, O> visitor, I input);
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O>
+			extends
+				ElkDifferentIndividualsAxiomNaryConversion.Visitor<O>,
+				ElkDisjointClassesAxiomNaryConversion.Visitor<O>,
+				ElkDisjointUnionAxiomNaryConversion.Visitor<O> {
+
+		// combined interface
+
+	}
+
+	<O> O accept(Visitor<O> visitor);
 
 }

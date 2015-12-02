@@ -26,7 +26,6 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.factories.IndexedDisjointClassesAxiomFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
@@ -94,7 +93,7 @@ public class ContradictionOfDisjointSubsumers extends
 	}
 	
 	public IndexedDisjointClassesAxiom getSideCondition(
-			IndexedDisjointClassesAxiomFactory factory) {
+			IndexedDisjointClassesAxiom.Factory factory) {
 		return factory.getIndexedDisjointClassesAxiom(reason_,
 				disjointExpressions_);
 	}

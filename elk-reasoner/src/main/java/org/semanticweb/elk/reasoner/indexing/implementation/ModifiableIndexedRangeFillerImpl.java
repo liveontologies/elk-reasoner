@@ -1,5 +1,8 @@
 package org.semanticweb.elk.reasoner.indexing.implementation;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
+
 /*
  * #%L
  * ELK Reasoner
@@ -25,9 +28,6 @@ package org.semanticweb.elk.reasoner.indexing.implementation;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedRangeFiller;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedContextRootVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedFillerVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 import org.semanticweb.elk.reasoner.saturation.ExtendedContext;
 
 /**
@@ -93,18 +93,13 @@ class ModifiableIndexedRangeFillerImpl implements ModifiableIndexedRangeFiller {
 	}
 
 	@Override
-	public <O> O accept(IndexedFillerVisitor<O> visitor) {
+	public <O> O accept(IndexedContextRoot.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
 	@Override
-	public <O> O accept(IndexedContextRootVisitor<O> visitor) {
-		return accept((IndexedFillerVisitor<O>) visitor);
-	}
-
-	@Override
-	public <O> O accept(IndexedObjectVisitor<O> visitor) {
-		return accept((IndexedContextRootVisitor<O>) visitor);
+	public <O> O accept(IndexedObject.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 }

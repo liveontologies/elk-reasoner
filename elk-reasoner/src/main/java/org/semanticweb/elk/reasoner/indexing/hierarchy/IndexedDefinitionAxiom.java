@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,8 +26,36 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 public interface IndexedDefinitionAxiom extends IndexedAxiom {
 
-	public IndexedClass getDefinedClass();
+	IndexedClass getDefinedClass();
 
-	public IndexedClassExpression getDefinition();
+	IndexedClassExpression getDefinition();
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
 
+		IndexedDefinitionAxiom getIndexedDefinitionAxiom(
+				ElkAxiom originalAxiom, IndexedClass definedClass,
+				IndexedClassExpression definition);
+
+	}
+	
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(IndexedDefinitionAxiom axiom);
+
+	}
+	
 }

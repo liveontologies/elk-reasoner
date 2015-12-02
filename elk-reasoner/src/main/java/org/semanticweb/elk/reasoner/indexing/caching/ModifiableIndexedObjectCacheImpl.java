@@ -62,7 +62,7 @@ public class ModifiableIndexedObjectCacheImpl implements
 
 	private final EntryCollection<CachedIndexedIndividual> cachedIndividuals_;
 
-	private final CachedIndexedObjectFilter resolver_, inserter_, deleter_;
+	private final CachedIndexedObject.Filter resolver_, inserter_, deleter_;
 
 	private final Entry<CachedIndexedClass, ?> owlThingResolver_,
 			owlNothingResolver_;
@@ -154,7 +154,7 @@ public class ModifiableIndexedObjectCacheImpl implements
 		input.accept(deleter_);
 	}
 
-	private class Resolver_ implements CachedIndexedObjectFilter {
+	private class Resolver_ implements CachedIndexedObject.Filter {
 
 		@Override
 		public CachedIndexedClass filter(CachedIndexedClass element) {
@@ -222,7 +222,7 @@ public class ModifiableIndexedObjectCacheImpl implements
 
 	}
 
-	private class Inserter_ implements CachedIndexedObjectFilter {
+	private class Inserter_ implements CachedIndexedObject.Filter {
 
 		@Override
 		public CachedIndexedClass filter(CachedIndexedClass element) {
@@ -301,7 +301,7 @@ public class ModifiableIndexedObjectCacheImpl implements
 
 	}
 
-	private class Deleter_ implements CachedIndexedObjectFilter {
+	private class Deleter_ implements CachedIndexedObject.Filter {
 
 		@Override
 		public CachedIndexedClass filter(CachedIndexedClass element) {

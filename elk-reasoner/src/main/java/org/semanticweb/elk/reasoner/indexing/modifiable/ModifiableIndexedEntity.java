@@ -34,6 +34,20 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedEntity;
 public interface ModifiableIndexedEntity extends ModifiableIndexedSubObject,
 		IndexedEntity {
 
-	// nothing specific to modify
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory
+			extends
+				ModifiableIndexedClassEntity.Factory,
+				ModifiableIndexedObjectProperty.Factory {
+
+		// combined interface
+
+	}
+
 
 }

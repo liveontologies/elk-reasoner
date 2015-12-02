@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectUnionOfVisitor;
 
 /**
  * Represents occurrences of an {@link ElkObjectUnionOf} in an ontology.
@@ -41,8 +40,20 @@ public interface IndexedObjectUnionOf extends IndexedClassExpression {
 	 * 
 	 * @see IndexedObjectUnionOf#getDisjuncts()
 	 */
-	public Set<? extends IndexedClassExpression> getDisjuncts();
+	Set<? extends IndexedClassExpression> getDisjuncts();
 
-	public <O> O accept(IndexedObjectUnionOfVisitor<O> visitor);
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+		
+		O visit(IndexedObjectUnionOf element);
+		
+	}
 
 }

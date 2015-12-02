@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.indexing.visitors;
+package org.semanticweb.elk.reasoner.indexing.implementation;
 
 /*
  * #%L
@@ -33,14 +33,14 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFr
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 
 /**
- * An {@link IndexedClassExpressionVisitor} that always returns {@code null}.
+ * An {@link IndexedClassExpression.Visitor} that always returns {@code null}.
  * 
  * @author "Yevgeny Kazakov"
  *
  * @param <O>
  */
-public class NoOpIndexedClassExpressionVisitor<O> implements
-		IndexedClassExpressionVisitor<O> {
+public class DummyIndexedClassExpressionVisitor<O> implements
+		IndexedClassExpression.Visitor<O> {
 
 	@SuppressWarnings("unused")
 	protected O defaultVisit(IndexedClassExpression element) {

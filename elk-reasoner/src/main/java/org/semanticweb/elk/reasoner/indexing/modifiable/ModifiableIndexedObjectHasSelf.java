@@ -35,6 +35,19 @@ public interface ModifiableIndexedObjectHasSelf extends
 		ModifiableIndexedClassExpression, IndexedObjectHasSelf {
 
 	@Override
-	public ModifiableIndexedObjectProperty getProperty();
+	ModifiableIndexedObjectProperty getProperty();
 
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		ModifiableIndexedObjectHasSelf getIndexedObjectHasSelf(
+				ModifiableIndexedObjectProperty property);
+
+	}
+	
 }

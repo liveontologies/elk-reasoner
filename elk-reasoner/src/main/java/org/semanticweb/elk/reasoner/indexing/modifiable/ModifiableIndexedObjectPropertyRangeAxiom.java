@@ -36,9 +36,9 @@ public interface ModifiableIndexedObjectPropertyRangeAxiom extends
 		ModifiableIndexedAxiom, IndexedObjectPropertyRangeAxiom {
 
 	@Override
-	public IndexedObjectProperty getProperty();
+	IndexedObjectProperty getProperty();
 
 	@Override
-	public IndexedClassExpression getRange();
+	IndexedClassExpression getRange();
 
 }

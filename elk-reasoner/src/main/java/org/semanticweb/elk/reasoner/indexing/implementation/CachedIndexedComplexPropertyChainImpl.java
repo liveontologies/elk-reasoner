@@ -23,15 +23,12 @@
 package org.semanticweb.elk.reasoner.indexing.implementation;
 
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedComplexPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedPropertyChainFilter;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedComplexPropertyChainVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitorEx;
 
 /**
  * Implements {@link CachedIndexedComplexPropertyChain}
@@ -131,23 +128,13 @@ final class CachedIndexedComplexPropertyChainImpl
 	}
 
 	@Override
-	public final <O> O accept(IndexedPropertyChainVisitor<O> visitor) {
+	public final <O> O accept(IndexedPropertyChain.Visitor<O> visitor) {
 		return visitor.visit(this);
-	}
-
-	public final <O> O accept(IndexedComplexPropertyChainVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	public final <O, P> O accept(IndexedPropertyChainVisitorEx<O, P> visitor,
-			P parameter) {
-		return visitor.visit(this, parameter);
 	}
 
 	@Override
 	public CachedIndexedComplexPropertyChain accept(
-			CachedIndexedPropertyChainFilter filter) {
+			CachedIndexedPropertyChain.Filter filter) {
 		return filter.filter(this);
 	}
 

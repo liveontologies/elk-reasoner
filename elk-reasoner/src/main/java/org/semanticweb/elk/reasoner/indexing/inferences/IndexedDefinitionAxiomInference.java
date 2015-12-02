@@ -36,7 +36,23 @@ public interface IndexedDefinitionAxiomInference
 			IndexedDefinitionAxiom,
 			IndexedAxiomInference {
 
-	public <I, O> O accept(IndexedDefinitionAxiomInferenceVisitor<I, O> visitor,
-			I input);
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O>
+			extends
+				ElkDisjointUnionAxiomDefinitionConversion.Visitor<O>,
+				ElkEquivalentClassesAxiomDefinitionConversion.Visitor<O> {
+
+		// combined interface
+
+	}
+	
+	<O> O accept(Visitor<O> visitor);
 
 }

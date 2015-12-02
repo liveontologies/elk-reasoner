@@ -50,8 +50,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFr
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedRangeFiller;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedContextRootVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 
 /**
  * Converts indexed objects to ELK OWL objects i.e. the inverse of indexing.
@@ -60,7 +58,7 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisito
  *
  *         pavel.klinov@uni-ulm.de
  */
-public class Deindexer implements IndexedContextRootVisitor<ElkClassExpression> {
+public class Deindexer implements IndexedContextRoot.Visitor<ElkClassExpression> {
 
 	private final static ElkObjectFactory factory_ = new ElkObjectFactoryImpl();
 
@@ -71,7 +69,7 @@ public class Deindexer implements IndexedContextRootVisitor<ElkClassExpression> 
 	public static ElkSubObjectPropertyExpression deindex(
 			IndexedPropertyChain ipc) {
 		return ipc
-				.accept(new IndexedPropertyChainVisitor<ElkSubObjectPropertyExpression>() {
+				.accept(new IndexedPropertyChain.Visitor<ElkSubObjectPropertyExpression>() {
 
 					@Override
 					public ElkSubObjectPropertyExpression visit(
@@ -99,7 +97,7 @@ public class Deindexer implements IndexedContextRootVisitor<ElkClassExpression> 
 
 			ipc = ipc
 					.getSuffixChain()
-					.accept(new IndexedPropertyChainVisitor<IndexedComplexPropertyChain>() {
+					.accept(new IndexedPropertyChain.Visitor<IndexedComplexPropertyChain>() {
 
 						@Override
 						public IndexedComplexPropertyChain visit(

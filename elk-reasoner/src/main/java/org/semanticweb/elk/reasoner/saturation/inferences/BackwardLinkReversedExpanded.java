@@ -1,7 +1,6 @@
 package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.factories.IndexedSubObjectPropertyOfAxiomFactory;
 
 /*
  * #%L
@@ -82,7 +81,7 @@ public class BackwardLinkReversedExpanded extends AbstractBackwardLinkInference 
 	}
 	
 	public IndexedSubObjectPropertyOfAxiom getSideCondition(
-			IndexedSubObjectPropertyOfAxiomFactory factory) {
+			IndexedSubObjectPropertyOfAxiom.Factory factory) {
 		return factory.getIndexedSubObjectPropertyOfAxiom(reason_, subChain_,
 				getBackwardRelation());
 	}

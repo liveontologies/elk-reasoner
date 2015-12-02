@@ -1,5 +1,8 @@
 package org.semanticweb.elk.reasoner.indexing.inferences;
 
+import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedIndividual;
+
 /*
  * #%L
  * ELK Reasoner
@@ -35,6 +38,20 @@ public interface ModifiableElkSameIndividualAxiomConversion
 			ElkSameIndividualAxiomConversion,
 			ModifiableIndexedSubClassOfAxiomInference {
 
-	// combined interface
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		ModifiableElkSameIndividualAxiomConversion getElkSameIndividualAxiomConversion(
+				ElkSameIndividualAxiom originalAxiom, int subIndividualPosition,
+				int superIndividualPosition,
+				ModifiableIndexedIndividual subIndividual,
+				ModifiableIndexedIndividual superIndividual);
+
+	}
 
 }

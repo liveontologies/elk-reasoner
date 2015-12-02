@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.caching;
  */
 
 /**
- * A {@link CachedIndexedObjectFactory} which can only create object present in
+ * A {@link CachedIndexedObject.Factory} which can only create object present in
  * the provided {@link ModifiableIndexedObjectCache}. If there is no
  * structurally equivalent object to the one that should be constructed,
  * {@code null} is returned.
@@ -37,7 +37,7 @@ public class ResolvingCachedIndexedObjectFactory extends
 	private final ModifiableIndexedObjectCache cache_;
 
 	public ResolvingCachedIndexedObjectFactory(
-			CachedIndexedObjectFactory baseFactory,
+			CachedIndexedObject.Factory baseFactory,
 			ModifiableIndexedObjectCache cache) {
 		super(baseFactory);
 		this.cache_ = cache;

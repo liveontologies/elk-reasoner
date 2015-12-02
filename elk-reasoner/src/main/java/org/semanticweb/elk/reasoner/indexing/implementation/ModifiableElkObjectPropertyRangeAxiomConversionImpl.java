@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.implementation;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
-import org.semanticweb.elk.reasoner.indexing.inferences.IndexedObjectPropertyRangeAxiomInferenceVisitor;
+import org.semanticweb.elk.reasoner.indexing.inferences.IndexedObjectPropertyRangeAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.inferences.ModifiableElkObjectPropertyRangeAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
@@ -47,10 +47,9 @@ class ModifiableElkObjectPropertyRangeAxiomConversionImpl
 	}
 
 	@Override
-	public <I, O> O accept(
-			IndexedObjectPropertyRangeAxiomInferenceVisitor<I, O> visitor,
-			I input) {
-		return visitor.visit(this, input);
+	public <O> O accept(
+			IndexedObjectPropertyRangeAxiomInference.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 }

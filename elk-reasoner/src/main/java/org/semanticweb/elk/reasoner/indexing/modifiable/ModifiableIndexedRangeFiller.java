@@ -34,9 +34,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedRangeFiller;
 public interface ModifiableIndexedRangeFiller extends IndexedRangeFiller {
 
 	@Override
-	public ModifiableIndexedObjectProperty getProperty();
+	ModifiableIndexedObjectProperty getProperty();
 
 	@Override
-	public ModifiableIndexedClassExpression getFiller();
+	ModifiableIndexedClassExpression getFiller();
 
 }

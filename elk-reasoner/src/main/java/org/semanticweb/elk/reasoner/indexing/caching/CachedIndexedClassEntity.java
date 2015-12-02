@@ -37,5 +37,33 @@ public interface CachedIndexedClassEntity<T extends CachedIndexedClassEntity<T>>
 		extends ModifiableIndexedClassEntity, CachedIndexedClassExpression<T>,
 		CachedIndexedEntity<T> {
 
-	// no further specific methods
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory
+			extends
+				CachedIndexedClass.Factory,
+				CachedIndexedIndividual.Factory {
+
+		// combined interface
+		
+	}
+	
+	/**
+	 * A filter for mapping objects
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Filter
+			extends
+				CachedIndexedClass.Filter,
+				CachedIndexedIndividual.Filter {
+
+		// combined interface
+		
+	}
 }

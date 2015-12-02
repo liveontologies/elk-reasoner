@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.modifiable;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
@@ -35,9 +36,11 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
  * @author "Yevgeny Kazakov"
  *
  */
-public interface ModifiableIndexedObjectProperty extends
-		ModifiableIndexedPropertyChain, ModifiableIndexedEntity,
-		IndexedObjectProperty {
+public interface ModifiableIndexedObjectProperty
+		extends
+			ModifiableIndexedPropertyChain,
+			ModifiableIndexedEntity,
+			IndexedObjectProperty {
 
 	/**
 	 * Adds the given {@link IndexedComplexPropertyChain} to the list of
@@ -122,5 +125,18 @@ public interface ModifiableIndexedObjectProperty extends
 	 *         {@link IndexedObjectProperty} does not change
 	 */
 	boolean removeToldRange(IndexedClassExpression range, ElkAxiom reason);
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		ModifiableIndexedObjectProperty getIndexedObjectProperty(
+				ElkObjectProperty elkObjectProperty);
+
+	}
 
 }

@@ -35,12 +35,26 @@ public interface ModifiableIndexedObjectSomeValuesFrom extends
 		ModifiableIndexedClassExpression, IndexedObjectSomeValuesFrom {
 
 	@Override
-	public ModifiableIndexedObjectProperty getProperty();
+	ModifiableIndexedObjectProperty getProperty();
 
 	@Override
-	public ModifiableIndexedRangeFiller getRangeFiller();
+	ModifiableIndexedRangeFiller getRangeFiller();
 	
 	@Override
-	public ModifiableIndexedClassExpression getFiller();
+	ModifiableIndexedClassExpression getFiller();
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		ModifiableIndexedObjectSomeValuesFrom getIndexedObjectSomeValuesFrom(
+				ModifiableIndexedObjectProperty property,
+				ModifiableIndexedClassExpression fillerConcept);
+
+	}
 
 }

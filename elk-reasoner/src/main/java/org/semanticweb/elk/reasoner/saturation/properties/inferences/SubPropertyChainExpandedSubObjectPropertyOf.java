@@ -26,7 +26,6 @@ package org.semanticweb.elk.reasoner.saturation.properties.inferences;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.factories.IndexedSubObjectPropertyOfAxiomFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubObjectPropertyOfAxiom;
@@ -76,7 +75,7 @@ public class SubPropertyChainExpandedSubObjectPropertyOf extends AbstractSubProp
 	}
 	
 	public IndexedSubObjectPropertyOfAxiom getSideCondition(
-			IndexedSubObjectPropertyOfAxiomFactory factory) {
+			IndexedSubObjectPropertyOfAxiom.Factory factory) {
 		return factory.getIndexedSubObjectPropertyOfAxiom(reason_,
 				getSubChain(), middleChain_);
 	}

@@ -56,7 +56,7 @@ public interface ModifiableOntologyIndex extends OntologyIndex,
 	 * @return {@code true} if the operation is successful and {@code false} if
 	 *         not; if {@code false} is return, the index remains unchanged
 	 */
-	public boolean addReflexiveProperty(IndexedObjectProperty property,
+	boolean addReflexiveProperty(IndexedObjectProperty property,
 			ElkAxiom reason);
 
 	/**
@@ -71,7 +71,7 @@ public interface ModifiableOntologyIndex extends OntologyIndex,
 	 * @return {@code true} if the operation is successful and {@code false} if
 	 *         not; if {@code false} is return, the index remains unchanged
 	 */
-	public boolean removeReflexiveProperty(IndexedObjectProperty property,
+	boolean removeReflexiveProperty(IndexedObjectProperty property,
 			ElkAxiom reason);
 
 	/**
@@ -84,7 +84,7 @@ public interface ModifiableOntologyIndex extends OntologyIndex,
 	 * 
 	 * @see OntologyIndex#getContextInitRuleHead()
 	 */
-	public boolean addContextInitRule(ChainableContextInitRule newRule);
+	boolean addContextInitRule(ChainableContextInitRule newRule);
 
 	/**
 	 * Removes an existing context initialization for this {@link OntologyIndex}
@@ -96,7 +96,7 @@ public interface ModifiableOntologyIndex extends OntologyIndex,
 	 * 
 	 * @see OntologyIndex#getContextInitRuleHead()
 	 */
-	public boolean removeContextInitRule(ChainableContextInitRule oldRule);
+	boolean removeContextInitRule(ChainableContextInitRule oldRule);
 
 	/**
 	 * Adds a new context rule for the given {@link IndexedClassExpression}
@@ -108,7 +108,7 @@ public interface ModifiableOntologyIndex extends OntologyIndex,
 	 * @return {@code true} if the operation is successful and {@code false} if
 	 *         not; if {@code false} is return, the index remains unchanged
 	 */
-	public boolean add(ModifiableIndexedClassExpression target,
+	boolean add(ModifiableIndexedClassExpression target,
 			ChainableSubsumerRule newRule);
 
 	/**
@@ -123,7 +123,7 @@ public interface ModifiableOntologyIndex extends OntologyIndex,
 	 * @return {@code true} if the operation is successful and {@code false} if
 	 *         not; if {@code false} is return, the index remains unchanged
 	 */
-	public boolean remove(ModifiableIndexedClassExpression target,
+	boolean remove(ModifiableIndexedClassExpression target,
 			ChainableSubsumerRule oldRule);
 
 	/**
@@ -142,7 +142,7 @@ public interface ModifiableOntologyIndex extends OntologyIndex,
 	 * 
 	 * @see #hasNegativeOwlThing()
 	 */
-	public boolean updateNegativeOwlThingOccurrenceNo(int increment);
+	boolean updateNegativeOwlThingOccurrenceNo(int increment);
 
 	/**
 	 * Tries to change the number of positive occurrences of {@code owl:Nothing}
@@ -160,7 +160,7 @@ public interface ModifiableOntologyIndex extends OntologyIndex,
 	 * 
 	 * @see #hasPositivelyOwlNothing()
 	 */
-	public boolean updatePositiveOwlNothingOccurrenceNo(int increment);
+	boolean updatePositiveOwlNothingOccurrenceNo(int increment);
 
 	/**
 	 * Tries to set the given {@link IndexedClassExpression} as definition for
@@ -179,7 +179,7 @@ public interface ModifiableOntologyIndex extends OntologyIndex,
 	 * @return {@code true} if the definition was set and {@code false} if this
 	 *         operation was not successful
 	 */
-	public boolean tryAddDefinition(ModifiableIndexedClass target,
+	boolean tryAddDefinition(ModifiableIndexedClass target,
 			ModifiableIndexedClassExpression definition, ElkAxiom reason);
 
 	/**
@@ -201,7 +201,7 @@ public interface ModifiableOntologyIndex extends OntologyIndex,
 	 * @return {@code true} if the definition was removed and {@code false} if
 	 *         this operation was not successful
 	 */
-	public boolean tryRemoveDefinition(ModifiableIndexedClass target,
+	boolean tryRemoveDefinition(ModifiableIndexedClass target,
 			ModifiableIndexedClassExpression definition, ElkAxiom reason);
 
 }

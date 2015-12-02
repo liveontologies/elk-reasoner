@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.modifiable;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 
 /**
@@ -32,8 +33,10 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
  * @author "Yevgeny Kazakov"
  *
  */
-public interface ModifiableIndexedClass extends ModifiableIndexedClassEntity,
-		IndexedClass {
+public interface ModifiableIndexedClass
+		extends
+			ModifiableIndexedClassEntity,
+			IndexedClass {
 
 	/**
 	 * Set the given {@link ModifiableIndexedClassExpression} as a definition of
@@ -56,5 +59,17 @@ public interface ModifiableIndexedClass extends ModifiableIndexedClassEntity,
 	 * method, {@link #getDefinition()} returns {@code null}
 	 */
 	void removeDefinition();
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		ModifiableIndexedClass getIndexedClass(ElkClass elkClass);
+
+	}
 
 }

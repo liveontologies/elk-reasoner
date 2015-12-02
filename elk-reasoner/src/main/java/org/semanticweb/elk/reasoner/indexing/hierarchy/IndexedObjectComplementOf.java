@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectComplementOfVisitor;
 
 /**
  * Represents occurrences of an {@link ElkObjectComplementOf} in an ontology.
@@ -38,8 +37,20 @@ public interface IndexedObjectComplementOf extends IndexedClassExpression {
 	 * 
 	 * @see ElkObjectComplementOf#getClassExpression()
 	 */
-	public IndexedClassExpression getNegated();
+	IndexedClassExpression getNegated();
 
-	public <O> O accept(IndexedObjectComplementOfVisitor<O> visitor);
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+		
+		O visit(IndexedObjectComplementOf element);
+		
+	}	
 
 }

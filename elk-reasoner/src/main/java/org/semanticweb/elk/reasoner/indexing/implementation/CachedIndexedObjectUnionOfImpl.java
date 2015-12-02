@@ -25,13 +25,12 @@ package org.semanticweb.elk.reasoner.indexing.implementation;
 import java.util.List;
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpressionFilter;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectUnionOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectUnionOfVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.logging.LogLevel;
@@ -133,18 +132,13 @@ class CachedIndexedObjectUnionOfImpl extends
 	}
 
 	@Override
-	public final <O> O accept(IndexedObjectUnionOfVisitor<O> visitor) {
+	public final <O> O accept(IndexedClassExpression.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
 	@Override
-	public final <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
-		return accept((IndexedObjectUnionOfVisitor<O>) visitor);
-	}
-
-	@Override
 	public CachedIndexedObjectUnionOf accept(
-			CachedIndexedClassExpressionFilter filter) {
+			CachedIndexedClassExpression.Filter filter) {
 		return filter.filter(this);
 	}
 

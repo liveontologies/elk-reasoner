@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.caching;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectComplementOf;
 
 /**
@@ -38,6 +39,32 @@ public interface CachedIndexedObjectComplementOf extends
 		ModifiableIndexedObjectComplementOf,
 		CachedIndexedComplexClassExpression<CachedIndexedObjectComplementOf> {
 
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		CachedIndexedObjectComplementOf getIndexedObjectComplementOf(
+				ModifiableIndexedClassExpression negated);
+
+	}
+	
+	/**
+	 * A filter for mapping objects
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Filter {
+
+		CachedIndexedObjectComplementOf filter(
+				CachedIndexedObjectComplementOf element);
+
+	}
+	
 	static class Helper extends CachedIndexedObject.Helper {
 
 		public static int structuralHashCode(IndexedClassExpression negated) {

@@ -23,14 +23,13 @@
 package org.semanticweb.elk.reasoner.indexing.implementation;
 
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpressionFilter;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedEntity;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedEntityVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedIndividualVisitor;
 
 /**
  * Implements {@link CachedIndexedIndividual}
@@ -77,28 +76,23 @@ class CachedIndexedIndividualImpl extends
 	}
 
 	@Override
-	public final <O> O accept(IndexedIndividualVisitor<O> visitor) {
+	public final <O> O accept(IndexedClassEntity.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
 	@Override
-	public final <O> O accept(IndexedClassEntityVisitor<O> visitor) {
-		return accept((IndexedIndividualVisitor<O>) visitor);
+	public final <O> O accept(IndexedEntity.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 	@Override
-	public final <O> O accept(IndexedEntityVisitor<O> visitor) {
-		return accept((IndexedIndividualVisitor<O>) visitor);
-	}
-
-	@Override
-	public final <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
-		return accept((IndexedIndividualVisitor<O>) visitor);
+	public final <O> O accept(IndexedClassExpression.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 	@Override
 	public CachedIndexedIndividual accept(
-			CachedIndexedClassExpressionFilter filter) {
+			CachedIndexedClassExpression.Filter filter) {
 		return filter.filter(this);
 	}
 

@@ -35,6 +35,6 @@ public interface ModifiableIndexedDeclarationAxiom extends
 		ModifiableIndexedAxiom, IndexedDeclarationAxiom {
 
 	@Override
-	public ModifiableIndexedEntity getEntity();
+	ModifiableIndexedEntity getEntity();
 
 }

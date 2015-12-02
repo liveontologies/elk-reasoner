@@ -43,6 +43,32 @@ public interface CachedIndexedClassExpressionList
 			CachedIndexedSubObject<CachedIndexedClassExpressionList>,
 			Entry<CachedIndexedClassExpressionList, CachedIndexedClassExpressionList> {
 
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		CachedIndexedClassExpressionList getIndexedClassExpressionList(
+				List<? extends ModifiableIndexedClassExpression> members);
+
+	}
+	
+	/**
+	 * A filter for mapping objects
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Filter {
+
+		CachedIndexedClassExpressionList filter(
+				CachedIndexedClassExpressionList element);
+
+	}
+	
 	static class Helper extends CachedIndexedObject.Helper {
 
 		public static int structuralHashCode(

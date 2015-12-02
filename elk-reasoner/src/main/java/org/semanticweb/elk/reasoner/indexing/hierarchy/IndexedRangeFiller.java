@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,7 +26,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedFillerVisitor;
 
 /**
  * @return Represents the filler of {@link ElkObjectSomeValuesFrom} that is a
@@ -46,7 +47,7 @@ public interface IndexedRangeFiller extends IndexedContextRoot {
 	 *         the {@link ElkObjectSomeValuesFrom} corresponding to this
 	 *         {@link IndexedRangeFiller}.
 	 */
-	public IndexedObjectProperty getProperty();
+	IndexedObjectProperty getProperty();
 
 	/**
 	 * @return The representation of the {@link ElkClassExpression} which this
@@ -54,8 +55,20 @@ public interface IndexedRangeFiller extends IndexedContextRoot {
 	 *         {@link ElkObjectSomeValuesFrom} corresponding to this
 	 *         {@link IndexedRangeFiller}.
 	 */
-	public IndexedClassExpression getFiller();
+	IndexedClassExpression getFiller();
 
-	public <O> O accept(IndexedFillerVisitor<O> visitor);
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+		
+		O visit(IndexedRangeFiller element);
+
+	}
 
 }

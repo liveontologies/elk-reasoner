@@ -1,5 +1,9 @@
 package org.semanticweb.elk.reasoner.indexing.inferences;
 
+import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedIndividual;
+
 /*
  * #%L
  * ELK Reasoner
@@ -36,6 +40,19 @@ public interface ModifiableElkClassAssertionAxiomConversion
 			ElkClassAssertionAxiomConversion,
 			ModifiableIndexedSubClassOfAxiomInference {
 
-	// combined interface
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		ModifiableElkClassAssertionAxiomConversion getElkClassAssertionAxiomConversion(
+				ElkClassAssertionAxiom originalAxiom,
+				ModifiableIndexedIndividual instance,
+				ModifiableIndexedClassExpression type);
+
+	}
 
 }

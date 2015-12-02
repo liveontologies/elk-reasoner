@@ -34,12 +34,8 @@ import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.AbstractObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.properties.inferences.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.properties.inferences.RightReflexiveSubPropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.properties.inferences.ToldSubProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.SideConditionLookup;
 
 /**
@@ -72,7 +68,7 @@ abstract class PropertyInferenceVisitor extends AbstractObjectPropertyInferenceV
 
 	@Override
 	public Inference visit(final RightReflexiveSubPropertyChainInference inference, final AxiomExpression<ElkSubObjectPropertyOfAxiom> premise) {
-		return inference.getReflexivePremise().getFullChain().accept(new IndexedPropertyChainVisitor<Inference>() {
+		return inference.getReflexivePremise().getFullChain().accept(new IndexedPropertyChain.Visitor<Inference>() {
 
 			@Override
 			public Inference visit(IndexedObjectProperty iop) {

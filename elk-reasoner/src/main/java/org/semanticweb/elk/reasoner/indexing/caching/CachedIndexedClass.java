@@ -36,6 +36,31 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClass;
 public interface CachedIndexedClass extends ModifiableIndexedClass,
 		CachedIndexedClassEntity<CachedIndexedClass> {
 
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+		
+		CachedIndexedClass getIndexedClass(ElkClass elkClass);
+		
+	}
+	
+	/**
+	 * A filter for mapping objects
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Filter {
+
+		CachedIndexedClass filter(CachedIndexedClass element);
+
+	}
+			
+	
 	static class Helper extends CachedIndexedObject.Helper {
 
 		public static int structuralHashCode(ElkClass entity) {

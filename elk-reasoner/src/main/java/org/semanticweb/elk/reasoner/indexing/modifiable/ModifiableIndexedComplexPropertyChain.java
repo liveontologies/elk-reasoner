@@ -35,9 +35,23 @@ public interface ModifiableIndexedComplexPropertyChain extends
 		ModifiableIndexedPropertyChain, IndexedComplexPropertyChain {
 
 	@Override
-	public ModifiableIndexedObjectProperty getFirstProperty();
+	ModifiableIndexedObjectProperty getFirstProperty();
 
 	@Override
-	public ModifiableIndexedPropertyChain getSuffixChain();
+	ModifiableIndexedPropertyChain getSuffixChain();
 
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		ModifiableIndexedComplexPropertyChain getIndexedComplexPropertyChain(
+				ModifiableIndexedObjectProperty leftProperty,
+				ModifiableIndexedPropertyChain rightProperty);
+
+	}
+	
 }
