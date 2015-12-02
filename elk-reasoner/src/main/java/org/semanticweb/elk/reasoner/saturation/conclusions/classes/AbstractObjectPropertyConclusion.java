@@ -3,6 +3,8 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
+import org.semanticweb.elk.reasoner.Conclusion;
+
 /*
  * #%L
  * ELK Reasoner
@@ -57,6 +59,11 @@ public abstract class AbstractObjectPropertyConclusion
 
 	@Override
 	public <O> O accept(SaturationConclusion.Visitor<O> visitor) {
+		return accept((ObjectPropertyConclusion.Visitor<O>) visitor);
+	}
+	
+	@Override
+	public final <O> O accept(Conclusion.Visitor<O> visitor) {
 		return accept((ObjectPropertyConclusion.Visitor<O>) visitor);
 	}
 

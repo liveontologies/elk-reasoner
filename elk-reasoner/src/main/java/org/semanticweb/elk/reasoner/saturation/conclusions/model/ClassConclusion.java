@@ -3,6 +3,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.model;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 
 /*
@@ -28,12 +29,13 @@ import org.semanticweb.elk.reasoner.saturation.rules.Rule;
  */
 
 /**
- * Derived class axioms produced by inference rules and used as premises of
- * inference rules. The rules can be applied to {@link ClassConclusion}s
- * together with other {@link ClassConclusion}s stored in
- * {@link ContextPremises}.
+ * A {@link SaturationConclusion} that represents a derived class axiom produced
+ * by {@link ClassInference}s. {@link ClassConclusion}s are stored in
+ * {@link ContextPremises} to which {@link Rule}s are applied producing
+ * {@link ClassInference}s.
  * 
  * @see Rule
+ * @see ClassInference
  * 
  * @author "Yevgeny Kazakov"
  * 

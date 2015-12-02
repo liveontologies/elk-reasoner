@@ -1,6 +1,6 @@
-package org.semanticweb.elk.reasoner.saturation.conclusions.model;
+package org.semanticweb.elk.reasoner;
 
-import org.semanticweb.elk.reasoner.Conclusion;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
 
 /*
@@ -26,32 +26,13 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
  */
 
 /**
- * A {@link Conclusion} that represents an axiom derived by saturation inference
- * rules.
- * 
- * @see SaturationInference
+ * A {@link Conclusion} obtained from other {@link Conclusion}s using some
+ * inference rule.
  * 
  * @author Yevgeny Kazakov
  *
  */
-public interface SaturationConclusion extends Conclusion {
-
-	public <O> O accept(Visitor<O> visitor);
-
-	/**
-	 * A factory for creating instances
-	 * 
-	 * @author Yevgeny Kazakov
-	 *
-	 */
-	interface Factory
-			extends
-				ClassConclusion.Factory,
-				ObjectPropertyConclusion.Factory {
-
-		// combined interface
-
-	}
+public interface Inference {
 
 	/**
 	 * The visitor pattern for instances
@@ -63,11 +44,13 @@ public interface SaturationConclusion extends Conclusion {
 	 */
 	interface Visitor<O>
 			extends
-				ClassConclusion.Visitor<O>,
-				ObjectPropertyConclusion.Visitor<O> {
+				IndexedAxiomInference.Visitor<O>,
+				SaturationInference.Visitor<O> {
 
 		// combined interface
 
 	}
+	
+	public <O> O accept(Visitor<O> visitor);
 
 }

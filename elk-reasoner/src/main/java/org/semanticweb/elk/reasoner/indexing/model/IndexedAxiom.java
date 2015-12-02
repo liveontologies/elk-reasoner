@@ -1,6 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.model;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.reasoner.Conclusion;
 
 /*
  * #%L
@@ -31,7 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface IndexedAxiom extends IndexedObject {
+public interface IndexedAxiom extends IndexedObject, Conclusion {
 
 	/**
 	 * @return the {@link ElkAxiom} from which this {@link IndexedAxiom}

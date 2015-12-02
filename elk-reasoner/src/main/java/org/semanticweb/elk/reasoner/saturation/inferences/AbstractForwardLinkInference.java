@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.inferences;
 
+import org.semanticweb.elk.reasoner.Inference;
+
 /*
  * #%L
  * ELK Reasoner
@@ -37,6 +39,11 @@ public abstract class AbstractForwardLinkInference<R extends IndexedPropertyChai
 	}
 
 	@Override
+	public <O> O accept(Inference.Visitor<O> visitor) {
+		return accept((ForwardLinkInference.Visitor<O>) visitor);
+	}
+	
+	@Override
 	public <O> O accept(SaturationInference.Visitor<O> visitor) {
 		return accept((ForwardLinkInference.Visitor<O>) visitor);
 	}
@@ -44,6 +51,6 @@ public abstract class AbstractForwardLinkInference<R extends IndexedPropertyChai
 	@Override
 	public <O> O accept(ClassInference.Visitor<O> visitor) {
 		return accept((ForwardLinkInference.Visitor<O>) visitor);
-	}
+	}	
 
 }

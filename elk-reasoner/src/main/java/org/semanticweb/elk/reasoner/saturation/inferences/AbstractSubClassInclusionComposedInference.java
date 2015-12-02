@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.inferences;
 
+import org.semanticweb.elk.reasoner.Inference;
+
 /*
  * #%L
  * ELK Reasoner
@@ -37,6 +39,11 @@ public abstract class AbstractSubClassInclusionComposedInference<S extends Index
 		super(root, subsumer);
 	}
 
+	@Override
+	public <O> O accept(Inference.Visitor<O> visitor) {
+		return accept((SubClassInclusionComposedInference.Visitor<O>) visitor);
+	}
+	
 	@Override
 	public <O> O accept(SaturationInference.Visitor<O> visitor) {
 		return accept((SubClassInclusionComposedInference.Visitor<O>) visitor);

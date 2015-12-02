@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.reasoner.Inference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.DisjointSubsumerImpl;
@@ -39,6 +40,11 @@ public abstract class AbstractDisjointSubsumerInference
 	}
 
 	@Override
+	public <O> O accept(Inference.Visitor<O> visitor) {
+		return accept((DisjointSubsumerInference.Visitor<O>) visitor);
+	}
+	
+	@Override
 	public <O> O accept(SaturationInference.Visitor<O> visitor) {
 		return accept((DisjointSubsumerInference.Visitor<O>) visitor);
 	}
@@ -46,6 +52,6 @@ public abstract class AbstractDisjointSubsumerInference
 	@Override
 	public <O> O accept(ClassInference.Visitor<O> visitor) {
 		return accept((DisjointSubsumerInference.Visitor<O>) visitor);
-	}
+	}	
 
 }

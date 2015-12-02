@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.properties.inferences;
 
+import org.semanticweb.elk.reasoner.Inference;
+
 /*
  * #%L
  * ELK Reasoner
@@ -34,6 +36,11 @@ public abstract class AbstractSubPropertyChainInference extends
 		super(subChain, superChain);
 	}
 
+	@Override
+	public <O> O accept(Inference.Visitor<O> visitor) {
+		return accept((SubPropertyChainInference.Visitor<O>) visitor);
+	}
+	
 	@Override
 	public <O> O accept(SaturationInference.Visitor<O> visitor) {
 		return accept((SubPropertyChainInference.Visitor<O>) visitor);

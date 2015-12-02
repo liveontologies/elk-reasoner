@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.inferences;
 
+import org.semanticweb.elk.reasoner.Inference;
+
 /*
  * #%L
  * ELK Reasoner
@@ -36,6 +38,11 @@ public abstract class AbstractBackwardLinkInference extends BackwardLinkImpl
 	}
 
 	@Override
+	public <O> O accept(Inference.Visitor<O> visitor) {
+		return accept((BackwardLinkInference.Visitor<O>) visitor);
+	}
+	
+	@Override
 	public <O> O accept(SaturationInference.Visitor<O> visitor) {
 		return accept((BackwardLinkInference.Visitor<O>) visitor);
 	}
@@ -43,6 +50,6 @@ public abstract class AbstractBackwardLinkInference extends BackwardLinkImpl
 	@Override
 	public <O> O accept(ClassInference.Visitor<O> visitor) {
 		return accept((BackwardLinkInference.Visitor<O>) visitor);
-	}
+	}	
 
 }

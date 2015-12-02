@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.inferences;
 
+import org.semanticweb.elk.reasoner.Inference;
+
 /*
  * #%L
  * ELK Reasoner
@@ -33,6 +35,11 @@ public abstract class AbstractPropagationInference extends PropagationImpl
 	public AbstractPropagationInference(IndexedContextRoot root,
 			IndexedObjectProperty relation, IndexedObjectSomeValuesFrom carry) {
 		super(root, relation, carry);
+	}
+	
+	@Override
+	public <O> O accept(Inference.Visitor<O> visitor) {
+		return accept((PropagationInference.Visitor<O>) visitor);
 	}
 
 	@Override

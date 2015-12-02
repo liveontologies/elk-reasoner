@@ -3,6 +3,8 @@
  */
 package org.semanticweb.elk.reasoner.saturation.inferences;
 
+import org.semanticweb.elk.reasoner.Inference;
+
 /*
  * #%L
  * ELK Reasoner
@@ -86,6 +88,11 @@ public class ForwardLinkOfObjectHasSelf extends AbstractClassConclusion
 	
 	@Override
 	public <O> O accept(ForwardLink.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(Inference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 	

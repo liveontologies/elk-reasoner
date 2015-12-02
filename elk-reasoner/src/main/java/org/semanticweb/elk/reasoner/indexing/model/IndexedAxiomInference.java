@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.model;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.reasoner.Inference;
 
 /**
  * Represents a transformation of an {@link ElkAxiom} to an {@link IndexedAxiom}
@@ -34,7 +35,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
  * @author Yevgeny Kazakov
  *
  */
-public interface IndexedAxiomInference extends IndexedAxiom {
+public interface IndexedAxiomInference extends IndexedAxiom, Inference {
 
 	/**
 	 * The visitor pattern for instances
