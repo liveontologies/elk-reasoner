@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;

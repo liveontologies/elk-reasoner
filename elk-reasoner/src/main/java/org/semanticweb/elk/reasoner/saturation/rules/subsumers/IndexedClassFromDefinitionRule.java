@@ -26,10 +26,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDefinitionAxiom;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedDefinedClass;

@@ -22,8 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassConclusion;

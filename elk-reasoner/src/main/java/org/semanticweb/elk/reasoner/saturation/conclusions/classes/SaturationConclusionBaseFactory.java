@@ -23,13 +23,13 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpressionList;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;

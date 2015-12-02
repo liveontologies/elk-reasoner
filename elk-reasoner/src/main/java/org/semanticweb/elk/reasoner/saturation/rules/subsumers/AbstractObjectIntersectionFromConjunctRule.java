@@ -24,8 +24,8 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
 
 import java.util.Map;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;

@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.contextinit;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,11 @@ package org.semanticweb.elk.reasoner.saturation.rules.contextinit;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedRangeFiller;
-import org.semanticweb.elk.reasoner.indexing.implementation.DummyIndexedContextRootVisitor;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.classes.DummyIndexedContextRootVisitor;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedRangeFiller;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;

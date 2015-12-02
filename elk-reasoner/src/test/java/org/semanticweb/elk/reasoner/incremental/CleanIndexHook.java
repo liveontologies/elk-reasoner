@@ -32,7 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyDomainAxiom;
 import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.util.collections.Operations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

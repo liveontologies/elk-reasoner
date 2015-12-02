@@ -24,7 +24,7 @@ package org.semanticweb.elk.proofs.inferences.mapping;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 
 /**
  * TODO rename

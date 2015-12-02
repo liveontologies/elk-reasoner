@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 
 /**

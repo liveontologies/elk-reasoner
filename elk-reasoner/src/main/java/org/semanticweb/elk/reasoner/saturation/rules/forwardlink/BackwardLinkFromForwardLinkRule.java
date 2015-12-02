@@ -25,8 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.rules.forwardlink;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;

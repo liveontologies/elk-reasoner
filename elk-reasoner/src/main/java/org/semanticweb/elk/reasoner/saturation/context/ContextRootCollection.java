@@ -26,7 +26,7 @@ import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 
 /**
  * A collection of {@link IndexedContextRoot}s that are roots of the given

@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionFactory;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionJob;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionListener;

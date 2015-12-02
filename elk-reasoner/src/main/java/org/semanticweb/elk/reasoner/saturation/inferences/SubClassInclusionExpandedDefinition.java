@@ -23,10 +23,10 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 
 /**

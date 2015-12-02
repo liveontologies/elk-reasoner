@@ -27,8 +27,8 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.ContextFactory;
 import org.semanticweb.elk.reasoner.saturation.ContextImpl;
 import org.semanticweb.elk.reasoner.saturation.MapSaturationState;

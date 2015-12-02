@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.model;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
 
 public class ObjectPropertyConclusionEquality implements
 		ObjectPropertyConclusion.Visitor<ObjectPropertyConclusion> {

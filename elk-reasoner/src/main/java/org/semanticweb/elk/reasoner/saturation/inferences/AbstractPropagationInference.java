@@ -22,9 +22,9 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.PropagationImpl;
 
 public abstract class AbstractPropagationInference extends PropagationImpl

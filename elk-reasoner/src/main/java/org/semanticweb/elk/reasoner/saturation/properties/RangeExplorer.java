@@ -26,9 +26,9 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

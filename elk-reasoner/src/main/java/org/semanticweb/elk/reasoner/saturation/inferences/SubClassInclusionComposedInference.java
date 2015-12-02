@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 
 public interface SubClassInclusionComposedInference<S extends IndexedClassExpression>

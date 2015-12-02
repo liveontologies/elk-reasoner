@@ -27,7 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.inferences.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 

@@ -31,8 +31,8 @@ import java.util.Iterator;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.context.ContextRootCollection;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyCleaning;
 import org.semanticweb.elk.util.collections.Operations;

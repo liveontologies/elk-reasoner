@@ -24,11 +24,11 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
 
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectUnionOf;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectUnionOf;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectUnionOf;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectUnionOf;

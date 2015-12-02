@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.saturation;
  */
 
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.properties.PropertyHierarchyCompositionComputationFactory;
 import org.semanticweb.elk.reasoner.saturation.tracing.ObjectPropertyInferenceProducer;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;

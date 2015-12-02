@@ -22,8 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.saturation;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;

@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.slf4j.Logger;

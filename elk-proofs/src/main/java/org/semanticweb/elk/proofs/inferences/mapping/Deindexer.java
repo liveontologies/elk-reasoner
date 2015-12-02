@@ -37,19 +37,19 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedRangeFiller;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedDataHasValue;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectComplementOf;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectIntersectionOf;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectUnionOf;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedRangeFiller;
 
 /**
  * Converts indexed objects to ELK OWL objects i.e. the inverse of indexing.

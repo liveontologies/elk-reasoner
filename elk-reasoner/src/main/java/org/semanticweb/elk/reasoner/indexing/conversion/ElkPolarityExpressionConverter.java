@@ -30,10 +30,10 @@ import org.semanticweb.elk.owl.predefined.ElkPolarity;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkIndividualVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyExpressionVisitor;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedIndividual;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObject;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
 
 /**
  * Converts {@link ElkObject}s that can occur with different polarities in the

@@ -53,8 +53,8 @@ import org.semanticweb.elk.proofs.inferences.classes.ExistentialComposition;
 import org.semanticweb.elk.proofs.inferences.classes.ExistentialLemmaChainComposition;
 import org.semanticweb.elk.proofs.inferences.classes.NaryExistentialAxiomComposition;
 import org.semanticweb.elk.proofs.transformations.InferenceTransformation;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
 
 /**

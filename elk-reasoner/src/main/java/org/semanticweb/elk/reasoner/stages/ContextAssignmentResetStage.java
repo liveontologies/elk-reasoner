@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

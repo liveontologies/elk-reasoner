@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.reduction;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 
 /**
  * The visitor pattern class to distinguish the saturation jobs.

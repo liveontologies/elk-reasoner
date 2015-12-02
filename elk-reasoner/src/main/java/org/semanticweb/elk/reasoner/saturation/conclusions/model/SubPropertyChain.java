@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.model;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 
 /**
  * Represents a conclusion that a chain is a sub-property chain of another chain

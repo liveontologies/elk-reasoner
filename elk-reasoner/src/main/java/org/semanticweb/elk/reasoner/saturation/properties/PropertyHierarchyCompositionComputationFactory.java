@@ -27,9 +27,9 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.ObjectPropertyInferenceProducer;
 import org.semanticweb.elk.util.collections.AbstractHashMultimap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;

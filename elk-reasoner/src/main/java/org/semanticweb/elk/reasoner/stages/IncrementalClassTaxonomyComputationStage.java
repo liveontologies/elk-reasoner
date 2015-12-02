@@ -31,7 +31,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
 import org.semanticweb.elk.util.collections.Operations;
 

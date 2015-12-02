@@ -23,10 +23,10 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
  */
 
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClass;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfOwlNothing;

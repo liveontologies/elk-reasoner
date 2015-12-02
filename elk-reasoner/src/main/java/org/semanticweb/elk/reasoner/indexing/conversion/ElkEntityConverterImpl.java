@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.indexing.conversion;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedEntity;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedEntity;
 
 /**
  * An implementation of {@link ElkEntityConverter} that uses a given

@@ -1,14 +1,12 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
-import org.semanticweb.elk.Reference;
-
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +22,10 @@ import org.semanticweb.elk.Reference;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
+import org.semanticweb.elk.Reference;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;

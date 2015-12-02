@@ -29,7 +29,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedEntity;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedEntity;
 
 /**
  * An {@link ElkEntityConverter} that always throws

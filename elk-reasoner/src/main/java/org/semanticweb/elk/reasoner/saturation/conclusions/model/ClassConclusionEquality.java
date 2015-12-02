@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.model;
 
 import org.semanticweb.elk.owl.comparison.ElkObjectEquality;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
 
 public class ClassConclusionEquality implements ClassConclusion.Visitor<ClassConclusion> {
 

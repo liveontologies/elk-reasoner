@@ -28,11 +28,11 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.incremental.NonIncrementalChangeListener;
+import org.semanticweb.elk.reasoner.indexing.classes.ChangeIndexingProcessor;
+import org.semanticweb.elk.reasoner.indexing.classes.NonIncrementalElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ChangeIndexingProcessor;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.NonIncrementalElkAxiomVisitor;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

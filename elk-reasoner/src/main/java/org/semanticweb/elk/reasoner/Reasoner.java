@@ -42,7 +42,7 @@ import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.stages.AbstractReasonerState;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.model.AnonymousNode;

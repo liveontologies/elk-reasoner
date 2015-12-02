@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 
 /**
  * Represents the input taken by {@link RuleApplicationFactory}'s processing

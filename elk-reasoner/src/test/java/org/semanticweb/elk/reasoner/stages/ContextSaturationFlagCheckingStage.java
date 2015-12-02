@@ -29,7 +29,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.collections.ArrayHashSet;

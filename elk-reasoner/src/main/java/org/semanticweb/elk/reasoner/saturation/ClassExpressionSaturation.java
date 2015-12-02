@@ -28,7 +28,7 @@ import java.util.Iterator;
 
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;

@@ -1,7 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.model;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 
 /*
  * #%L

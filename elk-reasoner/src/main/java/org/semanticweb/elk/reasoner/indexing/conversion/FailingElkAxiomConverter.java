@@ -62,7 +62,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
 
 /**
  * A {@link ElkAxiomConverter} that does nothing for {@link ElkAnnotationAxiom}s

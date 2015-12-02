@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.factories;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 
 class ContextTracingJobForProofUnwinding<I extends ClassConclusion, J extends ProofUnwindingJob<I>>

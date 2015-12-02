@@ -23,7 +23,7 @@
 package org.semanticweb.elk.reasoner.reduction;
 
 import org.semanticweb.elk.reasoner.ReasonerJob;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 
 /**
  * The type of the transitive reduction job. The input of the transitive

@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.reduction;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 
 /**
  * The result of the transitive reduction for satisfiable indexed class

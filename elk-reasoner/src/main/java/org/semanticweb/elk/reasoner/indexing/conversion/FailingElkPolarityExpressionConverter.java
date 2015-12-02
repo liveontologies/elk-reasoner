@@ -52,9 +52,9 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.owl.predefined.ElkPolarity;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedIndividual;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
 
 /**
  * An {@link ElkPolarityExpressionConverter} that always throws

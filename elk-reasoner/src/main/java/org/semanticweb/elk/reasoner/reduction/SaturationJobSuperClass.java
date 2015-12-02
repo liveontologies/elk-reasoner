@@ -22,8 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.reduction;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 
 /**
  * A job for computing saturation for the input indexed class that is required

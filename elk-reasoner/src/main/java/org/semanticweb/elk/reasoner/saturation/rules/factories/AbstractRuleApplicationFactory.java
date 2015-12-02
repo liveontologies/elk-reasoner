@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
 import org.semanticweb.elk.ModifiableReference;
 import org.semanticweb.elk.Reference;
 import org.semanticweb.elk.ReferenceImpl;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;

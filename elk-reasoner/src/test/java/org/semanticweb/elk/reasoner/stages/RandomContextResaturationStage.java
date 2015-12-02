@@ -34,8 +34,8 @@ import java.util.Set;
 
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationNoInput;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;

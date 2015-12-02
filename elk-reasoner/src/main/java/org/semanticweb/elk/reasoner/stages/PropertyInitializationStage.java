@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Iterator;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 
 //TODO: add progress monitor, make concurrent if possible

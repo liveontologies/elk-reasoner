@@ -1,13 +1,12 @@
 package org.semanticweb.elk.reasoner.saturation;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +21,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
  * limitations under the License.
  * #L%
  */
+
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 
 
 /**

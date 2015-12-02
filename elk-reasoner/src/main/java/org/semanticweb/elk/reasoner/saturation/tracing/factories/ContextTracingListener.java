@@ -3,7 +3,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.factories;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 
 /*
  * #%L

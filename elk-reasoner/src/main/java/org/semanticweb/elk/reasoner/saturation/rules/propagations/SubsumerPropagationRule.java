@@ -24,8 +24,8 @@ package org.semanticweb.elk.reasoner.saturation.rules.propagations;
 
 import java.util.Map;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;

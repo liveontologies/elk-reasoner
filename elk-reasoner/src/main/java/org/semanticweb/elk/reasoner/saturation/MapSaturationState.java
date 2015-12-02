@@ -25,9 +25,9 @@ package org.semanticweb.elk.reasoner.saturation;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 
 /**
  * A {@link SaturationState} backed by a map from {@link IndexedClassExpression}

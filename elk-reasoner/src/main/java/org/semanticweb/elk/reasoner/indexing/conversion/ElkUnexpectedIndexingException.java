@@ -1,6 +1,6 @@
 package org.semanticweb.elk.reasoner.indexing.conversion;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
 
 /*
  * #%L

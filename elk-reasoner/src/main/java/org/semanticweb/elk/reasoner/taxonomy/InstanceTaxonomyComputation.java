@@ -28,7 +28,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;

@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.reduction;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 
 /**
  * A job for computing direct super-classes for the input indexed class
