@@ -3,8 +3,6 @@
  */
 package org.semanticweb.elk.reasoner.saturation.inferences;
 
-import org.semanticweb.elk.reasoner.Inference;
-
 /*
  * #%L
  * ELK Reasoner
@@ -34,6 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.classes.AbstractClass
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
+import org.semanticweb.elk.reasoner.tracing.Inference;
 
 /**
  * A {@link ForwardLink} obtained from a {@link SubClassInclusionDecomposed}

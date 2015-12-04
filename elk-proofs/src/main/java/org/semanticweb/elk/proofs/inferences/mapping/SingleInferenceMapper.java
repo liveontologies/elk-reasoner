@@ -98,7 +98,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecom
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSubClassOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionTautology;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.SideConditionLookup;
+import org.semanticweb.elk.reasoner.tracing.SideConditionLookup;
 
 /**
  * Maps one or more lower-level inferences to a single {@link Inference}. If the given low-level

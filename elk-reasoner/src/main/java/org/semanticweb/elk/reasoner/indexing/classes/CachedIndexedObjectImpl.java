@@ -41,7 +41,7 @@ import org.semanticweb.elk.util.collections.entryset.EntryCollection;
  * 
  */
 abstract class CachedIndexedObjectImpl<T extends CachedIndexedObject<T> & Entry<T, N>, N>
-		extends ModifiableIndexedObjectImpl implements CachedIndexedObject<T>,
+		extends IndexedObjectImpl implements CachedIndexedObject<T>,
 		Entry<T, N> {
 
 	/**

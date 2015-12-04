@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
+import org.semanticweb.elk.reasoner.tracing.TraceState;
 
 /**
  * Provides access to package protected methods of {@link AbstractReasonerState}

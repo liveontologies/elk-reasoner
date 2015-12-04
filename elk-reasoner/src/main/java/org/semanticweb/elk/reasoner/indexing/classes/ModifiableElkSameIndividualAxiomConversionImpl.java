@@ -61,7 +61,8 @@ class ModifiableElkSameIndividualAxiomConversionImpl
 	}
 
 	@Override
-	public <O> O accept(IndexedSubClassOfAxiomInference.Visitor<O> visitor) {
+	public final <O> O accept(
+			IndexedSubClassOfAxiomInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

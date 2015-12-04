@@ -46,7 +46,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProper
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.properties.VerifySymmetricPropertySaturation.AsymmetricCompositionHook;
-import org.semanticweb.elk.reasoner.saturation.tracing.ObjectPropertyInferenceProducer;
+import org.semanticweb.elk.reasoner.tracing.ObjectPropertyInferenceProducer;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**

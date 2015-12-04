@@ -24,8 +24,6 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpressionList;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
@@ -41,38 +39,26 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerF
  */
 public class ModifiableIndexedDisjointClassesAxiomImpl<A extends ElkAxiom>
 		extends
-			ModifiableIndexedAxiomImpl<A>
+			IndexedDisjointClassesAxiomImpl<A, ModifiableIndexedClassExpressionList>
 		implements
 			ModifiableIndexedDisjointClassesAxiom {
 
-	/**
-	 * the {@link IndexedClassExpression}s stated to be disjoint. Note that
-	 * same may appear two times in this list, in which case they should be
-	 * inconsistent (disjoint with itself)
-	 */
-	private final ModifiableIndexedClassExpressionList members_;
-	
 	protected ModifiableIndexedDisjointClassesAxiomImpl(A originalAxiom,
 			ModifiableIndexedClassExpressionList members) {
-		super(originalAxiom);
-		this.members_ = members;
-	}
-	
-	@Override
-	public final ModifiableIndexedClassExpressionList getMembers() {
-		return members_;
+		super(originalAxiom, members);
 	}
 
 	@Override
-	public boolean addOccurrence(ModifiableOntologyIndex index) {		
+	public boolean addOccurrence(ModifiableOntologyIndex index) {
 		if (!index.updatePositiveOwlNothingOccurrenceNo(1)) {
 			return false;
 		}
-		if (!DisjointSubsumerFromMemberRule.addRulesFor(this, index, getOriginalAxiom())) {
+		if (!DisjointSubsumerFromMemberRule.addRulesFor(this, index,
+				getOriginalAxiom())) {
 			// revert the changes
 			index.updatePositiveOwlNothingOccurrenceNo(-1);
 			return false;
-		}		
+		}
 		return true;
 	}
 
@@ -81,22 +67,13 @@ public class ModifiableIndexedDisjointClassesAxiomImpl<A extends ElkAxiom>
 		if (!index.updatePositiveOwlNothingOccurrenceNo(-1)) {
 			return false;
 		}
-		if (!DisjointSubsumerFromMemberRule.removeRulesFor(this, index, getOriginalAxiom())) {
+		if (!DisjointSubsumerFromMemberRule.removeRulesFor(this, index,
+				getOriginalAxiom())) {
 			// revert the changes
 			index.updatePositiveOwlNothingOccurrenceNo(1);
 			return false;
 		}
 		return true;
-	}
-
-	@Override
-	public final String toStringStructural() {
-		return "DisjointClasses(" + members_ + ")";
-	}
-
-	@Override
-	public final <O> O accept(IndexedAxiom.Visitor<O> visitor) {
-		return visitor.visit(this);
 	}
 
 }

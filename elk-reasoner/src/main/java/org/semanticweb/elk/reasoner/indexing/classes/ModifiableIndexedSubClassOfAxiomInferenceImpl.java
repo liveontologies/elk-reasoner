@@ -23,11 +23,11 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.Inference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedSubClassOfAxiomInference;
+import org.semanticweb.elk.reasoner.tracing.Inference;
 
 /**
  * Implements {@link ModifiableIndexedSubClassOfAxiomInference}
@@ -47,13 +47,13 @@ abstract class ModifiableIndexedSubClassOfAxiomInferenceImpl<A extends ElkAxiom>
 	}
 
 	@Override
-	public <O> O accept(Inference.Visitor<O> visitor) {
+	public final <O> O accept(Inference.Visitor<O> visitor) {
 		return accept((IndexedSubClassOfAxiomInference.Visitor<O>) visitor);
 	}
-	
+
 	@Override
-	public <O> O accept(IndexedAxiomInference.Visitor<O> visitor) {
+	public final <O> O accept(IndexedAxiomInference.Visitor<O> visitor) {
 		return accept((IndexedSubClassOfAxiomInference.Visitor<O>) visitor);
 	}
-	
+
 }

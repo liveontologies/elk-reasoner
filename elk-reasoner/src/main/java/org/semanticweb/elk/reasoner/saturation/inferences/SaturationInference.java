@@ -1,7 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.inferences;
 
-import org.semanticweb.elk.reasoner.Inference;
-
 /*
  * #%L
  * ELK Reasoner
@@ -26,6 +24,7 @@ import org.semanticweb.elk.reasoner.Inference;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.tracing.Inference;
 
 /**
  * A {@link SaturationConclusion} obtained by an inference rule from other

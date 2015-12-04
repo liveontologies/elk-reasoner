@@ -47,7 +47,7 @@ class ModifiableElkObjectPropertyRangeAxiomConversionImpl
 	}
 
 	@Override
-	public <O> O accept(
+	public final <O> O accept(
 			IndexedObjectPropertyRangeAxiomInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

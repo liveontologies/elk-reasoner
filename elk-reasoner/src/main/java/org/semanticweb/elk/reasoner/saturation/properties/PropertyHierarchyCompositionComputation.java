@@ -28,7 +28,7 @@ import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.tracing.ObjectPropertyInferenceProducer;
+import org.semanticweb.elk.reasoner.tracing.ObjectPropertyInferenceProducer;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**

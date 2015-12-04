@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedSubObjectPropertyOfAxiom;
@@ -38,49 +37,29 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
  * @param <A>
  *            the type of the {@link ElkAxiom} from which this axiom originates
  */
-class ModifiableIndexedSubObjectPropertyOfAxiomImpl<A extends ElkAxiom> extends
-		ModifiableIndexedAxiomImpl<A> implements
-		ModifiableIndexedSubObjectPropertyOfAxiom {
+class ModifiableIndexedSubObjectPropertyOfAxiomImpl<A extends ElkAxiom>
+		extends
+			IndexedSubObjectPropertyOfAxiomImpl<A, ModifiableIndexedPropertyChain, ModifiableIndexedObjectProperty>
+		implements
+			ModifiableIndexedSubObjectPropertyOfAxiom {
 
-	private final ModifiableIndexedPropertyChain subPropertyChain_;
-
-	private final ModifiableIndexedObjectProperty superProperty_;
-
-	ModifiableIndexedSubObjectPropertyOfAxiomImpl(
-			A originalAxiom,
+	ModifiableIndexedSubObjectPropertyOfAxiomImpl(A originalAxiom,
 			ModifiableIndexedPropertyChain subPropertyChain,
 			ModifiableIndexedObjectProperty superProperty) {
-		super(originalAxiom);
-		this.subPropertyChain_ = subPropertyChain;
-		this.superProperty_ = superProperty;
-	}
-
-	@Override
-	public final ModifiableIndexedPropertyChain getSubPropertyChain() {
-		return this.subPropertyChain_;
-	}
-
-	@Override
-	public final ModifiableIndexedObjectProperty getSuperProperty() {
-		return this.superProperty_;
-	}
-
-	@Override
-	public final String toStringStructural() {
-		return "SubObjectPropertyOf(" + this.subPropertyChain_ + ' '
-				+ this.superProperty_ + ')';
+		super(originalAxiom, subPropertyChain, superProperty);
 	}
 
 	@Override
 	public boolean addOccurrence(ModifiableOntologyIndex index) {
 		ElkAxiom reason = getOriginalAxiom();
-		if (!subPropertyChain_.addToldSuperObjectProperty(superProperty_,
-				reason))
+		ModifiableIndexedPropertyChain subPropertyChain = getSubPropertyChain();
+		ModifiableIndexedObjectProperty superProperty = getSuperProperty();
+		if (!subPropertyChain.addToldSuperObjectProperty(superProperty, reason))
 			return false;
-		if (!superProperty_.addToldSubPropertyChain(subPropertyChain_, reason)) {
+		if (!superProperty.addToldSubPropertyChain(subPropertyChain, reason)) {
 			// revert the changes
-			if (!subPropertyChain_.removeToldSuperObjectProperty(
-					superProperty_, reason))
+			if (!subPropertyChain.removeToldSuperObjectProperty(superProperty,
+					reason))
 				throw new ElkUnexpectedIndexingException(this);
 			return false;
 		}
@@ -91,24 +70,21 @@ class ModifiableIndexedSubObjectPropertyOfAxiomImpl<A extends ElkAxiom> extends
 	@Override
 	public boolean removeOccurrence(ModifiableOntologyIndex index) {
 		ElkAxiom reason = getOriginalAxiom();
-		if (!subPropertyChain_.removeToldSuperObjectProperty(superProperty_,
+		ModifiableIndexedPropertyChain subPropertyChain = getSubPropertyChain();
+		ModifiableIndexedObjectProperty superProperty = getSuperProperty();
+		if (!subPropertyChain.removeToldSuperObjectProperty(superProperty,
 				reason))
 			return false;
-		if (!superProperty_.removeToldSubPropertyChain(subPropertyChain_,
+		if (!superProperty.removeToldSubPropertyChain(subPropertyChain,
 				reason)) {
 			// revert the changes
-			if (!subPropertyChain_.addToldSuperObjectProperty(superProperty_,
+			if (!subPropertyChain.addToldSuperObjectProperty(superProperty,
 					reason))
 				throw new ElkUnexpectedIndexingException(this);
 			return false;
 		}
 		// success
 		return true;
-	}
-
-	@Override
-	public final <O> O accept(IndexedAxiom.Visitor<O> visitor) {
-		return visitor.visit(this);
 	}
 
 }

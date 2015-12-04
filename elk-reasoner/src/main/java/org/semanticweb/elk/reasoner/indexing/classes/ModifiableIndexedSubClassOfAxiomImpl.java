@@ -23,7 +23,6 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
@@ -37,48 +36,28 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSub
  * @param <A>
  *            the type of the {@link ElkAxiom} from which this axiom originates
  */
-class ModifiableIndexedSubClassOfAxiomImpl<A extends ElkAxiom> extends ModifiableIndexedAxiomImpl<A>
-		implements ModifiableIndexedSubClassOfAxiom {
+class ModifiableIndexedSubClassOfAxiomImpl<A extends ElkAxiom>
+		extends
+			IndexedSubClassOfAxiomImpl<A, ModifiableIndexedClassExpression>
+		implements
+			ModifiableIndexedSubClassOfAxiom {
 
-	private final ModifiableIndexedClassExpression subClass_, superClass_;
-
-	ModifiableIndexedSubClassOfAxiomImpl(
-			A originalAxiom,
+	ModifiableIndexedSubClassOfAxiomImpl(A originalAxiom,
 			ModifiableIndexedClassExpression subClass,
 			ModifiableIndexedClassExpression superClass) {
-		super(originalAxiom);
-		this.subClass_ = subClass;
-		this.superClass_ = superClass;
-	}
-
-	@Override
-	public final ModifiableIndexedClassExpression getSubClass() {
-		return this.subClass_;
-	}
-
-	@Override
-	public final ModifiableIndexedClassExpression getSuperClass() {
-		return this.superClass_;
-	}
-
-	@Override
-	public final String toStringStructural() {
-		return "SubClassOf(" + this.subClass_ + ' ' + this.superClass_ + ')';
+		super(originalAxiom, subClass, superClass);
 	}
 
 	@Override
 	public boolean addOccurrence(ModifiableOntologyIndex index) {
-		return SuperClassFromSubClassRule.addRuleFor(this, index, getOriginalAxiom());
+		return SuperClassFromSubClassRule.addRuleFor(this, index,
+				getOriginalAxiom());
 	}
 
 	@Override
 	public boolean removeOccurrence(ModifiableOntologyIndex index) {
-		return SuperClassFromSubClassRule.removeRuleFor(this, index, getOriginalAxiom());
-	}
-
-	@Override
-	public final <O> O accept(IndexedAxiom.Visitor<O> visitor) {
-		return visitor.visit(this);
+		return SuperClassFromSubClassRule.removeRuleFor(this, index,
+				getOriginalAxiom());
 	}
 
 }

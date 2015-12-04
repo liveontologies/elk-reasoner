@@ -1,7 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.model;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.Conclusion;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
 
 /*
  * #%L

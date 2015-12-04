@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.AbstractObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.SideConditionLookup;
+import org.semanticweb.elk.reasoner.tracing.SideConditionLookup;
 
 /**
  * 

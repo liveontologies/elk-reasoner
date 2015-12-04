@@ -44,7 +44,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
-import org.semanticweb.elk.owl.visitors.NoOpElkAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.owlapi.wrapper.ElkAxiomWrap;
 import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.Expression;
@@ -96,7 +96,7 @@ public class ElkToOwlProofConverter {
 	public static OWLAxiom convert(ElkAxiom axiom) {
 		final OWLDataFactory factory = OWLManager.getOWLDataFactory();
 
-		return axiom.accept(new NoOpElkAxiomVisitor<OWLAxiom>() {
+		return axiom.accept(new DummyElkAxiomVisitor<OWLAxiom>() {
 
 			@Override
 			protected OWLAxiom defaultLogicalVisit(ElkAxiom axiom) {

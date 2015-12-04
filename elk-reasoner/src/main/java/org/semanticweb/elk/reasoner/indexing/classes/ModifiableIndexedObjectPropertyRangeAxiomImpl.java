@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectPropertyRangeAxiom;
@@ -37,52 +36,26 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
  * @param <A>
  *            the type of the {@link ElkAxiom} from which this axiom originates
  */
-class ModifiableIndexedObjectPropertyRangeAxiomImpl<A extends ElkAxiom> extends
-		ModifiableIndexedAxiomImpl<A> implements
-		ModifiableIndexedObjectPropertyRangeAxiom {
+class ModifiableIndexedObjectPropertyRangeAxiomImpl<A extends ElkAxiom>
+		extends
+			IndexedObjectPropertyRangeAxiomImpl<A, ModifiableIndexedObjectProperty, ModifiableIndexedClassExpression>
+		implements
+			ModifiableIndexedObjectPropertyRangeAxiom {
 
-	private final ModifiableIndexedObjectProperty property_;
-
-	private final ModifiableIndexedClassExpression range_;
-
-	ModifiableIndexedObjectPropertyRangeAxiomImpl(
-			A originalAxiom,
+	ModifiableIndexedObjectPropertyRangeAxiomImpl(A originalAxiom,
 			ModifiableIndexedObjectProperty property,
 			ModifiableIndexedClassExpression range) {
-		super(originalAxiom);
-		this.property_ = property;
-		this.range_ = range;
+		super(originalAxiom, property, range);
 	}
 
 	@Override
-	public final ModifiableIndexedObjectProperty getProperty() {
-		return this.property_;
-	}
-
-	@Override
-	public final ModifiableIndexedClassExpression getRange() {
-		return this.range_;
-	}
-
-	@Override
-	public final String toStringStructural() {
-		return "ObjectPropertyRange(" + this.property_ + ' ' + this.range_
-				+ ')';
-	}
-
-	@Override
-	public boolean addOccurrence(ModifiableOntologyIndex index) {		
-		return property_.addToldRange(range_, getOriginalAxiom());
+	public boolean addOccurrence(ModifiableOntologyIndex index) {
+		return getProperty().addToldRange(getRange(), getOriginalAxiom());
 	}
 
 	@Override
 	public boolean removeOccurrence(ModifiableOntologyIndex index) {
-		return property_.removeToldRange(range_, getOriginalAxiom());
-	}
-
-	@Override
-	public final <O> O accept(IndexedAxiom.Visitor<O> visitor) {
-		return visitor.visit(this);
+		return getProperty().removeToldRange(getRange(), getOriginalAxiom());
 	}
 
 }

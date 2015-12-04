@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.model;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.Inference;
+import org.semanticweb.elk.reasoner.tracing.Inference;
 
 /**
  * Represents a transformation of an {@link ElkAxiom} to an {@link IndexedAxiom}

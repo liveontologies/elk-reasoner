@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 
 /**
- * A {@link ClassInclusionDecomposed} obtained from a
+ * A {@link SubClassInclusionDecomposed} obtained from a
  * {@link SubClassInclusionDecomposed} with an {@link IndexedObjectHasSelf} super-class,
  * which property has a range the super-class of this conclusion. 
  * 

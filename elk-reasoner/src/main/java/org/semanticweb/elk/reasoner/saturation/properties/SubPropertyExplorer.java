@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPrope
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainExpandedSubObjectPropertyOf;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainTautology;
-import org.semanticweb.elk.reasoner.saturation.tracing.ObjectPropertyInferenceProducer;
+import org.semanticweb.elk.reasoner.tracing.ObjectPropertyInferenceProducer;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;

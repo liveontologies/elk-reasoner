@@ -59,8 +59,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationCon
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.tracing.InferenceSet;
-import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.OrphanInstanceNode;
@@ -70,6 +68,8 @@ import org.semanticweb.elk.reasoner.taxonomy.SingletoneInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.SingletoneTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.reasoner.tracing.InferenceSet;
+import org.semanticweb.elk.reasoner.tracing.TraceState;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;

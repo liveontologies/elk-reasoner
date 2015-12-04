@@ -3,8 +3,6 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
-import org.semanticweb.elk.reasoner.Conclusion;
-
 /*
  * #%L
  * ELK Reasoner
@@ -33,6 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusionHash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusionPrinter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
 
 /**
  * A skeleton for implementation of {@link ClassConclusion}.

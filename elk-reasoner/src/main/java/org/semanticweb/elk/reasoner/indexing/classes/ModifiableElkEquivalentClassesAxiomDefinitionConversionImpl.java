@@ -61,7 +61,8 @@ class ModifiableElkEquivalentClassesAxiomDefinitionConversionImpl
 	}
 
 	@Override
-	public <O> O accept(IndexedDefinitionAxiomInference.Visitor<O> visitor) {
+	public final <O> O accept(
+			IndexedDefinitionAxiomInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

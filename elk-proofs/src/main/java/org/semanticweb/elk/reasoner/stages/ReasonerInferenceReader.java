@@ -61,8 +61,8 @@ import org.semanticweb.elk.proofs.transformations.lemmas.BaseExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
-import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
+import org.semanticweb.elk.reasoner.tracing.RecursiveTraceUnwinder;
+import org.semanticweb.elk.reasoner.tracing.TraceStore;
 import org.semanticweb.elk.util.collections.Operations;
 
 

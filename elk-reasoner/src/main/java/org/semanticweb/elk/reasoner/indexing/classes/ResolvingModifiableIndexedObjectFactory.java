@@ -97,7 +97,7 @@ public class ResolvingModifiableIndexedObjectFactory
 
 	public ResolvingModifiableIndexedObjectFactory(
 			ModifiableIndexedObjectCache cache) {
-		this(new ModifiableIndexedObjectFactoryImpl(), cache);
+		this(new BaseModifiableIndexedObjectFactory(), cache);
 	}
 
 	@SuppressWarnings("static-method")

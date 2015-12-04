@@ -50,7 +50,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.predefined.ElkPolarity;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.reasoner.indexing.classes.ModifiableIndexedObjectFactoryImpl;
+import org.semanticweb.elk.reasoner.indexing.classes.BaseModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.ResolvingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.UpdatingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObject;
@@ -240,7 +240,7 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	 * 
 	 */
 	public ElkAxiomConverterImpl(ModifiableOntologyIndex index, int increment) {
-		this(new ModifiableIndexedObjectFactoryImpl(), index, increment);
+		this(new BaseModifiableIndexedObjectFactory(), index, increment);
 	}
 
 	@Override

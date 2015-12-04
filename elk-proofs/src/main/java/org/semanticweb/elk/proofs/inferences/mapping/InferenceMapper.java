@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.AbstractClassInference
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.AbstractObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
+import org.semanticweb.elk.reasoner.tracing.RecursiveTraceUnwinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

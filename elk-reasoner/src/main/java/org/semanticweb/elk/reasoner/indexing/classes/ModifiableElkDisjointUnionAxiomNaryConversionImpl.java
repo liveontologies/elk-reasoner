@@ -45,7 +45,7 @@ class ModifiableElkDisjointUnionAxiomNaryConversionImpl
 	}
 
 	@Override
-	public <O> O accept(
+	public final <O> O accept(
 			IndexedDisjointClassesAxiomInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

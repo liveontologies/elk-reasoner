@@ -28,7 +28,7 @@ import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.owl.visitors.NoOpElkAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 
 /**
  * Transforms axiom to a canonical form for structural equivalence checking and structural hashing.
@@ -37,7 +37,7 @@ import org.semanticweb.elk.owl.visitors.NoOpElkAxiomVisitor;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-class AxiomCanonicalizer extends NoOpElkAxiomVisitor<ElkAxiom> {
+class AxiomCanonicalizer extends DummyElkAxiomVisitor<ElkAxiom> {
 
 	private static AxiomCanonicalizer INSTANCE_ = new AxiomCanonicalizer(new ElkObjectFactoryImpl());
 	

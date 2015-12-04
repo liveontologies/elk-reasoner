@@ -29,9 +29,9 @@ import java.util.Collection;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTracingComputation;
-import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
-import org.semanticweb.elk.reasoner.saturation.tracing.factories.ProofUnwindingJob;
+import org.semanticweb.elk.reasoner.tracing.RecursiveTracingComputation;
+import org.semanticweb.elk.reasoner.tracing.TraceState;
+import org.semanticweb.elk.reasoner.tracing.factories.ProofUnwindingJob;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.Operations.Transformation;
 

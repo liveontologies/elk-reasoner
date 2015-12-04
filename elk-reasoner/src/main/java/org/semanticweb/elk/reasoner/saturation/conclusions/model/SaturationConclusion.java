@@ -1,7 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.model;
 
-import org.semanticweb.elk.reasoner.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
 
 /*
  * #%L

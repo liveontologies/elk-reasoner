@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedDefinitionAxiom;
@@ -31,43 +30,17 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassFromDefinitionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ModifiableIndexedDefinitionAxiomImpl<A extends ElkAxiom>
 		extends
-			ModifiableIndexedAxiomImpl<A>
+			IndexedDefinitionAxiomImpl<A, ModifiableIndexedClass, ModifiableIndexedClassExpression>
 		implements
 			ModifiableIndexedDefinitionAxiom {
-
-	static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ModifiableIndexedDefinitionAxiomImpl.class);
-
-	private final ModifiableIndexedClass definedClass_;
-	private final ModifiableIndexedClassExpression definition_;
 
 	protected ModifiableIndexedDefinitionAxiomImpl(A originalAxiom,
 			ModifiableIndexedClass definedClass,
 			ModifiableIndexedClassExpression definition) {
-		super(originalAxiom);
-		this.definedClass_ = definedClass;
-		this.definition_ = definition;
-	}
-
-	@Override
-	public ModifiableIndexedClass getDefinedClass() {
-		return this.definedClass_;
-	}
-
-	@Override
-	public ModifiableIndexedClassExpression getDefinition() {
-		return this.definition_;
-	}
-
-	@Override
-	public String toStringStructural() {
-		return "EquivalentClasses(" + this.definedClass_ + ' '
-				+ this.definition_ + ')';
+		super(originalAxiom, definedClass, definition);
 	}
 
 	@Override
@@ -88,11 +61,6 @@ public class ModifiableIndexedDefinitionAxiomImpl<A extends ElkAxiom>
 					reason);
 		// else
 		return SuperClassFromSubClassRule.removeRulesFor(this, index, reason);
-	}
-
-	@Override
-	public <O> O accept(IndexedAxiom.Visitor<O> visitor) {
-		return visitor.visit(this);
 	}
 
 }

@@ -44,7 +44,7 @@ class ModifiableElkDeclarationAxiomConversionImpl
 	}
 
 	@Override
-	public <O> O accept(
+	public final <O> O accept(
 			IndexedDeclarationAxiomInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

@@ -46,76 +46,70 @@ public class SaturationConclusionBaseFactory
 		implements
 			SaturationConclusion.Factory {
 
-	@SuppressWarnings("static-method")
-	protected <C extends SaturationConclusion> C filter(C newConclusion) {
-		// could be overridden in sub-classes
-		return newConclusion;
-	}
-
 	@Override
 	public ContextInitialization getContextInitialization(
 			IndexedContextRoot root, OntologyIndex ontologyIndex) {
-		return filter(new ContextInitializationImpl(root, ontologyIndex));
+		return new ContextInitializationImpl(root, ontologyIndex);
 	}
 
 	@Override
 	public Contradiction getContradiction(IndexedContextRoot root) {
-		return filter(new ContradictionImpl(root));
+		return new ContradictionImpl(root);
 	}
 
 	@Override
 	public DisjointSubsumer getDisjointSubsumer(IndexedContextRoot root,
 			IndexedClassExpressionList disjointExpressions, int position,
 			ElkAxiom reason) {
-		return filter(new DisjointSubsumerImpl(root, disjointExpressions,
-				position, reason));
+		return new DisjointSubsumerImpl(root, disjointExpressions, position,
+				reason);
 	}
 
 	@Override
 	public ForwardLink getForwardLink(IndexedContextRoot root,
 			IndexedPropertyChain forwardChain, IndexedContextRoot target) {
-		return filter(new ForwardLinkImpl<IndexedPropertyChain>(root,
-				forwardChain, target));
+		return new ForwardLinkImpl<IndexedPropertyChain>(root, forwardChain,
+				target);
 	}
 
 	@Override
 	public BackwardLink getBackwardLink(IndexedContextRoot root,
 			IndexedObjectProperty relation, IndexedContextRoot source) {
-		return filter(new BackwardLinkImpl(root, relation, source));
+		return new BackwardLinkImpl(root, relation, source);
 	}
 
 	@Override
 	public Propagation getPropagation(IndexedContextRoot root,
 			IndexedObjectProperty relation, IndexedObjectSomeValuesFrom carry) {
-		return filter(new PropagationImpl(root, relation, carry));
+		return new PropagationImpl(root, relation, carry);
 	}
 
 	@Override
 	public SubContextInitialization getSubContextInitialization(
 			IndexedContextRoot root, IndexedObjectProperty subRoot) {
-		return filter(new SubContextInitializationImpl(root, subRoot));
+		return new SubContextInitializationImpl(root, subRoot);
 	}
 
 	@Override
 	public SubClassInclusionComposed getComposedSubClassInclusion(
 			IndexedContextRoot subExpression,
 			IndexedClassExpression superExpression) {
-		return filter(new SubClassInclusionComposedImpl<IndexedClassExpression>(
-				subExpression, superExpression));
+		return new SubClassInclusionComposedImpl<IndexedClassExpression>(
+				subExpression, superExpression);
 	}
 
 	@Override
 	public SubClassInclusionDecomposed getDecomposedSubClassInclusion(
 			IndexedContextRoot subExpression,
 			IndexedClassExpression superExpression) {
-		return filter(new SubClassInclusionDecomposedImpl(subExpression,
-				superExpression));
+		return new SubClassInclusionDecomposedImpl(subExpression,
+				superExpression);
 	}
 
 	@Override
 	public SubPropertyChain getSubPropertyChain(IndexedPropertyChain subChain,
 			IndexedPropertyChain superChain) {
-		return filter(new SubPropertyChainImpl(subChain, superChain));
+		return new SubPropertyChainImpl(subChain, superChain);
 	}
 
 }

@@ -1,7 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.inferences;
 
-import org.semanticweb.elk.reasoner.Inference;
-
 /*
  * #%L
  * ELK Reasoner
@@ -28,6 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.PropagationImpl;
+import org.semanticweb.elk.reasoner.tracing.Inference;
 
 public abstract class AbstractPropagationInference extends PropagationImpl
 		implements PropagationInference {

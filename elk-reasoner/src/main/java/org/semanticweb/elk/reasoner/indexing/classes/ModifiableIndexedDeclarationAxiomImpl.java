@@ -23,7 +23,6 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedDeclarationAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedEntity;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
@@ -37,25 +36,15 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
  *            the type of the {@link ElkAxiom} from which this axiom originates
  * 
  */
-class ModifiableIndexedDeclarationAxiomImpl<A extends ElkAxiom> extends ModifiableIndexedAxiomImpl<A>
-		implements ModifiableIndexedDeclarationAxiom {
+class ModifiableIndexedDeclarationAxiomImpl<A extends ElkAxiom>
+		extends
+			IndexedDeclarationAxiomImpl<A, ModifiableIndexedEntity>
+		implements
+			ModifiableIndexedDeclarationAxiom {
 
-	private final ModifiableIndexedEntity entity_;
-
-	ModifiableIndexedDeclarationAxiomImpl(A originalAxiom, ModifiableIndexedEntity entity) {
-		super(originalAxiom);
-		this.entity_ = entity;
-	}
-
-	@Override
-	public final ModifiableIndexedEntity getEntity() {
-		return this.entity_;
-	}
-
-	@Override
-	public final String toStringStructural() {
-		return "Declaration(" + entity_.getElkEntity().getEntityType() + "("
-				+ this.entity_ + "))";
+	ModifiableIndexedDeclarationAxiomImpl(A originalAxiom,
+			ModifiableIndexedEntity entity) {
+		super(originalAxiom, entity);
 	}
 
 	/*
@@ -71,11 +60,6 @@ class ModifiableIndexedDeclarationAxiomImpl<A extends ElkAxiom> extends Modifiab
 	@Override
 	public boolean removeOccurrence(ModifiableOntologyIndex index) {
 		return true;
-	}
-
-	@Override
-	public final <O> O accept(IndexedAxiom.Visitor<O> visitor) {
-		return visitor.visit(this);
 	}
 
 }

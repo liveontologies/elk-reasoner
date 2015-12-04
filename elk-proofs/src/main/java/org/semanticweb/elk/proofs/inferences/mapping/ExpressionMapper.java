@@ -40,7 +40,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.AbstractElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
-import org.semanticweb.elk.owl.visitors.NoOpElkAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
@@ -91,7 +91,7 @@ public class ExpressionMapper {
 	}
 
 	private class Converter extends
-			NoOpElkAxiomVisitor<Iterable<TracingInput>> implements
+			DummyElkAxiomVisitor<Iterable<TracingInput>> implements
 			ExpressionVisitor<Void, Iterable<TracingInput>>,
 			ElkLemmaVisitor<Void, Iterable<TracingInput>> {
 

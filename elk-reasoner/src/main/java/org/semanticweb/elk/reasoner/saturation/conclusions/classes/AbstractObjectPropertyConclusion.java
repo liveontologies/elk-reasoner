@@ -3,8 +3,6 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
-import org.semanticweb.elk.reasoner.Conclusion;
-
 /*
  * #%L
  * ELK Reasoner
@@ -32,6 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyC
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusionHash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusionPrinter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
 
 /**
  * A skeleton for implementation of {@link ObjectPropertyConclusion}s.

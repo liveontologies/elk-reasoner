@@ -52,7 +52,7 @@ public interface IndexedDisjointClassesAxiom extends IndexedAxiom {
 	interface Factory {
 
 		IndexedDisjointClassesAxiom getIndexedDisjointClassesAxiom(
-				ElkAxiom originalAxiom, IndexedClassExpressionList disjointClasses);
+				ElkAxiom originalAxiom, IndexedClassExpressionList members);
 
 	}
 

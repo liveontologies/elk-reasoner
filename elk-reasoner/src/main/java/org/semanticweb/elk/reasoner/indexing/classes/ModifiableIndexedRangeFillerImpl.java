@@ -92,12 +92,12 @@ class ModifiableIndexedRangeFillerImpl implements ModifiableIndexedRangeFiller {
 	}
 
 	@Override
-	public <O> O accept(IndexedContextRoot.Visitor<O> visitor) {
+	public final <O> O accept(IndexedContextRoot.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
 	@Override
-	public <O> O accept(IndexedObject.Visitor<O> visitor) {
+	public final <O> O accept(IndexedObject.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

@@ -1,7 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.properties.inferences;
 
-import org.semanticweb.elk.reasoner.Inference;
-
 /*
  * #%L
  * ELK Reasoner
@@ -27,6 +25,7 @@ import org.semanticweb.elk.reasoner.Inference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SubPropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
+import org.semanticweb.elk.reasoner.tracing.Inference;
 
 public abstract class AbstractSubPropertyChainInference extends
 		SubPropertyChainImpl implements SubPropertyChainInference {
