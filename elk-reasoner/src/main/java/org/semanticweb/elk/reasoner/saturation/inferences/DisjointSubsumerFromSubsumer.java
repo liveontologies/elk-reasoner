@@ -58,7 +58,7 @@ public class DisjointSubsumerFromSubsumer extends
 	}
 
 	@Override
-	public <O> O accept(DisjointSubsumerInference.Visitor<O> visitor) {
+	public final <O> O accept(DisjointSubsumerInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 	

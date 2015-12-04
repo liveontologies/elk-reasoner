@@ -110,12 +110,12 @@ public class ForwardLinkComposition extends
 	}
 
 	@Override
-	public <O> O accept(ForwardLinkInference.Visitor<O> visitor) {
+	public final <O> O accept(ForwardLinkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 	
 	@Override
-	public <O> O accept(LinkComposition.Visitor<O> visitor) {
+	public final <O> O accept(LinkComposition.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

@@ -46,6 +46,16 @@ abstract class ModifiableIndexedDisjointClassesAxiomInferenceImpl<A extends ElkA
 	}
 
 	@Override
+	public int hashCode() {
+		return System.identityHashCode(this);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return this == o;
+	}
+	
+	@Override
 	public final <O> O accept(Inference.Visitor<O> visitor) {
 		return accept(
 				(IndexedDisjointClassesAxiomInference.Visitor<O>) visitor);

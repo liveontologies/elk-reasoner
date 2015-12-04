@@ -71,7 +71,7 @@ public class BackwardLinkOfObjectSomeValuesFrom extends
 	}
 
 	@Override
-	public <O> O accept(BackwardLinkInference.Visitor<O> visitor) {
+	public final <O> O accept(BackwardLinkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 	

@@ -44,7 +44,7 @@ public class SubClassInclusionDecomposedSecondConjunct extends SubClassInclusion
 	}
 
 	@Override
-	public <O> O accept(SubClassInclusionDecomposedInference.Visitor<O> visitor) {
+	public final <O> O accept(SubClassInclusionDecomposedInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 	

@@ -26,8 +26,6 @@ package org.semanticweb.elk.reasoner.tracing;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusionEquality;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusionHash;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -68,13 +66,13 @@ public class ModifiableObjectPropertyInferenceSetImpl implements
 
 		@Override
 		public int hashCode() {
-			return ObjectPropertyConclusionHash.hashCode(conclusion_);
+			return ConclusionHash.hashCode(conclusion_);
 		}
 
 		@Override
 		public boolean equals(Object other) {
 			if (other instanceof Key) {
-				return ObjectPropertyConclusionEquality.equals(conclusion_,
+				return ConclusionEquality.equals(conclusion_,
 						((Key) other).conclusion_);
 			}
 			// else

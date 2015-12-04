@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
+import org.semanticweb.elk.reasoner.tracing.AbstractConclusion;
 import org.semanticweb.elk.reasoner.tracing.Conclusion;
 
 /**
@@ -35,7 +36,7 @@ import org.semanticweb.elk.reasoner.tracing.Conclusion;
  * @param <A>
  *            the type of the {@link ElkAxiom} from which this axiom originates
  */
-abstract class IndexedAxiomImpl<A extends ElkAxiom> extends IndexedObjectImpl
+abstract class IndexedAxiomImpl<A extends ElkAxiom> extends AbstractConclusion
 		implements
 			IndexedAxiom {
 

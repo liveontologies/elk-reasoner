@@ -90,7 +90,7 @@ public class SubClassInclusionExpandedSubClassOf
 	}
 
 	@Override
-	public <O> O accept(
+	public final <O> O accept(
 			SubClassInclusionDecomposedInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

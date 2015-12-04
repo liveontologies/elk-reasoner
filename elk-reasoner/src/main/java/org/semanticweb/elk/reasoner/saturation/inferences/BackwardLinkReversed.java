@@ -60,7 +60,7 @@ public class BackwardLinkReversed extends AbstractBackwardLinkInference {
 	}
 
 	@Override
-	public <O> O accept(BackwardLinkInference.Visitor<O> visitor) {
+	public final <O> O accept(BackwardLinkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 	

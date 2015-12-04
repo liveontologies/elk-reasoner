@@ -105,7 +105,7 @@ public class ContradictionOfDisjointSubsumers extends
 	}
 
 	@Override
-	public <O> O accept(ContradictionInference.Visitor<O> visitor) {
+	public final <O> O accept(ContradictionInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 	

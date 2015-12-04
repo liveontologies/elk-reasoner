@@ -77,7 +77,7 @@ public class ContradictionPropagated extends AbstractContradictionInference {
 	}
 
 	@Override
-	public <O> O accept(ContradictionInference.Visitor<O> visitor) {
+	public final <O> O accept(ContradictionInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

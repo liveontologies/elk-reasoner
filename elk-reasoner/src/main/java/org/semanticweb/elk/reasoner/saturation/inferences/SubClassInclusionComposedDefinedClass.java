@@ -91,7 +91,7 @@ public class SubClassInclusionComposedDefinedClass
 	}
 
 	@Override
-	public <O> O accept(
+	public final <O> O accept(
 			SubClassInclusionComposedInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

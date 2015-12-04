@@ -27,10 +27,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusionEquality;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusionHash;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusionPrinter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
+import org.semanticweb.elk.reasoner.tracing.AbstractConclusion;
 import org.semanticweb.elk.reasoner.tracing.Conclusion;
 
 /**
@@ -40,7 +38,9 @@ import org.semanticweb.elk.reasoner.tracing.Conclusion;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public abstract class AbstractClassConclusion implements ClassConclusion {
+public abstract class AbstractClassConclusion extends AbstractConclusion
+		implements
+			ClassConclusion {
 
 	private final IndexedContextRoot root_;
 
@@ -59,28 +59,15 @@ public abstract class AbstractClassConclusion implements ClassConclusion {
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		return ClassConclusionEquality.equals(this, o);
-	}
-
-	@Override
-	public int hashCode() {
-		return ClassConclusionHash.hashCode(this);
-	}
-
-	@Override
-	public String toString() {
-		return ClassConclusionPrinter.toString(this);
-	}
-	
-	@Override
-	public <O> O accept(SaturationConclusion.Visitor<O> visitor) {
-		return accept((ClassConclusion.Visitor<O>) visitor);
-	}
-	
-	@Override
 	public final <O> O accept(Conclusion.Visitor<O> visitor) {
 		return accept((ClassConclusion.Visitor<O>) visitor);
 	}
+	
+	@Override
+	public final <O> O accept(SaturationConclusion.Visitor<O> visitor) {
+		return accept((ClassConclusion.Visitor<O>) visitor);
+	}
+	
+
 
 }

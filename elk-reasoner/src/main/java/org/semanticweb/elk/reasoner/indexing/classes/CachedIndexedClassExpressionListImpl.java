@@ -97,7 +97,7 @@ class CachedIndexedClassExpressionListImpl
 	}
 	
 	@Override
-	public <O> O accept(IndexedObject.Visitor<O> visitor) {
+	public final <O> O accept(IndexedObject.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

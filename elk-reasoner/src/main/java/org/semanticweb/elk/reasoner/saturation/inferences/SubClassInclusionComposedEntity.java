@@ -62,7 +62,7 @@ public class SubClassInclusionComposedEntity extends
 	}
 
 	@Override
-	public <O> O accept(SubClassInclusionComposedInference.Visitor<O> visitor) {
+	public final <O> O accept(SubClassInclusionComposedInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 	

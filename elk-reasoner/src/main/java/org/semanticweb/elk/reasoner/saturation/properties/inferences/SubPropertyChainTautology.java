@@ -68,7 +68,7 @@ public class SubPropertyChainTautology extends AbstractSubPropertyChainInference
 	}
 
 	@Override
-	public <O> O accept(SubPropertyChainInference.Visitor<O> visitor) {
+	public final <O> O accept(SubPropertyChainInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 	

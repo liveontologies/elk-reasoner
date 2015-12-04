@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation.properties.inferences;
+package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
 /*
  * #%L
@@ -22,19 +22,23 @@ package org.semanticweb.elk.reasoner.saturation.properties.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SubPropertyChainImpl;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
-public abstract class AbstractSubPropertyChainInference
-		extends
-			SubPropertyChainImpl
-		implements SubPropertyChainInference {
+/**
+ * A skeleton implementation of {@link ClassInference}
+ * 
+ * @author Yevgeny Kazakov
+ *
+ */
+public abstract class AbstractClassInference extends AbstractClassConclusion
+		implements
+			ClassInference {
 
-	public AbstractSubPropertyChainInference(IndexedPropertyChain subChain,
-			IndexedPropertyChain superChain) {
-		super(subChain, superChain);
+	protected AbstractClassInference(IndexedContextRoot root) {
+		super(root);
 	}
 
 	// we assume that different objects represent different inferences
@@ -51,17 +55,13 @@ public abstract class AbstractSubPropertyChainInference
 
 	@Override
 	public final <O> O accept(Inference.Visitor<O> visitor) {
-		return accept((SubPropertyChainInference.Visitor<O>) visitor);
+		return accept((ClassInference.Visitor<O>) visitor);
 	}
-
+	
 	@Override
 	public final <O> O accept(SaturationInference.Visitor<O> visitor) {
-		return accept((SubPropertyChainInference.Visitor<O>) visitor);
+		return accept((ClassInference.Visitor<O>) visitor);
 	}
 
-	@Override
-	public final <O> O accept(ObjectPropertyInference.Visitor<O> visitor) {
-		return accept((SubPropertyChainInference.Visitor<O>) visitor);
-	}
-
+	
 }

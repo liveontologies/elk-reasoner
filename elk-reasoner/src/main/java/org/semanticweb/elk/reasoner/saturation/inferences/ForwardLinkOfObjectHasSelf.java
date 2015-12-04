@@ -28,11 +28,10 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.AbstractClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.AbstractClassInference;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
-import org.semanticweb.elk.reasoner.tracing.Inference;
 
 /**
  * A {@link ForwardLink} obtained from a {@link SubClassInclusionDecomposed}
@@ -41,7 +40,7 @@ import org.semanticweb.elk.reasoner.tracing.Inference;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ForwardLinkOfObjectHasSelf extends AbstractClassConclusion
+public class ForwardLinkOfObjectHasSelf extends AbstractClassInference
 		implements ForwardLinkInference {
 
 	private final IndexedObjectHasSelf existential_;
@@ -51,7 +50,7 @@ public class ForwardLinkOfObjectHasSelf extends AbstractClassConclusion
 		super(inferenceRoot);
 		existential_ = subsumer;
 	}
-
+	
 	public IndexedObjectHasSelf getDecomposedExistential() {
 		return this.existential_;
 	}
@@ -81,32 +80,22 @@ public class ForwardLinkOfObjectHasSelf extends AbstractClassConclusion
 	}
 
 	@Override
-	public <O> O accept(ClassConclusion.Visitor<O> visitor) {
+	public final <O> O accept(ClassConclusion.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 	
 	@Override
-	public <O> O accept(ForwardLink.Visitor<O> visitor) {
+	public final <O> O accept(ForwardLink.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+	
+	@Override
+	public final <O> O accept(ClassInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
 	@Override
-	public <O> O accept(Inference.Visitor<O> visitor) {
-		return visitor.visit(this);
-	}
-	
-	@Override
-	public <O> O accept(SaturationInference.Visitor<O> visitor) {
-		return visitor.visit(this);
-	}
-	
-	@Override
-	public <O> O accept(ClassInference.Visitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	public <O> O accept(ForwardLinkInference.Visitor<O> visitor) {
+	public final <O> O accept(ForwardLinkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 	

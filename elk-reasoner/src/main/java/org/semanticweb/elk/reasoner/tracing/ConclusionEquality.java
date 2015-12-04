@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation.conclusions.model;
+package org.semanticweb.elk.reasoner.tracing;
 
 /*
  * #%L
@@ -24,19 +24,36 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.model;
 
 import org.semanticweb.elk.owl.comparison.ElkObjectEquality;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 
-public class ClassConclusionEquality implements ClassConclusion.Visitor<ClassConclusion> {
+public class ConclusionEquality implements Conclusion.Visitor<Conclusion> {
 
 	private final Object object_;
 
-	private ClassConclusionEquality(Object object) {
+	private ConclusionEquality(Object object) {
 		this.object_ = object;
 	}
 
-	public static boolean equals(ClassConclusion first, Object second) {
-		return first == null ? second == null : first.accept(
-				new ClassConclusionEquality(second)) == second;
+	public static boolean equals(Conclusion first, Object second) {
+		return first == null
+				? second == null
+				: first.accept(new ConclusionEquality(second)) == second;
 	}
 
 	private static boolean equals(IndexedObject first, IndexedObject second) {
@@ -46,7 +63,7 @@ public class ClassConclusionEquality implements ClassConclusion.Visitor<ClassCon
 	private static boolean equals(ElkObject first, ElkObject second) {
 		return (ElkObjectEquality.equals(first, second));
 	}
-	
+
 	private static boolean equals(int first, int second) {
 		return first == second;
 	}
@@ -101,7 +118,8 @@ public class ClassConclusionEquality implements ClassConclusion.Visitor<ClassCon
 	}
 
 	@Override
-	public SubClassInclusionComposed visit(SubClassInclusionComposed conclusion) {
+	public SubClassInclusionComposed visit(
+			SubClassInclusionComposed conclusion) {
 		if (object_ == conclusion)
 			return conclusion;
 		if (object_ instanceof SubClassInclusionComposed) {
@@ -142,7 +160,8 @@ public class ClassConclusionEquality implements ClassConclusion.Visitor<ClassCon
 	}
 
 	@Override
-	public SubClassInclusionDecomposed visit(SubClassInclusionDecomposed conclusion) {
+	public SubClassInclusionDecomposed visit(
+			SubClassInclusionDecomposed conclusion) {
 		if (object_ == conclusion)
 			return conclusion;
 		if (object_ instanceof SubClassInclusionDecomposed) {
@@ -164,7 +183,8 @@ public class ClassConclusionEquality implements ClassConclusion.Visitor<ClassCon
 			DisjointSubsumer result = (DisjointSubsumer) object_;
 			if (equals(result.getConclusionRoot(),
 					conclusion.getConclusionRoot())
-					&& equals(result.getDisjointExpressions(), conclusion.getDisjointExpressions())
+					&& equals(result.getDisjointExpressions(),
+							conclusion.getDisjointExpressions())
 					&& equals(result.getPosition(), conclusion.getPosition())
 					&& equals(result.getReason(), conclusion.getReason()))
 				return result;
@@ -183,6 +203,103 @@ public class ClassConclusionEquality implements ClassConclusion.Visitor<ClassCon
 					&& equals(result.getForwardChain(),
 							conclusion.getForwardChain())
 					&& equals(result.getTarget(), conclusion.getTarget()))
+				return result;
+		}
+		return null;
+	}
+
+	@Override
+	public SubPropertyChain visit(SubPropertyChain conclusion) {
+		if (object_ == conclusion)
+			return conclusion;
+		if (object_ instanceof SubPropertyChain) {
+			SubPropertyChain result = (SubPropertyChain) object_;
+			if (equals(result.getSubChain(), conclusion.getSubChain())
+					&& equals(result.getSuperChain(),
+							conclusion.getSuperChain()))
+				return result;
+		}
+		return null;
+	}
+
+	@Override
+	public IndexedDisjointClassesAxiom visit(
+			IndexedDisjointClassesAxiom conclusion) {
+		if (object_ == conclusion)
+			return conclusion;
+		if (object_ instanceof IndexedDisjointClassesAxiom) {
+			IndexedDisjointClassesAxiom result = (IndexedDisjointClassesAxiom) object_;
+			if (equals(result.getMembers(), conclusion.getMembers()))
+				return result;
+		}
+		return null;
+	}
+
+	@Override
+	public IndexedSubClassOfAxiom visit(IndexedSubClassOfAxiom conclusion) {
+		if (object_ == conclusion)
+			return conclusion;
+		if (object_ instanceof IndexedSubClassOfAxiom) {
+			IndexedSubClassOfAxiom result = (IndexedSubClassOfAxiom) object_;
+			if (equals(result.getSubClass(), conclusion.getSubClass())
+					&& equals(result.getSuperClass(),
+							conclusion.getSuperClass()))
+				return result;
+		}
+		return null;
+	}
+
+	@Override
+	public IndexedDefinitionAxiom visit(IndexedDefinitionAxiom conclusion) {
+		if (object_ == conclusion)
+			return conclusion;
+		if (object_ instanceof IndexedDefinitionAxiom) {
+			IndexedDefinitionAxiom result = (IndexedDefinitionAxiom) object_;
+			if (equals(result.getDefinedClass(), conclusion.getDefinedClass())
+					&& equals(result.getDefinition(),
+							conclusion.getDefinition()))
+				return result;
+		}
+		return null;
+	}
+
+	@Override
+	public IndexedSubObjectPropertyOfAxiom visit(
+			IndexedSubObjectPropertyOfAxiom conclusion) {
+		if (object_ == conclusion)
+			return conclusion;
+		if (object_ instanceof IndexedSubObjectPropertyOfAxiom) {
+			IndexedSubObjectPropertyOfAxiom result = (IndexedSubObjectPropertyOfAxiom) object_;
+			if (equals(result.getSubPropertyChain(),
+					conclusion.getSubPropertyChain())
+					&& equals(result.getSuperProperty(),
+							conclusion.getSuperProperty()))
+				return result;
+		}
+		return null;
+	}
+
+	@Override
+	public IndexedObjectPropertyRangeAxiom visit(
+			IndexedObjectPropertyRangeAxiom conclusion) {
+		if (object_ == conclusion)
+			return conclusion;
+		if (object_ instanceof IndexedObjectPropertyRangeAxiom) {
+			IndexedObjectPropertyRangeAxiom result = (IndexedObjectPropertyRangeAxiom) object_;
+			if (equals(result.getProperty(), conclusion.getProperty())
+					&& equals(result.getRange(), conclusion.getRange()))
+				return result;
+		}
+		return null;
+	}
+
+	@Override
+	public IndexedDeclarationAxiom visit(IndexedDeclarationAxiom conclusion) {
+		if (object_ == conclusion)
+			return conclusion;
+		if (object_ instanceof IndexedDeclarationAxiom) {
+			IndexedDeclarationAxiom result = (IndexedDeclarationAxiom) object_;
+			if (equals(result.getEntity(), conclusion.getEntity()))
 				return result;
 		}
 		return null;

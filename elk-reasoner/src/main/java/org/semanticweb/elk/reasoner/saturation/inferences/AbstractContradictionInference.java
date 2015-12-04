@@ -36,22 +36,32 @@ public abstract class AbstractContradictionInference extends ContradictionImpl
 	}
 
 	@Override
+	public int hashCode() {
+		return System.identityHashCode(this);
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		return this == o;
+	}
+	
+	@Override
 	public IndexedContextRoot getInferenceRoot() {
 		return getConclusionRoot();
 	}
 	
 	@Override
-	public <O> O accept(Inference.Visitor<O> visitor) {
+	public final <O> O accept(Inference.Visitor<O> visitor) {
 		return accept((ContradictionInference.Visitor<O>) visitor);
 	}
 
 	@Override
-	public <O> O accept(SaturationInference.Visitor<O> visitor) {
+	public final <O> O accept(SaturationInference.Visitor<O> visitor) {
 		return accept((ContradictionInference.Visitor<O>) visitor);
 	}
 	
 	@Override
-	public <O> O accept(ClassInference.Visitor<O> visitor) {
+	public final <O> O accept(ClassInference.Visitor<O> visitor) {
 		return accept((ContradictionInference.Visitor<O>) visitor);
 	}	
 	

@@ -1,4 +1,7 @@
-package org.semanticweb.elk.reasoner.saturation.conclusions.model;
+/**
+ * 
+ */
+package org.semanticweb.elk.reasoner.tracing;
 
 /*
  * #%L
@@ -22,23 +25,40 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.model;
  * #L%
  */
 
-public class ObjectPropertyConclusionPrinter implements
-		ObjectPropertyConclusion.Visitor<String> {
+/**
+ * A skeleton implementation of {@link Conclusion}
+ * 
+ * @author Yevgeny Kazakov
+ *
+ */
+public abstract class AbstractConclusion implements Conclusion {
 
-	private static ObjectPropertyConclusionPrinter INSTANCE_ = new ObjectPropertyConclusionPrinter();
+	/**
+	 * hash code, computed on demand
+	 */
+	private int hashCode_ = 0;
 
-	private ObjectPropertyConclusionPrinter() {
-
+	@Override
+	public int hashCode() {
+		if (hashCode_ == 0) {
+			hashCode_ = ConclusionHash.hashCode(this);
+		}
+		// else
+		return hashCode_;
 	}
-
-	public static String toString(ObjectPropertyConclusion conclusion) {
-		return conclusion.accept(INSTANCE_);
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o || hashCode() == o.hashCode()) {
+			return true;
+		}	
+		// else
+		return ConclusionEquality.equals(this, o);
 	}
 
 	@Override
-	public String visit(SubPropertyChain conclusion) {
-		return "SubPropertyChain(" + conclusion.getSubChain() + " "
-				+ conclusion.getSuperChain() + ")";
+	public String toString() {
+		return ConclusionPrinter.toString(this);
 	}
 
 }

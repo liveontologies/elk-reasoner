@@ -72,7 +72,7 @@ public class PropagationGenerated extends AbstractPropagationInference {
 	}
 
 	@Override
-	public <O> O accept(PropagationInference.Visitor<O> visitor) {
+	public final <O> O accept(PropagationInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

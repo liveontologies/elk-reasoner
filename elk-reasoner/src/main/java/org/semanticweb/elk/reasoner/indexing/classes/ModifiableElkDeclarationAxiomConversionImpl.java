@@ -44,6 +44,16 @@ class ModifiableElkDeclarationAxiomConversionImpl
 	}
 
 	@Override
+	public int hashCode() {
+		return System.identityHashCode(this);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return this == o;
+	}
+	
+	@Override
 	public final <O> O accept(
 			IndexedDeclarationAxiomInference.Visitor<O> visitor) {
 		return visitor.visit(this);

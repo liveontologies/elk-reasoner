@@ -48,6 +48,16 @@ abstract class ModifiableIndexedDefinitionAxiomInferenceImpl<A extends ElkAxiom>
 	}
 
 	@Override
+	public int hashCode() {
+		return System.identityHashCode(this);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return this == o;
+	}
+	
+	@Override
 	public final <O> O accept(Inference.Visitor<O> visitor) {
 		return accept((IndexedDefinitionAxiomInference.Visitor<O>) visitor);
 	}

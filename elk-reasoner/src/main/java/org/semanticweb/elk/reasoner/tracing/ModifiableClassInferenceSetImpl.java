@@ -26,8 +26,6 @@ package org.semanticweb.elk.reasoner.tracing;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusionEquality;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusionHash;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -68,13 +66,13 @@ public class ModifiableClassInferenceSetImpl implements
 
 		@Override
 		public int hashCode() {
-			return ClassConclusionHash.hashCode(conclusion_);
+			return ConclusionHash.hashCode(conclusion_);
 		}
 
 		@Override
 		public boolean equals(Object other) {
 			if (other instanceof Key) {
-				return ClassConclusionEquality.equals(conclusion_,
+				return ConclusionEquality.equals(conclusion_,
 						((Key) other).conclusion_);
 			}
 			// else

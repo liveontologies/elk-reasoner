@@ -39,14 +39,27 @@ import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
  */
 public abstract class ElkObjectImpl implements ElkObject {
 
+	/**
+	 * hash code, computed on demand
+	 */
+	private int hashCode_ = 0;
+
 	@Override
 	public int hashCode() {
-		return ElkObjectHash.hashCode(this);
+		if (hashCode_ == 0) {
+			hashCode_ = ElkObjectHash.hashCode(this);
+		}
+		// else
+		return hashCode_;
 	}
 
 	@Override
-	public boolean equals(Object other) {
-		return ElkObjectEquality.equals(this, other);
+	public boolean equals(Object o) {
+		if (this == o || hashCode() == o.hashCode()) {
+			return true;
+		}	
+		// else
+		return ElkObjectEquality.equals(this, o);
 	}
 
 	@Override

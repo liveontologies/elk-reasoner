@@ -53,12 +53,12 @@ public class ContradictionOfOwlNothing extends
 	}
 
 	@Override
-	public <O> O accept(ClassConclusion.Visitor<O> visitor) {
+	public final <O> O accept(ClassConclusion.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
 	@Override
-	public <O> O accept(ContradictionInference.Visitor<O> visitor) {
+	public final <O> O accept(ContradictionInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 	

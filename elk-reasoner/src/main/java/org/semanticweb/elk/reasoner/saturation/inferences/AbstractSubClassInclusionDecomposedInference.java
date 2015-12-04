@@ -39,25 +39,35 @@ public abstract class AbstractSubClassInclusionDecomposedInference
 	}
 
 	@Override
-	public <O> O accept(Inference.Visitor<O> visitor) {
+	public int hashCode() {
+		return System.identityHashCode(this);
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		return this == o;
+	}
+	
+	@Override
+	public final <O> O accept(Inference.Visitor<O> visitor) {
 		return accept(
 				(SubClassInclusionDecomposedInference.Visitor<O>) visitor);
 	}
 	
 	@Override
-	public <O> O accept(SaturationInference.Visitor<O> visitor) {
+	public final <O> O accept(SaturationInference.Visitor<O> visitor) {
 		return accept(
 				(SubClassInclusionDecomposedInference.Visitor<O>) visitor);
 	}
 
 	@Override
-	public <O> O accept(ClassInference.Visitor<O> visitor) {
+	public final <O> O accept(ClassInference.Visitor<O> visitor) {
 		return accept(
 				(SubClassInclusionDecomposedInference.Visitor<O>) visitor);
 	}
 
 	@Override
-	public <O> O accept(SubClassInclusionInference.Visitor<O> visitor) {
+	public final <O> O accept(SubClassInclusionInference.Visitor<O> visitor) {
 		return accept(
 				(SubClassInclusionDecomposedInference.Visitor<O>) visitor);
 	}

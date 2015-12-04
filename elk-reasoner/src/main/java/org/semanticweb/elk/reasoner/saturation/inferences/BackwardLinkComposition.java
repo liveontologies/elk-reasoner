@@ -139,12 +139,12 @@ public class BackwardLinkComposition extends AbstractBackwardLinkInference
 	}
 
 	@Override
-	public <O> O accept(BackwardLinkInference.Visitor<O> visitor) {
+	public final <O> O accept(BackwardLinkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
 	@Override
-	public <O> O accept(LinkComposition.Visitor<O> visitor) {
+	public final <O> O accept(LinkComposition.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation.conclusions.model;
+package org.semanticweb.elk.reasoner.tracing;
 
 /*
  * #%L
@@ -24,17 +24,35 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.model;
 
 import org.semanticweb.elk.owl.comparison.ElkObjectHash;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 import org.semanticweb.elk.util.hashing.Hasher;
 
-public class ClassConclusionHash implements ClassConclusion.Visitor<Integer>,
-		Hasher<ClassConclusion> {
+public class ConclusionHash
+		implements
+			Conclusion.Visitor<Integer>,
+			Hasher<Conclusion> {
 
-	private static final ClassConclusionHash INSTANCE_ = new ClassConclusionHash();
+	private static final ConclusionHash INSTANCE_ = new ConclusionHash();
 
 	// forbid construction; only static methods should be used
-	private ClassConclusionHash() {
+	private ConclusionHash() {
 
 	}
 
@@ -53,17 +71,17 @@ public class ClassConclusionHash implements ClassConclusion.Visitor<Integer>,
 	private static int hashCode(ElkObject elkObject) {
 		return ElkObjectHash.hashCode(elkObject);
 	}
-	
+
 	private static int hashCode(int n) {
 		return n;
 	}
 
-	public static int hashCode(ClassConclusion conclusion) {
+	public static int hashCode(Conclusion conclusion) {
 		return conclusion == null ? 0 : conclusion.accept(INSTANCE_);
 	}
 
 	@Override
-	public int hash(ClassConclusion conclusion) {
+	public int hash(Conclusion conclusion) {
 		return hashCode(conclusion);
 	}
 
@@ -131,6 +149,53 @@ public class ClassConclusionHash implements ClassConclusion.Visitor<Integer>,
 				hashCode(conclusion.getConclusionRoot()),
 				hashCode(conclusion.getForwardChain()),
 				hashCode(conclusion.getTarget()));
+	}
+
+	@Override
+	public Integer visit(SubPropertyChain conclusion) {
+		return combinedHashCode(hashCode(SubPropertyChain.class),
+				hashCode(conclusion.getSubChain()),
+				hashCode(conclusion.getSuperChain()));
+	}
+
+	@Override
+	public Integer visit(IndexedDisjointClassesAxiom conclusion) {
+		return combinedHashCode(hashCode(IndexedDisjointClassesAxiom.class),
+				hashCode(conclusion.getMembers()));
+	}
+
+	@Override
+	public Integer visit(IndexedSubClassOfAxiom conclusion) {
+		return combinedHashCode(hashCode(IndexedSubClassOfAxiom.class),
+				hashCode(conclusion.getSubClass()),
+				hashCode(conclusion.getSuperClass()));
+	}
+
+	@Override
+	public Integer visit(IndexedDefinitionAxiom conclusion) {
+		return combinedHashCode(hashCode(IndexedDefinitionAxiom.class),
+				hashCode(conclusion.getDefinedClass()),
+				hashCode(conclusion.getDefinition()));
+	}
+
+	@Override
+	public Integer visit(IndexedSubObjectPropertyOfAxiom conclusion) {
+		return combinedHashCode(hashCode(IndexedSubObjectPropertyOfAxiom.class),
+				hashCode(conclusion.getSubPropertyChain()),
+				hashCode(conclusion.getSuperProperty()));
+	}
+
+	@Override
+	public Integer visit(IndexedObjectPropertyRangeAxiom conclusion) {
+		return combinedHashCode(hashCode(IndexedObjectPropertyRangeAxiom.class),
+				hashCode(conclusion.getProperty()),
+				hashCode(conclusion.getRange()));
+	}
+
+	@Override
+	public Integer visit(IndexedDeclarationAxiom conclusion) {
+		return combinedHashCode(hashCode(IndexedDeclarationAxiom.class),
+				hashCode(conclusion.getEntity()));
 	}
 
 }
