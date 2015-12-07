@@ -22,28 +22,34 @@ package org.semanticweb.elk.reasoner.tracing;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
-
 /**
- * An object using which {@link ObjectPropertyInference}s can be produced
+ * A wrapper over {@link Conclusion}s for comparing them using
+ * {@link ConclusionEquality} and {@link ConclusionHash}
  * 
- * @author "Yevgeny Kazakov"
- * 
+ * @author Yevgeny Kazakov
+ *
  */
-public interface ObjectPropertyInferenceProducer {
+class ConclusionKey {
 
-	/**
-	 * Tells that the given {@link ObjectPropertyInference} is produced.
-	 * 
-	 * @param inference
-	 */
-	public void produce(ObjectPropertyInference inference);
+	private final Conclusion conclusion_;
 
-	public static ObjectPropertyInferenceProducer DUMMY = new ObjectPropertyInferenceProducer() {
-		@Override
-		public void produce(ObjectPropertyInference inference) {
-			// no-op
+	ConclusionKey(Conclusion conclusion) {
+		this.conclusion_ = conclusion;
+	}
+
+	@Override
+	public int hashCode() {
+		return ConclusionHash.hashCode(conclusion_);
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof ConclusionKey) {
+			return ConclusionEquality.equals(conclusion_,
+					((ConclusionKey) other).conclusion_);
 		}
-	};
+		// else
+		return false;
+	}
 
 }

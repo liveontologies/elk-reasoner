@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.indexing.model;
+package org.semanticweb.elk.reasoner.tracing;
 
 /*
  * #%L
@@ -22,18 +22,13 @@ package org.semanticweb.elk.reasoner.indexing.model;
  * #L%
  */
 
-/**
- * An {@link IndexedDefinitionAxiomInference} that can be modified as a result
- * of updating the {@link ModifiableOntologyIndex} where this object is stored.
- * 
- * @author "Yevgeny Kazakov"
- */
-public interface ModifiableIndexedDefinitionAxiomInference
-		extends
-			ModifiableIndexedAxiomInference,
-			IndexedDefinitionAxiomInference,
-			ModifiableIndexedDefinitionAxiom {
+interface ModifiableInferenceSet<I extends Inference> extends InferenceSet {
 
-	// combined interfaces
+	@Override
+	public Iterable<? extends I> getInferences(Conclusion conclusion);
+
+	public void add(I inference);
+
+	public void clear();
 
 }

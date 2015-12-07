@@ -39,9 +39,9 @@ import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.AbstractClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionOccurrenceCheckingVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.LocalRuleApplicationClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.RelativizedContextReference;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -51,7 +51,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.factories.AbstractRuleAppli
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.WorkerLocalTodo;
-import org.semanticweb.elk.reasoner.tracing.ClassInferenceProducer;
+import org.semanticweb.elk.reasoner.tracing.InferenceProducer;
 import org.semanticweb.elk.util.concurrent.computation.DelegatingInputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
@@ -60,7 +60,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * {@link ClassConclusion}s currently stored in the {@link Context}s of the main
  * {@link SaturationState}. This {@link SaturationState} is not modified. The
  * inferences producing the {@link ClassConclusion}s in this {@link SaturationState}
- * are produced using the supplied {@link ClassInferenceProducer}.
+ * are produced using the supplied {@link InferenceProducer}.
  * 
  * @author Pavel Klinov
  * 
@@ -73,13 +73,13 @@ public class ContextTracingRuleApplicationFactory extends
 
 	private final SaturationState<?> mainSaturationState_;
 
-	private final ClassInferenceProducer inferenceProducer_;
+	private final InferenceProducer<ClassInference> inferenceProducer_;
 	
 	private final SubContextInitialization.Factory factory_;
 
 	public ContextTracingRuleApplicationFactory(
 			SaturationState<?> mainSaturationState,
-			ClassInferenceProducer inferenceProducer) {
+			InferenceProducer<ClassInference> inferenceProducer) {
 		super(new MapSaturationState<ExtendedContext>(
 				mainSaturationState.getOntologyIndex(),
 				new MainContextFactory()));

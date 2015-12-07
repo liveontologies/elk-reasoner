@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
  * @author Yevgeny Kazakov
  *
  */
-public interface Inference {
+public interface Inference extends Conclusion {
 
 	/**
 	 * The visitor pattern for instances

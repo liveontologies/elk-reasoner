@@ -31,6 +31,7 @@ package org.semanticweb.elk.reasoner.indexing.model;
  */
 public interface ModifiableIndexedDisjointClassesAxiomInference
 		extends
+			ModifiableIndexedAxiomInference,
 			IndexedDisjointClassesAxiomInference,
 			ModifiableIndexedDisjointClassesAxiom {
 

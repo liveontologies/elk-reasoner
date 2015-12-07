@@ -1,3 +1,6 @@
+/**
+ * 
+ */
 package org.semanticweb.elk.reasoner.tracing;
 
 /*
@@ -22,21 +25,34 @@ package org.semanticweb.elk.reasoner.tracing;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.util.collections.HashListMultimap;
+import org.semanticweb.elk.util.collections.Multimap;
 
 /**
- * An object using which {@link ClassInference}s can be produced
+ * An implementation of {@link ModifiableInferenceSet} backed by a
+ * {@link Multimap}.
  * 
  * @author "Yevgeny Kazakov"
- * 
  */
-public interface ClassInferenceProducer {
+public class ModifiableInferenceSetImpl<I extends Inference>
+		implements
+			ModifiableInferenceSet<I> {
 
-	/**
-	 * Tells that the given {@link ClassInference} is produced.
-	 * 
-	 * @param inference
-	 */
-	public void produce(ClassInference inference);
+	private final Multimap<ConclusionKey, I> inferenceMap_ = new HashListMultimap<ConclusionKey, I>();
+
+	@Override
+	public void add(I inference) {
+		inferenceMap_.add(new ConclusionKey(inference), inference);
+	}
+
+	@Override
+	public void clear() {
+		inferenceMap_.clear();
+	}
+
+	@Override
+	public Iterable<? extends I> getInferences(Conclusion conclusion) {
+		return inferenceMap_.get(new ConclusionKey(conclusion));
+	}
 
 }

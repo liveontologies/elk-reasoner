@@ -31,6 +31,11 @@ package org.semanticweb.elk.reasoner.tracing;
  */
 public interface InferenceSet {
 
+	/**
+	 * @param conclusion
+	 * @return all {@link Inference}s stored in this {@link InferenceSet}
+	 *         producing the given {@link Conclusion}
+	 */
 	public Iterable<? extends Inference> getInferences(Conclusion conclusion);
 
 }

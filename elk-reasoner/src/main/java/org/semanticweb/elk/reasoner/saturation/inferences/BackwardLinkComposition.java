@@ -126,11 +126,7 @@ public class BackwardLinkComposition extends AbstractBackwardLinkInference
 	public IndexedSubObjectPropertyOfAxiom getSideCondition(
 			IndexedSubObjectPropertyOfAxiom.Factory factory) {
 		return factory.getIndexedSubObjectPropertyOfAxiom(reason_, composition_,
-				backwardRelation_);
-	}
-
-	public SubPropertyChain getFifthPremise(SubPropertyChain.Factory factory) {
-		return factory.getSubPropertyChain(composition_, getBackwardRelation());
+				getBackwardRelation());
 	}
 
 	@Override

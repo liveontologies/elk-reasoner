@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.semanticweb.elk.reasoner.tracing;
 
 /*
@@ -25,26 +22,26 @@ package org.semanticweb.elk.reasoner.tracing;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
-
 /**
- * An implementation for {@link ModifiableObjectPropertyInferenceSet}. Insertion
- * of inferences is synchronized. Inferences should not be read while insertion
- * is in place.
+ * An object using which {@link Inference}s can be produced
  * 
  * @author "Yevgeny Kazakov"
+ * 
  */
-public class SynchronizedModifiableObjectPropertyInferenceSet extends
-		ModifiableObjectPropertyInferenceSetImpl {
+public interface InferenceProducer<I extends Inference> {
 
-	@Override
-	public synchronized void add(ObjectPropertyInference inference) {
-		super.add(inference);
-	}
+	/**
+	 * Notifies about a new {@link Inference}.
+	 * 
+	 * @param inference
+	 */
+	public void produce(I inference);
 
-	@Override
-	public synchronized void clear() {
-		super.clear();
-	}
-
+	public static InferenceProducer<Inference> DUMMY = new InferenceProducer<Inference>() {
+		@Override
+		public void produce(Inference inference) {
+			// no-op
+		}
+	};
+	
 }

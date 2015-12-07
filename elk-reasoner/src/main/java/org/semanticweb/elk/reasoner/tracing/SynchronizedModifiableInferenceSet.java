@@ -1,3 +1,6 @@
+/**
+ * 
+ */
 package org.semanticweb.elk.reasoner.tracing;
 
 /*
@@ -22,13 +25,24 @@ package org.semanticweb.elk.reasoner.tracing;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
+/**
+ * A {@link ModifiableInferenceSet} in which the modification methods are
+ * synchronized.
+ * 
+ * @author "Yevgeny Kazakov"
+ */
+public class SynchronizedModifiableInferenceSet<I extends Inference>
+		extends
+			ModifiableInferenceSetImpl<I> {
 
-public interface ModifiableObjectPropertyInferenceSet extends
-		ObjectPropertyInferenceSet {
+	@Override
+	public synchronized void add(I inference) {
+		super.add(inference);
+	}
 
-	public void add(ObjectPropertyInference inference);
-	
-	public void clear();
+	@Override
+	public synchronized void clear() {
+		super.clear();
+	}
 
 }

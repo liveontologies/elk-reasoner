@@ -651,7 +651,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	}
 
 	private void createTraceState() {
-		traceState = new TraceState();
+		traceState = new TraceState(ontologyIndex);
 	}
 
 	TraceState getTraceState() {
@@ -667,6 +667,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 * SOME DEBUG METHODS, FIXME: REMOVE
 	 */
 	// ////////////////////////////////////////////////////////////////
+	@Deprecated
 	public synchronized Collection<? extends IndexedClassExpression> getIndexedClassExpressions() {
 		return ontologyIndex.getClassExpressions();
 	}

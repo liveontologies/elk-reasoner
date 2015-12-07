@@ -59,7 +59,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkSameIndividualAx
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkSubClassOfAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkSubObjectPropertyOfAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkTransitiveObjectPropertyAxiomConversion;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpressionList;
@@ -101,7 +101,8 @@ public class ResolvingModifiableIndexedObjectFactory
 	}
 
 	@SuppressWarnings("static-method")
-	<T extends ModifiableIndexedAxiom> T filter(T input) {
+	protected <T extends ModifiableIndexedAxiomInference> T filter(T input) {
+		// can be overriden in subclasses
 		return input;
 	}
 

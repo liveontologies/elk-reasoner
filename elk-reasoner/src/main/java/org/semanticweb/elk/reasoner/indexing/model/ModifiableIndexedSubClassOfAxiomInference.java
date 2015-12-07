@@ -30,6 +30,7 @@ package org.semanticweb.elk.reasoner.indexing.model;
  */
 public interface ModifiableIndexedSubClassOfAxiomInference
 		extends
+			ModifiableIndexedAxiomInference,
 			IndexedSubClassOfAxiomInference,
 			ModifiableIndexedSubClassOfAxiom {
 

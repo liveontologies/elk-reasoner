@@ -143,7 +143,6 @@ public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 		inference.getSecondPremise(conclusionFactory_);
 		inference.getThirdPremise(conclusionFactory_);
 		inference.getFourthPremise(conclusionFactory_);
-		inference.getFifthPremise(conclusionFactory_);
 		inference.getSideCondition(conclusionFactory_);
 		return null;
 	}

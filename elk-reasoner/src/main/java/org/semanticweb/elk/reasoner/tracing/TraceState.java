@@ -29,16 +29,24 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.reasoner.indexing.classes.ResolvingModifiableIndexedObjectFactory;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverter;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedAxiomInference;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectCache;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 /**
  * A collections of objects for tracing contexts and keeping the relevant
@@ -54,13 +62,35 @@ public class TraceState
 		implements
 			InferenceSet,
 			ModifiableClassInferenceTracingState,
-			ObjectPropertyInferenceProducer {
+			InferenceProducer<ObjectPropertyInference> {
 
 	private final Queue<ClassConclusion> toTrace_ = new LinkedList<ClassConclusion>();
 
 	private final ConcurrentHashMap<IndexedContextRoot, ClassInferenceSet> classInferenceMap_ = new ConcurrentHashMap<IndexedContextRoot, ClassInferenceSet>();
 
-	private final ModifiableObjectPropertyInferenceSet objectPropertyInferenceSet_ = new SynchronizedModifiableObjectPropertyInferenceSet();	
+	private final ModifiableInferenceSet<ObjectPropertyInference> objectPropertyInferenceSet_ = new SynchronizedModifiableInferenceSet<ObjectPropertyInference>();
+
+	private final ModifiableInferenceSet<IndexedAxiomInference> indexedAxiomInferenceSet_ = new SynchronizedModifiableInferenceSet<IndexedAxiomInference>();
+
+	private final Set<ElkAxiom> indexedAxioms_ = new ArrayHashSet<ElkAxiom>();
+
+	private final ModifiableIndexedObject.Factory indexedObjectFactory_;
+
+	private final ElkAxiomConverter elkAxiomConverter_;
+
+	public TraceState(ModifiableIndexedObjectCache cache) {
+		this.indexedObjectFactory_ = new ResolvingModifiableIndexedObjectFactory(
+				cache) {
+			@Override
+			protected <T extends ModifiableIndexedAxiomInference> T filter(
+					T input) {
+				indexedAxiomInferenceSet_.add(input);
+				return input;
+			}
+		};
+		this.elkAxiomConverter_ = new ElkAxiomConverterImpl(
+				indexedObjectFactory_);
+	}
 
 	public Collection<? extends ClassConclusion> getToTrace() {
 		return toTrace_;
@@ -130,20 +160,29 @@ public class TraceState
 					}
 
 					@Override
-					protected Iterable<? extends SaturationInference> defaultVisit(
+					protected Iterable<? extends ObjectPropertyInference> defaultVisit(
 							ObjectPropertyConclusion cncl) {
-						return objectPropertyInferenceSet_
-								.getObjectPropertyInferences(cncl);
+						return objectPropertyInferenceSet_.getInferences(cncl);
 					}
-					
+
 					@Override
-					protected Iterable<? extends IndexedAxiomInference> defaultVisit(IndexedAxiom conclusion) {
-						// TODO: collect inferences
-						return Collections.emptyList();
+					protected Iterable<? extends IndexedAxiomInference> defaultVisit(
+							IndexedAxiom cncl) {
+						indexAxiom(cncl.getOriginalAxiom());
+						return indexedAxiomInferenceSet_.getInferences(cncl);
 					}
 
 				});
 
 	}
 
+	synchronized void indexAxiom(ElkAxiom axiom) {
+		if (!indexedAxioms_.add(axiom)) {
+			// already done
+			return;
+		}
+		// else index axiom
+		axiom.accept(elkAxiomConverter_);
+	}
+	
 }

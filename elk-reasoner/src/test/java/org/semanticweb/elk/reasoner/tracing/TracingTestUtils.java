@@ -71,10 +71,6 @@ public class TracingTestUtils {
 
 		@Override
 		public void notifyUntraced(Conclusion conclusion) {
-			if (conclusion instanceof IndexedAxiom) {
-				// TODO: remove after trancing of IndexedAxioms is supported
-				return;
-			}
 			fail(conclusion + ": conclusion was not traced");
 		}
 
