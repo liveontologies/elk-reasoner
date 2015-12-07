@@ -88,7 +88,6 @@ public class TracingTest {
 	}
 
 	@Test
-	@Ignore //TODO: fix the test
 	public void tracingTest() throws Exception {
 		AxiomLoader fileLoader = new Owl2StreamLoader(
 				new Owl2FunctionalStyleParserFactory(new ElkObjectFactoryImpl(

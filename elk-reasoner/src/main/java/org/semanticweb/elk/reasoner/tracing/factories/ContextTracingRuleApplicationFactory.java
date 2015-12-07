@@ -93,7 +93,6 @@ public class ContextTracingRuleApplicationFactory extends
 	protected ClassConclusion.Visitor<Boolean> getConclusionProcessor(
 			Reference<Context> activeContext,
 			RuleVisitor<?> ruleVisitor,
-			// this writer will block cyclic inferences
 			SaturationStateWriter<? extends ExtendedContext> localWriter,
 			SaturationStatistics localStatistics) {
 

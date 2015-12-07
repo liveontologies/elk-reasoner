@@ -32,6 +32,7 @@ import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.tracing.factories.ProofUnwindingFactory;
 import org.semanticweb.elk.reasoner.tracing.factories.ProofUnwindingJob;
 import org.semanticweb.elk.reasoner.tracing.factories.ProofUnwindingListener;
@@ -47,22 +48,20 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  */
 public class RecursiveTracingComputation
 		extends
-		ReasonerComputationWithInputs<ProofUnwindingJob<ClassConclusion>, ProofUnwindingFactory<ClassConclusion, ProofUnwindingJob<ClassConclusion>>> {
+			ReasonerComputationWithInputs<ProofUnwindingJob<ClassConclusion>, ProofUnwindingFactory<ClassConclusion, ProofUnwindingJob<ClassConclusion>>> {
 
 	public RecursiveTracingComputation(
 			Collection<? extends ProofUnwindingJob<ClassConclusion>> inputs,
 			ComputationExecutor executor, int maxWorkers,
-			ProgressMonitor progressMonitor,
-			SaturationState<?> saturationState,
-			ModifiableClassInferenceTracingState tracingState) {
-		super(
-				inputs,
+			ProgressMonitor progressMonitor, SaturationState<?> saturationState,
+			InferenceProducer<? super ClassInference> inferenceProducer) {
+		super(inputs,
 				new ProofUnwindingFactory<ClassConclusion, ProofUnwindingJob<ClassConclusion>>(
-						saturationState, tracingState, maxWorkers,
+						saturationState, inferenceProducer, maxWorkers,
 						ProofUnwindingListener.Helper.dummyListener()),
 				executor, maxWorkers, progressMonitor);
 	}
-	
+
 	/**
 	 * Print statistics about taxonomy computation
 	 */

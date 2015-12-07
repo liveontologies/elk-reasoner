@@ -41,7 +41,7 @@ public class ModifiableInferenceSetImpl<I extends Inference>
 	private final Multimap<ConclusionKey, I> inferenceMap_ = new HashListMultimap<ConclusionKey, I>();
 
 	@Override
-	public void add(I inference) {
+	public void produce(I inference) {
 		inferenceMap_.add(new ConclusionKey(inference), inference);
 	}
 

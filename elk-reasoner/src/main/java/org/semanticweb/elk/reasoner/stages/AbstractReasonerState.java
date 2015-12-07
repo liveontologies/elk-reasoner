@@ -156,7 +156,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 * Keeps relevant information about tracing
 	 */
 	TraceState traceState;
-	
+
 	/**
 	 * creates conclusions for tracing
 	 */
@@ -256,7 +256,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		if (axiomLoader_ == null || axiomLoader_.isLoadingFinished())
 			axiomLoader_ = newAxiomLoader;
 		else
-			axiomLoader_ = new ComposedAxiomLoader(axiomLoader_, newAxiomLoader);
+			axiomLoader_ = new ComposedAxiomLoader(axiomLoader_,
+					newAxiomLoader);
 	}
 
 	/**
@@ -413,7 +414,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		if (isInconsistent())
 			throw new ElkInconsistentOntologyException();
 
-		if (isIncrementalMode() && instanceTaxonomyState.getTaxonomy() != null) {
+		if (isIncrementalMode()
+				&& instanceTaxonomyState.getTaxonomy() != null) {
 			complete(stageManager.incrementalInstanceTaxonomyComputationStage);
 		} else {
 			setNonIncrementalMode();
@@ -449,9 +451,10 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 					.iterator();
 			if (namedIndividualIterator.hasNext()) {
 				// there is at least one individual
-				node.addInstanceNode(new OrphanInstanceNode<ElkClass, ElkNamedIndividual>(
-						allNamedIndividuals, namedIndividualIterator.next(),
-						node));
+				node.addInstanceNode(
+						new OrphanInstanceNode<ElkClass, ElkNamedIndividual>(
+								allNamedIndividuals,
+								namedIndividualIterator.next(), node));
 			}
 			result = new SingletoneInstanceTaxonomy<ElkClass, ElkNamedIndividual, OrphanTypeNode<ElkClass, ElkNamedIndividual>>(
 					node);
@@ -464,8 +467,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 * @return all {@link ElkClass}es occurring in the ontology
 	 */
 	public synchronized Set<ElkClass> getAllClasses() {
-		Set<ElkClass> result = new ArrayHashSet<ElkClass>(ontologyIndex
-				.getClasses().size());
+		Set<ElkClass> result = new ArrayHashSet<ElkClass>(
+				ontologyIndex.getClasses().size());
 		for (IndexedClass ic : ontologyIndex.getClasses())
 			result.add(ic.getElkEntity());
 		return result;
@@ -543,8 +546,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	}
 
 	public synchronized void initClassTaxonomy() {
-		classTaxonomyState.getWriter().setTaxonomy(
-				new ConcurrentClassTaxonomy());
+		classTaxonomyState.getWriter()
+				.setTaxonomy(new ConcurrentClassTaxonomy());
 	}
 
 	public synchronized void initInstanceTaxonomy() {
@@ -567,11 +570,12 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 *---------------------------------------------------*/
 
 	private void toTrace(ClassConclusion conclusion) {
-		// if (traceState.getInferencesForOrigin(conclusion.getOriginRoot()) !=
-		// null)
-		// // already traced
-		// return;
-		// // else
+		if (traceState.getInferences(conclusion).iterator().hasNext()) {
+			// already traced
+			traceState.getInferences(conclusion);
+			return;
+		}
+		// else
 		stageManager.inferenceTracingStage.invalidate();
 		traceState.addToTrace(conclusion);
 	}
@@ -589,7 +593,9 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			toTrace(convertTraceTarget(subsumee, subsumer));
 		}
 
-		getStageExecutor().complete(stageManager.inferenceTracingStage);
+		if (!traceState.getToTrace().isEmpty()) {
+			getStageExecutor().complete(stageManager.inferenceTracingStage);
+		}
 
 		return traceState;
 	}
@@ -605,7 +611,9 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			throw new IllegalStateException("The ontology is consistent");
 		}
 		toTrace(factory_.getContradiction(inconsistentEntity));
-		getStageExecutor().complete(stageManager.inferenceTracingStage);
+		if (!traceState.getToTrace().isEmpty()) {
+			getStageExecutor().complete(stageManager.inferenceTracingStage);
+		}
 		return inconsistentEntity.getElkEntity();
 	}
 
@@ -613,8 +621,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		Context subsumeeContext = saturationState.getContext(subsumee);
 
 		if (subsumeeContext != null) {
-			return !subsumeeContext.containsConclusion(factory_.getContradiction(
-					subsumee));
+			return !subsumeeContext
+					.containsConclusion(factory_.getContradiction(subsumee));
 		}
 		// shouldn't happen if we suppport only named classes or abbreviate
 		// class expressions and saturate them prior to tracing

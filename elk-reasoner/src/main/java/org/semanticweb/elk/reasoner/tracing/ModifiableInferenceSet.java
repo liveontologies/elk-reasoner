@@ -22,12 +22,10 @@ package org.semanticweb.elk.reasoner.tracing;
  * #L%
  */
 
-interface ModifiableInferenceSet<I extends Inference> extends InferenceSet {
+public interface ModifiableInferenceSet<I extends Inference> extends InferenceSet, InferenceProducer<I> {
 
 	@Override
 	public Iterable<? extends I> getInferences(Conclusion conclusion);
-
-	public void add(I inference);
 
 	public void clear();
 

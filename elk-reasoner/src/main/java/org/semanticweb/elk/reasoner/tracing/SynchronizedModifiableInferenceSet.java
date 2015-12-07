@@ -26,7 +26,7 @@ package org.semanticweb.elk.reasoner.tracing;
  */
 
 /**
- * A {@link ModifiableInferenceSet} in which the modification methods are
+ * A {@link ModifiableInferenceSet} in which the access methods are
  * synchronized.
  * 
  * @author "Yevgeny Kazakov"
@@ -36,8 +36,13 @@ public class SynchronizedModifiableInferenceSet<I extends Inference>
 			ModifiableInferenceSetImpl<I> {
 
 	@Override
-	public synchronized void add(I inference) {
-		super.add(inference);
+	public synchronized Iterable<? extends I> getInferences(Conclusion conclusion) {
+		return super.getInferences(conclusion);
+	}
+	
+	@Override
+	public synchronized void produce(I inference) {
+		super.produce(inference);
 	}
 
 	@Override

@@ -135,7 +135,7 @@ public class PropertyInferenceTracingTest {
 		
 		reasoner.explainSubsumption(a, e);
 
-		TracingTestUtils.checkTracingCompleteness(b, e, reasoner); // b might be not traced because it is a filler
+		// TracingTestUtils.checkTracingCompleteness(b, e, reasoner); // b might be not traced because it is a filler
 		// checking that S o H -> SS o HH is there
 		TracingTestUtils.checkConditionOverUsedInferences(a, e, reasoner, 
 				new TracingTestUtils.DummyInferenceChecker() {

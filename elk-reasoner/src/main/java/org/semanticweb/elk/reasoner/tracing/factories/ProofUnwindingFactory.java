@@ -26,15 +26,18 @@ package org.semanticweb.elk.reasoner.tracing.factories;
  */
 
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentMap;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.tracing.ClassInferenceSet;
-import org.semanticweb.elk.reasoner.tracing.ModifiableClassInferenceTracingState;
+import org.semanticweb.elk.reasoner.tracing.InferenceProducer;
+import org.semanticweb.elk.reasoner.tracing.ModifiableInferenceSet;
+import org.semanticweb.elk.reasoner.tracing.ModifiableInferenceSetImpl;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
@@ -43,14 +46,13 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The factory for engines that concurrently perform unwinding of proofs for
- * {@link ClassConclusion}s. The {@link ClassConclusion}s are submitted as the input of
- * the {@link ProofUnwindingJob}, and the engines of the factory compute all
- * {@link ClassInference}s that derive these {@link ClassConclusion}s and,
- * recursively, all premises of such inferences. The computed
- * {@link ClassInference}s are saved in the
- * {@link ModifiableClassInferenceTracingState} given in the input of this
- * factory. A {@link ProofUnwindingListener} can be used to receive the
- * notification when the submitted {@link ProofUnwindingJob} is processed.
+ * {@link ClassConclusion}s. The {@link ClassConclusion}s are submitted as the
+ * input of the {@link ProofUnwindingJob}, and the engines of the factory
+ * compute all {@link ClassInference}s used in minimal derivations for these
+ * {@link ClassConclusion}s. The computed {@link ClassInference}s are reported
+ * using the provided {@link InferenceProducer}. A
+ * {@link ProofUnwindingListener} can be used to receive the notification when
+ * the submitted {@link ProofUnwindingJob} is processed.
  * 
  * @author Pavel Klinov
  * 
@@ -59,17 +61,33 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  */
 public class ProofUnwindingFactory<C extends ClassConclusion, J extends ProofUnwindingJob<C>>
-		extends SimpleInterrupter implements
-		InputProcessorFactory<J, ProofUnwindingFactory<C, J>.Engine> {
+		extends
+			SimpleInterrupter
+		implements
+			InputProcessorFactory<J, ProofUnwindingFactory<C, J>.Engine> {
 
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ProofUnwindingFactory.class);
 
+	/**
+	 * the object used to report the final inferences
+	 */
+	private final InferenceProducer<? super ClassInference> inferenceProducer_;
+
+	/**
+	 * the factory to compute all inferences for contexts
+	 */
 	private final ContextTracingFactory<IndexedContextRoot, ContextTracingJobForProofUnwinding<C, J>> contextTracingFactory_;
 
+	/**
+	 * the job queue
+	 */
 	private final Queue<ContextTracingJobForProofUnwinding<C, J>> jobsToDo_;
 
-	private final ModifiableClassInferenceTracingState tracingState_;
+	/**
+	 * the traced inferences stored by context; not all of them may be needed
+	 */
+	private final ConcurrentMap<IndexedContextRoot, ModifiableInferenceSet<ClassInference>> inferencesByContext_;
 
 	/**
 	 * The listener object implementing callback functions for this engine
@@ -77,13 +95,14 @@ public class ProofUnwindingFactory<C extends ClassConclusion, J extends ProofUnw
 	private final ProofUnwindingListener<C, J> listener_;
 
 	public ProofUnwindingFactory(SaturationState<?> mainSaturationState,
-			ModifiableClassInferenceTracingState tracingState, int maxWorkers,
-			ProofUnwindingListener<C, J> listener) {
-		tracingState_ = tracingState;
+			InferenceProducer<? super ClassInference> inferenceProducer,
+			int maxWorkers, ProofUnwindingListener<C, J> listener) {
+		inferenceProducer_ = inferenceProducer;
 		contextTracingFactory_ = new ContextTracingFactory<IndexedContextRoot, ContextTracingJobForProofUnwinding<C, J>>(
 				mainSaturationState, maxWorkers,
 				new ThisContextTracingListener());
 		jobsToDo_ = new ConcurrentLinkedQueue<ContextTracingJobForProofUnwinding<C, J>>();
+		inferencesByContext_ = new ConcurrentHashMap<IndexedContextRoot, ModifiableInferenceSet<ClassInference>>();
 		this.listener_ = listener;
 	}
 
@@ -125,16 +144,18 @@ public class ProofUnwindingFactory<C extends ClassConclusion, J extends ProofUnw
 				return;
 			}
 			// else
+			inferenceProducer_.produce(nextInference);
 			unwindingState.todoInferencePremises(nextInference);
 		}
 		jobsToDo_.add(new ContextTracingJobForProofUnwinding<C, J>(next,
 				unwindingState));
 	}
-	
+
 	class Engine implements InputProcessor<J> {
 
 		/**
-		 * The saturation engine with tracing that saves all inferences in special contexts
+		 * The saturation engine with tracing that saves all inferences in
+		 * special contexts
 		 */
 		private final ContextTracingFactory<IndexedContextRoot, ContextTracingJobForProofUnwinding<C, J>>.Engine tracingEngine_;
 
@@ -175,20 +196,28 @@ public class ProofUnwindingFactory<C extends ClassConclusion, J extends ProofUnw
 
 	private class ThisContextTracingListener
 			implements
-			ContextTracingListener<IndexedContextRoot, ContextTracingJobForProofUnwinding<C, J>> {
+				ContextTracingListener<IndexedContextRoot, ContextTracingJobForProofUnwinding<C, J>> {
 
 		@Override
-		public void notifyFinished(ContextTracingJobForProofUnwinding<C, J> job) {
-			IndexedContextRoot originRoot = job.getInput();
-			ClassInferenceSet inferences = tracingState_
-					.getInferencesForOrigin(originRoot);
-			if (inferences == null) {
-				// not computed yet
-				inferences = tracingState_.setClassInferences(originRoot,
-						job.getOutput());
+		public void notifyFinished(
+				ContextTracingJobForProofUnwinding<C, J> job) {
+			IndexedContextRoot root = job.getInput();
+			ModifiableInferenceSet<ClassInference> inferenceSet = inferencesByContext_
+					.get(root);
+			if (inferenceSet == null) {
+				ModifiableInferenceSet<ClassInference> newInferenceSet = new ModifiableInferenceSetImpl<ClassInference>();
+				inferenceSet = inferencesByContext_.putIfAbsent(root,
+						newInferenceSet);
+				if (inferenceSet == null) {
+					for (ClassInference inference : job.getOutput()) {
+						// TODO: avoid cyclic inferences
+						newInferenceSet.produce(inference);
+					}
+					inferenceSet = newInferenceSet;
+				}
 			}
-			for (ClassInference inference : inferences
-					.getClassInferences(job.conclusionToDo)) {
+			for (ClassInference inference : inferenceSet
+					.getInferences(job.tracedConclusion)) {
 				job.unwindingState.todoInferences.add(inference);
 			}
 			continueUnwinding(job.unwindingState);

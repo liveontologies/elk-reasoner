@@ -88,8 +88,7 @@ public class ContextTracingFactory<R extends IndexedContextRoot, J extends Conte
 
 	public ContextTracingFactory(SaturationState<?> saturationState,
 			int maxWorkers, ContextTracingListener<R, J> listener) {
-		// applying all local rules (non-redundant and redundant), saving the
-		// inferences using the class inference producer
+		// applying all local rules, saving the inferences using the class inference producer
 		this.saturationFactory_ = new ClassExpressionSaturationFactory<SaturationJobForContextTracing<R, J>>(
 				new ContextTracingRuleApplicationFactory(saturationState,
 						new ThisClassInferenceProducer()), maxWorkers,
@@ -156,16 +155,16 @@ public class ContextTracingFactory<R extends IndexedContextRoot, J extends Conte
 		@Override
 		public void produce(ClassInference inference) {
 			IndexedContextRoot originRoot = inference.getOriginRoot();
-			Queue<ClassInference> inferencesForOrigin = tracedInferences_
+			Queue<ClassInference> inferencesByOrigin = tracedInferences_
 					.get(originRoot);
-			if (inferencesForOrigin == null) {
-				inferencesForOrigin = new ConcurrentLinkedQueue<ClassInference>();
+			if (inferencesByOrigin == null) {
+				inferencesByOrigin = new ConcurrentLinkedQueue<ClassInference>();
 				Queue<ClassInference> previous = tracedInferences_.putIfAbsent(
-						originRoot, inferencesForOrigin);
+						originRoot, inferencesByOrigin);
 				if (previous != null)
-					inferencesForOrigin = previous;
+					inferencesByOrigin = previous;
 			}
-			inferencesForOrigin.add(inference);
+			inferencesByOrigin.add(inference);
 		}
 	}
 

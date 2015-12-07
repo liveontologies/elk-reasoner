@@ -26,16 +26,17 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 
 class ContextTracingJobForProofUnwinding<I extends ClassConclusion, J extends ProofUnwindingJob<I>>
-		extends ContextTracingJob<IndexedContextRoot> {
+		extends
+			ContextTracingJob<IndexedContextRoot> {
 
-	final ClassConclusion conclusionToDo;
+	final ClassConclusion tracedConclusion;
 
 	final ProofUnwindingState<I, J> unwindingState;
 
-	ContextTracingJobForProofUnwinding(ClassConclusion conclusionToDo,
+	ContextTracingJobForProofUnwinding(ClassConclusion tracedConclusion,
 			ProofUnwindingState<I, J> unwindingState) {
-		super(conclusionToDo.getOriginRoot());
-		this.conclusionToDo = conclusionToDo;
+		super(tracedConclusion.getOriginRoot());
+		this.tracedConclusion = tracedConclusion;
 		this.unwindingState = unwindingState;
 	}
 
