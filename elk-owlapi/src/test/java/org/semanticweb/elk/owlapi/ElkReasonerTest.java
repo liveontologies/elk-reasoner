@@ -142,12 +142,15 @@ public class ElkReasonerTest {
 			// ************************************
 			man.addAxiom(root, axiom);
 			axiom = dataFactory.getOWLSubClassOfAxiom(extA, extB);
-			man.removeAxiom(root, axiom);
+//			man.removeAxiom(root, axiom);
 			reasoner.flush();
 
 			// Because the removed axiom belongs to the imported ontology and
 			// not main ontology, the remove does not make any effect. So, we
 			// should end up with the ontology we have started with
+			/* 
+			 * This behaviour changed in owlapi 4.* and the axiom would really be removed
+			 */
 
 			assertEquals(root.getAxiomCount(), 3);
 			// all three ontologies should be in the closure

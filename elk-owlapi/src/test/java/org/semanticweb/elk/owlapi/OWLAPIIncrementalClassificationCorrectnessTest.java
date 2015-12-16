@@ -26,7 +26,6 @@ package org.semanticweb.elk.owlapi;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -47,7 +46,6 @@ import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
@@ -76,15 +74,14 @@ public class OWLAPIIncrementalClassificationCorrectnessTest extends
 			final IncrementalChangeType type) {
 		// the changes are applied indirectly by modifying the ontology
 		OWLOntologyManager manager = testOntology_.getOWLOntologyManager();
-		List<OWLOntologyChange> ontologyChanges = new ArrayList<OWLOntologyChange>();
 		
 		for (OWLAxiom axiom : changes) {
 			switch (type) {
 			case ADD:
-				ontologyChanges.addAll(manager.addAxiom(testOntology_, axiom));
+				manager.addAxiom(testOntology_, axiom);
 				break;
 			case DELETE:
-				ontologyChanges.addAll(manager.removeAxiom(testOntology_, axiom));
+				manager.removeAxiom(testOntology_, axiom);
 				break;
 			}
 		}

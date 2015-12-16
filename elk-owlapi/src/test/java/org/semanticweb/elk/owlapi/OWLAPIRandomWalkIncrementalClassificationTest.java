@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -73,7 +72,6 @@ import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
@@ -228,23 +226,21 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 		public void loadChanges(final Reasoner reasoner,
 				final IncrementalChange<OWLAxiom> change) {
 			OWLOntologyManager manager = ontology_.getOWLOntologyManager();
-			List<OWLOntologyChange> changes = new LinkedList<OWLOntologyChange>();
 			
 			for (OWLAxiom axiom : change.getDeletions()) {
 				if (LOGGER_.isTraceEnabled()) {
 					LOGGER_.trace("removing: " + axiom);
 				}
-				changes.addAll(manager.removeAxiom(ontology_, axiom));
+				manager.removeAxiom(ontology_, axiom);
 			}
 			
 			for (OWLAxiom axiom : change.getAdditions()) {
 				if (LOGGER_.isTraceEnabled()) {
 					LOGGER_.trace("adding: " + axiom);
 				}
-				changes.addAll(manager.addAxiom(ontology_, axiom));
+				manager.addAxiom(ontology_, axiom);
 			}
 			
-			manager.applyChanges(changes);
 			owlapiReasoner_.flush();
 		}
 
@@ -257,23 +253,21 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 		public void revertChanges(Reasoner reasoner,
 				IncrementalChange<OWLAxiom> change) {
 			OWLOntologyManager manager = ontology_.getOWLOntologyManager();
-			List<OWLOntologyChange> changes = new LinkedList<OWLOntologyChange>();
 			
 			for (OWLAxiom axiom : change.getDeletions()) {
 				if (LOGGER_.isTraceEnabled()) {
 					LOGGER_.trace("adding: " + axiom);
 				}
-				changes.addAll(manager.addAxiom(ontology_, axiom));
+				manager.addAxiom(ontology_, axiom);
 			}
 			
 			for (OWLAxiom axiom : change.getAdditions()) {
 				if (LOGGER_.isTraceEnabled()) {
 					LOGGER_.trace("deleting: " + axiom);
 				}
-				changes.addAll(manager.removeAxiom(ontology_, axiom));
+				manager.removeAxiom(ontology_, axiom);
 			}
 
-			manager.applyChanges(changes);
 			owlapiReasoner_.flush();
 		}
 	}

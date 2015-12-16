@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.io.OWLFunctionalSyntaxOntologyFormat;
+import org.semanticweb.owlapi.formats.FunctionalSyntaxDocumentFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -82,11 +82,11 @@ public class SavingInferredAxioms {
 		OWLOntology infOnt = outputOntologyManager.createOntology();
 		InferredOntologyGenerator iog = new InferredOntologyGenerator(reasoner,
 				gens);
-		iog.fillOntology(outputOntologyManager, infOnt);
+		iog.fillOntology(outputOntologyManager.getOWLDataFactory(), infOnt);
 
 		// Save the inferred ontology.
 		outputOntologyManager.saveOntology(infOnt,
-				new OWLFunctionalSyntaxOntologyFormat(),
+				new FunctionalSyntaxDocumentFormat(),
 				IRI.create((new File("path-to-output").toURI())));
 
 		// Terminate the worker threads used by the reasoner.

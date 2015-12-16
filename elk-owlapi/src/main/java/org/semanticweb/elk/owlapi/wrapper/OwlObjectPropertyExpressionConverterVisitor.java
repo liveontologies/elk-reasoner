@@ -23,6 +23,7 @@
 package org.semanticweb.elk.owlapi.wrapper;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLObjectInverseOf;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
@@ -70,4 +71,13 @@ public class OwlObjectPropertyExpressionConverterVisitor implements
 						+ " cannot be converted to "
 						+ ElkObjectPropertyExpression.class.getSimpleName());
 	}
+
+	@Override
+	public ElkObjectPropertyExpression visit(OWLAnnotationProperty property) {
+		throw new IllegalArgumentException(
+				OWLDataProperty.class.getSimpleName()
+						+ " cannot be converted to "
+						+ ElkObjectPropertyExpression.class.getSimpleName());
+	}
+	
 }

@@ -68,7 +68,7 @@
 							<outputDirectory>${project.build.directory}/lib</outputDirectory>
 							<stripVersion>true</stripVersion>
 						</configuration>
-					</execution>
+					</execution><!-- jsr305 misses sources !!!
 					<execution>
 						<id>copy-third-party-dependencies-sources</id>
 						<phase>package</phase>
@@ -81,7 +81,7 @@
 							<stripVersion>true</stripVersion>
 							<classifier>sources</classifier>
 						</configuration>
-					</execution>
+					</execution> -->
 				</executions>
 			</plugin>
 			<plugin>
