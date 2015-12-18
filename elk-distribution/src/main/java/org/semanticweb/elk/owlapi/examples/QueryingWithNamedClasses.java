@@ -52,6 +52,7 @@ import org.semanticweb.owlapi.util.mansyntax.ManchesterOWLSyntaxParser;
  * 
  *         samuel.croset@gmail.com
  * 
+ * @author Peter Skocovsky
  */
 public class QueryingWithNamedClasses {
 

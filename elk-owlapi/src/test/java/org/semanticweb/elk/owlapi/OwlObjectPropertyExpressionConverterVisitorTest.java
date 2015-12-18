@@ -44,6 +44,7 @@ import uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryImpl;
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  * 
  */
 public class OwlObjectPropertyExpressionConverterVisitorTest {
@@ -52,33 +53,51 @@ public class OwlObjectPropertyExpressionConverterVisitorTest {
 	 */
 	@Test
 	public void testNestedInverses() {
+		
+		
 		OWLDataFactory factory = new OWLDataFactoryImpl();
 		OWLObjectProperty r = factory.getOWLObjectProperty(IRI.create("R"));
 		OWLObjectPropertyExpression ri = factory.getOWLObjectInverseOf(r);
-//		OWLObjectPropertyExpression rii = factory.getOWLObjectInverseOf(ri);
-//		OWLObjectPropertyExpression riii = factory.getOWLObjectInverseOf(rii);
+		OWLObjectPropertyExpression rii = null;
+		OWLObjectPropertyExpression riii = null;
+		
+		try {
+			rii = factory.getOWLObjectInverseOf(ri);
+			riii = factory.getOWLObjectInverseOf(rii);
+		} catch(IllegalArgumentException e) {
+			// owlapi 4.* throws IllegalArgumentException when nested ObjectInverseOf is created.
+		}
 		
 		OWLPropertyExpressionVisitorEx<ElkObjectPropertyExpression> converter = OwlObjectPropertyExpressionConverterVisitor
 				.getInstance();
-
+	
 		ElkObjectPropertyExpression s = r.accept(converter);
 		ElkObjectPropertyExpression si = ri.accept(converter);
-//		ElkObjectPropertyExpression sii = rii.accept(converter);
-//		ElkObjectPropertyExpression siii = riii.accept(converter);
-
+		ElkObjectPropertyExpression sii = null;
+		ElkObjectPropertyExpression siii = null;
+		if (rii != null) {
+			sii = rii.accept(converter);
+			siii = riii.accept(converter);
+		}
+	
 		assertTrue(s instanceof ElkObjectProperty);
 		assertTrue(si instanceof ElkObjectInverseOf);
-//		assertTrue(sii instanceof ElkObjectProperty);
-//		assertTrue(siii instanceof ElkObjectInverseOf);
-
+		if (rii != null) {
+			assertTrue(sii instanceof ElkObjectProperty);
+			assertTrue(siii instanceof ElkObjectInverseOf);
+		}
+	
 		ElkIri expectedIri = ((ElkObjectProperty) s).getIri();
-
+	
 		assertEquals(expectedIri, ((ElkObjectInverseOf) si).getObjectProperty()
 				.getIri());
-//
-//		assertEquals(expectedIri, ((ElkObjectProperty) sii).getIri());
-//
-//		assertEquals(expectedIri, ((ElkObjectInverseOf) siii)
-//				.getObjectProperty().getIri());
+	
+		if (rii != null) {
+			assertEquals(expectedIri, ((ElkObjectProperty) sii).getIri());
+		
+			assertEquals(expectedIri, ((ElkObjectInverseOf) siii)
+					.getObjectProperty().getIri());
+		}
+		
 	}
 }

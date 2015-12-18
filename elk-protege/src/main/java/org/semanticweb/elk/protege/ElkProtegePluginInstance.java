@@ -34,12 +34,13 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.filter.ThresholdFilter;
 
 /**
- * Carries out some initialization, e.g. Log4j, which we don't want to put into
+ * Carries out some initialization, e.g. Logback, which we don't want to put into
  * the reasoner factory which could be used outside Protege (for example, in
  * Snow Owl)
  * 
  * 
  * @author Pavel Klinov
+ * @author Peter Skocovsky
  * 
  */
 public class ElkProtegePluginInstance extends EditorKitHook {

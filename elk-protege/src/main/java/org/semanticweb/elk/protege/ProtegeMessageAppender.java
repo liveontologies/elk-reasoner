@@ -45,6 +45,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
  * within {@link ElkReasoner}.
  * 
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  * 
  */
 public class ProtegeMessageAppender extends MessageDialogAppender {

@@ -40,6 +40,7 @@ import org.semanticweb.owlapi.model.OWLPropertyExpressionVisitorEx;
  * in OWL API but not in OWL 2 and thus in ELK OWL model.
  * 
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  * 
  */
 public class OwlObjectInverseOfConverterVisitor implements

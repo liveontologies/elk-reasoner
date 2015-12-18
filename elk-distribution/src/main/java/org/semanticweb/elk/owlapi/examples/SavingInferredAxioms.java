@@ -53,6 +53,7 @@ import org.semanticweb.owlapi.util.InferredSubClassAxiomGenerator;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  * 
  */
 public class SavingInferredAxioms {

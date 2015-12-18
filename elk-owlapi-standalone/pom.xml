@@ -18,6 +18,20 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-owlapi</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>net.sourceforge.owlapi</groupId>
+					<artifactId>owlapi-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.owlapi</groupId>
+					<artifactId>owlapi-apibinding</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.owlapi</groupId>
+					<artifactId>owlapi-impl</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 
@@ -64,11 +78,11 @@
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
-							<excludeGroupIds>${project.groupId},net.sourceforge.owlapi,org.apache.felix</excludeGroupIds>
+							<excludeGroupIds>${project.groupId}</excludeGroupIds>
 							<outputDirectory>${project.build.directory}/lib</outputDirectory>
 							<stripVersion>true</stripVersion>
 						</configuration>
-					</execution><!-- jsr305 misses sources !!!
+					</execution>
 					<execution>
 						<id>copy-third-party-dependencies-sources</id>
 						<phase>package</phase>
@@ -76,12 +90,12 @@
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
-							<excludeGroupIds>${project.groupId},net.sourceforge.owlapi,org.apache.felix</excludeGroupIds>
+							<excludeGroupIds>${project.groupId}</excludeGroupIds>
 							<outputDirectory>${project.build.directory}/lib</outputDirectory>
 							<stripVersion>true</stripVersion>
 							<classifier>sources</classifier>
 						</configuration>
-					</execution> -->
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>

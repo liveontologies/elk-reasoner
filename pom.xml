@@ -98,6 +98,17 @@
 			</roles>
 			<timezone>1</timezone>
 		</developer>
+		<developer>
+			<id>petesko</id>
+			<name>Peter Skocovsky</name>
+			<email>peter.skocovsky@uni-ulm.de</email>
+			<organization>Institute of Artificial Intelligence, University of Ulm</organization>
+			<organizationUrl>http://www.uni-ulm.de/en/in/ki.html</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<timezone>1</timezone>
+		</developer>
 	</developers>
 
 	<dependencyManagement>
@@ -201,7 +212,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>2.4</version>
+					<version>2.10</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>

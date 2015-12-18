@@ -207,8 +207,8 @@
 									<directory>${basedir}/src/main/resources/protege/</directory>
 									<filtering>true</filtering>
 									<includes>
-										<include>update.properties</include>
-										<include>version-info.txt</include>
+										<include>p5.update.properties</include>
+										<include>p5.version-info.txt</include>
 									</includes>
 								</resource>
 							</resources>
@@ -224,11 +224,25 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
+				
 					<execution>
 						<goals>
 							<goal>properties</goal>
 						</goals>
 					</execution>
+					
+					<execution>
+						<!-- Including dependencies of owlapi for the test. -->
+						<id>set-property-to-owlapi-dependencies</id>
+						<goals>
+							<goal>build-classpath</goal>
+						</goals>
+						<configuration>
+							<excludeGroupIds>${project.groupId},net.sourceforge.owlapi,junit</excludeGroupIds>
+							<outputProperty>owlapi.lib.path</outputProperty>
+						</configuration>
+					</execution>
+					
 				</executions>
 			</plugin>
 
@@ -251,6 +265,10 @@
 						<property>
 							<name>owlapi-path</name>
 							<value>${net.sourceforge.owlapi:owlapi-osgidistribution:jar}</value>
+						</property>
+ 						<property>
+							<name>owlapi-lib-path</name>
+							<value>${owlapi.lib.path}</value>
 						</property>
 					</systemProperties>
 				</configuration>
@@ -295,7 +313,7 @@
 							<goal>announcement-generate</goal>
 						</goals>
 						<configuration>
-							<announcementFile>version-info.txt</announcementFile>
+							<announcementFile>p5.version-info.txt</announcementFile>
 							<template>version-info.vm</template>
 							<outputDirectory>${project.build.directory}/site/resources</outputDirectory>
 						</configuration>

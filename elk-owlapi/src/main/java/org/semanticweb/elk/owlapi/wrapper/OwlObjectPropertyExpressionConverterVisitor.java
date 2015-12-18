@@ -37,6 +37,7 @@ import org.semanticweb.owlapi.model.OWLPropertyExpressionVisitorEx;
  * 
  * @author "Yevgeny Kazakov"
  * @author Frantisek Simancik
+ * @author Peter Skocovsky
  * 
  */
 public class OwlObjectPropertyExpressionConverterVisitor implements

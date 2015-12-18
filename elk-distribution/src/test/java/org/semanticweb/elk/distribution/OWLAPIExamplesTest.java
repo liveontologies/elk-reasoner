@@ -77,6 +77,7 @@ import org.semanticweb.elk.testing.io.URLTestIO;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
 @RunWith(PolySuite.class)
 public class OWLAPIExamplesTest {
@@ -87,6 +88,7 @@ public class OWLAPIExamplesTest {
 	private final BasicTestManifest<URLTestIO, BooleanTestOutput, BooleanTestOutput> manifest;
 	private File javaSrcFile = null;
 	private String owlapiClassPath = null;
+	private String owlapiLibClassPath = null;
 	private String elkOwlapiClassPath = null;
 
 	public OWLAPIExamplesTest(
@@ -157,6 +159,7 @@ public class OWLAPIExamplesTest {
 		owlapiClassPath = System.getProperty("owlapi-path");
 		elkOwlapiClassPath = LIB_DIR.getAbsolutePath()
 				+ System.getProperty("elk-owlapi-path-in-zip");
+		owlapiLibClassPath = System.getProperty("owlapi-lib-path");
 
 		assumeTrue(owlapiClassPath != null);// Here we gracefully exit if key
 											// properties aren't set
@@ -231,6 +234,12 @@ public class OWLAPIExamplesTest {
 				classpath += File.pathSeparator + file.getAbsolutePath();
 			}
 		}
+//		for (File file : new File(owlapiLibClassPath).listFiles()) {
+//			if (file.getName().endsWith(".jar")) {
+//				classpath += File.pathSeparator + file.getAbsolutePath();
+//			}
+//		}
+		classpath += File.pathSeparator + owlapiLibClassPath;
 		List<String> options = new ArrayList<String>();
 
 		options.addAll(Arrays.asList("-classpath", classpath));
