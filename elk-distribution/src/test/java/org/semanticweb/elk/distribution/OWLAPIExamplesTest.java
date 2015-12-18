@@ -226,6 +226,11 @@ public class OWLAPIExamplesTest {
 		// setting the classpath
 		String classpath = elkOwlapiClassPath + File.pathSeparator
 				+ owlapiClassPath;
+		for (File file : new File(new File(elkOwlapiClassPath).getParent() + "/lib").listFiles()) {
+			if (file.getName().endsWith(".jar")) {
+				classpath += File.pathSeparator + file.getAbsolutePath();
+			}
+		}
 		List<String> options = new ArrayList<String>();
 
 		options.addAll(Arrays.asList("-classpath", classpath));

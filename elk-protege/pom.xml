@@ -16,25 +16,19 @@
 	<dependencies>
 		<dependency>
 			<groupId>edu.stanford.protege</groupId>
-			<artifactId>org.protege.common</artifactId>
+			<artifactId>protege-editor-core</artifactId>
 			<version>${protege.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>edu.stanford.protege</groupId>
-			<artifactId>org.protege.editor.core.application</artifactId>
-			<version>${protege.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>edu.stanford.protege</groupId>
-			<artifactId>org.protege.editor.owl</artifactId>
+			<artifactId>protege-editor-owl</artifactId>
 			<version>${protege.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
-			<artifactId>owlapi-api</artifactId>
+			<artifactId>owlapi-osgidistribution</artifactId>
 			<version>${owlapi.version}</version>
 		</dependency>
 		<dependency>
@@ -63,8 +57,19 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.12</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>1.1.3</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.1.3</version>
 		</dependency>
 	</dependencies>
 
