@@ -197,7 +197,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 					assertEquals("Seed " + seed, expectedHash, taxonomyHash);
 				} catch (AssertionError e) {
 					// TODO print the taxonomies here?
-					printResult(reasoner, LOGGER_, Level.ERROR);
+					printResult(reasoner, LOGGER_, Level.DEBUG);
 
 					throw e;
 				}
