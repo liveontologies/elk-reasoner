@@ -309,10 +309,17 @@ public class ConsistencyChecking
 
 				final Iterator<IndexedClassEntity> inputsIterator = inputs
 						.iterator();
+				boolean inconsistent = false;
 
 				@Override
 				public boolean hasNext() {
-					if (consistencyMonitor.isInconsistent())
+					/*
+					 * since consistencyMonitor can be updated by other working
+					 * threads we need to cache this value so that if hasNext()
+					 * returns true then next() does not throw the exception
+					 */
+					inconsistent = consistencyMonitor.isInconsistent();
+					if (inconsistent)
 						return false;
 					// else
 					return inputsIterator.hasNext();
@@ -320,7 +327,7 @@ public class ConsistencyChecking
 
 				@Override
 				public SaturationJob<IndexedClassEntity> next() {
-					if (consistencyMonitor.isInconsistent())
+					if (inconsistent)
 						throw new NoSuchElementException();
 					// else
 					SaturationJob<IndexedClassEntity> job = new SaturationJob<IndexedClassEntity>(
@@ -328,6 +335,7 @@ public class ConsistencyChecking
 					if (LOGGER_.isTraceEnabled())
 						LOGGER_.trace(job.getInput()
 								+ ": consistency checking submitted");
+					inconsistent = consistencyMonitor.isInconsistent();
 					return job;
 				}
 
@@ -339,6 +347,7 @@ public class ConsistencyChecking
 			};
 
 		}
+
 	}
 
 }
