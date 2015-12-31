@@ -44,12 +44,16 @@ public class ClassTaxonomyTestOutput implements TestOutput {
 		return TaxonomyHasher.hash(taxonomy);
 	}
 
+	void dumpTaxonomy(Writer writer) throws IOException {
+		TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
+	}
+	
 	@Override
 	public String toString() {
 
 		Writer writer = new StringWriter();
 		try {
-			TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
+			dumpTaxonomy(writer);
 		} catch (IOException e) {
 			// TODO: what to return?
 			return e.toString();

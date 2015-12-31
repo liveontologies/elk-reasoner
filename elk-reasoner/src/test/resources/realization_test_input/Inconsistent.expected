@@ -1,3 +1,11 @@
+Prefix(:=<http://example.org/> )
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+
 Ontology(
-EquivalentClasses(<http://www.w3.org/2002/07/owl#Nothing> <http://www.w3.org/2002/07/owl#Thing>)
+
+Declaration(Class(:A))
+Declaration(Class(:B))
+Declaration(NamedIndividual(:a))
+EquivalentClasses(owl:Thing owl:Nothing :A :B)
+
 )

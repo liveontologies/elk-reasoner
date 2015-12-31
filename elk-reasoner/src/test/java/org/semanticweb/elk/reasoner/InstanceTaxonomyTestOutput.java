@@ -25,8 +25,12 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import java.io.IOException;
+import java.io.Writer;
+
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 
@@ -51,4 +55,10 @@ public class InstanceTaxonomyTestOutput extends ClassTaxonomyTestOutput {
 	int getHashCode() {
 		return InstanceTaxonomyHasher.hash(getTaxonomy());
 	}
+	
+	@Override
+	void dumpTaxonomy(Writer writer) throws IOException {
+		TaxonomyPrinter.dumpInstanceTaxomomy(getTaxonomy(), writer, false);
+	}
+	
 }

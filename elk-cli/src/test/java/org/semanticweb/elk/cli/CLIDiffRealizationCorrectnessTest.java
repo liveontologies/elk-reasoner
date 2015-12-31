@@ -49,7 +49,7 @@ import org.semanticweb.elk.testing.TestInput;
 public class CLIDiffRealizationCorrectnessTest extends
 		DiffRealizationCorrectnessTest {
 
-	static final String[] IGNORE_LIST = { "BasicABox.owl", "Inconsistent.owl" };
+	static final String[] IGNORE_LIST = { "Inconsistent.owl", "MultipleInconsistencies.owl" };
 
 	static {
 		Arrays.sort(IGNORE_LIST);
