@@ -81,9 +81,9 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
 			if (LOGGER_.isEnabledFor(Level.WARN))
-				LOGGER_.warn(new ElkMessage(
-						"ELK does not support negative occurrences of ObjectComplementOf. Reasoning might be incomplete!",
-						"reasoner.indexing.IndexedObjectComplementOf"));
+				LOGGER_.warn(ElkMessage.serialize(
+						"reasoner.indexing.IndexedObjectComplementOf",
+						"ELK does not support negative occurrences of ObjectComplementOf. Reasoning might be incomplete!"));
 		}
 
 		positiveOccurrenceNo += positiveIncrement;

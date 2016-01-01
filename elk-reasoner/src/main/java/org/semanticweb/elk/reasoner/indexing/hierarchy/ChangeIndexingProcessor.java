@@ -63,10 +63,11 @@ public class ChangeIndexingProcessor implements ElkAxiomProcessor {
 								: "deletion"));
 		} catch (ElkIndexingUnsupportedException e) {
 			if (LOGGER_.isEnabledFor(Level.WARN))
-				LOGGER_.warn(new ElkMessage(e.getMessage()
-						+ " Axiom ignored:\n"
-						+ OwlFunctionalStylePrinter.toString(elkAxiom),
-						"reasoner.indexing.axiomIgnored"));
+				LOGGER_.warn(
+						ElkMessage.serialize("reasoner.indexing.axiomIgnored",
+								e.getMessage() + " Axiom ignored:\n"
+										+ OwlFunctionalStylePrinter
+												.toString(elkAxiom)));
 		}
 	}
 }

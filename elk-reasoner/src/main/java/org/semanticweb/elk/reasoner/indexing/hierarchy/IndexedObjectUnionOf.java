@@ -89,9 +89,9 @@ public class IndexedObjectUnionOf extends IndexedClassExpression {
 		if (positiveOccurrenceNo == 0 && positiveIncrement > 0) {
 			// first positive occurrence of this expression
 			if (LOGGER_.isEnabledFor(Level.WARN))
-				LOGGER_.warn(new ElkMessage(
-						"ELK does not support positive occurrences of ObjectUnionOf. Reasoning might be incomplete!",
-						"reasoner.indexing.IndexedObjectUnionOf"));
+				LOGGER_.warn(ElkMessage.serialize(
+						"reasoner.indexing.IndexedObjectUnionOf",
+						"ELK does not support positive occurrences of ObjectUnionOf. Reasoning might be incomplete!"));
 		}
 
 		positiveOccurrenceNo += positiveIncrement;

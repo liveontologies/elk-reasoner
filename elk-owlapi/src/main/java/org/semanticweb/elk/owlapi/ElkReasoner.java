@@ -242,7 +242,7 @@ public class ElkReasoner implements OWLReasoner {
 		 * non-persistent settings for ignoring them, we better use only one
 		 * message type to make it easier to ignore them.
 		 */
-		LOGGER_.warn(new ElkMessage(message, "owlapi.unsupportedMethod"));
+		LOGGER_.warn(ElkMessage.serialize("owlapi.unsupportedMethod", message));
 		return new UnsupportedOperationException(message);
 	}
 
@@ -260,7 +260,7 @@ public class ElkReasoner implements OWLReasoner {
 			String method, String reason) {
 		String message = "OWL API reasoner method is not fully implemented: "
 				+ method + ": " + reason;
-		LOGGER_.warn(new ElkMessage(message, "owlapi.unsupportedMethod"));
+		LOGGER_.warn(ElkMessage.serialize("owlapi.unsupportedMethod", message));
 		return new UnsupportedOperationException(message);
 	}
 

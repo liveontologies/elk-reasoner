@@ -209,9 +209,8 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 	@Override
 	public IndexedClassExpression visit(ElkDataHasValue elkDataHasValue) {
 		if (LOGGER_.isEnabledFor(Level.WARN))
-			LOGGER_.warn(new ElkMessage(
-					"ELK supports DataHasValue only partially. Reasoning might be incomplete!",
-					"reasoner.indexing.dataHasValue"));
+			LOGGER_.warn(ElkMessage.serialize("reasoner.indexing.dataHasValue",
+					"ELK supports DataHasValue only partially. Reasoning might be incomplete!"));
 		return indexedClassFilter_.visit(new IndexedDataHasValue(
 				elkDataHasValue));
 	}

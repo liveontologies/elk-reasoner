@@ -146,15 +146,14 @@ public class MessageDialogAppender extends AppenderBase<ILoggingEvent> implement
 			messageLevel = JOptionPane.INFORMATION_MESSAGE;
 		}
 
-		Object message = event.getMessage();
-		String messageType;
-		if (message instanceof ElkMessage) {
-			messageType = ((ElkMessage) message).getMessageType();
-			if (ignoredMessageTypes.contains(messageType)) {
+		ElkMessage elkMessage = ElkMessage.deserialize(event
+				.getFormattedMessage());
+		String messageType = null;
+
+		if (elkMessage != null) {
+			messageType = elkMessage.getMessageType();
+			if (ignoredMessageTypes.contains(messageType))
 				return false;
-			}
-		} else {
-			messageType = null;
 		}
 
 		JPanel panel = new JPanel();
