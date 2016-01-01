@@ -29,7 +29,6 @@ import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
  * TODO docs

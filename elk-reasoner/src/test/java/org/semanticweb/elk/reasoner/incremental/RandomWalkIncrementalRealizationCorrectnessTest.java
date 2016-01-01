@@ -28,6 +28,7 @@ package org.semanticweb.elk.reasoner.incremental;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 
 import org.semanticweb.elk.loading.AxiomLoader;
@@ -37,6 +38,7 @@ import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TaxonomyDiffManifest;
 import org.semanticweb.elk.reasoner.incremental.RandomWalkRunnerIO.ElkAPIBasedIO;
 import org.semanticweb.elk.testing.ConfigurationUtils;
+import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
@@ -52,6 +54,12 @@ public class RandomWalkIncrementalRealizationCorrectnessTest extends
 		BaseRandomWalkIncrementalCorrectnessTest {
 
 	final static String INPUT_DATA_LOCATION = "realization_test_input";
+	
+	static final String[] IGNORE_LIST = { "MultipleInconsistencies.owl" };
+
+	static {
+		Arrays.sort(IGNORE_LIST);
+	}
 
 	public RandomWalkIncrementalRealizationCorrectnessTest(
 			ReasoningTestManifest<InstanceTaxonomyTestOutput, InstanceTaxonomyTestOutput> testManifest) {
@@ -90,6 +98,11 @@ public class RandomWalkIncrementalRealizationCorrectnessTest extends
 										input, null);
 							}
 						});
+	}
+	
+	@Override
+	protected boolean ignore(TestInput input) {
+		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
 	}
 
 }
