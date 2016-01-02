@@ -51,26 +51,15 @@
 			<classifier>lib</classifier>
 		</dependency>
 		<dependency>
-			<groupId>net.sourceforge.owlapi</groupId>
-			<artifactId>owlapi-api</artifactId>
-			<version>${owlapi.version}</version>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-owlapi</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
-			<artifactId>owlapi-apibinding</artifactId>
-			<version>${owlapi.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.owlapi</groupId>
-			<artifactId>owlapi-parsers</artifactId>
-			<version>${owlapi.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.owlapi</groupId>
-			<artifactId>owlapi-osgidistribution</artifactId>
-			<version>${owlapi.version}</version>
-			<!--classifier>bin</classifier-->
-			<scope>test</scope>
+			<artifactId>owlapi-distribution</artifactId>
+			<version>${owlapi.version}</version>			
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -224,13 +213,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
-				
-					<execution>
-						<goals>
-							<goal>properties</goal>
-						</goals>
-					</execution>
-					
+									
 					<execution>
 						<!-- Including dependencies of owlapi for the test. -->
 						<id>set-property-to-owlapi-dependencies</id>
@@ -238,7 +221,7 @@
 							<goal>build-classpath</goal>
 						</goals>
 						<configuration>
-							<excludeGroupIds>${project.groupId},net.sourceforge.owlapi,junit</excludeGroupIds>
+							<includeScope>provided</includeScope>
 							<outputProperty>owlapi.lib.path</outputProperty>
 						</configuration>
 					</execution>

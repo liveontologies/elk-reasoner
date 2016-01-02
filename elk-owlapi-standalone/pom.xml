@@ -18,20 +18,6 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-owlapi</artifactId>
 			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>net.sourceforge.owlapi</groupId>
-					<artifactId>owlapi-api</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>net.sourceforge.owlapi</groupId>
-					<artifactId>owlapi-apibinding</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>net.sourceforge.owlapi</groupId>
-					<artifactId>owlapi-impl</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 	</dependencies>
 
@@ -79,6 +65,7 @@
 						</goals>
 						<configuration>
 							<excludeGroupIds>${project.groupId}</excludeGroupIds>
+							<excludeClassifiers>provided</excludeClassifiers>
 							<outputDirectory>${project.build.directory}/lib</outputDirectory>
 							<stripVersion>true</stripVersion>
 						</configuration>
@@ -91,6 +78,7 @@
 						</goals>
 						<configuration>
 							<excludeGroupIds>${project.groupId}</excludeGroupIds>
+							<excludeClassifiers>provided</excludeClassifiers>
 							<outputDirectory>${project.build.directory}/lib</outputDirectory>
 							<stripVersion>true</stripVersion>
 							<classifier>sources</classifier>
