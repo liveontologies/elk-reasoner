@@ -27,6 +27,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
 
 import org.junit.Test;
 import org.semanticweb.elk.owlapi.ElkReasoner;
@@ -64,8 +65,8 @@ public class IgnoreChangesInNonImportedOntologiesTest {
 		OWLDataFactory dataFactory = man.getOWLDataFactory();
 
 		// set up resolution of prefixes
-		DefaultPrefixManager pm = new DefaultPrefixManager(
-				"http://www.example.com/main#");
+		DefaultPrefixManager pm = new DefaultPrefixManager();
+		pm.setDefaultPrefix("http://www.example.com/main#");
 		pm.setPrefix("A:", "http://www.example.com/A#");
 		pm.setPrefix("B:", "http://www.example.com/B#");
 
@@ -113,7 +114,8 @@ public class IgnoreChangesInNonImportedOntologiesTest {
 		final URI ontologyRoot = getClass().getClassLoader()
 				.getResource("ontologies").toURI();
 
-		man.addIRIMapper(new ThisIRIMapper(ontologyRoot.toString()));
+		OWLOntologyIRIMapper iriMapper = new ThisIRIMapper(ontologyRoot.toString());
+		man.setIRIMappers(Collections.singleton(iriMapper));
 
 		final URI mainOntology = getClass().getClassLoader()
 				.getResource("ontologies/" + name).toURI();
@@ -131,6 +133,7 @@ public class IgnoreChangesInNonImportedOntologiesTest {
 	 */
 	static class ThisIRIMapper implements OWLOntologyIRIMapper {
 
+		private static final long serialVersionUID = -4350181647395047687L;
 		final String root;
 
 		ThisIRIMapper(String root) {

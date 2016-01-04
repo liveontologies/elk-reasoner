@@ -30,6 +30,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Ignore;
@@ -47,6 +48,7 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyIRIMapper;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.model.PrefixManager;
 import org.semanticweb.owlapi.model.RemoveImport;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
@@ -74,8 +76,8 @@ public class ElkReasonerTest {
 		OWLDataFactory dataFactory = man.getOWLDataFactory();
 
 		// set up resolution of prefixes
-		DefaultPrefixManager pm = new DefaultPrefixManager(
-				"http://www.example.com/main#");
+		PrefixManager pm = new DefaultPrefixManager();
+		pm.setDefaultPrefix("http://www.example.com/main#");
 		pm.setPrefix("A:", "http://www.example.com/A#");
 		pm.setPrefix("B:", "http://www.example.com/B#");
 
@@ -132,8 +134,8 @@ public class ElkReasonerTest {
 		OWLDataFactory dataFactory = man.getOWLDataFactory();
 
 		// set up resolution of prefixes
-		DefaultPrefixManager pm = new DefaultPrefixManager(
-				"http://www.example.com/main#");
+		PrefixManager pm = new DefaultPrefixManager();
+		pm.setDefaultPrefix("http://www.example.com/main#");
 		pm.setPrefix("A:", "http://www.example.com/A#");
 		pm.setPrefix("B:", "http://www.example.com/B#");
 
@@ -194,22 +196,21 @@ public class ElkReasonerTest {
 	 * not main ontology, the remove does not make any effect. So, we
 	 * should end up with the ontology we have started with.
 	 * <p>
-	 * This test is ignored, because behaviour of owlapi 4.* changed
-	 * and the axiom would really be removed.
-	 * This is probably a bug in owlapi, so unignore this test after the fix.
+	 * This test is ignored, because as of OWL API 4.1.3 the removal
+	 * of the axiom is broadcasted even though the axiom is not removed.
 	 * 
-	 * TODO: bug report
+	 * TODO: file a bug report
 	 */
-	@Ignore
 	@Test
+	@Ignore
 	public void testRemovingAB() throws Exception {
 
 		OWLOntologyManager man = OWLManager.createOWLOntologyManager();
 		OWLDataFactory dataFactory = man.getOWLDataFactory();
 
 		// set up resolution of prefixes
-		DefaultPrefixManager pm = new DefaultPrefixManager(
-				"http://www.example.com/main#");
+		PrefixManager pm = new DefaultPrefixManager();
+		pm.setDefaultPrefix("http://www.example.com/main#");
 		pm.setPrefix("A:", "http://www.example.com/A#");
 		pm.setPrefix("B:", "http://www.example.com/B#");
 
@@ -276,8 +277,8 @@ public class ElkReasonerTest {
 		OWLDataFactory dataFactory = man.getOWLDataFactory();
 
 		// set up resolution of prefixes
-		DefaultPrefixManager pm = new DefaultPrefixManager(
-				"http://www.example.com/main#");
+		PrefixManager pm = new DefaultPrefixManager();
+		pm.setDefaultPrefix("http://www.example.com/main#");
 		pm.setPrefix("A:", "http://www.example.com/A#");
 		pm.setPrefix("B:", "http://www.example.com/B#");
 
@@ -345,8 +346,8 @@ public class ElkReasonerTest {
 		OWLDataFactory dataFactory = man.getOWLDataFactory();
 
 		// set up resolution of prefixes
-		DefaultPrefixManager pm = new DefaultPrefixManager(
-				"http://www.example.com/main#");
+		PrefixManager pm = new DefaultPrefixManager();
+		pm.setDefaultPrefix("http://www.example.com/main#");
 		pm.setPrefix("A:", "http://www.example.com/A#");
 		pm.setPrefix("B:", "http://www.example.com/B#");
 
@@ -419,8 +420,8 @@ public class ElkReasonerTest {
 		OWLDataFactory dataFactory = man.getOWLDataFactory();
 
 		// set up resolution of prefixes
-		DefaultPrefixManager pm = new DefaultPrefixManager(
-				"http://www.example.com/main#");
+		PrefixManager pm = new DefaultPrefixManager();
+		pm.setDefaultPrefix("http://www.example.com/main#");
 		pm.setPrefix("A:", "http://www.example.com/A#");
 		pm.setPrefix("B:", "http://www.example.com/B#");
 
@@ -495,7 +496,10 @@ public class ElkReasonerTest {
 		final URI ontologyRoot = getClass().getClassLoader()
 				.getResource("ontologies").toURI();
 
-		man.addIRIMapper(new ThisIRIMapper(ontologyRoot.toString()));
+		OWLOntologyIRIMapper iriMapper = new ThisIRIMapper(
+				ontologyRoot.toString());
+
+		man.setIRIMappers(Collections.singleton(iriMapper));
 
 		final URI mainOntology = getClass().getClassLoader()
 				.getResource("ontologies/" + name).toURI();
@@ -525,6 +529,8 @@ public class ElkReasonerTest {
 	 */
 	static class ThisIRIMapper implements OWLOntologyIRIMapper {
 
+		private static final long serialVersionUID = 7697972905355499952L;
+		
 		final String root;
 
 		ThisIRIMapper(String root) {
