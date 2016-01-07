@@ -148,10 +148,12 @@ public class MessageDialogAppender extends AppenderBase<ILoggingEvent> implement
 
 		ElkMessage elkMessage = ElkMessage.deserialize(event
 				.getFormattedMessage());
+		String messageText = event.getFormattedMessage();
 		String messageType = null;
 
 		if (elkMessage != null) {
 			messageType = elkMessage.getMessageType();
+			messageText = elkMessage.getMessage();
 			if (ignoredMessageTypes.contains(messageType))
 				return false;
 		}
@@ -159,7 +161,6 @@ public class MessageDialogAppender extends AppenderBase<ILoggingEvent> implement
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-		String messageText = event.getFormattedMessage();
 		// truncating too long message text
 		if (messageText.length() > 520)
 			messageText = messageText.substring(0, 500) + "...";
