@@ -5,12 +5,6 @@
 	<version>0.4.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<parent>
-		<groupId>org.sonatype.oss</groupId>
-		<artifactId>oss-parent</artifactId>
-		<version>7</version>
-	</parent>
-
 	<name>ELK</name>
 	<description>A Java-based OWL EL reasoner</description>
 	<url>http://elk.semanticweb.org/</url>
@@ -32,10 +26,9 @@
 	</modules>
 
 	<scm>
-		<connection>scm:git:https://code.google.com/p/elk-reasoner/</connection>
-		<developerConnection>scm:git:git@github.com:klinovp/elk.git</developerConnection>
-		<url>http://elk-reasoner.googlecode.com/git/</url>
-		<tag>v0.4.2</tag>
+		<connection>scm:git:https://github.com/liveontologies/elk-reasoner.git</connection>
+		<developerConnection>scm:git:git@github.com:liveontologies/elk-reasoner.git</developerConnection>
+		<url>https://github.com/liveontologies/elk-reasoner</url>
 	</scm>
 
 	<licenses>
@@ -148,16 +141,26 @@
 	</reporting>
 
 	<distributionManagement>
-		<downloadUrl>http://code.google.com/p/elk-reasoner/downloads/list</downloadUrl>
+		<downloadUrl>https://github.com/liveontologies/elk-reasoner/releases</downloadUrl>
 		<site>
 			<id>elk.semanticweb.org</id>
 			<url>scp://elk.semanticweb.org/home/elkuser/elk_semanticweb_org/www/maven/${project.version}</url>
 		</site>
+		<repository>
+			<id>sonatype-nexus-staging</id>
+			<name>Nexus Release Repository</name>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+		<snapshotRepository>
+			<id>sonatype-nexus-snapshots</id>
+			<name>Sonatype Nexus Snapshots</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+		</snapshotRepository>
 	</distributionManagement>
 
 	<issueManagement>
-		<system>GoogleCode</system>
-		<url>http://code.google.com/p/elk-reasoner/issues/</url>
+		<system>GitHub</system>
+		<url>https://github.com/liveontologies/elk-reasoner/issues/</url>
 	</issueManagement>
 
 	<mailingLists>
@@ -256,7 +259,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
-					<version>3.1</version>
+					<version>3.4</version>
 					<dependencies>
 						<dependency>
 							<groupId>org.apache.maven.wagon</groupId>
@@ -273,7 +276,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-release-plugin</artifactId>
-					<version>2.5.1</version>
+					<version>2.5.3</version>
 				</plugin>
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
 					only. It has no influence on the Maven build itself. -->
@@ -356,6 +359,8 @@
 					<pushChanges>false</pushChanges>
 					<localCheckout>true</localCheckout>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
+					<useReleaseProfile>false</useReleaseProfile>
+					<releaseProfiles>release-sign-artifacts</releaseProfiles>
 				</configuration>
 			</plugin>
 			<!-- making sure that the sources are always installed so that sources 
