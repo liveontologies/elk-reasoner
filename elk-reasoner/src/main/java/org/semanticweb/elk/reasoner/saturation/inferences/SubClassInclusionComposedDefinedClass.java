@@ -75,7 +75,7 @@ public class SubClassInclusionComposedDefinedClass
 
 	public SubClassInclusionComposed getPremise(
 			SubClassInclusionComposed.Factory factory) {
-		return factory.getComposedSubClassInclusion(getInferenceRoot(),
+		return factory.getSubClassInclusionComposed(getInferenceRoot(),
 				definition_);
 	}
 

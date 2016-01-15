@@ -62,13 +62,13 @@ public class SubClassInclusionComposedObjectIntersectionOf
 
 	public SubClassInclusionComposed getFirstPremise(
 			SubClassInclusionComposed.Factory factory) {
-		return factory.getComposedSubClassInclusion(getInferenceRoot(),
+		return factory.getSubClassInclusionComposed(getInferenceRoot(),
 				getSuperExpression().getFirstConjunct());
 	}
 
 	public SubClassInclusionComposed getSecondPremise(
 			SubClassInclusionComposed.Factory factory) {
-		return factory.getComposedSubClassInclusion(getInferenceRoot(),
+		return factory.getSubClassInclusionComposed(getInferenceRoot(),
 				getSuperExpression().getSecondConjunct());
 	}
 

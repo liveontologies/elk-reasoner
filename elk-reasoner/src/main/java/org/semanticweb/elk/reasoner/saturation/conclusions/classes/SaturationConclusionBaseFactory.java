@@ -91,7 +91,7 @@ public class SaturationConclusionBaseFactory
 	}
 
 	@Override
-	public SubClassInclusionComposed getComposedSubClassInclusion(
+	public SubClassInclusionComposed getSubClassInclusionComposed(
 			IndexedContextRoot subExpression,
 			IndexedClassExpression superExpression) {
 		return new SubClassInclusionComposedImpl<IndexedClassExpression>(
@@ -99,7 +99,7 @@ public class SaturationConclusionBaseFactory
 	}
 
 	@Override
-	public SubClassInclusionDecomposed getDecomposedSubClassInclusion(
+	public SubClassInclusionDecomposed getSubClassInclusionDecomposed(
 			IndexedContextRoot subExpression,
 			IndexedClassExpression superExpression) {
 		return new SubClassInclusionDecomposedImpl(subExpression,

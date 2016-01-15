@@ -59,7 +59,7 @@ public class SubClassInclusionObjectHasSelfPropertyRange extends
 	}
 
 	public SubClassInclusionDecomposed getPremise(SubClassInclusionDecomposed.Factory factory) {
-		return factory.getDecomposedSubClassInclusion(getInferenceRoot(),
+		return factory.getSubClassInclusionDecomposed(getInferenceRoot(),
 				premiseSubsumer_);
 	}
 

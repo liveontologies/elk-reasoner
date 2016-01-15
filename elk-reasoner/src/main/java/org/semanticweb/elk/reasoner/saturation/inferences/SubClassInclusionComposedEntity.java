@@ -53,7 +53,7 @@ public class SubClassInclusionComposedEntity extends
 	}
 
 	public SubClassInclusionDecomposed getPremise(SubClassInclusionDecomposed.Factory factory) {
-		return factory.getDecomposedSubClassInclusion(getInferenceRoot(), getSuperExpression());
+		return factory.getSubClassInclusionDecomposed(getInferenceRoot(), getSuperExpression());
 	}
 
 	@Override

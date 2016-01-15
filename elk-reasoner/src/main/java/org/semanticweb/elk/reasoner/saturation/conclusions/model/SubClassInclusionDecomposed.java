@@ -46,7 +46,7 @@ public interface SubClassInclusionDecomposed extends SubClassInclusion {
 	 */
 	interface Factory {
 
-		SubClassInclusionDecomposed getDecomposedSubClassInclusion(
+		SubClassInclusionDecomposed getSubClassInclusionDecomposed(
 				IndexedContextRoot subExpression,
 				IndexedClassExpression superExpression);
 

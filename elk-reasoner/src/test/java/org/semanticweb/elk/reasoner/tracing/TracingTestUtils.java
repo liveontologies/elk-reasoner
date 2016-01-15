@@ -87,7 +87,7 @@ public class TracingTestUtils {
 				return contradiction;
 			}
 
-			return FACTORY_.getComposedSubClassInclusion(root, subsumer);
+			return FACTORY_.getSubClassInclusionComposed(root, subsumer);
 		}
 
 		throw new IllegalArgumentException("Context may not be null");

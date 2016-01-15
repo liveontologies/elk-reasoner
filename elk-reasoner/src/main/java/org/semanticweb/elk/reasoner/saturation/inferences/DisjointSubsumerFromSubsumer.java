@@ -53,7 +53,7 @@ public class DisjointSubsumerFromSubsumer extends
 	}
 
 	public SubClassInclusionComposed getPremise(SubClassInclusionComposed.Factory factory) {
-		return factory.getComposedSubClassInclusion(getInferenceRoot(),
+		return factory.getSubClassInclusionComposed(getInferenceRoot(),
 				getDisjointExpressions().getElements().get(getPosition()));
 	}
 

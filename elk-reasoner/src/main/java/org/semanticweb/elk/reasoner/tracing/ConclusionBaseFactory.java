@@ -78,19 +78,19 @@ public class ConclusionBaseFactory implements Conclusion.Factory {
 	}
 
 	@Override
-	public SubClassInclusionComposed getComposedSubClassInclusion(
+	public SubClassInclusionComposed getSubClassInclusionComposed(
 			IndexedContextRoot subExpression,
 			IndexedClassExpression superExpression) {
 		return filter(saturationConclusionFactory_
-				.getComposedSubClassInclusion(subExpression, superExpression));
+				.getSubClassInclusionComposed(subExpression, superExpression));
 	}
 
 	@Override
-	public SubClassInclusionDecomposed getDecomposedSubClassInclusion(
+	public SubClassInclusionDecomposed getSubClassInclusionDecomposed(
 			IndexedContextRoot subExpression,
 			IndexedClassExpression superExpression) {
 		return filter(
-				saturationConclusionFactory_.getDecomposedSubClassInclusion(
+				saturationConclusionFactory_.getSubClassInclusionDecomposed(
 						subExpression, superExpression));
 	}
 

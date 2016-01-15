@@ -60,12 +60,12 @@ public class ContradictionOfObjectComplementOf extends AbstractContradictionInfe
 	}
 
 	public SubClassInclusionComposed getFirstPremise(SubClassInclusionComposed.Factory factory) {
-		return factory.getComposedSubClassInclusion(getInferenceRoot(),
+		return factory.getSubClassInclusionComposed(getInferenceRoot(),
 				negation_.getNegated());
 	}
 
 	public SubClassInclusionDecomposed getSecondPremise(SubClassInclusionDecomposed.Factory factory) {
-		return factory.getDecomposedSubClassInclusion(getInferenceRoot(), negation_);
+		return factory.getSubClassInclusionDecomposed(getInferenceRoot(), negation_);
 	}
 
 	@Override

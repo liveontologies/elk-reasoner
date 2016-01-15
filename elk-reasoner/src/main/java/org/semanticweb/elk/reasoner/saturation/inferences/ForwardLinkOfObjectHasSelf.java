@@ -66,7 +66,7 @@ public class ForwardLinkOfObjectHasSelf extends AbstractClassInference
 	}
 
 	public SubClassInclusionDecomposed getPremise(SubClassInclusionDecomposed.Factory factory) {
-		return factory.getDecomposedSubClassInclusion(getInferenceRoot(), existential_);
+		return factory.getSubClassInclusionDecomposed(getInferenceRoot(), existential_);
 	}
 
 	@Override

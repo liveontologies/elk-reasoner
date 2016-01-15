@@ -62,7 +62,7 @@ public class PropagationGenerated extends AbstractPropagationInference {
 
 	public SubClassInclusionComposed getFirstPremise(
 			SubClassInclusionComposed.Factory factory) {
-		return factory.getComposedSubClassInclusion(getInferenceRoot(),
+		return factory.getSubClassInclusionComposed(getInferenceRoot(),
 				getCarry().getFiller());
 	}
 
