@@ -65,6 +65,15 @@ public class SubClassInclusionComposedObjectUnionOf
 		return getConclusionRoot();
 	}
 
+	/**
+	 * @return the position of the produced super-class
+	 *         {@link IndexedObjectUnionOf} corresponding to the super-class of
+	 *         the premise
+	 */
+	public int getPosition() {
+		return position_;
+	}
+
 	public SubClassInclusionComposed getPremise(
 			SubClassInclusionComposed.Factory factory) {
 		return factory.getSubClassInclusionComposed(getInferenceRoot(),
