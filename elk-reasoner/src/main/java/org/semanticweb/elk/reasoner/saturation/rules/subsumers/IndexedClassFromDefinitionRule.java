@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
@@ -57,9 +58,9 @@ public class IndexedClassFromDefinitionRule extends
 
 	public static final String NAME = "Defined Class Introduction";
 
-	private final ArrayList<IndexedClass> definedClasses_;
+	private final List<IndexedClass> definedClasses_;
 
-	private final ArrayList<ElkAxiom> reasons_;
+	private final List<ElkAxiom> reasons_;
 
 	private IndexedClassFromDefinitionRule(ChainableSubsumerRule tail) {
 		super(tail);

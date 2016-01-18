@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
@@ -64,9 +65,9 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 
 	public static final String NAME = "SubClassOf Expansion";
 
-	private final ArrayList<IndexedClassExpression> toldSubsumers_;
+	private final List<IndexedClassExpression> toldSubsumers_;
 
-	private final ArrayList<ElkAxiom> reasons_;
+	private final List<ElkAxiom> reasons_;
 
 	SuperClassFromSubClassRule(ChainableSubsumerRule tail) {
 		super(tail);
