@@ -30,8 +30,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 
 /**
- * {@link SubClassInclusionDecomposed} representing a tautology {@code A ⊑ A}
- * or {@code A ⊑ owl:Thing} obtained from no premises.
+ * {@link SubClassInclusionDecomposed} representing a tautology {@code C ⊑ C}
+ * or {@code C ⊑ owl:Thing} obtained from no premises.
  * 
  * @author Pavel Klinov
  * 
