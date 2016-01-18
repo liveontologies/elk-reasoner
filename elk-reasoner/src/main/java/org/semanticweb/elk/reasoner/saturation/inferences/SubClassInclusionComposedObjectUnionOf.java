@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
@@ -41,19 +40,24 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * @author Pavel Klinov
  *
  *         pavel.klinov@uni-ulm.de
- *         
- * @author Yevgeny Kazakov        
+ * 
+ * @author Yevgeny Kazakov
  */
 public class SubClassInclusionComposedObjectUnionOf
 		extends
 			AbstractSubClassInclusionComposedInference<IndexedObjectUnionOf> {
 
-	private final IndexedClassExpression disjunct_;
+	/**
+	 * The position of the disjunct of {@link IndexedObjectUnionOf} from which
+	 * this {@link IndexedObjectUnionOf} is produced
+	 */
+	private final int position_;
 
-	public SubClassInclusionComposedObjectUnionOf(IndexedContextRoot inferenceRoot,
-			IndexedClassExpression premise, IndexedObjectUnionOf disjunction) {
+	public SubClassInclusionComposedObjectUnionOf(
+			IndexedContextRoot inferenceRoot, IndexedObjectUnionOf disjunction,
+			int position) {
 		super(inferenceRoot, disjunction);
-		disjunct_ = premise;
+		this.position_ = position;
 	}
 
 	@Override
@@ -64,7 +68,7 @@ public class SubClassInclusionComposedObjectUnionOf
 	public SubClassInclusionComposed getPremise(
 			SubClassInclusionComposed.Factory factory) {
 		return factory.getSubClassInclusionComposed(getInferenceRoot(),
-				disjunct_);
+				getSuperExpression().getDisjuncts().get(position_));
 	}
 
 	@Override
@@ -72,7 +76,7 @@ public class SubClassInclusionComposedObjectUnionOf
 			SubClassInclusionComposedInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	/**
 	 * Visitor pattern for instances
 	 * 
@@ -80,9 +84,9 @@ public class SubClassInclusionComposedObjectUnionOf
 	 *
 	 */
 	public static interface Visitor<O> {
-		
+
 		public O visit(SubClassInclusionComposedObjectUnionOf inference);
-		
+
 	}
 
 }

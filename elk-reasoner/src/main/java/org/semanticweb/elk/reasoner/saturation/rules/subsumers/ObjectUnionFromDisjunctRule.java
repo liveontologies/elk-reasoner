@@ -1,28 +1,8 @@
 package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
 
-/*
- * #%L
- * ELK Reasoner
- * $Id:$
- * $HeadURL:$
- * %%
- * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
-
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectUnionOf;
@@ -33,11 +13,12 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectUnionOf;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ChainableSubsumerRule} producing {@link SubClassInclusion} for an
@@ -48,23 +29,35 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  */
 public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 
+	// logger for events
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(ObjectUnionFromDisjunctRule.class);
+
 	public static final String NAME = "ObjectUnionOf Introduction";
 
 	/**
 	 * All disjunctions containing the disjunct for which this rule is
 	 * registered
 	 */
-	private final Set<IndexedObjectUnionOf> disjunctions_;
+	private final List<IndexedObjectUnionOf> disjunctions_;
+
+	/**
+	 * The position of the disjunct for which this rule is registered in the
+	 * respective disjunction
+	 */
+	private final List<Integer> positions_;
 
 	private ObjectUnionFromDisjunctRule(ChainableSubsumerRule tail) {
 		super(tail);
-		disjunctions_ = new ArrayHashSet<IndexedObjectUnionOf>();
-
+		this.disjunctions_ = new ArrayList<IndexedObjectUnionOf>();
+		this.positions_ = new ArrayList<Integer>();
 	}
 
-	private ObjectUnionFromDisjunctRule(IndexedObjectUnionOf disjunction) {
+	private ObjectUnionFromDisjunctRule(IndexedObjectUnionOf disjunction,
+			int position) {
 		this((ChainableSubsumerRule) null);
 		this.disjunctions_.add(disjunction);
+		this.positions_.add(position);
 	}
 
 	public static boolean addRulesFor(
@@ -72,10 +65,12 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 			ModifiableOntologyIndex index) {
 		boolean success = true;
 		int added = 0;
-		for (ModifiableIndexedClassExpression disjunct : disjunction
-				.getDisjuncts()) {
+		List<? extends ModifiableIndexedClassExpression> disjuncts = disjunction
+				.getDisjuncts();
+		for (int pos = 0; pos < disjuncts.size(); pos++) {
+			ModifiableIndexedClassExpression disjunct = disjuncts.get(pos);
 			if (index.add(disjunct,
-					new ObjectUnionFromDisjunctRule(disjunction))) {
+					new ObjectUnionFromDisjunctRule(disjunction, pos))) {
 				added++;
 			} else {
 				success = false;
@@ -85,13 +80,13 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 		if (success)
 			return true;
 		// else revert the changes made
-		for (ModifiableIndexedClassExpression disjunct : disjunction
-				.getDisjuncts()) {
+		for (int pos = 0; pos < disjuncts.size(); pos++) {
 			if (added == 0)
 				break;
 			// else
 			added--;
-			index.remove(disjunct, new ObjectUnionFromDisjunctRule(disjunction));
+			index.remove(disjuncts.get(pos),
+					new ObjectUnionFromDisjunctRule(disjunction, pos));
 		}
 		return false;
 	}
@@ -101,10 +96,12 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 			ModifiableOntologyIndex index) {
 		boolean success = true;
 		int removed = 0;
-		for (ModifiableIndexedClassExpression disjunct : disjunction
-				.getDisjuncts()) {
-			if (index.remove(disjunct, new ObjectUnionFromDisjunctRule(
-					disjunction))) {
+		List<? extends ModifiableIndexedClassExpression> disjuncts = disjunction
+				.getDisjuncts();
+		for (int pos = 0; pos < disjuncts.size(); pos++) {
+			ModifiableIndexedClassExpression disjunct = disjuncts.get(pos);
+			if (index.remove(disjunct,
+					new ObjectUnionFromDisjunctRule(disjunction, pos))) {
 				removed++;
 			} else {
 				success = false;
@@ -114,13 +111,13 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 		if (success)
 			return true;
 		// else revert the changes made
-		for (ModifiableIndexedClassExpression disjunct : disjunction
-				.getDisjuncts()) {
+		for (int pos = 0; pos < disjuncts.size(); pos++) {
 			if (removed == 0)
 				break;
 			// else
 			removed--;
-			index.add(disjunct, new ObjectUnionFromDisjunctRule(disjunction));
+			index.add(disjuncts.get(pos),
+					new ObjectUnionFromDisjunctRule(disjunction, pos));
 		}
 		return false;
 	}
@@ -138,16 +135,17 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 	}
 
 	@Deprecated
-	public Set<IndexedObjectUnionOf> getDisjunctions() {
+	public Collection<IndexedObjectUnionOf> getDisjunctions() {
 		return disjunctions_;
 	}
 
 	@Override
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ClassConclusionProducer producer) {
-		for (IndexedObjectUnionOf disjunction : disjunctions_) {
-			producer.produce(new SubClassInclusionComposedObjectUnionOf(premises.getRoot(),
-					premise, disjunction));
+		for (int i = 0; i < disjunctions_.size(); i++) {
+			producer.produce(new SubClassInclusionComposedObjectUnionOf(
+					premises.getRoot(), disjunctions_.get(i),
+					positions_.get(i)));
 		}
 	}
 
@@ -162,8 +160,42 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 			return true;
 		ObjectUnionFromDisjunctRule rule = ruleChain.getCreate(MATCHER_,
 				FACTORY_);
-		rule.disjunctions_.addAll(this.disjunctions_);
-		return true;
+		boolean success = true;
+		int added = 0;
+		for (int i = 0; i < disjunctions_.size(); i++) {
+			IndexedObjectUnionOf disjunction = disjunctions_.get(i);
+			int position = positions_.get(i);
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("{}: adding to {} matching disjunct position: {}",
+						disjunction, NAME, position);
+			}
+			if (rule.disjunctions_.add(disjunction)) {
+				rule.positions_.add(position);
+			} else {
+				success = false;
+				break;
+			}
+		}
+		if (success) {
+			return true;
+		}
+		// else revert all changes
+		for (int i = 0; i < disjunctions_.size(); i++) {
+			if (added == 0)
+				break;
+			added--;
+			IndexedObjectUnionOf disjunction = disjunctions_.get(i);
+			int position = positions_.get(i);
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace(
+						"{}: removing to {} matching disjunct position: {} [revert]",
+						disjunction, NAME, position);
+			}
+			int j = rule.indexOf(disjunction, position);
+			rule.disjunctions_.remove(j);
+			rule.positions_.remove(j);
+		}
+		return false;
 	}
 
 	@Override
@@ -176,27 +208,57 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 		// else
 		boolean success = true;
 		int removed = 0;
-		for (IndexedObjectUnionOf disjunction : this.disjunctions_) {
-			if (rule.disjunctions_.remove(disjunction))
+		for (int i = 0; i < disjunctions_.size(); i++) {
+			IndexedObjectUnionOf disjunction = disjunctions_.get(i);
+			int position = positions_.get(i);
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace(
+						"{}: removing to {} matching disjunct position: {} [revert]",
+						disjunction, NAME, position);
+			}
+			int j = rule.indexOf(disjunction, position);
+			if (j >= 0) {
+				rule.disjunctions_.remove(j);
+				rule.positions_.remove(j);
 				removed++;
-			else {
+			} else {
 				success = false;
 				break;
 			}
 		}
 		if (success) {
-			if (rule.isEmpty())
+			if (rule.isEmpty()) {
 				ruleChain.remove(MATCHER_);
+				LOGGER_.trace("{}: removed ", NAME);
+			}
 			return true;
 		}
 		// else revert all changes
-		for (IndexedObjectUnionOf disjunction : this.disjunctions_) {
+		for (int i = 0; i < disjunctions_.size(); i++) {
 			if (removed == 0)
 				break;
 			removed--;
+			IndexedObjectUnionOf disjunction = disjunctions_.get(i);
+			int position = positions_.get(i);
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace(
+						"{}: adding to {} matching disjunct position: {} [revert]",
+						disjunction, NAME, position);
+			}
 			rule.disjunctions_.add(disjunction);
+			rule.positions_.add(position);
 		}
 		return false;
+	}
+
+	private int indexOf(IndexedObjectUnionOf disjunction, int position) {
+		for (int i = 0; i < disjunctions_.size(); i++) {
+			if (disjunctions_.get(i).equals(disjunction)
+					&& positions_.get(i).equals(position))
+				return i;
+		}
+		// else not found
+		return -1;
 	}
 
 	/**

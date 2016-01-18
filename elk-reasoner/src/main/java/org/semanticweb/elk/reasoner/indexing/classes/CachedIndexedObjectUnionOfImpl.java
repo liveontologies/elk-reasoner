@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import java.util.ArrayList;
+
 /*
  * #%L
  * ELK Reasoner
@@ -23,7 +25,6 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import java.util.List;
-import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectUnionOf;
@@ -32,7 +33,6 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpress
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.slf4j.Logger;
@@ -52,7 +52,7 @@ class CachedIndexedObjectUnionOfImpl extends
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(CachedIndexedObjectUnionOfImpl.class);
 
-	private final Set<ModifiableIndexedClassExpression> disjuncts_;
+	private final List<ModifiableIndexedClassExpression> disjuncts_;
 
 	CachedIndexedObjectUnionOfImpl(
 			List<? extends ModifiableIndexedClassExpression> disjuncts) {
@@ -67,10 +67,10 @@ class CachedIndexedObjectUnionOfImpl extends
 	}
 
 	private static class Initializer {
-		private final Set<ModifiableIndexedClassExpression> disjuncts_;
+		private final List<ModifiableIndexedClassExpression> disjuncts_;
 
 		Initializer(List<? extends ModifiableIndexedClassExpression> disjuncts) {
-			this.disjuncts_ = new ArrayHashSet<ModifiableIndexedClassExpression>(
+			this.disjuncts_ = new ArrayList<ModifiableIndexedClassExpression>(
 					2);
 			for (ModifiableIndexedClassExpression disjunct : disjuncts) {
 				this.disjuncts_.add(disjunct);
@@ -79,7 +79,7 @@ class CachedIndexedObjectUnionOfImpl extends
 	}
 
 	@Override
-	public final Set<ModifiableIndexedClassExpression> getDisjuncts() {
+	public final List<ModifiableIndexedClassExpression> getDisjuncts() {
 		return disjuncts_;
 	}
 

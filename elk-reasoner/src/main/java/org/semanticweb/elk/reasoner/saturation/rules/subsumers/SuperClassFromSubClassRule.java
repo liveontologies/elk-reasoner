@@ -203,7 +203,7 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 			IndexedClassExpression subsumer = toldSubsumers_.get(i);
 			ElkAxiom reason = reasons_.get(i);
 			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("{}: removing from {} reason: {}", subsumer,
+				LOGGER_.trace("{}: removing from {} reason: {} [revert]", subsumer,
 						NAME, reason);
 			}
 			int j = rule.indexOf(subsumer, reason);
