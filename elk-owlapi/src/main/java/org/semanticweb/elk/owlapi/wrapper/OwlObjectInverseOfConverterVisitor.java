@@ -24,6 +24,7 @@ package org.semanticweb.elk.owlapi.wrapper;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLObjectInverseOf;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
@@ -39,6 +40,7 @@ import org.semanticweb.owlapi.model.OWLPropertyExpressionVisitorEx;
  * in OWL API but not in OWL 2 and thus in ELK OWL model.
  * 
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  * 
  */
 public class OwlObjectInverseOfConverterVisitor implements
@@ -68,6 +70,14 @@ public class OwlObjectInverseOfConverterVisitor implements
 
 	@Override
 	public ElkObjectPropertyExpression visit(OWLDataProperty property) {
+		throw new IllegalArgumentException("invers of "
+				+ property.getClass().getSimpleName()
+				+ " cannot be converted to "
+				+ ElkObjectPropertyExpression.class.getSimpleName());
+	}
+
+	@Override
+	public ElkObjectPropertyExpression visit(OWLAnnotationProperty property) {
 		throw new IllegalArgumentException("invers of "
 				+ property.getClass().getSimpleName()
 				+ " cannot be converted to "

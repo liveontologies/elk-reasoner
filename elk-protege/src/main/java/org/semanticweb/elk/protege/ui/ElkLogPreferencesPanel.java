@@ -41,10 +41,11 @@ import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.SpinnerNumberModel;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.spi.LoggingEvent;
 import org.semanticweb.elk.protege.ElkProtegeLogAppender;
 import org.semanticweb.elk.protege.preferences.ElkLogPreferences;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 
 public class ElkLogPreferencesPanel extends ElkPanel {
 
@@ -146,8 +147,8 @@ public class ElkLogPreferencesPanel extends ElkPanel {
 		JScrollPane scrollPane = new JScrollPane(logTextArea_);
 		logTextArea_.setEditable(false);
 		ElkProtegeLogAppender elkLog = ElkProtegeLogAppender.getInstance();
-		for (LoggingEvent event : elkLog.getEvents()) {
-			logTextArea_.append(event.getRenderedMessage() + "\n");
+		for (ILoggingEvent event : elkLog.getEvents()) {
+			logTextArea_.append(event.getFormattedMessage() + "\n");
 		}
 		return scrollPane;
 	}

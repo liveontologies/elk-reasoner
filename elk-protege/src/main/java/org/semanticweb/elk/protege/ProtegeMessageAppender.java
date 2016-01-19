@@ -31,11 +31,12 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
 import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.elk.protege.ui.MessageDialogAppender;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 
 /**
  * A {@link MessageDialogAppender} for Protege that uses additional
@@ -44,6 +45,7 @@ import org.semanticweb.elk.protege.ui.MessageDialogAppender;
  * within {@link ElkReasoner}.
  * 
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  * 
  */
 public class ProtegeMessageAppender extends MessageDialogAppender {
@@ -72,7 +74,7 @@ public class ProtegeMessageAppender extends MessageDialogAppender {
 	 * @return the generated check box message
 	 */
 	@Override
-	protected String getCheckboxMessage(LoggingEvent event) {
+	protected String getCheckboxMessage(ILoggingEvent event) {
 		return "<html><div style=\"width:%dpx;\">"
 				+ "<p>Do not show further messages of this kind in this session</p>"
 				+ "<p>(the messages can still be seen in the console if Prot&eacute;g&eacute; was started from the command line)</p>"
@@ -80,13 +82,13 @@ public class ProtegeMessageAppender extends MessageDialogAppender {
 	}
 
 	@Override
-	protected boolean showMessage(LoggingEvent event) {
+	protected boolean showMessage(ILoggingEvent event) {
 		if (!super.showMessage(event))
 			return false;
 		if (showUnsupportedOwlApiMethodInfo
 				&& event.getLevel().isGreaterOrEqual(Level.WARN)
 				&& event.getLoggerName().equals(
-						Logger.getLogger(ElkReasoner.class).getName())) {
+						LoggerFactory.getLogger(ElkReasoner.class).getName())) {
 
 			JPanel panel = new JPanel();
 			panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));

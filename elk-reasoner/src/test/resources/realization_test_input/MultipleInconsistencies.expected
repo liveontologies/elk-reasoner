@@ -2,7 +2,9 @@ Prefix(:=<http://example.org/> )
 Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
 
 Ontology(
-SubClassOf(owl:Thing :B)
+
+EquivalentClasses(owl:Nothing owl:Thing :A :B :C :D)
+SameIndividual(:a :b :c :d)
 ClassAssertion(:A :a)
-DisjointClasses(:A :B)
+
 )

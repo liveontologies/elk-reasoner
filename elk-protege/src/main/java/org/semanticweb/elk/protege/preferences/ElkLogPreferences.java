@@ -22,9 +22,10 @@ package org.semanticweb.elk.protege.preferences;
  * #L%
  */
 
-import org.apache.log4j.Level;
 import org.protege.editor.core.prefs.Preferences;
 import org.protege.editor.core.prefs.PreferencesManager;
+
+import ch.qos.logback.classic.Level;
 
 public class ElkLogPreferences {
 

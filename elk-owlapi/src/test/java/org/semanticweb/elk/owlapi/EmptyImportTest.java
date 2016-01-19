@@ -27,6 +27,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
@@ -96,7 +97,9 @@ public class EmptyImportTest {
 		final URI ontologyRoot = getClass().getClassLoader()
 				.getResource("empty_import").toURI();
 
-		man.addIRIMapper(new ThisIRIMapper(ontologyRoot.toString()));
+		OWLOntologyIRIMapper iriMapper = new ThisIRIMapper(ontologyRoot.toString());
+		
+		man.setIRIMappers(Collections.singleton(iriMapper));
 
 		final URI mainOntology = getClass().getClassLoader()
 				.getResource("empty_import/" + name).toURI();
@@ -126,6 +129,7 @@ public class EmptyImportTest {
 	 */
 	static class ThisIRIMapper implements OWLOntologyIRIMapper {
 
+		private static final long serialVersionUID = -6313558704830529341L;
 		final String root;
 
 		ThisIRIMapper(String root) {

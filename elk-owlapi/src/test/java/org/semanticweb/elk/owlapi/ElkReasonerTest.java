@@ -30,8 +30,10 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AddImport;
@@ -45,6 +47,8 @@ import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyIRIMapper;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.model.PrefixManager;
 import org.semanticweb.owlapi.model.RemoveImport;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
@@ -56,6 +60,7 @@ import uk.ac.manchester.cs.owl.owlapi.OWLImportsDeclarationImpl;
  * Testing correctness of ELK implementation of {@link OWLReasoner} interface
  * 
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  * 
  */
 public class ElkReasonerTest {
@@ -65,14 +70,14 @@ public class ElkReasonerTest {
 	 * 
 	 */
 	@Test
-	public void testChanges() throws Exception {
+	public void testNoChanges() throws Exception {
 
 		OWLOntologyManager man = OWLManager.createOWLOntologyManager();
 		OWLDataFactory dataFactory = man.getOWLDataFactory();
 
 		// set up resolution of prefixes
-		DefaultPrefixManager pm = new DefaultPrefixManager(
-				"http://www.example.com/main#");
+		PrefixManager pm = new DefaultPrefixManager();
+		pm.setDefaultPrefix("http://www.example.com/main#");
 		pm.setPrefix("A:", "http://www.example.com/A#");
 		pm.setPrefix("B:", "http://www.example.com/B#");
 
@@ -110,6 +115,45 @@ public class ElkReasonerTest {
 					.containsEntity(extB));
 			assertTrue(reasoner.getSuperClasses(extB, true)
 					.containsEntity(extC));
+			
+		} finally {
+			reasoner.dispose();
+		}
+
+	}
+
+	/**
+	 * Testing correctness of the reasoner with respect to ontology changes
+	 * 
+	 * removing an axiom ":X is-a :Y"
+	 */
+	@Test
+	public void testRemovingXY() throws Exception {
+
+		OWLOntologyManager man = OWLManager.createOWLOntologyManager();
+		OWLDataFactory dataFactory = man.getOWLDataFactory();
+
+		// set up resolution of prefixes
+		PrefixManager pm = new DefaultPrefixManager();
+		pm.setDefaultPrefix("http://www.example.com/main#");
+		pm.setPrefix("A:", "http://www.example.com/A#");
+		pm.setPrefix("B:", "http://www.example.com/B#");
+
+		// define query classes
+		OWLClass mainX = dataFactory.getOWLClass(":X", pm);
+		OWLClass mainY = dataFactory.getOWLClass(":Y", pm);
+		OWLClass extA = dataFactory.getOWLClass("A:A", pm);
+		OWLClass extB = dataFactory.getOWLClass("B:B", pm);
+		OWLClass extC = dataFactory.getOWLClass("B:C", pm);
+
+		// loading the root ontology
+		OWLOntology root = loadOntology(man, "root.owl");
+
+		// Create an ELK reasoner.
+		OWLReasonerFactory reasonerFactory = new ElkReasonerFactory();
+		OWLReasoner reasoner = reasonerFactory.createReasoner(root);
+
+		try {
 
 			// ************************************
 			// ** removing an axiom ":X is-a :Y"
@@ -137,11 +181,59 @@ public class ElkReasonerTest {
 			assertTrue(reasoner.getSuperClasses(extB, true)
 					.containsEntity(extC));
 
+		} finally {
+			reasoner.dispose();
+		}
+
+	}
+
+	/**
+	 * Testing correctness of the reasoner with respect to ontology changes
+	 * <p>
+	 * trying to remove "A:A is-a B:B"
+	 * <p>
+	 * Because the removed axiom belongs to the imported ontology and
+	 * not main ontology, the remove does not make any effect. So, we
+	 * should end up with the ontology we have started with.
+	 * <p>
+	 * This test is ignored, because as of OWL API 4.1.3 the removal
+	 * of the axiom is broadcasted even though the axiom is not removed.
+	 * 
+	 * TODO: file a bug report
+	 */
+	@Test
+	@Ignore
+	public void testRemovingAB() throws Exception {
+
+		OWLOntologyManager man = OWLManager.createOWLOntologyManager();
+		OWLDataFactory dataFactory = man.getOWLDataFactory();
+
+		// set up resolution of prefixes
+		PrefixManager pm = new DefaultPrefixManager();
+		pm.setDefaultPrefix("http://www.example.com/main#");
+		pm.setPrefix("A:", "http://www.example.com/A#");
+		pm.setPrefix("B:", "http://www.example.com/B#");
+
+		// define query classes
+		OWLClass mainX = dataFactory.getOWLClass(":X", pm);
+		OWLClass mainY = dataFactory.getOWLClass(":Y", pm);
+		OWLClass extA = dataFactory.getOWLClass("A:A", pm);
+		OWLClass extB = dataFactory.getOWLClass("B:B", pm);
+		OWLClass extC = dataFactory.getOWLClass("B:C", pm);
+
+		// loading the root ontology
+		OWLOntology root = loadOntology(man, "root.owl");
+
+		// Create an ELK reasoner.
+		OWLReasonerFactory reasonerFactory = new ElkReasonerFactory();
+		OWLReasoner reasoner = reasonerFactory.createReasoner(root);
+
+		try {
+
 			// ************************************
-			// ** adding it back, trying to remove "A:A is-a B:B"
+			// ** trying to remove "A:A is-a B:B"
 			// ************************************
-			man.addAxiom(root, axiom);
-			axiom = dataFactory.getOWLSubClassOfAxiom(extA, extB);
+			OWLSubClassOfAxiom axiom = dataFactory.getOWLSubClassOfAxiom(extA, extB);
 			man.removeAxiom(root, axiom);
 			reasoner.flush();
 
@@ -166,6 +258,45 @@ public class ElkReasonerTest {
 					.containsEntity(extB));
 			assertTrue(reasoner.getSuperClasses(extB, true)
 					.containsEntity(extC));
+
+		} finally {
+			reasoner.dispose();
+		}
+
+	}
+
+	/**
+	 * Testing correctness of the reasoner with respect to ontology changes
+	 * <p>
+	 * removing the import declaration for </impA>
+	 */
+	@Test
+	public void testRemovingImpA() throws Exception {
+
+		OWLOntologyManager man = OWLManager.createOWLOntologyManager();
+		OWLDataFactory dataFactory = man.getOWLDataFactory();
+
+		// set up resolution of prefixes
+		PrefixManager pm = new DefaultPrefixManager();
+		pm.setDefaultPrefix("http://www.example.com/main#");
+		pm.setPrefix("A:", "http://www.example.com/A#");
+		pm.setPrefix("B:", "http://www.example.com/B#");
+
+		// define query classes
+		OWLClass mainX = dataFactory.getOWLClass(":X", pm);
+		OWLClass mainY = dataFactory.getOWLClass(":Y", pm);
+		OWLClass extA = dataFactory.getOWLClass("A:A", pm);
+		OWLClass extB = dataFactory.getOWLClass("B:B", pm);
+		OWLClass extC = dataFactory.getOWLClass("B:C", pm);
+
+		// loading the root ontology
+		OWLOntology root = loadOntology(man, "root.owl");
+
+		// Create an ELK reasoner.
+		OWLReasonerFactory reasonerFactory = new ElkReasonerFactory();
+		OWLReasoner reasoner = reasonerFactory.createReasoner(root);
+
+		try {
 
 			// ************************************
 			// ** removing the import declaration for </impA>
@@ -195,16 +326,61 @@ public class ElkReasonerTest {
 			assertFalse(reasoner.getSuperClasses(extB, true).containsEntity(
 					extC));
 
+		} finally {
+			reasoner.dispose();
+		}
+
+	}
+
+	/**
+	 * Testing correctness of the reasoner with respect to ontology changes
+	 * <p>
+	 * removing the import declaration for </impA>,
+	 * adding the import declaration for </impB> and removing
+	 * ":Y is-a B:B"
+	 */
+	@Test
+	public void testRemovingImpAAddingImpBRemovingYB() throws Exception {
+
+		OWLOntologyManager man = OWLManager.createOWLOntologyManager();
+		OWLDataFactory dataFactory = man.getOWLDataFactory();
+
+		// set up resolution of prefixes
+		PrefixManager pm = new DefaultPrefixManager();
+		pm.setDefaultPrefix("http://www.example.com/main#");
+		pm.setPrefix("A:", "http://www.example.com/A#");
+		pm.setPrefix("B:", "http://www.example.com/B#");
+
+		// define query classes
+		OWLClass mainX = dataFactory.getOWLClass(":X", pm);
+		OWLClass mainY = dataFactory.getOWLClass(":Y", pm);
+		OWLClass extA = dataFactory.getOWLClass("A:A", pm);
+		OWLClass extB = dataFactory.getOWLClass("B:B", pm);
+		OWLClass extC = dataFactory.getOWLClass("B:C", pm);
+
+		// loading the root ontology
+		OWLOntology root = loadOntology(man, "root.owl");
+
+		// Create an ELK reasoner.
+		OWLReasonerFactory reasonerFactory = new ElkReasonerFactory();
+		OWLReasoner reasoner = reasonerFactory.createReasoner(root);
+
+		try {
+
 			// ************************************
 			// ** adding the import declaration for </impB> and removing
 			// ":Y is-a B:B"
 			// ************************************
 
+			OWLImportsDeclaration importA = new OWLImportsDeclarationImpl(
+					IRI.create("/impA"));
+			OWLOntologyChange change = new RemoveImport(root, importA);
+			man.applyChange(change);
 			OWLImportsDeclaration importB = new OWLImportsDeclarationImpl(
 					IRI.create("/impB"));
 			change = new AddImport(root, importB);
 			man.applyChange(change);
-			axiom = dataFactory.getOWLSubClassOfAxiom(mainY, extB);
+			OWLSubClassOfAxiom axiom = dataFactory.getOWLSubClassOfAxiom(mainY, extB);
 			man.removeAxiom(root, axiom);
 			reasoner.flush();
 
@@ -244,8 +420,8 @@ public class ElkReasonerTest {
 		OWLDataFactory dataFactory = man.getOWLDataFactory();
 
 		// set up resolution of prefixes
-		DefaultPrefixManager pm = new DefaultPrefixManager(
-				"http://www.example.com/main#");
+		PrefixManager pm = new DefaultPrefixManager();
+		pm.setDefaultPrefix("http://www.example.com/main#");
 		pm.setPrefix("A:", "http://www.example.com/A#");
 		pm.setPrefix("B:", "http://www.example.com/B#");
 
@@ -320,7 +496,10 @@ public class ElkReasonerTest {
 		final URI ontologyRoot = getClass().getClassLoader()
 				.getResource("ontologies").toURI();
 
-		man.addIRIMapper(new ThisIRIMapper(ontologyRoot.toString()));
+		OWLOntologyIRIMapper iriMapper = new ThisIRIMapper(
+				ontologyRoot.toString());
+
+		man.setIRIMappers(Collections.singleton(iriMapper));
 
 		final URI mainOntology = getClass().getClassLoader()
 				.getResource("ontologies/" + name).toURI();
@@ -350,6 +529,8 @@ public class ElkReasonerTest {
 	 */
 	static class ThisIRIMapper implements OWLOntologyIRIMapper {
 
+		private static final long serialVersionUID = 7697972905355499952L;
+		
 		final String root;
 
 		ThisIRIMapper(String root) {

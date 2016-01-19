@@ -26,7 +26,6 @@
 package org.semanticweb.elk.reasoner;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.Writer;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -53,17 +52,7 @@ public class InstanceTaxonomyTestOutput<T extends InstanceTaxonomy<ElkClass, Elk
 	}
 
 	@Override
-	public String toString() {
-
-		Writer writer = new StringWriter();
-		try {
-			TaxonomyPrinter.dumpInstanceTaxomomy(getTaxonomy(), writer, false);
-		} catch (IOException e) {
-			// TODO: what to return?
-			return e.toString();
-		}
-		return writer.toString();
-
-		// return String.valueOf(getHashCode());
+	void dumpTaxonomy(Writer writer) throws IOException {
+		TaxonomyPrinter.dumpInstanceTaxomomy(getTaxonomy(), writer, false);
 	}
 }

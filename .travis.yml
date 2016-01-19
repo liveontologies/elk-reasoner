@@ -1,16 +1,13 @@
 language: java
 
-jdk:
-  - openjdk6
-  - oraclejdk7
-  - openjdk7
+matrix:
+  include:
+   - jdk: openjdk6
+     env: EXTRA_OPTIONS='-pl !elk-owlapi,!elk-owlapi-standalone,!elk-protege,!elk-distribution'
+   - jdk: oraclejdk7
+   - jdk: openjdk7
+   - jdk: oraclejdk8
 
-script: mvn test -Dassembly.skipAssembly=true -B
+install: mvn install -DskipTests=true $EXTRA_OPTIONS
 
-notifications:
-  email:
-    recipients:
-      - secure: "b1Va2OE05Z+g6khbspbOsPVYRclYbsaDPYIx33I2ufXg57TOLnUFSTINpC2G/uZqiNZiHgNw/Rkr4Fw5bNZTCN5Qg8F9IRO2G986V0WkvGjVMhF/2ws316FUvMqCqENnb+5TmDsoO/JqwQGe8qDIFXmXlpqBf12N3f9WSTDWLJrQsGzHvHwHqxKISu6GTne7hX/5G0kDcJM6MNOhCRAiVgdvh4FdsIF5GzwjxRdRwL5RnWiTLO4AlbmSCLPhDbz2+fsa7o+mMMTQZO987TTbg7t7KENJOpip1QsZRXBzO763E6e2E3yBupM79iAHDTUqqW9SiYeOoPA7sp5K8hGf9wNQik2kyGfOJoHZMed3FQBJ6hCAH9lB1QadvA5II7AHPzsuEKxDsdtxXOUFO1J6DhuFlwxaL0tA8mgHEhR5Omz0pcV8ZHyaTsvHsbe33/C8MvQeFjLTR85aX0n9wGOlFcS7OYYJMr1SGCRMwp/J7KJ+Bt/R+2ry/WXXQKDSc5WjCtMvJxRxwv5TJwkypimGSOAQ5c5QYjCPARwIBqY69tAIi5JUD4JGtvHqlgCwGcHmsKLg91QFmnoL2wzvbNfdv9snTyukoiG2fB5zH6ybQGZlDfaFPFtJAAdHrRyofscQmzFY3iOLEgLA8R1jTfCKthLJmEN+CMcnaoJW/0bLy3M="
-      - secure: "gMe7nyegF07ILvTysZAnfezUZFcD8u1nXQkqpdg0ien8kmD63BwSjxM6k2qdaFqRrWxipu14/a6uhBLq4E4X2gNP5FdSfuLKBdxk4xAFKJ0JQMTYHXnkriyYU/XYn2WzXGH+ZUl8aA0NnHXP7WkkmAujTqrbczjyLwWuzXv72Xi8wMdIoiDBDTSyGTfnMoFVe1Dx+ZlQ7hJVDEia54ORottcN6Z6U2v7TLuYYQsWs8tKfN3wsrpKj6vM6QsStaj51TOPtw5a5vzOylHLIjo/1GLFOpqvPpP5RnYobSF3eXb3RstHSVCTSCtwZ8nxivcOzpv5eUvWK4G7vJ6BR5k6HT4Ru7Mh7FuW1o0ynXVlzQasXc2/VNYqeQN9NuUmj3zgb+9i1lax2CijxovsGA6AQrG62J+yOlF2MD/HPAJA18GH58EZKUPCVuEVJJNNnWpksXXjqUELm4+sau0nPf8bK4f7U9KPsUBGXz5BZSAyo0E332fBFFxpwDh2tX5peZaO3Jo5ymHpCy3fNOwUVKMK1dwJwPFcCYLI/rqB7sxDCCVCEyZw4m8mud48U8+NSNHWuUePy2XiPIva6LdZI4lcghS60Mk6rA6zJ8ZShD7X6TMDCrS75TdHW262ltyO1FzKZQWX35zlP06z/4eRl99E0a52vm1tY7CTEmNn7XYJ3+c="
-    on_success: never
-    on_failure: always
+script: mvn test -Dassembly.skipAssembly=true -B $EXTRA_OPTIONS

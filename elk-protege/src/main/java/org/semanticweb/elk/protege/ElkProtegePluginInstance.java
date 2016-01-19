@@ -25,17 +25,23 @@
  */
 package org.semanticweb.elk.protege;
 
-import org.apache.log4j.Logger;
 import org.protege.editor.core.editorkit.plugin.EditorKitHook;
 import org.semanticweb.elk.protege.preferences.ElkLogPreferences;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.filter.ThresholdFilter;
 
 /**
- * Carries out some initialization, e.g. Log4j, which we don't want to put into
+ * Carries out some initialization, e.g. Logback, which we don't want to put into
  * the reasoner factory which could be used outside Protege (for example, in
  * Snow Owl)
  * 
  * 
  * @author Pavel Klinov
+ * @author Peter Skocovsky
  * 
  */
 public class ElkProtegePluginInstance extends EditorKitHook {
@@ -48,12 +54,23 @@ public class ElkProtegePluginInstance extends EditorKitHook {
 
 	@Override
 	public void initialise() throws Exception {
-		Logger.getLogger(ELK_PACKAGE_).addAppender(
-				ProtegeMessageAppender.getInstance());
 		ElkProtegeLogAppender preferenceLogAppender = ElkProtegeLogAppender
 				.getInstance();
 		ElkLogPreferences elkLogPrefs = new ElkLogPreferences().load();
 		preferenceLogAppender.setLogLevel(elkLogPrefs.getLogLevel());
 		preferenceLogAppender.setBufferSize(elkLogPrefs.logBufferSize);
+		Logger logger = LoggerFactory.getLogger(ELK_PACKAGE_);
+		if (logger instanceof ch.qos.logback.classic.Logger) {
+			ch.qos.logback.classic.Logger logbackLogger = (ch.qos.logback.classic.Logger) logger;
+			ProtegeMessageAppender appender = ProtegeMessageAppender.getInstance();
+			LoggerContext context = logbackLogger.getLoggerContext();
+			appender.setContext(context);
+			logbackLogger.addAppender(appender);
+			ThresholdFilter filter = new ThresholdFilter();
+			filter.setLevel(Level.WARN.levelStr);
+			filter.start();
+			appender.addFilter(filter);
+			appender.start();
+		}
 	}
 }

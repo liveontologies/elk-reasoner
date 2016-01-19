@@ -975,6 +975,8 @@ public class ElkReasoner implements OWLReasoner {
 	private class OntologyChangeProgressListener implements
 			OWLOntologyChangeProgressListener {
 
+		private static final long serialVersionUID = -609834181047406971L;
+
 		@Override
 		public void begin(int size) {
 			if (isBufferingMode_ && loadBeforeChanges_) {
