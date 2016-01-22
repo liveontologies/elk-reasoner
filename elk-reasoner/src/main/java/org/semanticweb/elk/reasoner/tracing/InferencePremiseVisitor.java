@@ -72,7 +72,10 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecom
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedDefinition;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSubClassOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionObjectHasSelfPropertyRange;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionOwlThing;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionRange;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionTautology;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.PropertyRangeInherited;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainExpandedSubObjectPropertyOf;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainTautology;
 
@@ -89,52 +92,14 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubProperty
  */
 public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 
-	private final Conclusion.Factory conclusionFactory_;
-
 	private final ElkAxiomVisitor<?> axiomVisitor_;
+
+	private final Conclusion.Factory conclusionFactory_;
 
 	public InferencePremiseVisitor(Conclusion.Factory conclusionFactory,
 			ElkAxiomVisitor<?> axiomVisitor) {
 		this.conclusionFactory_ = conclusionFactory;
 		this.axiomVisitor_ = axiomVisitor;
-	}
-
-	@Override
-	public O visit(SubClassInclusionTautology inference) {
-		return null;
-	}
-
-	@Override
-	public O visit(SubClassInclusionExpandedSubClassOf inference) {
-		inference.getPremise(conclusionFactory_);
-		inference.getSideCondition(conclusionFactory_);
-		return null;
-	}
-
-	@Override
-	public O visit(SubClassInclusionComposedObjectIntersectionOf inference) {
-		inference.getFirstPremise(conclusionFactory_);
-		inference.getSecondPremise(conclusionFactory_);
-		return null;
-	}
-
-	@Override
-	public O visit(SubClassInclusionDecomposedFirstConjunct inference) {
-		inference.getPremise(conclusionFactory_);
-		return null;
-	}
-
-	@Override
-	public O visit(SubClassInclusionDecomposedSecondConjunct inference) {
-		inference.getPremise(conclusionFactory_);
-		return null;
-	}
-
-	@Override
-	public O visit(SubClassInclusionComposedObjectSomeValuesFrom inference) {
-		inference.getFirstPremise(conclusionFactory_);
-		inference.getSecondPremise(conclusionFactory_);
-		return null;
 	}
 
 	@Override
@@ -148,11 +113,14 @@ public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 	}
 
 	@Override
-	public O visit(ForwardLinkComposition inference) {
-		inference.getFirstPremise(conclusionFactory_);
-		inference.getSecondPremise(conclusionFactory_);
-		inference.getThirdPremise(conclusionFactory_);
-		inference.getFourthPremise(conclusionFactory_);
+	public O visit(BackwardLinkOfObjectHasSelf inference) {
+		inference.getPremise(conclusionFactory_);
+		return null;
+	}
+
+	@Override
+	public O visit(BackwardLinkOfObjectSomeValuesFrom inference) {
+		inference.getPremise(conclusionFactory_);
 		return null;
 	}
 
@@ -167,37 +135,6 @@ public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 		inference.getFirstPremise(conclusionFactory_);
 		inference.getSecondPremise(conclusionFactory_);
 		inference.getSideCondition(conclusionFactory_);
-		return null;
-	}
-
-	@Override
-	public O visit(BackwardLinkOfObjectSomeValuesFrom inference) {
-		inference.getPremise(conclusionFactory_);
-		return null;
-	}
-
-	@Override
-	public O visit(ForwardLinkOfObjectSomeValuesFrom inference) {
-		inference.getPremise(conclusionFactory_);
-		return null;
-	}
-
-	@Override
-	public O visit(BackwardLinkOfObjectHasSelf inference) {
-		inference.getPremise(conclusionFactory_);
-		return null;
-	}
-
-	@Override
-	public O visit(ForwardLinkOfObjectHasSelf inference) {
-		inference.getPremise(conclusionFactory_);
-		return null;
-	}
-
-	@Override
-	public O visit(PropagationGenerated inference) {
-		inference.getFirstPremise(conclusionFactory_);
-		inference.getSecondPremise(conclusionFactory_);
 		return null;
 	}
 
@@ -236,71 +173,13 @@ public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 	}
 
 	@Override
-	public O visit(SubClassInclusionComposedObjectUnionOf inference) {
-		inference.getPremise(conclusionFactory_);
-		return null;
-	}
-
-	@Override
-	public O visit(SubClassInclusionComposedEntity inference) {
-		inference.getPremise(conclusionFactory_);
-		return null;
-	}
-
-	@Override
-	public O visit(SubClassInclusionComposedDefinedClass inference) {
-		inference.getPremise(conclusionFactory_);
-		inference.getSideCondition(conclusionFactory_);
-		return null;
-	}
-
-	@Override
-	public O visit(SubClassInclusionExpandedDefinition inference) {
-		inference.getPremise(conclusionFactory_);
-		inference.getSideCondition(conclusionFactory_);
-		return null;
-	}
-
-	@Override
-	public O visit(SubPropertyChainTautology inference) {
-		// no premises
-		return null;
-	}
-
-	@Override
-	public O visit(SubPropertyChainExpandedSubObjectPropertyOf inference) {
-		inference.getPremise(conclusionFactory_);
-		inference.getSideCondition(conclusionFactory_);
-		return null;
-	}
-
-	@Override
-	public O visit(SubClassInclusionObjectHasSelfPropertyRange inference) {
-		inference.getPremise(conclusionFactory_);
-		// TODO: process the property range premise
-		return null;
-	}
-
-	@Override
-	public O visit(ElkDifferentIndividualsAxiomNaryConversion inference) {
-		axiomVisitor_.visit(inference.getOriginalAxiom());
-		return null;
-	}
-
-	@Override
-	public O visit(ElkDisjointClassesAxiomNaryConversion inference) {
-		axiomVisitor_.visit(inference.getOriginalAxiom());
-		return null;
-	}
-
-	@Override
-	public O visit(ElkDisjointUnionAxiomNaryConversion inference) {
-		axiomVisitor_.visit(inference.getOriginalAxiom());
-		return null;
-	}
-
-	@Override
 	public O visit(ElkClassAssertionAxiomConversion inference) {
+		axiomVisitor_.visit(inference.getOriginalAxiom());
+		return null;
+	}
+
+	@Override
+	public O visit(ElkDeclarationAxiomConversion inference) {
 		axiomVisitor_.visit(inference.getOriginalAxiom());
 		return null;
 	}
@@ -312,13 +191,19 @@ public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 	}
 
 	@Override
+	public O visit(ElkDifferentIndividualsAxiomNaryConversion inference) {
+		axiomVisitor_.visit(inference.getOriginalAxiom());
+		return null;
+	}
+
+	@Override
 	public O visit(ElkDisjointClassesAxiomBinaryConversion inference) {
 		axiomVisitor_.visit(inference.getOriginalAxiom());
 		return null;
 	}
 
 	@Override
-	public O visit(ElkDisjointUnionAxiomSubClassConversion inference) {
+	public O visit(ElkDisjointClassesAxiomNaryConversion inference) {
 		axiomVisitor_.visit(inference.getOriginalAxiom());
 		return null;
 	}
@@ -330,7 +215,37 @@ public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 	}
 
 	@Override
+	public O visit(ElkDisjointUnionAxiomDefinitionConversion inference) {
+		axiomVisitor_.visit(inference.getOriginalAxiom());
+		return null;
+	}
+
+	@Override
+	public O visit(ElkDisjointUnionAxiomNaryConversion inference) {
+		axiomVisitor_.visit(inference.getOriginalAxiom());
+		return null;
+	}
+
+	@Override
+	public O visit(ElkDisjointUnionAxiomSubClassConversion inference) {
+		axiomVisitor_.visit(inference.getOriginalAxiom());
+		return null;
+	}
+
+	@Override
+	public O visit(ElkEquivalentClassesAxiomDefinitionConversion inference) {
+		axiomVisitor_.visit(inference.getOriginalAxiom());
+		return null;
+	}
+
+	@Override
 	public O visit(ElkEquivalentClassesAxiomSubClassConversion inference) {
+		axiomVisitor_.visit(inference.getOriginalAxiom());
+		return null;
+	}
+
+	@Override
+	public O visit(ElkEquivalentObjectPropertiesAxiomConversion inference) {
 		axiomVisitor_.visit(inference.getOriginalAxiom());
 		return null;
 	}
@@ -343,6 +258,12 @@ public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 
 	@Override
 	public O visit(ElkObjectPropertyDomainAxiomConversion inference) {
+		axiomVisitor_.visit(inference.getOriginalAxiom());
+		return null;
+	}
+
+	@Override
+	public O visit(ElkObjectPropertyRangeAxiomConversion inference) {
 		axiomVisitor_.visit(inference.getOriginalAxiom());
 		return null;
 	}
@@ -366,24 +287,6 @@ public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 	}
 
 	@Override
-	public O visit(ElkDisjointUnionAxiomDefinitionConversion inference) {
-		axiomVisitor_.visit(inference.getOriginalAxiom());
-		return null;
-	}
-
-	@Override
-	public O visit(ElkEquivalentClassesAxiomDefinitionConversion inference) {
-		axiomVisitor_.visit(inference.getOriginalAxiom());
-		return null;
-	}
-
-	@Override
-	public O visit(ElkEquivalentObjectPropertiesAxiomConversion inference) {
-		axiomVisitor_.visit(inference.getOriginalAxiom());
-		return null;
-	}
-
-	@Override
 	public O visit(ElkSubObjectPropertyOfAxiomConversion inference) {
 		axiomVisitor_.visit(inference.getOriginalAxiom());
 		return null;
@@ -396,14 +299,133 @@ public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 	}
 
 	@Override
-	public O visit(ElkObjectPropertyRangeAxiomConversion inference) {
-		axiomVisitor_.visit(inference.getOriginalAxiom());
+	public O visit(ForwardLinkComposition inference) {
+		inference.getFirstPremise(conclusionFactory_);
+		inference.getSecondPremise(conclusionFactory_);
+		inference.getThirdPremise(conclusionFactory_);
+		inference.getFourthPremise(conclusionFactory_);
 		return null;
 	}
 
 	@Override
-	public O visit(ElkDeclarationAxiomConversion inference) {
-		axiomVisitor_.visit(inference.getOriginalAxiom());
+	public O visit(ForwardLinkOfObjectHasSelf inference) {
+		inference.getPremise(conclusionFactory_);
+		return null;
+	}
+
+	@Override
+	public O visit(ForwardLinkOfObjectSomeValuesFrom inference) {
+		inference.getPremise(conclusionFactory_);
+		return null;
+	}
+
+	@Override
+	public O visit(PropagationGenerated inference) {
+		inference.getFirstPremise(conclusionFactory_);
+		inference.getSecondPremise(conclusionFactory_);
+		return null;
+	}
+
+	@Override
+	public O visit(PropertyRangeInherited inference) {
+		inference.getPremise(conclusionFactory_);
+		inference.getSideCondition(conclusionFactory_);
+		return null;
+	}
+
+	@Override
+	public O visit(SubClassInclusionComposedDefinedClass inference) {
+		inference.getPremise(conclusionFactory_);
+		inference.getSideCondition(conclusionFactory_);
+		return null;
+	}
+
+	@Override
+	public O visit(SubClassInclusionComposedEntity inference) {
+		inference.getPremise(conclusionFactory_);
+		return null;
+	}
+
+	@Override
+	public O visit(SubClassInclusionComposedObjectIntersectionOf inference) {
+		inference.getFirstPremise(conclusionFactory_);
+		inference.getSecondPremise(conclusionFactory_);
+		return null;
+	}
+
+	@Override
+	public O visit(SubClassInclusionComposedObjectSomeValuesFrom inference) {
+		inference.getFirstPremise(conclusionFactory_);
+		inference.getSecondPremise(conclusionFactory_);
+		return null;
+	}
+
+	@Override
+	public O visit(SubClassInclusionComposedObjectUnionOf inference) {
+		inference.getPremise(conclusionFactory_);
+		return null;
+	}
+
+	@Override
+	public O visit(SubClassInclusionDecomposedFirstConjunct inference) {
+		inference.getPremise(conclusionFactory_);
+		return null;
+	}
+
+	@Override
+	public O visit(SubClassInclusionDecomposedSecondConjunct inference) {
+		inference.getPremise(conclusionFactory_);
+		return null;
+	}
+
+	@Override
+	public O visit(SubClassInclusionExpandedDefinition inference) {
+		inference.getPremise(conclusionFactory_);
+		inference.getSideCondition(conclusionFactory_);
+		return null;
+	}
+
+	@Override
+	public O visit(SubClassInclusionExpandedSubClassOf inference) {
+		inference.getPremise(conclusionFactory_);
+		inference.getSideCondition(conclusionFactory_);
+		return null;
+	}
+
+	@Override
+	public O visit(SubClassInclusionObjectHasSelfPropertyRange inference) {
+		inference.getFirstPremise(conclusionFactory_);
+		inference.getSecondPremise(conclusionFactory_);
+		return null;
+	}
+
+	@Override
+	public O visit(SubClassInclusionOwlThing inference) {
+		// no premises
+		return null;
+	}
+
+	@Override
+	public O visit(SubClassInclusionRange inference) {
+		inference.getPremise(conclusionFactory_);
+		return null;
+	}
+
+	@Override
+	public O visit(SubClassInclusionTautology inference) {
+		return null;
+	}
+
+	@Override
+	public O visit(SubPropertyChainExpandedSubObjectPropertyOf inference) {
+		inference.getPremise(conclusionFactory_);
+		inference.getSideCondition(conclusionFactory_);
+		return null;
+	}
+
+	@Override
+	public O visit(SubPropertyChainTautology inference) {
+		// no premises
 		return null;
 	}
 

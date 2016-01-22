@@ -26,6 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.PropertyRange;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 
 /**
@@ -33,10 +34,16 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
  *
  *         pavel.klinov@uni-ulm.de
  */
-public abstract class AbstractObjectPropertyConclusionVIsitor<O> implements
-		ObjectPropertyConclusion.Visitor<O> {
+public abstract class AbstractObjectPropertyConclusionVisitor<O>
+		implements
+			ObjectPropertyConclusion.Visitor<O> {
 
 	protected abstract O defaultVisit(ObjectPropertyConclusion conclusion);
+
+	@Override
+	public O visit(PropertyRange conclusion) {
+		return defaultVisit(conclusion);
+	}
 
 	@Override
 	public O visit(SubPropertyChain conclusion) {

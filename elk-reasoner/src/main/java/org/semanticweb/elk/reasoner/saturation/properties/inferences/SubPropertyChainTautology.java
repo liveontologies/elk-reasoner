@@ -47,27 +47,6 @@ public class SubPropertyChainTautology extends AbstractSubPropertyChainInference
 	}
 
 	@Override
-	public String toString() {
-		return "Init sub-chain: " + getSubChain() + " => " + getSuperChain();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof SubPropertyChainTautology)) {
-			return false;
-		}
-
-		SubPropertyChainTautology inf = (SubPropertyChainTautology) obj;
-
-		return getChain().equals(inf.getChain());
-	}
-
-	@Override
-	public int hashCode() {
-		return getChain().hashCode();
-	}
-
-	@Override
 	public final <O> O accept(SubPropertyChainInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

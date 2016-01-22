@@ -15,6 +15,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsume
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.PropertyRange;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
@@ -45,21 +46,26 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
 
 public class DummyConclusionVisitor<O> implements Conclusion.Visitor<O> {
 
+	protected O defaultVisit(ClassConclusion conclusion) {
+		return defaultVisit((SaturationConclusion) conclusion);
+	}
+
 	protected O defaultVisit(
 			@SuppressWarnings("unused") Conclusion conclusion) {
 		return null;
 	}
 
-	protected O defaultVisit(ClassConclusion conclusion) {
+	protected O defaultVisit(IndexedAxiom conclusion) {
 		return defaultVisit((SaturationConclusion) conclusion);
 	}
 
 	protected O defaultVisit(ObjectPropertyConclusion conclusion) {
 		return defaultVisit((SaturationConclusion) conclusion);
 	}
-	
-	protected O defaultVisit(IndexedAxiom conclusion) {
-		return defaultVisit((SaturationConclusion) conclusion);
+
+	@Override
+	public O visit(BackwardLink conclusion) {
+		return defaultVisit(conclusion);
 	}
 
 	@Override
@@ -78,22 +84,47 @@ public class DummyConclusionVisitor<O> implements Conclusion.Visitor<O> {
 	}
 
 	@Override
-	public O visit(SubContextInitialization conclusion) {
-		return defaultVisit(conclusion);
-	}
-
-	@Override
 	public O visit(ForwardLink conclusion) {
 		return defaultVisit(conclusion);
 	}
 
 	@Override
-	public O visit(BackwardLink conclusion) {
-		return defaultVisit(conclusion);
+	public O visit(IndexedDeclarationAxiom axiom) {
+		return defaultVisit(axiom);
+	}
+
+	@Override
+	public O visit(IndexedDefinitionAxiom axiom) {
+		return defaultVisit(axiom);
+	}
+
+	@Override
+	public O visit(IndexedDisjointClassesAxiom axiom) {
+		return defaultVisit(axiom);
+	}
+
+	@Override
+	public O visit(IndexedObjectPropertyRangeAxiom axiom) {
+		return defaultVisit(axiom);
+	}
+
+	@Override
+	public O visit(IndexedSubClassOfAxiom axiom) {
+		return defaultVisit(axiom);
+	}
+
+	@Override
+	public O visit(IndexedSubObjectPropertyOfAxiom axiom) {
+		return defaultVisit(axiom);
 	}
 
 	@Override
 	public O visit(Propagation conclusion) {
+		return defaultVisit(conclusion);
+	}
+
+	@Override
+	public O visit(PropertyRange conclusion) {
 		return defaultVisit(conclusion);
 	}
 
@@ -108,38 +139,13 @@ public class DummyConclusionVisitor<O> implements Conclusion.Visitor<O> {
 	}
 
 	@Override
-	public O visit(SubPropertyChain conclusion) {
+	public O visit(SubContextInitialization conclusion) {
 		return defaultVisit(conclusion);
 	}
 
 	@Override
-	public O visit(IndexedDisjointClassesAxiom axiom) {
-		return defaultVisit(axiom);
-	}
-
-	@Override
-	public O visit(IndexedSubClassOfAxiom axiom) {
-		return defaultVisit(axiom);
-	}
-
-	@Override
-	public O visit(IndexedDefinitionAxiom axiom) {
-		return defaultVisit(axiom);
-	}
-
-	@Override
-	public O visit(IndexedSubObjectPropertyOfAxiom axiom) {
-		return defaultVisit(axiom);
-	}
-
-	@Override
-	public O visit(IndexedObjectPropertyRangeAxiom axiom) {
-		return defaultVisit(axiom);
-	}
-
-	@Override
-	public O visit(IndexedDeclarationAxiom axiom) {
-		return defaultVisit(axiom);
+	public O visit(SubPropertyChain conclusion) {
+		return defaultVisit(conclusion);
 	}
 
 }

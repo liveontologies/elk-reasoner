@@ -105,7 +105,7 @@ public class PropertyHierarchyCompositionComputationFactory extends
 			SubPropertyExplorer.getSubPropertyChains(element,
 					inferenceProducer_);
 			// ensure that property ranges are computed
-			RangeExplorer.getRanges(element);// TODO: tracing
+			RangeExplorer.getRanges(element, inferenceProducer_);
 			// TODO: verify that global restrictions on range axioms are
 			// satisfied:
 			// http://www.w3.org/TR/owl2-profiles/#Global_Restrictions

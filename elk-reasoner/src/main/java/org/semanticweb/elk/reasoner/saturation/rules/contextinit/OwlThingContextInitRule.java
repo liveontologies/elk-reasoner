@@ -23,12 +23,11 @@ package org.semanticweb.elk.reasoner.saturation.rules.contextinit;
  */
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionTautology;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionOwlThing;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
@@ -50,13 +49,13 @@ public class OwlThingContextInitRule extends AbstractChainableContextInitRule {
 
 	public static final String NAME = "owl:Thing Introduction";
 
-	private IndexedClassExpression owlThing_;
+	private IndexedClass owlThing_;
 
 	private OwlThingContextInitRule(ChainableContextInitRule tail) {
 		super(tail);
 	}
 
-	private OwlThingContextInitRule(IndexedClassExpression owlThing) {
+	private OwlThingContextInitRule(IndexedClass owlThing) {
 		super(null);
 		this.owlThing_ = owlThing;
 	}
@@ -104,7 +103,7 @@ public class OwlThingContextInitRule extends AbstractChainableContextInitRule {
 			ClassConclusionProducer producer) {
 		// producer.produce(premises.getRoot(), new
 		// DecomposedSubsumer(owlThing_));
-		producer.produce(new SubClassInclusionTautology(premises.getRoot(),
+		producer.produce(new SubClassInclusionOwlThing(premises.getRoot(),
 				owlThing_));
 	}
 

@@ -1,4 +1,6 @@
-package org.semanticweb.elk.reasoner.saturation.inferences;
+package org.semanticweb.elk.reasoner.saturation.properties.inferences;
+
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.PropertyRange;
 
 /*
  * #%L
@@ -22,13 +24,10 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
-
-public interface SubClassInclusionDecomposedInference
+public interface PropertyRangeInference
 		extends
-			SubClassInclusionDecomposed,
-			SubClassInclusionInference<IndexedClassExpression> {
+			PropertyRange,
+			ObjectPropertyInference {
 
 	public <O> O accept(Visitor<O> visitor);
 
@@ -40,14 +39,7 @@ public interface SubClassInclusionDecomposedInference
 	 */
 	public static interface Visitor<O>
 			extends
-				SubClassInclusionDecomposedFirstConjunct.Visitor<O>,
-				SubClassInclusionDecomposedSecondConjunct.Visitor<O>,
-				SubClassInclusionExpandedDefinition.Visitor<O>,
-				SubClassInclusionExpandedSubClassOf.Visitor<O>,
-				SubClassInclusionObjectHasSelfPropertyRange.Visitor<O>,
-				SubClassInclusionOwlThing.Visitor<O>,
-				SubClassInclusionRange.Visitor<O>,
-				SubClassInclusionTautology.Visitor<O> {
+				PropertyRangeInherited.Visitor<O> {
 
 		// combined interface
 

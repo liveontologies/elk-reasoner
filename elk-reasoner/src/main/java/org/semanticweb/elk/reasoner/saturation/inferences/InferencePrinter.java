@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.PropertyRangeInherited;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainExpandedSubObjectPropertyOf;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainTautology;
 
@@ -48,51 +49,14 @@ public class InferencePrinter
 	private static InferencePrinter DEFAULT_PRINTER_ = new InferencePrinter(
 			new SaturationConclusionBaseFactory());
 
-	private final SaturationConclusion.Factory factory_;
-
-	public InferencePrinter(SaturationConclusion.Factory factory) {
-		this.factory_ = factory;
-	}
-
 	public static String print(ClassInference conclusion) {
 		return conclusion.accept(DEFAULT_PRINTER_);
 	}
 
-	@Override
-	public String visit(SubClassInclusionTautology conclusion) {
-		return "Root Initialization";
-	}
+	private final SaturationConclusion.Factory factory_;
 
-	@Override
-	public String visit(SubClassInclusionExpandedSubClassOf conclusion) {
-		return "SubClassOf( " + conclusion.getPremise(factory_) + " "
-				+ conclusion.getSuperExpression() + " )";
-	}
-
-	@Override
-	public String visit(SubClassInclusionComposedObjectIntersectionOf conclusion) {
-		return "Conjuncting " + conclusion.getFirstPremise(factory_) + " and "
-				+ conclusion.getSecondPremise(factory_);
-
-	}
-
-	@Override
-	public String visit(SubClassInclusionDecomposedFirstConjunct conclusion) {
-		return "Decomposing " + conclusion.getPremise(factory_);
-
-	}
-
-	@Override
-	public String visit(SubClassInclusionDecomposedSecondConjunct conclusion) {
-		return "Decomposing " + conclusion.getPremise(factory_);
-
-	}
-
-	@Override
-	public String visit(SubClassInclusionComposedObjectSomeValuesFrom conclusion) {
-		return "Existential inference from "
-				+ conclusion.getSecondPremise(factory_) + " and "
-				+ conclusion.getFirstPremise(factory_);
+	public InferencePrinter(SaturationConclusion.Factory factory) {
+		this.factory_ = factory;
 	}
 
 	@Override
@@ -103,10 +67,13 @@ public class InferencePrinter
 	}
 
 	@Override
-	public String visit(ForwardLinkComposition conclusion) {
-		BackwardLink bwLink = conclusion.getFirstPremise(factory_);
-		ForwardLink fwLink = conclusion.getThirdPremise(factory_);
-		return "Composed forward link from " + bwLink + " and " + fwLink;
+	public String visit(BackwardLinkOfObjectHasSelf conclusion) {
+		return "Creating forward link from " + conclusion.getPremise(factory_);
+	}
+
+	@Override
+	public String visit(BackwardLinkOfObjectSomeValuesFrom conclusion) {
+		return "Creating backward link from " + conclusion.getPremise(factory_);
 	}
 
 	@Override
@@ -122,40 +89,15 @@ public class InferencePrinter
 	}
 
 	@Override
-	public String visit(BackwardLinkOfObjectSomeValuesFrom conclusion) {
-		return "Creating backward link from " + conclusion.getPremise(factory_);
-	}
-
-	@Override
-	public String visit(BackwardLinkOfObjectHasSelf conclusion) {
-		return "Creating forward link from " + conclusion.getPremise(factory_);
-	}
-
-	@Override
-	public String visit(ForwardLinkOfObjectSomeValuesFrom conclusion) {
-		return "Creating forward link from " + conclusion.getPremise(factory_);
-	}
-
-	@Override
-	public String visit(ForwardLinkOfObjectHasSelf conclusion) {
-		return "Creating forward link from " + conclusion.getPremise(factory_);
-	}
-
-	@Override
-	public String visit(PropagationGenerated conclusion) {
-		return "Creating propagation from "
-				+ conclusion.getFirstPremise(factory_);
-	}
-
-	@Override
 	public String visit(ContradictionOfDisjointSubsumers conclusion) {
 		return conclusion.toString();
 	}
 
 	@Override
 	public String visit(ContradictionOfObjectComplementOf conclusion) {
-		return "Contradiction due to derived " + conclusion.getFirstPremise(factory_)
-				+ " and " + conclusion.getSecondPremise(factory_);
+		return "Contradiction due to derived "
+				+ conclusion.getFirstPremise(factory_) + " and "
+				+ conclusion.getSecondPremise(factory_);
 	}
 
 	@Override
@@ -176,27 +118,40 @@ public class InferencePrinter
 	}
 
 	@Override
-	public String visit(SubClassInclusionComposedObjectUnionOf conclusion) {
-		return "Composed disjunction " + conclusion.getSuperExpression() + " from "
-				+ conclusion.getPremise(factory_);
+	public String visit(ForwardLinkComposition conclusion) {
+		BackwardLink bwLink = conclusion.getFirstPremise(factory_);
+		ForwardLink fwLink = conclusion.getThirdPremise(factory_);
+		return "Composed forward link from " + bwLink + " and " + fwLink;
 	}
 
 	@Override
-	public String visit(SubPropertyChainTautology inference) {
-		return "Initialization (" + inference.getChain() + " => "
-				+ inference.getSuperChain() + ")";
+	public String visit(ForwardLinkOfObjectHasSelf conclusion) {
+		return "Creating forward link from " + conclusion.getPremise(factory_);
 	}
 
 	@Override
-	public String visit(SubPropertyChainExpandedSubObjectPropertyOf inference) {
-		return "Told sub-chain: " + inference.getSubChain() + " => "
-				+ inference.getSuperChain() + ", premise: "
-				+ inference.getPremise(factory_);
+	public String visit(ForwardLinkOfObjectSomeValuesFrom conclusion) {
+		return "Creating forward link from " + conclusion.getPremise(factory_);
 	}
 
 	@Override
-	public String visit(SubClassInclusionObjectHasSelfPropertyRange inference) {
-		return "Property range of " + inference.getPremise(factory_);
+	public String visit(PropagationGenerated conclusion) {
+		return "Creating propagation from "
+				+ conclusion.getFirstPremise(factory_);
+	}
+
+	@Override
+	public String visit(PropertyRangeInherited inference) {
+		return "Property Range Inherited (" + inference.getProperty() + " : "
+				+ inference.getRange() + ", premise: "
+				+ inference.getPremise(factory_) + ", reason: "
+				+ inference.getReason();
+	}
+
+	@Override
+	public String visit(SubClassInclusionComposedDefinedClass inference) {
+		return "Composed definition " + inference.getSuperExpression()
+				+ " from " + inference.getPremise(factory_);
 	}
 
 	@Override
@@ -205,15 +160,85 @@ public class InferencePrinter
 	}
 
 	@Override
-	public String visit(SubClassInclusionComposedDefinedClass inference) {
-		return "Composed definition " + inference.getSuperExpression() + " from "
-				+ inference.getPremise(factory_);
+	public String visit(
+			SubClassInclusionComposedObjectIntersectionOf conclusion) {
+		return "Conjuncting " + conclusion.getFirstPremise(factory_) + " and "
+				+ conclusion.getSecondPremise(factory_);
+
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionComposedObjectSomeValuesFrom conclusion) {
+		return "Existential inference from "
+				+ conclusion.getSecondPremise(factory_) + " and "
+				+ conclusion.getFirstPremise(factory_);
+	}
+
+	@Override
+	public String visit(SubClassInclusionComposedObjectUnionOf conclusion) {
+		return "Composed disjunction " + conclusion.getSuperExpression()
+				+ " from " + conclusion.getPremise(factory_);
+	}
+
+	@Override
+	public String visit(SubClassInclusionDecomposedFirstConjunct conclusion) {
+		return "Decomposing " + conclusion.getPremise(factory_);
+
+	}
+
+	@Override
+	public String visit(SubClassInclusionDecomposedSecondConjunct conclusion) {
+		return "Decomposing " + conclusion.getPremise(factory_);
+
 	}
 
 	@Override
 	public String visit(SubClassInclusionExpandedDefinition inference) {
-		return "Decomposed definition " + inference.getSuperExpression() + " of "
-				+ inference.getPremise(factory_);
+		return "Decomposed definition " + inference.getSuperExpression()
+				+ " of " + inference.getPremise(factory_);
+	}
+
+	@Override
+	public String visit(SubClassInclusionExpandedSubClassOf inference) {
+		return "SubClassOf( " + inference.getPremise(factory_) + " "
+				+ inference.getSuperExpression() + " )";
+	}
+
+	@Override
+	public String visit(SubClassInclusionObjectHasSelfPropertyRange inference) {
+		return "Property range of " + inference.getFirstPremise(factory_);
+	}
+
+	@Override
+	public String visit(SubClassInclusionOwlThing inference) {
+		return "SubClassOf( " + inference.getConclusionRoot() + " "
+				+ inference.getSuperExpression() + " ) [owl:Thing]";
+	}
+
+	@Override
+	public String visit(SubClassInclusionRange inference) {
+		return "SubClassOf( " + inference.getConclusionRoot() + " "
+				+ inference.getSuperExpression() + " ) [PropertyRange]";
+	}
+
+	@Override
+	public String visit(SubClassInclusionTautology conclusion) {
+		return "Root Initialization";
+	}
+
+	@Override
+	public String visit(SubPropertyChainExpandedSubObjectPropertyOf inference) {
+		return "Expanded sub-chain: " + inference.getSubChain() + " => "
+				+ inference.getSuperChain() + ", premise: "
+				+ inference.getPremise(factory_) + ", reason: "
+				+ inference.getReason();
+	}
+
+	@Override
+	public String visit(SubPropertyChainTautology inference) {
+		return "Initialization (" + inference.getChain() + " => "
+				+ inference.getSuperChain() + ")";
 	}
 
 }

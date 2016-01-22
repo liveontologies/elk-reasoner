@@ -37,6 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.PropertyRange;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
@@ -44,28 +45,28 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
 
 public class ConclusionEquality implements Conclusion.Visitor<Conclusion> {
 
-	private final Object object_;
-
-	private ConclusionEquality(Object object) {
-		this.object_ = object;
-	}
-
 	public static boolean equals(Conclusion first, Object second) {
 		return first == null
 				? second == null
 				: first.accept(new ConclusionEquality(second)) == second;
 	}
 
-	private static boolean equals(IndexedObject first, IndexedObject second) {
-		return first == second;
-	}
-
 	private static boolean equals(ElkObject first, ElkObject second) {
 		return (ElkObjectEquality.equals(first, second));
 	}
 
+	private static boolean equals(IndexedObject first, IndexedObject second) {
+		return first == second;
+	}
+
 	private static boolean equals(int first, int second) {
 		return first == second;
+	}
+
+	private final Object object_;
+
+	private ConclusionEquality(Object object) {
+		this.object_ = object;
 	}
 
 	@Override
@@ -80,54 +81,6 @@ public class ConclusionEquality implements Conclusion.Visitor<Conclusion> {
 							subConclusion.getConclusionSubRoot())
 					&& equals(result.getOriginRoot(),
 							subConclusion.getOriginRoot()))
-				return result;
-		}
-		return null;
-	}
-
-	@Override
-	public Propagation visit(Propagation subConclusion) {
-		if (object_ == subConclusion)
-			return subConclusion;
-		if (object_ instanceof Propagation) {
-			Propagation result = (Propagation) object_;
-			if (equals(result.getConclusionRoot(),
-					subConclusion.getConclusionRoot())
-					&& equals(result.getConclusionSubRoot(),
-							subConclusion.getConclusionSubRoot())
-					&& equals(result.getCarry(), subConclusion.getCarry()))
-				return result;
-		}
-		return null;
-	}
-
-	@Override
-	public SubContextInitialization visit(
-			SubContextInitialization subConclusion) {
-		if (object_ == subConclusion)
-			return subConclusion;
-		if (object_ instanceof SubContextInitialization) {
-			SubContextInitialization result = (SubContextInitialization) object_;
-			if (equals(result.getConclusionRoot(),
-					subConclusion.getConclusionRoot())
-					&& equals(result.getConclusionSubRoot(),
-							subConclusion.getConclusionSubRoot()))
-				return result;
-		}
-		return null;
-	}
-
-	@Override
-	public SubClassInclusionComposed visit(
-			SubClassInclusionComposed conclusion) {
-		if (object_ == conclusion)
-			return conclusion;
-		if (object_ instanceof SubClassInclusionComposed) {
-			SubClassInclusionComposed result = (SubClassInclusionComposed) object_;
-			if (equals(result.getConclusionRoot(),
-					conclusion.getConclusionRoot())
-					&& equals(result.getSuperExpression(),
-							conclusion.getSuperExpression()))
 				return result;
 		}
 		return null;
@@ -154,22 +107,6 @@ public class ConclusionEquality implements Conclusion.Visitor<Conclusion> {
 			Contradiction result = (Contradiction) object_;
 			if (equals(result.getConclusionRoot(),
 					conclusion.getConclusionRoot()))
-				return result;
-		}
-		return null;
-	}
-
-	@Override
-	public SubClassInclusionDecomposed visit(
-			SubClassInclusionDecomposed conclusion) {
-		if (object_ == conclusion)
-			return conclusion;
-		if (object_ instanceof SubClassInclusionDecomposed) {
-			SubClassInclusionDecomposed result = (SubClassInclusionDecomposed) object_;
-			if (equals(result.getConclusionRoot(),
-					conclusion.getConclusionRoot())
-					&& equals(result.getSuperExpression(),
-							conclusion.getSuperExpression()))
 				return result;
 		}
 		return null;
@@ -209,14 +146,26 @@ public class ConclusionEquality implements Conclusion.Visitor<Conclusion> {
 	}
 
 	@Override
-	public SubPropertyChain visit(SubPropertyChain conclusion) {
+	public IndexedDeclarationAxiom visit(IndexedDeclarationAxiom conclusion) {
 		if (object_ == conclusion)
 			return conclusion;
-		if (object_ instanceof SubPropertyChain) {
-			SubPropertyChain result = (SubPropertyChain) object_;
-			if (equals(result.getSubChain(), conclusion.getSubChain())
-					&& equals(result.getSuperChain(),
-							conclusion.getSuperChain()))
+		if (object_ instanceof IndexedDeclarationAxiom) {
+			IndexedDeclarationAxiom result = (IndexedDeclarationAxiom) object_;
+			if (equals(result.getEntity(), conclusion.getEntity()))
+				return result;
+		}
+		return null;
+	}
+
+	@Override
+	public IndexedDefinitionAxiom visit(IndexedDefinitionAxiom conclusion) {
+		if (object_ == conclusion)
+			return conclusion;
+		if (object_ instanceof IndexedDefinitionAxiom) {
+			IndexedDefinitionAxiom result = (IndexedDefinitionAxiom) object_;
+			if (equals(result.getDefinedClass(), conclusion.getDefinedClass())
+					&& equals(result.getDefinition(),
+							conclusion.getDefinition()))
 				return result;
 		}
 		return null;
@@ -236,6 +185,20 @@ public class ConclusionEquality implements Conclusion.Visitor<Conclusion> {
 	}
 
 	@Override
+	public IndexedObjectPropertyRangeAxiom visit(
+			IndexedObjectPropertyRangeAxiom conclusion) {
+		if (object_ == conclusion)
+			return conclusion;
+		if (object_ instanceof IndexedObjectPropertyRangeAxiom) {
+			IndexedObjectPropertyRangeAxiom result = (IndexedObjectPropertyRangeAxiom) object_;
+			if (equals(result.getProperty(), conclusion.getProperty())
+					&& equals(result.getRange(), conclusion.getRange()))
+				return result;
+		}
+		return null;
+	}
+
+	@Override
 	public IndexedSubClassOfAxiom visit(IndexedSubClassOfAxiom conclusion) {
 		if (object_ == conclusion)
 			return conclusion;
@@ -244,20 +207,6 @@ public class ConclusionEquality implements Conclusion.Visitor<Conclusion> {
 			if (equals(result.getSubClass(), conclusion.getSubClass())
 					&& equals(result.getSuperClass(),
 							conclusion.getSuperClass()))
-				return result;
-		}
-		return null;
-	}
-
-	@Override
-	public IndexedDefinitionAxiom visit(IndexedDefinitionAxiom conclusion) {
-		if (object_ == conclusion)
-			return conclusion;
-		if (object_ instanceof IndexedDefinitionAxiom) {
-			IndexedDefinitionAxiom result = (IndexedDefinitionAxiom) object_;
-			if (equals(result.getDefinedClass(), conclusion.getDefinedClass())
-					&& equals(result.getDefinition(),
-							conclusion.getDefinition()))
 				return result;
 		}
 		return null;
@@ -280,12 +229,27 @@ public class ConclusionEquality implements Conclusion.Visitor<Conclusion> {
 	}
 
 	@Override
-	public IndexedObjectPropertyRangeAxiom visit(
-			IndexedObjectPropertyRangeAxiom conclusion) {
+	public Propagation visit(Propagation subConclusion) {
+		if (object_ == subConclusion)
+			return subConclusion;
+		if (object_ instanceof Propagation) {
+			Propagation result = (Propagation) object_;
+			if (equals(result.getConclusionRoot(),
+					subConclusion.getConclusionRoot())
+					&& equals(result.getConclusionSubRoot(),
+							subConclusion.getConclusionSubRoot())
+					&& equals(result.getCarry(), subConclusion.getCarry()))
+				return result;
+		}
+		return null;
+	}
+
+	@Override
+	public Conclusion visit(PropertyRange conclusion) {
 		if (object_ == conclusion)
 			return conclusion;
-		if (object_ instanceof IndexedObjectPropertyRangeAxiom) {
-			IndexedObjectPropertyRangeAxiom result = (IndexedObjectPropertyRangeAxiom) object_;
+		if (object_ instanceof PropertyRange) {
+			PropertyRange result = (PropertyRange) object_;
 			if (equals(result.getProperty(), conclusion.getProperty())
 					&& equals(result.getRange(), conclusion.getRange()))
 				return result;
@@ -294,12 +258,62 @@ public class ConclusionEquality implements Conclusion.Visitor<Conclusion> {
 	}
 
 	@Override
-	public IndexedDeclarationAxiom visit(IndexedDeclarationAxiom conclusion) {
+	public SubClassInclusionComposed visit(
+			SubClassInclusionComposed conclusion) {
 		if (object_ == conclusion)
 			return conclusion;
-		if (object_ instanceof IndexedDeclarationAxiom) {
-			IndexedDeclarationAxiom result = (IndexedDeclarationAxiom) object_;
-			if (equals(result.getEntity(), conclusion.getEntity()))
+		if (object_ instanceof SubClassInclusionComposed) {
+			SubClassInclusionComposed result = (SubClassInclusionComposed) object_;
+			if (equals(result.getConclusionRoot(),
+					conclusion.getConclusionRoot())
+					&& equals(result.getSuperExpression(),
+							conclusion.getSuperExpression()))
+				return result;
+		}
+		return null;
+	}
+
+	@Override
+	public SubClassInclusionDecomposed visit(
+			SubClassInclusionDecomposed conclusion) {
+		if (object_ == conclusion)
+			return conclusion;
+		if (object_ instanceof SubClassInclusionDecomposed) {
+			SubClassInclusionDecomposed result = (SubClassInclusionDecomposed) object_;
+			if (equals(result.getConclusionRoot(),
+					conclusion.getConclusionRoot())
+					&& equals(result.getSuperExpression(),
+							conclusion.getSuperExpression()))
+				return result;
+		}
+		return null;
+	}
+
+	@Override
+	public SubContextInitialization visit(
+			SubContextInitialization subConclusion) {
+		if (object_ == subConclusion)
+			return subConclusion;
+		if (object_ instanceof SubContextInitialization) {
+			SubContextInitialization result = (SubContextInitialization) object_;
+			if (equals(result.getConclusionRoot(),
+					subConclusion.getConclusionRoot())
+					&& equals(result.getConclusionSubRoot(),
+							subConclusion.getConclusionSubRoot()))
+				return result;
+		}
+		return null;
+	}
+
+	@Override
+	public SubPropertyChain visit(SubPropertyChain conclusion) {
+		if (object_ == conclusion)
+			return conclusion;
+		if (object_ instanceof SubPropertyChain) {
+			SubPropertyChain result = (SubPropertyChain) object_;
+			if (equals(result.getSubChain(), conclusion.getSubChain())
+					&& equals(result.getSuperChain(),
+							conclusion.getSuperChain()))
 				return result;
 		}
 		return null;

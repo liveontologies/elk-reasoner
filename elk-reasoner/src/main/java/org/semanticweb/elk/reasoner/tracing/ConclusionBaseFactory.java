@@ -47,6 +47,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.PropertyRange;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
@@ -55,9 +56,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
 
 public class ConclusionBaseFactory implements Conclusion.Factory {
 
-	private final SaturationConclusion.Factory saturationConclusionFactory_ = new SaturationConclusionBaseFactory();
-
 	private final IndexedAxiom.Factory indexedAxiomFactory_ = new IndexedAxiomBaseFactory();
+
+	private final SaturationConclusion.Factory saturationConclusionFactory_ = new SaturationConclusionBaseFactory();
 
 	@SuppressWarnings("static-method")
 	protected <C extends Conclusion> C filter(C newConclusion) {
@@ -66,15 +67,97 @@ public class ConclusionBaseFactory implements Conclusion.Factory {
 	}
 
 	@Override
+	public BackwardLink getBackwardLink(IndexedContextRoot root,
+			IndexedObjectProperty relation, IndexedContextRoot source) {
+		return filter(saturationConclusionFactory_.getBackwardLink(root,
+				relation, source));
+	}
+
+	@Override
+	public ContextInitialization getContextInitialization(
+			IndexedContextRoot root, OntologyIndex ontologyIndex) {
+		return filter(saturationConclusionFactory_
+				.getContextInitialization(root, ontologyIndex));
+	}
+
+	@Override
 	public Contradiction getContradiction(IndexedContextRoot root) {
 		return filter(saturationConclusionFactory_.getContradiction(root));
 	}
 
 	@Override
-	public SubPropertyChain getSubPropertyChain(IndexedPropertyChain subChain,
-			IndexedPropertyChain superChain) {
-		return filter(saturationConclusionFactory_.getSubPropertyChain(subChain,
-				superChain));
+	public DisjointSubsumer getDisjointSubsumer(IndexedContextRoot root,
+			IndexedClassExpressionList disjointExpressions, int position,
+			ElkAxiom reason) {
+		return filter(saturationConclusionFactory_.getDisjointSubsumer(root,
+				disjointExpressions, position, reason));
+	}
+
+	@Override
+	public ForwardLink getForwardLink(IndexedContextRoot root,
+			IndexedPropertyChain forwardChain, IndexedContextRoot target) {
+		return filter(saturationConclusionFactory_.getForwardLink(root,
+				forwardChain, target));
+	}
+
+	@Override
+	public IndexedDeclarationAxiom getIndexedDeclarationAxiom(
+			ElkAxiom originalAxiom, IndexedEntity entity) {
+		return filter(indexedAxiomFactory_
+				.getIndexedDeclarationAxiom(originalAxiom, entity));
+	}
+
+	@Override
+	public IndexedDefinitionAxiom getIndexedDefinitionAxiom(
+			ElkAxiom originalAxiom, IndexedClass definedClass,
+			IndexedClassExpression definition) {
+		return filter(indexedAxiomFactory_.getIndexedDefinitionAxiom(
+				originalAxiom, definedClass, definition));
+	}
+
+	@Override
+	public IndexedDisjointClassesAxiom getIndexedDisjointClassesAxiom(
+			ElkAxiom originalAxiom, IndexedClassExpressionList members) {
+		return filter(indexedAxiomFactory_
+				.getIndexedDisjointClassesAxiom(originalAxiom, members));
+	}
+
+	@Override
+	public IndexedObjectPropertyRangeAxiom getIndexedObjectPropertyRangeAxiom(
+			ElkAxiom originalAxiom, IndexedObjectProperty property,
+			IndexedClassExpression range) {
+		return filter(indexedAxiomFactory_.getIndexedObjectPropertyRangeAxiom(
+				originalAxiom, property, range));
+	}
+
+	@Override
+	public IndexedSubClassOfAxiom getIndexedSubClassOfAxiom(
+			ElkAxiom originalAxiom, IndexedClassExpression subClass,
+			IndexedClassExpression superClass) {
+		return filter(indexedAxiomFactory_.getIndexedSubClassOfAxiom(
+				originalAxiom, subClass, superClass));
+	}
+
+	@Override
+	public IndexedSubObjectPropertyOfAxiom getIndexedSubObjectPropertyOfAxiom(
+			ElkAxiom originalAxiom, IndexedPropertyChain subPropertyChain,
+			IndexedObjectProperty superProperty) {
+		return filter(indexedAxiomFactory_.getIndexedSubObjectPropertyOfAxiom(
+				originalAxiom, subPropertyChain, superProperty));
+	}
+
+	@Override
+	public Propagation getPropagation(IndexedContextRoot root,
+			IndexedObjectProperty relation, IndexedObjectSomeValuesFrom carry) {
+		return filter(saturationConclusionFactory_.getPropagation(root,
+				relation, carry));
+	}
+
+	@Override
+	public PropertyRange getPropertyRange(IndexedObjectProperty property,
+			IndexedClassExpression range) {
+		return filter(
+				saturationConclusionFactory_.getPropertyRange(property, range));
 	}
 
 	@Override
@@ -102,85 +185,10 @@ public class ConclusionBaseFactory implements Conclusion.Factory {
 	}
 
 	@Override
-	public ContextInitialization getContextInitialization(
-			IndexedContextRoot root, OntologyIndex ontologyIndex) {
-		return filter(saturationConclusionFactory_
-				.getContextInitialization(root, ontologyIndex));
-	}
-
-	@Override
-	public ForwardLink getForwardLink(IndexedContextRoot root,
-			IndexedPropertyChain forwardChain, IndexedContextRoot target) {
-		return filter(saturationConclusionFactory_.getForwardLink(root,
-				forwardChain, target));
-	}
-
-	@Override
-	public DisjointSubsumer getDisjointSubsumer(IndexedContextRoot root,
-			IndexedClassExpressionList disjointExpressions, int position,
-			ElkAxiom reason) {
-		return filter(saturationConclusionFactory_.getDisjointSubsumer(root,
-				disjointExpressions, position, reason));
-	}
-
-	@Override
-	public Propagation getPropagation(IndexedContextRoot root,
-			IndexedObjectProperty relation, IndexedObjectSomeValuesFrom carry) {
-		return filter(saturationConclusionFactory_.getPropagation(root,
-				relation, carry));
-	}
-
-	@Override
-	public BackwardLink getBackwardLink(IndexedContextRoot root,
-			IndexedObjectProperty relation, IndexedContextRoot source) {
-		return filter(saturationConclusionFactory_.getBackwardLink(root,
-				relation, source));
-	}
-
-	@Override
-	public IndexedDefinitionAxiom getIndexedDefinitionAxiom(
-			ElkAxiom originalAxiom, IndexedClass definedClass,
-			IndexedClassExpression definition) {
-		return filter(indexedAxiomFactory_.getIndexedDefinitionAxiom(
-				originalAxiom, definedClass, definition));
-	}
-
-	@Override
-	public IndexedDeclarationAxiom getIndexedDeclarationAxiom(
-			ElkAxiom originalAxiom, IndexedEntity entity) {
-		return filter(indexedAxiomFactory_
-				.getIndexedDeclarationAxiom(originalAxiom, entity));
-	}
-
-	@Override
-	public IndexedDisjointClassesAxiom getIndexedDisjointClassesAxiom(
-			ElkAxiom originalAxiom, IndexedClassExpressionList members) {
-		return filter(indexedAxiomFactory_
-				.getIndexedDisjointClassesAxiom(originalAxiom, members));
-	}
-
-	@Override
-	public IndexedSubClassOfAxiom getIndexedSubClassOfAxiom(
-			ElkAxiom originalAxiom, IndexedClassExpression subClass,
-			IndexedClassExpression superClass) {
-		return filter(indexedAxiomFactory_.getIndexedSubClassOfAxiom(
-				originalAxiom, subClass, superClass));
-	}
-
-	@Override
-	public IndexedObjectPropertyRangeAxiom getIndexedObjectPropertyRangeAxiom(
-			ElkAxiom originalAxiom, IndexedObjectProperty property,
-			IndexedClassExpression range) {
-		return filter(indexedAxiomFactory_.getIndexedObjectPropertyRangeAxiom(
-				originalAxiom, property, range));
-	}
-
-	@Override
-	public IndexedSubObjectPropertyOfAxiom getIndexedSubObjectPropertyOfAxiom(
-			ElkAxiom originalAxiom, IndexedPropertyChain subPropertyChain,
-			IndexedObjectProperty superProperty) {
-		return filter(indexedAxiomFactory_.getIndexedSubObjectPropertyOfAxiom(
-				originalAxiom, subPropertyChain, superProperty));
+	public SubPropertyChain getSubPropertyChain(IndexedPropertyChain subChain,
+			IndexedPropertyChain superChain) {
+		return filter(saturationConclusionFactory_.getSubPropertyChain(subChain,
+				superChain));
 	}
 
 }

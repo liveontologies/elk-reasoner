@@ -32,134 +32,145 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public abstract class AbstractClassInferenceVisitor<O> implements
-		ClassInference.Visitor<O> {
+public abstract class AbstractClassInferenceVisitor<O>
+		implements
+			ClassInference.Visitor<O> {
 
-	protected abstract O defaultTracedVisit(ClassInference conclusion);
+	protected abstract O defaultTracedVisit(ClassInference inference);
 
 	@Override
-	public O visit(BackwardLinkComposition conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(BackwardLinkComposition inference) {
+		return defaultTracedVisit(inference);
 	}
 
 	@Override
-	public O visit(SubClassInclusionComposedObjectIntersectionOf conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(SubClassInclusionComposedObjectIntersectionOf inference) {
+		return defaultTracedVisit(inference);
 	}
 
 	@Override
-	public O visit(SubClassInclusionComposedEntity conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(SubClassInclusionComposedEntity inference) {
+		return defaultTracedVisit(inference);
 	}
 
 	@Override
-	public O visit(SubClassInclusionComposedDefinedClass conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(SubClassInclusionComposedDefinedClass inference) {
+		return defaultTracedVisit(inference);
 	}
 
 	@Override
-	public O visit(SubClassInclusionComposedObjectUnionOf conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(SubClassInclusionComposedObjectUnionOf inference) {
+		return defaultTracedVisit(inference);
 	}
 
 	@Override
-	public O visit(SubClassInclusionComposedObjectSomeValuesFrom conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(SubClassInclusionComposedObjectSomeValuesFrom inference) {
+		return defaultTracedVisit(inference);
 	}
 
 	@Override
-	public O visit(ForwardLinkComposition conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(ForwardLinkComposition inference) {
+		return defaultTracedVisit(inference);
 	}
 
 	@Override
-	public O visit(ContradictionOfDisjointSubsumers conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(ContradictionOfDisjointSubsumers inference) {
+		return defaultTracedVisit(inference);
 	}
 
 	@Override
-	public O visit(ContradictionOfObjectComplementOf conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(ContradictionOfObjectComplementOf inference) {
+		return defaultTracedVisit(inference);
 	}
 
 	@Override
-	public O visit(ContradictionOfOwlNothing conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(ContradictionOfOwlNothing inference) {
+		return defaultTracedVisit(inference);
 	}
 
 	@Override
-	public O visit(SubClassInclusionExpandedDefinition conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(SubClassInclusionExpandedDefinition inference) {
+		return defaultTracedVisit(inference);
 	}
 
 	@Override
-	public O visit(BackwardLinkOfObjectSomeValuesFrom conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(BackwardLinkOfObjectSomeValuesFrom inference) {
+		return defaultTracedVisit(inference);
 	}
 
 	@Override
-	public O visit(ForwardLinkOfObjectSomeValuesFrom conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(ForwardLinkOfObjectSomeValuesFrom inference) {
+		return defaultTracedVisit(inference);
 	}
 
 	@Override
-	public O visit(SubClassInclusionDecomposedFirstConjunct conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(SubClassInclusionDecomposedFirstConjunct inference) {
+		return defaultTracedVisit(inference);
 	}
 
 	@Override
-	public O visit(BackwardLinkOfObjectHasSelf conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(BackwardLinkOfObjectHasSelf inference) {
+		return defaultTracedVisit(inference);
 	}
 
 	@Override
-	public O visit(ForwardLinkOfObjectHasSelf conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(ForwardLinkOfObjectHasSelf inference) {
+		return defaultTracedVisit(inference);
 	}
 
 	@Override
-	public O visit(SubClassInclusionDecomposedSecondConjunct conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(SubClassInclusionDecomposedSecondConjunct inference) {
+		return defaultTracedVisit(inference);
 	}
 
 	@Override
-	public O visit(DisjointSubsumerFromSubsumer conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(DisjointSubsumerFromSubsumer inference) {
+		return defaultTracedVisit(inference);
 	}
 
 	@Override
-	public O visit(PropagationGenerated conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(PropagationGenerated inference) {
+		return defaultTracedVisit(inference);
 	}
 
 	@Override
-	public O visit(SubClassInclusionTautology conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(SubClassInclusionTautology inference) {
+		return defaultTracedVisit(inference);
 	}
 
 	@Override
-	public O visit(SubClassInclusionObjectHasSelfPropertyRange conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(SubClassInclusionObjectHasSelfPropertyRange inference) {
+		return defaultTracedVisit(inference);
 	}
 
 	@Override
-	public O visit(ContradictionPropagated conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(ContradictionPropagated inference) {
+		return defaultTracedVisit(inference);
 	}
 
 	@Override
-	public O visit(BackwardLinkReversed conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(BackwardLinkReversed inference) {
+		return defaultTracedVisit(inference);
 	}
 
 	@Override
-	public O visit(SubClassInclusionExpandedSubClassOf conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(SubClassInclusionExpandedSubClassOf inference) {
+		return defaultTracedVisit(inference);
 	}
 
 	@Override
-	public O visit(BackwardLinkReversedExpanded conclusion) {
-		return defaultTracedVisit(conclusion);
+	public O visit(BackwardLinkReversedExpanded inference) {
+		return defaultTracedVisit(inference);
+	}
+
+	@Override
+	public O visit(SubClassInclusionOwlThing inference) {
+		return defaultTracedVisit(inference);
+	}
+
+	@Override
+	public O visit(SubClassInclusionRange inference) {
+		return defaultTracedVisit(inference);
 	}
 
 }

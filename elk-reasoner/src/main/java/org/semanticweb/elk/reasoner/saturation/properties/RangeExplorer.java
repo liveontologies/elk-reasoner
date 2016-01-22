@@ -23,12 +23,17 @@ package org.semanticweb.elk.reasoner.saturation.properties;
  */
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.PropertyRangeInference;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.PropertyRangeInherited;
+import org.semanticweb.elk.reasoner.tracing.InferenceProducer;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +51,10 @@ public class RangeExplorer {
 			.getLogger(RangeExplorer.class);
 
 	/**
+	 * The element for which the ranges are computed
+	 */
+	final private IndexedObjectProperty input_;
+	/**
 	 * the set that will be closed under super-properties
 	 */
 	final private Set<IndexedObjectProperty> superProperties_;
@@ -58,13 +67,20 @@ public class RangeExplorer {
 	 * {@link #ranges_}
 	 */
 	final private Queue<IndexedObjectProperty> toDoSuperProperties_ = new LinkedList<IndexedObjectProperty>();
+	/**
+	 * used to record {@link PropertyRangeInference}
+	 */
+	final private InferenceProducer<? super PropertyRangeInference> inferenceProducer_;
 
-	RangeExplorer(IndexedObjectProperty element,
+	RangeExplorer(IndexedObjectProperty input,
 			Set<IndexedObjectProperty> currentSuperProperties,
-			Set<IndexedClassExpression> currentRanges) {
-		superProperties_ = currentSuperProperties;
-		ranges_ = currentRanges;
-		toDo(element);
+			Set<IndexedClassExpression> currentRanges,
+			InferenceProducer<? super PropertyRangeInference> inferenceProducer) {
+		this.input_ = input;
+		this.superProperties_ = currentSuperProperties;
+		this.ranges_ = currentRanges;
+		this.inferenceProducer_ = inferenceProducer;
+		toDo(input);
 	}
 
 	private void toDo(IndexedObjectProperty element) {
@@ -78,6 +94,15 @@ public class RangeExplorer {
 			IndexedObjectProperty next = toDoSuperProperties_.poll();
 			if (next == null)
 				break;
+			List<IndexedClassExpression> ranges = next.getToldRanges();
+			List<ElkAxiom> reasons = next.getToldRangesReasons();
+			for (int i = 0; i < ranges.size(); i++) {
+				IndexedClassExpression range = ranges.get(i);
+				ElkAxiom reason = reasons.get(i);
+				ranges_.add(range);
+				inferenceProducer_.produce(new PropertyRangeInherited(input_,
+						next, range, reason));
+			}
 			ranges_.addAll(next.getToldRanges());
 			for (IndexedObjectProperty superProperty : next
 					.getToldSuperProperties()) {
@@ -89,9 +114,10 @@ public class RangeExplorer {
 	private static void expandUnderSuperProperties(
 			IndexedObjectProperty property,
 			Set<IndexedObjectProperty> currentSuperProperties,
-			Set<IndexedClassExpression> currentRanges) {
-		new RangeExplorer(property, currentSuperProperties, currentRanges)
-				.process();
+			Set<IndexedClassExpression> currentRanges,
+			InferenceProducer<? super PropertyRangeInference> inferenceProducer) {
+		new RangeExplorer(property, currentSuperProperties, currentRanges,
+				inferenceProducer).process();
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace("{} super-properties: {}, ranges: {}", property,
 					currentSuperProperties, currentRanges);
@@ -99,7 +125,8 @@ public class RangeExplorer {
 	}
 
 	private static SaturatedPropertyChain computeRanges(
-			IndexedObjectProperty element) {
+			IndexedObjectProperty element,
+			InferenceProducer<? super PropertyRangeInference> inferenceProducer) {
 		SaturatedPropertyChain saturation = element.getSaturated();
 		if (saturation.derivedRangesComputed)
 			return saturation;
@@ -115,7 +142,7 @@ public class RangeExplorer {
 			// else
 			expandUnderSuperProperties(element,
 					new ArrayHashSet<IndexedObjectProperty>(8),
-					saturation.derivedRanges);
+					saturation.derivedRanges, inferenceProducer);
 			saturation.derivedRangesComputed = true;
 		}
 		return saturation;
@@ -126,7 +153,8 @@ public class RangeExplorer {
 	 * @return the sub-{@link IndexedPropertyChain}s of the given
 	 *         {@link IndexedPropertyChain}
 	 */
-	static Set<IndexedClassExpression> getRanges(IndexedObjectProperty element) {
-		return computeRanges(element).getRanges();
+	static Set<IndexedClassExpression> getRanges(IndexedObjectProperty element,
+			InferenceProducer<? super PropertyRangeInference> inferenceProducer) {
+		return computeRanges(element, inferenceProducer).getRanges();
 	}
 }

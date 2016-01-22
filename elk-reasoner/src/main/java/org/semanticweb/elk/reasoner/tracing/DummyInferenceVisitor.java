@@ -50,8 +50,11 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecom
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedDefinition;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSubClassOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionObjectHasSelfPropertyRange;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionOwlThing;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionRange;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionTautology;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.PropertyRangeInherited;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainExpandedSubObjectPropertyOf;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainTautology;
 
@@ -84,13 +87,13 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubProperty
  */
 public class DummyInferenceVisitor<O> implements Inference.Visitor<O> {
 
+	protected O defaultVisit(ClassInference inference) {
+		return defaultVisit((SaturationInference) inference);
+	}
+
 	protected O defaultVisit(@SuppressWarnings("unused") Inference inference) {
 		// can be overriden in sub-classes
 		return null;
-	}
-
-	protected O defaultVisit(ClassInference inference) {
-		return defaultVisit((SaturationInference) inference);
 	}
 
 	protected O defaultVisit(ObjectPropertyInference inference) {
@@ -123,11 +126,6 @@ public class DummyInferenceVisitor<O> implements Inference.Visitor<O> {
 	}
 
 	@Override
-	public O visit(ContradictionOfOwlNothing inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
 	public O visit(ContradictionOfDisjointSubsumers inference) {
 		return defaultVisit(inference);
 	}
@@ -138,12 +136,122 @@ public class DummyInferenceVisitor<O> implements Inference.Visitor<O> {
 	}
 
 	@Override
+	public O visit(ContradictionOfOwlNothing inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
 	public O visit(ContradictionPropagated inference) {
 		return defaultVisit(inference);
 	}
 
 	@Override
 	public O visit(DisjointSubsumerFromSubsumer inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkClassAssertionAxiomConversion inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkDeclarationAxiomConversion inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkDifferentIndividualsAxiomBinaryConversion inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkDifferentIndividualsAxiomNaryConversion inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkDisjointClassesAxiomBinaryConversion inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkDisjointClassesAxiomNaryConversion inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkDisjointUnionAxiomBinaryConversion inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkDisjointUnionAxiomDefinitionConversion inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkDisjointUnionAxiomNaryConversion inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkDisjointUnionAxiomSubClassConversion inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkEquivalentClassesAxiomDefinitionConversion inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkEquivalentClassesAxiomSubClassConversion inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkEquivalentObjectPropertiesAxiomConversion inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkObjectPropertyAssertionAxiomConversion inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkObjectPropertyDomainAxiomConversion inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkObjectPropertyRangeAxiomConversion inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkReflexiveObjectPropertyAxiomConversion inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkSameIndividualAxiomConversion inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkSubClassOfAxiomConversion inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkSubObjectPropertyOfAxiomConversion inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkTransitiveObjectPropertyAxiomConversion inference) {
 		return defaultVisit(inference);
 	}
 
@@ -164,6 +272,11 @@ public class DummyInferenceVisitor<O> implements Inference.Visitor<O> {
 
 	@Override
 	public O visit(PropagationGenerated inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(PropertyRangeInherited inference) {
 		return defaultVisit(inference);
 	}
 
@@ -218,6 +331,16 @@ public class DummyInferenceVisitor<O> implements Inference.Visitor<O> {
 	}
 
 	@Override
+	public O visit(SubClassInclusionOwlThing inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(SubClassInclusionRange inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
 	public O visit(SubClassInclusionTautology inference) {
 		return defaultVisit(inference);
 	}
@@ -229,111 +352,6 @@ public class DummyInferenceVisitor<O> implements Inference.Visitor<O> {
 
 	@Override
 	public O visit(SubPropertyChainTautology inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
-	public O visit(ElkDifferentIndividualsAxiomNaryConversion inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
-	public O visit(ElkDisjointClassesAxiomNaryConversion inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
-	public O visit(ElkDisjointUnionAxiomNaryConversion inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
-	public O visit(ElkClassAssertionAxiomConversion inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
-	public O visit(ElkDifferentIndividualsAxiomBinaryConversion inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
-	public O visit(ElkDisjointClassesAxiomBinaryConversion inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
-	public O visit(ElkDisjointUnionAxiomSubClassConversion inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
-	public O visit(ElkDisjointUnionAxiomBinaryConversion inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
-	public O visit(ElkEquivalentClassesAxiomSubClassConversion inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
-	public O visit(ElkObjectPropertyAssertionAxiomConversion inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
-	public O visit(ElkObjectPropertyDomainAxiomConversion inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
-	public O visit(ElkReflexiveObjectPropertyAxiomConversion inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
-	public O visit(ElkSameIndividualAxiomConversion inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
-	public O visit(ElkSubClassOfAxiomConversion inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
-	public O visit(ElkDisjointUnionAxiomDefinitionConversion inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
-	public O visit(ElkEquivalentClassesAxiomDefinitionConversion inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
-	public O visit(ElkEquivalentObjectPropertiesAxiomConversion inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
-	public O visit(ElkSubObjectPropertyOfAxiomConversion inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
-	public O visit(ElkTransitiveObjectPropertyAxiomConversion inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
-	public O visit(ElkObjectPropertyRangeAxiomConversion inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
-	public O visit(ElkDeclarationAxiomConversion inference) {
 		return defaultVisit(inference);
 	}
 

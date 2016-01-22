@@ -31,6 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitiali
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionRange;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionTautology;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 import org.semanticweb.elk.util.collections.chains.Chain;
@@ -96,23 +97,15 @@ public class RootContextInitializationRule extends
 	public void apply(ContextInitialization premise,
 			final ContextPremises premises, final ClassConclusionProducer producer) {
 		IndexedContextRoot root = premises.getRoot();
+		producer.produce(new SubClassInclusionTautology(premises.getRoot()));
 		root.accept(new DummyIndexedContextRootVisitor<Void>() {
-			@Override
-			protected Void defaultVisit(IndexedClassExpression element) {
-				producer.produce(new SubClassInclusionTautology(premises.getRoot(),
-						element));
-				return null;
-			}
 
 			@Override
 			public Void visit(IndexedRangeFiller element) {
-				producer.produce(new SubClassInclusionTautology(premises.getRoot(),
-						element.getFiller()));
 				for (IndexedClassExpression range : element.getProperty()
 						.getSaturated().getRanges()) {
-					// TODO: introduce a specific inference
-					producer.produce(new SubClassInclusionTautology(premises
-							.getRoot(), range));
+					producer.produce(
+							new SubClassInclusionRange(element, range));
 				}
 				return null;
 			}

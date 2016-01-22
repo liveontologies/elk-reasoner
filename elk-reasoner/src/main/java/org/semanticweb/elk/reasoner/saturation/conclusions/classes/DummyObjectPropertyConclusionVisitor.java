@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyC
  * pavel.klinov@uni-ulm.de
  */
 public class DummyObjectPropertyConclusionVisitor<O> extends
-		AbstractObjectPropertyConclusionVIsitor<O> {
+		AbstractObjectPropertyConclusionVisitor<O> {
 
 	@Override
 	protected O defaultVisit(ObjectPropertyConclusion conclusion) {

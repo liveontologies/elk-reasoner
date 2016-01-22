@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.saturation.properties;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ package org.semanticweb.elk.reasoner.saturation.properties;
  * #L%
  */
 
-import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
@@ -75,14 +75,14 @@ class SubPropertyExplorer {
 	 */
 	final private Queue<IndexedObjectProperty> toDoSubProperties_ = new LinkedList<IndexedObjectProperty>();
 	/**
-	 * used to record sub-property inferences
+	 * used to record {@link SubPropertyChainInference}
 	 */
-	final private InferenceProducer<? super ObjectPropertyInference> inferenceProducer_;
+	final private InferenceProducer<? super SubPropertyChainInference> inferenceProducer_;
 
 	SubPropertyExplorer(IndexedPropertyChain input,
 			Set<IndexedPropertyChain> subPropertyChains,
 			Set<IndexedObjectProperty> subProperties,
-			InferenceProducer<? super ObjectPropertyInference> inferenceProducer) {
+			InferenceProducer<? super SubPropertyChainInference> inferenceProducer) {
 		this.input_ = input;
 		this.subPropertyChains_ = subPropertyChains;
 		this.subProperties_ = subProperties;
@@ -109,9 +109,9 @@ class SubPropertyExplorer {
 			IndexedObjectProperty next = toDoSubProperties_.poll();
 			if (next == null)
 				break;
-			ArrayList<IndexedPropertyChain> toldSubChains = next
+			List<IndexedPropertyChain> toldSubChains = next
 					.getToldSubChains();
-			ArrayList<ElkAxiom> reasons = next.getToldSubChainsReasons();
+			List<ElkAxiom> reasons = next.getToldSubChainsReasons();
 			for (int i = 0; i < toldSubChains.size(); i++) {
 				IndexedPropertyChain sub = toldSubChains.get(i);
 				ElkAxiom reason = reasons.get(i);
@@ -124,7 +124,7 @@ class SubPropertyExplorer {
 	private static void expandUnderSubProperties(IndexedPropertyChain input,
 			Set<IndexedPropertyChain> currentSubPropertyChains,
 			Set<IndexedObjectProperty> currentSubProperties,
-			InferenceProducer<? super ObjectPropertyInference> inferenceProducer) {
+			InferenceProducer<? super SubPropertyChainInference> inferenceProducer) {
 		new SubPropertyExplorer(input, currentSubPropertyChains,
 				currentSubProperties, inferenceProducer).process();
 		if (LOGGER_.isTraceEnabled()) {
@@ -135,7 +135,7 @@ class SubPropertyExplorer {
 
 	private static SaturatedPropertyChain computeSubProperties(
 			IndexedPropertyChain input,
-			InferenceProducer<? super ObjectPropertyInference> inferenceProducer) {
+			InferenceProducer<? super SubPropertyChainInference> inferenceProducer) {
 		SaturatedPropertyChain saturation = input.getSaturated();
 		if (saturation.derivedSubPropertiesComputed)
 			return saturation;
@@ -178,7 +178,7 @@ class SubPropertyExplorer {
 	 */
 	static Set<IndexedPropertyChain> getSubPropertyChains(
 			IndexedPropertyChain input,
-			InferenceProducer<? super ObjectPropertyInference> inferenceProducer) {
+			InferenceProducer<? super SubPropertyChainInference> inferenceProducer) {
 		return computeSubProperties(input, inferenceProducer)
 				.getSubPropertyChains();
 	}
@@ -202,7 +202,7 @@ class SubPropertyExplorer {
 	 */
 	static Set<IndexedObjectProperty> getSubProperties(
 			IndexedPropertyChain input,
-			InferenceProducer<? super ObjectPropertyInference> inferenceProducer) {
+			InferenceProducer<? super SubPropertyChainInference> inferenceProducer) {
 		return computeSubProperties(input, inferenceProducer)
 				.getSubProperties();
 	}
@@ -226,7 +226,7 @@ class SubPropertyExplorer {
 	 */
 	static Multimap<IndexedObjectProperty, IndexedObjectProperty> getLeftSubComposableSubPropertiesByRightProperties(
 			IndexedObjectProperty input,
-			InferenceProducer<? super ObjectPropertyInference> inferenceProducer) {
+			InferenceProducer<? super SubPropertyChainInference> inferenceProducer) {
 		SaturatedPropertyChain saturation = input.getSaturated();
 		if (saturation.leftSubComposableSubPropertiesByRightPropertiesComputed)
 			return saturation.leftSubComposableSubPropertiesByRightProperties;

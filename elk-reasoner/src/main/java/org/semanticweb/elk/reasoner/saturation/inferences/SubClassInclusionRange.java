@@ -9,7 +9,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,34 +27,23 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectHasSelf;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedRangeFiller;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.PropertyRange;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 
 /**
- * A {@link SubClassInclusionDecomposed} obtained from a
- * {@link SubClassInclusionDecomposed} with an {@link IndexedObjectHasSelf}
- * super-class, which property has a range the super-class of this conclusion.
+ * {@link SubClassInclusionDecomposed} producing {@code (∃R^-.T) ⊓ C ⊑ D} from
+ * {@code R range D}.
  * 
- * @see IndexedObjectHasSelf#getProperty()
- * @see IndexedObjectProperty#getToldRanges()
- * 
- * @author "Yevgeny Kazakov"
- *
+ * @author Yevgeny Kazakov
  */
-public class SubClassInclusionObjectHasSelfPropertyRange
+public class SubClassInclusionRange
 		extends
 			AbstractSubClassInclusionDecomposedInference {
 
-	private final IndexedObjectHasSelf premiseSubsumer_;
-
-	public SubClassInclusionObjectHasSelfPropertyRange(
-			IndexedContextRoot inferenceRoot,
-			IndexedObjectHasSelf premiseSubsumer,
-			IndexedClassExpression range) {
-		super(inferenceRoot, range);
-		this.premiseSubsumer_ = premiseSubsumer;
+	public SubClassInclusionRange(IndexedRangeFiller inferenceRoot,
+			IndexedClassExpression propertyRange) {
+		super(inferenceRoot, propertyRange);
 	}
 
 	@Override
@@ -62,20 +51,15 @@ public class SubClassInclusionObjectHasSelfPropertyRange
 		return getConclusionRoot();
 	}
 
-	public SubClassInclusionDecomposed getFirstPremise(
-			SubClassInclusionDecomposed.Factory factory) {
-		return factory.getSubClassInclusionDecomposed(getInferenceRoot(),
-				premiseSubsumer_);
-	}
-
-	public PropertyRange getSecondPremise(PropertyRange.Factory factory) {
-		return factory.getPropertyRange(premiseSubsumer_.getProperty(),
+	public PropertyRange getPremise(PropertyRange.Factory factory) {
+		return factory.getPropertyRange(
+				((IndexedRangeFiller) getInferenceRoot()).getProperty(),
 				getSuperExpression());
 	}
 
 	@Override
 	public String toString() {
-		return super.toString() + " (reflexive range)";
+		return super.toString() + " (range)";
 	}
 
 	@Override
@@ -92,7 +76,7 @@ public class SubClassInclusionObjectHasSelfPropertyRange
 	 */
 	public static interface Visitor<O> {
 
-		public O visit(SubClassInclusionObjectHasSelfPropertyRange inference);
+		public O visit(SubClassInclusionRange inference);
 
 	}
 

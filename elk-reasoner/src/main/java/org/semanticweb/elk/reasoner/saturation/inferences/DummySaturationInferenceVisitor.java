@@ -4,6 +4,7 @@
 package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.PropertyRangeInherited;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainExpandedSubObjectPropertyOf;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainTautology;
 
@@ -38,18 +39,18 @@ public class DummySaturationInferenceVisitor<O>
 		implements
 			SaturationInference.Visitor<O> {
 
+	protected O defaultVisit(ClassInference inference) {
+		return defaultVisit((SaturationInference) inference);
+	}
+
+	protected O defaultVisit(ObjectPropertyInference inference) {
+		return defaultVisit((SaturationInference) inference);
+	}
+
 	protected O defaultVisit(
 			@SuppressWarnings("unused") SaturationInference inference) {
 		// can be overriden in sub-classes
 		return null;
-	}
-	
-	protected O defaultVisit(ClassInference inference) {
-		return defaultVisit((SaturationInference) inference);
-	}
-	
-	protected O defaultVisit(ObjectPropertyInference inference) {
-		return defaultVisit((SaturationInference) inference);
 	}
 
 	@Override
@@ -78,17 +79,17 @@ public class DummySaturationInferenceVisitor<O>
 	}
 
 	@Override
-	public O visit(ContradictionOfOwlNothing inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
 	public O visit(ContradictionOfDisjointSubsumers inference) {
 		return defaultVisit(inference);
 	}
 
 	@Override
 	public O visit(ContradictionOfObjectComplementOf inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ContradictionOfOwlNothing inference) {
 		return defaultVisit(inference);
 	}
 
@@ -119,6 +120,11 @@ public class DummySaturationInferenceVisitor<O>
 
 	@Override
 	public O visit(PropagationGenerated inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(PropertyRangeInherited inference) {
 		return defaultVisit(inference);
 	}
 
@@ -169,6 +175,16 @@ public class DummySaturationInferenceVisitor<O>
 
 	@Override
 	public O visit(SubClassInclusionObjectHasSelfPropertyRange inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(SubClassInclusionOwlThing inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(SubClassInclusionRange inference) {
 		return defaultVisit(inference);
 	}
 

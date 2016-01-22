@@ -12,6 +12,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.PropertyRange;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
@@ -59,25 +60,6 @@ public class ConclusionPrinter implements Conclusion.Visitor<String> {
 	}
 
 	@Override
-	public String visit(Propagation subConclusion) {
-		return "Propagation(" + subConclusion.getConclusionRoot() + ":"
-				+ subConclusion.getConclusionSubRoot() + ":"
-				+ subConclusion.getCarry() + ")";
-	}
-
-	@Override
-	public String visit(SubContextInitialization subConclusion) {
-		return "SubInit(" + subConclusion.getConclusionRoot() + ":"
-				+ subConclusion.getConclusionSubRoot() + ")";
-	}
-
-	@Override
-	public String visit(SubClassInclusionComposed conclusion) {
-		return "Subsumption+(" + conclusion.getConclusionRoot() + " "
-				+ conclusion.getSuperExpression() + ")";
-	}
-
-	@Override
 	public String visit(ContextInitialization conclusion) {
 		return "Init(" + conclusion.getConclusionRoot() + ")";
 	}
@@ -85,12 +67,6 @@ public class ConclusionPrinter implements Conclusion.Visitor<String> {
 	@Override
 	public String visit(Contradiction conclusion) {
 		return "Contradiction(" + conclusion.getConclusionRoot() + ")";
-	}
-
-	@Override
-	public String visit(SubClassInclusionDecomposed conclusion) {
-		return "Subsumption-(" + conclusion.getConclusionRoot() + " "
-				+ conclusion.getSuperExpression() + ")";
 	}
 
 	@Override
@@ -109,9 +85,14 @@ public class ConclusionPrinter implements Conclusion.Visitor<String> {
 	}
 
 	@Override
-	public String visit(SubPropertyChain conclusion) {
-		return "SubPropertyChain(" + conclusion.getSubChain() + " "
-				+ conclusion.getSuperChain() + ")";
+	public String visit(IndexedDeclarationAxiom conclusion) {
+		return "IndexedDeclarationAxiom(" + conclusion.getEntity() + ")";
+	}
+
+	@Override
+	public String visit(IndexedDefinitionAxiom conclusion) {
+		return "IndexedDefinitionAxiom(" + conclusion.getDefinedClass() + " "
+				+ conclusion.getDefinition() + ")";
 	}
 
 	@Override
@@ -120,15 +101,15 @@ public class ConclusionPrinter implements Conclusion.Visitor<String> {
 	}
 
 	@Override
-	public String visit(IndexedSubClassOfAxiom conclusion) {
-		return "IndexedSubClassOfAxiom(" + conclusion.getSubClass() + " "
-				+ conclusion.getSuperClass() + ")";
+	public String visit(IndexedObjectPropertyRangeAxiom conclusion) {
+		return "IndexedObjectPropertyRangeAxiom(" + conclusion.getProperty()
+				+ " " + conclusion.getRange() + ")";
 	}
 
 	@Override
-	public String visit(IndexedDefinitionAxiom conclusion) {
-		return "IndexedDefinitionAxiom(" + conclusion.getDefinedClass() + " "
-				+ conclusion.getDefinition() + ")";
+	public String visit(IndexedSubClassOfAxiom conclusion) {
+		return "IndexedSubClassOfAxiom(" + conclusion.getSubClass() + " "
+				+ conclusion.getSuperClass() + ")";
 	}
 
 	@Override
@@ -139,13 +120,39 @@ public class ConclusionPrinter implements Conclusion.Visitor<String> {
 	}
 
 	@Override
-	public String visit(IndexedObjectPropertyRangeAxiom conclusion) {
-		return "IndexedObjectPropertyRangeAxiom(" + conclusion.getProperty()
-				+ " " + conclusion.getRange() + ")";
+	public String visit(Propagation subConclusion) {
+		return "Propagation(" + subConclusion.getConclusionRoot() + ":"
+				+ subConclusion.getConclusionSubRoot() + ":"
+				+ subConclusion.getCarry() + ")";
 	}
 
 	@Override
-	public String visit(IndexedDeclarationAxiom conclusion) {
-		return "IndexedDeclarationAxiom(" + conclusion.getEntity() + ")";
+	public String visit(PropertyRange conclusion) {
+		return "PropertyRange(" + conclusion.getProperty() + ": "
+				+ conclusion.getRange() + ")";
+	}
+
+	@Override
+	public String visit(SubClassInclusionComposed conclusion) {
+		return "Subsumption+(" + conclusion.getConclusionRoot() + " "
+				+ conclusion.getSuperExpression() + ")";
+	}
+
+	@Override
+	public String visit(SubClassInclusionDecomposed conclusion) {
+		return "Subsumption-(" + conclusion.getConclusionRoot() + " "
+				+ conclusion.getSuperExpression() + ")";
+	}
+
+	@Override
+	public String visit(SubContextInitialization subConclusion) {
+		return "SubInit(" + subConclusion.getConclusionRoot() + ":"
+				+ subConclusion.getConclusionSubRoot() + ")";
+	}
+
+	@Override
+	public String visit(SubPropertyChain conclusion) {
+		return "SubPropertyChain(" + conclusion.getSubChain() + " "
+				+ conclusion.getSuperChain() + ")";
 	}
 }

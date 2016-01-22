@@ -37,6 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.PropertyRange;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
@@ -51,11 +52,6 @@ public class ConclusionHash
 
 	private static final ConclusionHash INSTANCE_ = new ConclusionHash();
 
-	// forbid construction; only static methods should be used
-	private ConclusionHash() {
-
-	}
-
 	private static int combinedHashCode(int... hashes) {
 		return HashGenerator.combineListHash(hashes);
 	}
@@ -64,20 +60,25 @@ public class ConclusionHash
 		return c.hashCode();
 	}
 
-	private static int hashCode(IndexedObject o) {
-		return o.hashCode();
+	public static int hashCode(Conclusion conclusion) {
+		return conclusion == null ? 0 : conclusion.accept(INSTANCE_);
 	}
 
 	private static int hashCode(ElkObject elkObject) {
 		return ElkObjectHash.hashCode(elkObject);
 	}
 
+	private static int hashCode(IndexedObject o) {
+		return o.hashCode();
+	}
+
 	private static int hashCode(int n) {
 		return n;
 	}
 
-	public static int hashCode(Conclusion conclusion) {
-		return conclusion == null ? 0 : conclusion.accept(INSTANCE_);
+	// forbid construction; only static methods should be used
+	private ConclusionHash() {
+
 	}
 
 	@Override
@@ -94,28 +95,6 @@ public class ConclusionHash
 	}
 
 	@Override
-	public Integer visit(Propagation subConclusion) {
-		return combinedHashCode(hashCode(Propagation.class),
-				hashCode(subConclusion.getConclusionRoot()),
-				hashCode(subConclusion.getConclusionSubRoot()),
-				hashCode(subConclusion.getCarry()));
-	}
-
-	@Override
-	public Integer visit(SubContextInitialization subConclusion) {
-		return combinedHashCode(hashCode(SubContextInitialization.class),
-				hashCode(subConclusion.getConclusionRoot()),
-				hashCode(subConclusion.getConclusionSubRoot()));
-	}
-
-	@Override
-	public Integer visit(SubClassInclusionComposed conclusion) {
-		return combinedHashCode(hashCode(SubClassInclusionComposed.class),
-				hashCode(conclusion.getConclusionRoot()),
-				hashCode(conclusion.getSuperExpression()));
-	}
-
-	@Override
 	public Integer visit(ContextInitialization conclusion) {
 		return combinedHashCode(hashCode(ContextInitialization.class),
 				hashCode(conclusion.getConclusionRoot()));
@@ -125,13 +104,6 @@ public class ConclusionHash
 	public Integer visit(Contradiction conclusion) {
 		return combinedHashCode(hashCode(Contradiction.class),
 				hashCode(conclusion.getConclusionRoot()));
-	}
-
-	@Override
-	public Integer visit(SubClassInclusionDecomposed conclusion) {
-		return combinedHashCode(hashCode(SubClassInclusionDecomposed.class),
-				hashCode(conclusion.getConclusionRoot()),
-				hashCode(conclusion.getSuperExpression()));
 	}
 
 	@Override
@@ -152,23 +124,9 @@ public class ConclusionHash
 	}
 
 	@Override
-	public Integer visit(SubPropertyChain conclusion) {
-		return combinedHashCode(hashCode(SubPropertyChain.class),
-				hashCode(conclusion.getSubChain()),
-				hashCode(conclusion.getSuperChain()));
-	}
-
-	@Override
-	public Integer visit(IndexedDisjointClassesAxiom conclusion) {
-		return combinedHashCode(hashCode(IndexedDisjointClassesAxiom.class),
-				hashCode(conclusion.getMembers()));
-	}
-
-	@Override
-	public Integer visit(IndexedSubClassOfAxiom conclusion) {
-		return combinedHashCode(hashCode(IndexedSubClassOfAxiom.class),
-				hashCode(conclusion.getSubClass()),
-				hashCode(conclusion.getSuperClass()));
+	public Integer visit(IndexedDeclarationAxiom conclusion) {
+		return combinedHashCode(hashCode(IndexedDeclarationAxiom.class),
+				hashCode(conclusion.getEntity()));
 	}
 
 	@Override
@@ -179,10 +137,9 @@ public class ConclusionHash
 	}
 
 	@Override
-	public Integer visit(IndexedSubObjectPropertyOfAxiom conclusion) {
-		return combinedHashCode(hashCode(IndexedSubObjectPropertyOfAxiom.class),
-				hashCode(conclusion.getSubPropertyChain()),
-				hashCode(conclusion.getSuperProperty()));
+	public Integer visit(IndexedDisjointClassesAxiom conclusion) {
+		return combinedHashCode(hashCode(IndexedDisjointClassesAxiom.class),
+				hashCode(conclusion.getMembers()));
 	}
 
 	@Override
@@ -193,9 +150,60 @@ public class ConclusionHash
 	}
 
 	@Override
-	public Integer visit(IndexedDeclarationAxiom conclusion) {
-		return combinedHashCode(hashCode(IndexedDeclarationAxiom.class),
-				hashCode(conclusion.getEntity()));
+	public Integer visit(IndexedSubClassOfAxiom conclusion) {
+		return combinedHashCode(hashCode(IndexedSubClassOfAxiom.class),
+				hashCode(conclusion.getSubClass()),
+				hashCode(conclusion.getSuperClass()));
+	}
+
+	@Override
+	public Integer visit(IndexedSubObjectPropertyOfAxiom conclusion) {
+		return combinedHashCode(hashCode(IndexedSubObjectPropertyOfAxiom.class),
+				hashCode(conclusion.getSubPropertyChain()),
+				hashCode(conclusion.getSuperProperty()));
+	}
+
+	@Override
+	public Integer visit(Propagation subConclusion) {
+		return combinedHashCode(hashCode(Propagation.class),
+				hashCode(subConclusion.getConclusionRoot()),
+				hashCode(subConclusion.getConclusionSubRoot()),
+				hashCode(subConclusion.getCarry()));
+	}
+
+	@Override
+	public Integer visit(PropertyRange conclusion) {
+		return combinedHashCode(hashCode(PropertyRange.class),
+				hashCode(conclusion.getProperty()),
+				hashCode(conclusion.getRange()));
+	}
+
+	@Override
+	public Integer visit(SubClassInclusionComposed conclusion) {
+		return combinedHashCode(hashCode(SubClassInclusionComposed.class),
+				hashCode(conclusion.getConclusionRoot()),
+				hashCode(conclusion.getSuperExpression()));
+	}
+
+	@Override
+	public Integer visit(SubClassInclusionDecomposed conclusion) {
+		return combinedHashCode(hashCode(SubClassInclusionDecomposed.class),
+				hashCode(conclusion.getConclusionRoot()),
+				hashCode(conclusion.getSuperExpression()));
+	}
+
+	@Override
+	public Integer visit(SubContextInitialization subConclusion) {
+		return combinedHashCode(hashCode(SubContextInitialization.class),
+				hashCode(subConclusion.getConclusionRoot()),
+				hashCode(subConclusion.getConclusionSubRoot()));
+	}
+
+	@Override
+	public Integer visit(SubPropertyChain conclusion) {
+		return combinedHashCode(hashCode(SubPropertyChain.class),
+				hashCode(conclusion.getSubChain()),
+				hashCode(conclusion.getSuperChain()));
 	}
 
 }

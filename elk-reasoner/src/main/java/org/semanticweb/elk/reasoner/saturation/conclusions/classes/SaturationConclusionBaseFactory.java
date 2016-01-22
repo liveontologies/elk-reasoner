@@ -36,6 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.PropertyRange;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
@@ -45,6 +46,12 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
 public class SaturationConclusionBaseFactory
 		implements
 			SaturationConclusion.Factory {
+
+	@Override
+	public BackwardLink getBackwardLink(IndexedContextRoot root,
+			IndexedObjectProperty relation, IndexedContextRoot source) {
+		return new BackwardLinkImpl(root, relation, source);
+	}
 
 	@Override
 	public ContextInitialization getContextInitialization(
@@ -73,21 +80,15 @@ public class SaturationConclusionBaseFactory
 	}
 
 	@Override
-	public BackwardLink getBackwardLink(IndexedContextRoot root,
-			IndexedObjectProperty relation, IndexedContextRoot source) {
-		return new BackwardLinkImpl(root, relation, source);
-	}
-
-	@Override
 	public Propagation getPropagation(IndexedContextRoot root,
 			IndexedObjectProperty relation, IndexedObjectSomeValuesFrom carry) {
 		return new PropagationImpl(root, relation, carry);
 	}
 
 	@Override
-	public SubContextInitialization getSubContextInitialization(
-			IndexedContextRoot root, IndexedObjectProperty subRoot) {
-		return new SubContextInitializationImpl(root, subRoot);
+	public PropertyRange getPropertyRange(IndexedObjectProperty property,
+			IndexedClassExpression range) {
+		return new PropertyRangeImpl(property, range);
 	}
 
 	@Override
@@ -104,6 +105,12 @@ public class SaturationConclusionBaseFactory
 			IndexedClassExpression superExpression) {
 		return new SubClassInclusionDecomposedImpl(subExpression,
 				superExpression);
+	}
+
+	@Override
+	public SubContextInitialization getSubContextInitialization(
+			IndexedContextRoot root, IndexedObjectProperty subRoot) {
+		return new SubContextInitializationImpl(root, subRoot);
 	}
 
 	@Override

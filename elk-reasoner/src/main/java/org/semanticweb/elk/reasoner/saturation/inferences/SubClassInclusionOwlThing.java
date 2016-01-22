@@ -3,15 +3,13 @@
  */
 package org.semanticweb.elk.reasoner.saturation.inferences;
 
-import org.semanticweb.elk.reasoner.indexing.classes.DummyIndexedContextRootVisitor;
-
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,44 +25,23 @@ import org.semanticweb.elk.reasoner.indexing.classes.DummyIndexedContextRootVisi
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedRangeFiller;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 
 /**
- * {@link SubClassInclusionDecomposed} representing a tautology {@code C ⊑ C}
- * obtained from no premises.
+ * {@link SubClassInclusionDecomposed} representing a tautology
+ * {@code C ⊑ owl:Thing} obtained from no premises.
  * 
- * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
  * @author Yevgeny Kazakov
  */
-public class SubClassInclusionTautology
+public class SubClassInclusionOwlThing
 		extends
 			AbstractSubClassInclusionDecomposedInference {
 
-	private static IndexedContextRoot.Visitor<IndexedClassExpression> SUBSUMER_EXTRACTOR_ = new SubsumerExtractor();
-
-	public SubClassInclusionTautology(IndexedContextRoot inferenceRoot) {
-		super(inferenceRoot, inferenceRoot.accept(SUBSUMER_EXTRACTOR_));
-	}
-
-	private static class SubsumerExtractor
-			extends
-				DummyIndexedContextRootVisitor<IndexedClassExpression> {
-
-		@Override
-		protected IndexedClassExpression defaultVisit(
-				IndexedClassExpression element) {
-			return element;
-		}
-
-		@Override
-		public IndexedClassExpression visit(IndexedRangeFiller element) {
-			return element.getFiller();
-		}
+	public SubClassInclusionOwlThing(IndexedContextRoot inferenceRoot,
+			IndexedClass owlThingSubsumer) {
+		super(inferenceRoot, owlThingSubsumer);
 	}
 
 	@Override
@@ -74,7 +51,7 @@ public class SubClassInclusionTautology
 
 	@Override
 	public String toString() {
-		return super.toString() + " (init)";
+		return super.toString() + " (owl:Thing)";
 	}
 
 	@Override
@@ -91,7 +68,7 @@ public class SubClassInclusionTautology
 	 */
 	public static interface Visitor<O> {
 
-		public O visit(SubClassInclusionTautology inference);
+		public O visit(SubClassInclusionOwlThing inference);
 
 	}
 

@@ -38,6 +38,11 @@ public abstract class AbstractObjectPropertyInferenceVisitor<O> implements
 	protected abstract O defaultTracedVisit(ObjectPropertyInference inference);
 
 	@Override
+	public O visit(PropertyRangeInherited inference) {
+		return defaultTracedVisit(inference);
+	}
+	
+	@Override
 	public O visit(SubPropertyChainTautology inference) {
 		return defaultTracedVisit(inference);
 	}

@@ -30,7 +30,6 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * A {@link SubPropertyChain} obtained from a {@link SubPropertyChain} by
@@ -81,36 +80,9 @@ public class SubPropertyChainExpandedSubObjectPropertyOf extends AbstractSubProp
 	}
 
 	@Override
-	public String toString() {
-		return "Expanded sub-chain: " + getSubChain() + " => "
-				+ getSuperChain() + ", premise: " + middleChain_ + " => "
-				+ getSuperChain() + ", reason: " + reason_;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof SubPropertyChainExpandedSubObjectPropertyOf)) {
-			return false;
-		}
-
-		SubPropertyChainExpandedSubObjectPropertyOf inf = (SubPropertyChainExpandedSubObjectPropertyOf) obj;
-
-		return middleChain_.equals(inf.middleChain_)
-				&& getSubChain().equals(inf.getSubChain())
-				&& getSuperChain().equals(inf.getSuperChain());
-	}
-
-	@Override
-	public int hashCode() {
-		return HashGenerator.combineListHash(middleChain_.hashCode(),
-				getSubChain().hashCode(), getSuperChain().hashCode());
-	}
-
-	@Override
 	public final <O> O accept(SubPropertyChainInference.Visitor<O> visitor) {
 		return visitor.visit(this);
-	}
-	
+	}	
 	
 	/**
 	 * Visitor pattern for instances

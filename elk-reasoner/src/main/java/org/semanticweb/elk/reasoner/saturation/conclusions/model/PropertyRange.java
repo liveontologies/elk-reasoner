@@ -1,14 +1,12 @@
-/**
- * 
- */
 package org.semanticweb.elk.reasoner.saturation.conclusions.model;
+
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,15 +22,25 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.model;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
+
 /**
- * The interface for objects representing object property inferences. Used
- * primarily for tracing.
+ * An {@link ObjectPropertyConclusion} stating that the given
+ * {@link IndexedClassExpression} returned by {@link #getRange()} is a derived
+ * range of the given {@link IndexedObjectProperty} returned by
+ * {@link #getProperty()}. It is logically equivalent to a
+ * {@code ElkObjectPropertyRangeAxiom} for the corresponding
+ * {@code ElkClassExpression} and {@code ElkObjectProperty}.
  * 
- * @author Pavel Klinov
+ * @author Yevgeny Kazakov
  * 
- *         pavel.klinov@uni-ulm.de
  */
-public interface ObjectPropertyConclusion extends SaturationConclusion {
+public interface PropertyRange extends ObjectPropertyConclusion {
+
+	public IndexedObjectProperty getProperty();
+
+	public IndexedClassExpression getRange();
 
 	public <O> O accept(Visitor<O> visitor);
 
@@ -42,9 +50,10 @@ public interface ObjectPropertyConclusion extends SaturationConclusion {
 	 * @author Yevgeny Kazakov
 	 *
 	 */
-	interface Factory extends PropertyRange.Factory, SubPropertyChain.Factory {
+	interface Factory {
 
-		// combined interface
+		PropertyRange getPropertyRange(IndexedObjectProperty property,
+				IndexedClassExpression range);
 
 	}
 
@@ -56,12 +65,9 @@ public interface ObjectPropertyConclusion extends SaturationConclusion {
 	 * @param <O>
 	 *            the type of the output
 	 */
-	interface Visitor<O>
-			extends
-				PropertyRange.Visitor<O>,
-				SubPropertyChain.Visitor<O> {
+	interface Visitor<O> {
 
-		// combined interface
+		public O visit(PropertyRange conclusion);
 
 	}
 
