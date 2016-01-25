@@ -51,8 +51,10 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.owl.iris.ElkAbbreviatedIri;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
+import org.semanticweb.elk.owl.iris.ElkPrefixImpl;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
@@ -347,12 +349,15 @@ public class LowLevelIncrementalTBoxTest {
 	@Test
 	public void testDeleteFromForest() throws ElkException, IOException {
 		InputStream stream = null;
-		String toDelete = "Prefix(test:=<http://www.test.com/schema#>) Ontology(\n"
-				+ "SubClassOf(ObjectSomeValuesFrom(<test:has-color> <test:brown>) <test:brown-thing>) \n"
-				+ "SubClassOf(<test:green> <test:color>) \n" + ")";
-		ElkClass tree = objectFactory.getClass(new ElkFullIri("test:tree"));
-		ElkClass greenThing = objectFactory.getClass(new ElkFullIri(
-				"test:green-thing"));
+		String toDelete = "Prefix(:=<http://www.test.com/schema#>) Ontology(\n"
+				+ "SubClassOf(ObjectSomeValuesFrom(:has-color :brown) :brown-thing) \n"
+				+ "SubClassOf(:green :color) \n" + ")";
+		ElkClass tree = objectFactory.getClass(new ElkAbbreviatedIri(
+				new ElkPrefixImpl(":", new ElkFullIri("http://www.test.com/schema#")),
+				"tree"));
+		ElkClass greenThing = objectFactory.getClass(new ElkAbbreviatedIri(
+				new ElkPrefixImpl(":", new ElkFullIri("http://www.test.com/schema#")),
+				"green-thing"));
 
 		try {
 			stream = getClass().getClassLoader().getResourceAsStream(
@@ -400,13 +405,14 @@ public class LowLevelIncrementalTBoxTest {
 	@Test
 	public void testDeleteFromKangaroo() throws ElkException, IOException {
 		InputStream stream = null;
-		String toDelete = "Prefix(test:=<http://www.test.com/schema#>) Ontology(\n"
+		String toDelete = "Prefix(:=<http://www.test.com/schema#>) Ontology(\n"
 				// +
-				// "SubClassOf(<test:KangarooInfant> ObjectIntersectionOf(ObjectSomeValuesFrom(<test:lives-in> <test:Pouch>) <test:Kangaroo>)) \n"
-				+ "DisjointClasses(<test:Irrational> <test:Rational>) \n "
-				+ "SubClassOf(<test:Kangaroo> <test:Beast>) \n" + ")";
-		ElkClass maternityKangaroo = objectFactory.getClass(new ElkFullIri(
-				"test:MaternityKangaroo"));
+				// "SubClassOf(:KangarooInfant ObjectIntersectionOf(ObjectSomeValuesFrom(:lives-in :Pouch) :Kangaroo)) \n"
+				+ "DisjointClasses(:Irrational :Rational) \n "
+				+ "SubClassOf(:Kangaroo :Beast) \n" + ")";
+		ElkClass maternityKangaroo = objectFactory.getClass(new ElkAbbreviatedIri(
+				new ElkPrefixImpl(":", new ElkFullIri("http://www.test.com/schema#")),
+				"MaternityKangaroo"));
 
 		try {
 			stream = getClass().getClassLoader().getResourceAsStream(
