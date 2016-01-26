@@ -44,9 +44,9 @@ public class BackwardLinkImpl extends AbstractSubClassConclusion implements
 	private final IndexedContextRoot origin_;
 
 	protected BackwardLinkImpl(IndexedContextRoot root,
-			IndexedObjectProperty relation, IndexedContextRoot source) {
+			IndexedObjectProperty relation, IndexedContextRoot origin) {
 		super(root, relation);
-		this.origin_ = source;
+		this.origin_ = origin;
 	}
 
 	@Override

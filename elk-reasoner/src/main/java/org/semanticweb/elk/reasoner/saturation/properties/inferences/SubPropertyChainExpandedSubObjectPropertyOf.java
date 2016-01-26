@@ -40,7 +40,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
  *         pavel.klinov@uni-ulm.de
  * @author "Yevgeny Kazakov"
  */
-public class SubPropertyChainExpandedSubObjectPropertyOf extends AbstractSubPropertyChainInference {
+public class SubPropertyChainExpandedSubObjectPropertyOf
+		extends
+			AbstractSubPropertyChainInference {
 
 	/**
 	 * The inferred sub-property of the super-chain for which the inference is
@@ -53,15 +55,16 @@ public class SubPropertyChainExpandedSubObjectPropertyOf extends AbstractSubProp
 	 */
 	private final ElkAxiom reason_;
 
-	public SubPropertyChainExpandedSubObjectPropertyOf(IndexedPropertyChain firstChain,
-			IndexedObjectProperty secondChain,
-			IndexedObjectProperty thirdChain, ElkAxiom reason) {
-		super(firstChain, thirdChain);
-		this.middleChain_ = secondChain;
+	public SubPropertyChainExpandedSubObjectPropertyOf(
+			IndexedPropertyChain firstChain,
+			IndexedObjectProperty secondProperty,
+			IndexedObjectProperty thirdProperty, ElkAxiom reason) {
+		super(firstChain, thirdProperty);
+		this.middleChain_ = secondProperty;
 		this.reason_ = reason;
 	}
 
-	public IndexedObjectProperty getToldSuperProperty() {
+	public IndexedObjectProperty getPremiseSuperChain() {
 		return middleChain_;
 	}
 
@@ -72,7 +75,7 @@ public class SubPropertyChainExpandedSubObjectPropertyOf extends AbstractSubProp
 	public SubPropertyChain getPremise(SubPropertyChain.Factory factory) {
 		return factory.getSubPropertyChain(middleChain_, getSuperChain());
 	}
-	
+
 	public IndexedSubObjectPropertyOfAxiom getSideCondition(
 			IndexedSubObjectPropertyOfAxiom.Factory factory) {
 		return factory.getIndexedSubObjectPropertyOfAxiom(reason_,
@@ -82,8 +85,8 @@ public class SubPropertyChainExpandedSubObjectPropertyOf extends AbstractSubProp
 	@Override
 	public final <O> O accept(SubPropertyChainInference.Visitor<O> visitor) {
 		return visitor.visit(this);
-	}	
-	
+	}
+
 	/**
 	 * Visitor pattern for instances
 	 * 
@@ -91,9 +94,9 @@ public class SubPropertyChainExpandedSubObjectPropertyOf extends AbstractSubProp
 	 *
 	 */
 	public static interface Visitor<O> {
-		
+
 		public O visit(SubPropertyChainExpandedSubObjectPropertyOf inference);
-		
+
 	}
-	
+
 }
