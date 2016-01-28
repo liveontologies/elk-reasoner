@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.owl.predefined;
 
+import org.semanticweb.elk.owl.comparison.ElkObjectSyntacticEqualityVisitor;
+import org.semanticweb.elk.owl.comparison.ElkObjectSyntacticHasherVisitor;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
@@ -37,13 +39,13 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
  * @author "Yevgeny Kazakov"
  * 
  */
-public enum PredefinedElkClass implements ElkClass {
+public class PredefinedElkClass implements ElkClass {
+	
+	private static final ElkObjectVisitor<Integer> HASHER_VISITOR_ = new ElkObjectSyntacticHasherVisitor();
 
-	OWL_THING(PredefinedElkIris.OWL_THING),
-
-	OWL_NOTHING(PredefinedElkIris.OWL_NOTHING),
-
-	;
+	public static final PredefinedElkClass
+			OWL_THING = new PredefinedElkClass(PredefinedElkIris.OWL_THING),
+			OWL_NOTHING = new PredefinedElkClass(PredefinedElkIris.OWL_NOTHING);
 
 	private final ElkIri iri_;
 
@@ -59,6 +61,21 @@ public enum PredefinedElkClass implements ElkClass {
 	@Override
 	public ElkEntityType getEntityType() {
 		return ElkEntityType.CLASS;
+	}
+
+	@Override
+	public int hashCode() {
+		return this.accept(HASHER_VISITOR_);
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return ElkObjectSyntacticEqualityVisitor.equals(this, other);
+	}
+
+	@Override
+	public String toString() {
+		return iri_.toString();
 	}
 
 	@Override
