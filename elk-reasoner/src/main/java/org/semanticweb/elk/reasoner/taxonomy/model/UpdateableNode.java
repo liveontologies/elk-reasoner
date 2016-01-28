@@ -24,14 +24,14 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public interface UpdateableNode<T extends ElkObject> extends Node<T> {
+public interface UpdateableNode<T extends ElkEntity> extends Node<T> {
 
 	public boolean trySetModified(boolean modified);
 	

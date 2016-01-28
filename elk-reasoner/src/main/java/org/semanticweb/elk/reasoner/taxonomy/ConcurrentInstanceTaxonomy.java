@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -176,7 +177,7 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 			if (previous == null)
 				continue;
 			synchronized (previous) {
-				if (previous.getMembers().size() < members.size())
+				if (previous.size() < members.size())
 					previous.setMembers(members);
 				else
 					return previous;
@@ -228,7 +229,7 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 			List<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> directTypes = new LinkedList<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>();
 
 			synchronized (node) {
-				for (ElkNamedIndividual individual : node.getMembers()) {
+				for (ElkNamedIndividual individual : node) {
 					individualNodeLookup_.remove(getKey(individual));
 				}
 
@@ -294,6 +295,11 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 	@Override
 	public boolean addToBottomNode(ElkClass member) {
 		return classTaxonomy_.addToBottomNode(member);
+	}
+
+	@Override
+	public boolean removeFromBottomNode(ElkClass member) {
+		return classTaxonomy_.removeFromBottomNode(member);
 	}
 
 	@Override
@@ -379,10 +385,20 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 		}
 
 		@Override
-		public Set<ElkClass> getMembers() {
-			return classNode_.getMembers();
+		public Iterator<ElkClass> iterator() {
+			return classNode_.iterator();
 		}
-
+		
+		@Override
+		public boolean contains(ElkClass member) {
+			return classNode_.contains(member);
+		}
+		
+		@Override
+		public int size() {
+			return classNode_.size();
+		}
+		
 		@Override
 		public ElkClass getCanonicalMember() {
 			return classNode_.getCanonicalMember();

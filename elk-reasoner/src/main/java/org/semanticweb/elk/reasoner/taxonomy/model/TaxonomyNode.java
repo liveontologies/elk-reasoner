@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
 
 import java.util.Set;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
  * A node in a taxonomy. It is a {@link Node} that refers to its sub and super
@@ -34,7 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * @param <T>
  *            the type of objects stored in the nodes
  */
-public interface TaxonomyNode<T extends ElkObject> extends Node<T> {
+public interface TaxonomyNode<T extends ElkEntity> extends Node<T> {
 	/**
 	 * Get an unmodifiable set of nodes for ElkObjects that are direct
 	 * super-objects of this Node.

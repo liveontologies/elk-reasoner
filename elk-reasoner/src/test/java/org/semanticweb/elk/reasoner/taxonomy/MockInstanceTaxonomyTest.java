@@ -66,7 +66,7 @@ public class MockInstanceTaxonomyTest {
 		taxonomy.getTopNode().addDirectParent(taxonomy.getTypeNode(A));
 
 		assertSame(taxonomy.getTopNode(), taxonomy.getTypeNode(A));
-		assertEquals(2, taxonomy.getTopNode().getMembers().size());
+		assertEquals(2, taxonomy.getTopNode().size());
 		assertEquals(2, taxonomy.getTypeNodes().size());
 		assertEquals(2, taxonomy.getNodes().size());
 
@@ -76,7 +76,7 @@ public class MockInstanceTaxonomyTest {
 		taxonomy.getTypeNode(B).addDirectParent(taxonomy.getBottomNode());
 
 		assertSame(taxonomy.getBottomNode(), taxonomy.getTypeNode(B));
-		assertEquals(2, taxonomy.getBottomNode().getMembers().size());
+		assertEquals(2, taxonomy.getBottomNode().size());
 		assertEquals(2, taxonomy.getTypeNodes().size());
 		assertEquals(2, taxonomy.getNodes().size());
 	}

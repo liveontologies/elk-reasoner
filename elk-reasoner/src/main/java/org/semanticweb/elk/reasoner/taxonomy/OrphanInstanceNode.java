@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.taxonomy;
 import java.util.Collections;
 import java.util.Set;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 
 /**
@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
  * @param <I>
  *            the type of instances of this node
  */
-public class OrphanInstanceNode<T extends ElkObject, I extends ElkObject>
+public class OrphanInstanceNode<T extends ElkEntity, I extends ElkEntity>
 		extends OrphanNode<I> implements InstanceNode<T, I> {
 
 	final OrphanTypeNode<T, I> typeNode;

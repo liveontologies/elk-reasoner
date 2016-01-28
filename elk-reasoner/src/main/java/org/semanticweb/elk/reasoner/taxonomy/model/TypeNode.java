@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
 
 import java.util.Set;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
  * A node in a taxonomy that has instances. This mainly makes sense for classes
@@ -39,7 +39,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * @param <I>
  *            the type of instances of this node
  */
-public interface TypeNode<T extends ElkObject, I extends ElkObject> extends
+public interface TypeNode<T extends ElkEntity, I extends ElkEntity> extends
 		TaxonomyNode<T> {
 
 	/**

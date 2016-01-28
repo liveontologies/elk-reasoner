@@ -26,7 +26,7 @@ package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.List;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 
 /**
@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class TaxonomyLinkConsistencyVisitor<T extends ElkObject> implements TaxonomyNodeVisitor<T> {
+public class TaxonomyLinkConsistencyVisitor<T extends ElkEntity> implements TaxonomyNodeVisitor<T> {
 
 	@Override
 	public void visit(TaxonomyNode<T> node,

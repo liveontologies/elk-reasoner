@@ -26,7 +26,7 @@ package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.List;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class TaxonomyNodeDisjointnessVisitor<T extends ElkObject> implements
+public class TaxonomyNodeDisjointnessVisitor<T extends ElkEntity> implements
 		TaxonomyNodeVisitor<T> {
 	
 	private final Taxonomy<T> taxonomy_;
@@ -48,7 +48,7 @@ public class TaxonomyNodeDisjointnessVisitor<T extends ElkObject> implements
 	@Override
 	public void visit(TaxonomyNode<T> node, List<TaxonomyNode<T>> pathFromStart) {
 		// Check that nodes are disjoint
-		for (T member : node.getMembers()) {
+		for (T member : node) {
 			if (node != taxonomy_.getNode(member)) {				
 				TaxonomyNode<T> otherNode = taxonomy_.getNode(member);
 				

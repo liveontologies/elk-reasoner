@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
@@ -48,7 +48,7 @@ import org.semanticweb.elk.util.collections.ArrayHashMap;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class SingletoneInstanceTaxonomy<T extends ElkObject, I extends ElkObject, N extends OrphanTypeNode<T, I>>
+public class SingletoneInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity, N extends OrphanTypeNode<T, I>>
 		extends SingletoneTaxonomy<T, N> implements InstanceTaxonomy<T, I> {
 
 	final Map<I, InstanceNode<T, I>> instanceNodeLookup;
@@ -58,7 +58,7 @@ public class SingletoneInstanceTaxonomy<T extends ElkObject, I extends ElkObject
 		this.instanceNodeLookup = new ArrayHashMap<I, InstanceNode<T, I>>(node
 				.getAllInstanceNodes().size());
 		for (InstanceNode<T, I> instanceNode : node.getAllInstanceNodes()) {
-			for (I instance : instanceNode.getMembers()) {
+			for (I instance : instanceNode) {
 				instanceNodeLookup.put(instance, instanceNode);
 			}
 		}
@@ -76,7 +76,7 @@ public class SingletoneInstanceTaxonomy<T extends ElkObject, I extends ElkObject
 
 	@Override
 	public TypeNode<T, I> getTypeNode(T elkObject) {
-		if (node.getMembers().contains(elkObject))
+		if (node.contains(elkObject))
 			return node;
 		// else
 		return null;

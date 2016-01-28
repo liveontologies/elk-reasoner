@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -150,7 +151,7 @@ public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 			if (previous == null)
 				continue;
 			synchronized (previous) {
-				if (previous.getMembers().size() < members.size())
+				if (previous.size() < members.size())
 					previous.setMembers(members);
 				else
 					return previous;
@@ -190,6 +191,11 @@ public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 	}
 
 	@Override
+	public boolean removeFromBottomNode(ElkClass member) {
+		return unsatisfiableClasses_.remove(member);
+	}
+	
+	@Override
 	public UpdateableTaxonomyNode<ElkClass> getCreateNode(
 			Collection<ElkClass> members) {
 		return getCreateNonBottomClassNode(members);
@@ -201,7 +207,7 @@ public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 
 		if (allSatisfiableClassNodes_.remove(node)) {
 			// removing node assignment for members
-			for (ElkClass member : node.getMembers()) {
+			for (ElkClass member : node) {
 				changed |= classNodeLookup_.remove(getKey(member)) != null;
 			}
 
@@ -239,10 +245,20 @@ public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 	protected class BottomClassNode implements UpdateableBottomNode<ElkClass> {
 
 		@Override
-		public Set<ElkClass> getMembers() {
-			return unsatisfiableClasses_;
+		public Iterator<ElkClass> iterator() {
+			return unsatisfiableClasses_.iterator();
 		}
-
+		
+		@Override
+		public boolean contains(final ElkClass member) {
+			return unsatisfiableClasses_.contains(member);
+		}
+		
+		@Override
+		public int size() {
+			return unsatisfiableClasses_.size();
+		}
+		
 		@Override
 		public ElkClass getCanonicalMember() {
 			return PredefinedElkClass.OWL_NOTHING;

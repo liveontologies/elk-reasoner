@@ -22,14 +22,14 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy.model;
 
-import java.util.Set;
-
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
- * Basic interface for representing sets of equivalent ElkObjects with one
+ * Basic interface for representing sets of equivalent ElkEntity with one
  * canonical representative. The notion of equivalence depends on the
  * application but will usually be implied extensional equality.
+ * <p>
+ * TODO: The entities are compared by their IRI-s!
  * 
  * @author Markus Kroetzsch
  * @author "Yevgeny Kazakov"
@@ -37,16 +37,25 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * @param <T>
  *            the type of members of the node
  */
-public interface Node<T extends ElkObject> {
+public interface Node<T extends ElkEntity> extends Iterable<T> {
 
 	/**
-	 * Get an unmodifiable set of objects that this Node represents. The
-	 * membership in this set is checked using the structural equality.
+	 * Returns <code>true</code> if this node contains a member
+	 * with the same IRI as the specified member.
 	 * 
-	 * @return collection of logically equivalent objects
+	 * @param member The member whose IRI is used for the search.
+	 * @return <code>true</code> if this node contains a member
+	 * 		with the same IRI as the specified member.
 	 */
-	public Set<T> getMembers();
+	public boolean contains(T member);
 
+	/**
+	 * Returns the number of members in this node.
+	 * 
+	 * @return the number of members in this node.
+	 */
+	public int size();
+	
 	/**
 	 * Get one object to canonically represent the classes in this Node.
 	 * 

@@ -22,9 +22,10 @@ package org.semanticweb.elk.reasoner.taxonomy;
  */
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Set;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 
 /**
@@ -37,7 +38,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
  * 
  * @see SingletoneTaxonomy
  */
-public class OrphanNode<T extends ElkObject> implements TaxonomyNode<T> {
+public class OrphanNode<T extends ElkEntity> implements TaxonomyNode<T> {
 
 	/**
 	 * the members of the node
@@ -54,10 +55,20 @@ public class OrphanNode<T extends ElkObject> implements TaxonomyNode<T> {
 	}
 
 	@Override
-	public Set<T> getMembers() {
-		return Collections.unmodifiableSet(members);
+	public Iterator<T> iterator() {
+		return members.iterator();
 	}
-
+	
+	@Override
+	public boolean contains(final T member) {
+		return members.contains(member);
+	}
+	
+	@Override
+	public int size() {
+		return members.size();
+	}
+	
 	@Override
 	public T getCanonicalMember() {
 		return canonical;

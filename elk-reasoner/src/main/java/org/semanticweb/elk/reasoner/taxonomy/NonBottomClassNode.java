@@ -25,7 +25,6 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -136,39 +135,22 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 		directSubNodes_.add(subNode);
 	}
 
-	// TODO: change the type of the output to SortedSet
 	@Override
-	public Set<ElkClass> getMembers() {
-		// create an unmodifiable set view of the members; alternatively, one
-		// could have created a TreeSet, but it consumes more memory
-		return new AbstractSet<ElkClass>() {
-
-			@Override
-			public boolean contains(Object arg) {
-				if (arg instanceof ElkClass)
-					return (Collections.binarySearch(members_, (ElkClass) arg,
-							Comparators.ELK_CLASS_COMPARATOR) >= 0);
-				return false;
-			}
-
-			@Override
-			public boolean isEmpty() {
-				return members_.isEmpty();
-			}
-
-			@Override
-			public Iterator<ElkClass> iterator() {
-				return members_.iterator();
-			}
-
-			@Override
-			public int size() {
-				return members_.size();
-			}
-
-		};
+	public Iterator<ElkClass> iterator() {
+		return members_.iterator();
 	}
-
+	
+	@Override
+	public boolean contains(ElkClass arg) {
+		return (Collections.binarySearch(members_, arg,
+				Comparators.ELK_CLASS_COMPARATOR) >= 0);
+	}
+	
+	@Override
+	public int size() {
+		return members_.size();
+	}
+	
 	@Override
 	public ElkClass getCanonicalMember() {
 		return members_.get(0);

@@ -30,12 +30,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.taxonomy.DepthFirstSearch.Direction;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
@@ -52,7 +53,7 @@ import org.semanticweb.elk.util.collections.Operations.Condition;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class MockInstanceTaxonomy<T extends ElkObject, I extends ElkObject>
+public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 		implements InstanceTaxonomy<T, I> {
 
 	// Top should be made final, the only problem is inconsistency (when it
@@ -83,7 +84,7 @@ public class MockInstanceTaxonomy<T extends ElkObject, I extends ElkObject>
 	}
 
 	private void initTypeNode(TypeNode<T, I> typeNode) {
-		for (T member : typeNode.getMembers()) {
+		for (T member : typeNode) {
 			typeIndex.put(member, typeNode);
 		}
 
@@ -137,7 +138,7 @@ public class MockInstanceTaxonomy<T extends ElkObject, I extends ElkObject>
 		instanceIndex.clear();
 		typeIndex.clear();
 		instanceTypeMap.clear();
-		bottom.addMembers(top.getMembers());
+		bottom.addMembers(top);
 		top = bottom;
 		// init the only node in the taxonomy
 		initTypeNode(bottom);
@@ -244,13 +245,13 @@ public class MockInstanceTaxonomy<T extends ElkObject, I extends ElkObject>
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	interface MutableTypeNode<T extends ElkObject, I extends ElkObject> extends
+	interface MutableTypeNode<T extends ElkEntity, I extends ElkEntity> extends
 			TypeNode<T, I> {
 		void addDirectInstance(InstanceNode<T, I> instNode);
 
 		void addDirectParent(TypeNode<T, I> parent);
 
-		void addMembers(Collection<T> members);
+		void addMembers(Iterable<T> members);
 	}
 
 	/**
@@ -259,7 +260,7 @@ public class MockInstanceTaxonomy<T extends ElkObject, I extends ElkObject>
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	protected abstract class MockNode<O extends ElkObject> implements Node<O> {
+	protected abstract class MockNode<O extends ElkEntity> implements Node<O> {
 
 		final SortedSet<O> members;
 
@@ -269,16 +270,26 @@ public class MockInstanceTaxonomy<T extends ElkObject, I extends ElkObject>
 		}
 
 		@Override
-		public Set<O> getMembers() {
-			return members;
+		public Iterator<O> iterator() {
+			return members.iterator();
 		}
-
+		
+		@Override
+		public boolean contains(O member) {
+			return members.contains(member);
+		}
+		
+		@Override
+		public int size() {
+			return members.size();
+		}
+		
 		@Override
 		public O getCanonicalMember() {
 			return members.isEmpty() ? null : members.iterator().next();
 		}
 
-		protected abstract void addMembers(Collection<O> newMembers);
+		protected abstract void addMembers(Iterable<O> newMembers);
 
 		@Override
 		public String toString() {
@@ -423,7 +434,7 @@ public class MockInstanceTaxonomy<T extends ElkObject, I extends ElkObject>
 		}
 
 		@Override
-		public void addMembers(Collection<T> newMembers) {
+		public void addMembers(Iterable<T> newMembers) {
 			for (T newMember : newMembers) {
 				this.members.add(newMember);
 				MockInstanceTaxonomy.this.typeIndex.put(newMember, this);
@@ -439,7 +450,7 @@ public class MockInstanceTaxonomy<T extends ElkObject, I extends ElkObject>
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	interface ExtremeNode<T extends ElkObject, I extends ElkObject> extends
+	interface ExtremeNode<T extends ElkEntity, I extends ElkEntity> extends
 			MutableTypeNode<T, I> {
 		void merge(TypeNode<T, I> node);
 	}
@@ -461,7 +472,7 @@ public class MockInstanceTaxonomy<T extends ElkObject, I extends ElkObject>
 			// Merge that node into top
 			// It's possible to have a generic "merge" method but it's
 			// non-trivial
-			addMembers(node.getMembers());
+			addMembers(node);
 			// No need to do anything with instances
 			remove(node);
 		}
@@ -567,7 +578,7 @@ public class MockInstanceTaxonomy<T extends ElkObject, I extends ElkObject>
 
 		@Override
 		public void merge(TypeNode<T, I> node) {
-			addMembers(node.getMembers());
+			addMembers(node);
 
 			if (!node.getDirectInstanceNodes().isEmpty()) {
 				makeInconsistent();
@@ -677,7 +688,7 @@ public class MockInstanceTaxonomy<T extends ElkObject, I extends ElkObject>
 		}
 
 		@Override
-		protected void addMembers(Collection<I> newMembers) {
+		protected void addMembers(Iterable<I> newMembers) {
 			for (I newMember : newMembers) {
 				this.members.add(newMember);
 				MockInstanceTaxonomy.this.instanceIndex.put(newMember, this);

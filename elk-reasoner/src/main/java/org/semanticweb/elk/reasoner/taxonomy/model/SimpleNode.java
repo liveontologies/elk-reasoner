@@ -21,29 +21,40 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
-import java.util.Collection;
 import java.util.Comparator;
-import java.util.Set;
+import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 
-public class SimpleNode<T extends ElkObject> implements Node<T> {
+public class SimpleNode<T extends ElkEntity> implements Node<T> {
 
 	final SortedSet<T> members;
 
-	public SimpleNode(Collection<T> members, Comparator<T> cmp) {
+	public SimpleNode(Iterable<T> members, Comparator<T> cmp) {
 		this.members = new TreeSet<T>(cmp);
-		this.members.addAll(members);
+		for (T member : members) {
+			this.members.add(member);
+		}
 	}
-
+	
 	@Override
-	public Set<T> getMembers() {
-		return members;
+	public Iterator<T> iterator() {
+		return members.iterator();
 	}
-
+	
+	@Override
+	public boolean contains(T member) {
+		return members.contains(member);
+	}
+	
+	@Override
+	public int size() {
+		return members.size();
+	}
+	
 	@Override
 	public T getCanonicalMember() {
 		return members.isEmpty() ? null : members.iterator().next();

@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
 import java.util.Collections;
 import java.util.Set;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
  * A fresh InstanceNode containing an object that does not occur in a taxonomy.
@@ -39,7 +39,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * @param <I>
  *            the type of instances in this node
  */
-public class FreshInstanceNode<T extends ElkObject, I extends ElkObject>
+public class FreshInstanceNode<T extends ElkEntity, I extends ElkEntity>
 		extends FreshNode<I> implements InstanceNode<T, I> {
 
 	protected InstanceTaxonomy<T, I> taxonomy;

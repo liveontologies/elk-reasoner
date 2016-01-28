@@ -26,7 +26,7 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
 
 import java.util.Set;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
  * Should be implemented by bottom nodes in updateable taxonomies
@@ -35,7 +35,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  *
  * pavel.klinov@uni-ulm.de
  */
-public interface UpdateableBottomNode<T extends ElkObject> extends TaxonomyNode<T> {
+public interface UpdateableBottomNode<T extends ElkEntity> extends TaxonomyNode<T> {
 
 	public Set<? extends UpdateableTaxonomyNode<T>> getDirectUpdateableSuperNodes();
 	

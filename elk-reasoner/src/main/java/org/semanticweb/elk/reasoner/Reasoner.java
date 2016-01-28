@@ -355,7 +355,7 @@ public class Reasoner extends AbstractReasonerState {
 		Node<ElkClass> queryNode = getQueryTaxonomyNode(queryClass,
 				materializedQuery);
 
-		return new AnonymousNode<ElkClass>(queryClass, queryNode.getMembers(),
+		return new AnonymousNode<ElkClass>(queryClass, queryNode,
 				Comparators.ELK_CLASS_COMPARATOR);
 	}
 
@@ -507,7 +507,7 @@ public class Reasoner extends AbstractReasonerState {
 			queryNode = getQueryNode(queryClass, materializedQuery);
 		}
 
-		return !queryNode.getMembers().contains(PredefinedElkClass.OWL_NOTHING);
+		return !queryNode.contains(PredefinedElkClass.OWL_NOTHING);
 	}
 
 	/**

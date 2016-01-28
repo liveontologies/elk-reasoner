@@ -25,7 +25,6 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -109,36 +108,19 @@ public class IndividualNode implements
 	}
 
 	@Override
-	public Set<ElkNamedIndividual> getMembers() {
-		// create an unmodifiable set view of the members; alternatively, one
-		// could have created a TreeSet, but it consumes more memory
-		return new AbstractSet<ElkNamedIndividual>() {
-
-			@Override
-			public boolean contains(Object arg) {
-				if (arg instanceof ElkNamedIndividual)
-					return (Collections.binarySearch(members_,
-							(ElkNamedIndividual) arg,
-							Comparators.ELK_NAMED_INDIVIDUAL_COMPARATOR) >= 0);
-				return false;
-			}
-
-			@Override
-			public boolean isEmpty() {
-				return members_.isEmpty();
-			}
-
-			@Override
-			public Iterator<ElkNamedIndividual> iterator() {
-				return members_.iterator();
-			}
-
-			@Override
-			public int size() {
-				return members_.size();
-			}
-
-		};
+	public Iterator<ElkNamedIndividual> iterator() {
+		return members_.iterator();
+	}
+	
+	@Override
+	public boolean contains(ElkNamedIndividual member) {
+		return (Collections.binarySearch(members_, member,
+				Comparators.ELK_NAMED_INDIVIDUAL_COMPARATOR) >= 0);
+	}
+	
+	@Override
+	public int size() {
+		return members_.size();
 	}
 	
 	public void setMembers(Collection<ElkNamedIndividual> members) {

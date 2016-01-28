@@ -76,7 +76,7 @@ public class ElkConverter {
 
 	public OWLClassNode convertClassNode(Node<ElkClass> node) {
 		Set<OWLClass> owlClasses = new HashSet<OWLClass>();
-		for (ElkClass cls : node.getMembers()) {
+		for (ElkClass cls : node) {
 			owlClasses.add(convert(cls));
 		}
 		return new OWLClassNode(owlClasses);
@@ -94,7 +94,7 @@ public class ElkConverter {
 	public OWLNamedIndividualNode convertIndividualNode(
 			Node<ElkNamedIndividual> node) {
 		Set<OWLNamedIndividual> owlIndividuals = new HashSet<OWLNamedIndividual>();
-		for (ElkNamedIndividual ind : node.getMembers()) {
+		for (ElkNamedIndividual ind : node) {
 			owlIndividuals.add(convert(ind));
 		}
 		return new OWLNamedIndividualNode(owlIndividuals);

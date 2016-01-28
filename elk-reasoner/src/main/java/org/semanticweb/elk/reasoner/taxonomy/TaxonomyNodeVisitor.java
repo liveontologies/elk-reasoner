@@ -26,7 +26,7 @@ package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.List;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 
 
@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
  *
  * pavel.klinov@uni-ulm.de
  */
-public interface TaxonomyNodeVisitor<T extends ElkObject> {
+public interface TaxonomyNodeVisitor<T extends ElkEntity> {
 
 	public void visit(TaxonomyNode<T> node, List<TaxonomyNode<T>> pathFromStart);
 }

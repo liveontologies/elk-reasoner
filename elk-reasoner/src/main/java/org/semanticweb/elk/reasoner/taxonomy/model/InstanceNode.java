@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
 
 import java.util.Set;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
  * A node of instances in an InstanceTaxonomy.
@@ -39,7 +39,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * 
  * 
  */
-public interface InstanceNode<T extends ElkObject, I extends ElkObject> extends
+public interface InstanceNode<T extends ElkEntity, I extends ElkEntity> extends
 		Node<I> {
 	/**
 	 * Get an unmodifiable set of nodes for ElkObjects that are direct types of

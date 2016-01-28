@@ -202,7 +202,10 @@ public class TaxonomyPrinter {
 			TaxonomyNode<ElkClass> classNode = classTaxonomy.getNode(elkClass);
 
 			ArrayList<ElkClass> orderedEquivalentClasses = new ArrayList<ElkClass>(
-					classNode.getMembers());
+					classNode.size());
+			for (ElkClass member : classNode) {
+				orderedEquivalentClasses.add(member);
+			}
 			Collections.sort(orderedEquivalentClasses, CLASS_COMPARATOR);
 
 			TreeSet<ElkClass> orderedSubClasses = new TreeSet<ElkClass>(
@@ -233,7 +236,7 @@ public class TaxonomyPrinter {
 				.getNodes().size() * 2);
 
 		for (TaxonomyNode<ElkClass> classNode : classTaxonomy.getNodes()) {
-			for (ElkClass clazz : classNode.getMembers()) {
+			for (ElkClass clazz : classNode) {
 				if (!clazz.getIri().equals(PredefinedElkIris.OWL_THING)
 						&& !clazz.getIri()
 								.equals(PredefinedElkIris.OWL_NOTHING)) {
@@ -256,7 +259,7 @@ public class TaxonomyPrinter {
 			Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>> individualNodes,
 			ElkObjectFactory objectFactory, Writer writer) throws IOException {
 		for (InstanceNode<ElkClass, ElkNamedIndividual> individualNode : individualNodes) {
-			for (ElkNamedIndividual individual : individualNode.getMembers()) {
+			for (ElkNamedIndividual individual : individualNode) {
 				ElkDeclarationAxiom decl = objectFactory
 						.getDeclarationAxiom(individual);
 				OwlFunctionalStylePrinter.append(writer, decl, true);
@@ -350,7 +353,10 @@ public class TaxonomyPrinter {
 					.getInstanceNode(individual);
 
 			ArrayList<ElkNamedIndividual> orderedSameIndividuals = new ArrayList<ElkNamedIndividual>(
-					node.getMembers());
+					node.size());
+			for (ElkNamedIndividual member : node) {
+				orderedSameIndividuals.add(member);
+			}
 			Collections.sort(orderedSameIndividuals, INDIVIDUAL_COMPARATOR);
 
 			TreeSet<ElkClass> orderedTypes = new TreeSet<ElkClass>(

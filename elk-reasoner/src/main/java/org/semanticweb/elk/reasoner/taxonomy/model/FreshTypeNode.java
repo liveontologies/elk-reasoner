@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
 import java.util.Collections;
 import java.util.Set;
 
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
@@ -38,7 +39,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  *            the type of instances of nodes of this taxonomy
  * 
  */
-public class FreshTypeNode<T extends ElkObject, I extends ElkObject> extends
+public class FreshTypeNode<T extends ElkEntity, I extends ElkEntity> extends
 		FreshNode<T> implements TypeNode<T, I> {
 
 	protected InstanceTaxonomy<T, I> taxonomy;
