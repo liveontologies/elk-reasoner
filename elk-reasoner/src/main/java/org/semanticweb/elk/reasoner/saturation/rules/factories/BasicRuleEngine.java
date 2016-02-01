@@ -25,52 +25,47 @@ import org.semanticweb.elk.ModifiableReference;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContextInitializationNoPremises;
 import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
- * An {@link AbstractRuleEngine} which produces {@link ClassConclusion}s and
+ * An {@link AbstractRuleEngine} which produces {@link ClassInference}s and
  * retrieves active {@link Context}s using the provided
  * {@link SaturationStateWriter}
  * 
  * @author "Yevgeny Kazakov"
  */
-public class BasicRuleEngine<I extends RuleApplicationInput> extends
-		AbstractRuleEngineWithStatistics<I> {
+public class BasicRuleEngine<I extends RuleApplicationInput>
+		extends
+			AbstractRuleEngineWithStatistics<I> {
 
 	private final OntologyIndex index_;
 
 	/**
-	 * The factory for creating {@link ContextInitialization}s
-	 */
-	private final ContextInitialization.Factory factory_;
-	
-	/**
-	 * a {@link SaturationStateWriter} to produce new {@link ClassConclusion}s and
-	 * query for active {@link Context}s
+	 * a {@link SaturationStateWriter} to produce new {@link ClassInference}s
+	 * and query for active {@link Context}s
 	 */
 	private final SaturationStateWriter<?> writer_;
 
 	protected BasicRuleEngine(OntologyIndex index,
 			ModifiableReference<Context> activeContext,
-			ClassConclusion.Visitor<Boolean> conclusionProcessor,
+			ClassInference.Visitor<Boolean> inferenceProcessor,
 			WorkerLocalTodo localTodo, Interrupter interrupter,
 			SaturationStateWriter<?> writer,
 			SaturationStatistics aggregatedStatistics,
 			SaturationStatistics localStatistics) {
-		super(activeContext, conclusionProcessor, localTodo, interrupter,
+		super(activeContext, inferenceProcessor, localTodo, interrupter,
 				aggregatedStatistics, localStatistics);
 		this.index_ = index;
-		this.factory_ = new SaturationConclusionBaseFactory();
 		this.writer_ = writer;
 	}
 
 	@Override
 	public void submit(RuleApplicationInput job) {
-		writer_.produce(factory_.getContextInitialization(job.getRoot(), index_));
+		writer_.produce(
+				new ContextInitializationNoPremises(job.getRoot(), index_));
 	}
 
 	@Override

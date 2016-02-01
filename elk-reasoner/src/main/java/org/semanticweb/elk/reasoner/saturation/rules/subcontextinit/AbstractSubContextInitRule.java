@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.subcontextinit;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.subcontextinit;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
@@ -35,9 +35,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 abstract class AbstractSubContextInitRule implements SubContextInitRule {
 
 	@Override
-	public void accept(RuleVisitor<?> visitor,
-			SubContextInitialization premise, ContextPremises premises,
-			ClassConclusionProducer producer) {
+	public void accept(RuleVisitor<?> visitor, SubContextInitialization premise,
+			ContextPremises premises, ClassInferenceProducer producer) {
 		accept((SubContextInitRuleVisitor<?>) visitor, premise, premises,
 				producer);
 	}

@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ForwardLinkImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
 public abstract class AbstractForwardLinkInference<R extends IndexedPropertyChain>
@@ -35,6 +36,11 @@ public abstract class AbstractForwardLinkInference<R extends IndexedPropertyChai
 	public AbstractForwardLinkInference(IndexedContextRoot root, R relation,
 			IndexedContextRoot target) {
 		super(root, relation, target);
+	}
+	
+	public ForwardLink getConclusion(ForwardLink.Factory factory) {
+		return factory.getForwardLink(getDestination(), getForwardChain(),
+				getTarget());
 	}
 	
 	@Override

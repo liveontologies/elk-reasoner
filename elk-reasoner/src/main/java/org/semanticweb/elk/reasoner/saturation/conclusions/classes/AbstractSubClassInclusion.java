@@ -27,7 +27,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SubsumerDecompositionVisitor;
@@ -60,7 +60,7 @@ public abstract class AbstractSubClassInclusion<S extends IndexedClassExpression
 
 	@Override
 	public IndexedContextRoot getSubExpression() {
-		return getConclusionRoot();
+		return getDestination();
 	}
 	
 	@Override
@@ -69,7 +69,7 @@ public abstract class AbstractSubClassInclusion<S extends IndexedClassExpression
 	}
 
 	void applyCompositionRules(RuleVisitor<?> ruleAppVisitor,
-			ContextPremises premises, ClassConclusionProducer producer) {
+			ContextPremises premises, ClassInferenceProducer producer) {
 		LinkedSubsumerRule compositionRule = expression_
 				.getCompositionRuleHead();
 		while (compositionRule != null) {
@@ -80,7 +80,7 @@ public abstract class AbstractSubClassInclusion<S extends IndexedClassExpression
 	}
 
 	void applyDecompositionRules(RuleVisitor<?> ruleAppVisitor,
-			ContextPremises premises, ClassConclusionProducer producer) {
+			ContextPremises premises, ClassInferenceProducer producer) {
 		expression_.accept(new SubsumerDecompositionVisitor(ruleAppVisitor,
 				premises, producer));
 	}

@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkClassAssertionAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
@@ -47,7 +48,15 @@ class ModifiableElkClassAssertionAxiomConversionImpl
 	}
 
 	@Override
-	public final <O> O accept(IndexedSubClassOfAxiomInference.Visitor<O> visitor) {
+	public IndexedSubClassOfAxiom getConclusion(
+			IndexedSubClassOfAxiom.Factory factory) {
+		return factory.getIndexedSubClassOfAxiom(getOriginalAxiom(),
+				getSubClass(), getSuperClass());
+	}
+
+	@Override
+	public final <O> O accept(
+			IndexedSubClassOfAxiomInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

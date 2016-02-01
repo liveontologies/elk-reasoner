@@ -56,13 +56,13 @@ public class PropagationGenerated extends AbstractPropagationInference {
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceRoot() {
-		return getConclusionRoot();
+	public IndexedContextRoot getOrigin() {
+		return getDestination();
 	}
 
 	public SubClassInclusionComposed getFirstPremise(
 			SubClassInclusionComposed.Factory factory) {
-		return factory.getSubClassInclusionComposed(getInferenceRoot(),
+		return factory.getSubClassInclusionComposed(getOrigin(),
 				getCarry().getFiller());
 	}
 

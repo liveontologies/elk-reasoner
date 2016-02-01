@@ -45,8 +45,8 @@ public class SubClassInclusionOwlThing
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceRoot() {
-		return getConclusionRoot();
+	public IndexedContextRoot getOrigin() {
+		return getDestination();
 	}
 
 	@Override

@@ -2,7 +2,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.contextinit;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 
 /*
  * #%L
@@ -37,10 +37,10 @@ import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 public interface LinkedContextInitRuleVisitor<O> {
 
 	public O visit(OwlThingContextInitRule rule, ContextInitialization premise,
-			ContextPremises premises, ClassConclusionProducer producer);
+			ContextPremises premises, ClassInferenceProducer producer);
 
 	public O visit(RootContextInitializationRule rule,
 			ContextInitialization premise, ContextPremises premises,
-			ClassConclusionProducer producer);
+			ClassInferenceProducer producer);
 
 }

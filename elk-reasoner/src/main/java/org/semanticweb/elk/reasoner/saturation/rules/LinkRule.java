@@ -29,5 +29,5 @@ public interface LinkRule<P> extends Rule<P>, Link<LinkRule<P>> {
 
 	@Override
 	public void accept(RuleVisitor<?> visitor, P premise,
-			ContextPremises premises, ClassConclusionProducer producer);
+			ContextPremises premises, ClassInferenceProducer producer);
 }

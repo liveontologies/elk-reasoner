@@ -29,12 +29,13 @@ import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.InitializationConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.SubContext;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContextInitializationNoPremises;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubContextInitializationNoPremises;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 
 /**
  * A {@link ClassConclusionInsertionVisitor} that initializes the
@@ -53,25 +54,16 @@ public class ContextInitializingClassConclusionInsertionVisitor
 	 * The producer for {@link ContextInitialization}s and
 	 * {@link SubContextInitialization}s
 	 */
-	private final ClassConclusionProducer producer_;
+	private final ClassInferenceProducer producer_;
 
 	private final OntologyIndex index_;
 
-	private final InitializationConclusion.Factory factory_;
-
 	public ContextInitializingClassConclusionInsertionVisitor(
 			Reference<Context> contextRef,
-			InitializationConclusion.Factory factory,
 			SaturationStateWriter<?> writer) {
 		super(contextRef, writer);
 		this.producer_ = writer;
 		this.index_ = writer.getSaturationState().getOntologyIndex();
-		this.factory_ = factory;
-	}
-
-	public ContextInitializingClassConclusionInsertionVisitor(
-			Reference<Context> contextRef, SaturationStateWriter<?> writer) {
-		this(contextRef, new SaturationConclusionBaseFactory(), writer);
 	}
 
 	@Override
@@ -79,14 +71,14 @@ public class ContextInitializingClassConclusionInsertionVisitor
 		Context context = get();
 		IndexedContextRoot root = context.getRoot();
 		if (context.isEmpty()) {
-			producer_.produce(factory_.getContextInitialization(root, index_));
+			producer_.produce(new ContextInitializationNoPremises(root, index_));
 		}
 		if (conclusion instanceof SubClassConclusion) {
 			IndexedObjectProperty subRoot = ((SubClassConclusion) conclusion)
-					.getConclusionSubRoot();
+					.getDestinationSubRoot();
 			if (context.isEmpty(subRoot)) {
 				producer_.produce(
-						factory_.getSubContextInitialization(root, subRoot));
+						new SubContextInitializationNoPremises(root, subRoot));
 			}
 		}
 		return super.defaultVisit(conclusion);

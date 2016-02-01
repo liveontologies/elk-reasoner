@@ -37,9 +37,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContextInitializationNoPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
 import org.semanticweb.elk.util.collections.Operations;
@@ -48,9 +47,13 @@ import org.semanticweb.elk.util.collections.Operations;
  * 
  * 
  */
-public class IncrementalDeletionInitializationStage extends AbstractIncrementalChangesInitializationStage {
+public class IncrementalDeletionInitializationStage
+		extends
+			AbstractIncrementalChangesInitializationStage {
 
-	public IncrementalDeletionInitializationStage(AbstractReasonerState reasoner, AbstractReasonerStage... preStages) {
+	public IncrementalDeletionInitializationStage(
+			AbstractReasonerState reasoner,
+			AbstractReasonerStage... preStages) {
 		super(reasoner, preStages);
 	}
 
@@ -76,16 +79,20 @@ public class IncrementalDeletionInitializationStage extends AbstractIncrementalC
 		changedDefinitions = diffIndex.getRemovedDefinitions();
 		changedDefinitionReasons = diffIndex.getRemovedDefinitionReasons();
 
-		if (changedInitRules != null || !changedRulesByCE.isEmpty() || !changedDefinitions.isEmpty()) {
+		if (changedInitRules != null || !changedRulesByCE.isEmpty()
+				|| !changedDefinitions.isEmpty()) {
 
-			inputs = Operations.split(reasoner.saturationState.getContexts(), 8 * workerNo);
+			inputs = Operations.split(reasoner.saturationState.getContexts(),
+					8 * workerNo);
 		}
 
 		// System.err.println(changedRulesByCE.keySet().size());
 
-		this.initialization = new IncrementalChangesInitialization(inputs, changedInitRules, changedRulesByCE,
-				changedDefinitions, changedDefinitionReasons, reasoner.saturationState, reasoner.getProcessExecutor(),
-				stageStatistics, workerNo, reasoner.getProgressMonitor());
+		this.initialization = new IncrementalChangesInitialization(inputs,
+				changedInitRules, changedRulesByCE, changedDefinitions,
+				changedDefinitionReasons, reasoner.saturationState,
+				reasoner.getProcessExecutor(), stageStatistics, workerNo,
+				reasoner.getProgressMonitor());
 
 		return true;
 	}
@@ -96,9 +103,12 @@ public class IncrementalDeletionInitializationStage extends AbstractIncrementalC
 			return false;
 		this.initialization = null;
 		// initializing contexts which will be removed
-		final SaturationStateWriter<?> satStateWriter = reasoner.saturationState.getContextCreatingWriter();
-		final ClassTaxonomyState.Writer taxStateWriter = reasoner.classTaxonomyState.getWriter();
-		final InstanceTaxonomyState.Writer instanceTaxStateWriter = reasoner.instanceTaxonomyState.getWriter();
+		final SaturationStateWriter<?> satStateWriter = reasoner.saturationState
+				.getContextCreatingWriter();
+		final ClassTaxonomyState.Writer taxStateWriter = reasoner.classTaxonomyState
+				.getWriter();
+		final InstanceTaxonomyState.Writer instanceTaxStateWriter = reasoner.instanceTaxonomyState
+				.getWriter();
 		final IndexedClassExpression.Visitor<Object> entityRemovalVisitor = new DummyIndexedClassExpressionVisitor<Object>() {
 
 			@Override
@@ -115,13 +125,13 @@ public class IncrementalDeletionInitializationStage extends AbstractIncrementalC
 		};
 
 		OntologyIndex index = reasoner.saturationState.getOntologyIndex();
-		
-		ContextInitialization.Factory factory = new SaturationConclusionBaseFactory();
 
-		for (IndexedClassExpression ice : reasoner.ontologyIndex.getRemovedClassExpressions()) {
+		for (IndexedClassExpression ice : reasoner.ontologyIndex
+				.getRemovedClassExpressions()) {
 
 			if (reasoner.saturationState.getContext(ice) != null) {
-				satStateWriter.produce(factory.getContextInitialization(ice, index));
+				satStateWriter.produce(
+						new ContextInitializationNoPremises(ice, index));
 				// mark removed classes
 				ice.accept(entityRemovalVisitor);
 			}

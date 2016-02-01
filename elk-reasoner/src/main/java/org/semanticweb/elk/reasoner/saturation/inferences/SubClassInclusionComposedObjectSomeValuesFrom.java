@@ -53,14 +53,14 @@ public class SubClassInclusionComposedObjectSomeValuesFrom
 	public SubClassInclusionComposedObjectSomeValuesFrom(Propagation premise,
 			IndexedContextRoot conclusionRoot) {
 		super(conclusionRoot, premise.getCarry());
-		inferenceRoot_ = premise.getConclusionRoot();
+		inferenceRoot_ = premise.getDestination();
 		propagationRelation_ = premise.getRelation();
 	}
 
 	public SubClassInclusionComposedObjectSomeValuesFrom(BackwardLink premise,
 			IndexedObjectSomeValuesFrom carry) {
-		super(premise.getOriginRoot(), carry);
-		inferenceRoot_ = premise.getConclusionRoot();
+		super(premise.getTraceRoot(), carry);
+		inferenceRoot_ = premise.getDestination();
 		propagationRelation_ = premise.getBackwardRelation();
 	}
 
@@ -69,17 +69,17 @@ public class SubClassInclusionComposedObjectSomeValuesFrom
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceRoot() {
+	public IndexedContextRoot getOrigin() {
 		return inferenceRoot_;
 	}
 
 	public BackwardLink getFirstPremise(BackwardLink.Factory factory) {
-		return factory.getBackwardLink(getInferenceRoot(), propagationRelation_,
-				getConclusionRoot());
+		return factory.getBackwardLink(getOrigin(), propagationRelation_,
+				getDestination());
 	}
 
 	public Propagation getSecondPremise(Propagation.Factory factory) {
-		return factory.getPropagation(getInferenceRoot(), propagationRelation_,
+		return factory.getPropagation(getOrigin(), propagationRelation_,
 				getSuperExpression());
 	}
 

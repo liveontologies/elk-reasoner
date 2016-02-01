@@ -26,7 +26,7 @@ package org.semanticweb.elk.reasoner.tracing;
  */
 
 /**
- * A skeleton implementation of {@link Conclusion}
+ * A skeleton implementation of {@link Conclusion} with structural comparison
  * 
  * @author Yevgeny Kazakov
  *
@@ -46,14 +46,19 @@ public abstract class AbstractConclusion implements Conclusion {
 		// else
 		return hashCode_;
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
-		if (this == o || hashCode() == o.hashCode()) {
+		if (this == o) {
 			return true;
-		}	
+		}
 		// else
-		return ConclusionEquality.equals(this, o);
+		if (o instanceof Conclusion) {
+			return hashCode() == o.hashCode()
+					&& ConclusionEquality.equals(this, (Conclusion) o);
+		}
+		// else
+		return false;
 	}
 
 	@Override

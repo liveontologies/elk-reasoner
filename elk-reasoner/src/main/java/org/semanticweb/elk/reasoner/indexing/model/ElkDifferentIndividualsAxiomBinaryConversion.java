@@ -62,7 +62,10 @@ public interface ElkDifferentIndividualsAxiomBinaryConversion
 	 * @see #getFirstIndividualPosition()
 	 */
 	int getSecondIndividualPosition();
-	
+
+	IndexedSubClassOfAxiom getConclusion(
+			IndexedSubClassOfAxiom.Factory factory);
+
 	/**
 	 * The visitor pattern for instances
 	 * 
@@ -72,9 +75,9 @@ public interface ElkDifferentIndividualsAxiomBinaryConversion
 	 *            the type of the output
 	 */
 	interface Visitor<O> {
-		
+
 		O visit(ElkDifferentIndividualsAxiomBinaryConversion inference);
-		
+
 	}
 
 }

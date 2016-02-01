@@ -22,9 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
-
-public interface ForwardLinkInference extends ForwardLink, ClassInference {
+public interface ForwardLinkInference extends ClassInference {
 
 	public <O> O accept(Visitor<O> visitor);
 

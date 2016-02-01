@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.contextinit;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 import org.semanticweb.elk.util.collections.chains.Link;
 
 /**
@@ -40,6 +40,6 @@ public interface LinkedContextInitRule extends ContextInitRule,
 
 	public void accept(LinkedContextInitRuleVisitor<?> visitor,
 			ContextInitialization premise, ContextPremises premises,
-			ClassConclusionProducer producer);
+			ClassInferenceProducer producer);
 
 }

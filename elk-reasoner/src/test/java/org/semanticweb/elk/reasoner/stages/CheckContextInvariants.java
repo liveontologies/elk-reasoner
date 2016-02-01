@@ -3,6 +3,10 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+
 /*
  * #%L
  * ELK Reasoner
@@ -27,9 +31,6 @@ package org.semanticweb.elk.reasoner.stages;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * For now just checks that all classes have themselves as subsumers in their contexts.
@@ -64,10 +65,10 @@ public class CheckContextInvariants extends BasePostProcessingStage {
 				LOGGER_.error(context.getRoot() + (context.isSaturated() ? " [saturated]" : " [modified]") + ": not a subsumer of itself");
 			}
 			
-			ClassConclusion conclusion = context.takeToDo(); 
+			ClassInference inference = context.takeToDo(); 
 			
-			if (conclusion != null) {
-				LOGGER_.error(context.getRoot() + ": non-empty TODO: " + conclusion);
+			if (inference != null) {
+				LOGGER_.error(context.getRoot() + ": non-empty TODO: " + inference);
 			}
 		}
 	}

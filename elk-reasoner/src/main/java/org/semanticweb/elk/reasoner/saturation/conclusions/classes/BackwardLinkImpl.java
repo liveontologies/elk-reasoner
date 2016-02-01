@@ -50,18 +50,18 @@ public class BackwardLinkImpl extends AbstractSubClassConclusion implements
 	}
 
 	@Override
-	public IndexedContextRoot getOriginRoot() {
+	public IndexedContextRoot getTraceRoot() {
 		return origin_;
 	}
 
 	@Override
-	public IndexedObjectProperty getOriginSubRoot() {
+	public IndexedObjectProperty getTraceSubRoot() {
 		return null;
 	}
 
 	@Override
 	public IndexedObjectProperty getBackwardRelation() {
-		return getConclusionSubRoot();
+		return getDestinationSubRoot();
 	}
 
 	@Override

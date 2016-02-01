@@ -24,8 +24,8 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriterWrap;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 
 /**
  * A {@link SaturationStateWriter} that produces {@link Conclusions} to the
@@ -49,12 +49,12 @@ public class WorkerLocalizedSaturationStateWriter<C extends Context> extends
 	}
 
 	@Override
-	public void produce(ClassConclusion conclusion) {
+	public void produce(ClassInference inference) {
 		if (localTodo_.isActivated()
-				&& conclusion.getConclusionRoot() == localTodo_.getActiveRoot()) {
-			localTodo_.add(conclusion);
+				&& inference.getDestination() == localTodo_.getActiveRoot()) {
+			localTodo_.add(inference);
 		} else {
-			mainWriter.produce(conclusion);
+			mainWriter.produce(inference);
 		}
 	}
 

@@ -66,7 +66,7 @@ public class ContradictionOfDisjointSubsumers extends
 
 	public ContradictionOfDisjointSubsumers(DisjointSubsumer premise,
 			Integer otherPos) {
-		super(premise.getConclusionRoot());
+		super(premise.getDestination());
 		this.disjointExpressions_ = premise.getDisjointExpressions();
 		this.firstPosition_ = premise.getPosition();
 		this.secondPosition_ = otherPos;
@@ -78,17 +78,17 @@ public class ContradictionOfDisjointSubsumers extends
 	}
 	
 	@Override
-	public IndexedContextRoot getInferenceRoot() {
-		return getConclusionRoot();
+	public IndexedContextRoot getOrigin() {
+		return getDestination();
 	}
 	
 	public DisjointSubsumer getFirstPremise(DisjointSubsumer.Factory factory) {
-		return factory.getDisjointSubsumer(getInferenceRoot(),
+		return factory.getDisjointSubsumer(getOrigin(),
 				disjointExpressions_, firstPosition_, reason_);
 	}
 	
 	public DisjointSubsumer getSecondPremise(DisjointSubsumer.Factory factory) {
-		return factory.getDisjointSubsumer(getInferenceRoot(),
+		return factory.getDisjointSubsumer(getOrigin(),
 				disjointExpressions_, secondPosition_, reason_);
 	}
 	

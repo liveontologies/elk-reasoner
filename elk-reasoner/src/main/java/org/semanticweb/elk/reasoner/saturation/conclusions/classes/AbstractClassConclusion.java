@@ -42,20 +42,20 @@ public abstract class AbstractClassConclusion extends AbstractConclusion
 		implements
 			ClassConclusion {
 
-	private final IndexedContextRoot root_;
+	private final IndexedContextRoot destination_;
 
-	protected AbstractClassConclusion(IndexedContextRoot root) {
-		this.root_ = root;
+	protected AbstractClassConclusion(IndexedContextRoot destination) {
+		this.destination_ = destination;
 	}
 
 	@Override
-	public IndexedContextRoot getConclusionRoot() {
-		return this.root_;
+	public IndexedContextRoot getDestination() {
+		return this.destination_;
 	}
 
 	@Override
-	public IndexedContextRoot getOriginRoot() {
-		return this.root_;
+	public IndexedContextRoot getTraceRoot() {
+		return this.destination_;
 	}
 
 	@Override

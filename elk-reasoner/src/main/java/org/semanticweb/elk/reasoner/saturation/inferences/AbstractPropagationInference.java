@@ -26,6 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.PropagationImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
 public abstract class AbstractPropagationInference extends PropagationImpl
@@ -34,6 +35,11 @@ public abstract class AbstractPropagationInference extends PropagationImpl
 	public AbstractPropagationInference(IndexedContextRoot root,
 			IndexedObjectProperty relation, IndexedObjectSomeValuesFrom carry) {
 		super(root, relation, carry);
+	}
+	
+	public Propagation getConclusion(Propagation.Factory factory) {
+		return factory.getPropagation(getDestination(), getRelation(),
+				getCarry());
 	}
 	
 	@Override

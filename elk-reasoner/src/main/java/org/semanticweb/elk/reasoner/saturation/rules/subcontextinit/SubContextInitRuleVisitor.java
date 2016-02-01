@@ -2,7 +2,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.subcontextinit;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 
 /*
  * #%L
@@ -38,6 +38,6 @@ public interface SubContextInitRuleVisitor<O> {
 
 	public O visit(PropagationInitializationRule rule,
 			SubContextInitialization premise, ContextPremises premises,
-			ClassConclusionProducer producer);
+			ClassInferenceProducer producer);
 
 }

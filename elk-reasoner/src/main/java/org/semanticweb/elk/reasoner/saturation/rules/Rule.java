@@ -30,7 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
  * A rule that can be applied to a given premise (either a {@link ClassConclusion} or
  * an object representing a {@link ClassConclusion}) together with other
  * {@link ClassConclusion}s stored in within {@link ContextPremises}. The rule
- * produces other {@link ClassConclusion}s using the given {@link ClassConclusionProducer}
+ * produces other {@link ClassConclusion}s using the given {@link ClassInferenceProducer}
  * .
  * 
  * @author "Yevgeny Kazakov"
@@ -44,7 +44,7 @@ public interface Rule<P> {
 	 * Apply the rule to the given premise representing a {@link ClassConclusion} and
 	 * other {@link ClassConclusion}s stored in within the given
 	 * {@link ContextPremises} and produce {@link ClassConclusion}s using the given
-	 * {@link ClassConclusionProducer}
+	 * {@link ClassInferenceProducer}
 	 * 
 	 * @param premise
 	 *            the element to which the rule is applied, it represents a
@@ -53,12 +53,12 @@ public interface Rule<P> {
 	 *            the {@link ContextPremises} from which other matching premises
 	 *            of the rule are taken
 	 * @param producer
-	 *            the {@link ClassConclusionProducer} using which {@link ClassConclusion}s
+	 *            the {@link ClassInferenceProducer} using which {@link ClassConclusion}s
 	 *            of the inferences are produced
 	 * 
 	 */
 	public void apply(P premise, ContextPremises premises,
-			ClassConclusionProducer producer);
+			ClassInferenceProducer producer);
 
 	/**
 	 * @return {@code true} if this {@link Rule} produces only
@@ -66,21 +66,21 @@ public interface Rule<P> {
 	 *         {@link ClassConclusion} (or its representation) to which the rule is
 	 *         applied. Specifically, if applied for a {@link ClassConclusion} the
 	 *         rule can produce only {@link ClassConclusion}s with the same value of
-	 *         {@link ClassConclusion#getOriginRoot()}. Additionally, if applied to a
+	 *         {@link ClassConclusion#getTraceRoot()}. Additionally, if applied to a
 	 *         {@link SubClassConclusion} the rule can produce only
 	 *         {@link SubClassConclusion} with the same values of
-	 *         {@link SubClassConclusion#getOriginSubRoot()} or a {@link ClassConclusion}
+	 *         {@link SubClassConclusion#getTraceSubRoot()} or a {@link ClassConclusion}
 	 *         if this value is {@code null}. Returns {@code false} if this
 	 *         {@link Rule} produces only {@link ClassConclusion}s with the different
 	 *         origin root or sub-root as the {@link ClassConclusion} (or its
 	 *         representation) to which the rule is applied.
 	 * 
-	 * @see ClassConclusion#getOriginRoot()
-	 * @see SubClassConclusion#getConclusionRoot()
+	 * @see ClassConclusion#getTraceRoot()
+	 * @see SubClassConclusion#getDestination()
 	 */
 	public boolean isLocal();
 
 	public void accept(RuleVisitor<?> visitor, P premise,
-			ContextPremises premises, ClassConclusionProducer producer);
+			ContextPremises premises, ClassInferenceProducer producer);
 
 }

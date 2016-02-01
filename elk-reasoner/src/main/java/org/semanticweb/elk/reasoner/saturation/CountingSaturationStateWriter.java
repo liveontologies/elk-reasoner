@@ -23,15 +23,15 @@ package org.semanticweb.elk.reasoner.saturation;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionCounter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.CountingClassConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.CountingClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 
 /**
  * A {@link SaturationStateWriter} that mirrors all operations of the provided
  * internal {@link SaturationStateWriter} and additionally counts the number of
- * produced {@link ClassConclusion}s using a provided {@link ClassConclusionCounter}
+ * produced {@link ClassInference}s using a provided {@link ClassConclusionCounter}
  * 
  * @see ClassConclusionProducer#produce(ClassConclusion)
  * 
@@ -40,18 +40,18 @@ import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 public class CountingSaturationStateWriter<C extends Context> extends
 		SaturationStateWriterWrap<C> {
 
-	private final ClassConclusion.Visitor<Boolean> countingVisitor_;
+	private final ClassInference.Visitor<Boolean> countingVisitor_;
 
 	public CountingSaturationStateWriter(SaturationStateWriter<C> writer,
 			ClassConclusionCounter counter) {
 		super(writer);
-		this.countingVisitor_ = new CountingClassConclusionVisitor(counter);
+		this.countingVisitor_ = new CountingClassInferenceVisitor(counter);
 	}
 
 	@Override
-	public void produce(ClassConclusion conclusion) {
-		mainWriter.produce(conclusion);
-		conclusion.accept(countingVisitor_);
+	public void produce(ClassInference inference) {
+		mainWriter.produce(inference);
+		inference.accept(countingVisitor_);
 	}
 
 }

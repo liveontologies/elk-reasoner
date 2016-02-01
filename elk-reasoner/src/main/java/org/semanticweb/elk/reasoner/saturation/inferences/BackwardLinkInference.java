@@ -22,9 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
-
-public interface BackwardLinkInference extends BackwardLink, ClassInference {
+public interface BackwardLinkInference extends ClassInference {
 
 	public <O> O accept(Visitor<O> visitor);
 

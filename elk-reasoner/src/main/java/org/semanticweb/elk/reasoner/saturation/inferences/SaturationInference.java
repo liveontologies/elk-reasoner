@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
 /**
@@ -33,10 +34,10 @@ import org.semanticweb.elk.reasoner.tracing.Inference;
  * @author Yevgeny Kazakov
  *
  */
-public interface SaturationInference extends SaturationConclusion, Inference {
+public interface SaturationInference extends Inference {
 
 	public <O> O accept(Visitor<O> visitor);
-	
+
 	/**
 	 * Visitor pattern for instances
 	 * 

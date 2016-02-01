@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.forwardlink;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 
 /**
  * A visitor pattern for {@link ForwardLinkRule}s
@@ -37,12 +37,12 @@ import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
 public interface ForwardLinkRuleVisitor<O> {
 
 	O visit(BackwardLinkFromForwardLinkRule rule, ForwardLink premise,
-			ContextPremises premises, ClassConclusionProducer producer);
+			ContextPremises premises, ClassInferenceProducer producer);
 
 	O visit(ReflexiveBackwardLinkCompositionRule rule, ForwardLink premise,
-			ContextPremises premises, ClassConclusionProducer producer);
+			ContextPremises premises, ClassInferenceProducer producer);
 
 	O visit(NonReflexiveBackwardLinkCompositionRule rule, ForwardLink premise,
-			ContextPremises premises, ClassConclusionProducer producer);
+			ContextPremises premises, ClassInferenceProducer producer);
 
 }

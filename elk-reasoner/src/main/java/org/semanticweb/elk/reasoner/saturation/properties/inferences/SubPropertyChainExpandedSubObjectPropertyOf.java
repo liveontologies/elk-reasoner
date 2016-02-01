@@ -76,6 +76,10 @@ public class SubPropertyChainExpandedSubObjectPropertyOf
 		return factory.getSubPropertyChain(middleChain_, getSuperChain());
 	}
 
+	public SubPropertyChain getConclusion(SubPropertyChain.Factory factory) {
+		return factory.getSubPropertyChain(getSubChain(), getSuperChain());
+	}
+
 	public IndexedSubObjectPropertyOfAxiom getSideCondition(
 			IndexedSubObjectPropertyOfAxiom.Factory factory) {
 		return factory.getIndexedSubObjectPropertyOfAxiom(reason_,

@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * {@link ClassConclusion} can potentially be re-derived. The visit method
  * returns always {@link true}.
  * 
- * @see ClassConclusion#getOriginRoot()
+ * @see ClassConclusion#getTraceRoot()
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -52,7 +52,7 @@ public class ClassConclusionOriginContextUnsaturationVisitor extends
 
 	@Override
 	protected Boolean defaultVisit(ClassConclusion conclusion) {
-		writer_.markAsNotSaturated(conclusion.getOriginRoot());
+		writer_.markAsNotSaturated(conclusion.getTraceRoot());
 		return true;
 	}
 

@@ -24,67 +24,67 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
 
 /**
- * An object which can be used to count {@link ClassConclusion}s. The fields of the
- * counter correspond to the methods of {@link ClassConclusion.Visitor}.
+ * An object which can be used to count {@link ClassConclusion}s. The fields of
+ * the counter correspond to the methods of {@link ClassConclusion.Visitor}.
  * 
  * @author "Yevgeny Kazakov"
  */
 public class ClassConclusionCounter {
 
 	/**
-	 * counter for {@link BackwardLink}s
+	 * counter for {@link BackwardLink}
 	 */
-	long countBackwardLinks;
+	long countBackwardLink;
 
 	/**
-	 * counter for {@link ContextInitialization}s
+	 * counter for {@link ContextInitialization}
 	 */
-	long countContextInitializations;
+	long countContextInitialization;
 
 	/**
-	 * counter for {@link Contradiction}s
+	 * counter for {@link Contradiction}
 	 */
-	long countContradictions;
+	long countContradiction;
 
 	/**
-	 * counter for {@link DisjointSubsumer}s
+	 * counter for {@link DisjointSubsumer}
 	 */
-	long countDisjointSubsumers;
+	long countDisjointSubsumer;
 
 	/**
-	 * counter for {@link ForwardLink}s
+	 * counter for {@link ForwardLink}
 	 */
-	long countForwardLinks;
+	long countForwardLink;
 
 	/**
-	 * counter for {@link SubClassInclusionDecomposed}s
+	 * counter for {@link SubClassInclusionDecomposed}
 	 */
-	long countDecomposedSubsumers;
+	long countSubClassInclusionDecomposed;
 
 	/**
-	 * counter for {@link SubClassInclusionComposed}s
+	 * counter for {@link SubClassInclusionComposed}
 	 */
-	long countComposedSubsumers;
+	long countSubClassInclusionComposed;
 
 	/**
-	 * counter for {@link Propagation}s
+	 * counter for {@link Propagation}
 	 */
-	long countPropagations;
+	long countPropagation;
 
 	/**
-	 * counter for {@link SubContextInitialization}s
+	 * counter for {@link SubContextInitialization}
 	 */
-	long countSubContextInitializations;
+	long countSubContextInitialization;
 
 	/**
 	 * Adds all counters of the argument to the corresponding counters of this
@@ -96,73 +96,73 @@ public class ClassConclusionCounter {
 	 *            the object which counters should be added
 	 */
 	public synchronized void add(ClassConclusionCounter counter) {
-		this.countDecomposedSubsumers += counter.countDecomposedSubsumers;
-		this.countComposedSubsumers += counter.countComposedSubsumers;
-		this.countBackwardLinks += counter.countBackwardLinks;
-		this.countForwardLinks += counter.countForwardLinks;
-		this.countContradictions += counter.countContradictions;
-		this.countPropagations += counter.countPropagations;
-		this.countDisjointSubsumers += counter.countDisjointSubsumers;
-		this.countContextInitializations += counter.countContextInitializations;
-		this.countSubContextInitializations += counter.countSubContextInitializations;
+		this.countSubClassInclusionDecomposed += counter.countSubClassInclusionDecomposed;
+		this.countSubClassInclusionComposed += counter.countSubClassInclusionComposed;
+		this.countBackwardLink += counter.countBackwardLink;
+		this.countForwardLink += counter.countForwardLink;
+		this.countContradiction += counter.countContradiction;
+		this.countPropagation += counter.countPropagation;
+		this.countDisjointSubsumer += counter.countDisjointSubsumer;
+		this.countContextInitialization += counter.countContextInitialization;
+		this.countSubContextInitialization += counter.countSubContextInitialization;
 	}
 
-	public long getCountBackwardLinks() {
-		return countBackwardLinks;
+	public long getCountBackwardLink() {
+		return countBackwardLink;
 	}
 
-	public long getCountContradictions() {
-		return countContradictions;
+	public long getCountContradiction() {
+		return countContradiction;
 	}
 
-	public long getCountContextInitializations() {
-		return countContextInitializations;
+	public long getCountContextInitialization() {
+		return countContextInitialization;
 	}
 
-	public long getCountDisjointSubsumers() {
-		return countDisjointSubsumers;
+	public long getCountDisjointSubsumer() {
+		return countDisjointSubsumer;
 	}
 
-	public long getCountForwardLinks() {
-		return countForwardLinks;
+	public long getCountForwardLink() {
+		return countForwardLink;
 	}
 
-	public long getCountDecomposedSubsumers() {
-		return countDecomposedSubsumers;
+	public long getCountSubClassInclusionDecomposed() {
+		return countSubClassInclusionDecomposed;
 	}
 
-	public long getCountComposedSubsumers() {
-		return countComposedSubsumers;
+	public long getCountSubClassInclusionComposed() {
+		return countSubClassInclusionComposed;
 	}
 
-	public long getCountPropagations() {
-		return countPropagations;
+	public long getCountPropagation() {
+		return countPropagation;
 	}
 
-	public long getCountSubContextInitializations() {
-		return countSubContextInitializations;
+	public long getCountSubContextInitialization() {
+		return countSubContextInitialization;
 	}
 
 	public long getTotalCount() {
-		return countDecomposedSubsumers + countComposedSubsumers
-				+ countBackwardLinks + countForwardLinks + countContradictions
-				+ countPropagations + countDisjointSubsumers
-				+ countContextInitializations + countSubContextInitializations;
+		return countSubClassInclusionDecomposed + countSubClassInclusionComposed
+				+ countBackwardLink + countForwardLink + countContradiction
+				+ countPropagation + countDisjointSubsumer
+				+ countContextInitialization + countSubContextInitialization;
 	}
 
 	/**
 	 * Reset all counters to zero.
 	 */
 	public void reset() {
-		countDecomposedSubsumers = 0;
-		countComposedSubsumers = 0;
-		countBackwardLinks = 0;
-		countForwardLinks = 0;
-		countContradictions = 0;
-		countPropagations = 0;
-		countDisjointSubsumers = 0;
-		countContextInitializations = 0;
-		countSubContextInitializations = 0;
+		countSubClassInclusionDecomposed = 0;
+		countSubClassInclusionComposed = 0;
+		countBackwardLink = 0;
+		countForwardLink = 0;
+		countContradiction = 0;
+		countPropagation = 0;
+		countDisjointSubsumer = 0;
+		countContextInitialization = 0;
+		countSubContextInitialization = 0;
 	}
 
 }

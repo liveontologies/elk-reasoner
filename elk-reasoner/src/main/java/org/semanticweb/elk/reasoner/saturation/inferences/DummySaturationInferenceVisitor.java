@@ -79,6 +79,11 @@ public class DummySaturationInferenceVisitor<O>
 	}
 
 	@Override
+	public O visit(ContextInitializationNoPremises inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
 	public O visit(ContradictionOfDisjointSubsumers inference) {
 		return defaultVisit(inference);
 	}
@@ -190,6 +195,11 @@ public class DummySaturationInferenceVisitor<O>
 
 	@Override
 	public O visit(SubClassInclusionTautology inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(SubContextInitializationNoPremises inference) {
 		return defaultVisit(inference);
 	}
 

@@ -32,15 +32,18 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ContextInitia
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.RuleApplicationClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInferenceConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
- * A {@link RuleApplicationFactory} that adds the produced {@link ClassConclusion}s
- * to the respective {@link Context} (creating new if necessary) and applies
- * rules, which in turn produce new {@link ClassConclusion}s for which this process
- * repeats if they have not been processed already. This
- * {@link RuleApplicationFactory} should not produce {@link ClassConclusion}s for
- * which the source {@link Context} is already saturated.
+ * A {@link RuleApplicationFactory} that adds the produced
+ * {@link ClassConclusion}s to the respective {@link Context} (creating new if
+ * necessary) and applies rules, which in turn produce new
+ * {@link ClassConclusion}s for which this process repeats if they have not been
+ * processed already. This {@link RuleApplicationFactory} should not produce
+ * {@link ClassConclusion}s for which the source {@link Context} is already
+ * saturated.
  * 
  * @author Frantisek Simancik
  * @author Yevgeny Kazakov
@@ -49,7 +52,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  * 
  */
 public class RuleApplicationAdditionFactory<I extends RuleApplicationInput>
-		extends AbstractRuleApplicationFactory<Context, I> {
+		extends
+			AbstractRuleApplicationFactory<Context, I> {
 
 	public RuleApplicationAdditionFactory(SaturationState<?> saturationState) {
 		super(saturationState);
@@ -57,27 +61,36 @@ public class RuleApplicationAdditionFactory<I extends RuleApplicationInput>
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected ClassConclusion.Visitor<Boolean> getConclusionProcessor(
-			Reference<Context> activeContext,
-			RuleVisitor<?> ruleVisitor,
+	protected ClassInference.Visitor<Boolean> getInferenceProcessor(
+			Reference<Context> activeContext, RuleVisitor<?> ruleVisitor,
 			SaturationStateWriter<? extends Context> writer,
 			SaturationStatistics localStatistics) {
-		return SaturationUtils
-				.compose(
-				// count processed conclusions, if necessary
-						SaturationUtils
-								.getProcessedConclusionCountingVisitor(localStatistics),
-						// insert conclusions initializing contexts if necessary
-						new ContextInitializingClassConclusionInsertionVisitor(activeContext, writer),
-						// if new, check that the source of the conclusion is
-						// not saturated (this is only needed for debugging)
-						new ClassConclusionOriginContextNotSaturatedCheckingVisitor(activeContext,
-								getSaturationState()),
-						// count conclusions used in the rules, if necessary
-						SaturationUtils
-								.getUsedConclusionCountingVisitor(localStatistics),
-						// and apply all rules
-						new RuleApplicationClassConclusionVisitor(activeContext, ruleVisitor,
-								writer));
+		return new ClassInferenceConclusionVisitor(
+				// measuring time, if necessary
+				SaturationUtils.getTimedConclusionVisitor(
+						SaturationUtils.compose(
+								// count processed conclusions, if necessary
+								SaturationUtils
+										.getProcessedConclusionCountingVisitor(
+												localStatistics),
+								// insert conclusions initializing contexts if
+								// necessary
+								new ContextInitializingClassConclusionInsertionVisitor(
+										activeContext, writer),
+								// if new, check that the source of the
+								// conclusion is
+								// not saturated (this is only needed for
+								// debugging)
+								new ClassConclusionOriginContextNotSaturatedCheckingVisitor(
+										activeContext, getSaturationState()),
+								// count conclusions used in the rules, if
+								// necessary
+								SaturationUtils
+										.getUsedConclusionCountingVisitor(
+												localStatistics),
+								// and apply all rules
+								new RuleApplicationClassConclusionVisitor(
+										activeContext, ruleVisitor, writer)),
+						localStatistics));
 	}
 }

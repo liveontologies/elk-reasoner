@@ -209,10 +209,6 @@ public class ConsistencyChecking
 		return consistencyMonitor_.isInconsistent();
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
 	public IndexedClassEntity getInconsistentEntity() {
 		return consistencyMonitor_.getInconsistentEntity();
 	}

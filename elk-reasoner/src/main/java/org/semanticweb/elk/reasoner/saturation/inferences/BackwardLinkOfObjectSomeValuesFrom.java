@@ -53,8 +53,8 @@ public class BackwardLinkOfObjectSomeValuesFrom extends
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceRoot() {
-		return getOriginRoot();
+	public IndexedContextRoot getOrigin() {
+		return getTraceRoot();
 	}
 
 	public IndexedObjectSomeValuesFrom getDecomposedExistential() {
@@ -62,7 +62,7 @@ public class BackwardLinkOfObjectSomeValuesFrom extends
 	}
 
 	public SubClassInclusionDecomposed getPremise(SubClassInclusionDecomposed.Factory factory) {
-		return factory.getSubClassInclusionDecomposed(getInferenceRoot(), existential_);
+		return factory.getSubClassInclusionDecomposed(getOrigin(), existential_);
 	}
 
 	@Override

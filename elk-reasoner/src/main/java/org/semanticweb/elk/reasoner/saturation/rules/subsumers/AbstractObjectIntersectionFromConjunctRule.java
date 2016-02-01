@@ -30,7 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 
@@ -66,7 +66,7 @@ public abstract class AbstractObjectIntersectionFromConjunctRule extends
 
 	@Override
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
-			ClassConclusionProducer producer) {
+			ClassInferenceProducer producer) {
 		for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
 				conjunctionsByConjunct_.keySet(),
 				premises.getComposedSubsumers())) {

@@ -23,11 +23,11 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
  */
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 
 /**
- * A queue to keep {@link ClassConclusion}s that should be processed in the
+ * A queue to keep {@link ClassInference}s that should be processed in the
  * {@link Context} currently processed by the worker. It is not thread-safe, so
  * all methods should be accessed from the same thread.
  * 
@@ -37,18 +37,18 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public interface WorkerLocalTodo {
 
 	/**
-	 * @return the next {@link ClassConclusion} in the queue or {@link null} if there
-	 *         is no such {@link ClassConclusion}
+	 * @return the next {@link ClassInference} in the queue or {@link null} if there
+	 *         is no such {@link ClassInference}
 	 */
-	ClassConclusion poll();
+	ClassInference poll();
 
 	/**
-	 * Inserts the given {@link ClassConclusion} to be processed in the current
+	 * Inserts the given {@link ClassInference} to be processed in the current
 	 * {@link Context}
 	 * 
-	 * @param concusion
+	 * @param inference
 	 */
-	void add(ClassConclusion concusion);
+	void add(ClassInference inference);
 
 	/**
 	 * @return {@code true} if this {@link WorkerLocalTodo} is assigned for

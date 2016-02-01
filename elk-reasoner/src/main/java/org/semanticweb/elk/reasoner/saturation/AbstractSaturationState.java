@@ -32,8 +32,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -192,9 +192,9 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 			return activeContexts_.poll();
 		}
 
-		void produce(Context context, ClassConclusion conclusion) {
-			LOGGER_.trace("{}: produced conclusion {}", context, conclusion);
-			if (context.addToDo(conclusion)) {
+		void produce(Context context, ClassInference inference) {
+			LOGGER_.trace("{}: new inference {}", context, inference);
+			if (context.addToDo(inference)) {
 				LOGGER_.trace("{}: activated", context);
 				// context was activated
 				activeContexts_.add(context);
@@ -202,9 +202,9 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 		}
 
 		@Override
-		public void produce(ClassConclusion conclusion) {
+		public void produce(ClassInference inference) {
 			// TODO: what if NPE?
-			produce(getContext(conclusion.getConclusionRoot()), conclusion);
+			produce(getContext(inference.getDestination()), inference);
 		}
 
 		void markAsNotSaturatedInternal(EC context) {
@@ -266,9 +266,9 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 		}
 
 		@Override
-		public void produce(ClassConclusion conclusion) {
-			produce(getCreateContext(conclusion.getConclusionRoot()),
-					conclusion);
+		public void produce(ClassInference inference) {
+			produce(getCreateContext(inference.getDestination()),
+					inference);
 		}
 
 		@Override

@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,32 +22,32 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 
 /**
- * A {@link ClassConclusionProducer} that combines two given
- * {@link ClassConclusionProducer}: all methods are executed first for the first
- * {@link ClassConclusionProducer} and then for the second.
+ * A {@link ClassInferenceProducer} that combines two given
+ * {@link ClassInferenceProducer}: all methods are executed first for the first
+ * {@link ClassInferenceProducer} and then for the second.
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class CombinedConclusionProducer implements ClassConclusionProducer {
+public class CombinedConclusionProducer implements ClassInferenceProducer {
 
-	private final ClassConclusionProducer firstProducer_;
+	private final ClassInferenceProducer firstProducer_;
 
-	private final ClassConclusionProducer secondProducer_;
+	private final ClassInferenceProducer secondProducer_;
 
-	public CombinedConclusionProducer(ClassConclusionProducer firstProducer,
-			ClassConclusionProducer secondProducer) {
+	public CombinedConclusionProducer(ClassInferenceProducer firstProducer,
+			ClassInferenceProducer secondProducer) {
 		this.firstProducer_ = firstProducer;
 		this.secondProducer_ = secondProducer;
 	}
 
 	@Override
-	public void produce(ClassConclusion conclusion) {
-		firstProducer_.produce(conclusion);
-		secondProducer_.produce(conclusion);
+	public void produce(ClassInference inference) {
+		firstProducer_.produce(inference);
+		secondProducer_.produce(inference);
 	}
 
 }

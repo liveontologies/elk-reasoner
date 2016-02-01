@@ -32,8 +32,8 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
@@ -46,7 +46,9 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  */
 public abstract class AbstractRuleApplicationFactory<C extends Context, I extends RuleApplicationInput>
-		extends SimpleInterrupter implements RuleApplicationFactory<C, I> {
+		extends
+			SimpleInterrupter
+		implements RuleApplicationFactory<C, I> {
 
 	// logger for this class
 	protected static final Logger LOGGER_ = LoggerFactory
@@ -70,24 +72,22 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 
 	/**
 	 * @param activeContext
-	 * @param conclusionProcessor
+	 * @param inferenceProcessor
 	 * @param saturationStateWriter
 	 * @param localStatistics
-	 * @return an {@link InputProcessor} that processes {@link ClassConclusion}s in
-	 *         {@link Context}s within an individual worker thread for the input
-	 *         root {@link IndexedClassExpression} using the supplied
+	 * @return an {@link InputProcessor} that processes {@link ClassInference}s
+	 *         in {@link Context}s within an individual worker thread for the
+	 *         input root {@link IndexedClassExpression} using the supplied
 	 *         {@link SaturationStateWriter} and updates the supplied local
 	 *         {@link SaturationStatistics} accordingly
 	 */
 	protected InputProcessor<I> getEngine(
 			ModifiableReference<Context> activeContext,
-			ClassConclusion.Visitor<Boolean> conclusionProcessor,
+			ClassInference.Visitor<Boolean> inferenceProcessor,
 			SaturationStateWriter<? extends C> saturationStateWriter,
 			WorkerLocalTodo localTodo, SaturationStatistics localStatistics) {
-		conclusionProcessor = SaturationUtils.getTimedConclusionVisitor(
-				conclusionProcessor, localStatistics);
 		return new BasicRuleEngine<I>(saturationState_.getOntologyIndex(),
-				activeContext, conclusionProcessor, localTodo, this, 
+				activeContext, inferenceProcessor, localTodo, this,
 				saturationStateWriter, aggregatedStats_, localStatistics);
 	}
 
@@ -125,8 +125,8 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 	}
 
 	/**
-	 * An instance of {@link ClassConclusion.Visitor} that processes
-	 * {@link ClassConclusion}s within {@link Context} by an individual worker.
+	 * An instance of {@link ClassInference.Visitor} that processes
+	 * {@link ClassInference}s within {@link Context} by an individual worker.
 	 * 
 	 * @param activeContext
 	 * @param ruleVisitor
@@ -134,7 +134,7 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 	 * @param localStatistics
 	 * @return
 	 */
-	protected abstract ClassConclusion.Visitor<Boolean> getConclusionProcessor(
+	protected abstract ClassInference.Visitor<Boolean> getInferenceProcessor(
 			Reference<Context> activeContext, RuleVisitor<?> ruleVisitor,
 			SaturationStateWriter<? extends C> writer,
 			SaturationStatistics localStatistics);
@@ -162,8 +162,8 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 				.getStatsAwareRuleVisitor(localStatistics.getRuleStatistics());
 		ModifiableReference<Context> activeContext = new ReferenceImpl<Context>();
 		return getEngine(
-				activeContext, getConclusionProcessor(activeContext,
-						ruleVisitor, writer, localStatistics),
+				activeContext, getInferenceProcessor(activeContext, ruleVisitor,
+						writer, localStatistics),
 				writer, localTodo, localStatistics);
 	}
 

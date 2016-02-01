@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * origin root f the {@link ClassConclusion} is not saturated, and reports an
  * error otherwise. Should be used for debugging.
  * 
- * @see ClassConclusion#getOriginRoot()
+ * @see ClassConclusion#getTraceRoot()
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -71,7 +71,7 @@ public class ClassConclusionOriginContextNotSaturatedCheckingVisitor extends
 
 	@Override
 	protected Boolean defaultVisit(ClassConclusion conclusion) {
-		Context originContext = state_.getContext(conclusion.getOriginRoot());
+		Context originContext = state_.getContext(conclusion.getTraceRoot());
 		if (originContext.isInitialized() && originContext.isSaturated()) {
 			LOGGER_.error(
 					"{}: adding conclusion {} to saturated context {}",

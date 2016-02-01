@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 
 /**
  * A {@link BackwardLinkRule} producing {@link SubClassInclusion}s when processing
@@ -56,7 +56,7 @@ public class SubsumerBackwardLinkRule extends AbstractBackwardLinkRule {
 
 	@Override
 	public void apply(BackwardLink premise, ContextPremises premises,
-			ClassConclusionProducer producer) {
+			ClassInferenceProducer producer) {
 
 		for (IndexedObjectSomeValuesFrom carry : premises
 				.getPropagatedSubsumers(premise.getBackwardRelation())) {
@@ -72,7 +72,7 @@ public class SubsumerBackwardLinkRule extends AbstractBackwardLinkRule {
 	@Override
 	public void accept(BackwardLinkRuleVisitor<?> visitor,
 			BackwardLink premise, ContextPremises premises,
-			ClassConclusionProducer producer) {
+			ClassInferenceProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}
 

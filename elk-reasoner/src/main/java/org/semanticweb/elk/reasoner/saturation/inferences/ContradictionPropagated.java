@@ -52,22 +52,22 @@ public class ContradictionPropagated extends AbstractContradictionInference {
 	}
 
 	public ContradictionPropagated(BackwardLink premise) {
-		this(premise.getConclusionRoot(), premise.getBackwardRelation(),
-				premise.getOriginRoot());
+		this(premise.getDestination(), premise.getBackwardRelation(),
+				premise.getTraceRoot());
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceRoot() {
+	public IndexedContextRoot getOrigin() {
 		return inferenceRoot_;
 	}
 
 	public BackwardLink getFirstPremise(BackwardLink.Factory factory) {
-		return factory.getBackwardLink(getInferenceRoot(), premiseRelation_,
-				getConclusionRoot());
+		return factory.getBackwardLink(getOrigin(), premiseRelation_,
+				getDestination());
 	}
 
 	public Contradiction getSecondPremise(Contradiction.Factory factory) {
-		return factory.getContradiction(getInferenceRoot());
+		return factory.getContradiction(getOrigin());
 	}
 
 	@Override

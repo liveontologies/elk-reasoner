@@ -27,9 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.AbstractClassInference;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 
@@ -56,38 +54,24 @@ public class ForwardLinkOfObjectSomeValuesFrom extends AbstractClassInference
 		return this.existential_;
 	}
 
-	@Override
-	public IndexedPropertyChain getForwardChain() {
-		return existential_.getProperty();
-	}
-
-	@Override
-	public IndexedContextRoot getTarget() {
-		return IndexedObjectSomeValuesFrom.Helper.getTarget(existential_);
-	}
-
 	public SubClassInclusionDecomposed getPremise(SubClassInclusionDecomposed.Factory factory) {
-		return factory.getSubClassInclusionDecomposed(getInferenceRoot(), existential_);
+		return factory.getSubClassInclusionDecomposed(getOrigin(), existential_);
+	}
+
+	public ForwardLink getConclusion(ForwardLink.Factory factory) {
+		return factory.getForwardLink(getDestination(),
+				existential_.getProperty(),
+				IndexedObjectSomeValuesFrom.Helper.getTarget(existential_));
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceRoot() {
-		return getConclusionRoot();
+	public IndexedContextRoot getOrigin() {
+		return getDestination();
 	}
 
 	@Override
 	public String toString() {
 		return super.toString() + " (decomposition)";
-	}
-
-	@Override
-	public final <O> O accept(ClassConclusion.Visitor<O> visitor) {
-		return visitor.visit(this);
-	}
-	
-	@Override
-	public final <O> O accept(ForwardLink.Visitor<O> visitor) {
-		return visitor.visit(this);
 	}
 
 	@Override

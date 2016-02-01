@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.tracing;
+package org.semanticweb.elk.reasoner.saturation.inferences;
 
 /*
  * #%L
@@ -22,34 +22,24 @@ package org.semanticweb.elk.reasoner.tracing;
  * #L%
  */
 
-/**
- * A wrapper over {@link Conclusion}s for comparing them using
- * {@link ConclusionEquality} and {@link ConclusionHash}
- * 
- * @author Yevgeny Kazakov
- *
- */
-class ConclusionKey {
+public interface ContextInitializationInference
+		extends
+			InitializationInference {
 
-	private final Conclusion conclusion_;
+	public <O> O accept(Visitor<O> visitor);
 
-	ConclusionKey(Conclusion conclusion) {
-		this.conclusion_ = conclusion;
-	}
+	/**
+	 * Visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public static interface Visitor<O>
+			extends
+				ContextInitializationNoPremises.Visitor<O> {
 
-	@Override
-	public int hashCode() {
-		return ConclusionHash.hashCode(conclusion_);
-	}
+		// combined interface
 
-	@Override
-	public boolean equals(Object other) {
-		if (other instanceof ConclusionKey) {
-			return ConclusionEquality.equals(conclusion_,
-					((ConclusionKey) other).conclusion_);
-		}
-		// else
-		return false;
 	}
 
 }

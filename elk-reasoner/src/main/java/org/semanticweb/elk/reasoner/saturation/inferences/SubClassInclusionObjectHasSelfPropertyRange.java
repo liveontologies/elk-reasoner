@@ -58,13 +58,13 @@ public class SubClassInclusionObjectHasSelfPropertyRange
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceRoot() {
-		return getConclusionRoot();
+	public IndexedContextRoot getOrigin() {
+		return getDestination();
 	}
 
 	public SubClassInclusionDecomposed getFirstPremise(
 			SubClassInclusionDecomposed.Factory factory) {
-		return factory.getSubClassInclusionDecomposed(getInferenceRoot(),
+		return factory.getSubClassInclusionDecomposed(getOrigin(),
 				premiseSubsumer_);
 	}
 

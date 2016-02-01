@@ -73,7 +73,7 @@ public class BackwardLinkComposition extends AbstractBackwardLinkInference
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceRoot() {
+	public IndexedContextRoot getOrigin() {
 		return inferenceRoot_;
 	}
 
@@ -101,8 +101,8 @@ public class BackwardLinkComposition extends AbstractBackwardLinkInference
 
 	@Override
 	public BackwardLink getFirstPremise(BackwardLink.Factory factory) {
-		return factory.getBackwardLink(getInferenceRoot(), backwardRelation_,
-				getOriginRoot());
+		return factory.getBackwardLink(getOrigin(), backwardRelation_,
+				getTraceRoot());
 	}
 
 	@Override
@@ -113,8 +113,8 @@ public class BackwardLinkComposition extends AbstractBackwardLinkInference
 
 	@Override
 	public ForwardLink getThirdPremise(ForwardLink.Factory factory) {
-		return factory.getForwardLink(getInferenceRoot(), forwardChain_,
-				getConclusionRoot());
+		return factory.getForwardLink(getOrigin(), forwardChain_,
+				getDestination());
 	}
 
 	@Override

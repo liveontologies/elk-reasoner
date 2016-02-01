@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectSo
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversed;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversedExpanded;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContextInitializationNoPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfDisjointSubsumers;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfObjectComplementOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfOwlNothing;
@@ -53,6 +54,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionObjec
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionOwlThing;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionRange;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionTautology;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubContextInitializationNoPremises;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.PropertyRangeInherited;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainExpandedSubObjectPropertyOf;
@@ -122,6 +124,11 @@ public class DummyInferenceVisitor<O> implements Inference.Visitor<O> {
 
 	@Override
 	public O visit(BackwardLinkReversedExpanded inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ContextInitializationNoPremises inference) {
 		return defaultVisit(inference);
 	}
 
@@ -342,6 +349,11 @@ public class DummyInferenceVisitor<O> implements Inference.Visitor<O> {
 
 	@Override
 	public O visit(SubClassInclusionTautology inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(SubContextInitializationNoPremises inference) {
 		return defaultVisit(inference);
 	}
 

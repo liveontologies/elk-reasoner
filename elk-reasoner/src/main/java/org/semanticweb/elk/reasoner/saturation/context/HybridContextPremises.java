@@ -44,8 +44,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackw
  * ) is {@code null}.
  * 
  * @see ContextPremises#getRoot()
- * @see ClassConclusion#getOriginRoot()
- * @see SubClassConclusion#getOriginSubRoot()
+ * @see ClassConclusion#getTraceRoot()
+ * @see SubClassConclusion#getTraceSubRoot()
  * 
  * @author "Yevgeny Kazakov"
  * 

@@ -32,6 +32,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ContextInitia
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.RuleApplicationClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference.Visitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInferenceConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
@@ -42,8 +44,9 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  * @author Yevgeny Kazakov
  * @author Pavel Klinov
  */
-public class RuleApplicationAdditionUnSaturationFactory extends
-		RuleApplicationAdditionFactory<RuleApplicationInput> {
+public class RuleApplicationAdditionUnSaturationFactory
+		extends
+			RuleApplicationAdditionFactory<RuleApplicationInput> {
 
 	public RuleApplicationAdditionUnSaturationFactory(
 			SaturationState<? extends Context> saturationState) {
@@ -52,26 +55,35 @@ public class RuleApplicationAdditionUnSaturationFactory extends
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected ClassConclusion.Visitor<Boolean> getConclusionProcessor(
-			Reference<Context> activeContext,
-			RuleVisitor<?> ruleVisitor,
+	protected Visitor<Boolean> getInferenceProcessor(
+			Reference<Context> activeContext, RuleVisitor<?> ruleVisitor,
 			SaturationStateWriter<? extends Context> writer,
 			SaturationStatistics localStatistics) {
 		// the visitor used for inserting conclusion
-		return SaturationUtils
-				.compose(
-				// count processed conclusions, if necessary
-						SaturationUtils
-								.getProcessedConclusionCountingVisitor(localStatistics),
-						// insert conclusions initializing contexts if necessary
-						new ContextInitializingClassConclusionInsertionVisitor(activeContext, writer),
-						// if new, mark the source context as unsaturated
-						new ClassConclusionOriginContextUnsaturationVisitor(writer),
-						// count conclusions used in the rules, if necessary
-						SaturationUtils
-								.getUsedConclusionCountingVisitor(localStatistics),
-						// apply rules
-						new RuleApplicationClassConclusionVisitor(activeContext, ruleVisitor,
-								writer));
+		return new ClassInferenceConclusionVisitor(
+				// measuring time, if necessary
+				SaturationUtils.getTimedConclusionVisitor(
+						SaturationUtils.compose(SaturationUtils.compose(
+								// count processed conclusions, if necessary
+								SaturationUtils
+										.getProcessedConclusionCountingVisitor(
+												localStatistics),
+								// insert conclusions initializing contexts if
+								// necessary
+								new ContextInitializingClassConclusionInsertionVisitor(
+										activeContext, writer),
+								// if new, mark the source context as
+								// unsaturated
+								new ClassConclusionOriginContextUnsaturationVisitor(
+										writer),
+								// count conclusions used in the rules, if
+								// necessary
+								SaturationUtils
+										.getUsedConclusionCountingVisitor(
+												localStatistics),
+								// apply rules
+								new RuleApplicationClassConclusionVisitor(
+										activeContext, ruleVisitor, writer))),
+						localStatistics));
 	}
 }

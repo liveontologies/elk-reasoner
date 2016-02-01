@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SubClassInclusionDecomposedImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
 public abstract class AbstractSubClassInclusionDecomposedInference
@@ -33,9 +34,15 @@ public abstract class AbstractSubClassInclusionDecomposedInference
 		implements
 			SubClassInclusionDecomposedInference {
 
-	public AbstractSubClassInclusionDecomposedInference(IndexedContextRoot root,
-			IndexedClassExpression subsumer) {
-		super(root, subsumer);
+	public AbstractSubClassInclusionDecomposedInference(IndexedContextRoot subExpression,
+			IndexedClassExpression superExpression) {
+		super(subExpression, superExpression);
+	}
+	
+	public SubClassInclusionDecomposed getConclusion(
+			SubClassInclusionDecomposed.Factory factory) {
+		return factory.getSubClassInclusionDecomposed(getDestination(),
+				getSuperExpression());
 	}
 
 	@Override

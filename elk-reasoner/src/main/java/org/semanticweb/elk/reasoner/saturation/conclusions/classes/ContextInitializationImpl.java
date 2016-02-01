@@ -33,8 +33,9 @@ import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextIn
  * 
  * @author "Yevgeny Kazakov"
  */
-public class ContextInitializationImpl extends AbstractClassConclusion implements
-		ContextInitialization {
+public class ContextInitializationImpl extends AbstractClassConclusion
+		implements
+			ContextInitialization {
 
 	// actually we just need only context initialization rules,
 	// but they can change after creating this object
@@ -44,13 +45,17 @@ public class ContextInitializationImpl extends AbstractClassConclusion implement
 			OntologyIndex ontologyIndex) {
 		super(root);
 		this.ontologyIndex_ = ontologyIndex;
-	}	
+	}
+
+	protected OntologyIndex getOntologyIndex() {
+		return ontologyIndex_;
+	}
 
 	@Override
 	public LinkedContextInitRule getContextInitRuleHead() {
 		return ontologyIndex_.getContextInitRuleHead();
 	}
-	
+
 	@Override
 	public <O> O accept(ClassConclusion.Visitor<O> visitor) {
 		return visitor.visit(this);

@@ -1,11 +1,4 @@
-/**
- * 
- */
-/**
- * @author "Yevgeny Kazakov"
- *
- */
-package org.semanticweb.elk.reasoner.saturation.rules.contextinit;
+package org.semanticweb.elk.reasoner.tracing;
 
 /*
  * #%L
@@ -13,7 +6,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.contextinit;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,3 +21,24 @@ package org.semanticweb.elk.reasoner.saturation.rules.contextinit;
  * limitations under the License.
  * #L%
  */
+
+/**
+ * Represents the conclusion of the given {@link Inference}
+ * 
+ * @author Yevgeny Kazakov
+ *
+ */
+class InferenceConclusion extends AbstractConclusion {
+
+	private final Inference inference_;
+
+	InferenceConclusion(Inference inference) {
+		this.inference_ = inference;
+	}
+
+	@Override
+	public <O> O accept(Conclusion.Visitor<O> visitor) {
+		return inference_.accept(new InferenceConclusionVisitor<O>(visitor));
+	}
+
+}

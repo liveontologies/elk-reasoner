@@ -65,7 +65,7 @@ public class SubClassInclusionExpandedDefinition
 
 	public SubClassInclusionDecomposed getPremise(
 			SubClassInclusionDecomposed.Factory factory) {
-		return factory.getSubClassInclusionDecomposed(getInferenceRoot(),
+		return factory.getSubClassInclusionDecomposed(getOrigin(),
 				defined_);
 	}
 
@@ -76,8 +76,8 @@ public class SubClassInclusionExpandedDefinition
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceRoot() {
-		return getConclusionRoot();
+	public IndexedContextRoot getOrigin() {
+		return getDestination();
 	}
 
 	@Override

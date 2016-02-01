@@ -30,7 +30,7 @@ import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
-import org.semanticweb.elk.reasoner.saturation.inferences.AbstractClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.DummyClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.AbstractObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
@@ -89,7 +89,7 @@ public class InferenceMapper {
 				exprFactory_);
 
 		unwinder_.accept(conclusion,
-				new AbstractClassInferenceVisitor<Void, Boolean>() {
+				new DummyClassInferenceVisitor<Void, Boolean>() {
 
 					@Override
 					protected Boolean defaultTracedVisit(

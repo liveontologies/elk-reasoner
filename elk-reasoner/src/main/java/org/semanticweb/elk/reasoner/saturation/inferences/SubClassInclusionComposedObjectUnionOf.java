@@ -61,8 +61,8 @@ public class SubClassInclusionComposedObjectUnionOf
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceRoot() {
-		return getConclusionRoot();
+	public IndexedContextRoot getOrigin() {
+		return getDestination();
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class SubClassInclusionComposedObjectUnionOf
 
 	public SubClassInclusionComposed getPremise(
 			SubClassInclusionComposed.Factory factory) {
-		return factory.getSubClassInclusionComposed(getInferenceRoot(),
+		return factory.getSubClassInclusionComposed(getOrigin(),
 				getSuperExpression().getDisjuncts().get(position_));
 	}
 

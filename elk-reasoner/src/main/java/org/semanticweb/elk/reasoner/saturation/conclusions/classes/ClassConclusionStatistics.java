@@ -36,11 +36,11 @@ import org.slf4j.LoggerFactory;
  * #L%
  */
 
-public class ConclusionStatistics extends AbstractStatistics {
+public class ClassConclusionStatistics extends AbstractStatistics {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ConclusionStatistics.class);
+			.getLogger(ClassConclusionStatistics.class);
 
 	/**
 	 * Number of conclusions put to the todo queue
@@ -57,7 +57,7 @@ public class ConclusionStatistics extends AbstractStatistics {
 
 	private final ClassConclusionTimer conclusionProcessingTimer_;
 
-	public ConclusionStatistics(ClassConclusionCounter producedConclusionCounter,
+	public ClassConclusionStatistics(ClassConclusionCounter producedConclusionCounter,
 			ClassConclusionCounter processedConclusionCounts,
 			ClassConclusionCounter usedConclusionCounts,
 			ClassConclusionTimer conclusionTimers) {
@@ -67,7 +67,7 @@ public class ConclusionStatistics extends AbstractStatistics {
 		this.conclusionProcessingTimer_ = conclusionTimers;
 	}
 
-	public ConclusionStatistics() {
+	public ClassConclusionStatistics() {
 		this(new ClassConclusionCounter(), new ClassConclusionCounter(),
 				new ClassConclusionCounter(), new ClassConclusionTimer());
 	}
@@ -100,7 +100,7 @@ public class ConclusionStatistics extends AbstractStatistics {
 		conclusionProcessingTimer_.reset();
 	}
 
-	public synchronized void add(ConclusionStatistics stats) {
+	public synchronized void add(ClassConclusionStatistics stats) {
 		super.add(stats);
 		this.producedConclusionCounts_.add(stats.producedConclusionCounts_);
 		this.processedConclusionCounts_.add(stats.processedConclusionCounts_);
@@ -151,57 +151,57 @@ public class ConclusionStatistics extends AbstractStatistics {
 		printer.printHeader();
 
 		print(printer, BackwardLink.NAME,
-				processedConclusionCounts_.countBackwardLinks,
-				usedConclusionCounts_.countBackwardLinks,
-				producedConclusionCounts_.countBackwardLinks,
+				processedConclusionCounts_.countBackwardLink,
+				usedConclusionCounts_.countBackwardLink,
+				producedConclusionCounts_.countBackwardLink,
 				conclusionProcessingTimer_.timeBackwardLinks);
 
 		print(printer, ContextInitialization.NAME,
-				processedConclusionCounts_.countContextInitializations,
-				usedConclusionCounts_.countContextInitializations,
-				producedConclusionCounts_.countContextInitializations,
+				processedConclusionCounts_.countContextInitialization,
+				usedConclusionCounts_.countContextInitialization,
+				producedConclusionCounts_.countContextInitialization,
 				conclusionProcessingTimer_.timeContextInitializations);
 
 		print(printer, Contradiction.NAME,
-				processedConclusionCounts_.countContradictions,
-				usedConclusionCounts_.countContradictions,
-				producedConclusionCounts_.countContradictions,
+				processedConclusionCounts_.countContradiction,
+				usedConclusionCounts_.countContradiction,
+				producedConclusionCounts_.countContradiction,
 				conclusionProcessingTimer_.timeContradictions);
 
 		print(printer, DisjointSubsumer.NAME,
-				processedConclusionCounts_.countDisjointSubsumers,
-				usedConclusionCounts_.countDisjointSubsumers,
-				producedConclusionCounts_.countDisjointSubsumers,
+				processedConclusionCounts_.countDisjointSubsumer,
+				usedConclusionCounts_.countDisjointSubsumer,
+				producedConclusionCounts_.countDisjointSubsumer,
 				conclusionProcessingTimer_.timeDisjointSubsumers);
 
 		print(printer, ForwardLink.NAME,
-				processedConclusionCounts_.countForwardLinks,
-				usedConclusionCounts_.countForwardLinks,
-				producedConclusionCounts_.countForwardLinks,
+				processedConclusionCounts_.countForwardLink,
+				usedConclusionCounts_.countForwardLink,
+				producedConclusionCounts_.countForwardLink,
 				conclusionProcessingTimer_.timeForwardLinks);
 
 		print(printer, SubClassInclusionDecomposed.NAME,
-				processedConclusionCounts_.countDecomposedSubsumers,
-				usedConclusionCounts_.countDecomposedSubsumers,
-				producedConclusionCounts_.countDecomposedSubsumers,
+				processedConclusionCounts_.countSubClassInclusionDecomposed,
+				usedConclusionCounts_.countSubClassInclusionDecomposed,
+				producedConclusionCounts_.countSubClassInclusionDecomposed,
 				conclusionProcessingTimer_.timeDecomposedSubsumers);
 
 		print(printer, SubClassInclusionComposed.NAME,
-				processedConclusionCounts_.countComposedSubsumers,
-				usedConclusionCounts_.countComposedSubsumers,
-				producedConclusionCounts_.countComposedSubsumers,
+				processedConclusionCounts_.countSubClassInclusionComposed,
+				usedConclusionCounts_.countSubClassInclusionComposed,
+				producedConclusionCounts_.countSubClassInclusionComposed,
 				conclusionProcessingTimer_.timeComposedSubsumers);
 
 		print(printer, Propagation.NAME,
-				processedConclusionCounts_.countPropagations,
-				usedConclusionCounts_.countPropagations,
-				producedConclusionCounts_.countPropagations,
+				processedConclusionCounts_.countPropagation,
+				usedConclusionCounts_.countPropagation,
+				producedConclusionCounts_.countPropagation,
 				conclusionProcessingTimer_.timePropagations);
 
 		print(printer, SubContextInitialization.NAME,
-				processedConclusionCounts_.countSubContextInitializations,
-				usedConclusionCounts_.countSubContextInitializations,
-				producedConclusionCounts_.countSubContextInitializations,
+				processedConclusionCounts_.countSubContextInitialization,
+				usedConclusionCounts_.countSubContextInitialization,
+				producedConclusionCounts_.countSubContextInitialization,
 				conclusionProcessingTimer_.timeSubContextInitializations);
 
 		printer.printSeparator();

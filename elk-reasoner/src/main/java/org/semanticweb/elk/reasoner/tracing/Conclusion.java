@@ -33,20 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConcl
  */
 public interface Conclusion {
 
-	/**
-	 * A factory for creating instances
-	 * 
-	 * @author Yevgeny Kazakov
-	 *
-	 */
-	interface Factory
-			extends
-				IndexedAxiom.Factory,
-				SaturationConclusion.Factory {
-
-		// combined interface
-
-	}
+	public <O> O accept(Visitor<O> visitor);
 
 	/**
 	 * The visitor pattern for instances
@@ -64,7 +51,20 @@ public interface Conclusion {
 		// combined interface
 
 	}
-	
-	public <O> O accept(Visitor<O> visitor);
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory
+			extends
+				IndexedAxiom.Factory,
+				SaturationConclusion.Factory {
+
+		// combined interface
+
+	}
 
 }

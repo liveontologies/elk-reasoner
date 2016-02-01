@@ -60,7 +60,10 @@ public interface ElkEquivalentClassesAxiomSubClassConversion
 	 * @see IndexedSubClassOfAxiom#getSuperClass()
 	 */
 	int getSuperClassPosition();
-	
+
+	IndexedSubClassOfAxiom getConclusion(
+			IndexedSubClassOfAxiom.Factory factory);
+
 	/**
 	 * The visitor pattern for instances
 	 * 
@@ -70,9 +73,9 @@ public interface ElkEquivalentClassesAxiomSubClassConversion
 	 *            the type of the output
 	 */
 	interface Visitor<O> {
-		
+
 		O visit(ElkEquivalentClassesAxiomSubClassConversion inference);
-		
+
 	}
 
 }

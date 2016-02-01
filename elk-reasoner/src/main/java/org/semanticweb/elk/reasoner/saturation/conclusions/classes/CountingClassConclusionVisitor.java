@@ -51,55 +51,55 @@ public class CountingClassConclusionVisitor implements
 
 	@Override
 	public Boolean visit(BackwardLink subConclusion) {
-		counter_.countBackwardLinks++;
+		counter_.countBackwardLink++;
 		return true;
 	}
 
 	@Override
 	public Boolean visit(SubClassInclusionComposed conclusion) {
-		counter_.countComposedSubsumers++;
+		counter_.countSubClassInclusionComposed++;
 		return true;
 	}
 
 	@Override
 	public Boolean visit(ContextInitialization conclusion) {
-		counter_.countContextInitializations++;
+		counter_.countContextInitialization++;
 		return true;
 	}
 
 	@Override
 	public Boolean visit(Contradiction conclusion) {
-		counter_.countContradictions++;
+		counter_.countContradiction++;
 		return true;
 	}
 
 	@Override
 	public Boolean visit(SubClassInclusionDecomposed conclusion) {
-		counter_.countDecomposedSubsumers++;
+		counter_.countSubClassInclusionDecomposed++;
 		return true;
 	}
 
 	@Override
 	public Boolean visit(DisjointSubsumer conclusion) {
-		counter_.countDisjointSubsumers++;
+		counter_.countDisjointSubsumer++;
 		return true;
 	}
 
 	@Override
 	public Boolean visit(ForwardLink conclusion) {
-		counter_.countForwardLinks++;
+		counter_.countForwardLink++;
 		return true;
 	}
 
 	@Override
 	public Boolean visit(Propagation subConclusion) {
-		counter_.countPropagations++;
+		counter_.countPropagation++;
 		return true;
 	}
 
 	@Override
 	public Boolean visit(SubContextInitialization subConclusion) {
-		counter_.countSubContextInitializations++;
+		counter_.countSubContextInitialization++;
 		return true;
 	}
 

@@ -30,7 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassConclus
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.HybridContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitors;
@@ -39,7 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitors;
  * A {@link ClassConclusion.Visitor} that applies local rules (rules producing
  * only {@link ClassConclusion}s with the same origin root and sub-root as for
  * the premise) for visited {@link ClassConclusion}s using the provided
- * {@link RuleVisitor} and {@link ClassConclusionProducer}.
+ * {@link RuleVisitor} and {@link ClassInferenceProducer}.
  * 
  * When applying local rules, to the visited {@link ClassConclusion}, local
  * premises (premises with the same origin root and sub-root as the
@@ -69,7 +69,7 @@ public class LocalRuleApplicationClassConclusionVisitor
 			SaturationState<?> mainState,
 			Reference<? extends ContextPremises> localPremisesRef,
 			RuleVisitor<?> ruleVisitor,
-			ClassConclusionProducer conclusionProducer) {
+			ClassInferenceProducer conclusionProducer) {
 		this.hybridPremisesRef_ = new HybrridContextPremises(localPremisesRef, mainState);
 		this.localRuleApplicator_ = new RuleApplicationClassConclusionVisitor(
 				hybridPremisesRef_, RuleVisitors.localize(ruleVisitor),

@@ -22,11 +22,8 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
-
 public interface DisjointSubsumerInference
 		extends
-			DisjointSubsumer,
 			ClassInference {
 
 	public <O> O accept(Visitor<O> visitor);

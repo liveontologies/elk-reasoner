@@ -45,12 +45,12 @@ public abstract class AbstractSubClassConclusion extends AbstractClassConclusion
 	}
 
 	@Override
-	public IndexedObjectProperty getConclusionSubRoot() {
+	public IndexedObjectProperty getDestinationSubRoot() {
 		return this.subRoot_;
 	}
 
 	@Override
-	public IndexedObjectProperty getOriginSubRoot() {
+	public IndexedObjectProperty getTraceSubRoot() {
 		return this.subRoot_;
 	}
 

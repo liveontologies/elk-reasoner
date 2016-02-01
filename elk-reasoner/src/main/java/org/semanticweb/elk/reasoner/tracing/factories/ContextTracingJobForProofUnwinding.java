@@ -35,7 +35,7 @@ class ContextTracingJobForProofUnwinding<I extends ClassConclusion, J extends Pr
 
 	ContextTracingJobForProofUnwinding(ClassConclusion tracedConclusion,
 			ProofUnwindingState<I, J> unwindingState) {
-		super(tracedConclusion.getOriginRoot());
+		super(tracedConclusion.getTraceRoot());
 		this.tracedConclusion = tracedConclusion;
 		this.unwindingState = unwindingState;
 	}

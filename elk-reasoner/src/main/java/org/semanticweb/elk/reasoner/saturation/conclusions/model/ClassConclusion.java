@@ -43,21 +43,21 @@ import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 public interface ClassConclusion extends SaturationConclusion {
 
 	/**
-	 * @return The root of the {@link Context} in which this conclusion should
+	 * @return the root of the {@link Context} in which this conclusion should
 	 *         participate in inferences; it cannot be {@code null}.
 	 */
-	public IndexedContextRoot getConclusionRoot();
+	public IndexedContextRoot getDestination();
 
 	/**
 	 * 
-	 * @return The {@link IndexedContextRoot} of the {@link Context} from which
-	 *         this {@link ClassConclusion} originate. This value may be
-	 *         different from {@link #getConclusionRoot()} but cannot be
-	 *         {@code null}. Specifically, this {@link ClassConclusion} is
-	 *         guaranteed to be derived from {@link ContextInitialization} with
-	 *         the value {@link #getConclusionRoot()} equal to this value.
+	 * @return the {@link IndexedContextRoot} that identifies this inference for
+	 *         tracing; every {@link ClassInference} that produces this
+	 *         {@link ClassConclusion} should be have the same value of
+	 *         {@link ClassInference#getTraceRoot()}
+	 * 
+	 * @see ClassInference#getTraceRoot()
 	 */
-	public IndexedContextRoot getOriginRoot();
+	public IndexedContextRoot getTraceRoot();
 
 	public <O> O accept(Visitor<O> visitor);
 

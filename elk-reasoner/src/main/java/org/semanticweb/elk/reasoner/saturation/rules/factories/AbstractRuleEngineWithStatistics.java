@@ -25,9 +25,9 @@ import org.semanticweb.elk.ModifiableReference;
  */
 
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextStatistics;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
@@ -63,11 +63,11 @@ public abstract class AbstractRuleEngineWithStatistics<I extends RuleApplication
 
 	public AbstractRuleEngineWithStatistics(
 			ModifiableReference<Context> activeContext,
-			ClassConclusion.Visitor<?> conclusionProcessor,
+			ClassInference.Visitor<?> inferenceProcessor,
 			WorkerLocalTodo localTodo, Interrupter interrupter,
 			SaturationStatistics aggregatedStats,
 			SaturationStatistics localStatistics) {
-		super(activeContext, conclusionProcessor, localTodo, interrupter);
+		super(activeContext, inferenceProcessor, localTodo, interrupter);
 		this.aggregatedStats_ = aggregatedStats;
 		this.localStatistics = localStatistics;
 		this.localContextStatistics = localStatistics.getContextStatistics();

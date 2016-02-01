@@ -26,6 +26,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.DisjointSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
 public abstract class AbstractDisjointSubsumerInference
@@ -37,6 +38,11 @@ public abstract class AbstractDisjointSubsumerInference
 			IndexedClassExpressionList disjoint, int position,
 			ElkAxiom reason) {
 		super(root, disjoint, position, reason);
+	}
+	
+	public DisjointSubsumer getConclusion(DisjointSubsumer.Factory factory) {
+		return factory.getDisjointSubsumer(getDestination(),
+				getDisjointExpressions(), getPosition(), getReason());
 	}
 	
 	@Override

@@ -1,14 +1,12 @@
 package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
-import org.semanticweb.elk.ModifiableReference;
-
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,17 +22,18 @@ import org.semanticweb.elk.ModifiableReference;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
+import org.semanticweb.elk.ModifiableReference;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An engine to concurrently processing pending {@link ClassConclusion}s within
+ * An engine to concurrently processing pending {@link ClassInference}s within
  * the corresponding {@link Context}s using a supplied
- * {@link ClassConclusion.Visitor}. The {@link ClassConclusion}s are retrieved
+ * {@link ClassInference.Visitor}. The {@link ClassInference}s are retrieved
  * by {@link Context#takeToDo()}.
  * 
  * @author "Yevgeny Kazakov"
@@ -54,13 +53,13 @@ public abstract class AbstractRuleEngine<I extends RuleApplicationInput>
 	private final ModifiableReference<Context> activeContext_;
 
 	/**
-	 * Specifies how {@link ClassConclusion}s of the {@link Context} should be
+	 * Specifies how {@link ClassInference}s in the {@link Context} should be
 	 * processed
 	 */
-	private final ClassConclusion.Visitor<?> conclusionProcessor_;
+	private final ClassInference.Visitor<?> inferenceProcessor_;
 
 	/**
-	 * Accumulates the produced {@link ClassConclusion}s that should be
+	 * Accumulates the produced {@link ClassInference}s that should be
 	 * processed within the same {@link Context} in which they were produced;
 	 * this should always be emptied before continuing to the next
 	 * {@link Context}
@@ -74,10 +73,10 @@ public abstract class AbstractRuleEngine<I extends RuleApplicationInput>
 
 	public AbstractRuleEngine(
 			ModifiableReference<Context> activeContext,
-			ClassConclusion.Visitor<?> conclusionProcessor,
+			ClassInference.Visitor<?> inferenceProcessor,
 			WorkerLocalTodo localizedProducer, Interrupter interrupter) {
 		this.activeContext_ = activeContext;
-		this.conclusionProcessor_ = conclusionProcessor;
+		this.inferenceProcessor_ = inferenceProcessor;
 		this.workerLocalTodo_ = localizedProducer;
 		this.interrupter_ = interrupter;
 	}
@@ -103,32 +102,31 @@ public abstract class AbstractRuleEngine<I extends RuleApplicationInput>
 	}
 
 	/**
-	 * Process all pending {@link Conclusions} of the given {@link Context}
+	 * Process all pending {@link ClassInference}s of the given {@link Context}
 	 * 
 	 * @param context
 	 *            the active {@link Context} with unprocessed
-	 *            {@link Conclusions}
+	 *            {@link ClassInference}s
 	 */
 	void process(Context context) {
 		activeContext_.set(context);
 		// at this point workerLocalTodo_ must be empty
 		workerLocalTodo_.setActiveRoot(context.getRoot());
 		for (;;) {
-			ClassConclusion conclusion = workerLocalTodo_.poll();
-			if (conclusion == null) {
-				conclusion = context.takeToDo();
-				if (conclusion == null)
+			ClassInference inference = workerLocalTodo_.poll();
+			if (inference == null) {
+				inference = context.takeToDo();
+				if (inference == null)
 					return;
 			}
-			LOGGER_.trace("{}: processing conclusion {}", context, conclusion);
-			conclusion.accept(conclusionProcessor_);
+			LOGGER_.trace("{}: processing inference {}", context, inference);
+			inference.accept(inferenceProcessor_);
 		}
 	}
 
 	/**
 	 * Removes and returns the next active {@link Context} that has unprocessed
-	 * {@link ClassConclusion}s. The letter can be retrieved using
-	 * {@link #getNextConclusion(Context)}
+	 * {@link ClassInference}s.
 	 * 
 	 * @return the next active {@link Context} to be processed by this
 	 *         {@link BasicRuleEngine}

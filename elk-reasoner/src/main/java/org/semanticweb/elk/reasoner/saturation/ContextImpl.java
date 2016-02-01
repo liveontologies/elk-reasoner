@@ -48,6 +48,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextIniti
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.BackwardLinkChainFromBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ContradictionOverBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
@@ -81,7 +82,7 @@ public class ContextImpl implements ExtendedContext {
 	 * {@link BackwardLinkImpl} s, i.e., the {@link BackwardLinkImpl}s whose
 	 * source is this {@link Context}; can be {@code null}
 	 * 
-	 * @see BackwardLinkImpl#getOriginRoot()
+	 * @see BackwardLinkImpl#getTraceRoot()
 	 */
 	private Set<IndexedObjectProperty> reflexiveBackwardLinks_ = null;
 
@@ -106,7 +107,7 @@ public class ContextImpl implements ExtendedContext {
 	/**
 	 * {@code true} if it is not initialized or otherwise all derived
 	 * {@link SubClassInclusion}s for {@link #root_} have been computed.
-	 * @see SubClassInclusion#getConclusionRoot()
+	 * @see SubClassInclusion#getDestination()
 	 */
 	private volatile boolean isSaturated_ = true;
 
@@ -129,9 +130,9 @@ public class ContextImpl implements ExtendedContext {
 	private final Set<IndexedClassExpression> decomposedSubsumers_;
 
 	/**
-	 * the queue of unprocessed {@code Conclusion}s of this {@link Context}
+	 * the queue of unprocessed {@code ClassInference}s of this {@link Context}
 	 */
-	private final ActivationStack<ClassConclusion> toDo_;
+	private final ActivationStack<ClassInference> toDo_;
 
 	/**
 	 * {@code true} if this {@link Context} is initialized, i.e., contains
@@ -140,7 +141,7 @@ public class ContextImpl implements ExtendedContext {
 	private volatile boolean isInitialized_ = false;
 
 	/**
-	 * the number of {@link ClassConclusion}s contained in this {@code ConclusionSet}
+	 * the number of different {@link ClassConclusion}s contained in this {@code ConclusionSet}
 	 */
 	private int size = 0;
 
@@ -152,7 +153,7 @@ public class ContextImpl implements ExtendedContext {
 	 */
 	public ContextImpl(IndexedContextRoot root) {
 		this.root_ = root;
-		this.toDo_ = new SynchronizedArrayListActivationStack<ClassConclusion>();
+		this.toDo_ = new SynchronizedArrayListActivationStack<ClassInference>();
 		this.composedSubsumers_ = new ArrayHashSet<IndexedClassExpression>(16);
 		this.decomposedSubsumers_ = new ArrayHashSet<IndexedClassExpression>(8);
 	}
@@ -194,8 +195,8 @@ public class ContextImpl implements ExtendedContext {
 	}
 
 	@Override
-	public boolean addToDo(ClassConclusion conclusion) {
-		return toDo_.push(conclusion);
+	public boolean addToDo(ClassInference inference) {
+		return toDo_.push(inference);
 	}
 
 	@Override
@@ -299,7 +300,7 @@ public class ContextImpl implements ExtendedContext {
 	}
 
 	@Override
-	public ClassConclusion takeToDo() {
+	public ClassInference takeToDo() {
 		return toDo_.pop();
 	}
 
@@ -342,7 +343,7 @@ public class ContextImpl implements ExtendedContext {
 					.getBackwardRelation();
 			// make sure that relevant context always exists
 			SubContext subContext = getCreateSubContext(relation);
-			if (subConclusion.getOriginRoot() == root_) {
+			if (subConclusion.getTraceRoot() == root_) {
 				// reflexive
 				if (reflexiveBackwardLinks_ == null) {
 					reflexiveBackwardLinks_ = new ArrayHashSet<IndexedObjectProperty>(
@@ -418,7 +419,7 @@ public class ContextImpl implements ExtendedContext {
 		@Override
 		public Boolean visit(SubContextInitialization subConclusion) {
 			return getCreateSubContext(
-					subConclusion.getConclusionSubRoot()).addSubConclusion(
+					subConclusion.getDestinationSubRoot()).addSubConclusion(
 					subConclusion);
 		}
 
@@ -434,7 +435,7 @@ public class ContextImpl implements ExtendedContext {
 			IndexedObjectProperty relation = subConclusion
 					.getBackwardRelation();
 			SubContext subContext = getCreateSubContext(relation);
-			if (subConclusion.getOriginRoot() == root_) {
+			if (subConclusion.getTraceRoot() == root_) {
 				// link is reflexive
 				if (reflexiveBackwardLinks_ != null) {
 					changed = reflexiveBackwardLinks_.remove(relation);
@@ -515,7 +516,7 @@ public class ContextImpl implements ExtendedContext {
 		@Override
 		public Boolean visit(SubContextInitialization subConclusion) {
 			SubContext subContext = getCreateSubContext(subConclusion
-					.getConclusionSubRoot());
+					.getDestinationSubRoot());
 			if (subContext == null)
 				return false;
 			// else
@@ -529,7 +530,7 @@ public class ContextImpl implements ExtendedContext {
 
 		@Override
 		public Boolean visit(BackwardLink subConclusion) {
-			if (subConclusion.getOriginRoot() == root_) {
+			if (subConclusion.getTraceRoot() == root_) {
 				// reflexive
 				return reflexiveBackwardLinks_ != null
 						&& reflexiveBackwardLinks_.contains(subConclusion
@@ -598,7 +599,7 @@ public class ContextImpl implements ExtendedContext {
 		@Override
 		public Boolean visit(SubContextInitialization subConclusion) {
 			SubContext subContext = getCreateSubContext(subConclusion
-					.getConclusionSubRoot());
+					.getDestinationSubRoot());
 			if (subContext == null)
 				return false;
 			// else

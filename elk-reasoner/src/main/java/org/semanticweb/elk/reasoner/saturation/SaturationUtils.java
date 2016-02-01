@@ -28,14 +28,15 @@ package org.semanticweb.elk.reasoner.saturation;
 import java.util.Arrays;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionCounter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ComposedClassConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.CountingClassConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.PreprocessedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.TimedClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextStatistics;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.BasicRuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
@@ -58,8 +59,8 @@ public class SaturationUtils {
 			.getLogger(SaturationUtils.class);
 
 	/*
-	 * --------------------------------------------------------------------------
-	 * METHODS WHICH ADD TIMERS AND COUNTERS TO VARIOUS VISITORS AND LISTENERS
+	 * -------------------------------------------------------------------------
+	 * - METHODS WHICH ADD TIMERS AND COUNTERS TO VARIOUS VISITORS AND LISTENERS
 	 * ----------------------------------------------------------------
 	 */
 
@@ -91,32 +92,39 @@ public class SaturationUtils {
 		return ruleAppVisitor;
 	}
 
-	public static <C extends Context> SaturationStateWriter<C> getStatAwareWriter(
-			SaturationStateWriter<C> writer,
-			SaturationStatistics localStatistics) {
-		return COLLECT_CONCLUSION_COUNTS ? new CountingSaturationStateWriter<C>(
-				writer, localStatistics.getConclusionStatistics()
-						.getProducedConclusionCounts()) : writer;
-	}
-
 	public static <C extends Context> SaturationStateWriter<C> getStatsAwareWriter(
 			SaturationStateWriter<C> writer,
 			SaturationStatistics localStatistics) {
-		return COLLECT_CONCLUSION_COUNTS ? new CountingSaturationStateWriter<C>(
-				writer, localStatistics.getConclusionStatistics()
-						.getProducedConclusionCounts()) : writer;
+		return COLLECT_CONCLUSION_COUNTS
+				? new CountingSaturationStateWriter<C>(writer,
+						localStatistics.getConclusionStatistics()
+								.getProducedConclusionCounts())
+				: writer;
 	}
 
 	/**
 	 * @param visitors
 	 * @return A {@link ClassConclusion.Visitor} that applies the given
-	 *         {@link ClassConclusion.Visitor}s consequently until one of them returns
-	 *         {@code false}. {@link ClassConclusion.Visitor}s that are {@code null}
-	 *         are ignored.
+	 *         {@link ClassConclusion.Visitor}s consequently until one of them
+	 *         returns {@code false}. {@link ClassConclusion.Visitor}s that are
+	 *         {@code null} are ignored.
 	 */
 	public static ClassConclusion.Visitor<Boolean> compose(
 			ClassConclusion.Visitor<Boolean>... visitors) {
 		return new ComposedClassConclusionVisitor(removeNulls(visitors));
+
+	}
+
+	/**
+	 * @param visitors
+	 * @return A {@link ClassInference.Visitor} that applies the given
+	 *         {@link ClassInference.Visitor}s consequently until one of them
+	 *         returns {@code false}. {@link ClassInference.Visitor}s that are
+	 *         {@code null} are ignored.
+	 */
+	public static ClassInference.Visitor<Boolean> compose(
+			ClassInference.Visitor<Boolean>... visitors) {
+		return new ComposedClassInferenceVisitor(removeNulls(visitors));
 
 	}
 
@@ -138,7 +146,8 @@ public class SaturationUtils {
 		return Arrays.copyOf(input, pos);
 	}
 
-	public static ClassConclusion.Visitor<Boolean> getCountingConclusionVisitor(ClassConclusionCounter counter) {
+	public static ClassConclusion.Visitor<Boolean> getCountingConclusionVisitor(
+			ClassConclusionCounter counter) {
 		if (!COLLECT_CONCLUSION_COUNTS)
 			return null;
 		// else
@@ -154,18 +163,18 @@ public class SaturationUtils {
 	public static ClassConclusion.Visitor<Boolean> getUsedConclusionCountingVisitor(
 			SaturationStatistics statistics) {
 		statistics.getConclusionStatistics().startMeasurements();
-		return getCountingConclusionVisitor(statistics
-				.getConclusionStatistics().getUsedConclusionCounts());
+		return getCountingConclusionVisitor(
+				statistics.getConclusionStatistics().getUsedConclusionCounts());
 	}
 
+	@SuppressWarnings("unchecked")
 	public static ClassConclusion.Visitor<Boolean> getUsedConclusionCountingProcessor(
 			ClassConclusion.Visitor<Boolean> ruleProcessor,
 			SaturationStatistics localStatistics) {
 		if (COLLECT_CONCLUSION_COUNTS) {
-			return new PreprocessedConclusionVisitor<Boolean>(
-					new CountingClassConclusionVisitor(localStatistics
-							.getConclusionStatistics()
-							.getUsedConclusionCounts()), ruleProcessor);
+			return compose(new CountingClassConclusionVisitor(localStatistics
+					.getConclusionStatistics().getUsedConclusionCounts()),
+					ruleProcessor);
 		}
 		return ruleProcessor;
 	}
@@ -174,7 +183,8 @@ public class SaturationUtils {
 			ClassConclusion.Visitor<O> conclusionVisitor,
 			SaturationStatistics localStatistics) {
 
-		ConclusionStatistics stats = localStatistics.getConclusionStatistics();
+		ClassConclusionStatistics stats = localStatistics
+				.getConclusionStatistics();
 		if (COLLECT_CONCLUSION_TIMES) {
 			return new TimedClassConclusionVisitor<O>(
 					stats.getConclusionTimers(), conclusionVisitor);

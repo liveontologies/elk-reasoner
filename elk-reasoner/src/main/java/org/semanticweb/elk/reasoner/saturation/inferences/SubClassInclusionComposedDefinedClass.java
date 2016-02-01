@@ -61,8 +61,8 @@ public class SubClassInclusionComposedDefinedClass
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceRoot() {
-		return getConclusionRoot();
+	public IndexedContextRoot getOrigin() {
+		return getDestination();
 	}
 
 	public IndexedClassExpression getDefinition() {
@@ -75,7 +75,7 @@ public class SubClassInclusionComposedDefinedClass
 
 	public SubClassInclusionComposed getPremise(
 			SubClassInclusionComposed.Factory factory) {
-		return factory.getSubClassInclusionComposed(getInferenceRoot(),
+		return factory.getSubClassInclusionComposed(getOrigin(),
 				definition_);
 	}
 

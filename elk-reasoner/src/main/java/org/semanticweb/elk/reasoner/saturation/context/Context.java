@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.context;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 import org.semanticweb.elk.util.collections.chains.Chain;
@@ -36,7 +37,7 @@ import org.semanticweb.elk.util.collections.chains.Chain;
  * {@link Context} ({@link Context#getRoot()}). The computation is organized in
  * a saturation process where all {@link ClassConclusion}s to which inferences should
  * be applied are added to the "todo" queue using
- * {@link #addConclusion(ClassConclusion)} and when the rules are applied, they are
+ * {@link #addConclusion(ClassInference)} and when the rules are applied, they are
  * repeatedly taken from this queue using {@link #takeToDo()}. The object
  * provides some methods in addition to {@link ClassConclusionSet} to store, test and
  * remove information for {@link ClassConclusion}s in this {@link Context}, and some
@@ -59,33 +60,34 @@ public interface Context extends ClassConclusionSet, ContextPremises {
 	Chain<LinkableBackwardLinkRule> getBackwardLinkRuleChain();
 
 	/**
-	 * Adds the given {@link ClassConclusion} to be processed within this
-	 * {@link Context}. The method returns {@code true} when this is the first
-	 * unprocessed conclusion added to the context after it is being created or
+	 * Adds the given {@link ClassInference} to be applied within this
+	 * {@link Context}. The method returns {@code true} when this is currently
+	 * the first inference added to the context after it is being created or
 	 * cleared (that is, {@link #takeToDo()} has returned {@code null}). If
 	 * several threads call this method at the same time for the same
 	 * {@link Context} then at most one of these method returns {@code true},
 	 * unless {@link #takeToDo()} is called as well.
 	 * 
-	 * @param conclusion
-	 *            the {@link ClassConclusion} added to be processed within this
+	 * @param inference
+	 *            the {@link ClassInference} added to be processed within this
 	 *            {@link Context}
-	 * @return {@code true} when the added conclusion is the first unprocessed
-	 *         conclusion for this context
+	 * @return {@code true} when the added inference is the only one in this
+	 *         context (i.e., there were no other inferences)
 	 * @see #takeToDo()
 	 */
-	boolean addToDo(ClassConclusion conclusion);
+	boolean addToDo(ClassInference inference);
 
 	/**
-	 * Removes and returns one of the unprocessed {@link ClassConclusion}s of this
-	 * context. This method is thread safe and can be used concurrently with the
-	 * method {@link #addToDo(ClassConclusion)}.
+	 * Removes and returns one of the unprocessed {@link ClassInference}s of
+	 * this context. This method is thread safe and can be used concurrently
+	 * with the method {@link #addToDo(ClassInference)}.
 	 * 
-	 * @return some unprocessed {@link ClassConclusion} of this context, if there is
-	 *         one, or {@code null} if there is no such {@link ClassConclusion}
-	 * @see #addToDo(ClassConclusion)
+	 * @return some unprocessed {@link ClassInference} of this context, if there
+	 *         is one, or {@code null} if there is no such
+	 *         {@link ClassInference}
+	 * @see #addToDo(ClassInference)
 	 */
-	ClassConclusion takeToDo();
+	ClassInference takeToDo();
 
 	/**
 	 * @return {@code true} if all {@link ClassConclusion}s for this {@link Context},

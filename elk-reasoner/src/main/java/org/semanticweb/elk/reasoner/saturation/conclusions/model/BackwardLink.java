@@ -57,7 +57,7 @@ public interface BackwardLink extends SubClassConclusion {
 	 *         {@link BackwardLink} follows
 	 */
 	@Override
-	public IndexedContextRoot getOriginRoot();
+	public IndexedContextRoot getTraceRoot();
 
 	public <O> O accept(Visitor<O> visitor);
 

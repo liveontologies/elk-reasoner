@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.backwardlinks;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 
@@ -44,7 +44,7 @@ abstract class AbstractLinkableBackwardLinkRule extends
 
 	@Override
 	public void accept(RuleVisitor<?> visitor, BackwardLink premise,
-			ContextPremises premises, ClassConclusionProducer producer) {
+			ContextPremises premises, ClassInferenceProducer producer) {
 		accept((BackwardLinkRuleVisitor<?>) visitor, premise, premises,
 				producer);
 	}
@@ -52,7 +52,7 @@ abstract class AbstractLinkableBackwardLinkRule extends
 	@Override
 	public void accept(BackwardLinkRuleVisitor<?> visitor,
 			BackwardLink premise, ContextPremises premises,
-			ClassConclusionProducer producer) {
+			ClassInferenceProducer producer) {
 		accept((LinkedBackwardLinkRuleVisitor<?>) visitor, premise, premises,
 				producer);
 	}

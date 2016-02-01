@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ContradictionImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
 public abstract class AbstractContradictionInference extends ContradictionImpl
@@ -33,6 +34,10 @@ public abstract class AbstractContradictionInference extends ContradictionImpl
 	protected AbstractContradictionInference(
 			IndexedContextRoot conclusionRoot) {
 		super(conclusionRoot);
+	}
+	
+	public Contradiction getConclusion(Contradiction.Factory factory) {
+		return factory.getContradiction(getDestination());
 	}
 
 	@Override
@@ -46,8 +51,8 @@ public abstract class AbstractContradictionInference extends ContradictionImpl
 	}
 	
 	@Override
-	public IndexedContextRoot getInferenceRoot() {
-		return getConclusionRoot();
+	public IndexedContextRoot getOrigin() {
+		return getDestination();
 	}
 	
 	@Override

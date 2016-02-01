@@ -76,14 +76,14 @@ public class ForwardLinkComposition extends
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceRoot() {
+	public IndexedContextRoot getOrigin() {
 		return inferenceRoot_;
 	}
 
 	@Override
 	public BackwardLink getFirstPremise(BackwardLink.Factory factory) {
-		return factory.getBackwardLink(getInferenceRoot(), backwardRelation_,
-				getConclusionRoot());
+		return factory.getBackwardLink(getOrigin(), backwardRelation_,
+				getDestination());
 	}
 
 	@Override
@@ -94,7 +94,7 @@ public class ForwardLinkComposition extends
 
 	@Override
 	public ForwardLink getThirdPremise(ForwardLink.Factory factory) {
-		return factory.getForwardLink(getInferenceRoot(), forwardChain_,
+		return factory.getForwardLink(getOrigin(), forwardChain_,
 				getTarget());
 	}
 

@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -136,7 +136,7 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 
 	@Override
 	public void apply(BackwardLink link, ContextPremises premises,
-			ClassConclusionProducer producer) {
+			ClassInferenceProducer producer) {
 
 		/* compose the link with all forward links */
 		SaturatedPropertyChain linkSaturation = link.getBackwardRelation()
@@ -157,7 +157,7 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 			for (IndexedComplexPropertyChain composition : compositions)
 				for (IndexedContextRoot forwardTarget : forwardTargets)
 					IndexedObjectSomeValuesFrom.Helper.produceComposedLink(
-							producer, link.getOriginRoot(),
+							producer, link.getTraceRoot(),
 							link.getBackwardRelation(), premises.getRoot(),
 							forwardRelation, forwardTarget, composition);
 		}
@@ -172,7 +172,7 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 	@Override
 	public void accept(LinkedBackwardLinkRuleVisitor<?> visitor,
 			BackwardLink premise, ContextPremises premises,
-			ClassConclusionProducer producer) {
+			ClassInferenceProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}
 

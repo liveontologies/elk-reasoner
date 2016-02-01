@@ -56,14 +56,14 @@ public class BackwardLinkReversedExpanded extends AbstractBackwardLinkInference 
 
 	public BackwardLinkReversedExpanded(ForwardLink premise,
 			IndexedObjectProperty superProperty, ElkAxiom reason) {
-		super(premise.getTarget(), superProperty, premise.getConclusionRoot());
+		super(premise.getTarget(), superProperty, premise.getDestination());
 		this.subChain_ = premise.getForwardChain();
 		this.reason_ = reason;
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceRoot() {
-		return getOriginRoot();
+	public IndexedContextRoot getOrigin() {
+		return getTraceRoot();
 	}
 
 	public IndexedPropertyChain getSubChain() {
@@ -75,8 +75,8 @@ public class BackwardLinkReversedExpanded extends AbstractBackwardLinkInference 
 	}
 
 	public ForwardLink getFirstPremise(ForwardLink.Factory factory) {
-		return factory.getForwardLink(getInferenceRoot(), subChain_,
-				getConclusionRoot());
+		return factory.getForwardLink(getOrigin(), subChain_,
+				getDestination());
 	}
 	
 	public IndexedSubObjectPropertyOfAxiom getSideCondition(

@@ -56,11 +56,11 @@ public class DummyConclusionVisitor<O> implements Conclusion.Visitor<O> {
 	}
 
 	protected O defaultVisit(IndexedAxiom conclusion) {
-		return defaultVisit((SaturationConclusion) conclusion);
+		return defaultVisit((Conclusion) conclusion);
 	}
 
 	protected O defaultVisit(ObjectPropertyConclusion conclusion) {
-		return defaultVisit((SaturationConclusion) conclusion);
+		return defaultVisit((Conclusion) conclusion);
 	}
 
 	@Override

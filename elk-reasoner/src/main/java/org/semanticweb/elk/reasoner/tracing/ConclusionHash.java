@@ -52,6 +52,10 @@ public class ConclusionHash
 
 	private static final ConclusionHash INSTANCE_ = new ConclusionHash();
 
+	public static Conclusion.Visitor<Integer> getHashVisitor() {
+		return INSTANCE_;
+	}
+
 	private static int combinedHashCode(int... hashes) {
 		return HashGenerator.combineListHash(hashes);
 	}
@@ -89,27 +93,27 @@ public class ConclusionHash
 	@Override
 	public Integer visit(BackwardLink subConclusion) {
 		return combinedHashCode(hashCode(BackwardLink.class),
-				hashCode(subConclusion.getConclusionRoot()),
-				hashCode(subConclusion.getConclusionSubRoot()),
-				hashCode(subConclusion.getOriginRoot()));
+				hashCode(subConclusion.getDestination()),
+				hashCode(subConclusion.getDestinationSubRoot()),
+				hashCode(subConclusion.getTraceRoot()));
 	}
 
 	@Override
 	public Integer visit(ContextInitialization conclusion) {
 		return combinedHashCode(hashCode(ContextInitialization.class),
-				hashCode(conclusion.getConclusionRoot()));
+				hashCode(conclusion.getDestination()));
 	}
 
 	@Override
 	public Integer visit(Contradiction conclusion) {
 		return combinedHashCode(hashCode(Contradiction.class),
-				hashCode(conclusion.getConclusionRoot()));
+				hashCode(conclusion.getDestination()));
 	}
 
 	@Override
 	public Integer visit(DisjointSubsumer conclusion) {
 		return combinedHashCode(hashCode(DisjointSubsumer.class),
-				hashCode(conclusion.getConclusionRoot()),
+				hashCode(conclusion.getDestination()),
 				hashCode(conclusion.getDisjointExpressions()),
 				hashCode(conclusion.getPosition()),
 				hashCode(conclusion.getReason()));
@@ -118,7 +122,7 @@ public class ConclusionHash
 	@Override
 	public Integer visit(ForwardLink conclusion) {
 		return combinedHashCode(hashCode(ForwardLink.class),
-				hashCode(conclusion.getConclusionRoot()),
+				hashCode(conclusion.getDestination()),
 				hashCode(conclusion.getForwardChain()),
 				hashCode(conclusion.getTarget()));
 	}
@@ -166,8 +170,8 @@ public class ConclusionHash
 	@Override
 	public Integer visit(Propagation subConclusion) {
 		return combinedHashCode(hashCode(Propagation.class),
-				hashCode(subConclusion.getConclusionRoot()),
-				hashCode(subConclusion.getConclusionSubRoot()),
+				hashCode(subConclusion.getDestination()),
+				hashCode(subConclusion.getDestinationSubRoot()),
 				hashCode(subConclusion.getCarry()));
 	}
 
@@ -181,22 +185,22 @@ public class ConclusionHash
 	@Override
 	public Integer visit(SubClassInclusionComposed conclusion) {
 		return combinedHashCode(hashCode(SubClassInclusionComposed.class),
-				hashCode(conclusion.getConclusionRoot()),
+				hashCode(conclusion.getDestination()),
 				hashCode(conclusion.getSuperExpression()));
 	}
 
 	@Override
 	public Integer visit(SubClassInclusionDecomposed conclusion) {
 		return combinedHashCode(hashCode(SubClassInclusionDecomposed.class),
-				hashCode(conclusion.getConclusionRoot()),
+				hashCode(conclusion.getDestination()),
 				hashCode(conclusion.getSuperExpression()));
 	}
 
 	@Override
 	public Integer visit(SubContextInitialization subConclusion) {
 		return combinedHashCode(hashCode(SubContextInitialization.class),
-				hashCode(subConclusion.getConclusionRoot()),
-				hashCode(subConclusion.getConclusionSubRoot()));
+				hashCode(subConclusion.getDestination()),
+				hashCode(subConclusion.getDestinationSubRoot()));
 	}
 
 	@Override

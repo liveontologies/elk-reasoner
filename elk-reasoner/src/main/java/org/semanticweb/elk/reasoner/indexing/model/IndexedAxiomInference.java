@@ -26,16 +26,18 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
 /**
- * Represents a transformation of an {@link ElkAxiom} to an {@link IndexedAxiom}
- * . An {@link ElkAxiom} can be converted to several {@link IndexedAxiom}s using
- * several such {@link IndexedAxiomInference}s
+ * An {@link Inference} representing a transformation of an {@link ElkAxiom} to
+ * an {@link IndexedAxiom}. An {@link ElkAxiom} can be converted to several
+ * {@link IndexedAxiom}s using several such {@link IndexedAxiomInference}s
  * 
  * @see IndexedAxiom#getOriginalAxiom()
  * 
  * @author Yevgeny Kazakov
  *
  */
-public interface IndexedAxiomInference extends IndexedAxiom, Inference {
+public interface IndexedAxiomInference extends Inference {
+
+	<O> O accept(Visitor<O> visitor);
 
 	/**
 	 * The visitor pattern for instances
@@ -57,7 +59,5 @@ public interface IndexedAxiomInference extends IndexedAxiom, Inference {
 		// combined interface
 
 	}
-	
-	<O> O accept(Visitor<O> visitor);
 
 }

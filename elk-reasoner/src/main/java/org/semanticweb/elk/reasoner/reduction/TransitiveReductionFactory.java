@@ -79,8 +79,10 @@ import org.slf4j.LoggerFactory;
  * @see TransitiveReductionListener
  */
 public class TransitiveReductionFactory<R extends IndexedClassExpression, J extends TransitiveReductionJob<R>>
-		extends SimpleInterrupter implements
-		InputProcessorFactory<J, TransitiveReductionFactory<R, J>.Engine> {
+		extends
+			SimpleInterrupter
+		implements
+			InputProcessorFactory<J, TransitiveReductionFactory<R, J>.Engine> {
 
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
@@ -126,9 +128,10 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	 * no (direct) subsumers
 	 */
 	private final List<ElkClass> defaultTopOutput_;
-	
+
 	/**
-	 * A factory for creating contradiction conclusions; used for checking unsatisfiable contexts
+	 * A factory for creating contradiction conclusions; used for checking
+	 * unsatisfiable contexts
 	 */
 	private final Contradiction.Factory factory_ = new SaturationConclusionBaseFactory();
 
@@ -152,8 +155,8 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		this.saturationState_ = saturationState;
 		this.saturationFactory_ = new ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>(
 				new RuleApplicationAdditionFactory<RuleApplicationInput>(
-						saturationState), maxWorkers,
-				new ThisClassExpressionSaturationListener());
+						saturationState),
+				maxWorkers, new ThisClassExpressionSaturationListener());
 		this.owlThing_ = saturationState.getOntologyIndex().getOwlThing();
 		this.defaultTopOutput_ = new ArrayList<ElkClass>(1);
 		defaultTopOutput_.add(PredefinedElkClass.OWL_THING);
@@ -195,12 +198,12 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	 */
 	private class ThisClassExpressionSaturationListener
 			implements
-			ClassExpressionSaturationListener<SaturationJobForTransitiveReduction<R, ?, J>> {
+				ClassExpressionSaturationListener<SaturationJobForTransitiveReduction<R, ?, J>> {
 
 		@Override
 		public void notifyFinished(
 				SaturationJobForTransitiveReduction<R, ?, J> output)
-				throws InterruptedException {
+						throws InterruptedException {
 			output.accept(saturationOutputProcessor_);
 		}
 	}
@@ -212,8 +215,9 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	private class SaturationOutputProcessor implements
-			SaturationJobVisitor<R, J> {
+	private class SaturationOutputProcessor
+			implements
+				SaturationJobVisitor<R, J> {
 
 		@Override
 		public void visit(SaturationJobRoot<R, J> saturationJob)
@@ -259,9 +263,10 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			/*
 			 * If saturation is unsatisfiable, return the unsatisfiable output.
 			 */
-			if (saturation.containsConclusion(factory_.getContradiction(root))) {
-				LOGGER_.trace(
-						"{}: transitive reduction finished: inconsistent", root);
+			if (saturation
+					.containsConclusion(factory_.getContradiction(root))) {
+				LOGGER_.trace("{}: transitive reduction finished: inconsistent",
+						root);
 
 				TransitiveReductionOutput<R> output = new TransitiveReductionOutputUnsatisfiable<R>(
 						root);
@@ -299,7 +304,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		 */
 		private void processTransitiveReductionState(
 				TransitiveReductionState<R, J> state)
-				throws InterruptedException {
+						throws InterruptedException {
 
 			Iterator<IndexedClassExpression> subsumerIterator = state.subsumerIterator;
 
@@ -331,7 +336,8 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			}
 
 			/* When all candidates are processed, the output is computed */
-			TransitiveReductionOutputEquivalentDirect<R> output = computeOutput(state);
+			TransitiveReductionOutputEquivalentDirect<R> output = computeOutput(
+					state);
 
 			// if (output.equivalent.isEmpty()) {
 			// LOGGER_.error("{}: empty equivalent class!", output.getRoot());
@@ -395,9 +401,13 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				return;
 			}
 
-			/* removing all pruned subsumers strictly subsumed by the candidate */
+			/*
+			 * removing all pruned subsumers strictly subsumed by the candidate
+			 */
 			if (candidateSubsumersSize > state.prunedSubsumers.size()) {
-				/* iterating over pruned subsumers checking candidate subsumers */
+				/*
+				 * iterating over pruned subsumers checking candidate subsumers
+				 */
 				Iterator<IndexedClass> iteratorPrunedSubsumers = state.prunedSubsumers
 						.iterator();
 				while (iteratorPrunedSubsumers.hasNext()) {
@@ -405,9 +415,12 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 							.next();
 					Set<IndexedClassExpression> prunedSubsumerSubsumers = saturationState_
 							.getContext(prunedSubsumer).getComposedSubsumers();
-					if (candidateSubsumersSize > prunedSubsumerSubsumers.size()) {
+					if (candidateSubsumersSize > prunedSubsumerSubsumers
+							.size()) {
 						if (candidateSubsumers.contains(prunedSubsumer)) {
-							/* candidate strictly subsumes the pruned subsumer */
+							/*
+							 * candidate strictly subsumes the pruned subsumer
+							 */
 							iteratorPrunedSubsumers.remove();
 						}
 					} else if (prunedSubsumerSubsumers.contains(candidate)
@@ -418,7 +431,9 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 					}
 				}
 			} else {
-				/* iterating over candidate subsumers checking pruned subsumers */
+				/*
+				 * iterating over candidate subsumers checking pruned subsumers
+				 */
 				for (IndexedClassExpression candidateSubsumer : candidateSubsumers) {
 					if (!(candidateSubsumer instanceof IndexedClass)
 							|| !state.prunedSubsumers
@@ -427,7 +442,8 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 					IndexedClass prunedSubsumer = (IndexedClass) candidateSubsumer;
 					Set<IndexedClassExpression> prunedSubsumerSubsumers = saturationState_
 							.getContext(prunedSubsumer).getComposedSubsumers();
-					if (candidateSubsumersSize > prunedSubsumerSubsumers.size()) {
+					if (candidateSubsumersSize > prunedSubsumerSubsumers
+							.size()) {
 						/* candidate strictly subsumes the pruned subsumer */
 						state.prunedSubsumers.remove(prunedSubsumer);
 					}
@@ -460,9 +476,8 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			 * direct subsumer for owl:Thing unless it is the output for
 			 * owl:Thing itself
 			 */
-			if (state.prunedSubsumers.isEmpty()
-					&& !output.getEquivalent().contains(
-							PredefinedElkClass.OWL_THING)) {
+			if (state.prunedSubsumers.isEmpty() && !output.getEquivalent()
+					.contains(PredefinedElkClass.OWL_THING)) {
 				output.directSubsumers.put(owlThing_, defaultTopOutput_);
 				return output;
 			}
@@ -474,8 +489,8 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			 * order. Now we removed subsumers that are strictly subsumed by
 			 * previous subsumers in this order.
 			 */
-			for (IndexedClassExpression subsumer : saturationState_.getContext(
-					root).getComposedSubsumers()) {
+			for (IndexedClassExpression subsumer : saturationState_
+					.getContext(root).getComposedSubsumers()) {
 				if (!(subsumer instanceof IndexedClass)
 						|| !state.prunedSubsumers.contains(subsumer))
 					continue;
@@ -507,14 +522,15 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 								.getComposedSubsumers();
 						if (candidateSubsumersSize >= prunedSubsumerSubsumers
 								.size()
-								&& candidateSubsumers.contains(prunedSubsumer)) {
+								&& candidateSubsumers
+										.contains(prunedSubsumer)) {
 							/* candidate subsumes the pruned subsumer */
 							iteratorPrunedSubsumers.remove();
 							if (candidateSubsumersSize == prunedSubsumerSubsumers
 									.size()) {
 								/* candidate equivalent to pruned subsumer */
-								candidateEquivalent.add(prunedSubsumer
-										.getElkEntity());
+								candidateEquivalent
+										.add(prunedSubsumer.getElkEntity());
 							}
 						}
 					}
@@ -543,8 +559,8 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 							if (candidateSubsumersSize == prunedSubsumerSubsumers
 									.size()) {
 								/* candidate equivalent to pruned subsumer */
-								candidateEquivalent.add(prunedSubsumer
-										.getElkEntity());
+								candidateEquivalent
+										.add(prunedSubsumer.getElkEntity());
 							}
 						}
 					}

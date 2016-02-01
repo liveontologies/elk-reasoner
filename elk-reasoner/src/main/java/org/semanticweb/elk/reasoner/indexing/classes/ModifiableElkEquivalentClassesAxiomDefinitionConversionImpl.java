@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkEquivalentClassesAxiomDefinitionConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
@@ -58,6 +59,13 @@ class ModifiableElkEquivalentClassesAxiomDefinitionConversionImpl
 	@Override
 	public int getDefinitionPosition() {
 		return definitionPosition_;
+	}
+
+	@Override
+	public IndexedDefinitionAxiom getConclusion(
+			IndexedDefinitionAxiom.Factory factory) {
+		return factory.getIndexedDefinitionAxiom(getOriginalAxiom(),
+				getDefinedClass(), getDefinition());
 	}
 
 	@Override

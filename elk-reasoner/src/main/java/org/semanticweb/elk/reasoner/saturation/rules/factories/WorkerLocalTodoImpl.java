@@ -26,8 +26,8 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +49,7 @@ public class WorkerLocalTodoImpl implements WorkerLocalTodo {
 	 */
 	private final Thread thisThread_;
 
-	private final Deque<ClassConclusion> localConclusions_;
+	private final Deque<ClassInference> localInferences_;
 
 	/**
 	 * {@code true} if this {@link WorkerLocalTodo} is assigned to some
@@ -65,20 +65,20 @@ public class WorkerLocalTodoImpl implements WorkerLocalTodo {
 
 	public WorkerLocalTodoImpl() {
 		this.thisThread_ = Thread.currentThread();
-		this.localConclusions_ = new ArrayDeque<ClassConclusion>(1024);
+		this.localInferences_ = new ArrayDeque<ClassInference>(1024);
 	}
 
 	@Override
-	public ClassConclusion poll() {
+	public ClassInference poll() {
 		checkThread();
-		return localConclusions_.pollLast();
+		return localInferences_.pollLast();
 	}
 
 	@Override
-	public void add(ClassConclusion concusion) {
+	public void add(ClassInference inference) {
 		checkThread();
-		LOGGER_.trace("{}: produced local conclusion", concusion);
-		localConclusions_.add(concusion);
+		LOGGER_.trace("{}: local inference", inference);
+		localInferences_.add(inference);
 	}
 
 	@Override

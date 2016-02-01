@@ -60,13 +60,13 @@ public abstract class SubClassInclusionDecomposedConjunct
 
 	public SubClassInclusionDecomposed getPremise(
 			SubClassInclusionDecomposed.Factory factory) {
-		return factory.getSubClassInclusionDecomposed(getInferenceRoot(),
+		return factory.getSubClassInclusionDecomposed(getOrigin(),
 				conjunction_);
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceRoot() {
-		return getConclusionRoot();
+	public IndexedContextRoot getOrigin() {
+		return getDestination();
 	}
 
 	@Override

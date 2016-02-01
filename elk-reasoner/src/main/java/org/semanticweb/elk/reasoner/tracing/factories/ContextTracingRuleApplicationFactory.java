@@ -36,16 +36,15 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.AbstractClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionInsertionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionOccurrenceCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.LocalRuleApplicationClassConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.RelativizedContextReference;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference.Visitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInferenceConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.DummyClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubContextInitializationNoPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.AbstractRuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
@@ -59,8 +58,9 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * A {@link RuleApplicationFactory} that applies inference rules to
  * {@link ClassConclusion}s currently stored in the {@link Context}s of the main
  * {@link SaturationState}. This {@link SaturationState} is not modified. The
- * inferences producing the {@link ClassConclusion}s in this {@link SaturationState}
- * are produced using the supplied {@link InferenceProducer}.
+ * inferences producing the {@link ClassConclusion}s in this
+ * {@link SaturationState} are produced using the supplied
+ * {@link InferenceProducer}.
  * 
  * @author Pavel Klinov
  * 
@@ -68,14 +68,13 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class ContextTracingRuleApplicationFactory extends
-		AbstractRuleApplicationFactory<ExtendedContext, RuleApplicationInput> {
+public class ContextTracingRuleApplicationFactory
+		extends
+			AbstractRuleApplicationFactory<ExtendedContext, RuleApplicationInput> {
 
 	private final SaturationState<?> mainSaturationState_;
 
 	private final InferenceProducer<ClassInference> inferenceProducer_;
-	
-	private final SubContextInitialization.Factory factory_;
 
 	public ContextTracingRuleApplicationFactory(
 			SaturationState<?> mainSaturationState,
@@ -85,44 +84,42 @@ public class ContextTracingRuleApplicationFactory extends
 				new MainContextFactory()));
 		mainSaturationState_ = mainSaturationState;
 		inferenceProducer_ = inferenceProducer;
-		factory_ = new SaturationConclusionBaseFactory();
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected ClassConclusion.Visitor<Boolean> getConclusionProcessor(
-			Reference<Context> activeContext,
-			RuleVisitor<?> ruleVisitor,
+	protected Visitor<Boolean> getInferenceProcessor(
+			Reference<Context> activeContext, RuleVisitor<?> ruleVisitor,
 			SaturationStateWriter<? extends ExtendedContext> localWriter,
 			SaturationStatistics localStatistics) {
 
 		return SaturationUtils.compose(
-		// Checking the conclusion against the main saturation
-		// state
-				new ClassConclusionOccurrenceCheckingVisitor(
-						new RelativizedContextReference(activeContext,
-								mainSaturationState_)),
-				// if the conclusion was indeed derived, save its inference
+				// save inference
 				new InferenceProducingVisitor(),
-				// insert the conclusion into the local context copies
-				new ClassConclusionInsertionVisitor(activeContext, localWriter),
-				// if the conclusion is new, apply local rules and produce
-				// conclusions to the active (local) saturation state
-				new LocalRuleApplicationClassConclusionVisitor(mainSaturationState_,
-						activeContext, ruleVisitor, localWriter)
-				);
+				// process conclusions of inferences:
+				new ClassInferenceConclusionVisitor(SaturationUtils.compose(
+						// insert the conclusion into the local context copies
+						new ClassConclusionInsertionVisitor(activeContext,
+								localWriter),
+						// if the conclusion is new, apply local rules and
+						// produce
+						// conclusions to the active (local) saturation state
+						new LocalRuleApplicationClassConclusionVisitor(
+								mainSaturationState_, activeContext,
+								ruleVisitor, localWriter))));
 	}
 
 	@Override
 	protected InputProcessor<RuleApplicationInput> getEngine(
 			ModifiableReference<Context> activeContext,
-			ClassConclusion.Visitor<Boolean> conclusionProcessor,
+			ClassInference.Visitor<Boolean> inferenceProcessor,
 			final SaturationStateWriter<? extends ExtendedContext> saturationStateWriter,
 			WorkerLocalTodo localTodo, SaturationStatistics localStatistics) {
-		final InputProcessor<RuleApplicationInput> defaultEngine = super
-				.getEngine(activeContext, conclusionProcessor, saturationStateWriter,
-						localTodo, localStatistics);
-		return new DelegatingInputProcessor<RuleApplicationInput>(defaultEngine) {
+		final InputProcessor<RuleApplicationInput> defaultEngine = super.getEngine(
+				activeContext, inferenceProcessor, saturationStateWriter,
+				localTodo, localStatistics);
+		return new DelegatingInputProcessor<RuleApplicationInput>(
+				defaultEngine) {
 			@Override
 			public void submit(RuleApplicationInput job) {
 				defaultEngine.submit(job);
@@ -132,8 +129,8 @@ public class ContextTracingRuleApplicationFactory extends
 				Context mainContext = mainSaturationState_.getContext(root);
 				for (IndexedObjectProperty subRoot : mainContext
 						.getSubContextPremisesByObjectProperty().keySet()) {
-					saturationStateWriter
-							.produce(factory_.getSubContextInitialization(root,
+					saturationStateWriter.produce(
+							new SubContextInitializationNoPremises(root,
 									subRoot));
 				}
 			}
@@ -148,14 +145,13 @@ public class ContextTracingRuleApplicationFactory extends
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	private class InferenceProducingVisitor extends
-			AbstractClassConclusionVisitor<Boolean> {
+	private class InferenceProducingVisitor
+			extends
+				DummyClassInferenceVisitor<Boolean> {
 
 		@Override
-		protected Boolean defaultVisit(final ClassConclusion conclusion) {
-			if (conclusion instanceof ClassInference) {
-				inferenceProducer_.produce((ClassInference) conclusion);
-			}
+		protected Boolean defaultVisit(final ClassInference inference) {
+			inferenceProducer_.produce(inference);
 			return true;
 		}
 	}

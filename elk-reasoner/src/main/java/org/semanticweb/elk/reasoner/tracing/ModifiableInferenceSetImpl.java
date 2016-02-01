@@ -38,11 +38,11 @@ public class ModifiableInferenceSetImpl<I extends Inference>
 		implements
 			ModifiableInferenceSet<I> {
 
-	private final Multimap<ConclusionKey, I> inferenceMap_ = new HashListMultimap<ConclusionKey, I>();
+	private final Multimap<Conclusion, I> inferenceMap_ = new HashListMultimap<Conclusion, I>();
 
 	@Override
 	public void produce(I inference) {
-		inferenceMap_.add(new ConclusionKey(inference), inference);
+		inferenceMap_.add(new InferenceConclusion(inference), inference);
 	}
 
 	@Override
@@ -52,7 +52,8 @@ public class ModifiableInferenceSetImpl<I extends Inference>
 
 	@Override
 	public Iterable<? extends I> getInferences(Conclusion conclusion) {
-		return inferenceMap_.get(new ConclusionKey(conclusion));
+		// assumes structural equality and hash of conclusions
+		return inferenceMap_.get(conclusion);
 	}
 
 }

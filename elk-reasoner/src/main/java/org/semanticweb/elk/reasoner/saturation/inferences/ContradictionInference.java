@@ -22,9 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
-
-public interface ContradictionInference extends Contradiction, ClassInference {
+public interface ContradictionInference extends ClassInference {
 
 	public <O> O accept(Visitor<O> visitor);
 

@@ -48,9 +48,8 @@ import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContextInitializationNoPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
 import org.semanticweb.elk.util.collections.Operations;
@@ -59,9 +58,13 @@ import org.semanticweb.elk.util.collections.Operations;
  * 
  * 
  */
-public class IncrementalAdditionInitializationStage extends AbstractIncrementalChangesInitializationStage {
+public class IncrementalAdditionInitializationStage
+		extends
+			AbstractIncrementalChangesInitializationStage {
 
-	public IncrementalAdditionInitializationStage(AbstractReasonerState reasoner, AbstractReasonerStage... preStages) {
+	public IncrementalAdditionInitializationStage(
+			AbstractReasonerState reasoner,
+			AbstractReasonerStage... preStages) {
 		super(reasoner, preStages);
 	}
 
@@ -82,61 +85,72 @@ public class IncrementalAdditionInitializationStage extends AbstractIncrementalC
 		Map<? extends IndexedClass, ? extends IndexedClassExpression> changedDefinitions = null;
 		Map<? extends IndexedClass, ? extends ElkAxiom> changedDefinitionReasons = null;
 		Collection<ArrayList<Context>> inputs = Collections.emptyList();
-		ContextCreationListener contextCreationListener = SaturationUtils.addStatsToContextCreationListener(
-				ContextCreationListener.DUMMY, stageStatistics.getContextStatistics());
-		ContextModificationListener contextModificationListener = SaturationUtils.addStatsToContextModificationListener(
-				ContextModificationListener.DUMMY, stageStatistics.getContextStatistics());
+		ContextCreationListener contextCreationListener = SaturationUtils
+				.addStatsToContextCreationListener(
+						ContextCreationListener.DUMMY,
+						stageStatistics.getContextStatistics());
+		ContextModificationListener contextModificationListener = SaturationUtils
+				.addStatsToContextModificationListener(
+						ContextModificationListener.DUMMY,
+						stageStatistics.getContextStatistics());
 
 		// first, create and init contexts for new classes
-		final ElkPolarityExpressionConverter converter = new ElkPolarityExpressionConverterImpl(reasoner.ontologyIndex);
+		final ElkPolarityExpressionConverter converter = new ElkPolarityExpressionConverterImpl(
+				reasoner.ontologyIndex);
 		final SaturationStateWriter<?> writer =
 
 		SaturationUtils.getStatsAwareWriter(
-				reasoner.saturationState.getContextCreatingWriter(contextCreationListener, contextModificationListener),
+				reasoner.saturationState.getContextCreatingWriter(
+						contextCreationListener, contextModificationListener),
 				stageStatistics);
 
 		// used to initialize new contexts
 		OntologyIndex index = reasoner.saturationState.getOntologyIndex();
-		
-		ContextInitialization.Factory factory = new SaturationConclusionBaseFactory();
 
-		for (ElkEntity newEntity : Operations.concat(reasoner.ontologyIndex.getAddedClasses(),
+		for (ElkEntity newEntity : Operations.concat(
+				reasoner.ontologyIndex.getAddedClasses(),
 				reasoner.ontologyIndex.getAddedIndividuals())) {
-			IndexedClassExpression ice = newEntity.accept(new ElkEntityVisitor<IndexedClassExpression>() {
+			IndexedClassExpression ice = newEntity
+					.accept(new ElkEntityVisitor<IndexedClassExpression>() {
 
-				@Override
-				public IndexedClassExpression visit(ElkAnnotationProperty elkAnnotationProperty) {
-					return null;
-				}
+						@Override
+						public IndexedClassExpression visit(
+								ElkAnnotationProperty elkAnnotationProperty) {
+							return null;
+						}
 
-				@Override
-				public IndexedClassExpression visit(ElkClass elkClass) {
-					return converter.visit(elkClass);
-				}
+						@Override
+						public IndexedClassExpression visit(ElkClass elkClass) {
+							return converter.visit(elkClass);
+						}
 
-				@Override
-				public IndexedClassExpression visit(ElkDataProperty elkDataProperty) {
-					return null;
-				}
+						@Override
+						public IndexedClassExpression visit(
+								ElkDataProperty elkDataProperty) {
+							return null;
+						}
 
-				@Override
-				public IndexedClassExpression visit(ElkDatatype elkDatatype) {
-					return null;
-				}
+						@Override
+						public IndexedClassExpression visit(
+								ElkDatatype elkDatatype) {
+							return null;
+						}
 
-				@Override
-				public IndexedClassExpression visit(ElkNamedIndividual elkNamedIndividual) {
-					return converter.visit(elkNamedIndividual);
-				}
+						@Override
+						public IndexedClassExpression visit(
+								ElkNamedIndividual elkNamedIndividual) {
+							return converter.visit(elkNamedIndividual);
+						}
 
-				@Override
-				public IndexedClassExpression visit(ElkObjectProperty elkObjectProperty) {
-					return null;
-				}
-			});
+						@Override
+						public IndexedClassExpression visit(
+								ElkObjectProperty elkObjectProperty) {
+							return null;
+						}
+					});
 
 			if (reasoner.saturationState.getContext(ice) == null)
-				writer.produce(factory.getContextInitialization(ice, index));
+				writer.produce(new ContextInitializationNoPremises(ice, index));
 		}
 
 		changedInitRules = diffIndex.getAddedContextInitRules();
@@ -144,13 +158,17 @@ public class IncrementalAdditionInitializationStage extends AbstractIncrementalC
 		changedDefinitions = diffIndex.getAddedDefinitions();
 		changedDefinitionReasons = diffIndex.getAddedDefinitionReasons();
 
-		if (changedInitRules != null || !changedRulesByCE.isEmpty() || !changedDefinitions.isEmpty()) {
-			inputs = Operations.split(reasoner.saturationState.getContexts(), 8 * workerNo);
+		if (changedInitRules != null || !changedRulesByCE.isEmpty()
+				|| !changedDefinitions.isEmpty()) {
+			inputs = Operations.split(reasoner.saturationState.getContexts(),
+					8 * workerNo);
 		}
 
-		this.initialization = new IncrementalChangesInitialization(inputs, changedInitRules, changedRulesByCE,
-				changedDefinitions, changedDefinitionReasons, reasoner.saturationState, reasoner.getProcessExecutor(),
-				stageStatistics, workerNo, reasoner.getProgressMonitor());
+		this.initialization = new IncrementalChangesInitialization(inputs,
+				changedInitRules, changedRulesByCE, changedDefinitions,
+				changedDefinitionReasons, reasoner.saturationState,
+				reasoner.getProcessExecutor(), stageStatistics, workerNo,
+				reasoner.getProgressMonitor());
 
 		return true;
 	}

@@ -27,7 +27,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfObjectComplementOf;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 
 /**
  * A {@link SubsumerDecompositionRule} producing {@link Contradiction} when
@@ -58,7 +58,7 @@ public class IndexedObjectComplementOfDecomposition extends
 
 	@Override
 	public void apply(IndexedObjectComplementOf premise,
-			ContextPremises premises, ClassConclusionProducer producer) {
+			ContextPremises premises, ClassInferenceProducer producer) {
 		if (premises.getComposedSubsumers().contains(premise.getNegated())) {
 			producer.produce(new ContradictionOfObjectComplementOf(premises.getRoot(),
 					premise));
@@ -73,7 +73,7 @@ public class IndexedObjectComplementOfDecomposition extends
 	@Override
 	public void accept(SubsumerDecompositionRuleVisitor<?> visitor,
 			IndexedObjectComplementOf premise, ContextPremises premises,
-			ClassConclusionProducer producer) {
+			ClassInferenceProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}
 

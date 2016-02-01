@@ -24,14 +24,14 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.model;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.context.SubContext;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInference;
 
 /**
  * A {@link ClassConclusion} that can be used in inferences that are assigned
  * with a {@link IndexedObjectProperty} sub-root
- * {@link SubClassConclusion#getConclusionSubRoot()} in addition to the
- * {@link IndexedClassExpression} root
- * {@link ClassConclusion#getConclusionRoot()} .
+ * {@link SubClassConclusion#getDestinationSubRoot()} in addition to the
+ * {@link IndexedClassExpression} root {@link ClassConclusion#getDestination()}
+ * .
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -43,27 +43,21 @@ public interface SubClassConclusion extends ClassConclusion {
 	 *         with which this {@link SubClassConclusion} can be used. All
 	 *         premises of such inferences must return the same {#getSubRoot()}
 	 */
-	public IndexedObjectProperty getConclusionSubRoot();
+	public IndexedObjectProperty getDestinationSubRoot();
 
 	/**
 	 * 
-	 * @return The {@link IndexedObjectProperty} identifying the
-	 *         {@link SubContext} from which this {@link SubClassConclusion}
-	 *         originate. This value may be different from
-	 *         {@link #getConclusionSubRoot()} and can be {@code null}.
-	 *         Specifically, if this value is not {@code null} then this
-	 *         {@link SubClassConclusion} is guaranteed to be derived from
-	 *         {@link SubContextInitialization} with the values
-	 *         {@link #getConclusionRoot()} and {@link #getConclusionSubRoot()}
-	 *         equal respectively to this {@link #getOriginRoot()} and
-	 *         {@link #getOriginSubRoot()}. If this value is {@code null}, this
-	 *         conclusion is guaranteed to be derived from
-	 *         {@link ContextInitialization} with the value
-	 *         {@link #getConclusionRoot()} equal to this
-	 *         {@link #getOriginRoot()}.
-	 * @see #getOriginRoot()
+	 * @return The {@link IndexedObjectProperty} that, together with
+	 *         {@link ClassConclusion#getTraceRoot()}, identifies this
+	 *         {@link SubClassConclusion} for tracing; every
+	 *         {@link SubClassInference} that produces this
+	 *         {@link SubClassConclusion} should be have the same value of
+	 *         {@link SubClassInference#getTraceSubRoot()}
+	 * 
+	 * @see #getTraceRoot()
+	 * @see SubClassInference#getTraceSubRoot()
 	 */
-	public IndexedObjectProperty getOriginSubRoot();
+	public IndexedObjectProperty getTraceSubRoot();
 
 	public <O> O accept(Visitor<O> visitor);
 

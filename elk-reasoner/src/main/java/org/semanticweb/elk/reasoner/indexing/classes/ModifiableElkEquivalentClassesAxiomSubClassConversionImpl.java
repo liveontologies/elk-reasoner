@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkEquivalentClassesAxiomSubClassConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
@@ -57,6 +58,13 @@ class ModifiableElkEquivalentClassesAxiomSubClassConversionImpl
 	@Override
 	public int getSuperClassPosition() {
 		return superClassPosition_;
+	}
+
+	@Override
+	public IndexedSubClassOfAxiom getConclusion(
+			IndexedSubClassOfAxiom.Factory factory) {
+		return factory.getIndexedSubClassOfAxiom(getOriginalAxiom(),
+				getSubClass(), getSuperClass());
 	}
 
 	@Override

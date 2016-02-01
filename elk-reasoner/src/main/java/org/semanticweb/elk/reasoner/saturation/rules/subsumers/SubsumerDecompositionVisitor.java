@@ -32,13 +32,13 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 
 /**
  * An {@link IndexedClassExpression.Visitor} applying decomposition rules using a
  * given {@link SubsumerDecompositionRuleVisitor} using given
  * {@link ContextPremises} and producing conclusions using a given
- * {@link ClassConclusionProducer}
+ * {@link ClassInferenceProducer}
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -59,11 +59,11 @@ public class SubsumerDecompositionVisitor implements
 	/**
 	 * the producer for conclusions
 	 */
-	private final ClassConclusionProducer producer_;
+	private final ClassInferenceProducer producer_;
 
 	public SubsumerDecompositionVisitor(
 			SubsumerDecompositionRuleVisitor<?> ruleVisitor,
-			ContextPremises premises, ClassConclusionProducer producer) {
+			ContextPremises premises, ClassInferenceProducer producer) {
 		this.ruleVisitor_ = ruleVisitor;
 		this.premises_ = premises;
 		this.producer_ = producer;

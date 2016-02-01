@@ -28,7 +28,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.inferences.AbstractClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.DummyClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 
 
@@ -39,13 +39,13 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class TracedContextsCollector extends AbstractClassInferenceVisitor<Boolean> {
+public class TracedContextsCollector extends DummyClassInferenceVisitor<Boolean> {
 
 	private final Set<IndexedContextRoot> tracedRoots_ = new HashSet<IndexedContextRoot>();
 	
 	@Override
-	protected Boolean defaultTracedVisit(ClassInference conclusion) {
-		tracedRoots_.add(conclusion.getOriginRoot());
+	protected Boolean defaultVisit(ClassInference conclusion) {
+		tracedRoots_.add(conclusion.getTraceRoot());
 		
 		return true;
 	}

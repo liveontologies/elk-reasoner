@@ -63,7 +63,10 @@ public interface ElkDisjointClassesAxiomBinaryConversion
 	 * @see #getFirstClassPosition()
 	 */
 	int getSecondClassPosition();
-	
+
+	IndexedSubClassOfAxiom getConclusion(
+			IndexedSubClassOfAxiom.Factory factory);
+
 	/**
 	 * The visitor pattern for instances
 	 * 
@@ -73,9 +76,9 @@ public interface ElkDisjointClassesAxiomBinaryConversion
 	 *            the type of the output
 	 */
 	interface Visitor<O> {
-		
+
 		O visit(ElkDisjointClassesAxiomBinaryConversion inference);
-		
+
 	}
 
 }

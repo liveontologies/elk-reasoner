@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionRange;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionTautology;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
@@ -95,7 +95,7 @@ public class RootContextInitializationRule extends
 
 	@Override
 	public void apply(ContextInitialization premise,
-			final ContextPremises premises, final ClassConclusionProducer producer) {
+			final ContextPremises premises, final ClassInferenceProducer producer) {
 		IndexedContextRoot root = premises.getRoot();
 		producer.produce(new SubClassInclusionTautology(premises.getRoot()));
 		root.accept(new DummyIndexedContextRootVisitor<Void>() {
@@ -135,7 +135,7 @@ public class RootContextInitializationRule extends
 	@Override
 	public void accept(LinkedContextInitRuleVisitor<?> visitor,
 			ContextInitialization premise, ContextPremises premises,
-			ClassConclusionProducer producer) {
+			ClassInferenceProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}
 

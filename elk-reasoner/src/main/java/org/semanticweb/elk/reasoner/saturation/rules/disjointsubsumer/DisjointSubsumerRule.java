@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 
 /**
@@ -38,6 +38,6 @@ public interface DisjointSubsumerRule extends Rule<DisjointSubsumer> {
 
 	public void accept(DisjointSubsumerRuleVisitor<?> visitor,
 			DisjointSubsumer premise, ContextPremises premises,
-			ClassConclusionProducer producer);
+			ClassInferenceProducer producer);
 
 }

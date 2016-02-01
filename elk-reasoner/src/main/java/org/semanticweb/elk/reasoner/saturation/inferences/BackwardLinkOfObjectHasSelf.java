@@ -48,8 +48,8 @@ public class BackwardLinkOfObjectHasSelf extends
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceRoot() {
-		return getConclusionRoot();
+	public IndexedContextRoot getOrigin() {
+		return getDestination();
 	}
 
 	public IndexedObjectHasSelf getDecomposedExistential() {
@@ -57,7 +57,7 @@ public class BackwardLinkOfObjectHasSelf extends
 	}
 
 	public SubClassInclusionDecomposed getPremise(SubClassInclusionDecomposed.Factory factory) {
-		return factory.getSubClassInclusionDecomposed(getInferenceRoot(), existential_);
+		return factory.getSubClassInclusionDecomposed(getOrigin(), existential_);
 	}
 
 	@Override

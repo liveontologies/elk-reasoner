@@ -28,7 +28,7 @@ package org.semanticweb.elk.reasoner.saturation;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 
 /**
  * An object that can modify the respective {@link SaturationState}.
@@ -39,7 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
  * @author "Yevgeny Kazakov"
  */
 public interface SaturationStateWriter<C extends Context> extends
-		ClassConclusionProducer {
+		ClassInferenceProducer {
 
 	/**
 	 * @return the {@link SaturationState} modified by this

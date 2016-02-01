@@ -27,7 +27,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SubsumerDecompositionVisitor;
@@ -46,15 +46,15 @@ public abstract class AbstractRuleApplicationClassConclusionVisitor extends
 	final RuleVisitor<?> ruleAppVisitor;
 
 	/**
-	 * {@link ClassConclusionProducer} to produce the {@link ClassConclusion}s of the
+	 * {@link ClassInferenceProducer} to produce the {@link ClassConclusion}s of the
 	 * applied rules
 	 */
-	final ClassConclusionProducer producer;
+	final ClassInferenceProducer producer;
 
 	AbstractRuleApplicationClassConclusionVisitor(
 			Reference<? extends ContextPremises> premisesRef,
 			RuleVisitor<?> ruleAppVisitor,
-			ClassConclusionProducer producer) {
+			ClassInferenceProducer producer) {
 		this.premisesRef_ = premisesRef;
 		this.ruleAppVisitor = ruleAppVisitor;
 		this.producer = producer;

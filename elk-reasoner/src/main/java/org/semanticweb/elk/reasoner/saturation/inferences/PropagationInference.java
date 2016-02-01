@@ -22,9 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
-
-public interface PropagationInference extends Propagation, ClassInference {
+public interface PropagationInference extends ClassInference {
 
 	public <O> O accept(Visitor<O> visitor);
 

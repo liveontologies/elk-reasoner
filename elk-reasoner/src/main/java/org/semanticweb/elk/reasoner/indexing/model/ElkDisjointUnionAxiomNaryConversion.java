@@ -26,8 +26,8 @@ import org.semanticweb.elk.owl.interfaces.ElkDisjointUnionAxiom;
 
 /**
  * Represents a transformation of an {@link ElkDisjointUnionAxiom} to an
- * {@link IndexedDisjointClasses} representing the disjointness of members of
- * the union.
+ * {@link IndexedDisjointClassesAxiom} representing the disjointness of members
+ * of the union.
  * 
  * @author Yevgeny Kazakov
  */
@@ -37,7 +37,10 @@ public interface ElkDisjointUnionAxiomNaryConversion
 
 	@Override
 	ElkDisjointUnionAxiom getOriginalAxiom();
-	
+
+	IndexedDisjointClassesAxiom getConclusion(
+			IndexedDisjointClassesAxiom.Factory factory);
+
 	/**
 	 * The visitor pattern for instances
 	 * 

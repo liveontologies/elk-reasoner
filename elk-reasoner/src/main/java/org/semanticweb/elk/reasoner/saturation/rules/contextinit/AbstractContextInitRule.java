@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.contextinit;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
@@ -36,7 +36,7 @@ abstract class AbstractContextInitRule implements ContextInitRule {
 
 	@Override
 	public void accept(RuleVisitor<?> visitor, ContextInitialization premise,
-			ContextPremises premises, ClassConclusionProducer producer) {
+			ContextPremises premises, ClassInferenceProducer producer) {
 		accept((ContextInitRuleVisitor<?>) visitor, premise, premises, producer);
 	}
 

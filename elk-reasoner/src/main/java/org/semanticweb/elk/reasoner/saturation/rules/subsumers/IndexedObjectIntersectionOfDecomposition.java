@@ -27,7 +27,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecomposedFirstConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecomposedSecondConjunct;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 
 /**
  * A {@link SubsumerDecompositionRule} that processes an
@@ -58,7 +58,7 @@ public class IndexedObjectIntersectionOfDecomposition extends
 
 	@Override
 	public void apply(IndexedObjectIntersectionOf premise,
-			ContextPremises premises, ClassConclusionProducer producer) {
+			ContextPremises premises, ClassInferenceProducer producer) {
 		producer.produce(new SubClassInclusionDecomposedFirstConjunct(premises.getRoot(),
 				premise));
 		producer.produce(new SubClassInclusionDecomposedSecondConjunct(premises.getRoot(),
@@ -73,7 +73,7 @@ public class IndexedObjectIntersectionOfDecomposition extends
 	@Override
 	public void accept(SubsumerDecompositionRuleVisitor<?> visitor,
 			IndexedObjectIntersectionOf premise, ContextPremises premises,
-			ClassConclusionProducer producer) {
+			ClassInferenceProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 
 	}

@@ -176,8 +176,8 @@ public class PropertyInferenceTracingTest {
 					public Boolean visit(BackwardLinkComposition backwardLink) {
 						// check that we use the inference that A <-R- B and B -SS o HH-> D imply A <-T- D  
 						return backwardLink.getBackwardRelation().equals(tIndexed) &&
-								backwardLink.getOriginRoot().equals(aIndexed) &&
-								backwardLink.getFirstPremise(FACTORY_).getOriginRoot().equals(aIndexed) &&
+								backwardLink.getTraceRoot().equals(aIndexed) &&
+								backwardLink.getFirstPremise(FACTORY_).getTraceRoot().equals(aIndexed) &&
 								backwardLink.getFirstPremise(FACTORY_).getBackwardRelation().equals(rIndexed) &&
 								backwardLink.getThirdPremise(FACTORY_).getTarget().equals(dIndexed) &&
 								backwardLink.getThirdPremise(FACTORY_).getForwardChain().equals(sshhIndexed) &&

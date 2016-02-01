@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation.rules;
+package org.semanticweb.elk.reasoner.saturation.inferences;
 
 /*
  * #%L
@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,21 +22,15 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
+public abstract class AbstractClassInferenceByConclusionTypeVisitor<O>
+		extends
+			ClassInferenceByTypesVisitor<O>
+		implements
+			ClassInferenceTypesVisitor<O> {
 
-/**
- * An object using which {@link ClassConclusion}s of inferences can be produced
- * 
- * @author "Yevgeny Kazakov"
- * 
- */
-public interface ClassConclusionProducer {
-
-	/**
-	 * Tells that the given {@link ClassConclusion} is derived.
-	 * 
-	 * @param conclusion
-	 */
-	public void produce(ClassConclusion conclusion);
+	@Override
+	final ClassInferenceTypesVisitor<O> getDelegatingVisitor() {
+		return this;
+	}
 
 }

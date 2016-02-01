@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * A {@link RuleVisitor} which simply applies the rules that it visits to the
  * given arguments.
  * 
- * @see {@link Rule#apply(Object, ContextPremises, ClassConclusionProducer)}
+ * @see {@link Rule#apply(Object, ContextPremises, ClassInferenceProducer)}
  * 
  * @author Pavel Klinov
  * 
@@ -48,7 +48,7 @@ public class BasicRuleVisitor extends AbstractRuleVisitor<Void> {
 
 	@Override
 	<P> Void defaultVisit(Rule<P> rule, P premise, ContextPremises premises,
-			ClassConclusionProducer producer) {
+			ClassInferenceProducer producer) {
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace("{}: process {} by {}", premises, premise, rule);
 		}

@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.saturation;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 
 /**
  * A {@link SaturationStateWriter} that does not produce conclusions if the
@@ -44,11 +44,11 @@ public class ContextExistenceCheckingWriter<C extends Context> extends
 	}
 
 	@Override
-	public void produce(ClassConclusion conclusion) {
-		Context context = state_.getContext(conclusion.getConclusionRoot());
+	public void produce(ClassInference inference) {
+		Context context = state_.getContext(inference.getDestination());
 
 		if (context != null) {
-			super.produce(conclusion);
+			super.produce(inference);
 		}
 	}
 

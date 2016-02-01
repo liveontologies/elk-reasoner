@@ -154,7 +154,7 @@ public class ContextTracingFactory<R extends IndexedContextRoot, J extends Conte
 
 		@Override
 		public void produce(ClassInference inference) {
-			IndexedContextRoot originRoot = inference.getOriginRoot();
+			IndexedContextRoot originRoot = inference.getTraceRoot();
 			Queue<ClassInference> inferencesByOrigin = tracedInferences_
 					.get(originRoot);
 			if (inferencesByOrigin == null) {

@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSubClassOf;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
@@ -157,7 +157,7 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 
 	@Override
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
-			ClassConclusionProducer producer) {
+			ClassInferenceProducer producer) {
 		for (int i = 0; i < toldSubsumers_.size(); i++) {
 			producer.produce(new SubClassInclusionExpandedSubClassOf(premises.getRoot(),
 					premise, toldSubsumers_.get(i), reasons_.get(i)));
@@ -279,7 +279,7 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 	@Override
 	public void accept(LinkedSubsumerRuleVisitor<?> visitor,
 			IndexedClassExpression premise, ContextPremises premises,
-			ClassConclusionProducer producer) {
+			ClassInferenceProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}
 

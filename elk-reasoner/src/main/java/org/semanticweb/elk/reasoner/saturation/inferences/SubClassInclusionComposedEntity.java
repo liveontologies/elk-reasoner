@@ -48,12 +48,12 @@ public class SubClassInclusionComposedEntity extends
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceRoot() {
-		return getConclusionRoot();
+	public IndexedContextRoot getOrigin() {
+		return getDestination();
 	}
 
 	public SubClassInclusionDecomposed getPremise(SubClassInclusionDecomposed.Factory factory) {
-		return factory.getSubClassInclusionDecomposed(getInferenceRoot(), getSuperExpression());
+		return factory.getSubClassInclusionDecomposed(getOrigin(), getSuperExpression());
 	}
 
 	@Override

@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkedBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A {@link ClassConclusion.Visitor} that applies inference rules for the visited
  * {@link ClassConclusion}s using the provided {@link RuleVisitor} to apply rules and
- * {@link ClassConclusionProducer} to output the {@link ClassConclusion}s of the applied
+ * {@link ClassInferenceProducer} to output the {@link ClassConclusion}s of the applied
  * rules. The methods always return {@link true}.
  * 
  * @author "Yevgeny Kazakov"
@@ -75,7 +75,7 @@ public class RuleApplicationClassConclusionVisitor extends
 	public RuleApplicationClassConclusionVisitor(
 			Reference<? extends ContextPremises> premisesRef,
 			RuleVisitor<?> ruleAppVisitor,
-			ClassConclusionProducer producer) {
+			ClassInferenceProducer producer) {
 		super(premisesRef, ruleAppVisitor, producer);
 	}
 
@@ -116,7 +116,7 @@ public class RuleApplicationClassConclusionVisitor extends
 		ContextPremises premises = get();
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace("{}::{} applying sub-concept init rules:",
-					premises.getRoot(), subConclusion.getConclusionSubRoot());
+					premises.getRoot(), subConclusion.getDestinationSubRoot());
 		}
 		PropagationInitializationRule.getInstance().accept(ruleAppVisitor,
 				subConclusion, premises, producer);

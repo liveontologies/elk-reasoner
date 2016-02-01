@@ -32,9 +32,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContextInitializationNoPremises;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,8 +41,9 @@ import org.slf4j.LoggerFactory;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-abstract class AbstractIncrementalContextInitializationStage extends
-		AbstractReasonerStage {
+abstract class AbstractIncrementalContextInitializationStage
+		extends
+			AbstractReasonerStage {
 
 	// logger for this class
 	static final Logger LOGGER_ = LoggerFactory
@@ -67,11 +66,10 @@ abstract class AbstractIncrementalContextInitializationStage extends
 	protected Iterator<IndexedContextRoot> todo = null;
 
 	private SaturationStateWriter<?> writer_ = null;
-	
-	private ContextInitialization.Factory factory_ = new SaturationConclusionBaseFactory();
 
 	public AbstractIncrementalContextInitializationStage(
-			AbstractReasonerState reasoner, AbstractReasonerStage... preStages) {
+			AbstractReasonerState reasoner,
+			AbstractReasonerStage... preStages) {
 		super(reasoner, preStages);
 	}
 
@@ -100,11 +98,9 @@ abstract class AbstractIncrementalContextInitializationStage extends
 				break;
 			IndexedContextRoot root = todo.next();
 
-			ClassConclusion init = factory_.getContextInitialization(root,
-					reasoner.saturationState.getOntologyIndex());
-
 			if (reasoner.saturationState.getContext(root) != null) {
-				writer_.produce(init);
+				writer_.produce(new ContextInitializationNoPremises(root,
+						reasoner.saturationState.getOntologyIndex()));
 			}
 
 			initContexts++;

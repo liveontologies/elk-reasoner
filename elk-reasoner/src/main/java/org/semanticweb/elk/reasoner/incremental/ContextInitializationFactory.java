@@ -120,7 +120,7 @@ class ContextInitializationFactory extends SimpleInterrupter
 		final RuleVisitor<?> ruleAppVisitor = SaturationUtils
 				.getStatsAwareRuleVisitor(localStatistics.getRuleStatistics());
 		final SaturationStateWriter<?> saturationStateWriter = SaturationUtils
-				.getStatAwareWriter(
+				.getStatsAwareWriter(
 						saturationState_.getContextModifyingWriter(),
 						localStatistics);
 

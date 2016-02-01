@@ -33,25 +33,27 @@ import org.semanticweb.elk.reasoner.tracing.Inference;
  * @author Yevgeny Kazakov
  *
  */
-public abstract class AbstractClassInference extends AbstractClassConclusion
+public abstract class AbstractClassInference
 		implements
 			ClassInference {
 
-	protected AbstractClassInference(IndexedContextRoot root) {
-		super(root);
+	private final IndexedContextRoot destination_;
+
+	protected AbstractClassInference(IndexedContextRoot destination) {
+		this.destination_ = destination;
+	}
+
+	@Override
+	public IndexedContextRoot getDestination() {
+		return this.destination_;
+	}
+	
+	@Override
+	public IndexedContextRoot getTraceRoot() {
+		return this.destination_;
 	}
 
 	// we assume that different objects represent different inferences
-
-	@Override
-	public int hashCode() {
-		return System.identityHashCode(this);
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		return this == o;
-	}
 
 	@Override
 	public final <O> O accept(Inference.Visitor<O> visitor) {

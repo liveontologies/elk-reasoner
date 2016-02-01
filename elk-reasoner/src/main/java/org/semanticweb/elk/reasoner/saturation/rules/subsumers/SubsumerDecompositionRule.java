@@ -27,7 +27,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 
 /**
  * A decomposition rules for {@link SubClassInclusion}s. The rule typically does not
@@ -41,6 +41,6 @@ public interface SubsumerDecompositionRule<P extends IndexedClassExpression>
 		extends SubsumerRule<P> {
 
 	public void accept(SubsumerDecompositionRuleVisitor<?> visitor, P premise,
-			ContextPremises premises, ClassConclusionProducer producer);
+			ContextPremises premises, ClassInferenceProducer producer);
 
 }

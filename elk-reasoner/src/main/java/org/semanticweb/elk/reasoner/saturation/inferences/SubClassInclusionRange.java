@@ -46,12 +46,12 @@ public class SubClassInclusionRange
 	}
 
 	@Override
-	public IndexedRangeFiller getInferenceRoot() {
-		return (IndexedRangeFiller) getConclusionRoot();
+	public IndexedRangeFiller getOrigin() {
+		return (IndexedRangeFiller) getDestination();
 	}
 
 	public PropertyRange getPremise(PropertyRange.Factory factory) {
-		return factory.getPropertyRange(getInferenceRoot().getProperty(),
+		return factory.getPropertyRange(getOrigin().getProperty(),
 				getSuperExpression());
 	}
 

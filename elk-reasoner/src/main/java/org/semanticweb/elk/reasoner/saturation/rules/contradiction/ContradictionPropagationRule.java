@@ -31,13 +31,13 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionPropagated;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 
 /**
  * A {@link ContradictionRule} applied when processing {@link Contradiction}
  * producing {@link Contradiction} in all contexts linked by non-reflexive
  * {@link BackwardLink}s in the {@code ContextPremises} (i.e.,
- * {@link BackwardLink}s such that {@link BackwardLink#getOriginRoot()} is
+ * {@link BackwardLink}s such that {@link BackwardLink#getTraceRoot()} is
  * different from {@link ContextPremises#getRoot()}.
  * 
  * @author "Yevgeny Kazakov"
@@ -64,7 +64,7 @@ public class ContradictionPropagationRule extends AbstractContradictionRule {
 
 	@Override
 	public void apply(Contradiction premise, ContextPremises premises,
-			ClassConclusionProducer producer) {
+			ClassInferenceProducer producer) {
 		final Map<IndexedObjectProperty, ? extends SubContextPremises> subPremises = premises
 				.getSubContextPremisesByObjectProperty();
 		// no need to propagate over reflexive links
@@ -86,7 +86,7 @@ public class ContradictionPropagationRule extends AbstractContradictionRule {
 	@Override
 	public void accept(ContradictionRuleVisitor<?> visitor,
 			Contradiction premise, ContextPremises premises,
-			ClassConclusionProducer producer) {
+			ClassInferenceProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}
 

@@ -40,6 +40,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.classes.LocalRuleAppl
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.RelativizedContextReference;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference.Visitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInferenceConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.CombinedConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
@@ -82,32 +84,46 @@ public class RuleApplicationAdditionPruningFactory
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected ClassConclusion.Visitor<Boolean> getConclusionProcessor(
+	protected Visitor<Boolean> getInferenceProcessor(
 			Reference<Context> activeContext, RuleVisitor<?> ruleVisitor,
 			SaturationStateWriter<? extends ExtendedContext> localWriter,
 			SaturationStatistics localStatistics) {
-		return SaturationUtils.compose(
-				// count processed conclusions, if necessary
-				SaturationUtils
-						.getProcessedConclusionCountingVisitor(localStatistics),
-				// checking the conclusion against the main saturation
-				// state
-				new ClassConclusionOccurrenceCheckingVisitor(
-						new RelativizedContextReference(activeContext,
-								mainSaturationState_)),
-				// if all fine, insert the conclusion to the local
-				// context copies
-				new ClassConclusionInsertionVisitor(activeContext, localWriter),
-				// count conclusions used in the rules, if necessary
-				SaturationUtils
-						.getUsedConclusionCountingVisitor(localStatistics),
-				// and apply rules locally
-				new LocalRuleApplicationClassConclusionVisitor(
-						mainSaturationState_, activeContext, ruleVisitor,
-						// the conclusions are produced in both main and
-						// tracing saturation states
-						new CombinedConclusionProducer(
-								mainSaturationState_.getContextCreatingWriter(),
-								localWriter)));
+		return new ClassInferenceConclusionVisitor(
+				// measuring time, if necessary
+				SaturationUtils.getTimedConclusionVisitor(
+						SaturationUtils.compose(
+								// count processed conclusions, if necessary
+								SaturationUtils
+										.getProcessedConclusionCountingVisitor(
+												localStatistics),
+								// checking the conclusion against the main
+								// saturation
+								// state
+								new ClassConclusionOccurrenceCheckingVisitor(
+										new RelativizedContextReference(
+												activeContext,
+												mainSaturationState_)),
+								// if all fine, insert the conclusion to the
+								// local
+								// context copies
+								new ClassConclusionInsertionVisitor(
+										activeContext, localWriter),
+								// count conclusions used in the rules, if
+								// necessary
+								SaturationUtils
+										.getUsedConclusionCountingVisitor(
+												localStatistics),
+								// and apply rules locally
+								new LocalRuleApplicationClassConclusionVisitor(
+										mainSaturationState_, activeContext,
+										ruleVisitor,
+										// the conclusions are produced in both
+										// main and
+										// tracing saturation states
+										new CombinedConclusionProducer(
+												mainSaturationState_
+														.getContextCreatingWriter(),
+												localWriter))),
+						localStatistics));
 	}
 }

@@ -43,280 +43,250 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 
-public class ConclusionEquality implements Conclusion.Visitor<Conclusion> {
+public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 
-	public static boolean equals(Conclusion first, Object second) {
-		return first == null
-				? second == null
-				: first.accept(new ConclusionEquality(second)) == second;
+	public static boolean equals(Conclusion first, Conclusion second) {
+		return first.accept(new ConclusionEquality(second));
 	}
 
-	private static boolean equals(ElkObject first, ElkObject second) {
-		return (ElkObjectEquality.equals(first, second));
+	private static class DefaultConclusionVisitor
+			extends
+				DummyConclusionVisitor<Boolean> {
+
+		@Override
+		protected Boolean defaultVisit(Conclusion conclusion) {
+			return false;
+		}
+
+		static boolean equals(ElkObject first, ElkObject second) {
+			return (ElkObjectEquality.equals(first, second));
+		}
+
+		static boolean equals(IndexedObject first, IndexedObject second) {
+			return first == second;
+		}
+
+		static boolean equals(int first, int second) {
+			return first == second;
+		}
+
 	}
 
-	private static boolean equals(IndexedObject first, IndexedObject second) {
-		return first == second;
-	}
+	private final Conclusion other_;
 
-	private static boolean equals(int first, int second) {
-		return first == second;
-	}
-
-	private final Object object_;
-
-	private ConclusionEquality(Object object) {
-		this.object_ = object;
+	private ConclusionEquality(Conclusion other) {
+		this.other_ = other;
 	}
 
 	@Override
-	public BackwardLink visit(BackwardLink subConclusion) {
-		if (object_ == subConclusion)
-			return subConclusion;
-		if (object_ instanceof BackwardLink) {
-			BackwardLink result = (BackwardLink) object_;
-			if (equals(result.getConclusionRoot(),
-					subConclusion.getConclusionRoot())
-					&& equals(result.getConclusionSubRoot(),
-							subConclusion.getConclusionSubRoot())
-					&& equals(result.getOriginRoot(),
-							subConclusion.getOriginRoot()))
-				return result;
-		}
-		return null;
+	public Boolean visit(final BackwardLink conclusion) {
+		return other_.accept(new DefaultConclusionVisitor() {
+			@Override
+			public Boolean visit(BackwardLink other) {
+				return equals(other.getDestination(),
+						conclusion.getDestination())
+						&& equals(other.getDestinationSubRoot(),
+								conclusion.getDestinationSubRoot())
+						&& equals(other.getTraceRoot(),
+								conclusion.getTraceRoot());
+			}
+		});
 	}
 
 	@Override
-	public ContextInitialization visit(ContextInitialization conclusion) {
-		if (object_ == conclusion)
-			return conclusion;
-		if (object_ instanceof ContextInitialization) {
-			ContextInitialization result = (ContextInitialization) object_;
-			if (equals(result.getConclusionRoot(),
-					conclusion.getConclusionRoot()))
-				return result;
-		}
-		return null;
+	public Boolean visit(final ContextInitialization conclusion) {
+		return other_.accept(new DefaultConclusionVisitor() {
+			@Override
+			public Boolean visit(ContextInitialization other) {
+				return equals(other.getDestination(),
+						conclusion.getDestination());
+			}
+		});
 	}
 
 	@Override
-	public Contradiction visit(Contradiction conclusion) {
-		if (object_ == conclusion)
-			return conclusion;
-		if (object_ instanceof Contradiction) {
-			Contradiction result = (Contradiction) object_;
-			if (equals(result.getConclusionRoot(),
-					conclusion.getConclusionRoot()))
-				return result;
-		}
-		return null;
+	public Boolean visit(final Contradiction conclusion) {
+		return other_.accept(new DefaultConclusionVisitor() {
+			@Override
+			public Boolean visit(Contradiction other) {
+				return equals(other.getDestination(),
+						conclusion.getDestination());
+			}
+		});
 	}
 
 	@Override
-	public DisjointSubsumer visit(DisjointSubsumer conclusion) {
-		if (object_ == conclusion)
-			return conclusion;
-		if (object_ instanceof DisjointSubsumer) {
-			DisjointSubsumer result = (DisjointSubsumer) object_;
-			if (equals(result.getConclusionRoot(),
-					conclusion.getConclusionRoot())
-					&& equals(result.getDisjointExpressions(),
-							conclusion.getDisjointExpressions())
-					&& equals(result.getPosition(), conclusion.getPosition())
-					&& equals(result.getReason(), conclusion.getReason()))
-				return result;
-		}
-		return null;
+	public Boolean visit(final DisjointSubsumer conclusion) {
+		return other_.accept(new DefaultConclusionVisitor() {
+			@Override
+			public Boolean visit(DisjointSubsumer other) {
+				return equals(other.getDestination(),
+						conclusion.getDestination())
+						&& equals(other.getDisjointExpressions(),
+								conclusion.getDisjointExpressions())
+						&& equals(other.getPosition(), conclusion.getPosition())
+						&& equals(other.getReason(), conclusion.getReason());
+			}
+		});
 	}
 
 	@Override
-	public ForwardLink visit(ForwardLink conclusion) {
-		if (object_ == conclusion)
-			return conclusion;
-		if (object_ instanceof ForwardLink) {
-			ForwardLink result = (ForwardLink) object_;
-			if (equals(result.getConclusionRoot(),
-					conclusion.getConclusionRoot())
-					&& equals(result.getForwardChain(),
-							conclusion.getForwardChain())
-					&& equals(result.getTarget(), conclusion.getTarget()))
-				return result;
-		}
-		return null;
+	public Boolean visit(final ForwardLink conclusion) {
+		return other_.accept(new DefaultConclusionVisitor() {
+			@Override
+			public Boolean visit(ForwardLink other) {
+				return equals(other.getDestination(),
+						conclusion.getDestination())
+						&& equals(other.getForwardChain(),
+								conclusion.getForwardChain())
+						&& equals(other.getTarget(), conclusion.getTarget());
+			}
+		});
 	}
 
 	@Override
-	public IndexedDeclarationAxiom visit(IndexedDeclarationAxiom conclusion) {
-		if (object_ == conclusion)
-			return conclusion;
-		if (object_ instanceof IndexedDeclarationAxiom) {
-			IndexedDeclarationAxiom result = (IndexedDeclarationAxiom) object_;
-			if (equals(result.getEntity(), conclusion.getEntity()))
-				return result;
-		}
-		return null;
+	public Boolean visit(final IndexedDeclarationAxiom conclusion) {
+		return other_.accept(new DefaultConclusionVisitor() {
+			@Override
+			public Boolean visit(IndexedDeclarationAxiom other) {
+				return equals(other.getEntity(), conclusion.getEntity());
+			}
+		});
 	}
 
 	@Override
-	public IndexedDefinitionAxiom visit(IndexedDefinitionAxiom conclusion) {
-		if (object_ == conclusion)
-			return conclusion;
-		if (object_ instanceof IndexedDefinitionAxiom) {
-			IndexedDefinitionAxiom result = (IndexedDefinitionAxiom) object_;
-			if (equals(result.getDefinedClass(), conclusion.getDefinedClass())
-					&& equals(result.getDefinition(),
-							conclusion.getDefinition()))
-				return result;
-		}
-		return null;
+	public Boolean visit(final IndexedDefinitionAxiom conclusion) {
+		return other_.accept(new DefaultConclusionVisitor() {
+			@Override
+			public Boolean visit(IndexedDefinitionAxiom other) {
+				return equals(other.getDefinedClass(),
+						conclusion.getDefinedClass())
+						&& equals(other.getDefinition(),
+								conclusion.getDefinition());
+			}
+		});
 	}
 
 	@Override
-	public IndexedDisjointClassesAxiom visit(
-			IndexedDisjointClassesAxiom conclusion) {
-		if (object_ == conclusion)
-			return conclusion;
-		if (object_ instanceof IndexedDisjointClassesAxiom) {
-			IndexedDisjointClassesAxiom result = (IndexedDisjointClassesAxiom) object_;
-			if (equals(result.getMembers(), conclusion.getMembers()))
-				return result;
-		}
-		return null;
+	public Boolean visit(final IndexedDisjointClassesAxiom conclusion) {
+		return other_.accept(new DefaultConclusionVisitor() {
+			@Override
+			public Boolean visit(IndexedDisjointClassesAxiom other) {
+				return equals(other.getMembers(), conclusion.getMembers());
+			}
+		});
 	}
 
 	@Override
-	public IndexedObjectPropertyRangeAxiom visit(
-			IndexedObjectPropertyRangeAxiom conclusion) {
-		if (object_ == conclusion)
-			return conclusion;
-		if (object_ instanceof IndexedObjectPropertyRangeAxiom) {
-			IndexedObjectPropertyRangeAxiom result = (IndexedObjectPropertyRangeAxiom) object_;
-			if (equals(result.getProperty(), conclusion.getProperty())
-					&& equals(result.getRange(), conclusion.getRange()))
-				return result;
-		}
-		return null;
+	public Boolean visit(final IndexedObjectPropertyRangeAxiom conclusion) {
+		return other_.accept(new DefaultConclusionVisitor() {
+			@Override
+			public Boolean visit(IndexedObjectPropertyRangeAxiom other) {
+				return equals(other.getProperty(), conclusion.getProperty())
+						&& equals(other.getRange(), conclusion.getRange());
+			}
+		});
 	}
 
 	@Override
-	public IndexedSubClassOfAxiom visit(IndexedSubClassOfAxiom conclusion) {
-		if (object_ == conclusion)
-			return conclusion;
-		if (object_ instanceof IndexedSubClassOfAxiom) {
-			IndexedSubClassOfAxiom result = (IndexedSubClassOfAxiom) object_;
-			if (equals(result.getSubClass(), conclusion.getSubClass())
-					&& equals(result.getSuperClass(),
-							conclusion.getSuperClass()))
-				return result;
-		}
-		return null;
+	public Boolean visit(final IndexedSubClassOfAxiom conclusion) {
+		return other_.accept(new DefaultConclusionVisitor() {
+			@Override
+			public Boolean visit(IndexedSubClassOfAxiom other) {
+				return equals(other.getSubClass(), conclusion.getSubClass())
+						&& equals(other.getSuperClass(),
+								conclusion.getSuperClass());
+			}
+		});
 	}
 
 	@Override
-	public IndexedSubObjectPropertyOfAxiom visit(
-			IndexedSubObjectPropertyOfAxiom conclusion) {
-		if (object_ == conclusion)
-			return conclusion;
-		if (object_ instanceof IndexedSubObjectPropertyOfAxiom) {
-			IndexedSubObjectPropertyOfAxiom result = (IndexedSubObjectPropertyOfAxiom) object_;
-			if (equals(result.getSubPropertyChain(),
-					conclusion.getSubPropertyChain())
-					&& equals(result.getSuperProperty(),
-							conclusion.getSuperProperty()))
-				return result;
-		}
-		return null;
+	public Boolean visit(final IndexedSubObjectPropertyOfAxiom conclusion) {
+		return other_.accept(new DefaultConclusionVisitor() {
+			@Override
+			public Boolean visit(IndexedSubObjectPropertyOfAxiom other) {
+				return equals(other.getSubPropertyChain(),
+						conclusion.getSubPropertyChain())
+						&& equals(other.getSuperProperty(),
+								conclusion.getSuperProperty());
+			}
+		});
 	}
 
 	@Override
-	public Propagation visit(Propagation subConclusion) {
-		if (object_ == subConclusion)
-			return subConclusion;
-		if (object_ instanceof Propagation) {
-			Propagation result = (Propagation) object_;
-			if (equals(result.getConclusionRoot(),
-					subConclusion.getConclusionRoot())
-					&& equals(result.getConclusionSubRoot(),
-							subConclusion.getConclusionSubRoot())
-					&& equals(result.getCarry(), subConclusion.getCarry()))
-				return result;
-		}
-		return null;
+	public Boolean visit(final Propagation subConclusion) {
+		return other_.accept(new DefaultConclusionVisitor() {
+			@Override
+			public Boolean visit(Propagation other) {
+				return equals(other.getDestination(),
+						subConclusion.getDestination())
+						&& equals(other.getDestinationSubRoot(),
+								subConclusion.getDestinationSubRoot())
+						&& equals(other.getCarry(), subConclusion.getCarry());
+			}
+		});
 	}
 
 	@Override
-	public Conclusion visit(PropertyRange conclusion) {
-		if (object_ == conclusion)
-			return conclusion;
-		if (object_ instanceof PropertyRange) {
-			PropertyRange result = (PropertyRange) object_;
-			if (equals(result.getProperty(), conclusion.getProperty())
-					&& equals(result.getRange(), conclusion.getRange()))
-				return result;
-		}
-		return null;
+	public Boolean visit(final PropertyRange conclusion) {
+		return other_.accept(new DefaultConclusionVisitor() {
+			@Override
+			public Boolean visit(PropertyRange other) {
+				return equals(other.getProperty(), conclusion.getProperty())
+						&& equals(other.getRange(), conclusion.getRange());
+			}
+		});
 	}
 
 	@Override
-	public SubClassInclusionComposed visit(
-			SubClassInclusionComposed conclusion) {
-		if (object_ == conclusion)
-			return conclusion;
-		if (object_ instanceof SubClassInclusionComposed) {
-			SubClassInclusionComposed result = (SubClassInclusionComposed) object_;
-			if (equals(result.getConclusionRoot(),
-					conclusion.getConclusionRoot())
-					&& equals(result.getSuperExpression(),
-							conclusion.getSuperExpression()))
-				return result;
-		}
-		return null;
+	public Boolean visit(final SubClassInclusionComposed conclusion) {
+		return other_.accept(new DefaultConclusionVisitor() {
+			@Override
+			public Boolean visit(SubClassInclusionComposed other) {
+				return equals(other.getDestination(),
+						conclusion.getDestination())
+						&& equals(other.getSuperExpression(),
+								conclusion.getSuperExpression());
+			}
+		});
 	}
 
 	@Override
-	public SubClassInclusionDecomposed visit(
-			SubClassInclusionDecomposed conclusion) {
-		if (object_ == conclusion)
-			return conclusion;
-		if (object_ instanceof SubClassInclusionDecomposed) {
-			SubClassInclusionDecomposed result = (SubClassInclusionDecomposed) object_;
-			if (equals(result.getConclusionRoot(),
-					conclusion.getConclusionRoot())
-					&& equals(result.getSuperExpression(),
-							conclusion.getSuperExpression()))
-				return result;
-		}
-		return null;
+	public Boolean visit(final SubClassInclusionDecomposed conclusion) {
+		return other_.accept(new DefaultConclusionVisitor() {
+			@Override
+			public Boolean visit(SubClassInclusionDecomposed other) {
+				return equals(other.getDestination(),
+						conclusion.getDestination())
+						&& equals(other.getSuperExpression(),
+								conclusion.getSuperExpression());
+			}
+		});
 	}
 
 	@Override
-	public SubContextInitialization visit(
-			SubContextInitialization subConclusion) {
-		if (object_ == subConclusion)
-			return subConclusion;
-		if (object_ instanceof SubContextInitialization) {
-			SubContextInitialization result = (SubContextInitialization) object_;
-			if (equals(result.getConclusionRoot(),
-					subConclusion.getConclusionRoot())
-					&& equals(result.getConclusionSubRoot(),
-							subConclusion.getConclusionSubRoot()))
-				return result;
-		}
-		return null;
+	public Boolean visit(final SubContextInitialization subConclusion) {
+		return other_.accept(new DefaultConclusionVisitor() {
+			@Override
+			public Boolean visit(SubContextInitialization other) {
+				return equals(other.getDestination(),
+						subConclusion.getDestination())
+						&& equals(other.getDestinationSubRoot(),
+								subConclusion.getDestinationSubRoot());
+			}
+		});
 	}
 
 	@Override
-	public SubPropertyChain visit(SubPropertyChain conclusion) {
-		if (object_ == conclusion)
-			return conclusion;
-		if (object_ instanceof SubPropertyChain) {
-			SubPropertyChain result = (SubPropertyChain) object_;
-			if (equals(result.getSubChain(), conclusion.getSubChain())
-					&& equals(result.getSuperChain(),
-							conclusion.getSuperChain()))
-				return result;
-		}
-		return null;
+	public Boolean visit(final SubPropertyChain conclusion) {
+		return other_.accept(new DefaultConclusionVisitor() {
+			@Override
+			public Boolean visit(SubPropertyChain other) {
+				return equals(other.getSubChain(), conclusion.getSubChain())
+						&& equals(other.getSuperChain(),
+								conclusion.getSuperChain());
+			}
+		});
 	}
 
 }

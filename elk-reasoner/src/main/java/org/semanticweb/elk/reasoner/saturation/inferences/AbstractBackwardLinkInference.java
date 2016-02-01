@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.BackwardLinkImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
 public abstract class AbstractBackwardLinkInference extends BackwardLinkImpl
@@ -36,6 +37,11 @@ public abstract class AbstractBackwardLinkInference extends BackwardLinkImpl
 		super(root, relation, source);
 	}
 
+	public BackwardLink getConclusion(BackwardLink.Factory factory) {
+		return factory.getBackwardLink(getDestination(),
+				getBackwardRelation(), getTraceRoot());
+	}
+	
 	@Override
 	public int hashCode() {
 		return System.identityHashCode(this);

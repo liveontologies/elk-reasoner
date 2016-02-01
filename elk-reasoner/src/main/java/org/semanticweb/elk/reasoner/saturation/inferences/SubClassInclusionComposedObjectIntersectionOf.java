@@ -56,19 +56,19 @@ public class SubClassInclusionComposedObjectIntersectionOf
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceRoot() {
-		return getConclusionRoot();
+	public IndexedContextRoot getOrigin() {
+		return getDestination();
 	}
 
 	public SubClassInclusionComposed getFirstPremise(
 			SubClassInclusionComposed.Factory factory) {
-		return factory.getSubClassInclusionComposed(getInferenceRoot(),
+		return factory.getSubClassInclusionComposed(getOrigin(),
 				getSuperExpression().getFirstConjunct());
 	}
 
 	public SubClassInclusionComposed getSecondPremise(
 			SubClassInclusionComposed.Factory factory) {
-		return factory.getSubClassInclusionComposed(getInferenceRoot(),
+		return factory.getSubClassInclusionComposed(getOrigin(),
 				getSuperExpression().getSecondConjunct());
 	}
 

@@ -39,8 +39,7 @@ import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationNoInput;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContextInitializationNoPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationDeletionNotSaturatedFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
@@ -109,12 +108,11 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 
 	private void initContexts(Collection<IndexedClassExpression> roots) {
 		OntologyIndex index = reasoner.saturationState.getOntologyIndex();
-		ContextInitialization.Factory factory = new SaturationConclusionBaseFactory();
 		SaturationStateWriter<?> writer = reasoner.saturationState
 				.getContextCreatingWriter();
 		for (IndexedClassExpression root : roots) {
 			if (reasoner.saturationState.getContext(root) != null)
-				writer.produce(factory.getContextInitialization(root, index));
+				writer.produce(new ContextInitializationNoPremises(root, index));
 		}
 	}
 
