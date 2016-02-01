@@ -153,10 +153,7 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 		SaturationStateWriter<? extends C> writer = getBaseWriter(
 				creationListener, modificationListener);
 		WorkerLocalTodo localTodo = new WorkerLocalTodoImpl();
-		WorkerLocalizedSaturationStateWriter<C> optimizedWriter = new WorkerLocalizedSaturationStateWriter<C>(
-				writer, localTodo);
-		writer = SaturationUtils.<C> getStatsAwareWriter(optimizedWriter,
-				localStatistics);
+		writer = new WorkerLocalizedSaturationStateWriter<C>(writer, localTodo);
 		writer = getFinalWriter(writer);
 		RuleVisitor<?> ruleVisitor = SaturationUtils
 				.getStatsAwareRuleVisitor(localStatistics.getRuleStatistics());

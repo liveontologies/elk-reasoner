@@ -1,13 +1,13 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
 import org.semanticweb.elk.util.logging.statistics.AbstractStatistics;
 import org.semanticweb.elk.util.logging.statistics.StatisticsPrinter;
@@ -43,45 +43,38 @@ public class ClassConclusionStatistics extends AbstractStatistics {
 			.getLogger(ClassConclusionStatistics.class);
 
 	/**
-	 * Number of conclusions put to the todo queue
+	 * Number of different inferences by type of the conclusion
 	 */
-	private final ClassConclusionCounter producedConclusionCounts_;
+	private final ClassConclusionCounter inferenceCounts_;
 	/**
-	 * Number of conclusions taken from the todo queue and processed
+	 * Number of different conclusions
 	 */
-	private final ClassConclusionCounter processedConclusionCounts_;
-	/**
-	 * Number of unique conclusions saved to contexts
-	 */
-	private final ClassConclusionCounter usedConclusionCounts_;
+	private final ClassConclusionCounter conclusionCounts_;
 
+	/**
+	 * Time for processing of conclusions of inferences
+	 */
 	private final ClassConclusionTimer conclusionProcessingTimer_;
 
-	public ClassConclusionStatistics(ClassConclusionCounter producedConclusionCounter,
-			ClassConclusionCounter processedConclusionCounts,
-			ClassConclusionCounter usedConclusionCounts,
+	public ClassConclusionStatistics(ClassConclusionCounter inferenceCounts,
+			ClassConclusionCounter conclusionCounts,
 			ClassConclusionTimer conclusionTimers) {
-		this.producedConclusionCounts_ = producedConclusionCounter;
-		this.processedConclusionCounts_ = processedConclusionCounts;
-		this.usedConclusionCounts_ = usedConclusionCounts;
+		this.inferenceCounts_ = inferenceCounts;
+		this.conclusionCounts_ = conclusionCounts;
 		this.conclusionProcessingTimer_ = conclusionTimers;
 	}
 
 	public ClassConclusionStatistics() {
 		this(new ClassConclusionCounter(), new ClassConclusionCounter(),
-				new ClassConclusionCounter(), new ClassConclusionTimer());
+				new ClassConclusionTimer());
 	}
 
-	public ClassConclusionCounter getProducedConclusionCounts() {
-		return producedConclusionCounts_;
+	public ClassConclusionCounter getInferenceCounts() {
+		return inferenceCounts_;
 	}
 
-	public ClassConclusionCounter getProcessedConclusionCounts() {
-		return processedConclusionCounts_;
-	}
-
-	public ClassConclusionCounter getUsedConclusionCounts() {
-		return usedConclusionCounts_;
+	public ClassConclusionCounter getConclusionCounts() {
+		return conclusionCounts_;
 	}
 
 	public ClassConclusionTimer getConclusionTimers() {
@@ -94,17 +87,15 @@ public class ClassConclusionStatistics extends AbstractStatistics {
 	@Override
 	public void reset() {
 		super.reset();
-		producedConclusionCounts_.reset();
-		processedConclusionCounts_.reset();
-		usedConclusionCounts_.reset();
+		inferenceCounts_.reset();
+		conclusionCounts_.reset();
 		conclusionProcessingTimer_.reset();
 	}
 
 	public synchronized void add(ClassConclusionStatistics stats) {
 		super.add(stats);
-		this.producedConclusionCounts_.add(stats.producedConclusionCounts_);
-		this.processedConclusionCounts_.add(stats.processedConclusionCounts_);
-		this.usedConclusionCounts_.add(stats.usedConclusionCounts_);
+		this.inferenceCounts_.add(stats.inferenceCounts_);
+		this.conclusionCounts_.add(stats.conclusionCounts_);
 		this.conclusionProcessingTimer_.add(stats.conclusionProcessingTimer_);
 	}
 
@@ -112,17 +103,17 @@ public class ClassConclusionStatistics extends AbstractStatistics {
 		// TODO
 	}
 
-	void print(StatisticsPrinter printer, String name, long processedCount,
-			long usedCount, long producedCount, long time) {
-		if (processedCount == 0)
+	void print(StatisticsPrinter printer, String name, long inferenceCount,
+			long conclusionCount, long time) {
+		if (inferenceCount == 0)
 			return;
 
-		if (usedCount > processedCount)
-			LOGGER_.error("{}: conclusions used: {} more than processed: {}!",
-					name, usedCount, processedCount);
+		if (conclusionCount > inferenceCount)
+			LOGGER_.error("{}: conclusions: {} more than inferences: {}!", name,
+					conclusionCount, inferenceCount);
 
-		printer.print(name, processedCount, usedCount, producedCount, time
-				/ getNumberOfMeasurements());
+		printer.print(name, inferenceCount, conclusionCount,
+				time / getNumberOfMeasurements());
 
 	}
 
@@ -135,81 +126,63 @@ public class ClassConclusionStatistics extends AbstractStatistics {
 			return;
 		}
 
-		if (processedConclusionCounts_.getTotalCount() == 0) {
+		if (conclusionCounts_.getTotalCount() == 0) {
 			return;
 		}
 
-		StatisticsPrinter printer = new StatisticsPrinter(
-				logger,
-				"%{CONCLUSIONS:}s %,{processed}d | %,{used}d | %,{produced}d [%,{time}d ms]",
-				"TOTAL CONCLUSIONS",
-				processedConclusionCounts_.getTotalCount(),
-				usedConclusionCounts_.getTotalCount(),
-				producedConclusionCounts_.getTotalCount(),
+		StatisticsPrinter printer = new StatisticsPrinter(logger,
+				"%{CONCLUSIONS:}s %,{processed}d | %,{unique}d [%,{time}d ms]",
+				"TOTAL CONCLUSIONS", conclusionCounts_.getTotalCount(),
+				inferenceCounts_.getTotalCount(),
 				conclusionProcessingTimer_.getTotalTime());
 
 		printer.printHeader();
 
-		print(printer, BackwardLink.NAME,
-				processedConclusionCounts_.countBackwardLink,
-				usedConclusionCounts_.countBackwardLink,
-				producedConclusionCounts_.countBackwardLink,
+		print(printer, BackwardLink.NAME, inferenceCounts_.countBackwardLink,
+				conclusionCounts_.countBackwardLink,
 				conclusionProcessingTimer_.timeBackwardLinks);
 
 		print(printer, ContextInitialization.NAME,
-				processedConclusionCounts_.countContextInitialization,
-				usedConclusionCounts_.countContextInitialization,
-				producedConclusionCounts_.countContextInitialization,
+				inferenceCounts_.countContextInitialization,
+				conclusionCounts_.countContextInitialization,
 				conclusionProcessingTimer_.timeContextInitializations);
 
-		print(printer, Contradiction.NAME,
-				processedConclusionCounts_.countContradiction,
-				usedConclusionCounts_.countContradiction,
-				producedConclusionCounts_.countContradiction,
+		print(printer, Contradiction.NAME, inferenceCounts_.countContradiction,
+				conclusionCounts_.countContradiction,
 				conclusionProcessingTimer_.timeContradictions);
 
 		print(printer, DisjointSubsumer.NAME,
-				processedConclusionCounts_.countDisjointSubsumer,
-				usedConclusionCounts_.countDisjointSubsumer,
-				producedConclusionCounts_.countDisjointSubsumer,
+				inferenceCounts_.countDisjointSubsumer,
+				conclusionCounts_.countDisjointSubsumer,
 				conclusionProcessingTimer_.timeDisjointSubsumers);
 
-		print(printer, ForwardLink.NAME,
-				processedConclusionCounts_.countForwardLink,
-				usedConclusionCounts_.countForwardLink,
-				producedConclusionCounts_.countForwardLink,
+		print(printer, ForwardLink.NAME, inferenceCounts_.countForwardLink,
+				conclusionCounts_.countForwardLink,
 				conclusionProcessingTimer_.timeForwardLinks);
 
 		print(printer, SubClassInclusionDecomposed.NAME,
-				processedConclusionCounts_.countSubClassInclusionDecomposed,
-				usedConclusionCounts_.countSubClassInclusionDecomposed,
-				producedConclusionCounts_.countSubClassInclusionDecomposed,
+				inferenceCounts_.countSubClassInclusionDecomposed,
+				conclusionCounts_.countSubClassInclusionDecomposed,
 				conclusionProcessingTimer_.timeDecomposedSubsumers);
 
 		print(printer, SubClassInclusionComposed.NAME,
-				processedConclusionCounts_.countSubClassInclusionComposed,
-				usedConclusionCounts_.countSubClassInclusionComposed,
-				producedConclusionCounts_.countSubClassInclusionComposed,
+				inferenceCounts_.countSubClassInclusionComposed,
+				conclusionCounts_.countSubClassInclusionComposed,
 				conclusionProcessingTimer_.timeComposedSubsumers);
 
-		print(printer, Propagation.NAME,
-				processedConclusionCounts_.countPropagation,
-				usedConclusionCounts_.countPropagation,
-				producedConclusionCounts_.countPropagation,
+		print(printer, Propagation.NAME, inferenceCounts_.countPropagation,
+				conclusionCounts_.countPropagation,
 				conclusionProcessingTimer_.timePropagations);
 
 		print(printer, SubContextInitialization.NAME,
-				processedConclusionCounts_.countSubContextInitialization,
-				usedConclusionCounts_.countSubContextInitialization,
-				producedConclusionCounts_.countSubContextInitialization,
+				inferenceCounts_.countSubContextInitialization,
+				conclusionCounts_.countSubContextInitialization,
 				conclusionProcessingTimer_.timeSubContextInitializations);
 
 		printer.printSeparator();
 
-		print(printer, "TOTAL CONCLUSIONS:",
-				processedConclusionCounts_.getTotalCount(),
-				usedConclusionCounts_.getTotalCount(),
-				producedConclusionCounts_.getTotalCount(),
+		print(printer, "TOTAL CONCLUSIONS:", inferenceCounts_.getTotalCount(),
+				conclusionCounts_.getTotalCount(),
 				conclusionProcessingTimer_.getTotalTime());
 
 		printer.printSeparator();

@@ -31,7 +31,6 @@ import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContextInitializationNoPremises;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,9 +82,7 @@ abstract class AbstractIncrementalContextInitializationStage
 		if (!super.preExecute())
 			return false;
 		this.stageStatistics_ = new SaturationStatistics();
-		this.writer_ = SaturationUtils.getStatsAwareWriter(
-				reasoner.saturationState.getContextCreatingWriter(),
-				stageStatistics_);
+		this.writer_ = reasoner.saturationState.getContextCreatingWriter();
 		return true;
 	}
 

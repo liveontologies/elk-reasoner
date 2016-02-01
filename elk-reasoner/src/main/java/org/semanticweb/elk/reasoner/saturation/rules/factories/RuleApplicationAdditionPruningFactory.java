@@ -94,7 +94,7 @@ public class RuleApplicationAdditionPruningFactory
 						SaturationUtils.compose(
 								// count processed conclusions, if necessary
 								SaturationUtils
-										.getProcessedConclusionCountingVisitor(
+										.getClassInferenceCountingVisitor(
 												localStatistics),
 								// checking the conclusion against the main
 								// saturation
@@ -111,7 +111,7 @@ public class RuleApplicationAdditionPruningFactory
 								// count conclusions used in the rules, if
 								// necessary
 								SaturationUtils
-										.getUsedConclusionCountingVisitor(
+										.getClassConclusionCountingVisitor(
 												localStatistics),
 								// and apply rules locally
 								new LocalRuleApplicationClassConclusionVisitor(

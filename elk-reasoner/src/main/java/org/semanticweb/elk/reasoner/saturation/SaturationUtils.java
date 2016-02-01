@@ -92,16 +92,6 @@ public class SaturationUtils {
 		return ruleAppVisitor;
 	}
 
-	public static <C extends Context> SaturationStateWriter<C> getStatsAwareWriter(
-			SaturationStateWriter<C> writer,
-			SaturationStatistics localStatistics) {
-		return COLLECT_CONCLUSION_COUNTS
-				? new CountingSaturationStateWriter<C>(writer,
-						localStatistics.getConclusionStatistics()
-								.getProducedConclusionCounts())
-				: writer;
-	}
-
 	/**
 	 * @param visitors
 	 * @return A {@link ClassConclusion.Visitor} that applies the given
@@ -154,29 +144,16 @@ public class SaturationUtils {
 		return new CountingClassConclusionVisitor(counter);
 	}
 
-	public static ClassConclusion.Visitor<Boolean> getProcessedConclusionCountingVisitor(
+	public static ClassConclusion.Visitor<Boolean> getClassInferenceCountingVisitor(
 			SaturationStatistics statistics) {
-		return getCountingConclusionVisitor(statistics.getConclusionStatistics()
-				.getProcessedConclusionCounts());
-	}
-
-	public static ClassConclusion.Visitor<Boolean> getUsedConclusionCountingVisitor(
-			SaturationStatistics statistics) {
-		statistics.getConclusionStatistics().startMeasurements();
 		return getCountingConclusionVisitor(
-				statistics.getConclusionStatistics().getUsedConclusionCounts());
+				statistics.getConclusionStatistics().getInferenceCounts());
 	}
 
-	@SuppressWarnings("unchecked")
-	public static ClassConclusion.Visitor<Boolean> getUsedConclusionCountingProcessor(
-			ClassConclusion.Visitor<Boolean> ruleProcessor,
-			SaturationStatistics localStatistics) {
-		if (COLLECT_CONCLUSION_COUNTS) {
-			return compose(new CountingClassConclusionVisitor(localStatistics
-					.getConclusionStatistics().getUsedConclusionCounts()),
-					ruleProcessor);
-		}
-		return ruleProcessor;
+	public static ClassConclusion.Visitor<Boolean> getClassConclusionCountingVisitor(
+			SaturationStatistics statistics) {
+		return getCountingConclusionVisitor(
+				statistics.getConclusionStatistics().getConclusionCounts());
 	}
 
 	public static <O> ClassConclusion.Visitor<O> getTimedConclusionVisitor(
@@ -186,6 +163,7 @@ public class SaturationUtils {
 		ClassConclusionStatistics stats = localStatistics
 				.getConclusionStatistics();
 		if (COLLECT_CONCLUSION_TIMES) {
+			stats.startMeasurements();
 			return new TimedClassConclusionVisitor<O>(
 					stats.getConclusionTimers(), conclusionVisitor);
 		}

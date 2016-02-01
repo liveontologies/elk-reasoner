@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  */
 class ContextInitializationFactory extends SimpleInterrupter
 		implements
-		InputProcessorFactory<ArrayList<Context>, InputProcessor<ArrayList<Context>>> {
+			InputProcessorFactory<ArrayList<Context>, InputProcessor<ArrayList<Context>>> {
 
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ContextInitializationFactory.class);
@@ -72,8 +72,7 @@ class ContextInitializationFactory extends SimpleInterrupter
 
 	private final SubsumerDecompositionRule<IndexedClass> classDecomposition_;
 
-	public ContextInitializationFactory(
-			SaturationState<?> state,
+	public ContextInitializationFactory(SaturationState<?> state,
 			LinkedContextInitRule changedGlobalRuleHead,
 			Map<? extends IndexedClassExpression, ? extends LinkedSubsumerRule> changedCompositionRules,
 			final Map<? extends IndexedClass, ? extends IndexedClassExpression> changedDefinitions,
@@ -97,7 +96,8 @@ class ContextInitializationFactory extends SimpleInterrupter
 			private final Map<? extends IndexedClass, ? extends ElkAxiom> changedDefinitionReasons_ = changedDefinitionReasons;
 
 			@Override
-			protected IndexedClassExpression getDefinition(IndexedClass premise) {
+			protected IndexedClassExpression getDefinition(
+					IndexedClass premise) {
 				return changedDefinitions_.get(premise);
 			}
 
@@ -119,10 +119,8 @@ class ContextInitializationFactory extends SimpleInterrupter
 
 		final RuleVisitor<?> ruleAppVisitor = SaturationUtils
 				.getStatsAwareRuleVisitor(localStatistics.getRuleStatistics());
-		final SaturationStateWriter<?> saturationStateWriter = SaturationUtils
-				.getStatsAwareWriter(
-						saturationState_.getContextModifyingWriter(),
-						localStatistics);
+		final SaturationStateWriter<?> saturationStateWriter = saturationState_
+				.getContextModifyingWriter();
 
 		localStatistics.getConclusionStatistics().startMeasurements();
 
@@ -147,7 +145,8 @@ class ContextInitializationFactory extends SimpleInterrupter
 				// apply all changed composition rules for composed subsumers
 				Set<IndexedClassExpression> composedSubsumers = context
 						.getComposedSubsumers();
-				if (composedSubsumers.size() > changedComposedSubsumers_.length >> 2) {
+				if (composedSubsumers
+						.size() > changedComposedSubsumers_.length >> 2) {
 					// iterate over changes, check subsumers
 					for (int j = 0; j < changedComposedSubsumers_.length; j++) {
 						IndexedClassExpression changedICE = changedComposedSubsumers_[j];
@@ -164,7 +163,8 @@ class ContextInitializationFactory extends SimpleInterrupter
 				// apply all definition expansion rules for decomposed subsumers
 				Set<IndexedClassExpression> decomposedSubsumers = context
 						.getDecomposedSubsumers();
-				if (decomposedSubsumers.size() > changedDecomposedSubsumers_.length >> 2) {
+				if (decomposedSubsumers
+						.size() > changedDecomposedSubsumers_.length >> 2) {
 					// iterate over changes, check subsumers
 					for (int j = 0; j < changedDecomposedSubsumers_.length; j++) {
 						IndexedClass changedIC = changedDecomposedSubsumers_[j];
@@ -222,7 +222,8 @@ class ContextInitializationFactory extends SimpleInterrupter
 			final ContextProcessor baseProcessor) {
 		if (SaturationUtils.COLLECT_PROCESSING_TIMES) {
 			return new TimedContextCollectionProcessor(baseProcessor,
-					stageStatistics_.getIncrementalProcessingStatistics(), this);
+					stageStatistics_.getIncrementalProcessingStatistics(),
+					this);
 		}
 		// else
 		return new ContextCollectionProcessor(baseProcessor);
@@ -232,10 +233,10 @@ class ContextInitializationFactory extends SimpleInterrupter
 	@Override
 	public void finish() {
 		if (LOGGER_.isDebugEnabled()) {
-			LOGGER_.debug("Composition rule hits: "
-					+ compositionRuleHits_.get());
-			LOGGER_.debug("Decomposition rule hits: "
-					+ decompositionRuleHits_.get());
+			LOGGER_.debug(
+					"Composition rule hits: " + compositionRuleHits_.get());
+			LOGGER_.debug(
+					"Decomposition rule hits: " + decompositionRuleHits_.get());
 		}
 	}
 
@@ -245,8 +246,9 @@ class ContextInitializationFactory extends SimpleInterrupter
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	private class ContextCollectionProcessor extends
-			BaseInputProcessor<ArrayList<Context>> {
+	private class ContextCollectionProcessor
+			extends
+				BaseInputProcessor<ArrayList<Context>> {
 
 		private final ContextProcessor contextProcessor_;
 

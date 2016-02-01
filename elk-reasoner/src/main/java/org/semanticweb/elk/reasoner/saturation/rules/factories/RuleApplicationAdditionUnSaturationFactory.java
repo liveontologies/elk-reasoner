@@ -66,7 +66,7 @@ public class RuleApplicationAdditionUnSaturationFactory
 						SaturationUtils.compose(SaturationUtils.compose(
 								// count processed conclusions, if necessary
 								SaturationUtils
-										.getProcessedConclusionCountingVisitor(
+										.getClassInferenceCountingVisitor(
 												localStatistics),
 								// insert conclusions initializing contexts if
 								// necessary
@@ -79,7 +79,7 @@ public class RuleApplicationAdditionUnSaturationFactory
 								// count conclusions used in the rules, if
 								// necessary
 								SaturationUtils
-										.getUsedConclusionCountingVisitor(
+										.getClassConclusionCountingVisitor(
 												localStatistics),
 								// apply rules
 								new RuleApplicationClassConclusionVisitor(

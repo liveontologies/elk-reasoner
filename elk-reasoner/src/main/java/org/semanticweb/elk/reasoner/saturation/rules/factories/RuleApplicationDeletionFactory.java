@@ -95,7 +95,7 @@ public class RuleApplicationDeletionFactory
 						.getTimedConclusionVisitor(SaturationUtils.compose(
 								// count processed conclusions, if necessary
 								SaturationUtils
-										.getProcessedConclusionCountingVisitor(
+										.getClassInferenceCountingVisitor(
 												localStatistics),
 								// check if conclusion occurs in the context and
 								// proceed
@@ -104,7 +104,7 @@ public class RuleApplicationDeletionFactory
 								// count conclusions used in the rules, if
 								// necessary
 								SaturationUtils
-										.getUsedConclusionCountingVisitor(
+										.getClassConclusionCountingVisitor(
 												localStatistics),
 								// apply rules
 								new RuleApplicationClassConclusionVisitor(
