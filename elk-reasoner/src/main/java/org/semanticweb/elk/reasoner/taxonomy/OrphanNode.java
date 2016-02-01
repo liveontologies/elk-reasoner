@@ -22,10 +22,13 @@ package org.semanticweb.elk.reasoner.taxonomy;
  */
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.reasoner.taxonomy.model.KeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 
 /**
@@ -43,25 +46,33 @@ public class OrphanNode<T extends ElkEntity> implements TaxonomyNode<T> {
 	/**
 	 * the members of the node
 	 */
-	final Set<T> members;
+	private final Map<Object, T> members;
 	/**
 	 * the representative of the node; should be among the members
 	 */
-	final T canonical;
+	private final T canonical;
+	/**
+	 * provides keys that are used for hashing instead of the members
+	 */
+	private final KeyProvider<ElkEntity> keyProvider_;
 
-	public OrphanNode(Set<T> members, T canonical) {
-		this.members = members;
+	public OrphanNode(Set<T> members, T canonical, KeyProvider<ElkEntity> keyProvider) {
+		this.members = new HashMap<Object, T>();// TODO: more efficient implementation for members!!
+		for (T member : members) {
+			this.members.put(keyProvider.getKey(member), member);
+		}
 		this.canonical = canonical;
+		this.keyProvider_ = keyProvider;
 	}
 
 	@Override
 	public Iterator<T> iterator() {
-		return members.iterator();
+		return members.values().iterator();
 	}
 	
 	@Override
 	public boolean contains(final T member) {
-		return members.contains(member);
+		return members.containsKey(keyProvider_.getKey(member));
 	}
 	
 	@Override

@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
@@ -51,15 +52,19 @@ import org.semanticweb.elk.util.collections.ArrayHashMap;
 public class SingletoneInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity, N extends OrphanTypeNode<T, I>>
 		extends SingletoneTaxonomy<T, N> implements InstanceTaxonomy<T, I> {
 
-	final Map<I, InstanceNode<T, I>> instanceNodeLookup;
+	final Map<Object, InstanceNode<T, I>> instanceNodeLookup;
+	/** provides keys that are used for hashing instead of the elkIndividuals */
+	private final ComparatorKeyProvider<ElkEntity> individualKeyProvider_;
 
-	public SingletoneInstanceTaxonomy(N node) {
+	public SingletoneInstanceTaxonomy(N node,
+			final ComparatorKeyProvider<ElkEntity> individualKeyProvider) {
 		super(node);
-		this.instanceNodeLookup = new ArrayHashMap<I, InstanceNode<T, I>>(node
+		this.individualKeyProvider_ = individualKeyProvider;
+		this.instanceNodeLookup = new ArrayHashMap<Object, InstanceNode<T, I>>(node
 				.getAllInstanceNodes().size());
 		for (InstanceNode<T, I> instanceNode : node.getAllInstanceNodes()) {
 			for (I instance : instanceNode) {
-				instanceNodeLookup.put(instance, instanceNode);
+				instanceNodeLookup.put(individualKeyProvider_.getKey(instance), instanceNode);
 			}
 		}
 	}
@@ -89,7 +94,7 @@ public class SingletoneInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity
 
 	@Override
 	public InstanceNode<T, I> getInstanceNode(I elkObject) {
-		return instanceNodeLookup.get(elkObject);
+		return instanceNodeLookup.get(individualKeyProvider_.getKey(elkObject));
 	}
 
 	@Override

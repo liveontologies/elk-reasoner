@@ -27,7 +27,6 @@ package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -39,6 +38,7 @@ import java.util.TreeSet;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.taxonomy.DepthFirstSearch.Direction;
+import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
@@ -62,20 +62,24 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 	protected final MockBottomNode bottom;
 	protected final Map<TypeNode<T, I>, Set<TypeNode<T, I>>> parentMap = new HashMap<TypeNode<T, I>, Set<TypeNode<T, I>>>();
 	protected final Map<TypeNode<T, I>, Set<TypeNode<T, I>>> childrenMap = new HashMap<TypeNode<T, I>, Set<TypeNode<T, I>>>();
-	protected final Map<T, TypeNode<T, I>> typeIndex = new HashMap<T, TypeNode<T, I>>();
-	protected final Map<I, MockInstanceNode> instanceIndex = new HashMap<I, MockInstanceNode>();
+	protected final Map<Object, TypeNode<T, I>> typeIndex = new HashMap<Object, TypeNode<T, I>>();
+	protected final Map<Object, MockInstanceNode> instanceIndex = new HashMap<Object, MockInstanceNode>();
 	protected final Map<MockInstanceNode, Set<TypeNode<T, I>>> instanceTypeMap = new HashMap<MockInstanceNode, Set<TypeNode<T, I>>>();
 
 	private int nodesWithoutParent = 0;
 	private int nodesWithoutChildren = 0;
 	private int instancesWithoutType = 0;
 
-	protected final Comparator<T> typeComparator;
-	protected final Comparator<I> instanceComparator;
+	/** provides keys that are used for hashing instead of the elkClasses */
+	private final ComparatorKeyProvider<ElkEntity> typeKeyProvider_;
+	/** provides keys that are used for hashing instead of the elkIndividuals */
+	private final ComparatorKeyProvider<ElkEntity> instanceKeyProvider_;
 
-	MockInstanceTaxonomy(T top, T bottom, Comparator<T> tCmp, Comparator<I> iCmp) {
-		this.typeComparator = tCmp;
-		this.instanceComparator = iCmp;
+	MockInstanceTaxonomy(T top, T bottom,
+			final ComparatorKeyProvider<ElkEntity> typeKeyProvider,
+			final ComparatorKeyProvider<ElkEntity> instanceKeyProvider) {
+		this.typeKeyProvider_ = typeKeyProvider;
+		this.instanceKeyProvider_ = instanceKeyProvider;
 		this.top = new MockTopNode(top);
 		this.bottom = new MockBottomNode(bottom);
 
@@ -85,7 +89,7 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 
 	private void initTypeNode(TypeNode<T, I> typeNode) {
 		for (T member : typeNode) {
-			typeIndex.put(member, typeNode);
+			typeIndex.put(typeKeyProvider_.getKey(member), typeNode);
 		}
 
 		parentMap.put(typeNode, new HashSet<TypeNode<T, I>>());
@@ -114,7 +118,7 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 
 	@Override
 	public MockTypeNode getTypeNode(T elkObject) {
-		return (MockTypeNode) typeIndex.get(elkObject);
+		return (MockTypeNode) typeIndex.get(typeKeyProvider_.getKey(elkObject));
 	}
 
 	@Override
@@ -124,7 +128,7 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 
 	@Override
 	public MockInstanceNode getInstanceNode(I elkObject) {
-		return instanceIndex.get(elkObject);
+		return instanceIndex.get(instanceKeyProvider_.getKey(elkObject));
 	}
 
 	@Override
@@ -199,13 +203,14 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 
 	public MockInstanceNode getCreateInstanceNode(Collection<I> instances,
 			Collection<TypeNode<T, I>> types) {
-		MockInstanceNode node = instanceIndex.get(instances.iterator().next());
+		MockInstanceNode node = instanceIndex.get(
+				instanceKeyProvider_.getKey(instances.iterator().next()));
 
 		if (node == null) {
 			node = new MockInstanceNode(instances, types);
 
 			for (I instance : instances) {
-				instanceIndex.put(instance, node);
+				instanceIndex.put(instanceKeyProvider_.getKey(instance), node);
 			}
 		}
 
@@ -264,8 +269,8 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 
 		final SortedSet<O> members;
 
-		MockNode(Collection<O> members, Comparator<O> cmp) {
-			this.members = new TreeSet<O>(cmp);
+		MockNode(Collection<O> members, ComparatorKeyProvider<ElkEntity> keyProvider) {
+			this.members = new TreeSet<O>(keyProvider.getComparator());
 			this.members.addAll(members);
 		}
 
@@ -315,7 +320,7 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 		final Set<InstanceNode<T, I>> instances = new ArrayHashSet<InstanceNode<T, I>>();
 
 		MockTypeNode(Collection<T> members) {
-			super(members, typeComparator);
+			super(members, typeKeyProvider_);
 		}
 
 		@Override
@@ -437,7 +442,7 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 		public void addMembers(Iterable<T> newMembers) {
 			for (T newMember : newMembers) {
 				this.members.add(newMember);
-				MockInstanceTaxonomy.this.typeIndex.put(newMember, this);
+				MockInstanceTaxonomy.this.typeIndex.put(typeKeyProvider_.getKey(newMember), this);
 			}
 		}
 	}
@@ -648,7 +653,7 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 			InstanceNode<T, I> {
 
 		MockInstanceNode(Collection<I> members, Collection<TypeNode<T, I>> types) {
-			super(members, instanceComparator);
+			super(members, instanceKeyProvider_);
 
 			instancesWithoutType++;
 			MockInstanceTaxonomy.this.instanceTypeMap.put(this,

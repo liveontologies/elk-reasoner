@@ -37,7 +37,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.managers.ElkEntityRecycler;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 
 /**
@@ -57,8 +56,8 @@ public class MockInstanceTaxonomyTest {
 				new ElkEntityRecycler());// we reuse iri objects
 		MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = new MockInstanceTaxonomy<ElkClass, ElkNamedIndividual>(
 				PredefinedElkClass.OWL_THING, PredefinedElkClass.OWL_NOTHING,
-				Comparators.ELK_CLASS_COMPARATOR,
-				Comparators.ELK_NAMED_INDIVIDUAL_COMPARATOR);
+				ElkClassKeyProvider.INSTANCE,
+				ElkIndividualKeyProvider.INSTANCE);
 
 		ElkClass A = factory.getClass(new ElkFullIri("#A"));
 
@@ -88,8 +87,8 @@ public class MockInstanceTaxonomyTest {
 				new ElkEntityRecycler());// we reuse iri objects
 		MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = new MockInstanceTaxonomy<ElkClass, ElkNamedIndividual>(
 				PredefinedElkClass.OWL_THING, PredefinedElkClass.OWL_NOTHING,
-				Comparators.ELK_CLASS_COMPARATOR,
-				Comparators.ELK_NAMED_INDIVIDUAL_COMPARATOR);
+				ElkClassKeyProvider.INSTANCE,
+				ElkIndividualKeyProvider.INSTANCE);
 
 		ElkClass A1 = factory.getClass(new ElkFullIri("#A"));
 		ElkClass A2 = factory.getClass(new ElkFullIri("#A"));
@@ -120,8 +119,8 @@ public class MockInstanceTaxonomyTest {
 				new ElkEntityRecycler());// we reuse iri objects
 		MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = new MockInstanceTaxonomy<ElkClass, ElkNamedIndividual>(
 				PredefinedElkClass.OWL_THING, PredefinedElkClass.OWL_NOTHING,
-				Comparators.ELK_CLASS_COMPARATOR,
-				Comparators.ELK_NAMED_INDIVIDUAL_COMPARATOR);
+				ElkClassKeyProvider.INSTANCE,
+				ElkIndividualKeyProvider.INSTANCE);
 
 		assertSame(PredefinedElkClass.OWL_THING, taxonomy.getTopNode()
 				.getCanonicalMember());

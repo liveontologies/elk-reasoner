@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,24 +22,16 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
-
-/**
- * A {@link Node} created for an anonymous {@link ElkObject} that should not be
- * listed among its members
- * 
- * @author Yevgeny Kazakov
- * 
- * @param <T>
- */
-public class AnonymousNode<T extends ElkEntity> extends SimpleNode<T> implements
-		Node<T> {
-
-	public AnonymousNode(T anonymousMember, Iterable<T> allMembers,
-			final ComparatorKeyProvider<ElkEntity> comparatorKeyProvider) {
-		super(allMembers, comparatorKeyProvider);
-		this.members.remove(anonymousMember);
-	}
-
+public interface KeyProvider<T> {
+	
+	/**
+	 * Returns the key for <code>arg</code>. The methods {@link #hashCode()} and
+	 * {@link #equals(Object)} will be called on this key instead of the
+	 * original object <code>arg</code>.
+	 * 
+	 * @param arg The object for which the key should be returned.
+	 * @return the key for <code>arg</code>.
+	 */
+	Object getKey(T arg);
+	
 }

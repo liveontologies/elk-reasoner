@@ -39,12 +39,12 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
-import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.stages.AbstractReasonerState;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
+import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.AnonymousNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.FreshInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.FreshTaxonomyNode;
@@ -356,7 +356,7 @@ public class Reasoner extends AbstractReasonerState {
 				materializedQuery);
 
 		return new AnonymousNode<ElkClass>(queryClass, queryNode,
-				Comparators.ELK_CLASS_COMPARATOR);
+				ElkClassKeyProvider.INSTANCE);
 	}
 
 	/**

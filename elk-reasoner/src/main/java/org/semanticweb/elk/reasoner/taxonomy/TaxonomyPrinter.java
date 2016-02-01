@@ -37,6 +37,7 @@ import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
@@ -44,7 +45,6 @@ import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIris;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
-import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
@@ -60,8 +60,9 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
  */
 public class TaxonomyPrinter {
 
-	protected static Comparator<ElkClass> CLASS_COMPARATOR = Comparators.ELK_CLASS_COMPARATOR;
-	protected static Comparator<ElkNamedIndividual> INDIVIDUAL_COMPARATOR = Comparators.ELK_NAMED_INDIVIDUAL_COMPARATOR;
+	protected static Comparator<ElkEntity>
+			CLASS_COMPARATOR = ElkClassKeyProvider.INSTANCE.getComparator(),
+			INDIVIDUAL_COMPARATOR = ElkIndividualKeyProvider.INSTANCE.getComparator();
 
 	/**
 	 * Convenience method for printing a {@link Taxonomy} to a file at the given

@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.KeyProvider;
 
 /**
  * An {@link OrphanNode} with one member type node
@@ -43,8 +44,8 @@ public class OrphanInstanceNode<T extends ElkEntity, I extends ElkEntity>
 	final OrphanTypeNode<T, I> typeNode;
 
 	public OrphanInstanceNode(Set<I> instances, I canonicalInstance,
-			OrphanTypeNode<T, I> typeNode) {
-		super(instances, canonicalInstance);
+			OrphanTypeNode<T, I> typeNode, KeyProvider<ElkEntity> instanceKeyProvider) {
+		super(instances, canonicalInstance, instanceKeyProvider);
 		this.typeNode = typeNode;
 	}
 

@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
  * A fresh TypeNode containing an object that does not occur in a taxonomy. Such

@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,24 +22,18 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import java.util.Comparator;
 
-/**
- * A {@link Node} created for an anonymous {@link ElkObject} that should not be
- * listed among its members
- * 
- * @author Yevgeny Kazakov
- * 
- * @param <T>
- */
-public class AnonymousNode<T extends ElkEntity> extends SimpleNode<T> implements
-		Node<T> {
-
-	public AnonymousNode(T anonymousMember, Iterable<T> allMembers,
-			final ComparatorKeyProvider<ElkEntity> comparatorKeyProvider) {
-		super(allMembers, comparatorKeyProvider);
-		this.members.remove(anonymousMember);
-	}
-
+public interface ComparatorKeyProvider<T> extends KeyProvider<T> {
+	
+	/**
+	 * Returns the comparator that should be used for comparison of the objects
+	 * of type <code>T</code>. This comparator <strong>must</strong> be
+	 * consistent with {@link #getKey(Object) getKey(Object).equals(Object)}! 
+	 * 
+	 * @return the comparator that should be used for comparison of the objects
+	 * of type <code>T</code>.
+	 */
+	Comparator<T> getComparator();
+	
 }

@@ -21,7 +21,6 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -32,9 +31,12 @@ import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 public class SimpleNode<T extends ElkEntity> implements Node<T> {
 
 	final SortedSet<T> members;
+	protected final ComparatorKeyProvider<ElkEntity> comparatorKeyProvider_;
 
-	public SimpleNode(Iterable<T> members, Comparator<T> cmp) {
-		this.members = new TreeSet<T>(cmp);
+	public SimpleNode(Iterable<T> members,
+			final ComparatorKeyProvider<ElkEntity> comparatorKeyProvider) {
+		this.members = new TreeSet<T>(comparatorKeyProvider.getComparator());
+		this.comparatorKeyProvider_ = comparatorKeyProvider;
 		for (T member : members) {
 			this.members.add(member);
 		}
