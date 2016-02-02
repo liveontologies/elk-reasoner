@@ -76,7 +76,7 @@ public abstract class AbstractObjectIntersectionFromConjunctRule extends
 	}
 
 	@Override
-	public boolean isLocal() {
+	public boolean isTracing() {
 		return true;
 	}
 

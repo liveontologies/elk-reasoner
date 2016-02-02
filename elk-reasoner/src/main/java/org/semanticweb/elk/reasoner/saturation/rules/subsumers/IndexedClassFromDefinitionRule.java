@@ -108,7 +108,7 @@ public class IndexedClassFromDefinitionRule extends
 	}
 
 	@Override
-	public boolean isLocal() {
+	public boolean isTracing() {
 		return true;
 	}
 

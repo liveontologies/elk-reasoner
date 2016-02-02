@@ -138,7 +138,7 @@ public class PropagationFromExistentialFillerRule extends
 	}
 
 	@Override
-	public boolean isLocal() {
+	public boolean isTracing() {
 		return false;
 	}
 

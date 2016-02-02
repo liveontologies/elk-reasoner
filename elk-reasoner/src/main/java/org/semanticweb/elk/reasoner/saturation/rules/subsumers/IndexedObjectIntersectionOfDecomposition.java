@@ -66,7 +66,7 @@ public class IndexedObjectIntersectionOfDecomposition extends
 	}
 
 	@Override
-	public boolean isLocal() {
+	public boolean isTracing() {
 		return true;
 	}
 

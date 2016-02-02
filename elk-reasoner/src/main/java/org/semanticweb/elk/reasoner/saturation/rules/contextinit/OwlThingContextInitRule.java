@@ -108,7 +108,7 @@ public class OwlThingContextInitRule extends AbstractChainableContextInitRule {
 	}
 
 	@Override
-	public boolean isLocal() {
+	public boolean isTracing() {
 		return true;
 	}
 

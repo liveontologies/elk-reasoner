@@ -193,7 +193,7 @@ public class DisjointSubsumerFromMemberRule
 	}
 
 	@Override
-	public boolean isLocal() {
+	public boolean isTracing() {
 		return true;
 	}
 

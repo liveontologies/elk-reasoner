@@ -65,7 +65,7 @@ public class SubsumerBackwardLinkRule extends AbstractBackwardLinkRule {
 	}
 
 	@Override
-	public boolean isLocal() {
+	public boolean isTracing() {
 		return true;
 	}
 

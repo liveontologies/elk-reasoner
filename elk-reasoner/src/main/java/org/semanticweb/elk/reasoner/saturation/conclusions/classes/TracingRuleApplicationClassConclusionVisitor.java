@@ -36,43 +36,43 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitors;
 
 /**
- * A {@link ClassConclusion.Visitor} that applies local rules (rules producing
- * only {@link ClassConclusion}s with the same origin root and sub-root as for
- * the premise) for visited {@link ClassConclusion}s using the provided
- * {@link RuleVisitor} and {@link ClassInferenceProducer}.
+ * A {@link ClassConclusion.Visitor} that applies all {@link Rule}s to visited
+ * {@link ClassConclusion}s for which {@link Rule#isTracing()} returns
+ * {@code true}.
  * 
- * When applying local rules, to the visited {@link ClassConclusion}, local
- * premises (premises with the same origin root and sub-root as the
- * {@link ClassConclusion}) are taken from the local {@link Context} of
- * {@link Reference} and other premises from the corresponding {@link Context}
- * in the main saturation state. This is done to ensure that every rule is
- * applied at most once and no inference is lost when processing only local
- * {@link ClassConclusion}s.
+ * When applying a {@link Rule} for a visited {@link ClassConclusion}, premises
+ * with the same values of {@link ClassConclusion#getTraceRoot()} and
+ * {@link SubClassConclusion#getTraceSubRoot()} as the conclusion are taken from
+ * the local {@link ContextPremises} of the {@link Reference} and other premises
+ * from the corresponding {@link Context} in the main {@link SaturationState}.
+ * This is done to ensure that every rule is applied at most once and no
+ * inference is lost.
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @see Rule#isLocal()
+ * @see Rule#isTracing()
  * @see RuleApplicationClassConclusion.Visitor
  */
-public class LocalRuleApplicationClassConclusionVisitor
+public class TracingRuleApplicationClassConclusionVisitor
 		extends
 			AbstractClassConclusionVisitor<Boolean> {
 
 	private final HybrridContextPremises hybridPremisesRef_;
-	
+
 	/**
 	 * {@link ClassConclusion.Visitor} applying local rules
 	 */
 	private final ClassConclusion.Visitor<Boolean> localRuleApplicator_;
 
-	public LocalRuleApplicationClassConclusionVisitor(
+	public TracingRuleApplicationClassConclusionVisitor(
 			SaturationState<?> mainState,
 			Reference<? extends ContextPremises> localPremisesRef,
 			RuleVisitor<?> ruleVisitor,
 			ClassInferenceProducer conclusionProducer) {
-		this.hybridPremisesRef_ = new HybrridContextPremises(localPremisesRef, mainState);
+		this.hybridPremisesRef_ = new HybrridContextPremises(localPremisesRef,
+				mainState);
 		this.localRuleApplicator_ = new RuleApplicationClassConclusionVisitor(
-				hybridPremisesRef_, RuleVisitors.localize(ruleVisitor),
+				hybridPremisesRef_, RuleVisitors.getTracingVisitor(ruleVisitor),
 				conclusionProducer);
 	}
 
@@ -83,8 +83,6 @@ public class LocalRuleApplicationClassConclusionVisitor
 		return true;
 	}
 
-
-	
 	/**
 	 * A {@link Reference} to {@link ContextPremises} that should be used in
 	 * rules with the given {@link ClassConclusion}. That effectively comprises
@@ -114,7 +112,7 @@ public class LocalRuleApplicationClassConclusionVisitor
 		void setConclusion(ClassConclusion conclusion) {
 			this.conclusion_ = conclusion;
 		}
-		
+
 		@Override
 		public ContextPremises get() {
 			ContextPremises localPremises = localPremisesRef_.get();

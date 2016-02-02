@@ -27,24 +27,25 @@ import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
  */
 
 /**
- * A rule that can be applied to a given premise (either a {@link ClassConclusion} or
- * an object representing a {@link ClassConclusion}) together with other
- * {@link ClassConclusion}s stored in within {@link ContextPremises}. The rule
- * produces other {@link ClassConclusion}s using the given {@link ClassInferenceProducer}
- * .
+ * A rule that can be applied to a given premise (either a
+ * {@link ClassConclusion} or an object representing a {@link ClassConclusion})
+ * together with other {@link ClassConclusion}s stored in within
+ * {@link ContextPremises}. The rule produces other {@link ClassConclusion}s
+ * using the given {@link ClassInferenceProducer} .
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <P>
+ * @param
+ * 			<P>
  *            the type of premises to which the rule can be applied
  */
 public interface Rule<P> {
 
 	/**
-	 * Apply the rule to the given premise representing a {@link ClassConclusion} and
-	 * other {@link ClassConclusion}s stored in within the given
-	 * {@link ContextPremises} and produce {@link ClassConclusion}s using the given
-	 * {@link ClassInferenceProducer}
+	 * Apply the rule to the given premise representing a
+	 * {@link ClassConclusion} and other {@link ClassConclusion}s stored in
+	 * within the given {@link ContextPremises} and produce
+	 * {@link ClassConclusion}s using the given {@link ClassInferenceProducer}
 	 * 
 	 * @param premise
 	 *            the element to which the rule is applied, it represents a
@@ -53,8 +54,8 @@ public interface Rule<P> {
 	 *            the {@link ContextPremises} from which other matching premises
 	 *            of the rule are taken
 	 * @param producer
-	 *            the {@link ClassInferenceProducer} using which {@link ClassConclusion}s
-	 *            of the inferences are produced
+	 *            the {@link ClassInferenceProducer} using which
+	 *            {@link ClassConclusion}s of the inferences are produced
 	 * 
 	 */
 	public void apply(P premise, ContextPremises premises,
@@ -62,23 +63,17 @@ public interface Rule<P> {
 
 	/**
 	 * @return {@code true} if this {@link Rule} produces only
-	 *         {@link ClassConclusion}s with the same origin root and sub-root as the
-	 *         {@link ClassConclusion} (or its representation) to which the rule is
-	 *         applied. Specifically, if applied for a {@link ClassConclusion} the
-	 *         rule can produce only {@link ClassConclusion}s with the same value of
-	 *         {@link ClassConclusion#getTraceRoot()}. Additionally, if applied to a
-	 *         {@link SubClassConclusion} the rule can produce only
-	 *         {@link SubClassConclusion} with the same values of
-	 *         {@link SubClassConclusion#getTraceSubRoot()} or a {@link ClassConclusion}
-	 *         if this value is {@code null}. Returns {@code false} if this
-	 *         {@link Rule} produces only {@link ClassConclusion}s with the different
-	 *         origin root or sub-root as the {@link ClassConclusion} (or its
-	 *         representation) to which the rule is applied.
-	 * 
+	 *         {@link ClassConclusion}s with the same value of
+	 *         {@link ClassConclusion#getTraceRoot()} and
+	 *         {@link SubClassConclusion#getTraceSubRoot()} (if
+	 *         {@link SubClassConclusion}) as the premise to which it applies.
+	 *         Returns {@code false} if all {@link ClassConclusion}s produced
+	 *         have different values of {@link ClassConclusion#getTraceRoot()}
+	 *         or {@link SubClassConclusion#getTraceSubRoot()} then the premise.
 	 * @see ClassConclusion#getTraceRoot()
 	 * @see SubClassConclusion#getDestination()
 	 */
-	public boolean isLocal();
+	public boolean isTracing();
 
 	public void accept(RuleVisitor<?> visitor, P premise,
 			ContextPremises premises, ClassInferenceProducer producer);

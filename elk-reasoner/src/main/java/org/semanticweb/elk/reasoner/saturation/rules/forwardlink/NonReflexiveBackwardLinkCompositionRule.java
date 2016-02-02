@@ -111,7 +111,7 @@ public class NonReflexiveBackwardLinkCompositionRule extends
 	}
 
 	@Override
-	public boolean isLocal() {
+	public boolean isTracing() {
 		return false;
 	}
 

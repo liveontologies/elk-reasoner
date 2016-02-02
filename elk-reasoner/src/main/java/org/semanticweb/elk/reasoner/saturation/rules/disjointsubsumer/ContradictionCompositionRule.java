@@ -68,7 +68,7 @@ public class ContradictionCompositionRule extends AbstractDisjointSubsumerRule {
 	}
 
 	@Override
-	public boolean isLocal() {
+	public boolean isTracing() {
 		return true;
 	}
 

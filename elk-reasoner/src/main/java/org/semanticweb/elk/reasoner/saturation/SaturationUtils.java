@@ -78,14 +78,14 @@ public class SaturationUtils {
 		RuleVisitor<?> ruleAppVisitor = new BasicRuleVisitor();
 
 		if (COLLECT_RULE_COUNTS) {
-			ruleAppVisitor = RuleVisitors.countingVisitor(ruleAppVisitor,
+			ruleAppVisitor = RuleVisitors.getCountingVisitor(ruleAppVisitor,
 					localStatistics.ruleCounter);
 		}
 
 		if (COLLECT_RULE_TIMES) {
 			localStatistics.startMeasurements();
 
-			ruleAppVisitor = RuleVisitors.timedVisitor(ruleAppVisitor,
+			ruleAppVisitor = RuleVisitors.getTimedVisitor(ruleAppVisitor,
 					localStatistics.ruleTimer);
 		}
 

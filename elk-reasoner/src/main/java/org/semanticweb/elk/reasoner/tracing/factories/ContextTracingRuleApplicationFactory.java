@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionInsertionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.LocalRuleApplicationClassConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.TracingRuleApplicationClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
@@ -104,7 +104,7 @@ public class ContextTracingRuleApplicationFactory
 						// if the conclusion is new, apply local rules and
 						// produce
 						// conclusions to the active (local) saturation state
-						new LocalRuleApplicationClassConclusionVisitor(
+						new TracingRuleApplicationClassConclusionVisitor(
 								mainSaturationState_, activeContext,
 								ruleVisitor, localWriter))));
 	}

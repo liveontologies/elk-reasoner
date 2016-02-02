@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionOccurrenceCheckingVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.LocalRuleApplicationClassConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.TracingRuleApplicationClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.RelativizedContextReference;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -114,7 +114,7 @@ public class RuleApplicationAdditionPruningFactory
 										.getClassConclusionCountingVisitor(
 												localStatistics),
 								// and apply rules locally
-								new LocalRuleApplicationClassConclusionVisitor(
+								new TracingRuleApplicationClassConclusionVisitor(
 										mainSaturationState_, activeContext,
 										ruleVisitor,
 										// the conclusions are produced in both

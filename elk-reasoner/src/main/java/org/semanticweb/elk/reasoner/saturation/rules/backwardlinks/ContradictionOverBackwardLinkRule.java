@@ -78,7 +78,7 @@ public class ContradictionOverBackwardLinkRule extends
 	}
 
 	@Override
-	public boolean isLocal() {
+	public boolean isTracing() {
 		return true;
 	}
 

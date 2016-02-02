@@ -103,7 +103,7 @@ public class IndexedClassDecompositionRule extends
 	}
 
 	@Override
-	public boolean isLocal() {
+	public boolean isTracing() {
 		return true;
 	}
 
