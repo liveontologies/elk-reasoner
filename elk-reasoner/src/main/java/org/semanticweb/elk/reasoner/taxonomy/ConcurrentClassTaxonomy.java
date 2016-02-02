@@ -92,6 +92,11 @@ public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 	}
 
 	@Override
+	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
+		return classKeyProvider_;
+	}
+	
+	@Override
 	public TaxonomyNode<ElkClass> getNode(ElkClass elkClass) {
 		TaxonomyNode<ElkClass> result = classNodeLookup_.get(classKeyProvider_.getKey(elkClass));
 
@@ -235,6 +240,11 @@ public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 	 */
 	protected class BottomClassNode implements UpdateableBottomNode<ElkClass> {
 
+		@Override
+		public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
+			return classKeyProvider_;
+		}
+		
 		@Override
 		public Iterator<ElkClass> iterator() {
 			return unsatisfiableClasses_.values().iterator();

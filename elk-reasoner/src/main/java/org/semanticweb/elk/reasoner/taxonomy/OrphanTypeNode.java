@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.reasoner.taxonomy.model.KeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 
@@ -45,7 +45,7 @@ public class OrphanTypeNode<T extends ElkEntity, I extends ElkEntity> extends
 	final Set<OrphanInstanceNode<T, I>> instanceNodes;
 
 	public OrphanTypeNode(Set<T> types, T canonicalType,
-			int estimatedInstanceNodes, KeyProvider<ElkEntity> typeKeyProvider) {
+			int estimatedInstanceNodes, ComparatorKeyProvider<ElkEntity> typeKeyProvider) {
 		super(types, canonicalType, typeKeyProvider);
 		this.instanceNodes = new ArrayHashSet<OrphanInstanceNode<T, I>>(
 				estimatedInstanceNodes);

@@ -46,6 +46,11 @@ public class FreshNode<T extends ElkEntity> implements Node<T> {
 	}
 
 	@Override
+	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
+		return null;// TODO: What to return when no key provider is needed?
+	}
+	
+	@Override
 	public Iterator<T> iterator() {
 		return Operations.singletonIterator(member);
 	}

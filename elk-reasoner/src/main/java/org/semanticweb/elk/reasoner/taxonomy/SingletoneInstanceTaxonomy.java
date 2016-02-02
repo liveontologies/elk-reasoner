@@ -70,6 +70,11 @@ public class SingletoneInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity
 	}
 
 	@Override
+	public ComparatorKeyProvider<ElkEntity> getInstanceKeyProvider() {
+		return individualKeyProvider_;
+	}
+	
+	@Override
 	public TypeNode<T, I> getTopNode() {
 		return node;
 	}

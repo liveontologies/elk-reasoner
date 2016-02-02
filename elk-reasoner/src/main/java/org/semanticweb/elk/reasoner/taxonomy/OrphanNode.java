@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.reasoner.taxonomy.model.KeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 
 /**
@@ -54,9 +54,9 @@ public class OrphanNode<T extends ElkEntity> implements TaxonomyNode<T> {
 	/**
 	 * provides keys that are used for hashing instead of the members
 	 */
-	private final KeyProvider<ElkEntity> keyProvider_;
+	private final ComparatorKeyProvider<ElkEntity> keyProvider_;
 
-	public OrphanNode(Set<T> members, T canonical, KeyProvider<ElkEntity> keyProvider) {
+	public OrphanNode(Set<T> members, T canonical, ComparatorKeyProvider<ElkEntity> keyProvider) {
 		this.members = new HashMap<Object, T>();// TODO: more efficient implementation for members!!
 		for (T member : members) {
 			this.members.put(keyProvider.getKey(member), member);
@@ -65,6 +65,11 @@ public class OrphanNode<T extends ElkEntity> implements TaxonomyNode<T> {
 		this.keyProvider_ = keyProvider;
 	}
 
+	@Override
+	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
+		return keyProvider_;
+	}
+	
 	@Override
 	public Iterator<T> iterator() {
 		return members.values().iterator();

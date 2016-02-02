@@ -103,6 +103,16 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 				classTaxonomy_.getUpdateableBottomNode());
 	}
 
+	@Override
+	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
+		return classTaxonomy_.getKeyProvider();
+	}
+	
+	@Override
+	public ComparatorKeyProvider<ElkEntity> getInstanceKeyProvider() {
+		return individualKeyProvider_;
+	}
+	
 	/**
 	 * Obtain a {@link TypeNode} object for a given {@link ElkClass}, or
 	 * {@code null} if none assigned.
@@ -380,6 +390,11 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 			classNode_ = node;
 		}
 
+		@Override
+		public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
+			return classNode_.getKeyProvider();
+		}
+		
 		@Override
 		public Iterator<ElkClass> iterator() {
 			return classNode_.iterator();

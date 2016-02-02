@@ -43,6 +43,14 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
 public interface Taxonomy<T extends ElkEntity> {
 
 	/**
+	 * Returns the {@link ComparatorKeyProvider} that provides a key for each node member.
+	 * These keys are used to compute hash codes and to compare the members.
+	 * 
+	 * @return the {@link ComparatorKeyProvider} that provides a key for each node member.
+	 */
+	public ComparatorKeyProvider<ElkEntity> getKeyProvider();
+
+	/**
 	 * Returns the {@link TaxonomyNode} containing the given {@link ElkEntity}
 	 * as a member or {@code null} if the input does not occur in the taxonomy.
 	 * 

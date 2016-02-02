@@ -97,6 +97,16 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 	}
 
 	@Override
+	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
+		return typeKeyProvider_;
+	}
+	
+	@Override
+	public ComparatorKeyProvider<ElkEntity> getInstanceKeyProvider() {
+		return instanceKeyProvider_;
+	}
+	
+	@Override
 	public TaxonomyNode<T> getNode(T elkObject) {
 		return getTypeNode(elkObject);
 	}
@@ -323,6 +333,11 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 			super(members, typeKeyProvider_);
 		}
 
+		@Override
+		public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
+			return typeKeyProvider_;
+		}
+		
 		@Override
 		public Set<? extends InstanceNode<T, I>> getDirectInstanceNodes() {
 			return instances;
@@ -667,6 +682,11 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 			}
 		}
 
+		@Override
+		public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
+			return instanceKeyProvider_;
+		}
+		
 		@Override
 		public Set<? extends TypeNode<T, I>> getDirectTypeNodes() {
 			Set<TypeNode<T, I>> typeNodes = MockInstanceTaxonomy.this.instanceTypeMap

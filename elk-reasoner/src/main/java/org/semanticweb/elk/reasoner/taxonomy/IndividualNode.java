@@ -114,6 +114,11 @@ public class IndividualNode implements
 	}
 
 	@Override
+	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
+		return individualKeyProvider_;
+	}
+	
+	@Override
 	public Iterator<ElkNamedIndividual> iterator() {
 		return members_.iterator();
 	}

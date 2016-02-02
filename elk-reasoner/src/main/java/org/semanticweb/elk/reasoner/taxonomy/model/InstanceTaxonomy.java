@@ -59,6 +59,14 @@ public interface InstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 	public Set<? extends TypeNode<T, I>> getTypeNodes();
 
 	/**
+	 * Returns the {@link ComparatorKeyProvider} that provides a key for each instance.
+	 * These keys are used to compute hash codes and to compare the instances.
+	 * 
+	 * @return the {@link ComparatorKeyProvider} that provides a key for each instance.
+	 */
+	public ComparatorKeyProvider<ElkEntity> getInstanceKeyProvider();
+	
+	/**
 	 * @param elkEntity
 	 *            {@link ElkEntity} for which the {@link InstanceNode} to be
 	 *            computed

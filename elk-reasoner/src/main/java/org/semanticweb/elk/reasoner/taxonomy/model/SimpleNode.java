@@ -43,6 +43,11 @@ public class SimpleNode<T extends ElkEntity> implements Node<T> {
 	}
 	
 	@Override
+	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
+		return comparatorKeyProvider_;
+	}
+	
+	@Override
 	public Iterator<T> iterator() {
 		return members.iterator();
 	}

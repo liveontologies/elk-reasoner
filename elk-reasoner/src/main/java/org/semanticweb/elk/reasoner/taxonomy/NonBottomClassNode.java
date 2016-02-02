@@ -71,10 +71,6 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 	 */
 	private final List<ElkClass> members_;
 	/**
-	 * provides keys that are used for hashing instead of the elkClasses
-	 */
-	private final ComparatorKeyProvider<ElkEntity> classKeyProvider_;
-	/**
 	 * ElkClass nodes whose members are direct super-classes of the members of
 	 * this node.
 	 */
@@ -104,10 +100,9 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 			final ComparatorKeyProvider<ElkEntity> classKeyProvider) {
 		this.taxonomy_ = taxonomy;
 		this.members_ = new ArrayList<ElkClass>(members);
-		this.classKeyProvider_ = classKeyProvider;
 		this.directSubNodes_ = new ArrayHashSet<UpdateableTaxonomyNode<ElkClass>>();
 		this.directSuperNodes_ = new ArrayHashSet<UpdateableTaxonomyNode<ElkClass>>();
-		Collections.sort(this.members_, this.classKeyProvider_.getComparator());
+		Collections.sort(this.members_, this.taxonomy_.getKeyProvider().getComparator());
 	}
 
 	/**
@@ -143,6 +138,11 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 	}
 
 	@Override
+	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
+		return taxonomy_.getKeyProvider();
+	}
+	
+	@Override
 	public Iterator<ElkClass> iterator() {
 		return members_.iterator();
 	}
@@ -150,7 +150,7 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 	@Override
 	public boolean contains(ElkClass arg) {
 		return (Collections.binarySearch(members_, arg,
-				classKeyProvider_.getComparator()) >= 0);
+				taxonomy_.getKeyProvider().getComparator()) >= 0);
 	}
 	
 	@Override
@@ -214,7 +214,7 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 		LOGGER_.trace("{}: updating members to {}", this, members);
 		members_.clear();
 		members_.addAll(members);
-		Collections.sort(this.members_, classKeyProvider_.getComparator());
+		Collections.sort(this.members_, taxonomy_.getKeyProvider().getComparator());
 	}
 
 	@Override
