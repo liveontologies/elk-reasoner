@@ -160,7 +160,7 @@ public class MessageDialogAppender extends AppenderBase<ILoggingEvent> implement
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-		String messageText = event.getFormattedMessage();
+		String messageText = elkMessage.getMessage();
 		// truncating too long message text
 		if (messageText.length() > 520) {
 			messageText = messageText.substring(0, 500) + "...";

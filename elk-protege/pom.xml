@@ -106,15 +106,14 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Bundle-SymbolicName>org.semanticweb.elk;singleton:=true</Bundle-SymbolicName>
 						<Implementation-Title>ELK Reasoner</Implementation-Title>
 						<Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
 						<Implementation-Version>${project.version}.${maven.build.timestamp}</Implementation-Version>
-						<Export-Package>!org.semanticweb.elk.*,org.semanticweb.elk.protege;org.semanticweb.elk.protege.ui</Export-Package>
-						<Import-Package>!com.sun.*,!org.semanticweb.elk.*,
-							org.protege.*;version="[${protege.lower.version},${protege.upper.version})",*</Import-Package>
+						<Import-Package>*</Import-Package>
+						<Export-Package>!*</Export-Package>
+						<Bundle-SymbolicName>${project.groupId};singleton:=true</Bundle-SymbolicName>
 						<Bundle-Activator>org.protege.editor.core.plugin.DefaultPluginActivator</Bundle-Activator>
-						<Embed-Dependency>*;scope=!provided;scope=compile|runtime;groupId=!net.sourceforge.owlapi|org.apache.felix|log4j;inline=false</Embed-Dependency>
+						<Embed-Dependency>*;scope=!provided;scope=compile|runtime;inline=false</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<Embed-Directory>target/dependency</Embed-Directory>
 						<Embed-StripGroup>true</Embed-StripGroup>
@@ -164,7 +163,6 @@
 						</executions>
 						<configuration>
 							<excludeScope>provided</excludeScope>
-							<excludeGroupIds>net.sourceforge.owlapi,org.apache.felix,log4j</excludeGroupIds>
 						</configuration>
 					</plugin>
 				</plugins>
