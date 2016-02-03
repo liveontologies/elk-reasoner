@@ -108,7 +108,10 @@ public class RuleApplicationDeletionFactory
 												localStatistics),
 								// apply rules
 								new RuleApplicationClassConclusionVisitor(
-										activeContext, ruleVisitor, writer),
+										activeContext,
+										getSaturationState().getOntologyIndex()
+												.getContextInitRuleHead(),
+										ruleVisitor, writer),
 								// after processing, delete the conclusion
 								new ClassConclusionDeletionVisitor(
 										activeContext),

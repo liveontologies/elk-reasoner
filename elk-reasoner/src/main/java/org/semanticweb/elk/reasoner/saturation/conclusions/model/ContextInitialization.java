@@ -1,7 +1,6 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.model;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 
 /*
  * #%L
@@ -26,7 +25,6 @@ import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
  */
 
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 
 /**
  * A {@code Conclusion} indicating that the {@link Context} corresponding to the
@@ -38,11 +36,6 @@ public interface ContextInitialization extends ClassConclusion {
 
 	public static final String NAME = "Context Initialization";
 
-	/**
-	 * @return the rules that should be applied for context initializations
-	 */
-	public LinkedContextInitRule getContextInitRuleHead();
-
 	public <O> O accept(Visitor<O> visitor);
 
 	/**
@@ -53,8 +46,7 @@ public interface ContextInitialization extends ClassConclusion {
 	 */
 	interface Factory {
 
-		ContextInitialization getContextInitialization(IndexedContextRoot root,
-				OntologyIndex ontologyIndex);
+		ContextInitialization getContextInitialization(IndexedContextRoot root);
 
 	}
 

@@ -68,6 +68,10 @@ public class RuleApplicationClassConclusionVisitor
 		implements
 			Reference<ContextPremises> {
 
+	// logger for events
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(RuleApplicationClassConclusionVisitor.class);
+
 	/**
 	 * cached rules for frequent use
 	 */
@@ -77,6 +81,11 @@ public class RuleApplicationClassConclusionVisitor
 	 * {@link ContextPremises} to which the rules are applied
 	 */
 	private final Reference<? extends ContextPremises> premisesRef_;
+
+	/**
+	 * rules applied for context initialization
+	 */
+	private final LinkedContextInitRule contextInitRuleHead_;
 
 	/**
 	 * {@link RuleVisitor} to track rule applications
@@ -89,14 +98,12 @@ public class RuleApplicationClassConclusionVisitor
 	 */
 	final ClassInferenceProducer producer;
 
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(RuleApplicationClassConclusionVisitor.class);
-
 	public RuleApplicationClassConclusionVisitor(
 			Reference<? extends ContextPremises> premisesRef,
+			LinkedContextInitRule contextInitRuleHead,
 			RuleVisitor<?> ruleAppVisitor, ClassInferenceProducer producer) {
 		this.premisesRef_ = premisesRef;
+		this.contextInitRuleHead_ = contextInitRuleHead;
 		this.ruleAppVisitor = ruleAppVisitor;
 		this.producer = producer;
 	}
@@ -107,7 +114,7 @@ public class RuleApplicationClassConclusionVisitor
 		throw new RuntimeException(
 				"Rules for " + conclusion + " not implemented!");
 	}
-	
+
 	@Override
 	public ContextPremises get() {
 		return premisesRef_.get();
@@ -132,7 +139,7 @@ public class RuleApplicationClassConclusionVisitor
 
 	@Override
 	public Boolean visit(ContextInitialization conclusion) {
-		LinkedContextInitRule rule = conclusion.getContextInitRuleHead();
+		LinkedContextInitRule rule = contextInitRuleHead_;
 		LOGGER_.trace("applying init rules:");
 		while (rule != null) {
 			LOGGER_.trace("init rule: {}", rule);

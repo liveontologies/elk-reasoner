@@ -35,7 +35,6 @@ import org.semanticweb.elk.reasoner.indexing.classes.DummyIndexedClassExpression
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
-import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContextInitializationNoPremises;
@@ -124,14 +123,12 @@ public class IncrementalDeletionInitializationStage
 			}
 		};
 
-		OntologyIndex index = reasoner.saturationState.getOntologyIndex();
-
 		for (IndexedClassExpression ice : reasoner.ontologyIndex
 				.getRemovedClassExpressions()) {
 
 			if (reasoner.saturationState.getContext(ice) != null) {
-				satStateWriter.produce(
-						new ContextInitializationNoPremises(ice, index));
+				satStateWriter
+						.produce(new ContextInitializationNoPremises(ice));
 				// mark removed classes
 				ice.accept(entityRemovalVisitor);
 			}

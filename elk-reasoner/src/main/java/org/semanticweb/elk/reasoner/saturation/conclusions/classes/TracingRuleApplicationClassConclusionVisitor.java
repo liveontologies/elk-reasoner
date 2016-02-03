@@ -72,7 +72,9 @@ public class TracingRuleApplicationClassConclusionVisitor
 		this.hybridPremisesRef_ = new HybrridContextPremises(localPremisesRef,
 				mainState);
 		this.localRuleApplicator_ = new RuleApplicationClassConclusionVisitor(
-				hybridPremisesRef_, RuleVisitors.getTracingVisitor(ruleVisitor),
+				hybridPremisesRef_,
+				mainState.getOntologyIndex().getContextInitRuleHead(),
+				RuleVisitors.getTracingVisitor(ruleVisitor),
 				conclusionProducer);
 	}
 

@@ -26,7 +26,6 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 
 /**
@@ -38,9 +37,8 @@ public class ContextInitializationNoPremises
 		extends
 			AbstractContextInitializationInference {
 
-	public ContextInitializationNoPremises(IndexedContextRoot root,
-			OntologyIndex ontologyIndex) {
-		super(root, ontologyIndex);
+	public ContextInitializationNoPremises(IndexedContextRoot root) {
+		super(root);
 	}
 
 	@Override
@@ -50,8 +48,7 @@ public class ContextInitializationNoPremises
 
 	public ContextInitialization getConclusion(
 			ContextInitialization.Factory factory) {
-		return factory.getContextInitialization(getDestination(),
-				getOntologyIndex());
+		return factory.getContextInitialization(getDestination());
 	}
 
 	@Override

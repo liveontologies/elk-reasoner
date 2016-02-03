@@ -83,7 +83,10 @@ public class RuleApplicationAdditionUnSaturationFactory
 												localStatistics),
 								// apply rules
 								new RuleApplicationClassConclusionVisitor(
-										activeContext, ruleVisitor, writer))),
+										activeContext,
+										getSaturationState().getOntologyIndex()
+												.getContextInitRuleHead(),
+										ruleVisitor, writer))),
 						localStatistics));
 	}
 }

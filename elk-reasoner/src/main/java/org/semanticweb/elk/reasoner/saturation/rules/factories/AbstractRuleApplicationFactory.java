@@ -86,9 +86,9 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 			ClassInference.Visitor<Boolean> inferenceProcessor,
 			SaturationStateWriter<? extends C> saturationStateWriter,
 			WorkerLocalTodo localTodo, SaturationStatistics localStatistics) {
-		return new BasicRuleEngine<I>(saturationState_.getOntologyIndex(),
-				activeContext, inferenceProcessor, localTodo, this,
-				saturationStateWriter, aggregatedStats_, localStatistics);
+		return new BasicRuleEngine<I>(activeContext, inferenceProcessor,
+				localTodo, this, saturationStateWriter, aggregatedStats_,
+				localStatistics);
 	}
 
 	/**

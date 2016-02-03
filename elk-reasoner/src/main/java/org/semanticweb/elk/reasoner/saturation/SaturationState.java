@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * Represents the state of saturation containing information about
- * {@link Context}s and their assignment to roots {@link IndexedClassExpression}
+ * {@link Context}s and their assignment to {@link IndexedContextRoot}
  * 
  * @author Pavel Klinov
  * 

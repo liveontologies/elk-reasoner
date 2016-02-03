@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 import org.semanticweb.elk.Reference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
@@ -56,14 +55,10 @@ public class ContextInitializingClassConclusionInsertionVisitor
 	 */
 	private final ClassInferenceProducer producer_;
 
-	private final OntologyIndex index_;
-
 	public ContextInitializingClassConclusionInsertionVisitor(
-			Reference<Context> contextRef,
-			SaturationStateWriter<?> writer) {
+			Reference<Context> contextRef, SaturationStateWriter<?> writer) {
 		super(contextRef, writer);
 		this.producer_ = writer;
-		this.index_ = writer.getSaturationState().getOntologyIndex();
 	}
 
 	@Override
@@ -71,7 +66,7 @@ public class ContextInitializingClassConclusionInsertionVisitor
 		Context context = get();
 		IndexedContextRoot root = context.getRoot();
 		if (context.isEmpty()) {
-			producer_.produce(new ContextInitializationNoPremises(root, index_));
+			producer_.produce(new ContextInitializationNoPremises(root));
 		}
 		if (conclusion instanceof SubClassConclusion) {
 			IndexedObjectProperty subRoot = ((SubClassConclusion) conclusion)

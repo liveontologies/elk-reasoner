@@ -90,7 +90,10 @@ public class RuleApplicationAdditionFactory<I extends RuleApplicationInput>
 												localStatistics),
 								// and apply all rules
 								new RuleApplicationClassConclusionVisitor(
-										activeContext, ruleVisitor, writer)),
+										activeContext,
+										getSaturationState().getOntologyIndex()
+												.getContextInitRuleHead(),
+										ruleVisitor, writer)),
 						localStatistics));
 	}
 }

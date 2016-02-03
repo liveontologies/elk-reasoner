@@ -23,10 +23,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
  */
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 
 /**
  * An implementation of {@link ContextInitialization}.
@@ -37,23 +35,8 @@ public class ContextInitializationImpl extends AbstractClassConclusion
 		implements
 			ContextInitialization {
 
-	// actually we just need only context initialization rules,
-	// but they can change after creating this object
-	private final OntologyIndex ontologyIndex_;
-
-	protected ContextInitializationImpl(IndexedContextRoot root,
-			OntologyIndex ontologyIndex) {
+	protected ContextInitializationImpl(IndexedContextRoot root) {
 		super(root);
-		this.ontologyIndex_ = ontologyIndex;
-	}
-
-	protected OntologyIndex getOntologyIndex() {
-		return ontologyIndex_;
-	}
-
-	@Override
-	public LinkedContextInitRule getContextInitRuleHead() {
-		return ontologyIndex_.getContextInitRuleHead();
 	}
 
 	@Override

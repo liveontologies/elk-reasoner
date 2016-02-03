@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ContextInitializationImpl;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
@@ -33,9 +32,8 @@ public abstract class AbstractContextInitializationInference
 		implements
 			ContextInitializationInference {
 
-	protected AbstractContextInitializationInference(IndexedContextRoot root,
-			OntologyIndex ontologyIndex) {
-		super(root, ontologyIndex);
+	protected AbstractContextInitializationInference(IndexedContextRoot root) {
+		super(root);
 	}
 
 	@Override

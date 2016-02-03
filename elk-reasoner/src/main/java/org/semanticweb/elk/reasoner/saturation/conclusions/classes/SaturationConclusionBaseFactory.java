@@ -29,7 +29,6 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
@@ -55,8 +54,8 @@ public class SaturationConclusionBaseFactory
 
 	@Override
 	public ContextInitialization getContextInitialization(
-			IndexedContextRoot root, OntologyIndex ontologyIndex) {
-		return new ContextInitializationImpl(root, ontologyIndex);
+			IndexedContextRoot root) {
+		return new ContextInitializationImpl(root);
 	}
 
 	@Override

@@ -39,7 +39,6 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
@@ -75,9 +74,9 @@ public class ConclusionBaseFactory implements Conclusion.Factory {
 
 	@Override
 	public ContextInitialization getContextInitialization(
-			IndexedContextRoot root, OntologyIndex ontologyIndex) {
-		return filter(saturationConclusionFactory_
-				.getContextInitialization(root, ontologyIndex));
+			IndexedContextRoot root) {
+		return filter(
+				saturationConclusionFactory_.getContextInitialization(root));
 	}
 
 	@Override

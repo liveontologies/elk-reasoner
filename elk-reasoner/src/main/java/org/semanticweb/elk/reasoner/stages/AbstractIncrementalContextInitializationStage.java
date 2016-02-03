@@ -96,8 +96,7 @@ abstract class AbstractIncrementalContextInitializationStage
 			IndexedContextRoot root = todo.next();
 
 			if (reasoner.saturationState.getContext(root) != null) {
-				writer_.produce(new ContextInitializationNoPremises(root,
-						reasoner.saturationState.getOntologyIndex()));
+				writer_.produce(new ContextInitializationNoPremises(root));
 			}
 
 			initContexts++;

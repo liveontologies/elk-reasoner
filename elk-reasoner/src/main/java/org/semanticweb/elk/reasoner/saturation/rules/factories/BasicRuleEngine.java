@@ -41,16 +41,13 @@ public class BasicRuleEngine<I extends RuleApplicationInput>
 		extends
 			AbstractRuleEngineWithStatistics<I> {
 
-	private final OntologyIndex index_;
-
 	/**
 	 * a {@link SaturationStateWriter} to produce new {@link ClassInference}s
 	 * and query for active {@link Context}s
 	 */
 	private final SaturationStateWriter<?> writer_;
 
-	protected BasicRuleEngine(OntologyIndex index,
-			ModifiableReference<Context> activeContext,
+	protected BasicRuleEngine(ModifiableReference<Context> activeContext,
 			ClassInference.Visitor<Boolean> inferenceProcessor,
 			WorkerLocalTodo localTodo, Interrupter interrupter,
 			SaturationStateWriter<?> writer,
@@ -58,14 +55,12 @@ public class BasicRuleEngine<I extends RuleApplicationInput>
 			SaturationStatistics localStatistics) {
 		super(activeContext, inferenceProcessor, localTodo, interrupter,
 				aggregatedStatistics, localStatistics);
-		this.index_ = index;
 		this.writer_ = writer;
 	}
 
 	@Override
 	public void submit(RuleApplicationInput job) {
-		writer_.produce(
-				new ContextInitializationNoPremises(job.getRoot(), index_));
+		writer_.produce(new ContextInitializationNoPremises(job.getRoot()));
 	}
 
 	@Override

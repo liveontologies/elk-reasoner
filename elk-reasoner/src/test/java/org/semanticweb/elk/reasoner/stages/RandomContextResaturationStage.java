@@ -35,7 +35,6 @@ import java.util.Set;
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationNoInput;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
@@ -75,7 +74,8 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 		// TODO: it seems like this stage cannot be currently interrupted
 
 		// first, pick random class expressions
-		List<IndexedClassExpression> contexts = pickRandomContexts(RandomSeedProvider.VALUE);
+		List<IndexedClassExpression> contexts = pickRandomContexts(
+				RandomSeedProvider.VALUE);
 		// init them for deletions
 		initContexts(contexts);
 		// and now clean then up
@@ -107,12 +107,11 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 	}
 
 	private void initContexts(Collection<IndexedClassExpression> roots) {
-		OntologyIndex index = reasoner.saturationState.getOntologyIndex();
 		SaturationStateWriter<?> writer = reasoner.saturationState
 				.getContextCreatingWriter();
 		for (IndexedClassExpression root : roots) {
 			if (reasoner.saturationState.getContext(root) != null)
-				writer.produce(new ContextInitializationNoPremises(root, index));
+				writer.produce(new ContextInitializationNoPremises(root));
 		}
 	}
 
