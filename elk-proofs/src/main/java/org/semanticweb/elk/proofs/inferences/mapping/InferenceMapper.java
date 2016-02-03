@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.DummyClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.properties.inferences.AbstractObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.DummyObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.tracing.RecursiveTraceUnwinder;
 import org.slf4j.Logger;
@@ -108,7 +108,7 @@ public class InferenceMapper {
 						// or it can be ignored
 						return false;
 					}
-				}, new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
+				}, new DummyObjectPropertyInferenceVisitor<Void, Boolean>() {
 
 					@Override
 					protected Boolean defaultTracedVisit(
@@ -135,7 +135,7 @@ public class InferenceMapper {
 				exprFactory_);
 
 		unwinder_.accept(conclusion,
-				new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
+				new DummyObjectPropertyInferenceVisitor<Void, Boolean>() {
 
 					@Override
 					protected Boolean defaultTracedVisit(

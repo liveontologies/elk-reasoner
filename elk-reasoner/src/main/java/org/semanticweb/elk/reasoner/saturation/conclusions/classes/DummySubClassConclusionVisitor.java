@@ -28,18 +28,28 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassConclus
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
 
 /**
- * A skeleton for implementation of {@link SubClassConclusion.Visitor}s using a common
- * (default) method
+ * A {@link SubClassConclusion.Visitor} that always returns {@code null}s. Can
+ * be used as prototype to implement other visitors by overriding the
+ * corresponding (default) methods.
  * 
  * @author "Yevgeny Kazakov"
  * 
  * @param <O>
  *            the type of output parameter with which this visitor works
  */
-public abstract class AbstractSubClassConclusionVisitor<O> implements
-		SubClassConclusion.Visitor<O> {
+public class DummySubClassConclusionVisitor<O>
+		implements
+			SubClassConclusion.Visitor<O> {
 
-	abstract O defaultVisit(SubClassConclusion subConclusion);
+	/**
+	 * The default implementation of all methods
+	 * 
+	 * @param subConclusion
+	 * @return
+	 */
+	protected O defaultVisit(SubClassConclusion subConclusion) {
+		return null;
+	}
 
 	@Override
 	public O visit(BackwardLink subConclusion) {

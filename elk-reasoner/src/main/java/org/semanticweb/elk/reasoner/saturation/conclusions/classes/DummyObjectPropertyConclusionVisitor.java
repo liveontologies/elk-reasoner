@@ -2,13 +2,14 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
+
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,18 +26,40 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.PropertyRange;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 
 /**
+ * An {@link ObjectPropertyConclusion.Visitor} that always returns {@code null}
+ * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
+ * 
+ * @author Yevgeny Kazakov
  */
-public class DummyObjectPropertyConclusionVisitor<O> extends
-		AbstractObjectPropertyConclusionVisitor<O> {
+public class DummyObjectPropertyConclusionVisitor<O>
+		implements
+			ObjectPropertyConclusion.Visitor<O> {
 
-	@Override
+	/**
+	 * The default implementation of all methods
+	 * 
+	 * @param conclusion
+	 * @return
+	 */
 	protected O defaultVisit(ObjectPropertyConclusion conclusion) {
 		return null;
+	}
+
+	@Override
+	public O visit(PropertyRange conclusion) {
+		return defaultVisit(conclusion);
+	}
+
+	@Override
+	public O visit(SubPropertyChain conclusion) {
+		return defaultVisit(conclusion);
 	}
 
 }

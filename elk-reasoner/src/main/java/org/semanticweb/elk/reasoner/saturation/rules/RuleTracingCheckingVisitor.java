@@ -25,8 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 
 /**
- * A {@link RuleVisitor} that returns {@code true} for local {@link Rule}s for
- * which {@link Rule#isTracing()} returns {@code true}, regardless of all other
+ * A {@link RuleVisitor} that returns {@code true} for {@link Rule}s for which
+ * {@link Rule#isTracing()} returns {@code true}, regardless of all other
  * parameters
  * 
  * @author "Yevgeny Kazakov"
@@ -34,11 +34,11 @@ import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
  * @see Rule#isTracing()
  *
  */
-public class RuleTracingCheckingVisitor extends AbstractRuleVisitor<Boolean> {
+public class RuleTracingCheckingVisitor extends DummyRuleVisitor<Boolean> {
 
 	@Override
-	<P> Boolean defaultVisit(Rule<P> rule, P premise, ContextPremises premises,
-			ClassInferenceProducer producer) {
+	protected <P> Boolean defaultVisit(Rule<P> rule, P premise,
+			ContextPremises premises, ClassInferenceProducer producer) {
 		return rule.isTracing();
 	}
 

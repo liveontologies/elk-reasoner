@@ -55,7 +55,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitors;
  */
 public class TracingRuleApplicationClassConclusionVisitor
 		extends
-			AbstractClassConclusionVisitor<Boolean> {
+			DummyClassConclusionVisitor<Boolean> {
 
 	private final HybrridContextPremises hybridPremisesRef_;
 

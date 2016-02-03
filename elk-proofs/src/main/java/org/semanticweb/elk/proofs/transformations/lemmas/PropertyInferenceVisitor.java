@@ -34,7 +34,7 @@ import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.properties.inferences.AbstractObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.DummyObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.tracing.SideConditionLookup;
 
@@ -46,7 +46,7 @@ import org.semanticweb.elk.reasoner.tracing.SideConditionLookup;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-abstract class PropertyInferenceVisitor extends AbstractObjectPropertyInferenceVisitor<AxiomExpression<ElkSubObjectPropertyOfAxiom>, Inference> {
+abstract class PropertyInferenceVisitor extends DummyObjectPropertyInferenceVisitor<AxiomExpression<ElkSubObjectPropertyOfAxiom>, Inference> {
 	
 	private final ElkObjectFactory elkFactory_ = new ElkObjectFactoryImpl();
 	

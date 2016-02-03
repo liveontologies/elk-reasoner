@@ -30,22 +30,23 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
- * A {@link ClassConclusion.Visitor} that marks the {@link Context} for the
- * origin of the visited {@link ClassConclusion} as not saturated if the
- * {@link ClassConclusion} can potentially be re-derived. The visit method
- * returns always {@link true}.
+ * A {@link ClassConclusion.Visitor} that marks the {@link Context} for the root
+ * returned by {@link ClassConclusion#getTraceRoot()} for the visited
+ * {@link ClassConclusion}s as not saturated if the {@link ClassConclusion} can
+ * potentially be re-derived. The visit method returns always {@link true}.
  * 
  * @see ClassConclusion#getTraceRoot()
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ClassConclusionOriginContextUnsaturationVisitor extends
-		AbstractClassConclusionVisitor<Boolean> {
+public class ClassConclusionTracingContextUnsaturationVisitor
+		extends
+			DummyClassConclusionVisitor<Boolean> {
 
 	private final SaturationStateWriter<?> writer_;
 
-	public ClassConclusionOriginContextUnsaturationVisitor(
+	public ClassConclusionTracingContextUnsaturationVisitor(
 			SaturationStateWriter<?> writer) {
 		this.writer_ = writer;
 	}
@@ -57,12 +58,13 @@ public class ClassConclusionOriginContextUnsaturationVisitor extends
 	}
 
 	Boolean defaultVisit(SubClassInclusion conclusion) {
-		// if the super-class does not occur in the ontology anymore, it cannot be
+		// if the super-class does not occur in the ontology anymore, it cannot
+		// be
 		// re-derived, and thus, the context should not be modified
 		// TODO: extend this check to other types of conclusions
 		if (conclusion.getSuperExpression().occurs()) {
 			return defaultVisit((ClassConclusion) conclusion);
-		}	
+		}
 		return true;
 	}
 

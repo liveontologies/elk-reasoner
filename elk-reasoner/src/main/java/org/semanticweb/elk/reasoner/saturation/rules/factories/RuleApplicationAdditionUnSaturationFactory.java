@@ -27,7 +27,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionOriginContextUnsaturationVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionTracingContextUnsaturationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ContextInitializingClassConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.RuleApplicationClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
@@ -74,7 +74,7 @@ public class RuleApplicationAdditionUnSaturationFactory
 										activeContext, writer),
 								// if new, mark the source context as
 								// unsaturated
-								new ClassConclusionOriginContextUnsaturationVisitor(
+								new ClassConclusionTracingContextUnsaturationVisitor(
 										writer),
 								// count conclusions used in the rules, if
 								// necessary

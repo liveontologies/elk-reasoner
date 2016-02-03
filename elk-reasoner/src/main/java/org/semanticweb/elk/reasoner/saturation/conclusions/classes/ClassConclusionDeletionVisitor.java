@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  */
 public class ClassConclusionDeletionVisitor extends
-		AbstractClassConclusionVisitor<Boolean> {
+		DummyClassConclusionVisitor<Boolean> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory

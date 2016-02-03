@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
-import org.semanticweb.elk.reasoner.saturation.properties.inferences.AbstractObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.DummyObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.RightReflexiveSubPropertyChainInference;
@@ -51,7 +51,7 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.ToldSubProp
  * 			pavel.klinov@uni-ulm.de
  *
  */
-class LemmaFreePropertyInferenceFactory extends AbstractObjectPropertyInferenceVisitor<AxiomExpression<ElkSubObjectPropertyOfAxiom>, Inference> {
+class LemmaFreePropertyInferenceFactory extends DummyObjectPropertyInferenceVisitor<AxiomExpression<ElkSubObjectPropertyOfAxiom>, Inference> {
 	
 	private final AxiomExpression<ElkSubObjectPropertyOfAxiom> expr_;
 	

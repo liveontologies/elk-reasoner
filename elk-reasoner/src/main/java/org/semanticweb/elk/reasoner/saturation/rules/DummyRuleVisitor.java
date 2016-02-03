@@ -1,11 +1,4 @@
-/**
- * 
- */
 package org.semanticweb.elk.reasoner.saturation.rules;
-
-import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /*
  * #%L
@@ -13,7 +6,7 @@ import org.slf4j.LoggerFactory;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,26 +22,265 @@ import org.slf4j.LoggerFactory;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectComplementOf;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectHasSelf;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectIntersectionOf;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.BackwardLinkChainFromBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ContradictionOverBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradictionCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.BackwardLinkFromForwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBackwardLinkCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.propagations.SubsumerPropagationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ComposedFromDecomposedSubsumerRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassFromDefinitionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectHasSelfDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSomeValuesFromDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromFirstConjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromSecondConjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
- * A {@link RuleVisitor} which does nothing
- * 
- * @see BasicRuleVisitor
+ * A {@link RuleVisitor} that always returns {@code null} and prints that the
+ * rules are ignored to the logger.
  * 
  * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the type of output parameter with which this visitor works
  */
-public class DummyRuleVisitor extends AbstractRuleVisitor<Void> {
+public class DummyRuleVisitor<O> implements RuleVisitor<O> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(DummyRuleVisitor.class);
 
-	@Override
-	<P> Void defaultVisit(Rule<P> rule, P premise, ContextPremises premises,
-			ClassInferenceProducer producer) {
+	/**
+	 * The default implementation of all methods
+	 * 
+	 * @param rule
+	 * @param premise
+	 * @param premises
+	 * @param producer
+	 * @return
+	 */
+	protected <P> O defaultVisit(Rule<P> rule, P premise,
+			ContextPremises premises, ClassInferenceProducer producer) {
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace("ignore {} by {} in {}", premise, rule, premises);
 		}
 		return null;
+	}
+
+	@Override
+	public O visit(BackwardLinkChainFromBackwardLinkRule rule,
+			BackwardLink premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(BackwardLinkFromForwardLinkRule rule, ForwardLink premise,
+			ContextPremises premises, ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(ComposedFromDecomposedSubsumerRule rule,
+			IndexedClassEntity premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(ContradictionCompositionRule rule, DisjointSubsumer premise,
+			ContextPremises premises, ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+
+	}
+
+	@Override
+	public O visit(ContradictionFromNegationRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(ContradictionFromOwlNothingRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(ContradictionOverBackwardLinkRule rule, BackwardLink premise,
+			ContextPremises premises, ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(ContradictionPropagationRule rule, Contradiction premise,
+			ContextPremises premises, ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+
+	}
+
+	@Override
+	public O visit(DisjointSubsumerFromMemberRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(IndexedClassDecompositionRule rule, IndexedClass premise,
+			ContextPremises premises, ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(IndexedClassFromDefinitionRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(IndexedObjectComplementOfDecomposition rule,
+			IndexedObjectComplementOf premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(IndexedObjectHasSelfDecomposition rule,
+			IndexedObjectHasSelf premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(IndexedObjectIntersectionOfDecomposition rule,
+			IndexedObjectIntersectionOf premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(IndexedObjectSomeValuesFromDecomposition rule,
+			IndexedObjectSomeValuesFrom premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(NonReflexiveBackwardLinkCompositionRule rule,
+			ForwardLink premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(ObjectIntersectionFromFirstConjunctRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(ObjectIntersectionFromSecondConjunctRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(ObjectUnionFromDisjunctRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(OwlThingContextInitRule rule, ContextInitialization premise,
+			ContextPremises premises, ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(PropagationFromExistentialFillerRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(PropagationInitializationRule rule,
+			SubContextInitialization premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(ReflexiveBackwardLinkCompositionRule rule,
+			ForwardLink premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+
+	}
+
+	@Override
+	public O visit(RootContextInitializationRule rule,
+			ContextInitialization premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(SubsumerBackwardLinkRule rule, BackwardLink premise,
+			ContextPremises premises, ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(SubsumerPropagationRule rule, Propagation premise,
+			ContextPremises premises, ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(SuperClassFromSubClassRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		return defaultVisit(rule, premise, premises, producer);
 	}
 
 }

@@ -32,28 +32,30 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ClassConclusion.Visitor} that checks if the {@link Context} for the
- * origin root f the {@link ClassConclusion} is not saturated, and reports an
- * error otherwise. Should be used for debugging.
+ * root returned by {@link ClassConclusion#getTraceRoot()} for the visited
+ * {@link ClassConclusion}s is not saturated, and reports an error otherwise.
+ * Should be used for debugging.
  * 
  * @see ClassConclusion#getTraceRoot()
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ClassConclusionOriginContextNotSaturatedCheckingVisitor extends
-		AbstractClassConclusionVisitor<Boolean> implements Reference<Context> {
+public class ClassConclusionTracingContextNotSaturatedCheckingVisitor
+		extends
+			DummyClassConclusionVisitor<Boolean>
+		implements Reference<Context> {
 
 	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ClassConclusionOriginContextNotSaturatedCheckingVisitor.class);
+	private static final Logger LOGGER_ = LoggerFactory.getLogger(
+			ClassConclusionTracingContextNotSaturatedCheckingVisitor.class);
 
 	private final Reference<Context> contextRef_;
-	
+
 	private final SaturationState<?> state_;
 
-	public ClassConclusionOriginContextNotSaturatedCheckingVisitor(
-			Reference<Context> context,
-			SaturationState<?> state) {
+	public ClassConclusionTracingContextNotSaturatedCheckingVisitor(
+			Reference<Context> context, SaturationState<?> state) {
 		this.contextRef_ = context;
 		this.state_ = state;
 	}
@@ -62,9 +64,9 @@ public class ClassConclusionOriginContextNotSaturatedCheckingVisitor extends
 	public Context get() {
 		return contextRef_.get();
 	}
-	
+
 	@Override
-	Boolean defaultVisit(SubClassConclusion subConclusion) {
+	protected Boolean defaultVisit(SubClassConclusion subConclusion) {
 		// ignore sub-conclusions
 		return true;
 	}
@@ -73,11 +75,10 @@ public class ClassConclusionOriginContextNotSaturatedCheckingVisitor extends
 	protected Boolean defaultVisit(ClassConclusion conclusion) {
 		Context originContext = state_.getContext(conclusion.getTraceRoot());
 		if (originContext.isInitialized() && originContext.isSaturated()) {
-			LOGGER_.error(
-					"{}: adding conclusion {} to saturated context {}",
-					contextRef_,
-					conclusion,
-					get().containsConclusion(conclusion) ? "(it is already there)"
+			LOGGER_.error("{}: adding conclusion {} to saturated context {}",
+					contextRef_, conclusion,
+					get().containsConclusion(conclusion)
+							? "(it is already there)"
 							: "");
 		}
 		return true;

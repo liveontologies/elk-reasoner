@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ClassConclusionInsertionVisitor
 		extends
-			AbstractClassConclusionVisitor<Boolean> implements Reference<Context> {
+			DummyClassConclusionVisitor<Boolean> implements Reference<Context> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory

@@ -1,6 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
 import org.semanticweb.elk.Reference;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 
 /*
  * #%L
@@ -47,43 +48,69 @@ import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBac
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.SubsumerPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SubsumerDecompositionVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link ClassConclusion.Visitor} that applies inference rules for the visited
- * {@link ClassConclusion}s using the provided {@link RuleVisitor} to apply rules and
- * {@link ClassInferenceProducer} to output the {@link ClassConclusion}s of the applied
- * rules. The methods always return {@link true}.
+ * A {@link ClassConclusion.Visitor} that applies inference rules for the
+ * visited {@link ClassConclusion}s using the provided {@link RuleVisitor} to
+ * apply rules and {@link ClassInferenceProducer} to output the
+ * {@link ClassConclusion}s of the applied rules. The methods always return
+ * {@link true}.
  * 
  * @author "Yevgeny Kazakov"
  */
-public class RuleApplicationClassConclusionVisitor extends
-		AbstractRuleApplicationClassConclusionVisitor {
-
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(RuleApplicationClassConclusionVisitor.class);
+public class RuleApplicationClassConclusionVisitor
+		extends
+			DummyClassConclusionVisitor<Boolean>
+		implements
+			Reference<ContextPremises> {
 
 	/**
 	 * cached rules for frequent use
 	 */
 	private static ContradictionCompositionRule CONTRADICTION_COMPOSITION_RULE_ = new ContradictionCompositionRule();
 
-	
-	
+	/**
+	 * {@link ContextPremises} to which the rules are applied
+	 */
+	private final Reference<? extends ContextPremises> premisesRef_;
+
+	/**
+	 * {@link RuleVisitor} to track rule applications
+	 */
+	final RuleVisitor<?> ruleAppVisitor;
+
+	/**
+	 * {@link ClassInferenceProducer} to produce the {@link ClassConclusion}s of
+	 * the applied rules
+	 */
+	final ClassInferenceProducer producer;
+
+	// logger for events
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(RuleApplicationClassConclusionVisitor.class);
+
 	public RuleApplicationClassConclusionVisitor(
 			Reference<? extends ContextPremises> premisesRef,
-			RuleVisitor<?> ruleAppVisitor,
-			ClassInferenceProducer producer) {
-		super(premisesRef, ruleAppVisitor, producer);
+			RuleVisitor<?> ruleAppVisitor, ClassInferenceProducer producer) {
+		this.premisesRef_ = premisesRef;
+		this.ruleAppVisitor = ruleAppVisitor;
+		this.producer = producer;
 	}
 
 	@Override
 	protected Boolean defaultVisit(ClassConclusion conclusion) {
 		// all methods should be explicitly implemented
-		throw new RuntimeException("Rules for " + conclusion
-				+ " not implemented!");
+		throw new RuntimeException(
+				"Rules for " + conclusion + " not implemented!");
+	}
+	
+	@Override
+	public ContextPremises get() {
+		return premisesRef_.get();
 	}
 
 	@Override
@@ -100,32 +127,6 @@ public class RuleApplicationClassConclusionVisitor extends
 					producer);
 			backLinkRule = backLinkRule.next();
 		}
-		return true;
-	}
-
-	@Override
-	public Boolean visit(Propagation subConclusion) {
-		// propagate over non-reflexive backward links
-		ruleAppVisitor.visit(SubsumerPropagationRule.getInstance(),
-				subConclusion, get(), producer);
-		return true;
-	}
-
-	@Override
-	public Boolean visit(SubContextInitialization subConclusion) {
-		ContextPremises premises = get();
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("{}::{} applying sub-concept init rules:",
-					premises.getRoot(), subConclusion.getDestinationSubRoot());
-		}
-		PropagationInitializationRule.getInstance().accept(ruleAppVisitor,
-				subConclusion, premises, producer);
-		return true;
-	}
-
-	@Override
-	public Boolean visit(SubClassInclusionComposed conclusion) {
-		applyCompositionRules(conclusion);
 		return true;
 	}
 
@@ -149,15 +150,9 @@ public class RuleApplicationClassConclusionVisitor extends
 	}
 
 	@Override
-	public Boolean visit(SubClassInclusionDecomposed conclusion) {
-		applyDecompositionRules(conclusion);
-		return true;
-	}
-
-	@Override
 	public Boolean visit(DisjointSubsumer conclusion) {
-		ruleAppVisitor.visit(CONTRADICTION_COMPOSITION_RULE_, conclusion,
-				get(), producer);
+		ruleAppVisitor.visit(CONTRADICTION_COMPOSITION_RULE_, conclusion, get(),
+				producer);
 		return true;
 	}
 
@@ -175,6 +170,45 @@ public class RuleApplicationClassConclusionVisitor extends
 		ruleAppVisitor.visit(
 				ReflexiveBackwardLinkCompositionRule.getRuleFor(conclusion),
 				conclusion, premises, producer);
+		return true;
+	}
+
+	@Override
+	public Boolean visit(Propagation subConclusion) {
+		// propagate over non-reflexive backward links
+		ruleAppVisitor.visit(SubsumerPropagationRule.getInstance(),
+				subConclusion, get(), producer);
+		return true;
+	}
+
+	@Override
+	public Boolean visit(SubClassInclusionComposed conclusion) {
+		IndexedClassExpression subsumer = conclusion.getSuperExpression();
+		LinkedSubsumerRule compositionRule = subsumer.getCompositionRuleHead();
+		while (compositionRule != null) {
+			compositionRule.accept(ruleAppVisitor, subsumer, get(), producer);
+			compositionRule = compositionRule.next();
+		}
+		return true;
+	}
+
+	@Override
+	public Boolean visit(SubClassInclusionDecomposed conclusion) {
+		IndexedClassExpression subsumer = conclusion.getSuperExpression();
+		subsumer.accept(new SubsumerDecompositionVisitor(ruleAppVisitor, get(),
+				producer));
+		return true;
+	}
+
+	@Override
+	public Boolean visit(SubContextInitialization subConclusion) {
+		ContextPremises premises = get();
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("{}::{} applying sub-concept init rules:",
+					premises.getRoot(), subConclusion.getDestinationSubRoot());
+		}
+		PropagationInitializationRule.getInstance().accept(ruleAppVisitor,
+				subConclusion, premises, producer);
 		return true;
 	}
 

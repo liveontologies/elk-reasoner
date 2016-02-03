@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  */
 public class ClassConclusionOccurrenceCheckingVisitor extends
-		AbstractClassConclusionVisitor<Boolean> {
+		DummyClassConclusionVisitor<Boolean> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
