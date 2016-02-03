@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 
 /**
@@ -47,6 +48,11 @@ public class SubClassInclusionOwlThing
 	@Override
 	public IndexedContextRoot getOrigin() {
 		return getDestination();
+	}
+	
+	public ContextInitialization getPremise(
+			ContextInitialization.Factory factory) {
+		return factory.getContextInitialization(getOrigin());
 	}
 
 	@Override

@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 
 /**
@@ -60,13 +61,19 @@ public class PropagationGenerated extends AbstractPropagationInference {
 		return getDestination();
 	}
 
-	public SubClassInclusionComposed getFirstPremise(
+	public SubContextInitialization getFirstPremise(
+			SubContextInitialization.Factory factory) {
+		return factory.getSubContextInitialization(getDestination(),
+				getDestinationSubRoot());
+	}
+	
+	public SubClassInclusionComposed getSecondPremise(
 			SubClassInclusionComposed.Factory factory) {
 		return factory.getSubClassInclusionComposed(getOrigin(),
 				getCarry().getFiller());
 	}
 
-	public SubPropertyChain getSecondPremise(SubPropertyChain.Factory factory) {
+	public SubPropertyChain getThirdPremise(SubPropertyChain.Factory factory) {
 		return factory.getSubPropertyChain(getRelation(),
 				getCarry().getProperty());
 	}

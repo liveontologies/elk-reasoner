@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.indexing.classes.DummyIndexedContextRootVisi
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedRangeFiller;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 
 /**
@@ -70,6 +71,11 @@ public class SubClassInclusionTautology
 	@Override
 	public IndexedContextRoot getOrigin() {
 		return getDestination();
+	}
+	
+	public ContextInitialization getPremise(
+			ContextInitialization.Factory factory) {
+		return factory.getContextInitialization(getOrigin());
 	}
 
 	@Override

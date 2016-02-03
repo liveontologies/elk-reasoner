@@ -142,7 +142,7 @@ public class InferencePrinter
 	@Override
 	public String visit(PropagationGenerated inference) {
 		return "Creating propagation from "
-				+ inference.getFirstPremise(factory_);
+				+ inference.getSecondPremise(factory_);
 	}
 
 	@Override

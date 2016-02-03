@@ -75,7 +75,7 @@ public class TracingTestUtils {
 		}
 
 	};
-	
+
 	private static final SaturationConclusion.Factory FACTORY_ = new SaturationConclusionBaseFactory();
 
 	static ClassConclusion getConclusionToTrace(Context context,
@@ -95,8 +95,8 @@ public class TracingTestUtils {
 
 	public static void checkTracingCompleteness(ElkClassExpression sub,
 			ElkClassExpression sup, Reasoner reasoner) {
-		IndexedClassExpression subsumee = ReasonerStateAccessor.transform(
-				reasoner, sub);
+		IndexedClassExpression subsumee = ReasonerStateAccessor
+				.transform(reasoner, sub);
 		ClassConclusion subsumer = getConclusionToTrace(
 				ReasonerStateAccessor.getContext(reasoner, subsumee),
 				ReasonerStateAccessor.transform(reasoner, sup));
@@ -117,7 +117,8 @@ public class TracingTestUtils {
 		explorer.accept(subsumer, counter);
 	}
 
-	public static void checkTracingOfInconsistencyCompleteness(Reasoner reasoner) {
+	public static void checkTracingOfInconsistencyCompleteness(
+			Reasoner reasoner) {
 		IndexedClassEntity entity = ReasonerStateAccessor
 				.getInconsistentEntity(reasoner);
 
@@ -155,8 +156,8 @@ public class TracingTestUtils {
 				ReasonerStateAccessor.getContext(reasoner, subsumee),
 				ReasonerStateAccessor.transform(reasoner, sup));
 		int actual = 0;
-		for (Inference ignore : ReasonerStateAccessor.getTraceState(
-				reasoner).getInferences(conclusion)) {
+		for (Inference ignore : ReasonerStateAccessor.getTraceState(reasoner)
+				.getInferences(conclusion)) {
 			actual++;
 		}
 		assertEquals(expected, actual);
@@ -168,15 +169,14 @@ public class TracingTestUtils {
 	 */
 	public static void checkNumberOfInferences(ElkObjectProperty sub,
 			ElkObjectProperty sup, Reasoner reasoner, int expected) {
-		final IndexedObjectProperty subsumee = ReasonerStateAccessor.transform(
-				reasoner, sub);
-		final IndexedObjectProperty subsumer = ReasonerStateAccessor.transform(
-				reasoner, sup);
-		ObjectPropertyConclusion conclusion = FACTORY_.getSubPropertyChain(
-				subsumee, subsumer);
+		final IndexedObjectProperty subsumee = ReasonerStateAccessor
+				.transform(reasoner, sub);
+		final IndexedObjectProperty subsumer = ReasonerStateAccessor
+				.transform(reasoner, sup);
+		ObjectPropertyConclusion conclusion = FACTORY_
+				.getSubPropertyChain(subsumee, subsumer);
 		int actual = 0;
-		for (Inference ignore : ReasonerStateAccessor
-				.getTraceState(reasoner)
+		for (Inference ignore : ReasonerStateAccessor.getTraceState(reasoner)
 				.getInferences(conclusion)) {
 			actual++;
 		}
@@ -189,10 +189,8 @@ public class TracingTestUtils {
 	 * 
 	 * TODO Generalize this to look for multiple inferences in the trace.
 	 */
-	public static void checkConditionOverUsedInferences(
-			ElkClassExpression sub,
-			ElkClassExpression sup,
-			Reasoner reasoner,
+	public static void checkConditionOverUsedInferences(ElkClassExpression sub,
+			ElkClassExpression sup, Reasoner reasoner,
 			final Inference.Visitor<Boolean> inferenceVisitor) {
 		final IndexedClassExpression subsumee = ReasonerStateAccessor
 				.transform(reasoner, sub);
@@ -202,23 +200,21 @@ public class TracingTestUtils {
 		final MutableBoolean inferenceCondition = new MutableBoolean(false);
 		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
 
-		new TestTraceUnwinder(traceState, UNTRACED_LISTENER)
-				.accept(conclusion,
-						new DummyInferenceChecker() {
+		new TestTraceUnwinder(traceState, UNTRACED_LISTENER).accept(conclusion,
+				new DummyInferenceChecker() {
 
-							@Override
-							protected Boolean defaultVisit(
-									Inference inference) {
-								inferenceCondition.or(inference.accept(
-										inferenceVisitor));
+					@Override
+					protected Boolean defaultVisit(Inference inference) {
+						inferenceCondition
+								.or(inference.accept(inferenceVisitor));
 
-								return true;
-							}
+						return true;
+					}
 
-						});
+				});
 
 		assertTrue("The condition didn't succeed on any used inference",
-				inferenceCondition.get());		
+				inferenceCondition.get());
 	}
 
 	/*
@@ -232,31 +228,27 @@ public class TracingTestUtils {
 				ReasonerStateAccessor.getContext(reasoner, subsumee),
 				ReasonerStateAccessor.transform(reasoner, sup));
 		Inference.Visitor<?> sideConditionVisitor = new InferencePremiseVisitor<Void>(
-				new ConclusionBaseFactory() {
-					@SuppressWarnings("static-method")
-					protected <C extends Conclusion> C filter(C newConclusion) {
-						if (newConclusion instanceof IndexedAxiom) {
-							sideConditions.add(
-									((IndexedAxiom) newConclusion).getOriginalAxiom());
-						}
-						return newConclusion;
+				new ConclusionBaseFactory(),
+				new DummyConclusionVisitor<Void>() {
+					@Override
+					protected Void defaultVisit(IndexedAxiom newConclusion) {
+						sideConditions.add(newConclusion.getOriginalAxiom());
+						return null;
 					}
 				}, new DummyElkAxiomVisitor<Void>());
 
-		for (Inference inference : ReasonerStateAccessor.getTraceState(
-				reasoner).getInferences(conclusion)) {
+		for (Inference inference : ReasonerStateAccessor.getTraceState(reasoner)
+				.getInferences(conclusion)) {
 			inference.accept(sideConditionVisitor);
 		}
 
 		return sideConditions;
 	}
 
-	public static void visitInferences(
-			ElkClassExpression sub,
-			ElkClassExpression sup,
-			Reasoner reasoner,
+	public static void visitInferences(ElkClassExpression sub,
+			ElkClassExpression sup, Reasoner reasoner,
 			final Inference.Visitor<Boolean> inferenceVisitor)
-			throws ElkException {
+					throws ElkException {
 		final IndexedClassExpression subsumee = ReasonerStateAccessor
 				.transform(reasoner, sub);
 		ClassConclusion conclusion = getConclusionToTrace(
@@ -270,10 +262,9 @@ public class TracingTestUtils {
 		traceUnwinder.accept(conclusion, inferenceVisitor);
 	}
 
-	public static void visitInferencesForInconsistency(
-			Reasoner reasoner,
+	public static void visitInferencesForInconsistency(Reasoner reasoner,
 			final Inference.Visitor<Boolean> inferenceVisitor)
-			throws ElkException {
+					throws ElkException {
 		IndexedClassEntity entity = ReasonerStateAccessor
 				.getInconsistentEntity(reasoner);
 
@@ -301,7 +292,7 @@ public class TracingTestUtils {
 		}
 
 	}
-	
+
 	static final Inference.Visitor<Boolean> DUMMY_INFERENCE_CHECKER = new DummyInferenceChecker();
-	
+
 }

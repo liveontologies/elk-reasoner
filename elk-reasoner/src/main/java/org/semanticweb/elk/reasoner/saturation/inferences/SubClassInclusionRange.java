@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedRangeFiller;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.PropertyRange;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 
@@ -50,7 +51,12 @@ public class SubClassInclusionRange
 		return (IndexedRangeFiller) getDestination();
 	}
 
-	public PropertyRange getPremise(PropertyRange.Factory factory) {
+	public ContextInitialization getFirstPremise(
+			ContextInitialization.Factory factory) {
+		return factory.getContextInitialization(getOrigin());
+	}
+
+	public PropertyRange getSecondPremise(PropertyRange.Factory factory) {
 		return factory.getPropertyRange(getOrigin().getProperty(),
 				getSuperExpression());
 	}

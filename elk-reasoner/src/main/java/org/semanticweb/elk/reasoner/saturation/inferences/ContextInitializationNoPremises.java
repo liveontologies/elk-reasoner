@@ -43,7 +43,7 @@ public class ContextInitializationNoPremises
 
 	@Override
 	public IndexedContextRoot getOrigin() {
-		return getDestination();
+		return null;
 	}
 
 	public ContextInitialization getConclusion(

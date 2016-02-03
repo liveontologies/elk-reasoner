@@ -61,16 +61,14 @@ public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 		addToQueue(conclusion, seenInferences);
 		// this visitor visits all premises and putting them into the todo queue
 		InferencePremiseVisitor<?> premiseVisitor = new InferencePremiseVisitor<Void>(
-				new ConclusionBaseFactory() {
+				new ConclusionBaseFactory(),
+				new DummyConclusionVisitor<Void>() {
 					@Override
-					protected <C extends Conclusion> C filter(C newConclusion) {
+					protected Void defaultVisit(Conclusion newConclusion) {
 						addToQueue(newConclusion, seenInferences);
-						return newConclusion;
+						return null;
 					}
-
-				}, new DummyElkAxiomVisitor<Void>()
-
-		);
+				}, new DummyElkAxiomVisitor<Void>());
 
 		for (;;) {
 			// take the first element

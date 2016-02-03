@@ -82,9 +82,10 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubProperty
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainTautology;
 
 /**
- * Creates all {@link Conclusion}s for premises of the visited {@link Inference}
- * s using the provided {@link Conclusion.Factory} and visits all
- * {@link ElkAxiom} side conditions using the provided {@link ElkAxiomVisitor}
+ * Creates all {@link Conclusion} premises of the visited {@link Inference}s
+ * using the provided {@link Conclusion.Factory} and visits them using the
+ * provided {@link Conclusion.Visitor}; additionally, visits all
+ * {@link ElkAxiom} premises using the provided {@link ElkAxiomVisitor}
  * 
  * @author Pavel Klinov
  * 
@@ -94,49 +95,58 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubProperty
  */
 public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 
-	private final ElkAxiomVisitor<?> axiomVisitor_;
-
 	private final Conclusion.Factory conclusionFactory_;
 
+	private final Conclusion.Visitor<?> conclusionVisitor_;
+
+	private final ElkAxiomVisitor<?> axiomVisitor_;
+
 	public InferencePremiseVisitor(Conclusion.Factory conclusionFactory,
+			Conclusion.Visitor<?> conclusionVisitor,
 			ElkAxiomVisitor<?> axiomVisitor) {
 		this.conclusionFactory_ = conclusionFactory;
+		this.conclusionVisitor_ = conclusionVisitor;
 		this.axiomVisitor_ = axiomVisitor;
 	}
 
 	@Override
 	public O visit(BackwardLinkComposition inference) {
-		inference.getFirstPremise(conclusionFactory_);
-		inference.getSecondPremise(conclusionFactory_);
-		inference.getThirdPremise(conclusionFactory_);
-		inference.getFourthPremise(conclusionFactory_);
-		inference.getSideCondition(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
+		conclusionVisitor_
+				.visit(inference.getSecondPremise(conclusionFactory_));
+		conclusionVisitor_.visit(inference.getThirdPremise(conclusionFactory_));
+		conclusionVisitor_
+				.visit(inference.getFourthPremise(conclusionFactory_));
+		conclusionVisitor_
+				.visit(inference.getSideCondition(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(BackwardLinkOfObjectHasSelf inference) {
-		inference.getPremise(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getPremise(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(BackwardLinkOfObjectSomeValuesFrom inference) {
-		inference.getPremise(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getPremise(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(BackwardLinkReversed inference) {
-		inference.getPremise(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getPremise(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(BackwardLinkReversedExpanded inference) {
-		inference.getFirstPremise(conclusionFactory_);
-		inference.getSecondPremise(conclusionFactory_);
-		inference.getSideCondition(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
+		conclusionVisitor_
+				.visit(inference.getSecondPremise(conclusionFactory_));
+		conclusionVisitor_
+				.visit(inference.getSideCondition(conclusionFactory_));
 		return null;
 	}
 
@@ -148,35 +158,39 @@ public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 
 	@Override
 	public O visit(ContradictionOfDisjointSubsumers inference) {
-		inference.getFirstPremise(conclusionFactory_);
-		inference.getSecondPremise(conclusionFactory_);
-		inference.getSideCondition(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
+		conclusionVisitor_
+				.visit(inference.getSecondPremise(conclusionFactory_));
+		conclusionVisitor_
+				.visit(inference.getSideCondition(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(ContradictionOfObjectComplementOf inference) {
-		inference.getFirstPremise(conclusionFactory_);
-		inference.getSecondPremise(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
+		conclusionVisitor_
+				.visit(inference.getSecondPremise(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(ContradictionOfOwlNothing inference) {
-		inference.getPremise(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getPremise(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(ContradictionPropagated inference) {
-		inference.getFirstPremise(conclusionFactory_);
-		inference.getSecondPremise(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
+		conclusionVisitor_
+				.visit(inference.getSecondPremise(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(DisjointSubsumerFromSubsumer inference) {
-		inference.getPremise(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getPremise(conclusionFactory_));
 		return null;
 	}
 
@@ -308,119 +322,133 @@ public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 
 	@Override
 	public O visit(ForwardLinkComposition inference) {
-		inference.getFirstPremise(conclusionFactory_);
-		inference.getSecondPremise(conclusionFactory_);
-		inference.getThirdPremise(conclusionFactory_);
-		inference.getFourthPremise(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
+		conclusionVisitor_
+				.visit(inference.getSecondPremise(conclusionFactory_));
+		conclusionVisitor_.visit(inference.getThirdPremise(conclusionFactory_));
+		conclusionVisitor_
+				.visit(inference.getFourthPremise(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(ForwardLinkOfObjectHasSelf inference) {
-		inference.getPremise(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getPremise(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(ForwardLinkOfObjectSomeValuesFrom inference) {
-		inference.getPremise(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getPremise(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(PropagationGenerated inference) {
-		inference.getFirstPremise(conclusionFactory_);
-		inference.getSecondPremise(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
+		conclusionVisitor_
+				.visit(inference.getSecondPremise(conclusionFactory_));
+		conclusionVisitor_.visit(inference.getThirdPremise(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(PropertyRangeInherited inference) {
-		inference.getPremise(conclusionFactory_);
-		inference.getSideCondition(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getPremise(conclusionFactory_));
+		conclusionVisitor_
+				.visit(inference.getSideCondition(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(SubClassInclusionComposedDefinedClass inference) {
-		inference.getPremise(conclusionFactory_);
-		inference.getSideCondition(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getPremise(conclusionFactory_));
+		conclusionVisitor_
+				.visit(inference.getSideCondition(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(SubClassInclusionComposedEntity inference) {
-		inference.getPremise(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getPremise(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(SubClassInclusionComposedObjectIntersectionOf inference) {
-		inference.getFirstPremise(conclusionFactory_);
-		inference.getSecondPremise(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
+		conclusionVisitor_
+				.visit(inference.getSecondPremise(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(SubClassInclusionComposedObjectSomeValuesFrom inference) {
-		inference.getFirstPremise(conclusionFactory_);
-		inference.getSecondPremise(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
+		conclusionVisitor_
+				.visit(inference.getSecondPremise(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(SubClassInclusionComposedObjectUnionOf inference) {
-		inference.getPremise(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getPremise(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(SubClassInclusionDecomposedFirstConjunct inference) {
-		inference.getPremise(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getPremise(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(SubClassInclusionDecomposedSecondConjunct inference) {
-		inference.getPremise(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getPremise(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(SubClassInclusionExpandedDefinition inference) {
-		inference.getPremise(conclusionFactory_);
-		inference.getSideCondition(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getPremise(conclusionFactory_));
+		conclusionVisitor_
+				.visit(inference.getSideCondition(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(SubClassInclusionExpandedSubClassOf inference) {
-		inference.getPremise(conclusionFactory_);
-		inference.getSideCondition(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getPremise(conclusionFactory_));
+		conclusionVisitor_
+				.visit(inference.getSideCondition(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(SubClassInclusionObjectHasSelfPropertyRange inference) {
-		inference.getFirstPremise(conclusionFactory_);
-		inference.getSecondPremise(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
+		conclusionVisitor_
+				.visit(inference.getSecondPremise(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(SubClassInclusionOwlThing inference) {
-		// no premises
+		conclusionVisitor_.visit(inference.getPremise(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(SubClassInclusionRange inference) {
-		inference.getPremise(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
+		conclusionVisitor_
+				.visit(inference.getSecondPremise(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(SubClassInclusionTautology inference) {
+		conclusionVisitor_.visit(inference.getPremise(conclusionFactory_));
 		return null;
 	}
 
@@ -432,8 +460,9 @@ public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 
 	@Override
 	public O visit(SubPropertyChainExpandedSubObjectPropertyOf inference) {
-		inference.getPremise(conclusionFactory_);
-		inference.getSideCondition(conclusionFactory_);
+		conclusionVisitor_.visit(inference.getPremise(conclusionFactory_));
+		conclusionVisitor_
+				.visit(inference.getSideCondition(conclusionFactory_));
 		return null;
 	}
 
