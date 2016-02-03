@@ -34,6 +34,8 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
@@ -62,9 +64,10 @@ class ContextInitializationFactory extends SimpleInterrupter
 			.getLogger(ContextInitializationFactory.class);
 
 	private final SaturationState<?> saturationState_;
+	private final ContextInitialization.Factory contextInitFactory_;
 	private final IndexedClassExpression[] changedComposedSubsumers_;
 	private final IndexedClass[] changedDecomposedSubsumers_;
-	private final LinkedContextInitRule changedGlobalRuleHead_;
+	private final LinkedContextInitRule changedContextInitRuleHead_;
 	private final Map<? extends IndexedClassExpression, ? extends LinkedSubsumerRule> changedCompositionRules_;
 	private AtomicInteger compositionRuleHits_ = new AtomicInteger(0);
 	private AtomicInteger decompositionRuleHits_ = new AtomicInteger(0);
@@ -73,13 +76,14 @@ class ContextInitializationFactory extends SimpleInterrupter
 	private final SubsumerDecompositionRule<IndexedClass> classDecomposition_;
 
 	public ContextInitializationFactory(SaturationState<?> state,
-			LinkedContextInitRule changedGlobalRuleHead,
+			LinkedContextInitRule changedContextInitRuleHead,
 			Map<? extends IndexedClassExpression, ? extends LinkedSubsumerRule> changedCompositionRules,
 			final Map<? extends IndexedClass, ? extends IndexedClassExpression> changedDefinitions,
 			final Map<? extends IndexedClass, ? extends ElkAxiom> changedDefinitionReasons,
 			SaturationStatistics stageStats) {
 
 		saturationState_ = state;
+		contextInitFactory_ = new SaturationConclusionBaseFactory();
 		changedCompositionRules_ = changedCompositionRules;
 		changedComposedSubsumers_ = new IndexedClassExpression[changedCompositionRules
 				.keySet().size()];
@@ -87,7 +91,7 @@ class ContextInitializationFactory extends SimpleInterrupter
 		changedDecomposedSubsumers_ = new IndexedClass[changedDefinitions
 				.keySet().size()];
 		changedDefinitions.keySet().toArray(changedDecomposedSubsumers_);
-		changedGlobalRuleHead_ = changedGlobalRuleHead;
+		changedContextInitRuleHead_ = changedContextInitRuleHead;
 		stageStatistics_ = stageStats;
 
 		classDecomposition_ = new IndexedClassDecompositionRule() {
@@ -132,15 +136,15 @@ class ContextInitializationFactory extends SimpleInterrupter
 			@Override
 			public void process(Context context) {
 				// apply all changed context initialization rules
-				// TODO: do the initialization using the context initialization
-				// conclusion
-				LinkedContextInitRule nextGlobalRule = changedGlobalRuleHead_;
-				while (nextGlobalRule != null) {
+				ContextInitialization contextInit = contextInitFactory_
+						.getContextInitialization(context.getRoot());
+				LinkedContextInitRule nextContextInitRule = changedContextInitRuleHead_;
+				while (nextContextInitRule != null) {
 					LOGGER_.trace("{}: applying rule {}", context,
-							nextGlobalRule);
-					nextGlobalRule.accept(ruleAppVisitor, null, context,
+							nextContextInitRule);
+					nextContextInitRule.accept(ruleAppVisitor, contextInit, context,
 							saturationStateWriter);
-					nextGlobalRule = nextGlobalRule.next();
+					nextContextInitRule = nextContextInitRule.next();
 				}
 				// apply all changed composition rules for composed subsumers
 				Set<IndexedClassExpression> composedSubsumers = context
