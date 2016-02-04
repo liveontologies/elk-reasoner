@@ -1,0 +1,17 @@
+Prefix(different: = <http://example.org/different#>)
+Prefix(same1: = <http://example.org/same#>)
+Prefix(same2: = <http://example.org/same#>)
+
+Prefix(rdf: = <http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs: = <http://www.w3.org/2000/01/rdf-schema#>)
+Prefix(xsd: = <http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl: = <http://www.w3.org/2002/07/owl#>)
+
+Ontology(
+
+SameIndividual(<http://example.org/same#a> same2:b)
+ClassAssertion(different:A <http://example.org/same#a>)
+ClassAssertion(different:B different:a)
+ClassAssertion(different:C <http://example.org/same#c>)
+
+)

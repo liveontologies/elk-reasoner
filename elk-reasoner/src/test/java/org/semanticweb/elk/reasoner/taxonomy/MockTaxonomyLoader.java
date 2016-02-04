@@ -180,7 +180,9 @@ public class MockTaxonomyLoader {
 					superNode = taxonomy.getCreateTypeNode(Collections
 							.singleton(superClass));
 
-					subNode.addDirectParent(superNode);
+					if (!subNode.equals(superNode)) {
+						subNode.addDirectParent(superNode);
+					}
 				}
 			}
 
