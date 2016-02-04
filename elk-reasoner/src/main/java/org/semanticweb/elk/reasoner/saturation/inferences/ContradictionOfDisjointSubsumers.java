@@ -92,7 +92,7 @@ public class ContradictionOfDisjointSubsumers extends
 				disjointExpressions_, secondPosition_, reason_);
 	}
 	
-	public IndexedDisjointClassesAxiom getSideCondition(
+	public IndexedDisjointClassesAxiom getThirdPremise(
 			IndexedDisjointClassesAxiom.Factory factory) {
 		return factory.getIndexedDisjointClassesAxiom(reason_,
 				disjointExpressions_);

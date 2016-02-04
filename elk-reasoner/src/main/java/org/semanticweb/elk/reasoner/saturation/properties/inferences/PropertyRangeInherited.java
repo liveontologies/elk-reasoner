@@ -67,7 +67,7 @@ public class PropertyRangeInherited extends AbstractPropertyRangeInference {
 		return this.reason_;
 	}
 
-	public SubPropertyChain getPremise(SubPropertyChain.Factory factory) {
+	public SubPropertyChain getFirstPremise(SubPropertyChain.Factory factory) {
 		return factory.getSubPropertyChain(getProperty(), getSuperProperty());
 	}
 
@@ -75,7 +75,7 @@ public class PropertyRangeInherited extends AbstractPropertyRangeInference {
 		return factory.getPropertyRange(getProperty(), getRange());
 	}
 
-	public IndexedObjectPropertyRangeAxiom getSideCondition(
+	public IndexedObjectPropertyRangeAxiom getSecondPremise(
 			IndexedObjectPropertyRangeAxiom.Factory factory) {
 		return factory.getIndexedObjectPropertyRangeAxiom(reason_,
 				getSuperProperty(), getRange());

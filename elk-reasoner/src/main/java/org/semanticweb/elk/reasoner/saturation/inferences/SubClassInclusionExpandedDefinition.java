@@ -63,13 +63,13 @@ public class SubClassInclusionExpandedDefinition
 		return this.reason_;
 	}
 
-	public SubClassInclusionDecomposed getPremise(
+	public SubClassInclusionDecomposed getFirstPremise(
 			SubClassInclusionDecomposed.Factory factory) {
 		return factory.getSubClassInclusionDecomposed(getOrigin(),
 				defined_);
 	}
 
-	public IndexedDefinitionAxiom getSideCondition(
+	public IndexedDefinitionAxiom getSecondPremise(
 			IndexedDefinitionAxiom.Factory factory) {
 		return factory.getIndexedDefinitionAxiom(reason_, defined_,
 				getSuperExpression());

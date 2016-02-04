@@ -29,7 +29,6 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 
 /**
  * A {@link BackwardLink} obtained from a {@link ForwardLink} with chain
@@ -40,7 +39,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
  * @author "Yevgeny Kazakov"
  * 
  */
-public class BackwardLinkReversedExpanded extends AbstractBackwardLinkInference {
+public class BackwardLinkReversedExpanded
+		extends
+			AbstractBackwardLinkInference {
 
 	/**
 	 * The sub chain of the property of this link that occurs in the premise
@@ -69,31 +70,26 @@ public class BackwardLinkReversedExpanded extends AbstractBackwardLinkInference 
 	public IndexedPropertyChain getSubChain() {
 		return this.subChain_;
 	}
-	
+
 	public ElkAxiom getReason() {
 		return this.reason_;
 	}
 
 	public ForwardLink getFirstPremise(ForwardLink.Factory factory) {
-		return factory.getForwardLink(getOrigin(), subChain_,
-				getDestination());
+		return factory.getForwardLink(getOrigin(), subChain_, getDestination());
 	}
-	
-	public IndexedSubObjectPropertyOfAxiom getSideCondition(
+
+	public IndexedSubObjectPropertyOfAxiom getSecondPremise(
 			IndexedSubObjectPropertyOfAxiom.Factory factory) {
 		return factory.getIndexedSubObjectPropertyOfAxiom(reason_, subChain_,
 				getBackwardRelation());
-	}
-
-	public SubPropertyChain getSecondPremise(SubPropertyChain.Factory factory) {
-		return factory.getSubPropertyChain(subChain_, getBackwardRelation());
 	}
 
 	@Override
 	public final <O> O accept(BackwardLinkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	/**
 	 * Visitor pattern for instances
 	 * 
@@ -101,9 +97,9 @@ public class BackwardLinkReversedExpanded extends AbstractBackwardLinkInference 
 	 *
 	 */
 	public static interface Visitor<O> {
-		
+
 		public O visit(BackwardLinkReversedExpanded inference);
-		
+
 	}
 
 }

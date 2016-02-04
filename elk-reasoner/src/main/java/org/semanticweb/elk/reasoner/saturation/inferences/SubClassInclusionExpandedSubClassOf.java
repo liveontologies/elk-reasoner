@@ -72,13 +72,13 @@ public class SubClassInclusionExpandedSubClassOf
 		return getDestination();
 	}
 
-	public SubClassInclusionComposed getPremise(
+	public SubClassInclusionComposed getFirstPremise(
 			SubClassInclusionComposed.Factory factory) {
 		return factory.getSubClassInclusionComposed(getOrigin(),
 				premiseSubsumer_);
 	}
 
-	public IndexedSubClassOfAxiom getSideCondition(
+	public IndexedSubClassOfAxiom getSecondPremise(
 			IndexedSubClassOfAxiom.Factory factory) {
 		return factory.getIndexedSubClassOfAxiom(reason_, premiseSubsumer_,
 				getSuperExpression());

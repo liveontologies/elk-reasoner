@@ -98,7 +98,7 @@ public class PropertyInferenceTracingTest {
 						// checking that S -> HH is in the trace (i.e. is used)
 						return inference.getSubChain().equals(s) && 
 								inference.getSuperChain().equals(hh) &&
-								inference.getPremise(FACTORY_).getSubChain().equals(r);
+								inference.getFirstPremise(FACTORY_).getSubChain().equals(r);
 					}
 			
 				});

@@ -3,38 +3,18 @@
  */
 package org.semanticweb.elk.reasoner.saturation.inferences;
 
-/*
- * #%L
- * ELK Reasoner
- * $Id:$
- * $HeadURL:$
- * %%
- * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
-
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.PropertyRangeInherited;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainExpandedSubObjectPropertyOf;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainTautology;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
+import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 
 /**
+ * TODO: improve and extend to all inferences
+ * 
  * A utility to pretty-print {@link ClassInference}s.
  * 
  * @author Pavel Klinov
@@ -47,15 +27,15 @@ public class InferencePrinter
 			ObjectPropertyInference.Visitor<String> {
 
 	private static InferencePrinter DEFAULT_PRINTER_ = new InferencePrinter(
-			new SaturationConclusionBaseFactory());
+			new ConclusionBaseFactory());
 
 	public static String print(ClassInference inference) {
 		return inference.accept(DEFAULT_PRINTER_);
 	}
 
-	private final SaturationConclusion.Factory factory_;
+	private final Conclusion.Factory factory_;
 
-	public InferencePrinter(SaturationConclusion.Factory factory) {
+	public InferencePrinter(Conclusion.Factory factory) {
 		this.factory_ = factory;
 	}
 
@@ -149,14 +129,14 @@ public class InferencePrinter
 	public String visit(PropertyRangeInherited inference) {
 		return "Property Range Inherited (" + inference.getProperty() + " : "
 				+ inference.getRange() + ", premise: "
-				+ inference.getPremise(factory_) + ", reason: "
+				+ inference.getFirstPremise(factory_) + ", reason: "
 				+ inference.getReason();
 	}
 
 	@Override
 	public String visit(SubClassInclusionComposedDefinedClass inference) {
 		return "Composed definition " + inference.getSuperExpression()
-				+ " from " + inference.getPremise(factory_);
+				+ " from " + inference.getFirstPremise(factory_);
 	}
 
 	@Override
@@ -201,12 +181,12 @@ public class InferencePrinter
 	@Override
 	public String visit(SubClassInclusionExpandedDefinition inference) {
 		return "Decomposed definition " + inference.getSuperExpression()
-				+ " of " + inference.getPremise(factory_);
+				+ " of " + inference.getFirstPremise(factory_);
 	}
 
 	@Override
 	public String visit(SubClassInclusionExpandedSubClassOf inference) {
-		return "SubClassOf( " + inference.getPremise(factory_) + " "
+		return "SubClassOf( " + inference.getFirstPremise(factory_) + " "
 				+ inference.getSuperExpression() + " )";
 	}
 
@@ -242,7 +222,7 @@ public class InferencePrinter
 	public String visit(SubPropertyChainExpandedSubObjectPropertyOf inference) {
 		return "Expanded sub-chain: " + inference.getSubChain() + " => "
 				+ inference.getSuperChain() + ", premise: "
-				+ inference.getPremise(factory_) + ", reason: "
+				+ inference.getFirstPremise(factory_) + ", reason: "
 				+ inference.getReason();
 	}
 

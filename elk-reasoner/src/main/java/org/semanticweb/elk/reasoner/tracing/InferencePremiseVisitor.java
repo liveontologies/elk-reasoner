@@ -117,8 +117,7 @@ public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 		conclusionVisitor_.visit(inference.getThirdPremise(conclusionFactory_));
 		conclusionVisitor_
 				.visit(inference.getFourthPremise(conclusionFactory_));
-		conclusionVisitor_
-				.visit(inference.getSideCondition(conclusionFactory_));
+		conclusionVisitor_.visit(inference.getFifthPremise(conclusionFactory_));
 		return null;
 	}
 
@@ -145,8 +144,6 @@ public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
 		conclusionVisitor_
 				.visit(inference.getSecondPremise(conclusionFactory_));
-		conclusionVisitor_
-				.visit(inference.getSideCondition(conclusionFactory_));
 		return null;
 	}
 
@@ -161,8 +158,7 @@ public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
 		conclusionVisitor_
 				.visit(inference.getSecondPremise(conclusionFactory_));
-		conclusionVisitor_
-				.visit(inference.getSideCondition(conclusionFactory_));
+		conclusionVisitor_.visit(inference.getThirdPremise(conclusionFactory_));
 		return null;
 	}
 
@@ -354,17 +350,17 @@ public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 
 	@Override
 	public O visit(PropertyRangeInherited inference) {
-		conclusionVisitor_.visit(inference.getPremise(conclusionFactory_));
+		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
 		conclusionVisitor_
-				.visit(inference.getSideCondition(conclusionFactory_));
+				.visit(inference.getSecondPremise(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(SubClassInclusionComposedDefinedClass inference) {
-		conclusionVisitor_.visit(inference.getPremise(conclusionFactory_));
+		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
 		conclusionVisitor_
-				.visit(inference.getSideCondition(conclusionFactory_));
+				.visit(inference.getSecondPremise(conclusionFactory_));
 		return null;
 	}
 
@@ -410,17 +406,17 @@ public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 
 	@Override
 	public O visit(SubClassInclusionExpandedDefinition inference) {
-		conclusionVisitor_.visit(inference.getPremise(conclusionFactory_));
+		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
 		conclusionVisitor_
-				.visit(inference.getSideCondition(conclusionFactory_));
+				.visit(inference.getSecondPremise(conclusionFactory_));
 		return null;
 	}
 
 	@Override
 	public O visit(SubClassInclusionExpandedSubClassOf inference) {
-		conclusionVisitor_.visit(inference.getPremise(conclusionFactory_));
+		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
 		conclusionVisitor_
-				.visit(inference.getSideCondition(conclusionFactory_));
+				.visit(inference.getSecondPremise(conclusionFactory_));
 		return null;
 	}
 
@@ -460,9 +456,9 @@ public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 
 	@Override
 	public O visit(SubPropertyChainExpandedSubObjectPropertyOf inference) {
-		conclusionVisitor_.visit(inference.getPremise(conclusionFactory_));
+		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
 		conclusionVisitor_
-				.visit(inference.getSideCondition(conclusionFactory_));
+				.visit(inference.getSecondPremise(conclusionFactory_));
 		return null;
 	}
 

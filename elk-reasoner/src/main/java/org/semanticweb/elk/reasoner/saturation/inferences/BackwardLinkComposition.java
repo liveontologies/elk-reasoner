@@ -123,7 +123,7 @@ public class BackwardLinkComposition extends AbstractBackwardLinkInference
 				composition_.getSuffixChain());
 	}
 
-	public IndexedSubObjectPropertyOfAxiom getSideCondition(
+	public IndexedSubObjectPropertyOfAxiom getFifthPremise(
 			IndexedSubObjectPropertyOfAxiom.Factory factory) {
 		return factory.getIndexedSubObjectPropertyOfAxiom(reason_, composition_,
 				getBackwardRelation());
