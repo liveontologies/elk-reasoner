@@ -311,7 +311,9 @@ public class ComputationExecutor {
 					}
 					return;				
 				} finally {
-					lock_.unlock();
+					if (lock_.isHeldByCurrentThread()) {
+						lock_.unlock();
+					}
 				}
 				if (workerId_ >= workerThreads_.length) {
 					// this worker is not needed anymore
