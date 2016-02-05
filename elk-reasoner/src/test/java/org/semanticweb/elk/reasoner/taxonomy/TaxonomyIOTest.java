@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.taxonomy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -114,7 +115,8 @@ public class TaxonomyIOTest {
 		 */
 
 		// compare
-		assertEquals(TaxonomyHasher.hash(original), TaxonomyHasher.hash(loaded));
+		assertTrue(TaxonomyHasher.hash(original) == TaxonomyHasher.hash(loaded)
+				&& original.equals(loaded));
 	}
 
 	@Test
@@ -140,8 +142,8 @@ public class TaxonomyIOTest {
 		outWriter.flush();
 
 		// compare
-		assertEquals(InstanceTaxonomyHasher.hash(original),
-				InstanceTaxonomyHasher.hash(loaded));
+		assertTrue(InstanceTaxonomyHasher.hash(original) == InstanceTaxonomyHasher.hash(loaded)
+				&& original.equals(loaded));
 	}
 
 	/*

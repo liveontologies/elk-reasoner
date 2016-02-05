@@ -54,6 +54,7 @@ import org.semanticweb.elk.util.collections.Operations.Condition;
  *         pavel.klinov@uni-ulm.de
  */
 public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
+		extends AbstractInstanceTaxonomy<T, I>
 		implements InstanceTaxonomy<T, I> {
 
 	// Top should be made final, the only problem is inconsistency (when it
@@ -433,7 +434,7 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 			assert this != getBottomNode();
 
 			if (this != getTopNode()) {
-				if (instances.isEmpty()) {
+				if (MockInstanceTaxonomy.this.instanceTypeMap.get(instance).isEmpty()) {
 					instancesWithoutType--;
 				}
 

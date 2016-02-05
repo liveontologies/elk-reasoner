@@ -43,7 +43,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
  * @see OrphanNode
  */
 public class SingletoneTaxonomy<T extends ElkEntity, N extends OrphanNode<T>>
-		implements Taxonomy<T> {
+		extends AbstractTaxonomy<T> {
 
 	final N node;
 

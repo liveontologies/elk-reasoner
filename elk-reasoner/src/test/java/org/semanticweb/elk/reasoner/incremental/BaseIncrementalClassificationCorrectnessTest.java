@@ -82,7 +82,8 @@ public abstract class BaseIncrementalClassificationCorrectnessTest<T>
 		Taxonomy<ElkClass> incremental = incrementalReasoner
 				.getTaxonomyQuietly();
 
-		if (TaxonomyHasher.hash(expected) != TaxonomyHasher.hash(incremental)) {
+		if (TaxonomyHasher.hash(expected) != TaxonomyHasher.hash(incremental)
+				|| !expected.equals(incremental)) {
 			StringWriter writer = new StringWriter();
 
 			try {

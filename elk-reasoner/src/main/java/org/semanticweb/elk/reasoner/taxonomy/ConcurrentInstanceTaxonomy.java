@@ -67,7 +67,9 @@ import org.slf4j.LoggerFactory;
  * @author Markus Kroetzsch
  * @author Pavel Klinov
  */
-public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
+public class ConcurrentInstanceTaxonomy
+		extends AbstractInstanceTaxonomy<ElkClass, ElkNamedIndividual>
+		implements IndividualClassTaxonomy {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory

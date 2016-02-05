@@ -57,7 +57,8 @@ import org.semanticweb.elk.util.collections.Operations.Condition;
  * @author Markus Kroetzsch
  * @author Pavel Klinov
  */
-public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
+public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
+		implements UpdateableTaxonomy<ElkClass> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
