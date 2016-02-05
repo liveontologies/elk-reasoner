@@ -35,7 +35,8 @@ public abstract class AbstractContradictionInference extends ContradictionImpl
 			IndexedContextRoot conclusionRoot) {
 		super(conclusionRoot);
 	}
-	
+
+	@Override
 	public Contradiction getConclusion(Contradiction.Factory factory) {
 		return factory.getContradiction(getDestination());
 	}
@@ -44,17 +45,17 @@ public abstract class AbstractContradictionInference extends ContradictionImpl
 	public int hashCode() {
 		return System.identityHashCode(this);
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		return this == o;
 	}
-	
+
 	@Override
 	public IndexedContextRoot getOrigin() {
 		return getDestination();
 	}
-	
+
 	@Override
 	public final <O> O accept(Inference.Visitor<O> visitor) {
 		return accept((ContradictionInference.Visitor<O>) visitor);
@@ -64,10 +65,10 @@ public abstract class AbstractContradictionInference extends ContradictionImpl
 	public final <O> O accept(SaturationInference.Visitor<O> visitor) {
 		return accept((ContradictionInference.Visitor<O>) visitor);
 	}
-	
+
 	@Override
 	public final <O> O accept(ClassInference.Visitor<O> visitor) {
 		return accept((ContradictionInference.Visitor<O>) visitor);
-	}	
-	
+	}
+
 }

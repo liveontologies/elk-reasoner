@@ -47,7 +47,7 @@ public class ComposedClassInferenceVisitor
 	 * Creates a new {@link ClassInference.Visitor} that combines several given
 	 * {@link ClassInference.Visitor}s. The visit method of the combined visitor
 	 * calls the original {@link ClassInference.Visitor}s in the specified order
-	 * and returns {@link true} for the {@link ClassInference} if and only all
+	 * and returns {@code true} for the {@link ClassInference} if and only all
 	 * of the {@link ClassInference.Visitor}s return {@code true}. The result is
 	 * evaluated lazily, i.e., if some {@link ClassInference.Visitor} returns
 	 * {@code false}, the subsequent {@link ClassInference.Visitor}s are not

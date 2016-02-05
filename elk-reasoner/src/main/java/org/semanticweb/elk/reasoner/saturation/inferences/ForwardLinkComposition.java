@@ -72,7 +72,7 @@ public class ForwardLinkComposition extends
 
 	@Override
 	public IndexedComplexPropertyChain getComposition() {
-		return getForwardChain();
+		return getRelation();
 	}
 
 	@Override

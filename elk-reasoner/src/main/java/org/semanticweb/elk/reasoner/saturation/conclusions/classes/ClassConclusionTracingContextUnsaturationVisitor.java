@@ -62,7 +62,7 @@ public class ClassConclusionTracingContextUnsaturationVisitor
 		// be
 		// re-derived, and thus, the context should not be modified
 		// TODO: extend this check to other types of conclusions
-		if (conclusion.getSuperExpression().occurs()) {
+		if (conclusion.getSubsumer().occurs()) {
 			return defaultVisit((ClassConclusion) conclusion);
 		}
 		return true;

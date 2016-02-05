@@ -72,7 +72,7 @@ public class SubClassInclusionExpandedDefinition
 	public IndexedDefinitionAxiom getSecondPremise(
 			IndexedDefinitionAxiom.Factory factory) {
 		return factory.getIndexedDefinitionAxiom(reason_, defined_,
-				getSuperExpression());
+				getSubsumer());
 	}
 
 	@Override

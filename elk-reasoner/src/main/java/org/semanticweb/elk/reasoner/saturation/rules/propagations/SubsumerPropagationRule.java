@@ -63,7 +63,7 @@ public class SubsumerPropagationRule extends AbstractPropagationRule {
 			ClassInferenceProducer producer) {
 		final Map<IndexedObjectProperty, ? extends SubContextPremises> subContextMap = premises
 				.getSubContextPremisesByObjectProperty();
-		IndexedObjectProperty subRoot = premise.getDestinationSubRoot();
+		IndexedObjectProperty subRoot = premise.getSubDestination();
 		SubContextPremises targets = subContextMap.get(subRoot);
 		for (IndexedContextRoot target : targets.getLinkedRoots()) {
 			producer.produce(new SubClassInclusionComposedObjectSomeValuesFrom(premise, target));

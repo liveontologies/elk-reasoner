@@ -54,14 +54,14 @@ public class SubClassInclusionComposedObjectSomeValuesFrom
 			IndexedContextRoot conclusionRoot) {
 		super(conclusionRoot, premise.getCarry());
 		inferenceRoot_ = premise.getDestination();
-		propagationRelation_ = premise.getRelation();
+		propagationRelation_ = premise.getSubDestination();
 	}
 
 	public SubClassInclusionComposedObjectSomeValuesFrom(BackwardLink premise,
 			IndexedObjectSomeValuesFrom carry) {
 		super(premise.getTraceRoot(), carry);
 		inferenceRoot_ = premise.getDestination();
-		propagationRelation_ = premise.getBackwardRelation();
+		propagationRelation_ = premise.getRelation();
 	}
 
 	public IndexedObjectProperty getPropagationRelation() {
@@ -80,7 +80,7 @@ public class SubClassInclusionComposedObjectSomeValuesFrom
 
 	public Propagation getSecondPremise(Propagation.Factory factory) {
 		return factory.getPropagation(getOrigin(), propagationRelation_,
-				getSuperExpression());
+				getSubsumer());
 	}
 
 	@Override

@@ -37,9 +37,10 @@ public abstract class AbstractBackwardLinkInference extends BackwardLinkImpl
 		super(root, relation, source);
 	}
 
+	@Override
 	public BackwardLink getConclusion(BackwardLink.Factory factory) {
 		return factory.getBackwardLink(getDestination(),
-				getBackwardRelation(), getTraceRoot());
+				getRelation(), getTraceRoot());
 	}
 	
 	@Override

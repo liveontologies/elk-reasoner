@@ -340,7 +340,7 @@ public class ContextImpl implements ExtendedContext {
 		@Override
 		public Boolean visit(BackwardLink subConclusion) {
 			IndexedObjectProperty relation = subConclusion
-					.getBackwardRelation();
+					.getRelation();
 			// make sure that relevant context always exists
 			SubContext subContext = getCreateSubContext(relation);
 			if (subConclusion.getTraceRoot() == root_) {
@@ -357,12 +357,12 @@ public class ContextImpl implements ExtendedContext {
 
 		@Override
 		public Boolean visit(SubClassInclusionComposed conclusion) {
-			return composedSubsumers_.add(conclusion.getSuperExpression());
+			return composedSubsumers_.add(conclusion.getSubsumer());
 		}
 
 		@Override
 		public Boolean visit(SubClassInclusionDecomposed conclusion) {
-			return decomposedSubsumers_.add(conclusion.getSuperExpression());
+			return decomposedSubsumers_.add(conclusion.getSubsumer());
 		}
 
 		@Override
@@ -412,14 +412,14 @@ public class ContextImpl implements ExtendedContext {
 
 		@Override
 		public Boolean visit(Propagation subConclusion) {
-			return getCreateSubContext(subConclusion.getRelation())
+			return getCreateSubContext(subConclusion.getSubDestination())
 					.addSubConclusion(subConclusion);
 		}
 
 		@Override
 		public Boolean visit(SubContextInitialization subConclusion) {
 			return getCreateSubContext(
-					subConclusion.getDestinationSubRoot()).addSubConclusion(
+					subConclusion.getSubDestination()).addSubConclusion(
 					subConclusion);
 		}
 
@@ -433,7 +433,7 @@ public class ContextImpl implements ExtendedContext {
 		public Boolean visit(BackwardLink subConclusion) {
 			boolean changed = false;
 			IndexedObjectProperty relation = subConclusion
-					.getBackwardRelation();
+					.getRelation();
 			SubContext subContext = getCreateSubContext(relation);
 			if (subConclusion.getTraceRoot() == root_) {
 				// link is reflexive
@@ -455,13 +455,13 @@ public class ContextImpl implements ExtendedContext {
 
 		@Override
 		public Boolean visit(SubClassInclusionComposed conclusion) {
-			return composedSubsumers_.remove(conclusion.getSuperExpression());
+			return composedSubsumers_.remove(conclusion.getSubsumer());
 		}
 
 		@Override
 		public Boolean visit(SubClassInclusionDecomposed conclusion) {
 			return decomposedSubsumers_
-					.remove(conclusion.getSuperExpression());
+					.remove(conclusion.getSubsumer());
 		}
 
 		@Override
@@ -506,7 +506,7 @@ public class ContextImpl implements ExtendedContext {
 		@Override
 		public Boolean visit(Propagation subConclusion) {
 			SubContext subContext = getCreateSubContext(subConclusion
-					.getRelation());
+					.getSubDestination());
 			if (subContext == null)
 				return false;
 			// else
@@ -516,7 +516,7 @@ public class ContextImpl implements ExtendedContext {
 		@Override
 		public Boolean visit(SubContextInitialization subConclusion) {
 			SubContext subContext = getCreateSubContext(subConclusion
-					.getDestinationSubRoot());
+					.getSubDestination());
 			if (subContext == null)
 				return false;
 			// else
@@ -534,11 +534,11 @@ public class ContextImpl implements ExtendedContext {
 				// reflexive
 				return reflexiveBackwardLinks_ != null
 						&& reflexiveBackwardLinks_.contains(subConclusion
-								.getBackwardRelation());
+								.getRelation());
 			}
 			// else non-reflexive
 			SubContext subContext = getCreateSubContext(subConclusion
-					.getBackwardRelation());
+					.getRelation());
 			return subContext != null
 					&& subContext.containsSubConclusion(subConclusion);
 		}
@@ -546,13 +546,13 @@ public class ContextImpl implements ExtendedContext {
 		@Override
 		public Boolean visit(SubClassInclusionComposed conclusion) {
 			return composedSubsumers_
-					.contains(conclusion.getSuperExpression());
+					.contains(conclusion.getSubsumer());
 		}
 
 		@Override
 		public Boolean visit(SubClassInclusionDecomposed conclusion) {
 			return decomposedSubsumers_.contains(conclusion
-					.getSuperExpression());
+					.getSubsumer());
 		}
 
 		@Override
@@ -589,7 +589,7 @@ public class ContextImpl implements ExtendedContext {
 		@Override
 		public Boolean visit(Propagation subConclusion) {
 			SubContext subContext = getCreateSubContext(subConclusion
-					.getRelation());
+					.getSubDestination());
 			if (subContext == null)
 				return false;
 			// else
@@ -599,7 +599,7 @@ public class ContextImpl implements ExtendedContext {
 		@Override
 		public Boolean visit(SubContextInitialization subConclusion) {
 			SubContext subContext = getCreateSubContext(subConclusion
-					.getDestinationSubRoot());
+					.getSubDestination());
 			if (subContext == null)
 				return false;
 			// else

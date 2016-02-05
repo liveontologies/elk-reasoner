@@ -41,17 +41,27 @@ public class BackwardLinkImpl extends AbstractSubClassConclusion implements
 	 * the source {@link IndexedContextRoot} of this {@link BackwardLinkImpl};
 	 * the root of the source implies this link.
 	 */
-	private final IndexedContextRoot origin_;
+	private final IndexedContextRoot source_;
 
 	protected BackwardLinkImpl(IndexedContextRoot root,
-			IndexedObjectProperty relation, IndexedContextRoot origin) {
+			IndexedObjectProperty relation, IndexedContextRoot source) {
 		super(root, relation);
-		this.origin_ = origin;
+		this.source_ = source;
 	}
-
+	
+	@Override
+	public IndexedContextRoot getSource() {		
+		return source_;
+	}
+	
+	@Override
+	public IndexedObjectProperty getRelation() {
+		return getSubDestination();
+	}
+	
 	@Override
 	public IndexedContextRoot getTraceRoot() {
-		return origin_;
+		return source_;
 	}
 
 	@Override
@@ -59,10 +69,6 @@ public class BackwardLinkImpl extends AbstractSubClassConclusion implements
 		return null;
 	}
 
-	@Override
-	public IndexedObjectProperty getBackwardRelation() {
-		return getDestinationSubRoot();
-	}
 
 	@Override
 	public <O> O accept(ClassConclusion.Visitor<O> visitor) {
@@ -77,6 +83,6 @@ public class BackwardLinkImpl extends AbstractSubClassConclusion implements
 	@Override
 	public <O> O accept(BackwardLink.Visitor<O> visitor) {
 		return visitor.visit(this);
-	}
+	}	
 
 }

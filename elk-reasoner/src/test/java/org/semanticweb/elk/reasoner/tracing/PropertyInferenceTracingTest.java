@@ -151,7 +151,7 @@ public class PropertyInferenceTracingTest {
 									left.getSuperChain().equals(ssIndexed) &&
 									right.getSubChain().equals(hIndexed) &&
 									right.getSuperChain().equals(hhIndexed) &&
-									conclusion.getForwardChain().equals(sshhIndexed);
+									conclusion.getRelation().equals(sshhIndexed);
 					}
 			
 				});
@@ -175,13 +175,13 @@ public class PropertyInferenceTracingTest {
 					@Override
 					public Boolean visit(BackwardLinkComposition backwardLink) {
 						// check that we use the inference that A <-R- B and B -SS o HH-> D imply A <-T- D  
-						return backwardLink.getBackwardRelation().equals(tIndexed) &&
+						return backwardLink.getRelation().equals(tIndexed) &&
 								backwardLink.getTraceRoot().equals(aIndexed) &&
 								backwardLink.getFirstPremise(FACTORY_).getTraceRoot().equals(aIndexed) &&
-								backwardLink.getFirstPremise(FACTORY_).getBackwardRelation().equals(rIndexed) &&
+								backwardLink.getFirstPremise(FACTORY_).getRelation().equals(rIndexed) &&
 								backwardLink.getThirdPremise(FACTORY_).getTarget().equals(dIndexed) &&
-								backwardLink.getThirdPremise(FACTORY_).getForwardChain().equals(sshhIndexed) &&
-								backwardLink.getBackwardRelation().equals(tIndexed);
+								backwardLink.getThirdPremise(FACTORY_).getRelation().equals(sshhIndexed) &&
+								backwardLink.getRelation().equals(tIndexed);
 					}
 				});
 		TracingTestUtils.checkConditionOverUsedInferences(a, e, reasoner,

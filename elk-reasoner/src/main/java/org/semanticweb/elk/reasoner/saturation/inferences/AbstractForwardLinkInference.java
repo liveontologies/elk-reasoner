@@ -38,8 +38,9 @@ public abstract class AbstractForwardLinkInference<R extends IndexedPropertyChai
 		super(root, relation, target);
 	}
 	
+	@Override
 	public ForwardLink getConclusion(ForwardLink.Factory factory) {
-		return factory.getForwardLink(getDestination(), getForwardChain(),
+		return factory.getForwardLink(getDestination(), getRelation(),
 				getTarget());
 	}
 	

@@ -52,7 +52,7 @@ public class ContradictionPropagated extends AbstractContradictionInference {
 	}
 
 	public ContradictionPropagated(BackwardLink premise) {
-		this(premise.getDestination(), premise.getBackwardRelation(),
+		this(premise.getDestination(), premise.getRelation(),
 				premise.getTraceRoot());
 	}
 

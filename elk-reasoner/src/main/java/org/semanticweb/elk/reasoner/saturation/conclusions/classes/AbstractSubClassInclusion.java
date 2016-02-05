@@ -57,14 +57,9 @@ public abstract class AbstractSubClassInclusion<S extends IndexedClassExpression
 			throw new NullPointerException("Subsumer cannot be null!");
 		this.expression_ = superExpression;
 	}
-
-	@Override
-	public IndexedContextRoot getSubExpression() {
-		return getDestination();
-	}
 	
 	@Override
-	public S getSuperExpression() {
+	public S getSubsumer() {
 		return expression_;
 	}
 

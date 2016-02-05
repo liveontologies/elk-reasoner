@@ -70,7 +70,7 @@ public class SubClassInclusionObjectHasSelfPropertyRange
 
 	public PropertyRange getSecondPremise(PropertyRange.Factory factory) {
 		return factory.getPropertyRange(premiseSubsumer_.getProperty(),
-				getSuperExpression());
+				getSubsumer());
 	}
 
 	@Override

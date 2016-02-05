@@ -31,10 +31,12 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainExpandedSubObjectPropertyOf;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainTautology;
+import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.InferenceProducer;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
@@ -55,6 +57,8 @@ class SubPropertyExplorer {
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(SubPropertyExplorer.class);
+	
+	private static final SubPropertyChain.Factory FACTORY_ = new ConclusionBaseFactory();
 
 	/**
 	 * The element for which the sub-property (chains) are computed
@@ -93,7 +97,8 @@ class SubPropertyExplorer {
 	private void toDo(SubPropertyChainInference inference) {
 		LOGGER_.trace("{}: new inference", inference);
 		inferenceProducer_.produce(inference);
-		IndexedPropertyChain subChain = inference.getSubChain();
+		SubPropertyChain conclusion = inference.getConclusion(FACTORY_);
+		IndexedPropertyChain subChain = conclusion.getSubChain();
 		if (subPropertyChains_.add(subChain)) {
 			if (subChain instanceof IndexedObjectProperty) {
 				IndexedObjectProperty subProperty = (IndexedObjectProperty) subChain;

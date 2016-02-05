@@ -58,7 +58,7 @@ public class SubClassInclusionRange
 
 	public PropertyRange getSecondPremise(PropertyRange.Factory factory) {
 		return factory.getPropertyRange(getOrigin().getProperty(),
-				getSuperExpression());
+				getSubsumer());
 	}
 
 	@Override

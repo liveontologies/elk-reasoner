@@ -77,7 +77,7 @@ public class SubClassInclusionComposedObjectUnionOf
 	public SubClassInclusionComposed getPremise(
 			SubClassInclusionComposed.Factory factory) {
 		return factory.getSubClassInclusionComposed(getOrigin(),
-				getSuperExpression().getDisjuncts().get(position_));
+				getSubsumer().getDisjuncts().get(position_));
 	}
 
 	@Override

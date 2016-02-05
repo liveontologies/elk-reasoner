@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInference;
 /**
  * A {@link ClassConclusion} that can be used in inferences that are assigned
  * with a {@link IndexedObjectProperty} sub-root
- * {@link SubClassConclusion#getDestinationSubRoot()} in addition to the
+ * {@link SubClassConclusion#getSubDestination()} in addition to the
  * {@link IndexedClassExpression} root {@link ClassConclusion#getDestination()}
  * .
  * 
@@ -43,7 +43,7 @@ public interface SubClassConclusion extends ClassConclusion {
 	 *         with which this {@link SubClassConclusion} can be used. All
 	 *         premises of such inferences must return the same {#getSubRoot()}
 	 */
-	public IndexedObjectProperty getDestinationSubRoot();
+	public IndexedObjectProperty getSubDestination();
 
 	/**
 	 * 

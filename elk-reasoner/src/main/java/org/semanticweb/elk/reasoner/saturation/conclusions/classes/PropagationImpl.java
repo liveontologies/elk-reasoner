@@ -60,7 +60,7 @@ public class PropagationImpl extends AbstractSubClassConclusion
 
 	@Override
 	public IndexedObjectProperty getRelation() {
-		return getDestinationSubRoot();
+		return getSubDestination();
 	}
 
 	@Override

@@ -59,7 +59,7 @@ public class ConclusionPrinter implements Conclusion.Visitor<String> {
 	@Override
 	public String visit(BackwardLink subConclusion) {
 		return "BackwardLink(" + subConclusion.getDestination() + ":"
-				+ subConclusion.getDestinationSubRoot() + ":"
+				+ subConclusion.getSubDestination() + ":"
 				+ subConclusion.getTraceRoot() + ")";
 	}
 
@@ -84,7 +84,7 @@ public class ConclusionPrinter implements Conclusion.Visitor<String> {
 	@Override
 	public String visit(ForwardLink conclusion) {
 		return "ForwardLink(" + conclusion.getDestination() + ":"
-				+ conclusion.getForwardChain() + "->" + conclusion.getTarget()
+				+ conclusion.getRelation() + "->" + conclusion.getTarget()
 				+ ")";
 	}
 
@@ -126,7 +126,7 @@ public class ConclusionPrinter implements Conclusion.Visitor<String> {
 	@Override
 	public String visit(Propagation subConclusion) {
 		return "Propagation(" + subConclusion.getDestination() + ":"
-				+ subConclusion.getDestinationSubRoot() + ":"
+				+ subConclusion.getSubDestination() + ":"
 				+ subConclusion.getCarry() + ")";
 	}
 
@@ -139,19 +139,19 @@ public class ConclusionPrinter implements Conclusion.Visitor<String> {
 	@Override
 	public String visit(SubClassInclusionComposed conclusion) {
 		return "Subsumption+(" + conclusion.getDestination() + " "
-				+ conclusion.getSuperExpression() + ")";
+				+ conclusion.getSubsumer() + ")";
 	}
 
 	@Override
 	public String visit(SubClassInclusionDecomposed conclusion) {
 		return "Subsumption-(" + conclusion.getDestination() + " "
-				+ conclusion.getSuperExpression() + ")";
+				+ conclusion.getSubsumer() + ")";
 	}
 
 	@Override
 	public String visit(SubContextInitialization subConclusion) {
 		return "SubInit(" + subConclusion.getDestination() + ":"
-				+ subConclusion.getDestinationSubRoot() + ")";
+				+ subConclusion.getSubDestination() + ")";
 	}
 
 	@Override

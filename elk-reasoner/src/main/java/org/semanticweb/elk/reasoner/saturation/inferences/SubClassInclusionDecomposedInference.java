@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.inferences;
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
+
 /*
  * #%L
  * ELK Reasoner
@@ -25,6 +27,14 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 public interface SubClassInclusionDecomposedInference
 		extends
 			SubClassInclusionInference {
+
+	/**
+	 * @param factory
+	 * @return the conclusion of this inference constructed using the given
+	 *         factory
+	 */
+	public SubClassInclusionDecomposed getConclusion(
+			SubClassInclusionDecomposed.Factory factory);
 
 	public <O> O accept(Visitor<O> visitor);
 

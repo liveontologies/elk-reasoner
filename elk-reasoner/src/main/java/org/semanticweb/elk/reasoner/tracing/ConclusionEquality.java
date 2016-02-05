@@ -85,8 +85,8 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 			public Boolean visit(BackwardLink other) {
 				return equals(other.getDestination(),
 						conclusion.getDestination())
-						&& equals(other.getDestinationSubRoot(),
-								conclusion.getDestinationSubRoot())
+						&& equals(other.getSubDestination(),
+								conclusion.getSubDestination())
 						&& equals(other.getTraceRoot(),
 								conclusion.getTraceRoot());
 			}
@@ -137,8 +137,8 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 			public Boolean visit(ForwardLink other) {
 				return equals(other.getDestination(),
 						conclusion.getDestination())
-						&& equals(other.getForwardChain(),
-								conclusion.getForwardChain())
+						&& equals(other.getRelation(),
+								conclusion.getRelation())
 						&& equals(other.getTarget(), conclusion.getTarget());
 			}
 		});
@@ -220,8 +220,8 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 			public Boolean visit(Propagation other) {
 				return equals(other.getDestination(),
 						subConclusion.getDestination())
-						&& equals(other.getDestinationSubRoot(),
-								subConclusion.getDestinationSubRoot())
+						&& equals(other.getSubDestination(),
+								subConclusion.getSubDestination())
 						&& equals(other.getCarry(), subConclusion.getCarry());
 			}
 		});
@@ -245,8 +245,8 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 			public Boolean visit(SubClassInclusionComposed other) {
 				return equals(other.getDestination(),
 						conclusion.getDestination())
-						&& equals(other.getSuperExpression(),
-								conclusion.getSuperExpression());
+						&& equals(other.getSubsumer(),
+								conclusion.getSubsumer());
 			}
 		});
 	}
@@ -258,8 +258,8 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 			public Boolean visit(SubClassInclusionDecomposed other) {
 				return equals(other.getDestination(),
 						conclusion.getDestination())
-						&& equals(other.getSuperExpression(),
-								conclusion.getSuperExpression());
+						&& equals(other.getSubsumer(),
+								conclusion.getSubsumer());
 			}
 		});
 	}
@@ -271,8 +271,8 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 			public Boolean visit(SubContextInitialization other) {
 				return equals(other.getDestination(),
 						subConclusion.getDestination())
-						&& equals(other.getDestinationSubRoot(),
-								subConclusion.getDestinationSubRoot());
+						&& equals(other.getSubDestination(),
+								subConclusion.getSubDestination());
 			}
 		});
 	}

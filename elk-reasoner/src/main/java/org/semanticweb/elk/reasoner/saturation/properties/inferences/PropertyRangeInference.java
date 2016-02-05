@@ -24,10 +24,14 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.PropertyRange;
  * #L%
  */
 
-public interface PropertyRangeInference
-		extends
-			PropertyRange,
-			ObjectPropertyInference {
+public interface PropertyRangeInference extends ObjectPropertyInference {
+
+	/**
+	 * @param factory
+	 * @return the conclusion of this inference constructed using the given
+	 *         factory
+	 */
+	public PropertyRange getConclusion(PropertyRange.Factory factory);
 
 	public <O> O accept(Visitor<O> visitor);
 

@@ -24,11 +24,16 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
  * #L%
  */
 
-public interface SubPropertyChainInference extends SubPropertyChain,
-		ObjectPropertyInference {
+public interface SubPropertyChainInference extends ObjectPropertyInference {
+
+	/**
+	 * @param factory
+	 * @return the conclusion of this inference constructed using the given
+	 *         factory
+	 */
+	public SubPropertyChain getConclusion(SubPropertyChain.Factory factory);
 
 	public <O> O accept(Visitor<O> visitor);
-	
 
 	/**
 	 * Visitor pattern for instances
@@ -40,10 +45,9 @@ public interface SubPropertyChainInference extends SubPropertyChain,
 			extends
 				SubPropertyChainExpandedSubObjectPropertyOf.Visitor<O>,
 				SubPropertyChainTautology.Visitor<O> {
-		
+
 		// combined interface
-		
+
 	}
-	
 
 }

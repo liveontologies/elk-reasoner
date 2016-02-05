@@ -37,8 +37,9 @@ public abstract class AbstractPropagationInference extends PropagationImpl
 		super(root, relation, carry);
 	}
 	
+	@Override
 	public Propagation getConclusion(Propagation.Factory factory) {
-		return factory.getPropagation(getDestination(), getRelation(),
+		return factory.getPropagation(getDestination(), getSubDestination(),
 				getCarry());
 	}
 	

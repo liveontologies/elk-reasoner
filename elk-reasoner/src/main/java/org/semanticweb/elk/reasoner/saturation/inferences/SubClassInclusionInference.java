@@ -31,7 +31,7 @@ public interface SubClassInclusionInference
 			ClassInference {
 
 	@Override
-	public IndexedClassExpression getSuperExpression();
+	public IndexedClassExpression getSubsumer();
 
 	public <O> O accept(Visitor<O> visitor);
 

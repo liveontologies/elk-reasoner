@@ -26,11 +26,13 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 
 /**
- * A {@link ClassConclusion} representing derived existential restriction for
- * the root. Intuitively, if a subclass axiom
- * {@code SubClassOf(:A ObjectSomeValuesFrom(:r :B))} is derived by inference
- * rules, then a {@link ForwardLink} with the root {@code :A}, relation
- * {@code :r} and the target {@code :B} can is produced.
+ * A {@link ClassConclusion} representing a derived subclass axiom between the
+ * class expression represented by {@link #getDestination()} and the existential
+ * restriction on property expression represented by {@link #getRelation()} and
+ * filler represented by {@link #getTarget()}. For example, a
+ * {@link ForwardLink} with {@link #getDestination()} = {@code :A},
+ * {@link #getRelation()} = {@code :r} and {@link #getTarget()} = {@code :B}
+ * represents {@code SubClassOf(:A ObjectSomeValuesFrom(:r :B))}.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
@@ -44,7 +46,7 @@ public interface ForwardLink extends ClassConclusion {
 	 * @return the {@link IndexedPropertyChain} in the existential restriction
 	 *         corresponding to this {@link ForwardLink}
 	 */
-	public IndexedPropertyChain getForwardChain();
+	public IndexedPropertyChain getRelation();
 
 	/**
 	 * @return the {@link IndexedContextRoot} corresponding to the filler of the
@@ -62,7 +64,7 @@ public interface ForwardLink extends ClassConclusion {
 	 */
 	interface Factory {
 
-		ForwardLink getForwardLink(IndexedContextRoot root,
+		ForwardLink getForwardLink(IndexedContextRoot destination,
 				IndexedPropertyChain forwardChain, IndexedContextRoot target);
 
 	}

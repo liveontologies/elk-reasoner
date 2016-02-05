@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
  * A {@link BackwardLink} obtained from a {@link ForwardLink} with chain
  * expanded under an {@link IndexedSubObjectPropertyOfAxiom}.
  * 
- * @see ForwardLink#getForwardChain()
+ * @see ForwardLink#getRelation()
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -58,7 +58,7 @@ public class BackwardLinkReversedExpanded
 	public BackwardLinkReversedExpanded(ForwardLink premise,
 			IndexedObjectProperty superProperty, ElkAxiom reason) {
 		super(premise.getTarget(), superProperty, premise.getDestination());
-		this.subChain_ = premise.getForwardChain();
+		this.subChain_ = premise.getRelation();
 		this.reason_ = reason;
 	}
 
@@ -82,7 +82,7 @@ public class BackwardLinkReversedExpanded
 	public IndexedSubObjectPropertyOfAxiom getSecondPremise(
 			IndexedSubObjectPropertyOfAxiom.Factory factory) {
 		return factory.getIndexedSubObjectPropertyOfAxiom(reason_, subChain_,
-				getBackwardRelation());
+				getRelation());
 	}
 
 	@Override

@@ -64,7 +64,7 @@ public class PropagationGenerated extends AbstractPropagationInference {
 	public SubContextInitialization getFirstPremise(
 			SubContextInitialization.Factory factory) {
 		return factory.getSubContextInitialization(getDestination(),
-				getDestinationSubRoot());
+				getSubDestination());
 	}
 	
 	public SubClassInclusionComposed getSecondPremise(
@@ -74,7 +74,7 @@ public class PropagationGenerated extends AbstractPropagationInference {
 	}
 
 	public SubPropertyChain getThirdPremise(SubPropertyChain.Factory factory) {
-		return factory.getSubPropertyChain(getRelation(),
+		return factory.getSubPropertyChain(getSubDestination(),
 				getCarry().getProperty());
 	}
 

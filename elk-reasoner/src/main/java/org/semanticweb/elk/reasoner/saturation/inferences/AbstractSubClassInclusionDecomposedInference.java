@@ -39,10 +39,11 @@ public abstract class AbstractSubClassInclusionDecomposedInference
 		super(subExpression, superExpression);
 	}
 	
+	@Override
 	public SubClassInclusionDecomposed getConclusion(
 			SubClassInclusionDecomposed.Factory factory) {
 		return factory.getSubClassInclusionDecomposed(getDestination(),
-				getSuperExpression());
+				getSubsumer());
 	}
 
 	@Override

@@ -42,7 +42,7 @@ public interface SubClassInference extends ClassInference {
 	 *         the conclusion of this {@link SubClassInference} should
 	 *         participate in inferences. It cannot be {@code null}.
 	 */
-	public IndexedObjectProperty getDestinationSubRoot();
+	public IndexedObjectProperty getSubDestination();
 
 	/**
 	 * @return the {@link IndexedObjectProperty}, which is the same as

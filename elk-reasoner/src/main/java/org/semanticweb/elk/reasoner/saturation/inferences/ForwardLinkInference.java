@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.inferences;
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
+
 /*
  * #%L
  * ELK Reasoner
@@ -22,7 +24,20 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * #L%
  */
 
+/**
+ * A {@link ClassInference} producing a {@link ForwardLink} conclusion
+ * 
+ * @author Yevgeny Kazakov
+ *
+ */
 public interface ForwardLinkInference extends ClassInference {
+
+	/**
+	 * @param factory
+	 * @return the conclusion of this inference constructed using the given
+	 *         factory
+	 */
+	public ForwardLink getConclusion(ForwardLink.Factory factory);
 
 	public <O> O accept(Visitor<O> visitor);
 

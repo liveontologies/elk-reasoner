@@ -70,7 +70,7 @@ public class ContextInitializingClassConclusionInsertionVisitor
 		}
 		if (conclusion instanceof SubClassConclusion) {
 			IndexedObjectProperty subRoot = ((SubClassConclusion) conclusion)
-					.getDestinationSubRoot();
+					.getSubDestination();
 			if (context.isEmpty(subRoot)) {
 				producer_.produce(
 						new SubContextInitializationNoPremises(root, subRoot));

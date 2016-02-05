@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.inferences;
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
+
 /*
  * #%L
  * ELK Reasoner
@@ -22,9 +24,20 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * #L%
  */
 
-public interface DisjointSubsumerInference
-		extends
-			ClassInference {
+/**
+ * A {@link ClassInference} producing a {@link DisjointSubsumer} conclusion
+ * 
+ * @author Yevgeny Kazakov
+ *
+ */
+public interface DisjointSubsumerInference extends ClassInference {
+
+	/**
+	 * @param factory
+	 * @return the conclusion of this inference constructed using the given
+	 *         factory
+	 */
+	public DisjointSubsumer getConclusion(DisjointSubsumer.Factory factory);
 
 	public <O> O accept(Visitor<O> visitor);
 

@@ -24,35 +24,33 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.model;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.PropagationImpl;
 
 /**
- * A {@link SubClassConclusion} representing that a filler of
- * {@link IndexedObjectSomeValuesFrom} has been derived as a subsumer, and
- * therefore {@link IndexedObjectSomeValuesFrom} should be propagated to all
- * predecessors over the sub-property of the property of this
- * {@link IndexedObjectSomeValuesFrom}
+ * A {@link ClassConclusion} representing a derived subclass axiom between the
+ * existential restriction on property expression represented by
+ * {@link #getRelation()} and filler represented by {@link #getDestination()}
+ * and (existential) class expression represented by {@link #getCarry()}. For
+ * example, a {@link Propagation} with {@link #getRelation()} = {@code :R},
+ * {@link #getDestination()} = {@code :A} and {@link #getCarry()} =
+ * {@code ObjectSomeValuesFrom(:s :B)} represents
+ * {@code SubClassOf(ObjectSomeValuesFrom(:r :A) ObjectSomeValuesFrom(:s :B))}.
  * 
- * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
- * 
+ * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  */
 public interface Propagation extends SubClassConclusion {
 
 	public static final String NAME = "Propagation";
 
-	// TODO: this is not needed anymore as it can be obtained from #getCarry()
 	/**
 	 * @return the {@link IndexedObjectProperty} that is the relation over which
-	 *         this {@link PropagationImpl} is applied
+	 *         this {@link Propagation} is applied
 	 */
 	public IndexedObjectProperty getRelation();
 
 	/**
 	 * @return the {@link IndexedObjectSomeValuesFrom} that is propagated by
-	 *         this {@link PropagationImpl}
+	 *         this {@link Propagation}
 	 */
 	public IndexedObjectSomeValuesFrom getCarry();
 
@@ -66,7 +64,7 @@ public interface Propagation extends SubClassConclusion {
 	 */
 	interface Factory {
 
-		Propagation getPropagation(IndexedContextRoot root,
+		Propagation getPropagation(IndexedContextRoot destination,
 				IndexedObjectProperty relation,
 				IndexedObjectSomeValuesFrom carry);
 

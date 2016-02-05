@@ -58,7 +58,7 @@ public class BackwardLinkFromForwardLinkRule extends AbstractForwardLinkRule {
 	@Override
 	public void apply(ForwardLink premise, ContextPremises premises,
 			ClassInferenceProducer producer) {
-		IndexedPropertyChain relation = premise.getForwardChain();
+		IndexedPropertyChain relation = premise.getRelation();
 		if (relation instanceof IndexedObjectProperty) {
 			producer.produce(new BackwardLinkReversed(premise));
 		} else {

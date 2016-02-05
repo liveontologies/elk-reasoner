@@ -29,7 +29,6 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
 
 /**
  * A finer representation for a set of {@link ClassConclusion}s that can be used as
@@ -46,17 +45,10 @@ public interface SubContextPremises {
 
 	/**
 	 * @return the sources of all derived {@link BackwardLink}s with relations
-	 *         {@link BackwardLink#getBackwardRelation()} to be sub-root of this
+	 *         {@link BackwardLink#getRelation()} to be sub-root of this
 	 *         {@link SubContextPremises}
 	 */
 	Set<IndexedContextRoot> getLinkedRoots();
-
-	/**
-	 * @return the representation of all derived {@link Propagation}s with
-	 *         relations {@link Propagation#getRelation()} to be sub-root of
-	 *         this {@link SubContextPremises}
-	 */
-	// Set<? extends IndexedObjectSomeValuesFrom> getPropagatedSubsumers();
 
 	boolean isInitialized();
 

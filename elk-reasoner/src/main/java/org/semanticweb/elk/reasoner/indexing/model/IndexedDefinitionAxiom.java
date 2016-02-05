@@ -31,20 +31,6 @@ public interface IndexedDefinitionAxiom extends IndexedAxiom {
 	IndexedClassExpression getDefinition();
 	
 	/**
-	 * A factory for creating instances
-	 * 
-	 * @author Yevgeny Kazakov
-	 *
-	 */
-	interface Factory {
-
-		IndexedDefinitionAxiom getIndexedDefinitionAxiom(
-				ElkAxiom originalAxiom, IndexedClass definedClass,
-				IndexedClassExpression definition);
-
-	}
-	
-	/**
 	 * The visitor pattern for instances
 	 * 
 	 * @author Yevgeny Kazakov
@@ -55,6 +41,20 @@ public interface IndexedDefinitionAxiom extends IndexedAxiom {
 	interface Visitor<O> {
 
 		O visit(IndexedDefinitionAxiom axiom);
+
+	}
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		IndexedDefinitionAxiom getIndexedDefinitionAxiom(
+				ElkAxiom originalAxiom, IndexedClass definedClass,
+				IndexedClassExpression definition);
 
 	}
 	

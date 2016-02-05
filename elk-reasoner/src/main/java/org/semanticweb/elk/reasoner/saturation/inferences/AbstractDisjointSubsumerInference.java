@@ -40,6 +40,7 @@ public abstract class AbstractDisjointSubsumerInference
 		super(root, disjoint, position, reason);
 	}
 	
+	@Override
 	public DisjointSubsumer getConclusion(DisjointSubsumer.Factory factory) {
 		return factory.getDisjointSubsumer(getDestination(),
 				getDisjointExpressions(), getPosition(), getReason());

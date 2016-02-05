@@ -47,8 +47,8 @@ public interface SubClassInclusionComposed extends SubClassInclusion {
 	interface Factory {
 
 		SubClassInclusionComposed getSubClassInclusionComposed(
-				IndexedContextRoot subExpression,
-				IndexedClassExpression superExpression);
+				IndexedContextRoot destination,
+				IndexedClassExpression subsumer);
 
 	}
 

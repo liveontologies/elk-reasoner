@@ -39,10 +39,11 @@ public abstract class AbstractSubClassInclusionComposedInference<S extends Index
 		super(subExpression, superExpression);
 	}
 	
+	@Override
 	public SubClassInclusionComposed getConclusion(
 			SubClassInclusionComposed.Factory factory) {
 		return factory.getSubClassInclusionComposed(getDestination(),
-				getSuperExpression());
+				getSubsumer());
 	}
 
 	@Override

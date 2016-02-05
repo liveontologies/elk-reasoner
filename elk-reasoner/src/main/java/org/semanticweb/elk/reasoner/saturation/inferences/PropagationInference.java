@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.inferences;
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +26,13 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 public interface PropagationInference extends ClassInference {
 
+	/**
+	 * @param factory
+	 * @return the conclusion of this inference constructed using the given
+	 *         factory
+	 */
+	public Propagation getConclusion(Propagation.Factory factory);
+
 	public <O> O accept(Visitor<O> visitor);
 
 	/**
@@ -32,9 +41,7 @@ public interface PropagationInference extends ClassInference {
 	 * @author Yevgeny Kazakov
 	 *
 	 */
-	public static interface Visitor<O>
-			extends
-				PropagationGenerated.Visitor<O> {
+	public static interface Visitor<O> extends PropagationGenerated.Visitor<O> {
 
 		// combined interface
 

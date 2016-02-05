@@ -25,7 +25,11 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
  */
 
 /**
- * A {@link ClassConclusion} representing an inconsistency derived for the root.
+ * A {@link ClassConclusion} representing a derived subclass axiom between the
+ * class expression represented by {@link #getDestination()} and
+ * {@code owl:Nothing}. For example, a {@link Contradiction} with
+ * {@link #getDestination()} = {@code :A} represents
+ * {@code SubClassOf(:A owl:Nothing)}.
  * 
  * @author Pavel Klinov
  * 

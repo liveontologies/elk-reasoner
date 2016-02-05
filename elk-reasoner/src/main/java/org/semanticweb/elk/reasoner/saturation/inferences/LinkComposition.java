@@ -60,7 +60,7 @@ public interface LinkComposition extends ClassInference {
 	 * 
 	 * @return the {@link BackwardLink} used as premise in this
 	 *         {@link LinkComposition}; its
-	 *         {@link BackwardLink#getBackwardRelation()} equals to
+	 *         {@link BackwardLink#getRelation()} equals to
 	 *         {@link #getPremiseBackwardRelation()}
 	 */
 	public BackwardLink getFirstPremise(BackwardLink.Factory factory);
@@ -82,7 +82,7 @@ public interface LinkComposition extends ClassInference {
 	 * 
 	 * @return the {@link ForwardLink} used as premise of this
 	 *         {@link LinkComposition}; its
-	 *         {@link ForwardLink#getForwardChain()} equals to
+	 *         {@link ForwardLink#getRelation()} equals to
 	 *         {@link #getPremiseForwardChain()}
 	 */
 	public ForwardLink getThirdPremise(ForwardLink.Factory factory);

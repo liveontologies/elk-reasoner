@@ -23,16 +23,16 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.model;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 
 /**
- * A {@code Conclusion} representing that some {@link IndexedClassExpression}
- * member of an {@link IndexedClassExpressionList} was derived as a subsumer in
- * the root.
+ * A {@code ClassConclusion} representing a derived subclass axiom between the
+ * class expression represented by {@link #getDestination()} and the class
+ * expression represented by the member of {@link #getDisjointExpressions()} at
+ * the position {@link #getPosition()}.
  * 
- * @see IndexedClassExpressionList#getDisjointMembers()
+ * @see IndexedClassExpressionList#getElements()
  * 
  * @author Pavel Klinov
  * 

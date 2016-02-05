@@ -27,8 +27,8 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 /**
  * A {@link ClassInference.Visitor} that returns {@code null}, can be used as a
- * prototype of other visitors by overriding
- * {@link #defaultVisit(ClassInference)} or other visit methods
+ * prototype of other visitors by overriding default methods or or other visit
+ * methods
  * 
  * @author Pavel Klinov
  * 

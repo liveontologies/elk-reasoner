@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.model;
 
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
+
 /*
  * #%L
  * ELK Reasoner
@@ -25,20 +27,40 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.model;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 
 /**
- * Represents a conclusion that a chain is a sub-property chain of another chain
+ * A {@link ObjectPropertyConclusion} representing a derived sub object property
+ * axiom with sub-property expression represented by {@link #getSubChain()} and
+ * super-property expression represented by {@link #getSuperChain()}. For
+ * example, a {@link SubPropertyChain} with {@link #getSubChain()} =
+ * {@code ObjectPropertyChain(:r :s)} and {@link #getSuperChain()} = {@code :h}
+ * represents {@code SubObjectProperyOf(ObjectPropertyChain(:r :s) :h)}.
  * 
  * @author Pavel Klinov
  *
  *         pavel.klinov@uni-ulm.de
+ * @author Yevgeny Kazakov
  */
 public interface SubPropertyChain extends ObjectPropertyConclusion {
 
+	/**
+	 * @return the {@code IndexedPropertyChain} corresponding to the
+	 *         sub-property of the {@link ElkSubObjectPropertyOfAxiom}
+	 *         represented by this {@link SubPropertyChain}
+	 * 
+	 * @see ElkSubObjectPropertyOfAxiom#getSubObjectPropertyExpression()
+	 */
 	public IndexedPropertyChain getSubChain();
 
+	/**
+	 * @return the {@code IndexedPropertyChain} corresponding to the
+	 *         super-property of the {@link ElkSubObjectPropertyOfAxiom}
+	 *         represented by this {@link SubPropertyChain}
+	 * 
+	 * @see ElkSubObjectPropertyOfAxiom#getSuperObjectPropertyExpression()
+	 */
 	public IndexedPropertyChain getSuperChain();
 
 	public <O> O accept(Visitor<O> visitor);
-	
+
 	/**
 	 * A factory for creating instances
 	 * 

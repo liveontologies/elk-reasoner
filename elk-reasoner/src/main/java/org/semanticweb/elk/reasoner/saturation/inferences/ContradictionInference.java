@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.inferences;
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+
 /*
  * #%L
  * ELK Reasoner
@@ -23,6 +25,13 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 public interface ContradictionInference extends ClassInference {
+
+	/**
+	 * @param factory
+	 * @return the conclusion of this inference constructed using the given
+	 *         factory
+	 */
+	public Contradiction getConclusion(Contradiction.Factory factory);
 
 	public <O> O accept(Visitor<O> visitor);
 

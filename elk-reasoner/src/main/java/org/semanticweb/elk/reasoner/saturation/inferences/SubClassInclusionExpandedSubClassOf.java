@@ -81,7 +81,7 @@ public class SubClassInclusionExpandedSubClassOf
 	public IndexedSubClassOfAxiom getSecondPremise(
 			IndexedSubClassOfAxiom.Factory factory) {
 		return factory.getIndexedSubClassOfAxiom(reason_, premiseSubsumer_,
-				getSuperExpression());
+				getSubsumer());
 	}
 
 	@Override

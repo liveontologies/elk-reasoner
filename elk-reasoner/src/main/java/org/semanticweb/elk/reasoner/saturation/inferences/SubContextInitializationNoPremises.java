@@ -51,7 +51,7 @@ public class SubContextInitializationNoPremises
 	public SubContextInitialization getConclusion(
 			SubContextInitialization.Factory factory) {
 		return factory.getSubContextInitialization(getDestination(),
-				getDestinationSubRoot());
+				getSubDestination());
 	}
 
 	@Override

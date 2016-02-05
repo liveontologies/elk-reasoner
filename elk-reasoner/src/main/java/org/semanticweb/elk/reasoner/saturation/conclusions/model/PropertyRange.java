@@ -26,15 +26,14 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 
 /**
- * An {@link ObjectPropertyConclusion} stating that the given
- * {@link IndexedClassExpression} returned by {@link #getRange()} is a derived
- * range of the given {@link IndexedObjectProperty} returned by
- * {@link #getProperty()}. It is logically equivalent to a
- * {@code ElkObjectPropertyRangeAxiom} for the corresponding
- * {@code ElkClassExpression} and {@code ElkObjectProperty}.
+ * A {@link ObjectPropertyConclusion} representing a derived object property
+ * range axiom with property expression represented by {@link #getProperty()}
+ * and range represented by {@link #getRange()}. For example, a
+ * {@link PropertyRange} with {@link #getProperty()} = {@code :r} and
+ * {@link #getRange()} = {@code :A} represents
+ * {@code ObjectPropertyRange(:r :A)}.
  * 
  * @author Yevgeny Kazakov
- * 
  */
 public interface PropertyRange extends ObjectPropertyConclusion {
 

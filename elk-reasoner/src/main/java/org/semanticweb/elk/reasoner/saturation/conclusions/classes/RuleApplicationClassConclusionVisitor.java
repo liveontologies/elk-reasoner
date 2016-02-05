@@ -190,7 +190,7 @@ public class RuleApplicationClassConclusionVisitor
 
 	@Override
 	public Boolean visit(SubClassInclusionComposed conclusion) {
-		IndexedClassExpression subsumer = conclusion.getSuperExpression();
+		IndexedClassExpression subsumer = conclusion.getSubsumer();
 		LinkedSubsumerRule compositionRule = subsumer.getCompositionRuleHead();
 		while (compositionRule != null) {
 			compositionRule.accept(ruleAppVisitor, subsumer, get(), producer);
@@ -201,7 +201,7 @@ public class RuleApplicationClassConclusionVisitor
 
 	@Override
 	public Boolean visit(SubClassInclusionDecomposed conclusion) {
-		IndexedClassExpression subsumer = conclusion.getSuperExpression();
+		IndexedClassExpression subsumer = conclusion.getSubsumer();
 		subsumer.accept(new SubsumerDecompositionVisitor(ruleAppVisitor, get(),
 				producer));
 		return true;
@@ -212,7 +212,7 @@ public class RuleApplicationClassConclusionVisitor
 		ContextPremises premises = get();
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace("{}::{} applying sub-concept init rules:",
-					premises.getRoot(), subConclusion.getDestinationSubRoot());
+					premises.getRoot(), subConclusion.getSubDestination());
 		}
 		PropagationInitializationRule.getInstance().accept(ruleAppVisitor,
 				subConclusion, premises, producer);

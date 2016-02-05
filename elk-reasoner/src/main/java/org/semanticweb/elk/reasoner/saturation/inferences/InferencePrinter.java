@@ -135,13 +135,13 @@ public class InferencePrinter
 
 	@Override
 	public String visit(SubClassInclusionComposedDefinedClass inference) {
-		return "Composed definition " + inference.getSuperExpression()
+		return "Composed definition " + inference.getSubsumer()
 				+ " from " + inference.getFirstPremise(factory_);
 	}
 
 	@Override
 	public String visit(SubClassInclusionComposedEntity inference) {
-		return "Composed decomposition " + inference.getSuperExpression();
+		return "Composed decomposition " + inference.getSubsumer();
 	}
 
 	@Override
@@ -162,7 +162,7 @@ public class InferencePrinter
 
 	@Override
 	public String visit(SubClassInclusionComposedObjectUnionOf inference) {
-		return "Composed disjunction " + inference.getSuperExpression()
+		return "Composed disjunction " + inference.getSubsumer()
 				+ " from " + inference.getPremise(factory_);
 	}
 
@@ -180,14 +180,14 @@ public class InferencePrinter
 
 	@Override
 	public String visit(SubClassInclusionExpandedDefinition inference) {
-		return "Decomposed definition " + inference.getSuperExpression()
+		return "Decomposed definition " + inference.getSubsumer()
 				+ " of " + inference.getFirstPremise(factory_);
 	}
 
 	@Override
 	public String visit(SubClassInclusionExpandedSubClassOf inference) {
 		return "SubClassOf( " + inference.getFirstPremise(factory_) + " "
-				+ inference.getSuperExpression() + " )";
+				+ inference.getSubsumer() + " )";
 	}
 
 	@Override
@@ -198,13 +198,13 @@ public class InferencePrinter
 	@Override
 	public String visit(SubClassInclusionOwlThing inference) {
 		return "SubClassOf( " + inference.getDestination() + " "
-				+ inference.getSuperExpression() + " ) [owl:Thing]";
+				+ inference.getSubsumer() + " ) [owl:Thing]";
 	}
 
 	@Override
 	public String visit(SubClassInclusionRange inference) {
 		return "SubClassOf( " + inference.getDestination() + " "
-				+ inference.getSuperExpression() + " ) [PropertyRange]";
+				+ inference.getSubsumer() + " ) [PropertyRange]";
 	}
 
 	@Override
@@ -215,7 +215,7 @@ public class InferencePrinter
 	@Override
 	public String visit(SubContextInitializationNoPremises inference) {
 		return "Init (" + inference.getDestination() + ":"
-				+ inference.getDestinationSubRoot() + ")";
+				+ inference.getSubDestination() + ")";
 	}
 
 	@Override

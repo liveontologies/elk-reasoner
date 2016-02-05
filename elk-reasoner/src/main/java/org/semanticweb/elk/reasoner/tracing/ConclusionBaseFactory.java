@@ -66,9 +66,9 @@ public class ConclusionBaseFactory implements Conclusion.Factory {
 	}
 
 	@Override
-	public BackwardLink getBackwardLink(IndexedContextRoot root,
+	public BackwardLink getBackwardLink(IndexedContextRoot destination,
 			IndexedObjectProperty relation, IndexedContextRoot source) {
-		return filter(saturationConclusionFactory_.getBackwardLink(root,
+		return filter(saturationConclusionFactory_.getBackwardLink(destination,
 				relation, source));
 	}
 
@@ -146,9 +146,9 @@ public class ConclusionBaseFactory implements Conclusion.Factory {
 	}
 
 	@Override
-	public Propagation getPropagation(IndexedContextRoot root,
+	public Propagation getPropagation(IndexedContextRoot destination,
 			IndexedObjectProperty relation, IndexedObjectSomeValuesFrom carry) {
-		return filter(saturationConclusionFactory_.getPropagation(root,
+		return filter(saturationConclusionFactory_.getPropagation(destination,
 				relation, carry));
 	}
 
@@ -161,19 +161,19 @@ public class ConclusionBaseFactory implements Conclusion.Factory {
 
 	@Override
 	public SubClassInclusionComposed getSubClassInclusionComposed(
-			IndexedContextRoot subExpression,
-			IndexedClassExpression superExpression) {
+			IndexedContextRoot destination,
+			IndexedClassExpression subsumer) {
 		return filter(saturationConclusionFactory_
-				.getSubClassInclusionComposed(subExpression, superExpression));
+				.getSubClassInclusionComposed(destination, subsumer));
 	}
 
 	@Override
 	public SubClassInclusionDecomposed getSubClassInclusionDecomposed(
-			IndexedContextRoot subExpression,
-			IndexedClassExpression superExpression) {
+			IndexedContextRoot destination,
+			IndexedClassExpression subsumer) {
 		return filter(
 				saturationConclusionFactory_.getSubClassInclusionDecomposed(
-						subExpression, superExpression));
+						destination, subsumer));
 	}
 
 	@Override

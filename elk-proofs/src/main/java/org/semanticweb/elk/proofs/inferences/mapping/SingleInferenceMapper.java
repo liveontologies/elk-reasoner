@@ -200,8 +200,8 @@ public class SingleInferenceMapper {
 			ElkAxiom sideCondition = sideConditionLookup_.lookup(inference);
 			
 			return new ClassSubsumption(sideCondition, Deindexer.deindex(inference.getDestination()),
-					Deindexer.deindex(inference.getSuperExpression()),
-					Deindexer.deindex(inference.getPremise().getSuperExpression()),
+					Deindexer.deindex(inference.getSubsumer()),
+					Deindexer.deindex(inference.getPremise().getSubsumer()),
 					factory_, exprFactory_);
 		}
 
@@ -210,16 +210,16 @@ public class SingleInferenceMapper {
 				Void parameter) {
 			return new ConjunctionComposition(Deindexer.deindex(inference.getDestination()),
 					Deindexer.deindex(inference.getFirstPremise()
-							.getSuperExpression()), Deindexer.deindex(inference
-							.getSecondPremise().getSuperExpression()), factory_, exprFactory_);
+							.getSubsumer()), Deindexer.deindex(inference
+							.getSecondPremise().getSubsumer()), factory_, exprFactory_);
 		}
 
 		@Override
 		public Inference visit(SubClassInclusionDecomposedConjunct inference,
 				Void parameter) {
-			IndexedClassExpression conclusion = inference.getSuperExpression();
+			IndexedClassExpression conclusion = inference.getSubsumer();
 			IndexedObjectIntersectionOf conjunction = inference
-					.getPremise().getSuperExpression();
+					.getPremise().getSubsumer();
 			ElkClassExpression sub = Deindexer.deindex(inference.getDestination());
 			ElkClassExpression other = Deindexer
 					.deindex(conclusion == conjunction.getFirstConjunct() ? conjunction
@@ -234,10 +234,10 @@ public class SingleInferenceMapper {
 		public Inference visit(SubClassInclusionComposedObjectSomeValuesFrom inference, Void parameter) {
 			// the left premise is an axiom with a simple existential on the right
 			ElkClassExpression c = Deindexer.deindex(inference.getDestination());
-			ElkObjectProperty r = Deindexer.deindex(inference.getFirstPremise().getBackwardRelation());
+			ElkObjectProperty r = Deindexer.deindex(inference.getFirstPremise().getRelation());
 			ElkClassExpression d = Deindexer.deindex(inference.getOrigin());
-			ElkObjectProperty s = Deindexer.deindex(inference.getSuperExpression().getProperty());
-			ElkClassExpression e = Deindexer.deindex(inference.getSuperExpression().getFiller());
+			ElkObjectProperty s = Deindexer.deindex(inference.getSubsumer().getProperty());
+			ElkClassExpression e = Deindexer.deindex(inference.getSubsumer().getFiller());
 			ElkObjectSomeValuesFrom rSomeD = factory_.getObjectSomeValuesFrom(r, d);
 			ElkObjectSomeValuesFrom sSomeE = factory_.getObjectSomeValuesFrom(s, e);
 			
@@ -299,7 +299,7 @@ public class SingleInferenceMapper {
 			ElkClassExpression d = Deindexer.deindex(inference.getOrigin());
 			ElkClassExpression rSomeD = factory_.getObjectSomeValuesFrom(r, d);
 			ElkClassExpression e = Deindexer.deindex(inference.getThirdPremise().getTarget());
-			ElkObjectProperty h = Deindexer.deindex(inference.getBackwardRelation());
+			ElkObjectProperty h = Deindexer.deindex(inference.getRelation());
 			ElkClassExpression hSomeE = factory_.getObjectSomeValuesFrom(h, e);
 			ElkSubClassOfAxiom firstExPremise = factory_.getSubClassOfAxiom(c, rSomeD);
 			ElkObjectProperty rPrime = Deindexer.deindex(leftPropertyPremise.getFullSuperChain());
@@ -331,7 +331,7 @@ public class SingleInferenceMapper {
 			ElkSubClassOfAxiom firstExPremise = factory_.getSubClassOfAxiom(c, rSomeD);
 			ElkObjectProperty rPrime = Deindexer.deindex(leftPropertyPremise.getFullSuperChain());
 			ElkSubObjectPropertyOfAxiom propSubsumption = factory_.getSubObjectPropertyOfAxiom(r, rPrime);
-			ElkSubObjectPropertyExpression conclusionChain = Deindexer.deindex(inference.getForwardChain()); 
+			ElkSubObjectPropertyExpression conclusionChain = Deindexer.deindex(inference.getRelation()); 
 			ElkSubClassOfLemma conclusion = lemmaObjectFactory_.getSubClassOfLemma(c, lemmaObjectFactory_.getComplexObjectSomeValuesFrom((ElkObjectPropertyChain) conclusionChain, e));
 			
 			Expression[] existentialPremises = createExistentialPremises(d, e, rightChainPremise, firstExPremise, propSubsumption, null);
@@ -359,12 +359,12 @@ public class SingleInferenceMapper {
 			ForwardLink premise = inference.getPremise();
 						
 			// existential composition with sub-property chain
-			IndexedPropertyChain subChain = premise.getForwardChain();
+			IndexedPropertyChain subChain = premise.getRelation();
 
 			final ElkClassExpression c = Deindexer.deindex(inference.getTraceRoot());
 			final ElkClassExpression d = Deindexer.deindex(inference.getDestination());
-			final ElkSubObjectPropertyExpression ss = Deindexer.deindex(premise.getForwardChain());
-			ElkObjectProperty h = Deindexer.deindex(inference.getBackwardRelation());
+			final ElkSubObjectPropertyExpression ss = Deindexer.deindex(premise.getRelation());
+			ElkObjectProperty h = Deindexer.deindex(inference.getRelation());
 			ElkObjectSomeValuesFrom hSomeD = factory_.getObjectSomeValuesFrom(h, d);
 			Expression cSubssSomeC = subChain.accept(new IndexedPropertyChain.Visitor<Expression>() {
 
@@ -410,7 +410,7 @@ public class SingleInferenceMapper {
 				ContradictionFromInconsistentDisjointnessAxiom inference, Void parameter) {
 			ElkDisjointClassesAxiom sideCondition = (ElkDisjointClassesAxiom) sideConditionLookup_.lookup(inference);
 			ElkClassExpression c = Deindexer.deindex(inference.getDestination());
-			ElkClassExpression d = Deindexer.deindex(inference.getPremise().getSuperExpression());
+			ElkClassExpression d = Deindexer.deindex(inference.getPremise().getSubsumer());
 			
 			return new InconsistentDisjointness(c, d, sideCondition, factory_, exprFactory_);
 		}
@@ -428,7 +428,7 @@ public class SingleInferenceMapper {
 		@Override
 		public Inference visit(ContradictionOfObjectComplementOf inference, Void parameter) {
 			ElkClassExpression c = Deindexer.deindex(inference.getDestination());
-			ElkClassExpression d = Deindexer.deindex(inference.getOtherPremise().getSuperExpression());
+			ElkClassExpression d = Deindexer.deindex(inference.getOtherPremise().getSubsumer());
 			
 			return new NegationContradiction(c, d, factory_, exprFactory_);
 		}
@@ -443,7 +443,7 @@ public class SingleInferenceMapper {
 		public Inference visit(ContradictionPropagated inference, Void parameter) {
 			// the left premise is an axiom with a simple existential on the right
 			ElkClassExpression c = Deindexer.deindex(inference.getDestination());
-			ElkObjectProperty r = Deindexer.deindex(inference.getLinkPremise().getBackwardRelation());
+			ElkObjectProperty r = Deindexer.deindex(inference.getLinkPremise().getRelation());
 			ElkClassExpression d = Deindexer.deindex(inference.getOrigin());
 			ElkObjectSomeValuesFrom rSomeD = factory_.getObjectSomeValuesFrom(r, d);
 
@@ -465,8 +465,8 @@ public class SingleInferenceMapper {
 				org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectUnionOf inference,
 				Void parameter) {
 			ElkClassExpression c = Deindexer.deindex(inference.getDestination());
-			ElkClassExpression d = Deindexer.deindex(inference.getPremise().getSuperExpression());
-			ElkObjectUnionOf dOrE = (ElkObjectUnionOf) Deindexer.deindex(inference.getSuperExpression());
+			ElkClassExpression d = Deindexer.deindex(inference.getPremise().getSubsumer());
+			ElkObjectUnionOf dOrE = (ElkObjectUnionOf) Deindexer.deindex(inference.getSubsumer());
 			
 			return new DisjunctionComposition(c, dOrE, d, factory_, exprFactory_);
 		}

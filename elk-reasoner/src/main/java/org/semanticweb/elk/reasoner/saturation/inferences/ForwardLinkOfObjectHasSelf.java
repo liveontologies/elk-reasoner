@@ -57,6 +57,7 @@ public class ForwardLinkOfObjectHasSelf extends AbstractClassInference
 		return factory.getSubClassInclusionDecomposed(getOrigin(), existential_);
 	}
 
+	@Override
 	public ForwardLink getConclusion(ForwardLink.Factory factory) {
 		return factory.getForwardLink(getDestination(),
 				existential_.getProperty(), getOrigin());

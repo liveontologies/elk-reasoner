@@ -81,7 +81,7 @@ public class SubClassInclusionComposedDefinedClass
 
 	public IndexedDefinitionAxiom getSecondPremise(
 			IndexedDefinitionAxiom.Factory factory) {
-		return factory.getIndexedDefinitionAxiom(reason_, getSuperExpression(),
+		return factory.getIndexedDefinitionAxiom(reason_, getSubsumer(),
 				definition_);
 	}
 

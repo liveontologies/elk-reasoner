@@ -38,14 +38,14 @@ public abstract class AbstractSubClassConclusion extends AbstractClassConclusion
 
 	private final IndexedObjectProperty subRoot_;
 
-	protected AbstractSubClassConclusion(IndexedContextRoot root,
+	protected AbstractSubClassConclusion(IndexedContextRoot destination,
 			IndexedObjectProperty subRoot) {
-		super(root);
+		super(destination);
 		this.subRoot_ = subRoot;
 	}
 
 	@Override
-	public IndexedObjectProperty getDestinationSubRoot() {
+	public IndexedObjectProperty getSubDestination() {
 		return this.subRoot_;
 	}
 
