@@ -54,7 +54,7 @@ public abstract class AbstractInstanceTaxonomy<T extends ElkEntity, I extends El
 			return superEquals;
 		}
 		try {
-//			final InstanceTaxonomy<?, ?> otherTaxonomy = (InstanceTaxonomy<?, ?>) obj;// TODO .: try this !!!
+			@SuppressWarnings("unchecked")
 			final InstanceTaxonomy<T, I> otherTaxonomy = (InstanceTaxonomy<T, I>) obj;
 			
 			/* 
@@ -63,8 +63,6 @@ public abstract class AbstractInstanceTaxonomy<T extends ElkEntity, I extends El
 			 */
 			
 			final Set<? extends InstanceNode<T, I>> thisInstanceNodes = getInstanceNodes();
-//			final Set<? extends InstanceNode<?, ?>> otherInstanceNodes =
-//					otherTaxonomy.getInstanceNodes();
 			final Set<? extends InstanceNode<T, I>> otherInstanceNodes =
 					otherTaxonomy.getInstanceNodes();
 			
@@ -142,10 +140,7 @@ public abstract class AbstractInstanceTaxonomy<T extends ElkEntity, I extends El
 			}
 			
 		} catch (ClassCastException e) {
-			// Some contains() received an argument of a wrong type.
-			return false;
-		} catch (NullPointerException e) {
-			// Some set does not support null elements.
+			// The other taxonomy contains members of different type than this one.
 			return false;
 		}
 		

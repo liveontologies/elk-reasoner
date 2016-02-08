@@ -47,13 +47,12 @@ public abstract class AbstractTaxonomy<T extends ElkEntity> implements Taxonomy<
 			return false;
 		}
 		try {
-//			final Taxonomy<?> otherTaxonomy = (Taxonomy<?>) obj;// TODO .: try this !!!
+			@SuppressWarnings("unchecked")
 			final Taxonomy<T> otherTaxonomy = (Taxonomy<T>) obj;
 			
 			// Each node must have the same sets of members, parents and children
 			
 			final Set<? extends TaxonomyNode<T>> thisNodes = getNodes();
-//			final Set<? extends TaxonomyNode<?>> otherNodes = otherTaxonomy.getNodes();
 			final Set<? extends TaxonomyNode<T>> otherNodes = otherTaxonomy.getNodes();
 			
 			if (thisNodes.size() != otherNodes.size()) {
@@ -117,10 +116,7 @@ public abstract class AbstractTaxonomy<T extends ElkEntity> implements Taxonomy<
 				
 			}
 		} catch (ClassCastException e) {
-			// Some contains() received an argument of a wrong type.
-			return false;
-		} catch (NullPointerException e) {
-			// Some set does not support null elements.
+			// The other taxonomy contains members of different type than this one.
 			return false;
 		}
 		
