@@ -25,11 +25,15 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ContradictionImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
+import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
 public abstract class AbstractContradictionInference extends ContradictionImpl
 		implements
 			ContradictionInference {
+
+	static Conclusion.Factory FACTORY = ConclusionBaseFactory.getInstance();
 
 	protected AbstractContradictionInference(
 			IndexedContextRoot conclusionRoot) {

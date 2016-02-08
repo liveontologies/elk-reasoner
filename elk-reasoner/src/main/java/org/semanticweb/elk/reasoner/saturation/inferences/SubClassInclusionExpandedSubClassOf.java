@@ -72,15 +72,13 @@ public class SubClassInclusionExpandedSubClassOf
 		return getDestination();
 	}
 
-	public SubClassInclusionComposed getFirstPremise(
-			SubClassInclusionComposed.Factory factory) {
-		return factory.getSubClassInclusionComposed(getOrigin(),
+	public SubClassInclusionComposed getFirstPremise() {
+		return FACTORY.getSubClassInclusionComposed(getOrigin(),
 				premiseSubsumer_);
 	}
 
-	public IndexedSubClassOfAxiom getSecondPremise(
-			IndexedSubClassOfAxiom.Factory factory) {
-		return factory.getIndexedSubClassOfAxiom(reason_, premiseSubsumer_,
+	public IndexedSubClassOfAxiom getSecondPremise() {
+		return FACTORY.getIndexedSubClassOfAxiom(reason_, premiseSubsumer_,
 				getSubsumer());
 	}
 

@@ -29,7 +29,6 @@ import java.util.Set;
 import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.DummyConclusionVisitor;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 import org.semanticweb.elk.reasoner.tracing.InferencePremiseVisitor;
@@ -46,7 +45,7 @@ class ProofUnwindingState<I extends ClassConclusion, J extends ProofUnwindingJob
 	final Queue<ClassInference> todoInferences;
 
 	private final Inference.Visitor<Void> inferencePremiseInsertionVisitor = new InferencePremiseVisitor<Void>(
-			new ConclusionBaseFactory(), new DummyConclusionVisitor<Void>() {
+			new DummyConclusionVisitor<Void>() {
 				@Override
 				protected Void defaultVisit(ClassConclusion conclusion) {
 					todoConclusions.add(conclusion);

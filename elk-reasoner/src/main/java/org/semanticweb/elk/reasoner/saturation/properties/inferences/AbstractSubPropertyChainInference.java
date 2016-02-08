@@ -26,6 +26,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SubPropertyChainImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
+import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
 public abstract class AbstractSubPropertyChainInference
@@ -33,6 +35,8 @@ public abstract class AbstractSubPropertyChainInference
 			SubPropertyChainImpl
 		implements SubPropertyChainInference {
 
+	static Conclusion.Factory FACTORY = ConclusionBaseFactory.getInstance();
+	
 	public AbstractSubPropertyChainInference(IndexedPropertyChain subChain,
 			IndexedPropertyChain superChain) {
 		super(subChain, superChain);

@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
 
 /**
  * A {@link BackwardLink} obtained from a {@link SubClassInclusionDecomposed}
- * with {@link IndexedObjectSomeValuesFrom} super-class. 
+ * with {@link IndexedObjectSomeValuesFrom} super-class.
  * 
  * @author Pavel Klinov
  * 
@@ -40,15 +40,16 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * 
  * @author "Yevgeny Kazakov"
  */
-public class BackwardLinkOfObjectSomeValuesFrom extends
-		AbstractBackwardLinkInference {
+public class BackwardLinkOfObjectSomeValuesFrom
+		extends
+			AbstractBackwardLinkInference {
 
 	private final IndexedObjectSomeValuesFrom existential_;
 
 	public BackwardLinkOfObjectSomeValuesFrom(IndexedContextRoot inferenceRoot,
 			IndexedObjectSomeValuesFrom subsumer) {
-		super(IndexedObjectSomeValuesFrom.Helper.getTarget(subsumer), subsumer
-				.getProperty(), inferenceRoot);
+		super(IndexedObjectSomeValuesFrom.Helper.getTarget(subsumer),
+				subsumer.getProperty(), inferenceRoot);
 		existential_ = subsumer;
 	}
 
@@ -61,8 +62,9 @@ public class BackwardLinkOfObjectSomeValuesFrom extends
 		return this.existential_;
 	}
 
-	public SubClassInclusionDecomposed getPremise(SubClassInclusionDecomposed.Factory factory) {
-		return factory.getSubClassInclusionDecomposed(getOrigin(), existential_);
+	public SubClassInclusionDecomposed getPremise() {
+		return FACTORY.getSubClassInclusionDecomposed(getOrigin(),
+				existential_);
 	}
 
 	@Override
@@ -74,7 +76,7 @@ public class BackwardLinkOfObjectSomeValuesFrom extends
 	public final <O> O accept(BackwardLinkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	/**
 	 * Visitor pattern for instances
 	 * 
@@ -82,9 +84,9 @@ public class BackwardLinkOfObjectSomeValuesFrom extends
 	 *
 	 */
 	public static interface Visitor<O> {
-		
+
 		public O visit(BackwardLinkOfObjectSomeValuesFrom inference);
-		
+
 	}
 
 }

@@ -72,13 +72,12 @@ public class SubPropertyChainExpandedSubObjectPropertyOf
 		return this.reason_;
 	}
 
-	public SubPropertyChain getFirstPremise(SubPropertyChain.Factory factory) {
-		return factory.getSubPropertyChain(middleChain_, getSuperChain());
+	public SubPropertyChain getFirstPremise() {
+		return FACTORY.getSubPropertyChain(middleChain_, getSuperChain());
 	}
 
-	public IndexedSubObjectPropertyOfAxiom getSecondPremise(
-			IndexedSubObjectPropertyOfAxiom.Factory factory) {
-		return factory.getIndexedSubObjectPropertyOfAxiom(reason_,
+	public IndexedSubObjectPropertyOfAxiom getSecondPremise() {
+		return FACTORY.getIndexedSubObjectPropertyOfAxiom(reason_,
 				getSubChain(), middleChain_);
 	}
 

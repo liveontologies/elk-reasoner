@@ -58,9 +58,8 @@ public abstract class SubClassInclusionDecomposedConjunct
 		conjunction_ = premiseSubsumer;
 	}
 
-	public SubClassInclusionDecomposed getPremise(
-			SubClassInclusionDecomposed.Factory factory) {
-		return factory.getSubClassInclusionDecomposed(getOrigin(),
+	public SubClassInclusionDecomposed getPremise() {
+		return FACTORY.getSubClassInclusionDecomposed(getOrigin(),
 				conjunction_);
 	}
 

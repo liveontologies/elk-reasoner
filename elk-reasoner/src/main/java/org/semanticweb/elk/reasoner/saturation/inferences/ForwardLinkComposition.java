@@ -37,11 +37,13 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
  * A {@link ForwardLink} obtained by composing a {@link BackwardLink} and
  * {@link ForwardLink} using {@link SubPropertyChain} premises.
  * 
- * @author "Yevgeny Kazakov" 
+ * @author "Yevgeny Kazakov"
  */
-public class ForwardLinkComposition extends
-		AbstractForwardLinkInference<IndexedComplexPropertyChain> implements
-		LinkComposition {
+public class ForwardLinkComposition
+		extends
+			AbstractForwardLinkInference<IndexedComplexPropertyChain>
+		implements
+			LinkComposition {
 
 	private final IndexedObjectProperty backwardRelation_;
 
@@ -51,8 +53,8 @@ public class ForwardLinkComposition extends
 
 	public ForwardLinkComposition(IndexedContextRoot originRoot,
 			IndexedObjectProperty backwardRelation,
-			IndexedContextRoot inferenceRoot,
-			IndexedPropertyChain forwardChain, IndexedContextRoot targetRoot,
+			IndexedContextRoot inferenceRoot, IndexedPropertyChain forwardChain,
+			IndexedContextRoot targetRoot,
 			IndexedComplexPropertyChain composition) {
 		super(originRoot, composition, targetRoot);
 		this.backwardRelation_ = backwardRelation;
@@ -81,26 +83,25 @@ public class ForwardLinkComposition extends
 	}
 
 	@Override
-	public BackwardLink getFirstPremise(BackwardLink.Factory factory) {
-		return factory.getBackwardLink(getOrigin(), backwardRelation_,
+	public BackwardLink getFirstPremise() {
+		return FACTORY.getBackwardLink(getOrigin(), backwardRelation_,
 				getDestination());
 	}
 
 	@Override
-	public SubPropertyChain getSecondPremise(SubPropertyChain.Factory factory) {
-		return factory.getSubPropertyChain(backwardRelation_, getComposition()
-				.getFirstProperty());
+	public SubPropertyChain getSecondPremise() {
+		return FACTORY.getSubPropertyChain(backwardRelation_,
+				getComposition().getFirstProperty());
 	}
 
 	@Override
-	public ForwardLink getThirdPremise(ForwardLink.Factory factory) {
-		return factory.getForwardLink(getOrigin(), forwardChain_,
-				getTarget());
+	public ForwardLink getThirdPremise() {
+		return FACTORY.getForwardLink(getOrigin(), forwardChain_, getTarget());
 	}
 
 	@Override
-	public SubPropertyChain getFourthPremise(SubPropertyChain.Factory factory) {
-		return factory.getSubPropertyChain(forwardChain_,
+	public SubPropertyChain getFourthPremise() {
+		return FACTORY.getSubPropertyChain(forwardChain_,
 				getComposition().getSuffixChain());
 	}
 
@@ -113,7 +114,7 @@ public class ForwardLinkComposition extends
 	public final <O> O accept(ForwardLinkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	@Override
 	public final <O> O accept(LinkComposition.Visitor<O> visitor) {
 		return visitor.visit(this);
@@ -126,9 +127,9 @@ public class ForwardLinkComposition extends
 	 *
 	 */
 	public static interface Visitor<O> {
-		
+
 		public O visit(ForwardLinkComposition inference);
-		
-	}	
-	
+
+	}
+
 }

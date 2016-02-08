@@ -39,11 +39,13 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  *
  *         pavel.klinov@uni-ulm.de
  */
-public class DisjointSubsumerFromSubsumer extends
-		AbstractDisjointSubsumerInference {
+public class DisjointSubsumerFromSubsumer
+		extends
+			AbstractDisjointSubsumerInference {
 
 	public DisjointSubsumerFromSubsumer(IndexedContextRoot inferenceRoot,
-			IndexedClassExpressionList disjoint, int position, ElkAxiom reason) {
+			IndexedClassExpressionList disjoint, int position,
+			ElkAxiom reason) {
 		super(inferenceRoot, disjoint, position, reason);
 	}
 
@@ -52,8 +54,8 @@ public class DisjointSubsumerFromSubsumer extends
 		return getDestination();
 	}
 
-	public SubClassInclusionComposed getPremise(SubClassInclusionComposed.Factory factory) {
-		return factory.getSubClassInclusionComposed(getOrigin(),
+	public SubClassInclusionComposed getPremise() {
+		return FACTORY.getSubClassInclusionComposed(getOrigin(),
 				getDisjointExpressions().getElements().get(getPosition()));
 	}
 
@@ -61,7 +63,7 @@ public class DisjointSubsumerFromSubsumer extends
 	public final <O> O accept(DisjointSubsumerInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	/**
 	 * Visitor pattern for instances
 	 * 
@@ -69,9 +71,9 @@ public class DisjointSubsumerFromSubsumer extends
 	 *
 	 */
 	public static interface Visitor<O> {
-		
+
 		public O visit(DisjointSubsumerFromSubsumer inference);
-		
+
 	}
 
 }

@@ -46,6 +46,12 @@ public class SaturationConclusionBaseFactory
 		implements
 			SaturationConclusion.Factory {
 
+	private static final SaturationConclusion.Factory INSTANCE_ = new SaturationConclusionBaseFactory();
+
+	public static SaturationConclusion.Factory getInstance() {
+		return INSTANCE_;
+	}
+
 	@Override
 	public BackwardLink getBackwardLink(IndexedContextRoot root,
 			IndexedObjectProperty relation, IndexedContextRoot source) {

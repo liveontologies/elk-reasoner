@@ -62,14 +62,13 @@ public class SubClassInclusionObjectHasSelfPropertyRange
 		return getDestination();
 	}
 
-	public SubClassInclusionDecomposed getFirstPremise(
-			SubClassInclusionDecomposed.Factory factory) {
-		return factory.getSubClassInclusionDecomposed(getOrigin(),
+	public SubClassInclusionDecomposed getFirstPremise() {
+		return FACTORY.getSubClassInclusionDecomposed(getOrigin(),
 				premiseSubsumer_);
 	}
 
-	public PropertyRange getSecondPremise(PropertyRange.Factory factory) {
-		return factory.getPropertyRange(premiseSubsumer_.getProperty(),
+	public PropertyRange getSecondPremise() {
+		return FACTORY.getPropertyRange(premiseSubsumer_.getProperty(),
 				getSubsumer());
 	}
 

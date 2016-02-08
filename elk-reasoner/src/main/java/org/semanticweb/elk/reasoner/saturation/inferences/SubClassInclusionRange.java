@@ -51,13 +51,12 @@ public class SubClassInclusionRange
 		return (IndexedRangeFiller) getDestination();
 	}
 
-	public ContextInitialization getFirstPremise(
-			ContextInitialization.Factory factory) {
-		return factory.getContextInitialization(getOrigin());
+	public ContextInitialization getFirstPremise() {
+		return FACTORY.getContextInitialization(getOrigin());
 	}
 
-	public PropertyRange getSecondPremise(PropertyRange.Factory factory) {
-		return factory.getPropertyRange(getOrigin().getProperty(),
+	public PropertyRange getSecondPremise() {
+		return FACTORY.getPropertyRange(getOrigin().getProperty(),
 				getSubsumer());
 	}
 

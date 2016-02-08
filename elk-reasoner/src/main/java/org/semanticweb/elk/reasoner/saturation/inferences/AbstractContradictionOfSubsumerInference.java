@@ -53,8 +53,8 @@ abstract class AbstractContradictionOfSubsumerInference<S extends IndexedClassEx
 		return getDestination();
 	}
 
-	public SubClassInclusionComposed getPremise(SubClassInclusionComposed.Factory factory) {
-		return factory.getSubClassInclusionComposed(getOrigin(),
+	public SubClassInclusionComposed getPremise() {
+		return FACTORY.getSubClassInclusionComposed(getOrigin(),
 				premiseSubsumer_);
 	}
 

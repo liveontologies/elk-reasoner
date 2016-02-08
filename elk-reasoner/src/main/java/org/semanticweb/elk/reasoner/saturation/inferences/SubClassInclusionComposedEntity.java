@@ -52,8 +52,8 @@ public class SubClassInclusionComposedEntity extends
 		return getDestination();
 	}
 
-	public SubClassInclusionDecomposed getPremise(SubClassInclusionDecomposed.Factory factory) {
-		return factory.getSubClassInclusionDecomposed(getOrigin(), getSubsumer());
+	public SubClassInclusionDecomposed getPremise() {
+		return FACTORY.getSubClassInclusionDecomposed(getOrigin(), getSubsumer());
 	}
 
 	@Override

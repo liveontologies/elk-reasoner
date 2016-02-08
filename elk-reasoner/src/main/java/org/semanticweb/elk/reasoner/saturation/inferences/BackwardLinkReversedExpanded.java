@@ -75,13 +75,12 @@ public class BackwardLinkReversedExpanded
 		return this.reason_;
 	}
 
-	public ForwardLink getFirstPremise(ForwardLink.Factory factory) {
-		return factory.getForwardLink(getOrigin(), subChain_, getDestination());
+	public ForwardLink getFirstPremise() {
+		return FACTORY.getForwardLink(getOrigin(), subChain_, getDestination());
 	}
 
-	public IndexedSubObjectPropertyOfAxiom getSecondPremise(
-			IndexedSubObjectPropertyOfAxiom.Factory factory) {
-		return factory.getIndexedSubObjectPropertyOfAxiom(reason_, subChain_,
+	public IndexedSubObjectPropertyOfAxiom getSecondPremise() {
+		return FACTORY.getIndexedSubObjectPropertyOfAxiom(reason_, subChain_,
 				getRelation());
 	}
 

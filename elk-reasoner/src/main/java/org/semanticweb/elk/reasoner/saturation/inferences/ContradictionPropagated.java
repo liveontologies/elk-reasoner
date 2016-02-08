@@ -61,13 +61,13 @@ public class ContradictionPropagated extends AbstractContradictionInference {
 		return inferenceRoot_;
 	}
 
-	public BackwardLink getFirstPremise(BackwardLink.Factory factory) {
-		return factory.getBackwardLink(getOrigin(), premiseRelation_,
+	public BackwardLink getFirstPremise() {
+		return FACTORY.getBackwardLink(getOrigin(), premiseRelation_,
 				getDestination());
 	}
 
-	public Contradiction getSecondPremise(Contradiction.Factory factory) {
-		return factory.getContradiction(getOrigin());
+	public Contradiction getSecondPremise() {
+		return FACTORY.getContradiction(getOrigin());
 	}
 
 	@Override
@@ -88,9 +88,9 @@ public class ContradictionPropagated extends AbstractContradictionInference {
 	 *
 	 */
 	public static interface Visitor<O> {
-		
+
 		public O visit(ContradictionPropagated inference);
-		
+
 	}
 
 }

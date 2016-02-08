@@ -35,18 +35,19 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsume
 
 /**
  * A {@link Contradiction} obtained from two {@link DisjointSubsumer} premises
- * with different disjoint expressions of the same disjoint expression list 
+ * with different disjoint expressions of the same disjoint expression list
  * 
  * @see DisjointSubsumer#getDisjointExpressions()
- *  
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
- *    
- * @author Yevgeny Kazakov        
+ * 
+ * @author Yevgeny Kazakov
  */
-public class ContradictionOfDisjointSubsumers extends
-		AbstractContradictionInference {
+public class ContradictionOfDisjointSubsumers
+		extends
+			AbstractContradictionInference {
 
 	/**
 	 * The disjoint {@link IndexedClassExpression}s that cause the contradiction
@@ -54,15 +55,15 @@ public class ContradictionOfDisjointSubsumers extends
 	private final IndexedClassExpressionList disjointExpressions_;
 
 	/**
-	 * The positions of subsumers that violate the disjointness axiom;
-	 * these positions must be different
+	 * The positions of subsumers that violate the disjointness axiom; these
+	 * positions must be different
 	 */
 	private final Integer firstPosition_, secondPosition_;
-	
+
 	/**
 	 * The original {@link ElkAxiom} due to which this axiom was indexed
 	 */
-	private final ElkAxiom reason_;	
+	private final ElkAxiom reason_;
 
 	public ContradictionOfDisjointSubsumers(DisjointSubsumer premise,
 			Integer otherPos) {
@@ -76,39 +77,41 @@ public class ContradictionOfDisjointSubsumers extends
 	public ElkAxiom getReason() {
 		return reason_;
 	}
-	
+
 	@Override
 	public IndexedContextRoot getOrigin() {
 		return getDestination();
 	}
-	
-	public DisjointSubsumer getFirstPremise(DisjointSubsumer.Factory factory) {
-		return factory.getDisjointSubsumer(getOrigin(),
-				disjointExpressions_, firstPosition_, reason_);
+
+	public DisjointSubsumer getFirstPremise() {
+		return FACTORY.getDisjointSubsumer(getOrigin(), disjointExpressions_,
+				firstPosition_, reason_);
 	}
-	
-	public DisjointSubsumer getSecondPremise(DisjointSubsumer.Factory factory) {
-		return factory.getDisjointSubsumer(getOrigin(),
-				disjointExpressions_, secondPosition_, reason_);
+
+	public DisjointSubsumer getSecondPremise() {
+		return FACTORY.getDisjointSubsumer(getOrigin(), disjointExpressions_,
+				secondPosition_, reason_);
 	}
-	
-	public IndexedDisjointClassesAxiom getThirdPremise(
-			IndexedDisjointClassesAxiom.Factory factory) {
-		return factory.getIndexedDisjointClassesAxiom(reason_,
+
+	public IndexedDisjointClassesAxiom getThirdPremise() {
+		return FACTORY.getIndexedDisjointClassesAxiom(reason_,
 				disjointExpressions_);
 	}
-	
+
 	@Override
 	public String toString() {
-		return "Contradiction from disjoint subsumer " + disjointExpressions_.getElements().get(firstPosition_)
-				+ " using " + disjointExpressions_.getElements().get(secondPosition_) + " due to " + reason_;
+		return "Contradiction from disjoint subsumer "
+				+ disjointExpressions_.getElements().get(firstPosition_)
+				+ " using "
+				+ disjointExpressions_.getElements().get(secondPosition_)
+				+ " due to " + reason_;
 	}
 
 	@Override
 	public final <O> O accept(ContradictionInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	/**
 	 * Visitor pattern for instances
 	 * 
@@ -116,9 +119,9 @@ public class ContradictionOfDisjointSubsumers extends
 	 *
 	 */
 	public static interface Visitor<O> {
-		
+
 		public O visit(ContradictionOfDisjointSubsumers inference);
-		
+
 	}
 
 }

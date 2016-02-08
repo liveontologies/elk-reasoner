@@ -73,13 +73,13 @@ public class SubClassInclusionComposedObjectSomeValuesFrom
 		return inferenceRoot_;
 	}
 
-	public BackwardLink getFirstPremise(BackwardLink.Factory factory) {
-		return factory.getBackwardLink(getOrigin(), propagationRelation_,
+	public BackwardLink getFirstPremise() {
+		return FACTORY.getBackwardLink(getOrigin(), propagationRelation_,
 				getDestination());
 	}
 
-	public Propagation getSecondPremise(Propagation.Factory factory) {
-		return factory.getPropagation(getOrigin(), propagationRelation_,
+	public Propagation getSecondPremise() {
+		return FACTORY.getPropagation(getOrigin(), propagationRelation_,
 				getSubsumer());
 	}
 

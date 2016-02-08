@@ -50,9 +50,8 @@ public class SubClassInclusionOwlThing
 		return getDestination();
 	}
 	
-	public ContextInitialization getPremise(
-			ContextInitialization.Factory factory) {
-		return factory.getContextInitialization(getOrigin());
+	public ContextInitialization getPremise() {
+		return FACTORY.getContextInitialization(getOrigin());
 	}
 
 	@Override

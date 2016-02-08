@@ -36,8 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * 
  * @author "Yevgeny Kazakov"
  */
-public class BackwardLinkOfObjectHasSelf extends
-		AbstractBackwardLinkInference {
+public class BackwardLinkOfObjectHasSelf extends AbstractBackwardLinkInference {
 
 	private final IndexedObjectHasSelf existential_;
 
@@ -56,8 +55,9 @@ public class BackwardLinkOfObjectHasSelf extends
 		return this.existential_;
 	}
 
-	public SubClassInclusionDecomposed getPremise(SubClassInclusionDecomposed.Factory factory) {
-		return factory.getSubClassInclusionDecomposed(getOrigin(), existential_);
+	public SubClassInclusionDecomposed getPremise() {
+		return FACTORY.getSubClassInclusionDecomposed(getOrigin(),
+				existential_);
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class BackwardLinkOfObjectHasSelf extends
 	public final <O> O accept(BackwardLinkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	/**
 	 * Visitor pattern for instances
 	 * 
@@ -77,9 +77,9 @@ public class BackwardLinkOfObjectHasSelf extends
 	 *
 	 */
 	public static interface Visitor<O> {
-		
+
 		public O visit(BackwardLinkOfObjectHasSelf inference);
-		
+
 	}
 
 }

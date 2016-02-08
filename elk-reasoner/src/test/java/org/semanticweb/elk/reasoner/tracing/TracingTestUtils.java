@@ -228,14 +228,14 @@ public class TracingTestUtils {
 				ReasonerStateAccessor.getContext(reasoner, subsumee),
 				ReasonerStateAccessor.transform(reasoner, sup));
 		Inference.Visitor<?> sideConditionVisitor = new InferencePremiseVisitor<Void>(
-				new ConclusionBaseFactory(),
 				new DummyConclusionVisitor<Void>() {
 					@Override
 					protected Void defaultVisit(IndexedAxiom newConclusion) {
 						sideConditions.add(newConclusion.getOriginalAxiom());
 						return null;
 					}
-				}, new DummyElkAxiomVisitor<Void>());
+				},
+				new DummyElkAxiomVisitor<Void>());
 
 		for (Inference inference : ReasonerStateAccessor.getTraceState(reasoner)
 				.getInferences(conclusion)) {

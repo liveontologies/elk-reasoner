@@ -45,8 +45,9 @@ public class BackwardLinkReversed extends AbstractBackwardLinkInference {
 	 * 
 	 */
 	public BackwardLinkReversed(ForwardLink premise) {
-		super(premise.getTarget(), (IndexedObjectProperty) premise
-				.getRelation(), premise.getDestination());
+		super(premise.getTarget(),
+				(IndexedObjectProperty) premise.getRelation(),
+				premise.getDestination());
 	}
 
 	@Override
@@ -54,8 +55,8 @@ public class BackwardLinkReversed extends AbstractBackwardLinkInference {
 		return getTraceRoot();
 	}
 
-	public ForwardLink getPremise(ForwardLink.Factory factory) {
-		return factory.getForwardLink(getOrigin(), getRelation(),
+	public ForwardLink getPremise() {
+		return FACTORY.getForwardLink(getOrigin(), getRelation(),
 				getDestination());
 	}
 
@@ -63,7 +64,7 @@ public class BackwardLinkReversed extends AbstractBackwardLinkInference {
 	public final <O> O accept(BackwardLinkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	/**
 	 * Visitor pattern for instances
 	 * 
@@ -71,9 +72,9 @@ public class BackwardLinkReversed extends AbstractBackwardLinkInference {
 	 *
 	 */
 	public static interface Visitor<O> {
-		
+
 		public O visit(BackwardLinkReversed inference);
-		
+
 	}
 
 }

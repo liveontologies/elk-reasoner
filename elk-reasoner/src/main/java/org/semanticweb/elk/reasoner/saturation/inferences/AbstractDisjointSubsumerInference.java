@@ -27,6 +27,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.DisjointSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
+import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
 public abstract class AbstractDisjointSubsumerInference
@@ -34,6 +36,8 @@ public abstract class AbstractDisjointSubsumerInference
 			DisjointSubsumerImpl
 		implements DisjointSubsumerInference {
 
+	static Conclusion.Factory FACTORY = ConclusionBaseFactory.getInstance();
+	
 	public AbstractDisjointSubsumerInference(IndexedContextRoot root,
 			IndexedClassExpressionList disjoint, int position,
 			ElkAxiom reason) {

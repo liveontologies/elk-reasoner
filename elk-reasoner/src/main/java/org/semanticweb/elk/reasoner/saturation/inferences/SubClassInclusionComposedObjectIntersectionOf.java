@@ -60,15 +60,13 @@ public class SubClassInclusionComposedObjectIntersectionOf
 		return getDestination();
 	}
 
-	public SubClassInclusionComposed getFirstPremise(
-			SubClassInclusionComposed.Factory factory) {
-		return factory.getSubClassInclusionComposed(getOrigin(),
+	public SubClassInclusionComposed getFirstPremise() {
+		return FACTORY.getSubClassInclusionComposed(getOrigin(),
 				getSubsumer().getFirstConjunct());
 	}
 
-	public SubClassInclusionComposed getSecondPremise(
-			SubClassInclusionComposed.Factory factory) {
-		return factory.getSubClassInclusionComposed(getOrigin(),
+	public SubClassInclusionComposed getSecondPremise() {
+		return FACTORY.getSubClassInclusionComposed(getOrigin(),
 				getSubsumer().getSecondConjunct());
 	}
 

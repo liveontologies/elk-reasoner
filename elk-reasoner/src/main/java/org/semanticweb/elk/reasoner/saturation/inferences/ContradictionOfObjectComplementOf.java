@@ -33,18 +33,21 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 
 /**
- * A {@link Contradiction} obtained from two {@link SubClassInclusionComposed} premises
- * having {@link IndexedObjectComplementOf} super-class and its negation respectively.
+ * A {@link Contradiction} obtained from two {@link SubClassInclusionComposed}
+ * premises having {@link IndexedObjectComplementOf} super-class and its
+ * negation respectively.
  * 
  * @see IndexedObjectComplementOf#getNegated()
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
- *         
- * @author Yevgeny Kazakov        
+ * 
+ * @author Yevgeny Kazakov
  */
-public class ContradictionOfObjectComplementOf extends AbstractContradictionInference {
+public class ContradictionOfObjectComplementOf
+		extends
+			AbstractContradictionInference {
 
 	private final IndexedObjectComplementOf negation_;
 
@@ -59,13 +62,13 @@ public class ContradictionOfObjectComplementOf extends AbstractContradictionInfe
 		return visitor.visit(this);
 	}
 
-	public SubClassInclusionComposed getFirstPremise(SubClassInclusionComposed.Factory factory) {
-		return factory.getSubClassInclusionComposed(getOrigin(),
+	public SubClassInclusionComposed getFirstPremise() {
+		return FACTORY.getSubClassInclusionComposed(getOrigin(),
 				negation_.getNegated());
 	}
 
-	public SubClassInclusionDecomposed getSecondPremise(SubClassInclusionDecomposed.Factory factory) {
-		return factory.getSubClassInclusionDecomposed(getOrigin(), negation_);
+	public SubClassInclusionDecomposed getSecondPremise() {
+		return FACTORY.getSubClassInclusionDecomposed(getOrigin(), negation_);
 	}
 
 	@Override
@@ -78,7 +81,7 @@ public class ContradictionOfObjectComplementOf extends AbstractContradictionInfe
 	public final <O> O accept(ContradictionInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	/**
 	 * Visitor pattern for instances
 	 * 
@@ -86,9 +89,9 @@ public class ContradictionOfObjectComplementOf extends AbstractContradictionInfe
 	 *
 	 */
 	public static interface Visitor<O> {
-		
+
 		public O visit(ContradictionOfObjectComplementOf inference);
-		
+
 	}
 
 }

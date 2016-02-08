@@ -74,9 +74,8 @@ public class SubClassInclusionComposedObjectUnionOf
 		return position_;
 	}
 
-	public SubClassInclusionComposed getPremise(
-			SubClassInclusionComposed.Factory factory) {
-		return factory.getSubClassInclusionComposed(getOrigin(),
+	public SubClassInclusionComposed getPremise() {
+		return FACTORY.getSubClassInclusionComposed(getOrigin(),
 				getSubsumer().getDisjuncts().get(position_));
 	}
 

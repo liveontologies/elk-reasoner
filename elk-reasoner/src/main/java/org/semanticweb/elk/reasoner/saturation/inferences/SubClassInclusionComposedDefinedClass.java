@@ -73,15 +73,13 @@ public class SubClassInclusionComposedDefinedClass
 		return this.reason_;
 	}
 
-	public SubClassInclusionComposed getFirstPremise(
-			SubClassInclusionComposed.Factory factory) {
-		return factory.getSubClassInclusionComposed(getOrigin(),
+	public SubClassInclusionComposed getFirstPremise() {
+		return FACTORY.getSubClassInclusionComposed(getOrigin(),
 				definition_);
 	}
 
-	public IndexedDefinitionAxiom getSecondPremise(
-			IndexedDefinitionAxiom.Factory factory) {
-		return factory.getIndexedDefinitionAxiom(reason_, getSubsumer(),
+	public IndexedDefinitionAxiom getSecondPremise() {
+		return FACTORY.getIndexedDefinitionAxiom(reason_, getSubsumer(),
 				definition_);
 	}
 

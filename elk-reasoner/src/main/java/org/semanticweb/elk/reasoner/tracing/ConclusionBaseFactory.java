@@ -55,9 +55,15 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
 
 public class ConclusionBaseFactory implements Conclusion.Factory {
 
+	private static final Conclusion.Factory INSTANCE_ = new ConclusionBaseFactory();
+
 	private final IndexedAxiom.Factory indexedAxiomFactory_ = new IndexedAxiomBaseFactory();
 
 	private final SaturationConclusion.Factory saturationConclusionFactory_ = new SaturationConclusionBaseFactory();
+
+	public static Conclusion.Factory getInstance() {
+		return INSTANCE_;
+	}
 
 	@SuppressWarnings("static-method")
 	protected <C extends Conclusion> C filter(C newConclusion) {
@@ -161,19 +167,16 @@ public class ConclusionBaseFactory implements Conclusion.Factory {
 
 	@Override
 	public SubClassInclusionComposed getSubClassInclusionComposed(
-			IndexedContextRoot destination,
-			IndexedClassExpression subsumer) {
+			IndexedContextRoot destination, IndexedClassExpression subsumer) {
 		return filter(saturationConclusionFactory_
 				.getSubClassInclusionComposed(destination, subsumer));
 	}
 
 	@Override
 	public SubClassInclusionDecomposed getSubClassInclusionDecomposed(
-			IndexedContextRoot destination,
-			IndexedClassExpression subsumer) {
-		return filter(
-				saturationConclusionFactory_.getSubClassInclusionDecomposed(
-						destination, subsumer));
+			IndexedContextRoot destination, IndexedClassExpression subsumer) {
+		return filter(saturationConclusionFactory_
+				.getSubClassInclusionDecomposed(destination, subsumer));
 	}
 
 	@Override
