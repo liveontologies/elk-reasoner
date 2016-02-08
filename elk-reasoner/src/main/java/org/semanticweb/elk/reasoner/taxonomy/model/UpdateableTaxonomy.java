@@ -28,22 +28,25 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
 import java.util.Collection;
 import java.util.Set;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
-public interface UpdateableTaxonomy<T extends ElkObject> extends Taxonomy<T> {
+public interface UpdateableTaxonomy<T extends ElkEntity> extends Taxonomy<T> {
 
 	public UpdateableTaxonomyNode<T> getCreateNode(Collection<T> members);
 
 	public boolean addToBottomNode(T member);
 
+	public boolean removeFromBottomNode(T member);
+
 	public boolean removeNode(UpdateableTaxonomyNode<T> node);
 
-	public UpdateableTaxonomyNode<T> getUpdateableNode(T elkObject);
+	public UpdateableTaxonomyNode<T> getUpdateableNode(T elkEntity);
 
 	public Set<? extends UpdateableTaxonomyNode<T>> getUpdateableNodes();
 

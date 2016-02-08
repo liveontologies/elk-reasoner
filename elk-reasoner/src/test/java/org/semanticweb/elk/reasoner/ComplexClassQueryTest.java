@@ -122,14 +122,14 @@ public class ComplexClassQueryTest {
 				objectFactory.getObjectIntersectionOf(B, C), true);
 		assertEquals(1, superClasses.size());
 		for (Node<ElkClass> node : superClasses) {
-			assertTrue(node.getMembers().contains(C));
+			assertTrue(node.contains(C));
 		}
 
 		Set<? extends Node<ElkClass>> subClasses = reasoner.getSubClasses(
 				objectFactory.getObjectIntersectionOf(B, C), true);
 		assertEquals(1, subClasses.size());
 		for (Node<ElkClass> node : subClasses) {
-			assertTrue(node.getMembers().contains(A));
+			assertTrue(node.contains(A));
 		}
 
 	}
@@ -144,10 +144,8 @@ public class ComplexClassQueryTest {
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
 		ElkClassExpression queryExpression = objectFactory
 				.getObjectIntersectionOf(A, B);
-		assertEquals(0, reasoner.getEquivalentClasses(queryExpression)
-				.getMembers().size());
+		assertEquals(0, reasoner.getEquivalentClasses(queryExpression).size());
 		// the following has reproduced Issue 23:
-		assertEquals(0, reasoner.getEquivalentClasses(queryExpression)
-				.getMembers().size());
+		assertEquals(0, reasoner.getEquivalentClasses(queryExpression).size());
 	}
 }

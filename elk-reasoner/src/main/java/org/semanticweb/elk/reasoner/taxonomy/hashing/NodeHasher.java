@@ -97,18 +97,17 @@ public class NodeHasher implements Hasher<Node<? extends ElkEntity>> {
 	 */
 	@Override
 	public int hash(Node<? extends ElkEntity> node) {
-		if (node.getMembers().size() >= cacheNodeMemberNo) {
+		if (node.size() >= cacheNodeMemberNo) {
 			if (hashCache.containsKey(node)) {
 				return hashCache.get(node);
 			}
 			// else
-			int hash = HashGenerator.combineMultisetHash(true,
-					node.getMembers(), elkEntityHasher);
+			int hash = HashGenerator.combineMultisetHash(true, node,
+					elkEntityHasher);
 			hashCache.put(node, hash);
 			return hash;
 		}
 		// else
-		return HashGenerator.combineMultisetHash(true, node.getMembers(),
-				elkEntityHasher);
+		return HashGenerator.combineMultisetHash(true, node, elkEntityHasher);
 	}
 }

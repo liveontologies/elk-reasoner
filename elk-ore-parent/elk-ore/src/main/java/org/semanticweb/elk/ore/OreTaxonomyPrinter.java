@@ -122,7 +122,10 @@ public class OreTaxonomyPrinter extends TaxonomyPrinter {
 			TaxonomyNode<ElkClass> classNode = classTaxonomy.getNode(elkClass);
 
 			ArrayList<ElkClass> orderedEquivalentClasses = new ArrayList<ElkClass>(
-					classNode.getMembers());
+					classNode.size());
+			for (ElkClass member : classNode) {
+				orderedEquivalentClasses.add(member);
+			}
 			Collections.sort(orderedEquivalentClasses, CLASS_COMPARATOR);
 
 			TreeSet<ElkClass> orderedSubClasses = new TreeSet<ElkClass>(
@@ -164,13 +167,16 @@ public class OreTaxonomyPrinter extends TaxonomyPrinter {
 					.getInstanceNode(individual);
 
 			ArrayList<ElkNamedIndividual> orderedSameIndividuals = new ArrayList<ElkNamedIndividual>(
-					node.getMembers());
+					node.size());
+			for (ElkNamedIndividual member : node) {
+				orderedSameIndividuals.add(member);
+			}
 			Collections.sort(orderedSameIndividuals, INDIVIDUAL_COMPARATOR);
 
 			TreeSet<ElkClass> orderedTypes = new TreeSet<ElkClass>(
 					CLASS_COMPARATOR);
 			for (TaxonomyNode<ElkClass> typeNode : node.getAllTypeNodes()) {
-				for (ElkClass member : typeNode.getMembers()) {
+				for (ElkClass member : typeNode) {
 					orderedTypes.add(member);
 				}
 			}

@@ -25,7 +25,6 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -35,7 +34,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.util.Comparators;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeUtils;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
@@ -54,6 +54,7 @@ import org.slf4j.LoggerFactory;
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  * @author Pavel Klinov
+ * @author Peter Skocovsky
  */
 class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 
@@ -96,12 +97,13 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 	 *            non-empty list of equivalent ElkClass objects
 	 */
 	protected NonBottomClassNode(ConcurrentClassTaxonomy taxonomy,
-			Collection<ElkClass> members) {
+			Collection<ElkClass> members,
+			final ComparatorKeyProvider<ElkEntity> classKeyProvider) {
 		this.taxonomy_ = taxonomy;
 		this.members_ = new ArrayList<ElkClass>(members);
 		this.directSubNodes_ = new ArrayHashSet<UpdateableTaxonomyNode<ElkClass>>();
 		this.directSuperNodes_ = new ArrayHashSet<UpdateableTaxonomyNode<ElkClass>>();
-		Collections.sort(this.members_, Comparators.ELK_CLASS_COMPARATOR);
+		Collections.sort(this.members_, this.taxonomy_.getKeyProvider().getComparator());
 	}
 
 	/**
@@ -136,39 +138,27 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 		directSubNodes_.add(subNode);
 	}
 
-	// TODO: change the type of the output to SortedSet
 	@Override
-	public Set<ElkClass> getMembers() {
-		// create an unmodifiable set view of the members; alternatively, one
-		// could have created a TreeSet, but it consumes more memory
-		return new AbstractSet<ElkClass>() {
-
-			@Override
-			public boolean contains(Object arg) {
-				if (arg instanceof ElkClass)
-					return (Collections.binarySearch(members_, (ElkClass) arg,
-							Comparators.ELK_CLASS_COMPARATOR) >= 0);
-				return false;
-			}
-
-			@Override
-			public boolean isEmpty() {
-				return members_.isEmpty();
-			}
-
-			@Override
-			public Iterator<ElkClass> iterator() {
-				return members_.iterator();
-			}
-
-			@Override
-			public int size() {
-				return members_.size();
-			}
-
-		};
+	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
+		return taxonomy_.getKeyProvider();
 	}
-
+	
+	@Override
+	public Iterator<ElkClass> iterator() {
+		return members_.iterator();
+	}
+	
+	@Override
+	public boolean contains(ElkClass arg) {
+		return (Collections.binarySearch(members_, arg,
+				taxonomy_.getKeyProvider().getComparator()) >= 0);
+	}
+	
+	@Override
+	public int size() {
+		return members_.size();
+	}
+	
 	@Override
 	public ElkClass getCanonicalMember() {
 		return members_.get(0);
@@ -225,7 +215,7 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 		LOGGER_.trace("{}: updating members to {}", this, members);
 		members_.clear();
 		members_.addAll(members);
-		Collections.sort(this.members_, Comparators.ELK_CLASS_COMPARATOR);
+		Collections.sort(this.members_, taxonomy_.getKeyProvider().getComparator());
 	}
 
 	@Override

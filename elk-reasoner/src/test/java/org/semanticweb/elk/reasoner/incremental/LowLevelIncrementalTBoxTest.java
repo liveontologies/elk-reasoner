@@ -266,7 +266,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
 
-		assertEquals(2, taxonomy.getNode(a).getMembers().size());
+		assertEquals(2, taxonomy.getNode(a).size());
 
 		reasoner.setAllowIncrementalMode(true);
 
@@ -278,7 +278,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		taxonomy = reasoner.getTaxonomy();
 
-		assertEquals(2, taxonomy.getNode(a).getMembers().size());
+		assertEquals(2, taxonomy.getNode(a).size());
 
 		reasoner.registerAxiomLoader(changeLoader);
 
@@ -287,7 +287,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		taxonomy = reasoner.getTaxonomy();
 
-		assertEquals(1, taxonomy.getNode(a).getMembers().size());
+		assertEquals(1, taxonomy.getNode(a).size());
 
 		reasoner.registerAxiomLoader(changeLoader);
 
@@ -297,7 +297,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		taxonomy = reasoner.getTaxonomy();
 
-		assertEquals(1, taxonomy.getNode(a).getMembers().size());
+		assertEquals(1, taxonomy.getNode(a).size());
 
 		reasoner.registerAxiomLoader(changeLoader);
 
@@ -307,7 +307,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		taxonomy = reasoner.getTaxonomy();
 
-		assertEquals(2, taxonomy.getNode(a).getMembers().size());
+		assertEquals(2, taxonomy.getNode(a).size());
 
 	}
 
@@ -841,7 +841,7 @@ public class LowLevelIncrementalTBoxTest {
 		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
 
 		// node for X = [X]
-		assertEquals(1, taxonomy.getNode(x).getMembers().size());
+		assertEquals(1, taxonomy.getNode(x).size());
 
 		reasoner.setAllowIncrementalMode(true);
 		TestChangesLoader changeLoader = new TestChangesLoader();
@@ -852,7 +852,7 @@ public class LowLevelIncrementalTBoxTest {
 		taxonomy = reasoner.getTaxonomy();
 
 		// node for X = [X,Y]
-		assertEquals(2, taxonomy.getNode(y).getMembers().size());
+		assertEquals(2, taxonomy.getNode(y).size());
 
 	}
 
@@ -886,7 +886,7 @@ public class LowLevelIncrementalTBoxTest {
 		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
 
 		// Y = A
-		assertEquals(2, taxonomy.getNode(y).getMembers().size());
+		assertEquals(2, taxonomy.getNode(y).size());
 
 		reasoner.setAllowIncrementalMode(true);
 		TestChangesLoader changeLoader = new TestChangesLoader();
@@ -897,7 +897,7 @@ public class LowLevelIncrementalTBoxTest {
 		taxonomy = reasoner.getTaxonomy();
 
 		// Y = X = A
-		assertEquals(3, taxonomy.getNode(y).getMembers().size());
+		assertEquals(3, taxonomy.getNode(y).size());
 
 	}
 

@@ -21,29 +21,47 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Set;
+import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 
-public class SimpleNode<T extends ElkObject> implements Node<T> {
+public class SimpleNode<T extends ElkEntity> implements Node<T> {
 
 	final SortedSet<T> members;
+	protected final ComparatorKeyProvider<ElkEntity> comparatorKeyProvider_;
 
-	public SimpleNode(Collection<T> members, Comparator<T> cmp) {
-		this.members = new TreeSet<T>(cmp);
-		this.members.addAll(members);
+	public SimpleNode(Iterable<T> members,
+			final ComparatorKeyProvider<ElkEntity> comparatorKeyProvider) {
+		this.members = new TreeSet<T>(comparatorKeyProvider.getComparator());
+		this.comparatorKeyProvider_ = comparatorKeyProvider;
+		for (T member : members) {
+			this.members.add(member);
+		}
 	}
-
+	
 	@Override
-	public Set<T> getMembers() {
-		return members;
+	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
+		return comparatorKeyProvider_;
 	}
-
+	
+	@Override
+	public Iterator<T> iterator() {
+		return members.iterator();
+	}
+	
+	@Override
+	public boolean contains(T member) {
+		return members.contains(member);
+	}
+	
+	@Override
+	public int size() {
+		return members.size();
+	}
+	
 	@Override
 	public T getCanonicalMember() {
 		return members.isEmpty() ? null : members.iterator().next();

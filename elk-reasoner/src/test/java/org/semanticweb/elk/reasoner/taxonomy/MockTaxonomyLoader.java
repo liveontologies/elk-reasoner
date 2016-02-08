@@ -50,7 +50,6 @@ import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.owl.visitors.AbstractElkEntityVisitor;
 import org.semanticweb.elk.reasoner.taxonomy.MockInstanceTaxonomy.MutableTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
@@ -62,6 +61,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
  *         pavel.klinov@uni-ulm.de
  * 
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  */
 public class MockTaxonomyLoader {
 
@@ -93,8 +93,8 @@ public class MockTaxonomyLoader {
 		final MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = new MockInstanceTaxonomy<ElkClass, ElkNamedIndividual>(
 				factory.getClass(PredefinedElkClass.OWL_THING.getIri()),
 				factory.getClass(PredefinedElkClass.OWL_NOTHING.getIri()),
-				Comparators.ELK_CLASS_COMPARATOR,
-				Comparators.ELK_NAMED_INDIVIDUAL_COMPARATOR);
+				ElkClassKeyProvider.INSTANCE,
+				ElkIndividualKeyProvider.INSTANCE);
 		TaxonomyInserter listener = new TaxonomyInserter(taxonomy);
 
 		parser.accept(listener);
@@ -181,7 +181,9 @@ public class MockTaxonomyLoader {
 					superNode = taxonomy.getCreateTypeNode(Collections
 							.singleton(superClass));
 
-					subNode.addDirectParent(superNode);
+					if (!subNode.equals(superNode)) {
+						subNode.addDirectParent(superNode);
+					}
 				}
 			}
 

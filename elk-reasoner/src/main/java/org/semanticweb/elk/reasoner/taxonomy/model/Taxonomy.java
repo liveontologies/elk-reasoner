@@ -27,32 +27,41 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
 
 import java.util.Set;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
- * A hierarchy of certain ElkObjects. For each such object, the taxonomy holds a
- * {@link TaxonomyNode} object from which direct sub- and super- nodes can be
- * retrieved.
+ * A hierarchy of certain ElkEntities.
+ * For each such entity, the taxonomy holds a {@link TaxonomyNode} object
+ * from which direct sub- and super- nodes can be retrieved.
  * 
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  * @author Frantisek Simancik
+ * @author Peter Skocovsky
  * @param <T>
  *            the type of objects stored in this taxonomy
  */
-public interface Taxonomy<T extends ElkObject> {
+public interface Taxonomy<T extends ElkEntity> {
 
 	/**
-	 * Returns the {@link TaxonomyNode} containing the given {@link ElkObject}
+	 * Returns the {@link ComparatorKeyProvider} that provides a key for each node member.
+	 * These keys are used to compute hash codes and to compare the members.
+	 * 
+	 * @return the {@link ComparatorKeyProvider} that provides a key for each node member.
+	 */
+	public ComparatorKeyProvider<ElkEntity> getKeyProvider();
+
+	/**
+	 * Returns the {@link TaxonomyNode} containing the given {@link ElkEntity}
 	 * as a member or {@code null} if the input does not occur in the taxonomy.
 	 * 
-	 * @param elkObject
-	 *            the {@link ElkObject} for which to return the
+	 * @param elkEntity
+	 *            the {@link ElkEntity} for which to return the
 	 *            {@link TaxonomyNode}
 	 * @return the {@link TaxonomyNode} for the specified input
-	 *         {@link ElkObject}
+	 *         {@link ElkEntity}
 	 */
-	public TaxonomyNode<T> getNode(T elkObject);
+	public TaxonomyNode<T> getNode(T elkEntity);
 
 	/**
 	 * Obtain an unmodifiable Set of all nodes in this taxonomy.

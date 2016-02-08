@@ -87,12 +87,12 @@ public class ComprehensiveSubsumptionTracingTests implements TracingTests {
 			TaxonomyNode<ElkClass> node, TaxonomyNode<ElkClass> superNode,
 			TracingTestVisitor visitor) throws Exception {
 
-		for (ElkClass sub : node.getMembers()) {
+		for (ElkClass sub : node) {
 			if (sub.getIri().equals(PredefinedElkIris.OWL_NOTHING)) {
 				continue;
 			}
 
-			for (ElkClass sup : superNode.getMembers()) {
+			for (ElkClass sup : superNode) {
 				if (sup.getIri().equals(PredefinedElkIris.OWL_THING)) {
 					continue;
 				}

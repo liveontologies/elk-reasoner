@@ -29,7 +29,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Set;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 
@@ -40,7 +40,7 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class DepthFirstSearch<T extends ElkObject> {
+public class DepthFirstSearch<T extends ElkEntity> {
 	// The search direction, up or down the taxonomy
 	public enum Direction {
 		UP {
@@ -86,7 +86,7 @@ public class DepthFirstSearch<T extends ElkObject> {
 		pathSet.remove(node);
 	}
 
-	protected static <U extends ElkObject> Set<? extends TaxonomyNode<U>> getSuccessors(
+	protected static <U extends ElkEntity> Set<? extends TaxonomyNode<U>> getSuccessors(
 			TaxonomyNode<U> node, Direction dir) {
 		switch (dir) {
 		case UP:

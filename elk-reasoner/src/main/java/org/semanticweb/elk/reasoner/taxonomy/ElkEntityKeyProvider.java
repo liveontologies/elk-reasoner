@@ -1,14 +1,12 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.taxonomy.model;
+package org.semanticweb.elk.reasoner.taxonomy;
+
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,19 +22,21 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
-import java.util.Set;
-
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.reasoner.taxonomy.model.KeyProvider;
 
 /**
- * Should be implemented by bottom nodes in updateable taxonomies
+ * {@link KeyProvider} for {@link ElkEntity}.
  * 
- * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
-public interface UpdateableBottomNode<T extends ElkEntity> extends TaxonomyNode<T> {
+public class ElkEntityKeyProvider implements KeyProvider<ElkEntity> {
 
-	public Set<? extends UpdateableTaxonomyNode<T>> getDirectUpdateableSuperNodes();
+	public static final ElkEntityKeyProvider INSTANCE = new ElkEntityKeyProvider();
 	
+	@Override
+	public Object getKey(final ElkEntity arg) {
+		return arg.getIri();
+	}
+
 }

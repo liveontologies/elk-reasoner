@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,96 +22,22 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * #L%
  */
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
-import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
-import org.semanticweb.elk.util.collections.ArrayHashMap;
 
 /**
- * An {@link InstanceTaxonomy} consisting of a single {@link TypeNode} = top
- * node = bottom node, which has a single {@link InstanceNode}. Typically, this
- * is used to represent an inconsistent {@link InstanceTaxonomy}.
- * 
- * @author "Yevgeny Kazakov"
  * @author Peter Skocovsky
- * 
+ *
  * @param <T>
- *            the type of objects stored in this taxonomy
  * @param <I>
- *            the type of instances of nodes of this taxonomy
- * @param <N>
- *            the type of the node of this taxonomy
  */
-public class SingletoneInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity, N extends OrphanTypeNode<T, I>>
-		extends SingletoneTaxonomy<T, N> implements InstanceTaxonomy<T, I> {
-
-	final Map<Object, InstanceNode<T, I>> instanceNodeLookup;
-	/** provides keys that are used for hashing instead of the elkIndividuals */
-	private final ComparatorKeyProvider<ElkEntity> individualKeyProvider_;
-
-	public SingletoneInstanceTaxonomy(N node,
-			final ComparatorKeyProvider<ElkEntity> individualKeyProvider) {
-		super(node);
-		this.individualKeyProvider_ = individualKeyProvider;
-		this.instanceNodeLookup = new ArrayHashMap<Object, InstanceNode<T, I>>(node
-				.getAllInstanceNodes().size());
-		for (InstanceNode<T, I> instanceNode : node.getAllInstanceNodes()) {
-			for (I instance : instanceNode) {
-				instanceNodeLookup.put(individualKeyProvider_.getKey(instance), instanceNode);
-			}
-		}
-	}
-
-	@Override
-	public ComparatorKeyProvider<ElkEntity> getInstanceKeyProvider() {
-		return individualKeyProvider_;
-	}
-	
-	@Override
-	public TypeNode<T, I> getTopNode() {
-		return node;
-	}
-
-	@Override
-	public TypeNode<T, I> getBottomNode() {
-		return node;
-	}
-
-	@Override
-	public TypeNode<T, I> getTypeNode(T elkObject) {
-		if (node.contains(elkObject))
-			return node;
-		// else
-		return null;
-	}
-
-	@Override
-	public Set<? extends TypeNode<T, I>> getTypeNodes() {
-		return Collections.singleton(node);
-	}
-
-	@Override
-	public InstanceNode<T, I> getInstanceNode(I elkObject) {
-		return instanceNodeLookup.get(individualKeyProvider_.getKey(elkObject));
-	}
-
-	@Override
-	public Set<? extends InstanceNode<T, I>> getInstanceNodes() {
-		return node.instanceNodes;
-	}
-	
-	/* 
-	 * FIXME: The following code is duplicated.
-	 * It should be subclassed from AbstractInstanceTaxonomy.
-	 * This should be implemented in a different way during the Taxonomy Interface Refactor.
-	 */
+public abstract class AbstractInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
+		extends AbstractTaxonomy<T> implements InstanceTaxonomy<T, I> {
 	
 	@Override
 	public int hashCode() {
@@ -220,10 +146,7 @@ public class SingletoneInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity
 			}
 			
 		} catch (ClassCastException e) {
-			// Some contains() received an argument of a wrong type.
-			return false;
-		} catch (NullPointerException e) {
-			// Some set does not support null elements.
+			// The other taxonomy contains members of different type than this one.
 			return false;
 		}
 		

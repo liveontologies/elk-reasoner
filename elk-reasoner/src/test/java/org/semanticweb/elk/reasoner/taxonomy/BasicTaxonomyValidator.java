@@ -27,7 +27,7 @@ package org.semanticweb.elk.reasoner.taxonomy;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.DepthFirstSearch.Direction;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
@@ -39,7 +39,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class BasicTaxonomyValidator<T extends ElkObject> implements TaxonomyValidator<T> {
+public class BasicTaxonomyValidator<T extends ElkEntity> implements TaxonomyValidator<T> {
 
 	private final List<TaxonomyNodeVisitor<T>> visitors_ = new ArrayList<TaxonomyNodeVisitor<T>>();
 	

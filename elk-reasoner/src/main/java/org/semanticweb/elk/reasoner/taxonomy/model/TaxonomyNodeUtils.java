@@ -30,7 +30,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 /**
@@ -49,12 +49,12 @@ public class TaxonomyNodeUtils {
 	 *
 	 * pavel.klinov@uni-ulm.de
 	 */
-	interface GetSuccessors<T extends ElkObject, O extends TaxonomyNode<T>> {
+	interface GetSuccessors<T extends ElkEntity, O extends TaxonomyNode<T>> {
 		
 		Set<? extends O> get(O node);
 	}
 
-	private static <T extends ElkObject, 	O extends TaxonomyNode<T>> Set<O> getAllReachable(Collection<? extends O> direct, GetSuccessors<T, O> succ) {		
+	private static <T extends ElkEntity, 	O extends TaxonomyNode<T>> Set<O> getAllReachable(Collection<? extends O> direct, GetSuccessors<T, O> succ) {		
 		Set<O> result = new ArrayHashSet<O>(direct.size());
 		Queue<O> todo = new LinkedList<O>();
 		
@@ -73,7 +73,7 @@ public class TaxonomyNodeUtils {
 		return Collections.unmodifiableSet(result);
 	}
 	
-	public static <T extends ElkObject> Set<? extends TaxonomyNode<T>> getAllSuperNodes(TaxonomyNode<T> tnode) {
+	public static <T extends ElkEntity> Set<? extends TaxonomyNode<T>> getAllSuperNodes(TaxonomyNode<T> tnode) {
 		return getAllReachable(tnode.getDirectSuperNodes(), new GetSuccessors<T, TaxonomyNode<T>> () {
 
 			@Override
@@ -82,7 +82,7 @@ public class TaxonomyNodeUtils {
 			}});
 	}
 	
-	public static <T extends ElkObject> Set<? extends TaxonomyNode<T>> getAllSubNodes(TaxonomyNode<T> tnode) {
+	public static <T extends ElkEntity> Set<? extends TaxonomyNode<T>> getAllSubNodes(TaxonomyNode<T> tnode) {
 		return getAllReachable(tnode.getDirectSubNodes(), new GetSuccessors<T, TaxonomyNode<T>> () {
 
 			@Override
@@ -91,7 +91,7 @@ public class TaxonomyNodeUtils {
 			}});
 	}	
 	
-	public static <T extends ElkObject> Set<? extends UpdateableTaxonomyNode<T>> getAllUpdateableSubNodes(UpdateableTaxonomyNode<T> tnode) {
+	public static <T extends ElkEntity> Set<? extends UpdateableTaxonomyNode<T>> getAllUpdateableSubNodes(UpdateableTaxonomyNode<T> tnode) {
 		return getAllReachable(tnode.getDirectUpdateableSubNodes(), new GetSuccessors<T, UpdateableTaxonomyNode<T>> () {
 
 			@Override
@@ -100,7 +100,7 @@ public class TaxonomyNodeUtils {
 			}});
 	}
 	
-	public static <T extends ElkObject> Set<? extends TaxonomyNode<T>> getAllUpdateableSuperNodes(UpdateableTaxonomyNode<T> tnode) {
+	public static <T extends ElkEntity> Set<? extends TaxonomyNode<T>> getAllUpdateableSuperNodes(UpdateableTaxonomyNode<T> tnode) {
 		return getAllReachable(tnode.getDirectUpdateableSuperNodes(), new GetSuccessors<T, UpdateableTaxonomyNode<T>> () {
 
 			@Override
@@ -109,7 +109,7 @@ public class TaxonomyNodeUtils {
 			}});
 	}	
 	
-	public static <T extends ElkObject> Set<? extends UpdateableTaxonomyNode<T>> getAllUpdateableSuperNodes(UpdateableBottomNode<T> tnode) {
+	public static <T extends ElkEntity> Set<? extends UpdateableTaxonomyNode<T>> getAllUpdateableSuperNodes(UpdateableBottomNode<T> tnode) {
 		return getAllReachable(tnode.getDirectUpdateableSuperNodes(), new GetSuccessors<T, UpdateableTaxonomyNode<T>> () {
 
 			@Override
