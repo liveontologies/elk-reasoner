@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ContextInitializationImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
 public abstract class AbstractContextInitializationInference
@@ -34,6 +35,13 @@ public abstract class AbstractContextInitializationInference
 
 	protected AbstractContextInitializationInference(IndexedContextRoot root) {
 		super(root);
+	}
+
+	/**
+	 * @return the conclusion produced by this inference
+	 */
+	public ContextInitialization getConclusion() {
+		return this;
 	}
 
 	@Override

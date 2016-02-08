@@ -71,10 +71,6 @@ public class PropertyRangeInherited extends AbstractPropertyRangeInference {
 		return factory.getSubPropertyChain(getProperty(), getSuperProperty());
 	}
 
-	public PropertyRange getConclusion(PropertyRange.Factory factory) {
-		return factory.getPropertyRange(getProperty(), getRange());
-	}
-
 	public IndexedObjectPropertyRangeAxiom getSecondPremise(
 			IndexedObjectPropertyRangeAxiom.Factory factory) {
 		return factory.getIndexedObjectPropertyRangeAxiom(reason_,

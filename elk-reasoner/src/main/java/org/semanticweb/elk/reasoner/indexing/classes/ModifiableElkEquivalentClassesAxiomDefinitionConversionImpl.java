@@ -62,10 +62,8 @@ class ModifiableElkEquivalentClassesAxiomDefinitionConversionImpl
 	}
 
 	@Override
-	public IndexedDefinitionAxiom getConclusion(
-			IndexedDefinitionAxiom.Factory factory) {
-		return factory.getIndexedDefinitionAxiom(getOriginalAxiom(),
-				getDefinedClass(), getDefinition());
+	public IndexedDefinitionAxiom getConclusion() {
+		return this;
 	}
 
 	@Override

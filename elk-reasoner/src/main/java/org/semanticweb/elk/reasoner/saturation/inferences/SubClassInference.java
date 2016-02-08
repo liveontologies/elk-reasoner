@@ -46,7 +46,7 @@ public interface SubClassInference extends ClassInference {
 
 	/**
 	 * @return the {@link IndexedObjectProperty}, which is the same as
-	 *         {@link SubClassConclusion#getTraceSuRoot()} for the conclusion of
+	 *         {@link SubClassConclusion#getTraceSubRoot()} for the conclusion of
 	 *         this {@link SubClassInference} and for some of the premises of
 	 *         this {@link SubClassInference}, if it has any (i.e., it is not an
 	 *         {@link SubContextInitializationInference}). This value is used

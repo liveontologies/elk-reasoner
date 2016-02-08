@@ -27,9 +27,6 @@ package org.semanticweb.elk.reasoner.indexing.model;
  * (caching).
  * 
  * @author "Yevgeny Kazakov"
- *
- * @param <T>
- *            the type of the {@link ModifiableIndexedObjectHasSelf}
  */
 public interface CachedIndexedObjectHasSelf extends
 		ModifiableIndexedObjectHasSelf,

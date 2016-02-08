@@ -27,9 +27,6 @@ package org.semanticweb.elk.reasoner.indexing.model;
  * memoization (caching).
  * 
  * @author "Yevgeny Kazakov"
- *
- * @param <T>
- *            the type of the {@link CachedIndexedObjectIntersectionOf}
  */
 public interface CachedIndexedObjectIntersectionOf extends
 		ModifiableIndexedObjectIntersectionOf,

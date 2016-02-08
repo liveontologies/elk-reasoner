@@ -48,12 +48,6 @@ public class SubContextInitializationNoPremises
 		return getDestination();
 	}
 
-	public SubContextInitialization getConclusion(
-			SubContextInitialization.Factory factory) {
-		return factory.getSubContextInitialization(getDestination(),
-				getSubDestination());
-	}
-
 	@Override
 	public String toString() {
 		return super.toString() + " (no premises)";

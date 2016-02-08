@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedDisjointClassesAxiomInference;
@@ -43,6 +44,11 @@ abstract class ModifiableIndexedDisjointClassesAxiomInferenceImpl<A extends ElkA
 	ModifiableIndexedDisjointClassesAxiomInferenceImpl(A originalAxiom,
 			ModifiableIndexedClassExpressionList members) {
 		super(originalAxiom, members);
+	}
+	
+	@Override
+	public IndexedDisjointClassesAxiom getConclusion() {
+		return this;
 	}
 
 	@Override

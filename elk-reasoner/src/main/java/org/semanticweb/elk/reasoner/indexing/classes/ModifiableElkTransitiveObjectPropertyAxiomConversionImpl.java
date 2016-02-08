@@ -48,10 +48,8 @@ class ModifiableElkTransitiveObjectPropertyAxiomConversionImpl
 	}
 
 	@Override
-	public IndexedSubObjectPropertyOfAxiom getConclusion(
-			IndexedSubObjectPropertyOfAxiom.Factory factory) {
-		return factory.getIndexedSubObjectPropertyOfAxiom(getOriginalAxiom(),
-				getSubPropertyChain(), getSuperProperty());
+	public IndexedSubObjectPropertyOfAxiom getConclusion() {
+		return this;
 	}
 
 	@Override

@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SubContextInitializationImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
 public abstract class AbstractSubContextInitializationInference
@@ -33,10 +34,16 @@ public abstract class AbstractSubContextInitializationInference
 		implements
 			SubContextInitializationInference {
 
-	
 	protected AbstractSubContextInitializationInference(IndexedContextRoot root,
 			IndexedObjectProperty subRoot) {
 		super(root, subRoot);
+	}
+
+	/**
+	 * @return the conclusion produced by this inference
+	 */
+	public SubContextInitialization getConclusion() {
+		return this;
 	}
 
 	@Override

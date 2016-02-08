@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
@@ -47,6 +48,11 @@ abstract class ModifiableIndexedDefinitionAxiomInferenceImpl<A extends ElkAxiom>
 		super(originalAxiom, definedClass, definition);
 	}
 
+	@Override
+	public IndexedDefinitionAxiom getConclusion() {
+		return this;
+	}
+	
 	@Override
 	public int hashCode() {
 		return System.identityHashCode(this);

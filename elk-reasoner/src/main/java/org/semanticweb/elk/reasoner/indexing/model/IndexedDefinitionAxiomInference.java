@@ -30,10 +30,12 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
  * 
  * @author Yevgeny Kazakov
  */
-public interface IndexedDefinitionAxiomInference
-		extends
-			IndexedDefinitionAxiom,
-			IndexedAxiomInference {
+public interface IndexedDefinitionAxiomInference extends IndexedAxiomInference {
+
+	/**
+	 * @return the conclusion produced by this inference
+	 */
+	public IndexedDefinitionAxiom getConclusion();
 
 	/**
 	 * The visitor pattern for instances
@@ -51,7 +53,7 @@ public interface IndexedDefinitionAxiomInference
 		// combined interface
 
 	}
-	
+
 	<O> O accept(Visitor<O> visitor);
 
 }

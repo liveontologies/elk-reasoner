@@ -61,9 +61,6 @@ public interface ElkSameIndividualAxiomConversion
 	 */
 	int getSuperIndividualPosition();
 
-	IndexedSubClassOfAxiom getConclusion(
-			IndexedSubClassOfAxiom.Factory factory);
-
 	/**
 	 * The visitor pattern for instances
 	 * 

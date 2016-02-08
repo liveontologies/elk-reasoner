@@ -37,6 +37,12 @@ import org.semanticweb.elk.reasoner.tracing.Inference;
  */
 public interface IndexedAxiomInference extends Inference {
 
+	/**
+	 * @return the {@link ElkAxiom} which has been converted by this
+	 *         {@link IndexedAxiomInference}
+	 */
+	ElkAxiom getOriginalAxiom();
+
 	<O> O accept(Visitor<O> visitor);
 
 	/**

@@ -32,9 +32,13 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
  */
 public interface IndexedDisjointClassesAxiomInference
 		extends
-			IndexedDisjointClassesAxiom,
 			IndexedAxiomInference {
 
+	/**
+	 * @return the conclusion produced by this inference
+	 */
+	IndexedDisjointClassesAxiom getConclusion();
+	
 	/**
 	 * The visitor pattern for instances
 	 * 

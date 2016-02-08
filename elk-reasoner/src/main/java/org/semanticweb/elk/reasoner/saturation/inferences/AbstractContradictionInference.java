@@ -36,9 +36,11 @@ public abstract class AbstractContradictionInference extends ContradictionImpl
 		super(conclusionRoot);
 	}
 
-	@Override
-	public Contradiction getConclusion(Contradiction.Factory factory) {
-		return factory.getContradiction(getDestination());
+	/**
+	 * @return the conclusion produced by this inference
+	 */
+	public Contradiction getConclusion() {
+		return this;
 	}
 
 	@Override

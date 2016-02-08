@@ -32,9 +32,6 @@ import org.semanticweb.elk.owl.interfaces.ElkLiteral;
  * (caching).
  * 
  * @author "Yevgeny Kazakov"
- *
- * @param <T>
- *            the type of the {@link CachedIndexedDataHasValue}
  */
 public interface CachedIndexedDataHasValue extends
 		ModifiableIndexedDataHasValue,

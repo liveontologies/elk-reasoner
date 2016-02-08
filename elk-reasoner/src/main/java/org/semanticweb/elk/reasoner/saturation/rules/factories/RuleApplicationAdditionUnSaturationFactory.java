@@ -60,7 +60,7 @@ public class RuleApplicationAdditionUnSaturationFactory
 			SaturationStateWriter<? extends Context> writer,
 			SaturationStatistics localStatistics) {
 		// the visitor used for inserting conclusion
-		return new ClassInferenceConclusionVisitor(
+		return new ClassInferenceConclusionVisitor<Boolean>(
 				// measuring time, if necessary
 				SaturationUtils.getTimedConclusionVisitor(
 						SaturationUtils.compose(SaturationUtils.compose(

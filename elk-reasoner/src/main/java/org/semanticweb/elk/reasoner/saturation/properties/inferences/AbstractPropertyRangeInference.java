@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.properties.inferences;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.PropertyRangeImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.PropertyRange;
 import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
@@ -35,6 +36,13 @@ public abstract class AbstractPropertyRangeInference extends PropertyRangeImpl
 	protected AbstractPropertyRangeInference(IndexedObjectProperty property,
 			IndexedClassExpression range) {
 		super(property, range);
+	}
+
+	/**
+	 * @return the conclusion produced by this inference
+	 */
+	public PropertyRange getConclusion() {
+		return this;
 	}
 
 	// we assume that different objects represent different inferences

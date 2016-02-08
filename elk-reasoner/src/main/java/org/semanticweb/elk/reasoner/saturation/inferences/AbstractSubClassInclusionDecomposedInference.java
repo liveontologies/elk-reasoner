@@ -34,34 +34,33 @@ public abstract class AbstractSubClassInclusionDecomposedInference
 		implements
 			SubClassInclusionDecomposedInference {
 
-	public AbstractSubClassInclusionDecomposedInference(IndexedContextRoot subExpression,
+	public AbstractSubClassInclusionDecomposedInference(
+			IndexedContextRoot subExpression,
 			IndexedClassExpression superExpression) {
 		super(subExpression, superExpression);
 	}
-	
+
 	@Override
-	public SubClassInclusionDecomposed getConclusion(
-			SubClassInclusionDecomposed.Factory factory) {
-		return factory.getSubClassInclusionDecomposed(getDestination(),
-				getSubsumer());
+	public SubClassInclusionDecomposed getConclusion() {
+		return this;
 	}
 
 	@Override
 	public int hashCode() {
 		return System.identityHashCode(this);
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		return this == o;
 	}
-	
+
 	@Override
 	public final <O> O accept(Inference.Visitor<O> visitor) {
 		return accept(
 				(SubClassInclusionDecomposedInference.Visitor<O>) visitor);
 	}
-	
+
 	@Override
 	public final <O> O accept(SaturationInference.Visitor<O> visitor) {
 		return accept(

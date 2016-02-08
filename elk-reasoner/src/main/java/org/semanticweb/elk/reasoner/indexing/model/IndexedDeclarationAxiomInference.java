@@ -33,8 +33,12 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
  */
 public interface IndexedDeclarationAxiomInference
 		extends
-			IndexedDeclarationAxiom,
 			IndexedAxiomInference {
+
+	/**
+	 * @return the conclusion produced by this inference
+	 */
+	public IndexedDeclarationAxiom getConclusion();
 
 	/**
 	 * The visitor pattern for instances
@@ -49,7 +53,7 @@ public interface IndexedDeclarationAxiomInference
 		// combined interface
 
 	}
-	
+
 	<O> O accept(Visitor<O> visitor);
 
 }

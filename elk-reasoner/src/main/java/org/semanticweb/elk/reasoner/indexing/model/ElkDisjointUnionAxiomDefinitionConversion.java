@@ -39,9 +39,6 @@ public interface ElkDisjointUnionAxiomDefinitionConversion
 	@Override
 	ElkDisjointUnionAxiom getOriginalAxiom();
 
-	IndexedDefinitionAxiom getConclusion(
-			IndexedDefinitionAxiom.Factory factory);
-
 	/**
 	 * The visitor pattern for instances
 	 * 

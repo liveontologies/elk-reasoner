@@ -33,13 +33,14 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
 
 /**
  * A {@link ForwardLink} obtained from a {@link SubClassInclusionDecomposed}
- * with {@link IndexedObjectHasSelf} super-class. 
+ * with {@link IndexedObjectHasSelf} super-class.
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
 public class ForwardLinkOfObjectHasSelf extends AbstractClassInference
-		implements ForwardLinkInference {
+		implements
+			ForwardLinkInference {
 
 	private final IndexedObjectHasSelf existential_;
 
@@ -48,21 +49,25 @@ public class ForwardLinkOfObjectHasSelf extends AbstractClassInference
 		super(inferenceRoot);
 		existential_ = subsumer;
 	}
-	
+
 	public IndexedObjectHasSelf getDecomposedExistential() {
 		return this.existential_;
 	}
 
-	public SubClassInclusionDecomposed getPremise(SubClassInclusionDecomposed.Factory factory) {
-		return factory.getSubClassInclusionDecomposed(getOrigin(), existential_);
+	public SubClassInclusionDecomposed getPremise(
+			SubClassInclusionDecomposed.Factory factory) {
+		return factory.getSubClassInclusionDecomposed(getOrigin(),
+				existential_);
 	}
 
-	@Override
-	public ForwardLink getConclusion(ForwardLink.Factory factory) {
-		return factory.getForwardLink(getDestination(),
+	/**
+	 * @return the conclusion produced by this inference
+	 */
+	public ForwardLink getConclusion() {
+		return CONCLUSION_FACTORY_.getForwardLink(getDestination(),
 				existential_.getProperty(), getOrigin());
 	}
-	
+
 	@Override
 	public IndexedContextRoot getOrigin() {
 		return getDestination();
@@ -72,7 +77,7 @@ public class ForwardLinkOfObjectHasSelf extends AbstractClassInference
 	public String toString() {
 		return super.toString() + " (decomposition)";
 	}
-	
+
 	@Override
 	public final <O> O accept(ClassInference.Visitor<O> visitor) {
 		return visitor.visit(this);
@@ -82,7 +87,7 @@ public class ForwardLinkOfObjectHasSelf extends AbstractClassInference
 	public final <O> O accept(ForwardLinkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	/**
 	 * Visitor pattern for instances
 	 * 
@@ -90,9 +95,9 @@ public class ForwardLinkOfObjectHasSelf extends AbstractClassInference
 	 *
 	 */
 	public static interface Visitor<O> {
-		
+
 		public O visit(ForwardLinkOfObjectHasSelf inference);
-		
+
 	}
 
 }

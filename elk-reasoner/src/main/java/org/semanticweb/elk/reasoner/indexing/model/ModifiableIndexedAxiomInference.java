@@ -29,10 +29,7 @@ package org.semanticweb.elk.reasoner.indexing.model;
  * @author "Yevgeny Kazakov"
  *
  */
-public interface ModifiableIndexedAxiomInference
-		extends
-			ModifiableIndexedAxiom,
-			IndexedAxiomInference {
+public interface ModifiableIndexedAxiomInference extends IndexedAxiomInference {
 
 	/**
 	 * A factory for creating instances

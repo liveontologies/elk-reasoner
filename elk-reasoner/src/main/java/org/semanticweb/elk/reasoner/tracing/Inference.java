@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
 public interface Inference {
 
 	public <O> O accept(Visitor<O> visitor);
-
+	
 	/**
 	 * The visitor pattern for instances
 	 * 

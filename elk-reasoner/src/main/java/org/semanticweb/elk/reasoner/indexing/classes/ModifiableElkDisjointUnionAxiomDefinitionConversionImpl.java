@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkDisjointUnionAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointUnionAxiomDefinitionConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
@@ -45,14 +44,7 @@ class ModifiableElkDisjointUnionAxiomDefinitionConversionImpl
 			ModifiableIndexedClass definedClass,
 			ModifiableIndexedClassExpression definition) {
 		super(originalAxiom, definedClass, definition);
-	}
-
-	@Override
-	public IndexedDefinitionAxiom getConclusion(
-			IndexedDefinitionAxiom.Factory factory) {
-		return factory.getIndexedDefinitionAxiom(getOriginalAxiom(),
-				getDefinedClass(), getDefinition());
-	}
+	}	
 
 	@Override
 	public final <O> O accept(

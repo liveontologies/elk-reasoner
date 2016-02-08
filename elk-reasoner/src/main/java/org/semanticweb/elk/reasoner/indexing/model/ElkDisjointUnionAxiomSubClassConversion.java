@@ -53,9 +53,6 @@ public interface ElkDisjointUnionAxiomSubClassConversion
 	 */
 	int getDisjunctPosition();
 
-	IndexedSubClassOfAxiom getConclusion(
-			IndexedSubClassOfAxiom.Factory factory);
-
 	/**
 	 * The visitor pattern for instances
 	 * 

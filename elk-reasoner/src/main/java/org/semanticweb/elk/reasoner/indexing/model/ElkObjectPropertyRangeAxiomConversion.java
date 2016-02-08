@@ -37,9 +37,6 @@ public interface ElkObjectPropertyRangeAxiomConversion
 	@Override
 	ElkObjectPropertyRangeAxiom getOriginalAxiom();
 
-	IndexedObjectPropertyRangeAxiom getConclusion(
-			IndexedObjectPropertyRangeAxiom.Factory factory);
-
 	/**
 	 * The visitor pattern for instances
 	 * 

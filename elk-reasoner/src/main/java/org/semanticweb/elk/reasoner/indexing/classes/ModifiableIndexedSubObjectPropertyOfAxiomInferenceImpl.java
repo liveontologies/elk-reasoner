@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
@@ -45,6 +46,11 @@ abstract class ModifiableIndexedSubObjectPropertyOfAxiomInferenceImpl<A extends 
 			ModifiableIndexedPropertyChain subPropertyChain,
 			ModifiableIndexedObjectProperty superProperty) {
 		super(originalAxiom, subPropertyChain, superProperty);
+	}
+	
+	@Override
+	public IndexedSubObjectPropertyOfAxiom getConclusion() {
+		return this;
 	}
 
 	@Override

@@ -29,9 +29,6 @@ import java.util.List;
  * (caching).
  * 
  * @author "Yevgeny Kazakov"
- *
- * @param <T>
- *            the type of the {@link CachedIndexedObjectUnionOf}
  */
 public interface CachedIndexedObjectUnionOf extends
 		ModifiableIndexedObjectUnionOf,

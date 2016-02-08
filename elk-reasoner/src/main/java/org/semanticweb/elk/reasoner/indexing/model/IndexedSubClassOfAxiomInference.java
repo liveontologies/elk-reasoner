@@ -30,10 +30,12 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
  * 
  * @author Yevgeny Kazakov
  */
-public interface IndexedSubClassOfAxiomInference
-		extends
-			IndexedSubClassOfAxiom,
-			IndexedAxiomInference {
+public interface IndexedSubClassOfAxiomInference extends IndexedAxiomInference {
+
+	/**
+	 * @return the conclusion produced by this inference
+	 */
+	public IndexedSubClassOfAxiom getConclusion();
 
 	/**
 	 * The visitor pattern for instances
@@ -61,7 +63,6 @@ public interface IndexedSubClassOfAxiomInference
 
 	}
 
-	
 	<O> O accept(Visitor<O> visitor);
 
 }

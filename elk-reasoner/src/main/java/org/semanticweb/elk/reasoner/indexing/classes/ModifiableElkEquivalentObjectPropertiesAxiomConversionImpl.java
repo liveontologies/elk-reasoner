@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkEquivalentObjectPropertiesAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
@@ -59,14 +58,7 @@ class ModifiableElkEquivalentObjectPropertiesAxiomConversionImpl
 	@Override
 	public int getSuperPropertyPosition() {
 		return superPropertyPosition_;
-	}
-
-	@Override
-	public IndexedSubObjectPropertyOfAxiom getConclusion(
-			IndexedSubObjectPropertyOfAxiom.Factory factory) {
-		return factory.getIndexedSubObjectPropertyOfAxiom(getOriginalAxiom(),
-				getSubPropertyChain(), getSuperProperty());
-	}
+	}	
 
 	@Override
 	public final <O> O accept(

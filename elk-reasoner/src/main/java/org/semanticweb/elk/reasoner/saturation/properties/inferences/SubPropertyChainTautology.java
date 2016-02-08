@@ -49,10 +49,6 @@ public class SubPropertyChainTautology
 		return super.getSubChain();
 	}
 
-	public SubPropertyChain getConclusion(SubPropertyChain.Factory factory) {
-		return factory.getSubPropertyChain(getSubChain(), getSuperChain());
-	}
-
 	@Override
 	public final <O> O accept(SubPropertyChainInference.Visitor<O> visitor) {
 		return visitor.visit(this);

@@ -36,10 +36,7 @@ public interface ElkDifferentIndividualsAxiomNaryConversion
 			IndexedDisjointClassesAxiomInference {
 
 	@Override
-	ElkDifferentIndividualsAxiom getOriginalAxiom();
-
-	IndexedDisjointClassesAxiom getConclusion(
-			IndexedDisjointClassesAxiom.Factory factory);
+	ElkDifferentIndividualsAxiom getOriginalAxiom();	
 
 	/**
 	 * The visitor pattern for instances

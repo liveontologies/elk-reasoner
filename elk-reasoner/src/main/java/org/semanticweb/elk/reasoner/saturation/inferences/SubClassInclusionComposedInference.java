@@ -29,12 +29,10 @@ public interface SubClassInclusionComposedInference
 			SubClassInclusionInference {
 
 	/**
-	 * @param factory
 	 * @return the conclusion of this inference constructed using the given
 	 *         factory
 	 */
-	public SubClassInclusionComposed getConclusion(
-			SubClassInclusionComposed.Factory factory);
+	public SubClassInclusionComposed getConclusion();
 
 	public <O> O accept(Visitor<O> visitor);
 

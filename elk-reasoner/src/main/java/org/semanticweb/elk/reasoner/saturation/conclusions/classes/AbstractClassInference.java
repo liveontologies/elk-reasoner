@@ -23,8 +23,10 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
  */
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
+import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
 /**
@@ -33,9 +35,9 @@ import org.semanticweb.elk.reasoner.tracing.Inference;
  * @author Yevgeny Kazakov
  *
  */
-public abstract class AbstractClassInference
-		implements
-			ClassInference {
+public abstract class AbstractClassInference implements ClassInference {
+
+	protected static ClassConclusion.Factory CONCLUSION_FACTORY_ = new ConclusionBaseFactory();
 
 	private final IndexedContextRoot destination_;
 
@@ -47,7 +49,7 @@ public abstract class AbstractClassInference
 	public IndexedContextRoot getDestination() {
 		return this.destination_;
 	}
-	
+
 	@Override
 	public IndexedContextRoot getTraceRoot() {
 		return this.destination_;
@@ -59,11 +61,10 @@ public abstract class AbstractClassInference
 	public final <O> O accept(Inference.Visitor<O> visitor) {
 		return accept((ClassInference.Visitor<O>) visitor);
 	}
-	
+
 	@Override
 	public final <O> O accept(SaturationInference.Visitor<O> visitor) {
 		return accept((ClassInference.Visitor<O>) visitor);
 	}
 
-	
 }

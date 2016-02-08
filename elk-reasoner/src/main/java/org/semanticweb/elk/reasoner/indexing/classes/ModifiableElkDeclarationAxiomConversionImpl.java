@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDeclarationAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedEntity;
@@ -52,14 +51,7 @@ class ModifiableElkDeclarationAxiomConversionImpl
 	@Override
 	public boolean equals(Object o) {
 		return this == o;
-	}
-
-	@Override
-	public IndexedDeclarationAxiom getConclusion(
-			IndexedDeclarationAxiom.Factory factory) {
-		return factory.getIndexedDeclarationAxiom(getOriginalAxiom(),
-				getEntity());
-	}
+	}	
 
 	@Override
 	public final <O> O accept(

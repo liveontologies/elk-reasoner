@@ -78,8 +78,6 @@ import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
  * {@link OccurrenceIncrement}.
  * 
  * @author "Yevgeny Kazakov"
- * 
- * @see ModifiableIndexedObject#updateOccurrenceNumbers
  *
  */
 public class UpdatingModifiableIndexedObjectFactory

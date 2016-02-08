@@ -32,7 +32,10 @@ import org.semanticweb.elk.reasoner.saturation.context.SubContext;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface SubContextInitialization extends SubClassConclusion {
+public interface SubContextInitialization
+		extends
+			SubClassConclusion,
+			InitializationConclusion {
 
 	public static final String NAME = "Sub-Context Initialization";
 

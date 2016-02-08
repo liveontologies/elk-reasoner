@@ -63,9 +63,6 @@ public interface ElkEquivalentClassesAxiomDefinitionConversion
 	 */
 	int getDefinitionPosition();
 
-	IndexedDefinitionAxiom getConclusion(
-			IndexedDefinitionAxiom.Factory factory);
-
 	/**
 	 * The visitor pattern for instances
 	 * 

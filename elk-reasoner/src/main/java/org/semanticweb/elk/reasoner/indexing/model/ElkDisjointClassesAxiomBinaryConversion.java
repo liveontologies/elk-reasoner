@@ -41,7 +41,7 @@ public interface ElkDisjointClassesAxiomBinaryConversion
 
 	@Override
 	ElkDisjointClassesAxiom getOriginalAxiom();
-
+	
 	/**
 	 * @return the position of the first {@link ElkClassExpression} in the
 	 *         member list of the {@link ElkDisjointClassesAxiom} that is stated
@@ -63,9 +63,6 @@ public interface ElkDisjointClassesAxiomBinaryConversion
 	 * @see #getFirstClassPosition()
 	 */
 	int getSecondClassPosition();
-
-	IndexedSubClassOfAxiom getConclusion(
-			IndexedSubClassOfAxiom.Factory factory);
 
 	/**
 	 * The visitor pattern for instances

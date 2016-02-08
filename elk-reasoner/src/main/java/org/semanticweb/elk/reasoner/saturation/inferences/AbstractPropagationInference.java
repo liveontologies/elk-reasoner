@@ -30,29 +30,31 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
 public abstract class AbstractPropagationInference extends PropagationImpl
-		implements PropagationInference {
+		implements
+			PropagationInference {
 
 	public AbstractPropagationInference(IndexedContextRoot root,
 			IndexedObjectProperty relation, IndexedObjectSomeValuesFrom carry) {
 		super(root, relation, carry);
 	}
-	
-	@Override
-	public Propagation getConclusion(Propagation.Factory factory) {
-		return factory.getPropagation(getDestination(), getSubDestination(),
-				getCarry());
+
+	/**
+	 * @return the conclusion produced by this inference
+	 */
+	public Propagation getConclusion() {
+		return this;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return System.identityHashCode(this);
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		return this == o;
 	}
-	
+
 	@Override
 	public final <O> O accept(Inference.Visitor<O> visitor) {
 		return accept((PropagationInference.Visitor<O>) visitor);
@@ -62,11 +64,10 @@ public abstract class AbstractPropagationInference extends PropagationImpl
 	public final <O> O accept(SaturationInference.Visitor<O> visitor) {
 		return accept((PropagationInference.Visitor<O>) visitor);
 	}
-	
+
 	@Override
 	public final <O> O accept(ClassInference.Visitor<O> visitor) {
 		return accept((PropagationInference.Visitor<O>) visitor);
 	}
-	
 
 }

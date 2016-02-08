@@ -31,14 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
  *
  */
 public interface ForwardLinkInference extends ClassInference {
-
-	/**
-	 * @param factory
-	 * @return the conclusion of this inference constructed using the given
-	 *         factory
-	 */
-	public ForwardLink getConclusion(ForwardLink.Factory factory);
-
+	
 	public <O> O accept(Visitor<O> visitor);
 
 	/**

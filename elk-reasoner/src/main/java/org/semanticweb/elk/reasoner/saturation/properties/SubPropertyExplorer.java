@@ -35,8 +35,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainExpandedSubObjectPropertyOf;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainInference;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainInferenceConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainTautology;
-import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.InferenceProducer;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
@@ -57,31 +57,40 @@ class SubPropertyExplorer {
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(SubPropertyExplorer.class);
-	
-	private static final SubPropertyChain.Factory FACTORY_ = new ConclusionBaseFactory();
 
 	/**
 	 * The element for which the sub-property (chains) are computed
 	 */
-	final private IndexedPropertyChain input_;
+	private final IndexedPropertyChain input_;
 	/**
 	 * the set that will be closed under told sub-properties
 	 */
-	final private Set<IndexedPropertyChain> subPropertyChains_;
+	private final Set<IndexedPropertyChain> subPropertyChains_;
 	/**
 	 * the subset of {@link #subProperties_} consisting of
 	 * {@link IndexedObjectProperty}s
 	 */
-	final private Set<IndexedObjectProperty> subProperties_;
+	private final Set<IndexedObjectProperty> subProperties_;
 	/**
 	 * the sub-properties for which the told sub-properties may not be yet
 	 * expanded
 	 */
-	final private Queue<IndexedObjectProperty> toDoSubProperties_ = new LinkedList<IndexedObjectProperty>();
+	private final Queue<IndexedObjectProperty> toDoSubProperties_ = new LinkedList<IndexedObjectProperty>();
 	/**
 	 * used to record {@link SubPropertyChainInference}
 	 */
-	final private InferenceProducer<? super SubPropertyChainInference> inferenceProducer_;
+	private final InferenceProducer<? super SubPropertyChainInference> inferenceProducer_;
+
+	private final SubPropertyChainInference.Visitor<Void> inferenceProcessor_ = new SubPropertyChainInferenceConclusionVisitor<Void>(
+			new SubPropertyChain.Visitor<Void>() {
+
+				@Override
+				public Void visit(SubPropertyChain conclusion) {
+					toDoConclusion(conclusion);
+					return null;
+				}
+
+			});
 
 	SubPropertyExplorer(IndexedPropertyChain input,
 			Set<IndexedPropertyChain> subPropertyChains,
@@ -91,13 +100,17 @@ class SubPropertyExplorer {
 		this.subPropertyChains_ = subPropertyChains;
 		this.subProperties_ = subProperties;
 		this.inferenceProducer_ = inferenceProducer;
-		toDo(new SubPropertyChainTautology(input));
+		toDoInference(new SubPropertyChainTautology(input));
 	}
 
-	private void toDo(SubPropertyChainInference inference) {
+	private void toDoInference(SubPropertyChainInference inference) {
 		LOGGER_.trace("{}: new inference", inference);
 		inferenceProducer_.produce(inference);
-		SubPropertyChain conclusion = inference.getConclusion(FACTORY_);
+		inference.accept(inferenceProcessor_);
+
+	}
+
+	private void toDoConclusion(SubPropertyChain conclusion) {
 		IndexedPropertyChain subChain = conclusion.getSubChain();
 		if (subPropertyChains_.add(subChain)) {
 			if (subChain instanceof IndexedObjectProperty) {
@@ -106,7 +119,6 @@ class SubPropertyExplorer {
 				toDoSubProperties_.add(subProperty);
 			}
 		}
-
 	}
 
 	private void process() {
@@ -114,14 +126,13 @@ class SubPropertyExplorer {
 			IndexedObjectProperty next = toDoSubProperties_.poll();
 			if (next == null)
 				break;
-			List<IndexedPropertyChain> toldSubChains = next
-					.getToldSubChains();
+			List<IndexedPropertyChain> toldSubChains = next.getToldSubChains();
 			List<ElkAxiom> reasons = next.getToldSubChainsReasons();
 			for (int i = 0; i < toldSubChains.size(); i++) {
 				IndexedPropertyChain sub = toldSubChains.get(i);
 				ElkAxiom reason = reasons.get(i);
-				toDo(new SubPropertyChainExpandedSubObjectPropertyOf(sub, next,
-						(IndexedObjectProperty) input_, reason));
+				toDoInference(new SubPropertyChainExpandedSubObjectPropertyOf(
+						sub, next, (IndexedObjectProperty) input_, reason));
 			}
 		}
 	}

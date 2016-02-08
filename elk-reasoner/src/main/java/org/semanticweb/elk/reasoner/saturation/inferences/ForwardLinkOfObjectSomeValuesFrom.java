@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
 
 /**
  * A {@link ForwardLink} obtained from a {@link SubClassInclusionDecomposed}
- * with {@link IndexedObjectSomeValuesFrom} super-class. 
+ * with {@link IndexedObjectSomeValuesFrom} super-class.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -54,13 +54,17 @@ public class ForwardLinkOfObjectSomeValuesFrom extends AbstractClassInference
 		return this.existential_;
 	}
 
-	public SubClassInclusionDecomposed getPremise(SubClassInclusionDecomposed.Factory factory) {
-		return factory.getSubClassInclusionDecomposed(getOrigin(), existential_);
+	public SubClassInclusionDecomposed getPremise(
+			SubClassInclusionDecomposed.Factory factory) {
+		return factory.getSubClassInclusionDecomposed(getOrigin(),
+				existential_);
 	}
 
-	@Override
-	public ForwardLink getConclusion(ForwardLink.Factory factory) {
-		return factory.getForwardLink(getDestination(),
+	/**
+	 * @return the conclusion produced by this inference
+	 */
+	public ForwardLink getConclusion() {
+		return CONCLUSION_FACTORY_.getForwardLink(getDestination(),
 				existential_.getProperty(),
 				IndexedObjectSomeValuesFrom.Helper.getTarget(existential_));
 	}
@@ -79,12 +83,12 @@ public class ForwardLinkOfObjectSomeValuesFrom extends AbstractClassInference
 	public final <O> O accept(ClassInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	@Override
 	public final <O> O accept(ForwardLinkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	/**
 	 * Visitor pattern for instances
 	 * 
@@ -92,9 +96,9 @@ public class ForwardLinkOfObjectSomeValuesFrom extends AbstractClassInference
 	 *
 	 */
 	public static interface Visitor<O> {
-		
+
 		public O visit(ForwardLinkOfObjectSomeValuesFrom inference);
-		
+
 	}
 
 }

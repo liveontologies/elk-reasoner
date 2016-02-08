@@ -32,7 +32,10 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface ContextInitialization extends ClassConclusion {
+public interface ContextInitialization
+		extends
+			ClassConclusion,
+			InitializationConclusion {
 
 	public static final String NAME = "Context Initialization";
 

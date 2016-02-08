@@ -1,7 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.properties.inferences;
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.PropertyRange;
-
 /*
  * #%L
  * ELK Reasoner
@@ -25,13 +23,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.PropertyRange;
  */
 
 public interface PropertyRangeInference extends ObjectPropertyInference {
-
-	/**
-	 * @param factory
-	 * @return the conclusion of this inference constructed using the given
-	 *         factory
-	 */
-	public PropertyRange getConclusion(PropertyRange.Factory factory);
 
 	public <O> O accept(Visitor<O> visitor);
 

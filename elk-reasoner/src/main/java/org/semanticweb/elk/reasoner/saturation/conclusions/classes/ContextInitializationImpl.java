@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.InitializationConclusion;
 
 /**
  * An implementation of {@link ContextInitialization}.
@@ -46,6 +47,11 @@ public class ContextInitializationImpl extends AbstractClassConclusion
 
 	@Override
 	public <O> O accept(ContextInitialization.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(InitializationConclusion.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

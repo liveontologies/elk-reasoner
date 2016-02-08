@@ -64,9 +64,6 @@ public interface ElkEquivalentObjectPropertiesAxiomConversion
 	 */
 	int getSuperPropertyPosition();
 
-	IndexedSubObjectPropertyOfAxiom getConclusion(
-			IndexedSubObjectPropertyOfAxiom.Factory factory);
-
 	/**
 	 * The visitor pattern for instances
 	 * 

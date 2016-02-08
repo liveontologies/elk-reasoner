@@ -97,16 +97,18 @@ public class ContextTracingRuleApplicationFactory
 				// save inference
 				new InferenceProducingVisitor(),
 				// process conclusions of inferences:
-				new ClassInferenceConclusionVisitor(SaturationUtils.compose(
-						// insert the conclusion into the local context copies
-						new ClassConclusionInsertionVisitor(activeContext,
-								localWriter),
-						// if the conclusion is new, apply local rules and
-						// produce
-						// conclusions to the active (local) saturation state
-						new TracingRuleApplicationClassConclusionVisitor(
-								mainSaturationState_, activeContext,
-								ruleVisitor, localWriter))));
+				new ClassInferenceConclusionVisitor<Boolean>(
+						SaturationUtils.compose(
+								// insert the conclusion into the local context
+								// copies
+								new ClassConclusionInsertionVisitor(
+										activeContext, localWriter),
+								// if the conclusion is new, apply local rules
+								// and produce conclusions to the active (local)
+								// saturation state
+								new TracingRuleApplicationClassConclusionVisitor(
+										mainSaturationState_, activeContext,
+										ruleVisitor, localWriter))));
 	}
 
 	@Override

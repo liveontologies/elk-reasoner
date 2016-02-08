@@ -40,7 +40,7 @@ import org.semanticweb.elk.util.collections.Multimap;
  * {@link IndexedPropertyChain}s. The methods of this class provide access to
  * such objects.
  * 
- * @see {@link IndexedObject}
+ * @see IndexedObject
  * 
  * @author Yevgeny Kazakov
  * @author Frantisek Simancik

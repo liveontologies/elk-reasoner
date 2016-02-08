@@ -46,11 +46,6 @@ public class ContextInitializationNoPremises
 		return null;
 	}
 
-	public ContextInitialization getConclusion(
-			ContextInitialization.Factory factory) {
-		return factory.getContextInitialization(getDestination());
-	}
-
 	@Override
 	public String toString() {
 		return super.toString() + " (no premises)";

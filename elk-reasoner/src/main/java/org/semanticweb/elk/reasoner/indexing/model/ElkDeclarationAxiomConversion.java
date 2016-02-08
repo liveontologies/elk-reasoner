@@ -38,9 +38,6 @@ public interface ElkDeclarationAxiomConversion
 	@Override
 	ElkDeclarationAxiom getOriginalAxiom();
 
-	IndexedDeclarationAxiom getConclusion(
-			IndexedDeclarationAxiom.Factory factory);
-
 	/**
 	 * The visitor pattern for instances
 	 * 

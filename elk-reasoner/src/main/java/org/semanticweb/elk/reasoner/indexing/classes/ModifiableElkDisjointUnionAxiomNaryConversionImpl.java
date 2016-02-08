@@ -46,11 +46,8 @@ class ModifiableElkDisjointUnionAxiomNaryConversionImpl
 	}
 
 	@Override
-	public IndexedDisjointClassesAxiom getConclusion(
-			IndexedDisjointClassesAxiom.Factory factory) {
-		return factory.getIndexedDisjointClassesAxiom(getOriginalAxiom(),
-				getMembers());
-
+	public IndexedDisjointClassesAxiom getConclusion() {
+		return this;
 	}
 
 	@Override

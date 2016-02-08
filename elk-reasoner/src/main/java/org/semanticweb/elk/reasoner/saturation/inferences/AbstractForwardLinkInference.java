@@ -37,18 +37,19 @@ public abstract class AbstractForwardLinkInference<R extends IndexedPropertyChai
 			IndexedContextRoot target) {
 		super(root, relation, target);
 	}
-	
-	@Override
-	public ForwardLink getConclusion(ForwardLink.Factory factory) {
-		return factory.getForwardLink(getDestination(), getRelation(),
-				getTarget());
+
+	/**
+	 * @return the conclusion produced by this inference
+	 */
+	public ForwardLink getConclusion() {
+		return this;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return System.identityHashCode(this);
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		return this == o;
@@ -58,15 +59,15 @@ public abstract class AbstractForwardLinkInference<R extends IndexedPropertyChai
 	public final <O> O accept(Inference.Visitor<O> visitor) {
 		return accept((ForwardLinkInference.Visitor<O>) visitor);
 	}
-	
+
 	@Override
 	public final <O> O accept(SaturationInference.Visitor<O> visitor) {
 		return accept((ForwardLinkInference.Visitor<O>) visitor);
 	}
-	
+
 	@Override
 	public final <O> O accept(ClassInference.Visitor<O> visitor) {
 		return accept((ForwardLinkInference.Visitor<O>) visitor);
-	}	
+	}
 
 }

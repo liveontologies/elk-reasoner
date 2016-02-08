@@ -38,29 +38,27 @@ public abstract class AbstractSubClassInclusionComposedInference<S extends Index
 			IndexedContextRoot subExpression, S superExpression) {
 		super(subExpression, superExpression);
 	}
-	
+
 	@Override
-	public SubClassInclusionComposed getConclusion(
-			SubClassInclusionComposed.Factory factory) {
-		return factory.getSubClassInclusionComposed(getDestination(),
-				getSubsumer());
+	public SubClassInclusionComposed getConclusion() {
+		return this;
 	}
 
 	@Override
 	public int hashCode() {
 		return System.identityHashCode(this);
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		return this == o;
 	}
-	
+
 	@Override
 	public final <O> O accept(Inference.Visitor<O> visitor) {
 		return accept((SubClassInclusionComposedInference.Visitor<O>) visitor);
 	}
-	
+
 	@Override
 	public final <O> O accept(SaturationInference.Visitor<O> visitor) {
 		return accept((SubClassInclusionComposedInference.Visitor<O>) visitor);

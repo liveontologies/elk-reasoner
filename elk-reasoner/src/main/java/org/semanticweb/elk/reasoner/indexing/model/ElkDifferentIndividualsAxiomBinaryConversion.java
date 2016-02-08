@@ -40,7 +40,7 @@ public interface ElkDifferentIndividualsAxiomBinaryConversion
 
 	@Override
 	ElkDifferentIndividualsAxiom getOriginalAxiom();
-
+	
 	/**
 	 * @return the position of the first {@link ElkIndividual} in the member
 	 *         list of the {@link ElkDifferentIndividualsAxiom} whose difference
@@ -61,10 +61,7 @@ public interface ElkDifferentIndividualsAxiomBinaryConversion
 	 * @see ElkDifferentIndividualsAxiom#getIndividuals()
 	 * @see #getFirstIndividualPosition()
 	 */
-	int getSecondIndividualPosition();
-
-	IndexedSubClassOfAxiom getConclusion(
-			IndexedSubClassOfAxiom.Factory factory);
+	int getSecondIndividualPosition();	
 
 	/**
 	 * The visitor pattern for instances

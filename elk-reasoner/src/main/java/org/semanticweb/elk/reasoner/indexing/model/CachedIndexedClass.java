@@ -28,9 +28,6 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
  * A {@link ModifiableIndexedClass} that can be used for memoization (caching).
  * 
  * @author "Yevgeny Kazakov"
- *
- * @param <T>
- *            the type of the {@link CachedIndexedClass}
  */
 public interface CachedIndexedClass extends ModifiableIndexedClass,
 		CachedIndexedClassEntity<CachedIndexedClass> {

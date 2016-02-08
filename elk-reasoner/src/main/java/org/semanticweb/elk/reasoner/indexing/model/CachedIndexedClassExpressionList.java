@@ -31,9 +31,6 @@ import org.semanticweb.elk.util.collections.entryset.Entry;
  * memoization (caching).
  * 
  * @author "Yevgeny Kazakov"
- *
- * @param <T>
- *            the type of the {@link CachedIndexedClassExpressionList}
  */
 public interface CachedIndexedClassExpressionList
 		extends

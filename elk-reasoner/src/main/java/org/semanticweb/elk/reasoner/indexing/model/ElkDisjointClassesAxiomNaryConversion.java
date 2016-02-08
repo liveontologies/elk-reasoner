@@ -38,9 +38,6 @@ public interface ElkDisjointClassesAxiomNaryConversion
 	@Override
 	ElkDisjointClassesAxiom getOriginalAxiom();
 
-	IndexedDisjointClassesAxiom getConclusion(
-			IndexedDisjointClassesAxiom.Factory factory);
-
 	/**
 	 * The visitor pattern for instances
 	 * 

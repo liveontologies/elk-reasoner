@@ -89,7 +89,7 @@ public class RuleApplicationDeletionFactory
 			Reference<Context> activeContext, RuleVisitor<?> ruleVisitor,
 			SaturationStateWriter<? extends Context> writer,
 			SaturationStatistics localStatistics) {
-		return new ClassInferenceConclusionVisitor(
+		return new ClassInferenceConclusionVisitor<Boolean>(
 				// measuring time, if necessary
 				SaturationUtils
 						.getTimedConclusionVisitor(SaturationUtils.compose(

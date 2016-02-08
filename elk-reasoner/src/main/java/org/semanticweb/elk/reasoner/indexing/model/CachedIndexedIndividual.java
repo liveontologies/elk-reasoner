@@ -29,9 +29,6 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
  * (caching).
  * 
  * @author "Yevgeny Kazakov"
- *
- * @param <T>
- *            the type of the {@link CachedIndexedIndividual}
  */
 public interface CachedIndexedIndividual extends ModifiableIndexedIndividual,
 		CachedIndexedClassExpression<CachedIndexedIndividual>,

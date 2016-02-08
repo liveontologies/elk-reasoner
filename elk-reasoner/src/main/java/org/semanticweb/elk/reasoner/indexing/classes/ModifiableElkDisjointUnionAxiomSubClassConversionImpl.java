@@ -56,10 +56,8 @@ class ModifiableElkDisjointUnionAxiomSubClassConversionImpl
 	}
 
 	@Override
-	public IndexedSubClassOfAxiom getConclusion(
-			IndexedSubClassOfAxiom.Factory factory) {
-		return factory.getIndexedSubClassOfAxiom(getOriginalAxiom(),
-				getSubClass(), getSuperClass());
+	public IndexedSubClassOfAxiom getConclusion() {
+		return this;
 	}
 
 	@Override

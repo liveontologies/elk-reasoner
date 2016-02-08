@@ -32,13 +32,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
  */
 public interface BackwardLinkInference extends ClassInference {
 
-	/**
-	 * @param factory
-	 * @return the conclusion of this inference constructed using the given
-	 *         factory
-	 */
-	public BackwardLink getConclusion(BackwardLink.Factory factory);
-
 	public <O> O accept(Visitor<O> visitor);
 
 	/**

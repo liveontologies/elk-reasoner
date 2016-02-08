@@ -29,9 +29,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
  * (caching).
  * 
  * @author "Yevgeny Kazakov"
- *
- * @param <T>
- *            the type of the {@link CachedIndexedObjectProperty}
  */
 public interface CachedIndexedObjectProperty extends
 		ModifiableIndexedObjectProperty,

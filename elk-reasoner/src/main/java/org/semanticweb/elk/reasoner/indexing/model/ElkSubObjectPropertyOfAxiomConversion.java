@@ -37,9 +37,6 @@ public interface ElkSubObjectPropertyOfAxiomConversion
 	@Override
 	ElkSubObjectPropertyOfAxiom getOriginalAxiom();
 
-	IndexedSubObjectPropertyOfAxiom getConclusion(
-			IndexedSubObjectPropertyOfAxiom.Factory factory);
-
 	/**
 	 * The visitor pattern for instances
 	 * 

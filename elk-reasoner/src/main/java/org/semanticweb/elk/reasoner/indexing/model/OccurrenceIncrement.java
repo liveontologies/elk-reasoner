@@ -33,7 +33,6 @@ import org.semanticweb.elk.owl.predefined.ElkPolarity;
  * the respective number of occurrences have been added, otherwise removed.
  *
  * @see ElkPolarity
- * @see ModifiableIndexedObject#updateOccurrenceNumbers
  * 
  * @author "Yevgeny Kazakov"
  *
