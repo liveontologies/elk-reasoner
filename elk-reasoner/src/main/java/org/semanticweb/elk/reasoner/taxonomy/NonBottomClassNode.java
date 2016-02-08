@@ -54,6 +54,7 @@ import org.slf4j.LoggerFactory;
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  * @author Pavel Klinov
+ * @author Peter Skocovsky
  */
 class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 

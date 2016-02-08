@@ -61,6 +61,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
  *         pavel.klinov@uni-ulm.de
  * 
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  */
 public class MockTaxonomyLoader {
 

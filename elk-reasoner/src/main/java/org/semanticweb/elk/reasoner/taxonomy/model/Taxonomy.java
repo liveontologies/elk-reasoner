@@ -37,6 +37,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  * @author Frantisek Simancik
+ * @author Peter Skocovsky
  * @param <T>
  *            the type of objects stored in this taxonomy
  */

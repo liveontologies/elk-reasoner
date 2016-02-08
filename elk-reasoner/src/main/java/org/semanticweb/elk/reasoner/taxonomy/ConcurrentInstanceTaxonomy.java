@@ -66,6 +66,7 @@ import org.slf4j.LoggerFactory;
  * @author Frantisek Simancik
  * @author Markus Kroetzsch
  * @author Pavel Klinov
+ * @author Peter Skocovsky
  */
 public class ConcurrentInstanceTaxonomy
 		extends AbstractInstanceTaxonomy<ElkClass, ElkNamedIndividual>

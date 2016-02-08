@@ -27,6 +27,12 @@ import java.util.Comparator;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 
+/**
+ * {@link ComparatorKeyProvider} for {@link org.semanticweb.elk.owl.interfaces.ElkNamedIndividual
+ * ElkNamedIndividual}.
+ * 
+ * @author Peter Skocovsky
+ */
 public class ElkIndividualKeyProvider extends ElkEntityKeyProvider
 		implements ComparatorKeyProvider<ElkEntity> {
 	

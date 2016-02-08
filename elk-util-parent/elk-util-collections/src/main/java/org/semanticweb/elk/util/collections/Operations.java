@@ -38,7 +38,7 @@ import java.util.Set;
  * Some useful static methods for collections
  * 
  * @author "Yevgeny Kazakov"
- * 
+ * @author Peter Skocovsky
  */
 public class Operations {
 

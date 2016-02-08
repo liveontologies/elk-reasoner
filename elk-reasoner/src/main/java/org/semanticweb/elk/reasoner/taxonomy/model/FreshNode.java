@@ -33,6 +33,7 @@ import org.semanticweb.elk.util.collections.Operations;
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  * 
  * @param <T>
  *            the type of objects in this node

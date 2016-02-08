@@ -34,6 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
 public interface UpdateableTaxonomy<T extends ElkEntity> extends Taxonomy<T> {
 

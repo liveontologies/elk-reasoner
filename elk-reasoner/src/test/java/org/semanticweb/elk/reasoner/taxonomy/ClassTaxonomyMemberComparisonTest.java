@@ -69,6 +69,11 @@ public class ClassTaxonomyMemberComparisonTest {
 		Taxonomy<ElkClass> getTaxonomy(String resource) throws ElkException;
 	}
 	
+	/**
+	 * Loads ontology from the <code>source</code>, classifies it with the reasoner
+	 * and returns its taxonomy. This ensures that the returned taxonomy is the one used
+	 * internally.
+	 */
 	static final ClassTaxonomyProvider REASONER_TAXONOMY = new ClassTaxonomyProvider() {
 		@Override
 		public Taxonomy<ElkClass> getTaxonomy(final String resource) throws ElkException {
@@ -95,6 +100,9 @@ public class ClassTaxonomyMemberComparisonTest {
 		};
 	};
 	
+	/**
+	 * Loads mock taxonomy from the source.
+	 */
 	static final ClassTaxonomyProvider MOCK_TAXONOMY = new ClassTaxonomyProvider() {
 		@Override
 		public Taxonomy<ElkClass> getTaxonomy(final String resource) throws ElkException {
@@ -141,6 +149,9 @@ public class ClassTaxonomyMemberComparisonTest {
 		return CONFIG;
 	}
 	
+	/**
+	 * Provides taxonomy that should be tested.
+	 */
 	private final ClassTaxonomyProvider classTaxonomyProvider_;
 	
 	public ClassTaxonomyMemberComparisonTest(final ClassTaxonomyProvider classTaxonomyProvider) {

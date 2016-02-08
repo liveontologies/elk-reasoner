@@ -40,6 +40,7 @@ import org.semanticweb.elk.util.collections.ArrayHashMap;
  * is used to represent an inconsistent {@link InstanceTaxonomy}.
  * 
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  * 
  * @param <T>
  *            the type of objects stored in this taxonomy
@@ -47,8 +48,6 @@ import org.semanticweb.elk.util.collections.ArrayHashMap;
  *            the type of instances of nodes of this taxonomy
  * @param <N>
  *            the type of the node of this taxonomy
- * 
- * @author "Yevgeny Kazakov"
  */
 public class SingletoneInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity, N extends OrphanTypeNode<T, I>>
 		extends SingletoneTaxonomy<T, N> implements InstanceTaxonomy<T, I> {
@@ -135,7 +134,7 @@ public class SingletoneInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity
 			return superEquals;
 		}
 		try {
-//			final InstanceTaxonomy<?, ?> otherTaxonomy = (InstanceTaxonomy<?, ?>) obj;// TODO .: try this !!!
+			@SuppressWarnings("unchecked")
 			final InstanceTaxonomy<T, I> otherTaxonomy = (InstanceTaxonomy<T, I>) obj;
 			
 			/* 
@@ -144,8 +143,6 @@ public class SingletoneInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity
 			 */
 			
 			final Set<? extends InstanceNode<T, I>> thisInstanceNodes = getInstanceNodes();
-//			final Set<? extends InstanceNode<?, ?>> otherInstanceNodes =
-//					otherTaxonomy.getInstanceNodes();
 			final Set<? extends InstanceNode<T, I>> otherInstanceNodes =
 					otherTaxonomy.getInstanceNodes();
 			

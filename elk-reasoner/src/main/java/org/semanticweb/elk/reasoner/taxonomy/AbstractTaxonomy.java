@@ -29,6 +29,11 @@ import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 
+/**
+ * @author Peter Skocovsky
+ *
+ * @param <T>
+ */
 public abstract class AbstractTaxonomy<T extends ElkEntity> implements Taxonomy<T> {
 	
 	@Override

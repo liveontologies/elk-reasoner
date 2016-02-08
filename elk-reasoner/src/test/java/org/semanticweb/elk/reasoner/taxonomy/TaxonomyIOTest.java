@@ -69,6 +69,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
  * 
  *         pavel.klinov@uni-ulm.de
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  */
 public class TaxonomyIOTest {
 
@@ -170,7 +171,6 @@ public class TaxonomyIOTest {
 		assertSame(taxonomy.getTopNode(), taxonomy.getBottomNode());
 	}
 
-	@SuppressWarnings("resource")
 	private InstanceTaxonomy<ElkClass, ElkNamedIndividual> loadAndClassify(
 			String resource) throws IOException, Owl2ParseException,
 			ElkInconsistentOntologyException, ElkException {
@@ -191,7 +191,6 @@ public class TaxonomyIOTest {
 		}
 	}
 
-	@SuppressWarnings("resource")
 	private Taxonomy<ElkClass> load(String resource) throws IOException,
 			Owl2ParseException, ElkInconsistentOntologyException {
 		InputStream stream = null;

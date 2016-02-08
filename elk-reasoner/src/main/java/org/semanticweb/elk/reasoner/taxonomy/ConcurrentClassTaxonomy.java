@@ -56,6 +56,7 @@ import org.semanticweb.elk.util.collections.Operations.Condition;
  * @author Frantisek Simancik
  * @author Markus Kroetzsch
  * @author Pavel Klinov
+ * @author Peter Skocovsky
  */
 public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
 		implements UpdateableTaxonomy<ElkClass> {

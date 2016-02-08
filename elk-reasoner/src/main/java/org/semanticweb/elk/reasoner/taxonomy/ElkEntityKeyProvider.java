@@ -25,6 +25,11 @@ package org.semanticweb.elk.reasoner.taxonomy;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.KeyProvider;
 
+/**
+ * {@link KeyProvider} for {@link ElkEntity}.
+ * 
+ * @author Peter Skocovsky
+ */
 public class ElkEntityKeyProvider implements KeyProvider<ElkEntity> {
 
 	public static final ElkEntityKeyProvider INSTANCE = new ElkEntityKeyProvider();

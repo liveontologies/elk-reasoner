@@ -55,6 +55,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * 
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
+ * @author Peter Skocovsky
  */
 public class IndividualNode implements
 		UpdateableInstanceNode<ElkClass, ElkNamedIndividual> {

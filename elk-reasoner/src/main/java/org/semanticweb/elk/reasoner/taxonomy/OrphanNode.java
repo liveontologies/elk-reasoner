@@ -35,6 +35,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
  * A {@link TaxonomyNode} that does not have any super nodes or sub nodes.
  * 
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  * 
  * @param <T>
  *            the type of objects stored in the nodes

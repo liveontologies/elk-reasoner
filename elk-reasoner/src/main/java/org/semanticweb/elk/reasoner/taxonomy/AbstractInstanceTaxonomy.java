@@ -30,6 +30,12 @@ import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 
+/**
+ * @author Peter Skocovsky
+ *
+ * @param <T>
+ * @param <I>
+ */
 public abstract class AbstractInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 		extends AbstractTaxonomy<T> implements InstanceTaxonomy<T, I> {
 	

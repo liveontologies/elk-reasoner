@@ -52,6 +52,7 @@ import org.semanticweb.elk.util.collections.Operations.Condition;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
 public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 		extends AbstractInstanceTaxonomy<T, I>

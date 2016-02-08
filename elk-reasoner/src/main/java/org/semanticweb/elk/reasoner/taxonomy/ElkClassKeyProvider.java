@@ -28,6 +28,11 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIris;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 
+/**
+ * {@link ComparatorKeyProvider} for {@link org.semanticweb.elk.owl.interfaces.ElkClass ElkClass}.
+ * 
+ * @author Peter Skocovsky
+ */
 public class ElkClassKeyProvider extends ElkEntityKeyProvider
 		implements ComparatorKeyProvider<ElkEntity> {
 
