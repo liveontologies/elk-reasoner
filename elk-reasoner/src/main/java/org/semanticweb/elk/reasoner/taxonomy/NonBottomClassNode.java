@@ -166,37 +166,27 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 
 	@Override
 	public Set<UpdateableTaxonomyNode<ElkClass>> getDirectSuperNodes() {
-		return getDirectUpdateableSuperNodes();
-	}
-
-	@Override
-	public Set<UpdateableTaxonomyNode<ElkClass>> getDirectUpdateableSuperNodes() {
 		return Collections.unmodifiableSet(directSuperNodes_);
 	}
 
 	@Override
-	public Set<? extends TaxonomyNode<ElkClass>> getAllSuperNodes() {
-		return TaxonomyNodeUtils.getAllSuperNodes(this);
+	public Set<? extends UpdateableTaxonomyNode<ElkClass>> getAllSuperNodes() {
+		return TaxonomyNodeUtils.getAllUpdateableSuperNodes(this);
 	}
 
 	@Override
-	public Set<TaxonomyNode<ElkClass>> getDirectSubNodes() {
+	public Set<UpdateableTaxonomyNode<ElkClass>> getDirectSubNodes() {
 		if (!directSubNodes_.isEmpty()) {
 			return Collections
-					.<TaxonomyNode<ElkClass>> unmodifiableSet(directSubNodes_);
+					.<UpdateableTaxonomyNode<ElkClass>> unmodifiableSet(directSubNodes_);
 		}
 		// else
 		return Collections.singleton(this.taxonomy_.getBottomNode());
 	}
 
 	@Override
-	public Set<UpdateableTaxonomyNode<ElkClass>> getDirectUpdateableSubNodes() {
-		return Collections.unmodifiableSet(directSubNodes_);
-	}
-
-	@Override
-	public Set<? extends TaxonomyNode<ElkClass>> getAllSubNodes() {
-		return TaxonomyNodeUtils.getAllSubNodes(this);
+	public Set<? extends UpdateableTaxonomyNode<ElkClass>> getAllSubNodes() {
+		return TaxonomyNodeUtils.getAllUpdateableSubNodes(this);
 	}
 
 	private final int hashCode_ = HashGenerator.generateNextHashCode();

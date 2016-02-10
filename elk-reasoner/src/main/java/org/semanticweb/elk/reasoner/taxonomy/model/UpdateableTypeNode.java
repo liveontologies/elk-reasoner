@@ -32,34 +32,33 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
 public interface UpdateableTypeNode<T extends ElkEntity, I extends ElkEntity>
 		extends TypeNode<T, I>, UpdateableTaxonomyNode<T> {
 
 	@Override
-	public Set<? extends UpdateableTypeNode<T, I>> getDirectUpdateableSubNodes();
+	Set<? extends UpdateableTypeNode<T, I>> getDirectSuperNodes();
 
-	/*
-	 * TODO Normally, this method should not exist, getDirectSuperNodes should
-	 * suffice since all super nodes are updateable. However, the inability of
-	 * Java 1.6 to deal with covariant return types in extended interfaces led
-	 * to this method. Otherwise, javac 1.6 complains that this interface
-	 * extends the same methods (getDirectSuperNodes) from TypeNode and
-	 * UpdateableTaxonomyNode while their return types are unrelated and ignores
-	 * the fact that UpdateableTypeNode is a sub-type of both, TypeNode and
-	 * UpdateableTaxonomyNode. Eclipse, however, has no problem with it. It is
-	 * allegedly fixed in Java 1.7
-	 */
 	@Override
-	public Set<? extends UpdateableTypeNode<T, I>> getDirectUpdateableSuperNodes();
+	Set<? extends UpdateableTypeNode<T, I>> getAllSuperNodes();
+
+	@Override
+	Set<? extends UpdateableTypeNode<T, I>> getDirectSubNodes();
+
+	@Override
+	Set<? extends UpdateableTypeNode<T, I>> getAllSubNodes();
 	
 	@Override
-	public Set<? extends UpdateableInstanceNode<T, I>> getDirectInstanceNodes();
-	
-	public void addDirectInstanceNode(
+	Set<? extends UpdateableInstanceNode<T, I>> getDirectInstanceNodes();
+
+	@Override
+	Set<? extends UpdateableInstanceNode<T, I>> getAllInstanceNodes();
+
+	void addDirectInstanceNode(
 			UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode);
 	
-	public void removeDirectInstanceNode(
+	void removeDirectInstanceNode(
 			UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode);
 
 }

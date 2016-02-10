@@ -76,7 +76,7 @@ public class LowLevelIncrementalABoxTest {
 
 		//Writer writer = new OutputStreamWriter(System.out);
 		
-		assertTrue(taxonomy.getTypeNode(B).getAllInstanceNodes().contains(taxonomy.getInstanceNode(ind)));
+		assertTrue(taxonomy.getNode(B).getAllInstanceNodes().contains(taxonomy.getInstanceNode(ind)));
 		
 		reasoner.setAllowIncrementalMode(true);
 		
@@ -91,7 +91,7 @@ public class LowLevelIncrementalABoxTest {
 		//TaxonomyPrinter.dumpInstanceTaxomomy(taxonomy, writer, false);
 		//writer.flush();
 		
-		assertFalse(taxonomy.getTypeNode(B).getAllInstanceNodes().contains(taxonomy.getInstanceNode(ind)));
+		assertFalse(taxonomy.getNode(B).getAllInstanceNodes().contains(taxonomy.getInstanceNode(ind)));
 	}	
 	
 	@Test
@@ -147,8 +147,8 @@ public class LowLevelIncrementalABoxTest {
 
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = reasoner.getInstanceTaxonomyQuietly();
 		
-		assertTrue(taxonomy.getTypeNode(A).getDirectInstanceNodes().size() == 1);
-		assertTrue(taxonomy.getTypeNode(B).getAllInstanceNodes().size() == 1);
+		assertTrue(taxonomy.getNode(A).getDirectInstanceNodes().size() == 1);
+		assertTrue(taxonomy.getNode(B).getAllInstanceNodes().size() == 1);
 		
 		reasoner.setAllowIncrementalMode(true);
 
@@ -160,8 +160,8 @@ public class LowLevelIncrementalABoxTest {
 
 		taxonomy = reasoner.getInstanceTaxonomyQuietly();
 		//the individual should be gone
-		assertTrue(taxonomy.getTypeNode(A).getDirectInstanceNodes().isEmpty());
-		assertTrue(taxonomy.getTypeNode(B).getAllInstanceNodes().isEmpty());
+		assertTrue(taxonomy.getNode(A).getDirectInstanceNodes().isEmpty());
+		assertTrue(taxonomy.getNode(B).getAllInstanceNodes().isEmpty());
 		//check that the individual properly re-appears
 		//changeLoader.clear();
 		
@@ -171,8 +171,8 @@ public class LowLevelIncrementalABoxTest {
 		
 		taxonomy = reasoner.getInstanceTaxonomyQuietly();
 		
-		assertTrue(taxonomy.getTypeNode(A).getDirectInstanceNodes().contains(taxonomy.getInstanceNode(ind)));
-		assertTrue(taxonomy.getTypeNode(B).getAllInstanceNodes().contains(taxonomy.getInstanceNode(ind)));
+		assertTrue(taxonomy.getNode(A).getDirectInstanceNodes().contains(taxonomy.getInstanceNode(ind)));
+		assertTrue(taxonomy.getNode(B).getAllInstanceNodes().contains(taxonomy.getInstanceNode(ind)));
 	}	
 	
 	@Test
@@ -196,8 +196,8 @@ public class LowLevelIncrementalABoxTest {
 
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = reasoner.getInstanceTaxonomyQuietly();
 		
-		assertTrue(taxonomy.getTypeNode(A).getDirectInstanceNodes().size() == 1);
-		assertTrue(taxonomy.getTypeNode(B).getAllInstanceNodes().size() == 1);
+		assertTrue(taxonomy.getNode(A).getDirectInstanceNodes().size() == 1);
+		assertTrue(taxonomy.getNode(B).getAllInstanceNodes().size() == 1);
 		
 		reasoner.setAllowIncrementalMode(true);		
 		TestChangesLoader changeLoader = new TestChangesLoader();
@@ -208,8 +208,8 @@ public class LowLevelIncrementalABoxTest {
 
 		taxonomy = reasoner.getInstanceTaxonomyQuietly();
 		
-		assertTrue(taxonomy.getTypeNode(A).getDirectInstanceNodes().size() == 1);
-		assertTrue(taxonomy.getTypeNode(B).getAllInstanceNodes().contains(taxonomy.getInstanceNode(ind)));
-		assertTrue(taxonomy.getTypeNode(B).getDirectInstanceNodes().contains(taxonomy.getInstanceNode(newInd)));
+		assertTrue(taxonomy.getNode(A).getDirectInstanceNodes().size() == 1);
+		assertTrue(taxonomy.getNode(B).getAllInstanceNodes().contains(taxonomy.getInstanceNode(ind)));
+		assertTrue(taxonomy.getNode(B).getDirectInstanceNodes().contains(taxonomy.getInstanceNode(newInd)));
 	}	
 }

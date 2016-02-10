@@ -22,7 +22,6 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * #L%
  */
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -72,29 +71,6 @@ public class SingletoneInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity
 	@Override
 	public ComparatorKeyProvider<ElkEntity> getInstanceKeyProvider() {
 		return individualKeyProvider_;
-	}
-	
-	@Override
-	public TypeNode<T, I> getTopNode() {
-		return node;
-	}
-
-	@Override
-	public TypeNode<T, I> getBottomNode() {
-		return node;
-	}
-
-	@Override
-	public TypeNode<T, I> getTypeNode(T elkObject) {
-		if (node.contains(elkObject))
-			return node;
-		// else
-		return null;
-	}
-
-	@Override
-	public Set<? extends TypeNode<T, I>> getTypeNodes() {
-		return Collections.singleton(node);
 	}
 
 	@Override
@@ -179,7 +155,7 @@ public class SingletoneInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity
 				for (final TypeNode<T, I> thisType : thisTypes) {
 					// While all nodes must be the same, it is sufficient to compare canonical members.
 					final TypeNode<T, I> otherType =
-							otherTaxonomy.getTypeNode(thisType.getCanonicalMember());
+							otherTaxonomy.getNode(thisType.getCanonicalMember());
 					/* 
 					 * otherType is a node from otherTaxonomy (or null), so contains(Object) on
 					 * a node set from otherTaxonomy should work for it as expected.
@@ -192,10 +168,10 @@ public class SingletoneInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity
 			}
 			
 			// Instances
-			for (final TypeNode<T, I> thisTypeNode : getTypeNodes()) {
+			for (final TypeNode<T, I> thisTypeNode : getNodes()) {
 				
 				final T thisMember = thisTypeNode.getCanonicalMember();
-				final TypeNode<T, I> otherTypeNode = otherTaxonomy.getTypeNode(thisMember);
+				final TypeNode<T, I> otherTypeNode = otherTaxonomy.getNode(thisMember);
 				
 				final Set<? extends InstanceNode<T, I>> thisInstances =
 						thisTypeNode.getDirectInstanceNodes();

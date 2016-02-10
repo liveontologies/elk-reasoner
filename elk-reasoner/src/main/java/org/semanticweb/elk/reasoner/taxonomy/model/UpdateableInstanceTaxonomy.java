@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.semanticweb.elk.reasoner.taxonomy.model;
 /*
  * #%L
@@ -25,6 +22,7 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  */
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
@@ -32,20 +30,35 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
-public interface UpdateableInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity> extends InstanceTaxonomy<T, I>, UpdateableTaxonomy<T> {
-
-	public UpdateableTypeNode<T, I> getCreateTypeNode(Collection<T> member);
+public interface UpdateableInstanceTaxonomy
+		<T extends ElkEntity, I extends ElkEntity>
+		extends InstanceTaxonomy<T, I>, UpdateableTaxonomy<T> {
 	
-	public UpdateableInstanceNode<T, I> getCreateInstanceNode(Collection<I> member);
-	
-	public UpdateableTypeNode<T, I> getUpdateableTypeNode(T elkEntity);
+	UpdateableInstanceNode<T, I> getCreateInstanceNode(Collection<I> member);
 
-	public boolean removeInstanceNode(I instance); 
+	boolean removeInstanceNode(I instance); 
+
+	@Override
+	UpdateableTypeNode<T, I> getCreateNode(Collection<T> members);
 	
 	@Override
-	public UpdateableTypeNode<T, I> getUpdateableTopNode();
-	
+	UpdateableInstanceNode<T, I> getInstanceNode(I elkEntity);
+
 	@Override
-	public UpdateableInstanceNode<T, I> getInstanceNode(I individual);
+	Set<? extends UpdateableInstanceNode<T, I>> getInstanceNodes();
+
+	@Override
+	UpdateableTypeNode<T, I> getNode(T elkEntity);
+
+	@Override
+	Set<? extends UpdateableTypeNode<T, I>> getNodes();
+
+	@Override
+	UpdateableTypeNode<T, I> getTopNode();
+
+	@Override
+	UpdateableTypeNode<T, I> getBottomNode();
+	
 }

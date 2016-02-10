@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.semanticweb.elk.reasoner.taxonomy.model;
 
 /*
@@ -33,19 +30,28 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
 public interface UpdateableTaxonomyNode<T extends ElkEntity> extends
 		UpdateableNode<T>, TaxonomyNode<T> {
 
-	public void addDirectSuperNode(UpdateableTaxonomyNode<T> superNode);
+	void addDirectSuperNode(UpdateableTaxonomyNode<T> superNode);
 
-	public void addDirectSubNode(UpdateableTaxonomyNode<T> subNode);
+	void addDirectSubNode(UpdateableTaxonomyNode<T> subNode);
 
-	public Set<? extends UpdateableTaxonomyNode<T>> getDirectUpdateableSubNodes();
+	boolean removeDirectSubNode(UpdateableTaxonomyNode<T> subNode);
 
-	public Set<? extends UpdateableTaxonomyNode<T>> getDirectUpdateableSuperNodes();
+	boolean removeDirectSuperNode(UpdateableTaxonomyNode<T> superNode);
 
-	public boolean removeDirectSubNode(UpdateableTaxonomyNode<T> subNode);
+	@Override
+	Set<? extends UpdateableTaxonomyNode<T>> getDirectSuperNodes();
 
-	public boolean removeDirectSuperNode(UpdateableTaxonomyNode<T> superNode);
+	@Override
+	Set<? extends UpdateableTaxonomyNode<T>> getAllSuperNodes();
+
+	@Override
+	Set<? extends UpdateableTaxonomyNode<T>> getDirectSubNodes();
+
+	@Override
+	Set<? extends UpdateableTaxonomyNode<T>> getAllSubNodes();
 }

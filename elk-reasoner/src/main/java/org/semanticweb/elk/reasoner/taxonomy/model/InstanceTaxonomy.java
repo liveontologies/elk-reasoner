@@ -43,29 +43,12 @@ public interface InstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 		extends Taxonomy<T> {
 
 	/**
-	 * @param elkObject
-	 *            {@link ElkEntity} for which the {@link TypeNode} to be
-	 *            computed
-	 * @return the {@link TypeNode} containing the given {@link ElkEntity} as a
-	 *         member, or {@code null} if the input does not occur in the
-	 *         taxonomy
-	 */
-	public TypeNode<T, I> getTypeNode(T elkEntity);
-
-	/**
-	 * Obtain an unmodifiable Set of all type nodes in this taxonomy.
-	 * 
-	 * @return an unmodifiable Set
-	 */
-	public Set<? extends TypeNode<T, I>> getTypeNodes();
-
-	/**
 	 * Returns the {@link ComparatorKeyProvider} that provides a key for each instance.
 	 * These keys are used to compute hash codes and to compare the instances.
 	 * 
 	 * @return the {@link ComparatorKeyProvider} that provides a key for each instance.
 	 */
-	public ComparatorKeyProvider<ElkEntity> getInstanceKeyProvider();
+	ComparatorKeyProvider<ElkEntity> getInstanceKeyProvider();
 	
 	/**
 	 * @param elkEntity
@@ -75,19 +58,25 @@ public interface InstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 	 *         as a member, or {@code null} if the input does not occur in the
 	 *         taxonomy
 	 */
-	public InstanceNode<T, I> getInstanceNode(I elkEntity);
+	InstanceNode<T, I> getInstanceNode(I elkEntity);
 
 	/**
 	 * Obtain an unmodifiable Set of all instance nodes in this taxonomy.
 	 * 
 	 * @return an unmodifiable Set
 	 */
-	public Set<? extends InstanceNode<T, I>> getInstanceNodes();
+	Set<? extends InstanceNode<T, I>> getInstanceNodes();
 
 	@Override
-	public TypeNode<T, I> getTopNode();
+	TypeNode<T, I> getNode(T elkEntity);
 
 	@Override
-	public TypeNode<T, I> getBottomNode();
+	Set<? extends TypeNode<T, I>> getNodes();
+
+	@Override
+	TypeNode<T, I> getTopNode();
+
+	@Override
+	TypeNode<T, I> getBottomNode();
 
 }

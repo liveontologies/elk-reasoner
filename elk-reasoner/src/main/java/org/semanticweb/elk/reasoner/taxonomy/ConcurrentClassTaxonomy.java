@@ -39,8 +39,6 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
-import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableBottomNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.util.collections.LazySetUnion;
@@ -99,10 +97,13 @@ public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
 	}
 	
 	@Override
-	public TaxonomyNode<ElkClass> getNode(ElkClass elkClass) {
-		TaxonomyNode<ElkClass> result = classNodeLookup_.get(classKeyProvider_.getKey(elkClass));
+	public UpdateableTaxonomyNode<ElkClass> getNode(ElkClass elkClass) {
+		UpdateableTaxonomyNode<ElkClass> result =
+				classNodeLookup_.get(classKeyProvider_.getKey(elkClass));
 
-		if (result == null && unsatisfiableClasses_.containsKey(classKeyProvider_.getKey(elkClass))) {
+		if (result == null
+				&& unsatisfiableClasses_.containsKey(
+						classKeyProvider_.getKey(elkClass))) {
 			result = bottomClassNode_;
 		}
 
@@ -110,12 +111,12 @@ public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
 	}
 
 	@Override
-	public Set<? extends TaxonomyNode<ElkClass>> getNodes() {
-		Set<? extends TaxonomyNode<ElkClass>> allNodes = allSatisfiableClassNodes_;
-		Set<? extends TaxonomyNode<ElkClass>> bottom = Collections
-				.<TaxonomyNode<ElkClass>> singleton(bottomClassNode_);
+	public Set<? extends UpdateableTaxonomyNode<ElkClass>> getNodes() {
 
-		return new LazySetUnion<TaxonomyNode<ElkClass>>(allNodes, bottom);	}
+		return new LazySetUnion<UpdateableTaxonomyNode<ElkClass>>(
+				allSatisfiableClassNodes_,
+				Collections.<UpdateableTaxonomyNode<ElkClass>> singleton(bottomClassNode_));
+	}
 
 	@Override
 	public NonBottomClassNode getTopNode() {
@@ -123,12 +124,7 @@ public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
 	}
 
 	@Override
-	public TaxonomyNode<ElkClass> getBottomNode() {
-		return getUpdateableBottomNode();
-	}
-	
-	@Override
-	public UpdateableBottomNode<ElkClass> getUpdateableBottomNode() {
+	public UpdateableTaxonomyNode<ElkClass> getBottomNode() {
 		return bottomClassNode_;
 	}
 
@@ -185,12 +181,14 @@ public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
 
 	@Override
 	public boolean addToBottomNode(ElkClass elkClass) {
-		return unsatisfiableClasses_.put(classKeyProvider_.getKey(elkClass), elkClass) == null;
+		return unsatisfiableClasses_.put(
+				classKeyProvider_.getKey(elkClass), elkClass) == null;
 	}
 
 	@Override
 	public boolean removeFromBottomNode(ElkClass member) {
-		return unsatisfiableClasses_.remove(classKeyProvider_.getKey(member)) != null;
+		return unsatisfiableClasses_.remove(
+				classKeyProvider_.getKey(member)) != null;
 	}
 	
 	@Override
@@ -200,13 +198,20 @@ public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
 	}
 
 	@Override
-	public boolean removeNode(UpdateableTaxonomyNode<ElkClass> node) {
+	public boolean removeNode(final ElkClass member) {
+		final UpdateableTaxonomyNode<ElkClass> node =
+				classNodeLookup_.get(classKeyProvider_.getKey(member));
+		if (node == null) {
+			return false;
+		}
+		
 		boolean changed = false;
 
 		if (allSatisfiableClassNodes_.remove(node)) {
 			// removing node assignment for members
-			for (ElkClass member : node) {
-				changed |= classNodeLookup_.remove(classKeyProvider_.getKey(member)) != null;
+			for (ElkClass m : node) {
+				changed |= classNodeLookup_.remove(
+						classKeyProvider_.getKey(m)) != null;
 			}
 
 			if (changed) {
@@ -217,21 +222,6 @@ public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
 		return changed;
 	}
 
-	@Override
-	public UpdateableTaxonomyNode<ElkClass> getUpdateableNode(ElkClass elkObject) {
-		return classNodeLookup_.get(classKeyProvider_.getKey(elkObject));
-	}
-	
-	@Override
-	public UpdateableTaxonomyNode<ElkClass> getUpdateableTopNode() {
-		return getTopNode();
-	}
-	
-	@Override
-	public Set<? extends UpdateableTaxonomyNode<ElkClass>> getUpdateableNodes() {
-		return Collections.unmodifiableSet(allSatisfiableClassNodes_);
-	}
-
 
 	/**
 	 * Special implementation for the bottom node in the taxonomy. Instead of
@@ -240,7 +230,8 @@ public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
 	 * of some performance if somebody should wish to traverse an ontology
 	 * bottom-up starting from this node.
 	 */
-	protected class BottomClassNode implements UpdateableBottomNode<ElkClass> {
+	protected class BottomClassNode
+			implements UpdateableTaxonomyNode<ElkClass> {
 
 		@Override
 		public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
@@ -254,7 +245,8 @@ public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
 		
 		@Override
 		public boolean contains(final ElkClass member) {
-			return unsatisfiableClasses_.containsKey(classKeyProvider_.getKey(member));
+			return unsatisfiableClasses_.containsKey(
+					classKeyProvider_.getKey(member));
 		}
 		
 		@Override
@@ -290,18 +282,46 @@ public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
 		}
 
 		@Override
-		public Set<TaxonomyNode<ElkClass>> getDirectSubNodes() {
+		public Set<UpdateableTaxonomyNode<ElkClass>> getDirectSubNodes() {
 			return Collections.emptySet();
 		}
 
 		@Override
-		public Set<TaxonomyNode<ElkClass>> getAllSubNodes() {
+		public Set<UpdateableTaxonomyNode<ElkClass>> getAllSubNodes() {
 			return Collections.emptySet();
 		}
 
 		@Override
-		public Set<? extends UpdateableTaxonomyNode<ElkClass>> getDirectUpdateableSuperNodes() {
-			return getDirectSuperNodes();
+		public boolean trySetModified(boolean modified) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean isModified() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void addDirectSuperNode(
+				UpdateableTaxonomyNode<ElkClass> superNode) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void addDirectSubNode(UpdateableTaxonomyNode<ElkClass> subNode) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean removeDirectSubNode(
+				UpdateableTaxonomyNode<ElkClass> subNode) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean removeDirectSuperNode(
+				UpdateableTaxonomyNode<ElkClass> superNode) {
+			throw new UnsupportedOperationException();
 		}
 	}
 }

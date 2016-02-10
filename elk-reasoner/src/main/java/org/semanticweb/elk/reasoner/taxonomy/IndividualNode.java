@@ -166,7 +166,7 @@ public class IndividualNode implements
 
 			if (result.add(next)) {
 				for (UpdateableTypeNode<ElkClass, ElkNamedIndividual> nextSuperNode : next
-						.getDirectUpdateableSuperNodes())
+						.getDirectSuperNodes())
 					todo.add(nextSuperNode);
 			}
 		}

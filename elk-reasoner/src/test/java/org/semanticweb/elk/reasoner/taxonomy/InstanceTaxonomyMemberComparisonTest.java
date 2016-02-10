@@ -234,7 +234,7 @@ public class InstanceTaxonomyMemberComparisonTest {
 	}
 	
 	@Test
-	@Ignore// TODO: it seems that SameIndividual does not put the individuals into the same node!
+	@Ignore// TODO: read comment in org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputationFactory
 	public void testMemberSet() throws ElkException {
 		final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy =
 				instanceTaxonomyProvider_.getTaxonomy("taxonomy_member_comparison/instance_member_set.owl");
@@ -353,7 +353,7 @@ public class InstanceTaxonomyMemberComparisonTest {
 				new ElkAbbreviatedIri(new ElkPrefixImpl("different:",
 						new ElkFullIri("http://example.org/different#")), "B"));
 		
-		final TypeNode<ElkClass, ElkNamedIndividual> nodeB = taxonomy.getTypeNode(differentB2);
+		final TypeNode<ElkClass, ElkNamedIndividual> nodeB = taxonomy.getNode(differentB2);
 		
 		assertEquals(2, nodeB.getDirectInstanceNodes().size());
 		
@@ -363,7 +363,7 @@ public class InstanceTaxonomyMemberComparisonTest {
 				new ElkAbbreviatedIri(new ElkPrefixImpl("different:",
 						new ElkFullIri("http://example.org/different#")), "C"));
 		
-		final TypeNode<ElkClass, ElkNamedIndividual> nodeC = taxonomy.getTypeNode(differentC2);
+		final TypeNode<ElkClass, ElkNamedIndividual> nodeC = taxonomy.getNode(differentC2);
 		
 		assertEquals(2, nodeC.getDirectInstanceNodes().size());
 		

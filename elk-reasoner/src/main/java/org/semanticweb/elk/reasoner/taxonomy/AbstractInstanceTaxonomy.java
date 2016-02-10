@@ -105,7 +105,7 @@ public abstract class AbstractInstanceTaxonomy<T extends ElkEntity, I extends El
 				for (final TypeNode<T, I> thisType : thisTypes) {
 					// While all nodes must be the same, it is sufficient to compare canonical members.
 					final TypeNode<T, I> otherType =
-							otherTaxonomy.getTypeNode(thisType.getCanonicalMember());
+							otherTaxonomy.getNode(thisType.getCanonicalMember());
 					/* 
 					 * otherType is a node from otherTaxonomy (or null), so contains(Object) on
 					 * a node set from otherTaxonomy should work for it as expected.
@@ -118,10 +118,10 @@ public abstract class AbstractInstanceTaxonomy<T extends ElkEntity, I extends El
 			}
 			
 			// Instances
-			for (final TypeNode<T, I> thisTypeNode : getTypeNodes()) {
+			for (final TypeNode<T, I> thisTypeNode : getNodes()) {
 				
 				final T thisMember = thisTypeNode.getCanonicalMember();
-				final TypeNode<T, I> otherTypeNode = otherTaxonomy.getTypeNode(thisMember);
+				final TypeNode<T, I> otherTypeNode = otherTaxonomy.getNode(thisMember);
 				
 				final Set<? extends InstanceNode<T, I>> thisInstances =
 						thisTypeNode.getDirectInstanceNodes();

@@ -291,7 +291,7 @@ public class Reasoner extends AbstractReasonerState {
 	protected TypeNode<ElkClass, ElkNamedIndividual> getTypeNode(
 			ElkClass elkClass) throws ElkException {
 		TypeNode<ElkClass, ElkNamedIndividual> node = getInstanceTaxonomy()
-				.getTypeNode(elkClass);
+				.getNode(elkClass);
 		if (node != null)
 			return node;
 		// else
