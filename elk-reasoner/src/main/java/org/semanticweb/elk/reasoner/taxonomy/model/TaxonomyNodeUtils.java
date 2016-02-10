@@ -110,14 +110,5 @@ public class TaxonomyNodeUtils {
 				return node.getDirectSuperNodes();
 			}});
 	}	
-	
-	public static <T extends ElkEntity> Set<? extends UpdateableTaxonomyNode<T>> getAllUpdateableSuperNodes(UpdateableBottomNode<T> tnode) {
-		return getAllReachable(tnode.getDirectUpdateableSuperNodes(), new GetSuccessors<T, UpdateableTaxonomyNode<T>> () {
-
-			@Override
-			public Set<? extends UpdateableTaxonomyNode<T>> get(UpdateableTaxonomyNode<T> node) {
-				return node.getDirectSuperNodes();
-			}});
-	}
 
 }

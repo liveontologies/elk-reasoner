@@ -48,10 +48,10 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * Class for storing information about a class in the context of classification.
- * It is the main data container for {@link IndividualClassTaxonomy} objects.
+ * It is the main data container for {@link InstanceTaxonomy} objects.
  * Like most such data containers in ELK, it is read-only for public access but
  * provides package-private ways of modifying it. Modifications of this class
- * happen in implementations of {@link IndividualClassTaxonomy} only.
+ * happen in implementations of {@link InstanceTaxonomy} only.
  * 
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch

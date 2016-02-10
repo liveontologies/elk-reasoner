@@ -41,6 +41,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
@@ -66,7 +67,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ConcurrentInstanceTaxonomy
 		extends AbstractInstanceTaxonomy<ElkClass, ElkNamedIndividual>
-		implements IndividualClassTaxonomy {
+		implements UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
