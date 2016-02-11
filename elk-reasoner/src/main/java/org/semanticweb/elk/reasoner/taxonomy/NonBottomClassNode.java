@@ -170,7 +170,7 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 
 	@Override
 	public Set<? extends UpdateableTaxonomyNode<ElkClass>> getAllSuperNodes() {
-		return TaxonomyNodeUtils.getAllUpdateableSuperNodes(this);
+		return TaxonomyNodeUtils.getAllSuperNodes(this);
 	}
 
 	@Override
@@ -185,7 +185,7 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 
 	@Override
 	public Set<? extends UpdateableTaxonomyNode<ElkClass>> getAllSubNodes() {
-		return TaxonomyNodeUtils.getAllUpdateableSubNodes(this);
+		return TaxonomyNodeUtils.getAllSubNodes(this);
 	}
 
 	private final int hashCode_ = HashGenerator.generateNextHashCode();

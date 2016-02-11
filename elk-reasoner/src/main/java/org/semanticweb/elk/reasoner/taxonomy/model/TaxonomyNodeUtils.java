@@ -47,14 +47,12 @@ public class TaxonomyNodeUtils {
 	 *
 	 * pavel.klinov@uni-ulm.de
 	 */
-	interface GetSuccessors<T extends ElkEntity, O extends TaxonomyNode<T>> {
-		
+	interface GetSuccessors<O> {
 		Set<? extends O> get(O node);
 	}
 
-	private static <T extends ElkEntity, O extends TaxonomyNode<T>>
-			Set<O> getAllReachable(
-					Collection<? extends O> direct, GetSuccessors<T, O> succ) {
+	private static <O> Set<O> getAllReachable(
+					Collection<? extends O> direct, GetSuccessors<O> succ) {
 		
 		Set<O> result = new ArrayHashSet<O>(direct.size());
 		Queue<O> todo = new LinkedList<O>();
@@ -74,12 +72,9 @@ public class TaxonomyNodeUtils {
 		return Collections.unmodifiableSet(result);
 	}
 	
-	/* TODO: This still does not work for UpdateableTaxonomyNode, because
-	 * it's type parameter N is fixed to UpdateableTaxonomyNode ( I guess :-P )
-	 */
 	public static <T extends ElkEntity, N extends GenericTaxonomyNode<T, N>>
-			Set<? extends N> getAllSuperNodes(final N tnode) {
-		return getAllReachable(tnode.getDirectSuperNodes(), new GetSuccessors<T, N> () {
+			Set<? extends N> getAllSuperNodes(final GenericTaxonomyNode<T, N> tnode) {
+		return getAllReachable(tnode.getDirectSuperNodes(), new GetSuccessors<N> () {
 
 			@Override
 			public Set<? extends N> get(final N node) {
@@ -88,30 +83,12 @@ public class TaxonomyNodeUtils {
 	}
 	
 	public static <T extends ElkEntity, N extends GenericTaxonomyNode<T, N>>
-			Set<? extends N> getAllSubNodes(final N tnode) {
-		return getAllReachable(tnode.getDirectSubNodes(), new GetSuccessors<T, N> () {
+			Set<? extends N> getAllSubNodes(final GenericTaxonomyNode<T, N> tnode) {
+		return getAllReachable(tnode.getDirectSubNodes(), new GetSuccessors<N> () {
 
 			@Override
 			public Set<? extends N> get(final N node) {
 				return node.getDirectSubNodes();
-			}});
-	}	
-	
-	public static <T extends ElkEntity> Set<? extends UpdateableTaxonomyNode<T>> getAllUpdateableSubNodes(UpdateableTaxonomyNode<T> tnode) {
-		return getAllReachable(tnode.getDirectSubNodes(), new GetSuccessors<T, UpdateableTaxonomyNode<T>> () {
-
-			@Override
-			public Set<? extends UpdateableTaxonomyNode<T>> get(UpdateableTaxonomyNode<T> node) {
-				return node.getDirectSubNodes();
-			}});
-	}
-	
-	public static <T extends ElkEntity> Set<? extends UpdateableTaxonomyNode<T>> getAllUpdateableSuperNodes(UpdateableTaxonomyNode<T> tnode) {
-		return getAllReachable(tnode.getDirectSuperNodes(), new GetSuccessors<T, UpdateableTaxonomyNode<T>> () {
-
-			@Override
-			public Set<? extends UpdateableTaxonomyNode<T>> get(UpdateableTaxonomyNode<T> node) {
-				return node.getDirectSuperNodes();
 			}});
 	}	
 
