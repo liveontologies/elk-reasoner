@@ -258,7 +258,8 @@ public class ConcurrentInstanceTaxonomy
 
 	@Override
 	public boolean removeNode(final ElkClass member) {
-		final UpdateableTaxonomyNode<ElkClass> node = getNode(member);
+		final UpdateableTaxonomyNode<ElkClass> node =
+				classTaxonomy_.getNode(member);
 		if (node == null) {
 			return false;
 		}
@@ -327,7 +328,7 @@ public class ConcurrentInstanceTaxonomy
 	private class UpdateableTypeNodeWrapper implements
 			UpdateableTypeNode<ElkClass, ElkNamedIndividual> {
 
-		protected final TaxonomyNode<ElkClass> classNode_;
+		protected final UpdateableTaxonomyNode<ElkClass> classNode_;
 
 		/**
 		 * ElkNamedIndividual nodes whose members are instances of the members
@@ -342,7 +343,7 @@ public class ConcurrentInstanceTaxonomy
 		}
 
 		public UpdateableTaxonomyNode<ElkClass> getNode() {
-			return (UpdateableTaxonomyNode<ElkClass>) classNode_;
+			return classNode_;
 		}
 
 		@Override
@@ -406,25 +407,34 @@ public class ConcurrentInstanceTaxonomy
 
 		@Override
 		public void addDirectSuperNode(
-				UpdateableTaxonomyNode<ElkClass> superNode) {
-			getNode().addDirectSuperNode(superNode);
+				UpdateableTypeNode<ElkClass, ElkNamedIndividual> superNode) {
+			// FIXME: This is a dirty trick, that shouldn't be necessary with generic implementation
+			getNode().addDirectSuperNode(
+					((UpdateableTypeNodeWrapper) superNode).getNode());
 		}
 
 		@Override
-		public void addDirectSubNode(UpdateableTaxonomyNode<ElkClass> subNode) {
-			getNode().addDirectSubNode(subNode);
+		public void addDirectSubNode(
+				UpdateableTypeNode<ElkClass, ElkNamedIndividual> subNode) {
+			// FIXME: This is a dirty trick, that shouldn't be necessary with generic implementation
+			getNode().addDirectSubNode(
+					((UpdateableTypeNodeWrapper) subNode).getNode());
 		}
 
 		@Override
 		public boolean removeDirectSubNode(
-				UpdateableTaxonomyNode<ElkClass> subNode) {
-			return getNode().removeDirectSubNode(subNode);
+				UpdateableTypeNode<ElkClass, ElkNamedIndividual> subNode) {
+			// FIXME: This is a dirty trick, that shouldn't be necessary with generic implementation
+			return getNode().removeDirectSubNode(
+					((UpdateableTypeNodeWrapper) subNode).getNode());
 		}
 
 		@Override
 		public boolean removeDirectSuperNode(
-				UpdateableTaxonomyNode<ElkClass> superNode) {
-			return getNode().removeDirectSuperNode(superNode);
+				UpdateableTypeNode<ElkClass, ElkNamedIndividual> superNode) {
+			// FIXME: This is a dirty trick, that shouldn't be necessary with generic implementation
+			return getNode().removeDirectSuperNode(
+					((UpdateableTypeNodeWrapper) superNode).getNode());
 		}
 
 		@Override

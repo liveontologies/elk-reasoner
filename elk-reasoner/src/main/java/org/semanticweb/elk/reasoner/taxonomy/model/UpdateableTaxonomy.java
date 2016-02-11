@@ -22,9 +22,6 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
-import java.util.Collection;
-import java.util.Set;
-
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
@@ -33,27 +30,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  *         pavel.klinov@uni-ulm.de
  * @author Peter Skocovsky
  */
-public interface UpdateableTaxonomy<T extends ElkEntity> extends Taxonomy<T> {
-
-	UpdateableTaxonomyNode<T> getCreateNode(Collection<T> members);
-
-	// TODO: This could return the removed node instead ;-)
-	boolean removeNode(T member);
-
-	boolean addToBottomNode(T member);
-
-	boolean removeFromBottomNode(T member);
-	
-	@Override
-	UpdateableTaxonomyNode<T> getNode(T elkEntity);
-
-	@Override
-	Set<? extends UpdateableTaxonomyNode<T>> getNodes();
-
-	@Override
-	UpdateableTaxonomyNode<T> getTopNode();
-
-	@Override
-	UpdateableTaxonomyNode<T> getBottomNode();
+public interface UpdateableTaxonomy<T extends ElkEntity>
+		extends UpdateableGenericTaxonomy<T, UpdateableTaxonomyNode<T>> {
 
 }

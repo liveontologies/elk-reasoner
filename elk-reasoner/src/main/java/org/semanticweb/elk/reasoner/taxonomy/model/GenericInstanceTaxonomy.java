@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,15 +22,32 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
+import java.util.Set;
+
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
-/**
- * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
- * @author Peter Skocovsky
- */
-public interface UpdateableTaxonomyNode<T extends ElkEntity> extends
-		UpdateableGenericTaxonomyNode<T, UpdateableTaxonomyNode<T>> {
+public interface GenericInstanceTaxonomy
+		<T extends ElkEntity, I extends ElkEntity,
+				TN extends GenericTypeNode<T, I, TN, IN>,
+				IN extends GenericInstanceNode<T, I, TN, IN>>
+		extends InstanceTaxonomy<T, I>, GenericTaxonomy<T, TN> {
+
+	@Override
+	IN getInstanceNode(I elkEntity);
+
+	@Override
+	Set<? extends IN> getInstanceNodes();
+
+	@Override
+	TN getNode(T elkEntity);
+
+	@Override
+	Set<? extends TN> getNodes();
+
+	@Override
+	TN getTopNode();
+
+	@Override
+	TN getBottomNode();
 
 }

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.semanticweb.elk.reasoner.taxonomy.model;
 /*
  * #%L
@@ -24,8 +21,6 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
-import java.util.Set;
-
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
@@ -34,15 +29,9 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  * pavel.klinov@uni-ulm.de
  * @author Peter Skocovsky
  */
-public interface UpdateableInstanceNode<T extends ElkEntity, I extends ElkEntity> extends InstanceNode<T, I>, UpdateableNode<I> {
+public interface UpdateableInstanceNode
+		<T extends ElkEntity, I extends ElkEntity>
+		extends UpdateableGenericInstanceNode
+				<T, I, UpdateableTypeNode<T, I>, UpdateableInstanceNode<T, I>> {
 	
-	@Override
-	Set<? extends UpdateableTypeNode<T, I>> getDirectTypeNodes();
-
-	@Override
-	Set<? extends UpdateableTypeNode<T, I>> getAllTypeNodes();
-
-	void addDirectTypeNode(UpdateableTypeNode<T, I> typeNode);
-	
-	void removeDirectTypeNode(UpdateableTypeNode<T, I> typeNode);
 }

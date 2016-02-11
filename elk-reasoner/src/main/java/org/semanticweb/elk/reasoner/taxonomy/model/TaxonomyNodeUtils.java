@@ -74,21 +74,25 @@ public class TaxonomyNodeUtils {
 		return Collections.unmodifiableSet(result);
 	}
 	
-	// TODO: In order to make this generic, we need to make the Node interface generic
-	public static <T extends ElkEntity> Set<? extends TaxonomyNode<T>> getAllSuperNodes(TaxonomyNode<T> tnode) {
-		return getAllReachable(tnode.getDirectSuperNodes(), new GetSuccessors<T, TaxonomyNode<T>> () {
+	/* TODO: This still does not work for UpdateableTaxonomyNode, because
+	 * it's type parameter N is fixed to UpdateableTaxonomyNode ( I guess :-P )
+	 */
+	public static <T extends ElkEntity, N extends GenericTaxonomyNode<T, N>>
+			Set<? extends N> getAllSuperNodes(final N tnode) {
+		return getAllReachable(tnode.getDirectSuperNodes(), new GetSuccessors<T, N> () {
 
 			@Override
-			public Set<? extends TaxonomyNode<T>> get(TaxonomyNode<T> node) {
+			public Set<? extends N> get(final N node) {
 				return node.getDirectSuperNodes();
 			}});
 	}
 	
-	public static <T extends ElkEntity> Set<? extends TaxonomyNode<T>> getAllSubNodes(TaxonomyNode<T> tnode) {
-		return getAllReachable(tnode.getDirectSubNodes(), new GetSuccessors<T, TaxonomyNode<T>> () {
+	public static <T extends ElkEntity, N extends GenericTaxonomyNode<T, N>>
+			Set<? extends N> getAllSubNodes(final N tnode) {
+		return getAllReachable(tnode.getDirectSubNodes(), new GetSuccessors<T, N> () {
 
 			@Override
-			public Set<? extends TaxonomyNode<T>> get(TaxonomyNode<T> node) {
+			public Set<? extends N> get(final N node) {
 				return node.getDirectSubNodes();
 			}});
 	}	
