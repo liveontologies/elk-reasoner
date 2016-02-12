@@ -356,7 +356,7 @@ public class Reasoner extends AbstractReasonerState {
 				materializedQuery);
 
 		return new AnonymousNode<ElkClass>(queryClass, queryNode,
-				ElkClassKeyProvider.INSTANCE);
+				queryNode.size(), ElkClassKeyProvider.INSTANCE);
 	}
 
 	/**

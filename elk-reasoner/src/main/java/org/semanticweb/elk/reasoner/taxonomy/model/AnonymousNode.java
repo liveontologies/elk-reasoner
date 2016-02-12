@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.taxonomy.model;
 
+import java.util.Collections;
+
 /*
  * #%L
  * ELK Reasoner
@@ -30,16 +32,21 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * listed among its members
  * 
  * @author Yevgeny Kazakov
+ * @author Peter Skocovsky
  * 
  * @param <T>
  */
 public class AnonymousNode<T extends ElkEntity> extends SimpleNode<T> implements
 		Node<T> {
 
-	public AnonymousNode(T anonymousMember, Iterable<T> allMembers,
-			final ComparatorKeyProvider<ElkEntity> comparatorKeyProvider) {
-		super(allMembers, comparatorKeyProvider);
-		this.members.remove(anonymousMember);
+	public AnonymousNode(T anonymousMember, Iterable<T> allMembers, int size,
+			final ComparatorKeyProvider<? super T> comparatorKeyProvider) {
+		super(allMembers, size, comparatorKeyProvider);
+		final int index = Collections.binarySearch(members_, anonymousMember,
+				getKeyProvider().getComparator());
+		if (index >= 0) {
+			members_.remove(index);
+		}
 	}
 
 }

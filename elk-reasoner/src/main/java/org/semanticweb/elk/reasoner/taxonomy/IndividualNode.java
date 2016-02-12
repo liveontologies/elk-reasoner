@@ -25,12 +25,9 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -41,6 +38,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.model.SimpleNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -57,21 +55,13 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author Markus Kroetzsch
  * @author Peter Skocovsky
  */
-public class IndividualNode implements
+public class IndividualNode extends SimpleNode<ElkNamedIndividual> implements
 		UpdateableInstanceNode<ElkClass, ElkNamedIndividual> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IndividualNode.class);
 
-	/**
-	 * Equivalent ElkClass objects that are representatives of this node.
-	 */
-	private final List<ElkNamedIndividual> members_;
-	/**
-	 * provides keys that are used for hashing instead of the elkClasses
-	 */
-	private final ComparatorKeyProvider<ElkEntity> individualKeyProvider_;
 	/**
 	 * ElkClass nodes whose members are direct types of the members of this
 	 * node.
@@ -94,11 +84,8 @@ public class IndividualNode implements
 	 */
 	protected IndividualNode(Collection<ElkNamedIndividual> members,
 			final ComparatorKeyProvider<ElkEntity> individualKeyProvider) {
-
-		this.members_ = new ArrayList<ElkNamedIndividual>(members);
-		this.individualKeyProvider_ = individualKeyProvider;
+		super(members, members.size(), individualKeyProvider);
 		this.directTypeNodes_ = new ArrayHashSet<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>();
-		Collections.sort(this.members_, this.individualKeyProvider_.getComparator());
 	}
 
 	/**
@@ -115,39 +102,13 @@ public class IndividualNode implements
 	}
 
 	@Override
-	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
-		return individualKeyProvider_;
-	}
-	
-	@Override
-	public Iterator<ElkNamedIndividual> iterator() {
-		return members_.iterator();
-	}
-	
-	@Override
-	public boolean contains(ElkNamedIndividual member) {
-		return (Collections.binarySearch(members_, member,
-				individualKeyProvider_.getComparator()) >= 0);
-	}
-	
-	@Override
-	public int size() {
-		return members_.size();
-	}
-
-	@Override
 	public void setMembers(final Iterable<ElkNamedIndividual> members) {
 		members_.clear();
 		for (final ElkNamedIndividual elkIndividual : members) {
 			members_.add(elkIndividual);
 		}
-		Collections.sort(this.members_, individualKeyProvider_.getComparator());
+		Collections.sort(this.members_, getKeyProvider().getComparator());
 		LOGGER_.trace("updated members of {}", this);
-	}
-	
-	@Override
-	public ElkNamedIndividual getCanonicalMember() {
-		return members_.get(0);
 	}
 
 	@Override

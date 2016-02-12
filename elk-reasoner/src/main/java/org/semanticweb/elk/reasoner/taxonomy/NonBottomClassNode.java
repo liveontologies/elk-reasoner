@@ -25,16 +25,13 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.model.SimpleNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeUtils;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -54,7 +51,8 @@ import org.slf4j.LoggerFactory;
  * @author Pavel Klinov
  * @author Peter Skocovsky
  */
-class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
+class NonBottomClassNode extends SimpleNode<ElkClass>
+		implements UpdateableTaxonomyNode<ElkClass> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -65,10 +63,6 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 	 */
 	private final ConcurrentClassTaxonomy taxonomy_;
 
-	/**
-	 * Equivalent ElkClass objects that are representatives of this node.
-	 */
-	private final List<ElkClass> members_;
 	/**
 	 * ElkClass nodes whose members are direct super-classes of the members of
 	 * this node.
@@ -96,11 +90,10 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 	 */
 	protected NonBottomClassNode(ConcurrentClassTaxonomy taxonomy,
 			Collection<ElkClass> members) {
+		super(members, members.size(), taxonomy.getKeyProvider());
 		this.taxonomy_ = taxonomy;
-		this.members_ = new ArrayList<ElkClass>(members);
 		this.directSubNodes_ = new ArrayHashSet<UpdateableTaxonomyNode<ElkClass>>();
 		this.directSuperNodes_ = new ArrayHashSet<UpdateableTaxonomyNode<ElkClass>>();
-		Collections.sort(this.members_, this.taxonomy_.getKeyProvider().getComparator());
 	}
 
 	/**
@@ -136,32 +129,6 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 	}
 
 	@Override
-	public ComparatorKeyProvider<? super ElkClass> getKeyProvider() {
-		return taxonomy_.getKeyProvider();
-	}
-	
-	@Override
-	public Iterator<ElkClass> iterator() {
-		return members_.iterator();
-	}
-	
-	@Override
-	public boolean contains(ElkClass arg) {
-		return (Collections.binarySearch(members_, arg,
-				taxonomy_.getKeyProvider().getComparator()) >= 0);
-	}
-	
-	@Override
-	public int size() {
-		return members_.size();
-	}
-	
-	@Override
-	public ElkClass getCanonicalMember() {
-		return members_.get(0);
-	}
-
-	@Override
 	public Set<UpdateableTaxonomyNode<ElkClass>> getDirectSuperNodes() {
 		return Collections.unmodifiableSet(directSuperNodes_);
 	}
@@ -194,17 +161,12 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 	}
 
 	@Override
-	public String toString() {
-		return members_.toString();
-	}
-
-	@Override
 	public void setMembers(final Iterable<ElkClass> members) {
 		members_.clear();
 		for (final ElkClass elkClass : members) {
 			members_.add(elkClass);
 		}
-		Collections.sort(this.members_, taxonomy_.getKeyProvider().getComparator());
+		Collections.sort(this.members_, getKeyProvider().getComparator());
 		LOGGER_.trace("updated members of {}", this);
 	}
 	

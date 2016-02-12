@@ -21,60 +21,71 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.List;
 
-import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
+/**
+ * @author Peter Skocovsky
+ *
+ * @param <T>
+ */
+public class SimpleNode<T> implements Node<T> {
 
-public class SimpleNode<T extends ElkEntity> implements Node<T> {
+	protected final List<T> members_;
+	protected final ComparatorKeyProvider<? super T> keyProvider_;
 
-	final SortedSet<T> members;
-	protected final ComparatorKeyProvider<ElkEntity> comparatorKeyProvider_;
-
-	public SimpleNode(Iterable<T> members,
-			final ComparatorKeyProvider<ElkEntity> comparatorKeyProvider) {
-		this.members = new TreeSet<T>(comparatorKeyProvider.getComparator());
-		this.comparatorKeyProvider_ = comparatorKeyProvider;
-		for (T member : members) {
-			this.members.add(member);
+	public SimpleNode(final Iterable<T> members, final int size,
+			final ComparatorKeyProvider<? super T> keyProvider) {
+		if (keyProvider == null) {
+			throw new IllegalArgumentException("keyProvider cannot be null!");
+		}
+		keyProvider_ = keyProvider;
+		if (members == null || size <= 0) {
+			this.members_ = new ArrayList<T>();
+		} else {
+			this.members_ = new ArrayList<T>(size);
+			for (T member : members) {
+				this.members_.add(member);
+			}
+			Collections.sort(this.members_, getKeyProvider().getComparator());
 		}
 	}
 	
+	public SimpleNode(final ComparatorKeyProvider<T> comparatorKeyProvider) {
+		this(null, 0, comparatorKeyProvider);
+	}
+	
 	@Override
-	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
-		return comparatorKeyProvider_;
+	public ComparatorKeyProvider<? super T> getKeyProvider() {
+		return keyProvider_;
 	}
 	
 	@Override
 	public Iterator<T> iterator() {
-		return members.iterator();
+		return members_.iterator();
 	}
 	
 	@Override
-	public boolean contains(T member) {
-		return members.contains(member);
+	public boolean contains(final T member) {
+		return (Collections.binarySearch(members_, member,
+				getKeyProvider().getComparator()) >= 0);
 	}
 	
 	@Override
 	public int size() {
-		return members.size();
+		return members_.size();
 	}
 	
 	@Override
 	public T getCanonicalMember() {
-		return members.isEmpty() ? null : members.iterator().next();
+		return members_.isEmpty() ? null : members_.get(0);
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-
-		for (T member : members) {
-			builder.append(OwlFunctionalStylePrinter.toString(member) + ",");
-		}
-
-		return builder.toString();
+		return members_.toString();
 	}
+	
 }
