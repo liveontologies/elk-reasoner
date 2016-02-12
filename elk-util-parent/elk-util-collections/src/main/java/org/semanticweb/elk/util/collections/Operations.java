@@ -309,7 +309,7 @@ public class Operations {
 	 * @return the filtered iterator
 	 * 
 	 */
-	public static <T> Iterable<T> filter(final Iterable<T> input,
+	public static <T> Iterable<T> filter(final Iterable<? extends T> input,
 			final Condition<? super T> condition) {
 		assert input != null;
 
@@ -319,7 +319,7 @@ public class Operations {
 			public Iterator<T> iterator() {
 
 				return new Iterator<T>() {
-					Iterator<T> i = input.iterator();
+					Iterator<? extends T> i = input.iterator();
 					T next;
 					boolean hasNext = advance();
 
@@ -383,7 +383,7 @@ public class Operations {
 	 * @return the set consisting of the elements of the input set satisfying
 	 *         the given condition
 	 */
-	public static <T> Set<T> filter(final Set<T> input,
+	public static <T> Set<T> filter(final Set<? extends T> input,
 			final Condition<? super T> condition, final int size) {
 		return new Set<T>() {
 

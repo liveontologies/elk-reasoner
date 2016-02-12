@@ -22,20 +22,11 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
-import java.util.Collection;
+public interface UpdateableGenericNodeStore<T, N extends UpdateableNode<T>>
+		extends GenericNodeStore<T, N> {
 
-import org.semanticweb.elk.owl.interfaces.ElkEntity;
-
-public interface UpdateableGenericTaxonomy
-		<T extends ElkEntity, N extends UpdateableGenericTaxonomyNode<T, N>>
-		extends GenericTaxonomy<T, N> {
-
-	N getCreateNode(Collection<T> members);
-
+	N putIfAbsent(N node);
+	
 	boolean removeNode(T member);
-
-	boolean addToBottomNode(T member);
-
-	boolean removeFromBottomNode(T member);
-
+	
 }

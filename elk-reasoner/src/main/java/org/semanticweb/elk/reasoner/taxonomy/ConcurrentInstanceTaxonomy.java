@@ -100,7 +100,7 @@ public class ConcurrentInstanceTaxonomy
 	}
 
 	@Override
-	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
+	public ComparatorKeyProvider<? super ElkClass> getKeyProvider() {
 		return classTaxonomy_.getKeyProvider();
 	}
 	
@@ -347,7 +347,7 @@ public class ConcurrentInstanceTaxonomy
 		}
 
 		@Override
-		public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
+		public ComparatorKeyProvider<? super ElkClass> getKeyProvider() {
 			return classNode_.getKeyProvider();
 		}
 		
@@ -447,6 +447,11 @@ public class ConcurrentInstanceTaxonomy
 			return getNode().isModified();
 		}
 
+		@Override
+		public void setMembers(final Iterable<ElkClass> members) {
+			getNode().setMembers(members);
+		}
+		
 		@Override
 		public Set<UpdateableTypeNodeWrapper> getDirectSuperNodes() {
 			return Operations.map(getNode().getDirectSuperNodes(), functor_);

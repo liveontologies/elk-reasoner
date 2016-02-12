@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.semanticweb.elk.reasoner.taxonomy.model;
 /*
  * #%L
@@ -24,16 +21,18 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkEntity;
-
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
-public interface UpdateableNode<T extends ElkEntity> extends Node<T> {
+public interface UpdateableNode<T> extends Node<T> {
 
-	public boolean trySetModified(boolean modified);
+	boolean trySetModified(boolean modified);
 	
-	public boolean isModified();	
+	boolean isModified();
+	
+	void setMembers(Iterable<T> members);
+	
 }

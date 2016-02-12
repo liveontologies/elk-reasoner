@@ -22,8 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy.model;
 
-import org.semanticweb.elk.owl.interfaces.ElkEntity;
-
 /**
  * Basic interface for representing sets of equivalent ElkEntity with one
  * canonical representative. The notion of equivalence depends on the
@@ -42,7 +40,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  * @param <T>
  *            the type of members of the node
  */
-public interface Node<T extends ElkEntity> extends Iterable<T> {
+public interface Node<T> extends Iterable<T> {
 
 	/**
 	 * Returns the {@link ComparatorKeyProvider} that provides a key for each member of this node.
@@ -50,7 +48,7 @@ public interface Node<T extends ElkEntity> extends Iterable<T> {
 	 * 
 	 * @return the {@link ComparatorKeyProvider} that provides a key for each member of this node.
 	 */
-	public ComparatorKeyProvider<ElkEntity> getKeyProvider();
+	public ComparatorKeyProvider<? super T> getKeyProvider();
 	
 	/**
 	 * Returns <code>true</code> iff this node contains a member

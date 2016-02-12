@@ -22,20 +22,14 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
-import java.util.Collection;
+import java.util.Set;
 
-import org.semanticweb.elk.owl.interfaces.ElkEntity;
+public interface GenericNodeStore<T, N extends Node<T>> extends NodeStore<T> {
+	
+	@Override
+	public N getNode(T member);
 
-public interface UpdateableGenericTaxonomy
-		<T extends ElkEntity, N extends UpdateableGenericTaxonomyNode<T, N>>
-		extends GenericTaxonomy<T, N> {
-
-	N getCreateNode(Collection<T> members);
-
-	boolean removeNode(T member);
-
-	boolean addToBottomNode(T member);
-
-	boolean removeFromBottomNode(T member);
+	@Override
+	public Set<? extends N> getNodes();
 
 }

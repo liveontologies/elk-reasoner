@@ -34,7 +34,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeUtils;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
@@ -96,8 +95,7 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 	 *            non-empty list of equivalent ElkClass objects
 	 */
 	protected NonBottomClassNode(ConcurrentClassTaxonomy taxonomy,
-			Collection<ElkClass> members,
-			final ComparatorKeyProvider<ElkEntity> classKeyProvider) {
+			Collection<ElkClass> members) {
 		this.taxonomy_ = taxonomy;
 		this.members_ = new ArrayList<ElkClass>(members);
 		this.directSubNodes_ = new ArrayHashSet<UpdateableTaxonomyNode<ElkClass>>();
@@ -138,7 +136,7 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 	}
 
 	@Override
-	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
+	public ComparatorKeyProvider<? super ElkClass> getKeyProvider() {
 		return taxonomy_.getKeyProvider();
 	}
 	
@@ -200,13 +198,16 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 		return members_.toString();
 	}
 
-	public void setMembers(Collection<ElkClass> members) {
-		LOGGER_.trace("{}: updating members to {}", this, members);
+	@Override
+	public void setMembers(final Iterable<ElkClass> members) {
 		members_.clear();
-		members_.addAll(members);
+		for (final ElkClass elkClass : members) {
+			members_.add(elkClass);
+		}
 		Collections.sort(this.members_, taxonomy_.getKeyProvider().getComparator());
+		LOGGER_.trace("updated members of {}", this);
 	}
-
+	
 	@Override
 	public boolean trySetModified(boolean modified) {
 		boolean result = modified_.compareAndSet(!modified, modified);

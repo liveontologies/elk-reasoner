@@ -28,7 +28,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 public interface GenericTaxonomy
 		<T extends ElkEntity, N extends GenericTaxonomyNode<T, N>>
-		extends Taxonomy<T> {
+		extends Taxonomy<T>, GenericNodeStore<T, N> {
 
 	@Override
 	public N getNode(T elkEntity);

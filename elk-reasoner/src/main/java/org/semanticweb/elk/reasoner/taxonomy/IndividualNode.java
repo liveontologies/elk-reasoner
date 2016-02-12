@@ -134,14 +134,17 @@ public class IndividualNode implements
 	public int size() {
 		return members_.size();
 	}
-	
-	public void setMembers(Collection<ElkNamedIndividual> members) {
-		LOGGER_.trace("{}: updating members to {}", this, members);
-		members_.clear();
-		members_.addAll(members);
-		Collections.sort(this.members_, individualKeyProvider_.getComparator());
-	}
 
+	@Override
+	public void setMembers(final Iterable<ElkNamedIndividual> members) {
+		members_.clear();
+		for (final ElkNamedIndividual elkIndividual : members) {
+			members_.add(elkIndividual);
+		}
+		Collections.sort(this.members_, individualKeyProvider_.getComparator());
+		LOGGER_.trace("updated members of {}", this);
+	}
+	
 	@Override
 	public ElkNamedIndividual getCanonicalMember() {
 		return members_.get(0);
