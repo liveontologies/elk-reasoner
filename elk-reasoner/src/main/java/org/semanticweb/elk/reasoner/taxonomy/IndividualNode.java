@@ -34,7 +34,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.SimpleUpdateableNode;
@@ -77,7 +76,7 @@ public class IndividualNode extends SimpleUpdateableNode<ElkNamedIndividual>
 	 *            non-empty list of equivalent ElkClass objects
 	 */
 	protected IndividualNode(Collection<ElkNamedIndividual> members,
-			final ComparatorKeyProvider<ElkEntity> individualKeyProvider) {
+			final ComparatorKeyProvider<? super ElkNamedIndividual> individualKeyProvider) {
 		super(members, members.size(), individualKeyProvider);
 		this.directTypeNodes_ = new ArrayHashSet<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>();
 	}

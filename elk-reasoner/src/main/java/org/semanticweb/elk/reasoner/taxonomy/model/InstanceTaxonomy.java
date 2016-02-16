@@ -48,7 +48,7 @@ public interface InstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 	 * 
 	 * @return the {@link ComparatorKeyProvider} that provides a key for each instance.
 	 */
-	ComparatorKeyProvider<ElkEntity> getInstanceKeyProvider();
+	ComparatorKeyProvider<? super I> getInstanceKeyProvider();
 	
 	/**
 	 * @param elkEntity

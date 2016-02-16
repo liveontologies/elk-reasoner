@@ -36,10 +36,10 @@ import java.util.concurrent.ConcurrentMap;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericNodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
@@ -73,12 +73,8 @@ public class ConcurrentInstanceTaxonomy
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ConcurrentInstanceTaxonomy.class);
 
-	/** provides keys that are used for hashing instead of the elkIndividuals */
-	private final ComparatorKeyProvider<ElkEntity> individualKeyProvider_;
-	/** thread safe map from class IRIs to individual nodes */
-	private final ConcurrentMap<Object, IndividualNode> individualNodeLookup_;
-	/** thread safe set of all individual nodes */
-	private final Set<UpdateableInstanceNode<ElkClass, ElkNamedIndividual>> allIndividualNodes_;
+	private final UpdateableGenericNodeStore<ElkNamedIndividual, IndividualNode>
+			individualNodeStore_;
 
 	private final UpdateableTaxonomy<ElkClass> classTaxonomy_;
 
@@ -91,11 +87,9 @@ public class ConcurrentInstanceTaxonomy
 
 	public ConcurrentInstanceTaxonomy(UpdateableTaxonomy<ElkClass> classTaxonomy,
 			final ComparatorKeyProvider<ElkEntity> individualKeyProvider) {
+		this.individualNodeStore_ = new ConcurrentNodeStore
+				<ElkNamedIndividual, IndividualNode>(individualKeyProvider);
 		this.classTaxonomy_ = classTaxonomy;
-		this.individualKeyProvider_ = individualKeyProvider;
-		this.individualNodeLookup_ = new ConcurrentHashMap<Object, IndividualNode>();
-		this.allIndividualNodes_ = Collections
-				.newSetFromMap(new ConcurrentHashMap<UpdateableInstanceNode<ElkClass, ElkNamedIndividual>, Boolean>());
 		this.wrapperMap_ = new ConcurrentHashMap<TaxonomyNode<ElkClass>, UpdateableTypeNodeWrapper>();
 	}
 
@@ -105,8 +99,8 @@ public class ConcurrentInstanceTaxonomy
 	}
 	
 	@Override
-	public ComparatorKeyProvider<ElkEntity> getInstanceKeyProvider() {
-		return individualKeyProvider_;
+	public ComparatorKeyProvider<? super ElkNamedIndividual> getInstanceKeyProvider() {
+		return individualNodeStore_.getKeyProvider();
 	}
 	
 	@Override
@@ -125,9 +119,8 @@ public class ConcurrentInstanceTaxonomy
 	 * @return instance node object for elkClass, possibly still incomplete
 	 */
 	@Override
-	public UpdateableInstanceNode<ElkClass, ElkNamedIndividual> getInstanceNode(
-			ElkNamedIndividual individual) {
-		return individualNodeLookup_.get(individualKeyProvider_.getKey(individual));
+	public IndividualNode getInstanceNode(final ElkNamedIndividual individual) {
+		return individualNodeStore_.getNode(individual);
 	}
 
 	@Override
@@ -140,58 +133,27 @@ public class ConcurrentInstanceTaxonomy
 	@Override
 	public Set<? extends UpdateableInstanceNode<ElkClass, ElkNamedIndividual>>
 			getInstanceNodes() {
-		return Collections.unmodifiableSet(allIndividualNodes_);
+		return individualNodeStore_.getNodes();
 	}
 
 	@Override
 	public IndividualNode getCreateInstanceNode(
 			Collection<ElkNamedIndividual> members) {
-		// search if some node is already assigned to some member, and if so
-		// use this node and update its members if necessary
-		IndividualNode previous = null;
 
-		for (ElkNamedIndividual member : members) {
-			previous = individualNodeLookup_.get(individualKeyProvider_.getKey(member));
-			if (previous == null)
-				continue;
-			synchronized (previous) {
-				if (previous.size() < members.size())
-					previous.setMembers(members);
-				else
-					return previous;
-			}
-			// updating the index
-			for (ElkNamedIndividual newMember : members) {
-				individualNodeLookup_.put(individualKeyProvider_.getKey(newMember), previous);
-			}
-
-			return previous;
+		if (members == null || members.isEmpty()) {
+			throw new IllegalArgumentException("Empty instance nodes must not be created!");
 		}
 
-		// TODO: avoid code duplication, the same technique is used for creating
-		// non-bottom class nodes!
-
-		IndividualNode node = new IndividualNode(members, individualKeyProvider_);
-		// we first assign the node to the canonical member to avoid
-		// concurrency problems
-		ElkNamedIndividual canonical = node.getCanonicalMember();
-
-		previous = individualNodeLookup_.putIfAbsent(individualKeyProvider_.getKey(canonical), node);
-
+		final IndividualNode node =
+				new IndividualNode(members, getInstanceKeyProvider());
+		
+		final IndividualNode previous = individualNodeStore_.putIfAbsent(node);
 		if (previous != null) {
 			return previous;
 		}
 
-		allIndividualNodes_.add(node);
-
 		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace(OwlFunctionalStylePrinter.toString(canonical)
-					+ ": node created");
-		}
-
-		for (ElkNamedIndividual member : members) {
-			if (member != canonical)
-				individualNodeLookup_.put(individualKeyProvider_.getKey(member), node);
+			LOGGER_.trace("created node: {}", node);
 		}
 
 		return node;
@@ -199,7 +161,7 @@ public class ConcurrentInstanceTaxonomy
 
 	@Override
 	public boolean removeInstanceNode(ElkNamedIndividual instance) {
-		IndividualNode node = individualNodeLookup_.get(individualKeyProvider_.getKey(instance));
+		IndividualNode node = getInstanceNode(instance);
 
 		if (node != null) {
 			LOGGER_.trace("Removing the instance node {}", node);
@@ -207,11 +169,7 @@ public class ConcurrentInstanceTaxonomy
 			List<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> directTypes = new LinkedList<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>();
 
 			synchronized (node) {
-				for (ElkNamedIndividual individual : node) {
-					individualNodeLookup_.remove(individualKeyProvider_.getKey(individual));
-				}
-
-				allIndividualNodes_.remove(node);
+				individualNodeStore_.removeNode(instance);
 				directTypes.addAll(node.getDirectTypeNodes());
 			}
 			// detaching the removed instance node from all its direct types
