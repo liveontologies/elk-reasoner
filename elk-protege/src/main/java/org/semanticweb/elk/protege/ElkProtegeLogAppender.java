@@ -26,41 +26,54 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
+import org.slf4j.LoggerFactory;
 
-public class ElkProtegeLogAppender extends AppenderSkeleton {
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.AppenderBase;
+
+public class ElkProtegeLogAppender extends AppenderBase<ILoggingEvent> {
 
 	private static final String ELK_PACKAGE_ = "org.semanticweb.elk";
 
-	private static final ElkProtegeLogAppender INSTANCE_ = new ElkProtegeLogAppender(
-			Logger.getLogger(ELK_PACKAGE_));
+	private static ElkProtegeLogAppender INSTANCE_ = null;
 
 	private final Logger logger_;
 
-	private LoggingEvent[] buffer_;
+	private ILoggingEvent[] buffer_;
 
 	private int cursor_ = 0;
 
 	ElkProtegeLogAppender(Logger logger) {
 		this.logger_ = logger;
+		setContext(logger.getLoggerContext());
 		logger.addAppender(this);
+		start();
 	}
 
 	public static ElkProtegeLogAppender getInstance() {
+		if (INSTANCE_ == null) {
+			org.slf4j.Logger logger = LoggerFactory.getLogger(ELK_PACKAGE_);
+			if (logger == null || !(logger instanceof Logger)) {
+				throw new IllegalArgumentException("Cannot instantiate "
+						+ ElkProtegeLogAppender.class.getName() + ", because there is no "
+						+ Logger.class.getName() + " for " + ELK_PACKAGE_);
+			} else {
+				INSTANCE_ = new ElkProtegeLogAppender((Logger) logger);
+			}
+		}
 		return INSTANCE_;
 	}
 
-	public Iterable<LoggingEvent> getEvents() {
+	public Iterable<ILoggingEvent> getEvents() {
 		if (buffer_ == null)
 			return Collections.emptyList();
 		// else
-		return new Iterable<LoggingEvent>() {
+		return new Iterable<ILoggingEvent>() {
 
 			@Override
-			public Iterator<LoggingEvent> iterator() {
+			public Iterator<ILoggingEvent> iterator() {
 				return new EventIterator();
 			}
 
@@ -76,13 +89,13 @@ public class ElkProtegeLogAppender extends AppenderSkeleton {
 		if (bufferSize <= 0)
 			throw new IllegalArgumentException(
 					"The buffer size should be positive!");
-		LoggingEvent[] newBuffer = new LoggingEvent[bufferSize];
+		ILoggingEvent[] newBuffer = new ILoggingEvent[bufferSize];
 		if (buffer_ != null) {
 			if (bufferSize == buffer_.length)
 				return this;
 			// else, copy the messages from the old buffer
 			int newCursor = 0;
-			for (LoggingEvent event : getEvents()) {
+			for (ILoggingEvent event : getEvents()) {
 				newBuffer[newCursor] = event;
 				newCursor++;
 				if (newCursor == bufferSize)
@@ -103,17 +116,13 @@ public class ElkProtegeLogAppender extends AppenderSkeleton {
 	}
 
 	@Override
-	public void close() {
+	public void stop() {
+		super.stop();
 		buffer_ = null;
 	}
 
 	@Override
-	public boolean requiresLayout() {
-		return false;
-	}
-
-	@Override
-	protected void append(LoggingEvent event) {
+	protected void append(ILoggingEvent event) {
 		if (buffer_ == null)
 			return;
 		buffer_[cursor_] = event;
@@ -122,10 +131,10 @@ public class ElkProtegeLogAppender extends AppenderSkeleton {
 			cursor_ = 0;
 	}
 
-	private class EventIterator implements Iterator<LoggingEvent> {
+	private class EventIterator implements Iterator<ILoggingEvent> {
 
 		int pos = buffer_[cursor_] == null ? 0 : cursor_;
-		LoggingEvent next = buffer_[pos];
+		ILoggingEvent next = buffer_[pos];
 
 		@Override
 		public boolean hasNext() {
@@ -133,10 +142,10 @@ public class ElkProtegeLogAppender extends AppenderSkeleton {
 		}
 
 		@Override
-		public LoggingEvent next() {
+		public ILoggingEvent next() {
 			if (next == null)
 				throw new NoSuchElementException();
-			LoggingEvent result = next;
+			ILoggingEvent result = next;
 			if (++pos == buffer_.length)
 				pos = 0;
 			next = pos == cursor_ ? null : buffer_[pos];

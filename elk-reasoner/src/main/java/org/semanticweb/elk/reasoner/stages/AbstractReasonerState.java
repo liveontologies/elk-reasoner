@@ -61,6 +61,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConcl
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentInstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.ElkIndividualKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.OrphanInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.OrphanNode;
 import org.semanticweb.elk.reasoner.taxonomy.OrphanTypeNode;
@@ -388,7 +390,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			LOGGER_.info("Ontology is inconsistent");
 
 			OrphanNode<ElkClass> node = new OrphanNode<ElkClass>(
-					getAllClasses(), PredefinedElkClass.OWL_NOTHING);
+					getAllClasses(), PredefinedElkClass.OWL_NOTHING, ElkClassKeyProvider.INSTANCE);
 			result = new SingletoneTaxonomy<ElkClass, OrphanNode<ElkClass>>(
 					node);
 		}
@@ -445,19 +447,18 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		} catch (ElkInconsistentOntologyException e) {
 			LOGGER_.info("Ontology is inconsistent");
 			OrphanTypeNode<ElkClass, ElkNamedIndividual> node = new OrphanTypeNode<ElkClass, ElkNamedIndividual>(
-					getAllClasses(), PredefinedElkClass.OWL_NOTHING, 1);
+					getAllClasses(), PredefinedElkClass.OWL_NOTHING, 1, ElkClassKeyProvider.INSTANCE);
 			Set<ElkNamedIndividual> allNamedIndividuals = getAllNamedIndividuals();
 			Iterator<ElkNamedIndividual> namedIndividualIterator = allNamedIndividuals
 					.iterator();
 			if (namedIndividualIterator.hasNext()) {
 				// there is at least one individual
-				node.addInstanceNode(
-						new OrphanInstanceNode<ElkClass, ElkNamedIndividual>(
-								allNamedIndividuals,
-								namedIndividualIterator.next(), node));
+				node.addInstanceNode(new OrphanInstanceNode<ElkClass, ElkNamedIndividual>(
+						allNamedIndividuals, namedIndividualIterator.next(),
+						node, ElkIndividualKeyProvider.INSTANCE));
 			}
 			result = new SingletoneInstanceTaxonomy<ElkClass, ElkNamedIndividual, OrphanTypeNode<ElkClass, ElkNamedIndividual>>(
-					node);
+					node, ElkIndividualKeyProvider.INSTANCE);
 		}
 
 		return result;
@@ -546,13 +547,13 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	}
 
 	public synchronized void initClassTaxonomy() {
-		classTaxonomyState.getWriter()
-				.setTaxonomy(new ConcurrentClassTaxonomy());
+		classTaxonomyState.getWriter().setTaxonomy(
+				new ConcurrentClassTaxonomy(ElkClassKeyProvider.INSTANCE));
 	}
 
 	public synchronized void initInstanceTaxonomy() {
 		instanceTaxonomyState.initTaxonomy(new ConcurrentInstanceTaxonomy(
-				classTaxonomyState.getTaxonomy()));
+				classTaxonomyState.getTaxonomy(), ElkIndividualKeyProvider.INSTANCE));
 	}
 
 	@Deprecated

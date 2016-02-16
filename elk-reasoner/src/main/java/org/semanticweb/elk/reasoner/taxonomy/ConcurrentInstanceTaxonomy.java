@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -35,8 +36,8 @@ import java.util.concurrent.ConcurrentMap;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
+import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeUtils;
@@ -65,15 +66,20 @@ import org.slf4j.LoggerFactory;
  * @author Frantisek Simancik
  * @author Markus Kroetzsch
  * @author Pavel Klinov
+ * @author Peter Skocovsky
  */
-public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
+public class ConcurrentInstanceTaxonomy
+		extends AbstractInstanceTaxonomy<ElkClass, ElkNamedIndividual>
+		implements IndividualClassTaxonomy {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ConcurrentInstanceTaxonomy.class);
 
+	/** provides keys that are used for hashing instead of the elkIndividuals */
+	private final ComparatorKeyProvider<ElkEntity> individualKeyProvider_;
 	/** thread safe map from class IRIs to individual nodes */
-	private final ConcurrentMap<ElkIri, IndividualNode> individualNodeLookup_;
+	private final ConcurrentMap<Object, IndividualNode> individualNodeLookup_;
 	/** thread safe set of all individual nodes */
 	private final Set<InstanceNode<ElkClass, ElkNamedIndividual>> allIndividualNodes_;
 
@@ -83,13 +89,16 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 
 	private final TypeNodeWrapper bottom_;
 
-	public ConcurrentInstanceTaxonomy() {
-		this(new ConcurrentClassTaxonomy());
+	public ConcurrentInstanceTaxonomy(final ComparatorKeyProvider<ElkEntity> classKeyProvider,
+			final ComparatorKeyProvider<ElkEntity> individualKeyProvider) {
+		this(new ConcurrentClassTaxonomy(classKeyProvider), individualKeyProvider);
 	}
 
-	public ConcurrentInstanceTaxonomy(UpdateableTaxonomy<ElkClass> classTaxonomy) {
+	public ConcurrentInstanceTaxonomy(UpdateableTaxonomy<ElkClass> classTaxonomy,
+			final ComparatorKeyProvider<ElkEntity> individualKeyProvider) {
 		this.classTaxonomy_ = classTaxonomy;
-		this.individualNodeLookup_ = new ConcurrentHashMap<ElkIri, IndividualNode>();
+		this.individualKeyProvider_ = individualKeyProvider;
+		this.individualNodeLookup_ = new ConcurrentHashMap<Object, IndividualNode>();
 		this.allIndividualNodes_ = Collections
 				.newSetFromMap(new ConcurrentHashMap<InstanceNode<ElkClass, ElkNamedIndividual>, Boolean>());
 		this.wrapperMap_ = new ConcurrentHashMap<TaxonomyNode<ElkClass>, UpdateableTypeNodeWrapper>();
@@ -97,15 +106,16 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 				classTaxonomy_.getUpdateableBottomNode());
 	}
 
-	/**
-	 * Returns the IRI of the given ELK entity.
-	 * 
-	 * @return the IRI of the given ELK entity
-	 */
-	static ElkIri getKey(ElkEntity elkEntity) {
-		return elkEntity.getIri();
+	@Override
+	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
+		return classTaxonomy_.getKeyProvider();
 	}
-
+	
+	@Override
+	public ComparatorKeyProvider<ElkEntity> getInstanceKeyProvider() {
+		return individualKeyProvider_;
+	}
+	
 	/**
 	 * Obtain a {@link TypeNode} object for a given {@link ElkClass}, or
 	 * {@code null} if none assigned.
@@ -137,7 +147,7 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 	@Override
 	public UpdateableInstanceNode<ElkClass, ElkNamedIndividual> getInstanceNode(
 			ElkNamedIndividual individual) {
-		return individualNodeLookup_.get(getKey(individual));
+		return individualNodeLookup_.get(individualKeyProvider_.getKey(individual));
 	}
 
 	@Override
@@ -172,18 +182,18 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 		IndividualNode previous = null;
 
 		for (ElkNamedIndividual member : members) {
-			previous = individualNodeLookup_.get(getKey(member));
+			previous = individualNodeLookup_.get(individualKeyProvider_.getKey(member));
 			if (previous == null)
 				continue;
 			synchronized (previous) {
-				if (previous.getMembers().size() < members.size())
+				if (previous.size() < members.size())
 					previous.setMembers(members);
 				else
 					return previous;
 			}
 			// updating the index
 			for (ElkNamedIndividual newMember : members) {
-				individualNodeLookup_.put(getKey(newMember), previous);
+				individualNodeLookup_.put(individualKeyProvider_.getKey(newMember), previous);
 			}
 
 			return previous;
@@ -192,12 +202,12 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 		// TODO: avoid code duplication, the same technique is used for creating
 		// non-bottom class nodes!
 
-		IndividualNode node = new IndividualNode(members);
+		IndividualNode node = new IndividualNode(members, individualKeyProvider_);
 		// we first assign the node to the canonical member to avoid
 		// concurrency problems
 		ElkNamedIndividual canonical = node.getCanonicalMember();
 
-		previous = individualNodeLookup_.putIfAbsent(getKey(canonical), node);
+		previous = individualNodeLookup_.putIfAbsent(individualKeyProvider_.getKey(canonical), node);
 
 		if (previous != null) {
 			return previous;
@@ -212,7 +222,7 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 
 		for (ElkNamedIndividual member : members) {
 			if (member != canonical)
-				individualNodeLookup_.put(getKey(member), node);
+				individualNodeLookup_.put(individualKeyProvider_.getKey(member), node);
 		}
 
 		return node;
@@ -220,7 +230,7 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 
 	@Override
 	public boolean removeInstanceNode(ElkNamedIndividual instance) {
-		IndividualNode node = individualNodeLookup_.get(getKey(instance));
+		IndividualNode node = individualNodeLookup_.get(individualKeyProvider_.getKey(instance));
 
 		if (node != null) {
 			LOGGER_.trace("Removing the instance node {}", node);
@@ -228,8 +238,8 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 			List<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> directTypes = new LinkedList<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>();
 
 			synchronized (node) {
-				for (ElkNamedIndividual individual : node.getMembers()) {
-					individualNodeLookup_.remove(getKey(individual));
+				for (ElkNamedIndividual individual : node) {
+					individualNodeLookup_.remove(individualKeyProvider_.getKey(individual));
 				}
 
 				allIndividualNodes_.remove(node);
@@ -294,6 +304,11 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 	@Override
 	public boolean addToBottomNode(ElkClass member) {
 		return classTaxonomy_.addToBottomNode(member);
+	}
+
+	@Override
+	public boolean removeFromBottomNode(ElkClass member) {
+		return classTaxonomy_.removeFromBottomNode(member);
 	}
 
 	@Override
@@ -379,10 +394,25 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 		}
 
 		@Override
-		public Set<ElkClass> getMembers() {
-			return classNode_.getMembers();
+		public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
+			return classNode_.getKeyProvider();
 		}
-
+		
+		@Override
+		public Iterator<ElkClass> iterator() {
+			return classNode_.iterator();
+		}
+		
+		@Override
+		public boolean contains(ElkClass member) {
+			return classNode_.contains(member);
+		}
+		
+		@Override
+		public int size() {
+			return classNode_.size();
+		}
+		
 		@Override
 		public ElkClass getCanonicalMember() {
 			return classNode_.getCanonicalMember();

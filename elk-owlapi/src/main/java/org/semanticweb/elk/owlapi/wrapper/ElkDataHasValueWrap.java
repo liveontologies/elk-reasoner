@@ -54,7 +54,7 @@ public class ElkDataHasValueWrap<T extends OWLDataHasValue> extends
 
 	@Override
 	public ElkLiteral getFiller() {
-		return converter.convert(this.owlObject.getValue());
+		return converter.convert(this.owlObject.getFiller());
 	}
 
 	@Override

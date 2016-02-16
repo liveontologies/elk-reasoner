@@ -24,14 +24,14 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public interface UpdateableInstanceNode<T extends ElkObject, I extends ElkObject> extends InstanceNode<T, I>, UpdateableNode<I> {
+public interface UpdateableInstanceNode<T extends ElkEntity, I extends ElkEntity> extends InstanceNode<T, I>, UpdateableNode<I> {
 
 	public void addDirectTypeNode(UpdateableTypeNode<T, I> typeNode);
 	

@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
 /**
@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
  *
  * pavel.klinov@uni-ulm.de
  */
-public interface TaxonomyValidator<T extends ElkObject> {
+public interface TaxonomyValidator<T extends ElkEntity> {
 
 	/**
 	 * @param taxonomy Taxonomy to be validated

@@ -88,8 +88,10 @@ public class InstanceTaxonomyState {
 		}
 
 		public void markIndividualsForModifiedNode(
-				Collection<ElkNamedIndividual> individuals) {
-			individualsForModifiedNodes_.addAll(individuals);
+				Iterable<ElkNamedIndividual> individuals) {
+			for (ElkNamedIndividual individual : individuals) {
+				individualsForModifiedNodes_.add(individual);
+			}
 		}
 
 		public void markRemovedIndividual(IndexedIndividual individual) {

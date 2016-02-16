@@ -111,7 +111,7 @@ public class ClassTaxonomyComputationFactory extends SimpleInterrupter
 	 */
 	public ClassTaxonomyComputationFactory(SaturationState<?> saturationState,
 			int maxWorkers) {
-		this(saturationState, maxWorkers, new ConcurrentClassTaxonomy());
+		this(saturationState, maxWorkers, new ConcurrentClassTaxonomy(ElkClassKeyProvider.INSTANCE));
 	}
 
 	/**

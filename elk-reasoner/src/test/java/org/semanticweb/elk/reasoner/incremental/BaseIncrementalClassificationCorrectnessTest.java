@@ -57,6 +57,7 @@ import org.semanticweb.elk.testing.io.URLTestIO;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
 @RunWith(PolySuite.class)
 public abstract class BaseIncrementalClassificationCorrectnessTest<T>
@@ -82,7 +83,8 @@ public abstract class BaseIncrementalClassificationCorrectnessTest<T>
 		Taxonomy<ElkClass> incremental = incrementalReasoner
 				.getTaxonomyQuietly();
 
-		if (TaxonomyHasher.hash(expected) != TaxonomyHasher.hash(incremental)) {
+		if (TaxonomyHasher.hash(expected) != TaxonomyHasher.hash(incremental)
+				|| !expected.equals(incremental)) {
 			StringWriter writer = new StringWriter();
 
 			try {

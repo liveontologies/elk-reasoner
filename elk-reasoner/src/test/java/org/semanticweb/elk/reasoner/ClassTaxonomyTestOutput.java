@@ -49,12 +49,16 @@ public class ClassTaxonomyTestOutput<T extends Taxonomy<ElkClass>> implements
 		return TaxonomyHasher.hash(taxonomy_);
 	}
 
+	void dumpTaxonomy(Writer writer) throws IOException {
+		TaxonomyPrinter.dumpClassTaxomomy(taxonomy_, writer, false);
+	}
+	
 	@Override
 	public String toString() {
 
 		Writer writer = new StringWriter();
 		try {
-			TaxonomyPrinter.dumpClassTaxomomy(taxonomy_, writer, false);
+			dumpTaxonomy(writer);
 		} catch (IOException e) {
 			// TODO: what to return?
 			return e.toString();

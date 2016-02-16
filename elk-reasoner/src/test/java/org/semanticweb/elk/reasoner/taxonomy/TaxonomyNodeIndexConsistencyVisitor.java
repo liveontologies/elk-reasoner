@@ -24,9 +24,10 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * #L%
  */
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 
@@ -35,7 +36,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class TaxonomyNodeIndexConsistencyVisitor<T extends ElkObject> implements
+public class TaxonomyNodeIndexConsistencyVisitor<T extends ElkEntity> implements
 		TaxonomyNodeVisitor<T> {
 
 	private final Taxonomy<T> taxonomy_;
@@ -47,11 +48,15 @@ public class TaxonomyNodeIndexConsistencyVisitor<T extends ElkObject> implements
 	@Override
 	public void visit(TaxonomyNode<T> node, List<TaxonomyNode<T>> pathFromStart) {
 		
-		if (!node.getMembers().contains(node.getCanonicalMember())) {
-			throw new InvalidTaxonomyException("Canonical member is not a member? " + node.getCanonicalMember() + ", members: " + node.getMembers());
+		if (!node.contains(node.getCanonicalMember())) {
+			final ArrayList<T> members = new ArrayList<T>(node.size());
+			for (T member : node) {
+				members.add(member);
+			}
+			throw new InvalidTaxonomyException("Canonical member is not a member? " + node.getCanonicalMember() + ", members: " + members);
 		}
 		
-		for (T obj : node.getMembers()) {
+		for (T obj : node) {
 			TaxonomyNode<T> n = taxonomy_.getNode(obj);
 
 			if (n != node) {

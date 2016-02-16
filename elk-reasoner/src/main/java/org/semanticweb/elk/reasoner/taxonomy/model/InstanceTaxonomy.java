@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
 
 import java.util.Set;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
  * Extended {@link Taxonomy} that also provides instances for each of its
@@ -32,24 +32,25 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * 
  * @author Markus Kroetzsch
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  * 
  * @param <T>
  *            the type of objects in the nodes of this taxonomy
  * @param <I>
  *            the type of instances of nodes of this taxonomy
  */
-public interface InstanceTaxonomy<T extends ElkObject, I extends ElkObject>
+public interface InstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 		extends Taxonomy<T> {
 
 	/**
 	 * @param elkObject
-	 *            {@link ElkObject} for which the {@link TypeNode} to be
+	 *            {@link ElkEntity} for which the {@link TypeNode} to be
 	 *            computed
-	 * @return the {@link TypeNode} containing the given {@link ElkObject} as a
+	 * @return the {@link TypeNode} containing the given {@link ElkEntity} as a
 	 *         member, or {@code null} if the input does not occur in the
 	 *         taxonomy
 	 */
-	public TypeNode<T, I> getTypeNode(T elkObject);
+	public TypeNode<T, I> getTypeNode(T elkEntity);
 
 	/**
 	 * Obtain an unmodifiable Set of all type nodes in this taxonomy.
@@ -59,14 +60,22 @@ public interface InstanceTaxonomy<T extends ElkObject, I extends ElkObject>
 	public Set<? extends TypeNode<T, I>> getTypeNodes();
 
 	/**
-	 * @param elkObject
-	 *            {@link ElkObject} for which the {@link InstanceNode} to be
+	 * Returns the {@link ComparatorKeyProvider} that provides a key for each instance.
+	 * These keys are used to compute hash codes and to compare the instances.
+	 * 
+	 * @return the {@link ComparatorKeyProvider} that provides a key for each instance.
+	 */
+	public ComparatorKeyProvider<ElkEntity> getInstanceKeyProvider();
+	
+	/**
+	 * @param elkEntity
+	 *            {@link ElkEntity} for which the {@link InstanceNode} to be
 	 *            computed
-	 * @return the {@link InstanceNode} containing the given {@link ElkObject}
+	 * @return the {@link InstanceNode} containing the given {@link ElkEntity}
 	 *         as a member, or {@code null} if the input does not occur in the
 	 *         taxonomy
 	 */
-	public InstanceNode<T, I> getInstanceNode(I elkObject);
+	public InstanceNode<T, I> getInstanceNode(I elkEntity);
 
 	/**
 	 * Obtain an unmodifiable Set of all instance nodes in this taxonomy.

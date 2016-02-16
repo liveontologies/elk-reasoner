@@ -25,15 +25,15 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public interface UpdateableTypeNode<T extends ElkObject, I extends ElkObject>
+public interface UpdateableTypeNode<T extends ElkEntity, I extends ElkEntity>
 		extends TypeNode<T, I>, UpdateableTaxonomyNode<T> {
 
 	@Override

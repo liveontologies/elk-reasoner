@@ -23,64 +23,71 @@ package org.semanticweb.elk.protege;
 
 import junit.framework.TestCase;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
 import org.junit.Test;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 
 public class ElkProtegeLogAppenderTest extends TestCase {
 
 	@Test
 	public static void testLogClear() {
-		Logger logger = Logger.getLogger(ElkProtegeLogAppenderTest.class);
+		org.slf4j.Logger slfLogger = LoggerFactory.getLogger(ElkProtegeLogAppenderTest.class);
+		if (slfLogger == null || !(slfLogger instanceof Logger)) {
+			fail("Cannot get a " + Logger.class.getName());
+		} else {
+			Logger logger = (Logger) slfLogger;
 
-		ElkProtegeLogAppender appender = new ElkProtegeLogAppender(logger);
-		logger.addAppender(appender);
+			ElkProtegeLogAppender appender = new ElkProtegeLogAppender(logger);
+			logger.addAppender(appender);
 
-		appender.setLogLevel(Level.DEBUG);
-		int bufferSize = 3;
-		appender.setBufferSize(bufferSize);
+			appender.setLogLevel(Level.DEBUG);
+			int bufferSize = 3;
+			appender.setBufferSize(bufferSize);
 
-		String[] messages = { "first message", "second message",
-				"third message", "forth message" };
+			String[] messages = { "first message", "second message",
+					"third message", "forth message" };
 
-		String[] furtherMessages = { "fifth message", "sixth message" };
+			String[] furtherMessages = { "fifth message", "sixth message" };
 
-		int i = 0;
-		for (i = 0; i < messages.length; i++) {
-			logger.debug(messages[i]);
+			int i = 0;
+			for (i = 0; i < messages.length; i++) {
+				logger.debug(messages[i]);
+			}
+
+			i = messages.length - Math.min(messages.length, bufferSize);
+			for (ILoggingEvent event : appender.getEvents()) {
+				assertEquals("Missing message:", event.getMessage(), messages[i++]);
+			}
+
+			assertEquals("The last message should be in the buffer",
+					messages.length, i);
+
+			appender.clear();
+
+			i = 0;
+			for (@SuppressWarnings("unused")
+			ILoggingEvent event : appender.getEvents()) {
+				i++;
+			}
+
+			assertEquals("After clear there should be no messages", 0, i);
+
+			for (i = 0; i < furtherMessages.length; i++) {
+				logger.debug(furtherMessages[i]);
+			}
+
+			i = messages.length - Math.min(furtherMessages.length, bufferSize);
+			for (ILoggingEvent event : appender.getEvents()) {
+				assertEquals("Missing message:", event.getMessage(),
+						furtherMessages[i++]);
+			}
+
+			assertEquals("The last message should be in the buffer",
+					furtherMessages.length, i);
+
 		}
-
-		i = messages.length - Math.min(messages.length, bufferSize);
-		for (LoggingEvent event : appender.getEvents()) {
-			assertEquals("Missing message:", event.getMessage(), messages[i++]);
-		}
-
-		assertEquals("The last message should be in the buffer",
-				messages.length, i);
-
-		appender.clear();
-
-		i = 0;
-		for (@SuppressWarnings("unused")
-		LoggingEvent event : appender.getEvents()) {
-			i++;
-		}
-
-		assertEquals("After clear there should be no messages", 0, i);
-
-		for (i = 0; i < furtherMessages.length; i++) {
-			logger.debug(furtherMessages[i]);
-		}
-
-		i = messages.length - Math.min(furtherMessages.length, bufferSize);
-		for (LoggingEvent event : appender.getEvents()) {
-			assertEquals("Missing message:", event.getMessage(),
-					furtherMessages[i++]);
-		}
-
-		assertEquals("The last message should be in the buffer",
-				furtherMessages.length, i);
-
 	}
 }

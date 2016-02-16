@@ -40,7 +40,6 @@ import org.semanticweb.elk.owl.managers.ElkEntityRecycler;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
@@ -212,8 +211,8 @@ public class TaxonomyValidatorTest {
 	private MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> createEmptyTaxonomy() {
 		return new MockInstanceTaxonomy<ElkClass, ElkNamedIndividual>(
 				PredefinedElkClass.OWL_THING, PredefinedElkClass.OWL_NOTHING,
-				Comparators.ELK_CLASS_COMPARATOR,
-				Comparators.ELK_NAMED_INDIVIDUAL_COMPARATOR);
+				ElkClassKeyProvider.INSTANCE,
+				ElkIndividualKeyProvider.INSTANCE);
 	}
 
 	@SuppressWarnings("resource")

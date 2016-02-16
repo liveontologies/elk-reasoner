@@ -22,42 +22,70 @@ package org.semanticweb.elk.reasoner.taxonomy;
  */
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 
 /**
  * A {@link TaxonomyNode} that does not have any super nodes or sub nodes.
  * 
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  * 
  * @param <T>
  *            the type of objects stored in the nodes
  * 
  * @see SingletoneTaxonomy
  */
-public class OrphanNode<T extends ElkObject> implements TaxonomyNode<T> {
+public class OrphanNode<T extends ElkEntity> implements TaxonomyNode<T> {
 
 	/**
 	 * the members of the node
 	 */
-	final Set<T> members;
+	private final Map<Object, T> members;
 	/**
 	 * the representative of the node; should be among the members
 	 */
-	final T canonical;
+	private final T canonical;
+	/**
+	 * provides keys that are used for hashing instead of the members
+	 */
+	private final ComparatorKeyProvider<ElkEntity> keyProvider_;
 
-	public OrphanNode(Set<T> members, T canonical) {
-		this.members = members;
+	public OrphanNode(Set<T> members, T canonical, ComparatorKeyProvider<ElkEntity> keyProvider) {
+		this.members = new HashMap<Object, T>();// TODO: more efficient implementation for members!!
+		for (T member : members) {
+			this.members.put(keyProvider.getKey(member), member);
+		}
 		this.canonical = canonical;
+		this.keyProvider_ = keyProvider;
 	}
 
 	@Override
-	public Set<T> getMembers() {
-		return Collections.unmodifiableSet(members);
+	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
+		return keyProvider_;
 	}
-
+	
+	@Override
+	public Iterator<T> iterator() {
+		return members.values().iterator();
+	}
+	
+	@Override
+	public boolean contains(final T member) {
+		return members.containsKey(keyProvider_.getKey(member));
+	}
+	
+	@Override
+	public int size() {
+		return members.size();
+	}
+	
 	@Override
 	public T getCanonicalMember() {
 		return canonical;

@@ -92,7 +92,7 @@ public class ClassTaxonomyState {
 
 		public void markClassesForModifiedNode(final Node<ElkClass> node) {
 			synchronized (node) {
-				for (ElkClass clazz : node.getMembers()) {
+				for (ElkClass clazz : node) {
 					markClassForModifiedNode(clazz);
 				}
 			}

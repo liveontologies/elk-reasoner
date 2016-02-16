@@ -24,7 +24,8 @@ package org.semanticweb.elk.reasoner.taxonomy;
 import java.util.Collections;
 import java.util.Set;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 
@@ -41,8 +42,8 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
  * 
  * @see OrphanNode
  */
-public class SingletoneTaxonomy<T extends ElkObject, N extends OrphanNode<T>>
-		implements Taxonomy<T> {
+public class SingletoneTaxonomy<T extends ElkEntity, N extends OrphanNode<T>>
+		extends AbstractTaxonomy<T> {
 
 	final N node;
 
@@ -57,7 +58,12 @@ public class SingletoneTaxonomy<T extends ElkObject, N extends OrphanNode<T>>
 	}
 
 	@Override
-	public TaxonomyNode<T> getNode(T elkObject) {
+	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
+		return node.getKeyProvider();
+	}
+	
+	@Override
+	public TaxonomyNode<T> getNode(T elkEntity) {
 		return node;
 	}
 

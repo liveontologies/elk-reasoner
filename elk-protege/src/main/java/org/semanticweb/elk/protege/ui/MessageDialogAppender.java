@@ -34,17 +34,15 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Level;
-import org.apache.log4j.spi.LoggingEvent;
 import org.semanticweb.elk.protege.ProtegeSuppressedMessages;
 import org.semanticweb.elk.util.logging.ElkMessage;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.AppenderBase;
+
 /**
- * A Log4J Appender that creates dialogs in order to "log" messages.
- * 
- * Like all Log4J loggers, this logger can be set to report only messages above
- * a certain threshold using setThreshold(). The default threshold is WARN.
+ * A Logback Appender that creates dialogs in order to "log" messages.
  * 
  * Only one dialog is shown at any single time: the user has to close it before
  * getting the next. The display of message dialogs is controlled by an
@@ -61,9 +59,9 @@ import org.semanticweb.elk.util.logging.ElkMessage;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class MessageDialogAppender extends AppenderSkeleton implements Runnable {
+public class MessageDialogAppender extends AppenderBase<ILoggingEvent> implements Runnable {
 
-	private final ConcurrentLinkedQueue<LoggingEvent> eventBuffer_ = new ConcurrentLinkedQueue<LoggingEvent>();
+	private final ConcurrentLinkedQueue<ILoggingEvent> eventBuffer_ = new ConcurrentLinkedQueue<ILoggingEvent>();
 
 	private final AtomicReference<String> messengerThreadName_ = new AtomicReference<String>(
 			"");
@@ -72,7 +70,6 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 
 	public MessageDialogAppender() {
 		super();
-		threshold = Level.WARN;
 		supperssedMessages_ = ProtegeSuppressedMessages.getInstance().reload();
 	}
 
@@ -81,22 +78,18 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 	 * thread will die too.
 	 */
 	@Override
-	public void close() {
+	public void stop() {
+		super.stop();
 		synchronized (eventBuffer_) {
 			eventBuffer_.clear(); // shoot the messenger
 		}
-	}
-
-	@Override
-	public boolean requiresLayout() {
-		return false;
 	}
 
 	/**
 	 * Append a logging event. This is what log4j calls to log an event.
 	 */
 	@Override
-	protected void append(LoggingEvent event) {
+	protected void append(ILoggingEvent event) {
 		if (!Thread.currentThread().getName()
 				.equals(messengerThreadName_.get())) {
 			eventBuffer_.add(event);
@@ -129,7 +122,7 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 	 * @return the generated check box message
 	 */
 	@SuppressWarnings("static-method")
-	protected String getCheckboxMessage(LoggingEvent event) {
+	protected String getCheckboxMessage(ILoggingEvent event) {
 		return "Do not show further messages of this kind";
 	}
 
@@ -140,7 +133,7 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 	 *            the event for which to display the message
 	 * @return {@code true} if the message has been shown
 	 */
-	protected boolean showMessage(LoggingEvent event) {
+	protected boolean showMessage(ILoggingEvent event) {
 		String messageTitle;
 		int messageLevel;
 		if (event.getLevel().isGreaterOrEqual(Level.ERROR)) {
@@ -155,7 +148,7 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		}
 
 		ElkMessage elkMessage = ElkMessage.deserialize(event
-				.getRenderedMessage());
+				.getFormattedMessage());
 		String messageType = null;
 
 		if (elkMessage != null) {
@@ -167,7 +160,7 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-		String messageText = event.getRenderedMessage();
+		String messageText = elkMessage.getMessage();
 		// truncating too long message text
 		if (messageText.length() > 520) {
 			messageText = messageText.substring(0, 500) + "...";

@@ -22,9 +22,7 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
-import java.util.Collection;
-import java.util.Comparator;
-
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
@@ -35,12 +33,12 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * 
  * @param <T>
  */
-public class AnonymousNode<T extends ElkObject> extends SimpleNode<T> implements
+public class AnonymousNode<T extends ElkEntity> extends SimpleNode<T> implements
 		Node<T> {
 
-	public AnonymousNode(T anonymousMember, Collection<T> allMembers,
-			Comparator<T> cmp) {
-		super(allMembers, cmp);
+	public AnonymousNode(T anonymousMember, Iterable<T> allMembers,
+			final ComparatorKeyProvider<ElkEntity> comparatorKeyProvider) {
+		super(allMembers, comparatorKeyProvider);
 		this.members.remove(anonymousMember);
 	}
 

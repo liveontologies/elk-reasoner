@@ -151,8 +151,7 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 				 * mark as modified) at the same time
 				 */
 				synchronized (classTaxonomy.getBottomNode()) {
-					if (classTaxonomy.getBottomNode().getMembers()
-							.remove(elkClass)) {
+					if (classTaxonomy.removeFromBottomNode(elkClass)) {
 						classStateWriter_
 								.markClassesForModifiedNode(classTaxonomy
 										.getBottomNode());
@@ -207,8 +206,7 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 					for (UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode : directInstances) {
 						if (instanceNode.trySetModified(true)) {
 							instanceStateWriter_
-									.markIndividualsForModifiedNode(instanceNode
-											.getMembers());
+									.markIndividualsForModifiedNode(instanceNode);
 							instanceTaxonomy.removeInstanceNode(instanceNode
 									.getCanonicalMember());
 						}
@@ -239,8 +237,7 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 
 					if (node != null && node.trySetModified(true)) {
 						instanceStateWriter_
-								.markIndividualsForModifiedNode(node
-										.getMembers());
+								.markIndividualsForModifiedNode(node);
 						taxonomy.removeInstanceNode(individual);
 					} else if (node == null) {
 						instanceStateWriter_

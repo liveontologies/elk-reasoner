@@ -117,7 +117,7 @@ public class ConcurrentComputationWithInputs<I, F extends InputProcessorFactory<
 	 *             available
 	 */
 	public synchronized boolean submit(I input) throws InterruptedException {
-		if (termination)
+		if (termination || isInterrupted())
 			return false;
 		buffer_.put(input);
 		return true;
@@ -173,7 +173,7 @@ public class ConcurrentComputationWithInputs<I, F extends InputProcessorFactory<
 						inputProcessor.submit(nextInput); // should not fail
 						inputProcessor.process(); // can be interrupted
 					}
-					if (termination) {
+					if (termination || isInterrupted()) {
 						if (buffer_.isEmpty()) {
 							// wake up blocked workers if not done already
 							buffer_.put(poison_pill_);

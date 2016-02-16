@@ -28,9 +28,9 @@ package org.semanticweb.elk.util.concurrent.computation;
  * {@link Processor} created by the {@link ProcessorFactory}. Processing starts
  * by calling {@link #start()}, which creates a specified number of working
  * threads and starts concurrent processing. All workers can be interrupted by
- * calling {@link #interrupt()}. When {@link #finish()} is called, the current
- * thread blocks until everything is processed by the workers or all workers
- * have been interrupted.
+ * calling {@link #setInterrupt(boolean)} with {@code false}. When
+ * {@link #finish()} is called, the current thread blocks until everything is
+ * processed by the workers or all workers have been interrupted.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -55,7 +55,7 @@ public class ConcurrentComputation<F extends ProcessorFactory<?>> extends
 	 * {@code true} the workers should stop either as soon as possible (if the
 	 * computation has been terminated) or after {@link #finish()} is called
 	 */
-	protected volatile boolean termination;
+	protected boolean termination;
 	/**
 	 * the worker instance used to process the jobs
 	 */
@@ -64,16 +64,16 @@ public class ConcurrentComputation<F extends ProcessorFactory<?>> extends
 	/**
 	 * Creating a {@link ConcurrentComputation} instance.
 	 * 
-	 * @param inputProcessorFactory
+	 * @param processorFactory
 	 *            the factory for input processors
 	 * @param executor
 	 *            the executor used internally to run the jobs
 	 * @param maxWorkers
 	 *            the maximal number of concurrent workers processing the jobs
 	 */
-	public ConcurrentComputation(F inputProcessorFactory,
+	public ConcurrentComputation(F processorFactory,
 			ComputationExecutor executor, int maxWorkers) {
-		this.processorFactory = inputProcessorFactory;
+		this.processorFactory = processorFactory;
 		this.termination = false;
 		this.worker = getWorker();
 		this.executor = executor;
@@ -86,14 +86,14 @@ public class ConcurrentComputation<F extends ProcessorFactory<?>> extends
 	 * @return {@code true} if the operation was successful
 	 */
 	public synchronized boolean start() {
+		termination = false;
 		return executor.start(worker, maxWorkers);
 	}
 
 	@Override
-	public final void setInterrupt(boolean flag) {
-		this.termination = flag;
-		super.setInterrupt(flag);
-		processorFactory.setInterrupt(flag);
+	public final void setInterrupt(boolean interrupt) {
+		super.setInterrupt(interrupt);
+		processorFactory.setInterrupt(interrupt);		
 	}
 
 	protected synchronized void waitWorkers() throws InterruptedException {
@@ -101,10 +101,7 @@ public class ConcurrentComputation<F extends ProcessorFactory<?>> extends
 	}
 
 	/**
-	 * Marks the end of the input and requests all workers to terminate when all
-	 * currently submitted input has been processed. After calling this method,
-	 * no new input can be submitted anymore, i.e., calling
-	 * {@link #submit(Object)} will always return {@code false}. The method
+	 * Requests all workers to terminate when processing is finished. The method
 	 * blocks until all workers have been stopped. If interrupted while blocked,
 	 * this method can be called again in order to complete the termination
 	 * request.
@@ -116,7 +113,6 @@ public class ConcurrentComputation<F extends ProcessorFactory<?>> extends
 		termination = true;
 		waitWorkers();
 		if (!isInterrupted()) {
-			termination = false;
 			processorFactory.finish();
 		}
 	}
@@ -147,7 +143,7 @@ public class ConcurrentComputation<F extends ProcessorFactory<?>> extends
 				for (;;) {
 					// FIXME: potential empty loop
 					inputProcessor.process(); // can be interrupted
-					if (termination) {
+					if (termination || isInterrupted()) {
 						break;
 					}
 				}

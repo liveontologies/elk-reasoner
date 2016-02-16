@@ -25,25 +25,19 @@
 	<dependencies>
 		<dependency>
 			<groupId>edu.stanford.protege</groupId>
-			<artifactId>org.protege.common</artifactId>
+			<artifactId>protege-editor-core</artifactId>
 			<version>${protege.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>edu.stanford.protege</groupId>
-			<artifactId>org.protege.editor.core.application</artifactId>
-			<version>${protege.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>edu.stanford.protege</groupId>
-			<artifactId>org.protege.editor.owl</artifactId>
+			<artifactId>protege-editor-owl</artifactId>
 			<version>${protege.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
-			<artifactId>owlapi-api</artifactId>
+			<artifactId>owlapi-osgidistribution</artifactId>
 			<version>${owlapi.version}</version>
 			<scope>provided</scope>
 		</dependency>
@@ -69,7 +63,20 @@
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
+			<artifactId>slf4j-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>1.1.3</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.1.3</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -104,31 +111,18 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Bundle-SymbolicName>org.semanticweb.elk;singleton:=true</Bundle-SymbolicName>
 						<Implementation-Title>ELK Reasoner</Implementation-Title>
 						<Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
 						<Implementation-Version>${project.version}.${maven.build.timestamp}</Implementation-Version>
-						<Export-Package>
-							!org.semanticweb.elk.*,
-							org.semanticweb.elk.protege,
-							org.semanticweb.elk.protege.ui</Export-Package>
-						<_exportcontents>
-							org.semanticweb.owlapitools.proofs.*
-						</_exportcontents>
-						<Import-Package>
-							!com.sun.*,
-							!org.semanticweb.elk.*,
-							!org.slf4j.*,
-							org.apache.log4j.*;version="[${log4j.lower.version},${log4j.upper.version})",
-							org.protege.*;version="[${protege.lower.version},${protege.upper.version})",
-							*
-						</Import-Package>
+						<Import-Package>*</Import-Package>
+						<Export-Package>!*</Export-Package>
+						<Bundle-SymbolicName>${project.groupId};singleton:=true</Bundle-SymbolicName>
 						<Bundle-Activator>org.protege.editor.core.plugin.DefaultPluginActivator</Bundle-Activator>
-						<Embed-Dependency>*;scope=!provided;scope=compile|runtime;groupId=!net.sourceforge.owlapi|org.apache.felix|log4j;inline=false</Embed-Dependency>
+						<Embed-Dependency>*;scope=!provided;scope=compile|runtime;inline=false</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<Embed-Directory>target/dependency</Embed-Directory>
 						<Embed-StripGroup>true</Embed-StripGroup>
-						<Update-Url>http://elk.semanticweb.org/maven/latest/elk-distribution/resources/update.properties</Update-Url>
+						<Update-Url>http://elk.semanticweb.org/maven/latest/elk-distribution/resources/p5.update.properties</Update-Url>
 					</instructions>
 				</configuration>
 			</plugin>
@@ -189,7 +183,6 @@
 						</executions>
 						<configuration>
 							<excludeScope>provided</excludeScope>
-							<excludeGroupIds>net.sourceforge.owlapi,org.apache.felix,log4j</excludeGroupIds>
 						</configuration>
 					</plugin>
 				</plugins>

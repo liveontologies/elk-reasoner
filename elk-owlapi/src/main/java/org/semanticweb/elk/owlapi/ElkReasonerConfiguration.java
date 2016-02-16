@@ -43,6 +43,7 @@ import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
  */
 public class ElkReasonerConfiguration implements OWLReasonerConfiguration {
 
+	private static final long serialVersionUID = 4747024112171682291L;	
 	private final ReasonerConfiguration elkConfig;
 	private final OWLReasonerConfiguration owlConfig;
 

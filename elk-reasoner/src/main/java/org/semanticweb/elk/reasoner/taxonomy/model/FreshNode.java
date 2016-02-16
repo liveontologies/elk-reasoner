@@ -22,10 +22,10 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy.model;
 
-import java.util.Collections;
-import java.util.Set;
+import java.util.Iterator;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.util.collections.Operations;
 
 /**
  * A fresh Node containing an object that does not occur in a taxonomy. Such
@@ -33,11 +33,12 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  * 
  * @param <T>
  *            the type of objects in this node
  */
-public class FreshNode<T extends ElkObject> implements Node<T> {
+public class FreshNode<T extends ElkEntity> implements Node<T> {
 
 	protected final T member;
 
@@ -46,10 +47,27 @@ public class FreshNode<T extends ElkObject> implements Node<T> {
 	}
 
 	@Override
-	public Set<T> getMembers() {
-		return Collections.singleton(member);
+	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
+		return null;// TODO: What to return when no key provider is needed?
 	}
-
+	
+	@Override
+	public Iterator<T> iterator() {
+		return Operations.singletonIterator(member);
+	}
+	
+	@Override
+	public boolean contains(T member) {
+		return member == null
+				? this.member == null
+				: member.getIri().equals(this.member.getIri());
+	}
+	
+	@Override
+	public int size() {
+		return 1;
+	}
+	
 	@Override
 	public T getCanonicalMember() {
 		return member;

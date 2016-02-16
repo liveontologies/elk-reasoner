@@ -38,7 +38,7 @@ import java.util.Set;
  * Some useful static methods for collections
  * 
  * @author "Yevgeny Kazakov"
- * 
+ * @author Peter Skocovsky
  */
 public class Operations {
 
@@ -95,29 +95,33 @@ public class Operations {
 		return concat(Arrays.asList(inputs));
 	}
 
+	public static <T> Iterator<T> singletonIterator(final T element) {
+		return new Iterator<T>() {
+			boolean hasNext = true;
+
+			@Override
+			public boolean hasNext() {
+				return hasNext;
+			}
+
+			@Override
+			public T next() {
+				hasNext = false;
+				return element;
+			}
+
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+		};
+	}
+
 	public static <T> Iterable<T> singleton(final T element) {
 		return new Iterable<T>() {
 			@Override
 			public Iterator<T> iterator() {
-				return new Iterator<T>() {
-					boolean hasNext = true;
-
-					@Override
-					public boolean hasNext() {
-						return hasNext;
-					}
-
-					@Override
-					public T next() {
-						hasNext = false;
-						return element;
-					}
-
-					@Override
-					public void remove() {
-						throw new UnsupportedOperationException();
-					}
-				};
+				return singletonIterator(element);
 			}
 		};
 	}

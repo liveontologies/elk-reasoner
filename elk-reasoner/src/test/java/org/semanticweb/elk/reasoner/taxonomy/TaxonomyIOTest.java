@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.taxonomy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -68,6 +69,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
  * 
  *         pavel.klinov@uni-ulm.de
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  */
 public class TaxonomyIOTest {
 
@@ -114,7 +116,8 @@ public class TaxonomyIOTest {
 		 */
 
 		// compare
-		assertEquals(TaxonomyHasher.hash(original), TaxonomyHasher.hash(loaded));
+		assertTrue(TaxonomyHasher.hash(original) == TaxonomyHasher.hash(loaded)
+				&& original.equals(loaded));
 	}
 
 	@Test
@@ -140,8 +143,8 @@ public class TaxonomyIOTest {
 		outWriter.flush();
 
 		// compare
-		assertEquals(InstanceTaxonomyHasher.hash(original),
-				InstanceTaxonomyHasher.hash(loaded));
+		assertTrue(InstanceTaxonomyHasher.hash(original) == InstanceTaxonomyHasher.hash(loaded)
+				&& original.equals(loaded));
 	}
 
 	/*
@@ -168,7 +171,6 @@ public class TaxonomyIOTest {
 		assertSame(taxonomy.getTopNode(), taxonomy.getBottomNode());
 	}
 
-	@SuppressWarnings("resource")
 	private InstanceTaxonomy<ElkClass, ElkNamedIndividual> loadAndClassify(
 			String resource) throws IOException, Owl2ParseException,
 			ElkInconsistentOntologyException, ElkException {
@@ -189,7 +191,6 @@ public class TaxonomyIOTest {
 		}
 	}
 
-	@SuppressWarnings("resource")
 	private Taxonomy<ElkClass> load(String resource) throws IOException,
 			Owl2ParseException, ElkInconsistentOntologyException {
 		InputStream stream = null;

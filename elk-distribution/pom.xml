@@ -51,25 +51,15 @@
 			<classifier>lib</classifier>
 		</dependency>
 		<dependency>
-			<groupId>net.sourceforge.owlapi</groupId>
-			<artifactId>owlapi-api</artifactId>
-			<version>${owlapi.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.owlapi</groupId>
-			<artifactId>owlapi-apibinding</artifactId>
-			<version>${owlapi.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.owlapi</groupId>
-			<artifactId>owlapi-parsers</artifactId>
-			<version>${owlapi.version}</version>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-owlapi</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-distribution</artifactId>
-			<version>${owlapi.version}</version>
-			<scope>test</scope>
+			<version>${owlapi.version}</version>			
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -195,8 +185,8 @@
 									<directory>${basedir}/src/main/resources/protege/</directory>
 									<filtering>true</filtering>
 									<includes>
-										<include>update.properties</include>
-										<include>version-info.txt</include>
+										<include>p5.update.properties</include>
+										<include>p5.version-info.txt</include>
 									</includes>
 								</resource>
 							</resources>
@@ -212,11 +202,19 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
+									
 					<execution>
+						<!-- Including dependencies of owlapi for the test. -->
+						<id>set-property-to-owlapi-dependencies</id>
 						<goals>
-							<goal>properties</goal>
+							<goal>build-classpath</goal>
 						</goals>
+						<configuration>
+							<includeScope>provided</includeScope>
+							<outputProperty>owlapi.lib.path</outputProperty>
+						</configuration>
 					</execution>
+					
 				</executions>
 			</plugin>
 
@@ -238,7 +236,11 @@
 						</property>
 						<property>
 							<name>owlapi-path</name>
-							<value>${net.sourceforge.owlapi:owlapi-distribution:jar}</value>
+							<value>${net.sourceforge.owlapi:owlapi-osgidistribution:jar}</value>
+						</property>
+ 						<property>
+							<name>owlapi-lib-path</name>
+							<value>${owlapi.lib.path}</value>
 						</property>
 					</systemProperties>
 				</configuration>
@@ -283,7 +285,7 @@
 							<goal>announcement-generate</goal>
 						</goals>
 						<configuration>
-							<announcementFile>version-info.txt</announcementFile>
+							<announcementFile>p5.version-info.txt</announcementFile>
 							<template>version-info.vm</template>
 							<outputDirectory>${project.build.directory}/site/resources</outputDirectory>
 						</configuration>
@@ -358,80 +360,6 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<profiles>
-		<!-- these actions will be activated only when staging a release -->
-		<profile>
-			<id>upload-files</id>
-			<activation>
-				<property>
-					<name>performRelease</name>
-					<value>true</value>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<!-- the plugin used to upload the release files to googlecode -->
-						<groupId>com.googlecode.maven-gcu-plugin</groupId>
-						<artifactId>maven-gcu-plugin</artifactId>
-						<version>1.1</version>
-						<executions>
-							<execution>
-								<phase>deploy</phase>
-								<goals>
-									<goal>upload</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<!-- the server and access credentials should be defined in the maven user configuration
-								file
-								(usually ~/.m2/settings.xml) -->
-							<serverId>elk-reasoner.googlecode.com</serverId>
-							<failsOnError>true</failsOnError>
-							<projectName>elk-reasoner</projectName>
-							<uploads>
-								<upload>
-									<file>${project.build.directory}/${elk-standalone.file}.zip</file>
-									<summary>
-										ELK reasoner standalone executable version
-										${project.version}
-									</summary>
-									<labels>
-										<label>Featured</label>
-										<label>OpSys-All</label>
-										<label>Type-Archive</label>
-									</labels>
-								</upload>
-								<upload>
-									<file>${project.build.directory}/${elk-protege.file}.zip</file>
-									<summary>ELK reasoner Protege plugin version ${project.version}</summary>
-									<labels>
-										<label>Featured</label>
-										<label>OpSys-All</label>
-										<label>Type-Archive</label>
-									</labels>
-								</upload>
-								<upload>
-									<file>${project.build.directory}/${elk-owlapi.file}.zip</file>
-									<summary>
-										ELK reasoner library for OWL API version
-										${project.version}
-									</summary>
-									<labels>
-										<label>Featured</label>
-										<label>OpSys-All</label>
-										<label>Type-Archive</label>
-									</labels>
-								</upload>
-							</uploads>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 
 	<reporting>
 		<plugins>

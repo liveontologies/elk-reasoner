@@ -36,8 +36,8 @@ import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
@@ -142,7 +142,7 @@ public class ComputeExpectedTaxonomies {
 
 	}
 
-	interface GetTaxonomy<T extends ElkObject> {
+	interface GetTaxonomy<T extends ElkEntity> {
 		Taxonomy<T> getTaxonomy(Reasoner reasoner) throws ElkException;
 
 		void dumpTaxonomy(Taxonomy<T> taxonomy, Writer writer)
