@@ -247,16 +247,6 @@ public class ConcurrentInstanceTaxonomy
 	}
 
 	@Override
-	public boolean addToBottomNode(ElkClass member) {
-		return classTaxonomy_.addToBottomNode(member);
-	}
-
-	@Override
-	public boolean removeFromBottomNode(ElkClass member) {
-		return classTaxonomy_.removeFromBottomNode(member);
-	}
-
-	@Override
 	public boolean removeNode(final ElkClass member) {
 		final UpdateableTaxonomyNode<ElkClass> node =
 				classTaxonomy_.getNode(member);
@@ -450,6 +440,16 @@ public class ConcurrentInstanceTaxonomy
 		@Override
 		public void setMembers(final Iterable<ElkClass> members) {
 			getNode().setMembers(members);
+		}
+		
+		@Override
+		public boolean add(final ElkClass member) {
+			return getNode().add(member);
+		}
+		
+		@Override
+		public boolean remove(final ElkClass member) {
+			return getNode().remove(member);
 		}
 		
 		@Override

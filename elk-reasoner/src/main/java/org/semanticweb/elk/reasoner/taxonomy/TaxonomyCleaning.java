@@ -152,7 +152,7 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 				 * mark as modified) at the same time
 				 */
 				synchronized (classTaxonomy.getBottomNode()) {
-					if (classTaxonomy.removeFromBottomNode(elkClass)) {
+					if (classTaxonomy.getBottomNode().remove(elkClass)) {
 						classStateWriter_
 								.markClassesForModifiedNode(classTaxonomy
 										.getBottomNode());

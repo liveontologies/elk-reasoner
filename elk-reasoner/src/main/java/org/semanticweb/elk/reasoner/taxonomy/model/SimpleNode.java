@@ -34,7 +34,7 @@ import java.util.List;
 public class SimpleNode<T> implements Node<T> {
 
 	protected final List<T> members_;
-	protected final ComparatorKeyProvider<? super T> keyProvider_;
+	private final ComparatorKeyProvider<? super T> keyProvider_;
 
 	public SimpleNode(final Iterable<T> members, final int size,
 			final ComparatorKeyProvider<? super T> keyProvider) {

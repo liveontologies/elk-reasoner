@@ -32,6 +32,10 @@ public interface UpdateableNode<T> extends Node<T> {
 	boolean trySetModified(boolean modified);
 	
 	boolean isModified();
+
+	boolean add(T member);
+
+	boolean remove(T member);
 	
 	void setMembers(Iterable<T> members);
 	

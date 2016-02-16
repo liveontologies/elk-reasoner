@@ -34,8 +34,4 @@ public interface UpdateableGenericTaxonomy
 
 	boolean removeNode(T member);
 
-	boolean addToBottomNode(T member);
-
-	boolean removeFromBottomNode(T member);
-
 }

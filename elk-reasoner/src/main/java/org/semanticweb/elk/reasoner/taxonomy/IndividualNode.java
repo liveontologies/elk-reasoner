@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +37,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
-import org.semanticweb.elk.reasoner.taxonomy.model.SimpleNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.SimpleUpdateableNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -55,8 +54,8 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author Markus Kroetzsch
  * @author Peter Skocovsky
  */
-public class IndividualNode extends SimpleNode<ElkNamedIndividual> implements
-		UpdateableInstanceNode<ElkClass, ElkNamedIndividual> {
+public class IndividualNode extends SimpleUpdateableNode<ElkNamedIndividual>
+		implements UpdateableInstanceNode<ElkClass, ElkNamedIndividual> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -67,11 +66,6 @@ public class IndividualNode extends SimpleNode<ElkNamedIndividual> implements
 	 * node.
 	 */
 	private final Set<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> directTypeNodes_;
-	/**
-	 * <tt>true</tt> if the direct type nodes need to be recomputed
-	 */
-	private final AtomicBoolean modified_ = new AtomicBoolean(true);
-	
 
 	/**
 	 * Constructing the class node for a given taxonomy and the set of
@@ -99,16 +93,6 @@ public class IndividualNode extends SimpleNode<ElkNamedIndividual> implements
 		LOGGER_.trace("{}: new direct type-node {}", this, typeNode);
 		
 		directTypeNodes_.add(typeNode);
-	}
-
-	@Override
-	public void setMembers(final Iterable<ElkNamedIndividual> members) {
-		members_.clear();
-		for (final ElkNamedIndividual elkIndividual : members) {
-			members_.add(elkIndividual);
-		}
-		Collections.sort(this.members_, getKeyProvider().getComparator());
-		LOGGER_.trace("updated members of {}", this);
 	}
 
 	@Override
@@ -149,24 +133,6 @@ public class IndividualNode extends SimpleNode<ElkNamedIndividual> implements
 	public String toString() {
 		return getCanonicalMember().getIri().getFullIriAsString();
 	}
-
-	@Override
-	public boolean trySetModified(boolean modified) {
-		boolean result = modified_.compareAndSet(!modified, modified);
-		
-		if (result && LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("node " + this + ": set "
-					+ (modified ? "modified" : "not modifiled"));
-		}
-		
-		return result;
-	}
-
-	@Override
-	public boolean isModified() {
-		return modified_.get();
-	}
-
 
 	@Override
 	public void removeDirectTypeNode(

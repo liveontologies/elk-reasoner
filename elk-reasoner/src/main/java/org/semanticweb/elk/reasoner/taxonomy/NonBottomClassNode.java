@@ -28,10 +28,9 @@ package org.semanticweb.elk.reasoner.taxonomy;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.taxonomy.model.SimpleNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.SimpleUpdateableNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeUtils;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -51,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * @author Pavel Klinov
  * @author Peter Skocovsky
  */
-class NonBottomClassNode extends SimpleNode<ElkClass>
+class NonBottomClassNode extends SimpleUpdateableNode<ElkClass>
 		implements UpdateableTaxonomyNode<ElkClass> {
 
 	// logger for events
@@ -73,11 +72,6 @@ class NonBottomClassNode extends SimpleNode<ElkClass>
 	 * sub-classes of the members of this node.
 	 */
 	private final Set<UpdateableTaxonomyNode<ElkClass>> directSubNodes_;
-	/**
-	 * <tt>true</tt> if the direct super-nodes of this node need to be
-	 * recomputed
-	 */
-	private final AtomicBoolean modified_ = new AtomicBoolean(true);
 
 	/**
 	 * Constructing the class node for a given taxonomy and the set of
@@ -158,30 +152,6 @@ class NonBottomClassNode extends SimpleNode<ElkClass>
 	@Override
 	public final int hashCode() {
 		return hashCode_;
-	}
-
-	@Override
-	public void setMembers(final Iterable<ElkClass> members) {
-		members_.clear();
-		for (final ElkClass elkClass : members) {
-			members_.add(elkClass);
-		}
-		Collections.sort(this.members_, getKeyProvider().getComparator());
-		LOGGER_.trace("updated members of {}", this);
-	}
-	
-	@Override
-	public boolean trySetModified(boolean modified) {
-		boolean result = modified_.compareAndSet(!modified, modified);
-		if (result && LOGGER_.isTraceEnabled())
-			LOGGER_.trace("node " + this + ": set "
-					+ (modified ? "modified" : "not modifiled"));
-		return result;
-	}
-
-	@Override
-	public boolean isModified() {
-		return modified_.get();
 	}
 
 	@Override
