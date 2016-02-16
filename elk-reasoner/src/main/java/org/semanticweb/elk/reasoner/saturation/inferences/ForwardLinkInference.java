@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
  *
  */
 public interface ForwardLinkInference extends ClassInference {
-	
+
 	public <O> O accept(Visitor<O> visitor);
 
 	/**
@@ -39,6 +39,8 @@ public interface ForwardLinkInference extends ClassInference {
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O>
 			extends

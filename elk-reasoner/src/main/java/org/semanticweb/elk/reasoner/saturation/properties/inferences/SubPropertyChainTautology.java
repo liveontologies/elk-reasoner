@@ -29,8 +29,17 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 
 /**
- * {@link SubPropertyChain} representing a tautology
- * {@code r1 ○ ... ○ rn  ⊑ r1 ○ ... ○ rn}
+ * An {@link ObjectPropertyInference} producing a tautological
+ * {@link SubPropertyChain} from no premises:<br>
+ * 
+ * <pre>
+ * ⎯⎯⎯⎯⎯⎯⎯⎯
+ *  P ⊑ P
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * P = {@link #getChain()}<br>
  * 
  * @author Pavel Klinov
  *
@@ -59,6 +68,8 @@ public class SubPropertyChainTautology
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
 

@@ -31,8 +31,20 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 
 /**
- * A {@link BackwardLink} obtained from a {@link ForwardLink} with
- * {@link IndexedObjectProperty} chain.
+ * A {@link ClassInference} producing a {@link BackwardLink} from a
+ * {@link ForwardLink} with an {@link IndexedObjectProperty} chain:<br>
+ * 
+ * <pre>
+ *  [C] ⊑ <∃R>.D
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *  C ⊑ <∃R>.[D]
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getOrigin()} = {@link #getSource()} <br>
+ * R = {@link #getRelation()}<br>
+ * D = {@link #getDestination()}<br>
  * 
  * @see ForwardLink#getRelation()
  * 
@@ -41,9 +53,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
  */
 public class BackwardLinkReversed extends AbstractBackwardLinkInference {
 
-	/**
-	 * 
-	 */
 	public BackwardLinkReversed(ForwardLink premise) {
 		super(premise.getTarget(),
 				(IndexedObjectProperty) premise.getRelation(),
@@ -70,6 +79,8 @@ public class BackwardLinkReversed extends AbstractBackwardLinkInference {
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
 

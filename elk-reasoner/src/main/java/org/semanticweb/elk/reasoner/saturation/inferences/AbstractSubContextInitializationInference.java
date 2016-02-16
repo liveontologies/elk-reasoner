@@ -28,7 +28,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SubContextIni
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
-public abstract class AbstractSubContextInitializationInference
+abstract class AbstractSubContextInitializationInference
 		extends
 			SubContextInitializationImpl
 		implements

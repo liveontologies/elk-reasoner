@@ -26,7 +26,14 @@ import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 
 /**
- * Represents occurrences of an {@link ElkIndividual} in an ontology.
+ * An {@link IndexedClassExpression} that corresponds to an
+ * {@link ElkIndividual}, which can be obtained by {@link #getElkEntity()}.
+ * 
+ * Notation:
+ * 
+ * <pre>
+ * A
+ * </pre>
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"

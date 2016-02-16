@@ -27,11 +27,25 @@ import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 
 /**
- * Represents all occurrences of an {@link ElkDataHasValue} in an ontology.
+ * An {@link IndexedClassExpression} constructed from an {@link ElkDataProperty}
+ * and an {@link ElkLiteral}.<br>
+ * 
+ * Notation:
+ * 
+ * <pre>
+ * ∃P.v
+ * </pre>
+ * 
+ * It is logically equivalent to an OWL class expression
+ * {@code ObjectDataHasValue(P v)}<br>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * P = {@link #getRelation()}<br>
+ * v = {@link #getFiller()}<br>
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
- * 
  */
 public interface IndexedDataHasValue extends IndexedClassExpression {
 
@@ -61,9 +75,9 @@ public interface IndexedDataHasValue extends IndexedClassExpression {
 	 *            the type of the output
 	 */
 	interface Visitor<O> {
-		
+
 		O visit(IndexedDataHasValue element);
-		
-	}	
+
+	}
 
 }

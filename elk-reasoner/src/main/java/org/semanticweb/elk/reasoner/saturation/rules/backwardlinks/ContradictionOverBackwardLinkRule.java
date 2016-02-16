@@ -23,10 +23,10 @@ package org.semanticweb.elk.reasoner.saturation.rules.backwardlinks;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionPropagated;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyPropagated;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
@@ -34,7 +34,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
  * A {@link LinkableBackwardLinkRule} applied when processing
- * {@link BackwardLink} that produces {@link Contradiction} in the context
+ * {@link BackwardLink} that produces {@link ClassInconsistency} in the context
  * linked by this {@link BackwardLink}.
  */
 public class ContradictionOverBackwardLinkRule extends
@@ -74,7 +74,7 @@ public class ContradictionOverBackwardLinkRule extends
 	@Override
 	public void apply(BackwardLink premise, ContextPremises premises,
 			ClassInferenceProducer producer) {
-		producer.produce(new ContradictionPropagated(premise));
+		producer.produce(new ClassInconsistencyPropagated(premise));
 	}
 
 	@Override

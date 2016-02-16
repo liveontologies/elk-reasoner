@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ContextInitia
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -376,7 +376,7 @@ public class ContextImpl implements ExtendedContext {
 		}
 
 		@Override
-		public Boolean visit(Contradiction conclusion) {
+		public Boolean visit(ClassInconsistency conclusion) {
 			boolean before = isInconsistent_;
 			isInconsistent_ = true;
 			ContradictionOverBackwardLinkRule.addTo(ContextImpl.this);
@@ -475,7 +475,7 @@ public class ContextImpl implements ExtendedContext {
 		}
 
 		@Override
-		public Boolean visit(Contradiction conclusion) {
+		public Boolean visit(ClassInconsistency conclusion) {
 			boolean before = isInconsistent_;
 			isInconsistent_ = false;
 			ContradictionOverBackwardLinkRule.removeFrom(ContextImpl.this);
@@ -561,7 +561,7 @@ public class ContextImpl implements ExtendedContext {
 		}
 
 		@Override
-		public Boolean visit(Contradiction conclusion) {
+		public Boolean visit(ClassInconsistency conclusion) {
 			return isInconsistent_;
 		}
 

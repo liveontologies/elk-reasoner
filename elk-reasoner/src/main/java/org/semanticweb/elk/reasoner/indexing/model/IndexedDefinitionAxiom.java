@@ -24,12 +24,32 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
  * #L%
  */
 
+/**
+ * An {@link IndexedAxiom} constructed from an {@link IndexedClass} and an
+ * {@link IndexedClassExpression}.<br>
+ * 
+ * Notation:
+ * 
+ * <pre>
+ * [A = D]
+ * </pre>
+ * 
+ * It is logically equivalent to the OWL axiom {@code EquivalentClasses(A D)}
+ * <br>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * A = {@link #getDefinedClass()}<br>
+ * D = {@link #getDefinition()}<br>
+ * 
+ * @author "Yevgeny Kazakov"
+ */
 public interface IndexedDefinitionAxiom extends IndexedAxiom {
 
 	IndexedClass getDefinedClass();
 
 	IndexedClassExpression getDefinition();
-	
+
 	/**
 	 * The visitor pattern for instances
 	 * 
@@ -43,7 +63,7 @@ public interface IndexedDefinitionAxiom extends IndexedAxiom {
 		O visit(IndexedDefinitionAxiom axiom);
 
 	}
-	
+
 	/**
 	 * A factory for creating instances
 	 * 
@@ -52,10 +72,9 @@ public interface IndexedDefinitionAxiom extends IndexedAxiom {
 	 */
 	interface Factory {
 
-		IndexedDefinitionAxiom getIndexedDefinitionAxiom(
-				ElkAxiom originalAxiom, IndexedClass definedClass,
-				IndexedClassExpression definition);
+		IndexedDefinitionAxiom getIndexedDefinitionAxiom(ElkAxiom originalAxiom,
+				IndexedClass definedClass, IndexedClassExpression definition);
 
 	}
-	
+
 }

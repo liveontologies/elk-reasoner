@@ -33,9 +33,25 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 
 /**
- * A {@link SubClassInclusionComposed} with {@link IndexedObjectSomeValuesFrom}
- * super-class obtained by from a {@link Propagation} and a matching
- * {@link BackwardLink}.
+ * A {@link ClassInference} producing a {@link SubClassInclusionComposed} with
+ * {@link SubClassInclusionComposed#getSubsumer()} instance of
+ * {@link IndexedObjectSomeValuesFrom} from a {@link BackwardLink} and a
+ * {@link Propagation}:<br>
+ * 
+ * <pre>
+ *   (1)                (2)
+ *  C ⊑ <∃R>.[D]  ∃[R].[D] ⊑ ∃S.E
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *          [C] ⊑ +∃S.E
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getDestination()}<br>
+ * R = {@link #getPropagationRelation()}<br>
+ * D = {@link #getOrigin()}<br>
+ * ∃S.E = {@link #getConclusionSubsumer()} (from which S and E can be obtained)
+ * <br>
  * 
  * @author Pavel Klinov
  * 
@@ -93,17 +109,19 @@ public class SubClassInclusionComposedObjectSomeValuesFrom
 			SubClassInclusionComposedInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	/**
 	 * Visitor pattern for instances
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
-		
+
 		public O visit(SubClassInclusionComposedObjectSomeValuesFrom inference);
-		
+
 	}
 
 }

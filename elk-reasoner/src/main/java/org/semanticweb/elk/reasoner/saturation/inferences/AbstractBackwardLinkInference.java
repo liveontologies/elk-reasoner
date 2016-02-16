@@ -30,39 +30,39 @@ import org.semanticweb.elk.reasoner.tracing.Conclusion;
 import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
-public abstract class AbstractBackwardLinkInference extends BackwardLinkImpl
+abstract class AbstractBackwardLinkInference extends BackwardLinkImpl
 		implements
 			BackwardLinkInference {
 
 	static Conclusion.Factory FACTORY = ConclusionBaseFactory.getInstance();
-	
+
 	public AbstractBackwardLinkInference(IndexedContextRoot root,
 			IndexedObjectProperty relation, IndexedContextRoot source) {
 		super(root, relation, source);
 	}
-		
+
 	/**
 	 * @return the conclusion produced by this inference
 	 */
 	public BackwardLink getConclusion() {
 		return this;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return System.identityHashCode(this);
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		return this == o;
 	}
-	
+
 	@Override
 	public final <O> O accept(Inference.Visitor<O> visitor) {
 		return accept((BackwardLinkInference.Visitor<O>) visitor);
 	}
-	
+
 	@Override
 	public final <O> O accept(SaturationInference.Visitor<O> visitor) {
 		return accept((BackwardLinkInference.Visitor<O>) visitor);
@@ -71,6 +71,6 @@ public abstract class AbstractBackwardLinkInference extends BackwardLinkImpl
 	@Override
 	public final <O> O accept(ClassInference.Visitor<O> visitor) {
 		return accept((BackwardLinkInference.Visitor<O>) visitor);
-	}	
+	}
 
 }

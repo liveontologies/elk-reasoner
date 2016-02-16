@@ -10,7 +10,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxi
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
@@ -74,7 +74,7 @@ public class DummyConclusionVisitor<O> implements Conclusion.Visitor<O> {
 	}
 
 	@Override
-	public O visit(Contradiction conclusion) {
+	public O visit(ClassInconsistency conclusion) {
 		return defaultVisit(conclusion);
 	}
 

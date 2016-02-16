@@ -33,14 +33,23 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 
 /**
- * Represents occurrences of an {@link ElkObjectProperty} in an ontology.
+ * An {@link IndexedPropertyChain} constructed from an {@link ElkObjectProperty}
+ * .<br>
  * 
- * @author Frantisek Simancik
- * @author Markus Kroetzsch
+ * Notation:
+ * 
+ * <pre>
+ * R
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * R = {@link #getElkEntity()}<br>
  */
-
-public interface IndexedObjectProperty extends IndexedPropertyChain,
-		IndexedEntity {
+public interface IndexedObjectProperty
+		extends
+			IndexedPropertyChain,
+			IndexedEntity {
 
 	/**
 	 * @return The {@link ElkObjectProperty} represented by this
@@ -92,7 +101,7 @@ public interface IndexedObjectProperty extends IndexedPropertyChain,
 	 * @see {@link IndexedComplexPropertyChain#getFirstProperty()}
 	 */
 	Collection<IndexedComplexPropertyChain> getLeftChains();
-	
+
 	/**
 	 * The visitor pattern for instances
 	 * 
@@ -106,6 +115,5 @@ public interface IndexedObjectProperty extends IndexedPropertyChain,
 		O visit(IndexedObjectProperty element);
 
 	}
-
 
 }

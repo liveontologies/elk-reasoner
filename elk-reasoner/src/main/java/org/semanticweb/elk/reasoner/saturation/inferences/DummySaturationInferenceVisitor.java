@@ -34,6 +34,9 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubProperty
  * A {@link SaturationInference.Visitor} that always returns {@code null}.
  * 
  * @author Yevgeny Kazakov
+ * 
+ * @param <O>
+ *            the type of the output
  */
 public class DummySaturationInferenceVisitor<O>
 		implements
@@ -84,22 +87,22 @@ public class DummySaturationInferenceVisitor<O>
 	}
 
 	@Override
-	public O visit(ContradictionOfDisjointSubsumers inference) {
+	public O visit(ClassInconsistencyOfDisjointSubsumers inference) {
 		return defaultVisit(inference);
 	}
 
 	@Override
-	public O visit(ContradictionOfObjectComplementOf inference) {
+	public O visit(ClassInconsistencyOfObjectComplementOf inference) {
 		return defaultVisit(inference);
 	}
 
 	@Override
-	public O visit(ContradictionOfOwlNothing inference) {
+	public O visit(ClassInconsistencyOfOwlNothing inference) {
 		return defaultVisit(inference);
 	}
 
 	@Override
-	public O visit(ContradictionPropagated inference) {
+	public O visit(ClassInconsistencyPropagated inference) {
 		return defaultVisit(inference);
 	}
 

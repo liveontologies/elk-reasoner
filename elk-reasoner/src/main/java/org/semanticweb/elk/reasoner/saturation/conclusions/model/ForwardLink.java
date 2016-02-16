@@ -26,13 +26,23 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 
 /**
- * A {@link ClassConclusion} representing a derived subclass axiom between the
- * class expression represented by {@link #getDestination()} and the existential
- * restriction on property expression represented by {@link #getRelation()} and
- * filler represented by {@link #getTarget()}. For example, a
- * {@link ForwardLink} with {@link #getDestination()} = {@code :A},
- * {@link #getRelation()} = {@code :r} and {@link #getTarget()} = {@code :B}
- * represents {@code SubClassOf(:A ObjectSomeValuesFrom(:r :B))}.
+ * A {@link ClassConclusion} representing an inclusion between an axiom and an
+ * existential restriction.<br>
+ * 
+ * Notation:
+ * 
+ * <pre>
+ * [C] ⊑ <∃P>.D
+ * </pre>
+ * 
+ * It is logically equivalent to axiom
+ * {@code SubClassOf(C ObjectSomeValuesFrom(P D))}<br>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getDestination()}<br>
+ * P = {@link #getRelation()}<br>
+ * D = {@link #getTarget()}<br>
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"

@@ -33,9 +33,21 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.PropertyRange;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 
 /**
- * A {@link PropertyRange} for the sub-property of a {@link SubPropertyChain}
- * obtained from an {@link IndexedObjectPropertyRangeAxiom} for the
- * super-property of this {@link SubPropertyChain}.
+ * An {@link ObjectPropertyInference} producing a {@link PropertyRange} from a
+ * {@link SubPropertyChain} and {@link IndexedObjectPropertyRangeAxiom}:<br>
+ * 
+ * <pre>
+ *     (1)      (2)
+ *  R ⊑ S  [Range(S,D)]
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *      Range(R,D)
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * R = {@link #getSubProperty()}<br>
+ * S = {@link #getSuperProperty()}<br>
+ * D = {@link #getRange()}<br>
  * 
  * @author "Yevgeny Kazakov"
  */
@@ -57,6 +69,10 @@ public class PropertyRangeInherited extends AbstractPropertyRangeInference {
 		super(subProperty, range);
 		this.superProperty_ = superProperty;
 		this.reason_ = reason;
+	}
+
+	public IndexedObjectProperty getSubProperty() {
+		return getProperty();
 	}
 
 	public IndexedObjectProperty getSuperProperty() {
@@ -86,6 +102,8 @@ public class PropertyRangeInherited extends AbstractPropertyRangeInference {
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
 

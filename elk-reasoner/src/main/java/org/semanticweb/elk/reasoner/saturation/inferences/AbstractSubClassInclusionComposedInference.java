@@ -30,17 +30,21 @@ import org.semanticweb.elk.reasoner.tracing.Conclusion;
 import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
-public abstract class AbstractSubClassInclusionComposedInference<S extends IndexedClassExpression>
+abstract class AbstractSubClassInclusionComposedInference<S extends IndexedClassExpression>
 		extends
 			SubClassInclusionComposedImpl<S>
 		implements
 			SubClassInclusionComposedInference {
 
 	static Conclusion.Factory FACTORY = ConclusionBaseFactory.getInstance();
-	
+
 	public AbstractSubClassInclusionComposedInference(
 			IndexedContextRoot subExpression, S superExpression) {
 		super(subExpression, superExpression);
+	}
+
+	public S getConclusionSubsumer() {
+		return super.getSubsumer();
 	}
 
 	@Override

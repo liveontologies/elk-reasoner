@@ -27,24 +27,37 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEntity;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 
 /**
- * A {@link SubClassInclusionComposed} with {@link IndexedClassEntity} super-class
- * obtained from the corresponding {@link SubClassInclusionDecomposed}.
+ * A {@link ClassInference} producing a {@link SubClassInclusionComposed} from a
+ * {@link SubClassInclusionDecomposed} with
+ * {@link SubClassInclusionDecomposed#getSubsumer()} instance of
+ * {@link IndexedEntity}:<br>
+ * 
+ * <pre>
+ *  [C] ⊑ -A
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *  [C] ⊑ +A
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getOrigin()} = {@link #getDestination()}<br>
+ * A = {@link #getSubsumer()}<br>
  * 
  * @author "Yevgeny Kazakov"
  *
  */
-public class SubClassInclusionComposedEntity extends
-		AbstractSubClassInclusionComposedInference<IndexedClassEntity> {
+public class SubClassInclusionComposedEntity
+		extends
+			AbstractSubClassInclusionComposedInference<IndexedClassEntity> {
 
-	/**
-	 */
-	public SubClassInclusionComposedEntity(IndexedContextRoot inferenceRoot,
+	public SubClassInclusionComposedEntity(IndexedContextRoot origin,
 			IndexedClassEntity subsumer) {
-		super(inferenceRoot, subsumer);
+		super(origin, subsumer);
 	}
 
 	@Override
@@ -53,7 +66,8 @@ public class SubClassInclusionComposedEntity extends
 	}
 
 	public SubClassInclusionDecomposed getPremise() {
-		return FACTORY.getSubClassInclusionDecomposed(getOrigin(), getSubsumer());
+		return FACTORY.getSubClassInclusionDecomposed(getOrigin(),
+				getSubsumer());
 	}
 
 	@Override
@@ -62,20 +76,23 @@ public class SubClassInclusionComposedEntity extends
 	}
 
 	@Override
-	public final <O> O accept(SubClassInclusionComposedInference.Visitor<O> visitor) {
+	public final <O> O accept(
+			SubClassInclusionComposedInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	/**
 	 * Visitor pattern for instances
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
-		
+
 		public O visit(SubClassInclusionComposedEntity inference);
-		
+
 	}
 
 }

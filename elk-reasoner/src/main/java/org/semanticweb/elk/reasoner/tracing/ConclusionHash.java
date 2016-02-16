@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -105,8 +105,8 @@ public class ConclusionHash
 	}
 
 	@Override
-	public Integer visit(Contradiction conclusion) {
-		return combinedHashCode(hashCode(Contradiction.class),
+	public Integer visit(ClassInconsistency conclusion) {
+		return combinedHashCode(hashCode(ClassInconsistency.class),
 				hashCode(conclusion.getDestination()));
 	}
 

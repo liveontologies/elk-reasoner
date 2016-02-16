@@ -28,11 +28,21 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 
 /**
- * {@link SubClassInclusionDecomposed} representing a tautology
- * {@code C ⊑ owl:Thing} obtained from no premises.
+ * A {@link ClassInference} producing a {@link SubClassInclusionComposed} from
+ * {@link ContextInitialization}:<br>
+ * 
+ * <pre>
+ *       ![C]
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *  [C] ⊑ +owl:Thing
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getOrigin()} = {@link #getDestination()}<br>
  * 
  * @author Yevgeny Kazakov
  */
@@ -49,7 +59,7 @@ public class SubClassInclusionOwlThing
 	public IndexedContextRoot getOrigin() {
 		return getDestination();
 	}
-	
+
 	public ContextInitialization getPremise() {
 		return FACTORY.getContextInitialization(getOrigin());
 	}
@@ -70,6 +80,8 @@ public class SubClassInclusionOwlThing
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
 

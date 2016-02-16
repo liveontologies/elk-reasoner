@@ -25,11 +25,21 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
  */
 
 /**
- * A {@link ClassConclusion} representing a derived subclass axiom between the
- * class expression represented by {@link #getDestination()} and
- * {@code owl:Nothing}. For example, a {@link Contradiction} with
- * {@link #getDestination()} = {@code :A} represents
- * {@code SubClassOf(:A owl:Nothing)}.
+ * A {@link ClassConclusion} representing inconsistency of the class expression
+ * corresponding to {@link #getDestination()}.<br>
+ * 
+ * Notation:
+ * 
+ * <pre>
+ * [C] ⊑ 0
+ * </pre>
+ * 
+ * It is logically equivalent to axiom {@code SubClassOf(C owl:Nothing)}<br>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getDestination()}<br>
+ * 
  * 
  * @author Pavel Klinov
  * 
@@ -37,7 +47,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface Contradiction extends ClassConclusion {
+public interface ClassInconsistency extends ClassConclusion {
 
 	public static final String NAME = "Contradiction";
 
@@ -51,7 +61,7 @@ public interface Contradiction extends ClassConclusion {
 	 */
 	interface Factory {
 
-		Contradiction getContradiction(IndexedContextRoot root);
+		ClassInconsistency getContradiction(IndexedContextRoot root);
 
 	}
 
@@ -65,7 +75,7 @@ public interface Contradiction extends ClassConclusion {
 	 */
 	interface Visitor<O> {
 
-		public O visit(Contradiction conclusion);
+		public O visit(ClassInconsistency conclusion);
 
 	}
 

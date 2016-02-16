@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.InitializationConclusion;
 
 /**
- * A {@link ClassInference} that produce {@link InitializationConclusion}
+ * A {@link ClassInference} that produce an {@link InitializationConclusion}
  * 
  * @author Yevgeny Kazakov
  *
@@ -39,6 +39,8 @@ public interface InitializationInference extends ClassInference {
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O>
 			extends

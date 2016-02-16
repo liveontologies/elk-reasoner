@@ -23,27 +23,28 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ContradictionImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassInconsistencyImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.tracing.Conclusion;
 import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
-public abstract class AbstractContradictionInference extends ContradictionImpl
-		implements
-			ContradictionInference {
+abstract class AbstractClassInconsistencyInference
+		extends
+			ClassInconsistencyImpl
+		implements ClassInconsistencyInference {
 
 	static Conclusion.Factory FACTORY = ConclusionBaseFactory.getInstance();
 
-	protected AbstractContradictionInference(
-			IndexedContextRoot conclusionRoot) {
-		super(conclusionRoot);
+	protected AbstractClassInconsistencyInference(
+			IndexedContextRoot destination) {
+		super(destination);
 	}
 
 	/**
 	 * @return the conclusion produced by this inference
 	 */
-	public Contradiction getConclusion() {
+	public ClassInconsistency getConclusion() {
 		return this;
 	}
 
@@ -58,23 +59,28 @@ public abstract class AbstractContradictionInference extends ContradictionImpl
 	}
 
 	@Override
+	public String toString() {
+		return "ClassInconsistency";
+	}
+
+	@Override
 	public IndexedContextRoot getOrigin() {
 		return getDestination();
 	}
 
 	@Override
 	public final <O> O accept(Inference.Visitor<O> visitor) {
-		return accept((ContradictionInference.Visitor<O>) visitor);
+		return accept((ClassInconsistencyInference.Visitor<O>) visitor);
 	}
 
 	@Override
 	public final <O> O accept(SaturationInference.Visitor<O> visitor) {
-		return accept((ContradictionInference.Visitor<O>) visitor);
+		return accept((ClassInconsistencyInference.Visitor<O>) visitor);
 	}
 
 	@Override
 	public final <O> O accept(ClassInference.Visitor<O> visitor) {
-		return accept((ContradictionInference.Visitor<O>) visitor);
+		return accept((ClassInconsistencyInference.Visitor<O>) visitor);
 	}
 
 }

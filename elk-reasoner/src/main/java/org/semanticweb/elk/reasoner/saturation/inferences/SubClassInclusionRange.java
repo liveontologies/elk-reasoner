@@ -32,8 +32,20 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.PropertyRange;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 
 /**
- * {@link SubClassInclusionDecomposed} producing {@code (∃R^-.T) ⊓ C ⊑ D} from
- * {@code R range D}.
+ * A {@link ClassInference} producing a {@link SubClassInclusionDecomposed} from
+ * {@link ContextInitialization} and {@link PropertyRange}:<br>
+ * 
+ * <pre>
+ *    (1)      (2)
+ *  !([C])  Range(R,D)
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ where C = (∃R^-.T) ⊓ C'
+ *       [C] ⊑ D
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getOrigin()} = {@link #getDestination()}<br>
+ * D = {@link #getRange() = #getConclusionSubsumer()}
  * 
  * @author Yevgeny Kazakov
  */
@@ -49,6 +61,10 @@ public class SubClassInclusionRange
 	@Override
 	public IndexedRangeFiller getOrigin() {
 		return (IndexedRangeFiller) getDestination();
+	}
+
+	public IndexedClassExpression getRange() {
+		return getSubsumer();
 	}
 
 	public ContextInitialization getFirstPremise() {
@@ -76,6 +92,8 @@ public class SubClassInclusionRange
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
 

@@ -30,7 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
- * A {@link SaturationInference} that produce {@link ClassConclusion}s
+ * A {@link SaturationInference} that produces {@link ClassConclusion}s
  * 
  * @author Pavel Klinov
  * 
@@ -73,10 +73,12 @@ public interface ClassInference extends SaturationInference {
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O>
 			extends
-				ContradictionInference.Visitor<O>,
+				ClassInconsistencyInference.Visitor<O>,
 				DisjointSubsumerInference.Visitor<O>,
 				ForwardLinkInference.Visitor<O>,
 				InitializationInference.Visitor<O>,

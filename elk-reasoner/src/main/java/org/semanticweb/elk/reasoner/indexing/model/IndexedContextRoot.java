@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.model;
 
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +26,13 @@ package org.semanticweb.elk.reasoner.indexing.model;
 
 import org.semanticweb.elk.reasoner.saturation.ExtendedContext;
 
+/**
+ * An {@link IndexedObject} that can be used in special "root" positions of
+ * other {@link IndexedObject}s. It corresponds to a {@link ElkClassExpression}.
+ * 
+ * @author Yevgeny Kazakov
+ *
+ */
 public interface IndexedContextRoot extends IndexedObject {
 
 	/**
@@ -67,7 +76,6 @@ public interface IndexedContextRoot extends IndexedObject {
 
 	}
 
-	
 	<O> O accept(IndexedContextRoot.Visitor<O> visitor);
 
 }

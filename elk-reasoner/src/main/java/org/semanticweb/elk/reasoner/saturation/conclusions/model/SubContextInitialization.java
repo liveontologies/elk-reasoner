@@ -23,12 +23,25 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.model;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 
 /**
- * A {@code SubConclusion} indicating that a {@link SubContext} of a
- * {@link Context} where it is stored should be initialized.
+ * A special {@link ClassConclusion} that is used to initialize inferences for
+ * {@link ClassConclusion}s associated with the concept expression represented
+ * by {@link #getDestination()} and object property expression represented by
+ * {@link #getSubDestination()}.<br>
+ * 
+ * Notation:
+ * 
+ * <pre>
+ * ![C:R]
+ * </pre>
+ * 
+ * The axiom has no logical meaning (equivalent to a tautology)<br>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getDestination()}<br>
+ * R = {@link #getSubDestination()}<br>
  * 
  * @author "Yevgeny Kazakov"
  */

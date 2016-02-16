@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassConclus
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
- * A {@link SaturationInference} that produce {@link SubClassConclusion}s
+ * A {@link ClassInference} that produces {@link SubClassConclusion}s
  * 
  * @author Yevgeny Kazakov
  */
@@ -46,8 +46,8 @@ public interface SubClassInference extends ClassInference {
 
 	/**
 	 * @return the {@link IndexedObjectProperty}, which is the same as
-	 *         {@link SubClassConclusion#getTraceSubRoot()} for the conclusion of
-	 *         this {@link SubClassInference} and for some of the premises of
+	 *         {@link SubClassConclusion#getTraceSubRoot()} for the conclusion
+	 *         of this {@link SubClassInference} and for some of the premises of
 	 *         this {@link SubClassInference}, if it has any (i.e., it is not an
 	 *         {@link SubContextInitializationInference}). This value is used
 	 *         for tracing of inferences. It cannot be {@code null}.
@@ -63,6 +63,8 @@ public interface SubClassInference extends ClassInference {
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O>
 			extends

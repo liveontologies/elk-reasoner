@@ -26,14 +26,23 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
 
 /**
- * A {@link ClassConclusion} representing a derived subclass axiom between the
- * existential restriction on property expression represented by
- * {@link #getRelation()} and filler represented by {@link #getDestination()}
- * and (existential) class expression represented by {@link #getCarry()}. For
- * example, a {@link Propagation} with {@link #getRelation()} = {@code :R},
- * {@link #getDestination()} = {@code :A} and {@link #getCarry()} =
- * {@code ObjectSomeValuesFrom(:s :B)} represents
- * {@code SubClassOf(ObjectSomeValuesFrom(:r :A) ObjectSomeValuesFrom(:s :B))}.
+ * A {@link ClassConclusion} representing a concept inclusion axiom between two
+ * existential restrictions.<br>
+ * 
+ * Notation:
+ * 
+ * <pre>
+ * ∃[R].[C] ⊑ ∃S.D
+ * </pre>
+ * 
+ * It is logically equivalent to axiom
+ * {@code SubClassOf(ObjectSomeValuesFrom(R C) ObjectSomeValuesFrom(S D))}<br>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getDestination()}<br>
+ * R = {@link #getSubDestination()}<br>
+ * ∃S.D = {@link #getCarry()} (from which S and D can be obtained)<br>
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"

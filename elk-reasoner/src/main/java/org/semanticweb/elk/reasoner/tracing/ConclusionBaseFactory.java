@@ -42,7 +42,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxi
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -86,7 +86,7 @@ public class ConclusionBaseFactory implements Conclusion.Factory {
 	}
 
 	@Override
-	public Contradiction getContradiction(IndexedContextRoot root) {
+	public ClassInconsistency getContradiction(IndexedContextRoot root) {
 		return filter(saturationConclusionFactory_.getContradiction(root));
 	}
 

@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.inferences;
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
+
 /*
  * #%L
  * ELK Reasoner
@@ -22,7 +24,13 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * #L%
  */
 
-public interface ContradictionInference extends ClassInference {
+/**
+ * A {@link ClassInference} that produces {@link ClassInconsistency}s
+ * 
+ * @author Yevgeny Kazakov
+ *
+ */
+public interface ClassInconsistencyInference extends ClassInference {
 
 	public <O> O accept(Visitor<O> visitor);
 
@@ -31,13 +39,15 @@ public interface ContradictionInference extends ClassInference {
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O>
 			extends
-				ContradictionOfOwlNothing.Visitor<O>,
-				ContradictionOfDisjointSubsumers.Visitor<O>,
-				ContradictionOfObjectComplementOf.Visitor<O>,
-				ContradictionPropagated.Visitor<O> {
+				ClassInconsistencyOfOwlNothing.Visitor<O>,
+				ClassInconsistencyOfDisjointSubsumers.Visitor<O>,
+				ClassInconsistencyOfObjectComplementOf.Visitor<O>,
+				ClassInconsistencyPropagated.Visitor<O> {
 
 		// combined interface
 

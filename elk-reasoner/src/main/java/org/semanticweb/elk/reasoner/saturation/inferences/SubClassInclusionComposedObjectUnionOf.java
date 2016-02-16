@@ -30,12 +30,24 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 
 /**
- * A {@link SubClassInclusionComposed} with {@link IndexedObjectUnionOf}
- * super-class obtained from a {@link SubClassInclusionComposed} in which the
- * super-class is one of its disjuncts.
+ * A {@link ClassInference} producing a {@link SubClassInclusionComposed} with
+ * {@link SubClassInclusionComposed#getSubsumer()} instance of
+ * {@link IndexedObjectUnionOf} from a {@link SubClassInclusionComposed}:<br>
+ * 
+ * <pre>
+ *  [C] ⊑ +D
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ E = (..⊔ D ⊔..)
+ *  [C] ⊑ +E
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getOrigin()} = {@link #getDestination()}<br>
+ * E = {@link #getConclusionSubsumer()}<br>
+ * D = {@link #getPosition()} gives the position of D in
+ * {@link IndexedObjectUnionOf#getDisjuncts()} for E<br>
  * 
  * @see IndexedObjectUnionOf#getDisjuncts()
- * 
  * 
  * @author Pavel Klinov
  *
@@ -90,6 +102,8 @@ public class SubClassInclusionComposedObjectUnionOf
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
 

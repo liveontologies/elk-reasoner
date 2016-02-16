@@ -39,6 +39,8 @@ public interface DisjointSubsumerInference extends ClassInference {
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O>
 			extends

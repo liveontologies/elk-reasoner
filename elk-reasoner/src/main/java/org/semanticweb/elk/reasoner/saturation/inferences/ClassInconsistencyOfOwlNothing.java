@@ -28,28 +28,41 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 
 /**
- * A {@link Contradiction} obtained from {@link SubClassInclusionComposed} with
- * an {@code owl:Nothing} super-class.
+ * A {@link ClassInference} producing a {@link ClassInconsistency} from
+ * {@link SubClassInclusionComposed} with
+ * {@link SubClassInclusionComposed#getSubsumer()} equal to {@code owl:Nothing}:<br>
+ * 
+ * <pre>
+ *  [C] ⊑ +⊥
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *  [C] ⊑ 0
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getOrigin()}={@link #getDestination()}<br>
  * 
  * @author Pavel Klinov
  *
  *         pavel.klinov@uni-ulm.de
+ * @author Yevgeny Kazakov
  */
-public class ContradictionOfOwlNothing extends
-		AbstractContradictionOfSubsumerInference<IndexedClass> {
+public class ClassInconsistencyOfOwlNothing
+		extends
+			AbstractClassInconsistencyOfInconsistentSubsumerInference<IndexedClass> {
 
-	public ContradictionOfOwlNothing(IndexedContextRoot inferenceRoot,
+	public ClassInconsistencyOfOwlNothing(IndexedContextRoot inferenceRoot,
 			IndexedClass premiseSubsumer) {
 		super(inferenceRoot, premiseSubsumer);
 	}
 
 	@Override
 	public String toString() {
-		return "Contradiction from owl:Nothing";
+		return super.toString() + " from owl:Nothing";
 	}
 
 	@Override
@@ -58,20 +71,22 @@ public class ContradictionOfOwlNothing extends
 	}
 
 	@Override
-	public final <O> O accept(ContradictionInference.Visitor<O> visitor) {
+	public final <O> O accept(ClassInconsistencyInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	/**
 	 * Visitor pattern for instances
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
-		
-		public O visit(ContradictionOfOwlNothing inference);
-		
+
+		public O visit(ClassInconsistencyOfOwlNothing inference);
+
 	}
 
 }

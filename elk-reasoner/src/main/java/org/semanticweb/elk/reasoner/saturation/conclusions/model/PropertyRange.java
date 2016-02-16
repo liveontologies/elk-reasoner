@@ -27,11 +27,20 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 
 /**
  * A {@link ObjectPropertyConclusion} representing a derived object property
- * range axiom with property expression represented by {@link #getProperty()}
- * and range represented by {@link #getRange()}. For example, a
- * {@link PropertyRange} with {@link #getProperty()} = {@code :r} and
- * {@link #getRange()} = {@code :A} represents
- * {@code ObjectPropertyRange(:r :A)}.
+ * range axiom.<br>
+ * 
+ * Notation:
+ * 
+ * <pre>
+ * Range(R,C)
+ * </pre>
+ * 
+ * It is logically equivalent to axiom {@code ObjectPropertyRange(R C)}<br>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * R = {@link #getProperty()}<br>
+ * C = {@link #getRange()}<br>
  * 
  * @author Yevgeny Kazakov
  */

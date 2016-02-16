@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.inferences;
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
+
 /*
  * #%L
  * ELK Reasoner
@@ -22,6 +24,12 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * #L%
  */
 
+/**
+ * A {@link SubClassInference} that produces an {@link SubContextInitialization}
+ * 
+ * @author Yevgeny Kazakov
+ *
+ */
 public interface SubContextInitializationInference
 		extends
 			SubClassInference,
@@ -34,6 +42,8 @@ public interface SubContextInitializationInference
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O>
 			extends

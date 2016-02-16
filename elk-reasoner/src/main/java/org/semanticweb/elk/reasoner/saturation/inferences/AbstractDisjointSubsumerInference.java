@@ -31,31 +31,30 @@ import org.semanticweb.elk.reasoner.tracing.Conclusion;
 import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
-public abstract class AbstractDisjointSubsumerInference
-		extends
-			DisjointSubsumerImpl
-		implements DisjointSubsumerInference {
+abstract class AbstractDisjointSubsumerInference extends DisjointSubsumerImpl
+		implements
+			DisjointSubsumerInference {
 
 	static Conclusion.Factory FACTORY = ConclusionBaseFactory.getInstance();
-	
+
 	public AbstractDisjointSubsumerInference(IndexedContextRoot root,
 			IndexedClassExpressionList disjoint, int position,
 			ElkAxiom reason) {
 		super(root, disjoint, position, reason);
 	}
-	
+
 	/**
 	 * @return the conclusion produced by this inference
 	 */
 	public DisjointSubsumer getConclusion() {
 		return this;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return System.identityHashCode(this);
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		return this == o;
@@ -65,15 +64,15 @@ public abstract class AbstractDisjointSubsumerInference
 	public final <O> O accept(Inference.Visitor<O> visitor) {
 		return accept((DisjointSubsumerInference.Visitor<O>) visitor);
 	}
-	
+
 	@Override
 	public final <O> O accept(SaturationInference.Visitor<O> visitor) {
 		return accept((DisjointSubsumerInference.Visitor<O>) visitor);
 	}
-	
+
 	@Override
 	public final <O> O accept(ClassInference.Visitor<O> visitor) {
 		return accept((DisjointSubsumerInference.Visitor<O>) visitor);
-	}	
+	}
 
 }

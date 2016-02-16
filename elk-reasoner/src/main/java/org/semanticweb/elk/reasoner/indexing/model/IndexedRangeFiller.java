@@ -28,12 +28,23 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 
 /**
- * Represents the filler of {@link ElkObjectSomeValuesFrom} that is a range of a
- * property of this {@link ElkObjectSomeValuesFrom}. That is, for
- * ObjectSomeValuesFrom(:R :C), it represents a concept equivalent to
- * ObjectIntersectionOf(C ObjectSomeValuesFrom(ObjectInverseOf(:R) owl:Thing)).
- * Every {@link ElkObjectSomeValuesFrom} uniquely corresponds to an
- * {@link IndexedRangeFiller} with the same parameters.
+ * An {@link IndexedContextRoot} constructed from an
+ * {@link IndexedObjectProperty} and an {@link IndexedClassExpression}.<br>
+ * 
+ * Notation:
+ * 
+ * <pre>
+ * C ⊓ ∃R-
+ * </pre>
+ * 
+ * It is logically equivalent to an OWL class expression
+ * {@code ObjectIntersectionOf(C ObjectSomeValuesFrom(ObjectInverseOf(R) owl:Thing))}
+ * <br>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getFiller()}<br>
+ * R = {@link #getProperty()}<br>
  * 
  * @see IndexedObjectSomeValuesFrom#getRangeFiller()
  * 

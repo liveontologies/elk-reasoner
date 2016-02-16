@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -100,7 +100,7 @@ public class ComposedClassConclusionVisitor implements
 	}
 
 	@Override
-	public Boolean visit(Contradiction conclusion) {
+	public Boolean visit(ClassInconsistency conclusion) {
 		for (int i = 0; i < visitors_.length; i++) {
 			if (!visitors_[i].visit(conclusion))
 				return false;

@@ -36,8 +36,26 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 
 /**
- * A {@link BackwardLink} obtained by composing a {@link BackwardLink} and
- * {@link ForwardLink} using {@link SubPropertyChain} premises.
+ * A {@link ClassInference} producing a {@link BackwardLink} from a
+ * {@link BackwardLink}, {@link SubPropertyChain}, {@link ForwardLink},
+ * {@link SubPropertyChain}, and a {@link IndexedSubObjectPropertyOfAxiom}:<br>
+ * 
+ * <pre>
+ *   (1)             (2)       (3)           (4)         (5)
+ *  C ⊑ <∃R1>.[D]  R1 ⊑ R2  [D] ⊑ <∃P1>.E  P1 ⊑ P2  [R2P2 ⊑ R]
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *                      C ⊑ <∃R>.[E]
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getPremiseSource()} = {@link #getConclusionSource()}<br>
+ * R1 = {@link #getPremiseBackwardRelation()}<br>
+ * D = {@link #getOrigin()}<br>
+ * P1 = {@link #getPremiseForwardChain()}<br>
+ * E = {@link #getPremiseTarget()} = {@link #getDestination()}<br>
+ * R2P2 = {@link #getComposition()} (from which R2 and P2 can be obtained)<br>
+ * R = {@link #getConclusionRelation()}<br>
  * 
  * @author "Yevgeny Kazakov"
  */
@@ -78,6 +96,11 @@ public class BackwardLinkComposition extends AbstractBackwardLinkInference
 	}
 
 	@Override
+	public IndexedContextRoot getPremiseSource() {
+		return getConclusionSource();
+	}
+
+	@Override
 	public IndexedObjectProperty getPremiseBackwardRelation() {
 		return backwardRelation_;
 	}
@@ -88,8 +111,21 @@ public class BackwardLinkComposition extends AbstractBackwardLinkInference
 	}
 
 	@Override
+	public IndexedContextRoot getPremiseTarget() {
+		return getDestination();
+	}
+
+	@Override
 	public IndexedComplexPropertyChain getComposition() {
 		return composition_;
+	}
+
+	public IndexedContextRoot getConclusionSource() {
+		return getSource();
+	}
+
+	public IndexedObjectProperty getConclusionRelation() {
+		return getRelation();
 	}
 
 	/**
@@ -147,7 +183,9 @@ public class BackwardLinkComposition extends AbstractBackwardLinkInference
 	 * Visitor pattern for instances
 	 * 
 	 * @author Yevgeny Kazakov
-	 *
+	 * 
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
 

@@ -27,11 +27,24 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 
 /**
- * Represents occurrences of an {@link ElkSubObjectPropertyOfAxiom} in an
- * ontology.
+ * An {@link IndexedAxiom} constructed from an {@link IndexedPropertyChain} and
+ * an {@link IndexedObjectProperty}.<br>
+ * 
+ * Notation:
+ * 
+ * <pre>
+ * [P ⊑ R]
+ * </pre>
+ * 
+ * It is logically equivalent to the OWL axiom {@code SubObjectPropertyOf(P R)}
+ * <br>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * P = {@link #getSubPropertyChain()}<br>
+ * R = {@link #getSuperProperty()}<br>
  * 
  * @author "Yevgeny Kazakov"
- *
  */
 public interface IndexedSubObjectPropertyOfAxiom extends IndexedAxiom {
 

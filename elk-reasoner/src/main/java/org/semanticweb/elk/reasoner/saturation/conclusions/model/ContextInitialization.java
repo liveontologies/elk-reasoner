@@ -1,14 +1,12 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.model;
 
-import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +22,24 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 
 /**
- * A {@code Conclusion} indicating that the {@link Context} corresponding to the
- * root should be initialized.
+ * A special {@link ClassConclusion} that is used to initialize inferences for
+ * {@link ClassConclusion}s associated with the concept represented by
+ * {@link #getDestination()}.<br>
+ * 
+ * Notation:
+ * 
+ * <pre>
+ * ![C]
+ * </pre>
+ * 
+ * The axiom has no logical meaning (equivalent to a tautology)<br>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getDestination()}<br>
  * 
  * @author "Yevgeny Kazakov"
  */

@@ -35,6 +35,9 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  *         pavel.klinov@uni-ulm.de
  * 
  * @author Yevgeny Kazakov
+ * 
+ * @param <O>
+ *            the type of the output
  */
 public class DummyClassInferenceVisitor<O>
 		implements
@@ -83,22 +86,22 @@ public class DummyClassInferenceVisitor<O>
 	}
 
 	@Override
-	public O visit(ContradictionOfDisjointSubsumers inference) {
+	public O visit(ClassInconsistencyOfDisjointSubsumers inference) {
 		return defaultVisit(inference);
 	}
 
 	@Override
-	public O visit(ContradictionOfObjectComplementOf inference) {
+	public O visit(ClassInconsistencyOfObjectComplementOf inference) {
 		return defaultVisit(inference);
 	}
 
 	@Override
-	public O visit(ContradictionOfOwlNothing inference) {
+	public O visit(ClassInconsistencyOfOwlNothing inference) {
 		return defaultVisit(inference);
 	}
 
 	@Override
-	public O visit(ContradictionPropagated inference) {
+	public O visit(ClassInconsistencyPropagated inference) {
 		return defaultVisit(inference);
 	}
 

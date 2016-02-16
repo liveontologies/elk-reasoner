@@ -30,20 +30,24 @@ import org.semanticweb.elk.reasoner.tracing.Conclusion;
 import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
-public abstract class AbstractSubClassInclusionDecomposedInference
+abstract class AbstractSubClassInclusionDecomposedInference
 		extends
 			SubClassInclusionDecomposedImpl
 		implements
 			SubClassInclusionDecomposedInference {
 
 	static Conclusion.Factory FACTORY = ConclusionBaseFactory.getInstance();
-	
+
 	public AbstractSubClassInclusionDecomposedInference(
 			IndexedContextRoot subExpression,
 			IndexedClassExpression superExpression) {
 		super(subExpression, superExpression);
 	}
 
+	public IndexedClassExpression getConclusionSubsumer() {
+		return getSubsumer();
+	}
+	
 	@Override
 	public SubClassInclusionDecomposed getConclusion() {
 		return this;

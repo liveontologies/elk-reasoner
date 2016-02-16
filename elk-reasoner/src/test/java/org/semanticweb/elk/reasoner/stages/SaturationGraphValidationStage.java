@@ -47,7 +47,7 @@ import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -339,7 +339,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		@Override
 		public Void visit(ContradictionPropagationRule rule,
-				Contradiction premise, ContextPremises premises,
+				ClassInconsistency premise, ContextPremises premises,
 				ClassInferenceProducer producer) {
 			// nothing is stored in the rule
 			return null;

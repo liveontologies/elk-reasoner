@@ -116,7 +116,7 @@ public class ComposedClassInferenceVisitor
 	}
 
 	@Override
-	public Boolean visit(ContradictionOfDisjointSubsumers inference) {
+	public Boolean visit(ClassInconsistencyOfDisjointSubsumers inference) {
 		for (int i = 0; i < visitors_.length; i++) {
 			if (!visitors_[i].visit(inference))
 				return false;
@@ -125,7 +125,7 @@ public class ComposedClassInferenceVisitor
 	}
 
 	@Override
-	public Boolean visit(ContradictionOfObjectComplementOf inference) {
+	public Boolean visit(ClassInconsistencyOfObjectComplementOf inference) {
 		for (int i = 0; i < visitors_.length; i++) {
 			if (!visitors_[i].visit(inference))
 				return false;
@@ -134,7 +134,7 @@ public class ComposedClassInferenceVisitor
 	}
 
 	@Override
-	public Boolean visit(ContradictionOfOwlNothing inference) {
+	public Boolean visit(ClassInconsistencyOfOwlNothing inference) {
 		for (int i = 0; i < visitors_.length; i++) {
 			if (!visitors_[i].visit(inference))
 				return false;
@@ -143,7 +143,7 @@ public class ComposedClassInferenceVisitor
 	}
 
 	@Override
-	public Boolean visit(ContradictionPropagated inference) {
+	public Boolean visit(ClassInconsistencyPropagated inference) {
 		for (int i = 0; i < visitors_.length; i++) {
 			if (!visitors_[i].visit(inference))
 				return false;

@@ -26,14 +26,21 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 
 /**
- * Represents occurrences of an {@link ElkClass} or an {@link ElkIndividual} in
- * an ontology.
+ * An {@link IndexedClassExpression} that corresponds to an {@link ElkClass} or
+ * an {@link ElkIndividual}, which can be obtained by {@link #getElkEntity()}.
+ * 
+ * Notation:
+ * 
+ * <pre>
+ * A
+ * </pre>
  * 
  * @author "Yevgeny Kazakov"
- * 
  */
-public interface IndexedClassEntity extends IndexedClassExpression,
-		IndexedEntity {
+public interface IndexedClassEntity
+		extends
+			IndexedClassExpression,
+			IndexedEntity {
 
 	/**
 	 * The visitor pattern for instances
@@ -51,7 +58,7 @@ public interface IndexedClassEntity extends IndexedClassExpression,
 		// combined interface
 
 	}
-	
+
 	<O> O accept(Visitor<O> visitor);
 
 }

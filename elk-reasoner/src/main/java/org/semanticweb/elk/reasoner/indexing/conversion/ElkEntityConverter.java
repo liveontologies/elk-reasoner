@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.conversion;
 
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
+
 /*
  * #%L
  * ELK Reasoner

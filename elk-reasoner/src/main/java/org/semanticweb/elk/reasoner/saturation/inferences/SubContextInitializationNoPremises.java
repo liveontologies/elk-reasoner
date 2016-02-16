@@ -30,7 +30,19 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
 
 /**
- * An inference producing {@link SubContextInitialization} from no premises.
+ * A {@link SubContextInitializationInference} that produces a
+ * {@link SubContextInitialization} from no premises:<br>
+ * 
+ * <pre>
+ * 
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *  ![C:R]
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getDestination()}<br>
+ * R = {@link #getSubDestination()}
  * 
  * @author "Yevgeny Kazakov"
  */
@@ -74,6 +86,8 @@ public class SubContextInitializationNoPremises
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
 

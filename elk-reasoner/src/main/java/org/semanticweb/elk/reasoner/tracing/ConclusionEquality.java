@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -105,10 +105,10 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 	}
 
 	@Override
-	public Boolean visit(final Contradiction conclusion) {
+	public Boolean visit(final ClassInconsistency conclusion) {
 		return other_.accept(new DefaultConclusionVisitor() {
 			@Override
-			public Boolean visit(Contradiction other) {
+			public Boolean visit(ClassInconsistency other) {
 				return equals(other.getDestination(),
 						conclusion.getDestination());
 			}

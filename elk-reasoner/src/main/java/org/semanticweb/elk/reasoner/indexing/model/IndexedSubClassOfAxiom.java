@@ -27,10 +27,23 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 
 /**
- * Represents occurrences of an {@link ElkSubClassOfAxiom} in an ontology.
+ * An {@link IndexedAxiom} constructed from two {@link IndexedClassExpression}s.
+ * <br>
+ * 
+ * Notation:
+ * 
+ * <pre>
+ * [C ⊑ D]
+ * </pre>
+ * 
+ * It is logically equivalent to the OWL axiom {@code SubClassOf(C D)}<br>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getSubClass()}<br>
+ * R = {@link #getSuperClass()}<br>
  * 
  * @author "Yevgeny Kazakov"
- *
  */
 public interface IndexedSubClassOfAxiom extends IndexedAxiom {
 
@@ -51,7 +64,7 @@ public interface IndexedSubClassOfAxiom extends IndexedAxiom {
 	 * @see IndexedSubClassOfAxiom#getSuperClass()
 	 */
 	IndexedClassExpression getSuperClass();
-	
+
 	/**
 	 * A factory for creating instances
 	 * 
@@ -65,7 +78,7 @@ public interface IndexedSubClassOfAxiom extends IndexedAxiom {
 				IndexedClassExpression superClass);
 
 	}
-	
+
 	/**
 	 * The visitor pattern for instances
 	 * 
@@ -79,5 +92,5 @@ public interface IndexedSubClassOfAxiom extends IndexedAxiom {
 		O visit(IndexedSubClassOfAxiom axiom);
 
 	}
-	
+
 }

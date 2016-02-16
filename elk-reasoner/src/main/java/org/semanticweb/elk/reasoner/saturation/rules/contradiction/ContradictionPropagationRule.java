@@ -27,15 +27,15 @@ import java.util.Map;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionPropagated;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyPropagated;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 
 /**
- * A {@link ContradictionRule} applied when processing {@link Contradiction}
- * producing {@link Contradiction} in all contexts linked by non-reflexive
+ * A {@link ContradictionRule} applied when processing {@link ClassInconsistency}
+ * producing {@link ClassInconsistency} in all contexts linked by non-reflexive
  * {@link BackwardLink}s in the {@code ContextPremises} (i.e.,
  * {@link BackwardLink}s such that {@link BackwardLink#getTraceRoot()} is
  * different from {@link ContextPremises#getRoot()}.
@@ -63,7 +63,7 @@ public class ContradictionPropagationRule extends AbstractContradictionRule {
 	}
 
 	@Override
-	public void apply(Contradiction premise, ContextPremises premises,
+	public void apply(ClassInconsistency premise, ContextPremises premises,
 			ClassInferenceProducer producer) {
 		final Map<IndexedObjectProperty, ? extends SubContextPremises> subPremises = premises
 				.getSubContextPremisesByObjectProperty();
@@ -72,7 +72,7 @@ public class ContradictionPropagationRule extends AbstractContradictionRule {
 			for (IndexedContextRoot target : subPremises.get(propRelation)
 					.getLinkedRoots()) {
 				// producer.produce(target, premise);
-				producer.produce(new ContradictionPropagated(
+				producer.produce(new ClassInconsistencyPropagated(
 						premises.getRoot(), propRelation, target));
 			}
 		}
@@ -85,7 +85,7 @@ public class ContradictionPropagationRule extends AbstractContradictionRule {
 
 	@Override
 	public void accept(ContradictionRuleVisitor<?> visitor,
-			Contradiction premise, ContextPremises premises,
+			ClassInconsistency premise, ContextPremises premises,
 			ClassInferenceProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}

@@ -33,9 +33,21 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedRangeFiller;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 
+// TODO: split on two inferences
 /**
- * {@link SubClassInclusionDecomposed} representing a tautology {@code C ⊑ C}
- * obtained from no premises.
+ * A {@link ClassInference} producing a {@link SubClassInclusionDecomposed} from
+ * {@link ContextInitialization}:<br>
+ * 
+ * <pre>
+ *   ![C]
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *  [C] ⊑ C
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getOrigin()} = {@link #getDestination()} =
+ * {@link #getConclusionSubsumer()}<br>
  * 
  * @author Pavel Klinov
  * 
@@ -72,7 +84,7 @@ public class SubClassInclusionTautology
 	public IndexedContextRoot getOrigin() {
 		return getDestination();
 	}
-	
+
 	public ContextInitialization getPremise() {
 		return FACTORY.getContextInitialization(getOrigin());
 	}
@@ -93,6 +105,8 @@ public class SubClassInclusionTautology
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
 

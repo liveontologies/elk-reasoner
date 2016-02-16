@@ -30,12 +30,26 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 
+// TODO: split on two inferences
 /**
- * A {@link ForwardLink} obtained from a {@link SubClassInclusionDecomposed}
- * with {@link IndexedObjectSomeValuesFrom} super-class.
+ * A {@link ClassInference} producing a {@link ForwardLink} from a
+ * {@link SubClassInclusionDecomposed} with
+ * {@link SubClassInclusionDecomposed#getSubsumer()} of the type
+ * {@link IndexedObjectSomeValuesFrom}:<br>
+ * 
+ * <pre>
+ *    [C] ⊑ -∃R.D
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *  [C] ⊑ <∃R>.(D ⊓ ∃R-)
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getOrigin()} = {@link #getDestination()} <br>
+ * ∃R.D = {@link #getDecomposedExistential()} (from which R and D can be
+ * obtained)<br>
  * 
  * @author "Yevgeny Kazakov"
- * 
  */
 public class ForwardLinkOfObjectSomeValuesFrom extends AbstractClassInference
 		implements
@@ -92,6 +106,8 @@ public class ForwardLinkOfObjectSomeValuesFrom extends AbstractClassInference
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
 

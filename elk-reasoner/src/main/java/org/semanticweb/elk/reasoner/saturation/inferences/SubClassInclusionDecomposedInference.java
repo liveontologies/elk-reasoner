@@ -24,6 +24,12 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * #L%
  */
 
+/**
+ * A {@link SubClassInclusionInference} that produces
+ * {@link SubClassInclusionDecomposed} conclusions
+ * 
+ * @author Yevgeny Kazakov
+ */
 public interface SubClassInclusionDecomposedInference
 		extends
 			SubClassInclusionInference {
@@ -41,6 +47,8 @@ public interface SubClassInclusionDecomposedInference
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O>
 			extends

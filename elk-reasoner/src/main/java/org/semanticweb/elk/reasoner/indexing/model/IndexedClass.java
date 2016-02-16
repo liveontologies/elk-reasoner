@@ -27,11 +27,20 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 
 /**
- * Represents occurrences of an {@link ElkClass} in an ontology.
+ * An {@link IndexedClassExpression} constructed form an {@link ElkClass}.<br>
+ * 
+ * Notation:
+ * 
+ * <pre>
+ * A
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * A = {@link #getElkEntity()}<br>
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
- * 
  */
 public interface IndexedClass extends IndexedClassEntity {
 

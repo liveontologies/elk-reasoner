@@ -26,11 +26,25 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
  */
 
 /**
- * A {@link SubClassInclusion} created by decomposition rules.
+ * A {@link SubClassInclusion} in which super-class was obtained as a part of
+ * another class expression.<br>
+ * 
+ * Notation:
+ * 
+ * <pre>
+ * [C] ⊑ -D
+ * </pre>
+ * 
+ * It is logically equivalent to axiom {@code SubClassInclusion(C D)}<br>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getDestination()}<br>
+ * D = {@link #getSubsumer()}<br>
+ * 
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
- * 
  */
 public interface SubClassInclusionDecomposed extends SubClassInclusion {
 

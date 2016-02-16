@@ -28,13 +28,20 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectIntersectionOf;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 
 /**
- * A {@link SubClassInclusionDecomposed} obtained from a
- * {@link SubClassInclusionDecomposed} in which the super-class is an
- * {@link IndexedObjectIntersectionOf} containing the super-class of the
- * conclusion as one of its conjuncts.
+ * A {@link ClassInference} producing a {@link SubClassInclusionDecomposed} from
+ * a {@link SubClassInclusionDecomposed} with
+ * {@link SubClassInclusionComposed#getSubsumer()} instance of
+ * {@link IndexedObjectIntersectionOf}:<br>
+ * 
+ * <pre>
+ *  [C] ⊑ -(D1 ⊓ D2)
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ D = D1 or D = D2
+ *      [C] ⊑ -D
+ * </pre>
  * 
  * @see IndexedObjectIntersectionOf#getFirstConjunct()
  * @see IndexedObjectIntersectionOf#getSecondConjunct()
@@ -58,6 +65,10 @@ public abstract class SubClassInclusionDecomposedConjunct
 		conjunction_ = premiseSubsumer;
 	}
 
+	public IndexedObjectIntersectionOf getConjunction() {
+		return conjunction_;
+	}
+	
 	public SubClassInclusionDecomposed getPremise() {
 		return FACTORY.getSubClassInclusionDecomposed(getOrigin(),
 				conjunction_);

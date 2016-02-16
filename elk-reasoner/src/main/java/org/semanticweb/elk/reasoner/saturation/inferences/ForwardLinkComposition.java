@@ -34,8 +34,26 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 
 /**
- * A {@link ForwardLink} obtained by composing a {@link BackwardLink} and
- * {@link ForwardLink} using {@link SubPropertyChain} premises.
+ * A {@link ClassInference} producing a {@link ForwardLink} from a
+ * {@link BackwardLink}, {@link SubPropertyChain}, {@link ForwardLink}, and a
+ * {@link SubPropertyChain}:<br>
+ * 
+ * <pre>
+ *   (1)             (2)       (3)           (4)
+ *  C ⊑ <∃R1>.[D]  R1 ⊑ R2  [D] ⊑ <∃P1>.E  P1 ⊑ P2
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *                  [C] ⊑ <∃R2P2>.E
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getPremiseSource()} = {@link #getDestination()}<br>
+ * R1 = {@link #getPremiseBackwardRelation()}<br>
+ * D = {@link #getOrigin()}<br>
+ * P1 = {@link #getPremiseForwardChain()}<br>
+ * E = {@link #getPremiseTarget()}<br>
+ * R2P2 = {@link #getComposition()} = {@link #getRelation()} (from which R2 and
+ * P2 can be obtained)<br>
  * 
  * @author "Yevgeny Kazakov"
  */
@@ -63,6 +81,11 @@ public class ForwardLinkComposition
 	}
 
 	@Override
+	public IndexedContextRoot getPremiseSource() {
+		return getDestination();
+	}
+
+	@Override
 	public IndexedObjectProperty getPremiseBackwardRelation() {
 		return backwardRelation_;
 	}
@@ -70,6 +93,11 @@ public class ForwardLinkComposition
 	@Override
 	public IndexedPropertyChain getPremiseForwardChain() {
 		return forwardChain_;
+	}
+
+	@Override
+	public IndexedContextRoot getPremiseTarget() {
+		return getTarget();
 	}
 
 	@Override
@@ -125,6 +153,8 @@ public class ForwardLinkComposition
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
 

@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -52,7 +52,7 @@ public class ClassConclusionCounter {
 	long countContextInitialization;
 
 	/**
-	 * counter for {@link Contradiction}
+	 * counter for {@link ClassInconsistency}
 	 */
 	long countContradiction;
 

@@ -116,9 +116,10 @@ public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				IndexedObjectSomeValuesFrom existential) {
 			SaturatedPropertyChain propertySaturation = existential
 					.getProperty().getSaturated();
-			if (propertySaturation.getRanges().isEmpty())
+			if (propertySaturation.getRanges().isEmpty()) {
 				// filler is sufficient
 				return existential.getFiller();
+			}	
 			// else we also need to take the property into account
 			return existential.getRangeFiller();
 		}

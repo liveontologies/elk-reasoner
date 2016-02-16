@@ -27,10 +27,24 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 
 /**
- * A {@code ClassConclusion} representing a derived subclass axiom between the
- * class expression represented by {@link #getDestination()} and the class
- * expression represented by the member of {@link #getDisjointExpressions()} at
- * the position {@link #getPosition()}.
+ * A {@link ClassConclusion} representing a concept inclusion and a concept
+ * disjointness axiom.<br>
+ * 
+ * Notation:
+ * 
+ * <pre>
+ * [C] ⊑ D|L   where L is a list of concepts containing D
+ * </pre>
+ * 
+ * It is logically equivalent to axioms {@code SubClassOf(C D)} and
+ * {@code DisjointClasses(L)}<br>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getDestination()}<br>
+ * L = {@link #getDisjointExpressions()}<br>
+ * D = {@link #getPosition()} returns the position of D in
+ * {@link IndexedClassExpressionList#getElements()} for L<br>
  * 
  * @see IndexedClassExpressionList#getElements()
  * 

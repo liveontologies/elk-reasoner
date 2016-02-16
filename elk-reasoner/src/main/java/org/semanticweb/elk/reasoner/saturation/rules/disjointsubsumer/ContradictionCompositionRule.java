@@ -25,15 +25,15 @@ package org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfDisjointSubsumers;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfDisjointSubsumers;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 
 /**
  * A {@link DisjointSubsumerRule} applied when processing a
- * {@link DisjointSubsumer} producing {@link Contradiction} caused by violation
+ * {@link DisjointSubsumer} producing {@link ClassInconsistency} caused by violation
  * of disjointness constrains of this {@link DisjointSubsumer}
  * 
  * @author "Yevgeny Kazakov"
@@ -59,7 +59,7 @@ public class ContradictionCompositionRule extends AbstractDisjointSubsumerRule {
 			int lastPos = premise.getPosition();
 			for (int otherPos : disjointSubsumerPositions) {
 				if (otherPos != lastPos) {
-					producer.produce(new ContradictionOfDisjointSubsumers(
+					producer.produce(new ClassInconsistencyOfDisjointSubsumers(
 							premise, otherPos));
 				}
 			}

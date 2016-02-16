@@ -8,7 +8,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -69,7 +69,7 @@ public class ConclusionPrinter implements Conclusion.Visitor<String> {
 	}
 
 	@Override
-	public String visit(Contradiction conclusion) {
+	public String visit(ClassInconsistency conclusion) {
 		return "Contradiction(" + conclusion.getDestination() + ")";
 	}
 

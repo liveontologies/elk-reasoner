@@ -33,9 +33,21 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 
 /**
- * A {@link SubClassInclusionDecomposed} obtained from a
- * {@link SubClassInclusionComposed} by unfolding a super-class under an
- * {@link IndexedSubClassOfAxiom}.
+ * A {@link ClassInference} producing a {@link SubClassInclusionDecomposed} from
+ * a {@link SubClassInclusionComposed} and {@link IndexedSubClassOfAxiom}:<br>
+ * 
+ * <pre>
+ *     (1)      (2)
+ *  [C] ⊑ +D  [D ⊑ E]
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *      [C] ⊑ -E
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getOrigin()} = {@link #getDestination()}<br>
+ * D = {@link #getPremiseSubsumer()}<br>
+ * E = {@link #getConclusionSubsumer()}<br>
  * 
  * @author Pavel Klinov
  * 
@@ -98,11 +110,13 @@ public class SubClassInclusionExpandedSubClassOf
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
-		
+
 		public O visit(SubClassInclusionExpandedSubClassOf inference);
-		
+
 	}
-	
+
 }

@@ -29,7 +29,18 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 
 /**
- * An inference producing {@link ContextInitialization} from no premises.
+ * A {@link ClassInference} producing a {@link ContextInitialization} conclusion
+ * from no premises:<br>
+ * 
+ * <pre>
+ * 
+ * ⎯⎯⎯⎯⎯⎯⎯⎯
+ *  ![C]
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getDestination()}<br>
  * 
  * @author "Yevgeny Kazakov"
  */
@@ -67,6 +78,8 @@ public class ContextInitializationNoPremises
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
 

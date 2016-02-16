@@ -30,13 +30,13 @@ import org.semanticweb.elk.reasoner.tracing.Conclusion;
 import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
-public abstract class AbstractForwardLinkInference<R extends IndexedPropertyChain>
+abstract class AbstractForwardLinkInference<R extends IndexedPropertyChain>
 		extends
 			ForwardLinkImpl<R>
 		implements ForwardLinkInference {
 
 	static Conclusion.Factory FACTORY = ConclusionBaseFactory.getInstance();
-	
+
 	public AbstractForwardLinkInference(IndexedContextRoot root, R relation,
 			IndexedContextRoot target) {
 		super(root, relation, target);

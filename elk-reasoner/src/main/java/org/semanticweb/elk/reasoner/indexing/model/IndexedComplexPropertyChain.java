@@ -26,12 +26,25 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 
 /**
- * Represents occurrences of an {@link ElkObjectPropertyChain} consisting of two
- * or more {@link ElkObjectProperty}.
+ * An {@link IndexedPropertyChain} constructed from an
+ * {@link IndexedObjectProperty} and another {@link IndexedPropertyChain}.<br>
+ * 
+ * Notation:
+ * 
+ * <pre>
+ * R∙P
+ * </pre>
+ * 
+ * It is logically equivalent to the OWL sub-property expression
+ * {@code ObjectPropertyChain(R P)}<br>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * R = {@link #getFirstProperty()}<br>
+ * P = {@link #getSuffixChain()}<br>
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
- * 
  */
 public interface IndexedComplexPropertyChain extends IndexedPropertyChain {
 
@@ -52,7 +65,7 @@ public interface IndexedComplexPropertyChain extends IndexedPropertyChain {
 	 * @see ElkObjectPropertyChain#getObjectPropertyExpressions()
 	 */
 	IndexedPropertyChain getSuffixChain();
-	
+
 	/**
 	 * The visitor pattern for instances
 	 * 

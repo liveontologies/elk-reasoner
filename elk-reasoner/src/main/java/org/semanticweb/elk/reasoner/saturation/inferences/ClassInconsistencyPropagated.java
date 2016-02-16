@@ -28,37 +28,57 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 
 /**
- * A {@link Contradiction} obtained by propagation of a {@link Contradiction}
- * over a {@link BackwardLink}.
+ * A {@link ClassInference} producing a {@link ClassInconsistency} from a
+ * {@link BackwardLink} and another {@link ClassInconsistency}:<br>
+ * 
+ * <pre>
+ *   (1)             (2)
+ *  C ⊑ <∃R>.[D]  [D] ⊑ 0  
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *        [C] ⊑ 0
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getDestination()}<br>
+ * R = {@link #getPremiseRelation()}<br>
+ * D = {@link #getOrigin()}<br>
  * 
  * @author Pavel Klinov
  *
  *         pavel.klinov@uni-ulm.de
+ * @author Yevgeny Kazakov
  */
-public class ContradictionPropagated extends AbstractContradictionInference {
+public class ClassInconsistencyPropagated
+		extends
+			AbstractClassInconsistencyInference {
+
+	private final IndexedContextRoot origin_;
 
 	private final IndexedObjectProperty premiseRelation_;
 
-	private final IndexedContextRoot inferenceRoot_;
-
-	public ContradictionPropagated(IndexedContextRoot inferenceRoot,
-			IndexedObjectProperty relation, IndexedContextRoot conclusionRoot) {
-		super(conclusionRoot);
+	public ClassInconsistencyPropagated(IndexedContextRoot origin,
+			IndexedObjectProperty relation, IndexedContextRoot destination) {
+		super(destination);
 		premiseRelation_ = relation;
-		inferenceRoot_ = inferenceRoot;
+		origin_ = origin;
 	}
 
-	public ContradictionPropagated(BackwardLink premise) {
+	public ClassInconsistencyPropagated(BackwardLink premise) {
 		this(premise.getDestination(), premise.getRelation(),
 				premise.getTraceRoot());
 	}
 
 	@Override
 	public IndexedContextRoot getOrigin() {
-		return inferenceRoot_;
+		return origin_;
+	}
+
+	public IndexedObjectProperty getPremiseRelation() {
+		return premiseRelation_;
 	}
 
 	public BackwardLink getFirstPremise() {
@@ -66,18 +86,18 @@ public class ContradictionPropagated extends AbstractContradictionInference {
 				getDestination());
 	}
 
-	public Contradiction getSecondPremise() {
+	public ClassInconsistency getSecondPremise() {
 		return FACTORY.getContradiction(getOrigin());
 	}
 
 	@Override
 	public String toString() {
-		return "Propagated contradiction" + premiseRelation_ + "<-"
-				+ inferenceRoot_;
+		return "Propagated ClassInconsistency" + premiseRelation_ + "<-"
+				+ origin_;
 	}
 
 	@Override
-	public final <O> O accept(ContradictionInference.Visitor<O> visitor) {
+	public final <O> O accept(ClassInconsistencyInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
@@ -86,10 +106,12 @@ public class ContradictionPropagated extends AbstractContradictionInference {
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
 
-		public O visit(ContradictionPropagated inference);
+		public O visit(ClassInconsistencyPropagated inference);
 
 	}
 

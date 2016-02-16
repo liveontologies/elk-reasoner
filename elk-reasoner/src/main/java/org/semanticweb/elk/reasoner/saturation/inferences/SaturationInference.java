@@ -24,12 +24,10 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.tracing.Conclusion;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
 /**
- * A {@link SaturationConclusion} obtained by an inference rule from other
- * {@link Conclusion}s
+ * An {@link Inference} that produces {@link SaturationConclusion}s
  * 
  * @author Yevgeny Kazakov
  *
@@ -43,6 +41,8 @@ public interface SaturationInference extends Inference {
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O>
 			extends

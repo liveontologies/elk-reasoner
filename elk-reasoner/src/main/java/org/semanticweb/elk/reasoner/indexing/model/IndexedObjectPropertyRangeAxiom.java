@@ -26,11 +26,24 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
 
 /**
- * Represents occurrences of an {@link ElkObjectPropertyRangeAxiom} in an
- * ontology.
+ * An {@link IndexedAxiom} constructed from an {@link IndexedObjectProperty} and
+ * {@link IndexedClassExpression}.<br>
+ * 
+ * Notation:
+ * 
+ * <pre>
+ * [Range(R,C)]
+ * </pre>
+ * 
+ * It is logically equivalent to the OWL axiom {@code ObjectPropertyRange(R C)}
+ * <br>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * R = {@link #getProperty()}<br>
+ * D = {@link #getRange()}<br>
  * 
  * @author "Yevgeny Kazakov"
- *
  */
 public interface IndexedObjectPropertyRangeAxiom extends IndexedAxiom {
 
@@ -51,7 +64,7 @@ public interface IndexedObjectPropertyRangeAxiom extends IndexedAxiom {
 	 * @see ElkObjectPropertyRangeAxiom#getRange()
 	 */
 	IndexedClassExpression getRange();
-	
+
 	/**
 	 * A factory for creating instances
 	 * 
@@ -65,7 +78,7 @@ public interface IndexedObjectPropertyRangeAxiom extends IndexedAxiom {
 				IndexedClassExpression range);
 
 	}
-	
+
 	/**
 	 * The visitor pattern for instances
 	 * 

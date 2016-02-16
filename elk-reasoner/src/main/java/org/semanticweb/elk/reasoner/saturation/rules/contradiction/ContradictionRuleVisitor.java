@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.contradiction;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 
@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
  */
 public interface ContradictionRuleVisitor<O> {
 
-	O visit(ContradictionPropagationRule rule, Contradiction premise,
+	O visit(ContradictionPropagationRule rule, ClassInconsistency premise,
 			ContextPremises premises, ClassInferenceProducer producer);
 
 }

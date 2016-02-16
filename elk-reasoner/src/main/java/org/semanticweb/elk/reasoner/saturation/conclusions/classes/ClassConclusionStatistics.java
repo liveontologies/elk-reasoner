@@ -2,7 +2,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -147,7 +147,7 @@ public class ClassConclusionStatistics extends AbstractStatistics {
 				conclusionCounts_.countContextInitialization,
 				conclusionProcessingTimer_.timeContextInitializations);
 
-		print(printer, Contradiction.NAME, inferenceCounts_.countContradiction,
+		print(printer, ClassInconsistency.NAME, inferenceCounts_.countContradiction,
 				conclusionCounts_.countContradiction,
 				conclusionProcessingTimer_.timeContradictions);
 

@@ -24,13 +24,13 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectComplementOf;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfObjectComplementOf;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfObjectComplementOf;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 
 /**
- * A {@link SubsumerDecompositionRule} producing {@link Contradiction} when
+ * A {@link SubsumerDecompositionRule} producing {@link ClassInconsistency} when
  * processing the {@link IndexedObjectComplementOf} which negation
  * {@link IndexedClassExpression} is contained in the {@code Context}
  * 
@@ -60,7 +60,7 @@ public class IndexedObjectComplementOfDecomposition extends
 	public void apply(IndexedObjectComplementOf premise,
 			ContextPremises premises, ClassInferenceProducer producer) {
 		if (premises.getComposedSubsumers().contains(premise.getNegated())) {
-			producer.produce(new ContradictionOfObjectComplementOf(premises.getRoot(),
+			producer.produce(new ClassInconsistencyOfObjectComplementOf(premises.getRoot(),
 					premise));
 		}
 	}

@@ -31,15 +31,19 @@ import org.semanticweb.elk.reasoner.tracing.Conclusion;
 import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
-public abstract class AbstractPropagationInference extends PropagationImpl
+abstract class AbstractPropagationInference extends PropagationImpl
 		implements
 			PropagationInference {
 
 	static Conclusion.Factory FACTORY = ConclusionBaseFactory.getInstance();
-	
+
 	public AbstractPropagationInference(IndexedContextRoot root,
 			IndexedObjectProperty relation, IndexedObjectSomeValuesFrom carry) {
 		super(root, relation, carry);
+	}
+
+	public IndexedObjectSomeValuesFrom getConclusionCarry() {
+		return getCarry();
 	}
 
 	/**

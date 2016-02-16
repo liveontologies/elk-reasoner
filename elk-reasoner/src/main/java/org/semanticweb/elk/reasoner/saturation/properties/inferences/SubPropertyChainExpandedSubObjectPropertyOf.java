@@ -32,8 +32,21 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxi
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 
 /**
- * A {@link SubPropertyChain} obtained from a {@link SubPropertyChain} by
- * unfolding a super-property under an {@link IndexedSubObjectPropertyOfAxiom}.
+ * An {@link ObjectPropertyInference} producing a {@link SubPropertyChain} from
+ * a {@link SubPropertyChain} and {@link IndexedSubObjectPropertyOfAxiom}:<br>
+ * 
+ * <pre>
+ *   (1)     (2)
+ *  P ⊑ R  [R ⊑ S]
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *      P ⊑ S
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * P = {@link #getSubChain()}<br>
+ * R = {@link #getPremiseSuperChain()}<br>
+ * S = {@link #getConclusionSuperChain()}<br>
  * 
  * @author Pavel Klinov
  *
@@ -68,6 +81,10 @@ public class SubPropertyChainExpandedSubObjectPropertyOf
 		return middleChain_;
 	}
 
+	public IndexedObjectProperty getConclusionSuperChain() {
+		return (IndexedObjectProperty) getSuperChain();
+	}
+
 	public ElkAxiom getReason() {
 		return this.reason_;
 	}
@@ -91,6 +108,8 @@ public class SubPropertyChainExpandedSubObjectPropertyOf
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
 

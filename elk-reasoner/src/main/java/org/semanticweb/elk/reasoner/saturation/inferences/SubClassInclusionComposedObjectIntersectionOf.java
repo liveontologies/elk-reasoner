@@ -30,9 +30,23 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 
 /**
- * A {@link SubClassInclusionComposed} with {@link IndexedObjectIntersectionOf}
- * super-class obtained from two {@link SubClassInclusionComposed} in which the
- * super-classes are the two corresponding conjunts.
+ * A {@link ClassInference} producing a {@link SubClassInclusionComposed} with
+ * {@link SubClassInclusionComposed#getSubsumer()} instance of
+ * {@link IndexedObjectIntersectionOf} from two
+ * {@link SubClassInclusionComposed} premises:<br>
+ * 
+ * <pre>
+ *     (1)        (2)
+ *  [C] ⊑ +D1  [C] ⊑ +D2
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *    [C] ⊑ +(D1 ⊓ D2)
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getOrigin()} = {@link #getDestination()}<br>
+ * D1 ⊓ D2 = {@link #getConclusionSubsumer()} (from which D1 and D2 can be
+ * obtained)<br>
  * 
  * @see IndexedObjectIntersectionOf#getFirstConjunct()
  * @see IndexedObjectIntersectionOf#getSecondConjunct()
@@ -47,8 +61,6 @@ public class SubClassInclusionComposedObjectIntersectionOf
 		extends
 			AbstractSubClassInclusionComposedInference<IndexedObjectIntersectionOf> {
 
-	/**
-	 */
 	public SubClassInclusionComposedObjectIntersectionOf(
 			IndexedContextRoot inferenceRoot,
 			IndexedObjectIntersectionOf conjunction) {
@@ -80,18 +92,19 @@ public class SubClassInclusionComposedObjectIntersectionOf
 			SubClassInclusionComposedInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	/**
 	 * Visitor pattern for instances
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
-		
-		public O visit(SubClassInclusionComposedObjectIntersectionOf inference);
-		
-	}
 
+		public O visit(SubClassInclusionComposedObjectIntersectionOf inference);
+
+	}
 
 }

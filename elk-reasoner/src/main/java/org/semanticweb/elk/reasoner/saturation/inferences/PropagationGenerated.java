@@ -34,13 +34,23 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextIniti
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 
 /**
- * A {@link Propagation} of a {@link IndexedObjectSomeValuesFrom} carry
- * {@link SubClassInclusionComposed} with the filler super-class and a
- * {@link SubPropertyChain} between the {@link IndexedObjectProperty}
- * propagation relation and the property of the carry.
+ * A {@link ClassInference} producing a {@link Propagation} from a
+ * {@link SubContextInitialization}, {@link SubClassInclusionComposed} with
+ * {@link SubClassInclusionComposed#getSubsumer()} of the type
+ * {@link IndexedObjectSomeValuesFrom}, and a {@link SubPropertyChain}:<br>
  * 
- * @see IndexedObjectSomeValuesFrom#getFiller()
- * @see IndexedObjectSomeValuesFrom#getProperty()
+ * <pre>
+ *   (1)       (2)        (3)
+ *  ![C:R]  [C] ⊑ +∃S.D  R ⊑ S
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *       ∃[R].[C] ⊑ ∃S.D
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getOrigin()} = {@link #getDestination()} <br>
+ * R = {@link #getSubDestination()}<br>
+ * ∃R.D = {@link #getConclusionCarry()} (from which R and D can be obtained)<br>
  * 
  * @author Pavel Klinov
  * 
@@ -51,9 +61,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
 public class PropagationGenerated extends AbstractPropagationInference {
 
 	public PropagationGenerated(IndexedContextRoot inferenceRoot,
-			IndexedObjectProperty superRelation,
+			IndexedObjectProperty subRelation,
 			IndexedObjectSomeValuesFrom carry) {
-		super(inferenceRoot, superRelation, carry);
+		super(inferenceRoot, subRelation, carry);
 	}
 
 	@Override
@@ -65,7 +75,7 @@ public class PropagationGenerated extends AbstractPropagationInference {
 		return FACTORY.getSubContextInitialization(getDestination(),
 				getSubDestination());
 	}
-	
+
 	public SubClassInclusionComposed getSecondPremise() {
 		return FACTORY.getSubClassInclusionComposed(getOrigin(),
 				getCarry().getFiller());
@@ -86,6 +96,8 @@ public class PropagationGenerated extends AbstractPropagationInference {
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
 

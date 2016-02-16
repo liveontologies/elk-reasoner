@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.contradiction;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 abstract class AbstractContradictionRule implements ContradictionRule {
 
 	@Override
-	public void accept(RuleVisitor<?> visitor, Contradiction premise,
+	public void accept(RuleVisitor<?> visitor, ClassInconsistency premise,
 			ContextPremises premises, ClassInferenceProducer producer) {
 		accept((ContradictionRuleVisitor<?>) visitor, premise, premises,
 				producer);

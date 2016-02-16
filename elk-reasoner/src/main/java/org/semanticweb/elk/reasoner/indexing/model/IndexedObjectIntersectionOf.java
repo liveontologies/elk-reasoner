@@ -22,17 +22,26 @@
  */
 package org.semanticweb.elk.reasoner.indexing.model;
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
-
 /**
- * Represents occurrences of an {@link ElkObjectIntersectionOf} in an ontology.
- * An {@link IndexedObjectIntersectionOf} is binary (has exactly two conjuncts).
- * In order to convert an (n-ary) {@link ElkObjectIntersectionOf} to an
- * {@link IndexedObjectIntersectionOf}, conjunctions must be binarized.
+ * An {@link IndexedClassExpression} constructed from two
+ * {@link IndexedClassExpression}s.<br>
+ * 
+ * Notation:
+ * 
+ * <pre>
+ * C ⊓ D
+ * </pre>
+ * 
+ * It is logically equivalent to OWL class expression
+ * {@code ObjectIntersectionOf(C D)} <br>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getFirstConjunct()}<br>
+ * D = {@link #getSecondConjunct()}<br>
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
- * 
  */
 public interface IndexedObjectIntersectionOf extends IndexedClassExpression {
 
@@ -56,9 +65,9 @@ public interface IndexedObjectIntersectionOf extends IndexedClassExpression {
 	 *            the type of the output
 	 */
 	interface Visitor<O> {
-		
+
 		O visit(IndexedObjectIntersectionOf element);
-		
+
 	}
-	
+
 }

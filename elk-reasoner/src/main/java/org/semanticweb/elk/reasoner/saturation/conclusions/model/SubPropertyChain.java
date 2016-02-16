@@ -27,12 +27,22 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 
 /**
- * A {@link ObjectPropertyConclusion} representing a derived sub object property
- * axiom with sub-property expression represented by {@link #getSubChain()} and
- * super-property expression represented by {@link #getSuperChain()}. For
- * example, a {@link SubPropertyChain} with {@link #getSubChain()} =
- * {@code ObjectPropertyChain(:r :s)} and {@link #getSuperChain()} = {@code :h}
- * represents {@code SubObjectProperyOf(ObjectPropertyChain(:r :s) :h)}.
+ * A {@link ObjectPropertyConclusion} representing an inclusion between two
+ * object property (chains).
+ * 
+ * Notation:
+ * 
+ * <pre>
+ * P ⊑ Q
+ * </pre>
+ * 
+ * It is logically equivalent to axiom {@code SubObjectPropertyInclusion(P Q)}
+ * <br>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getSubChain()}<br>
+ * D = {@link #getSuperChain()}<br>
  * 
  * @author Pavel Klinov
  *

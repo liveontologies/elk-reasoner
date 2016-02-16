@@ -53,11 +53,11 @@ import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectHa
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversed;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversedExpanded;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfDisjointSubsumers;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfObjectComplementOf;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfOwlNothing;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyPropagated;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContextInitializationNoPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfDisjointSubsumers;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfObjectComplementOf;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfOwlNothing;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionPropagated;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkComposition;
 import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkOfObjectHasSelf;
@@ -91,6 +91,9 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubProperty
  *         pavel.klinov@uni-ulm.de
  * 
  * @author Yevgeny Kazakov
+ * 
+ * @param <O>
+ *            the type of the output
  */
 public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 
@@ -146,7 +149,7 @@ public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 	}
 
 	@Override
-	public O visit(ContradictionOfDisjointSubsumers inference) {
+	public O visit(ClassInconsistencyOfDisjointSubsumers inference) {
 		conclusionVisitor_.visit(inference.getFirstPremise());
 		conclusionVisitor_.visit(inference.getSecondPremise());
 		conclusionVisitor_.visit(inference.getThirdPremise());
@@ -154,20 +157,20 @@ public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 	}
 
 	@Override
-	public O visit(ContradictionOfObjectComplementOf inference) {
+	public O visit(ClassInconsistencyOfObjectComplementOf inference) {
 		conclusionVisitor_.visit(inference.getFirstPremise());
 		conclusionVisitor_.visit(inference.getSecondPremise());
 		return null;
 	}
 
 	@Override
-	public O visit(ContradictionOfOwlNothing inference) {
+	public O visit(ClassInconsistencyOfOwlNothing inference) {
 		conclusionVisitor_.visit(inference.getPremise());
 		return null;
 	}
 
 	@Override
-	public O visit(ContradictionPropagated inference) {
+	public O visit(ClassInconsistencyPropagated inference) {
 		conclusionVisitor_.visit(inference.getFirstPremise());
 		conclusionVisitor_.visit(inference.getSecondPremise());
 		return null;
@@ -175,7 +178,8 @@ public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 
 	@Override
 	public O visit(DisjointSubsumerFromSubsumer inference) {
-		conclusionVisitor_.visit(inference.getPremise());
+		conclusionVisitor_.visit(inference.getFirstPremise());
+		conclusionVisitor_.visit(inference.getSecondPremise());
 		return null;
 	}
 

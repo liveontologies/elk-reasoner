@@ -30,10 +30,23 @@ import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain
 import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 
 /**
- * Represents occurrences of an {@link ElkObjectHasSelf} in an ontology.
+ * An {@link IndexedClassExpression} constructed from an
+ * {@link IndexedObjectProperty}.<br>
+ * 
+ * Notation:
+ * 
+ * <pre>
+ * ∃R.Self
+ * </pre>
+ * 
+ * It is logically equivalent to OWL class expression {@code ObjectHasSelf(R)}
+ * <br>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * R = {@link #getProperty()}<br>
  * 
  * @author "Yevgeny Kazakov"
- *
  */
 public interface IndexedObjectHasSelf extends IndexedClassExpression {
 
@@ -55,10 +68,10 @@ public interface IndexedObjectHasSelf extends IndexedClassExpression {
 	 *            the type of the output
 	 */
 	interface Visitor<O> {
-		
+
 		O visit(IndexedObjectHasSelf element);
-		
-	}	
+
+	}
 
 	class Helper {
 
@@ -67,12 +80,13 @@ public interface IndexedObjectHasSelf extends IndexedClassExpression {
 				IndexedObjectHasSelf subsumer) {
 			SaturatedPropertyChain propertySaturation = subsumer.getProperty()
 					.getSaturated();
-			if (propertySaturation.getCompositionsByLeftSubProperty().isEmpty()) {
-				producer.produce(new BackwardLinkOfObjectHasSelf(root,
-						subsumer));
+			if (propertySaturation.getCompositionsByLeftSubProperty()
+					.isEmpty()) {
+				producer.produce(
+						new BackwardLinkOfObjectHasSelf(root, subsumer));
 			} else {
-				producer.produce(new ForwardLinkOfObjectHasSelf(root,
-						subsumer));
+				producer.produce(
+						new ForwardLinkOfObjectHasSelf(root, subsumer));
 			}
 		}
 

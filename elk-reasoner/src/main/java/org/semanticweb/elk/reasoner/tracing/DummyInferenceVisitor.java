@@ -31,10 +31,10 @@ import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversed;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversedExpanded;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContextInitializationNoPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfDisjointSubsumers;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfObjectComplementOf;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfOwlNothing;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionPropagated;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfDisjointSubsumers;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfObjectComplementOf;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfOwlNothing;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyPropagated;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkComposition;
 import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkOfObjectHasSelf;
@@ -133,22 +133,22 @@ public class DummyInferenceVisitor<O> implements Inference.Visitor<O> {
 	}
 
 	@Override
-	public O visit(ContradictionOfDisjointSubsumers inference) {
+	public O visit(ClassInconsistencyOfDisjointSubsumers inference) {
 		return defaultVisit(inference);
 	}
 
 	@Override
-	public O visit(ContradictionOfObjectComplementOf inference) {
+	public O visit(ClassInconsistencyOfObjectComplementOf inference) {
 		return defaultVisit(inference);
 	}
 
 	@Override
-	public O visit(ContradictionOfOwlNothing inference) {
+	public O visit(ClassInconsistencyOfOwlNothing inference) {
 		return defaultVisit(inference);
 	}
 
 	@Override
-	public O visit(ContradictionPropagated inference) {
+	public O visit(ClassInconsistencyPropagated inference) {
 		return defaultVisit(inference);
 	}
 

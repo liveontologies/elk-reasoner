@@ -25,7 +25,21 @@ package org.semanticweb.elk.reasoner.indexing.model;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 
 /**
- * Represents occurrences of an {@link ElkObjectComplementOf} in an ontology.
+ * An {@link IndexedClassExpression} constructed from an
+ * {@link IndexedClassExpression}.<br>
+ * 
+ * Notation:
+ * 
+ * <pre>
+ * ¬C
+ * </pre>
+ * 
+ * It is logically equivalent to OWL class expression
+ * {@code ObjectComplementOf(C)} <br>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getNegated()}<br>
  * 
  * @author "Yevgeny Kazakov"
  */
@@ -48,9 +62,9 @@ public interface IndexedObjectComplementOf extends IndexedClassExpression {
 	 *            the type of the output
 	 */
 	interface Visitor<O> {
-		
+
 		O visit(IndexedObjectComplementOf element);
-		
-	}	
+
+	}
 
 }

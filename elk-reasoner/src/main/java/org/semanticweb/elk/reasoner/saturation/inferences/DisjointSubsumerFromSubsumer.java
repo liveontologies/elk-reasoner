@@ -28,16 +28,35 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 
 /**
- * A {@link DisjointSubsumer} obtained from a {@link SubClassInclusionComposed}
- * with the corresponding super-class.
+ * A {@link ClassInference} producing a {@link DisjointSubsumer} from a
+ * {@link SubClassInclusionComposed} and {@link IndexedDisjointClassesAxiom}
+ * such that {@link SubClassInclusionComposed#getSubsumer()} occurs in
+ * {@link IndexedDisjointClassesAxiom#getMembers()}:<br>
+ * 
+ * <pre>
+ *     (1)       (2)
+ *  [C] ⊑ D  [Disjoint(L)]  
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ D ∈ L
+ *        [C] ⊑ D:L
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getDestination()}<br>
+ * L = {@link #getDisjointExpressions()}<br>
+ * D = {@link #getPosition()} gives an index of D in
+ * {@link IndexedClassExpressionList#getElements()} <br>
  * 
  * @author Pavel Klinov
  *
  *         pavel.klinov@uni-ulm.de
+ * 
+ * @author Yevgeny Kazakov
  */
 public class DisjointSubsumerFromSubsumer
 		extends
@@ -54,9 +73,14 @@ public class DisjointSubsumerFromSubsumer
 		return getDestination();
 	}
 
-	public SubClassInclusionComposed getPremise() {
+	public SubClassInclusionComposed getFirstPremise() {
 		return FACTORY.getSubClassInclusionComposed(getOrigin(),
 				getDisjointExpressions().getElements().get(getPosition()));
+	}
+
+	public IndexedDisjointClassesAxiom getSecondPremise() {
+		return FACTORY.getIndexedDisjointClassesAxiom(getReason(),
+				getDisjointExpressions());
 	}
 
 	@Override
@@ -69,6 +93,8 @@ public class DisjointSubsumerFromSubsumer
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
 

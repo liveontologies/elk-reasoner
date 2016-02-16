@@ -27,9 +27,9 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfOwlNothing;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfOwlNothing;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
@@ -37,7 +37,7 @@ import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
- * A {@link ChainableSubsumerRule} producing {@link Contradiction} when
+ * A {@link ChainableSubsumerRule} producing {@link ClassInconsistency} when
  * processing an {@link IndexedClassExpression} that corresponds to
  * {@code owl:Nothing}.
  * 
@@ -82,7 +82,7 @@ public class ContradictionFromOwlNothingRule extends
 	@Override
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ClassInferenceProducer producer) {
-		producer.produce(new ContradictionOfOwlNothing(premises.getRoot(),
+		producer.produce(new ClassInconsistencyOfOwlNothing(premises.getRoot(),
 				(IndexedClass) premise));
 	}
 

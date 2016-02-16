@@ -33,14 +33,23 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 
 /**
- * A {@link SubClassInclusionComposed} with {@link IndexedClass} super-class
- * obtained from a {@link SubClassInclusionComposed} in which the super-class is
- * its definition.
+ * A {@link ClassInference} producing a {@link SubClassInclusionComposed} from a
+ * {@link SubClassInclusionComposed} and {@link IndexedDefinitionAxiom}:<br>
  * 
- * @see IndexedDefinitionAxiom
+ * <pre>
+ *     (1)      (2)
+ *  [C] ⊑ +D  [A = D]
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *      [C] ⊑ +A
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getOrigin()} = {@link #getDestination()}<br>
+ * D = {@link #getDefinition()}<br>
+ * A = {@link #getConclusionSubsumer()}<br>
  * 
  * @author "Yevgeny Kazakov"
- *
  */
 public class SubClassInclusionComposedDefinedClass
 		extends
@@ -50,11 +59,9 @@ public class SubClassInclusionComposedDefinedClass
 
 	private final ElkAxiom reason_;
 
-	/**
-	 */
-	public SubClassInclusionComposedDefinedClass(IndexedContextRoot inferenceRoot,
-			IndexedClass defined, IndexedClassExpression definition,
-			ElkAxiom reason) {
+	public SubClassInclusionComposedDefinedClass(
+			IndexedContextRoot inferenceRoot, IndexedClass defined,
+			IndexedClassExpression definition, ElkAxiom reason) {
 		super(inferenceRoot, defined);
 		this.definition_ = definition;
 		this.reason_ = reason;
@@ -74,8 +81,7 @@ public class SubClassInclusionComposedDefinedClass
 	}
 
 	public SubClassInclusionComposed getFirstPremise() {
-		return FACTORY.getSubClassInclusionComposed(getOrigin(),
-				definition_);
+		return FACTORY.getSubClassInclusionComposed(getOrigin(), definition_);
 	}
 
 	public IndexedDefinitionAxiom getSecondPremise() {
@@ -93,17 +99,19 @@ public class SubClassInclusionComposedDefinedClass
 			SubClassInclusionComposedInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	/**
 	 * Visitor pattern for instances
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
-		
+
 		public O visit(SubClassInclusionComposedDefinedClass inference);
-		
+
 	}
-	
+
 }

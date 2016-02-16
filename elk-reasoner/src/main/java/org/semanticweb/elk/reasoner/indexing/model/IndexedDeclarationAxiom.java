@@ -26,10 +26,23 @@ import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
  */
 
 /**
+ * An {@link IndexedAxiom} constructed from an {@link IndexedEntity}.<br>
+ * 
+ * Notation:
+ * 
+ * <pre>
+ * [Declaration(E)]
+ * </pre>
+ * 
+ * It is logically equivalent to the OWL axiom {@code Declaration(E)} <br>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * E = {@link #getEntity()}<br>
+ * 
  * Represents occurrences of an {@link ElkDeclarationAxiom} in an ontology.
  * 
  * @author "Yevgeny Kazakov"
- * 
  */
 public interface IndexedDeclarationAxiom extends IndexedAxiom {
 

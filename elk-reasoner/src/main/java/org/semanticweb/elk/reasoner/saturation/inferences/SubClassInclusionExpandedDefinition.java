@@ -27,12 +27,27 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 
 /**
- * A {@link SubClassInclusionDecomposed} obtained from a
- * {@link SubClassInclusionDecomposed} in which the super-class
- * {@link IndexedClass} is defined using the super-class of this conclusion.
+ * A {@link ClassInference} producing a {@link SubClassInclusionDecomposed} from
+ * a {@link SubClassInclusionDecomposed} with
+ * {@link SubClassInclusionComposed#getSubsumer()} instance of
+ * {@link IndexedClass} and an {@link IndexedDefinitionAxiom}:<br>
+ * 
+ * <pre>
+ *     (1)      (2)
+ *  [C] ⊑ -A  [A = D]
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *      [C] ⊑ -D
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getOrigin()} = {@link #getDestination()}<br>
+ * A = {@link #getDefinedClass()}<br>
+ * D = {@link #getDefinition()}<br>
  * 
  * @see IndexedDefinitionAxiom
  * 
@@ -55,17 +70,20 @@ public class SubClassInclusionExpandedDefinition
 		this.reason_ = reason;
 	}
 
-	public IndexedClass getDefined() {
-		return this.defined_;
+	public IndexedClass getDefinedClass() {
+		return defined_;
+	}
+
+	public IndexedClassExpression getDefinition() {
+		return getSubsumer();
 	}
 
 	public ElkAxiom getReason() {
-		return this.reason_;
+		return reason_;
 	}
 
 	public SubClassInclusionDecomposed getFirstPremise() {
-		return FACTORY.getSubClassInclusionDecomposed(getOrigin(),
-				defined_);
+		return FACTORY.getSubClassInclusionDecomposed(getOrigin(), defined_);
 	}
 
 	public IndexedDefinitionAxiom getSecondPremise() {
@@ -94,6 +112,8 @@ public class SubClassInclusionExpandedDefinition
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
 

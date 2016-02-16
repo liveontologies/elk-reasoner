@@ -33,6 +33,9 @@ package org.semanticweb.elk.reasoner.saturation.properties.inferences;
  *         pavel.klinov@uni-ulm.de
  * 
  * @author Yevgeny Kazakov
+ * 
+ * @param <O>
+ *            the type of the output
  */
 public class DummyObjectPropertyInferenceVisitor<O>
 		implements

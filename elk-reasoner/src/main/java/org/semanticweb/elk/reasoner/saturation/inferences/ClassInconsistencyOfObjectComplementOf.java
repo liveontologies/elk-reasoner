@@ -28,14 +28,27 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 
 /**
- * A {@link Contradiction} obtained from two {@link SubClassInclusionComposed}
- * premises having {@link IndexedObjectComplementOf} super-class and its
- * negation respectively.
+ * A {@link ClassInference} producing a {@link ClassInconsistency} obtained from
+ * {@link SubClassInclusionComposed} and {@link SubClassInclusionDecomposed}
+ * such that {@link SubClassInclusionDecomposed#getSubsumer()} is the negation
+ * of the {@link SubClassInclusionComposed#getSubsumer()}:<br>
+ * 
+ * <pre>
+ *     (1)       (2)
+ *  [C] ⊑ +D  [C] ⊑ -¬D
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *        [C] ⊑ 0
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getOrigin()}={@link #getDestination()}<br>
+ * ¬D = {@link #getNegation()} (from which D can be obtained)<br>
  * 
  * @see IndexedObjectComplementOf#getNegated()
  * 
@@ -45,21 +58,20 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * 
  * @author Yevgeny Kazakov
  */
-public class ContradictionOfObjectComplementOf
+public class ClassInconsistencyOfObjectComplementOf
 		extends
-			AbstractContradictionInference {
+			AbstractClassInconsistencyInference {
 
 	private final IndexedObjectComplementOf negation_;
 
-	public ContradictionOfObjectComplementOf(IndexedContextRoot root,
+	public ClassInconsistencyOfObjectComplementOf(IndexedContextRoot root,
 			IndexedObjectComplementOf negatedSubsumer) {
 		super(root);
 		this.negation_ = negatedSubsumer;
 	}
 
-	@Override
-	public final <O> O accept(ClassConclusion.Visitor<O> visitor) {
-		return visitor.visit(this);
+	public IndexedObjectComplementOf getNegation() {
+		return negation_;
 	}
 
 	public SubClassInclusionComposed getFirstPremise() {
@@ -73,12 +85,17 @@ public class ContradictionOfObjectComplementOf
 
 	@Override
 	public String toString() {
-		return "Contradiction from " + negation_.getNegated() + " and "
+		return super.toString() + " from " + negation_.getNegated() + " and "
 				+ negation_;
 	}
 
 	@Override
-	public final <O> O accept(ContradictionInference.Visitor<O> visitor) {
+	public final <O> O accept(ClassConclusion.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public final <O> O accept(ClassInconsistencyInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
@@ -87,10 +104,12 @@ public class ContradictionOfObjectComplementOf
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
 
-		public O visit(ContradictionOfObjectComplementOf inference);
+		public O visit(ClassInconsistencyOfObjectComplementOf inference);
 
 	}
 

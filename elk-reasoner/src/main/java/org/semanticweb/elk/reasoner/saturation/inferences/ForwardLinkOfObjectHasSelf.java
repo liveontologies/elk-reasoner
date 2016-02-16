@@ -31,8 +31,22 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 
 /**
- * A {@link ForwardLink} obtained from a {@link SubClassInclusionDecomposed}
- * with {@link IndexedObjectHasSelf} super-class.
+ * A {@link ClassInference} producing a {@link ForwardLink} from a
+ * {@link SubClassInclusionDecomposed} with
+ * {@link SubClassInclusionDecomposed#getSubsumer()} of the type
+ * {@link IndexedObjectHasSelf}:<br>
+ * 
+ * <pre>
+ *  [C] ⊑ -∃R.Self
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *  [C] ⊑ <∃R>.C
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getOrigin()} = {@link #getDestination()} <br>
+ * ∃R.Self = {@link #getDecomposedExistential()} (from which R can be obtained)
+ * <br>
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -91,6 +105,8 @@ public class ForwardLinkOfObjectHasSelf extends AbstractClassInference
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
 

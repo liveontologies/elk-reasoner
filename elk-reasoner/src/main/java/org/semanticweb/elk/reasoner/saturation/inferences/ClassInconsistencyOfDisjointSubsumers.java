@@ -30,12 +30,29 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 
 /**
- * A {@link Contradiction} obtained from two {@link DisjointSubsumer} premises
- * with different disjoint expressions of the same disjoint expression list
+ * A {@link ClassInference} producing a {@link ClassInconsistency} from two
+ * {@link DisjointSubsumer}s with different disjoint expressions of the same
+ * disjoint expression list:<br>
+ * 
+ * <pre>
+ *     (1)         (2)
+ *  [C] ⊑ D1:L  [C] ⊑ D2:L
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *        [C] ⊑ 0
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getOrigin()}={@link #getDestination()}<br>
+ * L = {@link #getDisjointExpressions()}<br>
+ * D1 = {@link #getFirstDisjointPosition()} gives the position of D1 in
+ * {@link IndexedClassExpressionList#getElements()} of L<br>
+ * D2 = {@link #getSecondDisjointPosition()} gives the position of D2 in
+ * {@link IndexedClassExpressionList#getElements()} of L<br>
  * 
  * @see DisjointSubsumer#getDisjointExpressions()
  * 
@@ -45,9 +62,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsume
  * 
  * @author Yevgeny Kazakov
  */
-public class ContradictionOfDisjointSubsumers
+public class ClassInconsistencyOfDisjointSubsumers
 		extends
-			AbstractContradictionInference {
+			AbstractClassInconsistencyInference {
 
 	/**
 	 * The disjoint {@link IndexedClassExpression}s that cause the contradiction
@@ -65,7 +82,7 @@ public class ContradictionOfDisjointSubsumers
 	 */
 	private final ElkAxiom reason_;
 
-	public ContradictionOfDisjointSubsumers(DisjointSubsumer premise,
+	public ClassInconsistencyOfDisjointSubsumers(DisjointSubsumer premise,
 			Integer otherPos) {
 		super(premise.getDestination());
 		this.disjointExpressions_ = premise.getDisjointExpressions();
@@ -81,6 +98,18 @@ public class ContradictionOfDisjointSubsumers
 	@Override
 	public IndexedContextRoot getOrigin() {
 		return getDestination();
+	}
+
+	public IndexedClassExpressionList getDisjointExpressions() {
+		return disjointExpressions_;
+	}
+
+	public int getFirstDisjointPosition() {
+		return firstPosition_;
+	}
+
+	public int getSecondDisjointPosition() {
+		return secondPosition_;
 	}
 
 	public DisjointSubsumer getFirstPremise() {
@@ -100,7 +129,7 @@ public class ContradictionOfDisjointSubsumers
 
 	@Override
 	public String toString() {
-		return "Contradiction from disjoint subsumer "
+		return super.toString() + " from disjoint subsumer "
 				+ disjointExpressions_.getElements().get(firstPosition_)
 				+ " using "
 				+ disjointExpressions_.getElements().get(secondPosition_)
@@ -108,7 +137,7 @@ public class ContradictionOfDisjointSubsumers
 	}
 
 	@Override
-	public final <O> O accept(ContradictionInference.Visitor<O> visitor) {
+	public final <O> O accept(ClassInconsistencyInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
@@ -117,10 +146,12 @@ public class ContradictionOfDisjointSubsumers
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
 
-		public O visit(ContradictionOfDisjointSubsumers inference);
+		public O visit(ClassInconsistencyOfDisjointSubsumers inference);
 
 	}
 

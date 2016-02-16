@@ -26,9 +26,9 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionOfObjectComplementOf;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfObjectComplementOf;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
@@ -36,7 +36,7 @@ import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
- * A {@link ChainableSubsumerRule} producing {@link Contradiction} when
+ * A {@link ChainableSubsumerRule} producing {@link ClassInconsistency} when
  * processing an {@link IndexedClassExpression} that is the negation of
  * {@link IndexedObjectComplementOf} that is contained in the {@code Context} .
  * 
@@ -90,7 +90,7 @@ public class ContradictionFromNegationRule extends
 			ClassInferenceProducer producer) {
 		if (negation_ != null
 				&& premises.getDecomposedSubsumers().contains(negation_)) {
-			producer.produce(new ContradictionOfObjectComplementOf(premises.getRoot(),
+			producer.produce(new ClassInconsistencyOfObjectComplementOf(premises.getRoot(),
 					negation_));
 		}
 	}

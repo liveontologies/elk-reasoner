@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.inferences;
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
+
 /*
  * #%L
  * ELK Reasoner
@@ -22,6 +24,12 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * #L%
  */
 
+/**
+ * A {@link ClassInference} producing a {@link ContextInitialization} conclusion
+ * 
+ * @author Yevgeny Kazakov
+ *
+ */
 public interface ContextInitializationInference
 		extends
 			InitializationInference {
@@ -33,6 +41,8 @@ public interface ContextInitializationInference
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O>
 			extends

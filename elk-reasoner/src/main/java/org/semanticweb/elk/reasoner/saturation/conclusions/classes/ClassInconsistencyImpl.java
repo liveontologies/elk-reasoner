@@ -24,12 +24,12 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An implementation of {@link Contradiction}
+ * An implementation of {@link ClassInconsistency}
  * 
  * @author Pavel Klinov
  * 
@@ -37,15 +37,15 @@ import org.slf4j.LoggerFactory;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class ContradictionImpl extends AbstractClassConclusion implements
-		Contradiction {
+public class ClassInconsistencyImpl extends AbstractClassConclusion implements
+		ClassInconsistency {
 
-	protected ContradictionImpl(IndexedContextRoot root) {
-		super(root);
+	protected ClassInconsistencyImpl(IndexedContextRoot destination) {
+		super(destination);
 	}
 
 	static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ContradictionImpl.class);
+			.getLogger(ClassInconsistencyImpl.class);
 
 	@Override
 	public <O> O accept(ClassConclusion.Visitor<O> visitor) {
@@ -53,7 +53,7 @@ public class ContradictionImpl extends AbstractClassConclusion implements
 	}
 
 	@Override
-	public <O> O accept(Contradiction.Visitor<O> visitor) {
+	public <O> O accept(ClassInconsistency.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

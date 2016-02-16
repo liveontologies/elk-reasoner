@@ -70,7 +70,7 @@ public interface ClassConclusion extends SaturationConclusion {
 	interface Factory
 			extends
 				ContextInitialization.Factory,
-				Contradiction.Factory,
+				ClassInconsistency.Factory,
 				DisjointSubsumer.Factory,
 				InitializationConclusion.Factory,
 				ForwardLink.Factory,
@@ -92,7 +92,7 @@ public interface ClassConclusion extends SaturationConclusion {
 	interface Visitor<O>
 			extends
 				ContextInitialization.Visitor<O>,
-				Contradiction.Visitor<O>,
+				ClassInconsistency.Visitor<O>,
 				DisjointSubsumer.Visitor<O>,
 				InitializationConclusion.Visitor<O>,
 				ForwardLink.Visitor<O>,

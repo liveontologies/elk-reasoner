@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -148,7 +148,7 @@ class RuleCounterVisitor<O> implements RuleVisitor<O> {
 	}
 
 	@Override
-	public O visit(ContradictionPropagationRule rule, Contradiction premise,
+	public O visit(ContradictionPropagationRule rule, ClassInconsistency premise,
 			ContextPremises premises, ClassInferenceProducer producer) {
 		counter_.countContradictionPropagationRule++;
 		return visitor_.visit(rule, premise, premises, producer);

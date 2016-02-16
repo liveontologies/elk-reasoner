@@ -27,13 +27,25 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 
 /**
- * Represents occurrences of an {@link ElkDisjointClassesAxiom} in an ontology.
+ * An {@link IndexedAxiom} constructed from an
+ * {@link IndexedClassExpressionList}.<br>
+ * 
+ * Notation:
+ * 
+ * <pre>
+ * [Disjoint(L)]
+ * </pre>
+ * 
+ * It is logically equivalent to the OWL axiom {@code DisjointClasses(L)} <br>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * L = {@link #getMembers()}<br>
  * 
  * @author "Yevgeny Kazakov"
- *
  */
 public interface IndexedDisjointClassesAxiom extends IndexedAxiom {
-	
+
 	/**
 	 * @return the {@link IndexedClassExpressionList} representing the members
 	 *         of the {@link ElkDisjointClassesAxiom} represented by this
@@ -56,7 +68,6 @@ public interface IndexedDisjointClassesAxiom extends IndexedAxiom {
 
 	}
 
-	
 	/**
 	 * The visitor pattern for instances
 	 * 
@@ -70,5 +81,5 @@ public interface IndexedDisjointClassesAxiom extends IndexedAxiom {
 		O visit(IndexedDisjointClassesAxiom axiom);
 
 	}
-	
+
 }

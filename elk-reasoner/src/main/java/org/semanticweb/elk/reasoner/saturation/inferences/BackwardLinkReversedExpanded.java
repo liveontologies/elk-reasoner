@@ -31,8 +31,22 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 
 /**
- * A {@link BackwardLink} obtained from a {@link ForwardLink} with chain
- * expanded under an {@link IndexedSubObjectPropertyOfAxiom}.
+ * A {@link ClassInference} producing a {@link BackwardLink} from a
+ * {@link ForwardLink} and an {@link IndexedSubObjectPropertyOfAxiom}:<br>
+ * 
+ * <pre>
+ *      (1)         (2)
+ *  [C] ⊑ <∃P>.D  [P ⊑ R]
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *       C ⊑ <∃R>.[D]
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getOrigin()} = {@link #getConclusionSource()} <br>
+ * P = {@link #getSubChain()}<br>
+ * R = {@link #getRelation()}<br>
+ * D = {@link #getDestination()}<br>
  * 
  * @see ForwardLink#getRelation()
  * 
@@ -67,6 +81,10 @@ public class BackwardLinkReversedExpanded
 		return getTraceRoot();
 	}
 
+	public IndexedContextRoot getConclusionSource() {
+		return getSource();
+	}
+	
 	public IndexedPropertyChain getSubChain() {
 		return this.subChain_;
 	}
@@ -94,6 +112,8 @@ public class BackwardLinkReversedExpanded
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
 

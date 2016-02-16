@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.properties.inferences;
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
+
 /*
  * #%L
  * ELK Reasoner
@@ -22,6 +24,13 @@ package org.semanticweb.elk.reasoner.saturation.properties.inferences;
  * #L%
  */
 
+/**
+ * An {@link ObjectPropertyInference} that produces {@link SubPropertyChain}
+ * conclusions
+ * 
+ * @author Yevgeny Kazakov
+ *
+ */
 public interface SubPropertyChainInference extends ObjectPropertyInference {
 
 	public <O> O accept(Visitor<O> visitor);
@@ -31,6 +40,8 @@ public interface SubPropertyChainInference extends ObjectPropertyInference {
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O>
 			extends

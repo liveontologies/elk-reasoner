@@ -26,8 +26,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
  */
 
 /**
- * A {@link Conclusion} obtained from other {@link Conclusion}s using some
- * inference rule.
+ * An operation producing {@link Conclusion}s from other {@link Conclusion}s
+ * called premises using some inference rule.
  * 
  * @author Yevgeny Kazakov
  *
@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
 public interface Inference {
 
 	public <O> O accept(Visitor<O> visitor);
-	
+
 	/**
 	 * The visitor pattern for instances
 	 * 

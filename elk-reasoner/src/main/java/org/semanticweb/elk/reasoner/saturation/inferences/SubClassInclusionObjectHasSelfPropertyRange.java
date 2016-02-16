@@ -34,8 +34,22 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
 
 /**
  * A {@link SubClassInclusionDecomposed} obtained from a
- * {@link SubClassInclusionDecomposed} with an {@link IndexedObjectHasSelf}
- * super-class, which property has a range the super-class of this conclusion.
+ * {@link SubClassInclusionDecomposed} with
+ * {@link SubClassInclusionDecomposed#getSubsumer()} of the type
+ * {@link IndexedObjectHasSelf} and a {@link PropertyRange}:<br>
+ * 
+ * <pre>
+ *     (1)            (2)
+ *  [C] ⊑ -∃R.Self  Range(R,D)
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *         [C] ⊑ -D
+ * </pre>
+ * 
+ * The parameters can be obtained as follows:<br>
+ * 
+ * C = {@link #getOrigin()} = {@link #getDestination()}<br>
+ * ∃R.Self = {@link #getPremiseSubsumer()} (from which R can be obtained)<br>
+ * D = {@link #getConclusionSubsumer()}
  * 
  * @see IndexedObjectHasSelf#getProperty()
  * @see IndexedObjectProperty#getToldRanges()
@@ -60,6 +74,10 @@ public class SubClassInclusionObjectHasSelfPropertyRange
 	@Override
 	public IndexedContextRoot getOrigin() {
 		return getDestination();
+	}
+
+	public IndexedObjectHasSelf getPremiseSubsumer() {
+		return premiseSubsumer_;
 	}
 
 	public SubClassInclusionDecomposed getFirstPremise() {
@@ -88,6 +106,8 @@ public class SubClassInclusionObjectHasSelfPropertyRange
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
 	public static interface Visitor<O> {
 

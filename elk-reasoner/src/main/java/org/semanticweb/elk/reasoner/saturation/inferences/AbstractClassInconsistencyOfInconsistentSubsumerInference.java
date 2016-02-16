@@ -27,23 +27,25 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 
 /**
- * A {@link Contradiction} obtained from a {@link SubClassInclusionComposed} premise.
+ * A {@link ClassInconsistency} obtained from a
+ * {@link SubClassInclusionComposed} premise.
  * 
  * @author Pavel Klinov
  *
  *         pavel.klinov@uni-ulm.de
  */
-abstract class AbstractContradictionOfSubsumerInference<S extends IndexedClassExpression>
-		extends AbstractContradictionInference {
+abstract class AbstractClassInconsistencyOfInconsistentSubsumerInference<S extends IndexedClassExpression>
+		extends
+			AbstractClassInconsistencyInference {
 
 	private final S premiseSubsumer_;
 
-	AbstractContradictionOfSubsumerInference(IndexedContextRoot root,
-			S premiseSubsumer) {
+	AbstractClassInconsistencyOfInconsistentSubsumerInference(
+			IndexedContextRoot root, S premiseSubsumer) {
 		super(root);
 		this.premiseSubsumer_ = premiseSubsumer;
 	}
