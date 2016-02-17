@@ -22,13 +22,11 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * #L%
  */
 
-import java.util.Set;
-
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyEqualator;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
-import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
 /**
  * @author Peter Skocovsky
@@ -44,113 +42,19 @@ public abstract class AbstractInstanceTaxonomy<T extends ElkEntity, I extends El
 		return InstanceTaxonomyHasher.hash(this);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean equals(final Object obj) {
 		
-		final boolean superEquals = super.equals(obj);
-		
-		// The super class compares type nodes
-		if (!superEquals) {
+		if (!(obj instanceof Taxonomy<?>)) {
 			return false;
 		}
 		
-		if (!(obj instanceof InstanceTaxonomy<?, ?>)) {
-			// If obj is just a Taxonomy, compare this only as a Taxonomy (ignore instances).
-			// However, super.equals(Object) checks whether obj is a Taxonomy, so no need to repeat.
-			return superEquals;
-		}
 		try {
-			@SuppressWarnings("unchecked")
-			final InstanceTaxonomy<T, I> otherTaxonomy = (InstanceTaxonomy<T, I>) obj;
-			
-			/* 
-			 * Each instance node must have the same sets of members and types,
-			 * each type node must have the same set of instances.
-			 */
-			
-			final Set<? extends InstanceNode<T, I>> thisInstanceNodes = getInstanceNodes();
-			final Set<? extends InstanceNode<T, I>> otherInstanceNodes =
-					otherTaxonomy.getInstanceNodes();
-			
-			if (thisInstanceNodes.size() != otherInstanceNodes.size()) {
-				return false;
-			}
-			for (final InstanceNode<T, I> thisInstanceNode : thisInstanceNodes) {
-				
-				final I thisMember = thisInstanceNode.getCanonicalMember();
-				final InstanceNode<T, I> otherInstanceNode =
-						otherTaxonomy.getInstanceNode(thisMember);
-				if (otherInstanceNode == null) {
-					return false;
-				}
-				
-				// Members
-				if (thisInstanceNode.size() != otherInstanceNode.size()) {
-					return false;
-				}
-				for (final I member : thisInstanceNode) {
-					if (!otherInstanceNode.contains(member)) {
-						return false;
-					}
-				}
-				
-				// Types
-				final Set<? extends TypeNode<T, I>> thisTypes =
-						thisInstanceNode.getDirectTypeNodes();
-				final Set<? extends TypeNode<T, I>> otherTypes =
-						otherInstanceNode.getDirectTypeNodes();
-				if (thisTypes.size() != otherTypes.size()) {
-					return false;
-				}
-				for (final TypeNode<T, I> thisType : thisTypes) {
-					// While all nodes must be the same, it is sufficient to compare canonical members.
-					final TypeNode<T, I> otherType =
-							otherTaxonomy.getNode(thisType.getCanonicalMember());
-					/* 
-					 * otherType is a node from otherTaxonomy (or null), so contains(Object) on
-					 * a node set from otherTaxonomy should work for it as expected.
-					 */
-					if (!otherTypes.contains(otherType)) {
-						return false;
-					}
-				}
-				
-			}
-			
-			// Instances
-			for (final TypeNode<T, I> thisTypeNode : getNodes()) {
-				
-				final T thisMember = thisTypeNode.getCanonicalMember();
-				final TypeNode<T, I> otherTypeNode = otherTaxonomy.getNode(thisMember);
-				
-				final Set<? extends InstanceNode<T, I>> thisInstances =
-						thisTypeNode.getDirectInstanceNodes();
-				final Set<? extends InstanceNode<T, I>> otherInstances =
-						otherTypeNode.getDirectInstanceNodes();
-				if (thisInstances.size() != otherInstances.size()) {
-					return false;
-				}
-				for (final InstanceNode<T, I> thisInstance : thisInstances) {
-					// While all nodes must be the same, it is sufficient to compare canonical members.
-					final InstanceNode<T, I> otherInstance =
-							otherTaxonomy.getInstanceNode(thisInstance.getCanonicalMember());
-					/* 
-					 * otherType is a node from otherTaxonomy (or null), so contains(Object) on
-					 * a node set from otherTaxonomy should work for it as expected.
-					 */
-					if (!otherInstances.contains(otherInstance)) {
-						return false;
-					}
-				}
-				
-			}
-			
+			return InstanceTaxonomyEqualator.equals(this, (Taxonomy<T>) obj);
 		} catch (ClassCastException e) {
-			// The other taxonomy contains members of different type than this one.
 			return false;
 		}
-		
-		return true;
 	}
 
 }

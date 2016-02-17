@@ -58,7 +58,7 @@ public class OrphanNode<T extends ElkEntity> implements TaxonomyNode<T> {
 	private final ComparatorKeyProvider<ElkEntity> keyProvider_;
 
 	public OrphanNode(Set<T> members, T canonical, ComparatorKeyProvider<ElkEntity> keyProvider) {
-		this.members = new HashMap<Object, T>();// TODO: more efficient implementation for members!!
+		this.members = new HashMap<Object, T>();
 		for (T member : members) {
 			this.members.put(keyProvider.getKey(member), member);
 		}
