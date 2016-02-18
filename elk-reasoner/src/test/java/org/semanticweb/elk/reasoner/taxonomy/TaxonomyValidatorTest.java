@@ -76,8 +76,8 @@ public class TaxonomyValidatorTest {
 		taxonomy.getCreateTypeNode(Arrays.asList(A));
 		taxonomy.getCreateTypeNode(Arrays.asList(C));
 		// The nodes for A and C overlap on B
-		taxonomy.getTypeNode(A).members.add(B);
-		taxonomy.getTypeNode(C).members.add(B);
+		taxonomy.getNode(A).members.add(B);
+		taxonomy.getNode(C).members.add(B);
 
 		TaxonomyValidator<ElkClass> validator = new BasicTaxonomyValidator<ElkClass>()
 				.add(new TaxonomyNodeDisjointnessVisitor<ElkClass>(taxonomy));
@@ -100,10 +100,10 @@ public class TaxonomyValidatorTest {
 		taxonomy.getCreateTypeNode(Arrays.asList(C));
 		taxonomy.getCreateTypeNode(Arrays.asList(D));
 
-		taxonomy.getTypeNode(C).addDirectParent(taxonomy.getTypeNode(A));
-		taxonomy.getTypeNode(D).addDirectParent(taxonomy.getTypeNode(B));
-		taxonomy.parentMap.get(taxonomy.getTypeNode(C)).add(
-				taxonomy.getTypeNode(B));
+		taxonomy.getNode(C).addDirectParent(taxonomy.getNode(A));
+		taxonomy.getNode(D).addDirectParent(taxonomy.getNode(B));
+		taxonomy.parentMap.get(taxonomy.getNode(C)).add(
+				taxonomy.getNode(B));
 
 		TaxonomyValidator<ElkClass> validator = new BasicTaxonomyValidator<ElkClass>()
 				.add(new TaxonomyLinkConsistencyVisitor<ElkClass>());
@@ -125,10 +125,10 @@ public class TaxonomyValidatorTest {
 		taxonomy.getCreateTypeNode(Arrays.asList(C));
 		taxonomy.getCreateTypeNode(Arrays.asList(D));
 
-		taxonomy.getTypeNode(B).addDirectParent(taxonomy.getTypeNode(A));
-		taxonomy.getTypeNode(C).addDirectParent(taxonomy.getTypeNode(A));
-		taxonomy.getTypeNode(D).addDirectParent(taxonomy.getTypeNode(B));
-		taxonomy.getTypeNode(D).addDirectParent(taxonomy.getTypeNode(C));
+		taxonomy.getNode(B).addDirectParent(taxonomy.getNode(A));
+		taxonomy.getNode(C).addDirectParent(taxonomy.getNode(A));
+		taxonomy.getNode(D).addDirectParent(taxonomy.getNode(B));
+		taxonomy.getNode(D).addDirectParent(taxonomy.getNode(C));
 
 		new TaxonomyAcyclicityAndReductionValidator<ElkClass>()
 				.validate(taxonomy);
@@ -148,12 +148,12 @@ public class TaxonomyValidatorTest {
 		taxonomy.getCreateTypeNode(Arrays.asList(C));
 		taxonomy.getCreateTypeNode(Arrays.asList(D));
 
-		taxonomy.getTypeNode(B).addDirectParent(taxonomy.getTypeNode(A));
-		taxonomy.getTypeNode(C).addDirectParent(taxonomy.getTypeNode(A));
-		taxonomy.getTypeNode(D).addDirectParent(taxonomy.getTypeNode(B));
-		taxonomy.getTypeNode(D).addDirectParent(taxonomy.getTypeNode(C));
+		taxonomy.getNode(B).addDirectParent(taxonomy.getNode(A));
+		taxonomy.getNode(C).addDirectParent(taxonomy.getNode(A));
+		taxonomy.getNode(D).addDirectParent(taxonomy.getNode(B));
+		taxonomy.getNode(D).addDirectParent(taxonomy.getNode(C));
 		// this one creates a cycle
-		taxonomy.getTypeNode(A).addDirectParent(taxonomy.getTypeNode(D));
+		taxonomy.getNode(A).addDirectParent(taxonomy.getNode(D));
 
 		new TaxonomyAcyclicityAndReductionValidator<ElkClass>()
 				.validate(taxonomy);
@@ -173,12 +173,12 @@ public class TaxonomyValidatorTest {
 		taxonomy.getCreateTypeNode(Arrays.asList(C));
 		taxonomy.getCreateTypeNode(Arrays.asList(D));
 
-		taxonomy.getTypeNode(B).addDirectParent(taxonomy.getTypeNode(A));
-		taxonomy.getTypeNode(C).addDirectParent(taxonomy.getTypeNode(A));
-		taxonomy.getTypeNode(D).addDirectParent(taxonomy.getTypeNode(B));
-		taxonomy.getTypeNode(D).addDirectParent(taxonomy.getTypeNode(C));
+		taxonomy.getNode(B).addDirectParent(taxonomy.getNode(A));
+		taxonomy.getNode(C).addDirectParent(taxonomy.getNode(A));
+		taxonomy.getNode(D).addDirectParent(taxonomy.getNode(B));
+		taxonomy.getNode(D).addDirectParent(taxonomy.getNode(C));
 		// this one creates a self-loop
-		taxonomy.getTypeNode(D).addDirectParent(taxonomy.getTypeNode(D));
+		taxonomy.getNode(D).addDirectParent(taxonomy.getNode(D));
 
 		new TaxonomyAcyclicityAndReductionValidator<ElkClass>()
 				.validate(taxonomy);
@@ -198,11 +198,11 @@ public class TaxonomyValidatorTest {
 		taxonomy.getCreateTypeNode(Arrays.asList(C));
 		taxonomy.getCreateTypeNode(Arrays.asList(D));
 
-		taxonomy.getTypeNode(B).addDirectParent(taxonomy.getTypeNode(A));
-		taxonomy.getTypeNode(C).addDirectParent(taxonomy.getTypeNode(A));
-		taxonomy.getTypeNode(D).addDirectParent(taxonomy.getTypeNode(B));
-		taxonomy.getTypeNode(D).addDirectParent(taxonomy.getTypeNode(C));
-		taxonomy.getTypeNode(D).addDirectParent(taxonomy.getTypeNode(A));
+		taxonomy.getNode(B).addDirectParent(taxonomy.getNode(A));
+		taxonomy.getNode(C).addDirectParent(taxonomy.getNode(A));
+		taxonomy.getNode(D).addDirectParent(taxonomy.getNode(B));
+		taxonomy.getNode(D).addDirectParent(taxonomy.getNode(C));
+		taxonomy.getNode(D).addDirectParent(taxonomy.getNode(A));
 
 		new TaxonomyAcyclicityAndReductionValidator<ElkClass>()
 				.validate(taxonomy);
@@ -215,7 +215,6 @@ public class TaxonomyValidatorTest {
 				ElkIndividualKeyProvider.INSTANCE);
 	}
 
-	@SuppressWarnings("resource")
 	private Taxonomy<ElkClass> load(String resource) throws IOException,
 			Owl2ParseException, ElkInconsistentOntologyException {
 		InputStream stream = null;

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.semanticweb.elk.reasoner.taxonomy.model;
 
 /*
@@ -25,41 +22,20 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
-import java.util.Collection;
-import java.util.Set;
-
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
+ * Updateable generic taxonomy that contains {@link UpdateableTaxonomyNode}.
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of members of the nodes in this taxonomy.
  */
-public interface UpdateableTaxonomy<T extends ElkEntity> extends Taxonomy<T> {
-
-	public UpdateableTaxonomyNode<T> getCreateNode(Collection<T> members);
-
-	public boolean addToBottomNode(T member);
-
-	public boolean removeFromBottomNode(T member);
-
-	public boolean removeNode(UpdateableTaxonomyNode<T> node);
-
-	public UpdateableTaxonomyNode<T> getUpdateableNode(T elkEntity);
-
-	public Set<? extends UpdateableTaxonomyNode<T>> getUpdateableNodes();
-
-	/*
-	 * FIXME replace by UpdateableTaxonomyNode getTopNode() when we switch to
-	 * Java 1.7 which can handle covariant return types
-	 */
-	public UpdateableTaxonomyNode<T> getUpdateableTopNode();
-
-	/*
-	 * Handy since being able to update a taxonomy means being able to update
-	 * super nodes of its bottom node
-	 */
-	public UpdateableBottomNode<T> getUpdateableBottomNode();
+public interface UpdateableTaxonomy<T extends ElkEntity>
+		extends UpdateableGenericTaxonomy<T, UpdateableTaxonomyNode<T>> {
 
 }

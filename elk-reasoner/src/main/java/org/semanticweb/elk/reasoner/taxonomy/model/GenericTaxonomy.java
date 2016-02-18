@@ -1,14 +1,12 @@
 package org.semanticweb.elk.reasoner.taxonomy.model;
 
-import java.util.Collections;
-
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,29 +22,33 @@ import java.util.Collections;
  * #L%
  */
 
+import java.util.Set;
+
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
- * A {@link Node} created for an anonymous {@link ElkObject} that should not be
- * listed among its members
+ * Taxonomy with parameterized type of its nodes.
  * 
- * @author Yevgeny Kazakov
  * @author Peter Skocovsky
- * 
+ *
  * @param <T>
+ *            The type of members of the nodes of this taxonomy.
+ * @param <N>
+ *            The type of nodes in this taxonomy.
  */
-public class AnonymousNode<T extends ElkEntity> extends SimpleNode<T> implements
-		Node<T> {
+public interface GenericTaxonomy<T extends ElkEntity, N extends GenericTaxonomyNode<T, N>>
+		extends Taxonomy<T>, GenericNodeStore<T, N> {
 
-	public AnonymousNode(T anonymousMember, Iterable<T> allMembers, int size,
-			final ComparatorKeyProvider<? super T> comparatorKeyProvider) {
-		super(allMembers, size, comparatorKeyProvider);
-		final int index = Collections.binarySearch(members_, anonymousMember,
-				getKeyProvider().getComparator());
-		if (index >= 0) {
-			members_.remove(index);
-		}
-	}
+	@Override
+	public N getNode(T elkEntity);
+
+	@Override
+	public Set<? extends N> getNodes();
+
+	@Override
+	public N getTopNode();
+
+	@Override
+	public N getBottomNode();
 
 }

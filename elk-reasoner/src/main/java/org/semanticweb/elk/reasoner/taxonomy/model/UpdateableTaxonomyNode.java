@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.semanticweb.elk.reasoner.taxonomy.model;
 
 /*
@@ -25,27 +22,21 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
-import java.util.Set;
-
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
+ * Updateable generic taxonomy node that can be related with
+ * {@link UpdateableTaxonomyNode}.
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of members of this node.
  */
-public interface UpdateableTaxonomyNode<T extends ElkEntity> extends
-		UpdateableNode<T>, TaxonomyNode<T> {
+public interface UpdateableTaxonomyNode<T extends ElkEntity>
+		extends UpdateableGenericTaxonomyNode<T, UpdateableTaxonomyNode<T>> {
 
-	public void addDirectSuperNode(UpdateableTaxonomyNode<T> superNode);
-
-	public void addDirectSubNode(UpdateableTaxonomyNode<T> subNode);
-
-	public Set<? extends UpdateableTaxonomyNode<T>> getDirectUpdateableSubNodes();
-
-	public Set<? extends UpdateableTaxonomyNode<T>> getDirectUpdateableSuperNodes();
-
-	public boolean removeDirectSubNode(UpdateableTaxonomyNode<T> subNode);
-
-	public boolean removeDirectSuperNode(UpdateableTaxonomyNode<T> superNode);
 }

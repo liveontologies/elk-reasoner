@@ -143,7 +143,7 @@ public class InstanceTaxonomyComputationFactory implements
 			for (List<ElkClass> directSuperEquivalent : output
 					.getDirectSubsumers()) {
 				UpdateableTypeNode<ElkClass, ElkNamedIndividual> superNode = taxonomy_
-						.getCreateTypeNode(directSuperEquivalent);
+						.getCreateNode(directSuperEquivalent);
 				assignDirectTypeNode(node, superNode);
 			}
 

@@ -41,33 +41,12 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  * @param <T>
  *            the type of objects stored in this taxonomy
  */
-public interface Taxonomy<T extends ElkEntity> {
+public interface Taxonomy<T extends ElkEntity> extends NodeStore<T> {
 
-	/**
-	 * Returns the {@link ComparatorKeyProvider} that provides a key for each node member.
-	 * These keys are used to compute hash codes and to compare the members.
-	 * 
-	 * @return the {@link ComparatorKeyProvider} that provides a key for each node member.
-	 */
-	public ComparatorKeyProvider<ElkEntity> getKeyProvider();
-
-	/**
-	 * Returns the {@link TaxonomyNode} containing the given {@link ElkEntity}
-	 * as a member or {@code null} if the input does not occur in the taxonomy.
-	 * 
-	 * @param elkEntity
-	 *            the {@link ElkEntity} for which to return the
-	 *            {@link TaxonomyNode}
-	 * @return the {@link TaxonomyNode} for the specified input
-	 *         {@link ElkEntity}
-	 */
+	@Override
 	public TaxonomyNode<T> getNode(T elkEntity);
 
-	/**
-	 * Obtain an unmodifiable Set of all nodes in this taxonomy.
-	 * 
-	 * @return an unmodifiable Collection
-	 */
+	@Override
 	public Set<? extends TaxonomyNode<T>> getNodes();
 
 	/**

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.semanticweb.elk.reasoner.taxonomy;
 
 /*
@@ -109,13 +106,13 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 	}
 	
 	@Override
-	public TaxonomyNode<T> getNode(T elkObject) {
-		return getTypeNode(elkObject);
+	public MockTypeNode getNode(T elkObject) {
+		return (MockTypeNode) typeIndex.get(typeKeyProvider_.getKey(elkObject));
 	}
 
 	@Override
-	public Set<? extends TaxonomyNode<T>> getNodes() {
-		return getTypeNodes();
+	public Set<? extends TypeNode<T, I>> getNodes() {
+		return parentMap.keySet();
 	}
 
 	@Override
@@ -126,16 +123,6 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 	@Override
 	public MockBottomNode getBottomNode() {
 		return bottom;
-	}
-
-	@Override
-	public MockTypeNode getTypeNode(T elkObject) {
-		return (MockTypeNode) typeIndex.get(typeKeyProvider_.getKey(elkObject));
-	}
-
-	@Override
-	public Set<? extends TypeNode<T, I>> getTypeNodes() {
-		return parentMap.keySet();
 	}
 
 	@Override
@@ -182,9 +169,9 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 					|| type.equals(bottom.getCanonicalMember())) {
 				// this is an unchecked cast. could be avoided at the expense of
 				// another LoC but i'm gonna punt on that
-				extreme = (ExtremeNode<T, I>) getTypeNode(type);
+				extreme = (ExtremeNode<T, I>) getNode(type);
 			} else {
-				MockTypeNode typeNode = getTypeNode(type);
+				MockTypeNode typeNode = getNode(type);
 				// raise an error since this class doesn't support node merging
 				assert node == null || node == typeNode;
 

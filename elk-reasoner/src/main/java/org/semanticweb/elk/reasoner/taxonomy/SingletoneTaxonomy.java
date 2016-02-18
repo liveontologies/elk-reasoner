@@ -27,13 +27,13 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 
 /**
  * A {@link Taxonomy} consisting of a single node = top node = bottom node.
  * Typically, this is used to represent an inconsistent taxonomy.
  * 
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  * 
  * @param <T>
  *            the type of objects stored in this taxonomy
@@ -61,24 +61,27 @@ public class SingletoneTaxonomy<T extends ElkEntity, N extends OrphanNode<T>>
 	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
 		return node.getKeyProvider();
 	}
-	
+
 	@Override
-	public TaxonomyNode<T> getNode(T elkEntity) {
-		return node;
+	public N getNode(T elkEntity) {
+		if (node.contains(elkEntity))
+			return node;
+		// else
+		return null;
 	}
 
 	@Override
-	public Set<? extends TaxonomyNode<T>> getNodes() {
+	public Set<? extends N> getNodes() {
 		return Collections.singleton(node);
 	}
 
 	@Override
-	public TaxonomyNode<T> getTopNode() {
+	public N getTopNode() {
 		return node;
 	}
 
 	@Override
-	public TaxonomyNode<T> getBottomNode() {
+	public N getBottomNode() {
 		return node;
 	}
 

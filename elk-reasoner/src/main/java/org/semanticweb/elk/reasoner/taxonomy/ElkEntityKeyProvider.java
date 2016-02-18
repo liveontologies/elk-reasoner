@@ -32,8 +32,11 @@ import org.semanticweb.elk.reasoner.taxonomy.model.KeyProvider;
  */
 public class ElkEntityKeyProvider implements KeyProvider<ElkEntity> {
 
+	/**
+	 * The instance of this class.
+	 */
 	public static final ElkEntityKeyProvider INSTANCE = new ElkEntityKeyProvider();
-	
+
 	@Override
 	public Object getKey(final ElkEntity arg) {
 		return arg.getIri();

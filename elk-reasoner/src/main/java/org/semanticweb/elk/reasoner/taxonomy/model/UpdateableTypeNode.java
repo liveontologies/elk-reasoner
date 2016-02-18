@@ -22,44 +22,24 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
-import java.util.Set;
-
-import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 
 /**
+ * Updateable generic type node that can be related with
+ * {@link UpdateableTypeNode} and {@link UpdateableInstanceNode}.
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of members of this node.
+ * @param <I>
+ *            The type of members of the related instance nodes.
  */
 public interface UpdateableTypeNode<T extends ElkEntity, I extends ElkEntity>
-		extends TypeNode<T, I>, UpdateableTaxonomyNode<T> {
-
-	@Override
-	public Set<? extends UpdateableTypeNode<T, I>> getDirectUpdateableSubNodes();
-
-	/*
-	 * TODO Normally, this method should not exist, getDirectSuperNodes should
-	 * suffice since all super nodes are updateable. However, the inability of
-	 * Java 1.6 to deal with covariant return types in extended interfaces led
-	 * to this method. Otherwise, javac 1.6 complains that this interface
-	 * extends the same methods (getDirectSuperNodes) from TypeNode and
-	 * UpdateableTaxonomyNode while their return types are unrelated and ignores
-	 * the fact that UpdateableTypeNode is a sub-type of both, TypeNode and
-	 * UpdateableTaxonomyNode. Eclipse, however, has no problem with it. It is
-	 * allegedly fixed in Java 1.7
-	 */
-	@Override
-	public Set<? extends UpdateableTypeNode<T, I>> getDirectUpdateableSuperNodes();
-	
-	@Override
-	public Set<? extends UpdateableInstanceNode<T, I>> getDirectInstanceNodes();
-	
-	public void addDirectInstanceNode(
-			UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode);
-	
-	public void removeDirectInstanceNode(
-			UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode);
+		extends
+		UpdateableGenericTypeNode<T, I, UpdateableTypeNode<T, I>, UpdateableInstanceNode<T, I>> {
 
 }
