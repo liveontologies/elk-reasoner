@@ -24,8 +24,18 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
 
 import java.util.Set;
 
+/**
+ * Node store with parameterized type of its nodes.
+ * 
+ * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of members of the nodes in this store.
+ * @param <N>
+ *            The type of nodes in this store.
+ */
 public interface GenericNodeStore<T, N extends Node<T>> extends NodeStore<T> {
-	
+
 	@Override
 	public N getNode(T member);
 

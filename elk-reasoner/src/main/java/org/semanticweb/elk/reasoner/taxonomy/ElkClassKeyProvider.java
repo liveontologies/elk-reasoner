@@ -29,16 +29,24 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkIris;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 
 /**
- * {@link ComparatorKeyProvider} for {@link org.semanticweb.elk.owl.interfaces.ElkClass ElkClass}.
+ * {@link ComparatorKeyProvider} for
+ * {@link org.semanticweb.elk.owl.interfaces.ElkClass ElkClass}.
  * 
  * @author Peter Skocovsky
  */
 public class ElkClassKeyProvider extends ElkEntityKeyProvider
 		implements ComparatorKeyProvider<ElkEntity> {
 
+	/**
+	 * The instance of this class.
+	 */
 	public static final ElkClassKeyProvider INSTANCE = new ElkClassKeyProvider();
-	
-	private static Comparator<ElkEntity> COMPARATOR = new Comparator<ElkEntity>() {
+
+	/**
+	 * The comparator for {@link org.semanticweb.elk.owl.interfaces.ElkClass
+	 * ElkClass}-es.
+	 */
+	private static final Comparator<ElkEntity> COMPARATOR = new Comparator<ElkEntity>() {
 		@Override
 		public int compare(ElkEntity o1, ElkEntity o2) {
 			return PredefinedElkIris.compare(o1.getIri(), o2.getIri());

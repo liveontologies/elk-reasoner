@@ -26,15 +26,43 @@ import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
-public interface UpdateableGenericInstanceTaxonomy
-		<T extends ElkEntity, I extends ElkEntity,
-				TN extends UpdateableGenericTypeNode<T, I, TN, IN>,
-				IN extends UpdateableGenericInstanceNode<T, I, TN, IN>>
+/**
+ * Generic instance taxonomy that can be modified.
+ * 
+ * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of members of the type nodes in this taxonomy.
+ * @param <I>
+ *            The type of members of the instance nodes in this taxonomy.
+ * @param <TN>
+ *            The type of type nodes in this taxonomy.
+ * @param <IN>
+ *            The type of instance nodes in this taxonomy.
+ */
+public interface UpdateableGenericInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity, TN extends UpdateableGenericTypeNode<T, I, TN, IN>, IN extends UpdateableGenericInstanceNode<T, I, TN, IN>>
 		extends UpdateableGenericTaxonomy<T, TN>,
-				GenericInstanceTaxonomy<T, I, TN, IN> {
-	
+		GenericInstanceTaxonomy<T, I, TN, IN> {
+
+	/**
+	 * Returns the instance node containing the specified members, creates the
+	 * node and adds it to this taxonomy if needed.
+	 * 
+	 * @param member
+	 *            The members of the node.
+	 * @return The instance node containing the specified members, creates the
+	 *         node and adds it to this taxonomy if needed.
+	 */
 	IN getCreateInstanceNode(Collection<I> member);
 
-	boolean removeInstanceNode(I instance); 
+	/**
+	 * Removes the instance node containing the specified member from the
+	 * taxonomy.
+	 * 
+	 * @param member
+	 *            The member whose instance node should be removed.
+	 * @return <code>true</code> if and only if some node was removed.
+	 */
+	boolean removeInstanceNode(I instance);
 
 }

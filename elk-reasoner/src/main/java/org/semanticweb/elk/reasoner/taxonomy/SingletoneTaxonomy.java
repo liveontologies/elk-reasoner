@@ -61,7 +61,7 @@ public class SingletoneTaxonomy<T extends ElkEntity, N extends OrphanNode<T>>
 	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
 		return node.getKeyProvider();
 	}
-	
+
 	@Override
 	public N getNode(T elkEntity) {
 		if (node.contains(elkEntity))

@@ -31,13 +31,39 @@ import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericNodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableNode;
 
+/**
+ * An updateable generic node store providing some concurrency guarantees.
+ * TODO: documentation
+ * 
+ * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of members of the nodes in this store.
+ * @param <N>
+ *            The type of nodes in this store.
+ */
 public class ConcurrentNodeStore<T, N extends UpdateableNode<T>>
 		implements UpdateableGenericNodeStore<T, N> {
 
+	/**
+	 * The key provider for members of the nodes in this node store.
+	 */
 	private final ComparatorKeyProvider<? super T> keyProvider_;
+	/**
+	 * The map from the member keys to the nodes containing the members.
+	 */
 	private final ConcurrentMap<Object, N> nodeLookup_;
+	/**
+	 * The set of all nodes.
+	 */
 	private final Set<N> allNodes_;
-	
+
+	/**
+	 * Creates the node store.
+	 * 
+	 * @param keyProvider
+	 *            The key provider for members of the nodes in this node store.
+	 */
 	public ConcurrentNodeStore(
 			final ComparatorKeyProvider<? super T> keyProvider) {
 		keyProvider_ = keyProvider;
@@ -45,7 +71,7 @@ public class ConcurrentNodeStore<T, N extends UpdateableNode<T>>
 		allNodes_ = Collections
 				.newSetFromMap(new ConcurrentHashMap<N, Boolean>());
 	}
-	
+
 	@Override
 	public N getNode(final T member) {
 		return nodeLookup_.get(keyProvider_.getKey(member));
@@ -80,8 +106,8 @@ public class ConcurrentNodeStore<T, N extends UpdateableNode<T>>
 			}
 		}
 		final T canonicalMember = node.getCanonicalMember();
-		final N previous = nodeLookup_.putIfAbsent(
-				keyProvider_.getKey(canonicalMember), node);
+		final N previous = nodeLookup_
+				.putIfAbsent(keyProvider_.getKey(canonicalMember), node);
 		if (previous != null) {
 			return previous;
 		}
@@ -96,20 +122,20 @@ public class ConcurrentNodeStore<T, N extends UpdateableNode<T>>
 
 	@Override
 	public boolean removeNode(final T member) {
-		
+
 		final N node = getNode(member);
 		if (node == null) {
 			return false;
 		}
-		
+
 		boolean changed = false;
 		if (allNodes_.remove(node)) {
 			for (final T m : node) {
 				changed |= nodeLookup_.remove(keyProvider_.getKey(m)) != null;
 			}
 		}
-		
+
 		return changed;
 	}
-	
+
 }

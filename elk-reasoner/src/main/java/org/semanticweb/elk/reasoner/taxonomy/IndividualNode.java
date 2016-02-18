@@ -44,10 +44,10 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * Class for storing information about a class in the context of classification.
- * It is the main data container for {@link InstanceTaxonomy} objects.
- * Like most such data containers in ELK, it is read-only for public access but
- * provides package-private ways of modifying it. Modifications of this class
- * happen in implementations of {@link InstanceTaxonomy} only.
+ * It is the main data container for {@link InstanceTaxonomy} objects. Like most
+ * such data containers in ELK, it is read-only for public access but provides
+ * package-private ways of modifying it. Modifications of this class happen in
+ * implementations of {@link InstanceTaxonomy} only.
  * 
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
@@ -88,9 +88,10 @@ public class IndividualNode extends SimpleUpdateableNode<ElkNamedIndividual>
 	 *            node to add
 	 */
 	@Override
-	public void addDirectTypeNode(UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode) {
+	public void addDirectTypeNode(
+			UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode) {
 		LOGGER_.trace("{}: new direct type-node {}", this, typeNode);
-		
+
 		directTypeNodes_.add(typeNode);
 	}
 
@@ -137,7 +138,7 @@ public class IndividualNode extends SimpleUpdateableNode<ElkNamedIndividual>
 	public void removeDirectTypeNode(
 			UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode) {
 		LOGGER_.trace("{}: removing direct type node: {}", this, typeNode);
-		
+
 		directTypeNodes_.remove(typeNode);
 	}
 }

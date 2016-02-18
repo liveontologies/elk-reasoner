@@ -30,19 +30,43 @@ import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 
+/**
+ * Compares two instance taxonomies for equality. Two instance taxonomies are
+ * equal when they are equal according to {@link TaxonomyEqualator}, each type
+ * node has the same set of instance nodes and each instance node has the same
+ * set of members and type nodes. If at least one compared taxonomy is not an
+ * instance taxonomy, the taxonomies are compared only by
+ * {@link TaxonomyEqualator}.
+ * 
+ * @author Peter Skocovsky
+ */
 public class InstanceTaxonomyEqualator {
-	
+
+	/**
+	 * Compares two instance taxonomies for equality. Two instance taxonomies
+	 * are equal when they are equal according to {@link TaxonomyEqualator},
+	 * each type node has the same set of instance nodes and each instance node
+	 * has the same set of members and type nodes. If at least one compared
+	 * taxonomy is not an instance taxonomy, the taxonomies are compared only by
+	 * {@link TaxonomyEqualator}.
+	 * 
+	 * @param taxonomy1
+	 *            The first taxonomy.
+	 * @param taxonomy2
+	 *            The second taxonomy.
+	 * @return <code>true</code> if and only if the taxonomies are equal.
+	 */
 	public static <T extends ElkEntity, I extends ElkEntity> boolean equals(
 			final Taxonomy<T> taxonomy1, final Taxonomy<T> taxonomy2) {
-		
+
 		// Check null and type nodes
-		final boolean areTaxonomiesEqual =
-				TaxonomyEqualator.equals(taxonomy1, taxonomy2);
-		
+		final boolean areTaxonomiesEqual = TaxonomyEqualator.equals(taxonomy1,
+				taxonomy2);
+
 		if (!areTaxonomiesEqual) {
 			return false;
 		}
-		
+
 		if (!(taxonomy1 instanceof InstanceTaxonomy<?, ?>)
 				|| !(taxonomy2 instanceof InstanceTaxonomy<?, ?>)) {
 			// If some of the arguments is just a Taxonomy, compare them only as
@@ -51,34 +75,32 @@ public class InstanceTaxonomyEqualator {
 		}
 		try {
 			@SuppressWarnings("unchecked")
-			final InstanceTaxonomy<T, I> instanceTaxonomy1 =
-					(InstanceTaxonomy<T, I>) taxonomy1;
+			final InstanceTaxonomy<T, I> instanceTaxonomy1 = (InstanceTaxonomy<T, I>) taxonomy1;
 			@SuppressWarnings("unchecked")
-			final InstanceTaxonomy<T, I> instanceTaxonomy2 =
-					(InstanceTaxonomy<T, I>) taxonomy2;
-			
-			/* 
+			final InstanceTaxonomy<T, I> instanceTaxonomy2 = (InstanceTaxonomy<T, I>) taxonomy2;
+
+			/*
 			 * Each instance node must have the same sets of members and types,
 			 * each type node must have the same set of instances.
 			 */
-			
-			final Set<? extends InstanceNode<T, I>> instanceNodes1 =
-					instanceTaxonomy1.getInstanceNodes();
-			final Set<? extends InstanceNode<T, I>> instanceNodes2 =
-					instanceTaxonomy2.getInstanceNodes();
-			
+
+			final Set<? extends InstanceNode<T, I>> instanceNodes1 = instanceTaxonomy1
+					.getInstanceNodes();
+			final Set<? extends InstanceNode<T, I>> instanceNodes2 = instanceTaxonomy2
+					.getInstanceNodes();
+
 			if (instanceNodes1.size() != instanceNodes2.size()) {
 				return false;
 			}
 			for (final InstanceNode<T, I> instanceNode1 : instanceNodes1) {
-				
+
 				final I member1 = instanceNode1.getCanonicalMember();
-				final InstanceNode<T, I> instanceNode2 =
-						instanceTaxonomy2.getInstanceNode(member1);
+				final InstanceNode<T, I> instanceNode2 = instanceTaxonomy2
+						.getInstanceNode(member1);
 				if (instanceNode2 == null) {
 					return false;
 				}
-				
+
 				// Members
 				if (instanceNode1.size() != instanceNode2.size()) {
 					return false;
@@ -88,65 +110,70 @@ public class InstanceTaxonomyEqualator {
 						return false;
 					}
 				}
-				
+
 				// Types
-				final Set<? extends TypeNode<T, I>> types1 =
-						instanceNode1.getDirectTypeNodes();
-				final Set<? extends TypeNode<T, I>> types2 =
-						instanceNode2.getDirectTypeNodes();
+				final Set<? extends TypeNode<T, I>> types1 = instanceNode1
+						.getDirectTypeNodes();
+				final Set<? extends TypeNode<T, I>> types2 = instanceNode2
+						.getDirectTypeNodes();
 				if (types1.size() != types2.size()) {
 					return false;
 				}
 				for (final TypeNode<T, I> type1 : types1) {
-					// While all nodes must be the same, it is sufficient to compare canonical members.
-					final TypeNode<T, I> type2 =
-							instanceTaxonomy2.getNode(
-									type1.getCanonicalMember());
-					/* 
-					 * otherType is a node from otherTaxonomy (or null), so contains(Object) on
-					 * a node set from otherTaxonomy should work for it as expected.
+					// While all nodes must be the same, it is sufficient to
+					// compare canonical members.
+					final TypeNode<T, I> type2 = instanceTaxonomy2
+							.getNode(type1.getCanonicalMember());
+					/*
+					 * otherType is a node from otherTaxonomy (or null), so
+					 * contains(Object) on a node set from otherTaxonomy should
+					 * work for it as expected.
 					 */
 					if (!types2.contains(type2)) {
 						return false;
 					}
 				}
-				
+
 			}
-			
+
 			// Instances
-			for (final TypeNode<T, I> typeNode1 : instanceTaxonomy1.getNodes()) {
-				
+			for (final TypeNode<T, I> typeNode1 : instanceTaxonomy1
+					.getNodes()) {
+
 				final T member1 = typeNode1.getCanonicalMember();
-				final TypeNode<T, I> typeNode2 = instanceTaxonomy2.getNode(member1);
-				
-				final Set<? extends InstanceNode<T, I>> instances1 =
-						typeNode1.getDirectInstanceNodes();
-				final Set<? extends InstanceNode<T, I>> instances2 =
-						typeNode2.getDirectInstanceNodes();
+				final TypeNode<T, I> typeNode2 = instanceTaxonomy2
+						.getNode(member1);
+
+				final Set<? extends InstanceNode<T, I>> instances1 = typeNode1
+						.getDirectInstanceNodes();
+				final Set<? extends InstanceNode<T, I>> instances2 = typeNode2
+						.getDirectInstanceNodes();
 				if (instances1.size() != instances2.size()) {
 					return false;
 				}
 				for (final InstanceNode<T, I> instance1 : instances1) {
-					// While all nodes must be the same, it is sufficient to compare canonical members.
-					final InstanceNode<T, I> instance2 =
-							instanceTaxonomy2.getInstanceNode(instance1.getCanonicalMember());
-					/* 
-					 * otherType is a node from otherTaxonomy (or null), so contains(Object) on
-					 * a node set from otherTaxonomy should work for it as expected.
+					// While all nodes must be the same, it is sufficient to
+					// compare canonical members.
+					final InstanceNode<T, I> instance2 = instanceTaxonomy2
+							.getInstanceNode(instance1.getCanonicalMember());
+					/*
+					 * otherType is a node from otherTaxonomy (or null), so
+					 * contains(Object) on a node set from otherTaxonomy should
+					 * work for it as expected.
 					 */
 					if (!instances2.contains(instance2)) {
 						return false;
 					}
 				}
-				
+
 			}
-			
+
 		} catch (ClassCastException e) {
 			// Some taxonomy contains members of unexpected type.
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 }

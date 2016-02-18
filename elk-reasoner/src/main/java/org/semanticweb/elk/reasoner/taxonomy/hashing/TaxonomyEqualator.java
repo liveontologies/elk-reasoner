@@ -28,34 +28,53 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 
+/**
+ * Compares two taxonomies for equality. For comparing instance taxonomies see
+ * {@link InstanceTaxonomyEqualator}. Two taxonomies are equal when they have
+ * the same set of nodes, each of which has the same set of members, super-nodes
+ * and sub-nodes.
+ * 
+ * @author Peter Skocovsky
+ */
 public class TaxonomyEqualator {
-	
+
+	/**
+	 * Compares two taxonomies for equality. Two taxonomies are equal when they
+	 * have the same set of nodes, each of which has the same set of members,
+	 * super-nodes and sub-nodes.
+	 * 
+	 * @param taxonomy1
+	 *            The first taxonomy.
+	 * @param taxonomy2
+	 *            The second taxonomy.
+	 * @return <code>true</code> if and only if the taxonomies are equal.
+	 */
 	public static <T extends ElkEntity> boolean equals(
 			final Taxonomy<T> taxonomy1, final Taxonomy<T> taxonomy2) {
-		
+
 		if (taxonomy1 == null) {
 			return taxonomy2 == null;
 		}
 		if (taxonomy2 == null) {
 			return false;
 		}
-		
+
 		// Each node must have the same sets of members, parents and children
-		
+
 		final Set<? extends TaxonomyNode<T>> nodes1 = taxonomy1.getNodes();
 		final Set<? extends TaxonomyNode<T>> nodes2 = taxonomy2.getNodes();
-		
+
 		if (nodes1.size() != nodes2.size()) {
 			return false;
 		}
 		for (final TaxonomyNode<T> node1 : nodes1) {
-			
+
 			final T thisMember = node1.getCanonicalMember();
 			final TaxonomyNode<T> node2 = taxonomy2.getNode(thisMember);
 			if (node2 == null) {
 				return false;
 			}
-			
+
 			// Members
 			if (node1.size() != node2.size()) {
 				return false;
@@ -65,49 +84,57 @@ public class TaxonomyEqualator {
 					return false;
 				}
 			}
-			
+
 			// Parents
-			final Set<? extends TaxonomyNode<T>> parents1 = node1.getDirectSuperNodes();
-			final Set<? extends TaxonomyNode<T>> parents2 = node2.getDirectSuperNodes();
+			final Set<? extends TaxonomyNode<T>> parents1 = node1
+					.getDirectSuperNodes();
+			final Set<? extends TaxonomyNode<T>> parents2 = node2
+					.getDirectSuperNodes();
 			if (parents1.size() != parents2.size()) {
 				return false;
 			}
 			for (final TaxonomyNode<T> parent1 : parents1) {
-				// While all nodes must be the same, it is sufficient to compare canonical members.
-				final TaxonomyNode<T> parent2 =
-						taxonomy2.getNode(parent1.getCanonicalMember());
-				/* 
-				 * otherParent is a node from taxonomy2 (or null), so contains(Object) on
-				 * a node set from taxonomy2 should work for it as expected.
+				// While all nodes must be the same, it is sufficient to compare
+				// canonical members.
+				final TaxonomyNode<T> parent2 = taxonomy2
+						.getNode(parent1.getCanonicalMember());
+				/*
+				 * otherParent is a node from taxonomy2 (or null), so
+				 * contains(Object) on a node set from taxonomy2 should work for
+				 * it as expected.
 				 */
 				if (!parents2.contains(parent2)) {
 					return false;
 				}
 			}
-			
+
 			// Children
-			final Set<? extends TaxonomyNode<T>> children1 = node1.getDirectSubNodes();
-			final Set<? extends TaxonomyNode<T>> children2 = node2.getDirectSubNodes();
+			final Set<? extends TaxonomyNode<T>> children1 = node1
+					.getDirectSubNodes();
+			final Set<? extends TaxonomyNode<T>> children2 = node2
+					.getDirectSubNodes();
 			if (children1.size() != children2.size()) {
 				return false;
 			}
 			for (final TaxonomyNode<T> child1 : children1) {
-				// While all nodes must be the same, it is sufficient to compare canonical members.
-				final TaxonomyNode<T> child2 =
-						taxonomy2.getNode(child1.getCanonicalMember());
-				/* 
-				 * otherParent is a node from taxonomy2 (or null), so contains(Object) on
-				 * a node set from taxonomy2 should work for it as expected.
+				// While all nodes must be the same, it is sufficient to compare
+				// canonical members.
+				final TaxonomyNode<T> child2 = taxonomy2
+						.getNode(child1.getCanonicalMember());
+				/*
+				 * otherParent is a node from taxonomy2 (or null), so
+				 * contains(Object) on a node set from taxonomy2 should work for
+				 * it as expected.
 				 */
 				if (!children2.contains(child2)) {
 					return false;
 				}
 			}
-			
+
 		}
-		
+
 		// No difference found ;-)
 		return true;
 	}
-	
+
 }

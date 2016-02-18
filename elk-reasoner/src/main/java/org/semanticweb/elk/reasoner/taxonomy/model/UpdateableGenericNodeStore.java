@@ -22,11 +22,37 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
+/**
+ * Generic node store that can be modified.
+ * 
+ * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of members of the nodes in this store.
+ * @param <N>
+ *            The type of nodes in this store.
+ */
 public interface UpdateableGenericNodeStore<T, N extends UpdateableNode<T>>
 		extends GenericNodeStore<T, N> {
 
+	/**
+	 * Adds the specified node to this store if it is not in it yet.
+	 * TODO: documentation
+	 * 
+	 * @param node
+	 *            The node that should be added to this store.
+	 * @return The node that was already in this node store, or
+	 *         <code>null</code> if the new node was added.
+	 */
 	N putIfAbsent(N node);
-	
+
+	/**
+	 * Removes the node containing the specified member from the taxonomy.
+	 * 
+	 * @param member
+	 *            The member whose node should be removed.
+	 * @return <code>true</code> if and only if some node was removed.
+	 */
 	boolean removeNode(T member);
-	
+
 }

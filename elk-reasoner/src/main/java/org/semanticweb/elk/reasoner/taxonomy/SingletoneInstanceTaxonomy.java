@@ -61,11 +61,12 @@ public class SingletoneInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity
 			final ComparatorKeyProvider<ElkEntity> individualKeyProvider) {
 		super(node);
 		this.individualKeyProvider_ = individualKeyProvider;
-		this.instanceNodeLookup = new ArrayHashMap<Object, InstanceNode<T, I>>(node
-				.getAllInstanceNodes().size());
+		this.instanceNodeLookup = new ArrayHashMap<Object, InstanceNode<T, I>>(
+				node.getAllInstanceNodes().size());
 		for (InstanceNode<T, I> instanceNode : node.getAllInstanceNodes()) {
 			for (I instance : instanceNode) {
-				instanceNodeLookup.put(individualKeyProvider_.getKey(instance), instanceNode);
+				instanceNodeLookup.put(individualKeyProvider_.getKey(instance),
+						instanceNode);
 			}
 		}
 	}
@@ -84,20 +85,20 @@ public class SingletoneInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity
 	public Set<? extends InstanceNode<T, I>> getInstanceNodes() {
 		return node.instanceNodes;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return InstanceTaxonomyHasher.hash(this);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean equals(final Object obj) {
-		
+
 		if (!(obj instanceof Taxonomy<?>)) {
 			return false;
 		}
-		
+
 		try {
 			return InstanceTaxonomyEqualator.equals(this, (Taxonomy<T>) obj);
 		} catch (ClassCastException e) {

@@ -24,14 +24,21 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
+ * Updateable generic instance taxonomy that contains {@link UpdateableTypeNode}
+ * and {@link UpdateableInstanceNode}.
+ * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
  * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of members of the type nodes in this taxonomy.
+ * @param <I>
+ *            The type of members of the instance nodes in this taxonomy.
  */
-public interface UpdateableInstanceTaxonomy
-		<T extends ElkEntity, I extends ElkEntity>
-		extends UpdateableGenericInstanceTaxonomy
-				<T, I, UpdateableTypeNode<T,I>, UpdateableInstanceNode<T,I>> {
-	
+public interface UpdateableInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
+		extends
+		UpdateableGenericInstanceTaxonomy<T, I, UpdateableTypeNode<T, I>, UpdateableInstanceNode<T, I>> {
+
 }

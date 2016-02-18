@@ -26,12 +26,37 @@ import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
-public interface UpdateableGenericTaxonomy
-		<T extends ElkEntity, N extends UpdateableGenericTaxonomyNode<T, N>>
+/**
+ * Generic taxonomy that can be modified.
+ * 
+ * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of members of the nodes of this taxonomy.
+ * @param <N>
+ *            The type of nodes in this taxonomy.
+ */
+public interface UpdateableGenericTaxonomy<T extends ElkEntity, N extends UpdateableGenericTaxonomyNode<T, N>>
 		extends GenericTaxonomy<T, N> {
 
+	/**
+	 * Returns the node containing the specified members, creates the node and
+	 * adds it to this taxonomy if needed.
+	 * 
+	 * @param members
+	 *            The members of the node.
+	 * @return The node containing the specified members, creates the node and
+	 *         adds it to this taxonomy if needed.
+	 */
 	N getCreateNode(Collection<T> members);
 
+	/**
+	 * Removes the node containing the specified member from the taxonomy.
+	 * 
+	 * @param member
+	 *            The member whose node should be removed.
+	 * @return <code>true</code> if and only if some node was removed.
+	 */
 	boolean removeNode(T member);
 
 }

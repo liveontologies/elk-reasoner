@@ -28,6 +28,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A simple modifiable node. Implements methods for manipulation with this node.
+ * 
+ * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of members of this node.
+ */
 public class SimpleUpdateableNode<T> extends SimpleNode<T>
 		implements UpdateableNode<T> {
 	
@@ -39,11 +47,23 @@ public class SimpleUpdateableNode<T> extends SimpleNode<T>
 	 */
 	private final AtomicBoolean modified_ = new AtomicBoolean(true);
 
+	/**
+	 * Creates a node containing the specified members.
+	 * 
+	 * @param members The members this node should contain.
+	 * @param size The number of the specified members.
+	 * @param keyProvider The key provider for the members.
+	 */
 	public SimpleUpdateableNode(final Iterable<T> members, final int size,
 			final ComparatorKeyProvider<? super T> keyProvider) {
 		super(members, size, keyProvider);
 	}
 
+	/**
+	 * Creates an empty node.
+	 * 
+	 * @param comparatorKeyProvider The key provider for the members.
+	 */
 	public SimpleUpdateableNode(
 			final ComparatorKeyProvider<T> comparatorKeyProvider) {
 		super(comparatorKeyProvider);

@@ -26,10 +26,21 @@ import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
-public interface GenericTypeNode
-		<T extends ElkEntity, I extends ElkEntity,
-				TN extends GenericTypeNode<T, I, TN, IN>,
-				IN extends GenericInstanceNode<T, I, TN, IN>>
+/**
+ * Type node with parameterized type of nodes with which it may be associated.
+ * 
+ * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of members of this node.
+ * @param <I>
+ *            The type of members of the related instance nodes.
+ * @param <TN>
+ *            The type of type nodes with which this node may be associated.
+ * @param <IN>
+ *            The type of instance nodes with which this node may be associated.
+ */
+public interface GenericTypeNode<T extends ElkEntity, I extends ElkEntity, TN extends GenericTypeNode<T, I, TN, IN>, IN extends GenericInstanceNode<T, I, TN, IN>>
 		extends TypeNode<T, I>, GenericTaxonomyNode<T, TN> {
 
 	@Override
@@ -37,7 +48,7 @@ public interface GenericTypeNode
 
 	@Override
 	public Set<? extends IN> getAllInstanceNodes();
-	
+
 	@Override
 	public Set<? extends TN> getDirectSuperNodes();
 

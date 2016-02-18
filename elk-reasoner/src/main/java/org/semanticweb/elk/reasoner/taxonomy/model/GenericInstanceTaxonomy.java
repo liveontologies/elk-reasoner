@@ -26,10 +26,21 @@ import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
-public interface GenericInstanceTaxonomy
-		<T extends ElkEntity, I extends ElkEntity,
-				TN extends GenericTypeNode<T, I, TN, IN>,
-				IN extends GenericInstanceNode<T, I, TN, IN>>
+/**
+ * Instance taxonomy with parameterized type of its nodes.
+ * 
+ * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of members of the type nodes in this taxonomy.
+ * @param <I>
+ *            The type of members of the instance nodes in this taxonomy.
+ * @param <TN>
+ *            The type of type nodes in this taxonomy.
+ * @param <IN>
+ *            The type of instance nodes in this taxonomy.
+ */
+public interface GenericInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity, TN extends GenericTypeNode<T, I, TN, IN>, IN extends GenericInstanceNode<T, I, TN, IN>>
 		extends InstanceTaxonomy<T, I>, GenericTaxonomy<T, TN> {
 
 	@Override

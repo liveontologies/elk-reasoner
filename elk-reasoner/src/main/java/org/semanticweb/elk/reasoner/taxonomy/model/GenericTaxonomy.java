@@ -26,8 +26,17 @@ import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
-public interface GenericTaxonomy
-		<T extends ElkEntity, N extends GenericTaxonomyNode<T, N>>
+/**
+ * Taxonomy with parameterized type of its nodes.
+ * 
+ * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of members of the nodes of this taxonomy.
+ * @param <N>
+ *            The type of nodes in this taxonomy.
+ */
+public interface GenericTaxonomy<T extends ElkEntity, N extends GenericTaxonomyNode<T, N>>
 		extends Taxonomy<T>, GenericNodeStore<T, N> {
 
 	@Override
@@ -41,5 +50,5 @@ public interface GenericTaxonomy
 
 	@Override
 	public N getBottomNode();
-	
+
 }

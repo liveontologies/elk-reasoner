@@ -24,14 +24,37 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
-public interface UpdateableGenericInstanceNode
-		<T extends ElkEntity, I extends ElkEntity,
-				TN extends UpdateableGenericTypeNode<T, I, TN, IN>,
-				IN extends UpdateableGenericInstanceNode<T, I, TN, IN>>
+/**
+ * Generic instance node that can be modified.
+ * 
+ * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of members of the related type nodes.
+ * @param <I>
+ *            The type of members of this node.
+ * @param <TN>
+ *            The type of type nodes with which this node may be associated.
+ * @param <IN>
+ *            The type of instance nodes with which this node may be associated.
+ */
+public interface UpdateableGenericInstanceNode<T extends ElkEntity, I extends ElkEntity, TN extends UpdateableGenericTypeNode<T, I, TN, IN>, IN extends UpdateableGenericInstanceNode<T, I, TN, IN>>
 		extends UpdateableNode<I>, GenericInstanceNode<T, I, TN, IN> {
 
+	/**
+	 * Associates this node with its direct type node.
+	 * 
+	 * @param typeNode
+	 *            The type node with which this node should be associated.
+	 */
 	void addDirectTypeNode(TN typeNode);
-	
+
+	/**
+	 * Deletes the association between this node and the specified type node.
+	 * 
+	 * @param typeNode
+	 *            The type node with which this node should not be associated.
+	 */
 	void removeDirectTypeNode(TN typeNode);
 
 }

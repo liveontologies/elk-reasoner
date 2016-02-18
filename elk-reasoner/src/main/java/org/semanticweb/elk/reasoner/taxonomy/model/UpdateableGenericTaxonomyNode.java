@@ -24,16 +24,51 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
-public interface UpdateableGenericTaxonomyNode
-		<T extends ElkEntity, N extends UpdateableGenericTaxonomyNode<T, N>>
+/**
+ * Generic taxonomy node that is modifiable.
+ * 
+ * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of members of this node.
+ * @param <N>
+ *            The type of nodes with which this node can be associated.
+ */
+public interface UpdateableGenericTaxonomyNode<T extends ElkEntity, N extends UpdateableGenericTaxonomyNode<T, N>>
 		extends UpdateableNode<T>, GenericTaxonomyNode<T, N> {
 
+	/**
+	 * Associates this node with its direct super-node.
+	 * 
+	 * @param superNode
+	 *            The super-node with which this node should be associated.
+	 */
 	void addDirectSuperNode(N superNode);
 
+	/**
+	 * Associates this node with its direct sub-node.
+	 * 
+	 * @param subNode
+	 *            The sub-node with which this node should be associated.
+	 */
 	void addDirectSubNode(N subNode);
 
+	/**
+	 * Deletes the association between this node and the specified sub-node.
+	 * 
+	 * @param subNode
+	 *            The sub-node with which this node should not be associated.
+	 * @return <code>true</code> if and only if this node changed.
+	 */
 	boolean removeDirectSubNode(N subNode);
 
+	/**
+	 * Deletes the association between this node and the specified super-node.
+	 * 
+	 * @param superNode
+	 *            The super-node with which this node should not be associated.
+	 * @return <code>true</code> if and only if this node changed.
+	 */
 	boolean removeDirectSuperNode(N superNode);
 
 }

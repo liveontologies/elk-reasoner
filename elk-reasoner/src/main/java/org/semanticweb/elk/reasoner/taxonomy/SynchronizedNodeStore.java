@@ -32,25 +32,58 @@ import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableNode;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 
+/**
+ * An updateable generic node store whose methods are synchronized.
+ * 
+ * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of members of the nodes in this store.
+ * @param <N>
+ *            The type of nodes in this store.
+ */
 public class SynchronizedNodeStore<T, N extends UpdateableNode<T>>
 		implements UpdateableGenericNodeStore<T, N> {
 
+	/**
+	 * The key provider for members of the nodes in this node store.
+	 */
 	private final ComparatorKeyProvider<? super T> keyProvider_;
+	/**
+	 * The map from the member keys to the nodes containing the members.
+	 */
 	private final Map<Object, N> nodeLookup_;
+	/**
+	 * The set of all nodes.
+	 */
 	private final Set<N> allNodes_;
-	
+
+	/**
+	 * Creates the node store with the provided initial capacity.
+	 * 
+	 * @param capacity
+	 *            The initial capacity.
+	 * @param keyProvider
+	 *            The key provider for members of the nodes in this node store.
+	 */
 	public SynchronizedNodeStore(final int capacity,
 			final ComparatorKeyProvider<? super T> keyProvider) {
 		keyProvider_ = keyProvider;
 		nodeLookup_ = new ArrayHashMap<Object, N>(capacity);
 		allNodes_ = new ArrayHashSet<N>(capacity);
 	}
-	
+
+	/**
+	 * Creates the node store.
+	 * 
+	 * @param keyProvider
+	 *            The key provider for members of the nodes in this node store.
+	 */
 	public SynchronizedNodeStore(
 			final ComparatorKeyProvider<? super T> keyProvider) {
 		this(127, keyProvider);
 	}
-	
+
 	@Override
 	public synchronized N getNode(final T member) {
 		return nodeLookup_.get(keyProvider_.getKey(member));
@@ -84,8 +117,8 @@ public class SynchronizedNodeStore<T, N extends UpdateableNode<T>>
 				return previous;
 			}
 		}
-		final N previous = nodeLookup_.get(
-				keyProvider_.getKey(node.getCanonicalMember()));
+		final N previous = nodeLookup_
+				.get(keyProvider_.getKey(node.getCanonicalMember()));
 		if (previous != null) {
 			return previous;
 		}
@@ -98,20 +131,20 @@ public class SynchronizedNodeStore<T, N extends UpdateableNode<T>>
 
 	@Override
 	public synchronized boolean removeNode(final T member) {
-		
+
 		final N node = getNode(member);
 		if (node == null) {
 			return false;
 		}
-		
+
 		boolean changed = false;
 		if (allNodes_.remove(node)) {
 			for (final T m : node) {
 				changed |= nodeLookup_.remove(keyProvider_.getKey(m)) != null;
 			}
 		}
-		
+
 		return changed;
 	}
-	
+
 }

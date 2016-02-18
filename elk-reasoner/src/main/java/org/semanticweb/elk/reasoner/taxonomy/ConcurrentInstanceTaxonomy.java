@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
  * Class taxonomy that is suitable for concurrent processing. Taxonomy objects
  * are only constructed for consistent ontologies, and some consequences of this
  * are hardcoded here.
- * 
+ * <p>
  * This class wraps an instance of {@link UpdateableTaxonomy} and lazily
  * generates wrappers for its nodes to store direct instances.
  * 
@@ -73,22 +73,33 @@ public class ConcurrentInstanceTaxonomy
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ConcurrentInstanceTaxonomy.class);
 
-	private final UpdateableGenericNodeStore<ElkNamedIndividual, IndividualNode>
-			individualNodeStore_;
+	/**
+	 * The store for instance nodes of this taxonomy.
+	 */
+	private final UpdateableGenericNodeStore<ElkNamedIndividual, IndividualNode> individualNodeStore_;
 
+	/**
+	 * The wrapped class taxonomy
+	 */
 	private final UpdateableTaxonomy<ElkClass> classTaxonomy_;
 
+	/**
+	 * Map from wrapped nodes to their wrappers.
+	 */
 	private final ConcurrentMap<TaxonomyNode<ElkClass>, UpdateableTypeNodeWrapper> wrapperMap_;
 
-	public ConcurrentInstanceTaxonomy(final ComparatorKeyProvider<ElkEntity> classKeyProvider,
+	public ConcurrentInstanceTaxonomy(
+			final ComparatorKeyProvider<ElkEntity> classKeyProvider,
 			final ComparatorKeyProvider<ElkEntity> individualKeyProvider) {
-		this(new ConcurrentClassTaxonomy(classKeyProvider), individualKeyProvider);
+		this(new ConcurrentClassTaxonomy(classKeyProvider),
+				individualKeyProvider);
 	}
 
-	public ConcurrentInstanceTaxonomy(UpdateableTaxonomy<ElkClass> classTaxonomy,
+	public ConcurrentInstanceTaxonomy(
+			UpdateableTaxonomy<ElkClass> classTaxonomy,
 			final ComparatorKeyProvider<ElkEntity> individualKeyProvider) {
-		this.individualNodeStore_ = new ConcurrentNodeStore
-				<ElkNamedIndividual, IndividualNode>(individualKeyProvider);
+		this.individualNodeStore_ = new ConcurrentNodeStore<ElkNamedIndividual, IndividualNode>(
+				individualKeyProvider);
 		this.classTaxonomy_ = classTaxonomy;
 		this.wrapperMap_ = new ConcurrentHashMap<TaxonomyNode<ElkClass>, UpdateableTypeNodeWrapper>();
 	}
@@ -97,16 +108,17 @@ public class ConcurrentInstanceTaxonomy
 	public ComparatorKeyProvider<? super ElkClass> getKeyProvider() {
 		return classTaxonomy_.getKeyProvider();
 	}
-	
+
 	@Override
 	public ComparatorKeyProvider<? super ElkNamedIndividual> getInstanceKeyProvider() {
 		return individualNodeStore_.getKeyProvider();
 	}
-	
+
 	@Override
-	public UpdateableTypeNode<ElkClass, ElkNamedIndividual>
-			getNode(ElkClass elkClass) {
-		UpdateableTaxonomyNode<ElkClass> node = classTaxonomy_.getNode(elkClass);
+	public UpdateableTypeNode<ElkClass, ElkNamedIndividual> getNode(
+			ElkClass elkClass) {
+		UpdateableTaxonomyNode<ElkClass> node = classTaxonomy_
+				.getNode(elkClass);
 
 		return getCreateUpdateableTypeNode(node);
 	}
@@ -124,15 +136,13 @@ public class ConcurrentInstanceTaxonomy
 	}
 
 	@Override
-	public Set<? extends UpdateableTypeNode<ElkClass, ElkNamedIndividual>>
-			getNodes() {
+	public Set<? extends UpdateableTypeNode<ElkClass, ElkNamedIndividual>> getNodes() {
 
 		return Operations.map(classTaxonomy_.getNodes(), functor_);
 	}
 
 	@Override
-	public Set<? extends UpdateableInstanceNode<ElkClass, ElkNamedIndividual>>
-			getInstanceNodes() {
+	public Set<? extends UpdateableInstanceNode<ElkClass, ElkNamedIndividual>> getInstanceNodes() {
 		return individualNodeStore_.getNodes();
 	}
 
@@ -141,12 +151,13 @@ public class ConcurrentInstanceTaxonomy
 			Collection<ElkNamedIndividual> members) {
 
 		if (members == null || members.isEmpty()) {
-			throw new IllegalArgumentException("Empty instance nodes must not be created!");
+			throw new IllegalArgumentException(
+					"Empty instance nodes must not be created!");
 		}
 
-		final IndividualNode node =
-				new IndividualNode(members, getInstanceKeyProvider());
-		
+		final IndividualNode node = new IndividualNode(members,
+				getInstanceKeyProvider());
+
 		final IndividualNode previous = individualNodeStore_.putIfAbsent(node);
 		if (previous != null) {
 			return previous;
@@ -206,8 +217,8 @@ public class ConcurrentInstanceTaxonomy
 
 	@Override
 	public boolean removeNode(final ElkClass member) {
-		final UpdateableTaxonomyNode<ElkClass> node =
-				classTaxonomy_.getNode(member);
+		final UpdateableTaxonomyNode<ElkClass> node = classTaxonomy_
+				.getNode(member);
 		if (node == null) {
 			return false;
 		}
@@ -273,9 +284,12 @@ public class ConcurrentInstanceTaxonomy
 	 *         pavel.klinov@uni-ulm.de
 	 * @author Peter Skocovsky
 	 */
-	private class UpdateableTypeNodeWrapper implements
-			UpdateableTypeNode<ElkClass, ElkNamedIndividual> {
+	private class UpdateableTypeNodeWrapper
+			implements UpdateableTypeNode<ElkClass, ElkNamedIndividual> {
 
+		/**
+		 * The wrapped node.
+		 */
 		protected final UpdateableTaxonomyNode<ElkClass> classNode_;
 
 		/**
@@ -298,36 +312,34 @@ public class ConcurrentInstanceTaxonomy
 		public ComparatorKeyProvider<? super ElkClass> getKeyProvider() {
 			return classNode_.getKeyProvider();
 		}
-		
+
 		@Override
 		public Iterator<ElkClass> iterator() {
 			return classNode_.iterator();
 		}
-		
+
 		@Override
 		public boolean contains(ElkClass member) {
 			return classNode_.contains(member);
 		}
-		
+
 		@Override
 		public int size() {
 			return classNode_.size();
 		}
-		
+
 		@Override
 		public ElkClass getCanonicalMember() {
 			return classNode_.getCanonicalMember();
 		}
 
 		@Override
-		public Set<? extends UpdateableInstanceNode<ElkClass, ElkNamedIndividual>>
-				getDirectInstanceNodes() {
+		public Set<? extends UpdateableInstanceNode<ElkClass, ElkNamedIndividual>> getDirectInstanceNodes() {
 			return Collections.unmodifiableSet(directInstanceNodes_);
 		}
 
 		@Override
-		public Set<? extends UpdateableInstanceNode<ElkClass, ElkNamedIndividual>>
-				getAllInstanceNodes() {
+		public Set<? extends UpdateableInstanceNode<ElkClass, ElkNamedIndividual>> getAllInstanceNodes() {
 			Set<UpdateableInstanceNode<ElkClass, ElkNamedIndividual>> result;
 
 			if (!classNode_.getDirectSubNodes().isEmpty()) {
@@ -337,7 +349,8 @@ public class ConcurrentInstanceTaxonomy
 				todo.add(this);
 
 				while (!todo.isEmpty()) {
-					UpdateableTypeNode<ElkClass, ElkNamedIndividual> next = todo.poll();
+					UpdateableTypeNode<ElkClass, ElkNamedIndividual> next = todo
+							.poll();
 					result.addAll(next.getDirectInstanceNodes());
 
 					for (UpdateableTypeNode<ElkClass, ElkNamedIndividual> nextSubNode : next
@@ -356,7 +369,14 @@ public class ConcurrentInstanceTaxonomy
 		@Override
 		public void addDirectSuperNode(
 				UpdateableTypeNode<ElkClass, ElkNamedIndividual> superNode) {
-			// FIXME: This is a dirty trick, that shouldn't be necessary with generic implementation
+			/*
+			 * FIXME: Ensure that superNode is a UpdateableTypeNodeWrapper The
+			 * problem is that the nodes passed to this method may come from
+			 * completely different taxonomy, which is inconsistent even for
+			 * simple taxonomy implementations. Methods that manipulate nodes
+			 * should be in UpdateableTaxonomy, so that it can check whether the
+			 * nodes are in it.
+			 */
 			getNode().addDirectSuperNode(
 					((UpdateableTypeNodeWrapper) superNode).getNode());
 		}
@@ -364,7 +384,7 @@ public class ConcurrentInstanceTaxonomy
 		@Override
 		public void addDirectSubNode(
 				UpdateableTypeNode<ElkClass, ElkNamedIndividual> subNode) {
-			// FIXME: This is a dirty trick, that shouldn't be necessary with generic implementation
+			// FIXME: This is a dirty trick; see above
 			getNode().addDirectSubNode(
 					((UpdateableTypeNodeWrapper) subNode).getNode());
 		}
@@ -372,7 +392,7 @@ public class ConcurrentInstanceTaxonomy
 		@Override
 		public boolean removeDirectSubNode(
 				UpdateableTypeNode<ElkClass, ElkNamedIndividual> subNode) {
-			// FIXME: This is a dirty trick, that shouldn't be necessary with generic implementation
+			// FIXME: This is a dirty trick; see above
 			return getNode().removeDirectSubNode(
 					((UpdateableTypeNodeWrapper) subNode).getNode());
 		}
@@ -380,7 +400,7 @@ public class ConcurrentInstanceTaxonomy
 		@Override
 		public boolean removeDirectSuperNode(
 				UpdateableTypeNode<ElkClass, ElkNamedIndividual> superNode) {
-			// FIXME: This is a dirty trick, that shouldn't be necessary with generic implementation
+			// FIXME: This is a dirty trick; see above
 			return getNode().removeDirectSuperNode(
 					((UpdateableTypeNodeWrapper) superNode).getNode());
 		}
@@ -399,17 +419,17 @@ public class ConcurrentInstanceTaxonomy
 		public void setMembers(final Iterable<ElkClass> members) {
 			getNode().setMembers(members);
 		}
-		
+
 		@Override
 		public boolean add(final ElkClass member) {
 			return getNode().add(member);
 		}
-		
+
 		@Override
 		public boolean remove(final ElkClass member) {
 			return getNode().remove(member);
 		}
-		
+
 		@Override
 		public Set<UpdateableTypeNodeWrapper> getDirectSuperNodes() {
 			return Operations.map(getNode().getDirectSuperNodes(), functor_);

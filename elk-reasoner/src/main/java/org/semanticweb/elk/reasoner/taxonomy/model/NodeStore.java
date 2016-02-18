@@ -26,13 +26,27 @@ import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
+/**
+ * An immutable storage of nodes.
+ * <p>
+ * The way members of each node are hashed and compared is controlled by
+ * {@link ComparatorKeyProvider} that is returned by {@link #getKeyProvider()}.
+ * For more information see {@link Node}.
+ * 
+ * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of members of nodes in this store.
+ */
 public interface NodeStore<T> {
 
 	/**
-	 * Returns the {@link ComparatorKeyProvider} that provides a key for each node member.
-	 * These keys are used to compute hash codes and to compare the members.
+	 * Returns the {@link ComparatorKeyProvider} that provides a key for each
+	 * node member. These keys are used to compute hash codes and to compare the
+	 * members.
 	 * 
-	 * @return the {@link ComparatorKeyProvider} that provides a key for each node member.
+	 * @return the {@link ComparatorKeyProvider} that provides a key for each
+	 *         node member.
 	 */
 	public ComparatorKeyProvider<? super T> getKeyProvider();
 

@@ -136,7 +136,8 @@ class NonBottomClassNode extends SimpleUpdateableNode<ElkClass>
 	public Set<UpdateableTaxonomyNode<ElkClass>> getDirectSubNodes() {
 		if (!directSubNodes_.isEmpty()) {
 			return Collections
-					.<UpdateableTaxonomyNode<ElkClass>> unmodifiableSet(directSubNodes_);
+					.<UpdateableTaxonomyNode<ElkClass>> unmodifiableSet(
+							directSubNodes_);
 		}
 		// else
 		return Collections.singleton(this.taxonomy_.getBottomNode());
@@ -155,7 +156,8 @@ class NonBottomClassNode extends SimpleUpdateableNode<ElkClass>
 	}
 
 	@Override
-	public boolean removeDirectSubNode(UpdateableTaxonomyNode<ElkClass> subNode) {
+	public boolean removeDirectSubNode(
+			UpdateableTaxonomyNode<ElkClass> subNode) {
 		boolean changed = directSubNodes_.remove(subNode);
 
 		if (changed)

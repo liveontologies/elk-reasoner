@@ -43,13 +43,15 @@ public interface InstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 		extends Taxonomy<T> {
 
 	/**
-	 * Returns the {@link ComparatorKeyProvider} that provides a key for each instance.
-	 * These keys are used to compute hash codes and to compare the instances.
+	 * Returns the {@link ComparatorKeyProvider} that provides a key for each
+	 * instance. These keys are used to compute hash codes and to compare the
+	 * instances.
 	 * 
-	 * @return the {@link ComparatorKeyProvider} that provides a key for each instance.
+	 * @return the {@link ComparatorKeyProvider} that provides a key for each
+	 *         instance.
 	 */
 	ComparatorKeyProvider<? super I> getInstanceKeyProvider();
-	
+
 	/**
 	 * @param elkEntity
 	 *            {@link ElkEntity} for which the {@link InstanceNode} to be

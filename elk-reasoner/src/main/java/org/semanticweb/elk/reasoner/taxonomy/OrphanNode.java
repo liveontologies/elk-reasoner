@@ -57,7 +57,8 @@ public class OrphanNode<T extends ElkEntity> implements TaxonomyNode<T> {
 	 */
 	private final ComparatorKeyProvider<ElkEntity> keyProvider_;
 
-	public OrphanNode(Set<T> members, T canonical, ComparatorKeyProvider<ElkEntity> keyProvider) {
+	public OrphanNode(Set<T> members, T canonical,
+			ComparatorKeyProvider<ElkEntity> keyProvider) {
 		this.members = new HashMap<Object, T>();
 		for (T member : members) {
 			this.members.put(keyProvider.getKey(member), member);
@@ -70,22 +71,22 @@ public class OrphanNode<T extends ElkEntity> implements TaxonomyNode<T> {
 	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
 		return keyProvider_;
 	}
-	
+
 	@Override
 	public Iterator<T> iterator() {
 		return members.values().iterator();
 	}
-	
+
 	@Override
 	public boolean contains(final T member) {
 		return members.containsKey(keyProvider_.getKey(member));
 	}
-	
+
 	@Override
 	public int size() {
 		return members.size();
 	}
-	
+
 	@Override
 	public T getCanonicalMember() {
 		return canonical;

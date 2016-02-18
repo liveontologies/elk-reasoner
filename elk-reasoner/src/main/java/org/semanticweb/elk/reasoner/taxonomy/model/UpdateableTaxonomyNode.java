@@ -25,12 +25,18 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
+ * Updateable generic taxonomy node that can be related with
+ * {@link UpdateableTaxonomyNode}.
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of members of this node.
  */
-public interface UpdateableTaxonomyNode<T extends ElkEntity> extends
-		UpdateableGenericTaxonomyNode<T, UpdateableTaxonomyNode<T>> {
+public interface UpdateableTaxonomyNode<T extends ElkEntity>
+		extends UpdateableGenericTaxonomyNode<T, UpdateableTaxonomyNode<T>> {
 
 }
