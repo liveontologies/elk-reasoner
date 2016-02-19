@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericNodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableNode;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
@@ -100,33 +101,38 @@ public class SynchronizedNodeStore<T, N extends UpdateableNode<T>>
 	}
 
 	@Override
-	public synchronized N putIfAbsent(final N node) {
-		for (final T member : node) {
+	public synchronized N getCreateNode(final Iterable<T> members,
+			final int size, final NodeFactory<T, N> factory) {
+		for (final T member : members) {
 			final N previous = getNode(member);
 			if (previous != null) {
 				synchronized (previous) {
-					if (previous.size() < node.size()) {
-						previous.setMembers(node);
+					if (previous.size() < size) {
+						previous.setMembers(members);
 					} else {
 						return previous;
 					}
 				}
-				for (final T m : node) {
+				for (final T m : members) {
 					nodeLookup_.put(keyProvider_.getKey(m), previous);
 				}
 				return previous;
 			}
 		}
-		final N previous = nodeLookup_
-				.get(keyProvider_.getKey(node.getCanonicalMember()));
+		final N node = factory.createNode(members, size, keyProvider_);
+		final T canonicalMember = node.getCanonicalMember();
+		final N previous = nodeLookup_.put(keyProvider_.getKey(canonicalMember),
+				node);
 		if (previous != null) {
 			return previous;
 		}
 		allNodes_.add(node);
-		for (T member : node) {
-			nodeLookup_.put(keyProvider_.getKey(member), node);
+		for (final T member : node) {
+			if (member != canonicalMember) {
+				nodeLookup_.put(keyProvider_.getKey(member), node);
+			}
 		}
-		return null;
+		return node;
 	}
 
 	@Override

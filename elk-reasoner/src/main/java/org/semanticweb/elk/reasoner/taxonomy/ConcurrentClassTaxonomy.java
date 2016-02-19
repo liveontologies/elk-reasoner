@@ -39,6 +39,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericNodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
@@ -132,17 +133,28 @@ public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
 					"Empty class taxonomy nodes must not be created!");
 		}
 
-		final NonBottomClassNode node = new NonBottomClassNode(this, members);
-
-		final NonBottomClassNode previous = nodeStore_.putIfAbsent(node);
-		if (previous != null) {
-			return previous;
-		}
+		final NonBottomClassNode node = nodeStore_.getCreateNode(members,
+				members.size(), NON_BOTTOM_NODE_FACTORY);
 
 		LOGGER_.trace("created node: {}", node);
 
 		return node;
 	}
+
+	/**
+	 * Node factory creating nodes of this taxonomy.
+	 */
+	private final NodeFactory<ElkClass, NonBottomClassNode> NON_BOTTOM_NODE_FACTORY = new NodeFactory<ElkClass, NonBottomClassNode>() {
+
+		@Override
+		public NonBottomClassNode createNode(final Iterable<ElkClass> members,
+				final int size,
+				final ComparatorKeyProvider<? super ElkClass> keyProvider) {
+			return new NonBottomClassNode(ConcurrentClassTaxonomy.this, members,
+					size);
+		}
+
+	};
 
 	@Override
 	public UpdateableTaxonomyNode<ElkClass> getCreateNode(

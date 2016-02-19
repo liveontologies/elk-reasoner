@@ -28,11 +28,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericNodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableNode;
 
 /**
  * An updateable generic node store providing some concurrency guarantees.
+ * 
  * TODO: documentation
  * 
  * @author Peter Skocovsky
@@ -88,23 +90,25 @@ public class ConcurrentNodeStore<T, N extends UpdateableNode<T>>
 	}
 
 	@Override
-	public N putIfAbsent(final N node) {
-		for (final T member : node) {
+	public N getCreateNode(final Iterable<T> members, final int size,
+			final NodeFactory<T, N> factory) {
+		for (final T member : members) {
 			final N previous = getNode(member);
 			if (previous != null) {
 				synchronized (previous) {
-					if (previous.size() < node.size()) {
-						previous.setMembers(node);
+					if (previous.size() < size) {
+						previous.setMembers(members);
 					} else {
 						return previous;
 					}
 				}
-				for (final T m : node) {
+				for (final T m : members) {
 					nodeLookup_.put(keyProvider_.getKey(m), previous);
 				}
 				return previous;
 			}
 		}
+		final N node = factory.createNode(members, size, keyProvider_);
 		final T canonicalMember = node.getCanonicalMember();
 		final N previous = nodeLookup_
 				.putIfAbsent(keyProvider_.getKey(canonicalMember), node);
@@ -117,7 +121,7 @@ public class ConcurrentNodeStore<T, N extends UpdateableNode<T>>
 				nodeLookup_.put(keyProvider_.getKey(member), node);
 			}
 		}
-		return null;
+		return node;
 	}
 
 	@Override

@@ -25,7 +25,6 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -67,17 +66,19 @@ public class IndividualNode extends SimpleUpdateableNode<ElkNamedIndividual>
 	private final Set<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> directTypeNodes_;
 
 	/**
-	 * Constructing the class node for a given taxonomy and the set of
-	 * equivalent classes.
+	 * Constructing the individual node for the set of same individuals.
 	 * 
-	 * @param taxonomy
-	 *            the taxonomy to which this node belongs
 	 * @param members
-	 *            non-empty list of equivalent ElkClass objects
+	 *            non-empty list of equivalent ElkNamedIndividual objects
+	 * @param size
+	 *            The number of equivalent ElkNamedIndividual objects
+	 * @param individualKeyProvider
+	 *            The key provider for the ElkNamedIndividual objects.
 	 */
-	protected IndividualNode(Collection<ElkNamedIndividual> members,
+	protected IndividualNode(final Iterable<ElkNamedIndividual> members,
+			final int size,
 			final ComparatorKeyProvider<? super ElkNamedIndividual> individualKeyProvider) {
-		super(members, members.size(), individualKeyProvider);
+		super(members, size, individualKeyProvider);
 		this.directTypeNodes_ = new ArrayHashSet<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>();
 	}
 

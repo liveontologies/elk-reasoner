@@ -25,7 +25,6 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
@@ -81,10 +80,12 @@ class NonBottomClassNode extends SimpleUpdateableNode<ElkClass>
 	 *            the taxonomy to which this node belongs
 	 * @param members
 	 *            non-empty list of equivalent ElkClass objects
+	 * @param size
+	 *            number of equivalent ElkClass objects
 	 */
-	protected NonBottomClassNode(ConcurrentClassTaxonomy taxonomy,
-			Collection<ElkClass> members) {
-		super(members, members.size(), taxonomy.getKeyProvider());
+	protected NonBottomClassNode(final ConcurrentClassTaxonomy taxonomy,
+			final Iterable<ElkClass> members, final int size) {
+		super(members, size, taxonomy.getKeyProvider());
 		this.taxonomy_ = taxonomy;
 		this.directSubNodes_ = new ArrayHashSet<UpdateableTaxonomyNode<ElkClass>>();
 		this.directSuperNodes_ = new ArrayHashSet<UpdateableTaxonomyNode<ElkClass>>();

@@ -37,6 +37,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericNodeStore;
@@ -155,13 +156,8 @@ public class ConcurrentInstanceTaxonomy
 					"Empty instance nodes must not be created!");
 		}
 
-		final IndividualNode node = new IndividualNode(members,
-				getInstanceKeyProvider());
-
-		final IndividualNode previous = individualNodeStore_.putIfAbsent(node);
-		if (previous != null) {
-			return previous;
-		}
+		final IndividualNode node = individualNodeStore_.getCreateNode(members,
+				members.size(), INSTANCE_NODE_FACTORY);
 
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace("created node: {}", node);
@@ -169,6 +165,20 @@ public class ConcurrentInstanceTaxonomy
 
 		return node;
 	}
+
+	/**
+	 * Node factory creating instance nodes of this taxonomy.
+	 */
+	private final NodeFactory<ElkNamedIndividual, IndividualNode> INSTANCE_NODE_FACTORY = new NodeFactory<ElkNamedIndividual, IndividualNode>() {
+
+		@Override
+		public IndividualNode createNode(
+				final Iterable<ElkNamedIndividual> members, final int size,
+				final ComparatorKeyProvider<? super ElkNamedIndividual> keyProvider) {
+			return new IndividualNode(members, size, keyProvider);
+		}
+
+	};
 
 	@Override
 	public boolean removeInstanceNode(ElkNamedIndividual instance) {

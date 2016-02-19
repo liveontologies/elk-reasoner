@@ -36,15 +36,19 @@ public interface UpdateableGenericNodeStore<T, N extends UpdateableNode<T>>
 		extends GenericNodeStore<T, N> {
 
 	/**
-	 * Adds the specified node to this store if it is not in it yet.
-	 * TODO: documentation
+	 * Returns the node that contains the members provided in arguments. If such
+	 * a node is not in this store, it is created using the provided factory and
+	 * inserted into this store.
 	 * 
-	 * @param node
-	 *            The node that should be added to this store.
-	 * @return The node that was already in this node store, or
-	 *         <code>null</code> if the new node was added.
+	 * @param members
+	 *            The members of the returned node.
+	 * @param size
+	 *            The number of the members.
+	 * @param factory
+	 *            The factory creating nodes that can be stored in this store.
+	 * @return The node containing the provided members.
 	 */
-	N putIfAbsent(N node);
+	N getCreateNode(Iterable<T> members, int size, NodeFactory<T, N> factory);
 
 	/**
 	 * Removes the node containing the specified member from the taxonomy.
