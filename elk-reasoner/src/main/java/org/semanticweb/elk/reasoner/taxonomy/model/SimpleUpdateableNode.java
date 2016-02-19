@@ -89,32 +89,6 @@ public class SimpleUpdateableNode<T> extends SimpleNode<T>
 	}
 
 	@Override
-	public boolean add(final T member) {
-		final int searchResult = Collections.binarySearch(members_, member,
-				getKeyProvider().getComparator());
-		if (searchResult >= 0) {
-			return false;
-		} else {
-			final int index = -(searchResult + 1);
-			members_.add(index, member);
-			return true;
-		}
-	}
-
-	@Override
-	public boolean remove(final T member) {
-		final int searchResult = Collections.binarySearch(members_, member,
-				getKeyProvider().getComparator());
-		if (searchResult >= 0) {
-			final int index = searchResult;
-			members_.remove(index);
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	@Override
 	public void setMembers(final Iterable<? extends T> members) {
 		members_.clear();
 		for (final T elkClass : members) {

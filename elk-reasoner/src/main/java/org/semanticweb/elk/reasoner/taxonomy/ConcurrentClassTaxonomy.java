@@ -225,6 +225,18 @@ public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
 		}
 	}
 
+	@Override
+	public boolean addToBottomNode(final ElkClass member) {
+		return unsatisfiableClasses_.put(
+				nodeStore_.getKeyProvider().getKey(member), member) == null;
+	}
+	
+	@Override
+	public boolean removeFromBottomNode(final ElkClass member) {
+		return unsatisfiableClasses_
+				.remove(nodeStore_.getKeyProvider().getKey(member)) != null;
+	}
+	
 	/**
 	 * Special implementation for the bottom node in the taxonomy. Instead of
 	 * storing its sub- and super-classes, the respective answers are computed
@@ -330,18 +342,6 @@ public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
 		@Override
 		public void setMembers(Iterable<? extends ElkClass> members) {
 			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public boolean add(final ElkClass member) {
-			return unsatisfiableClasses_.put(
-					nodeStore_.getKeyProvider().getKey(member), member) == null;
-		}
-
-		@Override
-		public boolean remove(final ElkClass member) {
-			return unsatisfiableClasses_
-					.remove(nodeStore_.getKeyProvider().getKey(member)) != null;
 		}
 
 	}

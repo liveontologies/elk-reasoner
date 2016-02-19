@@ -52,24 +52,6 @@ public interface UpdateableNode<T> extends Node<T> {
 	boolean isModified();
 
 	/**
-	 * Adds the specified member to this node.
-	 * 
-	 * @param member
-	 *            The member to add.
-	 * @return Whether the node changed.
-	 */
-	boolean add(T member);
-
-	/**
-	 * Removes the specified member from this node.
-	 * 
-	 * @param member
-	 *            The node to remove.
-	 * @return Whether the node changed.
-	 */
-	boolean remove(T member);
-
-	/**
 	 * Replaces the members of this node with the specified members.
 	 * 
 	 * @param members

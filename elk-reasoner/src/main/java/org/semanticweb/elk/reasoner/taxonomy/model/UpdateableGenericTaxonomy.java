@@ -51,4 +51,22 @@ public interface UpdateableGenericTaxonomy<T extends ElkEntity, N extends Update
 	 */
 	boolean removeNode(T member);
 
+	/**
+	 * Adds the specified member to the bottom node of this taxonomy.
+	 * 
+	 * @param member
+	 *            The member to add.
+	 * @return Whether the bottom node changed.
+	 */
+	boolean addToBottomNode(T member);
+
+	/**
+	 * Removes the specified member from the bottom node of this taxonomy.
+	 * 
+	 * @param member
+	 *            The node to remove.
+	 * @return Whether the bottom node changed.
+	 */
+	boolean removeFromBottomNode(T member);
+
 }

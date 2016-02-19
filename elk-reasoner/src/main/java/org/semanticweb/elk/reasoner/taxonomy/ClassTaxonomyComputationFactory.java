@@ -157,7 +157,7 @@ public class ClassTaxonomyComputationFactory extends SimpleInterrupter
 		public void visit(
 				TransitiveReductionOutputUnsatisfiable<IndexedClass> output) {
 
-			taxonomy_.getBottomNode().add(output.getRoot().getElkEntity());
+			taxonomy_.addToBottomNode(output.getRoot().getElkEntity());
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace(output.getRoot() + ": added to the bottom node");
 			}
