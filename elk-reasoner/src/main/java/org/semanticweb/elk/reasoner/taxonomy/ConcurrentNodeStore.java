@@ -90,7 +90,7 @@ public class ConcurrentNodeStore<T, N extends UpdateableNode<T>>
 	}
 
 	@Override
-	public N getCreateNode(final Iterable<T> members, final int size,
+	public N getCreateNode(final Iterable<? extends T> members, final int size,
 			final NodeFactory<T, N> factory) {
 		for (final T member : members) {
 			final N previous = getNode(member);

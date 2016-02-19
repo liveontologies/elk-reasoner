@@ -101,7 +101,7 @@ public class SynchronizedNodeStore<T, N extends UpdateableNode<T>>
 	}
 
 	@Override
-	public synchronized N getCreateNode(final Iterable<T> members,
+	public synchronized N getCreateNode(final Iterable<? extends T> members,
 			final int size, final NodeFactory<T, N> factory) {
 		for (final T member : members) {
 			final N previous = getNode(member);

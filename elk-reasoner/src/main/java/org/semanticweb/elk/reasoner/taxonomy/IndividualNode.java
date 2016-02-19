@@ -75,7 +75,8 @@ public class IndividualNode extends SimpleUpdateableNode<ElkNamedIndividual>
 	 * @param individualKeyProvider
 	 *            The key provider for the ElkNamedIndividual objects.
 	 */
-	protected IndividualNode(final Iterable<ElkNamedIndividual> members,
+	protected IndividualNode(
+			final Iterable<? extends ElkNamedIndividual> members,
 			final int size,
 			final ComparatorKeyProvider<? super ElkNamedIndividual> individualKeyProvider) {
 		super(members, size, individualKeyProvider);

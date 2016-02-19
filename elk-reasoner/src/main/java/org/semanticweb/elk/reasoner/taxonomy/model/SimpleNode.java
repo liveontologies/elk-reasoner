@@ -58,7 +58,7 @@ public class SimpleNode<T> implements Node<T> {
 	 * @param keyProvider
 	 *            The key provider for the members.
 	 */
-	public SimpleNode(final Iterable<T> members, final int size,
+	public SimpleNode(final Iterable<? extends T> members, final int size,
 			final ComparatorKeyProvider<? super T> keyProvider) {
 		if (keyProvider == null) {
 			throw new IllegalArgumentException("keyProvider cannot be null!");

@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SimpleUpdateableNode<T> extends SimpleNode<T>
 		implements UpdateableNode<T> {
-	
+
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(SimpleUpdateableNode.class);
 	/**
@@ -50,11 +50,15 @@ public class SimpleUpdateableNode<T> extends SimpleNode<T>
 	/**
 	 * Creates a node containing the specified members.
 	 * 
-	 * @param members The members this node should contain.
-	 * @param size The number of the specified members.
-	 * @param keyProvider The key provider for the members.
+	 * @param members
+	 *            The members this node should contain.
+	 * @param size
+	 *            The number of the specified members.
+	 * @param keyProvider
+	 *            The key provider for the members.
 	 */
-	public SimpleUpdateableNode(final Iterable<T> members, final int size,
+	public SimpleUpdateableNode(final Iterable<? extends T> members,
+			final int size,
 			final ComparatorKeyProvider<? super T> keyProvider) {
 		super(members, size, keyProvider);
 	}
@@ -62,13 +66,14 @@ public class SimpleUpdateableNode<T> extends SimpleNode<T>
 	/**
 	 * Creates an empty node.
 	 * 
-	 * @param comparatorKeyProvider The key provider for the members.
+	 * @param comparatorKeyProvider
+	 *            The key provider for the members.
 	 */
 	public SimpleUpdateableNode(
 			final ComparatorKeyProvider<T> comparatorKeyProvider) {
 		super(comparatorKeyProvider);
 	}
-	
+
 	@Override
 	public boolean trySetModified(boolean modified) {
 		boolean result = modified_.compareAndSet(!modified, modified);
@@ -95,7 +100,7 @@ public class SimpleUpdateableNode<T> extends SimpleNode<T>
 			return true;
 		}
 	}
-	
+
 	@Override
 	public boolean remove(final T member) {
 		final int searchResult = Collections.binarySearch(members_, member,
@@ -110,7 +115,7 @@ public class SimpleUpdateableNode<T> extends SimpleNode<T>
 	}
 
 	@Override
-	public void setMembers(final Iterable<T> members) {
+	public void setMembers(final Iterable<? extends T> members) {
 		members_.clear();
 		for (final T elkClass : members) {
 			members_.add(elkClass);
@@ -118,5 +123,5 @@ public class SimpleUpdateableNode<T> extends SimpleNode<T>
 		Collections.sort(this.members_, getKeyProvider().getComparator());
 		LOGGER_.trace("updated members of {}", this);
 	}
-	
+
 }

@@ -39,16 +39,8 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
 public interface UpdateableGenericTaxonomy<T extends ElkEntity, N extends UpdateableGenericTaxonomyNode<T, N>>
 		extends GenericTaxonomy<T, N> {
 
-	/**
-	 * Returns the node containing the specified members, creates the node and
-	 * adds it to this taxonomy if needed.
-	 * 
-	 * @param members
-	 *            The members of the node.
-	 * @return The node containing the specified members, creates the node and
-	 *         adds it to this taxonomy if needed.
-	 */
-	N getCreateNode(Collection<T> members);
+	void setCreateDirectSupernodes(Collection<? extends T> members,
+			Iterable<? extends Collection<? extends T>> superMemberSets);
 
 	/**
 	 * Removes the node containing the specified member from the taxonomy.

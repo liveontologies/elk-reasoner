@@ -44,16 +44,8 @@ public interface UpdateableGenericInstanceTaxonomy<T extends ElkEntity, I extend
 		extends UpdateableGenericTaxonomy<T, TN>,
 		GenericInstanceTaxonomy<T, I, TN, IN> {
 
-	/**
-	 * Returns the instance node containing the specified members, creates the
-	 * node and adds it to this taxonomy if needed.
-	 * 
-	 * @param member
-	 *            The members of the node.
-	 * @return The instance node containing the specified members, creates the
-	 *         node and adds it to this taxonomy if needed.
-	 */
-	IN getCreateInstanceNode(Collection<I> member);
+	void setCreateDirectTypes(Collection<? extends I> instances,
+			Iterable<? extends Collection<? extends T>> typeSets);
 
 	/**
 	 * Removes the instance node containing the specified member from the

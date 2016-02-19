@@ -84,7 +84,7 @@ class NonBottomClassNode extends SimpleUpdateableNode<ElkClass>
 	 *            number of equivalent ElkClass objects
 	 */
 	protected NonBottomClassNode(final ConcurrentClassTaxonomy taxonomy,
-			final Iterable<ElkClass> members, final int size) {
+			final Iterable<? extends ElkClass> members, final int size) {
 		super(members, size, taxonomy.getKeyProvider());
 		this.taxonomy_ = taxonomy;
 		this.directSubNodes_ = new ArrayHashSet<UpdateableTaxonomyNode<ElkClass>>();
@@ -157,7 +157,7 @@ class NonBottomClassNode extends SimpleUpdateableNode<ElkClass>
 	}
 
 	@Override
-	public boolean removeDirectSubNode(
+	public synchronized boolean removeDirectSubNode(
 			UpdateableTaxonomyNode<ElkClass> subNode) {
 		boolean changed = directSubNodes_.remove(subNode);
 
@@ -172,7 +172,7 @@ class NonBottomClassNode extends SimpleUpdateableNode<ElkClass>
 	}
 
 	@Override
-	public boolean removeDirectSuperNode(
+	public synchronized boolean removeDirectSuperNode(
 			UpdateableTaxonomyNode<ElkClass> superNode) {
 		boolean changed = directSuperNodes_.remove(superNode);
 

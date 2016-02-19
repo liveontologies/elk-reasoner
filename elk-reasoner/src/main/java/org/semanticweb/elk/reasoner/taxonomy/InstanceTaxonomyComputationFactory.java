@@ -23,7 +23,6 @@
 package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collections;
-import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
@@ -39,9 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputationFactory.Engine;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
@@ -59,8 +56,8 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  */
-public class InstanceTaxonomyComputationFactory implements
-		InputProcessorFactory<IndexedIndividual, Engine> {
+public class InstanceTaxonomyComputationFactory
+		implements InputProcessorFactory<IndexedIndividual, Engine> {
 
 	/**
 	 * The class taxonomy object into which we write the result
@@ -92,8 +89,7 @@ public class InstanceTaxonomyComputationFactory implements
 	 *            results in
 	 */
 	public InstanceTaxonomyComputationFactory(
-			SaturationState<?> saturationState,
-			int maxWorkers,
+			SaturationState<?> saturationState, int maxWorkers,
 			UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> partialTaxonomy) {
 		this.taxonomy_ = partialTaxonomy;
 		this.transitiveReductionShared_ = new TransitiveReductionFactory<IndexedIndividual, TransitiveReductionJob<IndexedIndividual>>(
@@ -108,13 +104,13 @@ public class InstanceTaxonomyComputationFactory implements
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 */
-	private class ThisTransitiveReductionListener
-			implements
+	private class ThisTransitiveReductionListener implements
 			TransitiveReductionListener<TransitiveReductionJob<IndexedIndividual>> {
 
 		@Override
-		public void notifyFinished(TransitiveReductionJob<IndexedIndividual> job)
-				throws InterruptedException {
+		public void notifyFinished(
+				TransitiveReductionJob<IndexedIndividual> job)
+						throws InterruptedException {
 			job.getOutput().accept(outputProcessor_);
 		}
 
@@ -128,26 +124,18 @@ public class InstanceTaxonomyComputationFactory implements
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	private class TransitiveReductionOutputProcessor implements
-			TransitiveReductionOutputVisitor<IndexedIndividual> {
+	private class TransitiveReductionOutputProcessor
+			implements TransitiveReductionOutputVisitor<IndexedIndividual> {
 
 		@Override
 		public void visit(
 				TransitiveReductionOutputEquivalentDirect<IndexedIndividual> output) {
 
 			// only supports singleton individuals
-			UpdateableInstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy_
-					.getCreateInstanceNode(Collections.singleton(output
-							.getRoot().getElkEntity()));
+			taxonomy_.setCreateDirectTypes(
+					Collections.singleton(output.getRoot().getElkEntity()),
+					output.getDirectSubsumers());
 
-			for (List<ElkClass> directSuperEquivalent : output
-					.getDirectSubsumers()) {
-				UpdateableTypeNode<ElkClass, ElkNamedIndividual> superNode = taxonomy_
-						.getCreateNode(directSuperEquivalent);
-				assignDirectTypeNode(node, superNode);
-			}
-
-			node.trySetModified(false);
 		}
 
 		@Override
@@ -167,29 +155,6 @@ public class InstanceTaxonomyComputationFactory implements
 			throw new IllegalArgumentException();
 		}
 
-	}
-
-	/**
-	 * Connecting the given pair of nodes in instance/type-node relation. The
-	 * method should not be called concurrently for the same first argument.
-	 * 
-	 * @param instanceNode
-	 *            the node that should be the sub-node of the second node
-	 * 
-	 * @param typeNode
-	 *            the node that should be the super-node of the first node
-	 */
-	private static void assignDirectTypeNode(
-			UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode,
-			UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode) {
-		instanceNode.addDirectTypeNode(typeNode);
-		/*
-		 * since type-nodes can be added from different nodes, this call should
-		 * be synchronized
-		 */
-		synchronized (typeNode) {
-			typeNode.addDirectInstanceNode(instanceNode);
-		}
 	}
 
 	/**

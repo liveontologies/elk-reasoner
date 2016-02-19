@@ -75,6 +75,6 @@ public interface UpdateableNode<T> extends Node<T> {
 	 * @param members
 	 *            The new members of this node.
 	 */
-	void setMembers(Iterable<T> members);
+	void setMembers(Iterable<? extends T> members);
 
 }

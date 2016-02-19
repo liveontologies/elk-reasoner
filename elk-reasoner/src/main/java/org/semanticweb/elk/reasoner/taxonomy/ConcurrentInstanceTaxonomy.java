@@ -147,25 +147,6 @@ public class ConcurrentInstanceTaxonomy
 		return individualNodeStore_.getNodes();
 	}
 
-	@Override
-	public IndividualNode getCreateInstanceNode(
-			Collection<ElkNamedIndividual> members) {
-
-		if (members == null || members.isEmpty()) {
-			throw new IllegalArgumentException(
-					"Empty instance nodes must not be created!");
-		}
-
-		final IndividualNode node = individualNodeStore_.getCreateNode(members,
-				members.size(), INSTANCE_NODE_FACTORY);
-
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("created node: {}", node);
-		}
-
-		return node;
-	}
-
 	/**
 	 * Node factory creating instance nodes of this taxonomy.
 	 */
@@ -173,12 +154,40 @@ public class ConcurrentInstanceTaxonomy
 
 		@Override
 		public IndividualNode createNode(
-				final Iterable<ElkNamedIndividual> members, final int size,
+				final Iterable<? extends ElkNamedIndividual> members,
+				final int size,
 				final ComparatorKeyProvider<? super ElkNamedIndividual> keyProvider) {
 			return new IndividualNode(members, size, keyProvider);
 		}
 
 	};
+
+	public void setCreateDirectTypes(
+			final Collection<? extends ElkNamedIndividual> instances,
+			final Iterable<? extends java.util.Collection<? extends ElkClass>> typeSets) {
+
+		final IndividualNode node = individualNodeStore_.getCreateNode(
+				instances, instances.size(), INSTANCE_NODE_FACTORY);
+
+		// TODO: establish consistency by adding default type to the nodes.
+
+		for (final Collection<? extends ElkClass> superMembers : typeSets) {
+			classTaxonomy_.setCreateDirectSupernodes(superMembers,
+					Collections.<Collection<ElkClass>> emptyList());
+			final UpdateableTypeNode<ElkClass, ElkNamedIndividual> superNode = getCreateUpdateableTypeNode(
+					classTaxonomy_.getNode(superMembers.iterator().next()));
+			addDirectType(superNode, node);
+		}
+
+		node.trySetModified(false);
+	};
+
+	private static void addDirectType(
+			final UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode,
+			final UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode) {
+		instanceNode.addDirectTypeNode(typeNode);
+		typeNode.addDirectInstanceNode(instanceNode);
+	}
 
 	@Override
 	public boolean removeInstanceNode(ElkNamedIndividual instance) {
@@ -207,12 +216,10 @@ public class ConcurrentInstanceTaxonomy
 	}
 
 	@Override
-	public UpdateableTypeNode<ElkClass, ElkNamedIndividual> getCreateNode(
-			Collection<ElkClass> members) {
-		UpdateableTaxonomyNode<ElkClass> taxNode = classTaxonomy_
-				.getCreateNode(members);
-
-		return getCreateUpdateableTypeNode(taxNode);
+	public void setCreateDirectSupernodes(
+			Collection<? extends ElkClass> members,
+			Iterable<? extends Collection<? extends ElkClass>> superMemberSets) {
+		classTaxonomy_.setCreateDirectSupernodes(members, superMemberSets);
 	}
 
 	@Override
@@ -426,7 +433,7 @@ public class ConcurrentInstanceTaxonomy
 		}
 
 		@Override
-		public void setMembers(final Iterable<ElkClass> members) {
+		public void setMembers(final Iterable<? extends ElkClass> members) {
 			getNode().setMembers(members);
 		}
 

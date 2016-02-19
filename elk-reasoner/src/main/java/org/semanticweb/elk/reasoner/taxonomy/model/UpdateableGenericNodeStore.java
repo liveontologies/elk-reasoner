@@ -48,7 +48,8 @@ public interface UpdateableGenericNodeStore<T, N extends UpdateableNode<T>>
 	 *            The factory creating nodes that can be stored in this store.
 	 * @return The node containing the provided members.
 	 */
-	N getCreateNode(Iterable<T> members, int size, NodeFactory<T, N> factory);
+	N getCreateNode(Iterable<? extends T> members, int size,
+			NodeFactory<T, N> factory);
 
 	/**
 	 * Removes the node containing the specified member from the taxonomy.

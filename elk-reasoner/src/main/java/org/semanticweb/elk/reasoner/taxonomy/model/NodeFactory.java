@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
 
 public interface NodeFactory<T, N extends Node<T>> {
 
-	N createNode(Iterable<T> members, int size,
+	N createNode(Iterable<? extends T> members, int size,
 			ComparatorKeyProvider<? super T> keyProvider);
 	
 }
