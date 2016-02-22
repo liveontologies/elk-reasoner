@@ -52,8 +52,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  *
  */
 public class SubClassInclusionComposedEntity
-		extends
-			AbstractSubClassInclusionComposedInference<IndexedClassEntity> {
+		extends AbstractSubClassInclusionComposedInference<IndexedClassEntity> {
 
 	public SubClassInclusionComposedEntity(IndexedContextRoot origin,
 			IndexedClassEntity subsumer) {
@@ -65,8 +64,9 @@ public class SubClassInclusionComposedEntity
 		return getDestination();
 	}
 
-	public SubClassInclusionDecomposed getPremise() {
-		return FACTORY.getSubClassInclusionDecomposed(getOrigin(),
+	public SubClassInclusionDecomposed getPremise(
+			SubClassInclusionDecomposed.Factory factory) {
+		return factory.getSubClassInclusionDecomposed(getOrigin(),
 				getSubsumer());
 	}
 

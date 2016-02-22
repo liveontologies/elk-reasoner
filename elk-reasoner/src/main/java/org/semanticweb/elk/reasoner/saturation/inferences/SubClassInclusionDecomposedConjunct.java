@@ -53,8 +53,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * @author Yevgeny Kazakov
  */
 public abstract class SubClassInclusionDecomposedConjunct
-		extends
-			AbstractSubClassInclusionDecomposedInference {
+		extends AbstractSubClassInclusionDecomposedInference {
 
 	private final IndexedObjectIntersectionOf conjunction_;
 
@@ -68,9 +67,10 @@ public abstract class SubClassInclusionDecomposedConjunct
 	public IndexedObjectIntersectionOf getConjunction() {
 		return conjunction_;
 	}
-	
-	public SubClassInclusionDecomposed getPremise() {
-		return FACTORY.getSubClassInclusionDecomposed(getOrigin(),
+
+	public SubClassInclusionDecomposed getPremise(
+			SubClassInclusionDecomposed.Factory factory) {
+		return factory.getSubClassInclusionDecomposed(getOrigin(),
 				conjunction_);
 	}
 

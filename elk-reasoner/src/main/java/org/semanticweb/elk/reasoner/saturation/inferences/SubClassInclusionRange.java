@@ -50,8 +50,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * @author Yevgeny Kazakov
  */
 public class SubClassInclusionRange
-		extends
-			AbstractSubClassInclusionDecomposedInference {
+		extends AbstractSubClassInclusionDecomposedInference {
 
 	public SubClassInclusionRange(IndexedRangeFiller inferenceRoot,
 			IndexedClassExpression propertyRange) {
@@ -67,12 +66,13 @@ public class SubClassInclusionRange
 		return getSubsumer();
 	}
 
-	public ContextInitialization getFirstPremise() {
-		return FACTORY.getContextInitialization(getOrigin());
+	public ContextInitialization getFirstPremise(
+			ContextInitialization.Factory factory) {
+		return factory.getContextInitialization(getOrigin());
 	}
 
-	public PropertyRange getSecondPremise() {
-		return FACTORY.getPropertyRange(getOrigin().getProperty(),
+	public PropertyRange getSecondPremise(PropertyRange.Factory factory) {
+		return factory.getPropertyRange(getOrigin().getProperty(),
 				getSubsumer());
 	}
 

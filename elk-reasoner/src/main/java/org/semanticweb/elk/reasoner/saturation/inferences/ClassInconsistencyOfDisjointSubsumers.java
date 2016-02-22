@@ -63,8 +63,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsume
  * @author Yevgeny Kazakov
  */
 public class ClassInconsistencyOfDisjointSubsumers
-		extends
-			AbstractClassInconsistencyInference {
+		extends AbstractClassInconsistencyInference {
 
 	/**
 	 * The disjoint {@link IndexedClassExpression}s that cause the contradiction
@@ -112,18 +111,19 @@ public class ClassInconsistencyOfDisjointSubsumers
 		return secondPosition_;
 	}
 
-	public DisjointSubsumer getFirstPremise() {
-		return FACTORY.getDisjointSubsumer(getOrigin(), disjointExpressions_,
+	public DisjointSubsumer getFirstPremise(DisjointSubsumer.Factory factory) {
+		return factory.getDisjointSubsumer(getOrigin(), disjointExpressions_,
 				firstPosition_, reason_);
 	}
 
-	public DisjointSubsumer getSecondPremise() {
-		return FACTORY.getDisjointSubsumer(getOrigin(), disjointExpressions_,
+	public DisjointSubsumer getSecondPremise(DisjointSubsumer.Factory factory) {
+		return factory.getDisjointSubsumer(getOrigin(), disjointExpressions_,
 				secondPosition_, reason_);
 	}
 
-	public IndexedDisjointClassesAxiom getThirdPremise() {
-		return FACTORY.getIndexedDisjointClassesAxiom(reason_,
+	public IndexedDisjointClassesAxiom getThirdPremise(
+			IndexedDisjointClassesAxiom.Factory factory) {
+		return factory.getIndexedDisjointClassesAxiom(reason_,
 				disjointExpressions_);
 	}
 

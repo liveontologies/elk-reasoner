@@ -27,26 +27,24 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.PropertyRangeImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.PropertyRange;
 import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
-import org.semanticweb.elk.reasoner.tracing.Conclusion;
-import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
 public abstract class AbstractPropertyRangeInference extends PropertyRangeImpl
-		implements
-			PropertyRangeInference {
+		implements PropertyRangeInference {
 
-	static Conclusion.Factory FACTORY = ConclusionBaseFactory.getInstance();
-	
 	protected AbstractPropertyRangeInference(IndexedObjectProperty property,
 			IndexedClassExpression range) {
 		super(property, range);
 	}
 
 	/**
+	 * @param factory
+	 *            the factory for creating conclusions
+	 * 
 	 * @return the conclusion produced by this inference
 	 */
-	public PropertyRange getConclusion() {
-		return this;
+	public PropertyRange getConclusion(PropertyRange.Factory factory) {
+		return factory.getPropertyRange(getProperty(), getRange());
 	}
 
 	// we assume that different objects represent different inferences

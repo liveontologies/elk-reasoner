@@ -61,7 +61,7 @@ public interface ClassInconsistency extends ClassConclusion {
 	 */
 	interface Factory {
 
-		ClassInconsistency getContradiction(IndexedContextRoot root);
+		ClassInconsistency getContradiction(IndexedContextRoot destination);
 
 	}
 

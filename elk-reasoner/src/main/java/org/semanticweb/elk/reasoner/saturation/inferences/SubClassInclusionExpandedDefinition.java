@@ -55,8 +55,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * 
  */
 public class SubClassInclusionExpandedDefinition
-		extends
-			AbstractSubClassInclusionDecomposedInference {
+		extends AbstractSubClassInclusionDecomposedInference {
 
 	private final IndexedClass defined_;
 
@@ -82,12 +81,14 @@ public class SubClassInclusionExpandedDefinition
 		return reason_;
 	}
 
-	public SubClassInclusionDecomposed getFirstPremise() {
-		return FACTORY.getSubClassInclusionDecomposed(getOrigin(), defined_);
+	public SubClassInclusionDecomposed getFirstPremise(
+			SubClassInclusionDecomposed.Factory factory) {
+		return factory.getSubClassInclusionDecomposed(getOrigin(), defined_);
 	}
 
-	public IndexedDefinitionAxiom getSecondPremise() {
-		return FACTORY.getIndexedDefinitionAxiom(reason_, defined_,
+	public IndexedDefinitionAxiom getSecondPremise(
+			IndexedDefinitionAxiom.Factory factory) {
+		return factory.getIndexedDefinitionAxiom(reason_, defined_,
 				getSubsumer());
 	}
 

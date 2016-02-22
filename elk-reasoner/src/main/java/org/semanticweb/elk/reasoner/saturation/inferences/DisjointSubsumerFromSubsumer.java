@@ -59,8 +59,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * @author Yevgeny Kazakov
  */
 public class DisjointSubsumerFromSubsumer
-		extends
-			AbstractDisjointSubsumerInference {
+		extends AbstractDisjointSubsumerInference {
 
 	public DisjointSubsumerFromSubsumer(IndexedContextRoot inferenceRoot,
 			IndexedClassExpressionList disjoint, int position,
@@ -73,13 +72,15 @@ public class DisjointSubsumerFromSubsumer
 		return getDestination();
 	}
 
-	public SubClassInclusionComposed getFirstPremise() {
-		return FACTORY.getSubClassInclusionComposed(getOrigin(),
+	public SubClassInclusionComposed getFirstPremise(
+			SubClassInclusionComposed.Factory factory) {
+		return factory.getSubClassInclusionComposed(getOrigin(),
 				getDisjointExpressions().getElements().get(getPosition()));
 	}
 
-	public IndexedDisjointClassesAxiom getSecondPremise() {
-		return FACTORY.getIndexedDisjointClassesAxiom(getReason(),
+	public IndexedDisjointClassesAxiom getSecondPremise(
+			IndexedDisjointClassesAxiom.Factory factory) {
+		return factory.getIndexedDisjointClassesAxiom(getReason(),
 				getDisjointExpressions());
 	}
 

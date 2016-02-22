@@ -32,13 +32,16 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
  *
  */
 public interface IndexedDeclarationAxiomInference
-		extends
-			IndexedAxiomInference {
+		extends IndexedAxiomInference {
 
 	/**
+	 * @param factory
+	 *            the factory for creating conclusions
+	 * 
 	 * @return the conclusion produced by this inference
 	 */
-	public IndexedDeclarationAxiom getConclusion();
+	public IndexedDeclarationAxiom getConclusion(
+			IndexedDeclarationAxiom.Factory factory);
 
 	/**
 	 * The visitor pattern for instances

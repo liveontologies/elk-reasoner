@@ -34,11 +34,9 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChai
  * 
  * @author "Yevgeny Kazakov"
  */
-class ModifiableElkTransitiveObjectPropertyAxiomConversionImpl
-		extends
-			ModifiableIndexedSubObjectPropertyOfAxiomInferenceImpl<ElkTransitiveObjectPropertyAxiom>
-		implements
-			ModifiableElkTransitiveObjectPropertyAxiomConversion {
+class ModifiableElkTransitiveObjectPropertyAxiomConversionImpl extends
+		ModifiableIndexedSubObjectPropertyOfAxiomInferenceImpl<ElkTransitiveObjectPropertyAxiom>
+		implements ModifiableElkTransitiveObjectPropertyAxiomConversion {
 
 	ModifiableElkTransitiveObjectPropertyAxiomConversionImpl(
 			ElkTransitiveObjectPropertyAxiom originalAxiom,
@@ -48,8 +46,10 @@ class ModifiableElkTransitiveObjectPropertyAxiomConversionImpl
 	}
 
 	@Override
-	public IndexedSubObjectPropertyOfAxiom getConclusion() {
-		return this;
+	public IndexedSubObjectPropertyOfAxiom getConclusion(
+			IndexedSubObjectPropertyOfAxiom.Factory factory) {
+		return factory.getIndexedSubObjectPropertyOfAxiom(getOriginalAxiom(),
+				getSubPropertyChain(), getSuperProperty());
 	}
 
 	@Override

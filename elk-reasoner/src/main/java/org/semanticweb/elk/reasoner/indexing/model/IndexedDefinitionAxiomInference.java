@@ -33,9 +33,12 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 public interface IndexedDefinitionAxiomInference extends IndexedAxiomInference {
 
 	/**
+	 * @param factory
+	 *            the factory for creating conclusions
+	 * 
 	 * @return the conclusion produced by this inference
 	 */
-	public IndexedDefinitionAxiom getConclusion();
+	public IndexedDefinitionAxiom getConclusion(IndexedDefinitionAxiom.Factory factory);
 
 	/**
 	 * The visitor pattern for instances
@@ -46,9 +49,8 @@ public interface IndexedDefinitionAxiomInference extends IndexedAxiomInference {
 	 *            the type of the output
 	 */
 	interface Visitor<O>
-			extends
-				ElkDisjointUnionAxiomDefinitionConversion.Visitor<O>,
-				ElkEquivalentClassesAxiomDefinitionConversion.Visitor<O> {
+			extends ElkDisjointUnionAxiomDefinitionConversion.Visitor<O>,
+			ElkEquivalentClassesAxiomDefinitionConversion.Visitor<O> {
 
 		// combined interface
 

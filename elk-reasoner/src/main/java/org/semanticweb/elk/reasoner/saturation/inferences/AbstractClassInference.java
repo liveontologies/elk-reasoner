@@ -23,8 +23,6 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.tracing.Conclusion;
-import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
 /**
@@ -34,8 +32,6 @@ import org.semanticweb.elk.reasoner.tracing.Inference;
  *
  */
 abstract class AbstractClassInference implements ClassInference {
-
-	static Conclusion.Factory FACTORY = ConclusionBaseFactory.getInstance();
 
 	private final IndexedContextRoot destination_;
 

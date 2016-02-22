@@ -39,8 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  *         pavel.klinov@uni-ulm.de
  */
 abstract class AbstractClassInconsistencyOfInconsistentSubsumerInference<S extends IndexedClassExpression>
-		extends
-			AbstractClassInconsistencyInference {
+		extends AbstractClassInconsistencyInference {
 
 	private final S premiseSubsumer_;
 
@@ -55,8 +54,9 @@ abstract class AbstractClassInconsistencyOfInconsistentSubsumerInference<S exten
 		return getDestination();
 	}
 
-	public SubClassInclusionComposed getPremise() {
-		return FACTORY.getSubClassInclusionComposed(getOrigin(),
+	public SubClassInclusionComposed getPremise(
+			SubClassInclusionComposed.Factory factory) {
+		return factory.getSubClassInclusionComposed(getOrigin(),
 				premiseSubsumer_);
 	}
 

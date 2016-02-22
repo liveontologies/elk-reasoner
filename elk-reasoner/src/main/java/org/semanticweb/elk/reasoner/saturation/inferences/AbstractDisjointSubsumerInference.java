@@ -27,15 +27,10 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.DisjointSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
-import org.semanticweb.elk.reasoner.tracing.Conclusion;
-import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
 abstract class AbstractDisjointSubsumerInference extends DisjointSubsumerImpl
-		implements
-			DisjointSubsumerInference {
-
-	static Conclusion.Factory FACTORY = ConclusionBaseFactory.getInstance();
+		implements DisjointSubsumerInference {
 
 	public AbstractDisjointSubsumerInference(IndexedContextRoot root,
 			IndexedClassExpressionList disjoint, int position,
@@ -44,10 +39,14 @@ abstract class AbstractDisjointSubsumerInference extends DisjointSubsumerImpl
 	}
 
 	/**
+	 * @param factory
+	 *            the factory for creating conclusions
+	 * 
 	 * @return the conclusion produced by this inference
 	 */
-	public DisjointSubsumer getConclusion() {
-		return this;
+	public DisjointSubsumer getConclusion(DisjointSubsumer.Factory factory) {
+		return factory.getDisjointSubsumer(getDestination(),
+				getDisjointExpressions(), getPosition(), getReason());
 	}
 
 	@Override

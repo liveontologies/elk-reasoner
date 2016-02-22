@@ -26,8 +26,6 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SubClassInclusionComposedImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
-import org.semanticweb.elk.reasoner.tracing.Conclusion;
-import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
 abstract class AbstractSubClassInclusionComposedInference<S extends IndexedClassExpression>
@@ -35,8 +33,6 @@ abstract class AbstractSubClassInclusionComposedInference<S extends IndexedClass
 			SubClassInclusionComposedImpl<S>
 		implements
 			SubClassInclusionComposedInference {
-
-	static Conclusion.Factory FACTORY = ConclusionBaseFactory.getInstance();
 
 	public AbstractSubClassInclusionComposedInference(
 			IndexedContextRoot subExpression, S superExpression) {
@@ -47,9 +43,16 @@ abstract class AbstractSubClassInclusionComposedInference<S extends IndexedClass
 		return super.getSubsumer();
 	}
 
-	@Override
-	public SubClassInclusionComposed getConclusion() {
-		return this;
+	/**
+	 * @param factory
+	 *            the factory for creating conclusions
+	 *            
+	 * @return the conclusion produced by this inference
+	 */
+	public SubClassInclusionComposed getConclusion(
+			SubClassInclusionComposed.Factory factory) {
+		return factory.getSubClassInclusionComposed(getDestination(),
+				getSubsumer());
 	}
 
 	@Override

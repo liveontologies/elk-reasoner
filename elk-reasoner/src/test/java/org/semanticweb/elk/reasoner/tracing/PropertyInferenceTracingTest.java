@@ -98,7 +98,7 @@ public class PropertyInferenceTracingTest {
 						// checking that S -> HH is in the trace (i.e. is used)
 						return inference.getSubChain().equals(s) && 
 								inference.getSuperChain().equals(hh) &&
-								inference.getFirstPremise().getSubChain().equals(r);
+								inference.getFirstPremise(FACTORY_).getSubChain().equals(r);
 					}
 			
 				});
@@ -143,8 +143,8 @@ public class PropertyInferenceTracingTest {
 					@Override
 					public Boolean visit(ForwardLinkComposition conclusion) {
 						// looking for the composition S o H -> SS o HH
-						SubPropertyChain left = conclusion.getSecondPremise();
-						SubPropertyChain right = conclusion.getFourthPremise();
+						SubPropertyChain left = conclusion.getSecondPremise(FACTORY_);
+						SubPropertyChain right = conclusion.getFourthPremise(FACTORY_);
 						
 							return conclusion.getTarget().equals(dIndexed) &&
 									left.getSubChain().equals(sIndexed) &&
@@ -177,10 +177,10 @@ public class PropertyInferenceTracingTest {
 						// check that we use the inference that A <-R- B and B -SS o HH-> D imply A <-T- D  
 						return backwardLink.getRelation().equals(tIndexed) &&
 								backwardLink.getTraceRoot().equals(aIndexed) &&
-								backwardLink.getFirstPremise().getTraceRoot().equals(aIndexed) &&
-								backwardLink.getFirstPremise().getRelation().equals(rIndexed) &&
-								backwardLink.getThirdPremise().getTarget().equals(dIndexed) &&
-								backwardLink.getThirdPremise().getRelation().equals(sshhIndexed) &&
+								backwardLink.getFirstPremise(FACTORY_).getTraceRoot().equals(aIndexed) &&
+								backwardLink.getFirstPremise(FACTORY_).getRelation().equals(rIndexed) &&
+								backwardLink.getThirdPremise(FACTORY_).getTarget().equals(dIndexed) &&
+								backwardLink.getThirdPremise(FACTORY_).getRelation().equals(sshhIndexed) &&
 								backwardLink.getRelation().equals(tIndexed);
 					}
 				});

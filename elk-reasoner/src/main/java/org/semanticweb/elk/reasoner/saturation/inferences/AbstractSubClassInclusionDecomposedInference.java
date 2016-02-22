@@ -26,17 +26,11 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SubClassInclusionDecomposedImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
-import org.semanticweb.elk.reasoner.tracing.Conclusion;
-import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
 abstract class AbstractSubClassInclusionDecomposedInference
-		extends
-			SubClassInclusionDecomposedImpl
-		implements
-			SubClassInclusionDecomposedInference {
-
-	static Conclusion.Factory FACTORY = ConclusionBaseFactory.getInstance();
+		extends SubClassInclusionDecomposedImpl
+		implements SubClassInclusionDecomposedInference {
 
 	public AbstractSubClassInclusionDecomposedInference(
 			IndexedContextRoot subExpression,
@@ -47,10 +41,17 @@ abstract class AbstractSubClassInclusionDecomposedInference
 	public IndexedClassExpression getConclusionSubsumer() {
 		return getSubsumer();
 	}
-	
-	@Override
-	public SubClassInclusionDecomposed getConclusion() {
-		return this;
+
+	/**
+	 * @param factory
+	 *            the factory for creating conclusions
+	 * 
+	 * @return the conclusion produced by this inference
+	 */
+	public SubClassInclusionDecomposed getConclusion(
+			SubClassInclusionDecomposed.Factory factory) {
+		return factory.getSubClassInclusionDecomposed(getDestination(),
+				getSubsumer());
 	}
 
 	@Override

@@ -54,8 +54,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
  * @author "Yevgeny Kazakov"
  */
 public class SubPropertyChainExpandedSubObjectPropertyOf
-		extends
-			AbstractSubPropertyChainInference {
+		extends AbstractSubPropertyChainInference {
 
 	/**
 	 * The inferred sub-property of the super-chain for which the inference is
@@ -89,12 +88,13 @@ public class SubPropertyChainExpandedSubObjectPropertyOf
 		return this.reason_;
 	}
 
-	public SubPropertyChain getFirstPremise() {
-		return FACTORY.getSubPropertyChain(middleChain_, getSuperChain());
+	public SubPropertyChain getFirstPremise(SubPropertyChain.Factory factory) {
+		return factory.getSubPropertyChain(middleChain_, getSuperChain());
 	}
 
-	public IndexedSubObjectPropertyOfAxiom getSecondPremise() {
-		return FACTORY.getIndexedSubObjectPropertyOfAxiom(reason_,
+	public IndexedSubObjectPropertyOfAxiom getSecondPremise(
+			IndexedSubObjectPropertyOfAxiom.Factory factory) {
+		return factory.getIndexedSubObjectPropertyOfAxiom(reason_,
 				getSubChain(), middleChain_);
 	}
 

@@ -55,9 +55,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * 
  * @author Yevgeny Kazakov
  */
-public class SubClassInclusionComposedObjectUnionOf
-		extends
-			AbstractSubClassInclusionComposedInference<IndexedObjectUnionOf> {
+public class SubClassInclusionComposedObjectUnionOf extends
+		AbstractSubClassInclusionComposedInference<IndexedObjectUnionOf> {
 
 	/**
 	 * The position of the disjunct of {@link IndexedObjectUnionOf} from which
@@ -86,8 +85,9 @@ public class SubClassInclusionComposedObjectUnionOf
 		return position_;
 	}
 
-	public SubClassInclusionComposed getPremise() {
-		return FACTORY.getSubClassInclusionComposed(getOrigin(),
+	public SubClassInclusionComposed getPremise(
+			SubClassInclusionComposed.Factory factory) {
+		return factory.getSubClassInclusionComposed(getOrigin(),
 				getSubsumer().getDisjuncts().get(position_));
 	}
 

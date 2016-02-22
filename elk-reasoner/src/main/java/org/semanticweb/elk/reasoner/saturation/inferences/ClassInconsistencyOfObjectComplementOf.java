@@ -59,8 +59,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * @author Yevgeny Kazakov
  */
 public class ClassInconsistencyOfObjectComplementOf
-		extends
-			AbstractClassInconsistencyInference {
+		extends AbstractClassInconsistencyInference {
 
 	private final IndexedObjectComplementOf negation_;
 
@@ -74,13 +73,15 @@ public class ClassInconsistencyOfObjectComplementOf
 		return negation_;
 	}
 
-	public SubClassInclusionComposed getFirstPremise() {
-		return FACTORY.getSubClassInclusionComposed(getOrigin(),
+	public SubClassInclusionComposed getFirstPremise(
+			SubClassInclusionComposed.Factory factory) {
+		return factory.getSubClassInclusionComposed(getOrigin(),
 				negation_.getNegated());
 	}
 
-	public SubClassInclusionDecomposed getSecondPremise() {
-		return FACTORY.getSubClassInclusionDecomposed(getOrigin(), negation_);
+	public SubClassInclusionDecomposed getSecondPremise(
+			SubClassInclusionDecomposed.Factory factory) {
+		return factory.getSubClassInclusionDecomposed(getOrigin(), negation_);
 	}
 
 	@Override

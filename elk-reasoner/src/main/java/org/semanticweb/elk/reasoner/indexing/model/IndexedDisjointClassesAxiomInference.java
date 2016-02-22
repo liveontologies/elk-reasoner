@@ -35,9 +35,12 @@ public interface IndexedDisjointClassesAxiomInference
 			IndexedAxiomInference {
 
 	/**
+	 * @param factory
+	 *            the factory for creating conclusions
+	 * 
 	 * @return the conclusion produced by this inference
 	 */
-	IndexedDisjointClassesAxiom getConclusion();
+	IndexedDisjointClassesAxiom getConclusion(IndexedDisjointClassesAxiom.Factory factory);
 	
 	/**
 	 * The visitor pattern for instances

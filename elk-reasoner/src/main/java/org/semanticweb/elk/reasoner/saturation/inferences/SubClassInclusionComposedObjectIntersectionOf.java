@@ -57,9 +57,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * @author Yevgeny Kazakov
  * 
  */
-public class SubClassInclusionComposedObjectIntersectionOf
-		extends
-			AbstractSubClassInclusionComposedInference<IndexedObjectIntersectionOf> {
+public class SubClassInclusionComposedObjectIntersectionOf extends
+		AbstractSubClassInclusionComposedInference<IndexedObjectIntersectionOf> {
 
 	public SubClassInclusionComposedObjectIntersectionOf(
 			IndexedContextRoot inferenceRoot,
@@ -72,13 +71,15 @@ public class SubClassInclusionComposedObjectIntersectionOf
 		return getDestination();
 	}
 
-	public SubClassInclusionComposed getFirstPremise() {
-		return FACTORY.getSubClassInclusionComposed(getOrigin(),
+	public SubClassInclusionComposed getFirstPremise(
+			SubClassInclusionComposed.Factory factory) {
+		return factory.getSubClassInclusionComposed(getOrigin(),
 				getSubsumer().getFirstConjunct());
 	}
 
-	public SubClassInclusionComposed getSecondPremise() {
-		return FACTORY.getSubClassInclusionComposed(getOrigin(),
+	public SubClassInclusionComposed getSecondPremise(
+			SubClassInclusionComposed.Factory factory) {
+		return factory.getSubClassInclusionComposed(getOrigin(),
 				getSubsumer().getSecondConjunct());
 	}
 

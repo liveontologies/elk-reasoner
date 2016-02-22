@@ -33,9 +33,13 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 public interface IndexedSubClassOfAxiomInference extends IndexedAxiomInference {
 
 	/**
+	 * @param factory
+	 *            the factory for creating conclusions
+	 * 
 	 * @return the conclusion produced by this inference
 	 */
-	public IndexedSubClassOfAxiom getConclusion();
+	public IndexedSubClassOfAxiom getConclusion(
+			IndexedSubClassOfAxiom.Factory factory);
 
 	/**
 	 * The visitor pattern for instances

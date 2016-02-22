@@ -64,8 +64,8 @@ public class BackwardLinkReversed extends AbstractBackwardLinkInference {
 		return getTraceRoot();
 	}
 
-	public ForwardLink getPremise() {
-		return FACTORY.getForwardLink(getOrigin(), getRelation(),
+	public ForwardLink getPremise(ForwardLink.Factory factory) {
+		return factory.getForwardLink(getOrigin(), getRelation(),
 				getDestination());
 	}
 

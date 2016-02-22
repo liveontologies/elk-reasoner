@@ -33,10 +33,13 @@ import org.semanticweb.elk.util.collections.Multimap;
  * {@link Multimap}.
  * 
  * @author "Yevgeny Kazakov"
+ *
+ * @param <I>
+ *            the type of inferences stored in this
+ *            {@link ModifiableInferenceSet}
  */
 public class ModifiableInferenceSetImpl<I extends Inference>
-		implements
-			ModifiableInferenceSet<I> {
+		implements ModifiableInferenceSet<I> {
 
 	private final Multimap<Conclusion, I> inferenceMap_ = new HashListMultimap<Conclusion, I>();
 

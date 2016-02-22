@@ -65,8 +65,8 @@ public class SaturationConclusionBaseFactory
 	}
 
 	@Override
-	public ClassInconsistency getContradiction(IndexedContextRoot root) {
-		return new ClassInconsistencyImpl(root);
+	public ClassInconsistency getContradiction(IndexedContextRoot destination) {
+		return new ClassInconsistencyImpl(destination);
 	}
 
 	@Override

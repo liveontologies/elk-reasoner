@@ -80,34 +80,46 @@ public interface LinkComposition extends ClassInference {
 	public IndexedComplexPropertyChain getComposition();
 
 	/**
+	 * @param factory
+	 *            the factory for creating conclusions
+	 * 
 	 * @return the {@link BackwardLink} used as premise in this
 	 *         {@link LinkComposition}; its {@link BackwardLink#getRelation()}
 	 *         equals to {@link #getPremiseBackwardRelation()}
 	 */
-	public BackwardLink getFirstPremise();
+	public BackwardLink getFirstPremise(BackwardLink.Factory factory);
 
 	/**
+	 * @param factory
+	 *            the factory for creating conclusions
+	 * 
 	 * @return the {@link SubPropertyChain} used as premise of this
 	 *         {@link LinkComposition}; its
 	 *         {@link SubPropertyChain#getSubChain()} equals to
 	 *         {@link #getPremiseBackwardRelation()}
 	 */
-	public SubPropertyChain getSecondPremise();
+	public SubPropertyChain getSecondPremise(SubPropertyChain.Factory factory);
 
 	/**
+	 * @param factory
+	 *            the factory for creating conclusions
+	 * 
 	 * @return the {@link ForwardLink} used as premise of this
 	 *         {@link LinkComposition}; its {@link ForwardLink#getRelation()}
 	 *         equals to {@link #getPremiseForwardChain()}
 	 */
-	public ForwardLink getThirdPremise();
+	public ForwardLink getThirdPremise(ForwardLink.Factory factory);
 
 	/**
+	 * @param factory
+	 *            the factory for creating conclusions
+	 *            
 	 * @return the {@link SubPropertyChain} used as premise of this
 	 *         {@link LinkComposition}; its
 	 *         {@link SubPropertyChain#getSubChain()} equals to
 	 *         {@link #getPremiseForwardChain()}
 	 */
-	public SubPropertyChain getFourthPremise();
+	public SubPropertyChain getFourthPremise(SubPropertyChain.Factory factory);
 
 	public <O> O accept(Visitor<O> visitor);
 

@@ -38,10 +38,14 @@ abstract class AbstractContextInitializationInference
 	}
 
 	/**
+	 * @param factory
+	 *            the factory for creating conclusions
+	 * 
 	 * @return the conclusion produced by this inference
 	 */
-	public ContextInitialization getConclusion() {
-		return this;
+	public ContextInitialization getConclusion(
+			ContextInitialization.Factory factory) {
+		return factory.getContextInitialization(getDestination());
 	}
 
 	@Override

@@ -27,15 +27,10 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
-import org.semanticweb.elk.reasoner.tracing.Conclusion;
-import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
 abstract class AbstractPropagationInference extends PropagationImpl
-		implements
-			PropagationInference {
-
-	static Conclusion.Factory FACTORY = ConclusionBaseFactory.getInstance();
+		implements PropagationInference {
 
 	public AbstractPropagationInference(IndexedContextRoot root,
 			IndexedObjectProperty relation, IndexedObjectSomeValuesFrom carry) {
@@ -47,10 +42,14 @@ abstract class AbstractPropagationInference extends PropagationImpl
 	}
 
 	/**
+	 * @param factory
+	 *            the factory for creating conclusions
+	 * 
 	 * @return the conclusion produced by this inference
 	 */
-	public Propagation getConclusion() {
-		return this;
+	public Propagation getConclusion(Propagation.Factory factory) {
+		return factory.getPropagation(getDestination(), getRelation(),
+				getCarry());
 	}
 
 	@Override

@@ -86,8 +86,8 @@ public class ConclusionBaseFactory implements Conclusion.Factory {
 	}
 
 	@Override
-	public ClassInconsistency getContradiction(IndexedContextRoot root) {
-		return filter(saturationConclusionFactory_.getContradiction(root));
+	public ClassInconsistency getContradiction(IndexedContextRoot destination) {
+		return filter(saturationConclusionFactory_.getContradiction(destination));
 	}
 
 	@Override

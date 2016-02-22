@@ -40,10 +40,15 @@ abstract class AbstractSubContextInitializationInference
 	}
 
 	/**
+	 * @param factory
+	 *            the factory for creating conclusions
+	 * 
 	 * @return the conclusion produced by this inference
 	 */
-	public SubContextInitialization getConclusion() {
-		return this;
+	public SubContextInitialization getConclusion(
+			SubContextInitialization.Factory factory) {
+		return factory.getSubContextInitialization(getDestination(),
+				getSubDestination());
 	}
 
 	@Override

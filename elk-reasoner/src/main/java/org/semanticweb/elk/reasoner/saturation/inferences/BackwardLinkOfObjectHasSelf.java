@@ -69,8 +69,9 @@ public class BackwardLinkOfObjectHasSelf extends AbstractBackwardLinkInference {
 		return this.existential_;
 	}
 
-	public SubClassInclusionDecomposed getPremise() {
-		return FACTORY.getSubClassInclusionDecomposed(getOrigin(),
+	public SubClassInclusionDecomposed getPremise(
+			SubClassInclusionDecomposed.Factory factory) {
+		return factory.getSubClassInclusionDecomposed(getOrigin(),
 				existential_);
 	}
 

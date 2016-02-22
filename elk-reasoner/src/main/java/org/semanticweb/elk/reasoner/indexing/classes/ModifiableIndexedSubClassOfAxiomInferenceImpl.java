@@ -48,8 +48,10 @@ abstract class ModifiableIndexedSubClassOfAxiomInferenceImpl<A extends ElkAxiom>
 	}
 
 	@Override
-	public IndexedSubClassOfAxiom getConclusion() {
-		return this;
+	public IndexedSubClassOfAxiom getConclusion(
+			IndexedSubClassOfAxiom.Factory factory) {
+		return factory.getIndexedSubClassOfAxiom(getOriginalAxiom(),
+				getSubClass(), getSuperClass());
 	}
 	
 	@Override

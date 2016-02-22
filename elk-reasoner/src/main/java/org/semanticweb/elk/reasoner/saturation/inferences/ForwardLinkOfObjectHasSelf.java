@@ -52,8 +52,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * 
  */
 public class ForwardLinkOfObjectHasSelf extends AbstractClassInference
-		implements
-			ForwardLinkInference {
+		implements ForwardLinkInference {
 
 	private final IndexedObjectHasSelf existential_;
 
@@ -67,16 +66,20 @@ public class ForwardLinkOfObjectHasSelf extends AbstractClassInference
 		return this.existential_;
 	}
 
-	public SubClassInclusionDecomposed getPremise() {
-		return FACTORY.getSubClassInclusionDecomposed(getOrigin(),
+	public SubClassInclusionDecomposed getPremise(
+			SubClassInclusionDecomposed.Factory factory) {
+		return factory.getSubClassInclusionDecomposed(getOrigin(),
 				existential_);
 	}
 
 	/**
+	 * @param factory
+	 *            the factory for creating conclusions
+	 * 
 	 * @return the conclusion produced by this inference
 	 */
-	public ForwardLink getConclusion() {
-		return FACTORY.getForwardLink(getDestination(),
+	public ForwardLink getConclusion(ForwardLink.Factory factory) {
+		return factory.getForwardLink(getDestination(),
 				existential_.getProperty(), getOrigin());
 	}
 

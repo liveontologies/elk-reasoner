@@ -60,8 +60,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
  * @author "Yevgeny Kazakov"
  */
 public class BackwardLinkComposition extends AbstractBackwardLinkInference
-		implements
-			LinkComposition {
+		implements LinkComposition {
 
 	private final IndexedContextRoot inferenceRoot_;
 
@@ -136,31 +135,32 @@ public class BackwardLinkComposition extends AbstractBackwardLinkInference
 	}
 
 	@Override
-	public BackwardLink getFirstPremise() {
-		return FACTORY.getBackwardLink(getOrigin(), backwardRelation_,
+	public BackwardLink getFirstPremise(BackwardLink.Factory factory) {
+		return factory.getBackwardLink(getOrigin(), backwardRelation_,
 				getTraceRoot());
 	}
 
 	@Override
-	public SubPropertyChain getSecondPremise() {
-		return FACTORY.getSubPropertyChain(backwardRelation_,
+	public SubPropertyChain getSecondPremise(SubPropertyChain.Factory factory) {
+		return factory.getSubPropertyChain(backwardRelation_,
 				composition_.getFirstProperty());
 	}
 
 	@Override
-	public ForwardLink getThirdPremise() {
-		return FACTORY.getForwardLink(getOrigin(), forwardChain_,
+	public ForwardLink getThirdPremise(ForwardLink.Factory factory) {
+		return factory.getForwardLink(getOrigin(), forwardChain_,
 				getDestination());
 	}
 
 	@Override
-	public SubPropertyChain getFourthPremise() {
-		return FACTORY.getSubPropertyChain(forwardChain_,
+	public SubPropertyChain getFourthPremise(SubPropertyChain.Factory factory) {
+		return factory.getSubPropertyChain(forwardChain_,
 				composition_.getSuffixChain());
 	}
 
-	public IndexedSubObjectPropertyOfAxiom getFifthPremise() {
-		return FACTORY.getIndexedSubObjectPropertyOfAxiom(reason_, composition_,
+	public IndexedSubObjectPropertyOfAxiom getFifthPremise(
+			IndexedSubObjectPropertyOfAxiom.Factory factory) {
+		return factory.getIndexedSubObjectPropertyOfAxiom(reason_, composition_,
 				getRelation());
 	}
 

@@ -31,14 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * @author Yevgeny Kazakov
  */
 public interface SubClassInclusionComposedInference
-		extends
-			SubClassInclusionInference {
-
-	/**
-	 * @return the conclusion of this inference constructed using the given
-	 *         factory
-	 */
-	public SubClassInclusionComposed getConclusion();
+		extends SubClassInclusionInference {
 
 	public <O> O accept(Visitor<O> visitor);
 
@@ -51,12 +44,11 @@ public interface SubClassInclusionComposedInference
 	 *            the type of the output
 	 */
 	public static interface Visitor<O>
-			extends
-				SubClassInclusionComposedDefinedClass.Visitor<O>,
-				SubClassInclusionComposedEntity.Visitor<O>,
-				SubClassInclusionComposedObjectIntersectionOf.Visitor<O>,
-				SubClassInclusionComposedObjectSomeValuesFrom.Visitor<O>,
-				SubClassInclusionComposedObjectUnionOf.Visitor<O> {
+			extends SubClassInclusionComposedDefinedClass.Visitor<O>,
+			SubClassInclusionComposedEntity.Visitor<O>,
+			SubClassInclusionComposedObjectIntersectionOf.Visitor<O>,
+			SubClassInclusionComposedObjectSomeValuesFrom.Visitor<O>,
+			SubClassInclusionComposedObjectUnionOf.Visitor<O> {
 
 		// combined interface
 

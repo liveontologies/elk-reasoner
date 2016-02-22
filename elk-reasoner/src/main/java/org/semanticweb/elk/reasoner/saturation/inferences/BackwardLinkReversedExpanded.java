@@ -54,8 +54,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
  * 
  */
 public class BackwardLinkReversedExpanded
-		extends
-			AbstractBackwardLinkInference {
+		extends AbstractBackwardLinkInference {
 
 	/**
 	 * The sub chain of the property of this link that occurs in the premise
@@ -84,7 +83,7 @@ public class BackwardLinkReversedExpanded
 	public IndexedContextRoot getConclusionSource() {
 		return getSource();
 	}
-	
+
 	public IndexedPropertyChain getSubChain() {
 		return this.subChain_;
 	}
@@ -93,12 +92,13 @@ public class BackwardLinkReversedExpanded
 		return this.reason_;
 	}
 
-	public ForwardLink getFirstPremise() {
-		return FACTORY.getForwardLink(getOrigin(), subChain_, getDestination());
+	public ForwardLink getFirstPremise(ForwardLink.Factory factory) {
+		return factory.getForwardLink(getOrigin(), subChain_, getDestination());
 	}
 
-	public IndexedSubObjectPropertyOfAxiom getSecondPremise() {
-		return FACTORY.getIndexedSubObjectPropertyOfAxiom(reason_, subChain_,
+	public IndexedSubObjectPropertyOfAxiom getSecondPremise(
+			IndexedSubObjectPropertyOfAxiom.Factory factory) {
+		return factory.getIndexedSubObjectPropertyOfAxiom(reason_, subChain_,
 				getRelation());
 	}
 

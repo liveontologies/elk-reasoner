@@ -53,8 +53,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsiste
  * @author Yevgeny Kazakov
  */
 public class ClassInconsistencyPropagated
-		extends
-			AbstractClassInconsistencyInference {
+		extends AbstractClassInconsistencyInference {
 
 	private final IndexedContextRoot origin_;
 
@@ -81,13 +80,14 @@ public class ClassInconsistencyPropagated
 		return premiseRelation_;
 	}
 
-	public BackwardLink getFirstPremise() {
-		return FACTORY.getBackwardLink(getOrigin(), premiseRelation_,
+	public BackwardLink getFirstPremise(BackwardLink.Factory factory) {
+		return factory.getBackwardLink(getOrigin(), premiseRelation_,
 				getDestination());
 	}
 
-	public ClassInconsistency getSecondPremise() {
-		return FACTORY.getContradiction(getOrigin());
+	public ClassInconsistency getSecondPremise(
+			ClassInconsistency.Factory factory) {
+		return factory.getContradiction(getOrigin());
 	}
 
 	@Override

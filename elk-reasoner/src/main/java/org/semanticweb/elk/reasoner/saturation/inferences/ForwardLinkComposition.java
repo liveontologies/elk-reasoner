@@ -58,10 +58,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
  * @author "Yevgeny Kazakov"
  */
 public class ForwardLinkComposition
-		extends
-			AbstractForwardLinkInference<IndexedComplexPropertyChain>
-		implements
-			LinkComposition {
+		extends AbstractForwardLinkInference<IndexedComplexPropertyChain>
+		implements LinkComposition {
 
 	private final IndexedObjectProperty backwardRelation_;
 
@@ -111,25 +109,25 @@ public class ForwardLinkComposition
 	}
 
 	@Override
-	public BackwardLink getFirstPremise() {
-		return FACTORY.getBackwardLink(getOrigin(), backwardRelation_,
+	public BackwardLink getFirstPremise(BackwardLink.Factory factory) {
+		return factory.getBackwardLink(getOrigin(), backwardRelation_,
 				getDestination());
 	}
 
 	@Override
-	public SubPropertyChain getSecondPremise() {
-		return FACTORY.getSubPropertyChain(backwardRelation_,
+	public SubPropertyChain getSecondPremise(SubPropertyChain.Factory factory) {
+		return factory.getSubPropertyChain(backwardRelation_,
 				getComposition().getFirstProperty());
 	}
 
 	@Override
-	public ForwardLink getThirdPremise() {
-		return FACTORY.getForwardLink(getOrigin(), forwardChain_, getTarget());
+	public ForwardLink getThirdPremise(ForwardLink.Factory factory) {
+		return factory.getForwardLink(getOrigin(), forwardChain_, getTarget());
 	}
 
 	@Override
-	public SubPropertyChain getFourthPremise() {
-		return FACTORY.getSubPropertyChain(forwardChain_,
+	public SubPropertyChain getFourthPremise(SubPropertyChain.Factory factory) {
+		return factory.getSubPropertyChain(forwardChain_,
 				getComposition().getSuffixChain());
 	}
 

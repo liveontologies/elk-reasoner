@@ -30,16 +30,20 @@ package org.semanticweb.elk.reasoner.tracing;
  * synchronized.
  * 
  * @author "Yevgeny Kazakov"
+ *
+ * @param <I>
+ *            the type of inferences stored in this
+ *            {@link ModifiableInferenceSet}
  */
 public class SynchronizedModifiableInferenceSet<I extends Inference>
-		extends
-			ModifiableInferenceSetImpl<I> {
+		extends ModifiableInferenceSetImpl<I> {
 
 	@Override
-	public synchronized Iterable<? extends I> getInferences(Conclusion conclusion) {
+	public synchronized Iterable<? extends I> getInferences(
+			Conclusion conclusion) {
 		return super.getInferences(conclusion);
 	}
-	
+
 	@Override
 	public synchronized void produce(I inference) {
 		super.produce(inference);

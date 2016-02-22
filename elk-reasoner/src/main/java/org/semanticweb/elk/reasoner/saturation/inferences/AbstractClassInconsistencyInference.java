@@ -25,16 +25,10 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassInconsistencyImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
-import org.semanticweb.elk.reasoner.tracing.Conclusion;
-import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.Inference;
 
 abstract class AbstractClassInconsistencyInference
-		extends
-			ClassInconsistencyImpl
-		implements ClassInconsistencyInference {
-
-	static Conclusion.Factory FACTORY = ConclusionBaseFactory.getInstance();
+		extends ClassInconsistencyImpl implements ClassInconsistencyInference {
 
 	protected AbstractClassInconsistencyInference(
 			IndexedContextRoot destination) {
@@ -42,10 +36,14 @@ abstract class AbstractClassInconsistencyInference
 	}
 
 	/**
+	 * @param factory
+	 *            the factory for creating conclusions
+	 * 
 	 * @return the conclusion produced by this inference
 	 */
-	public ClassInconsistency getConclusion() {
-		return this;
+	public ClassInconsistency getConclusion(
+			ClassInconsistency.Factory factory) {
+		return factory.getContradiction(getDestination());
 	}
 
 	@Override

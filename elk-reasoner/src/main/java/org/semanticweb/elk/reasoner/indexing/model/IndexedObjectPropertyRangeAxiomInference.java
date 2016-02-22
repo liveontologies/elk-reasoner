@@ -36,9 +36,13 @@ public interface IndexedObjectPropertyRangeAxiomInference
 			IndexedAxiomInference {
 
 	/**
+	 * @param factory
+	 *            the factory for creating conclusions
+	 * 
 	 * @return the conclusion produced by this inference
 	 */
-	public IndexedObjectPropertyRangeAxiom getConclusion();
+	public IndexedObjectPropertyRangeAxiom getConclusion(
+			IndexedObjectPropertyRangeAxiom.Factory factory);
 
 	/**
 	 * The visitor pattern for instances

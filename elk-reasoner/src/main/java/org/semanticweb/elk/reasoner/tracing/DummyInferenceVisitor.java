@@ -86,6 +86,9 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubProperty
  * An {@link Inference.Visitor} that always returns {@code null}.
  * 
  * @author Yevgeny Kazakov
+ * 
+ * @param <O>
+ *            the type of the output
  */
 public class DummyInferenceVisitor<O> implements Inference.Visitor<O> {
 

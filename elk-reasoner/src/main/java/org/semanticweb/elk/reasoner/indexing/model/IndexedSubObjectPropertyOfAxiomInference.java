@@ -36,9 +36,13 @@ public interface IndexedSubObjectPropertyOfAxiomInference
 			IndexedAxiomInference {
 
 	/**
+	 * @param factory
+	 *            the factory for creating conclusions
+	 * 
 	 * @return the conclusion produced by this inference
 	 */
-	public IndexedSubObjectPropertyOfAxiom getConclusion();
+	public IndexedSubObjectPropertyOfAxiom getConclusion(
+			IndexedSubObjectPropertyOfAxiom.Factory factory);
 
 	/**
 	 * The visitor pattern for instances

@@ -55,8 +55,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * @author Yevgeny Kazakov
  */
 public class SubClassInclusionTautology
-		extends
-			AbstractSubClassInclusionDecomposedInference {
+		extends AbstractSubClassInclusionDecomposedInference {
 
 	private static IndexedContextRoot.Visitor<IndexedClassExpression> SUBSUMER_EXTRACTOR_ = new SubsumerExtractor();
 
@@ -65,8 +64,7 @@ public class SubClassInclusionTautology
 	}
 
 	private static class SubsumerExtractor
-			extends
-				DummyIndexedContextRootVisitor<IndexedClassExpression> {
+			extends DummyIndexedContextRootVisitor<IndexedClassExpression> {
 
 		@Override
 		protected IndexedClassExpression defaultVisit(
@@ -85,8 +83,9 @@ public class SubClassInclusionTautology
 		return getDestination();
 	}
 
-	public ContextInitialization getPremise() {
-		return FACTORY.getContextInitialization(getOrigin());
+	public ContextInitialization getPremise(
+			ContextInitialization.Factory factory) {
+		return factory.getContextInitialization(getOrigin());
 	}
 
 	@Override

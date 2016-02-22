@@ -57,137 +57,170 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubProperty
  * them using the provided {@link Conclusion.Visitor}.
  * 
  * @author Yevgeny Kazakov
+ *
+ * @param <O>
+ *            the type of the output
  */
-public class InferenceConclusionVisitor<O>
-		extends
-			ClassInferenceConclusionVisitor<O>
-		implements Inference.Visitor<O> {
+public class InferenceConclusionVisitor<O> extends
+		ClassInferenceConclusionVisitor<O> implements Inference.Visitor<O> {
+
+	private final Conclusion.Factory conclusionFactory_;
 
 	private final Conclusion.Visitor<O> conclusionVisitor_;
 
-	public InferenceConclusionVisitor(Conclusion.Visitor<O> conclusionVisitor) {
-		super(conclusionVisitor);
+	public InferenceConclusionVisitor(Conclusion.Factory conclusionFactory,
+			Conclusion.Visitor<O> conclusionVisitor) {
+		super(conclusionFactory, conclusionVisitor);
+		this.conclusionFactory_ = conclusionFactory;
 		this.conclusionVisitor_ = conclusionVisitor;
+	}
+
+	public InferenceConclusionVisitor(Conclusion.Visitor<O> conclusionVisitor) {
+		this(new ConclusionBaseFactory(), conclusionVisitor);
 	}
 
 	@Override
 	public O visit(ElkDifferentIndividualsAxiomNaryConversion inference) {
-		return conclusionVisitor_.visit(inference.getConclusion());
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
 	public O visit(ElkDisjointClassesAxiomNaryConversion inference) {
-		return conclusionVisitor_.visit(inference.getConclusion());
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
 	public O visit(ElkDisjointUnionAxiomNaryConversion inference) {
-		return conclusionVisitor_.visit(inference.getConclusion());
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
 	public O visit(ElkClassAssertionAxiomConversion inference) {
-		return conclusionVisitor_.visit(inference.getConclusion());
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
 	public O visit(ElkDifferentIndividualsAxiomBinaryConversion inference) {
-		return conclusionVisitor_.visit(inference.getConclusion());
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
 	public O visit(ElkDisjointClassesAxiomBinaryConversion inference) {
-		return conclusionVisitor_.visit(inference.getConclusion());
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
 	public O visit(ElkDisjointUnionAxiomSubClassConversion inference) {
-		return conclusionVisitor_.visit(inference.getConclusion());
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
 	public O visit(ElkDisjointUnionAxiomBinaryConversion inference) {
-		return conclusionVisitor_.visit(inference.getConclusion());
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
 	public O visit(ElkEquivalentClassesAxiomSubClassConversion inference) {
-		return conclusionVisitor_.visit(inference.getConclusion());
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
 	public O visit(ElkObjectPropertyAssertionAxiomConversion inference) {
-		return conclusionVisitor_.visit(inference.getConclusion());
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
 	public O visit(ElkObjectPropertyDomainAxiomConversion inference) {
-		return conclusionVisitor_.visit(inference.getConclusion());
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
 	public O visit(ElkReflexiveObjectPropertyAxiomConversion inference) {
-		return conclusionVisitor_.visit(inference.getConclusion());
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
 	public O visit(ElkSameIndividualAxiomConversion inference) {
-		return conclusionVisitor_.visit(inference.getConclusion());
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
 	public O visit(ElkSubClassOfAxiomConversion inference) {
-		return conclusionVisitor_.visit(inference.getConclusion());
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
 	public O visit(ElkDisjointUnionAxiomDefinitionConversion inference) {
-		return conclusionVisitor_.visit(inference.getConclusion());
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
 	public O visit(ElkEquivalentClassesAxiomDefinitionConversion inference) {
-		return conclusionVisitor_.visit(inference.getConclusion());
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
 	public O visit(ElkEquivalentObjectPropertiesAxiomConversion inference) {
-		return conclusionVisitor_.visit(inference.getConclusion());
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
 	public O visit(ElkSubObjectPropertyOfAxiomConversion inference) {
-		return conclusionVisitor_.visit(inference.getConclusion());
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
 	public O visit(ElkTransitiveObjectPropertyAxiomConversion inference) {
-		return conclusionVisitor_.visit(inference.getConclusion());
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
 	public O visit(ElkObjectPropertyRangeAxiomConversion inference) {
-		return conclusionVisitor_.visit(inference.getConclusion());
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
 	public O visit(ElkDeclarationAxiomConversion inference) {
-		return conclusionVisitor_.visit(inference.getConclusion());
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
 	public O visit(PropertyRangeInherited inference) {
-		return conclusionVisitor_.visit(inference.getConclusion());
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
 	public O visit(SubPropertyChainExpandedSubObjectPropertyOf inference) {
-		return conclusionVisitor_.visit(inference.getConclusion());
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
 	public O visit(SubPropertyChainTautology inference) {
-		return conclusionVisitor_.visit(inference.getConclusion());
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 }

@@ -26,7 +26,9 @@ package org.semanticweb.elk.reasoner.tracing;
  * An object using which {@link Inference}s can be produced
  * 
  * @author "Yevgeny Kazakov"
- * 
+ *
+ * @param <I>
+ *            the type of produced inferences
  */
 public interface InferenceProducer<I extends Inference> {
 
@@ -43,5 +45,5 @@ public interface InferenceProducer<I extends Inference> {
 			// no-op
 		}
 	};
-	
+
 }

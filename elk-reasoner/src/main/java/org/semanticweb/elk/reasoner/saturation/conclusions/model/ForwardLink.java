@@ -75,7 +75,7 @@ public interface ForwardLink extends ClassConclusion {
 	interface Factory {
 
 		ForwardLink getForwardLink(IndexedContextRoot destination,
-				IndexedPropertyChain forwardChain, IndexedContextRoot target);
+				IndexedPropertyChain relation, IndexedContextRoot target);
 
 	}
 

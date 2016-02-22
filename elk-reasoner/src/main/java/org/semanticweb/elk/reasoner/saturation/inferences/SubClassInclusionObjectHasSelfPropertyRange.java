@@ -58,8 +58,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  *
  */
 public class SubClassInclusionObjectHasSelfPropertyRange
-		extends
-			AbstractSubClassInclusionDecomposedInference {
+		extends AbstractSubClassInclusionDecomposedInference {
 
 	private final IndexedObjectHasSelf premiseSubsumer_;
 
@@ -80,13 +79,14 @@ public class SubClassInclusionObjectHasSelfPropertyRange
 		return premiseSubsumer_;
 	}
 
-	public SubClassInclusionDecomposed getFirstPremise() {
-		return FACTORY.getSubClassInclusionDecomposed(getOrigin(),
+	public SubClassInclusionDecomposed getFirstPremise(
+			SubClassInclusionDecomposed.Factory factory) {
+		return factory.getSubClassInclusionDecomposed(getOrigin(),
 				premiseSubsumer_);
 	}
 
-	public PropertyRange getSecondPremise() {
-		return FACTORY.getPropertyRange(premiseSubsumer_.getProperty(),
+	public PropertyRange getSecondPremise(PropertyRange.Factory factory) {
+		return factory.getPropertyRange(premiseSubsumer_.getProperty(),
 				getSubsumer());
 	}
 
