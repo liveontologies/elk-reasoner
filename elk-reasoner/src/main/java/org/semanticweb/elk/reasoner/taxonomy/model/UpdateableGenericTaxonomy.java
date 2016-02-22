@@ -39,7 +39,9 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
 public interface UpdateableGenericTaxonomy<T extends ElkEntity, N extends UpdateableGenericTaxonomyNode<T, N>>
 		extends GenericTaxonomy<T, N> {
 
-	void setCreateDirectSupernodes(Collection<? extends T> members,
+	N getCreateNode(Collection<? extends T> members);
+
+	boolean setCreateDirectSupernodes(N subNode,
 			Iterable<? extends Collection<? extends T>> superMemberSets);
 
 	/**

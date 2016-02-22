@@ -34,7 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.SimpleUpdateableNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
@@ -59,6 +59,8 @@ public class IndividualNode extends SimpleUpdateableNode<ElkNamedIndividual>
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IndividualNode.class);
 
+	final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy_;
+
 	/**
 	 * ElkClass nodes whose members are direct types of the members of this
 	 * node.
@@ -68,18 +70,19 @@ public class IndividualNode extends SimpleUpdateableNode<ElkNamedIndividual>
 	/**
 	 * Constructing the individual node for the set of same individuals.
 	 * 
+	 * @param taxonomy
+	 *            The taxonomy to which this node belongs.
 	 * @param members
 	 *            non-empty list of equivalent ElkNamedIndividual objects
 	 * @param size
 	 *            The number of equivalent ElkNamedIndividual objects
-	 * @param individualKeyProvider
-	 *            The key provider for the ElkNamedIndividual objects.
 	 */
 	protected IndividualNode(
+			final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy,
 			final Iterable<? extends ElkNamedIndividual> members,
-			final int size,
-			final ComparatorKeyProvider<? super ElkNamedIndividual> individualKeyProvider) {
-		super(members, size, individualKeyProvider);
+			final int size) {
+		super(members, size, taxonomy.getInstanceKeyProvider());
+		this.taxonomy_ = taxonomy;
 		this.directTypeNodes_ = new ArrayHashSet<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>();
 	}
 

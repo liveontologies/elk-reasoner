@@ -169,7 +169,7 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 					return;
 				}
 
-				if (node.trySetModified(true)) {
+				if (node.trySetAllParentsAssigned(false)) {
 					toRemove_.add(node);
 					classStateWriter_.markClassesForModifiedNode(node);
 				}
@@ -179,7 +179,7 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 					for (UpdateableTaxonomyNode<ElkClass> subNode : node
 							.getDirectSubNodes()) {
 						if (subNode != classTaxonomy.getBottomNode()
-								&& subNode.trySetModified(true)) {
+								&& subNode.trySetAllParentsAssigned(false)) {
 							toRemove_.add(subNode);
 							classStateWriter_
 									.markClassesForModifiedNode(subNode);
@@ -206,7 +206,7 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 					}
 
 					for (UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode : directInstances) {
-						if (instanceNode.trySetModified(true)) {
+						if (instanceNode.trySetAllParentsAssigned(false)) {
 							instanceStateWriter_
 									.markIndividualsForModifiedNode(instanceNode);
 							instanceTaxonomy.removeInstanceNode(instanceNode
@@ -237,7 +237,7 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 					UpdateableInstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy
 							.getInstanceNode(individual);
 
-					if (node != null && node.trySetModified(true)) {
+					if (node != null && node.trySetAllParentsAssigned(false)) {
 						instanceStateWriter_
 								.markIndividualsForModifiedNode(node);
 						taxonomy.removeInstanceNode(individual);

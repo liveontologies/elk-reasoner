@@ -59,7 +59,7 @@ class NonBottomClassNode extends SimpleUpdateableNode<ElkClass>
 	/**
 	 * The link to the taxonomy to which this node belongs
 	 */
-	private final ConcurrentClassTaxonomy taxonomy_;
+	final ConcurrentClassTaxonomy taxonomy_;
 
 	/**
 	 * ElkClass nodes whose members are direct super-classes of the members of

@@ -39,6 +39,7 @@ import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputationFactory.Eng
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
@@ -148,7 +149,10 @@ public class ClassTaxonomyComputationFactory extends SimpleInterrupter
 			// LOGGER_.trace("+++ creating node for equivalent classes: " +
 			// output.getEquivalent());
 
-			taxonomy_.setCreateDirectSupernodes(output.getEquivalent(),
+			final UpdateableTaxonomyNode<ElkClass> node = taxonomy_
+					.getCreateNode(output.getEquivalent());
+
+			taxonomy_.setCreateDirectSupernodes(node,
 					output.getDirectSubsumers());
 
 		}

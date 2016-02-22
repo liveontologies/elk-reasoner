@@ -42,10 +42,11 @@ public class SimpleUpdateableNode<T> extends SimpleNode<T>
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(SimpleUpdateableNode.class);
 	/**
-	 * <code>true</code> if the direct super-nodes of this node need to be
+	 * <code>true</code> if the direct super-nodes of this node have been
 	 * recomputed
 	 */
-	private final AtomicBoolean modified_ = new AtomicBoolean(true);
+	private final AtomicBoolean areAllParentsAssigned_ = new AtomicBoolean(
+			false);
 
 	/**
 	 * Creates a node containing the specified members.
@@ -75,8 +76,9 @@ public class SimpleUpdateableNode<T> extends SimpleNode<T>
 	}
 
 	@Override
-	public boolean trySetModified(boolean modified) {
-		boolean result = modified_.compareAndSet(!modified, modified);
+	public boolean trySetAllParentsAssigned(boolean modified) {
+		boolean result = areAllParentsAssigned_.compareAndSet(!modified,
+				modified);
 		if (result && LOGGER_.isTraceEnabled())
 			LOGGER_.trace("node " + this + ": set "
 					+ (modified ? "modified" : "not modifiled"));
@@ -84,8 +86,8 @@ public class SimpleUpdateableNode<T> extends SimpleNode<T>
 	}
 
 	@Override
-	public boolean isModified() {
-		return modified_.get();
+	public boolean areAllParentsAssigned() {
+		return areAllParentsAssigned_.get();
 	}
 
 	@Override

@@ -157,29 +157,44 @@ public class ConcurrentInstanceTaxonomy
 				final Iterable<? extends ElkNamedIndividual> members,
 				final int size,
 				final ComparatorKeyProvider<? super ElkNamedIndividual> keyProvider) {
-			return new IndividualNode(members, size, keyProvider);
+			return new IndividualNode(ConcurrentInstanceTaxonomy.this, members,
+					size);
 		}
 
 	};
 
-	public void setCreateDirectTypes(
-			final Collection<? extends ElkNamedIndividual> instances,
+	@Override
+	public UpdateableInstanceNode<ElkClass, ElkNamedIndividual> getCreateInstanceNode(
+			final Collection<? extends ElkNamedIndividual> instances) {
+		return individualNodeStore_.getCreateNode(instances, instances.size(),
+				INSTANCE_NODE_FACTORY);
+	};
+
+	public boolean setCreateDirectTypes(
+			final UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode,
 			final Iterable<? extends java.util.Collection<? extends ElkClass>> typeSets) {
 
-		final IndividualNode node = individualNodeStore_.getCreateNode(
-				instances, instances.size(), INSTANCE_NODE_FACTORY);
+		if (!(instanceNode instanceof IndividualNode)) {
+			throw new IllegalArgumentException(
+					"The sub-node must belong to this taxonomy: "
+							+ instanceNode);
+		}
+		final IndividualNode node = (IndividualNode) instanceNode;
+		if (node.taxonomy_ != this) {
+			throw new IllegalArgumentException(
+					"The sub-node must belong to this taxonomy: "
+							+ instanceNode);
+		}
 
 		// TODO: establish consistency by adding default type to the nodes.
 
 		for (final Collection<? extends ElkClass> superMembers : typeSets) {
-			classTaxonomy_.setCreateDirectSupernodes(superMembers,
-					Collections.<Collection<ElkClass>> emptyList());
 			final UpdateableTypeNode<ElkClass, ElkNamedIndividual> superNode = getCreateUpdateableTypeNode(
-					classTaxonomy_.getNode(superMembers.iterator().next()));
+					classTaxonomy_.getCreateNode(superMembers));
 			addDirectType(superNode, node);
 		}
 
-		node.trySetModified(false);
+		return node.trySetAllParentsAssigned(true);
 	};
 
 	private static void addDirectType(
@@ -216,10 +231,27 @@ public class ConcurrentInstanceTaxonomy
 	}
 
 	@Override
-	public void setCreateDirectSupernodes(
-			Collection<? extends ElkClass> members,
-			Iterable<? extends Collection<? extends ElkClass>> superMemberSets) {
-		classTaxonomy_.setCreateDirectSupernodes(members, superMemberSets);
+	public UpdateableTypeNode<ElkClass, ElkNamedIndividual> getCreateNode(
+			final Collection<? extends ElkClass> members) {
+		return getCreateUpdateableTypeNode(
+				classTaxonomy_.getCreateNode(members));
+	}
+
+	@Override
+	public boolean setCreateDirectSupernodes(
+			final UpdateableTypeNode<ElkClass, ElkNamedIndividual> subNode,
+			final Iterable<? extends Collection<? extends ElkClass>> superMemberSets) {
+		if (!(subNode instanceof UpdateableTypeNodeWrapper)) {
+			throw new IllegalArgumentException(
+					"The sub-node must belong to this taxonomy: " + subNode);
+		}
+		final UpdateableTypeNodeWrapper node = (UpdateableTypeNodeWrapper) subNode;
+		if (node.getTaxonomy() != this) {
+			throw new IllegalArgumentException(
+					"The sub-node must belong to this taxonomy: " + subNode);
+		}
+		return classTaxonomy_.setCreateDirectSupernodes(node.getNode(),
+				superMemberSets);
 	}
 
 	@Override
@@ -258,12 +290,12 @@ public class ConcurrentInstanceTaxonomy
 	public boolean addToBottomNode(final ElkClass member) {
 		return classTaxonomy_.addToBottomNode(member);
 	}
-	
+
 	@Override
 	public boolean removeFromBottomNode(final ElkClass member) {
 		return classTaxonomy_.removeFromBottomNode(member);
 	}
-	
+
 	private UpdateableTypeNodeWrapper getCreateUpdateableTypeNode(
 			UpdateableTaxonomyNode<ElkClass> taxNode) {
 		if (taxNode == null) {
@@ -333,6 +365,10 @@ public class ConcurrentInstanceTaxonomy
 
 		public UpdateableTaxonomyNode<ElkClass> getNode() {
 			return classNode_;
+		}
+
+		public UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy() {
+			return ConcurrentInstanceTaxonomy.this;
 		}
 
 		@Override
@@ -433,13 +469,13 @@ public class ConcurrentInstanceTaxonomy
 		}
 
 		@Override
-		public boolean trySetModified(boolean modified) {
-			return getNode().trySetModified(modified);
+		public boolean trySetAllParentsAssigned(boolean modified) {
+			return getNode().trySetAllParentsAssigned(modified);
 		}
 
 		@Override
-		public boolean isModified() {
-			return getNode().isModified();
+		public boolean areAllParentsAssigned() {
+			return getNode().areAllParentsAssigned();
 		}
 
 		@Override

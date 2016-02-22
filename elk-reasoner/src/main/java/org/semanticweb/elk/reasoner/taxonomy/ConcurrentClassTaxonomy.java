@@ -164,41 +164,54 @@ public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
 	};
 
 	@Override
-	public void setCreateDirectSupernodes(
-			final Collection<? extends ElkClass> members,
+	public UpdateableTaxonomyNode<ElkClass> getCreateNode(
+			final Collection<? extends ElkClass> members) {
+		return nodeStore_.getCreateNode(members, members.size(),
+				NON_BOTTOM_NODE_FACTORY);
+	};
+
+	@Override
+	public boolean setCreateDirectSupernodes(
+			final UpdateableTaxonomyNode<ElkClass> subNode,
 			final Iterable<? extends Collection<? extends ElkClass>> superMemberSets) {
 
-		final NonBottomClassNode node = nodeStore_.getCreateNode(members,
-				members.size(), NON_BOTTOM_NODE_FACTORY);
-//		// TODO: establish consistency by adding default parent to the nodes.
-//		// node may have default parent, e.g., if it was creates by this method.
-//		for (final UpdateableTaxonomyNode<ElkClass> superNode : node
-//				.getDirectSuperNodes()) {
-//			if (superNode.equals(getTopNode())) {
-//				removeDirectRelation(superNode, node);
-//				break;
-//			}
-//		}
+		if (!(subNode instanceof NonBottomClassNode)) {
+			throw new IllegalArgumentException("The sub-node must belong to this taxonomy: " + subNode);
+		}
+		final NonBottomClassNode node = (NonBottomClassNode) subNode;
+		if (node.taxonomy_ != this) {
+			throw new IllegalArgumentException("The sub-node must belong to this taxonomy: " + subNode);
+		}
+		// // TODO: establish consistency by adding default parent to the nodes.
+		// // node may have default parent, e.g., if it was creates by this
+		// method.
+		// for (final UpdateableTaxonomyNode<ElkClass> superNode : node
+		// .getDirectSuperNodes()) {
+		// if (superNode.equals(getTopNode())) {
+		// removeDirectRelation(superNode, node);
+		// break;
+		// }
+		// }
 
 		for (final Collection<? extends ElkClass> superMembers : superMemberSets) {
 			final NonBottomClassNode superNode = nodeStore_.getCreateNode(
 					superMembers, superMembers.size(), NON_BOTTOM_NODE_FACTORY);
 			addDirectRelation(superNode, node);
-//
-//			// give default parent to superNode
-//			if (superNode.getDirectSuperNodes().isEmpty()
-//					&& !superNode.equals(getTopNode())) {
-//				addDirectRelation(getTopNode(), superNode);
-//			}
+			//
+			// // give default parent to superNode
+			// if (superNode.getDirectSuperNodes().isEmpty()
+			// && !superNode.equals(getTopNode())) {
+			// addDirectRelation(getTopNode(), superNode);
+			// }
 		}
-//
-//		// give default parent to node
-//		if (node.getDirectSuperNodes().isEmpty()
-//				&& !node.equals(getTopNode())) {
-//			addDirectRelation(getTopNode(), node);
-//		}
+		//
+		// // give default parent to node
+		// if (node.getDirectSuperNodes().isEmpty()
+		// && !node.equals(getTopNode())) {
+		// addDirectRelation(getTopNode(), node);
+		// }
 
-		node.trySetModified(false);
+		return node.trySetAllParentsAssigned(true);
 	}
 
 	private static void addDirectRelation(
@@ -207,13 +220,13 @@ public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
 		subNode.addDirectSuperNode(superNode);
 		superNode.addDirectSubNode(subNode);
 	}
-//
-//	private static void removeDirectRelation(
-//			final UpdateableTaxonomyNode<ElkClass> superNode,
-//			final UpdateableTaxonomyNode<ElkClass> subNode) {
-//		subNode.removeDirectSuperNode(superNode);
-//		superNode.removeDirectSubNode(subNode);
-//	}
+	//
+	// private static void removeDirectRelation(
+	// final UpdateableTaxonomyNode<ElkClass> superNode,
+	// final UpdateableTaxonomyNode<ElkClass> subNode) {
+	// subNode.removeDirectSuperNode(superNode);
+	// superNode.removeDirectSubNode(subNode);
+	// }
 
 	@Override
 	public boolean removeNode(final ElkClass member) {
@@ -230,13 +243,13 @@ public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
 		return unsatisfiableClasses_.put(
 				nodeStore_.getKeyProvider().getKey(member), member) == null;
 	}
-	
+
 	@Override
 	public boolean removeFromBottomNode(final ElkClass member) {
 		return unsatisfiableClasses_
 				.remove(nodeStore_.getKeyProvider().getKey(member)) != null;
 	}
-	
+
 	/**
 	 * Special implementation for the bottom node in the taxonomy. Instead of
 	 * storing its sub- and super-classes, the respective answers are computed
@@ -307,12 +320,12 @@ public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
 		}
 
 		@Override
-		public boolean trySetModified(boolean modified) {
+		public boolean trySetAllParentsAssigned(boolean modified) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public boolean isModified() {
+		public boolean areAllParentsAssigned() {
 			throw new UnsupportedOperationException();
 		}
 

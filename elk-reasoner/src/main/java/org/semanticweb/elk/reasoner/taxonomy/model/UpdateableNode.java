@@ -35,21 +35,23 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
 public interface UpdateableNode<T> extends Node<T> {
 
 	/**
-	 * Atomically sets the modification state of this node to the passed
-	 * argument if the state is different.
+	 * Atomically sets the <em>allParentsAssigned</em> flag of this node to the
+	 * passed argument if the state is different. When the
+	 * <em>allParentsAssigned</em> flag of a node is <code>true</code> it is
+	 * certain that all parent nodes of this node are set and can be retrieved.
 	 * 
-	 * @param modified
-	 *            How to set the modification state.
-	 * @return Whether the state changed.
+	 * @param allParentsAssigned
+	 *            How to set the flag.
+	 * @return Whether the flag changed.
 	 */
-	boolean trySetModified(boolean modified);
+	boolean trySetAllParentsAssigned(boolean allParentsAssigned);
 
 	/**
-	 * Whether this node is marked as modified.
+	 * Whether all parent nodes of this node were already assigned.
 	 * 
-	 * @return Whether this node is marked as modified.
+	 * @return The <em>allParentsAssigned</em> flag.
 	 */
-	boolean isModified();
+	boolean areAllParentsAssigned();
 
 	/**
 	 * Replaces the members of this node with the specified members.

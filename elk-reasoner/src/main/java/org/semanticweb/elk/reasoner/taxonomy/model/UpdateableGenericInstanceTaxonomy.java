@@ -44,7 +44,9 @@ public interface UpdateableGenericInstanceTaxonomy<T extends ElkEntity, I extend
 		extends UpdateableGenericTaxonomy<T, TN>,
 		GenericInstanceTaxonomy<T, I, TN, IN> {
 
-	void setCreateDirectTypes(Collection<? extends I> instances,
+	IN getCreateInstanceNode(Collection<? extends I> instances);
+	
+	boolean setCreateDirectTypes(IN instanceNode,
 			Iterable<? extends Collection<? extends T>> typeSets);
 
 	/**
