@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.taxonomy;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,13 +19,13 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
@@ -80,6 +75,7 @@ public class TaxonomyCleaning
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
 class TaxonomyCleaningFactory extends SimpleInterrupter
 		implements
@@ -124,12 +120,6 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 			private final InstanceTaxonomyState.Writer instanceStateWriter_ = instanceTaxonomyState_
 					.getWriter();
 
-			/**
-			 * Temporary queue of nodes that should be removed from the
-			 * taxonomies
-			 */
-			private final Queue<UpdateableTaxonomyNode<ElkClass>> toRemove_ = new ConcurrentLinkedQueue<UpdateableTaxonomyNode<ElkClass>>();
-
 			@Override
 			public void submit(IndexedClassEntity entity) {
 				entity.accept(submissionVisitor_);
@@ -169,18 +159,16 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 					return;
 				}
 
-				if (node.trySetAllParentsAssigned(false)) {
-					toRemove_.add(node);
+				if (classTaxonomy.removeDirectSupernodes(node)) {
 					classStateWriter_.markClassesForModifiedNode(node);
 				}
 
 				// add all its direct satisfiable sub-nodes to the queue
 				synchronized (node) {
-					for (UpdateableTaxonomyNode<ElkClass> subNode : node
-							.getDirectSubNodes()) {
+					final List<UpdateableTaxonomyNode<ElkClass>> subNodes = new ArrayList<UpdateableTaxonomyNode<ElkClass>>(node.getDirectSubNodes());
+					for (UpdateableTaxonomyNode<ElkClass> subNode : subNodes) {
 						if (subNode != classTaxonomy.getBottomNode()
-								&& subNode.trySetAllParentsAssigned(false)) {
-							toRemove_.add(subNode);
+								&& classTaxonomy.removeDirectSupernodes(subNode)) {
 							classStateWriter_
 									.markClassesForModifiedNode(subNode);
 						}
@@ -206,9 +194,10 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 					}
 
 					for (UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode : directInstances) {
-						if (instanceNode.trySetAllParentsAssigned(false)) {
+						if (instanceTaxonomy.removeDirectTypes(instanceNode)) {
 							instanceStateWriter_
 									.markIndividualsForModifiedNode(instanceNode);
+							// TODO: cannot the instance node stay there ??
 							instanceTaxonomy.removeInstanceNode(instanceNode
 									.getCanonicalMember());
 						}
@@ -237,7 +226,7 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 					UpdateableInstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy
 							.getInstanceNode(individual);
 
-					if (node != null && node.trySetAllParentsAssigned(false)) {
+					if (node != null && taxonomy.removeDirectTypes(node)) {
 						instanceStateWriter_
 								.markIndividualsForModifiedNode(node);
 						taxonomy.removeInstanceNode(individual);
@@ -258,34 +247,8 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 
 			@Override
 			public void process() {
-				for (;;) {
-					if (isInterrupted())
-						return;
-
-					UpdateableTaxonomyNode<ElkClass> node = toRemove_.poll();
-
-					if (node == null) {
-						return;
-					}
-
-					List<UpdateableTaxonomyNode<ElkClass>> superNodes = null;
-
-					// remove all super-class links
-					synchronized (node) {
-						superNodes = new LinkedList<UpdateableTaxonomyNode<ElkClass>>(
-								node.getDirectSuperNodes());
-
-						for (UpdateableTaxonomyNode<ElkClass> superNode : superNodes) {
-							node.removeDirectSuperNode(superNode);
-						}
-					}
-
-					for (UpdateableTaxonomyNode<ElkClass> superNode : superNodes) {
-						synchronized (superNode) {
-							superNode.removeDirectSubNode(node);
-						}
-					}
-				}
+				// Currently does nothing.
+				// TODO: The work done in submit should be moved here.
 			}
 
 			@Override

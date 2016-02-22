@@ -23,6 +23,7 @@
 
 package org.semanticweb.elk.reasoner.taxonomy;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -205,29 +206,51 @@ public class ConcurrentInstanceTaxonomy
 	}
 
 	@Override
-	public boolean removeInstanceNode(ElkNamedIndividual instance) {
-		IndividualNode node = getInstanceNode(instance);
+	public boolean removeDirectTypes(
+			final UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode) {
 
-		if (node != null) {
-			LOGGER_.trace("Removing the instance node {}", node);
-
-			List<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> directTypes = new LinkedList<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>();
-
-			synchronized (node) {
-				individualNodeStore_.removeNode(instance);
-				directTypes.addAll(node.getDirectTypeNodes());
-			}
-			// detaching the removed instance node from all its direct types
-			for (UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode : directTypes) {
-				synchronized (typeNode) {
-					typeNode.removeDirectInstanceNode(node);
-				}
-			}
-
-			return true;
+		if (!(instanceNode instanceof IndividualNode)) {
+			throw new IllegalArgumentException(
+					"The sub-node must belong to this taxonomy: "
+							+ instanceNode);
 		}
-		// else
-		return false;
+		final IndividualNode node = (IndividualNode) instanceNode;
+		if (node.taxonomy_ != this) {
+			throw new IllegalArgumentException(
+					"The sub-node must belong to this taxonomy: "
+							+ instanceNode);
+		}
+
+		if (!node.trySetAllParentsAssigned(false)) {
+			return false;
+		}
+
+		final List<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> directTypes = new ArrayList<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>();
+
+		synchronized (node) {
+			directTypes.addAll(node.getDirectTypeNodes());
+			for (UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode : directTypes) {
+				node.removeDirectTypeNode(typeNode);
+			}
+		}
+		// detaching the removed instance node from all its direct types
+		for (UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode : directTypes) {
+			synchronized (typeNode) {
+				typeNode.removeDirectInstanceNode(node);
+			}
+		}
+		
+		return true;
+	}
+
+	@Override
+	public boolean removeInstanceNode(final ElkNamedIndividual instance) {
+		if (individualNodeStore_.removeNode(instance)) {
+			LOGGER_.trace("removed instance node with member: {}", instance);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@Override
@@ -246,10 +269,6 @@ public class ConcurrentInstanceTaxonomy
 					"The sub-node must belong to this taxonomy: " + subNode);
 		}
 		final UpdateableTypeNodeWrapper node = (UpdateableTypeNodeWrapper) subNode;
-		if (node.getTaxonomy() != this) {
-			throw new IllegalArgumentException(
-					"The sub-node must belong to this taxonomy: " + subNode);
-		}
 		return classTaxonomy_.setCreateDirectSupernodes(node.getNode(),
 				superMemberSets);
 	}
@@ -265,6 +284,17 @@ public class ConcurrentInstanceTaxonomy
 	}
 
 	@Override
+	public boolean removeDirectSupernodes(
+			final UpdateableTypeNode<ElkClass, ElkNamedIndividual> subNode) {
+		if (!(subNode instanceof UpdateableTypeNodeWrapper)) {
+			throw new IllegalArgumentException(
+					"The sub-node must belong to this taxonomy: " + subNode);
+		}
+		final UpdateableTypeNodeWrapper node = (UpdateableTypeNodeWrapper) subNode;
+		return classTaxonomy_.removeDirectSupernodes(node.getNode());
+	}
+
+	@Override
 	public boolean removeNode(final ElkClass member) {
 		final UpdateableTaxonomyNode<ElkClass> node = classTaxonomy_
 				.getNode(member);
@@ -275,6 +305,7 @@ public class ConcurrentInstanceTaxonomy
 
 		if (wrapper != null && wrapperMap_.remove(node, wrapper)) {
 
+			// TODO: maybe this can be removed
 			for (UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode : wrapper
 					.getDirectInstanceNodes()) {
 				synchronized (instanceNode) {
@@ -365,10 +396,6 @@ public class ConcurrentInstanceTaxonomy
 
 		public UpdateableTaxonomyNode<ElkClass> getNode() {
 			return classNode_;
-		}
-
-		public UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy() {
-			return ConcurrentInstanceTaxonomy.this;
 		}
 
 		@Override

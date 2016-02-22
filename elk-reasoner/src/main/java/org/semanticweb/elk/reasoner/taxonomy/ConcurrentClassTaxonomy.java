@@ -25,9 +25,11 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -176,11 +178,13 @@ public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
 			final Iterable<? extends Collection<? extends ElkClass>> superMemberSets) {
 
 		if (!(subNode instanceof NonBottomClassNode)) {
-			throw new IllegalArgumentException("The sub-node must belong to this taxonomy: " + subNode);
+			throw new IllegalArgumentException(
+					"The sub-node must belong to this taxonomy: " + subNode);
 		}
 		final NonBottomClassNode node = (NonBottomClassNode) subNode;
 		if (node.taxonomy_ != this) {
-			throw new IllegalArgumentException("The sub-node must belong to this taxonomy: " + subNode);
+			throw new IllegalArgumentException(
+					"The sub-node must belong to this taxonomy: " + subNode);
 		}
 		// // TODO: establish consistency by adding default parent to the nodes.
 		// // node may have default parent, e.g., if it was creates by this
@@ -227,6 +231,43 @@ public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
 	// subNode.removeDirectSuperNode(superNode);
 	// superNode.removeDirectSubNode(subNode);
 	// }
+
+	@Override
+	public boolean removeDirectSupernodes(
+			final UpdateableTaxonomyNode<ElkClass> subNode) {
+
+		if (!(subNode instanceof NonBottomClassNode)) {
+			throw new IllegalArgumentException(
+					"The sub-node must belong to this taxonomy: " + subNode);
+		}
+		final NonBottomClassNode node = (NonBottomClassNode) subNode;
+		if (node.taxonomy_ != this) {
+			throw new IllegalArgumentException(
+					"The sub-node must belong to this taxonomy: " + subNode);
+		}
+
+		if (!node.trySetAllParentsAssigned(false)) {
+			return false;
+		}
+
+		final List<UpdateableTaxonomyNode<ElkClass>> superNodes = new ArrayList<UpdateableTaxonomyNode<ElkClass>>();
+
+		// remove all super-class links
+		synchronized (node) {
+			superNodes.addAll(node.getDirectSuperNodes());
+			for (UpdateableTaxonomyNode<ElkClass> superNode : superNodes) {
+				node.removeDirectSuperNode(superNode);
+			}
+		}
+
+		for (UpdateableTaxonomyNode<ElkClass> superNode : superNodes) {
+			synchronized (superNode) {
+				superNode.removeDirectSubNode(node);
+			}
+		}
+
+		return true;
+	}
 
 	@Override
 	public boolean removeNode(final ElkClass member) {

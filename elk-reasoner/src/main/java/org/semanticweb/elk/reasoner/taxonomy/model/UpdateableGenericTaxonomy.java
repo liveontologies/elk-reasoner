@@ -44,6 +44,8 @@ public interface UpdateableGenericTaxonomy<T extends ElkEntity, N extends Update
 	boolean setCreateDirectSupernodes(N subNode,
 			Iterable<? extends Collection<? extends T>> superMemberSets);
 
+	boolean removeDirectSupernodes(N subNode);
+	
 	/**
 	 * Removes the node containing the specified member from the taxonomy.
 	 * 

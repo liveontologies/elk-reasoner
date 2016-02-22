@@ -48,6 +48,8 @@ public interface UpdateableGenericInstanceTaxonomy<T extends ElkEntity, I extend
 	
 	boolean setCreateDirectTypes(IN instanceNode,
 			Iterable<? extends Collection<? extends T>> typeSets);
+	
+	boolean removeDirectTypes(IN instanceNode);
 
 	/**
 	 * Removes the instance node containing the specified member from the
