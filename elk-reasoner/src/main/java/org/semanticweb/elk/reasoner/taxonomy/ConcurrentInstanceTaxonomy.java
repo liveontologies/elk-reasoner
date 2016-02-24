@@ -39,6 +39,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericNodeStore;
@@ -394,6 +395,11 @@ public class ConcurrentInstanceTaxonomy
 					new ConcurrentHashMap<UpdateableInstanceNode<ElkClass, ElkNamedIndividual>, Boolean>());
 		}
 
+		@Override
+		public Taxonomy<ElkClass> getTaxonomy() {
+			return getNode().getTaxonomy();
+		}
+		
 		public UpdateableTaxonomyNode<ElkClass> getNode() {
 			return classNode_;
 		}

@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.taxonomy.model.SimpleUpdateableNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeUtils;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -59,7 +60,7 @@ class NonBottomClassNode extends SimpleUpdateableNode<ElkClass>
 	/**
 	 * The link to the taxonomy to which this node belongs
 	 */
-	final ConcurrentClassTaxonomy taxonomy_;
+	private final ConcurrentClassTaxonomy taxonomy_;
 
 	/**
 	 * ElkClass nodes whose members are direct super-classes of the members of
@@ -91,6 +92,11 @@ class NonBottomClassNode extends SimpleUpdateableNode<ElkClass>
 		this.directSuperNodes_ = new ArrayHashSet<UpdateableTaxonomyNode<ElkClass>>();
 	}
 
+	@Override
+	public Taxonomy<ElkClass> getTaxonomy() {
+		return taxonomy_;
+	}
+	
 	/**
 	 * Add a direct super-class node. This method is not thread safe.
 	 * 
