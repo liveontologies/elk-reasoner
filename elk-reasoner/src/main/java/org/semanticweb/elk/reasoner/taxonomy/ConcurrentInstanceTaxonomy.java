@@ -286,8 +286,8 @@ public class ConcurrentInstanceTaxonomy
 	}
 
 	@Override
-	public NonBottomTypeNode<ElkClass, ElkNamedIndividual> getTopNode() {
-		return getCreateUpdateableTypeNode(classTaxonomy_.getTopNode());
+	public TypeNode<ElkClass, ElkNamedIndividual> getTopNode() {
+		return functor_.apply(classTaxonomy_.getTopNode());
 	}
 
 	@Override

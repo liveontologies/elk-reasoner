@@ -41,9 +41,6 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
 public interface UpdateableTaxonomy<T extends ElkEntity>
 		extends Taxonomy<T> {
 
-	@Override
-	NonBottomTaxonomyNode<T> getTopNode();
-
 	NonBottomTaxonomyNode<T> getNonBottomNode(T elkEntity);
 
 	Set<? extends NonBottomTaxonomyNode<T>> getNonBottomNodes();
