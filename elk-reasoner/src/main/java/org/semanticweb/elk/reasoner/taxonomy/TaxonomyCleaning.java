@@ -38,11 +38,11 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.stages.ClassTaxonomyState;
 import org.semanticweb.elk.reasoner.stages.InstanceTaxonomyState;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
@@ -151,8 +151,8 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 					}
 				}
 
-				UpdateableTaxonomyNode<ElkClass> node = classTaxonomy
-						.getNode(elkClass);
+				final NonBottomTaxonomyNode<ElkClass> node = classTaxonomy
+						.getNonBottomNode(elkClass);
 
 				if (node == null) {
 					classStateWriter_.markClassForModifiedNode(elkClass);
@@ -165,10 +165,9 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 
 				// add all its direct satisfiable sub-nodes to the queue
 				synchronized (node) {
-					final List<UpdateableTaxonomyNode<ElkClass>> subNodes = new ArrayList<UpdateableTaxonomyNode<ElkClass>>(node.getDirectSubNodes());
-					for (UpdateableTaxonomyNode<ElkClass> subNode : subNodes) {
-						if (subNode != classTaxonomy.getBottomNode()
-								&& classTaxonomy.removeDirectSupernodes(subNode)) {
+					final List<NonBottomTaxonomyNode<ElkClass>> subNodes = new ArrayList<NonBottomTaxonomyNode<ElkClass>>(node.getDirectNonBottomSubNodes());
+					for (NonBottomTaxonomyNode<ElkClass> subNode : subNodes) {
+						if (classTaxonomy.removeDirectSupernodes(subNode)) {
 							classStateWriter_
 									.markClassesForModifiedNode(subNode);
 						}
@@ -178,7 +177,7 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 				// delete all direct instance nodes of the type node being
 				// removed
 				if (instanceTaxonomy != null) {
-					UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode = instanceTaxonomy
+					TypeNode<ElkClass, ElkNamedIndividual> typeNode = instanceTaxonomy
 							.getNode(elkClass);
 
 					if (typeNode == null) {
@@ -186,14 +185,14 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 						return;
 					}
 					// else
-					List<UpdateableInstanceNode<ElkClass, ElkNamedIndividual>> directInstances = null;
+					List<InstanceNode<ElkClass, ElkNamedIndividual>> directInstances = null;
 
 					synchronized (typeNode) {
-						directInstances = new LinkedList<UpdateableInstanceNode<ElkClass, ElkNamedIndividual>>(
+						directInstances = new LinkedList<InstanceNode<ElkClass, ElkNamedIndividual>>(
 								typeNode.getDirectInstanceNodes());
 					}
 
-					for (UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode : directInstances) {
+					for (InstanceNode<ElkClass, ElkNamedIndividual> instanceNode : directInstances) {
 						if (instanceTaxonomy.removeDirectTypes(instanceNode)) {
 							instanceStateWriter_
 									.markIndividualsForModifiedNode(instanceNode);
@@ -223,7 +222,7 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 							.getTaxonomy();
 					ElkNamedIndividual individual = indexedIndividual
 							.getElkEntity();
-					UpdateableInstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy
+					InstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy
 							.getInstanceNode(individual);
 
 					if (node != null && taxonomy.removeDirectTypes(node)) {

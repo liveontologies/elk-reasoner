@@ -26,9 +26,9 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.reasoner.taxonomy.model.GenericTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.SimpleUpdateableNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeUtils;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
@@ -37,14 +37,14 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NonBottomGenericTaxonomyNode<T extends ElkEntity, N extends GenericTaxonomyNode<T, N>>
+public class NonBottomGenericTaxonomyNode<T extends ElkEntity, N extends UpdateableGenericTaxonomyNode<T, N>>
 		extends SimpleUpdateableNode<T>
 		implements UpdateableGenericTaxonomyNode<T, N> {
 	
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(NonBottomGenericTaxonomyNode.class);
 	
-	private final AbstractDistinctBottomTaxonomy<T, N> taxonomy_;
+	private final AbstractDistinctBottomTaxonomy<T> taxonomy_;
 
 	/**
 	 * ElkClass nodes whose members are direct super-classes of the members of
@@ -57,7 +57,7 @@ public class NonBottomGenericTaxonomyNode<T extends ElkEntity, N extends Generic
 	 */
 	private final Set<N> directSubNodes_;
 	
-	protected NonBottomGenericTaxonomyNode(final AbstractDistinctBottomTaxonomy<T, N> taxonomy,
+	protected NonBottomGenericTaxonomyNode(final AbstractDistinctBottomTaxonomy<T> taxonomy,
 			final Iterable<? extends T> members, final int size) {
 		super(members, size, taxonomy.getKeyProvider());
 		this.taxonomy_ = taxonomy;
@@ -66,17 +66,22 @@ public class NonBottomGenericTaxonomyNode<T extends ElkEntity, N extends Generic
 	}
 
 	@Override
-	public Set<? extends N> getDirectSuperNodes() {
+	public Set<? extends TaxonomyNode<T>> getDirectSuperNodes() {
 		return Collections.unmodifiableSet(directSuperNodes_);
 	}
 
 	@Override
-	public Set<? extends N> getAllSuperNodes() {
+	public Set<? extends N> getDirectNonBottomSuperNodes() {
+		return Collections.unmodifiableSet(directSuperNodes_);
+	}
+	
+	@Override
+	public Set<? extends TaxonomyNode<T>> getAllSuperNodes() {
 		return TaxonomyNodeUtils.getAllSuperNodes(this);
 	}
 
 	@Override
-	public Set<? extends N> getDirectSubNodes() {
+	public Set<? extends TaxonomyNode<T>> getDirectSubNodes() {
 		if (!directSubNodes_.isEmpty()) {
 			return Collections.unmodifiableSet(directSubNodes_);
 		} else {
@@ -85,7 +90,12 @@ public class NonBottomGenericTaxonomyNode<T extends ElkEntity, N extends Generic
 	}
 
 	@Override
-	public Set<? extends N> getAllSubNodes() {
+	public Set<? extends N> getDirectNonBottomSubNodes() {
+		return Collections.unmodifiableSet(directSubNodes_);
+	}
+	
+	@Override
+	public Set<? extends TaxonomyNode<T>> getAllSubNodes() {
 		return TaxonomyNodeUtils.getAllSubNodes(this);
 	}
 
@@ -147,7 +157,7 @@ public class NonBottomGenericTaxonomyNode<T extends ElkEntity, N extends Generic
 			implements UpdateableTaxonomyNode<T> {
 
 		protected Projection(
-				AbstractDistinctBottomTaxonomy<T, UpdateableTaxonomyNode<T>> taxonomy,
+				AbstractDistinctBottomTaxonomy<T> taxonomy,
 				Iterable<? extends T> members, int size) {
 			super(taxonomy, members, size);
 		}

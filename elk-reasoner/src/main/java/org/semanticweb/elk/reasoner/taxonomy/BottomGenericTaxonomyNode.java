@@ -28,24 +28,24 @@ import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
-import org.semanticweb.elk.reasoner.taxonomy.model.GenericTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericTaxonomyNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.Operations.Condition;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
-public class BottomGenericTaxonomyNode<T extends ElkEntity, N extends GenericTaxonomyNode<T, N>>
-		implements UpdateableGenericTaxonomyNode<T, N> {
+public class BottomGenericTaxonomyNode<T extends ElkEntity>
+		implements TaxonomyNode<T> {
 
-	private final AbstractDistinctBottomTaxonomy<T, N> taxonomy_;
+	private final AbstractDistinctBottomTaxonomy<T> taxonomy_;
+
+	private final T bottomMember_;
 	
-	public BottomGenericTaxonomyNode(final AbstractDistinctBottomTaxonomy<T, N> taxonomy) {
+	public BottomGenericTaxonomyNode(final AbstractDistinctBottomTaxonomy<T> taxonomy, final T bottomMember) {
 		this.taxonomy_ = taxonomy;
+		this.bottomMember_ = bottomMember;
 		taxonomy_.unsatisfiableClasses_.put(
-				getKeyProvider().getKey(taxonomy_.bottomMember_),
-				taxonomy_.bottomMember_);
+				getKeyProvider().getKey(bottomMember_), bottomMember_);
 	}
 	
 	@Override
@@ -66,7 +66,7 @@ public class BottomGenericTaxonomyNode<T extends ElkEntity, N extends GenericTax
 
 	@Override
 	public T getCanonicalMember() {
-		return taxonomy_.bottomMember_;
+		return bottomMember_;
 	}
 
 	@Override
@@ -75,12 +75,12 @@ public class BottomGenericTaxonomyNode<T extends ElkEntity, N extends GenericTax
 	}
 
 	@Override
-	public Set<? extends N> getDirectSuperNodes() {
-		final Set<? extends N> nonBottomNodes = taxonomy_.getNonBottomNodes();
+	public Set<? extends TaxonomyNode<T>> getDirectSuperNodes() {
+		final Set<? extends TaxonomyNode<T>> nonBottomNodes = taxonomy_.getNonBottomNodes();
 		return Operations.filter(nonBottomNodes,
-				new Condition<N>() {
+				new Condition<TaxonomyNode<T>>() {
 					@Override
-					public boolean holds(final N element) {
+					public boolean holds(final TaxonomyNode<T> element) {
 						return element.getDirectSubNodes()
 								.contains(taxonomy_.getBottomNode());
 					}
@@ -92,19 +92,19 @@ public class BottomGenericTaxonomyNode<T extends ElkEntity, N extends GenericTax
 				}, nonBottomNodes.size()
 						- taxonomy_.countNodesWithSubClasses.get());
 	}
-
+	
 	@Override
-	public Set<? extends N> getAllSuperNodes() {
+	public Set<? extends TaxonomyNode<T>> getAllSuperNodes() {
 		return taxonomy_.getNonBottomNodes();
 	}
 
 	@Override
-	public Set<? extends N> getDirectSubNodes() {
+	public Set<? extends TaxonomyNode<T>> getDirectSubNodes() {
 		return Collections.emptySet();
 	}
-
+	
 	@Override
-	public Set<? extends N> getAllSubNodes() {
+	public Set<? extends TaxonomyNode<T>> getAllSubNodes() {
 		return Collections.emptySet();
 	}
 
@@ -113,59 +113,11 @@ public class BottomGenericTaxonomyNode<T extends ElkEntity, N extends GenericTax
 		return taxonomy_;
 	}
 
-	// The following methods do nothing. TODO: is there a way to remove them ?!?
-	
-	@Override
-	public boolean trySetAllParentsAssigned(final boolean allParentsAssigned) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean areAllParentsAssigned() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void setMembers(final Iterable<? extends T> members) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void addDirectSuperNode(final N superNode) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void addDirectSubNode(final N subNode) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean removeDirectSubNode(final N subNode) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean removeDirectSuperNode(final N superNode) {
-		throw new UnsupportedOperationException();
-	}
-
 	private final int hashCode_ = HashGenerator.generateNextHashCode();
 
 	@Override
 	public final int hashCode() {
 		return hashCode_;
-	}
-
-	public static class Projection<T extends ElkEntity>
-			extends BottomGenericTaxonomyNode<T, UpdateableTaxonomyNode<T>>
-			implements UpdateableTaxonomyNode<T> {
-
-		public Projection(
-				AbstractDistinctBottomTaxonomy<T, UpdateableTaxonomyNode<T>> taxonomy) {
-			super(taxonomy);
-		}
-		
 	}
 
 }

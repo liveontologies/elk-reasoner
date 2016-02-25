@@ -39,7 +39,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  *            The type of instance nodes with which this node may be associated.
  */
 public interface UpdateableGenericInstanceNode<T extends ElkEntity, I extends ElkEntity, TN extends UpdateableGenericTypeNode<T, I, TN, IN>, IN extends UpdateableGenericInstanceNode<T, I, TN, IN>>
-		extends UpdateableNode<I>, GenericInstanceNode<T, I, TN, IN> {
+		extends UpdateableNode<I>, InstanceNode<T, I> {
 
 	/**
 	 * Associates this node with its direct type node.

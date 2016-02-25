@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.taxonomy;
+package org.semanticweb.elk.reasoner.taxonomy.model;
 
 /*
  * #%L
@@ -23,18 +23,9 @@ package org.semanticweb.elk.reasoner.taxonomy;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.reasoner.taxonomy.model.Node;
-import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
 
-public abstract class InternalNodeFactory<
-				T extends ElkEntity,
-				N extends Node<T>
-		> implements NodeFactory<T, N> {
+public interface HasTaxonomy<T extends ElkEntity> {
 
-	protected final AbstractDistinctBottomTaxonomy<T> taxonomy_;
-	
-	public InternalNodeFactory(final AbstractDistinctBottomTaxonomy<T> taxonomy) {
-		this.taxonomy_ = taxonomy;
-	}
+	Taxonomy<T> getTaxonomy();
 	
 }

@@ -29,7 +29,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 
 /**
@@ -46,46 +46,42 @@ import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 public class ConcurrentClassTaxonomy
 		extends AbstractUpdateableGenericTaxonomy<
 				ElkClass,
-				UpdateableTaxonomyNode<ElkClass>,
-				NonBottomGenericTaxonomyNode.Projection<ElkClass>,
-				BottomGenericTaxonomyNode.Projection<ElkClass>
-		> implements UpdateableTaxonomy<ElkClass> {
+				UpdateableTaxonomyNode<ElkClass>
+		> {
 	
 	public ConcurrentClassTaxonomy(
 			final ComparatorKeyProvider<ElkEntity> classKeyProvider) {
 		super(
-				new ConcurrentNodeStore<ElkClass, NonBottomGenericTaxonomyNode.Projection<ElkClass>>(classKeyProvider),
-				new InternalNodeFactoryFactory<ElkClass, UpdateableTaxonomyNode<ElkClass>, NonBottomGenericTaxonomyNode.Projection<ElkClass>>() {
+				new ConcurrentNodeStore<ElkClass, UpdateableTaxonomyNode<ElkClass>>(classKeyProvider),
+				new InternalNodeFactoryFactory<ElkClass, UpdateableTaxonomyNode<ElkClass>>() {
 					@Override
-					public InternalNodeFactory<ElkClass, UpdateableTaxonomyNode<ElkClass>, NonBottomGenericTaxonomyNode.Projection<ElkClass>> createInternalNodeFactory(
-							AbstractDistinctBottomTaxonomy<ElkClass, UpdateableTaxonomyNode<ElkClass>> taxonomy) {
-						return new InternalNodeFactory<ElkClass, UpdateableTaxonomyNode<ElkClass>, NonBottomGenericTaxonomyNode.Projection<ElkClass>>(taxonomy) {
+					public InternalNodeFactory<ElkClass, UpdateableTaxonomyNode<ElkClass>> createInternalNodeFactory(
+							final AbstractDistinctBottomTaxonomy<ElkClass> taxonomy) {
+						return new InternalNodeFactory<ElkClass, UpdateableTaxonomyNode<ElkClass>>(taxonomy) {
 							@Override
-							public NonBottomGenericTaxonomyNode.Projection<ElkClass> createNode(
-									Iterable<? extends ElkClass> members,
-									int size,
-									ComparatorKeyProvider<? super ElkClass> keyProvider) {
+							public UpdateableTaxonomyNode<ElkClass> createNode(
+									final Iterable<? extends ElkClass> members, final int size,
+									final ComparatorKeyProvider<? super ElkClass> keyProvider) {
 								return new NonBottomGenericTaxonomyNode.Projection<ElkClass>(taxonomy_, members, size);
 							}
 						};
 					}
 				},
-				new InternalNodeFactoryFactory<ElkClass, UpdateableTaxonomyNode<ElkClass>, BottomGenericTaxonomyNode.Projection<ElkClass>>() {
+				new InternalNodeFactoryFactory<ElkClass, TaxonomyNode<ElkClass>>() {
 					@Override
-					public InternalNodeFactory<ElkClass, UpdateableTaxonomyNode<ElkClass>, BottomGenericTaxonomyNode.Projection<ElkClass>> createInternalNodeFactory(
-							AbstractDistinctBottomTaxonomy<ElkClass, UpdateableTaxonomyNode<ElkClass>> taxonomy) {
-						return new InternalNodeFactory<ElkClass, UpdateableTaxonomyNode<ElkClass>, BottomGenericTaxonomyNode.Projection<ElkClass>>(taxonomy) {
+					public InternalNodeFactory<ElkClass, TaxonomyNode<ElkClass>> createInternalNodeFactory(
+							AbstractDistinctBottomTaxonomy<ElkClass> taxonomy) {
+						return new InternalNodeFactory<ElkClass, TaxonomyNode<ElkClass>>(taxonomy) {
 							@Override
-							public BottomGenericTaxonomyNode.Projection<ElkClass> createNode(Iterable<? extends ElkClass> members,
-									int size, ComparatorKeyProvider<? super ElkClass> keyProvider) {
-								return new BottomGenericTaxonomyNode.Projection<ElkClass>(taxonomy_);
+							public TaxonomyNode<ElkClass> createNode(
+									final Iterable<? extends ElkClass> members, final int size,
+									final ComparatorKeyProvider<? super ElkClass> keyProvider) {
+								return new BottomGenericTaxonomyNode<ElkClass>(taxonomy_, PredefinedElkClass.OWL_NOTHING);
 							}
 						};
 					}
 				},
-				PredefinedElkClass.OWL_THING,
-				PredefinedElkClass.OWL_NOTHING
-			);
+				PredefinedElkClass.OWL_THING);
 	}
 
 }

@@ -41,7 +41,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  *            The type of instance nodes with which this node may be associated.
  */
 public interface GenericTypeNode<T extends ElkEntity, I extends ElkEntity, TN extends GenericTypeNode<T, I, TN, IN>, IN extends GenericInstanceNode<T, I, TN, IN>>
-		extends TypeNode<T, I>, GenericTaxonomyNode<T, TN> {
+		extends TypeNode<T, I> {
 
 	@Override
 	public Set<? extends IN> getDirectInstanceNodes();

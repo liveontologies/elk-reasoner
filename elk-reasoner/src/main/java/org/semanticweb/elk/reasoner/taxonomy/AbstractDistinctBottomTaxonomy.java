@@ -1,7 +1,5 @@
 package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.Set;
-
 /*
  * #%L
  * ELK Reasoner
@@ -29,26 +27,20 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.reasoner.taxonomy.model.GenericTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.GenericTaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 
-public abstract class AbstractDistinctBottomTaxonomy<T extends ElkEntity, N extends GenericTaxonomyNode<T, N>>
-		extends AbstractTaxonomy<T> implements GenericTaxonomy<T, N> {
+public abstract class AbstractDistinctBottomTaxonomy<T extends ElkEntity>
+		extends AbstractTaxonomy<T> implements UpdateableTaxonomy<T> {
 
-	final T bottomMember_;
-	
 	/** thread safe set of unsatisfiable classes */
 	final ConcurrentMap<Object, T> unsatisfiableClasses_;
 	
 	/** counts the number of nodes which have non-bottom sub-classes */
 	final AtomicInteger countNodesWithSubClasses;
 
-	public AbstractDistinctBottomTaxonomy(final T bottomMember) {
-		this.bottomMember_ = bottomMember;
+	public AbstractDistinctBottomTaxonomy() {
 		this.unsatisfiableClasses_ = new ConcurrentHashMap<Object, T>();
 		this.countNodesWithSubClasses = new AtomicInteger(0);
 	}
-	
-	public abstract Set<? extends N> getNonBottomNodes();
 	
 }

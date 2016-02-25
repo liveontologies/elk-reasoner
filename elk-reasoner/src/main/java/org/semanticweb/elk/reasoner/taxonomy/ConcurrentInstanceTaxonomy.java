@@ -38,7 +38,10 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
+import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
@@ -46,7 +49,6 @@ import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericNodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Operations;
@@ -99,7 +101,7 @@ public class ConcurrentInstanceTaxonomy
 	}
 
 	public ConcurrentInstanceTaxonomy(
-			UpdateableTaxonomy<ElkClass> classTaxonomy,
+			final UpdateableTaxonomy<ElkClass> classTaxonomy,
 			final ComparatorKeyProvider<ElkEntity> individualKeyProvider) {
 		this.individualNodeStore_ = new ConcurrentNodeStore<ElkNamedIndividual, IndividualNode>(
 				individualKeyProvider);
@@ -118,12 +120,8 @@ public class ConcurrentInstanceTaxonomy
 	}
 
 	@Override
-	public UpdateableTypeNode<ElkClass, ElkNamedIndividual> getNode(
-			ElkClass elkClass) {
-		UpdateableTaxonomyNode<ElkClass> node = classTaxonomy_
-				.getNode(elkClass);
-
-		return getCreateUpdateableTypeNode(node);
+	public TypeNode<ElkClass, ElkNamedIndividual> getNode(ElkClass elkClass) {
+		return functor_.apply(classTaxonomy_.getNode(elkClass));
 	}
 
 	/**
@@ -139,14 +137,26 @@ public class ConcurrentInstanceTaxonomy
 	}
 
 	@Override
-	public Set<? extends UpdateableTypeNode<ElkClass, ElkNamedIndividual>> getNodes() {
-
+	public Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> getNodes() {
 		return Operations.map(classTaxonomy_.getNodes(), functor_);
 	}
 
 	@Override
-	public Set<? extends UpdateableInstanceNode<ElkClass, ElkNamedIndividual>> getInstanceNodes() {
+	public Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>> getInstanceNodes() {
 		return individualNodeStore_.getNodes();
+	}
+
+	@Override
+	public NonBottomTaxonomyNode<ElkClass> getNonBottomNode(
+			final ElkClass elkEntity) {
+		return getCreateUpdateableTypeNode(
+				classTaxonomy_.getNonBottomNode(elkEntity));
+	}
+
+	@Override
+	public Set<? extends NonBottomTypeNode<ElkClass, ElkNamedIndividual>> getNonBottomNodes() {
+		return Operations.map(classTaxonomy_.getNonBottomNodes(),
+				nonBottomFunctor_);
 	}
 
 	/**
@@ -166,14 +176,15 @@ public class ConcurrentInstanceTaxonomy
 	};
 
 	@Override
-	public UpdateableInstanceNode<ElkClass, ElkNamedIndividual> getCreateInstanceNode(
+	public InstanceNode<ElkClass, ElkNamedIndividual> getCreateInstanceNode(
 			final Collection<? extends ElkNamedIndividual> instances) {
 		return individualNodeStore_.getCreateNode(instances, instances.size(),
 				INSTANCE_NODE_FACTORY);
 	};
 
+	@Override
 	public boolean setCreateDirectTypes(
-			final UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode,
+			final InstanceNode<ElkClass, ElkNamedIndividual> instanceNode,
 			final Iterable<? extends java.util.Collection<? extends ElkClass>> typeSets) {
 
 		if (!(instanceNode instanceof IndividualNode)) {
@@ -208,7 +219,7 @@ public class ConcurrentInstanceTaxonomy
 
 	@Override
 	public boolean removeDirectTypes(
-			final UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode) {
+			final InstanceNode<ElkClass, ElkNamedIndividual> instanceNode) {
 
 		if (!(instanceNode instanceof IndividualNode)) {
 			throw new IllegalArgumentException(
@@ -240,7 +251,7 @@ public class ConcurrentInstanceTaxonomy
 				typeNode.removeDirectInstanceNode(node);
 			}
 		}
-		
+
 		return true;
 	}
 
@@ -255,7 +266,7 @@ public class ConcurrentInstanceTaxonomy
 	}
 
 	@Override
-	public UpdateableTypeNode<ElkClass, ElkNamedIndividual> getCreateNode(
+	public NonBottomTypeNode<ElkClass, ElkNamedIndividual> getCreateNode(
 			final Collection<? extends ElkClass> members) {
 		return getCreateUpdateableTypeNode(
 				classTaxonomy_.getCreateNode(members));
@@ -263,7 +274,7 @@ public class ConcurrentInstanceTaxonomy
 
 	@Override
 	public boolean setCreateDirectSupernodes(
-			final UpdateableTypeNode<ElkClass, ElkNamedIndividual> subNode,
+			final NonBottomTaxonomyNode<ElkClass> subNode,
 			final Iterable<? extends Collection<? extends ElkClass>> superMemberSets) {
 		if (!(subNode instanceof UpdateableTypeNodeWrapper)) {
 			throw new IllegalArgumentException(
@@ -275,18 +286,18 @@ public class ConcurrentInstanceTaxonomy
 	}
 
 	@Override
-	public UpdateableTypeNode<ElkClass, ElkNamedIndividual> getTopNode() {
+	public NonBottomTypeNode<ElkClass, ElkNamedIndividual> getTopNode() {
 		return getCreateUpdateableTypeNode(classTaxonomy_.getTopNode());
 	}
 
 	@Override
-	public UpdateableTypeNode<ElkClass, ElkNamedIndividual> getBottomNode() {
-		return getCreateUpdateableTypeNode(classTaxonomy_.getBottomNode());
+	public TypeNode<ElkClass, ElkNamedIndividual> getBottomNode() {
+		return bottomNodeWrapper_;
 	}
 
 	@Override
 	public boolean removeDirectSupernodes(
-			final UpdateableTypeNode<ElkClass, ElkNamedIndividual> subNode) {
+			final NonBottomTaxonomyNode<ElkClass> subNode) {
 		if (!(subNode instanceof UpdateableTypeNodeWrapper)) {
 			throw new IllegalArgumentException(
 					"The sub-node must belong to this taxonomy: " + subNode);
@@ -297,8 +308,7 @@ public class ConcurrentInstanceTaxonomy
 
 	@Override
 	public boolean removeNode(final ElkClass member) {
-		final UpdateableTaxonomyNode<ElkClass> node = classTaxonomy_
-				.getNode(member);
+		final TaxonomyNode<ElkClass> node = classTaxonomy_.getNode(member);
 		if (node == null) {
 			return false;
 		}
@@ -329,7 +339,7 @@ public class ConcurrentInstanceTaxonomy
 	}
 
 	private UpdateableTypeNodeWrapper getCreateUpdateableTypeNode(
-			UpdateableTaxonomyNode<ElkClass> taxNode) {
+			NonBottomTaxonomyNode<ElkClass> taxNode) {
 		if (taxNode == null) {
 			return null;
 		}
@@ -349,21 +359,120 @@ public class ConcurrentInstanceTaxonomy
 	/**
 	 * Transforms updateable taxonomy nodes into updateable type nodes
 	 */
-	private final FunctorEx<UpdateableTaxonomyNode<ElkClass>, UpdateableTypeNodeWrapper> functor_ = new FunctorEx<UpdateableTaxonomyNode<ElkClass>, UpdateableTypeNodeWrapper>() {
+	private final FunctorEx<NonBottomTaxonomyNode<ElkClass>, UpdateableTypeNodeWrapper> nonBottomFunctor_ = new FunctorEx<NonBottomTaxonomyNode<ElkClass>, UpdateableTypeNodeWrapper>() {
 
 		@Override
 		public UpdateableTypeNodeWrapper apply(
-				UpdateableTaxonomyNode<ElkClass> node) {
+				final NonBottomTaxonomyNode<ElkClass> node) {
 			return getCreateUpdateableTypeNode(node);
 		}
 
 		@Override
-		public UpdateableTaxonomyNode<ElkClass> deapply(Object element) {
+		public NonBottomTaxonomyNode<ElkClass> deapply(final Object element) {
 			if (element instanceof UpdateableTypeNodeWrapper) {
 				return ((UpdateableTypeNodeWrapper) element).getNode();
+			} else {
+				return null;
 			}
-			// else
-			return null;
+		}
+
+	};
+
+	private final FunctorEx<TaxonomyNode<ElkClass>, TypeNodeWrapper> functor_ = new FunctorEx<TaxonomyNode<ElkClass>, TypeNodeWrapper>() {
+
+		@Override
+		public TypeNodeWrapper apply(final TaxonomyNode<ElkClass> node) {
+			if (node instanceof NonBottomTaxonomyNode) {
+				return nonBottomFunctor_
+						.apply((NonBottomTaxonomyNode<ElkClass>) node);
+			} else {
+				return bottomNodeWrapper_;
+			}
+		}
+
+		@Override
+		public TaxonomyNode<ElkClass> deapply(Object element) {
+			if (element instanceof TypeNodeWrapper) {
+				return ((TypeNodeWrapper) element).getNode();
+			} else {
+				return null;
+			}
+		}
+
+	};
+
+	private abstract class TypeNodeWrapper
+			implements TypeNode<ElkClass, ElkNamedIndividual> {
+
+		public abstract TaxonomyNode<ElkClass> getNode();
+
+		@Override
+		public ComparatorKeyProvider<? super ElkClass> getKeyProvider() {
+			return getNode().getKeyProvider();
+		}
+
+		@Override
+		public boolean contains(ElkClass member) {
+			return getNode().contains(member);
+		}
+
+		@Override
+		public int size() {
+			return getNode().size();
+		}
+
+		@Override
+		public ElkClass getCanonicalMember() {
+			return getNode().getCanonicalMember();
+		}
+
+		@Override
+		public Iterator<ElkClass> iterator() {
+			return getNode().iterator();
+		}
+
+		@Override
+		public Taxonomy<ElkClass> getTaxonomy() {
+			return getNode().getTaxonomy();
+		}
+
+		@Override
+		public Set<TypeNodeWrapper> getDirectSuperNodes() {
+			return Operations.map(getNode().getDirectSuperNodes(), functor_);
+		}
+
+		@Override
+		public Set<TypeNodeWrapper> getAllSuperNodes() {
+			return Operations.map(getNode().getAllSuperNodes(), functor_);
+		}
+
+		@Override
+		public Set<TypeNodeWrapper> getDirectSubNodes() {
+			return Operations.map(getNode().getDirectSubNodes(), functor_);
+		}
+
+		@Override
+		public Set<TypeNodeWrapper> getAllSubNodes() {
+			return Operations.map(getNode().getAllSubNodes(), functor_);
+		}
+
+	}
+
+	private final TypeNodeWrapper bottomNodeWrapper_ = new TypeNodeWrapper() {
+
+		@Override
+		public TaxonomyNode<ElkClass> getNode() {
+			return classTaxonomy_.getBottomNode();
+		}
+
+		@Override
+		public Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>> getDirectInstanceNodes() {
+			return Collections.emptySet();
+		}
+
+		@Override
+		public Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>> getAllInstanceNodes() {
+			return Collections.emptySet();
 		}
 
 	};
@@ -375,13 +484,13 @@ public class ConcurrentInstanceTaxonomy
 	 *         pavel.klinov@uni-ulm.de
 	 * @author Peter Skocovsky
 	 */
-	private class UpdateableTypeNodeWrapper
+	private class UpdateableTypeNodeWrapper extends TypeNodeWrapper
 			implements UpdateableTypeNode<ElkClass, ElkNamedIndividual> {
 
 		/**
 		 * The wrapped node.
 		 */
-		protected final UpdateableTaxonomyNode<ElkClass> classNode_;
+		protected final NonBottomTaxonomyNode<ElkClass> classNode_;
 
 		/**
 		 * ElkNamedIndividual nodes whose members are instances of the members
@@ -389,44 +498,14 @@ public class ConcurrentInstanceTaxonomy
 		 */
 		private final Set<UpdateableInstanceNode<ElkClass, ElkNamedIndividual>> directInstanceNodes_;
 
-		UpdateableTypeNodeWrapper(UpdateableTaxonomyNode<ElkClass> node) {
+		UpdateableTypeNodeWrapper(final NonBottomTaxonomyNode<ElkClass> node) {
 			this.classNode_ = node;
 			this.directInstanceNodes_ = Collections.newSetFromMap(
 					new ConcurrentHashMap<UpdateableInstanceNode<ElkClass, ElkNamedIndividual>, Boolean>());
 		}
 
-		@Override
-		public Taxonomy<ElkClass> getTaxonomy() {
-			return getNode().getTaxonomy();
-		}
-		
-		public UpdateableTaxonomyNode<ElkClass> getNode() {
+		public NonBottomTaxonomyNode<ElkClass> getNode() {
 			return classNode_;
-		}
-
-		@Override
-		public ComparatorKeyProvider<? super ElkClass> getKeyProvider() {
-			return classNode_.getKeyProvider();
-		}
-
-		@Override
-		public Iterator<ElkClass> iterator() {
-			return classNode_.iterator();
-		}
-
-		@Override
-		public boolean contains(ElkClass member) {
-			return classNode_.contains(member);
-		}
-
-		@Override
-		public int size() {
-			return classNode_.size();
-		}
-
-		@Override
-		public ElkClass getCanonicalMember() {
-			return classNode_.getCanonicalMember();
 		}
 
 		@Override
@@ -435,21 +514,20 @@ public class ConcurrentInstanceTaxonomy
 		}
 
 		@Override
-		public Set<? extends UpdateableInstanceNode<ElkClass, ElkNamedIndividual>> getAllInstanceNodes() {
-			Set<UpdateableInstanceNode<ElkClass, ElkNamedIndividual>> result;
+		public Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>> getAllInstanceNodes() {
+			Set<InstanceNode<ElkClass, ElkNamedIndividual>> result;
 
 			if (!classNode_.getDirectSubNodes().isEmpty()) {
-				result = new ArrayHashSet<UpdateableInstanceNode<ElkClass, ElkNamedIndividual>>();
-				Queue<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> todo = new LinkedList<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>();
+				result = new ArrayHashSet<InstanceNode<ElkClass, ElkNamedIndividual>>();
+				Queue<TypeNode<ElkClass, ElkNamedIndividual>> todo = new LinkedList<TypeNode<ElkClass, ElkNamedIndividual>>();
 
 				todo.add(this);
 
 				while (!todo.isEmpty()) {
-					UpdateableTypeNode<ElkClass, ElkNamedIndividual> next = todo
-							.poll();
+					TypeNode<ElkClass, ElkNamedIndividual> next = todo.poll();
 					result.addAll(next.getDirectInstanceNodes());
 
-					for (UpdateableTypeNode<ElkClass, ElkNamedIndividual> nextSubNode : next
+					for (TypeNode<ElkClass, ElkNamedIndividual> nextSubNode : next
 							.getDirectSubNodes()) {
 						todo.add(nextSubNode);
 					}
@@ -463,77 +541,34 @@ public class ConcurrentInstanceTaxonomy
 		}
 
 		@Override
-		public void addDirectSuperNode(
-				UpdateableTypeNode<ElkClass, ElkNamedIndividual> superNode) {
-			/*
-			 * FIXME: Ensure that superNode is a UpdateableTypeNodeWrapper The
-			 * problem is that the nodes passed to this method may come from
-			 * completely different taxonomy, which is inconsistent even for
-			 * simple taxonomy implementations. Methods that manipulate nodes
-			 * should be in UpdateableTaxonomy, so that it can check whether the
-			 * nodes are in it.
-			 */
-			getNode().addDirectSuperNode(
-					((UpdateableTypeNodeWrapper) superNode).getNode());
+		public Set<? extends UpdateableTypeNode<ElkClass, ElkNamedIndividual>> getDirectNonBottomSuperNodes() {
+			// TODO Auto-generated method stub
+			return Operations.map(getNode().getDirectNonBottomSuperNodes(),
+					nonBottomFunctor_);
 		}
 
 		@Override
-		public void addDirectSubNode(
-				UpdateableTypeNode<ElkClass, ElkNamedIndividual> subNode) {
-			// FIXME: This is a dirty trick; see above
-			getNode().addDirectSubNode(
-					((UpdateableTypeNodeWrapper) subNode).getNode());
-		}
-
-		@Override
-		public boolean removeDirectSubNode(
-				UpdateableTypeNode<ElkClass, ElkNamedIndividual> subNode) {
-			// FIXME: This is a dirty trick; see above
-			return getNode().removeDirectSubNode(
-					((UpdateableTypeNodeWrapper) subNode).getNode());
-		}
-
-		@Override
-		public boolean removeDirectSuperNode(
-				UpdateableTypeNode<ElkClass, ElkNamedIndividual> superNode) {
-			// FIXME: This is a dirty trick; see above
-			return getNode().removeDirectSuperNode(
-					((UpdateableTypeNodeWrapper) superNode).getNode());
+		public Set<? extends UpdateableTypeNode<ElkClass, ElkNamedIndividual>> getDirectNonBottomSubNodes() {
+			return Operations.map(getNode().getDirectNonBottomSubNodes(),
+					nonBottomFunctor_);
 		}
 
 		@Override
 		public boolean trySetAllParentsAssigned(boolean modified) {
-			return getNode().trySetAllParentsAssigned(modified);
+			// return getNode().trySetAllParentsAssigned(modified);
+			throw new UnsupportedOperationException();// TODO: get rid of these!
 		}
 
 		@Override
 		public boolean areAllParentsAssigned() {
-			return getNode().areAllParentsAssigned();
+			// return getNode().areAllParentsAssigned();
+			throw new UnsupportedOperationException();// TODO: get rid of these!
 		}
 
 		@Override
 		public void setMembers(final Iterable<? extends ElkClass> members) {
-			getNode().setMembers(members);
-		}
-
-		@Override
-		public Set<UpdateableTypeNodeWrapper> getDirectSuperNodes() {
-			return Operations.map(getNode().getDirectSuperNodes(), functor_);
-		}
-
-		@Override
-		public Set<UpdateableTypeNodeWrapper> getAllSuperNodes() {
-			return Operations.map(getNode().getAllSuperNodes(), functor_);
-		}
-
-		@Override
-		public Set<UpdateableTypeNodeWrapper> getDirectSubNodes() {
-			return Operations.map(getNode().getDirectSubNodes(), functor_);
-		}
-
-		@Override
-		public Set<UpdateableTypeNodeWrapper> getAllSubNodes() {
-			return Operations.map(getNode().getAllSubNodes(), functor_);
+			// getNode().setMembers(members);
+			throw new UnsupportedOperationException();// TODO: get rid of these!
 		}
 
 		@Override

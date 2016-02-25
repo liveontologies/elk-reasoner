@@ -23,15 +23,13 @@ package org.semanticweb.elk.reasoner.taxonomy;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.reasoner.taxonomy.model.GenericTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 
 public interface InternalNodeFactoryFactory<
 				T extends ElkEntity,
-				N extends GenericTaxonomyNode<T, N>,
-				CreatedN extends Node<T>
+				N extends Node<T>
 		> {
 
-	InternalNodeFactory<T, N, CreatedN> createInternalNodeFactory(AbstractDistinctBottomTaxonomy<T, N> taxonomy);
+	InternalNodeFactory<T, N> createInternalNodeFactory(AbstractDistinctBottomTaxonomy<T> taxonomy);
 	
 }

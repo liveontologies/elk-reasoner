@@ -22,33 +22,10 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
-import java.util.Set;
-
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
-/**
- * Taxonomy with parameterized type of its nodes.
- * 
- * @author Peter Skocovsky
- *
- * @param <T>
- *            The type of members of the nodes of this taxonomy.
- * @param <N>
- *            The type of nodes in this taxonomy.
- */
-public interface GenericTaxonomy<T extends ElkEntity, N extends GenericTaxonomyNode<T, N>>
-		extends Taxonomy<T>, GenericNodeStore<T, N> {
-
-	@Override
-	public N getNode(T elkEntity);
-
-	@Override
-	public Set<? extends N> getNodes();
-
-	@Override
-	public N getTopNode();
-
-	@Override
-	public N getBottomNode();
+public interface UpdateableGenericTaxonomyTypeNode<T extends ElkEntity, I extends ElkEntity, TN extends UpdateableGenericTaxonomyTypeNode<T, I, TN, IN>, IN extends UpdateableGenericInstanceNode<T, I, TN, IN>>
+		extends UpdateableGenericTaxonomyNode<T, TN>,
+		UpdateableGenericTypeNode<T, I, TN, IN> {
 
 }

@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.taxonomy.model;
 
+import java.util.Set;
+
 /*
  * #%L
  * ELK Reasoner
@@ -39,8 +41,11 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  *            The type of instance nodes with which this node may be associated.
  */
 public interface UpdateableGenericTypeNode<T extends ElkEntity, I extends ElkEntity, TN extends UpdateableGenericTypeNode<T, I, TN, IN>, IN extends UpdateableGenericInstanceNode<T, I, TN, IN>>
-		extends UpdateableGenericTaxonomyNode<T, TN>,
-		GenericTypeNode<T, I, TN, IN> {
+		extends UpdateableNode<T>, NonBottomTypeNode<T, I> {
+
+	Set<? extends TN> getDirectNonBottomSuperNodes();
+	
+	Set<? extends TN> getDirectNonBottomSubNodes();
 
 	/**
 	 * Associates this node with its direct instance node.

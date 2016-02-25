@@ -36,9 +36,9 @@ import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputUnsatisfi
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputationFactory.Engine;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
@@ -133,7 +133,7 @@ public class InstanceTaxonomyComputationFactory
 				TransitiveReductionOutputEquivalentDirect<IndexedIndividual> output) {
 
 			// only supports singleton individuals
-			final UpdateableInstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy_
+			final InstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy_
 					.getCreateInstanceNode(Collections
 							.singleton(output.getRoot().getElkEntity()));
 

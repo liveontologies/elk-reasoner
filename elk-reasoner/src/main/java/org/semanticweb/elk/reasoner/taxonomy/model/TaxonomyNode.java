@@ -34,7 +34,8 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  * @param <T>
  *            the type of objects stored in the nodes
  */
-public interface TaxonomyNode<T extends ElkEntity> extends Node<T> {
+public interface TaxonomyNode<T extends ElkEntity>
+		extends Node<T>, HasTaxonomy<T> {
 	/**
 	 * Get an unmodifiable set of nodes for ElkObjects that are direct
 	 * super-objects of this Node.

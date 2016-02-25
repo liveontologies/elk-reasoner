@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.taxonomy;
+package org.semanticweb.elk.reasoner.taxonomy.model;
 
 /*
  * #%L
@@ -22,19 +22,14 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * #L%
  */
 
+import java.util.Set;
+
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.reasoner.taxonomy.model.Node;
-import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
 
-public abstract class InternalNodeFactory<
-				T extends ElkEntity,
-				N extends Node<T>
-		> implements NodeFactory<T, N> {
+public interface NonBottomTaxonomyNode<T extends ElkEntity> extends TaxonomyNode<T> {
 
-	protected final AbstractDistinctBottomTaxonomy<T> taxonomy_;
+	Set<? extends NonBottomTaxonomyNode<T>> getDirectNonBottomSuperNodes();
 	
-	public InternalNodeFactory(final AbstractDistinctBottomTaxonomy<T> taxonomy) {
-		this.taxonomy_ = taxonomy;
-	}
+	Set<? extends NonBottomTaxonomyNode<T>> getDirectNonBottomSubNodes();
 	
 }

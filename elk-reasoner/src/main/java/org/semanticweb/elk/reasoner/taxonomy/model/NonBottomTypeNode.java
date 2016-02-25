@@ -26,39 +26,13 @@ import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
-/**
- * Instance taxonomy with parameterized type of its nodes.
- * 
- * @author Peter Skocovsky
- *
- * @param <T>
- *            The type of members of the type nodes in this taxonomy.
- * @param <I>
- *            The type of members of the instance nodes in this taxonomy.
- * @param <TN>
- *            The type of type nodes in this taxonomy.
- * @param <IN>
- *            The type of instance nodes in this taxonomy.
- */
-public interface GenericInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity, TN extends GenericTypeNode<T, I, TN, IN>, IN extends GenericInstanceNode<T, I, TN, IN>>
-		extends InstanceTaxonomy<T, I>, GenericTaxonomy<T, TN> {
+public interface NonBottomTypeNode<T extends ElkEntity, I extends ElkEntity>
+		extends TypeNode<T, I>, NonBottomTaxonomyNode<T> {
 
 	@Override
-	IN getInstanceNode(I elkEntity);
+	Set<? extends NonBottomTypeNode<T, I>> getDirectNonBottomSuperNodes();
 
 	@Override
-	Set<? extends IN> getInstanceNodes();
-
-	@Override
-	TN getNode(T elkEntity);
-
-	@Override
-	Set<? extends TN> getNodes();
-
-	@Override
-	TN getTopNode();
-
-	@Override
-	TN getBottomNode();
-
+	Set<? extends NonBottomTypeNode<T, I>> getDirectNonBottomSubNodes();
+	
 }

@@ -29,6 +29,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 
 /**
@@ -56,6 +57,10 @@ public class OrphanNode<T extends ElkEntity> implements TaxonomyNode<T> {
 	 * provides keys that are used for hashing instead of the members
 	 */
 	private final ComparatorKeyProvider<ElkEntity> keyProvider_;
+	/**
+	 * the taxonomy this node belongs to
+	 */
+	private Taxonomy<T> taxonomy_;
 
 	public OrphanNode(Set<T> members, T canonical,
 			ComparatorKeyProvider<ElkEntity> keyProvider) {
@@ -67,6 +72,15 @@ public class OrphanNode<T extends ElkEntity> implements TaxonomyNode<T> {
 		this.keyProvider_ = keyProvider;
 	}
 
+	void setTaxonomy(final Taxonomy<T> taxonomy) {// TODO: this node should be created in the constructor of SingletoneTaxonomy
+		this.taxonomy_ = taxonomy;
+	}
+	
+	@Override
+	public Taxonomy<T> getTaxonomy() {
+		return taxonomy_;
+	}
+	
 	@Override
 	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
 		return keyProvider_;

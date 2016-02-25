@@ -36,6 +36,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.SimpleUpdateableNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -106,19 +107,19 @@ public class IndividualNode extends SimpleUpdateableNode<ElkNamedIndividual>
 	}
 
 	@Override
-	public Set<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> getAllTypeNodes() {
-		Set<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> result = new ArrayHashSet<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>(
+	public Set<TypeNode<ElkClass, ElkNamedIndividual>> getAllTypeNodes() {
+		Set<TypeNode<ElkClass, ElkNamedIndividual>> result = new ArrayHashSet<TypeNode<ElkClass, ElkNamedIndividual>>(
 				directTypeNodes_.size());
 
-		Queue<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> todo = new LinkedList<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>();
+		Queue<TypeNode<ElkClass, ElkNamedIndividual>> todo = new LinkedList<TypeNode<ElkClass, ElkNamedIndividual>>();
 
 		todo.addAll(directTypeNodes_);
 
 		while (!todo.isEmpty()) {
-			UpdateableTypeNode<ElkClass, ElkNamedIndividual> next = todo.poll();
+			TypeNode<ElkClass, ElkNamedIndividual> next = todo.poll();
 
 			if (result.add(next)) {
-				for (UpdateableTypeNode<ElkClass, ElkNamedIndividual> nextSuperNode : next
+				for (TypeNode<ElkClass, ElkNamedIndividual> nextSuperNode : next
 						.getDirectSuperNodes())
 					todo.add(nextSuperNode);
 			}

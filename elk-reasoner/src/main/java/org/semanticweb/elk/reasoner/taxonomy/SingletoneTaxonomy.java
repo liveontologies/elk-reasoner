@@ -55,6 +55,7 @@ public class SingletoneTaxonomy<T extends ElkEntity, N extends OrphanNode<T>>
 	 */
 	public SingletoneTaxonomy(N node) {
 		this.node = node;
+		this.node.setTaxonomy(this);
 	}
 
 	@Override

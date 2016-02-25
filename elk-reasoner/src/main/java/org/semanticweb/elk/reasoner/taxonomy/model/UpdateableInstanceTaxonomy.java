@@ -21,6 +21,9 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
+import java.util.Collection;
+import java.util.Set;
+
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
@@ -38,7 +41,31 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  *            The type of members of the instance nodes in this taxonomy.
  */
 public interface UpdateableInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
-		extends
-		UpdateableGenericInstanceTaxonomy<T, I, UpdateableTypeNode<T, I>, UpdateableInstanceNode<T, I>> {
+		extends InstanceTaxonomy<T, I>, UpdateableTaxonomy<T> {
+
+	@Override
+	NonBottomTypeNode<T, I> getTopNode();
+	
+	Set<? extends NonBottomTypeNode<T, I>> getNonBottomNodes();
+
+	@Override
+	NonBottomTypeNode<T, I> getCreateNode(Collection<? extends T> members);
+
+	InstanceNode<T, I> getCreateInstanceNode(Collection<? extends I> instances);
+	
+	boolean setCreateDirectTypes(InstanceNode<T, I> instanceNode,
+			Iterable<? extends Collection<? extends T>> typeSets);
+	
+	boolean removeDirectTypes(InstanceNode<T, I> instanceNode);
+
+	/**
+	 * Removes the instance node containing the specified member from the
+	 * taxonomy.
+	 * 
+	 * @param member
+	 *            The member whose instance node should be removed.
+	 * @return <code>true</code> if and only if some node was removed.
+	 */
+	boolean removeInstanceNode(I instance);
 
 }

@@ -91,5 +91,25 @@ public class TaxonomyNodeUtils {
 				return node.getDirectSubNodes();
 			}});
 	}	
+	
+	public static <T extends ElkEntity>
+			Set<? extends TaxonomyNode<T>> getAllSuperNodes(final TaxonomyNode<T> tnode) {
+		return getAllReachable(tnode.getDirectSuperNodes(), new GetSuccessors<TaxonomyNode<T>> () {
+
+			@Override
+			public Set<? extends TaxonomyNode<T>> get(final TaxonomyNode<T> node) {
+				return node.getDirectSuperNodes();
+			}});
+	}
+	
+	public static <T extends ElkEntity>
+			Set<? extends TaxonomyNode<T>> getAllSubNodes(final TaxonomyNode<T> tnode) {
+		return getAllReachable(tnode.getDirectSubNodes(), new GetSuccessors<TaxonomyNode<T>> () {
+
+			@Override
+			public Set<? extends TaxonomyNode<T>> get(final TaxonomyNode<T> node) {
+				return node.getDirectSubNodes();
+			}});
+	}	
 
 }

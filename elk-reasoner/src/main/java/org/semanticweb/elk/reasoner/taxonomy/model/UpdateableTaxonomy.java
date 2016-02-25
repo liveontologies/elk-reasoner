@@ -1,5 +1,8 @@
 package org.semanticweb.elk.reasoner.taxonomy.model;
 
+import java.util.Collection;
+import java.util.Set;
+
 /*
  * #%L
  * ELK Reasoner
@@ -36,6 +39,47 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  *            The type of members of the nodes in this taxonomy.
  */
 public interface UpdateableTaxonomy<T extends ElkEntity>
-		extends UpdateableGenericTaxonomy<T, UpdateableTaxonomyNode<T>> {
+		extends Taxonomy<T> {
+
+	@Override
+	NonBottomTaxonomyNode<T> getTopNode();
+
+	NonBottomTaxonomyNode<T> getNonBottomNode(T elkEntity);
+
+	Set<? extends NonBottomTaxonomyNode<T>> getNonBottomNodes();
+
+	NonBottomTaxonomyNode<T> getCreateNode(Collection<? extends T> members);
+
+	boolean setCreateDirectSupernodes(NonBottomTaxonomyNode<T> subNode,
+			Iterable<? extends Collection<? extends T>> superMemberSets);
+
+	boolean removeDirectSupernodes(NonBottomTaxonomyNode<T> subNode);
+	
+	/**
+	 * Removes the node containing the specified member from the taxonomy.
+	 * 
+	 * @param member
+	 *            The member whose node should be removed.
+	 * @return <code>true</code> if and only if some node was removed.
+	 */
+	boolean removeNode(T member);
+
+	/**
+	 * Adds the specified member to the bottom node of this taxonomy.
+	 * 
+	 * @param member
+	 *            The member to add.
+	 * @return Whether the bottom node changed.
+	 */
+	boolean addToBottomNode(T member);
+
+	/**
+	 * Removes the specified member from the bottom node of this taxonomy.
+	 * 
+	 * @param member
+	 *            The node to remove.
+	 * @return Whether the bottom node changed.
+	 */
+	boolean removeFromBottomNode(T member);
 
 }
