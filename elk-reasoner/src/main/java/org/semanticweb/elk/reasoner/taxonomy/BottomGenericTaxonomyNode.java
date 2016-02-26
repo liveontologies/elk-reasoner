@@ -25,26 +25,39 @@ package org.semanticweb.elk.reasoner.taxonomy;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.reasoner.taxonomy.model.BottomTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.Operations.Condition;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
-public class BottomGenericTaxonomyNode<T extends ElkEntity>
-		implements TaxonomyNode<T> {
+public class BottomGenericTaxonomyNode<T extends ElkEntity, Tax extends UpdateableTaxonomy<T>>
+		implements BottomTaxonomyNode<T> {
 
-	private final AbstractDistinctBottomTaxonomy<T> taxonomy_;
+	protected final Tax taxonomy_;
 
 	private final T bottomMember_;
+
+	/** thread safe set of unsatisfiable classes */
+	private final ConcurrentMap<Object, T> unsatisfiableClasses_;
 	
-	public BottomGenericTaxonomyNode(final AbstractDistinctBottomTaxonomy<T> taxonomy, final T bottomMember) {
+	/** counts the number of nodes which have non-bottom sub-classes */
+	private final AtomicInteger countNodesWithSubClasses;
+	
+	public BottomGenericTaxonomyNode(final Tax taxonomy, final T bottomMember) {
 		this.taxonomy_ = taxonomy;
 		this.bottomMember_ = bottomMember;
-		taxonomy_.unsatisfiableClasses_.put(
+		this.unsatisfiableClasses_ = new ConcurrentHashMap<Object, T>();
+		this.countNodesWithSubClasses = new AtomicInteger(0);
+		unsatisfiableClasses_.put(
 				getKeyProvider().getKey(bottomMember_), bottomMember_);
 	}
 	
@@ -55,13 +68,13 @@ public class BottomGenericTaxonomyNode<T extends ElkEntity>
 
 	@Override
 	public boolean contains(final T member) {
-		return taxonomy_.unsatisfiableClasses_
+		return unsatisfiableClasses_
 				.containsKey(getKeyProvider().getKey(member));
 	}
 
 	@Override
 	public int size() {
-		return taxonomy_.unsatisfiableClasses_.size();
+		return unsatisfiableClasses_.size();
 	}
 
 	@Override
@@ -71,7 +84,34 @@ public class BottomGenericTaxonomyNode<T extends ElkEntity>
 
 	@Override
 	public Iterator<T> iterator() {
-		return taxonomy_.unsatisfiableClasses_.values().iterator();
+		return unsatisfiableClasses_.values().iterator();
+	}
+
+	@Override
+	public boolean add(final T member) {
+		return unsatisfiableClasses_.put(
+				getKeyProvider().getKey(member), member) == null;
+	}
+
+	@Override
+	public boolean remove(final T member) {
+		return unsatisfiableClasses_
+				.remove(getKeyProvider().getKey(member)) != null;
+	}
+
+	@Override
+	public void incrementCountOfNodesWithSubClasses() {
+		countNodesWithSubClasses.incrementAndGet();
+	}
+
+	@Override
+	public void decrementCountOfNodesWithSubClasses() {
+		countNodesWithSubClasses.decrementAndGet();
+	}
+
+	@Override
+	public int getCountOfNodesWithSubClasses() {
+		return countNodesWithSubClasses.get();
 	}
 
 	@Override
@@ -90,7 +130,7 @@ public class BottomGenericTaxonomyNode<T extends ElkEntity>
 					 * sub-classes and the bottom node
 					 */
 				}, nonBottomNodes.size()
-						- taxonomy_.countNodesWithSubClasses.get());
+						- countNodesWithSubClasses.get());
 	}
 	
 	@Override

@@ -27,63 +27,59 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 
 /**
- * A {@link Taxonomy} consisting of a single node = top node = bottom node.
- * Typically, this is used to represent an inconsistent taxonomy.
+ * A {@link TaxonomyNode} that does not have any super nodes or sub nodes.
  * 
  * @author "Yevgeny Kazakov"
  * @author Peter Skocovsky
  * 
  * @param <T>
- *            the type of objects stored in this taxonomy
- * @param <N>
- *            the type of the node of this taxonomy
+ *            the type of objects stored in the nodes
  * 
- * @see OrphanTaxonomyNode
+ * @see SingletoneTaxonomy
  */
-public class SingletoneTaxonomy<T extends ElkEntity, N extends OrphanTaxonomyNode<T>>
-		extends AbstractTaxonomy<T> {
-
-	final N node;
+public class OrphanTaxonomyNode<T extends ElkEntity> extends OrphanNode<T>
+		implements TaxonomyNode<T> {
 
 	/**
-	 * Constructs a {@link SingletoneTaxonomy} containing the given
-	 * {@link OrphanTaxonomyNode}
-	 * 
-	 * @param node
+	 * the taxonomy this node belongs to
 	 */
-	public SingletoneTaxonomy(N node) {
-		this.node = node;
-		this.node.setTaxonomy(this);
+	private Taxonomy<T> taxonomy_;
+
+	public OrphanTaxonomyNode(Set<T> members, T canonical,
+			ComparatorKeyProvider<ElkEntity> keyProvider) {
+		super(members, canonical, keyProvider);
+	}
+
+	void setTaxonomy(final Taxonomy<T> taxonomy) {// TODO: this node should be created in the constructor of SingletoneTaxonomy
+		this.taxonomy_ = taxonomy;
+	}
+	
+	@Override
+	public Taxonomy<T> getTaxonomy() {
+		return taxonomy_;
 	}
 
 	@Override
-	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
-		return node.getKeyProvider();
+	public Set<? extends TaxonomyNode<T>> getDirectSuperNodes() {
+		return Collections.emptySet();
 	}
 
 	@Override
-	public N getNode(T elkEntity) {
-		if (node.contains(elkEntity))
-			return node;
-		// else
-		return null;
+	public Set<? extends TaxonomyNode<T>> getAllSuperNodes() {
+		return Collections.emptySet();
 	}
 
 	@Override
-	public Set<? extends N> getNodes() {
-		return Collections.singleton(node);
+	public Set<? extends TaxonomyNode<T>> getDirectSubNodes() {
+		return Collections.emptySet();
 	}
 
 	@Override
-	public N getTopNode() {
-		return node;
-	}
-
-	@Override
-	public N getBottomNode() {
-		return node;
+	public Set<? extends TaxonomyNode<T>> getAllSubNodes() {
+		return Collections.emptySet();
 	}
 
 }

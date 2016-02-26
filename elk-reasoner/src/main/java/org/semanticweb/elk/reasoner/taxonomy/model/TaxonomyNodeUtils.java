@@ -90,7 +90,7 @@ public class TaxonomyNodeUtils {
 			public Set<? extends N> get(final N node) {
 				return node.getDirectSubNodes();
 			}});
-	}	
+	}
 	
 	public static <T extends ElkEntity>
 			Set<? extends TaxonomyNode<T>> getAllSuperNodes(final TaxonomyNode<T> tnode) {
@@ -110,6 +110,26 @@ public class TaxonomyNodeUtils {
 			public Set<? extends TaxonomyNode<T>> get(final TaxonomyNode<T> node) {
 				return node.getDirectSubNodes();
 			}});
-	}	
+	}
+	
+	public static <T extends ElkEntity, I extends ElkEntity>
+			Set<? extends TypeNode<T, I>> getAllSuperNodes(final TypeNode<T, I> tnode) {
+		return getAllReachable(tnode.getDirectSuperNodes(), new GetSuccessors<TypeNode<T, I>> () {
+
+			@Override
+			public Set<? extends TypeNode<T, I>> get(final TypeNode<T, I> node) {
+				return node.getDirectSuperNodes();
+			}});
+	}
+	
+	public static <T extends ElkEntity, I extends ElkEntity>
+			Set<? extends TypeNode<T, I>> getAllSubNodes(final TypeNode<T, I> tnode) {
+		return getAllReachable(tnode.getDirectSubNodes(), new GetSuccessors<TypeNode<T, I>> () {
+
+			@Override
+			public Set<? extends TypeNode<T, I>> get(final TypeNode<T, I> node) {
+				return node.getDirectSubNodes();
+			}});
+	}
 
 }

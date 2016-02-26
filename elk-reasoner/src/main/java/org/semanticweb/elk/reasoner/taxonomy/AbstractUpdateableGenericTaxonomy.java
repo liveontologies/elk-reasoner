@@ -34,47 +34,42 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.reasoner.taxonomy.model.BottomTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
-import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
 import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericNodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericTaxonomyNode;
 import org.semanticweb.elk.util.collections.LazySetUnion;
-import org.semanticweb.elk.util.collections.Operations;
 
 /**
  * @author Peter Skocovsky
  */
 public abstract class AbstractUpdateableGenericTaxonomy<
 				T extends ElkEntity,
-				N extends UpdateableGenericTaxonomyNode<T, N>
+				N extends UpdateableGenericTaxonomyNode<T, N>,
+				BN extends BottomTaxonomyNode<T>
 		>
 		extends AbstractDistinctBottomTaxonomy<T> {
 
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractUpdateableGenericTaxonomy.class);
 	
-	private final NodeFactory<T, N> nodeFactory_;
+	private final InternalNodeFactoryFactory<T, N, BN> nodeFactoryFactory_;
 
 	/** The store containing non-bottom nodes in this taxonomy. */
-	private final UpdateableGenericNodeStore<T, N> nodeStore_;
+	protected final UpdateableGenericNodeStore<T, N> nodeStore_;
 
-	private final T topMember_;
+	protected final T topMember_;
 	
-	/** The bottom node. */
-	private final TaxonomyNode<T> bottomClassNode_;
-
 	public AbstractUpdateableGenericTaxonomy(
 			final UpdateableGenericNodeStore<T, N> nodeStore,
-			final InternalNodeFactoryFactory<T, N> internalNodeFactoryFactory,
-			final InternalNodeFactoryFactory<T, TaxonomyNode<T>> bottomNodeFactoryFactory,
+			final InternalNodeFactoryFactory<T, N, BN> internalNodeFactoryFactory,
 			final T topMember) {
 		super();
 		this.nodeStore_ = nodeStore;
-		this.nodeFactory_ = internalNodeFactoryFactory.createInternalNodeFactory(this);
+		this.nodeFactoryFactory_ = internalNodeFactoryFactory;
 		this.topMember_ = topMember;
-		this.bottomClassNode_ = bottomNodeFactoryFactory.createInternalNodeFactory(this).createNode(Collections.<T>emptyList(), 0, getKeyProvider());
 	}
 
 	@Override
@@ -83,23 +78,23 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 	}
 
 	@Override
-	public TaxonomyNode<T> getNode(T elkClass) {
+	public TaxonomyNode<T> getNode(final T elkClass) {
 		TaxonomyNode<T> result = nodeStore_.getNode(elkClass);
-		if (result == null && bottomClassNode_.contains(elkClass)) {
-			result = bottomClassNode_;
+		if (result == null && getBottomNode().contains(elkClass)) {
+			result = getBottomNode();
 		}
 		return result;
 	}
 
 	@Override
-	public NonBottomTaxonomyNode<T> getNonBottomNode(final T elkEntity) {
+	public N getNonBottomNode(final T elkEntity) {
 		return nodeStore_.getNode(elkEntity);
 	}
 	
 	@Override
 	public Set<? extends TaxonomyNode<T>> getNodes() {
 		return new LazySetUnion<TaxonomyNode<T>>(nodeStore_.getNodes(),
-				Collections.singleton(bottomClassNode_));
+				Collections.singleton(getBottomNode()));
 	}
 
 	@Override
@@ -108,25 +103,21 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 	}
 	
 	@Override
-	public NonBottomTaxonomyNode<T> getTopNode() {
-		NonBottomTaxonomyNode<T> top = nodeStore_.getNode(topMember_);
+	public N getTopNode() {
+		N top = nodeStore_.getNode(topMember_);
 		if (top == null) {
-			top = nodeStore_.getCreateNode(
-					Operations.singleton(topMember_), 1,
-					nodeFactory_);
+			top = getCreateNode(Collections.singleton(topMember_));
 		}
 		return top;
 	}
 
 	@Override
-	public TaxonomyNode<T> getBottomNode() {
-		return bottomClassNode_;
-	}
-
+	public abstract BN getBottomNode();
+	
 	@Override
-	public NonBottomTaxonomyNode<T> getCreateNode(final Collection<? extends T> members) {
+	public N getCreateNode(final Collection<? extends T> members) {
 		return nodeStore_.getCreateNode(members, members.size(),
-				nodeFactory_);
+				nodeFactoryFactory_.createInternalNodeFactory(getBottomNode()));
 	};
 
 	@Override
@@ -138,8 +129,7 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 		// TODO: establish consistency by adding default parent to the nodes.
 		
 		for (final Collection<? extends T> superMembers : superMemberSets) {
-			final N superNode = nodeStore_.getCreateNode(
-					superMembers, superMembers.size(), nodeFactory_);
+			final N superNode = getCreateNode(superMembers);
 			addDirectRelation(superNode, node);
 		}
 
@@ -167,12 +157,12 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 		// remove all super-class links
 		synchronized (node) {
 			superNodes.addAll(node.getDirectNonBottomSuperNodes());
-			for (N superNode : superNodes) {
+			for (final N superNode : superNodes) {
 				node.removeDirectSuperNode(superNode);
 			}
 		}
 
-		for (N superNode : superNodes) {
+		for (final N superNode : superNodes) {
 			synchronized (superNode) {
 				superNode.removeDirectSubNode(node);
 			}
@@ -193,28 +183,27 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 
 	@Override
 	public boolean addToBottomNode(final T member) {
-		return unsatisfiableClasses_.put(
-				nodeStore_.getKeyProvider().getKey(member), member) == null;
+		return getBottomNode().add(member);
 	}
 
 	@Override
 	public boolean removeFromBottomNode(final T member) {
-		return unsatisfiableClasses_
-				.remove(nodeStore_.getKeyProvider().getKey(member)) != null;
+		return getBottomNode().remove(member);
 	}
 
 	@SuppressWarnings("unchecked")
-	private N toInternalNode(final TaxonomyNode<T> node) {
-		if (!(node instanceof UpdateableGenericTaxonomyNode)) {
-			throw new IllegalArgumentException(
-					"The sub-node must belong to this taxonomy: " + node);
-		}
+	protected N toInternalNode(final NonBottomTaxonomyNode<T> node) {
 		if (node.getTaxonomy() != this) {
 			throw new IllegalArgumentException(
 					"The sub-node must belong to this taxonomy: " + node);
 		}
 		// By construction, if the node is in this taxonomy, it is of type N.
-		return (N) node;
+		try {
+			return (N) node;
+		} catch (final ClassCastException e) {
+			throw new IllegalArgumentException(
+					"The sub-node must belong to this taxonomy: " + node);
+		}
 	}
 	
 }

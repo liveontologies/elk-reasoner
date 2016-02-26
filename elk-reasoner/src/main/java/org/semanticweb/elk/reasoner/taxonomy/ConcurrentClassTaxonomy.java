@@ -28,8 +28,9 @@ package org.semanticweb.elk.reasoner.taxonomy;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.reasoner.taxonomy.model.BottomTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
-import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 
 /**
@@ -46,18 +47,21 @@ import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 public class ConcurrentClassTaxonomy
 		extends AbstractUpdateableGenericTaxonomy<
 				ElkClass,
-				UpdateableTaxonomyNode<ElkClass>
+				UpdateableTaxonomyNode<ElkClass>,
+				BottomTaxonomyNode<ElkClass>
 		> {
+	
+	private final BottomTaxonomyNode<ElkClass> bottomNode_;
 	
 	public ConcurrentClassTaxonomy(
 			final ComparatorKeyProvider<ElkEntity> classKeyProvider) {
 		super(
 				new ConcurrentNodeStore<ElkClass, UpdateableTaxonomyNode<ElkClass>>(classKeyProvider),
-				new InternalNodeFactoryFactory<ElkClass, UpdateableTaxonomyNode<ElkClass>>() {
+				new InternalNodeFactoryFactory<ElkClass, UpdateableTaxonomyNode<ElkClass>, BottomTaxonomyNode<ElkClass>>() {
 					@Override
-					public InternalNodeFactory<ElkClass, UpdateableTaxonomyNode<ElkClass>> createInternalNodeFactory(
-							final AbstractDistinctBottomTaxonomy<ElkClass> taxonomy) {
-						return new InternalNodeFactory<ElkClass, UpdateableTaxonomyNode<ElkClass>>(taxonomy) {
+					public InternalNodeFactory<ElkClass, UpdateableTaxonomyNode<ElkClass>, BottomTaxonomyNode<ElkClass>> createInternalNodeFactory(
+							final BottomTaxonomyNode<ElkClass> taxonomy) {
+						return new InternalNodeFactory<ElkClass, UpdateableTaxonomyNode<ElkClass>, BottomTaxonomyNode<ElkClass>>(taxonomy) {
 							@Override
 							public UpdateableTaxonomyNode<ElkClass> createNode(
 									final Iterable<? extends ElkClass> members, final int size,
@@ -67,21 +71,13 @@ public class ConcurrentClassTaxonomy
 						};
 					}
 				},
-				new InternalNodeFactoryFactory<ElkClass, TaxonomyNode<ElkClass>>() {
-					@Override
-					public InternalNodeFactory<ElkClass, TaxonomyNode<ElkClass>> createInternalNodeFactory(
-							AbstractDistinctBottomTaxonomy<ElkClass> taxonomy) {
-						return new InternalNodeFactory<ElkClass, TaxonomyNode<ElkClass>>(taxonomy) {
-							@Override
-							public TaxonomyNode<ElkClass> createNode(
-									final Iterable<? extends ElkClass> members, final int size,
-									final ComparatorKeyProvider<? super ElkClass> keyProvider) {
-								return new BottomGenericTaxonomyNode<ElkClass>(taxonomy_, PredefinedElkClass.OWL_NOTHING);
-							}
-						};
-					}
-				},
 				PredefinedElkClass.OWL_THING);
+		this.bottomNode_ = new BottomGenericTaxonomyNode<ElkClass, UpdateableTaxonomy<ElkClass>>(this, PredefinedElkClass.OWL_NOTHING);
 	}
 
+	@Override
+	public BottomTaxonomyNode<ElkClass> getBottomNode() {
+		return bottomNode_;
+	}
+	
 }

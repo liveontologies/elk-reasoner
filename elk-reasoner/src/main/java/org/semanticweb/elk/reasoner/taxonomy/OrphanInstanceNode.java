@@ -27,9 +27,10 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
 /**
- * An {@link OrphanNode} with one member type node
+ * An {@link OrphanTaxonomyNode} with one member type node
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -58,6 +59,12 @@ public class OrphanInstanceNode<T extends ElkEntity, I extends ElkEntity>
 	@Override
 	public Set<? extends OrphanTypeNode<T, I>> getAllTypeNodes() {
 		return Collections.singleton(typeNode);
+	}
+
+	@Override
+	public Taxonomy<T> getTaxonomy() {
+		// TODO Implement this !!!
+		return null;
 	}
 
 }

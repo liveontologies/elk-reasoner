@@ -32,12 +32,16 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.SimpleUpdateableNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.hashing.HashGenerator;
@@ -53,20 +57,21 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author Markus Kroetzsch
  * @author Peter Skocovsky
  */
-public class IndividualNode extends SimpleUpdateableNode<ElkNamedIndividual>
-		implements UpdateableInstanceNode<ElkClass, ElkNamedIndividual> {
+public class IndividualNode<T extends ElkEntity, I extends ElkEntity, TN extends UpdateableGenericTypeNode<T, I, TN, IN>, IN extends UpdateableGenericInstanceNode<T, I, TN, IN>>
+		extends SimpleUpdateableNode<I>
+		implements UpdateableGenericInstanceNode<T, I, TN, IN> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IndividualNode.class);
 
-	final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy_;
+	final InstanceTaxonomy<T, I> taxonomy_;
 
 	/**
 	 * ElkClass nodes whose members are direct types of the members of this
 	 * node.
 	 */
-	private final Set<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> directTypeNodes_;
+	private final Set<TN> directTypeNodes_;
 
 	/**
 	 * Constructing the individual node for the set of same individuals.
@@ -78,13 +83,11 @@ public class IndividualNode extends SimpleUpdateableNode<ElkNamedIndividual>
 	 * @param size
 	 *            The number of equivalent ElkNamedIndividual objects
 	 */
-	protected IndividualNode(
-			final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy,
-			final Iterable<? extends ElkNamedIndividual> members,
-			final int size) {
+	protected IndividualNode(final InstanceTaxonomy<T, I> taxonomy,
+			final Iterable<? extends I> members, final int size) {
 		super(members, size, taxonomy.getInstanceKeyProvider());
 		this.taxonomy_ = taxonomy;
-		this.directTypeNodes_ = new ArrayHashSet<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>();
+		this.directTypeNodes_ = new ArrayHashSet<TN>();
 	}
 
 	/**
@@ -94,38 +97,42 @@ public class IndividualNode extends SimpleUpdateableNode<ElkNamedIndividual>
 	 *            node to add
 	 */
 	@Override
-	public void addDirectTypeNode(
-			UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode) {
+	public void addDirectTypeNode(final TN typeNode) {
 		LOGGER_.trace("{}: new direct type-node {}", this, typeNode);
 
 		directTypeNodes_.add(typeNode);
 	}
 
 	@Override
-	public Set<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> getDirectTypeNodes() {
+	public Set<? extends TN> getDirectTypeNodes() {
 		return Collections.unmodifiableSet(directTypeNodes_);
 	}
 
 	@Override
-	public Set<TypeNode<ElkClass, ElkNamedIndividual>> getAllTypeNodes() {
-		Set<TypeNode<ElkClass, ElkNamedIndividual>> result = new ArrayHashSet<TypeNode<ElkClass, ElkNamedIndividual>>(
+	public Set<? extends TypeNode<T, I>> getAllTypeNodes() {
+		// TODO: refactor TaxonomyNodeUtils
+		Set<TypeNode<T, I>> result = new ArrayHashSet<TypeNode<T, I>>(
 				directTypeNodes_.size());
 
-		Queue<TypeNode<ElkClass, ElkNamedIndividual>> todo = new LinkedList<TypeNode<ElkClass, ElkNamedIndividual>>();
+		Queue<TypeNode<T, I>> todo = new LinkedList<TypeNode<T, I>>();
 
 		todo.addAll(directTypeNodes_);
 
 		while (!todo.isEmpty()) {
-			TypeNode<ElkClass, ElkNamedIndividual> next = todo.poll();
+			TypeNode<T, I> next = todo.poll();
 
 			if (result.add(next)) {
-				for (TypeNode<ElkClass, ElkNamedIndividual> nextSuperNode : next
-						.getDirectSuperNodes())
+				for (TypeNode<T, I> nextSuperNode : next.getDirectSuperNodes())
 					todo.add(nextSuperNode);
 			}
 		}
 
 		return Collections.unmodifiableSet(result);
+	}
+
+	@Override
+	public Taxonomy<T> getTaxonomy() {
+		return taxonomy_;
 	}
 
 	private final int hashCode_ = HashGenerator.generateNextHashCode();
@@ -141,10 +148,39 @@ public class IndividualNode extends SimpleUpdateableNode<ElkNamedIndividual>
 	}
 
 	@Override
-	public void removeDirectTypeNode(
-			UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode) {
+	public void removeDirectTypeNode(final TN typeNode) {
 		LOGGER_.trace("{}: removing direct type node: {}", this, typeNode);
 
 		directTypeNodes_.remove(typeNode);
 	}
+
+	@Override
+	public Set<? extends TN> getDirectNonBottomTypeNodes() {
+		return getDirectTypeNodes();
+	}
+
+	public static class Projection<T extends ElkEntity, I extends ElkEntity>
+			extends
+			IndividualNode<T, I, UpdateableTypeNode<T, I>, UpdateableInstanceNode<T, I>>
+			implements UpdateableInstanceNode<T, I> {
+
+		protected Projection(final InstanceTaxonomy<T, I> taxonomy,
+				final Iterable<? extends I> members, final int size) {
+			super(taxonomy, members, size);
+		}
+
+	}
+
+	public static class Projection2<T extends ElkEntity, I extends ElkEntity>
+			extends
+			IndividualNode<T, I, UpdateableTaxonomyTypeNode<T, I>, UpdateableTaxonomyInstanceNode<T, I>>
+			implements UpdateableTaxonomyInstanceNode<T, I> {
+
+		protected Projection2(final InstanceTaxonomy<T, I> taxonomy,
+				final Iterable<? extends I> members, final int size) {
+			super(taxonomy, members, size);
+		}
+
+	}
+
 }

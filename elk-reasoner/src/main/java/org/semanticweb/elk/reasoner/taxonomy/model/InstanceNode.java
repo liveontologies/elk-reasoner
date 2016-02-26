@@ -40,7 +40,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  * 
  */
 public interface InstanceNode<T extends ElkEntity, I extends ElkEntity> extends
-		Node<I> {
+		Node<I>, HasTaxonomy<T> {
 	/**
 	 * Get an unmodifiable set of nodes for ElkObjects that are direct types of
 	 * this Node.

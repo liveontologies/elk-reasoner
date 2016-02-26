@@ -30,7 +30,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 /**
- * An {@link OrphanNode} with instances
+ * An {@link OrphanTaxonomyNode} with instances
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -40,7 +40,7 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  *            the type of instances of this node
  */
 public class OrphanTypeNode<T extends ElkEntity, I extends ElkEntity>
-		extends OrphanNode<T> implements TypeNode<T, I> {
+		extends OrphanTaxonomyNode<T> implements TypeNode<T, I> {
 
 	final Set<OrphanInstanceNode<T, I>> instanceNodes;
 

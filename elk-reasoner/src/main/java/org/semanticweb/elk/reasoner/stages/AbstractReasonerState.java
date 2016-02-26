@@ -61,7 +61,7 @@ import org.semanticweb.elk.reasoner.taxonomy.ConcurrentInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.ElkIndividualKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.OrphanInstanceNode;
-import org.semanticweb.elk.reasoner.taxonomy.OrphanNode;
+import org.semanticweb.elk.reasoner.taxonomy.OrphanTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.OrphanTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.SingletoneInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.SingletoneTaxonomy;
@@ -374,9 +374,9 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		} catch (ElkInconsistentOntologyException e) {
 			LOGGER_.info("Ontology is inconsistent");
 
-			OrphanNode<ElkClass> node = new OrphanNode<ElkClass>(
+			OrphanTaxonomyNode<ElkClass> node = new OrphanTaxonomyNode<ElkClass>(
 					getAllClasses(), PredefinedElkClass.OWL_NOTHING, ElkClassKeyProvider.INSTANCE);
-			result = new SingletoneTaxonomy<ElkClass, OrphanNode<ElkClass>>(
+			result = new SingletoneTaxonomy<ElkClass, OrphanTaxonomyNode<ElkClass>>(
 					node);
 		}
 

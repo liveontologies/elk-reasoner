@@ -81,7 +81,7 @@ public class ConcurrentInstanceTaxonomy
 	/**
 	 * The store for instance nodes of this taxonomy.
 	 */
-	private final UpdateableGenericNodeStore<ElkNamedIndividual, IndividualNode> individualNodeStore_;
+	private final UpdateableGenericNodeStore<ElkNamedIndividual, IndividualNode.Projection<ElkClass, ElkNamedIndividual>> individualNodeStore_;
 
 	/**
 	 * The wrapped class taxonomy
@@ -103,7 +103,7 @@ public class ConcurrentInstanceTaxonomy
 	public ConcurrentInstanceTaxonomy(
 			final UpdateableTaxonomy<ElkClass> classTaxonomy,
 			final ComparatorKeyProvider<ElkEntity> individualKeyProvider) {
-		this.individualNodeStore_ = new ConcurrentNodeStore<ElkNamedIndividual, IndividualNode>(
+		this.individualNodeStore_ = new ConcurrentNodeStore<ElkNamedIndividual, IndividualNode.Projection<ElkClass, ElkNamedIndividual>>(
 				individualKeyProvider);
 		this.classTaxonomy_ = classTaxonomy;
 		this.wrapperMap_ = new ConcurrentHashMap<TaxonomyNode<ElkClass>, UpdateableTypeNodeWrapper>();
@@ -132,7 +132,7 @@ public class ConcurrentInstanceTaxonomy
 	 * @return instance node object for elkClass, possibly still incomplete
 	 */
 	@Override
-	public IndividualNode getInstanceNode(final ElkNamedIndividual individual) {
+	public IndividualNode.Projection<ElkClass, ElkNamedIndividual> getInstanceNode(final ElkNamedIndividual individual) {
 		return individualNodeStore_.getNode(individual);
 	}
 
@@ -147,7 +147,7 @@ public class ConcurrentInstanceTaxonomy
 	}
 
 	@Override
-	public NonBottomTaxonomyNode<ElkClass> getNonBottomNode(
+	public NonBottomTypeNode<ElkClass, ElkNamedIndividual> getNonBottomNode(
 			final ElkClass elkEntity) {
 		return getCreateUpdateableTypeNode(
 				classTaxonomy_.getNonBottomNode(elkEntity));
@@ -162,14 +162,14 @@ public class ConcurrentInstanceTaxonomy
 	/**
 	 * Node factory creating instance nodes of this taxonomy.
 	 */
-	private final NodeFactory<ElkNamedIndividual, IndividualNode> INSTANCE_NODE_FACTORY = new NodeFactory<ElkNamedIndividual, IndividualNode>() {
+	private final NodeFactory<ElkNamedIndividual, IndividualNode.Projection<ElkClass, ElkNamedIndividual>> INSTANCE_NODE_FACTORY = new NodeFactory<ElkNamedIndividual, IndividualNode.Projection<ElkClass, ElkNamedIndividual>>() {
 
 		@Override
-		public IndividualNode createNode(
+		public IndividualNode.Projection<ElkClass, ElkNamedIndividual> createNode(
 				final Iterable<? extends ElkNamedIndividual> members,
 				final int size,
 				final ComparatorKeyProvider<? super ElkNamedIndividual> keyProvider) {
-			return new IndividualNode(ConcurrentInstanceTaxonomy.this, members,
+			return new IndividualNode.Projection<ElkClass, ElkNamedIndividual>(ConcurrentInstanceTaxonomy.this, members,
 					size);
 		}
 
@@ -192,7 +192,7 @@ public class ConcurrentInstanceTaxonomy
 					"The sub-node must belong to this taxonomy: "
 							+ instanceNode);
 		}
-		final IndividualNode node = (IndividualNode) instanceNode;
+		final IndividualNode.Projection<ElkClass, ElkNamedIndividual> node = (IndividualNode.Projection<ElkClass, ElkNamedIndividual>) instanceNode;
 		if (node.taxonomy_ != this) {
 			throw new IllegalArgumentException(
 					"The sub-node must belong to this taxonomy: "
@@ -226,7 +226,7 @@ public class ConcurrentInstanceTaxonomy
 					"The sub-node must belong to this taxonomy: "
 							+ instanceNode);
 		}
-		final IndividualNode node = (IndividualNode) instanceNode;
+		final IndividualNode.Projection<ElkClass, ElkNamedIndividual> node = (IndividualNode.Projection<ElkClass, ElkNamedIndividual>) instanceNode;
 		if (node.taxonomy_ != this) {
 			throw new IllegalArgumentException(
 					"The sub-node must belong to this taxonomy: "
@@ -515,6 +515,7 @@ public class ConcurrentInstanceTaxonomy
 
 		@Override
 		public Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>> getAllInstanceNodes() {
+			// TODO: refactor TaxonomyNodeUtils
 			Set<InstanceNode<ElkClass, ElkNamedIndividual>> result;
 
 			if (!classNode_.getDirectSubNodes().isEmpty()) {
@@ -542,7 +543,6 @@ public class ConcurrentInstanceTaxonomy
 
 		@Override
 		public Set<? extends UpdateableTypeNode<ElkClass, ElkNamedIndividual>> getDirectNonBottomSuperNodes() {
-			// TODO Auto-generated method stub
 			return Operations.map(getNode().getDirectNonBottomSuperNodes(),
 					nonBottomFunctor_);
 		}

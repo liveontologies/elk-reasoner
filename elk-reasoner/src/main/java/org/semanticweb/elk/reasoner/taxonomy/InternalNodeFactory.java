@@ -28,12 +28,13 @@ import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
 
 public abstract class InternalNodeFactory<
 				T extends ElkEntity,
-				N extends Node<T>
+				N extends Node<T>,
+				Tax
 		> implements NodeFactory<T, N> {
 
-	protected final AbstractDistinctBottomTaxonomy<T> taxonomy_;
+	protected final Tax taxonomy_;
 	
-	public InternalNodeFactory(final AbstractDistinctBottomTaxonomy<T> taxonomy) {
+	public InternalNodeFactory(final Tax taxonomy) {
 		this.taxonomy_ = taxonomy;
 	}
 	

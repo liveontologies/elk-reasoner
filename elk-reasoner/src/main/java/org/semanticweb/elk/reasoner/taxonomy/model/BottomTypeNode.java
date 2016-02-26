@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.taxonomy;
+package org.semanticweb.elk.reasoner.taxonomy.model;
 
 /*
  * #%L
@@ -23,14 +23,8 @@ package org.semanticweb.elk.reasoner.taxonomy;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 
-public interface InternalNodeFactoryFactory<
-				T extends ElkEntity,
-				N extends Node<T>,
-				Tax
-		> {
+public interface BottomTypeNode<T extends ElkEntity, I extends ElkEntity>
+		extends BottomTaxonomyNode<T>, TypeNode<T, I> {
 
-	InternalNodeFactory<T, N, Tax> createInternalNodeFactory(Tax taxonomy);
-	
 }

@@ -43,8 +43,10 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
 public interface UpdateableGenericTypeNode<T extends ElkEntity, I extends ElkEntity, TN extends UpdateableGenericTypeNode<T, I, TN, IN>, IN extends UpdateableGenericInstanceNode<T, I, TN, IN>>
 		extends UpdateableNode<T>, NonBottomTypeNode<T, I> {
 
+	@Override
 	Set<? extends TN> getDirectNonBottomSuperNodes();
 	
+	@Override
 	Set<? extends TN> getDirectNonBottomSubNodes();
 
 	/**

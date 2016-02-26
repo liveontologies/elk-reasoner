@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.taxonomy.model;
 
+import java.util.Set;
+
 /*
  * #%L
  * ELK Reasoner
@@ -41,6 +43,8 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
 public interface UpdateableGenericInstanceNode<T extends ElkEntity, I extends ElkEntity, TN extends UpdateableGenericTypeNode<T, I, TN, IN>, IN extends UpdateableGenericInstanceNode<T, I, TN, IN>>
 		extends UpdateableNode<I>, InstanceNode<T, I> {
 
+	Set<? extends TN> getDirectNonBottomTypeNodes();// TODO: maybe this can simply override getDirectTypeNodes() ???
+	
 	/**
 	 * Associates this node with its direct type node.
 	 * 
