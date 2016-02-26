@@ -98,6 +98,9 @@ public abstract class AbstractUpdateableGenericInstanceTaxonomy<
 	}
 
 	@Override
+	public abstract BN getBottomNode();
+
+	@Override
 	public InstanceNode<T, I> getCreateInstanceNode(
 			final Collection<? extends I> instances) {
 		return instanceNodeStore_.getCreateNode(instances, instances.size(), instanceNodeFactory_);
