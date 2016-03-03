@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.GenericTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.SimpleUpdateableNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeUtils;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericTaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 import org.slf4j.Logger;
@@ -38,11 +38,11 @@ import org.slf4j.LoggerFactory;
 public abstract class NonBottomGenericTaxonomyNode<
 				T extends ElkEntity,
 				N extends GenericTaxonomyNode<T, N>,
-				UN extends UpdateableGenericTaxonomyNode<T, N, UN>
+				UN extends UpdateableTaxonomyNode<T, N, UN>
 		>
 		extends SimpleUpdateableNode<T>
 		implements GenericTaxonomyNode<T, N>,
-		UpdateableGenericTaxonomyNode<T, N, UN> {
+		UpdateableTaxonomyNode<T, N, UN> {
 	
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(NonBottomGenericTaxonomyNode.class);

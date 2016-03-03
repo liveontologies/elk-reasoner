@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.taxonomy.model;
 
+import java.util.Set;
+
 /*
  * #%L
  * ELK Reasoner
@@ -37,9 +39,55 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  *            The type of members of this node.
  * @param <I>
  *            The type of members of the related instance nodes.
+ * @param <UTN>
+ *            The type of type nodes with which this node may be associated.
+ * @param <UIN>
+ *            The type of instance nodes with which this node may be associated.
  */
-public interface UpdateableTypeNode<T extends ElkEntity, I extends ElkEntity>
-		extends
-		UpdateableGenericTypeNode<T, I, UpdateableTypeNode<T, I>, UpdateableInstanceNode<T, I>> {
+public interface UpdateableTypeNode<
+				T extends ElkEntity,
+				I extends ElkEntity,
+				TN extends GenericTypeNode<T, I, TN, IN>,
+				IN extends GenericInstanceNode<T, I, TN, IN>,
+				UTN extends UpdateableTypeNode<T, I, TN, IN, UTN, UIN>,
+				UIN extends UpdateableInstanceNode<T, I, TN, IN, UTN, UIN>
+		>
+		extends NonBottomTypeNode<T, I> {
 
+	@Override
+	Set<? extends UTN> getDirectNonBottomSuperNodes();
+	
+	@Override
+	Set<? extends UTN> getDirectNonBottomSubNodes();
+
+	/**
+	 * Associates this node with its direct instance node.
+	 * 
+	 * @param instanceNode
+	 *            The instance node with which this node should be associated.
+	 */
+	void addDirectInstanceNode(UIN instanceNode);
+
+	/**
+	 * Deletes the association between this node and the specified instance
+	 * node.
+	 * 
+	 * @param instanceNode
+	 *            The instance node with which this node should not be
+	 *            associated.
+	 */
+	void removeDirectInstanceNode(UIN instanceNode);
+
+	public static interface Projection<T extends ElkEntity, I extends ElkEntity>
+			extends UpdateableTypeNode<
+					T,
+					I,
+					GenericTypeNode.Projection<T, I>,
+					GenericInstanceNode.Projection<T, I>,
+					Projection<T, I>,
+					UpdateableInstanceNode.Projection<T, I>
+			>, GenericTypeNode.Projection<T, I> {
+		// Empty.
+	}
+	
 }

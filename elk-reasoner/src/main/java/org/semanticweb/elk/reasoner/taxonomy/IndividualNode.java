@@ -33,12 +33,11 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.reasoner.taxonomy.model.GenericInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.GenericTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.SimpleUpdateableNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericInstanceNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -55,14 +54,16 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author Markus Kroetzsch
  * @author Peter Skocovsky
  */
-public class IndividualNode<
+public abstract class IndividualNode<
 				T extends ElkEntity,
 				I extends ElkEntity,
-				TN extends UpdateableGenericTypeNode<T, I, TN, IN>,
-				IN extends UpdateableGenericInstanceNode<T, I, TN, IN>
+				TN extends GenericTypeNode<T, I, TN, IN>,
+				IN extends GenericInstanceNode<T, I, TN, IN>,
+				UTN extends UpdateableTypeNode<T, I, TN, IN, UTN, UIN>,
+				UIN extends UpdateableInstanceNode<T, I, TN, IN, UTN, UIN>
 		>
 		extends SimpleUpdateableNode<I>
-		implements UpdateableGenericInstanceNode<T, I, TN, IN> {
+		implements UpdateableInstanceNode<T, I, TN, IN, UTN, UIN> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -74,7 +75,7 @@ public class IndividualNode<
 	 * ElkClass nodes whose members are direct types of the members of this
 	 * node.
 	 */
-	private final Set<TN> directTypeNodes_;
+	private final Set<UTN> directTypeNodes_;
 
 	/**
 	 * Constructing the individual node for the set of same individuals.
@@ -90,7 +91,7 @@ public class IndividualNode<
 			final Iterable<? extends I> members, final int size) {
 		super(members, size, taxonomy.getInstanceKeyProvider());
 		this.taxonomy_ = taxonomy;
-		this.directTypeNodes_ = new ArrayHashSet<TN>();
+		this.directTypeNodes_ = new ArrayHashSet<UTN>();
 	}
 
 	/**
@@ -100,7 +101,7 @@ public class IndividualNode<
 	 *            node to add
 	 */
 	@Override
-	public void addDirectTypeNode(final TN typeNode) {
+	public void addDirectTypeNode(final UTN typeNode) {
 		LOGGER_.trace("{}: new direct type-node {}", this, typeNode);
 
 		directTypeNodes_.add(typeNode);
@@ -108,24 +109,24 @@ public class IndividualNode<
 
 	@Override
 	public Set<? extends TN> getDirectTypeNodes() {
-		return Collections.unmodifiableSet(directTypeNodes_);
+		return Collections.unmodifiableSet(toTypeNodes(directTypeNodes_));
 	}
 
 	@Override
-	public Set<? extends TypeNode<T, I>> getAllTypeNodes() {
+	public Set<? extends TN> getAllTypeNodes() {
 		// TODO: refactor TaxonomyNodeUtils
-		Set<TypeNode<T, I>> result = new ArrayHashSet<TypeNode<T, I>>(
+		Set<TN> result = new ArrayHashSet<TN>(
 				directTypeNodes_.size());
 
-		Queue<TypeNode<T, I>> todo = new LinkedList<TypeNode<T, I>>();
+		Queue<TN> todo = new LinkedList<TN>();
 
-		todo.addAll(directTypeNodes_);
+		todo.addAll(getDirectTypeNodes());
 
 		while (!todo.isEmpty()) {
-			TypeNode<T, I> next = todo.poll();
+			TN next = todo.poll();
 
 			if (result.add(next)) {
-				for (TypeNode<T, I> nextSuperNode : next.getDirectSuperNodes())
+				for (TN nextSuperNode : next.getDirectSuperNodes())
 					todo.add(nextSuperNode);
 			}
 		}
@@ -137,6 +138,8 @@ public class IndividualNode<
 	public Taxonomy<T> getTaxonomy() {
 		return taxonomy_;
 	}
+
+	protected abstract Set<? extends TN> toTypeNodes(Set<? extends UTN> nodes);
 
 	private final int hashCode_ = HashGenerator.generateNextHashCode();
 
@@ -151,25 +154,59 @@ public class IndividualNode<
 	}
 
 	@Override
-	public void removeDirectTypeNode(final TN typeNode) {
+	public void removeDirectTypeNode(final UTN typeNode) {
 		LOGGER_.trace("{}: removing direct type node: {}", this, typeNode);
 
 		directTypeNodes_.remove(typeNode);
 	}
 
 	@Override
-	public Set<? extends TN> getDirectNonBottomTypeNodes() {
-		return getDirectTypeNodes();
+	public Set<? extends UTN> getDirectNonBottomTypeNodes() {
+		return directTypeNodes_;
 	}
 
 	public static class Projection<T extends ElkEntity, I extends ElkEntity>
-			extends
-			IndividualNode<T, I, UpdateableTypeNode<T, I>, UpdateableInstanceNode<T, I>>
-			implements UpdateableInstanceNode<T, I> {
+			extends IndividualNode<
+					T,
+					I,
+					GenericTypeNode.Projection<T, I>,
+					GenericInstanceNode.Projection<T, I>,
+					UpdateableTypeNode.Projection<T, I>,
+					UpdateableInstanceNode.Projection<T, I>
+			> implements UpdateableInstanceNode.Projection<T, I> {
 
 		protected Projection(final InstanceTaxonomy<T, I> taxonomy,
 				final Iterable<? extends I> members, final int size) {
 			super(taxonomy, members, size);
+		}
+
+		@Override
+		protected Set<? extends GenericTypeNode.Projection<T, I>> toTypeNodes(
+				final Set<? extends UpdateableTypeNode.Projection<T, I>> nodes) {
+			return nodes;
+		}
+
+	}
+
+	public static class Projection2<T extends ElkEntity, I extends ElkEntity>
+			extends IndividualNode<
+					T,
+					I,
+					GenericTypeNode.Projection<T, I>,
+					GenericInstanceNode.Projection<T, I>,
+					NonBottomGenericTypeNode.Projection<T, I>,
+					Projection2<T, I>
+			> implements GenericInstanceNode.Projection<T, I> {
+
+		protected Projection2(final InstanceTaxonomy<T, I> taxonomy,
+				final Iterable<? extends I> members, final int size) {
+			super(taxonomy, members, size);
+		}
+
+		@Override
+		protected Set<? extends GenericTypeNode.Projection<T, I>> toTypeNodes(
+				final Set<? extends NonBottomGenericTypeNode.Projection<T, I>> nodes) {
+			return nodes;
 		}
 
 	}

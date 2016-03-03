@@ -36,8 +36,8 @@ import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericNodeStore;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericTaxonomyInstanceNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericTaxonomyTypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyTypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 import org.semanticweb.elk.util.collections.LazySetUnion;
 
@@ -46,8 +46,8 @@ public abstract class AbstractUpdateableGenericInstanceTaxonomy<
 				I extends ElkEntity,
 				TN extends GenericTypeNode<T, I, TN, IN>,
 				IN extends GenericInstanceNode<T, I, TN, IN>,
-				UTN extends UpdateableGenericTaxonomyTypeNode<T, I, TN, IN, UTN, UIN>,
-				UIN extends UpdateableGenericTaxonomyInstanceNode<T, I, TN, IN, UTN, UIN>
+				UTN extends UpdateableTaxonomyTypeNode<T, I, TN, IN, UTN, UIN>,
+				UIN extends UpdateableInstanceNode<T, I, TN, IN, UTN, UIN>
 		>
 		extends AbstractUpdateableGenericTaxonomy<T, TN, UTN>
 		implements UpdateableInstanceTaxonomy<T, I> {

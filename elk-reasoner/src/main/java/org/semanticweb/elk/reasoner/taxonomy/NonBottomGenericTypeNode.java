@@ -29,8 +29,8 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericTypeNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericTaxonomyInstanceNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericTaxonomyTypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyTypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,12 +40,12 @@ public abstract class NonBottomGenericTypeNode<
 				I extends ElkEntity,
 				TN extends GenericTypeNode<T, I, TN, IN>,
 				IN extends GenericInstanceNode<T, I, TN, IN>,
-				UTN extends UpdateableGenericTaxonomyTypeNode<T, I, TN, IN, UTN, UIN>,
-				UIN extends UpdateableGenericTaxonomyInstanceNode<T, I, TN, IN, UTN, UIN>
+				UTN extends UpdateableTaxonomyTypeNode<T, I, TN, IN, UTN, UIN>,
+				UIN extends UpdateableInstanceNode<T, I, TN, IN, UTN, UIN>
 		>
 		extends NonBottomGenericTaxonomyNode<T, TN, UTN>
 		implements GenericTypeNode<T, I, TN, IN>,
-		UpdateableGenericTaxonomyTypeNode<T, I, TN, IN, UTN, UIN> {
+		UpdateableTaxonomyTypeNode<T, I, TN, IN, UTN, UIN> {
 
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(NonBottomGenericTypeNode.class);
@@ -112,7 +112,7 @@ public abstract class NonBottomGenericTypeNode<
 					GenericTypeNode.Projection<T, I>,
 					GenericInstanceNode.Projection<T, I>,
 					Projection<T, I>,
-					IndividualTaxonomyNode.Projection<T, I>
+					IndividualNode.Projection2<T, I>
 			> implements GenericTypeNode.Projection<T, I> {
 
 		public Projection(
@@ -129,7 +129,7 @@ public abstract class NonBottomGenericTypeNode<
 
 		@Override
 		protected Set<? extends GenericInstanceNode.Projection<T, I>> toInstanceNodes(
-				final Set<? extends IndividualTaxonomyNode.Projection<T, I>> nodes) {
+				final Set<? extends IndividualNode.Projection2<T, I>> nodes) {
 			return nodes;
 		}
 		

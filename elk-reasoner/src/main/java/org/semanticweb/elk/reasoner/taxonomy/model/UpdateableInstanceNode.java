@@ -21,6 +21,8 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
+import java.util.Set;
+
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
@@ -36,9 +38,49 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  *            The type of members of this node.
  * @param <I>
  *            The type of members of the related instance nodes.
+ * @param <UTN>
+ *            The type of type nodes with which this node may be associated.
+ * @param <UIN>
+ *            The type of instance nodes with which this node may be associated.
  */
-public interface UpdateableInstanceNode<T extends ElkEntity, I extends ElkEntity>
-		extends
-		UpdateableGenericInstanceNode<T, I, UpdateableTypeNode<T, I>, UpdateableInstanceNode<T, I>> {
+public interface UpdateableInstanceNode<
+				T extends ElkEntity,
+				I extends ElkEntity,
+				TN extends GenericTypeNode<T, I, TN, IN>,
+				IN extends GenericInstanceNode<T, I, TN, IN>,
+				UTN extends UpdateableTypeNode<T, I, TN, IN, UTN, UIN>,
+				UIN extends UpdateableInstanceNode<T, I, TN, IN, UTN, UIN>
+		>
+		extends UpdateableNode<I>, InstanceNode<T, I> {
 
+	Set<? extends UTN> getDirectNonBottomTypeNodes();// TODO: maybe this can simply override getDirectTypeNodes() ???
+	
+	/**
+	 * Associates this node with its direct type node.
+	 * 
+	 * @param typeNode
+	 *            The type node with which this node should be associated.
+	 */
+	void addDirectTypeNode(UTN typeNode);
+
+	/**
+	 * Deletes the association between this node and the specified type node.
+	 * 
+	 * @param typeNode
+	 *            The type node with which this node should not be associated.
+	 */
+	void removeDirectTypeNode(UTN typeNode);
+
+	public static interface Projection<T extends ElkEntity, I extends ElkEntity>
+			extends UpdateableInstanceNode<
+					T,
+					I,
+					GenericTypeNode.Projection<T, I>,
+					GenericInstanceNode.Projection<T, I>,
+					UpdateableTypeNode.Projection<T, I>,
+					Projection<T, I>
+			>, GenericInstanceNode.Projection<T, I>	{
+		// Empty.
+	}
+	
 }

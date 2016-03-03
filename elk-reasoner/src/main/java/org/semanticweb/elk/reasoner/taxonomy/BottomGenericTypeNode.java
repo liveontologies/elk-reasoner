@@ -27,8 +27,8 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericTypeNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericTaxonomyInstanceNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericTaxonomyTypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyTypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 
 public class BottomGenericTypeNode<
@@ -36,8 +36,8 @@ public class BottomGenericTypeNode<
 				I extends ElkEntity,
 				TN extends GenericTypeNode<T, I, TN, IN>,
 				IN extends GenericInstanceNode<T, I, TN, IN>,
-				UTN extends UpdateableGenericTaxonomyTypeNode<T, I, TN, IN, UTN, UIN>,
-				UIN extends UpdateableGenericTaxonomyInstanceNode<T, I, TN, IN, UTN, UIN>
+				UTN extends UpdateableTaxonomyTypeNode<T, I, TN, IN, UTN, UIN>,
+				UIN extends UpdateableInstanceNode<T, I, TN, IN, UTN, UIN>
 		>
 		extends BottomGenericTaxonomyNode<T, TN, UTN>
 		implements GenericTypeNode<T, I, TN, IN> {
@@ -64,7 +64,7 @@ public class BottomGenericTypeNode<
 					GenericTypeNode.Projection<T, I>,
 					GenericInstanceNode.Projection<T, I>,
 					NonBottomGenericTypeNode.Projection<T, I>,
-					IndividualTaxonomyNode.Projection<T, I>
+					IndividualNode.Projection2<T, I>
 			> implements GenericTypeNode.Projection<T, I> {
 
 		public Projection(

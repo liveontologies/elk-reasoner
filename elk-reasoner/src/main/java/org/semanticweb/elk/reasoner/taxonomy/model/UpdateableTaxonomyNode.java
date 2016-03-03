@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.taxonomy.model;
 
+import java.util.Set;
+
 /*
  * #%L
  * ELK Reasoner
@@ -35,9 +37,54 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  *
  * @param <T>
  *            The type of members of this node.
+ * @param <UN>
+ *            The type of nodes with which this node can be associated.
  */
-public interface UpdateableTaxonomyNode<T extends ElkEntity> extends
-		UpdateableGenericTaxonomyNode<T, GenericTaxonomyNode.Projection<T>, UpdateableTaxonomyNode<T>>,
-		GenericTaxonomyNode.Projection<T> {
+public interface UpdateableTaxonomyNode<
+				T extends ElkEntity,
+				N extends GenericTaxonomyNode<T, N>,
+				UN extends UpdateableTaxonomyNode<T, N, UN>
+		>
+		extends UpdateableNode<T>, NonBottomTaxonomyNode<T> {
+
+	@Override
+	Set<? extends UN> getDirectNonBottomSuperNodes();
+	
+	@Override
+	Set<? extends UN> getDirectNonBottomSubNodes();
+	
+	/**
+	 * Associates this node with its direct super-node.
+	 * 
+	 * @param superNode
+	 *            The super-node with which this node should be associated.
+	 */
+	void addDirectSuperNode(UN superNode);
+
+	/**
+	 * Associates this node with its direct sub-node.
+	 * 
+	 * @param subNode
+	 *            The sub-node with which this node should be associated.
+	 */
+	void addDirectSubNode(UN subNode);
+
+	/**
+	 * Deletes the association between this node and the specified sub-node.
+	 * 
+	 * @param subNode
+	 *            The sub-node with which this node should not be associated.
+	 * @return <code>true</code> if and only if this node changed.
+	 */
+	boolean removeDirectSubNode(UN subNode);
+
+	/**
+	 * Deletes the association between this node and the specified super-node.
+	 * 
+	 * @param superNode
+	 *            The super-node with which this node should not be associated.
+	 * @return <code>true</code> if and only if this node changed.
+	 */
+	boolean removeDirectSuperNode(UN superNode);
 
 }

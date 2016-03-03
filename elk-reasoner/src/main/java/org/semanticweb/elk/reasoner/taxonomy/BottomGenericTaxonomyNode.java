@@ -30,7 +30,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericTaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.Operations.Condition;
 import org.semanticweb.elk.util.hashing.HashGenerator;
@@ -38,7 +38,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 public class BottomGenericTaxonomyNode<
 				T extends ElkEntity,
 				N extends GenericTaxonomyNode<T, N>,
-				UN extends UpdateableGenericTaxonomyNode<T, N, UN>
+				UN extends UpdateableTaxonomyNode<T, N, UN>
 		>
 		implements GenericTaxonomyNode<T, N> {
 

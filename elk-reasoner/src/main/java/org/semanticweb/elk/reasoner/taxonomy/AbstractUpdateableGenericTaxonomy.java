@@ -39,7 +39,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.GenericTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericNodeStore;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericTaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.util.collections.LazySetUnion;
 
 /**
@@ -48,7 +48,7 @@ import org.semanticweb.elk.util.collections.LazySetUnion;
 public abstract class AbstractUpdateableGenericTaxonomy<
 				T extends ElkEntity,
 				N extends GenericTaxonomyNode<T, N>,
-				UN extends UpdateableGenericTaxonomyNode<T, N, UN>
+				UN extends UpdateableTaxonomyNode<T, N, UN>
 		>
 		extends AbstractDistinctBottomTaxonomy<T, N, UN> {
 

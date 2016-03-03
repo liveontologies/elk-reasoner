@@ -29,13 +29,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericTaxonomyNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 
 public abstract class AbstractDistinctBottomTaxonomy<
 				T extends ElkEntity,
 				N extends GenericTaxonomyNode<T, N>,
-				UN extends UpdateableGenericTaxonomyNode<T, N, UN>
+				UN extends UpdateableTaxonomyNode<T, N, UN>
 		> extends AbstractTaxonomy<T> implements UpdateableTaxonomy<T> {
 
 	/** thread safe set of unsatisfiable classes */
