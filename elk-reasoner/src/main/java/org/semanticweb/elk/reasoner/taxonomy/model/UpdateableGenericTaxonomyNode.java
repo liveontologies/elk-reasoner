@@ -33,17 +33,21 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  *
  * @param <T>
  *            The type of members of this node.
- * @param <N>
+ * @param <UN>
  *            The type of nodes with which this node can be associated.
  */
-public interface UpdateableGenericTaxonomyNode<T extends ElkEntity, N extends UpdateableGenericTaxonomyNode<T, N>>
+public interface UpdateableGenericTaxonomyNode<
+				T extends ElkEntity,
+				N extends GenericTaxonomyNode<T, N>,
+				UN extends UpdateableGenericTaxonomyNode<T, N, UN>
+		>
 		extends UpdateableNode<T>, NonBottomTaxonomyNode<T> {
 
 	@Override
-	Set<? extends N> getDirectNonBottomSuperNodes();
+	Set<? extends UN> getDirectNonBottomSuperNodes();
 	
 	@Override
-	Set<? extends N> getDirectNonBottomSubNodes();
+	Set<? extends UN> getDirectNonBottomSubNodes();
 	
 	/**
 	 * Associates this node with its direct super-node.
@@ -51,7 +55,7 @@ public interface UpdateableGenericTaxonomyNode<T extends ElkEntity, N extends Up
 	 * @param superNode
 	 *            The super-node with which this node should be associated.
 	 */
-	void addDirectSuperNode(N superNode);
+	void addDirectSuperNode(UN superNode);
 
 	/**
 	 * Associates this node with its direct sub-node.
@@ -59,7 +63,7 @@ public interface UpdateableGenericTaxonomyNode<T extends ElkEntity, N extends Up
 	 * @param subNode
 	 *            The sub-node with which this node should be associated.
 	 */
-	void addDirectSubNode(N subNode);
+	void addDirectSubNode(UN subNode);
 
 	/**
 	 * Deletes the association between this node and the specified sub-node.
@@ -68,7 +72,7 @@ public interface UpdateableGenericTaxonomyNode<T extends ElkEntity, N extends Up
 	 *            The sub-node with which this node should not be associated.
 	 * @return <code>true</code> if and only if this node changed.
 	 */
-	boolean removeDirectSubNode(N subNode);
+	boolean removeDirectSubNode(UN subNode);
 
 	/**
 	 * Deletes the association between this node and the specified super-node.
@@ -77,6 +81,6 @@ public interface UpdateableGenericTaxonomyNode<T extends ElkEntity, N extends Up
 	 *            The super-node with which this node should not be associated.
 	 * @return <code>true</code> if and only if this node changed.
 	 */
-	boolean removeDirectSuperNode(N superNode);
+	boolean removeDirectSuperNode(UN superNode);
 
 }

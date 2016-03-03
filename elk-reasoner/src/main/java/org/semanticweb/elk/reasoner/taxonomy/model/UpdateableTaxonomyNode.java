@@ -36,7 +36,8 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  * @param <T>
  *            The type of members of this node.
  */
-public interface UpdateableTaxonomyNode<T extends ElkEntity>
-		extends UpdateableGenericTaxonomyNode<T, UpdateableTaxonomyNode<T>> {
+public interface UpdateableTaxonomyNode<T extends ElkEntity> extends
+		UpdateableGenericTaxonomyNode<T, GenericTaxonomyNode.Projection<T>, UpdateableTaxonomyNode<T>>,
+		GenericTaxonomyNode.Projection<T> {
 
 }

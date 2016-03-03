@@ -554,24 +554,6 @@ public class ConcurrentInstanceTaxonomy
 		}
 
 		@Override
-		public boolean trySetAllParentsAssigned(boolean modified) {
-			// return getNode().trySetAllParentsAssigned(modified);
-			throw new UnsupportedOperationException();// TODO: get rid of these!
-		}
-
-		@Override
-		public boolean areAllParentsAssigned() {
-			// return getNode().areAllParentsAssigned();
-			throw new UnsupportedOperationException();// TODO: get rid of these!
-		}
-
-		@Override
-		public void setMembers(final Iterable<? extends ElkClass> members) {
-			// getNode().setMembers(members);
-			throw new UnsupportedOperationException();// TODO: get rid of these!
-		}
-
-		@Override
 		public void addDirectInstanceNode(
 				UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode) {
 			LOGGER_.trace("{}: new direct instance-node {}", classNode_,

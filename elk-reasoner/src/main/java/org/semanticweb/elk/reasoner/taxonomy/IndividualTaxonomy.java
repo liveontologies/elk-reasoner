@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,47 +19,44 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy;
+
+import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.reasoner.taxonomy.model.BottomTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.model.GenericInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.GenericTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericNodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyInstanceNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyTypeNode;
 
 public class IndividualTaxonomy
 		extends AbstractUpdateableGenericInstanceTaxonomy<
 				ElkClass,
 				ElkNamedIndividual,
-				UpdateableTaxonomyTypeNode<ElkClass, ElkNamedIndividual>,
-				UpdateableTaxonomyInstanceNode<ElkClass, ElkNamedIndividual>,
-				BottomTypeNode<ElkClass, ElkNamedIndividual>
+				GenericTypeNode.Projection<ElkClass, ElkNamedIndividual>,
+				GenericInstanceNode.Projection<ElkClass, ElkNamedIndividual>,
+				NonBottomGenericTypeNode.Projection<ElkClass, ElkNamedIndividual>,
+				IndividualTaxonomyNode.Projection<ElkClass, ElkNamedIndividual>
 		> {
 
-	private final BottomTypeNode<ElkClass, ElkNamedIndividual> bottomNode_;
+	private final GenericTypeNode.Projection<ElkClass, ElkNamedIndividual> bottomNode_;
 	
 	public IndividualTaxonomy(
 			final ComparatorKeyProvider<ElkEntity> classKeyProvider,
-			final ComparatorKeyProvider<ElkNamedIndividual> instanceKeyProvider,
-			UpdateableGenericNodeStore<ElkClass, UpdateableTaxonomyTypeNode<ElkClass, ElkNamedIndividual>> typeNodeStore,
-			InternalNodeFactoryFactory<ElkClass, UpdateableTaxonomyTypeNode<ElkClass, ElkNamedIndividual>, BottomTypeNode<ElkClass, ElkNamedIndividual>> typeNodeFactoryFactory,
-			UpdateableGenericNodeStore<ElkNamedIndividual, UpdateableTaxonomyInstanceNode<ElkClass, ElkNamedIndividual>> instanceNodeStore,
-			InternalNodeFactoryFactory<ElkNamedIndividual, UpdateableTaxonomyInstanceNode<ElkClass, ElkNamedIndividual>, InstanceTaxonomy<ElkClass, ElkNamedIndividual>> instanceNodeFactoryFactory,
-			ElkClass topMember) {
+			final ComparatorKeyProvider<ElkNamedIndividual> instanceKeyProvider) {
 		super(
-				new ConcurrentNodeStore<ElkClass, UpdateableTaxonomyTypeNode<ElkClass, ElkNamedIndividual>>(classKeyProvider),
-				new InternalNodeFactoryFactory<ElkClass, UpdateableTaxonomyTypeNode<ElkClass, ElkNamedIndividual>, BottomTypeNode<ElkClass, ElkNamedIndividual>>() {
+				new ConcurrentNodeStore<ElkClass, NonBottomGenericTypeNode.Projection<ElkClass, ElkNamedIndividual>>(classKeyProvider),
+				new InternalNodeFactoryFactory<ElkClass, NonBottomGenericTypeNode.Projection<ElkClass, ElkNamedIndividual>, AbstractDistinctBottomTaxonomy<ElkClass, GenericTypeNode.Projection<ElkClass, ElkNamedIndividual>, NonBottomGenericTypeNode.Projection<ElkClass, ElkNamedIndividual>>>() {
 					@Override
-					public InternalNodeFactory<ElkClass, UpdateableTaxonomyTypeNode<ElkClass, ElkNamedIndividual>, BottomTypeNode<ElkClass, ElkNamedIndividual>> createInternalNodeFactory(
-							final BottomTypeNode<ElkClass, ElkNamedIndividual> taxonomy) {
-						return new InternalNodeFactory<ElkClass, UpdateableTaxonomyTypeNode<ElkClass, ElkNamedIndividual>, BottomTypeNode<ElkClass, ElkNamedIndividual>>(taxonomy) {
+					public InternalNodeFactory<ElkClass, NonBottomGenericTypeNode.Projection<ElkClass, ElkNamedIndividual>, AbstractDistinctBottomTaxonomy<ElkClass, GenericTypeNode.Projection<ElkClass, ElkNamedIndividual>, NonBottomGenericTypeNode.Projection<ElkClass, ElkNamedIndividual>>> createInternalNodeFactory(
+							final AbstractDistinctBottomTaxonomy<ElkClass, GenericTypeNode.Projection<ElkClass, ElkNamedIndividual>, NonBottomGenericTypeNode.Projection<ElkClass, ElkNamedIndividual>> taxonomy) {
+						return new InternalNodeFactory<ElkClass, NonBottomGenericTypeNode.Projection<ElkClass, ElkNamedIndividual>, AbstractDistinctBottomTaxonomy<ElkClass, GenericTypeNode.Projection<ElkClass, ElkNamedIndividual>, NonBottomGenericTypeNode.Projection<ElkClass, ElkNamedIndividual>>>(taxonomy) {
 							@Override
-							public UpdateableTaxonomyTypeNode<ElkClass, ElkNamedIndividual> createNode(
+							public NonBottomGenericTypeNode.Projection<ElkClass, ElkNamedIndividual> createNode(
 									final Iterable<? extends ElkClass> members, final int size,
 									final ComparatorKeyProvider<? super ElkClass> keyProvider) {
 								return new NonBottomGenericTypeNode.Projection<ElkClass, ElkNamedIndividual>(taxonomy_, members, size);
@@ -69,28 +64,34 @@ public class IndividualTaxonomy
 						};
 					}
 				},
-				new ConcurrentNodeStore<ElkNamedIndividual, UpdateableTaxonomyInstanceNode<ElkClass, ElkNamedIndividual>>(instanceKeyProvider),
-				new InternalNodeFactoryFactory<ElkNamedIndividual, UpdateableTaxonomyInstanceNode<ElkClass, ElkNamedIndividual>, InstanceTaxonomy<ElkClass, ElkNamedIndividual>>() {
+				new ConcurrentNodeStore<ElkNamedIndividual, IndividualTaxonomyNode.Projection<ElkClass, ElkNamedIndividual>>(instanceKeyProvider),
+				new InternalNodeFactoryFactory<ElkNamedIndividual, IndividualTaxonomyNode.Projection<ElkClass, ElkNamedIndividual>, InstanceTaxonomy<ElkClass, ElkNamedIndividual>>() {
 					@Override
-					public InternalNodeFactory<ElkNamedIndividual, UpdateableTaxonomyInstanceNode<ElkClass, ElkNamedIndividual>, InstanceTaxonomy<ElkClass, ElkNamedIndividual>> createInternalNodeFactory(
+					public InternalNodeFactory<ElkNamedIndividual, IndividualTaxonomyNode.Projection<ElkClass, ElkNamedIndividual>, InstanceTaxonomy<ElkClass, ElkNamedIndividual>> createInternalNodeFactory(
 							final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy) {
-						return new InternalNodeFactory<ElkNamedIndividual, UpdateableTaxonomyInstanceNode<ElkClass, ElkNamedIndividual>, InstanceTaxonomy<ElkClass, ElkNamedIndividual>>(taxonomy) {
+						return new InternalNodeFactory<ElkNamedIndividual, IndividualTaxonomyNode.Projection<ElkClass, ElkNamedIndividual>, InstanceTaxonomy<ElkClass, ElkNamedIndividual>>(taxonomy) {
 							@Override
-							public UpdateableTaxonomyInstanceNode<ElkClass, ElkNamedIndividual> createNode(
+							public IndividualTaxonomyNode.Projection<ElkClass, ElkNamedIndividual> createNode(
 									final Iterable<? extends ElkNamedIndividual> members, final int size,
 									final ComparatorKeyProvider<? super ElkNamedIndividual> keyProvider) {
-								return new IndividualNode.Projection2<ElkClass, ElkNamedIndividual>(taxonomy_, members, size);
+								return new IndividualTaxonomyNode.Projection<ElkClass, ElkNamedIndividual>(taxonomy_, members, size);
 							}
 						};
 					}
 				},
 				PredefinedElkClass.OWL_THING);
-		this.bottomNode_ = new BottomGenericTypeNode<ElkClass, ElkNamedIndividual, UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual>>(this, PredefinedElkClass.OWL_NOTHING);
+		this.bottomNode_ = new BottomGenericTypeNode.Projection<ElkClass, ElkNamedIndividual, UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual>>(this, PredefinedElkClass.OWL_NOTHING);
 	}
 
 	@Override
-	public BottomTypeNode<ElkClass, ElkNamedIndividual> getBottomNode() {
+	public GenericTypeNode.Projection<ElkClass, ElkNamedIndividual> getBottomNode() {
 		return bottomNode_;
+	}
+
+	@Override
+	Set<? extends GenericTypeNode.Projection<ElkClass, ElkNamedIndividual>> toTaxonomyNodes(
+			final Set<? extends NonBottomGenericTypeNode.Projection<ElkClass, ElkNamedIndividual>> nodes) {
+		return nodes;
 	}
 
 }

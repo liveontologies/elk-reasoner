@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
-public interface UpdateableTaxonomyInstanceNode<T extends ElkEntity, I extends ElkEntity>
-		extends UpdateableGenericInstanceNode<T, I, UpdateableTaxonomyTypeNode<T, I>, UpdateableTaxonomyInstanceNode<T, I>> {
+public interface UpdateableTaxonomyInstanceNode<T extends ElkEntity, I extends ElkEntity> {
+//		extends UpdateableGenericInstanceNode<T, I, UpdateableTaxonomyTypeNode<T, I>, UpdateableTaxonomyInstanceNode<T, I>> {
 
 }

@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy.model;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy.model;
 
 import java.util.Set;
 
@@ -51,5 +50,10 @@ public interface GenericTaxonomyNode<T extends ElkEntity, N extends GenericTaxon
 
 	@Override
 	public Set<? extends N> getAllSubNodes();
+
+	public static interface Projection<T extends ElkEntity>
+			extends GenericTaxonomyNode<T, Projection<T>> {
+		// Empty.
+	}
 
 }

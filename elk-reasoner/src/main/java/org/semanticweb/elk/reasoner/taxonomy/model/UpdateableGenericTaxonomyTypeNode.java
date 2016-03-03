@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy.model;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,11 +19,19 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy.model;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
-public interface UpdateableGenericTaxonomyTypeNode<T extends ElkEntity, I extends ElkEntity, TN extends UpdateableGenericTaxonomyTypeNode<T, I, TN, IN>, IN extends UpdateableGenericInstanceNode<T, I, TN, IN>>
-		extends UpdateableGenericTaxonomyNode<T, TN>,
-		UpdateableGenericTypeNode<T, I, TN, IN> {
-
+public interface UpdateableGenericTaxonomyTypeNode<
+				T extends ElkEntity,
+				I extends ElkEntity,
+				TN extends GenericTypeNode<T, I, TN, IN>,
+				IN extends GenericInstanceNode<T, I, TN, IN>,
+				UTN extends UpdateableGenericTaxonomyTypeNode<T, I, TN, IN, UTN, UIN>,
+				UIN extends UpdateableGenericInstanceNode<T, I, UTN, UIN>
+		>
+		extends UpdateableGenericTaxonomyNode<T, TN, UTN>,
+		UpdateableGenericTypeNode<T, I, UTN, UIN> {
+	
 }

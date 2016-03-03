@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -28,92 +27,71 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.reasoner.taxonomy.model.BottomTypeNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeUtils;
-import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.GenericInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.GenericTypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericTaxonomyInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericTaxonomyTypeNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyInstanceNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyTypeNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NonBottomGenericTypeNode<T extends ElkEntity, I extends ElkEntity, TN extends UpdateableGenericTaxonomyTypeNode<T, I, TN, IN>, IN extends UpdateableGenericInstanceNode<T, I, TN, IN>, BN extends BottomTypeNode<T, I>>
-		extends NonBottomGenericTaxonomyNode<T, TN, BN>
-		implements UpdateableGenericTaxonomyTypeNode<T, I, TN, IN> {
+public abstract class NonBottomGenericTypeNode<
+				T extends ElkEntity,
+				I extends ElkEntity,
+				TN extends GenericTypeNode<T, I, TN, IN>,
+				IN extends GenericInstanceNode<T, I, TN, IN>,
+				UTN extends UpdateableGenericTaxonomyTypeNode<T, I, TN, IN, UTN, UIN>,
+				UIN extends UpdateableGenericTaxonomyInstanceNode<T, I, TN, IN, UTN, UIN>
+		>
+		extends NonBottomGenericTaxonomyNode<T, TN, UTN>
+		implements GenericTypeNode<T, I, TN, IN>,
+		UpdateableGenericTaxonomyTypeNode<T, I, TN, IN, UTN, UIN> {
 
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(NonBottomGenericTypeNode.class);
 
-	private final Set<IN> directInstanceNodes_;
+	private final Set<UIN> directInstanceNodes_;
 
 	public NonBottomGenericTypeNode(
-			final BN bottomNode,
+			final AbstractDistinctBottomTaxonomy<T, TN, UTN> taxonomy,
 			final Iterable<? extends T> members, final int size) {
-		super(bottomNode, members, size);
-		this.directInstanceNodes_ = new ArrayHashSet<IN>();
+		super(taxonomy, members, size);
+		this.directInstanceNodes_ = new ArrayHashSet<UIN>();
 	}
 
 	@Override
-	public Set<? extends TypeNode<T, I>> getDirectSuperNodes() {
-		return Collections.unmodifiableSet(directSuperNodes_);
-	}
-
-	@Override
-	public Set<? extends TypeNode<T, I>> getAllSuperNodes() {
-		return TaxonomyNodeUtils.getAllSuperNodes(this);
-	}
-
-	@Override
-	public Set<? extends TypeNode<T, I>> getDirectSubNodes() {
-		if (!directSubNodes_.isEmpty()) {
-			return Collections.unmodifiableSet(directSubNodes_);
-		} else {
-			return Collections.singleton(bottomNode_);
-		}
-	}
-
-	@Override
-	public Set<? extends TypeNode<T, I>> getAllSubNodes() {
-		return TaxonomyNodeUtils.getAllSubNodes(this);
-	}
-
-	@Override
-	public synchronized void addDirectInstanceNode(final IN instanceNode) {
+	public synchronized void addDirectInstanceNode(final UIN instanceNode) {
 		LOGGER_.trace("{}: new direct instance-node {}", this, instanceNode);
 		directInstanceNodes_.add(instanceNode);
 	}
 
 	@Override
-	public synchronized void removeDirectInstanceNode(final IN instanceNode) {
+	public synchronized void removeDirectInstanceNode(final UIN instanceNode) {
 		LOGGER_.trace("{}: direct instance node removed {}", this,
 				instanceNode);
 		directInstanceNodes_.remove(instanceNode);
 	}
 
 	@Override
-	public Set<? extends InstanceNode<T, I>> getDirectInstanceNodes() {
-		return Collections.unmodifiableSet(directInstanceNodes_);
+	public Set<? extends IN> getDirectInstanceNodes() {
+		return Collections.unmodifiableSet(toInstanceNodes(directInstanceNodes_));
 	}
 
 	@Override
-	public Set<? extends InstanceNode<T, I>> getAllInstanceNodes() {
+	public Set<? extends IN> getAllInstanceNodes() {
 		// TODO: refactor TaxonomyNodeUtils
-		Set<InstanceNode<T, I>> result;
+		Set<IN> result;
 
 		if (!getDirectSubNodes().isEmpty()) {
-			result = new ArrayHashSet<InstanceNode<T, I>>();
-			Queue<TypeNode<T, I>> todo = new LinkedList<TypeNode<T, I>>();
-
-			todo.add(this);
+			result = new ArrayHashSet<IN>();
+			result.addAll(getDirectInstanceNodes());
+			Queue<TN> todo = new LinkedList<TN>(getDirectSubNodes());
 
 			while (!todo.isEmpty()) {
-				TypeNode<T, I> next = todo.poll();
+				TN next = todo.poll();
 				result.addAll(next.getDirectInstanceNodes());
 
-				for (TypeNode<T, I> nextSubNode : next.getDirectSubNodes()) {
+				for (TN nextSubNode : next.getDirectSubNodes()) {
 					todo.add(nextSubNode);
 				}
 			}
@@ -125,13 +103,34 @@ public class NonBottomGenericTypeNode<T extends ElkEntity, I extends ElkEntity, 
 		return Collections.unmodifiableSet(getDirectInstanceNodes());
 	}
 
+	protected abstract Set<? extends IN> toInstanceNodes(Set<? extends UIN> nodes);
+	
 	public static class Projection<T extends ElkEntity, I extends ElkEntity>
-			extends NonBottomGenericTypeNode<T, I, UpdateableTaxonomyTypeNode<T, I>, UpdateableTaxonomyInstanceNode<T, I>, BottomTypeNode<T, I>>
-			implements UpdateableTaxonomyTypeNode<T, I> {
+			extends NonBottomGenericTypeNode<
+					T,
+					I,
+					GenericTypeNode.Projection<T, I>,
+					GenericInstanceNode.Projection<T, I>,
+					Projection<T, I>,
+					IndividualTaxonomyNode.Projection<T, I>
+			> implements GenericTypeNode.Projection<T, I> {
 
-		public Projection(final BottomTypeNode<T, I> bottomNode,
+		public Projection(
+				final AbstractDistinctBottomTaxonomy<T, GenericTypeNode.Projection<T, I>, NonBottomGenericTypeNode.Projection<T, I>> taxonomy,
 				final Iterable<? extends T> members, final int size) {
-			super(bottomNode, members, size);
+			super(taxonomy, members, size);
+		}
+
+		@Override
+		protected Set<? extends GenericTypeNode.Projection<T, I>> toTaxonomyNodes(
+				final Set<? extends NonBottomGenericTypeNode.Projection<T, I>> nodes) {
+			return nodes;
+		}
+
+		@Override
+		protected Set<? extends GenericInstanceNode.Projection<T, I>> toInstanceNodes(
+				final Set<? extends IndividualTaxonomyNode.Projection<T, I>> nodes) {
+			return nodes;
 		}
 		
 	}

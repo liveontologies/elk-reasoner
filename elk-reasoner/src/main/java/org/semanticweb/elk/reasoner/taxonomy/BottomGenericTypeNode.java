@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,68 +19,60 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collections;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.reasoner.taxonomy.model.BottomTypeNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.GenericInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.GenericTypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericTaxonomyInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericTaxonomyTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
-import org.semanticweb.elk.util.collections.Operations;
-import org.semanticweb.elk.util.collections.Operations.Condition;
 
-public class BottomGenericTypeNode<T extends ElkEntity, I extends ElkEntity, Tax extends UpdateableInstanceTaxonomy<T, I>>
-		extends BottomGenericTaxonomyNode<T, Tax> implements BottomTypeNode<T, I> {
+public class BottomGenericTypeNode<
+				T extends ElkEntity,
+				I extends ElkEntity,
+				TN extends GenericTypeNode<T, I, TN, IN>,
+				IN extends GenericInstanceNode<T, I, TN, IN>,
+				UTN extends UpdateableGenericTaxonomyTypeNode<T, I, TN, IN, UTN, UIN>,
+				UIN extends UpdateableGenericTaxonomyInstanceNode<T, I, TN, IN, UTN, UIN>
+		>
+		extends BottomGenericTaxonomyNode<T, TN, UTN>
+		implements GenericTypeNode<T, I, TN, IN> {
 
-	public BottomGenericTypeNode(final Tax taxonomy,
+	public BottomGenericTypeNode(final AbstractDistinctBottomTaxonomy<T, TN, UTN> taxonomy,
 			final T bottomMember) {
 		super(taxonomy, bottomMember);
 	}
 
 	@Override
-	public Set<? extends InstanceNode<T, I>> getDirectInstanceNodes() {
+	public Set<? extends IN> getDirectInstanceNodes() {
 		return Collections.emptySet();
 	}
 
 	@Override
-	public Set<? extends InstanceNode<T, I>> getAllInstanceNodes() {
+	public Set<? extends IN> getAllInstanceNodes() {
 		return Collections.emptySet();
 	}
 
-	@Override
-	public Set<? extends TypeNode<T, I>> getDirectSuperNodes() {
-		final Set<? extends TypeNode<T, I>> nonBottomNodes = taxonomy_.getNonBottomNodes();
-		return Operations.filter(nonBottomNodes,
-				new Condition<TypeNode<T, I>>() {
-					@Override
-					public boolean holds(final TypeNode<T, I> element) {
-						return element.getDirectSubNodes()
-								.contains(taxonomy_.getBottomNode());
-					}
-					/*
-					 * the direct super nodes of the bottom node are all
-					 * nodes except the nodes that have no non-bottom
-					 * sub-classes and the bottom node
-					 */
-				}, nonBottomNodes.size()
-						- getCountOfNodesWithSubClasses());
-	}
-	
-	@Override
-	public Set<? extends TypeNode<T, I>> getAllSuperNodes() {
-		return taxonomy_.getNonBottomNodes();
-	}
+	public static class Projection<T extends ElkEntity, I extends ElkEntity, Tax extends UpdateableInstanceTaxonomy<T, I>>
+			extends BottomGenericTypeNode<
+					T,
+					I,
+					GenericTypeNode.Projection<T, I>,
+					GenericInstanceNode.Projection<T, I>,
+					NonBottomGenericTypeNode.Projection<T, I>,
+					IndividualTaxonomyNode.Projection<T, I>
+			> implements GenericTypeNode.Projection<T, I> {
 
-	@Override
-	public Set<? extends TypeNode<T, I>> getDirectSubNodes() {
-		return Collections.emptySet();
-	}
-	
-	@Override
-	public Set<? extends TypeNode<T, I>> getAllSubNodes() {
-		return Collections.emptySet();
+		public Projection(
+				final AbstractDistinctBottomTaxonomy<T, GenericTypeNode.Projection<T, I>, NonBottomGenericTypeNode.Projection<T, I>> taxonomy,
+				final T bottomMember) {
+			super(taxonomy, bottomMember);
+		}
+		
 	}
 
 }

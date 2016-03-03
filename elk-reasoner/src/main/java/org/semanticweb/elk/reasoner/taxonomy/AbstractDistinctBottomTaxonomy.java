@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,16 +19,24 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy;
+
+import java.util.Set;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.reasoner.taxonomy.model.GenericTaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 
-public abstract class AbstractDistinctBottomTaxonomy<T extends ElkEntity>
-		extends AbstractTaxonomy<T> implements UpdateableTaxonomy<T> {
+public abstract class AbstractDistinctBottomTaxonomy<
+				T extends ElkEntity,
+				N extends GenericTaxonomyNode<T, N>,
+				UN extends UpdateableGenericTaxonomyNode<T, N, UN>
+		> extends AbstractTaxonomy<T> implements UpdateableTaxonomy<T> {
 
 	/** thread safe set of unsatisfiable classes */
 	final ConcurrentMap<Object, T> unsatisfiableClasses_;
@@ -42,5 +48,13 @@ public abstract class AbstractDistinctBottomTaxonomy<T extends ElkEntity>
 		this.unsatisfiableClasses_ = new ConcurrentHashMap<Object, T>();
 		this.countNodesWithSubClasses = new AtomicInteger(0);
 	}
+	
+	@Override
+	public abstract N getBottomNode();
+	
+	@Override
+	public abstract Set<? extends UN> getNonBottomNodes();
+
+	abstract Set<? extends N> toTaxonomyNodes(Set<? extends UN> nodes);
 	
 }
