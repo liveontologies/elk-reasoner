@@ -81,7 +81,7 @@ public abstract class NonBottomGenericTaxonomyNode<
 	
 	@Override
 	public Set<? extends N> getAllSuperNodes() {
-		return TaxonomyNodeUtils.getAllSuperNodes(this);
+		return TaxonomyNodeUtils.getAllSuperNodes(getDirectSuperNodes());
 	}
 
 	@Override
@@ -100,7 +100,7 @@ public abstract class NonBottomGenericTaxonomyNode<
 	
 	@Override
 	public Set<? extends N> getAllSubNodes() {
-		return TaxonomyNodeUtils.getAllSubNodes(this);
+		return TaxonomyNodeUtils.getAllSubNodes(getDirectSubNodes());
 	}
 
 	@Override

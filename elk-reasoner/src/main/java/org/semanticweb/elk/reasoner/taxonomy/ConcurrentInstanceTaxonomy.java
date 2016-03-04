@@ -20,16 +20,13 @@
  * limitations under the License.
  * #L%
  */
-
 package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -46,13 +43,13 @@ import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeUtils;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericNodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.Operations.FunctorEx;
 import org.slf4j.Logger;
@@ -517,30 +514,7 @@ public class ConcurrentInstanceTaxonomy
 
 		@Override
 		public Set<? extends GenericInstanceNode.Projection<ElkClass, ElkNamedIndividual>> getAllInstanceNodes() {
-			// TODO: refactor TaxonomyNodeUtils
-			Set<GenericInstanceNode.Projection<ElkClass, ElkNamedIndividual>> result;
-
-			if (!classNode_.getDirectSubNodes().isEmpty()) {
-				result = new ArrayHashSet<GenericInstanceNode.Projection<ElkClass, ElkNamedIndividual>>();
-				Queue<GenericTypeNode.Projection<ElkClass, ElkNamedIndividual>> todo = new LinkedList<GenericTypeNode.Projection<ElkClass, ElkNamedIndividual>>();
-
-				todo.add(this);
-
-				while (!todo.isEmpty()) {
-					GenericTypeNode.Projection<ElkClass, ElkNamedIndividual> next = todo.poll();
-					result.addAll(next.getDirectInstanceNodes());
-
-					for (GenericTypeNode.Projection<ElkClass, ElkNamedIndividual> nextSubNode : next
-							.getDirectSubNodes()) {
-						todo.add(nextSubNode);
-					}
-				}
-
-				return Collections.unmodifiableSet(result);
-
-			}
-			// else
-			return Collections.unmodifiableSet(getDirectInstanceNodes());
+			return TaxonomyNodeUtils.getAllInstanceNodes(this);
 		}
 
 		@Override

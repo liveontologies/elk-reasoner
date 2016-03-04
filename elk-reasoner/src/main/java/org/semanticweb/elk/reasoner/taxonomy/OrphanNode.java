@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,17 +19,17 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
+import org.semanticweb.elk.util.collections.ArrayHashMap;
 
-public class OrphanNode<T extends ElkEntity> implements Node<T> {
+public abstract class OrphanNode<T extends ElkEntity> implements Node<T> {
 
 	/**
 	 * the members of the node
@@ -41,24 +39,17 @@ public class OrphanNode<T extends ElkEntity> implements Node<T> {
 	 * the representative of the node; should be among the members
 	 */
 	private final T canonical;
-	/**
-	 * provides keys that are used for hashing instead of the members
-	 */
-	private final ComparatorKeyProvider<ElkEntity> keyProvider_;
 
-	public OrphanNode(Set<T> members, T canonical,
-			ComparatorKeyProvider<ElkEntity> keyProvider) {
-		this.members = new HashMap<Object, T>();
+	public OrphanNode(
+			final Iterable<? extends T> members,
+			final int size,
+			final T canonical,
+			ComparatorKeyProvider<? super T> keyProvider) {
+		this.members = new ArrayHashMap<Object, T>(size);
 		for (T member : members) {
 			this.members.put(keyProvider.getKey(member), member);
 		}
 		this.canonical = canonical;
-		this.keyProvider_ = keyProvider;
-	}
-	
-	@Override
-	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
-		return keyProvider_;
 	}
 
 	@Override
@@ -68,7 +59,7 @@ public class OrphanNode<T extends ElkEntity> implements Node<T> {
 
 	@Override
 	public boolean contains(final T member) {
-		return members.containsKey(keyProvider_.getKey(member));
+		return members.containsKey(getKeyProvider().getKey(member));
 	}
 
 	@Override

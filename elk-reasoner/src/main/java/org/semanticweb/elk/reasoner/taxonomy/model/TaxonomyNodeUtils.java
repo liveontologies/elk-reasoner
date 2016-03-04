@@ -1,4 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy.model;
 /*
  * #%L
  * ELK Reasoner
@@ -20,6 +19,7 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy.model;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -29,6 +29,8 @@ import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.collections.Operations;
+import org.semanticweb.elk.util.collections.Operations.Functor;
 
 /**
  * A collection of utility methods, mostly for the frequent use case of
@@ -41,30 +43,19 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  */
 public class TaxonomyNodeUtils {
 	
-	/**
-	 * 
-	 * @author Pavel Klinov
-	 *
-	 * pavel.klinov@uni-ulm.de
-	 */
-	interface GetSuccessors<O> {
-		Set<? extends O> get(O node);
-	}
-
-	private static <O> Set<O> getAllReachable(
-					Collection<? extends O> direct, GetSuccessors<O> succ) {
+	private static <N> Set<N> getAllReachable(
+					final Collection<? extends N> direct,
+					final Functor<N, Set<? extends N>> succ) {
 		
-		Set<O> result = new ArrayHashSet<O>(direct.size());
-		Queue<O> todo = new LinkedList<O>();
-		
-		todo.addAll(direct);
+		final Set<N> result = new ArrayHashSet<N>(direct.size());
+		final Queue<N> todo = new LinkedList<N>(direct);
 		
 		while (!todo.isEmpty()) {
-			O next = todo.poll();
+			final N next = todo.poll();
 			
 			if (result.add(next)) {
-				for (O nextSuperNode : succ.get(next)) {
-					todo.add(nextSuperNode);
+				for (final N succNode : succ.apply(next)) {
+					todo.add(succNode);
 				}
 			}
 		}
@@ -72,64 +63,62 @@ public class TaxonomyNodeUtils {
 		return Collections.unmodifiableSet(result);
 	}
 	
-	public static <T extends ElkEntity, N extends GenericTaxonomyNode<T, N>>
-			Set<? extends N> getAllSuperNodes(final GenericTaxonomyNode<T, N> tnode) {
-		return getAllReachable(tnode.getDirectSuperNodes(), new GetSuccessors<N> () {
-
-			@Override
-			public Set<? extends N> get(final N node) {
-				return node.getDirectSuperNodes();
-			}});
+	private static <N, O> Set<O> getAllReachable(
+					final N node,
+					final Functor<N, Set<? extends N>> succ,
+					final Functor<N, Set<? extends O>> collect) {
+		
+		final Set<O> result = new ArrayHashSet<O>();
+		final Queue<N> todo = new LinkedList<N>();
+		todo.add(node);
+		
+		while (!todo.isEmpty()) {
+			final N next = todo.poll();
+			
+			result.addAll(collect.apply(next));
+			for (final N succNode : succ.apply(next)) {
+				todo.add(succNode);
+			}
+		}
+		
+		return Collections.unmodifiableSet(result);
 	}
 	
 	public static <T extends ElkEntity, N extends GenericTaxonomyNode<T, N>>
-			Set<? extends N> getAllSubNodes(final GenericTaxonomyNode<T, N> tnode) {
-		return getAllReachable(tnode.getDirectSubNodes(), new GetSuccessors<N> () {
+			Set<? extends N> getAllSuperNodes(final Collection<? extends N> direct) {
+		return getAllReachable(direct, new Functor<N, Set<? extends N>>() {
 
 			@Override
-			public Set<? extends N> get(final N node) {
-				return node.getDirectSubNodes();
-			}});
-	}
-	
-	public static <T extends ElkEntity>
-			Set<? extends TaxonomyNode<T>> getAllSuperNodes(final TaxonomyNode<T> tnode) {
-		return getAllReachable(tnode.getDirectSuperNodes(), new GetSuccessors<TaxonomyNode<T>> () {
-
-			@Override
-			public Set<? extends TaxonomyNode<T>> get(final TaxonomyNode<T> node) {
+			public Set<? extends N> apply(final N node) {
 				return node.getDirectSuperNodes();
 			}});
 	}
 	
-	public static <T extends ElkEntity>
-			Set<? extends TaxonomyNode<T>> getAllSubNodes(final TaxonomyNode<T> tnode) {
-		return getAllReachable(tnode.getDirectSubNodes(), new GetSuccessors<TaxonomyNode<T>> () {
+	public static <T extends ElkEntity, N extends GenericTaxonomyNode<T, N>>
+			Set<? extends N> getAllSubNodes(final Collection<? extends N> direct) {
+		return getAllReachable(direct, new Functor<N, Set<? extends N>>() {
 
 			@Override
-			public Set<? extends TaxonomyNode<T>> get(final TaxonomyNode<T> node) {
+			public Set<? extends N> apply(final N node) {
 				return node.getDirectSubNodes();
 			}});
 	}
 	
-	public static <T extends ElkEntity, I extends ElkEntity>
-			Set<? extends TypeNode<T, I>> getAllSuperNodes(final TypeNode<T, I> tnode) {
-		return getAllReachable(tnode.getDirectSuperNodes(), new GetSuccessors<TypeNode<T, I>> () {
-
-			@Override
-			public Set<? extends TypeNode<T, I>> get(final TypeNode<T, I> node) {
-				return node.getDirectSuperNodes();
-			}});
+	public static <T extends ElkEntity, I extends ElkEntity, TN extends GenericTypeNode<T, I, TN, IN>, IN extends GenericInstanceNode<T, I, TN, IN>>
+			Set<? extends IN> getAllInstanceNodes(final GenericTypeNode<T, I, TN, IN> node) {
+		return TaxonomyNodeUtils.getAllReachable(node,
+				new Operations.Functor<GenericTypeNode<T, I, TN, IN>, Set<? extends GenericTypeNode<T, I, TN, IN>>>() {
+					@Override
+					public Set<? extends TN> apply(final GenericTypeNode<T, I, TN, IN> node) {
+						return node.getDirectSubNodes();
+					}
+				},
+				new Operations.Functor<GenericTypeNode<T, I, TN, IN>, Set<? extends IN>>() {
+					@Override
+					public Set<? extends IN> apply(final GenericTypeNode<T, I, TN, IN> node) {
+						return node.getDirectInstanceNodes();
+					}
+				});
 	}
 	
-	public static <T extends ElkEntity, I extends ElkEntity>
-			Set<? extends TypeNode<T, I>> getAllSubNodes(final TypeNode<T, I> tnode) {
-		return getAllReachable(tnode.getDirectSubNodes(), new GetSuccessors<TypeNode<T, I>> () {
-
-			@Override
-			public Set<? extends TypeNode<T, I>> get(final TypeNode<T, I> node) {
-				return node.getDirectSubNodes();
-			}});
-	}
-
 }

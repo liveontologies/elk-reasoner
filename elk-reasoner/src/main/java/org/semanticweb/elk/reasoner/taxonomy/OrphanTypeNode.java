@@ -1,4 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy;
 /*
  * #%L
  * ELK Reasoner
@@ -20,12 +19,13 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collections;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 
@@ -44,10 +44,13 @@ public class OrphanTypeNode<T extends ElkEntity, I extends ElkEntity>
 
 	final Set<OrphanInstanceNode<T, I>> instanceNodes;
 
-	public OrphanTypeNode(Set<T> types, T canonicalType,
-			int estimatedInstanceNodes,
-			ComparatorKeyProvider<ElkEntity> typeKeyProvider) {
-		super(types, canonicalType, typeKeyProvider);
+	public OrphanTypeNode(
+			final Iterable<? extends T> members,
+			final int size,
+			final T canonical,
+			final Taxonomy<T> taxonomy,
+			final int estimatedInstanceNodes) {
+		super(members, size, canonical, taxonomy);
 		this.instanceNodes = new ArrayHashSet<OrphanInstanceNode<T, I>>(
 				estimatedInstanceNodes);
 	}

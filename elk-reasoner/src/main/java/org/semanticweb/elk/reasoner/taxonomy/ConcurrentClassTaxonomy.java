@@ -65,8 +65,8 @@ public class ConcurrentClassTaxonomy
 							@Override
 							public NonBottomGenericTaxonomyNode.Projection<ElkClass> createNode(
 									final Iterable<? extends ElkClass> members, final int size,
-									final ComparatorKeyProvider<? super ElkClass> keyProvider) {
-								return new NonBottomGenericTaxonomyNode.Projection<ElkClass>(taxonomy_, members, size);
+									final AbstractDistinctBottomTaxonomy<ElkClass, GenericTaxonomyNode.Projection<ElkClass>, NonBottomGenericTaxonomyNode.Projection<ElkClass>> taxonomy) {
+								return new NonBottomGenericTaxonomyNode.Projection<ElkClass>(taxonomy, members, size);
 							}
 						};
 					}

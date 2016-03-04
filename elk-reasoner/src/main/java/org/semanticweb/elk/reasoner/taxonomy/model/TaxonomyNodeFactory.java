@@ -19,30 +19,16 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.taxonomy;
+package org.semanticweb.elk.reasoner.taxonomy.model;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
-import org.semanticweb.elk.reasoner.taxonomy.model.Node;
-import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
-import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 
-public abstract class InternalNodeFactory<
+public interface TaxonomyNodeFactory<
 				T extends ElkEntity,
 				N extends Node<T>,
 				Tax
-		> implements NodeFactory<T, N>, TaxonomyNodeFactory<T, N, Tax> {
+		> {
 
-	private final Tax taxonomy_;
-	
-	public InternalNodeFactory(final Tax taxonomy) {
-		this.taxonomy_ = taxonomy;
-	}
-	
-	@Override
-	public final N createNode(final Iterable<? extends T> members, final int size,
-			final ComparatorKeyProvider<? super T> keyProvider) {
-		return createNode(members, size, taxonomy_);
-	}// TODO: simplify all the node factories !!!
+	N createNode(Iterable<? extends T> members, int size, Tax taxonomy);
 	
 }

@@ -1,4 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy.model;
 /*
  * #%L
  * ELK Reasoner
@@ -20,6 +19,7 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy.model;
 
 import java.util.Set;
 
@@ -53,7 +53,7 @@ public interface UpdateableInstanceNode<
 		>
 		extends UpdateableNode<I>, InstanceNode<T, I> {
 
-	Set<? extends UTN> getDirectNonBottomTypeNodes();// TODO: maybe this can simply override getDirectTypeNodes() ???
+	Set<? extends UTN> getDirectNonBottomTypeNodes();
 	
 	/**
 	 * Associates this node with its direct type node.

@@ -1,4 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy;
 /*
  * #%L
  * ELK Reasoner
@@ -20,13 +19,16 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 
 /**
  * A {@link Taxonomy} consisting of a single node = top node = bottom node.
@@ -45,22 +47,21 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 public class SingletoneTaxonomy<T extends ElkEntity, N extends OrphanTaxonomyNode<T>>
 		extends AbstractTaxonomy<T> {
 
+	private final ComparatorKeyProvider<? super T> keyProvider_;
+	
 	final N node;
 
-	/**
-	 * Constructs a {@link SingletoneTaxonomy} containing the given
-	 * {@link OrphanTaxonomyNode}
-	 * 
-	 * @param node
-	 */
-	public SingletoneTaxonomy(N node) {
-		this.node = node;
-		this.node.setTaxonomy(this);
+	public SingletoneTaxonomy(
+			final ComparatorKeyProvider<? super T> keyProvider,
+			final Collection<? extends T> allMembers,
+			final TaxonomyNodeFactory<T, N, Taxonomy<T>> nodeFactory) {
+		this.keyProvider_ = keyProvider;
+		this.node = nodeFactory.createNode(allMembers, allMembers.size(), this);
 	}
 
 	@Override
-	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
-		return node.getKeyProvider();
+	public ComparatorKeyProvider<? super T> getKeyProvider() {
+		return keyProvider_;
 	}
 
 	@Override

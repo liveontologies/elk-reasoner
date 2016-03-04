@@ -22,13 +22,12 @@
 package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericTypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeUtils;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -79,28 +78,7 @@ public abstract class NonBottomGenericTypeNode<
 
 	@Override
 	public Set<? extends IN> getAllInstanceNodes() {
-		// TODO: refactor TaxonomyNodeUtils
-		Set<IN> result;
-
-		if (!getDirectSubNodes().isEmpty()) {
-			result = new ArrayHashSet<IN>();
-			result.addAll(getDirectInstanceNodes());
-			Queue<TN> todo = new LinkedList<TN>(getDirectSubNodes());
-
-			while (!todo.isEmpty()) {
-				TN next = todo.poll();
-				result.addAll(next.getDirectInstanceNodes());
-
-				for (TN nextSubNode : next.getDirectSubNodes()) {
-					todo.add(nextSubNode);
-				}
-			}
-
-			return Collections.unmodifiableSet(result);
-
-		}
-		// else
-		return Collections.unmodifiableSet(getDirectInstanceNodes());
+		return TaxonomyNodeUtils.getAllInstanceNodes(this);
 	}
 
 	protected abstract Set<? extends IN> toInstanceNodes(Set<? extends UIN> nodes);

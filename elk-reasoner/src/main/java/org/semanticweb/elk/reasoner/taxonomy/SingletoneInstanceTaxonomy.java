@@ -1,4 +1,27 @@
+/*
+ * #%L
+ * ELK Reasoner
+ * $Id:$
+ * $HeadURL:$
+ * %%
+ * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
 package org.semanticweb.elk.reasoner.taxonomy;
+
+import java.util.Collection;
 
 /*
  * #%L
@@ -32,6 +55,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 
@@ -55,11 +79,14 @@ public class SingletoneInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity
 
 	final Map<Object, InstanceNode<T, I>> instanceNodeLookup;
 	/** provides keys that are used for hashing instead of the elkIndividuals */
-	private final ComparatorKeyProvider<ElkEntity> individualKeyProvider_;
+	private final ComparatorKeyProvider<? super I> individualKeyProvider_;
 
-	public SingletoneInstanceTaxonomy(N node,
-			final ComparatorKeyProvider<ElkEntity> individualKeyProvider) {
-		super(node);
+	public SingletoneInstanceTaxonomy(
+			final ComparatorKeyProvider<? super T> keyProvider,
+			final Collection<? extends T> allMembers,
+			final TaxonomyNodeFactory<T, N, Taxonomy<T>> nodeFactory,
+			final ComparatorKeyProvider<? super I> individualKeyProvider) {
+		super(keyProvider, allMembers, nodeFactory);
 		this.individualKeyProvider_ = individualKeyProvider;
 		this.instanceNodeLookup = new ArrayHashMap<Object, InstanceNode<T, I>>(
 				node.getAllInstanceNodes().size());
@@ -72,7 +99,7 @@ public class SingletoneInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity
 	}
 
 	@Override
-	public ComparatorKeyProvider<ElkEntity> getInstanceKeyProvider() {
+	public ComparatorKeyProvider<? super I> getInstanceKeyProvider() {
 		return individualKeyProvider_;
 	}
 

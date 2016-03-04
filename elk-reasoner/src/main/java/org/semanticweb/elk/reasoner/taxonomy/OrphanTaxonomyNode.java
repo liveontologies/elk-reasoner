@@ -1,4 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy;
 /*
  * #%L
  * ELK Reasoner
@@ -20,6 +19,7 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collections;
 import java.util.Set;
@@ -46,20 +46,25 @@ public class OrphanTaxonomyNode<T extends ElkEntity> extends OrphanNode<T>
 	/**
 	 * the taxonomy this node belongs to
 	 */
-	private Taxonomy<T> taxonomy_;
+	private final Taxonomy<T> taxonomy_;
 
-	public OrphanTaxonomyNode(Set<T> members, T canonical,
-			ComparatorKeyProvider<ElkEntity> keyProvider) {
-		super(members, canonical, keyProvider);
-	}
-
-	void setTaxonomy(final Taxonomy<T> taxonomy) {// TODO: this node should be created in the constructor of SingletoneTaxonomy
+	public OrphanTaxonomyNode(
+			final Iterable<? extends T> members,
+			final int size,
+			final T canonical,
+			final Taxonomy<T> taxonomy) {
+		super(members, size, canonical, taxonomy.getKeyProvider());
 		this.taxonomy_ = taxonomy;
 	}
 	
 	@Override
 	public Taxonomy<T> getTaxonomy() {
 		return taxonomy_;
+	}
+
+	@Override
+	public ComparatorKeyProvider<? super T> getKeyProvider() {
+		return taxonomy_.getKeyProvider();
 	}
 
 	@Override

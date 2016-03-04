@@ -29,7 +29,6 @@ import org.semanticweb.elk.reasoner.taxonomy.model.GenericInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 
 public class BottomGenericTypeNode<
 				T extends ElkEntity,
@@ -57,7 +56,7 @@ public class BottomGenericTypeNode<
 		return Collections.emptySet();
 	}
 
-	public static class Projection<T extends ElkEntity, I extends ElkEntity, Tax extends UpdateableInstanceTaxonomy<T, I>>
+	public static class Projection<T extends ElkEntity, I extends ElkEntity>
 			extends BottomGenericTypeNode<
 					T,
 					I,

@@ -31,7 +31,6 @@ import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 
 public class IndividualTaxonomy
 		extends AbstractUpdateableGenericInstanceTaxonomy<
@@ -58,8 +57,8 @@ public class IndividualTaxonomy
 							@Override
 							public NonBottomGenericTypeNode.Projection<ElkClass, ElkNamedIndividual> createNode(
 									final Iterable<? extends ElkClass> members, final int size,
-									final ComparatorKeyProvider<? super ElkClass> keyProvider) {
-								return new NonBottomGenericTypeNode.Projection<ElkClass, ElkNamedIndividual>(taxonomy_, members, size);
+									final AbstractDistinctBottomTaxonomy<ElkClass, GenericTypeNode.Projection<ElkClass, ElkNamedIndividual>, NonBottomGenericTypeNode.Projection<ElkClass, ElkNamedIndividual>> taxonomy) {
+								return new NonBottomGenericTypeNode.Projection<ElkClass, ElkNamedIndividual>(taxonomy, members, size);
 							}
 						};
 					}
@@ -73,14 +72,14 @@ public class IndividualTaxonomy
 							@Override
 							public IndividualNode.Projection2<ElkClass, ElkNamedIndividual> createNode(
 									final Iterable<? extends ElkNamedIndividual> members, final int size,
-									final ComparatorKeyProvider<? super ElkNamedIndividual> keyProvider) {
-								return new IndividualNode.Projection2<ElkClass, ElkNamedIndividual>(taxonomy_, members, size);
+									final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy) {
+								return new IndividualNode.Projection2<ElkClass, ElkNamedIndividual>(taxonomy, members, size);
 							}
 						};
 					}
 				},
 				PredefinedElkClass.OWL_THING);
-		this.bottomNode_ = new BottomGenericTypeNode.Projection<ElkClass, ElkNamedIndividual, UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual>>(this, PredefinedElkClass.OWL_NOTHING);
+		this.bottomNode_ = new BottomGenericTypeNode.Projection<ElkClass, ElkNamedIndividual>(this, PredefinedElkClass.OWL_NOTHING);
 	}
 
 	@Override

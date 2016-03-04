@@ -26,8 +26,6 @@
 package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -38,6 +36,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.GenericTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.SimpleUpdateableNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeUtils;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -114,24 +113,7 @@ public abstract class IndividualNode<
 
 	@Override
 	public Set<? extends TN> getAllTypeNodes() {
-		// TODO: refactor TaxonomyNodeUtils
-		Set<TN> result = new ArrayHashSet<TN>(
-				directTypeNodes_.size());
-
-		Queue<TN> todo = new LinkedList<TN>();
-
-		todo.addAll(getDirectTypeNodes());
-
-		while (!todo.isEmpty()) {
-			TN next = todo.poll();
-
-			if (result.add(next)) {
-				for (TN nextSuperNode : next.getDirectSuperNodes())
-					todo.add(nextSuperNode);
-			}
-		}
-
-		return Collections.unmodifiableSet(result);
+		return TaxonomyNodeUtils.getAllSuperNodes(getDirectTypeNodes());
 	}
 
 	@Override
