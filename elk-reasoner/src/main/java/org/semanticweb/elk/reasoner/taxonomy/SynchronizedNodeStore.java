@@ -119,7 +119,7 @@ public class SynchronizedNodeStore<T, N extends UpdateableNode<T>>
 				return previous;
 			}
 		}
-		final N node = factory.createNode(members, size, keyProvider_);
+		final N node = factory.createNode(members, size);
 		final T canonicalMember = node.getCanonicalMember();
 		final N previous = nodeLookup_.put(keyProvider_.getKey(canonicalMember),
 				node);

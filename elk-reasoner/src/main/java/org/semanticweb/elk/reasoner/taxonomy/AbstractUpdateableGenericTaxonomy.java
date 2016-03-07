@@ -36,8 +36,10 @@ import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericTaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
 import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericNodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.util.collections.LazySetUnion;
@@ -55,7 +57,7 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractUpdateableGenericTaxonomy.class);
 	
-	private final InternalNodeFactoryFactory<T, UN, AbstractDistinctBottomTaxonomy<T, N, UN>> nodeFactoryFactory_;
+	private final NodeFactory<T, UN> nodeFactory_;
 
 	/** The store containing non-bottom nodes in this taxonomy. */
 	protected final UpdateableGenericNodeStore<T, UN> nodeStore_;
@@ -64,11 +66,18 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 	
 	public AbstractUpdateableGenericTaxonomy(
 			final UpdateableGenericNodeStore<T, UN> nodeStore,
-			final InternalNodeFactoryFactory<T, UN, AbstractDistinctBottomTaxonomy<T, N, UN>> internalNodeFactoryFactory,
+			final TaxonomyNodeFactory<T, UN, AbstractDistinctBottomTaxonomy<T, N, UN>> nodeFactory,
 			final T topMember) {
 		super();
 		this.nodeStore_ = nodeStore;
-		this.nodeFactoryFactory_ = internalNodeFactoryFactory;
+		this.nodeFactory_ = new NodeFactory<T, UN>() {
+			@Override
+			public UN createNode(final Iterable<? extends T> members,
+					final int size) {
+				return nodeFactory.createNode(members, size,
+						AbstractUpdateableGenericTaxonomy.this);
+			}
+		};
 		this.topMember_ = topMember;
 	}
 
@@ -116,8 +125,7 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 	
 	@Override
 	public UN getCreateNode(final Collection<? extends T> members) {
-		return nodeStore_.getCreateNode(members, members.size(),
-				nodeFactoryFactory_.createInternalNodeFactory(this));
+		return nodeStore_.getCreateNode(members, members.size(), nodeFactory_);
 	};
 
 	@Override

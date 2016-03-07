@@ -34,6 +34,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.GenericTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericNodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyTypeNode;
@@ -59,13 +60,20 @@ public abstract class AbstractUpdateableGenericInstanceTaxonomy<
 
 	public AbstractUpdateableGenericInstanceTaxonomy(
 			final UpdateableGenericNodeStore<T, UTN> typeNodeStore,
-			final InternalNodeFactoryFactory<T, UTN, AbstractDistinctBottomTaxonomy<T, TN, UTN>> typeNodeFactoryFactory,
+			final TaxonomyNodeFactory<T, UTN, AbstractDistinctBottomTaxonomy<T, TN, UTN>> typeNodeFactory,
 			final UpdateableGenericNodeStore<I, UIN> instanceNodeStore,
-			final InternalNodeFactoryFactory<I, UIN, InstanceTaxonomy<T, I>> instanceNodeFactoryFactory,
+			final TaxonomyNodeFactory<I, UIN, InstanceTaxonomy<T, I>> instanceNodeFactoryFactory,
 			final T topMember) {
-		super(typeNodeStore, typeNodeFactoryFactory, topMember);
+		super(typeNodeStore, typeNodeFactory, topMember);
 		this.instanceNodeStore_ = instanceNodeStore;
-		this.instanceNodeFactory_ = instanceNodeFactoryFactory.createInternalNodeFactory(this);
+		this.instanceNodeFactory_ = new NodeFactory<I, UIN>() {
+			@Override
+			public UIN createNode(final Iterable<? extends I> members,
+					final int size) {
+				return instanceNodeFactoryFactory.createNode(members, size,
+						AbstractUpdateableGenericInstanceTaxonomy.this);
+			}
+		};
 	}
 
 	@Override
@@ -104,7 +112,8 @@ public abstract class AbstractUpdateableGenericInstanceTaxonomy<
 	@Override
 	public InstanceNode<T, I> getCreateInstanceNode(
 			final Collection<? extends I> instances) {
-		return instanceNodeStore_.getCreateNode(instances, instances.size(), instanceNodeFactory_);
+		return instanceNodeStore_.getCreateNode(instances, instances.size(),
+				instanceNodeFactory_);
 	}
 
 	@Override

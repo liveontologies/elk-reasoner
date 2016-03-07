@@ -389,11 +389,6 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 									taxonomy);
 						}
 					});
-//			
-//			OrphanTaxonomyNode<ElkClass> node = new OrphanTaxonomyNode<ElkClass>(
-//					getAllClasses(), PredefinedElkClass.OWL_NOTHING, ElkClassKeyProvider.INSTANCE);
-//			result = new SingletoneTaxonomy<ElkClass, OrphanTaxonomyNode<ElkClass>>(
-//					node);// FIXME: Remove this !!!
 		}
 
 		return result;

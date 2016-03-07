@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy.model;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,10 +19,10 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy.model;
 
 public interface NodeFactory<T, N extends Node<T>> {
 
-	N createNode(Iterable<? extends T> members, int size,
-			ComparatorKeyProvider<? super T> keyProvider);
+	N createNode(Iterable<? extends T> members, int size);
 	
 }

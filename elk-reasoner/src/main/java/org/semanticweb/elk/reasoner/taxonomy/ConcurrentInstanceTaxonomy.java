@@ -166,10 +166,9 @@ public class ConcurrentInstanceTaxonomy
 		@Override
 		public IndividualNode.Projection<ElkClass, ElkNamedIndividual> createNode(
 				final Iterable<? extends ElkNamedIndividual> members,
-				final int size,
-				final ComparatorKeyProvider<? super ElkNamedIndividual> keyProvider) {
-			return new IndividualNode.Projection<ElkClass, ElkNamedIndividual>(ConcurrentInstanceTaxonomy.this, members,
-					size);
+				final int size) {
+			return new IndividualNode.Projection<ElkClass, ElkNamedIndividual>(
+					ConcurrentInstanceTaxonomy.this, members, size);
 		}
 
 	};
