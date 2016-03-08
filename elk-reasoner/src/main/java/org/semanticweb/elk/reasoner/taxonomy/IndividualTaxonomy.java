@@ -27,6 +27,12 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.reasoner.taxonomy.impl.AbstractDistinctBottomTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.impl.AbstractUpdateableGenericInstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.impl.BottomGenericTypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.impl.ConcurrentNodeStore;
+import org.semanticweb.elk.reasoner.taxonomy.impl.IndividualNode;
+import org.semanticweb.elk.reasoner.taxonomy.impl.NonBottomGenericTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericTypeNode;
@@ -77,7 +83,7 @@ public class IndividualTaxonomy
 	}
 
 	@Override
-	Set<? extends GenericTypeNode.Projection<ElkClass, ElkNamedIndividual>> toTaxonomyNodes(
+	protected Set<? extends GenericTypeNode.Projection<ElkClass, ElkNamedIndividual>> toTaxonomyNodes(
 			final Set<? extends NonBottomGenericTypeNode.Projection<ElkClass, ElkNamedIndividual>> nodes) {
 		return nodes;
 	}

@@ -19,11 +19,14 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.taxonomy.model;
+package org.semanticweb.elk.reasoner.taxonomy.impl;
 
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.reasoner.taxonomy.model.GenericInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.GenericTypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 
 /**
  * Updateable generic instance node that can be associated with

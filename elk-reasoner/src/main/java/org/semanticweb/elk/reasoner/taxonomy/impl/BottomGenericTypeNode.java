@@ -19,7 +19,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.taxonomy;
+package org.semanticweb.elk.reasoner.taxonomy.impl;
 
 import java.util.Collections;
 import java.util.Set;
@@ -27,8 +27,6 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericTypeNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyTypeNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
 
 public class BottomGenericTypeNode<
 				T extends ElkEntity,

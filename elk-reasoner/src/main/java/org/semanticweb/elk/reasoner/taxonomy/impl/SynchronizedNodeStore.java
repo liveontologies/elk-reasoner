@@ -19,22 +19,19 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.taxonomy;
+package org.semanticweb.elk.reasoner.taxonomy.impl;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableNodeStore;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableNode;
+import org.semanticweb.elk.util.collections.ArrayHashMap;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 /**
- * An updateable generic node store providing some concurrency guarantees.
- * 
- * TODO: documentation
+ * An updateable generic node store whose methods are synchronized.
  * 
  * @author Peter Skocovsky
  *
@@ -43,7 +40,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableNode;
  * @param <N>
  *            The type of nodes in this store.
  */
-public class ConcurrentNodeStore<T, N extends UpdateableNode<T>>
+public class SynchronizedNodeStore<T, N extends UpdateableNode<T>>
 		implements UpdateableNodeStore<T, N> {
 
 	/**
@@ -53,11 +50,26 @@ public class ConcurrentNodeStore<T, N extends UpdateableNode<T>>
 	/**
 	 * The map from the member keys to the nodes containing the members.
 	 */
-	private final ConcurrentMap<Object, N> nodeLookup_;
+	private final Map<Object, N> nodeLookup_;
 	/**
 	 * The set of all nodes.
 	 */
 	private final Set<N> allNodes_;
+
+	/**
+	 * Creates the node store with the provided initial capacity.
+	 * 
+	 * @param capacity
+	 *            The initial capacity.
+	 * @param keyProvider
+	 *            The key provider for members of the nodes in this node store.
+	 */
+	public SynchronizedNodeStore(final int capacity,
+			final ComparatorKeyProvider<? super T> keyProvider) {
+		keyProvider_ = keyProvider;
+		nodeLookup_ = new ArrayHashMap<Object, N>(capacity);
+		allNodes_ = new ArrayHashSet<N>(capacity);
+	}
 
 	/**
 	 * Creates the node store.
@@ -65,21 +77,18 @@ public class ConcurrentNodeStore<T, N extends UpdateableNode<T>>
 	 * @param keyProvider
 	 *            The key provider for members of the nodes in this node store.
 	 */
-	public ConcurrentNodeStore(
+	public SynchronizedNodeStore(
 			final ComparatorKeyProvider<? super T> keyProvider) {
-		keyProvider_ = keyProvider;
-		nodeLookup_ = new ConcurrentHashMap<Object, N>();
-		allNodes_ = Collections
-				.newSetFromMap(new ConcurrentHashMap<N, Boolean>());
+		this(127, keyProvider);
 	}
 
 	@Override
-	public N getNode(final T member) {
+	public synchronized N getNode(final T member) {
 		return nodeLookup_.get(keyProvider_.getKey(member));
 	}
 
 	@Override
-	public Set<N> getNodes() {
+	public synchronized Set<N> getNodes() {
 		return Collections.unmodifiableSet(allNodes_);
 	}
 
@@ -89,8 +98,8 @@ public class ConcurrentNodeStore<T, N extends UpdateableNode<T>>
 	}
 
 	@Override
-	public N getCreateNode(final Iterable<? extends T> members, final int size,
-			final NodeFactory<T, N> factory) {
+	public synchronized N getCreateNode(final Iterable<? extends T> members,
+			final int size, final NodeFactory<T, N> factory) {
 		for (final T member : members) {
 			final N previous = getNode(member);
 			if (previous != null) {
@@ -109,8 +118,8 @@ public class ConcurrentNodeStore<T, N extends UpdateableNode<T>>
 		}
 		final N node = factory.createNode(members, size);
 		final T canonicalMember = node.getCanonicalMember();
-		final N previous = nodeLookup_
-				.putIfAbsent(keyProvider_.getKey(canonicalMember), node);
+		final N previous = nodeLookup_.put(keyProvider_.getKey(canonicalMember),
+				node);
 		if (previous != null) {
 			return previous;
 		}
@@ -124,7 +133,7 @@ public class ConcurrentNodeStore<T, N extends UpdateableNode<T>>
 	}
 
 	@Override
-	public boolean removeNode(final T member) {
+	public synchronized boolean removeNode(final T member) {
 
 		final N node = getNode(member);
 		if (node == null) {

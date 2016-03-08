@@ -19,7 +19,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.taxonomy;
+package org.semanticweb.elk.reasoner.taxonomy.impl;
 
 import java.util.Set;
 
@@ -30,7 +30,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 
 public abstract class AbstractDistinctBottomTaxonomy<
 				T extends ElkEntity,
@@ -55,6 +54,6 @@ public abstract class AbstractDistinctBottomTaxonomy<
 	@Override
 	public abstract Set<? extends UN> getNonBottomNodes();
 
-	abstract Set<? extends N> toTaxonomyNodes(Set<? extends UN> nodes);
+	protected abstract Set<? extends N> toTaxonomyNodes(Set<? extends UN> nodes);
 	
 }

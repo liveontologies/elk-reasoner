@@ -1,4 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy.model;
 /*
  * #%L
  * ELK Reasoner
@@ -20,6 +19,7 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy.model;
 
 import java.util.Collection;
 import java.util.Set;
@@ -27,8 +27,7 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
- * Updateable generic instance taxonomy that contains {@link UpdateableTypeNode}
- * and {@link UpdateableInstanceNode}.
+ * Updateable generic instance taxonomy.
  * 
  * @author Pavel Klinov
  *

@@ -19,17 +19,14 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.taxonomy;
+package org.semanticweb.elk.reasoner.taxonomy.impl;
 
 import java.util.Collections;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericTaxonomyNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.SimpleUpdateableNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeUtils;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 import org.slf4j.Logger;
@@ -162,7 +159,7 @@ public abstract class NonBottomGenericTaxonomyNode<
 			extends NonBottomGenericTaxonomyNode<T, GenericTaxonomyNode.Projection<T>, Projection<T>>
 			implements GenericTaxonomyNode.Projection<T> {
 
-		protected Projection(
+		public Projection(
 				final AbstractDistinctBottomTaxonomy<T, GenericTaxonomyNode.Projection<T>, NonBottomGenericTaxonomyNode.Projection<T>> taxonomy,
 				final Iterable<? extends T> members, final int size) {
 			super(taxonomy, members, size);

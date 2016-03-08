@@ -19,9 +19,11 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.taxonomy.model;
+package org.semanticweb.elk.reasoner.taxonomy.impl;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.reasoner.taxonomy.model.GenericInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.GenericTypeNode;
 
 public interface UpdateableTaxonomyTypeNode<
 				T extends ElkEntity,

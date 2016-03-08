@@ -20,9 +20,6 @@
  * limitations under the License.
  * #L%
  */
-/**
- * @author Yevgeny Kazakov, May 15, 2011
- */
 package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Set;
@@ -30,7 +27,12 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.reasoner.taxonomy.NonBottomGenericTaxonomyNode.Projection;
+import org.semanticweb.elk.reasoner.taxonomy.impl.AbstractDistinctBottomTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.impl.AbstractUpdateableGenericTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.impl.BottomGenericTaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.impl.ConcurrentNodeStore;
+import org.semanticweb.elk.reasoner.taxonomy.impl.NonBottomGenericTaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.impl.NonBottomGenericTaxonomyNode.Projection;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
@@ -78,7 +80,7 @@ public class ConcurrentClassTaxonomy
 	}
 
 	@Override
-	Set<? extends GenericTaxonomyNode.Projection<ElkClass>> toTaxonomyNodes(
+	protected Set<? extends GenericTaxonomyNode.Projection<ElkClass>> toTaxonomyNodes(
 			final Set<? extends NonBottomGenericTaxonomyNode.Projection<ElkClass>> nodes) {
 		return nodes;
 	}

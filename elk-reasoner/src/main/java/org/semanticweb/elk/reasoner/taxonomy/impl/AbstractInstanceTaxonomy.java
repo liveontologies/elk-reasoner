@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,22 +19,26 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy.impl;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyEqualator;
-import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
+import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyEqualator;
+import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
 /**
  * @author Peter Skocovsky
  *
  * @param <T>
+ * @param <I>
  */
-public abstract class AbstractTaxonomy<T extends ElkEntity> implements Taxonomy<T> {
+public abstract class AbstractInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
+		extends AbstractTaxonomy<T> implements InstanceTaxonomy<T, I> {
 	
 	@Override
 	public int hashCode() {
-		return TaxonomyHasher.hash(this);
+		return InstanceTaxonomyHasher.hash(this);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -48,10 +50,10 @@ public abstract class AbstractTaxonomy<T extends ElkEntity> implements Taxonomy<
 		}
 		
 		try {
-			return TaxonomyEqualator.equals(this, (Taxonomy<T>) obj);
+			return InstanceTaxonomyEqualator.equals(this, (Taxonomy<T>) obj);
 		} catch (ClassCastException e) {
 			return false;
 		}
 	}
-	
+
 }

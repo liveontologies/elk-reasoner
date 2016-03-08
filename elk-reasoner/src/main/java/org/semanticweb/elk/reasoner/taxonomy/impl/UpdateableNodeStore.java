@@ -19,7 +19,10 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.taxonomy.model;
+package org.semanticweb.elk.reasoner.taxonomy.impl;
+
+import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
+import org.semanticweb.elk.reasoner.taxonomy.model.NodeStore;
 
 /**
  * Generic node store that can be modified.

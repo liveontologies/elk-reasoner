@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy.model;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,10 +19,12 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy.impl;
 
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

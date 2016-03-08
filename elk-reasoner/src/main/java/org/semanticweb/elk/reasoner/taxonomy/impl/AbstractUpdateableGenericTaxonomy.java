@@ -23,7 +23,7 @@
 /**
  * @author Yevgeny Kazakov, May 15, 2011
  */
-package org.semanticweb.elk.reasoner.taxonomy;
+package org.semanticweb.elk.reasoner.taxonomy.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,8 +40,6 @@ import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
 import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableNodeStore;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.util.collections.LazySetUnion;
 
 /**

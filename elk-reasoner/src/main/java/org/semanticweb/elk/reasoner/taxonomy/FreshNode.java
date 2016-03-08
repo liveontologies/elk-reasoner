@@ -20,11 +20,13 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.taxonomy.model;
+package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Iterator;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**

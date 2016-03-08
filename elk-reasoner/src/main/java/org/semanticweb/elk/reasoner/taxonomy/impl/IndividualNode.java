@@ -23,7 +23,7 @@
 /**
  * @author Yevgeny Kazakov, May 15, 2011
  */
-package org.semanticweb.elk.reasoner.taxonomy;
+package org.semanticweb.elk.reasoner.taxonomy.impl;
 
 import java.util.Collections;
 import java.util.Set;
@@ -34,11 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.SimpleUpdateableNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeUtils;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -157,7 +153,7 @@ public abstract class IndividualNode<
 					UpdateableInstanceNode.Projection<T, I>
 			> implements UpdateableInstanceNode.Projection<T, I> {
 
-		protected Projection(final InstanceTaxonomy<T, I> taxonomy,
+		public Projection(final InstanceTaxonomy<T, I> taxonomy,
 				final Iterable<? extends I> members, final int size) {
 			super(taxonomy, members, size);
 		}
@@ -180,7 +176,7 @@ public abstract class IndividualNode<
 					Projection2<T, I>
 			> implements GenericInstanceNode.Projection<T, I> {
 
-		protected Projection2(final InstanceTaxonomy<T, I> taxonomy,
+		public Projection2(final InstanceTaxonomy<T, I> taxonomy,
 				final Iterable<? extends I> members, final int size) {
 			super(taxonomy, members, size);
 		}

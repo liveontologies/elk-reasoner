@@ -34,6 +34,13 @@ import java.util.concurrent.ConcurrentMap;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.reasoner.taxonomy.impl.AbstractInstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.impl.ConcurrentNodeStore;
+import org.semanticweb.elk.reasoner.taxonomy.impl.IndividualNode;
+import org.semanticweb.elk.reasoner.taxonomy.impl.TaxonomyNodeUtils;
+import org.semanticweb.elk.reasoner.taxonomy.impl.UpdateableInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.impl.UpdateableNodeStore;
+import org.semanticweb.elk.reasoner.taxonomy.impl.UpdateableTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericTypeNode;
@@ -43,13 +50,9 @@ import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeUtils;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableNodeStore;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.Operations.FunctorEx;
 import org.slf4j.Logger;
@@ -191,7 +194,7 @@ public class ConcurrentInstanceTaxonomy
 							+ instanceNode);
 		}
 		final IndividualNode.Projection<ElkClass, ElkNamedIndividual> node = (IndividualNode.Projection<ElkClass, ElkNamedIndividual>) instanceNode;
-		if (node.taxonomy_ != this) {
+		if (node.getTaxonomy() != this) {
 			throw new IllegalArgumentException(
 					"The sub-node must belong to this taxonomy: "
 							+ instanceNode);
@@ -225,7 +228,7 @@ public class ConcurrentInstanceTaxonomy
 							+ instanceNode);
 		}
 		final IndividualNode.Projection<ElkClass, ElkNamedIndividual> node = (IndividualNode.Projection<ElkClass, ElkNamedIndividual>) instanceNode;
-		if (node.taxonomy_ != this) {
+		if (node.getTaxonomy() != this) {
 			throw new IllegalArgumentException(
 					"The sub-node must belong to this taxonomy: "
 							+ instanceNode);
