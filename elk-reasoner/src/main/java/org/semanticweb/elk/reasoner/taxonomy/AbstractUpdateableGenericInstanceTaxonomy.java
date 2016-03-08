@@ -28,12 +28,15 @@ import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyEqualator;
+import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericNodeStore;
@@ -181,6 +184,26 @@ public abstract class AbstractUpdateableGenericInstanceTaxonomy<
 		} catch (final ClassCastException e) {
 			throw new IllegalArgumentException(
 					"The sub-node must belong to this taxonomy: " + node);
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		return InstanceTaxonomyHasher.hash(this);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean equals(final Object obj) {
+
+		if (!(obj instanceof Taxonomy<?>)) {
+			return false;
+		}
+
+		try {
+			return InstanceTaxonomyEqualator.equals(this, (Taxonomy<T>) obj);
+		} catch (ClassCastException e) {
+			return false;
 		}
 	}
 	
