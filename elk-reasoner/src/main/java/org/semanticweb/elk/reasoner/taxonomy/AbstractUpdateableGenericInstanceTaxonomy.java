@@ -39,7 +39,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericNodeStore;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableNodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
@@ -59,12 +59,12 @@ public abstract class AbstractUpdateableGenericInstanceTaxonomy<
 	private final NodeFactory<I, UIN> instanceNodeFactory_;
 	
 	/** The store containing instance nodes of this taxonomy. */
-	protected final UpdateableGenericNodeStore<I, UIN> instanceNodeStore_;
+	protected final UpdateableNodeStore<I, UIN> instanceNodeStore_;
 
 	public AbstractUpdateableGenericInstanceTaxonomy(
-			final UpdateableGenericNodeStore<T, UTN> typeNodeStore,
+			final UpdateableNodeStore<T, UTN> typeNodeStore,
 			final TaxonomyNodeFactory<T, UTN, AbstractDistinctBottomTaxonomy<T, TN, UTN>> typeNodeFactory,
-			final UpdateableGenericNodeStore<I, UIN> instanceNodeStore,
+			final UpdateableNodeStore<I, UIN> instanceNodeStore,
 			final TaxonomyNodeFactory<I, UIN, InstanceTaxonomy<T, I>> instanceNodeFactoryFactory,
 			final T topMember) {
 		super(typeNodeStore, typeNodeFactory, topMember);

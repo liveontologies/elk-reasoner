@@ -45,7 +45,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeUtils;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericNodeStore;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableNodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
@@ -80,7 +80,7 @@ public class ConcurrentInstanceTaxonomy
 	/**
 	 * The store for instance nodes of this taxonomy.
 	 */
-	private final UpdateableGenericNodeStore<ElkNamedIndividual, IndividualNode.Projection<ElkClass, ElkNamedIndividual>> individualNodeStore_;
+	private final UpdateableNodeStore<ElkNamedIndividual, IndividualNode.Projection<ElkClass, ElkNamedIndividual>> individualNodeStore_;
 
 	/**
 	 * The wrapped class taxonomy

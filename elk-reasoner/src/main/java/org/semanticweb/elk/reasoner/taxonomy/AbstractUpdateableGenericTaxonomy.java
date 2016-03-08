@@ -40,7 +40,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
 import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericNodeStore;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableNodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.util.collections.LazySetUnion;
 
@@ -60,12 +60,12 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 	private final NodeFactory<T, UN> nodeFactory_;
 
 	/** The store containing non-bottom nodes in this taxonomy. */
-	protected final UpdateableGenericNodeStore<T, UN> nodeStore_;
+	protected final UpdateableNodeStore<T, UN> nodeStore_;
 
 	protected final T topMember_;
 	
 	public AbstractUpdateableGenericTaxonomy(
-			final UpdateableGenericNodeStore<T, UN> nodeStore,
+			final UpdateableNodeStore<T, UN> nodeStore,
 			final TaxonomyNodeFactory<T, UN, AbstractDistinctBottomTaxonomy<T, N, UN>> nodeFactory,
 			final T topMember) {
 		super();

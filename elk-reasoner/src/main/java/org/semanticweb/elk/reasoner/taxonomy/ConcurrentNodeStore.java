@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collections;
 import java.util.Set;
@@ -29,7 +28,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericNodeStore;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableNodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableNode;
 
 /**
@@ -45,7 +44,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableNode;
  *            The type of nodes in this store.
  */
 public class ConcurrentNodeStore<T, N extends UpdateableNode<T>>
-		implements UpdateableGenericNodeStore<T, N> {
+		implements UpdateableNodeStore<T, N> {
 
 	/**
 	 * The key provider for members of the nodes in this node store.

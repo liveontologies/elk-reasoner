@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy.model;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy.model;
 
 /**
  * Generic node store that can be modified.
@@ -32,8 +31,8 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * @param <N>
  *            The type of nodes in this store.
  */
-public interface UpdateableGenericNodeStore<T, N extends UpdateableNode<T>>
-		extends GenericNodeStore<T, N> {
+public interface UpdateableNodeStore<T, N extends UpdateableNode<T>>
+		extends NodeStore<T, N> {
 
 	/**
 	 * Returns the node that contains the members provided in arguments. If such

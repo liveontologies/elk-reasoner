@@ -30,9 +30,9 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
- * A hierarchy of certain ElkEntities.
- * For each such entity, the taxonomy holds a {@link TaxonomyNode} object
- * from which direct sub- and super- nodes can be retrieved.
+ * A hierarchy of certain ElkEntities. For each such entity, the taxonomy holds
+ * a {@link TaxonomyNode} object from which direct sub- and super- nodes can be
+ * retrieved.
  * 
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
@@ -41,7 +41,8 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  * @param <T>
  *            the type of objects stored in this taxonomy
  */
-public interface Taxonomy<T extends ElkEntity> extends NodeStore<T> {
+public interface Taxonomy<T extends ElkEntity>
+		extends NodeStore<T, TaxonomyNode<T>> {
 
 	@Override
 	public TaxonomyNode<T> getNode(T elkEntity);

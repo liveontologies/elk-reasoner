@@ -37,8 +37,10 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  *
  * @param <T>
  *            The type of members of nodes in this store.
+ * @param <N>
+ *            The type of nodes in this store.
  */
-public interface NodeStore<T> {
+public interface NodeStore<T, N extends Node<T>> {
 
 	/**
 	 * Returns the {@link ComparatorKeyProvider} that provides a key for each
@@ -60,13 +62,13 @@ public interface NodeStore<T> {
 	 * @return the {@link TaxonomyNode} for the specified input
 	 *         {@link ElkEntity}
 	 */
-	public Node<T> getNode(T member);
+	public N getNode(T member);
 
 	/**
 	 * Obtain an unmodifiable Set of all nodes in this taxonomy.
 	 * 
 	 * @return an unmodifiable Collection
 	 */
-	public Set<? extends Node<T>> getNodes();
+	public Set<? extends N> getNodes();
 
 }
