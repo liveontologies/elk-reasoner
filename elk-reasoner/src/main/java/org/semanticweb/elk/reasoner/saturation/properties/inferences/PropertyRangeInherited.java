@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
  * {@link SubPropertyChain} and {@link IndexedObjectPropertyRangeAxiom}:<br>
  * 
  * <pre>
- *     (1)      (2)
+ *   (1)       (2)
  *  R ⊑ S  [Range(S,D)]
  * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
  *      Range(R,D)

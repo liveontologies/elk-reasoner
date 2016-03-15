@@ -40,9 +40,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
  * {@link IndexedObjectSomeValuesFrom}, and a {@link SubPropertyChain}:<br>
  * 
  * <pre>
- *   (1)       (2)        (3)
- *  ![C:R]  [C] ⊑ +∃S.D  R ⊑ S
- * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *    (1)      (2)     (3)
+ *  ![C:R]  [C] ⊑ +D  R ⊑ S
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
  *       ∃[R].[C] ⊑ ∃S.D
  * </pre>
  * 
@@ -50,7 +50,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
  * 
  * C = {@link #getOrigin()} = {@link #getDestination()} <br>
  * R = {@link #getSubDestination()}<br>
- * ∃R.D = {@link #getConclusionCarry()} (from which R and D can be obtained)<br>
+ * ∃S.D = {@link #getConclusionCarry()} (from which S and D can be obtained)<br>
  * 
  * @author Pavel Klinov
  * 

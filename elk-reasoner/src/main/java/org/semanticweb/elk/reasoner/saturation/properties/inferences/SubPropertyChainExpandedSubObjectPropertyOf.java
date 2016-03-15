@@ -45,8 +45,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
  * The parameters can be obtained as follows:<br>
  * 
  * P = {@link #getSubChain()}<br>
- * R = {@link #getPremiseSuperChain()}<br>
- * S = {@link #getConclusionSuperChain()}<br>
+ * R = {@link #getPremiseSuperProperty()}<br>
+ * S = {@link #getConclusionSuperProperty()}<br>
  * 
  * @author Pavel Klinov
  *
@@ -76,11 +76,11 @@ public class SubPropertyChainExpandedSubObjectPropertyOf
 		this.reason_ = reason;
 	}
 
-	public IndexedObjectProperty getPremiseSuperChain() {
+	public IndexedObjectProperty getPremiseSuperProperty() {
 		return middleChain_;
 	}
 
-	public IndexedObjectProperty getConclusionSuperChain() {
+	public IndexedObjectProperty getConclusionSuperProperty() {
 		return (IndexedObjectProperty) getSuperChain();
 	}
 

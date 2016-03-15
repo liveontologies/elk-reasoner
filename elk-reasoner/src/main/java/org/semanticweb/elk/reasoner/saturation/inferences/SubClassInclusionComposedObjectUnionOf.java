@@ -35,15 +35,15 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * {@link IndexedObjectUnionOf} from a {@link SubClassInclusionComposed}:<br>
  * 
  * <pre>
- *  [C] ⊑ +D
- * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ E = (..⊔ D ⊔..)
- *  [C] ⊑ +E
+ *      [C] ⊑ +D
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ 
+ *  [C] ⊑ +(..⊔ D ⊔..)
  * </pre>
  * 
  * The parameters can be obtained as follows:<br>
  * 
  * C = {@link #getOrigin()} = {@link #getDestination()}<br>
- * E = {@link #getConclusionSubsumer()}<br>
+ * (..⊔ D ⊔..) = {@link #getConclusionSubsumer()}<br>
  * D = {@link #getPosition()} gives the position of D in
  * {@link IndexedObjectUnionOf#getDisjuncts()} for E<br>
  * 
