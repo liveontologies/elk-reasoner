@@ -59,9 +59,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class taxonomy that is suitable for concurrent processing. Taxonomy objects
- * are only constructed for consistent ontologies, and some consequences of this
- * are hardcoded here.
+ * Instance taxonomy that is suitable for concurrent processing. Taxonomy
+ * objects are only constructed for consistent ontologies, and some consequences
+ * of this are hardcoded here.
  * <p>
  * This class wraps an instance of {@link UpdateableTaxonomy} and lazily
  * generates wrappers for its nodes to store direct instances.
@@ -134,7 +134,8 @@ public class ConcurrentInstanceTaxonomy
 	 * @return instance node object for elkClass, possibly still incomplete
 	 */
 	@Override
-	public IndividualNode.Projection<ElkClass, ElkNamedIndividual> getInstanceNode(final ElkNamedIndividual individual) {
+	public IndividualNode.Projection<ElkClass, ElkNamedIndividual> getInstanceNode(
+			final ElkNamedIndividual individual) {
 		return individualNodeStore_.getNode(individual);
 	}
 
@@ -402,6 +403,13 @@ public class ConcurrentInstanceTaxonomy
 
 	};
 
+	/**
+	 * 
+	 * @author Pavel Klinov
+	 * 
+	 *         pavel.klinov@uni-ulm.de
+	 * @author Peter Skocovsky
+	 */
 	private abstract class TypeNodeWrapper implements
 			GenericTypeNode.Projection<ElkClass, ElkNamedIndividual> {
 
@@ -485,8 +493,8 @@ public class ConcurrentInstanceTaxonomy
 	 *         pavel.klinov@uni-ulm.de
 	 * @author Peter Skocovsky
 	 */
-	private class UpdateableTypeNodeWrapper extends TypeNodeWrapper
-			implements UpdateableTypeNode.Projection<ElkClass, ElkNamedIndividual> {
+	private class UpdateableTypeNodeWrapper extends TypeNodeWrapper implements
+			UpdateableTypeNode.Projection<ElkClass, ElkNamedIndividual> {
 
 		/**
 		 * The wrapped node.

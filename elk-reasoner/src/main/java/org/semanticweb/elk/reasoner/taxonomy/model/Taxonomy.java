@@ -51,14 +51,16 @@ public interface Taxonomy<T extends ElkEntity>
 	public Set<? extends TaxonomyNode<T>> getNodes();
 
 	/**
+	 * Returns the node of this taxonomy that has no parent nodes.
 	 * 
-	 * @return the node of this taxonomy that has no parent nodes
+	 * @return the node of this taxonomy that has no parent nodes.
 	 */
 	public TaxonomyNode<T> getTopNode();
 
 	/**
+	 * Returns the node of this taxonomy that has no child nodes.
 	 * 
-	 * @return the node of this taxonomy that has no child nodes
+	 * @return the node of this taxonomy that has no child nodes.
 	 */
 	public TaxonomyNode<T> getBottomNode();
 

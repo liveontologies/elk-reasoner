@@ -32,7 +32,6 @@ import org.semanticweb.elk.reasoner.taxonomy.impl.AbstractUpdateableGenericTaxon
 import org.semanticweb.elk.reasoner.taxonomy.impl.BottomGenericTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.impl.ConcurrentNodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.impl.NonBottomGenericTaxonomyNode;
-import org.semanticweb.elk.reasoner.taxonomy.impl.NonBottomGenericTaxonomyNode.Projection;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
@@ -60,18 +59,35 @@ public class ConcurrentClassTaxonomy
 	public ConcurrentClassTaxonomy(
 			final ComparatorKeyProvider<ElkEntity> classKeyProvider) {
 		super(
-				new ConcurrentNodeStore<ElkClass, NonBottomGenericTaxonomyNode.Projection<ElkClass>>(classKeyProvider),
-				new TaxonomyNodeFactory<ElkClass, NonBottomGenericTaxonomyNode.Projection<ElkClass>, AbstractDistinctBottomTaxonomy<ElkClass, GenericTaxonomyNode.Projection<ElkClass>, NonBottomGenericTaxonomyNode.Projection<ElkClass>>>() {
+				new ConcurrentNodeStore<
+						ElkClass,
+						NonBottomGenericTaxonomyNode.Projection<ElkClass>
+				>(classKeyProvider),
+				new TaxonomyNodeFactory<
+						ElkClass,
+						NonBottomGenericTaxonomyNode.Projection<ElkClass>,
+						AbstractDistinctBottomTaxonomy<
+								ElkClass,
+								GenericTaxonomyNode.Projection<ElkClass>,
+								NonBottomGenericTaxonomyNode.Projection<ElkClass>
+						>
+				>() {
 					@Override
-					public Projection<ElkClass> createNode(
+					public NonBottomGenericTaxonomyNode.Projection<ElkClass> createNode(
 							final Iterable<? extends ElkClass> members,
 							final int size,
-							final AbstractDistinctBottomTaxonomy<ElkClass, org.semanticweb.elk.reasoner.taxonomy.model.GenericTaxonomyNode.Projection<ElkClass>, Projection<ElkClass>> taxonomy) {
-						return new NonBottomGenericTaxonomyNode.Projection<ElkClass>(taxonomy, members, size);
+							final AbstractDistinctBottomTaxonomy<
+									ElkClass,
+									GenericTaxonomyNode.Projection<ElkClass>,
+									NonBottomGenericTaxonomyNode.Projection<ElkClass>
+							> taxonomy) {
+						return new NonBottomGenericTaxonomyNode.Projection<ElkClass>(
+								taxonomy, members, size);
 					}
 				},
 				PredefinedElkClass.OWL_THING);
-		this.bottomNode_ = new BottomGenericTaxonomyNode.Projection<ElkClass>(this, PredefinedElkClass.OWL_NOTHING);
+		this.bottomNode_ = new BottomGenericTaxonomyNode.Projection<ElkClass>(
+				this, PredefinedElkClass.OWL_NOTHING);
 	}
 
 	@Override

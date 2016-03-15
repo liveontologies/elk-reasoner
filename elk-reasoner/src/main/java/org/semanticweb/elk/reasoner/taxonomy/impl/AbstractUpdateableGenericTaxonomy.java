@@ -43,7 +43,16 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 import org.semanticweb.elk.util.collections.LazySetUnion;
 
 /**
+ * A generic implementation of class taxonomy.
+ * 
  * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of members of the nodes in this taxonomy.
+ * @param <N>
+ *            The immutable type of nodes in this taxonomy.
+ * @param <UN>
+ *            The mutable type of nodes in this taxonomy.
  */
 public abstract class AbstractUpdateableGenericTaxonomy<
 				T extends ElkEntity,
@@ -55,13 +64,25 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractUpdateableGenericTaxonomy.class);
 	
+	/** The factory creating the nodes of this taxonomy. */
 	private final NodeFactory<T, UN> nodeFactory_;
 
 	/** The store containing non-bottom nodes in this taxonomy. */
 	protected final UpdateableNodeStore<T, UN> nodeStore_;
 
+	/** The canonical member of the top node. */
 	protected final T topMember_;
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @param nodeStore
+	 *            Node store for the nodes of this taxonomy.
+	 * @param nodeFactory
+	 *            Factory that creates nodes of this taxonomy.
+	 * @param topMember
+	 *            The canonical member of the top node.
+	 */
 	public AbstractUpdateableGenericTaxonomy(
 			final UpdateableNodeStore<T, UN> nodeStore,
 			final TaxonomyNodeFactory<T, UN, AbstractDistinctBottomTaxonomy<T, N, UN>> nodeFactory,

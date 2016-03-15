@@ -31,6 +31,27 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A generic implementation of a mutable non-bottom type node of an
+ * {@link AbstractDistinctBottomTaxonomy}.
+ *
+ * @param <T>
+ *            The type of members of this nodes.
+ * @param <I>
+ *            The type of members of associated instance nodes.
+ * @param <TN>
+ *            The immutable type of type nodes with which this node may be
+ *            associated.
+ * @param <IN>
+ *            The immutable type of instance nodes with which this node may be
+ *            associated.
+ * @param <UTN>
+ *            The mutable type of type nodes with which this node may be
+ *            associated.
+ * @param <UIN>
+ *            The mutable type of instance nodes with which this node may be
+ *            associated.
+ */
 public abstract class NonBottomGenericTypeNode<
 				T extends ElkEntity,
 				I extends ElkEntity,
@@ -46,8 +67,19 @@ public abstract class NonBottomGenericTypeNode<
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(NonBottomGenericTypeNode.class);
 
+	/** The instance nodes associated with this node. */
 	private final Set<UIN> directInstanceNodes_;
 
+	/**
+	 * Constructs the node for the supplied equivalent members.
+	 * 
+	 * @param taxonomy
+	 *            The taxonomy to which this node belongs.
+	 * @param members
+	 *            Non-empty sequence of equivalent members.
+	 * @param size
+	 *            The number of equivalent members.
+	 */
 	public NonBottomGenericTypeNode(
 			final AbstractDistinctBottomTaxonomy<T, TN, UTN> taxonomy,
 			final Iterable<? extends T> members, final int size) {
@@ -78,8 +110,26 @@ public abstract class NonBottomGenericTypeNode<
 		return TaxonomyNodeUtils.getAllInstanceNodes(this);
 	}
 
-	protected abstract Set<? extends IN> toInstanceNodes(Set<? extends UIN> nodes);
+	/**
+	 * Returns the supplied set of mutable nodes as a set of immutable nodes.
+	 * 
+	 * @param nodes
+	 *            The set of mutable nodes that should be returned.
+	 * @return The supplied set of mutable nodes as a set of immutable nodes.
+	 */
+	protected abstract Set<? extends IN> toInstanceNodes(
+			final Set<? extends UIN> nodes);
 	
+	/**
+	 * A subclass with fixed type parameters.
+	 * 
+	 * @author Peter Skocovsky
+	 *
+	 * @param <T>
+	 *            The type of members of this nodes.
+	 * @param <I>
+	 *            The type of members of associated instance this nodes.
+	 */
 	public static class Projection<T extends ElkEntity, I extends ElkEntity>
 			extends NonBottomGenericTypeNode<
 					T,
@@ -90,16 +140,24 @@ public abstract class NonBottomGenericTypeNode<
 					IndividualNode.Projection2<T, I>
 			> implements GenericTypeNode.Projection<T, I> {
 
+		/**
+		 * Constructs the node for the supplied equivalent members.
+		 * 
+		 * @param taxonomy
+		 *            The taxonomy to which this node belongs.
+		 * @param members
+		 *            Non-empty sequence of equivalent members.
+		 * @param size
+		 *            The number of equivalent members.
+		 */
 		public Projection(
-				final AbstractDistinctBottomTaxonomy<T, GenericTypeNode.Projection<T, I>, NonBottomGenericTypeNode.Projection<T, I>> taxonomy,
+				final AbstractDistinctBottomTaxonomy<
+						T,
+						GenericTypeNode.Projection<T, I>,
+						NonBottomGenericTypeNode.Projection<T, I>
+				> taxonomy,
 				final Iterable<? extends T> members, final int size) {
 			super(taxonomy, members, size);
-		}
-
-		@Override
-		protected Set<? extends GenericTypeNode.Projection<T, I>> toTaxonomyNodes(
-				final Set<? extends NonBottomGenericTypeNode.Projection<T, I>> nodes) {
-			return nodes;
 		}
 
 		@Override

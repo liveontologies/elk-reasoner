@@ -39,7 +39,12 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  * @param <IN>
  *            The type of instance nodes with which this node may be associated.
  */
-public interface GenericTypeNode<T extends ElkEntity, I extends ElkEntity, TN extends GenericTypeNode<T, I, TN, IN>, IN extends GenericInstanceNode<T, I, TN, IN>>
+public interface GenericTypeNode<
+				T extends ElkEntity,
+				I extends ElkEntity,
+				TN extends GenericTypeNode<T, I, TN, IN>,
+				IN extends GenericInstanceNode<T, I, TN, IN>
+		>
 		extends TypeNode<T, I>, GenericTaxonomyNode<T, TN> {
 
 	@Override
@@ -61,7 +66,12 @@ public interface GenericTypeNode<T extends ElkEntity, I extends ElkEntity, TN ex
 	Set<? extends TN> getAllSubNodes();
 
 	public static interface Projection<T extends ElkEntity, I extends ElkEntity>
-			extends GenericTypeNode<T, I, Projection<T, I>, GenericInstanceNode.Projection<T, I>> {
+			extends GenericTypeNode<
+					T,
+					I,
+					Projection<T, I>,
+					GenericInstanceNode.Projection<T, I>
+			> {
 		// Empty.
 	}
 	

@@ -49,7 +49,7 @@ public class SingletoneTaxonomy<T extends ElkEntity, N extends OrphanTaxonomyNod
 		extends AbstractTaxonomy<T> {
 
 	private final ComparatorKeyProvider<? super T> keyProvider_;
-	
+
 	final N node;
 
 	public SingletoneTaxonomy(
@@ -67,10 +67,11 @@ public class SingletoneTaxonomy<T extends ElkEntity, N extends OrphanTaxonomyNod
 
 	@Override
 	public N getNode(T elkEntity) {
-		if (node.contains(elkEntity))
+		if (node.contains(elkEntity)) {
 			return node;
-		// else
-		return null;
+		} else {
+			return null;
+		}
 	}
 
 	@Override

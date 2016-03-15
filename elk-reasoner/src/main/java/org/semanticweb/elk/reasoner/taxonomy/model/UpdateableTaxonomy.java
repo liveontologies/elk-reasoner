@@ -27,7 +27,17 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
- * Updateable generic taxonomy.
+ * Updateable taxonomy. The bottom node of this taxonomy can be modified via
+ * dedicated methods {@link #addToBottomNode(ElkEntity)} and
+ * {@link #removeFromBottomNode(ElkEntity)}, whereas all other nodes must be
+ * created containing their final set of members by
+ * {@link #getCreateNode(Collection)} and they can be associated with their
+ * super-nodes by
+ * {@link #setCreateDirectSupernodes(NonBottomTaxonomyNode, Iterable)}.
+ * <p>
+ * The implementations are guaranteed to be thread-safe for concurrent additions
+ * <strong>xor</strong> concurrent deletions, but not necessarily for concurrent
+ * additions and deletions at the same time.
  * 
  * @author Pavel Klinov
  * 
@@ -37,20 +47,66 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  * @param <T>
  *            The type of members of the nodes in this taxonomy.
  */
-public interface UpdateableTaxonomy<T extends ElkEntity>
-		extends Taxonomy<T> {
+public interface UpdateableTaxonomy<T extends ElkEntity> extends Taxonomy<T> {
 
-	NonBottomTaxonomyNode<T> getNonBottomNode(T elkEntity);
+	/**
+	 * Returns a non-bottom node that contains the supplied member. If the
+	 * member is not in the taxonomy or it is only in the bottom node, returns
+	 * <code>null</code>.
+	 * 
+	 * @param member
+	 *            The member whose node should be returned.
+	 * @return a non-bottom node that contains the supplied member. If the
+	 *         member is not in the taxonomy or it is only in the bottom node,
+	 *         returns <code>null</code>.
+	 */
+	NonBottomTaxonomyNode<T> getNonBottomNode(T member);
 
+	/**
+	 * Returns all nodes in this taxonomy except the bottom node.
+	 * 
+	 * @return all nodes in this taxonomy except the bottom node.
+	 */
 	Set<? extends NonBottomTaxonomyNode<T>> getNonBottomNodes();
 
+	/**
+	 * Returns the node that contains the members provided in arguments. If such
+	 * a node is not in this taxonomy, it is created and inserted into this
+	 * taxonomy.
+	 * 
+	 * @param members
+	 *            The members of the returned node.
+	 * @return The node containing the provided members.
+	 */
 	NonBottomTaxonomyNode<T> getCreateNode(Collection<? extends T> members);
 
+	/**
+	 * Associates super-nodes containing the specified members with the supplied
+	 * node. If the super-nodes do not exist, they are created.
+	 * 
+	 * TODO: More consistent contract and concurrency!
+	 * 
+	 * @param subNode
+	 *            The node with which the super-nodes are to be associated.
+	 * @param superMemberSets
+	 *            A collection of collections that should be the members of the
+	 *            super-nodes.
+	 * @return <code>true</code> iff the job was successfully finished by the
+	 *         current thread.
+	 */
 	boolean setCreateDirectSupernodes(NonBottomTaxonomyNode<T> subNode,
 			Iterable<? extends Collection<? extends T>> superMemberSets);
 
+	/**
+	 * Removes the association between the supplied node and its super-nodes.
+	 * 
+	 * @param subNode
+	 *            The node whose association with super-nodes should be removed.
+	 * @return <code>true</code> iff the job was successfully finished by the
+	 *         current thread.
+	 */
 	boolean removeDirectSupernodes(NonBottomTaxonomyNode<T> subNode);
-	
+
 	/**
 	 * Removes the node containing the specified member from the taxonomy.
 	 * 

@@ -29,8 +29,8 @@ import org.semanticweb.elk.reasoner.taxonomy.model.GenericTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 
 /**
- * Updateable generic instance node that can be associated with
- * {@link UpdateableTypeNode} and {@link UpdateableInstanceNode}.
+ * Updateable generic instance node that can be associated with nodes of types
+ * of its instances.
  * 
  * @author Pavel Klinov
  *
@@ -38,13 +38,21 @@ import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
  * @author Peter Skocovsky
  *
  * @param <T>
- *            The type of members of this node.
+ *            The type of members of associated type nodes.
  * @param <I>
- *            The type of members of the related instance nodes.
+ *            The type of members of this nodes.
+ * @param <TN>
+ *            The immutable type of type nodes with which this node may be
+ *            associated.
+ * @param <IN>
+ *            The immutable type of instance nodes with which this node may be
+ *            associated.
  * @param <UTN>
- *            The type of type nodes with which this node may be associated.
+ *            The mutable type of type nodes with which this node may be
+ *            associated.
  * @param <UIN>
- *            The type of instance nodes with which this node may be associated.
+ *            The mutable type of instance nodes with which this node may be
+ *            associated.
  */
 public interface UpdateableInstanceNode<
 				T extends ElkEntity,
@@ -56,6 +64,13 @@ public interface UpdateableInstanceNode<
 		>
 		extends UpdateableNode<I>, InstanceNode<T, I> {
 
+	/**
+	 * Returns an immutable set of all direct type nodes without the bottom
+	 * node.
+	 * 
+	 * @return an immutable set of all direct type nodes without the bottom
+	 * node.
+	 */
 	Set<? extends UTN> getDirectNonBottomTypeNodes();
 	
 	/**
@@ -74,6 +89,16 @@ public interface UpdateableInstanceNode<
 	 */
 	void removeDirectTypeNode(UTN typeNode);
 
+	/**
+	 * A subinterface with fixed type parameters.
+	 * 
+	 * @author Peter Skocovsky
+	 *
+	 * @param <T>
+	 *            The type of members of associated type nodes.
+	 * @param <I>
+	 *            The type of members of this nodes.
+	 */
 	public static interface Projection<T extends ElkEntity, I extends ElkEntity>
 			extends UpdateableInstanceNode<
 					T,

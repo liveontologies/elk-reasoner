@@ -55,7 +55,12 @@ public interface GenericInstanceNode<
 	public Set<? extends TN> getAllTypeNodes();
 
 	public static interface Projection<T extends ElkEntity, I extends ElkEntity>
-			extends GenericInstanceNode<T, I, GenericTypeNode.Projection<T, I>, Projection<T, I>> {
+			extends GenericInstanceNode<
+					T,
+					I,
+					GenericTypeNode.Projection<T, I>,
+					Projection<T, I>
+			> {
 		// Empty.
 	}
 	

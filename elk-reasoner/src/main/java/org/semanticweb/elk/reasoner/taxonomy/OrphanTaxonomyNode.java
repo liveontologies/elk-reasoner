@@ -48,15 +48,12 @@ public class OrphanTaxonomyNode<T extends ElkEntity> extends OrphanNode<T>
 	 */
 	private final Taxonomy<T> taxonomy_;
 
-	public OrphanTaxonomyNode(
-			final Iterable<? extends T> members,
-			final int size,
-			final T canonical,
-			final Taxonomy<T> taxonomy) {
+	public OrphanTaxonomyNode(final Iterable<? extends T> members,
+			final int size, final T canonical, final Taxonomy<T> taxonomy) {
 		super(members, size, canonical, taxonomy.getKeyProvider());
 		this.taxonomy_ = taxonomy;
 	}
-	
+
 	@Override
 	public Taxonomy<T> getTaxonomy() {
 		return taxonomy_;

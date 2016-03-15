@@ -48,6 +48,23 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of members of associated type nodes.
+ * @param <I>
+ *            The type of members of this nodes.
+ * @param <TN>
+ *            The immutable type of type nodes with which this node may be
+ *            associated.
+ * @param <IN>
+ *            The immutable type of instance nodes with which this node may be
+ *            associated.
+ * @param <UTN>
+ *            The mutable type of type nodes with which this node may be
+ *            associated.
+ * @param <UIN>
+ *            The mutable type of instance nodes with which this node may be
+ *            associated.
  */
 public abstract class IndividualNode<
 				T extends ElkEntity,
@@ -64,6 +81,7 @@ public abstract class IndividualNode<
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IndividualNode.class);
 
+	/** The taxonomy of this node. */
 	final InstanceTaxonomy<T, I> taxonomy_;
 
 	/**
@@ -73,14 +91,14 @@ public abstract class IndividualNode<
 	private final Set<UTN> directTypeNodes_;
 
 	/**
-	 * Constructing the individual node for the set of same individuals.
+	 * Constructs the node for the supplied equivalent members.
 	 * 
 	 * @param taxonomy
 	 *            The taxonomy to which this node belongs.
 	 * @param members
-	 *            non-empty list of equivalent ElkNamedIndividual objects
+	 *            Non-empty sequence of equivalent members.
 	 * @param size
-	 *            The number of equivalent ElkNamedIndividual objects
+	 *            The number of equivalent members.
 	 */
 	protected IndividualNode(final InstanceTaxonomy<T, I> taxonomy,
 			final Iterable<? extends I> members, final int size) {
@@ -117,6 +135,13 @@ public abstract class IndividualNode<
 		return taxonomy_;
 	}
 
+	/**
+	 * Returns the supplied set of mutable nodes as a set of immutable nodes.
+	 * 
+	 * @param nodes
+	 *            The set of mutable nodes that should be returned.
+	 * @return The supplied set of mutable nodes as a set of immutable nodes.
+	 */
 	protected abstract Set<? extends TN> toTypeNodes(Set<? extends UTN> nodes);
 
 	private final int hashCode_ = HashGenerator.generateNextHashCode();
@@ -143,6 +168,17 @@ public abstract class IndividualNode<
 		return directTypeNodes_;
 	}
 
+	/**
+	 * A subclass with fixed type parameters so that this node may be associated
+	 * with {@link UpdateableTypeNode}s.
+	 * 
+	 * @author Peter Skocovsky
+	 *
+	 * @param <T>
+	 *            The type of members of associated type nodes.
+	 * @param <I>
+	 *            The type of members of this nodes.
+	 */
 	public static class Projection<T extends ElkEntity, I extends ElkEntity>
 			extends IndividualNode<
 					T,
@@ -153,6 +189,16 @@ public abstract class IndividualNode<
 					UpdateableInstanceNode.Projection<T, I>
 			> implements UpdateableInstanceNode.Projection<T, I> {
 
+		/**
+		 * Constructs the node for the supplied equivalent members.
+		 * 
+		 * @param taxonomy
+		 *            The taxonomy to which this node belongs.
+		 * @param members
+		 *            Non-empty sequence of equivalent members.
+		 * @param size
+		 *            The number of equivalent members.
+		 */
 		public Projection(final InstanceTaxonomy<T, I> taxonomy,
 				final Iterable<? extends I> members, final int size) {
 			super(taxonomy, members, size);
@@ -166,6 +212,17 @@ public abstract class IndividualNode<
 
 	}
 
+	/**
+	 * A subclass with fixed type parameters so that this node may be associated
+	 * with simple {@link NonBottomGenericTypeNode}s.
+	 * 
+	 * @author Peter Skocovsky
+	 *
+	 * @param <T>
+	 *            The type of members of associated type nodes.
+	 * @param <I>
+	 *            The type of members of this nodes.
+	 */
 	public static class Projection2<T extends ElkEntity, I extends ElkEntity>
 			extends IndividualNode<
 					T,
@@ -176,6 +233,16 @@ public abstract class IndividualNode<
 					Projection2<T, I>
 			> implements GenericInstanceNode.Projection<T, I> {
 
+		/**
+		 * Constructs the node for the supplied equivalent members.
+		 * 
+		 * @param taxonomy
+		 *            The taxonomy to which this node belongs.
+		 * @param members
+		 *            Non-empty sequence of equivalent members.
+		 * @param size
+		 *            The number of equivalent members.
+		 */
 		public Projection2(final InstanceTaxonomy<T, I> taxonomy,
 				final Iterable<? extends I> members, final int size) {
 			super(taxonomy, members, size);

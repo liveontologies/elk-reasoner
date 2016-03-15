@@ -32,6 +32,20 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A generic implementation of a mutable non-bottom node of an
+ * {@link AbstractDistinctBottomTaxonomy}.
+ * 
+ * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of members of this nodes.
+ * @param <N>
+ *            The immutable type of nodes with which this node may be
+ *            associated.
+ * @param <UN>
+ *            The mutable type of nodes with which this node may be associated.
+ */
 public abstract class NonBottomGenericTaxonomyNode<
 				T extends ElkEntity,
 				N extends GenericTaxonomyNode<T, N>,
@@ -44,6 +58,7 @@ public abstract class NonBottomGenericTaxonomyNode<
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(NonBottomGenericTaxonomyNode.class);
 
+	/** The taxonomy of this node. */
 	protected final AbstractDistinctBottomTaxonomy<T, N, UN> taxonomy_;
 	
 	/**
@@ -57,6 +72,16 @@ public abstract class NonBottomGenericTaxonomyNode<
 	 */
 	protected final Set<UN> directSubNodes_;
 	
+	/**
+	 * Constructs the node for the supplied equivalent members.
+	 * 
+	 * @param taxonomy
+	 *            The taxonomy to which this node belongs.
+	 * @param members
+	 *            Non-empty sequence of equivalent members.
+	 * @param size
+	 *            The number of equivalent members.
+	 */
 	public NonBottomGenericTaxonomyNode(
 			final AbstractDistinctBottomTaxonomy<T, N, UN> taxonomy,
 			final Iterable<? extends T> members, final int size) {
@@ -68,7 +93,8 @@ public abstract class NonBottomGenericTaxonomyNode<
 
 	@Override
 	public Set<? extends N> getDirectSuperNodes() {
-		return Collections.unmodifiableSet(toTaxonomyNodes(directSuperNodes_));
+		return Collections.unmodifiableSet(taxonomy_.toTaxonomyNodes(
+				directSuperNodes_));
 	}
 
 	@Override
@@ -84,7 +110,8 @@ public abstract class NonBottomGenericTaxonomyNode<
 	@Override
 	public Set<? extends N> getDirectSubNodes() {
 		if (!directSubNodes_.isEmpty()) {
-			return Collections.unmodifiableSet(toTaxonomyNodes(directSubNodes_));
+			return Collections.unmodifiableSet(taxonomy_.toTaxonomyNodes(
+					directSubNodes_));
 		} else {
 			return Collections.singleton(taxonomy_.getBottomNode());
 		}
@@ -117,7 +144,7 @@ public abstract class NonBottomGenericTaxonomyNode<
 		LOGGER_.trace("{}: new direct sub-node {}", this, subNode);
 
 		if (directSubNodes_.isEmpty()) {
-			taxonomy_.countNodesWithSubClasses.incrementAndGet();
+			taxonomy_.countNodesWithSubClasses_.incrementAndGet();
 		}
 
 		directSubNodes_.add(subNode);
@@ -131,7 +158,7 @@ public abstract class NonBottomGenericTaxonomyNode<
 			LOGGER_.trace("{}: removed direct sub-node {}", this, subNode);
 
 		if (directSubNodes_.isEmpty()) {
-			taxonomy_.countNodesWithSubClasses.decrementAndGet();
+			taxonomy_.countNodesWithSubClasses_.decrementAndGet();
 		}
 
 		return changed;
@@ -153,22 +180,36 @@ public abstract class NonBottomGenericTaxonomyNode<
 		return hashCode_;
 	}
 
-	protected abstract Set<? extends N> toTaxonomyNodes(Set<? extends UN> nodes);
-
+	/**
+	 * A subclass with fixed type parameters.
+	 * 
+	 * @author Peter Skocovsky
+	 *
+	 * @param <T>
+	 *            The type of members of this nodes.
+	 */
 	public static class Projection<T extends ElkEntity>
 			extends NonBottomGenericTaxonomyNode<T, GenericTaxonomyNode.Projection<T>, Projection<T>>
 			implements GenericTaxonomyNode.Projection<T> {
 
+		/**
+		 * Constructs the node for the supplied equivalent members.
+		 * 
+		 * @param taxonomy
+		 *            The taxonomy to which this node belongs.
+		 * @param members
+		 *            Non-empty sequence of equivalent members.
+		 * @param size
+		 *            The number of equivalent members.
+		 */
 		public Projection(
-				final AbstractDistinctBottomTaxonomy<T, GenericTaxonomyNode.Projection<T>, NonBottomGenericTaxonomyNode.Projection<T>> taxonomy,
+				final AbstractDistinctBottomTaxonomy<
+						T,
+						GenericTaxonomyNode.Projection<T>,
+						NonBottomGenericTaxonomyNode.Projection<T>
+				> taxonomy,
 				final Iterable<? extends T> members, final int size) {
 			super(taxonomy, members, size);
-		}
-
-		@Override
-		protected Set<? extends GenericTaxonomyNode.Projection<T>> toTaxonomyNodes(
-				final Set<? extends NonBottomGenericTaxonomyNode.Projection<T>> nodes) {
-			return nodes;
 		}
 		
 	}

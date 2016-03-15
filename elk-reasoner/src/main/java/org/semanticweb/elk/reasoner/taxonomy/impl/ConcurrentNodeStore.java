@@ -31,8 +31,8 @@ import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
 
 /**
  * An updateable generic node store providing some concurrency guarantees.
- * 
- * TODO: documentation
+ * <p>
+ * TODO: Document the concurrency guarantees
  * 
  * @author Peter Skocovsky
  *

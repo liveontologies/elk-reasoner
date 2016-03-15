@@ -36,11 +36,12 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  */
 public interface TaxonomyNode<T extends ElkEntity>
 		extends Node<T>, HasTaxonomy<T> {
+
 	/**
 	 * Get an unmodifiable set of nodes for ElkObjects that are direct
 	 * super-objects of this Node.
 	 * 
-	 * @return list of nodes for direct super-objects of this node's members
+	 * @return set of nodes for direct super-objects of this node's members
 	 */
 	public Set<? extends TaxonomyNode<T>> getDirectSuperNodes();
 
@@ -58,7 +59,7 @@ public interface TaxonomyNode<T extends ElkEntity>
 	 * Get an unmodifiable set of nodes for ElkObjects that are direct
 	 * sub-objects of this Node.
 	 * 
-	 * @return list of nodes for direct sub-objects of this node's members
+	 * @return set of nodes for direct sub-objects of this node's members
 	 */
 	public Set<? extends TaxonomyNode<T>> getDirectSubNodes();
 
@@ -71,4 +72,5 @@ public interface TaxonomyNode<T extends ElkEntity>
 	 * @return set of nodes for sub-objects of this node's members
 	 */
 	public Set<? extends TaxonomyNode<T>> getAllSubNodes();
+
 }

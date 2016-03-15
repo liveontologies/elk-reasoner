@@ -29,8 +29,11 @@ import org.semanticweb.elk.reasoner.taxonomy.model.GenericTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTypeNode;
 
 /**
- * Updateable generic type node that can be related with
- * {@link UpdateableTypeNode} and {@link UpdateableInstanceNode}.
+ * Updateable generic type node that can be related with nodes of instances
+ * of its types.
+ * <p>
+ * This is not an updateable generic taxonomy node. It cannot be associated with
+ * other type nodes.
  * 
  * @author Pavel Klinov
  * 
@@ -38,13 +41,21 @@ import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTypeNode;
  * @author Peter Skocovsky
  *
  * @param <T>
- *            The type of members of this node.
+ *            The type of members of this nodes.
  * @param <I>
- *            The type of members of the related instance nodes.
+ *            The type of members of associated instance nodes.
+ * @param <TN>
+ *            The immutable type of type nodes with which this node may be
+ *            associated.
+ * @param <IN>
+ *            The immutable type of instance nodes with which this node may be
+ *            associated.
  * @param <UTN>
- *            The type of type nodes with which this node may be associated.
+ *            The mutable type of type nodes with which this node may be
+ *            associated.
  * @param <UIN>
- *            The type of instance nodes with which this node may be associated.
+ *            The mutable type of instance nodes with which this node may be
+ *            associated.
  */
 public interface UpdateableTypeNode<
 				T extends ElkEntity,
@@ -80,6 +91,16 @@ public interface UpdateableTypeNode<
 	 */
 	void removeDirectInstanceNode(UIN instanceNode);
 
+	/**
+	 * A subinterface with fixed type parameters.
+	 * 
+	 * @author Peter Skocovsky
+	 *
+	 * @param <T>
+	 *            The type of members of this nodes.
+	 * @param <I>
+	 *            The type of members of associated instance this nodes.
+	 */
 	public static interface Projection<T extends ElkEntity, I extends ElkEntity>
 			extends UpdateableTypeNode<
 					T,

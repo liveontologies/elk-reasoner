@@ -35,8 +35,10 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  * 
  * @param <T>
+ *            the type of objects in this node
  */
 public class FreshTaxonomyNode<T extends ElkEntity> extends FreshNode<T>
 		implements TaxonomyNode<T> {
@@ -52,7 +54,7 @@ public class FreshTaxonomyNode<T extends ElkEntity> extends FreshNode<T>
 	public Taxonomy<T> getTaxonomy() {
 		return taxonomy;
 	}
-	
+
 	@Override
 	public Set<? extends TaxonomyNode<T>> getDirectSuperNodes() {
 		return Collections.singleton(taxonomy.getTopNode());

@@ -36,7 +36,10 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  * @param <N>
  *            The type of nodes with which this node can be associated.
  */
-public interface GenericTaxonomyNode<T extends ElkEntity, N extends GenericTaxonomyNode<T, N>>
+public interface GenericTaxonomyNode<
+				T extends ElkEntity,
+				N extends GenericTaxonomyNode<T, N>
+		>
 		extends TaxonomyNode<T> {
 
 	@Override

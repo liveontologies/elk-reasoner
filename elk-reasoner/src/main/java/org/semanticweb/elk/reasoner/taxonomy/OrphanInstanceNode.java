@@ -30,9 +30,10 @@ import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
 /**
- * An {@link OrphanTaxonomyNode} with one member type node
+ * An {@link OrphanNode} with one member type node
  * 
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  * 
  * @param <T>
  *            the type of objects in this node
@@ -46,10 +47,8 @@ public class OrphanInstanceNode<T extends ElkEntity, I extends ElkEntity>
 
 	private final ComparatorKeyProvider<? super I> instanceKeyProvider_;
 
-	public OrphanInstanceNode(
-			final Iterable<? extends I> members,
-			final int size,
-			final I canonical,
+	public OrphanInstanceNode(final Iterable<? extends I> members,
+			final int size, final I canonical,
 			ComparatorKeyProvider<? super I> instanceKeyProvider,
 			final OrphanTypeNode<T, I> typeNode) {
 		super(members, size, canonical, instanceKeyProvider);

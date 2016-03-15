@@ -87,6 +87,15 @@ public class TaxonomyNodeUtils {
 		return Collections.unmodifiableSet(result);
 	}
 	
+	/**
+	 * Returns all super-nodes of a node whose direct super-nodes are
+	 * <code>direct</code>.
+	 * 
+	 * @param direct
+	 *            The direct super-nodes.
+	 * @return all super-nodes of a node whose direct super-nodes are
+	 *         <code>direct</code>.
+	 */
 	public static <T extends ElkEntity, N extends GenericTaxonomyNode<T, N>>
 			Set<? extends N> getAllSuperNodes(final Collection<? extends N> direct) {
 		return getAllReachable(direct, new Functor<N, Set<? extends N>>() {
@@ -97,6 +106,15 @@ public class TaxonomyNodeUtils {
 			}});
 	}
 	
+	/**
+	 * Returns all sub-nodes of a node whose direct sub-nodes are
+	 * <code>direct</code>.
+	 * 
+	 * @param direct
+	 *            The direct sub-nodes.
+	 * @return all sub-nodes of a node whose direct sub-nodes are
+	 *         <code>direct</code>.
+	 */
 	public static <T extends ElkEntity, N extends GenericTaxonomyNode<T, N>>
 			Set<? extends N> getAllSubNodes(final Collection<? extends N> direct) {
 		return getAllReachable(direct, new Functor<N, Set<? extends N>>() {
@@ -107,6 +125,15 @@ public class TaxonomyNodeUtils {
 			}});
 	}
 	
+	/**
+	 * Returns all instance nodes of the specified type node and all its
+	 * sub-nodes.
+	 * 
+	 * @param node
+	 *            The type node whose instances should be returned.
+	 * @return all instance nodes of the specified type node and all its
+	 *         sub-nodes.
+	 */
 	public static <T extends ElkEntity, I extends ElkEntity, TN extends GenericTypeNode<T, I, TN, IN>, IN extends GenericInstanceNode<T, I, TN, IN>>
 			Set<? extends IN> getAllInstanceNodes(final GenericTypeNode<T, I, TN, IN> node) {
 		return TaxonomyNodeUtils.getAllReachable(node,

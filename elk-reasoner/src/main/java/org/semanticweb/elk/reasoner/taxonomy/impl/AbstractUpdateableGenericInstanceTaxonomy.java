@@ -42,6 +42,25 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 import org.semanticweb.elk.util.collections.LazySetUnion;
 
+/**
+ * A generic implementation of instance taxonomy that extends an implementation
+ * of class taxonomy.
+ * 
+ * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of members of the type nodes in this taxonomy.
+ * @param <I>
+ *            The type of members of the instance nodes in this taxonomy.
+ * @param <TN>
+ *            The immutable type of type nodes in this taxonomy.
+ * @param <IN>
+ *            The immutable type of instance nodes in this taxonomy.
+ * @param <UTN>
+ *            The mutable type of type nodes in this taxonomy.
+ * @param <UIN>
+ *            The mutable type of instance nodes in this taxonomy.
+ */
 public abstract class AbstractUpdateableGenericInstanceTaxonomy<
 				T extends ElkEntity,
 				I extends ElkEntity,
@@ -53,16 +72,31 @@ public abstract class AbstractUpdateableGenericInstanceTaxonomy<
 		extends AbstractUpdateableGenericTaxonomy<T, TN, UTN>
 		implements UpdateableInstanceTaxonomy<T, I> {
 	
+	/** Factory that creates instance nodes. */
 	private final NodeFactory<I, UIN> instanceNodeFactory_;
 	
 	/** The store containing instance nodes of this taxonomy. */
 	protected final UpdateableNodeStore<I, UIN> instanceNodeStore_;
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param typeNodeStore
+	 *            Node store for the type nodes.
+	 * @param typeNodeFactory
+	 *            Factory that creates type nodes.
+	 * @param instanceNodeStore
+	 *            Node store for the instance nodes.
+	 * @param instanceNodeFactory
+	 *            Factory that creates instance nodes.
+	 * @param topMember
+	 *            The canonical member of the top node.
+	 */
 	public AbstractUpdateableGenericInstanceTaxonomy(
 			final UpdateableNodeStore<T, UTN> typeNodeStore,
 			final TaxonomyNodeFactory<T, UTN, AbstractDistinctBottomTaxonomy<T, TN, UTN>> typeNodeFactory,
 			final UpdateableNodeStore<I, UIN> instanceNodeStore,
-			final TaxonomyNodeFactory<I, UIN, InstanceTaxonomy<T, I>> instanceNodeFactoryFactory,
+			final TaxonomyNodeFactory<I, UIN, InstanceTaxonomy<T, I>> instanceNodeFactory,
 			final T topMember) {
 		super(typeNodeStore, typeNodeFactory, topMember);
 		this.instanceNodeStore_ = instanceNodeStore;
@@ -70,7 +104,7 @@ public abstract class AbstractUpdateableGenericInstanceTaxonomy<
 			@Override
 			public UIN createNode(final Iterable<? extends I> members,
 					final int size) {
-				return instanceNodeFactoryFactory.createNode(members, size,
+				return instanceNodeFactory.createNode(members, size,
 						AbstractUpdateableGenericInstanceTaxonomy.this);
 			}
 		};

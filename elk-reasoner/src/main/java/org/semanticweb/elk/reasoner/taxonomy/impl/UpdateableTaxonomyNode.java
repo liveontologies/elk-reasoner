@@ -28,8 +28,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.GenericTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTaxonomyNode;
 
 /**
- * Updateable generic taxonomy node that can be related with
- * {@link UpdateableTaxonomyNode}.
+ * Updateable generic taxonomy node that can be related with other nodes.
  * 
  * @author Pavel Klinov
  * 
@@ -37,9 +36,12 @@ import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTaxonomyNode;
  * @author Peter Skocovsky
  *
  * @param <T>
- *            The type of members of this node.
+ *            The type of members of this nodes.
+ * @param <N>
+ *            The immutable type of nodes with which this node may be
+ *            associated.
  * @param <UN>
- *            The type of nodes with which this node can be associated.
+ *            The mutable type of nodes with which this node may be associated.
  */
 public interface UpdateableTaxonomyNode<
 				T extends ElkEntity,

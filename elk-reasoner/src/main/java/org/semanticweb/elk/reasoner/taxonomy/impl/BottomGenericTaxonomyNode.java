@@ -33,6 +33,23 @@ import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.Operations.Condition;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
+/**
+ * A generic implementation of a mutable bottom node of an
+ * {@link AbstractDistinctBottomTaxonomy}.
+ * <p>
+ * This node does not store any members, the members are store in the taxonomy
+ * of this node.
+ * 
+ * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of members of this nodes.
+ * @param <N>
+ *            The immutable type of nodes with which this node may be
+ *            associated.
+ * @param <UN>
+ *            The mutable type of nodes with which this node may be associated.
+ */
 public class BottomGenericTaxonomyNode<
 				T extends ElkEntity,
 				N extends GenericTaxonomyNode<T, N>,
@@ -40,10 +57,20 @@ public class BottomGenericTaxonomyNode<
 		>
 		implements GenericTaxonomyNode<T, N> {
 
+	/** The taxonomy of this node. */
 	protected final AbstractDistinctBottomTaxonomy<T, N, UN> taxonomy_;
 
+	/** The canonical member of this node. */
 	private final T bottomMember_;
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param taxonomy
+	 *            The taxonomy of this node.
+	 * @param bottomMember
+	 *            The canonical member of this node.
+	 */
 	public BottomGenericTaxonomyNode(
 			final AbstractDistinctBottomTaxonomy<T, N, UN> taxonomy,
 			final T bottomMember) {
@@ -92,7 +119,7 @@ public class BottomGenericTaxonomyNode<
 			 * the direct super nodes of the bottom node are all nodes except
 			 * the nodes that have no non-bottom sub-classes and the bottom node
 			 */
-		}, nonBottomNodes.size() - taxonomy_.countNodesWithSubClasses.get());
+		}, nonBottomNodes.size() - taxonomy_.countNodesWithSubClasses_.get());
 	}
 
 	@Override
@@ -122,13 +149,35 @@ public class BottomGenericTaxonomyNode<
 		return hashCode_;
 	}
 
+	/**
+	 * A subclass with fixed type parameters.
+	 * 
+	 * @author Peter Skocovsky
+	 *
+	 * @param <T>
+	 *            The type of members of this nodes.
+	 */
 	public static class Projection<T extends ElkEntity>
-			extends
-			BottomGenericTaxonomyNode<T, GenericTaxonomyNode.Projection<T>, NonBottomGenericTaxonomyNode.Projection<T>>
-			implements GenericTaxonomyNode.Projection<T> {
+			extends BottomGenericTaxonomyNode<
+					T,
+					GenericTaxonomyNode.Projection<T>,
+					NonBottomGenericTaxonomyNode.Projection<T>
+			> implements GenericTaxonomyNode.Projection<T> {
 
+		/**
+		 * Constructor.
+		 * 
+		 * @param taxonomy
+		 *            The taxonomy of this node.
+		 * @param bottomMember
+		 *            The canonical member of this node.
+		 */
 		public Projection(
-				final AbstractDistinctBottomTaxonomy<T, GenericTaxonomyNode.Projection<T>, NonBottomGenericTaxonomyNode.Projection<T>> taxonomy,
+				final AbstractDistinctBottomTaxonomy<
+						T,
+						GenericTaxonomyNode.Projection<T>,
+						NonBottomGenericTaxonomyNode.Projection<T>
+				> taxonomy,
 				final T bottomMember) {
 			super(taxonomy, bottomMember);
 		}

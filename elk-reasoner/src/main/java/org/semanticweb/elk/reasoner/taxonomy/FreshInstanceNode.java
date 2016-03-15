@@ -36,6 +36,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  * 
  * @param <T>
  *            the types of objects in this node
@@ -56,7 +57,7 @@ public class FreshInstanceNode<T extends ElkEntity, I extends ElkEntity>
 	public InstanceTaxonomy<T, I> getTaxonomy() {
 		return taxonomy;
 	}
-	
+
 	@Override
 	public Set<? extends TypeNode<T, I>> getDirectTypeNodes() {
 		return Collections.singleton(taxonomy.getTopNode());
