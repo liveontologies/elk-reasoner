@@ -121,8 +121,8 @@ import org.semanticweb.elk.util.hashing.Hasher;
  * @see ElkObjectEquality
  *
  */
-public class ElkObjectHash implements ElkObjectVisitor<Integer>,
-		Hasher<ElkObject> {
+public class ElkObjectHash
+		implements ElkObjectVisitor<Integer>, Hasher<ElkObject> {
 
 	private static ElkObjectHash INSTANCE_ = new ElkObjectHash();
 
@@ -142,7 +142,7 @@ public class ElkObjectHash implements ElkObjectVisitor<Integer>,
 		return object == null ? 0 : object.accept(INSTANCE_);
 	}
 
-	private static int hashCode(List<? extends ElkObject> objects) {
+	public static int hashCode(List<? extends ElkObject> objects) {
 		return HashGenerator.combineListHash(objects, INSTANCE_);
 	}
 
@@ -180,15 +180,13 @@ public class ElkObjectHash implements ElkObjectVisitor<Integer>,
 
 	@Override
 	public Integer visit(ElkAnnotationPropertyRangeAxiom axiom) {
-		return combinedHashCode(
-				hashCode(ElkAnnotationPropertyRangeAxiom.class),
+		return combinedHashCode(hashCode(ElkAnnotationPropertyRangeAxiom.class),
 				hashCode(axiom.getProperty()), hashCode(axiom.getRange()));
 	}
 
 	@Override
 	public Integer visit(ElkSubAnnotationPropertyOfAxiom axiom) {
-		return combinedHashCode(
-				hashCode(ElkSubAnnotationPropertyOfAxiom.class),
+		return combinedHashCode(hashCode(ElkSubAnnotationPropertyOfAxiom.class),
 				hashCode(axiom.getSubAnnotationProperty()),
 				hashCode(axiom.getSuperAnnotationProperty()));
 	}
@@ -231,8 +229,7 @@ public class ElkObjectHash implements ElkObjectVisitor<Integer>,
 
 	@Override
 	public Integer visit(ElkObjectPropertyAssertionAxiom axiom) {
-		return combinedHashCode(
-				hashCode(ElkObjectPropertyAssertionAxiom.class),
+		return combinedHashCode(hashCode(ElkObjectPropertyAssertionAxiom.class),
 				hashCode(axiom.getProperty()), hashCode(axiom.getObject()),
 				hashCode(axiom.getSubject()));
 	}
@@ -364,8 +361,7 @@ public class ElkObjectHash implements ElkObjectVisitor<Integer>,
 
 	@Override
 	public Integer visit(ElkInverseObjectPropertiesAxiom axiom) {
-		return combinedHashCode(
-				hashCode(ElkInverseObjectPropertiesAxiom.class),
+		return combinedHashCode(hashCode(ElkInverseObjectPropertiesAxiom.class),
 				hashCode(axiom.getFirstObjectPropertyExpression()),
 				hashCode(axiom.getSecondObjectPropertyExpression()));
 	}
@@ -391,8 +387,7 @@ public class ElkObjectHash implements ElkObjectVisitor<Integer>,
 
 	@Override
 	public Integer visit(ElkReflexiveObjectPropertyAxiom axiom) {
-		return combinedHashCode(
-				hashCode(ElkReflexiveObjectPropertyAxiom.class),
+		return combinedHashCode(hashCode(ElkReflexiveObjectPropertyAxiom.class),
 				hashCode(axiom.getProperty()));
 	}
 
@@ -405,8 +400,7 @@ public class ElkObjectHash implements ElkObjectVisitor<Integer>,
 
 	@Override
 	public Integer visit(ElkSymmetricObjectPropertyAxiom axiom) {
-		return combinedHashCode(
-				hashCode(ElkSymmetricObjectPropertyAxiom.class),
+		return combinedHashCode(hashCode(ElkSymmetricObjectPropertyAxiom.class),
 				hashCode(axiom.getProperty()));
 	}
 

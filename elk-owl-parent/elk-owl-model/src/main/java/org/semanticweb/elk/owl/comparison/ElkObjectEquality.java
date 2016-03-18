@@ -127,11 +127,11 @@ public class ElkObjectEquality implements ElkObjectVisitor<ElkObject> {
 	}
 
 	public static boolean equals(ElkObject first, Object second) {
-		return first == null ? second == null : first
-				.accept(new ElkObjectEquality(second)) == second;
+		return first == null ? second == null
+				: first.accept(new ElkObjectEquality(second)) == second;
 	}
 
-	private static boolean equals(List<? extends ElkObject> first,
+	public static boolean equals(List<? extends ElkObject> first,
 			List<? extends ElkObject> second) {
 		Iterator<? extends ElkObject> firstIterator = first.iterator();
 		Iterator<? extends ElkObject> secondIterator = second.iterator();
@@ -159,7 +159,8 @@ public class ElkObjectEquality implements ElkObjectVisitor<ElkObject> {
 	}
 
 	@Override
-	public ElkAnnotationAssertionAxiom visit(ElkAnnotationAssertionAxiom axiom) {
+	public ElkAnnotationAssertionAxiom visit(
+			ElkAnnotationAssertionAxiom axiom) {
 		if (object_ == axiom)
 			return axiom;
 		if (object_ instanceof ElkAnnotationAssertionAxiom) {
@@ -230,7 +231,8 @@ public class ElkObjectEquality implements ElkObjectVisitor<ElkObject> {
 	}
 
 	@Override
-	public ElkDifferentIndividualsAxiom visit(ElkDifferentIndividualsAxiom axiom) {
+	public ElkDifferentIndividualsAxiom visit(
+			ElkDifferentIndividualsAxiom axiom) {
 		if (object_ == axiom)
 			return axiom;
 		if (object_ instanceof ElkDifferentIndividualsAxiom) {
@@ -590,7 +592,8 @@ public class ElkObjectEquality implements ElkObjectVisitor<ElkObject> {
 	}
 
 	@Override
-	public ElkObjectPropertyDomainAxiom visit(ElkObjectPropertyDomainAxiom axiom) {
+	public ElkObjectPropertyDomainAxiom visit(
+			ElkObjectPropertyDomainAxiom axiom) {
 		if (object_ == axiom)
 			return axiom;
 		if (object_ instanceof ElkObjectPropertyDomainAxiom) {
@@ -603,7 +606,8 @@ public class ElkObjectEquality implements ElkObjectVisitor<ElkObject> {
 	}
 
 	@Override
-	public ElkObjectPropertyRangeAxiom visit(ElkObjectPropertyRangeAxiom axiom) {
+	public ElkObjectPropertyRangeAxiom visit(
+			ElkObjectPropertyRangeAxiom axiom) {
 		if (object_ == axiom)
 			return axiom;
 		if (object_ instanceof ElkObjectPropertyRangeAxiom) {
@@ -629,7 +633,8 @@ public class ElkObjectEquality implements ElkObjectVisitor<ElkObject> {
 	}
 
 	@Override
-	public ElkSubObjectPropertyOfAxiom visit(ElkSubObjectPropertyOfAxiom axiom) {
+	public ElkSubObjectPropertyOfAxiom visit(
+			ElkSubObjectPropertyOfAxiom axiom) {
 		if (object_ == axiom)
 			return axiom;
 		if (object_ instanceof ElkSubObjectPropertyOfAxiom) {
