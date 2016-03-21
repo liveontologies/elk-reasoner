@@ -570,6 +570,20 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 * TRACING METHODS
 	 *---------------------------------------------------*/
 
+	public ClassConclusion getConclusion(ElkClassExpression sub,
+			ElkClassExpression sup) {
+		IndexedClassExpression subsumee = sub.accept(expressionConverter_);
+		IndexedClassExpression subsumer = sup.accept(expressionConverter_);
+		
+		if (!isSatisfiable(subsumee)) {
+			// the subsumee is unsatisfiable so we explain the unsatisfiability
+			return factory_.getContradiction(subsumee);
+		}
+		// else
+		return factory_.getSubClassInclusionComposed(subsumee, subsumer);
+	}
+
+	
 	private void toTrace(ClassConclusion conclusion) {
 		if (traceState.getInferences(conclusion).iterator().hasNext()) {
 			// already traced
@@ -581,18 +595,12 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		traceState.addToTrace(conclusion);
 	}
 
-	public InferenceSet explainSubsumption(ElkClassExpression sub,
-			ElkClassExpression sup) throws ElkException {
+	public InferenceSet explainConclusion(ClassConclusion conclusion) throws ElkException {
 		if (traceState == null) {
 			resetTraceState();
 		}
 
-		IndexedClassExpression subsumee = sub.accept(expressionConverter_);
-		IndexedClassExpression subsumer = sup.accept(expressionConverter_);
-
-		if (subsumee != null & subsumer != null) {
-			toTrace(convertTraceTarget(subsumee, subsumer));
-		}
+		toTrace(conclusion);
 
 		if (!traceState.getToTrace().isEmpty()) {
 			getStageExecutor().complete(stageManager.inferenceTracingStage);
@@ -629,17 +637,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		// class expressions and saturate them prior to tracing
 		return true;
 	}
-
-	private ClassConclusion convertTraceTarget(IndexedClassExpression subsumee,
-			IndexedClassExpression subsumer) {
-		if (!isSatisfiable(subsumee)) {
-			// the subsumee is unsatisfiable so we explain the unsatisfiability
-			return factory_.getContradiction(subsumee);
-		}
-		// else
-		return factory_.getSubClassInclusionComposed(subsumee, subsumer);
-	}
-
+	
 	@Deprecated
 	IndexedClassExpression transform(ElkClassExpression ce) {
 		return ce.accept(expressionConverter_);

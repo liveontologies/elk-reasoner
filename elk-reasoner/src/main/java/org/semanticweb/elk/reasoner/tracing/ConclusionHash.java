@@ -32,8 +32,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxi
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -46,12 +46,19 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 import org.semanticweb.elk.util.hashing.Hasher;
 
 public class ConclusionHash
-		implements
-			Conclusion.Visitor<Integer>,
-			Hasher<Conclusion> {
+		implements Conclusion.Visitor<Integer>, Hasher<Conclusion> {
 
 	private static final ConclusionHash INSTANCE_ = new ConclusionHash();
 
+	// forbid construction; only static methods should be used
+	private ConclusionHash() {
+
+	}
+
+	public static int hashCode(Conclusion conclusion) {
+		return conclusion == null ? 0 : conclusion.accept(INSTANCE_);
+	}
+	
 	public static Conclusion.Visitor<Integer> getHashVisitor() {
 		return INSTANCE_;
 	}
@@ -63,11 +70,7 @@ public class ConclusionHash
 	private static int hashCode(Class<?> c) {
 		return c.hashCode();
 	}
-
-	public static int hashCode(Conclusion conclusion) {
-		return conclusion == null ? 0 : conclusion.accept(INSTANCE_);
-	}
-
+	
 	private static int hashCode(ElkObject elkObject) {
 		return ElkObjectHash.hashCode(elkObject);
 	}
@@ -78,11 +81,6 @@ public class ConclusionHash
 
 	private static int hashCode(int n) {
 		return n;
-	}
-
-	// forbid construction; only static methods should be used
-	private ConclusionHash() {
-
 	}
 
 	@Override

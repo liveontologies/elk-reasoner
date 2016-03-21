@@ -44,6 +44,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkComposition;
@@ -86,9 +87,10 @@ public class PropertyInferenceTracingTest {
 		final IndexedObjectProperty r = ReasonerStateAccessor.transform(reasoner, factory.getObjectProperty(new ElkFullIri("http://example.org/R")));
 		final IndexedObjectProperty hh = ReasonerStateAccessor.transform(reasoner, factory.getObjectProperty(new ElkFullIri("http://example.org/HH")));
 		
-		reasoner.explainSubsumption(a, d);
+		ClassConclusion conclusion = reasoner.getConclusion(a, d);
+		reasoner.explainConclusion(conclusion);
 
-		TracingTestUtils.checkTracingCompleteness(a, d, reasoner);
+		TracingTestUtils.checkTracingCompleteness(conclusion, reasoner);
 		// check that the inference S -> HH has been traced and used during unwinding
 		TracingTestUtils.checkConditionOverUsedInferences(a, d, reasoner,  
 				new TracingTestUtils.DummyInferenceChecker() {
@@ -133,7 +135,7 @@ public class PropertyInferenceTracingTest {
 		final IndexedClassExpression aIndexed = ReasonerStateAccessor.transform(reasoner, a);
 		final IndexedClassExpression dIndexed = ReasonerStateAccessor.transform(reasoner, d);
 		
-		reasoner.explainSubsumption(a, e);
+		reasoner.explainConclusion(reasoner.getConclusion(a, e));
 
 		// TracingTestUtils.checkTracingCompleteness(b, e, reasoner); // b might be not traced because it is a filler
 		// checking that S o H -> SS o HH is there

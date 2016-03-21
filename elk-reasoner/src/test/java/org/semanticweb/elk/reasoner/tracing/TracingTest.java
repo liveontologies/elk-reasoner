@@ -32,7 +32,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.loading.AxiomLoader;
@@ -45,6 +44,7 @@ import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
@@ -115,10 +115,10 @@ public class TracingTest {
 				try {
 					LOGGER_.trace("Tracing test: {} => {}", subsumee, subsumer);
 					
-					reasoner.explainSubsumption(subsumee, subsumer);
-						
-					TracingTestUtils.checkTracingCompleteness(subsumee, subsumer, reasoner);
-//					TracingTestUtils.checkTracingMinimality(subsumee, subsumer, reasoner);
+					ClassConclusion conclusion = reasoner.getConclusion(subsumee, subsumer);			
+					reasoner.explainConclusion(conclusion);						
+					TracingTestUtils.checkTracingCompleteness(conclusion, reasoner);
+
 				} catch (ElkException e) {
 					throw new RuntimeException(e);
 				}

@@ -41,8 +41,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -65,132 +65,126 @@ public class ConclusionBaseFactory implements Conclusion.Factory {
 		return INSTANCE_;
 	}
 
-	@SuppressWarnings("static-method")
-	protected <C extends Conclusion> C filter(C newConclusion) {
-		// could be overridden in sub-classes
-		return newConclusion;
-	}
-
 	@Override
 	public BackwardLink getBackwardLink(IndexedContextRoot destination,
 			IndexedObjectProperty relation, IndexedContextRoot source) {
-		return filter(saturationConclusionFactory_.getBackwardLink(destination,
-				relation, source));
+		return saturationConclusionFactory_.getBackwardLink(destination,
+				relation, source);
 	}
 
 	@Override
 	public ContextInitialization getContextInitialization(
 			IndexedContextRoot root) {
-		return filter(
-				saturationConclusionFactory_.getContextInitialization(root));
+		return 
+				saturationConclusionFactory_.getContextInitialization(root);
 	}
 
 	@Override
 	public ClassInconsistency getContradiction(IndexedContextRoot destination) {
-		return filter(saturationConclusionFactory_.getContradiction(destination));
+		return saturationConclusionFactory_.getContradiction(destination);
 	}
 
 	@Override
 	public DisjointSubsumer getDisjointSubsumer(IndexedContextRoot root,
 			IndexedClassExpressionList disjointExpressions, int position,
 			ElkAxiom reason) {
-		return filter(saturationConclusionFactory_.getDisjointSubsumer(root,
-				disjointExpressions, position, reason));
+		return saturationConclusionFactory_.getDisjointSubsumer(root,
+				disjointExpressions, position, reason);
 	}
 
 	@Override
 	public ForwardLink getForwardLink(IndexedContextRoot root,
 			IndexedPropertyChain forwardChain, IndexedContextRoot target) {
-		return filter(saturationConclusionFactory_.getForwardLink(root,
-				forwardChain, target));
+		return saturationConclusionFactory_.getForwardLink(root,
+				forwardChain, target);
 	}
 
 	@Override
 	public IndexedDeclarationAxiom getIndexedDeclarationAxiom(
 			ElkAxiom originalAxiom, IndexedEntity entity) {
-		return filter(indexedAxiomFactory_
-				.getIndexedDeclarationAxiom(originalAxiom, entity));
+		return indexedAxiomFactory_
+				.getIndexedDeclarationAxiom(originalAxiom, entity);
 	}
 
 	@Override
 	public IndexedDefinitionAxiom getIndexedDefinitionAxiom(
 			ElkAxiom originalAxiom, IndexedClass definedClass,
 			IndexedClassExpression definition) {
-		return filter(indexedAxiomFactory_.getIndexedDefinitionAxiom(
-				originalAxiom, definedClass, definition));
+		return indexedAxiomFactory_.getIndexedDefinitionAxiom(
+				originalAxiom, definedClass, definition);
 	}
 
 	@Override
 	public IndexedDisjointClassesAxiom getIndexedDisjointClassesAxiom(
 			ElkAxiom originalAxiom, IndexedClassExpressionList members) {
-		return filter(indexedAxiomFactory_
-				.getIndexedDisjointClassesAxiom(originalAxiom, members));
+		return indexedAxiomFactory_
+				.getIndexedDisjointClassesAxiom(originalAxiom, members);
 	}
 
 	@Override
 	public IndexedObjectPropertyRangeAxiom getIndexedObjectPropertyRangeAxiom(
 			ElkAxiom originalAxiom, IndexedObjectProperty property,
 			IndexedClassExpression range) {
-		return filter(indexedAxiomFactory_.getIndexedObjectPropertyRangeAxiom(
-				originalAxiom, property, range));
+		return indexedAxiomFactory_.getIndexedObjectPropertyRangeAxiom(
+				originalAxiom, property, range);
 	}
 
 	@Override
 	public IndexedSubClassOfAxiom getIndexedSubClassOfAxiom(
 			ElkAxiom originalAxiom, IndexedClassExpression subClass,
 			IndexedClassExpression superClass) {
-		return filter(indexedAxiomFactory_.getIndexedSubClassOfAxiom(
-				originalAxiom, subClass, superClass));
+		return indexedAxiomFactory_.getIndexedSubClassOfAxiom(
+				originalAxiom, subClass, superClass);
 	}
 
 	@Override
 	public IndexedSubObjectPropertyOfAxiom getIndexedSubObjectPropertyOfAxiom(
 			ElkAxiom originalAxiom, IndexedPropertyChain subPropertyChain,
 			IndexedObjectProperty superProperty) {
-		return filter(indexedAxiomFactory_.getIndexedSubObjectPropertyOfAxiom(
-				originalAxiom, subPropertyChain, superProperty));
+		return indexedAxiomFactory_.getIndexedSubObjectPropertyOfAxiom(
+				originalAxiom, subPropertyChain, superProperty);
 	}
 
 	@Override
 	public Propagation getPropagation(IndexedContextRoot destination,
 			IndexedObjectProperty relation, IndexedObjectSomeValuesFrom carry) {
-		return filter(saturationConclusionFactory_.getPropagation(destination,
-				relation, carry));
+		return saturationConclusionFactory_.getPropagation(destination,
+				relation, carry);
 	}
 
 	@Override
 	public PropertyRange getPropertyRange(IndexedObjectProperty property,
 			IndexedClassExpression range) {
-		return filter(
-				saturationConclusionFactory_.getPropertyRange(property, range));
+		return 
+				saturationConclusionFactory_.getPropertyRange(property, range);
 	}
 
 	@Override
 	public SubClassInclusionComposed getSubClassInclusionComposed(
 			IndexedContextRoot destination, IndexedClassExpression subsumer) {
-		return filter(saturationConclusionFactory_
-				.getSubClassInclusionComposed(destination, subsumer));
+		return saturationConclusionFactory_
+				.getSubClassInclusionComposed(destination, subsumer);
 	}
 
 	@Override
 	public SubClassInclusionDecomposed getSubClassInclusionDecomposed(
 			IndexedContextRoot destination, IndexedClassExpression subsumer) {
-		return filter(saturationConclusionFactory_
-				.getSubClassInclusionDecomposed(destination, subsumer));
+		return saturationConclusionFactory_
+				.getSubClassInclusionDecomposed(destination, subsumer);
 	}
 
 	@Override
 	public SubContextInitialization getSubContextInitialization(
 			IndexedContextRoot root, IndexedObjectProperty subRoot) {
-		return filter(saturationConclusionFactory_
-				.getSubContextInitialization(root, subRoot));
+		return saturationConclusionFactory_
+				.getSubContextInitialization(root, subRoot);
 	}
 
 	@Override
 	public SubPropertyChain getSubPropertyChain(IndexedPropertyChain subChain,
 			IndexedPropertyChain superChain) {
-		return filter(saturationConclusionFactory_.getSubPropertyChain(subChain,
-				superChain));
+		return saturationConclusionFactory_.getSubPropertyChain(subChain,
+				superChain);
 	}
 
 }

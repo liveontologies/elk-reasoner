@@ -40,6 +40,7 @@ import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,8 +79,9 @@ public class TracingSaturationTest {
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass d = factory.getClass(new ElkFullIri("http://example.org/D"));
 
-		reasoner.explainSubsumption(a, d);
-		TracingTestUtils.checkTracingCompleteness(a, d, reasoner);
+		ClassConclusion conclusion = reasoner.getConclusion(a, d);
+		reasoner.explainConclusion(conclusion);
+		TracingTestUtils.checkTracingCompleteness(conclusion, reasoner);
 	}
 
 	@Test
@@ -88,8 +90,10 @@ public class TracingSaturationTest {
 				.loadAndClassify("classification_test_input/Inconsistent.owl");
 
 		reasoner.explainInconsistency();
-		TracingTestUtils.checkTracingCompleteness(PredefinedElkClass.OWL_THING,
-				PredefinedElkClass.OWL_NOTHING, reasoner);
+		TracingTestUtils.checkTracingCompleteness(
+				reasoner.getConclusion(PredefinedElkClass.OWL_THING,
+						PredefinedElkClass.OWL_NOTHING),
+				reasoner);
 	}
 
 	@Test
@@ -102,11 +106,14 @@ public class TracingSaturationTest {
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 		ElkClassExpression bAndC = factory.getObjectIntersectionOf(b, c);
 
-		reasoner.explainSubsumption(a, bAndC);
-		TracingTestUtils.checkNumberOfInferences(a, bAndC, reasoner, 1);
-		TracingTestUtils.checkNumberOfInferences(a, b, reasoner, 1);
-		TracingTestUtils.checkNumberOfInferences(a, c, reasoner, 1);
-		TracingTestUtils.checkTracingCompleteness(a, bAndC, reasoner);
+		ClassConclusion aSubBAndC = reasoner.getConclusion(a, bAndC);
+		ClassConclusion aSubB = reasoner.getConclusion(a, b);
+		ClassConclusion aSubC = reasoner.getConclusion(a, c);
+		reasoner.explainConclusion(aSubBAndC);
+		TracingTestUtils.checkNumberOfInferences(aSubB, reasoner, 1);
+		TracingTestUtils.checkNumberOfInferences(aSubB, reasoner, 1);
+		TracingTestUtils.checkNumberOfInferences(aSubC, reasoner, 1);
+		TracingTestUtils.checkTracingCompleteness(aSubB, reasoner);
 	}
 
 	@Test
@@ -117,22 +124,21 @@ public class TracingSaturationTest {
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
-		ElkObjectProperty r = factory.getObjectProperty(new ElkFullIri(
-				"http://example.org/R"));
+		ElkObjectProperty r = factory
+				.getObjectProperty(new ElkFullIri("http://example.org/R"));
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 		ElkClass d = factory.getClass(new ElkFullIri("http://example.org/D"));
 		ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
-		ElkClassExpression rSomeB = factory.getObjectSomeValuesFrom(r, b);
 
-		reasoner.explainSubsumption(a, d);
-		// TracingTestUtils.checkNumberOfInferences(a, rSomeB, reasoner, 1);
-		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
-		reasoner.explainSubsumption(b, c);
+		ClassConclusion aSubD = reasoner.getConclusion(a, d);
+		ClassConclusion aSubRSomeC = reasoner.getConclusion(a, rSomeC);
+		reasoner.explainConclusion(aSubD);
+		TracingTestUtils.checkNumberOfInferences(aSubRSomeC, reasoner, 1);
+		reasoner.explainConclusion(reasoner.getConclusion(b, c));
 		// now check that we didn't get a duplicate inference in A due to
 		// tracing B
-		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
-		// TracingTestUtils.checkTracingCompleteness(a, rSomeB, reasoner);
-		TracingTestUtils.checkTracingCompleteness(a, rSomeC, reasoner);
+		TracingTestUtils.checkNumberOfInferences(aSubRSomeC, reasoner, 1);
+		TracingTestUtils.checkTracingCompleteness(aSubRSomeC, reasoner);
 	}
 
 	@Test
@@ -143,33 +149,37 @@ public class TracingSaturationTest {
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
-		ElkObjectProperty r = factory.getObjectProperty(new ElkFullIri(
-				"http://example.org/R"));
+		ElkObjectProperty r = factory
+				.getObjectProperty(new ElkFullIri("http://example.org/R"));
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 		ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
 
-		reasoner.explainSubsumption(a, rSomeC);
-		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
-		TracingTestUtils.checkTracingCompleteness(a, rSomeC, reasoner);
+		ClassConclusion aSubRSomeC = reasoner.getConclusion(a, rSomeC);
+		reasoner.explainConclusion(aSubRSomeC);
+		TracingTestUtils.checkNumberOfInferences(aSubRSomeC, reasoner, 1);
+		TracingTestUtils.checkTracingCompleteness(aSubRSomeC, reasoner);
 		// B must be traced recursively
-		TracingTestUtils.checkNumberOfInferences(b, b, reasoner, 1);
+		ClassConclusion bSubB = reasoner.getConclusion(b, b);
+		TracingTestUtils.checkNumberOfInferences(bSubB, reasoner, 1);
 	}
 
 	@Test
-	public void testDuplicateInferenceOfReflexiveExistential() throws Exception {
+	public void testDuplicateInferenceOfReflexiveExistential()
+			throws Exception {
 		Reasoner reasoner = TestReasonerUtils
 				.loadAndClassify("tracing/DuplicateReflexiveExistential.owl");
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
-		ElkObjectProperty r = factory.getObjectProperty(new ElkFullIri(
-				"http://example.org/R"));
+		ElkObjectProperty r = factory
+				.getObjectProperty(new ElkFullIri("http://example.org/R"));
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 		ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
 
-		reasoner.explainSubsumption(a, rSomeC);
-		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
-		TracingTestUtils.checkTracingCompleteness(a, rSomeC, reasoner);
+		ClassConclusion aSubRSomeC = reasoner.getConclusion(a, rSomeC);
+		reasoner.explainConclusion(aSubRSomeC);
+		TracingTestUtils.checkNumberOfInferences(aSubRSomeC, reasoner, 1);
+		TracingTestUtils.checkTracingCompleteness(aSubRSomeC, reasoner);
 	}
 
 	//
@@ -181,22 +191,18 @@ public class TracingSaturationTest {
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
-		ElkObjectProperty r = factory.getObjectProperty(new ElkFullIri(
-				"http://example.org/R"));
+		ElkObjectProperty r = factory
+				.getObjectProperty(new ElkFullIri("http://example.org/R"));
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 		ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
 
-		reasoner.explainSubsumption(a, rSomeC);
-		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
-		TracingTestUtils.checkNumberOfInferences(b, c, reasoner, 1); // b might
-																		// be
-																		// not
-																		// traced
-																		// because
-																		// it is
-																		// a
-																		// filler
-		TracingTestUtils.checkTracingCompleteness(a, rSomeC, reasoner);
+		ClassConclusion aSubRSomeC = reasoner.getConclusion(a, rSomeC);
+		ClassConclusion bSubC = reasoner.getConclusion(b, c);
+		reasoner.explainConclusion(aSubRSomeC);
+		TracingTestUtils.checkNumberOfInferences(aSubRSomeC, reasoner, 1);
+		// b might be not traced because it is a filler
+		TracingTestUtils.checkNumberOfInferences(bSubC, reasoner, 1); 
+		TracingTestUtils.checkTracingCompleteness(aSubRSomeC, reasoner);
 	}
 
 	@Test
@@ -207,15 +213,17 @@ public class TracingSaturationTest {
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
-		ElkObjectProperty r = factory.getObjectProperty(new ElkFullIri(
-				"http://example.org/R"));
+		ElkObjectProperty r = factory
+				.getObjectProperty(new ElkFullIri("http://example.org/R"));
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 		ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
 
-		reasoner.explainSubsumption(a, rSomeC);
-		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
-		TracingTestUtils.checkNumberOfInferences(b, b, reasoner, 1);
-		TracingTestUtils.checkTracingCompleteness(a, rSomeC, reasoner);
+		ClassConclusion aSubRSomeC = reasoner.getConclusion(a, rSomeC);
+		ClassConclusion aSubB = reasoner.getConclusion(b, b);
+		reasoner.explainConclusion(aSubRSomeC);
+		TracingTestUtils.checkNumberOfInferences(aSubRSomeC, reasoner, 1);
+		TracingTestUtils.checkNumberOfInferences(aSubB, reasoner, 1);
+		TracingTestUtils.checkTracingCompleteness(aSubRSomeC, reasoner);
 	}
 
 	@Test
@@ -229,8 +237,10 @@ public class TracingSaturationTest {
 		ElkClass a1 = factory.getClass(new ElkFullIri("http://example.org/A1"));
 		ElkClass b2 = factory.getClass(new ElkFullIri("http://example.org/B2"));
 
-		reasoner.explainSubsumption(a, a1);
-		TracingTestUtils.checkNumberOfInferences(b2, b2, reasoner, 0);
+		ClassConclusion aSubA1 = reasoner.getConclusion(a, a1);
+		ClassConclusion b2SubB2 = reasoner.getConclusion(b2, b2);
+		reasoner.explainConclusion(aSubA1);
+		TracingTestUtils.checkNumberOfInferences(b2SubB2, reasoner, 0);
 	}
 
 }

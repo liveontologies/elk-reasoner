@@ -9,8 +9,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
@@ -44,6 +44,14 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
  * #L%
  */
 
+/**
+ * A {@link Conclusion.Visitor} that always returns {@code null}
+ * 
+ * @author Yevgeny Kazakov
+ *
+ * @param <O>
+ *            the type of the output
+ */
 public class DummyConclusionVisitor<O> implements Conclusion.Visitor<O> {
 
 	protected O defaultVisit(ClassConclusion conclusion) {

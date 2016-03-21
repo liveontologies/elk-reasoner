@@ -35,9 +35,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * {@link ContextInitialization}:<br>
  * 
  * <pre>
- *       ![C]
- * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
- *  [C] ⊑ +owl:Thing
+ *    ![C]
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *  [C] ⊑ +⊤
  * </pre>
  * 
  * The parameters can be obtained as follows:<br>

@@ -96,7 +96,7 @@ public class ReasonerInferenceReader implements InferenceReader {
 			return initializeForInconsistency();
 		}
 		else {
-			reasoner.explainSubsumption(sub, sup);
+			reasoner.explainConclusion(sub, sup);
 			// create and return the first derived expression which corresponds to the initial subsumption
 			AxiomExpression<ElkSubClassOfAxiom> expr = expressionFactory_.create(new ElkObjectFactoryImpl().getSubClassOfAxiom(sub, sup)); 
 			

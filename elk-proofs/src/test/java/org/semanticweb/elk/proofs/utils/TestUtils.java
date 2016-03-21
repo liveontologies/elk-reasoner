@@ -24,19 +24,28 @@ package org.semanticweb.elk.proofs.utils;
  * #L%
  */
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
+import org.semanticweb.elk.matching.Matcher;
 import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.proofs.InferenceGraph;
-import org.semanticweb.elk.proofs.ProofReader;
-import org.semanticweb.elk.proofs.expressions.AxiomExpression;
-import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.inferences.Inference;
+import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
+import org.semanticweb.elk.proofs.inferences.ElkInference;
+import org.semanticweb.elk.proofs.inferences.ElkInferencePremiseVisitor;
+import org.semanticweb.elk.proofs.inferences.ElkInferenceSet;
+import org.semanticweb.elk.proofs.inferences.ModifiableElkInferenceSet;
+import org.semanticweb.elk.proofs.inferences.ModifiableElkInferenceSetImpl;
+import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utilities for testing proofs
@@ -44,65 +53,82 @@ import org.semanticweb.elk.proofs.inferences.Inference;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Yevgeny Kazakov
  */
 public class TestUtils {
 
-	// tests that each derived expression is provable. an expression is provable
-	// if either it doesn't require a proof (i.e. is a tautology or asserted) or
-	// returns at least one inference such that each of the premises is provable.
-	public static void provabilityOfSubsumptionTest(ProofReader reader, ElkClassExpression sub, ElkClassExpression sup) throws ElkException {
-		AxiomExpression<?> root = reader.getProofRoot(sub, sup);
-		InferenceGraph graph = ProofReader.readInferenceGraph(root);
-		
-		//FIXME
-		//System.out.println("Inference graph for " + root);
-		//System.out.println(graph);
-		
-		if (!graph.getExpressions().contains(root) && !root.isAsserted()) {
-			throw new AssertionError(root + " isn't derived!");
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(TestUtils.class);
+
+	public static void provabilityOfSubsumptionTest(Reasoner reasoner,
+			Set<? extends ElkAxiom> ontology, ElkObjectFactory factory,
+			ElkClassExpression sub, ElkClassExpression sup)
+			throws ElkException {
+
+		ModifiableElkInferenceSet elkInferences = new ModifiableElkInferenceSetImpl(
+				factory);
+		ClassConclusion conclusion = reasoner.getConclusion(sub, sup);
+		Matcher matcher = new Matcher(reasoner.explainConclusion(conclusion),
+				factory, elkInferences);
+		if (conclusion instanceof SubClassInclusionComposed) {
+			matcher.trace((SubClassInclusionComposed) conclusion);
 		}
-		
-		provabilityTest(graph, graph.getExpressions());
-		
-		
+
+		provabilityTest(elkInferences, ontology,
+				factory.getSubClassOfAxiom(sub, sup));
+
 	}
-	
-	public static void provabilityOfInconsistencyTest(ProofReader reader) throws ElkException {
-		Expression root = reader.getProofRootForInconsistency();
-		InferenceGraph graph = ProofReader.readInferenceGraph(root);
-		// only the expression which corresponds to inconsistency has to be
-		// explained, others aren't guaranteed to be derived since inconsistency
-		// aborts reasoning
-		provabilityTest(graph, Collections.singleton(root));
+
+	public static void provabilityOfInconsistencyTest(Reasoner reasoner,
+			Set<? extends ElkAxiom> ontology) throws ElkException {
+		// TODO
 	}
-	
-	public static void provabilityTest(InferenceGraph graph, Iterable<? extends Expression> toCheck) throws ElkException {
-		Set<Expression> proved = new HashSet<Expression>(graph.getExpressions().size());
-		Queue<Expression> toDo = new LinkedList<Expression>(graph.getRootExpressions()); 
-		
+
+	public static void provabilityTest(ElkInferenceSet inferences,
+			Set<? extends ElkAxiom> ontology, ElkAxiom goal)
+			throws ElkException {
+		final Set<ElkAxiom> done = new HashSet<ElkAxiom>();
+		final Queue<ElkAxiom> toDo = new LinkedList<ElkAxiom>();
+		System.out.println(ontology);
+		toDo.add(goal);
+
+		ElkInference.Visitor<Void> premiseVisitor = new ElkInferencePremiseVisitor<Void>(
+				new ElkObjectFactoryImpl(), new DummyElkAxiomVisitor<Void>() {
+					@Override
+					protected Void defaultLogicalVisit(ElkAxiom axiom) {
+						LOGGER_.info("{}: todo", axiom);
+						toDo.add(axiom);
+						return null;
+					}
+				});
+
 		for (;;) {
-			Expression next = toDo.poll();
-			
+			ElkAxiom next = toDo.poll();
+
 			if (next == null) {
 				break;
 			}
-			
-			if (proved.add(next)) {
-				for (Inference inf : graph.getInferencesForPremise(next)) {
-					if (proved.containsAll(inf.getPremises())) {
-						toDo.add(inf.getConclusion());
-						
-						//FIXME
-						//System.err.println("Proved: " + inf.getConclusion() + " by " + inf);
-					}
+
+			if (ontology.contains(next))
+				continue;
+
+			LOGGER_.info("{}: next lemma", next);
+
+			if (done.add(next)) {
+				boolean proved = false;
+				for (ElkInference inf : inferences.get(next)) {
+					LOGGER_.info("{}: unfolding", inf);
+					inf.accept(premiseVisitor);
+					proved |= true;
+				}
+				if (!proved) {
+					throw new AssertionError(
+							String.format("%s: no proof found", goal));
+				} else {
+					LOGGER_.info("{}: proved", next);
 				}
 			}
 		}
-		
-		for (Expression expr : toCheck) {
-			if (!proved.contains(expr) && !ProofUtils.isAsserted(expr)) {
-				throw new AssertionError(String.format("There is no acyclic proof of %s", expr));
-			}
-		}
+
 	}
 }

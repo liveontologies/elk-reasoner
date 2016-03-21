@@ -38,7 +38,7 @@ public interface IndexedSubClassOfAxiomInference extends IndexedAxiomInference {
 	 * 
 	 * @return the conclusion produced by this inference
 	 */
-	public IndexedSubClassOfAxiom getConclusion(
+	 IndexedSubClassOfAxiom getConclusion(
 			IndexedSubClassOfAxiom.Factory factory);
 
 	/**

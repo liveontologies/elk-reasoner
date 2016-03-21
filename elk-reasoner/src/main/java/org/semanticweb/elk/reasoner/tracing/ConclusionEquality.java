@@ -32,8 +32,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxi
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -45,13 +45,14 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
 
 public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 
-	public static boolean equals(Conclusion first, Conclusion second) {
-		return first.accept(new ConclusionEquality(second));
+	private final Conclusion other_;
+
+	private ConclusionEquality(Conclusion other) {
+		this.other_ = other;
 	}
 
-	private static class DefaultConclusionVisitor
-			extends
-				DummyConclusionVisitor<Boolean> {
+	private static class DefaultVisitor
+			extends DummyConclusionVisitor<Boolean> {
 
 		@Override
 		protected Boolean defaultVisit(Conclusion conclusion) {
@@ -72,15 +73,13 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 
 	}
 
-	private final Conclusion other_;
-
-	private ConclusionEquality(Conclusion other) {
-		this.other_ = other;
+	public static boolean equals(Conclusion first, Conclusion second) {
+		return first.accept(new ConclusionEquality(second));
 	}
 
 	@Override
 	public Boolean visit(final BackwardLink conclusion) {
-		return other_.accept(new DefaultConclusionVisitor() {
+		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(BackwardLink other) {
 				return equals(other.getDestination(),
@@ -95,7 +94,7 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 
 	@Override
 	public Boolean visit(final ContextInitialization conclusion) {
-		return other_.accept(new DefaultConclusionVisitor() {
+		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(ContextInitialization other) {
 				return equals(other.getDestination(),
@@ -106,7 +105,7 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 
 	@Override
 	public Boolean visit(final ClassInconsistency conclusion) {
-		return other_.accept(new DefaultConclusionVisitor() {
+		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(ClassInconsistency other) {
 				return equals(other.getDestination(),
@@ -117,7 +116,7 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 
 	@Override
 	public Boolean visit(final DisjointSubsumer conclusion) {
-		return other_.accept(new DefaultConclusionVisitor() {
+		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(DisjointSubsumer other) {
 				return equals(other.getDestination(),
@@ -132,13 +131,12 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 
 	@Override
 	public Boolean visit(final ForwardLink conclusion) {
-		return other_.accept(new DefaultConclusionVisitor() {
+		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(ForwardLink other) {
 				return equals(other.getDestination(),
 						conclusion.getDestination())
-						&& equals(other.getRelation(),
-								conclusion.getRelation())
+						&& equals(other.getRelation(), conclusion.getRelation())
 						&& equals(other.getTarget(), conclusion.getTarget());
 			}
 		});
@@ -146,7 +144,7 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 
 	@Override
 	public Boolean visit(final IndexedDeclarationAxiom conclusion) {
-		return other_.accept(new DefaultConclusionVisitor() {
+		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(IndexedDeclarationAxiom other) {
 				return equals(other.getEntity(), conclusion.getEntity());
@@ -156,7 +154,7 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 
 	@Override
 	public Boolean visit(final IndexedDefinitionAxiom conclusion) {
-		return other_.accept(new DefaultConclusionVisitor() {
+		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(IndexedDefinitionAxiom other) {
 				return equals(other.getDefinedClass(),
@@ -169,7 +167,7 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 
 	@Override
 	public Boolean visit(final IndexedDisjointClassesAxiom conclusion) {
-		return other_.accept(new DefaultConclusionVisitor() {
+		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(IndexedDisjointClassesAxiom other) {
 				return equals(other.getMembers(), conclusion.getMembers());
@@ -179,7 +177,7 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 
 	@Override
 	public Boolean visit(final IndexedObjectPropertyRangeAxiom conclusion) {
-		return other_.accept(new DefaultConclusionVisitor() {
+		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(IndexedObjectPropertyRangeAxiom other) {
 				return equals(other.getProperty(), conclusion.getProperty())
@@ -190,7 +188,7 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 
 	@Override
 	public Boolean visit(final IndexedSubClassOfAxiom conclusion) {
-		return other_.accept(new DefaultConclusionVisitor() {
+		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(IndexedSubClassOfAxiom other) {
 				return equals(other.getSubClass(), conclusion.getSubClass())
@@ -202,7 +200,7 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 
 	@Override
 	public Boolean visit(final IndexedSubObjectPropertyOfAxiom conclusion) {
-		return other_.accept(new DefaultConclusionVisitor() {
+		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(IndexedSubObjectPropertyOfAxiom other) {
 				return equals(other.getSubPropertyChain(),
@@ -215,7 +213,7 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 
 	@Override
 	public Boolean visit(final Propagation subConclusion) {
-		return other_.accept(new DefaultConclusionVisitor() {
+		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(Propagation other) {
 				return equals(other.getDestination(),
@@ -229,7 +227,7 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 
 	@Override
 	public Boolean visit(final PropertyRange conclusion) {
-		return other_.accept(new DefaultConclusionVisitor() {
+		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(PropertyRange other) {
 				return equals(other.getProperty(), conclusion.getProperty())
@@ -240,7 +238,7 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 
 	@Override
 	public Boolean visit(final SubClassInclusionComposed conclusion) {
-		return other_.accept(new DefaultConclusionVisitor() {
+		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(SubClassInclusionComposed other) {
 				return equals(other.getDestination(),
@@ -253,7 +251,7 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 
 	@Override
 	public Boolean visit(final SubClassInclusionDecomposed conclusion) {
-		return other_.accept(new DefaultConclusionVisitor() {
+		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(SubClassInclusionDecomposed other) {
 				return equals(other.getDestination(),
@@ -266,7 +264,7 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 
 	@Override
 	public Boolean visit(final SubContextInitialization subConclusion) {
-		return other_.accept(new DefaultConclusionVisitor() {
+		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(SubContextInitialization other) {
 				return equals(other.getDestination(),
@@ -279,7 +277,7 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 
 	@Override
 	public Boolean visit(final SubPropertyChain conclusion) {
-		return other_.accept(new DefaultConclusionVisitor() {
+		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(SubPropertyChain other) {
 				return equals(other.getSubChain(), conclusion.getSubChain())

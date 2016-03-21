@@ -93,13 +93,7 @@ public class TracingTestUtils {
 		throw new IllegalArgumentException("Context may not be null");
 	}
 
-	public static void checkTracingCompleteness(ElkClassExpression sub,
-			ElkClassExpression sup, Reasoner reasoner) {
-		IndexedClassExpression subsumee = ReasonerStateAccessor
-				.transform(reasoner, sub);
-		ClassConclusion subsumer = getConclusionToTrace(
-				ReasonerStateAccessor.getContext(reasoner, subsumee),
-				ReasonerStateAccessor.transform(reasoner, sup));
+	public static void checkTracingCompleteness(ClassConclusion conclusion, Reasoner reasoner) {		
 		final AtomicInteger conclusionCount = new AtomicInteger(0);
 		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
 		Inference.Visitor<Boolean> counter = new DummyInferenceChecker() {
@@ -114,7 +108,7 @@ public class TracingTestUtils {
 		TestTraceUnwinder explorer = new TestTraceUnwinder(traceState,
 				UNTRACED_LISTENER);
 
-		explorer.accept(subsumer, counter);
+		explorer.accept(conclusion, counter);
 	}
 
 	public static void checkTracingOfInconsistencyCompleteness(
@@ -148,15 +142,10 @@ public class TracingTestUtils {
 	 * checking that the number of inferences for the given class subsumption is
 	 * as expected
 	 */
-	public static void checkNumberOfInferences(ElkClassExpression sub,
-			ElkClassExpression sup, Reasoner reasoner, int expected) {
-		final IndexedClassExpression subsumee = ReasonerStateAccessor
-				.transform(reasoner, sub);
-		ClassConclusion conclusion = getConclusionToTrace(
-				ReasonerStateAccessor.getContext(reasoner, subsumee),
-				ReasonerStateAccessor.transform(reasoner, sup));
+	public static void checkNumberOfInferences(ClassConclusion conclusion,
+			Reasoner reasoner, int expected) {
 		int actual = 0;
-		for (Inference ignore : ReasonerStateAccessor.getTraceState(reasoner)
+		for (@SuppressWarnings("unused") Inference ignore : ReasonerStateAccessor.getTraceState(reasoner)
 				.getInferences(conclusion)) {
 			actual++;
 		}
@@ -243,23 +232,6 @@ public class TracingTestUtils {
 		}
 
 		return sideConditions;
-	}
-
-	public static void visitInferences(ElkClassExpression sub,
-			ElkClassExpression sup, Reasoner reasoner,
-			final Inference.Visitor<Boolean> inferenceVisitor)
-					throws ElkException {
-		final IndexedClassExpression subsumee = ReasonerStateAccessor
-				.transform(reasoner, sub);
-		ClassConclusion conclusion = getConclusionToTrace(
-				ReasonerStateAccessor.getContext(reasoner, subsumee),
-				ReasonerStateAccessor.transform(reasoner, sup));
-		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(
-				ReasonerStateAccessor.getTraceState(reasoner),
-				UNTRACED_LISTENER);
-
-		reasoner.explainSubsumption(sub, sup);
-		traceUnwinder.accept(conclusion, inferenceVisitor);
 	}
 
 	public static void visitInferencesForInconsistency(Reasoner reasoner,
