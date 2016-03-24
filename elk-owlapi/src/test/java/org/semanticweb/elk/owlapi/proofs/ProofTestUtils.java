@@ -1,7 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.owlapi.proofs;
 /*
  * #%L
  * ELK Proofs Package
@@ -23,6 +19,7 @@ package org.semanticweb.elk.owlapi.proofs;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.owlapi.proofs;
 
 import static org.junit.Assert.assertTrue;
 
@@ -32,10 +29,10 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Random;
 import java.util.Set;
 
 import org.semanticweb.elk.proofs.utils.TestUtils;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -57,6 +54,7 @@ import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
 public class ProofTestUtils {
 
@@ -132,10 +130,17 @@ public class ProofTestUtils {
 		};
 	}
 	
-	public static <T extends Exception> void visitAllSubsumptionsForProofTests(OWLReasoner reasoner, ProofTestVisitor<T> visitor) throws T {
+	public static <T extends Exception> void visitAllSubsumptionsForProofTests(
+			final OWLReasoner reasoner, final OWLDataFactory factory,
+			final ProofTestVisitor<T> visitor) throws T {
+		
+		if (!reasoner.isConsistent()) {
+			visitor.inconsistencyTest();
+			return;
+		}
+		
 		Set<Node<OWLClass>> visited = new HashSet<Node<OWLClass>>();
 		Queue<Node<OWLClass>> toDo = new LinkedList<Node<OWLClass>>();
-		OWLDataFactory factory = OWLManager.getOWLDataFactory();
 		
 		toDo.add(reasoner.getTopClassNode());
 		visited.add(reasoner.getTopClassNode());
@@ -182,6 +187,85 @@ public class ProofTestUtils {
 				}
 			}
 		}
+	}
+	
+	public static Set<OWLAxiom> collectProofBreaker(
+			final OWLExpression conclusion,
+			final OWLOntology ontology, final Random random)
+			throws ProofGenerationException {
+		final Set<OWLExpression> visited = new HashSet<OWLExpression>();
+		final Set<OWLExpression> tautologies = new HashSet<OWLExpression>();
+		return collectProofBreaker(conclusion, visited, tautologies, ontology,
+				random);
+	}
+	
+	public static Set<OWLAxiom> collectProofBreaker(
+			final OWLExpression conclusion, final Set<OWLExpression> visited,
+			final Set<OWLExpression> tautologies, final OWLOntology ontology,
+			final Random random)
+			throws ProofGenerationException {
+		
+		/* 
+		 * If the expressions in visited are not provable and
+		 * the result of this method is removed from the ontology,
+		 * conclusion is not provable.
+		 * TODO: Except if some expression is a tautology !!!
+		 */
+		
+		final Set<OWLAxiom> collected = new HashSet<OWLAxiom>();
+		
+		if (!visited.add(conclusion)) {
+			return collected;
+		}
+		
+		// If conclusion is asserted, it must be collected.
+		if (conclusion instanceof OWLAxiomExpression) {
+			final OWLAxiom ax = ((OWLAxiomExpression) conclusion).getAxiom();
+			if (ontology.containsAxiomIgnoreAnnotations(ax, true)) {
+				collected.add(ax);
+			}
+		}
+		
+		// For all inferences break proofs of one of their premises.
+		for (final OWLInference inf : conclusion.getInferences()) {
+			
+			final List<OWLExpression> premises =
+					new ArrayList<OWLExpression>(inf.getPremises());
+			Collections.shuffle(premises, random);
+			
+			boolean inferenceIsBroken = false;
+			for (final OWLExpression premise : premises) {
+				
+				final Set<OWLAxiom> premiseBreaker = collectProofBreaker(
+						premise, visited, tautologies, ontology, random);
+				
+				if (tautologies.contains(premise)) {
+					// The premise is a tautology and we need to break a different premise!
+				} else if(premiseBreaker.isEmpty()) {
+					// The premise was already visited, so this inference is already broken.
+					inferenceIsBroken = true;
+					break;
+				} else {
+					collected.addAll(premiseBreaker);
+					break;
+				}
+				
+			}
+			if (!inferenceIsBroken && collected.isEmpty()) {
+				/* 
+				 * None of the premises of this inference is already broken and
+				 * no axioms were collected, so conclusion is a tautology.
+				 * 
+				 * TODO: This is not complete,
+				 * because some tautology may be asserted!
+				 */
+				tautologies.add(conclusion);
+				return Collections.emptySet();
+			}
+			
+		}
+		
+		return collected;
 	}
 	
 }
