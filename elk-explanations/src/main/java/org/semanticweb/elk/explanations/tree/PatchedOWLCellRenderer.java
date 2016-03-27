@@ -822,7 +822,7 @@ public class PatchedOWLCellRenderer implements TreeCellRenderer {
                 		});
                 	}
                 	catch (Exception e) {
-                		ProtegeApplication.getErrorLog().logError(e);
+                		// TODO log error
                 	}
 
                 }
@@ -941,7 +941,7 @@ public class PatchedOWLCellRenderer implements TreeCellRenderer {
     		});
     	}
     	catch (Exception e) {
-    		ProtegeApplication.getErrorLog().logError(e);
+    		// TODO log error
     	}
     }
 

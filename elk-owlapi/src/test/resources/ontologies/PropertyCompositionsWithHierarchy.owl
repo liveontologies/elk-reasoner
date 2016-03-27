@@ -1,4 +1,4 @@
-Prefix( : = <http://example.org/> ) 
+Prefix(:=<http://example.org/>) 
 Ontology(
 SubClassOf(:A ObjectSomeValuesFrom(:R1 :B))
 SubClassOf(:B ObjectSomeValuesFrom(:R2 :C))

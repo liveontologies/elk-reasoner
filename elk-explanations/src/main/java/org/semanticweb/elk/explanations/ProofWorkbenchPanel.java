@@ -213,7 +213,7 @@ public class ProofWorkbenchPanel extends JPanel implements Disposable,
 			explanationDisplayHolder.add(list);
 			scrollPane.validate();
 		} catch (ExplanationException e) {
-			ProtegeApplication.getErrorLog().logError(e);
+			// TODO log error
 		}
 	}
 

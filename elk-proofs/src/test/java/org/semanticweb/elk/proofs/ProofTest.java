@@ -80,7 +80,7 @@ import org.slf4j.LoggerFactory;
 public class ProofTest {
 
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
-	
+
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ProofTest.class);
 
@@ -135,6 +135,13 @@ public class ProofTest {
 				new PostProcessingStageExecutor());
 
 		try {
+			// reasoner.getTaxonomy();
+			// ElkClass sub = elkFactory.getClass(new ElkFullIri("StiffNeck"));
+			// ElkClass sup = elkFactory
+			// .getClass(new ElkFullIri("PropertyOfPhenomenon"));
+			//
+			// getTestingVisitor(reasoner, ontology).subsumptionTest(sub, sup);
+
 			TracingTests tests = getProvabilityTests(reasoner);
 
 			tests.accept(getTestingVisitor(reasoner, ontology));
@@ -152,10 +159,12 @@ public class ProofTest {
 			@Override
 			public void subsumptionTest(ElkClass subsumee, ElkClass subsumer) {
 				try {
-					LOGGER_.info("Proof test: {} => {}", subsumee, subsumer);
+
+					LOGGER_.debug("Proof test: {} ⊑ {}", subsumee, subsumer);
 
 					TestUtils.provabilityOfSubsumptionTest(reasoner, ontology,
-							factory_, subsumee, subsumer);
+							factory_,
+							factory_.getSubClassOfAxiom(subsumee, subsumer));
 				} catch (ElkException e) {
 					throw new RuntimeException(e);
 				}

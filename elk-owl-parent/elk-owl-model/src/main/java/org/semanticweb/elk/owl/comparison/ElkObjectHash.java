@@ -105,7 +105,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.iris.ElkAbbreviatedIri;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
-import org.semanticweb.elk.owl.iris.ElkPrefix;
+import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 import org.semanticweb.elk.util.hashing.Hasher;
@@ -152,11 +152,6 @@ public class ElkObjectHash
 
 	private static int hashCode(String s) {
 		return s.hashCode();
-	}
-
-	private static int hashCode(ElkPrefix prefix) {
-		return combinedHashCode(hashCode(prefix.getName()),
-				hashCode(prefix.getIri()));
 	}
 
 	@Override
@@ -696,14 +691,13 @@ public class ElkObjectHash
 
 	@Override
 	public Integer visit(ElkFullIri expression) {
-		return combinedHashCode(hashCode(ElkFullIri.class),
+		return combinedHashCode(hashCode(ElkIri.class),
 				hashCode(expression.getFullIriAsString()));
 	}
 
 	@Override
 	public Integer visit(ElkAbbreviatedIri expression) {
-		return combinedHashCode(hashCode(ElkAbbreviatedIri.class),
-				hashCode(expression.getPrefix()),
-				hashCode(expression.getLocalName()));
+		return combinedHashCode(hashCode(ElkIri.class),
+				hashCode(expression.getFullIriAsString()));
 	}
 }

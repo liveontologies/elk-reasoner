@@ -106,7 +106,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.iris.ElkAbbreviatedIri;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
-import org.semanticweb.elk.owl.iris.ElkPrefix;
+import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
@@ -149,13 +149,6 @@ public class ElkObjectEquality implements ElkObjectVisitor<ElkObject> {
 
 	private static boolean equals(String first, String second) {
 		return first.equals(second);
-	}
-
-	private static boolean equals(ElkPrefix first, ElkPrefix second) {
-		if (first == second)
-			return true;
-		return equals(first.getName(), second.getName())
-				&& equals(first.getIri(), second.getIri());
 	}
 
 	@Override
@@ -1218,11 +1211,11 @@ public class ElkObjectEquality implements ElkObjectVisitor<ElkObject> {
 	}
 
 	@Override
-	public ElkFullIri visit(ElkFullIri expression) {
+	public ElkIri visit(ElkFullIri expression) {
 		if (object_ == expression)
 			return expression;
-		if (object_ instanceof ElkFullIri) {
-			ElkFullIri result = (ElkFullIri) object_;
+		if (object_ instanceof ElkIri) {
+			ElkIri result = (ElkIri) object_;
 			if (equals(result.getFullIriAsString(),
 					expression.getFullIriAsString()))
 				return result;
@@ -1231,13 +1224,13 @@ public class ElkObjectEquality implements ElkObjectVisitor<ElkObject> {
 	}
 
 	@Override
-	public ElkAbbreviatedIri visit(ElkAbbreviatedIri expression) {
+	public ElkIri visit(ElkAbbreviatedIri expression) {
 		if (object_ == expression)
 			return expression;
-		if (object_ instanceof ElkAbbreviatedIri) {
-			ElkAbbreviatedIri result = (ElkAbbreviatedIri) object_;
-			if (equals(result.getLocalName(), expression.getLocalName())
-					&& equals(result.getPrefix(), expression.getPrefix()))
+		if (object_ instanceof ElkIri) {
+			ElkIri result = (ElkIri) object_;
+			if (equals(result.getFullIriAsString(),
+					expression.getFullIriAsString()))
 				return result;
 		}
 		return null;

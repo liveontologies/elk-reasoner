@@ -32,15 +32,15 @@ import java.util.Set;
 import org.semanticweb.elk.matching.Matcher;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
+import org.semanticweb.elk.owl.inferences.ElkInference;
+import org.semanticweb.elk.owl.inferences.ElkInferencePremiseVisitor;
+import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
+import org.semanticweb.elk.owl.inferences.ModifiableElkInferenceSet;
+import org.semanticweb.elk.owl.inferences.ModifiableElkInferenceSetImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
-import org.semanticweb.elk.proofs.inferences.ElkInference;
-import org.semanticweb.elk.proofs.inferences.ElkInferencePremiseVisitor;
-import org.semanticweb.elk.proofs.inferences.ElkInferenceSet;
-import org.semanticweb.elk.proofs.inferences.ModifiableElkInferenceSet;
-import org.semanticweb.elk.proofs.inferences.ModifiableElkInferenceSetImpl;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
@@ -62,20 +62,23 @@ public class TestUtils {
 
 	public static void provabilityOfSubsumptionTest(Reasoner reasoner,
 			Set<? extends ElkAxiom> ontology, ElkObjectFactory factory,
-			ElkClassExpression sub, ElkClassExpression sup)
-			throws ElkException {
+			ElkSubClassOfAxiom subsumption) throws ElkException {
 
 		ModifiableElkInferenceSet elkInferences = new ModifiableElkInferenceSetImpl(
 				factory);
-		ClassConclusion conclusion = reasoner.getConclusion(sub, sup);
+		ClassConclusion conclusion = reasoner.getConclusion(subsumption);
+		if (conclusion == null) {
+			throw new AssertionError(String.format(
+					"%s: subsumption contains expressions not occurring in the ontology",
+					subsumption));
+		}
 		Matcher matcher = new Matcher(reasoner.explainConclusion(conclusion),
 				factory, elkInferences);
 		if (conclusion instanceof SubClassInclusionComposed) {
 			matcher.trace((SubClassInclusionComposed) conclusion);
 		}
 
-		provabilityTest(elkInferences, ontology,
-				factory.getSubClassOfAxiom(sub, sup));
+		provabilityTest(elkInferences, ontology, subsumption);
 
 	}
 
@@ -89,14 +92,13 @@ public class TestUtils {
 			throws ElkException {
 		final Set<ElkAxiom> done = new HashSet<ElkAxiom>();
 		final Queue<ElkAxiom> toDo = new LinkedList<ElkAxiom>();
-		System.out.println(ontology);
 		toDo.add(goal);
 
 		ElkInference.Visitor<Void> premiseVisitor = new ElkInferencePremiseVisitor<Void>(
 				new ElkObjectFactoryImpl(), new DummyElkAxiomVisitor<Void>() {
 					@Override
 					protected Void defaultLogicalVisit(ElkAxiom axiom) {
-						LOGGER_.info("{}: todo", axiom);
+						LOGGER_.trace("{}: todo", axiom);
 						toDo.add(axiom);
 						return null;
 					}
@@ -112,20 +114,19 @@ public class TestUtils {
 			if (ontology.contains(next))
 				continue;
 
-			LOGGER_.info("{}: next lemma", next);
-
 			if (done.add(next)) {
-				boolean proved = false;
+				LOGGER_.trace("{}: new lemma", next);
+				boolean inferred = false;
 				for (ElkInference inf : inferences.get(next)) {
-					LOGGER_.info("{}: unfolding", inf);
+					LOGGER_.trace("{}: expanding", inf);
 					inf.accept(premiseVisitor);
-					proved |= true;
+					inferred |= true;
 				}
-				if (!proved) {
-					throw new AssertionError(
-							String.format("%s: no proof found", goal));
+				if (!inferred) {
+					throw new AssertionError(String
+							.format("%s: cannot expand all proofs", goal));
 				} else {
-					LOGGER_.info("{}: proved", next);
+					LOGGER_.trace("{}: inferred", next);
 				}
 			}
 		}

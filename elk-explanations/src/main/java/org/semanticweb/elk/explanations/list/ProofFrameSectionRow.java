@@ -126,7 +126,7 @@ public class ProofFrameSectionRow implements OWLFrameSectionRow<OWLExpression, O
 				inferenceSections_.add(inferenceSection);
 			}
 		} catch (ProofGenerationException e) {
-			ProtegeApplication.getErrorLog().logError(e);
+			// TODO log error
 		}
     }
 
@@ -205,7 +205,7 @@ public class ProofFrameSectionRow implements OWLFrameSectionRow<OWLExpression, O
 			}
 			
 		} catch (ProofGenerationException e) {
-			ProtegeApplication.getErrorLog().logError(e);
+			// TODO log error
 		}
 		
 	}

@@ -30,24 +30,27 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.semanticweb.elk.loading.ElkLoadingException;
+import org.semanticweb.elk.matching.Matcher;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
+import org.semanticweb.elk.owl.inferences.ModifiableElkInferenceSet;
+import org.semanticweb.elk.owl.inferences.ModifiableElkInferenceSetImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
-import org.semanticweb.elk.owlapi.proofs.ElkToOwlProofConverter;
+import org.semanticweb.elk.owlapi.proofs.OwlAxiomExpressionWrap;
+import org.semanticweb.elk.owlapi.wrapper.ElkObjectWrapFactory;
 import org.semanticweb.elk.owlapi.wrapper.OwlClassAxiomConverterVisitor;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
-import org.semanticweb.elk.proofs.ProofReader;
-import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.reasoner.DummyProgressMonitor;
 import org.semanticweb.elk.reasoner.ElkUnsupportedReasoningTaskException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.util.logging.LogLevel;
@@ -953,15 +956,19 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 		if (axiom instanceof OWLSubClassOfAxiom) {
 			OWLSubClassOfAxiom scAxiom = (OWLSubClassOfAxiom) axiom;
 			ElkSubClassOfAxiom elkAxiom = (ElkSubClassOfAxiom) scAxiom.accept(OwlClassAxiomConverterVisitor.getInstance());
+			ClassConclusion conclusion = reasoner_.getConclusion(elkAxiom);
+			ElkObjectFactory factory = new ElkObjectWrapFactory(owlOntologymanager_.getOWLDataFactory());
+			ModifiableElkInferenceSet elkInferences = new ModifiableElkInferenceSetImpl(
+					factory);			
 			
 			try {
-				AxiomExpression<?> expr = new ProofReader(reasoner_)
-						.eliminateLemmas()
-						.getProofRoot(
-								elkAxiom.getSubClassExpression(),
-								elkAxiom.getSuperClassExpression());
+				Matcher matcher = new Matcher(reasoner_.explainConclusion(conclusion),
+						factory, elkInferences);
+				if (conclusion instanceof SubClassInclusionComposed) {
+					matcher.trace((SubClassInclusionComposed) conclusion);
+				}
 				
-				return ElkToOwlProofConverter.convert(expr);
+				return new OwlAxiomExpressionWrap(elkAxiom, elkInferences, owlOntology_, factory);								
 				
 			} catch (ElkException e) {
 				LOGGER_.error("Error during proof reconstruction", e);
@@ -973,18 +980,21 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 		throw new UnsupportedEntailmentTypeException(axiom);
 	}
 	
+	@Override
 	public OWLAxiomExpression getDerivedExpressionForInconsistency() throws ProofGenerationException {
-		try {
-			AxiomExpression<?> expr = new ProofReader(reasoner_)
-					.eliminateLemmas().getProofRootForInconsistency();
-			
-			return ElkToOwlProofConverter.convert(expr);
-			
-		} catch (ElkException e) {
-			LOGGER_.error("Error during proof reconstruction", e);
-			
-			throw new ProofGenerationException(e);
-		} 
+		// TODO
+		return null;
+//		try {
+//			AxiomExpression<?> expr = new ProofReader(reasoner_)
+//					.eliminateLemmas().getProofRootForInconsistency();
+//			
+//			return ElkToOwlProofConverter.convert(expr);
+//			
+//		} catch (ElkException e) {
+//			LOGGER_.error("Error during proof reconstruction", e);
+//			
+//			throw new ProofGenerationException(e);
+//		} 
 	}
 
 	protected class OntologyChangeListener implements OWLOntologyChangeListener {

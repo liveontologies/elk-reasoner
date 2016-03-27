@@ -26,19 +26,19 @@
 	<dependencies>
 		<dependency>
 			<groupId>edu.stanford.protege</groupId>
-			<artifactId>org.protege.common</artifactId>
+			<artifactId>protege-common</artifactId>
 			<version>${protege.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>edu.stanford.protege</groupId>
-			<artifactId>org.protege.editor.core.application</artifactId>
+			<artifactId>protege-editor-core</artifactId>
 			<version>${protege.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>edu.stanford.protege</groupId>
-			<artifactId>org.protege.editor.owl</artifactId>
+			<artifactId>protege-editor-owl</artifactId>
 			<version>${protege.version}</version>
 			<scope>provided</scope>
 		</dependency>
@@ -46,7 +46,6 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>owlapi-proofs</artifactId>
 			<version>${project.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -56,17 +55,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -97,16 +88,10 @@
 						<Bundle-SymbolicName>org.semanticweb.owl.proofs;singleton:=true</Bundle-SymbolicName>
 						<Bundle-Vendor>University of Ulm</Bundle-Vendor>
 						<Embed-Dependency>explanation</Embed-Dependency>
-						<Import-Package>
-							!org.slf4j.*,
-							org.eclipse.core.runtime;registry=split,
-							org.protege.editor.*;version="[${protege.lower.version},${protege.upper.version})",
-							org.apache.log4j.*;version="[${log4j.lower.version},${log4j.upper.version})",
-							org.semanticweb.owlapitools.*="0.4",
-							*
-						</Import-Package>
+						<Import-Package>*</Import-Package>
+						<Export-Package>org.semanticweb.owlapitools.proofs.*,!*</Export-Package>
 						<Bundle-Activator>org.protege.editor.core.plugin.DefaultPluginActivator</Bundle-Activator>
-						<Embed-Dependency>*;scope=!provided|test;scope=compile|runtime;groupId=!net.sourceforge.owlapi|org.apache.felix|log4j;inline=false</Embed-Dependency>
+						<Embed-Dependency>*;scope=!provided;scope=compile|runtime;inline=false</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<Embed-Directory>target/dependency</Embed-Directory>
 						<Embed-StripGroup>true</Embed-StripGroup>
@@ -179,7 +164,6 @@
 						</executions>
 						<configuration>
 							<excludeScope>provided</excludeScope>
-							<excludeGroupIds>net.sourceforge.owlapi,org.apache.felix,log4j</excludeGroupIds>
 						</configuration>
 					</plugin>
 				</plugins>

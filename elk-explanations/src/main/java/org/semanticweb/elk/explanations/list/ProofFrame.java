@@ -146,7 +146,7 @@ public class ProofFrame implements OWLFrame<CycleFreeProofRoot> {
 				rootSection_.update(Collections.singletonList(rootExpression_));
 			}
 		} catch (ProofGenerationException e) {
-			ProtegeApplication.getErrorLog().logError(e);
+			// TODO log error
 		}
 	}
 
@@ -179,7 +179,7 @@ public class ProofFrame implements OWLFrame<CycleFreeProofRoot> {
                 listener.frameContentChanged();
             }
             catch (Exception e) {
-            	ProtegeApplication.getErrorLog().logError(e);
+            	// TODO log error
             }
         }
     }
