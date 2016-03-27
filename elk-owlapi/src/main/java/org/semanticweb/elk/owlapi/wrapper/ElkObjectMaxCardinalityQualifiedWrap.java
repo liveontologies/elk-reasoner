@@ -39,7 +39,7 @@ import org.semanticweb.owlapi.model.OWLObjectMaxCardinality;
  *            the type of the wrapped object
  */
 public class ElkObjectMaxCardinalityQualifiedWrap<T extends OWLObjectMaxCardinality>
-		extends ElkObjectMaxCardinalityWrap<T> implements
+		extends ElkObjectMaxCardinalityUnqualifiedWrap<T> implements
 		ElkObjectMaxCardinalityQualified {
 
 	ElkObjectMaxCardinalityQualifiedWrap(T owlObjectMaxCardinality) {

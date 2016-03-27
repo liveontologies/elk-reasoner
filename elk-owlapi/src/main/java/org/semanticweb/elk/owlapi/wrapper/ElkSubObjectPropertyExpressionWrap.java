@@ -25,18 +25,17 @@ package org.semanticweb.elk.owlapi.wrapper;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
-import org.semanticweb.owlapi.model.OWLObject;
 
 /**
  * Implements the {@link ElkSubObjectPropertyExpression} interface by wrapping
- * instances of {@link OWLObject}
+ * instances of objects from OWLAPI
  * 
  * @author Yevgeny Kazakov
  * 
  * @param <T>
  *            the type of the wrapped object
  */
-public abstract class ElkSubObjectPropertyExpressionWrap<T extends OWLObject>
+public abstract class ElkSubObjectPropertyExpressionWrap<T>
 		extends ElkObjectWrap<T> implements ElkSubObjectPropertyExpression {
 
 	public ElkSubObjectPropertyExpressionWrap(T owlObject) {

@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.owlapi.wrapper;
 
+import java.util.List;
+
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationSubject;
@@ -298,7 +300,8 @@ public class OwlConverter {
 	}
 
 	@SuppressWarnings("static-method")
-	public ElkDataComplementOf convert(OWLDataComplementOf owlDataComplementOf) {
+	public ElkDataComplementOf convert(
+			OWLDataComplementOf owlDataComplementOf) {
 		return new ElkDataComplementOfWrap<OWLDataComplementOf>(
 				owlDataComplementOf);
 	}
@@ -310,7 +313,7 @@ public class OwlConverter {
 			return new ElkDataExactCardinalityQualifiedWrap<OWLDataExactCardinality>(
 					owlDataExactCardinality);
 		// else
-		return new ElkDataExactCardinalityWrap<OWLDataExactCardinality>(
+		return new ElkDataExactCardinalityUnqualifiedWrap<OWLDataExactCardinality>(
 				owlDataExactCardinality);
 	}
 
@@ -333,7 +336,7 @@ public class OwlConverter {
 			return new ElkDataMaxCardinalityQualifiedWrap<OWLDataMaxCardinality>(
 					owlDataMaxCardinality);
 		// else
-		return new ElkDataMaxCardinalityWrap<OWLDataMaxCardinality>(
+		return new ElkDataMaxCardinalityUnqualifiedWrap<OWLDataMaxCardinality>(
 				owlDataMaxCardinality);
 	}
 
@@ -344,7 +347,7 @@ public class OwlConverter {
 			return new ElkDataMinCardinalityQualifiedWrap<OWLDataMinCardinality>(
 					owlDataMinCardinality);
 		// else
-		return new ElkDataMinCardinalityWrap<OWLDataMinCardinality>(
+		return new ElkDataMinCardinalityUnqualifiedWrap<OWLDataMinCardinality>(
 				owlDataMinCardinality);
 	}
 
@@ -427,7 +430,8 @@ public class OwlConverter {
 	}
 
 	@SuppressWarnings("static-method")
-	public ElkDeclarationAxiom convert(OWLDeclarationAxiom owlDeclarationAxiom) {
+	public ElkDeclarationAxiom convert(
+			OWLDeclarationAxiom owlDeclarationAxiom) {
 		return new ElkDeclarationAxiomWrap<OWLDeclarationAxiom>(
 				owlDeclarationAxiom);
 	}
@@ -494,7 +498,8 @@ public class OwlConverter {
 	}
 
 	@SuppressWarnings("static-method")
-	public ElkFacetRestriction convert(OWLFacetRestriction owlFacetRestriction) {
+	public ElkFacetRestriction convert(
+			OWLFacetRestriction owlFacetRestriction) {
 		return new ElkFacetRestrictionWrap<OWLFacetRestriction>(
 				owlFacetRestriction);
 	}
@@ -585,7 +590,7 @@ public class OwlConverter {
 			return new ElkObjectExactCardinalityQualifiedWrap<OWLObjectExactCardinality>(
 					owlObjectExactCardinality);
 		// else
-		return new ElkObjectExactCardinalityWrap<OWLObjectExactCardinality>(
+		return new ElkObjectExactCardinalityUnqualifiedWrap<OWLObjectExactCardinality>(
 				owlObjectExactCardinality);
 	}
 
@@ -613,7 +618,7 @@ public class OwlConverter {
 			return new ElkObjectMaxCardinalityQualifiedWrap<OWLObjectMaxCardinality>(
 					owlObjectMaxCardinality);
 		// else
-		return new ElkObjectMaxCardinalityWrap<OWLObjectMaxCardinality>(
+		return new ElkObjectMaxCardinalityUnqualifiedWrap<OWLObjectMaxCardinality>(
 				owlObjectMaxCardinality);
 	}
 
@@ -624,7 +629,7 @@ public class OwlConverter {
 			return new ElkObjectMinCardinalityQualifiedWrap<OWLObjectMinCardinality>(
 					owlObjectMaxCardinality);
 		// else
-		return new ElkObjectMinCardinalityWrap<OWLObjectMinCardinality>(
+		return new ElkObjectMinCardinalityUnqualifiedWrap<OWLObjectMinCardinality>(
 				owlObjectMaxCardinality);
 	}
 
@@ -650,8 +655,8 @@ public class OwlConverter {
 	@SuppressWarnings("static-method")
 	public ElkObjectPropertyChain convert(
 			OWLSubPropertyChainOfAxiom owlSubPropertyChainOfAxiom) {
-		return new ElkObjectPropertyChainWrap<OWLSubPropertyChainOfAxiom>(
-				owlSubPropertyChainOfAxiom);
+		return new ElkObjectPropertyChainWrap<List<? extends OWLObjectPropertyExpression>>(
+				owlSubPropertyChainOfAxiom.getPropertyChain());
 	}
 
 	@SuppressWarnings("static-method")

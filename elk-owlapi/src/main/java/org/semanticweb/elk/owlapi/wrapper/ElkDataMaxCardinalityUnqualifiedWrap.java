@@ -22,31 +22,30 @@
  */
 package org.semanticweb.elk.owlapi.wrapper;
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinalityQualified;
-import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinalityUnqualified;
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinalityUnqualified;
+import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkCardinalityRestrictionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
-import org.semanticweb.elk.owl.visitors.ElkObjectMinCardinalityUnqualifiedVisitor;
-import org.semanticweb.elk.owl.visitors.ElkObjectMinCardinalityVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDataMaxCardinalityUnqualifiedVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDataMaxCardinalityVisitor;
 import org.semanticweb.elk.owl.visitors.ElkPropertyRestrictionVisitor;
-import org.semanticweb.owlapi.model.OWLObjectMinCardinality;
+import org.semanticweb.owlapi.model.OWLDataMaxCardinality;
 
 /**
- * Implements the {@link ElkObjectMaxCardinalityQualified} interface by wrapping
- * instances of {@link OWLObjectMinCardinality}
+ * Implements the {@link ElkDataMaxCardinalityQualified} interface by wrapping
+ * instances of {@link OWLDataMaxCardinality}
  * 
- * @author Yevgeny Kazakov
+ * @author "Yevgeny Kazakov"
  * 
  * @param <T>
  *            the type of the wrapped object
  */
-public class ElkObjectMinCardinalityWrap<T extends OWLObjectMinCardinality>
-		extends ElkClassExpressionWrap<T> implements
-		ElkObjectMinCardinalityUnqualified {
+public class ElkDataMaxCardinalityUnqualifiedWrap<T extends OWLDataMaxCardinality> extends
+		ElkClassExpressionWrap<T> implements ElkDataMaxCardinalityUnqualified {
 
-	ElkObjectMinCardinalityWrap(T owlObjectMinCardinality) {
-		super(owlObjectMinCardinality);
+	public ElkDataMaxCardinalityUnqualifiedWrap(T owlDataMaxCardinality) {
+		super(owlDataMaxCardinality);
 	}
 
 	@Override
@@ -55,33 +54,32 @@ public class ElkObjectMinCardinalityWrap<T extends OWLObjectMinCardinality>
 	}
 
 	@Override
-	public ElkObjectPropertyExpression getProperty() {
+	public ElkDataPropertyExpression getProperty() {
 		return converter.convert(this.owlObject.getProperty());
 	}
 
 	@Override
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
-		return accept((ElkObjectMinCardinalityUnqualifiedVisitor<O>) visitor);
+		return accept((ElkDataMaxCardinalityUnqualifiedVisitor<O>) visitor);
 	}
 
 	@Override
-	public <O> O accept(ElkObjectMinCardinalityVisitor<O> visitor) {
-		return accept((ElkObjectMinCardinalityUnqualifiedVisitor<O>) visitor);
+	public <O> O accept(ElkDataMaxCardinalityVisitor<O> visitor) {
+		return accept((ElkDataMaxCardinalityUnqualifiedVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkCardinalityRestrictionVisitor<O> visitor) {
-		return accept((ElkObjectMinCardinalityUnqualifiedVisitor<O>) visitor);
+		return accept((ElkDataMaxCardinalityUnqualifiedVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkPropertyRestrictionVisitor<O> visitor) {
-		return accept((ElkObjectMinCardinalityUnqualifiedVisitor<O>) visitor);
+		return accept((ElkDataMaxCardinalityUnqualifiedVisitor<O>) visitor);
 	}
 
 	@Override
-	public <O> O accept(ElkObjectMinCardinalityUnqualifiedVisitor<O> visitor) {
+	public <O> O accept(ElkDataMaxCardinalityUnqualifiedVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
-
 }

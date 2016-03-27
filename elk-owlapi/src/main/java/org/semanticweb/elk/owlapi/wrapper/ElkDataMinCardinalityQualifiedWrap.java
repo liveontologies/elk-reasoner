@@ -39,7 +39,7 @@ import org.semanticweb.owlapi.model.OWLDataMinCardinality;
  *            the type of the wrapped object
  */
 public class ElkDataMinCardinalityQualifiedWrap<T extends OWLDataMinCardinality>
-		extends ElkDataMinCardinalityWrap<T> implements
+		extends ElkDataMinCardinalityUnqualifiedWrap<T> implements
 		ElkDataMinCardinalityQualified {
 
 	public ElkDataMinCardinalityQualifiedWrap(T owlDataMinCardinality) {

@@ -32,15 +32,15 @@ import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.owlapi.model.OWLObject;
 
 /**
- * Implements the {@link ElkObject} interface by wrapping instances of
- * {@link OWLObject}
+ * Implements the {@link ElkObject} interface by wrapping instances of objects
+ * from OWLAPI.
  * 
  * @author Yevgeny Kazakov
  * 
  * @param <T>
  *            the type of the wrapped object
  */
-public abstract class ElkObjectWrap<T extends OWLObject> implements ElkObject {
+public abstract class ElkObjectWrap<T> implements ElkObject {
 
 	/**
 	 * The converter for converting sub-objects.
@@ -57,14 +57,27 @@ public abstract class ElkObjectWrap<T extends OWLObject> implements ElkObject {
 		this.owlObject = owlObject;
 	}
 
+	/**
+	 * hash code, computed on demand
+	 */
+	private int hashCode_ = 0;
+
 	@Override
 	public int hashCode() {
-		return ElkObjectHash.hashCode(this);
+		if (hashCode_ == 0) {
+			hashCode_ = ElkObjectHash.hashCode(this);
+		}
+		// else
+		return hashCode_;
 	}
 
 	@Override
-	public boolean equals(Object other) {
-		return ElkObjectEquality.equals(this, other);
+	public boolean equals(Object o) {
+		if (this == o || hashCode() == o.hashCode()) {
+			return true;
+		}
+		// else
+		return ElkObjectEquality.equals(this, o);
 	}
 
 	@Override

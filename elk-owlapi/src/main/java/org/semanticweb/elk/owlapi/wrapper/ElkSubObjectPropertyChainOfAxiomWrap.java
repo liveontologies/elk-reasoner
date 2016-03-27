@@ -22,11 +22,14 @@
  */
 package org.semanticweb.elk.owlapi.wrapper;
 
+import java.util.List;
+
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyOfAxiomVisitor;
+import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLSubPropertyChainOfAxiom;
 
 /**
@@ -39,8 +42,8 @@ import org.semanticweb.owlapi.model.OWLSubPropertyChainOfAxiom;
  *            the type of the wrapped object
  */
 public class ElkSubObjectPropertyChainOfAxiomWrap<T extends OWLSubPropertyChainOfAxiom>
-		extends ElkObjectPropertyAxiomWrap<T> implements
-		ElkSubObjectPropertyOfAxiom {
+		extends ElkObjectPropertyAxiomWrap<T>
+		implements ElkSubObjectPropertyOfAxiom {
 
 	public ElkSubObjectPropertyChainOfAxiomWrap(T owlSubPropertyChainOfAxiom) {
 		super(owlSubPropertyChainOfAxiom);
@@ -48,8 +51,8 @@ public class ElkSubObjectPropertyChainOfAxiomWrap<T extends OWLSubPropertyChainO
 
 	@Override
 	public ElkSubObjectPropertyExpression getSubObjectPropertyExpression() {
-		return new ElkObjectPropertyChainWrap<OWLSubPropertyChainOfAxiom>(
-				this.owlObject);
+		return new ElkObjectPropertyChainWrap<List<? extends OWLObjectPropertyExpression>>(
+				this.owlObject.getPropertyChain());
 	}
 
 	@Override
