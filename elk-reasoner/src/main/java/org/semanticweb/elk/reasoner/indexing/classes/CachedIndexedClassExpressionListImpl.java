@@ -86,11 +86,6 @@ class CachedIndexedClassExpressionListImpl
 	}
 		
 	@Override
-	public final String toStringStructural() {
-		return elements_.toString();
-	}
-
-	@Override
 	public CachedIndexedClassExpressionList accept(
 			CachedIndexedObject.Filter filter) {
 		return filter.filter(this);

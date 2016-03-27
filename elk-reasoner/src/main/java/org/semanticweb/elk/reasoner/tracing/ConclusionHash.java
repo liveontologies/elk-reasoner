@@ -121,7 +121,7 @@ public class ConclusionHash
 	public Integer visit(ForwardLink conclusion) {
 		return combinedHashCode(hashCode(ForwardLink.class),
 				hashCode(conclusion.getDestination()),
-				hashCode(conclusion.getRelation()),
+				hashCode(conclusion.getChain()),
 				hashCode(conclusion.getTarget()));
 	}
 

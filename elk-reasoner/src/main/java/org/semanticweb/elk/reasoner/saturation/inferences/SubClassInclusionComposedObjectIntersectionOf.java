@@ -84,11 +84,6 @@ public class SubClassInclusionComposedObjectIntersectionOf extends
 	}
 
 	@Override
-	public String toString() {
-		return super.toString() + " (conjunction+)";
-	}
-
-	@Override
 	public final <O> O accept(
 			SubClassInclusionComposedInference.Visitor<O> visitor) {
 		return visitor.visit(this);

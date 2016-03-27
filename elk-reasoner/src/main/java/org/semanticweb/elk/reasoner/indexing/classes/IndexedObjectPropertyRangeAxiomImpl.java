@@ -66,12 +66,6 @@ class IndexedObjectPropertyRangeAxiomImpl<A extends ElkAxiom, P extends IndexedO
 	}
 
 	@Override
-	public final String toStringStructural() {
-		return "ObjectPropertyRange(" + this.property_ + ' ' + this.range_
-				+ ')';
-	}
-
-	@Override
 	public final <O> O accept(IndexedAxiom.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

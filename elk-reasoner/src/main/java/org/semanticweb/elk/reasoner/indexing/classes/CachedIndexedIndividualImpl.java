@@ -70,12 +70,6 @@ class CachedIndexedIndividualImpl extends
 	}
 
 	@Override
-	public String toStringStructural() {
-		return "ObjectOneOf(<"
-				+ elkNamedIndividual_.getIri().getFullIriAsString() + ">)";
-	}
-
-	@Override
 	public final <O> O accept(IndexedClassEntity.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

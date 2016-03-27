@@ -122,12 +122,6 @@ final class CachedIndexedComplexPropertyChainImpl
 	}
 
 	@Override
-	public final String toStringStructural() {
-		return "ObjectPropertyChain(" + this.leftProperty_ + ' '
-				+ this.rightProperty_ + ')';
-	}
-
-	@Override
 	public final <O> O accept(IndexedPropertyChain.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

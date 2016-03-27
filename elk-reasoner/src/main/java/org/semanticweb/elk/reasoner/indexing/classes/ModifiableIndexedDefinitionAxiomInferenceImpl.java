@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedDefinitionAxiomInference;
 import org.semanticweb.elk.reasoner.tracing.Inference;
+import org.semanticweb.elk.reasoner.tracing.InferencePrinter;
 
 /**
  * Implements {@link ModifiableIndexedDefinitionAxiomInference}
@@ -63,6 +64,11 @@ abstract class ModifiableIndexedDefinitionAxiomInferenceImpl<A extends ElkAxiom>
 	@Override
 	public boolean equals(Object o) {
 		return this == o;
+	}
+	
+	@Override
+	public String toString() {
+		return InferencePrinter.toString(this);		
 	}
 	
 	@Override

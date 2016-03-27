@@ -136,7 +136,7 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 			public Boolean visit(ForwardLink other) {
 				return equals(other.getDestination(),
 						conclusion.getDestination())
-						&& equals(other.getRelation(), conclusion.getRelation())
+						&& equals(other.getChain(), conclusion.getChain())
 						&& equals(other.getTarget(), conclusion.getTarget());
 			}
 		});

@@ -58,11 +58,6 @@ public class ContextInitializationNoPremises
 	}
 
 	@Override
-	public String toString() {
-		return super.toString() + " (no premises)";
-	}
-
-	@Override
 	public final <O> O accept(
 			ContextInitializationInference.Visitor<O> visitor) {
 		return visitor.visit(this);

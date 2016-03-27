@@ -52,7 +52,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
  * D = {@link #getOrigin()}<br>
  * P1 = {@link #getPremiseForwardChain()}<br>
  * E = {@link #getPremiseTarget()}<br>
- * R2P2 = {@link #getComposition()} = {@link #getRelation()} (from which R2 and
+ * R2P2 = {@link #getComposition()} = {@link #getChain()} (from which R2 and
  * P2 can be obtained)<br>
  * 
  * @author "Yevgeny Kazakov"
@@ -100,7 +100,7 @@ public class ForwardLinkComposition
 
 	@Override
 	public IndexedComplexPropertyChain getComposition() {
-		return getRelation();
+		return getChain();
 	}
 
 	@Override
@@ -129,11 +129,6 @@ public class ForwardLinkComposition
 	public SubPropertyChain getFourthPremise(SubPropertyChain.Factory factory) {
 		return factory.getSubPropertyChain(forwardChain_,
 				getComposition().getSuffixChain());
-	}
-
-	@Override
-	public String toString() {
-		return super.toString() + " (composition)";
 	}
 
 	@Override

@@ -76,11 +76,6 @@ public class BackwardLinkOfObjectHasSelf extends AbstractBackwardLinkInference {
 	}
 
 	@Override
-	public String toString() {
-		return super.toString() + " (decomposition)";
-	}
-
-	@Override
 	public final <O> O accept(BackwardLinkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

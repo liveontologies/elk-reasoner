@@ -71,11 +71,6 @@ public class SubClassInclusionComposedEntity
 	}
 
 	@Override
-	public String toString() {
-		return super.toString() + " (- => +)";
-	}
-
-	@Override
 	public final <O> O accept(
 			SubClassInclusionComposedInference.Visitor<O> visitor) {
 		return visitor.visit(this);

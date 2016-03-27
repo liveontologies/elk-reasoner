@@ -61,11 +61,6 @@ public class ClassInconsistencyOfOwlNothing
 	}
 
 	@Override
-	public String toString() {
-		return super.toString() + " from owl:Nothing";
-	}
-
-	@Override
 	public final <O> O accept(ClassConclusion.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

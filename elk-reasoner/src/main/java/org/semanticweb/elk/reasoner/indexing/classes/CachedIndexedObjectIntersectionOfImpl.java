@@ -114,12 +114,6 @@ class CachedIndexedObjectIntersectionOfImpl
 	}
 
 	@Override
-	public final String toStringStructural() {
-		return "ObjectIntersectionOf(" + this.firstConjunct_ + ' '
-				+ this.secondConjunct_ + ')';
-	}
-
-	@Override
 	public final <O> O accept(IndexedClassExpression.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

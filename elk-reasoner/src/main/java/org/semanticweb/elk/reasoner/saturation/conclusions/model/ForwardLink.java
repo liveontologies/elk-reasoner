@@ -41,7 +41,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
  * The parameters can be obtained as follows:<br>
  * 
  * C = {@link #getDestination()}<br>
- * P = {@link #getRelation()}<br>
+ * P = {@link #getChain()}<br>
  * D = {@link #getTarget()}<br>
  * 
  * @author Frantisek Simancik
@@ -56,7 +56,7 @@ public interface ForwardLink extends ClassConclusion {
 	 * @return the {@link IndexedPropertyChain} in the existential restriction
 	 *         corresponding to this {@link ForwardLink}
 	 */
-	public IndexedPropertyChain getRelation();
+	public IndexedPropertyChain getChain();
 
 	/**
 	 * @return the {@link IndexedContextRoot} corresponding to the filler of the

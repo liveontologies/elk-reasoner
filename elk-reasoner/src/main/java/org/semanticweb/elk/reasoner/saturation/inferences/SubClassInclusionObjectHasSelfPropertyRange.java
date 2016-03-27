@@ -91,11 +91,6 @@ public class SubClassInclusionObjectHasSelfPropertyRange
 	}
 
 	@Override
-	public String toString() {
-		return super.toString() + " (reflexive range)";
-	}
-
-	@Override
 	public final <O> O accept(
 			SubClassInclusionDecomposedInference.Visitor<O> visitor) {
 		return visitor.visit(this);

@@ -165,11 +165,6 @@ public class BackwardLinkComposition extends AbstractBackwardLinkInference
 	}
 
 	@Override
-	public String toString() {
-		return super.toString() + " (composition)";
-	}
-
-	@Override
 	public final <O> O accept(BackwardLinkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

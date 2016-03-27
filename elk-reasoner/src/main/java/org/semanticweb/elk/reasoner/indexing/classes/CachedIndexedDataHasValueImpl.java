@@ -85,15 +85,6 @@ class CachedIndexedDataHasValueImpl
 	}
 
 	@Override
-	public final String toStringStructural() {
-		return "DataHasValue(" + '<'
-				+ this.property_.getIri().getFullIriAsString() + "> \""
-				+ this.filler_.getLexicalForm() + "\"^^<"
-				+ this.filler_.getDatatype().getIri().getFullIriAsString()
-				+ ">)";
-	}
-
-	@Override
 	public final <O> O accept(IndexedClassExpression.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

@@ -61,11 +61,6 @@ class IndexedSubClassOfAxiomImpl<A extends ElkAxiom, C extends IndexedClassExpre
 	}
 
 	@Override
-	public final String toStringStructural() {
-		return "SubClassOf(" + this.subClass_ + ' ' + this.superClass_ + ')';
-	}
-
-	@Override
 	public final <O> O accept(IndexedAxiom.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

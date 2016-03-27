@@ -86,7 +86,7 @@ public class NonReflexiveBackwardLinkCompositionRule extends
 			ClassInferenceProducer producer) {
 		/* compose the link with all non-reflexive backward links */
 		SaturatedPropertyChain linkSaturation = this.forwardLink_
-				.getRelation().getSaturated();
+				.getChain().getSaturated();
 		final Multimap<IndexedObjectProperty, IndexedComplexPropertyChain> comps = linkSaturation
 				.getCompositionsByLeftSubProperty();
 		final Map<IndexedObjectProperty, ? extends SubContextPremises> subContextMap = premises
@@ -104,7 +104,7 @@ public class NonReflexiveBackwardLinkCompositionRule extends
 				for (IndexedContextRoot source : subPremises.getLinkedRoots()) {
 					IndexedObjectSomeValuesFrom.Helper.produceComposedLink(producer, source,
 							backwardRelation, premises.getRoot(),
-							forwardLink_.getRelation(),
+							forwardLink_.getChain(),
 							forwardLink_.getTarget(), composition);
 				}
 		}

@@ -98,11 +98,6 @@ public class SubClassInclusionExpandedDefinition
 	}
 
 	@Override
-	public String toString() {
-		return super.toString() + " (definition-)";
-	}
-
-	@Override
 	public final <O> O accept(
 			SubClassInclusionDecomposedInference.Visitor<O> visitor) {
 		return visitor.visit(this);

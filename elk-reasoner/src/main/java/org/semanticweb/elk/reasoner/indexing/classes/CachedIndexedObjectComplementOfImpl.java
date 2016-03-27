@@ -40,8 +40,7 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  * 
  */
-class CachedIndexedObjectComplementOfImpl
-		extends
+class CachedIndexedObjectComplementOfImpl extends
 		CachedIndexedComplexClassExpressionImpl<CachedIndexedObjectComplementOf>
 		implements CachedIndexedObjectComplementOf {
 
@@ -51,7 +50,8 @@ class CachedIndexedObjectComplementOfImpl
 
 	private final ModifiableIndexedClassExpression negated_;
 
-	CachedIndexedObjectComplementOfImpl(ModifiableIndexedClassExpression negated) {
+	CachedIndexedObjectComplementOfImpl(
+			ModifiableIndexedClassExpression negated) {
 		super(CachedIndexedObjectComplementOf.Helper
 				.structuralHashCode(negated));
 		this.negated_ = negated;
@@ -63,7 +63,8 @@ class CachedIndexedObjectComplementOfImpl
 	}
 
 	@Override
-	public final CachedIndexedObjectComplementOf structuralEquals(Object other) {
+	public final CachedIndexedObjectComplementOf structuralEquals(
+			Object other) {
 		return CachedIndexedObjectComplementOf.Helper.structuralEquals(this,
 				other);
 	}
@@ -80,11 +81,9 @@ class CachedIndexedObjectComplementOfImpl
 		if (negativeOccurrenceNo == 0 && increment.negativeIncrement > 0) {
 			// first negative occurrence of this expression
 			if (LOGGER_.isWarnEnabled()) {
-				LoggerWrap
-						.log(LOGGER_,
-								LogLevel.WARN,
-								"reasoner.indexing.IndexedObjectComplementOf",
-								"ELK does not support negative occurrences of ObjectComplementOf. Reasoning might be incomplete!");
+				LoggerWrap.log(LOGGER_, LogLevel.WARN,
+						"reasoner.indexing.IndexedObjectComplementOf",
+						"ELK does not support negative occurrences of ObjectComplementOf. Reasoning might be incomplete!");
 			}
 		}
 
@@ -103,11 +102,6 @@ class CachedIndexedObjectComplementOfImpl
 			}
 		}
 		return true;
-	}
-
-	@Override
-	public final String toStringStructural() {
-		return "ObjectComplementOf(" + this.negated_ + ')';
 	}
 
 	@Override

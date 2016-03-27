@@ -91,12 +91,6 @@ public class ClassInconsistencyPropagated
 	}
 
 	@Override
-	public String toString() {
-		return "Propagated ClassInconsistency" + premiseRelation_ + "<-"
-				+ origin_;
-	}
-
-	@Override
 	public final <O> O accept(ClassInconsistencyInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

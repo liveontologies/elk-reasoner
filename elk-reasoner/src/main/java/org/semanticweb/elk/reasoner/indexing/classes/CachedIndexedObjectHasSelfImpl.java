@@ -69,11 +69,6 @@ class CachedIndexedObjectHasSelfImpl extends
 	}
 
 	@Override
-	public final String toStringStructural() {
-		return "ObjectHasSelf(" + getProperty() + ')';
-	}
-
-	@Override
 	public final <O> O accept(IndexedClassExpression.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

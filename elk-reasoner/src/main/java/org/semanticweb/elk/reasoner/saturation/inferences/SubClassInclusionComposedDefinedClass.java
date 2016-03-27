@@ -91,11 +91,6 @@ public class SubClassInclusionComposedDefinedClass
 	}
 
 	@Override
-	public String toString() {
-		return super.toString() + " (definition+)";
-	}
-
-	@Override
 	public final <O> O accept(
 			SubClassInclusionComposedInference.Visitor<O> visitor) {
 		return visitor.visit(this);

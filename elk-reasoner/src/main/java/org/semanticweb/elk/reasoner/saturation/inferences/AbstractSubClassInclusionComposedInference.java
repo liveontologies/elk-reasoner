@@ -27,6 +27,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SubClassInclusionComposedImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.tracing.Inference;
+import org.semanticweb.elk.reasoner.tracing.InferencePrinter;
 
 abstract class AbstractSubClassInclusionComposedInference<S extends IndexedClassExpression>
 		extends
@@ -63,6 +64,11 @@ abstract class AbstractSubClassInclusionComposedInference<S extends IndexedClass
 	@Override
 	public boolean equals(Object o) {
 		return this == o;
+	}
+	
+	@Override
+	public String toString() {
+		return InferencePrinter.toString(this);		
 	}
 
 	@Override

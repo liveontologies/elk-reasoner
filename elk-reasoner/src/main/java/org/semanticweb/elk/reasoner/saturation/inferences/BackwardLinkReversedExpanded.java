@@ -48,7 +48,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
  * R = {@link #getRelation()}<br>
  * D = {@link #getDestination()}<br>
  * 
- * @see ForwardLink#getRelation()
+ * @see ForwardLink#getChain()
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -71,7 +71,7 @@ public class BackwardLinkReversedExpanded
 	public BackwardLinkReversedExpanded(ForwardLink premise,
 			IndexedObjectProperty superProperty, ElkAxiom reason) {
 		super(premise.getTarget(), superProperty, premise.getDestination());
-		this.subChain_ = premise.getRelation();
+		this.subChain_ = premise.getChain();
 		this.reason_ = reason;
 	}
 

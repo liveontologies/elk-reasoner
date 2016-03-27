@@ -61,11 +61,6 @@ public class SubContextInitializationNoPremises
 	}
 
 	@Override
-	public String toString() {
-		return super.toString() + " (no premises)";
-	}
-
-	@Override
 	public final <O> O accept(SubClassInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

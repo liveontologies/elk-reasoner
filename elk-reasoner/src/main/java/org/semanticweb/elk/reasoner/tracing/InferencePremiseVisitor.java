@@ -465,9 +465,9 @@ public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 
 	@Override
 	public O visit(SubPropertyChainExpandedSubObjectPropertyOf inference) {
-		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
+		conclusionVisitor_.visit(inference.getSecondPremise(conclusionFactory_));
 		conclusionVisitor_
-				.visit(inference.getSecondPremise(conclusionFactory_));
+				.visit(inference.getFirstPremise(conclusionFactory_));
 		return null;
 	}
 

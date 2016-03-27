@@ -96,11 +96,6 @@ public class SubClassInclusionExpandedSubClassOf
 	}
 
 	@Override
-	public String toString() {
-		return super.toString() + " (subclassof)";
-	}
-
-	@Override
 	public final <O> O accept(
 			SubClassInclusionDecomposedInference.Visitor<O> visitor) {
 		return visitor.visit(this);

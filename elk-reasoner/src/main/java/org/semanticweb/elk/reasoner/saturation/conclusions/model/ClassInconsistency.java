@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
  * Notation:
  * 
  * <pre>
- * [C] ⊑ 0
+ * [C] = 0
  * </pre>
  * 
  * It is logically equivalent to axiom {@code SubClassOf(C owl:Nothing)}<br>

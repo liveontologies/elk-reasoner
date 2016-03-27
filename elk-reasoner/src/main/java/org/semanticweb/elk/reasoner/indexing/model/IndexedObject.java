@@ -33,13 +33,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
 public interface IndexedObject {
 
 	/**
-	 * @return a string representation of the object; if two indexed objects
-	 *         have the same string representation, they must be equal according
-	 *         to {@link Object#equals(Object)}
-	 */
-	String toStringStructural();
-
-	/**
 	 * The visitor pattern for instances
 	 * 
 	 * @author Yevgeny Kazakov

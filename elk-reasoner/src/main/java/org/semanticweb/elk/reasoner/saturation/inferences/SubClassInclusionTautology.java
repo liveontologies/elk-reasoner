@@ -89,11 +89,6 @@ public class SubClassInclusionTautology
 	}
 
 	@Override
-	public String toString() {
-		return super.toString() + " (init)";
-	}
-
-	@Override
 	public final <O> O accept(
 			SubClassInclusionDecomposedInference.Visitor<O> visitor) {
 		return visitor.visit(this);

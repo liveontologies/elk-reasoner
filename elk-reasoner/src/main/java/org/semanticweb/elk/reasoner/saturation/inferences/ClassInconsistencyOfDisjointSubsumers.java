@@ -128,15 +128,6 @@ public class ClassInconsistencyOfDisjointSubsumers
 	}
 
 	@Override
-	public String toString() {
-		return super.toString() + " from disjoint subsumer "
-				+ disjointExpressions_.getElements().get(firstPosition_)
-				+ " using "
-				+ disjointExpressions_.getElements().get(secondPosition_)
-				+ " due to " + reason_;
-	}
-
-	@Override
 	public final <O> O accept(ClassInconsistencyInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

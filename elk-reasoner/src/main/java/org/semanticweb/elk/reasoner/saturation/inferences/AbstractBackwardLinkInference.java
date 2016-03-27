@@ -27,6 +27,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.BackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.tracing.Inference;
+import org.semanticweb.elk.reasoner.tracing.InferencePrinter;
 
 abstract class AbstractBackwardLinkInference extends BackwardLinkImpl
 		implements
@@ -56,6 +57,11 @@ abstract class AbstractBackwardLinkInference extends BackwardLinkImpl
 	@Override
 	public boolean equals(Object o) {
 		return this == o;
+	}
+	
+	@Override
+	public String toString() {
+		return InferencePrinter.toString(this);		
 	}
 
 	@Override

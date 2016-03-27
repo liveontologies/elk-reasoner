@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.tracing.Inference;
+import org.semanticweb.elk.reasoner.tracing.InferencePrinter;
 
 /**
  * A skeleton implementation of {@link ClassInference}
@@ -50,6 +51,11 @@ abstract class AbstractClassInference implements ClassInference {
 	}
 
 	// we assume that different objects represent different inferences
+	
+	@Override
+	public String toString() {
+		return InferencePrinter.toString(this);		
+	}
 
 	@Override
 	public final <O> O accept(Inference.Visitor<O> visitor) {

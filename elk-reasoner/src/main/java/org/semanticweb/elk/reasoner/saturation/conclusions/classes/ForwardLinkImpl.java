@@ -64,7 +64,7 @@ public class ForwardLinkImpl<R extends IndexedPropertyChain> extends
 	}
 
 	@Override
-	public R getRelation() {
+	public R getChain() {
 		return forwardChain_;
 	}
 

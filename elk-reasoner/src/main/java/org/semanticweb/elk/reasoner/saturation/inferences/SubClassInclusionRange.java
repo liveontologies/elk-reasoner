@@ -77,11 +77,6 @@ public class SubClassInclusionRange
 	}
 
 	@Override
-	public String toString() {
-		return super.toString() + " (range)";
-	}
-
-	@Override
 	public final <O> O accept(
 			SubClassInclusionDecomposedInference.Visitor<O> visitor) {
 		return visitor.visit(this);

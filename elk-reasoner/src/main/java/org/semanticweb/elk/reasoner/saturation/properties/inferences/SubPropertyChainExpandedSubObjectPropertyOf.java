@@ -37,16 +37,16 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
  * 
  * <pre>
  *   (1)     (2)
- *  P ⊑ R  [R ⊑ S]
- * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ * [P ⊑ R]  R ⊑ S
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
  *      P ⊑ S
  * </pre>
  * 
  * The parameters can be obtained as follows:<br>
  * 
  * P = {@link #getSubChain()}<br>
- * R = {@link #getPremiseSuperProperty()}<br>
- * S = {@link #getConclusionSuperProperty()}<br>
+ * R = {@link #getInterProperty()}<br>
+ * S = {@link #getSuperProperty()}<br>
  * 
  * @author Pavel Klinov
  *
@@ -60,7 +60,7 @@ public class SubPropertyChainExpandedSubObjectPropertyOf
 	 * The inferred sub-property of the super-chain for which the inference is
 	 * performed by unfolding under told sub-chain of this property
 	 */
-	private final IndexedObjectProperty middleChain_;
+	private final IndexedObjectProperty interProperty_;
 
 	/**
 	 * The {@link ElkAxiom} responsible for the told sub-chain of the premise
@@ -72,15 +72,15 @@ public class SubPropertyChainExpandedSubObjectPropertyOf
 			IndexedObjectProperty secondProperty,
 			IndexedObjectProperty thirdProperty, ElkAxiom reason) {
 		super(firstChain, thirdProperty);
-		this.middleChain_ = secondProperty;
+		this.interProperty_ = secondProperty;
 		this.reason_ = reason;
 	}
 
-	public IndexedObjectProperty getPremiseSuperProperty() {
-		return middleChain_;
+	public IndexedObjectProperty getInterProperty() {
+		return interProperty_;
 	}
 
-	public IndexedObjectProperty getConclusionSuperProperty() {
+	public IndexedObjectProperty getSuperProperty() {
 		return (IndexedObjectProperty) getSuperChain();
 	}
 
@@ -88,14 +88,14 @@ public class SubPropertyChainExpandedSubObjectPropertyOf
 		return this.reason_;
 	}
 
-	public SubPropertyChain getFirstPremise(SubPropertyChain.Factory factory) {
-		return factory.getSubPropertyChain(middleChain_, getSuperChain());
-	}
-
-	public IndexedSubObjectPropertyOfAxiom getSecondPremise(
+	public IndexedSubObjectPropertyOfAxiom getFirstPremise(
 			IndexedSubObjectPropertyOfAxiom.Factory factory) {
 		return factory.getIndexedSubObjectPropertyOfAxiom(reason_,
-				getSubChain(), middleChain_);
+				getSubChain(), interProperty_);
+	}
+
+	public SubPropertyChain getSecondPremise(SubPropertyChain.Factory factory) {
+		return factory.getSubPropertyChain(interProperty_, getSuperChain());
 	}
 
 	@Override

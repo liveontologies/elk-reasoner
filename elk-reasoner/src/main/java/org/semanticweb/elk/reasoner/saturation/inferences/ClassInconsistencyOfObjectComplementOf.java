@@ -85,12 +85,6 @@ public class ClassInconsistencyOfObjectComplementOf
 	}
 
 	@Override
-	public String toString() {
-		return super.toString() + " from " + negation_.getNegated() + " and "
-				+ negation_;
-	}
-
-	@Override
 	public final <O> O accept(ClassConclusion.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

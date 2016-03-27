@@ -127,11 +127,6 @@ class CachedIndexedObjectUnionOfImpl extends
 	}
 
 	@Override
-	public final String toStringStructural() {
-		return "ObjectUnionOf(" + disjuncts_ + ')';
-	}
-
-	@Override
 	public final <O> O accept(IndexedClassExpression.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

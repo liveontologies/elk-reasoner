@@ -64,7 +64,7 @@ public interface LinkComposition extends ClassInference {
 	public IndexedObjectProperty getPremiseBackwardRelation();
 
 	/**
-	 * @return the {@link ForwardLink#getRelation()} of the third premise
+	 * @return the {@link ForwardLink#getChain()} of the third premise
 	 */
 	public IndexedPropertyChain getPremiseForwardChain();
 
@@ -105,7 +105,7 @@ public interface LinkComposition extends ClassInference {
 	 *            the factory for creating conclusions
 	 * 
 	 * @return the {@link ForwardLink} used as premise of this
-	 *         {@link LinkComposition}; its {@link ForwardLink#getRelation()}
+	 *         {@link LinkComposition}; its {@link ForwardLink#getChain()}
 	 *         equals to {@link #getPremiseForwardChain()}
 	 */
 	public ForwardLink getThirdPremise(ForwardLink.Factory factory);

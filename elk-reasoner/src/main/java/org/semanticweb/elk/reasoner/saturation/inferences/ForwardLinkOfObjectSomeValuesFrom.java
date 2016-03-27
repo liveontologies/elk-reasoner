@@ -90,11 +90,6 @@ public class ForwardLinkOfObjectSomeValuesFrom extends AbstractClassInference
 	}
 
 	@Override
-	public String toString() {
-		return super.toString() + " (decomposition)";
-	}
-
-	@Override
 	public final <O> O accept(ClassInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

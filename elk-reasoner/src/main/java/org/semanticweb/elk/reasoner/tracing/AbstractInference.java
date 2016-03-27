@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.indexing.classes;
+package org.semanticweb.elk.reasoner.tracing;
 
 /*
  * #%L
@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,19 +22,17 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
-
 /**
- * Implements {@link IndexedObject}.
+ * A skeleton implementation of {@link Inference}
  * 
- * @author "Yevgeny Kazakov"
+ * @author Yevgeny Kazakov
  *
  */
-abstract class IndexedObjectImpl implements IndexedObject {
+public abstract class AbstractInference implements Inference {
 
 	@Override
-	public final String toString() {
-		return IndexedObjectPrinter.toString(this);
+	public String toString() {
+		return InferencePrinter.toString(this);
 	}
 
 }

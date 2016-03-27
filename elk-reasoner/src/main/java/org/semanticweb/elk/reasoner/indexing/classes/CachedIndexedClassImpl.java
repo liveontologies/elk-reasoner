@@ -180,11 +180,6 @@ final class CachedIndexedClassImpl extends
 	}
 
 	@Override
-	public final String toStringStructural() {
-		return '<' + getElkEntity().getIri().getFullIriAsString() + '>';
-	}
-
-	@Override
 	public final <O> O accept(IndexedClassExpression.Visitor<O> visitor) {
 		return accept((IndexedClassEntity.Visitor<O>) visitor);
 	}

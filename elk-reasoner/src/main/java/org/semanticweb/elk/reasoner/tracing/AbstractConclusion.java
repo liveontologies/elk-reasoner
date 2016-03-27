@@ -26,7 +26,8 @@ package org.semanticweb.elk.reasoner.tracing;
  */
 
 /**
- * A skeleton implementation of {@link Conclusion} with structural comparison
+ * A skeleton implementation of {@link Conclusion} with defined structural hash
+ * and equality
  * 
  * @author Yevgeny Kazakov
  *

@@ -55,12 +55,6 @@ class IndexedDeclarationAxiomImpl<A extends ElkAxiom, E extends IndexedEntity>
 	}
 
 	@Override
-	public final String toStringStructural() {
-		return "Declaration(" + entity_.getElkEntity().getEntityType() + "("
-				+ this.entity_ + "))";
-	}
-
-	@Override
 	public final <O> O accept(IndexedAxiom.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

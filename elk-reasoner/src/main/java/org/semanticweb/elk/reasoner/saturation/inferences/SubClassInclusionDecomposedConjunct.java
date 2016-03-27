@@ -79,9 +79,4 @@ public abstract class SubClassInclusionDecomposedConjunct
 		return getDestination();
 	}
 
-	@Override
-	public String toString() {
-		return super.toString() + " (conjunction-)";
-	}
-
 }

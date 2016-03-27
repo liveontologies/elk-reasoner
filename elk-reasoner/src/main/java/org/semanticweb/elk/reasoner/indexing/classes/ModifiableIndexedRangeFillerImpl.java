@@ -34,7 +34,8 @@ import org.semanticweb.elk.reasoner.saturation.ExtendedContext;
  * 
  * @author "Yevgeny Kazakov"
  */
-class ModifiableIndexedRangeFillerImpl implements ModifiableIndexedRangeFiller {
+class ModifiableIndexedRangeFillerImpl extends IndexedObjectImpl
+		implements ModifiableIndexedRangeFiller {
 
 	private final ModifiableIndexedObjectProperty property_;
 
@@ -56,19 +57,6 @@ class ModifiableIndexedRangeFillerImpl implements ModifiableIndexedRangeFiller {
 	@Override
 	public ModifiableIndexedClassExpression getFiller() {
 		return this.filler_;
-	}
-
-	@Override
-	public String toStringStructural() {
-		return "ObjectIntersectionOf(" + this.filler_ + ' '
-				+ "ObjectSomeValuesFrom(ObjectInverseOf(" + property_ + ')'
-				+ " owl:Thing)";
-	}
-
-	@Override
-	public final String toString() {
-		// use in debugging to identify the object uniquely (more or less)
-		return toStringStructural() + "#" + hashCode();
 	}
 
 	@Override

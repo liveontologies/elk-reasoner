@@ -61,11 +61,6 @@ class IndexedDisjointClassesAxiomImpl<A extends ElkAxiom, M extends IndexedClass
 	}
 
 	@Override
-	public final String toStringStructural() {
-		return "DisjointClasses(" + members_ + ")";
-	}
-
-	@Override
 	public final <O> O accept(IndexedAxiom.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

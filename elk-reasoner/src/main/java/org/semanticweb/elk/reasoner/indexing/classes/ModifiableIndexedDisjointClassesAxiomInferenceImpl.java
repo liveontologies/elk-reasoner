@@ -29,6 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiomIn
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedDisjointClassesAxiomInference;
 import org.semanticweb.elk.reasoner.tracing.Inference;
+import org.semanticweb.elk.reasoner.tracing.InferencePrinter;
 
 /**
  * Implements {@link ModifiableIndexedDisjointClassesAxiomInference}
@@ -61,6 +62,11 @@ abstract class ModifiableIndexedDisjointClassesAxiomInferenceImpl<A extends ElkA
 	@Override
 	public boolean equals(Object o) {
 		return this == o;
+	}
+	
+	@Override
+	public String toString() {
+		return InferencePrinter.toString(this);		
 	}
 	
 	@Override

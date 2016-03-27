@@ -99,11 +99,6 @@ public class SubClassInclusionComposedObjectSomeValuesFrom extends
 	}
 
 	@Override
-	public String toString() {
-		return super.toString() + " (propagation)";
-	}
-
-	@Override
 	public final <O> O accept(
 			SubClassInclusionComposedInference.Visitor<O> visitor) {
 		return visitor.visit(this);

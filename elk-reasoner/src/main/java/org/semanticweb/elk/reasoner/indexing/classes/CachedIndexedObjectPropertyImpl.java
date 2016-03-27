@@ -239,16 +239,6 @@ final class CachedIndexedObjectPropertyImpl
 		return true;
 	}
 
-	/**
-	 * 
-	 * @return The string representation of the {@link ElkObjectProperty}
-	 *         corresponding to this object.
-	 */
-	@Override
-	public final String toStringStructural() {
-		return '<' + getElkEntity().getIri().getFullIriAsString() + '>';
-	}
-
 	@Override
 	public final <O> O accept(IndexedEntity.Visitor<O> visitor) {
 		return visitor.visit(this);

@@ -101,12 +101,6 @@ class CachedIndexedObjectSomeValuesFromImpl
 	}
 
 	@Override
-	public final String toStringStructural() {
-		return "ObjectSomeValuesFrom(" + getProperty() + ' ' + getFiller()
-				+ ')';
-	}
-
-	@Override
 	public final <O> O accept(IndexedClassExpression.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

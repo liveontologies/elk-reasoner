@@ -46,7 +46,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
  * R = {@link #getRelation()}<br>
  * D = {@link #getDestination()}<br>
  * 
- * @see ForwardLink#getRelation()
+ * @see ForwardLink#getChain()
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -55,7 +55,7 @@ public class BackwardLinkReversed extends AbstractBackwardLinkInference {
 
 	public BackwardLinkReversed(ForwardLink premise) {
 		super(premise.getTarget(),
-				(IndexedObjectProperty) premise.getRelation(),
+				(IndexedObjectProperty) premise.getChain(),
 				premise.getDestination());
 	}
 

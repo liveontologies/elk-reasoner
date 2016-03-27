@@ -1,5 +1,8 @@
 package org.semanticweb.elk.reasoner.tracing;
 
+import java.util.List;
+
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
@@ -7,8 +10,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxi
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -44,6 +47,10 @@ public class ConclusionPrinter implements Conclusion.Visitor<String> {
 
 	private static ConclusionPrinter INSTANCE_ = new ConclusionPrinter();
 
+	private ConclusionPrinter() {
+
+	}
+
 	public static String toString(Conclusion conclusion) {
 		return conclusion.accept(INSTANCE_);
 	}
@@ -52,111 +59,103 @@ public class ConclusionPrinter implements Conclusion.Visitor<String> {
 		return INSTANCE_;
 	}
 
-	private ConclusionPrinter() {
-
-	}
-
 	@Override
-	public String visit(BackwardLink subConclusion) {
-		return "BackwardLink(" + subConclusion.getDestination() + ":"
-				+ subConclusion.getSubDestination() + ":"
-				+ subConclusion.getTraceRoot() + ")";
+	public String visit(BackwardLink conclusion) {
+		return String.format("%s ⊑ <∃%s>.[%s]", conclusion.getSource(),
+				conclusion.getRelation(), conclusion.getDestination());
 	}
 
 	@Override
 	public String visit(ContextInitialization conclusion) {
-		return "Init(" + conclusion.getDestination() + ")";
+		return String.format("![%s]", conclusion.getDestination());
 	}
 
 	@Override
 	public String visit(ClassInconsistency conclusion) {
-		return "Contradiction(" + conclusion.getDestination() + ")";
+		return String.format("[%s] = 0", conclusion.getDestination());
 	}
 
 	@Override
 	public String visit(DisjointSubsumer conclusion) {
-		return "DisjointSubsumer(" + conclusion.getDestination() + ":"
-				+ conclusion.getDisjointExpressions() + ":"
-				+ conclusion.getPosition() + "[" + conclusion.getReason()
-				+ "])";
+		List<? extends IndexedClassExpression> members = conclusion
+				.getDisjointExpressions().getElements();
+		return String.format("[%s] ⊑ %s|%s", conclusion.getDestination(),
+				members.get(conclusion.getPosition()), members);
 	}
 
 	@Override
 	public String visit(ForwardLink conclusion) {
-		return "ForwardLink(" + conclusion.getDestination() + ":"
-				+ conclusion.getRelation() + "->" + conclusion.getTarget()
-				+ ")";
+		return String.format("[%s] ⊑ <∃%s>.%s", conclusion.getDestination(),
+				conclusion.getChain(), conclusion.getTarget());
 	}
 
 	@Override
 	public String visit(IndexedDeclarationAxiom conclusion) {
-		return "IndexedDeclarationAxiom(" + conclusion.getEntity() + ")";
+		return String.format("[Declaration(%s)]", conclusion.getEntity());
 	}
 
 	@Override
 	public String visit(IndexedDefinitionAxiom conclusion) {
-		return "IndexedDefinitionAxiom(" + conclusion.getDefinedClass() + " "
-				+ conclusion.getDefinition() + ")";
+		return String.format("[%s = %s]", conclusion.getDefinedClass(),
+				conclusion.getDefinition());
 	}
 
 	@Override
 	public String visit(IndexedDisjointClassesAxiom conclusion) {
-		return "IndexedDisjointClassesAxiom(" + conclusion.getMembers() + ")";
+		return String.format("[Disjoint(%s)]", conclusion.getMembers());
 	}
 
 	@Override
 	public String visit(IndexedObjectPropertyRangeAxiom conclusion) {
-		return "IndexedObjectPropertyRangeAxiom(" + conclusion.getProperty()
-				+ " " + conclusion.getRange() + ")";
+		return String.format("[Range(%s,%s)]", conclusion.getProperty(),
+				conclusion.getRange());
 	}
 
 	@Override
 	public String visit(IndexedSubClassOfAxiom conclusion) {
-		return "IndexedSubClassOfAxiom(" + conclusion.getSubClass() + " "
-				+ conclusion.getSuperClass() + ")";
+		return String.format("[%s ⊑ %s]", conclusion.getSubClass(),
+				conclusion.getSuperClass());
 	}
 
 	@Override
 	public String visit(IndexedSubObjectPropertyOfAxiom conclusion) {
-		return "IndexedSubObjectPropertyOfAxiom("
-				+ conclusion.getSubPropertyChain() + " "
-				+ conclusion.getSuperProperty() + ")";
+		return String.format("[%s ⊑ %s]", conclusion.getSubPropertyChain(),
+				conclusion.getSuperProperty());
 	}
 
 	@Override
-	public String visit(Propagation subConclusion) {
-		return "Propagation(" + subConclusion.getDestination() + ":"
-				+ subConclusion.getSubDestination() + ":"
-				+ subConclusion.getCarry() + ")";
+	public String visit(Propagation conclusion) {
+		return String.format("∃[%s].[%s] ⊑ %s", conclusion.getSubDestination(),
+				conclusion.getDestination(), conclusion.getCarry());
 	}
 
 	@Override
 	public String visit(PropertyRange conclusion) {
-		return "PropertyRange(" + conclusion.getProperty() + ": "
-				+ conclusion.getRange() + ")";
+		return String.format("Range(%s,%s)", conclusion.getProperty(),
+				conclusion.getRange());
 	}
 
 	@Override
 	public String visit(SubClassInclusionComposed conclusion) {
-		return "Subsumption+(" + conclusion.getDestination() + " "
-				+ conclusion.getSubsumer() + ")";
+		return String.format("[%s] ⊑ +%s", conclusion.getDestination(),
+				conclusion.getSubsumer());
 	}
 
 	@Override
 	public String visit(SubClassInclusionDecomposed conclusion) {
-		return "Subsumption-(" + conclusion.getDestination() + " "
-				+ conclusion.getSubsumer() + ")";
+		return String.format("[%s] ⊑ -%s", conclusion.getDestination(),
+				conclusion.getSubsumer());
 	}
 
 	@Override
-	public String visit(SubContextInitialization subConclusion) {
-		return "SubInit(" + subConclusion.getDestination() + ":"
-				+ subConclusion.getSubDestination() + ")";
+	public String visit(SubContextInitialization conclusion) {
+		return String.format("![C:R]", conclusion.getDestination(),
+				conclusion.getSubDestination());
 	}
 
 	@Override
 	public String visit(SubPropertyChain conclusion) {
-		return "SubPropertyChain(" + conclusion.getSubChain() + " "
-				+ conclusion.getSuperChain() + ")";
+		return String.format("%s ⊑ %s", conclusion.getSubChain(),
+				conclusion.getSuperChain());
 	}
 }

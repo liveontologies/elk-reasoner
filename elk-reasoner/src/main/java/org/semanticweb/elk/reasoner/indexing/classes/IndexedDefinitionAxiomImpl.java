@@ -64,12 +64,6 @@ class IndexedDefinitionAxiomImpl<A extends ElkAxiom, C extends IndexedClass, D e
 	}
 
 	@Override
-	public String toStringStructural() {
-		return "EquivalentClasses(" + this.definedClass_ + ' '
-				+ this.definition_ + ')';
-	}
-
-	@Override
 	public final <O> O accept(IndexedAxiom.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

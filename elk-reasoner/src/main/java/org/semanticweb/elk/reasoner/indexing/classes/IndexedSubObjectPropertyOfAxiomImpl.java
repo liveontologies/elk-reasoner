@@ -67,12 +67,6 @@ class IndexedSubObjectPropertyOfAxiomImpl<A extends ElkAxiom, C extends IndexedP
 	}
 
 	@Override
-	public final String toStringStructural() {
-		return "SubObjectPropertyOf(" + this.subPropertyChain_ + ' '
-				+ this.superProperty_ + ')';
-	}
-
-	@Override
 	public final <O> O accept(IndexedAxiom.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
