@@ -39,6 +39,7 @@ import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.managers.ElkEntityRecycler;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
@@ -108,6 +109,8 @@ public class TracingTest {
 	private TracingTestVisitor getTracingTestVisitor(final Reasoner reasoner) {
 		return new TracingTestVisitor() {
 			
+			private final ElkObjectFactory factory_ = new ElkObjectFactoryImpl();
+			
 			@Override
 			public void subsumptionTest(ElkClass subsumee, ElkClass subsumer) {
 //				ReasonerStateAccessor.cleanClassTraces(reasoner);
@@ -115,7 +118,7 @@ public class TracingTest {
 				try {
 					LOGGER_.trace("Tracing test: {} => {}", subsumee, subsumer);
 					
-					ClassConclusion conclusion = reasoner.getConclusion(subsumee, subsumer);			
+					ClassConclusion conclusion = reasoner.getConclusion(factory_.getSubClassOfAxiom(subsumee, subsumer));			
 					reasoner.explainConclusion(conclusion);						
 					TracingTestUtils.checkTracingCompleteness(conclusion, reasoner);
 

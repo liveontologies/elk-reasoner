@@ -74,12 +74,12 @@ public class TracingSaturationTest {
 	@Test
 	public void testBasicTracing() throws Exception {
 		Reasoner reasoner = TestReasonerUtils
-				.loadAndClassify("tracing/DuplicateExistential.owl");
+				.loadAndClassify(TestReasonerUtils.loadAxioms("tracing/DuplicateExistential.owl"));
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass d = factory.getClass(new ElkFullIri("http://example.org/D"));
 
-		ClassConclusion conclusion = reasoner.getConclusion(a, d);
+		ClassConclusion conclusion = reasoner.getConclusion(factory.getSubClassOfAxiom(a, d));
 		reasoner.explainConclusion(conclusion);
 		TracingTestUtils.checkTracingCompleteness(conclusion, reasoner);
 	}
@@ -87,28 +87,29 @@ public class TracingSaturationTest {
 	@Test
 	public void testInconsistency() throws Exception {
 		Reasoner reasoner = TestReasonerUtils
-				.loadAndClassify("classification_test_input/Inconsistent.owl");
+				.loadAndClassify(TestReasonerUtils.loadAxioms("classification_test_input/Inconsistent.owl"));
+		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 
 		reasoner.explainInconsistency();
 		TracingTestUtils.checkTracingCompleteness(
-				reasoner.getConclusion(PredefinedElkClass.OWL_THING,
-						PredefinedElkClass.OWL_NOTHING),
+				reasoner.getConclusion(factory.getSubClassOfAxiom(PredefinedElkClass.OWL_THING,
+						PredefinedElkClass.OWL_NOTHING)),
 				reasoner);
 	}
 
 	@Test
 	public void testDuplicateInferenceOfConjunction() throws Exception {
 		Reasoner reasoner = TestReasonerUtils
-				.loadAndClassify("tracing/DuplicateConjunction.owl");
+				.loadAndClassify(TestReasonerUtils.loadAxioms("tracing/DuplicateConjunction.owl"));
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 		ElkClassExpression bAndC = factory.getObjectIntersectionOf(b, c);
 
-		ClassConclusion aSubBAndC = reasoner.getConclusion(a, bAndC);
-		ClassConclusion aSubB = reasoner.getConclusion(a, b);
-		ClassConclusion aSubC = reasoner.getConclusion(a, c);
+		ClassConclusion aSubBAndC = reasoner.getConclusion(factory.getSubClassOfAxiom(a, bAndC));
+		ClassConclusion aSubB = reasoner.getConclusion(factory.getSubClassOfAxiom(a, b));
+		ClassConclusion aSubC = reasoner.getConclusion(factory.getSubClassOfAxiom(a, c));
 		reasoner.explainConclusion(aSubBAndC);
 		TracingTestUtils.checkNumberOfInferences(aSubB, reasoner, 1);
 		TracingTestUtils.checkNumberOfInferences(aSubB, reasoner, 1);
@@ -119,7 +120,7 @@ public class TracingSaturationTest {
 	@Test
 	public void testDuplicateInferenceOfExistential() throws Exception {
 		Reasoner reasoner = TestReasonerUtils
-				.loadAndClassify("tracing/DuplicateExistential.owl");
+				.loadAndClassify(TestReasonerUtils.loadAxioms("tracing/DuplicateExistential.owl"));
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
@@ -130,11 +131,11 @@ public class TracingSaturationTest {
 		ElkClass d = factory.getClass(new ElkFullIri("http://example.org/D"));
 		ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
 
-		ClassConclusion aSubD = reasoner.getConclusion(a, d);
-		ClassConclusion aSubRSomeC = reasoner.getConclusion(a, rSomeC);
+		ClassConclusion aSubD = reasoner.getConclusion(factory.getSubClassOfAxiom(a, d));
+		ClassConclusion aSubRSomeC = reasoner.getConclusion(factory.getSubClassOfAxiom(a, rSomeC));
 		reasoner.explainConclusion(aSubD);
 		TracingTestUtils.checkNumberOfInferences(aSubRSomeC, reasoner, 1);
-		reasoner.explainConclusion(reasoner.getConclusion(b, c));
+		reasoner.explainConclusion(reasoner.getConclusion(factory.getSubClassOfAxiom(b, c)));
 		// now check that we didn't get a duplicate inference in A due to
 		// tracing B
 		TracingTestUtils.checkNumberOfInferences(aSubRSomeC, reasoner, 1);
@@ -144,7 +145,7 @@ public class TracingSaturationTest {
 	@Test
 	public void testDuplicateInferenceViaComposition() throws Exception {
 		Reasoner reasoner = TestReasonerUtils
-				.loadAndClassify("tracing/DuplicateComposition.owl");
+				.loadAndClassify(TestReasonerUtils.loadAxioms("tracing/DuplicateComposition.owl"));
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
@@ -154,12 +155,12 @@ public class TracingSaturationTest {
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 		ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
 
-		ClassConclusion aSubRSomeC = reasoner.getConclusion(a, rSomeC);
+		ClassConclusion aSubRSomeC = reasoner.getConclusion(factory.getSubClassOfAxiom(a, rSomeC));
 		reasoner.explainConclusion(aSubRSomeC);
 		TracingTestUtils.checkNumberOfInferences(aSubRSomeC, reasoner, 1);
 		TracingTestUtils.checkTracingCompleteness(aSubRSomeC, reasoner);
 		// B must be traced recursively
-		ClassConclusion bSubB = reasoner.getConclusion(b, b);
+		ClassConclusion bSubB = reasoner.getConclusion(factory.getSubClassOfAxiom(b, b));
 		TracingTestUtils.checkNumberOfInferences(bSubB, reasoner, 1);
 	}
 
@@ -167,7 +168,7 @@ public class TracingSaturationTest {
 	public void testDuplicateInferenceOfReflexiveExistential()
 			throws Exception {
 		Reasoner reasoner = TestReasonerUtils
-				.loadAndClassify("tracing/DuplicateReflexiveExistential.owl");
+				.loadAndClassify(TestReasonerUtils.loadAxioms("tracing/DuplicateReflexiveExistential.owl"));
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
@@ -176,7 +177,7 @@ public class TracingSaturationTest {
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 		ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
 
-		ClassConclusion aSubRSomeC = reasoner.getConclusion(a, rSomeC);
+		ClassConclusion aSubRSomeC = reasoner.getConclusion(factory.getSubClassOfAxiom(a, rSomeC));
 		reasoner.explainConclusion(aSubRSomeC);
 		TracingTestUtils.checkNumberOfInferences(aSubRSomeC, reasoner, 1);
 		TracingTestUtils.checkTracingCompleteness(aSubRSomeC, reasoner);
@@ -187,7 +188,7 @@ public class TracingSaturationTest {
 	public void testRecursiveTracingExistential() throws Exception {
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		Reasoner reasoner = TestReasonerUtils
-				.loadAndClassify("tracing/RecursiveExistential.owl");
+				.loadAndClassify(TestReasonerUtils.loadAxioms("tracing/RecursiveExistential.owl"));
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
@@ -196,8 +197,8 @@ public class TracingSaturationTest {
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 		ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
 
-		ClassConclusion aSubRSomeC = reasoner.getConclusion(a, rSomeC);
-		ClassConclusion bSubC = reasoner.getConclusion(b, c);
+		ClassConclusion aSubRSomeC = reasoner.getConclusion(factory.getSubClassOfAxiom(a, rSomeC));
+		ClassConclusion bSubC = reasoner.getConclusion(factory.getSubClassOfAxiom(b, c));
 		reasoner.explainConclusion(aSubRSomeC);
 		TracingTestUtils.checkNumberOfInferences(aSubRSomeC, reasoner, 1);
 		// b might be not traced because it is a filler
@@ -209,7 +210,7 @@ public class TracingSaturationTest {
 	public void testRecursiveTracingComposition() throws Exception {
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		Reasoner reasoner = TestReasonerUtils
-				.loadAndClassify("tracing/RecursiveComposition.owl");
+				.loadAndClassify(TestReasonerUtils.loadAxioms("tracing/RecursiveComposition.owl"));
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
@@ -218,8 +219,8 @@ public class TracingSaturationTest {
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 		ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
 
-		ClassConclusion aSubRSomeC = reasoner.getConclusion(a, rSomeC);
-		ClassConclusion aSubB = reasoner.getConclusion(b, b);
+		ClassConclusion aSubRSomeC = reasoner.getConclusion(factory.getSubClassOfAxiom(a, rSomeC));
+		ClassConclusion aSubB = reasoner.getConclusion(factory.getSubClassOfAxiom(b, b));
 		reasoner.explainConclusion(aSubRSomeC);
 		TracingTestUtils.checkNumberOfInferences(aSubRSomeC, reasoner, 1);
 		TracingTestUtils.checkNumberOfInferences(aSubB, reasoner, 1);
@@ -231,14 +232,14 @@ public class TracingSaturationTest {
 	public void testAvoidTracingDueToCyclicInferences() throws Exception {
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		Reasoner reasoner = TestReasonerUtils
-				.loadAndClassify("tracing/TrivialPropagation.owl");
+				.loadAndClassify(TestReasonerUtils.loadAxioms("tracing/TrivialPropagation.owl"));
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass a1 = factory.getClass(new ElkFullIri("http://example.org/A1"));
 		ElkClass b2 = factory.getClass(new ElkFullIri("http://example.org/B2"));
 
-		ClassConclusion aSubA1 = reasoner.getConclusion(a, a1);
-		ClassConclusion b2SubB2 = reasoner.getConclusion(b2, b2);
+		ClassConclusion aSubA1 = reasoner.getConclusion(factory.getSubClassOfAxiom(a, a1));
+		ClassConclusion b2SubB2 = reasoner.getConclusion(factory.getSubClassOfAxiom(b2, b2));
 		reasoner.explainConclusion(aSubA1);
 		TracingTestUtils.checkNumberOfInferences(b2SubB2, reasoner, 0);
 	}

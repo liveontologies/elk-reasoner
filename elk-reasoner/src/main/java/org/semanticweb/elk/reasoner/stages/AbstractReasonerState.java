@@ -34,6 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
@@ -570,17 +571,20 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 * TRACING METHODS
 	 *---------------------------------------------------*/
 
-	public ClassConclusion getConclusion(ElkClassExpression sub,
-			ElkClassExpression sup) {
-		IndexedClassExpression subsumee = sub.accept(expressionConverter_);
-		IndexedClassExpression subsumer = sup.accept(expressionConverter_);
+	public ClassConclusion getConclusion(ElkSubClassOfAxiom axiom) {
+		IndexedClassExpression subExpression = axiom.getSubClassExpression().accept(expressionConverter_);
+		IndexedClassExpression superExpression = axiom.getSuperClassExpression().accept(expressionConverter_);
+		if (subExpression == null || superExpression == null) {
+			// input expressions do not occur in the ontology
+			return null;
+		}
 		
-		if (!isSatisfiable(subsumee)) {
+		if (!isSatisfiable(subExpression)) {
 			// the subsumee is unsatisfiable so we explain the unsatisfiability
-			return factory_.getContradiction(subsumee);
+			return factory_.getContradiction(subExpression);
 		}
 		// else
-		return factory_.getSubClassInclusionComposed(subsumee, subsumer);
+		return factory_.getSubClassInclusionComposed(subExpression, superExpression);
 	}
 
 	

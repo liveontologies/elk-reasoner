@@ -31,10 +31,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
@@ -75,52 +74,53 @@ public class TestReasonerUtils {
 
 		return createTestReasoner(axiomLoader, stageExecutor, config);
 	}
-	
-	public static Reasoner loadAndClassify(String resource) throws Exception {
-		return loadAndClassify(TestReasonerUtils.class.getClassLoader().getResourceAsStream(resource));
-	}
-	
-	public static Reasoner loadAndClassify(File file) throws Exception {
-		return loadAndClassify(new FileInputStream(file));
-	}	
-	
-	public static Reasoner loadAndClassify(InputStream stream) throws Exception {
-		Reasoner reasoner = null;
+
+	public static Reasoner loadAndClassify(Set<? extends ElkAxiom> ontology)
+			throws Exception {
+
+		TestChangesLoader initialLoader = new TestChangesLoader();
+		ReasonerStageExecutor executor = new LoggingStageExecutor();
+
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(initialLoader,
+				executor);
+
+		for (ElkAxiom axiom : ontology) {
+			initialLoader.add(axiom);
+		}
 
 		try {
-			List<ElkAxiom> ontology = loadAxioms(stream);
-			TestChangesLoader initialLoader = new TestChangesLoader();
-			ReasonerStageExecutor executor = new LoggingStageExecutor();
-
-			reasoner = TestReasonerUtils.createTestReasoner(initialLoader,
-					executor);
-
-			for (ElkAxiom axiom : ontology) {
-				initialLoader.add(axiom);
-			}
-
-			try {
-				reasoner.getTaxonomy();
-			} catch (ElkInconsistentOntologyException e) {
-				// shit happens
-			}
-		} finally {
-			IOUtils.closeQuietly(stream);
+			reasoner.getTaxonomy();
+		} catch (ElkInconsistentOntologyException e) {
+			// shit happens
 		}
 
 		return reasoner;
 	}
 
-	public static List<ElkAxiom> loadAxioms(InputStream stream) throws IOException,
-			Owl2ParseException {
+	public static Set<? extends ElkAxiom> loadAxioms(InputStream stream)
+			throws IOException, Owl2ParseException {
 		return loadAxioms(new InputStreamReader(stream));
 	}
 
-	public static List<ElkAxiom> loadAxioms(Reader reader) throws IOException,
-			Owl2ParseException {
+	public static Set<? extends ElkAxiom> loadAxioms(String resource)
+			throws Exception {
+		return loadAxioms(TestReasonerUtils.class.getClassLoader()
+				.getResourceAsStream(resource));
+	}
+
+	public static Set<? extends ElkAxiom> loadAxioms(File file)
+			throws Exception {
+		InputStream stream = new FileInputStream(file);
+		Set<? extends ElkAxiom> result = loadAxioms(stream);
+		stream.close();
+		return result;
+	}
+
+	public static Set<ElkAxiom> loadAxioms(Reader reader)
+			throws IOException, Owl2ParseException {
 		Owl2Parser parser = new Owl2FunctionalStyleParserFactory()
 				.getParser(reader);
-		final List<ElkAxiom> axioms = new ArrayList<ElkAxiom>();
+		final Set<ElkAxiom> axioms = new HashSet<ElkAxiom>();
 
 		parser.accept(new Owl2ParserAxiomProcessor() {
 
@@ -141,5 +141,5 @@ public class TestReasonerUtils {
 		});
 
 		return axioms;
-	}	
+	}
 }

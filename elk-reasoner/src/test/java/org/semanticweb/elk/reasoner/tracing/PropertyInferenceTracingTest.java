@@ -79,7 +79,7 @@ public class PropertyInferenceTracingTest {
 	
 	@Test
 	public void testPropertyHierarchy() throws Exception {
-		Reasoner reasoner = TestReasonerUtils.loadAndClassify("tracing/DeepPropertyHierarchy.owl");
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify(TestReasonerUtils.loadAxioms("tracing/DeepPropertyHierarchy.owl"));
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass d = factory.getClass(new ElkFullIri("http://example.org/D"));
@@ -87,7 +87,7 @@ public class PropertyInferenceTracingTest {
 		final IndexedObjectProperty r = ReasonerStateAccessor.transform(reasoner, factory.getObjectProperty(new ElkFullIri("http://example.org/R")));
 		final IndexedObjectProperty hh = ReasonerStateAccessor.transform(reasoner, factory.getObjectProperty(new ElkFullIri("http://example.org/HH")));
 		
-		ClassConclusion conclusion = reasoner.getConclusion(a, d);
+		ClassConclusion conclusion = reasoner.getConclusion(factory.getSubClassOfAxiom(a, d));
 		reasoner.explainConclusion(conclusion);
 
 		TracingTestUtils.checkTracingCompleteness(conclusion, reasoner);
@@ -100,7 +100,7 @@ public class PropertyInferenceTracingTest {
 						// checking that S -> HH is in the trace (i.e. is used)
 						return inference.getSubChain().equals(s) && 
 								inference.getSuperChain().equals(hh) &&
-								inference.getFirstPremise(FACTORY_).getSubChain().equals(r);
+								inference.getSecondPremise(FACTORY_).getSubChain().equals(r);
 					}
 			
 				});
@@ -108,7 +108,9 @@ public class PropertyInferenceTracingTest {
 	
 	@Test
 	public void testCompositionInferences() throws Exception {
-		Reasoner reasoner = TestReasonerUtils.loadAndClassify("tracing/SimpleCompositions.owl");
+		
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify(
+				TestReasonerUtils.loadAxioms("tracing/SimpleCompositions.owl"));
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
@@ -135,7 +137,7 @@ public class PropertyInferenceTracingTest {
 		final IndexedClassExpression aIndexed = ReasonerStateAccessor.transform(reasoner, a);
 		final IndexedClassExpression dIndexed = ReasonerStateAccessor.transform(reasoner, d);
 		
-		reasoner.explainConclusion(reasoner.getConclusion(a, e));
+		reasoner.explainConclusion(reasoner.getConclusion(factory.getSubClassOfAxiom(a, e)));
 
 		// TracingTestUtils.checkTracingCompleteness(b, e, reasoner); // b might be not traced because it is a filler
 		// checking that S o H -> SS o HH is there
@@ -153,7 +155,7 @@ public class PropertyInferenceTracingTest {
 									left.getSuperChain().equals(ssIndexed) &&
 									right.getSubChain().equals(hIndexed) &&
 									right.getSuperChain().equals(hhIndexed) &&
-									conclusion.getRelation().equals(sshhIndexed);
+									conclusion.getChain().equals(sshhIndexed);
 					}
 			
 				});
@@ -182,7 +184,7 @@ public class PropertyInferenceTracingTest {
 								backwardLink.getFirstPremise(FACTORY_).getTraceRoot().equals(aIndexed) &&
 								backwardLink.getFirstPremise(FACTORY_).getRelation().equals(rIndexed) &&
 								backwardLink.getThirdPremise(FACTORY_).getTarget().equals(dIndexed) &&
-								backwardLink.getThirdPremise(FACTORY_).getRelation().equals(sshhIndexed) &&
+								backwardLink.getThirdPremise(FACTORY_).getChain().equals(sshhIndexed) &&
 								backwardLink.getRelation().equals(tIndexed);
 					}
 				});
