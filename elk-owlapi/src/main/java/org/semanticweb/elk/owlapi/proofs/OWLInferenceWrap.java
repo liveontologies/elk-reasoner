@@ -71,8 +71,7 @@ public class OWLInferenceWrap implements OWLInference {
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return elkInference_.getName();
 	}
 
 	@Override

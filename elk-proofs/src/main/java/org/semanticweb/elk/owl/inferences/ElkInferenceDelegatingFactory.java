@@ -41,7 +41,7 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 	}
 
 	@Override
-	public ElkClassInclusionExistentialFillerUnfolding getElkClassInclusionExistentialFillerUnfolding(
+	public ElkClassInclusionExistentialFillerExpansion getElkClassInclusionExistentialFillerUnfolding(
 			ElkClassExpression subClass, ElkObjectPropertyExpression property,
 			ElkClassExpression subFiller, ElkClassExpression superFiller) {
 		return filter(
@@ -58,7 +58,7 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 	}
 
 	@Override
-	public ElkClassInclusionExistentialPropertyUnfolding getElkClassInclusionExistentialPropertyUnfolding(
+	public ElkClassInclusionExistentialPropertyExpansion getElkClassInclusionExistentialPropertyUnfolding(
 			ElkClassExpression subExpression,
 			ElkObjectPropertyExpression subProperty, ElkClassExpression filler,
 			ElkObjectPropertyExpression superProperty) {
@@ -68,7 +68,7 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 	}
 
 	@Override
-	public ElkClassInclusionExistentialPropertyUnfolding getElkClassInclusionExistentialPropertyUnfolding(
+	public ElkClassInclusionExistentialPropertyExpansion getElkClassInclusionExistentialPropertyUnfolding(
 			List<? extends ElkClassExpression> classExpressions,
 			List<? extends ElkObjectPropertyExpression> subChain,
 			ElkObjectPropertyExpression superProperty) {
@@ -199,7 +199,7 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 	}
 
 	@Override
-	public ElkPropertyRangePropertyUnfolding getElkPropertyRangePropertyUnfolding(
+	public ElkPropertyRangePropertyExpansion getElkPropertyRangePropertyUnfolding(
 			ElkObjectPropertyExpression superProperty, ElkClassExpression range,
 			ElkObjectPropertyExpression subProperty) {
 		return filter(mainFactory_.getElkPropertyRangePropertyUnfolding(

@@ -42,6 +42,8 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  */
 public class ElkClassInclusionOwlThing extends AbstractElkInference {
 
+	private final static String NAME_ = "Top Superclass";
+	
 	private final ElkClassExpression subClass_;
 
 	ElkClassInclusionOwlThing(ElkClassExpression subClass) {
@@ -52,6 +54,11 @@ public class ElkClassInclusionOwlThing extends AbstractElkInference {
 		return subClass_;
 	}
 
+	@Override
+	public String getName() {
+		return NAME_;
+	}
+	
 	@Override
 	public int getPremiseCount() {
 		return 0;

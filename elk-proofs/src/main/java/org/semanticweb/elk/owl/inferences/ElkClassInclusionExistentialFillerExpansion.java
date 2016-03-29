@@ -42,14 +42,16 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  * @author Yevgeny Kazakov
  *
  */
-public class ElkClassInclusionExistentialFillerUnfolding
+public class ElkClassInclusionExistentialFillerExpansion
 		extends AbstractElkInference {
+	
+	private final static String NAME_ = "Existential Filler Expansion";
 
 	private final ElkClassExpression subClass_, subFiller_, superFiller_;
 
 	private final ElkObjectPropertyExpression property_;
 
-	ElkClassInclusionExistentialFillerUnfolding(ElkClassExpression subClass,
+	ElkClassInclusionExistentialFillerExpansion(ElkClassExpression subClass,
 			ElkObjectPropertyExpression property, ElkClassExpression subFiller,
 			ElkClassExpression superFiller) {
 		this.subClass_ = subClass;
@@ -72,6 +74,11 @@ public class ElkClassInclusionExistentialFillerUnfolding
 
 	public ElkClassExpression getSuperFiller() {
 		return superFiller_;
+	}
+	
+	@Override
+	public String getName() {
+		return NAME_;
 	}
 
 	@Override
@@ -120,7 +127,7 @@ public class ElkClassInclusionExistentialFillerUnfolding
 	 */
 	public interface Factory {
 
-		ElkClassInclusionExistentialFillerUnfolding getElkClassInclusionExistentialFillerUnfolding(
+		ElkClassInclusionExistentialFillerExpansion getElkClassInclusionExistentialFillerUnfolding(
 				ElkClassExpression subClass,
 				ElkObjectPropertyExpression property,
 				ElkClassExpression subFiller, ElkClassExpression superFiller);
@@ -137,7 +144,7 @@ public class ElkClassInclusionExistentialFillerUnfolding
 	 */
 	interface Visitor<O> {
 
-		O visit(ElkClassInclusionExistentialFillerUnfolding inference);
+		O visit(ElkClassInclusionExistentialFillerExpansion inference);
 
 	}
 

@@ -43,13 +43,15 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
  * @author Yevgeny Kazakov
  *
  */
-public class ElkPropertyRangePropertyUnfolding extends AbstractElkInference {
+public class ElkPropertyRangePropertyExpansion extends AbstractElkInference {
 
+	private final static String NAME_ = "Property Range Expansion";
+	
 	private final ElkObjectPropertyExpression subProperty_, superProperty_;
 
 	private final ElkClassExpression range_;
 
-	ElkPropertyRangePropertyUnfolding(ElkObjectPropertyExpression superProperty,
+	ElkPropertyRangePropertyExpansion(ElkObjectPropertyExpression superProperty,
 			ElkClassExpression range, ElkObjectPropertyExpression subProperty) {
 		this.superProperty_ = superProperty;
 		this.range_ = range;
@@ -68,6 +70,11 @@ public class ElkPropertyRangePropertyUnfolding extends AbstractElkInference {
 		return range_;
 	}
 
+	@Override
+	public String getName() {
+		return NAME_;
+	}
+	
 	@Override
 	public int getPremiseCount() {
 		return 2;
@@ -118,7 +125,7 @@ public class ElkPropertyRangePropertyUnfolding extends AbstractElkInference {
 	 */
 	public interface Factory {
 
-		ElkPropertyRangePropertyUnfolding getElkPropertyRangePropertyUnfolding(
+		ElkPropertyRangePropertyExpansion getElkPropertyRangePropertyUnfolding(
 				ElkObjectPropertyExpression superProperty,
 				ElkClassExpression range,
 				ElkObjectPropertyExpression subProperty);
@@ -135,7 +142,7 @@ public class ElkPropertyRangePropertyUnfolding extends AbstractElkInference {
 	 */
 	interface Visitor<O> {
 
-		O visit(ElkPropertyRangePropertyUnfolding inference);
+		O visit(ElkPropertyRangePropertyExpansion inference);
 
 	}
 

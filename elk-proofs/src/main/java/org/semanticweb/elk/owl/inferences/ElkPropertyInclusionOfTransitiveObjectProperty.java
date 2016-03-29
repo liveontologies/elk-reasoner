@@ -45,6 +45,8 @@ import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 public class ElkPropertyInclusionOfTransitiveObjectProperty
 		extends AbstractElkInference {
 
+	private final static String NAME_ = "Transitive Property Translation";
+	
 	private final ElkObjectPropertyExpression property_;
 
 	ElkPropertyInclusionOfTransitiveObjectProperty(
@@ -56,6 +58,11 @@ public class ElkPropertyInclusionOfTransitiveObjectProperty
 		return property_;
 	}
 
+	@Override
+	public String getName() {
+		return NAME_;
+	}
+	
 	@Override
 	public int getPremiseCount() {
 		return 1;

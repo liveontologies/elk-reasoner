@@ -45,6 +45,8 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
  */
 public class ElkPropertyInclusionHierarchy extends AbstractElkInference {
 
+	private final static String NAME_ = "Property Hierarchy";
+	
 	private final ElkSubObjectPropertyExpression subExpression_;
 
 	private final List<? extends ElkObjectPropertyExpression> expressions_;
@@ -74,6 +76,11 @@ public class ElkPropertyInclusionHierarchy extends AbstractElkInference {
 		return expressions_;
 	}
 
+	@Override
+	public String getName() {
+		return NAME_;
+	}
+	
 	@Override
 	public int getPremiseCount() {
 		return expressions_.size();

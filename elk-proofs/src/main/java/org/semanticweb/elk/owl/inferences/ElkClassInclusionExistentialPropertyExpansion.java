@@ -45,8 +45,12 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
  * @author Yevgeny Kazakov
  *
  */
-public class ElkClassInclusionExistentialPropertyUnfolding
+public class ElkClassInclusionExistentialPropertyExpansion
 		extends AbstractElkInference {
+	
+	private final static String NAME_SIMPLE_ = "Existential Property Expansion";
+	
+	private final static String NAME_COMPLEX_ = "Existential Composition";
 
 	private final List<? extends ElkClassExpression> classExpressions_;
 
@@ -54,7 +58,7 @@ public class ElkClassInclusionExistentialPropertyUnfolding
 
 	private final ElkObjectPropertyExpression superProperty_;
 
-	ElkClassInclusionExistentialPropertyUnfolding(
+	ElkClassInclusionExistentialPropertyExpansion(
 			List<? extends ElkClassExpression> classExpressions,
 			List<? extends ElkObjectPropertyExpression> subChain,
 			ElkObjectPropertyExpression superProperty) {
@@ -67,7 +71,7 @@ public class ElkClassInclusionExistentialPropertyUnfolding
 		this.superProperty_ = superProperty;
 	}
 
-	ElkClassInclusionExistentialPropertyUnfolding(
+	ElkClassInclusionExistentialPropertyExpansion(
 			ElkClassExpression subExpression,
 			ElkObjectPropertyExpression subProperty, ElkClassExpression filler,
 			ElkObjectPropertyExpression superProperty) {
@@ -95,7 +99,16 @@ public class ElkClassInclusionExistentialPropertyUnfolding
 	public ElkObjectPropertyExpression getSuperProperty() {
 		return superProperty_;
 	}
-
+	
+	@Override
+	public String getName() {
+		if (subChain_.size() == 1) {
+			return NAME_SIMPLE_;
+		}
+		// else
+		return NAME_COMPLEX_;
+	}
+	
 	@Override
 	public int getPremiseCount() {
 		return classExpressions_.size();
@@ -156,12 +169,12 @@ public class ElkClassInclusionExistentialPropertyUnfolding
 	 */
 	public interface Factory {
 
-		ElkClassInclusionExistentialPropertyUnfolding getElkClassInclusionExistentialPropertyUnfolding(
+		ElkClassInclusionExistentialPropertyExpansion getElkClassInclusionExistentialPropertyUnfolding(
 				List<? extends ElkClassExpression> classExpressions,
 				List<? extends ElkObjectPropertyExpression> subChain,
 				ElkObjectPropertyExpression superProperty);
 
-		ElkClassInclusionExistentialPropertyUnfolding getElkClassInclusionExistentialPropertyUnfolding(
+		ElkClassInclusionExistentialPropertyExpansion getElkClassInclusionExistentialPropertyUnfolding(
 				ElkClassExpression subExpression,
 				ElkObjectPropertyExpression subProperty,
 				ElkClassExpression filler,
@@ -179,7 +192,7 @@ public class ElkClassInclusionExistentialPropertyUnfolding
 	 */
 	interface Visitor<O> {
 
-		O visit(ElkClassInclusionExistentialPropertyUnfolding inference);
+		O visit(ElkClassInclusionExistentialPropertyExpansion inference);
 
 	}
 

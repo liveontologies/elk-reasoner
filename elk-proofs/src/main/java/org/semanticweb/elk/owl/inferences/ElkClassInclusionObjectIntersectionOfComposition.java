@@ -44,6 +44,8 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 public class ElkClassInclusionObjectIntersectionOfComposition
 		extends AbstractElkInference {
 
+	private final static String NAME_ = "Conjunction Composition";
+	
 	private final ElkClassExpression subExpression_;
 
 	private final List<? extends ElkClassExpression> conjuncts_;
@@ -63,6 +65,11 @@ public class ElkClassInclusionObjectIntersectionOfComposition
 		return conjuncts_;
 	}
 
+	@Override
+	public String getName() {
+		return NAME_;
+	}
+	
 	@Override
 	public int getPremiseCount() {
 		return conjuncts_.size();

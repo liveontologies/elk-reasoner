@@ -31,10 +31,10 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 public class ElkInferenceBaseFactory implements ElkInference.Factory {
 
 	@Override
-	public ElkClassInclusionExistentialFillerUnfolding getElkClassInclusionExistentialFillerUnfolding(
+	public ElkClassInclusionExistentialFillerExpansion getElkClassInclusionExistentialFillerUnfolding(
 			ElkClassExpression subClass, ElkObjectPropertyExpression property,
 			ElkClassExpression subFiller, ElkClassExpression superFiller) {
-		return new ElkClassInclusionExistentialFillerUnfolding(subClass,
+		return new ElkClassInclusionExistentialFillerExpansion(subClass,
 				property, subFiller, superFiller);
 	}
 
@@ -46,20 +46,20 @@ public class ElkInferenceBaseFactory implements ElkInference.Factory {
 	}
 
 	@Override
-	public ElkClassInclusionExistentialPropertyUnfolding getElkClassInclusionExistentialPropertyUnfolding(
+	public ElkClassInclusionExistentialPropertyExpansion getElkClassInclusionExistentialPropertyUnfolding(
 			ElkClassExpression subExpression,
 			ElkObjectPropertyExpression subProperty, ElkClassExpression filler,
 			ElkObjectPropertyExpression superProperty) {
-		return new ElkClassInclusionExistentialPropertyUnfolding(subExpression,
+		return new ElkClassInclusionExistentialPropertyExpansion(subExpression,
 				subProperty, filler, superProperty);
 	}
 
 	@Override
-	public ElkClassInclusionExistentialPropertyUnfolding getElkClassInclusionExistentialPropertyUnfolding(
+	public ElkClassInclusionExistentialPropertyExpansion getElkClassInclusionExistentialPropertyUnfolding(
 			List<? extends ElkClassExpression> classExpressions,
 			List<? extends ElkObjectPropertyExpression> subChain,
 			ElkObjectPropertyExpression superProperty) {
-		return new ElkClassInclusionExistentialPropertyUnfolding(
+		return new ElkClassInclusionExistentialPropertyExpansion(
 				classExpressions, subChain, superProperty);
 	}
 
@@ -175,10 +175,10 @@ public class ElkInferenceBaseFactory implements ElkInference.Factory {
 	}
 
 	@Override
-	public ElkPropertyRangePropertyUnfolding getElkPropertyRangePropertyUnfolding(
+	public ElkPropertyRangePropertyExpansion getElkPropertyRangePropertyUnfolding(
 			ElkObjectPropertyExpression superProperty, ElkClassExpression range,
 			ElkObjectPropertyExpression subProperty) {
-		return new ElkPropertyRangePropertyUnfolding(superProperty, range,
+		return new ElkPropertyRangePropertyExpansion(superProperty, range,
 				subProperty);
 	}
 

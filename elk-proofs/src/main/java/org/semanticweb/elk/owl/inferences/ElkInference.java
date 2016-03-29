@@ -28,6 +28,11 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 public interface ElkInference {
 
 	/**
+	 * @return the name of this inference
+	 */
+	String getName();
+	
+	/**
 	 * @return the number of premises of this inference
 	 */
 	int getPremiseCount();
@@ -60,9 +65,9 @@ public interface ElkInference {
 	 *
 	 */
 	interface Factory
-			extends ElkClassInclusionExistentialFillerUnfolding.Factory,
+			extends ElkClassInclusionExistentialFillerExpansion.Factory,
 			ElkClassInclusionExistentialOfObjectHasSelf.Factory,
-			ElkClassInclusionExistentialPropertyUnfolding.Factory,
+			ElkClassInclusionExistentialPropertyExpansion.Factory,
 			ElkClassInclusionHierarchy.Factory,
 			ElkClassInclusionObjectIntersectionOfComposition.Factory,
 			ElkClassInclusionObjectIntersectionOfDecomposition.Factory,
@@ -76,7 +81,7 @@ public interface ElkInference {
 			ElkPropertyInclusionHierarchy.Factory,
 			ElkPropertyInclusionOfTransitiveObjectProperty.Factory,
 			ElkPropertyInclusionTautology.Factory,
-			ElkPropertyRangePropertyUnfolding.Factory {
+			ElkPropertyRangePropertyExpansion.Factory {
 
 		// combined interface
 
@@ -91,9 +96,9 @@ public interface ElkInference {
 	 *            the type of the output
 	 */
 	interface Visitor<O>
-			extends ElkClassInclusionExistentialFillerUnfolding.Visitor<O>,
+			extends ElkClassInclusionExistentialFillerExpansion.Visitor<O>,
 			ElkClassInclusionExistentialOfObjectHasSelf.Visitor<O>,
-			ElkClassInclusionExistentialPropertyUnfolding.Visitor<O>,
+			ElkClassInclusionExistentialPropertyExpansion.Visitor<O>,
 			ElkClassInclusionHierarchy.Visitor<O>,
 			ElkClassInclusionObjectIntersectionOfComposition.Visitor<O>,
 			ElkClassInclusionObjectIntersectionOfDecomposition.Visitor<O>,
@@ -107,7 +112,7 @@ public interface ElkInference {
 			ElkPropertyInclusionHierarchy.Visitor<O>,
 			ElkPropertyInclusionOfTransitiveObjectProperty.Visitor<O>,
 			ElkPropertyInclusionTautology.Visitor<O>,
-			ElkPropertyRangePropertyUnfolding.Visitor<O> {
+			ElkPropertyRangePropertyExpansion.Visitor<O> {
 
 		// combined interface
 
