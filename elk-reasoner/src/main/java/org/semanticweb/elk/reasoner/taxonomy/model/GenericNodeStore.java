@@ -1,11 +1,12 @@
+package org.semanticweb.elk.reasoner.taxonomy.model;
+
 /*
  * #%L
  * ELK Reasoner
- * 
- * $Id$
- * $HeadURL$
+ * $Id:$
+ * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,21 +21,25 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.taxonomy;
 
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
+import java.util.Set;
 
 /**
- * A marker interface for taxonomy of classes and their instances (individuals).
+ * Node store with parameterized type of its nodes.
  * 
- * @author Markus Kroetzsch
- * @author Pavel Klinov
- * 
+ * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of members of the nodes in this store.
+ * @param <N>
+ *            The type of nodes in this store.
  */
+public interface GenericNodeStore<T, N extends Node<T>> extends NodeStore<T> {
 
-public interface IndividualClassTaxonomy extends
-		UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> {
-	// nothing more
+	@Override
+	public N getNode(T member);
+
+	@Override
+	public Set<? extends N> getNodes();
+
 }

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.semanticweb.elk.reasoner.taxonomy.model;
 /*
  * #%L
@@ -24,16 +21,60 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkEntity;
-
 /**
+ * A node that can be modified.
+ * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
+ *
+ * @param <T>
+ *            The type of the members of this node.
  */
-public interface UpdateableNode<T extends ElkEntity> extends Node<T> {
+public interface UpdateableNode<T> extends Node<T> {
 
-	public boolean trySetModified(boolean modified);
-	
-	public boolean isModified();	
+	/**
+	 * Atomically sets the modification state of this node to the passed
+	 * argument if the state is different.
+	 * 
+	 * @param modified
+	 *            How to set the modification state.
+	 * @return Whether the state changed.
+	 */
+	boolean trySetModified(boolean modified);
+
+	/**
+	 * Whether this node is marked as modified.
+	 * 
+	 * @return Whether this node is marked as modified.
+	 */
+	boolean isModified();
+
+	/**
+	 * Adds the specified member to this node.
+	 * 
+	 * @param member
+	 *            The member to add.
+	 * @return Whether the node changed.
+	 */
+	boolean add(T member);
+
+	/**
+	 * Removes the specified member from this node.
+	 * 
+	 * @param member
+	 *            The node to remove.
+	 * @return Whether the node changed.
+	 */
+	boolean remove(T member);
+
+	/**
+	 * Replaces the members of this node with the specified members.
+	 * 
+	 * @param members
+	 *            The new members of this node.
+	 */
+	void setMembers(Iterable<T> members);
+
 }

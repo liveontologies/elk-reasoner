@@ -1,14 +1,12 @@
-/**
- * 
- */
 package org.semanticweb.elk.reasoner.taxonomy.model;
+
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,14 +27,29 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
- * Should be implemented by bottom nodes in updateable taxonomies
+ * Taxonomy node with parameterized type of nodes with which it may be
+ * associated.
  * 
- * @author Pavel Klinov
+ * @author Peter Skocovsky
  *
- * pavel.klinov@uni-ulm.de
+ * @param <T>
+ *            The type of members of this node.
+ * @param <N>
+ *            The type of nodes with which this node can be associated.
  */
-public interface UpdateableBottomNode<T extends ElkEntity> extends TaxonomyNode<T> {
+public interface GenericTaxonomyNode<T extends ElkEntity, N extends GenericTaxonomyNode<T, N>>
+		extends TaxonomyNode<T> {
 
-	public Set<? extends UpdateableTaxonomyNode<T>> getDirectUpdateableSuperNodes();
-	
+	@Override
+	public Set<? extends N> getDirectSuperNodes();
+
+	@Override
+	public Set<? extends N> getAllSuperNodes();
+
+	@Override
+	public Set<? extends N> getDirectSubNodes();
+
+	@Override
+	public Set<? extends N> getAllSubNodes();
+
 }

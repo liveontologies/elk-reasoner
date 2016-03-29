@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.semanticweb.elk.reasoner.taxonomy;
 
 /*
@@ -168,9 +165,9 @@ public class MockTaxonomyLoader {
 				ElkClass superClass = (ElkClass) superCE;
 				// check if both nodes are there yet
 				MutableTypeNode<ElkClass, ElkNamedIndividual> subNode = taxonomy
-						.getTypeNode(subClass);
+						.getNode(subClass);
 				MutableTypeNode<ElkClass, ElkNamedIndividual> superNode = taxonomy
-						.getTypeNode(superClass);
+						.getNode(superClass);
 
 				if ((subNode == null || superNode == null) && !createNodes) {
 					// wait, maybe we'll create these nodes later
@@ -237,7 +234,7 @@ public class MockTaxonomyLoader {
 				ElkNamedIndividual individual = (ElkNamedIndividual) elkClassAssertionAxiom
 						.getIndividual();
 				MutableTypeNode<ElkClass, ElkNamedIndividual> typeNode = taxonomy
-						.getTypeNode(type);
+						.getNode(type);
 
 				if (typeNode == null && !createNodes) {
 					// wait

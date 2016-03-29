@@ -25,22 +25,18 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.model.SimpleUpdateableNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -48,40 +44,27 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * Class for storing information about a class in the context of classification.
- * It is the main data container for {@link IndividualClassTaxonomy} objects.
- * Like most such data containers in ELK, it is read-only for public access but
- * provides package-private ways of modifying it. Modifications of this class
- * happen in implementations of {@link IndividualClassTaxonomy} only.
+ * It is the main data container for {@link InstanceTaxonomy} objects. Like most
+ * such data containers in ELK, it is read-only for public access but provides
+ * package-private ways of modifying it. Modifications of this class happen in
+ * implementations of {@link InstanceTaxonomy} only.
  * 
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  * @author Peter Skocovsky
  */
-public class IndividualNode implements
-		UpdateableInstanceNode<ElkClass, ElkNamedIndividual> {
+public class IndividualNode extends SimpleUpdateableNode<ElkNamedIndividual>
+		implements UpdateableInstanceNode<ElkClass, ElkNamedIndividual> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IndividualNode.class);
 
 	/**
-	 * Equivalent ElkClass objects that are representatives of this node.
-	 */
-	private final List<ElkNamedIndividual> members_;
-	/**
-	 * provides keys that are used for hashing instead of the elkClasses
-	 */
-	private final ComparatorKeyProvider<ElkEntity> individualKeyProvider_;
-	/**
 	 * ElkClass nodes whose members are direct types of the members of this
 	 * node.
 	 */
 	private final Set<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> directTypeNodes_;
-	/**
-	 * <tt>true</tt> if the direct type nodes need to be recomputed
-	 */
-	private final AtomicBoolean modified_ = new AtomicBoolean(true);
-	
 
 	/**
 	 * Constructing the class node for a given taxonomy and the set of
@@ -93,12 +76,9 @@ public class IndividualNode implements
 	 *            non-empty list of equivalent ElkClass objects
 	 */
 	protected IndividualNode(Collection<ElkNamedIndividual> members,
-			final ComparatorKeyProvider<ElkEntity> individualKeyProvider) {
-
-		this.members_ = new ArrayList<ElkNamedIndividual>(members);
-		this.individualKeyProvider_ = individualKeyProvider;
+			final ComparatorKeyProvider<? super ElkNamedIndividual> individualKeyProvider) {
+		super(members, members.size(), individualKeyProvider);
 		this.directTypeNodes_ = new ArrayHashSet<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>();
-		Collections.sort(this.members_, this.individualKeyProvider_.getComparator());
 	}
 
 	/**
@@ -108,43 +88,11 @@ public class IndividualNode implements
 	 *            node to add
 	 */
 	@Override
-	public void addDirectTypeNode(UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode) {
+	public void addDirectTypeNode(
+			UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode) {
 		LOGGER_.trace("{}: new direct type-node {}", this, typeNode);
-		
+
 		directTypeNodes_.add(typeNode);
-	}
-
-	@Override
-	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
-		return individualKeyProvider_;
-	}
-	
-	@Override
-	public Iterator<ElkNamedIndividual> iterator() {
-		return members_.iterator();
-	}
-	
-	@Override
-	public boolean contains(ElkNamedIndividual member) {
-		return (Collections.binarySearch(members_, member,
-				individualKeyProvider_.getComparator()) >= 0);
-	}
-	
-	@Override
-	public int size() {
-		return members_.size();
-	}
-	
-	public void setMembers(Collection<ElkNamedIndividual> members) {
-		LOGGER_.trace("{}: updating members to {}", this, members);
-		members_.clear();
-		members_.addAll(members);
-		Collections.sort(this.members_, individualKeyProvider_.getComparator());
-	}
-
-	@Override
-	public ElkNamedIndividual getCanonicalMember() {
-		return members_.get(0);
 	}
 
 	@Override
@@ -166,7 +114,7 @@ public class IndividualNode implements
 
 			if (result.add(next)) {
 				for (UpdateableTypeNode<ElkClass, ElkNamedIndividual> nextSuperNode : next
-						.getDirectUpdateableSuperNodes())
+						.getDirectSuperNodes())
 					todo.add(nextSuperNode);
 			}
 		}
@@ -187,28 +135,10 @@ public class IndividualNode implements
 	}
 
 	@Override
-	public boolean trySetModified(boolean modified) {
-		boolean result = modified_.compareAndSet(!modified, modified);
-		
-		if (result && LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("node " + this + ": set "
-					+ (modified ? "modified" : "not modifiled"));
-		}
-		
-		return result;
-	}
-
-	@Override
-	public boolean isModified() {
-		return modified_.get();
-	}
-
-
-	@Override
 	public void removeDirectTypeNode(
 			UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode) {
 		LOGGER_.trace("{}: removing direct type node: {}", this, typeNode);
-		
+
 		directTypeNodes_.remove(typeNode);
 	}
 }

@@ -44,7 +44,8 @@ public class OrphanInstanceNode<T extends ElkEntity, I extends ElkEntity>
 	final OrphanTypeNode<T, I> typeNode;
 
 	public OrphanInstanceNode(Set<I> instances, I canonicalInstance,
-			OrphanTypeNode<T, I> typeNode, ComparatorKeyProvider<ElkEntity> instanceKeyProvider) {
+			OrphanTypeNode<T, I> typeNode,
+			ComparatorKeyProvider<ElkEntity> instanceKeyProvider) {
 		super(instances, canonicalInstance, instanceKeyProvider);
 		this.typeNode = typeNode;
 	}

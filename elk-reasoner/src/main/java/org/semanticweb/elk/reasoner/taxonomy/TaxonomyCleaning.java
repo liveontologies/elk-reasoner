@@ -151,7 +151,7 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 				 * mark as modified) at the same time
 				 */
 				synchronized (classTaxonomy.getBottomNode()) {
-					if (classTaxonomy.removeFromBottomNode(elkClass)) {
+					if (classTaxonomy.getBottomNode().remove(elkClass)) {
 						classStateWriter_
 								.markClassesForModifiedNode(classTaxonomy
 										.getBottomNode());
@@ -161,7 +161,7 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 				}
 
 				UpdateableTaxonomyNode<ElkClass> node = classTaxonomy
-						.getUpdateableNode(elkClass);
+						.getNode(elkClass);
 
 				if (node == null) {
 					classStateWriter_.markClassForModifiedNode(elkClass);
@@ -176,8 +176,9 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 				// add all its direct satisfiable sub-nodes to the queue
 				synchronized (node) {
 					for (UpdateableTaxonomyNode<ElkClass> subNode : node
-							.getDirectUpdateableSubNodes()) {
-						if (subNode.trySetModified(true)) {
+							.getDirectSubNodes()) {
+						if (subNode != classTaxonomy.getBottomNode()
+								&& subNode.trySetModified(true)) {
 							toRemove_.add(subNode);
 							classStateWriter_
 									.markClassesForModifiedNode(subNode);
@@ -189,7 +190,7 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 				// removed
 				if (instanceTaxonomy != null) {
 					UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode = instanceTaxonomy
-							.getUpdateableTypeNode(elkClass);
+							.getNode(elkClass);
 
 					if (typeNode == null) {
 						// could be deleted meanwhile in another thread
@@ -218,10 +219,10 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 				 * have only one copy of each class node but it's not guaranteed
 				 * so we still remove it from both taxonomies.
 				 */
-				classTaxonomy.removeNode(node);
+				classTaxonomy.removeNode(node.getCanonicalMember());
 
 				if (instanceTaxonomy != null) {
-					instanceTaxonomy.removeNode(node);
+					instanceTaxonomy.removeNode(node.getCanonicalMember());
 				}
 			}
 
@@ -271,7 +272,7 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 					// remove all super-class links
 					synchronized (node) {
 						superNodes = new LinkedList<UpdateableTaxonomyNode<ElkClass>>(
-								node.getDirectUpdateableSuperNodes());
+								node.getDirectSuperNodes());
 
 						for (UpdateableTaxonomyNode<ElkClass> superNode : superNodes) {
 							node.removeDirectSuperNode(superNode);
