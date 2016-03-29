@@ -27,28 +27,13 @@ import java.util.Collection;
 import java.util.List;
 
 import org.semanticweb.elk.owl.inferences.ElkInference;
-import org.semanticweb.elk.owl.inferences.ElkInferenceConclusionVisitor;
-import org.semanticweb.elk.owl.inferences.ElkInferencePremiseVisitor;
 import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
-import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
-import org.semanticweb.owlapitools.proofs.util.Operations;
-import org.semanticweb.owlapitools.proofs.util.Operations.Transformation;
 
 public class OWLInferenceWrap implements OWLInference {
-
-	private final static ElkAxiomVisitor<ElkAxiom> TRIVIAL_AXIOM_VISITOR_ = new DummyElkAxiomVisitor<ElkAxiom>() {
-
-		@Override
-		protected ElkAxiom defaultLogicalVisit(ElkAxiom axiom) {
-			return axiom;
-		}
-	};
 
 	private final ElkInference elkInference_;
 
@@ -68,28 +53,20 @@ public class OWLInferenceWrap implements OWLInference {
 
 	@Override
 	public OWLExpression getConclusion() {
-		ElkAxiom elkConclusion = elkInference_
-				.accept(new ElkInferenceConclusionVisitor<ElkAxiom>(elkFactory_,
-						TRIVIAL_AXIOM_VISITOR_));
-		return new OwlAxiomExpressionWrap(elkConclusion, elkInferences_,
+		return new OwlAxiomExpressionWrap(
+				elkInference_.getConclusion(elkFactory_), elkInferences_,
 				owlOntology_, elkFactory_);
 	}
 
 	@Override
 	public Collection<? extends OWLExpression> getPremises() {
-		AxiomSavingVisitor elkPremiseSaver = new AxiomSavingVisitor();
-		elkInference_.accept(new ElkInferencePremiseVisitor<ElkAxiom>(
-				elkFactory_, elkPremiseSaver));
-		return Operations.map(elkPremiseSaver.elkAxioms_,
-				new Transformation<ElkAxiom, OWLExpression>() {
-
-					@Override
-					public OWLExpression transform(ElkAxiom premise) {
-						return new OwlAxiomExpressionWrap(premise,
-								elkInferences_, owlOntology_, elkFactory_);
-					}
-
-				});
+		List<OWLExpression> result = new ArrayList<OWLExpression>();
+		for (int i = 0; i < elkInference_.getPremiseCount(); i++) {
+			result.add(new OwlAxiomExpressionWrap(
+					elkInference_.getPremise(i, elkFactory_), elkInferences_,
+					owlOntology_, elkFactory_));
+		}
+		return result;
 	}
 
 	@Override
@@ -102,17 +79,5 @@ public class OWLInferenceWrap implements OWLInference {
 	public String toString() {
 		return elkInference_.toString();
 	}
-
-	private static class AxiomSavingVisitor extends DummyElkAxiomVisitor<Void> {
-
-		private final List<ElkAxiom> elkAxioms_ = new ArrayList<ElkAxiom>();
-
-		@Override
-		protected Void defaultLogicalVisit(ElkAxiom axiom) {
-			elkAxioms_.add(axiom);
-			return null;
-		}
-
-	};
 
 }

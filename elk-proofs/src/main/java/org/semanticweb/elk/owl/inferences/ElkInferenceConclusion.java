@@ -48,8 +48,7 @@ public class ElkInferenceConclusion extends ElkObjectImpl implements ElkAxiom {
 
 	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
-		return inference_.accept(
-				new ElkInferenceConclusionVisitor<O>(elkFactory_, visitor));
+		return inference_.getConclusion(elkFactory_).accept(visitor);
 	}
 
 	@Override

@@ -36,7 +36,7 @@ public abstract class AbstractElkInference implements ElkInference {
 
 	@Override
 	public String toString() {
-		return ElkInferencePriner.toString(this);
+		return ElkInferencePrinter.toString(this);
 	}
 
 }
