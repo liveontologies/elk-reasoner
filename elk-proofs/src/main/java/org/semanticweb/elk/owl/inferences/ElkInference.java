@@ -1,5 +1,8 @@
 package org.semanticweb.elk.owl.inferences;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -23,6 +26,30 @@ package org.semanticweb.elk.owl.inferences;
  */
 
 public interface ElkInference {
+
+	/**
+	 * @return the number of premises of this inference
+	 */
+	int getPremiseCount();
+
+	/**
+	 * @param index
+	 *            index of the premise to return
+	 * @param factory
+	 *            the factory for creating the premises
+	 * @return the premise at the specified position in this inference.
+	 * @throws IndexOutOfBoundsException
+	 *             if the position is out of range (
+	 *             <tt>index &lt; 0 || index &gt;= size()</tt>)
+	 */
+	ElkAxiom getPremise(int index, ElkObjectFactory factory);
+
+	/**
+	 * @param factory
+	 *            the factory for creating conclusion
+	 * @return the conclusion of this inference
+	 */
+	ElkAxiom getConclusion(ElkObjectFactory factory);
 
 	<O> O accept(Visitor<O> visitor);
 

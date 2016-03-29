@@ -74,26 +74,27 @@ public class ElkPropertyInclusionHierarchy extends AbstractElkInference {
 		return expressions_;
 	}
 
+	@Override
 	public int getPremiseCount() {
 		return expressions_.size();
 	}
 
-	public ElkSubObjectPropertyOfAxiom getPremise(int i,
+	@Override
+	public ElkSubObjectPropertyOfAxiom getPremise(int index,
 			ElkObjectFactory factory) {
-		if (i < 1 || i > expressions_.size()) {
-			throw new IllegalArgumentException("No such premise: " + i);
-		}
+		checkPremiseIndex(index);
 		// else
-		if (i == 1) {
+		if (index == 0) {
 			return factory.getSubObjectPropertyOfAxiom(subExpression_,
 					expressions_.get(0));
 		}
-		// else i > 1
-		return factory.getSubObjectPropertyOfAxiom(expressions_.get(i - 2),
-				expressions_.get(i - 1));
+		// else index > 0
+		return factory.getSubObjectPropertyOfAxiom(expressions_.get(index - 1),
+				expressions_.get(index));
 
 	}
 
+	@Override
 	public ElkSubObjectPropertyOfAxiom getConclusion(ElkObjectFactory factory) {
 		return factory.getSubObjectPropertyOfAxiom(subExpression_,
 				expressions_.get(expressions_.size() - 1));

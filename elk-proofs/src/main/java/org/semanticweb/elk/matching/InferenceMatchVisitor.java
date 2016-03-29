@@ -1329,13 +1329,12 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		inferenceMatch1.getConclusionMatch(conclusionFactory_);
 
 		// creating ELK inferences
-		ElkSubObjectPropertyExpression fullChainMatch = inferenceMatch1
-				.getFullChainMatch();
-
-		if (fullChainMatch instanceof ElkObjectPropertyExpression) {
-			elkInferenceFactory_.getElkPropertyInclusionTautology(
-					(ElkObjectPropertyExpression) fullChainMatch);
+		ElkObjectPropertyExpression expression = inferenceMatch1
+				.getPropertyExpressionMatch();
+		if (expression != null) {
+			elkInferenceFactory_.getElkPropertyInclusionTautology(expression);
 		}
+
 		return null;
 	}
 

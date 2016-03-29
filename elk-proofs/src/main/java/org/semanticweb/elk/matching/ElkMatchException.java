@@ -65,7 +65,7 @@ public class ElkMatchException extends ElkRuntimeException {
 	public ElkMatchException(IndexedPropertyChain expression,
 			ElkSubObjectPropertyExpression match, int startPos) {
 		this((IndexedObject) expression,
-				startPos == 0 ? match : match + "[" + startPos + "-]");
+				startPos == 0 ? match : match + "[" + startPos + 1 + "-]");
 	}
 
 	public ElkMatchException(IndexedContextRoot expression,

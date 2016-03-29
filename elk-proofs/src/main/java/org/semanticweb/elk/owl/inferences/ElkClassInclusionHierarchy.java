@@ -64,19 +64,20 @@ public class ElkClassInclusionHierarchy extends AbstractElkInference {
 		return expressions_;
 	}
 
+	@Override
 	public int getPremiseCount() {
 		return expressions_.size() - 1;
 	}
 
-	public ElkSubClassOfAxiom getPremise(int i, ElkObjectFactory factory) {
-		if (i < 1 || i >= expressions_.size()) {
-			throw new IllegalArgumentException("No such premise: " + i);
-		}
+	@Override
+	public ElkSubClassOfAxiom getPremise(int index, ElkObjectFactory factory) {
+		checkPremiseIndex(index);
 		// else
-		return factory.getSubClassOfAxiom(expressions_.get(i - 1),
-				expressions_.get(i));
+		return factory.getSubClassOfAxiom(expressions_.get(index),
+				expressions_.get(index + 1));
 	}
 
+	@Override
 	public ElkSubClassOfAxiom getConclusion(ElkObjectFactory factory) {
 		return factory.getSubClassOfAxiom(expressions_.get(0),
 				expressions_.get(expressions_.size() - 1));

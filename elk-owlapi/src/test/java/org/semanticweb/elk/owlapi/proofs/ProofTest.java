@@ -103,7 +103,7 @@ public class ProofTest {
 		ProofTestUtils.provabilityTest(reasoner, factory.getOWLSubClassOfAxiom(sub, sup));
 	}
 	
-	@Test
+	@Test @Ignore
 	public void proofsUnderOntologyUpdate() throws Exception {
 		OWLDataFactory factory = OWLManager.getOWLDataFactory();
 		// loading and classifying via the OWL API

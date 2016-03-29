@@ -1,5 +1,7 @@
 package org.semanticweb.elk.owl.inferences;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -67,6 +69,23 @@ public class ElkClassInclusionReflexivePropertyRange
 		return range_;
 	}
 
+	@Override
+	public int getPremiseCount() {
+		return 2;
+	}
+
+	@Override
+	public ElkAxiom getPremise(int index, ElkObjectFactory factory) {
+		switch (index) {
+		case 0:
+			return getFirstPremise(factory);
+		case 1:
+			return getSecondPremise(factory);
+		default:
+			return failGetPremise(index);
+		}
+	}
+
 	public ElkSubClassOfAxiom getFirstPremise(ElkObjectFactory factory) {
 		return factory.getSubClassOfAxiom(subClass_,
 				factory.getObjectHasSelf(property_));
@@ -77,6 +96,7 @@ public class ElkClassInclusionReflexivePropertyRange
 		return factory.getObjectPropertyRangeAxiom(property_, range_);
 	}
 
+	@Override
 	public ElkSubClassOfAxiom getConclusion(ElkObjectFactory factory) {
 		return factory.getSubClassOfAxiom(subClass_, range_);
 	}

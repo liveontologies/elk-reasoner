@@ -25,6 +25,7 @@ package org.semanticweb.elk.owl.inferences;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
@@ -87,10 +88,25 @@ public class ElkClassInclusionOfEquivalence extends AbstractElkInference {
 		return superPos_;
 	}
 
+	@Override
+	public int getPremiseCount() {
+		return 1;
+	}
+
+	@Override
+	public ElkAxiom getPremise(int index, ElkObjectFactory factory) {
+		if (index == 0) {
+			return getPremise(factory);
+		}
+		// else
+		return failGetPremise(index);
+	}
+
 	public ElkEquivalentClassesAxiom getPremise(ElkObjectFactory factory) {
 		return factory.getEquivalentClassesAxiom(expressions_);
 	}
 
+	@Override
 	public ElkSubClassOfAxiom getConclusion(ElkObjectFactory factory) {
 		return factory.getSubClassOfAxiom(expressions_.get(subPos_),
 				expressions_.get(superPos_));

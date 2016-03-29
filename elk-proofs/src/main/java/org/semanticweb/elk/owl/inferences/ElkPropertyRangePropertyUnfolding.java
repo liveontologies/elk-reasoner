@@ -1,5 +1,7 @@
 package org.semanticweb.elk.owl.inferences;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -66,6 +68,23 @@ public class ElkPropertyRangePropertyUnfolding extends AbstractElkInference {
 		return range_;
 	}
 
+	@Override
+	public int getPremiseCount() {
+		return 2;
+	}
+
+	@Override
+	public ElkAxiom getPremise(int index, ElkObjectFactory factory) {
+		switch (index) {
+		case 0:
+			return getFirstPremise(factory);
+		case 1:
+			return getSecondPremise(factory);
+		default:
+			return failGetPremise(index);
+		}
+	}
+
 	public ElkObjectPropertyRangeAxiom getFirstPremise(
 			ElkObjectFactory factory) {
 		return factory.getObjectPropertyRangeAxiom(superProperty_, range_);
@@ -77,6 +96,7 @@ public class ElkPropertyRangePropertyUnfolding extends AbstractElkInference {
 				superProperty_);
 	}
 
+	@Override
 	public ElkObjectPropertyRangeAxiom getConclusion(ElkObjectFactory factory) {
 		return factory.getObjectPropertyRangeAxiom(subProperty_, range_);
 	}

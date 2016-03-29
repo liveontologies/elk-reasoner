@@ -63,7 +63,7 @@ public class ElkInferencePriner implements ElkInference.Visitor<String> {
 	public String visit(
 			ElkClassInclusionExistentialPropertyUnfolding inference) {
 		String result = inference.getConclusion(factory_) + CONCLUSION_DELIM_;
-		for (int i = 1; i <= inference.getExistentialPremiseCount(); i++) {
+		for (int i = 0; i < inference.getExistentialPremiseCount(); i++) {
 			result += inference.getExistentialPremise(i, factory_)
 					+ PREMISE_DELIM_;
 		}
@@ -75,10 +75,10 @@ public class ElkInferencePriner implements ElkInference.Visitor<String> {
 	public String visit(ElkClassInclusionHierarchy inference) {
 		String result = inference.getConclusion(factory_) + CONCLUSION_DELIM_;
 		int premiseCount = inference.getPremiseCount();
-		for (int i = 1; i < premiseCount; i++) {
+		for (int i = 0; i < premiseCount - 1; i++) {
 			result += inference.getPremise(i, factory_) + PREMISE_DELIM_;
 		}
-		result += inference.getPremise(premiseCount, factory_);
+		result += inference.getPremise(premiseCount - 1, factory_);
 		return result;
 	}
 
@@ -87,10 +87,10 @@ public class ElkInferencePriner implements ElkInference.Visitor<String> {
 			ElkClassInclusionObjectIntersectionOfComposition inference) {
 		String result = inference.getConclusion(factory_) + CONCLUSION_DELIM_;
 		int premiseCount = inference.getPremiseCount();
-		for (int i = 1; i < premiseCount; i++) {
+		for (int i = 0; i < premiseCount - 1; i++) {
 			result += inference.getPremise(i, factory_) + PREMISE_DELIM_;
 		}
-		result += inference.getPremise(premiseCount, factory_);
+		result += inference.getPremise(premiseCount - 1, factory_);
 		return result;
 	}
 
@@ -146,10 +146,10 @@ public class ElkInferencePriner implements ElkInference.Visitor<String> {
 	public String visit(ElkPropertyInclusionHierarchy inference) {
 		String result = inference.getConclusion(factory_) + CONCLUSION_DELIM_;
 		int premiseCount = inference.getPremiseCount();
-		for (int i = 1; i < premiseCount; i++) {
+		for (int i = 0; i < premiseCount - 1; i++) {
 			result += inference.getPremise(i, factory_) + PREMISE_DELIM_;
 		}
-		result += inference.getPremise(premiseCount, factory_);
+		result += inference.getPremise(premiseCount - 1, factory_);
 		return result;
 	}
 

@@ -24,6 +24,16 @@ package org.semanticweb.elk.owl.inferences;
 
 public abstract class AbstractElkInference implements ElkInference {
 
+	<T> T failGetPremise(int index) {
+		throw new IndexOutOfBoundsException("No premise with index: " + index);
+	}
+
+	void checkPremiseIndex(int index) {
+		if (index < 0 || index >= getPremiseCount()) {
+			failGetPremise(index);
+		}
+	}
+
 	@Override
 	public String toString() {
 		return ElkInferencePriner.toString(this);

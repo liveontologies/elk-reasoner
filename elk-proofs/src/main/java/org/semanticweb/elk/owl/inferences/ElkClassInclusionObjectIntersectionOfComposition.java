@@ -63,19 +63,19 @@ public class ElkClassInclusionObjectIntersectionOfComposition
 		return conjuncts_;
 	}
 
+	@Override
 	public int getPremiseCount() {
 		return conjuncts_.size();
 	}
 
-	public ElkSubClassOfAxiom getPremise(int i, ElkObjectFactory factory) {
-		if (i < 1 || i > conjuncts_.size()) {
-			throw new IllegalArgumentException("No such premise: " + i);
-		}
-		// else
+	@Override
+	public ElkSubClassOfAxiom getPremise(int index, ElkObjectFactory factory) {
+		checkPremiseIndex(index);
 		return factory.getSubClassOfAxiom(subExpression_,
-				conjuncts_.get(i - 1));
+				conjuncts_.get(index));
 	}
 
+	@Override
 	public ElkSubClassOfAxiom getConclusion(ElkObjectFactory factory) {
 		return factory.getSubClassOfAxiom(subExpression_,
 				factory.getObjectIntersectionOf(conjuncts_));

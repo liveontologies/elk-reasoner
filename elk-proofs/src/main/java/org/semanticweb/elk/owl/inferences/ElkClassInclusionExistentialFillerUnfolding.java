@@ -1,5 +1,7 @@
 package org.semanticweb.elk.owl.inferences;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -72,6 +74,23 @@ public class ElkClassInclusionExistentialFillerUnfolding
 		return superFiller_;
 	}
 
+	@Override
+	public int getPremiseCount() {
+		return 2;
+	}
+
+	@Override
+	public ElkAxiom getPremise(int index, ElkObjectFactory factory) {
+		switch (index) {
+		case 0:
+			return getFirstPremise(factory);
+		case 1:
+			return getSecondPremise(factory);
+		default:
+			return failGetPremise(index);
+		}
+	}
+
 	public ElkSubClassOfAxiom getFirstPremise(ElkObjectFactory factory) {
 		return factory.getSubClassOfAxiom(subClass_,
 				factory.getObjectSomeValuesFrom(property_, subFiller_));
@@ -81,6 +100,7 @@ public class ElkClassInclusionExistentialFillerUnfolding
 		return factory.getSubClassOfAxiom(subFiller_, superFiller_);
 	}
 
+	@Override
 	public ElkSubClassOfAxiom getConclusion(ElkObjectFactory factory) {
 		return factory.getSubClassOfAxiom(subClass_,
 				factory.getObjectSomeValuesFrom(property_, superFiller_));

@@ -53,7 +53,7 @@ public class ElkInferencePremiseVisitor<O> implements ElkInference.Visitor<O> {
 
 	@Override
 	public O visit(ElkClassInclusionExistentialPropertyUnfolding inference) {
-		for (int i = 1; i <= inference.getExistentialPremiseCount(); i++) {
+		for (int i = 0; i < inference.getExistentialPremiseCount(); i++) {
 			conclusionVisitor_.visit(
 					inference.getExistentialPremise(i, conclusionFactory_));
 		}
@@ -63,7 +63,7 @@ public class ElkInferencePremiseVisitor<O> implements ElkInference.Visitor<O> {
 
 	@Override
 	public O visit(ElkClassInclusionHierarchy inference) {
-		for (int i = 1; i <= inference.getPremiseCount(); i++) {
+		for (int i = 0; i < inference.getPremiseCount(); i++) {
 			conclusionVisitor_
 					.visit(inference.getPremise(i, conclusionFactory_));
 		}
@@ -72,7 +72,7 @@ public class ElkInferencePremiseVisitor<O> implements ElkInference.Visitor<O> {
 
 	@Override
 	public O visit(ElkClassInclusionObjectIntersectionOfComposition inference) {
-		for (int i = 1; i <= inference.getPremiseCount(); i++) {
+		for (int i = 0; i < inference.getPremiseCount(); i++) {
 			conclusionVisitor_
 					.visit(inference.getPremise(i, conclusionFactory_));
 		}
@@ -132,7 +132,7 @@ public class ElkInferencePremiseVisitor<O> implements ElkInference.Visitor<O> {
 
 	@Override
 	public O visit(ElkPropertyInclusionHierarchy inference) {
-		for (int i = 1; i <= inference.getPremiseCount(); i++) {
+		for (int i = 0; i < inference.getPremiseCount(); i++) {
 			conclusionVisitor_
 					.visit(inference.getPremise(i, conclusionFactory_));
 		}

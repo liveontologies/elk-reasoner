@@ -1,5 +1,7 @@
 package org.semanticweb.elk.owl.inferences;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -61,10 +63,25 @@ public class ElkClassInclusionOfObjectPropertyDomain
 		return domain_;
 	}
 
+	@Override
+	public int getPremiseCount() {
+		return 1;
+	}
+
+	@Override
+	public ElkAxiom getPremise(int index, ElkObjectFactory factory) {
+		if (index == 0) {
+			return getPremise(factory);
+		}
+		// else
+		return failGetPremise(index);
+	}
+
 	public ElkObjectPropertyDomainAxiom getPremise(ElkObjectFactory factory) {
 		return factory.getObjectPropertyDomainAxiom(property_, domain_);
 	}
 
+	@Override
 	public ElkSubClassOfAxiom getConclusion(ElkObjectFactory factory) {
 		return factory.getSubClassOfAxiom(factory.getObjectSomeValuesFrom(
 				property_, factory.getOwlThing()), domain_);

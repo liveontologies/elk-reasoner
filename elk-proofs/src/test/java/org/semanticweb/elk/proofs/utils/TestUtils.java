@@ -24,23 +24,16 @@ package org.semanticweb.elk.proofs.utils;
  * #L%
  */
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Set;
 
 import org.semanticweb.elk.matching.Matcher;
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
-import org.semanticweb.elk.owl.inferences.ElkInference;
-import org.semanticweb.elk.owl.inferences.ElkInferencePremiseVisitor;
 import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
 import org.semanticweb.elk.owl.inferences.ModifiableElkInferenceSet;
 import org.semanticweb.elk.owl.inferences.ModifiableElkInferenceSetImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
-import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
@@ -90,46 +83,16 @@ public class TestUtils {
 	public static void provabilityTest(ElkInferenceSet inferences,
 			Set<? extends ElkAxiom> ontology, ElkAxiom goal)
 			throws ElkException {
-		final Set<ElkAxiom> done = new HashSet<ElkAxiom>();
-		final Queue<ElkAxiom> toDo = new LinkedList<ElkAxiom>();
-		toDo.add(goal);
-
-		ElkInference.Visitor<Void> premiseVisitor = new ElkInferencePremiseVisitor<Void>(
-				new ElkObjectFactoryImpl(), new DummyElkAxiomVisitor<Void>() {
-					@Override
-					protected Void defaultLogicalVisit(ElkAxiom axiom) {
-						LOGGER_.trace("{}: todo", axiom);
-						toDo.add(axiom);
-						return null;
-					}
-				});
-
-		for (;;) {
-			ElkAxiom next = toDo.poll();
-
-			if (next == null) {
-				break;
-			}
-
-			if (ontology.contains(next))
-				continue;
-
-			if (done.add(next)) {
-				LOGGER_.trace("{}: new lemma", next);
-				boolean inferred = false;
-				for (ElkInference inf : inferences.get(next)) {
-					LOGGER_.trace("{}: expanding", inf);
-					inf.accept(premiseVisitor);
-					inferred |= true;
-				}
-				if (!inferred) {
-					throw new AssertionError(String
-							.format("%s: cannot expand all proofs", goal));
-				} else {
-					LOGGER_.trace("{}: inferred", next);
-				}
-			}
+		ProvabilityTester tester = new ProvabilityTester(inferences, ontology);
+		if (!tester.isProvable(goal)) {
+			throw new AssertionError(String.format("%s: not provable", goal));
 		}
+		Set<? extends ElkAxiom> unproved = tester.getUnprovedLemmas();
+		if (!unproved.isEmpty()) {
+			throw new AssertionError(
+					String.format("%s: unproved lemmas", unproved));
 
+		}
 	}
+
 }

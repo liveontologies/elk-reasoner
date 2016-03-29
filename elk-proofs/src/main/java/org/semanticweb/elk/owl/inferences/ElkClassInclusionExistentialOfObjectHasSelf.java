@@ -1,5 +1,7 @@
 package org.semanticweb.elk.owl.inferences;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -60,11 +62,26 @@ public class ElkClassInclusionExistentialOfObjectHasSelf
 		return property_;
 	}
 
+	@Override
+	public int getPremiseCount() {
+		return 1;
+	}
+
+	@Override
+	public ElkAxiom getPremise(int index, ElkObjectFactory factory) {
+		if (index == 0) {
+			return getPremise(factory);
+		}
+		// else
+		return failGetPremise(index);
+	}
+
 	public ElkSubClassOfAxiom getPremise(ElkObjectFactory factory) {
 		return factory.getSubClassOfAxiom(subClass_,
 				factory.getObjectHasSelf(property_));
 	}
 
+	@Override
 	public ElkSubClassOfAxiom getConclusion(ElkObjectFactory factory) {
 		return factory.getSubClassOfAxiom(subClass_,
 				factory.getObjectSomeValuesFrom(property_, subClass_));

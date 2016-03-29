@@ -1,5 +1,7 @@
 package org.semanticweb.elk.matching.inferences;
 
+import java.util.List;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -25,6 +27,8 @@ package org.semanticweb.elk.matching.inferences;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1;
 import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch2;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainTautology;
 
@@ -39,6 +43,23 @@ public class SubPropertyChainTautologyMatch1
 		super(parent);
 		fullChainMatch_ = conclusionMatch.getFullSuperChainMatch();
 		chainStartPos_ = conclusionMatch.getSuperChainStartPos();
+	}
+
+	public ElkObjectPropertyExpression getPropertyExpressionMatch() {
+		if (chainStartPos_ == 0
+				&& fullChainMatch_ instanceof ElkObjectPropertyExpression) {
+			return (ElkObjectPropertyExpression) fullChainMatch_;
+		}
+		// else
+		if (fullChainMatch_ instanceof ElkObjectPropertyChain) {
+			List<? extends ElkObjectPropertyExpression> expressions = ((ElkObjectPropertyChain) fullChainMatch_)
+					.getObjectPropertyExpressions();
+			if (chainStartPos_ == expressions.size() - 1) {
+				return expressions.get(chainStartPos_);
+			}
+		}
+		// else
+		return null;
 	}
 
 	public ElkSubObjectPropertyExpression getFullChainMatch() {

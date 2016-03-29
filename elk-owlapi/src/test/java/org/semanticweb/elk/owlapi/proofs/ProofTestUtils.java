@@ -141,7 +141,7 @@ public class ProofTestUtils {
 
 			private boolean isAsserted(OWLOntology ontology, OWLAxiom axiom) {
 				for (OWLAxiom ax : ontology.getAxioms()) {
-					if (ax == axiom) {
+					if (ax.equals(axiom)) {
 						return true;
 					}
 				}

@@ -25,6 +25,7 @@ package org.semanticweb.elk.owl.inferences;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
@@ -95,19 +96,35 @@ public class ElkClassInclusionExistentialPropertyUnfolding
 		return superProperty_;
 	}
 
+	@Override
+	public int getPremiseCount() {
+		return classExpressions_.size();
+	}
+
+	@Override
+	public ElkAxiom getPremise(int index, ElkObjectFactory factory) {
+		checkPremiseIndex(index);
+		if (index < getExistentialPremiseCount()) {
+			return getExistentialPremise(index, factory);
+		}
+		// else
+		return getLastPremise(factory);
+	}
+
 	public int getExistentialPremiseCount() {
 		return classExpressions_.size() - 1;
 	}
 
-	public ElkSubClassOfAxiom getExistentialPremise(int i,
+	public ElkSubClassOfAxiom getExistentialPremise(int index,
 			ElkObjectFactory factory) {
-		if (i < 1 || i > classExpressions_.size() - 1) {
-			throw new IllegalArgumentException("No such premise: " + i);
+		if (index < 0 || index >= getExistentialPremiseCount()) {
+			throw new IndexOutOfBoundsException(
+					"No existential premise with index: " + index);
 		}
 		// else
-		return factory.getSubClassOfAxiom(classExpressions_.get(i - 1),
-				factory.getObjectSomeValuesFrom(subChain_.get(i - 1),
-						classExpressions_.get(i)));
+		return factory.getSubClassOfAxiom(classExpressions_.get(index),
+				factory.getObjectSomeValuesFrom(subChain_.get(index),
+						classExpressions_.get(index + 1)));
 	}
 
 	public ElkSubObjectPropertyOfAxiom getLastPremise(
@@ -118,6 +135,7 @@ public class ElkClassInclusionExistentialPropertyUnfolding
 				superProperty_);
 	}
 
+	@Override
 	public ElkSubClassOfAxiom getConclusion(ElkObjectFactory factory) {
 		return factory.getSubClassOfAxiom(classExpressions_.get(0),
 				factory.getObjectSomeValuesFrom(superProperty_,

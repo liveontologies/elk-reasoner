@@ -1,5 +1,7 @@
 package org.semanticweb.elk.owl.inferences;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -50,6 +52,17 @@ public class ElkClassInclusionTautology extends AbstractElkInference {
 		return expression_;
 	}
 
+	@Override
+	public int getPremiseCount() {
+		return 0;
+	}
+
+	@Override
+	public ElkAxiom getPremise(int index, ElkObjectFactory factory) {
+		return failGetPremise(index);
+	}
+
+	@Override
 	public ElkSubClassOfAxiom getConclusion(ElkObjectFactory factory) {
 		return factory.getSubClassOfAxiom(expression_, expression_);
 	}
