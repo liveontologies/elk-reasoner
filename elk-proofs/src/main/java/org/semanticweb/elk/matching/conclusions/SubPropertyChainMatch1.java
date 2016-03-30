@@ -1,5 +1,10 @@
 package org.semanticweb.elk.matching.conclusions;
 
+import java.util.List;
+
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -37,6 +42,17 @@ public class SubPropertyChainMatch1
 			int superChainStartPos) {
 		super(parent);
 		checkChainMatch(fullSuperChainMatch, superChainStartPos);
+		if (fullSuperChainMatch instanceof ElkObjectPropertyChain) {
+			List<? extends ElkObjectPropertyExpression> expressions = ((ElkObjectPropertyChain) fullSuperChainMatch)
+					.getObjectPropertyExpressions();
+			if (superChainStartPos == expressions.size() - 1) {
+				// only the last property is matched
+				this.fullSuperChainMatch_ = expressions.get(superChainStartPos);
+				this.superChainStartPos_ = 0;
+				return;
+			}
+		}
+		// else
 		this.fullSuperChainMatch_ = fullSuperChainMatch;
 		this.superChainStartPos_ = superChainStartPos;
 	}
