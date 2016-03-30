@@ -3,11 +3,13 @@ language: java
 matrix:
   include:
    - jdk: openjdk6
-     env: EXTRA_OPTIONS='-pl !elk-owlapi,!elk-owlapi-standalone,!elk-protege,!elk-distribution'
+     env: INSTALL_OPTIONS='-pl !elk-owlapi,!elk-owlapi-standalone,!elk-protege,!elk-distribution,!elk-explanations' TEST_OPTIONS='-pl !elk-owlapi,!elk-owlapi-standalone,!elk-protege,!elk-distribution,!elk-explanations'
    - jdk: oraclejdk7
+     env: TEST_OPTIONS='-pl !elk-explanations'
    - jdk: openjdk7
+     env: TEST_OPTIONS='-pl !elk-explanations'
    - jdk: oraclejdk8
 
-install: mvn install -DskipTests=true $EXTRA_OPTIONS
+install: mvn install -DskipTests=true $INSTALL_OPTIONS
 
-script: mvn test -Dassembly.skipAssembly=true -B $EXTRA_OPTIONS
+script: mvn test -Dassembly.skipAssembly=true -B $TEST_OPTIONS

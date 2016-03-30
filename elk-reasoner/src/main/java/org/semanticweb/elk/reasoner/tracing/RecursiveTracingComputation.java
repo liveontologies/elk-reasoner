@@ -58,7 +58,7 @@ public class RecursiveTracingComputation
 		super(inputs,
 				new ProofUnwindingFactory<ClassConclusion, ProofUnwindingJob<ClassConclusion>>(
 						saturationState, inferenceProducer, maxWorkers,
-						ProofUnwindingListener.Helper.dummyListener()),
+						ProofUnwindingListener.Helper.<ClassConclusion, ProofUnwindingJob<ClassConclusion>>dummyListener()),
 				executor, maxWorkers, progressMonitor);
 	}
 

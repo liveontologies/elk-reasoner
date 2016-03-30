@@ -116,15 +116,24 @@ abstract class CachedIndexedPropertyChainImpl<T extends CachedIndexedPropertyCha
 
 	@Override
 	public final ArrayList<IndexedObjectProperty> getToldSuperProperties() {
-		return toldSuperProperties_ == null ? (CachedIndexedPropertyChainImpl
-				.<IndexedObjectProperty> emptyArrayList())
-				: toldSuperProperties_;
+		if (toldSuperProperties_ == null) {
+			final ArrayList<IndexedObjectProperty> result =
+					CachedIndexedPropertyChainImpl.emptyArrayList();
+			return result;
+		} else {
+			return toldSuperProperties_;
+		}
 	}
 
 	@Override
 	public ArrayList<ElkAxiom> getToldSuperPropertiesReasons() {
-		return toldSuperPropertiesReasons_ == null ? (CachedIndexedPropertyChainImpl
-				.<ElkAxiom> emptyArrayList()) : toldSuperPropertiesReasons_;
+		if (toldSuperPropertiesReasons_ == null) {
+			final ArrayList<ElkAxiom> result =
+					CachedIndexedPropertyChainImpl.emptyArrayList();
+			return result;
+		} else {
+			return toldSuperPropertiesReasons_;
+		}
 	}
 
 	@Override
