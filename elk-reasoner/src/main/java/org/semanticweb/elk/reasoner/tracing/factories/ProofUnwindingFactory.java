@@ -61,10 +61,8 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  */
 public class ProofUnwindingFactory<C extends ClassConclusion, J extends ProofUnwindingJob<C>>
-		extends
-			SimpleInterrupter
-		implements
-			InputProcessorFactory<J, ProofUnwindingFactory<C, J>.Engine> {
+		extends SimpleInterrupter implements
+		InputProcessorFactory<J, ProofUnwindingFactory<C, J>.Engine> {
 
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ProofUnwindingFactory.class);
@@ -194,9 +192,8 @@ public class ProofUnwindingFactory<C extends ClassConclusion, J extends ProofUnw
 
 	}
 
-	private class ThisContextTracingListener
-			implements
-				ContextTracingListener<IndexedContextRoot, ContextTracingJobForProofUnwinding<C, J>> {
+	private class ThisContextTracingListener implements
+			ContextTracingListener<IndexedContextRoot, ContextTracingJobForProofUnwinding<C, J>> {
 
 		@Override
 		public void notifyFinished(
@@ -209,11 +206,12 @@ public class ProofUnwindingFactory<C extends ClassConclusion, J extends ProofUnw
 				inferenceSet = inferencesByContext_.putIfAbsent(root,
 						newInferenceSet);
 				if (inferenceSet == null) {
-					for (ClassInference inference : job.getOutput()) {
-						// TODO: avoid cyclic inferences
-						newInferenceSet.produce(inference);
-					}
 					inferenceSet = newInferenceSet;
+					ClassInferenceBlockingFilter filter = new ClassInferenceBlockingFilter(
+							inferenceSet);
+					for (ClassInference inference : job.getOutput()) {
+						filter.produce(inference);
+					}
 				}
 			}
 			for (ClassInference inference : inferenceSet
