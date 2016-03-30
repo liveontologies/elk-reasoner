@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.owlapi.proofs;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,12 +19,12 @@ package org.semanticweb.elk.owlapi.proofs;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.owlapi.proofs;
 
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
@@ -37,13 +32,9 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
-import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.tracing.ComprehensiveSubsumptionTracingTests;
 import org.semanticweb.elk.reasoner.tracing.TracingTestManifest;
-import org.semanticweb.elk.reasoner.tracing.TracingTests;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
@@ -53,13 +44,9 @@ import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.VoidTestOutput;
 import org.semanticweb.elk.testing.io.URLTestIO;
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.reasoner.InconsistentOntologyException;
 import org.semanticweb.owlapi.reasoner.InferenceType;
@@ -75,7 +62,7 @@ import org.slf4j.LoggerFactory;
  * 
  */
 @RunWith(PolySuite.class)
-public class AllOntologiesProofTest {
+public class AllOntologiesProofTest extends BaseProofTest {
 
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
 	private static final Logger LOGGER_ = LoggerFactory.getLogger(AllOntologiesProofTest.class);
@@ -86,15 +73,13 @@ public class AllOntologiesProofTest {
 		Arrays.sort(IGNORE_LIST);
 	}
 
-	protected final TracingTestManifest manifest;
-
 	public AllOntologiesProofTest(TracingTestManifest testManifest) {
-		manifest = testManifest;
+		super(testManifest);
 	}
 
 	@Before
 	public void before() throws IOException, Owl2ParseException {
-		assumeTrue(!ignore(manifest.getInput()));
+		assumeTrue(!ignore(manifest_.getInput()));
 	}
 
 	protected boolean ignore(TestInput input) {
@@ -103,9 +88,9 @@ public class AllOntologiesProofTest {
 
 	@Test
 	public void proofTest() throws Exception {
-		final OWLDataFactory factory = OWLManager.getOWLDataFactory();
+		final OWLDataFactory factory = manager_.getOWLDataFactory();
 		// loading and classifying via the OWL API
-		final OWLOntology ontology = loadOntology(manifest.getInput()
+		final OWLOntology ontology = loadOntology(manifest_.getInput()
 				.getInputStream());
 		final ExplainingOWLReasoner reasoner = OWLAPITestUtils
 				.createReasoner(ontology);
@@ -124,7 +109,7 @@ public class AllOntologiesProofTest {
 					.getAxiomBindingChecker(ontology);
 
 			ProofTestUtils.visitAllSubsumptionsForProofTests(reasoner,
-					new ProofTestVisitor<Exception>() {
+					factory, new ProofTestVisitor<Exception>() {
 
 						@Override
 						public void visit(OWLClassExpression subsumee,
@@ -160,27 +145,6 @@ public class AllOntologiesProofTest {
 		} finally {
 			reasoner.dispose();
 		}
-	}
-
-	private OWLOntology loadOntology(InputStream stream) throws IOException,
-			Owl2ParseException {
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		OWLOntology ontology = null;
-
-		try {
-			ontology = manager.loadOntologyFromOntologyDocument(stream);
-		} catch (OWLOntologyCreationIOException e) {
-			throw new IOException(e);
-		} catch (OWLOntologyCreationException e) {
-			throw new Owl2ParseException(e);
-		}
-
-		return ontology;
-	}
-
-	protected TracingTests getProvabilityTests(Reasoner reasoner)
-			throws ElkException {
-		return new ComprehensiveSubsumptionTracingTests(reasoner);
 	}
 
 	@Config
