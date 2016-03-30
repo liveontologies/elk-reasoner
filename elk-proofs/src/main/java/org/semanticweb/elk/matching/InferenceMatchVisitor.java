@@ -898,8 +898,6 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		ElkClass definedClassMatch = inferenceMatch1.getDefinedClassMatch();
 		IndexedContextRootMatch originMatch = inferenceMatch1.getOriginMatch();
 
-		elkInferenceFactory_.getElkClassInclusionOfEquivalence(
-				definedClassMatch, definitionMatch, false);
 		elkInferenceFactory_.getElkClassInclusionHierarchy(
 				toElkExpression(originMatch), definitionMatch,
 				definedClassMatch);
@@ -1120,8 +1118,6 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 				.getParent();
 		IndexedContextRootMatch originMatch = inferenceMatch1.getOriginMatch();
 
-		elkInferenceFactory_.getElkClassInclusionOfEquivalence(
-				definedClassMatch, definitionMatch, true);
 		elkInferenceFactory_.getElkClassInclusionHierarchy(
 				toElkExpression(originMatch), definedClassMatch,
 				definitionMatch);
