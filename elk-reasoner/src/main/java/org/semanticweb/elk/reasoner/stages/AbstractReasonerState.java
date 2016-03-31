@@ -158,7 +158,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	/**
 	 * Keeps relevant information about tracing
 	 */
-	TraceState traceState;
+	private final TraceState traceState_;
 
 	/**
 	 * creates conclusions for tracing
@@ -178,6 +178,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		this.expressionConverter_ = new ElkPolarityExpressionConverterImpl(
 				ontologyIndex);
 		this.subPropertyConverter_ = new ElkAxiomConverterImpl(ontologyIndex);
+		this.traceState_ = new TraceState(ontologyIndex);
 	}
 
 	protected AbstractReasonerState(AxiomLoader axiomLoader) {
@@ -601,17 +602,14 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	}
 
 	private void toTrace(ClassConclusion conclusion) {
-		if (traceState == null) {
-			createTraceState();
-		}
-		if (traceState.getInferences(conclusion).iterator().hasNext()) {
+		if (traceState_.getInferences(conclusion).iterator().hasNext()) {
 			// already traced
-			traceState.getInferences(conclusion);
+			traceState_.getInferences(conclusion);
 			return;
 		}
 		// else
 		stageManager.inferenceTracingStage.invalidateRecursive();
-		traceState.addToTrace(conclusion);
+		traceState_.addToTrace(conclusion);
 	}
 
 	public InferenceSet explainConclusion(ClassConclusion conclusion)
@@ -620,7 +618,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		getTaxonomy(); // make sure the taxonomy is computed
 		getStageExecutor().complete(stageManager.inferenceTracingStage);
 
-		return traceState;
+		return traceState_;
 	}
 
 	/**
@@ -634,7 +632,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			throw new IllegalStateException("The ontology is consistent");
 		}
 		toTrace(factory_.getContradiction(inconsistentEntity));
-		if (!traceState.getToTrace().isEmpty()) {
+		if (!traceState_.getToTrace().isEmpty()) {
 			getStageExecutor().complete(stageManager.inferenceTracingStage);
 		}
 		return inconsistentEntity.getElkEntity();
@@ -667,15 +665,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		return ce.accept(subPropertyConverter_);
 	}
 
-	private void createTraceState() {
-		traceState = new TraceState(ontologyIndex);
-	}
-
 	TraceState getTraceState() {
-		if (traceState == null) {
-			createTraceState();
-		}
-		return traceState;
+		return traceState_;
 	}
 
 	// ////////////////////////////////////////////////////////////////

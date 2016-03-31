@@ -69,8 +69,9 @@ public class InferenceTracingStage extends AbstractReasonerStage {
 			return false;
 		}
 
+		TraceState traceState = reasoner.getTraceState();
 		Collection<ProofUnwindingJob<ClassConclusion>> inputs = Operations
-				.map(reasoner.traceState.getToTrace(),
+				.map(traceState.getToTrace(),
 						new Transformation<ClassConclusion, ProofUnwindingJob<ClassConclusion>>() {
 							@Override
 							public ProofUnwindingJob<ClassConclusion> transform(
@@ -82,7 +83,7 @@ public class InferenceTracingStage extends AbstractReasonerStage {
 		computation_ = new RecursiveTracingComputation(inputs,
 				reasoner.getProcessExecutor(), reasoner.getNumberOfWorkers(),
 				reasoner.getProgressMonitor(), reasoner.saturationState,
-				reasoner.traceState);
+				traceState);
 		return true;
 	}
 
@@ -96,7 +97,7 @@ public class InferenceTracingStage extends AbstractReasonerStage {
 		if (!super.postExecute()) {
 			return false;
 		}
-		reasoner.traceState.clearToTrace();
+		reasoner.getTraceState().clearToTrace();
 		this.computation_ = null;
 		return true;
 	}

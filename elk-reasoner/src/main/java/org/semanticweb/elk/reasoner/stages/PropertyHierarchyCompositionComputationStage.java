@@ -79,7 +79,7 @@ public class PropertyHierarchyCompositionComputationStage extends
 	boolean invalidate() {
 		boolean invalidated = super.invalidate();
 		if (invalidated) {
-			reasoner.traceState.clearObjectPropertyInferences();
+			reasoner.getTraceState().clearObjectPropertyInferences();
 		}
 		return invalidated;
 	}

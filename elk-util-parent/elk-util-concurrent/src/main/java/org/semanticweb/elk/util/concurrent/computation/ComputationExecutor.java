@@ -231,6 +231,10 @@ public class ComputationExecutor {
 	 *             if was interrupted while waiting
 	 */
 	public synchronized void waitDone() throws InterruptedException {
+		if (jobsAccepted_) {
+			// nothing has been executed
+			return;
+		}
 		try {
 			jobDone_.await();
 		} catch (InterruptedException e) {
