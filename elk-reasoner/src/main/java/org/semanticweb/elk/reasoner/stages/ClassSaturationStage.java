@@ -72,8 +72,7 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 				reasoner.ontologyIndex.getClasses(),
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), ruleFactory);
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info(getName() + " using " + workerNo + " workers");
+		LOGGER_.info("{} using {} workers", this, workerNo);
 		return true;
 	}
 

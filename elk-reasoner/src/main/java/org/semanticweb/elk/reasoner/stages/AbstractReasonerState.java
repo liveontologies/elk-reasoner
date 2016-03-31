@@ -491,22 +491,22 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 * @return {@code true} if the ontology has been checked for consistency.
 	 */
 	public synchronized boolean doneConsistencyCheck() {
-		return stageManager.consistencyCheckingStage.isCompleted;
+		return stageManager.consistencyCheckingStage.isCompleted();
 	}
 
 	/**
 	 * @return {@code true} if the class taxonomy has been computed
 	 */
 	public synchronized boolean doneTaxonomy() {
-		return stageManager.classTaxonomyComputationStage.isCompleted
-				|| stageManager.incrementalClassTaxonomyComputationStage.isCompleted;
+		return stageManager.classTaxonomyComputationStage.isCompleted()
+				|| stageManager.incrementalClassTaxonomyComputationStage.isCompleted();
 	}
 
 	/**
 	 * @return {@code true} if the instance taxonomy has been computed
 	 */
 	public synchronized boolean doneInstanceTaxonomy() {
-		return stageManager.instanceTaxonomyComputationStage.isCompleted;
+		return stageManager.instanceTaxonomyComputationStage.isCompleted();
 	}
 
 	@Override

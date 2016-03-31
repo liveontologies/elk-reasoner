@@ -90,7 +90,7 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 
 		cleaning_ = new TaxonomyCleaning(inputs, reasoner.classTaxonomyState,
 				reasoner.instanceTaxonomyState, reasoner.getProcessExecutor(),
-				workerNo, progressMonitor);
+				workerNo, reasoner.getProgressMonitor());
 
 		return true;
 	}

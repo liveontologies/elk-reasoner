@@ -82,7 +82,7 @@ class ContextAssignmentResetStage extends AbstractReasonerStage {
 		int contexResetCount = reasoner.saturationState.getContexts().size()
 				- contextCountBefore_;
 		if (contexResetCount > 0)
-			LOGGER_.debug("Contexts deleted: {}" + contexResetCount);
+			LOGGER_.debug("Contexts deleted: {}", contexResetCount);
 	}
 
 }

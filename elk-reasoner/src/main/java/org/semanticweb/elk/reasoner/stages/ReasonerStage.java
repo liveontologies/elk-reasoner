@@ -80,7 +80,7 @@ public interface ReasonerStage extends Interrupter {
 	 * @return {@code true} if the operation is successful
 	 */
 	public boolean postExecute();
-
+	
 	/**
 	 * Prints detailed information about the (progress) of this stage. This
 	 * function can be used to print statistics after this stage is executed or

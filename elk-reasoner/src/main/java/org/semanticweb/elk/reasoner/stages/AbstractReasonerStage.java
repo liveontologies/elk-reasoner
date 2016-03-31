@@ -25,11 +25,9 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
-import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.concurrent.computation.Interrupter;
@@ -56,13 +54,13 @@ abstract class AbstractReasonerStage extends SimpleInterrupter implements
 	 * {@code true} if all information required for execution of this
 	 * {@link ReasonerStage} has been initialized
 	 */
-	boolean initialized = false;
+	private boolean isInitialized_ = false;
 
 	/**
 	 * {@code true} if the stage does not require execution, i.e., if it is
 	 * already executed
 	 */
-	boolean isCompleted = false;
+	private boolean isCompleted_ = false;
 
 	/**
 	 * the maximal number of concurrent workers used in this computation stage
@@ -70,44 +68,42 @@ abstract class AbstractReasonerStage extends SimpleInterrupter implements
 	int workerNo;
 
 	/**
-	 * the progress monitor used to report progress of this stage
-	 */
-	ProgressMonitor progressMonitor;
-
-	/**
 	 * Stages that need to be executed before this stage
 	 */
-	final Iterable<AbstractReasonerStage> preStages;
+	private final Iterable<AbstractReasonerStage> preStages_;
 
 	/**
 	 * Stages that need to be executed after this stage
 	 */
-	final List<AbstractReasonerStage> postStages = new LinkedList<AbstractReasonerStage>();
+	private final List<AbstractReasonerStage> postStages_ = new LinkedList<AbstractReasonerStage>();
 
 	/**
 	 * Creates a new reasoner stage for a given reasoner.
 	 * 
 	 * @param reasoner
 	 *            the reasoner for which the reasoner stage is created
+	 * @param preStages
+	 *            the reasoner stages that should be executed directly before
+	 *            this stage
 	 */
 	public AbstractReasonerStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
 		this.reasoner = reasoner;
-		this.preStages = Arrays.asList(preStages);
+		this.preStages_ = Arrays.asList(preStages);
 		for (AbstractReasonerStage preStage : preStages)
-			preStage.postStages.add(this);
+			preStage.postStages_.add(this);
 	}
 
 	@Override
 	public boolean isCompleted() {
-		return isCompleted;
+		return isCompleted_;
 	}
 
 	@Override
 	public Iterable<? extends ReasonerStage> getPreStages() {
-		return preStages;
+		return preStages_;
 	}
-
+	
 	/**
 	 * Initialize the parameters of the computation for this stage; this is the
 	 * first thing to be done before stage is executed
@@ -116,12 +112,11 @@ abstract class AbstractReasonerStage extends SimpleInterrupter implements
 	 */
 	@Override
 	public boolean preExecute() {
-		if (initialized)
+		if (isInitialized_)
 			return false;
-		LOGGER_.trace(getName() + ": initialized");
+		LOGGER_.trace("{}: initialized", this);
 		this.workerNo = reasoner.getNumberOfWorkers();
-		this.progressMonitor = reasoner.getProgressMonitor();
-		return initialized = true;
+		return isInitialized_ = true;
 	}
 
 	/**
@@ -132,13 +127,12 @@ abstract class AbstractReasonerStage extends SimpleInterrupter implements
 	 */
 	@Override
 	public boolean postExecute() {
-		if (!initialized)
+		if (!isInitialized_)
 			return false;
-		LOGGER_.trace(getName() + ": done");
-		this.isCompleted = true;
+		LOGGER_.trace("{}: done", this);
+		this.isCompleted_ = true;
 		this.workerNo = 0;
-		this.progressMonitor = null;
-		this.initialized = false;		
+		this.isInitialized_ = false;		
 		return true;
 	}
 
@@ -151,46 +145,39 @@ abstract class AbstractReasonerStage extends SimpleInterrupter implements
 
 	@Override
 	public void execute() throws ElkException {
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info(getName() + " using " + workerNo + " workers");
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.info("=== " + getName() + " using " + workerNo + " workers"
-					+ " ===");
-		progressMonitor.start(getName());
+		LOGGER_.info("{} using {} workers", this, workerNo);
+		LOGGER_.info("=== {} using {} workers  ===", this, workerNo);
+		reasoner.getProgressMonitor().start(getName());
 
 		try {
 			executeStage();
 			checkInterrupt();
 		} finally {
-			progressMonitor.finish();
+			reasoner.getProgressMonitor().finish();
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return getName();
 	}
 
 	/**
 	 * Marks this {@link AbstractReasonerStage} and all dependent stages as not
 	 * completed; this will require their execution next time
 	 * 
-	 * @return {@code true} if this stage is invalidated or {@code false} if
-	 *         this stage was already invalidated before the call
+	 * @return {@code true} if this stage was not invalidated and {@code false}
+	 *         if this stage was already invalidated before the call
 	 */
 	boolean invalidate() {
-		if (!isCompleted)
+		if (!isCompleted_)
 			return false;
-		Queue<AbstractReasonerStage> toInvalidate = new LinkedList<AbstractReasonerStage>();
-		toInvalidate.add(this);
-		for (;;) {
-			AbstractReasonerStage stage = toInvalidate.poll();
-			if (stage == null)
-				return true;
-			if (stage.isCompleted) {
-				if (LOGGER_.isTraceEnabled())
-					LOGGER_.trace(stage.getName() + ": invalidated");
-				stage.isCompleted = false;
-				for (AbstractReasonerStage postStage : stage.postStages) {
-					toInvalidate.add(postStage);
-				}
-			}
+		LOGGER_.trace("{}: invalidated", this);
+		isCompleted_ = false;
+		for (AbstractReasonerStage postStage : postStages_) {
+			postStage.invalidate();
 		}
+		return true;
 	}
 
 	/**
@@ -198,40 +185,32 @@ abstract class AbstractReasonerStage extends SimpleInterrupter implements
 	 * completed; next time the stage will not be executed unless some of the
 	 * dependencies are invalidated
 	 * 
-	 * @return
+	 * @return {@code true} if this stage was invalidated and {@code false} if
+	 *         this stage was already not invalidated before the call
 	 */
 	boolean setCompleted() {
-		if (isCompleted)
+		if (isCompleted_)
 			return false;
-		Queue<AbstractReasonerStage> toMark = new LinkedList<AbstractReasonerStage>();
-		toMark.add(this);
-		for (;;) {
-			AbstractReasonerStage stage = toMark.poll();
-			if (stage == null)
-				return true;
-			if (!stage.isCompleted) {
-				if (LOGGER_.isTraceEnabled())
-					LOGGER_.trace(stage.getName() + ": marked completed");
-				stage.isCompleted = true;
-				for (AbstractReasonerStage preStage : stage.preStages) {
-					toMark.add(preStage);
-				}
-			}
+		LOGGER_.trace("{}: marked completed", this);
+		isCompleted_ = true;
+		for (AbstractReasonerStage preStage : preStages_) {
+			preStage.setCompleted();
 		}
+		return true;
 	}
 
 	protected void checkInterrupt() throws ElkInterruptedException {
 		if (isInterrupted()) {
-			LOGGER_.info("{}: interrupted", getName());
-			throw new ElkInterruptedException(getName() + " interrupted");
+			LOGGER_.info("{}: interrupted", this);
+			throw new ElkInterruptedException(this + " interrupted");
 		}
 	}
 
 	protected void setInterrupt(Interrupter interrupter, boolean flag) {
 		if (interrupter == null) {
 			if (!flag)
-				throw new ElkRuntimeException(getName()
-						+ ": cannot clear interrupt!");
+				throw new ElkRuntimeException(
+						this + ": cannot clear interrupt!");
 			return;
 		}
 		// else

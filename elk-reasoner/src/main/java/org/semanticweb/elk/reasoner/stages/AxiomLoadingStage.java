@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.stages;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.incremental.NonIncrementalChangeListener;
 import org.semanticweb.elk.reasoner.indexing.classes.ChangeIndexingProcessor;
@@ -116,10 +115,7 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 				axiomCounter_++;
 				if (resetDone)
 					return;
-				if (LOGGER_.isDebugEnabled()) {
-					LOGGER_.debug("Disallowing incremental mode due to "
-							+ OwlFunctionalStylePrinter.toString(axiom));
-				}
+				LOGGER_.debug("Disallowing incremental mode due to {}", axiom);
 				reasoner.resetPropertySaturation();
 				reasoner.setNonIncrementalMode();
 				resetDone = true;

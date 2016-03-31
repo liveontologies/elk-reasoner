@@ -96,8 +96,8 @@ public class IncrementalInstanceTaxonomyComputationStage extends
 				modifiedIndividuals.size());
 
 		this.computation_ = new InstanceTaxonomyComputation(modified,
-				reasoner.getProcessExecutor(), workerNo, progressMonitor,
-				reasoner.saturationState,
+				reasoner.getProcessExecutor(), workerNo,
+				reasoner.getProgressMonitor(), reasoner.saturationState,
 				reasoner.instanceTaxonomyState.getTaxonomy());
 		return true;
 	}

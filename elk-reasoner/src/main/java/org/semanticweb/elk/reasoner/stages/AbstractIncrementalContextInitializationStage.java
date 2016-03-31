@@ -100,7 +100,7 @@ abstract class AbstractIncrementalContextInitializationStage
 			}
 
 			initContexts++;
-			progressMonitor.report(initContexts, maxContexts);
+			reasoner.getProgressMonitor().report(initContexts, maxContexts);
 
 		}
 	}
@@ -118,8 +118,9 @@ abstract class AbstractIncrementalContextInitializationStage
 
 	@Override
 	public void printInfo() {
-		if (initContexts > 0 && LOGGER_.isDebugEnabled())
-			LOGGER_.debug("Contexts init:" + initContexts);
+		if (initContexts > 0) {
+			LOGGER_.debug("Contexts init: {}", initContexts);
+		}	
 	}
 
 	protected abstract IncrementalStages stage();

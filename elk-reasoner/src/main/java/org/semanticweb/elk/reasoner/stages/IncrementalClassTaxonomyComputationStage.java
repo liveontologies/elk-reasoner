@@ -94,9 +94,10 @@ public class IncrementalClassTaxonomyComputationStage extends
 				reasoner.classTaxonomyState.getClassesWithModifiedNodes()
 						.size());
 
-		this.computation_ = new ClassTaxonomyComputation(Operations.split(
-				modified, 64), reasoner.getProcessExecutor(), workerNo,
-				progressMonitor, reasoner.saturationState,
+		this.computation_ = new ClassTaxonomyComputation(
+				Operations.split(modified, 64), reasoner.getProcessExecutor(),
+				workerNo, reasoner.getProgressMonitor(),
+				reasoner.saturationState,
 				reasoner.classTaxonomyState.getTaxonomy());
 
 		return true;

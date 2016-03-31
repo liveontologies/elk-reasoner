@@ -81,7 +81,7 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 			IndexedPropertyChain ipc = todo_.next();
 			SaturatedPropertyChain saturation = ipc.getSaturated();
 			saturation.clear();
-			progressMonitor.report(++progress_, maxProgress_);
+			reasoner.getProgressMonitor().report(++progress_, maxProgress_);
 		}
 	}
 

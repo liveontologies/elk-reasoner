@@ -64,14 +64,12 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 
 			computation_ = new InstanceTaxonomyComputation(
 					reasoner.ontologyIndex.getIndividuals(),
-					reasoner.getProcessExecutor(), workerNo, progressMonitor,
-					reasoner.saturationState,
+					reasoner.getProcessExecutor(), workerNo,
+					reasoner.getProgressMonitor(), reasoner.saturationState,
 					reasoner.instanceTaxonomyState.getTaxonomy());
 		}
 
-		if (LOGGER_.isInfoEnabled()) {
-			LOGGER_.info(getName() + " using " + workerNo + " workers");
-		}
+		LOGGER_.info("{} using {} workers", this, workerNo);
 
 		return true;
 	}
