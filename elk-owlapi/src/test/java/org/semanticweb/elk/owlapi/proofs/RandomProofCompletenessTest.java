@@ -22,12 +22,12 @@
 package org.semanticweb.elk.owlapi.proofs;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -44,13 +44,15 @@ import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.VoidTestOutput;
 import org.semanticweb.elk.testing.io.URLTestIO;
+import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.model.RemoveAxiom;
 import org.semanticweb.owlapi.reasoner.InconsistentOntologyException;
 import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.owlapitools.proofs.ExplainingOWLReasoner;
@@ -77,6 +79,8 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 	@Test
 	public void proofCompletenessTest() throws Exception {
 		final long seed = RandomSeedProvider.VALUE;
+//		final long seed = 1459433444278L; TODO: seed to reproduce the problem with property chain optimization
+		final Random random = new Random(seed);
 		
 		final OWLDataFactory factory = manager_.getOWLDataFactory();
 		
@@ -103,20 +107,20 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 								throws ProofGenerationException {
 					randomProofCompletenessTest(reasoner,
 							factory.getOWLSubClassOfAxiom(subsumee, subsumer),
-							ontology, seed);
+							ontology, random, seed);
 				}
 
 				@Override
 				public void inconsistencyTest()
 						throws ProofGenerationException {
 					randomInconsistencyProofCompletenessTest(reasoner, ontology,
-							seed);
+							random, seed);
 				}
 				
 			});
 			
-		} catch (final ProofGenerationException e) {
-			fail(e.getClass().getName() + " " + e.getMessage());
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
 		} finally {
 			reasoner.dispose();
 		}
@@ -126,87 +130,67 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 	private void randomProofCompletenessTest(
 			final ExplainingOWLReasoner reasoner,
 			final OWLSubClassOfAxiom conclusion, final OWLOntology ontology,
-			final long seed) throws ProofGenerationException {
-		final Random random = new Random(seed);
-		
+			final Random random, final long seed)
+					throws ProofGenerationException {
 		final OWLExpression expr = reasoner.getDerivedExpression(conclusion);
 		
 		final Set<OWLAxiom> proofBreaker =
 				ProofTestUtils.collectProofBreaker(expr, ontology, random);
-		
-		final Set<OWLAxiom> axs = new HashSet<OWLAxiom>(ontology.getAxioms());
-		axs.removeAll(proofBreaker);
-		
-		ExplainingOWLReasoner checkReasoner = null;
-		try {
-			
-			checkReasoner = OWLAPITestUtils.createReasoner(
-					manager_.createOntology(axs));
-			
-			if (!checkReasoner.isConsistent()) {
-				fail("Not all proofs were found!\n"
-						+ "Seed: " + seed + "\n"
-						+ "Conclusion: " + conclusion + "\n"
-						+ "Proof Breaker: " + proofBreaker);
-			}
-			
-			final boolean conclusionDerived =
-					checkReasoner.getSuperClasses(conclusion.getSubClass(), false)
-					.containsEntity((OWLClass) conclusion.getSuperClass());
-			
-			assertFalse("Not all proofs were found!\n"
-							+ "Seed: " + seed + "\n"
-							+ "Conclusion: " + conclusion + "\n"
-							+ "Proof Breaker: " + proofBreaker,
-					conclusionDerived
-			);
-			
-		} catch (final OWLOntologyCreationException e) {
-			throw new RuntimeException(e);
-		} finally {
-			if (checkReasoner != null) {
-				checkReasoner.dispose();
-			}
+		final List<OWLOntologyChange> deletions =
+				new ArrayList<OWLOntologyChange>();
+		final List<OWLOntologyChange> additions =
+				new ArrayList<OWLOntologyChange>();
+		for (final OWLAxiom axiom : proofBreaker) {
+			deletions.add(new RemoveAxiom(ontology, axiom));
+			additions.add(new AddAxiom(ontology, axiom));
 		}
 		
+		manager_.applyChanges(deletions);
+		
+		final boolean conclusionDerived =
+				reasoner.getSuperClasses(conclusion.getSubClass(), false)
+				.containsEntity((OWLClass) conclusion.getSuperClass());
+		
+		manager_.applyChanges(additions);
+		
+		assertFalse("Not all proofs were found!\n"
+						+ "Seed: " + seed + "\n"
+						+ "Conclusion: " + conclusion + "\n"
+						+ "Proof Breaker: " + proofBreaker,
+				conclusionDerived
+		);
 	}
 	
 	private void randomInconsistencyProofCompletenessTest(
 			final ExplainingOWLReasoner reasoner, final OWLOntology ontology,
-			final long seed) throws ProofGenerationException {
-		final Random random = new Random(seed);
-		
+			final Random random, final long seed)
+					throws ProofGenerationException {
 		final OWLExpression expr =
 				reasoner.getDerivedExpressionForInconsistency();
 		
 		final Set<OWLAxiom> proofBreaker =
 				ProofTestUtils.collectProofBreaker(expr, ontology, random);
-		
-		final Set<OWLAxiom> axs = new HashSet<OWLAxiom>(ontology.getAxioms());
-		axs.removeAll(proofBreaker);
-		
-		ExplainingOWLReasoner checkReasoner = null;
-		try {
-			checkReasoner = OWLAPITestUtils.createReasoner(
-					manager_.createOntology(axs));
-			
-			final boolean conclusionDerived = !reasoner.isConsistent();
-			
-			assertFalse("Not all proofs were found!\n"
-							+ "Seed: " + seed + "\n"
-							+ "Conclusion: Ontology is inconsistent\n"
-							+ "Proof Breaker: " + proofBreaker,
-					conclusionDerived
-			);
-			
-		} catch (final OWLOntologyCreationException e) {
-			throw new RuntimeException(e);
-		} finally {
-			if (checkReasoner != null) {
-				checkReasoner.dispose();
-			}
+		final List<OWLOntologyChange> deletions =
+				new ArrayList<OWLOntologyChange>();
+		final List<OWLOntologyChange> additions =
+				new ArrayList<OWLOntologyChange>();
+		for (final OWLAxiom axiom : proofBreaker) {
+			deletions.add(new RemoveAxiom(ontology, axiom));
+			additions.add(new AddAxiom(ontology, axiom));
 		}
 		
+		manager_.applyChanges(deletions);
+		
+		final boolean conclusionDerived = !reasoner.isConsistent();
+		
+		manager_.applyChanges(additions);
+		
+		assertFalse("Not all proofs were found!\n"
+						+ "Seed: " + seed + "\n"
+						+ "Conclusion: Ontology is inconsistent\n"
+						+ "Proof Breaker: " + proofBreaker,
+				conclusionDerived
+		);
 	}
 
 	@Config

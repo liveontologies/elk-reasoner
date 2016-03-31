@@ -35,10 +35,14 @@ import org.semanticweb.elk.reasoner.indexing.classes.ResolvingModifiableIndexedO
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedAxiomInference;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectCache;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 /**
@@ -51,30 +55,39 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  * 
  * @author "Yevgeny Kazakov"
  * 
- * TODO: save only acyclic inferences
+ *         TODO: filter out cyclic inferences
  */
-public class TraceState extends SynchronizedModifiableInferenceSet<Inference> {
+public class TraceState
+		implements InferenceProducer<SaturationInference>, InferenceSet {
 
 	private final Queue<ClassConclusion> toTrace_ = new LinkedList<ClassConclusion>();
 
 	private final Set<ElkAxiom> indexedAxioms_ = new ArrayHashSet<ElkAxiom>();
 
-	private final ModifiableIndexedObject.Factory indexedObjectFactory_;
+	private final ModifiableInferenceSet<ClassInference> classInferences_ = new SynchronizedModifiableInferenceSet<ClassInference>();
+
+	private final ModifiableInferenceSet<ObjectPropertyInference> objectPropertyInferences_ = new SynchronizedModifiableInferenceSet<ObjectPropertyInference>();
+
+	private final ModifiableInferenceSet<IndexedAxiomInference> indexedAxiomInferences_ = new SynchronizedModifiableInferenceSet<IndexedAxiomInference>();
+
+	private final SaturationInference.Visitor<Void> inferenceProducer_ = new InferenceProducer();
+
+	private final Conclusion.Visitor<Iterable<? extends Inference>> inferenceGetter_ = new InferenceGetter();
 
 	private final ElkAxiomConverter elkAxiomConverter_;
 
 	public TraceState(ModifiableIndexedObjectCache cache) {
-		this.indexedObjectFactory_ = new ResolvingModifiableIndexedObjectFactory(
-				cache) {
-			@Override
-			protected <T extends ModifiableIndexedAxiomInference> T filter(
-					T input) {
-				produce(input);
-				return input;
-			}
-		};
+		// the axiom converter that resolves indexed axioms from the given cache
+		// and additionally saves the inferences that produced them
 		this.elkAxiomConverter_ = new ElkAxiomConverterImpl(
-				indexedObjectFactory_);
+				new ResolvingModifiableIndexedObjectFactory(cache) {
+					@Override
+					protected <T extends ModifiableIndexedAxiomInference> T filter(
+							T input) {
+						indexedAxiomInferences_.produce(input);
+						return input;
+					}
+				});
 	}
 
 	public Collection<? extends ClassConclusion> getToTrace() {
@@ -89,12 +102,27 @@ public class TraceState extends SynchronizedModifiableInferenceSet<Inference> {
 		toTrace_.clear();
 	}
 
+	public void clearClassInferences() {
+		classInferences_.clear();
+	}
+
+	public void clearObjectPropertyInferences() {
+		objectPropertyInferences_.clear();
+	}
+
+	public void clearIndexedAxiomInferences() {
+		indexedAxioms_.clear();
+		indexedAxiomInferences_.clear();
+	}
+
 	@Override
 	public Iterable<? extends Inference> getInferences(Conclusion conclusion) {
-		if (conclusion instanceof IndexedAxiom) {
-			indexAxiom(((IndexedAxiom) conclusion).getOriginalAxiom());			
-		}
-		return super.getInferences(conclusion);
+		return conclusion.accept(inferenceGetter_);
+	}
+
+	@Override
+	public void produce(SaturationInference inference) {
+		inference.accept(inferenceProducer_);
 	}
 
 	synchronized void indexAxiom(ElkAxiom axiom) {
@@ -104,6 +132,57 @@ public class TraceState extends SynchronizedModifiableInferenceSet<Inference> {
 		}
 		// else index axiom
 		axiom.accept(elkAxiomConverter_);
+	}
+
+	/**
+	 * Delegates getting inferences to the corresponding inference set
+	 * 
+	 * @author Yevgeny Kazakov
+	 */
+	private class InferenceGetter
+			extends DummyConclusionVisitor<Iterable<? extends Inference>> {
+
+		@Override
+		protected Iterable<? extends ClassInference> defaultVisit(
+				ClassConclusion conclusion) {
+			return classInferences_.getInferences(conclusion);
+		}
+
+		@Override
+		protected Iterable<? extends ObjectPropertyInference> defaultVisit(
+				ObjectPropertyConclusion conclusion) {
+			return objectPropertyInferences_.getInferences(conclusion);
+		}
+
+		@Override
+		protected Iterable<? extends IndexedAxiomInference> defaultVisit(
+				IndexedAxiom conclusion) {
+			// compute inferences on demand
+			indexAxiom(conclusion.getOriginalAxiom());
+			return indexedAxiomInferences_.getInferences(conclusion);
+		}
+
+	}
+
+	/**
+	 * Delegates saving inferences to the corresponding inference set
+	 * 
+	 * @author Yevgeny Kazakov
+	 */
+	private class InferenceProducer extends DummyInferenceVisitor<Void> {
+
+		@Override
+		protected Void defaultVisit(ClassInference inference) {
+			classInferences_.produce(inference);
+			return null;
+		}
+
+		@Override
+		protected Void defaultVisit(ObjectPropertyInference inference) {
+			objectPropertyInferences_.produce(inference);
+			return null;
+		}
+
 	}
 
 }

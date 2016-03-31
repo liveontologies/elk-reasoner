@@ -951,32 +951,42 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 	}
 	
 	@Override
-	public OWLAxiomExpression getDerivedExpression(OWLAxiom axiom) throws ProofGenerationException {
+	public OWLAxiomExpression getDerivedExpression(OWLAxiom axiom)
+			throws ProofGenerationException {
 		// support only class subsumptions for the moment
 		if (axiom instanceof OWLSubClassOfAxiom) {
 			OWLSubClassOfAxiom scAxiom = (OWLSubClassOfAxiom) axiom;
-			ElkSubClassOfAxiom elkAxiom = (ElkSubClassOfAxiom) scAxiom.accept(OwlClassAxiomConverterVisitor.getInstance());
-			ClassConclusion conclusion = reasoner_.getConclusion(elkAxiom);
-			ElkObjectFactory factory = new ElkObjectWrapFactory(owlOntologymanager_.getOWLDataFactory());
-			ModifiableElkInferenceSet elkInferences = new ModifiableElkInferenceSetImpl(
-					factory);			
-			
+			ElkSubClassOfAxiom elkAxiom = (ElkSubClassOfAxiom) scAxiom
+					.accept(OwlClassAxiomConverterVisitor.getInstance());
 			try {
-				Matcher matcher = new Matcher(reasoner_.explainConclusion(conclusion),
-						factory, elkInferences);
+				ClassConclusion conclusion = reasoner_.getConclusion(elkAxiom);
+				ElkObjectFactory factory = new ElkObjectWrapFactory(
+						owlOntologymanager_.getOWLDataFactory());
+				ModifiableElkInferenceSet elkInferences = new ModifiableElkInferenceSetImpl(
+						factory);
+				if (conclusion == null) {
+					// not derivable
+					return new OwlAxiomExpressionWrap(elkAxiom, elkInferences,
+							owlOntology_, factory);
+				}
+				Matcher matcher = new Matcher(
+						reasoner_.explainConclusion(conclusion), factory,
+						elkInferences);
 				if (conclusion instanceof SubClassInclusionComposed) {
 					matcher.trace((SubClassInclusionComposed) conclusion);
 				}
-				
-				return new OwlAxiomExpressionWrap(elkAxiom, elkInferences, owlOntology_, factory);								
-				
+
+				return new OwlAxiomExpressionWrap(elkAxiom, elkInferences,
+						owlOntology_, factory);
+
 			} catch (ElkException e) {
 				LOGGER_.error("Error during proof reconstruction", e);
-				
+
 				throw new ProofGenerationException(e);
-			} 
+			}
 		}
-		
+		// else
+
 		throw new UnsupportedEntailmentTypeException(axiom);
 	}
 	

@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
@@ -163,8 +164,8 @@ abstract class AbstractReasonerStage extends SimpleInterrupter implements
 	}
 
 	/**
-	 * Marks this {@link AbstractReasonerStage} and all dependent stages as not
-	 * completed; this will require their execution next time
+	 * Marks this {@link AbstractReasonerStage} as not completed; this will
+	 * require its execution next time unless {@link #setCompleted()} is called
 	 * 
 	 * @return {@code true} if this stage was not invalidated and {@code false}
 	 *         if this stage was already invalidated before the call
@@ -173,17 +174,29 @@ abstract class AbstractReasonerStage extends SimpleInterrupter implements
 		if (!isCompleted_)
 			return false;
 		LOGGER_.trace("{}: invalidated", this);
-		isCompleted_ = false;
-		for (AbstractReasonerStage postStage : postStages_) {
-			postStage.invalidate();
-		}
+		isCompleted_ = false;		
 		return true;
+	}
+	
+	/**
+	 * Invalidates this stage and all subsequent stages if not already done so
+	 */
+	public void invalidateRecursive() {
+		Queue<AbstractReasonerStage> toInvalidate_ = new LinkedList<AbstractReasonerStage>();
+		toInvalidate_.add(this);
+		AbstractReasonerStage next;
+		while ((next = toInvalidate_.poll()) != null) {
+			if (next.invalidate()) {
+				for (AbstractReasonerStage postStage : next.postStages_) {
+					toInvalidate_.add(postStage);
+				}
+			}
+		}
 	}
 
 	/**
-	 * Marks this {@link AbstractReasonerStage} and its dependencies as
-	 * completed; next time the stage will not be executed unless some of the
-	 * dependencies are invalidated
+	 * Marks this {@link AbstractReasonerStage} as completed; next time the
+	 * stage will not be executed unless {@link #invalidate()} is called
 	 * 
 	 * @return {@code true} if this stage was invalidated and {@code false} if
 	 *         this stage was already not invalidated before the call
@@ -193,12 +206,27 @@ abstract class AbstractReasonerStage extends SimpleInterrupter implements
 			return false;
 		LOGGER_.trace("{}: marked completed", this);
 		isCompleted_ = true;
-		for (AbstractReasonerStage preStage : preStages_) {
-			preStage.setCompleted();
-		}
 		return true;
 	}
 
+	/**
+	 * Marks this stage and all preceding stages as completed if not already
+	 * done so
+	 */
+	public void setCompletedRecursive() {
+		Queue<AbstractReasonerStage> toComplete_ = new LinkedList<AbstractReasonerStage>();
+		toComplete_.add(this);
+		AbstractReasonerStage next;
+		while ((next = toComplete_.poll()) != null) {
+			if (next.setCompleted()) {
+				for (AbstractReasonerStage preStage : next.preStages_) {
+					toComplete_.add(preStage);
+				}
+			}
+		}
+	}
+
+	
 	protected void checkInterrupt() throws ElkInterruptedException {
 		if (isInterrupted()) {
 			LOGGER_.info("{}: interrupted", this);

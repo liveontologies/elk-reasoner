@@ -24,17 +24,18 @@ import org.semanticweb.elk.reasoner.indexing.model.ElkSameIndividualAxiomConvers
 import org.semanticweb.elk.reasoner.indexing.model.ElkSubClassOfAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkSubObjectPropertyOfAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkTransitiveObjectPropertyAxiomConversion;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkComposition;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectHasSelf;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversed;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversedExpanded;
-import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.ContextInitializationNoPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfDisjointSubsumers;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfObjectComplementOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfOwlNothing;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyPropagated;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContextInitializationNoPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkComposition;
 import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkOfObjectHasSelf;
@@ -92,15 +93,23 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubProperty
  */
 public class DummyInferenceVisitor<O> implements Inference.Visitor<O> {
 
-	protected O defaultVisit(ClassInference inference) {
-		return defaultVisit((SaturationInference) inference);
-	}
-
 	protected O defaultVisit(@SuppressWarnings("unused") Inference inference) {
 		// can be overriden in sub-classes
 		return null;
 	}
 
+	protected O defaultVisit(IndexedAxiomInference inference) {
+		return defaultVisit((Inference) inference);
+	}
+	
+	protected O defaultVisit(SaturationInference inference) {
+		return defaultVisit((Inference) inference);
+	}
+	
+	protected O defaultVisit(ClassInference inference) {
+		return defaultVisit((SaturationInference) inference);
+	}	
+	
 	protected O defaultVisit(ObjectPropertyInference inference) {
 		return defaultVisit((SaturationInference) inference);
 	}

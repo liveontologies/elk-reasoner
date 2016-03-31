@@ -119,7 +119,6 @@ public class IncrementalInstanceTaxonomyComputationStage extends
 		this.computation_ = null;
 
 		return true;
-
 	}
 
 	@Override

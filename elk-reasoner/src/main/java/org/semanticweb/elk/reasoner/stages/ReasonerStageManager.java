@@ -109,7 +109,6 @@ public class ReasonerStageManager {
 
 		/* Tracing stages */
 
-		this.inferenceTracingStage = new InferenceTracingStage(reasoner,
-				classTaxonomyComputationStage);
+		this.inferenceTracingStage = new InferenceTracingStage(reasoner);
 	}
 }

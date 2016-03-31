@@ -239,8 +239,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 */
 	public synchronized void resetAxiomLoading() {
 		LOGGER_.trace("Reset axiom loading");
-		stageManager.axiomLoadingStage.invalidate();
-		stageManager.incrementalCompletionStage.invalidate();
+		stageManager.axiomLoadingStage.invalidateRecursive();
+		stageManager.incrementalCompletionStage.invalidateRecursive();
 	}
 
 	/**
@@ -248,7 +248,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 */
 	public synchronized void resetPropertySaturation() {
 		LOGGER_.trace("Reset property saturation");
-		stageManager.propertyInitializationStage.invalidate();
+		stageManager.propertyInitializationStage.invalidateRecursive();
 	}
 
 	public synchronized void registerAxiomLoader(AxiomLoader newAxiomLoader) {
@@ -278,8 +278,9 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 * @throws ElkException
 	 */
 	public synchronized void forceLoading() throws ElkException {
-		if (classTaxonomyState.getTaxonomy() != null)
+		if (classTaxonomyState.getTaxonomy() != null) {
 			trySetIncrementalMode();
+		}
 		complete(stageManager.axiomLoadingStage);
 	}
 
@@ -337,7 +338,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		} else {
 			setNonIncrementalMode();
 			complete(stageManager.consistencyCheckingStage);
-			stageManager.incrementalConsistencyCheckingStage.setCompleted();
+			stageManager.incrementalConsistencyCheckingStage
+					.setCompletedRecursive();
 		}
 
 		return inconsistentEntity != null;
@@ -367,7 +369,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			setNonIncrementalMode();
 			complete(stageManager.classTaxonomyComputationStage);
 			stageManager.incrementalClassTaxonomyComputationStage
-					.setCompleted();
+					.setCompletedRecursive();
 		}
 
 		return classTaxonomyState.getTaxonomy();
@@ -391,7 +393,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			LOGGER_.info("Ontology is inconsistent");
 
 			OrphanNode<ElkClass> node = new OrphanNode<ElkClass>(
-					getAllClasses(), PredefinedElkClass.OWL_NOTHING, ElkClassKeyProvider.INSTANCE);
+					getAllClasses(), PredefinedElkClass.OWL_NOTHING,
+					ElkClassKeyProvider.INSTANCE);
 			result = new SingletoneTaxonomy<ElkClass, OrphanNode<ElkClass>>(
 					node);
 		}
@@ -424,7 +427,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			setNonIncrementalMode();
 			complete(stageManager.instanceTaxonomyComputationStage);
 			stageManager.incrementalInstanceTaxonomyComputationStage
-					.setCompleted();
+					.setCompletedRecursive();
 		}
 
 		return instanceTaxonomyState.getTaxonomy();
@@ -448,15 +451,18 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		} catch (ElkInconsistentOntologyException e) {
 			LOGGER_.info("Ontology is inconsistent");
 			OrphanTypeNode<ElkClass, ElkNamedIndividual> node = new OrphanTypeNode<ElkClass, ElkNamedIndividual>(
-					getAllClasses(), PredefinedElkClass.OWL_NOTHING, 1, ElkClassKeyProvider.INSTANCE);
+					getAllClasses(), PredefinedElkClass.OWL_NOTHING, 1,
+					ElkClassKeyProvider.INSTANCE);
 			Set<ElkNamedIndividual> allNamedIndividuals = getAllNamedIndividuals();
 			Iterator<ElkNamedIndividual> namedIndividualIterator = allNamedIndividuals
 					.iterator();
 			if (namedIndividualIterator.hasNext()) {
 				// there is at least one individual
-				node.addInstanceNode(new OrphanInstanceNode<ElkClass, ElkNamedIndividual>(
-						allNamedIndividuals, namedIndividualIterator.next(),
-						node, ElkIndividualKeyProvider.INSTANCE));
+				node.addInstanceNode(
+						new OrphanInstanceNode<ElkClass, ElkNamedIndividual>(
+								allNamedIndividuals,
+								namedIndividualIterator.next(), node,
+								ElkIndividualKeyProvider.INSTANCE));
 			}
 			result = new SingletoneInstanceTaxonomy<ElkClass, ElkNamedIndividual, OrphanTypeNode<ElkClass, ElkNamedIndividual>>(
 					node, ElkIndividualKeyProvider.INSTANCE);
@@ -499,7 +505,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 */
 	public synchronized boolean doneTaxonomy() {
 		return stageManager.classTaxonomyComputationStage.isCompleted()
-				|| stageManager.incrementalClassTaxonomyComputationStage.isCompleted();
+				|| stageManager.incrementalClassTaxonomyComputationStage
+						.isCompleted();
 	}
 
 	/**
@@ -553,8 +560,9 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	}
 
 	public synchronized void initInstanceTaxonomy() {
-		instanceTaxonomyState.initTaxonomy(new ConcurrentInstanceTaxonomy(
-				classTaxonomyState.getTaxonomy(), ElkIndividualKeyProvider.INSTANCE));
+		instanceTaxonomyState.initTaxonomy(
+				new ConcurrentInstanceTaxonomy(classTaxonomyState.getTaxonomy(),
+						ElkIndividualKeyProvider.INSTANCE));
 	}
 
 	@Deprecated
@@ -571,44 +579,46 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 * TRACING METHODS
 	 *---------------------------------------------------*/
 
-	public ClassConclusion getConclusion(ElkSubClassOfAxiom axiom) {
-		IndexedClassExpression subExpression = axiom.getSubClassExpression().accept(expressionConverter_);
-		IndexedClassExpression superExpression = axiom.getSuperClassExpression().accept(expressionConverter_);
+	public ClassConclusion getConclusion(ElkSubClassOfAxiom axiom)
+			throws ElkException {
+		forceLoading(); // to make sure that the index is up to date
+		IndexedClassExpression subExpression = axiom.getSubClassExpression()
+				.accept(expressionConverter_);
+		IndexedClassExpression superExpression = axiom.getSuperClassExpression()
+				.accept(expressionConverter_);
 		if (subExpression == null || superExpression == null) {
 			// input expressions do not occur in the ontology
 			return null;
 		}
-		
+
 		if (!isSatisfiable(subExpression)) {
 			// the subsumee is unsatisfiable so we explain the unsatisfiability
 			return factory_.getContradiction(subExpression);
 		}
 		// else
-		return factory_.getSubClassInclusionComposed(subExpression, superExpression);
+		return factory_.getSubClassInclusionComposed(subExpression,
+				superExpression);
 	}
 
-	
 	private void toTrace(ClassConclusion conclusion) {
+		if (traceState == null) {
+			createTraceState();
+		}
 		if (traceState.getInferences(conclusion).iterator().hasNext()) {
 			// already traced
 			traceState.getInferences(conclusion);
 			return;
 		}
 		// else
-		stageManager.inferenceTracingStage.invalidate();
+		stageManager.inferenceTracingStage.invalidateRecursive();
 		traceState.addToTrace(conclusion);
 	}
 
-	public InferenceSet explainConclusion(ClassConclusion conclusion) throws ElkException {
-		if (traceState == null) {
-			resetTraceState();
-		}
-
+	public InferenceSet explainConclusion(ClassConclusion conclusion)
+			throws ElkException {
 		toTrace(conclusion);
-
-		if (!traceState.getToTrace().isEmpty()) {
-			getStageExecutor().complete(stageManager.inferenceTracingStage);
-		}
+		getTaxonomy(); // make sure the taxonomy is computed
+		getStageExecutor().complete(stageManager.inferenceTracingStage);
 
 		return traceState;
 	}
@@ -641,7 +651,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		// class expressions and saturate them prior to tracing
 		return true;
 	}
-	
+
 	@Deprecated
 	IndexedClassExpression transform(ElkClassExpression ce) {
 		return ce.accept(expressionConverter_);
@@ -657,19 +667,14 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		return ce.accept(subPropertyConverter_);
 	}
 
-	public void resetTraceState() {
-		createTraceState();
-	}
-
 	private void createTraceState() {
 		traceState = new TraceState(ontologyIndex);
 	}
 
 	TraceState getTraceState() {
 		if (traceState == null) {
-			resetTraceState();
+			createTraceState();
 		}
-
 		return traceState;
 	}
 

@@ -51,11 +51,8 @@ public class PropertyHierarchyCompositionComputationStage extends
 			return false;
 		}
 
-		if (reasoner.traceState == null) {
-			reasoner.resetTraceState();
-		}
 
-		InferenceProducer<? super ObjectPropertyInference> inferenceProducer = reasoner.traceState;
+		InferenceProducer<? super ObjectPropertyInference> inferenceProducer = reasoner.getTraceState();
 
 		computation_ = new PropertyHierarchyCompositionComputation(
 				reasoner.ontologyIndex, inferenceProducer,
@@ -78,6 +75,15 @@ public class PropertyHierarchyCompositionComputationStage extends
 		return true;
 	}
 
+	@Override
+	boolean invalidate() {
+		boolean invalidated = super.invalidate();
+		if (invalidated) {
+			reasoner.traceState.clearObjectPropertyInferences();
+		}
+		return invalidated;
+	}
+	
 	@Override
 	public void printInfo() {
 		// TODO Auto-generated method stub

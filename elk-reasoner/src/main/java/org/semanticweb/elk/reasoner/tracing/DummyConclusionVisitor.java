@@ -54,13 +54,13 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
  */
 public class DummyConclusionVisitor<O> implements Conclusion.Visitor<O> {
 
-	protected O defaultVisit(ClassConclusion conclusion) {
-		return defaultVisit((SaturationConclusion) conclusion);
-	}
-
 	protected O defaultVisit(
 			@SuppressWarnings("unused") Conclusion conclusion) {
 		return null;
+	}
+	
+	protected O defaultVisit(ClassConclusion conclusion) {
+		return defaultVisit((SaturationConclusion) conclusion);
 	}
 
 	protected O defaultVisit(IndexedAxiom conclusion) {

@@ -156,6 +156,16 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 	public void printInfo() {
 		// TODO
 	}
+	
+	@Override
+	boolean invalidate() {
+		boolean invalidated = super.invalidate();
+		if (invalidated) {
+			reasoner.traceState.clearIndexedAxiomInferences();
+			reasoner.traceState.clearClassInferences();
+		}
+		return invalidated;
+	}
 
 	@Override
 	public void setInterrupt(boolean flag) {
