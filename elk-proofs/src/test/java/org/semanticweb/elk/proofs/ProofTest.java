@@ -194,7 +194,7 @@ public class ProofTest {
 	public static Configuration getConfig()
 			throws URISyntaxException, IOException {
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION, ProofTest.class, "owl",
+				INPUT_DATA_LOCATION, TracingTestManifest.class, "owl",
 				new TestManifestCreator<URLTestIO, VoidTestOutput, VoidTestOutput>() {
 					@Override
 					public TestManifest<URLTestIO, VoidTestOutput, VoidTestOutput> create(

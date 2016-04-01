@@ -153,7 +153,7 @@ public class AllOntologiesProofTest extends BaseProofTest {
 		return ConfigurationUtils
 				.loadFileBasedTestConfiguration(
 						INPUT_DATA_LOCATION,
-						AllOntologiesProofTest.class,
+						TracingTestManifest.class,
 						"owl",
 						new TestManifestCreator<URLTestIO, VoidTestOutput, VoidTestOutput>() {
 							@Override

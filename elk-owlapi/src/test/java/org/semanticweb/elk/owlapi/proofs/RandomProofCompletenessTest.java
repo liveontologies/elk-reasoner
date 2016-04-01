@@ -72,7 +72,7 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
 
-	public RandomProofCompletenessTest(TracingTestManifest testManifest) {
+	public RandomProofCompletenessTest(final TracingTestManifest testManifest) {
 		super(testManifest);
 	}
 
@@ -199,7 +199,7 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 		return ConfigurationUtils
 				.loadFileBasedTestConfiguration(
 						INPUT_DATA_LOCATION,
-						RandomProofCompletenessTest.class,
+						TracingTestManifest.class,
 						"owl",
 						new TestManifestCreator<URLTestIO, VoidTestOutput, VoidTestOutput>() {
 							@Override
