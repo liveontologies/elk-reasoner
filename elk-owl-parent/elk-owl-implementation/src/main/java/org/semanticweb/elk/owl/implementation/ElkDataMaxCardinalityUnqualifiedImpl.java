@@ -39,9 +39,9 @@ public class ElkDataMaxCardinalityUnqualifiedImpl extends
 		ElkCardinalityRestrictionImpl<ElkDataPropertyExpression> implements
 		ElkDataMaxCardinalityUnqualified {
 
-	ElkDataMaxCardinalityUnqualifiedImpl(ElkDataPropertyExpression dataPropertyExpression,
+	ElkDataMaxCardinalityUnqualifiedImpl(ElkDataPropertyExpression property,
 			int cardinality) {
-		super(dataPropertyExpression, cardinality);
+		super(property, cardinality);
 	}
 
 	@Override

@@ -31,11 +31,11 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.inferences.ElkInference;
 import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,7 +101,7 @@ public class ProvabilityTester {
 	 * a factory that is used for creating premises and conclusions of
 	 * inferences
 	 */
-	private final ElkObjectFactory factory_ = new ElkObjectFactoryImpl();;
+	private final ElkObject.Factory factory_ = new ElkObjectEntityRecyclingFactory();
 
 	ProvabilityTester(ElkInferenceSet inferences,
 			Set<? extends ElkAxiom> ontology) {

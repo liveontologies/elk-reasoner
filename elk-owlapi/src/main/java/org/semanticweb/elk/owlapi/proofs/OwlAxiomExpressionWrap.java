@@ -25,7 +25,7 @@ package org.semanticweb.elk.owlapi.proofs;
 import org.semanticweb.elk.owl.inferences.ElkInference;
 import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owlapi.wrapper.ElkAxiomWrap;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -44,10 +44,10 @@ public class OwlAxiomExpressionWrap implements OWLAxiomExpression {
 
 	private final OWLOntology owlOntology_;
 
-	private final ElkObjectFactory elkFactory_;
+	private final ElkObject.Factory elkFactory_;
 
 	public OwlAxiomExpressionWrap(ElkAxiom axiom, ElkInferenceSet elkInferences,
-			OWLOntology ontology, ElkObjectFactory elkFactory) {
+			OWLOntology ontology, ElkObject.Factory elkFactory) {
 		super();
 		this.axiom_ = axiom;
 		this.elkInferences_ = elkInferences;

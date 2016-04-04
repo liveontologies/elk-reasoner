@@ -30,6 +30,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
@@ -116,7 +117,8 @@ public class DifferentialIndex extends DirectIndex {
 	private Map<ModifiableIndexedClass, ElkAxiom> addedDefinitionReasons_,
 			removedDefinitionReasons_;
 
-	public DifferentialIndex() {
+	public DifferentialIndex(PredefinedElkClassFactory elkFactory) {
+		super(elkFactory);
 		init();
 	}
 

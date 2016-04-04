@@ -49,7 +49,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.predefined.ElkPolarity;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.BaseModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.ResolvingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.UpdatingModifiableIndexedObjectFactory;
@@ -92,6 +92,11 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 			.getLogger(ElkAxiomConverterImpl.class);
 
 	/**
+	 * The factory for creating entities
+	 */
+	private final PredefinedElkClassFactory elkFactory_;
+	
+	/**
 	 * The factory to convert axioms
 	 */
 	private final ModifiableIndexedAxiom.Factory axiomFactory_;
@@ -108,13 +113,15 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 
 	private final ElkEntityConverter entityConverter_;
 
-	ElkAxiomConverterImpl(ModifiableIndexedAxiom.Factory axiomFactory,
+	ElkAxiomConverterImpl(PredefinedElkClassFactory elkFactory,
+			ModifiableIndexedAxiom.Factory axiomFactory,
 			ModifiableIndexedObject.Factory positiveFactory,
 			ModifiableIndexedObject.Factory negativeFactory,
 			ElkPolarityExpressionConverter positiveConverter,
 			ElkPolarityExpressionConverter negativeConverter,
 			ElkPolarityExpressionConverter dualConverter,
 			ElkEntityConverter entityConverter) {
+		this.elkFactory_ = elkFactory;
 		this.axiomFactory_ = axiomFactory;
 		this.positiveFactory_ = positiveFactory;
 		this.negativeFactory_ = negativeFactory;
@@ -130,6 +137,9 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	 * {@link ModifiableIndexedObject} sub-expression of the resulting
 	 * {@link ModifiableIndexedAxiom}s depending on (logical) polarity of their
 	 * occurrence.
+	 * 
+	 * @param elkFactory
+	 *            used to create auxiliary {@link ElkObject}s 	
 	 * 
 	 * @param neutralFactory
 	 *            this {@link ModifiableIndexedObject.Factory} is used to create
@@ -155,18 +165,21 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	 *            {@link IndexedClassExpression}s in {@code EquivalentClasses}
 	 *            axioms.
 	 */
-	public ElkAxiomConverterImpl(ModifiableIndexedObject.Factory neutralFactory,
+	public ElkAxiomConverterImpl(PredefinedElkClassFactory elkFactory,
+			ModifiableIndexedObject.Factory neutralFactory,
 			ModifiableIndexedObject.Factory positiveFactory,
 			ModifiableIndexedObject.Factory negativeFactory,
 			ModifiableIndexedObject.Factory dualFactory) {
+		this.elkFactory_ = elkFactory;
 		this.axiomFactory_ = neutralFactory;
 		this.positiveFactory_ = positiveFactory;
 		this.negativeFactory_ = negativeFactory;
 		this.positiveConverter_ = new ElkPolarityExpressionConverterImpl(
-				ElkPolarity.POSITIVE, positiveFactory, negativeFactory);
+				ElkPolarity.POSITIVE, elkFactory, positiveFactory,
+				negativeFactory);
 		this.negativeConverter_ = positiveConverter_
 				.getComplementaryConverter();
-		this.dualConverter_ = new ElkPolarityExpressionConverterImpl(
+		this.dualConverter_ = new ElkPolarityExpressionConverterImpl(elkFactory,
 				dualFactory);
 		this.entityConverter_ = new ElkEntityConverterImpl(neutralFactory);
 	}
@@ -177,13 +190,17 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	 * {@link ModifiableIndexedObject} sub-expression of the resulting
 	 * {@link ModifiableIndexedAxiom}s.
 	 * 
-	 * @param faactory
+	 * @param elkFactory
+	 *            used to create auxiliary {@link ElkObject}s
+	 * 
+	 * @param factory
 	 *            the {@link ModifiableIndexedObject.Factory} that is used to
 	 *            create all {@link ModifiableIndexedObject}s necessary for
 	 *            conversion of {@link ElkAxiom}s.
 	 */
-	public ElkAxiomConverterImpl(ModifiableIndexedObject.Factory factory) {
-		this(factory, factory, factory, factory);
+	public ElkAxiomConverterImpl(PredefinedElkClassFactory elkFactory,
+			ModifiableIndexedObject.Factory factory) {
+		this(elkFactory, factory, factory, factory, factory);
 	}
 
 	/**
@@ -197,18 +214,24 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	 * not been indexed in the given {@link ModifiableIndexedObjectCache} (e.g.,
 	 * {@link NullPointerException}s may occur).
 	 * 
+	 * @param elkFactory
+	 *            used to create auxiliary {@link ElkObject}s
+	 * 
 	 * @param cache
 	 *            the {@link ModifiableIndexedObjectCache} from which all
 	 *            {@link ModifiableIndexedObject}s are used.
 	 */
-	public ElkAxiomConverterImpl(ModifiableIndexedObjectCache cache) {
-		this(new ResolvingModifiableIndexedObjectFactory(cache));
+	public ElkAxiomConverterImpl(PredefinedElkClassFactory elkFactory,
+			ModifiableIndexedObjectCache cache) {
+		this(elkFactory, new ResolvingModifiableIndexedObjectFactory(cache));
 	}
 
 	<F extends CachedIndexedObject.Factory & ModifiableIndexedObject.Factory> ElkAxiomConverterImpl(
-			F baseFactory, ModifiableOntologyIndex index, int increment) {
-		this(new UpdatingModifiableIndexedObjectFactory(baseFactory, index,
-				OccurrenceIncrement.getNeutralIncrement(increment)),
+			PredefinedElkClassFactory elkFactory, F baseFactory,
+			ModifiableOntologyIndex index, int increment) {
+		this(elkFactory,
+				new UpdatingModifiableIndexedObjectFactory(baseFactory, index,
+						OccurrenceIncrement.getNeutralIncrement(increment)),
 				new UpdatingModifiableIndexedObjectFactory(baseFactory, index,
 						OccurrenceIncrement.getPositiveIncrement(increment)),
 				new UpdatingModifiableIndexedObjectFactory(baseFactory, index,
@@ -226,6 +249,9 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	 * of their occurrences. Some {@link ModifiableIndexedObject}s will be
 	 * reused and only their multiplicity will be updated.
 	 * 
+	 * @param elkFactory
+	 *            used to create auxiliary {@link ElkObject}s
+	 * 
 	 * @param index
 	 *            the {@link ModifiableOntologyIndex} representing the ontology
 	 *            to which the resulting {@link ModifiableIndexedObject}s will
@@ -239,14 +265,16 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	 *            removed the corresponding number of times.
 	 * 
 	 */
-	public ElkAxiomConverterImpl(ModifiableOntologyIndex index, int increment) {
-		this(new BaseModifiableIndexedObjectFactory(), index, increment);
+	public ElkAxiomConverterImpl(PredefinedElkClassFactory elkFactory,
+			ModifiableOntologyIndex index, int increment) {
+		this(elkFactory, new BaseModifiableIndexedObjectFactory(), index,
+				increment);
 	}
 
 	@Override
 	public Void visit(ElkObjectPropertyDomainAxiom axiom) {
 		ModifiableIndexedClass indexedOwlThing = negativeFactory_
-				.getIndexedClass(PredefinedElkClass.OWL_THING);
+				.getIndexedClass(elkFactory_.getOwlThing());
 		axiomFactory_.getElkObjectPropertyDomainAxiomConversion(axiom,
 				negativeFactory_.getIndexedObjectSomeValuesFrom(
 						axiom.getProperty().accept(negativeConverter_),
@@ -266,7 +294,7 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	@Override
 	public Void visit(ElkReflexiveObjectPropertyAxiom axiom) {
 		axiomFactory_.getElkReflexiveObjectPropertyAxiomConversion(axiom,
-				negativeFactory_.getIndexedClass(PredefinedElkClass.OWL_THING),
+				negativeFactory_.getIndexedClass(elkFactory_.getOwlThing()),
 				positiveFactory_.getIndexedObjectHasSelf(
 						axiom.getProperty().accept(positiveConverter_)));
 		return null;
@@ -399,6 +427,9 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	private <A extends ElkAxiom, M extends ElkObject> void indexDisjointMembers(
 			DisjointnessIndexer<A, M> indexer, A axiom,
 			List<? extends M> members) {
+		/* index (possibly implicit) positive occurrence of owl:Nothing */
+		ModifiableIndexedClass indexedOwlNothing = positiveFactory_
+				.getIndexedClass(elkFactory_.getOwlNothing());
 		/*
 		 * for many disjoint members, convert natively
 		 */
@@ -414,9 +445,7 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 		/*
 		 * otherwise create a binary disjointness axioms for all pairs (first,
 		 * second) where second occurs after first in members
-		 */
-		ModifiableIndexedClass indexedOwlNothing = positiveFactory_
-				.getIndexedClass(PredefinedElkClass.OWL_NOTHING);
+		 */		
 		for (int firstPos = 0; firstPos < members.size(); firstPos++) {
 			M first = members.get(firstPos);
 			ModifiableIndexedClassExpression firstIndexed = indexer
@@ -453,6 +482,7 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 		@Override
 		public void indexNary(ElkDisjointClassesAxiom axiom,
 				ModifiableIndexedClassExpressionList members) {
+			
 			axiomFactory_.getElkDisjointClassesAxiomNaryConversion(axiom,
 					members);
 		}
@@ -522,7 +552,7 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 				defined = (ModifiableIndexedClass) axiom.getDefinedClass()
 						.accept(positiveConverter_);
 				member = negativeFactory_
-						.getIndexedClass(PredefinedElkClass.OWL_THING);
+						.getIndexedClass(elkFactory_.getOwlThing());
 				axiomFactory_.getElkDisjointUnionAxiomSubClassConversion(axiom,
 						0, member, defined);
 				break;

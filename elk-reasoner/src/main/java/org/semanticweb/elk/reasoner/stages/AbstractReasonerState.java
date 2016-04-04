@@ -33,10 +33,10 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
@@ -107,6 +107,11 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 */
 	final boolean BIND_AXIOMS = true;
 
+	/**
+	 * The factory for creating auxiliary ElkObjects
+	 */
+	private final ElkObject.Factory elkFactory_;
+
 	final SaturationState<? extends Context> saturationState;
 
 	/**
@@ -169,23 +174,30 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 
 	private final ElkSubObjectPropertyExpressionVisitor<ModifiableIndexedPropertyChain> subPropertyConverter_;
 
-	protected AbstractReasonerState() {
-		this.ontologyIndex = new DifferentialIndex();
+	protected AbstractReasonerState(ElkObject.Factory elkFactory) {
+		this.elkFactory_ = elkFactory;
+		this.ontologyIndex = new DifferentialIndex(elkFactory);
 		this.saturationState = SaturationStateFactory
 				.createSaturationState(ontologyIndex);
 		this.ruleAndConclusionStats = new SaturationStatistics();
 		this.stageManager = new ReasonerStageManager(this);
 		this.expressionConverter_ = new ElkPolarityExpressionConverterImpl(
+				elkFactory, ontologyIndex);
+		this.subPropertyConverter_ = new ElkAxiomConverterImpl(elkFactory,
 				ontologyIndex);
-		this.subPropertyConverter_ = new ElkAxiomConverterImpl(ontologyIndex);
-		this.traceState_ = new TraceState(ontologyIndex);
+		this.traceState_ = new TraceState(elkFactory, ontologyIndex);
 	}
 
-	protected AbstractReasonerState(AxiomLoader axiomLoader) {
-		this();
+	protected AbstractReasonerState(ElkObject.Factory elkFactory,
+			AxiomLoader axiomLoader) {
+		this(elkFactory);
 		registerAxiomLoader(axiomLoader);
 	}
 
+	public ElkObject.Factory getElkFactory() {
+		return elkFactory_;
+	}
+	
 	protected void complete(ReasonerStage stage) throws ElkException {
 		try {
 			getStageExecutor().complete(stage);
@@ -394,7 +406,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			LOGGER_.info("Ontology is inconsistent");
 
 			OrphanNode<ElkClass> node = new OrphanNode<ElkClass>(
-					getAllClasses(), PredefinedElkClass.OWL_NOTHING,
+					getAllClasses(), elkFactory_.getOwlNothing(),
 					ElkClassKeyProvider.INSTANCE);
 			result = new SingletoneTaxonomy<ElkClass, OrphanNode<ElkClass>>(
 					node);
@@ -452,7 +464,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		} catch (ElkInconsistentOntologyException e) {
 			LOGGER_.info("Ontology is inconsistent");
 			OrphanTypeNode<ElkClass, ElkNamedIndividual> node = new OrphanTypeNode<ElkClass, ElkNamedIndividual>(
-					getAllClasses(), PredefinedElkClass.OWL_NOTHING, 1,
+					getAllClasses(), elkFactory_.getOwlNothing(), 1,
 					ElkClassKeyProvider.INSTANCE);
 			Set<ElkNamedIndividual> allNamedIndividuals = getAllNamedIndividuals();
 			Iterator<ElkNamedIndividual> namedIndividualIterator = allNamedIndividuals
@@ -556,8 +568,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	}
 
 	public synchronized void initClassTaxonomy() {
-		classTaxonomyState.getWriter().setTaxonomy(
-				new ConcurrentClassTaxonomy(ElkClassKeyProvider.INSTANCE));
+		classTaxonomyState.getWriter().setTaxonomy(new ConcurrentClassTaxonomy(
+				elkFactory_, ElkClassKeyProvider.INSTANCE));
 	}
 
 	public synchronized void initInstanceTaxonomy() {

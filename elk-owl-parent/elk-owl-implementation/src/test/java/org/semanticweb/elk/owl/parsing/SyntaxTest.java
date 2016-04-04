@@ -22,16 +22,15 @@
  */
 package org.semanticweb.elk.owl.parsing;
 
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
+
 import junit.framework.TestCase;
 
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.owl.iris.ElkFullIri;
-import org.semanticweb.elk.owl.managers.ElkEntityRecycler;
-
 public class SyntaxTest extends TestCase {
-	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl(new ElkEntityRecycler());
+	final ElkObject.Factory objectFactory = new ElkObjectEntityRecyclingFactory();
 
 	public SyntaxTest(String testName) {
 		super(testName);

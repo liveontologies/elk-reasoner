@@ -25,7 +25,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
@@ -81,7 +81,7 @@ public class ElkPropertyRangePropertyExpansion extends AbstractElkInference {
 	}
 
 	@Override
-	public ElkAxiom getPremise(int index, ElkObjectFactory factory) {
+	public ElkAxiom getPremise(int index, ElkObject.Factory factory) {
 		switch (index) {
 		case 0:
 			return getFirstPremise(factory);
@@ -93,18 +93,18 @@ public class ElkPropertyRangePropertyExpansion extends AbstractElkInference {
 	}
 
 	public ElkObjectPropertyRangeAxiom getFirstPremise(
-			ElkObjectFactory factory) {
+			ElkObject.Factory factory) {
 		return factory.getObjectPropertyRangeAxiom(superProperty_, range_);
 	}
 
 	public ElkSubObjectPropertyOfAxiom getSecondPremise(
-			ElkObjectFactory factory) {
+			ElkObject.Factory factory) {
 		return factory.getSubObjectPropertyOfAxiom(subProperty_,
 				superProperty_);
 	}
 
 	@Override
-	public ElkObjectPropertyRangeAxiom getConclusion(ElkObjectFactory factory) {
+	public ElkObjectPropertyRangeAxiom getConclusion(ElkObject.Factory factory) {
 		return factory.getObjectPropertyRangeAxiom(subProperty_, range_);
 	}
 

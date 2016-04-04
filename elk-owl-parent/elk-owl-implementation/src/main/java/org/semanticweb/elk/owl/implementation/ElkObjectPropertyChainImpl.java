@@ -34,8 +34,8 @@ public class ElkObjectPropertyChainImpl extends
 		ElkObjectPropertyExpressionListObject implements ElkObjectPropertyChain {
 
 	ElkObjectPropertyChainImpl(
-			List<? extends ElkObjectPropertyExpression> objectPropertyExpressions) {
-		super(objectPropertyExpressions);
+			List<? extends ElkObjectPropertyExpression> properties) {
+		super(properties);
 	}
 
 	@Override

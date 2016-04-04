@@ -27,7 +27,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.implementation.ElkSWRLRuleImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotation;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationAssertionAxiom;
@@ -90,7 +89,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityUnqualified;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
@@ -121,10 +119,12 @@ import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAnnotationPropertyDomainAxiom;
 import org.semanticweb.owlapi.model.OWLAnnotationPropertyRangeAxiom;
+import org.semanticweb.owlapi.model.OWLAnnotationValue;
 import org.semanticweb.owlapi.model.OWLAnonymousIndividual;
 import org.semanticweb.owlapi.model.OWLAsymmetricObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -198,22 +198,20 @@ import org.semanticweb.owlapi.model.OWLSubObjectPropertyOfAxiom;
 import org.semanticweb.owlapi.model.OWLSubPropertyChainOfAxiom;
 import org.semanticweb.owlapi.model.OWLSymmetricObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLTransitiveObjectPropertyAxiom;
+import org.semanticweb.owlapi.vocab.OWL2Datatype;
 import org.semanticweb.owlapi.vocab.OWLFacet;
 
 /**
- * An {@link ElkObjectFactory} that creates {@link ElkObjectWrap} expression. It
- * is required that all {@link ElkObject}s given as arguments must be instances
- * of {@link ElkObjectWrap}.
+ * An {@link ElkObject.Factory} that creates {@link ElkObjectWrap} expression.
+ * It is required that all {@link ElkObject}s given as arguments must be
+ * instances of {@link ElkObjectWrap}.
  * 
  * @author Yevgeny Kazakov
  */
-public class ElkObjectWrapFactory implements ElkObjectFactory {
+public class ElkObjectWrapFactory implements ElkObject.Factory {
 
 	// the factory for constructing wrapped OWL objects
 	private final OWLDataFactory owlFactory_;
-
-	// the factory for constructing object that do not wrap OWL objects
-	private final ElkObjectFactory elkFactory_ = new ElkObjectFactoryImpl();
 
 	public ElkObjectWrapFactory(OWLDataFactory owlFactory) {
 		this.owlFactory_ = owlFactory;
@@ -262,6 +260,10 @@ public class ElkObjectWrapFactory implements ElkObjectFactory {
 
 	OWLAnnotationProperty convert(ElkAnnotationProperty input) {
 		return ((ElkAnnotationPropertyWrap<?>) input).owlObject;
+	}
+	
+	OWLAnnotationValue convert(ElkAnnotationValue input) {
+		return (OWLAnnotationValue) ((ElkObjectWrap<?>) input).owlObject;
 	}
 
 	OWLLiteral convert(ElkLiteral input) {
@@ -462,8 +464,8 @@ public class ElkObjectWrapFactory implements ElkObjectFactory {
 	@Override
 	public ElkAnnotation getAnnotation(ElkAnnotationProperty property,
 			ElkAnnotationValue value) {
-		// TODO: wrap annotations?
-		return elkFactory_.getAnnotation(property, value);
+		return new ElkAnnotationWrap<OWLAnnotation>(owlFactory_
+				.getOWLAnnotation(convert(property), convert(value)));
 	}
 
 	@Override
@@ -526,121 +528,118 @@ public class ElkObjectWrapFactory implements ElkObjectFactory {
 	}
 
 	@Override
-	public ElkDataAllValuesFrom getDataAllValuesFrom(ElkDataRange dataRange,
-			ElkDataPropertyExpression dpe1, ElkDataPropertyExpression... dpe) {
-		if (dpe.length > 0) {
+	public ElkDataAllValuesFrom getDataAllValuesFrom(ElkDataRange range,
+			ElkDataPropertyExpression first,
+			ElkDataPropertyExpression... other) {
+		if (other.length > 0) {
 			throw new IllegalArgumentException(
 					"OWLAPI supports only one data property in OWLDataAllValuesFrom");
 		}
 		return new ElkDataAllValuesFromWrap<OWLDataAllValuesFrom>(owlFactory_
-				.getOWLDataAllValuesFrom(convert(dpe1), convert(dataRange)));
+				.getOWLDataAllValuesFrom(convert(first), convert(range)));
 	}
 
 	@Override
-	public ElkDataAllValuesFrom getDataAllValuesFrom(ElkDataRange dataRange,
-			List<? extends ElkDataPropertyExpression> dpList) {
-		if (dpList.size() > 1) {
+	public ElkDataAllValuesFrom getDataAllValuesFrom(
+			List<? extends ElkDataPropertyExpression> properties,
+			ElkDataRange range) {
+		if (properties.size() > 1) {
 			throw new IllegalArgumentException(
 					"OWLAPI supports only one data property in OWLDataAllValuesFrom");
 		}
 		return new ElkDataAllValuesFromWrap<OWLDataAllValuesFrom>(
-				owlFactory_.getOWLDataAllValuesFrom(convert(dpList.get(0)),
-						convert(dataRange)));
+				owlFactory_.getOWLDataAllValuesFrom(convert(properties.get(0)),
+						convert(range)));
 	}
 
 	@Override
-	public ElkDataComplementOf getDataComplementOf(ElkDataRange dataRange) {
+	public ElkDataComplementOf getDataComplementOf(ElkDataRange range) {
 		return new ElkDataComplementOfWrap<OWLDataComplementOf>(
-				owlFactory_.getOWLDataComplementOf(convert(dataRange)));
+				owlFactory_.getOWLDataComplementOf(convert(range)));
 	}
 
 	@Override
 	public ElkDataExactCardinalityUnqualified getDataExactCardinalityUnqualified(
-			ElkDataPropertyExpression dataPropertyExpression, int cardinality) {
+			ElkDataPropertyExpression property, int cardinality) {
 		return new ElkDataExactCardinalityUnqualifiedWrap<OWLDataExactCardinality>(
 				owlFactory_.getOWLDataExactCardinality(cardinality,
-						convert(dataPropertyExpression)));
+						convert(property)));
 	}
 
 	@Override
 	public ElkDataExactCardinalityQualified getDataExactCardinalityQualified(
-			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
-			ElkDataRange dataRange) {
+			ElkDataPropertyExpression property, int cardinality,
+			ElkDataRange range) {
 		return new ElkDataExactCardinalityQualifiedWrap<OWLDataExactCardinality>(
 				owlFactory_.getOWLDataExactCardinality(cardinality,
-						convert(dataPropertyExpression), convert(dataRange)));
+						convert(property), convert(range)));
 	}
 
 	@Override
-	public ElkDataHasValue getDataHasValue(
-			ElkDataPropertyExpression dataPropertyExpression,
-			ElkLiteral literal) {
-		return new ElkDataHasValueWrap<OWLDataHasValue>(
-				owlFactory_.getOWLDataHasValue(convert(dataPropertyExpression),
-						convert(literal)));
+	public ElkDataHasValue getDataHasValue(ElkDataPropertyExpression property,
+			ElkLiteral value) {
+		return new ElkDataHasValueWrap<OWLDataHasValue>(owlFactory_
+				.getOWLDataHasValue(convert(property), convert(value)));
 	}
 
 	@Override
-	public ElkDataIntersectionOf getDataIntersectionOf(
-			ElkDataRange firstDataRange, ElkDataRange secondDataRange,
-			ElkDataRange... otherDataRanges) {
-		return new ElkDataIntersectionOfWrap<OWLDataIntersectionOf>(
-				owlFactory_.getOWLDataIntersectionOf(toSet(firstDataRange,
-						secondDataRange, otherDataRanges)));
-	}
-
-	@Override
-	public ElkDataIntersectionOf getDataIntersectionOf(
-			List<? extends ElkDataRange> dataRanges) {
+	public ElkDataIntersectionOf getDataIntersectionOf(ElkDataRange first,
+			ElkDataRange second, ElkDataRange... other) {
 		return new ElkDataIntersectionOfWrap<OWLDataIntersectionOf>(owlFactory_
-				.getOWLDataIntersectionOf(toDataRangeSet(dataRanges)));
+				.getOWLDataIntersectionOf(toSet(first, second, other)));
+	}
+
+	@Override
+	public ElkDataIntersectionOf getDataIntersectionOf(
+			List<? extends ElkDataRange> ranges) {
+		return new ElkDataIntersectionOfWrap<OWLDataIntersectionOf>(
+				owlFactory_.getOWLDataIntersectionOf(toDataRangeSet(ranges)));
 	}
 
 	@Override
 	public ElkDataMaxCardinalityUnqualified getDataMaxCardinalityUnqualified(
-			ElkDataPropertyExpression dataPropertyExpression, int cardinality) {
+			ElkDataPropertyExpression property, int cardinality) {
 		return new ElkDataMaxCardinalityUnqualifiedWrap<OWLDataMaxCardinality>(
 				owlFactory_.getOWLDataMaxCardinality(cardinality,
-						convert(dataPropertyExpression)));
+						convert(property)));
 	}
 
 	@Override
 	public ElkDataMaxCardinalityQualified getDataMaxCardinalityQualified(
-			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
-			ElkDataRange dataRange) {
+			ElkDataPropertyExpression property, int cardinality,
+			ElkDataRange range) {
 		return new ElkDataMaxCardinalityQualifiedWrap<OWLDataMaxCardinality>(
 				owlFactory_.getOWLDataMaxCardinality(cardinality,
-						convert(dataPropertyExpression), convert(dataRange)));
+						convert(property), convert(range)));
 	}
 
 	@Override
 	public ElkDataMinCardinalityUnqualified getDataMinCardinalityUnqualified(
-			ElkDataPropertyExpression dataPropertyExpression, int cardinality) {
+			ElkDataPropertyExpression property, int cardinality) {
 		return new ElkDataMinCardinalityUnqualifiedWrap<OWLDataMinCardinality>(
 				owlFactory_.getOWLDataMinCardinality(cardinality,
-						convert(dataPropertyExpression)));
+						convert(property)));
 	}
 
 	@Override
 	public ElkDataMinCardinalityQualified getDataMinCardinalityQualified(
-			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
-			ElkDataRange dataRange) {
+			ElkDataPropertyExpression property, int cardinality,
+			ElkDataRange range) {
 		return new ElkDataMinCardinalityQualifiedWrap<OWLDataMinCardinality>(
 				owlFactory_.getOWLDataMinCardinality(cardinality,
-						convert(dataPropertyExpression), convert(dataRange)));
+						convert(property), convert(range)));
 	}
 
 	@Override
-	public ElkDataOneOf getDataOneOf(ElkLiteral firstLiteral,
-			ElkLiteral... otherLiterals) {
-		return new ElkDataOneOfWrap<OWLDataOneOf>(owlFactory_
-				.getOWLDataOneOf(toSet(firstLiteral, otherLiterals)));
-	}
-
-	@Override
-	public ElkDataOneOf getDataOneOf(List<? extends ElkLiteral> literals) {
+	public ElkDataOneOf getDataOneOf(ElkLiteral first, ElkLiteral... other) {
 		return new ElkDataOneOfWrap<OWLDataOneOf>(
-				owlFactory_.getOWLDataOneOf(toLiteralSet(literals)));
+				owlFactory_.getOWLDataOneOf(toSet(first, other)));
+	}
+
+	@Override
+	public ElkDataOneOf getDataOneOf(List<? extends ElkLiteral> members) {
+		return new ElkDataOneOfWrap<OWLDataOneOf>(
+				owlFactory_.getOWLDataOneOf(toLiteralSet(members)));
 	}
 
 	@Override
@@ -651,56 +650,52 @@ public class ElkObjectWrapFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkDataPropertyAssertionAxiom getDataPropertyAssertionAxiom(
-			ElkDataPropertyExpression dataPropertyExpression,
-			ElkIndividual individual, ElkLiteral literal) {
+			ElkDataPropertyExpression property, ElkIndividual subject,
+			ElkLiteral object) {
 		return new ElkDataPropertyAssertionAxiomWrap<OWLDataPropertyAssertionAxiom>(
-				owlFactory_.getOWLDataPropertyAssertionAxiom(
-						convert(dataPropertyExpression), convert(individual),
-						convert(literal)));
+				owlFactory_.getOWLDataPropertyAssertionAxiom(convert(property),
+						convert(subject), convert(object)));
 	}
 
 	@Override
 	public ElkDataPropertyDomainAxiom getDataPropertyDomainAxiom(
-			ElkDataPropertyExpression dataPropertyExpression,
-			ElkClassExpression classExpression) {
+			ElkDataPropertyExpression property, ElkClassExpression domain) {
 		return new ElkDataPropertyDomainAxiomWrap<OWLDataPropertyDomainAxiom>(
-				owlFactory_.getOWLDataPropertyDomainAxiom(
-						convert(dataPropertyExpression),
-						convert(classExpression)));
+				owlFactory_.getOWLDataPropertyDomainAxiom(convert(property),
+						convert(domain)));
 	}
 
 	@Override
 	public ElkDataPropertyRangeAxiom getDataPropertyRangeAxiom(
-			ElkDataPropertyExpression dataPropertyExpression,
-			ElkDataRange dataRange) {
+			ElkDataPropertyExpression property, ElkDataRange range) {
 		return new ElkDataPropertyRangeAxiomWrap<OWLDataPropertyRangeAxiom>(
-				owlFactory_.getOWLDataPropertyRangeAxiom(
-						convert(dataPropertyExpression), convert(dataRange)));
+				owlFactory_.getOWLDataPropertyRangeAxiom(convert(property),
+						convert(range)));
 	}
 
 	@Override
-	public ElkDataSomeValuesFrom getDataSomeValuesFrom(ElkDataRange dataRange,
-			ElkDataPropertyExpression firstDataPropertyExpression,
-			ElkDataPropertyExpression... otherDataPropertyExpressions) {
-		if (otherDataPropertyExpressions.length > 0) {
+	public ElkDataSomeValuesFrom getDataSomeValuesFrom(ElkDataRange range,
+			ElkDataPropertyExpression first,
+			ElkDataPropertyExpression... other) {
+		if (other.length > 0) {
 			throw new IllegalArgumentException(
 					"OWLAPI supports only one data property in OWLDataSomeValuesFrom");
 		}
 		return new ElkDataSomeValuesFromWrap<OWLDataSomeValuesFrom>(owlFactory_
-				.getOWLDataSomeValuesFrom(convert(firstDataPropertyExpression),
-						convert(dataRange)));
+				.getOWLDataSomeValuesFrom(convert(first), convert(range)));
 	}
 
 	@Override
-	public ElkDataSomeValuesFrom getDataSomeValuesFrom(ElkDataRange dataRange,
-			List<? extends ElkDataPropertyExpression> dpList) {
-		if (dpList.size() > 1) {
+	public ElkDataSomeValuesFrom getDataSomeValuesFrom(
+			List<? extends ElkDataPropertyExpression> properties,
+			ElkDataRange range) {
+		if (properties.size() > 1) {
 			throw new IllegalArgumentException(
 					"OWLAPI supports only one data property in OWLDataSomeValuesFrom");
 		}
 		return new ElkDataSomeValuesFromWrap<OWLDataSomeValuesFrom>(
-				owlFactory_.getOWLDataSomeValuesFrom(convert(dpList.get(0)),
-						convert(dataRange)));
+				owlFactory_.getOWLDataSomeValuesFrom(convert(properties.get(0)),
+						convert(range)));
 	}
 
 	@Override
@@ -717,25 +712,23 @@ public class ElkObjectWrapFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkDatatypeRestriction getDatatypeRestriction(ElkDatatype datatype,
-			List<ElkFacetRestriction> facetRestrictions) {
+			List<ElkFacetRestriction> restrictions) {
 		return new ElkDatatypeRestrictionWrap<OWLDatatypeRestriction>(
 				owlFactory_.getOWLDatatypeRestriction(convert(datatype),
-						toFacetRestrictionSet(facetRestrictions)));
+						toFacetRestrictionSet(restrictions)));
 	}
 
 	@Override
-	public ElkDataUnionOf getDataUnionOf(ElkDataRange firstDataRange,
-			ElkDataRange secondDataRange, ElkDataRange... otherDataRanges) {
+	public ElkDataUnionOf getDataUnionOf(ElkDataRange first,
+			ElkDataRange second, ElkDataRange... other) {
 		return new ElkDataUnionOfWrap<OWLDataUnionOf>(
-				owlFactory_.getOWLDataUnionOf(toSet(firstDataRange,
-						secondDataRange, otherDataRanges)));
+				owlFactory_.getOWLDataUnionOf(toSet(first, second, other)));
 	}
 
 	@Override
-	public ElkDataUnionOf getDataUnionOf(
-			List<? extends ElkDataRange> dataRanges) {
+	public ElkDataUnionOf getDataUnionOf(List<? extends ElkDataRange> ranges) {
 		return new ElkDataUnionOfWrap<OWLDataUnionOf>(
-				owlFactory_.getOWLDataUnionOf(toDataRangeSet(dataRanges)));
+				owlFactory_.getOWLDataUnionOf(toDataRangeSet(ranges)));
 	}
 
 	@Override
@@ -746,11 +739,10 @@ public class ElkObjectWrapFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkDifferentIndividualsAxiom getDifferentIndividualsAxiom(
-			ElkIndividual firstIndividual, ElkIndividual secondIndividual,
-			ElkIndividual... otherIndividuals) {
+			ElkIndividual first, ElkIndividual second, ElkIndividual... other) {
 		return new ElkDifferentIndividualsAxiomWrap<OWLDifferentIndividualsAxiom>(
-				owlFactory_.getOWLDifferentIndividualsAxiom(toSet(
-						firstIndividual, secondIndividual, otherIndividuals)));
+				owlFactory_.getOWLDifferentIndividualsAxiom(
+						toSet(first, second, other)));
 	}
 
 	@Override
@@ -763,13 +755,11 @@ public class ElkObjectWrapFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkDisjointClassesAxiom getDisjointClassesAxiom(
-			ElkClassExpression firstClassExpression,
-			ElkClassExpression secondClassExpression,
-			ElkClassExpression... otherClassExpressions) {
+			ElkClassExpression first, ElkClassExpression second,
+			ElkClassExpression... other) {
 		return new ElkDisjointClassesAxiomWrap<OWLDisjointClassesAxiom>(
-				owlFactory_
-						.getOWLDisjointClassesAxiom(toSet(firstClassExpression,
-								secondClassExpression, otherClassExpressions)));
+				owlFactory_.getOWLDisjointClassesAxiom(
+						toSet(first, second, other)));
 	}
 
 	@Override
@@ -782,14 +772,11 @@ public class ElkObjectWrapFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkDisjointDataPropertiesAxiom getDisjointDataPropertiesAxiom(
-			ElkDataPropertyExpression firstDataPropertyExpression,
-			ElkDataPropertyExpression secondDataPropertyExpression,
-			ElkDataPropertyExpression... otherDataPropertyExpressions) {
+			ElkDataPropertyExpression first, ElkDataPropertyExpression second,
+			ElkDataPropertyExpression... other) {
 		return new ElkDisjointDataPropertiesAxiomWrap<OWLDisjointDataPropertiesAxiom>(
 				owlFactory_.getOWLDisjointDataPropertiesAxiom(
-						toSet(firstDataPropertyExpression,
-								secondDataPropertyExpression,
-								otherDataPropertyExpressions)));
+						toSet(first, second, other)));
 	}
 
 	@Override
@@ -803,14 +790,12 @@ public class ElkObjectWrapFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkDisjointObjectPropertiesAxiom getDisjointObjectPropertiesAxiom(
-			ElkObjectPropertyExpression firstObjectPropertyExpression,
-			ElkObjectPropertyExpression secondObjectPropertyExpression,
-			ElkObjectPropertyExpression... otherObjectPropertyExpressions) {
+			ElkObjectPropertyExpression first,
+			ElkObjectPropertyExpression second,
+			ElkObjectPropertyExpression... other) {
 		return new ElkDisjointObjectPropertiesAxiomWrap<OWLDisjointObjectPropertiesAxiom>(
 				owlFactory_.getOWLDisjointObjectPropertiesAxiom(
-						toSet(firstObjectPropertyExpression,
-								secondObjectPropertyExpression,
-								otherObjectPropertyExpressions)));
+						toSet(first, second, other)));
 	}
 
 	@Override
@@ -824,13 +809,11 @@ public class ElkObjectWrapFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkDisjointUnionAxiom getDisjointUnionAxiom(ElkClass definedClass,
-			ElkClassExpression firstClassExpression,
-			ElkClassExpression secondClassExpression,
-			ElkClassExpression... otherClassExpressions) {
+			ElkClassExpression first, ElkClassExpression second,
+			ElkClassExpression... other) {
 		return new ElkDisjointUnionAxiomWrap<OWLDisjointUnionAxiom>(
 				owlFactory_.getOWLDisjointUnionAxiom(convert(definedClass),
-						toSet(firstClassExpression, secondClassExpression,
-								otherClassExpressions)));
+						toSet(first, second, other)));
 	}
 
 	@Override
@@ -843,13 +826,11 @@ public class ElkObjectWrapFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkEquivalentClassesAxiom getEquivalentClassesAxiom(
-			ElkClassExpression firstClassExpression,
-			ElkClassExpression secondClassExpression,
-			ElkClassExpression... otherClassExpressions) {
+			ElkClassExpression first, ElkClassExpression second,
+			ElkClassExpression... other) {
 		return new ElkEquivalentClassesAxiomWrap<OWLEquivalentClassesAxiom>(
 				owlFactory_.getOWLEquivalentClassesAxiom(
-						toSet(firstClassExpression, secondClassExpression,
-								otherClassExpressions)));
+						toSet(first, second, other)));
 	}
 
 	@Override
@@ -862,14 +843,11 @@ public class ElkObjectWrapFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkEquivalentDataPropertiesAxiom getEquivalentDataPropertiesAxiom(
-			ElkDataPropertyExpression firstDataPropertyExpression,
-			ElkDataPropertyExpression secondDataPropertyExpression,
-			ElkDataPropertyExpression... otherDataPropertyExpressions) {
+			ElkDataPropertyExpression first, ElkDataPropertyExpression second,
+			ElkDataPropertyExpression... other) {
 		return new ElkEquivalentDataPropertiesAxiomWrap<OWLEquivalentDataPropertiesAxiom>(
 				owlFactory_.getOWLEquivalentDataPropertiesAxiom(
-						toSet(firstDataPropertyExpression,
-								secondDataPropertyExpression,
-								otherDataPropertyExpressions)));
+						toSet(first, second, other)));
 	}
 
 	@Override
@@ -883,14 +861,12 @@ public class ElkObjectWrapFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkEquivalentObjectPropertiesAxiom getEquivalentObjectPropertiesAxiom(
-			ElkObjectPropertyExpression firstObjectPropertyExpression,
-			ElkObjectPropertyExpression secondObjectPropertyExpression,
-			ElkObjectPropertyExpression... otherObjectPropertyExpressions) {
+			ElkObjectPropertyExpression first,
+			ElkObjectPropertyExpression second,
+			ElkObjectPropertyExpression... other) {
 		return new ElkEquivalentObjectPropertiesAxiomWrap<OWLEquivalentObjectPropertiesAxiom>(
 				owlFactory_.getOWLEquivalentObjectPropertiesAxiom(
-						toSet(firstObjectPropertyExpression,
-								secondObjectPropertyExpression,
-								otherObjectPropertyExpressions)));
+						toSet(first, second, other)));
 	}
 
 	@Override
@@ -904,44 +880,43 @@ public class ElkObjectWrapFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkFunctionalDataPropertyAxiom getFunctionalDataPropertyAxiom(
-			ElkDataPropertyExpression dataPropertyExpression) {
+			ElkDataPropertyExpression property) {
 		return new ElkFunctionalDataPropertyAxiomWrap<OWLFunctionalDataPropertyAxiom>(
-				owlFactory_.getOWLFunctionalDataPropertyAxiom(
-						convert(dataPropertyExpression)));
+				owlFactory_
+						.getOWLFunctionalDataPropertyAxiom(convert(property)));
 	}
 
 	@Override
 	public ElkFunctionalObjectPropertyAxiom getFunctionalObjectPropertyAxiom(
-			ElkObjectPropertyExpression objectPropertyExpression) {
+			ElkObjectPropertyExpression property) {
 		return new ElkFunctionalObjectPropertyAxiomWrap<OWLFunctionalObjectPropertyAxiom>(
 				owlFactory_.getOWLFunctionalObjectPropertyAxiom(
-						convert(objectPropertyExpression)));
+						convert(property)));
 	}
 
 	@Override
 	public ElkInverseFunctionalObjectPropertyAxiom getInverseFunctionalObjectPropertyAxiom(
-			ElkObjectPropertyExpression objectPropertyExpression) {
+			ElkObjectPropertyExpression property) {
 		return new ElkInverseFunctionalObjectPropertyAxiomWrap<OWLInverseFunctionalObjectPropertyAxiom>(
 				owlFactory_.getOWLInverseFunctionalObjectPropertyAxiom(
-						convert(objectPropertyExpression)));
+						convert(property)));
 	}
 
 	@Override
 	public ElkInverseObjectPropertiesAxiom getInverseObjectPropertiesAxiom(
-			ElkObjectPropertyExpression firstObjectPropertyExpression,
-			ElkObjectPropertyExpression secondObjectPropertyExpression) {
+			ElkObjectPropertyExpression first,
+			ElkObjectPropertyExpression second) {
 		return new ElkInverseObjectPropertiesAxiomWrap<OWLInverseObjectPropertiesAxiom>(
-				owlFactory_.getOWLInverseObjectPropertiesAxiom(
-						convert(secondObjectPropertyExpression),
-						convert(secondObjectPropertyExpression)));
+				owlFactory_.getOWLInverseObjectPropertiesAxiom(convert(second),
+						convert(second)));
 	}
 
 	@Override
 	public ElkIrreflexiveObjectPropertyAxiom getIrreflexiveObjectPropertyAxiom(
-			ElkObjectPropertyExpression objectPropertyExpression) {
+			ElkObjectPropertyExpression property) {
 		return new ElkIrreflexiveObjectPropertyAxiomWrap<OWLIrreflexiveObjectPropertyAxiom>(
 				owlFactory_.getOWLIrreflexiveObjectPropertyAxiom(
-						convert(objectPropertyExpression)));
+						convert(property)));
 	}
 
 	@Override
@@ -958,152 +933,137 @@ public class ElkObjectWrapFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkNegativeDataPropertyAssertionAxiom getNegativeDataPropertyAssertionAxiom(
-			ElkDataPropertyExpression dataPropertyExpression,
-			ElkIndividual individual, ElkLiteral literal) {
+			ElkDataPropertyExpression property, ElkIndividual subject,
+			ElkLiteral object) {
 		return new ElkNegativeDataPropertyAssertionAxiomWrap<OWLNegativeDataPropertyAssertionAxiom>(
 				owlFactory_.getOWLNegativeDataPropertyAssertionAxiom(
-						convert(dataPropertyExpression), convert(individual),
-						convert(literal)));
+						convert(property), convert(subject), convert(object)));
 	}
 
 	@Override
 	public ElkNegativeObjectPropertyAssertionAxiom getNegativeObjectPropertyAssertionAxiom(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			ElkIndividual firstIndividual, ElkIndividual secondIndividual) {
+			ElkObjectPropertyExpression property, ElkIndividual subject,
+			ElkIndividual object) {
 		return new ElkNegativeObjectPropertyAssertionAxiomWrap<OWLNegativeObjectPropertyAssertionAxiom>(
 				owlFactory_.getOWLNegativeObjectPropertyAssertionAxiom(
-						convert(objectPropertyExpression),
-						convert(firstIndividual), convert(secondIndividual)));
+						convert(property), convert(subject), convert(object)));
 	}
 
 	@Override
 	public ElkObjectAllValuesFrom getObjectAllValuesFrom(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			ElkClassExpression classExpression) {
+			ElkObjectPropertyExpression property, ElkClassExpression filler) {
 		return new ElkObjectAllValuesFromWrap<OWLObjectAllValuesFrom>(
-				owlFactory_.getOWLObjectAllValuesFrom(
-						convert(objectPropertyExpression),
-						convert(classExpression)));
+				owlFactory_.getOWLObjectAllValuesFrom(convert(property),
+						convert(filler)));
 	}
 
 	@Override
 	public ElkObjectComplementOf getObjectComplementOf(
-			ElkClassExpression classExpression) {
+			ElkClassExpression negated) {
 		return new ElkObjectComplementOfWrap<OWLObjectComplementOf>(
-				owlFactory_.getOWLObjectComplementOf(convert(classExpression)));
+				owlFactory_.getOWLObjectComplementOf(convert(negated)));
 	}
 
 	@Override
 	public ElkObjectExactCardinalityUnqualified getObjectExactCardinalityUnqualified(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			int cardinality) {
+			ElkObjectPropertyExpression property, int cardinality) {
 		return new ElkObjectExactCardinalityUnqualifiedWrap<OWLObjectExactCardinality>(
 				owlFactory_.getOWLObjectExactCardinality(cardinality,
-						convert(objectPropertyExpression)));
+						convert(property)));
 	}
 
 	@Override
 	public ElkObjectExactCardinalityQualified getObjectExactCardinalityQualified(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			int cardinality, ElkClassExpression classExpression) {
+			ElkObjectPropertyExpression property, int cardinality,
+			ElkClassExpression filler) {
 		return new ElkObjectExactCardinalityQualifiedWrap<OWLObjectExactCardinality>(
 				owlFactory_.getOWLObjectExactCardinality(cardinality,
-						convert(objectPropertyExpression)));
+						convert(property)));
 	}
 
 	@Override
 	public ElkObjectHasSelf getObjectHasSelf(
-			ElkObjectPropertyExpression objectPropertyExpression) {
-		return new ElkObjectHasSelfWrap<OWLObjectHasSelf>(owlFactory_
-				.getOWLObjectHasSelf(convert(objectPropertyExpression)));
+			ElkObjectPropertyExpression property) {
+		return new ElkObjectHasSelfWrap<OWLObjectHasSelf>(
+				owlFactory_.getOWLObjectHasSelf(convert(property)));
 	}
 
 	@Override
 	public ElkObjectHasValue getObjectHasValue(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			ElkIndividual individual) {
+			ElkObjectPropertyExpression property, ElkIndividual value) {
 		return new ElkObjectHasValueWrap<OWLObjectHasValue>(owlFactory_
-				.getOWLObjectHasValue(convert(objectPropertyExpression),
-						convert(individual)));
+				.getOWLObjectHasValue(convert(property), convert(value)));
 	}
 
 	@Override
 	public ElkObjectIntersectionOf getObjectIntersectionOf(
-			ElkClassExpression firstClassExpression,
-			ElkClassExpression secondClassExpression,
-			ElkClassExpression... otherClassExpressions) {
-		return new ElkObjectIntersectionOfWrap<OWLObjectIntersectionOf>(
-				owlFactory_
-						.getOWLObjectIntersectionOf(toSet(firstClassExpression,
-								secondClassExpression, otherClassExpressions)));
-	}
-
-	@Override
-	public ElkObjectIntersectionOf getObjectIntersectionOf(
-			List<? extends ElkClassExpression> classExpressions) {
+			ElkClassExpression first, ElkClassExpression second,
+			ElkClassExpression... other) {
 		return new ElkObjectIntersectionOfWrap<OWLObjectIntersectionOf>(
 				owlFactory_.getOWLObjectIntersectionOf(
-						toClassExpressionSet(classExpressions)));
+						toSet(first, second, other)));
 	}
 
 	@Override
-	public ElkObjectInverseOf getObjectInverseOf(
-			ElkObjectProperty objectProperty) {
-		return new ElkObjectInverseOfWrap<OWLObjectProperty>(
-				owlFactory_.getOWLObjectInverseOf(convert(objectProperty))
-						.getNamedProperty());
+	public ElkObjectIntersectionOf getObjectIntersectionOf(
+			List<? extends ElkClassExpression> members) {
+		return new ElkObjectIntersectionOfWrap<OWLObjectIntersectionOf>(
+				owlFactory_.getOWLObjectIntersectionOf(
+						toClassExpressionSet(members)));
+	}
+
+	@Override
+	public ElkObjectInverseOf getObjectInverseOf(ElkObjectProperty property) {
+		return new ElkObjectInverseOfWrap<OWLObjectProperty>(owlFactory_
+				.getOWLObjectInverseOf(convert(property)).getNamedProperty());
 	}
 
 	@Override
 	public ElkObjectMaxCardinalityUnqualified getObjectMaxCardinalityUnqualified(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			int cardinality) {
+			ElkObjectPropertyExpression property, int cardinality) {
 		return new ElkObjectMaxCardinalityUnqualifiedWrap<OWLObjectMaxCardinality>(
 				owlFactory_.getOWLObjectMaxCardinality(cardinality,
-						convert(objectPropertyExpression)));
+						convert(property)));
 	}
 
 	@Override
 	public ElkObjectMaxCardinalityQualified getObjectMaxCardinalityQualified(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			int cardinality, ElkClassExpression classExpression) {
+			ElkObjectPropertyExpression property, int cardinality,
+			ElkClassExpression filler) {
 		return new ElkObjectMaxCardinalityQualifiedWrap<OWLObjectMaxCardinality>(
 				owlFactory_.getOWLObjectMaxCardinality(cardinality,
-						convert(objectPropertyExpression),
-						convert(classExpression)));
+						convert(property), convert(filler)));
 	}
 
 	@Override
 	public ElkObjectMinCardinalityUnqualified getObjectMinCardinalityUnqualified(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			int cardinality) {
+			ElkObjectPropertyExpression property, int cardinality) {
 		return new ElkObjectMinCardinalityUnqualifiedWrap<OWLObjectMinCardinality>(
 				owlFactory_.getOWLObjectMinCardinality(cardinality,
-						convert(objectPropertyExpression)));
+						convert(property)));
 	}
 
 	@Override
 	public ElkObjectMinCardinalityQualified getObjectMinCardinalityQualified(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			int cardinality, ElkClassExpression classExpression) {
+			ElkObjectPropertyExpression property, int cardinality,
+			ElkClassExpression filler) {
 		return new ElkObjectMinCardinalityQualifiedWrap<OWLObjectMinCardinality>(
 				owlFactory_.getOWLObjectMinCardinality(cardinality,
-						convert(objectPropertyExpression),
-						convert(classExpression)));
+						convert(property), convert(filler)));
 	}
 
 	@Override
-	public ElkObjectOneOf getObjectOneOf(ElkIndividual firstIndividual,
-			ElkIndividual... otherIndividuals) {
-		return new ElkObjectOneOfWrap<OWLObjectOneOf>(owlFactory_
-				.getOWLObjectOneOf(toSet(firstIndividual, otherIndividuals)));
+	public ElkObjectOneOf getObjectOneOf(ElkIndividual first,
+			ElkIndividual... other) {
+		return new ElkObjectOneOfWrap<OWLObjectOneOf>(
+				owlFactory_.getOWLObjectOneOf(toSet(first, other)));
 	}
 
 	@Override
 	public ElkObjectOneOf getObjectOneOf(
-			List<? extends ElkIndividual> individuals) {
+			List<? extends ElkIndividual> members) {
 		return new ElkObjectOneOfWrap<OWLObjectOneOf>(
-				owlFactory_.getOWLObjectOneOf(toIndividualSet(individuals)));
+				owlFactory_.getOWLObjectOneOf(toIndividualSet(members)));
 	}
 
 	@Override
@@ -1114,66 +1074,56 @@ public class ElkObjectWrapFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkObjectPropertyAssertionAxiom getObjectPropertyAssertionAxiom(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			ElkIndividual firstIndividual, ElkIndividual secondIndividual) {
+			ElkObjectPropertyExpression property, ElkIndividual subject,
+			ElkIndividual object) {
 		return new ElkObjectPropertyAssertionAxiomWrap<OWLObjectPropertyAssertionAxiom>(
 				owlFactory_.getOWLObjectPropertyAssertionAxiom(
-						convert(objectPropertyExpression),
-						convert(firstIndividual), convert(secondIndividual)));
+						convert(property), convert(subject), convert(object)));
 	}
 
 	@Override
 	public ElkObjectPropertyChain getObjectPropertyChain(
-			List<? extends ElkObjectPropertyExpression> objectPropertyExpressions) {
+			List<? extends ElkObjectPropertyExpression> properties) {
 		return new ElkObjectPropertyChainWrap<List<? extends OWLObjectPropertyExpression>>(
-				toObjectPropertyExpressionList(objectPropertyExpressions));
+				toObjectPropertyExpressionList(properties));
 	}
 
 	@Override
 	public ElkObjectPropertyDomainAxiom getObjectPropertyDomainAxiom(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			ElkClassExpression classExpression) {
+			ElkObjectPropertyExpression property, ElkClassExpression domain) {
 		return new ElkObjectPropertyDomainAxiomWrap<OWLObjectPropertyDomainAxiom>(
-				owlFactory_.getOWLObjectPropertyDomainAxiom(
-						convert(objectPropertyExpression),
-						convert(classExpression)));
+				owlFactory_.getOWLObjectPropertyDomainAxiom(convert(property),
+						convert(domain)));
 	}
 
 	@Override
 	public ElkObjectPropertyRangeAxiom getObjectPropertyRangeAxiom(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			ElkClassExpression classExpression) {
+			ElkObjectPropertyExpression property, ElkClassExpression range) {
 		return new ElkObjectPropertyRangeAxiomWrap<OWLObjectPropertyRangeAxiom>(
-				owlFactory_.getOWLObjectPropertyRangeAxiom(
-						convert(objectPropertyExpression),
-						convert(classExpression)));
+				owlFactory_.getOWLObjectPropertyRangeAxiom(convert(property),
+						convert(range)));
 	}
 
 	@Override
 	public ElkObjectSomeValuesFrom getObjectSomeValuesFrom(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			ElkClassExpression classExpression) {
+			ElkObjectPropertyExpression property, ElkClassExpression filler) {
 		return new ElkObjectSomeValuesFromWrap<OWLObjectSomeValuesFrom>(
-				owlFactory_.getOWLObjectSomeValuesFrom(
-						convert(objectPropertyExpression),
-						convert(classExpression)));
+				owlFactory_.getOWLObjectSomeValuesFrom(convert(property),
+						convert(filler)));
 	}
 
 	@Override
-	public ElkObjectUnionOf getObjectUnionOf(
-			ElkClassExpression firstClassExpression,
-			ElkClassExpression secondClassExpression,
-			ElkClassExpression... otherClassExpressions) {
+	public ElkObjectUnionOf getObjectUnionOf(ElkClassExpression first,
+			ElkClassExpression second, ElkClassExpression... other) {
 		return new ElkObjectUnionOfWrap<OWLObjectUnionOf>(
-				owlFactory_.getOWLObjectUnionOf(toSet(firstClassExpression,
-						secondClassExpression, otherClassExpressions)));
+				owlFactory_.getOWLObjectUnionOf(toSet(first, second, other)));
 	}
 
 	@Override
 	public ElkObjectUnionOf getObjectUnionOf(
-			List<? extends ElkClassExpression> classExpressions) {
-		return new ElkObjectUnionOfWrap<OWLObjectUnionOf>(owlFactory_
-				.getOWLObjectUnionOf(toClassExpressionSet(classExpressions)));
+			List<? extends ElkClassExpression> members) {
+		return new ElkObjectUnionOfWrap<OWLObjectUnionOf>(
+				owlFactory_.getOWLObjectUnionOf(toClassExpressionSet(members)));
 	}
 
 	@Override
@@ -1212,19 +1162,18 @@ public class ElkObjectWrapFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkReflexiveObjectPropertyAxiom getReflexiveObjectPropertyAxiom(
-			ElkObjectPropertyExpression objectPropertyExpression) {
+			ElkObjectPropertyExpression property) {
 		return new ElkReflexiveObjectPropertyAxiomWrap<OWLReflexiveObjectPropertyAxiom>(
-				owlFactory_.getOWLReflexiveObjectPropertyAxiom(
-						convert(objectPropertyExpression)));
+				owlFactory_
+						.getOWLReflexiveObjectPropertyAxiom(convert(property)));
 	}
 
 	@Override
-	public ElkSameIndividualAxiom getSameIndividualAxiom(
-			ElkIndividual firstIndividual, ElkIndividual secondIndividual,
-			ElkIndividual... otherIndividuals) {
+	public ElkSameIndividualAxiom getSameIndividualAxiom(ElkIndividual first,
+			ElkIndividual second, ElkIndividual... other) {
 		return new ElkSameIndividualAxiomWrap<OWLSameIndividualAxiom>(
-				owlFactory_.getOWLSameIndividualAxiom(toSet(firstIndividual,
-						secondIndividual, otherIndividuals)));
+				owlFactory_.getOWLSameIndividualAxiom(
+						toSet(first, second, other)));
 	}
 
 	@Override
@@ -1256,27 +1205,26 @@ public class ElkObjectWrapFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkSubDataPropertyOfAxiom getSubDataPropertyOfAxiom(
-			ElkDataPropertyExpression subDataPropertyExpression,
-			ElkDataPropertyExpression superDataPropertyExpression) {
+			ElkDataPropertyExpression subProperty,
+			ElkDataPropertyExpression superProperty) {
 		return new ElkSubDataPropertyOfAxiomWrap<OWLSubDataPropertyOfAxiom>(
-				owlFactory_.getOWLSubDataPropertyOfAxiom(
-						convert(subDataPropertyExpression),
-						convert(superDataPropertyExpression)));
+				owlFactory_.getOWLSubDataPropertyOfAxiom(convert(subProperty),
+						convert(superProperty)));
 	}
 
 	@Override
 	public ElkSubObjectPropertyOfAxiom getSubObjectPropertyOfAxiom(
-			ElkSubObjectPropertyExpression subObjectPropertyExpression,
-			final ElkObjectPropertyExpression superObjectPropertyExpression) {
-		return subObjectPropertyExpression.accept(
+			ElkSubObjectPropertyExpression subProperty,
+			final ElkObjectPropertyExpression superProperty) {
+		return subProperty.accept(
 				new ElkSubObjectPropertyExpressionVisitor<ElkSubObjectPropertyOfAxiom>() {
 
 					ElkSubObjectPropertyOfAxiom defaultVisit(
 							ElkObjectPropertyExpression expression) {
 						return new ElkSubObjectPropertyOfAxiomWrap<OWLSubObjectPropertyOfAxiom>(
 								owlFactory_.getOWLSubObjectPropertyOfAxiom(
-										convert(expression), convert(
-												superObjectPropertyExpression)));
+										convert(expression),
+										convert(superProperty)));
 					}
 
 					@Override
@@ -1284,8 +1232,8 @@ public class ElkObjectWrapFactory implements ElkObjectFactory {
 							ElkObjectPropertyChain expression) {
 						return new ElkSubObjectPropertyChainOfAxiomWrap<OWLSubPropertyChainOfAxiom>(
 								owlFactory_.getOWLSubPropertyChainOfAxiom(
-										convert(expression), convert(
-												superObjectPropertyExpression)));
+										convert(expression),
+										convert(superProperty)));
 					}
 
 					@Override
@@ -1306,27 +1254,27 @@ public class ElkObjectWrapFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkSymmetricObjectPropertyAxiom getSymmetricObjectPropertyAxiom(
-			ElkObjectPropertyExpression objectPropertyExpression) {
+			ElkObjectPropertyExpression property) {
 		return new ElkSymmetricObjectPropertyAxiomWrap<OWLSymmetricObjectPropertyAxiom>(
-				owlFactory_.getOWLSymmetricObjectPropertyAxiom(
-						convert(objectPropertyExpression)));
+				owlFactory_
+						.getOWLSymmetricObjectPropertyAxiom(convert(property)));
 	}
 
 	@Override
 	public ElkTransitiveObjectPropertyAxiom getTransitiveObjectPropertyAxiom(
-			ElkObjectPropertyExpression objectPropertyExpression) {
+			ElkObjectPropertyExpression property) {
 		return new ElkTransitiveObjectPropertyAxiomWrap<OWLTransitiveObjectPropertyAxiom>(
 				owlFactory_.getOWLTransitiveObjectPropertyAxiom(
-						convert(objectPropertyExpression)));
+						convert(property)));
 	}
 
 	@Override
-	public ElkHasKeyAxiom getHasKeyAxiom(ElkClassExpression classExpr,
-			List<? extends ElkObjectPropertyExpression> objectPEs,
-			List<? extends ElkDataPropertyExpression> dataPEs) {
-		return new ElkHasKeyAxiomWrap<OWLHasKeyAxiom>(
-				owlFactory_.getOWLHasKeyAxiom(convert(classExpr),
-						toPropertyExpressionSet(objectPEs, dataPEs)));
+	public ElkHasKeyAxiom getHasKeyAxiom(ElkClassExpression object,
+			List<? extends ElkObjectPropertyExpression> objectPropertyKeys,
+			List<? extends ElkDataPropertyExpression> dataPropertyKeys) {
+		return new ElkHasKeyAxiomWrap<OWLHasKeyAxiom>(owlFactory_
+				.getOWLHasKeyAxiom(convert(object), toPropertyExpressionSet(
+						objectPropertyKeys, dataPropertyKeys)));
 	}
 
 	@Override
@@ -1348,6 +1296,198 @@ public class ElkObjectWrapFactory implements ElkObjectFactory {
 	@Override
 	public ElkSWRLRule getSWRLRule() {
 		return new ElkSWRLRuleImpl();
+	}
+
+	@Override
+	public ElkDatatype getOwlReal() {
+		return new ElkDatatypeWrap<OWLDatatype>(
+				owlFactory_.getOWLDatatype(OWL2Datatype.OWL_REAL.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getOwlRational() {
+		return new ElkDatatypeWrap<OWLDatatype>(
+				owlFactory_.getOWLDatatype(OWL2Datatype.OWL_RATIONAL.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdDecimal() {
+		return new ElkDatatypeWrap<OWLDatatype>(
+				owlFactory_.getOWLDatatype(OWL2Datatype.XSD_DECIMAL.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdInteger() {
+		return new ElkDatatypeWrap<OWLDatatype>(
+				owlFactory_.getOWLDatatype(OWL2Datatype.XSD_INTEGER.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdNonNegativeInteger() {
+		return new ElkDatatypeWrap<OWLDatatype>(owlFactory_.getOWLDatatype(
+				OWL2Datatype.XSD_NON_NEGATIVE_INTEGER.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdNonPositiveInteger() {
+		return new ElkDatatypeWrap<OWLDatatype>(owlFactory_.getOWLDatatype(
+				OWL2Datatype.XSD_NON_POSITIVE_INTEGER.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdPositiveInteger() {
+		return new ElkDatatypeWrap<OWLDatatype>(owlFactory_
+				.getOWLDatatype(OWL2Datatype.XSD_POSITIVE_INTEGER.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdNegativeInteger() {
+		return new ElkDatatypeWrap<OWLDatatype>(owlFactory_
+				.getOWLDatatype(OWL2Datatype.XSD_NEGATIVE_INTEGER.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdLong() {
+		return new ElkDatatypeWrap<OWLDatatype>(
+				owlFactory_.getOWLDatatype(OWL2Datatype.XSD_LONG.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdInt() {
+		return new ElkDatatypeWrap<OWLDatatype>(
+				owlFactory_.getOWLDatatype(OWL2Datatype.XSD_INT.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdShort() {
+		return new ElkDatatypeWrap<OWLDatatype>(
+				owlFactory_.getOWLDatatype(OWL2Datatype.XSD_SHORT.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdByte() {
+		return new ElkDatatypeWrap<OWLDatatype>(
+				owlFactory_.getOWLDatatype(OWL2Datatype.XSD_BYTE.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdUnsignedLong() {
+		return new ElkDatatypeWrap<OWLDatatype>(owlFactory_
+				.getOWLDatatype(OWL2Datatype.XSD_UNSIGNED_LONG.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdUnsignedInt() {
+		return new ElkDatatypeWrap<OWLDatatype>(owlFactory_
+				.getOWLDatatype(OWL2Datatype.XSD_UNSIGNED_INT.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdUnsignedShort() {
+		return new ElkDatatypeWrap<OWLDatatype>(owlFactory_
+				.getOWLDatatype(OWL2Datatype.XSD_UNSIGNED_SHORT.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdUnsignedByte() {
+		return new ElkDatatypeWrap<OWLDatatype>(owlFactory_
+				.getOWLDatatype(OWL2Datatype.XSD_UNSIGNED_BYTE.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdDouble() {
+		return new ElkDatatypeWrap<OWLDatatype>(
+				owlFactory_.getOWLDatatype(OWL2Datatype.XSD_DOUBLE.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdFloat() {
+		return new ElkDatatypeWrap<OWLDatatype>(
+				owlFactory_.getOWLDatatype(OWL2Datatype.XSD_FLOAT.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdString() {
+		return new ElkDatatypeWrap<OWLDatatype>(
+				owlFactory_.getOWLDatatype(OWL2Datatype.XSD_STRING.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdNormalizedString() {
+		return new ElkDatatypeWrap<OWLDatatype>(owlFactory_
+				.getOWLDatatype(OWL2Datatype.XSD_NORMALIZED_STRING.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdToken() {
+		return new ElkDatatypeWrap<OWLDatatype>(
+				owlFactory_.getOWLDatatype(OWL2Datatype.XSD_TOKEN.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdLanguage() {
+		return new ElkDatatypeWrap<OWLDatatype>(
+				owlFactory_.getOWLDatatype(OWL2Datatype.XSD_LANGUAGE.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdName() {
+		return new ElkDatatypeWrap<OWLDatatype>(
+				owlFactory_.getOWLDatatype(OWL2Datatype.XSD_NAME.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdNCName() {
+		return new ElkDatatypeWrap<OWLDatatype>(
+				owlFactory_.getOWLDatatype(OWL2Datatype.XSD_NCNAME.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdNMTOKEN() {
+		return new ElkDatatypeWrap<OWLDatatype>(
+				owlFactory_.getOWLDatatype(OWL2Datatype.XSD_NMTOKEN.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdHexBinary() {
+		return new ElkDatatypeWrap<OWLDatatype>(owlFactory_
+				.getOWLDatatype(OWL2Datatype.XSD_HEX_BINARY.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdBase64Binary() {
+		return new ElkDatatypeWrap<OWLDatatype>(owlFactory_
+				.getOWLDatatype(OWL2Datatype.XSD_BASE_64_BINARY.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdAnyUri() {
+		return new ElkDatatypeWrap<OWLDatatype>(
+				owlFactory_.getOWLDatatype(OWL2Datatype.XSD_ANY_URI.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdDateTime() {
+		return new ElkDatatypeWrap<OWLDatatype>(owlFactory_
+				.getOWLDatatype(OWL2Datatype.XSD_DATE_TIME.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getXsdDateTimeStamp() {
+		return new ElkDatatypeWrap<OWLDatatype>(owlFactory_
+				.getOWLDatatype(OWL2Datatype.XSD_DATE_TIME_STAMP.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getRdfXMLLiteral() {
+		return new ElkDatatypeWrap<OWLDatatype>(owlFactory_
+				.getOWLDatatype(OWL2Datatype.RDF_XML_LITERAL.getIRI()));
+	}
+
+	@Override
+	public ElkDatatype getRdfsLiteral() {
+		return new ElkDatatypeWrap<OWLDatatype>(
+				owlFactory_.getOWLDatatype(OWL2Datatype.RDFS_LITERAL.getIRI()));
 	}
 
 }

@@ -37,9 +37,9 @@ import static org.semanticweb.elk.proofs.expressions.entries.TestEntities.s;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.proofs.expressions.CachingExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
@@ -54,7 +54,7 @@ import org.semanticweb.elk.proofs.inferences.InferenceReader;
  */
 public class CachingExpressionFactoryTest {
 
-	private static final ElkObjectFactory objFactory_ = new ElkObjectFactoryImpl();
+	private static final ElkObject.Factory objFactory_ = new ElkObjectEntityRecyclingFactory();
 	private static final ElkLemmaObjectFactory lemmaFactory_ = new ElkLemmaObjectFactoryImpl();
 	
 	@Test

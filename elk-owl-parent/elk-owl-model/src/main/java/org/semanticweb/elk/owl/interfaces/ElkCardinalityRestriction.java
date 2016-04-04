@@ -31,7 +31,8 @@ import org.semanticweb.elk.owl.visitors.ElkCardinalityRestrictionVisitor;
  * 
  * @param <P>
  */
-public interface ElkCardinalityRestriction<P> extends ElkPropertyRestriction<P> {
+public interface ElkCardinalityRestriction<P>
+		extends ElkPropertyRestriction<P> {
 
 	/**
 	 * @return the cardinality that this expression refers to.
@@ -46,5 +47,20 @@ public interface ElkCardinalityRestriction<P> extends ElkPropertyRestriction<P> 
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkCardinalityRestrictionVisitor<O> visitor);
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory extends ElkCardinalityRestrictionQualified.Factory,
+			ElkDataExactCardinality.Factory, ElkDataMaxCardinality.Factory,
+			ElkDataMinCardinality.Factory, ElkObjectExactCardinality.Factory,
+			ElkObjectMaxCardinality.Factory, ElkObjectMinCardinality.Factory {
+
+		// combined interface
+
+	}
 
 }

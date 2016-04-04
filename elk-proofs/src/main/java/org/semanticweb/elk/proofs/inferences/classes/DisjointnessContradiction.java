@@ -30,8 +30,7 @@ import java.util.Collection;
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
@@ -58,9 +57,9 @@ public class DisjointnessContradiction extends AbstractInference<AxiomExpression
 			ElkClassExpression firstSup, 
 			ElkClassExpression secondSup, 
 			ElkDisjointClassesAxiom sideCondition, 
-			ElkObjectFactory factory, 
+			ElkObject.Factory factory, 
 			ExpressionFactory exprFactory) {
-		super(exprFactory.create(factory.getSubClassOfAxiom(sub, PredefinedElkClass.OWL_NOTHING)));
+		super(exprFactory.create(factory.getSubClassOfAxiom(sub, factory.getOwlNothing())));
 
 		firstPremise_ = exprFactory.create(factory.getSubClassOfAxiom(sub, firstSup));
 		secondPremise_ = exprFactory.create(factory.getSubClassOfAxiom(sub, secondSup));

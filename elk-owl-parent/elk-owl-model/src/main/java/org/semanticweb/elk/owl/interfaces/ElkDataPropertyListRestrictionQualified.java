@@ -41,8 +41,8 @@ import org.semanticweb.elk.owl.visitors.ElkDataPropertyListRestrictionQualifiedV
  *         pavel.klinov@uni-ulm.de
  *
  */
-public interface ElkDataPropertyListRestrictionQualified extends
-		ElkClassExpression {
+public interface ElkDataPropertyListRestrictionQualified
+		extends ElkClassExpression {
 
 	public List<? extends ElkDataPropertyExpression> getDataPropertyExpressions();
 
@@ -57,4 +57,17 @@ public interface ElkDataPropertyListRestrictionQualified extends
 	 */
 	public <O> O accept(
 			ElkDataPropertyListRestrictionQualifiedVisitor<O> visitor);
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory extends ElkDataAllValuesFrom.Factory,
+			ElkDataSomeValuesFrom.Factory {
+
+		// combined interface
+
+	}
 }

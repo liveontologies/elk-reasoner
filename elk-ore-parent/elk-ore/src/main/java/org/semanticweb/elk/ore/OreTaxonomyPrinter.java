@@ -35,16 +35,14 @@ import java.util.Collections;
 import java.util.TreeSet;
 
 import org.semanticweb.elk.io.IOUtils;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.owl.predefined.PredefinedElkIris;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
@@ -109,7 +107,7 @@ public class OreTaxonomyPrinter extends TaxonomyPrinter {
 
 	protected static void processTaxomomy(Taxonomy<ElkClass> classTaxonomy,
 			Appendable writer) throws IOException {
-		ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
+		ElkObject.Factory objectFactory = new ElkObjectEntityRecyclingFactory();
 
 		printDeclarations(classTaxonomy, objectFactory, writer);
 
@@ -137,7 +135,7 @@ public class OreTaxonomyPrinter extends TaxonomyPrinter {
 			// adding owl:Thing if the class is its direct subclass
 			if (orderedEquivalentClasses.isEmpty()
 					&& orderedSubClasses.isEmpty()) {
-				orderedSubClasses.add(PredefinedElkClass.OWL_THING);
+				orderedSubClasses.add(objectFactory.getOwlThing());
 			}
 
 			printClassAxioms(elkClass, orderedEquivalentClasses,
@@ -148,7 +146,7 @@ public class OreTaxonomyPrinter extends TaxonomyPrinter {
 	protected static void processInstanceTaxomomy(
 			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy,
 			Writer writer) throws IOException {
-		ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
+		ElkObject.Factory objectFactory = new ElkObjectEntityRecyclingFactory();
 
 		printIndividualDeclarations(taxonomy.getInstanceNodes(), objectFactory,
 				writer);
@@ -181,7 +179,7 @@ public class OreTaxonomyPrinter extends TaxonomyPrinter {
 				}
 			}
 
-			orderedTypes.add(PredefinedElkClass.OWL_THING);
+			orderedTypes.add(objectFactory.getOwlThing());
 
 			printIndividualAxioms(individual, orderedSameIndividuals,
 					orderedTypes, objectFactory, writer);
@@ -193,7 +191,7 @@ public class OreTaxonomyPrinter extends TaxonomyPrinter {
 			TreeSet<ElkClass> orderedSubClasses, Appendable writer)
 			throws IOException {
 
-		ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
+		ElkObject.Factory objectFactory = new ElkObjectEntityRecyclingFactory();
 
 		if (orderedEquivalentClasses.size() > 1) {
 			ElkEquivalentClassesAxiom elkEquivalentClassesAxiom = objectFactory
@@ -204,7 +202,7 @@ public class OreTaxonomyPrinter extends TaxonomyPrinter {
 		}
 
 		for (ElkClass elkSubClass : orderedSubClasses)
-			if (!elkSubClass.getIri().equals(PredefinedElkIris.OWL_NOTHING)) {
+			if (!elkSubClass.getIri().equals(objectFactory.getOwlNothing())) {
 				ElkSubClassOfAxiom elkSubClassAxiom = objectFactory
 						.getSubClassOfAxiom(elkSubClass, elkClass);
 				OwlFunctionalStylePrinter
@@ -216,7 +214,7 @@ public class OreTaxonomyPrinter extends TaxonomyPrinter {
 	protected static void printIndividualAxioms(ElkNamedIndividual individual,
 			ArrayList<ElkNamedIndividual> orderedSameIndividuals,
 			TreeSet<ElkClass> orderedDirectClasses,
-			ElkObjectFactory objectFactory, Writer writer) throws IOException {
+			ElkObject.Factory objectFactory, Writer writer) throws IOException {
 
 		if (orderedSameIndividuals.size() > 1) {
 			ElkSameIndividualAxiom axiom = objectFactory

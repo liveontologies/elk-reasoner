@@ -31,13 +31,12 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
@@ -75,7 +74,7 @@ public class TracingSaturationTest {
 	public void testBasicTracing() throws Exception {
 		Reasoner reasoner = TestReasonerUtils
 				.loadAndClassify(TestReasonerUtils.loadAxioms("tracing/DuplicateExistential.owl"));
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass d = factory.getClass(new ElkFullIri("http://example.org/D"));
 
@@ -88,12 +87,12 @@ public class TracingSaturationTest {
 	public void testInconsistency() throws Exception {
 		Reasoner reasoner = TestReasonerUtils
 				.loadAndClassify(TestReasonerUtils.loadAxioms("classification_test_input/Inconsistent.owl"));
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 
 		reasoner.explainInconsistency();
 		TracingTestUtils.checkTracingCompleteness(
-				reasoner.getConclusion(factory.getSubClassOfAxiom(PredefinedElkClass.OWL_THING,
-						PredefinedElkClass.OWL_NOTHING)),
+				reasoner.getConclusion(factory.getSubClassOfAxiom(factory.getOwlThing(),
+						factory.getOwlNothing())),
 				reasoner);
 	}
 
@@ -101,7 +100,7 @@ public class TracingSaturationTest {
 	public void testDuplicateInferenceOfConjunction() throws Exception {
 		Reasoner reasoner = TestReasonerUtils
 				.loadAndClassify(TestReasonerUtils.loadAxioms("tracing/DuplicateConjunction.owl"));
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
@@ -121,7 +120,7 @@ public class TracingSaturationTest {
 	public void testDuplicateInferenceOfExistential() throws Exception {
 		Reasoner reasoner = TestReasonerUtils
 				.loadAndClassify(TestReasonerUtils.loadAxioms("tracing/DuplicateExistential.owl"));
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
@@ -146,7 +145,7 @@ public class TracingSaturationTest {
 	public void testDuplicateInferenceViaComposition() throws Exception {
 		Reasoner reasoner = TestReasonerUtils
 				.loadAndClassify(TestReasonerUtils.loadAxioms("tracing/DuplicateComposition.owl"));
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
@@ -169,7 +168,7 @@ public class TracingSaturationTest {
 			throws Exception {
 		Reasoner reasoner = TestReasonerUtils
 				.loadAndClassify(TestReasonerUtils.loadAxioms("tracing/DuplicateReflexiveExistential.owl"));
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkObjectProperty r = factory
@@ -186,7 +185,7 @@ public class TracingSaturationTest {
 	//
 	@Test
 	public void testRecursiveTracingExistential() throws Exception {
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 		Reasoner reasoner = TestReasonerUtils
 				.loadAndClassify(TestReasonerUtils.loadAxioms("tracing/RecursiveExistential.owl"));
 
@@ -208,7 +207,7 @@ public class TracingSaturationTest {
 
 	@Test
 	public void testRecursiveTracingComposition() throws Exception {
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 		Reasoner reasoner = TestReasonerUtils
 				.loadAndClassify(TestReasonerUtils.loadAxioms("tracing/RecursiveComposition.owl"));
 
@@ -230,7 +229,7 @@ public class TracingSaturationTest {
 	@Test
 	@Ignore
 	public void testAvoidTracingDueToCyclicInferences() throws Exception {
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 		Reasoner reasoner = TestReasonerUtils
 				.loadAndClassify(TestReasonerUtils.loadAxioms("tracing/TrivialPropagation.owl"));
 

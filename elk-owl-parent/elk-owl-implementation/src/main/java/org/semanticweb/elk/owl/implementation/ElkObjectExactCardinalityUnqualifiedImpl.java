@@ -40,9 +40,9 @@ public class ElkObjectExactCardinalityUnqualifiedImpl extends
 		ElkObjectExactCardinalityUnqualified {
 
 	ElkObjectExactCardinalityUnqualifiedImpl(
-			ElkObjectPropertyExpression objectPropertyExpression,
+			ElkObjectPropertyExpression property,
 			int cardinality) {
-		super(objectPropertyExpression, cardinality);
+		super(property, cardinality);
 	}
 
 	@Override

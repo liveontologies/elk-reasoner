@@ -49,12 +49,12 @@ public class ElkHasKeyAxiomImpl implements ElkHasKeyAxiom {
 	private final List<? extends ElkObjectPropertyExpression> objectPropExprs_;
 	private final List<? extends ElkDataPropertyExpression> dataPropExprs_;
 
-	ElkHasKeyAxiomImpl(ElkClassExpression classExp,
-			List<? extends ElkObjectPropertyExpression> objectPEs,
-			List<? extends ElkDataPropertyExpression> dataPEs) {
-		classExp_ = classExp;
-		objectPropExprs_ = objectPEs;
-		dataPropExprs_ = dataPEs;
+	ElkHasKeyAxiomImpl(ElkClassExpression object,
+			List<? extends ElkObjectPropertyExpression> objectPropertyKeys,
+			List<? extends ElkDataPropertyExpression> dataPropertyKeys) {
+		classExp_ = object;
+		objectPropExprs_ = objectPropertyKeys;
+		dataPropExprs_ = dataPropertyKeys;
 	}
 
 	@Override

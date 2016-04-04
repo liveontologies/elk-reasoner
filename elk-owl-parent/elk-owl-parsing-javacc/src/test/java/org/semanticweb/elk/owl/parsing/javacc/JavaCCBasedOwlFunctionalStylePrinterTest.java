@@ -24,7 +24,6 @@ package org.semanticweb.elk.owl.parsing.javacc;
 
 import java.io.Reader;
 
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.printers.AbstractImplOwl2FunctionalSyntaxPrinterTest;
 
@@ -39,6 +38,6 @@ public class JavaCCBasedOwlFunctionalStylePrinterTest extends AbstractImplOwl2Fu
 
 	@Override
 	protected Owl2Parser instantiateParser(Reader reader) {
-		return new Owl2FunctionalStyleParserFactory(new ElkObjectFactoryImpl()).getParser(reader);
+		return new Owl2FunctionalStyleParserFactory().getParser(reader);
 	}
 }

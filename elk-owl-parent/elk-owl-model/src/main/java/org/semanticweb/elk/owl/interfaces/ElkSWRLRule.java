@@ -48,4 +48,20 @@ public interface ElkSWRLRule extends ElkAxiom {
 	 */
 	public <O> O accept(ElkSWRLRuleVisitor<O> visitor);
 
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		/**
+		 * No arguments since we don't have a full representation of SWRL rules
+		 * 
+		 * @return a dummy object
+		 */
+		public ElkSWRLRule getSWRLRule();
+	}
+
 }

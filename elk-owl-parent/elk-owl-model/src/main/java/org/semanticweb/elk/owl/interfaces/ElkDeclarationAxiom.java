@@ -52,5 +52,24 @@ public interface ElkDeclarationAxiom extends ElkAxiom {
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkDeclarationAxiomVisitor<O> visitor);
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		/**
+		 * Create an {@link ElkDeclarationAxiom}.
+		 * 
+		 * @param entity
+		 *            the {@link ElkEntity} for which the axiom should be created
+		 * @return an {@link ElkDeclarationAxiom} corresponding to the input
+		 */
+		public ElkDeclarationAxiom getDeclarationAxiom(ElkEntity entity);
+
+	}
 
 }

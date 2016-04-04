@@ -25,10 +25,10 @@ package org.semanticweb.elk.owl.parsing.javacc;
 import java.io.InputStream;
 import java.io.Reader;
 
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.iris.ElkPrefixDeclarations;
 import org.semanticweb.elk.owl.iris.ElkPrefixDeclarationsImpl;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserFactory;
 
@@ -37,24 +37,24 @@ public class Owl2FunctionalStyleParserFactory implements Owl2ParserFactory {
 	private final static JavaCCLexerFactory<AbstractOwl2FunctionalStyleParserTokenManager> DEFAULT_LEXER_FACTORY = new ConcurrentJavaCCLexerFactory();
 
 	/**
-	 * the {@link ElkObjectFactory} used with this {@link Owl2ParserFactory}
+	 * the {@link ElkObject.Factory} used with this {@link Owl2ParserFactory}
 	 */
-	private final ElkObjectFactory objectFactory_;
+	private final ElkObject.Factory objectFactory_;
 
 	private final JavaCCLexerFactory<AbstractOwl2FunctionalStyleParserTokenManager> lexerFactory_;
 
-	public Owl2FunctionalStyleParserFactory(ElkObjectFactory objectFactory,
+	public Owl2FunctionalStyleParserFactory(ElkObject.Factory objectFactory,
 			JavaCCLexerFactory<AbstractOwl2FunctionalStyleParserTokenManager> lexerFactory) {
 		this.objectFactory_ = objectFactory;
 		this.lexerFactory_ = lexerFactory;
 	}
 
-	public Owl2FunctionalStyleParserFactory(ElkObjectFactory objectFactory) {
+	public Owl2FunctionalStyleParserFactory(ElkObject.Factory objectFactory) {
 		this(objectFactory, DEFAULT_LEXER_FACTORY);
 	}
 
 	public Owl2FunctionalStyleParserFactory() {
-		this(new ElkObjectFactoryImpl(), DEFAULT_LEXER_FACTORY);
+		this(new ElkObjectEntityRecyclingFactory(), DEFAULT_LEXER_FACTORY);
 	}
 
 	@Override
@@ -78,14 +78,14 @@ public class Owl2FunctionalStyleParserFactory implements Owl2ParserFactory {
 	 */
 	private static class Owl2FunctionalStyleParser extends AbstractOwl2FunctionalStyleParser {
 
-		private final ElkObjectFactory objectFactory_;
+		private final ElkObject.Factory objectFactory_;
 
 		private final ElkPrefixDeclarations prefixDeclarations_;
 
 		private final JavaCCLexerFactory<AbstractOwl2FunctionalStyleParserTokenManager> lexerFactory_;
 
 		private Owl2FunctionalStyleParser(InputStream stream,
-				ElkObjectFactory objectFactory,
+				ElkObject.Factory objectFactory,
 				ElkPrefixDeclarations prefixDeclarations,
 				JavaCCLexerFactory<AbstractOwl2FunctionalStyleParserTokenManager> factory) {
 			super(stream);
@@ -97,13 +97,13 @@ public class Owl2FunctionalStyleParserFactory implements Owl2ParserFactory {
 		}
 
 		Owl2FunctionalStyleParser(InputStream stream,
-				ElkObjectFactory objectFactory, JavaCCLexerFactory<AbstractOwl2FunctionalStyleParserTokenManager> lexerFactory) {
+				ElkObject.Factory objectFactory, JavaCCLexerFactory<AbstractOwl2FunctionalStyleParserTokenManager> lexerFactory) {
 			this(stream, objectFactory, new ElkPrefixDeclarationsImpl(),
 					lexerFactory);
 		}
 
 		Owl2FunctionalStyleParser(Reader reader,
-				ElkObjectFactory objectFactory,
+				ElkObject.Factory objectFactory,
 				ElkPrefixDeclarations prefixDeclarations,
 				JavaCCLexerFactory<AbstractOwl2FunctionalStyleParserTokenManager> factory) {
 			super(reader);
@@ -115,7 +115,7 @@ public class Owl2FunctionalStyleParserFactory implements Owl2ParserFactory {
 		}
 
 		Owl2FunctionalStyleParser(Reader reader,
-				ElkObjectFactory objectFactory, JavaCCLexerFactory<AbstractOwl2FunctionalStyleParserTokenManager> lexerFactory) {
+				ElkObject.Factory objectFactory, JavaCCLexerFactory<AbstractOwl2FunctionalStyleParserTokenManager> lexerFactory) {
 			this(reader, objectFactory, new ElkPrefixDeclarationsImpl(),
 					lexerFactory);
 		}
@@ -126,7 +126,7 @@ public class Owl2FunctionalStyleParserFactory implements Owl2ParserFactory {
 		}
 
 		@Override
-		protected ElkObjectFactory getElkObjectFactory() {
+		protected ElkObject.Factory getElkObjectFactory() {
 			return this.objectFactory_;
 		}
 

@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.stages;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.incremental.NonIncrementalChangeListener;
 import org.semanticweb.elk.reasoner.indexing.classes.ChangeIndexingProcessor;
@@ -93,10 +94,11 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 
 		ModifiableOntologyIndex ontologyIndex = reasoner
 				.getModifiableOntologyIndex();
+		ElkObject.Factory elkFactory = reasoner.getElkFactory();
 
-		ElkAxiomConverter axiomInserter = new ElkAxiomConverterImpl(
+		ElkAxiomConverter axiomInserter = new ElkAxiomConverterImpl(elkFactory,
 				ontologyIndex, 1);
-		ElkAxiomConverter axiomDeleter = new ElkAxiomConverterImpl(
+		ElkAxiomConverter axiomDeleter = new ElkAxiomConverterImpl(elkFactory,
 				ontologyIndex, -1);
 
 		/*

@@ -30,15 +30,14 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkIri;
-import org.semanticweb.elk.proofs.expressions.entries.StructuralEquivalenceChecker;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemmaObjectFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.impl.ElkLemmaObjectFactoryImpl;
 
@@ -51,7 +50,7 @@ public class StructuralEquivalenceTest {
 
 	@Test
 	public void entities() {
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 		ElkClass a = factory.getClass(getIri("A"));
 		
 		assertTrue(StructuralEquivalenceChecker.equal(a, TestEntities.a));
@@ -83,7 +82,7 @@ public class StructuralEquivalenceTest {
 
 	@Test
 	public void axioms() {
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 		ElkClass a = factory.getClass(getIri("A"));
 		ElkClass b = factory.getClass(getIri("B"));
 		ElkClass c = factory.getClass(getIri("C"));
@@ -118,7 +117,7 @@ public class StructuralEquivalenceTest {
 	
 	@Test
 	public void lemmas() {
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 		ElkClass a = factory.getClass(getIri("A"));
 		ElkClass b = factory.getClass(getIri("B"));
 		ElkObjectProperty r = factory.getObjectProperty(getIri("R"));

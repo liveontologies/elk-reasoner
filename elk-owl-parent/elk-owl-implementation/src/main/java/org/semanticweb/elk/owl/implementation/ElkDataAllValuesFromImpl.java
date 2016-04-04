@@ -42,9 +42,9 @@ public class ElkDataAllValuesFromImpl extends
 		ElkDataAllValuesFrom {
 
 	ElkDataAllValuesFromImpl(
-			List<? extends ElkDataPropertyExpression> dataProps,
-			ElkDataRange dataRange) {
-		super(dataProps, dataRange);
+			List<? extends ElkDataPropertyExpression> properties,
+			ElkDataRange range) {
+		super(properties, range);
 	}
 
 	@Override

@@ -51,4 +51,17 @@ public interface ElkPropertyRestriction<P> extends ElkClassExpression {
 	 */
 	public <O> O accept(ElkPropertyRestrictionVisitor<O> visitor);
 
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory extends ElkCardinalityRestriction.Factory,
+			ElkObjectHasSelf.Factory, ElkPropertyRestrictionQualified.Factory {
+
+		// combined interface
+
+	}
+
 }

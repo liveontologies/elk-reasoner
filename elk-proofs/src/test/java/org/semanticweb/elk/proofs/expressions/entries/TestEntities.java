@@ -24,14 +24,14 @@ package org.semanticweb.elk.proofs.expressions.entries;
  * #L%
  */
 
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkAbbreviatedIri;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.iris.ElkPrefixImpl;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 
 /**
  * @author Pavel Klinov
@@ -41,7 +41,7 @@ import org.semanticweb.elk.owl.iris.ElkPrefixImpl;
 public class TestEntities {
 
 	public static final ElkPrefix prefix_ = new ElkPrefixImpl("", new ElkFullIri("http://test.org/"));
-	private static final ElkObjectFactory factory_ = new ElkObjectFactoryImpl();
+	private static final ElkObject.Factory factory_ = new ElkObjectEntityRecyclingFactory();
 	
 	public static final ElkClass a = factory_.getClass(new ElkAbbreviatedIri(prefix_, "A"));
 	public static final ElkClass b = factory_.getClass(new ElkAbbreviatedIri(prefix_, "B"));

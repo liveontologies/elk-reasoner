@@ -42,9 +42,9 @@ public class ElkObjectMinCardinalityQualifiedImpl
 		implements ElkObjectMinCardinalityQualified {
 
 	ElkObjectMinCardinalityQualifiedImpl(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			int cardinality, ElkClassExpression classExpression) {
-		super(objectPropertyExpression, cardinality, classExpression);
+			ElkObjectPropertyExpression property,
+			int cardinality, ElkClassExpression filler) {
+		super(property, cardinality, filler);
 	}
 
 	@Override

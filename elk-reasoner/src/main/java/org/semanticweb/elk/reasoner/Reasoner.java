@@ -29,15 +29,12 @@ import org.semanticweb.elk.loading.AbstractAxiomLoader;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
@@ -91,12 +88,6 @@ public class Reasoner extends AbstractReasonerState {
 	private int workerNo_;
 
 	/**
-	 * A factory for creating new {@link ElkObject}s; mainly use for answering
-	 * complex queries
-	 */
-	private ElkObjectFactory elkFactory = new ElkObjectFactoryImpl();
-
-	/**
 	 * Should fresh entities in reasoner queries be accepted (configuration
 	 * setting). If false, a {@link ElkFreshEntitiesException} will be thrown
 	 * when encountering entities that did not occur in the ontology.
@@ -107,9 +98,9 @@ public class Reasoner extends AbstractReasonerState {
 	 * Constructor. In most cases, Reasoners should be created by the
 	 * {@link ReasonerFactory}.
 	 * */
-	protected Reasoner(AxiomLoader axiomLoader,
+	protected Reasoner(ElkObject.Factory elkFactory, AxiomLoader axiomLoader,
 			ReasonerStageExecutor stageExecutor, ReasonerConfiguration config) {
-		super(axiomLoader);
+		super(elkFactory, axiomLoader);
 
 		this.stageExecutor_ = stageExecutor;
 		this.progressMonitor = new DummyProgressMonitor();
@@ -322,9 +313,9 @@ public class Reasoner extends AbstractReasonerState {
 			return getTaxonomyNode((ElkClass) classExpression);
 		}
 		// else
-		ElkClass queryClass = elkFactory.getClass(new ElkFullIri(
+		ElkClass queryClass = getElkFactory().getClass(new ElkFullIri(
 				OwlFunctionalStylePrinter.toString(classExpression)));
-		ElkAxiom materializedQuery = elkFactory.getEquivalentClassesAxiom(
+		ElkAxiom materializedQuery = getElkFactory().getEquivalentClassesAxiom(
 				queryClass, classExpression);
 		return getQueryTaxonomyNode(queryClass, materializedQuery);
 	}
@@ -348,9 +339,9 @@ public class Reasoner extends AbstractReasonerState {
 			return getTaxonomyNode((ElkClass) classExpression);
 		}
 		// else
-		ElkClass queryClass = elkFactory.getClass(new ElkFullIri(
+		ElkClass queryClass = getElkFactory().getClass(new ElkFullIri(
 				OwlFunctionalStylePrinter.toString(classExpression)));
-		ElkAxiom materializedQuery = elkFactory.getEquivalentClassesAxiom(
+		ElkAxiom materializedQuery = getElkFactory().getEquivalentClassesAxiom(
 				queryClass, classExpression);
 		Node<ElkClass> queryNode = getQueryTaxonomyNode(queryClass,
 				materializedQuery);
@@ -441,9 +432,9 @@ public class Reasoner extends AbstractReasonerState {
 		if (classExpression instanceof ElkClass) {
 			queryNode = getTypeNode((ElkClass) classExpression);
 		} else {
-			ElkClass queryClass = elkFactory.getClass(new ElkFullIri(
+			ElkClass queryClass = getElkFactory().getClass(new ElkFullIri(
 					OwlFunctionalStylePrinter.toString(classExpression)));
-			ElkAxiom materializedQuery = elkFactory.getSubClassOfAxiom(
+			ElkAxiom materializedQuery = getElkFactory().getSubClassOfAxiom(
 					classExpression, queryClass);
 			queryNode = getQueryTypeNode(queryClass, materializedQuery);
 		}
@@ -500,14 +491,14 @@ public class Reasoner extends AbstractReasonerState {
 		if (classExpression instanceof ElkClass) {
 			queryNode = getClassNode(classExpression);
 		} else {
-			ElkClass queryClass = elkFactory.getClass(new ElkFullIri(
+			ElkClass queryClass = getElkFactory().getClass(new ElkFullIri(
 					OwlFunctionalStylePrinter.toString(classExpression)));
-			ElkAxiom materializedQuery = elkFactory.getSubClassOfAxiom(
+			ElkAxiom materializedQuery = getElkFactory().getSubClassOfAxiom(
 					queryClass, classExpression);
 			queryNode = getQueryNode(queryClass, materializedQuery);
 		}
 
-		return !queryNode.contains(PredefinedElkClass.OWL_NOTHING);
+		return !queryNode.contains(getElkFactory().getOwlNothing());
 	}
 
 	/**

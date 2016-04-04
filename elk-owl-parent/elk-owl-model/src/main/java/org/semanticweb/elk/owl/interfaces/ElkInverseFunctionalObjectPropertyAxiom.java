@@ -29,8 +29,8 @@ import org.semanticweb.elk.owl.visitors.ElkInverseFunctionalObjectPropertyAxiomV
 
 /**
  * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Inverse-Functional_Object_Properties"
- * >Inverse Functional Object Property Axiom<a> in the OWL 2 specification.
+ * "http://www.w3.org/TR/owl2-syntax/#Inverse-Functional_Object_Properties" >
+ * Inverse Functional Object Property Axiom<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  * @author "Yevgeny Kazakov"
@@ -47,4 +47,26 @@ public interface ElkInverseFunctionalObjectPropertyAxiom extends
 	 */
 	public abstract <O> O accept(
 			ElkInverseFunctionalObjectPropertyAxiomVisitor<O> visitor);
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		/**
+		 * Create an {@link ElkInverseFunctionalObjectPropertyAxiom}.
+		 * 
+		 * @param property
+		 *            the inverse functional {@link ElkObjectPropertyExpression}
+		 *            for which the axiom should be created
+		 * @return an {@link ElkInverseFunctionalObjectPropertyAxiom}
+		 *         corresponding to the input
+		 */
+		public ElkInverseFunctionalObjectPropertyAxiom getInverseFunctionalObjectPropertyAxiom(
+				ElkObjectPropertyExpression property);
+
+	}
 }

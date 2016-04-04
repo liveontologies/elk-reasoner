@@ -40,8 +40,8 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkObjectOneOfImpl extends ElkObjectListObject<ElkIndividual>
 		implements ElkObjectOneOf {
 
-	ElkObjectOneOfImpl(List<? extends ElkIndividual> individuals) {
-		super(individuals);
+	ElkObjectOneOfImpl(List<? extends ElkIndividual> members) {
+		super(members);
 	}
 
 	@Override

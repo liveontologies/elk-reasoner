@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericNodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
@@ -71,21 +71,24 @@ public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
 	/** thread safe set of unsatisfiable classes */
 	private final ConcurrentMap<Object, ElkClass> unsatisfiableClasses_;
 
+	/** canonical top and bottom node members */
+	private final ElkClass owlThing_, owlNothing_;
 	/**
 	 * The bottom node.
 	 */
 	private final BottomClassNode bottomClassNode_;
 
-	public ConcurrentClassTaxonomy(
+	public ConcurrentClassTaxonomy(PredefinedElkClassFactory elkFactory,
 			final ComparatorKeyProvider<ElkEntity> classKeyProvider) {
 		this.nodeStore_ = new ConcurrentNodeStore<ElkClass, NonBottomClassNode>(
 				classKeyProvider);
+		this.owlThing_ = elkFactory.getOwlThing();
+		this.owlNothing_ = elkFactory.getOwlNothing();
 		this.bottomClassNode_ = new BottomClassNode();
 		this.countNodesWithSubClasses = new AtomicInteger(0);
 		this.unsatisfiableClasses_ = new ConcurrentHashMap<Object, ElkClass>();
-		this.unsatisfiableClasses_.put(
-				classKeyProvider.getKey(PredefinedElkClass.OWL_NOTHING),
-				PredefinedElkClass.OWL_NOTHING);
+		this.unsatisfiableClasses_.put(classKeyProvider.getKey(owlNothing_),
+				owlNothing_);
 	}
 
 	@Override
@@ -116,7 +119,7 @@ public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
 
 	@Override
 	public NonBottomClassNode getTopNode() {
-		return nodeStore_.getNode(PredefinedElkClass.OWL_THING);
+		return nodeStore_.getNode(owlThing_);
 	}
 
 	@Override
@@ -155,9 +158,9 @@ public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
 		if (nodeStore_.removeNode(member)) {
 			LOGGER_.trace("removed node with member: {}", member);
 			return true;
-		} else {
-			return false;
 		}
+		// else
+		return false;
 	}
 
 	/**
@@ -193,7 +196,7 @@ public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
 
 		@Override
 		public ElkClass getCanonicalMember() {
-			return PredefinedElkClass.OWL_NOTHING;
+			return owlNothing_;
 		}
 
 		@Override

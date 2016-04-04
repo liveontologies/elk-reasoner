@@ -23,7 +23,7 @@ package org.semanticweb.elk.owl.inferences;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.slf4j.Logger;
@@ -37,9 +37,9 @@ public class ModifiableElkInferenceSetImpl
 
 	private final Multimap<ElkAxiom, ElkInference> inferenceMap_ = new HashListMultimap<ElkAxiom, ElkInference>();
 
-	private final ElkObjectFactory elkFactory_;
+	private final ElkObject.Factory elkFactory_;
 
-	public ModifiableElkInferenceSetImpl(ElkObjectFactory elkFactory) {
+	public ModifiableElkInferenceSetImpl(ElkObject.Factory elkFactory) {
 		this.elkFactory_ = elkFactory;
 	}
 

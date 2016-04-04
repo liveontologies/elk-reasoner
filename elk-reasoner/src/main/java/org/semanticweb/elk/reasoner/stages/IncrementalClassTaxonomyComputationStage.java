@@ -74,7 +74,7 @@ public class IncrementalClassTaxonomyComputationStage extends
 		Operations.Transformation<ElkClass, IndexedClass> transformation = new Operations.Transformation<ElkClass, IndexedClass>() {
 
 			private final ElkPolarityExpressionConverter converter = new ElkPolarityExpressionConverterImpl(
-					reasoner.ontologyIndex);
+					reasoner.getElkFactory(), reasoner.ontologyIndex);
 
 			@Override
 			public IndexedClass transform(ElkClass element) {

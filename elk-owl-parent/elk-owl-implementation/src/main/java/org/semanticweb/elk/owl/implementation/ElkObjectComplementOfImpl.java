@@ -39,8 +39,8 @@ public class ElkObjectComplementOfImpl extends ElkObjectImpl implements
 
 	private final ElkClassExpression classExpression_;
 
-	ElkObjectComplementOfImpl(ElkClassExpression classExpression) {
-		this.classExpression_ = classExpression;
+	ElkObjectComplementOfImpl(ElkClassExpression negated) {
+		this.classExpression_ = negated;
 	}
 
 	@Override

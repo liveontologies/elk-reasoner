@@ -33,11 +33,10 @@ import java.util.Set;
 import org.semanticweb.elk.matching.Matcher;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.inferences.ModifiableElkInferenceSet;
 import org.semanticweb.elk.owl.inferences.ModifiableElkInferenceSetImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owlapi.proofs.OwlAxiomExpressionWrap;
 import org.semanticweb.elk.owlapi.wrapper.ElkObjectWrapFactory;
@@ -129,7 +128,7 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 	/** listener to keep track of when changes are applied to the ontology */
 	private final OntologyChangeProgressListener ontologyChangeProgressListener_;
 	/** ELK object factory used to create any ElkObjects */
-	private final ElkObjectFactory objectFactory_;
+	private final ElkObject.Factory objectFactory_;
 	/** Converter from OWL API to ELK OWL */
 	private final OwlConverter owlConverter_;
 	/** Converter from ELK OWL to OWL API */
@@ -169,7 +168,7 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 		this.ontologyChangeProgressListener_ = new OntologyChangeProgressListener();
 		this.owlOntologymanager_
 				.addOntologyChangeProgessListener(ontologyChangeProgressListener_);
-		this.objectFactory_ = new ElkObjectFactoryImpl();
+		this.objectFactory_ = new ElkObjectWrapFactory(owlOntologymanager_.getOWLDataFactory());
 		this.owlConverter_ = OwlConverter.getInstance();
 		this.elkConverter_ = ElkConverter.getInstance();
 
@@ -220,6 +219,8 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 	 */
 	private void reCreateReasoner() {
 		this.reasoner_ = new ReasonerFactory().createReasoner(
+				new ElkObjectWrapFactory(
+						owlOntologymanager_.getOWLDataFactory()),
 				new OwlOntologyLoader(owlOntology_, this.mainProgressMonitor_),
 				stageExecutor_, config_);
 		this.reasoner_.setAllowFreshEntities(isAllowFreshEntities);
@@ -960,7 +961,7 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 					.accept(OwlClassAxiomConverterVisitor.getInstance());
 			try {
 				ClassConclusion conclusion = reasoner_.getConclusion(elkAxiom);
-				ElkObjectFactory factory = new ElkObjectWrapFactory(
+				ElkObject.Factory factory = new ElkObjectWrapFactory(
 						owlOntologymanager_.getOWLDataFactory());
 				ModifiableElkInferenceSet elkInferences = new ModifiableElkInferenceSetImpl(
 						factory);

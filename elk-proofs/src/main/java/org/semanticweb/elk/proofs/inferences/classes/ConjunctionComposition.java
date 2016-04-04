@@ -29,7 +29,7 @@ import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
@@ -49,7 +49,7 @@ public class ConjunctionComposition extends AbstractInference<AxiomExpression<? 
 	
 	private final Expression secondPremise_;
 	
-	public ConjunctionComposition(ElkClassExpression sub, ElkClassExpression firstConjunct, ElkClassExpression secondConjunct, ElkObjectFactory factory, ExpressionFactory exprFactory) {
+	public ConjunctionComposition(ElkClassExpression sub, ElkClassExpression firstConjunct, ElkClassExpression secondConjunct, ElkObject.Factory factory, ExpressionFactory exprFactory) {
 		super(exprFactory.create(factory.getSubClassOfAxiom(sub, factory.getObjectIntersectionOf(firstConjunct, secondConjunct))));
 
 		firstPremise_ = exprFactory.create(factory.getSubClassOfAxiom(sub, firstConjunct));

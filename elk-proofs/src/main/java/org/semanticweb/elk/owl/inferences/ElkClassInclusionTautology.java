@@ -25,7 +25,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 
 /**
@@ -65,12 +65,12 @@ public class ElkClassInclusionTautology extends AbstractElkInference {
 	}
 
 	@Override
-	public ElkAxiom getPremise(int index, ElkObjectFactory factory) {
+	public ElkAxiom getPremise(int index, ElkObject.Factory factory) {
 		return failGetPremise(index);
 	}
 
 	@Override
-	public ElkSubClassOfAxiom getConclusion(ElkObjectFactory factory) {
+	public ElkSubClassOfAxiom getConclusion(ElkObject.Factory factory) {
 		return factory.getSubClassOfAxiom(expression_, expression_);
 	}
 

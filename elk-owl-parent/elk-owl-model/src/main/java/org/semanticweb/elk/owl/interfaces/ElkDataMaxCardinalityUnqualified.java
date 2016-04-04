@@ -43,5 +43,28 @@ public interface ElkDataMaxCardinalityUnqualified extends ElkDataMaxCardinality 
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkDataMaxCardinalityUnqualifiedVisitor<O> visitor);
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		/**
+		 * Create an {@link ElkDataMaxCardinalityUnqualified}.
+		 * 
+		 * @param property
+		 *            the {@link ElkDataPropertyExpression} for which the object
+		 *            should be created
+		 * @param cardinality
+		 *            the cardinality for which the object should be created
+		 * @return an {@link ElkDataMaxCardinalityUnqualified} corresponding to the
+		 *         input
+		 */
+		public ElkDataMaxCardinalityUnqualified getDataMaxCardinalityUnqualified(
+				ElkDataPropertyExpression property, int cardinality);
+	}
 
 }

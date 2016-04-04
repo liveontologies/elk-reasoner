@@ -42,8 +42,8 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkDataIntersectionOfImpl extends ElkDataRangeListObject implements
 		ElkDataIntersectionOf {
 
-	ElkDataIntersectionOfImpl(List<? extends ElkDataRange> dataRanges) {
-		super(dataRanges);
+	ElkDataIntersectionOfImpl(List<? extends ElkDataRange> ranges) {
+		super(ranges);
 	}
 
 	@Override

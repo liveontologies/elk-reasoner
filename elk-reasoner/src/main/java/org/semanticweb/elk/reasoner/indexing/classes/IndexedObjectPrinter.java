@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.owl.predefined.PredefinedElkIris;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexPropertyChain;
@@ -65,11 +65,11 @@ public class IndexedObjectPrinter implements IndexedObject.Visitor<String> {
 	@Override
 	public String visit(IndexedClass element) {
 		ElkClass entity = element.getElkEntity();
-		if (entity == PredefinedElkClass.OWL_THING) {
+		if (entity.getIri().equals(PredefinedElkIris.OWL_THING)) {
 			return "⊤";
 		}
 		// else
-		if (entity == PredefinedElkClass.OWL_NOTHING) {
+		if (entity.getIri().equals(PredefinedElkIris.OWL_NOTHING)) {
 			return "⊥";
 		}
 		// else

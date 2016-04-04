@@ -28,7 +28,7 @@ import java.util.Map;
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatch;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionDelegatingFactory;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +44,7 @@ class ConclusionMatchExpressionRecycleFactory
 
 	private final Collection<ConclusionMatch> newConclusions_;
 
-	ConclusionMatchExpressionRecycleFactory(ElkObjectFactory elkObjectFactory,
+	ConclusionMatchExpressionRecycleFactory(ElkObject.Factory elkObjectFactory,
 			Collection<ConclusionMatch> newMatches,
 			ConclusionMatch.Visitor<?> newMatchVisitor) {
 		super(elkObjectFactory);
@@ -57,9 +57,11 @@ class ConclusionMatchExpressionRecycleFactory
 		@SuppressWarnings("unchecked")
 		C previous = (C) cache_.get(candidate);
 		if (previous != null) {
+			LOGGER_.trace("{}: recycled", previous);
 			return previous;
 		}
 		// else
+		LOGGER_.trace("{}: new", candidate);
 		cache_.put(candidate, candidate);
 		newConclusions_.add(candidate);
 		candidate.accept(newMatchVisitor_);

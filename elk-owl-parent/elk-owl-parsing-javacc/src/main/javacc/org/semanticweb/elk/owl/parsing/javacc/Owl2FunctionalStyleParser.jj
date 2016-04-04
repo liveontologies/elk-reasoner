@@ -105,10 +105,11 @@ import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNegativeDataPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkNegativeObjectPropertyAssertionAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinality;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject.Factory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
@@ -155,7 +156,7 @@ public abstract class AbstractOwl2FunctionalStyleParser implements Owl2Parser {
 	/**
 	 * Get a factory used for creating of ELK Objects.
 	 */
-	protected abstract ElkObjectFactory getElkObjectFactory();
+	protected abstract ElkObject.Factory getElkObjectFactory();
 
 	@Override
 	public void declarePrefix(ElkPrefix prefix) {
@@ -1228,7 +1229,7 @@ ElkDataSomeValuesFrom dataSomeValuesFromSuffix(List<ElkDataPropertyExpression> d
 		) 
 	)
 	{
-		return getElkObjectFactory().getDataSomeValuesFrom(dr, dpList);
+		return getElkObjectFactory().getDataSomeValuesFrom(dpList, dr);
 	}
 }
 
@@ -1261,7 +1262,7 @@ ElkDataAllValuesFrom dataAllValuesFromSuffix(List<ElkDataPropertyExpression> dpL
 		) 
 	)
 	{
-		return getElkObjectFactory().getDataAllValuesFrom(dr, dpList);
+		return getElkObjectFactory().getDataAllValuesFrom(dpList, dr);
 	}
 }
 

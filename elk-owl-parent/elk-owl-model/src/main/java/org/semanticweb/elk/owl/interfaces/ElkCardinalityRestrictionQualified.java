@@ -47,4 +47,21 @@ public interface ElkCardinalityRestrictionQualified<P, F> extends
 	 */
 	public <O> O accept(ElkCardinalityRestrictionQualifiedVisitor<O> visitor);
 
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory extends ElkDataExactCardinalityQualified.Factory,
+			ElkDataMaxCardinalityQualified.Factory,
+			ElkDataMinCardinalityQualified.Factory,
+			ElkObjectExactCardinalityQualified.Factory,
+			ElkObjectMaxCardinalityQualified.Factory,
+			ElkObjectMinCardinalityQualified.Factory {
+
+		// combined interface
+
+	}
+
 }

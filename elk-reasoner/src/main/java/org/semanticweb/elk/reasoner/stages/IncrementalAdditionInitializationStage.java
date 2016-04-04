@@ -95,7 +95,7 @@ public class IncrementalAdditionInitializationStage
 
 		// first, create and init contexts for new classes
 		final ElkPolarityExpressionConverter converter = new ElkPolarityExpressionConverterImpl(
-				reasoner.ontologyIndex);
+				reasoner.getElkFactory(), reasoner.ontologyIndex);
 		final SaturationStateWriter<?> writer = reasoner.saturationState
 				.getContextCreatingWriter(contextCreationListener,
 						contextModificationListener);

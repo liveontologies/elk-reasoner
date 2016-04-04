@@ -28,8 +28,6 @@ import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedEntity;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 
 /**
  * Implements {@link CachedIndexedIndividual}
@@ -59,14 +57,6 @@ class CachedIndexedIndividualImpl extends
 	@Override
 	public CachedIndexedIndividual structuralEquals(Object other) {
 		return CachedIndexedIndividual.Helper.structuralEquals(this, other);
-	}
-
-	@Override
-	public boolean updateOccurrenceNumbers(final ModifiableOntologyIndex index,
-			OccurrenceIncrement increment) {
-
-		totalOccurrenceNo += increment.totalIncrement;
-		return true;
 	}
 
 	@Override

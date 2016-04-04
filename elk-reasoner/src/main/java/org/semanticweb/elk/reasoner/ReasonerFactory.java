@@ -26,6 +26,8 @@
 package org.semanticweb.elk.reasoner;
 
 import org.semanticweb.elk.loading.AxiomLoader;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
@@ -49,27 +51,29 @@ public class ReasonerFactory {
 	final static ReasonerStageExecutor DEFAULT_STAGE_EXECUTOR = new SimpleStageExecutor();
 
 	public Reasoner createReasoner(AxiomLoader axiomLoader) {
-		return createReasoner(axiomLoader, DEFAULT_STAGE_EXECUTOR,
+		return createReasoner(new ElkObjectEntityRecyclingFactory(),
+				axiomLoader, DEFAULT_STAGE_EXECUTOR,
 				ReasonerConfiguration.getConfiguration());
 	}
 
-	/**
-	 * Creates {@link Reasoner} with the configuration loaded from
-	 * elk.properties (if exists in the classpath) or the default configuration
-	 * 
-	 * @param stageExecutor
-	 * @return ELK reasoner
-	 */
 	public Reasoner createReasoner(AxiomLoader axiomLoader,
 			ReasonerStageExecutor stageExecutor) {
 		return createReasoner(axiomLoader, stageExecutor,
 				ReasonerConfiguration.getConfiguration());
 	}
-
-	@SuppressWarnings("static-method")
+	
 	public Reasoner createReasoner(AxiomLoader axiomLoader,
 			ReasonerStageExecutor stageExecutor, ReasonerConfiguration config) {
-		Reasoner reasoner = new Reasoner(axiomLoader, stageExecutor, config);
+		return createReasoner(new ElkObjectEntityRecyclingFactory(),
+				axiomLoader, stageExecutor, config);
+	}
+
+	@SuppressWarnings("static-method")
+	public Reasoner createReasoner(ElkObject.Factory elkFactory,
+			AxiomLoader axiomLoader, ReasonerStageExecutor stageExecutor,
+			ReasonerConfiguration config) {
+		Reasoner reasoner = new Reasoner(elkFactory, axiomLoader, stageExecutor,
+				config);
 
 		return reasoner;
 	}

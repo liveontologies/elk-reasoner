@@ -30,14 +30,14 @@ import java.util.List;
 import org.semanticweb.elk.owl.visitors.ElkEquivalentObjectPropertiesAxiomVisitor;
 
 /**
- * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Equivalent_Object_Properties">Equivalent
- * Object Properties Axiom<a> in the OWL 2 specification.
+ * Corresponds to an
+ * <a href= "http://www.w3.org/TR/owl2-syntax/#Equivalent_Object_Properties">
+ * Equivalent Object Properties Axiom<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
-public interface ElkEquivalentObjectPropertiesAxiom extends
-		ElkObjectPropertyAxiom {
+public interface ElkEquivalentObjectPropertiesAxiom
+		extends ElkObjectPropertyAxiom {
 
 	/**
 	 * Get the list of equivalent object property expressions that this axiom
@@ -57,5 +57,46 @@ public interface ElkEquivalentObjectPropertiesAxiom extends
 	 */
 	public abstract <O> O accept(
 			ElkEquivalentObjectPropertiesAxiomVisitor<O> visitor);
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		/**
+		 * Create an {@link ElkEquivalentObjectPropertiesAxiom}.
+		 * 
+		 * @param first
+		 *            the first equivalent {@link ElkObjectPropertyExpression}
+		 *            for which the axiom should be created
+		 * @param second
+		 *            the second equivalent {@link ElkObjectPropertyExpression}
+		 *            for which the axiom should be created
+		 * @param other
+		 *            other equivalent {@link ElkObjectPropertyExpression}s for
+		 *            which the axiom should be created
+		 * @return an {@link ElkEquivalentObjectPropertiesAxiom} corresponding
+		 *         to the input
+		 */
+		public ElkEquivalentObjectPropertiesAxiom getEquivalentObjectPropertiesAxiom(
+				ElkObjectPropertyExpression first,
+				ElkObjectPropertyExpression second,
+				ElkObjectPropertyExpression... other);
+
+		/**
+		 * Create an {@link ElkEquivalentObjectPropertiesAxiom}.
+		 * 
+		 * @param equivalentObjectPropertyExpressions
+		 *            the equivalent {@link ElkObjectPropertyExpression}s for
+		 *            which the axiom should be created
+		 * @return an {@link ElkEquivalentObjectPropertiesAxiom} corresponding
+		 *         to the input
+		 */
+		public ElkEquivalentObjectPropertiesAxiom getEquivalentObjectPropertiesAxiom(
+				List<? extends ElkObjectPropertyExpression> equivalentObjectPropertyExpressions);
+	}
 
 }

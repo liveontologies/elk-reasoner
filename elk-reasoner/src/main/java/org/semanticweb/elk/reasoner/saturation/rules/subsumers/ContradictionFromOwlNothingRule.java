@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
  * #L%
  */
 
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.owl.predefined.PredefinedElkIris;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
@@ -57,9 +57,10 @@ public class ContradictionFromOwlNothingRule extends
 	}
 
 	private static void checkOwlNothing(IndexedClass candidate) {
-		if (candidate.getElkEntity() != PredefinedElkClass.OWL_NOTHING)
+		if (!candidate.getElkEntity().getIri().equals(PredefinedElkIris.OWL_NOTHING)) {		
 			throw new IllegalArgumentException(
-					"The rule can be registered only for owl:Nothing");
+					"The rule can be registered only for owl:Nothing and not for " + candidate);
+		}	
 	}
 
 	public static boolean addRuleFor(ModifiableIndexedClass owlNothing,

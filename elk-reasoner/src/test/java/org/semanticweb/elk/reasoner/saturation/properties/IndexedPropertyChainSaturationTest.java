@@ -34,9 +34,9 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.reasoner.DummyProgressMonitor;
 import org.semanticweb.elk.reasoner.indexing.classes.DirectIndex;
 import org.semanticweb.elk.reasoner.indexing.classes.IndexedObjectsCreator;
@@ -61,9 +61,9 @@ public class IndexedPropertyChainSaturationTest {
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
-	public void testPropertyCompositionSymmetry() {
-		ModifiableOntologyIndex index = new DirectIndex();
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+	public void testPropertyCompositionSymmetry() {		
+		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
+		ModifiableOntologyIndex index = new DirectIndex(factory);
 
 		ModifiableIndexedObjectProperty R1 = IndexedObjectsCreator
 				.createIndexedObjectProperty(index,
@@ -132,8 +132,8 @@ public class IndexedPropertyChainSaturationTest {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testCyclicCompositions() {
-		ModifiableOntologyIndex index = new DirectIndex();
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
+		ModifiableOntologyIndex index = new DirectIndex(factory);
 
 		ModifiableIndexedObjectProperty H = IndexedObjectsCreator
 				.createIndexedObjectProperty(index,

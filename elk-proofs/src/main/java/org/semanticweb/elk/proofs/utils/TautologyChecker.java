@@ -22,9 +22,11 @@ package org.semanticweb.elk.proofs.utils;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.owl.predefined.PredefinedElkIris;
 import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
@@ -40,10 +42,9 @@ import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
  * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
  */
-public class TautologyChecker extends
-		DummyElkAxiomVisitor<Boolean> implements
+public class TautologyChecker extends DummyElkAxiomVisitor<Boolean> implements
 		ExpressionVisitor<Void, Boolean>, ElkLemmaVisitor<Void, Boolean> {
 
 	@Override
@@ -63,7 +64,8 @@ public class TautologyChecker extends
 
 	@Override
 	public Boolean visit(ElkSubPropertyChainOfLemma lemma, Void input) {
-		return StructuralEquivalenceChecker.equal(lemma.getSubPropertyChain(), lemma.getSuperPropertyChain());
+		return StructuralEquivalenceChecker.equal(lemma.getSubPropertyChain(),
+				lemma.getSuperPropertyChain());
 	}
 
 	@Override
@@ -78,14 +80,20 @@ public class TautologyChecker extends
 
 	@Override
 	public Boolean visit(ElkSubClassOfAxiom ax) {
-		return StructuralEquivalenceChecker.equal(ax.getSubClassExpression(), ax.getSuperClassExpression()) || 
-				StructuralEquivalenceChecker.equal(ax.getSuperClassExpression(), PredefinedElkClass.OWL_THING) ||
-				StructuralEquivalenceChecker.equal(PredefinedElkClass.OWL_NOTHING, ax.getSubClassExpression());
+		ElkClassExpression sub = ax.getSubClassExpression();
+		ElkClassExpression sup = ax.getSuperClassExpression();
+		return StructuralEquivalenceChecker.equal(sub, sup)
+				|| (sub instanceof ElkClass && ((ElkClass) sub).getIri()
+						.equals(PredefinedElkIris.OWL_NOTHING))
+				|| (sup instanceof ElkClass && ((ElkClass) sup).getIri()
+						.equals(PredefinedElkIris.OWL_THING));
 	}
 
 	@Override
 	public Boolean visit(ElkSubObjectPropertyOfAxiom ax) {
-		return StructuralEquivalenceChecker.equal(ax.getSubObjectPropertyExpression(), ax.getSuperObjectPropertyExpression());
+		return StructuralEquivalenceChecker.equal(
+				ax.getSubObjectPropertyExpression(),
+				ax.getSuperObjectPropertyExpression());
 	}
-	
+
 }

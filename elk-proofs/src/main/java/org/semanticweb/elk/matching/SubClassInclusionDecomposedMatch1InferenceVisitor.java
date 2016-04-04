@@ -30,7 +30,6 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecom
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedDefinition;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSubClassOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionObjectHasSelfPropertyRange;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionOwlThing;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionRange;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionTautology;
 
@@ -76,12 +75,6 @@ class SubClassInclusionDecomposedMatch1InferenceVisitor
 	public Void visit(SubClassInclusionObjectHasSelfPropertyRange inference) {
 		factory.getSubClassInclusionObjectHasSelfPropertyRangeMatch1(inference,
 				child);
-		return null;
-	}
-
-	@Override
-	public Void visit(SubClassInclusionOwlThing inference) {
-		factory.getSubClassInclusionOwlThingMatch1(inference, child);
 		return null;
 	}
 

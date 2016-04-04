@@ -39,13 +39,13 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
  */
 public class ElkAnnotationImpl implements ElkAnnotation {
 
-	private final ElkAnnotationProperty annProperty_;
-	private final ElkAnnotationValue annValue_;
+	private final ElkAnnotationProperty property_;
+	private final ElkAnnotationValue value_;
 
-	ElkAnnotationImpl(ElkAnnotationProperty annProperty,
-			ElkAnnotationValue annValue) {
-		this.annProperty_ = annProperty;
-		this.annValue_ = annValue;
+	ElkAnnotationImpl(ElkAnnotationProperty property,
+			ElkAnnotationValue value) {
+		this.property_ = property;
+		this.value_ = value;
 	}
 
 	@Override
@@ -60,12 +60,12 @@ public class ElkAnnotationImpl implements ElkAnnotation {
 
 	@Override
 	public ElkAnnotationProperty getProperty() {
-		return annProperty_;
+		return property_;
 	}
 
 	@Override
 	public ElkAnnotationValue getValue() {
-		return annValue_;
+		return value_;
 	}
 
 }

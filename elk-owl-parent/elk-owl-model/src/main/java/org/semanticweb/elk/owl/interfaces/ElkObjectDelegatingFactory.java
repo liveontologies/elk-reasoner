@@ -27,18 +27,18 @@ import java.util.List;
 import org.semanticweb.elk.owl.iris.ElkIri;
 
 /**
- * An {@link ElkObjectFactory} that delegates all calls to the provided
- * {@code ElkObjectFactory}. Useful as a prototype for factories that perform
+ * An {@link ElkObject.Factory} that delegates all calls to the provided
+ * {@code ElkObject.Factory}. Useful as a prototype for factories that perform
  * additional actions in addition to creation of the {@link ElkObject}s.
  * 
  * @author Yevgeny Kazakov
  *
  */
-public class ElkObjectDelegatingFactory implements ElkObjectFactory {
+public class ElkObjectDelegatingFactory implements ElkObject.Factory {
 
-	private final ElkObjectFactory factory_;
+	private final ElkObject.Factory factory_;
 
-	public ElkObjectDelegatingFactory(ElkObjectFactory factory) {
+	public ElkObjectDelegatingFactory(ElkObject.Factory factory) {
 		this.factory_ = factory;
 	}
 
@@ -54,16 +54,16 @@ public class ElkObjectDelegatingFactory implements ElkObjectFactory {
 	}
 
 	@Override
-	public ElkAnnotationProperty getAnnotationProperty(ElkIri iri) {
-		return filter(factory_.getAnnotationProperty(iri));
-	}
-
-	@Override
 	public ElkAnnotationAssertionAxiom getAnnotationAssertionAxiom(
 			ElkAnnotationProperty property, ElkAnnotationSubject subject,
 			ElkAnnotationValue value) {
 		return filter(
 				factory_.getAnnotationAssertionAxiom(property, subject, value));
+	}
+
+	@Override
+	public ElkAnnotationProperty getAnnotationProperty(ElkIri iri) {
+		return filter(factory_.getAnnotationProperty(iri));
 	}
 
 	@Override
@@ -87,9 +87,9 @@ public class ElkObjectDelegatingFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkAsymmetricObjectPropertyAxiom getAsymmetricObjectPropertyAxiom(
-			ElkObjectPropertyExpression objectPropertyExpression) {
+			ElkObjectPropertyExpression property) {
 		return filter(factory_
-				.getAsymmetricObjectPropertyAxiom(objectPropertyExpression));
+				.getAsymmetricObjectPropertyAxiom(property));
 	}
 
 	@Override
@@ -105,98 +105,98 @@ public class ElkObjectDelegatingFactory implements ElkObjectFactory {
 	}
 
 	@Override
-	public ElkDataAllValuesFrom getDataAllValuesFrom(ElkDataRange dataRange,
-			ElkDataPropertyExpression dpe1, ElkDataPropertyExpression... dpe) {
-		return filter(factory_.getDataAllValuesFrom(dataRange, dpe1, dpe));
+	public ElkDataAllValuesFrom getDataAllValuesFrom(ElkDataRange range,
+			ElkDataPropertyExpression first, ElkDataPropertyExpression... other) {
+		return filter(factory_.getDataAllValuesFrom(range, first, other));
 	}
 
 	@Override
-	public ElkDataAllValuesFrom getDataAllValuesFrom(ElkDataRange dataRange,
-			List<? extends ElkDataPropertyExpression> dpList) {
-		return filter(factory_.getDataAllValuesFrom(dataRange, dpList));
+	public ElkDataAllValuesFrom getDataAllValuesFrom(List<? extends ElkDataPropertyExpression> properties,
+			ElkDataRange range) {
+		return filter(factory_.getDataAllValuesFrom(properties, range));
 	}
 
 	@Override
-	public ElkDataComplementOf getDataComplementOf(ElkDataRange dataRange) {
-		return filter(factory_.getDataComplementOf(dataRange));
-	}
-
-	@Override
-	public ElkDataExactCardinalityUnqualified getDataExactCardinalityUnqualified(
-			ElkDataPropertyExpression dataPropertyExpression, int cardinality) {
-		return filter(factory_.getDataExactCardinalityUnqualified(
-				dataPropertyExpression, cardinality));
+	public ElkDataComplementOf getDataComplementOf(ElkDataRange range) {
+		return filter(factory_.getDataComplementOf(range));
 	}
 
 	@Override
 	public ElkDataExactCardinalityQualified getDataExactCardinalityQualified(
-			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
-			ElkDataRange dataRange) {
+			ElkDataPropertyExpression property, int cardinality,
+			ElkDataRange range) {
 		return filter(factory_.getDataExactCardinalityQualified(
-				dataPropertyExpression, cardinality, dataRange));
+				property, cardinality, range));
+	}
+
+	@Override
+	public ElkDataExactCardinalityUnqualified getDataExactCardinalityUnqualified(
+			ElkDataPropertyExpression property, int cardinality) {
+		return filter(factory_.getDataExactCardinalityUnqualified(
+				property, cardinality));
 	}
 
 	@Override
 	public ElkDataHasValue getDataHasValue(
-			ElkDataPropertyExpression dataPropertyExpression,
-			ElkLiteral literal) {
+			ElkDataPropertyExpression property,
+			ElkLiteral value) {
 		return filter(
-				factory_.getDataHasValue(dataPropertyExpression, literal));
+				factory_.getDataHasValue(property, value));
 	}
 
 	@Override
 	public ElkDataIntersectionOf getDataIntersectionOf(
-			ElkDataRange firstDataRange, ElkDataRange secondDataRange,
-			ElkDataRange... otherDataRanges) {
-		return filter(factory_.getDataIntersectionOf(firstDataRange,
-				secondDataRange, otherDataRanges));
+			ElkDataRange first, ElkDataRange second,
+			ElkDataRange... other) {
+		return filter(factory_.getDataIntersectionOf(first,
+				second, other));
 	}
 
 	@Override
 	public ElkDataIntersectionOf getDataIntersectionOf(
-			List<? extends ElkDataRange> dataRanges) {
-		return filter(factory_.getDataIntersectionOf(dataRanges));
-	}
-
-	@Override
-	public ElkDataMaxCardinalityUnqualified getDataMaxCardinalityUnqualified(
-			ElkDataPropertyExpression dataPropertyExpression, int cardinality) {
-		return filter(factory_.getDataMaxCardinalityUnqualified(
-				dataPropertyExpression, cardinality));
+			List<? extends ElkDataRange> ranges) {
+		return filter(factory_.getDataIntersectionOf(ranges));
 	}
 
 	@Override
 	public ElkDataMaxCardinalityQualified getDataMaxCardinalityQualified(
-			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
-			ElkDataRange dataRange) {
+			ElkDataPropertyExpression property, int cardinality,
+			ElkDataRange range) {
 		return filter(factory_.getDataMaxCardinalityQualified(
-				dataPropertyExpression, cardinality, dataRange));
+				property, cardinality, range));
 	}
 
 	@Override
-	public ElkDataMinCardinalityUnqualified getDataMinCardinalityUnqualified(
-			ElkDataPropertyExpression dataPropertyExpression, int cardinality) {
-		return filter(factory_.getDataMinCardinalityUnqualified(
-				dataPropertyExpression, cardinality));
+	public ElkDataMaxCardinalityUnqualified getDataMaxCardinalityUnqualified(
+			ElkDataPropertyExpression property, int cardinality) {
+		return filter(factory_.getDataMaxCardinalityUnqualified(
+				property, cardinality));
 	}
 
 	@Override
 	public ElkDataMinCardinalityQualified getDataMinCardinalityQualified(
-			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
-			ElkDataRange dataRange) {
+			ElkDataPropertyExpression property, int cardinality,
+			ElkDataRange range) {
 		return filter(factory_.getDataMinCardinalityQualified(
-				dataPropertyExpression, cardinality, dataRange));
+				property, cardinality, range));
 	}
 
 	@Override
-	public ElkDataOneOf getDataOneOf(ElkLiteral firstLiteral,
-			ElkLiteral... otherLiterals) {
-		return filter(factory_.getDataOneOf(firstLiteral, otherLiterals));
+	public ElkDataMinCardinalityUnqualified getDataMinCardinalityUnqualified(
+			ElkDataPropertyExpression property, int cardinality) {
+		return filter(factory_.getDataMinCardinalityUnqualified(
+				property, cardinality));
 	}
 
 	@Override
-	public ElkDataOneOf getDataOneOf(List<? extends ElkLiteral> literals) {
-		return filter(factory_.getDataOneOf(literals));
+	public ElkDataOneOf getDataOneOf(ElkLiteral first,
+			ElkLiteral... other) {
+		return filter(factory_.getDataOneOf(first, other));
+	}
+
+	@Override
+	public ElkDataOneOf getDataOneOf(List<? extends ElkLiteral> members) {
+		return filter(factory_.getDataOneOf(members));
 	}
 
 	@Override
@@ -206,45 +206,51 @@ public class ElkObjectDelegatingFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkDataPropertyAssertionAxiom getDataPropertyAssertionAxiom(
-			ElkDataPropertyExpression dataPropertyExpression,
-			ElkIndividual individual, ElkLiteral literal) {
+			ElkDataPropertyExpression property,
+			ElkIndividual subject, ElkLiteral object) {
 		return filter(factory_.getDataPropertyAssertionAxiom(
-				dataPropertyExpression, individual, literal));
+				property, subject, object));
 	}
 
 	@Override
 	public ElkDataPropertyDomainAxiom getDataPropertyDomainAxiom(
-			ElkDataPropertyExpression dataPropertyExpression,
-			ElkClassExpression classExpression) {
+			ElkDataPropertyExpression property,
+			ElkClassExpression domain) {
 		return filter(factory_.getDataPropertyDomainAxiom(
-				dataPropertyExpression, classExpression));
+				property, domain));
 	}
 
 	@Override
 	public ElkDataPropertyRangeAxiom getDataPropertyRangeAxiom(
-			ElkDataPropertyExpression dataPropertyExpression,
-			ElkDataRange dataRange) {
-		return filter(factory_.getDataPropertyRangeAxiom(dataPropertyExpression,
-				dataRange));
+			ElkDataPropertyExpression property,
+			ElkDataRange range) {
+		return filter(factory_.getDataPropertyRangeAxiom(property,
+				range));
 	}
 
 	@Override
-	public ElkDataSomeValuesFrom getDataSomeValuesFrom(ElkDataRange dataRange,
-			ElkDataPropertyExpression firstDataPropertyExpression,
-			ElkDataPropertyExpression... otherDataPropertyExpressions) {
-		return filter(factory_.getDataSomeValuesFrom(dataRange,
-				firstDataPropertyExpression, otherDataPropertyExpressions));
+	public ElkDataSomeValuesFrom getDataSomeValuesFrom(ElkDataRange range,
+			ElkDataPropertyExpression first,
+			ElkDataPropertyExpression... other) {
+		return filter(factory_.getDataSomeValuesFrom(range,
+				first, other));
 	}
 
 	@Override
-	public ElkDataSomeValuesFrom getDataSomeValuesFrom(ElkDataRange dataRange,
-			List<? extends ElkDataPropertyExpression> dpList) {
-		return filter(factory_.getDataSomeValuesFrom(dataRange, dpList));
+	public ElkDataSomeValuesFrom getDataSomeValuesFrom(List<? extends ElkDataPropertyExpression> properties,
+			ElkDataRange range) {
+		return filter(factory_.getDataSomeValuesFrom(properties, range));
 	}
 
 	@Override
 	public ElkDatatype getDatatype(ElkIri iri) {
 		return filter(factory_.getDatatype(iri));
+	}
+
+	@Override
+	public ElkDatatypeDefinitionAxiom getDatatypeDefinitionAxiom(
+			ElkDatatype datatype, ElkDataRange dataRange) {
+		return filter(factory_.getDatatypeDefinitionAxiom(datatype, dataRange));
 	}
 
 	@Override
@@ -254,22 +260,22 @@ public class ElkObjectDelegatingFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkDatatypeRestriction getDatatypeRestriction(ElkDatatype datatype,
-			List<ElkFacetRestriction> facetRestrictions) {
+			List<ElkFacetRestriction> restrictions) {
 		return filter(
-				factory_.getDatatypeRestriction(datatype, facetRestrictions));
+				factory_.getDatatypeRestriction(datatype, restrictions));
 	}
 
 	@Override
-	public ElkDataUnionOf getDataUnionOf(ElkDataRange firstDataRange,
-			ElkDataRange secondDataRange, ElkDataRange... otherDataRanges) {
-		return filter(factory_.getDataUnionOf(firstDataRange, secondDataRange,
-				otherDataRanges));
+	public ElkDataUnionOf getDataUnionOf(ElkDataRange first,
+			ElkDataRange second, ElkDataRange... other) {
+		return filter(factory_.getDataUnionOf(first, second,
+				other));
 	}
 
 	@Override
 	public ElkDataUnionOf getDataUnionOf(
-			List<? extends ElkDataRange> dataRanges) {
-		return filter(factory_.getDataUnionOf(dataRanges));
+			List<? extends ElkDataRange> ranges) {
+		return filter(factory_.getDataUnionOf(ranges));
 	}
 
 	@Override
@@ -279,10 +285,10 @@ public class ElkObjectDelegatingFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkDifferentIndividualsAxiom getDifferentIndividualsAxiom(
-			ElkIndividual firstIndividual, ElkIndividual secondIndividual,
-			ElkIndividual... otherIndividuals) {
-		return filter(factory_.getDifferentIndividualsAxiom(firstIndividual,
-				secondIndividual, otherIndividuals));
+			ElkIndividual first, ElkIndividual second,
+			ElkIndividual... other) {
+		return filter(factory_.getDifferentIndividualsAxiom(first,
+				second, other));
 	}
 
 	@Override
@@ -293,11 +299,11 @@ public class ElkObjectDelegatingFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkDisjointClassesAxiom getDisjointClassesAxiom(
-			ElkClassExpression firstClassExpression,
-			ElkClassExpression secondClassExpression,
-			ElkClassExpression... otherClassExpressions) {
-		return filter(factory_.getDisjointClassesAxiom(firstClassExpression,
-				secondClassExpression, otherClassExpressions));
+			ElkClassExpression first,
+			ElkClassExpression second,
+			ElkClassExpression... other) {
+		return filter(factory_.getDisjointClassesAxiom(first,
+				second, other));
 	}
 
 	@Override
@@ -309,12 +315,12 @@ public class ElkObjectDelegatingFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkDisjointDataPropertiesAxiom getDisjointDataPropertiesAxiom(
-			ElkDataPropertyExpression firstDataPropertyExpression,
-			ElkDataPropertyExpression secondDataPropertyExpression,
-			ElkDataPropertyExpression... otherDataPropertyExpressions) {
+			ElkDataPropertyExpression first,
+			ElkDataPropertyExpression second,
+			ElkDataPropertyExpression... other) {
 		return filter(factory_.getDisjointDataPropertiesAxiom(
-				firstDataPropertyExpression, secondDataPropertyExpression,
-				otherDataPropertyExpressions));
+				first, second,
+				other));
 	}
 
 	@Override
@@ -326,12 +332,12 @@ public class ElkObjectDelegatingFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkDisjointObjectPropertiesAxiom getDisjointObjectPropertiesAxiom(
-			ElkObjectPropertyExpression firstObjectPropertyExpression,
-			ElkObjectPropertyExpression secondObjectPropertyExpression,
-			ElkObjectPropertyExpression... otherObjectPropertyExpressions) {
+			ElkObjectPropertyExpression first,
+			ElkObjectPropertyExpression second,
+			ElkObjectPropertyExpression... other) {
 		return filter(factory_.getDisjointObjectPropertiesAxiom(
-				firstObjectPropertyExpression, secondObjectPropertyExpression,
-				otherObjectPropertyExpressions));
+				first, second,
+				other));
 	}
 
 	@Override
@@ -343,12 +349,12 @@ public class ElkObjectDelegatingFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkDisjointUnionAxiom getDisjointUnionAxiom(ElkClass definedClass,
-			ElkClassExpression firstClassExpression,
-			ElkClassExpression secondClassExpression,
-			ElkClassExpression... otherClassExpressions) {
+			ElkClassExpression first,
+			ElkClassExpression second,
+			ElkClassExpression... other) {
 		return filter(factory_.getDisjointUnionAxiom(definedClass,
-				firstClassExpression, secondClassExpression,
-				otherClassExpressions));
+				first, second,
+				other));
 	}
 
 	@Override
@@ -360,11 +366,11 @@ public class ElkObjectDelegatingFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkEquivalentClassesAxiom getEquivalentClassesAxiom(
-			ElkClassExpression firstClassExpression,
-			ElkClassExpression secondClassExpression,
-			ElkClassExpression... otherClassExpressions) {
-		return filter(factory_.getEquivalentClassesAxiom(firstClassExpression,
-				secondClassExpression, otherClassExpressions));
+			ElkClassExpression first,
+			ElkClassExpression second,
+			ElkClassExpression... other) {
+		return filter(factory_.getEquivalentClassesAxiom(first,
+				second, other));
 	}
 
 	@Override
@@ -376,12 +382,12 @@ public class ElkObjectDelegatingFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkEquivalentDataPropertiesAxiom getEquivalentDataPropertiesAxiom(
-			ElkDataPropertyExpression firstDataPropertyExpression,
-			ElkDataPropertyExpression secondDataPropertyExpression,
-			ElkDataPropertyExpression... otherDataPropertyExpressions) {
+			ElkDataPropertyExpression first,
+			ElkDataPropertyExpression second,
+			ElkDataPropertyExpression... other) {
 		return filter(factory_.getEquivalentDataPropertiesAxiom(
-				firstDataPropertyExpression, secondDataPropertyExpression,
-				otherDataPropertyExpressions));
+				first, second,
+				other));
 	}
 
 	@Override
@@ -393,12 +399,12 @@ public class ElkObjectDelegatingFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkEquivalentObjectPropertiesAxiom getEquivalentObjectPropertiesAxiom(
-			ElkObjectPropertyExpression firstObjectPropertyExpression,
-			ElkObjectPropertyExpression secondObjectPropertyExpression,
-			ElkObjectPropertyExpression... otherObjectPropertyExpressions) {
+			ElkObjectPropertyExpression first,
+			ElkObjectPropertyExpression second,
+			ElkObjectPropertyExpression... other) {
 		return filter(factory_.getEquivalentObjectPropertiesAxiom(
-				firstObjectPropertyExpression, secondObjectPropertyExpression,
-				otherObjectPropertyExpressions));
+				first, second,
+				other));
 	}
 
 	@Override
@@ -409,39 +415,52 @@ public class ElkObjectDelegatingFactory implements ElkObjectFactory {
 	}
 
 	@Override
+	public ElkFacetRestriction getFacetRestriction(ElkIri iri,
+			ElkLiteral literal) {
+		return filter(factory_.getFacetRestriction(iri, literal));
+	}
+
+	@Override
 	public ElkFunctionalDataPropertyAxiom getFunctionalDataPropertyAxiom(
-			ElkDataPropertyExpression dataPropertyExpression) {
+			ElkDataPropertyExpression property) {
 		return filter(factory_
-				.getFunctionalDataPropertyAxiom(dataPropertyExpression));
+				.getFunctionalDataPropertyAxiom(property));
 	}
 
 	@Override
 	public ElkFunctionalObjectPropertyAxiom getFunctionalObjectPropertyAxiom(
-			ElkObjectPropertyExpression objectPropertyExpression) {
+			ElkObjectPropertyExpression property) {
 		return filter(factory_
-				.getFunctionalObjectPropertyAxiom(objectPropertyExpression));
+				.getFunctionalObjectPropertyAxiom(property));
+	}
+
+	@Override
+	public ElkHasKeyAxiom getHasKeyAxiom(ElkClassExpression object,
+			List<? extends ElkObjectPropertyExpression> objectPropertyKeys,
+			List<? extends ElkDataPropertyExpression> dataPropertyKeys) {
+		return filter(factory_.getHasKeyAxiom(object, objectPropertyKeys, dataPropertyKeys));
 	}
 
 	@Override
 	public ElkInverseFunctionalObjectPropertyAxiom getInverseFunctionalObjectPropertyAxiom(
-			ElkObjectPropertyExpression objectPropertyExpression) {
+			ElkObjectPropertyExpression property) {
 		return filter(factory_.getInverseFunctionalObjectPropertyAxiom(
-				objectPropertyExpression));
+				property));
 	}
 
 	@Override
 	public ElkInverseObjectPropertiesAxiom getInverseObjectPropertiesAxiom(
-			ElkObjectPropertyExpression firstObjectPropertyExpression,
-			ElkObjectPropertyExpression secondObjectPropertyExpression) {
+			ElkObjectPropertyExpression first,
+			ElkObjectPropertyExpression second) {
 		return filter(factory_.getInverseObjectPropertiesAxiom(
-				firstObjectPropertyExpression, secondObjectPropertyExpression));
+				first, second));
 	}
 
 	@Override
 	public ElkIrreflexiveObjectPropertyAxiom getIrreflexiveObjectPropertyAxiom(
-			ElkObjectPropertyExpression objectPropertyExpression) {
+			ElkObjectPropertyExpression property) {
 		return filter(factory_
-				.getIrreflexiveObjectPropertyAxiom(objectPropertyExpression));
+				.getIrreflexiveObjectPropertyAxiom(property));
 	}
 
 	@Override
@@ -456,128 +475,128 @@ public class ElkObjectDelegatingFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkNegativeDataPropertyAssertionAxiom getNegativeDataPropertyAssertionAxiom(
-			ElkDataPropertyExpression dataPropertyExpression,
-			ElkIndividual individual, ElkLiteral literal) {
+			ElkDataPropertyExpression property,
+			ElkIndividual subject, ElkLiteral object) {
 		return filter(factory_.getNegativeDataPropertyAssertionAxiom(
-				dataPropertyExpression, individual, literal));
+				property, subject, object));
 	}
 
 	@Override
 	public ElkNegativeObjectPropertyAssertionAxiom getNegativeObjectPropertyAssertionAxiom(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			ElkIndividual firstIndividual, ElkIndividual secondIndividual) {
+			ElkObjectPropertyExpression property,
+			ElkIndividual subject, ElkIndividual object) {
 		return filter(factory_.getNegativeObjectPropertyAssertionAxiom(
-				objectPropertyExpression, firstIndividual, secondIndividual));
+				property, subject, object));
 	}
 
 	@Override
 	public ElkObjectAllValuesFrom getObjectAllValuesFrom(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			ElkClassExpression classExpression) {
-		return filter(factory_.getObjectAllValuesFrom(objectPropertyExpression,
-				classExpression));
+			ElkObjectPropertyExpression property,
+			ElkClassExpression filler) {
+		return filter(factory_.getObjectAllValuesFrom(property,
+				filler));
 	}
 
 	@Override
 	public ElkObjectComplementOf getObjectComplementOf(
-			ElkClassExpression classExpression) {
-		return filter(factory_.getObjectComplementOf(classExpression));
-	}
-
-	@Override
-	public ElkObjectExactCardinalityUnqualified getObjectExactCardinalityUnqualified(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			int cardinality) {
-		return filter(factory_.getObjectExactCardinalityUnqualified(
-				objectPropertyExpression, cardinality));
+			ElkClassExpression negated) {
+		return filter(factory_.getObjectComplementOf(negated));
 	}
 
 	@Override
 	public ElkObjectExactCardinalityQualified getObjectExactCardinalityQualified(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			int cardinality, ElkClassExpression classExpression) {
+			ElkObjectPropertyExpression property,
+			int cardinality, ElkClassExpression filler) {
 		return filter(factory_.getObjectExactCardinalityQualified(
-				objectPropertyExpression, cardinality, classExpression));
+				property, cardinality, filler));
+	}
+
+	@Override
+	public ElkObjectExactCardinalityUnqualified getObjectExactCardinalityUnqualified(
+			ElkObjectPropertyExpression property,
+			int cardinality) {
+		return filter(factory_.getObjectExactCardinalityUnqualified(
+				property, cardinality));
 	}
 
 	@Override
 	public ElkObjectHasSelf getObjectHasSelf(
-			ElkObjectPropertyExpression objectPropertyExpression) {
-		return filter(factory_.getObjectHasSelf(objectPropertyExpression));
+			ElkObjectPropertyExpression property) {
+		return filter(factory_.getObjectHasSelf(property));
 	}
 
 	@Override
 	public ElkObjectHasValue getObjectHasValue(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			ElkIndividual individual) {
-		return filter(factory_.getObjectHasValue(objectPropertyExpression,
-				individual));
+			ElkObjectPropertyExpression property,
+			ElkIndividual value) {
+		return filter(factory_.getObjectHasValue(property,
+				value));
 	}
 
 	@Override
 	public ElkObjectIntersectionOf getObjectIntersectionOf(
-			ElkClassExpression firstClassExpression,
-			ElkClassExpression secondClassExpression,
-			ElkClassExpression... otherClassExpressions) {
-		return filter(factory_.getObjectIntersectionOf(firstClassExpression,
-				secondClassExpression, otherClassExpressions));
+			ElkClassExpression first,
+			ElkClassExpression second,
+			ElkClassExpression... other) {
+		return filter(factory_.getObjectIntersectionOf(first,
+				second, other));
 	}
 
 	@Override
 	public ElkObjectIntersectionOf getObjectIntersectionOf(
-			List<? extends ElkClassExpression> classExpressions) {
-		return filter(factory_.getObjectIntersectionOf(classExpressions));
+			List<? extends ElkClassExpression> members) {
+		return filter(factory_.getObjectIntersectionOf(members));
 	}
 
 	@Override
 	public ElkObjectInverseOf getObjectInverseOf(
-			ElkObjectProperty objectProperty) {
-		return filter(factory_.getObjectInverseOf(objectProperty));
-	}
-
-	@Override
-	public ElkObjectMaxCardinalityUnqualified getObjectMaxCardinalityUnqualified(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			int cardinality) {
-		return filter(factory_.getObjectMaxCardinalityUnqualified(
-				objectPropertyExpression, cardinality));
+			ElkObjectProperty property) {
+		return filter(factory_.getObjectInverseOf(property));
 	}
 
 	@Override
 	public ElkObjectMaxCardinalityQualified getObjectMaxCardinalityQualified(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			int cardinality, ElkClassExpression classExpression) {
+			ElkObjectPropertyExpression property,
+			int cardinality, ElkClassExpression filler) {
 		return filter(factory_.getObjectMaxCardinalityQualified(
-				objectPropertyExpression, cardinality, classExpression));
+				property, cardinality, filler));
 	}
 
 	@Override
-	public ElkObjectMinCardinalityUnqualified getObjectMinCardinalityUnqualified(
-			ElkObjectPropertyExpression objectPropertyExpression,
+	public ElkObjectMaxCardinalityUnqualified getObjectMaxCardinalityUnqualified(
+			ElkObjectPropertyExpression property,
 			int cardinality) {
-		return filter(factory_.getObjectMinCardinalityUnqualified(
-				objectPropertyExpression, cardinality));
+		return filter(factory_.getObjectMaxCardinalityUnqualified(
+				property, cardinality));
 	}
 
 	@Override
 	public ElkObjectMinCardinalityQualified getObjectMinCardinalityQualified(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			int cardinality, ElkClassExpression classExpression) {
+			ElkObjectPropertyExpression property,
+			int cardinality, ElkClassExpression filler) {
 		return filter(factory_.getObjectMinCardinalityQualified(
-				objectPropertyExpression, cardinality, classExpression));
+				property, cardinality, filler));
 	}
 
 	@Override
-	public ElkObjectOneOf getObjectOneOf(ElkIndividual firstIndividual,
-			ElkIndividual... otherIndividuals) {
+	public ElkObjectMinCardinalityUnqualified getObjectMinCardinalityUnqualified(
+			ElkObjectPropertyExpression property,
+			int cardinality) {
+		return filter(factory_.getObjectMinCardinalityUnqualified(
+				property, cardinality));
+	}
+
+	@Override
+	public ElkObjectOneOf getObjectOneOf(ElkIndividual first,
+			ElkIndividual... other) {
 		return filter(
-				factory_.getObjectOneOf(firstIndividual, otherIndividuals));
+				factory_.getObjectOneOf(first, other));
 	}
 
 	@Override
 	public ElkObjectOneOf getObjectOneOf(
-			List<? extends ElkIndividual> individuals) {
-		return filter(factory_.getObjectOneOf(individuals));
+			List<? extends ElkIndividual> members) {
+		return filter(factory_.getObjectOneOf(members));
 	}
 
 	@Override
@@ -587,56 +606,56 @@ public class ElkObjectDelegatingFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkObjectPropertyAssertionAxiom getObjectPropertyAssertionAxiom(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			ElkIndividual firstIndividual, ElkIndividual secondIndividual) {
+			ElkObjectPropertyExpression property,
+			ElkIndividual subject, ElkIndividual object) {
 		return filter(factory_.getObjectPropertyAssertionAxiom(
-				objectPropertyExpression, firstIndividual, secondIndividual));
+				property, subject, object));
 	}
 
 	@Override
 	public ElkObjectPropertyChain getObjectPropertyChain(
-			List<? extends ElkObjectPropertyExpression> objectPropertyExpressions) {
+			List<? extends ElkObjectPropertyExpression> properties) {
 		return filter(
-				factory_.getObjectPropertyChain(objectPropertyExpressions));
+				factory_.getObjectPropertyChain(properties));
 	}
 
 	@Override
 	public ElkObjectPropertyDomainAxiom getObjectPropertyDomainAxiom(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			ElkClassExpression classExpression) {
+			ElkObjectPropertyExpression property,
+			ElkClassExpression domain) {
 		return filter(factory_.getObjectPropertyDomainAxiom(
-				objectPropertyExpression, classExpression));
+				property, domain));
 	}
 
 	@Override
 	public ElkObjectPropertyRangeAxiom getObjectPropertyRangeAxiom(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			ElkClassExpression classExpression) {
+			ElkObjectPropertyExpression property,
+			ElkClassExpression range) {
 		return filter(factory_.getObjectPropertyRangeAxiom(
-				objectPropertyExpression, classExpression));
+				property, range));
 	}
 
 	@Override
 	public ElkObjectSomeValuesFrom getObjectSomeValuesFrom(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			ElkClassExpression classExpression) {
-		return filter(factory_.getObjectSomeValuesFrom(objectPropertyExpression,
-				classExpression));
+			ElkObjectPropertyExpression property,
+			ElkClassExpression filler) {
+		return filter(factory_.getObjectSomeValuesFrom(property,
+				filler));
 	}
 
 	@Override
 	public ElkObjectUnionOf getObjectUnionOf(
-			ElkClassExpression firstClassExpression,
-			ElkClassExpression secondClassExpression,
-			ElkClassExpression... otherClassExpressions) {
-		return filter(factory_.getObjectUnionOf(firstClassExpression,
-				secondClassExpression, otherClassExpressions));
+			ElkClassExpression first,
+			ElkClassExpression second,
+			ElkClassExpression... other) {
+		return filter(factory_.getObjectUnionOf(first,
+				second, other));
 	}
 
 	@Override
 	public ElkObjectUnionOf getObjectUnionOf(
-			List<? extends ElkClassExpression> classExpressions) {
-		return filter(factory_.getObjectUnionOf(classExpressions));
+			List<? extends ElkClassExpression> members) {
+		return filter(factory_.getObjectUnionOf(members));
 	}
 
 	@Override
@@ -655,6 +674,16 @@ public class ElkObjectDelegatingFactory implements ElkObjectFactory {
 	}
 
 	@Override
+	public ElkDatatype getOwlRational() {
+		return filter(factory_.getOwlRational());
+	}
+
+	@Override
+	public ElkDatatype getOwlReal() {
+		return filter(factory_.getOwlReal());
+	}
+
+	@Override
 	public ElkClass getOwlThing() {
 		return filter(factory_.getOwlThing());
 	}
@@ -670,18 +699,28 @@ public class ElkObjectDelegatingFactory implements ElkObjectFactory {
 	}
 
 	@Override
+	public ElkDatatype getRdfsLiteral() {
+		return filter(factory_.getRdfsLiteral());
+	}
+
+	@Override
+	public ElkDatatype getRdfXMLLiteral() {
+		return filter(factory_.getRdfXMLLiteral());
+	}
+
+	@Override
 	public ElkReflexiveObjectPropertyAxiom getReflexiveObjectPropertyAxiom(
-			ElkObjectPropertyExpression objectPropertyExpression) {
+			ElkObjectPropertyExpression property) {
 		return filter(factory_
-				.getReflexiveObjectPropertyAxiom(objectPropertyExpression));
+				.getReflexiveObjectPropertyAxiom(property));
 	}
 
 	@Override
 	public ElkSameIndividualAxiom getSameIndividualAxiom(
-			ElkIndividual firstIndividual, ElkIndividual secondIndividual,
-			ElkIndividual... otherIndividuals) {
-		return filter(factory_.getSameIndividualAxiom(firstIndividual,
-				secondIndividual, otherIndividuals));
+			ElkIndividual first, ElkIndividual second,
+			ElkIndividual... other) {
+		return filter(factory_.getSameIndividualAxiom(first,
+				second, other));
 	}
 
 	@Override
@@ -692,10 +731,10 @@ public class ElkObjectDelegatingFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkSubAnnotationPropertyOfAxiom getSubAnnotationPropertyOfAxiom(
-			ElkAnnotationProperty subAnnotationProperty,
-			ElkAnnotationProperty superAnnotationProperty) {
-		return filter(factory_.getSubAnnotationPropertyOfAxiom(
-				subAnnotationProperty, superAnnotationProperty));
+			ElkAnnotationProperty subProperty,
+			ElkAnnotationProperty superProperty) {
+		return filter(factory_.getSubAnnotationPropertyOfAxiom(subProperty,
+				superProperty));
 	}
 
 	@Override
@@ -708,56 +747,177 @@ public class ElkObjectDelegatingFactory implements ElkObjectFactory {
 
 	@Override
 	public ElkSubDataPropertyOfAxiom getSubDataPropertyOfAxiom(
-			ElkDataPropertyExpression subDataPropertyExpression,
-			ElkDataPropertyExpression superDataPropertyExpression) {
+			ElkDataPropertyExpression subProperty,
+			ElkDataPropertyExpression superProperty) {
 		return filter(factory_.getSubDataPropertyOfAxiom(
-				subDataPropertyExpression, superDataPropertyExpression));
+				subProperty, superProperty));
 	}
 
 	@Override
 	public ElkSubObjectPropertyOfAxiom getSubObjectPropertyOfAxiom(
-			ElkSubObjectPropertyExpression subObjectPropertyExpression,
-			ElkObjectPropertyExpression superObjectPropertyExpression) {
+			ElkSubObjectPropertyExpression subProperty,
+			ElkObjectPropertyExpression superProperty) {
 		return filter(factory_.getSubObjectPropertyOfAxiom(
-				subObjectPropertyExpression, superObjectPropertyExpression));
-	}
-
-	@Override
-	public ElkSymmetricObjectPropertyAxiom getSymmetricObjectPropertyAxiom(
-			ElkObjectPropertyExpression objectPropertyExpression) {
-		return filter(factory_
-				.getSymmetricObjectPropertyAxiom(objectPropertyExpression));
-	}
-
-	@Override
-	public ElkTransitiveObjectPropertyAxiom getTransitiveObjectPropertyAxiom(
-			ElkObjectPropertyExpression objectPropertyExpression) {
-		return filter(factory_
-				.getTransitiveObjectPropertyAxiom(objectPropertyExpression));
-	}
-
-	@Override
-	public ElkHasKeyAxiom getHasKeyAxiom(ElkClassExpression classExpr,
-			List<? extends ElkObjectPropertyExpression> objectPEs,
-			List<? extends ElkDataPropertyExpression> dataPEs) {
-		return filter(factory_.getHasKeyAxiom(classExpr, objectPEs, dataPEs));
-	}
-
-	@Override
-	public ElkDatatypeDefinitionAxiom getDatatypeDefinitionAxiom(
-			ElkDatatype datatype, ElkDataRange dataRange) {
-		return filter(factory_.getDatatypeDefinitionAxiom(datatype, dataRange));
-	}
-
-	@Override
-	public ElkFacetRestriction getFacetRestriction(ElkIri iri,
-			ElkLiteral literal) {
-		return filter(factory_.getFacetRestriction(iri, literal));
+				subProperty, superProperty));
 	}
 
 	@Override
 	public ElkSWRLRule getSWRLRule() {
 		return filter(factory_.getSWRLRule());
+	}
+
+	@Override
+	public ElkSymmetricObjectPropertyAxiom getSymmetricObjectPropertyAxiom(
+			ElkObjectPropertyExpression property) {
+		return filter(factory_
+				.getSymmetricObjectPropertyAxiom(property));
+	}
+
+	@Override
+	public ElkTransitiveObjectPropertyAxiom getTransitiveObjectPropertyAxiom(
+			ElkObjectPropertyExpression property) {
+		return filter(factory_
+				.getTransitiveObjectPropertyAxiom(property));
+	}
+
+	@Override
+	public ElkDatatype getXsdAnyUri() {
+		return filter(factory_.getXsdAnyUri());
+	}
+
+	@Override
+	public ElkDatatype getXsdBase64Binary() {
+		return filter(factory_.getXsdBase64Binary());
+	}
+
+	@Override
+	public ElkDatatype getXsdByte() {
+		return filter(factory_.getXsdByte());
+	}
+
+	@Override
+	public ElkDatatype getXsdDateTime() {
+		return filter(factory_.getXsdDateTime());
+	}
+
+	@Override
+	public ElkDatatype getXsdDateTimeStamp() {
+		return filter(factory_.getXsdDateTimeStamp());
+	}
+
+	@Override
+	public ElkDatatype getXsdDecimal() {
+		return filter(factory_.getXsdDecimal());
+	}
+
+	@Override
+	public ElkDatatype getXsdDouble() {
+		return filter(factory_.getXsdDouble());
+	}
+
+	@Override
+	public ElkDatatype getXsdFloat() {
+		return filter(factory_.getXsdFloat());
+	}
+
+	@Override
+	public ElkDatatype getXsdHexBinary() {
+		return filter(factory_.getXsdHexBinary());
+	}
+
+	@Override
+	public ElkDatatype getXsdInt() {
+		return filter(factory_.getXsdInt());
+	}
+
+	@Override
+	public ElkDatatype getXsdInteger() {
+		return filter(factory_.getXsdInteger());
+	}
+
+	@Override
+	public ElkDatatype getXsdLanguage() {
+		return filter(factory_.getXsdLanguage());
+	}
+
+	@Override
+	public ElkDatatype getXsdLong() {
+		return filter(factory_.getXsdLong());
+	}
+
+	@Override
+	public ElkDatatype getXsdName() {
+		return filter(factory_.getXsdName());
+	}
+
+	@Override
+	public ElkDatatype getXsdNCName() {
+		return filter(factory_.getXsdNCName());
+	}
+
+	@Override
+	public ElkDatatype getXsdNegativeInteger() {
+		return filter(factory_.getXsdNegativeInteger());
+	}
+
+	@Override
+	public ElkDatatype getXsdNMTOKEN() {
+		return filter(factory_.getXsdNMTOKEN());
+	}
+
+	@Override
+	public ElkDatatype getXsdNonNegativeInteger() {
+		return filter(factory_.getXsdNonNegativeInteger());
+	}
+
+	@Override
+	public ElkDatatype getXsdNonPositiveInteger() {
+		return filter(factory_.getXsdNonPositiveInteger());
+	}
+
+	@Override
+	public ElkDatatype getXsdNormalizedString() {
+		return filter(factory_.getXsdNormalizedString());
+	}
+
+	@Override
+	public ElkDatatype getXsdPositiveInteger() {
+		return filter(factory_.getXsdPositiveInteger());
+	}
+
+	@Override
+	public ElkDatatype getXsdShort() {
+		return filter(factory_.getXsdShort());
+	}
+
+	@Override
+	public ElkDatatype getXsdString() {
+		return filter(factory_.getXsdString());
+	}
+
+	@Override
+	public ElkDatatype getXsdToken() {
+		return filter(factory_.getXsdToken());
+	}
+
+	@Override
+	public ElkDatatype getXsdUnsignedByte() {
+		return filter(factory_.getXsdUnsignedByte());
+	}
+
+	@Override
+	public ElkDatatype getXsdUnsignedInt() {
+		return filter(factory_.getXsdUnsignedInt());
+	}
+
+	@Override
+	public ElkDatatype getXsdUnsignedLong() {
+		return filter(factory_.getXsdUnsignedLong());
+	}
+
+	@Override
+	public ElkDatatype getXsdUnsignedShort() {
+		return filter(factory_.getXsdUnsignedShort());
 	}
 
 }

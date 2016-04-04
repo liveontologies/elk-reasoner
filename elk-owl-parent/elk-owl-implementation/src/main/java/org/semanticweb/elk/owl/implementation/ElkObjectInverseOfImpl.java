@@ -45,8 +45,8 @@ public class ElkObjectInverseOfImpl extends ElkObjectImpl implements
 
 	protected final ElkObjectProperty objectProperty_;
 
-	ElkObjectInverseOfImpl(ElkObjectProperty objectProperty) {
-		this.objectProperty_ = objectProperty;
+	ElkObjectInverseOfImpl(ElkObjectProperty property) {
+		this.objectProperty_ = property;
 	}
 
 	@Override

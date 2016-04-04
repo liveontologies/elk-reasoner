@@ -39,8 +39,8 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkDataUnionOfImpl extends ElkDataRangeListObject implements
 		ElkDataUnionOf {
 
-	ElkDataUnionOfImpl(List<? extends ElkDataRange> dataRanges) {
-		super(dataRanges);
+	ElkDataUnionOfImpl(List<? extends ElkDataRange> ranges) {
+		super(ranges);
 	}
 
 	@Override

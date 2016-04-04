@@ -41,14 +41,12 @@ import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkIri;
-import org.semanticweb.elk.owl.managers.ElkEntityRecycler;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserFactory;
@@ -74,16 +72,15 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 public class TaxonomyIOTest {
 
 	/**
-	 * The {@link ElkObjectFactory} used for construction of {@link ElkObject}s.
+	 * The {@link ElkObject.Factory} used for construction of {@link ElkObject}s.
 	 * In order for {@link MockTaxonomyLoader} to work correctly, the factory
 	 * should identify all {@link ElkEntity} objects.
 	 */
-	private final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl(
-			new ElkEntityRecycler());
+	private final ElkObject.Factory objectFactory = new ElkObjectEntityRecyclingFactory();
 
 	/**
 	 * The {@link Owl2ParserFactory} used for parsing the input file. It should
-	 * use the same {@link ElkObjectFactory} as in all other places to avoid
+	 * use the same {@link ElkObject.Factory} as in all other places to avoid
 	 * creation of different objects for the same {@link ElkIri}s.
 	 */
 	private final Owl2ParserFactory parserFactory = new Owl2FunctionalStyleParserFactory(
@@ -137,10 +134,10 @@ public class TaxonomyIOTest {
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> loaded = MockTaxonomyLoader
 				.load(objectFactory, parser);
 
-		System.out.println("=================================");
+		/*System.out.println("=================================");
 		outWriter = new OutputStreamWriter(System.out);
 		TaxonomyPrinter.dumpInstanceTaxomomy(loaded, outWriter, false);
-		outWriter.flush();
+		outWriter.flush();*/
 
 		// compare
 		assertTrue(InstanceTaxonomyHasher.hash(original) == InstanceTaxonomyHasher.hash(loaded)
@@ -171,6 +168,7 @@ public class TaxonomyIOTest {
 		assertSame(taxonomy.getTopNode(), taxonomy.getBottomNode());
 	}
 
+	@SuppressWarnings("resource")
 	private InstanceTaxonomy<ElkClass, ElkNamedIndividual> loadAndClassify(
 			String resource) throws IOException, Owl2ParseException,
 			ElkInconsistentOntologyException, ElkException {
@@ -187,10 +185,13 @@ public class TaxonomyIOTest {
 
 			return reasoner.getInstanceTaxonomy();
 		} finally {
-			IOUtils.closeQuietly(stream);
+			if (stream != null) {
+				IOUtils.closeQuietly(stream);
+			}
 		}
 	}
 
+	@SuppressWarnings("resource")
 	private Taxonomy<ElkClass> load(String resource) throws IOException,
 			Owl2ParseException, ElkInconsistentOntologyException {
 		InputStream stream = null;
@@ -200,7 +201,9 @@ public class TaxonomyIOTest {
 			return MockTaxonomyLoader.load(objectFactory,
 					parserFactory.getParser(stream));
 		} finally {
-			IOUtils.closeQuietly(stream);
+			if (stream != null) {
+				IOUtils.closeQuietly(stream);
+			}
 		}
 	}
 }

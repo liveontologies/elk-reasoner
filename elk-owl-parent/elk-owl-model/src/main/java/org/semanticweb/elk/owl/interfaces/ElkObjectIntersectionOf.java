@@ -31,8 +31,8 @@ import org.semanticweb.elk.owl.visitors.ElkObjectIntersectionOfVisitor;
 
 /**
  * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Intersection_of_Class_Expressions"
- * >Intersection of Class Expressions<a> in the OWL 2 specification.
+ * "http://www.w3.org/TR/owl2-syntax/#Intersection_of_Class_Expressions" >
+ * Intersection of Class Expressions<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
@@ -55,5 +55,45 @@ public interface ElkObjectIntersectionOf extends ElkClassExpression {
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkObjectIntersectionOfVisitor<O> visitor);
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		/**
+		 * Create an {@link ElkObjectIntersectionOf}.
+		 * 
+		 * @param first
+		 *            the first {@link ElkClassExpression} for which the object
+		 *            should be created
+		 * @param second
+		 *            the second {@link ElkClassExpression} for which the object
+		 *            should be created
+		 * @param other
+		 *            other {@link ElkClassExpression}s for which the object
+		 *            should be created
+		 * @return an {@link ElkObjectIntersectionOf} corresponding to the input
+		 */
+		public ElkObjectIntersectionOf getObjectIntersectionOf(
+				ElkClassExpression first,
+				ElkClassExpression second,
+				ElkClassExpression... other);
+
+		/**
+		 * Create an {@link ElkObjectIntersectionOf}.
+		 * 
+		 * @param members
+		 *            the {@link ElkClassExpression}s for which the object
+		 *            should be created
+		 * @return an {@link ElkObjectIntersectionOf} corresponding to the input
+		 */
+		public ElkObjectIntersectionOf getObjectIntersectionOf(
+				List<? extends ElkClassExpression> members);
+
+	}
 
 }

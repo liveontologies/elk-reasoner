@@ -24,6 +24,8 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassEntity;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +52,14 @@ abstract class CachedIndexedClassEntityImpl<T extends CachedIndexedClassEntity<T
 
 	CachedIndexedClassEntityImpl(int structuralHash) {
 		super(structuralHash);
+	}
+	
+	@Override
+	public boolean updateOccurrenceNumbers(final ModifiableOntologyIndex index,
+			OccurrenceIncrement increment) {
+
+		totalOccurrenceNo += increment.totalIncrement;
+		return true;
 	}
 
 	@Override

@@ -54,4 +54,32 @@ public interface ElkHasKeyAxiom extends ElkAxiom {
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkHasKeyAxiomVisitor<O> visitor);
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		/**
+		 * Create an {@link ElkHasKeyAxiom}
+		 * 
+		 * @param object
+		 *            the {@link ElkClassExpression} for which the axiom should
+		 *            be created
+		 * @param objectPropertyKeys
+		 *            the {@link ElkObjectPropertyExpression}s for which the
+		 *            axiom should be created
+		 * @param dataPropertyKeys
+		 *            the {@link ElkDataPropertyExpression}s for which the axiom
+		 *            should be created
+		 * @return an {@link ElkHasKeyAxiom} corresponding to the input
+		 */
+		public ElkHasKeyAxiom getHasKeyAxiom(ElkClassExpression object,
+				List<? extends ElkObjectPropertyExpression> objectPropertyKeys,
+				List<? extends ElkDataPropertyExpression> dataPropertyKeys);
+
+	}
 }

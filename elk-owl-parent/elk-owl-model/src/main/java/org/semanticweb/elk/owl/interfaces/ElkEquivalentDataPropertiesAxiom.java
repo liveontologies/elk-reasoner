@@ -30,9 +30,9 @@ import java.util.List;
 import org.semanticweb.elk.owl.visitors.ElkEquivalentDataPropertiesAxiomVisitor;
 
 /**
- * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Equivalent_Data_Properties">Equivalent
- * Data Properties Axiom<a> in the OWL 2 specification.
+ * Corresponds to an
+ * <a href= "http://www.w3.org/TR/owl2-syntax/#Equivalent_Data_Properties">
+ * Equivalent Data Properties Axiom<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
@@ -56,5 +56,46 @@ public interface ElkEquivalentDataPropertiesAxiom extends ElkDataPropertyAxiom {
 	 */
 	public abstract <O> O accept(
 			ElkEquivalentDataPropertiesAxiomVisitor<O> visitor);
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		/**
+		 * Create an {@link ElkEquivalentDataPropertiesAxiom}.
+		 * 
+		 * @param first
+		 *            the fist equivalent {@link ElkDataPropertyExpression} for
+		 *            which the axiom should be created
+		 * @param second
+		 *            the second equivalent {@link ElkDataPropertyExpression}
+		 *            for which the axiom should be created
+		 * @param other
+		 *            other equivalent {@link ElkDataPropertyExpression}s for
+		 *            which the axiom should be created
+		 * @return an {@link ElkEquivalentDataPropertiesAxiom} corresponding to
+		 *         the input
+		 */
+		public ElkEquivalentDataPropertiesAxiom getEquivalentDataPropertiesAxiom(
+				ElkDataPropertyExpression first,
+				ElkDataPropertyExpression second,
+				ElkDataPropertyExpression... other);
+
+		/**
+		 * Create an {@link ElkEquivalentDataPropertiesAxiom}.
+		 * 
+		 * @param equivalentDataPropertyExpressions
+		 *            the equivalent {@link ElkDataPropertyExpression}s for
+		 *            which the axiom should be created
+		 * @return an {@link ElkEquivalentDataPropertiesAxiom} corresponding to
+		 *         the input
+		 */
+		public ElkEquivalentDataPropertiesAxiom getEquivalentDataPropertiesAxiom(
+				List<? extends ElkDataPropertyExpression> equivalentDataPropertyExpressions);
+	}
 
 }

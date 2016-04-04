@@ -43,8 +43,8 @@ public class ElkObjectIntersectionOfImpl extends ElkClassExpressionListObject
 		implements ElkObjectIntersectionOf {
 
 	ElkObjectIntersectionOfImpl(
-			List<? extends ElkClassExpression> classExpressions) {
-		super(classExpressions);
+			List<? extends ElkClassExpression> members) {
+		super(members);
 	}
 
 	@Override

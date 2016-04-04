@@ -53,4 +53,18 @@ public interface ElkPropertyDomainAxiom<P, D> extends ElkPropertyAxiom<P> {
 	 */
 	public <O> O accept(ElkPropertyDomainAxiomVisitor<O> visitor);
 
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory extends ElkAnnotationPropertyDomainAxiom.Factory,
+			ElkDataPropertyDomainAxiom.Factory,
+			ElkObjectPropertyDomainAxiom.Factory {
+
+		// combined interface
+
+	}
+
 }

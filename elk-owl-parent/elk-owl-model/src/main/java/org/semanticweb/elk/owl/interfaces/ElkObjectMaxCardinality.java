@@ -30,8 +30,8 @@ import org.semanticweb.elk.owl.visitors.ElkObjectMaxCardinalityVisitor;
  * @author "Yevgeny Kazakov"
  *
  */
-public interface ElkObjectMaxCardinality extends
-		ElkCardinalityRestriction<ElkObjectPropertyExpression> {
+public interface ElkObjectMaxCardinality
+		extends ElkCardinalityRestriction<ElkObjectPropertyExpression> {
 
 	/**
 	 * Accept an {@link ElkObjectMaxCardinalityVisitor}.
@@ -41,5 +41,18 @@ public interface ElkObjectMaxCardinality extends
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkObjectMaxCardinalityVisitor<O> visitor);
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory extends ElkObjectMaxCardinalityQualified.Factory,
+			ElkObjectMaxCardinalityUnqualified.Factory {
+
+		// combined interface
+
+	}
 
 }

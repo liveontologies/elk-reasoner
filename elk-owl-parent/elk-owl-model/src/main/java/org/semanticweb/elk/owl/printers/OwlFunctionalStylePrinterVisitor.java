@@ -427,10 +427,10 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	}
 
 	@Override
-	public Void visit(ElkFacetRestriction elkFacetRestriction) {
-		write(elkFacetRestriction.getConstrainingFacet());
+	public Void visit(ElkFacetRestriction restricition) {
+		write(restricition.getConstrainingFacet());
 		write(' ');
-		write(elkFacetRestriction.getRestrictionValue());
+		write(restricition.getRestrictionValue());
 		return null;
 	}
 

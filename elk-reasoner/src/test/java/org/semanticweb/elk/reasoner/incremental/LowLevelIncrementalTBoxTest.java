@@ -45,16 +45,16 @@ import java.util.List;
 import org.junit.Test;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.iris.ElkAbbreviatedIri;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.iris.ElkPrefixImpl;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
@@ -74,7 +74,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
  */
 public class LowLevelIncrementalTBoxTest {
 
-	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
+	final ElkObject.Factory objectFactory = new ElkObjectEntityRecyclingFactory();
 
 	@Test
 	public void testBasicDeletion() throws ElkException {

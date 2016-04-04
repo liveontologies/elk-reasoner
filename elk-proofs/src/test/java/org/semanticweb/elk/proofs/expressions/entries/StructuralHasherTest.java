@@ -34,13 +34,12 @@ import static org.semanticweb.elk.proofs.expressions.entries.TestEntities.s;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkIri;
-import org.semanticweb.elk.proofs.expressions.entries.StructuralEquivalenceHasher;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemmaObjectFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.impl.ElkLemmaObjectFactoryImpl;
 
@@ -53,7 +52,7 @@ import org.semanticweb.elk.proofs.expressions.lemmas.impl.ElkLemmaObjectFactoryI
  */
 public class StructuralHasherTest {
 
-	private static final ElkObjectFactory objFactory_ = new ElkObjectFactoryImpl();
+	private static final ElkObject.Factory objFactory_ = new ElkObjectEntityRecyclingFactory();
 	private static final ElkLemmaObjectFactory lemmaFactory_ = new ElkLemmaObjectFactoryImpl();	
 	
 	@Test

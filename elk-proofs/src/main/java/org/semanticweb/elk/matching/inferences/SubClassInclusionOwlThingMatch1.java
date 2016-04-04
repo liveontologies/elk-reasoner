@@ -1,5 +1,7 @@
 package org.semanticweb.elk.matching.inferences;
 
+import org.semanticweb.elk.matching.ElkMatchException;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -24,10 +26,10 @@ package org.semanticweb.elk.matching.inferences;
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
-import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1;
-import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
+import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.predefined.PredefinedElkIris;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionOwlThing;
 
 public class SubClassInclusionOwlThingMatch1
@@ -35,27 +37,38 @@ public class SubClassInclusionOwlThingMatch1
 
 	private final IndexedContextRootMatch originMatch_;
 
+	private final ElkClass owlThingMatch_;
+
 	SubClassInclusionOwlThingMatch1(SubClassInclusionOwlThing parent,
-			SubClassInclusionDecomposedMatch1 conclusionMatch) {
+			SubClassInclusionComposedMatch1 conclusionMatch) {
 		super(parent);
 		originMatch_ = conclusionMatch.getDestinationMatch();
+		ElkClassExpression subsumerMatch = conclusionMatch
+				.getSubsumerGeneralMatch();
+		if (subsumerMatch instanceof ElkClass) {
+			owlThingMatch_ = (ElkClass) subsumerMatch;
+			if (owlThingMatch_.getIri().equals(PredefinedElkIris.OWL_THING)) {
+				return;
+			}
+		}
+		// else
+		throw new ElkMatchException(parent.getConclusionSubsumer(),
+				subsumerMatch);
 	}
 
 	public IndexedContextRootMatch getOriginMatch() {
 		return originMatch_;
 	}
 
-	@SuppressWarnings("static-method")
 	public ElkClass getSubsumerMatch() {
-		return PredefinedElkClass.OWL_NOTHING;
+		return owlThingMatch_;
 	}
 
-	public SubClassInclusionDecomposedMatch2 getConclusionMatch(
+	public SubClassInclusionComposedMatch1 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getSubClassInclusionDecomposedMatch2(
-				factory.getSubClassInclusionDecomposedMatch1(
-						getParent().getConclusion(factory), originMatch_),
-				getSubsumerMatch());
+		return factory.getSubClassInclusionComposedMatch1(
+				getParent().getConclusion(factory), originMatch_,
+				owlThingMatch_);
 	}
 
 	@Override
@@ -87,7 +100,7 @@ public class SubClassInclusionOwlThingMatch1
 
 		SubClassInclusionOwlThingMatch1 getSubClassInclusionOwlThingMatch1(
 				SubClassInclusionOwlThing parent,
-				SubClassInclusionDecomposedMatch1 conclusionMatch);
+				SubClassInclusionComposedMatch1 conclusionMatch);
 
 	}
 

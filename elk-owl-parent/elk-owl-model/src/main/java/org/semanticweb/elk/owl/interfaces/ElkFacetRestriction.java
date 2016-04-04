@@ -56,4 +56,26 @@ public interface ElkFacetRestriction extends ElkObject {
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkFacetRestrictionVisitor<O> visitor);
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		/**
+		 * Create an {@link ElkFacetRestriction}
+		 * 
+		 * @param iri
+		 *            the {@link ElkIri} for which the object should be created
+		 * @param literal
+		 *            the {@link ElkLiteral} for which the object should be
+		 *            created
+		 * @return an {@link ElkFacetRestriction} corresponding to the input
+		 */
+		public ElkFacetRestriction getFacetRestriction(ElkIri iri,
+				ElkLiteral literal);
+	}
 }

@@ -43,8 +43,8 @@ public class ElkTransitiveObjectPropertyAxiomImpl extends
 		ElkTransitiveObjectPropertyAxiom {
 
 	ElkTransitiveObjectPropertyAxiomImpl(
-			ElkObjectPropertyExpression objectPropertyExpression) {
-		super(objectPropertyExpression);
+			ElkObjectPropertyExpression property) {
+		super(property);
 	}
 
 	@Override

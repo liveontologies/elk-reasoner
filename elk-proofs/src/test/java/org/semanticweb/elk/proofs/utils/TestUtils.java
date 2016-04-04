@@ -32,7 +32,7 @@ import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
 import org.semanticweb.elk.owl.inferences.ModifiableElkInferenceSet;
 import org.semanticweb.elk.owl.inferences.ModifiableElkInferenceSetImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
@@ -54,7 +54,7 @@ public class TestUtils {
 			.getLogger(TestUtils.class);
 
 	public static void provabilityOfSubsumptionTest(Reasoner reasoner,
-			Set<? extends ElkAxiom> ontology, ElkObjectFactory factory,
+			Set<? extends ElkAxiom> ontology, ElkObject.Factory factory,
 			ElkSubClassOfAxiom subsumption) throws ElkException {
 
 		ModifiableElkInferenceSet elkInferences = new ModifiableElkInferenceSetImpl(

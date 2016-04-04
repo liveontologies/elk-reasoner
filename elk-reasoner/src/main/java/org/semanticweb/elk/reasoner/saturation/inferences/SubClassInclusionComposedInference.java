@@ -48,7 +48,8 @@ public interface SubClassInclusionComposedInference
 			SubClassInclusionComposedEntity.Visitor<O>,
 			SubClassInclusionComposedObjectIntersectionOf.Visitor<O>,
 			SubClassInclusionComposedObjectSomeValuesFrom.Visitor<O>,
-			SubClassInclusionComposedObjectUnionOf.Visitor<O> {
+			SubClassInclusionComposedObjectUnionOf.Visitor<O>,
+			SubClassInclusionOwlThing.Visitor<O> {
 
 		// combined interface
 

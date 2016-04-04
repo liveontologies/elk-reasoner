@@ -122,42 +122,6 @@ public interface ModifiableOntologyIndex extends OntologyIndex,
 			ChainableSubsumerRule oldRule);
 
 	/**
-	 * Tries to change the number of negative occurrences of {@code owl:Thing}
-	 * in the ontology represented by this {@link ModifiableOntologyIndex}.
-	 * 
-	 * @param increment
-	 *            how many occurrences should be added (if positive) or removed
-	 *            (if negative)
-	 * 
-	 * @return {@code true} if the operation has been successful or
-	 *         {@code false} otherwise. If {@code false} is return, this
-	 *         {@link ModifiableOntologyIndex} should not logically change,
-	 *         i.e., it should correspond to the same logical representation of
-	 *         the ontology as before the operation
-	 * 
-	 * @see #hasNegativeOwlThing()
-	 */
-	boolean updateNegativeOwlThingOccurrenceNo(int increment);
-
-	/**
-	 * Tries to change the number of positive occurrences of {@code owl:Nothing}
-	 * in the ontology represented by this {@link ModifiableOntologyIndex}.
-	 * 
-	 * @param increment
-	 *            how many occurrences should be added (if positive) or removed
-	 *            (if negative)
-	 * 
-	 * @return {@code true} if the operation has been successful or
-	 *         {@code false} otherwise. If {@code false} is return, this
-	 *         {@link ModifiableOntologyIndex} should not logically change,
-	 *         i.e., it should correspond to the same logical representation of
-	 *         the ontology as before the operation
-	 * 
-	 * @see #hasPositivelyOwlNothing()
-	 */
-	boolean updatePositiveOwlNothingOccurrenceNo(int increment);
-
-	/**
 	 * Tries to set the given {@link IndexedClassExpression} as definition for
 	 * the given target {@link ModifiableIndexedClass}. There can be at most one
 	 * definition set for each {@link ModifiableIndexedClass}.

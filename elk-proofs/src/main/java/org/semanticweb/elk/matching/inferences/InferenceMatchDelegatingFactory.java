@@ -624,7 +624,7 @@ public class InferenceMatchDelegatingFactory implements InferenceMatch.Factory {
 	@Override
 	public SubClassInclusionOwlThingMatch1 getSubClassInclusionOwlThingMatch1(
 			SubClassInclusionOwlThing parent,
-			SubClassInclusionDecomposedMatch1 conclusionMatch) {
+			SubClassInclusionComposedMatch1 conclusionMatch) {
 		return filter(mainFactory_.getSubClassInclusionOwlThingMatch1(parent,
 				conclusionMatch));
 	}

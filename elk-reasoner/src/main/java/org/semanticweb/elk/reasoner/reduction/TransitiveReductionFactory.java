@@ -30,7 +30,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
@@ -159,7 +158,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				maxWorkers, new ThisClassExpressionSaturationListener());
 		this.owlThing_ = saturationState.getOntologyIndex().getOwlThing();
 		this.defaultTopOutput_ = new ArrayList<ElkClass>(1);
-		defaultTopOutput_.add(PredefinedElkClass.OWL_THING);
+		defaultTopOutput_.add(owlThing_.getElkEntity());
 	}
 
 	@Override
@@ -353,11 +352,8 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 					LOGGER_.trace(root + ": equivalent " + equivalent.getIri());
 				}
 				for (IndexedClass direct : output.directSubsumers.keySet()) {
-					String message = root + ": direct super class [" + direct;
-					for (ElkClass equivalent : output.directSubsumers
-							.get(direct))
-						message = message + ", " + equivalent.getIri();
-					message = message + "]";
+					String message = root + ": direct super class " + direct
+							+ ": " + output.directSubsumers.get(direct);
 					LOGGER_.trace(message);
 				}
 			}
@@ -390,7 +386,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				return;
 			}
 
-			if (candidate.getElkEntity() == PredefinedElkClass.OWL_THING
+			if (candidate.getElkEntity() == owlThing_.getElkEntity()
 					&& candidateSubsumersSize == 1) {
 				/*
 				 * if subsumer is top and has no other subsumers (which means,
@@ -477,7 +473,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			 * owl:Thing itself
 			 */
 			if (state.prunedSubsumers.isEmpty() && !output.getEquivalent()
-					.contains(PredefinedElkClass.OWL_THING)) {
+					.contains(owlThing_.getElkEntity())) {
 				output.directSubsumers.put(owlThing_, defaultTopOutput_);
 				return output;
 			}

@@ -39,9 +39,7 @@ import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.managers.ElkEntityRecycler;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
@@ -110,8 +108,8 @@ public abstract class BaseRandomWalkIncrementalCorrectnessTest {
 
 		InputStream stream = manifest.getInput().getInputStream();
 		AxiomLoader fileLoader = new Owl2StreamLoader(
-				new Owl2FunctionalStyleParserFactory(new ElkObjectFactoryImpl(
-						new ElkEntityRecycler())), stream);
+				new Owl2FunctionalStyleParserFactory(),
+				stream);
 		AxiomLoader trackingLoader = getAxiomTrackingLoader(fileLoader,
 				changingAxioms, staticAxioms);
 		incrementalReasoner = TestReasonerUtils.createTestReasoner(

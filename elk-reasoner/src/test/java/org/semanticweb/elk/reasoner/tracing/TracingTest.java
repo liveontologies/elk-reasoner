@@ -37,10 +37,9 @@ import org.junit.runner.RunWith;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.owl.managers.ElkEntityRecycler;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
@@ -91,25 +90,24 @@ public class TracingTest {
 	@Test
 	public void tracingTest() throws Exception {
 		AxiomLoader fileLoader = new Owl2StreamLoader(
-				new Owl2FunctionalStyleParserFactory(new ElkObjectFactoryImpl(
-						new ElkEntityRecycler())), manifest.getInput().getInputStream());
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(fileLoader, new PostProcessingStageExecutor());
+				new Owl2FunctionalStyleParserFactory(),
+				manifest.getInput().getInputStream());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(fileLoader,
+				new PostProcessingStageExecutor());
 
 		try {
 			TracingTests tests = getTracingTests(reasoner);
-			
+
 			tests.accept(getTracingTestVisitor(reasoner));
-		} 
-		finally {
+		} finally {
 			reasoner.shutdown();
 		}
-	}
-	
+	}	
 	
 	private TracingTestVisitor getTracingTestVisitor(final Reasoner reasoner) {
 		return new TracingTestVisitor() {
 			
-			private final ElkObjectFactory factory_ = new ElkObjectFactoryImpl();
+			private final ElkObject.Factory factory_ = new ElkObjectEntityRecyclingFactory();
 			
 			@Override
 			public void subsumptionTest(ElkClass subsumee, ElkClass subsumer) {

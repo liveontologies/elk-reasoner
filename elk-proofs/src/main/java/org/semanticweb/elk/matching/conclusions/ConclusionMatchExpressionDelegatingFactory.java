@@ -27,8 +27,8 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectDelegatingFactory;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
@@ -59,7 +59,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 import org.semanticweb.elk.reasoner.tracing.Conclusion;
-import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
 import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 
 public class ConclusionMatchExpressionDelegatingFactory extends
@@ -72,14 +71,15 @@ public class ConclusionMatchExpressionDelegatingFactory extends
 	private final IndexedContextRootMatch.Factory rootMatchFactory_;
 
 	public ConclusionMatchExpressionDelegatingFactory(
-			ElkObjectFactory elkObjectFactory) {
+			ElkObject.Factory elkObjectFactory) {
 		this(elkObjectFactory, new ConclusionBaseFactory(),
 				new ConclusionMatchBaseFactory(),
 				new IndexedContextRootMatchBaseFactory());
 	}
 
 	public ConclusionMatchExpressionDelegatingFactory(
-			ElkObjectFactory elkObjectFactory, Factory conclusionFactory,
+			ElkObject.Factory elkObjectFactory,
+			Conclusion.Factory conclusionFactory,
 			ConclusionMatch.Factory conclusionMatchFactory,
 			IndexedContextRootMatch.Factory rootMatchFactory) {
 		super(elkObjectFactory);

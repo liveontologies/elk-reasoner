@@ -31,15 +31,14 @@ import java.util.Arrays;
 
 import org.junit.Test;
 import org.semanticweb.elk.io.IOUtils;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
-import org.semanticweb.elk.owl.managers.ElkEntityRecycler;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
@@ -67,7 +66,7 @@ public class TaxonomyValidatorTest {
 	@Test(expected = InvalidTaxonomyException.class)
 	public void testNodesNonDisjoint() throws Exception {
 		MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = createEmptyTaxonomy();
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 		ElkClass A = factory.getClass(new ElkFullIri("#A"));
 		ElkClass B = factory.getClass(new ElkFullIri("#B"));
 		ElkClass C = factory.getClass(new ElkFullIri("#C"));
@@ -88,7 +87,7 @@ public class TaxonomyValidatorTest {
 	@Test(expected = InvalidTaxonomyException.class)
 	public void testNodeLinksInconsistent() throws Exception {
 		MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = createEmptyTaxonomy();
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 		ElkClass A = factory.getClass(new ElkFullIri("#A"));
 		ElkClass B = factory.getClass(new ElkFullIri("#B"));
 		ElkClass C = factory.getClass(new ElkFullIri("#C"));
@@ -114,7 +113,7 @@ public class TaxonomyValidatorTest {
 	@Test
 	public void testAcyclic() throws Exception {
 		MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = createEmptyTaxonomy();
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 		ElkClass A = factory.getClass(new ElkFullIri("#A"));
 		ElkClass B = factory.getClass(new ElkFullIri("#B"));
 		ElkClass C = factory.getClass(new ElkFullIri("#C"));
@@ -137,7 +136,7 @@ public class TaxonomyValidatorTest {
 	@Test(expected = InvalidTaxonomyException.class)
 	public void testCyclic() throws Exception {
 		MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = createEmptyTaxonomy();
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 		ElkClass A = factory.getClass(new ElkFullIri("#A"));
 		ElkClass B = factory.getClass(new ElkFullIri("#B"));
 		ElkClass C = factory.getClass(new ElkFullIri("#C"));
@@ -162,7 +161,7 @@ public class TaxonomyValidatorTest {
 	@Test(expected = InvalidTaxonomyException.class)
 	public void testSelfLoop() throws Exception {
 		MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = createEmptyTaxonomy();
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 		ElkClass A = factory.getClass(new ElkFullIri("#A"));
 		ElkClass B = factory.getClass(new ElkFullIri("#B"));
 		ElkClass C = factory.getClass(new ElkFullIri("#C"));
@@ -187,7 +186,7 @@ public class TaxonomyValidatorTest {
 	@Test(expected = InvalidTaxonomyException.class)
 	public void testNonReduced() throws Exception {
 		MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = createEmptyTaxonomy();
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 		ElkClass A = factory.getClass(new ElkFullIri("#A"));
 		ElkClass B = factory.getClass(new ElkFullIri("#B"));
 		ElkClass C = factory.getClass(new ElkFullIri("#C"));
@@ -209,25 +208,28 @@ public class TaxonomyValidatorTest {
 	}
 
 	private MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> createEmptyTaxonomy() {
+		PredefinedElkClassFactory factory = new ElkObjectEntityRecyclingFactory();
 		return new MockInstanceTaxonomy<ElkClass, ElkNamedIndividual>(
-				PredefinedElkClass.OWL_THING, PredefinedElkClass.OWL_NOTHING,
+				factory.getOwlThing(), factory.getOwlNothing(),
 				ElkClassKeyProvider.INSTANCE,
 				ElkIndividualKeyProvider.INSTANCE);
 	}
 
+	@SuppressWarnings("resource")
 	private Taxonomy<ElkClass> load(String resource) throws IOException,
 			Owl2ParseException, ElkInconsistentOntologyException {
 		InputStream stream = null;
 
 		try {
 			stream = getClass().getClassLoader().getResourceAsStream(resource);
-			ElkObjectFactory objectFactory = new ElkObjectFactoryImpl(
-					new ElkEntityRecycler());
+			ElkObject.Factory objectFactory = new ElkObjectEntityRecyclingFactory();
 			return MockTaxonomyLoader.load(objectFactory,
 					new Owl2FunctionalStyleParserFactory(objectFactory)
 							.getParser(stream));
 		} finally {
-			IOUtils.closeQuietly(stream);
+			if (stream != null) {
+				IOUtils.closeQuietly(stream);
+			}
 		}
 	}
 }

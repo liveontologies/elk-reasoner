@@ -30,14 +30,14 @@ import java.util.List;
 import org.semanticweb.elk.owl.visitors.ElkDisjointObjectPropertiesAxiomVisitor;
 
 /**
- * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Disjoint_Object_Properties">Disjoint
- * Object Properties Axiom<a> in the OWL 2 specification.
+ * Corresponds to an
+ * <a href= "http://www.w3.org/TR/owl2-syntax/#Disjoint_Object_Properties">
+ * Disjoint Object Properties Axiom<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
-public interface ElkDisjointObjectPropertiesAxiom extends
-		ElkObjectPropertyAxiom {
+public interface ElkDisjointObjectPropertiesAxiom
+		extends ElkObjectPropertyAxiom {
 
 	/**
 	 * Get the list of disjoint object property expressions that this axiom
@@ -57,5 +57,47 @@ public interface ElkDisjointObjectPropertiesAxiom extends
 	 */
 	public abstract <O> O accept(
 			ElkDisjointObjectPropertiesAxiomVisitor<O> visitor);
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		/**
+		 * Create an {@link ElkDisjointObjectPropertiesAxiom}.
+		 * 
+		 * @param first
+		 *            the first {@link ElkObjectPropertyExpression} for which
+		 *            the axiom should be created
+		 * @param second
+		 *            the second {@link ElkObjectPropertyExpression} for which
+		 *            the axiom should be created
+		 * @param other
+		 *            other {@link ElkObjectPropertyExpression}s for which the
+		 *            axiom should be created
+		 * @return an {@link ElkDisjointObjectPropertiesAxiom} corresponding to
+		 *         the input
+		 */
+		public ElkDisjointObjectPropertiesAxiom getDisjointObjectPropertiesAxiom(
+				ElkObjectPropertyExpression first,
+				ElkObjectPropertyExpression second,
+				ElkObjectPropertyExpression... other);
+
+		/**
+		 * Create an {@link ElkDisjointObjectPropertiesAxiom}.
+		 * 
+		 * @param disjointObjectPropertyExpressions
+		 *            the {@link ElkObjectPropertyExpression}s for which the
+		 *            axiom should be created
+		 * @return an {@link ElkDisjointObjectPropertiesAxiom} corresponding to
+		 *         the input
+		 */
+		public ElkDisjointObjectPropertiesAxiom getDisjointObjectPropertiesAxiom(
+				List<? extends ElkObjectPropertyExpression> disjointObjectPropertyExpressions);
+
+	}
 
 }

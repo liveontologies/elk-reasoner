@@ -31,6 +31,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.indexing.classes.ResolvingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
@@ -76,10 +77,10 @@ public class TraceState
 
 	private final ElkAxiomConverter elkAxiomConverter_;
 
-	public TraceState(ModifiableIndexedObjectCache cache) {
+	public TraceState(ElkObject.Factory elkFactory, ModifiableIndexedObjectCache cache) {
 		// the axiom converter that resolves indexed axioms from the given cache
 		// and additionally saves the inferences that produced them
-		this.elkAxiomConverter_ = new ElkAxiomConverterImpl(
+		this.elkAxiomConverter_ = new ElkAxiomConverterImpl(elkFactory,
 				new ResolvingModifiableIndexedObjectFactory(cache) {
 					@Override
 					protected <T extends ModifiableIndexedAxiomInference> T filter(

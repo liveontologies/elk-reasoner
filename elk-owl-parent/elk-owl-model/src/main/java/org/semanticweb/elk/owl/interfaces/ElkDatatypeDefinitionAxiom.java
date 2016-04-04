@@ -52,5 +52,27 @@ public interface ElkDatatypeDefinitionAxiom extends ElkAxiom {
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkDatatypeDefinitionAxiomVisitor<O> visitor);
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		/**
+		 * Create an {@link ElkDatatypeDefinitionAxiom}
+		 * 
+		 * @param datatype
+		 *            the {@link ElkDatatype} for which the axiom should be created
+		 * @param dataRange
+		 *            the {@link ElkDataRange} for which the axiom should be created
+		 * @return an {@link ElkDatatypeDefinitionAxiom} corresponding to the input
+		 */
+		public ElkDatatypeDefinitionAxiom getDatatypeDefinitionAxiom(
+				ElkDatatype datatype, ElkDataRange dataRange);
+
+	}
 
 }

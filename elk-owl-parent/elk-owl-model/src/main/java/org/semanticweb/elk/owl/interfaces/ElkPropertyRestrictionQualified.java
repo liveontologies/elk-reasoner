@@ -34,8 +34,8 @@ import org.semanticweb.elk.owl.visitors.ElkPropertyRestrictionQualifiedVisitor;
  * @param <F>
  *            the type of the filler of this restriction
  */
-public interface ElkPropertyRestrictionQualified<P, F> extends
-		ElkPropertyRestriction<P> {
+public interface ElkPropertyRestrictionQualified<P, F>
+		extends ElkPropertyRestriction<P> {
 
 	/**
 	 * Get the filler of this restriction.
@@ -52,5 +52,19 @@ public interface ElkPropertyRestrictionQualified<P, F> extends
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkPropertyRestrictionQualifiedVisitor<O> visitor);
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory extends ElkCardinalityRestrictionQualified.Factory,
+			ElkDataHasValue.Factory, ElkObjectAllValuesFrom.Factory,
+			ElkObjectHasValue.Factory, ElkObjectSomeValuesFrom.Factory {
+
+		// combined interface
+
+	}
 
 }

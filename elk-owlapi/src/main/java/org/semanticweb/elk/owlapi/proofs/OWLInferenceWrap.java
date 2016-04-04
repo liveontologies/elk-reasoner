@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.semanticweb.elk.owl.inferences.ElkInference;
 import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
@@ -41,10 +41,10 @@ public class OWLInferenceWrap implements OWLInference {
 
 	private final OWLOntology owlOntology_;
 
-	private final ElkObjectFactory elkFactory_;
+	private final ElkObject.Factory elkFactory_;
 
 	OWLInferenceWrap(ElkInference elkInference, ElkInferenceSet elkInferences,
-			OWLOntology owlOntology, ElkObjectFactory elkFactory) {
+			OWLOntology owlOntology, ElkObject.Factory elkFactory) {
 		this.elkInference_ = elkInference;
 		this.owlOntology_ = owlOntology;
 		this.elkFactory_ = elkFactory;

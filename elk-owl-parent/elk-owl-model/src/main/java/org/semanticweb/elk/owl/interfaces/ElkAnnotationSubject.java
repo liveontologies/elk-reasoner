@@ -46,4 +46,16 @@ public interface ElkAnnotationSubject extends ElkObject {
 	 */
 	public <O> O accept(ElkAnnotationSubjectVisitor<O> visitor);
 
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory extends ElkAnonymousIndividual.Factory {
+
+		// combined interface
+
+	}
+
 }

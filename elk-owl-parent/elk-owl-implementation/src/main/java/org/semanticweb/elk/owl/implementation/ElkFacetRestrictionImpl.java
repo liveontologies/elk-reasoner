@@ -44,8 +44,8 @@ public class ElkFacetRestrictionImpl implements ElkFacetRestriction {
 	private final ElkIri facetURI_;
 	private final ElkLiteral literal_;
 
-	ElkFacetRestrictionImpl(ElkIri facetURI, ElkLiteral literal) {
-		this.facetURI_ = facetURI;
+	ElkFacetRestrictionImpl(ElkIri iri, ElkLiteral literal) {
+		this.facetURI_ = iri;
 		this.literal_ = literal;
 	}
 

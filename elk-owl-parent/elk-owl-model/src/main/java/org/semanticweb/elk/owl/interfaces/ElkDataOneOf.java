@@ -30,9 +30,9 @@ import java.util.List;
 import org.semanticweb.elk.owl.visitors.ElkDataOneOfVisitor;
 
 /**
- * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Enumeration_of_Literals">Enumeration of
- * Literals<a> in the OWL 2 specification.
+ * Corresponds to an
+ * <a href= "http://www.w3.org/TR/owl2-syntax/#Enumeration_of_Literals">
+ * Enumeration of Literals<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
@@ -55,5 +55,39 @@ public interface ElkDataOneOf extends ElkDataRange {
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkDataOneOfVisitor<O> visitor);
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		/**
+		 * Create an {@link ElkDataOneOf}.
+		 * 
+		 * @param first
+		 *            the {@link ElkLiteral} for which the object should be
+		 *            created
+		 * @param other
+		 *            other {@link ElkLiteral}s for which the object should be
+		 *            created
+		 * @return an {@link ElkDataOneOf} corresponding to the input
+		 */
+		public ElkDataOneOf getDataOneOf(ElkLiteral first,
+				ElkLiteral... other);
+
+		/**
+		 * Create an {@link ElkDataOneOf}.
+		 * 
+		 * @param members
+		 *            the {@link ElkLiteral}s for which the object should be
+		 *            created
+		 * @return an {@link ElkDataOneOf} corresponding to the input
+		 */
+		public ElkDataOneOf getDataOneOf(List<? extends ElkLiteral> members);
+
+	}
 
 }

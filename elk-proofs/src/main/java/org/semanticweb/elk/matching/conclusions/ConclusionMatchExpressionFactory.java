@@ -1,6 +1,6 @@
 package org.semanticweb.elk.matching.conclusions;
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.tracing.Conclusion;
 
 /*
@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.tracing.Conclusion;
  *
  */
 public interface ConclusionMatchExpressionFactory
-		extends ElkObjectFactory, Conclusion.Factory, ConclusionMatch.Factory,
+		extends ElkObject.Factory, Conclusion.Factory, ConclusionMatch.Factory,
 		IndexedContextRootMatch.Factory {
 
 	// combined interface

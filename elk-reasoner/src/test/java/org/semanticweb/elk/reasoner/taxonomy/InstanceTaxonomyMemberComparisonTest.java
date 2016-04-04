@@ -1,5 +1,11 @@
 package org.semanticweb.elk.reasoner.taxonomy;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 /*
  * #%L
  * ELK Reasoner
@@ -31,13 +37,13 @@ import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.iris.ElkAbbreviatedIri;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkPrefixImpl;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
@@ -49,12 +55,6 @@ import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-
 /**
  * Tests whether members of various implementations of taxonomy
  * are compared according to their full IRI.
@@ -65,7 +65,7 @@ import static org.junit.Assert.assertFalse;
 @RunWith(PolySuite.class)
 public class InstanceTaxonomyMemberComparisonTest {
 	
-	final static ElkObjectFactory OBJECT_FACTORY = new ElkObjectFactoryImpl();	
+	final static ElkObject.Factory OBJECT_FACTORY = new ElkObjectEntityRecyclingFactory();	
 
 	static interface InstanceTaxonomyProvider {
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy(String resource)

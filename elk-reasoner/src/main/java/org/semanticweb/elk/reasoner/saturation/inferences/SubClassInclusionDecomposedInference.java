@@ -49,7 +49,6 @@ public interface SubClassInclusionDecomposedInference
 			SubClassInclusionExpandedDefinition.Visitor<O>,
 			SubClassInclusionExpandedSubClassOf.Visitor<O>,
 			SubClassInclusionObjectHasSelfPropertyRange.Visitor<O>,
-			SubClassInclusionOwlThing.Visitor<O>,
 			SubClassInclusionRange.Visitor<O>,
 			SubClassInclusionTautology.Visitor<O> {
 

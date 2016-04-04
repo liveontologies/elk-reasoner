@@ -32,12 +32,12 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
@@ -80,7 +80,7 @@ public class PropertyInferenceTracingTest {
 	@Test
 	public void testPropertyHierarchy() throws Exception {
 		Reasoner reasoner = TestReasonerUtils.loadAndClassify(TestReasonerUtils.loadAxioms("tracing/DeepPropertyHierarchy.owl"));
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass d = factory.getClass(new ElkFullIri("http://example.org/D"));
 		final IndexedObjectProperty s = ReasonerStateAccessor.transform(reasoner, factory.getObjectProperty(new ElkFullIri("http://example.org/S")));
@@ -111,7 +111,7 @@ public class PropertyInferenceTracingTest {
 		
 		Reasoner reasoner = TestReasonerUtils.loadAndClassify(
 				TestReasonerUtils.loadAxioms("tracing/SimpleCompositions.owl"));
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
 		ElkClass d = factory.getClass(new ElkFullIri("http://example.org/D"));

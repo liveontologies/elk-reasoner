@@ -43,9 +43,9 @@ public class ElkObjectSomeValuesFromImpl
 		implements ElkObjectSomeValuesFrom {
 
 	ElkObjectSomeValuesFromImpl(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			ElkClassExpression classExpression) {
-		super(objectPropertyExpression, classExpression);
+			ElkObjectPropertyExpression property,
+			ElkClassExpression filler) {
+		super(property, filler);
 	}
 
 	@Override

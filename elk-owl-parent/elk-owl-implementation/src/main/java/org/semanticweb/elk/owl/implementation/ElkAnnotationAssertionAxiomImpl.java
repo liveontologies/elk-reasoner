@@ -46,25 +46,25 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkAnnotationAssertionAxiomImpl implements
 		ElkAnnotationAssertionAxiom {
 
-	private final ElkAnnotationSubject annSubject_;
-	private final ElkAnnotationProperty annProperty_;
-	private final ElkAnnotationValue annValue_;
+	private final ElkAnnotationProperty property_;
+	private final ElkAnnotationSubject subject_;	
+	private final ElkAnnotationValue value_;
 
-	ElkAnnotationAssertionAxiomImpl(ElkAnnotationProperty annProperty,
-			ElkAnnotationSubject annSubject, ElkAnnotationValue annValue) {
-		this.annSubject_ = annSubject;
-		this.annProperty_ = annProperty;
-		this.annValue_ = annValue;
+	ElkAnnotationAssertionAxiomImpl(ElkAnnotationProperty property,
+			ElkAnnotationSubject subject, ElkAnnotationValue value) {
+		this.property_ = property;
+		this.subject_ = subject;		
+		this.value_ = value;
 	}
 
 	@Override
 	public ElkAnnotationProperty getProperty() {
-		return annProperty_;
+		return property_;
 	}
 
 	@Override
 	public ElkAnnotationValue getValue() {
-		return annValue_;
+		return value_;
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public class ElkAnnotationAssertionAxiomImpl implements
 
 	@Override
 	public ElkAnnotationSubject getSubject() {
-		return annSubject_;
+		return subject_;
 	}
 
 	@Override

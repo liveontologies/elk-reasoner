@@ -31,8 +31,8 @@ import org.semanticweb.elk.owl.visitors.ElkDisjointUnionAxiomVisitor;
 
 /**
  * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Disjoint_Union_of_Class_Expressions"
- * >Disjoint Union of Class Expressions Axiom<a> in the OWL 2 specification.
+ * "http://www.w3.org/TR/owl2-syntax/#Disjoint_Union_of_Class_Expressions" >
+ * Disjoint Union of Class Expressions Axiom<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
@@ -62,5 +62,52 @@ public interface ElkDisjointUnionAxiom extends ElkClassAxiom {
 	 * @return the output of the visitor
 	 */
 	public abstract <O> O accept(ElkDisjointUnionAxiomVisitor<O> visitor);
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		/**
+		 * Create an {@link ElkDisjointUnionAxiom}.
+		 * 
+		 * @param definedClass
+		 *            the defined {@link ElkClassExpression} for which the axiom
+		 *            should be created
+		 * @param first
+		 *            the first disjoint {@link ElkClassExpression} for which
+		 *            the axiom should be created
+		 * @param second
+		 *            the second disjoint {@link ElkClassExpression} for which
+		 *            the axiom should be created
+		 * @param other
+		 *            other disjoint {@link ElkClassExpression}s for which the
+		 *            axiom should be created
+		 * @return an {@link ElkDisjointUnionAxiom} corresponding to the input
+		 */
+		public ElkDisjointUnionAxiom getDisjointUnionAxiom(
+				ElkClass definedClass, ElkClassExpression first,
+				ElkClassExpression second,
+				ElkClassExpression... other);
+
+		/**
+		 * Create an {@link ElkDisjointUnionAxiom}.
+		 * 
+		 * @param definedClass
+		 *            the defined {@link ElkClassExpression} for which the axiom
+		 *            should be created
+		 * @param disjointClassExpressions
+		 *            the disjoint {@link ElkClassExpression}s for which the
+		 *            axiom should be created
+		 * @return an {@link ElkDisjointUnionAxiom} corresponding to the input
+		 */
+		public ElkDisjointUnionAxiom getDisjointUnionAxiom(
+				ElkClass definedClass,
+				List<? extends ElkClassExpression> disjointClassExpressions);
+
+	}
 
 }

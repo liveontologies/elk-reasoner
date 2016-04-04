@@ -38,7 +38,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.owl.predefined.ElkPolarity;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.ResolvingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedIndividual;
@@ -66,14 +66,18 @@ public class ElkPolarityExpressionConverterImpl extends
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ElkPolarityExpressionConverterImpl.class);
 
+	private final PredefinedElkClassFactory elkFactory_;
+	
 	private final ModifiableIndexedObject.Factory factory_;
 
 	private final ElkPolarityExpressionConverter complementaryConverter_;
 
 	ElkPolarityExpressionConverterImpl(ElkPolarity polarity,
+			PredefinedElkClassFactory elkFactory,
 			ModifiableIndexedObject.Factory factory,
 			ElkPolarityExpressionConverter complementaryConverter) {
 		super(polarity);
+		this.elkFactory_ = elkFactory;
 		this.factory_ = factory;
 		this.complementaryConverter_ = complementaryConverter;
 	}
@@ -96,12 +100,15 @@ public class ElkPolarityExpressionConverterImpl extends
 	 *            {@link ModifiableIndexedObject}s of the complementary polarity
 	 */
 	public ElkPolarityExpressionConverterImpl(ElkPolarity polarity,
+			PredefinedElkClassFactory elkFactory,
 			ModifiableIndexedObject.Factory factory,
 			ModifiableIndexedObject.Factory complementaryFactory) {
 		super(polarity);
+		this.elkFactory_ = elkFactory;
 		this.factory_ = factory;
 		this.complementaryConverter_ = new ElkPolarityExpressionConverterImpl(
-				polarity.getComplementary(), complementaryFactory, this);
+				polarity.getComplementary(), elkFactory, complementaryFactory,
+				this);
 	}
 
 	/**
@@ -117,14 +124,18 @@ public class ElkPolarityExpressionConverterImpl extends
 	 * 
 	 */
 	public ElkPolarityExpressionConverterImpl(
+			PredefinedElkClassFactory elkFactory,
 			ModifiableIndexedObject.Factory dualFactory) {
 		super(ElkPolarity.DUAL);
+		this.elkFactory_ = elkFactory;
 		this.factory_ = dualFactory;
 		this.complementaryConverter_ = this;
 	}
 
-	public ElkPolarityExpressionConverterImpl(ModifiableIndexedObjectCache cache) {
-		this(new ResolvingModifiableIndexedObjectFactory(cache));
+	public ElkPolarityExpressionConverterImpl(
+			PredefinedElkClassFactory elkFactory,
+			ModifiableIndexedObjectCache cache) {
+		this(elkFactory, new ResolvingModifiableIndexedObjectFactory(cache));
 	}
 
 	@Override
@@ -170,7 +181,7 @@ public class ElkPolarityExpressionConverterImpl extends
 		int size = elkObjectIntersectionOf.getClassExpressions().size();
 		switch (size) {
 		case 0:
-			return factory_.getIndexedClass(PredefinedElkClass.OWL_NOTHING);
+			return factory_.getIndexedClass(elkFactory_.getOwlNothing());
 		default:
 			// binarization
 			ModifiableIndexedClassExpression result = null;
@@ -200,7 +211,7 @@ public class ElkPolarityExpressionConverterImpl extends
 		int size = elkObjectOneOf.getIndividuals().size();
 		switch (size) {
 		case 0:
-			return factory_.getIndexedClass(PredefinedElkClass.OWL_THING);
+			return factory_.getIndexedClass(elkFactory_.getOwlThing());
 		case 1:
 			if (LOGGER_.isWarnEnabled()) {
 				LoggerWrap
@@ -226,7 +237,7 @@ public class ElkPolarityExpressionConverterImpl extends
 		int size = elkObjectUnionOf.getClassExpressions().size();
 		switch (size) {
 		case 0:
-			return factory_.getIndexedClass(PredefinedElkClass.OWL_THING);
+			return factory_.getIndexedClass(elkFactory_.getOwlThing());
 		case 1:
 			return elkObjectUnionOf.getClassExpressions().iterator().next()
 					.accept(this);

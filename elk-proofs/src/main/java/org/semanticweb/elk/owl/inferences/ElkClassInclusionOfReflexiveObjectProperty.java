@@ -1,7 +1,5 @@
 package org.semanticweb.elk.owl.inferences;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-
 /*
  * #%L
  * ELK Proofs Package
@@ -24,7 +22,8 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
@@ -68,7 +67,7 @@ public class ElkClassInclusionOfReflexiveObjectProperty
 	}
 
 	@Override
-	public ElkAxiom getPremise(int index, ElkObjectFactory factory) {
+	public ElkAxiom getPremise(int index, ElkObject.Factory factory) {
 		if (index == 0) {
 			return getPremise(factory);
 		}
@@ -77,12 +76,12 @@ public class ElkClassInclusionOfReflexiveObjectProperty
 	}
 
 	public ElkReflexiveObjectPropertyAxiom getPremise(
-			ElkObjectFactory factory) {
+			ElkObject.Factory factory) {
 		return factory.getReflexiveObjectPropertyAxiom(property_);
 	}
 
 	@Override
-	public ElkSubClassOfAxiom getConclusion(ElkObjectFactory factory) {
+	public ElkSubClassOfAxiom getConclusion(ElkObject.Factory factory) {
 		return factory.getSubClassOfAxiom(factory.getOwlThing(),
 				factory.getObjectHasSelf(property_));
 	}

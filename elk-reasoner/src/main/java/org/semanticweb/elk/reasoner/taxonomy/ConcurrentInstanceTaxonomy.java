@@ -36,6 +36,7 @@ import java.util.concurrent.ConcurrentMap;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
@@ -89,9 +90,10 @@ public class ConcurrentInstanceTaxonomy
 	private final ConcurrentMap<TaxonomyNode<ElkClass>, UpdateableTypeNodeWrapper> wrapperMap_;
 
 	public ConcurrentInstanceTaxonomy(
+			PredefinedElkClassFactory elkFactory,
 			final ComparatorKeyProvider<ElkEntity> classKeyProvider,
 			final ComparatorKeyProvider<ElkEntity> individualKeyProvider) {
-		this(new ConcurrentClassTaxonomy(classKeyProvider),
+		this(new ConcurrentClassTaxonomy(elkFactory, classKeyProvider),
 				individualKeyProvider);
 	}
 

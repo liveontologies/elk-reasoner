@@ -45,5 +45,28 @@ public interface ElkDataHasValue extends
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkDataHasValueVisitor<O> visitor);
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		/**
+		 * Create an {@link ElkDataHasValue}.
+		 * 
+		 * @param property
+		 *            the {@link ElkDataPropertyExpression} for which the object
+		 *            should be created
+		 * @param value
+		 *            the {@link ElkLiteral} for which the object should be created
+		 * @return an {@link ElkDataHasValue} corresponding to the input
+		 */
+		public ElkDataHasValue getDataHasValue(
+				ElkDataPropertyExpression property, ElkLiteral value);
+
+	}
 
 }

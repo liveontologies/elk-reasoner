@@ -40,9 +40,9 @@ public class ElkObjectMaxCardinalityUnqualifiedImpl extends
 		ElkObjectMaxCardinalityUnqualified {
 
 	ElkObjectMaxCardinalityUnqualifiedImpl(
-			ElkObjectPropertyExpression objectPropertyExpression,
+			ElkObjectPropertyExpression property,
 			int cardinality) {
-		super(objectPropertyExpression, cardinality);
+		super(property, cardinality);
 	}
 
 	@Override

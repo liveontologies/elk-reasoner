@@ -50,13 +50,8 @@ public class ModifiableIndexedDisjointClassesAxiomImpl<A extends ElkAxiom>
 
 	@Override
 	public boolean addOccurrence(ModifiableOntologyIndex index) {
-		if (!index.updatePositiveOwlNothingOccurrenceNo(1)) {
-			return false;
-		}
 		if (!DisjointSubsumerFromMemberRule.addRulesFor(this, index,
 				getOriginalAxiom())) {
-			// revert the changes
-			index.updatePositiveOwlNothingOccurrenceNo(-1);
 			return false;
 		}
 		return true;
@@ -64,13 +59,9 @@ public class ModifiableIndexedDisjointClassesAxiomImpl<A extends ElkAxiom>
 
 	@Override
 	public boolean removeOccurrence(ModifiableOntologyIndex index) {
-		if (!index.updatePositiveOwlNothingOccurrenceNo(-1)) {
-			return false;
-		}
 		if (!DisjointSubsumerFromMemberRule.removeRulesFor(this, index,
 				getOriginalAxiom())) {
 			// revert the changes
-			index.updatePositiveOwlNothingOccurrenceNo(1);
 			return false;
 		}
 		return true;

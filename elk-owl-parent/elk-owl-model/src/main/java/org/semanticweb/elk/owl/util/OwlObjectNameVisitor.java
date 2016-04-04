@@ -573,7 +573,7 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 	 * This object does not exist in the standard OWL2 syntax.
 	 */
 	@Override
-	public String visit(ElkFacetRestriction elkFacetRestriction) {
+	public String visit(ElkFacetRestriction restricition) {
 		return "FacetRestriction";
 	}
 

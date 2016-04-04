@@ -46,4 +46,29 @@ public interface ElkDataPropertyDomainAxiom extends ElkDataPropertyAxiom,
 	 * @return the output of the visitor
 	 */
 	public abstract <O> O accept(ElkDataPropertyDomainAxiomVisitor<O> visitor);
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		/**
+		 * Create an {@link ElkDataPropertyDomainAxiom}.
+		 * 
+		 * @param property
+		 *            the {@link ElkDataPropertyExpression} for which the object
+		 *            should be created
+		 * @param domain
+		 *            the {@link ElkClassExpression} for which the object should be
+		 *            created
+		 * @return an {@link ElkDataPropertyDomainAxiom} corresponding to the input
+		 */
+		public ElkDataPropertyDomainAxiom getDataPropertyDomainAxiom(
+				ElkDataPropertyExpression property,
+				ElkClassExpression domain);
+
+	}
 }

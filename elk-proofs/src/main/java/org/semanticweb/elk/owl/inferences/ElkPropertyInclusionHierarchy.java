@@ -25,7 +25,7 @@ package org.semanticweb.elk.owl.inferences;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
@@ -88,7 +88,7 @@ public class ElkPropertyInclusionHierarchy extends AbstractElkInference {
 
 	@Override
 	public ElkSubObjectPropertyOfAxiom getPremise(int index,
-			ElkObjectFactory factory) {
+			ElkObject.Factory factory) {
 		checkPremiseIndex(index);
 		// else
 		if (index == 0) {
@@ -102,7 +102,7 @@ public class ElkPropertyInclusionHierarchy extends AbstractElkInference {
 	}
 
 	@Override
-	public ElkSubObjectPropertyOfAxiom getConclusion(ElkObjectFactory factory) {
+	public ElkSubObjectPropertyOfAxiom getConclusion(ElkObject.Factory factory) {
 		return factory.getSubObjectPropertyOfAxiom(subExpression_,
 				expressions_.get(expressions_.size() - 1));
 	}

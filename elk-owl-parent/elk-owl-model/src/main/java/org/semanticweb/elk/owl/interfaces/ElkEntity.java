@@ -27,6 +27,7 @@ package org.semanticweb.elk.owl.interfaces;
 
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.predefined.ElkEntityType;
+import org.semanticweb.elk.owl.predefined.PredefinedElkEntityFactory;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 
 /**
@@ -56,5 +57,20 @@ public interface ElkEntity extends ElkObject {
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkEntityVisitor<O> visitor);
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory extends ElkAnnotationProperty.Factory, ElkClass.Factory,
+			ElkDataProperty.Factory, ElkDatatype.Factory,
+			ElkNamedIndividual.Factory, ElkObjectProperty.Factory,
+			PredefinedElkEntityFactory {
+
+		// combined interface
+
+	}
 
 }

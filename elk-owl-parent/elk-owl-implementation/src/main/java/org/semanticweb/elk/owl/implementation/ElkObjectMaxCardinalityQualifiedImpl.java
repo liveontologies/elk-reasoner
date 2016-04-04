@@ -42,9 +42,9 @@ public class ElkObjectMaxCardinalityQualifiedImpl
 		implements ElkObjectMaxCardinalityQualified {
 
 	ElkObjectMaxCardinalityQualifiedImpl(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			int cardinality, ElkClassExpression classExpression) {
-		super(objectPropertyExpression, cardinality, classExpression);
+			ElkObjectPropertyExpression property,
+			int cardinality, ElkClassExpression filler) {
+		super(property, cardinality, filler);
 	}
 
 	@Override

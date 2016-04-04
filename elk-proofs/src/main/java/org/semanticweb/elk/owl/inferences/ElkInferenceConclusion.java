@@ -24,7 +24,7 @@ package org.semanticweb.elk.owl.inferences;
 
 import org.semanticweb.elk.owl.implementation.ElkObjectImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
@@ -38,9 +38,9 @@ public class ElkInferenceConclusion extends ElkObjectImpl implements ElkAxiom {
 
 	private final ElkInference inference_;
 
-	private final ElkObjectFactory elkFactory_;
+	private final ElkObject.Factory elkFactory_;
 
-	ElkInferenceConclusion(ElkObjectFactory elkFactory,
+	ElkInferenceConclusion(ElkObject.Factory elkFactory,
 			ElkInference inference) {
 		this.inference_ = inference;
 		this.elkFactory_ = elkFactory;

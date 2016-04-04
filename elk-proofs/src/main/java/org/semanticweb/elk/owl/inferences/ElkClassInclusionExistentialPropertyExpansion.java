@@ -27,7 +27,7 @@ import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
@@ -115,7 +115,7 @@ public class ElkClassInclusionExistentialPropertyExpansion
 	}
 
 	@Override
-	public ElkAxiom getPremise(int index, ElkObjectFactory factory) {
+	public ElkAxiom getPremise(int index, ElkObject.Factory factory) {
 		checkPremiseIndex(index);
 		if (index < getExistentialPremiseCount()) {
 			return getExistentialPremise(index, factory);
@@ -129,7 +129,7 @@ public class ElkClassInclusionExistentialPropertyExpansion
 	}
 
 	public ElkSubClassOfAxiom getExistentialPremise(int index,
-			ElkObjectFactory factory) {
+			ElkObject.Factory factory) {
 		if (index < 0 || index >= getExistentialPremiseCount()) {
 			throw new IndexOutOfBoundsException(
 					"No existential premise with index: " + index);
@@ -141,7 +141,7 @@ public class ElkClassInclusionExistentialPropertyExpansion
 	}
 
 	public ElkSubObjectPropertyOfAxiom getLastPremise(
-			ElkObjectFactory factory) {
+			ElkObject.Factory factory) {
 		return factory.getSubObjectPropertyOfAxiom(
 				subChain_.size() == 1 ? subChain_.get(0)
 						: factory.getObjectPropertyChain(subChain_),
@@ -149,7 +149,7 @@ public class ElkClassInclusionExistentialPropertyExpansion
 	}
 
 	@Override
-	public ElkSubClassOfAxiom getConclusion(ElkObjectFactory factory) {
+	public ElkSubClassOfAxiom getConclusion(ElkObject.Factory factory) {
 		return factory.getSubClassOfAxiom(classExpressions_.get(0),
 				factory.getObjectSomeValuesFrom(superProperty_,
 						classExpressions_.get(classExpressions_.size() - 1)));

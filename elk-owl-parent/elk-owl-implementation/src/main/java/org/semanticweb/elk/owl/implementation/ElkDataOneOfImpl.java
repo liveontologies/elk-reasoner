@@ -38,8 +38,8 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkDataOneOfImpl extends ElkObjectListObject<ElkLiteral> implements
 		ElkDataOneOf {
 
-	ElkDataOneOfImpl(List<? extends ElkLiteral> literals) {
-		super(literals);
+	ElkDataOneOfImpl(List<? extends ElkLiteral> members) {
+		super(members);
 	}
 
 	@Override

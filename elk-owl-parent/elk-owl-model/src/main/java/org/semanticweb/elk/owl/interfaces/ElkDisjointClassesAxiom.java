@@ -30,9 +30,9 @@ import java.util.List;
 import org.semanticweb.elk.owl.visitors.ElkDisjointClassesAxiomVisitor;
 
 /**
- * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Disjoint_Classes">Disjoint Classes
- * Axiom<a> in the OWL 2 specification.
+ * Corresponds to an
+ * <a href= "http://www.w3.org/TR/owl2-syntax/#Disjoint_Classes">Disjoint
+ * Classes Axiom<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
@@ -55,5 +55,44 @@ public interface ElkDisjointClassesAxiom extends ElkClassAxiom {
 	 * @return the output of the visitor
 	 */
 	public abstract <O> O accept(ElkDisjointClassesAxiomVisitor<O> visitor);
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		/**
+		 * Create an {@link ElkDisjointClassesAxiom}.
+		 * 
+		 * @param first
+		 *            the first {@link ElkClassExpression} for which the axiom
+		 *            should be created
+		 * @param second
+		 *            the second {@link ElkClassExpression} for which the axiom
+		 *            should be created
+		 * @param other
+		 *            other {@link ElkClassExpression} for which the axiom
+		 *            should be created
+		 * @return an {@link ElkDisjointClassesAxiom} corresponding to the input
+		 */
+		public ElkDisjointClassesAxiom getDisjointClassesAxiom(
+				ElkClassExpression first,
+				ElkClassExpression second,
+				ElkClassExpression... other);
+
+		/**
+		 * Create an {@link ElkDisjointClassesAxiom}.
+		 * 
+		 * @param disjointClassExpressions
+		 *            the {@link ElkClassExpression}s for which the axiom should
+		 *            be created
+		 * @return an {@link ElkDisjointClassesAxiom} corresponding to the input
+		 */
+		public ElkDisjointClassesAxiom getDisjointClassesAxiom(
+				List<? extends ElkClassExpression> disjointClassExpressions);
+	}
 
 }

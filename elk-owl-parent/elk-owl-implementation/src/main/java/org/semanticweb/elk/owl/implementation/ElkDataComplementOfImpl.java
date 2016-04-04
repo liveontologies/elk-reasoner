@@ -39,9 +39,9 @@ public class ElkDataComplementOfImpl extends ElkObjectImpl implements
 
 	private final ElkDataRange dataRange_;
 
-	ElkDataComplementOfImpl(ElkDataRange dataRange) {
+	ElkDataComplementOfImpl(ElkDataRange range) {
 
-		this.dataRange_ = dataRange;
+		this.dataRange_ = range;
 	}
 
 	@Override

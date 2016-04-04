@@ -80,7 +80,7 @@ public class IncrementalInstanceTaxonomyComputationStage extends
 		Operations.Transformation<ElkNamedIndividual, IndexedIndividual> transformation = new Operations.Transformation<ElkNamedIndividual, IndexedIndividual>() {
 
 			private final ElkPolarityExpressionConverter converter = new ElkPolarityExpressionConverterImpl(
-					reasoner.ontologyIndex);
+					reasoner.getElkFactory(), reasoner.ontologyIndex);
 
 			@Override
 			public IndexedIndividual transform(ElkNamedIndividual element) {

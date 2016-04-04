@@ -24,9 +24,7 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 
 import java.util.Collection;
 
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.iris.ElkIri;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexClassExpression;
@@ -40,6 +38,8 @@ import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectIntersecti
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectUnionOf;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlNothing;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlThing;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
@@ -47,7 +47,6 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectCache;
 import org.semanticweb.elk.util.collections.Operations;
-import org.semanticweb.elk.util.collections.entryset.Entry;
 import org.semanticweb.elk.util.collections.entryset.EntryCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,8 +56,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author "Yevgeny Kazakov"
  */
-class ModifiableIndexedObjectCacheImpl implements
-		ModifiableIndexedObjectCache {
+class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -78,10 +76,12 @@ class ModifiableIndexedObjectCacheImpl implements
 
 	private final CachedIndexedObject.Filter resolver_, inserter_, deleter_;
 
-	private final Entry<CachedIndexedClass, ?> owlThingResolver_,
-			owlNothingResolver_;
+	private final CachedIndexedOwlThing owlThing_;
 
-	public ModifiableIndexedObjectCacheImpl(int initialSize) {
+	private final CachedIndexedOwlNothing owlNothing_;
+
+	public ModifiableIndexedObjectCacheImpl(
+			PredefinedElkClassFactory elkFactory, int initialSize) {
 		this.cachedComplexClassExpressions_ = new EntryCollection<CachedIndexedComplexClassExpression<?>>(
 				initialSize);
 		this.cachedBinaryPropertyChains_ = new EntryCollection<CachedIndexedComplexPropertyChain>(
@@ -97,13 +97,18 @@ class ModifiableIndexedObjectCacheImpl implements
 		this.resolver_ = new Resolver_();
 		this.inserter_ = new Inserter_();
 		this.deleter_ = new Deleter_();
-		this.owlThingResolver_ = new ClassResolver(PredefinedElkClass.OWL_THING);
-		this.owlNothingResolver_ = new ClassResolver(
-				PredefinedElkClass.OWL_NOTHING);
+		// owl:Thing and owl:Nothing always occur in the cache
+		this.owlThing_ = new CachedIndexedOwlThingImpl(
+				elkFactory.getOwlThing());
+		this.owlNothing_ = new CachedIndexedOwlNothingImpl(
+				elkFactory.getOwlNothing());
+		add(owlThing_);
+		add(owlNothing_);
 	}
 
-	public ModifiableIndexedObjectCacheImpl() {
-		this(1024);
+	public ModifiableIndexedObjectCacheImpl(
+			PredefinedElkClassFactory elkFactory) {
+		this(elkFactory, 1024);
 	}
 
 	@Override
@@ -124,8 +129,9 @@ class ModifiableIndexedObjectCacheImpl implements
 	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<? extends IndexedClassExpression> getClassExpressions() {
-		return Operations.getCollection(Operations.concat(cachedClasses_,
-				cachedIndividuals_, cachedComplexClassExpressions_),
+		return Operations.getCollection(
+				Operations.concat(cachedClasses_, cachedIndividuals_,
+						cachedComplexClassExpressions_),
 				cachedClasses_.size() + cachedIndividuals_.size()
 						+ cachedComplexClassExpressions_.size());
 	}
@@ -141,13 +147,13 @@ class ModifiableIndexedObjectCacheImpl implements
 	}
 
 	@Override
-	public IndexedClass getOwlThing() {
-		return cachedClasses_.findStructural(owlThingResolver_);
+	public CachedIndexedOwlThing getOwlThing() {
+		return owlThing_;
 	}
 
 	@Override
-	public IndexedClass getOwlNothing() {
-		return cachedClasses_.findStructural(owlNothingResolver_);
+	public CachedIndexedOwlNothing getOwlNothing() {
+		return owlNothing_;
 	}
 
 	@Override
@@ -379,47 +385,6 @@ class ModifiableIndexedObjectCacheImpl implements
 		public CachedIndexedClassExpressionList filter(
 				CachedIndexedClassExpressionList element) {
 			return cachedClassExpressionLists_.removeStructural(element);
-		}
-
-	}
-
-	private static class ClassResolver implements
-			Entry<CachedIndexedClass, CachedIndexedClass> {
-
-		private final ElkIri iri_;
-
-		private final int structuralHash_;
-
-		ClassResolver(ElkClass entity) {
-			this.iri_ = entity.getIri();
-			this.structuralHash_ = CachedIndexedClass.Helper
-					.structuralHashCode(entity);
-		}
-
-		@Override
-		public void setNext(CachedIndexedClass next) {
-			// no needed
-		}
-
-		@Override
-		public CachedIndexedClass getNext() {
-			return null;
-		}
-
-		@Override
-		public CachedIndexedClass structuralEquals(Object other) {
-			if (other instanceof CachedIndexedClass) {
-				CachedIndexedClass otherEntry = (CachedIndexedClass) other;
-				if (iri_.equals(otherEntry.getElkEntity().getIri()))
-					return otherEntry;
-			}
-			// else
-			return null;
-		}
-
-		@Override
-		public int structuralHashCode() {
-			return structuralHash_;
 		}
 
 	}

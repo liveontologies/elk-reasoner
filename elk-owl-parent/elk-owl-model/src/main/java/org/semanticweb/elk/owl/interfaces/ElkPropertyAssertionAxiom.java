@@ -36,8 +36,8 @@ import org.semanticweb.elk.owl.visitors.ElkPropertyAssertionAxiomVisitor;
  * @param <O>
  *            the type of the object of this assertion
  */
-public interface ElkPropertyAssertionAxiom<P, S, O> extends
-		ElkPropertyAxiom<P>, ElkAssertionAxiom {
+public interface ElkPropertyAssertionAxiom<P, S, O>
+		extends ElkPropertyAxiom<P>, ElkAssertionAxiom {
 
 	/**
 	 * Get the subject of this restriction.
@@ -61,5 +61,20 @@ public interface ElkPropertyAssertionAxiom<P, S, O> extends
 	 * @return the output of the visitor
 	 */
 	public <T> T accept(ElkPropertyAssertionAxiomVisitor<T> visitor);
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory extends ElkDataPropertyAssertionAxiom.Factory,
+			ElkNegativeDataPropertyAssertionAxiom.Factory,
+			ElkNegativeObjectPropertyAssertionAxiom.Factory,
+			ElkObjectPropertyAssertionAxiom.Factory {
+
+		// combined interface
+
+	}
 
 }

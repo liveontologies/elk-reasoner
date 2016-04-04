@@ -25,7 +25,7 @@ package org.semanticweb.elk.owl.inferences;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 
 /**
@@ -76,14 +76,14 @@ public class ElkClassInclusionObjectIntersectionOfComposition
 	}
 
 	@Override
-	public ElkSubClassOfAxiom getPremise(int index, ElkObjectFactory factory) {
+	public ElkSubClassOfAxiom getPremise(int index, ElkObject.Factory factory) {
 		checkPremiseIndex(index);
 		return factory.getSubClassOfAxiom(subExpression_,
 				conjuncts_.get(index));
 	}
 
 	@Override
-	public ElkSubClassOfAxiom getConclusion(ElkObjectFactory factory) {
+	public ElkSubClassOfAxiom getConclusion(ElkObject.Factory factory) {
 		return factory.getSubClassOfAxiom(subExpression_,
 				factory.getObjectIntersectionOf(conjuncts_));
 	}

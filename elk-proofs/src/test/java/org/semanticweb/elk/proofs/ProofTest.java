@@ -39,13 +39,11 @@ import org.junit.runner.RunWith;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectDelegatingFactory;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.owl.managers.ElkEntityRecycler;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.proofs.utils.TestUtils;
@@ -109,11 +107,10 @@ public class ProofTest {
 
 	@Test
 	public void provabilityTest() throws Exception {
-		ElkObjectFactory elkFactory = new ElkObjectFactoryImpl(
-				new ElkEntityRecycler());
+		ElkObject.Factory elkFactory = new ElkObjectEntityRecyclingFactory();
 		// to save all loaded axioms
 		final Set<ElkAxiom> ontology = new ArrayHashSet<ElkAxiom>();
-		ElkObjectFactory axiomSavingFactory = new ElkObjectDelegatingFactory(
+		ElkObject.Factory axiomSavingFactory = new ElkObjectDelegatingFactory(
 				elkFactory) {
 
 			@Override
@@ -154,7 +151,7 @@ public class ProofTest {
 			final Set<ElkAxiom> ontology) {
 		return new TracingTestVisitor() {
 
-			private final ElkObjectFactory factory_ = new ElkObjectFactoryImpl();
+			private final ElkObject.Factory factory_ = new ElkObjectEntityRecyclingFactory();
 
 			@Override
 			public void subsumptionTest(ElkClass subsumee, ElkClass subsumer) {

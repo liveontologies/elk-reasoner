@@ -53,4 +53,16 @@ public interface ElkPropertyRangeAxiom<P, R> extends ElkPropertyAxiom<P> {
 	 */
 	public <O> O accept(ElkPropertyRangeAxiomVisitor<O> visitor);
 
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory extends ElkAnnotationPropertyRangeAxiom.Factory,
+			ElkDataPropertyRangeAxiom.Factory,
+			ElkObjectPropertyRangeAxiom.Factory {
+
+	}
+
 }

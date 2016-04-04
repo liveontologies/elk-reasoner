@@ -47,7 +47,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * @author Yevgeny Kazakov
  */
 public class SubClassInclusionOwlThing
-		extends AbstractSubClassInclusionDecomposedInference {
+		extends AbstractSubClassInclusionComposedInference<IndexedClass> {
 
 	public SubClassInclusionOwlThing(IndexedContextRoot inferenceRoot,
 			IndexedClass owlThingSubsumer) {
@@ -66,7 +66,7 @@ public class SubClassInclusionOwlThing
 
 	@Override
 	public final <O> O accept(
-			SubClassInclusionDecomposedInference.Visitor<O> visitor) {
+			SubClassInclusionComposedInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

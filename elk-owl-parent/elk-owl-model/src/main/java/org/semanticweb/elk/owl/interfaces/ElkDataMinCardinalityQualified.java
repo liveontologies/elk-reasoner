@@ -48,4 +48,32 @@ public interface ElkDataMinCardinalityQualified
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkDataMinCardinalityQualifiedVisitor<O> visitor);
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		/**
+		 * Create an {@link ElkDataMinCardinalityQualified}.
+		 * 
+		 * @param property
+		 *            the {@link ElkDataPropertyExpression} for which the object
+		 *            should be created
+		 * @param cardinality
+		 *            the cardinality for which the object should be created
+		 * @param range
+		 *            the {@link ElkDataRange} for which the object should be
+		 *            created
+		 * @return an {@link ElkDataMinCardinalityQualified} corresponding to the
+		 *         input
+		 */
+		public ElkDataMinCardinalityQualified getDataMinCardinalityQualified(
+				ElkDataPropertyExpression property, int cardinality,
+				ElkDataRange range);
+
+	}
 }

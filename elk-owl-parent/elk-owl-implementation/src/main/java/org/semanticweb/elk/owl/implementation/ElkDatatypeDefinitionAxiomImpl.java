@@ -46,9 +46,9 @@ public class ElkDatatypeDefinitionAxiomImpl implements
 	private final ElkDatatype datatype_;
 	private final ElkDataRange dataRange_;
 
-	ElkDatatypeDefinitionAxiomImpl(ElkDatatype dt, ElkDataRange dr) {
-		datatype_ = dt;
-		dataRange_ = dr;
+	ElkDatatypeDefinitionAxiomImpl(ElkDatatype datatype, ElkDataRange dataRange) {
+		datatype_ = datatype;
+		dataRange_ = dataRange;
 	}
 
 	@Override

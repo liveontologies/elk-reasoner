@@ -46,4 +46,29 @@ public interface ElkDataPropertyRangeAxiom extends ElkDataPropertyAxiom,
 	 * @return the output of the visitor
 	 */
 	public abstract <O> O accept(ElkDataPropertyRangeAxiomVisitor<O> visitor);
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		/**
+		 * Create an {@link ElkDataPropertyRangeAxiom}.
+		 * 
+		 * @param property
+		 *            the {@link ElkDataPropertyExpression} for which the object
+		 *            should be created
+		 * @param range
+		 *            the {@link ElkDataRange} for which the object should be
+		 *            created
+		 * @return an {@link ElkDataPropertyRangeAxiom} corresponding to the input
+		 */
+		public ElkDataPropertyRangeAxiom getDataPropertyRangeAxiom(
+				ElkDataPropertyExpression property,
+				ElkDataRange range);
+
+	}
 }

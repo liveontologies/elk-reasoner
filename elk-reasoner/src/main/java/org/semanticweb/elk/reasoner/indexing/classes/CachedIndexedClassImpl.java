@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
@@ -32,17 +31,13 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedEntity;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
-import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 
 /**
  * Implements an equality view for instances of {@link IndexedClass}
  * 
  * @author "Yevgeny Kazakov"
  */
-final class CachedIndexedClassImpl extends
+class CachedIndexedClassImpl extends
 		CachedIndexedClassEntityImpl<CachedIndexedClass> implements
 		CachedIndexedClass {
 
@@ -101,82 +96,6 @@ final class CachedIndexedClassImpl extends
 	@Override
 	public final CachedIndexedClass structuralEquals(Object other) {
 		return CachedIndexedClass.Helper.structuralEquals(this, other);
-	}
-
-	boolean updateTotalOccurrenceNo(final ModifiableOntologyIndex index,
-			int totalIncrement) {
-
-		if (totalOccurrenceNo == 0 && totalIncrement > 0) {
-			if (elkClass_ == PredefinedElkClass.OWL_NOTHING
-					&& !ContradictionFromOwlNothingRule.addRuleFor(this, index)) {
-				return false;
-			}
-		}
-		totalOccurrenceNo += totalIncrement;
-
-		if (totalOccurrenceNo == 0 && totalIncrement < 0) {
-			if (elkClass_ == PredefinedElkClass.OWL_NOTHING
-					&& !ContradictionFromOwlNothingRule.removeRuleFor(this,
-							index)) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	boolean updateNegativeOccurrenceNo(final ModifiableOntologyIndex index,
-			int negativeIncrement) {
-		if (elkClass_ != PredefinedElkClass.OWL_THING)
-			return true;
-
-		if (!index.hasNegativeOwlThing() && negativeIncrement > 0) {
-			if (!OwlThingContextInitRule.addRuleFor(this, index)) {
-				return false;
-			}
-		}
-
-		index.updateNegativeOwlThingOccurrenceNo(negativeIncrement);
-
-		if (!index.hasNegativeOwlThing() && negativeIncrement < 0) {
-			if (!OwlThingContextInitRule.removeRuleFor(this, index)) {
-				// revert the changes
-				index.updateNegativeOwlThingOccurrenceNo(-negativeIncrement);
-				return false;
-			}
-		}
-		return true;
-	}
-
-	boolean updatePositiveOccurrenceNo(final ModifiableOntologyIndex index,
-			int positiveIncrement) {
-		if (elkClass_ != PredefinedElkClass.OWL_NOTHING)
-			return true;
-
-		index.updatePositiveOwlNothingOccurrenceNo(positiveIncrement);
-
-		return true;
-	}
-
-	@Override
-	public final boolean updateOccurrenceNumbers(
-			final ModifiableOntologyIndex index, OccurrenceIncrement increment) {
-
-		if (!updateTotalOccurrenceNo(index, increment.totalIncrement)) {
-			return false;
-		}
-		if (!updatePositiveOccurrenceNo(index, increment.positiveIncrement)) {
-			// revert the changes
-			updateTotalOccurrenceNo(index, -increment.positiveIncrement);
-			return false;
-		}
-		if (!updateNegativeOccurrenceNo(index, increment.negativeIncrement)) {
-			// revert the changes
-			updateTotalOccurrenceNo(index, -increment.negativeIncrement);
-			updatePositiveOccurrenceNo(index, -increment.positiveIncrement);
-			return false;
-		}
-
-		return true;
 	}
 
 	@Override

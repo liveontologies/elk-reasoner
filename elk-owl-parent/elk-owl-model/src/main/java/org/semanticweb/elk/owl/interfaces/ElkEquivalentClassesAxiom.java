@@ -30,9 +30,9 @@ import java.util.List;
 import org.semanticweb.elk.owl.visitors.ElkEquivalentClassesAxiomVisitor;
 
 /**
- * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Equivalent_Classes">Equivalent Class
- * Axiom<a> in the OWL 2 specification.
+ * Corresponds to an
+ * <a href= "http://www.w3.org/TR/owl2-syntax/#Equivalent_Classes">Equivalent
+ * Class Axiom<a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
@@ -55,5 +55,47 @@ public interface ElkEquivalentClassesAxiom extends ElkClassAxiom {
 	 * @return the output of the visitor
 	 */
 	public abstract <O> O accept(ElkEquivalentClassesAxiomVisitor<O> visitor);
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		/**
+		 * Create an {@link ElkEquivalentClassesAxiom}.
+		 * 
+		 * @param first
+		 *            the first equivalent {@link ElkClassExpression} for which
+		 *            the axiom should be created
+		 * @param second
+		 *            the second equivalent {@link ElkClassExpression} for which
+		 *            the axiom should be created
+		 * @param other
+		 *            other equivalent {@link ElkClassExpression}s for which the
+		 *            axiom should be created
+		 * @return an {@link ElkEquivalentClassesAxiom} corresponding to the
+		 *         input
+		 */
+		public ElkEquivalentClassesAxiom getEquivalentClassesAxiom(
+				ElkClassExpression first,
+				ElkClassExpression second,
+				ElkClassExpression... other);
+
+		/**
+		 * Create an {@link ElkEquivalentClassesAxiom}.
+		 * 
+		 * @param equivalentClassExpressions
+		 *            the equivalent {@link ElkClassExpression}s for which the
+		 *            axiom should be created
+		 * @return an {@link ElkEquivalentClassesAxiom} corresponding to the
+		 *         input
+		 */
+		public ElkEquivalentClassesAxiom getEquivalentClassesAxiom(
+				List<? extends ElkClassExpression> equivalentClassExpressions);
+
+	}
 
 }

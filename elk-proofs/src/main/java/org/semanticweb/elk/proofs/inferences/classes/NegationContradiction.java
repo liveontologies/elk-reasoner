@@ -29,8 +29,7 @@ import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
@@ -50,8 +49,8 @@ public class NegationContradiction extends AbstractInference<AxiomExpression<? e
 	
 	private final Expression negativeSubsumer_;
 	
-	public NegationContradiction(ElkClassExpression sub, ElkClassExpression sup, ElkObjectFactory factory, ExpressionFactory exprFactory) {
-		super(exprFactory.create(factory.getSubClassOfAxiom(sub, PredefinedElkClass.OWL_NOTHING)));
+	public NegationContradiction(ElkClassExpression sub, ElkClassExpression sup, ElkObject.Factory factory, ExpressionFactory exprFactory) {
+		super(exprFactory.create(factory.getSubClassOfAxiom(sub, factory.getOwlNothing())));
 
 		subsumer_ = exprFactory.create(factory.getSubClassOfAxiom(sub, sup));
 		negativeSubsumer_ = exprFactory.create(factory.getSubClassOfAxiom(sub, factory.getObjectComplementOf(sup)));

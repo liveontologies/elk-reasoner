@@ -31,19 +31,18 @@ import java.util.Set;
 import org.junit.Test;
 import org.semanticweb.elk.loading.EmptyAxiomLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 
 public class ComplexClassQueryTest {
 
-	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
+	final ElkObject.Factory objectFactory = new ElkObjectEntityRecyclingFactory();
 
 	@Test
 	public void testSimpleSubsumption() throws ElkException {
@@ -71,7 +70,7 @@ public class ComplexClassQueryTest {
 		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
 		loader.add(objectFactory.getSubClassOfAxiom(A,
-				PredefinedElkClass.OWL_NOTHING));
+				objectFactory.getOwlNothing()));
 		reasoner.isInconsistent();
 		ElkObjectProperty R = objectFactory.getObjectProperty(new ElkFullIri(
 				":R"));

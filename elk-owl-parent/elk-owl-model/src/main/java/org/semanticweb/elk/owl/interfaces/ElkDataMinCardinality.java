@@ -30,8 +30,8 @@ import org.semanticweb.elk.owl.visitors.ElkDataMinCardinalityVisitor;
  * @author "Yevgeny Kazakov"
  *
  */
-public interface ElkDataMinCardinality extends
-		ElkCardinalityRestriction<ElkDataPropertyExpression> {
+public interface ElkDataMinCardinality
+		extends ElkCardinalityRestriction<ElkDataPropertyExpression> {
 
 	/**
 	 * Accept an {@link ElkDataMinCardinalityVisitor}.
@@ -41,5 +41,18 @@ public interface ElkDataMinCardinality extends
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkDataMinCardinalityVisitor<O> visitor);
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory extends ElkDataMinCardinalityQualified.Factory,
+			ElkDataMinCardinalityUnqualified.Factory {
+
+		// combined interface
+
+	}
 
 }

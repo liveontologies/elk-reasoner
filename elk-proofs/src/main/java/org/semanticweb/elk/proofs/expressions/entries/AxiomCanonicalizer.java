@@ -24,10 +24,10 @@ package org.semanticweb.elk.proofs.expressions.entries;
  * #L%
  */
 
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 
 /**
@@ -39,11 +39,11 @@ import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
  */
 class AxiomCanonicalizer extends DummyElkAxiomVisitor<ElkAxiom> {
 
-	private static AxiomCanonicalizer INSTANCE_ = new AxiomCanonicalizer(new ElkObjectFactoryImpl());
+	private static AxiomCanonicalizer INSTANCE_ = new AxiomCanonicalizer(new ElkObjectEntityRecyclingFactory());
 	
-	private final ElkObjectFactory factory_;
+	private final ElkObject.Factory factory_;
 	
-	AxiomCanonicalizer(ElkObjectFactory f) {
+	AxiomCanonicalizer(ElkObject.Factory f) {
 		factory_ = f;
 	}
 	

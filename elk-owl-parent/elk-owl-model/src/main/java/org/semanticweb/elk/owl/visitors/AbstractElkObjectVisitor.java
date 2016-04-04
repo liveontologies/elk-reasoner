@@ -592,9 +592,9 @@ public abstract class AbstractElkObjectVisitor<O> implements ElkObjectVisitor<O>
 	}
 
 	@Override
-	public O visit(ElkFacetRestriction elkFacetRestriction) {
+	public O visit(ElkFacetRestriction restricition) {
 		
-		return defaultVisit(elkFacetRestriction);
+		return defaultVisit(restricition);
 	}
 
 	@Override

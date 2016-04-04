@@ -29,7 +29,7 @@ import java.util.Arrays;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
@@ -53,7 +53,7 @@ public class ClassSubsumption extends AbstractInference<AxiomExpression<? extend
 	// parameters. Perhaps we could have an inference factory which would do it.
 	public ClassSubsumption(ElkAxiom sideCondition,
 			ElkClassExpression sub, ElkClassExpression sup,
-			ElkClassExpression premise, ElkObjectFactory factory, ExpressionFactory exprFactory) {
+			ElkClassExpression premise, ElkObject.Factory factory, ExpressionFactory exprFactory) {
 		super(exprFactory.create(factory.getSubClassOfAxiom(sub, sup)));
 
 		premise_ = exprFactory.create(factory.getSubClassOfAxiom(sub, premise));

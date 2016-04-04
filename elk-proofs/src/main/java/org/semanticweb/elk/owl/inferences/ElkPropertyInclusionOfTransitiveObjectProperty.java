@@ -25,7 +25,7 @@ package org.semanticweb.elk.owl.inferences;
 import java.util.Arrays;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
@@ -69,7 +69,7 @@ public class ElkPropertyInclusionOfTransitiveObjectProperty
 	}
 
 	@Override
-	public ElkAxiom getPremise(int index, ElkObjectFactory factory) {
+	public ElkAxiom getPremise(int index, ElkObject.Factory factory) {
 		if (index == 0) {
 			return getPremise(factory);
 		}
@@ -78,12 +78,12 @@ public class ElkPropertyInclusionOfTransitiveObjectProperty
 	}
 
 	public ElkTransitiveObjectPropertyAxiom getPremise(
-			ElkObjectFactory factory) {
+			ElkObject.Factory factory) {
 		return factory.getTransitiveObjectPropertyAxiom(property_);
 	}
 
 	@Override
-	public ElkSubObjectPropertyOfAxiom getConclusion(ElkObjectFactory factory) {
+	public ElkSubObjectPropertyOfAxiom getConclusion(ElkObject.Factory factory) {
 		return factory
 				.getSubObjectPropertyOfAxiom(
 						factory.getObjectPropertyChain(

@@ -25,17 +25,17 @@ package org.semanticweb.elk.owl.interfaces;
 import org.semanticweb.elk.owl.visitors.ElkLiteralVisitor;
 
 /**
- * Corresponds to a <a href="http://www.w3.org/TR/owl2-syntax/#Literals"
- * >Literal<a> in the OWL 2 specification.
+ * Corresponds to a
+ * <a href="http://www.w3.org/TR/owl2-syntax/#Literals" >Literal<a> in the OWL 2
+ * specification.
  * 
  * The OWL specification distinguishes three specific kinds of literals: typed
  * literals, plain literals without language tag, and plain literals with
  * language tag. However, plain literals are identified with typed literals of
  * type "rdf:PlainLiteral" where the language tag is represented as part of the
- * lexical form. For example, "Some text"@de is represented as
- * "Some text@de"^^rdf:PlainLiteral and "Another text" is represented as
- * "Another text@"^^rdf:PlainLiteral. These forms are considered structurally
- * identical.
+ * lexical form. For example, "Some text"@de is represented as "Some text@de"
+ * ^^rdf:PlainLiteral and "Another text" is represented as "Another text@"
+ * ^^rdf:PlainLiteral. These forms are considered structurally identical.
  * 
  * Therefore, all literals can be considered as consisting of a lexical form and
  * a datatype.
@@ -71,5 +71,27 @@ public interface ElkLiteral extends ElkObject, ElkAnnotationValue {
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkLiteralVisitor<O> visitor);
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		/**
+		 * Create an {@link ElkLiteral}.
+		 * 
+		 * @param lexicalForm
+		 *            the {@link String} for which the object should be created
+		 * @param datatype
+		 *            the {@link ElkDatatype} for which the object should be
+		 *            created
+		 * @return an {@link ElkLiteral} corresponding to the input
+		 */
+		public ElkLiteral getLiteral(String lexicalForm, ElkDatatype datatype);
+
+	}
 
 }

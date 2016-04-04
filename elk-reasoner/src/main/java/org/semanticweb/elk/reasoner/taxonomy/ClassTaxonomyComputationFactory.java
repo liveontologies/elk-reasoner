@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionFactory;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionJob;
@@ -104,14 +105,17 @@ public class ClassTaxonomyComputationFactory extends SimpleInterrupter
 	/**
 	 * Create a new class taxonomy engine for the input ontology index.
 	 * 
+	 * @param elkFactory
+	 *            a factory for creating owl:Thing and owl:Nothing
 	 * @param saturationState
 	 *            the saturation state of the reasoner
 	 * @param maxWorkers
 	 *            the maximum number of workers that can use this factory
 	 */
-	public ClassTaxonomyComputationFactory(SaturationState<?> saturationState,
-			int maxWorkers) {
-		this(saturationState, maxWorkers, new ConcurrentClassTaxonomy(ElkClassKeyProvider.INSTANCE));
+	public ClassTaxonomyComputationFactory(PredefinedElkClassFactory elkFactory,
+			SaturationState<?> saturationState, int maxWorkers) {
+		this(saturationState, maxWorkers, new ConcurrentClassTaxonomy(
+				elkFactory, ElkClassKeyProvider.INSTANCE));
 	}
 
 	/**

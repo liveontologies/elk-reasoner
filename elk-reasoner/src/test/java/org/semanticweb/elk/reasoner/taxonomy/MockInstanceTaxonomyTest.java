@@ -30,13 +30,11 @@ import java.util.Collections;
 import java.util.HashSet;
 
 import org.junit.Test;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
-import org.semanticweb.elk.owl.managers.ElkEntityRecycler;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 
 /**
@@ -52,10 +50,9 @@ public class MockInstanceTaxonomyTest {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testTopBotEquivalence() {
-		ElkObjectFactory factory = new ElkObjectFactoryImpl(
-				new ElkEntityRecycler());// we reuse iri objects
+		ElkClass.Factory factory = new ElkObjectEntityRecyclingFactory();// we reuse iri objects
 		MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = new MockInstanceTaxonomy<ElkClass, ElkNamedIndividual>(
-				PredefinedElkClass.OWL_THING, PredefinedElkClass.OWL_NOTHING,
+				factory.getOwlThing(), factory.getOwlNothing(),
 				ElkClassKeyProvider.INSTANCE,
 				ElkIndividualKeyProvider.INSTANCE);
 
@@ -83,10 +80,9 @@ public class MockInstanceTaxonomyTest {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testForDuplicates() {
-		ElkObjectFactory factory = new ElkObjectFactoryImpl(
-				new ElkEntityRecycler());// we reuse iri objects
+		ElkEntity.Factory factory = new ElkObjectEntityRecyclingFactory();// we reuse iri objects
 		MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = new MockInstanceTaxonomy<ElkClass, ElkNamedIndividual>(
-				PredefinedElkClass.OWL_THING, PredefinedElkClass.OWL_NOTHING,
+				factory.getOwlThing(), factory.getOwlNothing(),
 				ElkClassKeyProvider.INSTANCE,
 				ElkIndividualKeyProvider.INSTANCE);
 
@@ -115,16 +111,15 @@ public class MockInstanceTaxonomyTest {
 	@SuppressWarnings({ "unchecked", "rawtypes", "static-method" })
 	@Test
 	public void testMockTaxonomy() {
-		ElkObjectFactory factory = new ElkObjectFactoryImpl(
-				new ElkEntityRecycler());// we reuse iri objects
+		ElkEntity.Factory factory = new ElkObjectEntityRecyclingFactory();// we reuse iri objects
 		MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = new MockInstanceTaxonomy<ElkClass, ElkNamedIndividual>(
-				PredefinedElkClass.OWL_THING, PredefinedElkClass.OWL_NOTHING,
+				factory.getOwlThing(), factory.getOwlNothing(),
 				ElkClassKeyProvider.INSTANCE,
 				ElkIndividualKeyProvider.INSTANCE);
 
-		assertSame(PredefinedElkClass.OWL_THING, taxonomy.getTopNode()
+		assertSame(factory.getOwlThing(), taxonomy.getTopNode()
 				.getCanonicalMember());
-		assertSame(PredefinedElkClass.OWL_NOTHING, taxonomy.getBottomNode()
+		assertSame(factory.getOwlNothing(), taxonomy.getBottomNode()
 				.getCanonicalMember());
 		// check subclass relationships between Top and Bot
 		assertSame(taxonomy.getTopNode(), taxonomy.getBottomNode()

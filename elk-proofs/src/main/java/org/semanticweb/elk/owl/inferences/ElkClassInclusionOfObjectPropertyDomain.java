@@ -25,7 +25,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyDomainAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
@@ -76,7 +76,7 @@ public class ElkClassInclusionOfObjectPropertyDomain
 	}
 
 	@Override
-	public ElkAxiom getPremise(int index, ElkObjectFactory factory) {
+	public ElkAxiom getPremise(int index, ElkObject.Factory factory) {
 		if (index == 0) {
 			return getPremise(factory);
 		}
@@ -84,12 +84,12 @@ public class ElkClassInclusionOfObjectPropertyDomain
 		return failGetPremise(index);
 	}
 
-	public ElkObjectPropertyDomainAxiom getPremise(ElkObjectFactory factory) {
+	public ElkObjectPropertyDomainAxiom getPremise(ElkObject.Factory factory) {
 		return factory.getObjectPropertyDomainAxiom(property_, domain_);
 	}
 
 	@Override
-	public ElkSubClassOfAxiom getConclusion(ElkObjectFactory factory) {
+	public ElkSubClassOfAxiom getConclusion(ElkObject.Factory factory) {
 		return factory.getSubClassOfAxiom(factory.getObjectSomeValuesFrom(
 				property_, factory.getOwlThing()), domain_);
 	}

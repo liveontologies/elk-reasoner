@@ -38,14 +38,13 @@ import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
 import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.DummyElkEntityVisitor;
 import org.semanticweb.elk.reasoner.taxonomy.MockInstanceTaxonomy.MutableTypeNode;
@@ -64,20 +63,19 @@ public class MockTaxonomyLoader {
 
 	/**
 	 * Loads an {@link InstanceTaxonomy} using the given
-	 * {@link ElkObjectFactory} and {@link Owl2Parser}. The
-	 * {@link ElkObjectFactory} should create equal {@link ElkClass}s and
+	 * {@link ElkObject.Factory} and {@link Owl2Parser}. The
+	 * {@link ElkObject.Factory} should create equal {@link ElkClass}s and
 	 * {@link ElkIndividual}s for equal {@link ElkIri}s (w.r.t. to the
 	 * {@link #equals(Object)} method. The {@link Owl2Parser} should use the
-	 * same {@link ElkObjectFactory}.
+	 * same {@link ElkObject.Factory}.
 	 * 
 	 * 
 	 * @param factory
-	 *            the {@link ElkObjectFactory} that is used to create
-	 *            {@link ElkObject}s.
+	 *            the factory for creating owl:Thing and owl:Nothing
 	 * 
 	 * @param parser
 	 *            the {@link Owl2Parser} for loading the ontology representing
-	 *            the taxonomy; it should use the same {@link ElkObjectFactory}
+	 *            the taxonomy; it should use the same {@link ElkObject.Factory}
 	 * 
 	 * @return the {@link InstanceTaxonomy} constructed from the parsed ontology
 	 * 
@@ -85,11 +83,11 @@ public class MockTaxonomyLoader {
 	 *             if the ontology cannot be parsed by the parser
 	 */
 	public static InstanceTaxonomy<ElkClass, ElkNamedIndividual> load(
-			ElkObjectFactory factory, Owl2Parser parser)
+			PredefinedElkClassFactory factory, Owl2Parser parser)
 			throws Owl2ParseException {
 		final MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = new MockInstanceTaxonomy<ElkClass, ElkNamedIndividual>(
-				factory.getClass(PredefinedElkClass.OWL_THING.getIri()),
-				factory.getClass(PredefinedElkClass.OWL_NOTHING.getIri()),
+				factory.getOwlThing(),
+				factory.getOwlNothing(),
 				ElkClassKeyProvider.INSTANCE,
 				ElkIndividualKeyProvider.INSTANCE);
 		TaxonomyInserter listener = new TaxonomyInserter(taxonomy);

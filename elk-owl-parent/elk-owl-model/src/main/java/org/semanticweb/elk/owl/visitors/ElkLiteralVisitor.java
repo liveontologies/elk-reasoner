@@ -35,6 +35,6 @@ import org.semanticweb.elk.owl.interfaces.ElkLiteral;
  */
 public interface ElkLiteralVisitor<O> {
 
-	O visit(ElkLiteral literal);
+	O visit(ElkLiteral expression);
 
 }

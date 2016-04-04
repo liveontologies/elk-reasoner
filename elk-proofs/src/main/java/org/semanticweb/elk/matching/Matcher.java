@@ -31,7 +31,7 @@ import org.semanticweb.elk.matching.conclusions.IndexedClassExpressionMatch;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
 import org.semanticweb.elk.owl.inferences.ElkInferenceProducer;
 import org.semanticweb.elk.owl.inferences.ElkInferenceProducingFactory;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
@@ -55,7 +55,7 @@ public class Matcher {
 
 	private final ConclusionMatchExpressionFactory conclusionMatchFactory_;
 
-	public Matcher(InferenceSet inferences, ElkObjectFactory elkObjectFactory,
+	public Matcher(InferenceSet inferences, ElkObject.Factory elkObjectFactory,
 			ElkInferenceProducer elkInferenceProducer) {
 		toDoInferences_ = new LinkedList<InferenceMatch>();
 		toDoConclusions_ = new LinkedList<ConclusionMatch>();

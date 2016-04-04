@@ -22,8 +22,8 @@ package org.semanticweb.elk.owl.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 
 public class ElkInferencePrinter extends ElkInferenceDummyVisitor<String> {
 
@@ -37,7 +37,7 @@ public class ElkInferencePrinter extends ElkInferenceDummyVisitor<String> {
 		return conclusion.accept(INSTANCE_);
 	}
 
-	ElkObjectFactory factory_ = new ElkObjectFactoryImpl();
+	ElkObject.Factory factory_ = new ElkObjectEntityRecyclingFactory();
 
 	private ElkInferencePrinter() {
 

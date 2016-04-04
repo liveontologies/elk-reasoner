@@ -23,15 +23,12 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
-import org.semanticweb.elk.owl.predefined.PredefinedElkDeclaration;
-import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverter;
-import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
-import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ChainableContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
@@ -54,28 +51,17 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl implements
 	private ChainableContextInitRule contextInitRules_;
 
 	private final Multimap<IndexedObjectProperty, ElkAxiom> reflexiveObjectProperties_;
-
-	private int negativeOwlThingOccurrenceNo_ = 0,
-			positiveOwlNothingOccurrenceNo_ = 0;
-
-	public DirectIndex() {
+		
+	public DirectIndex(PredefinedElkClassFactory elkFactory) {
+		super(elkFactory);
 		this.reflexiveObjectProperties_ = new HashListMultimap<IndexedObjectProperty, ElkAxiom>(
-				64);
-
+				64);						
 		// the context root initialization rule is always registered
 		RootContextInitializationRule.addRuleFor(this);
-
-		// index build-in declarations TODO: move somewhere else
-		ElkAxiomConverter tmpConverter = new ElkAxiomConverterImpl(this, 1);
-		for (ElkDeclarationAxiom declaration : PredefinedElkDeclaration
-				.values()) {
-			try {
-				declaration.accept(tmpConverter);
-			} catch (ElkIndexingUnsupportedException e) {
-				// ignore unsupported declarations
-				continue;
-			}
-		}
+		// owl:Thing and owl:Nothing always occur
+		OccurrenceIncrement addition = OccurrenceIncrement.getNeutralIncrement(1);
+		getOwlThing().updateOccurrenceNumbers(this, addition);
+		getOwlNothing().updateOccurrenceNumbers(this, addition);
 	}
 
 	/* read-only methods required by the interface */
@@ -129,18 +115,12 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl implements
 
 	@Override
 	public boolean hasNegativeOwlThing() {
-		return negativeOwlThingOccurrenceNo_ > 0;
-	}
-
-	@Override
-	public boolean updateNegativeOwlThingOccurrenceNo(int increment) {
-		negativeOwlThingOccurrenceNo_ += increment;
-		return true;
+		return getOwlThing().occursNegatively();
 	}
 
 	@Override
 	public boolean hasPositivelyOwlNothing() {
-		return positiveOwlNothingOccurrenceNo_ > 0;
+		return getOwlNothing().occursPositively();
 	}
 
 	@Override
@@ -158,12 +138,6 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl implements
 			return false;
 		// else
 		target.removeDefinition();
-		return true;
-	}
-
-	@Override
-	public boolean updatePositiveOwlNothingOccurrenceNo(int increment) {
-		positiveOwlNothingOccurrenceNo_ += increment;
 		return true;
 	}
 

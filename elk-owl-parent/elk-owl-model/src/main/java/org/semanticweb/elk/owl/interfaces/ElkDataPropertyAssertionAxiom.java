@@ -47,5 +47,33 @@ public interface ElkDataPropertyAssertionAxiom
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkDataPropertyAssertionAxiomVisitor<O> visitor);
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		/**
+		 * Create an {@link ElkDataPropertyAssertionAxiom}.
+		 * 
+		 * @param property
+		 *            the {@link ElkDataPropertyExpression} for which the object
+		 *            should be created
+		 * @param subject
+		 *            the {@link ElkIndividual} for which the object should be
+		 *            created
+		 * @param object
+		 *            the {@link ElkLiteral} for which the object should be created
+		 * @return an {@link ElkDataPropertyAssertionAxiom} corresponding to the
+		 *         input
+		 */
+		public ElkDataPropertyAssertionAxiom getDataPropertyAssertionAxiom(
+				ElkDataPropertyExpression property,
+				ElkIndividual subject, ElkLiteral object);
+
+	}
 
 }

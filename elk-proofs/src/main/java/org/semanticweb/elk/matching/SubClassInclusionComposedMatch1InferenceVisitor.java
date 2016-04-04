@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionCompo
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectUnionOf;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionOwlThing;
 
 class SubClassInclusionComposedMatch1InferenceVisitor extends
 		AbstractConclusionMatchInferenceVisitor<SubClassInclusionComposedMatch1>
@@ -74,5 +75,12 @@ class SubClassInclusionComposedMatch1InferenceVisitor extends
 				child);
 		return null;
 	}
+	
+	@Override
+	public Void visit(SubClassInclusionOwlThing inference) {
+		factory.getSubClassInclusionOwlThingMatch1(inference, child);
+		return null;
+	}
+
 
 }

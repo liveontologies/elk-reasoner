@@ -52,5 +52,24 @@ public interface ElkAnonymousIndividual extends ElkIndividual,
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkAnonymousIndividualVisitor<O> visitor);
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+		
+		/**
+		 * Create an {@link ElkAnonymousIndividual}.
+		 * 
+		 * @param nodeId
+		 *            the {@link String} for which the object should be created
+		 * @return an {@link ElkAnonymousIndividual} corresponding to the input
+		 */
+		public ElkAnonymousIndividual getAnonymousIndividual(String nodeId);
+
+	}
 
 }

@@ -29,7 +29,7 @@ import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.Expression;
@@ -48,7 +48,7 @@ public class DisjunctionComposition extends AbstractInference<AxiomExpression<? 
 
 	private final Expression premise_;
 	
-	public DisjunctionComposition(ElkClassExpression sub, ElkObjectUnionOf sup, ElkClassExpression premise, ElkObjectFactory factory, ExpressionFactory exprFactory) {
+	public DisjunctionComposition(ElkClassExpression sub, ElkObjectUnionOf sup, ElkClassExpression premise, ElkObject.Factory factory, ExpressionFactory exprFactory) {
 		super(exprFactory.create(factory.getSubClassOfAxiom(sub, sup)));
 
 		premise_ = exprFactory.create(factory.getSubClassOfAxiom(sub, premise));

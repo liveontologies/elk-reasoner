@@ -22,14 +22,14 @@
  */
 package org.semanticweb.elk.reasoner.indexing.classes;
 
-import junit.framework.TestCase;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import junit.framework.TestCase;
 
 public class IndexConstructionTest extends TestCase {
 
-	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
+	final ElkObject.Factory objectFactory = new ElkObjectEntityRecyclingFactory();
 
 	public IndexConstructionTest(String testName) {
 		super(testName);

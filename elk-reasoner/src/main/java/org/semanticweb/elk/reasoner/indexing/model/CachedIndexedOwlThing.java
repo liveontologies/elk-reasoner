@@ -1,13 +1,12 @@
-package org.semanticweb.elk.owl.managers;
+package org.semanticweb.elk.reasoner.indexing.model;
 
 /*
  * #%L
  * ELK Reasoner
- * 
- * $Id$
- * $HeadURL$
+ * $Id:$
+ * $HeadURL:$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,20 +22,13 @@ package org.semanticweb.elk.owl.managers;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
-
 /**
- * An {@link ElkObjectRecycler} that does not recycle anything and simply
- * returns the input {@link ElkObject}.
+ * A {@link CachedIndexedClass} that represents {@code owl:Thing}.
  * 
- * @author Markus Kroetzsch
  * @author "Yevgeny Kazakov"
  */
-public class DummyElkObjectRecycler implements ElkObjectRecycler {
+public interface CachedIndexedOwlThing extends CachedIndexedClass {
 
-	@Override
-	public ElkObject recycle(ElkObject object) {
-		return object;
-	}
+	public boolean occursNegatively();
 
 }

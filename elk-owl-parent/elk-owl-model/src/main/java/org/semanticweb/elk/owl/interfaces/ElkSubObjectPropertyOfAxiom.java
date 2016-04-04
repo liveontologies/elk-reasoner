@@ -58,5 +58,30 @@ public interface ElkSubObjectPropertyOfAxiom extends ElkObjectPropertyAxiom {
 	 * @return the output of the visitor
 	 */
 	public abstract <O> O accept(ElkSubObjectPropertyOfAxiomVisitor<O> visitor);
+	
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		/**
+		 * Create an {@link ElkSubObjectPropertyOfAxiom}.
+		 * 
+		 * @param subProperty
+		 *            the {@link ElkSubObjectPropertyExpression} for which the axiom
+		 *            should be created
+		 * @param superProperty
+		 *            the super-{@link ElkObjectPropertyExpression} for which the
+		 *            axiom should be created
+		 * @return an {@link ElkSubObjectPropertyOfAxiom} corresponding to the input
+		 */
+		public ElkSubObjectPropertyOfAxiom getSubObjectPropertyOfAxiom(
+				ElkSubObjectPropertyExpression subProperty,
+				ElkObjectPropertyExpression superProperty);
+
+	}
 
 }

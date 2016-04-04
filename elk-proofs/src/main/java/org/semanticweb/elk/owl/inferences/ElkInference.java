@@ -1,7 +1,7 @@
 package org.semanticweb.elk.owl.inferences;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /*
  * #%L
@@ -47,14 +47,14 @@ public interface ElkInference {
 	 *             if the position is out of range (
 	 *             <tt>index &lt; 0 || index &gt;= size()</tt>)
 	 */
-	ElkAxiom getPremise(int index, ElkObjectFactory factory);
+	ElkAxiom getPremise(int index, ElkObject.Factory factory);
 
 	/**
 	 * @param factory
 	 *            the factory for creating conclusion
 	 * @return the conclusion of this inference
 	 */
-	ElkAxiom getConclusion(ElkObjectFactory factory);
+	ElkAxiom getConclusion(ElkObject.Factory factory);
 
 	<O> O accept(Visitor<O> visitor);
 

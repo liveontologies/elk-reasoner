@@ -41,9 +41,9 @@ public class ElkObjectAllValuesFromImpl
 		implements ElkObjectAllValuesFrom {
 
 	ElkObjectAllValuesFromImpl(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			ElkClassExpression classExpression) {
-		super(objectPropertyExpression, classExpression);
+			ElkObjectPropertyExpression property,
+			ElkClassExpression filler) {
+		super(property, filler);
 	}
 
 	@Override

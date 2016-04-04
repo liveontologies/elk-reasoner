@@ -32,12 +32,12 @@ import java.io.IOException;
 
 import org.junit.Test;
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
@@ -52,7 +52,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
  */
 public class LowLevelIncrementalABoxTest {
 
-	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
+	final ElkObject.Factory objectFactory = new ElkObjectEntityRecyclingFactory();
 
 	@Test
 	public void testBasicDeletion() throws ElkException, IOException {

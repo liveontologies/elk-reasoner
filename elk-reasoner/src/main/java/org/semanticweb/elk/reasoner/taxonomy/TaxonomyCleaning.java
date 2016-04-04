@@ -34,7 +34,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
@@ -141,7 +140,7 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 				UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy = instanceTaxonomyState_
 						.getTaxonomy();
 
-				if (elkClass == PredefinedElkClass.OWL_NOTHING) {
+				if (elkClass == classTaxonomy.getBottomNode().getCanonicalMember()) {
 					// classStateWriter_.markClassesForModifiedNode(classTaxonomy.getBottomNode());
 					return;
 				}

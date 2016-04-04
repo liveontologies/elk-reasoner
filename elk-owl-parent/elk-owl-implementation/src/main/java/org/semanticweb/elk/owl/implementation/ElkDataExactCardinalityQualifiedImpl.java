@@ -42,9 +42,9 @@ public class ElkDataExactCardinalityQualifiedImpl
 		implements ElkDataExactCardinalityQualified {
 
 	ElkDataExactCardinalityQualifiedImpl(
-			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
-			ElkDataRange dataRange) {
-		super(dataPropertyExpression, cardinality, dataRange);
+			ElkDataPropertyExpression property, int cardinality,
+			ElkDataRange range) {
+		super(property, cardinality, range);
 	}
 
 	@Override

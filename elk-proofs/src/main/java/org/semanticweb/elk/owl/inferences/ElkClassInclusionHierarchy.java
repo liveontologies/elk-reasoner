@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 
 /**
@@ -77,7 +77,7 @@ public class ElkClassInclusionHierarchy extends AbstractElkInference {
 	}
 
 	@Override
-	public ElkSubClassOfAxiom getPremise(int index, ElkObjectFactory factory) {
+	public ElkSubClassOfAxiom getPremise(int index, ElkObject.Factory factory) {
 		checkPremiseIndex(index);
 		// else
 		return factory.getSubClassOfAxiom(expressions_.get(index),
@@ -85,7 +85,7 @@ public class ElkClassInclusionHierarchy extends AbstractElkInference {
 	}
 
 	@Override
-	public ElkSubClassOfAxiom getConclusion(ElkObjectFactory factory) {
+	public ElkSubClassOfAxiom getConclusion(ElkObject.Factory factory) {
 		return factory.getSubClassOfAxiom(expressions_.get(0),
 				expressions_.get(expressions_.size() - 1));
 	}

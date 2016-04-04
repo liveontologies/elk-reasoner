@@ -40,9 +40,9 @@ public class ElkObjectHasValueImpl
 		ElkPropertyRestrictionQualifiedImpl<ElkObjectPropertyExpression, ElkIndividual>
 		implements ElkObjectHasValue {
 
-	ElkObjectHasValueImpl(ElkObjectPropertyExpression objectPropertyExpression,
-			ElkIndividual individual) {
-		super(objectPropertyExpression, individual);
+	ElkObjectHasValueImpl(ElkObjectPropertyExpression property,
+			ElkIndividual value) {
+		super(property, value);
 	}
 
 	@Override

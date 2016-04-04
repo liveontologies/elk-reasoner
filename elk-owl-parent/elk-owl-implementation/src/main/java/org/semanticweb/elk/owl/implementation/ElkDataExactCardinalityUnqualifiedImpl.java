@@ -40,8 +40,8 @@ public class ElkDataExactCardinalityUnqualifiedImpl extends
 		ElkDataExactCardinalityUnqualified {
 
 	ElkDataExactCardinalityUnqualifiedImpl(
-			ElkDataPropertyExpression dataPropertyExpression, int cardinality) {
-		super(dataPropertyExpression, cardinality);
+			ElkDataPropertyExpression property, int cardinality) {
+		super(property, cardinality);
 	}
 
 	@Override
