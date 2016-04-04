@@ -435,7 +435,7 @@ public class LowLevelIncrementalTBoxTest {
 			assertSame(taxonomy.getBottomNode(),
 					taxonomy.getNode(maternityKangaroo));
 
-			System.out.println("\n\n\n\n========DELETIONS======");
+//			System.out.println("\n\n\n\n========DELETIONS======");
 
 			reasoner.setAllowIncrementalMode(true);
 			TestChangesLoader changeLoader = new TestChangesLoader();
@@ -450,7 +450,7 @@ public class LowLevelIncrementalTBoxTest {
 			assertNotSame(taxonomy.getBottomNode(),
 					taxonomy.getNode(maternityKangaroo));
 
-			System.out.println("\n\n\n\n========ADDING BACK======");
+//			System.out.println("\n\n\n\n========ADDING BACK======");
 
 			reasoner.setAllowIncrementalMode(true);
 			reasoner.registerAxiomLoader(changeLoader);
@@ -605,13 +605,13 @@ public class LowLevelIncrementalTBoxTest {
 
 		changeLoader.remove(axiom1);
 
-		System.out.println("===========================================");
+//		System.out.println("===========================================");
 
 		reasoner.getTaxonomy();
 
 		changeLoader.remove(axiom2).remove(axiom3);
 
-		System.out.println("===========================================");
+//		System.out.println("===========================================");
 
 		reasoner.getTaxonomy();
 	}
@@ -652,8 +652,8 @@ public class LowLevelIncrementalTBoxTest {
 
 		changeLoader.remove(disjCB);
 
-		System.out
-				.println("\n\n\n\n\n===========================================");
+//		System.out
+//				.println("\n\n\n\n\n===========================================");
 
 		taxonomy = reasoner.getTaxonomy();
 
@@ -945,7 +945,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		changeLoader.remove(toDelete).add(toAdd1).add(toAdd2);
 
-		System.out.println("\n\n\n\n\n");
+//		System.out.println("\n\n\n\n\n");
 
 		taxonomy = reasoner.getTaxonomy();
 
@@ -1074,8 +1074,8 @@ public class LowLevelIncrementalTBoxTest {
 				.contains(taxonomy.getNode(F)));
 		// at this point there is a backward link from B1 to A, and a (negative)
 		// subsumer R some C1 for A
-		System.out
-				.println("\n\n\n\n===========================================");
+//		System.out
+//				.println("\n\n\n\n===========================================");
 		// The subsumer R some C1 already exists, so it won't be processed
 		// (decomposed) for A again
 		// as a result, there won't be a backward link from C1 to A
@@ -1095,8 +1095,8 @@ public class LowLevelIncrementalTBoxTest {
 
 		taxonomy = reasoner.getTaxonomy();
 
-		System.out
-				.println("\n\n\n\n===========================================");
+//		System.out
+//				.println("\n\n\n\n===========================================");
 		// this leads to cleaning of A so the backward link A <-R<- B1 will be
 		// deleted
 		String toDelete = "Prefix(:=<http://www.test.com/schema#>) Ontology(\n"
@@ -1111,8 +1111,8 @@ public class LowLevelIncrementalTBoxTest {
 
 		taxonomy = reasoner.getTaxonomy();
 
-		System.out
-				.println("\n\n\n\n===========================================");
+//		System.out
+//				.println("\n\n\n\n===========================================");
 
 		toDelete = "Prefix(:=<http://www.test.com/schema#>) Ontology(\n"
 				+ "SubClassOf(:D ObjectSomeValuesFrom(:R :A)) " + ")";

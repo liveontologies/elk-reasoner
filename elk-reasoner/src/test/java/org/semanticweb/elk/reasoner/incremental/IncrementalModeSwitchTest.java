@@ -134,7 +134,7 @@ public class IncrementalModeSwitchTest {
 		assertFalse(reasoner.isInconsistent());
 		reasoner.getTaxonomy();
 
-		System.out.println("===========================================");
+//		System.out.println("===========================================");
 
 		reasoner.setAllowIncrementalMode(true);
 

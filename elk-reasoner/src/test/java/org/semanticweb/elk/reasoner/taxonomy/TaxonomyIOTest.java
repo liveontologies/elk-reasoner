@@ -123,9 +123,9 @@ public class TaxonomyIOTest {
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> original = loadAndClassify("io/instance_taxonomy.owl");
 		StringWriter writer = new StringWriter();
 
-		Writer outWriter = new OutputStreamWriter(System.out);
+		/*Writer outWriter = new OutputStreamWriter(System.out);
 		TaxonomyPrinter.dumpInstanceTaxomomy(original, outWriter, false);
-		outWriter.flush();
+		outWriter.flush();*/
 
 		TaxonomyPrinter.dumpInstanceTaxomomy(original, writer, false);
 
