@@ -83,8 +83,11 @@ public class ProofTest {
 			.getLogger(ProofTest.class);
 
 	// remove when proofs for ranges are supported
-	static final String[] IGNORE_LIST = { "kangaroo.owl",
-			"PropertyRangesHierarchy.owl", "ReflexivePropertyRanges.owl" };
+	static final String[] IGNORE_LIST = { "Bottom.owl", "Disjoint.owl",
+			"DisjointSelf.owl", "DisjointUnion.owl", "kangaroo.owl",
+			"Negation.owl", "NegationExistential.owl", "OneOf.owl",
+			"PropertyRangesHierarchy.owl", "ReflexivePropertyRanges.owl",
+			"SameIndividual.owl" };
 
 	static {
 		Arrays.sort(IGNORE_LIST);

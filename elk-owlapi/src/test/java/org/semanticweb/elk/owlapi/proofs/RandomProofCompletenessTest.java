@@ -22,23 +22,28 @@
 package org.semanticweb.elk.owlapi.proofs;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.RandomSeedProvider;
+import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
 import org.semanticweb.elk.reasoner.tracing.TracingTestManifest;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
+import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifest;
@@ -72,8 +77,28 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
 
+	static final String[] IGNORE_LIST = { "AssertionDisjoint.owl",
+			"ConjunctionsComplex.owl", "DifferentSameIndividual.owl",
+			"Inconsistent.owl", "OneOf.owl", "PropertyRangesHierarchy.owl",
+			"SameIndividual.owl" };
+
+	static {
+		Arrays.sort(IGNORE_LIST);
+	}
+	
 	public RandomProofCompletenessTest(final TracingTestManifest testManifest) {
 		super(testManifest);
+	}
+	
+	@Override
+	@Before
+	public void before() throws IOException, Owl2ParseException {
+		assumeTrue(!ignore(manifest_.getInput()));
+	}
+
+	@Override
+	protected boolean ignore(TestInput input) {
+		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
 	}
 
 	@Test

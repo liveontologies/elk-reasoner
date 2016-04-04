@@ -21,7 +21,6 @@
  */
 package org.semanticweb.elk.owlapi.proofs;
 
-import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
@@ -51,7 +50,6 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.reasoner.InconsistentOntologyException;
 import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.owlapitools.proofs.ExplainingOWLReasoner;
-import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +65,10 @@ public class AllOntologiesProofTest extends BaseProofTest {
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
 	private static final Logger LOGGER_ = LoggerFactory.getLogger(AllOntologiesProofTest.class);
 
-	static final String[] IGNORE_LIST = { "PropertyRangesHierarchy.owl", "SameIndividual.owl" };
+	static final String[] IGNORE_LIST = { "AssertionDisjoint.owl",
+			"ConjunctionsComplex.owl", "DifferentSameIndividual.owl",
+			"Inconsistent.owl", "OneOf.owl", "PropertyRangesHierarchy.owl",
+			"SameIndividual.owl" };
 
 	static {
 		Arrays.sort(IGNORE_LIST);
@@ -77,11 +78,13 @@ public class AllOntologiesProofTest extends BaseProofTest {
 		super(testManifest);
 	}
 
+	@Override
 	@Before
 	public void before() throws IOException, Owl2ParseException {
 		assumeTrue(!ignore(manifest_.getInput()));
 	}
 
+	@Override
 	protected boolean ignore(TestInput input) {
 		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
 	}
@@ -114,8 +117,7 @@ public class AllOntologiesProofTest extends BaseProofTest {
 						@Override
 						public void visit(OWLClassExpression subsumee,
 								OWLClassExpression subsumer) {
-							LOGGER_.info("Requesting proofs for {} |= {}",
-									subsumee, subsumer);
+							LOGGER_.debug("Proof test: {} ⊑ {}", subsumee, subsumer);
 
 							try {
 								OWLSubClassOfAxiom axiom = factory
@@ -124,8 +126,8 @@ public class AllOntologiesProofTest extends BaseProofTest {
 								ProofTestUtils.provabilityTest(reasoner, axiom);
 								RecursiveInferenceVisitor.visitInferences(
 										reasoner, axiom, bindingChecker, true);
-							} catch (ProofGenerationException e) {
-								fail(e.getMessage());
+							} catch (Exception e) {
+								throw new RuntimeException(e);
 							}
 						}
 
@@ -139,9 +141,6 @@ public class AllOntologiesProofTest extends BaseProofTest {
 						}
 
 					});
-
-		} catch (Exception e) {
-			LOGGER_.error("Unexpected exception", e);
 		} finally {
 			reasoner.dispose();
 		}
