@@ -236,6 +236,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	void setNonIncrementalMode() {
 		ontologyIndex.setIncrementalMode(false);
 		setAllowIncrementalTaxonomy(false);
+		classTaxonomyState.getWriter().clearTaxonomy();
+		stageManager.propertyInitializationStage.invalidateRecursive();
 	}
 
 	boolean trySetIncrementalMode() {
