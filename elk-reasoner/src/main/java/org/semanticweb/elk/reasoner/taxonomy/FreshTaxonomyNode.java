@@ -20,12 +20,14 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.taxonomy.model;
+package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collections;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 
 /**
  * A fresh TaxonomyNode containing an object that does not occur in a taxonomy.
@@ -33,8 +35,10 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  * 
  * @param <T>
+ *            the type of objects in this node
  */
 public class FreshTaxonomyNode<T extends ElkEntity> extends FreshNode<T>
 		implements TaxonomyNode<T> {
@@ -44,6 +48,11 @@ public class FreshTaxonomyNode<T extends ElkEntity> extends FreshNode<T>
 	public FreshTaxonomyNode(T member, Taxonomy<T> taxonomy) {
 		super(member);
 		this.taxonomy = taxonomy;
+	}
+
+	@Override
+	public Taxonomy<T> getTaxonomy() {
+		return taxonomy;
 	}
 
 	@Override

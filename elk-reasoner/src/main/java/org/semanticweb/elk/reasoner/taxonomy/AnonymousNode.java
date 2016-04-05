@@ -1,14 +1,11 @@
-package org.semanticweb.elk.reasoner.taxonomy.model;
-
-import java.util.Collections;
-
 /*
  * #%L
- * ELK Reasoner
- * $Id:$
- * $HeadURL:$
+ * elk-reasoner
+ * 
+ * $Id$
+ * $HeadURL$
  * %%
- * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 Oxford University Computing Laboratory
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +20,15 @@ import java.util.Collections;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy;
+
+import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.reasoner.taxonomy.impl.SimpleNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 
 /**
  * A {@link Node} created for an anonymous {@link ElkObject} that should not be

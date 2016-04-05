@@ -1,11 +1,10 @@
-package org.semanticweb.elk.reasoner.taxonomy;
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,21 +19,20 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
-import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.Node;
+import org.semanticweb.elk.util.collections.ArrayHashMap;
 
 /**
- * A {@link TaxonomyNode} that does not have any super nodes or sub nodes.
+ * A base {@link Node} whose subclasses are supposed to be associated with no
+ * (or minimal number) of other nodes.
  * 
- * @author "Yevgeny Kazakov"
  * @author Peter Skocovsky
  * 
  * @param <T>
@@ -42,7 +40,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
  * 
  * @see SingletoneTaxonomy
  */
-public class OrphanNode<T extends ElkEntity> implements TaxonomyNode<T> {
+public abstract class OrphanNode<T extends ElkEntity> implements Node<T> {
 
 	/**
 	 * the members of the node
@@ -52,24 +50,14 @@ public class OrphanNode<T extends ElkEntity> implements TaxonomyNode<T> {
 	 * the representative of the node; should be among the members
 	 */
 	private final T canonical;
-	/**
-	 * provides keys that are used for hashing instead of the members
-	 */
-	private final ComparatorKeyProvider<ElkEntity> keyProvider_;
 
-	public OrphanNode(Set<T> members, T canonical,
-			ComparatorKeyProvider<ElkEntity> keyProvider) {
-		this.members = new HashMap<Object, T>();
+	public OrphanNode(final Iterable<? extends T> members, final int size,
+			final T canonical, ComparatorKeyProvider<? super T> keyProvider) {
+		this.members = new ArrayHashMap<Object, T>(size);
 		for (T member : members) {
 			this.members.put(keyProvider.getKey(member), member);
 		}
 		this.canonical = canonical;
-		this.keyProvider_ = keyProvider;
-	}
-
-	@Override
-	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
-		return keyProvider_;
 	}
 
 	@Override
@@ -79,7 +67,7 @@ public class OrphanNode<T extends ElkEntity> implements TaxonomyNode<T> {
 
 	@Override
 	public boolean contains(final T member) {
-		return members.containsKey(keyProvider_.getKey(member));
+		return members.containsKey(getKeyProvider().getKey(member));
 	}
 
 	@Override
@@ -90,26 +78,6 @@ public class OrphanNode<T extends ElkEntity> implements TaxonomyNode<T> {
 	@Override
 	public T getCanonicalMember() {
 		return canonical;
-	}
-
-	@Override
-	public Set<? extends TaxonomyNode<T>> getDirectSuperNodes() {
-		return Collections.emptySet();
-	}
-
-	@Override
-	public Set<? extends TaxonomyNode<T>> getAllSuperNodes() {
-		return Collections.emptySet();
-	}
-
-	@Override
-	public Set<? extends TaxonomyNode<T>> getDirectSubNodes() {
-		return Collections.emptySet();
-	}
-
-	@Override
-	public Set<? extends TaxonomyNode<T>> getAllSubNodes() {
-		return Collections.emptySet();
 	}
 
 }

@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.taxonomy;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,13 +19,13 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
@@ -41,11 +36,11 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
 import org.semanticweb.elk.reasoner.stages.ClassTaxonomyState;
 import org.semanticweb.elk.reasoner.stages.InstanceTaxonomyState;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
@@ -78,6 +73,7 @@ public class TaxonomyCleaning
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
 class TaxonomyCleaningFactory extends SimpleInterrupter
 		implements
@@ -122,12 +118,6 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 			private final InstanceTaxonomyState.Writer instanceStateWriter_ = instanceTaxonomyState_
 					.getWriter();
 
-			/**
-			 * Temporary queue of nodes that should be removed from the
-			 * taxonomies
-			 */
-			private final Queue<UpdateableTaxonomyNode<ElkClass>> toRemove_ = new ConcurrentLinkedQueue<UpdateableTaxonomyNode<ElkClass>>();
-
 			@Override
 			public void submit(IndexedClassEntity entity) {
 				entity.accept(submissionVisitor_);
@@ -150,7 +140,7 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 				 * mark as modified) at the same time
 				 */
 				synchronized (classTaxonomy.getBottomNode()) {
-					if (classTaxonomy.getBottomNode().remove(elkClass)) {
+					if (classTaxonomy.removeFromBottomNode(elkClass)) {
 						classStateWriter_
 								.markClassesForModifiedNode(classTaxonomy
 										.getBottomNode());
@@ -159,26 +149,23 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 					}
 				}
 
-				UpdateableTaxonomyNode<ElkClass> node = classTaxonomy
-						.getNode(elkClass);
+				final NonBottomTaxonomyNode<ElkClass> node = classTaxonomy
+						.getNonBottomNode(elkClass);
 
 				if (node == null) {
 					classStateWriter_.markClassForModifiedNode(elkClass);
 					return;
 				}
 
-				if (node.trySetModified(true)) {
-					toRemove_.add(node);
+				if (classTaxonomy.removeDirectSupernodes(node)) {
 					classStateWriter_.markClassesForModifiedNode(node);
 				}
 
 				// add all its direct satisfiable sub-nodes to the queue
 				synchronized (node) {
-					for (UpdateableTaxonomyNode<ElkClass> subNode : node
-							.getDirectSubNodes()) {
-						if (subNode != classTaxonomy.getBottomNode()
-								&& subNode.trySetModified(true)) {
-							toRemove_.add(subNode);
+					final List<NonBottomTaxonomyNode<ElkClass>> subNodes = new ArrayList<NonBottomTaxonomyNode<ElkClass>>(node.getDirectNonBottomSubNodes());
+					for (NonBottomTaxonomyNode<ElkClass> subNode : subNodes) {
+						if (classTaxonomy.removeDirectSupernodes(subNode)) {
 							classStateWriter_
 									.markClassesForModifiedNode(subNode);
 						}
@@ -188,7 +175,7 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 				// delete all direct instance nodes of the type node being
 				// removed
 				if (instanceTaxonomy != null) {
-					UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode = instanceTaxonomy
+					TypeNode<ElkClass, ElkNamedIndividual> typeNode = instanceTaxonomy
 							.getNode(elkClass);
 
 					if (typeNode == null) {
@@ -196,17 +183,18 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 						return;
 					}
 					// else
-					List<UpdateableInstanceNode<ElkClass, ElkNamedIndividual>> directInstances = null;
+					List<InstanceNode<ElkClass, ElkNamedIndividual>> directInstances = null;
 
 					synchronized (typeNode) {
-						directInstances = new LinkedList<UpdateableInstanceNode<ElkClass, ElkNamedIndividual>>(
+						directInstances = new LinkedList<InstanceNode<ElkClass, ElkNamedIndividual>>(
 								typeNode.getDirectInstanceNodes());
 					}
 
-					for (UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode : directInstances) {
-						if (instanceNode.trySetModified(true)) {
+					for (InstanceNode<ElkClass, ElkNamedIndividual> instanceNode : directInstances) {
+						if (instanceTaxonomy.removeDirectTypes(instanceNode)) {
 							instanceStateWriter_
 									.markIndividualsForModifiedNode(instanceNode);
+							// TODO: cannot the instance node stay there ??
 							instanceTaxonomy.removeInstanceNode(instanceNode
 									.getCanonicalMember());
 						}
@@ -232,10 +220,10 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 							.getTaxonomy();
 					ElkNamedIndividual individual = indexedIndividual
 							.getElkEntity();
-					UpdateableInstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy
+					InstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy
 							.getInstanceNode(individual);
 
-					if (node != null && node.trySetModified(true)) {
+					if (node != null && taxonomy.removeDirectTypes(node)) {
 						instanceStateWriter_
 								.markIndividualsForModifiedNode(node);
 						taxonomy.removeInstanceNode(individual);
@@ -256,34 +244,8 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 
 			@Override
 			public void process() {
-				for (;;) {
-					if (isInterrupted())
-						return;
-
-					UpdateableTaxonomyNode<ElkClass> node = toRemove_.poll();
-
-					if (node == null) {
-						return;
-					}
-
-					List<UpdateableTaxonomyNode<ElkClass>> superNodes = null;
-
-					// remove all super-class links
-					synchronized (node) {
-						superNodes = new LinkedList<UpdateableTaxonomyNode<ElkClass>>(
-								node.getDirectSuperNodes());
-
-						for (UpdateableTaxonomyNode<ElkClass> superNode : superNodes) {
-							node.removeDirectSuperNode(superNode);
-						}
-					}
-
-					for (UpdateableTaxonomyNode<ElkClass> superNode : superNodes) {
-						synchronized (superNode) {
-							superNode.removeDirectSubNode(node);
-						}
-					}
-				}
+				// Currently does nothing.
+				// TODO: The work done in submit should be moved here.
 			}
 
 			@Override

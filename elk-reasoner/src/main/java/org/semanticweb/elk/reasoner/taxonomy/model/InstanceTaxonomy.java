@@ -65,7 +65,7 @@ public interface InstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 	/**
 	 * Obtain an unmodifiable Set of all instance nodes in this taxonomy.
 	 * 
-	 * @return an unmodifiable Set
+	 * @return an unmodifiable Set of all instance nodes in this taxonomy.
 	 */
 	Set<? extends InstanceNode<T, I>> getInstanceNodes();
 

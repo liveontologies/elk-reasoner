@@ -1,4 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy;
 /*
  * #%L
  * ELK Reasoner
@@ -20,13 +19,17 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.reasoner.taxonomy.impl.AbstractTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 
 /**
  * A {@link Taxonomy} consisting of a single node = top node = bottom node.
@@ -40,34 +43,35 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
  * @param <N>
  *            the type of the node of this taxonomy
  * 
- * @see OrphanNode
+ * @see OrphanTaxonomyNode
  */
-public class SingletoneTaxonomy<T extends ElkEntity, N extends OrphanNode<T>>
+public class SingletoneTaxonomy<T extends ElkEntity, N extends OrphanTaxonomyNode<T>>
 		extends AbstractTaxonomy<T> {
+
+	private final ComparatorKeyProvider<? super T> keyProvider_;
 
 	final N node;
 
-	/**
-	 * Constructs a {@link SingletoneTaxonomy} containing the given
-	 * {@link OrphanNode}
-	 * 
-	 * @param node
-	 */
-	public SingletoneTaxonomy(N node) {
-		this.node = node;
+	public SingletoneTaxonomy(
+			final ComparatorKeyProvider<? super T> keyProvider,
+			final Collection<? extends T> allMembers,
+			final TaxonomyNodeFactory<T, N, Taxonomy<T>> nodeFactory) {
+		this.keyProvider_ = keyProvider;
+		this.node = nodeFactory.createNode(allMembers, allMembers.size(), this);
 	}
 
 	@Override
-	public ComparatorKeyProvider<ElkEntity> getKeyProvider() {
-		return node.getKeyProvider();
+	public ComparatorKeyProvider<? super T> getKeyProvider() {
+		return keyProvider_;
 	}
 
 	@Override
 	public N getNode(T elkEntity) {
-		if (node.contains(elkEntity))
+		if (node.contains(elkEntity)) {
 			return node;
-		// else
-		return null;
+		} else {
+			return null;
+		}
 	}
 
 	@Override

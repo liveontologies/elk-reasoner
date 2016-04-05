@@ -35,10 +35,12 @@ import java.util.TreeSet;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.taxonomy.DepthFirstSearch.Direction;
+import org.semanticweb.elk.reasoner.taxonomy.impl.AbstractInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -271,6 +273,10 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 		MockNode(Collection<O> members, ComparatorKeyProvider<ElkEntity> keyProvider) {
 			this.members = new TreeSet<O>(keyProvider.getComparator());
 			this.members.addAll(members);
+		}
+
+		public Taxonomy<T> getTaxonomy() {
+			return MockInstanceTaxonomy.this;
 		}
 
 		@Override

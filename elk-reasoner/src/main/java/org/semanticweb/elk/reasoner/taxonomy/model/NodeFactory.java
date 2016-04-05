@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,37 +19,29 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * limitations under the License.
  * #L%
  */
-
-import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyEqualator;
-import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
-import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+package org.semanticweb.elk.reasoner.taxonomy.model;
 
 /**
+ * Instantiates {@link Node}s containing the supplied members.
+ * 
  * @author Peter Skocovsky
  *
  * @param <T>
+ *            The type of members of the created nodes.
+ * @param <N>
+ *            The type of the created nodes.
  */
-public abstract class AbstractTaxonomy<T extends ElkEntity> implements Taxonomy<T> {
-	
-	@Override
-	public int hashCode() {
-		return TaxonomyHasher.hash(this);
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public boolean equals(final Object obj) {
-		
-		if (!(obj instanceof Taxonomy<?>)) {
-			return false;
-		}
-		
-		try {
-			return TaxonomyEqualator.equals(this, (Taxonomy<T>) obj);
-		} catch (ClassCastException e) {
-			return false;
-		}
-	}
-	
+public interface NodeFactory<T, N extends Node<T>> {
+
+	/**
+	 * Instantiates {@link Node} containing the supplied members.
+	 * 
+	 * @param members
+	 *            The members the node should contain.
+	 * @param size
+	 *            The number of the members the node should contain.
+	 * @return The new {@link Node} containing the supplied members.
+	 */
+	N createNode(Iterable<? extends T> members, int size);
+
 }

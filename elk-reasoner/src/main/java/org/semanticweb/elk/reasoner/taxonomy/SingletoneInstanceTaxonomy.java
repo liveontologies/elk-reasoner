@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,7 +19,9 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,6 +32,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 
@@ -55,11 +56,14 @@ public class SingletoneInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity
 
 	final Map<Object, InstanceNode<T, I>> instanceNodeLookup;
 	/** provides keys that are used for hashing instead of the elkIndividuals */
-	private final ComparatorKeyProvider<ElkEntity> individualKeyProvider_;
+	private final ComparatorKeyProvider<? super I> individualKeyProvider_;
 
-	public SingletoneInstanceTaxonomy(N node,
-			final ComparatorKeyProvider<ElkEntity> individualKeyProvider) {
-		super(node);
+	public SingletoneInstanceTaxonomy(
+			final ComparatorKeyProvider<? super T> keyProvider,
+			final Collection<? extends T> allMembers,
+			final TaxonomyNodeFactory<T, N, Taxonomy<T>> nodeFactory,
+			final ComparatorKeyProvider<? super I> individualKeyProvider) {
+		super(keyProvider, allMembers, nodeFactory);
 		this.individualKeyProvider_ = individualKeyProvider;
 		this.instanceNodeLookup = new ArrayHashMap<Object, InstanceNode<T, I>>(
 				node.getAllInstanceNodes().size());
@@ -72,7 +76,7 @@ public class SingletoneInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity
 	}
 
 	@Override
-	public ComparatorKeyProvider<ElkEntity> getInstanceKeyProvider() {
+	public ComparatorKeyProvider<? super I> getInstanceKeyProvider() {
 		return individualKeyProvider_;
 	}
 

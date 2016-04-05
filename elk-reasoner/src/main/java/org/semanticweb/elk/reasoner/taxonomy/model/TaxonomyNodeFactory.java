@@ -21,42 +21,39 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy.model;
 
-import java.util.Set;
-
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
- * Taxonomy node with parameterized type of nodes with which it may be
- * associated.
+ * Instantiates {@link Node}s based on the supplied members and an additional
+ * parameter.
  * 
  * @author Peter Skocovsky
  *
  * @param <T>
- *            The type of members of this node.
+ *            The type of members of the created nodes.
  * @param <N>
- *            The type of nodes with which this node can be associated.
+ *            The type of the created nodes.
+ * @param <P>
+ *            The type of the additional parameter.
  */
-public interface GenericTaxonomyNode<
+public interface TaxonomyNodeFactory<
 				T extends ElkEntity,
-				N extends GenericTaxonomyNode<T, N>
-		>
-		extends TaxonomyNode<T> {
+				N extends Node<T>,
+				P
+		> {
 
-	@Override
-	public Set<? extends N> getDirectSuperNodes();
-
-	@Override
-	public Set<? extends N> getAllSuperNodes();
-
-	@Override
-	public Set<? extends N> getDirectSubNodes();
-
-	@Override
-	public Set<? extends N> getAllSubNodes();
-
-	public static interface Projection<T extends ElkEntity>
-			extends GenericTaxonomyNode<T, Projection<T>> {
-		// Empty.
-	}
-
+	/**
+	 * Instantiates {@link Node} based on the supplied members and an additional
+	 * parameter.
+	 * 
+	 * @param members
+	 *            The members the node should contain.
+	 * @param size
+	 *            The number of the members the node should contain.
+	 * @param param
+	 *            The additional parameter for the node creation.
+	 * @return The new {@link Node}
+	 */
+	N createNode(Iterable<? extends T> members, int size, P param);
+	
 }

@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy.model;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy.model;
 
 import java.util.Set;
 
@@ -40,25 +39,40 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  * @param <IN>
  *            The type of instance nodes with which this node may be associated.
  */
-public interface GenericTypeNode<T extends ElkEntity, I extends ElkEntity, TN extends GenericTypeNode<T, I, TN, IN>, IN extends GenericInstanceNode<T, I, TN, IN>>
+public interface GenericTypeNode<
+				T extends ElkEntity,
+				I extends ElkEntity,
+				TN extends GenericTypeNode<T, I, TN, IN>,
+				IN extends GenericInstanceNode<T, I, TN, IN>
+		>
 		extends TypeNode<T, I>, GenericTaxonomyNode<T, TN> {
 
 	@Override
-	public Set<? extends IN> getDirectInstanceNodes();
+	Set<? extends IN> getDirectInstanceNodes();
 
 	@Override
-	public Set<? extends IN> getAllInstanceNodes();
+	Set<? extends IN> getAllInstanceNodes();
 
 	@Override
-	public Set<? extends TN> getDirectSuperNodes();
+	Set<? extends TN> getDirectSuperNodes();
 
 	@Override
-	public Set<? extends TN> getAllSuperNodes();
+	Set<? extends TN> getAllSuperNodes();
 
 	@Override
-	public Set<? extends TN> getDirectSubNodes();
+	Set<? extends TN> getDirectSubNodes();
 
 	@Override
-	public Set<? extends TN> getAllSubNodes();
+	Set<? extends TN> getAllSubNodes();
 
+	public static interface Projection<T extends ElkEntity, I extends ElkEntity>
+			extends GenericTypeNode<
+					T,
+					I,
+					Projection<T, I>,
+					GenericInstanceNode.Projection<T, I>
+			> {
+		// Empty.
+	}
+	
 }

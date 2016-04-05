@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy.model;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,10 +19,12 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy.impl;
 
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,23 +38,28 @@ import org.slf4j.LoggerFactory;
  */
 public class SimpleUpdateableNode<T> extends SimpleNode<T>
 		implements UpdateableNode<T> {
-	
+
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(SimpleUpdateableNode.class);
 	/**
-	 * <code>true</code> if the direct super-nodes of this node need to be
+	 * <code>true</code> if the direct super-nodes of this node have been
 	 * recomputed
 	 */
-	private final AtomicBoolean modified_ = new AtomicBoolean(true);
+	private final AtomicBoolean areAllParentsAssigned_ = new AtomicBoolean(
+			false);
 
 	/**
 	 * Creates a node containing the specified members.
 	 * 
-	 * @param members The members this node should contain.
-	 * @param size The number of the specified members.
-	 * @param keyProvider The key provider for the members.
+	 * @param members
+	 *            The members this node should contain.
+	 * @param size
+	 *            The number of the specified members.
+	 * @param keyProvider
+	 *            The key provider for the members.
 	 */
-	public SimpleUpdateableNode(final Iterable<T> members, final int size,
+	public SimpleUpdateableNode(final Iterable<? extends T> members,
+			final int size,
 			final ComparatorKeyProvider<? super T> keyProvider) {
 		super(members, size, keyProvider);
 	}
@@ -62,16 +67,18 @@ public class SimpleUpdateableNode<T> extends SimpleNode<T>
 	/**
 	 * Creates an empty node.
 	 * 
-	 * @param comparatorKeyProvider The key provider for the members.
+	 * @param comparatorKeyProvider
+	 *            The key provider for the members.
 	 */
 	public SimpleUpdateableNode(
 			final ComparatorKeyProvider<T> comparatorKeyProvider) {
 		super(comparatorKeyProvider);
 	}
-	
+
 	@Override
-	public boolean trySetModified(boolean modified) {
-		boolean result = modified_.compareAndSet(!modified, modified);
+	public boolean trySetAllParentsAssigned(boolean modified) {
+		boolean result = areAllParentsAssigned_.compareAndSet(!modified,
+				modified);
 		if (result && LOGGER_.isTraceEnabled())
 			LOGGER_.trace("node " + this + ": set "
 					+ (modified ? "modified" : "not modifiled"));
@@ -79,38 +86,12 @@ public class SimpleUpdateableNode<T> extends SimpleNode<T>
 	}
 
 	@Override
-	public boolean isModified() {
-		return modified_.get();
+	public boolean areAllParentsAssigned() {
+		return areAllParentsAssigned_.get();
 	}
 
 	@Override
-	public boolean add(final T member) {
-		final int searchResult = Collections.binarySearch(members_, member,
-				getKeyProvider().getComparator());
-		if (searchResult >= 0) {
-			return false;
-		} else {
-			final int index = -(searchResult + 1);
-			members_.add(index, member);
-			return true;
-		}
-	}
-	
-	@Override
-	public boolean remove(final T member) {
-		final int searchResult = Collections.binarySearch(members_, member,
-				getKeyProvider().getComparator());
-		if (searchResult >= 0) {
-			final int index = searchResult;
-			members_.remove(index);
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	public void setMembers(final Iterable<T> members) {
+	public void setMembers(final Iterable<? extends T> members) {
 		members_.clear();
 		for (final T elkClass : members) {
 			members_.add(elkClass);
@@ -118,5 +99,5 @@ public class SimpleUpdateableNode<T> extends SimpleNode<T>
 		Collections.sort(this.members_, getKeyProvider().getComparator());
 		LOGGER_.trace("updated members of {}", this);
 	}
-	
+
 }

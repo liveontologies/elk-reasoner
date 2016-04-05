@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy.model;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,25 +19,40 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy.impl;
 
-import java.util.Set;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyEqualator;
+import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
 /**
- * Node store with parameterized type of its nodes.
- * 
  * @author Peter Skocovsky
  *
  * @param <T>
- *            The type of members of the nodes in this store.
- * @param <N>
- *            The type of nodes in this store.
+ *            The type of members of the nodes in this taxonomy.
  */
-public interface GenericNodeStore<T, N extends Node<T>> extends NodeStore<T> {
+public abstract class AbstractTaxonomy<T extends ElkEntity>
+		implements Taxonomy<T> {
 
 	@Override
-	public N getNode(T member);
+	public int hashCode() {
+		return TaxonomyHasher.hash(this);
+	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Set<? extends N> getNodes();
+	public boolean equals(final Object obj) {
+
+		if (!(obj instanceof Taxonomy<?>)) {
+			return false;
+		}
+
+		try {
+			return TaxonomyEqualator.equals(this, (Taxonomy<T>) obj);
+		} catch (ClassCastException e) {
+			return false;
+		}
+	}
 
 }

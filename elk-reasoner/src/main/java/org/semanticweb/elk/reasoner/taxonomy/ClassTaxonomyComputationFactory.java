@@ -23,7 +23,6 @@
 package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
@@ -39,9 +38,9 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputationFactory.Engine;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
+import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
@@ -143,8 +142,8 @@ public class ClassTaxonomyComputationFactory extends SimpleInterrupter
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	private class TransitiveReductionOutputProcessor implements
-			TransitiveReductionOutputVisitor<IndexedClass> {
+	private class TransitiveReductionOutputProcessor
+			implements TransitiveReductionOutputVisitor<IndexedClass> {
 
 		@Override
 		public void visit(
@@ -153,25 +152,19 @@ public class ClassTaxonomyComputationFactory extends SimpleInterrupter
 			// LOGGER_.trace("+++ creating node for equivalent classes: " +
 			// output.getEquivalent());
 
-			UpdateableTaxonomyNode<ElkClass> node = taxonomy_
+			final NonBottomTaxonomyNode<ElkClass> node = taxonomy_
 					.getCreateNode(output.getEquivalent());
 
-			for (List<ElkClass> directSuperEquivalent : output
-					.getDirectSubsumers()) {
+			taxonomy_.setCreateDirectSupernodes(node,
+					output.getDirectSubsumers());
 
-				UpdateableTaxonomyNode<ElkClass> superNode = taxonomy_
-						.getCreateNode(directSuperEquivalent);
-				assignDirectSuperClassNode(node, superNode);
-			}
-
-			node.trySetModified(false);
 		}
 
 		@Override
 		public void visit(
 				TransitiveReductionOutputUnsatisfiable<IndexedClass> output) {
 
-			taxonomy_.getBottomNode().add(output.getRoot().getElkEntity());
+			taxonomy_.addToBottomNode(output.getRoot().getElkEntity());
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace(output.getRoot() + ": added to the bottom node");
 			}
@@ -185,29 +178,6 @@ public class ClassTaxonomyComputationFactory extends SimpleInterrupter
 			throw new IllegalArgumentException();
 		}
 
-	}
-
-	/**
-	 * Connecting the given pair of nodes in sub/super-node relation. The method
-	 * should not be called concurrently for the same first argument.
-	 * 
-	 * @param subNode
-	 *            the node that should be the sub-node of the second node
-	 * 
-	 * @param superNode
-	 *            the node that should be the super-node of the first node
-	 */
-	private static void assignDirectSuperClassNode(
-			UpdateableTaxonomyNode<ElkClass> subNode,
-			UpdateableTaxonomyNode<ElkClass> superNode) {
-		subNode.addDirectSuperNode(superNode);
-		/*
-		 * since super-nodes can be added from different nodes, this call should
-		 * be synchronized
-		 */
-		synchronized (superNode) {
-			superNode.addDirectSubNode(subNode);
-		}
 	}
 
 	/**

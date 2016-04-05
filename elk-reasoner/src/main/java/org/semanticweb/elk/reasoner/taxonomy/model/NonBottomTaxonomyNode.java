@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy.model;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,34 +19,38 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy.model;
 
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
- * Taxonomy with parameterized type of its nodes.
+ * A taxonomy node that is not a bottom node.
  * 
  * @author Peter Skocovsky
  *
  * @param <T>
- *            The type of members of the nodes of this taxonomy.
- * @param <N>
- *            The type of nodes in this taxonomy.
+ *            The type of members of this node.
  */
-public interface GenericTaxonomy<T extends ElkEntity, N extends GenericTaxonomyNode<T, N>>
-		extends Taxonomy<T>, GenericNodeStore<T, N> {
+public interface NonBottomTaxonomyNode<T extends ElkEntity>
+		extends TaxonomyNode<T> {
 
-	@Override
-	public N getNode(T elkEntity);
+	/**
+	 * Returns immutable set of direct super-nodes.
+	 * 
+	 * @return immutable set of direct super-nodes.
+	 * @see TaxonomyNode#getDirectSuperNodes()
+	 */
+	Set<? extends NonBottomTaxonomyNode<T>> getDirectNonBottomSuperNodes();
 
-	@Override
-	public Set<? extends N> getNodes();
-
-	@Override
-	public N getTopNode();
-
-	@Override
-	public N getBottomNode();
+	/**
+	 * Returns immutable set of direct sub-nodes that does <strong>not</strong>
+	 * contain the bottom node.
+	 * 
+	 * @return immutable set of direct sub-nodes that does <strong>not</strong>
+	 * contain the bottom node.
+	 */
+	Set<? extends NonBottomTaxonomyNode<T>> getDirectNonBottomSubNodes();
 
 }

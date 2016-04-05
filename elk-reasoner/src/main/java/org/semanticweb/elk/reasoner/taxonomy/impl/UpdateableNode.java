@@ -1,4 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy.model;
 /*
  * #%L
  * ELK Reasoner
@@ -20,6 +19,9 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy.impl;
+
+import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 
 /**
  * A node that can be modified.
@@ -35,39 +37,23 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
 public interface UpdateableNode<T> extends Node<T> {
 
 	/**
-	 * Atomically sets the modification state of this node to the passed
-	 * argument if the state is different.
+	 * Atomically sets the <em>allParentsAssigned</em> flag of this node to the
+	 * passed argument if the state is different. When the
+	 * <em>allParentsAssigned</em> flag of a node is <code>true</code> it is
+	 * certain that all parent nodes of this node are set and can be retrieved.
 	 * 
-	 * @param modified
-	 *            How to set the modification state.
-	 * @return Whether the state changed.
+	 * @param allParentsAssigned
+	 *            How to set the flag.
+	 * @return Whether the flag changed.
 	 */
-	boolean trySetModified(boolean modified);
+	boolean trySetAllParentsAssigned(boolean allParentsAssigned);
 
 	/**
-	 * Whether this node is marked as modified.
+	 * Whether all parent nodes of this node were already assigned.
 	 * 
-	 * @return Whether this node is marked as modified.
+	 * @return The <em>allParentsAssigned</em> flag.
 	 */
-	boolean isModified();
-
-	/**
-	 * Adds the specified member to this node.
-	 * 
-	 * @param member
-	 *            The member to add.
-	 * @return Whether the node changed.
-	 */
-	boolean add(T member);
-
-	/**
-	 * Removes the specified member from this node.
-	 * 
-	 * @param member
-	 *            The node to remove.
-	 * @return Whether the node changed.
-	 */
-	boolean remove(T member);
+	boolean areAllParentsAssigned();
 
 	/**
 	 * Replaces the members of this node with the specified members.
@@ -75,6 +61,6 @@ public interface UpdateableNode<T> extends Node<T> {
 	 * @param members
 	 *            The new members of this node.
 	 */
-	void setMembers(Iterable<T> members);
+	void setMembers(Iterable<? extends T> members);
 
 }

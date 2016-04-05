@@ -1,4 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy.model;
 /*
  * #%L
  * ELK Reasoner
@@ -20,11 +19,15 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 
 /**
  * A simple implementation of immutable node.
@@ -58,7 +61,7 @@ public class SimpleNode<T> implements Node<T> {
 	 * @param keyProvider
 	 *            The key provider for the members.
 	 */
-	public SimpleNode(final Iterable<T> members, final int size,
+	public SimpleNode(final Iterable<? extends T> members, final int size,
 			final ComparatorKeyProvider<? super T> keyProvider) {
 		if (keyProvider == null) {
 			throw new IllegalArgumentException("keyProvider cannot be null!");

@@ -1,12 +1,10 @@
-package org.semanticweb.elk.reasoner.taxonomy.model;
-
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,25 +19,25 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy.model;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
- * Updateable generic type node that can be related with
- * {@link UpdateableTypeNode} and {@link UpdateableInstanceNode}.
+ * Instances of this interface are associated with a taxonomy.
  * 
- * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
  * @author Peter Skocovsky
  *
  * @param <T>
- *            The type of members of this node.
- * @param <I>
- *            The type of members of the related instance nodes.
+ *            the type of objects stored in the associated taxonomy
  */
-public interface UpdateableTypeNode<T extends ElkEntity, I extends ElkEntity>
-		extends
-		UpdateableGenericTypeNode<T, I, UpdateableTypeNode<T, I>, UpdateableInstanceNode<T, I>> {
+public interface HasTaxonomy<T extends ElkEntity> {
+
+	/**
+	 * Returns the associated taxonomy.
+	 * 
+	 * @return the associated taxonomy.
+	 */
+	Taxonomy<T> getTaxonomy();
 
 }

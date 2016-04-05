@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy.model;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,44 +19,29 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy.model;
 
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
- * Instance taxonomy with parameterized type of its nodes.
+ * A type node that is not a bottom node.
  * 
  * @author Peter Skocovsky
  *
  * @param <T>
- *            The type of members of the type nodes in this taxonomy.
+ *            The type of members of this node.
  * @param <I>
- *            The type of members of the instance nodes in this taxonomy.
- * @param <TN>
- *            The type of type nodes in this taxonomy.
- * @param <IN>
- *            The type of instance nodes in this taxonomy.
+ *            The type of members of the related instance nodes.
  */
-public interface GenericInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity, TN extends GenericTypeNode<T, I, TN, IN>, IN extends GenericInstanceNode<T, I, TN, IN>>
-		extends InstanceTaxonomy<T, I>, GenericTaxonomy<T, TN> {
+public interface NonBottomTypeNode<T extends ElkEntity, I extends ElkEntity>
+		extends TypeNode<T, I>, NonBottomTaxonomyNode<T> {
 
 	@Override
-	IN getInstanceNode(I elkEntity);
+	Set<? extends NonBottomTypeNode<T, I>> getDirectNonBottomSuperNodes();
 
 	@Override
-	Set<? extends IN> getInstanceNodes();
-
-	@Override
-	TN getNode(T elkEntity);
-
-	@Override
-	Set<? extends TN> getNodes();
-
-	@Override
-	TN getTopNode();
-
-	@Override
-	TN getBottomNode();
-
+	Set<? extends NonBottomTypeNode<T, I>> getDirectNonBottomSubNodes();
+	
 }

@@ -27,25 +27,22 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
- * A node of instances in an InstanceTaxonomy.
+ * A node of instances in an InstanceTaxonomy. It can be associated with
+ * multiple type nodes.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  * 
  * @param <T>
- *            the type of objects in this node
+ *            The type of members of the related type nodes.
  * @param <I>
- *            the type of instances in this node
- * 
- * 
+ *            The type of members of this node.
  */
-public interface InstanceNode<T extends ElkEntity, I extends ElkEntity> extends
-		Node<I> {
+public interface InstanceNode<T extends ElkEntity, I extends ElkEntity>
+		extends Node<I>, HasTaxonomy<T> {
+
 	/**
-	 * Get an unmodifiable set of nodes for ElkObjects that are direct types of
-	 * this Node.
-	 * 
-	 * 
 	 * Get an unmodifiable set of {@link TypeNode}s of which the members of this
 	 * {@link InstanceNode} are direct instances. A member is a direct instance
 	 * of a {@link TypeNode} if it is an instance of the {@link TypeNode} and

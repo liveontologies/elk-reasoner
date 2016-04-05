@@ -20,31 +20,21 @@
  * limitations under the License.
  * #L%
  */
-/**
- * @author Yevgeny Kazakov, May 15, 2011
- */
 package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
+import org.semanticweb.elk.reasoner.taxonomy.impl.AbstractDistinctBottomTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.impl.AbstractUpdateableGenericTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.impl.BottomGenericTaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.impl.ConcurrentNodeStore;
+import org.semanticweb.elk.reasoner.taxonomy.impl.NonBottomGenericTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericNodeStore;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
-import org.semanticweb.elk.util.collections.Condition;
-import org.semanticweb.elk.util.collections.LazySetUnion;
-import org.semanticweb.elk.util.collections.Operations;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.semanticweb.elk.reasoner.taxonomy.model.GenericTaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 
 /**
  * Class taxonomy that is suitable for concurrent processing. Taxonomy objects
@@ -57,230 +47,58 @@ import org.slf4j.LoggerFactory;
  * @author Pavel Klinov
  * @author Peter Skocovsky
  */
-public class ConcurrentClassTaxonomy extends AbstractTaxonomy<ElkClass>
-		implements UpdateableTaxonomy<ElkClass> {
-
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ConcurrentClassTaxonomy.class);
-
-	/** The store containing non-bottom nodes in this taxonomy. */
-	private final UpdateableGenericNodeStore<ElkClass, NonBottomClassNode> nodeStore_;
-	/** counts the number of nodes which have non-bottom sub-classes */
-	final AtomicInteger countNodesWithSubClasses;
-	/** thread safe set of unsatisfiable classes */
-	private final ConcurrentMap<Object, ElkClass> unsatisfiableClasses_;
-
-	/** canonical top and bottom node members */
-	private final ElkClass owlThing_, owlNothing_;
-	/**
-	 * The bottom node.
-	 */
-	private final BottomClassNode bottomClassNode_;
-
-	public ConcurrentClassTaxonomy(PredefinedElkClassFactory elkFactory,
+public class ConcurrentClassTaxonomy
+		extends AbstractUpdateableGenericTaxonomy<
+				ElkClass,
+				GenericTaxonomyNode.Projection<ElkClass>,
+				NonBottomGenericTaxonomyNode.Projection<ElkClass>
+		> {
+	
+	private final GenericTaxonomyNode.Projection<ElkClass> bottomNode_;
+	
+	public ConcurrentClassTaxonomy(final PredefinedElkClassFactory elkFactory,
 			final ComparatorKeyProvider<ElkEntity> classKeyProvider) {
-		this.nodeStore_ = new ConcurrentNodeStore<ElkClass, NonBottomClassNode>(
-				classKeyProvider);
-		this.owlThing_ = elkFactory.getOwlThing();
-		this.owlNothing_ = elkFactory.getOwlNothing();
-		this.bottomClassNode_ = new BottomClassNode();
-		this.countNodesWithSubClasses = new AtomicInteger(0);
-		this.unsatisfiableClasses_ = new ConcurrentHashMap<Object, ElkClass>();
-		this.unsatisfiableClasses_.put(classKeyProvider.getKey(owlNothing_),
-				owlNothing_);
+		super(
+				new ConcurrentNodeStore<
+						ElkClass,
+						NonBottomGenericTaxonomyNode.Projection<ElkClass>
+				>(classKeyProvider),
+				new TaxonomyNodeFactory<
+						ElkClass,
+						NonBottomGenericTaxonomyNode.Projection<ElkClass>,
+						AbstractDistinctBottomTaxonomy<
+								ElkClass,
+								GenericTaxonomyNode.Projection<ElkClass>,
+								NonBottomGenericTaxonomyNode.Projection<ElkClass>
+						>
+				>() {
+					@Override
+					public NonBottomGenericTaxonomyNode.Projection<ElkClass> createNode(
+							final Iterable<? extends ElkClass> members,
+							final int size,
+							final AbstractDistinctBottomTaxonomy<
+									ElkClass,
+									GenericTaxonomyNode.Projection<ElkClass>,
+									NonBottomGenericTaxonomyNode.Projection<ElkClass>
+							> taxonomy) {
+						return new NonBottomGenericTaxonomyNode.Projection<ElkClass>(
+								taxonomy, members, size);
+					}
+				},
+				elkFactory.getOwlThing());
+		this.bottomNode_ = new BottomGenericTaxonomyNode.Projection<ElkClass>(
+				this, elkFactory.getOwlNothing());
 	}
 
 	@Override
-	public ComparatorKeyProvider<? super ElkClass> getKeyProvider() {
-		return nodeStore_.getKeyProvider();
+	public GenericTaxonomyNode.Projection<ElkClass> getBottomNode() {
+		return bottomNode_;
 	}
 
 	@Override
-	public UpdateableTaxonomyNode<ElkClass> getNode(ElkClass elkClass) {
-		UpdateableTaxonomyNode<ElkClass> result = nodeStore_.getNode(elkClass);
-
-		if (result == null && unsatisfiableClasses_
-				.containsKey(nodeStore_.getKeyProvider().getKey(elkClass))) {
-			result = bottomClassNode_;
-		}
-
-		return result;
+	protected Set<? extends GenericTaxonomyNode.Projection<ElkClass>> toTaxonomyNodes(
+			final Set<? extends NonBottomGenericTaxonomyNode.Projection<ElkClass>> nodes) {
+		return nodes;
 	}
-
-	@Override
-	public Set<? extends UpdateableTaxonomyNode<ElkClass>> getNodes() {
-
-		return new LazySetUnion<UpdateableTaxonomyNode<ElkClass>>(
-				nodeStore_.getNodes(),
-				Collections.<UpdateableTaxonomyNode<ElkClass>> singleton(
-						bottomClassNode_));
-	}
-
-	@Override
-	public NonBottomClassNode getTopNode() {
-		return nodeStore_.getNode(owlThing_);
-	}
-
-	@Override
-	public UpdateableTaxonomyNode<ElkClass> getBottomNode() {
-		return bottomClassNode_;
-	}
-
-	protected NonBottomClassNode getCreateNonBottomClassNode(
-			final Collection<ElkClass> members) {
-
-		if (members == null || members.isEmpty()) {
-			throw new IllegalArgumentException(
-					"Empty class taxonomy nodes must not be created!");
-		}
-
-		final NonBottomClassNode node = new NonBottomClassNode(this, members);
-
-		final NonBottomClassNode previous = nodeStore_.putIfAbsent(node);
-		if (previous != null) {
-			return previous;
-		}
-
-		LOGGER_.trace("created node: {}", node);
-
-		return node;
-	}
-
-	@Override
-	public UpdateableTaxonomyNode<ElkClass> getCreateNode(
-			Collection<ElkClass> members) {
-		return getCreateNonBottomClassNode(members);
-	}
-
-	@Override
-	public boolean removeNode(final ElkClass member) {
-		if (nodeStore_.removeNode(member)) {
-			LOGGER_.trace("removed node with member: {}", member);
-			return true;
-		}
-		// else
-		return false;
-	}
-
-	/**
-	 * Special implementation for the bottom node in the taxonomy. Instead of
-	 * storing its sub- and super-classes, the respective answers are computed
-	 * or taken from the taxonomy object directly. This saves memory at the cost
-	 * of some performance if somebody should wish to traverse an ontology
-	 * bottom-up starting from this node.
-	 */
-	protected class BottomClassNode
-			implements UpdateableTaxonomyNode<ElkClass> {
-
-		@Override
-		public ComparatorKeyProvider<? super ElkClass> getKeyProvider() {
-			return nodeStore_.getKeyProvider();
-		}
-
-		@Override
-		public Iterator<ElkClass> iterator() {
-			return unsatisfiableClasses_.values().iterator();
-		}
-
-		@Override
-		public boolean contains(final ElkClass member) {
-			return unsatisfiableClasses_
-					.containsKey(nodeStore_.getKeyProvider().getKey(member));
-		}
-
-		@Override
-		public int size() {
-			return unsatisfiableClasses_.size();
-		}
-
-		@Override
-		public ElkClass getCanonicalMember() {
-			return owlNothing_;
-		}
-
-		@Override
-		public Set<NonBottomClassNode> getDirectSuperNodes() {
-			return Operations.filter(nodeStore_.getNodes(),
-					new Condition<NonBottomClassNode>() {
-						@Override
-						public boolean holds(NonBottomClassNode element) {
-							return element.getDirectSubNodes()
-									.contains(bottomClassNode_);
-						}
-						/*
-						 * the direct super nodes of the bottom node are all
-						 * nodes except the nodes that have no non-bottom
-						 * sub-classes and the bottom node
-						 */
-					}, nodeStore_.getNodes().size()
-							- countNodesWithSubClasses.get());
-		}
-
-		@Override
-		public Set<? extends NonBottomClassNode> getAllSuperNodes() {
-			return nodeStore_.getNodes();
-		}
-
-		@Override
-		public Set<UpdateableTaxonomyNode<ElkClass>> getDirectSubNodes() {
-			return Collections.emptySet();
-		}
-
-		@Override
-		public Set<UpdateableTaxonomyNode<ElkClass>> getAllSubNodes() {
-			return Collections.emptySet();
-		}
-
-		@Override
-		public boolean trySetModified(boolean modified) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public boolean isModified() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public void addDirectSuperNode(
-				UpdateableTaxonomyNode<ElkClass> superNode) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public void addDirectSubNode(UpdateableTaxonomyNode<ElkClass> subNode) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public boolean removeDirectSubNode(
-				UpdateableTaxonomyNode<ElkClass> subNode) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public boolean removeDirectSuperNode(
-				UpdateableTaxonomyNode<ElkClass> superNode) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public void setMembers(Iterable<ElkClass> members) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public boolean add(final ElkClass member) {
-			return unsatisfiableClasses_.put(
-					nodeStore_.getKeyProvider().getKey(member), member) == null;
-		}
-
-		@Override
-		public boolean remove(final ElkClass member) {
-			return unsatisfiableClasses_
-					.remove(nodeStore_.getKeyProvider().getKey(member)) != null;
-		}
-
-	}
+	
 }

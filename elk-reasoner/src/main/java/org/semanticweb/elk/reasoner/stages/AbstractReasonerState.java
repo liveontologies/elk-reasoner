@@ -65,7 +65,7 @@ import org.semanticweb.elk.reasoner.taxonomy.ConcurrentInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.ElkIndividualKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.OrphanInstanceNode;
-import org.semanticweb.elk.reasoner.taxonomy.OrphanNode;
+import org.semanticweb.elk.reasoner.taxonomy.OrphanTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.OrphanTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.SingletoneInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.SingletoneTaxonomy;
@@ -73,6 +73,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.tracing.InferenceSet;
 import org.semanticweb.elk.reasoner.tracing.TraceState;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
@@ -405,11 +406,20 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		} catch (ElkInconsistentOntologyException e) {
 			LOGGER_.info("Ontology is inconsistent");
 
-			OrphanNode<ElkClass> node = new OrphanNode<ElkClass>(
-					getAllClasses(), elkFactory_.getOwlNothing(),
-					ElkClassKeyProvider.INSTANCE);
-			result = new SingletoneTaxonomy<ElkClass, OrphanNode<ElkClass>>(
-					node);
+			result = new SingletoneTaxonomy<ElkClass, OrphanTaxonomyNode<ElkClass>>(
+					ElkClassKeyProvider.INSTANCE,
+					getAllClasses(),
+					new TaxonomyNodeFactory<ElkClass, OrphanTaxonomyNode<ElkClass>, Taxonomy<ElkClass>>() {
+						@Override
+						public OrphanTaxonomyNode<ElkClass> createNode(
+								final Iterable<? extends ElkClass> members,
+								final int size,
+								final Taxonomy<ElkClass> taxonomy) {
+							return new OrphanTaxonomyNode<ElkClass>(members,
+									size, elkFactory_.getOwlNothing(),
+									taxonomy);
+						}
+					});
 		}
 
 		return result;
@@ -463,22 +473,33 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			result = getInstanceTaxonomy();
 		} catch (ElkInconsistentOntologyException e) {
 			LOGGER_.info("Ontology is inconsistent");
-			OrphanTypeNode<ElkClass, ElkNamedIndividual> node = new OrphanTypeNode<ElkClass, ElkNamedIndividual>(
-					getAllClasses(), elkFactory_.getOwlNothing(), 1,
-					ElkClassKeyProvider.INSTANCE);
-			Set<ElkNamedIndividual> allNamedIndividuals = getAllNamedIndividuals();
-			Iterator<ElkNamedIndividual> namedIndividualIterator = allNamedIndividuals
-					.iterator();
-			if (namedIndividualIterator.hasNext()) {
-				// there is at least one individual
-				node.addInstanceNode(
-						new OrphanInstanceNode<ElkClass, ElkNamedIndividual>(
-								allNamedIndividuals,
-								namedIndividualIterator.next(), node,
-								ElkIndividualKeyProvider.INSTANCE));
-			}
 			result = new SingletoneInstanceTaxonomy<ElkClass, ElkNamedIndividual, OrphanTypeNode<ElkClass, ElkNamedIndividual>>(
-					node, ElkIndividualKeyProvider.INSTANCE);
+					ElkClassKeyProvider.INSTANCE, getAllClasses(),
+					new TaxonomyNodeFactory<ElkClass, OrphanTypeNode<ElkClass, ElkNamedIndividual>, Taxonomy<ElkClass>>() {
+						@Override
+						public OrphanTypeNode<ElkClass, ElkNamedIndividual> createNode(
+								final Iterable<? extends ElkClass> members,
+								final int size,
+								final Taxonomy<ElkClass> taxonomy) {
+							final OrphanTypeNode<ElkClass, ElkNamedIndividual> node = new OrphanTypeNode<ElkClass, ElkNamedIndividual>(
+									members, size, elkFactory_.getOwlNothing(),
+									taxonomy, 1);
+							final Set<ElkNamedIndividual> allNamedIndividuals = getAllNamedIndividuals();
+							final Iterator<ElkNamedIndividual> namedIndividualIterator = allNamedIndividuals
+									.iterator();
+							if (namedIndividualIterator.hasNext()) {
+								// there is at least one individual
+								node.addInstanceNode(new OrphanInstanceNode<ElkClass, ElkNamedIndividual>(
+										allNamedIndividuals,
+										allNamedIndividuals.size(),
+										namedIndividualIterator.next(),
+										ElkIndividualKeyProvider.INSTANCE,
+										node));
+							}
+							return node;
+						}
+					},
+					ElkIndividualKeyProvider.INSTANCE);
 		}
 
 		return result;

@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy.model;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,34 +19,39 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy.impl;
 
-import java.util.Collection;
-
-import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
+import org.semanticweb.elk.reasoner.taxonomy.model.NodeStore;
 
 /**
- * Generic taxonomy that can be modified.
+ * Generic node store that can be modified.
  * 
  * @author Peter Skocovsky
  *
  * @param <T>
- *            The type of members of the nodes of this taxonomy.
+ *            The type of members of the nodes in this store.
  * @param <N>
- *            The type of nodes in this taxonomy.
+ *            The type of nodes in this store.
  */
-public interface UpdateableGenericTaxonomy<T extends ElkEntity, N extends UpdateableGenericTaxonomyNode<T, N>>
-		extends GenericTaxonomy<T, N> {
+public interface UpdateableNodeStore<T, N extends UpdateableNode<T>>
+		extends NodeStore<T, N> {
 
 	/**
-	 * Returns the node containing the specified members, creates the node and
-	 * adds it to this taxonomy if needed.
+	 * Returns the node that contains the members provided in arguments. If such
+	 * a node is not in this store, it is created using the provided factory and
+	 * inserted into this store.
 	 * 
 	 * @param members
-	 *            The members of the node.
-	 * @return The node containing the specified members, creates the node and
-	 *         adds it to this taxonomy if needed.
+	 *            The members of the returned node.
+	 * @param size
+	 *            The number of the members.
+	 * @param factory
+	 *            The factory creating nodes that can be stored in this store.
+	 * @return The node containing the provided members.
 	 */
-	N getCreateNode(Collection<T> members);
+	N getCreateNode(Iterable<? extends T> members, int size,
+			NodeFactory<T, N> factory);
 
 	/**
 	 * Removes the node containing the specified member from the taxonomy.

@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,19 +19,20 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy.impl;
 
 import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableGenericNodeStore;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableNode;
-import org.semanticweb.elk.util.collections.ArrayHashMap;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
 
 /**
- * An updateable generic node store whose methods are synchronized.
+ * An updateable generic node store providing some concurrency guarantees.
+ * <p>
+ * TODO: Document the concurrency guarantees
  * 
  * @author Peter Skocovsky
  *
@@ -42,8 +41,8 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  * @param <N>
  *            The type of nodes in this store.
  */
-public class SynchronizedNodeStore<T, N extends UpdateableNode<T>>
-		implements UpdateableGenericNodeStore<T, N> {
+public class ConcurrentNodeStore<T, N extends UpdateableNode<T>>
+		implements UpdateableNodeStore<T, N> {
 
 	/**
 	 * The key provider for members of the nodes in this node store.
@@ -52,26 +51,11 @@ public class SynchronizedNodeStore<T, N extends UpdateableNode<T>>
 	/**
 	 * The map from the member keys to the nodes containing the members.
 	 */
-	private final Map<Object, N> nodeLookup_;
+	private final ConcurrentMap<Object, N> nodeLookup_;
 	/**
 	 * The set of all nodes.
 	 */
 	private final Set<N> allNodes_;
-
-	/**
-	 * Creates the node store with the provided initial capacity.
-	 * 
-	 * @param capacity
-	 *            The initial capacity.
-	 * @param keyProvider
-	 *            The key provider for members of the nodes in this node store.
-	 */
-	public SynchronizedNodeStore(final int capacity,
-			final ComparatorKeyProvider<? super T> keyProvider) {
-		keyProvider_ = keyProvider;
-		nodeLookup_ = new ArrayHashMap<Object, N>(capacity);
-		allNodes_ = new ArrayHashSet<N>(capacity);
-	}
 
 	/**
 	 * Creates the node store.
@@ -79,18 +63,21 @@ public class SynchronizedNodeStore<T, N extends UpdateableNode<T>>
 	 * @param keyProvider
 	 *            The key provider for members of the nodes in this node store.
 	 */
-	public SynchronizedNodeStore(
+	public ConcurrentNodeStore(
 			final ComparatorKeyProvider<? super T> keyProvider) {
-		this(127, keyProvider);
+		keyProvider_ = keyProvider;
+		nodeLookup_ = new ConcurrentHashMap<Object, N>();
+		allNodes_ = Collections
+				.newSetFromMap(new ConcurrentHashMap<N, Boolean>());
 	}
 
 	@Override
-	public synchronized N getNode(final T member) {
+	public N getNode(final T member) {
 		return nodeLookup_.get(keyProvider_.getKey(member));
 	}
 
 	@Override
-	public synchronized Set<N> getNodes() {
+	public Set<N> getNodes() {
 		return Collections.unmodifiableSet(allNodes_);
 	}
 
@@ -100,37 +87,42 @@ public class SynchronizedNodeStore<T, N extends UpdateableNode<T>>
 	}
 
 	@Override
-	public synchronized N putIfAbsent(final N node) {
-		for (final T member : node) {
+	public N getCreateNode(final Iterable<? extends T> members, final int size,
+			final NodeFactory<T, N> factory) {
+		for (final T member : members) {
 			final N previous = getNode(member);
 			if (previous != null) {
 				synchronized (previous) {
-					if (previous.size() < node.size()) {
-						previous.setMembers(node);
+					if (previous.size() < size) {
+						previous.setMembers(members);
 					} else {
 						return previous;
 					}
 				}
-				for (final T m : node) {
+				for (final T m : members) {
 					nodeLookup_.put(keyProvider_.getKey(m), previous);
 				}
 				return previous;
 			}
 		}
+		final N node = factory.createNode(members, size);
+		final T canonicalMember = node.getCanonicalMember();
 		final N previous = nodeLookup_
-				.get(keyProvider_.getKey(node.getCanonicalMember()));
+				.putIfAbsent(keyProvider_.getKey(canonicalMember), node);
 		if (previous != null) {
 			return previous;
 		}
 		allNodes_.add(node);
-		for (T member : node) {
-			nodeLookup_.put(keyProvider_.getKey(member), node);
+		for (final T member : node) {
+			if (member != canonicalMember) {
+				nodeLookup_.put(keyProvider_.getKey(member), node);
+			}
 		}
-		return null;
+		return node;
 	}
 
 	@Override
-	public synchronized boolean removeNode(final T member) {
+	public boolean removeNode(final T member) {
 
 		final N node = getNode(member);
 		if (node == null) {

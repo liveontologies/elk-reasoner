@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy.model;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,12 +19,13 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy.model;
 
 /**
- * Instances of this interface are able to return keys of objects of type
+ * Instances of this interface are able to return keys for objects of type
  * <code>T</code>. The purpose of these keys is that the methods
- * {@link #hashCode()} and {@link #equals(Object)} will be called on them
- * instead of the original objects.
+ * {@link #hashCode()} and {@link #equals(Object)} are called on them instead of
+ * the original objects.
  * 
  * @author Peter Skocovsky
  *
