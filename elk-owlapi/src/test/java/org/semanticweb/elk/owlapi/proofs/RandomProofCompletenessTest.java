@@ -80,7 +80,8 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 	static final String[] IGNORE_LIST = { "AssertionDisjoint.owl",
 			"ConjunctionsComplex.owl", "DifferentSameIndividual.owl",
 			"Inconsistent.owl", "OneOf.owl", "PropertyRangesHierarchy.owl",
-			"SameIndividual.owl" };
+			"SameIndividual.owl", "forest.owl", "TransitivePropertyChain.owl",
+			"TransitivityByChain.owl" };
 
 	static {
 		Arrays.sort(IGNORE_LIST);
