@@ -45,6 +45,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference.Visitor
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInferenceConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.DummyClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubContextInitializationNoPremises;
+import org.semanticweb.elk.reasoner.saturation.rules.AllInferencesRuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.AbstractRuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
@@ -84,6 +86,13 @@ public class ContextTracingRuleApplicationFactory
 				new MainContextFactory()));
 		mainSaturationState_ = mainSaturationState;
 		inferenceProducer_ = inferenceProducer;
+	}
+
+	@Override
+	protected RuleVisitor<?> getRuleVisitor(RuleStatistics statistics) {
+		// a rule visitor that also produces redundant inferences
+		// to make sure that all proofs are found
+		return new AllInferencesRuleVisitor();
 	}
 
 	@Override

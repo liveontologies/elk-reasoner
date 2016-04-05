@@ -306,7 +306,7 @@ public class ContextImpl implements ExtendedContext {
 
 	@Override
 	public String toString() {
-		return root_.toString() + (this != root_.getContext() ? "[local]" : "");
+		return root_.toString() +"[#" + hashCode() +"]" + (this != root_.getContext() ? "[local]" : "");
 	}
 
 	@Override

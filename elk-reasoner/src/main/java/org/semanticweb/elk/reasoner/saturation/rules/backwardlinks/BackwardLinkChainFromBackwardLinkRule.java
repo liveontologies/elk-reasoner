@@ -32,7 +32,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
@@ -134,22 +133,18 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 		return NAME;
 	}
 
-	@Override
-	public void apply(BackwardLink link, ContextPremises premises,
+	private void apply(
+			Multimap<IndexedPropertyChain, IndexedComplexPropertyChain> compsByForwardRelations,
+			BackwardLink link, ContextPremises premises,
 			ClassInferenceProducer producer) {
-
 		/* compose the link with all forward links */
-		SaturatedPropertyChain linkSaturation = link.getRelation()
-				.getSaturated();
-		final Multimap<IndexedPropertyChain, IndexedComplexPropertyChain> comps = linkSaturation
-				.getCompositionsByRightSubProperty();
-		if (comps == null)
+		if (compsByForwardRelations == null)
 			return;
 
 		for (IndexedPropertyChain forwardRelation : new LazySetIntersection<IndexedPropertyChain>(
-				comps.keySet(), forwardLinksByObjectProperty_.keySet())) {
+				compsByForwardRelations.keySet(), forwardLinksByObjectProperty_.keySet())) {
 
-			Collection<IndexedComplexPropertyChain> compositions = comps
+			Collection<IndexedComplexPropertyChain> compositions = compsByForwardRelations
 					.get(forwardRelation);
 			Collection<IndexedContextRoot> forwardTargets = forwardLinksByObjectProperty_
 					.get(forwardRelation);
@@ -160,12 +155,27 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 							producer, link.getTraceRoot(),
 							link.getRelation(), premises.getRoot(),
 							forwardRelation, forwardTarget, composition);
-		}
-
+		}		
+	}
+	
+	@Override
+	public void apply(BackwardLink link, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		apply(link.getRelation().getSaturated()
+				.getNonRedundantCompositionsByRightSubProperty(), link,
+				premises, producer);		
+	}
+	
+	@Override
+	public void applyRedundant(BackwardLink link, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		apply(link.getRelation().getSaturated()
+				.getRedundantCompositionsByRightSubProperty(), link,
+				premises, producer);
 	}
 
 	@Override
-	public boolean isTracing() {
+	public boolean isTracingRule() {
 		return true;
 	}
 

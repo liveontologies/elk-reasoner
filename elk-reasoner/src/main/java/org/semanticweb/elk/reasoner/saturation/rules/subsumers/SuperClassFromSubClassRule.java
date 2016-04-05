@@ -165,7 +165,7 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 	}
 
 	@Override
-	public boolean isTracing() {
+	public boolean isTracingRule() {
 		return true;
 	}
 

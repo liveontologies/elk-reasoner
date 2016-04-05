@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitors;
 
 /**
  * A {@link ClassConclusion.Visitor} that applies all {@link Rule}s to visited
- * {@link ClassConclusion}s for which {@link Rule#isTracing()} returns
+ * {@link ClassConclusion}s for which {@link Rule#isTracingRule()} returns
  * {@code true}.
  * 
  * When applying a {@link Rule} for a visited {@link ClassConclusion}, premises
@@ -50,7 +50,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitors;
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @see Rule#isTracing()
+ * @see Rule#isTracingRule()
  * @see RuleApplicationClassConclusion.Visitor
  */
 public class TracingRuleApplicationClassConclusionVisitor

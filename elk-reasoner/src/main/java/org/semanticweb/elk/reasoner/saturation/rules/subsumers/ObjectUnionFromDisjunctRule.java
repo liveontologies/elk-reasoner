@@ -172,7 +172,7 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 	}
 
 	@Override
-	public boolean isTracing() {
+	public boolean isTracingRule() {
 		return true;
 	}
 

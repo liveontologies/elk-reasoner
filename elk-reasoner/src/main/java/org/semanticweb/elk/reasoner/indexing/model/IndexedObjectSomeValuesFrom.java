@@ -129,7 +129,7 @@ public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				IndexedObjectSomeValuesFrom subsumer) {
 			SaturatedPropertyChain propertySaturation = subsumer.getProperty()
 					.getSaturated();
-			if (propertySaturation.getCompositionsByLeftSubProperty()
+			if (propertySaturation.getNonRedundantCompositionsByLeftSubProperty()
 					.isEmpty()) {
 				producer.produce(
 						new BackwardLinkOfObjectSomeValuesFrom(root, subsumer));
@@ -146,8 +146,13 @@ public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				IndexedPropertyChain forwardRelation, IndexedContextRoot target,
 				IndexedComplexPropertyChain composition) {
 
-			if (composition.getSaturated().getCompositionsByLeftSubProperty()
-					.isEmpty()) {
+			if (composition.getSaturated()
+					.getNonRedundantCompositionsByLeftSubProperty().isEmpty()
+					// check redundant inferences because composition can be
+					// used for tracing
+					&& composition.getSaturated()
+							.getRedundantCompositionsByLeftSubProperty()
+							.isEmpty()) {
 				List<IndexedObjectProperty> toldSuperProperties = composition
 						.getToldSuperProperties();
 				List<ElkAxiom> toldSuperPropertiesReasons = composition

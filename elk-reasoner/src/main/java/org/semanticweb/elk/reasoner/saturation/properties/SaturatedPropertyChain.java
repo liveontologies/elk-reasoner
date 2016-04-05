@@ -96,13 +96,25 @@ public class SaturatedPropertyChain {
 	 * A {@link Multimap} from R to S such that ObjectPropertyChain(R, root) is
 	 * a subrole of S
 	 */
-	AbstractHashMultimap<IndexedObjectProperty, IndexedComplexPropertyChain> compositionsByLeftSubProperty;
+	AbstractHashMultimap<IndexedObjectProperty, IndexedComplexPropertyChain> nonRedundantCompositionsByLeftSubProperty;
+	
+	/**
+	 * A {@link Multimap} from R to S such that ObjectPropertyChain(R, root) is
+	 * a subrole of S, which is considered to be redundant
+	 */
+	AbstractHashMultimap<IndexedObjectProperty, IndexedComplexPropertyChain> redundantCompositionsByLeftSubProperty;
 
 	/**
 	 * A {@link Multimap} from R to S such that ObjectPropertyChain(root, R) is
 	 * a subrole of S
 	 */
-	AbstractHashMultimap<IndexedPropertyChain, IndexedComplexPropertyChain> compositionsByRightSubProperty;
+	AbstractHashMultimap<IndexedPropertyChain, IndexedComplexPropertyChain> nonRedundantCompositionsByRightSubProperty;
+	
+	/**
+	 * A {@link Multimap} from R to S such that ObjectPropertyChain(root, R) is
+	 * a subrole of S, which is considered to be redundant
+	 */
+	AbstractHashMultimap<IndexedPropertyChain, IndexedComplexPropertyChain> redundantCompositionsByRightSubProperty;
 
 	public SaturatedPropertyChain(IndexedPropertyChain ipc) {
 		this.root = ipc;
@@ -119,8 +131,10 @@ public class SaturatedPropertyChain {
 		derivedRangesComputed = false;
 		leftSubComposableSubPropertiesByRightProperties = null;
 		leftSubComposableSubPropertiesByRightPropertiesComputed = false;
-		compositionsByLeftSubProperty = null;
-		compositionsByRightSubProperty = null;
+		nonRedundantCompositionsByLeftSubProperty = null;
+		redundantCompositionsByLeftSubProperty = null;
+		nonRedundantCompositionsByRightSubProperty = null;
+		redundantCompositionsByRightSubProperty = null;
 	}
 
 	/**
@@ -131,8 +145,10 @@ public class SaturatedPropertyChain {
 	public boolean isClear() {
 		return derivedSubProperties == null && derivedSubProperyChains == null
 				&& leftSubComposableSubPropertiesByRightProperties == null
-				&& compositionsByLeftSubProperty == null
-				&& compositionsByRightSubProperty == null;
+				&& nonRedundantCompositionsByLeftSubProperty == null
+				&& redundantCompositionsByLeftSubProperty == null
+				&& nonRedundantCompositionsByRightSubProperty == null
+				&& redundantCompositionsByRightSubProperty == null;
 	}
 
 	/**
@@ -172,22 +188,42 @@ public class SaturatedPropertyChain {
 
 	/**
 	 * @return A {@link Multimap} from R to S such that ObjectPropertyChain(R,
-	 *         root) is a subrole of S
+	 *         root) is a subrole of S, non-redundant ones
 	 */
-	public Multimap<IndexedObjectProperty, IndexedComplexPropertyChain> getCompositionsByLeftSubProperty() {
-		return compositionsByLeftSubProperty == null ? Operations
+	public Multimap<IndexedObjectProperty, IndexedComplexPropertyChain> getNonRedundantCompositionsByLeftSubProperty() {
+		return nonRedundantCompositionsByLeftSubProperty == null ? Operations
 				.<IndexedObjectProperty, IndexedComplexPropertyChain> emptyMultimap()
-				: compositionsByLeftSubProperty;
+				: nonRedundantCompositionsByLeftSubProperty;
+	}
+	
+	/**
+	 * @return A {@link Multimap} from R to S such that ObjectPropertyChain(R,
+	 *         root) is a subrole of S, redundant ones
+	 */
+	public Multimap<IndexedObjectProperty, IndexedComplexPropertyChain> getRedundantCompositionsByLeftSubProperty() {
+		return redundantCompositionsByLeftSubProperty == null ? Operations
+				.<IndexedObjectProperty, IndexedComplexPropertyChain> emptyMultimap()
+				: redundantCompositionsByLeftSubProperty;
 	}
 
 	/**
 	 * @return A {@link Multimap} from R to S such that
 	 *         ObjectPropertyChain(root, R) is a subrole of S
 	 */
-	public Multimap<IndexedPropertyChain, IndexedComplexPropertyChain> getCompositionsByRightSubProperty() {
-		return compositionsByRightSubProperty == null ? Operations
+	public Multimap<IndexedPropertyChain, IndexedComplexPropertyChain> getNonRedundantCompositionsByRightSubProperty() {
+		return nonRedundantCompositionsByRightSubProperty == null ? Operations
 				.<IndexedPropertyChain, IndexedComplexPropertyChain> emptyMultimap()
-				: compositionsByRightSubProperty;
+				: nonRedundantCompositionsByRightSubProperty;
+	}
+	
+	/**
+	 * @return A {@link Multimap} from R to S such that
+	 *         ObjectPropertyChain(root, R) is a subrole of S, including the redundant ones
+	 */
+	public Multimap<IndexedPropertyChain, IndexedComplexPropertyChain> getRedundantCompositionsByRightSubProperty() {
+		return redundantCompositionsByRightSubProperty == null ? Operations
+				.<IndexedPropertyChain, IndexedComplexPropertyChain> emptyMultimap()
+				: redundantCompositionsByRightSubProperty;
 	}
 
 	/* Functions that modify the saturation */
@@ -215,17 +251,29 @@ public class SaturatedPropertyChain {
 				this.getSubPropertyChains(), writer, root
 						+ ": other sub-property not in this: ");
 		// comparing derived compositions
-		Operations.dumpDiff(this.getCompositionsByLeftSubProperty(),
-				other.getCompositionsByLeftSubProperty(), writer, root
-						+ ": this left composition not in other: ");
-		Operations.dumpDiff(other.getCompositionsByLeftSubProperty(),
-				this.getCompositionsByLeftSubProperty(), writer, root
-						+ ": other left composition not in this: ");
-		Operations.dumpDiff(this.getCompositionsByRightSubProperty(),
-				other.getCompositionsByRightSubProperty(), writer, root
-						+ ": this right composition not in other: ");
-		Operations.dumpDiff(other.getCompositionsByRightSubProperty(),
-				this.getCompositionsByRightSubProperty(), writer, root
-						+ ": other right composition not in this: ");
+		Operations.dumpDiff(this.getNonRedundantCompositionsByLeftSubProperty(),
+				other.getNonRedundantCompositionsByLeftSubProperty(), writer, root
+						+ ": this non-redundant left composition not in other: ");
+		Operations.dumpDiff(this.getRedundantCompositionsByLeftSubProperty(),
+				other.getRedundantCompositionsByLeftSubProperty(), writer, root
+						+ ": this redundant left composition not in other: ");
+		Operations.dumpDiff(other.getNonRedundantCompositionsByLeftSubProperty(),
+				this.getNonRedundantCompositionsByLeftSubProperty(), writer, root
+						+ ": other non-redundant left composition not in this: ");
+		Operations.dumpDiff(other.getRedundantCompositionsByLeftSubProperty(),
+				this.getRedundantCompositionsByLeftSubProperty(), writer, root
+						+ ": other redundant left composition not in this: ");
+		Operations.dumpDiff(this.getNonRedundantCompositionsByRightSubProperty(),
+				other.getNonRedundantCompositionsByRightSubProperty(), writer, root
+						+ ": this non-redundant right composition not in other: ");
+		Operations.dumpDiff(this.getRedundantCompositionsByRightSubProperty(),
+				other.getRedundantCompositionsByRightSubProperty(), writer, root
+						+ ": this redundant right composition not in other: ");
+		Operations.dumpDiff(other.getNonRedundantCompositionsByRightSubProperty(),
+				this.getNonRedundantCompositionsByRightSubProperty(), writer, root
+						+ ": other non-redundant right composition not in this: ");
+		Operations.dumpDiff(other.getRedundantCompositionsByRightSubProperty(),
+				this.getRedundantCompositionsByRightSubProperty(), writer, root
+						+ ": other redundant right composition not in this: ");
 	}
 }

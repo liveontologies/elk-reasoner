@@ -80,7 +80,7 @@ public interface IndexedObjectHasSelf extends IndexedClassExpression {
 				IndexedObjectHasSelf subsumer) {
 			SaturatedPropertyChain propertySaturation = subsumer.getProperty()
 					.getSaturated();
-			if (propertySaturation.getCompositionsByLeftSubProperty()
+			if (propertySaturation.getNonRedundantCompositionsByLeftSubProperty()
 					.isEmpty()) {
 				producer.produce(
 						new BackwardLinkOfObjectHasSelf(root, subsumer));

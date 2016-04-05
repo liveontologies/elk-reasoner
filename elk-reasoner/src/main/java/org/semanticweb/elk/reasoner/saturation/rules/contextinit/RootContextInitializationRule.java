@@ -114,7 +114,7 @@ public class RootContextInitializationRule extends
 	}
 
 	@Override
-	public boolean isTracing() {
+	public boolean isTracingRule() {
 		return true;
 	}
 

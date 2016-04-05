@@ -105,7 +105,8 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 	@Test
 	public void proofCompletenessTest() throws Exception {
 		final long seed = RandomSeedProvider.VALUE;
-//		final long seed = 1459433444278L; TODO: seed to reproduce the problem with property chain optimization
+//		final long seed = 1459433444278L; // problem with property chain optimization
+//		final long seed = 1459864883969L; // problem with incremental mode 
 		final Random random = new Random(seed);
 		
 		final OWLDataFactory factory = manager_.getOWLDataFactory();

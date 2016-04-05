@@ -34,6 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
@@ -44,6 +45,11 @@ import org.slf4j.LoggerFactory;
  * A skeleton for implementing {@link RuleApplicationFactory}
  * 
  * @author "Yevgeny Kazakov"
+ *
+ * @param <C>
+ *            the type of the context used by this factory
+ * @param <I>
+ *            the type of the input processed by this factory
  */
 public abstract class AbstractRuleApplicationFactory<C extends Context, I extends RuleApplicationInput>
 		extends
@@ -139,6 +145,17 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 			SaturationStateWriter<? extends C> writer,
 			SaturationStatistics localStatistics);
 
+	/**
+	 * Creates a {@link RuleVisitor} that specifies how the rules are applied 
+	 * 
+	 * @param statistics
+	 * @return the {@link RuleVisitor} used by this 
+	 */
+	@SuppressWarnings("static-method")
+	protected RuleVisitor<?> getRuleVisitor(RuleStatistics statistics) {
+		return SaturationUtils.getStatsAwareRuleVisitor(statistics);
+	}
+	
 	@Override
 	public final InputProcessor<I> getEngine(
 			ContextCreationListener creationListener,
@@ -155,8 +172,7 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 		WorkerLocalTodo localTodo = new WorkerLocalTodoImpl();
 		writer = new WorkerLocalizedSaturationStateWriter<C>(writer, localTodo);
 		writer = getFinalWriter(writer);
-		RuleVisitor<?> ruleVisitor = SaturationUtils
-				.getStatsAwareRuleVisitor(localStatistics.getRuleStatistics());
+		RuleVisitor<?> ruleVisitor = getRuleVisitor(localStatistics.getRuleStatistics());
 		ModifiableReference<Context> activeContext = new ReferenceImpl<Context>();
 		return getEngine(
 				activeContext, getInferenceProcessor(activeContext, ruleVisitor,

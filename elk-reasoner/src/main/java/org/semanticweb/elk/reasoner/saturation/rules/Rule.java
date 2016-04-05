@@ -35,8 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param
- * 			<P>
+ * @param <P>
  *            the type of premises to which the rule can be applied
  */
 public interface Rule<P> {
@@ -62,6 +61,26 @@ public interface Rule<P> {
 			ClassInferenceProducer producer);
 
 	/**
+	 * Like {@link #apply(Object, ContextPremises, ClassInferenceProducer)}, but
+	 * produces additional redundant inferences using the
+	 * {@link ClassInferenceProducer} that are not necessary for producing the
+	 * required conclusion, but may be necessary to capture all proofs from
+	 * axioms
+	 * 
+	 * @param premise
+	 *            the element to which the rule is applied, it represents a
+	 *            {@link ClassConclusion}
+	 * @param premises
+	 *            the {@link ContextPremises} from which other matching premises
+	 *            of the rule are taken
+	 * @param producer
+	 *            the {@link ClassInferenceProducer} using which
+	 *            {@link ClassConclusion}s of the inferences are produced
+	 */
+	public void applyRedundant(P premise, ContextPremises premises,
+			ClassInferenceProducer producer);
+
+	/**
 	 * @return {@code true} if this {@link Rule} produces only
 	 *         {@link ClassConclusion}s with the same value of
 	 *         {@link ClassConclusion#getTraceRoot()} and
@@ -73,7 +92,7 @@ public interface Rule<P> {
 	 * @see ClassConclusion#getTraceRoot()
 	 * @see SubClassConclusion#getDestination()
 	 */
-	public boolean isTracing();
+	public boolean isTracingRule();
 
 	public void accept(RuleVisitor<?> visitor, P premise,
 			ContextPremises premises, ClassInferenceProducer producer);

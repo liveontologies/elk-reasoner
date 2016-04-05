@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation.rules.subcontextinit;
+package org.semanticweb.elk.reasoner.saturation.rules;
 
 /*
  * #%L
@@ -22,25 +22,22 @@ package org.semanticweb.elk.reasoner.saturation.rules.subcontextinit;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.AbstractRule;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
- * A skeleton implementation of {@link SubContextInitRule}
+ * A skeleton implementation of {@code Rule}
  * 
- * @author "Yevgeny Kazakov"
+ * @author Yevgeny Kazakov
+ *
+ * @param <P>
+ *            the type of premises to which the rule can be applied
  */
-abstract class AbstractSubContextInitRule extends AbstractRule<SubContextInitialization>
-		implements SubContextInitRule {
-
+public abstract class AbstractRule<P> implements Rule<P> {
+	
 	@Override
-	public void accept(RuleVisitor<?> visitor, SubContextInitialization premise,
-			ContextPremises premises, ClassInferenceProducer producer) {
-		accept((SubContextInitRuleVisitor<?>) visitor, premise, premises,
-				producer);
+	public void applyRedundant(P premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		// by default does no do anything
 	}
 
 }

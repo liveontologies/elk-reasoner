@@ -127,15 +127,6 @@ public class PropertyHierarchyCompositionComputationFactory extends
 
 			for (IndexedPropertyChain rightSubPropertyChain : rightSubProperties) {
 
-				SaturatedPropertyChain rightSaturation = rightSubPropertyChain
-						.getSaturated();
-				synchronized (rightSaturation) {
-					if (rightSaturation.compositionsByLeftSubProperty == null)
-						rightSaturation.compositionsByLeftSubProperty = new CompositionMultimap<IndexedObjectProperty>();
-				}
-
-				AbstractHashMultimap<IndexedObjectProperty, IndexedComplexPropertyChain> compositionsByLeft = rightSaturation.compositionsByLeftSubProperty;
-
 				// computing left properties for which composition with the
 				// current right sub-property chain is redundant
 				Collection<IndexedObjectProperty> redundantLeftProperties = Collections
@@ -155,25 +146,38 @@ public class PropertyHierarchyCompositionComputationFactory extends
 					}
 				}
 
+				SaturatedPropertyChain rightSaturation = rightSubPropertyChain
+						.getSaturated();
+				synchronized (rightSaturation) {
+					if (rightSaturation.nonRedundantCompositionsByLeftSubProperty == null) {
+						rightSaturation.nonRedundantCompositionsByLeftSubProperty = new CompositionMultimap<IndexedObjectProperty>();
+					}
+				}
+				
+				if (!redundantLeftProperties.isEmpty()) {
+					synchronized (rightSaturation) {
+						if (rightSaturation.redundantCompositionsByLeftSubProperty == null) {
+							rightSaturation.redundantCompositionsByLeftSubProperty = new CompositionMultimap<IndexedObjectProperty>();
+						}
+					}
+				}
+				
 				for (IndexedObjectProperty leftSubProperty : leftSubProperties) {
 					boolean newRecord = false;
 
-					if (redundantLeftProperties.contains(leftSubProperty)) {
-						if (LOGGER_.isTraceEnabled()) {
-							LOGGER_.trace(
-									"{} o {} => {}: composition is redundant",
-									leftSubProperty, rightSubPropertyChain,
-									element);
-						}
-						continue;
-					}
+					boolean redundant = redundantLeftProperties.contains(leftSubProperty);
 
 					if (LOGGER_.isTraceEnabled()) {
-						LOGGER_.trace("{} o {} => {}: new composition",
-								leftSubProperty, rightSubPropertyChain, element);
+						LOGGER_.trace("{} o {} => {}: new composition [redundant: {}]",
+								leftSubProperty, rightSubPropertyChain, element, redundant);
 					}
 
+					AbstractHashMultimap<IndexedObjectProperty, IndexedComplexPropertyChain> compositionsByLeft = redundant
+							? rightSaturation.redundantCompositionsByLeftSubProperty
+							: rightSaturation.nonRedundantCompositionsByLeftSubProperty;
+					
 					Collection<IndexedComplexPropertyChain> compositionsSoFar;
+					
 					synchronized (compositionsByLeft) {
 						compositionsSoFar = compositionsByLeft
 								.getValues(leftSubProperty);
@@ -189,11 +193,21 @@ public class PropertyHierarchyCompositionComputationFactory extends
 					if (newRecord) {
 						SaturatedPropertyChain leftSaturation = leftSubProperty
 								.getSaturated();
-						synchronized (leftSaturation) {
-							if (leftSaturation.compositionsByRightSubProperty == null)
-								leftSaturation.compositionsByRightSubProperty = new CompositionMultimap<IndexedPropertyChain>();
+						Map<IndexedPropertyChain, Collection<IndexedComplexPropertyChain>> compositionsByRight;
+						if (redundant) {
+							synchronized (leftSaturation) {
+								if (leftSaturation.redundantCompositionsByRightSubProperty == null)
+									leftSaturation.redundantCompositionsByRightSubProperty = new CompositionMultimap<IndexedPropertyChain>();
+							}
+							compositionsByRight = leftSaturation.redundantCompositionsByRightSubProperty;
+						} else {
+							synchronized (leftSaturation) {
+								if (leftSaturation.nonRedundantCompositionsByRightSubProperty == null)
+									leftSaturation.nonRedundantCompositionsByRightSubProperty = new CompositionMultimap<IndexedPropertyChain>();
+							}
+							compositionsByRight = leftSaturation.nonRedundantCompositionsByRightSubProperty;
 						}
-						Map<IndexedPropertyChain, Collection<IndexedComplexPropertyChain>> compositionsByRight = leftSaturation.compositionsByRightSubProperty;
+						
 						synchronized (compositionsByRight) {
 							compositionsByRight.put(rightSubPropertyChain,
 									compositionsSoFar);

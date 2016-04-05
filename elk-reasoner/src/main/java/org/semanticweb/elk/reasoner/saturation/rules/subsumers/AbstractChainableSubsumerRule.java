@@ -41,6 +41,12 @@ abstract class AbstractChainableSubsumerRule extends
 	AbstractChainableSubsumerRule(ChainableSubsumerRule tail) {
 		super(tail);
 	}
+	
+	@Override
+	public void applyRedundant(IndexedClassExpression premise,
+			ContextPremises premises, ClassInferenceProducer producer) {
+		// by default does not do anything
+	}
 
 	@Override
 	public void accept(RuleVisitor<?> visitor, IndexedClassExpression premise,

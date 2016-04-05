@@ -38,10 +38,10 @@ public class RuleVisitors {
 	 * @param visitor
 	 * @return A {@link RuleVisitor} that delegates the calls to the provided
 	 *         {@link RuleVisitor} when for the {@link Rule} which accepts this
-	 *         visitor, {@link Rule#isTracing()} returns {@code true}. Otherwise
+	 *         visitor, {@link Rule#isTracingRule()} returns {@code true}. Otherwise
 	 *         the {@link RuleVisitor} returns {@code null}.
 	 * 
-	 * @see Rule#isTracing()
+	 * @see Rule#isTracingRule()
 	 */
 	public static <O> RuleVisitor<O> getTracingVisitor(RuleVisitor<O> visitor) {
 		return new ConditionalRuleVisitor<O>(visitor, LOCALITY_CHECKER_);

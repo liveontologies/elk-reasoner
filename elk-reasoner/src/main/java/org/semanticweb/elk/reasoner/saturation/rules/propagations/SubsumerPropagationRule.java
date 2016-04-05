@@ -74,7 +74,7 @@ public class SubsumerPropagationRule extends AbstractPropagationRule {
 	}
 
 	@Override
-	public boolean isTracing() {
+	public boolean isTracingRule() {
 		return false;
 	}
 

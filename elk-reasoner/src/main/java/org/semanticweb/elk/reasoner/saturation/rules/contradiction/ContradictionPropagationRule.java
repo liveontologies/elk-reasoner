@@ -79,7 +79,7 @@ public class ContradictionPropagationRule extends AbstractContradictionRule {
 	}
 
 	@Override
-	public boolean isTracing() {
+	public boolean isTracingRule() {
 		return false;
 	}
 

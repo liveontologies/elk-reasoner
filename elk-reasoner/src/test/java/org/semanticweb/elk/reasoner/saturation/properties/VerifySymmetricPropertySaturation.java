@@ -47,13 +47,13 @@ public class VerifySymmetricPropertySaturation {
 			AsymmetricCompositionHook hook) {
 		SaturatedPropertyChain saturation = ipc.getSaturated();
 		Multimap<IndexedObjectProperty, IndexedComplexPropertyChain> compositionsByLeft = saturation
-				.getCompositionsByLeftSubProperty();
+				.getNonRedundantCompositionsByLeftSubProperty();
 		for (IndexedObjectProperty left : compositionsByLeft.keySet()) {
 			for (IndexedComplexPropertyChain composition : compositionsByLeft
 					.get(left)) {
 				SaturatedPropertyChain leftSaturation = left.getSaturated();
 				Multimap<IndexedPropertyChain, IndexedComplexPropertyChain> compositionsByRight = leftSaturation
-						.getCompositionsByRightSubProperty();
+						.getNonRedundantCompositionsByRightSubProperty();
 				if (!compositionsByRight.contains(ipc, composition)) {
 					hook.error(left, ipc, composition, ipc);
 				}
@@ -71,13 +71,13 @@ public class VerifySymmetricPropertySaturation {
 			AsymmetricCompositionHook hook) {
 		SaturatedPropertyChain saturation = ip.getSaturated();
 		Multimap<IndexedPropertyChain, IndexedComplexPropertyChain> compositionsByRight = saturation
-				.getCompositionsByRightSubProperty();
+				.getNonRedundantCompositionsByRightSubProperty();
 		for (IndexedPropertyChain right : compositionsByRight.keySet()) {
 			for (IndexedComplexPropertyChain composition : compositionsByRight
 					.get(right)) {
 				SaturatedPropertyChain rightSaturation = right.getSaturated();
 				Multimap<IndexedObjectProperty, IndexedComplexPropertyChain> compositionsByLeft = rightSaturation
-						.getCompositionsByLeftSubProperty();
+						.getNonRedundantCompositionsByLeftSubProperty();
 				if (!compositionsByLeft.contains(ip, composition)) {
 					hook.error(ip, right, composition, ip);
 				}

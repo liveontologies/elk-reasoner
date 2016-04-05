@@ -42,6 +42,12 @@ abstract class AbstractChainableContextInitRule extends
 	AbstractChainableContextInitRule(ChainableContextInitRule tail) {
 		super(tail);
 	}
+	
+	@Override
+	public void applyRedundant(ContextInitialization premise,
+			ContextPremises premises, ClassInferenceProducer producer) {
+		// by default does not do anything
+	}
 
 	@Override
 	public void accept(RuleVisitor<?> visitor, ContextInitialization premise,

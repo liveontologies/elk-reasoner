@@ -36,11 +36,16 @@ import org.semanticweb.elk.util.concurrent.computation.Interrupter;
  * {@link SaturationState} in parallel. Each engine has an exclusive read-write
  * access to the {@link Context} of the {@link SaturationState} in which the
  * current {@link ClassConclusion} is processed, so it can modify this
- * {@link Context} and apply the rules using {@link ClassConclusion}s saved in the
- * {@link Context}, which can possibly produce {@link ClassConclusion}s for other
- * {@link Context}s.
+ * {@link Context} and apply the rules using {@link ClassConclusion}s saved in
+ * the {@link Context}, which can possibly produce {@link ClassConclusion}s for
+ * other {@link Context}s.
  * 
  * @author "Yevgeny Kazakov"
+ *
+ * @param <C>
+ *            the type of the context used by this factory
+ * @param <I>
+ *            the type of the input processed by this factory
  */
 public interface RuleApplicationFactory<C extends Context, I extends RuleApplicationInput>
 		extends Interrupter {

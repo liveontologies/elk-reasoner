@@ -43,6 +43,12 @@ abstract class AbstractLinkableBackwardLinkRule extends
 	}
 
 	@Override
+	public void applyRedundant(BackwardLink premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		// by default does not do anything
+	}
+	
+	@Override
 	public void accept(RuleVisitor<?> visitor, BackwardLink premise,
 			ContextPremises premises, ClassInferenceProducer producer) {
 		accept((BackwardLinkRuleVisitor<?>) visitor, premise, premises,

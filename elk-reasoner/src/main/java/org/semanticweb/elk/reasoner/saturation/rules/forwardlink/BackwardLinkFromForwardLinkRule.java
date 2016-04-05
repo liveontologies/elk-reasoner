@@ -74,7 +74,7 @@ public class BackwardLinkFromForwardLinkRule extends AbstractForwardLinkRule {
 	}
 
 	@Override
-	public boolean isTracing() {
+	public boolean isTracingRule() {
 		return true;
 	}
 

@@ -32,7 +32,6 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -82,33 +81,46 @@ public class ReflexiveBackwardLinkCompositionRule extends
 		return NAME;
 	}
 
-	@Override
-	public void apply(ForwardLink premise, ContextPremises premises,
-			ClassInferenceProducer producer) {
+	private void apply(
+			final Multimap<IndexedObjectProperty, IndexedComplexPropertyChain> compsByBackwardRelation,
+			ContextPremises premises, ClassInferenceProducer producer) {
 		/* compose the link with all reflexive backward links */
-		SaturatedPropertyChain linkSaturation = this.forwardLink_
-				.getChain().getSaturated();
-		final Multimap<IndexedObjectProperty, IndexedComplexPropertyChain> comps = linkSaturation
-				.getCompositionsByLeftSubProperty();
 		final Set<IndexedObjectProperty> reflexiveBackwardRelations = premises
 				.getLocalReflexiveObjectProperties();
 
 		for (IndexedObjectProperty backwardRelation : new LazySetIntersection<IndexedObjectProperty>(
-				comps.keySet(), reflexiveBackwardRelations)) {
-			Collection<IndexedComplexPropertyChain> compositions = comps
+				compsByBackwardRelation.keySet(), reflexiveBackwardRelations)) {
+			Collection<IndexedComplexPropertyChain> compositions = compsByBackwardRelation
 					.get(backwardRelation);
 			for (IndexedComplexPropertyChain composition : compositions) {
 				IndexedContextRoot root = premises.getRoot();
-				IndexedObjectSomeValuesFrom.Helper.produceComposedLink(
-						producer, root, backwardRelation, root,
-						forwardLink_.getChain(),
+				IndexedObjectSomeValuesFrom.Helper.produceComposedLink(producer,
+						root, backwardRelation, root, forwardLink_.getChain(),
 						forwardLink_.getTarget(), composition);
 			}
 		}
 	}
+	
+	@Override
+	public void apply(ForwardLink premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		/* compose the link with all reflexive backward links */
+		apply(forwardLink_.getChain().getSaturated()
+				.getNonRedundantCompositionsByLeftSubProperty(), premises,
+				producer);
+	}
+	
+	@Override
+	public void applyRedundant(ForwardLink premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		/* compose the link with all reflexive backward links */
+		apply(forwardLink_.getChain().getSaturated()
+				.getRedundantCompositionsByLeftSubProperty(), premises,
+				producer);
+	}
 
 	@Override
-	public boolean isTracing() {
+	public boolean isTracingRule() {
 		return true;
 	}
 

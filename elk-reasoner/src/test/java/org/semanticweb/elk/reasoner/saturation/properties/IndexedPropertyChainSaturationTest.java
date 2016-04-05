@@ -202,9 +202,9 @@ public class IndexedPropertyChainSaturationTest {
 
 		computation.process();
 
-		assertTrue(R.getSaturated().getCompositionsByLeftSubProperty().get(R)
+		assertTrue(R.getSaturated().getNonRedundantCompositionsByLeftSubProperty().get(R)
 				.contains(RR));
-		assertTrue(R.getSaturated().getCompositionsByRightSubProperty().get(R)
+		assertTrue(R.getSaturated().getNonRedundantCompositionsByRightSubProperty().get(R)
 				.contains(RR));
 	}
 

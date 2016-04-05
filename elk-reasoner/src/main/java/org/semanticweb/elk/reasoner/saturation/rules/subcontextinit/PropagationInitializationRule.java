@@ -59,7 +59,7 @@ public class PropagationInitializationRule extends AbstractSubContextInitRule {
 	}
 
 	@Override
-	public boolean isTracing() {
+	public boolean isTracingRule() {
 		return true;
 	}
 

@@ -541,17 +541,18 @@ public class DifferentialIndex extends DirectIndex {
 	/**
 	 * Sets the incremental mode for this {@code DifferentialIndex}.
 	 * 
-	 * @param mode
+	 * @param incremental
 	 *            if {@code true}, deletions and additions to this indexed are
 	 *            stored separately; if {@code false} all changes are
 	 *            immediately applied to the index.
 	 */
-	public void setIncrementalMode(boolean mode) {
-		if (this.incrementalMode == mode)
+	public void setIncrementalMode(boolean incremental) {
+		if (this.incrementalMode == incremental)
 			// already set
 			return;
-		this.incrementalMode = mode;
-		if (!mode) {
+		LOGGER_.trace("set incremental mode: " + incremental);
+		this.incrementalMode = incremental;
+		if (!incremental) {
 			clearDeletedRules();
 			commitAddedRules();
 			initClassChanges();

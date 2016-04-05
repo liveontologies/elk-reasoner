@@ -96,7 +96,7 @@ public class ContradictionFromNegationRule extends
 	}
 
 	@Override
-	public boolean isTracing() {
+	public boolean isTracingRule() {
 		return true;
 	}
 

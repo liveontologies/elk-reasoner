@@ -26,12 +26,12 @@ import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 
 /**
  * A {@link RuleVisitor} that returns {@code true} for {@link Rule}s for which
- * {@link Rule#isTracing()} returns {@code true}, regardless of all other
+ * {@link Rule#isTracingRule()} returns {@code true}, regardless of all other
  * parameters
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @see Rule#isTracing()
+ * @see Rule#isTracingRule()
  *
  */
 public class RuleTracingCheckingVisitor extends DummyRuleVisitor<Boolean> {
@@ -39,7 +39,7 @@ public class RuleTracingCheckingVisitor extends DummyRuleVisitor<Boolean> {
 	@Override
 	protected <P> Boolean defaultVisit(Rule<P> rule, P premise,
 			ContextPremises premises, ClassInferenceProducer producer) {
-		return rule.isTracing();
+		return rule.isTracingRule();
 	}
 
 }
