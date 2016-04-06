@@ -529,7 +529,7 @@ public class DifferentialIndex extends DirectIndex {
 	 * @return {@code true} if there are no uncommitted changes in this
 	 *         {@link DifferentialIndex}
 	 */
-	public boolean isEmpty() {
+	public boolean isFullyCommitted() {
 		return addedContextInitRules_ == null
 				&& removedContextInitRules_ == null
 				&& (addedContextRuleHeadByClassExpressions_ == null || addedContextRuleHeadByClassExpressions_

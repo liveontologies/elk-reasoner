@@ -208,24 +208,6 @@ abstract class AbstractReasonerStage extends SimpleInterrupter implements
 		isCompleted_ = true;
 		return true;
 	}
-
-	/**
-	 * Marks this stage and all preceding stages as completed if not already
-	 * done so
-	 */
-	public void setCompletedRecursive() {
-		Queue<AbstractReasonerStage> toComplete_ = new LinkedList<AbstractReasonerStage>();
-		toComplete_.add(this);
-		AbstractReasonerStage next;
-		while ((next = toComplete_.poll()) != null) {
-			if (next.setCompleted()) {
-				for (AbstractReasonerStage preStage : next.preStages_) {
-					toComplete_.add(preStage);
-				}
-			}
-		}
-	}
-
 	
 	protected void checkInterrupt() throws ElkInterruptedException {
 		if (isInterrupted()) {

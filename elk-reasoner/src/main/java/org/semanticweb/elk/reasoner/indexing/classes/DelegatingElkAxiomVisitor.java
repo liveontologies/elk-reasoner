@@ -70,227 +70,213 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
+ * 
+ * @author Yevgeny Kazakov
+ * 
+ * @param <O>
+ *            the type of the output of this visitor
  */
-class DelegatingElkAxiomVisitor implements ElkAxiomVisitor<Void>{
+class DelegatingElkAxiomVisitor<O> implements ElkAxiomVisitor<O>{
 
-	private final ElkAxiomVisitor<Void> visitor_;
+	private final ElkAxiomVisitor<O> visitor_;
 	
-	public DelegatingElkAxiomVisitor(ElkAxiomVisitor<Void> visitor) {
+	public DelegatingElkAxiomVisitor(ElkAxiomVisitor<O> visitor) {
 		this.visitor_ = visitor;
 	}
 	
-	protected ElkAxiomVisitor<Void> getVisitor() {
+	protected ElkAxiomVisitor<O> getVisitor() {
 		return visitor_;
 	}
 
 	@Override
-	public Void visit(ElkDeclarationAxiom elkDeclarationAxiom) {
-		return elkDeclarationAxiom.accept(visitor_);
+	public O visit(ElkSWRLRule axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(ElkDisjointClassesAxiom elkDisjointClasses) {
-		return elkDisjointClasses.accept(visitor_);
+	public O visit(ElkSubClassOfAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(ElkDisjointUnionAxiom elkDisjointUnionAxiom) {
-		return elkDisjointUnionAxiom.accept(visitor_);
+	public O visit(ElkDisjointUnionAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(ElkEquivalentClassesAxiom elkEquivalentClassesAxiom) {
-		return elkEquivalentClassesAxiom.accept(visitor_);
+	public O visit(ElkClassAssertionAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(ElkSubClassOfAxiom elkSubClassOfAxiom) {
-		return elkSubClassOfAxiom.accept(visitor_);
+	public O visit(ElkSameIndividualAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(
-			ElkAsymmetricObjectPropertyAxiom elkAsymmetricObjectPropertyAxiom) {
-		return elkAsymmetricObjectPropertyAxiom.accept(visitor_);
+	public O visit(ElkDisjointClassesAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(
-			ElkDisjointObjectPropertiesAxiom elkDisjointObjectPropertiesAxiom) {
-		return elkDisjointObjectPropertiesAxiom.accept(visitor_);
+	public O visit(ElkDataPropertyRangeAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(
-			ElkEquivalentObjectPropertiesAxiom elkEquivalentObjectProperties) {
-		return elkEquivalentObjectProperties.accept(visitor_);
+	public O visit(ElkEquivalentClassesAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(
-			ElkFunctionalObjectPropertyAxiom elkFunctionalObjectPropertyAxiom) {
-		return elkFunctionalObjectPropertyAxiom.accept(visitor_);
+	public O visit(ElkSubDataPropertyOfAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(
-			ElkInverseFunctionalObjectPropertyAxiom elkInverseFunctionalObjectPropertyAxiom) {
-		return elkInverseFunctionalObjectPropertyAxiom.accept(visitor_);
+	public O visit(ElkDataPropertyDomainAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(
-			ElkInverseObjectPropertiesAxiom elkInverseObjectPropertiesAxiom) {
-		return elkInverseObjectPropertiesAxiom.accept(visitor_);
+	public O visit(ElkAnnotationAssertionAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(
-			ElkIrreflexiveObjectPropertyAxiom elkIrreflexiveObjectPropertyAxiom) {
-		return elkIrreflexiveObjectPropertyAxiom.accept(visitor_);
+	public O visit(ElkObjectPropertyRangeAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(ElkObjectPropertyDomainAxiom elkObjectPropertyDomainAxiom) {
-		return elkObjectPropertyDomainAxiom.accept(visitor_);
+	public O visit(ElkSubObjectPropertyOfAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(ElkObjectPropertyRangeAxiom elkObjectPropertyRangeAxiom) {
-		return elkObjectPropertyRangeAxiom.accept(visitor_);
+	public O visit(ElkDifferentIndividualsAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(
-			ElkReflexiveObjectPropertyAxiom elkReflexiveObjectPropertyAxiom) {
-		return elkReflexiveObjectPropertyAxiom.accept(visitor_);
+	public O visit(ElkObjectPropertyDomainAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(ElkSubObjectPropertyOfAxiom elkSubObjectPropertyOfAxiom) {
-		return elkSubObjectPropertyOfAxiom.accept(visitor_);
+	public O visit(ElkDataPropertyAssertionAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(
-			ElkSymmetricObjectPropertyAxiom elkSymmetricObjectPropertyAxiom) {
-		return elkSymmetricObjectPropertyAxiom.accept(visitor_);
+	public O visit(ElkDeclarationAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(
-			ElkTransitiveObjectPropertyAxiom elkTransitiveObjectPropertyAxiom) {
-		return elkTransitiveObjectPropertyAxiom.accept(visitor_);
+	public O visit(ElkDisjointDataPropertiesAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(ElkDataPropertyDomainAxiom elkDataPropertyDomainAxiom) {
-		return elkDataPropertyDomainAxiom.accept(visitor_);
+	public O visit(ElkFunctionalDataPropertyAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(ElkDataPropertyRangeAxiom elkDataPropertyRangeAxiom) {
-		return elkDataPropertyRangeAxiom.accept(visitor_);
+	public O visit(ElkAnnotationPropertyRangeAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(
-			ElkDisjointDataPropertiesAxiom elkDisjointDataPropertiesAxiom) {
-		return elkDisjointDataPropertiesAxiom.accept(visitor_);
+	public O visit(ElkInverseObjectPropertiesAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(
-			ElkEquivalentDataPropertiesAxiom elkEquivalentDataProperties) {
-		return elkEquivalentDataProperties.accept(visitor_);
+	public O visit(ElkObjectPropertyAssertionAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(
-			ElkFunctionalDataPropertyAxiom elkFunctionalDataPropertyAxiom) {
-		return elkFunctionalDataPropertyAxiom.accept(visitor_);
+	public O visit(ElkReflexiveObjectPropertyAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(ElkSubDataPropertyOfAxiom elkSubDataPropertyOfAxiom) {
-		return elkSubDataPropertyOfAxiom.accept(visitor_);
+	public O visit(ElkSubAnnotationPropertyOfAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(ElkDatatypeDefinitionAxiom datatypeDefn) {
-		return datatypeDefn.accept(visitor_);
+	public O visit(ElkSymmetricObjectPropertyAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(ElkHasKeyAxiom elkHasKey) {
-		return elkHasKey.accept(visitor_);
+	public O visit(ElkAnnotationPropertyDomainAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(ElkClassAssertionAxiom elkClassAssertionAxiom) {
-		return elkClassAssertionAxiom.accept(visitor_);
+	public O visit(ElkAsymmetricObjectPropertyAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(
-			ElkDataPropertyAssertionAxiom elkDataPropertyAssertionAxiom) {
-		return elkDataPropertyAssertionAxiom.accept(visitor_);
+	public O visit(ElkDisjointObjectPropertiesAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(ElkDifferentIndividualsAxiom elkDifferentIndividualsAxiom) {
-		return elkDifferentIndividualsAxiom.accept(visitor_);
+	public O visit(ElkEquivalentDataPropertiesAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(
-			ElkNegativeDataPropertyAssertionAxiom elkNegativeDataPropertyAssertion) {
-		return null;
+	public O visit(ElkFunctionalObjectPropertyAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(
-			ElkNegativeObjectPropertyAssertionAxiom elkNegativeObjectPropertyAssertion) {
-		return elkNegativeObjectPropertyAssertion.accept(visitor_);
+	public O visit(ElkTransitiveObjectPropertyAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(
-			ElkObjectPropertyAssertionAxiom elkObjectPropertyAssertionAxiom) {
-		return elkObjectPropertyAssertionAxiom.accept(visitor_);
+	public O visit(ElkIrreflexiveObjectPropertyAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(ElkSameIndividualAxiom elkSameIndividualAxiom) {
-		return elkSameIndividualAxiom.accept(visitor_);
+	public O visit(ElkEquivalentObjectPropertiesAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(
-			ElkSubAnnotationPropertyOfAxiom subAnnotationPropertyOfAxiom) {
-		return subAnnotationPropertyOfAxiom.accept(visitor_);
+	public O visit(ElkHasKeyAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(
-			ElkAnnotationPropertyDomainAxiom annotationPropertyDomainAxiom) {
-		return annotationPropertyDomainAxiom.accept(visitor_);
+	public O visit(ElkNegativeDataPropertyAssertionAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(
-			ElkAnnotationPropertyRangeAxiom annotationPropertyRangeAxiom) {
-		return annotationPropertyRangeAxiom.accept(visitor_);
+	public O visit(ElkInverseFunctionalObjectPropertyAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(ElkAnnotationAssertionAxiom annotationAssertionAxiom) {
-		return annotationAssertionAxiom.accept(visitor_);
+	public O visit(ElkNegativeObjectPropertyAssertionAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
 	@Override
-	public Void visit(ElkSWRLRule rule) {
-		return rule.accept(visitor_);
+	public O visit(ElkDatatypeDefinitionAxiom axiom) {
+		return visitor_.visit(axiom);
 	}
 
+		
 }

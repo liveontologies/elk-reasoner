@@ -51,19 +51,14 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 			.getLogger(AxiomLoadingStage.class);
 
 	/**
-	 * After loading how many axioms recommend garbage collection
-	 */
-	private static final int GC_THRESHOLD_ = 10000;
-
-	/**
 	 * the {@link AxiomLoader} using which the axioms are loaded
 	 */
 	private volatile AxiomLoader loader_;
-
+	
 	/**
-	 * counts how many axioms were loaded
+	 * {@code true} if this stage was not yet successfully completed before
 	 */
-	private int axiomCounter_;
+	private boolean firstLoad_ = true;
 
 	/**
 	 * the {@link ElkAxiomProcessor}s using which the axioms are inserted and
@@ -86,7 +81,9 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-		axiomCounter_ = 0;
+		if (!firstLoad_) {
+			reasoner.trySetIncrementalMode();			
+		}
 		loader_ = reasoner.getAxiomLoader();
 		if (loader_ == null || loader_.isLoadingFinished()) {
 			return true;
@@ -115,10 +112,9 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 
 			@Override
 			public void notify(ElkAxiom axiom) {
-				axiomCounter_++;
 				if (resetDone)
 					return;
-				LOGGER_.debug("Disallowing incremental mode due to {}", axiom);
+				LOGGER_.debug("{}: axiom not supported in incremental mode", axiom);
 				reasoner.resetPropertySaturation();
 				reasoner.setNonIncrementalMode();
 				resetDone = true;
@@ -144,14 +140,11 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 	@Override
 	public boolean postExecute() {
 		if (!super.postExecute())
-			return false;
+			return false;	
+		this.firstLoad_ = false;
 		this.loader_ = null;
 		this.axiomInsertionProcessor_ = null;
 		this.axiomDeletionProcessor_ = null;
-		if (axiomCounter_ > GC_THRESHOLD_) {
-			// recommend garbage collection
-			System.gc();
-		}
 		return true;
 	}
 

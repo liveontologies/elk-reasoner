@@ -43,7 +43,7 @@ import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverter;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class NonIncrementalElkAxiomVisitor extends DelegatingElkAxiomVisitor
+public class NonIncrementalElkAxiomVisitor extends DelegatingElkAxiomVisitor<Void>
 		implements ElkAxiomConverter {
 
 	private final NonIncrementalChangeListener<ElkAxiom> listener_;

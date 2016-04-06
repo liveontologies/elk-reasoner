@@ -172,8 +172,6 @@ public class Reasoner extends AbstractReasonerState {
 
 		setAllowIncrementalMode(config
 				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_MODE_ALLOWED));
-		setAllowIncrementalTaxonomy(config
-				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_TAXONOMY));
 
 		if (executor_ != null) {// could be null during initialization
 			executor_.setPoolSize(workerNo_);

@@ -71,9 +71,9 @@ import org.semanticweb.elk.reasoner.taxonomy.SingletoneInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.SingletoneTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 import org.semanticweb.elk.reasoner.tracing.InferenceSet;
 import org.semanticweb.elk.reasoner.tracing.TraceState;
-import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
@@ -155,7 +155,6 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 */
 	private boolean allowIncrementalMode_ = true;
 
-	private boolean allowIncrementalTaxonomy_ = true;
 	/**
 	 * if the property hierarchy correspond to the loading axioms
 	 */
@@ -212,17 +211,16 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	public synchronized void setAllowIncrementalMode(boolean allow) {
 		if (allowIncrementalMode_ == allow)
 			return;
+		if (LOGGER_.isInfoEnabled()) {
+			LOGGER_.debug("Incremental mode is "
+					+ (allow ? "allowed" : "disallowed"));
+		}
 		allowIncrementalMode_ = allow;
 
 		if (!allow) {
 			setNonIncrementalMode();
 		}
-		setAllowIncrementalTaxonomy(allow);
-
-		if (LOGGER_.isInfoEnabled()) {
-			LOGGER_.info("Incremental mode is "
-					+ (allow ? "allowed" : "disallowed"));
-		}
+		
 	}
 
 	public synchronized boolean isAllowIncrementalMode() {
@@ -234,17 +232,15 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	}
 
 	void setNonIncrementalMode() {
-		ontologyIndex.setIncrementalMode(false);
-		setAllowIncrementalTaxonomy(false);
-		classTaxonomyState.getWriter().clearTaxonomy();
-		stageManager.propertyInitializationStage.invalidateRecursive();
+		ontologyIndex.setIncrementalMode(false);		
 	}
 
 	boolean trySetIncrementalMode() {
-		if (!allowIncrementalMode_)
+		if (!allowIncrementalMode_) {
 			// switching to incremental mode not allowed
 			return false;
-
+		}	
+		// else
 		ontologyIndex.setIncrementalMode(true);
 		return true;
 
@@ -256,7 +252,6 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	public synchronized void resetAxiomLoading() {
 		LOGGER_.trace("Reset axiom loading");
 		stageManager.axiomLoadingStage.invalidateRecursive();
-		stageManager.incrementalCompletionStage.invalidateRecursive();
 	}
 
 	/**
@@ -294,9 +289,6 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 * @throws ElkException
 	 */
 	public synchronized void forceLoading() throws ElkException {
-		if (classTaxonomyState.getTaxonomy() != null) {
-			trySetIncrementalMode();
-		}
 		complete(stageManager.axiomLoadingStage);
 	}
 
@@ -332,7 +324,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 * interrupts running reasoning stages
 	 */
 	public void interrupt() {
-		LOGGER_.info("Interrupt requested");
+		LOGGER_.debug("Interrupt requested");
 		setInterrupt(true);
 	}
 
@@ -354,8 +346,6 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		} else {
 			setNonIncrementalMode();
 			complete(stageManager.consistencyCheckingStage);
-			stageManager.incrementalConsistencyCheckingStage
-					.setCompletedRecursive();
 		}
 
 		return inconsistentEntity != null;
@@ -384,8 +374,6 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		} else {
 			setNonIncrementalMode();
 			complete(stageManager.classTaxonomyComputationStage);
-			stageManager.incrementalClassTaxonomyComputationStage
-					.setCompletedRecursive();
 		}
 
 		return classTaxonomyState.getTaxonomy();
@@ -406,7 +394,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		try {
 			result = getTaxonomy();
 		} catch (ElkInconsistentOntologyException e) {
-			LOGGER_.info("Ontology is inconsistent");
+			LOGGER_.debug("Ontology is inconsistent");
 
 			result = new SingletoneTaxonomy<ElkClass, OrphanTaxonomyNode<ElkClass>>(
 					ElkClassKeyProvider.INSTANCE,
@@ -451,8 +439,6 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		} else {
 			setNonIncrementalMode();
 			complete(stageManager.instanceTaxonomyComputationStage);
-			stageManager.incrementalInstanceTaxonomyComputationStage
-					.setCompletedRecursive();
 		}
 
 		return instanceTaxonomyState.getTaxonomy();
@@ -474,7 +460,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		try {
 			result = getInstanceTaxonomy();
 		} catch (ElkInconsistentOntologyException e) {
-			LOGGER_.info("Ontology is inconsistent");
+			LOGGER_.debug("Ontology is inconsistent");
 			result = new SingletoneInstanceTaxonomy<ElkClass, ElkNamedIndividual, OrphanTypeNode<ElkClass, ElkNamedIndividual>>(
 					ElkClassKeyProvider.INSTANCE, getAllClasses(),
 					new TaxonomyNodeFactory<ElkClass, OrphanTypeNode<ElkClass, ElkNamedIndividual>, Taxonomy<ElkClass>>() {
@@ -572,22 +558,6 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	protected OntologyIndex getOntologyIndex() throws ElkException {
 		forceLoading();
 		return ontologyIndex;
-	}
-
-	protected boolean setAllowIncrementalTaxonomy(boolean flag) {
-		if (!flag) {
-			allowIncrementalTaxonomy_ = false;
-		} else if (allowIncrementalMode_) {
-			allowIncrementalTaxonomy_ = true;
-		} else {
-			return false;
-		}
-
-		return true;
-	}
-
-	protected boolean useIncrementalTaxonomy() {
-		return allowIncrementalTaxonomy_;
 	}
 
 	public synchronized void initClassTaxonomy() {
