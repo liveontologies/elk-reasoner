@@ -147,9 +147,11 @@ class ReferenceSaturationState extends AbstractSaturationState<ExtendedContext> 
 		if (contextCount.get() == 0)
 			// everything is already done
 			return;
+		// else
 		for (Context context : getContexts()) {
 			context.getRoot().resetContext();
 		}
+		contextCount.set(0);
 	}
 
 	@Override
