@@ -135,9 +135,15 @@ public class OWLAPIExamplesTest {
 			File f = new java.io.File(destDir + java.io.File.separator
 					+ entry.getName());
 
-			if (entry.isDirectory()) { // if its a directory, create it
-				f.mkdir();
+			// ensure that all directories for the file are created
+			if (entry.isDirectory()) {
+				f.mkdirs();
 				continue;
+			} 
+			// else
+			File p = f.getParentFile();
+			if (p != null) {
+				p.mkdirs();
 			}
 
 			InputStream is = null;

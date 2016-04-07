@@ -10,7 +10,7 @@
 	</formats>
 	<files>
 		<!-- the additional files to be bundled in the archive -->
-		<file>
+		<file>			
 			<source>${basedir}/src/main/resources/standalone/README.txt</source>
 			<filtered>true</filtered>
 		</file>
@@ -20,7 +20,6 @@
 		</file>
 		<file>
 			<source>${basedir}/target/Changes.txt</source>
-			<filtered>false</filtered>
 		</file>
 	</files>
 	<dependencySets>

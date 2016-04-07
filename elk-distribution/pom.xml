@@ -310,7 +310,6 @@
 					on
 					them, therefore we create them at the generate-test-resources phase -->
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.3</version>
 				<executions>
 					<execution>
 						<!-- creating the distribution archive for elk-standalone -->
@@ -322,7 +321,7 @@
 						<configuration>
 							<appendAssemblyId>true</appendAssemblyId>
 							<descriptors>
-								<descriptor>${basedir}/src/main/assembly/standalone-zip.xml</descriptor>
+								<descriptor>${basedir}/src/assembly/standalone-zip.xml</descriptor>
 							</descriptors>
 						</configuration>
 					</execution>
@@ -337,7 +336,7 @@
 							<appendAssemblyId>true</appendAssemblyId>
 							<descriptors>
 								<!-- configuration file describing how to create the archive -->
-								<descriptor>${basedir}/src/main/assembly/protege-zip.xml</descriptor>
+								<descriptor>${basedir}/src/assembly/protege-zip.xml</descriptor>
 							</descriptors>
 						</configuration>
 					</execution>
@@ -352,7 +351,7 @@
 							<appendAssemblyId>true</appendAssemblyId>
 							<descriptors>
 								configuration file describing how to create the archive
-								<descriptor>${basedir}/src/main/assembly/owlapi-zip.xml</descriptor>
+								<descriptor>${basedir}/src/assembly/owlapi-zip.xml</descriptor>
 							</descriptors>
 						</configuration>
 					</execution>
