@@ -26,8 +26,8 @@ package org.semanticweb.elk.proofs.utils;
 
 import java.util.Set;
 
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.matching.Matcher;
-import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
 import org.semanticweb.elk.owl.inferences.ModifiableElkInferenceSet;
 import org.semanticweb.elk.owl.inferences.ModifiableElkInferenceSetImpl;

@@ -28,7 +28,7 @@ package org.semanticweb.elk.reasoner.incremental;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.Reasoner;

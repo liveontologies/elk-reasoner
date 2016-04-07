@@ -28,7 +28,7 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Collection;
 import java.util.Set;
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.context.Context;

@@ -28,7 +28,7 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Map;
 import java.util.Set;
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;

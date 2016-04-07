@@ -25,7 +25,7 @@
  */
 package org.semanticweb.elk.owl.parsing;
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkException;
 
 /**
  * Base exception class for parsing exceptions

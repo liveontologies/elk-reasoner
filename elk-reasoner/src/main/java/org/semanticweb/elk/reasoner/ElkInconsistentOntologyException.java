@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.reasoner;
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkException;
 
 /**
  * Thrown when irrelevant reasoning methods are called for an ontology that is

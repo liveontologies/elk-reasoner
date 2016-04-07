@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.owl.exceptions;
+package org.semanticweb.elk.exceptions;
 
 /**
  * The top level ELK runtime exception

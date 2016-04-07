@@ -27,7 +27,7 @@ package org.semanticweb.elk.proofs.transformations.lemmas;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 

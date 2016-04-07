@@ -27,8 +27,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
+import org.semanticweb.elk.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.concurrent.computation.Interrupter;

@@ -30,8 +30,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
+import org.semanticweb.elk.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.logging.ElkTimer;

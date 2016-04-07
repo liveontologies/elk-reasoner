@@ -27,7 +27,7 @@ package org.semanticweb.elk.proofs.transformations;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceEntry;

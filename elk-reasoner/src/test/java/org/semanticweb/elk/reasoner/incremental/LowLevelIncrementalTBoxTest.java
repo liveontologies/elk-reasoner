@@ -43,8 +43,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.io.IOUtils;
-import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObject;

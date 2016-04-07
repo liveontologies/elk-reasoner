@@ -29,7 +29,6 @@
 			<artifactId>elk-reasoner</artifactId>
 			<version>${project.version}</version>
 			<type>jar</type>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -38,6 +37,11 @@
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-util-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>		
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-util-testing</artifactId>

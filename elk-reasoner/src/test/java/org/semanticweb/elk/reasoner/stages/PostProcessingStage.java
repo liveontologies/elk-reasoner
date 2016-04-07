@@ -21,7 +21,7 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkException;
 
 public interface PostProcessingStage {
 

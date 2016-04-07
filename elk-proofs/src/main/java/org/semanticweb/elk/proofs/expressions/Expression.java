@@ -24,7 +24,7 @@ package org.semanticweb.elk.proofs.expressions;
  * #L%
  */
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.proofs.inferences.Inference;
 
 /**

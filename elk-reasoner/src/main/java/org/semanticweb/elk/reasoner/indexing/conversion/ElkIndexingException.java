@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.conversion;
 
-import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
+import org.semanticweb.elk.exceptions.ElkRuntimeException;
 
 /**
  * An exception to signal indexing problems

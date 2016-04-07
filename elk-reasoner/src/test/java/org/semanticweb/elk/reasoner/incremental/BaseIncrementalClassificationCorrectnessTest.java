@@ -33,7 +33,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.Reasoner;

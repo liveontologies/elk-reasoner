@@ -1,4 +1,4 @@
-package org.semanticweb.elk;
+package org.semanticweb.elk.logging;
 /*
  * #%L
  * ELK Reasoner
@@ -24,7 +24,7 @@ package org.semanticweb.elk;
 import org.apache.log4j.Appender;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
-import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
+import org.semanticweb.elk.exceptions.ElkRuntimeException;
 
 /**
  * An {@link Appender} that throws {@link ElkRuntimeException} on received

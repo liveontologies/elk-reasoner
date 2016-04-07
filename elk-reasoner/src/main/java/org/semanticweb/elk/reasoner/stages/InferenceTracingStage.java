@@ -27,7 +27,7 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Collection;
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.tracing.RecursiveTracingComputation;
 import org.semanticweb.elk.reasoner.tracing.TraceState;

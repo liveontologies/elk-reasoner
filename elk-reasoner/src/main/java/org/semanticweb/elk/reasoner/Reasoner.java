@@ -25,10 +25,10 @@ package org.semanticweb.elk.reasoner;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.loading.AbstractAxiomLoader;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
-import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;

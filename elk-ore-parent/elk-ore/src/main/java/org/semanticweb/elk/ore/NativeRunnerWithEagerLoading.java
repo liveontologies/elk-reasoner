@@ -24,7 +24,7 @@ package org.semanticweb.elk.ore;
  * #L%
  */
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.Reasoner;
 
 /**

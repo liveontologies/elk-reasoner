@@ -30,7 +30,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIris;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;

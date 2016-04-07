@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.reasoner;
 
-import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
+import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
 import org.semanticweb.elk.util.concurrent.computation.ProcessorFactory;

@@ -1,15 +1,12 @@
 package org.semanticweb.elk.matching;
 
-import org.semanticweb.elk.matching.conclusions.IndexedClassExpressionMatch;
-import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
-
 /*
  * #%L
- * ELK Reasoner
+ * ELK Proofs Package
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +22,9 @@ import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
  * #L%
  */
 
-import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
+import org.semanticweb.elk.exceptions.ElkRuntimeException;
+import org.semanticweb.elk.matching.conclusions.IndexedClassExpressionMatch;
+import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;

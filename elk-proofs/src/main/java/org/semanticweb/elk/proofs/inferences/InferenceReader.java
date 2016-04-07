@@ -26,7 +26,7 @@ package org.semanticweb.elk.proofs.inferences;
 
 import java.util.Collections;
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.proofs.expressions.Expression;
 
 

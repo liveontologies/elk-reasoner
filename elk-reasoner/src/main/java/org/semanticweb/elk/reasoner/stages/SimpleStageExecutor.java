@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkException;
 
 /**
  * A simple {@link ReasonerStageExecutor}. If a stage has not been done, first,

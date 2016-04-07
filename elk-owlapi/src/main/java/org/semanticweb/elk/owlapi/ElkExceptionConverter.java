@@ -24,8 +24,8 @@ package org.semanticweb.elk.owlapi;
 
 import java.util.HashSet;
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
+import org.semanticweb.elk.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.ElkFreshEntitiesException;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;

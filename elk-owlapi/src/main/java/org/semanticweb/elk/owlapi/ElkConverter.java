@@ -28,8 +28,8 @@ package org.semanticweb.elk.owlapi;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
+import org.semanticweb.elk.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;

@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.stages;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.taxonomy.BasicTaxonomyValidator;
 import org.semanticweb.elk.reasoner.taxonomy.InvalidTaxonomyException;

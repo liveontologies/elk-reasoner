@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.loading;
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkException;
 
 public class ElkLoadingException extends ElkException {
 

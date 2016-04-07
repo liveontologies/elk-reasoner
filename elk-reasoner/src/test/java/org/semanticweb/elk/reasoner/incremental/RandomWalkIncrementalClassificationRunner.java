@@ -35,7 +35,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;

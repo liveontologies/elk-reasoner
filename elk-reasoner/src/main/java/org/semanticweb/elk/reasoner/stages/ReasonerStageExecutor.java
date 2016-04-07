@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**

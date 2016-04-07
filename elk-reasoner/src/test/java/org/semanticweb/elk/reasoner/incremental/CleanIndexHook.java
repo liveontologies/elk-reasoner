@@ -27,7 +27,7 @@ package org.semanticweb.elk.reasoner.incremental;
 
 import java.util.List;
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyDomainAxiom;

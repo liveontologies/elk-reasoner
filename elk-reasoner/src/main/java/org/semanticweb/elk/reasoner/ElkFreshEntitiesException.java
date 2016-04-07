@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 
 /**
