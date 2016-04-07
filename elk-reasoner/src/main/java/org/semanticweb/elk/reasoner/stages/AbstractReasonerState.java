@@ -232,7 +232,13 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	}
 
 	void setNonIncrementalMode() {
-		ontologyIndex.setIncrementalMode(false);		
+		if (!isIncrementalMode()) {
+			return;
+		}
+		ontologyIndex.setIncrementalMode(false);
+		// delete existing taxonomies as they cannot be updated incrementally
+		resetTaxonomy();
+		resetInstanceTaxonomy();
 	}
 
 	boolean trySetIncrementalMode() {
@@ -260,6 +266,20 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	public synchronized void resetPropertySaturation() {
 		LOGGER_.trace("Reset property saturation");
 		stageManager.propertyInitializationStage.invalidateRecursive();
+	}
+	
+	public synchronized void resetTaxonomy() {
+		LOGGER_.trace("Reset class taxonomy");
+		// force non-incremental taxonomy computation
+		classTaxonomyState.getWriter().clearTaxonomy(); 
+		stageManager.classTaxonomyComputationStage.invalidateRecursive();
+	}
+	
+	public synchronized void resetInstanceTaxonomy() {
+		LOGGER_.trace("Reset instance taxonomy");
+		// force non-incremental taxonomy computation
+		instanceTaxonomyState.getWriter().clearTaxonomy(); 
+		stageManager.instanceTaxonomyComputationStage.invalidateRecursive();
 	}
 
 	public synchronized void registerAxiomLoader(AxiomLoader newAxiomLoader) {
@@ -342,8 +362,10 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		forceLoading();
 
 		if (isIncrementalMode() && !saturationState.getContexts().isEmpty()) {
+			LOGGER_.trace("Consistency checking [incremental]");
 			complete(stageManager.incrementalConsistencyCheckingStage);
 		} else {
+			LOGGER_.trace("Consistency checking [non-incremental]");
 			setNonIncrementalMode();
 			complete(stageManager.consistencyCheckingStage);
 		}
@@ -370,8 +392,10 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			throw new ElkInconsistentOntologyException();
 
 		if (isIncrementalMode() && classTaxonomyState.getTaxonomy() != null) {
+			LOGGER_.trace("Taxonomy computation [incremental]");
 			complete(stageManager.incrementalClassTaxonomyComputationStage);
 		} else {
+			LOGGER_.trace("Taxonomy computation [non-incremental]");
 			setNonIncrementalMode();
 			complete(stageManager.classTaxonomyComputationStage);
 		}
@@ -435,8 +459,10 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 
 		if (isIncrementalMode()
 				&& instanceTaxonomyState.getTaxonomy() != null) {
+			LOGGER_.trace("Instance taxonomy computation [incremental]");
 			complete(stageManager.incrementalInstanceTaxonomyComputationStage);
 		} else {
+			LOGGER_.trace("Instance taxonomy computation [non-incremental]");
 			setNonIncrementalMode();
 			complete(stageManager.instanceTaxonomyComputationStage);
 		}
