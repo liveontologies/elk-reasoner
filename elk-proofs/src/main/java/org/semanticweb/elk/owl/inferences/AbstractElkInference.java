@@ -24,7 +24,12 @@ package org.semanticweb.elk.owl.inferences;
 
 public abstract class AbstractElkInference implements ElkInference {
 
-	<T> T failGetPremise(int index) {
+	/**
+	 * hash code, computed on demand
+	 */
+	private int hashCode_ = 0;
+
+	static <T> T failGetPremise(int index) {
 		throw new IndexOutOfBoundsException("No premise with index: " + index);
 	}
 
@@ -32,6 +37,29 @@ public abstract class AbstractElkInference implements ElkInference {
 		if (index < 0 || index >= getPremiseCount()) {
 			failGetPremise(index);
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		if (hashCode_ == 0) {
+			hashCode_ = ElkInferenceHash.hashCode(this);
+		}
+		// else
+		return hashCode_;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		// else
+		if (o instanceof ElkInference) {
+			return hashCode() == o.hashCode()
+					&& ElkInferenceEquality.equals(this, (ElkInference) o);
+		}
+		// else
+		return false;
 	}
 
 	@Override
