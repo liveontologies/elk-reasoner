@@ -43,9 +43,10 @@ abstract class AbstractLinkableBackwardLinkRule extends
 	}
 
 	@Override
-	public void applyRedundant(BackwardLink premise, ContextPremises premises,
+	public void applyTracing(BackwardLink premise, ContextPremises premises,
 			ClassInferenceProducer producer) {
-		// by default does not do anything
+		// by default apply normally
+		apply(premise, premises, producer);
 	}
 	
 	@Override

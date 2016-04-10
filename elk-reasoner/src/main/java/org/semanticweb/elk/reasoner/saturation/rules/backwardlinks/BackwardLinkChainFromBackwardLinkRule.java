@@ -136,7 +136,7 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 	private void apply(
 			Multimap<IndexedPropertyChain, IndexedComplexPropertyChain> compsByForwardRelations,
 			BackwardLink link, ContextPremises premises,
-			ClassInferenceProducer producer) {
+			ClassInferenceProducer producer, boolean tracingMode) {
 		/* compose the link with all forward links */
 		if (compsByForwardRelations == null)
 			return;
@@ -154,7 +154,7 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 					IndexedObjectSomeValuesFrom.Helper.produceComposedLink(
 							producer, link.getTraceRoot(),
 							link.getRelation(), premises.getRoot(),
-							forwardRelation, forwardTarget, composition);
+							forwardRelation, forwardTarget, composition, tracingMode);
 		}		
 	}
 	
@@ -163,15 +163,18 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 			ClassInferenceProducer producer) {
 		apply(link.getRelation().getSaturated()
 				.getNonRedundantCompositionsByRightSubProperty(), link,
-				premises, producer);		
+				premises, producer, false);		
 	}
 	
 	@Override
-	public void applyRedundant(BackwardLink link, ContextPremises premises,
+	public void applyTracing(BackwardLink link, ContextPremises premises,
 			ClassInferenceProducer producer) {
 		apply(link.getRelation().getSaturated()
+				.getNonRedundantCompositionsByRightSubProperty(), link,
+				premises, producer, true);
+		apply(link.getRelation().getSaturated()
 				.getRedundantCompositionsByRightSubProperty(), link,
-				premises, producer);
+				premises, producer, true);
 	}
 
 	@Override

@@ -77,7 +77,7 @@ public interface Rule<P> {
 	 *            the {@link ClassInferenceProducer} using which
 	 *            {@link ClassConclusion}s of the inferences are produced
 	 */
-	public void applyRedundant(P premise, ContextPremises premises,
+	public void applyTracing(P premise, ContextPremises premises,
 			ClassInferenceProducer producer);
 
 	/**

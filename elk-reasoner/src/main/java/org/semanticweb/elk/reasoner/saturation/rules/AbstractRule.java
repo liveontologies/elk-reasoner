@@ -35,9 +35,10 @@ import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 public abstract class AbstractRule<P> implements Rule<P> {
 	
 	@Override
-	public void applyRedundant(P premise, ContextPremises premises,
+	public void applyTracing(P premise, ContextPremises premises,
 			ClassInferenceProducer producer) {
-		// by default does no do anything
+		// by default apply normally
+		apply(premise, premises, producer);
 	}
 
 }

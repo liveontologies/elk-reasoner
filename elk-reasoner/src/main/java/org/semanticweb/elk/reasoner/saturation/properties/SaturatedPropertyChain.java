@@ -208,7 +208,7 @@ public class SaturatedPropertyChain {
 
 	/**
 	 * @return A {@link Multimap} from R to S such that
-	 *         ObjectPropertyChain(root, R) is a subrole of S
+	 *         ObjectPropertyChain(root, R) is a subrole of S, non-redundant ones
 	 */
 	public Multimap<IndexedPropertyChain, IndexedComplexPropertyChain> getNonRedundantCompositionsByRightSubProperty() {
 		return nonRedundantCompositionsByRightSubProperty == null ? Operations

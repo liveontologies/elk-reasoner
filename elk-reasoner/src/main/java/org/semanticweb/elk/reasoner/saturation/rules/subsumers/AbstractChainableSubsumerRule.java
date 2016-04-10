@@ -43,9 +43,10 @@ abstract class AbstractChainableSubsumerRule extends
 	}
 	
 	@Override
-	public void applyRedundant(IndexedClassExpression premise,
+	public void applyTracing(IndexedClassExpression premise,
 			ContextPremises premises, ClassInferenceProducer producer) {
-		// by default does not do anything
+		// by default apply normally
+		apply(premise, premises, producer);
 	}
 
 	@Override

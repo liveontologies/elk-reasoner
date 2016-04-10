@@ -30,12 +30,11 @@ import org.slf4j.LoggerFactory;
  * A {@link RuleVisitor} which applies the rules that it visits to the
  * given arguments, producing also redundant inferences
  * 
- * @see Rule#apply(Object, ContextPremises, ClassInferenceProducer)
- * @see Rule#applyRedundant(Object, ContextPremises, ClassInferenceProducer)
+ * @see Rule#applyTracing(Object, ContextPremises, ClassInferenceProducer)
  * 
  * @author Yevgeny Kazakov
  */
-public class AllInferencesRuleVisitor extends BasicRuleVisitor {
+public class AllInferencesRuleVisitor extends DummyRuleVisitor<Void> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -46,9 +45,9 @@ public class AllInferencesRuleVisitor extends BasicRuleVisitor {
 			ContextPremises premises, ClassInferenceProducer producer) {
 		super.defaultVisit(rule, premise, premises, producer);
 		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("{}: process {} by {}", premises, premise, rule);
+			LOGGER_.trace("{}: process {} by {} [tracing]", premises, premise, rule);
 		}
-		rule.applyRedundant(premise, premises, producer);
+		rule.applyTracing(premise, premises, producer);
 		return null;
 	}
 
