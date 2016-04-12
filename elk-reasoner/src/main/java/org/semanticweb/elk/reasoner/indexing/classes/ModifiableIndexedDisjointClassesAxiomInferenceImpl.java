@@ -28,8 +28,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedDisjointClassesAxiomInference;
-import org.semanticweb.elk.reasoner.tracing.Inference;
-import org.semanticweb.elk.reasoner.tracing.InferencePrinter;
+import org.semanticweb.elk.reasoner.tracing.TracingInference;
+import org.semanticweb.elk.reasoner.tracing.TracingInferencePrinter;
 
 /**
  * Implements {@link ModifiableIndexedDisjointClassesAxiomInference}
@@ -66,11 +66,11 @@ abstract class ModifiableIndexedDisjointClassesAxiomInferenceImpl<A extends ElkA
 	
 	@Override
 	public String toString() {
-		return InferencePrinter.toString(this);		
+		return TracingInferencePrinter.toString(this);		
 	}
 	
 	@Override
-	public final <O> O accept(Inference.Visitor<O> visitor) {
+	public final <O> O accept(TracingInference.Visitor<O> visitor) {
 		return accept(
 				(IndexedDisjointClassesAxiomInference.Visitor<O>) visitor);
 	}

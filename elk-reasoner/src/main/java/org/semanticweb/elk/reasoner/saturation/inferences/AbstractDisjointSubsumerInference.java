@@ -27,8 +27,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.DisjointSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
-import org.semanticweb.elk.reasoner.tracing.Inference;
-import org.semanticweb.elk.reasoner.tracing.InferencePrinter;
+import org.semanticweb.elk.reasoner.tracing.TracingInference;
+import org.semanticweb.elk.reasoner.tracing.TracingInferencePrinter;
 
 abstract class AbstractDisjointSubsumerInference extends DisjointSubsumerImpl
 		implements DisjointSubsumerInference {
@@ -62,11 +62,11 @@ abstract class AbstractDisjointSubsumerInference extends DisjointSubsumerImpl
 	
 	@Override
 	public String toString() {
-		return InferencePrinter.toString(this);		
+		return TracingInferencePrinter.toString(this);		
 	}
 
 	@Override
-	public final <O> O accept(Inference.Visitor<O> visitor) {
+	public final <O> O accept(TracingInference.Visitor<O> visitor) {
 		return accept((DisjointSubsumerInference.Visitor<O>) visitor);
 	}
 

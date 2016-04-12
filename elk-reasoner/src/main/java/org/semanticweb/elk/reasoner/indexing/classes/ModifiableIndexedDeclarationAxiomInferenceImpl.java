@@ -28,8 +28,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedDeclarationAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedEntity;
-import org.semanticweb.elk.reasoner.tracing.Inference;
-import org.semanticweb.elk.reasoner.tracing.InferencePrinter;
+import org.semanticweb.elk.reasoner.tracing.TracingInference;
+import org.semanticweb.elk.reasoner.tracing.TracingInferencePrinter;
 
 abstract class ModifiableIndexedDeclarationAxiomInferenceImpl<A extends ElkAxiom>
 		extends
@@ -59,11 +59,11 @@ abstract class ModifiableIndexedDeclarationAxiomInferenceImpl<A extends ElkAxiom
 	
 	@Override
 	public String toString() {
-		return InferencePrinter.toString(this);		
+		return TracingInferencePrinter.toString(this);		
 	}
 	
 	@Override
-	public final <O> O accept(Inference.Visitor<O> visitor) {
+	public final <O> O accept(TracingInference.Visitor<O> visitor) {
 		return accept((IndexedDeclarationAxiomInference.Visitor<O>) visitor);
 	}
 

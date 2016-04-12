@@ -52,7 +52,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.factories.AbstractRuleAppli
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.WorkerLocalTodo;
-import org.semanticweb.elk.reasoner.tracing.InferenceProducer;
+import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
 import org.semanticweb.elk.util.concurrent.computation.DelegatingInputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
@@ -62,7 +62,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * {@link SaturationState}. This {@link SaturationState} is not modified. The
  * inferences producing the {@link ClassConclusion}s in this
  * {@link SaturationState} are produced using the supplied
- * {@link InferenceProducer}.
+ * {@link TracingInferenceProducer}.
  * 
  * @author Pavel Klinov
  * 
@@ -76,11 +76,11 @@ public class ContextTracingRuleApplicationFactory
 
 	private final SaturationState<?> mainSaturationState_;
 
-	private final InferenceProducer<ClassInference> inferenceProducer_;
+	private final TracingInferenceProducer<ClassInference> inferenceProducer_;
 
 	public ContextTracingRuleApplicationFactory(
 			SaturationState<?> mainSaturationState,
-			InferenceProducer<ClassInference> inferenceProducer) {
+			TracingInferenceProducer<ClassInference> inferenceProducer) {
 		super(new MapSaturationState<ExtendedContext>(
 				mainSaturationState.getOntologyIndex(),
 				new MainContextFactory()));

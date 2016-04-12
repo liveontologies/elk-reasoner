@@ -34,25 +34,25 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.tracing.Conclusion;
 import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.DummyConclusionVisitor;
-import org.semanticweb.elk.reasoner.tracing.Inference;
-import org.semanticweb.elk.reasoner.tracing.InferenceProducer;
-import org.semanticweb.elk.reasoner.tracing.ModifiableInferenceSet;
+import org.semanticweb.elk.reasoner.tracing.TracingInference;
+import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
+import org.semanticweb.elk.reasoner.tracing.ModifiableTracingInferenceSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An {@link InferenceProducer} that filters out the unnecessary
+ * An {@link TracingInferenceProducer} that filters out the unnecessary
  * {@link ClassInference}s and saves the remaining ones into the provided
- * {@link ModifiableInferenceSet}. A {@link ClassInference} is unnecessary if
+ * {@link ModifiableTracingInferenceSet}. A {@link ClassInference} is unnecessary if
  * one of the local premises of the inference is either its conclusion (cycle of
  * length one) or can only be a conclusion of inferences in the provided
- * {@link ModifiableInferenceSet} which have this conclusion as one of the
+ * {@link ModifiableTracingInferenceSet} which have this conclusion as one of the
  * premises (cycle of length two).
  * 
  * @author Yevgeny Kazakov
  */
 class ClassInferenceBlockingFilter
-		implements InferenceProducer<ClassInference> {
+		implements TracingInferenceProducer<ClassInference> {
 
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ClassInferenceBlockingFilter.class);
@@ -62,7 +62,7 @@ class ClassInferenceBlockingFilter
 	private final static ClassInference.Visitor<ClassConclusion> CONCLUSION_GETTER_ = new ClassInferenceConclusionGettingVisitor(
 			CONCLUSION_FACTORY_);
 
-	private final ModifiableInferenceSet<ClassInference> output_;
+	private final ModifiableTracingInferenceSet<ClassInference> output_;
 
 	/**
 	 * inferences such that one of their local premises cannot be obtained as a
@@ -79,7 +79,7 @@ class ClassInferenceBlockingFilter
 	private final Queue<ClassInference> unblocked_ = new LinkedList<ClassInference>();
 
 	ClassInferenceBlockingFilter(
-			ModifiableInferenceSet<ClassInference> output) {
+			ModifiableTracingInferenceSet<ClassInference> output) {
 		this.output_ = output;
 	}
 
@@ -176,7 +176,7 @@ class ClassInferenceBlockingFilter
 	private boolean derivableWithoutPremise(ClassConclusion conclusion,
 			ClassConclusion premise) {
 		boolean derivable = false;
-		for (Inference inf : output_.getInferences(conclusion)) {
+		for (TracingInference inf : output_.getInferences(conclusion)) {
 			if (derivable |= !hasPremise((ClassInference) inf, premise)) {
 				return true;
 			}

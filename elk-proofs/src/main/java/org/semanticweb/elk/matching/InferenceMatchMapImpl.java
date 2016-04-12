@@ -76,7 +76,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionCompo
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecomposedInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.PropertyRangeInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainInference;
-import org.semanticweb.elk.reasoner.tracing.InferenceSet;
+import org.semanticweb.elk.reasoner.tracing.TracingInferenceSet;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 
@@ -85,11 +85,11 @@ import org.semanticweb.elk.util.collections.Multimap;
 class InferenceMatchMapImpl
 		implements InferenceMap, InferenceMatchMap, InferenceMatchMapWriter {
 
-	private final InferenceSet inferences_;
+	private final TracingInferenceSet inferences_;
 
 	private final Multimap<ConclusionMatch, InferenceMatch> watchedInferences_ = new HashListMultimap<ConclusionMatch, InferenceMatch>();
 
-	InferenceMatchMapImpl(InferenceSet inferences) {
+	InferenceMatchMapImpl(TracingInferenceSet inferences) {
 		this.inferences_ = inferences;
 	}
 

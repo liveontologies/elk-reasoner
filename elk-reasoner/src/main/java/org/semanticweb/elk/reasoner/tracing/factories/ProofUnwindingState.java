@@ -30,8 +30,8 @@ import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.tracing.DummyConclusionVisitor;
-import org.semanticweb.elk.reasoner.tracing.Inference;
-import org.semanticweb.elk.reasoner.tracing.InferencePremiseVisitor;
+import org.semanticweb.elk.reasoner.tracing.TracingInference;
+import org.semanticweb.elk.reasoner.tracing.TracingInferencePremiseVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 class ProofUnwindingState<I extends ClassConclusion, J extends ProofUnwindingJob<I>> {
@@ -44,7 +44,7 @@ class ProofUnwindingState<I extends ClassConclusion, J extends ProofUnwindingJob
 
 	final Queue<ClassInference> todoInferences;
 
-	private final Inference.Visitor<Void> inferencePremiseInsertionVisitor = new InferencePremiseVisitor<Void>(
+	private final TracingInference.Visitor<Void> inferencePremiseInsertionVisitor = new TracingInferencePremiseVisitor<Void>(
 			new DummyConclusionVisitor<Void>() {
 				@Override
 				protected Void defaultVisit(ClassConclusion conclusion) {

@@ -22,7 +22,7 @@ package org.semanticweb.elk.owl.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.tracing.Inference;
+import org.semanticweb.elk.reasoner.tracing.TracingInference;
 
 /**
  * An object using which {@link ElkInference}s can be produced
@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.tracing.Inference;
 public interface ElkInferenceProducer {
 
 	/**
-	 * Notifies about a new {@link Inference}.
+	 * Notifies about a new {@link TracingInference}.
 	 * 
 	 * @param inference
 	 */

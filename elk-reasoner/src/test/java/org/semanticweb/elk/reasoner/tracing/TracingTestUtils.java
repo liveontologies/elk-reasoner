@@ -96,10 +96,10 @@ public class TracingTestUtils {
 	public static void checkTracingCompleteness(ClassConclusion conclusion, Reasoner reasoner) {		
 		final AtomicInteger conclusionCount = new AtomicInteger(0);
 		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
-		Inference.Visitor<Boolean> counter = new DummyInferenceChecker() {
+		TracingInference.Visitor<Boolean> counter = new DummyInferenceChecker() {
 
 			@Override
-			protected Boolean defaultVisit(Inference inference) {
+			protected Boolean defaultVisit(TracingInference inference) {
 				conclusionCount.incrementAndGet();
 				return true;
 			}
@@ -122,10 +122,10 @@ public class TracingTestUtils {
 
 		final AtomicInteger conclusionCount = new AtomicInteger(0);
 		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
-		Inference.Visitor<Boolean> counter = new DummyInferenceChecker() {
+		TracingInference.Visitor<Boolean> counter = new DummyInferenceChecker() {
 
 			@Override
-			protected Boolean defaultVisit(Inference inference) {
+			protected Boolean defaultVisit(TracingInference inference) {
 				conclusionCount.incrementAndGet();
 				return true;
 			}
@@ -145,7 +145,7 @@ public class TracingTestUtils {
 	public static void checkNumberOfInferences(ClassConclusion conclusion,
 			Reasoner reasoner, int expected) {
 		int actual = 0;
-		for (@SuppressWarnings("unused") Inference ignore : ReasonerStateAccessor.getTraceState(reasoner)
+		for (@SuppressWarnings("unused") TracingInference ignore : ReasonerStateAccessor.getTraceState(reasoner)
 				.getInferences(conclusion)) {
 			actual++;
 		}
@@ -165,7 +165,7 @@ public class TracingTestUtils {
 		ObjectPropertyConclusion conclusion = FACTORY_
 				.getSubPropertyChain(subsumee, subsumer);
 		int actual = 0;
-		for (Inference ignore : ReasonerStateAccessor.getTraceState(reasoner)
+		for (TracingInference ignore : ReasonerStateAccessor.getTraceState(reasoner)
 				.getInferences(conclusion)) {
 			actual++;
 		}
@@ -180,7 +180,7 @@ public class TracingTestUtils {
 	 */
 	public static void checkConditionOverUsedInferences(ElkClassExpression sub,
 			ElkClassExpression sup, Reasoner reasoner,
-			final Inference.Visitor<Boolean> inferenceVisitor) {
+			final TracingInference.Visitor<Boolean> inferenceVisitor) {
 		final IndexedClassExpression subsumee = ReasonerStateAccessor
 				.transform(reasoner, sub);
 		SaturationConclusion conclusion = getConclusionToTrace(
@@ -193,7 +193,7 @@ public class TracingTestUtils {
 				new DummyInferenceChecker() {
 
 					@Override
-					protected Boolean defaultVisit(Inference inference) {
+					protected Boolean defaultVisit(TracingInference inference) {
 						inferenceCondition
 								.or(inference.accept(inferenceVisitor));
 
@@ -216,7 +216,7 @@ public class TracingTestUtils {
 		ClassConclusion conclusion = getConclusionToTrace(
 				ReasonerStateAccessor.getContext(reasoner, subsumee),
 				ReasonerStateAccessor.transform(reasoner, sup));
-		Inference.Visitor<?> sideConditionVisitor = new InferencePremiseVisitor<Void>(
+		TracingInference.Visitor<?> sideConditionVisitor = new TracingInferencePremiseVisitor<Void>(
 				new DummyConclusionVisitor<Void>() {
 					@Override
 					protected Void defaultVisit(IndexedAxiom newConclusion) {
@@ -226,7 +226,7 @@ public class TracingTestUtils {
 				},
 				new DummyElkAxiomVisitor<Void>());
 
-		for (Inference inference : ReasonerStateAccessor.getTraceState(reasoner)
+		for (TracingInference inference : ReasonerStateAccessor.getTraceState(reasoner)
 				.getInferences(conclusion)) {
 			inference.accept(sideConditionVisitor);
 		}
@@ -235,7 +235,7 @@ public class TracingTestUtils {
 	}
 
 	public static void visitInferencesForInconsistency(Reasoner reasoner,
-			final Inference.Visitor<Boolean> inferenceVisitor)
+			final TracingInference.Visitor<Boolean> inferenceVisitor)
 					throws ElkException {
 		IndexedClassEntity entity = ReasonerStateAccessor
 				.getInconsistentEntity(reasoner);
@@ -256,15 +256,15 @@ public class TracingTestUtils {
 	// //////////////////////////////////////////////////////////////////////
 	// some dummy utility visitors
 	// //////////////////////////////////////////////////////////////////////
-	static class DummyInferenceChecker extends DummyInferenceVisitor<Boolean> {
+	static class DummyInferenceChecker extends TracingInferenceDummyVisitor<Boolean> {
 
 		@Override
-		protected Boolean defaultVisit(Inference inference) {
+		protected Boolean defaultVisit(TracingInference inference) {
 			return true;
 		}
 
 	}
 
-	static final Inference.Visitor<Boolean> DUMMY_INFERENCE_CHECKER = new DummyInferenceChecker();
+	static final TracingInference.Visitor<Boolean> DUMMY_INFERENCE_CHECKER = new DummyInferenceChecker();
 
 }

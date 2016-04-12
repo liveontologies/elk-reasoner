@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
-import org.semanticweb.elk.reasoner.tracing.InferenceSet;
+import org.semanticweb.elk.reasoner.tracing.TracingInferenceSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +55,7 @@ public class Matcher {
 
 	private final ConclusionMatchExpressionFactory conclusionMatchFactory_;
 
-	public Matcher(InferenceSet inferences, ElkObject.Factory elkObjectFactory,
+	public Matcher(TracingInferenceSet inferences, ElkObject.Factory elkObjectFactory,
 			ElkInferenceProducer elkInferenceProducer) {
 		toDoInferences_ = new LinkedList<InferenceMatch>();
 		toDoConclusions_ = new LinkedList<ConclusionMatch>();

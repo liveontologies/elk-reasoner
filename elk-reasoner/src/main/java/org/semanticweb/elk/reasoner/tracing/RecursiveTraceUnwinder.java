@@ -44,23 +44,23 @@ import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
  */
 public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 
-	private final InferenceSet inferenceSet_;
+	private final TracingInferenceSet inferenceSet_;
 
-	private final Queue<Inference> innferencesToDo_ = new LinkedList<Inference>();
+	private final Queue<TracingInference> innferencesToDo_ = new LinkedList<TracingInference>();
 
-	public RecursiveTraceUnwinder(InferenceSet inferenceSet) {
+	public RecursiveTraceUnwinder(TracingInferenceSet inferenceSet) {
 		this.inferenceSet_ = inferenceSet;
 	}
 
 	@Override
 	public void accept(final Conclusion conclusion,
-			final Inference.Visitor<Boolean> inferenceVisitor) {
-		final Set<Inference> seenInferences = new HashSet<Inference>();
+			final TracingInference.Visitor<Boolean> inferenceVisitor) {
+		final Set<TracingInference> seenInferences = new HashSet<TracingInference>();
 		// should be empty anyways
 		innferencesToDo_.clear();
 		addToQueue(conclusion, seenInferences);
 		// this visitor visits all premises and putting them into the todo queue
-		InferencePremiseVisitor<?> premiseVisitor = new InferencePremiseVisitor<Void>(
+		TracingInferencePremiseVisitor<?> premiseVisitor = new TracingInferencePremiseVisitor<Void>(
 				new DummyConclusionVisitor<Void>() {
 					@Override
 					protected Void defaultVisit(Conclusion newConclusion) {
@@ -72,7 +72,7 @@ public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 
 		for (;;) {
 			// take the first element
-			final Inference next = innferencesToDo_.poll();
+			final TracingInference next = innferencesToDo_.poll();
 
 			if (next == null) {
 				break;
@@ -87,13 +87,13 @@ public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 	}
 
 	private void addToQueue(final Conclusion conclusion,
-			final Set<Inference> seenInferences) {
+			final Set<TracingInference> seenInferences) {
 
 		boolean derived = false;
 		// finding all inferences that produced the given conclusion (if we are
 		// here, the inference must have premises, i.e. it's not an
 		// initialization inference)
-		for (Inference inference : inferenceSet_.getInferences(conclusion)) {
+		for (TracingInference inference : inferenceSet_.getInferences(conclusion)) {
 			if (!seenInferences.contains(inference)) {
 				seenInferences.add(inference);
 				innferencesToDo_.add(inference);

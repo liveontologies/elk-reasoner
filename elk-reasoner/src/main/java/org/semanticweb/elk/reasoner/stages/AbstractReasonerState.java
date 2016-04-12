@@ -72,7 +72,7 @@ import org.semanticweb.elk.reasoner.taxonomy.SingletoneTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
-import org.semanticweb.elk.reasoner.tracing.InferenceSet;
+import org.semanticweb.elk.reasoner.tracing.TracingInferenceSet;
 import org.semanticweb.elk.reasoner.tracing.TraceState;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
@@ -643,7 +643,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		traceState_.addToTrace(conclusion);
 	}
 
-	public InferenceSet explainConclusion(ClassConclusion conclusion)
+	public TracingInferenceSet explainConclusion(ClassConclusion conclusion)
 			throws ElkException {
 		toTrace(conclusion);
 		getTaxonomy(); // make sure the taxonomy is computed

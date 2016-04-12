@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.tracing;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,16 +23,22 @@ package org.semanticweb.elk.reasoner.tracing;
  */
 
 /**
- * A skeleton implementation of {@link Inference}
+ * Represents the conclusion of the given {@link TracingInference}
  * 
  * @author Yevgeny Kazakov
  *
  */
-public abstract class AbstractInference implements Inference {
+class TracingInferenceConclusion extends AbstractConclusion {
+
+	private final TracingInference inference_;
+
+	TracingInferenceConclusion(TracingInference inference) {
+		this.inference_ = inference;
+	}
 
 	@Override
-	public String toString() {
-		return InferencePrinter.toString(this);
+	public <O> O accept(Conclusion.Visitor<O> visitor) {
+		return inference_.accept(new TracingInferenceConclusionVisitor<O>(visitor));
 	}
 
 }

@@ -53,7 +53,7 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubProperty
 
 /**
  * Creates all {@link Conclusion}s for conclusions of the visited
- * {@link Inference}s using the provided {@link Conclusion.Factory} and visits
+ * {@link TracingInference}s using the provided {@link Conclusion.Factory} and visits
  * them using the provided {@link Conclusion.Visitor}.
  * 
  * @author Yevgeny Kazakov
@@ -61,21 +61,21 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubProperty
  * @param <O>
  *            the type of the output
  */
-public class InferenceConclusionVisitor<O> extends
-		ClassInferenceConclusionVisitor<O> implements Inference.Visitor<O> {
+public class TracingInferenceConclusionVisitor<O> extends
+		ClassInferenceConclusionVisitor<O> implements TracingInference.Visitor<O> {
 
 	private final Conclusion.Factory conclusionFactory_;
 
 	private final Conclusion.Visitor<O> conclusionVisitor_;
 
-	public InferenceConclusionVisitor(Conclusion.Factory conclusionFactory,
+	public TracingInferenceConclusionVisitor(Conclusion.Factory conclusionFactory,
 			Conclusion.Visitor<O> conclusionVisitor) {
 		super(conclusionFactory, conclusionVisitor);
 		this.conclusionFactory_ = conclusionFactory;
 		this.conclusionVisitor_ = conclusionVisitor;
 	}
 
-	public InferenceConclusionVisitor(Conclusion.Visitor<O> conclusionVisitor) {
+	public TracingInferenceConclusionVisitor(Conclusion.Visitor<O> conclusionVisitor) {
 		this(new ConclusionBaseFactory(), conclusionVisitor);
 	}
 

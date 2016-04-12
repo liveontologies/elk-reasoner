@@ -25,8 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassInconsistencyImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
-import org.semanticweb.elk.reasoner.tracing.Inference;
-import org.semanticweb.elk.reasoner.tracing.InferencePrinter;
+import org.semanticweb.elk.reasoner.tracing.TracingInference;
+import org.semanticweb.elk.reasoner.tracing.TracingInferencePrinter;
 
 abstract class AbstractClassInconsistencyInference
 		extends ClassInconsistencyImpl implements ClassInconsistencyInference {
@@ -59,7 +59,7 @@ abstract class AbstractClassInconsistencyInference
 
 	@Override
 	public String toString() {
-		return InferencePrinter.toString(this);		
+		return TracingInferencePrinter.toString(this);		
 	}
 
 	@Override
@@ -68,7 +68,7 @@ abstract class AbstractClassInconsistencyInference
 	}
 
 	@Override
-	public final <O> O accept(Inference.Visitor<O> visitor) {
+	public final <O> O accept(TracingInference.Visitor<O> visitor) {
 		return accept((ClassInconsistencyInference.Visitor<O>) visitor);
 	}
 

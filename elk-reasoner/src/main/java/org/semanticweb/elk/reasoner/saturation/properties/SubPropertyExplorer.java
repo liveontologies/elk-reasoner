@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubProperty
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainInferenceConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainTautology;
-import org.semanticweb.elk.reasoner.tracing.InferenceProducer;
+import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
@@ -79,7 +79,7 @@ class SubPropertyExplorer {
 	/**
 	 * used to record {@link SubPropertyChainInference}
 	 */
-	private final InferenceProducer<? super SubPropertyChainInference> inferenceProducer_;
+	private final TracingInferenceProducer<? super SubPropertyChainInference> inferenceProducer_;
 
 	private final SubPropertyChainInference.Visitor<Void> inferenceProcessor_ = new SubPropertyChainInferenceConclusionVisitor<Void>(
 			new SubPropertyChain.Visitor<Void>() {
@@ -95,7 +95,7 @@ class SubPropertyExplorer {
 	SubPropertyExplorer(IndexedPropertyChain input,
 			Set<IndexedPropertyChain> subPropertyChains,
 			Set<IndexedObjectProperty> subProperties,
-			InferenceProducer<? super SubPropertyChainInference> inferenceProducer) {
+			TracingInferenceProducer<? super SubPropertyChainInference> inferenceProducer) {
 		this.input_ = input;
 		this.subPropertyChains_ = subPropertyChains;
 		this.subProperties_ = subProperties;
@@ -140,7 +140,7 @@ class SubPropertyExplorer {
 	private static void expandUnderSubProperties(IndexedPropertyChain input,
 			Set<IndexedPropertyChain> currentSubPropertyChains,
 			Set<IndexedObjectProperty> currentSubProperties,
-			InferenceProducer<? super SubPropertyChainInference> inferenceProducer) {
+			TracingInferenceProducer<? super SubPropertyChainInference> inferenceProducer) {
 		new SubPropertyExplorer(input, currentSubPropertyChains,
 				currentSubProperties, inferenceProducer).process();
 		if (LOGGER_.isTraceEnabled()) {
@@ -151,7 +151,7 @@ class SubPropertyExplorer {
 
 	private static SaturatedPropertyChain computeSubProperties(
 			IndexedPropertyChain input,
-			InferenceProducer<? super SubPropertyChainInference> inferenceProducer) {
+			TracingInferenceProducer<? super SubPropertyChainInference> inferenceProducer) {
 		SaturatedPropertyChain saturation = input.getSaturated();
 		if (saturation.derivedSubPropertiesComputed)
 			return saturation;
@@ -179,7 +179,7 @@ class SubPropertyExplorer {
 	 * Computes all sub-{@link IndexedPropertyChain}s of the given
 	 * {@link IndexedPropertyChain}, if not computing before, recording all
 	 * {@link ObjectPropertyInference}s using the provided
-	 * {@link InferenceProducer}. It is ensured that all
+	 * {@link TracingInferenceProducer}. It is ensured that all
 	 * {@link ObjectPropertyInference}s are applied only once even if the method
 	 * is called multiple times.
 	 * 
@@ -187,14 +187,14 @@ class SubPropertyExplorer {
 	 *            the {@link IndexedPropertyChain} for which to find the sub-
 	 *            {@link IndexedPropertyChain}s.
 	 * @param inferenceProducer
-	 *            the {@link InferenceProducer} using which all applied
+	 *            the {@link TracingInferenceProducer} using which all applied
 	 *            {@link ObjectPropertyInference}s are recorded.
 	 * @return the sub-{@link IndexedPropertyChain}s of the given
 	 *         {@link IndexedPropertyChain}
 	 */
 	static Set<IndexedPropertyChain> getSubPropertyChains(
 			IndexedPropertyChain input,
-			InferenceProducer<? super SubPropertyChainInference> inferenceProducer) {
+			TracingInferenceProducer<? super SubPropertyChainInference> inferenceProducer) {
 		return computeSubProperties(input, inferenceProducer)
 				.getSubPropertyChains();
 	}
@@ -203,7 +203,7 @@ class SubPropertyExplorer {
 	 * Computes all sub-{@link IndexedObjectProperty}s of the given
 	 * {@link IndexedPropertyChain}, if not computing before, recording all
 	 * {@link ObjectPropertyInference}s using the provided
-	 * {@link InferenceProducer}. It is ensured that all
+	 * {@link TracingInferenceProducer}. It is ensured that all
 	 * {@link ObjectPropertyInference}s are applied only once even if the method
 	 * is called multiple times.
 	 * 
@@ -211,14 +211,14 @@ class SubPropertyExplorer {
 	 *            the {@link IndexedPropertyChain} for which to find the sub-
 	 *            {@link IndexedObjectProperty}s.
 	 * @param inferenceProducer
-	 *            the {@link InferenceProducer} using which all applied
+	 *            the {@link TracingInferenceProducer} using which all applied
 	 *            {@link ObjectPropertyInference}s are recorded.
 	 * @return the sub-{@link IndexedObjectProperty} of the given
 	 *         {@link IndexedPropertyChain}
 	 */
 	static Set<IndexedObjectProperty> getSubProperties(
 			IndexedPropertyChain input,
-			InferenceProducer<? super SubPropertyChainInference> inferenceProducer) {
+			TracingInferenceProducer<? super SubPropertyChainInference> inferenceProducer) {
 		return computeSubProperties(input, inferenceProducer)
 				.getSubProperties();
 	}
@@ -228,7 +228,7 @@ class SubPropertyExplorer {
 	 * {@link IndexedObjectProperty}s to {@link IndexedObjectProperty}
 	 * consisting of the the assignments T -> S such that both S and
 	 * ObjectPropertyChain(S, T) are sub-properties of the given
-	 * {@link IndexedObjectProperty}. The provided {@link InferenceProducer} is
+	 * {@link IndexedObjectProperty}. The provided {@link TracingInferenceProducer} is
 	 * used to record all {@link ObjectPropertyInference}s that are applied in
 	 * this computation of sub-{@link IndexedPropertyChain}s involved. It is
 	 * ensured that the computation is performed only once.
@@ -242,7 +242,7 @@ class SubPropertyExplorer {
 	 */
 	static Multimap<IndexedObjectProperty, IndexedObjectProperty> getLeftSubComposableSubPropertiesByRightProperties(
 			IndexedObjectProperty input,
-			InferenceProducer<? super SubPropertyChainInference> inferenceProducer) {
+			TracingInferenceProducer<? super SubPropertyChainInference> inferenceProducer) {
 		SaturatedPropertyChain saturation = input.getSaturated();
 		if (saturation.leftSubComposableSubPropertiesByRightPropertiesComputed)
 			return saturation.leftSubComposableSubPropertiesByRightProperties;

@@ -26,8 +26,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SubContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
-import org.semanticweb.elk.reasoner.tracing.Inference;
-import org.semanticweb.elk.reasoner.tracing.InferencePrinter;
+import org.semanticweb.elk.reasoner.tracing.TracingInference;
+import org.semanticweb.elk.reasoner.tracing.TracingInferencePrinter;
 
 abstract class AbstractSubContextInitializationInference
 		extends
@@ -64,11 +64,11 @@ abstract class AbstractSubContextInitializationInference
 	
 	@Override
 	public String toString() {
-		return InferencePrinter.toString(this);		
+		return TracingInferencePrinter.toString(this);		
 	}
 
 	@Override
-	public final <O> O accept(Inference.Visitor<O> visitor) {
+	public final <O> O accept(TracingInference.Visitor<O> visitor) {
 		return accept((SubContextInitializationInference.Visitor<O>) visitor);
 	}
 

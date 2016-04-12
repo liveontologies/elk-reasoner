@@ -39,6 +39,6 @@ package org.semanticweb.elk.reasoner.tracing;
 public interface TraceUnwinder<O> {
 
 	public void accept(Conclusion conclusion,
-			Inference.Visitor<O> inferenceVisitor);
+			TracingInference.Visitor<O> inferenceVisitor);
 
 }

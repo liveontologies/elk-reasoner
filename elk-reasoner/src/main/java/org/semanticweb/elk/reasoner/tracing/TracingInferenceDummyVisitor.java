@@ -84,26 +84,26 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubProperty
  */
 
 /**
- * An {@link Inference.Visitor} that always returns {@code null}.
+ * An {@link TracingInference.Visitor} that always returns {@code null}.
  * 
  * @author Yevgeny Kazakov
  * 
  * @param <O>
  *            the type of the output
  */
-public class DummyInferenceVisitor<O> implements Inference.Visitor<O> {
+public class TracingInferenceDummyVisitor<O> implements TracingInference.Visitor<O> {
 
-	protected O defaultVisit(@SuppressWarnings("unused") Inference inference) {
+	protected O defaultVisit(@SuppressWarnings("unused") TracingInference inference) {
 		// can be overriden in sub-classes
 		return null;
 	}
 
 	protected O defaultVisit(IndexedAxiomInference inference) {
-		return defaultVisit((Inference) inference);
+		return defaultVisit((TracingInference) inference);
 	}
 	
 	protected O defaultVisit(SaturationInference inference) {
-		return defaultVisit((Inference) inference);
+		return defaultVisit((TracingInference) inference);
 	}
 	
 	protected O defaultVisit(ClassInference inference) {

@@ -22,11 +22,28 @@ package org.semanticweb.elk.reasoner.tracing;
  * #L%
  */
 
-public interface ModifiableInferenceSet<I extends Inference> extends InferenceSet, InferenceProducer<I> {
+/**
+ * An object using which {@link TracingInference}s can be produced
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ * @param <I>
+ *            the type of produced inferences
+ */
+public interface TracingInferenceProducer<I extends TracingInference> {
 
-	@Override
-	public Iterable<? extends I> getInferences(Conclusion conclusion);
+	/**
+	 * Notifies about a new {@link TracingInference}.
+	 * 
+	 * @param inference
+	 */
+	public void produce(I inference);
 
-	public void clear();
+	public static TracingInferenceProducer<TracingInference> DUMMY = new TracingInferenceProducer<TracingInference>() {
+		@Override
+		public void produce(TracingInference inference) {
+			// no-op
+		}
+	};
 
 }

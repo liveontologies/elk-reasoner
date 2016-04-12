@@ -26,17 +26,17 @@ package org.semanticweb.elk.reasoner.tracing;
  */
 
 /**
- * A {@link ModifiableInferenceSet} in which the access methods are
+ * A {@link ModifiableTracingInferenceSet} in which the access methods are
  * synchronized.
  * 
  * @author "Yevgeny Kazakov"
  *
  * @param <I>
  *            the type of inferences stored in this
- *            {@link ModifiableInferenceSet}
+ *            {@link ModifiableTracingInferenceSet}
  */
-public class SynchronizedModifiableInferenceSet<I extends Inference>
-		extends ModifiableInferenceSetImpl<I> {
+public class SynchronizedModifiableTracingInferenceSet<I extends TracingInference>
+		extends ModifiableTracingInferenceSetImpl<I> {
 
 	@Override
 	public synchronized Iterable<? extends I> getInferences(

@@ -76,19 +76,19 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.PropertyRan
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainExpandedSubObjectPropertyOf;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainTautology;
 
-public class InferencePrinter implements Inference.Visitor<String> {
+public class TracingInferencePrinter implements TracingInference.Visitor<String> {
 
-	private static InferencePrinter INSTANCE_ = new InferencePrinter();
+	private static TracingInferencePrinter INSTANCE_ = new TracingInferencePrinter();
 
-	private InferencePrinter() {
+	private TracingInferencePrinter() {
 
 	}
 
-	public static String toString(Inference inference) {
+	public static String toString(TracingInference inference) {
 		return inference.accept(INSTANCE_);
 	}
 
-	static Inference.Visitor<String> getPrinterVisitor() {
+	static TracingInference.Visitor<String> getPrinterVisitor() {
 		return INSTANCE_;
 	}
 

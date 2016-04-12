@@ -43,7 +43,7 @@ public class TestTraceUnwinder extends RecursiveTraceUnwinder {
 
 	private final UntracedConclusionListener listener_;
 
-	public TestTraceUnwinder(InferenceSet inferences,
+	public TestTraceUnwinder(TracingInferenceSet inferences,
 			UntracedConclusionListener listener) {
 		super(inferences);
 		listener_ = listener;

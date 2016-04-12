@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.tracing.InferenceProducer;
+import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
@@ -150,7 +150,7 @@ public class ContextTracingFactory<R extends IndexedContextRoot, J extends Conte
 		}
 	}
 
-	private class ThisClassInferenceProducer implements InferenceProducer<ClassInference> {
+	private class ThisClassInferenceProducer implements TracingInferenceProducer<ClassInference> {
 
 		@Override
 		public void produce(ClassInference inference) {

@@ -23,27 +23,19 @@ package org.semanticweb.elk.reasoner.tracing;
  */
 
 /**
- * An object using which {@link Inference}s can be produced
+ * 
+ * An object which can be used to retrieve {@link TracingInference}s producing a given
+ * {@link Conclusion}.
  * 
  * @author "Yevgeny Kazakov"
- *
- * @param <I>
- *            the type of produced inferences
  */
-public interface InferenceProducer<I extends Inference> {
+public interface TracingInferenceSet {
 
 	/**
-	 * Notifies about a new {@link Inference}.
-	 * 
-	 * @param inference
+	 * @param conclusion
+	 * @return all {@link TracingInference}s stored in this {@link TracingInferenceSet}
+	 *         producing the given {@link Conclusion}
 	 */
-	public void produce(I inference);
-
-	public static InferenceProducer<Inference> DUMMY = new InferenceProducer<Inference>() {
-		@Override
-		public void produce(Inference inference) {
-			// no-op
-		}
-	};
+	public Iterable<? extends TracingInference> getInferences(Conclusion conclusion);
 
 }

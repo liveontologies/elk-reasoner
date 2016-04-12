@@ -23,10 +23,10 @@ package org.semanticweb.elk.reasoner.indexing.model;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.tracing.Inference;
+import org.semanticweb.elk.reasoner.tracing.TracingInference;
 
 /**
- * An {@link Inference} representing a transformation of an {@link ElkAxiom} to
+ * An {@link TracingInference} representing a transformation of an {@link ElkAxiom} to
  * an {@link IndexedAxiom}. An {@link ElkAxiom} can be converted to several
  * {@link IndexedAxiom}s using several such {@link IndexedAxiomInference}s
  * 
@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.tracing.Inference;
  * @author Yevgeny Kazakov
  *
  */
-public interface IndexedAxiomInference extends Inference {
+public interface IndexedAxiomInference extends TracingInference {
 
 	/**
 	 * @return the {@link ElkAxiom} which has been converted by this

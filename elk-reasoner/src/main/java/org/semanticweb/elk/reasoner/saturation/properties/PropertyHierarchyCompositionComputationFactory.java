@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.tracing.InferenceProducer;
+import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
 import org.semanticweb.elk.util.collections.AbstractHashMultimap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -59,10 +59,10 @@ public class PropertyHierarchyCompositionComputationFactory extends
 	/**
 	 * used to record sub-property inferences
 	 */
-	private final InferenceProducer<? super ObjectPropertyInference> inferenceProducer_;
+	private final TracingInferenceProducer<? super ObjectPropertyInference> inferenceProducer_;
 
 	public PropertyHierarchyCompositionComputationFactory(
-			InferenceProducer<? super ObjectPropertyInference> inferenceProducer) {
+			TracingInferenceProducer<? super ObjectPropertyInference> inferenceProducer) {
 		this.inferenceProducer_ = inferenceProducer;
 	}
 

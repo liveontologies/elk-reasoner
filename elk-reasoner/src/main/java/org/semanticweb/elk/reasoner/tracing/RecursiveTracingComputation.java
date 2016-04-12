@@ -54,7 +54,7 @@ public class RecursiveTracingComputation
 			Collection<? extends ProofUnwindingJob<ClassConclusion>> inputs,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, SaturationState<?> saturationState,
-			InferenceProducer<? super ClassInference> inferenceProducer) {
+			TracingInferenceProducer<? super ClassInference> inferenceProducer) {
 		super(inputs,
 				new ProofUnwindingFactory<ClassConclusion, ProofUnwindingJob<ClassConclusion>>(
 						saturationState, inferenceProducer, maxWorkers,

@@ -35,9 +35,9 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.tracing.InferenceProducer;
-import org.semanticweb.elk.reasoner.tracing.ModifiableInferenceSet;
-import org.semanticweb.elk.reasoner.tracing.ModifiableInferenceSetImpl;
+import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
+import org.semanticweb.elk.reasoner.tracing.ModifiableTracingInferenceSet;
+import org.semanticweb.elk.reasoner.tracing.ModifiableTracingInferenceSetImpl;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * input of the {@link ProofUnwindingJob}, and the engines of the factory
  * compute all {@link ClassInference}s used in minimal derivations for these
  * {@link ClassConclusion}s. The computed {@link ClassInference}s are reported
- * using the provided {@link InferenceProducer}. A
+ * using the provided {@link TracingInferenceProducer}. A
  * {@link ProofUnwindingListener} can be used to receive the notification when
  * the submitted {@link ProofUnwindingJob} is processed.
  * 
@@ -70,7 +70,7 @@ public class ProofUnwindingFactory<C extends ClassConclusion, J extends ProofUnw
 	/**
 	 * the object used to report the final inferences
 	 */
-	private final InferenceProducer<? super ClassInference> inferenceProducer_;
+	private final TracingInferenceProducer<? super ClassInference> inferenceProducer_;
 
 	/**
 	 * the factory to compute all inferences for contexts
@@ -85,7 +85,7 @@ public class ProofUnwindingFactory<C extends ClassConclusion, J extends ProofUnw
 	/**
 	 * the traced inferences stored by context; not all of them may be needed
 	 */
-	private final ConcurrentMap<IndexedContextRoot, ModifiableInferenceSet<ClassInference>> inferencesByContext_;
+	private final ConcurrentMap<IndexedContextRoot, ModifiableTracingInferenceSet<ClassInference>> inferencesByContext_;
 
 	/**
 	 * The listener object implementing callback functions for this engine
@@ -93,14 +93,14 @@ public class ProofUnwindingFactory<C extends ClassConclusion, J extends ProofUnw
 	private final ProofUnwindingListener<C, J> listener_;
 
 	public ProofUnwindingFactory(SaturationState<?> mainSaturationState,
-			InferenceProducer<? super ClassInference> inferenceProducer,
+			TracingInferenceProducer<? super ClassInference> inferenceProducer,
 			int maxWorkers, ProofUnwindingListener<C, J> listener) {
 		inferenceProducer_ = inferenceProducer;
 		contextTracingFactory_ = new ContextTracingFactory<IndexedContextRoot, ContextTracingJobForProofUnwinding<C, J>>(
 				mainSaturationState, maxWorkers,
 				new ThisContextTracingListener());
 		jobsToDo_ = new ConcurrentLinkedQueue<ContextTracingJobForProofUnwinding<C, J>>();
-		inferencesByContext_ = new ConcurrentHashMap<IndexedContextRoot, ModifiableInferenceSet<ClassInference>>();
+		inferencesByContext_ = new ConcurrentHashMap<IndexedContextRoot, ModifiableTracingInferenceSet<ClassInference>>();
 		this.listener_ = listener;
 	}
 
@@ -199,10 +199,10 @@ public class ProofUnwindingFactory<C extends ClassConclusion, J extends ProofUnw
 		public void notifyFinished(
 				ContextTracingJobForProofUnwinding<C, J> job) {
 			IndexedContextRoot root = job.getInput();
-			ModifiableInferenceSet<ClassInference> inferenceSet = inferencesByContext_
+			ModifiableTracingInferenceSet<ClassInference> inferenceSet = inferencesByContext_
 					.get(root);
 			if (inferenceSet == null) {
-				ModifiableInferenceSet<ClassInference> newInferenceSet = new ModifiableInferenceSetImpl<ClassInference>();
+				ModifiableTracingInferenceSet<ClassInference> newInferenceSet = new ModifiableTracingInferenceSetImpl<ClassInference>();
 				inferenceSet = inferencesByContext_.putIfAbsent(root,
 						newInferenceSet);
 				if (inferenceSet == null) {

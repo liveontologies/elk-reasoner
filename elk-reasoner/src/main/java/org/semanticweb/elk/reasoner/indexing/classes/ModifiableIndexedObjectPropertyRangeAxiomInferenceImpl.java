@@ -29,8 +29,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxi
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectPropertyRangeAxiomInference;
-import org.semanticweb.elk.reasoner.tracing.Inference;
-import org.semanticweb.elk.reasoner.tracing.InferencePrinter;
+import org.semanticweb.elk.reasoner.tracing.TracingInference;
+import org.semanticweb.elk.reasoner.tracing.TracingInferencePrinter;
 
 /**
  * Implements {@link ModifiableIndexedObjectPropertyRangeAxiomInference}
@@ -68,11 +68,11 @@ abstract class ModifiableIndexedObjectPropertyRangeAxiomInferenceImpl<A extends 
 	
 	@Override
 	public String toString() {
-		return InferencePrinter.toString(this);		
+		return TracingInferencePrinter.toString(this);		
 	}
 	
 	@Override
-	public final <O> O accept(Inference.Visitor<O> visitor) {
+	public final <O> O accept(TracingInference.Visitor<O> visitor) {
 		return accept(
 				(IndexedObjectPropertyRangeAxiomInference.Visitor<O>) visitor);
 	}

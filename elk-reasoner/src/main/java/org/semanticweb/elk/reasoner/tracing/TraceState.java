@@ -59,21 +59,21 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  *         TODO: filter out cyclic inferences
  */
 public class TraceState
-		implements InferenceProducer<SaturationInference>, InferenceSet {
+		implements TracingInferenceProducer<SaturationInference>, TracingInferenceSet {
 
 	private final Queue<ClassConclusion> toTrace_ = new LinkedList<ClassConclusion>();
 
 	private final Set<ElkAxiom> indexedAxioms_ = new ArrayHashSet<ElkAxiom>();
 
-	private final ModifiableInferenceSet<ClassInference> classInferences_ = new SynchronizedModifiableInferenceSet<ClassInference>();
+	private final ModifiableTracingInferenceSet<ClassInference> classInferences_ = new SynchronizedModifiableTracingInferenceSet<ClassInference>();
 
-	private final ModifiableInferenceSet<ObjectPropertyInference> objectPropertyInferences_ = new SynchronizedModifiableInferenceSet<ObjectPropertyInference>();
+	private final ModifiableTracingInferenceSet<ObjectPropertyInference> objectPropertyInferences_ = new SynchronizedModifiableTracingInferenceSet<ObjectPropertyInference>();
 
-	private final ModifiableInferenceSet<IndexedAxiomInference> indexedAxiomInferences_ = new SynchronizedModifiableInferenceSet<IndexedAxiomInference>();
+	private final ModifiableTracingInferenceSet<IndexedAxiomInference> indexedAxiomInferences_ = new SynchronizedModifiableTracingInferenceSet<IndexedAxiomInference>();
 
 	private final SaturationInference.Visitor<Void> inferenceProducer_ = new InferenceProducer();
 
-	private final Conclusion.Visitor<Iterable<? extends Inference>> inferenceGetter_ = new InferenceGetter();
+	private final Conclusion.Visitor<Iterable<? extends TracingInference>> inferenceGetter_ = new InferenceGetter();
 
 	private final ElkAxiomConverter elkAxiomConverter_;
 
@@ -117,7 +117,7 @@ public class TraceState
 	}
 
 	@Override
-	public Iterable<? extends Inference> getInferences(Conclusion conclusion) {
+	public Iterable<? extends TracingInference> getInferences(Conclusion conclusion) {
 		return conclusion.accept(inferenceGetter_);
 	}
 
@@ -141,7 +141,7 @@ public class TraceState
 	 * @author Yevgeny Kazakov
 	 */
 	private class InferenceGetter
-			extends DummyConclusionVisitor<Iterable<? extends Inference>> {
+			extends DummyConclusionVisitor<Iterable<? extends TracingInference>> {
 
 		@Override
 		protected Iterable<? extends ClassInference> defaultVisit(
@@ -170,7 +170,7 @@ public class TraceState
 	 * 
 	 * @author Yevgeny Kazakov
 	 */
-	private class InferenceProducer extends DummyInferenceVisitor<Void> {
+	private class InferenceProducer extends TracingInferenceDummyVisitor<Void> {
 
 		@Override
 		protected Void defaultVisit(ClassInference inference) {

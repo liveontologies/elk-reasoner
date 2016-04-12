@@ -1,5 +1,8 @@
 package org.semanticweb.elk.reasoner.tracing;
 
+import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
+
 /*
  * #%L
  * ELK Reasoner
@@ -23,19 +26,31 @@ package org.semanticweb.elk.reasoner.tracing;
  */
 
 /**
+ * An operation producing {@link Conclusion}s from other {@link Conclusion}s
+ * called premises using some inference rule.
  * 
- * An object which can be used to retrieve {@link Inference}s producing a given
- * {@link Conclusion}.
- * 
- * @author "Yevgeny Kazakov"
+ * @author Yevgeny Kazakov
+ *
  */
-public interface InferenceSet {
+public interface TracingInference {
+
+	public <O> O accept(Visitor<O> visitor);
 
 	/**
-	 * @param conclusion
-	 * @return all {@link Inference}s stored in this {@link InferenceSet}
-	 *         producing the given {@link Conclusion}
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
-	public Iterable<? extends Inference> getInferences(Conclusion conclusion);
+	interface Visitor<O>
+			extends
+				IndexedAxiomInference.Visitor<O>,
+				SaturationInference.Visitor<O> {
+
+		// combined interface
+
+	}
 
 }

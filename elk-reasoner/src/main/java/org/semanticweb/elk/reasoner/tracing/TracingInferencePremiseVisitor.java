@@ -82,7 +82,7 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubProperty
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainTautology;
 
 /**
- * Visits all {@link Conclusion} premises of the visited {@link Inference}s
+ * Visits all {@link Conclusion} premises of the visited {@link TracingInference}s
  * using the provided {@link Conclusion.Visitor}; additionally, visits all
  * {@link ElkAxiom} premises using the provided {@link ElkAxiomVisitor}
  * 
@@ -95,7 +95,7 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubProperty
  * @param <O>
  *            the type of the output
  */
-public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
+public class TracingInferencePremiseVisitor<O> implements TracingInference.Visitor<O> {
 
 	private final Conclusion.Factory conclusionFactory_;
 
@@ -103,7 +103,7 @@ public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 
 	private final ElkAxiomVisitor<?> axiomVisitor_;
 
-	public InferencePremiseVisitor(Conclusion.Factory conclusionFactory,
+	public TracingInferencePremiseVisitor(Conclusion.Factory conclusionFactory,
 			Conclusion.Visitor<?> conclusionVisitor,
 			ElkAxiomVisitor<?> axiomVisitor) {
 		this.conclusionFactory_ = conclusionFactory;
@@ -111,7 +111,7 @@ public class InferencePremiseVisitor<O> implements Inference.Visitor<O> {
 		this.axiomVisitor_ = axiomVisitor;
 	}
 
-	public InferencePremiseVisitor(Conclusion.Visitor<?> conclusionVisitor,
+	public TracingInferencePremiseVisitor(Conclusion.Visitor<?> conclusionVisitor,
 			ElkAxiomVisitor<?> axiomVisitor) {
 		this(new ConclusionBaseFactory(), conclusionVisitor, axiomVisitor);
 	}

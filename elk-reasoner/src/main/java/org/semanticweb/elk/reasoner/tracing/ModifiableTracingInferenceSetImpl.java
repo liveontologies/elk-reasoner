@@ -29,23 +29,23 @@ import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 
 /**
- * An implementation of {@link ModifiableInferenceSet} backed by a
+ * An implementation of {@link ModifiableTracingInferenceSet} backed by a
  * {@link Multimap}.
  * 
  * @author "Yevgeny Kazakov"
  *
  * @param <I>
  *            the type of inferences stored in this
- *            {@link ModifiableInferenceSet}
+ *            {@link ModifiableTracingInferenceSet}
  */
-public class ModifiableInferenceSetImpl<I extends Inference>
-		implements ModifiableInferenceSet<I> {
+public class ModifiableTracingInferenceSetImpl<I extends TracingInference>
+		implements ModifiableTracingInferenceSet<I> {
 
 	private final Multimap<Conclusion, I> inferenceMap_ = new HashListMultimap<Conclusion, I>();
 
 	@Override
 	public void produce(I inference) {
-		inferenceMap_.add(new InferenceConclusion(inference), inference);
+		inferenceMap_.add(new TracingInferenceConclusion(inference), inference);
 	}
 
 	@Override
