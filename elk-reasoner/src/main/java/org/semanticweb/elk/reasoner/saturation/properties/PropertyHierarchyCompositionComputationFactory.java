@@ -127,6 +127,15 @@ public class PropertyHierarchyCompositionComputationFactory extends
 
 			for (IndexedPropertyChain rightSubPropertyChain : rightSubProperties) {
 
+				if (left == right && rightSubPropertyChain == element) {
+					// a special but very common case with transitivity axiom when
+					// all compositions are redundant and not needed for tracing
+					LOGGER_.trace(
+							"{} o {} => {}: transitivity composition [ignored]",
+							left, rightSubPropertyChain, element);
+					continue;
+				}				
+				
 				// computing left properties for which composition with the
 				// current right sub-property chain is redundant
 				Collection<IndexedObjectProperty> redundantLeftProperties = Collections
