@@ -31,12 +31,11 @@ import java.util.Queue;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.tracing.Conclusion;
 import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.DummyConclusionVisitor;
+import org.semanticweb.elk.reasoner.tracing.ModifiableTracingInferenceSet;
 import org.semanticweb.elk.reasoner.tracing.TracingInference;
 import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
-import org.semanticweb.elk.reasoner.tracing.ModifiableTracingInferenceSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -175,9 +174,8 @@ class ClassInferenceBlockingFilter
 	 */
 	private boolean derivableWithoutPremise(ClassConclusion conclusion,
 			ClassConclusion premise) {
-		boolean derivable = false;
 		for (TracingInference inf : output_.getInferences(conclusion)) {
-			if (derivable |= !hasPremise((ClassInference) inf, premise)) {
+			if (!hasPremise((ClassInference) inf, premise)) {
 				return true;
 			}
 		}
