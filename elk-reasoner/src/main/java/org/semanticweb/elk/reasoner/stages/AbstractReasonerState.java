@@ -72,8 +72,8 @@ import org.semanticweb.elk.reasoner.taxonomy.SingletoneTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
-import org.semanticweb.elk.reasoner.tracing.TracingInferenceSet;
 import org.semanticweb.elk.reasoner.tracing.TraceState;
+import org.semanticweb.elk.reasoner.tracing.TracingInferenceSet;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
@@ -107,6 +107,12 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 * certain memory overhead because otherwise we don't store asserted axioms.
 	 */
 	final boolean BIND_AXIOMS = true;
+	
+	/**
+	 * If true, try to reuse inferences computed for tracing of the previous
+	 * conclusions whenever possible
+	 */
+	final boolean CACHE_INFERENCES = false;
 
 	/**
 	 * The factory for creating auxiliary ElkObjects
@@ -632,13 +638,17 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 				superExpression);
 	}
 
+	@SuppressWarnings("unused")
 	private void toTrace(ClassConclusion conclusion) {
-		if (traceState_.getInferences(conclusion).iterator().hasNext()) {
+		if (CACHE_INFERENCES
+				&& traceState_.getInferences(conclusion).iterator().hasNext()) {
 			// already traced
-			traceState_.getInferences(conclusion);
 			return;
 		}
 		// else
+		// FIXME: need to clear to avoid duplicate inferences
+		traceState_.clearClassInferences();
+		traceState_.clearIndexedAxiomInferences();
 		stageManager.inferenceTracingStage.invalidateRecursive();
 		traceState_.addToTrace(conclusion);
 	}

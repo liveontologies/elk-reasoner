@@ -117,31 +117,6 @@ public class TracingSaturationTest {
 	}
 
 	@Test
-	public void testDuplicateInferenceOfExistential() throws Exception {
-		Reasoner reasoner = TestReasonerUtils
-				.loadAndClassify(TestReasonerUtils.loadAxioms("tracing/DuplicateExistential.owl"));
-		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
-
-		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
-		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
-		ElkObjectProperty r = factory
-				.getObjectProperty(new ElkFullIri("http://example.org/R"));
-		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
-		ElkClass d = factory.getClass(new ElkFullIri("http://example.org/D"));
-		ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
-
-		ClassConclusion aSubD = reasoner.getConclusion(factory.getSubClassOfAxiom(a, d));
-		ClassConclusion aSubRSomeC = reasoner.getConclusion(factory.getSubClassOfAxiom(a, rSomeC));
-		reasoner.explainConclusion(aSubD);
-		TracingTestUtils.checkNumberOfInferences(aSubRSomeC, reasoner, 1);
-		reasoner.explainConclusion(reasoner.getConclusion(factory.getSubClassOfAxiom(b, c)));
-		// now check that we didn't get a duplicate inference in A due to
-		// tracing B
-		TracingTestUtils.checkNumberOfInferences(aSubRSomeC, reasoner, 1);
-		TracingTestUtils.checkTracingCompleteness(aSubRSomeC, reasoner);
-	}
-
-	@Test
 	public void testDuplicateInferenceViaComposition() throws Exception {
 		Reasoner reasoner = TestReasonerUtils
 				.loadAndClassify(TestReasonerUtils.loadAxioms("tracing/DuplicateComposition.owl"));
