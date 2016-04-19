@@ -117,6 +117,28 @@ public class TracingSaturationTest {
 	}
 
 	@Test
+	public void testDuplicateInferenceOfExistential() throws Exception {
+		Reasoner reasoner = TestReasonerUtils
+				.loadAndClassify(TestReasonerUtils.loadAxioms("tracing/DuplicateExistential.owl"));
+		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
+
+		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
+		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
+		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
+		ElkClass d = factory.getClass(new ElkFullIri("http://example.org/D"));
+		ElkClass e = factory.getClass(new ElkFullIri("http://example.org/E"));
+		ClassConclusion aSubD = reasoner.getConclusion(factory.getSubClassOfAxiom(a, d));
+		ClassConclusion bSubC = reasoner.getConclusion(factory.getSubClassOfAxiom(b, c));
+		ClassConclusion eSubD = reasoner.getConclusion(factory.getSubClassOfAxiom(e, d));
+		reasoner.explainConclusion(aSubD);
+		TracingTestUtils.checkNumberOfInferences(aSubD, reasoner, 1);
+		TracingTestUtils.checkNumberOfInferences(bSubC, reasoner, 1);
+		reasoner.explainConclusion(eSubD);
+		TracingTestUtils.checkNumberOfInferences(eSubD, reasoner, 1);
+		TracingTestUtils.checkNumberOfInferences(bSubC, reasoner, 1);		
+	}
+
+	@Test
 	public void testDuplicateInferenceViaComposition() throws Exception {
 		Reasoner reasoner = TestReasonerUtils
 				.loadAndClassify(TestReasonerUtils.loadAxioms("tracing/DuplicateComposition.owl"));

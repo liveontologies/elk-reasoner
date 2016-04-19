@@ -2,7 +2,6 @@
  * 
  */
 package org.semanticweb.elk.reasoner.tracing;
-
 /*
  * #%L
  * ELK Reasoner
@@ -25,11 +24,15 @@ package org.semanticweb.elk.reasoner.tracing;
  * #L%
  */
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -69,11 +72,12 @@ import org.slf4j.LoggerFactory;
 public class TracingTest {
 
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
-	protected static final Logger LOGGER_ = LoggerFactory	.getLogger(TracingTest.class);
+	protected static final Logger LOGGER_ = LoggerFactory
+			.getLogger(TracingTest.class);
 
 	protected final TracingTestManifest manifest;
 
-	public TracingTest(	TracingTestManifest testManifest) {
+	public TracingTest(TracingTestManifest testManifest) {
 		manifest = testManifest;
 	}
 
@@ -97,28 +101,47 @@ public class TracingTest {
 
 		try {
 			TracingTests tests = getTracingTests(reasoner);
+			TracingTestVisitor testVisitor = getTracingTestVisitor(reasoner);
 
-			tests.accept(getTracingTestVisitor(reasoner));
+			// visit all subsumptions twice: the second time to ensure
+			// that the proofs are still the same
+			tests.accept(testVisitor);
+			tests.accept(testVisitor);
 		} finally {
 			reasoner.shutdown();
 		}
-	}	
-	
+	}
+
 	private TracingTestVisitor getTracingTestVisitor(final Reasoner reasoner) {
 		return new TracingTestVisitor() {
-			
+
 			private final ElkObject.Factory factory_ = new ElkObjectEntityRecyclingFactory();
-			
+
+			/**
+			 * collect statistics about the proofs for conclusions to match results 
+			 */
+			private final Map<Conclusion, TracingInferenceStatistics> proofsStats_ = new HashMap<Conclusion, TracingInferenceStatistics>();
+
 			@Override
 			public void subsumptionTest(ElkClass subsumee, ElkClass subsumer) {
-//				ReasonerStateAccessor.cleanClassTraces(reasoner);
-				
+
 				try {
 					LOGGER_.trace("Tracing test: {} => {}", subsumee, subsumer);
-					
-					ClassConclusion conclusion = reasoner.getConclusion(factory_.getSubClassOfAxiom(subsumee, subsumer));			
-					reasoner.explainConclusion(conclusion);						
-					TracingTestUtils.checkTracingCompleteness(conclusion, reasoner);
+
+					ClassConclusion conclusion = reasoner.getConclusion(
+							factory_.getSubClassOfAxiom(subsumee, subsumer));
+					TracingInferenceSet inferences = reasoner
+							.explainConclusion(conclusion);
+					TracingInferenceStatistics proofStats = TracingInferenceStatistics
+							.getStatistics(inferences, conclusion);
+					assertTrue("Subsumption is not provable!",
+							proofStats.isProvable());
+					TracingInferenceStatistics previous = proofsStats_
+							.put(conclusion, proofStats);
+					if (previous != null) {
+						assertEquals("Previous proof does not match!", previous,
+								proofStats);
+					}
 
 				} catch (ElkException e) {
 					throw new RuntimeException(e);
@@ -127,14 +150,14 @@ public class TracingTest {
 
 			@Override
 			public void inconsistencyTest() throws Exception {
-//				ReasonerStateAccessor.cleanClassTraces(reasoner);
-				
+
 				try {
 					LOGGER_.trace("Tracing test: inconsistency");
-					
+
 					reasoner.explainInconsistency();
-						
-					TracingTestUtils.checkTracingOfInconsistencyCompleteness(reasoner);
+
+					TracingTestUtils
+							.checkTracingOfInconsistencyCompleteness(reasoner);
 				} catch (ElkException e) {
 					throw new RuntimeException(e);
 				}
@@ -143,25 +166,23 @@ public class TracingTest {
 	}
 
 	@SuppressWarnings("static-method")
-	protected TracingTests getTracingTests(Reasoner reasoner) throws ElkException {
+	protected TracingTests getTracingTests(Reasoner reasoner)
+			throws ElkException {
 		return new ComprehensiveSubsumptionTracingTests(reasoner);
 	}
-	
+
 	@Config
-	public static Configuration getConfig() throws URISyntaxException,
-			IOException {
-		return ConfigurationUtils
-				.loadFileBasedTestConfiguration(
-						INPUT_DATA_LOCATION,
-						TracingTest.class,
-						"owl",
-						new TestManifestCreator<URLTestIO, VoidTestOutput, VoidTestOutput>() {
-							@Override
-							public TestManifest<URLTestIO, VoidTestOutput, VoidTestOutput> create(
-									URL input, URL output) throws IOException {
-								// don't need an expected output for these tests
-								return new TracingTestManifest(input);
-							}
-						});
+	public static Configuration getConfig()
+			throws URISyntaxException, IOException {
+		return ConfigurationUtils.loadFileBasedTestConfiguration(
+				INPUT_DATA_LOCATION, TracingTest.class, "owl",
+				new TestManifestCreator<URLTestIO, VoidTestOutput, VoidTestOutput>() {
+					@Override
+					public TestManifest<URLTestIO, VoidTestOutput, VoidTestOutput> create(
+							URL input, URL output) throws IOException {
+						// don't need an expected output for these tests
+						return new TracingTestManifest(input);
+					}
+				});
 	}
 }
