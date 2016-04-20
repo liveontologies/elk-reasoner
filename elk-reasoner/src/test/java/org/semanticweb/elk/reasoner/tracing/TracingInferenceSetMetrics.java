@@ -38,7 +38,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author Yevgeny Kazakov
  *
  */
-public class TracingInferenceStatistics {
+public class TracingInferenceSetMetrics {
 
 	/**
 	 * true if all premises used in the proofs can be derived
@@ -93,7 +93,7 @@ public class TracingInferenceStatistics {
 
 	@Override
 	public int hashCode() {
-		return HashGenerator.combinedHashCode(TracingInferenceStatistics.class,
+		return HashGenerator.combinedHashCode(TracingInferenceSetMetrics.class,
 				provable_, countConclusions_, countInferences_, countAxioms_);
 	}
 
@@ -102,8 +102,8 @@ public class TracingInferenceStatistics {
 		if (obj == this) {
 			return true;
 		}
-		if (obj instanceof TracingInferenceStatistics) {
-			TracingInferenceStatistics other = (TracingInferenceStatistics) obj;
+		if (obj instanceof TracingInferenceSetMetrics) {
+			TracingInferenceSetMetrics other = (TracingInferenceSetMetrics) obj;
 			return provable_ == other.provable_
 					&& countConclusions_ == other.countConclusions_
 					&& countInferences_ == other.countInferences_
@@ -126,7 +126,7 @@ public class TracingInferenceStatistics {
 	 * @return the statistics about the proofs for the given
 	 *         {@linkplain Conclusion} in the given {@link TracingInferenceSet}
 	 */
-	public static TracingInferenceStatistics getStatistics(
+	public static TracingInferenceSetMetrics getStatistics(
 			TracingInferenceSet inferences, Conclusion conclusion) {
 		Computation comp = new Computation(inferences);
 		comp.toDo(conclusion);
@@ -144,7 +144,7 @@ public class TracingInferenceStatistics {
 
 		Set<ElkAxiom> axioms_ = new HashSet<ElkAxiom>();
 
-		TracingInferenceStatistics statistics_ = new TracingInferenceStatistics();
+		TracingInferenceSetMetrics statistics_ = new TracingInferenceSetMetrics();
 
 		TracingInference.Visitor<Void> infVisitor_ = new TracingInferencePremiseVisitor<Void>(
 				new InferencePremiseProcessor(), new InferenceAxiomProcessor());

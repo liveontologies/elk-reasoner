@@ -120,7 +120,7 @@ public class TracingTest {
 			/**
 			 * collect statistics about the proofs for conclusions to match results 
 			 */
-			private final Map<Conclusion, TracingInferenceStatistics> proofsStats_ = new HashMap<Conclusion, TracingInferenceStatistics>();
+			private final Map<Conclusion, TracingInferenceSetMetrics> proofsStats_ = new HashMap<Conclusion, TracingInferenceSetMetrics>();
 
 			@Override
 			public void subsumptionTest(ElkClass subsumee, ElkClass subsumer) {
@@ -132,11 +132,11 @@ public class TracingTest {
 							factory_.getSubClassOfAxiom(subsumee, subsumer));
 					TracingInferenceSet inferences = reasoner
 							.explainConclusion(conclusion);
-					TracingInferenceStatistics proofStats = TracingInferenceStatistics
+					TracingInferenceSetMetrics proofStats = TracingInferenceSetMetrics
 							.getStatistics(inferences, conclusion);
 					assertTrue("Subsumption is not provable!",
 							proofStats.isProvable());
-					TracingInferenceStatistics previous = proofsStats_
+					TracingInferenceSetMetrics previous = proofsStats_
 							.put(conclusion, proofStats);
 					if (previous != null) {
 						assertEquals("Previous proof does not match!", previous,
