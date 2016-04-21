@@ -46,6 +46,14 @@ public interface LinkedSubsumerRuleVisitor<O> {
 	O visit(DisjointSubsumerFromMemberRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
 			ClassInferenceProducer producer);
+	
+	O visit(EquivalentClassFirstFromSecondRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ClassInferenceProducer producer);
+	
+	O visit(EquivalentClassSecondFromFirstRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ClassInferenceProducer producer);
 
 	O visit(IndexedClassFromDefinitionRule rule,
 			IndexedClassExpression premise, ContextPremises premises,

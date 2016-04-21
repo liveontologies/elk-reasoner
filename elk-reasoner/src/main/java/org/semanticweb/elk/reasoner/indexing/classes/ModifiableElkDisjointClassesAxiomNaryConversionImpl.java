@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointClassesAxiomNaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpressionList;
@@ -43,13 +42,6 @@ class ModifiableElkDisjointClassesAxiomNaryConversionImpl
 			ElkDisjointClassesAxiom originalAxiom,
 			ModifiableIndexedClassExpressionList disjointClasses) {
 		super(originalAxiom, disjointClasses);
-	}
-
-	@Override
-	public IndexedDisjointClassesAxiom getConclusion(
-			IndexedDisjointClassesAxiom.Factory factory) {
-		return factory.getIndexedDisjointClassesAxiom(getOriginalAxiom(),
-				getMembers());
 	}
 
 	@Override

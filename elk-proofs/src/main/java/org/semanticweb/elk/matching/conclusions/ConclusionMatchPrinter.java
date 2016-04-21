@@ -23,7 +23,7 @@ package org.semanticweb.elk.matching.conclusions;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
@@ -101,19 +101,19 @@ public class ConclusionMatchPrinter implements ConclusionMatch.Visitor<String> {
 	}
 
 	@Override
-	public String visit(IndexedDefinitionAxiomMatch1 conclusionMatch) {
+	public String visit(IndexedEquivalentClassesAxiomMatch1 conclusionMatch) {
 		return conclusionMatch.getParent() + MATCH_LEVEL_;
 	}
 
 	@Override
-	public String visit(IndexedDefinitionAxiomMatch2 conclusionMatch) {
-		IndexedDefinitionAxiom conclusion = conclusionMatch.getParent()
+	public String visit(IndexedEquivalentClassesAxiomMatch2 conclusionMatch) {
+		IndexedEquivalentClassesAxiom conclusion = conclusionMatch.getParent()
 				.getParent();
 		return conclusionMatch.getParent() + MATCH_LEVEL_//
-				+ conclusion.getDefinedClass() + MATCH_
-				+ conclusionMatch.getDefinedClassMatch() + MATCH_SEP_
-				+ conclusion.getDefinition() + MATCH_
-				+ conclusionMatch.getDefinitionMatch();
+				+ conclusion.getFirstMember() + MATCH_
+				+ conclusionMatch.getFirstMemberMatch() + MATCH_SEP_
+				+ conclusion.getSecondMember() + MATCH_
+				+ conclusionMatch.getSecondMemberMatch();
 	}
 
 	@Override

@@ -25,12 +25,11 @@ package org.semanticweb.elk.reasoner.tracing;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.classes.IndexedAxiomBaseFactory;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedEntity;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
@@ -107,11 +106,11 @@ public class ConclusionBaseFactory implements Conclusion.Factory {
 	}
 
 	@Override
-	public IndexedDefinitionAxiom getIndexedDefinitionAxiom(
-			ElkAxiom originalAxiom, IndexedClass definedClass,
-			IndexedClassExpression definition) {
-		return indexedAxiomFactory_.getIndexedDefinitionAxiom(
-				originalAxiom, definedClass, definition);
+	public IndexedEquivalentClassesAxiom getIndexedEquivalentClassesAxiom(
+			ElkAxiom originalAxiom, IndexedClassExpression firstMember,
+			IndexedClassExpression secondMember) {
+		return indexedAxiomFactory_.getIndexedEquivalentClassesAxiom(
+				originalAxiom, firstMember, secondMember);
 	}
 
 	@Override

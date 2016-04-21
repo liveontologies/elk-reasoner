@@ -24,8 +24,8 @@ package org.semanticweb.elk.matching;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiomInference;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiomInference;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxiom;
@@ -58,8 +58,8 @@ public interface InferenceMap {
 	Iterable<? extends IndexedDeclarationAxiomInference> get(
 			IndexedDeclarationAxiom conclusion);
 
-	Iterable<? extends IndexedDefinitionAxiomInference> get(
-			IndexedDefinitionAxiom conclusion);
+	Iterable<? extends IndexedEquivalentClassesAxiomInference> get(
+			IndexedEquivalentClassesAxiom conclusion);
 
 	Iterable<? extends IndexedDisjointClassesAxiomInference> get(
 			IndexedDisjointClassesAxiom conclusion);

@@ -24,38 +24,35 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiomInference;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedDefinitionAxiomInference;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedEquivalentClassesAxiomInference;
 import org.semanticweb.elk.reasoner.tracing.TracingInference;
 import org.semanticweb.elk.reasoner.tracing.TracingInferencePrinter;
 
 /**
- * Implements {@link ModifiableIndexedDefinitionAxiomInference}
+ * Implements {@link ModifiableIndexedEquivalentClassesAxiomInference}
  * 
  * @author "Yevgeny Kazakov"
  */
-abstract class ModifiableIndexedDefinitionAxiomInferenceImpl<A extends ElkAxiom>
-		extends
-			ModifiableIndexedDefinitionAxiomImpl<A>
-		implements
-			ModifiableIndexedDefinitionAxiomInference {
+abstract class ModifiableIndexedEquivalentClassesAxiomInferenceImpl<A extends ElkAxiom>
+		extends ModifiableIndexedEquivalentClassesAxiomImpl<A>
+		implements ModifiableIndexedEquivalentClassesAxiomInference {
 
-	protected ModifiableIndexedDefinitionAxiomInferenceImpl(A originalAxiom,
-			ModifiableIndexedClass definedClass,
-			ModifiableIndexedClassExpression definition) {
-		super(originalAxiom, definedClass, definition);
+	protected ModifiableIndexedEquivalentClassesAxiomInferenceImpl(
+			A originalAxiom, ModifiableIndexedClassExpression firstMember,
+			ModifiableIndexedClassExpression secondMember) {
+		super(originalAxiom, firstMember, secondMember);
 	}
 
 	@Override
-	public IndexedDefinitionAxiom getConclusion(
-			IndexedDefinitionAxiom.Factory factory) {
-		return factory.getIndexedDefinitionAxiom(getOriginalAxiom(),
-				getDefinedClass(), getDefinition());
+	public final IndexedEquivalentClassesAxiom getConclusion(
+			IndexedEquivalentClassesAxiom.Factory factory) {
+		return factory.getIndexedEquivalentClassesAxiom(getOriginalAxiom(),
+				getFirstMember(), getSecondMember());
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return System.identityHashCode(this);
@@ -65,20 +62,22 @@ abstract class ModifiableIndexedDefinitionAxiomInferenceImpl<A extends ElkAxiom>
 	public boolean equals(Object o) {
 		return this == o;
 	}
-	
+
 	@Override
 	public String toString() {
-		return TracingInferencePrinter.toString(this);		
+		return TracingInferencePrinter.toString(this);
 	}
-	
+
 	@Override
 	public final <O> O accept(TracingInference.Visitor<O> visitor) {
-		return accept((IndexedDefinitionAxiomInference.Visitor<O>) visitor);
+		return accept(
+				(IndexedEquivalentClassesAxiomInference.Visitor<O>) visitor);
 	}
 
 	@Override
 	public final <O> O accept(IndexedAxiomInference.Visitor<O> visitor) {
-		return accept((IndexedDefinitionAxiomInference.Visitor<O>) visitor);
+		return accept(
+				(IndexedEquivalentClassesAxiomInference.Visitor<O>) visitor);
 	}
 
 }

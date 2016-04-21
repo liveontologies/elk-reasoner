@@ -22,6 +22,7 @@ package org.semanticweb.elk.matching.inferences;
  * #L%
  */
 
+// TODO: add other matching parameters
 public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 
 	private static InferenceMatchPrinter INSTANCE_ = new InferenceMatchPrinter();
@@ -147,7 +148,7 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 
 	@Override
 	public String visit(
-			ElkEquivalentClassesAxiomDefinitionConversionMatch1 inferenceMatch1) {
+			ElkEquivalentClassesAxiomEquivalenceConversionMatch1 inferenceMatch1) {
 		return inferenceMatch1.getParent() + " | ";
 	}
 
@@ -355,6 +356,30 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	@Override
 	public String visit(
 			SubClassInclusionExpandedDefinitionMatch2 inferenceMatch2) {
+		return inferenceMatch2.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionExpandedFirstEquivalentClassMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionExpandedFirstEquivalentClassMatch2 inferenceMatch2) {
+		return inferenceMatch2.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionExpandedSecondEquivalentClassMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionExpandedSecondEquivalentClassMatch2 inferenceMatch2) {
 		return inferenceMatch2.getParent() + " | ";
 	}
 

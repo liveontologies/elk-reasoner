@@ -25,16 +25,15 @@ package org.semanticweb.elk.reasoner.indexing.model;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 
 /**
- * An {@link ElkEquivalentClassesAxiomDefinitionConversion} that can be modified
- * as a result of updating the {@link ModifiableOntologyIndex} where this object
- * is stored.
+ * An {@link ElkEquivalentClassesAxiomEquivalenceConversion} that can be
+ * modified as a result of updating the {@link ModifiableOntologyIndex} where
+ * this object is stored.
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface ModifiableElkEquivalentClassesAxiomDefinitionConversion
-		extends
-			ElkEquivalentClassesAxiomDefinitionConversion,
-			ModifiableIndexedDefinitionAxiomInference {
+public interface ModifiableElkEquivalentClassesAxiomEquivalenceConversion
+		extends ElkEquivalentClassesAxiomEquivalenceConversion,
+		ModifiableIndexedEquivalentClassesAxiomInference {
 
 	/**
 	 * A factory for creating instances
@@ -43,13 +42,13 @@ public interface ModifiableElkEquivalentClassesAxiomDefinitionConversion
 	 *
 	 */
 	interface Factory {
-		
-		ModifiableElkEquivalentClassesAxiomDefinitionConversion getElkEquivalentClassesAxiomDefinitionConversion(
+
+		ModifiableElkEquivalentClassesAxiomEquivalenceConversion getElkEquivalentClassesAxiomEquivalenceConversion(
 				ElkEquivalentClassesAxiom originalAxiom,
-				int definedClassPosition, int definitionPosition,
-				ModifiableIndexedClass definedClass,
-				ModifiableIndexedClassExpression definition);
-		
+				int firstMemberPosition, int secondMemberPosition,
+				ModifiableIndexedClassExpression firstMember,
+				ModifiableIndexedClassExpression secondMember);
+
 	}
 
 }

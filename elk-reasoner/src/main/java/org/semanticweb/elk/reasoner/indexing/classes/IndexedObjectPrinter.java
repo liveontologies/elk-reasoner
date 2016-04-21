@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
@@ -98,8 +98,8 @@ public class IndexedObjectPrinter implements IndexedObject.Visitor<String> {
 	}
 
 	@Override
-	public String visit(IndexedDefinitionAxiom axiom) {
-		return axiom.getDefinedClass() + " = " + axiom.getDefinition();
+	public String visit(IndexedEquivalentClassesAxiom axiom) {
+		return axiom.getFirstMember() + " = " + axiom.getSecondMember();
 	}
 
 	@Override

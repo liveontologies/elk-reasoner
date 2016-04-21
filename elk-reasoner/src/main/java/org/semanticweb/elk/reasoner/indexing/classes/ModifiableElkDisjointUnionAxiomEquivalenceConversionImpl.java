@@ -23,23 +23,23 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkDisjointUnionAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiomInference;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointUnionAxiomDefinitionConversion;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiomInference;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointUnionAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 
 /**
- * Implements {@link ModifiableElkDisjointUnionAxiomDefinitionConversion}
+ * Implements {@link ModifiableElkDisjointUnionAxiomEquivalenceConversion}
  * 
  * @author "Yevgeny Kazakov"
  */
-class ModifiableElkDisjointUnionAxiomDefinitionConversionImpl
+class ModifiableElkDisjointUnionAxiomEquivalenceConversionImpl
 		extends
-			ModifiableIndexedDefinitionAxiomInferenceImpl<ElkDisjointUnionAxiom>
+			ModifiableIndexedEquivalentClassesAxiomInferenceImpl<ElkDisjointUnionAxiom>
 		implements
-			ModifiableElkDisjointUnionAxiomDefinitionConversion {
+			ModifiableElkDisjointUnionAxiomEquivalenceConversion {
 
-	ModifiableElkDisjointUnionAxiomDefinitionConversionImpl(
+	ModifiableElkDisjointUnionAxiomEquivalenceConversionImpl(
 			ElkDisjointUnionAxiom originalAxiom,
 			ModifiableIndexedClass definedClass,
 			ModifiableIndexedClassExpression definition) {
@@ -48,7 +48,7 @@ class ModifiableElkDisjointUnionAxiomDefinitionConversionImpl
 
 	@Override
 	public final <O> O accept(
-			IndexedDefinitionAxiomInference.Visitor<O> visitor) {
+			IndexedEquivalentClassesAxiomInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

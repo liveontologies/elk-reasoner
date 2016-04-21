@@ -24,13 +24,12 @@ package org.semanticweb.elk.matching.conclusions;
 
 import java.util.List;
 
-import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
@@ -75,17 +74,17 @@ public class ConclusionMatchBaseFactory implements ConclusionMatch.Factory {
 	}
 
 	@Override
-	public IndexedDefinitionAxiomMatch1 getIndexedDefinitionAxiomMatch1(
-			IndexedDefinitionAxiom parent) {
-		return new IndexedDefinitionAxiomMatch1(parent);
+	public IndexedEquivalentClassesAxiomMatch1 getIndexedEquivalentClassesAxiomMatch1(
+			IndexedEquivalentClassesAxiom parent) {
+		return new IndexedEquivalentClassesAxiomMatch1(parent);
 	}
 
 	@Override
-	public IndexedDefinitionAxiomMatch2 getIndexedDefinitionAxiomMatch2(
-			IndexedDefinitionAxiomMatch1 parent, ElkClass definedClassMatch,
-			ElkClassExpression definitionMatch) {
-		return new IndexedDefinitionAxiomMatch2(parent, definedClassMatch,
-				definitionMatch);
+	public IndexedEquivalentClassesAxiomMatch2 getIndexedEquivalentClassesAxiomMatch2(
+			IndexedEquivalentClassesAxiomMatch1 parent, ElkClassExpression firstMemberMatch,
+			ElkClassExpression secondMemberMatch) {
+		return new IndexedEquivalentClassesAxiomMatch2(parent, firstMemberMatch,
+				secondMemberMatch);
 	}
 
 	@Override

@@ -148,25 +148,25 @@ public class ConclusionMatchEquality
 	}
 
 	@Override
-	public Boolean visit(final IndexedDefinitionAxiomMatch1 conclusionMatch) {
+	public Boolean visit(final IndexedEquivalentClassesAxiomMatch1 conclusionMatch) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
-			public Boolean visit(IndexedDefinitionAxiomMatch1 other) {
+			public Boolean visit(IndexedEquivalentClassesAxiomMatch1 other) {
 				return equals(other.getParent(), conclusionMatch.getParent());
 			}
 		});
 	}
 
 	@Override
-	public Boolean visit(final IndexedDefinitionAxiomMatch2 conclusionMatch) {
+	public Boolean visit(final IndexedEquivalentClassesAxiomMatch2 conclusionMatch) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
-			public Boolean visit(IndexedDefinitionAxiomMatch2 other) {
+			public Boolean visit(IndexedEquivalentClassesAxiomMatch2 other) {
 				return equals(other.getParent(), conclusionMatch.getParent())
-						&& equals(other.getDefinedClassMatch(),
-								conclusionMatch.getDefinedClassMatch())
-						&& equals(other.getDefinitionMatch(),
-								conclusionMatch.getDefinitionMatch());
+						&& equals(other.getFirstMemberMatch(),
+								conclusionMatch.getFirstMemberMatch())
+						&& equals(other.getSecondMemberMatch(),
+								conclusionMatch.getSecondMemberMatch());
 			}
 		});
 	}

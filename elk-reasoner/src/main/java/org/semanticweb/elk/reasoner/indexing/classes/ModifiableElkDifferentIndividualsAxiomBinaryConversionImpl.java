@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDifferentIndividualsAxiomBinaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
@@ -60,13 +59,6 @@ class ModifiableElkDifferentIndividualsAxiomBinaryConversionImpl
 	@Override
 	public int getSecondIndividualPosition() {
 		return secondIndividualPosition_;
-	}
-
-	@Override
-	public IndexedSubClassOfAxiom getConclusion(
-			IndexedSubClassOfAxiom.Factory factory) {
-		return factory.getIndexedSubClassOfAxiom(getOriginalAxiom(),
-				getSubClass(), getSuperClass());
 	}
 
 	@Override

@@ -27,6 +27,8 @@ package org.semanticweb.elk.reasoner.tracing;
 
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An implementation of {@link ModifiableTracingInferenceSet} backed by a
@@ -41,10 +43,15 @@ import org.semanticweb.elk.util.collections.Multimap;
 public class ModifiableTracingInferenceSetImpl<I extends TracingInference>
 		implements ModifiableTracingInferenceSet<I> {
 
+	// logger for this class
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(ModifiableTracingInferenceSetImpl.class);
+	
 	private final Multimap<Conclusion, I> inferenceMap_ = new HashListMultimap<Conclusion, I>();
 
 	@Override
 	public void produce(I inference) {
+		LOGGER_.trace("{}: inference produced", inference);
 		inferenceMap_.add(new TracingInferenceConclusion(inference), inference);
 	}
 

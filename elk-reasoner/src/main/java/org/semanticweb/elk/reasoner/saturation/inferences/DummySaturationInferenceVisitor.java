@@ -82,11 +82,6 @@ public class DummySaturationInferenceVisitor<O>
 	}
 
 	@Override
-	public O visit(ContextInitializationNoPremises inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
 	public O visit(ClassInconsistencyOfDisjointSubsumers inference) {
 		return defaultVisit(inference);
 	}
@@ -103,6 +98,11 @@ public class DummySaturationInferenceVisitor<O>
 
 	@Override
 	public O visit(ClassInconsistencyPropagated inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ContextInitializationNoPremises inference) {
 		return defaultVisit(inference);
 	}
 
@@ -173,6 +173,16 @@ public class DummySaturationInferenceVisitor<O>
 
 	@Override
 	public O visit(SubClassInclusionExpandedDefinition inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(SubClassInclusionExpandedFirstEquivalentClass inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(SubClassInclusionExpandedSecondEquivalentClass inference) {
 		return defaultVisit(inference);
 	}
 

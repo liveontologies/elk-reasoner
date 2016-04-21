@@ -25,30 +25,36 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
  */
 
 /**
- * An {@link IndexedAxiom} constructed from an {@link IndexedClass} and an
- * {@link IndexedClassExpression}.<br>
+ * An {@link IndexedAxiom} constructed from two {@link IndexedClassExpression}s.
+ * <br>
  * 
  * Notation:
  * 
  * <pre>
- * [A = D]
+ * [C = D]
  * </pre>
  * 
- * It is logically equivalent to the OWL axiom {@code EquivalentClasses(A D)}
+ * It is logically equivalent to the OWL axiom {@code EquivalentClasses(C D)}
  * <br>
  * 
  * The parameters can be obtained as follows:<br>
  * 
- * A = {@link #getDefinedClass()}<br>
- * D = {@link #getDefinition()}<br>
+ * C = {@link #getFirstMember()}<br>
+ * D = {@link #getSecondMember()}<br>
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface IndexedDefinitionAxiom extends IndexedAxiom {
+public interface IndexedEquivalentClassesAxiom extends IndexedAxiom {
 
-	IndexedClass getDefinedClass();
+	/**
+	 * @return the first of the two equivalent {@link IndexedClassExpression}s
+	 */
+	IndexedClassExpression getFirstMember();
 
-	IndexedClassExpression getDefinition();
+	/**
+	 * @return the first of the two equivalent {@link IndexedClassExpression}s
+	 */
+	IndexedClassExpression getSecondMember();
 
 	/**
 	 * The visitor pattern for instances
@@ -60,7 +66,7 @@ public interface IndexedDefinitionAxiom extends IndexedAxiom {
 	 */
 	interface Visitor<O> {
 
-		O visit(IndexedDefinitionAxiom axiom);
+		O visit(IndexedEquivalentClassesAxiom axiom);
 
 	}
 
@@ -72,8 +78,9 @@ public interface IndexedDefinitionAxiom extends IndexedAxiom {
 	 */
 	interface Factory {
 
-		IndexedDefinitionAxiom getIndexedDefinitionAxiom(ElkAxiom originalAxiom,
-				IndexedClass definedClass, IndexedClassExpression definition);
+		IndexedEquivalentClassesAxiom getIndexedEquivalentClassesAxiom(
+				ElkAxiom originalAxiom, IndexedClassExpression firstMember,
+				IndexedClassExpression secondMember);
 
 	}
 

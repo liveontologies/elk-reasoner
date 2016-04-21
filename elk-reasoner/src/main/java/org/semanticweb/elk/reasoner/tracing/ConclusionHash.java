@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.tracing;
 import org.semanticweb.elk.owl.comparison.ElkObjectHash;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxiom;
@@ -132,10 +132,10 @@ public class ConclusionHash
 	}
 
 	@Override
-	public Integer visit(IndexedDefinitionAxiom conclusion) {
-		return combinedHashCode(hashCode(IndexedDefinitionAxiom.class),
-				hashCode(conclusion.getDefinedClass()),
-				hashCode(conclusion.getDefinition()));
+	public Integer visit(IndexedEquivalentClassesAxiom conclusion) {
+		return combinedHashCode(hashCode(IndexedEquivalentClassesAxiom.class),
+				hashCode(conclusion.getFirstMember()),
+				hashCode(conclusion.getSecondMember()));
 	}
 
 	@Override

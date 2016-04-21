@@ -50,6 +50,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionCompo
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecomposedFirstConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecomposedSecondConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedDefinition;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedFirstEquivalentClass;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSecondEquivalentClass;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSubClassOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionObjectHasSelfPropertyRange;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionOwlThing;
@@ -118,11 +120,6 @@ class ClassInferenceLocalPremiseVisitor<O>
 	}
 
 	@Override
-	public O visit(ContextInitializationNoPremises inference) {
-		return null;
-	}
-
-	@Override
 	public O visit(ClassInconsistencyOfDisjointSubsumers inference) {
 		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
 		conclusionVisitor_
@@ -151,6 +148,11 @@ class ClassInferenceLocalPremiseVisitor<O>
 			conclusionVisitor_
 					.visit(inference.getSecondPremise(conclusionFactory_));
 		}
+		return null;
+	}
+
+	@Override
+	public O visit(ContextInitializationNoPremises inference) {
 		return null;
 	}
 
@@ -240,6 +242,18 @@ class ClassInferenceLocalPremiseVisitor<O>
 
 	@Override
 	public O visit(SubClassInclusionExpandedDefinition inference) {
+		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
+		return null;
+	}
+
+	@Override
+	public O visit(SubClassInclusionExpandedFirstEquivalentClass inference) {
+		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
+		return null;
+	}
+
+	@Override
+	public O visit(SubClassInclusionExpandedSecondEquivalentClass inference) {
 		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
 		return null;
 	}

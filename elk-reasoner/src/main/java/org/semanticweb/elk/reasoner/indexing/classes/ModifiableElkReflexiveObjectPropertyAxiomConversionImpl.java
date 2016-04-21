@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkReflexiveObjectPropertyAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
@@ -44,13 +43,6 @@ class ModifiableElkReflexiveObjectPropertyAxiomConversionImpl
 			ModifiableIndexedClassExpression subClass,
 			ModifiableIndexedClassExpression superClass) {
 		super(originalAxiom, subClass, superClass);
-	}
-
-	@Override
-	public IndexedSubClassOfAxiom getConclusion(
-			IndexedSubClassOfAxiom.Factory factory) {
-		return factory.getIndexedSubClassOfAxiom(getOriginalAxiom(),
-				getSubClass(), getSuperClass());
 	}
 
 	@Override

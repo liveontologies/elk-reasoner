@@ -45,66 +45,6 @@ public class ClassInferenceConclusionVisitor<O>
 	}
 
 	@Override
-	public O visit(ClassInconsistencyOfOwlNothing inference) {
-		return conclusionVisitor_
-				.visit(inference.getConclusion(conclusionFactory_));
-	}
-
-	@Override
-	public O visit(ClassInconsistencyOfDisjointSubsumers inference) {
-		return conclusionVisitor_
-				.visit(inference.getConclusion(conclusionFactory_));
-	}
-
-	@Override
-	public O visit(ClassInconsistencyOfObjectComplementOf inference) {
-		return conclusionVisitor_
-				.visit(inference.getConclusion(conclusionFactory_));
-	}
-
-	@Override
-	public O visit(ClassInconsistencyPropagated inference) {
-		return conclusionVisitor_
-				.visit(inference.getConclusion(conclusionFactory_));
-	}
-
-	@Override
-	public O visit(DisjointSubsumerFromSubsumer inference) {
-		return conclusionVisitor_
-				.visit(inference.getConclusion(conclusionFactory_));
-	}
-
-	@Override
-	public O visit(ForwardLinkComposition inference) {
-		return conclusionVisitor_
-				.visit(inference.getConclusion(conclusionFactory_));
-	}
-
-	@Override
-	public O visit(ForwardLinkOfObjectHasSelf inference) {
-		return conclusionVisitor_
-				.visit(inference.getConclusion(conclusionFactory_));
-	}
-
-	@Override
-	public O visit(ForwardLinkOfObjectSomeValuesFrom inference) {
-		return conclusionVisitor_
-				.visit(inference.getConclusion(conclusionFactory_));
-	}
-
-	@Override
-	public O visit(ContextInitializationNoPremises inference) {
-		return conclusionVisitor_
-				.visit(inference.getConclusion(conclusionFactory_));
-	}
-
-	@Override
-	public O visit(SubContextInitializationNoPremises inference) {
-		return conclusionVisitor_
-				.visit(inference.getConclusion(conclusionFactory_));
-	}
-
-	@Override
 	public O visit(BackwardLinkComposition inference) {
 		return conclusionVisitor_
 				.visit(inference.getConclusion(conclusionFactory_));
@@ -130,6 +70,60 @@ public class ClassInferenceConclusionVisitor<O>
 
 	@Override
 	public O visit(BackwardLinkReversedExpanded inference) {
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
+	}
+
+	@Override
+	public O visit(ClassInconsistencyOfDisjointSubsumers inference) {
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
+	}
+
+	@Override
+	public O visit(ClassInconsistencyOfObjectComplementOf inference) {
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
+	}
+
+	@Override
+	public O visit(ClassInconsistencyOfOwlNothing inference) {
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
+	}
+
+	@Override
+	public O visit(ClassInconsistencyPropagated inference) {
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
+	}
+
+	@Override
+	public O visit(ContextInitializationNoPremises inference) {
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
+	}
+
+	@Override
+	public O visit(DisjointSubsumerFromSubsumer inference) {
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
+	}
+
+	@Override
+	public O visit(ForwardLinkComposition inference) {
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
+	}
+
+	@Override
+	public O visit(ForwardLinkOfObjectHasSelf inference) {
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
+	}
+
+	@Override
+	public O visit(ForwardLinkOfObjectSomeValuesFrom inference) {
 		return conclusionVisitor_
 				.visit(inference.getConclusion(conclusionFactory_));
 	}
@@ -189,6 +183,18 @@ public class ClassInferenceConclusionVisitor<O>
 	}
 
 	@Override
+	public O visit(SubClassInclusionExpandedFirstEquivalentClass inference) {
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
+	}
+
+	@Override
+	public O visit(SubClassInclusionExpandedSecondEquivalentClass inference) {
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
+	}
+
+	@Override
 	public O visit(SubClassInclusionExpandedSubClassOf inference) {
 		return conclusionVisitor_
 				.visit(inference.getConclusion(conclusionFactory_));
@@ -214,6 +220,12 @@ public class ClassInferenceConclusionVisitor<O>
 
 	@Override
 	public O visit(SubClassInclusionTautology inference) {
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
+	}
+
+	@Override
+	public O visit(SubContextInitializationNoPremises inference) {
 		return conclusionVisitor_
 				.visit(inference.getConclusion(conclusionFactory_));
 	}

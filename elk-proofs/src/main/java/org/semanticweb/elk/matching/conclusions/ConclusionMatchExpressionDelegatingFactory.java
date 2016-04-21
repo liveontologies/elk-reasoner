@@ -25,7 +25,6 @@ package org.semanticweb.elk.matching.conclusions;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectDelegatingFactory;
@@ -33,12 +32,11 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedEntity;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
@@ -185,26 +183,26 @@ public class ConclusionMatchExpressionDelegatingFactory extends
 	}
 
 	@Override
-	public IndexedDefinitionAxiom getIndexedDefinitionAxiom(
-			ElkAxiom originalAxiom, IndexedClass definedClass,
-			IndexedClassExpression definition) {
-		return filter(conclusionFactory_.getIndexedDefinitionAxiom(
-				originalAxiom, definedClass, definition));
+	public IndexedEquivalentClassesAxiom getIndexedEquivalentClassesAxiom(
+			ElkAxiom originalAxiom, IndexedClassExpression firstMember,
+			IndexedClassExpression secondMember) {
+		return filter(conclusionFactory_.getIndexedEquivalentClassesAxiom(
+				originalAxiom, firstMember, secondMember));
 	}
 
 	@Override
-	public IndexedDefinitionAxiomMatch1 getIndexedDefinitionAxiomMatch1(
-			IndexedDefinitionAxiom parent) {
+	public IndexedEquivalentClassesAxiomMatch1 getIndexedEquivalentClassesAxiomMatch1(
+			IndexedEquivalentClassesAxiom parent) {
 		return filter(conclusionMatchFactory_
-				.getIndexedDefinitionAxiomMatch1(parent));
+				.getIndexedEquivalentClassesAxiomMatch1(parent));
 	}
 
 	@Override
-	public IndexedDefinitionAxiomMatch2 getIndexedDefinitionAxiomMatch2(
-			IndexedDefinitionAxiomMatch1 parent, ElkClass definedClassMatch,
-			ElkClassExpression definitionMatch) {
-		return filter(conclusionMatchFactory_.getIndexedDefinitionAxiomMatch2(
-				parent, definedClassMatch, definitionMatch));
+	public IndexedEquivalentClassesAxiomMatch2 getIndexedEquivalentClassesAxiomMatch2(
+			IndexedEquivalentClassesAxiomMatch1 parent, ElkClassExpression firstMemberMatch,
+			ElkClassExpression secondMemberMatch) {
+		return filter(conclusionMatchFactory_.getIndexedEquivalentClassesAxiomMatch2(
+				parent, firstMemberMatch, secondMemberMatch));
 	}
 
 	@Override

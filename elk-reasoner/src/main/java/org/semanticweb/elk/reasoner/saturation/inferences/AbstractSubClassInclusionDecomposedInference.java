@@ -39,7 +39,7 @@ abstract class AbstractSubClassInclusionDecomposedInference
 		super(subExpression, superExpression);
 	}
 
-	public IndexedClassExpression getConclusionSubsumer() {
+	public final IndexedClassExpression getConclusionSubsumer() {
 		return getSubsumer();
 	}
 
@@ -49,24 +49,24 @@ abstract class AbstractSubClassInclusionDecomposedInference
 	 * 
 	 * @return the conclusion produced by this inference
 	 */
-	public SubClassInclusionDecomposed getConclusion(
+	public final SubClassInclusionDecomposed getConclusion(
 			SubClassInclusionDecomposed.Factory factory) {
 		return factory.getSubClassInclusionDecomposed(getDestination(),
 				getSubsumer());
 	}
 
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		return System.identityHashCode(this);
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public final boolean equals(Object o) {
 		return this == o;
 	}
 	
 	@Override
-	public String toString() {
+	public final String toString() {
 		return TracingInferencePrinter.toString(this);		
 	}
 

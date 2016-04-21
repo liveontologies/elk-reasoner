@@ -46,24 +46,24 @@ abstract class AbstractSubContextInitializationInference
 	 * 
 	 * @return the conclusion produced by this inference
 	 */
-	public SubContextInitialization getConclusion(
+	public final SubContextInitialization getConclusion(
 			SubContextInitialization.Factory factory) {
 		return factory.getSubContextInitialization(getDestination(),
 				getSubDestination());
 	}
 
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		return System.identityHashCode(this);
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public final boolean equals(Object o) {
 		return this == o;
 	}
 	
 	@Override
-	public String toString() {
+	public final String toString() {
 		return TracingInferencePrinter.toString(this);		
 	}
 

@@ -10,10 +10,10 @@ import org.semanticweb.elk.reasoner.indexing.model.ElkDifferentIndividualsAxiomN
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointClassesAxiomBinaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointClassesAxiomNaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomBinaryConversion;
-import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomDefinitionConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomNaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomSubClassConversion;
-import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomDefinitionConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomSubClassConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentObjectPropertiesAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkObjectPropertyAssertionAxiomConversion;
@@ -50,6 +50,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionCompo
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecomposedFirstConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecomposedSecondConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedDefinition;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedFirstEquivalentClass;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSecondEquivalentClass;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSubClassOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionObjectHasSelfPropertyRange;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionOwlThing;
@@ -93,25 +95,25 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubProperty
  */
 public class TracingInferenceDummyVisitor<O> implements TracingInference.Visitor<O> {
 
-	protected O defaultVisit(@SuppressWarnings("unused") TracingInference inference) {
-		// can be overriden in sub-classes
-		return null;
+	protected O defaultVisit(ClassInference inference) {
+		return defaultVisit((SaturationInference) inference);
 	}
 
 	protected O defaultVisit(IndexedAxiomInference inference) {
 		return defaultVisit((TracingInference) inference);
 	}
 	
-	protected O defaultVisit(SaturationInference inference) {
-		return defaultVisit((TracingInference) inference);
-	}
-	
-	protected O defaultVisit(ClassInference inference) {
-		return defaultVisit((SaturationInference) inference);
-	}	
-	
 	protected O defaultVisit(ObjectPropertyInference inference) {
 		return defaultVisit((SaturationInference) inference);
+	}
+	
+	protected O defaultVisit(SaturationInference inference) {
+		return defaultVisit((TracingInference) inference);
+	}	
+	
+	protected O defaultVisit(@SuppressWarnings("unused") TracingInference inference) {
+		// can be overriden in sub-classes
+		return null;
 	}
 
 	@Override
@@ -140,11 +142,6 @@ public class TracingInferenceDummyVisitor<O> implements TracingInference.Visitor
 	}
 
 	@Override
-	public O visit(ContextInitializationNoPremises inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
 	public O visit(ClassInconsistencyOfDisjointSubsumers inference) {
 		return defaultVisit(inference);
 	}
@@ -161,6 +158,11 @@ public class TracingInferenceDummyVisitor<O> implements TracingInference.Visitor
 
 	@Override
 	public O visit(ClassInconsistencyPropagated inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ContextInitializationNoPremises inference) {
 		return defaultVisit(inference);
 	}
 
@@ -205,7 +207,7 @@ public class TracingInferenceDummyVisitor<O> implements TracingInference.Visitor
 	}
 
 	@Override
-	public O visit(ElkDisjointUnionAxiomDefinitionConversion inference) {
+	public O visit(ElkDisjointUnionAxiomEquivalenceConversion inference) {
 		return defaultVisit(inference);
 	}
 
@@ -220,7 +222,7 @@ public class TracingInferenceDummyVisitor<O> implements TracingInference.Visitor
 	}
 
 	@Override
-	public O visit(ElkEquivalentClassesAxiomDefinitionConversion inference) {
+	public O visit(ElkEquivalentClassesAxiomEquivalenceConversion inference) {
 		return defaultVisit(inference);
 	}
 
@@ -336,6 +338,16 @@ public class TracingInferenceDummyVisitor<O> implements TracingInference.Visitor
 
 	@Override
 	public O visit(SubClassInclusionExpandedDefinition inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(SubClassInclusionExpandedFirstEquivalentClass inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(SubClassInclusionExpandedSecondEquivalentClass inference) {
 		return defaultVisit(inference);
 	}
 

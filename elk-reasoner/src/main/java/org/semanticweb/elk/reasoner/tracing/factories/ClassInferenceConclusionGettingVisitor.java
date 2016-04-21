@@ -50,6 +50,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionCompo
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecomposedFirstConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecomposedSecondConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedDefinition;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedFirstEquivalentClass;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSecondEquivalentClass;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSubClassOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionObjectHasSelfPropertyRange;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionOwlThing;
@@ -75,58 +77,6 @@ public class ClassInferenceConclusionGettingVisitor
 	}
 
 	@Override
-	public ClassConclusion visit(ClassInconsistencyOfOwlNothing inference) {
-		return inference.getConclusion(conclusionFactory_);
-	}
-
-	@Override
-	public ClassConclusion visit(
-			ClassInconsistencyOfDisjointSubsumers inference) {
-		return inference.getConclusion(conclusionFactory_);
-	}
-
-	@Override
-	public ClassConclusion visit(
-			ClassInconsistencyOfObjectComplementOf inference) {
-		return inference.getConclusion(conclusionFactory_);
-	}
-
-	@Override
-	public ClassConclusion visit(ClassInconsistencyPropagated inference) {
-		return inference.getConclusion(conclusionFactory_);
-	}
-
-	@Override
-	public ClassConclusion visit(DisjointSubsumerFromSubsumer inference) {
-		return inference.getConclusion(conclusionFactory_);
-	}
-
-	@Override
-	public ClassConclusion visit(ForwardLinkComposition inference) {
-		return inference.getConclusion(conclusionFactory_);
-	}
-
-	@Override
-	public ClassConclusion visit(ForwardLinkOfObjectHasSelf inference) {
-		return inference.getConclusion(conclusionFactory_);
-	}
-
-	@Override
-	public ClassConclusion visit(ForwardLinkOfObjectSomeValuesFrom inference) {
-		return inference.getConclusion(conclusionFactory_);
-	}
-
-	@Override
-	public ClassConclusion visit(ContextInitializationNoPremises inference) {
-		return inference.getConclusion(conclusionFactory_);
-	}
-
-	@Override
-	public ClassConclusion visit(SubContextInitializationNoPremises inference) {
-		return inference.getConclusion(conclusionFactory_);
-	}
-
-	@Override
 	public ClassConclusion visit(BackwardLinkComposition inference) {
 		return inference.getConclusion(conclusionFactory_);
 	}
@@ -148,6 +98,53 @@ public class ClassInferenceConclusionGettingVisitor
 
 	@Override
 	public ClassConclusion visit(BackwardLinkReversedExpanded inference) {
+		return inference.getConclusion(conclusionFactory_);
+	}
+
+	@Override
+	public ClassConclusion visit(
+			ClassInconsistencyOfDisjointSubsumers inference) {
+		return inference.getConclusion(conclusionFactory_);
+	}
+
+	@Override
+	public ClassConclusion visit(
+			ClassInconsistencyOfObjectComplementOf inference) {
+		return inference.getConclusion(conclusionFactory_);
+	}
+
+	@Override
+	public ClassConclusion visit(ClassInconsistencyOfOwlNothing inference) {
+		return inference.getConclusion(conclusionFactory_);
+	}
+
+	@Override
+	public ClassConclusion visit(ClassInconsistencyPropagated inference) {
+		return inference.getConclusion(conclusionFactory_);
+	}
+
+	@Override
+	public ClassConclusion visit(ContextInitializationNoPremises inference) {
+		return inference.getConclusion(conclusionFactory_);
+	}
+
+	@Override
+	public ClassConclusion visit(DisjointSubsumerFromSubsumer inference) {
+		return inference.getConclusion(conclusionFactory_);
+	}
+
+	@Override
+	public ClassConclusion visit(ForwardLinkComposition inference) {
+		return inference.getConclusion(conclusionFactory_);
+	}
+
+	@Override
+	public ClassConclusion visit(ForwardLinkOfObjectHasSelf inference) {
+		return inference.getConclusion(conclusionFactory_);
+	}
+
+	@Override
+	public ClassConclusion visit(ForwardLinkOfObjectSomeValuesFrom inference) {
 		return inference.getConclusion(conclusionFactory_);
 	}
 
@@ -205,6 +202,18 @@ public class ClassInferenceConclusionGettingVisitor
 
 	@Override
 	public ClassConclusion visit(
+			SubClassInclusionExpandedFirstEquivalentClass inference) {
+		return inference.getConclusion(conclusionFactory_);
+	}
+
+	@Override
+	public ClassConclusion visit(
+			SubClassInclusionExpandedSecondEquivalentClass inference) {
+		return inference.getConclusion(conclusionFactory_);
+	}
+
+	@Override
+	public ClassConclusion visit(
 			SubClassInclusionExpandedSubClassOf inference) {
 		return inference.getConclusion(conclusionFactory_);
 	}
@@ -227,6 +236,11 @@ public class ClassInferenceConclusionGettingVisitor
 
 	@Override
 	public ClassConclusion visit(SubClassInclusionTautology inference) {
+		return inference.getConclusion(conclusionFactory_);
+	}
+
+	@Override
+	public ClassConclusion visit(SubContextInitializationNoPremises inference) {
 		return inference.getConclusion(conclusionFactory_);
 	}
 

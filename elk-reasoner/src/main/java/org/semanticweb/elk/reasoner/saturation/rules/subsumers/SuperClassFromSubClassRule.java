@@ -27,11 +27,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedDefinitionAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
@@ -91,42 +88,6 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 			ModifiableOntologyIndex index, ElkAxiom reason) {
 		return index.remove(axiom.getSubClass(),
 				new SuperClassFromSubClassRule(axiom.getSuperClass(), reason));
-	}
-
-	public static boolean addRulesFor(ModifiableIndexedDefinitionAxiom axiom,
-			ModifiableOntologyIndex index, ElkAxiom reason) {
-		ModifiableIndexedClass definedClass = axiom.getDefinedClass();
-		ChainableSubsumerRule firstRule = new SuperClassFromSubClassRule(
-				axiom.getDefinition(), reason);
-		if (!index.add(definedClass, firstRule))
-			return false;
-		if (!index.add(axiom.getDefinition(), new SuperClassFromSubClassRule(
-				axiom.getDefinedClass(), reason))) {
-			// revert all changes
-			if (!index.remove(definedClass, firstRule))
-				throw new ElkUnexpectedIndexingException(axiom);
-			return false;
-		}
-		return true;
-	}
-
-	public static boolean removeRulesFor(
-			ModifiableIndexedDefinitionAxiom axiom,
-			ModifiableOntologyIndex index, ElkAxiom reason) {
-		ModifiableIndexedClass definedClass = axiom.getDefinedClass();
-		ChainableSubsumerRule firstRule = new SuperClassFromSubClassRule(
-				axiom.getDefinition(), reason);
-		if (!index.remove(definedClass, firstRule))
-			return false;
-		if (!index
-				.remove(axiom.getDefinition(), new SuperClassFromSubClassRule(
-						axiom.getDefinedClass(), reason))) {
-			// revert all changes
-			if (!index.add(definedClass, firstRule))
-				throw new ElkUnexpectedIndexingException(axiom);
-			return false;
-		}
-		return true;
 	}
 
 	@Deprecated

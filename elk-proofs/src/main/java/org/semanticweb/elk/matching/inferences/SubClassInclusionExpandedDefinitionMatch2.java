@@ -1,5 +1,7 @@
 package org.semanticweb.elk.matching.inferences;
 
+import org.semanticweb.elk.matching.ElkMatchException;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -23,7 +25,7 @@ package org.semanticweb.elk.matching.inferences;
  */
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.IndexedDefinitionAxiomMatch2;
+import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch2;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -38,10 +40,18 @@ public class SubClassInclusionExpandedDefinitionMatch2 extends
 
 	SubClassInclusionExpandedDefinitionMatch2(
 			SubClassInclusionExpandedDefinitionMatch1 parent,
-			IndexedDefinitionAxiomMatch2 secondPremiseMatch) {
+			IndexedEquivalentClassesAxiomMatch2 secondPremiseMatch) {
 		super(parent);
-		this.definedClassMatch_ = secondPremiseMatch.getDefinedClassMatch();
-		this.definitionMatch_ = secondPremiseMatch.getDefinitionMatch();
+		ElkClassExpression firstMemberMatch = secondPremiseMatch
+				.getFirstMemberMatch();
+		if (firstMemberMatch instanceof ElkClass) {
+			this.definedClassMatch_ = (ElkClass) secondPremiseMatch
+					.getFirstMemberMatch();
+		} else {
+			throw new ElkMatchException(parent.getParent().getDefinedClass(),
+					firstMemberMatch);
+		}
+		this.definitionMatch_ = secondPremiseMatch.getSecondMemberMatch();
 	}
 
 	public ElkClass getDefinedClassMatch() {
@@ -94,7 +104,7 @@ public class SubClassInclusionExpandedDefinitionMatch2 extends
 
 		SubClassInclusionExpandedDefinitionMatch2 getSubClassInclusionExpandedDefinitionMatch2(
 				SubClassInclusionExpandedDefinitionMatch1 parent,
-				IndexedDefinitionAxiomMatch2 secondPremiseMatch);
+				IndexedEquivalentClassesAxiomMatch2 secondPremiseMatch);
 
 	}
 

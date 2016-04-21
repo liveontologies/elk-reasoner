@@ -2,7 +2,7 @@ package org.semanticweb.elk.reasoner.tracing;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
@@ -102,7 +102,7 @@ public class DummyConclusionVisitor<O> implements Conclusion.Visitor<O> {
 	}
 
 	@Override
-	public O visit(IndexedDefinitionAxiom axiom) {
+	public O visit(IndexedEquivalentClassesAxiom axiom) {
 		return defaultVisit(axiom);
 	}
 

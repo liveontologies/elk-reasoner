@@ -127,17 +127,17 @@ public class ConclusionMatchHash
 	}
 
 	@Override
-	public Integer visit(IndexedDefinitionAxiomMatch1 conclusionMatch) {
-		return combinedHashCode(hashCode(IndexedDefinitionAxiomMatch1.class),
+	public Integer visit(IndexedEquivalentClassesAxiomMatch1 conclusionMatch) {
+		return combinedHashCode(hashCode(IndexedEquivalentClassesAxiomMatch1.class),
 				hashCode(conclusionMatch.getParent()));
 	}
 
 	@Override
-	public Integer visit(IndexedDefinitionAxiomMatch2 conclusionMatch) {
-		return combinedHashCode(hashCode(IndexedDefinitionAxiomMatch2.class),
+	public Integer visit(IndexedEquivalentClassesAxiomMatch2 conclusionMatch) {
+		return combinedHashCode(hashCode(IndexedEquivalentClassesAxiomMatch2.class),
 				hashCode(conclusionMatch.getParent()),
-				hashCode(conclusionMatch.getDefinedClassMatch()),
-				hashCode(conclusionMatch.getDefinitionMatch()));
+				hashCode(conclusionMatch.getFirstMemberMatch()),
+				hashCode(conclusionMatch.getSecondMemberMatch()));
 	}
 
 	@Override

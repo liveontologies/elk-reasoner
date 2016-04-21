@@ -22,18 +22,21 @@ package org.semanticweb.elk.matching;
  * #L%
  */
 
-import org.semanticweb.elk.matching.conclusions.IndexedDefinitionAxiomMatch1Watch;
-import org.semanticweb.elk.matching.conclusions.IndexedDefinitionAxiomMatch2;
+import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1Watch;
+import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch2;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
 import org.semanticweb.elk.matching.inferences.SubClassInclusionComposedDefinedClassMatch1;
 import org.semanticweb.elk.matching.inferences.SubClassInclusionExpandedDefinitionMatch1;
+import org.semanticweb.elk.matching.inferences.SubClassInclusionExpandedFirstEquivalentClassMatch1;
+import org.semanticweb.elk.matching.inferences.SubClassInclusionExpandedSecondEquivalentClassMatch1;
 
-class IndexedDefinitionAxiomMatch2InferenceVisitor extends
-		AbstractConclusionMatchInferenceVisitor<IndexedDefinitionAxiomMatch2>
-		implements IndexedDefinitionAxiomMatch1Watch.Visitor<Void> {
+class IndexedEquivalentClassesAxiomMatch2InferenceVisitor extends
+		AbstractConclusionMatchInferenceVisitor<IndexedEquivalentClassesAxiomMatch2>
+		implements IndexedEquivalentClassesAxiomMatch1Watch.Visitor<Void> {
 
-	IndexedDefinitionAxiomMatch2InferenceVisitor(InferenceMatch.Factory factory,
-			IndexedDefinitionAxiomMatch2 child) {
+	IndexedEquivalentClassesAxiomMatch2InferenceVisitor(
+			InferenceMatch.Factory factory,
+			IndexedEquivalentClassesAxiomMatch2 child) {
 		super(factory, child);
 	}
 
@@ -50,6 +53,22 @@ class IndexedDefinitionAxiomMatch2InferenceVisitor extends
 			SubClassInclusionExpandedDefinitionMatch1 inferenceMatch1) {
 		factory.getSubClassInclusionExpandedDefinitionMatch2(inferenceMatch1,
 				child);
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionExpandedFirstEquivalentClassMatch1 inferenceMatch1) {
+		factory.getSubClassInclusionExpandedFirstEquivalentClassMatch2(
+				inferenceMatch1, child);
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionExpandedSecondEquivalentClassMatch1 inferenceMatch1) {
+		factory.getSubClassInclusionExpandedSecondEquivalentClassMatch2(
+				inferenceMatch1, child);
 		return null;
 	}
 

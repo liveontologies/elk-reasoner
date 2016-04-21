@@ -58,12 +58,12 @@ public class ConclusionMatchDummyVisitor<O>
 	}
 
 	@Override
-	public O visit(IndexedDefinitionAxiomMatch1 conclusionMatch) {
+	public O visit(IndexedEquivalentClassesAxiomMatch1 conclusionMatch) {
 		return defaultVisit(conclusionMatch);
 	}
 
 	@Override
-	public O visit(IndexedDefinitionAxiomMatch2 conclusionMatch) {
+	public O visit(IndexedEquivalentClassesAxiomMatch2 conclusionMatch) {
 		return defaultVisit(conclusionMatch);
 	}
 

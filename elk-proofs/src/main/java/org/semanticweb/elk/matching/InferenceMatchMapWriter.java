@@ -26,8 +26,8 @@ import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1Watch;
-import org.semanticweb.elk.matching.conclusions.IndexedDefinitionAxiomMatch1;
-import org.semanticweb.elk.matching.conclusions.IndexedDefinitionAxiomMatch1Watch;
+import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1;
+import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.IndexedObjectPropertyRangeAxiomMatch1;
@@ -53,8 +53,8 @@ public interface InferenceMatchMapWriter {
 
 	void add(ForwardLinkMatch1 conclusion, ForwardLinkMatch1Watch inference);
 
-	void add(IndexedDefinitionAxiomMatch1 conclusion,
-			IndexedDefinitionAxiomMatch1Watch inference);
+	void add(IndexedEquivalentClassesAxiomMatch1 conclusion,
+			IndexedEquivalentClassesAxiomMatch1Watch inference);
 
 	void add(IndexedDisjointClassesAxiomMatch1 conclusion,
 			IndexedDisjointClassesAxiomMatch1Watch inference);

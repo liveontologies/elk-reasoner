@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.indexing.model;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,46 +22,45 @@ package org.semanticweb.elk.reasoner.indexing.model;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 
 /**
  * Represents a transformation of an {@link ElkEquivalentClassesAxiom} to an
- * {@link IndexedDefinitionAxiom} representing that one {@link ElkClass} that is
- * a member of the {@link ElkEquivalentClassesAxiom} is defined to be equivalent
- * to another {@link ElkClassExpression} member.
+ * {@link IndexedEquivalentClassesAxiom} with two members representing the
+ * corresponding members of the {@link ElkEquivalentClassesAxiom}.
  * 
  * @see ElkEquivalentClassesAxiom#getClassExpressions()
  * 
  * @author Yevgeny Kazakov
  */
-public interface ElkEquivalentClassesAxiomDefinitionConversion
-		extends
-			IndexedDefinitionAxiomInference {
+public interface ElkEquivalentClassesAxiomEquivalenceConversion
+		extends IndexedEquivalentClassesAxiomInference {
 
 	@Override
 	ElkEquivalentClassesAxiom getOriginalAxiom();
 
 	/**
-	 * @return the position of the {@link ElkClass} in the member list of the
-	 *         {@link ElkEquivalentClassesAxiom} that is converted to the
-	 *         defined class of the resulting {@link IndexedDefinitionAxiom}
+	 * @return the position of the {@link ElkClassExpression} in the member list
+	 *         of the {@link ElkEquivalentClassesAxiom} that is converted to the
+	 *         first member of the resulting
+	 *         {@link IndexedEquivalentClassesAxiom}
 	 * 
 	 * @see ElkEquivalentClassesAxiom#getClassExpressions()
-	 * @see IndexedDefinitionAxiom#getDefinedClass()
+	 * @see IndexedEquivalentClassesAxiom#getFirstMember()
 	 */
-	int getDefinedClassPosition();
+	int getFirstMemberPosition();
 
 	/**
 	 * @return the position of the {@link ElkClassExpression} in the member list
 	 *         of the {@link ElkEquivalentClassesAxiom} that is converted to the
-	 *         definition of the resulting {@link IndexedDefinitionAxiom}
+	 *         second member of the resulting
+	 *         {@link IndexedEquivalentClassesAxiom}
 	 * 
 	 * @see ElkEquivalentClassesAxiom#getClassExpressions()
-	 * @see IndexedDefinitionAxiom#getDefinition()
+	 * @see IndexedEquivalentClassesAxiom#getSecondMember()
 	 */
-	int getDefinitionPosition();
+	int getSecondMemberPosition();
 
 	/**
 	 * The visitor pattern for instances
@@ -73,7 +72,7 @@ public interface ElkEquivalentClassesAxiomDefinitionConversion
 	 */
 	interface Visitor<O> {
 
-		O visit(ElkEquivalentClassesAxiomDefinitionConversion inference);
+		O visit(ElkEquivalentClassesAxiomEquivalenceConversion inference);
 
 	}
 

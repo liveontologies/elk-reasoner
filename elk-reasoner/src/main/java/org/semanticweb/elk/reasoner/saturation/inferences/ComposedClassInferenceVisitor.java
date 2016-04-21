@@ -107,15 +107,6 @@ public class ComposedClassInferenceVisitor
 	}
 
 	@Override
-	public Boolean visit(ContextInitializationNoPremises inference) {
-		for (int i = 0; i < visitors_.length; i++) {
-			if (!visitors_[i].visit(inference))
-				return false;
-		}
-		return true;
-	}
-
-	@Override
 	public Boolean visit(ClassInconsistencyOfDisjointSubsumers inference) {
 		for (int i = 0; i < visitors_.length; i++) {
 			if (!visitors_[i].visit(inference))
@@ -144,6 +135,15 @@ public class ComposedClassInferenceVisitor
 
 	@Override
 	public Boolean visit(ClassInconsistencyPropagated inference) {
+		for (int i = 0; i < visitors_.length; i++) {
+			if (!visitors_[i].visit(inference))
+				return false;
+		}
+		return true;
+	}
+
+	@Override
+	public Boolean visit(ContextInitializationNoPremises inference) {
 		for (int i = 0; i < visitors_.length; i++) {
 			if (!visitors_[i].visit(inference))
 				return false;
@@ -263,6 +263,26 @@ public class ComposedClassInferenceVisitor
 
 	@Override
 	public Boolean visit(SubClassInclusionExpandedDefinition inference) {
+		for (int i = 0; i < visitors_.length; i++) {
+			if (!visitors_[i].visit(inference))
+				return false;
+		}
+		return true;
+	}
+
+	@Override
+	public Boolean visit(
+			SubClassInclusionExpandedFirstEquivalentClass inference) {
+		for (int i = 0; i < visitors_.length; i++) {
+			if (!visitors_[i].visit(inference))
+				return false;
+		}
+		return true;
+	}
+
+	@Override
+	public Boolean visit(
+			SubClassInclusionExpandedSecondEquivalentClass inference) {
 		for (int i = 0; i < visitors_.length; i++) {
 			if (!visitors_[i].visit(inference))
 				return false;

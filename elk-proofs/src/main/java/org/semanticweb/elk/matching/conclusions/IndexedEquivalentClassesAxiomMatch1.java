@@ -2,7 +2,7 @@ package org.semanticweb.elk.matching.conclusions;
 
 /*
  * #%L
- * ELK Reasoner
+ * ELK Proofs Package
  * $Id:$
  * $HeadURL:$
  * %%
@@ -22,30 +22,13 @@ package org.semanticweb.elk.matching.conclusions;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
 
-public class IndexedDefinitionAxiomMatch2
-		extends
-			AbstractIndexedAxiomMatch<IndexedDefinitionAxiomMatch1> {
+public class IndexedEquivalentClassesAxiomMatch1
+		extends AbstractIndexedAxiomMatch<IndexedEquivalentClassesAxiom> {
 
-	private final ElkClass definedClassMatch_;
-
-	private final ElkClassExpression definitionMatch_;
-
-	IndexedDefinitionAxiomMatch2(IndexedDefinitionAxiomMatch1 parent,
-			ElkClass definedClassMatch, ElkClassExpression definitionMatch) {
+	IndexedEquivalentClassesAxiomMatch1(IndexedEquivalentClassesAxiom parent) {
 		super(parent);
-		this.definedClassMatch_ = definedClassMatch;
-		this.definitionMatch_ = definitionMatch;
-	}
-
-	public ElkClass getDefinedClassMatch() {
-		return definedClassMatch_;
-	}
-
-	public ElkClassExpression getDefinitionMatch() {
-		return definitionMatch_;
 	}
 
 	@Override
@@ -61,9 +44,8 @@ public class IndexedDefinitionAxiomMatch2
 	 */
 	public interface Factory {
 
-		IndexedDefinitionAxiomMatch2 getIndexedDefinitionAxiomMatch2(
-				IndexedDefinitionAxiomMatch1 parent, ElkClass definedClassMatch,
-				ElkClassExpression definitionMatch);
+		IndexedEquivalentClassesAxiomMatch1 getIndexedEquivalentClassesAxiomMatch1(
+				IndexedEquivalentClassesAxiom parent);
 
 	}
 
@@ -77,7 +59,7 @@ public class IndexedDefinitionAxiomMatch2
 	 */
 	interface Visitor<O> {
 
-		O visit(IndexedDefinitionAxiomMatch2 conclusionMatch);
+		O visit(IndexedEquivalentClassesAxiomMatch1 conclusionMatch);
 
 	}
 

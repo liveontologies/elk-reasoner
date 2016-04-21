@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointClassesAxiomBinaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
@@ -60,13 +59,6 @@ class ModifiableElkDisjointClassesAxiomBinaryConversionImpl
 	@Override
 	public int getSecondClassPosition() {
 		return secondClassPosition_;
-	}
-
-	@Override
-	public IndexedSubClassOfAxiom getConclusion(
-			IndexedSubClassOfAxiom.Factory factory) {
-		return factory.getIndexedSubClassOfAxiom(getOriginalAxiom(),
-				getSubClass(), getSuperClass());
 	}
 
 	@Override

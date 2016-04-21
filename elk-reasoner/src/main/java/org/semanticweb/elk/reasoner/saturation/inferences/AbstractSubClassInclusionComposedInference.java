@@ -40,7 +40,7 @@ abstract class AbstractSubClassInclusionComposedInference<S extends IndexedClass
 		super(subExpression, superExpression);
 	}
 
-	public S getConclusionSubsumer() {
+	public final S getConclusionSubsumer() {
 		return super.getSubsumer();
 	}
 
@@ -50,24 +50,24 @@ abstract class AbstractSubClassInclusionComposedInference<S extends IndexedClass
 	 *            
 	 * @return the conclusion produced by this inference
 	 */
-	public SubClassInclusionComposed getConclusion(
+	public final SubClassInclusionComposed getConclusion(
 			SubClassInclusionComposed.Factory factory) {
 		return factory.getSubClassInclusionComposed(getDestination(),
 				getSubsumer());
 	}
 
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		return System.identityHashCode(this);
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public final boolean equals(Object o) {
 		return this == o;
 	}
 	
 	@Override
-	public String toString() {
+	public final String toString() {
 		return TracingInferencePrinter.toString(this);		
 	}
 

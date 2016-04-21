@@ -22,30 +22,30 @@ package org.semanticweb.elk.matching;
  * #L%
  */
 
-import org.semanticweb.elk.matching.conclusions.IndexedDefinitionAxiomMatch1;
+import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
-import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomDefinitionConversion;
-import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomDefinitionConversion;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiomInference;
+import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomEquivalenceConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomEquivalenceConversion;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiomInference;
 
-class IndexedDefinitionAxiomMatch1InferenceVisitor extends
-		AbstractConclusionMatchInferenceVisitor<IndexedDefinitionAxiomMatch1>
-		implements IndexedDefinitionAxiomInference.Visitor<Void> {
+class IndexedEquivalentClassesAxiomMatch1InferenceVisitor extends
+		AbstractConclusionMatchInferenceVisitor<IndexedEquivalentClassesAxiomMatch1>
+		implements IndexedEquivalentClassesAxiomInference.Visitor<Void> {
 
-	IndexedDefinitionAxiomMatch1InferenceVisitor(InferenceMatch.Factory factory,
-			IndexedDefinitionAxiomMatch1 child) {
+	IndexedEquivalentClassesAxiomMatch1InferenceVisitor(InferenceMatch.Factory factory,
+			IndexedEquivalentClassesAxiomMatch1 child) {
 		super(factory, child);
 	}
 
 	@Override
-	public Void visit(ElkDisjointUnionAxiomDefinitionConversion inference) {
+	public Void visit(ElkDisjointUnionAxiomEquivalenceConversion inference) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ElkEquivalentClassesAxiomDefinitionConversion inference) {
-		factory.getElkEquivalentClassesAxiomDefinitionConversionMatch1(
+	public Void visit(ElkEquivalentClassesAxiomEquivalenceConversion inference) {
+		factory.getElkEquivalentClassesAxiomEquivalenceConversionMatch1(
 				inference, child);
 		return null;
 	}

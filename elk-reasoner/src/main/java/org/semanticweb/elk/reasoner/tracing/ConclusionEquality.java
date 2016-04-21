@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.tracing;
 import org.semanticweb.elk.owl.comparison.ElkObjectEquality;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxiom;
@@ -153,14 +153,14 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 	}
 
 	@Override
-	public Boolean visit(final IndexedDefinitionAxiom conclusion) {
+	public Boolean visit(final IndexedEquivalentClassesAxiom conclusion) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
-			public Boolean visit(IndexedDefinitionAxiom other) {
-				return equals(other.getDefinedClass(),
-						conclusion.getDefinedClass())
-						&& equals(other.getDefinition(),
-								conclusion.getDefinition());
+			public Boolean visit(IndexedEquivalentClassesAxiom other) {
+				return equals(other.getFirstMember(),
+						conclusion.getFirstMember())
+						&& equals(other.getSecondMember(),
+								conclusion.getSecondMember());
 			}
 		});
 	}

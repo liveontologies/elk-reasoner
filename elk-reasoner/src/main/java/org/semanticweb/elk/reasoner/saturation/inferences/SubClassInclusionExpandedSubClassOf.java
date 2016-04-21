@@ -56,43 +56,18 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * @author Yevgeny Kazakov
  */
 public class SubClassInclusionExpandedSubClassOf
-		extends AbstractSubClassInclusionDecomposedInference {
-
-	private final IndexedClassExpression premiseSubsumer_;
-
-	private final ElkAxiom reason_;
+		extends AbstractSubClassInclusionExpansionInference {
 
 	public SubClassInclusionExpandedSubClassOf(IndexedContextRoot inferenceRoot,
 			IndexedClassExpression premiseSubsumer,
-			IndexedClassExpression conclusion, ElkAxiom reason) {
-		super(inferenceRoot, conclusion);
-		this.premiseSubsumer_ = premiseSubsumer;
-		this.reason_ = reason;
-	}
-
-	public IndexedClassExpression getPremiseSubsumer() {
-		return this.premiseSubsumer_;
-	}
-
-	public ElkAxiom getReason() {
-		return reason_;
-	}
-
-	@Override
-	public IndexedContextRoot getOrigin() {
-		return getDestination();
-	}
-
-	public SubClassInclusionComposed getFirstPremise(
-			SubClassInclusionComposed.Factory factory) {
-		return factory.getSubClassInclusionComposed(getOrigin(),
-				premiseSubsumer_);
+			IndexedClassExpression conclusionSubsumer, ElkAxiom reason) {
+		super(inferenceRoot, premiseSubsumer, conclusionSubsumer, reason);
 	}
 
 	public IndexedSubClassOfAxiom getSecondPremise(
 			IndexedSubClassOfAxiom.Factory factory) {
-		return factory.getIndexedSubClassOfAxiom(reason_, premiseSubsumer_,
-				getSubsumer());
+		return factory.getIndexedSubClassOfAxiom(getReason(),
+				getPremiseSubsumer(), getConclusionSubsumer());
 	}
 
 	@Override

@@ -32,10 +32,10 @@ import org.semanticweb.elk.reasoner.indexing.model.ElkDifferentIndividualsAxiomN
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointClassesAxiomBinaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointClassesAxiomNaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomBinaryConversion;
-import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomDefinitionConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomNaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomSubClassConversion;
-import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomDefinitionConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomSubClassConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentObjectPropertiesAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkObjectPropertyAssertionAxiomConversion;
@@ -164,13 +164,13 @@ public class TracingInferenceConclusionVisitor<O> extends
 	}
 
 	@Override
-	public O visit(ElkDisjointUnionAxiomDefinitionConversion inference) {
+	public O visit(ElkDisjointUnionAxiomEquivalenceConversion inference) {
 		return conclusionVisitor_
 				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
-	public O visit(ElkEquivalentClassesAxiomDefinitionConversion inference) {
+	public O visit(ElkEquivalentClassesAxiomEquivalenceConversion inference) {
 		return conclusionVisitor_
 				.visit(inference.getConclusion(conclusionFactory_));
 	}

@@ -26,7 +26,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 
@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * A {@link ClassInference} producing a {@link SubClassInclusionDecomposed} from
  * a {@link SubClassInclusionDecomposed} with
  * {@link SubClassInclusionComposed#getSubsumer()} instance of
- * {@link IndexedClass} and an {@link IndexedDefinitionAxiom}:<br>
+ * {@link IndexedClass} and an {@link IndexedEquivalentClassesAxiom}:<br>
  * 
  * <pre>
  *     (1)      (2)
@@ -49,7 +49,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * A = {@link #getDefinedClass()}<br>
  * D = {@link #getDefinition()}<br>
  * 
- * @see IndexedDefinitionAxiom
+ * @see IndexedEquivalentClassesAxiom
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -86,9 +86,9 @@ public class SubClassInclusionExpandedDefinition
 		return factory.getSubClassInclusionDecomposed(getOrigin(), defined_);
 	}
 
-	public IndexedDefinitionAxiom getSecondPremise(
-			IndexedDefinitionAxiom.Factory factory) {
-		return factory.getIndexedDefinitionAxiom(reason_, defined_,
+	public IndexedEquivalentClassesAxiom getSecondPremise(
+			IndexedEquivalentClassesAxiom.Factory factory) {
+		return factory.getIndexedEquivalentClassesAxiom(reason_, defined_,
 				getSubsumer());
 	}
 

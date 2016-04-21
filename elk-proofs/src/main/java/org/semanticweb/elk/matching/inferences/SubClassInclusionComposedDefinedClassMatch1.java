@@ -25,8 +25,8 @@ package org.semanticweb.elk.matching.inferences;
 import org.semanticweb.elk.matching.ElkMatchException;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
-import org.semanticweb.elk.matching.conclusions.IndexedDefinitionAxiomMatch1;
-import org.semanticweb.elk.matching.conclusions.IndexedDefinitionAxiomMatch1Watch;
+import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1;
+import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionCompo
 
 public class SubClassInclusionComposedDefinedClassMatch1
 		extends AbstractInferenceMatch<SubClassInclusionComposedDefinedClass>
-		implements IndexedDefinitionAxiomMatch1Watch {
+		implements IndexedEquivalentClassesAxiomMatch1Watch {
 
 	private final IndexedContextRootMatch originMatch_;
 
@@ -75,9 +75,9 @@ public class SubClassInclusionComposedDefinedClassMatch1
 				definedClassMatch_);
 	}
 
-	public IndexedDefinitionAxiomMatch1 getSecondPremiseMatch(
+	public IndexedEquivalentClassesAxiomMatch1 getSecondPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getIndexedDefinitionAxiomMatch1(
+		return factory.getIndexedEquivalentClassesAxiomMatch1(
 				getParent().getSecondPremise(factory));
 	}
 
@@ -87,7 +87,7 @@ public class SubClassInclusionComposedDefinedClassMatch1
 	}
 
 	@Override
-	public <O> O accept(IndexedDefinitionAxiomMatch1Watch.Visitor<O> visitor) {
+	public <O> O accept(IndexedEquivalentClassesAxiomMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

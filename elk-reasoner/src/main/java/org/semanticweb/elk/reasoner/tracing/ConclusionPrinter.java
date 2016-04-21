@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
@@ -95,9 +95,9 @@ public class ConclusionPrinter implements Conclusion.Visitor<String> {
 	}
 
 	@Override
-	public String visit(IndexedDefinitionAxiom conclusion) {
-		return String.format("[%s = %s]", conclusion.getDefinedClass(),
-				conclusion.getDefinition());
+	public String visit(IndexedEquivalentClassesAxiom conclusion) {
+		return String.format("[%s = %s]", conclusion.getFirstMember(),
+				conclusion.getSecondMember());
 	}
 
 	@Override

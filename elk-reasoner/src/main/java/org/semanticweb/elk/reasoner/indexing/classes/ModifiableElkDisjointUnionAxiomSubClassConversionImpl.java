@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkDisjointUnionAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointUnionAxiomSubClassConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
@@ -53,13 +52,6 @@ class ModifiableElkDisjointUnionAxiomSubClassConversionImpl
 	@Override
 	public int getDisjunctPosition() {
 		return disjunctPosition_;
-	}
-
-	@Override
-	public IndexedSubClassOfAxiom getConclusion(
-			IndexedSubClassOfAxiom.Factory factory) {
-		return factory.getIndexedSubClassOfAxiom(getOriginalAxiom(),
-				getSubClass(), getSuperClass());
 	}
 
 	@Override

@@ -27,7 +27,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
@@ -77,7 +77,7 @@ public class DummyIndexedObjectVisitor<O> implements IndexedObject.Visitor<O> {
 	}
 
 	@Override
-	public O visit(IndexedDefinitionAxiom axiom) {
+	public O visit(IndexedEquivalentClassesAxiom axiom) {
 		return defaultVisit(axiom);
 	}
 

@@ -30,8 +30,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -53,6 +53,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ComposedFromDecom
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.EquivalentClassFirstFromSecondRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.EquivalentClassSecondFromFirstRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassFromDefinitionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
@@ -166,9 +168,8 @@ class RuleApplicationTimerVisitor<O> implements RuleVisitor<O> {
 	}
 
 	@Override
-	public O visit(ContradictionOverBackwardLinkRule rule,
-			BackwardLink premise, ContextPremises premises,
-			ClassInferenceProducer producer) {
+	public O visit(ContradictionOverBackwardLinkRule rule, BackwardLink premise,
+			ContextPremises premises, ClassInferenceProducer producer) {
 		timer_.timeContradictionOverBackwardLinkRule -= CachedTimeThread
 				.getCurrentTimeMillis();
 		O result = visitor_.visit(rule, premise, premises, producer);
@@ -178,8 +179,9 @@ class RuleApplicationTimerVisitor<O> implements RuleVisitor<O> {
 	}
 
 	@Override
-	public O visit(ContradictionPropagationRule rule, ClassInconsistency premise,
-			ContextPremises premises, ClassInferenceProducer producer) {
+	public O visit(ContradictionPropagationRule rule,
+			ClassInconsistency premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
 		timer_.timeContradictionPropagationRule -= CachedTimeThread
 				.getCurrentTimeMillis();
 		O result = visitor_.visit(rule, premise, premises, producer);
@@ -409,6 +411,30 @@ class RuleApplicationTimerVisitor<O> implements RuleVisitor<O> {
 				.getCurrentTimeMillis();
 		O result = visitor_.visit(rule, premise, premises, producer);
 		timer_.timeSuperClassFromSubClassRule += CachedTimeThread
+				.getCurrentTimeMillis();
+		return result;
+	}
+
+	@Override
+	public O visit(EquivalentClassFirstFromSecondRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		timer_.timeEquivalentClassFirstFromSecondRule -= CachedTimeThread
+				.getCurrentTimeMillis();
+		O result = visitor_.visit(rule, premise, premises, producer);
+		timer_.timeEquivalentClassFirstFromSecondRule += CachedTimeThread
+				.getCurrentTimeMillis();
+		return result;
+	}
+
+	@Override
+	public O visit(EquivalentClassSecondFromFirstRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		timer_.timeEquivalentClassSecondFromFirstRule -= CachedTimeThread
+				.getCurrentTimeMillis();
+		O result = visitor_.visit(rule, premise, premises, producer);
+		timer_.timeEquivalentClassSecondFromFirstRule += CachedTimeThread
 				.getCurrentTimeMillis();
 		return result;
 	}

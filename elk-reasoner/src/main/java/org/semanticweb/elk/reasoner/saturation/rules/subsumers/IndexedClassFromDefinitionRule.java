@@ -29,9 +29,10 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedDefinedClass;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
@@ -43,8 +44,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link ChainableSubsumerRule} producing {@link SubClassInclusion} for an
- * {@link IndexedClass} when processing its defined
+ * A {@link ChainableSubsumerRule} producing {@link SubClassInclusionComposed}
+ * for an {@link IndexedClass} when processing its defined
  * {@link IndexedClassExpression}
  * 
  * @author "Yevgeny Kazakov"
@@ -74,20 +75,30 @@ public class IndexedClassFromDefinitionRule extends
 		this.reasons_.add(reason);
 	}
 
-	public static boolean addRuleFor(ModifiableIndexedDefinitionAxiom axiom,
+	public static boolean addRuleFor(ModifiableIndexedEquivalentClassesAxiom axiom,
 			ModifiableOntologyIndex index, ElkAxiom reason) {
-		return index.add(axiom.getDefinition(),
-				new IndexedClassFromDefinitionRule(axiom.getDefinedClass(),
-						reason));
+		ModifiableIndexedClass definedClass = IndexedClassDecompositionRule.getDefinedClass(axiom);
+		if (definedClass == null) {
+			return false;
+		}
+		// else
+		return index.add(axiom.getSecondMember(),
+				new IndexedClassFromDefinitionRule(definedClass, reason));
 	}
 
-	public static boolean removeRuleFor(ModifiableIndexedDefinitionAxiom axiom,
+	public static boolean removeRuleFor(ModifiableIndexedEquivalentClassesAxiom axiom,
 			ModifiableOntologyIndex index, ElkAxiom reason) {
-		return index.remove(axiom.getDefinition(),
-				new IndexedClassFromDefinitionRule(axiom.getDefinedClass(),
-						reason));
+		ModifiableIndexedClass definedClass = IndexedClassDecompositionRule.getDefinedClass(axiom);
+		if (definedClass == null) {
+			return false;
+		}
+		// else
+		return index.remove(axiom.getSecondMember(),
+				new IndexedClassFromDefinitionRule(definedClass, reason));
 	}
 
+	
+	
 	@Override
 	public String toString() {
 		return NAME;

@@ -53,6 +53,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ComposedFromDecom
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.EquivalentClassFirstFromSecondRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.EquivalentClassSecondFromFirstRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassFromDefinitionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
@@ -137,6 +139,20 @@ public class DelegatingRuleVisitor<O> implements RuleVisitor<O> {
 
 	@Override
 	public O visit(DisjointSubsumerFromMemberRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		return visitor_.visit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(EquivalentClassFirstFromSecondRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		return visitor_.visit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public O visit(EquivalentClassSecondFromFirstRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
 			ClassInferenceProducer producer) {
 		return visitor_.visit(rule, premise, premises, producer);

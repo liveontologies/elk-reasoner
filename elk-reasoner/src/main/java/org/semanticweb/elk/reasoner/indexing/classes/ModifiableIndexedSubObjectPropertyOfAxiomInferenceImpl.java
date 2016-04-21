@@ -50,7 +50,7 @@ abstract class ModifiableIndexedSubObjectPropertyOfAxiomInferenceImpl<A extends 
 	}
 	
 	@Override
-	public IndexedSubObjectPropertyOfAxiom getConclusion(
+	public final IndexedSubObjectPropertyOfAxiom getConclusion(
 			IndexedSubObjectPropertyOfAxiom.Factory factory) {
 		return factory.getIndexedSubObjectPropertyOfAxiom(getOriginalAxiom(),
 				getSubPropertyChain(), getSuperProperty());

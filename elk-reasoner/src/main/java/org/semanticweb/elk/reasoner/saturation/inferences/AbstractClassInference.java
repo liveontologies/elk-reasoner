@@ -41,19 +41,19 @@ abstract class AbstractClassInference implements ClassInference {
 	}
 
 	@Override
-	public IndexedContextRoot getDestination() {
+	public final IndexedContextRoot getDestination() {
 		return this.destination_;
 	}
 
 	@Override
-	public IndexedContextRoot getTraceRoot() {
+	public final IndexedContextRoot getTraceRoot() {
 		return this.destination_;
 	}
 
 	// we assume that different objects represent different inferences
 	
 	@Override
-	public String toString() {
+	public final String toString() {
 		return TracingInferencePrinter.toString(this);		
 	}
 

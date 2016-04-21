@@ -26,8 +26,8 @@ import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch2;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2;
-import org.semanticweb.elk.matching.conclusions.IndexedDefinitionAxiomMatch1;
-import org.semanticweb.elk.matching.conclusions.IndexedDefinitionAxiomMatch2;
+import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1;
+import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch2;
 import org.semanticweb.elk.matching.conclusions.IndexedObjectPropertyRangeAxiomMatch2;
 import org.semanticweb.elk.matching.conclusions.IndexedSubClassOfAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedSubClassOfAxiomMatch2;
@@ -48,7 +48,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ElkDifferentIndividualsAxiomB
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointClassesAxiomBinaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomBinaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomSubClassConversion;
-import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomDefinitionConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomSubClassConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkObjectPropertyAssertionAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkObjectPropertyDomainAxiomConversion;
@@ -74,6 +74,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionCompo
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecomposedFirstConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecomposedSecondConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedDefinition;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedFirstEquivalentClass;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSecondEquivalentClass;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSubClassOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionObjectHasSelfPropertyRange;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionOwlThing;
@@ -259,11 +261,11 @@ public class InferenceMatchDelegatingFactory implements InferenceMatch.Factory {
 	}
 
 	@Override
-	public ElkEquivalentClassesAxiomDefinitionConversionMatch1 getElkEquivalentClassesAxiomDefinitionConversionMatch1(
-			ElkEquivalentClassesAxiomDefinitionConversion parent,
-			IndexedDefinitionAxiomMatch1 conclusionMatch) {
+	public ElkEquivalentClassesAxiomEquivalenceConversionMatch1 getElkEquivalentClassesAxiomEquivalenceConversionMatch1(
+			ElkEquivalentClassesAxiomEquivalenceConversion parent,
+			IndexedEquivalentClassesAxiomMatch1 conclusionMatch) {
 		return filter(mainFactory_
-				.getElkEquivalentClassesAxiomDefinitionConversionMatch1(parent,
+				.getElkEquivalentClassesAxiomEquivalenceConversionMatch1(parent,
 						conclusionMatch));
 	}
 
@@ -467,7 +469,7 @@ public class InferenceMatchDelegatingFactory implements InferenceMatch.Factory {
 	@Override
 	public SubClassInclusionComposedDefinedClassMatch2 getSubClassInclusionComposedDefinedClassMatch2(
 			SubClassInclusionComposedDefinedClassMatch1 parent,
-			IndexedDefinitionAxiomMatch2 secondPremiseMatch) {
+			IndexedEquivalentClassesAxiomMatch2 secondPremiseMatch) {
 		return filter(
 				mainFactory_.getSubClassInclusionComposedDefinedClassMatch2(
 						parent, secondPremiseMatch));
@@ -573,9 +575,45 @@ public class InferenceMatchDelegatingFactory implements InferenceMatch.Factory {
 	@Override
 	public SubClassInclusionExpandedDefinitionMatch2 getSubClassInclusionExpandedDefinitionMatch2(
 			SubClassInclusionExpandedDefinitionMatch1 parent,
-			IndexedDefinitionAxiomMatch2 secondPremiseMatch) {
+			IndexedEquivalentClassesAxiomMatch2 secondPremiseMatch) {
 		return filter(mainFactory_.getSubClassInclusionExpandedDefinitionMatch2(
 				parent, secondPremiseMatch));
+	}
+
+	@Override
+	public SubClassInclusionExpandedFirstEquivalentClassMatch1 getSubClassInclusionExpandedFirstEquivalentClassMatch1(
+			SubClassInclusionExpandedFirstEquivalentClass parent,
+			SubClassInclusionDecomposedMatch1 conclusionMatch) {
+		return filter(mainFactory_
+				.getSubClassInclusionExpandedFirstEquivalentClassMatch1(parent,
+						conclusionMatch));
+	}
+
+	@Override
+	public SubClassInclusionExpandedFirstEquivalentClassMatch2 getSubClassInclusionExpandedFirstEquivalentClassMatch2(
+			SubClassInclusionExpandedFirstEquivalentClassMatch1 parent,
+			IndexedEquivalentClassesAxiomMatch2 secondPremiseMatch) {
+		return filter(mainFactory_
+				.getSubClassInclusionExpandedFirstEquivalentClassMatch2(parent,
+						secondPremiseMatch));
+	}
+
+	@Override
+	public SubClassInclusionExpandedSecondEquivalentClassMatch1 getSubClassInclusionExpandedSecondEquivalentClassMatch1(
+			SubClassInclusionExpandedSecondEquivalentClass parent,
+			SubClassInclusionDecomposedMatch1 conclusionMatch) {
+		return filter(mainFactory_
+				.getSubClassInclusionExpandedSecondEquivalentClassMatch1(parent,
+						conclusionMatch));
+	}
+
+	@Override
+	public SubClassInclusionExpandedSecondEquivalentClassMatch2 getSubClassInclusionExpandedSecondEquivalentClassMatch2(
+			SubClassInclusionExpandedSecondEquivalentClassMatch1 parent,
+			IndexedEquivalentClassesAxiomMatch2 secondPremiseMatch) {
+		return filter(mainFactory_
+				.getSubClassInclusionExpandedSecondEquivalentClassMatch2(parent,
+						secondPremiseMatch));
 	}
 
 	@Override

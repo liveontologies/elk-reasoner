@@ -62,10 +62,10 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDifferentIndivid
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointClassesAxiomBinaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointClassesAxiomNaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointUnionAxiomBinaryConversion;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointUnionAxiomDefinitionConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointUnionAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointUnionAxiomNaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointUnionAxiomSubClassConversion;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkEquivalentClassesAxiomDefinitionConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkEquivalentClassesAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkEquivalentClassesAxiomSubClassConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkEquivalentObjectPropertiesAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkObjectPropertyAssertionAxiomConversion;
@@ -234,11 +234,11 @@ public class BaseModifiableIndexedObjectFactory
 	}
 
 	@Override
-	public ModifiableElkDisjointUnionAxiomDefinitionConversion getElkDisjointUnionAxiomDefinitionConversion(
+	public ModifiableElkDisjointUnionAxiomEquivalenceConversion getElkDisjointUnionAxiomEquivalenceConversion(
 			ElkDisjointUnionAxiom originalAxiom,
 			ModifiableIndexedClass definedClass,
 			ModifiableIndexedClassExpression definition) {
-		return new ModifiableElkDisjointUnionAxiomDefinitionConversionImpl(
+		return new ModifiableElkDisjointUnionAxiomEquivalenceConversionImpl(
 				originalAxiom, definedClass, definition);
 	}
 
@@ -260,13 +260,13 @@ public class BaseModifiableIndexedObjectFactory
 	}
 
 	@Override
-	public ModifiableElkEquivalentClassesAxiomDefinitionConversion getElkEquivalentClassesAxiomDefinitionConversion(
-			ElkEquivalentClassesAxiom originalAxiom, int definedClassPosition,
-			int definitionPosition, ModifiableIndexedClass definedClass,
-			ModifiableIndexedClassExpression definition) {
-		return new ModifiableElkEquivalentClassesAxiomDefinitionConversionImpl(
-				originalAxiom, definedClassPosition, definitionPosition,
-				definedClass, definition);
+	public ModifiableElkEquivalentClassesAxiomEquivalenceConversion getElkEquivalentClassesAxiomEquivalenceConversion(
+			ElkEquivalentClassesAxiom originalAxiom, int firstMemberPosition,
+			int secondMemberPosition, ModifiableIndexedClassExpression firstMember,
+			ModifiableIndexedClassExpression secondMember) {
+		return new ModifiableElkEquivalentClassesAxiomEquivalenceConversionImpl(
+				originalAxiom, firstMemberPosition, secondMemberPosition,
+				firstMember, secondMember);
 	}
 
 	@Override

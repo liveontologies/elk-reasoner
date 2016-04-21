@@ -23,7 +23,7 @@ package org.semanticweb.elk.matching.inferences;
  */
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.IndexedDefinitionAxiomMatch2;
+import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch2;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 
@@ -34,9 +34,9 @@ public class SubClassInclusionComposedDefinedClassMatch2 extends
 
 	SubClassInclusionComposedDefinedClassMatch2(
 			SubClassInclusionComposedDefinedClassMatch1 parent,
-			IndexedDefinitionAxiomMatch2 secondPremiseMatch) {
+			IndexedEquivalentClassesAxiomMatch2 secondPremiseMatch) {
 		super(parent);
-		this.definitionMatch_ = secondPremiseMatch.getDefinitionMatch();
+		this.definitionMatch_ = secondPremiseMatch.getSecondMemberMatch();
 	}
 
 	public ElkClassExpression getDefinitionMatch() {
@@ -79,7 +79,7 @@ public class SubClassInclusionComposedDefinedClassMatch2 extends
 
 		SubClassInclusionComposedDefinedClassMatch2 getSubClassInclusionComposedDefinedClassMatch2(
 				SubClassInclusionComposedDefinedClassMatch1 parent,
-				IndexedDefinitionAxiomMatch2 secondPremiseMatch);
+				IndexedEquivalentClassesAxiomMatch2 secondPremiseMatch);
 
 	}
 

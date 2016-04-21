@@ -24,43 +24,39 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
 
 /**
- * Implements {@link IndexedDefinitionAxiom}
+ * Implements {@link IndexedEquivalentClassesAxiom}
  * 
  * @author Yevgeny Kazakov
  *
  * @param <A>
- *            the type of the defined class originates
- * @param <E>
- *            the type of the definition
+ *            the type of the {@link ElkAxiom} from which this axiom originates
+ * @param <C>
+ *            the type of the members
  */
-class IndexedDefinitionAxiomImpl<A extends ElkAxiom, C extends IndexedClass, D extends IndexedClassExpression>
-		extends
-			IndexedAxiomImpl<A>
-		implements IndexedDefinitionAxiom {
+class IndexedEquivalentClassesAxiomImpl<A extends ElkAxiom, C extends IndexedClassExpression>
+		extends IndexedAxiomImpl<A> implements IndexedEquivalentClassesAxiom {
 
-	private final C definedClass_;
-	private final D definition_;
+	private final C firstMember_, secondMember_;
 
-	protected IndexedDefinitionAxiomImpl(A originalAxiom, C definedClass,
-			D definition) {
+	protected IndexedEquivalentClassesAxiomImpl(A originalAxiom, C firstMember,
+			C secondMember) {
 		super(originalAxiom);
-		this.definedClass_ = definedClass;
-		this.definition_ = definition;
+		this.firstMember_ = firstMember;
+		this.secondMember_ = secondMember;
 	}
 
 	@Override
-	public C getDefinedClass() {
-		return this.definedClass_;
+	public C getFirstMember() {
+		return this.firstMember_;
 	}
 
 	@Override
-	public D getDefinition() {
-		return this.definition_;
+	public C getSecondMember() {
+		return this.secondMember_;
 	}
 
 	@Override

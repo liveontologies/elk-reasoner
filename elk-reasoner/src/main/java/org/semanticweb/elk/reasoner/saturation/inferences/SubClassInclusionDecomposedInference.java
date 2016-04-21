@@ -44,9 +44,12 @@ public interface SubClassInclusionDecomposedInference
 	 *            the type of the output
 	 */
 	public static interface Visitor<O>
-			extends SubClassInclusionDecomposedFirstConjunct.Visitor<O>,
+			extends
+			SubClassInclusionDecomposedFirstConjunct.Visitor<O>,
 			SubClassInclusionDecomposedSecondConjunct.Visitor<O>,
 			SubClassInclusionExpandedDefinition.Visitor<O>,
+			SubClassInclusionExpandedFirstEquivalentClass.Visitor<O>,
+			SubClassInclusionExpandedSecondEquivalentClass.Visitor<O>,
 			SubClassInclusionExpandedSubClassOf.Visitor<O>,
 			SubClassInclusionObjectHasSelfPropertyRange.Visitor<O>,
 			SubClassInclusionRange.Visitor<O>,

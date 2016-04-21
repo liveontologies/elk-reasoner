@@ -22,33 +22,18 @@ package org.semanticweb.elk.reasoner.indexing.model;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkDisjointUnionAxiom;
-
 /**
- * An {@link ElkDisjointUnionAxiomDefinitionConversion} that can be modified as
- * a result of updating the {@link ModifiableOntologyIndex} where this object is
- * stored.
+ * An {@link IndexedEquivalentClassesAxiomInference} that can be modified as a result
+ * of updating the {@link ModifiableOntologyIndex} where this object is stored.
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface ModifiableElkDisjointUnionAxiomDefinitionConversion
+public interface ModifiableIndexedEquivalentClassesAxiomInference
 		extends
-			ElkDisjointUnionAxiomDefinitionConversion,
-			ModifiableIndexedDefinitionAxiomInference {
+			ModifiableIndexedAxiomInference,
+			IndexedEquivalentClassesAxiomInference,
+			ModifiableIndexedEquivalentClassesAxiom {
 
-	/**
-	 * A factory for creating instances
-	 * 
-	 * @author Yevgeny Kazakov
-	 *
-	 */
-	interface Factory {
-		
-		ModifiableElkDisjointUnionAxiomDefinitionConversion getElkDisjointUnionAxiomDefinitionConversion(
-				ElkDisjointUnionAxiom originalAxiom,
-				ModifiableIndexedClass definedClass,
-				ModifiableIndexedClassExpression definition);
-		
-	}
+	// combined interfaces
 
 }

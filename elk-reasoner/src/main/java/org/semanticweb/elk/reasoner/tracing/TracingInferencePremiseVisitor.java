@@ -34,10 +34,10 @@ import org.semanticweb.elk.reasoner.indexing.model.ElkDifferentIndividualsAxiomN
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointClassesAxiomBinaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointClassesAxiomNaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomBinaryConversion;
-import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomDefinitionConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomNaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomSubClassConversion;
-import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomDefinitionConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomSubClassConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentObjectPropertiesAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkObjectPropertyAssertionAxiomConversion;
@@ -71,6 +71,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionCompo
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecomposedFirstConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecomposedSecondConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedDefinition;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedFirstEquivalentClass;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSecondEquivalentClass;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSubClassOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionObjectHasSelfPropertyRange;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionOwlThing;
@@ -82,9 +84,10 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubProperty
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainTautology;
 
 /**
- * Visits all {@link Conclusion} premises of the visited {@link TracingInference}s
- * using the provided {@link Conclusion.Visitor}; additionally, visits all
- * {@link ElkAxiom} premises using the provided {@link ElkAxiomVisitor}
+ * Visits all {@link Conclusion} premises of the visited
+ * {@link TracingInference}s using the provided {@link Conclusion.Visitor};
+ * additionally, visits all {@link ElkAxiom} premises using the provided
+ * {@link ElkAxiomVisitor}
  * 
  * @author Pavel Klinov
  * 
@@ -95,13 +98,14 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubProperty
  * @param <O>
  *            the type of the output
  */
-public class TracingInferencePremiseVisitor<O> implements TracingInference.Visitor<O> {
+public class TracingInferencePremiseVisitor<O>
+		implements TracingInference.Visitor<O> {
+
+	private final ElkAxiomVisitor<?> axiomVisitor_;
 
 	private final Conclusion.Factory conclusionFactory_;
 
 	private final Conclusion.Visitor<?> conclusionVisitor_;
-
-	private final ElkAxiomVisitor<?> axiomVisitor_;
 
 	public TracingInferencePremiseVisitor(Conclusion.Factory conclusionFactory,
 			Conclusion.Visitor<?> conclusionVisitor,
@@ -111,7 +115,8 @@ public class TracingInferencePremiseVisitor<O> implements TracingInference.Visit
 		this.axiomVisitor_ = axiomVisitor;
 	}
 
-	public TracingInferencePremiseVisitor(Conclusion.Visitor<?> conclusionVisitor,
+	public TracingInferencePremiseVisitor(
+			Conclusion.Visitor<?> conclusionVisitor,
 			ElkAxiomVisitor<?> axiomVisitor) {
 		this(new ConclusionBaseFactory(), conclusionVisitor, axiomVisitor);
 	}
@@ -155,12 +160,6 @@ public class TracingInferencePremiseVisitor<O> implements TracingInference.Visit
 	}
 
 	@Override
-	public O visit(ContextInitializationNoPremises inference) {
-		// no premises
-		return null;
-	}
-
-	@Override
 	public O visit(ClassInconsistencyOfDisjointSubsumers inference) {
 		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
 		conclusionVisitor_
@@ -188,6 +187,12 @@ public class TracingInferencePremiseVisitor<O> implements TracingInference.Visit
 		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
 		conclusionVisitor_
 				.visit(inference.getSecondPremise(conclusionFactory_));
+		return null;
+	}
+
+	@Override
+	public O visit(ContextInitializationNoPremises inference) {
+		// no premises
 		return null;
 	}
 
@@ -242,7 +247,7 @@ public class TracingInferencePremiseVisitor<O> implements TracingInference.Visit
 	}
 
 	@Override
-	public O visit(ElkDisjointUnionAxiomDefinitionConversion inference) {
+	public O visit(ElkDisjointUnionAxiomEquivalenceConversion inference) {
 		axiomVisitor_.visit(inference.getOriginalAxiom());
 		return null;
 	}
@@ -260,7 +265,7 @@ public class TracingInferencePremiseVisitor<O> implements TracingInference.Visit
 	}
 
 	@Override
-	public O visit(ElkEquivalentClassesAxiomDefinitionConversion inference) {
+	public O visit(ElkEquivalentClassesAxiomEquivalenceConversion inference) {
 		axiomVisitor_.visit(inference.getOriginalAxiom());
 		return null;
 	}
@@ -422,6 +427,22 @@ public class TracingInferencePremiseVisitor<O> implements TracingInference.Visit
 	}
 
 	@Override
+	public O visit(SubClassInclusionExpandedFirstEquivalentClass inference) {
+		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
+		conclusionVisitor_
+				.visit(inference.getSecondPremise(conclusionFactory_));
+		return null;
+	}
+
+	@Override
+	public O visit(SubClassInclusionExpandedSecondEquivalentClass inference) {
+		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
+		conclusionVisitor_
+				.visit(inference.getSecondPremise(conclusionFactory_));
+		return null;
+	}
+
+	@Override
 	public O visit(SubClassInclusionExpandedSubClassOf inference) {
 		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
 		conclusionVisitor_
@@ -464,10 +485,10 @@ public class TracingInferencePremiseVisitor<O> implements TracingInference.Visit
 	}
 
 	@Override
-	public O visit(SubPropertyChainExpandedSubObjectPropertyOf inference) {		
+	public O visit(SubPropertyChainExpandedSubObjectPropertyOf inference) {
+		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
 		conclusionVisitor_
-				.visit(inference.getFirstPremise(conclusionFactory_));
-		conclusionVisitor_.visit(inference.getSecondPremise(conclusionFactory_));
+				.visit(inference.getSecondPremise(conclusionFactory_));
 		return null;
 	}
 

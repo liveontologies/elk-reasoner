@@ -50,17 +50,17 @@ abstract class AbstractClassInconsistencyOfInconsistentSubsumerInference<S exten
 	}
 
 	@Override
-	public IndexedContextRoot getOrigin() {
+	public final IndexedContextRoot getOrigin() {
 		return getDestination();
 	}
 
-	public SubClassInclusionComposed getPremise(
+	public final SubClassInclusionComposed getPremise(
 			SubClassInclusionComposed.Factory factory) {
 		return factory.getSubClassInclusionComposed(getOrigin(),
 				premiseSubsumer_);
 	}
 
-	protected S getPremiseSubsumer() {
+	final S getPremiseSubsumer() {
 		return this.premiseSubsumer_;
 	}
 

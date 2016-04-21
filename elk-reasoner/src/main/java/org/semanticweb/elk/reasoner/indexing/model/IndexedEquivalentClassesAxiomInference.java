@@ -26,11 +26,11 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 
 /**
  * Represents a transformation of an {@link ElkAxiom} to an
- * {@link IndexedDefinitionAxiom}.
+ * {@link IndexedEquivalentClassesAxiom}.
  * 
  * @author Yevgeny Kazakov
  */
-public interface IndexedDefinitionAxiomInference extends IndexedAxiomInference {
+public interface IndexedEquivalentClassesAxiomInference extends IndexedAxiomInference {
 
 	/**
 	 * @param factory
@@ -38,7 +38,7 @@ public interface IndexedDefinitionAxiomInference extends IndexedAxiomInference {
 	 * 
 	 * @return the conclusion produced by this inference
 	 */
-	public IndexedDefinitionAxiom getConclusion(IndexedDefinitionAxiom.Factory factory);
+	public IndexedEquivalentClassesAxiom getConclusion(IndexedEquivalentClassesAxiom.Factory factory);
 
 	/**
 	 * The visitor pattern for instances
@@ -49,8 +49,8 @@ public interface IndexedDefinitionAxiomInference extends IndexedAxiomInference {
 	 *            the type of the output
 	 */
 	interface Visitor<O>
-			extends ElkDisjointUnionAxiomDefinitionConversion.Visitor<O>,
-			ElkEquivalentClassesAxiomDefinitionConversion.Visitor<O> {
+			extends ElkDisjointUnionAxiomEquivalenceConversion.Visitor<O>,
+			ElkEquivalentClassesAxiomEquivalenceConversion.Visitor<O> {
 
 		// combined interface
 

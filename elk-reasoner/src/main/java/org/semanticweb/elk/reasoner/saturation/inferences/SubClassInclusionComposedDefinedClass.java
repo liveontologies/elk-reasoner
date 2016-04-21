@@ -29,12 +29,12 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 
 /**
  * A {@link ClassInference} producing a {@link SubClassInclusionComposed} from a
- * {@link SubClassInclusionComposed} and {@link IndexedDefinitionAxiom}:<br>
+ * {@link SubClassInclusionComposed} and {@link IndexedEquivalentClassesAxiom}:<br>
  * 
  * <pre>
  *     (1)      (2)
@@ -84,9 +84,9 @@ public class SubClassInclusionComposedDefinedClass
 		return factory.getSubClassInclusionComposed(getOrigin(), definition_);
 	}
 
-	public IndexedDefinitionAxiom getSecondPremise(
-			IndexedDefinitionAxiom.Factory factory) {
-		return factory.getIndexedDefinitionAxiom(reason_, getSubsumer(),
+	public IndexedEquivalentClassesAxiom getSecondPremise(
+			IndexedEquivalentClassesAxiom.Factory factory) {
+		return factory.getIndexedEquivalentClassesAxiom(reason_, getSubsumer(),
 				definition_);
 	}
 

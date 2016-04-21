@@ -57,7 +57,7 @@ public interface IndexedAxiomInference extends TracingInference {
 			extends
 				IndexedDisjointClassesAxiomInference.Visitor<O>,
 				IndexedSubClassOfAxiomInference.Visitor<O>,
-				IndexedDefinitionAxiomInference.Visitor<O>,
+				IndexedEquivalentClassesAxiomInference.Visitor<O>,
 				IndexedSubObjectPropertyOfAxiomInference.Visitor<O>,
 				IndexedObjectPropertyRangeAxiomInference.Visitor<O>,
 				IndexedDeclarationAxiomInference.Visitor<O> {

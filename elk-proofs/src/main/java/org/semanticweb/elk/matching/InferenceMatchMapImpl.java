@@ -29,8 +29,8 @@ import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatch;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1Watch;
-import org.semanticweb.elk.matching.conclusions.IndexedDefinitionAxiomMatch1;
-import org.semanticweb.elk.matching.conclusions.IndexedDefinitionAxiomMatch1Watch;
+import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1;
+import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.IndexedObjectPropertyRangeAxiomMatch1;
@@ -52,8 +52,8 @@ import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1Watch;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiomInference;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiomInference;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxiom;
@@ -114,8 +114,8 @@ class InferenceMatchMapImpl
 	}
 
 	@Override
-	public void add(IndexedDefinitionAxiomMatch1 conclusion,
-			IndexedDefinitionAxiomMatch1Watch inference) {
+	public void add(IndexedEquivalentClassesAxiomMatch1 conclusion,
+			IndexedEquivalentClassesAxiomMatch1Watch inference) {
 		watchedInferences_.add(conclusion, inference);
 
 	}
@@ -218,16 +218,16 @@ class InferenceMatchMapImpl
 	}
 
 	@Override
-	public Iterable<? extends IndexedDefinitionAxiomInference> get(
-			IndexedDefinitionAxiom conclusion) {
-		return (Iterable<? extends IndexedDefinitionAxiomInference>) inferences_
+	public Iterable<? extends IndexedEquivalentClassesAxiomInference> get(
+			IndexedEquivalentClassesAxiom conclusion) {
+		return (Iterable<? extends IndexedEquivalentClassesAxiomInference>) inferences_
 				.getInferences(conclusion);
 	}
 
 	@Override
-	public Iterable<? extends IndexedDefinitionAxiomMatch1Watch> get(
-			IndexedDefinitionAxiomMatch1 conclusion) {
-		return (Collection<? extends IndexedDefinitionAxiomMatch1Watch>) getWatchInferences(
+	public Iterable<? extends IndexedEquivalentClassesAxiomMatch1Watch> get(
+			IndexedEquivalentClassesAxiomMatch1 conclusion) {
+		return (Collection<? extends IndexedEquivalentClassesAxiomMatch1Watch>) getWatchInferences(
 				conclusion);
 	}
 

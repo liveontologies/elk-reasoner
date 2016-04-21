@@ -29,10 +29,10 @@ import org.semanticweb.elk.reasoner.indexing.model.ElkDifferentIndividualsAxiomN
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointClassesAxiomBinaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointClassesAxiomNaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomBinaryConversion;
-import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomDefinitionConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomNaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomSubClassConversion;
-import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomDefinitionConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomSubClassConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentObjectPropertiesAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkObjectPropertyAssertionAxiomConversion;
@@ -66,6 +66,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionCompo
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecomposedFirstConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecomposedSecondConjunct;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedDefinition;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedFirstEquivalentClass;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSecondEquivalentClass;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedSubClassOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionObjectHasSelfPropertyRange;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionOwlThing;
@@ -80,215 +82,18 @@ public class TracingInferencePrinter implements TracingInference.Visitor<String>
 
 	private static TracingInferencePrinter INSTANCE_ = new TracingInferencePrinter();
 
-	private TracingInferencePrinter() {
-
+	static TracingInference.Visitor<String> getPrinterVisitor() {
+		return INSTANCE_;
 	}
 
 	public static String toString(TracingInference inference) {
 		return inference.accept(INSTANCE_);
 	}
 
-	static TracingInference.Visitor<String> getPrinterVisitor() {
-		return INSTANCE_;
-	}
-
 	private final Conclusion.Factory factory_ = new ConclusionBaseFactory();
 
-	@Override
-	public String visit(ElkDifferentIndividualsAxiomNaryConversion inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getOriginalAxiom());
-	}
+	private TracingInferencePrinter() {
 
-	@Override
-	public String visit(ElkDisjointClassesAxiomNaryConversion inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getOriginalAxiom());
-	}
-
-	@Override
-	public String visit(ElkDisjointUnionAxiomNaryConversion inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getOriginalAxiom());
-	}
-
-	@Override
-	public String visit(ElkClassAssertionAxiomConversion inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getOriginalAxiom());
-	}
-
-	@Override
-	public String visit(
-			ElkDifferentIndividualsAxiomBinaryConversion inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getOriginalAxiom());
-	}
-
-	@Override
-	public String visit(ElkDisjointClassesAxiomBinaryConversion inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getOriginalAxiom());
-	}
-
-	@Override
-	public String visit(ElkDisjointUnionAxiomSubClassConversion inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getOriginalAxiom());
-	}
-
-	@Override
-	public String visit(ElkDisjointUnionAxiomBinaryConversion inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getOriginalAxiom());
-	}
-
-	@Override
-	public String visit(ElkEquivalentClassesAxiomSubClassConversion inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getOriginalAxiom());
-	}
-
-	@Override
-	public String visit(ElkObjectPropertyAssertionAxiomConversion inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getOriginalAxiom());
-	}
-
-	@Override
-	public String visit(ElkObjectPropertyDomainAxiomConversion inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getOriginalAxiom());
-	}
-
-	@Override
-	public String visit(ElkReflexiveObjectPropertyAxiomConversion inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getOriginalAxiom());
-	}
-
-	@Override
-	public String visit(ElkSameIndividualAxiomConversion inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getOriginalAxiom());
-	}
-
-	@Override
-	public String visit(ElkSubClassOfAxiomConversion inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getOriginalAxiom());
-	}
-
-	@Override
-	public String visit(ElkDisjointUnionAxiomDefinitionConversion inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getOriginalAxiom());
-	}
-
-	@Override
-	public String visit(
-			ElkEquivalentClassesAxiomDefinitionConversion inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getOriginalAxiom());
-	}
-
-	@Override
-	public String visit(
-			ElkEquivalentObjectPropertiesAxiomConversion inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getOriginalAxiom());
-	}
-
-	@Override
-	public String visit(ElkSubObjectPropertyOfAxiomConversion inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getOriginalAxiom());
-	}
-
-	@Override
-	public String visit(ElkTransitiveObjectPropertyAxiomConversion inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getOriginalAxiom());
-	}
-
-	@Override
-	public String visit(ElkObjectPropertyRangeAxiomConversion inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getOriginalAxiom());
-	}
-
-	@Override
-	public String visit(ElkDeclarationAxiomConversion inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getOriginalAxiom());
-	}
-
-	@Override
-	public String visit(ClassInconsistencyOfOwlNothing inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getPremise(factory_));
-	}
-
-	@Override
-	public String visit(ClassInconsistencyOfDisjointSubsumers inference) {
-		return String.format("%s -| %s; %s; %s",
-				inference.getConclusion(factory_),
-				inference.getFirstPremise(factory_),
-				inference.getSecondPremise(factory_),
-				inference.getThirdPremise(factory_));
-	}
-
-	@Override
-	public String visit(ClassInconsistencyOfObjectComplementOf inference) {
-		return String.format("%s -| %s; %s", inference.getConclusion(factory_),
-				inference.getFirstPremise(factory_),
-				inference.getSecondPremise(factory_));
-	}
-
-	@Override
-	public String visit(ClassInconsistencyPropagated inference) {
-		return String.format("%s -| %s; %s", inference.getConclusion(factory_),
-				inference.getFirstPremise(factory_),
-				inference.getSecondPremise(factory_));
-	}
-
-	@Override
-	public String visit(DisjointSubsumerFromSubsumer inference) {
-		return String.format("%s -| %s; %s", inference.getConclusion(factory_),
-				inference.getFirstPremise(factory_),
-				inference.getSecondPremise(factory_));
-	}
-
-	@Override
-	public String visit(ForwardLinkComposition inference) {
-		return String.format("%s -| %s; %s; %s; %s",
-				inference.getConclusion(factory_),
-				inference.getFirstPremise(factory_),
-				inference.getSecondPremise(factory_),
-				inference.getThirdPremise(factory_),
-				inference.getFourthPremise(factory_));
-	}
-
-	@Override
-	public String visit(ForwardLinkOfObjectHasSelf inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getPremise(factory_));
-	}
-
-	@Override
-	public String visit(ForwardLinkOfObjectSomeValuesFrom inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getPremise(factory_));
-	}
-
-	@Override
-	public String visit(ContextInitializationNoPremises inference) {
-		return String.format("%s -|", inference.getConclusion(factory_));
-	}
-
-	@Override
-	public String visit(SubContextInitializationNoPremises inference) {
-		return String.format("%s -|", inference.getConclusion(factory_));
 	}
 
 	@Override
@@ -328,12 +133,211 @@ public class TracingInferencePrinter implements TracingInference.Visitor<String>
 	}
 
 	@Override
+	public String visit(ClassInconsistencyOfDisjointSubsumers inference) {
+		return String.format("%s -| %s; %s; %s",
+				inference.getConclusion(factory_),
+				inference.getFirstPremise(factory_),
+				inference.getSecondPremise(factory_),
+				inference.getThirdPremise(factory_));
+	}
+
+	@Override
+	public String visit(ClassInconsistencyOfObjectComplementOf inference) {
+		return String.format("%s -| %s; %s", inference.getConclusion(factory_),
+				inference.getFirstPremise(factory_),
+				inference.getSecondPremise(factory_));
+	}
+
+	@Override
+	public String visit(ClassInconsistencyOfOwlNothing inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getPremise(factory_));
+	}
+
+	@Override
+	public String visit(ClassInconsistencyPropagated inference) {
+		return String.format("%s -| %s; %s", inference.getConclusion(factory_),
+				inference.getFirstPremise(factory_),
+				inference.getSecondPremise(factory_));
+	}
+
+	@Override
+	public String visit(ContextInitializationNoPremises inference) {
+		return String.format("%s -|", inference.getConclusion(factory_));
+	}
+
+	@Override
+	public String visit(DisjointSubsumerFromSubsumer inference) {
+		return String.format("%s -| %s; %s", inference.getConclusion(factory_),
+				inference.getFirstPremise(factory_),
+				inference.getSecondPremise(factory_));
+	}
+
+	@Override
+	public String visit(ElkClassAssertionAxiomConversion inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getOriginalAxiom());
+	}
+
+	@Override
+	public String visit(ElkDeclarationAxiomConversion inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getOriginalAxiom());
+	}
+
+	@Override
+	public String visit(
+			ElkDifferentIndividualsAxiomBinaryConversion inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getOriginalAxiom());
+	}
+
+	@Override
+	public String visit(ElkDifferentIndividualsAxiomNaryConversion inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getOriginalAxiom());
+	}
+
+	@Override
+	public String visit(ElkDisjointClassesAxiomBinaryConversion inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getOriginalAxiom());
+	}
+
+	@Override
+	public String visit(ElkDisjointClassesAxiomNaryConversion inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getOriginalAxiom());
+	}
+
+	@Override
+	public String visit(ElkDisjointUnionAxiomBinaryConversion inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getOriginalAxiom());
+	}
+
+	@Override
+	public String visit(ElkDisjointUnionAxiomEquivalenceConversion inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getOriginalAxiom());
+	}
+
+	@Override
+	public String visit(ElkDisjointUnionAxiomNaryConversion inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getOriginalAxiom());
+	}
+
+	@Override
+	public String visit(ElkDisjointUnionAxiomSubClassConversion inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getOriginalAxiom());
+	}
+
+	@Override
+	public String visit(
+			ElkEquivalentClassesAxiomEquivalenceConversion inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getOriginalAxiom());
+	}
+
+	@Override
+	public String visit(ElkEquivalentClassesAxiomSubClassConversion inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getOriginalAxiom());
+	}
+
+	@Override
+	public String visit(
+			ElkEquivalentObjectPropertiesAxiomConversion inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getOriginalAxiom());
+	}
+
+	@Override
+	public String visit(ElkObjectPropertyAssertionAxiomConversion inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getOriginalAxiom());
+	}
+
+	@Override
+	public String visit(ElkObjectPropertyDomainAxiomConversion inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getOriginalAxiom());
+	}
+
+	@Override
+	public String visit(ElkObjectPropertyRangeAxiomConversion inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getOriginalAxiom());
+	}
+
+	@Override
+	public String visit(ElkReflexiveObjectPropertyAxiomConversion inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getOriginalAxiom());
+	}
+
+	@Override
+	public String visit(ElkSameIndividualAxiomConversion inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getOriginalAxiom());
+	}
+
+	@Override
+	public String visit(ElkSubClassOfAxiomConversion inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getOriginalAxiom());
+	}
+
+	@Override
+	public String visit(ElkSubObjectPropertyOfAxiomConversion inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getOriginalAxiom());
+	}
+
+	@Override
+	public String visit(ElkTransitiveObjectPropertyAxiomConversion inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getOriginalAxiom());
+	}
+
+	@Override
+	public String visit(ForwardLinkComposition inference) {
+		return String.format("%s -| %s; %s; %s; %s",
+				inference.getConclusion(factory_),
+				inference.getFirstPremise(factory_),
+				inference.getSecondPremise(factory_),
+				inference.getThirdPremise(factory_),
+				inference.getFourthPremise(factory_));
+	}
+
+	@Override
+	public String visit(ForwardLinkOfObjectHasSelf inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getPremise(factory_));
+	}
+
+	@Override
+	public String visit(ForwardLinkOfObjectSomeValuesFrom inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getPremise(factory_));
+	}
+
+	@Override
 	public String visit(PropagationGenerated inference) {
 		return String.format("%s -| %s; %s; %s",
 				inference.getConclusion(factory_),
 				inference.getFirstPremise(factory_),
 				inference.getSecondPremise(factory_),
 				inference.getThirdPremise(factory_));
+	}
+
+	@Override
+	public String visit(PropertyRangeInherited inference) {
+		return String.format("%s -| %s; %s", inference.getConclusion(factory_),
+				inference.getFirstPremise(factory_),
+				inference.getSecondPremise(factory_));
 	}
 
 	@Override
@@ -391,6 +395,22 @@ public class TracingInferencePrinter implements TracingInference.Visitor<String>
 	}
 
 	@Override
+	public String visit(
+			SubClassInclusionExpandedFirstEquivalentClass inference) {
+		return String.format("%s -| %s; %s", inference.getConclusion(factory_),
+				inference.getFirstPremise(factory_),
+				inference.getSecondPremise(factory_));
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionExpandedSecondEquivalentClass inference) {
+		return String.format("%s -| %s; %s", inference.getConclusion(factory_),
+				inference.getFirstPremise(factory_),
+				inference.getSecondPremise(factory_));
+	}
+
+	@Override
 	public String visit(SubClassInclusionExpandedSubClassOf inference) {
 		return String.format("%s -| %s; %s", inference.getConclusion(factory_),
 				inference.getFirstPremise(factory_),
@@ -424,10 +444,8 @@ public class TracingInferencePrinter implements TracingInference.Visitor<String>
 	}
 
 	@Override
-	public String visit(PropertyRangeInherited inference) {
-		return String.format("%s -| %s; %s", inference.getConclusion(factory_),
-				inference.getFirstPremise(factory_),
-				inference.getSecondPremise(factory_));
+	public String visit(SubContextInitializationNoPremises inference) {
+		return String.format("%s -|", inference.getConclusion(factory_));
 	}
 
 	@Override

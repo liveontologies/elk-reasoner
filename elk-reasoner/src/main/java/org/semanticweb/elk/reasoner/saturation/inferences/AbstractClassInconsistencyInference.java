@@ -42,23 +42,23 @@ abstract class AbstractClassInconsistencyInference
 	 * 
 	 * @return the conclusion produced by this inference
 	 */
-	public ClassInconsistency getConclusion(
+	public final ClassInconsistency getConclusion(
 			ClassInconsistency.Factory factory) {
 		return factory.getContradiction(getDestination());
 	}
 
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		return System.identityHashCode(this);
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public final boolean equals(Object o) {
 		return this == o;
 	}
 
 	@Override
-	public String toString() {
+	public final String toString() {
 		return TracingInferencePrinter.toString(this);		
 	}
 

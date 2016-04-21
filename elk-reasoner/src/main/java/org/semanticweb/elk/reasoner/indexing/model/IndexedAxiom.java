@@ -50,7 +50,7 @@ public interface IndexedAxiom extends IndexedObject, Conclusion {
 			extends
 			IndexedDisjointClassesAxiom.Factory,
 			IndexedSubClassOfAxiom.Factory,
-			IndexedDefinitionAxiom.Factory,
+			IndexedEquivalentClassesAxiom.Factory,
 			IndexedSubObjectPropertyOfAxiom.Factory,
 			IndexedObjectPropertyRangeAxiom.Factory,
 			IndexedDeclarationAxiom.Factory {
@@ -72,7 +72,7 @@ public interface IndexedAxiom extends IndexedObject, Conclusion {
 			extends
 				IndexedDisjointClassesAxiom.Visitor<O>,
 				IndexedSubClassOfAxiom.Visitor<O>,
-				IndexedDefinitionAxiom.Visitor<O>,
+				IndexedEquivalentClassesAxiom.Visitor<O>,
 				IndexedSubObjectPropertyOfAxiom.Visitor<O>,
 				IndexedObjectPropertyRangeAxiom.Visitor<O>,
 				IndexedDeclarationAxiom.Visitor<O> {

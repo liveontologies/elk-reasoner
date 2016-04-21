@@ -46,8 +46,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedRangeFiller;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -75,6 +75,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ComposedFromDecom
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.EquivalentClassFirstFromSecondRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.EquivalentClassSecondFromFirstRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassFromDefinitionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
@@ -531,6 +533,26 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 				IndexedClassExpression premise, ContextPremises premises,
 				ClassInferenceProducer producer) {
 			for (IndexedClassExpression ice : rule.getDefinedClasses()) {
+				iceValidator_.checkNew(ice);
+			}
+			return null;
+		}
+
+		@Override
+		public Void visit(EquivalentClassFirstFromSecondRule rule,
+				IndexedClassExpression premise, ContextPremises premises,
+				ClassInferenceProducer producer) {
+			for (IndexedClassExpression ice : rule.getFirstEquivalentMembers()) {
+				iceValidator_.checkNew(ice);
+			}
+			return null;
+		}
+
+		@Override
+		public Void visit(EquivalentClassSecondFromFirstRule rule,
+				IndexedClassExpression premise, ContextPremises premises,
+				ClassInferenceProducer producer) {
+			for (IndexedClassExpression ice : rule.getSecondEquivalentMembers()) {
 				iceValidator_.checkNew(ice);
 			}
 			return null;

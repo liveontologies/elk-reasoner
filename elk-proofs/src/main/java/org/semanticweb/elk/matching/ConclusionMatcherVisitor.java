@@ -29,9 +29,9 @@ import org.semanticweb.elk.matching.conclusions.ConclusionMatch;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2;
-import org.semanticweb.elk.matching.conclusions.IndexedDefinitionAxiomMatch1;
-import org.semanticweb.elk.matching.conclusions.IndexedDefinitionAxiomMatch1Watch;
-import org.semanticweb.elk.matching.conclusions.IndexedDefinitionAxiomMatch2;
+import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1;
+import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1Watch;
+import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch2;
 import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch2;
 import org.semanticweb.elk.matching.conclusions.IndexedObjectPropertyRangeAxiomMatch1;
@@ -58,7 +58,7 @@ import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1;
 import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch2;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinitionAxiomInference;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiomInference;
@@ -124,20 +124,20 @@ public class ConclusionMatcherVisitor implements ConclusionMatch.Visitor<Void> {
 	}
 
 	@Override
-	public Void visit(IndexedDefinitionAxiomMatch1 conclusionMatch) {
-		for (IndexedDefinitionAxiomInference inf : inferences_
+	public Void visit(IndexedEquivalentClassesAxiomMatch1 conclusionMatch) {
+		for (IndexedEquivalentClassesAxiomInference inf : inferences_
 				.get(conclusionMatch.getParent())) {
-			inf.accept(new IndexedDefinitionAxiomMatch1InferenceVisitor(
+			inf.accept(new IndexedEquivalentClassesAxiomMatch1InferenceVisitor(
 					inferenceFactory_, conclusionMatch));
 		}
 		return null;
 	}
 
 	@Override
-	public Void visit(IndexedDefinitionAxiomMatch2 conclusionMatch) {
-		for (IndexedDefinitionAxiomMatch1Watch inf : inferences_
+	public Void visit(IndexedEquivalentClassesAxiomMatch2 conclusionMatch) {
+		for (IndexedEquivalentClassesAxiomMatch1Watch inf : inferences_
 				.get(conclusionMatch.getParent())) {
-			inf.accept(new IndexedDefinitionAxiomMatch2InferenceVisitor(
+			inf.accept(new IndexedEquivalentClassesAxiomMatch2InferenceVisitor(
 					inferenceFactory_, conclusionMatch));
 		}
 		return null;

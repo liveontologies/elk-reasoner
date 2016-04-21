@@ -38,6 +38,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ComposedFromDecom
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.EquivalentClassFirstFromSecondRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.EquivalentClassSecondFromFirstRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassFromDefinitionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
@@ -196,6 +198,16 @@ public class RuleApplicationTimer {
 	long timeSuperClassFromSubClassRule;
 
 	/**
+	 * timer for {@link EquivalentClassFirstFromSecondRule}
+	 */
+	long timeEquivalentClassFirstFromSecondRule;
+
+	/**
+	 * timer for {@link EquivalentClassSecondFromFirstRule}
+	 */
+	long timeEquivalentClassSecondFromFirstRule;
+
+	/**
 	 * Add the values the corresponding values of the given timer
 	 * 
 	 * @param timer
@@ -228,6 +240,8 @@ public class RuleApplicationTimer {
 		timeComposedFromDecomposedSubsumerRule += timer.timeComposedFromDecomposedSubsumerRule;
 		timeIndexedClassDecompositionRule += timer.timeIndexedClassDecompositionRule;
 		timeIndexedClassFromDefinitionRule += timer.timeIndexedClassFromDefinitionRule;
+		timeEquivalentClassFirstFromSecondRule += timer.timeEquivalentClassFirstFromSecondRule;
+		timeEquivalentClassSecondFromFirstRule += timer.timeEquivalentClassSecondFromFirstRule;
 	}
 
 	public long getTotalRuleAppTime() {
@@ -256,7 +270,9 @@ public class RuleApplicationTimer {
 				+ timeBackwardLinkFromForwardLinkRule
 				+ timeComposedFromDecomposedSubsumerRule
 				+ timeIndexedClassDecompositionRule
-				+ timeIndexedClassFromDefinitionRule;
+				+ timeIndexedClassFromDefinitionRule
+				+ timeEquivalentClassFirstFromSecondRule
+				+ timeEquivalentClassSecondFromFirstRule;
 	}
 
 	/**
@@ -290,6 +306,8 @@ public class RuleApplicationTimer {
 		timeComposedFromDecomposedSubsumerRule = 0;
 		timeIndexedClassDecompositionRule = 0;
 		timeIndexedClassFromDefinitionRule = 0;
+		timeEquivalentClassFirstFromSecondRule = 0;
+		timeEquivalentClassSecondFromFirstRule = 0;
 	}
 
 }

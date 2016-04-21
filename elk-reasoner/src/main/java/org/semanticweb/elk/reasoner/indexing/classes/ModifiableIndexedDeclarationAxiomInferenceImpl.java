@@ -43,7 +43,7 @@ abstract class ModifiableIndexedDeclarationAxiomInferenceImpl<A extends ElkAxiom
 	}
 
 	@Override
-	public IndexedDeclarationAxiom getConclusion(IndexedDeclarationAxiom.Factory factory) {
+	public final IndexedDeclarationAxiom getConclusion(IndexedDeclarationAxiom.Factory factory) {
 		return factory.getIndexedDeclarationAxiom(getOriginalAxiom(), getEntity());
 	}
 	

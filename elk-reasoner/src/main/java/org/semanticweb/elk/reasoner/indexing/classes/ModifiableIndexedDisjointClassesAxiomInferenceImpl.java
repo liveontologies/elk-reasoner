@@ -48,7 +48,7 @@ abstract class ModifiableIndexedDisjointClassesAxiomInferenceImpl<A extends ElkA
 	}
 	
 	@Override
-	public IndexedDisjointClassesAxiom getConclusion(
+	public final IndexedDisjointClassesAxiom getConclusion(
 			IndexedDisjointClassesAxiom.Factory factory) {
 		return factory.getIndexedDisjointClassesAxiom(getOriginalAxiom(),
 				getMembers());

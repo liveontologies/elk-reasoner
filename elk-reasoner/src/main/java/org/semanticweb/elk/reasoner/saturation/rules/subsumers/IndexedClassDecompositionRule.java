@@ -27,7 +27,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
@@ -65,10 +65,14 @@ public class IndexedClassDecompositionRule extends
 		return INSTANCE_;
 	}
 
-	public static boolean tryAddRuleFor(ModifiableIndexedDefinitionAxiom axiom,
+	public static boolean tryAddRuleFor(ModifiableIndexedEquivalentClassesAxiom axiom,
 			ModifiableOntologyIndex index, ElkAxiom reason) {
-		ModifiableIndexedClass definedClass = axiom.getDefinedClass();
-		ModifiableIndexedClassExpression definition = axiom.getDefinition();
+		ModifiableIndexedClass definedClass = getDefinedClass(axiom);
+		if (definedClass == null) {
+			return false;
+		}
+		// else
+		ModifiableIndexedClassExpression definition = axiom.getSecondMember();
 		boolean success = index.tryAddDefinition(definedClass, definition,
 				reason);
 		if (success & LOGGER_.isTraceEnabled()) {
@@ -79,10 +83,14 @@ public class IndexedClassDecompositionRule extends
 	}
 
 	public static boolean tryRemoveRuleFor(
-			ModifiableIndexedDefinitionAxiom axiom,
+			ModifiableIndexedEquivalentClassesAxiom axiom,
 			ModifiableOntologyIndex index, ElkAxiom reason) {
-		ModifiableIndexedClass definedClass = axiom.getDefinedClass();
-		ModifiableIndexedClassExpression definition = axiom.getDefinition();
+		ModifiableIndexedClass definedClass = getDefinedClass(axiom);
+		if (definedClass == null) {
+			return false;
+		}
+		// else
+		ModifiableIndexedClassExpression definition = axiom.getSecondMember();
 		boolean success = index.tryRemoveDefinition(definedClass, definition,
 				reason);
 		if (success & LOGGER_.isTraceEnabled()) {
@@ -92,6 +100,16 @@ public class IndexedClassDecompositionRule extends
 		return success;
 	}
 
+	static ModifiableIndexedClass getDefinedClass(ModifiableIndexedEquivalentClassesAxiom axiom) {
+		ModifiableIndexedClassExpression firstMember = axiom.getFirstMember();
+		if (firstMember instanceof ModifiableIndexedClass) {
+			return (ModifiableIndexedClass) firstMember;
+			
+		}
+		// else
+		return null;
+	}
+	
 	@Override
 	public void apply(IndexedClass premise, ContextPremises premises,
 			ClassInferenceProducer producer) {

@@ -28,8 +28,8 @@ import org.semanticweb.elk.matching.conclusions.ConclusionMatch;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchHierarchy;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2;
-import org.semanticweb.elk.matching.conclusions.IndexedDefinitionAxiomMatch1;
-import org.semanticweb.elk.matching.conclusions.IndexedDefinitionAxiomMatch2;
+import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1;
+import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch2;
 import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch2;
 import org.semanticweb.elk.matching.conclusions.IndexedObjectPropertyRangeAxiomMatch1;
@@ -57,7 +57,7 @@ public class ConclusionMatchHierarchyImpl
 
 	private final ChildMap<ForwardLinkMatch2> forwardLinkMatch2Map_ = new ChildMap<ForwardLinkMatch2>();
 
-	private final ChildMap<IndexedDefinitionAxiomMatch2> indexedDefinitionAxiomMatch2Map_ = new ChildMap<IndexedDefinitionAxiomMatch2>();
+	private final ChildMap<IndexedEquivalentClassesAxiomMatch2> indexedDefinitionAxiomMatch2Map_ = new ChildMap<IndexedEquivalentClassesAxiomMatch2>();
 
 	private final ChildMap<IndexedDisjointClassesAxiomMatch2> indexedDisjointClassesAxiomMatch2Map_ = new ChildMap<IndexedDisjointClassesAxiomMatch2>();
 
@@ -98,12 +98,12 @@ public class ConclusionMatchHierarchyImpl
 	}
 
 	@Override
-	public Boolean visit(IndexedDefinitionAxiomMatch1 conclusionMatch) {
+	public Boolean visit(IndexedEquivalentClassesAxiomMatch1 conclusionMatch) {
 		return false;
 	}
 
 	@Override
-	public Boolean visit(IndexedDefinitionAxiomMatch2 conclusionMatch) {
+	public Boolean visit(IndexedEquivalentClassesAxiomMatch2 conclusionMatch) {
 		indexedDefinitionAxiomMatch2Map_.add(conclusionMatch);
 		return null;
 	}
@@ -216,8 +216,8 @@ public class ConclusionMatchHierarchyImpl
 	}
 
 	@Override
-	public Iterable<? extends IndexedDefinitionAxiomMatch2> getChildren(
-			IndexedDefinitionAxiomMatch1 parent) {
+	public Iterable<? extends IndexedEquivalentClassesAxiomMatch2> getChildren(
+			IndexedEquivalentClassesAxiomMatch1 parent) {
 		return indexedDefinitionAxiomMatch2Map_.get(parent);
 	}
 

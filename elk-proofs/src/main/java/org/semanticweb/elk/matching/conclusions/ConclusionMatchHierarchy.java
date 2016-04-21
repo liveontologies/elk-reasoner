@@ -29,8 +29,8 @@ public interface ConclusionMatchHierarchy {
 
 	Iterable<? extends ForwardLinkMatch2> getChildren(ForwardLinkMatch1 parent);
 
-	Iterable<? extends IndexedDefinitionAxiomMatch2> getChildren(
-			IndexedDefinitionAxiomMatch1 parent);
+	Iterable<? extends IndexedEquivalentClassesAxiomMatch2> getChildren(
+			IndexedEquivalentClassesAxiomMatch1 parent);
 
 	Iterable<? extends IndexedDisjointClassesAxiomMatch2> getChildren(
 			IndexedDisjointClassesAxiomMatch1 parent);

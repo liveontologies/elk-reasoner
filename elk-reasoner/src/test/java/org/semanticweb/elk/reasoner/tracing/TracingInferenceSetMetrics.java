@@ -30,6 +30,8 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.util.hashing.HashGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Basic statistical information about the proofs for {@link Conclusion}s in
@@ -136,6 +138,10 @@ public class TracingInferenceSetMetrics {
 
 	static class Computation {
 
+		// logger for this class
+		private static final Logger LOGGER_ = LoggerFactory
+				.getLogger(TracingInferenceSetMetrics.Computation.class);
+		
 		private final TracingInferenceSet inferences_;
 
 		Queue<Conclusion> toDo_ = new LinkedList<Conclusion>();
@@ -176,6 +182,7 @@ public class TracingInferenceSetMetrics {
 					provable = true;
 				}
 				if (!provable) {
+					LOGGER_.warn("{}: not provable!", next);
 					statistics_.provable_ = false;
 				}
 			}

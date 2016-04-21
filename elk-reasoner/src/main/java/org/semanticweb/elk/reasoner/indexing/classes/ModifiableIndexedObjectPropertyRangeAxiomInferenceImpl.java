@@ -50,7 +50,7 @@ abstract class ModifiableIndexedObjectPropertyRangeAxiomInferenceImpl<A extends 
 	}
 	
 	@Override
-	public IndexedObjectPropertyRangeAxiom getConclusion(
+	public final IndexedObjectPropertyRangeAxiom getConclusion(
 			IndexedObjectPropertyRangeAxiom.Factory factory) {
 		return factory.getIndexedObjectPropertyRangeAxiom(getOriginalAxiom(),
 				getProperty(), getRange());

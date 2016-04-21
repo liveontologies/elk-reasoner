@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkTransitiveObjectPropertyAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
@@ -43,13 +42,6 @@ class ModifiableElkTransitiveObjectPropertyAxiomConversionImpl extends
 			ModifiableIndexedPropertyChain subPropertyChain,
 			ModifiableIndexedObjectProperty superProperty) {
 		super(originalAxiom, subPropertyChain, superProperty);
-	}
-
-	@Override
-	public IndexedSubObjectPropertyOfAxiom getConclusion(
-			IndexedSubObjectPropertyOfAxiom.Factory factory) {
-		return factory.getIndexedSubObjectPropertyOfAxiom(getOriginalAxiom(),
-				getSubPropertyChain(), getSuperProperty());
 	}
 
 	@Override

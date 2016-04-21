@@ -30,8 +30,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -53,6 +53,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ComposedFromDecom
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.EquivalentClassFirstFromSecondRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.EquivalentClassSecondFromFirstRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassFromDefinitionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
@@ -167,6 +169,26 @@ public class ConditionalRuleVisitor<O> implements RuleVisitor<O> {
 
 	@Override
 	public O visit(DisjointSubsumerFromMemberRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		if (condition_.visit(rule, premise, premises, producer))
+			return visitor_.visit(rule, premise, premises, producer);
+		// else
+		return null;
+	}
+
+	@Override
+	public O visit(EquivalentClassFirstFromSecondRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		if (condition_.visit(rule, premise, premises, producer))
+			return visitor_.visit(rule, premise, premises, producer);
+		// else
+		return null;
+	}
+
+	@Override
+	public O visit(EquivalentClassSecondFromFirstRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
 			ClassInferenceProducer producer) {
 		if (condition_.visit(rule, premise, premises, producer))
