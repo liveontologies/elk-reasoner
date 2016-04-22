@@ -65,32 +65,46 @@ public class IndexedClassDecompositionRule extends
 		return INSTANCE_;
 	}
 
-	public static boolean tryAddRuleFor(ModifiableIndexedEquivalentClassesAxiom axiom,
+	public static boolean addRuleFor(ModifiableIndexedEquivalentClassesAxiom axiom,
 			ModifiableOntologyIndex index, ElkAxiom reason) {
+		ModifiableIndexedClassExpression definition = axiom.getSecondMember();
+		if (definition instanceof ModifiableIndexedClass) {
+			// define only complex classes
+			return false;
+		}
+		// else
 		ModifiableIndexedClass definedClass = getDefinedClass(axiom);
 		if (definedClass == null) {
 			return false;
 		}
-		// else
-		ModifiableIndexedClassExpression definition = axiom.getSecondMember();
+		// else		
 		boolean success = index.tryAddDefinition(definedClass, definition,
 				reason);
-		if (success & LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("{}: added definition {} from {}", definedClass,
-					definition, reason);
+		if (LOGGER_.isTraceEnabled()) {
+			if (success) {
+				LOGGER_.trace("{}: added definition {} from {}", definedClass,
+						definition, reason);
+			} else {
+				LOGGER_.trace("{}: defined multiple times", definedClass);
+			}
 		}
 		return success;
 	}
 
-	public static boolean tryRemoveRuleFor(
+	public static boolean removeRuleFor(
 			ModifiableIndexedEquivalentClassesAxiom axiom,
 			ModifiableOntologyIndex index, ElkAxiom reason) {
+		ModifiableIndexedClassExpression definition = axiom.getSecondMember();
+		if (definition instanceof ModifiableIndexedClass) {
+			// define only complex classes
+			return false;
+		}
+		// else
 		ModifiableIndexedClass definedClass = getDefinedClass(axiom);
 		if (definedClass == null) {
 			return false;
 		}
 		// else
-		ModifiableIndexedClassExpression definition = axiom.getSecondMember();
 		boolean success = index.tryRemoveDefinition(definedClass, definition,
 				reason);
 		if (success & LOGGER_.isTraceEnabled()) {

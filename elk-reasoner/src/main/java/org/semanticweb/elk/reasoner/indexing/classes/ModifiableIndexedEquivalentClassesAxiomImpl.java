@@ -45,50 +45,63 @@ public class ModifiableIndexedEquivalentClassesAxiomImpl<A extends ElkAxiom>
 	@Override
 	public boolean addOccurrence(ModifiableOntologyIndex index) {
 		ElkAxiom reason = getOriginalAxiom();
-		if (IndexedClassDecompositionRule.tryAddRuleFor(this, index, reason)) {
-			return IndexedClassFromDefinitionRule.addRuleFor(this, index,
-					reason);
-		}
-		// else
-		boolean success = EquivalentClassFirstFromSecondRule.addRuleFor(this,
-				index, reason);
-		if (!success) {
-			return false;
-		}
-		// else
-		success = EquivalentClassSecondFromFirstRule.addRuleFor(this, index,
+		boolean success = IndexedClassDecompositionRule.addRuleFor(this, index,
 				reason);
-		if (!success) {
+		if (success) {
+			success = IndexedClassFromDefinitionRule.addRuleFor(this, index,
+					reason);
+			if (success) {
+				return true;
+			}
+			// else revert
+			IndexedClassDecompositionRule.removeRuleFor(this, index, reason);
+		}
+		// else
+		success = EquivalentClassFirstFromSecondRule.addRuleFor(this, index,
+				reason);
+		if (success) {
+			success = EquivalentClassSecondFromFirstRule.addRuleFor(this, index,
+					reason);
+			if (success) {
+				return true;
+			}
+			// else revert
 			EquivalentClassFirstFromSecondRule.removeRuleFor(this, index,
 					reason);
-			return false;
 		}
-		// else
-		return true;
+		// all failed
+		return false;
 	}
 
 	@Override
 	public boolean removeOccurrence(ModifiableOntologyIndex index) {
 		ElkAxiom reason = getOriginalAxiom();
-		if (IndexedClassDecompositionRule.tryRemoveRuleFor(this, index, reason)) {
-			return IndexedClassFromDefinitionRule.removeRuleFor(this, index,
-					reason);
-		}	
-		// else
-		boolean success = EquivalentClassFirstFromSecondRule.removeRuleFor(this,
+		boolean success = IndexedClassDecompositionRule.removeRuleFor(this,
 				index, reason);
-		if (!success) {
-			return false;
+		if (success) {
+			success = IndexedClassFromDefinitionRule.removeRuleFor(this, index,
+					reason);
+			if (success) {
+				return true;
+			}
+			// else revert
+			IndexedClassDecompositionRule.addRuleFor(this, index, reason);
 		}
 		// else
-		success = EquivalentClassSecondFromFirstRule.removeRuleFor(this, index,
+		success = EquivalentClassFirstFromSecondRule.removeRuleFor(this, index,
 				reason);
-		if (!success) {
+		if (success) {
+			success = EquivalentClassSecondFromFirstRule.removeRuleFor(this,
+					index, reason);
+			if (success) {
+				return true;
+			}
+			// else revert
 			EquivalentClassFirstFromSecondRule.addRuleFor(this, index, reason);
-			return false;
 		}
-		// else
-		return true;
+		// all failed
+		return false;
+
 	}
 
 }
