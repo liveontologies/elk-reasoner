@@ -109,6 +109,11 @@ public class ElkInferenceDummyVisitor<O> implements ElkInference.Visitor<O> {
 	}
 
 	@Override
+	public O visit(ElkPropertyInclusionOfEquivalence inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
 	public O visit(ElkPropertyInclusionOfTransitiveObjectProperty inference) {
 		return defaultVisit(inference);
 	}

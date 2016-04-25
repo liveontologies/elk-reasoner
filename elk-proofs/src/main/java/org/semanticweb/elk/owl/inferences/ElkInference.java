@@ -79,6 +79,7 @@ public interface ElkInference {
 			ElkClassInclusionReflexivePropertyRange.Factory,
 			ElkClassInclusionTautology.Factory,
 			ElkPropertyInclusionHierarchy.Factory,
+			ElkPropertyInclusionOfEquivalence.Factory,
 			ElkPropertyInclusionOfTransitiveObjectProperty.Factory,
 			ElkPropertyInclusionTautology.Factory,
 			ElkPropertyRangePropertyExpansion.Factory {
@@ -110,6 +111,7 @@ public interface ElkInference {
 			ElkClassInclusionReflexivePropertyRange.Visitor<O>,
 			ElkClassInclusionTautology.Visitor<O>,
 			ElkPropertyInclusionHierarchy.Visitor<O>,
+			ElkPropertyInclusionOfEquivalence.Visitor<O>,
 			ElkPropertyInclusionOfTransitiveObjectProperty.Visitor<O>,
 			ElkPropertyInclusionTautology.Visitor<O>,
 			ElkPropertyRangePropertyExpansion.Visitor<O> {

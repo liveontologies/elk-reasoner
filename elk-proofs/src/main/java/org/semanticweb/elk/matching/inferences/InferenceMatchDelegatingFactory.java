@@ -50,6 +50,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomBinaryCo
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomSubClassConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomSubClassConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentObjectPropertiesAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkObjectPropertyAssertionAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkObjectPropertyDomainAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkReflexiveObjectPropertyAxiomConversion;
@@ -275,6 +276,15 @@ public class InferenceMatchDelegatingFactory implements InferenceMatch.Factory {
 			IndexedSubClassOfAxiomMatch1 conclusionMatch) {
 		return filter(mainFactory_
 				.getElkEquivalentClassesAxiomSubClassConversionMatch1(parent,
+						conclusionMatch));
+	}
+
+	@Override
+	public ElkEquivalentObjectPropertiesAxiomConversionMatch1 getElkEquivalentObjectPropertiesAxiomConversionMatch1(
+			ElkEquivalentObjectPropertiesAxiomConversion parent,
+			IndexedSubObjectPropertyOfAxiomMatch1 conclusionMatch) {
+		return filter(mainFactory_
+				.getElkEquivalentObjectPropertiesAxiomConversionMatch1(parent,
 						conclusionMatch));
 	}
 

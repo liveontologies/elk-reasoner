@@ -26,45 +26,45 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 
 /**
  * Represents the inference:
  * 
  * <pre>
- *  EquivalentClasses(C0 C1 ... Cn)
- * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
- *           Ci ⊑ Cj
+ *  EquivalentObjectProperties(R0 R1 ... Rn)
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *                  Ri ⊑ Rj
  * </pre>
  * 
  * @author Yevgeny Kazakov
  *
  */
-public class ElkClassInclusionOfEquivalence extends AbstractElkInference {
-	
-	private final static String NAME_ = "Equivalent Classes Decomposition";
+public class ElkPropertyInclusionOfEquivalence extends AbstractElkInference {
 
-	private final List<? extends ElkClassExpression> expressions_;
+	private final static String NAME_ = "Equivalent Properties Decomposition";
+
+	private final List<? extends ElkObjectPropertyExpression> expressions_;
 
 	/**
-	 * positions for sub-class and super-class within class equivalence
+	 * positions for sub-property and super-property within property equivalence
 	 */
 	private final int subPos_, superPos_;
 
-	ElkClassInclusionOfEquivalence(
-			List<? extends ElkClassExpression> expressions, int subPos,
+	ElkPropertyInclusionOfEquivalence(
+			List<? extends ElkObjectPropertyExpression> expressions, int subPos,
 			int superPos) {
 		this.expressions_ = expressions;
 		this.subPos_ = subPos;
 		this.superPos_ = superPos;
 	}
 
-	ElkClassInclusionOfEquivalence(ElkClassExpression first,
-			ElkClassExpression second, boolean sameOrder) {
-		List<ElkClassExpression> expressions = new ArrayList<ElkClassExpression>(
+	ElkPropertyInclusionOfEquivalence(ElkObjectPropertyExpression first,
+			ElkObjectPropertyExpression second, boolean sameOrder) {
+		List<ElkObjectPropertyExpression> expressions = new ArrayList<ElkObjectPropertyExpression>(
 				2);
 		expressions.add(first);
 		expressions.add(second);
@@ -78,7 +78,7 @@ public class ElkClassInclusionOfEquivalence extends AbstractElkInference {
 		}
 	}
 
-	public List<? extends ElkClassExpression> getExpressions() {
+	public List<? extends ElkObjectPropertyExpression> getExpressions() {
 		return expressions_;
 	}
 
@@ -89,7 +89,7 @@ public class ElkClassInclusionOfEquivalence extends AbstractElkInference {
 	public int getSuperPos() {
 		return superPos_;
 	}
-	
+
 	@Override
 	public String getName() {
 		return NAME_;
@@ -109,13 +109,15 @@ public class ElkClassInclusionOfEquivalence extends AbstractElkInference {
 		return failGetPremise(index);
 	}
 
-	public ElkEquivalentClassesAxiom getPremise(ElkObject.Factory factory) {
-		return factory.getEquivalentClassesAxiom(expressions_);
+	public ElkEquivalentObjectPropertiesAxiom getPremise(
+			ElkObject.Factory factory) {
+		return factory.getEquivalentObjectPropertiesAxiom(expressions_);
 	}
 
 	@Override
-	public ElkSubClassOfAxiom getConclusion(ElkObject.Factory factory) {
-		return factory.getSubClassOfAxiom(expressions_.get(subPos_),
+	public ElkSubObjectPropertyOfAxiom getConclusion(
+			ElkObject.Factory factory) {
+		return factory.getSubObjectPropertyOfAxiom(expressions_.get(subPos_),
 				expressions_.get(superPos_));
 	}
 
@@ -132,13 +134,13 @@ public class ElkClassInclusionOfEquivalence extends AbstractElkInference {
 	 */
 	public interface Factory {
 
-		ElkClassInclusionOfEquivalence getElkClassInclusionOfEquivalence(
-				List<? extends ElkClassExpression> expressions, int subPos,
-				int superPos);
+		ElkPropertyInclusionOfEquivalence getElkPropertyInclusionOfEquivalence(
+				List<? extends ElkObjectPropertyExpression> expressions,
+				int subPos, int superPos);
 
-		ElkClassInclusionOfEquivalence getElkClassInclusionOfEquivalence(
-				ElkClassExpression first, ElkClassExpression second,
-				boolean sameOrder);
+		ElkPropertyInclusionOfEquivalence getElkPropertyInclusionOfEquivalence(
+				ElkObjectPropertyExpression first,
+				ElkObjectPropertyExpression second, boolean sameOrder);
 
 	}
 
@@ -152,7 +154,7 @@ public class ElkClassInclusionOfEquivalence extends AbstractElkInference {
 	 */
 	interface Visitor<O> {
 
-		O visit(ElkClassInclusionOfEquivalence inference);
+		O visit(ElkPropertyInclusionOfEquivalence inference);
 
 	}
 

@@ -160,6 +160,12 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 
 	@Override
 	public String visit(
+			ElkEquivalentObjectPropertiesAxiomConversionMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
 			ElkObjectPropertyAssertionAxiomConversionMatch1 inferenceMatch1) {
 		return inferenceMatch1.getParent() + " | ";
 	}

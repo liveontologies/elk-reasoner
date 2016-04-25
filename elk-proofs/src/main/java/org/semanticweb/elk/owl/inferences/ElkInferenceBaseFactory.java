@@ -163,6 +163,21 @@ public class ElkInferenceBaseFactory implements ElkInference.Factory {
 	}
 
 	@Override
+	public ElkPropertyInclusionOfEquivalence getElkPropertyInclusionOfEquivalence(
+			ElkObjectPropertyExpression first,
+			ElkObjectPropertyExpression second, boolean sameOrder) {
+		return new ElkPropertyInclusionOfEquivalence(first, second, sameOrder);
+	}
+
+	@Override
+	public ElkPropertyInclusionOfEquivalence getElkPropertyInclusionOfEquivalence(
+			List<? extends ElkObjectPropertyExpression> expressions, int subPos,
+			int superPos) {
+		return new ElkPropertyInclusionOfEquivalence(expressions, subPos,
+				superPos);
+	}
+
+	@Override
 	public ElkPropertyInclusionOfTransitiveObjectProperty getElkPropertyInclusionOfTransitiveObjectProperty(
 			ElkObjectPropertyExpression property) {
 		return new ElkPropertyInclusionOfTransitiveObjectProperty(property);

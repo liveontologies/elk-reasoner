@@ -185,6 +185,22 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 	}
 
 	@Override
+	public ElkPropertyInclusionOfEquivalence getElkPropertyInclusionOfEquivalence(
+			ElkObjectPropertyExpression first,
+			ElkObjectPropertyExpression second, boolean sameOrder) {
+		return filter(mainFactory_.getElkPropertyInclusionOfEquivalence(first,
+				second, sameOrder));
+	}
+
+	@Override
+	public ElkPropertyInclusionOfEquivalence getElkPropertyInclusionOfEquivalence(
+			List<? extends ElkObjectPropertyExpression> expressions, int subPos,
+			int superPos) {
+		return filter(mainFactory_.getElkPropertyInclusionOfEquivalence(
+				expressions, subPos, superPos));
+	}
+
+	@Override
 	public ElkPropertyInclusionOfTransitiveObjectProperty getElkPropertyInclusionOfTransitiveObjectProperty(
 			ElkObjectPropertyExpression property) {
 		return filter(mainFactory_

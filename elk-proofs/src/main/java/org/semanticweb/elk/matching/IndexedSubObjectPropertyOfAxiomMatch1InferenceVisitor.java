@@ -41,7 +41,8 @@ class IndexedSubObjectPropertyOfAxiomMatch1InferenceVisitor extends
 
 	@Override
 	public Void visit(ElkEquivalentObjectPropertiesAxiomConversion inference) {
-		// TODO Auto-generated method stub
+		factory.getElkEquivalentObjectPropertiesAxiomConversionMatch1(inference,
+				child);
 		return null;
 	}
 

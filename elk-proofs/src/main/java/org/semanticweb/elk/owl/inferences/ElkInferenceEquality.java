@@ -254,6 +254,19 @@ public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 	}
 
 	@Override
+	public Boolean visit(final ElkPropertyInclusionOfEquivalence inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(ElkPropertyInclusionOfEquivalence other) {
+				return equals(other.getExpressions(),
+						inference.getExpressions())
+						&& equals(other.getSubPos(), inference.getSubPos())
+						&& equals(other.getSuperPos(), inference.getSuperPos());
+			}
+		});
+	}
+
+	@Override
 	public Boolean visit(
 			final ElkPropertyInclusionOfTransitiveObjectProperty inference) {
 		return other_.accept(new DefaultVisitor() {

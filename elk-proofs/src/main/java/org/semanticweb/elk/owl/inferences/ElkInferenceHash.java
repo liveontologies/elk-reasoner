@@ -190,6 +190,14 @@ public class ElkInferenceHash
 	}
 
 	@Override
+	public Integer visit(ElkPropertyInclusionOfEquivalence inference) {
+		return combinedHashCode(hashCode(ElkPropertyInclusionOfEquivalence.class),
+				hashCode(inference.getExpressions()),
+				hashCode(inference.getSubPos()),
+				hashCode(inference.getSuperPos()));
+	}
+
+	@Override
 	public Integer visit(
 			ElkPropertyInclusionOfTransitiveObjectProperty inference) {
 		return combinedHashCode(

@@ -75,6 +75,7 @@ import org.semanticweb.elk.matching.inferences.ElkDisjointUnionAxiomBinaryConver
 import org.semanticweb.elk.matching.inferences.ElkDisjointUnionAxiomSubClassConversionMatch1;
 import org.semanticweb.elk.matching.inferences.ElkEquivalentClassesAxiomEquivalenceConversionMatch1;
 import org.semanticweb.elk.matching.inferences.ElkEquivalentClassesAxiomSubClassConversionMatch1;
+import org.semanticweb.elk.matching.inferences.ElkEquivalentObjectPropertiesAxiomConversionMatch1;
 import org.semanticweb.elk.matching.inferences.ElkObjectPropertyAssertionAxiomConversionMatch1;
 import org.semanticweb.elk.matching.inferences.ElkObjectPropertyDomainAxiomConversionMatch1;
 import org.semanticweb.elk.matching.inferences.ElkReflexiveObjectPropertyAxiomConversionMatch1;
@@ -132,6 +133,7 @@ import org.semanticweb.elk.owl.inferences.ElkInference;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
@@ -146,6 +148,7 @@ import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomSubClassConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentObjectPropertiesAxiomConversion;
 
 class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
@@ -569,6 +572,23 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		elkInferenceFactory_.getElkClassInclusionOfEquivalence(
 				originalAxiom.getClassExpressions(),
 				parent.getSubClassPosition(), parent.getSuperClassPosition());
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			ElkEquivalentObjectPropertiesAxiomConversionMatch1 inferenceMatch1) {
+		inferenceMatch1.getConclusionMatch(conclusionFactory_);
+		
+		// creating ELK inferences
+		ElkEquivalentObjectPropertiesAxiomConversion parent = inferenceMatch1
+				.getParent();
+		ElkEquivalentObjectPropertiesAxiom originalAxiom = parent
+				.getOriginalAxiom();
+		elkInferenceFactory_.getElkPropertyInclusionOfEquivalence(
+				originalAxiom.getObjectPropertyExpressions(),
+				parent.getSubPropertyPosition(),
+				parent.getSuperPropertyPosition());
 		return null;
 	}
 
