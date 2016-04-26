@@ -22,15 +22,12 @@ package org.semanticweb.elk.matching.conclusions;
  * #L%
  */
 
-import org.semanticweb.elk.owl.comparison.ElkObjectEquality;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
-
 public class IndexedContextRootMatchEquality
 		implements IndexedContextRootMatch.Visitor<Boolean> {
 
 	private final IndexedContextRootMatch other_;
 
-	private IndexedContextRootMatchEquality(IndexedContextRootMatch other) {
+	public IndexedContextRootMatchEquality(IndexedContextRootMatch other) {
 		this.other_ = other;
 	}
 
@@ -42,15 +39,10 @@ public class IndexedContextRootMatchEquality
 			return false;
 		}
 
-		boolean equals(ElkObject first, ElkObject second) {
-			return ElkObjectEquality.equals(first, second);
+		boolean equals(Object first, Object second) {
+			return first.equals(second);
 		}
 
-	}
-
-	public static boolean equals(IndexedContextRootMatch first,
-			IndexedContextRootMatch second) {
-		return first.accept(new IndexedContextRootMatchEquality(second));
 	}
 
 	@Override

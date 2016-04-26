@@ -39,7 +39,7 @@ public abstract class AbstractConclusionMatch<P> extends AbstractMatch<P>
 	@Override
 	public int hashCode() {
 		if (hashCode_ == 0) {
-			hashCode_ = ConclusionMatchHash.hashCode(this);
+			hashCode_ = accept(ConclusionMatchHash.getInstance());
 		}
 		// else
 		return hashCode_;

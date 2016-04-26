@@ -22,25 +22,16 @@ package org.semanticweb.elk.owl.inferences;
  * #L%
  */
 
-import java.util.List;
-
-import org.semanticweb.elk.owl.comparison.ElkObjectHash;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.util.hashing.HashGenerator;
-import org.semanticweb.elk.util.hashing.Hasher;
 
 public class ElkInferenceHash
-		implements ElkInference.Visitor<Integer>, Hasher<ElkInference> {
+		implements ElkInference.Visitor<Integer> {
 
 	private static final ElkInferenceHash INSTANCE_ = new ElkInferenceHash();
 
 	// forbid construction; only static methods should be used
 	private ElkInferenceHash() {
 
-	}
-
-	public static int hashCode(ElkInference conclusion) {
-		return conclusion == null ? 0 : conclusion.accept(INSTANCE_);
 	}
 
 	public static ElkInference.Visitor<Integer> getHashVisitor() {
@@ -50,26 +41,13 @@ public class ElkInferenceHash
 	private static int combinedHashCode(int... hashes) {
 		return HashGenerator.combineListHash(hashes);
 	}
-
-	private static int hashCode(Class<?> c) {
-		return c.hashCode();
-	}
-
-	private static int hashCode(ElkObject elkObject) {
-		return ElkObjectHash.hashCode(elkObject);
-	}
-
-	private static int hashCode(List<? extends ElkObject> elkObjects) {
-		return ElkObjectHash.hashCode(elkObjects);
+	
+	private static int hashCode(Object o) {
+		return o.hashCode();
 	}
 
 	private static int hashCode(int n) {
 		return n;
-	}
-
-	@Override
-	public int hash(ElkInference inference) {
-		return hashCode(inference);
 	}
 
 	@Override

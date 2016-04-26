@@ -22,7 +22,6 @@ package org.semanticweb.elk.matching.conclusions;
  * #L%
  */
 
-import org.semanticweb.elk.owl.comparison.ElkObjectHash;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 import org.semanticweb.elk.util.hashing.Hasher;
@@ -55,7 +54,7 @@ public class IndexedContextRootMatchHash
 	}
 
 	private static int hashCode(ElkObject elkObject) {
-		return ElkObjectHash.hashCode(elkObject);
+		return elkObject.hashCode();
 	}
 
 	@Override

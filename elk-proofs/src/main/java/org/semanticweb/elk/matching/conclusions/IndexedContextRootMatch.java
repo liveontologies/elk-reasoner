@@ -45,8 +45,9 @@ public abstract class IndexedContextRootMatch {
 		}
 		// else
 		if (o instanceof IndexedContextRootMatch) {
-			return hashCode() == o.hashCode() && IndexedContextRootMatchEquality
-					.equals(this, (IndexedContextRootMatch) o);
+			return hashCode() == o.hashCode()
+					&& accept(new IndexedContextRootMatchEquality(
+							(IndexedContextRootMatch) o));
 		}
 		// else
 		return false;

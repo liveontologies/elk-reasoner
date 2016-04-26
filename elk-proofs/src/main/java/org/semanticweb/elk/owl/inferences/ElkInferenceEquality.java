@@ -22,11 +22,6 @@ package org.semanticweb.elk.owl.inferences;
  * #L%
  */
 
-import java.util.List;
-
-import org.semanticweb.elk.owl.comparison.ElkObjectEquality;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
-
 public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 
 	private final ElkInference other_;
@@ -43,13 +38,8 @@ public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 			return false;
 		}
 
-		static boolean equals(ElkObject first, ElkObject second) {
-			return (ElkObjectEquality.equals(first, second));
-		}
-
-		static boolean equals(List<? extends ElkObject> first,
-				List<? extends ElkObject> second) {
-			return (ElkObjectEquality.equals(first, second));
+		static boolean equals(Object first, Object second) {
+			return first.equals(second);
 		}
 
 		static boolean equals(int first, int second) {

@@ -22,9 +22,6 @@ package org.semanticweb.elk.matching.conclusions;
  * #L%
  */
 
-import org.semanticweb.elk.owl.comparison.ElkObjectEquality;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
-
 public class SubsumerMatchEquality implements SubsumerMatch.Visitor<Boolean> {
 
 	private final SubsumerMatch other_;
@@ -45,12 +42,12 @@ public class SubsumerMatchEquality implements SubsumerMatch.Visitor<Boolean> {
 			return false;
 		}
 
+		static boolean equals(Object first, Object second) {
+			return first.equals(second);
+		}
+		
 		static boolean equals(int first, int second) {
 			return first == second;
-		}
-
-		static boolean equals(ElkObject first, ElkObject second) {
-			return ElkObjectEquality.equals(first, second);
 		}
 	}
 

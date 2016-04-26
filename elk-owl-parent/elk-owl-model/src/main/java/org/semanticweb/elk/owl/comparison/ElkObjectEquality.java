@@ -6,7 +6,7 @@ package org.semanticweb.elk.owl.comparison;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,6 @@ package org.semanticweb.elk.owl.comparison;
  * limitations under the License.
  * #L%
  */
-
-import java.util.Iterator;
-import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkAnnotation;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationAssertionAxiom;
@@ -110,7 +107,7 @@ import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * Static methods for computing syntactic equality between {@link ElkObject}s.
+ * A visitor for computing syntactic equality between {@link ElkObject}s.
  * Two {@link ElkObject}s are syntactically equal if all their corresponding
  * values are syntactically equal.
  * 
@@ -122,33 +119,16 @@ public class ElkObjectEquality implements ElkObjectVisitor<ElkObject> {
 
 	private final Object object_;
 
-	private ElkObjectEquality(Object object) {
+	public ElkObjectEquality(Object object) {
 		this.object_ = object;
 	}
-
-	public static boolean equals(ElkObject first, Object second) {
-		return first == null ? second == null
-				: first.accept(new ElkObjectEquality(second)) == second;
-	}
-
-	public static boolean equals(List<? extends ElkObject> first,
-			List<? extends ElkObject> second) {
-		Iterator<? extends ElkObject> firstIterator = first.iterator();
-		Iterator<? extends ElkObject> secondIterator = second.iterator();
-		while (firstIterator.hasNext() && secondIterator.hasNext()) {
-			if (equals(firstIterator.next(), secondIterator.next()))
-				continue;
-			return false;
-		}
-		return !(firstIterator.hasNext() || secondIterator.hasNext());
+	
+	private static boolean equals(Object first, Object second) {
+		return first.equals(second);
 	}
 
 	private static boolean equals(int first, int second) {
 		return first == second;
-	}
-
-	private static boolean equals(String first, String second) {
-		return first.equals(second);
 	}
 
 	@Override

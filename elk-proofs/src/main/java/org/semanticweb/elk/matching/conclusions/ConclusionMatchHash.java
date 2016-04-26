@@ -22,16 +22,10 @@ package org.semanticweb.elk.matching.conclusions;
  * #L%
  */
 
-import java.util.List;
-
-import org.semanticweb.elk.owl.comparison.ElkObjectHash;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.reasoner.tracing.Conclusion;
 import org.semanticweb.elk.util.hashing.HashGenerator;
-import org.semanticweb.elk.util.hashing.Hasher;
 
 public class ConclusionMatchHash
-		implements ConclusionMatch.Visitor<Integer>, Hasher<ConclusionMatch> {
+		implements ConclusionMatch.Visitor<Integer> {
 
 	private static final ConclusionMatchHash INSTANCE_ = new ConclusionMatchHash();
 
@@ -40,49 +34,20 @@ public class ConclusionMatchHash
 
 	}
 
-	public static ConclusionMatch.Visitor<Integer> getHashVisitor() {
+	public static ConclusionMatch.Visitor<Integer> getInstance() {
 		return INSTANCE_;
-	}
-
-	@Override
-	public int hash(ConclusionMatch match) {
-		return hashCode(match);
 	}
 
 	private static int combinedHashCode(int... hashes) {
 		return HashGenerator.combineListHash(hashes);
 	}
 
-	private static int hashCode(Class<?> c) {
-		return c.hashCode();
-	}
-
-	public static int hashCode(ConclusionMatch conclusionMatch) {
-		return conclusionMatch == null ? 0 : conclusionMatch.accept(INSTANCE_);
+	private static int hashCode(Object o) {
+		return o.hashCode();
 	}
 
 	private static int hashCode(int i) {
 		return i;
-	}
-
-	private static int hashCode(Conclusion conclusion) {
-		return conclusion.hashCode();
-	}
-
-	private static int hashCode(ElkObject elkObject) {
-		return elkObject.hashCode();
-	}
-
-	private static int hashCode(List<? extends ElkObject> list) {
-		return ElkObjectHash.hashCode(list);
-	}
-
-	private static int hashCode(IndexedContextRootMatch match) {
-		return match.hashCode();
-	}
-
-	private static int hashCode(SubsumerMatch match) {
-		return match.hashCode();
 	}
 
 	private static int hashCode(IndexedContextRootMatchChain chain) {

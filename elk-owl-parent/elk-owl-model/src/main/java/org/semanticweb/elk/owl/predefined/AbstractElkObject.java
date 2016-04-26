@@ -1,8 +1,8 @@
-package org.semanticweb.elk.owl.inferences;
+package org.semanticweb.elk.owl.predefined;
 
 /*
  * #%L
- * ELK Proofs Package
+ * ELK OWL Object Interfaces
  * $Id:$
  * $HeadURL:$
  * %%
@@ -22,49 +22,43 @@ package org.semanticweb.elk.owl.inferences;
  * #L%
  */
 
-public abstract class AbstractElkInference implements ElkInference {
+import org.semanticweb.elk.owl.comparison.ElkObjectEquality;
+import org.semanticweb.elk.owl.comparison.ElkObjectHash;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
+
+/**
+ * A skeleton implementation of {@link ElkObject} defining equality, hash, and
+ * similar functions. All other implementation should extend or delegate to this
+ * class.
+ * 
+ * @author Yevgeny Kazakov
+ */
+public abstract class AbstractElkObject implements ElkObject {
 
 	/**
 	 * hash code, computed on demand
 	 */
 	private int hashCode_ = 0;
 
-	static <T> T failGetPremise(int index) {
-		throw new IndexOutOfBoundsException("No premise with index: " + index);
-	}
-
-	void checkPremiseIndex(int index) {
-		if (index < 0 || index >= getPremiseCount()) {
-			failGetPremise(index);
-		}
-	}
-
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		if (hashCode_ == 0) {
-			hashCode_ = accept(ElkInferenceHash.getHashVisitor());
+			hashCode_ = accept(ElkObjectHash.getInstance());
 		}
 		// else
 		return hashCode_;
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		// else
-		if (o instanceof ElkInference) {
-			return hashCode() == o.hashCode()
-					&& ElkInferenceEquality.equals(this, (ElkInference) o);
-		}
-		// else
-		return false;
+	public final boolean equals(Object o) {
+		return this == o || (o != null && hashCode() == o.hashCode()
+				&& accept(new ElkObjectEquality(o)) != null);
 	}
 
 	@Override
 	public String toString() {
-		return ElkInferencePrinter.toString(this);
+		return OwlFunctionalStylePrinter.toString(this);
 	}
 
 }

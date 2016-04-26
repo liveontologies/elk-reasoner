@@ -6,7 +6,7 @@ package org.semanticweb.elk.owl.comparison;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,6 @@ package org.semanticweb.elk.owl.comparison;
  * limitations under the License.
  * #L%
  */
-
-import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkAnnotation;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationAssertionAxiom;
@@ -108,10 +106,9 @@ import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 import org.semanticweb.elk.util.hashing.HashGenerator;
-import org.semanticweb.elk.util.hashing.Hasher;
 
 /**
- * Static methods for computing hash codes for {@link ElkObject}s modulo
+ * A visitor for computing hash codes for {@link ElkObject}s modulo
  * syntactic equality. Two {@link ElkObject}s are syntactically equal if all
  * their corresponding values are syntactically equal. Syntactically equal
  * objects should return the same hash values.
@@ -121,42 +118,28 @@ import org.semanticweb.elk.util.hashing.Hasher;
  * @see ElkObjectEquality
  *
  */
-public class ElkObjectHash
-		implements ElkObjectVisitor<Integer>, Hasher<ElkObject> {
+public class ElkObjectHash implements ElkObjectVisitor<Integer> {
 
 	private static ElkObjectHash INSTANCE_ = new ElkObjectHash();
 
 	private ElkObjectHash() {
 
 	}
+	
+	public static ElkObjectVisitor<Integer> getInstance() {
+		return INSTANCE_;
+	}
 
 	private static int combinedHashCode(int... hashes) {
 		return HashGenerator.combineListHash(hashes);
 	}
 
-	private static int hashCode(Class<?> c) {
-		return c.hashCode();
+	private static int hashCode(Object object) {
+		return object.hashCode();
 	}
-
-	public static int hashCode(ElkObject object) {
-		return object == null ? 0 : object.accept(INSTANCE_);
-	}
-
-	public static int hashCode(List<? extends ElkObject> objects) {
-		return HashGenerator.combineListHash(objects, INSTANCE_);
-	}
-
+	
 	private static int hashCode(int i) {
 		return i;
-	}
-
-	private static int hashCode(String s) {
-		return s.hashCode();
-	}
-
-	@Override
-	public int hash(ElkObject object) {
-		return hashCode(object);
 	}
 
 	@Override

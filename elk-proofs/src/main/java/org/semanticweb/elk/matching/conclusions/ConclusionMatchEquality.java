@@ -22,12 +22,6 @@ package org.semanticweb.elk.matching.conclusions;
  * #L%
  */
 
-import java.util.List;
-
-import org.semanticweb.elk.owl.comparison.ElkObjectEquality;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.reasoner.tracing.Conclusion;
-
 public class ConclusionMatchEquality
 		implements ConclusionMatch.Visitor<Boolean> {
 
@@ -45,19 +39,10 @@ public class ConclusionMatchEquality
 			return false;
 		}
 
-		static boolean equals(ConclusionMatch first, ConclusionMatch second) {
+		static boolean equals(Object first, Object second) {
 			return first.equals(second);
 		}
-
-		static boolean equals(IndexedContextRootMatch first,
-				IndexedContextRootMatch second) {
-			return first.equals(second);
-		}
-
-		static boolean equals(SubsumerMatch first, SubsumerMatch second) {
-			return first.equals(second);
-		}
-
+				
 		static boolean equals(IndexedContextRootMatchChain first,
 				IndexedContextRootMatchChain second) {
 			boolean result = false;
@@ -76,22 +61,10 @@ public class ConclusionMatchEquality
 			}
 		}
 
-		static boolean equals(Conclusion first, Conclusion second) {
-			return first.equals(second);
-		}
-
 		static boolean equals(int first, int second) {
 			return first == second;
-		}
+		}		
 
-		static boolean equals(ElkObject first, ElkObject second) {
-			return first.equals(second);
-		}
-
-		static boolean equals(List<? extends ElkObject> first,
-				List<? extends ElkObject> second) {
-			return ElkObjectEquality.equals(first, second);
-		}
 	}
 
 	public static boolean equals(ConclusionMatch first,
