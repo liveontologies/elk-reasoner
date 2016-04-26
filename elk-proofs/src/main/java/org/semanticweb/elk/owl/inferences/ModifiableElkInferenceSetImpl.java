@@ -46,8 +46,7 @@ public class ModifiableElkInferenceSetImpl
 	@Override
 	public void produce(ElkInference inference) {
 		LOGGER_.trace("{}: inference produced", inference);
-		inferenceMap_.add(new ElkInferenceConclusion(elkFactory_, inference),
-				inference);
+		inferenceMap_.add(inference.getConclusion(elkFactory_), inference);
 	}
 
 	@Override
