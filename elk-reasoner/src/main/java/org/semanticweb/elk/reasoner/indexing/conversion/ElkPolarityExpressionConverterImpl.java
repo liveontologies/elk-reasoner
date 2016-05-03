@@ -211,7 +211,7 @@ public class ElkPolarityExpressionConverterImpl extends
 		int size = elkObjectOneOf.getIndividuals().size();
 		switch (size) {
 		case 0:
-			return factory_.getIndexedClass(elkFactory_.getOwlThing());
+			return factory_.getIndexedClass(elkFactory_.getOwlNothing());
 		case 1:
 			if (LOGGER_.isWarnEnabled()) {
 				LoggerWrap
@@ -237,7 +237,7 @@ public class ElkPolarityExpressionConverterImpl extends
 		int size = elkObjectUnionOf.getClassExpressions().size();
 		switch (size) {
 		case 0:
-			return factory_.getIndexedClass(elkFactory_.getOwlThing());
+			return factory_.getIndexedClass(elkFactory_.getOwlNothing());
 		case 1:
 			return elkObjectUnionOf.getClassExpressions().iterator().next()
 					.accept(this);
