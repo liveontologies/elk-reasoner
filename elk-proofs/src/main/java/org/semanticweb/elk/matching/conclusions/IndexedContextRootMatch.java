@@ -1,5 +1,8 @@
 package org.semanticweb.elk.matching.conclusions;
 
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -58,6 +61,9 @@ public abstract class IndexedContextRootMatch {
 		return IndexedContextRootMatchPrinter.toString(this);
 	}
 
+	
+	public abstract ElkClassExpression toElkExpression(ElkObject.Factory factory);		
+	
 	public abstract <O> O accept(Visitor<O> visitor);
 
 	/**

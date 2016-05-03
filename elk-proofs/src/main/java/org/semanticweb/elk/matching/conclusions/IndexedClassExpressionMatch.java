@@ -23,6 +23,7 @@ package org.semanticweb.elk.matching.conclusions;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 public class IndexedClassExpressionMatch extends IndexedContextRootMatch {
 
@@ -34,6 +35,11 @@ public class IndexedClassExpressionMatch extends IndexedContextRootMatch {
 
 	public ElkClassExpression getValue() {
 		return match_;
+	}
+
+	@Override
+	public ElkClassExpression toElkExpression(ElkObject.Factory factory) {
+		return getValue();
 	}
 
 	@Override

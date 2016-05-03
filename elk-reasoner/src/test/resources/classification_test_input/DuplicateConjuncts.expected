@@ -1,0 +1,6 @@
+Prefix(:=<http://example.org/>)
+Ontology(
+
+SubClassOf(:A :B)
+
+)

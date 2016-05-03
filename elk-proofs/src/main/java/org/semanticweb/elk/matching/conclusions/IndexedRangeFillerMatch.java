@@ -1,5 +1,8 @@
 package org.semanticweb.elk.matching.conclusions;
 
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -40,6 +43,12 @@ public class IndexedRangeFillerMatch extends IndexedContextRootMatch {
 	 */
 	public ElkObjectSomeValuesFrom getValue() {
 		return existentialMatch_;
+	}
+
+	@Override
+	public ElkClassExpression toElkExpression(ElkObject.Factory factory) {
+		// TODO: provide full support
+		return getValue().getFiller();
 	}
 
 	@Override

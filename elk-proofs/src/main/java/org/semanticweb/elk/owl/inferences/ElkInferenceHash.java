@@ -52,6 +52,33 @@ public class ElkInferenceHash
 
 	@Override
 	public Integer visit(
+			ElkClassInclusionEmptyObjectIntersectionOfComposition inference) {
+		return combinedHashCode(
+				hashCode(
+						ElkClassInclusionEmptyObjectIntersectionOfComposition.class),
+				hashCode(inference.getSubExpression()));
+	}
+
+	@Override
+	public Integer visit(
+			ElkClassInclusionEmptyObjectOneOfDecomposition inference) {
+		return combinedHashCode(
+				hashCode(
+						ElkClassInclusionEmptyObjectIntersectionOfComposition.class),
+				hashCode(inference.getSubExpression()));
+	}
+
+	@Override
+	public Integer visit(
+			ElkClassInclusionEmptyObjectUnionOfDecomposition inference) {
+		return combinedHashCode(
+				hashCode(
+						ElkClassInclusionEmptyObjectIntersectionOfComposition.class),
+				hashCode(inference.getSubExpression()));
+	}
+
+	@Override
+	public Integer visit(
 			ElkClassInclusionExistentialFillerExpansion inference) {
 		return combinedHashCode(
 				hashCode(ElkClassInclusionExistentialFillerExpansion.class),
@@ -155,6 +182,16 @@ public class ElkInferenceHash
 	}
 
 	@Override
+	public Integer visit(
+			ElkClassInclusionSingletonObjectUnionOfDecomposition inference) {
+		return combinedHashCode(
+				hashCode(
+						ElkClassInclusionEmptyObjectIntersectionOfComposition.class),
+				hashCode(inference.getSubExpression()),
+				hashCode(inference.getDisjunct()));
+	}
+
+	@Override
 	public Integer visit(ElkClassInclusionTautology inference) {
 		return combinedHashCode(hashCode(ElkClassInclusionTautology.class),
 				hashCode(inference.getExpression()));
@@ -169,7 +206,8 @@ public class ElkInferenceHash
 
 	@Override
 	public Integer visit(ElkPropertyInclusionOfEquivalence inference) {
-		return combinedHashCode(hashCode(ElkPropertyInclusionOfEquivalence.class),
+		return combinedHashCode(
+				hashCode(ElkPropertyInclusionOfEquivalence.class),
 				hashCode(inference.getExpressions()),
 				hashCode(inference.getSubPos()),
 				hashCode(inference.getSuperPos()));

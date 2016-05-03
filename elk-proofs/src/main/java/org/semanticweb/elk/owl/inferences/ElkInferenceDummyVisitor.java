@@ -38,6 +38,22 @@ public class ElkInferenceDummyVisitor<O> implements ElkInference.Visitor<O> {
 	}
 
 	@Override
+	public O visit(
+			ElkClassInclusionEmptyObjectIntersectionOfComposition inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkClassInclusionEmptyObjectOneOfDecomposition inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkClassInclusionEmptyObjectUnionOfDecomposition inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
 	public O visit(ElkClassInclusionExistentialFillerExpansion inference) {
 		return defaultVisit(inference);
 	}
@@ -95,6 +111,12 @@ public class ElkInferenceDummyVisitor<O> implements ElkInference.Visitor<O> {
 
 	@Override
 	public O visit(ElkClassInclusionReflexivePropertyRange inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(
+			ElkClassInclusionSingletonObjectUnionOfDecomposition inference) {
 		return defaultVisit(inference);
 	}
 

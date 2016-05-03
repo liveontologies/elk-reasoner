@@ -41,7 +41,7 @@ public abstract class SubsumerMatch {
 
 	public abstract int getConjunctionPrefixLength(
 			IndexedClassExpression subsumer);
-
+	
 	public abstract <O> O accept(Visitor<O> visitor);
 
 	@Override
@@ -80,7 +80,7 @@ public abstract class SubsumerMatch {
 	 * @param <O>
 	 *            the type of the output
 	 */
-	interface Visitor<O> extends SubsumerGeneralMatch.Visitor<O>,
+	public interface Visitor<O> extends SubsumerGeneralMatch.Visitor<O>,
 			SubsumerPartialConjunctionMatch.Visitor<O> {
 
 		// combined interface

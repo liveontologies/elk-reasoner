@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatch;
+import org.semanticweb.elk.matching.conclusions.ConclusionMatchCanonizerVisitor;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.IndexedClassExpressionMatch;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
@@ -50,6 +51,8 @@ public class Matcher {
 	private final Queue<ConclusionMatch> toDoConclusions_;
 
 	private final ConclusionMatch.Visitor<Void> conclusionMatcher_;
+	
+	private final ConclusionMatch.Visitor<Boolean> conclusionCanonizer_;
 
 	private final InferenceMatch.Visitor<Void> inferenceMatcher_;
 
@@ -68,9 +71,13 @@ public class Matcher {
 				inferences);
 		conclusionMatcher_ = new ConclusionMatcherVisitor(inferenceMatchFactory,
 				matchedInferences);
+		ElkInferenceProducingFactory elkInferenceFactory = new ElkInferenceProducingFactory(
+				elkInferenceProducer);
+		conclusionCanonizer_ = new ConclusionMatchCanonizerVisitor(
+				conclusionMatchFactory_, elkInferenceFactory);
 		inferenceMatcher_ = new InferenceMatchVisitor(matchedInferences,
 				hierarchy, conclusionMatchFactory_, inferenceMatchFactory,
-				new ElkInferenceProducingFactory(elkInferenceProducer));
+				elkInferenceFactory);
 	}
 
 	public void trace(SubClassInclusionComposed conclusion) {
@@ -96,7 +103,9 @@ public class Matcher {
 			ConclusionMatch conclusion = toDoConclusions_.poll();
 			if (conclusion != null) {
 				LOGGER_.trace("{}: process", conclusion);
-				conclusion.accept(conclusionMatcher_);
+				if (!conclusion.accept(conclusionCanonizer_)) {
+					conclusion.accept(conclusionMatcher_);
+				}
 				continue;
 			}
 			InferenceMatch inference = toDoInferences_.poll();

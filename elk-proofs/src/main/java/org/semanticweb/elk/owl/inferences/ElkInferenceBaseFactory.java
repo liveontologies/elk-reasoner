@@ -31,6 +31,27 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 public class ElkInferenceBaseFactory implements ElkInference.Factory {
 
 	@Override
+	public ElkClassInclusionEmptyObjectIntersectionOfComposition getElkClassInclusionEmptyObjectIntersectionOfComposition(
+			ElkClassExpression subExpression) {
+		return new ElkClassInclusionEmptyObjectIntersectionOfComposition(
+				subExpression);
+	}
+
+	@Override
+	public ElkClassInclusionEmptyObjectOneOfDecomposition getElkClassInclusionEmptyObjectOneOfDecomposition(
+			ElkClassExpression subExpression) {
+		return new ElkClassInclusionEmptyObjectOneOfDecomposition(
+				subExpression);
+	}
+
+	@Override
+	public ElkClassInclusionEmptyObjectUnionOfDecomposition getElkClassInclusionEmptyObjectUnionOfDecomposition(
+			ElkClassExpression subExpression) {
+		return new ElkClassInclusionEmptyObjectUnionOfDecomposition(
+				subExpression);
+	}
+
+	@Override
 	public ElkClassInclusionExistentialFillerExpansion getElkClassInclusionExistentialFillerUnfolding(
 			ElkClassExpression subClass, ElkObjectPropertyExpression property,
 			ElkClassExpression subFiller, ElkClassExpression superFiller) {
@@ -139,6 +160,13 @@ public class ElkInferenceBaseFactory implements ElkInference.Factory {
 			ElkClassExpression range) {
 		return new ElkClassInclusionReflexivePropertyRange(subClass, property,
 				range);
+	}
+
+	@Override
+	public ElkClassInclusionSingletonObjectUnionOfDecomposition getElkClassInclusionSingletonObjectUnionOfDecomposition(
+			ElkClassExpression subExpression, ElkClassExpression disjunct) {
+		return new ElkClassInclusionSingletonObjectUnionOfDecomposition(
+				subExpression, disjunct);
 	}
 
 	@Override

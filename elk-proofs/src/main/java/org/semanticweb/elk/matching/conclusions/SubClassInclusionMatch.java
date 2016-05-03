@@ -45,6 +45,13 @@ public abstract class SubClassInclusionMatch<P>
 			ElkObjectIntersectionOf subsumerFullConjunctionMatch,
 			int subsumerConjunctionPrefixLength) {
 		super(parent);
+		if (subsumerConjunctionPrefixLength < 1
+				|| subsumerConjunctionPrefixLength >= subsumerFullConjunctionMatch
+						.getClassExpressions().size()) {
+			throw new IllegalArgumentException(
+					"Incorrect conjunction prefix length: "
+							+ subsumerConjunctionPrefixLength);
+		}
 		if (subsumerConjunctionPrefixLength == 1) {
 			this.subsumerMatch_ = new SubsumerGeneralMatch(
 					subsumerFullConjunctionMatch.getClassExpressions().get(0));
@@ -71,6 +78,6 @@ public abstract class SubClassInclusionMatch<P>
 
 	public int getSubsumerConjunctionPrefixLength() {
 		return subsumerMatch_.getConjunctionPrefixLength(getSubsumer());
-	}
+	}	
 
 }

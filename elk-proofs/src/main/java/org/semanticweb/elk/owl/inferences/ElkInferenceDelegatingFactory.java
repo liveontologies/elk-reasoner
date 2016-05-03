@@ -41,6 +41,30 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 	}
 
 	@Override
+	public ElkClassInclusionEmptyObjectIntersectionOfComposition getElkClassInclusionEmptyObjectIntersectionOfComposition(
+			ElkClassExpression subExpression) {
+		return filter(mainFactory_
+				.getElkClassInclusionEmptyObjectIntersectionOfComposition(
+						subExpression));
+	}
+
+	@Override
+	public ElkClassInclusionEmptyObjectOneOfDecomposition getElkClassInclusionEmptyObjectOneOfDecomposition(
+			ElkClassExpression subExpression) {
+		return filter(
+				mainFactory_.getElkClassInclusionEmptyObjectOneOfDecomposition(
+						subExpression));
+	}
+
+	@Override
+	public ElkClassInclusionEmptyObjectUnionOfDecomposition getElkClassInclusionEmptyObjectUnionOfDecomposition(
+			ElkClassExpression subExpression) {
+		return filter(mainFactory_
+				.getElkClassInclusionEmptyObjectUnionOfDecomposition(
+						subExpression));
+	}
+
+	@Override
 	public ElkClassInclusionExistentialFillerExpansion getElkClassInclusionExistentialFillerUnfolding(
 			ElkClassExpression subClass, ElkObjectPropertyExpression property,
 			ElkClassExpression subFiller, ElkClassExpression superFiller) {
@@ -159,6 +183,14 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 			ElkClassExpression range) {
 		return filter(mainFactory_.getElkClassInclusionReflexivePropertyRange(
 				subClass, property, range));
+	}
+
+	@Override
+	public ElkClassInclusionSingletonObjectUnionOfDecomposition getElkClassInclusionSingletonObjectUnionOfDecomposition(
+			ElkClassExpression subExpression, ElkClassExpression disjunct) {
+		return filter(mainFactory_
+				.getElkClassInclusionSingletonObjectUnionOfDecomposition(
+						subExpression, disjunct));
 	}
 
 	@Override

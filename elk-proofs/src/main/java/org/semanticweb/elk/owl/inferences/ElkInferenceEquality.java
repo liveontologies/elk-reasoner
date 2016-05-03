@@ -54,6 +54,45 @@ public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 
 	@Override
 	public Boolean visit(
+			final ElkClassInclusionEmptyObjectIntersectionOfComposition inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(
+					ElkClassInclusionEmptyObjectIntersectionOfComposition other) {
+				return equals(other.getSubExpression(),
+						inference.getSubExpression());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(
+			final ElkClassInclusionEmptyObjectOneOfDecomposition inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(
+					ElkClassInclusionEmptyObjectOneOfDecomposition other) {
+				return equals(other.getSubExpression(),
+						inference.getSubExpression());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(
+			final ElkClassInclusionEmptyObjectUnionOfDecomposition inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(
+					ElkClassInclusionEmptyObjectUnionOfDecomposition other) {
+				return equals(other.getSubExpression(),
+						inference.getSubExpression());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(
 			final ElkClassInclusionExistentialFillerExpansion inference) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
@@ -216,6 +255,20 @@ public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 				return equals(other.getSubClass(), inference.getSubClass())
 						&& equals(other.getProperty(), inference.getProperty())
 						&& equals(other.getRange(), inference.getRange());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(
+			final ElkClassInclusionSingletonObjectUnionOfDecomposition inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(
+					ElkClassInclusionSingletonObjectUnionOfDecomposition other) {
+				return equals(other.getSubExpression(),
+						inference.getSubExpression())
+						&& equals(other.getDisjunct(), inference.getDisjunct());
 			}
 		});
 	}

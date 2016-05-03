@@ -36,6 +36,13 @@ public class SubsumerPartialConjunctionMatch extends SubsumerMatch {
 	SubsumerPartialConjunctionMatch(
 			ElkObjectIntersectionOf fullConjunctionMatch,
 			int conjunctionPrefixLength) {
+		if (conjunctionPrefixLength <= 1
+				|| conjunctionPrefixLength >= fullConjunctionMatch
+						.getClassExpressions().size()) {
+			throw new IllegalArgumentException(
+					"Prefix length should be non-trivial: "
+							+ conjunctionPrefixLength);
+		}
 		this.fullConjunctionMatch_ = fullConjunctionMatch;
 		this.conjunctionPrefixLength_ = conjunctionPrefixLength;
 	}
@@ -50,13 +57,6 @@ public class SubsumerPartialConjunctionMatch extends SubsumerMatch {
 
 	@Override
 	public ElkClassExpression getGeneralMatch(IndexedClassExpression subsumer) {
-		if (conjunctionPrefixLength_ == fullConjunctionMatch_
-				.getClassExpressions().size()) {
-			return fullConjunctionMatch_;
-		} else if (conjunctionPrefixLength_ == 1) {
-			return fullConjunctionMatch_.getClassExpressions().get(0);
-		}
-		// else
 		throw new ElkMatchException(subsumer, fullConjunctionMatch_,
 				conjunctionPrefixLength_);
 	}
@@ -71,7 +71,7 @@ public class SubsumerPartialConjunctionMatch extends SubsumerMatch {
 	public int getConjunctionPrefixLength(IndexedClassExpression subsumer) {
 		return conjunctionPrefixLength_;
 	}
-
+	
 	@Override
 	public <O> O accept(SubsumerMatch.Visitor<O> visitor) {
 		return visitor.visit(this);

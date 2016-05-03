@@ -1,0 +1,8 @@
+Prefix(:=<http://example.org/>)
+Ontology(
+
+SubClassOf(
+	ObjectUnionOf(:A ObjectUnionOf(:A :A) ObjectUnionOf(:A :A :A)) 
+	:B
+	)
+)

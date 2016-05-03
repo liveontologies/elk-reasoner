@@ -32,14 +32,12 @@ import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchHierarchy;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2;
-import org.semanticweb.elk.matching.conclusions.IndexedClassExpressionMatch;
 import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatchChain;
 import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch2;
 import org.semanticweb.elk.matching.conclusions.IndexedObjectPropertyRangeAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedObjectPropertyRangeAxiomMatch2;
-import org.semanticweb.elk.matching.conclusions.IndexedRangeFillerMatch;
 import org.semanticweb.elk.matching.conclusions.IndexedSubClassOfAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedSubClassOfAxiomMatch2;
 import org.semanticweb.elk.matching.conclusions.IndexedSubObjectPropertyOfAxiomMatch1;
@@ -186,23 +184,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 	}
 
 	ElkClassExpression toElkExpression(IndexedContextRootMatch rootMatch) {
-		return rootMatch.accept(
-				new IndexedContextRootMatch.Visitor<ElkClassExpression>() {
-
-					@Override
-					public ElkClassExpression visit(
-							IndexedClassExpressionMatch match) {
-						return match.getValue();
-					}
-
-					@Override
-					public ElkClassExpression visit(
-							IndexedRangeFillerMatch match) {
-						// TODO: get expression for the property
-						return match.getValue().getFiller();
-					}
-
-				});
+		return rootMatch.toElkExpression(conclusionFactory_);
 	}
 
 	List<? extends ElkObjectPropertyExpression> toList(

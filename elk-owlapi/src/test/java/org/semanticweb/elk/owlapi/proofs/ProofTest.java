@@ -48,8 +48,7 @@ import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
 
 /**
  * 
- * @author	Pavel Klinov
- * 			pavel.klinov@uni-ulm.de
+ * @author Pavel Klinov pavel.klinov@uni-ulm.de
  *
  */
 public class ProofTest {
@@ -58,102 +57,235 @@ public class ProofTest {
 	public void reflexiveRoles() throws Exception {
 		final OWLDataFactory factory = OWLManager.getOWLDataFactory();
 		// loading and classifying via the OWL API
-		final OWLOntology ontology = loadOntology(ProofTest.class.getClassLoader().getResourceAsStream("classification_test_input/ReflexiveRole.owl"));
-		final ExplainingOWLReasoner reasoner = OWLAPITestUtils.createReasoner(ontology);
-		
+		final OWLOntology ontology = loadOntology(
+				ProofTest.class.getClassLoader().getResourceAsStream(
+						"classification_test_input/ReflexiveRole.owl"));
+		final ExplainingOWLReasoner reasoner = OWLAPITestUtils
+				.createReasoner(ontology);
+
 		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
-		
+
 		OWLClass sub = factory.getOWLClass(IRI.create("http://example.org/K"));
 		OWLClass sup = factory.getOWLClass(IRI.create("http://example.org/L"));
-		
-		//printInferences(reasoner, sub, sup);
-		
-		ProofTestUtils.provabilityTest(reasoner, factory.getOWLSubClassOfAxiom(sub, sup));
+
+		// printInferences(reasoner, sub, sup);
+
+		ProofTestUtils.provabilityTest(reasoner,
+				factory.getOWLSubClassOfAxiom(sub, sup));
 	}
-	
+
 	@Test
 	public void reflexiveRoles2() throws Exception {
 		final OWLDataFactory factory = OWLManager.getOWLDataFactory();
-		final OWLOntology ontology = loadOntology(ProofTest.class.getClassLoader().getResourceAsStream("classification_test_input/ReflexiveRole.owl"));
-		final ExplainingOWLReasoner reasoner = OWLAPITestUtils.createReasoner(ontology);
-		
+		final OWLOntology ontology = loadOntology(
+				ProofTest.class.getClassLoader().getResourceAsStream(
+						"classification_test_input/ReflexiveRole.owl"));
+		final ExplainingOWLReasoner reasoner = OWLAPITestUtils
+				.createReasoner(ontology);
+
 		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
-		
+
 		OWLClass sub = factory.getOWLClass(IRI.create("http://example.org/C1"));
 		OWLClass sup = factory.getOWLClass(IRI.create("http://example.org/F"));
-		
-		ProofTestUtils.provabilityTest(reasoner, factory.getOWLSubClassOfAxiom(sub, sup));
+
+		ProofTestUtils.provabilityTest(reasoner,
+				factory.getOWLSubClassOfAxiom(sub, sup));
 	}
-	
+
 	@Test
 	public void compositionReflexivity() throws Exception {
 		final OWLDataFactory factory = OWLManager.getOWLDataFactory();
 		// loading and classifying via the OWL API
-		final OWLOntology ontology = loadOntology(ProofTest.class.getClassLoader().getResourceAsStream("classification_test_input/CompositionReflexivity.owl"));
-		final ExplainingOWLReasoner reasoner = OWLAPITestUtils.createReasoner(ontology);
-		
+		final OWLOntology ontology = loadOntology(
+				ProofTest.class.getClassLoader().getResourceAsStream(
+						"classification_test_input/CompositionReflexivity.owl"));
+		final ExplainingOWLReasoner reasoner = OWLAPITestUtils
+				.createReasoner(ontology);
+
 		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
-		
+
 		OWLClass sub = factory.getOWLClass(IRI.create("http://example.org/A"));
 		OWLClass sup = factory.getOWLClass(IRI.create("http://example.org/B"));
+
+		// printInferences(reasoner, sub, sup);
+
+		ProofTestUtils.provabilityTest(reasoner,
+				factory.getOWLSubClassOfAxiom(sub, sup));
+	}
+
+	@Test
+	public void emptyConjunction() throws Exception {
+		final OWLDataFactory factory = OWLManager.getOWLDataFactory();
+		OWLOntologyManager owlManager = OWLManager
+				.createConcurrentOWLOntologyManager();
+		// creating an ontology
+		final OWLOntology ontology = owlManager.createOntology();
+		OWLClass a = factory.getOWLClass(IRI.create("http://example.org/A"));
+		OWLClass b = factory.getOWLClass(IRI.create("http://example.org/B"));
+		OWLClass c = factory.getOWLClass(IRI.create("http://example.org/C"));
+		OWLClass d = factory.getOWLClass(IRI.create("http://example.org/D"));
+		// ObjectInteresectionOf() = owl:Thing
+		owlManager.addAxiom(ontology, factory.getOWLSubClassOfAxiom(a,
+				factory.getOWLObjectIntersectionOf()));
+		owlManager.addAxiom(ontology,
+				factory.getOWLSubClassOfAxiom(b, factory.getOWLThing()));
+		owlManager.addAxiom(ontology, factory.getOWLSubClassOfAxiom(
+				factory.getOWLObjectIntersectionOf(), c));
+		owlManager.addAxiom(ontology,
+				factory.getOWLSubClassOfAxiom(factory.getOWLThing(), d));
+
+		final ExplainingOWLReasoner reasoner = OWLAPITestUtils
+				.createReasoner(ontology);
+
+		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+
+		ProofTestUtils.provabilityTest(reasoner,
+				factory.getOWLSubClassOfAxiom(a, c));
+		ProofTestUtils.provabilityTest(reasoner,
+				factory.getOWLSubClassOfAxiom(a, d));
+		ProofTestUtils.provabilityTest(reasoner,
+				factory.getOWLSubClassOfAxiom(b, c));
+		ProofTestUtils.provabilityTest(reasoner,
+				factory.getOWLSubClassOfAxiom(b, d));
+	}
+
+	
+	@Test
+	public void emptyDisjunction() throws Exception {
+		final OWLDataFactory factory = OWLManager.getOWLDataFactory();
+		OWLOntologyManager owlManager = OWLManager
+				.createConcurrentOWLOntologyManager();
+		// creating an ontology
+		final OWLOntology ontology = owlManager.createOntology();
+		OWLClass a = factory.getOWLClass(IRI.create("http://example.org/A"));
+		OWLClass b = factory.getOWLClass(IRI.create("http://example.org/B"));
+		OWLClass c = factory.getOWLClass(IRI.create("http://example.org/C"));
+		// ObjectUnionOf() = owl:Nothing
+		owlManager.addAxiom(ontology, factory.getOWLSubClassOfAxiom(a,
+				factory.getOWLObjectUnionOf()));
+		owlManager.addAxiom(ontology,
+				factory.getOWLSubClassOfAxiom(b, factory.getOWLNothing()));
+		owlManager.addAxiom(ontology, factory.getOWLSubClassOfAxiom(
+				factory.getOWLObjectUnionOf(), c));
 		
-		//printInferences(reasoner, sub, sup);
+		final ExplainingOWLReasoner reasoner = OWLAPITestUtils
+				.createReasoner(ontology);
+
+		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+
+		ProofTestUtils.provabilityTest(reasoner,
+				factory.getOWLSubClassOfAxiom(a, b));
+		ProofTestUtils.provabilityTest(reasoner,
+				factory.getOWLSubClassOfAxiom(b, a));
+		ProofTestUtils.provabilityTest(reasoner,
+				factory.getOWLSubClassOfAxiom(a, c));
+		ProofTestUtils.provabilityTest(reasoner,
+				factory.getOWLSubClassOfAxiom(b, c));
+	}
+	
+	@Test
+	public void emptyEnumeration() throws Exception {
+		final OWLDataFactory factory = OWLManager.getOWLDataFactory();
+		OWLOntologyManager owlManager = OWLManager
+				.createConcurrentOWLOntologyManager();
+		// creating an ontology
+		final OWLOntology ontology = owlManager.createOntology();
+		OWLClass a = factory.getOWLClass(IRI.create("http://example.org/A"));
+		OWLClass b = factory.getOWLClass(IRI.create("http://example.org/B"));
+		OWLClass c = factory.getOWLClass(IRI.create("http://example.org/C"));
+		// ObjectOneOf() = owl:Nothing
+		owlManager.addAxiom(ontology, factory.getOWLSubClassOfAxiom(a,
+				factory.getOWLObjectOneOf()));
+		owlManager.addAxiom(ontology,
+				factory.getOWLSubClassOfAxiom(b, factory.getOWLNothing()));
+		owlManager.addAxiom(ontology, factory.getOWLSubClassOfAxiom(
+				factory.getOWLObjectOneOf(), c));
 		
-		ProofTestUtils.provabilityTest(reasoner, factory.getOWLSubClassOfAxiom(sub, sup));
+		final ExplainingOWLReasoner reasoner = OWLAPITestUtils
+				.createReasoner(ontology);
+
+		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+
+		ProofTestUtils.provabilityTest(reasoner,
+				factory.getOWLSubClassOfAxiom(a, b));
+		ProofTestUtils.provabilityTest(reasoner,
+				factory.getOWLSubClassOfAxiom(b, a));
+		ProofTestUtils.provabilityTest(reasoner,
+				factory.getOWLSubClassOfAxiom(a, c));
+		ProofTestUtils.provabilityTest(reasoner,
+				factory.getOWLSubClassOfAxiom(b, c));
 	}
 	
 	@Test
 	public void proofsUnderOntologyUpdate() throws Exception {
 		OWLDataFactory factory = OWLManager.getOWLDataFactory();
 		// loading and classifying via the OWL API
-		OWLOntology ontology = loadOntology(ProofTest.class.getClassLoader().getResourceAsStream("ontologies/PropertyCompositionsWithHierarchy.owl"));
-		ExplainingOWLReasoner reasoner = OWLAPITestUtils.createReasoner(ontology);
-		
+		OWLOntology ontology = loadOntology(
+				ProofTest.class.getClassLoader().getResourceAsStream(
+						"ontologies/PropertyCompositionsWithHierarchy.owl"));
+		ExplainingOWLReasoner reasoner = OWLAPITestUtils
+				.createReasoner(ontology);
+
 		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
-		
+
 		OWLClass sub = factory.getOWLClass(IRI.create("http://example.org/A"));
 		OWLClass sup = factory.getOWLClass(IRI.create("http://example.org/G"));
-		
-		//printInferences(reasoner, sub, sup);
-		//OWLExpression root = reasoner.getDerivedExpression(factory.getOWLSubClassOfAxiom(sub, sup));
-		//System.err.println(OWLProofUtils.printProofTree(root));
-		ProofTestUtils.provabilityTest(reasoner, factory.getOWLSubClassOfAxiom(sub, sup));
-		
+
+		// printInferences(reasoner, sub, sup);
+		// OWLExpression root =
+		// reasoner.getDerivedExpression(factory.getOWLSubClassOfAxiom(sub,
+		// sup));
+		// System.err.println(OWLProofUtils.printProofTree(root));
+		ProofTestUtils.provabilityTest(reasoner,
+				factory.getOWLSubClassOfAxiom(sub, sup));
+
 		// now convert C <= R3 some D to C < S3 some D
 		OWLClass c = factory.getOWLClass(IRI.create("http://example.org/C"));
 		OWLClass d = factory.getOWLClass(IRI.create("http://example.org/D"));
-		OWLObjectProperty r3 = factory.getOWLObjectProperty(IRI.create("http://example.org/R3"));
-		OWLObjectProperty s3 = factory.getOWLObjectProperty(IRI.create("http://example.org/S3"));
-		OWLAxiom oldAx = factory.getOWLSubClassOfAxiom(c, factory.getOWLObjectSomeValuesFrom(r3, d));
-		OWLAxiom newAx = factory.getOWLSubClassOfAxiom(c, factory.getOWLObjectSomeValuesFrom(s3, d));
-		
+		OWLObjectProperty r3 = factory
+				.getOWLObjectProperty(IRI.create("http://example.org/R3"));
+		OWLObjectProperty s3 = factory
+				.getOWLObjectProperty(IRI.create("http://example.org/S3"));
+		OWLAxiom oldAx = factory.getOWLSubClassOfAxiom(c,
+				factory.getOWLObjectSomeValuesFrom(r3, d));
+		OWLAxiom newAx = factory.getOWLSubClassOfAxiom(c,
+				factory.getOWLObjectSomeValuesFrom(s3, d));
+
 		OWLOntologyManager manager = ontology.getOWLOntologyManager();
-		
-		manager.applyChanges(Arrays.asList(new RemoveAxiom(ontology, oldAx), new AddAxiom(ontology, newAx)));
-		
+
+		manager.applyChanges(Arrays.asList(new RemoveAxiom(ontology, oldAx),
+				new AddAxiom(ontology, newAx)));
+
 		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
-		
-		//printInferences(reasoner, sub, sup);
-		//root = reasoner.getDerivedExpression(factory.getOWLSubClassOfAxiom(sub, sup));
-		//System.err.println(OWLProofUtils.printProofTree(root));
-		ProofTestUtils.provabilityTest(reasoner, factory.getOWLSubClassOfAxiom(sub, sup));
+
+		// printInferences(reasoner, sub, sup);
+		// root =
+		// reasoner.getDerivedExpression(factory.getOWLSubClassOfAxiom(sub,
+		// sup));
+		// System.err.println(OWLProofUtils.printProofTree(root));
+		ProofTestUtils.provabilityTest(reasoner,
+				factory.getOWLSubClassOfAxiom(sub, sup));
 	}
-	
-	void printInferences(ExplainingOWLReasoner reasoner, OWLClassExpression sub, OWLClassExpression sup) throws ProofGenerationException {
+
+	void printInferences(ExplainingOWLReasoner reasoner, OWLClassExpression sub,
+			OWLClassExpression sup) throws ProofGenerationException {
 		OWLDataFactory factory = OWLManager.getOWLDataFactory();
-		
-		RecursiveInferenceVisitor.visitInferences(reasoner, factory.getOWLSubClassOfAxiom(sub, sup), new OWLInferenceVisitor() {
-			
-			@Override
-			public void visit(OWLInference inference) {
-				System.err.println(inference);
-				System.err.print("");
-			}
-			
-		}, true);
+
+		RecursiveInferenceVisitor.visitInferences(reasoner,
+				factory.getOWLSubClassOfAxiom(sub, sup),
+				new OWLInferenceVisitor() {
+
+					@Override
+					public void visit(OWLInference inference) {
+						System.err.println(inference);
+						System.err.print("");
+					}
+
+				}, true);
 	}
-	
-	private OWLOntology loadOntology(InputStream stream) throws IOException, Owl2ParseException {
+
+	private OWLOntology loadOntology(InputStream stream)
+			throws IOException, Owl2ParseException {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLOntology ontology = null;
 
@@ -164,7 +296,7 @@ public class ProofTest {
 		} catch (OWLOntologyCreationException e) {
 			throw new Owl2ParseException(e);
 		}
-		
+
 		return ontology;
 	}
 }

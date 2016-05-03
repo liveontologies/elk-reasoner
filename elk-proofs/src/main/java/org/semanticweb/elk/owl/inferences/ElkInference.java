@@ -31,7 +31,7 @@ public interface ElkInference {
 	 * @return the name of this inference
 	 */
 	String getName();
-	
+
 	/**
 	 * @return the number of premises of this inference
 	 */
@@ -64,8 +64,11 @@ public interface ElkInference {
 	 * @author Yevgeny Kazakov
 	 *
 	 */
-	interface Factory
-			extends ElkClassInclusionExistentialFillerExpansion.Factory,
+	interface Factory extends
+			ElkClassInclusionEmptyObjectIntersectionOfComposition.Factory,
+			ElkClassInclusionEmptyObjectOneOfDecomposition.Factory,
+			ElkClassInclusionEmptyObjectUnionOfDecomposition.Factory,
+			ElkClassInclusionExistentialFillerExpansion.Factory,
 			ElkClassInclusionExistentialOfObjectHasSelf.Factory,
 			ElkClassInclusionExistentialPropertyExpansion.Factory,
 			ElkClassInclusionHierarchy.Factory,
@@ -77,6 +80,7 @@ public interface ElkInference {
 			ElkClassInclusionOfReflexiveObjectProperty.Factory,
 			ElkClassInclusionOwlThing.Factory,
 			ElkClassInclusionReflexivePropertyRange.Factory,
+			ElkClassInclusionSingletonObjectUnionOfDecomposition.Factory,
 			ElkClassInclusionTautology.Factory,
 			ElkPropertyInclusionHierarchy.Factory,
 			ElkPropertyInclusionOfEquivalence.Factory,
@@ -96,8 +100,11 @@ public interface ElkInference {
 	 * @param <O>
 	 *            the type of the output
 	 */
-	interface Visitor<O>
-			extends ElkClassInclusionExistentialFillerExpansion.Visitor<O>,
+	interface Visitor<O> extends
+			ElkClassInclusionEmptyObjectIntersectionOfComposition.Visitor<O>,
+			ElkClassInclusionEmptyObjectOneOfDecomposition.Visitor<O>,
+			ElkClassInclusionEmptyObjectUnionOfDecomposition.Visitor<O>,
+			ElkClassInclusionExistentialFillerExpansion.Visitor<O>,
 			ElkClassInclusionExistentialOfObjectHasSelf.Visitor<O>,
 			ElkClassInclusionExistentialPropertyExpansion.Visitor<O>,
 			ElkClassInclusionHierarchy.Visitor<O>,
@@ -109,6 +116,7 @@ public interface ElkInference {
 			ElkClassInclusionOfReflexiveObjectProperty.Visitor<O>,
 			ElkClassInclusionOwlThing.Visitor<O>,
 			ElkClassInclusionReflexivePropertyRange.Visitor<O>,
+			ElkClassInclusionSingletonObjectUnionOfDecomposition.Visitor<O>,
 			ElkClassInclusionTautology.Visitor<O>,
 			ElkPropertyInclusionHierarchy.Visitor<O>,
 			ElkPropertyInclusionOfEquivalence.Visitor<O>,

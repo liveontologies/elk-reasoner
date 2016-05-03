@@ -66,9 +66,8 @@ public class AllOntologiesProofTest extends BaseProofTest {
 	private static final Logger LOGGER_ = LoggerFactory.getLogger(AllOntologiesProofTest.class);
 
 	static final String[] IGNORE_LIST = { "AssertionDisjoint.owl",
-			"ConjunctionsComplex.owl", "DifferentSameIndividual.owl",
-			"Inconsistent.owl", "OneOf.owl", "PropertyRangesHierarchy.owl",
-			"SameIndividual.owl" };
+			"DifferentSameIndividual.owl", "Inconsistent.owl", "OneOf.owl",
+			"PropertyRangesHierarchy.owl", "SameIndividual.owl" };
 
 	static {
 		Arrays.sort(IGNORE_LIST);
