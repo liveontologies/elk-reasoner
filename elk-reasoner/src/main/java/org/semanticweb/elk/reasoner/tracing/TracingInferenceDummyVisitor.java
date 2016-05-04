@@ -12,6 +12,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointClassesAxiomNaryCo
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomBinaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomNaryConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomOwlNothingConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomSubClassConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomSubClassConversion;
@@ -213,6 +214,11 @@ public class TracingInferenceDummyVisitor<O> implements TracingInference.Visitor
 
 	@Override
 	public O visit(ElkDisjointUnionAxiomNaryConversion inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkDisjointUnionAxiomOwlNothingConversion inference) {
 		return defaultVisit(inference);
 	}
 

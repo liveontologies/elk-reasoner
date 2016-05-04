@@ -545,10 +545,9 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 		case 0:
 			defined = (ModifiableIndexedClass) axiom.getDefinedClass()
 					.accept(positiveConverter_);
-			member = negativeFactory_
-					.getIndexedClass(elkFactory_.getOwlThing());
-			axiomFactory_.getElkDisjointUnionAxiomSubClassConversion(axiom, 0,
-					member, defined);
+			axiomFactory_.getElkDisjointUnionAxiomOwlNothingConversion(axiom,
+					defined, positiveFactory_
+							.getIndexedClass(elkFactory_.getOwlNothing()));
 			break;
 		case 1:
 			defined = (ModifiableIndexedClass) axiom.getDefinedClass()

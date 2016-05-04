@@ -34,6 +34,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointClassesAxiomNaryCo
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomBinaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomNaryConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomOwlNothingConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomSubClassConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomSubClassConversion;
@@ -80,25 +81,13 @@ public class TracingInferenceConclusionVisitor<O> extends
 	}
 
 	@Override
-	public O visit(ElkDifferentIndividualsAxiomNaryConversion inference) {
-		return conclusionVisitor_
-				.visit(inference.getConclusion(conclusionFactory_));
-	}
-
-	@Override
-	public O visit(ElkDisjointClassesAxiomNaryConversion inference) {
-		return conclusionVisitor_
-				.visit(inference.getConclusion(conclusionFactory_));
-	}
-
-	@Override
-	public O visit(ElkDisjointUnionAxiomNaryConversion inference) {
-		return conclusionVisitor_
-				.visit(inference.getConclusion(conclusionFactory_));
-	}
-
-	@Override
 	public O visit(ElkClassAssertionAxiomConversion inference) {
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
+	}
+
+	@Override
+	public O visit(ElkDeclarationAxiomConversion inference) {
 		return conclusionVisitor_
 				.visit(inference.getConclusion(conclusionFactory_));
 	}
@@ -110,13 +99,19 @@ public class TracingInferenceConclusionVisitor<O> extends
 	}
 
 	@Override
+	public O visit(ElkDifferentIndividualsAxiomNaryConversion inference) {
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
+	}
+
+	@Override
 	public O visit(ElkDisjointClassesAxiomBinaryConversion inference) {
 		return conclusionVisitor_
 				.visit(inference.getConclusion(conclusionFactory_));
 	}
 
 	@Override
-	public O visit(ElkDisjointUnionAxiomSubClassConversion inference) {
+	public O visit(ElkDisjointClassesAxiomNaryConversion inference) {
 		return conclusionVisitor_
 				.visit(inference.getConclusion(conclusionFactory_));
 	}
@@ -128,7 +123,43 @@ public class TracingInferenceConclusionVisitor<O> extends
 	}
 
 	@Override
+	public O visit(ElkDisjointUnionAxiomEquivalenceConversion inference) {
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
+	}
+
+	@Override
+	public O visit(ElkDisjointUnionAxiomNaryConversion inference) {
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
+	}
+
+	@Override
+	public O visit(ElkDisjointUnionAxiomOwlNothingConversion inference) {
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
+	}
+
+	@Override
+	public O visit(ElkDisjointUnionAxiomSubClassConversion inference) {
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
+	}
+
+	@Override
+	public O visit(ElkEquivalentClassesAxiomEquivalenceConversion inference) {
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
+	}
+
+	@Override
 	public O visit(ElkEquivalentClassesAxiomSubClassConversion inference) {
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
+	}
+
+	@Override
+	public O visit(ElkEquivalentObjectPropertiesAxiomConversion inference) {
 		return conclusionVisitor_
 				.visit(inference.getConclusion(conclusionFactory_));
 	}
@@ -141,6 +172,12 @@ public class TracingInferenceConclusionVisitor<O> extends
 
 	@Override
 	public O visit(ElkObjectPropertyDomainAxiomConversion inference) {
+		return conclusionVisitor_
+				.visit(inference.getConclusion(conclusionFactory_));
+	}
+
+	@Override
+	public O visit(ElkObjectPropertyRangeAxiomConversion inference) {
 		return conclusionVisitor_
 				.visit(inference.getConclusion(conclusionFactory_));
 	}
@@ -164,24 +201,6 @@ public class TracingInferenceConclusionVisitor<O> extends
 	}
 
 	@Override
-	public O visit(ElkDisjointUnionAxiomEquivalenceConversion inference) {
-		return conclusionVisitor_
-				.visit(inference.getConclusion(conclusionFactory_));
-	}
-
-	@Override
-	public O visit(ElkEquivalentClassesAxiomEquivalenceConversion inference) {
-		return conclusionVisitor_
-				.visit(inference.getConclusion(conclusionFactory_));
-	}
-
-	@Override
-	public O visit(ElkEquivalentObjectPropertiesAxiomConversion inference) {
-		return conclusionVisitor_
-				.visit(inference.getConclusion(conclusionFactory_));
-	}
-
-	@Override
 	public O visit(ElkSubObjectPropertyOfAxiomConversion inference) {
 		return conclusionVisitor_
 				.visit(inference.getConclusion(conclusionFactory_));
@@ -189,18 +208,6 @@ public class TracingInferenceConclusionVisitor<O> extends
 
 	@Override
 	public O visit(ElkTransitiveObjectPropertyAxiomConversion inference) {
-		return conclusionVisitor_
-				.visit(inference.getConclusion(conclusionFactory_));
-	}
-
-	@Override
-	public O visit(ElkObjectPropertyRangeAxiomConversion inference) {
-		return conclusionVisitor_
-				.visit(inference.getConclusion(conclusionFactory_));
-	}
-
-	@Override
-	public O visit(ElkDeclarationAxiomConversion inference) {
 		return conclusionVisitor_
 				.visit(inference.getConclusion(conclusionFactory_));
 	}

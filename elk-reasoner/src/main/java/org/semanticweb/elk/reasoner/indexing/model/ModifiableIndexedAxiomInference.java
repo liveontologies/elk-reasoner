@@ -48,6 +48,7 @@ public interface ModifiableIndexedAxiomInference extends IndexedAxiomInference {
 				ModifiableElkDisjointUnionAxiomBinaryConversion.Factory,
 				ModifiableElkDisjointUnionAxiomEquivalenceConversion.Factory,
 				ModifiableElkDisjointUnionAxiomNaryConversion.Factory,
+				ModifiableElkDisjointUnionAxiomOwlNothingConversion.Factory,
 				ModifiableElkDisjointUnionAxiomSubClassConversion.Factory,
 				ModifiableElkEquivalentClassesAxiomEquivalenceConversion.Factory,
 				ModifiableElkEquivalentClassesAxiomSubClassConversion.Factory,

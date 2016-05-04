@@ -31,6 +31,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointClassesAxiomNaryCo
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomBinaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomNaryConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomOwlNothingConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomSubClassConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomSubClassConversion;
@@ -224,6 +225,12 @@ public class TracingInferencePrinter implements TracingInference.Visitor<String>
 
 	@Override
 	public String visit(ElkDisjointUnionAxiomNaryConversion inference) {
+		return String.format("%s -| %s", inference.getConclusion(factory_),
+				inference.getOriginalAxiom());
+	}
+
+	@Override
+	public String visit(ElkDisjointUnionAxiomOwlNothingConversion inference) {
 		return String.format("%s -| %s", inference.getConclusion(factory_),
 				inference.getOriginalAxiom());
 	}

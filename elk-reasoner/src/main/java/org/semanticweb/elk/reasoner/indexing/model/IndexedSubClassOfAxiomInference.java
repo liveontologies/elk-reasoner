@@ -54,6 +54,7 @@ public interface IndexedSubClassOfAxiomInference extends IndexedAxiomInference {
 				ElkClassAssertionAxiomConversion.Visitor<O>,
 				ElkDifferentIndividualsAxiomBinaryConversion.Visitor<O>,
 				ElkDisjointClassesAxiomBinaryConversion.Visitor<O>,
+				ElkDisjointUnionAxiomOwlNothingConversion.Visitor<O>,
 				ElkDisjointUnionAxiomSubClassConversion.Visitor<O>,
 				ElkDisjointUnionAxiomBinaryConversion.Visitor<O>,
 				ElkEquivalentClassesAxiomSubClassConversion.Visitor<O>,

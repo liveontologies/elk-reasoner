@@ -36,6 +36,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointClassesAxiomNaryCo
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomBinaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomNaryConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomOwlNothingConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomSubClassConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomSubClassConversion;
@@ -254,6 +255,12 @@ public class TracingInferencePremiseVisitor<O>
 
 	@Override
 	public O visit(ElkDisjointUnionAxiomNaryConversion inference) {
+		axiomVisitor_.visit(inference.getOriginalAxiom());
+		return null;
+	}
+
+	@Override
+	public O visit(ElkDisjointUnionAxiomOwlNothingConversion inference) {
 		axiomVisitor_.visit(inference.getOriginalAxiom());
 		return null;
 	}

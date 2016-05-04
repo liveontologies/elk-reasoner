@@ -28,6 +28,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ElkClassAssertionAxiomConvers
 import org.semanticweb.elk.reasoner.indexing.model.ElkDifferentIndividualsAxiomBinaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointClassesAxiomBinaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomBinaryConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomOwlNothingConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomSubClassConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomSubClassConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkObjectPropertyAssertionAxiomConversion;
@@ -117,6 +118,12 @@ class IndexedSubClassOfAxiomMatch1InferenceVisitor extends
 	@Override
 	public Void visit(ElkSubClassOfAxiomConversion inference) {
 		factory.getElkSubClassOfAxiomConversionMatch1(inference, child);
+		return null;
+	}
+
+	@Override
+	public Void visit(ElkDisjointUnionAxiomOwlNothingConversion inference) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

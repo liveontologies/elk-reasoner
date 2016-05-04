@@ -70,6 +70,7 @@ import org.semanticweb.elk.matching.inferences.ElkClassAssertionAxiomConversionM
 import org.semanticweb.elk.matching.inferences.ElkDifferentIndividualsAxiomBinaryConversionMatch1;
 import org.semanticweb.elk.matching.inferences.ElkDisjointClassesAxiomBinaryConversionMatch1;
 import org.semanticweb.elk.matching.inferences.ElkDisjointUnionAxiomBinaryConversionMatch1;
+import org.semanticweb.elk.matching.inferences.ElkDisjointUnionAxiomOwlNothingConversionMatch1;
 import org.semanticweb.elk.matching.inferences.ElkDisjointUnionAxiomSubClassConversionMatch1;
 import org.semanticweb.elk.matching.inferences.ElkEquivalentClassesAxiomEquivalenceConversionMatch1;
 import org.semanticweb.elk.matching.inferences.ElkEquivalentClassesAxiomSubClassConversionMatch1;
@@ -510,6 +511,13 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 	@Override
 	public Void visit(
 			ElkDisjointUnionAxiomBinaryConversionMatch1 inferenceMatch1) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			ElkDisjointUnionAxiomOwlNothingConversionMatch1 inferenceMatch1) {
 		// TODO Auto-generated method stub
 		return null;
 	}

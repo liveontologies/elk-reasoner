@@ -142,6 +142,12 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 
 	@Override
 	public String visit(
+			ElkDisjointUnionAxiomOwlNothingConversionMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
 			ElkDisjointUnionAxiomSubClassConversionMatch1 inferenceMatch1) {
 		return inferenceMatch1.getParent() + " | ";
 	}

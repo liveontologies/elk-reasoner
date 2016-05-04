@@ -47,6 +47,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointClassesA
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointUnionAxiomBinaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointUnionAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointUnionAxiomNaryConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointUnionAxiomOwlNothingConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointUnionAxiomSubClassConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkEquivalentClassesAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkEquivalentClassesAxiomSubClassConversion;
@@ -188,6 +189,16 @@ public class ResolvingModifiableIndexedObjectFactory
 			ModifiableIndexedClassExpressionList disjointClasses) {
 		return filter(baseFactory_.getElkDisjointUnionAxiomNaryConversion(
 				originalAxiom, disjointClasses));
+	}
+
+	@Override
+	public ModifiableElkDisjointUnionAxiomOwlNothingConversion getElkDisjointUnionAxiomOwlNothingConversion(
+			ElkDisjointUnionAxiom originalAxiom,
+			ModifiableIndexedClass definedClass,
+			ModifiableIndexedClass bottom) {
+		return filter(baseFactory_
+				.getElkDisjointUnionAxiomOwlNothingConversion(
+						originalAxiom, definedClass, bottom));
 	}
 
 	@Override

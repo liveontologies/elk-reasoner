@@ -64,6 +64,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointClassesA
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointUnionAxiomBinaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointUnionAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointUnionAxiomNaryConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointUnionAxiomOwlNothingConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointUnionAxiomSubClassConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkEquivalentClassesAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkEquivalentClassesAxiomSubClassConversion;
@@ -98,75 +99,6 @@ public class BaseModifiableIndexedObjectFactory
 		implements
 			ModifiableIndexedObject.Factory,
 			CachedIndexedObject.Factory {
-
-	@Override
-	public CachedIndexedClass getIndexedClass(ElkClass elkClass) {
-		return new CachedIndexedClassImpl(elkClass);
-	}
-
-	@Override
-	public CachedIndexedClassExpressionList getIndexedClassExpressionList(
-			List<? extends ModifiableIndexedClassExpression> elements) {
-		return new CachedIndexedClassExpressionListImpl(elements);
-	}
-
-	@Override
-	public CachedIndexedComplexPropertyChain getIndexedComplexPropertyChain(
-			ModifiableIndexedObjectProperty leftProperty,
-			ModifiableIndexedPropertyChain rightProperty) {
-		return new CachedIndexedComplexPropertyChainImpl(leftProperty,
-				rightProperty);
-	}
-
-	@Override
-	public CachedIndexedDataHasValue getIndexedDataHasValue(
-			ElkDataHasValue elkDataHasValue) {
-		return new CachedIndexedDataHasValueImpl(elkDataHasValue);
-	}
-
-	@Override
-	public CachedIndexedIndividual getIndexedIndividual(
-			ElkNamedIndividual elkNamedIndividual) {
-		return new CachedIndexedIndividualImpl(elkNamedIndividual);
-	}
-
-	@Override
-	public CachedIndexedObjectComplementOf getIndexedObjectComplementOf(
-			ModifiableIndexedClassExpression negated) {
-		return new CachedIndexedObjectComplementOfImpl(negated);
-	}
-
-	@Override
-	public CachedIndexedObjectHasSelf getIndexedObjectHasSelf(
-			ModifiableIndexedObjectProperty property) {
-		return new CachedIndexedObjectHasSelfImpl(property);
-	}
-
-	@Override
-	public CachedIndexedObjectIntersectionOf getIndexedObjectIntersectionOf(
-			ModifiableIndexedClassExpression conjunctA,
-			ModifiableIndexedClassExpression conjunctB) {
-		return new CachedIndexedObjectIntersectionOfImpl(conjunctA, conjunctB);
-	}
-
-	@Override
-	public CachedIndexedObjectProperty getIndexedObjectProperty(
-			ElkObjectProperty elkObjectProperty) {
-		return new CachedIndexedObjectPropertyImpl(elkObjectProperty);
-	}
-
-	@Override
-	public CachedIndexedObjectSomeValuesFrom getIndexedObjectSomeValuesFrom(
-			ModifiableIndexedObjectProperty property,
-			ModifiableIndexedClassExpression filler) {
-		return new CachedIndexedObjectSomeValuesFromImpl(property, filler);
-	}
-
-	@Override
-	public CachedIndexedObjectUnionOf getIndexedObjectUnionOf(
-			List<? extends ModifiableIndexedClassExpression> disjuncts) {
-		return new CachedIndexedObjectUnionOfImpl(disjuncts);
-	}
 
 	@Override
 	public ModifiableElkClassAssertionAxiomConversion getElkClassAssertionAxiomConversion(
@@ -362,6 +294,84 @@ public class BaseModifiableIndexedObjectFactory
 			ModifiableIndexedObjectProperty superProperty) {
 		return new ModifiableElkTransitiveObjectPropertyAxiomConversionImpl(
 				originalAxiom, subPropertyChain, superProperty);
+	}
+
+	@Override
+	public CachedIndexedClass getIndexedClass(ElkClass elkClass) {
+		return new CachedIndexedClassImpl(elkClass);
+	}
+
+	@Override
+	public CachedIndexedClassExpressionList getIndexedClassExpressionList(
+			List<? extends ModifiableIndexedClassExpression> elements) {
+		return new CachedIndexedClassExpressionListImpl(elements);
+	}
+
+	@Override
+	public CachedIndexedComplexPropertyChain getIndexedComplexPropertyChain(
+			ModifiableIndexedObjectProperty leftProperty,
+			ModifiableIndexedPropertyChain rightProperty) {
+		return new CachedIndexedComplexPropertyChainImpl(leftProperty,
+				rightProperty);
+	}
+
+	@Override
+	public CachedIndexedDataHasValue getIndexedDataHasValue(
+			ElkDataHasValue elkDataHasValue) {
+		return new CachedIndexedDataHasValueImpl(elkDataHasValue);
+	}
+
+	@Override
+	public CachedIndexedIndividual getIndexedIndividual(
+			ElkNamedIndividual elkNamedIndividual) {
+		return new CachedIndexedIndividualImpl(elkNamedIndividual);
+	}
+
+	@Override
+	public CachedIndexedObjectComplementOf getIndexedObjectComplementOf(
+			ModifiableIndexedClassExpression negated) {
+		return new CachedIndexedObjectComplementOfImpl(negated);
+	}
+
+	@Override
+	public CachedIndexedObjectHasSelf getIndexedObjectHasSelf(
+			ModifiableIndexedObjectProperty property) {
+		return new CachedIndexedObjectHasSelfImpl(property);
+	}
+
+	@Override
+	public CachedIndexedObjectIntersectionOf getIndexedObjectIntersectionOf(
+			ModifiableIndexedClassExpression conjunctA,
+			ModifiableIndexedClassExpression conjunctB) {
+		return new CachedIndexedObjectIntersectionOfImpl(conjunctA, conjunctB);
+	}
+
+	@Override
+	public CachedIndexedObjectProperty getIndexedObjectProperty(
+			ElkObjectProperty elkObjectProperty) {
+		return new CachedIndexedObjectPropertyImpl(elkObjectProperty);
+	}
+
+	@Override
+	public CachedIndexedObjectSomeValuesFrom getIndexedObjectSomeValuesFrom(
+			ModifiableIndexedObjectProperty property,
+			ModifiableIndexedClassExpression filler) {
+		return new CachedIndexedObjectSomeValuesFromImpl(property, filler);
+	}
+
+	@Override
+	public CachedIndexedObjectUnionOf getIndexedObjectUnionOf(
+			List<? extends ModifiableIndexedClassExpression> disjuncts) {
+		return new CachedIndexedObjectUnionOfImpl(disjuncts);
+	}
+
+	@Override
+	public ModifiableElkDisjointUnionAxiomOwlNothingConversion getElkDisjointUnionAxiomOwlNothingConversion(
+			ElkDisjointUnionAxiom originalAxiom,
+			ModifiableIndexedClass definedClass,
+			ModifiableIndexedClass bottom) {
+		return new ModifiableElkDisjointUnionAxiomOwlNothingConversionImpl(
+				originalAxiom, definedClass, bottom);
 	}
 
 }
