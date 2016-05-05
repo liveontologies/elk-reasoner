@@ -181,7 +181,7 @@ public class ElkPolarityExpressionConverterImpl extends
 		int size = elkObjectIntersectionOf.getClassExpressions().size();
 		switch (size) {
 		case 0:
-			return factory_.getIndexedClass(elkFactory_.getOwlNothing());
+			return factory_.getIndexedClass(elkFactory_.getOwlThing());
 		default:
 			// binarization
 			ModifiableIndexedClassExpression result = null;
