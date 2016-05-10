@@ -22,34 +22,52 @@ package org.semanticweb.elk.matching.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch2;
+import org.semanticweb.elk.matching.ElkMatchException;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2;
-import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2Watch;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 
 public class BackwardLinkReversedMatch2
-		extends AbstractInferenceMatch<BackwardLinkReversedMatch1> {
+		extends AbstractInferenceMatch<BackwardLinkReversedMatch1>
+		implements ForwardLinkMatch2Watch {
 
-	private final IndexedContextRootMatch destinationMatch_;
+	private final ElkObjectProperty relationMatch_;
 
 	BackwardLinkReversedMatch2(BackwardLinkReversedMatch1 parent,
 			ForwardLinkMatch2 premiseMatch) {
 		super(parent);
-		this.destinationMatch_ = premiseMatch.getTargetMatch();
+		ElkSubObjectPropertyExpression fullChainMatch = premiseMatch
+				.getFullChainMatch();
+		int chainStartPos = premiseMatch.getChainStartPos();
+		if (fullChainMatch instanceof ElkObjectProperty && chainStartPos == 0) {
+			this.relationMatch_ = (ElkObjectProperty) fullChainMatch;
+		} else {
+			throw new ElkMatchException(parent.getParent().getRelation(),
+					fullChainMatch, chainStartPos);
+		}
+
 	}
 
-	public IndexedContextRootMatch getDestinationMatch() {
-		return destinationMatch_;
+	public ElkObjectProperty getRelationMatch() {
+		return relationMatch_;
 	}
 
-	public BackwardLinkMatch2 getConclusionMatch(
+	public ForwardLinkMatch2 getPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getBackwardLinkMatch2(
-				getParent().getConclusionMatch(factory), destinationMatch_);
+		return factory.getForwardLinkMatch2(
+				getParent().getPremiseMatch(factory), relationMatch_, 0);
+
 	}
 
 	@Override
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(ForwardLinkMatch2Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

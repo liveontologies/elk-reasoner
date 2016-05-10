@@ -22,7 +22,6 @@ package org.semanticweb.elk.matching.conclusions;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 
 public class BackwardLinkMatch1
@@ -30,13 +29,9 @@ public class BackwardLinkMatch1
 
 	private final IndexedContextRootMatch sourceMatch_;
 
-	private final ElkObjectProperty relationMatch_;
-
-	BackwardLinkMatch1(BackwardLink parent, IndexedContextRootMatch sourceMatch,
-			ElkObjectProperty relationMatch) {
+	BackwardLinkMatch1(BackwardLink parent, IndexedContextRootMatch sourceMatch) {
 		super(parent);
 		this.sourceMatch_ = sourceMatch;
-		this.relationMatch_ = relationMatch;
 	}
 
 	/**
@@ -44,13 +39,6 @@ public class BackwardLinkMatch1
 	 */
 	public IndexedContextRootMatch getSourceMatch() {
 		return sourceMatch_;
-	}
-
-	/**
-	 * @return a match for {@link BackwardLink#getRelation()}
-	 */
-	public ElkObjectProperty getRelationMatch() {
-		return relationMatch_;
 	}
 
 	@Override
@@ -67,8 +55,7 @@ public class BackwardLinkMatch1
 	public interface Factory {
 
 		BackwardLinkMatch1 getBackwardLinkMatch1(BackwardLink parent,
-				IndexedContextRootMatch sourceMatch,
-				ElkObjectProperty relationMatch);
+				IndexedContextRootMatch sourceMatch);
 
 	}
 

@@ -24,29 +24,29 @@ package org.semanticweb.elk.matching.inferences;
 
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch2;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch3;
 import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
-import org.semanticweb.elk.matching.conclusions.PropagationMatch3;
 
-public class SubClassInclusionComposedObjectSomeValuesFromMatch3 extends
-		AbstractInferenceMatch<SubClassInclusionComposedObjectSomeValuesFromMatch2> {
+public class BackwardLinkReversedMatch3
+		extends AbstractInferenceMatch<BackwardLinkReversedMatch2> {
 
-	private final IndexedContextRootMatch originMatch_;
+	private final IndexedContextRootMatch destinationMatch_;
 
-	SubClassInclusionComposedObjectSomeValuesFromMatch3(
-			SubClassInclusionComposedObjectSomeValuesFromMatch2 parent,
-			BackwardLinkMatch2 firstPremiseMatch) {
+	BackwardLinkReversedMatch3(BackwardLinkReversedMatch2 parent,
+			ForwardLinkMatch3 premiseMatch) {
 		super(parent);
-		originMatch_ = firstPremiseMatch.getDestinationMatch();
+		this.destinationMatch_ = premiseMatch.getTargetMatch();
 	}
 
-	public IndexedContextRootMatch getOriginMatch() {
-		return originMatch_;
+	public IndexedContextRootMatch getDestinationMatch() {
+		return destinationMatch_;
 	}
 
-	public PropagationMatch3 getSecondPremiseMatch(
+	public BackwardLinkMatch2 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getPropagationMatch3(
-				getParent().getSecondPremiseMatch(factory), originMatch_);
+		return factory.getBackwardLinkMatch2(
+				getParent().getParent().getConclusionMatch(factory),
+				getParent().getRelationMatch(), getDestinationMatch());
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class SubClassInclusionComposedObjectSomeValuesFromMatch3 extends
 	 */
 	public interface Visitor<O> {
 
-		O visit(SubClassInclusionComposedObjectSomeValuesFromMatch3 inferenceMatch3);
+		O visit(BackwardLinkReversedMatch3 inferenceMatch2);
 
 	}
 
@@ -76,9 +76,9 @@ public class SubClassInclusionComposedObjectSomeValuesFromMatch3 extends
 	 */
 	public interface Factory {
 
-		SubClassInclusionComposedObjectSomeValuesFromMatch3 getSubClassInclusionComposedObjectSomeValuesFromMatch3(
-				SubClassInclusionComposedObjectSomeValuesFromMatch2 parent,
-				BackwardLinkMatch2 firstPremiseMatch);
+		BackwardLinkReversedMatch3 getBackwardLinkReversedMatch3(
+				BackwardLinkReversedMatch2 parent,
+				ForwardLinkMatch3 premiseMatch);
 
 	}
 

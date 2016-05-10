@@ -1,9 +1,10 @@
 package org.semanticweb.elk.matching.conclusions;
 
-import org.semanticweb.elk.matching.inferences.BackwardLinkCompositionMatch3;
+import org.semanticweb.elk.matching.inferences.BackwardLinkCompositionMatch2;
+import org.semanticweb.elk.matching.inferences.ClassInconsistencyPropagatedMatch1;
 import org.semanticweb.elk.matching.inferences.ForwardLinkCompositionMatch2;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionComposedObjectSomeValuesFromMatch2;
+import org.semanticweb.elk.matching.inferences.SubClassInclusionComposedObjectSomeValuesFromMatch1;
 
 /*
  * #%L
@@ -39,9 +40,10 @@ public interface BackwardLinkMatch1Watch extends InferenceMatch {
 	 * @param <O>
 	 *            the type of the output
 	 */
-	interface Visitor<O> extends BackwardLinkCompositionMatch3.Visitor<O>,
+	interface Visitor<O> extends BackwardLinkCompositionMatch2.Visitor<O>,
+			ClassInconsistencyPropagatedMatch1.Visitor<O>,
 			ForwardLinkCompositionMatch2.Visitor<O>,
-			SubClassInclusionComposedObjectSomeValuesFromMatch2.Visitor<O> {
+			SubClassInclusionComposedObjectSomeValuesFromMatch1.Visitor<O> {
 
 		// combined interface
 

@@ -27,9 +27,11 @@ import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 
-public abstract class LinkOfObjectHasSelfMatch2<P>
-		extends AbstractInferenceMatch<P> {
+abstract class LinkOfObjectHasSelfMatch2<P> extends AbstractInferenceMatch<P> {
 
 	private final ElkObjectHasSelf premiseSubsumerMatch_;
 
@@ -51,8 +53,19 @@ public abstract class LinkOfObjectHasSelfMatch2<P>
 				premiseMatch.getParent());
 	}
 
-	public ElkObjectHasSelf getPremiseSuperExpressionMatch() {
+	ElkObjectHasSelf getPremiseSuperExpressionMatch() {
 		return premiseSubsumerMatch_;
+	}
+
+	ElkObjectProperty getPremisePropertyMatch(
+			IndexedObjectProperty premiseProperty) {
+		ElkObjectPropertyExpression premisePropertyMatch = premiseSubsumerMatch_
+				.getProperty();
+		if (premisePropertyMatch instanceof ElkObjectProperty) {
+			return (ElkObjectProperty) premisePropertyMatch;
+		} else {
+			throw new ElkMatchException(premiseProperty, premisePropertyMatch);
+		}
 	}
 
 }

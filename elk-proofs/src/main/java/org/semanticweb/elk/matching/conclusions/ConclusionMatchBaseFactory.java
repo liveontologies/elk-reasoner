@@ -29,12 +29,14 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.PropertyRange;
@@ -46,45 +48,56 @@ public class ConclusionMatchBaseFactory implements ConclusionMatch.Factory {
 
 	@Override
 	public BackwardLinkMatch1 getBackwardLinkMatch1(BackwardLink parent,
-			IndexedContextRootMatch sourceMatch,
-			ElkObjectProperty relationMatch) {
-		return new BackwardLinkMatch1(parent, sourceMatch, relationMatch);
+			IndexedContextRootMatch sourceMatch) {
+		return new BackwardLinkMatch1(parent, sourceMatch);
 	}
 
 	@Override
 	public BackwardLinkMatch2 getBackwardLinkMatch2(BackwardLinkMatch1 parent,
+			ElkObjectProperty relationMatch,
 			IndexedContextRootMatch destinationMatch) {
-		return new BackwardLinkMatch2(parent, destinationMatch);
+		return new BackwardLinkMatch2(parent, relationMatch, destinationMatch);
+	}
+
+	@Override
+	public ClassInconsistencyMatch1 getClassInconsistencyMatch1(
+			ClassInconsistency parent,
+			IndexedContextRootMatch destinationMatch) {
+		return new ClassInconsistencyMatch1(parent, destinationMatch);
+	}
+
+	@Override
+	public DisjointSubsumerMatch1 getDisjointSubsumerMatch1(
+			DisjointSubsumer parent, IndexedContextRootMatch destinationMatch) {
+		return new DisjointSubsumerMatch1(parent, destinationMatch);
+	}
+
+	@Override
+	public DisjointSubsumerMatch2 getDisjointSubsumerMatch2(
+			DisjointSubsumerMatch1 parent,
+			List<? extends ElkClassExpression> disjointExpressionsMatch) {
+		return new DisjointSubsumerMatch2(parent, disjointExpressionsMatch);
 	}
 
 	@Override
 	public ForwardLinkMatch1 getForwardLinkMatch1(ForwardLink parent,
-			IndexedContextRootMatch destinationMatch,
-			ElkSubObjectPropertyExpression fullForwardChainMatch,
-			int forwardChainStartPos) {
-		return new ForwardLinkMatch1(parent, destinationMatch,
-				fullForwardChainMatch, forwardChainStartPos);
+			IndexedContextRootMatch destinationMatch) {
+		return new ForwardLinkMatch1(parent, destinationMatch);
 	}
 
 	@Override
 	public ForwardLinkMatch2 getForwardLinkMatch2(ForwardLinkMatch1 parent,
+			ElkSubObjectPropertyExpression fullForwardChainMatch,
+			int forwardChainStartPos) {
+		return new ForwardLinkMatch2(parent, fullForwardChainMatch,
+				forwardChainStartPos);
+	}
+
+	@Override
+	public ForwardLinkMatch3 getForwardLinkMatch3(ForwardLinkMatch2 parent,
 			IndexedContextRootMatchChain intermediateRoots,
 			IndexedContextRootMatch targetMatch) {
-		return new ForwardLinkMatch2(parent, intermediateRoots, targetMatch);
-	}
-
-	@Override
-	public IndexedEquivalentClassesAxiomMatch1 getIndexedEquivalentClassesAxiomMatch1(
-			IndexedEquivalentClassesAxiom parent) {
-		return new IndexedEquivalentClassesAxiomMatch1(parent);
-	}
-
-	@Override
-	public IndexedEquivalentClassesAxiomMatch2 getIndexedEquivalentClassesAxiomMatch2(
-			IndexedEquivalentClassesAxiomMatch1 parent, ElkClassExpression firstMemberMatch,
-			ElkClassExpression secondMemberMatch) {
-		return new IndexedEquivalentClassesAxiomMatch2(parent, firstMemberMatch,
-				secondMemberMatch);
+		return new ForwardLinkMatch3(parent, intermediateRoots, targetMatch);
 	}
 
 	@Override
@@ -98,6 +111,21 @@ public class ConclusionMatchBaseFactory implements ConclusionMatch.Factory {
 			IndexedDisjointClassesAxiomMatch1 parent,
 			List<? extends ElkClassExpression> memberMatches) {
 		return new IndexedDisjointClassesAxiomMatch2(parent, memberMatches);
+	}
+
+	@Override
+	public IndexedEquivalentClassesAxiomMatch1 getIndexedEquivalentClassesAxiomMatch1(
+			IndexedEquivalentClassesAxiom parent) {
+		return new IndexedEquivalentClassesAxiomMatch1(parent);
+	}
+
+	@Override
+	public IndexedEquivalentClassesAxiomMatch2 getIndexedEquivalentClassesAxiomMatch2(
+			IndexedEquivalentClassesAxiomMatch1 parent,
+			ElkClassExpression firstMemberMatch,
+			ElkClassExpression secondMemberMatch) {
+		return new IndexedEquivalentClassesAxiomMatch2(parent, firstMemberMatch,
+				secondMemberMatch);
 	}
 
 	@Override
@@ -146,20 +174,11 @@ public class ConclusionMatchBaseFactory implements ConclusionMatch.Factory {
 
 	@Override
 	public PropagationMatch1 getPropagationMatch1(Propagation parent,
+			IndexedContextRootMatch destinationMatch,
+			ElkObjectProperty subDestinationMatch,
 			ElkObjectSomeValuesFrom carryMatch) {
-		return new PropagationMatch1(parent, carryMatch);
-	}
-
-	@Override
-	public PropagationMatch2 getPropagationMatch2(PropagationMatch1 parent,
-			ElkObjectProperty relationMatch) {
-		return new PropagationMatch2(parent, relationMatch);
-	}
-
-	@Override
-	public PropagationMatch3 getPropagationMatch3(PropagationMatch2 parent,
-			IndexedContextRootMatch destinationMatch) {
-		return new PropagationMatch3(parent, destinationMatch);
+		return new PropagationMatch1(parent, destinationMatch,
+				subDestinationMatch, carryMatch);
 	}
 
 	@Override

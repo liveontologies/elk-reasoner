@@ -1,5 +1,7 @@
 package org.semanticweb.elk.matching.conclusions;
 
+import java.util.List;
+
 /*
  * #%L
  * ELK Reasoner
@@ -22,21 +24,21 @@ package org.semanticweb.elk.matching.conclusions;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 
-public class PropagationMatch2
-		extends AbstractClassConclusionMatch<PropagationMatch1> {
+public class DisjointSubsumerMatch2
+		extends AbstractClassConclusionMatch<DisjointSubsumerMatch1> {
 
-	private final ElkObjectProperty relationMatch_;
+	private final List<? extends ElkClassExpression> disjointExpressionsMatch_;
 
-	PropagationMatch2(PropagationMatch1 parent,
-			ElkObjectProperty relationMatch) {
+	DisjointSubsumerMatch2(DisjointSubsumerMatch1 parent,
+			List<? extends ElkClassExpression> disjointExpressionsMatch) {
 		super(parent);
-		this.relationMatch_ = relationMatch;
+		this.disjointExpressionsMatch_ = disjointExpressionsMatch;
 	}
 
-	public ElkObjectProperty getRelationMatch() {
-		return this.relationMatch_;
+	public List<? extends ElkClassExpression> getDisjointExpressionsMatch() {
+		return disjointExpressionsMatch_;
 	}
 
 	@Override
@@ -52,8 +54,9 @@ public class PropagationMatch2
 	 */
 	public interface Factory {
 
-		PropagationMatch2 getPropagationMatch2(PropagationMatch1 parent,
-				ElkObjectProperty relationMatch);
+		DisjointSubsumerMatch2 getDisjointSubsumerMatch2(
+				DisjointSubsumerMatch1 parent,
+				List<? extends ElkClassExpression> disjointExpressionsMatch);
 
 	}
 
@@ -67,7 +70,7 @@ public class PropagationMatch2
 	 */
 	interface Visitor<O> {
 
-		O visit(PropagationMatch2 conclusionMatch);
+		O visit(DisjointSubsumerMatch2 conclusionMatch);
 
 	}
 

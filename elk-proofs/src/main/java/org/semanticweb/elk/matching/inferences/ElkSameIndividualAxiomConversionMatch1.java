@@ -1,5 +1,7 @@
 package org.semanticweb.elk.matching.inferences;
 
+import java.util.List;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -25,6 +27,8 @@ package org.semanticweb.elk.matching.inferences;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.IndexedSubClassOfAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedSubClassOfAxiomMatch2;
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ElkSameIndividualAxiomConversion;
 
 public class ElkSameIndividualAxiomConversionMatch1
@@ -38,8 +42,16 @@ public class ElkSameIndividualAxiomConversionMatch1
 
 	public IndexedSubClassOfAxiomMatch2 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
-		// TODO
-		return null;
+		ElkSameIndividualAxiomConversion parent = getParent();
+		ElkSameIndividualAxiom premise = parent.getOriginalAxiom();
+		List<? extends ElkIndividual> members = premise.getIndividuals();
+		return factory.getIndexedSubClassOfAxiomMatch2(
+				factory.getIndexedSubClassOfAxiomMatch1(
+						parent.getConclusion(factory)),
+				factory.getObjectOneOf(
+						members.get(parent.getSubIndividualPosition())),
+				factory.getObjectOneOf(
+						members.get(parent.getSuperIndividualPosition())));
 	}
 
 	@Override

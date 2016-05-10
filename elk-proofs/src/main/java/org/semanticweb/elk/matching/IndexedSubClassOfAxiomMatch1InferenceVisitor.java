@@ -68,15 +68,22 @@ class IndexedSubClassOfAxiomMatch1InferenceVisitor extends
 	}
 
 	@Override
-	public Void visit(ElkDisjointUnionAxiomSubClassConversion inference) {
-		factory.getElkDisjointUnionAxiomSubClassConversionMatch1(inference,
+	public Void visit(ElkDisjointUnionAxiomBinaryConversion inference) {
+		factory.getElkDisjointUnionAxiomBinaryConversionMatch1(inference,
 				child);
 		return null;
 	}
 
 	@Override
-	public Void visit(ElkDisjointUnionAxiomBinaryConversion inference) {
-		factory.getElkDisjointUnionAxiomBinaryConversionMatch1(inference,
+	public Void visit(ElkDisjointUnionAxiomOwlNothingConversion inference) {
+		factory.getElkDisjointUnionAxiomOwlNothingConversionMatch1(inference,
+				child);
+		return null;
+	}
+
+	@Override
+	public Void visit(ElkDisjointUnionAxiomSubClassConversion inference) {
+		factory.getElkDisjointUnionAxiomSubClassConversionMatch1(inference,
 				child);
 		return null;
 	}
@@ -118,12 +125,6 @@ class IndexedSubClassOfAxiomMatch1InferenceVisitor extends
 	@Override
 	public Void visit(ElkSubClassOfAxiomConversion inference) {
 		factory.getElkSubClassOfAxiomConversionMatch1(inference, child);
-		return null;
-	}
-
-	@Override
-	public Void visit(ElkDisjointUnionAxiomOwlNothingConversion inference) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

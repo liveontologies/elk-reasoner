@@ -22,12 +22,11 @@ package org.semanticweb.elk.owl.inferences;
  * #L%
  */
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 
@@ -35,61 +34,49 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  * Represents the inference:
  * 
  * <pre>
- *  EquivalentClasses(C0 C1 ... Cn)
- * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
- *           Ci ⊑ Cj
+ *  DisjointClasses(C0 C1 ... Cn)
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *         Ci ⊓ Cj ⊑ ⊥
  * </pre>
  * 
  * @author Yevgeny Kazakov
  *
  */
-public class ElkClassInclusionOfEquivalence extends AbstractElkInference {
-	
-	private final static String NAME_ = "Equivalent Classes Decomposition";
+public class ElkClassInclusionOfDisjointClasses extends AbstractElkInference {
+
+	private final static String NAME_ = "Disjoint Classes Translation";
 
 	private final List<? extends ElkClassExpression> expressions_;
 
 	/**
-	 * positions for sub-class and super-class within class equivalence
+	 * (different) positions for two disjoint classes
 	 */
-	private final int subPos_, superPos_;
+	private final int firstPos_, secondPos_;
 
-	ElkClassInclusionOfEquivalence(
-			List<? extends ElkClassExpression> expressions, int subPos,
-			int superPos) {
-		this.expressions_ = expressions;
-		this.subPos_ = subPos;
-		this.superPos_ = superPos;
-	}
-
-	ElkClassInclusionOfEquivalence(ElkClassExpression first,
-			ElkClassExpression second, boolean sameOrder) {
-		List<ElkClassExpression> expressions = new ArrayList<ElkClassExpression>(
-				2);
-		expressions.add(first);
-		expressions.add(second);
-		this.expressions_ = expressions;
-		if (sameOrder) {
-			subPos_ = 0;
-			superPos_ = 1;
-		} else {
-			subPos_ = 1;
-			superPos_ = 0;
+	ElkClassInclusionOfDisjointClasses(
+			List<? extends ElkClassExpression> expressions, int firstPos,
+			int secondPos) {
+		if (firstPos == secondPos) {
+			throw new IllegalArgumentException(
+					"Different positions expected: " + firstPos);
 		}
+		this.expressions_ = expressions;
+		this.firstPos_ = firstPos;
+		this.secondPos_ = secondPos;
 	}
 
 	public List<? extends ElkClassExpression> getExpressions() {
 		return expressions_;
 	}
 
-	public int getSubPos() {
-		return subPos_;
+	public int getFirstPos() {
+		return firstPos_;
 	}
 
-	public int getSuperPos() {
-		return superPos_;
+	public int getSecondPos() {
+		return secondPos_;
 	}
-	
+
 	@Override
 	public String getName() {
 		return NAME_;
@@ -109,14 +96,16 @@ public class ElkClassInclusionOfEquivalence extends AbstractElkInference {
 		return failGetPremise(index);
 	}
 
-	public ElkEquivalentClassesAxiom getPremise(ElkObject.Factory factory) {
-		return factory.getEquivalentClassesAxiom(expressions_);
+	public ElkDisjointClassesAxiom getPremise(ElkObject.Factory factory) {
+		return factory.getDisjointClassesAxiom(expressions_);
 	}
 
 	@Override
 	public ElkSubClassOfAxiom getConclusion(ElkObject.Factory factory) {
-		return factory.getSubClassOfAxiom(expressions_.get(subPos_),
-				expressions_.get(superPos_));
+		return factory.getSubClassOfAxiom(
+				factory.getObjectIntersectionOf(expressions_.get(firstPos_),
+						expressions_.get(secondPos_)),
+				factory.getOwlNothing());
 	}
 
 	@Override
@@ -132,13 +121,9 @@ public class ElkClassInclusionOfEquivalence extends AbstractElkInference {
 	 */
 	public interface Factory {
 
-		ElkClassInclusionOfEquivalence getElkClassInclusionOfEquivalence(
-				List<? extends ElkClassExpression> expressions, int subPos,
-				int superPos);
-
-		ElkClassInclusionOfEquivalence getElkClassInclusionOfEquivalence(
-				ElkClassExpression first, ElkClassExpression second,
-				boolean sameOrder);
+		ElkClassInclusionOfDisjointClasses getElkClassInclusionOfDisjointClasses(
+				List<? extends ElkClassExpression> expressions, int firstPos,
+				int secondPos);
 
 	}
 
@@ -152,7 +137,7 @@ public class ElkClassInclusionOfEquivalence extends AbstractElkInference {
 	 */
 	interface Visitor<O> {
 
-		O visit(ElkClassInclusionOfEquivalence inference);
+		O visit(ElkClassInclusionOfDisjointClasses inference);
 
 	}
 

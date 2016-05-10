@@ -1,5 +1,8 @@
 package org.semanticweb.elk.owl.inferences;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -22,8 +25,6 @@ package org.semanticweb.elk.owl.inferences;
  * #L%
  */
 
-import java.util.Collections;
-
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
@@ -33,28 +34,34 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  * Represents the inference:
  * 
  * <pre>
- *   C ⊑ ObjectOneOf()
- * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
- *        C ⊑ ⊥
+ *    C(a)
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *  {a} ⊑ C
  * </pre>
  * 
  * @author Yevgeny Kazakov
  *
  */
-public class ElkClassInclusionEmptyObjectOneOfDecomposition
-		extends AbstractElkInference {
+public class ElkClassInclusionOfClassAssertion extends AbstractElkInference {
 
-	private final static String NAME_ = "Empty Enumeration Decomposition";
+	private final static String NAME_ = "Class Assertion Transaltion";
 
-	private final ElkClassExpression subExpression_;
+	private final ElkIndividual instance_;
 
-	ElkClassInclusionEmptyObjectOneOfDecomposition(
-			ElkClassExpression subExpression) {
-		this.subExpression_ = subExpression;
+	private final ElkClassExpression type_;
+
+	ElkClassInclusionOfClassAssertion(ElkIndividual instance,
+			ElkClassExpression type) {
+		this.instance_ = instance;
+		this.type_ = type;
 	}
 
-	public ElkClassExpression getSubExpression() {
-		return subExpression_;
+	public ElkIndividual getInstance() {
+		return instance_;
+	}
+
+	public ElkClassExpression getType() {
+		return type_;
 	}
 
 	@Override
@@ -68,16 +75,22 @@ public class ElkClassInclusionEmptyObjectOneOfDecomposition
 	}
 
 	@Override
-	public ElkSubClassOfAxiom getPremise(int index, ElkObject.Factory factory) {
-		checkPremiseIndex(index);
-		return factory.getSubClassOfAxiom(subExpression_, factory
-				.getObjectOneOf(Collections.<ElkIndividual> emptyList()));
+	public ElkAxiom getPremise(int index, ElkObject.Factory factory) {
+		if (index == 0) {
+			return getPremise(factory);
+		}
+		// else
+		return failGetPremise(index);
+	}
+
+	public ElkClassAssertionAxiom getPremise(ElkObject.Factory factory) {
+		return factory.getClassAssertionAxiom(type_, instance_);
 	}
 
 	@Override
 	public ElkSubClassOfAxiom getConclusion(ElkObject.Factory factory) {
-		return factory.getSubClassOfAxiom(subExpression_,
-				factory.getOwlNothing());
+		return factory.getSubClassOfAxiom(factory.getObjectOneOf(instance_),
+				type_);
 	}
 
 	@Override
@@ -93,9 +106,8 @@ public class ElkClassInclusionEmptyObjectOneOfDecomposition
 	 */
 	public interface Factory {
 
-		ElkClassInclusionEmptyObjectOneOfDecomposition getElkClassInclusionEmptyObjectOneOfDecomposition(
-				ElkClassExpression subExpression);
-
+		ElkClassInclusionOfClassAssertion getElkClassInclusionOfClassAssertion(
+				ElkIndividual instance, ElkClassExpression type);
 	}
 
 	/**
@@ -108,7 +120,7 @@ public class ElkClassInclusionEmptyObjectOneOfDecomposition
 	 */
 	interface Visitor<O> {
 
-		O visit(ElkClassInclusionEmptyObjectOneOfDecomposition inference);
+		O visit(ElkClassInclusionOfClassAssertion inference);
 
 	}
 

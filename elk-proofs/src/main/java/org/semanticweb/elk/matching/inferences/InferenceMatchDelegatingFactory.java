@@ -24,18 +24,23 @@ package org.semanticweb.elk.matching.inferences;
 
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch2;
+import org.semanticweb.elk.matching.conclusions.ClassInconsistencyMatch1;
+import org.semanticweb.elk.matching.conclusions.DisjointSubsumerMatch1;
+import org.semanticweb.elk.matching.conclusions.DisjointSubsumerMatch2;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch3;
+import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch1;
+import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch2;
 import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch2;
+import org.semanticweb.elk.matching.conclusions.IndexedObjectPropertyRangeAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedObjectPropertyRangeAxiomMatch2;
 import org.semanticweb.elk.matching.conclusions.IndexedSubClassOfAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedSubClassOfAxiomMatch2;
 import org.semanticweb.elk.matching.conclusions.IndexedSubObjectPropertyOfAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedSubObjectPropertyOfAxiomMatch2;
 import org.semanticweb.elk.matching.conclusions.PropagationMatch1;
-import org.semanticweb.elk.matching.conclusions.PropagationMatch2;
-import org.semanticweb.elk.matching.conclusions.PropagationMatch3;
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch1;
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch2;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
@@ -45,8 +50,12 @@ import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1;
 import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch2;
 import org.semanticweb.elk.reasoner.indexing.model.ElkClassAssertionAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDifferentIndividualsAxiomBinaryConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkDifferentIndividualsAxiomNaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointClassesAxiomBinaryConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointClassesAxiomNaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomBinaryConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomEquivalenceConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomNaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomOwlNothingConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomSubClassConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomEquivalenceConversion;
@@ -54,6 +63,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomSubC
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentObjectPropertiesAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkObjectPropertyAssertionAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkObjectPropertyDomainAxiomConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkObjectPropertyRangeAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkReflexiveObjectPropertyAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkSameIndividualAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkSubClassOfAxiomConversion;
@@ -64,6 +74,11 @@ import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectHa
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversed;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversedExpanded;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfDisjointSubsumers;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfObjectComplementOf;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfOwlNothing;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyPropagated;
+import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkComposition;
 import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkOfObjectHasSelf;
 import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkOfObjectSomeValuesFrom;
@@ -119,32 +134,24 @@ public class InferenceMatchDelegatingFactory implements InferenceMatch.Factory {
 	@Override
 	public BackwardLinkCompositionMatch3 getBackwardLinkCompositionMatch3(
 			BackwardLinkCompositionMatch2 parent,
-			SubPropertyChainMatch2 secondPremiseMatch) {
+			BackwardLinkMatch2 firstPremiseMatch) {
 		return filter(mainFactory_.getBackwardLinkCompositionMatch3(parent,
-				secondPremiseMatch));
+				firstPremiseMatch));
 	}
 
 	@Override
 	public BackwardLinkCompositionMatch4 getBackwardLinkCompositionMatch4(
 			BackwardLinkCompositionMatch3 parent,
-			BackwardLinkMatch2 secondPremiseMatch) {
+			SubPropertyChainMatch2 fourthPremiseMatch) {
 		return filter(mainFactory_.getBackwardLinkCompositionMatch4(parent,
-				secondPremiseMatch));
+				fourthPremiseMatch));
 	}
 
 	@Override
 	public BackwardLinkCompositionMatch5 getBackwardLinkCompositionMatch5(
 			BackwardLinkCompositionMatch4 parent,
-			SubPropertyChainMatch2 fourthPremiseMatch) {
+			ForwardLinkMatch3 thirdPremiseMatch) {
 		return filter(mainFactory_.getBackwardLinkCompositionMatch5(parent,
-				fourthPremiseMatch));
-	}
-
-	@Override
-	public BackwardLinkCompositionMatch6 getBackwardLinkCompositionMatch6(
-			BackwardLinkCompositionMatch5 parent,
-			ForwardLinkMatch2 thirdPremiseMatch) {
-		return filter(mainFactory_.getBackwardLinkCompositionMatch6(parent,
 				thirdPremiseMatch));
 	}
 
@@ -199,7 +206,7 @@ public class InferenceMatchDelegatingFactory implements InferenceMatch.Factory {
 	@Override
 	public BackwardLinkReversedExpandedMatch3 getBackwardLinkReversedExpandedMatch3(
 			BackwardLinkReversedExpandedMatch2 parent,
-			ForwardLinkMatch2 firstPremiseMatch) {
+			ForwardLinkMatch3 firstPremiseMatch) {
 		return filter(mainFactory_.getBackwardLinkReversedExpandedMatch3(parent,
 				firstPremiseMatch));
 	}
@@ -216,6 +223,89 @@ public class InferenceMatchDelegatingFactory implements InferenceMatch.Factory {
 			BackwardLinkReversedMatch1 parent, ForwardLinkMatch2 premiseMatch) {
 		return filter(mainFactory_.getBackwardLinkReversedMatch2(parent,
 				premiseMatch));
+	}
+
+	@Override
+	public BackwardLinkReversedMatch3 getBackwardLinkReversedMatch3(
+			BackwardLinkReversedMatch2 parent, ForwardLinkMatch3 premiseMatch) {
+		return filter(mainFactory_.getBackwardLinkReversedMatch3(parent,
+				premiseMatch));
+	}
+
+	@Override
+	public ClassInconsistencyOfDisjointSubsumersMatch1 getClassInconsistencyOfDisjointSubsumersMatch1(
+			ClassInconsistencyOfDisjointSubsumers parent,
+			ClassInconsistencyMatch1 conclusionMatch) {
+		return filter(
+				mainFactory_.getClassInconsistencyOfDisjointSubsumersMatch1(
+						parent, conclusionMatch));
+	}
+
+	@Override
+	public ClassInconsistencyOfDisjointSubsumersMatch2 getClassInconsistencyOfDisjointSubsumersMatch2(
+			ClassInconsistencyOfDisjointSubsumersMatch1 parent,
+			DisjointSubsumerMatch2 firstPremiseMatch) {
+		return filter(
+				mainFactory_.getClassInconsistencyOfDisjointSubsumersMatch2(
+						parent, firstPremiseMatch));
+	}
+
+	@Override
+	public ClassInconsistencyOfObjectComplementOfMatch1 getClassInconsistencyOfObjectComplementOfMatch1(
+			ClassInconsistencyOfObjectComplementOf parent,
+			ClassInconsistencyMatch1 conclusionMatch) {
+		return filter(
+				mainFactory_.getClassInconsistencyOfObjectComplementOfMatch1(
+						parent, conclusionMatch));
+	}
+
+	@Override
+	public ClassInconsistencyOfObjectComplementOfMatch2 getClassInconsistencyOfObjectComplementOfMatch2(
+			ClassInconsistencyOfObjectComplementOfMatch1 parent,
+			SubClassInclusionDecomposedMatch2 secondPremiseMatch) {
+		return filter(
+				mainFactory_.getClassInconsistencyOfObjectComplementOfMatch2(
+						parent, secondPremiseMatch));
+	}
+
+	@Override
+	public ClassInconsistencyOfOwlNothingMatch1 getClassInconsistencyOfOwlNothingMatch1(
+			ClassInconsistencyOfOwlNothing parent,
+			ClassInconsistencyMatch1 conclusionMatch) {
+		return filter(mainFactory_.getClassInconsistencyOfOwlNothingMatch1(
+				parent, conclusionMatch));
+	}
+
+	@Override
+	public ClassInconsistencyPropagatedMatch1 getClassInconsistencyPropagatedMatch1(
+			ClassInconsistencyPropagated parent,
+			ClassInconsistencyMatch1 conclusionMatch) {
+		return filter(mainFactory_.getClassInconsistencyPropagatedMatch1(parent,
+				conclusionMatch));
+	}
+
+	@Override
+	public ClassInconsistencyPropagatedMatch2 getClassInconsistencyPropagatedMatch2(
+			ClassInconsistencyPropagatedMatch1 parent,
+			BackwardLinkMatch2 firstPremiseMatch) {
+		return filter(mainFactory_.getClassInconsistencyPropagatedMatch2(parent,
+				firstPremiseMatch));
+	}
+
+	@Override
+	public DisjointSubsumerFromSubsumerMatch1 getDisjointSubsumerFromSubsumerMatch1(
+			DisjointSubsumerFromSubsumer parent,
+			DisjointSubsumerMatch1 conclusionMatch) {
+		return filter(mainFactory_.getDisjointSubsumerFromSubsumerMatch1(parent,
+				conclusionMatch));
+	}
+
+	@Override
+	public DisjointSubsumerFromSubsumerMatch2 getDisjointSubsumerFromSubsumerMatch2(
+			DisjointSubsumerFromSubsumerMatch1 parent,
+			IndexedDisjointClassesAxiomMatch2 secondPremiseMatch) {
+		return filter(mainFactory_.getDisjointSubsumerFromSubsumerMatch2(parent,
+				secondPremiseMatch));
 	}
 
 	@Override
@@ -236,11 +326,29 @@ public class InferenceMatchDelegatingFactory implements InferenceMatch.Factory {
 	}
 
 	@Override
+	public ElkDifferentIndividualsAxiomNaryConversionMatch1 getElkDifferentIndividualsAxiomNaryConversionMatch1(
+			ElkDifferentIndividualsAxiomNaryConversion parent,
+			IndexedDisjointClassesAxiomMatch1 conclusionMatch) {
+		return filter(mainFactory_
+				.getElkDifferentIndividualsAxiomNaryConversionMatch1(parent,
+						conclusionMatch));
+	}
+
+	@Override
 	public ElkDisjointClassesAxiomBinaryConversionMatch1 getElkDisjointClassesAxiomBinaryConversionMatch1(
 			ElkDisjointClassesAxiomBinaryConversion parent,
 			IndexedSubClassOfAxiomMatch1 conclusionMatch) {
 		return filter(
 				mainFactory_.getElkDisjointClassesAxiomBinaryConversionMatch1(
+						parent, conclusionMatch));
+	}
+
+	@Override
+	public ElkDisjointClassesAxiomNaryConversionMatch1 getElkDisjointClassesAxiomNaryConversionMatch1(
+			ElkDisjointClassesAxiomNaryConversion parent,
+			IndexedDisjointClassesAxiomMatch1 conclusionMatch) {
+		return filter(
+				mainFactory_.getElkDisjointClassesAxiomNaryConversionMatch1(
 						parent, conclusionMatch));
 	}
 
@@ -251,6 +359,23 @@ public class InferenceMatchDelegatingFactory implements InferenceMatch.Factory {
 		return filter(
 				mainFactory_.getElkDisjointUnionAxiomBinaryConversionMatch1(
 						parent, conclusionMatch));
+	}
+
+	@Override
+	public ElkDisjointUnionAxiomEquivalenceConversionMatch1 getElkDisjointUnionAxiomEquivalenceConversionMatch1(
+			ElkDisjointUnionAxiomEquivalenceConversion parent,
+			IndexedEquivalentClassesAxiomMatch1 conclusionMatch) {
+		return filter(mainFactory_
+				.getElkDisjointUnionAxiomEquivalenceConversionMatch1(parent,
+						conclusionMatch));
+	}
+
+	@Override
+	public ElkDisjointUnionAxiomNaryConversionMatch1 getElkDisjointUnionAxiomNaryConversionMatch1(
+			ElkDisjointUnionAxiomNaryConversion parent,
+			IndexedDisjointClassesAxiomMatch1 conclusionMatch) {
+		return filter(mainFactory_.getElkDisjointUnionAxiomNaryConversionMatch1(
+				parent, conclusionMatch));
 	}
 
 	@Override
@@ -317,6 +442,15 @@ public class InferenceMatchDelegatingFactory implements InferenceMatch.Factory {
 	}
 
 	@Override
+	public ElkObjectPropertyRangeAxiomConversionMatch1 getElkObjectPropertyRangeAxiomConversionMatch1(
+			ElkObjectPropertyRangeAxiomConversion parent,
+			IndexedObjectPropertyRangeAxiomMatch1 conclusionMatch) {
+		return filter(
+				mainFactory_.getElkObjectPropertyRangeAxiomConversionMatch1(
+						parent, conclusionMatch));
+	}
+
+	@Override
 	public ElkReflexiveObjectPropertyAxiomConversionMatch1 getElkReflexiveObjectPropertyAxiomConversionMatch1(
 			ElkReflexiveObjectPropertyAxiomConversion parent,
 			IndexedSubClassOfAxiomMatch1 conclusionMatch) {
@@ -369,17 +503,17 @@ public class InferenceMatchDelegatingFactory implements InferenceMatch.Factory {
 	@Override
 	public ForwardLinkCompositionMatch2 getForwardLinkCompositionMatch2(
 			ForwardLinkCompositionMatch1 parent,
-			SubPropertyChainMatch2 secondPremiseMatch) {
+			ForwardLinkMatch2 conclusionMatch) {
 		return filter(mainFactory_.getForwardLinkCompositionMatch2(parent,
-				secondPremiseMatch));
+				conclusionMatch));
 	}
 
 	@Override
 	public ForwardLinkCompositionMatch3 getForwardLinkCompositionMatch3(
 			ForwardLinkCompositionMatch2 parent,
-			BackwardLinkMatch2 secondPremiseMatch) {
+			BackwardLinkMatch2 firstPremiseMatch) {
 		return filter(mainFactory_.getForwardLinkCompositionMatch3(parent,
-				secondPremiseMatch));
+				firstPremiseMatch));
 	}
 
 	@Override
@@ -393,7 +527,7 @@ public class InferenceMatchDelegatingFactory implements InferenceMatch.Factory {
 	@Override
 	public ForwardLinkCompositionMatch5 getForwardLinkCompositionMatch5(
 			ForwardLinkCompositionMatch4 parent,
-			ForwardLinkMatch2 thirdPremiseMatch) {
+			ForwardLinkMatch3 thirdPremiseMatch) {
 		return filter(mainFactory_.getForwardLinkCompositionMatch5(parent,
 				thirdPremiseMatch));
 	}
@@ -434,22 +568,6 @@ public class InferenceMatchDelegatingFactory implements InferenceMatch.Factory {
 	public PropagationGeneratedMatch1 getPropagationGeneratedMatch1(
 			PropagationGenerated parent, PropagationMatch1 conclusionMatch) {
 		return filter(mainFactory_.getPropagationGeneratedMatch1(parent,
-				conclusionMatch));
-	}
-
-	@Override
-	public PropagationGeneratedMatch2 getPropagationGeneratedMatch2(
-			PropagationGeneratedMatch1 parent,
-			SubPropertyChainMatch2 thirdPremiseMatch) {
-		return filter(mainFactory_.getPropagationGeneratedMatch2(parent,
-				thirdPremiseMatch));
-	}
-
-	@Override
-	public PropagationGeneratedMatch3 getPropagationGeneratedMatch3(
-			PropagationGeneratedMatch2 parent,
-			PropagationMatch3 conclusionMatch) {
-		return filter(mainFactory_.getPropagationGeneratedMatch3(parent,
 				conclusionMatch));
 	}
 
@@ -524,19 +642,10 @@ public class InferenceMatchDelegatingFactory implements InferenceMatch.Factory {
 	@Override
 	public SubClassInclusionComposedObjectSomeValuesFromMatch2 getSubClassInclusionComposedObjectSomeValuesFromMatch2(
 			SubClassInclusionComposedObjectSomeValuesFromMatch1 parent,
-			PropagationMatch2 secondPremiseMatch) {
+			BackwardLinkMatch2 secondPremiseMatch) {
 		return filter(mainFactory_
 				.getSubClassInclusionComposedObjectSomeValuesFromMatch2(parent,
 						secondPremiseMatch));
-	}
-
-	@Override
-	public SubClassInclusionComposedObjectSomeValuesFromMatch3 getSubClassInclusionComposedObjectSomeValuesFromMatch3(
-			SubClassInclusionComposedObjectSomeValuesFromMatch2 parent,
-			BackwardLinkMatch2 firstPremiseMatch) {
-		return filter(mainFactory_
-				.getSubClassInclusionComposedObjectSomeValuesFromMatch3(parent,
-						firstPremiseMatch));
 	}
 
 	@Override

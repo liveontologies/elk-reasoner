@@ -22,20 +22,27 @@ package org.semanticweb.elk.matching.conclusions;
  * #L%
  */
 
-public class PropagationMatch3
-		extends
-			AbstractClassConclusionMatch<PropagationMatch2> {
+public class ForwardLinkMatch3
+		extends AbstractClassConclusionMatch<ForwardLinkMatch2> {
 
-	private final IndexedContextRootMatch destinationMatch_;
+	private final IndexedContextRootMatchChain intermediateRoots_;
 
-	PropagationMatch3(PropagationMatch2 parent,
-			IndexedContextRootMatch destinationMatch) {
+	private final IndexedContextRootMatch targetMatch_;
+
+	ForwardLinkMatch3(ForwardLinkMatch2 parent,
+			IndexedContextRootMatchChain intermediateRoots,
+			IndexedContextRootMatch targetMatch) {
 		super(parent);
-		this.destinationMatch_ = destinationMatch;
+		this.intermediateRoots_ = intermediateRoots;
+		this.targetMatch_ = targetMatch;
 	}
 
-	public IndexedContextRootMatch getDestinationMatch() {
-		return this.destinationMatch_;
+	public IndexedContextRootMatchChain getIntermediateRoots() {
+		return intermediateRoots_;
+	}
+
+	public IndexedContextRootMatch getTargetMatch() {
+		return targetMatch_;
 	}
 
 	@Override
@@ -51,8 +58,9 @@ public class PropagationMatch3
 	 */
 	public interface Factory {
 
-		PropagationMatch3 getPropagationMatch3(PropagationMatch2 parent,
-				IndexedContextRootMatch destinationMatch);
+		ForwardLinkMatch3 getForwardLinkMatch3(ForwardLinkMatch2 parent,
+				IndexedContextRootMatchChain intermediateRoots,
+				IndexedContextRootMatch targetMatch);
 
 	}
 
@@ -66,7 +74,7 @@ public class PropagationMatch3
 	 */
 	interface Visitor<O> {
 
-		O visit(PropagationMatch3 conclusionMatch);
+		O visit(ForwardLinkMatch3 conclusionMatch);
 
 	}
 

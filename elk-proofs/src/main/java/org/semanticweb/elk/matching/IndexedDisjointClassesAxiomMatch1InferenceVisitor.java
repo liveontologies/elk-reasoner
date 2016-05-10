@@ -41,19 +41,21 @@ class IndexedDisjointClassesAxiomMatch1InferenceVisitor extends
 
 	@Override
 	public Void visit(ElkDifferentIndividualsAxiomNaryConversion inference) {
-		// TODO Auto-generated method stub
+		factory.getElkDifferentIndividualsAxiomNaryConversionMatch1(inference,
+				child);
 		return null;
 	}
 
 	@Override
 	public Void visit(ElkDisjointClassesAxiomNaryConversion inference) {
-		// TODO Auto-generated method stub
+		factory.getElkDisjointClassesAxiomNaryConversionMatch1(inference,
+				child);
 		return null;
 	}
 
 	@Override
 	public Void visit(ElkDisjointUnionAxiomNaryConversion inference) {
-		// TODO Auto-generated method stub
+		factory.getElkDisjointUnionAxiomNaryConversionMatch1(inference, child);
 		return null;
 	}
 

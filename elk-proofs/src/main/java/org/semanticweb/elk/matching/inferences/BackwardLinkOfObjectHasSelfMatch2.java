@@ -25,6 +25,7 @@ package org.semanticweb.elk.matching.inferences;
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch2;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 
 public class BackwardLinkOfObjectHasSelfMatch2
 		extends LinkOfObjectHasSelfMatch2<BackwardLinkOfObjectHasSelfMatch1>
@@ -35,11 +36,16 @@ public class BackwardLinkOfObjectHasSelfMatch2
 		super(parent, premiseMatch);
 	}
 
+	public ElkObjectProperty getRelationMatch() {
+		return getPremisePropertyMatch(getParent().getParent()
+				.getDecomposedExistential().getProperty());
+	}
+
 	public BackwardLinkMatch2 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getBackwardLinkMatch2(
 				getParent().getConclusionMatch(factory),
-				getParent().getOriginMatch());
+				getRelationMatch(), getParent().getOriginMatch());
 	}
 
 	@Override

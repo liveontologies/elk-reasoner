@@ -24,7 +24,7 @@ package org.semanticweb.elk.matching.inferences;
 
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch2;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch3;
 import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatchChain;
 
@@ -37,7 +37,7 @@ public class BackwardLinkReversedExpandedMatch3
 
 	BackwardLinkReversedExpandedMatch3(
 			BackwardLinkReversedExpandedMatch2 parent,
-			ForwardLinkMatch2 firstPremiseMatch) {
+			ForwardLinkMatch3 firstPremiseMatch) {
 		super(parent);
 		intermediateRoots_ = firstPremiseMatch.getIntermediateRoots();
 		destinationMatch_ = firstPremiseMatch.getTargetMatch();
@@ -55,7 +55,7 @@ public class BackwardLinkReversedExpandedMatch3
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getBackwardLinkMatch2(
 				getParent().getParent().getConclusionMatch(factory),
-				destinationMatch_);
+				getParent().getRelationMatch(), getDestinationMatch());
 	}
 
 	@Override
@@ -87,7 +87,7 @@ public class BackwardLinkReversedExpandedMatch3
 
 		BackwardLinkReversedExpandedMatch3 getBackwardLinkReversedExpandedMatch3(
 				BackwardLinkReversedExpandedMatch2 parent,
-				ForwardLinkMatch2 firstPremiseMatch);
+				ForwardLinkMatch3 firstPremiseMatch);
 
 	}
 

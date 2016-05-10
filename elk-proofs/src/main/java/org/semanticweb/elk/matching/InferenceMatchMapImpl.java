@@ -27,22 +27,22 @@ import java.util.Collection;
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatch;
+import org.semanticweb.elk.matching.conclusions.DisjointSubsumerMatch1;
+import org.semanticweb.elk.matching.conclusions.DisjointSubsumerMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1Watch;
-import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1;
-import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1Watch;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2Watch;
 import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch1Watch;
+import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1;
+import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.IndexedObjectPropertyRangeAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedObjectPropertyRangeAxiomMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.IndexedSubClassOfAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedSubClassOfAxiomMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.IndexedSubObjectPropertyOfAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedSubObjectPropertyOfAxiomMatch1Watch;
-import org.semanticweb.elk.matching.conclusions.PropagationMatch1;
-import org.semanticweb.elk.matching.conclusions.PropagationMatch1Watch;
-import org.semanticweb.elk.matching.conclusions.PropagationMatch2;
-import org.semanticweb.elk.matching.conclusions.PropagationMatch2Watch;
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch1;
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1;
@@ -52,10 +52,10 @@ import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1Watch;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiomInference;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiomInference;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
@@ -63,6 +63,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiomInferen
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiomInference;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.PropertyRange;
@@ -70,6 +72,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagationInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedInference;
@@ -93,17 +97,17 @@ class InferenceMatchMapImpl
 		this.inferences_ = inferences;
 	}
 
-	private Collection<? extends InferenceMatch> getWatchInferences(
-			ConclusionMatch conclusion) {
-		// need this method since some java compilers have problems for casting
-		// directly
-		return watchedInferences_.get(conclusion);
-	}
-
 	@Override
 	public void add(BackwardLinkMatch1 conclusion,
 			BackwardLinkMatch1Watch inference) {
 		watchedInferences_.add(conclusion, inference);
+	}
+
+	@Override
+	public void add(DisjointSubsumerMatch1 conclusion,
+			DisjointSubsumerMatch1Watch inference) {
+		watchedInferences_.add(conclusion, inference);
+
 	}
 
 	@Override
@@ -114,15 +118,21 @@ class InferenceMatchMapImpl
 	}
 
 	@Override
-	public void add(IndexedEquivalentClassesAxiomMatch1 conclusion,
-			IndexedEquivalentClassesAxiomMatch1Watch inference) {
+	public void add(ForwardLinkMatch2 conclusion,
+			ForwardLinkMatch2Watch inference) {
 		watchedInferences_.add(conclusion, inference);
-
 	}
 
 	@Override
 	public void add(IndexedDisjointClassesAxiomMatch1 conclusion,
 			IndexedDisjointClassesAxiomMatch1Watch inference) {
+		watchedInferences_.add(conclusion, inference);
+
+	}
+
+	@Override
+	public void add(IndexedEquivalentClassesAxiomMatch1 conclusion,
+			IndexedEquivalentClassesAxiomMatch1Watch inference) {
 		watchedInferences_.add(conclusion, inference);
 
 	}
@@ -143,20 +153,6 @@ class InferenceMatchMapImpl
 	@Override
 	public void add(IndexedSubObjectPropertyOfAxiomMatch1 conclusion,
 			IndexedSubObjectPropertyOfAxiomMatch1Watch inference) {
-		watchedInferences_.add(conclusion, inference);
-
-	}
-
-	@Override
-	public void add(PropagationMatch1 conclusion,
-			PropagationMatch1Watch inference) {
-		watchedInferences_.add(conclusion, inference);
-
-	}
-
-	@Override
-	public void add(PropagationMatch2 conclusion,
-			PropagationMatch2Watch inference) {
 		watchedInferences_.add(conclusion, inference);
 
 	}
@@ -197,6 +193,27 @@ class InferenceMatchMapImpl
 	}
 
 	@Override
+	public Iterable<? extends ClassInconsistencyInference> get(
+			ClassInconsistency conclusion) {
+		return (Iterable<? extends ClassInconsistencyInference>) inferences_
+				.getInferences(conclusion);
+	}
+
+	@Override
+	public Iterable<? extends DisjointSubsumerInference> get(
+			DisjointSubsumer conclusion) {
+		return (Iterable<? extends DisjointSubsumerInference>) inferences_
+				.getInferences(conclusion);
+	}
+
+	@Override
+	public Iterable<? extends DisjointSubsumerMatch1Watch> get(
+			DisjointSubsumerMatch1 conclusion) {
+		return (Iterable<? extends DisjointSubsumerMatch1Watch>) getWatchInferences(
+				conclusion);
+	}
+
+	@Override
 	public Iterable<? extends ForwardLinkInference> get(
 			ForwardLink conclusion) {
 		return (Iterable<? extends ForwardLinkInference>) inferences_
@@ -211,24 +228,17 @@ class InferenceMatchMapImpl
 	}
 
 	@Override
+	public Iterable<? extends ForwardLinkMatch2Watch> get(
+			ForwardLinkMatch2 conclusion) {
+		return (Collection<? extends ForwardLinkMatch2Watch>) getWatchInferences(
+				conclusion);
+	}
+
+	@Override
 	public Iterable<? extends IndexedDeclarationAxiomInference> get(
 			IndexedDeclarationAxiom conclusion) {
 		return (Iterable<? extends IndexedDeclarationAxiomInference>) inferences_
 				.getInferences(conclusion);
-	}
-
-	@Override
-	public Iterable<? extends IndexedEquivalentClassesAxiomInference> get(
-			IndexedEquivalentClassesAxiom conclusion) {
-		return (Iterable<? extends IndexedEquivalentClassesAxiomInference>) inferences_
-				.getInferences(conclusion);
-	}
-
-	@Override
-	public Iterable<? extends IndexedEquivalentClassesAxiomMatch1Watch> get(
-			IndexedEquivalentClassesAxiomMatch1 conclusion) {
-		return (Collection<? extends IndexedEquivalentClassesAxiomMatch1Watch>) getWatchInferences(
-				conclusion);
 	}
 
 	@Override
@@ -242,6 +252,20 @@ class InferenceMatchMapImpl
 	public Iterable<? extends IndexedDisjointClassesAxiomMatch1Watch> get(
 			IndexedDisjointClassesAxiomMatch1 conclusion) {
 		return (Collection<? extends IndexedDisjointClassesAxiomMatch1Watch>) getWatchInferences(
+				conclusion);
+	}
+
+	@Override
+	public Iterable<? extends IndexedEquivalentClassesAxiomInference> get(
+			IndexedEquivalentClassesAxiom conclusion) {
+		return (Iterable<? extends IndexedEquivalentClassesAxiomInference>) inferences_
+				.getInferences(conclusion);
+	}
+
+	@Override
+	public Iterable<? extends IndexedEquivalentClassesAxiomMatch1Watch> get(
+			IndexedEquivalentClassesAxiomMatch1 conclusion) {
+		return (Collection<? extends IndexedEquivalentClassesAxiomMatch1Watch>) getWatchInferences(
 				conclusion);
 	}
 
@@ -295,20 +319,6 @@ class InferenceMatchMapImpl
 	}
 
 	@Override
-	public Iterable<? extends PropagationMatch1Watch> get(
-			PropagationMatch1 conclusion) {
-		return (Collection<? extends PropagationMatch1Watch>) getWatchInferences(
-				conclusion);
-	}
-
-	@Override
-	public Iterable<? extends PropagationMatch2Watch> get(
-			PropagationMatch2 conclusion) {
-		return (Collection<? extends PropagationMatch2Watch>) getWatchInferences(
-				conclusion);
-	}
-
-	@Override
 	public Iterable<? extends PropertyRangeInference> get(
 			PropertyRange conclusion) {
 		return (Iterable<? extends PropertyRangeInference>) inferences_
@@ -355,6 +365,13 @@ class InferenceMatchMapImpl
 			SubPropertyChainMatch1 conclusion) {
 		return (Collection<? extends SubPropertyChainMatch1Watch>) getWatchInferences(
 				conclusion);
+	}
+
+	private Collection<? extends InferenceMatch> getWatchInferences(
+			ConclusionMatch conclusion) {
+		// need this method since some java compilers have problems for casting
+		// directly
+		return watchedInferences_.get(conclusion);
 	}
 
 }

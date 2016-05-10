@@ -24,30 +24,16 @@ package org.semanticweb.elk.matching.conclusions;
 
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
-public class ConclusionMatchHash
-		implements ConclusionMatch.Visitor<Integer> {
+public class ConclusionMatchHash implements ConclusionMatch.Visitor<Integer> {
 
 	private static final ConclusionMatchHash INSTANCE_ = new ConclusionMatchHash();
-
-	// forbid construction; only static methods should be used
-	private ConclusionMatchHash() {
-
-	}
-
-	public static ConclusionMatch.Visitor<Integer> getInstance() {
-		return INSTANCE_;
-	}
 
 	private static int combinedHashCode(int... hashes) {
 		return HashGenerator.combineListHash(hashes);
 	}
 
-	private static int hashCode(Object o) {
-		return o.hashCode();
-	}
-
-	private static int hashCode(int i) {
-		return i;
+	public static ConclusionMatch.Visitor<Integer> getInstance() {
+		return INSTANCE_;
 	}
 
 	private static int hashCode(IndexedContextRootMatchChain chain) {
@@ -60,6 +46,78 @@ public class ConclusionMatchHash
 			result = combinedHashCode(result, hashCode(chain.getHead()));
 			chain = chain.getTail();
 		}
+	}
+
+	private static int hashCode(int i) {
+		return i;
+	}
+
+	private static int hashCode(Object o) {
+		return o.hashCode();
+	}
+
+	// forbid construction; only static methods should be used
+	private ConclusionMatchHash() {
+
+	}
+
+	@Override
+	public Integer visit(BackwardLinkMatch1 conclusionMatch) {
+		return combinedHashCode(hashCode(BackwardLinkMatch1.class),
+				hashCode(conclusionMatch.getParent()),
+				hashCode(conclusionMatch.getSourceMatch()));
+	}
+
+	@Override
+	public Integer visit(BackwardLinkMatch2 conclusionMatch) {
+		return combinedHashCode(hashCode(BackwardLinkMatch2.class),
+				hashCode(conclusionMatch.getParent()),
+				hashCode(conclusionMatch.getRelationMatch()),
+				hashCode(conclusionMatch.getDestinationMatch()));
+	}
+
+	@Override
+	public Integer visit(ClassInconsistencyMatch1 conclusionMatch) {
+		return combinedHashCode(hashCode(ClassInconsistencyMatch1.class),
+				hashCode(conclusionMatch.getParent()),
+				hashCode(conclusionMatch.getDestinationMatch()));
+	}
+
+	@Override
+	public Integer visit(DisjointSubsumerMatch1 conclusionMatch) {
+		return combinedHashCode(hashCode(DisjointSubsumerMatch1.class),
+				hashCode(conclusionMatch.getParent()),
+				hashCode(conclusionMatch.getDestinationMatch()));
+	}
+
+	@Override
+	public Integer visit(DisjointSubsumerMatch2 conclusionMatch) {
+		return combinedHashCode(hashCode(DisjointSubsumerMatch2.class),
+				hashCode(conclusionMatch.getParent()),
+				hashCode(conclusionMatch.getDisjointExpressionsMatch()));
+	}
+
+	@Override
+	public Integer visit(ForwardLinkMatch1 conclusionMatch) {
+		return combinedHashCode(hashCode(ForwardLinkMatch1.class),
+				hashCode(conclusionMatch.getParent()),
+				hashCode(conclusionMatch.getDestinationMatch()));
+	}
+
+	@Override
+	public Integer visit(ForwardLinkMatch2 conclusionMatch) {
+		return combinedHashCode(hashCode(ForwardLinkMatch2.class),
+				hashCode(conclusionMatch.getParent()),
+				hashCode(conclusionMatch.getChainStartPos()),
+				hashCode(conclusionMatch.getFullChainMatch()));
+	}
+
+	@Override
+	public Integer visit(ForwardLinkMatch3 conclusionMatch) {
+		return combinedHashCode(hashCode(ForwardLinkMatch3.class),
+				hashCode(conclusionMatch.getParent()),
+				hashCode(conclusionMatch.getTargetMatch()),
+				hashCode(conclusionMatch.getIntermediateRoots()));
 	}
 
 	@Override
@@ -78,49 +136,19 @@ public class ConclusionMatchHash
 	}
 
 	@Override
-	public Integer visit(IndexedSubClassOfAxiomMatch1 conclusionMatch) {
-		return combinedHashCode(hashCode(IndexedSubClassOfAxiomMatch1.class),
-				hashCode(conclusionMatch.getParent()));
-	}
-
-	@Override
-	public Integer visit(IndexedSubClassOfAxiomMatch2 conclusionMatch) {
-		return combinedHashCode(hashCode(IndexedSubClassOfAxiomMatch2.class),
-				hashCode(conclusionMatch.getParent()),
-				hashCode(conclusionMatch.getSubClassMatch()),
-				hashCode(conclusionMatch.getSuperClassMatch()));
-	}
-
-	@Override
 	public Integer visit(IndexedEquivalentClassesAxiomMatch1 conclusionMatch) {
-		return combinedHashCode(hashCode(IndexedEquivalentClassesAxiomMatch1.class),
+		return combinedHashCode(
+				hashCode(IndexedEquivalentClassesAxiomMatch1.class),
 				hashCode(conclusionMatch.getParent()));
 	}
 
 	@Override
 	public Integer visit(IndexedEquivalentClassesAxiomMatch2 conclusionMatch) {
-		return combinedHashCode(hashCode(IndexedEquivalentClassesAxiomMatch2.class),
+		return combinedHashCode(
+				hashCode(IndexedEquivalentClassesAxiomMatch2.class),
 				hashCode(conclusionMatch.getParent()),
 				hashCode(conclusionMatch.getFirstMemberMatch()),
 				hashCode(conclusionMatch.getSecondMemberMatch()));
-	}
-
-	@Override
-	public Integer visit(
-			IndexedSubObjectPropertyOfAxiomMatch1 conclusionMatch) {
-		return combinedHashCode(
-				hashCode(IndexedSubObjectPropertyOfAxiomMatch1.class),
-				hashCode(conclusionMatch.getParent()));
-	}
-
-	@Override
-	public Integer visit(
-			IndexedSubObjectPropertyOfAxiomMatch2 conclusionMatch) {
-		return combinedHashCode(
-				hashCode(IndexedSubObjectPropertyOfAxiomMatch2.class),
-				hashCode(conclusionMatch.getParent()),
-				hashCode(conclusionMatch.getSubPropertyChainMatch()),
-				hashCode(conclusionMatch.getSuperPropertyMatch()));
 	}
 
 	@Override
@@ -142,18 +170,58 @@ public class ConclusionMatchHash
 	}
 
 	@Override
-	public Integer visit(BackwardLinkMatch1 conclusionMatch) {
-		return combinedHashCode(hashCode(BackwardLinkMatch1.class),
-				hashCode(conclusionMatch.getParent()),
-				hashCode(conclusionMatch.getRelationMatch()),
-				hashCode(conclusionMatch.getSourceMatch()));
+	public Integer visit(IndexedSubClassOfAxiomMatch1 conclusionMatch) {
+		return combinedHashCode(hashCode(IndexedSubClassOfAxiomMatch1.class),
+				hashCode(conclusionMatch.getParent()));
 	}
 
 	@Override
-	public Integer visit(BackwardLinkMatch2 conclusionMatch) {
-		return combinedHashCode(hashCode(BackwardLinkMatch2.class),
+	public Integer visit(IndexedSubClassOfAxiomMatch2 conclusionMatch) {
+		return combinedHashCode(hashCode(IndexedSubClassOfAxiomMatch2.class),
 				hashCode(conclusionMatch.getParent()),
-				hashCode(conclusionMatch.getDestinationMatch()));
+				hashCode(conclusionMatch.getSubClassMatch()),
+				hashCode(conclusionMatch.getSuperClassMatch()));
+	}
+
+	@Override
+	public Integer visit(
+			IndexedSubObjectPropertyOfAxiomMatch1 conclusionMatch) {
+		return combinedHashCode(
+				hashCode(IndexedSubObjectPropertyOfAxiomMatch1.class),
+				hashCode(conclusionMatch.getParent()));
+	}
+
+	@Override
+	public Integer visit(
+			IndexedSubObjectPropertyOfAxiomMatch2 conclusionMatch) {
+		return combinedHashCode(
+				hashCode(IndexedSubObjectPropertyOfAxiomMatch2.class),
+				hashCode(conclusionMatch.getParent()),
+				hashCode(conclusionMatch.getSubPropertyChainMatch()),
+				hashCode(conclusionMatch.getSuperPropertyMatch()));
+	}
+
+	@Override
+	public Integer visit(PropagationMatch1 conclusionMatch) {
+		return combinedHashCode(hashCode(PropagationMatch1.class),
+				hashCode(conclusionMatch.getParent()),
+				hashCode(conclusionMatch.getDestinationMatch()),
+				hashCode(conclusionMatch.getSubDestinationMatch()),
+				hashCode(conclusionMatch.getCarryMatch()));
+	}
+
+	@Override
+	public Integer visit(PropertyRangeMatch1 conclusionMatch) {
+		return combinedHashCode(hashCode(PropertyRangeMatch1.class),
+				hashCode(conclusionMatch.getParent()),
+				hashCode(conclusionMatch.getPropertyMatch()));
+	}
+
+	@Override
+	public Integer visit(PropertyRangeMatch2 conclusionMatch) {
+		return combinedHashCode(hashCode(PropertyRangeMatch2.class),
+				hashCode(conclusionMatch.getParent()),
+				hashCode(conclusionMatch.getRangeMatch()));
 	}
 
 	@Override
@@ -178,58 +246,6 @@ public class ConclusionMatchHash
 				hashCode(SubClassInclusionDecomposedMatch2.class),
 				hashCode(conclusionMatch.getParent()),
 				hashCode(conclusionMatch.getSubsumerMatch()));
-	}
-
-	@Override
-	public Integer visit(ForwardLinkMatch1 conclusionMatch) {
-		return combinedHashCode(hashCode(ForwardLinkMatch1.class),
-				hashCode(conclusionMatch.getParent()),
-				hashCode(conclusionMatch.getDestinationMatch()),
-				hashCode(conclusionMatch.getChainStartPos()),
-				hashCode(conclusionMatch.getFullChainMatch()));
-	}
-
-	@Override
-	public Integer visit(ForwardLinkMatch2 conclusionMatch) {
-		return combinedHashCode(hashCode(ForwardLinkMatch2.class),
-				hashCode(conclusionMatch.getParent()),
-				hashCode(conclusionMatch.getTargetMatch()),
-				hashCode(conclusionMatch.getIntermediateRoots()));
-	}
-
-	@Override
-	public Integer visit(PropagationMatch1 conclusionMatch) {
-		return combinedHashCode(hashCode(PropagationMatch1.class),
-				hashCode(conclusionMatch.getParent()),
-				hashCode(conclusionMatch.getCarryMatch()));
-	}
-
-	@Override
-	public Integer visit(PropagationMatch2 conclusionMatch) {
-		return combinedHashCode(hashCode(PropagationMatch2.class),
-				hashCode(conclusionMatch.getParent()),
-				hashCode(conclusionMatch.getRelationMatch()));
-	}
-
-	@Override
-	public Integer visit(PropagationMatch3 conclusionMatch) {
-		return combinedHashCode(hashCode(PropagationMatch3.class),
-				hashCode(conclusionMatch.getParent()),
-				hashCode(conclusionMatch.getDestinationMatch()));
-	}
-
-	@Override
-	public Integer visit(PropertyRangeMatch1 conclusionMatch) {
-		return combinedHashCode(hashCode(PropertyRangeMatch1.class),
-				hashCode(conclusionMatch.getParent()),
-				hashCode(conclusionMatch.getPropertyMatch()));
-	}
-
-	@Override
-	public Integer visit(PropertyRangeMatch2 conclusionMatch) {
-		return combinedHashCode(hashCode(PropertyRangeMatch2.class),
-				hashCode(conclusionMatch.getParent()),
-				hashCode(conclusionMatch.getRangeMatch()));
 	}
 
 	@Override

@@ -28,29 +28,29 @@ import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory
 import org.semanticweb.elk.matching.conclusions.IndexedSubClassOfAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedSubClassOfAxiomMatch2;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomSubClassConversion;
 
 public class ElkEquivalentClassesAxiomSubClassConversionMatch1 extends
 		AbstractInferenceMatch<ElkEquivalentClassesAxiomSubClassConversion> {
 
-	private final int subClassPos_, superClassPos_;
-
 	ElkEquivalentClassesAxiomSubClassConversionMatch1(
 			ElkEquivalentClassesAxiomSubClassConversion parent,
 			IndexedSubClassOfAxiomMatch1 conclusionMatch) {
 		super(parent);
-		this.subClassPos_ = parent.getSubClassPosition();
-		this.superClassPos_ = parent.getSuperClassPosition();
 	}
 
 	public IndexedSubClassOfAxiomMatch2 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
-		List<? extends ElkClassExpression> members = getParent()
-				.getOriginalAxiom().getClassExpressions();
+		ElkEquivalentClassesAxiomSubClassConversion parent = getParent();
+		ElkEquivalentClassesAxiom premise = parent.getOriginalAxiom();
+		List<? extends ElkClassExpression> members = premise
+				.getClassExpressions();
 		return factory.getIndexedSubClassOfAxiomMatch2(
 				factory.getIndexedSubClassOfAxiomMatch1(
-						getParent().getConclusion(factory)),
-				members.get(subClassPos_), members.get(superClassPos_));
+						parent.getConclusion(factory)),
+				members.get(parent.getSubClassPosition()),
+				members.get(parent.getSuperClassPosition()));
 	}
 
 	@Override

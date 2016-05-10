@@ -38,22 +38,52 @@ public class ConclusionMatchDummyVisitor<O>
 	}
 
 	@Override
+	public O visit(BackwardLinkMatch1 conclusionMatch) {
+		return defaultVisit(conclusionMatch);
+	}
+
+	@Override
+	public O visit(BackwardLinkMatch2 conclusionMatch) {
+		return defaultVisit(conclusionMatch);
+	}
+
+	@Override
+	public O visit(ClassInconsistencyMatch1 conclusionMatch) {
+		return defaultVisit(conclusionMatch);
+	}
+
+	@Override
+	public O visit(DisjointSubsumerMatch1 conclusionMatch) {
+		return defaultVisit(conclusionMatch);
+	}
+
+	@Override
+	public O visit(DisjointSubsumerMatch2 conclusionMatch) {
+		return defaultVisit(conclusionMatch);
+	}
+
+	@Override
+	public O visit(ForwardLinkMatch1 conclusionMatch) {
+		return defaultVisit(conclusionMatch);
+	}
+
+	@Override
+	public O visit(ForwardLinkMatch2 conclusionMatch) {
+		return defaultVisit(conclusionMatch);
+	}
+
+	@Override
+	public O visit(ForwardLinkMatch3 conclusionMatch) {
+		return defaultVisit(conclusionMatch);
+	}
+
+	@Override
 	public O visit(IndexedDisjointClassesAxiomMatch1 conclusionMatch) {
 		return defaultVisit(conclusionMatch);
 	}
 
 	@Override
 	public O visit(IndexedDisjointClassesAxiomMatch2 conclusionMatch) {
-		return defaultVisit(conclusionMatch);
-	}
-
-	@Override
-	public O visit(IndexedSubClassOfAxiomMatch1 conclusionMatch) {
-		return defaultVisit(conclusionMatch);
-	}
-
-	@Override
-	public O visit(IndexedSubClassOfAxiomMatch2 conclusionMatch) {
 		return defaultVisit(conclusionMatch);
 	}
 
@@ -68,16 +98,6 @@ public class ConclusionMatchDummyVisitor<O>
 	}
 
 	@Override
-	public O visit(IndexedSubObjectPropertyOfAxiomMatch1 conclusionMatch) {
-		return defaultVisit(conclusionMatch);
-	}
-
-	@Override
-	public O visit(IndexedSubObjectPropertyOfAxiomMatch2 conclusionMatch) {
-		return defaultVisit(conclusionMatch);
-	}
-
-	@Override
 	public O visit(IndexedObjectPropertyRangeAxiomMatch1 conclusionMatch) {
 		return defaultVisit(conclusionMatch);
 	}
@@ -88,12 +108,37 @@ public class ConclusionMatchDummyVisitor<O>
 	}
 
 	@Override
-	public O visit(BackwardLinkMatch1 conclusionMatch) {
+	public O visit(IndexedSubClassOfAxiomMatch1 conclusionMatch) {
 		return defaultVisit(conclusionMatch);
 	}
 
 	@Override
-	public O visit(BackwardLinkMatch2 conclusionMatch) {
+	public O visit(IndexedSubClassOfAxiomMatch2 conclusionMatch) {
+		return defaultVisit(conclusionMatch);
+	}
+
+	@Override
+	public O visit(IndexedSubObjectPropertyOfAxiomMatch1 conclusionMatch) {
+		return defaultVisit(conclusionMatch);
+	}
+
+	@Override
+	public O visit(IndexedSubObjectPropertyOfAxiomMatch2 conclusionMatch) {
+		return defaultVisit(conclusionMatch);
+	}
+
+	@Override
+	public O visit(PropagationMatch1 conclusionMatch) {
+		return defaultVisit(conclusionMatch);
+	}
+
+	@Override
+	public O visit(PropertyRangeMatch1 conclusionMatch) {
+		return defaultVisit(conclusionMatch);
+	}
+
+	@Override
+	public O visit(PropertyRangeMatch2 conclusionMatch) {
 		return defaultVisit(conclusionMatch);
 	}
 
@@ -109,41 +154,6 @@ public class ConclusionMatchDummyVisitor<O>
 
 	@Override
 	public O visit(SubClassInclusionDecomposedMatch2 conclusionMatch) {
-		return defaultVisit(conclusionMatch);
-	}
-
-	@Override
-	public O visit(ForwardLinkMatch1 conclusionMatch) {
-		return defaultVisit(conclusionMatch);
-	}
-
-	@Override
-	public O visit(ForwardLinkMatch2 conclusionMatch) {
-		return defaultVisit(conclusionMatch);
-	}
-
-	@Override
-	public O visit(PropagationMatch1 conclusionMatch) {
-		return defaultVisit(conclusionMatch);
-	}
-
-	@Override
-	public O visit(PropagationMatch2 conclusionMatch) {
-		return defaultVisit(conclusionMatch);
-	}
-
-	@Override
-	public O visit(PropagationMatch3 conclusionMatch) {
-		return defaultVisit(conclusionMatch);
-	}
-
-	@Override
-	public O visit(PropertyRangeMatch1 conclusionMatch) {
-		return defaultVisit(conclusionMatch);
-	}
-
-	@Override
-	public O visit(PropertyRangeMatch2 conclusionMatch) {
 		return defaultVisit(conclusionMatch);
 	}
 

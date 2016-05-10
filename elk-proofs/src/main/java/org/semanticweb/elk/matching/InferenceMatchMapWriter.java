@@ -24,22 +24,22 @@ package org.semanticweb.elk.matching;
 
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1Watch;
+import org.semanticweb.elk.matching.conclusions.DisjointSubsumerMatch1;
+import org.semanticweb.elk.matching.conclusions.DisjointSubsumerMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1Watch;
-import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1;
-import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1Watch;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2Watch;
 import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch1Watch;
+import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1;
+import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.IndexedObjectPropertyRangeAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedObjectPropertyRangeAxiomMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.IndexedSubClassOfAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedSubClassOfAxiomMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.IndexedSubObjectPropertyOfAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedSubObjectPropertyOfAxiomMatch1Watch;
-import org.semanticweb.elk.matching.conclusions.PropagationMatch1;
-import org.semanticweb.elk.matching.conclusions.PropagationMatch1Watch;
-import org.semanticweb.elk.matching.conclusions.PropagationMatch2;
-import org.semanticweb.elk.matching.conclusions.PropagationMatch2Watch;
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch1;
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1;
@@ -51,26 +51,27 @@ public interface InferenceMatchMapWriter {
 
 	void add(BackwardLinkMatch1 conclusion, BackwardLinkMatch1Watch inference);
 
+	void add(DisjointSubsumerMatch1 conclusion,
+			DisjointSubsumerMatch1Watch inference);
+
 	void add(ForwardLinkMatch1 conclusion, ForwardLinkMatch1Watch inference);
 
-	void add(IndexedEquivalentClassesAxiomMatch1 conclusion,
-			IndexedEquivalentClassesAxiomMatch1Watch inference);
+	void add(ForwardLinkMatch2 conclusion, ForwardLinkMatch2Watch inference);
 
 	void add(IndexedDisjointClassesAxiomMatch1 conclusion,
 			IndexedDisjointClassesAxiomMatch1Watch inference);
 
+	void add(IndexedEquivalentClassesAxiomMatch1 conclusion,
+			IndexedEquivalentClassesAxiomMatch1Watch inference);
+
 	void add(IndexedObjectPropertyRangeAxiomMatch1 conclusion,
 			IndexedObjectPropertyRangeAxiomMatch1Watch inference);
-
-	void add(IndexedSubObjectPropertyOfAxiomMatch1 conclusion,
-			IndexedSubObjectPropertyOfAxiomMatch1Watch inference);
 
 	void add(IndexedSubClassOfAxiomMatch1 conclusion,
 			IndexedSubClassOfAxiomMatch1Watch inference);
 
-	void add(PropagationMatch1 conclusion, PropagationMatch1Watch inference);
-
-	void add(PropagationMatch2 conclusion, PropagationMatch2Watch inference);
+	void add(IndexedSubObjectPropertyOfAxiomMatch1 conclusion,
+			IndexedSubObjectPropertyOfAxiomMatch1Watch inference);
 
 	void add(PropertyRangeMatch1 conclusion,
 			PropertyRangeMatch1Watch inference);

@@ -22,28 +22,26 @@ package org.semanticweb.elk.matching;
  * #L%
  */
 
-import org.semanticweb.elk.matching.conclusions.PropagationMatch1Watch;
-import org.semanticweb.elk.matching.conclusions.PropagationMatch2;
+import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch1Watch;
+import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch2;
+import org.semanticweb.elk.matching.inferences.DisjointSubsumerFromSubsumerMatch1;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionComposedObjectSomeValuesFromMatch1;
 
-class PropagationMatch2InferenceVisitor
-		extends
-			AbstractConclusionMatchInferenceVisitor<PropagationMatch2>
-		implements
-			PropagationMatch1Watch.Visitor<Void> {
+class IndexedDisjointClassesAxiomMatch2InferenceVisitor extends
+		AbstractConclusionMatchInferenceVisitor<IndexedDisjointClassesAxiomMatch2>
+		implements IndexedDisjointClassesAxiomMatch1Watch.Visitor<Void> {
 
-	PropagationMatch2InferenceVisitor(InferenceMatch.Factory factory,
-			PropagationMatch2 child) {
+	IndexedDisjointClassesAxiomMatch2InferenceVisitor(
+			InferenceMatch.Factory factory,
+			IndexedDisjointClassesAxiomMatch2 child) {
 		super(factory, child);
 	}
 
 	@Override
-	public Void visit(
-			SubClassInclusionComposedObjectSomeValuesFromMatch1 inferenceMatch1) {
-		factory.getSubClassInclusionComposedObjectSomeValuesFromMatch2(
-				inferenceMatch1, child);
+	public Void visit(DisjointSubsumerFromSubsumerMatch1 inferenceMatch1) {
+		factory.getDisjointSubsumerFromSubsumerMatch2(inferenceMatch1, child);
 		return null;
 	}
+
 
 }

@@ -32,52 +32,43 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  * Represents the inference:
  * 
  * <pre>
- *          C ⊑ ⊤
- * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
- *  C ⊑ ObjectIntersectionOf()
+ *  
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *  ObjectUnionOf() ⊑ ⊥
  * </pre>
  * 
  * @author Yevgeny Kazakov
  *
  */
-public class ElkClassInclusionEmptyObjectIntersectionOfComposition
+public class ElkClassInclusionEmptyObjectUnionOfOwlNothing
 		extends AbstractElkInference {
 
-	private final static String NAME_ = "Empty Conjunction Composition";
-	
-	private final ElkClassExpression subExpression_;
+	private final static String NAME_ = "Empty Disjunction";
 
-	ElkClassInclusionEmptyObjectIntersectionOfComposition(
-			ElkClassExpression subExpression) {
-		this.subExpression_ = subExpression;
-	}
-
-	public ElkClassExpression getSubExpression() {
-		return subExpression_;
+	ElkClassInclusionEmptyObjectUnionOfOwlNothing() {
 	}
 
 	@Override
 	public String getName() {
 		return NAME_;
 	}
-	
+
 	@Override
 	public int getPremiseCount() {
-		return 1;
+		return 0;
 	}
 
 	@Override
 	public ElkSubClassOfAxiom getPremise(int index, ElkObject.Factory factory) {
-		checkPremiseIndex(index);
-		return factory.getSubClassOfAxiom(subExpression_,
-				factory.getOwlThing());
+		return failGetPremise(index);
 	}
 
 	@Override
 	public ElkSubClassOfAxiom getConclusion(ElkObject.Factory factory) {
-		return factory.getSubClassOfAxiom(subExpression_,
-				factory.getObjectIntersectionOf(
-						Collections.<ElkClassExpression> emptyList()));
+		return factory.getSubClassOfAxiom(
+				factory.getObjectUnionOf(
+						Collections.<ElkClassExpression> emptyList()),
+				factory.getOwlNothing());
 	}
 
 	@Override
@@ -93,8 +84,7 @@ public class ElkClassInclusionEmptyObjectIntersectionOfComposition
 	 */
 	public interface Factory {
 
-		ElkClassInclusionEmptyObjectIntersectionOfComposition getElkClassInclusionEmptyObjectIntersectionOfComposition(
-				ElkClassExpression subExpression);
+		ElkClassInclusionEmptyObjectUnionOfOwlNothing getElkClassInclusionEmptyObjectUnionOfOwlNothing();
 
 	}
 
@@ -108,7 +98,7 @@ public class ElkClassInclusionEmptyObjectIntersectionOfComposition
 	 */
 	interface Visitor<O> {
 
-		O visit(ElkClassInclusionEmptyObjectIntersectionOfComposition inference);
+		O visit(ElkClassInclusionEmptyObjectUnionOfOwlNothing inference);
 
 	}
 

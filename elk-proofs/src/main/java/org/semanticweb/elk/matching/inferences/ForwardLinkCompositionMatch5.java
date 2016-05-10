@@ -23,9 +23,10 @@ package org.semanticweb.elk.matching.inferences;
  */
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch3;
 import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatchChain;
+import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1;
 
 public class ForwardLinkCompositionMatch5
 		extends AbstractInferenceMatch<ForwardLinkCompositionMatch4> {
@@ -35,7 +36,7 @@ public class ForwardLinkCompositionMatch5
 	private final IndexedContextRootMatch conclusionTargetMatch_;
 
 	ForwardLinkCompositionMatch5(ForwardLinkCompositionMatch4 parent,
-			ForwardLinkMatch2 thirdPremiseMatch) {
+			ForwardLinkMatch3 thirdPremiseMatch) {
 		super(parent);
 		this.premiseIntermediateRoots_ = thirdPremiseMatch
 				.getIntermediateRoots();
@@ -50,24 +51,23 @@ public class ForwardLinkCompositionMatch5
 		return conclusionTargetMatch_;
 	}
 
-	public ForwardLinkMatch2 getThirdPremiseMatch(
+	public SubPropertyChainMatch1 getSecondPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getForwardLinkMatch2(
-				getParent().getThirdPremiseMatch(factory),
-				premiseIntermediateRoots_, conclusionTargetMatch_);
+		return factory.getSubPropertyChainMatch1(
+				getParent().getParent().getParent().getParent().getParent()
+						.getSecondPremise(factory),
+				getParent().getParent().getParent().getFirstProperty(), 0);
 	}
 
-	public ForwardLinkMatch2 getConclusionMatch(
+	public ForwardLinkMatch3 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getForwardLinkMatch2(
-				getParent().getParent().getParent().getParent()
-						.getConclusionMatch(factory),
+		return factory.getForwardLinkMatch3(
+				getParent().getParent().getParent().getConclusionMatch(factory),
 				new IndexedContextRootMatchChain(
 						getParent().getParent().getOriginMatch(),
 						getParent().getPremiseForwardChainStartPos() == 0 ? null
 								: premiseIntermediateRoots_),
 				conclusionTargetMatch_);
-
 	}
 
 	@Override
@@ -99,7 +99,7 @@ public class ForwardLinkCompositionMatch5
 
 		ForwardLinkCompositionMatch5 getForwardLinkCompositionMatch5(
 				ForwardLinkCompositionMatch4 parent,
-				ForwardLinkMatch2 thirdPremiseMatch);
+				ForwardLinkMatch3 thirdPremiseMatch);
 
 	}
 

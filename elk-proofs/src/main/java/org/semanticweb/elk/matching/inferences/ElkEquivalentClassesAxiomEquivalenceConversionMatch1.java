@@ -28,29 +28,29 @@ import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory
 import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch2;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomEquivalenceConversion;
 
 public class ElkEquivalentClassesAxiomEquivalenceConversionMatch1 extends
 		AbstractInferenceMatch<ElkEquivalentClassesAxiomEquivalenceConversion> {
 
-	private final int firstMemberPos_, secondMemberPos_;
-
 	ElkEquivalentClassesAxiomEquivalenceConversionMatch1(
 			ElkEquivalentClassesAxiomEquivalenceConversion parent,
 			IndexedEquivalentClassesAxiomMatch1 conclusionMatch) {
 		super(parent);
-		this.firstMemberPos_ = parent.getFirstMemberPosition();
-		this.secondMemberPos_ = parent.getSecondMemberPosition();
 	}
 
 	public IndexedEquivalentClassesAxiomMatch2 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
-		List<? extends ElkClassExpression> members = getParent()
-				.getOriginalAxiom().getClassExpressions();
+		ElkEquivalentClassesAxiomEquivalenceConversion parent = getParent();
+		ElkEquivalentClassesAxiom premise = parent.getOriginalAxiom();
+		List<? extends ElkClassExpression> members = premise
+				.getClassExpressions();
 		return factory.getIndexedEquivalentClassesAxiomMatch2(
 				factory.getIndexedEquivalentClassesAxiomMatch1(
 						getParent().getConclusion(factory)),
-				members.get(firstMemberPos_), members.get(secondMemberPos_));
+				members.get(parent.getFirstMemberPosition()),
+				members.get(parent.getSecondMemberPosition()));
 	}
 
 	@Override

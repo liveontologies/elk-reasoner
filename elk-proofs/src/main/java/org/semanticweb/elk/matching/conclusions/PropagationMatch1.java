@@ -1,5 +1,7 @@
 package org.semanticweb.elk.matching.conclusions;
 
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -28,11 +30,28 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
 public class PropagationMatch1
 		extends AbstractClassConclusionMatch<Propagation> {
 
+	private final IndexedContextRootMatch destinationMatch_;
+
+	private final ElkObjectProperty subDestinationMatch_;
+
 	private final ElkObjectSomeValuesFrom carryMatch_;
 
-	PropagationMatch1(Propagation parent, ElkObjectSomeValuesFrom carryMatch) {
+	PropagationMatch1(Propagation parent,
+			IndexedContextRootMatch destinationMatch,
+			ElkObjectProperty subDestinationMatch,
+			ElkObjectSomeValuesFrom carryMatch) {
 		super(parent);
+		this.destinationMatch_ = destinationMatch;
+		this.subDestinationMatch_ = subDestinationMatch;
 		this.carryMatch_ = carryMatch;
+	}
+
+	public IndexedContextRootMatch getDestinationMatch() {
+		return destinationMatch_;
+	}
+
+	public ElkObjectProperty getSubDestinationMatch() {
+		return subDestinationMatch_;
 	}
 
 	public ElkObjectSomeValuesFrom getCarryMatch() {
@@ -53,6 +72,8 @@ public class PropagationMatch1
 	public interface Factory {
 
 		PropagationMatch1 getPropagationMatch1(Propagation parent,
+				IndexedContextRootMatch destinationMatch,
+				ElkObjectProperty subDestinationMatch,
 				ElkObjectSomeValuesFrom carryMatch);
 
 	}

@@ -1,5 +1,7 @@
 package org.semanticweb.elk.matching.inferences;
 
+import java.util.List;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -25,6 +27,8 @@ package org.semanticweb.elk.matching.inferences;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.IndexedSubClassOfAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedSubClassOfAxiomMatch2;
+import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDifferentIndividualsAxiomBinaryConversion;
 
 public class ElkDifferentIndividualsAxiomBinaryConversionMatch1 extends
@@ -38,8 +42,18 @@ public class ElkDifferentIndividualsAxiomBinaryConversionMatch1 extends
 
 	public IndexedSubClassOfAxiomMatch2 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
-		// TODO
-		return null;
+		ElkDifferentIndividualsAxiomBinaryConversion parent = getParent();
+		ElkDifferentIndividualsAxiom premise = parent.getOriginalAxiom();
+		List<? extends ElkIndividual> disjoint = premise.getIndividuals();
+		return factory.getIndexedSubClassOfAxiomMatch2(
+				factory.getIndexedSubClassOfAxiomMatch1(
+						parent.getConclusion(factory)),
+				factory.getObjectIntersectionOf(
+						factory.getObjectOneOf(disjoint
+								.get(parent.getFirstIndividualPosition())),
+						factory.getObjectOneOf(disjoint
+								.get(parent.getSecondIndividualPosition()))),
+				factory.getOwlNothing());
 	}
 
 	@Override

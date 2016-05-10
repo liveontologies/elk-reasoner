@@ -24,26 +24,20 @@ package org.semanticweb.elk.owl.inferences;
 
 public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 
-	private final ElkInference other_;
-
-	ElkInferenceEquality(ElkInference other) {
-		this.other_ = other;
-	}
-
 	private static class DefaultVisitor
 			extends ElkInferenceDummyVisitor<Boolean> {
 
-		@Override
-		protected Boolean defaultVisit(ElkInference conclusion) {
-			return false;
+		static boolean equals(int first, int second) {
+			return first == second;
 		}
 
 		static boolean equals(Object first, Object second) {
 			return first.equals(second);
 		}
 
-		static boolean equals(int first, int second) {
-			return first == second;
+		@Override
+		protected Boolean defaultVisit(ElkInference conclusion) {
+			return false;
 		}
 
 	}
@@ -52,41 +46,44 @@ public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 		return first.accept(new ElkInferenceEquality(second));
 	}
 
+	private final ElkInference other_;
+
+	ElkInferenceEquality(ElkInference other) {
+		this.other_ = other;
+	}
+
 	@Override
 	public Boolean visit(
-			final ElkClassInclusionEmptyObjectIntersectionOfComposition inference) {
+			final ElkClassInclusionOwlThingEmptyObjectIntersectionOf inference) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(
-					ElkClassInclusionEmptyObjectIntersectionOfComposition other) {
-				return equals(other.getSubExpression(),
-						inference.getSubExpression());
+					ElkClassInclusionOwlThingEmptyObjectIntersectionOf other) {
+				return true;
 			}
 		});
 	}
 
 	@Override
 	public Boolean visit(
-			final ElkClassInclusionEmptyObjectOneOfDecomposition inference) {
+			final ElkClassInclusionEmptyObjectOneOfOwlNothing inference) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(
-					ElkClassInclusionEmptyObjectOneOfDecomposition other) {
-				return equals(other.getSubExpression(),
-						inference.getSubExpression());
+					ElkClassInclusionEmptyObjectOneOfOwlNothing other) {
+				return true;
 			}
 		});
 	}
 
 	@Override
 	public Boolean visit(
-			final ElkClassInclusionEmptyObjectUnionOfDecomposition inference) {
+			final ElkClassInclusionEmptyObjectUnionOfOwlNothing inference) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(
-					ElkClassInclusionEmptyObjectUnionOfDecomposition other) {
-				return equals(other.getSubExpression(),
-						inference.getSubExpression());
+					ElkClassInclusionEmptyObjectUnionOfOwlNothing other) {
+				return true;
 			}
 		});
 	}
@@ -198,14 +195,69 @@ public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 	}
 
 	@Override
-	public Boolean visit(final ElkClassInclusionOfEquivalence inference) {
+	public Boolean visit(final ElkClassInclusionOfClassAssertion inference) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
-			public Boolean visit(ElkClassInclusionOfEquivalence other) {
+			public Boolean visit(ElkClassInclusionOfClassAssertion other) {
+				return equals(other.getInstance(), inference.getInstance())
+						&& equals(other.getType(), inference.getType());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(
+			final ElkClassInclusionOfDifferentIndividuals inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(
+					ElkClassInclusionOfDifferentIndividuals other) {
+				return equals(other.getIndividuals(),
+						inference.getIndividuals())
+						&& equals(other.getFirstPos(), inference.getFirstPos())
+						&& equals(other.getSecondPos(),
+								inference.getSecondPos());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(final ElkClassInclusionOfDisjointClasses inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(ElkClassInclusionOfDisjointClasses other) {
+				return equals(other.getExpressions(),
+						inference.getExpressions())
+						&& equals(other.getFirstPos(), inference.getFirstPos())
+						&& equals(other.getSecondPos(),
+								inference.getSecondPos());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(final ElkClassInclusionOfEquivaletClasses inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(ElkClassInclusionOfEquivaletClasses other) {
 				return equals(other.getExpressions(),
 						inference.getExpressions())
 						&& equals(other.getSubPos(), inference.getSubPos())
 						&& equals(other.getSuperPos(), inference.getSuperPos());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(
+			final ElkClassInclusionOfObjectPropertyAssertion inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(
+					ElkClassInclusionOfObjectPropertyAssertion other) {
+				return equals(other.getSubject(), inference.getSubject())
+						&& equals(other.getProperty(), inference.getProperty())
+						&& equals(other.getObject(), inference.getObject());
 			}
 		});
 	}
@@ -231,6 +283,16 @@ public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 			public Boolean visit(
 					ElkClassInclusionOfReflexiveObjectProperty other) {
 				return equals(other.getProperty(), inference.getProperty());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(final ElkClassInclusionOwlNothing inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(ElkClassInclusionOwlNothing other) {
+				return equals(other.getSuperClass(), inference.getSuperClass());
 			}
 		});
 	}
@@ -266,9 +328,7 @@ public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 			@Override
 			public Boolean visit(
 					ElkClassInclusionSingletonObjectUnionOfDecomposition other) {
-				return equals(other.getSubExpression(),
-						inference.getSubExpression())
-						&& equals(other.getDisjunct(), inference.getDisjunct());
+				return equals(other.getDisjunct(), inference.getDisjunct());
 			}
 		});
 	}
@@ -279,6 +339,28 @@ public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 			@Override
 			public Boolean visit(ElkClassInclusionTautology other) {
 				return equals(other.getExpression(), inference.getExpression());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(final ElkDisjointClassesOfDisjointUnion inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(ElkDisjointClassesOfDisjointUnion other) {
+				return equals(other.getDefined(), inference.getDefined())
+						&& equals(other.getDisjoint(), inference.getDisjoint());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(final ElkEquivalentClassesOfDisjointUnion inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(ElkEquivalentClassesOfDisjointUnion other) {
+				return equals(other.getDefined(), inference.getDefined())
+						&& equals(other.getDisjoint(), inference.getDisjoint());
 			}
 		});
 	}

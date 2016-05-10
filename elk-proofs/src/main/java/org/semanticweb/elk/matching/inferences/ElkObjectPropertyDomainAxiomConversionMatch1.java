@@ -43,7 +43,7 @@ public class ElkObjectPropertyDomainAxiomConversionMatch1
 		ElkObjectPropertyDomainAxiom premise = parent.getOriginalAxiom();
 		return factory.getIndexedSubClassOfAxiomMatch2(
 				factory.getIndexedSubClassOfAxiomMatch1(
-						getParent().getConclusion(factory)),
+						parent.getConclusion(factory)),
 				factory.getObjectSomeValuesFrom(premise.getProperty(),
 						factory.getOwlThing()),
 				premise.getDomain());

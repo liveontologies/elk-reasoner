@@ -24,10 +24,10 @@ package org.semanticweb.elk.matching;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiomInference;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiomInference;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
@@ -35,6 +35,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiomInferen
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiomInference;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.PropertyRange;
@@ -42,6 +44,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagationInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedInference;
@@ -53,16 +57,22 @@ public interface InferenceMap {
 
 	Iterable<? extends BackwardLinkInference> get(BackwardLink conclusion);
 
+	Iterable<? extends ClassInconsistencyInference> get(
+			ClassInconsistency conclusion);
+
+	Iterable<? extends DisjointSubsumerInference> get(
+			DisjointSubsumer conclusion);
+
 	Iterable<? extends ForwardLinkInference> get(ForwardLink conclusion);
 
 	Iterable<? extends IndexedDeclarationAxiomInference> get(
 			IndexedDeclarationAxiom conclusion);
 
-	Iterable<? extends IndexedEquivalentClassesAxiomInference> get(
-			IndexedEquivalentClassesAxiom conclusion);
-
 	Iterable<? extends IndexedDisjointClassesAxiomInference> get(
 			IndexedDisjointClassesAxiom conclusion);
+
+	Iterable<? extends IndexedEquivalentClassesAxiomInference> get(
+			IndexedEquivalentClassesAxiom conclusion);
 
 	Iterable<? extends IndexedObjectPropertyRangeAxiomInference> get(
 			IndexedObjectPropertyRangeAxiom conclusion);
@@ -79,11 +89,11 @@ public interface InferenceMap {
 
 	Iterable<? extends SubClassInclusionComposedInference> get(
 			SubClassInclusionComposed conclusion);
-
+	
 	Iterable<? extends SubClassInclusionDecomposedInference> get(
 			SubClassInclusionDecomposed conclusion);
-
+	
 	Iterable<? extends SubPropertyChainInference> get(
-			SubPropertyChain conclusion);
+			SubPropertyChain conclusion);	
 
 }

@@ -27,7 +27,6 @@ import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1Watch;
-import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkOfObjectHasSelf;
 
 public class ForwardLinkOfObjectHasSelfMatch1
@@ -35,33 +34,21 @@ public class ForwardLinkOfObjectHasSelfMatch1
 		implements SubClassInclusionDecomposedMatch1Watch {
 
 	private final IndexedContextRootMatch originMatch_;
-	private final ElkSubObjectPropertyExpression fullChainMatch_;
-	private final int chainStartPos_;
 
 	ForwardLinkOfObjectHasSelfMatch1(ForwardLinkOfObjectHasSelf parent,
 			ForwardLinkMatch1 conclusionMatch) {
 		super(parent);
 		originMatch_ = conclusionMatch.getDestinationMatch();
-		fullChainMatch_ = conclusionMatch.getFullChainMatch();
-		chainStartPos_ = conclusionMatch.getChainStartPos();
 	}
 
 	public IndexedContextRootMatch getOriginMatch() {
 		return originMatch_;
 	}
 
-	public ElkSubObjectPropertyExpression getFullChainMatch() {
-		return fullChainMatch_;
-	}
-
-	public int getChainStartPos() {
-		return chainStartPos_;
-	}
-
 	public ForwardLinkMatch1 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getForwardLinkMatch1(getParent().getConclusion(factory),
-				originMatch_, fullChainMatch_, chainStartPos_);
+				originMatch_);
 	}
 
 	public SubClassInclusionDecomposedMatch1 getPremiseMatch(

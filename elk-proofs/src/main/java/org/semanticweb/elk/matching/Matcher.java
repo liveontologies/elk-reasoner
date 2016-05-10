@@ -36,6 +36,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.tracing.TracingInferenceSet;
 import org.slf4j.Logger;
@@ -90,7 +91,15 @@ public class Matcher {
 					((IndexedClass) superExpression).getElkEntity());
 			process();
 		}
-
+	}
+	
+	public void trace(ClassInconsistency conclusion) {
+		IndexedContextRoot inconsistent = conclusion.getDestination();
+		if (inconsistent instanceof IndexedClass) {
+			conclusionMatchFactory_.getClassInconsistencyMatch1(conclusion,
+					getMatch((IndexedClass) inconsistent));
+			process();
+		}
 	}
 
 	private IndexedClassExpressionMatch getMatch(IndexedClass indexedClass) {

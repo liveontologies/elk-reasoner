@@ -30,6 +30,7 @@ import org.semanticweb.elk.matching.conclusions.IndexedSubObjectPropertyOfAxiomM
 import org.semanticweb.elk.matching.conclusions.IndexedSubObjectPropertyOfAxiomMatch2;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ElkTransitiveObjectPropertyAxiomConversion;
 
 public class ElkTransitiveObjectPropertyAxiomConversionMatch1 extends
@@ -43,18 +44,19 @@ public class ElkTransitiveObjectPropertyAxiomConversionMatch1 extends
 
 	public IndexedSubObjectPropertyOfAxiomMatch2 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
-		ElkObjectPropertyExpression propertyExpression = getParent()
-				.getOriginalAxiom().getProperty();
+		ElkTransitiveObjectPropertyAxiomConversion parent = getParent();
+		ElkTransitiveObjectPropertyAxiom premise = parent.getOriginalAxiom();
+		ElkObjectPropertyExpression propertyExpression = premise.getProperty();
 		if (propertyExpression instanceof ElkObjectProperty) {
 			return factory.getIndexedSubObjectPropertyOfAxiomMatch2(
 					factory.getIndexedSubObjectPropertyOfAxiomMatch1(
-							getParent().getConclusion(factory)),
+							parent.getConclusion(factory)),
 					factory.getObjectPropertyChain(Arrays
 							.asList(propertyExpression, propertyExpression)),
 					(ElkObjectProperty) propertyExpression);
 		} else {
 			throw new ElkMatchException(
-					getParent().getConclusion(factory).getSuperProperty(),
+					parent.getConclusion(factory).getSuperProperty(),
 					propertyExpression);
 		}
 	}

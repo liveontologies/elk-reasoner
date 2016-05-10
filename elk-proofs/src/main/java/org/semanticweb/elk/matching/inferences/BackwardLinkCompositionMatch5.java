@@ -22,53 +22,55 @@ package org.semanticweb.elk.matching.inferences;
  * #L%
  */
 
+import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch2;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1;
-import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1Watch;
-import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch2;
-import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch3;
+import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
+import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatchChain;
+import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1;
 
 public class BackwardLinkCompositionMatch5
-		extends AbstractInferenceMatch<BackwardLinkCompositionMatch4>
-		implements ForwardLinkMatch1Watch {
+		extends AbstractInferenceMatch<BackwardLinkCompositionMatch4> {
 
-	private final ElkSubObjectPropertyExpression fullPremiseForwardChainMatch_;
+	private IndexedContextRootMatchChain intermediateRoots_;
 
-	private final int premiseForwardChainStartPos_;
+	private final IndexedContextRootMatch destinationMatch_;
 
 	BackwardLinkCompositionMatch5(BackwardLinkCompositionMatch4 parent,
-			SubPropertyChainMatch2 fourthPremiseMatch) {
+			ForwardLinkMatch3 thirdPremiseMatch) {
 		super(parent);
-		this.fullPremiseForwardChainMatch_ = fourthPremiseMatch
-				.getFullSubChainMatch();
-		this.premiseForwardChainStartPos_ = fourthPremiseMatch
-				.getSubChainStartPos();
+		this.intermediateRoots_ = thirdPremiseMatch.getIntermediateRoots();
+		this.destinationMatch_ = thirdPremiseMatch.getTargetMatch();
 	}
 
-	public ElkSubObjectPropertyExpression getPremiseFullForwardChainMatch() {
-		return fullPremiseForwardChainMatch_;
+	public IndexedContextRootMatchChain getIntermediateRoots() {
+		return intermediateRoots_;
 	}
 
-	public int getPremiseForwardChainStartPos() {
-		return premiseForwardChainStartPos_;
+	public IndexedContextRootMatch getDestinationMatch() {
+		return destinationMatch_;
 	}
 
-	public ForwardLinkMatch1 getThirdPremiseMatch(
+	public SubPropertyChainMatch1 getSecondPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getForwardLinkMatch1(
+		return factory.getSubPropertyChainMatch1(
 				getParent().getParent().getParent().getParent().getParent()
-						.getThirdPremise(factory),
-				getParent().getOriginMatch(), fullPremiseForwardChainMatch_,
-				premiseForwardChainStartPos_);
+						.getSecondPremise(factory),
+				getParent().getParent().getParent().getFirstProperty(), 0);
+	}
+
+	public BackwardLinkMatch2 getConclusionMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getBackwardLinkMatch2(
+				getParent().getParent().getParent().getParent()
+						.getConclusionMatch(factory),
+				getParent().getParent().getParent()
+						.getConclusionRelationMatch(),
+				getDestinationMatch());
 	}
 
 	@Override
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	public <O> O accept(ForwardLinkMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
@@ -82,7 +84,7 @@ public class BackwardLinkCompositionMatch5
 	 */
 	public interface Visitor<O> {
 
-		O visit(BackwardLinkCompositionMatch5 inferenceMatch5);
+		O visit(BackwardLinkCompositionMatch5 inferenceMatch4);
 
 	}
 
@@ -96,7 +98,7 @@ public class BackwardLinkCompositionMatch5
 
 		BackwardLinkCompositionMatch5 getBackwardLinkCompositionMatch5(
 				BackwardLinkCompositionMatch4 parent,
-				SubPropertyChainMatch2 fourthPremiseMatch);
+				ForwardLinkMatch3 thirdPremiseMatch);
 
 	}
 

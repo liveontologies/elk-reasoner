@@ -48,7 +48,7 @@ public class ElkDisjointUnionAxiomBinaryConversionMatch1
 				.getClassExpressions();
 		return factory.getIndexedSubClassOfAxiomMatch2(
 				factory.getIndexedSubClassOfAxiomMatch1(
-						getParent().getConclusion(factory)),
+						parent.getConclusion(factory)),
 				factory.getObjectIntersectionOf(
 						disjoint.get(parent.getFirstDisjunctPosition()),
 						disjoint.get(parent.getSecondDisjunctPosition())),

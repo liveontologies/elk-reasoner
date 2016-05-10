@@ -37,11 +37,12 @@ public class BackwardLinkOfObjectSomeValuesFromMatch2 extends
 
 	public BackwardLinkMatch2 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory
-				.getBackwardLinkMatch2(getParent().getConclusionMatch(factory),
-						getRootMatch(getParent().getParent()
-								.getConclusion(factory).getDestination(),
-								factory));
+		return factory.getBackwardLinkMatch2(
+				getParent().getConclusionMatch(factory),
+				getPremisePropertyMatch(getParent().getParent()
+						.getDecomposedExistential().getProperty()),
+				getRootMatch(getParent().getParent().getConclusion(factory)
+						.getDestination(), factory));
 	}
 
 	@Override

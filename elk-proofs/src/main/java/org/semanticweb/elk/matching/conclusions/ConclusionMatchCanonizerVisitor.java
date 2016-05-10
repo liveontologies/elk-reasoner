@@ -86,9 +86,16 @@ public class ConclusionMatchCanonizerVisitor
 				conclusionFactory_.getSubClassInclusionComposedMatch1(parent,
 						destinationMatch, conclusionFactory_.getOwlThing());
 				// create ELK inference
+				ElkClassExpression subExpression = toElkExpression(
+						destinationMatch);
 				elkInferenceFactory_
-						.getElkClassInclusionEmptyObjectIntersectionOfComposition(
-								toElkExpression(destinationMatch));
+						.getElkClassInclusionOwlThing(subExpression);
+				elkInferenceFactory_.getElkClassInclusionHierarchy(
+						subExpression, conclusionFactory_.getOwlThing(),
+						conclusionFactory_.getObjectIntersectionOf(
+								Collections.<ElkClassExpression> emptyList()));
+				elkInferenceFactory_
+						.getElkClassInclusionOwlThingEmptyObjectIntersectionOf();
 			}
 
 			@Override
@@ -160,19 +167,28 @@ public class ConclusionMatchCanonizerVisitor
 				conclusionFactory_.getSubClassInclusionDecomposedMatch2(parent,
 						conclusionFactory_.getOwlNothing());
 				// create ELK inference
+				elkInferenceFactory_.getElkClassInclusionHierarchy(
+						toElkExpression(destinationMatch),
+						conclusionFactory_.getObjectOneOf(
+								Collections.<ElkIndividual> emptyList()),
+						conclusionFactory_.getOwlNothing());
 				elkInferenceFactory_
-						.getElkClassInclusionEmptyObjectOneOfDecomposition(
-								toElkExpression(destinationMatch));
+						.getElkClassInclusionEmptyObjectOneOfOwlNothing();
 			}
 
 			@Override
 			public void emptyElkObjectUnionOf() {
 				conclusionFactory_.getSubClassInclusionDecomposedMatch2(parent,
 						conclusionFactory_.getOwlNothing());
-				// create ELK inference
+				// create ELK inferences
+				;
+				elkInferenceFactory_.getElkClassInclusionHierarchy(
+						toElkExpression(destinationMatch),
+						conclusionFactory_.getObjectUnionOf(
+								Collections.<ElkClassExpression> emptyList()),
+						conclusionFactory_.getOwlNothing());
 				elkInferenceFactory_
-						.getElkClassInclusionEmptyObjectUnionOfDecomposition(
-								toElkExpression(destinationMatch));
+						.getElkClassInclusionEmptyObjectUnionOfOwlNothing();
 			}
 
 			@Override
@@ -199,7 +215,7 @@ public class ConclusionMatchCanonizerVisitor
 				// create ELK inference
 				elkInferenceFactory_
 						.getElkClassInclusionSingletonObjectUnionOfDecomposition(
-								toElkExpression(destinationMatch), disjunct);
+								disjunct);
 			}
 
 		});

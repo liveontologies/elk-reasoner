@@ -38,7 +38,7 @@ public class IndexedDisjointClassesAxiomMatch2
 		this.memberMatches_ = memberMatches;
 	}
 
-	List<? extends ElkClassExpression> getMemberMatches() {
+	public List<? extends ElkClassExpression> getMemberMatches() {
 		return memberMatches_;
 	}
 

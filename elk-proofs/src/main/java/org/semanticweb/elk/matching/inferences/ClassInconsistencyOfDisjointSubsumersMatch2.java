@@ -1,5 +1,7 @@
 package org.semanticweb.elk.matching.inferences;
 
+import java.util.List;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -23,31 +25,33 @@ package org.semanticweb.elk.matching.inferences;
  */
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
-import org.semanticweb.elk.matching.conclusions.PropagationMatch3;
-import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
+import org.semanticweb.elk.matching.conclusions.DisjointSubsumerMatch2;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 
-public class PropagationGeneratedMatch3
-		extends AbstractInferenceMatch<PropagationGeneratedMatch2> {
+public class ClassInconsistencyOfDisjointSubsumersMatch2 extends
+		AbstractInferenceMatch<ClassInconsistencyOfDisjointSubsumersMatch1> {
 
-	private final IndexedContextRootMatch destinationMatch_;
+	private final List<? extends ElkClassExpression> disjointExpressionsMatch_;
 
-	PropagationGeneratedMatch3(PropagationGeneratedMatch2 parent,
-			PropagationMatch3 conclusionMatch) {
+	ClassInconsistencyOfDisjointSubsumersMatch2(
+			ClassInconsistencyOfDisjointSubsumersMatch1 parent,
+			DisjointSubsumerMatch2 firstPremiseMatch) {
 		super(parent);
-		destinationMatch_ = conclusionMatch.getDestinationMatch();
+		this.disjointExpressionsMatch_ = firstPremiseMatch
+				.getDisjointExpressionsMatch();
 	}
 
-	public IndexedContextRootMatch getDestinationMatch() {
-		return destinationMatch_;
+	public List<? extends ElkClassExpression> getDisjointExpressionsMatch() {
+		return disjointExpressionsMatch_;
 	}
 
-	public SubClassInclusionComposedMatch1 getSecondPremiseMatch(
+	public DisjointSubsumerMatch2 getSecondPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getSubClassInclusionComposedMatch1(
-				getParent().getParent().getParent().getSecondPremise(factory),
-				destinationMatch_,
-				getParent().getParent().getCarryMatch().getFiller());
+		return factory.getDisjointSubsumerMatch2(
+				factory.getDisjointSubsumerMatch1(
+						getParent().getParent().getSecondPremise(factory),
+						getParent().getOriginMatch()),
+				getDisjointExpressionsMatch());
 	}
 
 	@Override
@@ -65,7 +69,7 @@ public class PropagationGeneratedMatch3
 	 */
 	public interface Visitor<O> {
 
-		O visit(PropagationGeneratedMatch3 inferenceMatch3);
+		O visit(ClassInconsistencyOfDisjointSubsumersMatch2 inferenceMatch2);
 
 	}
 
@@ -77,9 +81,9 @@ public class PropagationGeneratedMatch3
 	 */
 	public interface Factory {
 
-		PropagationGeneratedMatch3 getPropagationGeneratedMatch3(
-				PropagationGeneratedMatch2 parent,
-				PropagationMatch3 conclusionMatch);
+		ClassInconsistencyOfDisjointSubsumersMatch2 getClassInconsistencyOfDisjointSubsumersMatch2(
+				ClassInconsistencyOfDisjointSubsumersMatch1 parent,
+				DisjointSubsumerMatch2 firstPremiseMatch);
 
 	}
 

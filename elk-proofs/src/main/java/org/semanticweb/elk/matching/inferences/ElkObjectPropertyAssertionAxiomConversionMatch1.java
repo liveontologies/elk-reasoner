@@ -25,6 +25,7 @@ package org.semanticweb.elk.matching.inferences;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.IndexedSubClassOfAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedSubClassOfAxiomMatch2;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAssertionAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ElkObjectPropertyAssertionAxiomConversion;
 
 public class ElkObjectPropertyAssertionAxiomConversionMatch1 extends
@@ -38,8 +39,14 @@ public class ElkObjectPropertyAssertionAxiomConversionMatch1 extends
 
 	public IndexedSubClassOfAxiomMatch2 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
-		// TODO
-		return null;
+		ElkObjectPropertyAssertionAxiomConversion parent = getParent();
+		ElkObjectPropertyAssertionAxiom premise = parent.getOriginalAxiom();
+		return factory.getIndexedSubClassOfAxiomMatch2(
+				factory.getIndexedSubClassOfAxiomMatch1(
+						parent.getConclusion(factory)),
+				factory.getObjectOneOf(premise.getObject()),
+				factory.getObjectSomeValuesFrom(premise.getProperty(),
+						factory.getObjectOneOf(premise.getSubject())));
 	}
 
 	@Override

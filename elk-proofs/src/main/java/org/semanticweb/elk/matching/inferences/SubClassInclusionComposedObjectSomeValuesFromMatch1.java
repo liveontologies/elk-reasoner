@@ -23,10 +23,10 @@ package org.semanticweb.elk.matching.inferences;
  */
 
 import org.semanticweb.elk.matching.ElkMatchException;
+import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1;
+import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
-import org.semanticweb.elk.matching.conclusions.PropagationMatch1;
-import org.semanticweb.elk.matching.conclusions.PropagationMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionCompo
 
 public class SubClassInclusionComposedObjectSomeValuesFromMatch1 extends
 		AbstractInferenceMatch<SubClassInclusionComposedObjectSomeValuesFrom>
-		implements PropagationMatch1Watch {
+		implements BackwardLinkMatch1Watch {
 
 	private final IndexedContextRootMatch destinationMatch_;
 
@@ -76,20 +76,19 @@ public class SubClassInclusionComposedObjectSomeValuesFromMatch1 extends
 				conclusionSubsumerMatch_);
 	}
 
-	public PropagationMatch1 getSecondPremiseMatch(
+	public BackwardLinkMatch1 getFirstPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getPropagationMatch1(
-				getParent().getSecondPremise(factory),
-				conclusionSubsumerMatch_);
+		return factory.getBackwardLinkMatch1(
+				getParent().getFirstPremise(factory), getDestinationMatch());
 	}
-
+	
 	@Override
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
 	@Override
-	public <O> O accept(PropagationMatch1Watch.Visitor<O> visitor) {
+	public <O> O accept(BackwardLinkMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

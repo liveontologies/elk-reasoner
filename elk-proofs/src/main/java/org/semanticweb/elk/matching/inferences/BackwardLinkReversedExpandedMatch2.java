@@ -23,33 +23,44 @@ package org.semanticweb.elk.matching.inferences;
  */
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1;
-import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1Watch;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2Watch;
 import org.semanticweb.elk.matching.conclusions.IndexedSubObjectPropertyOfAxiomMatch2;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 
 public class BackwardLinkReversedExpandedMatch2
 		extends AbstractInferenceMatch<BackwardLinkReversedExpandedMatch1>
-		implements ForwardLinkMatch1Watch {
+		implements ForwardLinkMatch2Watch {
 
 	private final ElkSubObjectPropertyExpression subChainMatch_;
+
+	private final ElkObjectProperty relationMatch_;
 
 	BackwardLinkReversedExpandedMatch2(
 			BackwardLinkReversedExpandedMatch1 parent,
 			IndexedSubObjectPropertyOfAxiomMatch2 secondPremiseMatch) {
 		super(parent);
 		this.subChainMatch_ = secondPremiseMatch.getSubPropertyChainMatch();
+		this.relationMatch_ = secondPremiseMatch.getSuperPropertyMatch();
 	}
 
 	public ElkSubObjectPropertyExpression getSubChainMatch() {
 		return subChainMatch_;
 	}
 
-	public ForwardLinkMatch1 getFirstPremiseMatch(
+	public ElkObjectProperty getRelationMatch() {
+		return relationMatch_;
+	}
+
+	public ForwardLinkMatch2 getFirstPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getForwardLinkMatch1(
-				getParent().getParent().getFirstPremise(factory),
-				getParent().getOriginMatch(), subChainMatch_, 0);
+		return factory
+				.getForwardLinkMatch2(
+						factory.getForwardLinkMatch1(getParent().getParent()
+								.getFirstPremise(factory),
+								getParent().getOriginMatch()),
+						subChainMatch_, 0);
 	}
 
 	@Override
@@ -58,7 +69,7 @@ public class BackwardLinkReversedExpandedMatch2
 	}
 
 	@Override
-	public <O> O accept(ForwardLinkMatch1Watch.Visitor<O> visitor) {
+	public <O> O accept(ForwardLinkMatch2Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

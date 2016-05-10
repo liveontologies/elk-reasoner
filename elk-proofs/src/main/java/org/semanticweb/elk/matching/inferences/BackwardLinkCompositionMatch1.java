@@ -27,7 +27,6 @@ import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory
 import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.conclusions.IndexedSubObjectPropertyOfAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedSubObjectPropertyOfAxiomMatch1Watch;
-import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkComposition;
 
 public class BackwardLinkCompositionMatch1
@@ -36,27 +35,20 @@ public class BackwardLinkCompositionMatch1
 
 	private final IndexedContextRootMatch conclusionSourceMatch_;
 
-	private final ElkObjectProperty conclusionRelationMatch_;
-
 	BackwardLinkCompositionMatch1(BackwardLinkComposition parent,
 			BackwardLinkMatch1 conclusionMatch) {
 		super(parent);
 		this.conclusionSourceMatch_ = conclusionMatch.getSourceMatch();
-		this.conclusionRelationMatch_ = conclusionMatch.getRelationMatch();
 	}
 
 	public IndexedContextRootMatch getConclusionSourceMatch() {
 		return conclusionSourceMatch_;
 	}
 
-	public ElkObjectProperty getConclusionRelationMatch() {
-		return conclusionRelationMatch_;
-	}
-
 	public BackwardLinkMatch1 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getBackwardLinkMatch1(getParent().getConclusion(factory),
-				getConclusionSourceMatch(), getConclusionRelationMatch());
+				getConclusionSourceMatch());
 	}
 
 	public IndexedSubObjectPropertyOfAxiomMatch1 getFifthPremiseMatch(

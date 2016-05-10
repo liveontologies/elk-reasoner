@@ -27,13 +27,16 @@ import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.classes.DummyIndexedContextRootVisitor;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedRangeFiller;
 
-public abstract class LinkOfObjectSomeValuesFromMatch2<P>
+abstract class LinkOfObjectSomeValuesFromMatch2<P>
 		extends AbstractInferenceMatch<P> {
 
 	private final ElkObjectSomeValuesFrom premiseSubsumerMatch_;
@@ -54,6 +57,17 @@ public abstract class LinkOfObjectSomeValuesFromMatch2<P>
 			SubClassInclusionDecomposedMatch2 premiseMatch) {
 		this(parent, premiseMatch.getSubsumerGeneralMatch(),
 				premiseMatch.getParent());
+	}
+
+	ElkObjectProperty getPremisePropertyMatch(
+			IndexedObjectProperty premiseProperty) {
+		ElkObjectPropertyExpression premisePropertyMatch = premiseSubsumerMatch_
+				.getProperty();
+		if (premisePropertyMatch instanceof ElkObjectProperty) {
+			return (ElkObjectProperty) premisePropertyMatch;
+		} else {
+			throw new ElkMatchException(premiseProperty, premisePropertyMatch);
+		}
 	}
 
 	IndexedContextRootMatch getRootMatch(IndexedContextRoot root,

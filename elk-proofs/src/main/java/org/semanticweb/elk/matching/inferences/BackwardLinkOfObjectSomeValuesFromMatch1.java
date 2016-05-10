@@ -27,7 +27,6 @@ import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory
 import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1Watch;
-import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectSomeValuesFrom;
 
 public class BackwardLinkOfObjectSomeValuesFromMatch1
@@ -36,28 +35,21 @@ public class BackwardLinkOfObjectSomeValuesFromMatch1
 
 	private final IndexedContextRootMatch originMatch_;
 
-	private final ElkObjectProperty relationMatch_;
-
 	BackwardLinkOfObjectSomeValuesFromMatch1(
 			BackwardLinkOfObjectSomeValuesFrom parent,
 			BackwardLinkMatch1 conclusionMatch) {
 		super(parent);
 		originMatch_ = conclusionMatch.getSourceMatch();
-		relationMatch_ = conclusionMatch.getRelationMatch();
 	}
 
 	public IndexedContextRootMatch getOriginMatch() {
 		return originMatch_;
 	}
 
-	public ElkObjectProperty getRelationMatch() {
-		return relationMatch_;
-	}
-
 	public BackwardLinkMatch1 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getBackwardLinkMatch1(getParent().getConclusion(factory),
-				originMatch_, relationMatch_);
+				originMatch_);
 	}
 
 	public SubClassInclusionDecomposedMatch1 getPremiseMatch(

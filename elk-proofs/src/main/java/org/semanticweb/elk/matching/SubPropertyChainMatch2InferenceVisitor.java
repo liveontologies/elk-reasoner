@@ -24,12 +24,9 @@ package org.semanticweb.elk.matching;
 
 import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch2;
-import org.semanticweb.elk.matching.inferences.BackwardLinkCompositionMatch2;
-import org.semanticweb.elk.matching.inferences.BackwardLinkCompositionMatch4;
-import org.semanticweb.elk.matching.inferences.ForwardLinkCompositionMatch1;
+import org.semanticweb.elk.matching.inferences.BackwardLinkCompositionMatch3;
 import org.semanticweb.elk.matching.inferences.ForwardLinkCompositionMatch3;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
-import org.semanticweb.elk.matching.inferences.PropagationGeneratedMatch1;
 import org.semanticweb.elk.matching.inferences.PropertyRangeInheritedMatch2;
 
 class SubPropertyChainMatch2InferenceVisitor
@@ -42,38 +39,20 @@ class SubPropertyChainMatch2InferenceVisitor
 	}
 
 	@Override
-	public Void visit(BackwardLinkCompositionMatch2 inferenceMatch2) {
-		factory.getBackwardLinkCompositionMatch3(inferenceMatch2, child);
+	public Void visit(PropertyRangeInheritedMatch2 inferenceMatch2) {
+		factory.getPropertyRangeInheritedMatch3(inferenceMatch2, child);
 		return null;
 	}
 
 	@Override
-	public Void visit(BackwardLinkCompositionMatch4 inferenceMatch4) {
-		factory.getBackwardLinkCompositionMatch5(inferenceMatch4, child);
-		return null;
-	}
-
-	@Override
-	public Void visit(ForwardLinkCompositionMatch1 inferenceMatch1) {
-		factory.getForwardLinkCompositionMatch2(inferenceMatch1, child);
+	public Void visit(BackwardLinkCompositionMatch3 inferenceMatch3) {
+		factory.getBackwardLinkCompositionMatch4(inferenceMatch3, child);
 		return null;
 	}
 
 	@Override
 	public Void visit(ForwardLinkCompositionMatch3 inferenceMatch3) {
 		factory.getForwardLinkCompositionMatch4(inferenceMatch3, child);
-		return null;
-	}
-
-	@Override
-	public Void visit(PropagationGeneratedMatch1 inferenceMatch1) {
-		factory.getPropagationGeneratedMatch2(inferenceMatch1, child);
-		return null;
-	}
-
-	@Override
-	public Void visit(PropertyRangeInheritedMatch2 inferenceMatch2) {
-		factory.getPropertyRangeInheritedMatch3(inferenceMatch2, child);
 		return null;
 	}
 

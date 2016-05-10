@@ -22,10 +22,10 @@ package org.semanticweb.elk.matching.inferences;
  * #L%
  */
 
+import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1;
+import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.IndexedSubObjectPropertyOfAxiomMatch2;
-import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1;
-import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1Watch;
 import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
@@ -34,21 +34,26 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 
 public class BackwardLinkCompositionMatch2
-		extends
-			AbstractInferenceMatch<BackwardLinkCompositionMatch1>
-		implements			
-			SubPropertyChainMatch1Watch {
+		extends AbstractInferenceMatch<BackwardLinkCompositionMatch1>
+		implements BackwardLinkMatch1Watch {
 
 	private final ElkSubObjectPropertyExpression compositionMatch_;
+	private final ElkObjectProperty conclusionRelationMatch_;
 
 	BackwardLinkCompositionMatch2(BackwardLinkCompositionMatch1 parent,
 			IndexedSubObjectPropertyOfAxiomMatch2 fifthPremiseMatch) {
 		super(parent);
 		this.compositionMatch_ = fifthPremiseMatch.getSubPropertyChainMatch();
+		this.conclusionRelationMatch_ = fifthPremiseMatch
+				.getSuperPropertyMatch();
 	}
-	
+
 	public ElkSubObjectPropertyExpression getCompositionMatch() {
 		return compositionMatch_;
+	}
+
+	public ElkObjectProperty getConclusionRelationMatch() {
+		return conclusionRelationMatch_;
 	}
 
 	ElkObjectPropertyExpression getFirstProperty() {
@@ -75,11 +80,19 @@ public class BackwardLinkCompositionMatch2
 				});
 	}
 
-	public SubPropertyChainMatch1 getSecondPremiseMatch(
+	public IndexedSubObjectPropertyOfAxiomMatch2 getFifthPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getSubPropertyChainMatch1(
-				getParent().getParent().getSecondPremise(factory),
-				getFirstProperty(), 0);
+		return factory.getIndexedSubObjectPropertyOfAxiomMatch2(
+				getParent().getFifthPremiseMatch(factory),
+				getCompositionMatch(), getConclusionRelationMatch());
+
+	}
+
+	public BackwardLinkMatch1 getFirstPremiseMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getBackwardLinkMatch1(
+				getParent().getParent().getFirstPremise(factory),
+				getParent().getConclusionSourceMatch());
 	}
 
 	@Override
@@ -88,7 +101,7 @@ public class BackwardLinkCompositionMatch2
 	}
 
 	@Override
-	public <O> O accept(SubPropertyChainMatch1Watch.Visitor<O> visitor) {
+	public <O> O accept(BackwardLinkMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

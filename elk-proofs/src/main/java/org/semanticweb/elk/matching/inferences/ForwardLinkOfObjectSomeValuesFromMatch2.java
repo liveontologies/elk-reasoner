@@ -23,7 +23,7 @@ package org.semanticweb.elk.matching.inferences;
  */
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch3;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
 
 public class ForwardLinkOfObjectSomeValuesFromMatch2 extends
@@ -35,12 +35,16 @@ public class ForwardLinkOfObjectSomeValuesFromMatch2 extends
 		super(parent, premiseMatch);
 	}
 
-	public ForwardLinkMatch2 getConclusionMatch(
+	public ForwardLinkMatch3 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getForwardLinkMatch2(
-				getParent().getConclusionMatch(factory), null,
-				getRootMatch(getParent().getParent().getConclusion(factory)
-						.getTarget(), factory));
+		return factory.getForwardLinkMatch3(
+				factory.getForwardLinkMatch2(
+						getParent().getConclusionMatch(factory),
+						getPremisePropertyMatch(getParent().getParent()
+								.getDecomposedExistential().getProperty()),
+						0),
+				null, getRootMatch(getParent().getParent()
+						.getConclusion(factory).getTarget(), factory));
 	}
 
 	@Override

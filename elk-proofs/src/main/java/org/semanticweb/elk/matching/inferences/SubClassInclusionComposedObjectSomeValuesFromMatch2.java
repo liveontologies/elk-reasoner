@@ -22,50 +22,56 @@ package org.semanticweb.elk.matching.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1;
-import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1Watch;
+import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch2;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.PropagationMatch2;
+import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
+import org.semanticweb.elk.matching.conclusions.PropagationMatch1;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 
 public class SubClassInclusionComposedObjectSomeValuesFromMatch2 extends
-		AbstractInferenceMatch<SubClassInclusionComposedObjectSomeValuesFromMatch1>
-		implements BackwardLinkMatch1Watch {
+		AbstractInferenceMatch<SubClassInclusionComposedObjectSomeValuesFromMatch1> {
 
 	private final ElkObjectProperty propagationRelationMatch_;
 
+	private final IndexedContextRootMatch originMatch_;
+
 	SubClassInclusionComposedObjectSomeValuesFromMatch2(
 			SubClassInclusionComposedObjectSomeValuesFromMatch1 parent,
-			PropagationMatch2 secondPremiseMatch) {
+			BackwardLinkMatch2 secondPremiseMatch) {
 		super(parent);
 		this.propagationRelationMatch_ = secondPremiseMatch.getRelationMatch();
+		this.originMatch_ = secondPremiseMatch.getDestinationMatch();
 	}
 
 	public ElkObjectProperty getPropagationRelationMatch() {
 		return propagationRelationMatch_;
 	}
 
-	public PropagationMatch2 getSecondPremiseMatch(
-			ConclusionMatchExpressionFactory factory) {
-		return factory.getPropagationMatch2(
-				getParent().getSecondPremiseMatch(factory),
-				propagationRelationMatch_);
+	public IndexedContextRootMatch getOriginMatch() {
+		return originMatch_;
 	}
 
-	public BackwardLinkMatch1 getFirstPremiseMatch(
+	public BackwardLinkMatch2 getFirstPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getBackwardLinkMatch1(
-				getParent().getParent().getFirstPremise(factory),
-				getParent().getDestinationMatch(), propagationRelationMatch_);
+		return factory
+				.getBackwardLinkMatch2(
+						factory.getBackwardLinkMatch1(
+								getParent().getParent()
+										.getFirstPremise(factory),
+								getParent().getDestinationMatch()),
+						propagationRelationMatch_, originMatch_);
+	}
+
+	public PropagationMatch1 getSecondPremiseMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getPropagationMatch1(
+				getParent().getParent().getSecondPremise(factory), originMatch_,
+				propagationRelationMatch_,
+				getParent().getConclusionSubsumerMatch());
 	}
 
 	@Override
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	public <O> O accept(BackwardLinkMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
@@ -93,7 +99,7 @@ public class SubClassInclusionComposedObjectSomeValuesFromMatch2 extends
 
 		SubClassInclusionComposedObjectSomeValuesFromMatch2 getSubClassInclusionComposedObjectSomeValuesFromMatch2(
 				SubClassInclusionComposedObjectSomeValuesFromMatch1 parent,
-				PropagationMatch2 secondPremiseMatch);
+				BackwardLinkMatch2 secondPremiseMatch);
 
 	}
 

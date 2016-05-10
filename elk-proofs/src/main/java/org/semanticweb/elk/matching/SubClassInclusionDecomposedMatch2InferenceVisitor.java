@@ -26,6 +26,7 @@ import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
 import org.semanticweb.elk.matching.inferences.BackwardLinkOfObjectHasSelfMatch1;
 import org.semanticweb.elk.matching.inferences.BackwardLinkOfObjectSomeValuesFromMatch1;
+import org.semanticweb.elk.matching.inferences.ClassInconsistencyOfObjectComplementOfMatch1;
 import org.semanticweb.elk.matching.inferences.ForwardLinkOfObjectHasSelfMatch1;
 import org.semanticweb.elk.matching.inferences.ForwardLinkOfObjectSomeValuesFromMatch1;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
@@ -54,6 +55,14 @@ class SubClassInclusionDecomposedMatch2InferenceVisitor extends
 			BackwardLinkOfObjectSomeValuesFromMatch1 inferenceMatch1) {
 		factory.getBackwardLinkOfObjectSomeValuesFromMatch2(inferenceMatch1,
 				child);
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			ClassInconsistencyOfObjectComplementOfMatch1 inferenceMatch1) {
+		factory.getClassInconsistencyOfObjectComplementOfMatch2(
+				inferenceMatch1, child);
 		return null;
 	}
 

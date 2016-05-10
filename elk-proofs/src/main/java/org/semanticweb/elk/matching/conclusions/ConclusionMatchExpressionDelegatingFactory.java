@@ -36,9 +36,9 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedEntity;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
@@ -113,17 +113,25 @@ public class ConclusionMatchExpressionDelegatingFactory extends
 
 	@Override
 	public BackwardLinkMatch1 getBackwardLinkMatch1(BackwardLink parent,
-			IndexedContextRootMatch sourceMatch,
-			ElkObjectProperty relationMatch) {
+			IndexedContextRootMatch sourceMatch) {
 		return filter(conclusionMatchFactory_.getBackwardLinkMatch1(parent,
-				sourceMatch, relationMatch));
+				sourceMatch));
 	}
 
 	@Override
 	public BackwardLinkMatch2 getBackwardLinkMatch2(BackwardLinkMatch1 parent,
+			ElkObjectProperty relationMatch,
 			IndexedContextRootMatch destinationMatch) {
 		return filter(conclusionMatchFactory_.getBackwardLinkMatch2(parent,
-				destinationMatch));
+				relationMatch, destinationMatch));
+	}
+
+	@Override
+	public ClassInconsistencyMatch1 getClassInconsistencyMatch1(
+			ClassInconsistency parent,
+			IndexedContextRootMatch destinationMatch) {
+		return filter(conclusionMatchFactory_
+				.getClassInconsistencyMatch1(parent, destinationMatch));
 	}
 
 	@Override
@@ -146,6 +154,21 @@ public class ConclusionMatchExpressionDelegatingFactory extends
 	}
 
 	@Override
+	public DisjointSubsumerMatch1 getDisjointSubsumerMatch1(
+			DisjointSubsumer parent, IndexedContextRootMatch destinationMatch) {
+		return filter(conclusionMatchFactory_.getDisjointSubsumerMatch1(parent,
+				destinationMatch));
+	}
+
+	@Override
+	public DisjointSubsumerMatch2 getDisjointSubsumerMatch2(
+			DisjointSubsumerMatch1 parent,
+			List<? extends ElkClassExpression> disjointExpressionsMatch) {
+		return filter(conclusionMatchFactory_.getDisjointSubsumerMatch2(parent,
+				disjointExpressionsMatch));
+	}
+
+	@Override
 	public ForwardLink getForwardLink(IndexedContextRoot destination,
 			IndexedPropertyChain relation, IndexedContextRoot target) {
 		return filter(conclusionFactory_.getForwardLink(destination, relation,
@@ -154,18 +177,24 @@ public class ConclusionMatchExpressionDelegatingFactory extends
 
 	@Override
 	public ForwardLinkMatch1 getForwardLinkMatch1(ForwardLink parent,
-			IndexedContextRootMatch destinationMatch,
-			ElkSubObjectPropertyExpression fullForwardChainMatch,
-			int forwardChainStartPos) {
+			IndexedContextRootMatch destinationMatch) {
 		return filter(conclusionMatchFactory_.getForwardLinkMatch1(parent,
-				destinationMatch, fullForwardChainMatch, forwardChainStartPos));
+				destinationMatch));
 	}
 
 	@Override
 	public ForwardLinkMatch2 getForwardLinkMatch2(ForwardLinkMatch1 parent,
+			ElkSubObjectPropertyExpression fullForwardChainMatch,
+			int forwardChainStartPos) {
+		return filter(conclusionMatchFactory_.getForwardLinkMatch2(parent,
+				fullForwardChainMatch, forwardChainStartPos));
+	}
+
+	@Override
+	public ForwardLinkMatch3 getForwardLinkMatch3(ForwardLinkMatch2 parent,
 			IndexedContextRootMatchChain intermediateRoots,
 			IndexedContextRootMatch targetMatch) {
-		return filter(conclusionMatchFactory_.getForwardLinkMatch2(parent,
+		return filter(conclusionMatchFactory_.getForwardLinkMatch3(parent,
 				intermediateRoots, targetMatch));
 	}
 
@@ -180,29 +209,6 @@ public class ConclusionMatchExpressionDelegatingFactory extends
 			ElkAxiom originalAxiom, IndexedEntity entity) {
 		return filter(conclusionFactory_
 				.getIndexedDeclarationAxiom(originalAxiom, entity));
-	}
-
-	@Override
-	public IndexedEquivalentClassesAxiom getIndexedEquivalentClassesAxiom(
-			ElkAxiom originalAxiom, IndexedClassExpression firstMember,
-			IndexedClassExpression secondMember) {
-		return filter(conclusionFactory_.getIndexedEquivalentClassesAxiom(
-				originalAxiom, firstMember, secondMember));
-	}
-
-	@Override
-	public IndexedEquivalentClassesAxiomMatch1 getIndexedEquivalentClassesAxiomMatch1(
-			IndexedEquivalentClassesAxiom parent) {
-		return filter(conclusionMatchFactory_
-				.getIndexedEquivalentClassesAxiomMatch1(parent));
-	}
-
-	@Override
-	public IndexedEquivalentClassesAxiomMatch2 getIndexedEquivalentClassesAxiomMatch2(
-			IndexedEquivalentClassesAxiomMatch1 parent, ElkClassExpression firstMemberMatch,
-			ElkClassExpression secondMemberMatch) {
-		return filter(conclusionMatchFactory_.getIndexedEquivalentClassesAxiomMatch2(
-				parent, firstMemberMatch, secondMemberMatch));
 	}
 
 	@Override
@@ -225,6 +231,31 @@ public class ConclusionMatchExpressionDelegatingFactory extends
 			List<? extends ElkClassExpression> memberMatches) {
 		return filter(conclusionMatchFactory_
 				.getIndexedDisjointClassesAxiomMatch2(parent, memberMatches));
+	}
+
+	@Override
+	public IndexedEquivalentClassesAxiom getIndexedEquivalentClassesAxiom(
+			ElkAxiom originalAxiom, IndexedClassExpression firstMember,
+			IndexedClassExpression secondMember) {
+		return filter(conclusionFactory_.getIndexedEquivalentClassesAxiom(
+				originalAxiom, firstMember, secondMember));
+	}
+
+	@Override
+	public IndexedEquivalentClassesAxiomMatch1 getIndexedEquivalentClassesAxiomMatch1(
+			IndexedEquivalentClassesAxiom parent) {
+		return filter(conclusionMatchFactory_
+				.getIndexedEquivalentClassesAxiomMatch1(parent));
+	}
+
+	@Override
+	public IndexedEquivalentClassesAxiomMatch2 getIndexedEquivalentClassesAxiomMatch2(
+			IndexedEquivalentClassesAxiomMatch1 parent,
+			ElkClassExpression firstMemberMatch,
+			ElkClassExpression secondMemberMatch) {
+		return filter(
+				conclusionMatchFactory_.getIndexedEquivalentClassesAxiomMatch2(
+						parent, firstMemberMatch, secondMemberMatch));
 	}
 
 	@Override
@@ -316,23 +347,11 @@ public class ConclusionMatchExpressionDelegatingFactory extends
 
 	@Override
 	public PropagationMatch1 getPropagationMatch1(Propagation parent,
+			IndexedContextRootMatch destinationMatch,
+			ElkObjectProperty subDestinationMatch,
 			ElkObjectSomeValuesFrom carryMatch) {
 		return filter(conclusionMatchFactory_.getPropagationMatch1(parent,
-				carryMatch));
-	}
-
-	@Override
-	public PropagationMatch2 getPropagationMatch2(PropagationMatch1 parent,
-			ElkObjectProperty relationMatch) {
-		return filter(conclusionMatchFactory_.getPropagationMatch2(parent,
-				relationMatch));
-	}
-
-	@Override
-	public PropagationMatch3 getPropagationMatch3(PropagationMatch2 parent,
-			IndexedContextRootMatch destinationMatch) {
-		return filter(conclusionMatchFactory_.getPropagationMatch3(parent,
-				destinationMatch));
+				destinationMatch, subDestinationMatch, carryMatch));
 	}
 
 	@Override

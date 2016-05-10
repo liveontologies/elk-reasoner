@@ -40,8 +40,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * 
  * <pre>
  *     (1)       (2)
- *  [C] ⊑ D  [Disjoint(L)]  
- * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ D ∈ L
+ *  [C] ⊑ +D  [Disjoint(L)]  
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ D ∈ L
  *        [C] ⊑ D:L
  * </pre>
  * 

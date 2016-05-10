@@ -28,6 +28,7 @@ import org.semanticweb.elk.matching.ElkMatchException;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.IndexedSubObjectPropertyOfAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedSubObjectPropertyOfAxiomMatch2;
+import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentObjectPropertiesAxiomConversion;
@@ -35,31 +36,30 @@ import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentObjectProperties
 public class ElkEquivalentObjectPropertiesAxiomConversionMatch1 extends
 		AbstractInferenceMatch<ElkEquivalentObjectPropertiesAxiomConversion> {
 
-	private final int subPropertyPos_, superPropertyPos_;
-
 	ElkEquivalentObjectPropertiesAxiomConversionMatch1(
 			ElkEquivalentObjectPropertiesAxiomConversion parent,
 			IndexedSubObjectPropertyOfAxiomMatch1 conclusionMatch) {
 		super(parent);
-		this.subPropertyPos_ = parent.getSubPropertyPosition();
-		this.superPropertyPos_ = parent.getSuperPropertyPosition();
 	}
 
 	public IndexedSubObjectPropertyOfAxiomMatch2 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
-		List<? extends ElkObjectPropertyExpression> members = getParent()
-				.getOriginalAxiom().getObjectPropertyExpressions();
+		ElkEquivalentObjectPropertiesAxiomConversion parent = getParent();
+		ElkEquivalentObjectPropertiesAxiom premise = parent.getOriginalAxiom();
+		List<? extends ElkObjectPropertyExpression> members = premise
+				.getObjectPropertyExpressions();
 		ElkObjectPropertyExpression superPropertyExpression = members
-				.get(superPropertyPos_);
+				.get(parent.getSuperPropertyPosition());
 		if (superPropertyExpression instanceof ElkObjectProperty) {
 			ElkObjectProperty superProperty = (ElkObjectProperty) superPropertyExpression;
 			return factory.getIndexedSubObjectPropertyOfAxiomMatch2(
 					factory.getIndexedSubObjectPropertyOfAxiomMatch1(
-							getParent().getConclusion(factory)),
-					members.get(subPropertyPos_), superProperty);
+							parent.getConclusion(factory)),
+					members.get(parent.getSubPropertyPosition()),
+					superProperty);
 		} else {
 			throw new ElkMatchException(
-					getParent().getConclusion(factory).getSuperProperty(),
+					parent.getConclusion(factory).getSuperProperty(),
 					superPropertyExpression);
 		}
 	}

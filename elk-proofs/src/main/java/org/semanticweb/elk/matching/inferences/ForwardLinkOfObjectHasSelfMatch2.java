@@ -23,8 +23,9 @@ package org.semanticweb.elk.matching.inferences;
  */
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch3;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 
 public class ForwardLinkOfObjectHasSelfMatch2
 		extends LinkOfObjectHasSelfMatch2<ForwardLinkOfObjectHasSelfMatch1> {
@@ -34,11 +35,16 @@ public class ForwardLinkOfObjectHasSelfMatch2
 		super(parent, premiseMatch);
 	}
 
-	public ForwardLinkMatch2 getConclusionMatch(
+	public ElkObjectProperty getRelationMatch() {
+		return getPremisePropertyMatch(getParent().getParent()
+				.getDecomposedExistential().getProperty());
+	}
+
+	public ForwardLinkMatch3 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getForwardLinkMatch2(
-				getParent().getConclusionMatch(factory), null,
-				getParent().getOriginMatch());
+		return factory.getForwardLinkMatch3(factory.getForwardLinkMatch2(
+				getParent().getConclusionMatch(factory), getRelationMatch(), 0),
+				null, getParent().getOriginMatch());
 	}
 
 	@Override

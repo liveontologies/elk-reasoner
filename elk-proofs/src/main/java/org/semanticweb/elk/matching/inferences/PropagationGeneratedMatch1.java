@@ -23,48 +23,65 @@ package org.semanticweb.elk.matching.inferences;
  */
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
+import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.conclusions.PropagationMatch1;
+import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
 import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1;
-import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1Watch;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagationGenerated;
 
 public class PropagationGeneratedMatch1
-		extends AbstractInferenceMatch<PropagationGenerated>
-		implements SubPropertyChainMatch1Watch {
+		extends AbstractInferenceMatch<PropagationGenerated> {
 
-	private final ElkObjectSomeValuesFrom carryMatch_;
+	private final IndexedContextRootMatch destinationMatch_;
+
+	private final ElkObjectProperty subDestinationMatch_;
+
+	private final ElkObjectSomeValuesFrom conclusionCarryMatch_;
 
 	PropagationGeneratedMatch1(PropagationGenerated parent,
 			PropagationMatch1 conclusionMatch) {
 		super(parent);
-		carryMatch_ = conclusionMatch.getCarryMatch();
+		this.destinationMatch_ = conclusionMatch.getDestinationMatch();
+		this.subDestinationMatch_ = conclusionMatch.getSubDestinationMatch();
+		this.conclusionCarryMatch_ = conclusionMatch.getCarryMatch();
 	}
 
-	public ElkObjectSomeValuesFrom getCarryMatch() {
-		return carryMatch_;
+	public IndexedContextRootMatch getDestinationMatch() {
+		return destinationMatch_;
+	}
+	
+	public ElkObjectProperty getSubDestinationMatch() {
+		return subDestinationMatch_;
+	}
+	
+	public ElkObjectSomeValuesFrom getConclusionCarryMatch() {
+		return conclusionCarryMatch_;
 	}
 
 	public PropagationMatch1 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getPropagationMatch1(getParent().getConclusion(factory),
-				carryMatch_);
+				destinationMatch_, subDestinationMatch_, conclusionCarryMatch_);
 	}
 
+	public SubClassInclusionComposedMatch1 getSecondPremiseMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getSubClassInclusionComposedMatch1(
+				getParent().getSecondPremise(factory), destinationMatch_,
+				getConclusionCarryMatch().getFiller());
+	}
+	
 	public SubPropertyChainMatch1 getThirdPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getSubPropertyChainMatch1(
-				getParent().getThirdPremise(factory), carryMatch_.getProperty(),
-				0);
+				getParent().getThirdPremise(factory),
+				conclusionCarryMatch_.getProperty(), 0);
 	}
 
 	@Override
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	public <O> O accept(SubPropertyChainMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

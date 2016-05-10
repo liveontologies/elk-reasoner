@@ -65,11 +65,6 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	}
 
 	@Override
-	public String visit(BackwardLinkCompositionMatch6 inferenceMatch6) {
-		return inferenceMatch6.getParent() + " | ";
-	}
-
-	@Override
 	public String visit(BackwardLinkOfObjectHasSelfMatch1 inferenceMatch1) {
 		return inferenceMatch1.getParent() + " | ";
 	}
@@ -117,6 +112,60 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	}
 
 	@Override
+	public String visit(BackwardLinkReversedMatch3 inferenceMatch3) {
+		return inferenceMatch3.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			ClassInconsistencyOfDisjointSubsumersMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			ClassInconsistencyOfDisjointSubsumersMatch2 inferenceMatch2) {
+		return inferenceMatch2.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			ClassInconsistencyOfObjectComplementOfMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			ClassInconsistencyOfObjectComplementOfMatch2 inferenceMatch2) {
+		return inferenceMatch2.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(ClassInconsistencyOfOwlNothingMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(ClassInconsistencyPropagatedMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(ClassInconsistencyPropagatedMatch2 inferenceMatch2) {
+		return inferenceMatch2.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(DisjointSubsumerFromSubsumerMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(DisjointSubsumerFromSubsumerMatch2 inferenceMatch2) {
+		return inferenceMatch2.getParent() + " | ";
+	}
+
+	@Override
 	public String visit(
 			ElkClassAssertionAxiomConversionMatch1 inferenceMatch1) {
 		return inferenceMatch1.getParent() + " | ";
@@ -130,13 +179,37 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 
 	@Override
 	public String visit(
+			ElkDifferentIndividualsAxiomNaryConversionMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
 			ElkDisjointClassesAxiomBinaryConversionMatch1 inferenceMatch1) {
 		return inferenceMatch1.getParent() + " | ";
 	}
 
 	@Override
 	public String visit(
+			ElkDisjointClassesAxiomNaryConversionMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
 			ElkDisjointUnionAxiomBinaryConversionMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			ElkDisjointUnionAxiomEquivalenceConversionMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			ElkDisjointUnionAxiomNaryConversionMatch1 inferenceMatch1) {
 		return inferenceMatch1.getParent() + " | ";
 	}
 
@@ -179,6 +252,12 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	@Override
 	public String visit(
 			ElkObjectPropertyDomainAxiomConversionMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			ElkObjectPropertyRangeAxiomConversionMatch1 inferenceMatch1) {
 		return inferenceMatch1.getParent() + " | ";
 	}
 
@@ -264,16 +343,6 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	}
 
 	@Override
-	public String visit(PropagationGeneratedMatch2 inferenceMatch2) {
-		return inferenceMatch2.getParent() + " | ";
-	}
-
-	@Override
-	public String visit(PropagationGeneratedMatch3 inferenceMatch3) {
-		return inferenceMatch3.getParent() + " | ";
-	}
-
-	@Override
 	public String visit(PropertyRangeInheritedMatch1 inferenceMatch1) {
 		return inferenceMatch1.getParent() + " | ";
 	}
@@ -321,12 +390,6 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	public String visit(
 			SubClassInclusionComposedObjectSomeValuesFromMatch2 inferenceMatch2) {
 		return inferenceMatch2.getParent() + " | ";
-	}
-
-	@Override
-	public String visit(
-			SubClassInclusionComposedObjectSomeValuesFromMatch3 inferenceMatch3) {
-		return inferenceMatch3.getParent() + " | ";
 	}
 
 	@Override

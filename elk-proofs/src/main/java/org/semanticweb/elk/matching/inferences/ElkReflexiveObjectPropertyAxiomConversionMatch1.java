@@ -39,11 +39,12 @@ public class ElkReflexiveObjectPropertyAxiomConversionMatch1 extends
 
 	public IndexedSubClassOfAxiomMatch2 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
+		ElkReflexiveObjectPropertyAxiomConversion parent = getParent();
 		ElkReflexiveObjectPropertyAxiom premise = getParent()
 				.getOriginalAxiom();
 		return factory.getIndexedSubClassOfAxiomMatch2(
 				factory.getIndexedSubClassOfAxiomMatch1(
-						getParent().getConclusion(factory)),
+						parent.getConclusion(factory)),
 				factory.getOwlThing(),
 				factory.getObjectHasSelf(premise.getProperty()));
 	}

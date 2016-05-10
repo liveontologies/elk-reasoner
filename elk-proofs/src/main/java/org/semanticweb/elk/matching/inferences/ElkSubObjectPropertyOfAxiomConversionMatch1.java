@@ -42,18 +42,19 @@ public class ElkSubObjectPropertyOfAxiomConversionMatch1
 
 	public IndexedSubObjectPropertyOfAxiomMatch2 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
-		ElkSubObjectPropertyOfAxiom premise = getParent().getOriginalAxiom();
+		ElkSubObjectPropertyOfAxiomConversion parent = getParent();
+		ElkSubObjectPropertyOfAxiom premise = parent.getOriginalAxiom();
 		ElkObjectPropertyExpression superPropertyExpression = premise
 				.getSuperObjectPropertyExpression();
 		if (superPropertyExpression instanceof ElkObjectProperty) {
 			return factory.getIndexedSubObjectPropertyOfAxiomMatch2(
 					factory.getIndexedSubObjectPropertyOfAxiomMatch1(
-							getParent().getConclusion(factory)),
+							parent.getConclusion(factory)),
 					premise.getSubObjectPropertyExpression(),
 					(ElkObjectProperty) superPropertyExpression);
 		} else {
 			throw new ElkMatchException(
-					getParent().getConclusion(factory).getSuperProperty(),
+					parent.getConclusion(factory).getSuperProperty(),
 					superPropertyExpression);
 		}
 	}

@@ -32,9 +32,9 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  * Represents the inference:
  * 
  * <pre>
- *  C ⊑ ObjectUnionOf(D)
- * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
- *        C ⊑ D
+ *  
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *  ObjectUnionOf(D) ⊑ D
  * </pre>
  * 
  * @author Yevgeny Kazakov
@@ -45,18 +45,11 @@ public class ElkClassInclusionSingletonObjectUnionOfDecomposition
 
 	private final static String NAME_ = "Singleton Disjunction Decomposition";
 
-	private final ElkClassExpression subExpression_;
-
 	private final ElkClassExpression disjunct_;
 
 	ElkClassInclusionSingletonObjectUnionOfDecomposition(
-			ElkClassExpression subExpression, ElkClassExpression disjunct) {
-		this.subExpression_ = subExpression;
+			ElkClassExpression disjunct) {
 		this.disjunct_ = disjunct;
-	}
-
-	public ElkClassExpression getSubExpression() {
-		return subExpression_;
 	}
 
 	public ElkClassExpression getDisjunct() {
@@ -70,19 +63,19 @@ public class ElkClassInclusionSingletonObjectUnionOfDecomposition
 
 	@Override
 	public int getPremiseCount() {
-		return 1;
+		return 0;
 	}
 
 	@Override
 	public ElkSubClassOfAxiom getPremise(int index, ElkObject.Factory factory) {
-		checkPremiseIndex(index);
-		return factory.getSubClassOfAxiom(subExpression_,
-				factory.getObjectUnionOf(Collections.singletonList(disjunct_)));
+		return failGetPremise(index);
 	}
 
 	@Override
 	public ElkSubClassOfAxiom getConclusion(ElkObject.Factory factory) {
-		return factory.getSubClassOfAxiom(subExpression_, disjunct_);
+		return factory.getSubClassOfAxiom(
+				factory.getObjectUnionOf(Collections.singletonList(disjunct_)),
+				disjunct_);
 	}
 
 	@Override
@@ -99,7 +92,7 @@ public class ElkClassInclusionSingletonObjectUnionOfDecomposition
 	public interface Factory {
 
 		ElkClassInclusionSingletonObjectUnionOfDecomposition getElkClassInclusionSingletonObjectUnionOfDecomposition(
-				ElkClassExpression subExpression, ElkClassExpression disjunct);
+				ElkClassExpression disjunct);
 
 	}
 

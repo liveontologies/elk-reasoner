@@ -43,7 +43,7 @@ public class ElkDisjointUnionAxiomSubClassConversionMatch1 extends
 		ElkDisjointUnionAxiom premise = parent.getOriginalAxiom();
 		return factory.getIndexedSubClassOfAxiomMatch2(
 				factory.getIndexedSubClassOfAxiomMatch1(
-						getParent().getConclusion(factory)),
+						parent.getConclusion(factory)),
 				premise.getClassExpressions().get(parent.getDisjunctPosition()),
 				premise.getDefinedClass());
 	}

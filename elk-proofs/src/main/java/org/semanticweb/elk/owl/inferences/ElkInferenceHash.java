@@ -24,57 +24,50 @@ package org.semanticweb.elk.owl.inferences;
 
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
-public class ElkInferenceHash
-		implements ElkInference.Visitor<Integer> {
+public class ElkInferenceHash implements ElkInference.Visitor<Integer> {
 
 	private static final ElkInferenceHash INSTANCE_ = new ElkInferenceHash();
 
-	// forbid construction; only static methods should be used
-	private ElkInferenceHash() {
-
+	private static int combinedHashCode(int... hashes) {
+		return HashGenerator.combineListHash(hashes);
 	}
 
 	public static ElkInference.Visitor<Integer> getHashVisitor() {
 		return INSTANCE_;
 	}
 
-	private static int combinedHashCode(int... hashes) {
-		return HashGenerator.combineListHash(hashes);
-	}
-	
-	private static int hashCode(Object o) {
-		return o.hashCode();
-	}
-
 	private static int hashCode(int n) {
 		return n;
 	}
 
-	@Override
-	public Integer visit(
-			ElkClassInclusionEmptyObjectIntersectionOfComposition inference) {
-		return combinedHashCode(
-				hashCode(
-						ElkClassInclusionEmptyObjectIntersectionOfComposition.class),
-				hashCode(inference.getSubExpression()));
+	private static int hashCode(Object o) {
+		return o.hashCode();
+	}
+
+	// forbid construction; only static methods should be used
+	private ElkInferenceHash() {
+
 	}
 
 	@Override
 	public Integer visit(
-			ElkClassInclusionEmptyObjectOneOfDecomposition inference) {
-		return combinedHashCode(
-				hashCode(
-						ElkClassInclusionEmptyObjectIntersectionOfComposition.class),
-				hashCode(inference.getSubExpression()));
+			ElkClassInclusionOwlThingEmptyObjectIntersectionOf inference) {
+		return combinedHashCode(hashCode(
+				ElkClassInclusionOwlThingEmptyObjectIntersectionOf.class));
 	}
 
 	@Override
 	public Integer visit(
-			ElkClassInclusionEmptyObjectUnionOfDecomposition inference) {
-		return combinedHashCode(
-				hashCode(
-						ElkClassInclusionEmptyObjectIntersectionOfComposition.class),
-				hashCode(inference.getSubExpression()));
+			ElkClassInclusionEmptyObjectOneOfOwlNothing inference) {
+		return combinedHashCode(hashCode(
+				ElkClassInclusionOwlThingEmptyObjectIntersectionOf.class));
+	}
+
+	@Override
+	public Integer visit(
+			ElkClassInclusionEmptyObjectUnionOfOwlNothing inference) {
+		return combinedHashCode(hashCode(
+				ElkClassInclusionOwlThingEmptyObjectIntersectionOf.class));
 	}
 
 	@Override
@@ -144,11 +137,47 @@ public class ElkInferenceHash
 	}
 
 	@Override
-	public Integer visit(ElkClassInclusionOfEquivalence inference) {
-		return combinedHashCode(hashCode(ElkClassInclusionOfEquivalence.class),
+	public Integer visit(ElkClassInclusionOfClassAssertion inference) {
+		return combinedHashCode(
+				hashCode(ElkClassInclusionOfClassAssertion.class),
+				hashCode(inference.getInstance()),
+				hashCode(inference.getType()));
+	}
+
+	@Override
+	public Integer visit(ElkClassInclusionOfDifferentIndividuals inference) {
+		return combinedHashCode(
+				hashCode(ElkClassInclusionOfDifferentIndividuals.class),
+				hashCode(inference.getIndividuals()),
+				hashCode(inference.getFirstPos()),
+				hashCode(inference.getSecondPos()));
+	}
+
+	@Override
+	public Integer visit(ElkClassInclusionOfDisjointClasses inference) {
+		return combinedHashCode(
+				hashCode(ElkClassInclusionOfDisjointClasses.class),
+				hashCode(inference.getExpressions()),
+				hashCode(inference.getFirstPos()),
+				hashCode(inference.getSecondPos()));
+	}
+
+	@Override
+	public Integer visit(ElkClassInclusionOfEquivaletClasses inference) {
+		return combinedHashCode(
+				hashCode(ElkClassInclusionOfEquivaletClasses.class),
 				hashCode(inference.getExpressions()),
 				hashCode(inference.getSubPos()),
 				hashCode(inference.getSuperPos()));
+	}
+
+	@Override
+	public Integer visit(ElkClassInclusionOfObjectPropertyAssertion inference) {
+		return combinedHashCode(
+				hashCode(ElkClassInclusionOfObjectPropertyAssertion.class),
+				hashCode(inference.getSubject()),
+				hashCode(inference.getProperty()),
+				hashCode(inference.getObject()));
 	}
 
 	@Override
@@ -164,6 +193,12 @@ public class ElkInferenceHash
 		return combinedHashCode(
 				hashCode(ElkClassInclusionOfReflexiveObjectProperty.class),
 				hashCode(inference.getProperty()));
+	}
+
+	@Override
+	public Integer visit(ElkClassInclusionOwlNothing inference) {
+		return combinedHashCode(hashCode(ElkClassInclusionOwlNothing.class),
+				hashCode(inference.getSuperClass()));
 	}
 
 	@Override
@@ -186,8 +221,7 @@ public class ElkInferenceHash
 			ElkClassInclusionSingletonObjectUnionOfDecomposition inference) {
 		return combinedHashCode(
 				hashCode(
-						ElkClassInclusionEmptyObjectIntersectionOfComposition.class),
-				hashCode(inference.getSubExpression()),
+						ElkClassInclusionOwlThingEmptyObjectIntersectionOf.class),
 				hashCode(inference.getDisjunct()));
 	}
 
@@ -195,6 +229,22 @@ public class ElkInferenceHash
 	public Integer visit(ElkClassInclusionTautology inference) {
 		return combinedHashCode(hashCode(ElkClassInclusionTautology.class),
 				hashCode(inference.getExpression()));
+	}
+
+	@Override
+	public Integer visit(ElkDisjointClassesOfDisjointUnion inference) {
+		return combinedHashCode(
+				hashCode(ElkDisjointClassesOfDisjointUnion.class),
+				hashCode(inference.getDefined()),
+				hashCode(inference.getDisjoint()));
+	}
+
+	@Override
+	public Integer visit(ElkEquivalentClassesOfDisjointUnion inference) {
+		return combinedHashCode(
+				hashCode(ElkEquivalentClassesOfDisjointUnion.class),
+				hashCode(inference.getDefined()),
+				hashCode(inference.getDisjoint()));
 	}
 
 	@Override

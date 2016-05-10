@@ -39,7 +39,8 @@ class IndexedEquivalentClassesAxiomMatch1InferenceVisitor extends
 
 	@Override
 	public Void visit(ElkDisjointUnionAxiomEquivalenceConversion inference) {
-		// TODO Auto-generated method stub
+		factory.getElkDisjointUnionAxiomEquivalenceConversionMatch1(inference,
+				child);
 		return null;
 	}
 

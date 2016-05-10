@@ -22,47 +22,49 @@ package org.semanticweb.elk.matching.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.matching.ElkMatchException;
-import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1;
-import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1Watch;
+import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch2;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch2;
+import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
+import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1;
+import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1Watch;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 
 public class BackwardLinkCompositionMatch3
 		extends AbstractInferenceMatch<BackwardLinkCompositionMatch2>
-		implements BackwardLinkMatch1Watch {
+		implements SubPropertyChainMatch1Watch {
 
 	private final ElkObjectProperty premiseBackwardRelationMatch_;
 
+	private final IndexedContextRootMatch originMatch_;
+
 	BackwardLinkCompositionMatch3(BackwardLinkCompositionMatch2 parent,
-			SubPropertyChainMatch2 secondPremiseMatch) {
+			BackwardLinkMatch2 firstPremiseMatch) {
 		super(parent);
-		ElkSubObjectPropertyExpression subChainMatch = secondPremiseMatch
-				.getFullSubChainMatch();
-		int subChainStartPos = secondPremiseMatch.getSubChainStartPos();
-		if (subChainMatch instanceof ElkObjectProperty
-				&& subChainStartPos == 0) {
-			premiseBackwardRelationMatch_ = (ElkObjectProperty) subChainMatch;
-		} else {
-			throw new ElkMatchException(
-					getParent().getParent().getParent()
-							.getPremiseBackwardRelation(),
-					subChainMatch, subChainStartPos);
-		}
+		this.premiseBackwardRelationMatch_ = firstPremiseMatch
+				.getRelationMatch();
+		this.originMatch_ = firstPremiseMatch.getDestinationMatch();
 	}
 
 	public ElkObjectProperty getPremiseBackwardRelationMatch() {
 		return premiseBackwardRelationMatch_;
 	}
 
-	public BackwardLinkMatch1 getFirstPremiseMatch(
+	public IndexedContextRootMatch getOriginMatch() {
+		return originMatch_;
+	}
+
+	public BackwardLinkMatch2 getFirstPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getBackwardLinkMatch1(
-				getParent().getParent().getParent().getFirstPremise(factory),
-				getParent().getParent().getConclusionSourceMatch(),
-				getPremiseBackwardRelationMatch());
+		return factory.getBackwardLinkMatch2(
+				getParent().getFirstPremiseMatch(factory),
+				getPremiseBackwardRelationMatch(), getOriginMatch());
+	}
+
+	public SubPropertyChainMatch1 getFourthPremiseMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getSubPropertyChainMatch1(
+				getParent().getParent().getParent().getFourthPremise(factory),
+				getParent().getCompositionMatch(), 1);
 	}
 
 	@Override
@@ -71,7 +73,7 @@ public class BackwardLinkCompositionMatch3
 	}
 
 	@Override
-	public <O> O accept(BackwardLinkMatch1Watch.Visitor<O> visitor) {
+	public <O> O accept(SubPropertyChainMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
@@ -99,7 +101,7 @@ public class BackwardLinkCompositionMatch3
 
 		BackwardLinkCompositionMatch3 getBackwardLinkCompositionMatch3(
 				BackwardLinkCompositionMatch2 parent,
-				SubPropertyChainMatch2 secondPremiseMatch);
+				BackwardLinkMatch2 firstPremiseMatch);
 
 	}
 

@@ -22,25 +22,23 @@ package org.semanticweb.elk.matching;
  * #L%
  */
 
-import org.semanticweb.elk.matching.conclusions.PropagationMatch2Watch;
-import org.semanticweb.elk.matching.conclusions.PropagationMatch3;
+import org.semanticweb.elk.matching.conclusions.DisjointSubsumerMatch1;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
-import org.semanticweb.elk.matching.inferences.PropagationGeneratedMatch2;
+import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerInference;
 
-class PropagationMatch3InferenceVisitor
-		extends
-			AbstractConclusionMatchInferenceVisitor<PropagationMatch3>
-		implements
-			PropagationMatch2Watch.Visitor<Void> {
+class DisjointSubsumerMatch1InferenceVisitor
+		extends AbstractConclusionMatchInferenceVisitor<DisjointSubsumerMatch1>
+		implements DisjointSubsumerInference.Visitor<Void> {
 
-	PropagationMatch3InferenceVisitor(InferenceMatch.Factory factory,
-			PropagationMatch3 child) {
+	DisjointSubsumerMatch1InferenceVisitor(InferenceMatch.Factory factory,
+			DisjointSubsumerMatch1 child) {
 		super(factory, child);
 	}
 
 	@Override
-	public Void visit(PropagationGeneratedMatch2 inferenceMatch2) {
-		factory.getPropagationGeneratedMatch3(inferenceMatch2, child);
+	public Void visit(DisjointSubsumerFromSubsumer inference) {
+		factory.getDisjointSubsumerFromSubsumerMatch1(inference, child);
 		return null;
 	}
 

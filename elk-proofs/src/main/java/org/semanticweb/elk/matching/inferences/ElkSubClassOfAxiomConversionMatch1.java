@@ -38,10 +38,11 @@ public class ElkSubClassOfAxiomConversionMatch1
 
 	public IndexedSubClassOfAxiomMatch2 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
-		ElkSubClassOfAxiom premise = getParent().getOriginalAxiom();
+		ElkSubClassOfAxiomConversion parent = getParent();
+		ElkSubClassOfAxiom premise = parent.getOriginalAxiom();
 		return factory.getIndexedSubClassOfAxiomMatch2(
 				factory.getIndexedSubClassOfAxiomMatch1(
-						getParent().getConclusion(factory)),
+						parent.getConclusion(factory)),
 				premise.getSubClassExpression(),
 				premise.getSuperClassExpression());
 	}

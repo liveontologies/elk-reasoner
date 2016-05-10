@@ -39,7 +39,8 @@ class IndexedObjectPropertyRangeAxiomMatch1InferenceVisitor extends
 
 	@Override
 	public Void visit(ElkObjectPropertyRangeAxiomConversion inference) {
-		// TODO Auto-generated method stub
+		factory.getElkObjectPropertyRangeAxiomConversionMatch1(inference,
+				child);
 		return null;
 	}
 
