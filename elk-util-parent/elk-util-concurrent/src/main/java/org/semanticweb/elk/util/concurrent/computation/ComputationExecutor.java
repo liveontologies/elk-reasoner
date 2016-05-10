@@ -231,6 +231,7 @@ public class ComputationExecutor {
 	 *             if was interrupted while waiting
 	 */
 	public synchronized void waitDone() throws InterruptedException {
+		checkException();
 		if (jobsAccepted_) {
 			// nothing has been executed
 			return;
