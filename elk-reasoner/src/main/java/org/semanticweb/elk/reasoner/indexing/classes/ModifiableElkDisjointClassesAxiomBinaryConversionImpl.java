@@ -47,6 +47,11 @@ class ModifiableElkDisjointClassesAxiomBinaryConversionImpl
 			ModifiableIndexedObjectIntersectionOf conjunction,
 			ModifiableIndexedClass bottom) {
 		super(originalAxiom, conjunction, bottom);
+		if (firstClassPosition == secondClassPosition) {
+			throw new IllegalArgumentException(
+					"Different positions expected but both = "
+							+ firstClassPosition);
+		}
 		this.firstClassPosition_ = firstClassPosition;
 		this.secondClassPosition_ = secondClassPosition;
 	}

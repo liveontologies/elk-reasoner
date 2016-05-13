@@ -1,5 +1,8 @@
 package org.semanticweb.elk.owl.inferences;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -26,56 +29,36 @@ import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 
 /**
  * Represents the inference:
  * 
  * <pre>
  *  DifferentIndividuals(a0 a1 ... an)
- * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
- *          {ai} ⊓ {aj} ⊑ ⊥
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *  DisjointClasses({a0} {a1} ... {an})
  * </pre>
  * 
  * @author Yevgeny Kazakov
  *
  */
-public class ElkClassInclusionOfDifferentIndividuals
-		extends AbstractElkInference {
+public class ElkDisjointClassesOfDifferentIndividuals extends AbstractElkInference {
 
 	private final static String NAME_ = "Different Individuals Translation";
 
-	private final List<? extends ElkIndividual> individuals_;
+	private final List<? extends ElkIndividual> different_;
 
-	/**
-	 * (different) positions for two different individuals
-	 */
-	private final int firstPos_, secondPos_;
-
-	ElkClassInclusionOfDifferentIndividuals(
-			List<? extends ElkIndividual> individuals, int firstPos,
-			int secondPos) {
-		if (firstPos == secondPos) {
-			throw new IllegalArgumentException(
-					"Different positions expected: " + firstPos);
-		}
-		this.individuals_ = individuals;
-		this.firstPos_ = firstPos;
-		this.secondPos_ = secondPos;
+	ElkDisjointClassesOfDifferentIndividuals(
+			List<? extends ElkIndividual> different) {
+		this.different_ = different;
 	}
 
-	public List<? extends ElkIndividual> getIndividuals() {
-		return individuals_;
-	}
-
-	public int getFirstPos() {
-		return firstPos_;
-	}
-
-	public int getSecondPos() {
-		return secondPos_;
+	public List<? extends ElkIndividual> getDifferent() {
+		return different_;
 	}
 
 	@Override
@@ -98,16 +81,18 @@ public class ElkClassInclusionOfDifferentIndividuals
 	}
 
 	public ElkDifferentIndividualsAxiom getPremise(ElkObject.Factory factory) {
-		return factory.getDifferentIndividualsAxiom(individuals_);
+		return factory.getDifferentIndividualsAxiom(different_);
 	}
 
 	@Override
-	public ElkSubClassOfAxiom getConclusion(ElkObject.Factory factory) {
-		return factory.getSubClassOfAxiom(
-				factory.getObjectIntersectionOf(
-						factory.getObjectOneOf(individuals_.get(firstPos_)),
-						factory.getObjectOneOf(individuals_.get(secondPos_))),
-				factory.getOwlNothing());
+	public ElkDisjointClassesAxiom getConclusion(ElkObject.Factory factory) {
+		List<ElkObjectOneOf> disjoint = new ArrayList<ElkObjectOneOf>(
+				different_.size());
+		for (ElkIndividual individual : different_) {
+			disjoint.add(factory
+					.getObjectOneOf(Collections.singletonList(individual)));
+		}
+		return factory.getDisjointClassesAxiom(disjoint);
 	}
 
 	@Override
@@ -123,9 +108,8 @@ public class ElkClassInclusionOfDifferentIndividuals
 	 */
 	public interface Factory {
 
-		ElkClassInclusionOfDifferentIndividuals getElkClassInclusionOfDifferentIndividuals(
-				List<? extends ElkIndividual> individuals, int firstPos,
-				int secondPos);
+		ElkDisjointClassesOfDifferentIndividuals getElkDisjointClassesOfDifferentIndividuals(
+				List<? extends ElkIndividual> different);
 
 	}
 
@@ -139,7 +123,7 @@ public class ElkClassInclusionOfDifferentIndividuals
 	 */
 	interface Visitor<O> {
 
-		O visit(ElkClassInclusionOfDifferentIndividuals inference);
+		O visit(ElkDisjointClassesOfDifferentIndividuals inference);
 
 	}
 

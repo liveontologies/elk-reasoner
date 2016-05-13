@@ -23,12 +23,13 @@ package org.semanticweb.elk.matching.inferences;
  */
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.conclusions.PropagationMatch1;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
 import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
+import org.semanticweb.elk.matching.subsumers.IndexedObjectSomeValuesFromMatch;
+import org.semanticweb.elk.matching.subsumers.SubsumerMatches;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagationGenerated;
 
 public class PropagationGeneratedMatch1
@@ -38,7 +39,7 @@ public class PropagationGeneratedMatch1
 
 	private final ElkObjectProperty subDestinationMatch_;
 
-	private final ElkObjectSomeValuesFrom conclusionCarryMatch_;
+	private final IndexedObjectSomeValuesFromMatch conclusionCarryMatch_;
 
 	PropagationGeneratedMatch1(PropagationGenerated parent,
 			PropagationMatch1 conclusionMatch) {
@@ -51,12 +52,12 @@ public class PropagationGeneratedMatch1
 	public IndexedContextRootMatch getDestinationMatch() {
 		return destinationMatch_;
 	}
-	
+
 	public ElkObjectProperty getSubDestinationMatch() {
 		return subDestinationMatch_;
 	}
-	
-	public ElkObjectSomeValuesFrom getConclusionCarryMatch() {
+
+	public IndexedObjectSomeValuesFromMatch getConclusionCarryMatch() {
 		return conclusionCarryMatch_;
 	}
 
@@ -70,14 +71,15 @@ public class PropagationGeneratedMatch1
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getSubClassInclusionComposedMatch1(
 				getParent().getSecondPremise(factory), destinationMatch_,
-				getConclusionCarryMatch().getFiller());
+				SubsumerMatches
+						.create(getConclusionCarryMatch().getFillerMatch()));
 	}
-	
+
 	public SubPropertyChainMatch1 getThirdPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getSubPropertyChainMatch1(
 				getParent().getThirdPremise(factory),
-				conclusionCarryMatch_.getProperty(), 0);
+				getConclusionCarryMatch().getPropertyMatch(), 0);
 	}
 
 	@Override

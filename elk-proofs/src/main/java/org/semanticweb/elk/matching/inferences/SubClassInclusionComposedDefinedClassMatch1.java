@@ -22,14 +22,12 @@ package org.semanticweb.elk.matching.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.matching.ElkMatchException;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedDefinedClass;
 
 public class SubClassInclusionComposedDefinedClassMatch1
@@ -40,24 +38,13 @@ public class SubClassInclusionComposedDefinedClassMatch1
 
 	private final ElkClass definedClassMatch_;
 
-	private SubClassInclusionComposedDefinedClassMatch1(
-			SubClassInclusionComposedDefinedClass parent,
-			IndexedContextRootMatch originMatch,
-			ElkClassExpression subsumerMatch) {
-		super(parent);
-		this.originMatch_ = originMatch;
-		if (subsumerMatch instanceof ElkClass) {
-			definedClassMatch_ = (ElkClass) subsumerMatch;
-		} else {
-			throw new ElkMatchException(parent.getSubsumer(), subsumerMatch);
-		}
-	}
-
 	SubClassInclusionComposedDefinedClassMatch1(
 			SubClassInclusionComposedDefinedClass parent,
 			SubClassInclusionComposedMatch1 conclusionMatch) {
-		this(parent, conclusionMatch.getDestinationMatch(),
-				conclusionMatch.getSubsumerGeneralMatch());
+		super(parent);
+		this.originMatch_ = conclusionMatch.getDestinationMatch();
+		definedClassMatch_ = conclusionMatch.getSubsumerIndexedClassMatch()
+				.getValue();
 	}
 
 	public IndexedContextRootMatch getOriginMatch() {
@@ -87,7 +74,8 @@ public class SubClassInclusionComposedDefinedClassMatch1
 	}
 
 	@Override
-	public <O> O accept(IndexedEquivalentClassesAxiomMatch1Watch.Visitor<O> visitor) {
+	public <O> O accept(
+			IndexedEquivalentClassesAxiomMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

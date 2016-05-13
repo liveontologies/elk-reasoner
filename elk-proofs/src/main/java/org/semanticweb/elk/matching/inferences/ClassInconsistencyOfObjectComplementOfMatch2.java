@@ -1,7 +1,5 @@
 package org.semanticweb.elk.matching.inferences;
 
-import org.semanticweb.elk.matching.ElkMatchException;
-
 /*
  * #%L
  * ELK Proofs Package
@@ -27,7 +25,6 @@ import org.semanticweb.elk.matching.ElkMatchException;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 
 public class ClassInconsistencyOfObjectComplementOfMatch2 extends
@@ -39,14 +36,8 @@ public class ClassInconsistencyOfObjectComplementOfMatch2 extends
 			ClassInconsistencyOfObjectComplementOfMatch1 parent,
 			SubClassInclusionDecomposedMatch2 secondPremiseMatch) {
 		super(parent);
-		ElkClassExpression subsumerMatch = secondPremiseMatch
-				.getSubsumerGeneralMatch();
-		if (subsumerMatch instanceof ElkObjectComplementOf) {
-			this.negationMatch_ = (ElkObjectComplementOf) subsumerMatch;
-		} else {
-			throw new ElkMatchException(parent.getParent().getNegation(),
-					subsumerMatch);
-		}
+		this.negationMatch_ = secondPremiseMatch
+				.getSubsumerIndexedObjectComplementOfMatch().getValue();
 	}
 
 	public ElkObjectComplementOf getNegationMatch() {

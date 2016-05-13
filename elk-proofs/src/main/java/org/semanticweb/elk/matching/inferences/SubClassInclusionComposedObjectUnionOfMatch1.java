@@ -22,12 +22,13 @@ package org.semanticweb.elk.matching.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.matching.ElkMatchException;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
+import org.semanticweb.elk.matching.subsumers.IndexedObjectUnionOfMatch;
+import org.semanticweb.elk.matching.subsumers.IndexedObjectUnionOfOneOfMatch;
+import org.semanticweb.elk.matching.subsumers.IndexedObjectUnionOfUnionOfMatch;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectUnionOf;
 
 public class SubClassInclusionComposedObjectUnionOfMatch1
@@ -35,34 +36,22 @@ public class SubClassInclusionComposedObjectUnionOfMatch1
 
 	private final IndexedContextRootMatch originMatch_;
 
-	private final ElkObjectUnionOf conclusionSubsumerMatch_;
-
-	private SubClassInclusionComposedObjectUnionOfMatch1(
-			SubClassInclusionComposedObjectUnionOf parent,
-			IndexedContextRootMatch originMatch,
-			ElkClassExpression subsumerMatch) {
-		super(parent);
-		this.originMatch_ = originMatch;
-		if (subsumerMatch instanceof ElkObjectUnionOf) {
-			conclusionSubsumerMatch_ = (ElkObjectUnionOf) subsumerMatch;
-		} else {
-			throw new ElkMatchException(getParent().getSubsumer(),
-					subsumerMatch);
-		}
-	}
+	private final IndexedObjectUnionOfMatch conclusionSubsumerMatch_;
 
 	SubClassInclusionComposedObjectUnionOfMatch1(
 			SubClassInclusionComposedObjectUnionOf parent,
 			SubClassInclusionComposedMatch1 conclusionMatch) {
-		this(parent, conclusionMatch.getDestinationMatch(),
-				conclusionMatch.getSubsumerGeneralMatch());
+		super(parent);
+		this.originMatch_ = conclusionMatch.getDestinationMatch();
+		conclusionSubsumerMatch_ = conclusionMatch
+				.getSubsumerIndexedObjectUnionOfMatch();
 	}
 
 	public IndexedContextRootMatch getOriginMatch() {
 		return originMatch_;
 	}
 
-	public ElkObjectUnionOf getConclusionSubsumerMatch() {
+	public IndexedObjectUnionOfMatch getConclusionSubsumerMatch() {
 		return conclusionSubsumerMatch_;
 	}
 
@@ -81,8 +70,29 @@ public class SubClassInclusionComposedObjectUnionOfMatch1
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getSubClassInclusionComposedMatch1(
 				getParent().getPremise(factory), originMatch_,
-				conclusionSubsumerMatch_.getClassExpressions()
-						.get(getPosition()));
+				getPremiseSubsumer(factory));
+	}
+
+	private ElkClassExpression getPremiseSubsumer(
+			final ConclusionMatchExpressionFactory factory) {
+		final int pos = getPosition();
+		return conclusionSubsumerMatch_.accept(
+				new IndexedObjectUnionOfMatch.Visitor<ElkClassExpression>() {
+
+					@Override
+					public ElkClassExpression visit(
+							IndexedObjectUnionOfOneOfMatch match) {
+						return factory.getObjectOneOf(
+								match.getValue().getIndividuals().get(pos));
+					}
+
+					@Override
+					public ElkClassExpression visit(
+							IndexedObjectUnionOfUnionOfMatch match) {
+						return match.getValue().getClassExpressions().get(pos);
+					}
+				});
+
 	}
 
 	@Override

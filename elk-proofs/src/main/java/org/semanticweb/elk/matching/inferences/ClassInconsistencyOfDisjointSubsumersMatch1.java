@@ -26,7 +26,7 @@ import org.semanticweb.elk.matching.conclusions.ClassInconsistencyMatch1;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.DisjointSubsumerMatch1;
 import org.semanticweb.elk.matching.conclusions.DisjointSubsumerMatch1Watch;
-import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfDisjointSubsumers;
 
 public class ClassInconsistencyOfDisjointSubsumersMatch1

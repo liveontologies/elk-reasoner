@@ -27,16 +27,12 @@ package org.semanticweb.elk.proofs.utils;
 import java.util.Set;
 
 import org.semanticweb.elk.exceptions.ElkException;
-import org.semanticweb.elk.matching.Matcher;
 import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
-import org.semanticweb.elk.owl.inferences.ModifiableElkInferenceSet;
-import org.semanticweb.elk.owl.inferences.ModifiableElkInferenceSetImpl;
+import org.semanticweb.elk.owl.inferences.ReasonerProofProvider;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,21 +53,8 @@ public class TestUtils {
 			Set<? extends ElkAxiom> ontology, ElkObject.Factory factory,
 			ElkSubClassOfAxiom subsumption) throws ElkException {
 
-		ModifiableElkInferenceSet elkInferences = new ModifiableElkInferenceSetImpl(
-				factory);
-		ClassConclusion conclusion = reasoner.getConclusion(subsumption);
-		if (conclusion == null) {
-			throw new AssertionError(String.format(
-					"%s: subsumption contains expressions not occurring in the ontology",
-					subsumption));
-		}
-		Matcher matcher = new Matcher(reasoner.explainConclusion(conclusion),
-				factory, elkInferences);
-		if (conclusion instanceof SubClassInclusionComposed) {
-			matcher.trace((SubClassInclusionComposed) conclusion);
-		}
-
-		provabilityTest(elkInferences, ontology, subsumption);
+		provabilityTest(new ReasonerProofProvider(reasoner, factory)
+				.getInferences(subsumption), ontology, subsumption);
 
 	}
 

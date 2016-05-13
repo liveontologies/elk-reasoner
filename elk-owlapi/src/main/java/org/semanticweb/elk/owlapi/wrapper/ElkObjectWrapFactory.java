@@ -255,7 +255,7 @@ public class ElkObjectWrapFactory implements ElkObject.Factory {
 	}
 
 	OWLIndividual convert(ElkIndividual input) {
-		return ((ElkIndividualWrap<?>) input).owlObject;
+		return (OWLIndividual) ((ElkObjectWrap<?>) input).owlObject;
 	}
 
 	OWLAnnotationProperty convert(ElkAnnotationProperty input) {

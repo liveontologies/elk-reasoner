@@ -22,13 +22,11 @@ package org.semanticweb.elk.matching.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.matching.ElkMatchException;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
+import org.semanticweb.elk.matching.subsumers.IndexedClassEntityMatch;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedEntity;
 
 public class SubClassInclusionComposedEntityMatch1
@@ -36,34 +34,22 @@ public class SubClassInclusionComposedEntityMatch1
 
 	private final IndexedContextRootMatch originMatch_;
 
-	private final ElkClass conclusionSubsumerMatch_;
-
-	private SubClassInclusionComposedEntityMatch1(
-			SubClassInclusionComposedEntity parent,
-			IndexedContextRootMatch originMatch,
-			ElkClassExpression subsumerMatch) {
-		super(parent);
-		this.originMatch_ = originMatch;
-		if (subsumerMatch instanceof ElkClass) {
-			conclusionSubsumerMatch_ = (ElkClass) subsumerMatch;
-		} else {
-			throw new ElkMatchException(parent.getConclusionSubsumer(),
-					subsumerMatch);
-		}
-	}
+	private final IndexedClassEntityMatch conclusionSubsumerMatch_;
 
 	SubClassInclusionComposedEntityMatch1(
 			SubClassInclusionComposedEntity parent,
 			SubClassInclusionComposedMatch1 conclusionMatch) {
-		this(parent, conclusionMatch.getDestinationMatch(),
-				conclusionMatch.getSubsumerGeneralMatch());
+		super(parent);
+		this.originMatch_ = conclusionMatch.getDestinationMatch();
+		this.conclusionSubsumerMatch_ = conclusionMatch
+				.getSubsumerIndexedClassEntityMatch();
 	}
 
 	public IndexedContextRootMatch getOriginMatch() {
 		return originMatch_;
 	}
 
-	public ElkClass getConclusionSubsumerMatch() {
+	public IndexedClassEntityMatch getConclusionSubsumerMatch() {
 		return conclusionSubsumerMatch_;
 	}
 

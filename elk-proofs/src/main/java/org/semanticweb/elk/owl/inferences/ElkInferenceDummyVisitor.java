@@ -38,12 +38,6 @@ public class ElkInferenceDummyVisitor<O> implements ElkInference.Visitor<O> {
 	}
 
 	@Override
-	public O visit(
-			ElkClassInclusionOwlThingEmptyObjectIntersectionOf inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
 	public O visit(ElkClassInclusionEmptyObjectOneOfOwlNothing inference) {
 		return defaultVisit(inference);
 	}
@@ -64,12 +58,22 @@ public class ElkInferenceDummyVisitor<O> implements ElkInference.Visitor<O> {
 	}
 
 	@Override
+	public O visit(ElkClassInclusionExistentialOwlNothing inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
 	public O visit(ElkClassInclusionExistentialPropertyExpansion inference) {
 		return defaultVisit(inference);
 	}
 
 	@Override
 	public O visit(ElkClassInclusionHierarchy inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkClassInclusionNegationClash inference) {
 		return defaultVisit(inference);
 	}
 
@@ -85,17 +89,17 @@ public class ElkInferenceDummyVisitor<O> implements ElkInference.Visitor<O> {
 	}
 
 	@Override
+	public O visit(ElkClassInclusionObjectOneOfInclusion inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
 	public O visit(ElkClassInclusionObjectUnionOfComposition inference) {
 		return defaultVisit(inference);
 	}
 
 	@Override
 	public O visit(ElkClassInclusionOfClassAssertion inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
-	public O visit(ElkClassInclusionOfDifferentIndividuals inference) {
 		return defaultVisit(inference);
 	}
 
@@ -135,6 +139,12 @@ public class ElkInferenceDummyVisitor<O> implements ElkInference.Visitor<O> {
 	}
 
 	@Override
+	public O visit(
+			ElkClassInclusionOwlThingEmptyObjectIntersectionOf inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
 	public O visit(ElkClassInclusionReflexivePropertyRange inference) {
 		return defaultVisit(inference);
 	}
@@ -151,12 +161,27 @@ public class ElkInferenceDummyVisitor<O> implements ElkInference.Visitor<O> {
 	}
 
 	@Override
+	public O visit(ElkDisjointClassesOfDifferentIndividuals inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
 	public O visit(ElkDisjointClassesOfDisjointUnion inference) {
 		return defaultVisit(inference);
 	}
 
 	@Override
+	public O visit(ElkEquivalentClassesObjectHasValue inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
 	public O visit(ElkEquivalentClassesOfDisjointUnion inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkEquivalentClassesOfSameIndividual inference) {
 		return defaultVisit(inference);
 	}
 

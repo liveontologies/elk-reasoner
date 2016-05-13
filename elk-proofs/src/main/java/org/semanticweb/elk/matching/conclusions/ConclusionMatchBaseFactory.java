@@ -24,10 +24,14 @@ package org.semanticweb.elk.matching.conclusions;
 
 import java.util.List;
 
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatchChain;
+import org.semanticweb.elk.matching.subsumers.IndexedObjectSomeValuesFromMatch;
+import org.semanticweb.elk.matching.subsumers.SubsumerMatch;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
@@ -176,7 +180,7 @@ public class ConclusionMatchBaseFactory implements ConclusionMatch.Factory {
 	public PropagationMatch1 getPropagationMatch1(Propagation parent,
 			IndexedContextRootMatch destinationMatch,
 			ElkObjectProperty subDestinationMatch,
-			ElkObjectSomeValuesFrom carryMatch) {
+			IndexedObjectSomeValuesFromMatch carryMatch) {
 		return new PropagationMatch1(parent, destinationMatch,
 				subDestinationMatch, carryMatch);
 	}
@@ -197,9 +201,18 @@ public class ConclusionMatchBaseFactory implements ConclusionMatch.Factory {
 	public SubClassInclusionComposedMatch1 getSubClassInclusionComposedMatch1(
 			SubClassInclusionComposed parent,
 			IndexedContextRootMatch destinationMatch,
-			ElkClassExpression subsumerMatch) {
+			ElkClassExpression subsumerMatchValue) {
 		return new SubClassInclusionComposedMatch1(parent, destinationMatch,
-				subsumerMatch);
+				subsumerMatchValue);
+	}
+
+	@Override
+	public SubClassInclusionComposedMatch1 getSubClassInclusionComposedMatch1(
+			SubClassInclusionComposed parent,
+			IndexedContextRootMatch destinationMatch,
+			ElkIndividual subsumerMatchValue) {
+		return new SubClassInclusionComposedMatch1(parent, destinationMatch,
+				subsumerMatchValue);
 	}
 
 	@Override
@@ -210,6 +223,15 @@ public class ConclusionMatchBaseFactory implements ConclusionMatch.Factory {
 			int subsumerPrefixLength) {
 		return new SubClassInclusionComposedMatch1(parent, destinationMatch,
 				fullSubsumerMatch, subsumerPrefixLength);
+	}
+
+	@Override
+	public SubClassInclusionComposedMatch1 getSubClassInclusionComposedMatch1(
+			SubClassInclusionComposed parent,
+			IndexedContextRootMatch destinationMatch,
+			SubsumerMatch subsumerMatch) {
+		return new SubClassInclusionComposedMatch1(parent, destinationMatch,
+				subsumerMatch);
 	}
 
 	@Override
@@ -229,10 +251,25 @@ public class ConclusionMatchBaseFactory implements ConclusionMatch.Factory {
 	@Override
 	public SubClassInclusionDecomposedMatch2 getSubClassInclusionDecomposedMatch2(
 			SubClassInclusionDecomposedMatch1 parent,
+			ElkIndividual subsumerMatchValue) {
+		return new SubClassInclusionDecomposedMatch2(parent,
+				subsumerMatchValue);
+	}
+
+	@Override
+	public SubClassInclusionDecomposedMatch2 getSubClassInclusionDecomposedMatch2(
+			SubClassInclusionDecomposedMatch1 parent,
 			ElkObjectIntersectionOf subsumerFullConjunctionMatch,
 			int subsumerConjunctionPrefixLength) {
 		return new SubClassInclusionDecomposedMatch2(parent,
 				subsumerFullConjunctionMatch, subsumerConjunctionPrefixLength);
+	}
+
+	@Override
+	public SubClassInclusionDecomposedMatch2 getSubClassInclusionDecomposedMatch2(
+			SubClassInclusionDecomposedMatch1 parent,
+			SubsumerMatch subsumerMatch) {
+		return new SubClassInclusionDecomposedMatch2(parent, subsumerMatch);
 	}
 
 	@Override

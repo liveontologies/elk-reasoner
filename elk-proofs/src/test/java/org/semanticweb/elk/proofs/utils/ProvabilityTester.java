@@ -174,7 +174,7 @@ public class ProvabilityTester {
 
 	private void toCheck(ElkAxiom conclusion) {
 		if (checked_.add(conclusion)) {
-			LOGGER_.trace("{}: new lemma", conclusion);
+			LOGGER_.trace("{}: new subgoal", conclusion);
 			toCheck_.add(conclusion);
 		}
 	}
@@ -200,7 +200,7 @@ public class ProvabilityTester {
 	}
 
 	private void check(ElkInference inf, int pos) {
-		for (int i = pos; i < inf.getPremiseCount() - 1; i++) {
+		for (int i = pos; i < inf.getPremiseCount(); i++) {
 			ElkAxiom premise = inf.getPremise(i, factory_);
 			if (!proved_.contains(premise)) {
 				addWatch(premise, inf, i);
@@ -208,6 +208,7 @@ public class ProvabilityTester {
 			}
 		}
 		// all premises are proved
+		LOGGER_.trace("{}: fire", inf);
 		proved(inf.getConclusion(factory_));
 	}
 

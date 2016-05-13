@@ -39,7 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  *    (1)      (2)
  *  !([C])  Range(R,D)
  * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ where C = (∃R^-.T) ⊓ C'
- *       [C] ⊑ D
+ *       [C] ⊑ -D
  * </pre>
  * 
  * The parameters can be obtained as follows:<br>

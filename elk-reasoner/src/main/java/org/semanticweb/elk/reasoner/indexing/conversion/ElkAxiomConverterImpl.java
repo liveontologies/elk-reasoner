@@ -440,21 +440,15 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 		}
 		/*
 		 * otherwise create a binary disjointness axioms for all pairs (first,
-		 * second) where second occurs after first in members
+		 * second) where second occurs after the first in the member list
 		 */
 		for (int firstPos = 0; firstPos < members.size(); firstPos++) {
 			M first = members.get(firstPos);
 			ModifiableIndexedClassExpression firstIndexed = indexer
 					.convert(first);
-			boolean selfFound = false;
-			for (int secondPos = 0; secondPos < members.size(); secondPos++) {
+			for (int secondPos = firstPos + 1; secondPos < members
+					.size(); secondPos++) {
 				M second = members.get(secondPos);
-				if (!selfFound) {
-					if (second == first)
-						selfFound = true;
-					continue;
-				}
-				// else second appears after first
 				ModifiableIndexedClassExpression secondIndexed = indexer
 						.convert(second);
 				indexer.indexBinary(axiom, firstPos, secondPos,

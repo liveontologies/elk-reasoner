@@ -23,13 +23,11 @@ package org.semanticweb.elk.matching.inferences;
  */
 
 import org.semanticweb.elk.matching.ElkMatchException;
-import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
-import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
+import org.semanticweb.elk.matching.subsumers.IndexedObjectSomeValuesFromMatch;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.classes.DummyIndexedContextRootVisitor;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
@@ -39,30 +37,19 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedRangeFiller;
 abstract class LinkOfObjectSomeValuesFromMatch2<P>
 		extends AbstractInferenceMatch<P> {
 
-	private final ElkObjectSomeValuesFrom premiseSubsumerMatch_;
-
-	private LinkOfObjectSomeValuesFromMatch2(P parent,
-			ElkClassExpression subsumerMatch,
-			SubClassInclusionDecomposedMatch1 parentMatch) {
-		super(parent);
-		if (subsumerMatch instanceof ElkObjectSomeValuesFrom) {
-			this.premiseSubsumerMatch_ = (ElkObjectSomeValuesFrom) subsumerMatch;
-		} else {
-			throw new ElkMatchException(parentMatch.getParent().getSubsumer(),
-					subsumerMatch);
-		}
-	}
+	private final IndexedObjectSomeValuesFromMatch premiseSubsumerMatch_;
 
 	public LinkOfObjectSomeValuesFromMatch2(P parent,
 			SubClassInclusionDecomposedMatch2 premiseMatch) {
-		this(parent, premiseMatch.getSubsumerGeneralMatch(),
-				premiseMatch.getParent());
+		super(parent);
+		this.premiseSubsumerMatch_ = premiseMatch
+				.getSubsumerIndexedObjectSomeValuesFromMatch();
 	}
 
 	ElkObjectProperty getPremisePropertyMatch(
 			IndexedObjectProperty premiseProperty) {
 		ElkObjectPropertyExpression premisePropertyMatch = premiseSubsumerMatch_
-				.getProperty();
+				.getPropertyMatch();
 		if (premisePropertyMatch instanceof ElkObjectProperty) {
 			return (ElkObjectProperty) premisePropertyMatch;
 		} else {
@@ -78,15 +65,14 @@ abstract class LinkOfObjectSomeValuesFromMatch2<P>
 					@Override
 					protected IndexedContextRootMatch defaultVisit(
 							IndexedClassExpression element) {
-						return factory.getIndexedClassExpressionMatch(
-								premiseSubsumerMatch_.getFiller());
+						return premiseSubsumerMatch_
+								.getFillerRootMatch(factory);
 					}
 
 					@Override
 					public IndexedContextRootMatch visit(
 							IndexedRangeFiller element) {
-						return factory.getIndexedRangeFillerMatch(
-								premiseSubsumerMatch_);
+						return premiseSubsumerMatch_.getRangeRootMatch(factory);
 					}
 
 				});

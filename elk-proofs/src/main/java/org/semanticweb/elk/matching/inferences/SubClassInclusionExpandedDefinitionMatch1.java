@@ -23,10 +23,10 @@ package org.semanticweb.elk.matching.inferences;
  */
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionExpandedDefinition;
 
 public class SubClassInclusionExpandedDefinitionMatch1

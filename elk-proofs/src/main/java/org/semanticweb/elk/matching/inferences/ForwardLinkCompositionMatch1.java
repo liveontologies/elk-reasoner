@@ -25,7 +25,7 @@ package org.semanticweb.elk.matching.inferences;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1Watch;
-import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkComposition;
 
 public class ForwardLinkCompositionMatch1

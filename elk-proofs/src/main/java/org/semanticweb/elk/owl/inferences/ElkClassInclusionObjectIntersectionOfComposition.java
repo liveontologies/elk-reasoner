@@ -1,5 +1,7 @@
 package org.semanticweb.elk.owl.inferences;
 
+import java.util.ArrayList;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -56,6 +58,17 @@ public class ElkClassInclusionObjectIntersectionOfComposition
 		this.subExpression_ = subExpression;
 		this.conjuncts_ = conjuncts;
 	}
+	
+	ElkClassInclusionObjectIntersectionOfComposition(
+			ElkClassExpression subExpression, ElkClassExpression firstConjunct,
+			ElkClassExpression secondConjunct) {
+		this.subExpression_ = subExpression;
+		List<ElkClassExpression> conjuncts = new ArrayList<ElkClassExpression>(
+				2);
+		this.conjuncts_ = conjuncts;
+		conjuncts.add(firstConjunct);
+		conjuncts.add(secondConjunct);
+	}
 
 	public ElkClassExpression getSubExpression() {
 		return subExpression_;
@@ -104,6 +117,11 @@ public class ElkClassInclusionObjectIntersectionOfComposition
 		ElkClassInclusionObjectIntersectionOfComposition getElkClassInclusionObjectIntersectionOfComposition(
 				ElkClassExpression subExpression,
 				List<? extends ElkClassExpression> conjuncts);
+		
+		ElkClassInclusionObjectIntersectionOfComposition getElkClassInclusionObjectIntersectionOfComposition(
+				ElkClassExpression subExpression,
+				ElkClassExpression firstConjunct,
+				ElkClassExpression secondConjunct);
 
 	}
 

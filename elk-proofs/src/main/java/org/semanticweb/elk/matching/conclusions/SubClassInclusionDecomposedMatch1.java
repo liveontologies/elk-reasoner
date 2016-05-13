@@ -1,5 +1,7 @@
 package org.semanticweb.elk.matching.conclusions;
 
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
+
 /*
  * #%L
  * ELK Proofs Package

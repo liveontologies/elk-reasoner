@@ -1,4 +1,4 @@
-package org.semanticweb.elk.matching.conclusions;
+package org.semanticweb.elk.matching.subsumers;
 
 /*
  * #%L
@@ -22,24 +22,32 @@ package org.semanticweb.elk.matching.conclusions;
  * #L%
  */
 
-public class IndexedContextRootMatchChain {
+import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 
-	private final IndexedContextRootMatch head_;
+public class IndexedObjectUnionOfUnionOfMatch
+		extends AbstractIndexedObjectUnionOfMatch<ElkObjectUnionOf> {
 
-	private final IndexedContextRootMatchChain tail_;
-
-	public IndexedContextRootMatchChain(IndexedContextRootMatch head,
-			IndexedContextRootMatchChain tail) {
-		this.head_ = head;
-		this.tail_ = tail;
+	IndexedObjectUnionOfUnionOfMatch(ElkObjectUnionOf value) {
+		super(value);
 	}
 
-	public IndexedContextRootMatch getHead() {
-		return head_;
+	@Override
+	public <O> O accept(IndexedObjectUnionOfMatch.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
-	public IndexedContextRootMatchChain getTail() {
-		return tail_;
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(IndexedObjectUnionOfUnionOfMatch match);
+
 	}
 
 }

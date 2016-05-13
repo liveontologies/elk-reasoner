@@ -1,5 +1,8 @@
 package org.semanticweb.elk.matching.conclusions;
 
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
+import org.semanticweb.elk.matching.subsumers.SubsumerMatch;
+
 /*
  * #%L
  * ELK Reasoner
@@ -23,6 +26,7 @@ package org.semanticweb.elk.matching.conclusions;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
@@ -34,17 +38,30 @@ public class SubClassInclusionComposedMatch1
 
 	SubClassInclusionComposedMatch1(SubClassInclusionComposed parent,
 			IndexedContextRootMatch destinationMatch,
-			ElkClassExpression subsumerGeneralMatch) {
-		super(parent, subsumerGeneralMatch);
+			ElkClassExpression subsumerMatchValue) {
+		super(parent, subsumerMatchValue);
 		this.destinationMatch_ = destinationMatch;
 	}
 
 	SubClassInclusionComposedMatch1(SubClassInclusionComposed parent,
 			IndexedContextRootMatch destinationMatch,
-			ElkObjectIntersectionOf subsumerFullConjunctionMatch,
-			int subsumerConjunctionPrefixLength) {
-		super(parent, subsumerFullConjunctionMatch,
-				subsumerConjunctionPrefixLength);
+			ElkIndividual subsumerMatchValue) {
+		super(parent, subsumerMatchValue);
+		this.destinationMatch_ = destinationMatch;
+	}
+	
+	SubClassInclusionComposedMatch1(SubClassInclusionComposed parent,
+			IndexedContextRootMatch destinationMatch,
+			ElkObjectIntersectionOf fullSubsumerMatch,
+			int subsumerPrefixLength) {
+		super(parent, fullSubsumerMatch, subsumerPrefixLength);
+		this.destinationMatch_ = destinationMatch;
+	}
+
+	SubClassInclusionComposedMatch1(SubClassInclusionComposed parent,
+			IndexedContextRootMatch destinationMatch,
+			SubsumerMatch subsumerMatch) {
+		super(parent, subsumerMatch);
 		this.destinationMatch_ = destinationMatch;
 	}
 
@@ -73,13 +90,23 @@ public class SubClassInclusionComposedMatch1
 		SubClassInclusionComposedMatch1 getSubClassInclusionComposedMatch1(
 				SubClassInclusionComposed parent,
 				IndexedContextRootMatch destinationMatch,
-				ElkClassExpression subsumerMatch);
+				ElkClassExpression subsumerMatchValue);
+		
+		SubClassInclusionComposedMatch1 getSubClassInclusionComposedMatch1(
+				SubClassInclusionComposed parent,
+				IndexedContextRootMatch destinationMatch,
+				ElkIndividual subsumerMatchValue);
 
 		SubClassInclusionComposedMatch1 getSubClassInclusionComposedMatch1(
 				SubClassInclusionComposed parent,
 				IndexedContextRootMatch destinationMatch,
 				ElkObjectIntersectionOf fullSubsumerMatch,
 				int subsumerPrefixLength);
+
+		SubClassInclusionComposedMatch1 getSubClassInclusionComposedMatch1(
+				SubClassInclusionComposed parent,
+				IndexedContextRootMatch destinationMatch,
+				SubsumerMatch subsumerMatch);
 
 	}
 

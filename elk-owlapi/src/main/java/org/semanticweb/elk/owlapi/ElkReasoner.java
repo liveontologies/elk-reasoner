@@ -32,12 +32,10 @@ import java.util.Set;
 
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
-import org.semanticweb.elk.matching.Matcher;
-import org.semanticweb.elk.owl.inferences.ModifiableElkInferenceSet;
-import org.semanticweb.elk.owl.inferences.ModifiableElkInferenceSetImpl;
+import org.semanticweb.elk.owl.inferences.ReasonerProofProvider;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owlapi.proofs.OwlAxiomExpressionWrap;
 import org.semanticweb.elk.owlapi.wrapper.ElkObjectWrapFactory;
 import org.semanticweb.elk.owlapi.wrapper.OwlClassAxiomConverterVisitor;
@@ -48,8 +46,6 @@ import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.util.logging.LogLevel;
@@ -69,7 +65,6 @@ import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
 import org.semanticweb.owlapi.model.OWLOntologyChangeProgressListener;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.reasoner.AxiomNotInProfileException;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
 import org.semanticweb.owlapi.reasoner.ClassExpressionNotInProfileException;
@@ -141,6 +136,8 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 	private final ReasonerStageExecutor stageExecutor_;
 	/** the ELK reasoner instance used for reasoning */
 	private Reasoner reasoner_;
+	/** Inferences for derived ELK axioms */
+	private ReasonerProofProvider elkProofProvider_;
 
 	/**
 	 * {@code true} if the ontology should be loaded before any changes are
@@ -228,6 +225,8 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 		// switch to the primary progress monitor; this is to avoid bugs with
 		// progress monitors in Protege
 		this.reasoner_.setProgressMonitor(this.secondaryProgressMonitor_);
+		this.elkProofProvider_ = new ReasonerProofProvider(reasoner_,
+				objectFactory_);
 	}
 
 	/**
@@ -954,41 +953,11 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 	@Override
 	public OWLAxiomExpression getDerivedExpression(OWLAxiom axiom)
 			throws ProofGenerationException {
-		// support only class subsumptions for the moment
-		if (axiom instanceof OWLSubClassOfAxiom) {
-			OWLSubClassOfAxiom scAxiom = (OWLSubClassOfAxiom) axiom;
-			ElkSubClassOfAxiom elkAxiom = (ElkSubClassOfAxiom) scAxiom
-					.accept(OwlClassAxiomConverterVisitor.getInstance());
-			try {
-				ClassConclusion conclusion = reasoner_.getConclusion(elkAxiom);
-				ElkObject.Factory factory = new ElkObjectWrapFactory(
-						owlOntologymanager_.getOWLDataFactory());
-				ModifiableElkInferenceSet elkInferences = new ModifiableElkInferenceSetImpl(
-						factory);
-				if (conclusion == null) {
-					// not derivable
-					return new OwlAxiomExpressionWrap(elkAxiom, elkInferences,
-							owlOntology_, factory);
-				}
-				Matcher matcher = new Matcher(
-						reasoner_.explainConclusion(conclusion), factory,
-						elkInferences);
-				if (conclusion instanceof SubClassInclusionComposed) {
-					matcher.trace((SubClassInclusionComposed) conclusion);
-				}
-
-				return new OwlAxiomExpressionWrap(elkAxiom, elkInferences,
-						owlOntology_, factory);
-
-			} catch (ElkException e) {
-				LOGGER_.error("Error during proof reconstruction", e);
-
-				throw new ProofGenerationException(e);
-			}
-		}
-		// else
-
-		throw new UnsupportedEntailmentTypeException(axiom);
+		ElkClassAxiom elkAxiom = axiom
+				.accept(OwlClassAxiomConverterVisitor.getInstance());
+		return new OwlAxiomExpressionWrap(elkAxiom,
+				elkProofProvider_.getInferences(elkAxiom), owlOntology_,
+				objectFactory_);
 	}
 	
 	@Override

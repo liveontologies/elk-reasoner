@@ -1,4 +1,4 @@
-package org.semanticweb.elk.matching.conclusions;
+package org.semanticweb.elk.matching.subsumers;
 
 /*
  * #%L
@@ -22,27 +22,31 @@ package org.semanticweb.elk.matching.conclusions;
  * #L%
  */
 
-public class SubsumerMatchPrinter implements SubsumerMatch.Visitor<String> {
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 
-	private static SubsumerMatchPrinter INSTANCE_ = new SubsumerMatchPrinter();
+public interface SubsumerElkObjectMatch extends SubsumerMatch {
 
-	private SubsumerMatchPrinter() {
+	ElkObject getValue();
 
-	}
+	<O> O accept(Visitor<O> visitor);
 
-	public static String toString(SubsumerMatch match) {
-		return match.accept(INSTANCE_);
-	}
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> extends IndexedClassEntityMatch.Visitor<O>,
+			IndexedDataHasValueMatch.Visitor<O>,
+			IndexedObjectComplementOfMatch.Visitor<O>,
+			IndexedObjectHasSelfMatch.Visitor<O>,
+			IndexedObjectSomeValuesFromMatch.Visitor<O>,
+			IndexedObjectUnionOfMatch.Visitor<O> {
 
-	@Override
-	public String visit(SubsumerGeneralMatch subsumerMatch) {
-		return subsumerMatch.getGeneralMatch().toString();
-	}
+		// combined interface
 
-	@Override
-	public String visit(SubsumerPartialConjunctionMatch subsumerMatch) {
-		return subsumerMatch.getFullConjunctionMatch() + "[-"
-				+ subsumerMatch.getConjunctionPrefixLength() + "]";
 	}
 
 }

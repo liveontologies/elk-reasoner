@@ -33,9 +33,8 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  * Represents the inference:
  * 
  * <pre>
- *      C ⊑ D
  * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
- *   C ⊑ (..⊔ D ⊔..)
+ *   D ⊑ (..⊔ D ⊔..)
  * </pre>
  * 
  * @author Yevgeny Kazakov
@@ -44,23 +43,16 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 public class ElkClassInclusionObjectUnionOfComposition
 		extends AbstractElkInference {
 	
-	private final static String NAME_ = "Disjunction Composition";
-
-	private final ElkClassExpression subExpression_;
+	private final static String NAME_ = "Disjunction From Disjunct";
 
 	private final List<? extends ElkClassExpression> disjuncts_;
 
 	private final int disjunctPos_;
 
-	ElkClassInclusionObjectUnionOfComposition(ElkClassExpression subExpression,
+	ElkClassInclusionObjectUnionOfComposition(
 			List<? extends ElkClassExpression> disjuncts, int disjunctPos) {
-		this.subExpression_ = subExpression;
 		this.disjuncts_ = disjuncts;
 		this.disjunctPos_ = disjunctPos;
-	}
-
-	public ElkClassExpression getSubExpression() {
-		return subExpression_;
 	}
 
 	public List<? extends ElkClassExpression> getDisjuncts() {
@@ -78,26 +70,17 @@ public class ElkClassInclusionObjectUnionOfComposition
 	
 	@Override
 	public int getPremiseCount() {
-		return 1;
+		return 0;
 	}
 
 	@Override
 	public ElkAxiom getPremise(int index, ElkObject.Factory factory) {
-		if (index == 0) {
-			return getPremise(factory);
-		}
-		// else
 		return failGetPremise(index);
-	}
-
-	public ElkSubClassOfAxiom getPremise(ElkObject.Factory factory) {
-		return factory.getSubClassOfAxiom(subExpression_,
-				disjuncts_.get(disjunctPos_));
 	}
 
 	@Override
 	public ElkSubClassOfAxiom getConclusion(ElkObject.Factory factory) {
-		return factory.getSubClassOfAxiom(subExpression_,
+		return factory.getSubClassOfAxiom(disjuncts_.get(disjunctPos_),
 				factory.getObjectUnionOf(disjuncts_));
 	}
 
@@ -115,7 +98,6 @@ public class ElkClassInclusionObjectUnionOfComposition
 	public interface Factory {
 
 		ElkClassInclusionObjectUnionOfComposition getElkClassInclusionObjectUnionOfComposition(
-				ElkClassExpression subExpression,
 				List<? extends ElkClassExpression> disjuncts, int disjunctPos);
 
 	}

@@ -24,7 +24,9 @@ package org.semanticweb.elk.owlapi.proofs;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
@@ -53,9 +55,15 @@ import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
  */
 public class ProofTest {
 
+	OWLDataFactory factory;
+	
+	@Before 
+	public void initialize() {
+		factory = OWLManager.getOWLDataFactory();
+	}
+	
 	@Test
 	public void reflexiveRoles() throws Exception {
-		final OWLDataFactory factory = OWLManager.getOWLDataFactory();
 		// loading and classifying via the OWL API
 		final OWLOntology ontology = loadOntology(
 				ProofTest.class.getClassLoader().getResourceAsStream(
@@ -76,7 +84,6 @@ public class ProofTest {
 
 	@Test
 	public void reflexiveRoles2() throws Exception {
-		final OWLDataFactory factory = OWLManager.getOWLDataFactory();
 		final OWLOntology ontology = loadOntology(
 				ProofTest.class.getClassLoader().getResourceAsStream(
 						"classification_test_input/ReflexiveRole.owl"));
@@ -94,7 +101,6 @@ public class ProofTest {
 
 	@Test
 	public void compositionReflexivity() throws Exception {
-		final OWLDataFactory factory = OWLManager.getOWLDataFactory();
 		// loading and classifying via the OWL API
 		final OWLOntology ontology = loadOntology(
 				ProofTest.class.getClassLoader().getResourceAsStream(
@@ -115,7 +121,6 @@ public class ProofTest {
 
 	@Test
 	public void emptyConjunction() throws Exception {
-		final OWLDataFactory factory = OWLManager.getOWLDataFactory();
 		OWLOntologyManager owlManager = OWLManager
 				.createConcurrentOWLOntologyManager();
 		// creating an ontology
@@ -152,7 +157,6 @@ public class ProofTest {
 	
 	@Test
 	public void emptyDisjunction() throws Exception {
-		final OWLDataFactory factory = OWLManager.getOWLDataFactory();
 		OWLOntologyManager owlManager = OWLManager
 				.createConcurrentOWLOntologyManager();
 		// creating an ontology
@@ -185,7 +189,6 @@ public class ProofTest {
 	
 	@Test
 	public void emptyEnumeration() throws Exception {
-		final OWLDataFactory factory = OWLManager.getOWLDataFactory();
 		OWLOntologyManager owlManager = OWLManager
 				.createConcurrentOWLOntologyManager();
 		// creating an ontology
@@ -217,8 +220,30 @@ public class ProofTest {
 	}
 	
 	@Test
+	public void emptyDisjointUnion() throws Exception {
+		OWLOntologyManager owlManager = OWLManager
+				.createConcurrentOWLOntologyManager();
+		// creating an ontology
+		final OWLOntology ontology = owlManager.createOntology();
+		OWLClass a = factory.getOWLClass(IRI.create("http://example.org/A"));
+		OWLClass b = factory.getOWLClass(IRI.create("http://example.org/B"));
+		// DisjointUnion(A ) = EquivalentClasses(A owl:Nothing)
+		owlManager.addAxiom(ontology, factory.getOWLDisjointUnionAxiom(a,
+				Collections.<OWLClassExpression> emptySet()));
+		owlManager.addAxiom(ontology,
+				factory.getOWLSubClassOfAxiom(b, b));
+		
+		final ExplainingOWLReasoner reasoner = OWLAPITestUtils
+				.createReasoner(ontology);
+
+		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+
+		ProofTestUtils.provabilityTest(reasoner,
+				factory.getOWLSubClassOfAxiom(a, b));
+	}
+	
+	@Test
 	public void proofsUnderOntologyUpdate() throws Exception {
-		OWLDataFactory factory = OWLManager.getOWLDataFactory();
 		// loading and classifying via the OWL API
 		OWLOntology ontology = loadOntology(
 				ProofTest.class.getClassLoader().getResourceAsStream(
@@ -269,8 +294,6 @@ public class ProofTest {
 
 	void printInferences(ExplainingOWLReasoner reasoner, OWLClassExpression sub,
 			OWLClassExpression sup) throws ProofGenerationException {
-		OWLDataFactory factory = OWLManager.getOWLDataFactory();
-
 		RecursiveInferenceVisitor.visitInferences(reasoner,
 				factory.getOWLSubClassOfAxiom(sub, sup),
 				new OWLInferenceVisitor() {

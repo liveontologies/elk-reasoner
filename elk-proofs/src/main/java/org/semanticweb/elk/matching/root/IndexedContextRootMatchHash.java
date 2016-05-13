@@ -1,4 +1,4 @@
-package org.semanticweb.elk.matching.conclusions;
+package org.semanticweb.elk.matching.root;
 
 /*
  * #%L
@@ -22,7 +22,6 @@ package org.semanticweb.elk.matching.conclusions;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 import org.semanticweb.elk.util.hashing.Hasher;
 
@@ -32,29 +31,25 @@ public class IndexedContextRootMatchHash
 
 	private static final IndexedContextRootMatchHash INSTANCE_ = new IndexedContextRootMatchHash();
 
-	// forbid construction; only static methods should be used
-	private IndexedContextRootMatchHash() {
-
-	}
-
-	public static int hashCode(IndexedContextRootMatch match) {
-		return match == null ? 0 : match.accept(INSTANCE_);
+	private static int combinedHashCode(int... hashes) {
+		return HashGenerator.combineListHash(hashes);
 	}
 
 	public static IndexedContextRootMatch.Visitor<Integer> getHashVisitor() {
 		return INSTANCE_;
 	}
 
-	private static int combinedHashCode(int... hashes) {
-		return HashGenerator.combineListHash(hashes);
+	public static int hashCode(IndexedContextRootMatch match) {
+		return match == null ? 0 : match.accept(INSTANCE_);
 	}
 
-	private static int hashCode(Class<?> c) {
-		return c.hashCode();
+	private static int hashCode(Object o) {
+		return o.hashCode();
 	}
 
-	private static int hashCode(ElkObject elkObject) {
-		return elkObject.hashCode();
+	// forbid construction; only static methods should be used
+	private IndexedContextRootMatchHash() {
+
 	}
 
 	@Override
@@ -63,14 +58,30 @@ public class IndexedContextRootMatchHash
 	}
 
 	@Override
-	public Integer visit(IndexedClassExpressionMatch match) {
-		return combinedHashCode(hashCode(IndexedClassExpressionMatch.class),
+	public Integer visit(IndexedContextRootClassExpressionMatch match) {
+		return combinedHashCode(
+				hashCode(IndexedContextRootClassExpressionMatch.class),
 				hashCode(match.getValue()));
 	}
 
 	@Override
-	public Integer visit(IndexedRangeFillerMatch match) {
-		return combinedHashCode(hashCode(IndexedRangeFillerMatch.class),
+	public Integer visit(IndexedContextRootIndividualMatch match) {
+		return combinedHashCode(
+				hashCode(IndexedContextRootIndividualMatch.class),
+				hashCode(match.getValue()));
+	}
+
+	@Override
+	public Integer visit(IndexedContextRootRangeHasValueMatch match) {
+		return combinedHashCode(
+				hashCode(IndexedContextRootRangeHasValueMatch.class),
+				hashCode(match.getValue()));
+	}
+
+	@Override
+	public Integer visit(IndexedContextRootRangeSomeValuesFromMatch match) {
+		return combinedHashCode(
+				hashCode(IndexedContextRootRangeSomeValuesFromMatch.class),
 				hashCode(match.getValue()));
 	}
 

@@ -1,4 +1,6 @@
-package org.semanticweb.elk.matching.conclusions;
+package org.semanticweb.elk.matching.root;
+
+import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 
 /*
  * #%L
@@ -29,25 +31,36 @@ public class IndexedContextRootMatchPrinter
 
 	private static IndexedContextRootMatchPrinter INSTANCE_ = new IndexedContextRootMatchPrinter();
 
-	private IndexedContextRootMatchPrinter() {
-
+	static IndexedContextRootMatch.Visitor<String> getPrinterVisitor() {
+		return INSTANCE_;
 	}
 
 	public static String toString(IndexedContextRootMatch match) {
 		return match.accept(INSTANCE_);
 	}
 
-	static IndexedContextRootMatch.Visitor<String> getPrinterVisitor() {
-		return INSTANCE_;
+	private IndexedContextRootMatchPrinter() {
+
 	}
 
 	@Override
-	public String visit(IndexedClassExpressionMatch match) {
+	public String visit(IndexedContextRootClassExpressionMatch match) {
 		return match.getValue().toString();
 	}
 
 	@Override
-	public String visit(IndexedRangeFillerMatch match) {
+	public String visit(IndexedContextRootIndividualMatch match) {
+		return match.getValue().toString();
+	}
+
+	@Override
+	public String visit(IndexedContextRootRangeHasValueMatch match) {
+		ElkObjectHasValue value = match.getValue();
+		return "{" + value.getFiller() + "} ⊓ ∃" + value.getProperty() + "-.";
+	}
+
+	@Override
+	public String visit(IndexedContextRootRangeSomeValuesFromMatch match) {
 		ElkObjectSomeValuesFrom value = match.getValue();
 		return value.getFiller() + " ⊓ ∃" + value.getProperty() + "-.";
 	}

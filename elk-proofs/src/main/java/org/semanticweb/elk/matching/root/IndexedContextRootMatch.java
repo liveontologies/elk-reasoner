@@ -1,4 +1,4 @@
-package org.semanticweb.elk.matching.conclusions;
+package org.semanticweb.elk.matching.root;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
@@ -25,46 +25,11 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * #L%
  */
 
-public abstract class IndexedContextRootMatch {
+public interface IndexedContextRootMatch {
 
-	/**
-	 * hash code, computed on demand
-	 */
-	private int hashCode_ = 0;
+	ElkClassExpression toElkExpression(ElkObject.Factory factory);
 
-	@Override
-	public int hashCode() {
-		if (hashCode_ == 0) {
-			hashCode_ = IndexedContextRootMatchHash.hashCode(this);
-		}
-		// else
-		return hashCode_;
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		// else
-		if (o instanceof IndexedContextRootMatch) {
-			return hashCode() == o.hashCode()
-					&& accept(new IndexedContextRootMatchEquality(
-							(IndexedContextRootMatch) o));
-		}
-		// else
-		return false;
-	}
-
-	@Override
-	public String toString() {
-		return IndexedContextRootMatchPrinter.toString(this);
-	}
-
-	
-	public abstract ElkClassExpression toElkExpression(ElkObject.Factory factory);		
-	
-	public abstract <O> O accept(Visitor<O> visitor);
+	<O> O accept(Visitor<O> visitor);
 
 	/**
 	 * The visitor pattern for instances
@@ -74,8 +39,10 @@ public abstract class IndexedContextRootMatch {
 	 * @param <O>
 	 *            the type of the output
 	 */
-	public interface Visitor<O> extends IndexedClassExpressionMatch.Visitor<O>,
-			IndexedRangeFillerMatch.Visitor<O> {
+	public interface Visitor<O>
+			extends IndexedContextRootClassExpressionMatch.Visitor<O>,
+			IndexedContextRootIndividualMatch.Visitor<O>,
+			IndexedContextRootRangeMatch.Visitor<O> {
 
 		// combined interface
 
@@ -87,8 +54,10 @@ public abstract class IndexedContextRootMatch {
 	 * @author Yevgeny Kazakov
 	 *
 	 */
-	public interface Factory extends IndexedClassExpressionMatch.Factory,
-			IndexedRangeFillerMatch.Factory {
+	public interface Factory
+			extends IndexedContextRootClassExpressionMatch.Factory,
+			IndexedContextRootIndividualMatch.Factory,
+			IndexedContextRootRangeMatch.Factory {
 
 		// combined interface
 

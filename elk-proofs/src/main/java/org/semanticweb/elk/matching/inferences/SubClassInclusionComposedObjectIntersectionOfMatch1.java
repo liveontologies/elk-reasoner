@@ -23,8 +23,9 @@ package org.semanticweb.elk.matching.inferences;
  */
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
+import org.semanticweb.elk.matching.subsumers.IndexedObjectIntersectionOfMatch;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectIntersectionOf;
 
@@ -40,9 +41,11 @@ public class SubClassInclusionComposedObjectIntersectionOfMatch1 extends
 			SubClassInclusionComposedMatch1 conclusionMatch) {
 		super(parent);
 		originMatch_ = conclusionMatch.getDestinationMatch();
-		fullSubsumerMatch_ = conclusionMatch.getSubsumerFullConjunctionMatch();
-		conclusionSubsumerPrefixLength_ = conclusionMatch
-				.getSubsumerConjunctionPrefixLength();
+		IndexedObjectIntersectionOfMatch conclusionSubsumerMatch = conclusionMatch
+				.getSubsumerIndexedObjectIntersectionOfMatch();
+		fullSubsumerMatch_ = conclusionSubsumerMatch.getFullValue();
+		conclusionSubsumerPrefixLength_ = conclusionSubsumerMatch
+				.getPrefixLength();
 	}
 
 	public IndexedContextRootMatch getOriginMatch() {

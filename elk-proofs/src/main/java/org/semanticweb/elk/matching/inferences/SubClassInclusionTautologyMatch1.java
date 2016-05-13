@@ -23,12 +23,15 @@ package org.semanticweb.elk.matching.inferences;
  */
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.IndexedClassExpressionMatch;
-import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
-import org.semanticweb.elk.matching.conclusions.IndexedRangeFillerMatch;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.matching.root.IndexedContextRootClassExpressionMatch;
+import org.semanticweb.elk.matching.root.IndexedContextRootIndividualMatch;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
+import org.semanticweb.elk.matching.root.IndexedContextRootRangeHasValueMatch;
+import org.semanticweb.elk.matching.root.IndexedContextRootRangeSomeValuesFromMatch;
+import org.semanticweb.elk.matching.subsumers.SubsumerMatch;
+import org.semanticweb.elk.matching.subsumers.SubsumerMatches;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionTautology;
 
 public class SubClassInclusionTautologyMatch1
@@ -46,20 +49,34 @@ public class SubClassInclusionTautologyMatch1
 		return originMatch_;
 	}
 
-	ElkClassExpression getSubsumerMatch() {
-		return originMatch_.accept(
-				new IndexedContextRootMatch.Visitor<ElkClassExpression>() {
+	SubsumerMatch getSubsumerMatch() {
+		return originMatch_
+				.accept(new IndexedContextRootMatch.Visitor<SubsumerMatch>() {
 
 					@Override
-					public ElkClassExpression visit(
-							IndexedClassExpressionMatch match) {
-						return match.getValue();
+					public SubsumerMatch visit(
+							IndexedContextRootClassExpressionMatch match) {
+						return SubsumerMatches.create(match.getValue());
 					}
 
 					@Override
-					public ElkClassExpression visit(
-							IndexedRangeFillerMatch match) {
-						return match.getValue().getFiller();
+					public SubsumerMatch visit(
+							IndexedContextRootIndividualMatch match) {
+						return SubsumerMatches.create(match.getValue());
+					}
+
+					@Override
+					public SubsumerMatch visit(
+							IndexedContextRootRangeHasValueMatch match) {
+						return SubsumerMatches
+								.create(match.getValue().getFiller());
+					}
+
+					@Override
+					public SubsumerMatch visit(
+							IndexedContextRootRangeSomeValuesFromMatch match) {
+						return SubsumerMatches
+								.create(match.getValue().getFiller());
 					}
 
 				});

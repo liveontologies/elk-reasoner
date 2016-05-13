@@ -1,5 +1,7 @@
 package org.semanticweb.elk.matching.conclusions;
 
+import org.semanticweb.elk.matching.subsumers.SubsumerMatch;
+
 /*
  * #%L
  * ELK Reasoner
@@ -23,6 +25,7 @@ package org.semanticweb.elk.matching.conclusions;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 
@@ -30,15 +33,24 @@ public class SubClassInclusionDecomposedMatch2
 		extends SubClassInclusionMatch<SubClassInclusionDecomposedMatch1> {
 
 	SubClassInclusionDecomposedMatch2(SubClassInclusionDecomposedMatch1 parent,
-			ElkClassExpression subsumerGeneralMatch) {
-		super(parent, subsumerGeneralMatch);
+			ElkClassExpression subsumerMatchValue) {
+		super(parent, subsumerMatchValue);
+	}
+	
+	SubClassInclusionDecomposedMatch2(SubClassInclusionDecomposedMatch1 parent,
+			ElkIndividual subsumerMatchValue) {
+		super(parent, subsumerMatchValue);
 	}
 
 	SubClassInclusionDecomposedMatch2(SubClassInclusionDecomposedMatch1 parent,
-			ElkObjectIntersectionOf subsumerFullConjunctionMatch,
-			int subsumerConjunctionPrefixLength) {
-		super(parent, subsumerFullConjunctionMatch,
-				subsumerConjunctionPrefixLength);
+			ElkObjectIntersectionOf subsumerMatchFullValue,
+			int subsumerMatchPrefixLength) {
+		super(parent, subsumerMatchFullValue, subsumerMatchPrefixLength);
+	}
+
+	SubClassInclusionDecomposedMatch2(SubClassInclusionDecomposedMatch1 parent,
+			SubsumerMatch subsumerMatch) {
+		super(parent, subsumerMatch);
 	}
 
 	@Override
@@ -61,12 +73,20 @@ public class SubClassInclusionDecomposedMatch2
 
 		SubClassInclusionDecomposedMatch2 getSubClassInclusionDecomposedMatch2(
 				SubClassInclusionDecomposedMatch1 parent,
-				ElkClassExpression subsumerMatch);
+				ElkClassExpression subsumerMatchValue);
+		
+		SubClassInclusionDecomposedMatch2 getSubClassInclusionDecomposedMatch2(
+				SubClassInclusionDecomposedMatch1 parent,
+				ElkIndividual subsumerMatchValue);
 
 		SubClassInclusionDecomposedMatch2 getSubClassInclusionDecomposedMatch2(
 				SubClassInclusionDecomposedMatch1 parent,
-				ElkObjectIntersectionOf subsumerFullConjunctionMatch,
-				int subsumerConjunctionPrefixLength);
+				ElkObjectIntersectionOf subsumerMatchFullValue,
+				int subsumerMatchPrefixLength);
+
+		SubClassInclusionDecomposedMatch2 getSubClassInclusionDecomposedMatch2(
+				SubClassInclusionDecomposedMatch1 parent,
+				SubsumerMatch subsumerMatch);
 
 	}
 

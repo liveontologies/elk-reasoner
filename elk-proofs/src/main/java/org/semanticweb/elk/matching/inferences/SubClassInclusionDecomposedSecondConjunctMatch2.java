@@ -24,6 +24,7 @@ package org.semanticweb.elk.matching.inferences;
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
+import org.semanticweb.elk.matching.subsumers.IndexedObjectIntersectionOfMatch;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 
 public class SubClassInclusionDecomposedSecondConjunctMatch2 extends
@@ -37,10 +38,11 @@ public class SubClassInclusionDecomposedSecondConjunctMatch2 extends
 			SubClassInclusionDecomposedSecondConjunctMatch1 parent,
 			SubClassInclusionDecomposedMatch2 premiseMatch) {
 		super(parent);
-		this.fullSubsumerMatch_ = premiseMatch
-				.getSubsumerFullConjunctionMatch();
-		this.premiseSubsumerPrefixLength_ = premiseMatch
-				.getSubsumerConjunctionPrefixLength();
+		IndexedObjectIntersectionOfMatch premiseSubsumerMatch = premiseMatch
+				.getSubsumerIndexedObjectIntersectionOfMatch();
+		this.fullSubsumerMatch_ = premiseSubsumerMatch.getFullValue();
+		this.premiseSubsumerPrefixLength_ = premiseSubsumerMatch
+				.getPrefixLength();
 	}
 
 	public ElkObjectIntersectionOf getFullSubsumerMatch() {

@@ -1,4 +1,4 @@
-package org.semanticweb.elk.matching.conclusions;
+package org.semanticweb.elk.matching.subsumers;
 
 /*
  * #%L
@@ -22,29 +22,19 @@ package org.semanticweb.elk.matching.conclusions;
  * #L%
  */
 
-/**
- * A {@link IndexedContextRootMatch.Visitor} that always returns {@code null}
- * 
- * @author Yevgeny Kazakov
- *
- * @param <O>
- *            the type of the output
- */
-public class DummyIndexedContextRootMatchVisitor<O>
-		implements IndexedContextRootMatch.Visitor<O> {
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 
-	protected O defaultVisit(IndexedContextRootMatch conclusion) {
-		return null;
+public abstract class AbstractIndexedClassEntityMatch<V extends ElkObject>
+		extends AbstractSubsumerElkObjectMatch<V>
+		implements IndexedClassEntityMatch {
+
+	AbstractIndexedClassEntityMatch(V value) {
+		super(value);
 	}
 
 	@Override
-	public O visit(IndexedClassExpressionMatch match) {
-		return defaultVisit(match);
-	}
-
-	@Override
-	public O visit(IndexedRangeFillerMatch match) {
-		return defaultVisit(match);
+	public <O> O accept(SubsumerElkObjectMatch.Visitor<O> visitor) {
+		return accept((IndexedClassEntityMatch.Visitor<O>) visitor);
 	}
 
 }

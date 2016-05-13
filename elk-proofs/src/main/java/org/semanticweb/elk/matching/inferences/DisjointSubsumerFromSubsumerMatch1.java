@@ -24,9 +24,9 @@ package org.semanticweb.elk.matching.inferences;
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.DisjointSubsumerMatch1;
-import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch1Watch;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
 
 public class DisjointSubsumerFromSubsumerMatch1
@@ -49,6 +49,12 @@ public class DisjointSubsumerFromSubsumerMatch1
 
 	public IndexedContextRootMatch getOriginMatch() {
 		return originMatch_;
+	}
+	
+	public DisjointSubsumerMatch1 getConclusionMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getDisjointSubsumerMatch1(
+				getParent().getConclusion(factory), getOriginMatch());
 	}
 
 	public IndexedDisjointClassesAxiomMatch1 getSecondPremiseMatch(

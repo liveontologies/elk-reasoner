@@ -1,4 +1,4 @@
-package org.semanticweb.elk.matching.conclusions;
+package org.semanticweb.elk.matching.subsumers;
 
 /*
  * #%L
@@ -26,8 +26,8 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 import org.semanticweb.elk.util.hashing.Hasher;
 
-public class SubsumerMatchHash
-		implements SubsumerMatch.Visitor<Integer>, Hasher<SubsumerMatch> {
+public class SubsumerMatchHash extends SubsumerMatchDummyVisitor<Integer>
+		implements Hasher<SubsumerMatch> {
 
 	private static final SubsumerMatchHash INSTANCE_ = new SubsumerMatchHash();
 
@@ -66,16 +66,17 @@ public class SubsumerMatchHash
 	}
 
 	@Override
-	public Integer visit(SubsumerGeneralMatch subsumerMatch) {
-		return combinedHashCode(hashCode(SubsumerGeneralMatch.class),
-				hashCode(subsumerMatch.getGeneralMatch()));
+	protected Integer defaultVisit(final SubsumerElkObjectMatch match) {
+		return combinedHashCode(hashCode(SubsumerElkObjectMatch.class),
+				hashCode(match.getValue()));
 	}
 
 	@Override
-	public Integer visit(SubsumerPartialConjunctionMatch subsumerMatch) {
-		return combinedHashCode(hashCode(SubsumerPartialConjunctionMatch.class),
-				hashCode(subsumerMatch.getFullConjunctionMatch()),
-				hashCode(subsumerMatch.getConjunctionPrefixLength()));
+	public Integer visit(final IndexedObjectIntersectionOfMatch match) {
+		return combinedHashCode(
+				hashCode(IndexedObjectIntersectionOfMatch.class),
+				hashCode(match.getFullValue()),
+				hashCode(match.getPrefixLength()));
 	}
 
 }

@@ -1,7 +1,6 @@
-package org.semanticweb.elk.matching.conclusions;
+package org.semanticweb.elk.matching.root;
 
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import java.util.Collections;
 
 /*
  * #%L
@@ -25,30 +24,25 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedRangeFiller;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 
-public class IndexedRangeFillerMatch extends IndexedContextRootMatch {
+public class IndexedContextRootIndividualMatch
+		extends AbstractIndexedContextRootMatch<ElkIndividual> {
 
-	private final ElkObjectSomeValuesFrom existentialMatch_;
-
-	public IndexedRangeFillerMatch(ElkObjectSomeValuesFrom existentialMatch) {
-		this.existentialMatch_ = existentialMatch;
+	IndexedContextRootIndividualMatch(ElkIndividual value) {
+		super(value);
 	}
 
-	/**
-	 * @return the {@link ElkObjectSomeValuesFrom} whose property and filler
-	 *         match respectively the property and the filler of the
-	 *         {@link IndexedRangeFiller}
-	 */
-	public ElkObjectSomeValuesFrom getValue() {
-		return existentialMatch_;
+	@Override
+	public ElkIndividual getValue() {
+		return super.getValue();
 	}
 
 	@Override
 	public ElkClassExpression toElkExpression(ElkObject.Factory factory) {
-		// TODO: provide full support
-		return getValue().getFiller();
+		return factory.getObjectOneOf(Collections.singletonList(getValue()));
 	}
 
 	@Override
@@ -66,7 +60,7 @@ public class IndexedRangeFillerMatch extends IndexedContextRootMatch {
 	 */
 	interface Visitor<O> {
 
-		O visit(IndexedRangeFillerMatch match);
+		O visit(IndexedContextRootIndividualMatch match);
 
 	}
 
@@ -78,8 +72,8 @@ public class IndexedRangeFillerMatch extends IndexedContextRootMatch {
 	 */
 	public interface Factory {
 
-		IndexedRangeFillerMatch getIndexedRangeFillerMatch(
-				ElkObjectSomeValuesFrom existentialMatch);
+		IndexedContextRootIndividualMatch getIndexedContextRootIndividualMatch(
+				ElkIndividual value);
 
 	}
 

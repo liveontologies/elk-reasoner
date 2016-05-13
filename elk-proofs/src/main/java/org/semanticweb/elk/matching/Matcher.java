@@ -28,8 +28,8 @@ import java.util.Queue;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatch;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchCanonizerVisitor;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.IndexedClassExpressionMatch;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
+import org.semanticweb.elk.matching.root.IndexedContextRootClassExpressionMatch;
 import org.semanticweb.elk.owl.inferences.ElkInferenceProducer;
 import org.semanticweb.elk.owl.inferences.ElkInferenceProducingFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
@@ -102,9 +102,9 @@ public class Matcher {
 		}
 	}
 
-	private IndexedClassExpressionMatch getMatch(IndexedClass indexedClass) {
+	private IndexedContextRootClassExpressionMatch getMatch(IndexedClass indexedClass) {
 		return conclusionMatchFactory_
-				.getIndexedClassExpressionMatch(indexedClass.getElkEntity());
+				.getIndexedContextRootClassExpressionMatch(indexedClass.getElkEntity());
 	}
 
 	private void process() {

@@ -1,4 +1,4 @@
-package org.semanticweb.elk.matching.conclusions;
+package org.semanticweb.elk.matching.subsumers;
 
 /*
  * #%L
@@ -22,7 +22,7 @@ package org.semanticweb.elk.matching.conclusions;
  * #L%
  */
 
-public class SubsumerMatchEquality implements SubsumerMatch.Visitor<Boolean> {
+public class SubsumerMatchEquality extends SubsumerMatchDummyVisitor<Boolean> {
 
 	private final SubsumerMatch other_;
 
@@ -45,32 +45,30 @@ public class SubsumerMatchEquality implements SubsumerMatch.Visitor<Boolean> {
 		static boolean equals(Object first, Object second) {
 			return first.equals(second);
 		}
-		
+
 		static boolean equals(int first, int second) {
 			return first == second;
 		}
 	}
 
 	@Override
-	public Boolean visit(final SubsumerGeneralMatch subsumerMatch) {
+	protected Boolean defaultVisit(final SubsumerElkObjectMatch match) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
-			public Boolean visit(SubsumerGeneralMatch other) {
-				return equals(other.getGeneralMatch(),
-						subsumerMatch.getGeneralMatch());
+			public Boolean defaultVisit(SubsumerElkObjectMatch other) {
+				return equals(other.getValue(), match.getValue());
 			}
 		});
 	}
 
 	@Override
-	public Boolean visit(final SubsumerPartialConjunctionMatch subsumerMatch) {
+	public Boolean visit(final IndexedObjectIntersectionOfMatch match) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
-			public Boolean visit(SubsumerPartialConjunctionMatch other) {
-				return equals(other.getFullConjunctionMatch(),
-						subsumerMatch.getFullConjunctionMatch())
-						&& equals(other.getConjunctionPrefixLength(),
-								subsumerMatch.getConjunctionPrefixLength());
+			public Boolean visit(IndexedObjectIntersectionOfMatch other) {
+				return equals(other.getFullValue(), match.getFullValue())
+						&& equals(other.getPrefixLength(),
+								match.getPrefixLength());
 			}
 		});
 	}

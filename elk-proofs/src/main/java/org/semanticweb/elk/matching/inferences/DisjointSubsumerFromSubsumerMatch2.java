@@ -25,6 +25,7 @@ import java.util.List;
  */
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
+import org.semanticweb.elk.matching.conclusions.DisjointSubsumerMatch2;
 import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch2;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -54,6 +55,13 @@ public class DisjointSubsumerFromSubsumerMatch2
 				originalInference.getFirstPremise(factory),
 				getParent().getOriginMatch(), getDisjointExpressionsMatch()
 						.get(originalInference.getPosition()));
+	}
+
+	public DisjointSubsumerMatch2 getConclusionMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getDisjointSubsumerMatch2(
+				getParent().getConclusionMatch(factory),
+				getDisjointExpressionsMatch());
 	}
 
 	@Override

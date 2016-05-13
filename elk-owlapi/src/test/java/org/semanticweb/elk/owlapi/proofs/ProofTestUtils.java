@@ -69,6 +69,7 @@ public class ProofTestUtils {
 			OWLSubClassOfAxiom axiom) throws ProofGenerationException {
 		OWLExpression root = reasoner.getDerivedExpression(axiom);
 		OWLInferenceGraph graph = OWLProofUtils.computeInferenceGraph(root);
+		assertTrue(graph.getExpressions().contains(root));
 
 		provabilityTest(graph, graph.getExpressions());
 	}

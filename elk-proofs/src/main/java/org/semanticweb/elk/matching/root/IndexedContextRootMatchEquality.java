@@ -1,4 +1,4 @@
-package org.semanticweb.elk.matching.conclusions;
+package org.semanticweb.elk.matching.root;
 
 /*
  * #%L
@@ -25,14 +25,8 @@ package org.semanticweb.elk.matching.conclusions;
 public class IndexedContextRootMatchEquality
 		implements IndexedContextRootMatch.Visitor<Boolean> {
 
-	private final IndexedContextRootMatch other_;
-
-	public IndexedContextRootMatchEquality(IndexedContextRootMatch other) {
-		this.other_ = other;
-	}
-
 	private static class DefaultVisitor
-			extends DummyIndexedContextRootMatchVisitor<Boolean> {
+			extends IndexedContextRootMatchDummyVisitor<Boolean> {
 
 		@Override
 		protected Boolean defaultVisit(IndexedContextRootMatch match) {
@@ -45,21 +39,49 @@ public class IndexedContextRootMatchEquality
 
 	}
 
+	private final IndexedContextRootMatch other_;
+
+	public IndexedContextRootMatchEquality(IndexedContextRootMatch other) {
+		this.other_ = other;
+	}
+
 	@Override
-	public Boolean visit(final IndexedClassExpressionMatch match) {
+	public Boolean visit(final IndexedContextRootClassExpressionMatch match) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
-			public Boolean visit(IndexedClassExpressionMatch other) {
+			public Boolean visit(IndexedContextRootClassExpressionMatch other) {
 				return equals(other.getValue(), match.getValue());
 			}
 		});
 	}
 
 	@Override
-	public Boolean visit(final IndexedRangeFillerMatch match) {
+	public Boolean visit(final IndexedContextRootIndividualMatch match) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
-			public Boolean visit(IndexedRangeFillerMatch other) {
+			public Boolean visit(IndexedContextRootIndividualMatch other) {
+				return equals(other.getValue(), match.getValue());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(final IndexedContextRootRangeHasValueMatch match) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(IndexedContextRootRangeHasValueMatch other) {
+				return equals(other.getValue(), match.getValue());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(
+			final IndexedContextRootRangeSomeValuesFromMatch match) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(
+					IndexedContextRootRangeSomeValuesFromMatch other) {
 				return equals(other.getValue(), match.getValue());
 			}
 		});

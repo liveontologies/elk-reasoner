@@ -1,7 +1,5 @@
 package org.semanticweb.elk.matching.conclusions;
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-
 /*
  * #%L
  * ELK Proofs Package
@@ -24,7 +22,9 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
+import org.semanticweb.elk.matching.subsumers.IndexedObjectSomeValuesFromMatch;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
 
 public class PropagationMatch1
@@ -34,12 +34,12 @@ public class PropagationMatch1
 
 	private final ElkObjectProperty subDestinationMatch_;
 
-	private final ElkObjectSomeValuesFrom carryMatch_;
+	private final IndexedObjectSomeValuesFromMatch carryMatch_;
 
 	PropagationMatch1(Propagation parent,
 			IndexedContextRootMatch destinationMatch,
 			ElkObjectProperty subDestinationMatch,
-			ElkObjectSomeValuesFrom carryMatch) {
+			IndexedObjectSomeValuesFromMatch carryMatch) {
 		super(parent);
 		this.destinationMatch_ = destinationMatch;
 		this.subDestinationMatch_ = subDestinationMatch;
@@ -54,7 +54,7 @@ public class PropagationMatch1
 		return subDestinationMatch_;
 	}
 
-	public ElkObjectSomeValuesFrom getCarryMatch() {
+	public IndexedObjectSomeValuesFromMatch getCarryMatch() {
 		return carryMatch_;
 	}
 
@@ -74,7 +74,7 @@ public class PropagationMatch1
 		PropagationMatch1 getPropagationMatch1(Propagation parent,
 				IndexedContextRootMatch destinationMatch,
 				ElkObjectProperty subDestinationMatch,
-				ElkObjectSomeValuesFrom carryMatch);
+				IndexedObjectSomeValuesFromMatch carryMatch);
 
 	}
 

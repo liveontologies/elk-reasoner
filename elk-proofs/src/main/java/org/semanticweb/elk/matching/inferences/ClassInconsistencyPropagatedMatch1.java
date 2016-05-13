@@ -26,20 +26,20 @@ import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.ClassInconsistencyMatch1;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyPropagated;
 
 public class ClassInconsistencyPropagatedMatch1
 		extends AbstractInferenceMatch<ClassInconsistencyPropagated>
 		implements BackwardLinkMatch1Watch {
 
-	private final IndexedContextRootMatch originMatch_;
+	private final IndexedContextRootMatch destinationMatch_;
 
 	private ClassInconsistencyPropagatedMatch1(
 			ClassInconsistencyPropagated parent,
 			IndexedContextRootMatch originMatch) {
 		super(parent);
-		this.originMatch_ = originMatch;
+		this.destinationMatch_ = originMatch;
 	}
 
 	ClassInconsistencyPropagatedMatch1(ClassInconsistencyPropagated parent,
@@ -47,14 +47,14 @@ public class ClassInconsistencyPropagatedMatch1
 		this(parent, conclusionMatch.getDestinationMatch());
 	}
 
-	public IndexedContextRootMatch getOriginMatch() {
-		return originMatch_;
+	public IndexedContextRootMatch getDestinationMatch() {
+		return destinationMatch_;
 	}
 
 	public BackwardLinkMatch1 getFirstPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getBackwardLinkMatch1(
-				getParent().getFirstPremise(factory), originMatch_);
+				getParent().getFirstPremise(factory), destinationMatch_);
 	}
 
 	@Override

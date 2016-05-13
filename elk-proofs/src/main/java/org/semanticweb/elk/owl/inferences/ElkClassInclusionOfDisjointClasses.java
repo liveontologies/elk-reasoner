@@ -58,7 +58,7 @@ public class ElkClassInclusionOfDisjointClasses extends AbstractElkInference {
 			int secondPos) {
 		if (firstPos == secondPos) {
 			throw new IllegalArgumentException(
-					"Different positions expected: " + firstPos);
+					"Different positions expected but both = " + firstPos);
 		}
 		this.expressions_ = expressions;
 		this.firstPos_ = firstPos;

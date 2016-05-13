@@ -26,7 +26,7 @@ import org.semanticweb.elk.matching.conclusions.ClassInconsistencyMatch1;
  */
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 
 public class ClassInconsistencyPropagatedMatch2
@@ -54,7 +54,8 @@ public class ClassInconsistencyPropagatedMatch2
 
 	public ClassInconsistencyMatch1 getSecondPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getClassInconsistencyMatch1(getParent().getParent(),
+		return factory.getClassInconsistencyMatch1(
+				getParent().getParent().getSecondPremise(factory),
 				getOriginMatch());
 	}
 

@@ -24,10 +24,21 @@ package org.semanticweb.elk.matching.conclusions;
 
 import java.util.List;
 
+import org.semanticweb.elk.matching.root.IndexedContextRootClassExpressionMatch;
+import org.semanticweb.elk.matching.root.IndexedContextRootIndividualMatch;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatchBaseFactory;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatchChain;
+import org.semanticweb.elk.matching.root.IndexedContextRootRangeHasValueMatch;
+import org.semanticweb.elk.matching.root.IndexedContextRootRangeSomeValuesFromMatch;
+import org.semanticweb.elk.matching.subsumers.IndexedObjectSomeValuesFromMatch;
+import org.semanticweb.elk.matching.subsumers.SubsumerMatch;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectDelegatingFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
@@ -199,9 +210,31 @@ public class ConclusionMatchExpressionDelegatingFactory extends
 	}
 
 	@Override
-	public IndexedClassExpressionMatch getIndexedClassExpressionMatch(
+	public IndexedContextRootClassExpressionMatch getIndexedContextRootClassExpressionMatch(
 			ElkClassExpression match) {
-		return filter(rootMatchFactory_.getIndexedClassExpressionMatch(match));
+		return filter(rootMatchFactory_
+				.getIndexedContextRootClassExpressionMatch(match));
+	}
+
+	@Override
+	public IndexedContextRootIndividualMatch getIndexedContextRootIndividualMatch(
+			ElkIndividual value) {
+		return filter(
+				rootMatchFactory_.getIndexedContextRootIndividualMatch(value));
+	}
+
+	@Override
+	public IndexedContextRootRangeHasValueMatch getIndexedContextRootRangeHasValueMatch(
+			ElkObjectHasValue value) {
+		return filter(rootMatchFactory_
+				.getIndexedContextRootRangeHasValueMatch(value));
+	}
+
+	@Override
+	public IndexedContextRootRangeSomeValuesFromMatch getIndexedContextRootRangeSomeValuesFromMatch(
+			ElkObjectSomeValuesFrom value) {
+		return filter(rootMatchFactory_
+				.getIndexedContextRootRangeSomeValuesFromMatch(value));
 	}
 
 	@Override
@@ -283,13 +316,6 @@ public class ConclusionMatchExpressionDelegatingFactory extends
 	}
 
 	@Override
-	public IndexedRangeFillerMatch getIndexedRangeFillerMatch(
-			ElkObjectSomeValuesFrom existentialMatch) {
-		return filter(
-				rootMatchFactory_.getIndexedRangeFillerMatch(existentialMatch));
-	}
-
-	@Override
 	public IndexedSubClassOfAxiom getIndexedSubClassOfAxiom(
 			ElkAxiom originalAxiom, IndexedClassExpression subClass,
 			IndexedClassExpression superClass) {
@@ -349,7 +375,7 @@ public class ConclusionMatchExpressionDelegatingFactory extends
 	public PropagationMatch1 getPropagationMatch1(Propagation parent,
 			IndexedContextRootMatch destinationMatch,
 			ElkObjectProperty subDestinationMatch,
-			ElkObjectSomeValuesFrom carryMatch) {
+			IndexedObjectSomeValuesFromMatch carryMatch) {
 		return filter(conclusionMatchFactory_.getPropagationMatch1(parent,
 				destinationMatch, subDestinationMatch, carryMatch));
 	}
@@ -385,10 +411,20 @@ public class ConclusionMatchExpressionDelegatingFactory extends
 	public SubClassInclusionComposedMatch1 getSubClassInclusionComposedMatch1(
 			SubClassInclusionComposed parent,
 			IndexedContextRootMatch destinationMatch,
-			ElkClassExpression subsumerMatch) {
+			ElkClassExpression subsumerMatchValue) {
 		return filter(
 				conclusionMatchFactory_.getSubClassInclusionComposedMatch1(
-						parent, destinationMatch, subsumerMatch));
+						parent, destinationMatch, subsumerMatchValue));
+	}
+
+	@Override
+	public SubClassInclusionComposedMatch1 getSubClassInclusionComposedMatch1(
+			SubClassInclusionComposed parent,
+			IndexedContextRootMatch destinationMatch,
+			ElkIndividual subsumerMatchValue) {
+		return filter(
+				conclusionMatchFactory_.getSubClassInclusionComposedMatch1(
+						parent, destinationMatch, subsumerMatchValue));
 	}
 
 	@Override
@@ -400,6 +436,16 @@ public class ConclusionMatchExpressionDelegatingFactory extends
 		return filter(conclusionMatchFactory_
 				.getSubClassInclusionComposedMatch1(parent, destinationMatch,
 						fullSubsumerMatch, subsumerPrefixLength));
+	}
+
+	@Override
+	public SubClassInclusionComposedMatch1 getSubClassInclusionComposedMatch1(
+			SubClassInclusionComposed parent,
+			IndexedContextRootMatch destinationMatch,
+			SubsumerMatch subsumerMatch) {
+		return filter(
+				conclusionMatchFactory_.getSubClassInclusionComposedMatch1(
+						parent, destinationMatch, subsumerMatch));
 	}
 
 	@Override
@@ -429,12 +475,29 @@ public class ConclusionMatchExpressionDelegatingFactory extends
 	@Override
 	public SubClassInclusionDecomposedMatch2 getSubClassInclusionDecomposedMatch2(
 			SubClassInclusionDecomposedMatch1 parent,
+			ElkIndividual subsumerMatchValue) {
+		return filter(
+				conclusionMatchFactory_.getSubClassInclusionDecomposedMatch2(
+						parent, subsumerMatchValue));
+	}
+
+	@Override
+	public SubClassInclusionDecomposedMatch2 getSubClassInclusionDecomposedMatch2(
+			SubClassInclusionDecomposedMatch1 parent,
 			ElkObjectIntersectionOf subsumerFullConjunctionMatch,
 			int subsumerConjunctionPrefixLength) {
 		return filter(
 				conclusionMatchFactory_.getSubClassInclusionDecomposedMatch2(
 						parent, subsumerFullConjunctionMatch,
 						subsumerConjunctionPrefixLength));
+	}
+
+	@Override
+	public SubClassInclusionDecomposedMatch2 getSubClassInclusionDecomposedMatch2(
+			SubClassInclusionDecomposedMatch1 parent,
+			SubsumerMatch subsumerMatch) {
+		return filter(conclusionMatchFactory_
+				.getSubClassInclusionDecomposedMatch2(parent, subsumerMatch));
 	}
 
 	@Override

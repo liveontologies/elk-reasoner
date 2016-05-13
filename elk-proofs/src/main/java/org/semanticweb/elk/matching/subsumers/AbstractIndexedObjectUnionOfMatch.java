@@ -1,4 +1,4 @@
-package org.semanticweb.elk.matching.conclusions;
+package org.semanticweb.elk.matching.subsumers;
 
 /*
  * #%L
@@ -22,21 +22,19 @@ package org.semanticweb.elk.matching.conclusions;
  * #L%
  */
 
-public class SubsumerMatchDummyVisitor<O> implements SubsumerMatch.Visitor<O> {
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 
-	protected O defaultVisit(SubsumerMatch subsumerMatch) {
-		// can be overridden in sub-classes
-		return null;
+public abstract class AbstractIndexedObjectUnionOfMatch<V extends ElkClassExpression>
+		extends AbstractSubsumerElkObjectMatch<V>
+		implements IndexedObjectUnionOfMatch {
+
+	AbstractIndexedObjectUnionOfMatch(V value) {
+		super(value);
 	}
 
 	@Override
-	public O visit(SubsumerGeneralMatch subsumerMatch) {
-		return defaultVisit(subsumerMatch);
-	}
-
-	@Override
-	public O visit(SubsumerPartialConjunctionMatch subsumerMatch) {
-		return defaultVisit(subsumerMatch);
+	public <O> O accept(SubsumerElkObjectMatch.Visitor<O> visitor) {
+		return accept((IndexedObjectUnionOfMatch.Visitor<O>) visitor);
 	}
 
 }

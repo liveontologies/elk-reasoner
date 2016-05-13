@@ -1,4 +1,4 @@
-package org.semanticweb.elk.matching.conclusions;
+package org.semanticweb.elk.matching.subsumers;
 
 /*
  * #%L
@@ -22,28 +22,13 @@ package org.semanticweb.elk.matching.conclusions;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
-
-public abstract class SubsumerMatch {
+public abstract class AbstractSubsumerMatch implements SubsumerMatch {
 
 	/**
 	 * hash code, computed on demand
 	 */
 	private int hashCode_ = 0;
-
-	public abstract ElkClassExpression getGeneralMatch(
-			IndexedClassExpression subsumer);
-
-	public abstract ElkObjectIntersectionOf getFullConjunctionMatch(
-			IndexedClassExpression subsumer);
-
-	public abstract int getConjunctionPrefixLength(
-			IndexedClassExpression subsumer);
 	
-	public abstract <O> O accept(Visitor<O> visitor);
-
 	@Override
 	public int hashCode() {
 		if (hashCode_ == 0) {
@@ -70,21 +55,6 @@ public abstract class SubsumerMatch {
 	@Override
 	public String toString() {
 		return SubsumerMatchPrinter.toString(this);
-	}
-
-	/**
-	 * The visitor pattern for instances
-	 * 
-	 * @author Yevgeny Kazakov
-	 *
-	 * @param <O>
-	 *            the type of the output
-	 */
-	public interface Visitor<O> extends SubsumerGeneralMatch.Visitor<O>,
-			SubsumerPartialConjunctionMatch.Visitor<O> {
-
-		// combined interface
-
 	}
 
 }

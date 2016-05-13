@@ -138,6 +138,9 @@ public class ContextTracingRuleApplicationFactory
 				// saturation state
 				IndexedContextRoot root = job.getRoot();
 				Context mainContext = mainSaturationState_.getContext(root);
+				if (mainContext == null) {
+					System.err.println(root);
+				}
 				for (IndexedObjectProperty subRoot : mainContext
 						.getSubContextPremisesByObjectProperty().keySet()) {
 					saturationStateWriter.produce(

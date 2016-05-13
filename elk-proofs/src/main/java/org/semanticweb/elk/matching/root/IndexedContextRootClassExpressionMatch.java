@@ -1,4 +1,4 @@
-package org.semanticweb.elk.matching.conclusions;
+package org.semanticweb.elk.matching.root;
 
 /*
  * #%L
@@ -25,16 +25,16 @@ package org.semanticweb.elk.matching.conclusions;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 
-public class IndexedClassExpressionMatch extends IndexedContextRootMatch {
+public class IndexedContextRootClassExpressionMatch
+		extends AbstractIndexedContextRootMatch<ElkClassExpression> {
 
-	private final ElkClassExpression match_;
-
-	public IndexedClassExpressionMatch(ElkClassExpression match) {
-		this.match_ = match;
+	IndexedContextRootClassExpressionMatch(ElkClassExpression value) {
+		super(value);
 	}
 
+	@Override
 	public ElkClassExpression getValue() {
-		return match_;
+		return super.getValue();
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class IndexedClassExpressionMatch extends IndexedContextRootMatch {
 	 */
 	interface Visitor<O> {
 
-		O visit(IndexedClassExpressionMatch match);
+		O visit(IndexedContextRootClassExpressionMatch match);
 
 	}
 
@@ -69,8 +69,8 @@ public class IndexedClassExpressionMatch extends IndexedContextRootMatch {
 	 */
 	public interface Factory {
 
-		IndexedClassExpressionMatch getIndexedClassExpressionMatch(
-				ElkClassExpression match);
+		IndexedContextRootClassExpressionMatch getIndexedContextRootClassExpressionMatch(
+				ElkClassExpression value);
 
 	}
 

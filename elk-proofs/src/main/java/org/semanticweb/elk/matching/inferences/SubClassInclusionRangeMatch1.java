@@ -24,12 +24,12 @@ package org.semanticweb.elk.matching.inferences;
 
 import org.semanticweb.elk.matching.ElkMatchException;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.IndexedClassExpressionMatch;
-import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
-import org.semanticweb.elk.matching.conclusions.IndexedRangeFillerMatch;
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch1;
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatchDummyVisitor;
+import org.semanticweb.elk.matching.root.IndexedContextRootRangeMatch;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionRange;
@@ -40,42 +40,39 @@ public class SubClassInclusionRangeMatch1
 
 	private final IndexedContextRootMatch originMatch_;
 
-	private final ElkObjectProperty propertyMatch_;
-
 	SubClassInclusionRangeMatch1(final SubClassInclusionRange parent,
 			SubClassInclusionDecomposedMatch1 conclusionMatch) {
 		super(parent);
 		originMatch_ = conclusionMatch.getDestinationMatch();
-		propertyMatch_ = conclusionMatch.getDestinationMatch().accept(
-				new IndexedContextRootMatch.Visitor<ElkObjectProperty>() {
-
-					@Override
-					public ElkObjectProperty visit(
-							IndexedClassExpressionMatch match) {
-						throw new ElkMatchException(parent.getOrigin(), match);
-					}
-
-					@Override
-					public ElkObjectProperty visit(
-							IndexedRangeFillerMatch match) {
-						ElkObjectPropertyExpression property = match.getValue()
-								.getProperty();
-						if (property instanceof ElkObjectProperty) {
-							return (ElkObjectProperty) property;
-						}
-						// else
-						throw new ElkMatchException(
-								parent.getOrigin().getProperty(), property);
-					}
-				});
 	}
 
 	public IndexedContextRootMatch getOriginMatch() {
 		return originMatch_;
 	}
 
-	public ElkObjectProperty getPropertyMatch() {
-		return propertyMatch_;
+	ElkObjectProperty getPropertyMatch() {
+		return originMatch_.accept(
+				new IndexedContextRootMatchDummyVisitor<ElkObjectProperty>() {
+
+					@Override
+					protected ElkObjectProperty defaultVisit(
+							IndexedContextRootMatch match) {
+						throw new ElkMatchException(getParent().getOrigin(),
+								match);
+					}
+
+					@Override
+					protected ElkObjectProperty defaultVisit(
+							IndexedContextRootRangeMatch match) {
+						ElkObjectPropertyExpression property = match
+								.getPropertyMatch();
+						if (property instanceof ElkObjectProperty) {
+							return (ElkObjectProperty) property;
+						}
+						// else
+						return defaultVisit((IndexedContextRootMatch) match);
+					}
+				});
 	}
 
 	public SubClassInclusionDecomposedMatch1 getConclusionMatch(
@@ -87,7 +84,7 @@ public class SubClassInclusionRangeMatch1
 	public PropertyRangeMatch1 getPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getPropertyRangeMatch1(
-				getParent().getSecondPremise(factory), propertyMatch_);
+				getParent().getSecondPremise(factory), getPropertyMatch());
 	}
 
 	@Override

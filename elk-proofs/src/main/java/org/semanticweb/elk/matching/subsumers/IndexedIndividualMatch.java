@@ -1,4 +1,4 @@
-package org.semanticweb.elk.matching.conclusions;
+package org.semanticweb.elk.matching.subsumers;
 
 /*
  * #%L
@@ -22,22 +22,32 @@ package org.semanticweb.elk.matching.conclusions;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 
-public class IndexedContextRootMatchBaseFactory
-		implements IndexedContextRootMatch.Factory {
+public class IndexedIndividualMatch
+		extends AbstractIndexedClassEntityMatch<ElkIndividual> {
 
-	@Override
-	public IndexedClassExpressionMatch getIndexedClassExpressionMatch(
-			ElkClassExpression match) {
-		return new IndexedClassExpressionMatch(match);
+	IndexedIndividualMatch(ElkIndividual value) {
+		super(value);
 	}
 
 	@Override
-	public IndexedRangeFillerMatch getIndexedRangeFillerMatch(
-			ElkObjectSomeValuesFrom existentialMatch) {
-		return new IndexedRangeFillerMatch(existentialMatch);
+	public <O> O accept(IndexedClassEntityMatch.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(IndexedIndividualMatch match);
+
 	}
 
 }

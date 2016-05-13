@@ -43,12 +43,6 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 	}
 
 	@Override
-	public ElkClassInclusionOwlThingEmptyObjectIntersectionOf getElkClassInclusionOwlThingEmptyObjectIntersectionOf() {
-		return filter(mainFactory_
-				.getElkClassInclusionOwlThingEmptyObjectIntersectionOf());
-	}
-
-	@Override
 	public ElkClassInclusionEmptyObjectOneOfOwlNothing getElkClassInclusionEmptyObjectOneOfOwlNothing() {
 		return filter(
 				mainFactory_.getElkClassInclusionEmptyObjectOneOfOwlNothing());
@@ -75,6 +69,13 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 		return filter(
 				mainFactory_.getElkClassInclusionExistentialOfObjectHasSelf(
 						subClass, property));
+	}
+
+	@Override
+	public ElkClassInclusionExistentialOwlNothing getElkClassInclusionExistentialOwlNothing(
+			ElkObjectPropertyExpression property) {
+		return filter(mainFactory_
+				.getElkClassInclusionExistentialOwlNothing(property));
 	}
 
 	@Override
@@ -112,6 +113,22 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 	}
 
 	@Override
+	public ElkClassInclusionNegationClash getElkClassInclusionNegationClash(
+			ElkClassExpression expression) {
+		return filter(
+				mainFactory_.getElkClassInclusionNegationClash(expression));
+	}
+
+	@Override
+	public ElkClassInclusionObjectIntersectionOfComposition getElkClassInclusionObjectIntersectionOfComposition(
+			ElkClassExpression subExpression, ElkClassExpression firstConjunct,
+			ElkClassExpression secondConjunct) {
+		return filter(mainFactory_
+				.getElkClassInclusionObjectIntersectionOfComposition(
+						subExpression, firstConjunct, secondConjunct));
+	}
+
+	@Override
 	public ElkClassInclusionObjectIntersectionOfComposition getElkClassInclusionObjectIntersectionOfComposition(
 			ElkClassExpression subExpression,
 			List<? extends ElkClassExpression> conjuncts) {
@@ -130,11 +147,18 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 	}
 
 	@Override
+	public ElkClassInclusionObjectOneOfInclusion getElkClassInclusionObjectOneOfInclusion(
+			List<? extends ElkIndividual> superIndividuals,
+			List<Integer> subPositions) {
+		return filter(mainFactory_.getElkClassInclusionObjectOneOfInclusion(
+				superIndividuals, subPositions));
+	}
+
+	@Override
 	public ElkClassInclusionObjectUnionOfComposition getElkClassInclusionObjectUnionOfComposition(
-			ElkClassExpression subExpression,
 			List<? extends ElkClassExpression> disjuncts, int disjunctPos) {
 		return filter(mainFactory_.getElkClassInclusionObjectUnionOfComposition(
-				subExpression, disjuncts, disjunctPos));
+				disjuncts, disjunctPos));
 	}
 
 	@Override
@@ -142,14 +166,6 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 			ElkIndividual instance, ElkClassExpression type) {
 		return filter(mainFactory_
 				.getElkClassInclusionOfClassAssertion(instance, type));
-	}
-
-	@Override
-	public ElkClassInclusionOfDifferentIndividuals getElkClassInclusionOfDifferentIndividuals(
-			List<? extends ElkIndividual> individuals, int firstPos,
-			int secondPos) {
-		return filter(mainFactory_.getElkClassInclusionOfDifferentIndividuals(
-				individuals, firstPos, secondPos));
 	}
 
 	@Override
@@ -212,6 +228,12 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 	}
 
 	@Override
+	public ElkClassInclusionOwlThingEmptyObjectIntersectionOf getElkClassInclusionOwlThingEmptyObjectIntersectionOf() {
+		return filter(mainFactory_
+				.getElkClassInclusionOwlThingEmptyObjectIntersectionOf());
+	}
+
+	@Override
 	public ElkClassInclusionReflexivePropertyRange getElkClassInclusionReflexivePropertyRange(
 			ElkClassExpression subClass, ElkObjectPropertyExpression property,
 			ElkClassExpression range) {
@@ -234,6 +256,13 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 	}
 
 	@Override
+	public ElkDisjointClassesOfDifferentIndividuals getElkDisjointClassesOfDifferentIndividuals(
+			List<? extends ElkIndividual> different) {
+		return filter(mainFactory_
+				.getElkDisjointClassesOfDifferentIndividuals(different));
+	}
+
+	@Override
 	public ElkDisjointClassesOfDisjointUnion getElkDisjointClassesOfDisjointUnion(
 			ElkClass defined, List<? extends ElkClassExpression> disjoint) {
 		return filter(mainFactory_.getElkDisjointClassesOfDisjointUnion(defined,
@@ -241,10 +270,24 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 	}
 
 	@Override
+	public ElkEquivalentClassesObjectHasValue getElkEquivalentClassesObjectHasValue(
+			ElkObjectPropertyExpression property, ElkIndividual value) {
+		return filter(mainFactory_
+				.getElkEquivalentClassesObjectHasValue(property, value));
+	}
+
+	@Override
 	public ElkEquivalentClassesOfDisjointUnion getElkEquivalentClassesOfDisjointUnion(
 			ElkClass defined, List<? extends ElkClassExpression> disjoint) {
 		return filter(mainFactory_
 				.getElkEquivalentClassesOfDisjointUnion(defined, disjoint));
+	}
+
+	@Override
+	public ElkEquivalentClassesOfSameIndividual getElkEquivalentClassesOfSameIndividual(
+			List<? extends ElkIndividual> same) {
+		return filter(
+				mainFactory_.getElkEquivalentClassesOfSameIndividual(same));
 	}
 
 	@Override

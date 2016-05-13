@@ -1,4 +1,4 @@
-package org.semanticweb.elk.matching.conclusions;
+package org.semanticweb.elk.matching.subsumers;
 
 /*
  * #%L
@@ -22,59 +22,44 @@ package org.semanticweb.elk.matching.conclusions;
  * #L%
  */
 
-import org.semanticweb.elk.matching.ElkMatchException;
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 
-public class SubsumerPartialConjunctionMatch extends SubsumerMatch {
+public class IndexedObjectIntersectionOfMatch extends AbstractSubsumerMatch {
 
 	private final ElkObjectIntersectionOf fullConjunctionMatch_;
 
 	private final int conjunctionPrefixLength_;
 
-	SubsumerPartialConjunctionMatch(
+	IndexedObjectIntersectionOfMatch(ElkObjectIntersectionOf value) {
+		this.fullConjunctionMatch_ = value;
+		this.conjunctionPrefixLength_ = value.getClassExpressions().size();
+	}
+
+	IndexedObjectIntersectionOfMatch(
 			ElkObjectIntersectionOf fullConjunctionMatch,
 			int conjunctionPrefixLength) {
+		int conjunctsCount = fullConjunctionMatch.getClassExpressions().size();
 		if (conjunctionPrefixLength <= 1
-				|| conjunctionPrefixLength >= fullConjunctionMatch
-						.getClassExpressions().size()) {
+				|| conjunctionPrefixLength > conjunctsCount) {
 			throw new IllegalArgumentException(
-					"Prefix length should be non-trivial: "
-							+ conjunctionPrefixLength);
+					"Prefix length should be > 1 and <= " + conjunctsCount
+							+ ": " + +conjunctionPrefixLength);
 		}
 		this.fullConjunctionMatch_ = fullConjunctionMatch;
 		this.conjunctionPrefixLength_ = conjunctionPrefixLength;
 	}
 
-	ElkObjectIntersectionOf getFullConjunctionMatch() {
-		return fullConjunctionMatch_;
-	}
-
-	int getConjunctionPrefixLength() {
-		return conjunctionPrefixLength_;
-	}
-
-	@Override
-	public ElkClassExpression getGeneralMatch(IndexedClassExpression subsumer) {
-		throw new ElkMatchException(subsumer, fullConjunctionMatch_,
-				conjunctionPrefixLength_);
-	}
-
-	@Override
-	public ElkObjectIntersectionOf getFullConjunctionMatch(
-			IndexedClassExpression subsumer) {
-		return fullConjunctionMatch_;
-	}
-
-	@Override
-	public int getConjunctionPrefixLength(IndexedClassExpression subsumer) {
-		return conjunctionPrefixLength_;
-	}
-	
 	@Override
 	public <O> O accept(SubsumerMatch.Visitor<O> visitor) {
 		return visitor.visit(this);
+	}
+
+	public ElkObjectIntersectionOf getFullValue() {
+		return fullConjunctionMatch_;
+	}
+
+	public int getPrefixLength() {
+		return conjunctionPrefixLength_;
 	}
 
 	/**
@@ -85,10 +70,9 @@ public class SubsumerPartialConjunctionMatch extends SubsumerMatch {
 	 * @param <O>
 	 *            the type of the output
 	 */
-	interface Visitor<O> {
+	public interface Visitor<O> {
 
-		O visit(SubsumerPartialConjunctionMatch subsumerMatch);
-
+		O visit(IndexedObjectIntersectionOfMatch match);
 	}
 
 }

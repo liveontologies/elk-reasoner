@@ -51,13 +51,6 @@ public class ElkInferenceHash implements ElkInference.Visitor<Integer> {
 
 	@Override
 	public Integer visit(
-			ElkClassInclusionOwlThingEmptyObjectIntersectionOf inference) {
-		return combinedHashCode(hashCode(
-				ElkClassInclusionOwlThingEmptyObjectIntersectionOf.class));
-	}
-
-	@Override
-	public Integer visit(
 			ElkClassInclusionEmptyObjectOneOfOwlNothing inference) {
 		return combinedHashCode(hashCode(
 				ElkClassInclusionOwlThingEmptyObjectIntersectionOf.class));
@@ -91,6 +84,13 @@ public class ElkInferenceHash implements ElkInference.Visitor<Integer> {
 	}
 
 	@Override
+	public Integer visit(ElkClassInclusionExistentialOwlNothing inference) {
+		return combinedHashCode(
+				hashCode(ElkClassInclusionExistentialOwlNothing.class),
+				hashCode(inference.getProperty()));
+	}
+
+	@Override
 	public Integer visit(
 			ElkClassInclusionExistentialPropertyExpansion inference) {
 		return combinedHashCode(
@@ -104,6 +104,12 @@ public class ElkInferenceHash implements ElkInference.Visitor<Integer> {
 	public Integer visit(ElkClassInclusionHierarchy inference) {
 		return combinedHashCode(hashCode(ElkClassInclusionHierarchy.class),
 				hashCode(inference.getExpressions()));
+	}
+
+	@Override
+	public Integer visit(ElkClassInclusionNegationClash inference) {
+		return combinedHashCode(hashCode(ElkClassInclusionNegationClash.class),
+				hashCode(inference.getExpression()));
 	}
 
 	@Override
@@ -128,10 +134,17 @@ public class ElkInferenceHash implements ElkInference.Visitor<Integer> {
 	}
 
 	@Override
+	public Integer visit(ElkClassInclusionObjectOneOfInclusion inference) {
+		return combinedHashCode(
+				hashCode(ElkClassInclusionObjectOneOfInclusion.class),
+				hashCode(inference.getSuperIndividuals()),
+				hashCode(inference.getSubIndividualPositions()));
+	}
+
+	@Override
 	public Integer visit(ElkClassInclusionObjectUnionOfComposition inference) {
 		return combinedHashCode(
 				hashCode(ElkClassInclusionObjectUnionOfComposition.class),
-				hashCode(inference.getSubExpression()),
 				hashCode(inference.getDisjuncts()),
 				hashCode(inference.getDisjunctPos()));
 	}
@@ -142,15 +155,6 @@ public class ElkInferenceHash implements ElkInference.Visitor<Integer> {
 				hashCode(ElkClassInclusionOfClassAssertion.class),
 				hashCode(inference.getInstance()),
 				hashCode(inference.getType()));
-	}
-
-	@Override
-	public Integer visit(ElkClassInclusionOfDifferentIndividuals inference) {
-		return combinedHashCode(
-				hashCode(ElkClassInclusionOfDifferentIndividuals.class),
-				hashCode(inference.getIndividuals()),
-				hashCode(inference.getFirstPos()),
-				hashCode(inference.getSecondPos()));
 	}
 
 	@Override
@@ -208,6 +212,13 @@ public class ElkInferenceHash implements ElkInference.Visitor<Integer> {
 	}
 
 	@Override
+	public Integer visit(
+			ElkClassInclusionOwlThingEmptyObjectIntersectionOf inference) {
+		return combinedHashCode(hashCode(
+				ElkClassInclusionOwlThingEmptyObjectIntersectionOf.class));
+	}
+
+	@Override
 	public Integer visit(ElkClassInclusionReflexivePropertyRange inference) {
 		return combinedHashCode(
 				hashCode(ElkClassInclusionReflexivePropertyRange.class),
@@ -232,6 +243,13 @@ public class ElkInferenceHash implements ElkInference.Visitor<Integer> {
 	}
 
 	@Override
+	public Integer visit(ElkDisjointClassesOfDifferentIndividuals inference) {
+		return combinedHashCode(
+				hashCode(ElkDisjointClassesOfDifferentIndividuals.class),
+				hashCode(inference.getDifferent()));
+	}
+
+	@Override
 	public Integer visit(ElkDisjointClassesOfDisjointUnion inference) {
 		return combinedHashCode(
 				hashCode(ElkDisjointClassesOfDisjointUnion.class),
@@ -240,11 +258,26 @@ public class ElkInferenceHash implements ElkInference.Visitor<Integer> {
 	}
 
 	@Override
+	public Integer visit(ElkEquivalentClassesObjectHasValue inference) {
+		return combinedHashCode(
+				hashCode(ElkPropertyInclusionOfTransitiveObjectProperty.class),
+				hashCode(inference.getProperty()),
+				hashCode(inference.getValue()));
+	}
+
+	@Override
 	public Integer visit(ElkEquivalentClassesOfDisjointUnion inference) {
 		return combinedHashCode(
 				hashCode(ElkEquivalentClassesOfDisjointUnion.class),
 				hashCode(inference.getDefined()),
 				hashCode(inference.getDisjoint()));
+	}
+
+	@Override
+	public Integer visit(ElkEquivalentClassesOfSameIndividual inference) {
+		return combinedHashCode(
+				hashCode(ElkEquivalentClassesOfSameIndividual.class),
+				hashCode(inference.getSame()));
 	}
 
 	@Override

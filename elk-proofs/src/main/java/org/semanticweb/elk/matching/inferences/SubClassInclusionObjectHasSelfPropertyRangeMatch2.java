@@ -26,10 +26,8 @@ import org.semanticweb.elk.matching.ElkMatchException;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch1;
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch1Watch;
-import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
+import org.semanticweb.elk.matching.subsumers.IndexedObjectHasSelfMatch;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 
@@ -39,27 +37,20 @@ public class SubClassInclusionObjectHasSelfPropertyRangeMatch2 extends
 
 	private final ElkObjectProperty propertyMatch_;
 
-	private SubClassInclusionObjectHasSelfPropertyRangeMatch2(
-			SubClassInclusionObjectHasSelfPropertyRangeMatch1 parent,
-			ElkClassExpression subsumerMatch,
-			SubClassInclusionDecomposedMatch1 parentMatch) {
-		super(parent);
-		ElkObjectPropertyExpression propertyMatch;
-		if (subsumerMatch instanceof ElkObjectHasSelf
-				&& (propertyMatch = ((ElkObjectHasSelf) subsumerMatch)
-						.getProperty()) instanceof ElkObjectProperty) {
-			propertyMatch_ = (ElkObjectProperty) propertyMatch;
-		} else {
-			throw new ElkMatchException(parentMatch.getParent().getSubsumer(),
-					subsumerMatch);
-		}
-	}
-
 	SubClassInclusionObjectHasSelfPropertyRangeMatch2(
 			SubClassInclusionObjectHasSelfPropertyRangeMatch1 parent,
 			SubClassInclusionDecomposedMatch2 firstPremiseMatch) {
-		this(parent, firstPremiseMatch.getSubsumerGeneralMatch(),
-				firstPremiseMatch.getParent());
+		super(parent);
+		IndexedObjectHasSelfMatch premiseSubsumerMatch = firstPremiseMatch
+				.getSubsumerIndexedObjectHasSelfMatch();
+		ElkObjectPropertyExpression premisePropertyMatch = premiseSubsumerMatch
+				.getValue().getProperty();
+		if (premisePropertyMatch instanceof ElkObjectProperty) {
+			this.propertyMatch_ = (ElkObjectProperty) premisePropertyMatch;
+		} else {
+			throw new ElkMatchException(parent.getParent().getSubsumer(),
+					premiseSubsumerMatch);
+		}
 	}
 
 	public ElkObjectProperty getPropertyMatch() {

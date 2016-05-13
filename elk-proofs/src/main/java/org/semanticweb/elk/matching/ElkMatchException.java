@@ -23,9 +23,11 @@ package org.semanticweb.elk.matching;
  */
 
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
-import org.semanticweb.elk.matching.conclusions.IndexedClassExpressionMatch;
-import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
+import org.semanticweb.elk.matching.root.IndexedContextRootClassExpressionMatch;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
+import org.semanticweb.elk.matching.subsumers.SubsumerMatch;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
@@ -36,7 +38,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 
 /**
- * Exception thrown when to signal that {@link IndexedClassExpressionMatch} is
+ * Exception thrown when to signal that {@link IndexedContextRootClassExpressionMatch} is
  * invalid, that is, the {@link IndexedClassExpression} in the match cannot be
  * obtained from the corresponding {@link ElkClassExpression}
  * 
@@ -52,7 +54,12 @@ public class ElkMatchException extends ElkRuntimeException {
 	}
 
 	public ElkMatchException(IndexedClassExpression expression,
-			ElkClassExpression match) {
+			ElkObject match) {
+		this((IndexedObject) expression, match);
+	}
+	
+	public ElkMatchException(IndexedClassExpression expression,
+			SubsumerMatch match) {
 		this((IndexedObject) expression, match);
 	}
 

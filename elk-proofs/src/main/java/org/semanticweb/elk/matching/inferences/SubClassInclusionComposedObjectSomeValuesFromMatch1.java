@@ -22,14 +22,12 @@ package org.semanticweb.elk.matching.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.matching.ElkMatchException;
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
+import org.semanticweb.elk.matching.subsumers.IndexedObjectSomeValuesFromMatch;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectSomeValuesFrom;
 
 public class SubClassInclusionComposedObjectSomeValuesFromMatch1 extends
@@ -38,34 +36,22 @@ public class SubClassInclusionComposedObjectSomeValuesFromMatch1 extends
 
 	private final IndexedContextRootMatch destinationMatch_;
 
-	private final ElkObjectSomeValuesFrom conclusionSubsumerMatch_;
-
-	private SubClassInclusionComposedObjectSomeValuesFromMatch1(
-			SubClassInclusionComposedObjectSomeValuesFrom parent,
-			IndexedContextRootMatch destinationMatch,
-			ElkClassExpression subsumerMatch) {
-		super(parent);
-		this.destinationMatch_ = destinationMatch;
-		if (subsumerMatch instanceof ElkObjectSomeValuesFrom) {
-			conclusionSubsumerMatch_ = (ElkObjectSomeValuesFrom) subsumerMatch;
-		} else {
-			throw new ElkMatchException(getParent().getConclusionSubsumer(),
-					subsumerMatch);
-		}
-	}
+	private final IndexedObjectSomeValuesFromMatch conclusionSubsumerMatch_;
 
 	SubClassInclusionComposedObjectSomeValuesFromMatch1(
 			SubClassInclusionComposedObjectSomeValuesFrom parent,
 			SubClassInclusionComposedMatch1 conclusionMatch) {
-		this(parent, conclusionMatch.getDestinationMatch(),
-				conclusionMatch.getSubsumerGeneralMatch());
+		super(parent);
+		this.destinationMatch_ = conclusionMatch.getDestinationMatch();
+		this.conclusionSubsumerMatch_ = conclusionMatch
+				.getSubsumerIndexedObjectSomeValuesFromMatch();
 	}
 
 	public IndexedContextRootMatch getDestinationMatch() {
 		return destinationMatch_;
 	}
 
-	public ElkObjectSomeValuesFrom getConclusionSubsumerMatch() {
+	public IndexedObjectSomeValuesFromMatch getConclusionSubsumerMatch() {
 		return conclusionSubsumerMatch_;
 	}
 
@@ -81,7 +67,7 @@ public class SubClassInclusionComposedObjectSomeValuesFromMatch1 extends
 		return factory.getBackwardLinkMatch1(
 				getParent().getFirstPremise(factory), getDestinationMatch());
 	}
-	
+
 	@Override
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
 		return visitor.visit(this);

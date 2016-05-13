@@ -25,8 +25,8 @@ package org.semanticweb.elk.matching.inferences;
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch2;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch3;
-import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatch;
-import org.semanticweb.elk.matching.conclusions.IndexedContextRootMatchChain;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatchChain;
 
 public class BackwardLinkReversedExpandedMatch3
 		extends AbstractInferenceMatch<BackwardLinkReversedExpandedMatch2> {
