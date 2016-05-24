@@ -1,5 +1,8 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*
  * #%L
  * ELK Reasoner
@@ -39,8 +42,11 @@ final class CachedIndexedOwlNothingImpl extends CachedIndexedClassImpl
 
 	private int positiveOccurrenceNo = 0;
 
+	private final List<CachedIndexedOwlNothing.ChangeListener> listeners_;
+
 	CachedIndexedOwlNothingImpl(ElkClass entity) {
 		super(entity);
+		this.listeners_ = new ArrayList<CachedIndexedOwlNothing.ChangeListener>();
 	}
 
 	@Override
@@ -70,7 +76,24 @@ final class CachedIndexedOwlNothingImpl extends CachedIndexedClassImpl
 
 		positiveOccurrenceNo += positiveIncrement;
 
+		if (positiveOccurrenceNo > 0) {
+			if (positiveOccurrenceNo <= positiveIncrement) {
+				// positiveOccurrenceNo just became > 0
+				for (int i = 0; i < listeners_.size(); i++) {
+					listeners_.get(i).positiveOccurrenceAppeared();
+				}
+			}
+		} else {
+			if (positiveOccurrenceNo > positiveIncrement) {
+				// positiveOccurrenceNo just became <= 0
+				for (int i = 0; i < listeners_.size(); i++) {
+					listeners_.get(i).positiveOccurrenceDisappeared();
+				}
+			}
+		}
+
 		return true;
+
 	}
 
 	@Override
@@ -88,6 +111,16 @@ final class CachedIndexedOwlNothingImpl extends CachedIndexedClassImpl
 		}
 
 		return true;
+	}
+
+	@Override
+	public boolean addListener(ChangeListener listener) {
+		return listeners_.add(listener);
+	}
+
+	@Override
+	public boolean removeListener(ChangeListener listener) {
+		return listeners_.remove(listener);
 	}
 
 }

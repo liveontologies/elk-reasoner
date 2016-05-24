@@ -1,5 +1,8 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*
  * #%L
  * ELK Reasoner
@@ -39,10 +42,11 @@ final class CachedIndexedOwlThingImpl extends CachedIndexedClassImpl
 
 	private int negativeOccurrenceNo = 0;
 
+	private final List<CachedIndexedOwlThing.ChangeListener> listeners_;
+
 	CachedIndexedOwlThingImpl(ElkClass entity) {
 		super(entity);
-		// always occurs
-		totalOccurrenceNo = 1;
+		this.listeners_ = new ArrayList<CachedIndexedOwlThing.ChangeListener>();
 	}
 
 	@Override
@@ -53,21 +57,36 @@ final class CachedIndexedOwlThingImpl extends CachedIndexedClassImpl
 	boolean updateNegativeOccurrenceNo(final ModifiableOntologyIndex index,
 			int negativeIncrement) {
 
-		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
-			if (!OwlThingContextInitRule.addRuleFor(this, index)) {
-				return false;
-			}
-		}
-
 		negativeOccurrenceNo += negativeIncrement;
 
-		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
-			if (!OwlThingContextInitRule.removeRuleFor(this, index)) {
-				// revert the changes
-				negativeOccurrenceNo -= negativeIncrement;
-				return false;
+		if (negativeOccurrenceNo > 0) {
+			if (negativeOccurrenceNo <= negativeIncrement) {
+				// positiveOccurrenceNo just became > 0
+				if (!OwlThingContextInitRule.addRuleFor(this, index)) {
+					// revert the changes
+					negativeOccurrenceNo -= negativeIncrement;
+					return false;
+				}
+				// else
+				for (int i = 0; i < listeners_.size(); i++) {
+					listeners_.get(i).negativeOccurrenceAppeared();
+				}
+			}
+		} else {
+			if (negativeOccurrenceNo > negativeIncrement) {
+				// positiveOccurrenceNo just became <= 0
+				if (!OwlThingContextInitRule.removeRuleFor(this, index)) {
+					// revert the changes
+					negativeOccurrenceNo -= negativeIncrement;
+					return false;
+				}
+				// else
+				for (int i = 0; i < listeners_.size(); i++) {
+					listeners_.get(i).negativeOccurrenceDisappeared();
+				}
 			}
 		}
+
 		return true;
 	}
 
@@ -87,6 +106,16 @@ final class CachedIndexedOwlThingImpl extends CachedIndexedClassImpl
 		}
 
 		return true;
+	}
+
+	@Override
+	public boolean addListener(ChangeListener listener) {
+		return listeners_.add(listener);
+	}
+
+	@Override
+	public boolean removeListener(ChangeListener listener) {
+		return listeners_.remove(listener);
 	}
 
 }

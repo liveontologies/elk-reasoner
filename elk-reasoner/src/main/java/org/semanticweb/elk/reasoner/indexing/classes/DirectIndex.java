@@ -22,8 +22,13 @@
  */
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlNothing;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlThing;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
@@ -45,34 +50,74 @@ import org.semanticweb.elk.util.collections.chains.Chain;
  * @author "Yevgeny Kazakov"
  *
  */
-public class DirectIndex extends ModifiableIndexedObjectCacheImpl implements
-		ModifiableOntologyIndex {
+public class DirectIndex extends ModifiableIndexedObjectCacheImpl
+		implements ModifiableOntologyIndex {
 
 	private ChainableContextInitRule contextInitRules_;
 
 	private final Multimap<IndexedObjectProperty, ElkAxiom> reflexiveObjectProperties_;
-		
+
+	private final List<OntologyIndex.ChangeListener> listeners_;
+
 	public DirectIndex(PredefinedElkClassFactory elkFactory) {
 		super(elkFactory);
 		this.reflexiveObjectProperties_ = new HashListMultimap<IndexedObjectProperty, ElkAxiom>(
-				64);						
+				64);
+		this.listeners_ = new ArrayList<OntologyIndex.ChangeListener>();
 		// the context root initialization rule is always registered
 		RootContextInitializationRule.addRuleFor(this);
 		// owl:Thing and owl:Nothing always occur
-		OccurrenceIncrement addition = OccurrenceIncrement.getNeutralIncrement(1);
+		OccurrenceIncrement addition = OccurrenceIncrement
+				.getNeutralIncrement(1);
 		getOwlThing().updateOccurrenceNumbers(this, addition);
 		getOwlNothing().updateOccurrenceNumbers(this, addition);
+		// register listeners for occurrences
+		getOwlThing().addListener(new CachedIndexedOwlThing.ChangeListener() {
+
+			@Override
+			public void negativeOccurrenceAppeared() {
+				for (int i = 0; i < listeners_.size(); i++) {
+					listeners_.get(i).negativeOwlThingAppeared();
+				}
+			}
+
+			@Override
+			public void negativeOccurrenceDisappeared() {
+				for (int i = 0; i < listeners_.size(); i++) {
+					listeners_.get(i).negativeOwlThingDisappeared();
+				}
+
+			}
+
+		});
+		getOwlNothing().addListener(new CachedIndexedOwlNothing.ChangeListener() {
+
+			@Override
+			public void positiveOccurrenceAppeared() {
+				for (int i = 0; i < listeners_.size(); i++) {
+					listeners_.get(i).positiveOwlNothingAppeared();
+				}
+			}
+
+			@Override
+			public void positiveOccurrenceDisappeared() {
+				for (int i = 0; i < listeners_.size(); i++) {
+					listeners_.get(i).positiveOwlNothingDisappeared();
+				}
+
+			}
+		});
 	}
 
 	/* read-only methods required by the interface */
 
 	@Override
-	public LinkedContextInitRule getContextInitRuleHead() {
+	public final LinkedContextInitRule getContextInitRuleHead() {
 		return contextInitRules_;
 	}
 
 	@Override
-	public Multimap<IndexedObjectProperty, ElkAxiom> getReflexiveObjectProperties() {
+	public final Multimap<IndexedObjectProperty, ElkAxiom> getReflexiveObjectProperties() {
 		// TODO: make unmodifiable
 		return reflexiveObjectProperties_;
 	}
@@ -104,22 +149,36 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl implements
 	@Override
 	public boolean addReflexiveProperty(IndexedObjectProperty property,
 			ElkAxiom reason) {
-		return reflexiveObjectProperties_.add(property, reason);
+		boolean success = reflexiveObjectProperties_.add(property, reason);
+		if (success) {
+			for (int i = 0; i < listeners_.size(); i++) {
+				listeners_.get(i).reflexiveObjectPropertyAddition(property,
+						reason);
+			}
+		}
+		return success;
 	}
 
 	@Override
 	public boolean removeReflexiveProperty(IndexedObjectProperty property,
 			ElkAxiom reason) {
-		return reflexiveObjectProperties_.remove(property, reason);
+		boolean success = reflexiveObjectProperties_.remove(property, reason);
+		if (success) {
+			for (int i = 0; i < listeners_.size(); i++) {
+				listeners_.get(i).reflexiveObjectPropertyRemoval(property,
+						reason);
+			}
+		}
+		return success;
 	}
 
 	@Override
-	public boolean hasNegativeOwlThing() {
+	public final boolean hasNegativeOwlThing() {
 		return getOwlThing().occursNegatively();
 	}
 
 	@Override
-	public boolean hasPositivelyOwlNothing() {
+	public final boolean hasPositiveOwlNothing() {
 		return getOwlNothing().occursPositively();
 	}
 
@@ -159,8 +218,41 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl implements
 			@Override
 			public void setNext(ChainableContextInitRule tail) {
 				contextInitRules_ = tail;
+				for (int i = 0; i < listeners_.size(); i++) {
+					listeners_.get(i).contextInitRuleHeadSet(tail);
+				}
 			}
 		};
+	}
+
+	@Override
+	public boolean addListener(OntologyIndex.ChangeListener listener) {
+		if (!super.addListener(listener)) {
+			return false;
+		}
+		// else
+		if (!listeners_.add(listener)) {
+			// revert
+			super.removeListener(listener);
+			return false;
+		}
+		// else
+		return true;
+	}
+
+	@Override
+	public boolean removeListener(OntologyIndex.ChangeListener listener) {
+		if (!super.removeListener(listener)) {
+			return false;
+		}
+		// else
+		if (!listeners_.remove(listener)) {
+			// revert
+			super.addListener(listener);
+			return false;
+		}
+		// else
+		return true;
 	}
 
 }

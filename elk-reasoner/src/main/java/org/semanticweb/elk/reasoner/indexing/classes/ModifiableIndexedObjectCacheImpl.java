@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import java.util.ArrayList;
+
 /*
  * #%L
  * ELK Reasoner
@@ -23,6 +25,7 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import java.util.Collection;
+import java.util.List;
 
 import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClass;
@@ -43,6 +46,7 @@ import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlThing;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectCache;
@@ -80,6 +84,8 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 
 	private final CachedIndexedOwlNothing owlNothing_;
 
+	private final List<IndexedObjectCache.ChangeListener> listeners_;
+
 	public ModifiableIndexedObjectCacheImpl(
 			PredefinedElkClassFactory elkFactory, int initialSize) {
 		this.cachedComplexClassExpressions_ = new EntryCollection<CachedIndexedComplexClassExpression<?>>(
@@ -102,8 +108,9 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 				elkFactory.getOwlThing());
 		this.owlNothing_ = new CachedIndexedOwlNothingImpl(
 				elkFactory.getOwlNothing());
+		this.listeners_ = new ArrayList<IndexedObjectCache.ChangeListener>();
 		add(owlThing_);
-		add(owlNothing_);
+		add(owlNothing_);		
 	}
 
 	public ModifiableIndexedObjectCacheImpl(
@@ -112,23 +119,23 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 	}
 
 	@Override
-	public Collection<? extends IndexedClass> getClasses() {
+	public final Collection<? extends IndexedClass> getClasses() {
 		return cachedClasses_;
 	}
 
 	@Override
-	public Collection<? extends IndexedIndividual> getIndividuals() {
+	public final Collection<? extends IndexedIndividual> getIndividuals() {
 		return cachedIndividuals_;
 	}
 
 	@Override
-	public Collection<? extends IndexedObjectProperty> getObjectProperties() {
+	public final Collection<? extends IndexedObjectProperty> getObjectProperties() {
 		return cachedObjectProperties_;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Collection<? extends IndexedClassExpression> getClassExpressions() {
+	public final Collection<? extends IndexedClassExpression> getClassExpressions() {
 		return Operations.getCollection(
 				Operations.concat(cachedClasses_, cachedIndividuals_,
 						cachedComplexClassExpressions_),
@@ -138,7 +145,7 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Collection<? extends IndexedPropertyChain> getPropertyChains() {
+	public final Collection<? extends IndexedPropertyChain> getPropertyChains() {
 		return Operations.getCollection(
 				Operations.concat(cachedObjectProperties_,
 						cachedBinaryPropertyChains_),
@@ -147,12 +154,12 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 	}
 
 	@Override
-	public CachedIndexedOwlThing getOwlThing() {
+	public final CachedIndexedOwlThing getOwlThing() {
 		return owlThing_;
 	}
 
 	@Override
-	public CachedIndexedOwlNothing getOwlNothing() {
+	public final CachedIndexedOwlNothing getOwlNothing() {
 		return owlNothing_;
 	}
 
@@ -172,6 +179,16 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 	public void remove(CachedIndexedObject<?> input) {
 		LOGGER_.trace("{}: removing from cache", input);
 		input.accept(deleter_);
+	}
+
+	@Override
+	public final boolean addListener(IndexedObjectCache.ChangeListener listener) {
+		return listeners_.add(listener);
+	}
+
+	@Override
+	public final boolean removeListener(IndexedObjectCache.ChangeListener listener) {
+		return listeners_.remove(listener);
 	}
 
 	private class Resolver_ implements CachedIndexedObject.Filter {
@@ -247,61 +264,79 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 		@Override
 		public CachedIndexedClass filter(CachedIndexedClass element) {
 			cachedClasses_.addStructural(element);
+			for (int i = 0; i < listeners_.size(); i++) {
+				IndexedObjectCache.ChangeListener listener = listeners_.get(i);
+				listener.classAddition(element);
+				listener.classExpressionAddition(element);
+			}
 			return null;
 		}
 
 		@Override
 		public CachedIndexedIndividual filter(CachedIndexedIndividual element) {
 			cachedIndividuals_.addStructural(element);
+			for (int i = 0; i < listeners_.size(); i++) {
+				IndexedObjectCache.ChangeListener listener = listeners_.get(i);
+				listener.individualAddition(element);
+				listener.classExpressionAddition(element);
+			}
+			return null;
+		}
+
+		private <T extends CachedIndexedComplexClassExpression<T>> T defaultFilter(
+				T element) {
+			cachedComplexClassExpressions_.addStructural(element);
+			for (int i = 0; i < listeners_.size(); i++) {
+				listeners_.get(i).classExpressionAddition(element);
+			}
 			return null;
 		}
 
 		@Override
 		public CachedIndexedObjectComplementOf filter(
 				CachedIndexedObjectComplementOf element) {
-			cachedComplexClassExpressions_.addStructural(element);
-			return null;
+			return defaultFilter(element);
 		}
 
 		@Override
 		public CachedIndexedObjectIntersectionOf filter(
 				CachedIndexedObjectIntersectionOf element) {
-			cachedComplexClassExpressions_.addStructural(element);
-			return null;
+			return defaultFilter(element);
 		}
 
 		@Override
 		public CachedIndexedObjectSomeValuesFrom filter(
 				CachedIndexedObjectSomeValuesFrom element) {
-			cachedComplexClassExpressions_.addStructural(element);
-			return null;
+			return defaultFilter(element);
 		}
 
 		@Override
 		public CachedIndexedObjectHasSelf filter(
 				CachedIndexedObjectHasSelf element) {
-			cachedComplexClassExpressions_.addStructural(element);
-			return null;
+			return defaultFilter(element);
 		}
 
 		@Override
 		public CachedIndexedObjectUnionOf filter(
 				CachedIndexedObjectUnionOf element) {
-			cachedComplexClassExpressions_.addStructural(element);
-			return null;
+			return defaultFilter(element);
 		}
 
 		@Override
 		public CachedIndexedDataHasValue filter(
 				CachedIndexedDataHasValue element) {
-			cachedComplexClassExpressions_.addStructural(element);
-			return null;
+			return defaultFilter(element);
 		}
 
 		@Override
 		public CachedIndexedObjectProperty filter(
 				CachedIndexedObjectProperty element) {
 			cachedObjectProperties_.addStructural(element);
+			for (int i = 0; i < listeners_.size(); i++) {
+				IndexedObjectCache.ChangeListener listener = listeners_.get(i);
+				listener.objectPropertyAddition(element);
+				listener.propertyChainAddition(element);
+			}
 			return null;
 		}
 
@@ -309,6 +344,9 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 		public CachedIndexedComplexPropertyChain filter(
 				CachedIndexedComplexPropertyChain element) {
 			cachedBinaryPropertyChains_.addStructural(element);
+			for (int i = 0; i < listeners_.size(); i++) {
+				listeners_.get(i).propertyChainAddition(element);
+			}
 			return null;
 		}
 
@@ -325,60 +363,105 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 
 		@Override
 		public CachedIndexedClass filter(CachedIndexedClass element) {
-			return cachedClasses_.removeStructural(element);
+			CachedIndexedClass result = cachedClasses_
+					.removeStructural(element);
+			if (result != null) {
+				for (int i = 0; i < listeners_.size(); i++) {
+					IndexedObjectCache.ChangeListener listener = listeners_.get(i);
+					listener.classRemoval(result);
+					listener.classExpressionRemoval(result);
+				}
+			}
+			return result;
 		}
 
 		@Override
 		public CachedIndexedIndividual filter(CachedIndexedIndividual element) {
-			return cachedIndividuals_.removeStructural(element);
+			CachedIndexedIndividual result = cachedIndividuals_
+					.removeStructural(element);
+			if (result != null) {
+				for (int i = 0; i < listeners_.size(); i++) {
+					IndexedObjectCache.ChangeListener listener = listeners_.get(i);
+					listener.individualRemoval(result);
+					listener.classExpressionRemoval(result);
+				}
+			}
+			return result;
+		}
+
+		private <T extends CachedIndexedComplexClassExpression<T>> T defaultFilter(
+				T element) {
+			T result = cachedComplexClassExpressions_.removeStructural(element);
+			if (result != null) {
+				for (int i = 0; i < listeners_.size(); i++) {
+					listeners_.get(i).classExpressionRemoval(element);
+				}
+			}
+			return result;
 		}
 
 		@Override
 		public CachedIndexedObjectComplementOf filter(
 				CachedIndexedObjectComplementOf element) {
-			return cachedComplexClassExpressions_.removeStructural(element);
+			return defaultFilter(element);
 		}
 
 		@Override
 		public CachedIndexedObjectIntersectionOf filter(
 				CachedIndexedObjectIntersectionOf element) {
-			return cachedComplexClassExpressions_.removeStructural(element);
+			return defaultFilter(element);
 		}
 
 		@Override
 		public CachedIndexedObjectSomeValuesFrom filter(
 				CachedIndexedObjectSomeValuesFrom element) {
-			return cachedComplexClassExpressions_.removeStructural(element);
+			return defaultFilter(element);
 		}
 
 		@Override
 		public CachedIndexedObjectHasSelf filter(
 				CachedIndexedObjectHasSelf element) {
-			return cachedComplexClassExpressions_.removeStructural(element);
+			return defaultFilter(element);
 		}
 
 		@Override
 		public CachedIndexedObjectUnionOf filter(
 				CachedIndexedObjectUnionOf element) {
-			return cachedComplexClassExpressions_.removeStructural(element);
+			return defaultFilter(element);
 		}
 
 		@Override
 		public CachedIndexedDataHasValue filter(
 				CachedIndexedDataHasValue element) {
-			return cachedComplexClassExpressions_.removeStructural(element);
+			return defaultFilter(element);
 		}
 
 		@Override
 		public CachedIndexedObjectProperty filter(
 				CachedIndexedObjectProperty element) {
-			return cachedObjectProperties_.removeStructural(element);
+			CachedIndexedObjectProperty result = cachedObjectProperties_
+					.removeStructural(element);
+			if (result != null) {
+				for (int i = 0; i < listeners_.size(); i++) {
+					IndexedObjectCache.ChangeListener listener = listeners_.get(i);
+					listener.objectPropertyRemoval(result);
+					listener.propertyChainRemoval(result);
+				}
+			}
+			return result;
 		}
 
 		@Override
 		public CachedIndexedComplexPropertyChain filter(
 				CachedIndexedComplexPropertyChain element) {
-			return cachedBinaryPropertyChains_.removeStructural(element);
+			CachedIndexedComplexPropertyChain result = cachedBinaryPropertyChains_
+					.removeStructural(element);
+			if (result != null) {
+				for (int i = 0; i < listeners_.size(); i++) {
+					listeners_.get(i).propertyChainRemoval(element);
+				}
+			}
+			return result;
 		}
 
 		@Override

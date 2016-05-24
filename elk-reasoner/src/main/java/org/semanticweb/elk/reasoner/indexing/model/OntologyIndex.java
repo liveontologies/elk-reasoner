@@ -73,6 +73,52 @@ public interface OntologyIndex extends IndexedObjectCache {
 	 * @return {@code true} if {@code owl:Nothing} occurs positively in the
 	 *         ontology represented by this {@link OntologyIndex}
 	 */
-	boolean hasPositivelyOwlNothing();
+	boolean hasPositiveOwlNothing();
+
+	/**
+	 * Registers a given {@link ChangeListener} with this {@link OntologyIndex}
+	 * 
+	 * @param listener
+	 * @return {@code true} if the operation was successful and {@code false}
+	 *         otherwise; if {@code false} is return, the listener was not
+	 *         registered
+	 */
+	public boolean addListener(ChangeListener listener);
+
+	/**
+	 * Removes a given {@link ChangeListener} from this {@link OntologyIndex}
+	 * 
+	 * @param listener
+	 * @return {@code true} if the operation was successful and {@code false}
+	 *         otherwise; if {@code false} is return, the listener was not
+	 *         removed
+	 */
+	public boolean removeListener(ChangeListener listener);
+
+	/**
+	 * The listener for changes in {@link OntologyIndex}
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public interface ChangeListener extends IndexedObjectCache.ChangeListener {
+
+		void reflexiveObjectPropertyAddition(IndexedObjectProperty property,
+				ElkAxiom reason);
+
+		void reflexiveObjectPropertyRemoval(IndexedObjectProperty property,
+				ElkAxiom reason);
+
+		void contextInitRuleHeadSet(LinkedContextInitRule rule);
+
+		void negativeOwlThingAppeared();
+
+		void negativeOwlThingDisappeared();
+
+		void positiveOwlNothingAppeared();
+
+		void positiveOwlNothingDisappeared();
+
+	}
 
 }

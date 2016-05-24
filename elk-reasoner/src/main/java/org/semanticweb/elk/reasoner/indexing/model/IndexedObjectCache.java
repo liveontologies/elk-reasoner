@@ -89,4 +89,54 @@ public interface IndexedObjectCache {
 	 */
 	public IndexedClass getOwlNothing();
 
+	/**
+	 * Registers a given {@link ChangeListener} with this {@link IndexedObjectCache}
+	 * 
+	 * @param listener
+	 * @return {@code true} if the operation was successful and {@code false}
+	 *         otherwise; if {@code false} is return, the listener was not
+	 *         registered
+	 */
+	public boolean addListener(ChangeListener listener);
+
+	/**
+	 * Removes a given {@link ChangeListener} from this {@link IndexedObjectCache}
+	 * 
+	 * @param listener
+	 * @return {@code true} if the operation was successful and {@code false}
+	 *         otherwise; if {@code false} is return, the listener was not
+	 *         removed
+	 */
+	public boolean removeListener(ChangeListener listener);
+
+	/**
+	 * The listener for changes in {@link IndexedObjectCache}
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	public interface ChangeListener {
+
+		void classAddition(IndexedClass cls);
+
+		void classRemoval(IndexedClass cls);
+
+		void individualAddition(IndexedIndividual ind);
+
+		void individualRemoval(IndexedIndividual ind);
+
+		void objectPropertyAddition(IndexedObjectProperty prop);
+
+		void objectPropertyRemoval(IndexedObjectProperty prop);
+
+		void classExpressionAddition(IndexedClassExpression expr);
+
+		void classExpressionRemoval(IndexedClassExpression expr);
+
+		void propertyChainAddition(IndexedPropertyChain chain);
+
+		void propertyChainRemoval(IndexedPropertyChain chain);
+
+	}
+
 }
