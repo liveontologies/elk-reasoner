@@ -40,6 +40,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
+import org.semanticweb.elk.reasoner.consistency.ConsistencyCheckingState;
 import org.semanticweb.elk.reasoner.indexing.classes.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
@@ -136,9 +137,9 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 */
 	final DifferentialIndex ontologyIndex;
 	/**
-	 * {@code true} if the current ontology is inconsistent
+	 * Stores (partial) information about consistency checking computation
 	 */
-	IndexedClassEntity inconsistentEntity = null;
+	final ConsistencyCheckingState consistencyCheckingState;
 	/**
 	 * Taxonomy state that stores (partial) classification
 	 */
@@ -185,6 +186,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		this.ontologyIndex = new DifferentialIndex(elkFactory);
 		this.saturationState = SaturationStateFactory
 				.createSaturationState(ontologyIndex);
+		this.consistencyCheckingState = ConsistencyCheckingState
+				.create(saturationState);
 		this.ruleAndConclusionStats = new SaturationStatistics();
 		this.stageManager = new ReasonerStageManager(this);
 		this.expressionConverter_ = new ElkPolarityExpressionConverterImpl(
@@ -376,7 +379,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			complete(stageManager.consistencyCheckingStage);
 		}
 
-		return inconsistentEntity != null;
+		return consistencyCheckingState.isInconsistent();
 	}
 
 	/**
@@ -662,6 +665,14 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		return traceState_;
 	}
 
+	@Deprecated
+	public IndexedClassEntity getInconsistentEntity() {
+		return consistencyCheckingState.isOwlThingInconsistent()
+				? ontologyIndex.getOwlThing()
+				: consistencyCheckingState.getInconsistentIndividuals()
+						.iterator().next();
+	}
+	
 	/**
 	 * @return either owl:Thing, if it was derived to be a subclass of
 	 *         owl:Nothing or the individual which was inferred to be an
@@ -672,6 +683,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		if (!isInconsistent()) {
 			throw new IllegalStateException("The ontology is consistent");
 		}
+		IndexedClassEntity inconsistentEntity = getInconsistentEntity();
 		toTrace(factory_.getContradiction(inconsistentEntity));
 		if (!traceState_.getToTrace().isEmpty()) {
 			getStageExecutor().complete(stageManager.inferenceTracingStage);

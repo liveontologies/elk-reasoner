@@ -38,6 +38,14 @@ public interface IndexedEntity extends IndexedObject {
 	ElkEntity getElkEntity();
 
 	/**
+	 * @return {@code true} if this {@link IndexedClassExpression} occurs in the
+	 *         ontology
+	 */
+	boolean occurs();
+
+	String printOccurrenceNumbers();
+	
+	/**
 	 * The visitor pattern for instances
 	 * 
 	 * @author Yevgeny Kazakov

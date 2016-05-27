@@ -22,9 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
-
 /**
+ * FIXME: make this stage incremental and update the result
+ * 
  * A {@link ReasonerStage} during which consistency of the current ontology is
  * checked
  * 
@@ -41,25 +41,6 @@ class IncrementalConsistencyCheckingStage extends ConsistencyCheckingStage {
 	@Override
 	public String getName() {
 		return "Incremental Consistency Checking";
-	}
-
-	@Override
-	public boolean preExecute() {
-		if (!super.preExecute())
-			return false;
-
-		this.computation = new ConsistencyChecking(
-				reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor(), reasoner.ontologyIndex,
-				reasoner.saturationState);
-		return true;
-	}
-
-	@Override
-	public boolean postExecute() {
-		if (!super.postExecute())
-			return false;
-		return true;
 	}
 
 }

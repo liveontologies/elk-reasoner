@@ -22,7 +22,10 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
+import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
 
 /**
  * A {@link ReasonerStage} during which consistency of the current ontology is
@@ -36,7 +39,7 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	/**
 	 * the computation used for this stage
 	 */
-	protected ConsistencyChecking computation = null;
+	protected ClassExpressionSaturation<IndexedClassEntity> computation = null;
 
 	public ConsistencyCheckingStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
@@ -52,10 +55,12 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-		this.computation = new ConsistencyChecking(
+		this.computation = new ClassExpressionSaturation<IndexedClassEntity>(
+				reasoner.consistencyCheckingState.getTestEntitites(),
 				reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor(), reasoner.ontologyIndex,
-				reasoner.saturationState);
+				reasoner.getProgressMonitor(),
+				new RuleApplicationAdditionFactory<RuleApplicationInput>(
+						reasoner.saturationState));
 		return true;
 	}
 
@@ -68,13 +73,11 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		reasoner.inconsistentEntity = computation.getInconsistentEntity();
-		reasoner.ruleAndConclusionStats.add(computation
-				.getRuleAndConclusionStatistics());
+		reasoner.ruleAndConclusionStats
+				.add(computation.getRuleAndConclusionStatistics());
 		this.computation = null;
-
 		// FIXME Obviously needed a better clean-up after inconsistency
-		if (reasoner.inconsistentEntity != null) {
+		if (reasoner.consistencyCheckingState.isInconsistent()) {
 			reasoner.classTaxonomyState.getWriter().clearTaxonomy();
 			reasoner.instanceTaxonomyState.getWriter().clearTaxonomy();
 		}

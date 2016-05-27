@@ -79,8 +79,8 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 				reasoner.instanceTaxonomyState.getRemovedIndividuals());
 		@SuppressWarnings("unchecked")
 		Collection<IndexedClassEntity> inputs = Operations.getCollection(
-				Operations.concat(modifiedEntities,
-						Operations.concat(removedClasses, removedIndividuals)),
+				Operations.concat(modifiedEntities, removedClasses,
+						removedIndividuals),
 				modifiedEntities.size() + removedClasses.size()
 						+ removedIndividuals.size());
 

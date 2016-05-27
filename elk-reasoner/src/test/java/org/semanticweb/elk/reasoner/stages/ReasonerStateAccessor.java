@@ -68,6 +68,6 @@ public class ReasonerStateAccessor {
 	}
 	
 	public static IndexedClassEntity getInconsistentEntity(AbstractReasonerState reasoner) {
-		return reasoner.inconsistentEntity;
+		return reasoner.getInconsistentEntity();
 	}
 }
