@@ -23,9 +23,11 @@ package org.semanticweb.elk.reasoner.saturation;
  */
 
 import java.util.AbstractCollection;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -42,6 +44,8 @@ import org.slf4j.LoggerFactory;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <EC>
+ *            the type of contexts maintained by this {@link SaturationState}
  */
 public abstract class AbstractSaturationState<EC extends ExtendedContext>
 		implements SaturationState<EC> {
@@ -74,9 +78,12 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 	/**
 	 * increments every time a {@link Context} is marked as saturated
 	 */
-	private final AtomicInteger contextSetSaturatedCount_ = new AtomicInteger(0);
+	private final AtomicInteger contextSetSaturatedCount_ = new AtomicInteger(
+			0);
 
 	private final ContextFactory<EC> contextFactory;
+
+	private final List<SaturationState.ChangeListener<EC>> listeners_ = new ArrayList<SaturationState.ChangeListener<EC>>();
 
 	public AbstractSaturationState(OntologyIndex index,
 			ContextFactory<EC> factory) {
@@ -122,10 +129,14 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 		if (next == null)
 			return null;
 		// else
-		if (next.setSaturated(true))
+		if (next.setSaturated(true)) {
 			LOGGER_.error("{}: was marked as saturated already");
+		}	
 		LOGGER_.trace("{}: marked as saturated", next);
 		contextSetSaturatedCount_.incrementAndGet();
+		for (int i = 0; i < listeners_.size(); i++) {
+			listeners_.get(i).contextMarkSaturated(next);
+		}
 		return next;
 	}
 
@@ -155,7 +166,25 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 	}
 
 	@Override
+	public boolean addListener(SaturationState.ChangeListener<EC> listener) {
+		return listeners_.add(listener);
+	}
+
+	@Override
+	public boolean removeListener(SaturationState.ChangeListener<EC> listener) {
+		return listeners_.remove(listener);
+	}
+
+	@Override
 	abstract public EC getContext(IndexedContextRoot root);
+
+	int getChangeListenerCount() {
+		return listeners_.size();
+	}
+
+	SaturationState.ChangeListener<EC> getChangeListener(int index) {
+		return listeners_.get(index);
+	}
 
 	abstract void resetContexts();
 
@@ -166,8 +195,8 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 	 * @param context
 	 *            the {@link ExtendedContext} to be added to this
 	 *            {@link SaturationState}
-	 * @return the {@link ExtendedContext} in this {@link SaturationState}
-	 *         assigned to the same root, or {@link null} if no such
+	 * @return the {@link ExtendedContext} in this {@link SaturationState} that
+	 *         was assigned to the same root, or {@link null} if no such
 	 *         {@link Context} existed before this method is called
 	 * 
 	 * @see ExtendedContext#getRoot()
@@ -212,6 +241,9 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 			notSaturatedContexts_.add(context);
 			countextMarkNonSaturatedCount_.incrementAndGet();
 			contextModificationListener_.notifyContextModification(context);
+			for (int i = 0; i < listeners_.size(); i++) {
+				listeners_.get(i).contextMarkNonSaturated(context);
+			}
 		}
 
 		@Override
@@ -267,8 +299,7 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 
 		@Override
 		public void produce(ClassInference inference) {
-			produce(getCreateContext(inference.getDestination()),
-					inference);
+			produce(getCreateContext(inference.getDestination()), inference);
 		}
 
 		@Override

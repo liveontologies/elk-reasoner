@@ -36,10 +36,15 @@ import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * 
  * @author "Yevgeny Kazakov"
+ * 
+ * @param <C>
+ *            the type of contexts maintained by this
+ *            {@link SaturationStateWriter}
  */
-public interface SaturationStateWriter<C extends Context> extends
-		ClassInferenceProducer {
+public interface SaturationStateWriter<C extends Context>
+		extends ClassInferenceProducer {
 
 	/**
 	 * @return the {@link SaturationState} modified by this

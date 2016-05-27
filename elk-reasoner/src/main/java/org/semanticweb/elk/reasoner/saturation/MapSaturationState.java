@@ -35,9 +35,11 @@ import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <EC>
+ *            the type of contexts maintained by this {@link MapSaturationState}
  */
-public class MapSaturationState<EC extends ExtendedContext> extends
-		AbstractSaturationState<EC> {
+public class MapSaturationState<EC extends ExtendedContext>
+		extends AbstractSaturationState<EC> {
 
 	private final ConcurrentHashMap<IndexedContextRoot, EC> contextAssignment_;
 
@@ -67,11 +69,21 @@ public class MapSaturationState<EC extends ExtendedContext> extends
 	@Override
 	void resetContexts() {
 		contextAssignment_.clear();
+		for (int i = 0; i < getChangeListenerCount(); i++) {
+			getChangeListener(i).contextsClear();
+		}
 	}
 
 	@Override
 	EC setIfAbsent(EC context) {
-		return contextAssignment_.putIfAbsent(context.getRoot(), context);
+		EC previous = contextAssignment_.putIfAbsent(context.getRoot(),
+				context);
+		if (previous == null) {
+			for (int i = 0; i < getChangeListenerCount(); i++) {
+				getChangeListener(i).contextAddition(context);
+			}
+		}
+		return previous;
 	}
 
 }

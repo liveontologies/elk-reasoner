@@ -48,7 +48,8 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * @author "Yevgeny Kazakov"
  * 
  */
-class ReferenceSaturationState extends AbstractSaturationState<ExtendedContext> {
+class ReferenceSaturationState
+		extends AbstractSaturationState<ExtendedContext> {
 
 	// the number of contexts created by this SaturationState
 	AtomicInteger contextCount = new AtomicInteger(0);
@@ -96,7 +97,8 @@ class ReferenceSaturationState extends AbstractSaturationState<ExtendedContext> 
 
 					@Override
 					public boolean hasNext() {
-						return (nextContext != null || nextFillerContext != null);
+						return (nextContext != null
+								|| nextFillerContext != null);
 					}
 
 					@Override
@@ -148,18 +150,26 @@ class ReferenceSaturationState extends AbstractSaturationState<ExtendedContext> 
 			// everything is already done
 			return;
 		// else
-		for (Context context : getContexts()) {
-			context.getRoot().resetContext();
+		for (ExtendedContext context : getContexts()) {
+			context.getRoot().resetContext();			
 		}
 		contextCount.set(0);
+		for (int i = 0; i < getChangeListenerCount(); i++) {
+			getChangeListener(i).contextsClear();
+		}
 	}
 
 	@Override
 	ExtendedContext setIfAbsent(ExtendedContext context) {
-		ExtendedContext result = context.getRoot().setContextIfAbsent(context);
-		if (result == null)
+		ExtendedContext previous = context.getRoot()
+				.setContextIfAbsent(context);
+		if (previous == null) {
 			contextCount.incrementAndGet();
-		return result;
+			for (int i = 0; i < getChangeListenerCount(); i++) {
+				getChangeListener(i).contextAddition(context);
+			}
+		}
+		return previous;
 	}
 
 }

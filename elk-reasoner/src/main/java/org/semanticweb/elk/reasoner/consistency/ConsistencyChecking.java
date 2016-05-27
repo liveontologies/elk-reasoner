@@ -142,7 +142,7 @@ public class ConsistencyChecking
 	 */
 	public static Collection<IndexedClassEntity> getTestEntities(
 			final OntologyIndex ontologyIndex) {
-		if (!ontologyIndex.hasPositivelyOwlNothing()) {
+		if (!ontologyIndex.hasPositiveOwlNothing()) {
 			LOGGER_.trace("owl:Nothing does not occur positively; ontology is consistent");
 			/*
 			 * if the ontology does not have any positive occurrence of bottom,

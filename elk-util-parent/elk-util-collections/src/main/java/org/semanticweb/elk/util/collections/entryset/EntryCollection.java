@@ -31,12 +31,11 @@ import java.util.NoSuchElementException;
 /**
  * TODO: update documentation
  * 
- * A duplicate-free collection of entries {@code E#equals(Object)}. The main
- * method is merging a entry into the collection, which returns an equal entry
- * from the collection, if there is one, or, otherwise, inserts the input entry
- * into the collection returning itself. Other methods include finding an entry
- * in the collection that is equal to the given one, deleting such an entry from
- * the collection, if found, and iterating over the entries.
+ * A collection of entries, maintained modulo structural equality
+ * {@code Entry#structuralEquals(Object)}. This may be different from
+ * {@code Entry#equals(Object)}, which is used for finding an element in the
+ * collection. The main methods are inserting, removing, and finding elements
+ * modulo structural equality.
  * 
  * The implementation is largely based on the implementation of
  * {@linkplain HashSet} from the standard Java collection library.
@@ -47,8 +46,8 @@ import java.util.NoSuchElementException;
  * @param <E>
  *            the type of entries in the collection
  */
-public class EntryCollection<E extends Entry<?, E>> extends
-		AbstractCollection<E> {
+public class EntryCollection<E extends Entry<?, E>>
+		extends AbstractCollection<E> {
 
 	/**
 	 * The default initial capacity - MUST be a power of two.
@@ -146,13 +145,13 @@ public class EntryCollection<E extends Entry<?, E>> extends
 	public EntryCollection(int initialCapacity, float underloadFactor,
 			float overloadFactor) {
 		if (initialCapacity < 0)
-			throw new IllegalArgumentException("Illegal initial capacity: "
-					+ initialCapacity);
+			throw new IllegalArgumentException(
+					"Illegal initial capacity: " + initialCapacity);
 		if (initialCapacity > MAXIMUM_CAPACITY)
 			initialCapacity = MAXIMUM_CAPACITY;
 		if (overloadFactor <= 0 || Float.isNaN(overloadFactor))
-			throw new IllegalArgumentException("Illegal load factor: "
-					+ overloadFactor);
+			throw new IllegalArgumentException(
+					"Illegal load factor: " + overloadFactor);
 
 		// Find a power of 2 >= initialCapacity
 		int capacity = 1;
@@ -179,7 +178,8 @@ public class EntryCollection<E extends Entry<?, E>> extends
 	 *             if the initial capacity is negative.
 	 */
 	public EntryCollection(int initialCapacity) {
-		this(initialCapacity, DEFAULT_UNDERLOAD_FACTOR, DEFAULT_OVERLOAD_FACTOR);
+		this(initialCapacity, DEFAULT_UNDERLOAD_FACTOR,
+				DEFAULT_OVERLOAD_FACTOR);
 	}
 
 	/**
@@ -268,9 +268,14 @@ public class EntryCollection<E extends Entry<?, E>> extends
 	}
 
 	/**
-	 * Adds the given entry to this collection
+	 * Adds the given entry to this collection; the entry is added even if a
+	 * structurally equal entry (modulo {@link Entry#structuralHashCode()} and
+	 * {@link Entry#structuralEquals(Object)}) is already present in the
+	 * collection
 	 * 
 	 * @param entry
+	 *            the entry to be inserted; it is not allowed to have linked
+	 *            elements: {@link Entry#getNext()} should be {@code null}
 	 */
 	public void addStructural(E entry) {
 		if (entry.getNext() != null)

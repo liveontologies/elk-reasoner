@@ -27,7 +27,6 @@ package org.semanticweb.elk.reasoner.saturation;
 
 import java.util.Collection;
 
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -39,7 +38,11 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ *         
  * @author "Yevgeny Kazakov"
+ *
+ * @param <C>
+ *            the type of contexts maintained by this {@link SaturationState}
  */
 public interface SaturationState<C extends Context> {
 
@@ -78,7 +81,7 @@ public interface SaturationState<C extends Context> {
 	 * @return the total number of times a {@link Context} was marked as
 	 *         non-saturated using this {@link SaturationState}, i.e., the
 	 *         number of times a method
-	 *         {@link SaturationStateWriter#markAsNotSaturated(IndexedClassExpression)}
+	 *         {@link SaturationStateWriter#markAsNotSaturated(IndexedContextRoot)}
 	 *         returned {@code true}. It can only increase over time.
 	 */
 	int getContextMarkNonSaturatedCount();
@@ -86,8 +89,8 @@ public interface SaturationState<C extends Context> {
 	/**
 	 * @return the total number of times a {@link Context} was set as saturated
 	 *         using this {@link SaturationState}, i.e., the number of times a
-	 *         method {@link setNextContextSaturated} returned not {@link null}.
-	 *         It can only increase over time. This should always be smaller
+	 *         method {@link #setNextContextSaturated} returned not {@link null}
+	 *         . It can only increase over time. This should always be smaller
 	 *         than the value of #getContextMarkNonSaturatedCount().
 	 */
 	int getContextSetSaturatedCount();
@@ -170,5 +173,72 @@ public interface SaturationState<C extends Context> {
 	 * @see #getContextModifyingWriter()
 	 */
 	public ContextCreatingSaturationStateWriter<C> getContextCreatingWriter();
+
+	/**
+	 * Registers a given {@link ChangeListener} with this
+	 * {@link SaturationState}
+	 * 
+	 * @param listener
+	 * @return {@code true} if the operation was successful and {@code false}
+	 *         otherwise; if {@code false} is return, the listener was not
+	 *         registered
+	 */
+	public boolean addListener(ChangeListener<C> listener);
+
+	/**
+	 * Removes a given {@link ChangeListener} from this {@link SaturationState}
+	 * 
+	 * @param listener
+	 * @return {@code true} if the operation was successful and {@code false}
+	 *         otherwise; if {@code false} is return, the listener was not
+	 *         removed
+	 */
+	public boolean removeListener(ChangeListener<C> listener);
+
+	/**
+	 * The listener for changes in {@link SaturationState}
+	 * 
+	 * @author Yevgeny Kazakov
+	 * 
+	 * @param <C>
+	 *            the type of contexts maintained by the {@link SaturationState}
+	 */
+	public interface ChangeListener<C extends Context> {
+
+		/**
+		 * Is triggered immediately after a give context is added to the
+		 * {@link SaturationState}, i.e., it appears
+		 * {@link SaturationState#getContexts()}.
+		 * 
+		 * @param context
+		 */
+		void contextAddition(C context);
+
+		/**
+		 * Is triggered immediately after all contexts are removed from the
+		 * {@link SaturationState}, i.e., {@link SaturationState#getContexts()}
+		 * becomes empty.
+		 */
+		void contextsClear();
+
+		/**
+		 * Is triggered immediately after the given context is marked as
+		 * saturated, i.e., it disappears from
+		 * {@link SaturationState#getNotSaturatedContexts()}.
+		 * 
+		 * @param context
+		 */
+		void contextMarkSaturated(C context);
+
+		/**
+		 * Is triggered immediately after the given context is marked as
+		 * non-saturated, i.e., it appears in
+		 * {@link SaturationState#getNotSaturatedContexts()}.
+		 * 
+		 * @param context
+		 */
+		void contextMarkNonSaturated(C context);
+
+	}
 
 }
