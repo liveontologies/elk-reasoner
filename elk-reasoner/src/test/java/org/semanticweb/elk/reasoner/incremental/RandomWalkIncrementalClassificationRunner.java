@@ -26,7 +26,6 @@ package org.semanticweb.elk.reasoner.incremental;
  */
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -49,12 +48,12 @@ import org.slf4j.LoggerFactory;
 /**
  * A reusable runner which can be used for both unit tests and benchmarking
  * 
- * @param T
- *            Type of axioms (using the ELK API, the OWL API, or whatever)
- * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * 
+ * @param <T>
+ *            Type of axioms (using the ELK API, the OWL API, or whatever)
  */
 public class RandomWalkIncrementalClassificationRunner<T> {
 
@@ -77,8 +76,8 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 	@SuppressWarnings("unchecked")
 	public void run(final Reasoner reasoner,
 			final OnOffVector<T> changingAxioms, final List<T> staticAxioms,
-			final long seed) throws ElkException, InterruptedException,
-			IOException {
+			final long seed)
+			throws ElkException, InterruptedException, IOException {
 
 		// for storing taxonomy hash history
 		Deque<String> resultHashHistory = new LinkedList<String>();
@@ -128,8 +127,9 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 					LOGGER_.trace("Taxonomy hash code for round " + (j + 1)
 							+ " iteration " + (i + 1) + ": " + resultHash);
 					LOGGER_.trace("Current axioms");
-					printCurrentAxioms(Operations.concat(
-							changingAxioms.getOnElements(), staticAxioms),
+					printCurrentAxioms(
+							Operations.concat(changingAxioms.getOnElements(),
+									staticAxioms),
 							LogLevel.DEBUG);
 
 					printResult(reasoner, LOGGER_, LogLevel.TRACE);
@@ -139,15 +139,19 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 			LOGGER_.trace("Checking the final result");
 
 			String finalResultHash = resultHashHistory.pollLast();
-			Reasoner standardReasoner = io_.createReasoner(Operations.concat(
-					changingAxioms.getOnElements(), staticAxioms));
+			Reasoner standardReasoner = io_.createReasoner(Operations
+					.concat(changingAxioms.getOnElements(), staticAxioms));
 
 			final String expectedResultHash = getResultHash(standardReasoner);
 
 			if (!expectedResultHash.equals(finalResultHash)) {
-				failWithResults(reasoner, changingAxioms, staticAxioms, seed);
+				assertEquals(
+						getFailureMessage(reasoner, changingAxioms,
+								staticAxioms, seed),
+						expectedResultHash, finalResultHash);
 			}
 
+			
 			standardReasoner.shutdown();
 
 			LOGGER_.trace("Reverting the changes");
@@ -172,13 +176,13 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 
 				String taxonomyHash = getResultHash(reasoner);
 
-				try {
-					assertEquals("Seed " + seed, expectedHash, taxonomyHash);
-				} catch (AssertionError e) {
-
-					failWithResults(reasoner, changingAxioms, staticAxioms,
-							seed);
+				if (!expectedHash.equals(taxonomyHash)) {
+					assertEquals(
+							getFailureMessage(reasoner, changingAxioms,
+									staticAxioms, seed),
+							expectedHash, taxonomyHash);
 				}
+
 			}
 
 			// doubling the change size every round
@@ -187,16 +191,16 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void failWithResults(Reasoner testReasoner,
+	private String getFailureMessage(Reasoner testReasoner,
 			final OnOffVector<T> changingAxioms, final List<T> staticAxioms,
 			long seed) throws ElkException {
 
 		LOGGER_.trace("====== FAILURE! ====");
 		LOGGER_.trace("= Expected Reasoner Computation =");
 
-		Reasoner standardReasoner = io_.createReasoner(Operations.concat(
-				changingAxioms.getOnElements(), staticAxioms));
-		standardReasoner.getTaxonomy();
+		Reasoner standardReasoner = io_.createReasoner(Operations
+				.concat(changingAxioms.getOnElements(), staticAxioms));
+		standardReasoner.getTaxonomyQuietly();
 
 		LOGGER_.trace("Current axioms");
 		printCurrentAxioms(
@@ -215,7 +219,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 			// TODO
 		}
 
-		fail("Seed: " + seed + "\n" + writer.getBuffer().toString());
+		return "Seed: " + seed + "\n" + writer.getBuffer().toString();
 	}
 
 	/*

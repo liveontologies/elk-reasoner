@@ -105,6 +105,8 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 
 	protected final ReasoningTestManifest<ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>> manifest;
 	
+	private final OWLOntologyManager manager_ = OWLManager.createOWLOntologyManager();
+	
 	public OWLAPIRandomWalkIncrementalClassificationTest(
 			ReasoningTestManifest<ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>> testManifest) {
 		manifest = testManifest;
@@ -133,14 +135,13 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 
 		LOGGER_.trace("Initial load of test axioms");
 
+		OWLOntology ontology = null;
+		
 		try {
 			stream = manifest.getInput().getInputStream();
 			
-			OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-			OWLOntology ontology = null;
-			
 			try {
-				ontology = manager.loadOntologyFromOntologyDocument(stream);
+				ontology = manager_.loadOntologyFromOntologyDocument(stream);
 				axiomFilter_.filter(ontology, staticAxioms, changingAxioms);
 				
 			} catch (OWLOntologyCreationException e) {
@@ -160,6 +161,9 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 			throw new ElkRuntimeException("Seed " + seed, e);
 		} finally {
 			incrementalReasoner.dispose();
+			if (ontology != null) {
+				manager_.removeOntology(ontology);
+			}
 			IOUtils.closeQuietly(stream);
 		}
 	}
@@ -203,7 +207,7 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 		@Override
 		public Reasoner createReasoner(Iterable<OWLAxiom> axioms) {
 			Set<OWLAxiom> axSet = new ArrayHashSet<OWLAxiom>();
-			OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+			OWLOntologyManager manager = ontology_.getOWLOntologyManager();
 			OWLOntology ontology = null;
 			
 			for (OWLAxiom axiom : axioms) {
@@ -218,8 +222,10 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 				throw new RuntimeException(e);
 			}
 			
-			return new ElkReasoner(ontology, false,
+			Reasoner result = new ElkReasoner(ontology, false,
 					new SimpleStageExecutor()).getInternalReasoner();
+			manager.removeOntology(ontology);
+			return result;
 		}
 
 		@Override
