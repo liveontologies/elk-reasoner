@@ -34,9 +34,8 @@ public interface IndexedObjectUnionOfMatch extends SubsumerElkObjectMatch {
 	 * @param <O>
 	 *            the type of the output
 	 */
-	public interface Visitor<O>
-			extends IndexedObjectUnionOfOneOfMatch.Visitor<O>,
-			IndexedObjectUnionOfUnionOfMatch.Visitor<O> {
+	public interface Visitor<O> extends SubsumerObjectUnionOfMatch.Visitor<O>,
+			SubsumerObjectOneOfMatch.Visitor<O> {
 
 		// combined interface
 	}

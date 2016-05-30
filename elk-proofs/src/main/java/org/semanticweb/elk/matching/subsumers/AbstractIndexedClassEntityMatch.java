@@ -24,9 +24,8 @@ package org.semanticweb.elk.matching.subsumers;
 
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 
-public abstract class AbstractIndexedClassEntityMatch<V extends ElkObject>
-		extends AbstractSubsumerElkObjectMatch<V>
-		implements IndexedClassEntityMatch {
+abstract class AbstractIndexedClassEntityMatch<V extends ElkObject> extends
+		AbstractSubsumerElkObjectMatch<V> implements IndexedClassEntityMatch {
 
 	AbstractIndexedClassEntityMatch(V value) {
 		super(value);

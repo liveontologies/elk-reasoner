@@ -24,7 +24,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * #L%
  */
 
-public abstract class AbstractIndexedContextRootMatch<V extends ElkObject>
+abstract class AbstractIndexedContextRootMatch<V extends ElkObject>
 		implements IndexedContextRootMatch {
 
 	private final V value_;

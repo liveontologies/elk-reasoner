@@ -71,18 +71,7 @@ public class ProofManager implements Disposable {
     private CycleFreeProofRoot blockCycles(OWLAxiomExpression root) throws ProofGenerationException {
     	return new CycleFreeProofRoot(root, OWLProofUtils.computeInferenceGraph(root));
     }
-    
-    public CycleFreeProofRoot getProofRootForInconsistency()  throws ExplanationException {
-    	try {
-			ExplainingOWLReasoner reasoner = getExplainingReasoner();
-			OWLAxiomExpression root = reasoner.getDerivedExpressionForInconsistency();
-			
-			return blockCycles(root);
-		} catch (ProofGenerationException e) {
-			throw new ExplanationException(e);
-		}
-    }
-    
+        
     public CycleFreeProofRoot getProofRoot(OWLAxiom entailment)  throws ExplanationException {
     	// TODO caching
     	try {

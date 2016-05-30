@@ -960,23 +960,6 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 				objectFactory_);
 	}
 	
-	@Override
-	public OWLAxiomExpression getDerivedExpressionForInconsistency() throws ProofGenerationException {
-		// TODO
-		return null;
-//		try {
-//			AxiomExpression<?> expr = new ProofReader(reasoner_)
-//					.eliminateLemmas().getProofRootForInconsistency();
-//			
-//			return ElkToOwlProofConverter.convert(expr);
-//			
-//		} catch (ElkException e) {
-//			LOGGER_.error("Error during proof reconstruction", e);
-//			
-//			throw new ProofGenerationException(e);
-//		} 
-	}
-
 	protected class OntologyChangeListener implements OWLOntologyChangeListener {
 		@Override
 		public void ontologiesChanged(List<? extends OWLOntologyChange> changes)

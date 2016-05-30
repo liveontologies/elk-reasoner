@@ -114,6 +114,11 @@ public class ElkInferenceDummyVisitor<O> implements ElkInference.Visitor<O> {
 	}
 
 	@Override
+	public O visit(ElkClassInclusionOfInconsistentIndividual inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
 	public O visit(ElkClassInclusionOfObjectPropertyAssertion inference) {
 		return defaultVisit(inference);
 	}
@@ -171,7 +176,17 @@ public class ElkInferenceDummyVisitor<O> implements ElkInference.Visitor<O> {
 	}
 
 	@Override
+	public O visit(ElkEquivalentClassesCycle inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
 	public O visit(ElkEquivalentClassesObjectHasValue inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkEquivalentClassesObjectOneOf inference) {
 		return defaultVisit(inference);
 	}
 

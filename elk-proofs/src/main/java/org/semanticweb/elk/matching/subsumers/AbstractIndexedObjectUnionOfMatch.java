@@ -1,5 +1,7 @@
 package org.semanticweb.elk.matching.subsumers;
 
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -22,9 +24,7 @@ package org.semanticweb.elk.matching.subsumers;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-
-public abstract class AbstractIndexedObjectUnionOfMatch<V extends ElkClassExpression>
+abstract class AbstractIndexedObjectUnionOfMatch<V extends ElkClassExpression>
 		extends AbstractSubsumerElkObjectMatch<V>
 		implements IndexedObjectUnionOfMatch {
 
@@ -33,7 +33,7 @@ public abstract class AbstractIndexedObjectUnionOfMatch<V extends ElkClassExpres
 	}
 
 	@Override
-	public <O> O accept(SubsumerElkObjectMatch.Visitor<O> visitor) {
+	public final <O> O accept(SubsumerElkObjectMatch.Visitor<O> visitor) {
 		return accept((IndexedObjectUnionOfMatch.Visitor<O>) visitor);
 	}
 

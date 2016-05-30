@@ -22,11 +22,9 @@ package org.semanticweb.elk.matching.subsumers;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
-import org.semanticweb.elk.owl.interfaces.ElkPropertyRestrictionQualified;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 
-public abstract class AbstractIndexedObjectSomeValuesFromMatch<V extends ElkPropertyRestrictionQualified<ElkObjectPropertyExpression, ? extends ElkObject>>
+abstract class AbstractIndexedObjectSomeValuesFromMatch<V extends ElkClassExpression>
 		extends AbstractSubsumerElkObjectMatch<V>
 		implements IndexedObjectSomeValuesFromMatch {
 
@@ -35,17 +33,7 @@ public abstract class AbstractIndexedObjectSomeValuesFromMatch<V extends ElkProp
 	}
 
 	@Override
-	public ElkObjectPropertyExpression getPropertyMatch() {
-		return getValue().getProperty();
-	}
-
-	@Override
-	public ElkObject getFillerMatch() {
-		return getValue().getFiller();
-	}
-
-	@Override
-	public <O> O accept(SubsumerElkObjectMatch.Visitor<O> visitor) {
+	public final <O> O accept(SubsumerElkObjectMatch.Visitor<O> visitor) {
 		return accept((IndexedObjectSomeValuesFromMatch.Visitor<O>) visitor);
 	}
 

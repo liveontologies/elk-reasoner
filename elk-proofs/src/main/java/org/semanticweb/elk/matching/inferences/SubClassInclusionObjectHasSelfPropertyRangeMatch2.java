@@ -27,7 +27,7 @@ import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch1;
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
-import org.semanticweb.elk.matching.subsumers.IndexedObjectHasSelfMatch;
+import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 
@@ -41,10 +41,10 @@ public class SubClassInclusionObjectHasSelfPropertyRangeMatch2 extends
 			SubClassInclusionObjectHasSelfPropertyRangeMatch1 parent,
 			SubClassInclusionDecomposedMatch2 firstPremiseMatch) {
 		super(parent);
-		IndexedObjectHasSelfMatch premiseSubsumerMatch = firstPremiseMatch
+		ElkObjectHasSelf premiseSubsumerMatch = firstPremiseMatch
 				.getSubsumerIndexedObjectHasSelfMatch();
 		ElkObjectPropertyExpression premisePropertyMatch = premiseSubsumerMatch
-				.getValue().getProperty();
+				.getProperty();
 		if (premisePropertyMatch instanceof ElkObjectProperty) {
 			this.propertyMatch_ = (ElkObjectProperty) premisePropertyMatch;
 		} else {

@@ -24,6 +24,7 @@ package org.semanticweb.elk.explanations;
 import org.protege.editor.owl.ui.explanation.ExplanationResult;
 import org.protege.editor.owl.ui.explanation.ExplanationService;
 import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 
@@ -44,7 +45,8 @@ public class ProofBasedExplanationService extends ExplanationService {
 
     @Override
     public boolean hasExplanation(OWLAxiom axiom) {
-        return axiom instanceof OWLSubClassOfAxiom;
+		return axiom instanceof OWLSubClassOfAxiom
+				|| axiom instanceof OWLEquivalentClassesAxiom;
     }
 
     @Override

@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -31,11 +32,9 @@ import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.ComposedAxiomLoader;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
@@ -46,11 +45,11 @@ import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
@@ -59,7 +58,10 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.DerivedClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentInstanceTaxonomy;
@@ -620,25 +622,59 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 * TRACING METHODS
 	 *---------------------------------------------------*/
 
-	public ClassConclusion getConclusion(ElkSubClassOfAxiom axiom)
-			throws ElkException {
-		forceLoading(); // to make sure that the index is up to date
-		IndexedClassExpression subExpression = axiom.getSubClassExpression()
-				.accept(expressionConverter_);
-		IndexedClassExpression superExpression = axiom.getSuperClassExpression()
-				.accept(expressionConverter_);
-		if (subExpression == null || superExpression == null) {
-			// input expressions do not occur in the ontology
-			return null;
+	public void visitDerivedConclusionsForSubsumption(ElkClassExpression subClass,
+			ElkClassExpression superClass,
+			DerivedClassConclusionVisitor visitor) throws ElkException {
+		isInconsistent();
+		complete(stageManager.classSaturationStage);
+		// checking owl:Thing consistency
+		if (consistencyCheckingState.isOwlThingInconsistent()) {
+			if (!visitor.inconsistentOwlThing(
+					factory_.getContradiction(ontologyIndex.getOwlThing()))) {
+				return;
+			}
 		}
+		// processing inconsistent individuals
+		for (IndexedIndividual ind : consistencyCheckingState
+				.getInconsistentIndividuals()) {
+			if (!visitor.inconsistentIndividual(factory_.getContradiction(ind),
+					ind.getElkEntity())) {
+				return;
+			}
+		}
+		// checking inconsistency of subClass
+		ModifiableIndexedClassExpression root = subClass
+				.accept(expressionConverter_);
+		if (root == null) {
+			return;
+		}
+		ClassInconsistency conclusion = checkDerived(
+				factory_.getContradiction(root));
+		if (conclusion != null && !visitor.inconsistentSubClass(conclusion)) {
+			return;
+		}
+		// checking subsumption
+		IndexedClassExpression superExpression = superClass
+				.accept(expressionConverter_);
+		if (superExpression == null) {
+			return;
+		}
+		SubClassInclusionComposed subsumption = checkDerived(
+				factory_.getSubClassInclusionComposed(root, superExpression));
+		if (subsumption != null
+				&& !visitor.derivedClassInclusion(subsumption)) {
+			return;
+		}
+	}
 
-		if (!isSatisfiable(subExpression)) {
-			// the subsumee is unsatisfiable so we explain the unsatisfiability
-			return factory_.getContradiction(subExpression);
+	private <C extends ClassConclusion> C checkDerived(C conclusion)
+			throws ElkException {
+		if (saturationState.getContext(conclusion.getDestination())
+				.containsConclusion(conclusion)) {
+			return conclusion;
 		}
-		// else
-		return factory_.getSubClassInclusionComposed(subExpression,
-				superExpression);
+		// else not derived
+		return null;
 	}
 
 	@SuppressWarnings("unused")
@@ -656,51 +692,19 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		traceState_.addToTrace(conclusion);
 	}
 
-	public TracingInferenceSet explainConclusion(ClassConclusion conclusion)
+	public TracingInferenceSet explainConclusions(Iterable<? extends ClassConclusion> conclusions)
 			throws ElkException {
-		toTrace(conclusion);
-		getTaxonomy(); // make sure the taxonomy is computed
+		for (ClassConclusion conclusion : conclusions) {
+			toTrace(conclusion);
+		}
+		getStageExecutor().complete(stageManager.classSaturationStage);
 		getStageExecutor().complete(stageManager.inferenceTracingStage);
 
 		return traceState_;
 	}
-
-	@Deprecated
-	public IndexedClassEntity getInconsistentEntity() {
-		return consistencyCheckingState.isOwlThingInconsistent()
-				? ontologyIndex.getOwlThing()
-				: consistencyCheckingState.getInconsistentIndividuals()
-						.iterator().next();
-	}
 	
-	/**
-	 * @return either owl:Thing, if it was derived to be a subclass of
-	 *         owl:Nothing or the individual which was inferred to be an
-	 *         instance of owl:Nothing.
-	 * @throws ElkException
-	 */
-	public ElkEntity explainInconsistency() throws ElkException {
-		if (!isInconsistent()) {
-			throw new IllegalStateException("The ontology is consistent");
-		}
-		IndexedClassEntity inconsistentEntity = getInconsistentEntity();
-		toTrace(factory_.getContradiction(inconsistentEntity));
-		if (!traceState_.getToTrace().isEmpty()) {
-			getStageExecutor().complete(stageManager.inferenceTracingStage);
-		}
-		return inconsistentEntity.getElkEntity();
-	}
-
-	boolean isSatisfiable(IndexedClassExpression subsumee) {
-		Context subsumeeContext = saturationState.getContext(subsumee);
-
-		if (subsumeeContext != null) {
-			return !subsumeeContext
-					.containsConclusion(factory_.getContradiction(subsumee));
-		}
-		// shouldn't happen if we suppport only named classes or abbreviate
-		// class expressions and saturate them prior to tracing
-		return true;
+	public TracingInferenceSet explainConclusion(ClassConclusion conclusion) throws ElkException {
+		return explainConclusions(Collections.singleton(conclusion));
 	}
 
 	@Deprecated

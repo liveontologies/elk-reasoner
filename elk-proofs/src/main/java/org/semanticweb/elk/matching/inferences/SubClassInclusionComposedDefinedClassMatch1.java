@@ -43,8 +43,7 @@ public class SubClassInclusionComposedDefinedClassMatch1
 			SubClassInclusionComposedMatch1 conclusionMatch) {
 		super(parent);
 		this.originMatch_ = conclusionMatch.getDestinationMatch();
-		definedClassMatch_ = conclusionMatch.getSubsumerIndexedClassMatch()
-				.getValue();
+		definedClassMatch_ = conclusionMatch.getSubsumerElkClassMatch();
 	}
 
 	public IndexedContextRootMatch getOriginMatch() {

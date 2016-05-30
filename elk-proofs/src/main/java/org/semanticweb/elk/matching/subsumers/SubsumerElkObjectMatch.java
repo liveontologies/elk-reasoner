@@ -43,7 +43,8 @@ public interface SubsumerElkObjectMatch extends SubsumerMatch {
 			IndexedObjectComplementOfMatch.Visitor<O>,
 			IndexedObjectHasSelfMatch.Visitor<O>,
 			IndexedObjectSomeValuesFromMatch.Visitor<O>,
-			IndexedObjectUnionOfMatch.Visitor<O> {
+			IndexedObjectUnionOfMatch.Visitor<O>,
+			SubsumerNonCanonicalMatch.Visitor<O> {
 
 		// combined interface
 

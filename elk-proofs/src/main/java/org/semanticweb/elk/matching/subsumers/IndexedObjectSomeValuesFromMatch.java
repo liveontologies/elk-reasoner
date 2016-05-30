@@ -1,5 +1,9 @@
 package org.semanticweb.elk.matching.subsumers;
 
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -21,10 +25,6 @@ package org.semanticweb.elk.matching.subsumers;
  * limitations under the License.
  * #L%
  */
-
-import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 
 public interface IndexedObjectSomeValuesFromMatch
 		extends SubsumerElkObjectMatch {
@@ -50,8 +50,8 @@ public interface IndexedObjectSomeValuesFromMatch
 	 *            the type of the output
 	 */
 	public interface Visitor<O>
-			extends IndexedObjectSomeValuesFromHasValueMatch.Visitor<O>,
-			IndexedObjectSomeValuesFromSomeValuesFromMatch.Visitor<O> {
+			extends SubsumerObjectSomeValuesFromMatch.Visitor<O>,
+			SubsumerObjectHasValueMatch.Visitor<O> {
 
 		// combined interface
 	}

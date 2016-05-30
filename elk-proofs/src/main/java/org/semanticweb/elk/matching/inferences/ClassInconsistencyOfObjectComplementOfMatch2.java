@@ -37,7 +37,7 @@ public class ClassInconsistencyOfObjectComplementOfMatch2 extends
 			SubClassInclusionDecomposedMatch2 secondPremiseMatch) {
 		super(parent);
 		this.negationMatch_ = secondPremiseMatch
-				.getSubsumerIndexedObjectComplementOfMatch().getValue();
+				.getSubsumerElkObjectComplementOfMatch();
 	}
 
 	public ElkObjectComplementOf getNegationMatch() {

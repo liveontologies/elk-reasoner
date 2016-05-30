@@ -22,32 +22,21 @@ package org.semanticweb.elk.matching.subsumers;
  * #L%
  */
 
-import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
-import org.semanticweb.elk.matching.root.IndexedContextRootMatch.Factory;
-import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 
-public class IndexedObjectSomeValuesFromSomeValuesFromMatch extends
-		AbstractIndexedObjectSomeValuesFromMatch<ElkObjectSomeValuesFrom> {
+public class SubsumerEmptyObjectOneOfMatch
+		extends AbstractSubsumerNonCanonicalMatch<ElkObjectOneOf> {
 
-	IndexedObjectSomeValuesFromSomeValuesFromMatch(
-			ElkObjectSomeValuesFrom value) {
+	SubsumerEmptyObjectOneOfMatch(ElkObjectOneOf value) {
 		super(value);
+		if (!value.getIndividuals().isEmpty()) {
+			throw new IllegalArgumentException(
+					"ElkObjectOneOf must be empty: " + value);
+		}
 	}
 
 	@Override
-	public IndexedContextRootMatch getFillerRootMatch(Factory factory) {
-		return factory.getIndexedContextRootClassExpressionMatch(
-				getValue().getFiller());
-	}
-
-	@Override
-	public IndexedContextRootMatch getRangeRootMatch(Factory factory) {
-		return factory
-				.getIndexedContextRootRangeSomeValuesFromMatch(getValue());
-	}
-
-	@Override
-	public <O> O accept(IndexedObjectSomeValuesFromMatch.Visitor<O> visitor) {
+	public <O> O accept(SubsumerNonCanonicalMatch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
@@ -61,7 +50,7 @@ public class IndexedObjectSomeValuesFromSomeValuesFromMatch extends
 	 */
 	interface Visitor<O> {
 
-		O visit(IndexedObjectSomeValuesFromSomeValuesFromMatch match);
+		O visit(SubsumerEmptyObjectOneOfMatch match);
 
 	}
 

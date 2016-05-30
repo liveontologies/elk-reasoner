@@ -24,15 +24,19 @@ package org.semanticweb.elk.matching.subsumers;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 
-public class IndexedObjectUnionOfUnionOfMatch
-		extends AbstractIndexedObjectUnionOfMatch<ElkObjectUnionOf> {
+public class SubsumerEmptyObjectUnionOfMatch
+		extends AbstractSubsumerNonCanonicalMatch<ElkObjectUnionOf> {
 
-	IndexedObjectUnionOfUnionOfMatch(ElkObjectUnionOf value) {
+	SubsumerEmptyObjectUnionOfMatch(ElkObjectUnionOf value) {
 		super(value);
+		if (!value.getClassExpressions().isEmpty()) {
+			throw new IllegalArgumentException(
+					"ElkObjectUnionOf must be empty: " + value);
+		}
 	}
 
 	@Override
-	public <O> O accept(IndexedObjectUnionOfMatch.Visitor<O> visitor) {
+	public <O> O accept(SubsumerNonCanonicalMatch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
@@ -46,7 +50,7 @@ public class IndexedObjectUnionOfUnionOfMatch
 	 */
 	interface Visitor<O> {
 
-		O visit(IndexedObjectUnionOfUnionOfMatch match);
+		O visit(SubsumerEmptyObjectUnionOfMatch match);
 
 	}
 

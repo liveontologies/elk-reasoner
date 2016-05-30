@@ -22,19 +22,9 @@ package org.semanticweb.elk.matching.subsumers;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
+public interface SubsumerNonCanonicalMatch extends SubsumerElkObjectMatch {
 
-public class IndexedObjectUnionOfOneOfMatch
-		extends AbstractIndexedObjectUnionOfMatch<ElkObjectOneOf> {
-
-	IndexedObjectUnionOfOneOfMatch(ElkObjectOneOf value) {
-		super(value);
-	}
-
-	@Override
-	public <O> O accept(IndexedObjectUnionOfMatch.Visitor<O> visitor) {
-		return visitor.visit(this);
-	}
+	<O> O accept(Visitor<O> visitor);
 
 	/**
 	 * The visitor pattern for instances
@@ -44,10 +34,16 @@ public class IndexedObjectUnionOfOneOfMatch
 	 * @param <O>
 	 *            the type of the output
 	 */
-	interface Visitor<O> {
+	public interface Visitor<O>
+			extends SubsumerEmptyObjectIntersectionOfMatch.Visitor<O>,
+			SubsumerEmptyObjectOneOfMatch.Visitor<O>,
+			SubsumerEmptyObjectUnionOfMatch.Visitor<O>,
+			SubsumerObjectHasValueMatch.Visitor<O>,
+			SubsumerSingletonObjectIntersectionOfMatch.Visitor<O>,
+			SubsumerSingletonObjectOneOfMatch.Visitor<O>,
+			SubsumerSingletonObjectUnionOfMatch.Visitor<O> {
 
-		O visit(IndexedObjectUnionOfOneOfMatch match);
-
+		// combined interface
 	}
 
 }

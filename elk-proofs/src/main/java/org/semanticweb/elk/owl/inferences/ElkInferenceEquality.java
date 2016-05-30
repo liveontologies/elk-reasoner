@@ -254,6 +254,19 @@ public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 
 	@Override
 	public Boolean visit(
+			final ElkClassInclusionOfInconsistentIndividual inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(
+					ElkClassInclusionOfInconsistentIndividual other) {
+				return equals(other.getInconsistent(),
+						inference.getInconsistent());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(
 			final ElkClassInclusionOfObjectPropertyAssertion inference) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
@@ -383,12 +396,33 @@ public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 	}
 
 	@Override
+	public Boolean visit(final ElkEquivalentClassesCycle inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(ElkEquivalentClassesCycle other) {
+				return equals(other.getExpressions(),
+						inference.getExpressions());
+			}
+		});
+	}
+
+	@Override
 	public Boolean visit(final ElkEquivalentClassesObjectHasValue inference) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(ElkEquivalentClassesObjectHasValue other) {
 				return equals(other.getProperty(), inference.getProperty())
 						&& equals(other.getValue(), inference.getValue());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(final ElkEquivalentClassesObjectOneOf inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(ElkEquivalentClassesObjectOneOf other) {
+				return equals(other.getMembers(), inference.getMembers());
 			}
 		});
 	}

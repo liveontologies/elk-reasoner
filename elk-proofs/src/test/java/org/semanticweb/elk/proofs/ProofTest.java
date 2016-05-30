@@ -31,12 +31,14 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
@@ -64,8 +66,6 @@ import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.VoidTestOutput;
 import org.semanticweb.elk.testing.io.URLTestIO;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Tests tracing and axiom binding for all atomic subsumption inferences in all
@@ -78,9 +78,6 @@ import org.slf4j.LoggerFactory;
 public class ProofTest {
 
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
-
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ProofTest.class);
 
 	// remove when proofs for ranges are supported
 	static final String[] IGNORE_LIST = { "kangaroo.owl",
@@ -154,28 +151,23 @@ public class ProofTest {
 			private final ElkObject.Factory factory_ = new ElkObjectEntityRecyclingFactory();
 
 			@Override
-			public void subsumptionTest(ElkClass subsumee, ElkClass subsumer) {
+			public void testSubsumption(ElkClass subsumee, ElkClass subsumer) {
 				try {
-
-					LOGGER_.debug("Proof test: {} ⊑ {}", subsumee, subsumer);
-
-					TestUtils.provabilityOfSubsumptionTest(reasoner, ontology,
-							factory_,
+					TestUtils.provabilityTest(reasoner, ontology, factory_,
 							factory_.getSubClassOfAxiom(subsumee, subsumer));
 				} catch (ElkException e) {
-					throw new RuntimeException(e);
+					throw new ElkRuntimeException(e);
 				}
 			}
 
 			@Override
-			public void inconsistencyTest() throws Exception {
+			public void testEquivalence(List<? extends ElkClass> equivalent)
+					throws Exception {
 				try {
-					LOGGER_.trace("Proof test for inconsistency");
-
-					TestUtils.provabilityOfInconsistencyTest(reasoner,
-							ontology);
+					TestUtils.provabilityTest(reasoner, ontology, factory_,
+							factory_.getEquivalentClassesAxiom(equivalent));
 				} catch (ElkException e) {
-					throw new RuntimeException(e);
+					throw new ElkRuntimeException(e);
 				}
 			}
 

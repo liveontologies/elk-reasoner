@@ -9,9 +9,12 @@ import org.semanticweb.elk.matching.subsumers.IndexedObjectHasSelfMatch;
 import org.semanticweb.elk.matching.subsumers.IndexedObjectIntersectionOfMatch;
 import org.semanticweb.elk.matching.subsumers.IndexedObjectSomeValuesFromMatch;
 import org.semanticweb.elk.matching.subsumers.IndexedObjectUnionOfMatch;
+import org.semanticweb.elk.matching.subsumers.IndexedObjectUnionOfMatchVisitor;
+import org.semanticweb.elk.matching.subsumers.SubsumerElkObjectMatch;
 import org.semanticweb.elk.matching.subsumers.SubsumerMatch;
 import org.semanticweb.elk.matching.subsumers.SubsumerMatchDummyVisitor;
 import org.semanticweb.elk.matching.subsumers.SubsumerMatches;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 
 /*
  * #%L
@@ -37,7 +40,13 @@ import org.semanticweb.elk.matching.subsumers.SubsumerMatches;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
+import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
+import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
+import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
+import org.semanticweb.elk.owl.visitors.DummyElkObjectVisitor;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 
 public abstract class SubClassInclusionMatch<P>
@@ -47,7 +56,15 @@ public abstract class SubClassInclusionMatch<P>
 			extends SubsumerMatchDummyVisitor<M> {
 		@Override
 		public M defaultVisit(SubsumerMatch subsumerMatch) {
-			throw new ElkMatchException(getSubsumer(), subsumerMatch);
+			return failSubsumerMatch();
+		}
+
+	}
+
+	class FailingElkObjectMatcher<O> extends DummyElkObjectVisitor<O> {
+		@Override
+		public O defaultVisit(ElkObject object) {
+			return failSubsumerMatch();
 		}
 
 	}
@@ -58,7 +75,7 @@ public abstract class SubClassInclusionMatch<P>
 		super(parent);
 		this.subsumerMatch_ = SubsumerMatches.create(subsumerMatchValue);
 	}
-	
+
 	SubClassInclusionMatch(P parent, ElkIndividual subsumerMatchValue) {
 		super(parent);
 		this.subsumerMatch_ = SubsumerMatches.create(subsumerMatchValue);
@@ -84,6 +101,10 @@ public abstract class SubClassInclusionMatch<P>
 
 	abstract IndexedClassExpression getSubsumer();
 
+	private <O> O failSubsumerMatch() {
+		throw new ElkMatchException(getSubsumer(), subsumerMatch_);
+	}
+
 	public IndexedClassEntityMatch getSubsumerIndexedClassEntityMatch() {
 		return subsumerMatch_
 				.accept(new FailingSubsumerMatcher<IndexedClassEntityMatch>() {
@@ -97,68 +118,68 @@ public abstract class SubClassInclusionMatch<P>
 				});
 	}
 
-	public IndexedClassMatch getSubsumerIndexedClassMatch() {
-		return subsumerMatch_
-				.accept(new FailingSubsumerMatcher<IndexedClassMatch>() {
+	public <O> O accept(final IndexedObjectUnionOfMatchVisitor<O> visitor) {
 
-					@Override
-					public IndexedClassMatch visit(IndexedClassMatch match) {
-						return match;
-					}
+		if (subsumerMatch_ instanceof SubsumerElkObjectMatch) {
+			return ((SubsumerElkObjectMatch) subsumerMatch_).getValue()
+					.accept(new FailingElkObjectMatcher<O>() {
 
-				});
+						@Override
+						public O visit(ElkObjectUnionOf object) {
+							return visitor.visit(object);
+						}
+
+						@Override
+						public O visit(ElkObjectOneOf object) {
+							return visitor.visit(object);
+						}
+
+					});
+
+		}
+		// else
+		return failSubsumerMatch();
+
 	}
 
-	public IndexedIndividualMatch getSubsumerIndexedIndividualMatch() {
-		return subsumerMatch_
-				.accept(new FailingSubsumerMatcher<IndexedIndividualMatch>() {
-
-					@Override
-					public IndexedIndividualMatch visit(
-							IndexedIndividualMatch match) {
-						return match;
-					}
-
-				});
+	public ElkClass getSubsumerElkClassMatch() {
+		if (subsumerMatch_ instanceof IndexedClassMatch) {
+			return ((IndexedClassMatch) subsumerMatch_).getValue();
+		}
+		// else
+		return failSubsumerMatch();
 	}
 
-	public IndexedObjectComplementOfMatch getSubsumerIndexedObjectComplementOfMatch() {
-		return subsumerMatch_.accept(
-				new FailingSubsumerMatcher<IndexedObjectComplementOfMatch>() {
-
-					@Override
-					public IndexedObjectComplementOfMatch visit(
-							IndexedObjectComplementOfMatch match) {
-						return match;
-					}
-
-				});
+	public ElkIndividual getSubsumerElkIndividualMatch() {
+		if (subsumerMatch_ instanceof IndexedIndividualMatch) {
+			return ((IndexedIndividualMatch) subsumerMatch_).getValue();
+		}
+		// else
+		return failSubsumerMatch();
 	}
 
-	public IndexedObjectHasSelfMatch getSubsumerIndexedObjectHasSelfMatch() {
-		return subsumerMatch_.accept(
-				new FailingSubsumerMatcher<IndexedObjectHasSelfMatch>() {
+	public ElkObjectComplementOf getSubsumerElkObjectComplementOfMatch() {
+		if (subsumerMatch_ instanceof IndexedObjectComplementOfMatch) {
+			return ((IndexedObjectComplementOfMatch) subsumerMatch_).getValue();
+		}
+		// else
+		return failSubsumerMatch();
+	}
 
-					@Override
-					public IndexedObjectHasSelfMatch visit(
-							IndexedObjectHasSelfMatch match) {
-						return match;
-					}
-
-				});
+	public ElkObjectHasSelf getSubsumerIndexedObjectHasSelfMatch() {
+		if (subsumerMatch_ instanceof IndexedObjectHasSelfMatch) {
+			return ((IndexedObjectHasSelfMatch) subsumerMatch_).getValue();
+		}
+		// else
+		return failSubsumerMatch();
 	}
 
 	public IndexedObjectIntersectionOfMatch getSubsumerIndexedObjectIntersectionOfMatch() {
-		return subsumerMatch_.accept(
-				new FailingSubsumerMatcher<IndexedObjectIntersectionOfMatch>() {
-
-					@Override
-					public IndexedObjectIntersectionOfMatch visit(
-							IndexedObjectIntersectionOfMatch match) {
-						return match;
-					}
-
-				});
+		if (subsumerMatch_ instanceof IndexedObjectIntersectionOfMatch) {
+			return ((IndexedObjectIntersectionOfMatch) subsumerMatch_);
+		}
+		// else
+		return failSubsumerMatch();
 	}
 
 	public IndexedObjectSomeValuesFromMatch getSubsumerIndexedObjectSomeValuesFromMatch() {
@@ -183,6 +204,7 @@ public abstract class SubClassInclusionMatch<P>
 							IndexedObjectUnionOfMatch match) {
 						return match;
 					}
+
 				});
 	}
 

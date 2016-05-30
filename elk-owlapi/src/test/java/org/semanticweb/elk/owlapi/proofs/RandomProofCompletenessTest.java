@@ -43,9 +43,9 @@ import org.semanticweb.elk.reasoner.tracing.TracingTestManifest;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
+import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.VoidTestOutput;
 import org.semanticweb.elk.testing.io.URLTestIO;
@@ -136,13 +136,6 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 							factory.getOWLSubClassOfAxiom(subsumee, subsumer),
 							ontology, random, seed);
 				}
-
-				@Override
-				public void inconsistencyTest()
-						throws ProofGenerationException {
-					randomInconsistencyProofCompletenessTest(reasoner, ontology,
-							random, seed);
-				}
 				
 			});
 			
@@ -188,38 +181,6 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 		);
 	}
 	
-	private void randomInconsistencyProofCompletenessTest(
-			final ExplainingOWLReasoner reasoner, final OWLOntology ontology,
-			final Random random, final long seed)
-					throws ProofGenerationException {
-		final OWLExpression expr =
-				reasoner.getDerivedExpressionForInconsistency();
-		
-		final Set<OWLAxiom> proofBreaker =
-				ProofTestUtils.collectProofBreaker(expr, ontology, random);
-		final List<OWLOntologyChange> deletions =
-				new ArrayList<OWLOntologyChange>();
-		final List<OWLOntologyChange> additions =
-				new ArrayList<OWLOntologyChange>();
-		for (final OWLAxiom axiom : proofBreaker) {
-			deletions.add(new RemoveAxiom(ontology, axiom));
-			additions.add(new AddAxiom(ontology, axiom));
-		}
-		
-		manager_.applyChanges(deletions);
-		
-		final boolean conclusionDerived = !reasoner.isConsistent();
-		
-		manager_.applyChanges(additions);
-		
-		assertFalse("Not all proofs were found!\n"
-						+ "Seed: " + seed + "\n"
-						+ "Conclusion: Ontology is inconsistent\n"
-						+ "Proof Breaker: " + proofBreaker,
-				conclusionDerived
-		);
-	}
-
 	@Config
 	public static Configuration getConfig() throws URISyntaxException,
 			IOException {

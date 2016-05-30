@@ -40,11 +40,6 @@ public class WorkbenchManager {
         this.entailment = entailment;
     }
     
-    public WorkbenchManager(ProofManager proofManager) {
-        this.proofManager = proofManager;
-        this.entailment = null;
-    }
-
     public OWLAxiom getEntailment() {
         return entailment;
     }

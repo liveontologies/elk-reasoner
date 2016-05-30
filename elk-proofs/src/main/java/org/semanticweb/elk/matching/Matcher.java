@@ -1,5 +1,7 @@
 package org.semanticweb.elk.matching;
 
+import java.util.Collections;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -30,12 +32,14 @@ import org.semanticweb.elk.matching.conclusions.ConclusionMatchCanonizerVisitor;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
 import org.semanticweb.elk.matching.root.IndexedContextRootClassExpressionMatch;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.owl.inferences.ElkInferenceProducer;
 import org.semanticweb.elk.owl.inferences.ElkInferenceProducingFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.tracing.TracingInferenceSet;
@@ -52,14 +56,15 @@ public class Matcher {
 	private final Queue<ConclusionMatch> toDoConclusions_;
 
 	private final ConclusionMatch.Visitor<Void> conclusionMatcher_;
-	
+
 	private final ConclusionMatch.Visitor<Boolean> conclusionCanonizer_;
 
 	private final InferenceMatch.Visitor<Void> inferenceMatcher_;
 
 	private final ConclusionMatchExpressionFactory conclusionMatchFactory_;
 
-	public Matcher(TracingInferenceSet inferences, ElkObject.Factory elkObjectFactory,
+	public Matcher(TracingInferenceSet inferences,
+			ElkObject.Factory elkObjectFactory,
 			ElkInferenceProducer elkInferenceProducer) {
 		toDoInferences_ = new LinkedList<InferenceMatch>();
 		toDoConclusions_ = new LinkedList<ConclusionMatch>();
@@ -92,19 +97,35 @@ public class Matcher {
 			process();
 		}
 	}
-	
+
 	public void trace(ClassInconsistency conclusion) {
 		IndexedContextRoot inconsistent = conclusion.getDestination();
+		IndexedContextRootMatch rootMatch = null;
 		if (inconsistent instanceof IndexedClass) {
+			rootMatch = getMatch((IndexedClass) inconsistent);
+		} else if (inconsistent instanceof IndexedIndividual) {
+			rootMatch = getMatch((IndexedIndividual) inconsistent);
+		}
+		if (rootMatch != null) {
 			conclusionMatchFactory_.getClassInconsistencyMatch1(conclusion,
-					getMatch((IndexedClass) inconsistent));
+					rootMatch);
 			process();
 		}
 	}
 
-	private IndexedContextRootClassExpressionMatch getMatch(IndexedClass indexedClass) {
+	private IndexedContextRootClassExpressionMatch getMatch(
+			IndexedClass indexedClass) {
 		return conclusionMatchFactory_
-				.getIndexedContextRootClassExpressionMatch(indexedClass.getElkEntity());
+				.getIndexedContextRootClassExpressionMatch(
+						indexedClass.getElkEntity());
+	}
+
+	private IndexedContextRootClassExpressionMatch getMatch(
+			IndexedIndividual indexedClass) {
+		return conclusionMatchFactory_
+				.getIndexedContextRootClassExpressionMatch(
+						conclusionMatchFactory_.getObjectOneOf(Collections
+								.singletonList(indexedClass.getElkEntity())));
 	}
 
 	private void process() {

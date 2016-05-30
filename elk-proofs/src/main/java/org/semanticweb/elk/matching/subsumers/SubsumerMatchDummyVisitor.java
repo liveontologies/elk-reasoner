@@ -45,6 +45,10 @@ public class SubsumerMatchDummyVisitor<O> implements SubsumerMatch.Visitor<O> {
 		return null;
 	}
 
+	protected O defaultVisit(SubsumerNonCanonicalMatch match) {
+		return defaultVisit((SubsumerElkObjectMatch) match);
+	}
+
 	@Override
 	public O visit(IndexedClassMatch match) {
 		return defaultVisit(match);
@@ -76,22 +80,52 @@ public class SubsumerMatchDummyVisitor<O> implements SubsumerMatch.Visitor<O> {
 	}
 
 	@Override
-	public O visit(IndexedObjectSomeValuesFromHasValueMatch match) {
+	public O visit(SubsumerEmptyObjectIntersectionOfMatch match) {
 		return defaultVisit(match);
 	}
 
 	@Override
-	public O visit(IndexedObjectSomeValuesFromSomeValuesFromMatch match) {
+	public O visit(SubsumerEmptyObjectOneOfMatch match) {
 		return defaultVisit(match);
 	}
 
 	@Override
-	public O visit(IndexedObjectUnionOfOneOfMatch match) {
+	public O visit(SubsumerEmptyObjectUnionOfMatch match) {
 		return defaultVisit(match);
 	}
 
 	@Override
-	public O visit(IndexedObjectUnionOfUnionOfMatch match) {
+	public O visit(SubsumerObjectHasValueMatch match) {
+		return defaultVisit(match);
+	}
+
+	@Override
+	public O visit(SubsumerObjectOneOfMatch match) {
+		return defaultVisit(match);
+	}
+
+	@Override
+	public O visit(SubsumerObjectSomeValuesFromMatch match) {
+		return defaultVisit(match);
+	}
+
+	@Override
+	public O visit(SubsumerObjectUnionOfMatch match) {
+		return defaultVisit(match);
+	}
+
+	@Override
+	public O visit(SubsumerSingletonObjectIntersectionOfMatch match) {
+		return defaultVisit(match);
+	}
+
+	@Override
+	public O visit(SubsumerSingletonObjectOneOfMatch match) {
+		return defaultVisit(match);
+	}
+
+	@Override
+	public O visit(SubsumerSingletonObjectUnionOfMatch match) {
 		return defaultVisit(match);
 	}
 

@@ -27,7 +27,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkPropertyRestrictionQualified;
 
-public abstract class AbstractIndexedContextRootRangeMatch<V extends ElkPropertyRestrictionQualified<ElkObjectPropertyExpression, ?>>
+abstract class AbstractIndexedContextRootRangeMatch<V extends ElkPropertyRestrictionQualified<ElkObjectPropertyExpression, ?>>
 		extends AbstractIndexedContextRootMatch<V>
 		implements IndexedContextRootRangeMatch {
 
@@ -50,7 +50,7 @@ public abstract class AbstractIndexedContextRootRangeMatch<V extends ElkProperty
 	}
 
 	@Override
-	public <O> O accept(IndexedContextRootMatch.Visitor<O> visitor) {
+	public final <O> O accept(IndexedContextRootMatch.Visitor<O> visitor) {
 		return accept((IndexedContextRootRangeMatch.Visitor<O>) visitor);
 	}
 

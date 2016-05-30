@@ -30,7 +30,9 @@ import static org.junit.Assert.assertTrue;
 
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -42,10 +44,10 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.DerivedClassConclusionDummyVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
@@ -93,7 +95,45 @@ public class TracingTestUtils {
 		throw new IllegalArgumentException("Context may not be null");
 	}
 
-	public static void checkTracingCompleteness(ClassConclusion conclusion, Reasoner reasoner) {		
+	public static void checkTracingCompleteness(ElkClassExpression subClass,
+			ElkClassExpression superClass, final Reasoner reasoner)
+			throws ElkException {
+		final List<ClassConclusion> conclusions = new ArrayList<ClassConclusion>();
+		reasoner.visitDerivedConclusionsForSubsumption(subClass, superClass,
+				new DerivedClassConclusionDummyVisitor() {
+
+					@Override
+					protected boolean defaultVisit(ClassConclusion conclusion) {
+						conclusions.add(conclusion);
+						return true;
+					}
+
+				});
+
+		if (conclusions.isEmpty()) {			
+			fail(subClass + " ⊑ " + superClass + " not provable!");
+		}
+		reasoner.explainConclusions(conclusions);
+		final AtomicInteger conclusionCount = new AtomicInteger(0);
+		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
+		TracingInference.Visitor<Boolean> counter = new DummyInferenceChecker() {
+
+			@Override
+			protected Boolean defaultVisit(TracingInference inference) {
+				conclusionCount.incrementAndGet();
+				return true;
+			}
+		};
+
+		TestTraceUnwinder explorer = new TestTraceUnwinder(traceState,
+				UNTRACED_LISTENER);
+		for (ClassConclusion conclusion: conclusions) {
+			explorer.accept(conclusion, counter);				
+		}
+	}
+
+	public static void checkTracingCompleteness(ClassConclusion conclusion,
+			Reasoner reasoner) {
 		final AtomicInteger conclusionCount = new AtomicInteger(0);
 		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
 		TracingInference.Visitor<Boolean> counter = new DummyInferenceChecker() {
@@ -111,33 +151,6 @@ public class TracingTestUtils {
 		explorer.accept(conclusion, counter);
 	}
 
-	public static void checkTracingOfInconsistencyCompleteness(
-			Reasoner reasoner) {
-		IndexedClassEntity entity = ReasonerStateAccessor
-				.getInconsistentEntity(reasoner);
-
-		if (entity == null) {
-			throw new IllegalStateException("The ontology is consistent");
-		}
-
-		final AtomicInteger conclusionCount = new AtomicInteger(0);
-		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
-		TracingInference.Visitor<Boolean> counter = new DummyInferenceChecker() {
-
-			@Override
-			protected Boolean defaultVisit(TracingInference inference) {
-				conclusionCount.incrementAndGet();
-				return true;
-			}
-		};
-
-		TestTraceUnwinder explorer = new TestTraceUnwinder(traceState,
-				UNTRACED_LISTENER);
-
-		ClassConclusion contradiction = FACTORY_.getContradiction(entity);
-		explorer.accept(contradiction, counter);
-	}
-
 	/*
 	 * checking that the number of inferences for the given class subsumption is
 	 * as expected
@@ -145,7 +158,8 @@ public class TracingTestUtils {
 	public static void checkNumberOfInferences(ClassConclusion conclusion,
 			Reasoner reasoner, int expected) {
 		int actual = 0;
-		for (@SuppressWarnings("unused") TracingInference ignore : ReasonerStateAccessor.getTraceState(reasoner)
+		for (@SuppressWarnings("unused")
+		TracingInference ignore : ReasonerStateAccessor.getTraceState(reasoner)
 				.getInferences(conclusion)) {
 			actual++;
 		}
@@ -165,8 +179,8 @@ public class TracingTestUtils {
 		ObjectPropertyConclusion conclusion = FACTORY_
 				.getSubPropertyChain(subsumee, subsumer);
 		int actual = 0;
-		for (TracingInference ignore : ReasonerStateAccessor.getTraceState(reasoner)
-				.getInferences(conclusion)) {
+		for (TracingInference ignore : ReasonerStateAccessor
+				.getTraceState(reasoner).getInferences(conclusion)) {
 			actual++;
 		}
 		assertEquals(expected, actual);
@@ -223,40 +237,21 @@ public class TracingTestUtils {
 						sideConditions.add(newConclusion.getOriginalAxiom());
 						return null;
 					}
-				},
-				new DummyElkAxiomVisitor<Void>());
+				}, new DummyElkAxiomVisitor<Void>());
 
-		for (TracingInference inference : ReasonerStateAccessor.getTraceState(reasoner)
-				.getInferences(conclusion)) {
+		for (TracingInference inference : ReasonerStateAccessor
+				.getTraceState(reasoner).getInferences(conclusion)) {
 			inference.accept(sideConditionVisitor);
 		}
 
 		return sideConditions;
 	}
 
-	public static void visitInferencesForInconsistency(Reasoner reasoner,
-			final TracingInference.Visitor<Boolean> inferenceVisitor)
-					throws ElkException {
-		IndexedClassEntity entity = ReasonerStateAccessor
-				.getInconsistentEntity(reasoner);
-
-		if (entity == null) {
-			throw new IllegalStateException("The ontology is consistent");
-		}
-
-		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(
-				ReasonerStateAccessor.getTraceState(reasoner),
-				UNTRACED_LISTENER);
-
-		reasoner.explainInconsistency();
-		traceUnwinder.accept(FACTORY_.getContradiction(entity),
-				inferenceVisitor);
-	}
-
 	// //////////////////////////////////////////////////////////////////////
 	// some dummy utility visitors
 	// //////////////////////////////////////////////////////////////////////
-	static class DummyInferenceChecker extends TracingInferenceDummyVisitor<Boolean> {
+	static class DummyInferenceChecker
+			extends TracingInferenceDummyVisitor<Boolean> {
 
 		@Override
 		protected Boolean defaultVisit(TracingInference inference) {

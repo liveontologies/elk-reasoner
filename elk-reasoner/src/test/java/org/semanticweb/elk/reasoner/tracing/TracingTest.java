@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -41,6 +42,7 @@ import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
@@ -48,6 +50,9 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.DerivedClassConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
@@ -118,30 +123,74 @@ public class TracingTest {
 			private final ElkObject.Factory factory_ = new ElkObjectEntityRecyclingFactory();
 
 			/**
-			 * collect statistics about the proofs for conclusions to match results 
+			 * collect statistics about the proofs for conclusions to match
+			 * results
 			 */
 			private final Map<Conclusion, TracingInferenceSetMetrics> proofsStats_ = new HashMap<Conclusion, TracingInferenceSetMetrics>();
 
 			@Override
-			public void subsumptionTest(ElkClass subsumee, ElkClass subsumer) {
+			public void testSubsumption(ElkClass subsumee, ElkClass subsumer) {
 
 				try {
-					LOGGER_.trace("Tracing test: {} => {}", subsumee, subsumer);
+					LOGGER_.trace("Tracing test: {} ⊑ {}", subsumee, subsumer);
 
-					ClassConclusion conclusion = reasoner.getConclusion(
-							factory_.getSubClassOfAxiom(subsumee, subsumer));
-					TracingInferenceSet inferences = reasoner
-							.explainConclusion(conclusion);
-					TracingInferenceSetMetrics proofStats = TracingInferenceSetMetrics
-							.getStatistics(inferences, conclusion);
-					assertTrue("Subsumption is not provable!",
-							proofStats.isProvable());
-					TracingInferenceSetMetrics previous = proofsStats_
-							.put(conclusion, proofStats);
-					if (previous != null) {
-						assertEquals("Previous proof does not match!", previous,
-								proofStats);
+					if (subsumer.equals(factory_.getOwlThing())) {
+						// trivial
+						return;
 					}
+					// else
+					DerivedClassConclusionVisitor conclusionVisitor = new DerivedClassConclusionVisitor() {
+
+						@Override
+						public boolean inconsistentOwlThing(
+								ClassInconsistency conclusion)
+								throws ElkException {
+							return traceConclsuion(conclusion);
+						}
+
+						@Override
+						public boolean inconsistentIndividual(
+								ClassInconsistency conclusion,
+								ElkIndividual inconsistent)
+								throws ElkException {
+							return traceConclsuion(conclusion);
+						}
+
+						@Override
+						public boolean inconsistentSubClass(
+								ClassInconsistency conclusion)
+								throws ElkException {
+							return traceConclsuion(conclusion);
+						}
+
+						@Override
+						public boolean derivedClassInclusion(
+								SubClassInclusionComposed conclusion)
+								throws ElkException {
+							return traceConclsuion(conclusion);
+						}
+
+						boolean traceConclsuion(ClassConclusion conclusion)
+								throws ElkException {
+							TracingInferenceSet inferences = reasoner
+									.explainConclusion(conclusion);
+							TracingInferenceSetMetrics proofStats = TracingInferenceSetMetrics
+									.getStatistics(inferences, conclusion);
+							assertTrue(
+									"Conclusion is not provable " + conclusion,
+									proofStats.isProvable());
+							TracingInferenceSetMetrics previous = proofsStats_
+									.put(conclusion, proofStats);
+							if (previous != null) {
+								assertEquals("Previous proof does not match!",
+										previous, proofStats);
+							}
+							return true;
+						}
+
+					};
+					reasoner.visitDerivedConclusionsForSubsumption(subsumee, subsumer,
+							conclusionVisitor);
 
 				} catch (ElkException e) {
 					throw new RuntimeException(e);
@@ -149,19 +198,19 @@ public class TracingTest {
 			}
 
 			@Override
-			public void inconsistencyTest() throws Exception {
-
-				try {
-					LOGGER_.trace("Tracing test: inconsistency");
-
-					reasoner.explainInconsistency();
-
-					TracingTestUtils
-							.checkTracingOfInconsistencyCompleteness(reasoner);
-				} catch (ElkException e) {
-					throw new RuntimeException(e);
+			public void testEquivalence(List<? extends ElkClass> equivalent)
+					throws Exception {
+				int size = equivalent.size();
+				if (size <= 1) {
+					return;
+				}
+				ElkClass first = equivalent.get(size - 1);
+				for (ElkClass second : equivalent) {
+					testSubsumption(first, second);
+					first = second;
 				}
 			}
+
 		};
 	}
 

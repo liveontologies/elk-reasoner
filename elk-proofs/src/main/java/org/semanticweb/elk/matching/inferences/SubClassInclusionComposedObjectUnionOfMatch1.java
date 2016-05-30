@@ -26,8 +26,8 @@ import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.subsumers.IndexedObjectUnionOfMatch;
-import org.semanticweb.elk.matching.subsumers.IndexedObjectUnionOfOneOfMatch;
-import org.semanticweb.elk.matching.subsumers.IndexedObjectUnionOfUnionOfMatch;
+import org.semanticweb.elk.matching.subsumers.SubsumerObjectOneOfMatch;
+import org.semanticweb.elk.matching.subsumers.SubsumerObjectUnionOfMatch;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectUnionOf;
 
@@ -81,16 +81,17 @@ public class SubClassInclusionComposedObjectUnionOfMatch1
 
 					@Override
 					public ElkClassExpression visit(
-							IndexedObjectUnionOfOneOfMatch match) {
+							SubsumerObjectOneOfMatch match) {
 						return factory.getObjectOneOf(
 								match.getValue().getIndividuals().get(pos));
 					}
 
 					@Override
 					public ElkClassExpression visit(
-							IndexedObjectUnionOfUnionOfMatch match) {
+							SubsumerObjectUnionOfMatch match) {
 						return match.getValue().getClassExpressions().get(pos);
 					}
+
 				});
 
 	}

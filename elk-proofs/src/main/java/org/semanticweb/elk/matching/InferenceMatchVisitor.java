@@ -141,12 +141,12 @@ import org.semanticweb.elk.matching.inferences.SubPropertyChainExpandedSubObject
 import org.semanticweb.elk.matching.inferences.SubPropertyChainTautologyMatch1;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatchChain;
-import org.semanticweb.elk.matching.subsumers.IndexedObjectSomeValuesFromHasValueMatch;
 import org.semanticweb.elk.matching.subsumers.IndexedObjectSomeValuesFromMatch;
-import org.semanticweb.elk.matching.subsumers.IndexedObjectSomeValuesFromSomeValuesFromMatch;
 import org.semanticweb.elk.matching.subsumers.IndexedObjectUnionOfMatch;
-import org.semanticweb.elk.matching.subsumers.IndexedObjectUnionOfOneOfMatch;
-import org.semanticweb.elk.matching.subsumers.IndexedObjectUnionOfUnionOfMatch;
+import org.semanticweb.elk.matching.subsumers.SubsumerObjectHasValueMatch;
+import org.semanticweb.elk.matching.subsumers.SubsumerObjectOneOfMatch;
+import org.semanticweb.elk.matching.subsumers.SubsumerObjectSomeValuesFromMatch;
+import org.semanticweb.elk.matching.subsumers.SubsumerObjectUnionOfMatch;
 import org.semanticweb.elk.owl.inferences.ElkInference;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
@@ -1336,14 +1336,14 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 					@Override
 					public ElkClassExpression visit(
-							IndexedObjectSomeValuesFromHasValueMatch match) {
+							SubsumerObjectHasValueMatch match) {
 						return conclusionFactory_.getObjectOneOf(Collections
 								.singletonList(match.getValue().getFiller()));
 					}
 
 					@Override
 					public ElkClassExpression visit(
-							IndexedObjectSomeValuesFromSomeValuesFromMatch match) {
+							SubsumerObjectSomeValuesFromMatch match) {
 						return match.getValue().getFiller();
 					}
 				});
@@ -1373,7 +1373,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		disjunctionMatch.accept(new IndexedObjectUnionOfMatch.Visitor<Void>() {
 
 			@Override
-			public Void visit(IndexedObjectUnionOfOneOfMatch match) {
+			public Void visit(SubsumerObjectOneOfMatch match) {
 				ElkObjectOneOf enumeration = match.getValue();
 				List<? extends ElkIndividual> members = enumeration
 						.getIndividuals();
@@ -1389,7 +1389,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 			}
 
 			@Override
-			public Void visit(IndexedObjectUnionOfUnionOfMatch match) {
+			public Void visit(SubsumerObjectUnionOfMatch match) {
 				ElkObjectUnionOf disjunction = match.getValue();
 				List<? extends ElkClassExpression> disjuncts = disjunction
 						.getClassExpressions();
@@ -1402,8 +1402,8 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 						subExpression, disjunct, disjunction);
 				return null;
 			}
-		});
 
+		});
 		return null;
 	}
 

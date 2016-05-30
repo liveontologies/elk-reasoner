@@ -39,6 +39,11 @@ public class IndexedObjectIntersectionOfMatch extends AbstractSubsumerMatch {
 			ElkObjectIntersectionOf fullConjunctionMatch,
 			int conjunctionPrefixLength) {
 		int conjunctsCount = fullConjunctionMatch.getClassExpressions().size();
+		if (conjunctsCount <= 1) {
+			throw new IllegalArgumentException(
+					"ElkObjectIntersectionOf must have at least 2 conjuncts: "
+							+ fullConjunctionMatch);
+		}
 		if (conjunctionPrefixLength <= 1
 				|| conjunctionPrefixLength > conjunctsCount) {
 			throw new IllegalArgumentException(

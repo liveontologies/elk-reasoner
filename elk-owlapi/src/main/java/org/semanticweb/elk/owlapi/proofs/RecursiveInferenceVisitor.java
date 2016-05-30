@@ -48,13 +48,7 @@ public class RecursiveInferenceVisitor {
 		
 		visitInferences(reasoner, root, visitor, allProofs);
 	}
-	
-	public static void visitInferencesOfInconsistency(ExplainingOWLReasoner reasoner, OWLInferenceVisitor visitor, boolean allProofs) throws ProofGenerationException {
-		OWLExpression root = reasoner.getDerivedExpressionForInconsistency();
 		
-		visitInferences(reasoner, root, visitor, allProofs);
-	}
-	
 	static void visitInferences(ExplainingOWLReasoner reasoner, OWLExpression root, OWLInferenceVisitor visitor, boolean allProofs) throws ProofGenerationException {
 		// start recursive unwinding
 		Queue<OWLExpression> toDo = new LinkedList<OWLExpression>();

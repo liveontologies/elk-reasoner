@@ -29,6 +29,7 @@ import javax.swing.JOptionPane;
 
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.explanation.io.InconsistentOntologyPluginInstance;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 /**
@@ -41,12 +42,17 @@ public class ProofBasedInconsistencyExplanationPlugin implements InconsistentOnt
 
     private OWLEditorKit editorKit;
     
-    public void setup(OWLEditorKit editorKit) {
+    @Override
+	public void setup(OWLEditorKit editorKit) {
         this.editorKit = editorKit;
     }
 
-    public void explain(OWLOntology ontology) {
-        final ProofWorkbenchPanel panel = new ProofWorkbenchPanel(editorKit);
+    @Override
+	public void explain(OWLOntology ontology) {
+    	OWLDataFactory factory = ontology.getOWLOntologyManager().getOWLDataFactory();
+		final ProofWorkbenchPanel panel = new ProofWorkbenchPanel(editorKit,
+				factory.getOWLSubClassOfAxiom(factory.getOWLThing(),
+						factory.getOWLNothing()));
         JOptionPane op = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION);
         JDialog dlg = op.createDialog("Inconsistent ontology explanation");
         
@@ -63,9 +69,11 @@ public class ProofBasedInconsistencyExplanationPlugin implements InconsistentOnt
         dlg.setVisible(true);
     }
 
-    public void initialise() throws Exception {
+    @Override
+	public void initialise() throws Exception {
     }
 
-    public void dispose() throws Exception {
+    @Override
+	public void dispose() throws Exception {
     }
 }

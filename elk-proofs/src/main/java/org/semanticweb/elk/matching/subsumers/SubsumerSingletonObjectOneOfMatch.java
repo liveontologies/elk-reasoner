@@ -22,39 +22,36 @@ package org.semanticweb.elk.matching.subsumers;
  * #L%
  */
 
-abstract class AbstractSubsumerMatch implements SubsumerMatch {
+import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
+
+public class SubsumerSingletonObjectOneOfMatch
+		extends AbstractSubsumerNonCanonicalMatch<ElkObjectOneOf> {
+
+	SubsumerSingletonObjectOneOfMatch(ElkObjectOneOf value) {
+		super(value);
+		if (value.getIndividuals().size() != 1) {
+			throw new IllegalArgumentException(
+					"ElkObjectOneOf must be singleton: " + value);
+		}
+	}
+
+	@Override
+	public <O> O accept(SubsumerNonCanonicalMatch.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
 
 	/**
-	 * hash code, computed on demand
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
-	private int hashCode_ = 0;
+	interface Visitor<O> {
 
-	@Override
-	public int hashCode() {
-		if (hashCode_ == 0) {
-			hashCode_ = SubsumerMatchHash.hashCode(this);
-		}
-		// else
-		return hashCode_;
-	}
+		O visit(SubsumerSingletonObjectOneOfMatch match);
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		// else
-		if (o instanceof SubsumerMatch) {
-			return hashCode() == o.hashCode()
-					&& SubsumerMatchEquality.equals(this, (SubsumerMatch) o);
-		}
-		// else
-		return false;
-	}
-
-	@Override
-	public String toString() {
-		return SubsumerMatchPrinter.toString(this);
 	}
 
 }

@@ -64,7 +64,6 @@ import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
-import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 
 /**
  * An {@link ElkAxiomVisitor} that always returns {@code null}.
@@ -80,18 +79,22 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
  */
 public class DummyElkAxiomVisitor<O> implements ElkAxiomVisitor<O> {
 
+	protected O defaultVisit(ElkAxiom axiom) {
+		return null;
+	}
+	
 	/**
 	 * Invoked to visit every logical axiom
 	 */
 	protected O defaultLogicalVisit(ElkAxiom axiom) {
-		return null;
+		return defaultVisit(axiom);
 	}
 
 	/**
 	 * Invoked to visit every non-logical (annotation) axiom
 	 */
 	protected O defaultNonLogicalVisit(ElkAxiom axiom) {
-		return null;
+		return defaultVisit(axiom);
 	}
 
 	@Override

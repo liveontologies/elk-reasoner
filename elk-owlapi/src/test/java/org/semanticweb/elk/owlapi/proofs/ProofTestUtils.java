@@ -74,14 +74,6 @@ public class ProofTestUtils {
 		provabilityTest(graph, graph.getExpressions());
 	}
 
-	public static void provabilityOfInconsistencyTest(
-			ExplainingOWLReasoner reasoner) throws ProofGenerationException {
-		OWLExpression root = reasoner.getDerivedExpressionForInconsistency();
-		OWLInferenceGraph graph = OWLProofUtils.computeInferenceGraph(root);
-
-		provabilityTest(graph, Collections.singleton(root));
-	}
-
 	// tests that each derived expression is provable
 	static void provabilityTest(OWLInferenceGraph graph,
 			Iterable<OWLExpression> expressions)
@@ -157,7 +149,7 @@ public class ProofTestUtils {
 			final ProofTestVisitor<T> visitor) throws T {
 		
 		if (!reasoner.isConsistent()) {
-			visitor.inconsistencyTest();
+			visitor.visit(factory.getOWLThing(), factory.getOWLNothing());
 			return;
 		}
 		

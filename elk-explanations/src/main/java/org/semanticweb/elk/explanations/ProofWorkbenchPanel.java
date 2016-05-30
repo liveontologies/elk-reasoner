@@ -37,7 +37,6 @@ import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
 
 import org.protege.editor.core.Disposable;
-import org.protege.editor.core.ProtegeApplication;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
@@ -91,12 +90,6 @@ public class ProofWorkbenchPanel extends JPanel implements Disposable,
 	public ProofWorkbenchPanel(OWLEditorKit ek, OWLAxiom entailment) {
 		this(ek, new WorkbenchManager(ProofManager.getExplanationManager(ek
 				.getOWLModelManager()), entailment));
-	}
-
-	// proof workbench panel for inconsistency
-	public ProofWorkbenchPanel(OWLEditorKit ek) {
-		this(ek, new WorkbenchManager(ProofManager.getExplanationManager(ek
-				.getOWLModelManager())));
 	}
 
 	private ProofWorkbenchPanel(OWLEditorKit ek, WorkbenchManager wbManager) {
@@ -199,12 +192,9 @@ public class ProofWorkbenchPanel extends JPanel implements Disposable,
 			OWLAxiom entailment = workbenchManager.getEntailment();
 			ProofManager proofManager = workbenchManager.getProofManager();
 
-			proofDisplay = entailment == null ? createProofExplanationDisplay(
-					proofManager.getProofRootForInconsistency(), true,
-					ProofFrameExplanationDisplay.INCONSISTENCY_TITLE)
-					: createProofExplanationDisplay(
-							proofManager.getProofRoot(entailment), true,
-							ProofFrameExplanationDisplay.SUBSUMPTION_TITLE);
+			proofDisplay = createProofExplanationDisplay(
+					proofManager.getProofRoot(entailment), true,
+					ProofFrameExplanationDisplay.TITLE);
 			// GUI
 			ExplanationDisplayList list = new ExplanationDisplayList(editorKit,
 					workbenchManager, proofDisplay, 1);
@@ -220,9 +210,7 @@ public class ProofWorkbenchPanel extends JPanel implements Disposable,
 	public void updateProofRoot() {
 		OWLAxiom entailment = workbenchManager.getEntailment();
 		ProofManager proofManager = workbenchManager.getProofManager();
-		CycleFreeProofRoot root = entailment == null ? proofManager
-				.getProofRootForInconsistency() : proofManager
-				.getProofRoot(entailment);
+		CycleFreeProofRoot root = proofManager.getProofRoot(entailment);
 
 		proofDisplay.update(root);
 		scrollPane.validate();

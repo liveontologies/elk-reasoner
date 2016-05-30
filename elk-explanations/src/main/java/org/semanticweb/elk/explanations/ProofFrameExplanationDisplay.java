@@ -40,9 +40,7 @@ import org.semanticweb.owlapitools.proofs.util.CycleFreeProofRoot;
 @SuppressWarnings("serial")
 public class ProofFrameExplanationDisplay extends JPanel {
     
-	static final String SUBSUMPTION_TITLE = "Proof tree for class subsumption";
-	
-	static final String INCONSISTENCY_TITLE = "Proof tree for ontology inconsistency";
+	static final String TITLE = "Proof tree for entailment";
 	
     private ProofFrame frame;
 

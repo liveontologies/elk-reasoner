@@ -130,15 +130,6 @@ public class AllOntologiesProofTest extends BaseProofTest {
 							}
 						}
 
-						@Override
-						public void inconsistencyTest() throws Exception {
-							ProofTestUtils
-									.provabilityOfInconsistencyTest(reasoner);
-							RecursiveInferenceVisitor
-									.visitInferencesOfInconsistency(reasoner,
-											bindingChecker, true);
-						}
-
 					});
 		} finally {
 			reasoner.dispose();

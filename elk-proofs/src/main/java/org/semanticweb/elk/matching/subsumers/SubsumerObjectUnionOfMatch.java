@@ -22,30 +22,21 @@ package org.semanticweb.elk.matching.subsumers;
  * #L%
  */
 
-import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
-import org.semanticweb.elk.matching.root.IndexedContextRootMatch.Factory;
-import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
+import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 
-public class IndexedObjectSomeValuesFromHasValueMatch
-		extends AbstractIndexedObjectSomeValuesFromMatch<ElkObjectHasValue> {
+public class SubsumerObjectUnionOfMatch
+		extends AbstractIndexedObjectUnionOfMatch<ElkObjectUnionOf> {
 
-	IndexedObjectSomeValuesFromHasValueMatch(ElkObjectHasValue value) {
+	SubsumerObjectUnionOfMatch(ElkObjectUnionOf value) {
 		super(value);
-	}	
-
-	@Override
-	public IndexedContextRootMatch getFillerRootMatch(Factory factory) {
-		return factory
-				.getIndexedContextRootIndividualMatch(getValue().getFiller());
+		if (value.getClassExpressions().size() <= 1) {
+			throw new IllegalArgumentException(
+					"ElkObjectUnionOf must have at lest two members: " + value);
+		}
 	}
 
 	@Override
-	public IndexedContextRootMatch getRangeRootMatch(Factory factory) {
-		return factory.getIndexedContextRootRangeHasValueMatch(getValue());
-	}
-
-	@Override
-	public <O> O accept(IndexedObjectSomeValuesFromMatch.Visitor<O> visitor) {
+	public <O> O accept(IndexedObjectUnionOfMatch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
@@ -59,7 +50,7 @@ public class IndexedObjectSomeValuesFromHasValueMatch
 	 */
 	interface Visitor<O> {
 
-		O visit(IndexedObjectSomeValuesFromHasValueMatch match);
+		O visit(SubsumerObjectUnionOfMatch match);
 
 	}
 

@@ -31,7 +31,6 @@ import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
 import org.semanticweb.elk.owl.inferences.ReasonerProofProvider;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,23 +48,13 @@ public class TestUtils {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(TestUtils.class);
 
-	public static void provabilityOfSubsumptionTest(Reasoner reasoner,
+	public static void provabilityTest(Reasoner reasoner,
 			Set<? extends ElkAxiom> ontology, ElkObject.Factory factory,
-			ElkSubClassOfAxiom subsumption) throws ElkException {
+			ElkAxiom goal) throws ElkException {
 
-		provabilityTest(new ReasonerProofProvider(reasoner, factory)
-				.getInferences(subsumption), ontology, subsumption);
-
-	}
-
-	public static void provabilityOfInconsistencyTest(Reasoner reasoner,
-			Set<? extends ElkAxiom> ontology) throws ElkException {
-		// TODO
-	}
-
-	public static void provabilityTest(ElkInferenceSet inferences,
-			Set<? extends ElkAxiom> ontology, ElkAxiom goal)
-			throws ElkException {
+		LOGGER_.debug("Provability test: {}", goal);
+		ElkInferenceSet inferences = new ReasonerProofProvider(reasoner,
+				factory).getInferences(goal);
 		ProvabilityTester tester = new ProvabilityTester(inferences, ontology);
 		if (!tester.isProvable(goal)) {
 			throw new AssertionError(String.format("%s: not provable", goal));

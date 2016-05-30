@@ -53,11 +53,6 @@ class SubsumerMatcherVisitor extends DummyElkObjectVisitor<SubsumerMatch> {
 		return INSTANCE_;
 	}
 
-	@Override
-	public SubsumerMatch visit(ElkClass match) {
-		return new IndexedClassMatch(match);
-	}
-
 	public SubsumerMatch defaultVisit(ElkIndividual match) {
 		return new IndexedIndividualMatch((ElkIndividual) match);
 	}
@@ -68,13 +63,18 @@ class SubsumerMatcherVisitor extends DummyElkObjectVisitor<SubsumerMatch> {
 	}
 
 	@Override
-	public SubsumerMatch visit(ElkNamedIndividual match) {
-		return defaultVisit(match);
+	public SubsumerMatch visit(ElkClass match) {
+		return new IndexedClassMatch(match);
 	}
 
 	@Override
 	public SubsumerMatch visit(ElkDataHasValue match) {
 		return new IndexedDataHasValueMatch(match);
+	}
+
+	@Override
+	public SubsumerMatch visit(ElkNamedIndividual match) {
+		return defaultVisit(match);
 	}
 
 	@Override
@@ -88,28 +88,49 @@ class SubsumerMatcherVisitor extends DummyElkObjectVisitor<SubsumerMatch> {
 	}
 
 	@Override
-	public SubsumerMatch visit(ElkObjectIntersectionOf match) {
-		return new IndexedObjectIntersectionOfMatch(match);
-	}
-
-	@Override
-	public SubsumerMatch visit(ElkObjectSomeValuesFrom match) {
-		return new IndexedObjectSomeValuesFromSomeValuesFromMatch(match);
-	}
-
-	@Override
 	public SubsumerMatch visit(ElkObjectHasValue match) {
-		return new IndexedObjectSomeValuesFromHasValueMatch(match);
+		return new SubsumerObjectHasValueMatch(match);
 	}
 
 	@Override
-	public SubsumerMatch visit(ElkObjectUnionOf match) {
-		return new IndexedObjectUnionOfUnionOfMatch(match);
+	public SubsumerMatch visit(ElkObjectIntersectionOf match) {
+		switch (match.getClassExpressions().size()) {
+		case 0:
+			return new SubsumerEmptyObjectIntersectionOfMatch(match);
+		case 1:
+			return new SubsumerSingletonObjectIntersectionOfMatch(match);
+		default:
+			return new IndexedObjectIntersectionOfMatch(match);
+		}
 	}
 
 	@Override
 	public SubsumerMatch visit(ElkObjectOneOf match) {
-		return new IndexedObjectUnionOfOneOfMatch(match);
+		switch (match.getIndividuals().size()) {
+		case 0:
+			return new SubsumerEmptyObjectOneOfMatch(match);
+		case 1:
+			return new SubsumerSingletonObjectOneOfMatch(match);
+		default:
+			return new SubsumerObjectOneOfMatch(match);
+		}
+	}
+
+	@Override
+	public SubsumerMatch visit(ElkObjectSomeValuesFrom match) {
+		return new SubsumerObjectSomeValuesFromMatch(match);
+	}
+
+	@Override
+	public SubsumerMatch visit(ElkObjectUnionOf match) {
+		switch (match.getClassExpressions().size()) {
+		case 0:
+			return new SubsumerEmptyObjectUnionOfMatch(match);
+		case 1:
+			return new SubsumerSingletonObjectUnionOfMatch(match);
+		default:
+			return new SubsumerObjectUnionOfMatch(match);
+		}
 	}
 
 }

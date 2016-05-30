@@ -40,8 +40,7 @@ public class SubClassInclusionOwlThingMatch1
 			SubClassInclusionComposedMatch1 conclusionMatch) {
 		super(parent);
 		originMatch_ = conclusionMatch.getDestinationMatch();
-		ElkClass subsumerMatch = conclusionMatch.getSubsumerIndexedClassMatch()
-				.getValue();
+		ElkClass subsumerMatch = conclusionMatch.getSubsumerElkClassMatch();
 		if (!subsumerMatch.getIri().equals(PredefinedElkIris.OWL_THING)) {
 			throw new ElkMatchException(parent.getConclusionSubsumer(),
 					subsumerMatch);

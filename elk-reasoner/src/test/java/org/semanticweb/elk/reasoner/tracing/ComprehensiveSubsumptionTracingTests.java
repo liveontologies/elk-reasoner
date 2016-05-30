@@ -9,7 +9,7 @@ package org.semanticweb.elk.reasoner.tracing;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,103 +25,80 @@ package org.semanticweb.elk.reasoner.tracing;
  * #L%
  */
 
-import java.util.Deque;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.predefined.PredefinedElkIris;
-import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
+import org.semanticweb.elk.owl.interfaces.ElkObject.Factory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 
 /**
- * Visits all atomic subsumptions in a class taxonomy using a {@link TracingTestVisitor}. Used for tracing tests and benchmarking.
+ * Checks equivalence of classes in each taxonomy node and subsumptions between
+ * direct sub-nodes using the provided {@link TracingTestVisitor}. Used for
+ * tracing tests and benchmarking.
  * 
  * @author Pavel Klinov
  *
  *         pavel.klinov@uni-ulm.de
+ * 
+ * @author Yevgeny Kazakov
  */
 public class ComprehensiveSubsumptionTracingTests implements TracingTests {
 
-	private final Taxonomy<ElkClass> classTaxonomy_;
-	
-	public ComprehensiveSubsumptionTracingTests(Reasoner reasoner) throws ElkException {
-		classTaxonomy_ = initTaxonomy(reasoner);
-	}
-	
-	private static Taxonomy<ElkClass> initTaxonomy(Reasoner reasoner) throws ElkException {
-		try {
-			return reasoner.getTaxonomy();
-		} catch (ElkInconsistentOntologyException e) {
-			// no worries
-			return null;
-		} 
+	private Reasoner reasoner_;
+
+	public ComprehensiveSubsumptionTracingTests(Reasoner reasoner)
+			throws ElkException {
+		this.reasoner_ = reasoner;
 	}
 
 	@Override
 	public void accept(TracingTestVisitor visitor) throws Exception {
-		if (classTaxonomy_ == null) {
-			visitor.inconsistencyTest();
+		if (reasoner_.isInconsistent()) {
+			Factory elkFactory = reasoner_.getElkFactory();
+			visitor.testSubsumption(elkFactory.getOwlThing(),
+					elkFactory.getOwlNothing());
 			return;
 		}
-		
-		Set<TaxonomyNode<ElkClass>> visited = new HashSet<TaxonomyNode<ElkClass>>();
-		Deque<TaxonomyNode<ElkClass>> toDo = new LinkedList<TaxonomyNode<ElkClass>>();
+		// else
 
-		toDo.add(classTaxonomy_.getTopNode());
+		Taxonomy<ElkClass> classTaxonomy = reasoner_.getTaxonomy();
+		Set<TaxonomyNode<ElkClass>> visited = new HashSet<TaxonomyNode<ElkClass>>();
+		Queue<TaxonomyNode<ElkClass>> toDo = new LinkedList<TaxonomyNode<ElkClass>>();
+
+		toDo.add(classTaxonomy.getTopNode());
 
 		for (;;) {
 			TaxonomyNode<ElkClass> next = toDo.poll();
 
 			if (next == null) {
-				break;
+				return;
 			}
 
-			visitEquivalentClassesTracingTasks(next, visitor);
+			int nextSize = next.size();
+			if (nextSize > 1) {
+				List<ElkClass> equivalent = new ArrayList<ElkClass>(nextSize);
+				for (ElkClass member : next) {
+					equivalent.add(member);
+				}
+				visitor.testEquivalence(equivalent);
+			}
 
 			for (TaxonomyNode<ElkClass> subNode : next.getDirectSubNodes()) {
-				if (subNode != classTaxonomy_.getBottomNode()
-						&& next != classTaxonomy_.getTopNode()) {
-					visitTracingTasksForDirectSubClasses(subNode, next, visitor);
-				}
-
+				visitor.testSubsumption(subNode.getCanonicalMember(),
+						next.getCanonicalMember());
 				if (visited.add(subNode)) {
-					toDo.push(subNode);
+					toDo.add(subNode);
 				}
 			}
 		}
-	}
-
-	private void visitTracingTasksForDirectSubClasses(
-			TaxonomyNode<ElkClass> node, TaxonomyNode<ElkClass> superNode,
-			TracingTestVisitor visitor) throws Exception {
-
-		for (ElkClass sub : node) {
-			if (sub.getIri().equals(PredefinedElkIris.OWL_NOTHING)) {
-				continue;
-			}
-
-			for (ElkClass sup : superNode) {
-				if (sup.getIri().equals(PredefinedElkIris.OWL_THING)) {
-					continue;
-				}
-
-				if (sub != sup) {
-					visitor.subsumptionTest(sub, sup);
-				}
-			}
-		}
-
-	}
-
-	private void visitEquivalentClassesTracingTasks(
-			TaxonomyNode<ElkClass> node, TracingTestVisitor visitor)
-			throws Exception {
-		visitTracingTasksForDirectSubClasses(node, node, visitor);
 	}
 
 }

@@ -37,7 +37,7 @@ abstract class LinkOfObjectHasSelfMatch2<P> extends AbstractInferenceMatch<P> {
 			SubClassInclusionDecomposedMatch2 premiseMatch) {
 		super(parent);
 		this.premiseSubsumerMatch_ = premiseMatch
-				.getSubsumerIndexedObjectHasSelfMatch().getValue();
+				.getSubsumerIndexedObjectHasSelfMatch();
 	}
 
 	ElkObjectHasSelf getPremiseSuperExpressionMatch() {

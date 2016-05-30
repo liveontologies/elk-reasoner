@@ -24,7 +24,7 @@ package org.semanticweb.elk.matching.subsumers;
 
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 
-public abstract class AbstractSubsumerElkObjectMatch<V extends ElkObject>
+abstract class AbstractSubsumerElkObjectMatch<V extends ElkObject>
 		extends AbstractSubsumerMatch implements SubsumerElkObjectMatch {
 
 	private final V value_;
@@ -39,8 +39,8 @@ public abstract class AbstractSubsumerElkObjectMatch<V extends ElkObject>
 	}
 
 	@Override
-	public <O> O accept(SubsumerMatch.Visitor<O> visitor) {
+	public final <O> O accept(SubsumerMatch.Visitor<O> visitor) {
 		return accept((SubsumerElkObjectMatch.Visitor<O>) visitor);
 	}
-	
+
 }

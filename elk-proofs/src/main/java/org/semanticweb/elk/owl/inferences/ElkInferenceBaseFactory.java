@@ -170,6 +170,12 @@ public class ElkInferenceBaseFactory implements ElkInference.Factory {
 	}
 
 	@Override
+	public ElkClassInclusionOfInconsistentIndividual getElkClassInclusionOfInconsistentIndividual(
+			ElkIndividual inconsistent) {
+		return new ElkClassInclusionOfInconsistentIndividual(inconsistent);
+	}
+
+	@Override
 	public ElkClassInclusionOfObjectPropertyAssertion getElkClassInclusionOfObjectPropertyAssertion(
 			ElkIndividual subject, ElkObjectPropertyExpression property,
 			ElkIndividual object) {
@@ -240,9 +246,27 @@ public class ElkInferenceBaseFactory implements ElkInference.Factory {
 	}
 
 	@Override
+	public ElkEquivalentClassesCycle getElkEquivalentClassesCycle(
+			ElkClassExpression first, ElkClassExpression second) {
+		return new ElkEquivalentClassesCycle(first, second);
+	}
+
+	@Override
+	public ElkEquivalentClassesCycle getElkEquivalentClassesCycle(
+			List<? extends ElkClassExpression> expressions) {
+		return new ElkEquivalentClassesCycle(expressions);
+	}
+
+	@Override
 	public ElkEquivalentClassesObjectHasValue getElkEquivalentClassesObjectHasValue(
 			ElkObjectPropertyExpression property, ElkIndividual value) {
 		return new ElkEquivalentClassesObjectHasValue(property, value);
+	}
+
+	@Override
+	public ElkEquivalentClassesObjectOneOf getElkEquivalentClassesObjectOneOf(
+			List<? extends ElkIndividual> members) {
+		return new ElkEquivalentClassesObjectOneOf(members);
 	}
 
 	@Override

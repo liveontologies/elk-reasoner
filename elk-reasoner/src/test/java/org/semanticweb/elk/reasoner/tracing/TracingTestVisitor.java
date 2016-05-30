@@ -24,16 +24,24 @@ package org.semanticweb.elk.reasoner.tracing;
  * #L%
  */
 
+import java.util.List;
+
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 
 /**
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
+ * 
+ * @author Yevgeny Kazakov
+ * 
  */
 public interface TracingTestVisitor {
 
-	public void subsumptionTest(ElkClass subsumee, ElkClass subsumer) throws Exception;
-	
-	public void inconsistencyTest() throws Exception;
+	public void testSubsumption(ElkClass subsumee, ElkClass subsumer)
+			throws Exception;
+
+	public void testEquivalence(List<? extends ElkClass> equivalent)
+			throws Exception;
+
 }

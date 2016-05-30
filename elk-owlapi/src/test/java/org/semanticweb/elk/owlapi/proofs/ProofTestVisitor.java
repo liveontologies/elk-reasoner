@@ -35,5 +35,4 @@ public interface ProofTestVisitor<E extends Exception> {
 
 	public void visit(OWLClassExpression subsumee, OWLClassExpression subsumer) throws E;
 	
-	public void inconsistencyTest() throws E;
 }

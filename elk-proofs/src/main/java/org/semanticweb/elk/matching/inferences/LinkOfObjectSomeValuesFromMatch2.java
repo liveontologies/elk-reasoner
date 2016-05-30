@@ -46,6 +46,10 @@ abstract class LinkOfObjectSomeValuesFromMatch2<P>
 				.getSubsumerIndexedObjectSomeValuesFromMatch();
 	}
 
+	public IndexedObjectSomeValuesFromMatch getPremiseSubsumerMatch() {
+		return premiseSubsumerMatch_;
+	}
+
 	ElkObjectProperty getPremisePropertyMatch(
 			IndexedObjectProperty premiseProperty) {
 		ElkObjectPropertyExpression premisePropertyMatch = premiseSubsumerMatch_

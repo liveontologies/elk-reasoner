@@ -26,41 +26,29 @@ import java.util.Collections;
 import java.util.List;
 
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
-import org.semanticweb.elk.matching.subsumers.IndexedObjectIntersectionOfMatch;
-import org.semanticweb.elk.matching.subsumers.IndexedObjectSomeValuesFromHasValueMatch;
-import org.semanticweb.elk.matching.subsumers.IndexedObjectUnionOfOneOfMatch;
-import org.semanticweb.elk.matching.subsumers.IndexedObjectUnionOfUnionOfMatch;
+import org.semanticweb.elk.matching.subsumers.SubsumerEmptyObjectIntersectionOfMatch;
+import org.semanticweb.elk.matching.subsumers.SubsumerEmptyObjectOneOfMatch;
+import org.semanticweb.elk.matching.subsumers.SubsumerEmptyObjectUnionOfMatch;
 import org.semanticweb.elk.matching.subsumers.SubsumerMatch;
 import org.semanticweb.elk.matching.subsumers.SubsumerMatchDummyVisitor;
+import org.semanticweb.elk.matching.subsumers.SubsumerNonCanonicalMatch;
+import org.semanticweb.elk.matching.subsumers.SubsumerObjectHasValueMatch;
+import org.semanticweb.elk.matching.subsumers.SubsumerSingletonObjectIntersectionOfMatch;
+import org.semanticweb.elk.matching.subsumers.SubsumerSingletonObjectOneOfMatch;
+import org.semanticweb.elk.matching.subsumers.SubsumerSingletonObjectUnionOfMatch;
 import org.semanticweb.elk.owl.inferences.ElkInference;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
-import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
+import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 
 public class ConclusionMatchCanonizerVisitor
 		extends ConclusionMatchDummyVisitor<Boolean> {
-
-	private static interface SubsumerCasesCanonizer {
-
-		boolean anyElkObjectHasValue(ElkObjectHasValue existential);
-
-		boolean emptyElkObjectIntersectionOf();
-
-		boolean emptyElkObjectOneOf();
-
-		boolean emptyElkObjectUnionOf();
-
-		boolean singletonElkObjectIntersectionOf(ElkClassExpression conjunct);
-
-		boolean singletonElkObjectOneOf(ElkIndividual member);
-
-		boolean singletonElkObjectUnionOf(ElkClassExpression disjunct);
-
-	}
 
 	private final ConclusionMatchExpressionFactory conclusionFactory_;
 
@@ -88,10 +76,75 @@ public class ConclusionMatchCanonizerVisitor
 		final SubClassInclusionComposed parent = conclusionMatch.getParent();
 		final IndexedContextRootMatch destinationMatch = conclusionMatch
 				.getDestinationMatch();
-		return visit(conclusionMatch, new SubsumerCasesCanonizer() {
+		SubsumerMatch subsumerMatch = conclusionMatch.getSubsumerMatch();
+		return subsumerMatch.accept(new SubsumerMatchDummyVisitor<Boolean>() {
 
 			@Override
-			public boolean anyElkObjectHasValue(ElkObjectHasValue existential) {
+			protected Boolean defaultVisit(SubsumerMatch match) {
+				return false;
+			}
+
+			@Override
+			protected Boolean defaultVisit(SubsumerNonCanonicalMatch match) {
+				// fail fast if some case is forgotten
+				return null;
+			}
+
+			@Override
+			public Boolean visit(SubsumerEmptyObjectIntersectionOfMatch match) {
+				conclusionFactory_.getSubClassInclusionComposedMatch1(parent,
+						destinationMatch, conclusionFactory_.getOwlThing());
+				// create ELK inferences
+				ElkClassExpression subExpression = toElkExpression(
+						destinationMatch);
+				elkInferenceFactory_
+						.getElkClassInclusionOwlThing(subExpression);
+				elkInferenceFactory_.getElkClassInclusionHierarchy(
+						subExpression, conclusionFactory_.getOwlThing(),
+						conclusionFactory_.getObjectIntersectionOf(
+								Collections.<ElkClassExpression> emptyList()));
+				elkInferenceFactory_
+						.getElkClassInclusionOwlThingEmptyObjectIntersectionOf();
+				return true;
+			}
+
+			@Override
+			public Boolean visit(SubsumerEmptyObjectOneOfMatch match) {
+				ElkClass owlNothing = conclusionFactory_.getOwlNothing();
+				ElkObjectOneOf emptyOneOf = conclusionFactory_.getObjectOneOf(
+						Collections.<ElkIndividual> emptyList());
+				ElkClassExpression subExpression = toElkExpression(
+						destinationMatch);
+				conclusionFactory_.getSubClassInclusionComposedMatch1(parent,
+						destinationMatch, conclusionFactory_.getOwlNothing());
+				// create ELK inferences
+				elkInferenceFactory_.getElkClassInclusionOwlNothing(emptyOneOf);
+				elkInferenceFactory_.getElkClassInclusionHierarchy(
+						subExpression, owlNothing, emptyOneOf);
+				return true;
+			}
+
+			@Override
+			public Boolean visit(SubsumerEmptyObjectUnionOfMatch match) {
+				ElkClass owlNothing = conclusionFactory_.getOwlNothing();
+				ElkObjectUnionOf emptyUnionOf = conclusionFactory_
+						.getObjectUnionOf(
+								Collections.<ElkClassExpression> emptyList());
+				ElkClassExpression subExpression = toElkExpression(
+						destinationMatch);
+				conclusionFactory_.getSubClassInclusionComposedMatch1(parent,
+						destinationMatch, owlNothing);
+				// create ELK inferences
+				elkInferenceFactory_
+						.getElkClassInclusionOwlNothing(emptyUnionOf);
+				elkInferenceFactory_.getElkClassInclusionHierarchy(
+						subExpression, owlNothing, emptyUnionOf);
+				return true;
+			}
+
+			@Override
+			public Boolean visit(SubsumerObjectHasValueMatch match) {
+				ElkObjectHasValue existential = match.getValue();
 				ElkObjectPropertyExpression property = existential
 						.getProperty();
 				ElkIndividual value = existential.getFiller();
@@ -113,42 +166,10 @@ public class ConclusionMatchCanonizerVisitor
 			}
 
 			@Override
-			public boolean emptyElkObjectIntersectionOf() {
-				conclusionFactory_.getSubClassInclusionComposedMatch1(parent,
-						destinationMatch, conclusionFactory_.getOwlThing());
-				// create ELK inference
-				ElkClassExpression subExpression = toElkExpression(
-						destinationMatch);
-				elkInferenceFactory_
-						.getElkClassInclusionOwlThing(subExpression);
-				elkInferenceFactory_.getElkClassInclusionHierarchy(
-						subExpression, conclusionFactory_.getOwlThing(),
-						conclusionFactory_.getObjectIntersectionOf(
-								Collections.<ElkClassExpression> emptyList()));
-				elkInferenceFactory_
-						.getElkClassInclusionOwlThingEmptyObjectIntersectionOf();
-				return true;
-			}
-
-			@Override
-			public boolean emptyElkObjectOneOf() {
-				conclusionFactory_.getSubClassInclusionComposedMatch1(parent,
-						destinationMatch, conclusionFactory_.getOwlNothing());
-				// no ELK inference necessary due to class inconsistency
-				return true;
-			}
-
-			@Override
-			public boolean emptyElkObjectUnionOf() {
-				conclusionFactory_.getSubClassInclusionComposedMatch1(parent,
-						destinationMatch, conclusionFactory_.getOwlNothing());
-				// no ELK inference necessary due to class inconsistency
-				return true;
-			}
-
-			@Override
-			public boolean singletonElkObjectIntersectionOf(
-					ElkClassExpression conjunct) {
+			public Boolean visit(
+					SubsumerSingletonObjectIntersectionOfMatch match) {
+				ElkClassExpression conjunct = match.getValue()
+						.getClassExpressions().get(0);
 				conclusionFactory_.getSubClassInclusionComposedMatch1(parent,
 						destinationMatch, conjunct);
 				// create ELK inference
@@ -160,16 +181,19 @@ public class ConclusionMatchCanonizerVisitor
 			}
 
 			@Override
-			public boolean singletonElkObjectOneOf(ElkIndividual member) {
+			public Boolean visit(SubsumerSingletonObjectOneOfMatch match) {
+				ElkIndividual member = match.getValue().getIndividuals().get(0);
 				conclusionFactory_.getSubClassInclusionComposedMatch1(parent,
 						destinationMatch, member);
-				// no ELK inferences
+				// no ELK inferences since indexed individuals are
+				// converted to ObjectOneOf
 				return true;
 			}
 
 			@Override
-			public boolean singletonElkObjectUnionOf(
-					ElkClassExpression disjunct) {
+			public Boolean visit(SubsumerSingletonObjectUnionOfMatch match) {
+				ElkClassExpression disjunct = match.getValue()
+						.getClassExpressions().get(0);
 				conclusionFactory_.getSubClassInclusionComposedMatch1(parent,
 						destinationMatch, disjunct);
 				// create ELK inferences
@@ -194,32 +218,22 @@ public class ConclusionMatchCanonizerVisitor
 				.getParent();
 		final IndexedContextRootMatch destinationMatch = parent
 				.getDestinationMatch();
-		return visit(conclusionMatch, new SubsumerCasesCanonizer() {
+		SubsumerMatch subsumerMatch = conclusionMatch.getSubsumerMatch();
+		return subsumerMatch.accept(new SubsumerMatchDummyVisitor<Boolean>() {
 
 			@Override
-			public boolean anyElkObjectHasValue(ElkObjectHasValue existential) {
-				ElkObjectPropertyExpression property = existential
-						.getProperty();
-				ElkIndividual value = existential.getFiller();
-				ElkObjectSomeValuesFrom translated = conclusionFactory_
-						.getObjectSomeValuesFrom(property,
-								conclusionFactory_.getObjectOneOf(value));
-				conclusionFactory_.getSubClassInclusionDecomposedMatch2(parent,
-						translated);
-
-				// create ELK inferences
-				elkInferenceFactory_
-						.getElkEquivalentClassesObjectHasValue(property, value);
-				elkInferenceFactory_.getElkClassInclusionOfEquivaletClasses(
-						existential, translated, true);
-				elkInferenceFactory_.getElkClassInclusionHierarchy(
-						toElkExpression(destinationMatch), existential,
-						translated);
-				return true;
+			protected Boolean defaultVisit(SubsumerMatch match) {
+				return false;
 			}
 
 			@Override
-			public boolean emptyElkObjectIntersectionOf() {
+			protected Boolean defaultVisit(SubsumerNonCanonicalMatch match) {
+				// fail fast if some case is forgotten
+				return null;
+			}
+
+			@Override
+			public Boolean visit(SubsumerEmptyObjectIntersectionOfMatch match) {
 				conclusionFactory_.getSubClassInclusionDecomposedMatch2(parent,
 						conclusionFactory_.getOwlThing());
 				// create ELK inference
@@ -229,7 +243,7 @@ public class ConclusionMatchCanonizerVisitor
 			}
 
 			@Override
-			public boolean emptyElkObjectOneOf() {
+			public Boolean visit(SubsumerEmptyObjectOneOfMatch match) {
 				conclusionFactory_.getSubClassInclusionDecomposedMatch2(parent,
 						conclusionFactory_.getOwlNothing());
 				// create ELK inference
@@ -244,7 +258,7 @@ public class ConclusionMatchCanonizerVisitor
 			}
 
 			@Override
-			public boolean emptyElkObjectUnionOf() {
+			public Boolean visit(SubsumerEmptyObjectUnionOfMatch match) {
 				conclusionFactory_.getSubClassInclusionDecomposedMatch2(parent,
 						conclusionFactory_.getOwlNothing());
 				// create ELK inferences
@@ -259,8 +273,33 @@ public class ConclusionMatchCanonizerVisitor
 			}
 
 			@Override
-			public boolean singletonElkObjectIntersectionOf(
-					ElkClassExpression conjunct) {
+			public Boolean visit(SubsumerObjectHasValueMatch match) {
+				ElkObjectHasValue existential = match.getValue();
+				ElkObjectPropertyExpression property = existential
+						.getProperty();
+				ElkIndividual value = existential.getFiller();
+				ElkObjectSomeValuesFrom translated = conclusionFactory_
+						.getObjectSomeValuesFrom(property,
+								conclusionFactory_.getObjectOneOf(value));
+				conclusionFactory_.getSubClassInclusionDecomposedMatch2(parent,
+						translated);
+				// create ELK inferences
+				elkInferenceFactory_
+						.getElkEquivalentClassesObjectHasValue(property, value);
+				elkInferenceFactory_.getElkClassInclusionOfEquivaletClasses(
+						existential, translated, true);
+				elkInferenceFactory_.getElkClassInclusionHierarchy(
+						toElkExpression(destinationMatch), existential,
+						translated);
+				return true;
+
+			}
+
+			@Override
+			public Boolean visit(
+					SubsumerSingletonObjectIntersectionOfMatch match) {
+				ElkClassExpression conjunct = match.getValue()
+						.getClassExpressions().get(0);
 				conclusionFactory_.getSubClassInclusionDecomposedMatch2(parent,
 						conjunct);
 				// create ELK inference
@@ -272,7 +311,8 @@ public class ConclusionMatchCanonizerVisitor
 			}
 
 			@Override
-			public boolean singletonElkObjectOneOf(ElkIndividual member) {
+			public Boolean visit(SubsumerSingletonObjectOneOfMatch match) {
+				ElkIndividual member = match.getValue().getIndividuals().get(0);
 				conclusionFactory_.getSubClassInclusionDecomposedMatch2(parent,
 						member);
 				// no ELK inferences
@@ -280,8 +320,9 @@ public class ConclusionMatchCanonizerVisitor
 			}
 
 			@Override
-			public boolean singletonElkObjectUnionOf(
-					ElkClassExpression disjunct) {
+			public Boolean visit(SubsumerSingletonObjectUnionOfMatch match) {
+				ElkClassExpression disjunct = match.getValue()
+						.getClassExpressions().get(0);
 				conclusionFactory_.getSubClassInclusionDecomposedMatch2(parent,
 						disjunct);
 				// create ELK inference
@@ -292,93 +333,6 @@ public class ConclusionMatchCanonizerVisitor
 			}
 
 		});
-	}
-
-	private boolean visit(final SubClassInclusionMatch<?> conclusionMatch,
-			final SubsumerCasesCanonizer canonizer) {
-
-		return conclusionMatch.getSubsumerMatch()
-				.accept(new SubsumerMatchDummyVisitor<Boolean>() {
-
-					@Override
-					protected Boolean defaultVisit(SubsumerMatch match) {
-						return false;
-					}
-
-					@Override
-					public Boolean visit(
-							IndexedObjectIntersectionOfMatch subsumerMatch) {
-
-						ElkObjectIntersectionOf expression = subsumerMatch
-								.getFullValue();
-						List<? extends ElkClassExpression> conjuncts = expression
-								.getClassExpressions();
-						if (subsumerMatch.getPrefixLength() < conjuncts
-								.size()) {
-							return false;
-						}
-						// else
-						switch (conjuncts.size()) {
-
-						case 0:
-							return canonizer.emptyElkObjectIntersectionOf();
-
-						case 1:
-							return canonizer.singletonElkObjectIntersectionOf(
-									conjuncts.get(0));
-						default:
-							return false;
-
-						}
-					}
-
-					@Override
-					public Boolean visit(
-							IndexedObjectSomeValuesFromHasValueMatch match) {
-						return canonizer.anyElkObjectHasValue(match.getValue());
-					}
-
-					@Override
-					public Boolean visit(IndexedObjectUnionOfOneOfMatch match) {
-						List<? extends ElkIndividual> individuals = match
-								.getValue().getIndividuals();
-
-						switch (individuals.size()) {
-
-						case 0:
-							return canonizer.emptyElkObjectOneOf();
-
-						case 1:
-							return canonizer.singletonElkObjectOneOf(
-									individuals.get(0));
-
-						default:
-							return false;
-
-						}
-
-					}
-
-					@Override
-					public Boolean visit(
-							IndexedObjectUnionOfUnionOfMatch match) {
-						List<? extends ElkClassExpression> disjuncts = match
-								.getValue().getClassExpressions();
-
-						switch (disjuncts.size()) {
-
-						case 0:
-							return canonizer.emptyElkObjectUnionOf();
-						case 1:
-							return canonizer.singletonElkObjectUnionOf(
-									disjuncts.get(0));
-						default:
-							return false;
-						}
-
-					}
-
-				});
 
 	}
 
