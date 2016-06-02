@@ -162,13 +162,14 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 				}
 
 				// add all its direct satisfiable sub-nodes to the queue
+				final List<NonBottomTaxonomyNode<ElkClass>> subNodes;
 				synchronized (node) {
-					final List<NonBottomTaxonomyNode<ElkClass>> subNodes = new ArrayList<NonBottomTaxonomyNode<ElkClass>>(node.getDirectNonBottomSubNodes());
-					for (NonBottomTaxonomyNode<ElkClass> subNode : subNodes) {
-						if (classTaxonomy.removeDirectSupernodes(subNode)) {
-							classStateWriter_
-									.markClassesForModifiedNode(subNode);
-						}
+					subNodes = new ArrayList<NonBottomTaxonomyNode<ElkClass>>(
+							node.getDirectNonBottomSubNodes());
+				}
+				for (NonBottomTaxonomyNode<ElkClass> subNode : subNodes) {
+					if (classTaxonomy.removeDirectSupernodes(subNode)) {
+						classStateWriter_.markClassesForModifiedNode(subNode);
 					}
 				}
 
