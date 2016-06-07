@@ -28,6 +28,7 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.impl.AbstractTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.model.NodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 
@@ -87,6 +88,30 @@ public class SingletoneTaxonomy<T extends ElkEntity, N extends OrphanTaxonomyNod
 	@Override
 	public N getBottomNode() {
 		return node;
+	}
+
+	@Override
+	public boolean addListener(final NodeStore.Listener<T> listener) {
+		// No events are ever fired.
+		return true;
+	}
+
+	@Override
+	public boolean removeListener(final NodeStore.Listener<T> listener) {
+		// No events are ever fired.
+		return true;
+	}
+
+	@Override
+	public boolean addListener(final Taxonomy.Listener<T> listener) {
+		// No events are ever fired.
+		return true;
+	}
+
+	@Override
+	public boolean removeListener(final Taxonomy.Listener<T> listener) {
+		// No events are ever fired.
+		return true;
 	}
 
 }

@@ -41,7 +41,7 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  *            The type of nodes in this store.
  */
 public class SynchronizedNodeStore<T, N extends UpdateableNode<T>>
-		implements UpdateableNodeStore<T, N> {
+		extends AbstractNodeStore<T, N> implements UpdateableNodeStore<T, N> {
 
 	/**
 	 * The key provider for members of the nodes in this node store.
@@ -103,6 +103,7 @@ public class SynchronizedNodeStore<T, N extends UpdateableNode<T>>
 		for (final T member : members) {
 			final N previous = getNode(member);
 			if (previous != null) {
+				// TODO: This should fire an exception instead of this.
 				synchronized (previous) {
 					if (previous.size() < size) {
 						previous.setMembers(members);
@@ -113,6 +114,7 @@ public class SynchronizedNodeStore<T, N extends UpdateableNode<T>>
 				for (final T m : members) {
 					nodeLookup_.put(keyProvider_.getKey(m), previous);
 				}
+				fireMemberForNodeAppeared(previous);
 				return previous;
 			}
 		}
@@ -129,6 +131,7 @@ public class SynchronizedNodeStore<T, N extends UpdateableNode<T>>
 				nodeLookup_.put(keyProvider_.getKey(member), node);
 			}
 		}
+		fireMemberForNodeAppeared(node);
 		return node;
 	}
 
@@ -145,6 +148,7 @@ public class SynchronizedNodeStore<T, N extends UpdateableNode<T>>
 			for (final T m : node) {
 				changed |= nodeLookup_.remove(keyProvider_.getKey(m)) != null;
 			}
+			fireMemberForNodeDisappeared(node);
 		}
 
 		return changed;

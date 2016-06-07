@@ -112,9 +112,6 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 				}
 			};
 			// writers have no state so can be safely reused
-			private final ClassTaxonomyState.Writer classStateWriter_ = classTaxonomyState_
-					.getWriter();
-
 			private final InstanceTaxonomyState.Writer instanceStateWriter_ = instanceTaxonomyState_
 					.getWriter();
 
@@ -141,10 +138,6 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 				 */
 				synchronized (classTaxonomy.getBottomNode()) {
 					if (classTaxonomy.removeFromBottomNode(elkClass)) {
-						classStateWriter_
-								.markClassesForModifiedNode(classTaxonomy
-										.getBottomNode());
-						classStateWriter_.markClassForModifiedNode(elkClass);
 						return;
 					}
 				}
@@ -153,13 +146,10 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 						.getNonBottomNode(elkClass);
 
 				if (node == null) {
-					classStateWriter_.markClassForModifiedNode(elkClass);
 					return;
 				}
 
-				if (classTaxonomy.removeDirectSupernodes(node)) {
-					classStateWriter_.markClassesForModifiedNode(node);
-				}
+				classTaxonomy.removeDirectSupernodes(node);
 
 				// add all its direct satisfiable sub-nodes to the queue
 				final List<NonBottomTaxonomyNode<ElkClass>> subNodes;
@@ -168,9 +158,7 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 							node.getDirectNonBottomSubNodes());
 				}
 				for (NonBottomTaxonomyNode<ElkClass> subNode : subNodes) {
-					if (classTaxonomy.removeDirectSupernodes(subNode)) {
-						classStateWriter_.markClassesForModifiedNode(subNode);
-					}
+					classTaxonomy.removeDirectSupernodes(subNode);
 				}
 
 				// delete all direct instance nodes of the type node being

@@ -47,6 +47,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.GenericInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
+import org.semanticweb.elk.reasoner.taxonomy.model.NodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
@@ -581,6 +582,30 @@ public class ConcurrentInstanceTaxonomy
 			return false;
 		}
 
+	}
+
+	@Override
+	public boolean addListener(
+			final Taxonomy.Listener<ElkClass> listener) {
+		return classTaxonomy_.addListener(listener);
+	}
+
+	@Override
+	public boolean removeListener(
+			final Taxonomy.Listener<ElkClass> listener) {
+		return classTaxonomy_.removeListener(listener);
+	}
+
+	@Override
+	public boolean addListener(
+			final NodeStore.Listener<ElkClass> listener) {
+		return classTaxonomy_.addListener(listener);
+	}
+
+	@Override
+	public boolean removeListener(
+			final NodeStore.Listener<ElkClass> listener) {
+		return classTaxonomy_.removeListener(listener);
 	}
 
 }

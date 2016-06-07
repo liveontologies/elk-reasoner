@@ -25,6 +25,7 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy.model;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
@@ -63,5 +64,66 @@ public interface Taxonomy<T extends ElkEntity>
 	 * @return the node of this taxonomy that has no child nodes.
 	 */
 	public TaxonomyNode<T> getBottomNode();
+
+	/**
+	 * Registers the given {@link Taxonomy.Listener} with this taxonomy.
+	 * 
+	 * @param listener
+	 *            The listener that should be registered.
+	 * @return {@code true} if the operation was successful and {@code false}
+	 *         otherwise; if {@code false} is return, the listener was not
+	 *         registered
+	 */
+	boolean addListener(Taxonomy.Listener<T> listener);
+
+	/**
+	 * Removes the given {@link Taxonomy.Listener} from this taxonomy.
+	 * 
+	 * @param listener
+	 *            The listener that should be removed.
+	 * @return {@code true} if the operation was successful and {@code false}
+	 *         otherwise; if {@code false} is return, the listener was not
+	 *         removed
+	 */
+	boolean removeListener(Taxonomy.Listener<T> listener);
+
+	/**
+	 * Instances of this interface registered by
+	 * {@link Taxonomy#addListener(Taxonomy.Listener)} will be notified
+	 * about changes to the taxonomy.
+	 * 
+	 * @author Peter Skocovsky
+	 *
+	 * @param <T>
+	 *            The type of members of the nodes in the taxonomy for which
+	 *            this listener is registered.
+	 */
+	interface Listener<T extends ElkEntity> {
+	
+		/**
+		 * Called just after the links to super-nodes of <code>subNode</code>
+		 * are assigned.
+		 * 
+		 * @param subNode
+		 *            The node whose links to super-nodes are being added.
+		 * @param superNodes
+		 *            The super-nodes links to which were assigned.
+		 */
+		void directSupernodeAssignment(NonBottomTaxonomyNode<T> subNode,
+				Collection<? extends NonBottomTaxonomyNode<T>> superNodes);
+	
+		/**
+		 * Called just after the links to super-nodes of <code>subNode</code>
+		 * are deleted.
+		 * 
+		 * @param subNode
+		 *            The node whose links to super-nodes are being deleted.
+		 * @param superNodes
+		 *            The super-nodes links to which were removed.
+		 */
+		void directSupernodeRemoval(NonBottomTaxonomyNode<T> subNode,
+				Collection<? extends NonBottomTaxonomyNode<T>> superNodes);
+	
+	}
 
 }

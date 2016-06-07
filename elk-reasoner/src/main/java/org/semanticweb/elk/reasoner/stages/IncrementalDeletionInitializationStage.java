@@ -104,17 +104,9 @@ public class IncrementalDeletionInitializationStage
 		// initializing contexts which will be removed
 		final SaturationStateWriter<?> satStateWriter = reasoner.saturationState
 				.getContextCreatingWriter();
-		final ClassTaxonomyState.Writer taxStateWriter = reasoner.classTaxonomyState
-				.getWriter();
 		final InstanceTaxonomyState.Writer instanceTaxStateWriter = reasoner.instanceTaxonomyState
 				.getWriter();
 		final IndexedClassExpression.Visitor<Object> entityRemovalVisitor = new DummyIndexedClassExpressionVisitor<Object>() {
-
-			@Override
-			public Object visit(IndexedClass element) {
-				taxStateWriter.markRemovedClass(element);
-				return null;
-			}
 
 			@Override
 			public Object visit(IndexedIndividual element) {

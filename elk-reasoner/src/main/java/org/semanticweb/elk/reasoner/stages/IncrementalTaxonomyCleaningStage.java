@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.stages;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +19,7 @@ package org.semanticweb.elk.reasoner.stages;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.stages;
 
 import java.util.AbstractCollection;
 import java.util.Collection;
@@ -74,7 +70,7 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 				new ContextRootCollection(
 						reasoner.saturationState.getNotSaturatedContexts()));
 		final Collection<IndexedClassEntity> removedClasses = new IndexedClassEntityCollection(
-				reasoner.classTaxonomyState.getRemovedClasses());
+				reasoner.classTaxonomyState.getRemoved());
 		final Collection<IndexedClassEntity> removedIndividuals = new IndexedClassEntityCollection(
 				reasoner.instanceTaxonomyState.getRemovedIndividuals());
 		@SuppressWarnings("unchecked")
@@ -112,7 +108,6 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 		}
 		// at this point we're done with unsaturated contexts
 		markAllContextsAsSaturated();
-		reasoner.classTaxonomyState.getWriter().clearRemovedClasses();
 		reasoner.instanceTaxonomyState.getWriter().clearRemovedIndividuals();
 		this.cleaning_ = null;
 

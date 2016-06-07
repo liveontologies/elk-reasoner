@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.stages;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,13 +19,11 @@ package org.semanticweb.elk.reasoner.stages;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Collection;
 
-import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
-import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
-import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
 import org.semanticweb.elk.util.collections.Operations;
@@ -43,6 +36,7 @@ import org.semanticweb.elk.util.collections.Operations;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
 public class IncrementalClassTaxonomyComputationStage extends
 		AbstractReasonerStage {
@@ -66,33 +60,8 @@ public class IncrementalClassTaxonomyComputationStage extends
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-		/*
-		 * classes which correspond to changed nodes in the taxonomy they must
-		 * include new classes let's convert to indexed objects and filter out
-		 * removed classes
-		 */
-		Operations.Transformation<ElkClass, IndexedClass> transformation = new Operations.Transformation<ElkClass, IndexedClass>() {
-
-			private final ElkPolarityExpressionConverter converter = new ElkPolarityExpressionConverterImpl(
-					reasoner.getElkFactory(), reasoner.ontologyIndex);
-
-			@Override
-			public IndexedClass transform(ElkClass element) {
-				IndexedClass indexedClass = (IndexedClass) element
-						.accept(converter);
-				if (indexedClass == null)
-					return null;
-				// else
-				return indexedClass.occurs() ? indexedClass : null;
-			}
-		};
-
-		Collection<IndexedClass> modified = Operations.getCollection(Operations
-				.map(reasoner.classTaxonomyState.getClassesWithModifiedNodes(),
-						transformation),
-		// an upper bound
-				reasoner.classTaxonomyState.getClassesWithModifiedNodes()
-						.size());
+		
+		final Collection<IndexedClass> modified = reasoner.classTaxonomyState.getModified();
 
 		this.computation_ = new ClassTaxonomyComputation(
 				Operations.split(modified, 64), reasoner.getProcessExecutor(),
@@ -113,7 +82,6 @@ public class IncrementalClassTaxonomyComputationStage extends
 		if (!super.postExecute()) {
 			return false;
 		}
-		reasoner.classTaxonomyState.getWriter().clearModifiedNodeObjects();
 		reasoner.ontologyIndex.initClassChanges();
 		reasoner.ruleAndConclusionStats.add(computation_
 				.getRuleAndConclusionStatistics());

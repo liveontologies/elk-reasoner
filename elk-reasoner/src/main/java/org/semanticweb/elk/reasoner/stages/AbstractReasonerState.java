@@ -145,7 +145,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	/**
 	 * Taxonomy state that stores (partial) classification
 	 */
-	final ClassTaxonomyState classTaxonomyState = new ClassTaxonomyState();
+	final ClassTaxonomyState classTaxonomyState;
 	/**
 	 * Defines reasoning stages and dependencies between them
 	 */
@@ -190,6 +190,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 				.createSaturationState(ontologyIndex);
 		this.consistencyCheckingState = ConsistencyCheckingState
 				.create(saturationState);
+		this.classTaxonomyState = new ClassTaxonomyState(saturationState,
+				ontologyIndex, elkFactory);
 		this.ruleAndConclusionStats = new SaturationStatistics();
 		this.stageManager = new ReasonerStageManager(this);
 		this.expressionConverter_ = new ElkPolarityExpressionConverterImpl(

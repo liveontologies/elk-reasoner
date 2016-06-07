@@ -40,6 +40,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
+import org.semanticweb.elk.reasoner.taxonomy.model.NodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
@@ -715,4 +716,29 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 			}
 		}
 	}
+
+	@Override
+	public boolean addListener(final Taxonomy.Listener<T> listener) {
+		// Ignore
+		return false;
+	}
+
+	@Override
+	public boolean removeListener(final Listener<T> listener) {
+		// Ignore
+		return false;
+	}
+
+	@Override
+	public boolean addListener(final NodeStore.Listener<T> listener) {
+		// Ignore
+		return false;
+	}
+
+	@Override
+	public boolean removeListener(final NodeStore.Listener<T> listener) {
+		// Ignore
+		return false;
+	}
+
 }

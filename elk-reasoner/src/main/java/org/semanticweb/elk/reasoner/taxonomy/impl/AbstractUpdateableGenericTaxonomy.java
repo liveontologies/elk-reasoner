@@ -20,9 +20,6 @@
  * limitations under the License.
  * #L%
  */
-/**
- * @author Yevgeny Kazakov, May 15, 2011
- */
 package org.semanticweb.elk.reasoner.taxonomy.impl;
 
 import java.util.ArrayList;
@@ -36,8 +33,11 @@ import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericTaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
+import org.semanticweb.elk.reasoner.taxonomy.model.NodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 import org.semanticweb.elk.util.collections.LazySetUnion;
@@ -73,6 +73,12 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 	/** The canonical member of the top node. */
 	protected final T topMember_;
 	
+	/** The listeners notified about the changes to taxonomy. */
+	protected final List<Taxonomy.Listener<T>> listeners_;
+	
+	/** The listeners notified about the changes to node store. */
+	protected final List<NodeStore.Listener<T>> nodeStoreListeners_;
+	
 	/**
 	 * Constructor.
 	 * 
@@ -98,6 +104,8 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 			}
 		};
 		this.topMember_ = topMember;
+		this.listeners_ = new ArrayList<Taxonomy.Listener<T>>();
+		this.nodeStoreListeners_ = new ArrayList<NodeStore.Listener<T>>();
 	}
 
 	@Override
@@ -160,7 +168,13 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 			addDirectRelation(superNode, node);
 		}
 
-		return node.trySetAllParentsAssigned(true);
+		if (node.trySetAllParentsAssigned(true)) {
+			fireDirectSupernodeAssignment(subNode,
+					subNode.getDirectNonBottomSuperNodes());
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	private void addDirectRelation(
@@ -195,6 +209,8 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 			}
 		}
 
+		fireDirectSupernodeRemoval(subNode, superNodes);
+		
 		return true;
 	}
 
@@ -210,14 +226,24 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 
 	@Override
 	public boolean addToBottomNode(final T member) {
-		return unsatisfiableClasses_.put(getKeyProvider().getKey(member),
-				member) == null;
+		if (unsatisfiableClasses_.put(getKeyProvider().getKey(member),
+				member) == null) {
+			fireMemberForNodeAppeared(member, getBottomNode());
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@Override
 	public boolean removeFromBottomNode(final T member) {
-		return unsatisfiableClasses_
-				.remove(getKeyProvider().getKey(member)) != null;
+		if (unsatisfiableClasses_
+				.remove(getKeyProvider().getKey(member)) != null) {
+			fireMemberForNodeDisappeared(member, getBottomNode());
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -232,6 +258,57 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 		} catch (final ClassCastException e) {
 			throw new IllegalArgumentException(
 					"The sub-node must belong to this taxonomy: " + node);
+		}
+	}
+	
+	@Override
+	public boolean addListener(final NodeStore.Listener<T> listener) {
+		return nodeStore_.addListener(listener)
+				&& nodeStoreListeners_.add(listener);
+	}
+	
+	@Override
+	public boolean removeListener(final NodeStore.Listener<T> listener) {
+		return nodeStore_.removeListener(listener)
+				&& nodeStoreListeners_.remove(listener);
+	}
+	
+	@Override
+	public boolean addListener(final Taxonomy.Listener<T> listener) {
+		return listeners_.add(listener);
+	}
+	
+	@Override
+	public boolean removeListener(final Taxonomy.Listener<T> listener) {
+		return listeners_.remove(listener);
+	}
+
+	protected void fireMemberForNodeAppeared(final T member, final Node<T> node) {
+		for (final NodeStore.Listener<T> listener : nodeStoreListeners_) {
+			listener.memberForNodeAppeared(member, node);
+		}
+	}
+
+	protected void fireMemberForNodeDisappeared(final T member,
+			final Node<T> node) {
+		for (final NodeStore.Listener<T> listener : nodeStoreListeners_) {
+			listener.memberForNodeDisappeared(member, node);
+		}
+	}
+
+	protected void fireDirectSupernodeAssignment(
+			final NonBottomTaxonomyNode<T> subNode,
+			final Collection<? extends NonBottomTaxonomyNode<T>> superNodes) {
+		for (final Taxonomy.Listener<T> listener : listeners_) {
+			listener.directSupernodeAssignment(subNode, superNodes);
+		}
+	}
+
+	protected void fireDirectSupernodeRemoval(
+			final NonBottomTaxonomyNode<T> subNode,
+			final Collection<? extends NonBottomTaxonomyNode<T>> superNodes) {
+		for (final Taxonomy.Listener<T> listener : listeners_) {
+			listener.directSupernodeRemoval(subNode, superNodes);
 		}
 	}
 	

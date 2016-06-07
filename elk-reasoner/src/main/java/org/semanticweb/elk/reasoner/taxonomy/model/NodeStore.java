@@ -71,4 +71,65 @@ public interface NodeStore<T, N extends Node<T>> {
 	 */
 	public Set<? extends N> getNodes();
 
+	/**
+	 * Registers the given {@link Listener} with this node store.
+	 * 
+	 * @param listener
+	 *            The listener that should be registered.
+	 * @return {@code true} if the operation was successful and {@code false}
+	 *         otherwise; if {@code false} is return, the listener was not
+	 *         registered
+	 */
+	boolean addListener(Listener<T> listener);
+
+	/**
+	 * Removes a given {@link Listener} from this node store.
+	 * 
+	 * @param listener
+	 *            The listener that should be removed.
+	 * @return {@code true} if the operation was successful and {@code false}
+	 *         otherwise; if {@code false} is return, the listener was not
+	 *         removed
+	 */
+	boolean removeListener(Listener<T> listener);
+
+	/**
+	 * Instances of this interface registered by
+	 * {@link NodeStore#addListener(Listener)} will be notified about changes to
+	 * the node store.
+	 * 
+	 * @author Peter Skocovsky
+	 *
+	 * @param <T>
+	 *            The type of members of the nodes in the node store for which
+	 *            this listener is registered.
+	 */
+	interface Listener<T> {
+
+		/**
+		 * Called just after the value returned from
+		 * {@link NodeStore#getNode(Object)} for <code>member</code> changes to
+		 * <strong>non</strong>-<code>null</code>.
+		 * 
+		 * @param member
+		 *            The member that appeared.
+		 * @param node
+		 *            The node in which the member appeared.
+		 */
+		void memberForNodeAppeared(T member, Node<T> node);
+
+		/**
+		 * Called just after the value returned from
+		 * {@link NodeStore#getNode(Object)} for <code>member</code> changes to
+		 * <code>null</code>.
+		 * 
+		 * @param member
+		 *            The member that appeared.
+		 * @param node
+		 *            The node in which the member appeared.
+		 */
+		void memberForNodeDisappeared(T member, Node<T> node);
+
+	}
+
 }
