@@ -46,6 +46,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
 import org.semanticweb.elk.reasoner.taxonomy.model.NodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTaxonomyNode;
@@ -97,6 +98,9 @@ public class ConcurrentInstanceTaxonomy
 	 */
 	private final ConcurrentMap<TaxonomyNode<ElkClass>, UpdateableTypeNodeWrapper> wrapperMap_;
 
+	/** The listeners notified about the changes to instance taxonomy. */
+	protected final List<InstanceTaxonomy.Listener<ElkClass, ElkNamedIndividual>> instanceListeners_;
+
 	public ConcurrentInstanceTaxonomy(
 			PredefinedElkClassFactory elkFactory,
 			final ComparatorKeyProvider<ElkEntity> classKeyProvider,
@@ -112,6 +116,7 @@ public class ConcurrentInstanceTaxonomy
 				individualKeyProvider);
 		this.classTaxonomy_ = classTaxonomy;
 		this.wrapperMap_ = new ConcurrentHashMap<TaxonomyNode<ElkClass>, UpdateableTypeNodeWrapper>();
+		this.instanceListeners_ = new ArrayList<InstanceTaxonomy.Listener<ElkClass, ElkNamedIndividual>>();
 	}
 
 	@Override
@@ -212,7 +217,13 @@ public class ConcurrentInstanceTaxonomy
 			addDirectType(superNode, node);
 		}
 
-		return node.trySetAllParentsAssigned(true);
+		if (node.trySetAllParentsAssigned(true)) {
+			fireDirectTypeAssignment(instanceNode,
+					instanceNode.getDirectTypeNodes());
+			return true;
+		} else {
+			return false;
+		}
 	};
 
 	private static void addDirectType(
@@ -256,6 +267,8 @@ public class ConcurrentInstanceTaxonomy
 				typeNode.removeDirectInstanceNode(node);
 			}
 		}
+
+		fireDirectTypeRemoval(instanceNode, directTypes);
 
 		return true;
 	}
@@ -585,27 +598,63 @@ public class ConcurrentInstanceTaxonomy
 	}
 
 	@Override
-	public boolean addListener(
-			final Taxonomy.Listener<ElkClass> listener) {
+	public boolean addListener(final Taxonomy.Listener<ElkClass> listener) {
 		return classTaxonomy_.addListener(listener);
 	}
 
 	@Override
-	public boolean removeListener(
-			final Taxonomy.Listener<ElkClass> listener) {
+	public boolean removeListener(final Taxonomy.Listener<ElkClass> listener) {
 		return classTaxonomy_.removeListener(listener);
 	}
 
 	@Override
-	public boolean addListener(
-			final NodeStore.Listener<ElkClass> listener) {
+	public boolean addListener(final NodeStore.Listener<ElkClass> listener) {
 		return classTaxonomy_.addListener(listener);
 	}
 
 	@Override
-	public boolean removeListener(
-			final NodeStore.Listener<ElkClass> listener) {
+	public boolean removeListener(final NodeStore.Listener<ElkClass> listener) {
 		return classTaxonomy_.removeListener(listener);
+	}
+
+	@Override
+	public boolean addInstanceListener(
+			final NodeStore.Listener<ElkNamedIndividual> listener) {
+		return individualNodeStore_.addListener(listener);
+	}
+
+	@Override
+	public boolean removeInstanceListener(
+			final NodeStore.Listener<ElkNamedIndividual> listener) {
+		return individualNodeStore_.removeListener(listener);
+	}
+
+	@Override
+	public boolean addInstanceListener(
+			final InstanceTaxonomy.Listener<ElkClass, ElkNamedIndividual> listener) {
+		return instanceListeners_.add(listener);
+	}
+
+	@Override
+	public boolean removeInstanceListener(
+			final InstanceTaxonomy.Listener<ElkClass, ElkNamedIndividual> listener) {
+		return instanceListeners_.remove(listener);
+	}
+
+	protected void fireDirectTypeAssignment(
+			final InstanceNode<ElkClass, ElkNamedIndividual> instanceNode,
+			final Collection<? extends TypeNode<ElkClass, ElkNamedIndividual>> typeNodes) {
+		for (final InstanceTaxonomy.Listener<ElkClass, ElkNamedIndividual> listener : instanceListeners_) {
+			listener.directTypeAssignment(instanceNode, typeNodes);
+		}
+	}
+
+	protected void fireDirectTypeRemoval(
+			final InstanceNode<ElkClass, ElkNamedIndividual> instanceNode,
+			final Collection<? extends TypeNode<ElkClass, ElkNamedIndividual>> typeNodes) {
+		for (final InstanceTaxonomy.Listener<ElkClass, ElkNamedIndividual> listener : instanceListeners_) {
+			listener.directTypeRemoval(instanceNode, typeNodes);
+		}
 	}
 
 }

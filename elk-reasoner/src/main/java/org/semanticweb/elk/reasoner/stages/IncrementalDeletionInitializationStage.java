@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.stages;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.stages;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.stages;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,10 +30,8 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.incremental.IncrementalChangesInitialization;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.classes.DifferentialIndex;
-import org.semanticweb.elk.reasoner.indexing.classes.DummyIndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContextInitializationNoPremises;
@@ -104,16 +101,6 @@ public class IncrementalDeletionInitializationStage
 		// initializing contexts which will be removed
 		final SaturationStateWriter<?> satStateWriter = reasoner.saturationState
 				.getContextCreatingWriter();
-		final InstanceTaxonomyState.Writer instanceTaxStateWriter = reasoner.instanceTaxonomyState
-				.getWriter();
-		final IndexedClassExpression.Visitor<Object> entityRemovalVisitor = new DummyIndexedClassExpressionVisitor<Object>() {
-
-			@Override
-			public Object visit(IndexedIndividual element) {
-				instanceTaxStateWriter.markRemovedIndividual(element);
-				return null;
-			}
-		};
 
 		for (IndexedClassExpression ice : reasoner.ontologyIndex
 				.getRemovedClassExpressions()) {
@@ -121,8 +108,6 @@ public class IncrementalDeletionInitializationStage
 			if (reasoner.saturationState.getContext(ice) != null) {
 				satStateWriter
 						.produce(new ContextInitializationNoPremises(ice));
-				// mark removed classes
-				ice.accept(entityRemovalVisitor);
 			}
 		}
 

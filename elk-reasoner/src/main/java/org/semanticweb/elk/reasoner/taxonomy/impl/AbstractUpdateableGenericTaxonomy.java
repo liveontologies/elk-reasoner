@@ -73,11 +73,11 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 	/** The canonical member of the top node. */
 	protected final T topMember_;
 	
-	/** The listeners notified about the changes to taxonomy. */
-	protected final List<Taxonomy.Listener<T>> listeners_;
-	
 	/** The listeners notified about the changes to node store. */
 	protected final List<NodeStore.Listener<T>> nodeStoreListeners_;
+	
+	/** The listeners notified about the changes to taxonomy. */
+	protected final List<Taxonomy.Listener<T>> taxonomyListeners_;
 	
 	/**
 	 * Constructor.
@@ -104,7 +104,7 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 			}
 		};
 		this.topMember_ = topMember;
-		this.listeners_ = new ArrayList<Taxonomy.Listener<T>>();
+		this.taxonomyListeners_ = new ArrayList<Taxonomy.Listener<T>>();
 		this.nodeStoreListeners_ = new ArrayList<NodeStore.Listener<T>>();
 	}
 
@@ -275,12 +275,12 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 	
 	@Override
 	public boolean addListener(final Taxonomy.Listener<T> listener) {
-		return listeners_.add(listener);
+		return taxonomyListeners_.add(listener);
 	}
 	
 	@Override
 	public boolean removeListener(final Taxonomy.Listener<T> listener) {
-		return listeners_.remove(listener);
+		return taxonomyListeners_.remove(listener);
 	}
 
 	protected void fireMemberForNodeAppeared(final T member, final Node<T> node) {
@@ -296,20 +296,18 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 		}
 	}
 
-	protected void fireDirectSupernodeAssignment(
-			final NonBottomTaxonomyNode<T> subNode,
-			final Collection<? extends NonBottomTaxonomyNode<T>> superNodes) {
-		for (final Taxonomy.Listener<T> listener : listeners_) {
+	protected void fireDirectSupernodeAssignment(final TaxonomyNode<T> subNode,
+			final Collection<? extends TaxonomyNode<T>> superNodes) {
+		for (final Taxonomy.Listener<T> listener : taxonomyListeners_) {
 			listener.directSupernodeAssignment(subNode, superNodes);
 		}
 	}
 
-	protected void fireDirectSupernodeRemoval(
-			final NonBottomTaxonomyNode<T> subNode,
-			final Collection<? extends NonBottomTaxonomyNode<T>> superNodes) {
-		for (final Taxonomy.Listener<T> listener : listeners_) {
+	protected void fireDirectSupernodeRemoval(final TaxonomyNode<T> subNode,
+			final Collection<? extends TaxonomyNode<T>> superNodes) {
+		for (final Taxonomy.Listener<T> listener : taxonomyListeners_) {
 			listener.directSupernodeRemoval(subNode, superNodes);
 		}
 	}
-	
+
 }

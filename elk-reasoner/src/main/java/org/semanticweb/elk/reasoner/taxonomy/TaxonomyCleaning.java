@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -111,9 +110,6 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 					return null;
 				}
 			};
-			// writers have no state so can be safely reused
-			private final InstanceTaxonomyState.Writer instanceStateWriter_ = instanceTaxonomyState_
-					.getWriter();
 
 			@Override
 			public void submit(IndexedClassEntity entity) {
@@ -181,9 +177,6 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 
 					for (InstanceNode<ElkClass, ElkNamedIndividual> instanceNode : directInstances) {
 						if (instanceTaxonomy.removeDirectTypes(instanceNode)) {
-							instanceStateWriter_
-									.markIndividualsForModifiedNode(instanceNode);
-							// TODO: cannot the instance node stay there ??
 							instanceTaxonomy.removeInstanceNode(instanceNode
 									.getCanonicalMember());
 						}
@@ -213,13 +206,7 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 							.getInstanceNode(individual);
 
 					if (node != null && taxonomy.removeDirectTypes(node)) {
-						instanceStateWriter_
-								.markIndividualsForModifiedNode(node);
 						taxonomy.removeInstanceNode(individual);
-					} else if (node == null) {
-						instanceStateWriter_
-								.markIndividualsForModifiedNode(Collections
-										.singleton(individual));
 					}
 				} else {
 					/*

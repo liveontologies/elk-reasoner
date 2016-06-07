@@ -724,7 +724,7 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 	}
 
 	@Override
-	public boolean removeListener(final Listener<T> listener) {
+	public boolean removeListener(final Taxonomy.Listener<T> listener) {
 		// Ignore
 		return false;
 	}
@@ -737,6 +737,33 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 
 	@Override
 	public boolean removeListener(final NodeStore.Listener<T> listener) {
+		// Ignore
+		return false;
+	}
+
+	@Override
+	public boolean addInstanceListener(final NodeStore.Listener<I> listener) {
+		// Ignore
+		return false;
+	}
+
+	@Override
+	public boolean removeInstanceListener(
+			final NodeStore.Listener<I> listener) {
+		// Ignore
+		return false;
+	}
+
+	@Override
+	public boolean addInstanceListener(
+			final InstanceTaxonomy.Listener<T, I> listener) {
+		// Ignore
+		return false;
+	}
+
+	@Override
+	public boolean removeInstanceListener(
+			final InstanceTaxonomy.Listener<T, I> listener) {
 		// Ignore
 		return false;
 	}

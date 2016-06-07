@@ -1,18 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.stages;
-
-import java.util.Collection;
-import java.util.Set;
-
-import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
-import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
-import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputation;
-import org.semanticweb.elk.util.collections.Operations;
-
 /*
  * #%L
  * ELK Reasoner
@@ -34,6 +19,12 @@ import org.semanticweb.elk.util.collections.Operations;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.stages;
+
+import java.util.Set;
+
+import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
+import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputation;
 
 /**
  * Incrementally updates the instance taxonomy by creating nodes for individuals
@@ -70,30 +61,9 @@ public class IncrementalInstanceTaxonomyComputationStage extends
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-		/*
-		 * individuals which correspond to removed instance nodes in the
-		 * taxonomy they must include new individuals
-		 */
-		final Set<ElkNamedIndividual> modifiedIndividuals = reasoner.instanceTaxonomyState
-				.getIndividualsWithModifiedNodes();
-		// let's convert to indexed objects and filter out removed individuals
-		Operations.Transformation<ElkNamedIndividual, IndexedIndividual> transformation = new Operations.Transformation<ElkNamedIndividual, IndexedIndividual>() {
 
-			private final ElkPolarityExpressionConverter converter = new ElkPolarityExpressionConverterImpl(
-					reasoner.getElkFactory(), reasoner.ontologyIndex);
-
-			@Override
-			public IndexedIndividual transform(ElkNamedIndividual element) {
-				IndexedIndividual indexedindividual = element.accept(converter);
-				if (indexedindividual == null)
-					return null;
-				return indexedindividual.occurs() ? indexedindividual : null;
-			}
-		};
-		Collection<IndexedIndividual> modified = Operations.getCollection(
-				Operations.map(modifiedIndividuals, transformation),
-				// an upper bound
-				modifiedIndividuals.size());
+		final Set<IndexedIndividual> modified = reasoner.instanceTaxonomyState
+				.getModified();
 
 		this.computation_ = new InstanceTaxonomyComputation(modified,
 				reasoner.getProcessExecutor(), workerNo,
@@ -113,7 +83,6 @@ public class IncrementalInstanceTaxonomyComputationStage extends
 			return false;
 		}
 
-		reasoner.instanceTaxonomyState.getWriter().clearModifiedNodeObjects();
 		reasoner.ontologyIndex.initIndividualChanges();
 		// reasoner.ruleAndConclusionStats.add(computation_.getRuleAndConclusionStatistics());
 		this.computation_ = null;

@@ -21,15 +21,13 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import java.util.AbstractCollection;
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.context.ContextRootCollection;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyCleaning;
 import org.semanticweb.elk.util.collections.Operations;
 import org.slf4j.Logger;
@@ -66,21 +64,15 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 			return false;
 		}
 
-		final Collection<IndexedClassEntity> modifiedEntities = new IndexedClassEntityCollection(
-				new ContextRootCollection(
-						reasoner.saturationState.getNotSaturatedContexts()));
-		final Collection<IndexedClassEntity> removedClasses = new IndexedClassEntityCollection(
-				reasoner.classTaxonomyState.getRemoved());
-		final Collection<IndexedClassEntity> removedIndividuals = new IndexedClassEntityCollection(
-				reasoner.instanceTaxonomyState.getRemovedIndividuals());
+		final Collection<IndexedClass> removedClasses = reasoner.classTaxonomyState
+				.getRemoved();
+		final Collection<IndexedIndividual> removedIndividuals = reasoner.instanceTaxonomyState
+				.getRemoved();
 		@SuppressWarnings("unchecked")
 		Collection<IndexedClassEntity> inputs = Operations.getCollection(
-				Operations.concat(modifiedEntities, removedClasses,
-						removedIndividuals),
-				modifiedEntities.size() + removedClasses.size()
-						+ removedIndividuals.size());
+				Operations.concat(removedClasses, removedIndividuals),
+				removedClasses.size() + removedIndividuals.size());
 
-		LOGGER_.trace("{}: entities with modified contexts", modifiedEntities);
 		LOGGER_.trace("{}: removed classes", removedClasses);
 		LOGGER_.trace("{}: removed individuals", removedIndividuals);
 
@@ -108,7 +100,6 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 		}
 		// at this point we're done with unsaturated contexts
 		markAllContextsAsSaturated();
-		reasoner.instanceTaxonomyState.getWriter().clearRemovedIndividuals();
 		this.cleaning_ = null;
 
 		return true;
@@ -125,64 +116,4 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 		setInterrupt(cleaning_, flag);
 	}
 
-	/*
-	 * Used to pass a collection of context's roots without extra copying
-	 */
-	private static class IndexedClassEntityCollection extends
-			AbstractCollection<IndexedClassEntity> {
-
-		private final Collection<? extends IndexedContextRoot> roots_;
-
-		IndexedClassEntityCollection(
-				Collection<? extends IndexedContextRoot> roots) {
-			roots_ = roots;
-		}
-
-		@Override
-		public Iterator<IndexedClassEntity> iterator() {
-			return new Iterator<IndexedClassEntity>() {
-
-				private IndexedClassEntity curr_ = null;
-				private final Iterator<? extends IndexedContextRoot> iter_ = roots_
-						.iterator();
-
-				@Override
-				public boolean hasNext() {
-					if (curr_ != null) {
-						return true;
-					}
-					while (curr_ == null && iter_.hasNext()) {
-						IndexedContextRoot expr = iter_.next();
-
-						if (expr instanceof IndexedClassEntity) {
-							curr_ = (IndexedClassEntity) expr;
-						}
-					}
-
-					return curr_ != null;
-				}
-
-				@Override
-				public IndexedClassEntity next() {
-					IndexedClassEntity tmp = curr_;
-
-					curr_ = null;
-
-					return tmp;
-				}
-
-				@Override
-				public void remove() {
-					throw new UnsupportedOperationException();
-				}
-			};
-		}
-
-		@Override
-		public int size() {
-			// upper bound, the actual size may be smaller since some contexts'
-			// roots could be complex expressions
-			return roots_.size();
-		}
-	}
 }

@@ -36,6 +36,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.GenericTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.NodeFactory;
+import org.semanticweb.elk.reasoner.taxonomy.model.NodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
@@ -77,6 +78,9 @@ public abstract class AbstractUpdateableGenericInstanceTaxonomy<
 	
 	/** The store containing instance nodes of this taxonomy. */
 	protected final UpdateableNodeStore<I, UIN> instanceNodeStore_;
+	
+	/** The listeners notified about the changes to instance taxonomy. */
+	protected final List<InstanceTaxonomy.Listener<T, I>> instanceListeners_;
 
 	/**
 	 * Constructor.
@@ -108,6 +112,7 @@ public abstract class AbstractUpdateableGenericInstanceTaxonomy<
 						AbstractUpdateableGenericInstanceTaxonomy.this);
 			}
 		};
+		this.instanceListeners_ = new ArrayList<InstanceTaxonomy.Listener<T, I>>();
 	}
 
 	@Override
@@ -153,15 +158,21 @@ public abstract class AbstractUpdateableGenericInstanceTaxonomy<
 	@Override
 	public boolean setCreateDirectTypes(final InstanceNode<T, I> instanceNode,
 			final Iterable<? extends Collection<? extends T>> typeSets) {
-		
+
 		final UIN node = toInternalInstanceNode(instanceNode);
-		
+
 		for (final Collection<? extends T> superMembers : typeSets) {
 			final UTN superNode = getCreateNode(superMembers);
 			addDirectType(superNode, node);
 		}
 
-		return node.trySetAllParentsAssigned(true);
+		if (node.trySetAllParentsAssigned(true)) {
+			fireDirectTypeAssignment(instanceNode,
+					instanceNode.getDirectTypeNodes());
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	private void addDirectType(
@@ -173,7 +184,7 @@ public abstract class AbstractUpdateableGenericInstanceTaxonomy<
 
 	@Override
 	public boolean removeDirectTypes(final InstanceNode<T, I> instanceNode) {
-		
+
 		final UIN node = toInternalInstanceNode(instanceNode);
 
 		if (!node.trySetAllParentsAssigned(false)) {
@@ -194,6 +205,8 @@ public abstract class AbstractUpdateableGenericInstanceTaxonomy<
 				typeNode.removeDirectInstanceNode(node);
 			}
 		}
+
+		fireDirectTypeRemoval(instanceNode, directTypes);
 
 		return true;
 	}
@@ -237,5 +250,43 @@ public abstract class AbstractUpdateableGenericInstanceTaxonomy<
 			return false;
 		}
 	}
+
+	@Override
+	public boolean addInstanceListener(final NodeStore.Listener<I> listener) {
+		return instanceNodeStore_.addListener(listener);
+	}
+
+	@Override
+	public boolean removeInstanceListener(
+			final NodeStore.Listener<I> listener) {
+		return instanceNodeStore_.removeListener(listener);
+	}
 	
+	@Override
+	public boolean addInstanceListener(
+			final InstanceTaxonomy.Listener<T, I> listener) {
+		return instanceListeners_.add(listener);
+	}
+	
+	@Override
+	public boolean removeInstanceListener(
+			final InstanceTaxonomy.Listener<T, I> listener) {
+		return instanceListeners_.remove(listener);
+	}
+
+	protected void fireDirectTypeAssignment(
+			final InstanceNode<T, I> instanceNode,
+			final Collection<? extends TypeNode<T, I>> typeNodes) {
+		for (final InstanceTaxonomy.Listener<T, I> listener : instanceListeners_) {
+			listener.directTypeAssignment(instanceNode, typeNodes);
+		}
+	}
+
+	protected void fireDirectTypeRemoval(final InstanceNode<T, I> instanceNode,
+			final Collection<? extends TypeNode<T, I>> typeNodes) {
+		for (final InstanceTaxonomy.Listener<T, I> listener : instanceListeners_) {
+			listener.directTypeRemoval(instanceNode, typeNodes);
+		}
+	}
+
 }

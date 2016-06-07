@@ -154,7 +154,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 * Taxonomy that stores (partial) classification and (partial) realization
 	 * of individuals
 	 */
-	final InstanceTaxonomyState instanceTaxonomyState = new InstanceTaxonomyState();
+	final InstanceTaxonomyState instanceTaxonomyState;
 	/**
 	 * The source where axioms and changes in ontology can be loaded
 	 */
@@ -191,6 +191,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		this.consistencyCheckingState = ConsistencyCheckingState
 				.create(saturationState);
 		this.classTaxonomyState = new ClassTaxonomyState(saturationState,
+				ontologyIndex, elkFactory);
+		this.instanceTaxonomyState = new InstanceTaxonomyState(saturationState,
 				ontologyIndex, elkFactory);
 		this.ruleAndConclusionStats = new SaturationStatistics();
 		this.stageManager = new ReasonerStageManager(this);
@@ -605,7 +607,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	}
 
 	public synchronized void initInstanceTaxonomy() {
-		instanceTaxonomyState.initTaxonomy(
+		instanceTaxonomyState.getWriter().setTaxonomy(
 				new ConcurrentInstanceTaxonomy(classTaxonomyState.getTaxonomy(),
 						ElkIndividualKeyProvider.INSTANCE));
 	}

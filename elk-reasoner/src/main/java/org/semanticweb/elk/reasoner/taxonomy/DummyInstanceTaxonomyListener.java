@@ -24,8 +24,9 @@ package org.semanticweb.elk.reasoner.taxonomy;
 import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 
 /**
  * Implementation with all methods empty.
@@ -33,21 +34,24 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
  * @author Peter Skocovsky
  *
  * @param <T>
- *            The type of members of the nodes in the taxonomy for which this
- *            listener is registered.
+ *            The type of members of the type nodes in the taxonomy for which
+ *            this listener is registered.
+ * @param <I>
+ *            The type of members of the instance nodes in the taxonomy for
+ *            which this listener is registered.
  */
-public class DummyTaxonomyListener<T extends ElkEntity>
-		implements Taxonomy.Listener<T> {
+public class DummyInstanceTaxonomyListener<T extends ElkEntity, I extends ElkEntity>
+		implements InstanceTaxonomy.Listener<T, I> {
 
 	@Override
-	public void directSupernodeAssignment(final TaxonomyNode<T> subNode,
-			final Collection<? extends TaxonomyNode<T>> superNodes) {
+	public void directTypeAssignment(final InstanceNode<T, I> instanceNode,
+			final Collection<? extends TypeNode<T, I>> typeNodes) {
 		// Empty.
 	}
 
 	@Override
-	public void directSupernodeRemoval(final TaxonomyNode<T> subNode,
-			final Collection<? extends TaxonomyNode<T>> superNodes) {
+	public void directTypeRemoval(final InstanceNode<T, I> instanceNode,
+			final Collection<? extends TypeNode<T, I>> typeNodes) {
 		// Empty.
 	}
 

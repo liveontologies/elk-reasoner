@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy.model;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
@@ -80,5 +81,96 @@ public interface InstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 
 	@Override
 	TypeNode<T, I> getBottomNode();
+
+	/**
+	 * Registers the given {@link NodeStore.Listener} with this instance
+	 * taxonomy. The registered listener will be notified about changes to
+	 * members of instance nodes.
+	 * 
+	 * @param listener
+	 *            The listener that should be registered.
+	 * @return {@code true} if the operation was successful and {@code false}
+	 *         otherwise; if {@code false} is return, the listener was not
+	 *         registered
+	 */
+	boolean addInstanceListener(NodeStore.Listener<I> listener);
+
+	/**
+	 * Removes a given {@link NodeStore.Listener} from this instance taxonomy.
+	 * 
+	 * @param listener
+	 *            The listener that should be removed.
+	 * @return {@code true} if the operation was successful and {@code false}
+	 *         otherwise; if {@code false} is return, the listener was not
+	 *         removed
+	 */
+	boolean removeInstanceListener(NodeStore.Listener<I> listener);
+
+	/**
+	 * Registers the given {@link Taxonomy.Listener} with this instance
+	 * taxonomy. The registered listener will be notified about changes in
+	 * relations between instance and type nodes.
+	 * 
+	 * @param listener
+	 *            The listener that should be registered.
+	 * @return {@code true} if the operation was successful and {@code false}
+	 *         otherwise; if {@code false} is return, the listener was not
+	 *         registered
+	 */
+	boolean addInstanceListener(InstanceTaxonomy.Listener<T, I> listener);
+
+	/**
+	 * Removes the given {@link Taxonomy.Listener} from this instance taxonomy.
+	 * 
+	 * @param listener
+	 *            The listener that should be removed.
+	 * @return {@code true} if the operation was successful and {@code false}
+	 *         otherwise; if {@code false} is return, the listener was not
+	 *         removed
+	 */
+	boolean removeInstanceListener(InstanceTaxonomy.Listener<T, I> listener);
+
+	/**
+	 * Instances of this interface registered by
+	 * {@link InstanceTaxonomy#addListener(InstanceTaxonomy.Listener)} will be
+	 * notified about changes to the relations between the instance and type
+	 * nodes.
+	 * 
+	 * @author Peter Skocovsky
+	 *
+	 * @param <T>
+	 *            The type of members of the type nodes in the taxonomy for
+	 *            which this listener is registered.
+	 * @param <I>
+	 *            The type of members of the instance nodes in the taxonomy for
+	 *            which this listener is registered.
+	 */
+	interface Listener<T extends ElkEntity, I extends ElkEntity> {
+
+		/**
+		 * Called just after the links to type nodes of
+		 * <code>instanceNode</code> are assigned.
+		 * 
+		 * @param instanceNode
+		 *            The node whose links to type nodes are being added.
+		 * @param typeNodes
+		 *            The type nodes links to which were assigned.
+		 */
+		void directTypeAssignment(InstanceNode<T, I> instanceNode,
+				Collection<? extends TypeNode<T, I>> typeNodes);
+
+		/**
+		 * Called just after the links to type nodes of
+		 * <code>instanceNode</code> are deleted.
+		 * 
+		 * @param instanceNode
+		 *            The node whose links to type nodes are being deleted.
+		 * @param typeNodes
+		 *            The type nodes links to which were removed.
+		 */
+		void directTypeRemoval(InstanceNode<T, I> instanceNode,
+				Collection<? extends TypeNode<T, I>> typeNodes);
+
+	}
 
 }

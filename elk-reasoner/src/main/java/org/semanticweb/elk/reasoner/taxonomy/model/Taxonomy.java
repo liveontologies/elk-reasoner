@@ -89,8 +89,8 @@ public interface Taxonomy<T extends ElkEntity>
 
 	/**
 	 * Instances of this interface registered by
-	 * {@link Taxonomy#addListener(Taxonomy.Listener)} will be notified
-	 * about changes to the taxonomy.
+	 * {@link Taxonomy#addListener(Taxonomy.Listener)} will be notified about
+	 * changes to the relations between the taxonomy nodes.
 	 * 
 	 * @author Peter Skocovsky
 	 *
@@ -99,7 +99,7 @@ public interface Taxonomy<T extends ElkEntity>
 	 *            this listener is registered.
 	 */
 	interface Listener<T extends ElkEntity> {
-	
+
 		/**
 		 * Called just after the links to super-nodes of <code>subNode</code>
 		 * are assigned.
@@ -109,9 +109,9 @@ public interface Taxonomy<T extends ElkEntity>
 		 * @param superNodes
 		 *            The super-nodes links to which were assigned.
 		 */
-		void directSupernodeAssignment(NonBottomTaxonomyNode<T> subNode,
-				Collection<? extends NonBottomTaxonomyNode<T>> superNodes);
-	
+		void directSupernodeAssignment(TaxonomyNode<T> subNode,
+				Collection<? extends TaxonomyNode<T>> superNodes);
+
 		/**
 		 * Called just after the links to super-nodes of <code>subNode</code>
 		 * are deleted.
@@ -121,9 +121,9 @@ public interface Taxonomy<T extends ElkEntity>
 		 * @param superNodes
 		 *            The super-nodes links to which were removed.
 		 */
-		void directSupernodeRemoval(NonBottomTaxonomyNode<T> subNode,
-				Collection<? extends NonBottomTaxonomyNode<T>> superNodes);
-	
+		void directSupernodeRemoval(TaxonomyNode<T> subNode,
+				Collection<? extends TaxonomyNode<T>> superNodes);
+
 	}
 
 }

@@ -31,6 +31,7 @@ import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.NodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
@@ -108,6 +109,33 @@ public class SingletoneInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity
 		} catch (ClassCastException e) {
 			return false;
 		}
+	}
+
+	@Override
+	public boolean addInstanceListener(final NodeStore.Listener<I> listener) {
+		// No events are ever fired.
+		return true;
+	}
+
+	@Override
+	public boolean removeInstanceListener(
+			final NodeStore.Listener<I> listener) {
+		// No events are ever fired.
+		return true;
+	}
+
+	@Override
+	public boolean addInstanceListener(
+			final InstanceTaxonomy.Listener<T, I> listener) {
+		// No events are ever fired.
+		return true;
+	}
+
+	@Override
+	public boolean removeInstanceListener(
+			final InstanceTaxonomy.Listener<T, I> listener) {
+		// No events are ever fired.
+		return true;
 	}
 
 }

@@ -45,8 +45,8 @@ import org.semanticweb.elk.reasoner.taxonomy.DummyNodeStoreListener;
 import org.semanticweb.elk.reasoner.taxonomy.DummyTaxonomyListener;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.NodeStore;
-import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 
 /**
@@ -127,9 +127,8 @@ public class ClassTaxonomyState {
 	final Taxonomy.Listener<ElkClass> taxonomyListener_ = new DummyTaxonomyListener<ElkClass>() {
 
 		@Override
-		public void directSupernodeRemoval(
-				final NonBottomTaxonomyNode<ElkClass> subNode,
-				final Collection<? extends NonBottomTaxonomyNode<ElkClass>> superNodes) {
+		public void directSupernodeRemoval(final TaxonomyNode<ElkClass> subNode,
+				final Collection<? extends TaxonomyNode<ElkClass>> superNodes) {
 			for (final ElkClass elkClass : subNode) {
 				addModified(elkClass);
 			}
@@ -216,7 +215,7 @@ public class ClassTaxonomyState {
 	public class Writer {
 
 		void setTaxonomy(UpdateableTaxonomy<ElkClass> classTaxonomy) {
-			if (classTaxonomy == null && taxonomy_ != null) {
+			if (taxonomy_ != null) {
 				taxonomy_.removeListener(nodeStoreListener_);
 				taxonomy_.removeListener(taxonomyListener_);
 			}
