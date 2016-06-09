@@ -140,11 +140,7 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 	
 	@Override
 	public UN getTopNode() {
-		UN top = nodeStore_.getNode(topMember_);
-		if (top == null) {
-			top = getCreateNode(Collections.singleton(topMember_));
-		}
-		return top;
+		return nodeStore_.getNode(topMember_);
 	}
 
 	@Override
@@ -156,21 +152,27 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 	};
 
 	@Override
-	public boolean setCreateDirectSupernodes(final NonBottomTaxonomyNode<T> subNode,
+	public boolean setCreateDirectSupernodes(
+			final NonBottomTaxonomyNode<T> subNode,
 			final Iterable<? extends Collection<? extends T>> superMemberSets) {
 
 		final UN node = toInternalNode(subNode);
-		
+
 		// TODO: establish consistency by adding default parent to the nodes.
-		
+
+		boolean isSuperMemberSetsEmpty = true;
+
 		for (final Collection<? extends T> superMembers : superMemberSets) {
 			final UN superNode = getCreateNode(superMembers);
+			isSuperMemberSetsEmpty = false;
 			addDirectRelation(superNode, node);
 		}
 
 		if (node.trySetAllParentsAssigned(true)) {
-			fireDirectSupernodeAssignment(subNode,
-					subNode.getDirectNonBottomSuperNodes());
+			if (!isSuperMemberSetsEmpty) {
+				fireDirectSupernodeAssignment(subNode,
+						subNode.getDirectSuperNodes());
+			}
 			return true;
 		} else {
 			return false;

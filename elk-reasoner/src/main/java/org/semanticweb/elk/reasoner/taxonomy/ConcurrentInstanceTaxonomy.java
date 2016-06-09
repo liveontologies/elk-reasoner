@@ -211,15 +211,20 @@ public class ConcurrentInstanceTaxonomy
 
 		// TODO: establish consistency by adding default type to the nodes.
 
+		boolean isTypeSets = true;
+
 		for (final Collection<? extends ElkClass> superMembers : typeSets) {
 			final UpdateableTypeNode.Projection<ElkClass, ElkNamedIndividual> superNode = getCreateUpdateableTypeNode(
 					classTaxonomy_.getCreateNode(superMembers));
+			isTypeSets = false;
 			addDirectType(superNode, node);
 		}
 
 		if (node.trySetAllParentsAssigned(true)) {
-			fireDirectTypeAssignment(instanceNode,
-					instanceNode.getDirectTypeNodes());
+			if (!isTypeSets) {
+				fireDirectTypeAssignment(instanceNode,
+						instanceNode.getDirectTypeNodes());
+			}
 			return true;
 		} else {
 			return false;
@@ -400,7 +405,9 @@ public class ConcurrentInstanceTaxonomy
 
 		@Override
 		public TypeNodeWrapper apply(final TaxonomyNode<ElkClass> node) {
-			if (node instanceof NonBottomTaxonomyNode) {
+			if (node == null) {
+				return null;
+			} else if (node instanceof NonBottomTaxonomyNode) {
 				return nonBottomFunctor_
 						.apply((NonBottomTaxonomyNode<ElkClass>) node);
 			} else {

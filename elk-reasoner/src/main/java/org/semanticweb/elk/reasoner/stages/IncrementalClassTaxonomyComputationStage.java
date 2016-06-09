@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Collection;
 
+import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
@@ -81,6 +82,13 @@ public class IncrementalClassTaxonomyComputationStage extends
 	public boolean postExecute() {
 		if (!super.postExecute()) {
 			return false;
+		}
+		final Collection<IndexedClass> modified = reasoner.classTaxonomyState
+				.getModified();
+		if (!modified.isEmpty()) {
+			throw new ElkRuntimeException(
+					ClassTaxonomyComputation.class.getSimpleName()
+							+ " did not consume all modified classes!");
 		}
 		reasoner.ontologyIndex.initClassChanges();
 		reasoner.ruleAndConclusionStats.add(computation_

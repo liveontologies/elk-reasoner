@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Collection;
 
 import org.semanticweb.elk.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
@@ -97,6 +98,18 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 	public boolean postExecute() {
 		if (!super.postExecute()) {
 			return false;
+		}
+		final Collection<IndexedClass> removedClasses = reasoner.classTaxonomyState
+				.getRemoved();
+		if (!removedClasses.isEmpty()) {
+			throw new ElkRuntimeException(TaxonomyCleaning.class.getSimpleName()
+					+ " did not consume all removed classes!");
+		}
+		final Collection<IndexedIndividual> removedIndividuals = reasoner.instanceTaxonomyState
+				.getRemoved();
+		if (!removedIndividuals.isEmpty()) {
+			throw new ElkRuntimeException(TaxonomyCleaning.class.getSimpleName()
+					+ " did not consume all removed individuals!");
 		}
 		// at this point we're done with unsaturated contexts
 		markAllContextsAsSaturated();

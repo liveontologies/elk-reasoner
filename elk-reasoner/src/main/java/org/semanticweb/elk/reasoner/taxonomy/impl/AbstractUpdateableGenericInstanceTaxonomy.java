@@ -161,14 +161,19 @@ public abstract class AbstractUpdateableGenericInstanceTaxonomy<
 
 		final UIN node = toInternalInstanceNode(instanceNode);
 
+		boolean isTypeSetsEmpty = true;
+
 		for (final Collection<? extends T> superMembers : typeSets) {
 			final UTN superNode = getCreateNode(superMembers);
+			isTypeSetsEmpty = false;
 			addDirectType(superNode, node);
 		}
 
 		if (node.trySetAllParentsAssigned(true)) {
-			fireDirectTypeAssignment(instanceNode,
-					instanceNode.getDirectTypeNodes());
+			if (!isTypeSetsEmpty) {
+				fireDirectTypeAssignment(instanceNode,
+						instanceNode.getDirectTypeNodes());
+			}
 			return true;
 		} else {
 			return false;

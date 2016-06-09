@@ -22,11 +22,8 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -50,6 +47,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.NodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
+import org.semanticweb.elk.util.collections.Operations;
 
 /**
  * Stores information about the state of the instance taxonomy
@@ -67,8 +65,7 @@ public class InstanceTaxonomyState {
 	 * Contains at least all individuals that are in ontology, but either are
 	 * removed from taxonomy or their type nodes in taxonomy were removed.
 	 */
-	private final Set<IndexedIndividual> modified_ = Collections
-			.newSetFromMap(new ConcurrentHashMap<IndexedIndividual, Boolean>());
+	private final Queue<IndexedIndividual> modified_ = new ConcurrentLinkedQueue<IndexedIndividual>();
 
 	/**
 	 * Contains at least all individuals that are in taxonomy, but either are
@@ -116,7 +113,7 @@ public class InstanceTaxonomyState {
 
 	}
 
-	final NodeStore.Listener<ElkNamedIndividual> nodeStoreListener_ = new DummyNodeStoreListener<ElkNamedIndividual>() {
+	private final NodeStore.Listener<ElkNamedIndividual> nodeStoreListener_ = new DummyNodeStoreListener<ElkNamedIndividual>() {
 
 		@Override
 		public void memberForNodeDisappeared(final ElkNamedIndividual member,
@@ -126,14 +123,14 @@ public class InstanceTaxonomyState {
 
 	};
 
-	final InstanceTaxonomy.Listener<ElkClass, ElkNamedIndividual> taxonomyListener_ = new DummyInstanceTaxonomyListener<ElkClass, ElkNamedIndividual>() {
+	private final InstanceTaxonomy.Listener<ElkClass, ElkNamedIndividual> taxonomyListener_ = new DummyInstanceTaxonomyListener<ElkClass, ElkNamedIndividual>() {
 
 		@Override
 		public void directTypeRemoval(
 				InstanceNode<ElkClass, ElkNamedIndividual> instanceNode,
 				Collection<? extends TypeNode<ElkClass, ElkNamedIndividual>> typeNodes) {
-			for (final ElkNamedIndividual elkClass : instanceNode) {
-				addModified(elkClass);
+			for (final ElkNamedIndividual elkIndividual : instanceNode) {
+				addModified(elkIndividual);
 			}
 		};
 
@@ -152,14 +149,46 @@ public class InstanceTaxonomyState {
 		}
 	}
 
-	private void pruneModified() {
+	private int pruneModified() {
 		final Iterator<IndexedIndividual> iter = modified_.iterator();
+		int size = 0;
 		while (iter.hasNext()) {
-			final IndexedIndividual cls = iter.next();
-			if (!cls.occurs()) {
+			final IndexedIndividual ind = iter.next();
+			/* @formatter:off
+			 * 
+			 * Should be pruned when:
+			 * it is not in ontology, or
+			 * it has types in taxonomy.
+			 * 
+			 * @formatter:on
+			 */
+			if (!ind.occurs()) {
 				iter.remove();
+				continue;
 			}
+			// else
+			if (taxonomy_ == null) {
+				// it is not in taxonomy
+				size++;
+				continue;
+			}
+			// else
+			final InstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy_
+					.getInstanceNode(ind.getElkEntity());
+			if (node == null) {
+				// it is not in taxonomy
+				size++;
+				continue;
+			}
+			// else
+			if (!node.getDirectTypeNodes().isEmpty()) {
+				iter.remove();
+				continue;
+			}
+			// else
+			size++;
 		}
+		return size;
 	}
 
 	/**
@@ -171,23 +200,49 @@ public class InstanceTaxonomyState {
 	 *         ontology, but either are removed from taxonomy or their type
 	 *         nodes in taxonomy were removed.
 	 */
-	Set<IndexedIndividual> getModified() {
-		pruneModified();
-		return modified_;
+	Collection<IndexedIndividual> getModified() {
+		final int size = pruneModified();
+		/*
+		 * since getting the size of the queue is a linear operation, use the
+		 * computed size
+		 */
+		return Operations.getCollection(modified_, size);
 	}
 
-	private void pruneRemoved() {
+	private int pruneRemoved() {
 		final Iterator<IndexedIndividual> iter = removed_.iterator();
+		int size = 0;
 		while (iter.hasNext()) {
 			final IndexedIndividual cls = iter.next();
-			if (taxonomy_ == null// TODO: Never set taxonomy_ to null !!!
-					|| taxonomy_.getInstanceNode(cls.getElkEntity()) == null) {
+			/* @formatter:off
+			 * 
+			 * Should be pruned when
+			 * it is not in taxonomy.
+			 * 
+			 * @formatter:on
+			 */
+			if (taxonomy_ == null) {// TODO: Never set taxonomy_ to null !!!
+				// it is not in taxonomy
 				iter.remove();
 				if (cls.occurs()) {
 					modified_.add(cls);
 				}
+				continue;
 			}
+			// else
+			final InstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy_
+					.getInstanceNode(cls.getElkEntity());
+			if (node == null) {
+				iter.remove();
+				if (cls.occurs()) {
+					modified_.add(cls);
+				}
+				continue;
+			}
+			// else
+			size++;
 		}
+		return size;
 	}
 
 	/**
@@ -200,8 +255,12 @@ public class InstanceTaxonomyState {
 	 *         became not saturated.
 	 */
 	Collection<IndexedIndividual> getRemoved() {
-		pruneRemoved();
-		return removed_;
+		final int size = pruneRemoved();
+		/*
+		 * since getting the size of the queue is a linear operation, use the
+		 * computed size
+		 */
+		return Operations.getCollection(removed_, size);
 	}
 
 	public Writer getWriter() {
@@ -237,7 +296,7 @@ public class InstanceTaxonomyState {
 			}
 			taxonomy_ = null;
 		}
-		
+
 	}
 
 }

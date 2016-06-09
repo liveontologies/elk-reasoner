@@ -22,11 +22,8 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -38,6 +35,7 @@ import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionCon
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateDummyChangeListener;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -48,6 +46,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.NodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
+import org.semanticweb.elk.util.collections.Operations;
 
 /**
  * Stores information about the state of the class taxonomy
@@ -65,14 +64,15 @@ public class ClassTaxonomyState {
 	 * Contains at least all classes that are in ontology, but either are
 	 * removed from taxonomy or their super-nodes in taxonomy were removed.
 	 */
-	private final Set<IndexedClass> modified_ = Collections
-			.newSetFromMap(new ConcurrentHashMap<IndexedClass, Boolean>());
+	private final Queue<IndexedClass> modified_ = new ConcurrentLinkedQueue<IndexedClass>();
 
 	/**
 	 * Contains at least all classes that are in taxonomy, but either are
 	 * removed from ontology or their context became not saturated.
 	 */
 	private final Queue<IndexedClass> removed_ = new ConcurrentLinkedQueue<IndexedClass>();
+
+	private final OntologyIndex ontologyIndex_;
 
 	private final ElkPolarityExpressionConverter converter_;
 
@@ -81,6 +81,7 @@ public class ClassTaxonomyState {
 			final DifferentialIndex ontologyIndex,
 			final ElkObject.Factory elkFactory) {
 
+		this.ontologyIndex_ = ontologyIndex;
 		this.converter_ = new ElkPolarityExpressionConverterImpl(elkFactory,
 				ontologyIndex);
 
@@ -114,7 +115,7 @@ public class ClassTaxonomyState {
 
 	}
 
-	final NodeStore.Listener<ElkClass> nodeStoreListener_ = new DummyNodeStoreListener<ElkClass>() {
+	private final NodeStore.Listener<ElkClass> nodeStoreListener_ = new DummyNodeStoreListener<ElkClass>() {
 
 		@Override
 		public void memberForNodeDisappeared(final ElkClass member,
@@ -124,7 +125,7 @@ public class ClassTaxonomyState {
 
 	};
 
-	final Taxonomy.Listener<ElkClass> taxonomyListener_ = new DummyTaxonomyListener<ElkClass>() {
+	private final Taxonomy.Listener<ElkClass> taxonomyListener_ = new DummyTaxonomyListener<ElkClass>() {
 
 		@Override
 		public void directSupernodeRemoval(final TaxonomyNode<ElkClass> subNode,
@@ -141,7 +142,7 @@ public class ClassTaxonomyState {
 	}
 
 	private void addModified(final ElkClass elkClass) {
-		ModifiableIndexedClassExpression converted = elkClass
+		final ModifiableIndexedClassExpression converted = elkClass
 				.accept(converter_);
 		if (converted != null && (converted instanceof IndexedClass)) {
 			final IndexedClass cls = (IndexedClass) converted;
@@ -149,14 +150,52 @@ public class ClassTaxonomyState {
 		}
 	}
 
-	private void pruneModified() {
+	private int pruneModified() {
 		final Iterator<IndexedClass> iter = modified_.iterator();
+		int size = 0;
 		while (iter.hasNext()) {
 			final IndexedClass cls = iter.next();
+			/* @formatter:off
+			 * 
+			 * Should be pruned when:
+			 * it is not in ontology, or
+			 * it is in the top node, or
+			 * it has super-nodes in taxonomy.
+			 * 
+			 * @formatter:on
+			 */
 			if (!cls.occurs()) {
 				iter.remove();
+				continue;
 			}
+			// else
+			if (taxonomy_ == null) {
+				// it is not in taxonomy
+				size++;
+				continue;
+			}
+			// else
+			final TaxonomyNode<ElkClass> node = taxonomy_
+					.getNode(cls.getElkEntity());
+			if (node == null) {
+				// it is not in taxonomy
+				size++;
+				continue;
+			}
+			// else
+			if (node.equals(taxonomy_.getTopNode())) {
+				iter.remove();
+				continue;
+			}
+			// else
+			if (!node.getDirectSuperNodes().isEmpty()) {
+				iter.remove();
+				continue;
+			}
+			// else
+			size++;
 		}
+		return size;
 	}
 
 	/**
@@ -168,23 +207,57 @@ public class ClassTaxonomyState {
 	 *         ontology, but either are removed from taxonomy or their
 	 *         super-nodes in taxonomy were removed.
 	 */
-	Set<IndexedClass> getModified() {
-		pruneModified();
-		return modified_;
+	Collection<IndexedClass> getModified() {
+		final int size = pruneModified();
+		/*
+		 * since getting the size of the queue is a linear operation, use the
+		 * computed size
+		 */
+		return Operations.getCollection(modified_, size);
 	}
 
-	private void pruneRemoved() {
+	private int pruneRemoved() {
 		final Iterator<IndexedClass> iter = removed_.iterator();
+		int size = 0;
 		while (iter.hasNext()) {
 			final IndexedClass cls = iter.next();
-			if (taxonomy_ == null// TODO: Never set taxonomy_ to null !!!
-					|| taxonomy_.getNode(cls.getElkEntity()) == null) {
+			/* @formatter:off
+			 * 
+			 * Should be pruned when
+			 * it is not in taxonomy, or
+			 * it is in the bottom class.
+			 * 
+			 * @formatter:on
+			 */
+			if (taxonomy_ == null) {// TODO: Never set taxonomy_ to null !!!
+				// it is not in taxonomy
 				iter.remove();
 				if (cls.occurs()) {
 					modified_.add(cls);
 				}
+				continue;
 			}
+			// else
+			final TaxonomyNode<ElkClass> node = taxonomy_
+					.getNode(cls.getElkEntity());
+			if (node == null) {
+				iter.remove();
+				if (cls.occurs()) {
+					modified_.add(cls);
+				}
+				continue;
+			}
+			// else
+			if (cls == ontologyIndex_.getOwlNothing()) {
+				iter.remove();
+				if (cls.occurs()) {
+					modified_.add(cls);
+				}
+				continue;
+			}
+			size++;
 		}
+		return size;
 	}
 
 	/**
@@ -197,8 +270,12 @@ public class ClassTaxonomyState {
 	 *         became not saturated.
 	 */
 	Collection<IndexedClass> getRemoved() {
-		pruneRemoved();
-		return removed_;
+		final int size = pruneRemoved();
+		/*
+		 * since getting the size of the queue is a linear operation, use the
+		 * computed size
+		 */
+		return Operations.getCollection(removed_, size);
 	}
 
 	public Writer getWriter() {

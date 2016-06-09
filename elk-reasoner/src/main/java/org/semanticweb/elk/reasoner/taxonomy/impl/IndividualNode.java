@@ -114,7 +114,7 @@ public abstract class IndividualNode<
 	 *            node to add
 	 */
 	@Override
-	public void addDirectTypeNode(final UTN typeNode) {
+	public synchronized void addDirectTypeNode(final UTN typeNode) {
 		LOGGER_.trace("{}: new direct type-node {}", this, typeNode);
 
 		directTypeNodes_.add(typeNode);
@@ -157,7 +157,7 @@ public abstract class IndividualNode<
 	}
 
 	@Override
-	public void removeDirectTypeNode(final UTN typeNode) {
+	public synchronized void removeDirectTypeNode(final UTN typeNode) {
 		LOGGER_.trace("{}: removing direct type node: {}", this, typeNode);
 
 		directTypeNodes_.remove(typeNode);

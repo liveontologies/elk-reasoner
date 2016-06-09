@@ -21,8 +21,9 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import java.util.Set;
+import java.util.Collection;
 
+import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputation;
 
@@ -62,7 +63,7 @@ public class IncrementalInstanceTaxonomyComputationStage extends
 		if (!super.preExecute())
 			return false;
 
-		final Set<IndexedIndividual> modified = reasoner.instanceTaxonomyState
+		final Collection<IndexedIndividual> modified = reasoner.instanceTaxonomyState
 				.getModified();
 
 		this.computation_ = new InstanceTaxonomyComputation(modified,
@@ -83,6 +84,13 @@ public class IncrementalInstanceTaxonomyComputationStage extends
 			return false;
 		}
 
+		final Collection<IndexedIndividual> modified = reasoner.instanceTaxonomyState
+				.getModified();
+		if (!modified.isEmpty()) {
+			throw new ElkRuntimeException(
+					InstanceTaxonomyComputation.class.getSimpleName()
+							+ " did not consume all modified individuals!");
+		}
 		reasoner.ontologyIndex.initIndividualChanges();
 		// reasoner.ruleAndConclusionStats.add(computation_.getRuleAndConclusionStatistics());
 		this.computation_ = null;
