@@ -232,7 +232,7 @@ public class Main {
 		LOGGER_.info("Writing taxonomy to {}", file);
 
 		Statistics.logOperationStart("Writing taxonomy", LOGGER_);
-		TaxonomyPrinter.dumpClassTaxomomyToFile(taxonomy, file.getPath(), printHash);
+		TaxonomyPrinter.dumpTaxomomyToFile(taxonomy, file.getPath(), printHash);
 		Statistics.logOperationFinish("Writing taxonomy", LOGGER_);
 	}
 

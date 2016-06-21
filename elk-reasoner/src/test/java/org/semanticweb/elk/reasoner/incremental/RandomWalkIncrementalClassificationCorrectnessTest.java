@@ -33,7 +33,7 @@ import java.util.List;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
+import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TaxonomyDiffManifest;
 import org.semanticweb.elk.reasoner.incremental.RandomWalkRunnerIO.ElkAPIBasedIO;
@@ -56,7 +56,7 @@ public class RandomWalkIncrementalClassificationCorrectnessTest extends
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
 
 	public RandomWalkIncrementalClassificationCorrectnessTest(
-			ReasoningTestManifest<ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>> testManifest) {
+			ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> testManifest) {
 		super(testManifest);
 	}
 
@@ -84,12 +84,12 @@ public class RandomWalkIncrementalClassificationCorrectnessTest extends
 						RandomWalkIncrementalClassificationCorrectnessTest.class,
 						"owl",
 						"expected",
-						new TestManifestCreator<URLTestIO, ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>>() {
+						new TestManifestCreator<URLTestIO, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>() {
 							@Override
-							public TestManifest<URLTestIO, ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>> create(
+							public TestManifest<URLTestIO, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> create(
 									URL input, URL output) throws IOException {
 								// don't need an expected output for these tests
-								return new TaxonomyDiffManifest<ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>>(
+								return new TaxonomyDiffManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>(
 										input, null);
 							}
 						});

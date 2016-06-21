@@ -44,12 +44,12 @@ import org.semanticweb.elk.testing.TestResultComparisonException;
  */
 @RunWith(PolySuite.class)
 public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput>
-		extends BaseReasoningCorrectnessTest<EO, ClassTaxonomyTestOutput<?>> {
+		extends BaseReasoningCorrectnessTest<EO, TaxonomyTestOutput<?>> {
 
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
 
 	public BaseClassificationCorrectnessTest(
-			ReasoningTestManifest<EO, ClassTaxonomyTestOutput<?>> testManifest) {
+			ReasoningTestManifest<EO, TaxonomyTestOutput<?>> testManifest) {
 		super(testManifest);
 	}
 
@@ -70,7 +70,7 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput>
 
 		taxonomy = reasoner.getTaxonomyQuietly();
 
-		manifest.compare(new ClassTaxonomyTestOutput<Taxonomy<ElkClass>>(taxonomy));
+		manifest.compare(new TaxonomyTestOutput<Taxonomy<ElkClass>>(taxonomy));
 	}
 
 	/**
@@ -101,7 +101,7 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput>
 
 		if (reasoningProcess.exception != null)
 			throw reasoningProcess.exception;
-		manifest.compare(new ClassTaxonomyTestOutput<Taxonomy<ElkClass>>(reasoningProcess
+		manifest.compare(new TaxonomyTestOutput<Taxonomy<ElkClass>>(reasoningProcess
 				.getTaxonomy()));
 
 	}

@@ -40,7 +40,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
  *         pavel.klinov@uni-ulm.de
  */
 public class InstanceTaxonomyTestOutput<T extends InstanceTaxonomy<ElkClass, ElkNamedIndividual>>
-		extends ClassTaxonomyTestOutput<T> {
+		extends TaxonomyTestOutput<T> {
 
 	InstanceTaxonomyTestOutput(T taxonomy) {
 		super(taxonomy);

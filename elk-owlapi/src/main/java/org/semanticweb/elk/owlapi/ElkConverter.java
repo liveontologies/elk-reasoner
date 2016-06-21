@@ -32,20 +32,26 @@ import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLRuntimeException;
 import org.semanticweb.owlapi.reasoner.impl.OWLClassNode;
 import org.semanticweb.owlapi.reasoner.impl.OWLClassNodeSet;
 import org.semanticweb.owlapi.reasoner.impl.OWLNamedIndividualNode;
 import org.semanticweb.owlapi.reasoner.impl.OWLNamedIndividualNodeSet;
+import org.semanticweb.owlapi.reasoner.impl.OWLObjectPropertyNode;
+import org.semanticweb.owlapi.reasoner.impl.OWLObjectPropertyNodeSet;
 
 /**
  * Facade class for conversion from ELK objects to OWL API objects.
  * 
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
+ * @author Peter Skocovsky
  */
 public class ElkConverter {
 
@@ -72,6 +78,11 @@ public class ElkConverter {
 	@SuppressWarnings("static-method")
 	public OWLNamedIndividual convert(ElkNamedIndividual ind) {
 		return ELK_ENTITY_CONVERTER.visit(ind);
+	}
+
+	@SuppressWarnings("static-method")
+	public OWLObjectProperty convert(final ElkObjectProperty prop) {
+		return ELK_ENTITY_CONVERTER.visit(prop);
 	}
 
 	public OWLClassNode convertClassNode(Node<ElkClass> node) {
@@ -107,6 +118,24 @@ public class ElkConverter {
 			owlNodes.add(convertIndividualNode(node));
 		}
 		return new OWLNamedIndividualNodeSet(owlNodes);
+	}
+
+	public OWLObjectPropertyNode convertObjectPropertyNode(
+			final Node<ElkObjectProperty> node) {
+		final Set<OWLObjectPropertyExpression> owlObjectProps = new HashSet<OWLObjectPropertyExpression>();
+		for (final ElkObjectProperty cls : node) {
+			owlObjectProps.add(convert(cls));
+		}
+		return new OWLObjectPropertyNode(owlObjectProps);
+	}
+
+	public OWLObjectPropertyNodeSet convertObjectPropertyNodes(
+			final Iterable<? extends Node<ElkObjectProperty>> nodes) {
+		Set<org.semanticweb.owlapi.reasoner.Node<OWLObjectPropertyExpression>> owlNodes = new HashSet<org.semanticweb.owlapi.reasoner.Node<OWLObjectPropertyExpression>>();
+		for (final Node<ElkObjectProperty> node : nodes) {
+			owlNodes.add(convertObjectPropertyNode(node));
+		}
+		return new OWLObjectPropertyNodeSet(owlNodes);
 	}
 
 	@SuppressWarnings("static-method")

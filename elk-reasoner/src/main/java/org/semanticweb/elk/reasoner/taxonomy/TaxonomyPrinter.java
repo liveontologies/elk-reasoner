@@ -28,47 +28,43 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
-import org.semanticweb.elk.owl.predefined.PredefinedElkIris;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
+import org.semanticweb.elk.owl.visitors.AbstractElkEntityVisitor;
+import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
+import org.semanticweb.elk.util.collections.Operations;
 
 /**
  * Class of static helper functions for printing and hashing a taxonomy. It is
  * primarily intended to be used for controlling the output of classification.
  * 
  * @author Markus Kroetzsch
+ * @author Peter Skocovsky
  */
 public class TaxonomyPrinter {
-
-	protected static Comparator<ElkEntity>
-			CLASS_COMPARATOR = ElkClassKeyProvider.INSTANCE.getComparator(),
-			INDIVIDUAL_COMPARATOR = ElkIndividualKeyProvider.INSTANCE.getComparator();
 
 	/**
 	 * Convenience method for printing a {@link Taxonomy} to a file at the given
 	 * location.
 	 * 
-	 * @see org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter#dumpClassTaxomomy
+	 * @see #dumpTaxomomy(Taxonomy, Writer, boolean)
 	 * 
 	 * @param taxonomy
 	 * @param fileName
@@ -78,13 +74,16 @@ public class TaxonomyPrinter {
 	 * @throws IOException
 	 *             If an I/O error occurs
 	 */
-	public static void dumpClassTaxomomyToFile(Taxonomy<ElkClass> taxonomy,
-			String fileName, boolean addHash) throws IOException {
-		FileWriter fstream = new FileWriter(fileName);
-		BufferedWriter writer = new BufferedWriter(fstream);
-
-		dumpClassTaxomomy(taxonomy, writer, addHash);
-		writer.close();
+	public static void dumpTaxomomyToFile(
+			final Taxonomy<? extends ElkEntity> taxonomy, final String fileName,
+			final boolean addHash) throws IOException {
+		final FileWriter fstream = new FileWriter(fileName);
+		final BufferedWriter writer = new BufferedWriter(fstream);
+		try {
+			dumpTaxomomy(taxonomy, writer, addHash);
+		} finally {
+			writer.close();
+		}
 	}
 
 	/**
@@ -100,10 +99,11 @@ public class TaxonomyPrinter {
 	 * @throws IOException
 	 *             If an I/O error occurs
 	 */
-	public static void dumpClassTaxomomy(Taxonomy<ElkClass> taxonomy,
-			Writer writer, boolean addHash) throws IOException {
+	public static void dumpTaxomomy(
+			final Taxonomy<? extends ElkEntity> taxonomy, final Writer writer,
+			final boolean addHash) throws IOException {
 		writer.append("Ontology(\n");
-		TaxonomyPrinter.processTaxomomy(taxonomy, writer);
+		processTaxomomy(taxonomy, writer);
 		writer.append(")\n");
 
 		if (addHash) {
@@ -127,13 +127,15 @@ public class TaxonomyPrinter {
 	 *             If an I/O error occurs
 	 */
 	public static void dumpInstanceTaxomomyToFile(
-			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy,
-			String fileName, boolean addHash) throws IOException {
-		FileWriter fstream = new FileWriter(fileName);
-		BufferedWriter writer = new BufferedWriter(fstream);
-
-		dumpInstanceTaxomomy(taxonomy, writer, addHash);
-		writer.close();
+			final InstanceTaxonomy<? extends ElkEntity, ? extends ElkEntity> taxonomy,
+			final String fileName, final boolean addHash) throws IOException {
+		final FileWriter fstream = new FileWriter(fileName);
+		final BufferedWriter writer = new BufferedWriter(fstream);
+		try {
+			dumpInstanceTaxomomy(taxonomy, writer, addHash);
+		} finally {
+			writer.close();
+		}
 	}
 
 	/**
@@ -150,15 +152,15 @@ public class TaxonomyPrinter {
 	 *             If an I/O error occurs
 	 */
 	public static void dumpInstanceTaxomomy(
-			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy,
-			Writer writer, boolean addHash) throws IOException {
+			final InstanceTaxonomy<? extends ElkEntity, ? extends ElkEntity> taxonomy,
+			final Writer writer, final boolean addHash) throws IOException {
 		writer.write("Ontology(\n");
-		TaxonomyPrinter.processInstanceTaxomomy(taxonomy, writer);
+		processInstanceTaxomomy(taxonomy, writer);
 		writer.write(")\n");
 
 		if (addHash) {
-			writer.write("\n# Hash code: " + getInstanceHashString(taxonomy)
-					+ "\n");
+			writer.write(
+					"\n# Hash code: " + getInstanceHashString(taxonomy) + "\n");
 		}
 	}
 
@@ -171,203 +173,264 @@ public class TaxonomyPrinter {
 	 * @param taxonomy
 	 * @return hash string
 	 */
-	public static String getHashString(Taxonomy<ElkClass> taxonomy) {
+	public static String getHashString(Taxonomy<? extends ElkEntity> taxonomy) {
 		return Integer.toHexString(TaxonomyHasher.hash(taxonomy));
 	}
 
 	public static String getInstanceHashString(
-			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy) {
+			InstanceTaxonomy<? extends ElkEntity, ? extends ElkEntity> taxonomy) {
 		return Integer.toHexString(InstanceTaxonomyHasher.hash(taxonomy));
 	}
 
 	/**
 	 * Process a taxonomy and write a normalized serialization.
 	 * 
-	 * @param classTaxonomy
+	 * @param taxonomy
 	 * @param writer
 	 * @throws IOException
 	 */
-	protected static void processTaxomomy(Taxonomy<ElkClass> classTaxonomy,
-			Appendable writer) throws IOException {
+	protected static <T extends ElkEntity> void processTaxomomy(
+			final Taxonomy<T> taxonomy, final Appendable writer)
+					throws IOException {
 
-		ElkObject.Factory objectFactory = new ElkObjectEntityRecyclingFactory();
+		final ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 
-		printDeclarations(classTaxonomy, objectFactory, writer);
+		// Declarations.
 
-		TreeSet<ElkClass> canonicalElkClasses = new TreeSet<ElkClass>(
-				CLASS_COMPARATOR);
-		for (TaxonomyNode<ElkClass> classNode : classTaxonomy.getNodes())
-			canonicalElkClasses.add(classNode.getCanonicalMember());
+		final List<T> members = new ArrayList<T>(
+				taxonomy.getNodes().size() * 2);
 
-		for (ElkClass elkClass : canonicalElkClasses) {
-			TaxonomyNode<ElkClass> classNode = classTaxonomy.getNode(elkClass);
-
-			ArrayList<ElkClass> orderedEquivalentClasses = new ArrayList<ElkClass>(
-					classNode.size());
-			for (ElkClass member : classNode) {
-				orderedEquivalentClasses.add(member);
-			}
-			Collections.sort(orderedEquivalentClasses, CLASS_COMPARATOR);
-
-			TreeSet<ElkClass> orderedSubClasses = new TreeSet<ElkClass>(
-					CLASS_COMPARATOR);
-			for (TaxonomyNode<ElkClass> childNode : classNode
-					.getDirectSubNodes()) {
-				orderedSubClasses.add(childNode.getCanonicalMember());
-			}
-
-			printClassAxioms(elkClass, orderedEquivalentClasses,
-					orderedSubClasses, writer);
-		}
-	}
-
-	/**
-	 * Prints class declarations
-	 * 
-	 * @param classTaxonomy
-	 * @param objectFactory
-	 * @param writer
-	 * @throws IOException
-	 */
-	protected static void printDeclarations(Taxonomy<ElkClass> classTaxonomy,
-			ElkObject.Factory objectFactory, Appendable writer)
-			throws IOException {
-
-		List<ElkClass> classes = new ArrayList<ElkClass>(classTaxonomy
-				.getNodes().size() * 2);
-
-		for (TaxonomyNode<ElkClass> classNode : classTaxonomy.getNodes()) {
-			for (ElkClass clazz : classNode) {
-				if (!clazz.getIri().equals(PredefinedElkIris.OWL_THING)
-						&& !clazz.getIri()
-								.equals(PredefinedElkIris.OWL_NOTHING)) {
-					classes.add(clazz);
-
+		for (final TaxonomyNode<T> node : taxonomy.getNodes()) {
+			for (final T member : node) {
+				// TODO: this should check whether IRIs are predefined!
+				if (!member.getIri()
+						.equals(taxonomy.getTopNode().getCanonicalMember()
+								.getIri())
+						&& !member.getIri().equals(taxonomy.getBottomNode()
+								.getCanonicalMember().getIri())) {
+					members.add(member);
 				}
 			}
 		}
 
-		Collections.sort(classes, CLASS_COMPARATOR);
+		Collections.sort(members, taxonomy.getKeyProvider().getComparator());
 
-		for (ElkClass clazz : classes) {
-			ElkDeclarationAxiom decl = objectFactory.getDeclarationAxiom(clazz);
-			OwlFunctionalStylePrinter.append(writer, decl, true);
-			writer.append('\n');
+		printDeclarations(members, factory, writer);
+
+		// Relations.
+
+		final TreeSet<T> canonicalMembers = new TreeSet<T>(
+				taxonomy.getKeyProvider().getComparator());
+		for (final TaxonomyNode<T> node : taxonomy.getNodes()) {
+			canonicalMembers.add(node.getCanonicalMember());
+		}
+
+		for (final T canonicalMember : canonicalMembers) {
+			final TaxonomyNode<T> node = taxonomy.getNode(canonicalMember);
+
+			final ArrayList<T> orderedEquivalentMembers = new ArrayList<T>(
+					node.size());
+			for (final T member : node) {
+				orderedEquivalentMembers.add(member);
+			}
+			Collections.sort(orderedEquivalentMembers,
+					taxonomy.getKeyProvider().getComparator());
+
+			final TreeSet<T> orderedSuperMembers = new TreeSet<T>(
+					taxonomy.getKeyProvider().getComparator());
+			for (final TaxonomyNode<T> superNode : node.getDirectSuperNodes()) {
+				orderedSuperMembers.add(superNode.getCanonicalMember());
+			}
+
+			printMemberAxioms(canonicalMember, orderedEquivalentMembers,
+					orderedSuperMembers, taxonomy, factory, writer);
 		}
 	}
 
-	protected static void printIndividualDeclarations(
-			Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>> individualNodes,
-			ElkObject.Factory objectFactory, Writer writer) throws IOException {
-		for (InstanceNode<ElkClass, ElkNamedIndividual> individualNode : individualNodes) {
-			for (ElkNamedIndividual individual : individualNode) {
-				ElkDeclarationAxiom decl = objectFactory
-						.getDeclarationAxiom(individual);
-				OwlFunctionalStylePrinter.append(writer, decl, true);
-				writer.append('\n');
-			}
+	protected static <T extends ElkEntity> void printDeclarations(
+			final Iterable<T> members, final ElkObject.Factory factory,
+			final Appendable writer) throws IOException {
+		for (final T member : members) {
+			final ElkAxiom axiom = factory.getDeclarationAxiom(member);
+			OwlFunctionalStylePrinter.append(writer, axiom, true);
+			writer.append('\n');
 		}
 	}
 
 	/**
-	 * Process axioms related to one {@link ElkClass}, where the relevant
-	 * related classes are given in two ordered collections of equivalent
-	 * classes and subclasses, respectively. The method serializes the axioms to
-	 * the Writer.
-	 * 
-	 * @param elkClass
-	 * @param orderedEquivalentClasses
-	 * @param orderedSubClasses
-	 * @param writer
-	 * @throws IOException
+	 * Process axioms related to one member of {@link Taxonomy}, where the
+	 * relevant related members are given in two ordered collections of
+	 * equivalent members and super-members, respectively. The method serializes
+	 * the axioms to the Writer.
 	 */
-	protected static void printClassAxioms(ElkClass elkClass,
-			ArrayList<ElkClass> orderedEquivalentClasses,
-			TreeSet<ElkClass> orderedSubClasses, Appendable writer)
-			throws IOException {
+	protected static <T extends ElkEntity, I extends ElkEntity> void printMemberAxioms(
+			final I member, final List<I> equivalentMembers,
+			final SortedSet<T> directSuperMembers, final Taxonomy<T> taxonomy,
+			final ElkObject.Factory factory, final Appendable writer)
+					throws IOException {
 
-		ElkObject.Factory objectFactory = new ElkObjectEntityRecyclingFactory();
-
-		if (orderedEquivalentClasses.size() > 1) {
-			ElkEquivalentClassesAxiom elkEquivalentClassesAxiom = objectFactory
-					.getEquivalentClassesAxiom(orderedEquivalentClasses);
-			OwlFunctionalStylePrinter.append(writer, elkEquivalentClassesAxiom,
-					true);
-			writer.append('\n');
-		}
-
-		if (!elkClass.getIri().equals(PredefinedElkIris.OWL_THING))
-			for (ElkClass elkSubClass : orderedSubClasses)
-				if (!elkSubClass.getIri().equals(PredefinedElkIris.OWL_NOTHING)) {
-					ElkSubClassOfAxiom elkSubClassAxiom = objectFactory
-							.getSubClassOfAxiom(elkSubClass, elkClass);
-					OwlFunctionalStylePrinter.append(writer, elkSubClassAxiom,
-							true);
-					writer.append('\n');
-				}
-	}
-
-	protected static void printIndividualAxioms(ElkNamedIndividual individual,
-			ArrayList<ElkNamedIndividual> orderedSameIndividuals,
-			TreeSet<ElkClass> orderedDirectClasses,
-			ElkObject.Factory objectFactory, Writer writer) throws IOException {
-
-		if (orderedSameIndividuals.size() > 1) {
-			ElkSameIndividualAxiom axiom = objectFactory
-					.getSameIndividualAxiom(orderedSameIndividuals);
-
+		if (equivalentMembers.size() > 1) {
+			final ElkAxiom axiom = member.accept(
+					getEquivalentAxiomProvider(equivalentMembers, factory));
 			OwlFunctionalStylePrinter.append(writer, axiom, true);
 			writer.append('\n');
 		}
 
-		for (ElkClass clazz : orderedDirectClasses) {
-			if (!clazz.getIri().equals(PredefinedElkIris.OWL_THING)) {
-				ElkClassAssertionAxiom axiom = objectFactory
-						.getClassAssertionAxiom(clazz, individual);
-
-				OwlFunctionalStylePrinter.append(writer, axiom, true);
-				writer.append('\n');
+		// TODO: this should exclude implicit axioms as owl:Thing ⊑ owl:Nothing
+		if (!member.equals(taxonomy.getBottomNode().getCanonicalMember())) {
+			for (final T superMember : directSuperMembers) {
+				if (!superMember
+						.equals(taxonomy.getTopNode().getCanonicalMember())) {
+					final ElkAxiom axiom = member
+							.accept(getSubAxiomProvider(superMember, factory));
+					OwlFunctionalStylePrinter.append(writer, axiom, true);
+					writer.append('\n');
+				}
 			}
 		}
+
 	}
 
-	protected static void processInstanceTaxomomy(
-			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy,
-			Writer writer) throws IOException {
+	private static ElkEntityVisitor<ElkAxiom> getEquivalentAxiomProvider(
+			final List<? extends ElkEntity> equivalent,
+			final ElkObject.Factory factory) {
 
-		ElkObject.Factory objectFactory = new ElkObjectEntityRecyclingFactory();
+		return new AbstractElkEntityVisitor<ElkAxiom>() {
 
-		printIndividualDeclarations(taxonomy.getInstanceNodes(), objectFactory,
-				writer);
-		// TBox printed here
+			@Override
+			protected ElkAxiom defaultVisit(final ElkEntity entity) {
+				return null;
+			}
+
+			@Override
+			public ElkAxiom visit(final ElkClass cls) {
+				return factory.getEquivalentClassesAxiom(
+						new ArrayList<ElkClass>(Operations.getCollection(
+								Operations.filter(equivalent, ElkClass.class),
+								equivalent.size())));
+			}
+
+			@Override
+			public ElkAxiom visit(final ElkNamedIndividual ind) {
+				return factory.getSameIndividualAxiom(
+						new ArrayList<ElkNamedIndividual>(
+								Operations.getCollection(
+										Operations.filter(equivalent,
+												ElkNamedIndividual.class),
+										equivalent.size())));
+			}
+
+			@Override
+			public ElkAxiom visit(final ElkObjectProperty prop) {
+				return factory.getEquivalentObjectPropertiesAxiom(
+						new ArrayList<ElkObjectProperty>(
+								Operations.getCollection(
+										Operations.filter(equivalent,
+												ElkObjectProperty.class),
+										equivalent.size())));
+			}
+
+		};
+	}
+
+	private static ElkEntityVisitor<ElkAxiom> getSubAxiomProvider(
+			final ElkEntity superEntity, final ElkObject.Factory factory) {
+
+		return new AbstractElkEntityVisitor<ElkAxiom>() {
+
+			@Override
+			protected ElkAxiom defaultVisit(final ElkEntity entity) {
+				return null;
+			}
+
+			@Override
+			public ElkAxiom visit(final ElkClass cls) {
+				if (superEntity instanceof ElkClass) {
+					return factory.getSubClassOfAxiom(cls,
+							(ElkClass) superEntity);
+				} else {
+					return defaultVisit(cls);
+				}
+			}
+
+			@Override
+			public ElkAxiom visit(final ElkNamedIndividual ind) {
+				if (superEntity instanceof ElkClass) {
+					return factory.getClassAssertionAxiom(
+							(ElkClass) superEntity, ind);
+				} else {
+					return defaultVisit(ind);
+				}
+			}
+
+			@Override
+			public ElkAxiom visit(final ElkObjectProperty prop) {
+				if (superEntity instanceof ElkObjectProperty) {
+					return factory.getSubObjectPropertyOfAxiom(prop,
+							(ElkObjectProperty) superEntity);
+				} else {
+					return defaultVisit(prop);
+				}
+			}
+
+		};
+	}
+
+	protected static <T extends ElkEntity, I extends ElkEntity> void processInstanceTaxomomy(
+			final InstanceTaxonomy<T, I> taxonomy, final Appendable writer)
+					throws IOException {
+
+		final ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
+
+		// Declarations.
+
+		final List<I> members = new ArrayList<I>(
+				taxonomy.getInstanceNodes().size() * 2);
+
+		for (final InstanceNode<T, I> node : taxonomy.getInstanceNodes()) {
+			for (final I member : node) {
+				members.add(member);
+			}
+		}
+
+		Collections.sort(members,
+				taxonomy.getInstanceKeyProvider().getComparator());
+
+		printDeclarations(members, factory, writer);
+
+		// TBox.
+
 		processTaxomomy(taxonomy, writer);
-		// print the ABox
-		TreeSet<ElkNamedIndividual> canonicalIndividuals = new TreeSet<ElkNamedIndividual>(
-				INDIVIDUAL_COMPARATOR);
-		for (InstanceNode<ElkClass, ElkNamedIndividual> node : taxonomy
-				.getInstanceNodes()) {
+
+		// ABox.
+
+		final TreeSet<I> canonicalIndividuals = new TreeSet<I>(
+				taxonomy.getInstanceKeyProvider().getComparator());
+		for (final InstanceNode<T, I> node : taxonomy.getInstanceNodes()) {
 			canonicalIndividuals.add(node.getCanonicalMember());
 		}
 
-		for (ElkNamedIndividual individual : canonicalIndividuals) {
-			InstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy
+		for (final I individual : canonicalIndividuals) {
+			final InstanceNode<T, I> node = taxonomy
 					.getInstanceNode(individual);
 
-			ArrayList<ElkNamedIndividual> orderedSameIndividuals = new ArrayList<ElkNamedIndividual>(
+			final ArrayList<I> orderedSameIndividuals = new ArrayList<I>(
 					node.size());
-			for (ElkNamedIndividual member : node) {
+			for (final I member : node) {
 				orderedSameIndividuals.add(member);
 			}
-			Collections.sort(orderedSameIndividuals, INDIVIDUAL_COMPARATOR);
+			Collections.sort(orderedSameIndividuals,
+					taxonomy.getInstanceKeyProvider().getComparator());
 
-			TreeSet<ElkClass> orderedTypes = new TreeSet<ElkClass>(
-					CLASS_COMPARATOR);
-			for (TaxonomyNode<ElkClass> typeNode : node.getDirectTypeNodes()) {
+			final TreeSet<T> orderedTypes = new TreeSet<T>(
+					taxonomy.getKeyProvider().getComparator());
+			for (final TypeNode<T, I> typeNode : node.getDirectTypeNodes()) {
 				orderedTypes.add(typeNode.getCanonicalMember());
 			}
 
-			printIndividualAxioms(individual, orderedSameIndividuals,
-					orderedTypes, objectFactory, writer);
+			printMemberAxioms(individual, orderedSameIndividuals, orderedTypes,
+					taxonomy, factory, writer);
 		}
 	}
+
 }

@@ -35,7 +35,7 @@ import java.net.URL;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
+import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TaxonomyDiffManifest;
@@ -62,12 +62,12 @@ import org.semanticweb.elk.testing.io.URLTestIO;
 @RunWith(PolySuite.class)
 public abstract class BaseIncrementalClassificationCorrectnessTest<T>
 		extends
-		BaseIncrementalReasoningCorrectnessTest<T, ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>> {
+		BaseIncrementalReasoningCorrectnessTest<T, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> {
 
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
 
 	public BaseIncrementalClassificationCorrectnessTest(
-			ReasoningTestManifest<ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>> testManifest) {
+			ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> testManifest) {
 		super(testManifest);
 	}
 
@@ -89,9 +89,9 @@ public abstract class BaseIncrementalClassificationCorrectnessTest<T>
 
 			try {
 				writer.write("EXPECTED TAXONOMY:\n");
-				TaxonomyPrinter.dumpClassTaxomomy(expected, writer, false);
+				TaxonomyPrinter.dumpTaxomomy(expected, writer, false);
 				writer.write("INCREMENTAL TAXONOMY:\n");
-				TaxonomyPrinter.dumpClassTaxomomy(incremental, writer, false);
+				TaxonomyPrinter.dumpTaxomomy(incremental, writer, false);
 				writer.flush();
 			} catch (IOException ioe) {
 				// TODO
@@ -111,12 +111,12 @@ public abstract class BaseIncrementalClassificationCorrectnessTest<T>
 						IncrementalClassificationCorrectnessTest.class,
 						"owl",
 						"expected",
-						new TestManifestCreator<URLTestIO, ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>>() {
+						new TestManifestCreator<URLTestIO, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>() {
 							@Override
-							public TestManifest<URLTestIO, ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>> create(
+							public TestManifest<URLTestIO, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> create(
 									URL input, URL output) throws IOException {
 								// don't need an expected output for these tests
-								return new TaxonomyDiffManifest<ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>>(
+								return new TaxonomyDiffManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>(
 										input, null);
 							}
 						});

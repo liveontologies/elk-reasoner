@@ -54,16 +54,18 @@ import org.semanticweb.elk.util.collections.LazySetUnion;
  * @param <UN>
  *            The mutable type of nodes in this taxonomy.
  */
+// @formatter:off
 public abstract class AbstractUpdateableGenericTaxonomy<
 				T extends ElkEntity,
 				N extends GenericTaxonomyNode<T, N>,
 				UN extends UpdateableTaxonomyNode<T, N, UN>
 		>
 		extends AbstractDistinctBottomTaxonomy<T, N, UN> {
+// @formatter:on
 
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractUpdateableGenericTaxonomy.class);
-	
+
 	/** The factory creating the nodes of this taxonomy. */
 	private final NodeFactory<T, UN> nodeFactory_;
 
@@ -72,13 +74,13 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 
 	/** The canonical member of the top node. */
 	protected final T topMember_;
-	
+
 	/** The listeners notified about the changes to node store. */
 	protected final List<NodeStore.Listener<T>> nodeStoreListeners_;
-	
+
 	/** The listeners notified about the changes to taxonomy. */
 	protected final List<Taxonomy.Listener<T>> taxonomyListeners_;
-	
+
 	/**
 	 * Constructor.
 	 * 
@@ -126,7 +128,7 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 	public UN getNonBottomNode(final T elkEntity) {
 		return nodeStore_.getNode(elkEntity);
 	}
-	
+
 	@Override
 	public Set<? extends TaxonomyNode<T>> getNodes() {
 		return new LazySetUnion<TaxonomyNode<T>>(nodeStore_.getNodes(),
@@ -137,7 +139,7 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 	public Set<? extends UN> getNonBottomNodes() {
 		return nodeStore_.getNodes();
 	}
-	
+
 	@Override
 	public UN getTopNode() {
 		return nodeStore_.getNode(topMember_);
@@ -145,7 +147,7 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 
 	@Override
 	public abstract N getBottomNode();
-	
+
 	@Override
 	public UN getCreateNode(final Collection<? extends T> members) {
 		return nodeStore_.getCreateNode(members, members.size(), nodeFactory_);
@@ -179,15 +181,14 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 		}
 	}
 
-	private void addDirectRelation(
-			final UN superNode,
-			final UN subNode) {
+	protected void addDirectRelation(final UN superNode, final UN subNode) {
 		subNode.addDirectSuperNode(superNode);
 		superNode.addDirectSubNode(subNode);
 	}
 
 	@Override
-	public boolean removeDirectSupernodes(final NonBottomTaxonomyNode<T> subNode) {
+	public boolean removeDirectSupernodes(
+			final NonBottomTaxonomyNode<T> subNode) {
 
 		final UN node = toInternalNode(subNode);
 
@@ -200,6 +201,9 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 		// remove all super-class links
 		synchronized (node) {
 			superNodes.addAll(node.getDirectNonBottomSuperNodes());
+			if (superNodes.isEmpty()) {
+				return true;
+			}
 			for (final UN superNode : superNodes) {
 				node.removeDirectSuperNode(superNode);
 			}
@@ -212,7 +216,7 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 		}
 
 		fireDirectSupernodeRemoval(subNode, superNodes);
-		
+
 		return true;
 	}
 
@@ -262,30 +266,31 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 					"The sub-node must belong to this taxonomy: " + node);
 		}
 	}
-	
+
 	@Override
 	public boolean addListener(final NodeStore.Listener<T> listener) {
 		return nodeStore_.addListener(listener)
 				&& nodeStoreListeners_.add(listener);
 	}
-	
+
 	@Override
 	public boolean removeListener(final NodeStore.Listener<T> listener) {
 		return nodeStore_.removeListener(listener)
 				&& nodeStoreListeners_.remove(listener);
 	}
-	
+
 	@Override
 	public boolean addListener(final Taxonomy.Listener<T> listener) {
 		return taxonomyListeners_.add(listener);
 	}
-	
+
 	@Override
 	public boolean removeListener(final Taxonomy.Listener<T> listener) {
 		return taxonomyListeners_.remove(listener);
 	}
 
-	protected void fireMemberForNodeAppeared(final T member, final Node<T> node) {
+	protected void fireMemberForNodeAppeared(final T member,
+			final Node<T> node) {
 		for (final NodeStore.Listener<T> listener : nodeStoreListeners_) {
 			listener.memberForNodeAppeared(member, node);
 		}

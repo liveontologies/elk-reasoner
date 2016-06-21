@@ -80,7 +80,7 @@ public class ComputeExpectedTaxonomies {
 					@Override
 					public void dumpTaxonomy(Taxonomy<ElkClass> taxonomy,
 							Writer writer) throws IOException {
-						TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer,
+						TaxonomyPrinter.dumpTaxomomy(taxonomy, writer,
 								false);
 					}
 				});

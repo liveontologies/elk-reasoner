@@ -45,7 +45,7 @@ import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
-import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
+import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TaxonomyDiffManifest;
@@ -103,12 +103,12 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 	
 	private final static AxiomFilter axiomFilter_ = new DummyAxiomFilter();//new PropertyAxiomFilter();
 
-	protected final ReasoningTestManifest<ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>> manifest;
+	protected final ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> manifest;
 	
 	private final OWLOntologyManager manager_ = OWLManager.createOWLOntologyManager();
 	
 	public OWLAPIRandomWalkIncrementalClassificationTest(
-			ReasoningTestManifest<ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>> testManifest) {
+			ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> testManifest) {
 		manifest = testManifest;
 	}
 
@@ -177,12 +177,12 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 						IncrementalClassificationCorrectnessTest.class,
 						"owl",
 						"expected",
-						new TestManifestCreator<URLTestIO, ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>>() {
+						new TestManifestCreator<URLTestIO, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>() {
 							@Override
-							public TestManifest<URLTestIO, ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>> create(
+							public TestManifest<URLTestIO, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> create(
 									URL input, URL output) throws IOException {
 								// don't need an expected output for these tests
-								return new TaxonomyDiffManifest<ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>>(
+								return new TaxonomyDiffManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>(
 										input, null);
 							}
 						});

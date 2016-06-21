@@ -6,3 +6,4 @@ plugin.xml
 .project
 .idea
 *.iml
+**/catalog-v???.xml

@@ -26,18 +26,18 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.TestOutput;
 
-public class ClassTaxonomyTestOutput<T extends Taxonomy<ElkClass>> implements
+public class TaxonomyTestOutput<T extends Taxonomy<? extends ElkEntity>> implements
 		TestOutput {
 
 	private final T taxonomy_;
 
-	ClassTaxonomyTestOutput(T taxonomy) {
+	TaxonomyTestOutput(T taxonomy) {
 		this.taxonomy_ = taxonomy;
 	}
 
@@ -50,7 +50,7 @@ public class ClassTaxonomyTestOutput<T extends Taxonomy<ElkClass>> implements
 	}
 
 	void dumpTaxonomy(Writer writer) throws IOException {
-		TaxonomyPrinter.dumpClassTaxomomy(taxonomy_, writer, false);
+		TaxonomyPrinter.dumpTaxomomy(taxonomy_, writer, false);
 	}
 	
 	@Override

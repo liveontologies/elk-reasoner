@@ -242,7 +242,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 			throws IOException, ElkException {
 		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomyQuietly();
 
-		TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
+		TaxonomyPrinter.dumpTaxomomy(taxonomy, writer, false);
 		writer.flush();
 	}
 

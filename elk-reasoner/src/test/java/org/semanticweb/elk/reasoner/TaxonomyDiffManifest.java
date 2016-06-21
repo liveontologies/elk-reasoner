@@ -26,7 +26,7 @@ import java.net.URL;
 
 import org.semanticweb.elk.testing.TestResultComparisonException;
 
-public class TaxonomyDiffManifest<EO extends ClassTaxonomyTestOutput<?>, AO extends ClassTaxonomyTestOutput<?>>
+public class TaxonomyDiffManifest<EO extends TaxonomyTestOutput<?>, AO extends TaxonomyTestOutput<?>>
 		extends ReasoningTestManifest<EO, AO> {
 
 	public TaxonomyDiffManifest(URL input, EO expOutput) {

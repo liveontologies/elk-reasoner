@@ -34,6 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
@@ -292,6 +293,31 @@ public class Reasoner extends AbstractReasonerState {
 	}
 
 	/**
+	 * Helper method to get a {@link TaxonomyNode} from the property taxonomy.
+	 * 
+	 * @param elkProperty
+	 *            an {@link ElkObjectProperty} for which to find a
+	 *            {@link TaxonomyNode}
+	 * @return the {@link TaxonomyNode} for the given {@link ElkObjectProperty}
+	 * 
+	 */
+	protected TaxonomyNode<ElkObjectProperty> getObjectPropertyTaxonomyNode(
+			final ElkObjectProperty elkProperty) throws ElkException {
+		final TaxonomyNode<ElkObjectProperty> node = getObjectPropertyTaxonomy()
+				.getNode(elkProperty);
+		if (node != null) {
+			return node;
+		}
+		// else
+		if (allowFreshEntities) {
+			return new FreshTaxonomyNode<ElkObjectProperty>(elkProperty,
+					getObjectPropertyTaxonomy());
+		}
+		// else
+		throw new ElkFreshEntitiesException(elkProperty);
+	}
+
+	/**
 	 * Return the {@link TaxonomyNode} for the given {@link ElkClassExpression}.
 	 * Calling of this method may trigger the computation of the taxonomy, if it
 	 * has not been done yet. If the input is an {@link ElkClass} that does not
@@ -316,6 +342,25 @@ public class Reasoner extends AbstractReasonerState {
 		ElkAxiom materializedQuery = getElkFactory().getEquivalentClassesAxiom(
 				queryClass, classExpression);
 		return getQueryTaxonomyNode(queryClass, materializedQuery);
+	}
+
+	/**
+	 * Return the {@link TaxonomyNode} for the given {@link ElkObjectProperty}.
+	 * Calling of this method may trigger the computation of the taxonomy, if it
+	 * has not been done yet. If the input is an {@link ElkObjectProperty} that
+	 * does not occur in the ontology and fresh entities are not allowed, a
+	 * {@link ElkFreshEntitiesException} will be thrown.
+	 * 
+	 * @param property
+	 *            the {@link ElkObjectProperty} for which to return the
+	 *            {@link Node}
+	 * @return the {@link TaxonomyNode} for the given {@link ElkObjectProperty}
+	 * @throws ElkException
+	 *             if the result cannot be computed
+	 */
+	public synchronized TaxonomyNode<ElkObjectProperty> getObjectPropertyNode(
+			final ElkObjectProperty property) throws ElkException {
+		return getObjectPropertyTaxonomyNode(property);
 	}
 
 	/**
@@ -402,6 +447,64 @@ public class Reasoner extends AbstractReasonerState {
 
 		return (direct) ? queryNode.getDirectSuperNodes() : queryNode
 				.getAllSuperNodes();
+	}
+
+	/**
+	 * Return the (direct or indirect) sub-properties of the given
+	 * {@link ElkObjectProperty} as specified by the parameter. The method
+	 * returns a set of {@link Node}s, each of which representing an equivalence
+	 * class of sub-properties. Calling of this method may trigger the
+	 * computation of the taxonomy, if it has not been done yet.
+	 * 
+	 * @param property
+	 *            the {@link ElkObjectProperty} for which to return the
+	 *            sub-property {@link Node}s
+	 * @param direct
+	 *            if {@code true}, only direct sub-properties should be returned
+	 * @return the set of {@link Node}s for direct or indirect sub-properties of
+	 *         the given {@link ElkObjectProperty} according to the specified
+	 *         parameter
+	 * @throws ElkException
+	 *             if the result cannot be computed
+	 */
+	public synchronized Set<? extends Node<ElkObjectProperty>> getSubObjectProperties(
+			final ElkObjectProperty property, final boolean direct)
+					throws ElkException {
+
+		final TaxonomyNode<ElkObjectProperty> queryNode = getObjectPropertyNode(
+				property);
+
+		return (direct) ? queryNode.getDirectSubNodes()
+				: queryNode.getAllSubNodes();
+	}
+
+	/**
+	 * Return the (direct or indirect) super-properties of the given
+	 * {@link ElkObjectProperty} as specified by the parameter. The method
+	 * returns a set of {@link Node}s, each of which representing an equivalence
+	 * class of super-properties. Calling of this method may trigger the
+	 * computation of the taxonomy, if it has not been done yet.
+	 * 
+	 * @param property
+	 *            the {@link ElkObjectProperty} for which to return the
+	 *            super-property {@link Node}s
+	 * @param direct
+	 *            if {@code true}, only direct super-properties are returned
+	 * @return the set of {@link Node}s for direct or indirect super-properties
+	 *         of the given {@link ElkObjectProperty} according to the specified
+	 *         parameter
+	 * @throws ElkException
+	 *             if the result cannot be computed
+	 */
+	public synchronized Set<? extends Node<ElkObjectProperty>> getSuperObjectProperties(
+			final ElkObjectProperty property, final boolean direct)
+					throws ElkException {
+
+		TaxonomyNode<ElkObjectProperty> queryNode = getObjectPropertyNode(
+				property);
+
+		return (direct) ? queryNode.getDirectSuperNodes()
+				: queryNode.getAllSuperNodes();
 	}
 
 	/**

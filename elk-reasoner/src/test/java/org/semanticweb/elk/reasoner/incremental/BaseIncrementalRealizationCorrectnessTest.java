@@ -36,7 +36,7 @@ import org.junit.runner.RunWith;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
+import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TaxonomyDiffManifest;
@@ -63,12 +63,12 @@ import org.semanticweb.elk.testing.io.URLTestIO;
 @RunWith(PolySuite.class)
 public abstract class BaseIncrementalRealizationCorrectnessTest<T>
 		extends
-		BaseIncrementalReasoningCorrectnessTest<T, ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>> {
+		BaseIncrementalReasoningCorrectnessTest<T, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> {
 
 	final static String INPUT_DATA_LOCATION = "realization_test_input";
 
 	public BaseIncrementalRealizationCorrectnessTest(
-			ReasoningTestManifest<ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>> testManifest) {
+			ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> testManifest) {
 		super(testManifest);
 	}
 
@@ -110,12 +110,12 @@ public abstract class BaseIncrementalRealizationCorrectnessTest<T>
 						IncrementalClassificationCorrectnessTest.class,
 						"owl",
 						"expected",
-						new TestManifestCreator<URLTestIO, ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>>() {
+						new TestManifestCreator<URLTestIO, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>() {
 							@Override
-							public TestManifest<URLTestIO, ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>> create(
+							public TestManifest<URLTestIO, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> create(
 									URL input, URL output) throws IOException {
 								// don't need an expected output for these tests
-								return new TaxonomyDiffManifest<ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>>(
+								return new TaxonomyDiffManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>(
 										input, null);
 							}
 						});

@@ -36,6 +36,7 @@ import org.semanticweb.elk.owl.inferences.ReasonerProofProvider;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owlapi.proofs.OwlAxiomExpressionWrap;
 import org.semanticweb.elk.owlapi.wrapper.ElkObjectWrapFactory;
 import org.semanticweb.elk.owlapi.wrapper.OwlClassAxiomConverterVisitor;
@@ -59,6 +60,7 @@ import org.semanticweb.owlapi.model.OWLDataPropertyExpression;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
@@ -94,6 +96,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
+ * @author Peter Skocovsky
  */
 public class ElkReasoner implements ExplainingOWLReasoner {
 	// logger for this class
@@ -295,6 +298,17 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 		}
 	}
 
+	private Node<OWLObjectPropertyExpression> getObjectPropertyNode(
+			final ElkObjectProperty elkClass) throws FreshEntitiesException,
+					InconsistentOntologyException, ElkException {
+		try {
+			return elkConverter_.convertObjectPropertyNode(
+					reasoner_.getObjectPropertyNode(elkClass));
+		} catch (ElkException e) {
+			throw elkConverter_.convert(e);
+		}
+	}
+
 	/**
 	 * 
 	 * @throws ReasonerInterruptedException
@@ -397,8 +411,18 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 		LOGGER_.trace("getBottomObjectPropertyNode()");
 
 		checkInterrupted();
-		// TODO Provide implementation
-		throw unsupportedOwlApiMethod("getBottomObjectPropertyNode()");
+
+		try {
+			return getObjectPropertyNode(
+					objectFactory_.getOwlBottomObjectProperty());
+		} catch (final ElkUnsupportedReasoningTaskException e) {
+			throw unsupportedOwlApiMethod("getBottomObjectPropertyNode()",
+					e.getMessage());
+		} catch (final ElkException e) {
+			throw elkConverter_.convert(e);
+		} catch (final ElkRuntimeException e) {
+			throw elkConverter_.convert(e);
+		}
 	}
 
 	@Override
@@ -515,14 +539,31 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 
 	@Override
 	public Node<OWLObjectPropertyExpression> getEquivalentObjectProperties(
-			OWLObjectPropertyExpression arg0)
-			throws InconsistentOntologyException, FreshEntitiesException,
-			ReasonerInterruptedException, TimeOutException {
-		LOGGER_.trace("getEquivalentObjectProperties(OWLObjectPropertyExpression)");
+			final OWLObjectPropertyExpression pe)
+					throws InconsistentOntologyException,
+					FreshEntitiesException, ReasonerInterruptedException,
+					TimeOutException {
+		LOGGER_.trace(
+				"getEquivalentObjectProperties(OWLObjectPropertyExpression)");
 
 		checkInterrupted();
-		// TODO Provide implementation
-		throw unsupportedOwlApiMethod("getEquivalentObjectProperties(OWLObjectPropertyExpression)");
+		if (pe instanceof OWLObjectProperty) {
+			try {
+				return elkConverter_
+						.convertObjectPropertyNode(reasoner_.getObjectPropertyNode(
+								owlConverter_.convert((OWLObjectProperty) pe)));
+			} catch (final ElkUnsupportedReasoningTaskException e) {
+				throw unsupportedOwlApiMethod(
+						"getEquivalentObjectProperties(OWLObjectPropertyExpression)",
+						e.getMessage());
+			} catch (final ElkException e) {
+				throw elkConverter_.convert(e);
+			} catch (final ElkRuntimeException e) {
+				throw elkConverter_.convert(e);
+			}
+		}
+		throw unsupportedOwlApiMethod(
+				"getEquivalentObjectProperties(OWLObjectPropertyExpression)");
 	}
 
 	@Override
@@ -712,13 +753,33 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 
 	@Override
 	public NodeSet<OWLObjectPropertyExpression> getSubObjectProperties(
-			OWLObjectPropertyExpression arg0, boolean arg1)
-			throws InconsistentOntologyException, FreshEntitiesException,
-			ReasonerInterruptedException, TimeOutException {
-		// TODO Provide implementation
-		LOGGER_.trace("getSubObjectProperties(OWLObjectPropertyExpression, boolean)");
+			final OWLObjectPropertyExpression pe, final boolean direct)
+					throws InconsistentOntologyException,
+					FreshEntitiesException, ReasonerInterruptedException,
+					TimeOutException {
+		LOGGER_.trace(
+				"getSubObjectProperties(OWLObjectPropertyExpression, boolean)");
+
 		checkInterrupted();
-		throw unsupportedOwlApiMethod("getSubObjectProperties(OWLObjectPropertyExpression, boolean)");
+
+		if (pe instanceof OWLObjectProperty) {
+			try {
+				return elkConverter_
+						.convertObjectPropertyNodes(reasoner_.getSubObjectProperties(
+								owlConverter_.convert((OWLObjectProperty) pe),
+								direct));
+			} catch (final ElkUnsupportedReasoningTaskException e) {
+				throw unsupportedOwlApiMethod(
+						"getSubObjectProperties(OWLObjectPropertyExpression, boolean)",
+						e.getMessage());
+			} catch (final ElkException e) {
+				throw elkConverter_.convert(e);
+			} catch (final ElkRuntimeException e) {
+				throw elkConverter_.convert(e);
+			}
+		}
+		throw unsupportedOwlApiMethod(
+				"getSubObjectProperties(OWLObjectPropertyExpression, boolean)");
 	}
 
 	@Override
@@ -755,13 +816,33 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 
 	@Override
 	public NodeSet<OWLObjectPropertyExpression> getSuperObjectProperties(
-			OWLObjectPropertyExpression arg0, boolean arg1)
-			throws InconsistentOntologyException, FreshEntitiesException,
-			ReasonerInterruptedException, TimeOutException {
-		LOGGER_.trace("getSuperObjectProperties(OWLObjectPropertyExpression, boolean)");
+			final OWLObjectPropertyExpression pe, final boolean direct)
+					throws InconsistentOntologyException,
+					FreshEntitiesException, ReasonerInterruptedException,
+					TimeOutException {
+		LOGGER_.trace(
+				"getSuperObjectProperties(OWLObjectPropertyExpression, boolean)");
+
 		checkInterrupted();
-		// TODO Provide implementation
-		throw unsupportedOwlApiMethod("getSuperObjectProperties(OWLObjectPropertyExpression, boolean)");
+
+		if (pe instanceof OWLObjectProperty) {
+			try {
+				return elkConverter_.convertObjectPropertyNodes(
+						reasoner_.getSuperObjectProperties(
+								owlConverter_.convert((OWLObjectProperty) pe),
+								direct));
+			} catch (final ElkUnsupportedReasoningTaskException e) {
+				throw unsupportedOwlApiMethod(
+						"getSuperObjectProperties(OWLObjectPropertyExpression, boolean)",
+						e.getMessage());
+			} catch (final ElkException e) {
+				throw elkConverter_.convert(e);
+			} catch (final ElkRuntimeException e) {
+				throw elkConverter_.convert(e);
+			}
+		}
+		throw unsupportedOwlApiMethod(
+				"getSuperObjectProperties(OWLObjectPropertyExpression, boolean)");
 	}
 
 	@Override
@@ -797,9 +878,20 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 	@Override
 	public Node<OWLObjectPropertyExpression> getTopObjectPropertyNode() {
 		LOGGER_.trace("getTopObjectPropertyNode()");
+
 		checkInterrupted();
-		// TODO Provide implementation
-		throw unsupportedOwlApiMethod("getTopObjectPropertyNode()");
+
+		try {
+			return getObjectPropertyNode(
+					objectFactory_.getOwlTopObjectProperty());
+		} catch (final ElkUnsupportedReasoningTaskException e) {
+			throw unsupportedOwlApiMethod("getTopObjectPropertyNode()",
+					e.getMessage());
+		} catch (final ElkException e) {
+			throw elkConverter_.convert(e);
+		} catch (final ElkRuntimeException e) {
+			throw elkConverter_.convert(e);
+		}
 	}
 
 	@Override

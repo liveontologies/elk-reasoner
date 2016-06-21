@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.stages;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,22 +19,24 @@ package org.semanticweb.elk.reasoner.stages;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.stages;
 
 /**
  * Defines all {@link ReasonerStage}s used by the reasoner and dependencies
  * between them.
  * 
  * @author "Yevgeny Kazakov"
- * 
+ * @author Peter Skocovsky
  */
 public class ReasonerStageManager {
 
 	final AbstractReasonerStage axiomLoadingStage, propertyInitializationStage,
 			propertyHierarchyCompositionComputationStage,
-			contextInitializationStage, consistencyCheckingStage,
-			classSaturationStage, classTaxonomyComputationStage,
-			incrementalCompletionStage, incrementalDeletionInitializationStage,
-			incrementalDeletionStage, incrementalContextGapFillingStage,
+			objectPropertyTaxonomyComputationStage, contextInitializationStage,
+			consistencyCheckingStage, classSaturationStage,
+			classTaxonomyComputationStage, incrementalCompletionStage,
+			incrementalDeletionInitializationStage, incrementalDeletionStage,
+			incrementalContextGapFillingStage,
 			incrementalAdditionInitializationStage, incrementalAdditionStage,
 			incrementalConsistencyCheckingStage,
 			incrementalTaxonomyCleaningStage,
@@ -57,6 +57,9 @@ public class ReasonerStageManager {
 
 		this.propertyHierarchyCompositionComputationStage = new PropertyHierarchyCompositionComputationStage(
 				reasoner, propertyInitializationStage);
+
+		this.objectPropertyTaxonomyComputationStage = new ObjectPropertyTaxonomyComputationStage(
+				reasoner, propertyHierarchyCompositionComputationStage);
 
 		this.contextInitializationStage = new ContextAssignmentResetStage(
 				reasoner, axiomLoadingStage,

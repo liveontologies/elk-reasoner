@@ -65,8 +65,10 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentInstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.ConcurrentObjectPropertyTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.ElkIndividualKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.ElkObjectPropertyKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.OrphanInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.OrphanTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.OrphanTypeNode;
@@ -90,7 +92,7 @@ import org.slf4j.LoggerFactory;
  * instance taxonomy.
  * 
  * @author "Yevgeny Kazakov"
- * 
+ * @author Peter Skocovsky
  */
 public abstract class AbstractReasonerState extends SimpleInterrupter {
 
@@ -146,6 +148,10 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 * Taxonomy state that stores (partial) classification
 	 */
 	final ClassTaxonomyState classTaxonomyState;
+	/**
+	 * Taxonomy state that stores property hierarchy
+	 */
+	final ObjectPropertyTaxonomyState objectPropertyTaxonomyState = new ObjectPropertyTaxonomyState();
 	/**
 	 * Defines reasoning stages and dependencies between them
 	 */
@@ -254,6 +260,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		// delete existing taxonomies as they cannot be updated incrementally
 		resetTaxonomy();
 		resetInstanceTaxonomy();
+		resetObjectPropertyTaxonomy();
 	}
 
 	boolean trySetIncrementalMode() {
@@ -295,6 +302,16 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		// force non-incremental taxonomy computation
 		instanceTaxonomyState.getWriter().clearTaxonomy(); 
 		stageManager.instanceTaxonomyComputationStage.invalidateRecursive();
+	}
+
+	public synchronized void resetObjectPropertyTaxonomy() {
+		LOGGER_.trace("Reset object property taxonomy");
+		// force non-incremental taxonomy computation
+		// TODO: maybe this can be done in
+		// PropertyTaxonomyComputationStage.invalidate()
+		objectPropertyTaxonomyState.getWriter().clearTaxonomy();
+		stageManager.objectPropertyTaxonomyComputationStage
+				.invalidateRecursive();
 	}
 
 	public synchronized void registerAxiomLoader(AxiomLoader newAxiomLoader) {
@@ -535,6 +552,67 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	}
 
 	/**
+	 * Compute the inferred taxonomy of the object properties for the given
+	 * ontology if it has not been done yet.
+	 * 
+	 * @return the object property taxonomy implied by the current ontology
+	 * @throws ElkInconsistentOntologyException
+	 *             if the ontology is inconsistent
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
+	 */
+	public synchronized Taxonomy<ElkObjectProperty> getObjectPropertyTaxonomy()
+			throws ElkInconsistentOntologyException, ElkException {
+
+		ruleAndConclusionStats.reset();
+
+		if (isInconsistent()) {
+			throw new ElkInconsistentOntologyException();
+		}
+
+		LOGGER_.trace("Property hierarchy computation");
+		complete(stageManager.objectPropertyTaxonomyComputationStage);
+
+		return objectPropertyTaxonomyState.getTaxonomy();
+	}
+
+	/**
+	 * Compute the inferred taxonomy of the object properties for the given
+	 * ontology if it has not been done yet.
+	 * 
+	 * @return the object property taxonomy implied by the current ontology
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
+	 */
+	public synchronized Taxonomy<ElkObjectProperty> getObjectPropertyTaxonomyQuietly()
+			throws ElkException {
+		Taxonomy<ElkObjectProperty> result;
+
+		try {
+			result = getObjectPropertyTaxonomy();
+		} catch (ElkInconsistentOntologyException e) {
+			LOGGER_.debug("Ontology is inconsistent");
+
+			result = new SingletoneTaxonomy<ElkObjectProperty, OrphanTaxonomyNode<ElkObjectProperty>>(
+					ElkObjectPropertyKeyProvider.INSTANCE, getAllObjectProperties(),
+					new TaxonomyNodeFactory<ElkObjectProperty, OrphanTaxonomyNode<ElkObjectProperty>, Taxonomy<ElkObjectProperty>>() {
+						@Override
+						public OrphanTaxonomyNode<ElkObjectProperty> createNode(
+								final Iterable<? extends ElkObjectProperty> members,
+								final int size,
+								final Taxonomy<ElkObjectProperty> taxonomy) {
+							return new OrphanTaxonomyNode<ElkObjectProperty>(
+									members, size,
+									elkFactory_.getOwlBottomObjectProperty(),
+									taxonomy);
+						}
+					});
+		}
+
+		return result;
+	}
+
+	/**
 	 * @return all {@link ElkClass}es occurring in the ontology
 	 */
 	public synchronized Set<ElkClass> getAllClasses() {
@@ -554,6 +632,19 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		for (IndexedIndividual ii : ontologyIndex.getIndividuals())
 			allNamedIndividuals.add(ii.getElkEntity());
 		return allNamedIndividuals;
+	}
+
+	/**
+	 * @return all {@link ElkObjectProperty}es occurring in the ontology
+	 */
+	public synchronized Set<ElkObjectProperty> getAllObjectProperties() {
+		final Set<ElkObjectProperty> result = new ArrayHashSet<ElkObjectProperty>(
+				ontologyIndex.getObjectProperties().size());
+		for (final IndexedObjectProperty prop : ontologyIndex
+				.getObjectProperties()) {
+			result.add(prop.getElkEntity());
+		}
+		return result;
 	}
 
 	/**
@@ -610,6 +701,12 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		instanceTaxonomyState.getWriter().setTaxonomy(
 				new ConcurrentInstanceTaxonomy(classTaxonomyState.getTaxonomy(),
 						ElkIndividualKeyProvider.INSTANCE));
+	}
+
+	public synchronized void initObjectPropertyTaxonomy() {
+		objectPropertyTaxonomyState.getWriter()
+				.setTaxonomy(new ConcurrentObjectPropertyTaxonomy(elkFactory_,
+						ElkObjectPropertyKeyProvider.INSTANCE));
 	}
 
 	@Deprecated

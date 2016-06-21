@@ -32,32 +32,43 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
+import org.semanticweb.elk.owl.predefined.PredefinedElkIris;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
+import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.ElkIndividualKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 
 /**
- * A wrapper around {@link TaxonomyPrinter} to satisfy the ORE specification
+ * TaxonomyPrinter that satisfies the ORE specification
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class OreTaxonomyPrinter extends TaxonomyPrinter {
+public class OreTaxonomyPrinter {
+
+	protected static Comparator<ElkEntity>
+			CLASS_COMPARATOR = ElkClassKeyProvider.INSTANCE.getComparator(),
+			INDIVIDUAL_COMPARATOR = ElkIndividualKeyProvider.INSTANCE.getComparator();
 
 	// prints SubClassOf(A, owl:Thing) for all direct subclasses of owl:Thing
 	static void printClassTaxonomy(Taxonomy<ElkClass> taxonomy, File out)
@@ -143,6 +154,41 @@ public class OreTaxonomyPrinter extends TaxonomyPrinter {
 		}
 	}
 
+	/**
+	 * Prints class declarations
+	 * 
+	 * @param classTaxonomy
+	 * @param objectFactory
+	 * @param writer
+	 * @throws IOException
+	 */
+	protected static void printDeclarations(Taxonomy<ElkClass> classTaxonomy,
+			ElkObject.Factory objectFactory, Appendable writer)
+			throws IOException {
+
+		List<ElkClass> classes = new ArrayList<ElkClass>(classTaxonomy
+				.getNodes().size() * 2);
+
+		for (TaxonomyNode<ElkClass> classNode : classTaxonomy.getNodes()) {
+			for (ElkClass clazz : classNode) {
+				if (!clazz.getIri().equals(PredefinedElkIris.OWL_THING)
+						&& !clazz.getIri()
+								.equals(PredefinedElkIris.OWL_NOTHING)) {
+					classes.add(clazz);
+
+				}
+			}
+		}
+
+		Collections.sort(classes, CLASS_COMPARATOR);
+
+		for (ElkClass clazz : classes) {
+			ElkDeclarationAxiom decl = objectFactory.getDeclarationAxiom(clazz);
+			OwlFunctionalStylePrinter.append(writer, decl, true);
+			writer.append('\n');
+		}
+	}
+
 	protected static void processInstanceTaxomomy(
 			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy,
 			Writer writer) throws IOException {
@@ -183,6 +229,19 @@ public class OreTaxonomyPrinter extends TaxonomyPrinter {
 
 			printIndividualAxioms(individual, orderedSameIndividuals,
 					orderedTypes, objectFactory, writer);
+		}
+	}
+
+	protected static void printIndividualDeclarations(
+			Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>> individualNodes,
+			ElkObject.Factory objectFactory, Writer writer) throws IOException {
+		for (InstanceNode<ElkClass, ElkNamedIndividual> individualNode : individualNodes) {
+			for (ElkNamedIndividual individual : individualNode) {
+				ElkDeclarationAxiom decl = objectFactory
+						.getDeclarationAxiom(individual);
+				OwlFunctionalStylePrinter.append(writer, decl, true);
+				writer.append('\n');
+			}
 		}
 	}
 
