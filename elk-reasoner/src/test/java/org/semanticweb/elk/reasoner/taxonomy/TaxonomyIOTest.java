@@ -88,8 +88,7 @@ public class TaxonomyIOTest {
 	@Test
 	public void classTaxonomyRoundtrip() throws IOException, Owl2ParseException,
 			ElkInconsistentOntologyException, ElkException {
-		Taxonomy<ElkClass> original = loadAndClassify("io/taxonomy.owl")
-				.getInstanceTaxonomy();
+		Taxonomy<ElkClass> original = loadAndClassify("io/taxonomy.owl");
 		StringWriter writer = new StringWriter();
 
 		TaxonomyPrinter.dumpTaxomomy(original, writer, false);
@@ -119,7 +118,7 @@ public class TaxonomyIOTest {
 	public void instanceTaxonomyRoundtrip() throws IOException,
 			Owl2ParseException, ElkInconsistentOntologyException, ElkException {
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> original = loadAndClassify(
-				"io/instance_taxonomy.owl").getInstanceTaxonomy();
+				"io/instance_taxonomy.owl");
 		StringWriter writer = new StringWriter();
 
 		TaxonomyPrinter.dumpInstanceTaxomomy(original, writer, false);
@@ -130,7 +129,7 @@ public class TaxonomyIOTest {
 				.load(objectFactory, parser);
 
 		final StringWriter loadedWriter = new StringWriter();
-		TaxonomyPrinter.dumpTaxomomy(loaded, loadedWriter, false);
+		TaxonomyPrinter.dumpInstanceTaxomomy(loaded, loadedWriter, false);
 
 		// compare
 		// @formatter:off
@@ -148,8 +147,8 @@ public class TaxonomyIOTest {
 	@Test
 	public void objectPropertyTaxonomyRoundtrip() throws IOException,
 			Owl2ParseException, ElkInconsistentOntologyException, ElkException {
-		final Taxonomy<ElkObjectProperty> original = loadAndClassify(
-				"io/property_taxonomy.owl").getObjectPropertyTaxonomy();
+		final Taxonomy<ElkObjectProperty> original = loadAndClassifyObjectProperties(
+				"io/property_taxonomy.owl");
 		final StringWriter writer = new StringWriter();
 
 		TaxonomyPrinter.dumpTaxomomy(original, writer, false);
@@ -227,7 +226,7 @@ public class TaxonomyIOTest {
 		assertSame(taxonomy.getTopNode(), taxonomy.getBottomNode());
 	}
 
-	private Reasoner loadAndClassify(String resource) throws IOException,
+	private InstanceTaxonomy<ElkClass,ElkNamedIndividual> loadAndClassify(String resource) throws IOException,
 			Owl2ParseException, ElkInconsistentOntologyException, ElkException {
 
 		InputStream stream = null;
@@ -240,7 +239,28 @@ public class TaxonomyIOTest {
 			Reasoner reasoner = TestReasonerUtils.createTestReasoner(
 					streamLoader, new FailingOnInterruptStageExecutor(), 1);
 
-			return reasoner;
+			return reasoner.getInstanceTaxonomy();
+		} finally {
+			if (stream != null) {
+				IOUtils.closeQuietly(stream);
+			}
+		}
+	}
+
+	private Taxonomy<ElkObjectProperty> loadAndClassifyObjectProperties(String resource) throws IOException,
+			Owl2ParseException, ElkInconsistentOntologyException, ElkException {
+
+		InputStream stream = null;
+
+		try {
+			stream = getClass().getClassLoader().getResourceAsStream(resource);
+			AxiomLoader streamLoader = new Owl2StreamLoader(
+					new Owl2FunctionalStyleParserFactory(), stream);
+
+			Reasoner reasoner = TestReasonerUtils.createTestReasoner(
+					streamLoader, new FailingOnInterruptStageExecutor(), 1);
+
+			return reasoner.getObjectPropertyTaxonomy();
 		} finally {
 			if (stream != null) {
 				IOUtils.closeQuietly(stream);

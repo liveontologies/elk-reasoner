@@ -162,6 +162,7 @@ public class TaxonomyPrinter {
 			writer.write(
 					"\n# Hash code: " + getInstanceHashString(taxonomy) + "\n");
 		}
+		writer.flush();
 	}
 
 	/**
