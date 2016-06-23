@@ -65,7 +65,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentInstanceTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.ConcurrentObjectPropertyTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.ElkIndividualKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.ElkObjectPropertyKeyProvider;
@@ -151,7 +150,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	/**
 	 * Taxonomy state that stores property hierarchy
 	 */
-	final ObjectPropertyTaxonomyState objectPropertyTaxonomyState = new ObjectPropertyTaxonomyState();
+	final ObjectPropertyTaxonomyState objectPropertyTaxonomyState;
 	/**
 	 * Defines reasoning stages and dependencies between them
 	 */
@@ -200,6 +199,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 				ontologyIndex, elkFactory);
 		this.instanceTaxonomyState = new InstanceTaxonomyState(saturationState,
 				ontologyIndex, elkFactory);
+		this.objectPropertyTaxonomyState = new ObjectPropertyTaxonomyState(
+				elkFactory);
 		this.ruleAndConclusionStats = new SaturationStatistics();
 		this.stageManager = new ReasonerStageManager(this);
 		this.expressionConverter_ = new ElkPolarityExpressionConverterImpl(
@@ -704,9 +705,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	}
 
 	public synchronized void initObjectPropertyTaxonomy() {
-		objectPropertyTaxonomyState.getWriter()
-				.setTaxonomy(new ConcurrentObjectPropertyTaxonomy(elkFactory_,
-						ElkObjectPropertyKeyProvider.INSTANCE));
+		objectPropertyTaxonomyState.getWriter().initTaxonomy();
 	}
 
 	@Deprecated

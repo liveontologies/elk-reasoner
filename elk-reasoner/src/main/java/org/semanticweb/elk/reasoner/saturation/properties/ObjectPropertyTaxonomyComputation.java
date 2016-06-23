@@ -29,7 +29,6 @@ import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**
@@ -42,13 +41,13 @@ public class ObjectPropertyTaxonomyComputation extends
 		ReasonerComputationWithInputs<IndexedObjectProperty, ObjectPropertyTaxonomyComputationFactory> {
 
 	public ObjectPropertyTaxonomyComputation(final OntologyIndex ontIndex,
-			final UpdateableTaxonomy<ElkObjectProperty> taxonomy,
+			final TransitiveReductionOutputVisitor<ElkObjectProperty> outputProcessor,
 			final PredefinedElkObjectPropertyFactory predefinedFactory,
 			final ComputationExecutor executor, final int maxWorkers,
 			final ProgressMonitor progressMonitor) {
 		this(ontIndex.getObjectProperties(),
-				new ObjectPropertyTaxonomyComputationFactory(taxonomy, ontIndex,
-						predefinedFactory),
+				new ObjectPropertyTaxonomyComputationFactory(outputProcessor,
+						ontIndex, predefinedFactory),
 				executor, maxWorkers, progressMonitor);
 	}
 

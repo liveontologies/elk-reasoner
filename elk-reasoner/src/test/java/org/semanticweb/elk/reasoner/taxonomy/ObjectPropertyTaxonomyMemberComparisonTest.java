@@ -23,8 +23,7 @@ package org.semanticweb.elk.reasoner.taxonomy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
@@ -179,8 +178,8 @@ public class ObjectPropertyTaxonomyMemberComparisonTest {
 		final TaxonomyNode<ElkObjectProperty> nodeSameA2 = taxonomy.getNode(sameA2);
 		final TaxonomyNode<ElkObjectProperty> nodeSameA3 = taxonomy.getNode(sameA3);
 		
-		assertSame(nodeSameA1, nodeSameA2);
-		assertSame(nodeSameA1, nodeSameA3);
+		assertEquals(nodeSameA1, nodeSameA2);
+		assertEquals(nodeSameA1, nodeSameA3);
 		
 		// IRI-s that are different point to different nodes
 		
@@ -194,8 +193,8 @@ public class ObjectPropertyTaxonomyMemberComparisonTest {
 		final TaxonomyNode<ElkObjectProperty> nodeDifferentA1 = taxonomy.getNode(differentA1);
 		final TaxonomyNode<ElkObjectProperty> nodeDifferentA2 = taxonomy.getNode(differentA2);
 		
-		assertNotSame(nodeSameA1, nodeDifferentA1);
-		assertNotSame(nodeSameA1, nodeDifferentA2);
+		assertNotEquals(nodeSameA1, nodeDifferentA1);
+		assertNotEquals(nodeSameA1, nodeDifferentA2);
 		
 		final ElkObjectProperty sameC1 = OBJECT_FACTORY.getObjectProperty(
 				new ElkFullIri("http://example.org/same#C"));
@@ -212,9 +211,9 @@ public class ObjectPropertyTaxonomyMemberComparisonTest {
 		final TaxonomyNode<ElkObjectProperty> nodeSameC2 = taxonomy.getNode(sameC2);
 		final TaxonomyNode<ElkObjectProperty> nodeSameC3 = taxonomy.getNode(sameC3);
 		
-		assertNotSame(nodeSameA1, nodeSameC1);
-		assertNotSame(nodeSameA1, nodeSameC2);
-		assertNotSame(nodeSameA1, nodeSameC3);
+		assertNotEquals(nodeSameA1, nodeSameC1);
+		assertNotEquals(nodeSameA1, nodeSameC2);
+		assertNotEquals(nodeSameA1, nodeSameC3);
 		
 	}
 	

@@ -58,7 +58,8 @@ public class ObjectPropertyTaxonomyComputationStage
 
 		computation_ = new ObjectPropertyTaxonomyComputation(
 				reasoner.ontologyIndex,
-				reasoner.objectPropertyTaxonomyState.getTaxonomy(),
+				reasoner.objectPropertyTaxonomyState
+						.getTransitiveReductionOutputProcessor(),
 				reasoner.getElkFactory(), reasoner.getProcessExecutor(),
 				workerNo, reasoner.getProgressMonitor());
 

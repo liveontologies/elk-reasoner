@@ -21,21 +21,19 @@
  */
 package org.semanticweb.elk.reasoner.saturation.properties;
 
-import java.util.AbstractSet;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.predefined.PredefinedElkObjectPropertyFactory;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
-import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTaxonomyNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
+import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -52,9 +50,9 @@ public class ObjectPropertyTaxonomyComputationFactory extends SimpleInterrupter
 		InputProcessorFactory<IndexedObjectProperty, ObjectPropertyTaxonomyComputationFactory.Engine> {
 
 	/**
-	 * Property taxonomy that is populated during processing.
+	 * Visitor accepting results of the transitive reduction.
 	 */
-	private final UpdateableTaxonomy<ElkObjectProperty> taxonomy_;
+	private final TransitiveReductionOutputVisitor<ElkObjectProperty> outputProcessor_;
 
 	private final OntologyIndex index_;
 
@@ -65,10 +63,10 @@ public class ObjectPropertyTaxonomyComputationFactory extends SimpleInterrupter
 	private final IndexedObjectProperty indexedBottomProperty_;
 
 	public ObjectPropertyTaxonomyComputationFactory(
-			final UpdateableTaxonomy<ElkObjectProperty> taxonomy,
+			final TransitiveReductionOutputVisitor<ElkObjectProperty> outputProcessor,
 			final OntologyIndex index,
 			final PredefinedElkObjectPropertyFactory predefinedFactory) {
-		this.taxonomy_ = taxonomy;
+		this.outputProcessor_ = outputProcessor;
 		this.index_ = index;
 		this.topProperty_ = predefinedFactory.getOwlTopObjectProperty();
 		this.bottomProperty_ = predefinedFactory.getOwlBottomObjectProperty();
@@ -89,55 +87,7 @@ public class ObjectPropertyTaxonomyComputationFactory extends SimpleInterrupter
 
 	@Override
 	public void finish() {
-
-		// Add top node if not present.
-
-		NonBottomTaxonomyNode<ElkObjectProperty> topNode = taxonomy_
-				.getNonBottomNode(topProperty_);
-		if (topNode == null) {
-			topNode = taxonomy_
-					.getCreateNode(Collections.singleton(topProperty_));
-		}
-
-		// Collect all nodes with no super-node.
-		final Collection<Set<ElkObjectProperty>> subMemberSets = Operations.map(
-				taxonomy_.getNodes(),
-				new Operations.Transformation<TaxonomyNode<ElkObjectProperty>, Set<ElkObjectProperty>>() {
-
-					@Override
-					public Set<ElkObjectProperty> transform(
-							final TaxonomyNode<ElkObjectProperty> node) {
-						if (!node.getDirectSuperNodes().isEmpty()
-								|| node.equals(taxonomy_.getTopNode())) {
-							return null;
-						}
-						// else
-						return new AbstractSet<ElkObjectProperty>() {
-
-							@Override
-							public Iterator<ElkObjectProperty> iterator() {
-								return node.iterator();
-							}
-
-							@Override
-							public int size() {
-								return node.size();
-							}
-
-							@Override
-							public boolean contains(final Object o) {
-								if (o instanceof ElkObjectProperty) {
-									return node.contains((ElkObjectProperty) o);
-								}
-								return false;
-							}
-
-						};
-					}
-
-				});
-
-		taxonomy_.setCreateDirectSupernodes(topNode, subMemberSets);
+		// Empty.
 	}
 
 	class Engine implements InputProcessor<IndexedObjectProperty> {
@@ -180,169 +130,102 @@ public class ObjectPropertyTaxonomyComputationFactory extends SimpleInterrupter
 		 * @formatter:on
 		 */
 
-		final Set<IndexedObjectProperty> subProperties = getSubProperties(
+		final Map<IndexedObjectProperty, ElkObjectProperty> equivalent = collectEquivalent(
 				property);
-		final NonBottomTaxonomyNode<ElkObjectProperty> createdNode;
-		final TaxonomyNode<ElkObjectProperty> node = taxonomy_
-				.getNode(property.getElkEntity());
-		if (node != null) {
-
-			// If property is in the bottom node, it is already finished.
-			if (node.equals(taxonomy_.getBottomNode())) {
-				return;
-			}
-
-			createdNode = taxonomy_.getNonBottomNode(property.getElkEntity());
-
-			/*
-			 * If property has some non-bottom sub-nodes, it is already
-			 * finished.
-			 */
-			if (!createdNode.getDirectNonBottomSubNodes().isEmpty()) {
-				return;
-			}
-
-		} else {
-
-			// There is no node, so we need to create it.
-			createdNode = createNodeFromEquivalent(property);
-			if (createdNode == null) {
-				// There should be no sub-nodes.
-				return;
-			}
-
-		}
-
-		/*
-		 * If this is a top node, do not assign sub-nodes, it will be done in
-		 * finish.
-		 */
-		if (createdNode.equals(taxonomy_.getTopNode())) {
+		if (equivalent == null) {
+			// Equivalent to top.
 			return;
 		}
+		final Map<IndexedObjectProperty, Collection<? extends ElkObjectProperty>> subEquivalent = new ArrayHashMap<IndexedObjectProperty, Collection<? extends ElkObjectProperty>>();
+		final Set<IndexedObjectProperty> indirect = new ArrayHashSet<IndexedObjectProperty>();
+		for (final IndexedObjectProperty subProperty : getSubProperties(
+				property)) {
 
-		/*
-		 * Create nodes for strict sub-properties and collect their strict
-		 * sub-properties.
-		 */
-		final Set<TaxonomyNode<ElkObjectProperty>> subNodes = new ArrayHashSet<TaxonomyNode<ElkObjectProperty>>();
-		final Set<ElkObjectProperty> indirect = new ArrayHashSet<ElkObjectProperty>();
-		for (final IndexedObjectProperty subProperty : subProperties) {
-
-			if (createdNode.contains(subProperty.getElkEntity())) {
-				// not strict
+			if (equivalent.containsKey(subProperty)) {
+				// subProperty is not strict
 				continue;
 			}
+			// subProperty is strict
 
-			final Set<IndexedObjectProperty> subSubProperties = getSubProperties(
+			final Map<IndexedObjectProperty, ElkObjectProperty> subEq = collectEquivalent(
 					subProperty);
-			final NonBottomTaxonomyNode<ElkObjectProperty> createdSubNode;
-			final TaxonomyNode<ElkObjectProperty> subNode = taxonomy_
-					.getNode(subProperty.getElkEntity());
-			if (subNode != null) {
-				// if subNode is bottom, this will be null
-				createdSubNode = taxonomy_
-						.getNonBottomNode(subProperty.getElkEntity());
-			} else {
-				// There is no subNode, so we need to create it.
-				createdSubNode = createNodeFromEquivalent(subProperty);
-				// if subProperty is in bottom, this will be null
-			}
-
-			if (createdSubNode != null) {
-				/*
-				 * subProperty is not in bottom, so it may have strict
-				 * sub-properties and its node may be added as a sub-node.
-				 */
-				subNodes.add(createdSubNode);
-				for (final IndexedObjectProperty subSubProperty : subSubProperties) {
-					if (!createdSubNode
-							.contains(subSubProperty.getElkEntity())) {
-						// strict
-						indirect.add(subSubProperty.getElkEntity());
-					}
+			// should not be null, because top cannot be a strict sub-property
+			subEquivalent.put(subProperty, subEq.values());
+			for (final IndexedObjectProperty subSubProperty : getSubProperties(
+					subProperty)) {
+				if (!subEq.containsKey(subSubProperty)) {
+					// strict
+					indirect.add(subSubProperty);
 				}
 			}
 
 		}
 
-		final Collection<Set<ElkObjectProperty>> subMemberSets = Operations.map(
-				subNodes,
-				new Operations.Transformation<TaxonomyNode<ElkObjectProperty>, Set<ElkObjectProperty>>() {
+		/*
+		 * If property is not equivalent to bottom and there are no strict sub
+		 * properties, add the bottom as a default sub property.
+		 */
+		if (subEquivalent.isEmpty() && (indexedBottomProperty_ == null
+				|| !equivalent.containsKey(indexedBottomProperty_))) {
+			outputProcessor_
+					.visit(new TransitiveReductionOutputEquivalentDirectImpl<ElkObjectProperty>(
+							equivalent.values(), Collections.singleton(
+									Collections.singleton(bottomProperty_))));
+			return;
+		}
+		// else
 
-					@Override
-					public Set<ElkObjectProperty> transform(
-							final TaxonomyNode<ElkObjectProperty> node) {
-						if (indirect.contains(node.getCanonicalMember())) {
-							return null;
-						}
-						// else
-						return new AbstractSet<ElkObjectProperty>() {
-
-							@Override
-							public Iterator<ElkObjectProperty> iterator() {
-								return node.iterator();
-							}
-
-							@Override
-							public int size() {
-								return node.size();
-							}
+		final Collection<Collection<? extends ElkObjectProperty>> direct = Operations
+				.map(subEquivalent.entrySet(),
+						new Operations.Transformation<Map.Entry<IndexedObjectProperty, Collection<? extends ElkObjectProperty>>, Collection<? extends ElkObjectProperty>>() {
 
 							@Override
-							public boolean contains(final Object o) {
-								if (o instanceof ElkObjectProperty) {
-									return node.contains((ElkObjectProperty) o);
+							public Collection<? extends ElkObjectProperty> transform(
+									final Entry<IndexedObjectProperty, Collection<? extends ElkObjectProperty>> element) {
+								if (indirect.contains(element.getKey())) {
+									return null;
+								} else {
+									return element.getValue();
 								}
-								return false;
 							}
 
-						};
-					}
+						});
 
-				});
-
-		taxonomy_.setCreateDirectSupernodes(createdNode, subMemberSets);
+		outputProcessor_
+				.visit(new TransitiveReductionOutputEquivalentDirectImpl<ElkObjectProperty>(
+						equivalent.values(), direct));
 
 	}
 
 	/**
-	 * Collects properties that are equivalent to <code>property</code> and adds
-	 * creates a node in the taxonomy that contains them, except if
-	 * <code>property</code> is equivalent to bottom, in which case it is added
-	 * to the bottom node.
+	 * Collects sub-properties of <code>property</code> that are equivalent to
+	 * it. Returns <code>null</code> if <code>property</code> is equivalent to
+	 * the top property.
 	 * 
 	 * @param property
-	 * @return The created node if <code>property</code> is <strong>not</strong>
-	 *         equivalent to bottom, <code>null</code> otherwise.
+	 * @return <code>null</code> if the specified property is equivalent to the
+	 *         top property, otherwise mapping from equivalent indexed
+	 *         properties to their elk entities.
 	 */
-	private NonBottomTaxonomyNode<ElkObjectProperty> createNodeFromEquivalent(
+	private Map<IndexedObjectProperty, ElkObjectProperty> collectEquivalent(
 			final IndexedObjectProperty property) {
 
 		final Set<IndexedObjectProperty> subProperties = getSubProperties(
 				property);
-		final Collection<ElkObjectProperty> equivalent = new ArrayList<ElkObjectProperty>(
-				subProperties.size());
-		boolean isInBottom = false;
+		final Map<IndexedObjectProperty, ElkObjectProperty> equivalent = new ArrayHashMap<IndexedObjectProperty, ElkObjectProperty>();
 		for (final IndexedObjectProperty subProperty : subProperties) {
-
 			if (subProperty.getElkEntity().equals(topProperty_)) {
-				equivalent.add(subProperty.getElkEntity());
-			} else if (getSubProperties(subProperty).contains(property)) {
-				isInBottom = isInBottom
-						|| subProperty.getElkEntity().equals(bottomProperty_);
-				equivalent.add(subProperty.getElkEntity());
+				outputProcessor_
+						.visit(new TransitiveReductionOutputExtremeImpl<ElkObjectProperty>(
+								property.getElkEntity()));
+				return null;
 			}
+			if (getSubProperties(subProperty).contains(property)) {
+				equivalent.put(subProperty, subProperty.getElkEntity());
+			}
+		}
 
-		}
-		if (isInBottom) {
-			for (final ElkObjectProperty eqProp : equivalent) {
-				taxonomy_.addToBottomNode(eqProp);
-			}
-			return null;
-		} else {
-			return taxonomy_.getCreateNode(equivalent);
-		}
+		return equivalent;
 	}
 
 	/**
@@ -366,6 +249,57 @@ public class ObjectPropertyTaxonomyComputationFactory extends SimpleInterrupter
 			result.add(indexedBottomProperty_);
 		}
 		return result;
+	}
+
+	private static class TransitiveReductionOutputEquivalentDirectImpl<E extends ElkEntity>
+			implements TransitiveReductionOutputEquivalentDirect<E> {
+
+		final Collection<? extends E> equivalent_;
+		final Collection<? extends Collection<? extends E>> direct_;
+
+		public TransitiveReductionOutputEquivalentDirectImpl(
+				final Collection<? extends E> equivalent,
+				final Collection<? extends Collection<? extends E>> direct) {
+			this.equivalent_ = equivalent;
+			this.direct_ = direct;
+		}
+
+		@Override
+		public Collection<? extends E> getEquivalent() {
+			return equivalent_;
+		}
+
+		@Override
+		public Iterable<? extends Collection<? extends E>> getDirectlyRelated() {
+			return Collections.unmodifiableCollection(direct_);
+		}
+
+		@Override
+		public void accept(final TransitiveReductionOutputVisitor<E> visitor) {
+			visitor.visit(this);
+		}
+
+	}
+
+	private static class TransitiveReductionOutputExtremeImpl<E extends ElkEntity>
+			implements TransitiveReductionOutputExtreme<E> {
+
+		final E extremeMember_;
+
+		public TransitiveReductionOutputExtremeImpl(final E extremeMember) {
+			this.extremeMember_ = extremeMember;
+		}
+
+		@Override
+		public E getExtremeMember() {
+			return extremeMember_;
+		}
+
+		@Override
+		public void accept(final TransitiveReductionOutputVisitor<E> visitor) {
+			visitor.visit(this);
+		}
+
 	}
 
 }

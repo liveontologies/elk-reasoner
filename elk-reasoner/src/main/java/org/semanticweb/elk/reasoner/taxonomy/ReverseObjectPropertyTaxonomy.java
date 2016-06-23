@@ -22,9 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
@@ -44,10 +41,8 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
  * Object property taxonomy suitable for concurrent construction or concurrent
  * cleaning.
  * <p>
- * <strong>CAUTION!</strong> This implementation of
- * {@link org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy
- * UpdateableTaxonomy} adds and removes sub-nodes instead of super-nodes. This
- * is due to the way property taxonomy is constructed.
+ * <strong>CAUTION!</strong> This taxonomy is reverse, i.e., top node contains
+ * bottom property, sub-nodes contain super-properties, and so on.
  * 
  * @author Peter Skocovsky
  * 
@@ -55,7 +50,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
  * @see #removeDirectSupernodes(NonBottomTaxonomyNode)
  */
 // @formatter:off
-public class ConcurrentObjectPropertyTaxonomy
+public class ReverseObjectPropertyTaxonomy
 		extends AbstractUpdateableGenericTaxonomy<
 				ElkObjectProperty,
 				GenericTaxonomyNode.Projection<ElkObjectProperty>,
@@ -64,7 +59,7 @@ public class ConcurrentObjectPropertyTaxonomy
 
 	private final GenericTaxonomyNode.Projection<ElkObjectProperty> bottomNode_;
 
-	public ConcurrentObjectPropertyTaxonomy(
+	public ReverseObjectPropertyTaxonomy(
 			final PredefinedElkObjectPropertyFactory elkFactory,
 			final ComparatorKeyProvider<ElkEntity> classKeyProvider) {
 		super(
@@ -94,9 +89,9 @@ public class ConcurrentObjectPropertyTaxonomy
 								taxonomy, members, size);
 					}
 				},
-				elkFactory.getOwlTopObjectProperty());
+				elkFactory.getOwlBottomObjectProperty());
 		this.bottomNode_ = new BottomGenericTaxonomyNode.Projection<ElkObjectProperty>(
-				this, elkFactory.getOwlBottomObjectProperty());
+				this, elkFactory.getOwlTopObjectProperty());
 	}
 // @formatter:on
 
@@ -109,96 +104,6 @@ public class ConcurrentObjectPropertyTaxonomy
 	protected Set<? extends GenericTaxonomyNode.Projection<ElkObjectProperty>> toTaxonomyNodes(
 			final Set<? extends NonBottomGenericTaxonomyNode.Projection<ElkObjectProperty>> nodes) {
 		return nodes;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * <p>
-	 * <strong>CAUTION!</strong> This implementation creates sub-nodes instead
-	 * of super-nodes. This is due to the way property taxonomy is constructed.
-	 */
-	@Override
-	public boolean setCreateDirectSupernodes(
-			final NonBottomTaxonomyNode<ElkObjectProperty> superNode,
-			final Iterable<? extends Collection<? extends ElkObjectProperty>> subMemberSets) {
-		/*
-		 * Adding sub-nodes instead of super-nodes !!!
-		 */
-
-		final NonBottomGenericTaxonomyNode.Projection<ElkObjectProperty> node = toInternalNode(
-				superNode);
-
-		// If subMemberSets contain bottom, don't create anything.
-		for (final Collection<? extends ElkObjectProperty> subMembers : subMemberSets) {
-			if (subMembers.contains(getBottomNode().getCanonicalMember())) {
-				// No event fired, because sub-nodes didn't change.
-				return node.trySetAllParentsAssigned(true);
-			}
-		}
-
-		boolean isSubMemberSetsEmpty = true;
-
-		for (final Collection<? extends ElkObjectProperty> subMembers : subMemberSets) {
-			final NonBottomGenericTaxonomyNode.Projection<ElkObjectProperty> subNode = getCreateNode(
-					subMembers);
-			isSubMemberSetsEmpty = false;
-			addDirectRelation(node, subNode);
-		}
-
-		if (node.trySetAllParentsAssigned(true)) {
-			if (!isSubMemberSetsEmpty) {
-				fireDirectSupernodeAssignment(superNode,
-						superNode.getDirectSuperNodes());
-			}
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * <p>
-	 * <strong>CAUTION!</strong> This implementation removes sub-nodes instead
-	 * of super-nodes. This is due to the way property taxonomy is constructed.
-	 */
-	@Override
-	public boolean removeDirectSupernodes(
-			final NonBottomTaxonomyNode<ElkObjectProperty> superNode) {
-		/*
-		 * Removing sub-nodes instead of super-nodes !!!
-		 */
-
-		final NonBottomGenericTaxonomyNode.Projection<ElkObjectProperty> node = toInternalNode(
-				superNode);
-
-		if (!node.trySetAllParentsAssigned(false)) {
-			return false;
-		}
-
-		final List<NonBottomGenericTaxonomyNode.Projection<ElkObjectProperty>> subNodes = new ArrayList<NonBottomGenericTaxonomyNode.Projection<ElkObjectProperty>>();
-
-		// remove all sub-node links
-		synchronized (node) {
-			subNodes.addAll(node.getDirectNonBottomSubNodes());
-			// If there are no non-bottom sub nodes, do nothing.
-			if (subNodes.isEmpty()) {
-				return true;
-			}
-			for (final NonBottomGenericTaxonomyNode.Projection<ElkObjectProperty> subNode : subNodes) {
-				node.removeDirectSubNode(subNode);
-			}
-		}
-
-		for (final NonBottomGenericTaxonomyNode.Projection<ElkObjectProperty> subNode : subNodes) {
-			synchronized (subNode) {
-				subNode.removeDirectSuperNode(node);
-			}
-		}
-
-		fireDirectSupernodeRemoval(superNode, subNodes);
-
-		return true;
 	}
 
 }

@@ -22,7 +22,16 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
+import org.semanticweb.elk.owl.predefined.PredefinedElkObjectPropertyFactory;
+import org.semanticweb.elk.reasoner.saturation.properties.TransitiveReductionOutputEquivalent;
+import org.semanticweb.elk.reasoner.saturation.properties.TransitiveReductionOutputEquivalentDirect;
+import org.semanticweb.elk.reasoner.saturation.properties.TransitiveReductionOutputExtreme;
+import org.semanticweb.elk.reasoner.saturation.properties.TransitiveReductionOutputVisitor;
+import org.semanticweb.elk.reasoner.taxonomy.ElkObjectPropertyKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.ReverseObjectPropertyTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.ReverseTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
 /**
  * Keeps track of state of the object property taxonomy. Currently contains only
@@ -32,10 +41,28 @@ import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
  */
 public class ObjectPropertyTaxonomyState {
 
-	private UpdateableTaxonomy<ElkObjectProperty> taxonomy_ = null;
+	private final PredefinedElkObjectPropertyFactory elkFactory_;
+	
+	/**
+	 * Object property taxonomy is constructed in the opposite order than class
+	 * taxonomy, i.e., from super-properties to sub-properties. In order to use
+	 * the same taxonomy implementation as for the class taxonomy, property
+	 * taxonomy is up side down. It must be reversed before passing it out of
+	 * the reasoner!
+	 */
+	private ReverseObjectPropertyTaxonomy taxonomy_ = null;
 
-	public UpdateableTaxonomy<ElkObjectProperty> getTaxonomy() {
-		return taxonomy_;
+	public ObjectPropertyTaxonomyState(
+			final PredefinedElkObjectPropertyFactory elkFactory) {
+		this.elkFactory_ = elkFactory;
+	}
+
+	public Taxonomy<ElkObjectProperty> getTaxonomy() {
+		return new ReverseTaxonomy<ElkObjectProperty>(taxonomy_);
+	}
+
+	public TransitiveReductionOutputVisitor<ElkObjectProperty> getTransitiveReductionOutputProcessor() {
+		return transitiveReductionOutputProcessor_;
 	}
 
 	public Writer getWriter() {
@@ -44,14 +71,49 @@ public class ObjectPropertyTaxonomyState {
 
 	public class Writer {
 
-		void setTaxonomy(final UpdateableTaxonomy<ElkObjectProperty> taxonomy) {
-			taxonomy_ = taxonomy;
+		void initTaxonomy() {
+			taxonomy_ = new ReverseObjectPropertyTaxonomy(elkFactory_,
+					ElkObjectPropertyKeyProvider.INSTANCE);
 		}
-
+		
 		void clearTaxonomy() {
 			taxonomy_ = null;
 		}
 
 	}
+
+	/**
+	 * Receives the output of the transitive reduction of sub object properties
+	 * and constructs the taxonomy from it.
+	 */
+	private final TransitiveReductionOutputVisitor<ElkObjectProperty> transitiveReductionOutputProcessor_ = new TransitiveReductionOutputVisitor<ElkObjectProperty>() {
+
+		@Override
+		public void visit(
+				final TransitiveReductionOutputEquivalentDirect<ElkObjectProperty> output) {
+			// Properties equivalent to top should not be submitted here.
+
+			final NonBottomTaxonomyNode<ElkObjectProperty> node = taxonomy_
+					.getCreateNode(output.getEquivalent());
+			taxonomy_.setCreateDirectSupernodes(node,
+					output.getDirectlyRelated());
+
+		}
+
+		@Override
+		public void visit(
+				final TransitiveReductionOutputExtreme<ElkObjectProperty> output) {
+			taxonomy_.addToBottomNode(output.getExtremeMember());
+		}
+
+		@Override
+		public void visit(
+				final TransitiveReductionOutputEquivalent<ElkObjectProperty> output) {
+			throw new IllegalArgumentException(
+					"Object property transitive reduction is not expected to emit "
+							+ output.getClass());
+		}
+
+	};
 
 }
