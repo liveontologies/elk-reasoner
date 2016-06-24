@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -204,7 +203,8 @@ public class ReverseTaxonomy<T extends ElkEntity> extends AbstractTaxonomy<T> {
 				return false;
 			}
 
-			final ReverseTaxonomy<?>.ReverseTaxonomyNode other = (ReverseTaxonomy<?>.ReverseTaxonomyNode) obj;
+			@SuppressWarnings("unchecked")
+			final ReverseTaxonomyNode other = (ReverseTaxonomyNode) obj;
 			return originalNode_ == null ? other.originalNode_ == null
 					: originalNode_.equals(other.originalNode_);
 		}
