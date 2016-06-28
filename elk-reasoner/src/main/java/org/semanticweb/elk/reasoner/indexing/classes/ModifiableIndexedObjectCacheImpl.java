@@ -1,7 +1,3 @@
-package org.semanticweb.elk.reasoner.indexing.classes;
-
-import java.util.ArrayList;
-
 /*
  * #%L
  * ELK Reasoner
@@ -23,11 +19,14 @@ import java.util.ArrayList;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.indexing.classes;
+
+import java.util.ArrayList;
 
 import java.util.Collection;
 import java.util.List;
 
-import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
+import org.semanticweb.elk.owl.predefined.PredefinedElkEntityFactory;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexClassExpression;
@@ -84,10 +83,14 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 
 	private final CachedIndexedOwlNothing owlNothing_;
 
+	private final CachedIndexedObjectProperty owlTopObjectProperty_;
+
+	private final CachedIndexedObjectProperty owlBottomObjectProperty_;
+
 	private final List<IndexedObjectCache.ChangeListener> listeners_;
 
 	public ModifiableIndexedObjectCacheImpl(
-			PredefinedElkClassFactory elkFactory, int initialSize) {
+			final PredefinedElkEntityFactory elkFactory, int initialSize) {
 		this.cachedComplexClassExpressions_ = new EntryCollection<CachedIndexedComplexClassExpression<?>>(
 				initialSize);
 		this.cachedBinaryPropertyChains_ = new EntryCollection<CachedIndexedComplexPropertyChain>(
@@ -108,13 +111,19 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 				elkFactory.getOwlThing());
 		this.owlNothing_ = new CachedIndexedOwlNothingImpl(
 				elkFactory.getOwlNothing());
+		this.owlTopObjectProperty_ = new CachedIndexedObjectPropertyImpl(
+				elkFactory.getOwlTopObjectProperty());
+		this.owlBottomObjectProperty_ = new CachedIndexedObjectPropertyImpl(
+				elkFactory.getOwlBottomObjectProperty());
 		this.listeners_ = new ArrayList<IndexedObjectCache.ChangeListener>();
 		add(owlThing_);
-		add(owlNothing_);		
+		add(owlNothing_);
+		add(owlTopObjectProperty_);
+		add(owlBottomObjectProperty_);
 	}
 
 	public ModifiableIndexedObjectCacheImpl(
-			PredefinedElkClassFactory elkFactory) {
+			final PredefinedElkEntityFactory elkFactory) {
 		this(elkFactory, 1024);
 	}
 
@@ -161,6 +170,16 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 	@Override
 	public final CachedIndexedOwlNothing getOwlNothing() {
 		return owlNothing_;
+	}
+
+	@Override
+	public CachedIndexedObjectProperty getOwlTopObjectProperty() {
+		return owlTopObjectProperty_;
+	}
+
+	@Override
+	public CachedIndexedObjectProperty getOwlBottomObjectProperty() {
+		return owlBottomObjectProperty_;
 	}
 
 	@Override

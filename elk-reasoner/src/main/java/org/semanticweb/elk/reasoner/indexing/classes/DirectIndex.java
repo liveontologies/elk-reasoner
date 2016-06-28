@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
+import org.semanticweb.elk.owl.predefined.PredefinedElkEntityFactory;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlNothing;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlThing;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
@@ -59,7 +59,7 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl
 
 	private final List<OntologyIndex.ChangeListener> listeners_;
 
-	public DirectIndex(PredefinedElkClassFactory elkFactory) {
+	public DirectIndex(final PredefinedElkEntityFactory elkFactory) {
 		super(elkFactory);
 		this.reflexiveObjectProperties_ = new HashListMultimap<IndexedObjectProperty, ElkAxiom>(
 				64);
@@ -71,6 +71,8 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl
 				.getNeutralIncrement(1);
 		getOwlThing().updateOccurrenceNumbers(this, addition);
 		getOwlNothing().updateOccurrenceNumbers(this, addition);
+		getOwlTopObjectProperty().updateOccurrenceNumbers(this, addition);
+		getOwlBottomObjectProperty().updateOccurrenceNumbers(this, addition);
 		// register listeners for occurrences
 		getOwlThing().addListener(new CachedIndexedOwlThing.ChangeListener() {
 

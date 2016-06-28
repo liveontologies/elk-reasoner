@@ -90,6 +90,18 @@ public interface IndexedObjectCache {
 	public IndexedClass getOwlNothing();
 
 	/**
+	 * @return the {@link IndexedObjectProperty} corresponding to
+	 *         {@code owl:topObjectProperty}.
+	 */
+	public IndexedObjectProperty getOwlTopObjectProperty();
+
+	/**
+	 * @return the {@link IndexedObjectProperty} corresponding to
+	 *         {@code owl:bottomObjectProperty}.
+	 */
+	public IndexedObjectProperty getOwlBottomObjectProperty();
+
+	/**
 	 * Registers a given {@link ChangeListener} with this {@link IndexedObjectCache}
 	 * 
 	 * @param listener

@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.saturation.properties;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -54,30 +53,21 @@ public class ObjectPropertyTaxonomyComputationFactory extends SimpleInterrupter
 	 */
 	private final TransitiveReductionOutputVisitor<ElkObjectProperty> outputProcessor_;
 
-	private final OntologyIndex index_;
-
-	private final ElkObjectProperty topProperty_;
-
-	private final ElkObjectProperty bottomProperty_;
+	private final IndexedObjectProperty indexedTopProperty_;
 
 	private final IndexedObjectProperty indexedBottomProperty_;
+
+	private final Collection<? extends Collection<? extends ElkObjectProperty>> defaultDirectSubproperties_;
 
 	public ObjectPropertyTaxonomyComputationFactory(
 			final TransitiveReductionOutputVisitor<ElkObjectProperty> outputProcessor,
 			final OntologyIndex index,
 			final PredefinedElkObjectPropertyFactory predefinedFactory) {
 		this.outputProcessor_ = outputProcessor;
-		this.index_ = index;
-		this.topProperty_ = predefinedFactory.getOwlTopObjectProperty();
-		this.bottomProperty_ = predefinedFactory.getOwlBottomObjectProperty();
-		// TODO: Index should provide the bottom property instead of this.
-		for (final IndexedObjectProperty prop : index.getObjectProperties()) {
-			if (prop.getElkEntity().equals(bottomProperty_)) {
-				indexedBottomProperty_ = prop;
-				return;
-			}
-		}
-		indexedBottomProperty_ = null;
+		this.indexedTopProperty_ = index.getOwlTopObjectProperty();
+		this.indexedBottomProperty_ = index.getOwlBottomObjectProperty();
+		this.defaultDirectSubproperties_ = Collections.singleton(Collections
+				.singleton(predefinedFactory.getOwlBottomObjectProperty()));
 	}
 
 	@Override
@@ -138,8 +128,8 @@ public class ObjectPropertyTaxonomyComputationFactory extends SimpleInterrupter
 		}
 		final Map<IndexedObjectProperty, Collection<? extends ElkObjectProperty>> subEquivalent = new ArrayHashMap<IndexedObjectProperty, Collection<? extends ElkObjectProperty>>();
 		final Set<IndexedObjectProperty> indirect = new ArrayHashSet<IndexedObjectProperty>();
-		for (final IndexedObjectProperty subProperty : getSubProperties(
-				property)) {
+		for (final IndexedObjectProperty subProperty : property.getSaturated()
+				.getSubProperties()) {
 
 			if (equivalent.containsKey(subProperty)) {
 				// subProperty is not strict
@@ -151,8 +141,8 @@ public class ObjectPropertyTaxonomyComputationFactory extends SimpleInterrupter
 					subProperty);
 			// should not be null, because top cannot be a strict sub-property
 			subEquivalent.put(subProperty, subEq.values());
-			for (final IndexedObjectProperty subSubProperty : getSubProperties(
-					subProperty)) {
+			for (final IndexedObjectProperty subSubProperty : subProperty
+					.getSaturated().getSubProperties()) {
 				if (!subEq.containsKey(subSubProperty)) {
 					// strict
 					indirect.add(subSubProperty);
@@ -169,8 +159,7 @@ public class ObjectPropertyTaxonomyComputationFactory extends SimpleInterrupter
 				|| !equivalent.containsKey(indexedBottomProperty_))) {
 			outputProcessor_
 					.visit(new TransitiveReductionOutputEquivalentDirectImpl<ElkObjectProperty>(
-							equivalent.values(), Collections.singleton(
-									Collections.singleton(bottomProperty_))));
+							equivalent.values(), defaultDirectSubproperties_));
 			return;
 		}
 		// else
@@ -210,45 +199,28 @@ public class ObjectPropertyTaxonomyComputationFactory extends SimpleInterrupter
 	private Map<IndexedObjectProperty, ElkObjectProperty> collectEquivalent(
 			final IndexedObjectProperty property) {
 
-		final Set<IndexedObjectProperty> subProperties = getSubProperties(
-				property);
+		final Set<IndexedObjectProperty> subProperties = property.getSaturated()
+				.getSubProperties();
 		final Map<IndexedObjectProperty, ElkObjectProperty> equivalent = new ArrayHashMap<IndexedObjectProperty, ElkObjectProperty>();
 		for (final IndexedObjectProperty subProperty : subProperties) {
-			if (subProperty.getElkEntity().equals(topProperty_)) {
+			if (subProperty.equals(indexedTopProperty_)) {
 				outputProcessor_
 						.visit(new TransitiveReductionOutputExtremeImpl<ElkObjectProperty>(
 								property.getElkEntity()));
 				return null;
 			}
-			if (getSubProperties(subProperty).contains(property)) {
+			if (subProperty.getSaturated().getSubProperties().contains(property)
+					|| property.equals(indexedBottomProperty_)) {
 				equivalent.put(subProperty, subProperty.getElkEntity());
 			}
 		}
+		if (indexedBottomProperty_.getSaturated().getSubProperties()
+				.contains(property)) {
+			equivalent.put(indexedBottomProperty_,
+					indexedBottomProperty_.getElkEntity());
+		}
 
 		return equivalent;
-	}
-
-	/**
-	 * Returns derived sub-properties of <code>property</code> including the
-	 * bottom property (if it is indexed). If <code>property</code> is the top
-	 * property, returns all properties.
-	 * 
-	 * @param property
-	 * @return derived sub-properties of <code>property</code> including the
-	 *         bottom property (if it is indexed). If <code>property</code> is
-	 *         the top property, returns all properties.
-	 */
-	private Set<IndexedObjectProperty> getSubProperties(
-			final IndexedObjectProperty property) {
-		// TODO: This should be done during property saturation!
-		final Set<IndexedObjectProperty> result = new HashSet<IndexedObjectProperty>(
-				topProperty_.equals(property.getElkEntity())
-						? index_.getObjectProperties()
-						: property.getSaturated().getSubProperties());
-		if (indexedBottomProperty_ != null) {
-			result.add(indexedBottomProperty_);
-		}
-		return result;
 	}
 
 	private static class TransitiveReductionOutputEquivalentDirectImpl<E extends ElkEntity>
