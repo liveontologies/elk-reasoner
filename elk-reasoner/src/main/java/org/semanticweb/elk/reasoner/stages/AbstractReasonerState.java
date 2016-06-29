@@ -671,6 +671,14 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		return stageManager.instanceTaxonomyComputationStage.isCompleted();
 	}
 
+	/**
+	 * @return {@code true} if the object property taxonomy has been computed
+	 */
+	public synchronized boolean doneObjectPropertyTaxonomy() {
+		return stageManager.objectPropertyTaxonomyComputationStage
+				.isCompleted();
+	}
+
 	@Override
 	public void setInterrupt(boolean flag) {
 		super.setInterrupt(flag);

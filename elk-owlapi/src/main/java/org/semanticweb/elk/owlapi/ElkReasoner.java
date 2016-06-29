@@ -672,7 +672,8 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 	public Set<InferenceType> getPrecomputableInferenceTypes() {
 		LOGGER_.trace("getPrecomputableInferenceTypes()");
 		return new HashSet<InferenceType>(Arrays.asList(
-				InferenceType.CLASS_ASSERTIONS, InferenceType.CLASS_HIERARCHY));
+				InferenceType.CLASS_ASSERTIONS, InferenceType.CLASS_HIERARCHY,
+				InferenceType.OBJECT_PROPERTY_HIERARCHY));
 	}
 
 	@Override
@@ -990,6 +991,9 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 			return reasoner_.doneTaxonomy();
 		if (inferenceType.equals(InferenceType.CLASS_ASSERTIONS))
 			return reasoner_.doneInstanceTaxonomy();
+		if (inferenceType.equals(InferenceType.OBJECT_PROPERTY_HIERARCHY)) {
+			return reasoner_.doneObjectPropertyTaxonomy();
+		}
 
 		return false;
 	}
@@ -1028,6 +1032,10 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 					reasoner_.getTaxonomy();
 				else if (inferenceType.equals(InferenceType.CLASS_ASSERTIONS))
 					reasoner_.getInstanceTaxonomy();
+				else if (inferenceType
+						.equals(InferenceType.OBJECT_PROPERTY_HIERARCHY)) {
+					reasoner_.getObjectPropertyTaxonomy();
+				}
 			}
 		} catch (ElkUnsupportedReasoningTaskException e) {
 			throw unsupportedOwlApiMethod(
