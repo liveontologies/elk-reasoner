@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.saturation.properties;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.saturation.properties;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.saturation.properties;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -31,6 +30,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.stages.PropertyHierarchyCompositionState;
 import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
 import org.semanticweb.elk.util.collections.AbstractHashMultimap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -61,9 +61,17 @@ public class PropertyHierarchyCompositionComputationFactory extends
 	 */
 	private final TracingInferenceProducer<? super ObjectPropertyInference> inferenceProducer_;
 
+	/**
+	 * The dispatcher of events over derived property hierarchy and
+	 * compositions.
+	 */
+	private final PropertyHierarchyCompositionState.Dispatcher dispatcher_;
+	
 	public PropertyHierarchyCompositionComputationFactory(
-			TracingInferenceProducer<? super ObjectPropertyInference> inferenceProducer) {
+			TracingInferenceProducer<? super ObjectPropertyInference> inferenceProducer,
+			final PropertyHierarchyCompositionState.Dispatcher dispatcher) {
 		this.inferenceProducer_ = inferenceProducer;
+		this.dispatcher_ = dispatcher;
 	}
 
 	@Override
@@ -103,7 +111,7 @@ public class PropertyHierarchyCompositionComputationFactory extends
 					element);
 			// ensure that sub-properties are computed
 			SubPropertyExplorer.getSubPropertyChains(element,
-					inferenceProducer_);
+					inferenceProducer_, dispatcher_);
 			// ensure that property ranges are computed
 			RangeExplorer.getRanges(element, inferenceProducer_);
 			// TODO: verify that global restrictions on range axioms are
@@ -119,11 +127,13 @@ public class PropertyHierarchyCompositionComputationFactory extends
 			IndexedObjectProperty left = element.getFirstProperty();
 			IndexedPropertyChain right = element.getSuffixChain();
 			Set<IndexedObjectProperty> leftSubProperties = SubPropertyExplorer
-					.getSubProperties(left, inferenceProducer_);
+					.getSubProperties(left, inferenceProducer_,
+							dispatcher_);
 			if (leftSubProperties.isEmpty())
 				return null;
 			Set<IndexedPropertyChain> rightSubProperties = SubPropertyExplorer
-					.getSubPropertyChains(right, inferenceProducer_);
+					.getSubPropertyChains(right, inferenceProducer_,
+							dispatcher_);
 
 			for (IndexedPropertyChain rightSubPropertyChain : rightSubProperties) {
 
@@ -150,7 +160,8 @@ public class PropertyHierarchyCompositionComputationFactory extends
 								.getFirstProperty();
 						redundantLeftProperties = SubPropertyExplorer
 								.getLeftSubComposableSubPropertiesByRightProperties(
-										left, inferenceProducer_).get(
+										left, inferenceProducer_,
+										dispatcher_).get(
 										rightLeftSubProperty);
 					}
 				}

@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.saturation.properties;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.saturation.properties;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.saturation.properties;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -37,6 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubProperty
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainInferenceConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainTautology;
+import org.semanticweb.elk.reasoner.stages.PropertyHierarchyCompositionState;
 import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * {@link IndexedPropertyChain}
  * 
  * @author "Yevgeny Kazakov"
- * 
+ * @author Peter Skocovsky
  */
 class SubPropertyExplorer {
 
@@ -151,7 +151,8 @@ class SubPropertyExplorer {
 
 	private static SaturatedPropertyChain computeSubProperties(
 			IndexedPropertyChain input,
-			TracingInferenceProducer<? super SubPropertyChainInference> inferenceProducer) {
+			TracingInferenceProducer<? super SubPropertyChainInference> inferenceProducer,
+			final PropertyHierarchyCompositionState.Dispatcher dispatcher) {
 		SaturatedPropertyChain saturation = input.getSaturated();
 		if (saturation.derivedSubPropertiesComputed)
 			return saturation;
@@ -171,6 +172,7 @@ class SubPropertyExplorer {
 			expandUnderSubProperties(input, saturation.derivedSubProperyChains,
 					saturation.derivedSubProperties, inferenceProducer);
 			saturation.derivedSubPropertiesComputed = true;
+			dispatcher.firePropertyBecameSaturated(input);
 		}
 		return saturation;
 	}
@@ -194,8 +196,9 @@ class SubPropertyExplorer {
 	 */
 	static Set<IndexedPropertyChain> getSubPropertyChains(
 			IndexedPropertyChain input,
-			TracingInferenceProducer<? super SubPropertyChainInference> inferenceProducer) {
-		return computeSubProperties(input, inferenceProducer)
+			TracingInferenceProducer<? super SubPropertyChainInference> inferenceProducer,
+			final PropertyHierarchyCompositionState.Dispatcher dispatcher) {
+		return computeSubProperties(input, inferenceProducer, dispatcher)
 				.getSubPropertyChains();
 	}
 
@@ -218,8 +221,9 @@ class SubPropertyExplorer {
 	 */
 	static Set<IndexedObjectProperty> getSubProperties(
 			IndexedPropertyChain input,
-			TracingInferenceProducer<? super SubPropertyChainInference> inferenceProducer) {
-		return computeSubProperties(input, inferenceProducer)
+			TracingInferenceProducer<? super SubPropertyChainInference> inferenceProducer,
+			final PropertyHierarchyCompositionState.Dispatcher dispatcher) {
+		return computeSubProperties(input, inferenceProducer, dispatcher)
 				.getSubProperties();
 	}
 
@@ -242,7 +246,8 @@ class SubPropertyExplorer {
 	 */
 	static Multimap<IndexedObjectProperty, IndexedObjectProperty> getLeftSubComposableSubPropertiesByRightProperties(
 			IndexedObjectProperty input,
-			TracingInferenceProducer<? super SubPropertyChainInference> inferenceProducer) {
+			TracingInferenceProducer<? super SubPropertyChainInference> inferenceProducer,
+			final PropertyHierarchyCompositionState.Dispatcher dispatcher) {
 		SaturatedPropertyChain saturation = input.getSaturated();
 		if (saturation.leftSubComposableSubPropertiesByRightPropertiesComputed)
 			return saturation.leftSubComposableSubPropertiesByRightProperties;
@@ -256,20 +261,22 @@ class SubPropertyExplorer {
 				return saturation.leftSubComposableSubPropertiesByRightProperties;
 			// else compute it
 			Set<IndexedObjectProperty> subProperties = getSubProperties(input,
-					inferenceProducer);
+					inferenceProducer, dispatcher);
 			for (IndexedPropertyChain subPropertyChain : getSubPropertyChains(
-					input, inferenceProducer)) {
+					input, inferenceProducer, dispatcher)) {
 				if (subPropertyChain instanceof IndexedComplexPropertyChain) {
 					IndexedComplexPropertyChain composition = (IndexedComplexPropertyChain) subPropertyChain;
 					Set<IndexedObjectProperty> leftSubProperties = getSubProperties(
-							composition.getFirstProperty(), inferenceProducer);
+							composition.getFirstProperty(), inferenceProducer,
+							dispatcher);
 					Set<IndexedObjectProperty> commonSubProperties = new LazySetIntersection<IndexedObjectProperty>(
 							subProperties, leftSubProperties);
 					if (commonSubProperties.isEmpty())
 						continue;
 					// else
 					for (IndexedObjectProperty rightSubProperty : getSubProperties(
-							composition.getSuffixChain(), inferenceProducer))
+							composition.getSuffixChain(), inferenceProducer,
+							dispatcher))
 						for (IndexedObjectProperty commonLeft : commonSubProperties)
 							saturation.leftSubComposableSubPropertiesByRightProperties
 									.add(rightSubProperty, commonLeft);

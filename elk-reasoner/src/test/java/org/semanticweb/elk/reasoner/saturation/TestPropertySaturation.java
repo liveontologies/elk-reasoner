@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation;
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.properties.PropertyHierarchyCompositionComputationFactory;
+import org.semanticweb.elk.reasoner.stages.PropertyHierarchyCompositionState;
 import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputationWithInputs;
@@ -42,6 +43,8 @@ public class TestPropertySaturation
 
 	public TestPropertySaturation(ComputationExecutor executor, int maxWorkers) {
 		super(new PropertyHierarchyCompositionComputationFactory(
-				TracingInferenceProducer.DUMMY), executor, maxWorkers);
+				TracingInferenceProducer.DUMMY,
+				PropertyHierarchyCompositionState.Dispatcher.DUMMY), executor,
+				maxWorkers);
 	}
 }

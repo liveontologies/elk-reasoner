@@ -140,6 +140,10 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 */
 	final DifferentialIndex ontologyIndex;
 	/**
+	 * Manages information about property hierarchy computation.
+	 */
+	final PropertyHierarchyCompositionState propertyHierarchyCompositionState_ = new PropertyHierarchyCompositionState();
+	/**
 	 * Stores (partial) information about consistency checking computation
 	 */
 	final ConsistencyCheckingState consistencyCheckingState;
@@ -194,7 +198,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		this.saturationState = SaturationStateFactory
 				.createSaturationState(ontologyIndex);
 		this.consistencyCheckingState = ConsistencyCheckingState
-				.create(saturationState);
+				.create(saturationState, propertyHierarchyCompositionState_);
 		this.classTaxonomyState = new ClassTaxonomyState(saturationState,
 				ontologyIndex, elkFactory);
 		this.instanceTaxonomyState = new InstanceTaxonomyState(saturationState,

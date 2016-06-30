@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.saturation.properties;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.saturation.properties;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.saturation.properties;
 
 import java.util.Collection;
 
@@ -29,6 +28,7 @@ import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.stages.PropertyHierarchyCompositionState;
 import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
@@ -45,11 +45,12 @@ public class PropertyHierarchyCompositionComputation
 
 	public PropertyHierarchyCompositionComputation(OntologyIndex ontIndex,
 			TracingInferenceProducer<? super ObjectPropertyInference> inferenceProducer,
+			final PropertyHierarchyCompositionState.Dispatcher dispatcher,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor) {
 		this(ontIndex.getPropertyChains(),
 				new PropertyHierarchyCompositionComputationFactory(
-						inferenceProducer), executor, maxWorkers,
+						inferenceProducer, dispatcher), executor, maxWorkers,
 				progressMonitor);
 	}
 

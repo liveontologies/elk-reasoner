@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.stages;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.stages;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.saturation.properties.PropertyHierarchyCompositionComputation;
@@ -56,6 +55,7 @@ public class PropertyHierarchyCompositionComputationStage extends
 
 		computation_ = new PropertyHierarchyCompositionComputation(
 				reasoner.ontologyIndex, inferenceProducer,
+				reasoner.propertyHierarchyCompositionState_.getDispatcher(),
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor());
 

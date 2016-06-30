@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.stages;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.stages;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Iterator;
 
@@ -34,9 +33,15 @@ import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain
  * {@link SaturatedPropertyChain} assigned to {@link IndexedPropertyChain}s
  * 
  * @author "Yevgeny Kazakov"
- * 
+ * @author Peter Skocovsky
  */
 class PropertyInitializationStage extends AbstractReasonerStage {
+
+	/**
+	 * The dispatcher of events over derived property hierarchy and
+	 * compositions.
+	 */
+	private final PropertyHierarchyCompositionState.Dispatcher dispatcher_;
 
 	/**
 	 * The progress counter
@@ -55,6 +60,8 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 	public PropertyInitializationStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
 		super(reasoner, preStages);
+		this.dispatcher_ = reasoner.propertyHierarchyCompositionState_
+				.getDispatcher();
 	}
 
 	@Override
@@ -81,6 +88,7 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 			IndexedPropertyChain ipc = todo_.next();
 			SaturatedPropertyChain saturation = ipc.getSaturated();
 			saturation.clear();
+			dispatcher_.firePropertyBecameNotSaturated(ipc);
 			reasoner.getProgressMonitor().report(++progress_, maxProgress_);
 		}
 	}

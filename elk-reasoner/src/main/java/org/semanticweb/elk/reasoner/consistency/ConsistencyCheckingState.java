@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.consistency;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.consistency;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.consistency;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -35,12 +34,15 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateDummyChangeListener;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.stages.PropertyHierarchyCompositionState;
 import org.semanticweb.elk.util.collections.Operations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +51,7 @@ import org.slf4j.LoggerFactory;
  * Stores information about the state of consistency checking computation
  * 
  * @author Yevgeny Kazakov
- *
+ * @author Peter Skocovsky
  */
 public class ConsistencyCheckingState {
 
@@ -73,6 +75,11 @@ public class ConsistencyCheckingState {
 	 */
 	private volatile boolean isOwlThingInconsistent_ = false;
 	/**
+	 * {@code true} if inconsistency is derived for
+	 * {@code owl:bottomObjectProperty}
+	 */
+	private volatile boolean isTopObjectPropertyInBottom_ = false;
+	/**
 	 * the set of individuals for which inconsistency is derived
 	 */
 	private final Set<IndexedIndividual> inconsistentIndividuals_ = Collections
@@ -83,7 +90,8 @@ public class ConsistencyCheckingState {
 	private final Queue<IndexedClassEntity> toDoEntities_;
 
 	private <C extends Context> ConsistencyCheckingState(
-			SaturationState<C> saturationState) {
+			SaturationState<C> saturationState,
+			final PropertyHierarchyCompositionState propertHierarchyState) {
 		this.saturationState_ = saturationState;
 		final OntologyIndex index = saturationState.getOntologyIndex();
 		toDoEntities_ = new ConcurrentLinkedQueue<IndexedClassEntity>(
@@ -162,6 +170,34 @@ public class ConsistencyCheckingState {
 					}
 
 				});
+		// listening to changes in the property hierarchy state
+		propertHierarchyState
+				.addListener(new PropertyHierarchyCompositionState.Listener() {
+
+					private final IndexedObjectProperty bottomProperty_ = index
+							.getOwlBottomObjectProperty();
+
+					private final IndexedObjectProperty topProperty_ = index
+							.getOwlTopObjectProperty();
+
+					@Override
+					public void propertyBecameSaturated(
+							final IndexedPropertyChain chain) {
+						if (bottomProperty_ == chain && chain.getSaturated()
+								.getSubProperties().contains(topProperty_)) {
+							tellTopObjectPropertyInBottom();
+						}
+					}
+
+					@Override
+					public void propertyBecameNotSaturated(
+							final IndexedPropertyChain chain) {
+						if (bottomProperty_ == chain) {
+							isTopObjectPropertyInBottom_ = false;
+						}
+					}
+
+				});
 	}
 
 	/**
@@ -170,8 +206,10 @@ public class ConsistencyCheckingState {
 	 *         {@link SaturationState}
 	 */
 	public static ConsistencyCheckingState create(
-			SaturationState<?> saturationState) {
-		return new ConsistencyCheckingState(saturationState);
+			SaturationState<?> saturationState,
+			final PropertyHierarchyCompositionState propertHierarchyState) {
+		return new ConsistencyCheckingState(saturationState,
+				propertHierarchyState);
 	}
 
 	/**
@@ -222,6 +260,16 @@ public class ConsistencyCheckingState {
 	}
 
 	/**
+	 * tells that derived sub-properties of {@code owl:bottomObjectProperty}
+	 * contain {@code owl:topObjectProperty}
+	 */
+	private void tellTopObjectPropertyInBottom() {
+		isTopObjectPropertyInBottom_ = true;
+		LOGGER_.trace(
+				"owl:topObjectProperty is a sub-property of owl:bottomObjectProperty");
+	}
+
+	/**
 	 * tells that the given {@link IndexedIndividual} is inconsistent in the
 	 * {@link SaturationState},
 	 * 
@@ -237,7 +285,8 @@ public class ConsistencyCheckingState {
 	 *         state
 	 */
 	public boolean isInconsistent() {
-		return isOwlThingInconsistent_ || !inconsistentIndividuals_.isEmpty();
+		return isOwlThingInconsistent_ || isTopObjectPropertyInBottom_
+				|| !inconsistentIndividuals_.isEmpty();
 	}
 
 	/**
@@ -245,6 +294,14 @@ public class ConsistencyCheckingState {
 	 */
 	public boolean isOwlThingInconsistent() {
 		return isOwlThingInconsistent_;
+	}
+
+	/**
+	 * @return {@code true} if inconsistency is derived from object property
+	 *         hierarchy
+	 */
+	public boolean isTopObjectPropertyInBottom() {
+		return isTopObjectPropertyInBottom_;
 	}
 
 	/**

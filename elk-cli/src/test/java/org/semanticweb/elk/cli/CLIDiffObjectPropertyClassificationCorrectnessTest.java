@@ -44,7 +44,7 @@ import org.semanticweb.elk.testing.TestInput;
 public class CLIDiffObjectPropertyClassificationCorrectnessTest
 		extends DiffObjectPropertyClassificationCorrectnessTest {
 
-	static final String[] IGNORE_LIST = { "Inconsistent.owl" };
+	static final String[] IGNORE_LIST = {};
 
 	static {
 		Arrays.sort(IGNORE_LIST);
