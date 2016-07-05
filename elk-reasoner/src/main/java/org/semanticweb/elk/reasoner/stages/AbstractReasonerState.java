@@ -312,9 +312,6 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	public synchronized void resetObjectPropertyTaxonomy() {
 		LOGGER_.trace("Reset object property taxonomy");
 		// force non-incremental taxonomy computation
-		// TODO: maybe this can be done in
-		// PropertyTaxonomyComputationStage.invalidate()
-		objectPropertyTaxonomyState.getWriter().clearTaxonomy();
 		stageManager.objectPropertyTaxonomyComputationStage
 				.invalidateRecursive();
 	}
@@ -714,10 +711,6 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		instanceTaxonomyState.getWriter().setTaxonomy(
 				new ConcurrentInstanceTaxonomy(classTaxonomyState.getTaxonomy(),
 						ElkIndividualKeyProvider.INSTANCE));
-	}
-
-	public synchronized void initObjectPropertyTaxonomy() {
-		objectPropertyTaxonomyState.getWriter().initTaxonomy();
 	}
 
 	@Deprecated

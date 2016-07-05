@@ -21,8 +21,10 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.predefined.PredefinedElkObjectPropertyFactory;
+import org.semanticweb.elk.reasoner.saturation.properties.ObjectPropertyTaxonomyComputation;
 import org.semanticweb.elk.reasoner.saturation.properties.TransitiveReductionOutputEquivalent;
 import org.semanticweb.elk.reasoner.saturation.properties.TransitiveReductionOutputEquivalentDirect;
 import org.semanticweb.elk.reasoner.saturation.properties.TransitiveReductionOutputExtreme;
@@ -42,7 +44,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 public class ObjectPropertyTaxonomyState {
 
 	private final PredefinedElkObjectPropertyFactory elkFactory_;
-	
+
 	/**
 	 * Object property taxonomy is constructed in the opposite order than class
 	 * taxonomy, i.e., from super-properties to sub-properties. In order to use
@@ -61,25 +63,13 @@ public class ObjectPropertyTaxonomyState {
 		return new ReverseTaxonomy<ElkObjectProperty>(taxonomy_);
 	}
 
-	public TransitiveReductionOutputVisitor<ElkObjectProperty> getTransitiveReductionOutputProcessor() {
-		return transitiveReductionOutputProcessor_;
+	private void initTaxonomy() {
+		taxonomy_ = new ReverseObjectPropertyTaxonomy(elkFactory_,
+				ElkObjectPropertyKeyProvider.INSTANCE);
 	}
 
-	public Writer getWriter() {
-		return new Writer();
-	}
-
-	public class Writer {
-
-		void initTaxonomy() {
-			taxonomy_ = new ReverseObjectPropertyTaxonomy(elkFactory_,
-					ElkObjectPropertyKeyProvider.INSTANCE);
-		}
-		
-		void clearTaxonomy() {
-			taxonomy_ = null;
-		}
-
+	private void clearTaxonomy() {
+		taxonomy_ = null;
 	}
 
 	/**
@@ -115,5 +105,84 @@ public class ObjectPropertyTaxonomyState {
 		}
 
 	};
+
+	/**
+	 * Creates stage that computes object property taxonomy.
+	 * 
+	 * @param reasoner
+	 *            the reasoner for which the reasoner stage is created
+	 * @param preStages
+	 *            the reasoner stages that should be executed directly before
+	 *            this stage
+	 * @return the stage that computes object property taxonomy.
+	 */
+	AbstractReasonerStage createStage(final AbstractReasonerState reasoner,
+			final AbstractReasonerStage... preStages) {
+		return new AbstractReasonerStage(reasoner, preStages) {
+
+			/**
+			 * The computation used for this stage.
+			 */
+			private ObjectPropertyTaxonomyComputation computation_ = null;
+
+			@Override
+			public String getName() {
+				return "Object Property Taxonomy Computation";
+			}
+
+			@Override
+			public boolean preExecute() {
+				if (!super.preExecute()) {
+					return false;
+				}
+
+				initTaxonomy();
+
+				computation_ = new ObjectPropertyTaxonomyComputation(
+						reasoner.ontologyIndex,
+						transitiveReductionOutputProcessor_,
+						reasoner.getElkFactory(), reasoner.getProcessExecutor(),
+						workerNo, reasoner.getProgressMonitor());
+
+				return true;
+			}
+
+			@Override
+			void executeStage() throws ElkException {
+				computation_.process();
+			}
+
+			@Override
+			public boolean postExecute() {
+				if (!super.postExecute()) {
+					return false;
+				}
+				this.computation_ = null;
+				return true;
+			}
+
+			@Override
+			boolean invalidate() {
+				final boolean invalidated = super.invalidate();
+				if (invalidated) {
+					clearTaxonomy();
+				}
+				return invalidated;
+			}
+
+			@Override
+			public void printInfo() {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void setInterrupt(final boolean flag) {
+				super.setInterrupt(flag);
+				setInterrupt(computation_, flag);
+			}
+
+		};
+	}
 
 }

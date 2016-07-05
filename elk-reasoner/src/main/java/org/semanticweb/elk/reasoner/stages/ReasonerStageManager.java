@@ -58,8 +58,9 @@ public class ReasonerStageManager {
 		this.propertyHierarchyCompositionComputationStage = new PropertyHierarchyCompositionComputationStage(
 				reasoner, propertyInitializationStage);
 
-		this.objectPropertyTaxonomyComputationStage = new ObjectPropertyTaxonomyComputationStage(
-				reasoner, propertyHierarchyCompositionComputationStage);
+		this.objectPropertyTaxonomyComputationStage = reasoner.objectPropertyTaxonomyState
+				.createStage(reasoner,
+						propertyHierarchyCompositionComputationStage);
 
 		this.contextInitializationStage = new ContextAssignmentResetStage(
 				reasoner, axiomLoadingStage,
