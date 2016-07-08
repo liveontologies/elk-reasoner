@@ -571,38 +571,6 @@ public class Reasoner extends AbstractReasonerState {
 	}
 
 	/**
-	 * Check if the given {@link ElkClassExpression} is satisfiable, that is, if
-	 * it can possibly have instances. {@link ElkClassExpression}s are not
-	 * satisfiable if they are equivalent to {@code owl:Nothing}. A satisfiable
-	 * {@link ElkClassExpression} is also called consistent or coherent. Calling
-	 * of this method may trigger the computation of the taxonomy, if it has not
-	 * been done yet.
-	 * 
-	 * @param classExpression
-	 *            the {@link ElkClassExpression} for which to check
-	 *            satisfiability
-	 * @return {@code true} if the given input is satisfiable
-	 * @throws ElkException
-	 *             if the result cannot be computed
-	 */
-	public synchronized boolean isSatisfiable(ElkClassExpression classExpression)
-			throws ElkException {
-
-		Node<ElkClass> queryNode;
-		if (classExpression instanceof ElkClass) {
-			queryNode = getClassNode(classExpression);
-		} else {
-			ElkClass queryClass = getElkFactory().getClass(new ElkFullIri(
-					OwlFunctionalStylePrinter.toString(classExpression)));
-			ElkAxiom materializedQuery = getElkFactory().getSubClassOfAxiom(
-					queryClass, classExpression);
-			queryNode = getQueryNode(queryClass, materializedQuery);
-		}
-
-		return !queryNode.contains(getElkFactory().getOwlNothing());
-	}
-
-	/**
 	 * @param materializedQuery
 	 *            An {@link ElkAxiom} introduced for the query
 	 * @param addition

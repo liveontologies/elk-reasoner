@@ -156,6 +156,10 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 */
 	final ObjectPropertyTaxonomyState objectPropertyTaxonomyState;
 	/**
+	 * Stores information about queried class expressions.
+	 */
+	final ClassExpressionQueryState classExpressionQueryState_;
+	/**
 	 * Defines reasoning stages and dependencies between them
 	 */
 	final ReasonerStageManager stageManager;
@@ -212,6 +216,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		this.subPropertyConverter_ = new ElkAxiomConverterImpl(elkFactory,
 				ontologyIndex);
 		this.traceState_ = new TraceState(elkFactory, ontologyIndex);
+		this.classExpressionQueryState_ = new ClassExpressionQueryState(
+				saturationState, elkFactory, ontologyIndex, factory_);
 	}
 
 	protected AbstractReasonerState(ElkObject.Factory elkFactory,
@@ -612,6 +618,41 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		}
 
 		return result;
+	}
+
+	/**
+	 * Check if the given {@link ElkClassExpression} is satisfiable, that is, if
+	 * it can possibly have instances. {@link ElkClassExpression}s are not
+	 * satisfiable if they are equivalent to {@code owl:Nothing}. A satisfiable
+	 * {@link ElkClassExpression} is also called consistent or coherent.
+	 * 
+	 * @param classExpression
+	 *            the {@link ElkClassExpression} for which to check
+	 *            satisfiability
+	 * @return {@code true} if the given input is satisfiable
+	 * @throws ElkException
+	 *             if the result cannot be computed
+	 */
+	public synchronized boolean isSatisfiable(
+			final ElkClassExpression classExpression) throws ElkException {
+
+		classExpressionQueryState_.addQuery(classExpression);
+
+		Boolean result = classExpressionQueryState_
+				.isSatisfiable(classExpression);
+		if (result != null) {
+			return result.booleanValue();
+		}
+
+		stageManager.incrementalCompletionStage.invalidateRecursive();
+		complete(stageManager.classExpressionQueryStage);
+
+		result = classExpressionQueryState_.isSatisfiable(classExpression);
+		if (result == null) {
+			throw new IllegalStateException(
+					"Query was not computed! " + classExpression);
+		}
+		return result.booleanValue();
 	}
 
 	/**
