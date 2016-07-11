@@ -22,6 +22,9 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -42,15 +45,15 @@ import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.stages.AbstractReasonerState;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
-import org.semanticweb.elk.reasoner.taxonomy.AnonymousNode;
-import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.FreshInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.FreshTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.FreshTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -382,15 +385,8 @@ public class Reasoner extends AbstractReasonerState {
 			return getTaxonomyNode((ElkClass) classExpression);
 		}
 		// else
-		ElkClass queryClass = getElkFactory().getClass(new ElkFullIri(
-				OwlFunctionalStylePrinter.toString(classExpression)));
-		ElkAxiom materializedQuery = getElkFactory().getEquivalentClassesAxiom(
-				queryClass, classExpression);
-		Node<ElkClass> queryNode = getQueryTaxonomyNode(queryClass,
-				materializedQuery);
-
-		return new AnonymousNode<ElkClass>(queryClass, queryNode,
-				queryNode.size(), ElkClassKeyProvider.INSTANCE);
+		
+		return queryEquivalentClasses(classExpression);
 	}
 
 	/**
@@ -442,11 +438,46 @@ public class Reasoner extends AbstractReasonerState {
 	public synchronized Set<? extends Node<ElkClass>> getSuperClasses(
 			ElkClassExpression classExpression, boolean direct)
 			throws ElkException {
+		if (classExpression instanceof ElkClass) {
+			final TaxonomyNode<ElkClass> queryNode = getTaxonomyNode(
+					(ElkClass) classExpression);
+			return direct ? queryNode.getDirectSuperNodes()
+					: queryNode.getAllSuperNodes();
+		} else {
 
-		TaxonomyNode<ElkClass> queryNode = getClassNode(classExpression);
+			final Set<? extends Node<ElkClass>> superNodes = queryDirectSuperClasses(
+					classExpression);
+			if (direct) {
+				return superNodes;
+			}
+			// else all nodes
 
-		return (direct) ? queryNode.getDirectSuperNodes() : queryNode
-				.getAllSuperNodes();
+			// TODO: what if ontology is inconsistent !?!?
+			final Taxonomy<ElkClass> taxonomy = getTaxonomy();
+
+			final Set<TaxonomyNode<ElkClass>> result = new ArrayHashSet<TaxonomyNode<ElkClass>>();
+			final Queue<TaxonomyNode<ElkClass>> todo = new LinkedList<TaxonomyNode<ElkClass>>();
+			for (final Node<ElkClass> superNode : superNodes) {
+				final TaxonomyNode<ElkClass> taxonomyNode = taxonomy
+						.getNode(superNode.getCanonicalMember());
+				result.add(taxonomyNode);
+				todo.add(taxonomyNode);
+			}
+
+			while (!todo.isEmpty()) {
+				final TaxonomyNode<ElkClass> next = todo.poll();
+
+				for (final TaxonomyNode<ElkClass> succNode : next
+						.getDirectSuperNodes()) {
+					if (result.add(succNode)) {
+						todo.add(succNode);
+					}
+				}
+			}
+
+			return Collections.unmodifiableSet(result);
+		}
+
 	}
 
 	/**

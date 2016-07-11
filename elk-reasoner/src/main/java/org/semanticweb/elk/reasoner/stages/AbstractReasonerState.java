@@ -74,6 +74,7 @@ import org.semanticweb.elk.reasoner.taxonomy.OrphanTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.SingletoneInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.SingletoneTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 import org.semanticweb.elk.reasoner.tracing.TraceState;
@@ -636,23 +637,93 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	public synchronized boolean isSatisfiable(
 			final ElkClassExpression classExpression) throws ElkException {
 
-		classExpressionQueryState_.addQuery(classExpression);
-
-		Boolean result = classExpressionQueryState_
-				.isSatisfiable(classExpression);
-		if (result != null) {
-			return result.booleanValue();
+		final boolean oldIsAllowIncrementalMode = isAllowIncrementalMode();
+		setAllowIncrementalMode(true);
+		if (!trySetIncrementalMode()) {
+			throw new IllegalStateException(
+					"Switching to incremental mode failed!");
 		}
 
-		stageManager.incrementalCompletionStage.invalidateRecursive();
-		complete(stageManager.classExpressionQueryStage);
+		try {
 
-		result = classExpressionQueryState_.isSatisfiable(classExpression);
+			classExpressionQueryState_.addQuery(classExpression);
+
+			Boolean result = classExpressionQueryState_
+					.isSatisfiable(classExpression);
+			if (result != null) {
+				return result.booleanValue();
+			}
+
+			stageManager.incrementalCompletionStage.invalidateRecursive();
+			complete(stageManager.classExpressionQueryStage);
+
+			result = classExpressionQueryState_.isSatisfiable(classExpression);
+			if (result == null) {
+				throw new IllegalStateException(
+						"Query was not computed! " + classExpression);
+			}
+			return result.booleanValue();
+
+		} finally {
+			setAllowIncrementalMode(oldIsAllowIncrementalMode);
+		}
+	}
+
+	/**
+	 * Computes all atomic classes that are equivalent to the supplied (possibly
+	 * complex) class expression. The query state is updated accordingly.
+	 * 
+	 * @param classExpression
+	 *            The queried class expression.
+	 * @return all atomic classes that are equivalent to the supplied class
+	 *         expression.
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
+	 */
+	protected Node<ElkClass> queryEquivalentClasses(
+			final ElkClassExpression classExpression) throws ElkException {
+
+		if (!isSatisfiable(classExpression)) {
+			return getTaxonomy().getBottomNode();
+		}
+		// else
+
+		final Node<ElkClass> result = classExpressionQueryState_
+				.getEquivalentClasses(classExpression);
 		if (result == null) {
 			throw new IllegalStateException(
 					"Query was not computed! " + classExpression);
 		}
-		return result.booleanValue();
+
+		return result;
+	}
+
+	/**
+	 * Computes all atomic direct super-classes of the supplied (possibly
+	 * complex) class expression. The query state is updated accordingly.
+	 * 
+	 * @param classExpression
+	 *            The queried class expression.
+	 * @return all atomic direct super-classes of the supplied class expression.
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
+	 */
+	protected Set<? extends Node<ElkClass>> queryDirectSuperClasses(
+			final ElkClassExpression classExpression) throws ElkException {
+
+		if (!isSatisfiable(classExpression)) {
+			return getTaxonomy().getBottomNode().getAllSuperNodes();
+		}
+		// else
+
+		final Set<? extends Node<ElkClass>> result = classExpressionQueryState_
+				.getDirectSuperClasses(classExpression);
+		if (result == null) {
+			throw new IllegalStateException(
+					"Query was not computed! " + classExpression);
+		}
+
+		return result;
 	}
 
 	/**
