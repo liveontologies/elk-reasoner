@@ -71,7 +71,6 @@ public class ComplexClassQueryTest {
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
 		loader.add(objectFactory.getSubClassOfAxiom(A,
 				objectFactory.getOwlNothing()));
-		reasoner.isInconsistent();
 		ElkObjectProperty R = objectFactory.getObjectProperty(new ElkFullIri(
 				":R"));
 		assertFalse(reasoner.isSatisfiable(objectFactory
@@ -89,7 +88,6 @@ public class ComplexClassQueryTest {
 		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
 		loader.add(objectFactory.getSubClassOfAxiom(A, B));
-		reasoner.getTaxonomy();
 		ElkObjectProperty R = objectFactory.getObjectProperty(new ElkFullIri(
 				":R"));
 		assertFalse(reasoner.isSatisfiable(objectFactory
@@ -115,7 +113,6 @@ public class ComplexClassQueryTest {
 		ElkClass C = objectFactory.getClass(new ElkFullIri(":C"));
 		loader.add(objectFactory.getSubClassOfAxiom(A, B)).add(
 				(objectFactory.getSubClassOfAxiom(B, C)));
-		reasoner.getTaxonomy();
 
 		Set<? extends Node<ElkClass>> superClasses = reasoner.getSuperClasses(
 				objectFactory.getObjectIntersectionOf(B, C), true);

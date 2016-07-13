@@ -646,7 +646,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 
 		try {
 
-			classExpressionQueryState_.addQuery(classExpression);
+			classExpressionQueryState_.loadQuery(classExpression);
 
 			Boolean result = classExpressionQueryState_
 					.isSatisfiable(classExpression);
@@ -677,11 +677,18 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 *            The queried class expression.
 	 * @return all atomic classes that are equivalent to the supplied class
 	 *         expression.
+	 * @throws ElkInconsistentOntologyException
+	 *             if the ontology is inconsistent
 	 * @throws ElkException
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	protected Node<ElkClass> queryEquivalentClasses(
-			final ElkClassExpression classExpression) throws ElkException {
+			final ElkClassExpression classExpression)
+					throws ElkInconsistentOntologyException, ElkException {
+
+		if (isInconsistent()) {
+			throw new ElkInconsistentOntologyException();
+		}
 
 		if (!isSatisfiable(classExpression)) {
 			return getTaxonomy().getBottomNode();
@@ -705,19 +712,63 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 * @param classExpression
 	 *            The queried class expression.
 	 * @return all atomic direct super-classes of the supplied class expression.
+	 * @throws ElkInconsistentOntologyException
+	 *             if the ontology is inconsistent
 	 * @throws ElkException
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	protected Set<? extends Node<ElkClass>> queryDirectSuperClasses(
-			final ElkClassExpression classExpression) throws ElkException {
+			final ElkClassExpression classExpression)
+					throws ElkInconsistentOntologyException, ElkException {
+
+		if (isInconsistent()) {
+			throw new ElkInconsistentOntologyException();
+		}
 
 		if (!isSatisfiable(classExpression)) {
-			return getTaxonomy().getBottomNode().getAllSuperNodes();
+			return getTaxonomy().getBottomNode().getDirectSuperNodes();
 		}
 		// else
 
 		final Set<? extends Node<ElkClass>> result = classExpressionQueryState_
 				.getDirectSuperClasses(classExpression);
+		if (result == null) {
+			throw new IllegalStateException(
+					"Query was not computed! " + classExpression);
+		}
+
+		return result;
+	}
+
+	/**
+	 * Computes all atomic direct sub-classes of the supplied (possibly complex)
+	 * class expression. The query state is updated accordingly.
+	 * 
+	 * @param classExpression
+	 *            The queried class expression.
+	 * @return all atomic direct sub-classes of the supplied class expression.
+	 * @throws ElkInconsistentOntologyException
+	 *             if the ontology is inconsistent
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
+	 */
+	protected Set<? extends Node<ElkClass>> queryDirectSubClasses(
+			final ElkClassExpression classExpression)
+					throws ElkInconsistentOntologyException, ElkException {
+
+		if (isInconsistent()) {
+			throw new ElkInconsistentOntologyException();
+		}
+
+		final Taxonomy<ElkClass> taxonomy = getTaxonomy();
+
+		if (!isSatisfiable(classExpression)) {
+			return taxonomy.getBottomNode().getAllSubNodes();
+		}
+		// else
+
+		final Set<? extends Node<ElkClass>> result = classExpressionQueryState_
+				.getDirectSubClasses(classExpression, taxonomy);
 		if (result == null) {
 			throw new IllegalStateException(
 					"Query was not computed! " + classExpression);

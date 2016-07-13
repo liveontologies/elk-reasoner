@@ -321,33 +321,6 @@ public class Reasoner extends AbstractReasonerState {
 	}
 
 	/**
-	 * Return the {@link TaxonomyNode} for the given {@link ElkClassExpression}.
-	 * Calling of this method may trigger the computation of the taxonomy, if it
-	 * has not been done yet. If the input is an {@link ElkClass} that does not
-	 * occur in the ontology and fresh entities are not allowed, a
-	 * {@link ElkFreshEntitiesException} will be thrown.
-	 * 
-	 * @param classExpression
-	 *            the {@link ElkClassExpression} for which to return the
-	 *            {@link Node}
-	 * @return the {@link TaxonomyNode} for the given {@link ElkClassExpression}
-	 * @throws ElkException
-	 *             if the result cannot be computed
-	 */
-	public synchronized TaxonomyNode<ElkClass> getClassNode(
-			ElkClassExpression classExpression) throws ElkException {
-		if (classExpression instanceof ElkClass) {
-			return getTaxonomyNode((ElkClass) classExpression);
-		}
-		// else
-		ElkClass queryClass = getElkFactory().getClass(new ElkFullIri(
-				OwlFunctionalStylePrinter.toString(classExpression)));
-		ElkAxiom materializedQuery = getElkFactory().getEquivalentClassesAxiom(
-				queryClass, classExpression);
-		return getQueryTaxonomyNode(queryClass, materializedQuery);
-	}
-
-	/**
 	 * Return the {@link TaxonomyNode} for the given {@link ElkObjectProperty}.
 	 * Calling of this method may trigger the computation of the taxonomy, if it
 	 * has not been done yet. If the input is an {@link ElkObjectProperty} that
@@ -410,11 +383,45 @@ public class Reasoner extends AbstractReasonerState {
 	public synchronized Set<? extends Node<ElkClass>> getSubClasses(
 			ElkClassExpression classExpression, boolean direct)
 			throws ElkException {
+		if (classExpression instanceof ElkClass) {
+			final TaxonomyNode<ElkClass> queryNode = getTaxonomyNode(
+					(ElkClass) classExpression);
+			return direct ? queryNode.getDirectSubNodes()
+					: queryNode.getAllSubNodes();
+		} else {
 
-		TaxonomyNode<ElkClass> queryNode = getClassNode(classExpression);
+			final Set<? extends Node<ElkClass>> subNodes = queryDirectSubClasses(
+					classExpression);
+			if (direct) {
+				return subNodes;
+			}
+			// else all nodes
 
-		return (direct) ? queryNode.getDirectSubNodes() : queryNode
-				.getAllSubNodes();
+			final Taxonomy<ElkClass> taxonomy = getTaxonomy();
+
+			final Set<TaxonomyNode<ElkClass>> result = new ArrayHashSet<TaxonomyNode<ElkClass>>();
+			final Queue<TaxonomyNode<ElkClass>> todo = new LinkedList<TaxonomyNode<ElkClass>>();
+			for (final Node<ElkClass> subNode : subNodes) {
+				final TaxonomyNode<ElkClass> taxonomyNode = taxonomy
+						.getNode(subNode.getCanonicalMember());
+				result.add(taxonomyNode);
+				todo.add(taxonomyNode);
+			}
+
+			while (!todo.isEmpty()) {
+				final TaxonomyNode<ElkClass> next = todo.poll();
+
+				for (final TaxonomyNode<ElkClass> succNode : next
+						.getDirectSubNodes()) {
+					if (result.add(succNode)) {
+						todo.add(succNode);
+					}
+				}
+			}
+
+			return Collections.unmodifiableSet(result);
+		}
+
 	}
 
 	/**
@@ -452,7 +459,6 @@ public class Reasoner extends AbstractReasonerState {
 			}
 			// else all nodes
 
-			// TODO: what if ontology is inconsistent !?!?
 			final Taxonomy<ElkClass> taxonomy = getTaxonomy();
 
 			final Set<TaxonomyNode<ElkClass>> result = new ArrayHashSet<TaxonomyNode<ElkClass>>();
@@ -639,34 +645,6 @@ public class Reasoner extends AbstractReasonerState {
 	}
 
 	/**
-	 * Computes a {@link Node} for the given {@link ElkClass} in the taxonomy
-	 * resulted from adding the given {@link ElkAxiom}
-	 * 
-	 * @param queryClass
-	 *            the {@link ElkClass} for which to return the node
-	 * @param materializedQuery
-	 *            the {@link ElkAxiom} that should be added to the ontology
-	 *            before computing the {@link Node}
-	 * @return the {@link Node} for the given {@link ElkClass} in the taxonomy
-	 *         resulted from adding the given {@link ElkAxiom}
-	 * @throws ElkException
-	 *             if the result cannot be computed
-	 */
-	Node<ElkClass> getQueryNode(ElkClass queryClass,
-			final ElkAxiom materializedQuery) throws ElkException {
-
-		boolean oldIsAllowIncrementalMode = isAllowIncrementalMode();
-		setAllowIncrementalMode(true);
-		registerAxiomLoader(getQueryLoader(materializedQuery, true));
-		try {
-			return getClassNode(queryClass);
-		} finally {
-			registerAxiomLoader(getQueryLoader(materializedQuery, false));
-			setAllowIncrementalMode(oldIsAllowIncrementalMode);
-		}
-	}
-
-	/**
 	 * Compute a {@link TypeNode} for the given {@link ElkClass} in the taxonomy
 	 * resulted from adding the given {@link ElkAxiom}
 	 * 
@@ -689,34 +667,6 @@ public class Reasoner extends AbstractReasonerState {
 		registerAxiomLoader(getQueryLoader(materializedQuery, true));
 		try {
 			return getTypeNode(queryClass);
-		} finally {
-			registerAxiomLoader(getQueryLoader(materializedQuery, false));
-			setAllowIncrementalMode(oldIsAllowIncrementalMode);
-		}
-	}
-
-	/**
-	 * Compute a {@link TaxonomyNode} for the given {@link ElkClass} in the
-	 * taxonomy resulted from adding the given {@link ElkAxiom}
-	 * 
-	 * @param queryClass
-	 *            the {@link ElkClass} for which to return the node
-	 * @param materializedQuery
-	 *            the {@link ElkAxiom} that should be added to the ontology
-	 *            before computing the {@link TaxonomyNode}
-	 * @return the {@link TaxonomyNode} for the given {@link ElkClass} in the
-	 *         taxonomy resulted from adding the given {@link ElkAxiom}
-	 * @throws ElkException
-	 *             if the result cannot be computed
-	 */
-	TaxonomyNode<ElkClass> getQueryTaxonomyNode(ElkClass queryClass,
-			final ElkAxiom materializedQuery) throws ElkException {
-
-		boolean oldIsAllowIncrementalMode = isAllowIncrementalMode();
-		setAllowIncrementalMode(true);
-		registerAxiomLoader(getQueryLoader(materializedQuery, true));
-		try {
-			return getTaxonomyNode(queryClass);
 		} finally {
 			registerAxiomLoader(getQueryLoader(materializedQuery, false));
 			setAllowIncrementalMode(oldIsAllowIncrementalMode);

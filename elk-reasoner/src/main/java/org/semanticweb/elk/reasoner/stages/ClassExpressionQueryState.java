@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +40,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
+import org.semanticweb.elk.reasoner.query.QueryNode;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputEquivalent;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputEquivalentDirect;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputUnsatisfiable;
@@ -47,9 +49,11 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateDummyChangeListener;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.taxonomy.AnonymousTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 /**
  * Keeps track of class expressions that were queried for satisfiability,
@@ -85,11 +89,13 @@ public class ClassExpressionQueryState {
 	 * Maps indexed class expressions that were queried, added to the index,
 	 * saturated and are satisfiable to the nodes with their equivalent classes.
 	 */
-	private final Map<IndexedClassExpression, AnonymousTaxonomyNode<ElkClass>> satisfiable_ = new ConcurrentHashMap<IndexedClassExpression, AnonymousTaxonomyNode<ElkClass>>();
+	private final Map<IndexedClassExpression, QueryNode<ElkClass>> satisfiable_ = new ConcurrentHashMap<IndexedClassExpression, QueryNode<ElkClass>>();
 
 	private final SaturationState<? extends Context> saturationState_;
 
-	private final ElkPolarityExpressionConverter expressionConverter_;
+	private final ElkPolarityExpressionConverter updatingExpressionConverter_;
+
+	private final ElkPolarityExpressionConverter resolvingExpressionConverter_;
 
 	private final ClassInconsistency.Factory conclusionFactory_;
 
@@ -99,11 +105,13 @@ public class ClassExpressionQueryState {
 			final ModifiableOntologyIndex ontologyIndex,
 			final ClassInconsistency.Factory conclusionFactory) {
 		this.saturationState_ = saturationState;
-		this.expressionConverter_ = new ElkPolarityExpressionConverterImpl(
+		this.updatingExpressionConverter_ = new ElkPolarityExpressionConverterImpl(
 				elkFactory,
 				new UpdatingModifiableIndexedObjectFactory(
 						new BaseModifiableIndexedObjectFactory(), ontologyIndex,
 						OccurrenceIncrement.getDualIncrement(1)));
+		this.resolvingExpressionConverter_ = new ElkPolarityExpressionConverterImpl(
+				elkFactory, ontologyIndex);
 		this.conclusionFactory_ = conclusionFactory;
 		saturationState
 				.addListener(new SaturationStateDummyChangeListener<C>() {
@@ -142,7 +150,7 @@ public class ClassExpressionQueryState {
 	 * 
 	 * @param classExpression
 	 */
-	void addQuery(final ElkClassExpression classExpression) {
+	void loadQuery(final ElkClassExpression classExpression) {
 		/* @formatter:off
 		 * 
 		 * If it was already queried, do nothing. Otherwise:
@@ -157,7 +165,7 @@ public class ClassExpressionQueryState {
 			if (queried_.containsKey(classExpression)) {
 				return;
 			}
-			ice = classExpression.accept(expressionConverter_);
+			ice = classExpression.accept(updatingExpressionConverter_);
 			queried_.put(classExpression, ice);
 		}
 
@@ -192,19 +200,16 @@ public class ClassExpressionQueryState {
 			final Collection<? extends List<ElkClass>> directSubsumers = output
 					.getDirectSubsumers();
 
-			final AnonymousTaxonomyNode<ElkClass> node = new AnonymousTaxonomyNode<ElkClass>(
-					equivalent, equivalent.size(),
-					ElkClassKeyProvider.INSTANCE);
+			final QueryNode<ElkClass> node = new QueryNode<ElkClass>(equivalent,
+					equivalent.size(), ElkClassKeyProvider.INSTANCE);
 
 			for (final List<ElkClass> directSubs : directSubsumers) {
 				// direct subsumers should not be empty
-				final AnonymousTaxonomyNode<ElkClass> directSuperNode = new AnonymousTaxonomyNode<ElkClass>(
+				final QueryNode<ElkClass> directSuperNode = new QueryNode<ElkClass>(
 						directSubs, directSubs.size(),
 						ElkClassKeyProvider.INSTANCE);
 				node.addDirectSuperNode(directSuperNode);
 			}
-
-			// TODO: subnodes !!!
 
 			satisfiable_.put(ice, node);
 		}
@@ -253,8 +258,8 @@ public class ClassExpressionQueryState {
 	/**
 	 * Checks whether the supplied class expression is satisfiable, if the
 	 * result was already computed. If the class expression was not registered
-	 * by {@link #addQuery(ElkClassExpression)} or the appropriate stage was not
-	 * completed yet, returns <code>null</code>.
+	 * by {@link #loadQuery(ElkClassExpression)} or the appropriate stage was
+	 * not completed yet, returns <code>null</code>.
 	 * 
 	 * @param classExpression
 	 * @return <code>null</code> if the result is not ready, otherwise whether
@@ -275,7 +280,7 @@ public class ClassExpressionQueryState {
 	 * Returns {@link Node} containing all {@link ElkClass}es equivalent to the
 	 * supplied class expression, if the result was already computed. If the
 	 * class expression was not registered by
-	 * {@link #addQuery(ElkClassExpression)} or the appropriate stage was not
+	 * {@link #loadQuery(ElkClassExpression)} or the appropriate stage was not
 	 * completed yet, returns <code>null</code>.
 	 * 
 	 * @param classExpression
@@ -298,8 +303,8 @@ public class ClassExpressionQueryState {
 	 * Returns set of {@link Node}s containing all {@link ElkClass}es that are
 	 * direct strict super-classes of the supplied class expression, if the
 	 * result was already computed. If the class expression was not registered
-	 * by {@link #addQuery(ElkClassExpression)} or the appropriate stage was not
-	 * completed yet, returns <code>null</code>.
+	 * by {@link #loadQuery(ElkClassExpression)} or the appropriate stage was
+	 * not completed yet, returns <code>null</code>.
 	 * 
 	 * @param classExpression
 	 * @return <code>null</code> if the result is not ready, otherwise atomic
@@ -311,11 +316,68 @@ public class ClassExpressionQueryState {
 		final IndexedClassExpression ice = queried_.get(classExpression);
 
 		if (ice != null && saturated_.contains(ice)) {
-			final AnonymousTaxonomyNode<ElkClass> node = satisfiable_.get(ice);
+			final QueryNode<ElkClass> node = satisfiable_.get(ice);
 			return node.getDirectSuperNodes();
 		}
 
 		return null;
+	}
+
+	/**
+	 * Returns set of {@link Node}s containing all {@link ElkClass}es that are
+	 * direct strict sub-classes of the supplied class expression, if the result
+	 * was already computed. If the class expression was not registered by
+	 * {@link #loadQuery(ElkClassExpression)} or the appropriate stage was not
+	 * completed yet, returns <code>null</code>.
+	 * 
+	 * @param classExpression
+	 * @param taxonomy
+	 * @return <code>null</code> if the result is not ready, otherwise atomic
+	 *         direct strict sub-classes of the supplied class expression.
+	 */
+	Set<? extends Node<ElkClass>> getDirectSubClasses(
+			final ElkClassExpression classExpression,
+			final Taxonomy<ElkClass> taxonomy) {
+
+		final IndexedClassExpression ice = queried_.get(classExpression);
+
+		if (ice == null || !saturated_.contains(ice)) {
+			return null;
+		}
+		// else
+
+		final QueryNode<ElkClass> node = satisfiable_.get(ice);
+
+		final Iterator<ElkClass> iter = node.iterator();
+		if (iter.hasNext()) {
+			final ElkClass cls = iter.next();
+			return taxonomy.getNode(cls).getDirectSubNodes();
+		}
+		/*
+		 * Else, if classExpression is not equivalent to any atomic class,
+		 * direct sub-classes of classExpression are direct sub-classes of
+		 * direct super-classes of classExpression that are sub-classes of
+		 * classExpression.
+		 */
+
+		final Set<TaxonomyNode<ElkClass>> result = new ArrayHashSet<TaxonomyNode<ElkClass>>();
+
+		for (final Node<ElkClass> superNode : node.getDirectSuperNodes()) {
+			final Set<? extends TaxonomyNode<ElkClass>> subNodes = taxonomy
+					.getNode(superNode.getCanonicalMember())
+					.getDirectSubNodes();
+			for (final TaxonomyNode<ElkClass> subNode : subNodes) {
+				final IndexedClassExpression canonical = subNode
+						.getCanonicalMember()
+						.accept(resolvingExpressionConverter_);
+				if (saturationState_.getContext(canonical)
+						.getComposedSubsumers().contains(ice)) {
+					result.add(subNode);
+				}
+			}
+		}
+
+		return Collections.unmodifiableSet(result);
 	}
 
 }
