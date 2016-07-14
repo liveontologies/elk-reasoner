@@ -637,36 +637,28 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	public synchronized boolean isSatisfiable(
 			final ElkClassExpression classExpression) throws ElkException {
 
-		final boolean oldIsAllowIncrementalMode = isAllowIncrementalMode();
-		setAllowIncrementalMode(true);
-		if (!trySetIncrementalMode()) {
-			throw new IllegalStateException(
-					"Switching to incremental mode failed!");
-		}
+		classExpressionQueryState_.loadQuery(classExpression);
 
-		try {
-
-			classExpressionQueryState_.loadQuery(classExpression);
-
-			Boolean result = classExpressionQueryState_
-					.isSatisfiable(classExpression);
-			if (result != null) {
-				return result.booleanValue();
-			}
-
-			stageManager.incrementalCompletionStage.invalidateRecursive();
-			complete(stageManager.classExpressionQueryStage);
-
-			result = classExpressionQueryState_.isSatisfiable(classExpression);
-			if (result == null) {
-				throw new IllegalStateException(
-						"Query was not computed! " + classExpression);
-			}
+		Boolean result = classExpressionQueryState_
+				.isSatisfiable(classExpression);
+		if (result != null) {
 			return result.booleanValue();
-
-		} finally {
-			setAllowIncrementalMode(oldIsAllowIncrementalMode);
 		}
+
+		if (isIncrementalMode()) {
+			stageManager.incrementalCompletionStage.invalidateRecursive();
+			complete(stageManager.incrementalClassExpressionQueryStage);
+		} else {
+			stageManager.classExpressionQueryStage.invalidateRecursive();
+			complete(stageManager.classExpressionQueryStage);
+		}
+
+		result = classExpressionQueryState_.isSatisfiable(classExpression);
+		if (result == null) {
+			throw new IllegalStateException(
+					"Query was not computed! " + classExpression);
+		}
+		return result.booleanValue();
 	}
 
 	/**
