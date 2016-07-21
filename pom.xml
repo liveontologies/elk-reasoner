@@ -19,10 +19,8 @@
 		<module>elk-util-parent</module>
 		<module>elk-reasoner</module>
 		<module>elk-proofs</module>
-		<module>owlapi-proofs</module>
 		<module>elk-owlapi</module>
 		<module>elk-protege</module>
-		<module>elk-explanations</module>
 		<module>elk-cli</module>
 		<module>elk-standalone</module>
 		<module>elk-distribution</module>
@@ -230,6 +228,13 @@
 		<currentYear>2016</currentYear>
 	</properties>
 
+	<repositories>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</repository>
+	</repositories>
+
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -246,7 +251,7 @@
 					<artifactId>maven-jar-plugin</artifactId>
 					<version>2.4</version>
 				</plugin>
-				<plugin>				
+				<plugin>
 					<artifactId>maven-assembly-plugin</artifactId>
 					<version>2.6</version>
 				</plugin>
@@ -439,26 +444,6 @@
 					<target>${java.required.version}</target>
 				</configuration>
 			</plugin>
-			<!-- plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-toolchains-plugin</artifactId>
-				<version>1.1</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>toolchain</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<toolchains>
-						<jdk>
-							<version>1.6</version>
-							<vendor>sun</vendor>
-						</jdk>
-					</toolchains>
-				</configuration>
-			</plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>

@@ -1,5 +1,7 @@
 package org.semanticweb.elk.owl.inferences;
 
+import java.util.Collection;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -26,6 +28,6 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 
 public interface ElkInferenceSet {
 
-	Iterable<? extends ElkInference> get(ElkAxiom conclusion);
+	Collection<? extends ElkInference> get(ElkAxiom conclusion);
 
 }

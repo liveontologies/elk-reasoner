@@ -31,8 +31,8 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
  *
  * pavel.klinov@uni-ulm.de
  */
-public interface ProofTestVisitor<E extends Exception> {
+public interface ProofTestVisitor {
 
-	public void visit(OWLClassExpression subsumee, OWLClassExpression subsumer) throws E;
+	public void visit(OWLClassExpression subsumee, OWLClassExpression subsumer);
 	
 }

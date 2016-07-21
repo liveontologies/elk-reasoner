@@ -65,6 +65,10 @@ public class OWLAPITestUtils {
 	public static ElkReasoner createReasoner(OWLOntology ontology) {
 		return new ElkReasoner(ontology, false, new RestartingStageExecutor());
 	}
+	
+	public static ElkProver createProver(OWLOntology ontology) {
+		return new ElkProver(createReasoner(ontology));
+	}
 
 	public static ElkReasoner createReasoner(OWLOntology ontology,
 			ReasonerConfiguration config) {

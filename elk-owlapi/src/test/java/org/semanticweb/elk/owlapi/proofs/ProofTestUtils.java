@@ -32,6 +32,10 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 
+import org.liveontologies.owlapi.proof.OWLProver;
+import org.liveontologies.owlapi.proof.util.OWLProofUtils;
+import org.liveontologies.owlapi.proof.util.ProofNode;
+import org.liveontologies.owlapi.proof.util.ProofStep;
 import org.semanticweb.elk.proofs.utils.TestUtils;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -42,117 +46,37 @@ import org.semanticweb.owlapi.model.parameters.AxiomAnnotations;
 import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import org.semanticweb.owlapitools.proofs.ExplainingOWLReasoner;
-import org.semanticweb.owlapitools.proofs.OWLInference;
-import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
-import org.semanticweb.owlapitools.proofs.expressions.OWLAxiomExpression;
-import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
-import org.semanticweb.owlapitools.proofs.util.OWLInferenceGraph;
-import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * TODO this is adapted from {@link TestUtils}, see if we can get rid of copy-paste.
+ * TODO this is adapted from {@link TestUtils}, see if we can get rid of
+ * copy-paste.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  * @author Peter Skocovsky
+ * 
+ * @author Yevgeny Kazakov
+ * 
  */
 public class ProofTestUtils {
 
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ProofTestUtils.class);
-
-	public static void provabilityTest(ExplainingOWLReasoner reasoner,
-			OWLSubClassOfAxiom axiom) throws ProofGenerationException {
-		OWLExpression root = reasoner.getDerivedExpression(axiom);
-		OWLInferenceGraph graph = OWLProofUtils.computeInferenceGraph(root);
-		assertTrue(graph.getExpressions().contains(root));
-
-		provabilityTest(graph, graph.getExpressions());
+	public static void provabilityTest(OWLProver prover,
+			OWLSubClassOfAxiom axiom) {
+		assertTrue(String.format("Entailment %s not derivable!", axiom),
+				OWLProofUtils.isDerivable(prover.getProof(axiom),
+						prover.getRootOntology().getAxioms(Imports.INCLUDED)));
 	}
 
-	// tests that each derived expression is provable
-	static void provabilityTest(OWLInferenceGraph graph,
-			Iterable<OWLExpression> expressions)
-			throws ProofGenerationException {
-		Set<OWLExpression> proved = new HashSet<OWLExpression>(
-				graph.getExpressions().size());
-		Queue<OWLExpression> toDo = new LinkedList<OWLExpression>(
-				graph.getRootExpressions());
-
-		for (;;) {
-			OWLExpression next = toDo.poll();
-
-			if (next == null) {
-				break;
-			}			
-
-			if (proved.add(next)) {
-				LOGGER_.trace("{}: proved", next);
-				for (OWLInference inf : graph.getInferencesForPremise(next)) {
-					if (proved.containsAll(inf.getPremises())) {
-						LOGGER_.trace("{}: inference", inf);
-						toDo.add(inf.getConclusion());
-					}
-				}
-			}
-		}
-
-		for (OWLExpression expr : expressions) {
-			if (!proved.contains(expr) && !OWLProofUtils.isAsserted(expr)) {
-				throw new AssertionError(
-						String.format("There is no acyclic proof of %s", expr));
-			}
-		}
-	}
-
-	// checks that each axiom premise is in fact an axiom in the source ontology
-	// raises an assertion error if it's not the case
-	public static OWLInferenceVisitor getAxiomBindingChecker(
-			final OWLOntology ontology) {
-		return new OWLInferenceVisitor() {
-
-			@Override
-			public void visit(OWLInference inference) {
-				for (OWLExpression premise : inference.getPremises()) {
-					// all asserted premises must be present in the ontology
-					if (premise instanceof OWLAxiomExpression) {
-						OWLAxiomExpression expr = (OWLAxiomExpression) premise;
-
-						assertTrue(
-								"Asserted premise is not found in the ontology: "
-										+ expr.getAxiom(),
-								!expr.isAsserted() || isAsserted(ontology,
-										expr.getAxiom()));
-					}
-				}
-
-			}
-
-			private boolean isAsserted(OWLOntology ontology, OWLAxiom axiom) {
-				for (OWLAxiom ax : ontology.getAxioms()) {
-					if (ax.equals(axiom)) {
-						return true;
-					}
-				}
-
-				return false;
-			}
-		};
-	}
-
-	public static <T extends Exception> void visitAllSubsumptionsForProofTests(
+	public static void visitAllSubsumptionsForProofTests(
 			final OWLReasoner reasoner, final OWLDataFactory factory,
-			final ProofTestVisitor<T> visitor) throws T {
-		
+			final ProofTestVisitor visitor) {
+
 		if (!reasoner.isConsistent()) {
 			visitor.visit(factory.getOWLThing(), factory.getOWLNothing());
 			return;
 		}
-		
+
 		Set<Node<OWLClass>> visited = new HashSet<Node<OWLClass>>();
 		Queue<Node<OWLClass>> toDo = new LinkedList<Node<OWLClass>>();
 
@@ -216,84 +140,82 @@ public class ProofTestUtils {
 			}
 		}
 	}
-	
+
 	public static Set<OWLAxiom> collectProofBreaker(
-			final OWLExpression conclusion,
-			final OWLOntology ontology, final Random random)
-			throws ProofGenerationException {
-		final Set<OWLExpression> visited = new HashSet<OWLExpression>();
-		final Set<OWLExpression> tautologies = new HashSet<OWLExpression>();
+			final ProofNode<OWLAxiom> conclusion, final OWLOntology ontology,
+			final Random random) {
+		final Set<ProofNode<OWLAxiom>> visited = new HashSet<ProofNode<OWLAxiom>>();
+		final Set<ProofNode<OWLAxiom>> tautologies = new HashSet<ProofNode<OWLAxiom>>();
 		return collectProofBreaker(conclusion, visited, tautologies, ontology,
 				random);
 	}
-	
+
 	public static Set<OWLAxiom> collectProofBreaker(
-			final OWLExpression conclusion, final Set<OWLExpression> visited,
-			final Set<OWLExpression> tautologies, final OWLOntology ontology,
-			final Random random)
-			throws ProofGenerationException {
-		
-		/* 
-		 * If the expressions in visited are not provable and
-		 * the result of this method is removed from the ontology,
-		 * conclusion is not provable.
+			final ProofNode<OWLAxiom> conclusion,
+			final Set<ProofNode<OWLAxiom>> visited,
+			final Set<ProofNode<OWLAxiom>> tautologies, final OWLOntology ontology,
+			final Random random) {
+
+		/*
+		 * If the expressions in visited are not provable and the result of this
+		 * method is removed from the ontology, conclusion is not provable.
 		 * TODO: Except if some expression is a tautology !!!
 		 */
-		
+
 		final Set<OWLAxiom> collected = new HashSet<OWLAxiom>();
-		
+
 		if (!visited.add(conclusion)) {
 			return collected;
 		}
-		
+
 		// If conclusion is asserted, it must be collected.
-		if (conclusion instanceof OWLAxiomExpression) {
-			final OWLAxiom ax = ((OWLAxiomExpression) conclusion).getAxiom();
-			if (ontology.containsAxiom(ax, Imports.INCLUDED,
-					AxiomAnnotations.IGNORE_AXIOM_ANNOTATIONS)) {
-				collected.add(ax);
-			}
+		final OWLAxiom ax = conclusion.getMember();
+		if (ontology.containsAxiom(ax, Imports.INCLUDED,
+				AxiomAnnotations.IGNORE_AXIOM_ANNOTATIONS)) {
+			collected.add(ax);
 		}
-		
+
 		// For all inferences break proofs of one of their premises.
-		for (final OWLInference inf : conclusion.getInferences()) {
-			
-			final List<OWLExpression> premises =
-					new ArrayList<OWLExpression>(inf.getPremises());
+		for (final ProofStep<OWLAxiom> inf : conclusion.getInferences()) {
+
+			final List<ProofNode<OWLAxiom>> premises = new ArrayList<ProofNode<OWLAxiom>>(
+					inf.getPremises());
 			Collections.shuffle(premises, random);
-			
+
 			boolean inferenceIsBroken = false;
-			for (final OWLExpression premise : premises) {
-				
+			for (final ProofNode<OWLAxiom> premise : premises) {
+
 				final Set<OWLAxiom> premiseBreaker = collectProofBreaker(
 						premise, visited, tautologies, ontology, random);
-				
+
 				if (tautologies.contains(premise)) {
-					// The premise is a tautology and we need to break a different premise!
-				} else if(premiseBreaker.isEmpty()) {
-					// The premise was already visited, so this inference is already broken.
+					// The premise is a tautology and we need to break a
+					// different premise!
+				} else if (premiseBreaker.isEmpty()) {
+					// The premise was already visited, so this inference is
+					// already broken.
 					inferenceIsBroken = true;
 					break;
 				} else {
 					collected.addAll(premiseBreaker);
 					break;
 				}
-				
+
 			}
 			if (!inferenceIsBroken && collected.isEmpty()) {
-				/* 
+				/*
 				 * None of the premises of this inference is already broken and
 				 * no axioms were collected, so conclusion is a tautology.
 				 * 
-				 * TODO: This is not complete,
-				 * because some tautology may be asserted!
+				 * TODO: This is not complete, because some tautology may be
+				 * asserted!
 				 */
 				tautologies.add(conclusion);
 				return Collections.emptySet();
 			}
-			
+
 		}
-		
+
 		return collected;
 	}
 

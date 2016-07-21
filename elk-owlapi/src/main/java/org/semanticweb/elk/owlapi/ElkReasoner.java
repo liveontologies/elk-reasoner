@@ -34,12 +34,9 @@ import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.inferences.ReasonerProofProvider;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.owlapi.proofs.OwlAxiomExpressionWrap;
 import org.semanticweb.elk.owlapi.wrapper.ElkObjectWrapFactory;
-import org.semanticweb.elk.owlapi.wrapper.OwlClassAxiomConverterVisitor;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.reasoner.DummyProgressMonitor;
 import org.semanticweb.elk.reasoner.ElkUnsupportedReasoningTaskException;
@@ -85,9 +82,6 @@ import org.semanticweb.owlapi.reasoner.TimeOutException;
 import org.semanticweb.owlapi.reasoner.UnsupportedEntailmentTypeException;
 import org.semanticweb.owlapi.reasoner.impl.OWLNamedIndividualNode;
 import org.semanticweb.owlapi.util.Version;
-import org.semanticweb.owlapitools.proofs.ExplainingOWLReasoner;
-import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
-import org.semanticweb.owlapitools.proofs.expressions.OWLAxiomExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,7 +92,7 @@ import org.slf4j.LoggerFactory;
  * @author Markus Kroetzsch
  * @author Peter Skocovsky
  */
-public class ElkReasoner implements ExplainingOWLReasoner {
+public class ElkReasoner implements OWLReasoner {
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ElkReasoner.class);
@@ -212,6 +206,18 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 				new LoggingStageExecutor());
 	}
 
+	OWLOntology getOWLOntology() {
+		return owlOntology_;
+	}
+	
+	ElkObject.Factory getElkObjectFactory() {
+		return objectFactory_;
+	}
+	
+	ReasonerProofProvider getElkProofProvider() {
+		return elkProofProvider_;
+	}
+	
 	/**
 	 * re-creates a new instance of reasoner for the parameters; required if
 	 * ontology needs to be reloaded, since a reasoner can do initial load only
@@ -1048,16 +1054,6 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 			this.reasoner_.setProgressMonitor(this.secondaryProgressMonitor_);
 		}
 
-	}
-	
-	@Override
-	public OWLAxiomExpression getDerivedExpression(OWLAxiom axiom)
-			throws ProofGenerationException {
-		ElkClassAxiom elkAxiom = axiom
-				.accept(OwlClassAxiomConverterVisitor.getInstance());
-		return new OwlAxiomExpressionWrap(elkAxiom,
-				elkProofProvider_.getInferences(elkAxiom), owlOntology_,
-				objectFactory_);
 	}
 	
 	protected class OntologyChangeListener implements OWLOntologyChangeListener {
