@@ -6,7 +6,7 @@
 	<version>0.5.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>ELK</name>
+	<name>ELK Reasoner</name>
 	<description>A Java-based OWL EL reasoner</description>
 	<url>http://elk.semanticweb.org/</url>
 
