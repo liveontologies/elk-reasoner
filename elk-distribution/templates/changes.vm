@@ -15,7 +15,7 @@
 ## specific language governing permissions and limitations
 ## under the License.
 #foreach($release in $releases)    
-ELK Reasoner ${release.version}:
+${project.parent.name} ${release.version}:
 -------------------
 #if ($release.getActions().size() == 0)
 No detail

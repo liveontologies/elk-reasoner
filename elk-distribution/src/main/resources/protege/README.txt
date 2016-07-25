@@ -22,16 +22,19 @@ This package contains a plug-in for using ELK in Protege.
 
 REQUIREMENTS:
 
-ELK plug-in is tested to work with Protege ${protege.version}. It may work with other 
-versions of Protege.
+ELK plug-in is tested to work with Protege ${protege.version}. It may work with
+other versions of Protege.
 
 Java ${java.required.version} or higher.
 
 INSTALLATION:
 
-To install, place the file ${elk-protege.base}.jar to the plugins folder
-of the Protege installation. The plug-in supports Protege 4 Auto Update 
-feature which can be used for upgrading to newer versions according to the 
-instructions here:
+To install, place the file 
+
+${elk-protege.base}.jar 
+
+to the plugins folder of the Protege installation. The plug-in supports Protege
+Auto Update feature which can be used for upgrading to newer versions according
+to the instructions here:
 
     http://protegewiki.stanford.edu/wiki/EnablePluginAutoUpdate

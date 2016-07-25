@@ -28,8 +28,10 @@
 			<includes>
 				<include>*:elk-standalone:*</include>
 			</includes>
+			<!-- verify that all filters worked -->
+			<useStrictFiltering>true</useStrictFiltering>
 			<!-- we omit the version numbers in the included artifact names -->
-			<outputFileNameMapping>${elk-standalone.base}.jar</outputFileNameMapping>
+			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
 			<!-- don't include the artifact for this project -->
 			<useProjectArtifact>false</useProjectArtifact>
 		</dependencySet>
