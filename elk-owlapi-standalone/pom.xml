@@ -67,7 +67,6 @@
 							<excludeGroupIds>${project.groupId}</excludeGroupIds>
 							<excludeClassifiers>provided</excludeClassifiers>
 							<outputDirectory>${project.build.directory}/lib</outputDirectory>
-							<stripVersion>true</stripVersion>
 						</configuration>
 					</execution>
 					<execution>
@@ -80,7 +79,6 @@
 							<excludeGroupIds>${project.groupId}</excludeGroupIds>
 							<excludeClassifiers>provided</excludeClassifiers>
 							<outputDirectory>${project.build.directory}/lib</outputDirectory>
-							<stripVersion>true</stripVersion>
 							<classifier>sources</classifier>
 						</configuration>
 					</execution>
