@@ -1,5 +1,8 @@
 language: java
 
+git:
+  depth: 3
+
 matrix:
   include:
    - jdk: openjdk6
@@ -14,7 +17,7 @@ install: mvn install -DskipTests=true $OPTIONS
 script: mvn test -Dassembly.skipAssembly=true -B $OPTIONS
 
 after_success:
-  - test "$DEPLOY" = true -a "$TRAVIS_PULL_REQUEST" = false
+  - test "$DEPLOY" = true -a "$TRAVIS_PULL_REQUEST" = false -a "$TRAVIS_BRANCH" = master
     && mvn source:jar deploy --settings .travis-settings.xml -DskipTests=true -B
 
 env:
