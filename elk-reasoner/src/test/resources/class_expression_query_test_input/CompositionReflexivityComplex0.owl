@@ -1,0 +1,49 @@
+Prefix(:=<owlapi:ontology#ont3#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+
+Ontology(<owlapi:ontology#ont3>
+
+Declaration(Class(<http://example.org/A>))
+Declaration(Class(<http://example.org/B>))
+Declaration(Class(<http://example.org/C>))
+Declaration(Class(<http://example.org/D>))
+Declaration(ObjectProperty(<http://example.org/H>))
+Declaration(ObjectProperty(<http://example.org/R>))
+Declaration(ObjectProperty(<http://example.org/S>))
+Declaration(ObjectProperty(<http://example.org/T>))
+Declaration(ObjectProperty(<http://example.org/V>))
+Declaration(ObjectProperty(<http://example.org/W>))
+############################
+#   Object Properties
+############################
+
+# Object Property: <http://example.org/R> (<http://example.org/R>)
+
+ReflexiveObjectProperty(<http://example.org/R>)
+
+
+############################
+#   Classes
+############################
+
+# Class: <http://example.org/A> (<http://example.org/A>)
+
+SubClassOf(<http://example.org/A> ObjectSomeValuesFrom(<http://example.org/S> <http://example.org/B>))
+
+# Class: <http://example.org/B> (<http://example.org/B>)
+
+SubClassOf(<http://example.org/B> ObjectSomeValuesFrom(<http://example.org/T> <http://example.org/C>))
+
+# Class: <http://example.org/C> (<http://example.org/C>)
+
+SubClassOf(<http://example.org/C> ObjectSomeValuesFrom(<http://example.org/V> <http://example.org/D>))
+
+
+SubObjectPropertyOf(ObjectPropertyChain(<http://example.org/H> <http://example.org/V>) <http://example.org/W>)
+SubObjectPropertyOf(ObjectPropertyChain(<http://example.org/R> <http://example.org/S> <http://example.org/T>) <http://example.org/H>)
+)

@@ -38,7 +38,6 @@ import java.util.List;
 import org.semanticweb.elk.io.FileUtils;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
-import org.semanticweb.elk.testing.io.URLTestIO;
 
 /**
  * A collection of utility methods to create various common test configurations
@@ -68,7 +67,7 @@ public class ConfigurationUtils {
 	public static <I extends TestInput, EO extends TestOutput, AO extends TestOutput> Configuration loadFileBasedTestConfiguration(
 			final String path, final Class<?> srcClass,
 			final String inputFileExt, final String outputFileExt,
-			final TestManifestCreator<URLTestIO, EO, AO> creator)
+			final TestManifestCreator<I, EO, AO> creator)
 			throws IOException, URISyntaxException {
 		final URI srcURI = srcClass.getClassLoader().getResource(path).toURI();
 		// Load inputs and expected results
@@ -85,7 +84,7 @@ public class ConfigurationUtils {
 		Collections.sort(results);
 
 		// do the matching via a kind of merge join
-		final List<TestManifest<URLTestIO, EO, AO>> manifests = new ArrayList<TestManifest<URLTestIO, EO, AO>>(
+		final List<TestManifest<I, EO, AO>> manifests = new ArrayList<TestManifest<I, EO, AO>>(
 				inputs.size());
 		Iterator<String> resultIter = results.iterator();
 		Iterator<String> inputIter = inputs.iterator();
@@ -107,7 +106,7 @@ public class ConfigurationUtils {
 							nextInput);
 					URL resultURL = srcClass.getClassLoader().getResource(
 							nextResult);
-					TestManifest<URLTestIO, EO, AO> manifest = creator.create(
+					TestManifest<I, EO, AO> manifest = creator.create(
 							inputURL, resultURL);
 
 					if (manifest != null)
@@ -132,7 +131,7 @@ public class ConfigurationUtils {
 			}
 		}
 
-		return new SimpleConfiguration<URLTestIO, EO, AO>(manifests);
+		return new SimpleConfiguration<I, EO, AO>(manifests);
 	}
 
 	/**
@@ -150,7 +149,7 @@ public class ConfigurationUtils {
 	public static <I extends TestInput, EO extends TestOutput, AO extends TestOutput> Configuration loadFileBasedTestConfiguration(
 			final String path, final Class<?> srcClass,
 			final String inputFileExt,
-			final TestManifestCreator<URLTestIO, EO, AO> creator)
+			final TestManifestCreator<I, EO, AO> creator)
 			throws IOException, URISyntaxException {
 		final URI srcURI = srcClass.getClassLoader().getResource(path).toURI();
 		// Load inputs
@@ -159,19 +158,19 @@ public class ConfigurationUtils {
 				: IOUtils.getResourceNamesFromDir(new File(srcURI),
 						inputFileExt);
 
-		final List<TestManifest<URLTestIO, EO, AO>> manifests = new ArrayList<TestManifest<URLTestIO, EO, AO>>(
+		final List<TestManifest<I, EO, AO>> manifests = new ArrayList<TestManifest<I, EO, AO>>(
 				inputs.size());
 
 		for (String input : inputs) {
 			URL inputURL = srcClass.getClassLoader().getResource(input);
-			TestManifest<URLTestIO, EO, AO> manifest = creator.create(inputURL,
+			TestManifest<I, EO, AO> manifest = creator.create(inputURL,
 					null);
 
 			if (manifest != null)
 				manifests.add(manifest);
 		}
 
-		return new SimpleConfiguration<URLTestIO, EO, AO>(manifests);
+		return new SimpleConfiguration<I, EO, AO>(manifests);
 	}
 
 	private static boolean endOfData(Iterator<String> inputIter,

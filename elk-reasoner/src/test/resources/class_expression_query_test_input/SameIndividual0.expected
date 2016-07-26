@@ -1,0 +1,30 @@
+Prefix(:=<owlapi:ontology#ont28#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+
+Ontology(<owlapi:ontology#ont28>
+
+Declaration(Class(<http://example.org/B>))
+Declaration(ObjectProperty(<http://example.org/R>))
+Declaration(NamedIndividual(<http://example.org/a>))
+
+############################
+#   Classes
+############################
+
+# Class: <http://example.org/B> (<http://example.org/B>)
+
+EquivalentClasses(<http://example.org/B> ObjectHasValue(<http://example.org/R> <http://example.org/a>))
+
+# Class: owl:Nothing (owl:Nothing)
+
+SubClassOf(owl:Nothing ObjectHasValue(<http://example.org/R> <http://example.org/a>))
+
+
+
+SubClassOf(ObjectHasValue(<http://example.org/R> <http://example.org/a>) owl:Thing)
+)

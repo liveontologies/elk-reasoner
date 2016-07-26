@@ -33,7 +33,7 @@ package org.semanticweb.elk.testing;
  * pavel.klinov@uni-ulm.de
  *
  */
-public class TestResultComparisonException extends Exception {
+public class TestResultComparisonException extends AssertionError {
 
 	private TestOutput expOutput;
 	private TestOutput actualOutput;

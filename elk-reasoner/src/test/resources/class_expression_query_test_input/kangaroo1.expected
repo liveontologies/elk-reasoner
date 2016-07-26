@@ -1,0 +1,30 @@
+Prefix(:=<owlapi:ontology#ont10#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+
+Ontology(<owlapi:ontology#ont10>
+
+Declaration(Class(<http://www.test.com/schema#Kangaroo>))
+Declaration(Class(<http://www.test.com/schema#KangarooInfant>))
+Declaration(Class(<http://www.test.com/schema#Parent>))
+Declaration(Class(<http://www.test.com/schema#Pouch>))
+Declaration(ObjectProperty(<http://www.test.com/schema#has-body-part>))
+Declaration(ObjectProperty(<http://www.test.com/schema#has-child>))
+
+############################
+#   Classes
+############################
+
+# Class: owl:Nothing (owl:Nothing)
+
+EquivalentClasses(owl:Nothing ObjectIntersectionOf(<http://www.test.com/schema#Kangaroo> ObjectSomeValuesFrom(<http://www.test.com/schema#has-body-part> <http://www.test.com/schema#Pouch>) ObjectSomeValuesFrom(<http://www.test.com/schema#has-child> <http://www.test.com/schema#KangarooInfant>)))
+
+
+SubClassOf(ObjectIntersectionOf(<http://www.test.com/schema#Kangaroo> ObjectSomeValuesFrom(<http://www.test.com/schema#has-body-part> <http://www.test.com/schema#Pouch>) ObjectSomeValuesFrom(<http://www.test.com/schema#has-child> <http://www.test.com/schema#KangarooInfant>)) <http://www.test.com/schema#KangarooInfant>)
+SubClassOf(ObjectIntersectionOf(<http://www.test.com/schema#Kangaroo> ObjectSomeValuesFrom(<http://www.test.com/schema#has-body-part> <http://www.test.com/schema#Pouch>) ObjectSomeValuesFrom(<http://www.test.com/schema#has-child> <http://www.test.com/schema#KangarooInfant>)) <http://www.test.com/schema#Parent>)
+SubClassOf(ObjectIntersectionOf(<http://www.test.com/schema#Kangaroo> ObjectSomeValuesFrom(<http://www.test.com/schema#has-body-part> <http://www.test.com/schema#Pouch>) ObjectSomeValuesFrom(<http://www.test.com/schema#has-child> <http://www.test.com/schema#KangarooInfant>)) <http://www.test.com/schema#Pouch>)
+)

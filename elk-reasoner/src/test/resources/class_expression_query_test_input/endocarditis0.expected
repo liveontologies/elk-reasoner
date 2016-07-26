@@ -1,0 +1,32 @@
+Prefix(:=<owlapi:ontology#ont6#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+
+Ontology(<owlapi:ontology#ont6>
+
+Declaration(Class(<http://www.test.com/schema#Disease>))
+Declaration(Class(<http://www.test.com/schema#Endocarditis>))
+Declaration(Class(<http://www.test.com/schema#Heart>))
+Declaration(Class(<http://www.test.com/schema#Pericarditis>))
+Declaration(ObjectProperty(<http://www.test.com/schema#has-location>))
+
+############################
+#   Classes
+############################
+
+# Class: <http://www.test.com/schema#Endocarditis> (<http://www.test.com/schema#Endocarditis>)
+
+SubClassOf(<http://www.test.com/schema#Endocarditis> ObjectIntersectionOf(<http://www.test.com/schema#Disease> ObjectSomeValuesFrom(<http://www.test.com/schema#has-location> <http://www.test.com/schema#Heart>)))
+
+# Class: <http://www.test.com/schema#Pericarditis> (<http://www.test.com/schema#Pericarditis>)
+
+SubClassOf(<http://www.test.com/schema#Pericarditis> ObjectIntersectionOf(<http://www.test.com/schema#Disease> ObjectSomeValuesFrom(<http://www.test.com/schema#has-location> <http://www.test.com/schema#Heart>)))
+
+
+
+SubClassOf(ObjectIntersectionOf(<http://www.test.com/schema#Disease> ObjectSomeValuesFrom(<http://www.test.com/schema#has-location> <http://www.test.com/schema#Heart>)) <http://www.test.com/schema#Disease>)
+)
