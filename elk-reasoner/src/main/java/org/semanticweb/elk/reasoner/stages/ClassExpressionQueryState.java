@@ -24,8 +24,10 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -355,26 +357,73 @@ public class ClassExpressionQueryState {
 		}
 		/*
 		 * Else, if classExpression is not equivalent to any atomic class,
-		 * direct sub-classes of classExpression are direct sub-classes of
-		 * direct super-classes of classExpression that are sub-classes of
-		 * classExpression.
+		 * direct atomic sub-classes of classExpression are atomic classes that
+		 * have classExpression among their subsumers, but no other of their
+		 * strict subsumers have classExpression among its subsumers.
+		 * 
+		 * The search can be limited to all sub-classes of direct super-classes
+		 * of classExpression.
 		 */
 
 		final Set<TaxonomyNode<ElkClass>> result = new ArrayHashSet<TaxonomyNode<ElkClass>>();
+
+		final Queue<TaxonomyNode<ElkClass>> toDo = new LinkedList<TaxonomyNode<ElkClass>>();
+		final Set<TaxonomyNode<ElkClass>> done = new ArrayHashSet<TaxonomyNode<ElkClass>>();
 
 		for (final Node<ElkClass> superNode : node.getDirectSuperNodes()) {
 			final Set<? extends TaxonomyNode<ElkClass>> subNodes = taxonomy
 					.getNode(superNode.getCanonicalMember())
 					.getDirectSubNodes();
 			for (final TaxonomyNode<ElkClass> subNode : subNodes) {
-				final IndexedClassExpression canonical = subNode
-						.getCanonicalMember()
-						.accept(resolvingExpressionConverter_);
-				if (saturationState_.getContext(canonical)
-						.getComposedSubsumers().contains(ice)) {
-					result.add(subNode);
+				if (done.add(subNode)) {
+					toDo.add(subNode);
 				}
 			}
+		}
+
+		while (!toDo.isEmpty()) {
+			final TaxonomyNode<ElkClass> subNode = toDo.poll();
+
+			// test direct subsumption
+
+			final IndexedClassExpression canonical = subNode
+					.getCanonicalMember().accept(resolvingExpressionConverter_);
+
+			boolean isDirect = true;
+			boolean isSubClass = false;
+			for (final IndexedClassExpression subsumer : saturationState_
+					.getContext(canonical).getComposedSubsumers()) {
+				if (subsumer == ice) {
+					isSubClass = true;
+				} else {
+					final Context context = saturationState_
+							.getContext(subsumer);
+					if (context != null) {
+						final Set<IndexedClassExpression> subsumers = context
+								.getComposedSubsumers();
+						if (!subsumers.contains(canonical)
+								&& subsumers.contains(ice)) {
+							// not direct
+							isDirect = false;
+							break;
+						}
+					}
+				}
+			}
+
+			if (isDirect && isSubClass) {
+				result.add(subNode);
+			}
+
+			// queue up sub-nodes
+
+			for (final TaxonomyNode<ElkClass> subSubNode : subNode
+					.getDirectSubNodes()) {
+				if (done.add(subSubNode)) {
+					toDo.add(subSubNode);
+				}
+			}
+
 		}
 
 		return Collections.unmodifiableSet(result);
