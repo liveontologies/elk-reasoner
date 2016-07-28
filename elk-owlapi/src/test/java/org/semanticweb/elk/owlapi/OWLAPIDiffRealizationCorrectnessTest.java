@@ -20,21 +20,17 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
 package org.semanticweb.elk.owlapi;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.owl.parsing.Owl2ParseException;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.DiffRealizationCorrectnessTest;
 import org.semanticweb.elk.reasoner.InstanceTaxonomyTestOutput;
-import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestInput;
 
@@ -58,17 +54,26 @@ public class OWLAPIDiffRealizationCorrectnessTest extends
 
 	public OWLAPIDiffRealizationCorrectnessTest(
 			final ReasoningTestManifest<InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>> testManifest) {
-		super(testManifest);
-	}
+		super(testManifest,
+				new OwlApiReasoningTestDelegate<InstanceTaxonomyTestOutput<?>>(
+						testManifest) {
 
-	@Override
-	protected Reasoner createReasoner(InputStream input) throws IOException,
-			Owl2ParseException {
-		return OWLAPITestUtils.createReasoner(input).getInternalReasoner();
+					@Override
+					public InstanceTaxonomyTestOutput<?> getActualOutput()
+							throws Exception {
+						final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = reasoner_
+								.getInternalReasoner()
+								.getInstanceTaxonomyQuietly();
+						return new InstanceTaxonomyTestOutput<InstanceTaxonomy<ElkClass, ElkNamedIndividual>>(
+								taxonomy);
+					}
+
+				});
 	}
 
 	@Override
 	protected boolean ignore(TestInput input) {
 		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
 	}
+
 }

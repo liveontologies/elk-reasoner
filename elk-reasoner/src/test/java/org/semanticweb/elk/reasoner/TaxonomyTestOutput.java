@@ -37,7 +37,7 @@ public class TaxonomyTestOutput<T extends Taxonomy<? extends ElkEntity>> impleme
 
 	private final T taxonomy_;
 
-	TaxonomyTestOutput(T taxonomy) {
+	public TaxonomyTestOutput(T taxonomy) {
 		this.taxonomy_ = taxonomy;
 	}
 

@@ -21,27 +21,33 @@
  */
 package org.semanticweb.elk.owlapi.query;
 
-import org.semanticweb.elk.reasoner.query.EquivalentEntitiesTestOutput;
+import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.reasoner.NodeSet;
 
-public class OwlEquivalentEntitiesTestOutput
-		implements EquivalentEntitiesTestOutput<OWLClass> {
+/**
+ * ensures that the test results can be compared with {@link #equals(Object)}
+ * 
+ * @author Peter Skocovsky
+ */
+public class OwlApiRelatedEntitiesTestOutput
+		implements RelatedEntitiesTestOutput<OWLClass> {
 
-	private final Iterable<OWLClass> equivalent_;
+	private final NodeSet<OWLClass> related_;
 
-	public OwlEquivalentEntitiesTestOutput(final Iterable<OWLClass> equivalent) {
-		this.equivalent_ = equivalent;
+	public OwlApiRelatedEntitiesTestOutput(final NodeSet<OWLClass> related) {
+		this.related_ = related;
 	}
 
 	@Override
-	public Iterable<OWLClass> getEquivalent() {
-		return equivalent_;
+	public Iterable<? extends Iterable<OWLClass>> getSubEntities() {
+		return related_;
 	}
 
 	@Override
 	public int hashCode() {
-		return HashGenerator.combinedHashCode(getClass(), equivalent_);
+		return HashGenerator.combinedHashCode(getClass(), related_);
 	}
 
 	@Override
@@ -55,13 +61,12 @@ public class OwlEquivalentEntitiesTestOutput
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		return equivalent_
-				.equals(((OwlEquivalentEntitiesTestOutput) obj).equivalent_);
+		return related_.equals(((OwlApiRelatedEntitiesTestOutput) obj).related_);
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "(" + equivalent_ + ")";
+		return getClass().getSimpleName() + "(" + related_ + ")";
 	}
 
 }

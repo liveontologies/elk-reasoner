@@ -20,22 +20,20 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
 package org.semanticweb.elk.testing;
 
 /**
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  * @param <I>
  * @param <EO>
  * @param <AO>
  * 
  */
 public class BasicTestManifest<I extends TestInput, EO extends TestOutput, AO extends TestOutput>
-		implements TestManifest<I, EO, AO> {
+		implements TestManifestWithOutput<I, EO, AO> {
 
 	private final String name;
 	private final I input;
@@ -69,11 +67,19 @@ public class BasicTestManifest<I extends TestInput, EO extends TestOutput, AO ex
 	}
 
 	@Override
-	public void compare(AO actualOutput) throws TestResultComparisonException {
-		if (!expOutput.equals(actualOutput)) {
+	public void compare(final AO actualOutput)
+			throws TestResultComparisonException {
+		if (expOutput == null ? actualOutput != null
+				: !expOutput.equals(actualOutput)) {
 
-			throw new TestResultComparisonException(
-					"Actual result isn't equal to the expected one", expOutput,
+			// @formatter:off
+			final String message = "Actual output is not equal to the expected output\n"
+					+ "Input: " + getInput().getName() + "\n"
+					+ "expected:\n" + expOutput + "\n"
+					+ "actual:\n" + actualOutput + "\n";
+			// @formatter:on
+
+			throw new TestResultComparisonException(message, expOutput,
 					actualOutput);
 		}
 	}

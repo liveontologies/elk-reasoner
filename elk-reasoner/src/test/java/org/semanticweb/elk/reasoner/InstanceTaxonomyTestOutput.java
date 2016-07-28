@@ -42,7 +42,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 public class InstanceTaxonomyTestOutput<T extends InstanceTaxonomy<ElkClass, ElkNamedIndividual>>
 		extends TaxonomyTestOutput<T> {
 
-	InstanceTaxonomyTestOutput(T taxonomy) {
+	public InstanceTaxonomyTestOutput(T taxonomy) {
 		super(taxonomy);
 	}
 
@@ -55,4 +55,5 @@ public class InstanceTaxonomyTestOutput<T extends InstanceTaxonomy<ElkClass, Elk
 	void dumpTaxonomy(Writer writer) throws IOException {
 		TaxonomyPrinter.dumpInstanceTaxomomy(getTaxonomy(), writer, false);
 	}
+
 }

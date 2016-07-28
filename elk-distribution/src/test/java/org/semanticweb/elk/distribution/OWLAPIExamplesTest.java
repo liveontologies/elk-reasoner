@@ -20,9 +20,6 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
 package org.semanticweb.elk.distribution;
 
 import static org.junit.Assert.assertTrue;
@@ -62,7 +59,7 @@ import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
-import org.semanticweb.elk.testing.TestManifest;
+import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.elk.testing.TestUtils;
 import org.semanticweb.elk.testing.io.URLTestIO;
 
@@ -183,7 +180,7 @@ public class OWLAPIExamplesTest {
 				+ manifest.getInput().getName());
 
 		try {
-			inStream = manifest.getInput().getInputStream();
+			inStream = manifest.getInput().getUrl().openStream();
 			outStream = new FileOutputStream(javaSrcFile);
 
 			IOUtils.copy(inStream, outStream);
@@ -215,7 +212,7 @@ public class OWLAPIExamplesTest {
 
 						new TestManifestCreator<URLTestIO, BooleanTestOutput, BooleanTestOutput>() {
 							@Override
-							public TestManifest<URLTestIO, BooleanTestOutput, BooleanTestOutput> create(
+							public TestManifestWithOutput<URLTestIO, BooleanTestOutput, BooleanTestOutput> create(
 									URL input, URL output) {
 								String name = FileUtils.getFileName(FileUtils
 										.dropExtension(input.toString()));

@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.incremental;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,94 +19,57 @@ package org.semanticweb.elk.reasoner.incremental;
  * limitations under the License.
  * #L%
  */
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
+package org.semanticweb.elk.reasoner.incremental;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.iris.ElkPrefix;
-import org.semanticweb.elk.owl.parsing.Owl2ParseException;
-import org.semanticweb.elk.owl.parsing.Owl2Parser;
-import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
-import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
-import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
-import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
-import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.ReasoningTestManifest;
-import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.reasoner.InstanceTaxonomyTestOutput;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.util.logging.LogLevel;
-import org.semanticweb.elk.util.logging.LoggerWrap;
+import org.semanticweb.elk.testing.TestManifest;
+import org.semanticweb.elk.testing.UrlTestInput;
 
 /**
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
 @RunWith(PolySuite.class)
-public class IncrementalRealizationCorrectnessTest extends
-		BaseIncrementalRealizationCorrectnessTest<ElkAxiom> {
+public class IncrementalRealizationCorrectnessTest
+		extends BaseIncrementalRealizationCorrectnessTest<ElkAxiom> {
 
 	public IncrementalRealizationCorrectnessTest(
-			ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> testManifest) {
-		super(testManifest);
-	}
+			final TestManifest<UrlTestInput> testManifest) {
+		super(testManifest,
+				new CliIncrementalReasoningTestDelegate<InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>>(
+						testManifest) {
 
-	@Override
-	protected void applyChanges(final Reasoner reasoner,
-			final Iterable<ElkAxiom> changes, final IncrementalChangeType type) {
-		reasoner.registerAxiomLoader(new TestChangesLoader(changes, type));
-	}
+					@Override
+					public InstanceTaxonomyTestOutput<?> getExpectedOutput()
+							throws Exception {
+						LOGGER_.trace(
+								"======= Computing Expected Taxonomy =======");
+						final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = standardReasoner_
+								.getInstanceTaxonomyQuietly();
+						return new InstanceTaxonomyTestOutput<InstanceTaxonomy<ElkClass, ElkNamedIndividual>>(
+								taxonomy);
+					}
 
-	@Override
-	protected void dumpChangeToLog(ElkAxiom change, LogLevel level) {
-		LoggerWrap.log(LOGGER_, level,
-				OwlFunctionalStylePrinter.toString(change) + ": deleted");
-	}
+					@Override
+					public InstanceTaxonomyTestOutput<?> getActualOutput()
+							throws Exception {
+						LOGGER_.trace(
+								"======= Computing Incremental Taxonomy =======");
+						final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = incrementalReasoner_
+								.getInstanceTaxonomyQuietly();
+						return new InstanceTaxonomyTestOutput<InstanceTaxonomy<ElkClass, ElkNamedIndividual>>(
+								taxonomy);
+					}
 
-	@Override
-	protected void loadAxioms(InputStream stream,
-			final List<ElkAxiom> inputStaticAxioms,
-			final OnOffVector<ElkAxiom> inputChangingAxioms)
-			throws IOException, Owl2ParseException {
-
-		Owl2Parser parser = new Owl2FunctionalStyleParserFactory()
-				.getParser(stream);
-		parser.accept(new Owl2ParserAxiomProcessor() {
-
-			@Override
-			public void visit(ElkPrefix elkPrefix) throws Owl2ParseException {
-				// does nothing
-			}
-
-			@Override
-			public void visit(ElkAxiom elkAxiom) throws Owl2ParseException {
-				/*
-				 * if (elkAxiom instanceof ElkClassAxiom || elkAxiom instanceof
-				 * ElkAssertionAxiom) { changingAxioms.add(elkAxiom); } else {
-				 * staticAxioms.add(elkAxiom); }
-				 */
-				// all axioms are dynamic
-				inputChangingAxioms.add(elkAxiom);
-			}
-
-			@Override
-			public void finish() throws Owl2ParseException {
-				// everything is processed immediately
-			}
-		});
-	}
-
-	@Override
-	protected Reasoner getReasoner(final Iterable<ElkAxiom> axioms) {
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				new TestChangesLoader(axioms, IncrementalChangeType.ADD),
-				new PostProcessingStageExecutor());
-
-		return reasoner;
+				});
 	}
 
 }

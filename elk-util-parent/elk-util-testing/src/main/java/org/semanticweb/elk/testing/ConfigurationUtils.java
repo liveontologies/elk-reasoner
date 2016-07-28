@@ -20,9 +20,6 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
 package org.semanticweb.elk.testing;
 
 import java.io.File;
@@ -84,7 +81,7 @@ public class ConfigurationUtils {
 		Collections.sort(results);
 
 		// do the matching via a kind of merge join
-		final List<TestManifest<I, EO, AO>> manifests = new ArrayList<TestManifest<I, EO, AO>>(
+		final List<TestManifestWithOutput<I, EO, AO>> manifests = new ArrayList<TestManifestWithOutput<I, EO, AO>>(
 				inputs.size());
 		Iterator<String> resultIter = results.iterator();
 		Iterator<String> inputIter = inputs.iterator();
@@ -106,7 +103,7 @@ public class ConfigurationUtils {
 							nextInput);
 					URL resultURL = srcClass.getClassLoader().getResource(
 							nextResult);
-					TestManifest<I, EO, AO> manifest = creator.create(
+					TestManifestWithOutput<I, EO, AO> manifest = creator.create(
 							inputURL, resultURL);
 
 					if (manifest != null)
@@ -158,12 +155,12 @@ public class ConfigurationUtils {
 				: IOUtils.getResourceNamesFromDir(new File(srcURI),
 						inputFileExt);
 
-		final List<TestManifest<I, EO, AO>> manifests = new ArrayList<TestManifest<I, EO, AO>>(
+		final List<TestManifestWithOutput<I, EO, AO>> manifests = new ArrayList<TestManifestWithOutput<I, EO, AO>>(
 				inputs.size());
 
 		for (String input : inputs) {
 			URL inputURL = srcClass.getClassLoader().getResource(input);
-			TestManifest<I, EO, AO> manifest = creator.create(inputURL,
+			TestManifestWithOutput<I, EO, AO> manifest = creator.create(inputURL,
 					null);
 
 			if (manifest != null)
@@ -191,7 +188,7 @@ public class ConfigurationUtils {
 	 */
 	public interface TestManifestCreator<I extends TestInput, EO extends TestOutput, AO extends TestOutput> {
 
-		public TestManifest<I, EO, AO> create(URL input, URL output)
+		public TestManifestWithOutput<I, EO, AO> create(URL input, URL output)
 				throws IOException;
 	}
 }

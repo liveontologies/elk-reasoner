@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.proofs;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +19,7 @@ package org.semanticweb.elk.proofs;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.proofs;
 
 import static org.junit.Assume.assumeTrue;
 
@@ -62,9 +58,9 @@ import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestInput;
-import org.semanticweb.elk.testing.TestManifest;
+import org.semanticweb.elk.testing.TestManifestWithOutput;
+import org.semanticweb.elk.testing.UrlTestInput;
 import org.semanticweb.elk.testing.VoidTestOutput;
-import org.semanticweb.elk.testing.io.URLTestIO;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 /**
@@ -121,7 +117,7 @@ public class ProofTest {
 
 		AxiomLoader fileLoader = new Owl2StreamLoader(
 				new Owl2FunctionalStyleParserFactory(axiomSavingFactory),
-				manifest.getInput().getInputStream()) {
+				manifest.getInput().getUrl().openStream()) {
 
 		};
 
@@ -184,9 +180,9 @@ public class ProofTest {
 			throws URISyntaxException, IOException {
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION, TracingTestManifest.class, "owl",
-				new TestManifestCreator<URLTestIO, VoidTestOutput, VoidTestOutput>() {
+				new TestManifestCreator<UrlTestInput, VoidTestOutput, VoidTestOutput>() {
 					@Override
-					public TestManifest<URLTestIO, VoidTestOutput, VoidTestOutput> create(
+					public TestManifestWithOutput<UrlTestInput, VoidTestOutput, VoidTestOutput> create(
 							URL input, URL output) throws IOException {
 						// don't need an expected output for these tests
 						return new TracingTestManifest(input);

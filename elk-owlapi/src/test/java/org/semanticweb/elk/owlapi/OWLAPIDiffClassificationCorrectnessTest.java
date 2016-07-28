@@ -22,22 +22,20 @@
  */
 package org.semanticweb.elk.owlapi;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.owl.parsing.Owl2ParseException;
-import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.DiffClassificationCorrectnessTest;
-import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
+import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestInput;
 
 @RunWith(PolySuite.class)
-public class OWLAPIDiffClassificationCorrectnessTest extends
-		DiffClassificationCorrectnessTest {
+public class OWLAPIDiffClassificationCorrectnessTest
+		extends DiffClassificationCorrectnessTest {
 
 	static final String[] IGNORE_LIST = { "DisjointSelf.owl",
 			"CompositionReflexivityComplex.owl" };
@@ -48,13 +46,20 @@ public class OWLAPIDiffClassificationCorrectnessTest extends
 
 	public OWLAPIDiffClassificationCorrectnessTest(
 			final ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> testManifest) {
-		super(testManifest);
-	}
+		super(testManifest,
+				new OwlApiReasoningTestDelegate<TaxonomyTestOutput<?>>(
+						testManifest) {
 
-	@Override
-	protected Reasoner createReasoner(InputStream input) throws IOException,
-			Owl2ParseException {
-		return OWLAPITestUtils.createReasoner(input).getInternalReasoner();
+					@Override
+					public TaxonomyTestOutput<?> getActualOutput()
+							throws Exception {
+						final Taxonomy<ElkClass> taxonomy = reasoner_
+								.getInternalReasoner().getTaxonomyQuietly();
+						return new TaxonomyTestOutput<Taxonomy<ElkClass>>(
+								taxonomy);
+					}
+
+				});
 	}
 
 	@Override

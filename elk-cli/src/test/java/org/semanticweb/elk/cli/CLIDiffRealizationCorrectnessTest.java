@@ -20,25 +20,16 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
 package org.semanticweb.elk.cli;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 
-import org.semanticweb.elk.loading.AxiomLoader;
-import org.semanticweb.elk.loading.Owl2StreamLoader;
-import org.semanticweb.elk.owl.parsing.Owl2ParseException;
-import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.DiffRealizationCorrectnessTest;
 import org.semanticweb.elk.reasoner.InstanceTaxonomyTestOutput;
-import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
-import org.semanticweb.elk.reasoner.stages.RestartingStageExecutor;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.testing.TestInput;
 
 /**
@@ -60,20 +51,25 @@ public class CLIDiffRealizationCorrectnessTest extends
 
 	public CLIDiffRealizationCorrectnessTest(
 			final ReasoningTestManifest<InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>> testManifest) {
-		super(testManifest);
-	}
+		super(testManifest,
+				new CliReasoningTestDelegate<InstanceTaxonomyTestOutput<?>>(
+						testManifest) {
 
-	@Override
-	protected Reasoner createReasoner(final InputStream input)
-			throws Owl2ParseException, IOException {
-		AxiomLoader loader = new Owl2StreamLoader(
-				new Owl2FunctionalStyleParserFactory(), input);
-		return new ReasonerFactory().createReasoner(loader,
-				new RestartingStageExecutor());
+					@Override
+					public InstanceTaxonomyTestOutput<?> getActualOutput()
+							throws Exception {
+						final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = reasoner_
+								.getInstanceTaxonomyQuietly();
+						return new InstanceTaxonomyTestOutput<InstanceTaxonomy<ElkClass, ElkNamedIndividual>>(
+								taxonomy);
+					}
+
+				});
 	}
 
 	@Override
 	protected boolean ignore(TestInput input) {
 		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
 	}
+
 }

@@ -20,25 +20,15 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
 package org.semanticweb.elk.cli;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 
-import org.semanticweb.elk.loading.AxiomLoader;
-import org.semanticweb.elk.loading.Owl2StreamLoader;
-import org.semanticweb.elk.owl.parsing.Owl2ParseException;
-import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
-import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.DiffClassificationCorrectnessTest;
-import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
-import org.semanticweb.elk.reasoner.stages.RestartingStageExecutor;
+import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.TestInput;
 
 /**
@@ -46,8 +36,8 @@ import org.semanticweb.elk.testing.TestInput;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class CLIDiffClassificationCorrectnessTest extends
-		DiffClassificationCorrectnessTest {
+public class CLIDiffClassificationCorrectnessTest
+		extends DiffClassificationCorrectnessTest {
 
 	static final String[] IGNORE_LIST = { "CompositionReflexivityComplex.owl" };
 
@@ -57,16 +47,17 @@ public class CLIDiffClassificationCorrectnessTest extends
 
 	public CLIDiffClassificationCorrectnessTest(
 			final ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> testManifest) {
-		super(testManifest);
-	}
+		super(testManifest, new CliReasoningTestDelegate<TaxonomyTestOutput<?>>(
+				testManifest) {
 
-	@Override
-	protected Reasoner createReasoner(final InputStream input)
-			throws Owl2ParseException, IOException {
-		AxiomLoader loader = new Owl2StreamLoader(
-				new Owl2FunctionalStyleParserFactory(), input);
-		return new ReasonerFactory().createReasoner(loader,
-				new RestartingStageExecutor());
+			@Override
+			public TaxonomyTestOutput<?> getActualOutput() throws Exception {
+				final Taxonomy<ElkClass> taxonomy = reasoner_
+						.getTaxonomyQuietly();
+				return new TaxonomyTestOutput<Taxonomy<ElkClass>>(taxonomy);
+			}
+
+		});
 	}
 
 	@Override
@@ -74,4 +65,5 @@ public class CLIDiffClassificationCorrectnessTest extends
 		return super.ignore(input)
 				|| Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
 	}
+
 }

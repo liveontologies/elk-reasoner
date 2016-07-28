@@ -20,36 +20,31 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
 package org.semanticweb.elk.testing.io;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 
 import org.semanticweb.elk.io.FileUtils;
-import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestOutput;
+import org.semanticweb.elk.testing.UrlTestInput;
 
 /**
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
- *
+ *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
-public class URLTestIO implements TestInput, TestOutput {
+public class URLTestIO implements UrlTestInput, TestOutput {
 
 	private final URL url;
-	
-	
+
 	public URLTestIO(final URL file) {
 		this.url = file;
 	}
-	
-	public InputStream getInputStream() throws IOException {
-		return url.openStream();
+
+	@Override
+	public URL getUrl() {
+		return url;
 	}
 
 	@Override
@@ -61,4 +56,5 @@ public class URLTestIO implements TestInput, TestOutput {
 	public String getName() {
 		return FileUtils.getFileName(url.getPath());
 	}
+
 }

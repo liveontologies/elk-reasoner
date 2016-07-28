@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.incremental;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +19,7 @@ package org.semanticweb.elk.reasoner.incremental;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.incremental;
 
 import static org.junit.Assume.assumeTrue;
 
@@ -106,7 +102,7 @@ public abstract class BaseRandomWalkIncrementalCorrectnessTest {
 
 		LOGGER_.info("Initial load of test axioms");
 
-		InputStream stream = manifest.getInput().getInputStream();
+		InputStream stream = manifest.getInput().getUrl().openStream();
 		AxiomLoader fileLoader = new Owl2StreamLoader(
 				new Owl2FunctionalStyleParserFactory(),
 				stream);

@@ -40,9 +40,9 @@ import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestInput;
-import org.semanticweb.elk.testing.TestManifest;
+import org.semanticweb.elk.testing.TestManifestWithOutput;
+import org.semanticweb.elk.testing.UrlTestInput;
 import org.semanticweb.elk.testing.VoidTestOutput;
-import org.semanticweb.elk.testing.io.URLTestIO;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -93,7 +93,7 @@ public class AllOntologiesProofTest extends BaseProofTest {
 		final OWLDataFactory factory = manager_.getOWLDataFactory();
 		// loading and classifying via the OWL API
 		final OWLOntology ontology = loadOntology(manifest_.getInput()
-				.getInputStream());
+				.getUrl().openStream());
 		final ExplainingOWLReasoner reasoner = OWLAPITestUtils
 				.createReasoner(ontology);
 
@@ -144,9 +144,9 @@ public class AllOntologiesProofTest extends BaseProofTest {
 						INPUT_DATA_LOCATION,
 						TracingTestManifest.class,
 						"owl",
-						new TestManifestCreator<URLTestIO, VoidTestOutput, VoidTestOutput>() {
+						new TestManifestCreator<UrlTestInput, VoidTestOutput, VoidTestOutput>() {
 							@Override
-							public TestManifest<URLTestIO, VoidTestOutput, VoidTestOutput> create(
+							public TestManifestWithOutput<UrlTestInput, VoidTestOutput, VoidTestOutput> create(
 									URL input, URL output) throws IOException {
 								// don't need an expected output for these tests
 								return new TracingTestManifest(input);

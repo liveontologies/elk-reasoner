@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.incremental;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +19,7 @@ package org.semanticweb.elk.reasoner.incremental;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.incremental;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -40,8 +36,8 @@ import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
-import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.io.URLTestIO;
+import org.semanticweb.elk.testing.TestManifestWithOutput;
+import org.semanticweb.elk.testing.UrlTestInput;
 
 /**
  * @author Pavel Klinov
@@ -81,9 +77,9 @@ public class RandomWalkIncrementalRealizationCorrectnessTest extends
 						RandomWalkIncrementalClassificationCorrectnessTest.class,
 						"owl",
 						"expected",
-						new TestManifestCreator<URLTestIO, InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>>() {
+						new TestManifestCreator<UrlTestInput, InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>>() {
 							@Override
-							public TestManifest<URLTestIO, InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>> create(
+							public TestManifestWithOutput<UrlTestInput, InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>> create(
 									URL input, URL output) throws IOException {
 								// don't need an expected output for these tests
 								return new TaxonomyDiffManifest<InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>>(

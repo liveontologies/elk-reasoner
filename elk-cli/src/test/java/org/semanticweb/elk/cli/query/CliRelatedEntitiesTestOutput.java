@@ -19,24 +19,42 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.owlapi.query;
+package org.semanticweb.elk.cli.query;
 
+import java.util.Collection;
+import java.util.Set;
+
+import org.semanticweb.elk.cli.CliTestUtil;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
+import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.util.hashing.HashGenerator;
-import org.semanticweb.owlapi.model.OWLClass;
 
-public class OwlRelatedEntitiesTestOutput
-		implements RelatedEntitiesTestOutput<OWLClass> {
+/**
+ * ensures that the test results can be compared with {@link #equals(Object)}
+ * 
+ * @author Peter Skocovsky
+ */
+public class CliRelatedEntitiesTestOutput
+		implements RelatedEntitiesTestOutput<ElkClass> {
 
-	private final Iterable<? extends Iterable<OWLClass>> related_;
+	private final Iterable<? extends Iterable<ElkClass>> related_;
 
-	public OwlRelatedEntitiesTestOutput(
-			final Iterable<? extends Iterable<OWLClass>> related) {
-		this.related_ = related;
+	public CliRelatedEntitiesTestOutput(
+			final Collection<? extends Collection<ElkClass>> related) {
+		this.related_ = CliTestUtil.related2Equalable(related,
+				ElkClassKeyProvider.INSTANCE.getComparator());
+	}
+
+	public CliRelatedEntitiesTestOutput(
+			final Set<? extends Node<ElkClass>> related) {
+		this.related_ = CliTestUtil.relatedNodes2Equalable(related,
+				ElkClassKeyProvider.INSTANCE.getComparator());
 	}
 
 	@Override
-	public Iterable<? extends Iterable<OWLClass>> getSubEntities() {
+	public Iterable<? extends Iterable<ElkClass>> getSubEntities() {
 		return related_;
 	}
 
@@ -56,7 +74,8 @@ public class OwlRelatedEntitiesTestOutput
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		return related_.equals(((OwlRelatedEntitiesTestOutput) obj).related_);
+
+		return related_.equals(((CliRelatedEntitiesTestOutput) obj).related_);
 	}
 
 	@Override

@@ -26,33 +26,43 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.semanticweb.elk.io.IOUtils;
-import org.semanticweb.elk.owlapi.ElkReasoner;
-import org.semanticweb.elk.owlapi.OWLAPITestUtils;
+import org.semanticweb.elk.owlapi.OwlApiReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.BaseClassExpressionQueryTest;
-import org.semanticweb.elk.reasoner.query.BaseClassExpressionQueryTestManifest;
 import org.semanticweb.elk.reasoner.query.BaseSatisfiabilityTestOutput;
+import org.semanticweb.elk.reasoner.query.ClassExpressionQueryTestManifest;
 import org.semanticweb.elk.reasoner.query.ClassQueryTestInput;
 import org.semanticweb.elk.reasoner.query.SatisfiabilityTestOutput;
 import org.semanticweb.elk.testing.ConfigurationUtils;
-import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.TestResultComparisonException;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
+import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
-import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 
+@RunWith(PolySuite.class)
 public class OwlApiClassExpressionSatisfiabilityQueryTest extends
-		BaseClassExpressionQueryTest<OWLOntology, OWLClassExpression, SatisfiabilityTestOutput> {
+		BaseClassExpressionQueryTest<OWLClassExpression, SatisfiabilityTestOutput> {
 
 	public OwlApiClassExpressionSatisfiabilityQueryTest(
-			final TestManifest<ClassQueryTestInput<OWLOntology, OWLClassExpression>, SatisfiabilityTestOutput, SatisfiabilityTestOutput> manifest) {
-		super(manifest);
+			final TestManifestWithOutput<ClassQueryTestInput<OWLClassExpression>, SatisfiabilityTestOutput, SatisfiabilityTestOutput> manifest) {
+		super(manifest,
+				new OwlApiReasoningTestDelegate<SatisfiabilityTestOutput>(
+						manifest) {
+
+					@Override
+					public SatisfiabilityTestOutput getActualOutput()
+							throws Exception {
+						final boolean isSatisfiable = reasoner_.isSatisfiable(
+								manifest.getInput().getClassQuery());
+						return new BaseSatisfiabilityTestOutput(isSatisfiable);
+					}
+
+				});
 	}
 
 	@Config
@@ -60,40 +70,26 @@ public class OwlApiClassExpressionSatisfiabilityQueryTest extends
 			throws IOException, URISyntaxException {
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION, OwlApiClassExpressionSatisfiabilityQueryTest.class,
-				"owl", "expected",
-				new TestManifestCreator<ClassQueryTestInput<OWLOntology, OWLClassExpression>, SatisfiabilityTestOutput, SatisfiabilityTestOutput>() {
+				INPUT_DATA_LOCATION, BaseClassExpressionQueryTest.class, "owl",
+				"expected",
+				new TestManifestCreator<ClassQueryTestInput<OWLClassExpression>, SatisfiabilityTestOutput, SatisfiabilityTestOutput>() {
 
 					@Override
-					public TestManifest<ClassQueryTestInput<OWLOntology, OWLClassExpression>, SatisfiabilityTestOutput, SatisfiabilityTestOutput> create(
+					public TestManifestWithOutput<ClassQueryTestInput<OWLClassExpression>, SatisfiabilityTestOutput, SatisfiabilityTestOutput> create(
 							final URL input, final URL output)
-									throws IOException {
+							throws IOException {
 
-						final OWLOntologyManager manager = OWLManager
-								.createOWLOntologyManager();
-
-						InputStream inputIS = null;
 						InputStream outputIS = null;
 						try {
-							inputIS = input.openStream();
-							final OWLOntology inputOnt = manager
-									.loadOntologyFromOntologyDocument(inputIS);
 							outputIS = output.openStream();
 							final ExpectedTestOutputLoader expected = ExpectedTestOutputLoader
 									.load(outputIS);
 
-							return new BaseClassExpressionQueryTestManifest<OWLOntology, OWLClassExpression, SatisfiabilityTestOutput>(
-									input, inputOnt, expected.getQueryClass()) {
-								@Override
-								public SatisfiabilityTestOutput getExpectedOutput() {
-									return expected.getSatisfiabilityTestOutput();
-								}
-							};
+							return new ClassExpressionQueryTestManifest<OWLClassExpression, SatisfiabilityTestOutput>(
+									input, expected.getQueryClass(),
+									expected.getSatisfiabilityTestOutput());
 
-						} catch (final OWLOntologyCreationException e) {
-							throw new IOException(e);
 						} finally {
-							IOUtils.closeQuietly(inputIS);
 							IOUtils.closeQuietly(outputIS);
 						}
 
@@ -104,15 +100,10 @@ public class OwlApiClassExpressionSatisfiabilityQueryTest extends
 	}
 
 	@Test
-	public void testQuery() throws TestResultComparisonException {
-
-		final ElkReasoner reasoner = OWLAPITestUtils
-				.createReasoner(manifest_.getInput().getOntology());
-
-		final boolean isSatisfiable = reasoner.isSatisfiable(manifest_.getInput().getClassQuery());
-
-		manifest_.compare(new BaseSatisfiabilityTestOutput(isSatisfiable));
-
+	@Ignore
+	@Override
+	public void testWithInterruptions() throws Exception {
+		super.testWithInterruptions();
 	}
 
 }

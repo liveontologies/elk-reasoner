@@ -172,7 +172,7 @@ public class ExpectedTestOutputLoader {
 
 	public EquivalentEntitiesTestOutput<OWLClass> getEquivalentEntitiesTestOutput() {
 		final OWLClassNode node = equivalent_.get(queryClass_);
-		return new OwlEquivalentEntitiesTestOutput(
+		return new OwlApiEquivalentEntitiesTestOutput(
 				node == null ? new OWLClassNode() : node);
 	}
 
@@ -192,7 +192,7 @@ public class ExpectedTestOutputLoader {
 					}
 				});
 
-		return new OwlRelatedEntitiesTestOutput(
+		return new OwlApiRelatedEntitiesTestOutput(
 				new OWLClassNodeSet(new HashSet<Node<OWLClass>>(superNodes)));
 	}
 
@@ -211,7 +211,7 @@ public class ExpectedTestOutputLoader {
 					}
 				});
 
-		return new OwlRelatedEntitiesTestOutput(
+		return new OwlApiRelatedEntitiesTestOutput(
 				new OWLClassNodeSet(new HashSet<Node<OWLClass>>(subNodes)));
 	}
 

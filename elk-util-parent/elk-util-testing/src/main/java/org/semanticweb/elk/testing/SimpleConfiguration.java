@@ -20,9 +20,6 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
 package org.semanticweb.elk.testing;
 
 import java.util.List;
@@ -40,9 +37,9 @@ import org.semanticweb.elk.testing.PolySuite.Configuration;
  */
 public class SimpleConfiguration<I extends TestInput, EO extends TestOutput, AO extends TestOutput> implements Configuration {
 
-	private final List<TestManifest<I, EO, AO>> manifests;
+	private final List<TestManifestWithOutput<I, EO, AO>> manifests;
 	
-	SimpleConfiguration(List<TestManifest<I, EO, AO>> manifests) {
+	SimpleConfiguration(List<TestManifestWithOutput<I, EO, AO>> manifests) {
 		this.manifests = manifests;
 	}
 	
@@ -52,7 +49,7 @@ public class SimpleConfiguration<I extends TestInput, EO extends TestOutput, AO 
 	}
 
 	@Override
-	public TestManifest<I, EO, AO> getTestValue(int index) {
+	public TestManifestWithOutput<I, EO, AO> getTestValue(int index) {
 		return manifests.get(index);
 	}
 

@@ -1,11 +1,10 @@
 /*
  * #%L
  * ELK Utilities for Testing
- * 
- * $Id$
- * $HeadURL$
+ * $Id:$
+ * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,29 +19,20 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
 package org.semanticweb.elk.testing;
 
 /**
- * The base interface for a test instance which defines:
- * - the input
- * - the expected output
- * - the method of comparison
+ * The basic interface for a test case which defines test name and test input.
  * 
- * @author Pavel Klinov
+ * @author Peter Skocovsky
  *
- * pavel.klinov@uni-ulm.de
- * @param <I> 
- * @param <EO> 
- * @param <AO> 
- *
+ * @param <I>
+ *            The type of test input.
  */
-public interface TestManifest<I extends TestInput, EO extends TestOutput, AO extends TestOutput> {
+public interface TestManifest<I extends TestInput> {
 
 	public String getName();
+
 	public I getInput();
-	public EO getExpectedOutput();
-	public void compare(AO actualOutput) throws TestResultComparisonException;
+
 }

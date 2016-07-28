@@ -21,37 +21,24 @@
  */
 package org.semanticweb.elk.reasoner.query;
 
-import static org.junit.Assume.assumeTrue;
-
-import java.io.IOException;
-
-import org.junit.Before;
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.owl.parsing.Owl2ParseException;
+import org.semanticweb.elk.reasoner.ReasoningCorrectnessTestWithInterrupts;
+import org.semanticweb.elk.reasoner.ReasoningTestWithInterruptsDelegate;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestInput;
-import org.semanticweb.elk.testing.TestManifest;
+import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.elk.testing.TestOutput;
 
 @RunWith(PolySuite.class)
-public abstract class BaseClassExpressionQueryTest<Ont, C, O extends TestOutput> {
+public abstract class BaseClassExpressionQueryTest<C, O extends TestOutput>
+		extends
+		ReasoningCorrectnessTestWithInterrupts<ClassQueryTestInput<C>, O, O, TestManifestWithOutput<ClassQueryTestInput<C>, O, O>, ReasoningTestWithInterruptsDelegate<O>> {
 
 	public final static String INPUT_DATA_LOCATION = "class_expression_query_test_input";
 
-	protected final TestManifest<ClassQueryTestInput<Ont, C>, O, O> manifest_;
-
 	public BaseClassExpressionQueryTest(
-			final TestManifest<ClassQueryTestInput<Ont, C>, O, O> manifest) {
-		this.manifest_ = manifest;
-	}
-
-	@Before
-	public void before() throws IOException, Owl2ParseException {
-		assumeTrue(!ignore(manifest_.getInput()));
-	}
-
-	protected boolean ignore(TestInput input) {
-		return false;
+			final TestManifestWithOutput<ClassQueryTestInput<C>, O, O> manifest,
+			final ReasoningTestWithInterruptsDelegate<O> delegate) {
+		super(manifest, delegate);
 	}
 
 }

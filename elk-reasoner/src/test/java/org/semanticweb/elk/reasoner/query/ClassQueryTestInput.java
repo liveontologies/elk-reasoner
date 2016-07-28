@@ -22,25 +22,19 @@
 package org.semanticweb.elk.reasoner.query;
 
 import org.semanticweb.elk.testing.TestInput;
+import org.semanticweb.elk.testing.UrlTestInput;
 
 /**
  * A {@link TestInput} of a class query test. The class returned by
  * {@link #getClassQuery()} should be queried with respect to the ontology
- * returned by {@link #getOntology()}.
+ * loaded from the test input.
  * 
  * @author Peter Skocovsky
  *
- * @param <O>
- *            the type of the ontology
  * @param <C>
  *            the type of the class
  */
-public interface ClassQueryTestInput<O, C> extends TestInput {
-
-	/**
-	 * @return the ontology with respect to which the class should be queried.
-	 */
-	O getOntology();
+public interface ClassQueryTestInput<C> extends UrlTestInput {
 
 	/**
 	 * @return the class that should be queried.

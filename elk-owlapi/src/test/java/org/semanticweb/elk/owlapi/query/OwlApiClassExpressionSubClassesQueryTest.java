@@ -27,35 +27,47 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 
+import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.semanticweb.elk.io.IOUtils;
-import org.semanticweb.elk.owlapi.ElkReasoner;
-import org.semanticweb.elk.owlapi.OWLAPITestUtils;
+import org.semanticweb.elk.owlapi.OwlApiReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.BaseClassExpressionQueryTest;
-import org.semanticweb.elk.reasoner.query.BaseClassExpressionQueryTestManifest;
+import org.semanticweb.elk.reasoner.query.ClassExpressionQueryTestManifest;
 import org.semanticweb.elk.reasoner.query.ClassQueryTestInput;
 import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.testing.ConfigurationUtils;
-import org.semanticweb.elk.testing.TestInput;
-import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.TestResultComparisonException;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
+import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
-import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.elk.testing.TestInput;
+import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 
+@RunWith(PolySuite.class)
 public class OwlApiClassExpressionSubClassesQueryTest extends
-		BaseClassExpressionQueryTest<OWLOntology, OWLClassExpression, RelatedEntitiesTestOutput<OWLClass>> {
+		BaseClassExpressionQueryTest<OWLClassExpression, RelatedEntitiesTestOutput<OWLClass>> {
 
 	public OwlApiClassExpressionSubClassesQueryTest(
-			final TestManifest<ClassQueryTestInput<OWLOntology, OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>, RelatedEntitiesTestOutput<OWLClass>> manifest) {
-		super(manifest);
+			final TestManifestWithOutput<ClassQueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>, RelatedEntitiesTestOutput<OWLClass>> manifest) {
+		super(manifest,
+				new OwlApiReasoningTestDelegate<RelatedEntitiesTestOutput<OWLClass>>(
+						manifest) {
+
+					@Override
+					public RelatedEntitiesTestOutput<OWLClass> getActualOutput()
+							throws Exception {
+						final NodeSet<OWLClass> subNodes = reasoner_
+								.getSubClasses(
+										manifest.getInput().getClassQuery(),
+										true);
+						return new OwlApiRelatedEntitiesTestOutput(subNodes);
+					}
+
+				});
 	}
 
 	@Config
@@ -63,41 +75,26 @@ public class OwlApiClassExpressionSubClassesQueryTest extends
 			throws IOException, URISyntaxException {
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION,
-				OwlApiClassExpressionSubClassesQueryTest.class, "owl",
+				INPUT_DATA_LOCATION, BaseClassExpressionQueryTest.class, "owl",
 				"expected",
-				new TestManifestCreator<ClassQueryTestInput<OWLOntology, OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>, RelatedEntitiesTestOutput<OWLClass>>() {
+				new TestManifestCreator<ClassQueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>, RelatedEntitiesTestOutput<OWLClass>>() {
 
 					@Override
-					public TestManifest<ClassQueryTestInput<OWLOntology, OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>, RelatedEntitiesTestOutput<OWLClass>> create(
+					public TestManifestWithOutput<ClassQueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>, RelatedEntitiesTestOutput<OWLClass>> create(
 							final URL input, final URL output)
-									throws IOException {
+							throws IOException {
 
-						final OWLOntologyManager manager = OWLManager
-								.createOWLOntologyManager();
-
-						InputStream inputIS = null;
 						InputStream outputIS = null;
 						try {
-							inputIS = input.openStream();
-							final OWLOntology inputOnt = manager
-									.loadOntologyFromOntologyDocument(inputIS);
 							outputIS = output.openStream();
 							final ExpectedTestOutputLoader expected = ExpectedTestOutputLoader
 									.load(outputIS);
 
-							return new BaseClassExpressionQueryTestManifest<OWLOntology, OWLClassExpression, RelatedEntitiesTestOutput<OWLClass>>(
-									input, inputOnt, expected.getQueryClass()) {
-								@Override
-								public RelatedEntitiesTestOutput<OWLClass> getExpectedOutput() {
-									return expected.getSubEntitiesTestOutput();
-								}
-							};
+							return new ClassExpressionQueryTestManifest<OWLClassExpression, RelatedEntitiesTestOutput<OWLClass>>(
+									input, expected.getQueryClass(),
+									expected.getSubEntitiesTestOutput());
 
-						} catch (final OWLOntologyCreationException e) {
-							throw new IOException(e);
 						} finally {
-							IOUtils.closeQuietly(inputIS);
 							IOUtils.closeQuietly(outputIS);
 						}
 
@@ -109,17 +106,17 @@ public class OwlApiClassExpressionSubClassesQueryTest extends
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
-//			"CompositionReflexivity0.owl",
-//			"CompositionReflexivityComplex0.owl",
-//			"ReflexiveRole0.owl",
-//			"ReflexiveRole1.owl",
-//			"ReflexiveRole2.owl",
-//			"ReflexiveRole3.owl",
-//			"SameIndividual0.owl",
-//			"SameIndividual1.owl",
-//			"TransitiveProperty0.owl",
-//			"TransitivePropertyChain0.owl",
-//			"kangaroo0.owl"
+			"CompositionReflexivity0.owl",
+			"CompositionReflexivityComplex0.owl",
+			"ReflexiveRole0.owl",
+			"ReflexiveRole1.owl",
+			"ReflexiveRole2.owl",
+			"ReflexiveRole3.owl",
+			"SameIndividual0.owl",
+			"SameIndividual1.owl",
+			"TransitiveProperty0.owl",
+			"TransitivePropertyChain0.owl",
+			"kangaroo0.owl"
 		};
 	// @formatter:on
 
@@ -133,16 +130,10 @@ public class OwlApiClassExpressionSubClassesQueryTest extends
 	}
 
 	@Test
-	public void testQuery() throws TestResultComparisonException {
-
-		final ElkReasoner reasoner = OWLAPITestUtils
-				.createReasoner(manifest_.getInput().getOntology());
-
-		final NodeSet<OWLClass> subNodes = reasoner
-				.getSubClasses(manifest_.getInput().getClassQuery(), true);
-
-		manifest_.compare(new OwlRelatedEntitiesTestOutput(subNodes));
-
+	@Ignore
+	@Override
+	public void testWithInterruptions() throws Exception {
+		super.testWithInterruptions();
 	}
 
 }
