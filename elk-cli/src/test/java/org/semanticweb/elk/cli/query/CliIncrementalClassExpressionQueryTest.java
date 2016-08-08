@@ -30,7 +30,6 @@ import org.junit.runner.RunWith;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.incremental.CliIncrementalReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.BaseIncrementalClassExpressionQueryTest;
 import org.semanticweb.elk.reasoner.query.ClassExpressionQueryTestManifest;
@@ -48,9 +47,6 @@ import org.semanticweb.elk.testing.TestOutput;
 public abstract class CliIncrementalClassExpressionQueryTest<O extends TestOutput>
 		extends
 		BaseIncrementalClassExpressionQueryTest<ElkClassExpression, ElkAxiom, O> {
-
-	protected Reasoner standardReasoner_;
-	protected Reasoner incrementalReasoner_;
 
 	public CliIncrementalClassExpressionQueryTest(
 			final TestManifest<ClassQueryTestInput<ElkClassExpression>> manifest,

@@ -621,6 +621,24 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		return result;
 	}
 
+	private void computeQuery(final ElkClassExpression classExpression)
+			throws ElkException {
+
+		if (classExpressionQueryState_.indexQuery(classExpression)) {
+			return;
+		}
+		// else
+
+		if (isIncrementalMode()) {
+			stageManager.incrementalCompletionStage.invalidateRecursive();
+			complete(stageManager.incrementalClassExpressionQueryStage);
+		} else {
+			stageManager.classExpressionQueryStage.invalidateRecursive();
+			complete(stageManager.classExpressionQueryStage);
+		}
+
+	}
+
 	/**
 	 * Check if the given {@link ElkClassExpression} is satisfiable, that is, if
 	 * it can possibly have instances. {@link ElkClassExpression}s are not
@@ -636,29 +654,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 */
 	public synchronized boolean isSatisfiable(
 			final ElkClassExpression classExpression) throws ElkException {
-
-		classExpressionQueryState_.loadQuery(classExpression);
-
-		Boolean result = classExpressionQueryState_
-				.isSatisfiable(classExpression);
-		if (result != null) {
-			return result.booleanValue();
-		}
-
-		if (isIncrementalMode()) {
-			stageManager.incrementalCompletionStage.invalidateRecursive();
-			complete(stageManager.incrementalClassExpressionQueryStage);
-		} else {
-			stageManager.classExpressionQueryStage.invalidateRecursive();
-			complete(stageManager.classExpressionQueryStage);
-		}
-
-		result = classExpressionQueryState_.isSatisfiable(classExpression);
-		if (result == null) {
-			throw new IllegalStateException(
-					"Query was not computed! " + classExpression);
-		}
-		return result.booleanValue();
+		computeQuery(classExpression);
+		return classExpressionQueryState_.isSatisfiable(classExpression);
 	}
 
 	/**
@@ -682,19 +679,15 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			throw new ElkInconsistentOntologyException();
 		}
 
-		if (!isSatisfiable(classExpression)) {
-			return getTaxonomy().getBottomNode();
-		}
-		// else
+		computeQuery(classExpression);
 
 		final Node<ElkClass> result = classExpressionQueryState_
 				.getEquivalentClasses(classExpression);
 		if (result == null) {
-			throw new IllegalStateException(
-					"Query was not computed! " + classExpression);
+			return getTaxonomy().getBottomNode();
+		} else {
+			return result;
 		}
-
-		return result;
 	}
 
 	/**
@@ -717,19 +710,15 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			throw new ElkInconsistentOntologyException();
 		}
 
-		if (!isSatisfiable(classExpression)) {
-			return getTaxonomy().getBottomNode().getDirectSuperNodes();
-		}
-		// else
+		computeQuery(classExpression);
 
 		final Set<? extends Node<ElkClass>> result = classExpressionQueryState_
 				.getDirectSuperClasses(classExpression);
 		if (result == null) {
-			throw new IllegalStateException(
-					"Query was not computed! " + classExpression);
+			return getTaxonomy().getBottomNode().getDirectSuperNodes();
+		} else {
+			return result;
 		}
-
-		return result;
 	}
 
 	/**
@@ -752,21 +741,18 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			throw new ElkInconsistentOntologyException();
 		}
 
+		// TODO: Always compute taxonomy in computeQuery!
+		classExpressionQueryState_.indexQuery(classExpression);
 		final Taxonomy<ElkClass> taxonomy = getTaxonomy();
-
-		if (!isSatisfiable(classExpression)) {
-			return taxonomy.getBottomNode().getAllSubNodes();
-		}
-		// else
+		computeQuery(classExpression);
 
 		final Set<? extends Node<ElkClass>> result = classExpressionQueryState_
 				.getDirectSubClasses(classExpression, taxonomy);
 		if (result == null) {
-			throw new IllegalStateException(
-					"Query was not computed! " + classExpression);
+			return taxonomy.getBottomNode().getDirectSubNodes();
+		} else {
+			return result;
 		}
-
-		return result;
 	}
 
 	/**

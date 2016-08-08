@@ -26,7 +26,6 @@ import org.semanticweb.elk.owlapi.OwlApiIncrementalReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.ClassQueryTestInput;
 import org.semanticweb.elk.reasoner.query.EquivalentEntitiesTestOutput;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -63,11 +62,6 @@ public class OwlApiIncrementalClassExpressionEquivalentClassesQueryTest extends
 					}
 
 				});
-	}
-
-	@Override
-	protected boolean ignore(TestInput input) {
-		return true;
 	}
 
 }

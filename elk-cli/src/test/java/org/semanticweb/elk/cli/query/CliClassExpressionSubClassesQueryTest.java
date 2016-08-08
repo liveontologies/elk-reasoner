@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Set;
 
 import org.junit.runner.RunWith;
@@ -43,7 +42,6 @@ import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
-import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
 
 @RunWith(PolySuite.class)
@@ -101,31 +99,6 @@ public class CliClassExpressionSubClassesQueryTest extends
 
 				});
 
-	}
-
-	// @formatter:off
-	static final String[] IGNORE_LIST = {
-			"CompositionReflexivity0.owl",
-			"CompositionReflexivityComplex0.owl",
-			"ReflexiveRole0.owl",
-			"ReflexiveRole1.owl",
-			"ReflexiveRole2.owl",
-			"ReflexiveRole3.owl",
-			"SameIndividual0.owl",
-			"SameIndividual1.owl",
-			"TransitiveProperty0.owl",
-			"TransitivePropertyChain0.owl",
-			"kangaroo0.owl"
-		};
-	// @formatter:on
-
-	static {
-		Arrays.sort(IGNORE_LIST);
-	}
-
-	@Override
-	protected boolean ignore(TestInput input) {
-		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
 	}
 
 }

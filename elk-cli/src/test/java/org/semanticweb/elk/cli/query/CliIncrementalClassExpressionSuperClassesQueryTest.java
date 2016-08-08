@@ -31,7 +31,6 @@ import org.semanticweb.elk.reasoner.query.ClassQueryTestInput;
 import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
 
 @RunWith(PolySuite.class)
@@ -65,11 +64,6 @@ public class CliIncrementalClassExpressionSuperClassesQueryTest extends
 					}
 
 				});
-	}
-
-	@Override
-	protected boolean ignore(TestInput input) {
-		return true;
 	}
 
 }

@@ -38,10 +38,12 @@ import org.semanticweb.elk.reasoner.indexing.classes.BaseModifiableIndexedObject
 import org.semanticweb.elk.reasoner.indexing.classes.UpdatingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
+import org.semanticweb.elk.reasoner.query.ElkQueryException;
 import org.semanticweb.elk.reasoner.query.QueryNode;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputEquivalent;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputEquivalentDirect;
@@ -73,25 +75,42 @@ public class ClassExpressionQueryState {
 
 	/**
 	 * Contains indexed class expressions that were queried and added to the
-	 * index, but not saturated.
+	 * index, but not computed.
+	 * 
+	 * Computed means that output of transitive reduction was received by
+	 * {@link #transitiveReductionOutputProcessor_}.
+	 * 
+	 * @see #computed_
 	 */
-	private final Set<IndexedClassExpression> notSaturated_ = Collections
+	private final Set<IndexedClassExpression> notComputed_ = Collections
 			.newSetFromMap(
 					new ConcurrentHashMap<IndexedClassExpression, Boolean>());
 
 	/**
 	 * Contains indexed class expressions that were queried, added to the index
-	 * and saturated.
+	 * and computed.
+	 * 
+	 * @see #notComputed_
 	 */
-	private final Set<IndexedClassExpression> saturated_ = Collections
+	private final Set<IndexedClassExpression> computed_ = Collections
 			.newSetFromMap(
 					new ConcurrentHashMap<IndexedClassExpression, Boolean>());
 
 	/**
 	 * Maps indexed class expressions that were queried, added to the index,
-	 * saturated and are satisfiable to the nodes with their equivalent classes.
+	 * computed and are satisfiable to the nodes with their equivalent classes.
+	 * 
+	 * @see #notComputed_
+	 * @see #computed_
 	 */
 	private final Map<IndexedClassExpression, QueryNode<ElkClass>> satisfiable_ = new ConcurrentHashMap<IndexedClassExpression, QueryNode<ElkClass>>();
+
+	/**
+	 * Maps atomic classes to queried indexed class expressions to which they
+	 * are related, i.e., the atomic classes are equivalent to them, or their
+	 * direct super-classes.
+	 */
+	private final Map<ElkClass, Collection<IndexedClassExpression>> queriesByRelated_ = new ConcurrentHashMap<ElkClass, Collection<IndexedClassExpression>>();
 
 	private final SaturationState<? extends Context> saturationState_;
 
@@ -127,9 +146,25 @@ public class ClassExpressionQueryState {
 							 * Saturation and "un-saturation" should not happen
 							 * on the same time, so this should be thread-safe.
 							 */
-							if (saturated_.remove(ice)) {
-								notSaturated_.add(ice);
+							if (computed_.remove(ice)) {
+								notComputed_.add(ice);
 								satisfiable_.remove(ice);
+							}
+
+							if (ice instanceof IndexedClass) {
+								final IndexedClass ic = (IndexedClass) ice;
+
+								final Collection<IndexedClassExpression> queryClasses = queriesByRelated_
+										.remove(ic.getElkEntity());
+								if (queryClasses != null) {
+									for (final IndexedClassExpression queryClass : queryClasses) {
+										if (computed_.remove(queryClass)) {
+											notComputed_.add(queryClass);
+											satisfiable_.remove(queryClass);
+										}
+									}
+								}
+
 							}
 						}
 					}
@@ -137,9 +172,10 @@ public class ClassExpressionQueryState {
 					@Override
 					public void contextsClear() {
 						// TODO: does this need to be more thread-safe ??
-						notSaturated_.addAll(saturated_);
-						saturated_.clear();
+						notComputed_.addAll(computed_);
+						computed_.clear();
 						satisfiable_.clear();
+						queriesByRelated_.clear();
 					}
 
 				});
@@ -151,8 +187,9 @@ public class ClassExpressionQueryState {
 	 * <code>null</code> for class expressions that were not registered.
 	 * 
 	 * @param classExpression
+	 * @return whether the query is already computed
 	 */
-	void loadQuery(final ElkClassExpression classExpression) {
+	boolean indexQuery(final ElkClassExpression classExpression) {
 		/* @formatter:off
 		 * 
 		 * If it was already queried, do nothing. Otherwise:
@@ -162,10 +199,11 @@ public class ClassExpressionQueryState {
 		 * @formatter:on
 		 */
 
-		final IndexedClassExpression ice;
+		IndexedClassExpression ice;
 		synchronized (queried_) {
-			if (queried_.containsKey(classExpression)) {
-				return;
+			ice = queried_.get(classExpression);
+			if (ice != null) {
+				return computed_.contains(ice);
 			}
 			ice = classExpression.accept(updatingExpressionConverter_);
 			queried_.put(classExpression, ice);
@@ -175,9 +213,13 @@ public class ClassExpressionQueryState {
 		if (context != null && context.isInitialized() && context.isSaturated()
 				&& context.containsConclusion(
 						conclusionFactory_.getContradiction(ice))) {
-			saturated_.add(ice);
+			// If the query is unsatisfiable, it is already computed ...
+			computed_.add(ice);
+			return true;
 		} else {
-			notSaturated_.add(ice);
+			// ... otherwise we need to compute the equivalent and super-classes
+			notComputed_.add(ice);
+			return false;
 		}
 
 	}
@@ -193,10 +235,10 @@ public class ClassExpressionQueryState {
 			 * Saturation and "un-saturation" should not happen at the same
 			 * time, so this should be thread-safe.
 			 */
-			if (!notSaturated_.remove(ice)) {
+			if (!notComputed_.remove(ice)) {
 				return;
 			}
-			saturated_.add(ice);
+			computed_.add(ice);
 
 			final List<ElkClass> equivalent = output.getEquivalent();
 			final Collection<? extends List<ElkClass>> directSubsumers = output
@@ -204,6 +246,9 @@ public class ClassExpressionQueryState {
 
 			final QueryNode<ElkClass> node = new QueryNode<ElkClass>(equivalent,
 					equivalent.size(), ElkClassKeyProvider.INSTANCE);
+			for (final ElkClass elkClass : equivalent) {
+				addRelated(ice, elkClass);
+			}
 
 			for (final List<ElkClass> directSubs : directSubsumers) {
 				// direct subsumers should not be empty
@@ -211,6 +256,9 @@ public class ClassExpressionQueryState {
 						directSubs, directSubs.size(),
 						ElkClassKeyProvider.INSTANCE);
 				node.addDirectSuperNode(directSuperNode);
+				for (final ElkClass elkClass : directSubs) {
+					addRelated(ice, elkClass);
+				}
 			}
 
 			satisfiable_.put(ice, node);
@@ -225,10 +273,10 @@ public class ClassExpressionQueryState {
 			 * Saturation and "un-saturation" should not happen at the same
 			 * time, so this should be thread-safe.
 			 */
-			if (!notSaturated_.remove(ice)) {
+			if (!notComputed_.remove(ice)) {
 				return;
 			}
-			saturated_.add(ice);
+			computed_.add(ice);
 		}
 
 		@Override
@@ -240,6 +288,20 @@ public class ClassExpressionQueryState {
 		}
 
 	};
+
+	private void addRelated(final IndexedClassExpression queryClass,
+			final ElkClass related) {
+		// More fine-grained synchronization is possible but not necessary.
+		synchronized (queriesByRelated_) {
+			Collection<IndexedClassExpression> queryClasses = queriesByRelated_
+					.get(related);
+			if (queryClasses == null) {
+				queryClasses = new ArrayHashSet<IndexedClassExpression>();
+				queriesByRelated_.put(related, queryClasses);
+			}
+			queryClasses.add(queryClass);
+		}
+	}
 
 	/**
 	 * @return processor of output of transitive reduction of the queried class
@@ -254,101 +316,109 @@ public class ClassExpressionQueryState {
 	 *         index, but not saturated.
 	 */
 	public Collection<IndexedClassExpression> getNotSaturatedQueriedClassExpressions() {
-		return notSaturated_;
+		return notComputed_;
+	}
+
+	private IndexedClassExpression checkComputed(
+			final ElkClassExpression classExpression) throws ElkQueryException {
+
+		final IndexedClassExpression ice = queried_.get(classExpression);
+
+		if (ice != null && computed_.contains(ice)) {
+			return ice;
+		}
+
+		throw new ElkQueryException(
+				"Query was not computed yet: " + classExpression);
 	}
 
 	/**
 	 * Checks whether the supplied class expression is satisfiable, if the
 	 * result was already computed. If the class expression was not registered
-	 * by {@link #loadQuery(ElkClassExpression)} or the appropriate stage was
-	 * not completed yet, returns <code>null</code>.
+	 * by {@link #indexQuery(ElkClassExpression)} or the appropriate stage was
+	 * not completed yet, throws {@link ElkQueryException}.
 	 * 
 	 * @param classExpression
-	 * @return <code>null</code> if the result is not ready, otherwise whether
-	 *         the supplied class expression is satisfiable.
+	 * @return whether the supplied class expression is satisfiable.
+	 * @throws ElkQueryException
+	 *             if the result is not ready
 	 */
-	Boolean isSatisfiable(final ElkClassExpression classExpression) {
-
-		final IndexedClassExpression ice = queried_.get(classExpression);
-
-		if (ice != null && saturated_.contains(ice)) {
-			return satisfiable_.containsKey(ice);
-		}
-
-		return null;
+	boolean isSatisfiable(final ElkClassExpression classExpression)
+			throws ElkQueryException {
+		final IndexedClassExpression ice = checkComputed(classExpression);
+		return satisfiable_.containsKey(ice);
 	}
 
 	/**
 	 * Returns {@link Node} containing all {@link ElkClass}es equivalent to the
-	 * supplied class expression, if the result was already computed. If the
-	 * class expression was not registered by
-	 * {@link #loadQuery(ElkClassExpression)} or the appropriate stage was not
-	 * completed yet, returns <code>null</code>.
+	 * supplied class expression, if it is satisfiable. Returns
+	 * <code>null</code> otherwise. If the class expression was not registered
+	 * by {@link #indexQuery(ElkClassExpression)} or the appropriate stage was
+	 * not completed yet, throws {@link ElkQueryException}.
 	 * 
 	 * @param classExpression
-	 * @return <code>null</code> if the result is not ready, otherwise atomic
-	 *         classes equivalent to the supplied class expression.
+	 * @return atomic classes equivalent to the supplied class expression, if it
+	 *         is satisfiable, otherwise <code>null</code>.
+	 * @throws ElkQueryException
+	 *             if the result is not ready
 	 */
 	Node<ElkClass> getEquivalentClasses(
-			final ElkClassExpression classExpression) {
-
-		final IndexedClassExpression ice = queried_.get(classExpression);
-
-		if (ice != null && saturated_.contains(ice)) {
-			return satisfiable_.get(ice);
-		}
-
-		return null;
+			final ElkClassExpression classExpression) throws ElkQueryException {
+		final IndexedClassExpression ice = checkComputed(classExpression);
+		return satisfiable_.get(ice);
 	}
 
 	/**
 	 * Returns set of {@link Node}s containing all {@link ElkClass}es that are
-	 * direct strict super-classes of the supplied class expression, if the
-	 * result was already computed. If the class expression was not registered
-	 * by {@link #loadQuery(ElkClassExpression)} or the appropriate stage was
-	 * not completed yet, returns <code>null</code>.
+	 * direct strict super-classes of the supplied class expression, if it is
+	 * satisfiable. Returns <code>null</code> otherwise. If the class expression
+	 * was not registered by {@link #indexQuery(ElkClassExpression)} or the
+	 * appropriate stage was not completed yet, throws {@link ElkQueryException}
+	 * .
 	 * 
 	 * @param classExpression
-	 * @return <code>null</code> if the result is not ready, otherwise atomic
-	 *         direct strict super-classes of the supplied class expression.
+	 * @return atomic direct strict super-classes of the supplied class
+	 *         expression, if it is satisfiable, otherwise <code>null</code>.
+	 * @throws ElkQueryException
+	 *             if the result is not ready
 	 */
 	Set<? extends Node<ElkClass>> getDirectSuperClasses(
-			final ElkClassExpression classExpression) {
-
-		final IndexedClassExpression ice = queried_.get(classExpression);
-
-		if (ice != null && saturated_.contains(ice)) {
-			final QueryNode<ElkClass> node = satisfiable_.get(ice);
+			final ElkClassExpression classExpression) throws ElkQueryException {
+		final IndexedClassExpression ice = checkComputed(classExpression);
+		final QueryNode<ElkClass> node = satisfiable_.get(ice);
+		if (node == null) {
+			return null;
+		} else {
 			return node.getDirectSuperNodes();
 		}
-
-		return null;
 	}
 
 	/**
 	 * Returns set of {@link Node}s containing all {@link ElkClass}es that are
-	 * direct strict sub-classes of the supplied class expression, if the result
-	 * was already computed. If the class expression was not registered by
-	 * {@link #loadQuery(ElkClassExpression)} or the appropriate stage was not
-	 * completed yet, returns <code>null</code>.
+	 * direct strict sub-classes of the supplied class expression, if it is
+	 * satisfiable. Returns <code>null</code> otherwise. If the class expression
+	 * was not registered by {@link #indexQuery(ElkClassExpression)} or the
+	 * appropriate stage was not completed yet, throws {@link ElkQueryException}
+	 * .
 	 * 
 	 * @param classExpression
 	 * @param taxonomy
-	 * @return <code>null</code> if the result is not ready, otherwise atomic
-	 *         direct strict sub-classes of the supplied class expression.
+	 * @return atomic direct strict sub-classes of the supplied class
+	 *         expression, if it is satisfiable, otherwise <code>null</code>.
+	 * @throws ElkQueryException
+	 *             if the result is not ready
 	 */
 	Set<? extends Node<ElkClass>> getDirectSubClasses(
 			final ElkClassExpression classExpression,
-			final Taxonomy<ElkClass> taxonomy) {
+			final Taxonomy<ElkClass> taxonomy) throws ElkQueryException {
 
-		final IndexedClassExpression ice = queried_.get(classExpression);
+		final IndexedClassExpression ice = checkComputed(classExpression);
 
-		if (ice == null || !saturated_.contains(ice)) {
+		final QueryNode<ElkClass> node = satisfiable_.get(ice);
+		if (node == null) {
 			return null;
 		}
 		// else
-
-		final QueryNode<ElkClass> node = satisfiable_.get(ice);
 
 		final Iterator<ElkClass> iter = node.iterator();
 		if (iter.hasNext()) {
@@ -426,6 +496,14 @@ public class ClassExpressionQueryState {
 
 		}
 
+		if (result.isEmpty()) {
+			/*
+			 * No indexed class has classExpression among its subsumers and
+			 * classExpression is not equivalent to any atomic class, so the
+			 * only subclass of classExpression is Nothing and it is direct.
+			 */
+			result.add(taxonomy.getBottomNode());
+		}
 		return Collections.unmodifiableSet(result);
 	}
 
