@@ -1,4 +1,4 @@
-Prefix(:=<owlapi:ontology#ont1#>)
+Prefix(: = <http://example.org/>)
 Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
 Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
 Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
@@ -6,30 +6,14 @@ Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
 Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
 
 
-Ontology(<owlapi:ontology#ont1>
+Ontology(
 
-Declaration(Class(<http://example.org/A>))
-Declaration(Class(<http://example.org/C>))
-Declaration(ObjectProperty(<http://example.org/H>))
-Declaration(ObjectProperty(<http://example.org/R>))
-Declaration(ObjectProperty(<http://example.org/T>))
-############################
-#   Object Properties
-############################
+# TODO: redundant
 
-# Object Property: <http://example.org/R> (<http://example.org/R>)
+ReflexiveObjectProperty(:R)
 
-ReflexiveObjectProperty(<http://example.org/R>)
+SubClassOf(:A ObjectSomeValuesFrom(:H :C))
 
+SubObjectPropertyOf(ObjectPropertyChain(:H :R) :T)
 
-############################
-#   Classes
-############################
-
-# Class: <http://example.org/A> (<http://example.org/A>)
-
-SubClassOf(<http://example.org/A> ObjectSomeValuesFrom(<http://example.org/H> <http://example.org/C>))
-
-
-SubObjectPropertyOf(ObjectPropertyChain(<http://example.org/H> <http://example.org/R>) <http://example.org/T>)
 )

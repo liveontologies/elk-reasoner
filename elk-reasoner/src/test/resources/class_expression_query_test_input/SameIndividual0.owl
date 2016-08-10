@@ -1,34 +1,15 @@
-Prefix(:=<owlapi:ontology#ont27#>)
-Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
-Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
-Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
-Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
-Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+Prefix(: = <http://example.org/>)
+Prefix(rdf: = <http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs: = <http://www.w3.org/2000/01/rdf-schema#>)
+Prefix(xsd: = <http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl: = <http://www.w3.org/2002/07/owl#>)
+Prefix(xml: = <http://www.w3.org/XML/1998/namespace>)
+Ontology(
 
+# TODO: call it HasValue
 
-Ontology(<owlapi:ontology#ont27>
+EquivalentClasses(:A ObjectHasValue(:R :a))
 
-Declaration(Class(<http://example.org/B>))
-Declaration(ObjectProperty(<http://example.org/R>))
-Declaration(NamedIndividual(<http://example.org/a>))
-Declaration(NamedIndividual(<http://example.org/b>))
-
-############################
-#   Classes
-############################
-
-# Class: <http://example.org/B> (<http://example.org/B>)
-
-EquivalentClasses(<http://example.org/B> ObjectHasValue(<http://example.org/R> <http://example.org/b>))
-
-
-############################
-#   Named Individuals
-############################
-
-# Individual: <http://example.org/a> (<http://example.org/a>)
-
-SameIndividual(<http://example.org/a> <http://example.org/b>)
-
+SameIndividual(:a :b)
 
 )

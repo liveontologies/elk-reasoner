@@ -1,62 +1,25 @@
-Prefix(:=<owlapi:ontology#ont7#>)
+Prefix(:=<http://www.test.com/schema#>)
 Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
 Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
 Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
 Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
 Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
 
+Ontology(
 
-Ontology(<owlapi:ontology#ont7>
+ObjectPropertyDomain(:has-child :Human)
+ObjectPropertyRange(:has-child :Human)
 
-Declaration(Class(<http://www.test.com/schema#Animal>))
-Declaration(Class(<http://www.test.com/schema#Beast>))
-Declaration(Class(<http://www.test.com/schema#Human>))
-Declaration(Class(<http://www.test.com/schema#Irrational>))
-Declaration(Class(<http://www.test.com/schema#Kangaroo>))
-Declaration(Class(<http://www.test.com/schema#KangarooInfant>))
-Declaration(Class(<http://www.test.com/schema#MaternityKangaroo>))
-Declaration(Class(<http://www.test.com/schema#Pouch>))
-Declaration(Class(<http://www.test.com/schema#Rational>))
-Declaration(ObjectProperty(<http://www.test.com/schema#has-body-part>))
-Declaration(ObjectProperty(<http://www.test.com/schema#has-child>))
-Declaration(ObjectProperty(<http://www.test.com/schema#lives-in>))
-############################
-#   Object Properties
-############################
+SubClassOf(:Beast ObjectIntersectionOf(:Animal :Irrational))
 
-# Object Property: <http://www.test.com/schema#has-child> (<http://www.test.com/schema#has-child>)
+SubClassOf(:Human ObjectIntersectionOf(:Animal :Rational))
 
-ObjectPropertyDomain(<http://www.test.com/schema#has-child> <http://www.test.com/schema#Human>)
-ObjectPropertyRange(<http://www.test.com/schema#has-child> <http://www.test.com/schema#Human>)
+DisjointClasses(:Irrational :Rational)
 
+SubClassOf(:Kangaroo :Beast)
 
-############################
-#   Classes
-############################
+SubClassOf(:KangarooInfant ObjectIntersectionOf(:Kangaroo ObjectSomeValuesFrom(:lives-in :Pouch)))
 
-# Class: <http://www.test.com/schema#Beast> (<http://www.test.com/schema#Beast>)
-
-SubClassOf(<http://www.test.com/schema#Beast> ObjectIntersectionOf(<http://www.test.com/schema#Animal> <http://www.test.com/schema#Irrational>))
-
-# Class: <http://www.test.com/schema#Human> (<http://www.test.com/schema#Human>)
-
-SubClassOf(<http://www.test.com/schema#Human> ObjectIntersectionOf(<http://www.test.com/schema#Animal> <http://www.test.com/schema#Rational>))
-
-# Class: <http://www.test.com/schema#Irrational> (<http://www.test.com/schema#Irrational>)
-
-DisjointClasses(<http://www.test.com/schema#Irrational> <http://www.test.com/schema#Rational>)
-
-# Class: <http://www.test.com/schema#Kangaroo> (<http://www.test.com/schema#Kangaroo>)
-
-SubClassOf(<http://www.test.com/schema#Kangaroo> <http://www.test.com/schema#Beast>)
-
-# Class: <http://www.test.com/schema#KangarooInfant> (<http://www.test.com/schema#KangarooInfant>)
-
-SubClassOf(<http://www.test.com/schema#KangarooInfant> ObjectIntersectionOf(<http://www.test.com/schema#Kangaroo> ObjectSomeValuesFrom(<http://www.test.com/schema#lives-in> <http://www.test.com/schema#Pouch>)))
-
-# Class: <http://www.test.com/schema#MaternityKangaroo> (<http://www.test.com/schema#MaternityKangaroo>)
-
-EquivalentClasses(<http://www.test.com/schema#MaternityKangaroo> ObjectIntersectionOf(<http://www.test.com/schema#Kangaroo> ObjectSomeValuesFrom(<http://www.test.com/schema#has-body-part> <http://www.test.com/schema#Pouch>) ObjectSomeValuesFrom(<http://www.test.com/schema#has-child> <http://www.test.com/schema#KangarooInfant>)))
-
+EquivalentClasses(:MaternityKangaroo ObjectIntersectionOf(:Kangaroo ObjectSomeValuesFrom(:has-body-part :Pouch) ObjectSomeValuesFrom(:has-child :KangarooInfant)))
 
 )

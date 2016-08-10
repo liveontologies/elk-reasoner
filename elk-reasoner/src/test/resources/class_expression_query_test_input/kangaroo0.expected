@@ -1,27 +1,15 @@
-Prefix(:=<owlapi:ontology#ont8#>)
+Prefix(:=<http://www.test.com/schema#>)
 Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
 Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
 Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
 Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
 Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
 
+Ontology(
 
-Ontology(<owlapi:ontology#ont8>
+EquivalentClasses(:MaternityKangaroo owl:Nothing)
+SubClassOf(:MaternityKangaroo ObjectSomeValuesFrom(:has-child owl:Thing))
 
-Declaration(Class(<http://www.test.com/schema#Human>))
-Declaration(Class(<http://www.test.com/schema#MaternityKangaroo>))
-Declaration(ObjectProperty(<http://www.test.com/schema#has-child>))
+SubClassOf(ObjectSomeValuesFrom(:has-child owl:Thing) :Human)
 
-############################
-#   Classes
-############################
-
-# Class: <http://www.test.com/schema#MaternityKangaroo> (<http://www.test.com/schema#MaternityKangaroo>)
-
-EquivalentClasses(<http://www.test.com/schema#MaternityKangaroo> owl:Nothing)
-SubClassOf(<http://www.test.com/schema#MaternityKangaroo> ObjectSomeValuesFrom(<http://www.test.com/schema#has-child> owl:Thing))
-
-
-
-SubClassOf(ObjectSomeValuesFrom(<http://www.test.com/schema#has-child> owl:Thing) <http://www.test.com/schema#Human>)
 )

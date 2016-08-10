@@ -1,70 +1,30 @@
-Prefix(:=<owlapi:ontology#ont25#>)
-Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
-Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
-Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
-Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
-Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+Prefix(: = <http://example.org/>)
+Prefix(rdf: = <http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs: = <http://www.w3.org/2000/01/rdf-schema#>)
+Prefix(xsd: = <http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl: = <http://www.w3.org/2002/07/owl#>)
+Ontology(
 
+# TODO: redundant
 
-Ontology(<owlapi:ontology#ont25>
+Annotation( rdfs:label 
+ "S is implicitly reflexive since R and H1 are.
+ Tests that :H (an implicitly reflexive role) is properly handled, i.e., :T1 o :T2 -> U.
+ Tests that :R is properly eliminated from these chains to still entail V1 -> V3 and, thus, K -> L." )
 
-Declaration(Class(<http://example.org/A>))
-Declaration(Class(<http://example.org/B>))
-Declaration(Class(<http://example.org/C>))
-Declaration(Class(<http://example.org/C1>))
-Declaration(Class(<http://example.org/C2>))
-Declaration(Class(<http://example.org/D>))
-Declaration(Class(<http://example.org/F>))
-Declaration(Class(<http://example.org/K>))
-Declaration(Class(<http://example.org/K1>))
-Declaration(ObjectProperty(<http://example.org/H>))
-Declaration(ObjectProperty(<http://example.org/H1>))
-Declaration(ObjectProperty(<http://example.org/R>))
-Declaration(ObjectProperty(<http://example.org/S>))
-Declaration(ObjectProperty(<http://example.org/T1>))
-Declaration(ObjectProperty(<http://example.org/T2>))
-Declaration(ObjectProperty(<http://example.org/U>))
-Declaration(ObjectProperty(<http://example.org/V1>))
-Declaration(ObjectProperty(<http://example.org/V2>))
-Declaration(ObjectProperty(<http://example.org/V3>))
-############################
-#   Object Properties
-############################
+ReflexiveObjectProperty(:R)
+ReflexiveObjectProperty(:H)
 
-# Object Property: <http://example.org/H> (<http://example.org/H>)
+EquivalentClasses(:B ObjectSomeValuesFrom(:R :A))
+EquivalentClasses(:D ObjectSomeValuesFrom(:S :C))
+SubObjectPropertyOf(:H :H1)
+SubObjectPropertyOf(ObjectPropertyChain(:R :H1) :S) 
 
-SubObjectPropertyOf(<http://example.org/H> <http://example.org/H1>)
-ReflexiveObjectProperty(<http://example.org/H>)
+SubObjectPropertyOf(ObjectPropertyChain(:T1 :T2 :H) :U)
+SubClassOf(:C1 ObjectSomeValuesFrom(:T1 ObjectSomeValuesFrom(:T2 :C2)))
+SubClassOf(ObjectSomeValuesFrom(:U :C2) :F)
 
-# Object Property: <http://example.org/R> (<http://example.org/R>)
-
-ReflexiveObjectProperty(<http://example.org/R>)
-
-
-############################
-#   Classes
-############################
-
-# Class: <http://example.org/B> (<http://example.org/B>)
-
-EquivalentClasses(<http://example.org/B> ObjectSomeValuesFrom(<http://example.org/R> <http://example.org/A>))
-
-# Class: <http://example.org/C1> (<http://example.org/C1>)
-
-SubClassOf(<http://example.org/C1> ObjectSomeValuesFrom(<http://example.org/T1> ObjectSomeValuesFrom(<http://example.org/T2> <http://example.org/C2>)))
-
-# Class: <http://example.org/D> (<http://example.org/D>)
-
-EquivalentClasses(<http://example.org/D> ObjectSomeValuesFrom(<http://example.org/S> <http://example.org/C>))
-
-# Class: <http://example.org/K> (<http://example.org/K>)
-
-EquivalentClasses(<http://example.org/K> ObjectSomeValuesFrom(<http://example.org/V1> <http://example.org/K1>))
-
-
-SubClassOf(ObjectSomeValuesFrom(<http://example.org/U> <http://example.org/C2>) <http://example.org/F>)
-SubObjectPropertyOf(ObjectPropertyChain(<http://example.org/R> <http://example.org/H1>) <http://example.org/S>)
-SubObjectPropertyOf(ObjectPropertyChain(<http://example.org/R> <http://example.org/V1>) <http://example.org/V2>)
-SubObjectPropertyOf(ObjectPropertyChain(<http://example.org/T1> <http://example.org/T2> <http://example.org/H>) <http://example.org/U>)
-SubObjectPropertyOf(ObjectPropertyChain(<http://example.org/V2> <http://example.org/R>) <http://example.org/V3>)
+SubObjectPropertyOf(ObjectPropertyChain(:R :V1) :V2)
+SubObjectPropertyOf(ObjectPropertyChain(:V2 :R) :V3)
+EquivalentClasses(:K ObjectSomeValuesFrom(:V1 :K1))
 )

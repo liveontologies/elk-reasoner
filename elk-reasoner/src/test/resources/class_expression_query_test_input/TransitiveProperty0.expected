@@ -1,26 +1,13 @@
-Prefix(:=<owlapi:ontology#ont32#>)
-Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
-Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
-Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
-Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
-Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+Prefix(: = <http://example.org/>)
+Prefix(rdf: = <http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs: = <http://www.w3.org/2000/01/rdf-schema#>)
+Prefix(xsd: = <http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl: = <http://www.w3.org/2002/07/owl#>)
+Prefix(xml: = <http://www.w3.org/XML/1998/namespace>)
+Ontology(
 
+SubClassOf(:A ObjectSomeValuesFrom(:T :C))
 
-Ontology(<owlapi:ontology#ont32>
+SubClassOf(ObjectSomeValuesFrom(:T :C) owl:Thing)
 
-Declaration(Class(<http://example.org/A>))
-Declaration(Class(<http://example.org/C>))
-Declaration(ObjectProperty(<http://example.org/T>))
-
-############################
-#   Classes
-############################
-
-# Class: <http://example.org/A> (<http://example.org/A>)
-
-SubClassOf(<http://example.org/A> ObjectSomeValuesFrom(<http://example.org/T> <http://example.org/C>))
-
-
-
-SubClassOf(ObjectSomeValuesFrom(<http://example.org/T> <http://example.org/C>) owl:Thing)
 )

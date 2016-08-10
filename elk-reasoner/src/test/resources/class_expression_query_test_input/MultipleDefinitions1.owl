@@ -1,4 +1,4 @@
-Prefix(:=<owlapi:ontology#ont13#>)
+Prefix(:=<http://example.org/>)
 Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
 Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
 Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
@@ -6,25 +6,14 @@ Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
 Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
 
 
-Ontology(<owlapi:ontology#ont13>
+Ontology(
 
-Declaration(Class(<http://example.org/B>))
-Declaration(Class(<http://example.org/C>))
-Declaration(Class(<http://example.org/D>))
-Declaration(ObjectProperty(<http://example.org/R>))
+# TODO: redundant
 
-############################
-#   Classes
-############################
+EquivalentClasses(:B ObjectSomeValuesFrom(:R :C))
 
-# Class: <http://example.org/B> (<http://example.org/B>)
+EquivalentClasses(:D ObjectSomeValuesFrom(:R :B))
 
-EquivalentClasses(<http://example.org/B> ObjectSomeValuesFrom(<http://example.org/R> <http://example.org/C>))
+EquivalentClasses(ObjectSomeValuesFrom(:R :B) ObjectSomeValuesFrom(:R :C))
 
-# Class: <http://example.org/D> (<http://example.org/D>)
-
-EquivalentClasses(<http://example.org/D> ObjectSomeValuesFrom(<http://example.org/R> <http://example.org/B>))
-
-
-EquivalentClasses(ObjectSomeValuesFrom(<http://example.org/R> <http://example.org/B>) ObjectSomeValuesFrom(<http://example.org/R> <http://example.org/C>))
 )
