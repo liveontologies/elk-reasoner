@@ -6,8 +6,8 @@ Prefix(owl: = <http://www.w3.org/2002/07/owl#>)
 Prefix(xml: = <http://www.w3.org/XML/1998/namespace>)
 Ontology(
 
-SubClassOf(:K ObjectSomeValuesFrom(:V3 :K1))
+EquivalentClasses(:A ObjectHasValue(:R :a))
 
-SubClassOf(ObjectSomeValuesFrom(:V3 :K1) owl:Thing)
+SameIndividual(:a :b)
 
 )

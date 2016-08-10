@@ -1,19 +1,16 @@
-Prefix(: = <http://example.org/>)
+Prefix(:=<http://example.org/>)
 Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
 Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
 Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
 Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
 Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
 
-
 Ontology(
 
-# TODO: redundant
+EquivalentClasses(:B :D ObjectSomeValuesFrom(:R :C))
 
-ReflexiveObjectProperty(:R)
+SubClassOf(owl:Nothing ObjectSomeValuesFrom(:R :C))
 
-SubClassOf(:A ObjectSomeValuesFrom(:H :C))
-
-SubObjectPropertyOf(ObjectPropertyChain(:H :R) :T)
+SubClassOf(ObjectSomeValuesFrom(:R :C) owl:Thing)
 
 )

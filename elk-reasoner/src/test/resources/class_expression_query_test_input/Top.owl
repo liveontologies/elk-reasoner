@@ -12,5 +12,4 @@ SubClassOf(owl:Thing :C)
 ReflexiveObjectProperty(:S)
 ObjectPropertyDomain(:S ObjectSomeValuesFrom(:R :A))
 
-
 )

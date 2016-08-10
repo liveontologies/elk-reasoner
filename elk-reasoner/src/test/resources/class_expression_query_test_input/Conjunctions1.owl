@@ -4,10 +4,8 @@ Prefix(rdfs: = <http://www.w3.org/2000/01/rdf-schema#>)
 Prefix(xsd: = <http://www.w3.org/2001/XMLSchema#>)
 Prefix(owl: = <http://www.w3.org/2002/07/owl#>)
 Ontology(
-
-SubClassOf(:A :B) 
+SubClassOf(:A :B)
 SubClassOf(:A :C)
-SubClassOf(:A :D)
-
-SubClassOf(ObjectIntersectionOf(:B :C :D) :BCD)
+SubClassOf(:B :D)
+SubClassOf(:C :D)
 )

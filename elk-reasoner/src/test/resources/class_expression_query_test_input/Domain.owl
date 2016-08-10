@@ -4,9 +4,6 @@ Prefix(rdfs: = <http://www.w3.org/2000/01/rdf-schema#>)
 Prefix(xsd: = <http://www.w3.org/2001/XMLSchema#>)
 Prefix(owl: = <http://www.w3.org/2002/07/owl#>)
 Ontology(
-
-# TODO: Actually querying domain of :T
-
 SubClassOf(:A ObjectSomeValuesFrom(:R1 :B))
 SubClassOf(:B ObjectSomeValuesFrom(:R2 :C))
 SubClassOf(:C ObjectSomeValuesFrom(:R3 :D))

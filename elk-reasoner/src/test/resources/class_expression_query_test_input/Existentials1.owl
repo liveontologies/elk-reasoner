@@ -4,9 +4,6 @@ Prefix(rdfs: = <http://www.w3.org/2000/01/rdf-schema#>)
 Prefix(xsd: = <http://www.w3.org/2001/XMLSchema#>)
 Prefix(owl: = <http://www.w3.org/2002/07/owl#>)
 Ontology(
-
-# TODO: At most testing some existantial
-
 SubClassOf(:A :B)
 SubClassOf(:B ObjectSomeValuesFrom(:R :C))
 SubClassOf(:C :D)
