@@ -24,10 +24,8 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -427,70 +425,49 @@ public class ClassExpressionQueryState {
 		 * direct atomic sub-classes of classExpression are atomic classes that
 		 * have classExpression among their subsumers, but no other of their
 		 * strict subsumers have classExpression among its subsumers.
-		 * 
-		 * The search can be limited to all sub-classes of direct super-classes
-		 * of classExpression.
 		 */
 
-		final Set<TaxonomyNode<ElkClass>> result = new ArrayHashSet<TaxonomyNode<ElkClass>>();
+		final Collection<? extends IndexedClass> allClasses = saturationState_
+				.getOntologyIndex().getClasses();
+		final Set<IndexedClass> strictSubclasses = new ArrayHashSet<IndexedClass>(
+				allClasses.size());
 
-		final Queue<TaxonomyNode<ElkClass>> toDo = new LinkedList<TaxonomyNode<ElkClass>>();
-		final Set<TaxonomyNode<ElkClass>> done = new ArrayHashSet<TaxonomyNode<ElkClass>>();
-
-		for (final Node<ElkClass> superNode : node.getDirectSuperNodes()) {
-			final Set<? extends TaxonomyNode<ElkClass>> subNodes = taxonomy
-					.getNode(superNode.getCanonicalMember())
-					.getDirectSubNodes();
-			for (final TaxonomyNode<ElkClass> subNode : subNodes) {
-				if (done.add(subNode)) {
-					toDo.add(subNode);
-				}
+		for (final IndexedClass ic : allClasses) {
+			final Set<IndexedClassExpression> subsumers = ic.getContext()
+					.getComposedSubsumers();
+			if (subsumers.contains(ice) && ice.getContext()
+					.getComposedSubsumers().size() != subsumers.size()) {
+				// is subclass, but not equivalent
+				strictSubclasses.add(ic);
 			}
 		}
 
-		while (!toDo.isEmpty()) {
-			final TaxonomyNode<ElkClass> subNode = toDo.poll();
+		final Set<TaxonomyNode<ElkClass>> result = new ArrayHashSet<TaxonomyNode<ElkClass>>();
 
-			// test direct subsumption
-
-			final IndexedClassExpression canonical = subNode
-					.getCanonicalMember().accept(resolvingExpressionConverter_);
-
+		for (final IndexedClass strictSubclass : strictSubclasses) {
+			/*
+			 * If some strict superclass of strictSubclass is a strict subclass
+			 * of classExpression, strictSubclass is not direct.
+			 * 
+			 * It is sufficient to check only direct superclasses of
+			 * strictSubclass.
+			 */
 			boolean isDirect = true;
-			boolean isSubClass = false;
-			for (final IndexedClassExpression subsumer : saturationState_
-					.getContext(canonical).getComposedSubsumers()) {
-				if (subsumer == ice) {
-					isSubClass = true;
-				} else {
-					final Context context = saturationState_
-							.getContext(subsumer);
-					if (context != null) {
-						final Set<IndexedClassExpression> subsumers = context
-								.getComposedSubsumers();
-						if (!subsumers.contains(canonical)
-								&& subsumers.contains(ice)) {
-							// not direct
-							isDirect = false;
-							break;
-						}
-					}
+			for (final TaxonomyNode<ElkClass> superNode : taxonomy
+					.getNode(strictSubclass.getElkEntity())
+					.getDirectSuperNodes()) {
+				final IndexedClassExpression superClass = superNode
+						.getCanonicalMember()
+						.accept(resolvingExpressionConverter_);
+				if (strictSubclasses.contains(superClass)) {
+					isDirect = false;
+					break;
 				}
 			}
 
-			if (isDirect && isSubClass) {
-				result.add(subNode);
+			if (isDirect) {
+				result.add(taxonomy.getNode(strictSubclass.getElkEntity()));
 			}
-
-			// queue up sub-nodes
-
-			for (final TaxonomyNode<ElkClass> subSubNode : subNode
-					.getDirectSubNodes()) {
-				if (done.add(subSubNode)) {
-					toDo.add(subSubNode);
-				}
-			}
-
 		}
 
 		if (result.isEmpty()) {
