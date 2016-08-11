@@ -22,9 +22,6 @@
  */
 package org.semanticweb.elk.reasoner;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -48,12 +45,13 @@ import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.FreshInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.FreshTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.FreshTypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNodeUtils;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -427,27 +425,25 @@ public class Reasoner extends AbstractReasonerState {
 
 			final Taxonomy<ElkClass> taxonomy = getTaxonomy();
 
-			final Set<TaxonomyNode<ElkClass>> result = new ArrayHashSet<TaxonomyNode<ElkClass>>();
-			final Queue<TaxonomyNode<ElkClass>> todo = new LinkedList<TaxonomyNode<ElkClass>>();
-			for (final Node<ElkClass> subNode : subNodes) {
-				final TaxonomyNode<ElkClass> taxonomyNode = taxonomy
-						.getNode(subNode.getCanonicalMember());
-				result.add(taxonomyNode);
-				todo.add(taxonomyNode);
-			}
+			return TaxonomyNodeUtils.getAllReachable(Operations.map(subNodes,
+					new Operations.Transformation<Node<ElkClass>, TaxonomyNode<ElkClass>>() {
 
-			while (!todo.isEmpty()) {
-				final TaxonomyNode<ElkClass> next = todo.poll();
+						@Override
+						public TaxonomyNode<ElkClass> transform(
+								final Node<ElkClass> node) {
+							return taxonomy.getNode(node.getCanonicalMember());
+						}
 
-				for (final TaxonomyNode<ElkClass> succNode : next
-						.getDirectSubNodes()) {
-					if (result.add(succNode)) {
-						todo.add(succNode);
-					}
-				}
-			}
+					}),
+					new Operations.Functor<TaxonomyNode<ElkClass>, Set<? extends TaxonomyNode<ElkClass>>>() {
 
-			return Collections.unmodifiableSet(result);
+						@Override
+						public Set<? extends TaxonomyNode<ElkClass>> apply(
+								final TaxonomyNode<ElkClass> node) {
+							return node.getDirectSubNodes();
+						}
+
+					});
 		}
 
 	}
@@ -522,27 +518,25 @@ public class Reasoner extends AbstractReasonerState {
 
 			final Taxonomy<ElkClass> taxonomy = getTaxonomy();
 
-			final Set<TaxonomyNode<ElkClass>> result = new ArrayHashSet<TaxonomyNode<ElkClass>>();
-			final Queue<TaxonomyNode<ElkClass>> todo = new LinkedList<TaxonomyNode<ElkClass>>();
-			for (final Node<ElkClass> superNode : superNodes) {
-				final TaxonomyNode<ElkClass> taxonomyNode = taxonomy
-						.getNode(superNode.getCanonicalMember());
-				result.add(taxonomyNode);
-				todo.add(taxonomyNode);
-			}
+			return TaxonomyNodeUtils.getAllReachable(Operations.map(superNodes,
+					new Operations.Transformation<Node<ElkClass>, TaxonomyNode<ElkClass>>() {
 
-			while (!todo.isEmpty()) {
-				final TaxonomyNode<ElkClass> next = todo.poll();
+						@Override
+						public TaxonomyNode<ElkClass> transform(
+								final Node<ElkClass> node) {
+							return taxonomy.getNode(node.getCanonicalMember());
+						}
 
-				for (final TaxonomyNode<ElkClass> succNode : next
-						.getDirectSuperNodes()) {
-					if (result.add(succNode)) {
-						todo.add(succNode);
-					}
-				}
-			}
+					}),
+					new Operations.Functor<TaxonomyNode<ElkClass>, Set<? extends TaxonomyNode<ElkClass>>>() {
 
-			return Collections.unmodifiableSet(result);
+						@Override
+						public Set<? extends TaxonomyNode<ElkClass>> apply(
+								final TaxonomyNode<ElkClass> node) {
+							return node.getDirectSuperNodes();
+						}
+
+					});
 		}
 
 	}

@@ -19,7 +19,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.taxonomy.impl;
+package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -46,18 +46,19 @@ import org.semanticweb.elk.util.collections.Operations.Functor;
  */
 public class TaxonomyNodeUtils {
 	
-	private static <N> Set<N> getAllReachable(
+	public static <N> Set<N> getAllReachable(
 					final Collection<? extends N> direct,
 					final Functor<N, Set<? extends N>> succ) {
 		
 		final Set<N> result = new ArrayHashSet<N>(direct.size());
+		result.addAll(direct);
 		final Queue<N> todo = new LinkedList<N>(direct);
 		
 		while (!todo.isEmpty()) {
 			final N next = todo.poll();
 			
-			if (result.add(next)) {
-				for (final N succNode : succ.apply(next)) {
+			for (final N succNode : succ.apply(next)) {
+				if (result.add(succNode)) {
 					todo.add(succNode);
 				}
 			}
@@ -66,21 +67,26 @@ public class TaxonomyNodeUtils {
 		return Collections.unmodifiableSet(result);
 	}
 	
-	private static <N, O> Set<O> getAllReachable(
+	public static <N, O> Set<O> getAllReachable(
 					final N node,
 					final Functor<N, Set<? extends N>> succ,
 					final Functor<N, Set<? extends O>> collect) {
 		
 		final Set<O> result = new ArrayHashSet<O>();
+		final Set<N> done = new ArrayHashSet<N>();
 		final Queue<N> todo = new LinkedList<N>();
+		result.addAll(collect.apply(node));
+		done.add(node);
 		todo.add(node);
 		
 		while (!todo.isEmpty()) {
 			final N next = todo.poll();
 			
-			result.addAll(collect.apply(next));
 			for (final N succNode : succ.apply(next)) {
-				todo.add(succNode);
+				if (done.add(succNode)) {
+					result.addAll(collect.apply(succNode));
+					todo.add(succNode);
+				}
 			}
 		}
 		
