@@ -183,13 +183,12 @@ public class ClassExpressionQueryState {
 
 	/**
 	 * Registers the supplied class expression for querying. Methods
-	 * {@link #isSatisfiable(ElkClassExpression)}, ... will always return
-	 * <code>null</code> for class expressions that were not registered.
+	 * {@link #isSatisfiable(ElkClassExpression)}, ... will throw
+	 * {@link ElkQueryException} for class expressions that were not registered.
 	 * 
 	 * @param classExpression
-	 * @return whether the query is already computed
 	 */
-	boolean indexQuery(final ElkClassExpression classExpression) {
+	void indexQuery(final ElkClassExpression classExpression) {
 		/* @formatter:off
 		 * 
 		 * If it was already queried, do nothing. Otherwise:
@@ -203,7 +202,7 @@ public class ClassExpressionQueryState {
 		synchronized (queried_) {
 			ice = queried_.get(classExpression);
 			if (ice != null) {
-				return computed_.contains(ice);
+				return;
 			}
 			ice = classExpression.accept(updatingExpressionConverter_);
 			queried_.put(classExpression, ice);
@@ -215,11 +214,9 @@ public class ClassExpressionQueryState {
 						conclusionFactory_.getContradiction(ice))) {
 			// If the query is unsatisfiable, it is already computed ...
 			computed_.add(ice);
-			return true;
 		} else {
 			// ... otherwise we need to compute the equivalent and super-classes
 			notComputed_.add(ice);
-			return false;
 		}
 
 	}

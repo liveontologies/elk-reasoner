@@ -622,20 +622,19 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	}
 
 	private void computeQuery(final ElkClassExpression classExpression)
-			throws ElkException {
+			throws ElkInconsistentOntologyException, ElkException {
 
-		if (classExpressionQueryState_.indexQuery(classExpression)) {
-			return;
-		}
-		// else
+		// Load the query
+		classExpressionQueryState_.indexQuery(classExpression);
 
-		if (isIncrementalMode()) {
-			stageManager.incrementalCompletionStage.invalidateRecursive();
-			complete(stageManager.incrementalClassExpressionQueryStage);
-		} else {
-			stageManager.classExpressionQueryStage.invalidateRecursive();
-			complete(stageManager.classExpressionQueryStage);
-		}
+		// Invalidate stages that depend on axiom loading stage
+		stageManager.contextInitializationStage.invalidateRecursive();
+		stageManager.incrementalCompletionStage.invalidateRecursive();
+
+		// Complete all stages
+		getTaxonomy();
+		stageManager.classExpressionQueryStage.invalidateRecursive();
+		complete(stageManager.classExpressionQueryStage);
 
 	}
 
@@ -657,10 +656,6 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	public synchronized boolean isSatisfiable(
 			final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
-
-		if (isInconsistent()) {
-			throw new ElkInconsistentOntologyException();
-		}
 
 		computeQuery(classExpression);
 
@@ -705,11 +700,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 */
 	protected Node<ElkClass> queryEquivalentClasses(
 			final ElkClassExpression classExpression)
-					throws ElkInconsistentOntologyException, ElkException {
-
-		if (isInconsistent()) {
-			throw new ElkInconsistentOntologyException();
-		}
+			throws ElkInconsistentOntologyException, ElkException {
 
 		computeQuery(classExpression);
 
@@ -736,11 +727,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 */
 	protected Set<? extends Node<ElkClass>> queryDirectSuperClasses(
 			final ElkClassExpression classExpression)
-					throws ElkInconsistentOntologyException, ElkException {
-
-		if (isInconsistent()) {
-			throw new ElkInconsistentOntologyException();
-		}
+			throws ElkInconsistentOntologyException, ElkException {
 
 		computeQuery(classExpression);
 
@@ -767,16 +754,11 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 */
 	protected Set<? extends Node<ElkClass>> queryDirectSubClasses(
 			final ElkClassExpression classExpression)
-					throws ElkInconsistentOntologyException, ElkException {
+			throws ElkInconsistentOntologyException, ElkException {
 
-		if (isInconsistent()) {
-			throw new ElkInconsistentOntologyException();
-		}
-
-		// TODO: Always compute taxonomy in computeQuery!
-		classExpressionQueryState_.indexQuery(classExpression);
-		final Taxonomy<ElkClass> taxonomy = getTaxonomy();
 		computeQuery(classExpression);
+
+		final Taxonomy<ElkClass> taxonomy = getTaxonomy();
 
 		final Set<? extends Node<ElkClass>> result = classExpressionQueryState_
 				.getDirectSubClasses(classExpression, taxonomy);
