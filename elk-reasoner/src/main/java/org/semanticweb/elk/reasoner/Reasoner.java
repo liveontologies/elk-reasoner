@@ -349,17 +349,43 @@ public class Reasoner extends AbstractReasonerState {
 	 *            {@link Node}
 	 * @return the set of {@link Node} whose members are {@link ElkClass}es
 	 *         equivalent to the given {@link ElkClassExpression}
+	 * @throws ElkInconsistentOntologyException
+	 *             if the ontology is inconsistent
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
 	public synchronized Node<ElkClass> getEquivalentClasses(
-			ElkClassExpression classExpression) throws ElkException {
+			ElkClassExpression classExpression)
+			throws ElkInconsistentOntologyException, ElkException {
 		if (classExpression instanceof ElkClass) {
 			return getTaxonomyNode((ElkClass) classExpression);
 		}
 		// else
 		
 		return queryEquivalentClasses(classExpression);
+	}
+
+	/**
+	 * Return the {@code Node} containing equivalent classes of the given
+	 * {@link ElkClassExpression}. Calling of this method may trigger the
+	 * computation of the taxonomy, if it has not been done yet.
+	 * 
+	 * @param classExpression
+	 *            the {@link ElkClassExpression} for which to return the
+	 *            {@link Node}
+	 * @return the set of {@link Node} whose members are {@link ElkClass}es
+	 *         equivalent to the given {@link ElkClassExpression}
+	 * @throws ElkException
+	 *             if the result cannot be computed
+	 */
+	public synchronized Node<ElkClass> getEquivalentClassesQuietly(
+			ElkClassExpression classExpression) throws ElkException {
+		try {
+			return getEquivalentClasses(classExpression);
+		} catch (final ElkInconsistentOntologyException e) {
+			// All classes are equivalent to each other, so also to owl:Nothing.
+			return getTaxonomyQuietly().getBottomNode();
+		}
 	}
 
 	/**
@@ -377,12 +403,14 @@ public class Reasoner extends AbstractReasonerState {
 	 * @return the set of {@link Node}s for direct or indirect subclasses of the
 	 *         given {@link ElkClassExpression} according to the specified
 	 *         parameter
+	 * @throws ElkInconsistentOntologyException
+	 *             if the ontology is inconsistent
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
 	public synchronized Set<? extends Node<ElkClass>> getSubClasses(
 			ElkClassExpression classExpression, boolean direct)
-			throws ElkException {
+			throws ElkInconsistentOntologyException, ElkException {
 		if (classExpression instanceof ElkClass) {
 			final TaxonomyNode<ElkClass> queryNode = getTaxonomyNode(
 					(ElkClass) classExpression);
@@ -425,6 +453,37 @@ public class Reasoner extends AbstractReasonerState {
 	}
 
 	/**
+	 * Return the (direct or indirect) subclasses of the given
+	 * {@link ElkClassExpression} as specified by the parameter. The method
+	 * returns a set of {@link Node}s, each of which representing an equivalent
+	 * class of subclasses. Calling of this method may trigger the computation
+	 * of the taxonomy, if it has not been done yet.
+	 * 
+	 * @param classExpression
+	 *            the {@link ElkClassExpression} for which to return the
+	 *            subclass {@link Node}s
+	 * @param direct
+	 *            if {@code true}, only direct subclasses should be returned
+	 * @return the set of {@link Node}s for direct or indirect subclasses of the
+	 *         given {@link ElkClassExpression} according to the specified
+	 *         parameter
+	 * @throws ElkException
+	 *             if the result cannot be computed
+	 */
+	public synchronized Set<? extends Node<ElkClass>> getSubClassesQuietly(
+			final ElkClassExpression classExpression, final boolean direct)
+			throws ElkException {
+		try {
+			return getSubClasses(classExpression, direct);
+		} catch (final ElkInconsistentOntologyException e) {
+			// All classes are equivalent to each other, so also to owl:Nothing.
+			final TaxonomyNode<ElkClass> node = getTaxonomyQuietly()
+					.getBottomNode();
+			return direct ? node.getDirectSubNodes() : node.getAllSubNodes();
+		}
+	}
+
+	/**
 	 * Return the (direct or indirect) superclasses of the given
 	 * {@link ElkClassExpression} as specified by the parameter. The method
 	 * returns a set of {@link Node}s, each of which representing an equivalent
@@ -439,12 +498,14 @@ public class Reasoner extends AbstractReasonerState {
 	 * @return the set of {@link Node}s for direct or indirect superclasses of
 	 *         the given {@link ElkClassExpression} according to the specified
 	 *         parameter
+	 * @throws ElkInconsistentOntologyException
+	 *             if the ontology is inconsistent
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
 	public synchronized Set<? extends Node<ElkClass>> getSuperClasses(
 			ElkClassExpression classExpression, boolean direct)
-			throws ElkException {
+			throws ElkInconsistentOntologyException, ElkException {
 		if (classExpression instanceof ElkClass) {
 			final TaxonomyNode<ElkClass> queryNode = getTaxonomyNode(
 					(ElkClass) classExpression);
@@ -484,6 +545,38 @@ public class Reasoner extends AbstractReasonerState {
 			return Collections.unmodifiableSet(result);
 		}
 
+	}
+
+	/**
+	 * Return the (direct or indirect) superclasses of the given
+	 * {@link ElkClassExpression} as specified by the parameter. The method
+	 * returns a set of {@link Node}s, each of which representing an equivalent
+	 * class of superclasses. Calling of this method may trigger the computation
+	 * of the taxonomy, if it has not been done yet.
+	 * 
+	 * @param classExpression
+	 *            the {@link ElkClassExpression} for which to return the
+	 *            superclass {@link Node}s
+	 * @param direct
+	 *            if {@code true}, only direct superclasses are returned
+	 * @return the set of {@link Node}s for direct or indirect superclasses of
+	 *         the given {@link ElkClassExpression} according to the specified
+	 *         parameter
+	 * @throws ElkException
+	 *             if the result cannot be computed
+	 */
+	public synchronized Set<? extends Node<ElkClass>> getSuperClassesQuietly(
+			ElkClassExpression classExpression, boolean direct)
+			throws ElkException {
+		try {
+			return getSuperClasses(classExpression, direct);
+		} catch (final ElkInconsistentOntologyException e) {
+			// All classes are equivalent to each other, so also to owl:Nothing.
+			final TaxonomyNode<ElkClass> node = getTaxonomyQuietly()
+					.getBottomNode();
+			return direct ? node.getDirectSuperNodes()
+					: node.getAllSuperNodes();
+		}
 	}
 
 	/**

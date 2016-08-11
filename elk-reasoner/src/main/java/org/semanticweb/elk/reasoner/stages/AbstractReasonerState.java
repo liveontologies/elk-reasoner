@@ -649,13 +649,45 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 *            the {@link ElkClassExpression} for which to check
 	 *            satisfiability
 	 * @return {@code true} if the given input is satisfiable
+	 * @throws ElkInconsistentOntologyException
+	 *             if the ontology is inconsistent
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
 	public synchronized boolean isSatisfiable(
-			final ElkClassExpression classExpression) throws ElkException {
+			final ElkClassExpression classExpression)
+			throws ElkInconsistentOntologyException, ElkException {
+
+		if (isInconsistent()) {
+			throw new ElkInconsistentOntologyException();
+		}
+
 		computeQuery(classExpression);
+
 		return classExpressionQueryState_.isSatisfiable(classExpression);
+	}
+
+	/**
+	 * Check if the given {@link ElkClassExpression} is satisfiable, that is, if
+	 * it can possibly have instances. {@link ElkClassExpression}s are not
+	 * satisfiable if they are equivalent to {@code owl:Nothing}. A satisfiable
+	 * {@link ElkClassExpression} is also called consistent or coherent.
+	 * 
+	 * @param classExpression
+	 *            the {@link ElkClassExpression} for which to check
+	 *            satisfiability
+	 * @return {@code true} if the given input is satisfiable
+	 * @throws ElkException
+	 *             if the result cannot be computed
+	 */
+	public synchronized boolean isSatisfiableQuietly(
+			final ElkClassExpression classExpression) throws ElkException {
+		try {
+			return isSatisfiable(classExpression);
+		} catch (final ElkInconsistentOntologyException e) {
+			// Any class is unsatisfiable.
+			return false;
+		}
 	}
 
 	/**

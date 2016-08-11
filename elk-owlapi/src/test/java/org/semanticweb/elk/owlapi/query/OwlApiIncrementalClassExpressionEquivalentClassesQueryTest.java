@@ -21,11 +21,14 @@
  */
 package org.semanticweb.elk.owlapi.query;
 
+import java.util.Arrays;
+
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owlapi.OwlApiIncrementalReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.ClassQueryTestInput;
 import org.semanticweb.elk.reasoner.query.EquivalentEntitiesTestOutput;
 import org.semanticweb.elk.testing.PolySuite;
+import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -34,6 +37,22 @@ import org.semanticweb.owlapi.reasoner.Node;
 @RunWith(PolySuite.class)
 public class OwlApiIncrementalClassExpressionEquivalentClassesQueryTest extends
 		OwlApiIncrementalClassExpressionQueryTest<EquivalentEntitiesTestOutput<OWLClass>> {
+
+	// @formatter:off
+	static final String[] IGNORE_LIST = {
+			"Inconsistent.owl",// Throwing InconsistentOntologyException
+			"DuplicateDisjuncts.owl",// TODO: Check this
+		};
+	// @formatter:on
+
+	static {
+		Arrays.sort(IGNORE_LIST);
+	}
+
+	@Override
+	protected boolean ignore(final TestInput input) {
+		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
+	}
 
 	public OwlApiIncrementalClassExpressionEquivalentClassesQueryTest(
 			final TestManifest<ClassQueryTestInput<OWLClassExpression>> manifest) {
