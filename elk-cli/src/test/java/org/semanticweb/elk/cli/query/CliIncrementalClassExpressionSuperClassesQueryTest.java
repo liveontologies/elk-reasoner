@@ -43,7 +43,6 @@ public class CliIncrementalClassExpressionSuperClassesQueryTest extends
 	static final String[] IGNORE_LIST = {
 			"Disjunctions.owl",// Disjuctions not supported
 			"OneOf.owl",// Disjuctions not supported
-			"DuplicateDisjuncts.owl",// TODO: Check this
 		};
 	// @formatter:on
 

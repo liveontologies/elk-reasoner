@@ -36,12 +36,14 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
+import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyCheckingState;
 import org.semanticweb.elk.reasoner.indexing.classes.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
@@ -53,6 +55,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpress
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
+import org.semanticweb.elk.reasoner.query.QueryNode;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
@@ -82,6 +85,8 @@ import org.semanticweb.elk.reasoner.tracing.TracingInferenceSet;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -621,11 +626,33 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		return result;
 	}
 
-	private void computeQuery(final ElkClassExpression classExpression)
+	/**
+	 * Indexes the supplied class expression and, if successful, computes the
+	 * query so that the results for this expressions are ready in
+	 * {@link #classExpressionQueryState_}.
+	 * 
+	 * @param classExpression
+	 * @return <code>true</code> if the query was indexed successfully,
+	 *         <code>false</code> otherwise.
+	 * @throws ElkInconsistentOntologyException
+	 * @throws ElkException
+	 */
+	private boolean computeQuery(final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 
 		// Load the query
-		classExpressionQueryState_.indexQuery(classExpression);
+		try {
+			classExpressionQueryState_.indexQuery(classExpression);
+		} catch (final ElkIndexingUnsupportedException e) {
+			if (LOGGER_.isWarnEnabled()) {
+				LoggerWrap.log(LOGGER_, LogLevel.WARN,
+						"reasoner.indexing.queryIgnored",
+						e.getMessage() + " Query results may be incomplete:\n"
+								+ OwlFunctionalStylePrinter
+										.toString(classExpression));
+			}
+			return false;
+		}
 
 		// Invalidate stages that depend on axiom loading stage
 		stageManager.contextInitializationStage.invalidateRecursive();
@@ -636,6 +663,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		stageManager.classExpressionQueryStage.invalidateRecursive();
 		complete(stageManager.classExpressionQueryStage);
 
+		return true;
 	}
 
 	/**
@@ -657,9 +685,13 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 
-		computeQuery(classExpression);
+		if (computeQuery(classExpression)) {
+			return classExpressionQueryState_.isSatisfiable(classExpression);
+		} else {
+			// classExpression couldn't be indexed; pretend it is a fresh class
+			return true;
+		}
 
-		return classExpressionQueryState_.isSatisfiable(classExpression);
 	}
 
 	/**
@@ -702,15 +734,22 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 
-		computeQuery(classExpression);
+		if (computeQuery(classExpression)) {
 
-		final Node<ElkClass> result = classExpressionQueryState_
-				.getEquivalentClasses(classExpression);
-		if (result == null) {
-			return getTaxonomy().getBottomNode();
+			final Node<ElkClass> result = classExpressionQueryState_
+					.getEquivalentClasses(classExpression);
+			if (result == null) {
+				return getTaxonomy().getBottomNode();
+			} else {
+				return result;
+			}
+
 		} else {
-			return result;
+			// classExpression couldn't be indexed; pretend it is a fresh class
+
+			return new QueryNode<ElkClass>(ElkClassKeyProvider.INSTANCE);
 		}
+
 	}
 
 	/**
@@ -729,15 +768,22 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 
-		computeQuery(classExpression);
+		if (computeQuery(classExpression)) {
 
-		final Set<? extends Node<ElkClass>> result = classExpressionQueryState_
-				.getDirectSuperClasses(classExpression);
-		if (result == null) {
-			return getTaxonomy().getBottomNode().getDirectSuperNodes();
+			final Set<? extends Node<ElkClass>> result = classExpressionQueryState_
+					.getDirectSuperClasses(classExpression);
+			if (result == null) {
+				return getTaxonomy().getBottomNode().getDirectSuperNodes();
+			} else {
+				return result;
+			}
+
 		} else {
-			return result;
+			// classExpression couldn't be indexed; pretend it is a fresh class
+
+			return Collections.singleton(getTaxonomy().getTopNode());
 		}
+
 	}
 
 	/**
@@ -756,17 +802,24 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 
-		computeQuery(classExpression);
+		if (computeQuery(classExpression)) {
 
-		final Taxonomy<ElkClass> taxonomy = getTaxonomy();
+			final Taxonomy<ElkClass> taxonomy = getTaxonomy();
 
-		final Set<? extends Node<ElkClass>> result = classExpressionQueryState_
-				.getDirectSubClasses(classExpression, taxonomy);
-		if (result == null) {
-			return taxonomy.getBottomNode().getDirectSubNodes();
+			final Set<? extends Node<ElkClass>> result = classExpressionQueryState_
+					.getDirectSubClasses(classExpression, taxonomy);
+			if (result == null) {
+				return taxonomy.getBottomNode().getDirectSubNodes();
+			} else {
+				return result;
+			}
+
 		} else {
-			return result;
+			// classExpression couldn't be indexed; pretend it is a fresh class
+
+			return Collections.singleton(getTaxonomy().getBottomNode());
 		}
+
 	}
 
 	/**

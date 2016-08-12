@@ -40,7 +40,6 @@ public class OwlApiIncrementalClassExpressionSatisfiabilityQueryTest extends
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
 			"Inconsistent.owl",// Throwing InconsistentOntologyException
-			"DuplicateDisjuncts.owl",// TODO: Check this
 		};
 	// @formatter:on
 

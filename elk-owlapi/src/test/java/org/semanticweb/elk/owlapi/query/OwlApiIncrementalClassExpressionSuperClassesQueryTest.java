@@ -43,7 +43,6 @@ public class OwlApiIncrementalClassExpressionSuperClassesQueryTest extends
 			"Disjunctions.owl",// Disjuctions not supported
 			"OneOf.owl",// Disjuctions not supported
 			"Inconsistent.owl",// Throwing InconsistentOntologyException
-			"DuplicateDisjuncts.owl",// TODO: Check this
 		};
 	// @formatter:on
 

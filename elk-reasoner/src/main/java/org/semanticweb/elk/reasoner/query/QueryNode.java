@@ -52,6 +52,12 @@ public class QueryNode<T extends ElkEntity> extends SimpleNode<T>
 		this.directSuperNodes_ = new ArrayHashSet<Node<T>>();
 	}
 
+	public QueryNode(
+			final ComparatorKeyProvider<? super T> comparatorKeyProvider) {
+		super(comparatorKeyProvider);
+		this.directSuperNodes_ = new ArrayHashSet<Node<T>>();
+	}
+
 	public Set<? extends Node<T>> getDirectSuperNodes() {
 		return Collections.unmodifiableSet(directSuperNodes_);
 	}

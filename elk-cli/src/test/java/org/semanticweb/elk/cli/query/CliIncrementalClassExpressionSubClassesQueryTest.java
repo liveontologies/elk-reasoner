@@ -21,7 +21,6 @@
  */
 package org.semanticweb.elk.cli.query;
 
-import java.util.Arrays;
 import java.util.Set;
 
 import org.junit.runner.RunWith;
@@ -32,27 +31,11 @@ import org.semanticweb.elk.reasoner.query.ClassQueryTestInput;
 import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
 
 @RunWith(PolySuite.class)
 public class CliIncrementalClassExpressionSubClassesQueryTest extends
 		CliIncrementalClassExpressionQueryTest<RelatedEntitiesTestOutput<ElkClass>> {
-
-	// @formatter:off
-	static final String[] IGNORE_LIST = {
-			"DuplicateDisjuncts.owl",// TODO: Check this
-		};
-	// @formatter:on
-
-	static {
-		Arrays.sort(IGNORE_LIST);
-	}
-
-	@Override
-	protected boolean ignore(final TestInput input) {
-		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
-	}
 
 	public CliIncrementalClassExpressionSubClassesQueryTest(
 			final TestManifest<ClassQueryTestInput<ElkClassExpression>> manifest) {

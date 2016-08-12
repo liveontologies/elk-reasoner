@@ -34,6 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.BaseModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.UpdatingModifiableIndexedObjectFactory;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
@@ -185,8 +186,11 @@ public class ClassExpressionQueryState {
 	 * {@link ElkQueryException} for class expressions that were not registered.
 	 * 
 	 * @param classExpression
+	 * @throws ElkIndexingUnsupportedException
+	 *             when the queried class expression is not supported.
 	 */
-	void indexQuery(final ElkClassExpression classExpression) {
+	void indexQuery(final ElkClassExpression classExpression)
+			throws ElkIndexingUnsupportedException {
 		/* @formatter:off
 		 * 
 		 * If it was already queried, do nothing. Otherwise:

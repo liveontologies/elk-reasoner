@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Arrays;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.cli.CliReasoningTestDelegate;
@@ -39,7 +38,6 @@ import org.semanticweb.elk.reasoner.query.SatisfiabilityTestOutput;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
@@ -47,21 +45,6 @@ import org.semanticweb.elk.testing.TestManifestWithOutput;
 @RunWith(PolySuite.class)
 public class CliClassExpressionSatisfiabilityQueryTest extends
 		BaseClassExpressionQueryTest<ElkClassExpression, SatisfiabilityTestOutput> {
-
-	// @formatter:off
-	static final String[] IGNORE_LIST = {
-			"DuplicateDisjuncts.owl",// TODO: Check this
-		};
-	// @formatter:on
-
-	static {
-		Arrays.sort(IGNORE_LIST);
-	}
-
-	@Override
-	protected boolean ignore(final TestInput input) {
-		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
-	}
 
 	public CliClassExpressionSatisfiabilityQueryTest(
 			final TestManifestWithOutput<ClassQueryTestInput<ElkClassExpression>, SatisfiabilityTestOutput, SatisfiabilityTestOutput> manifest) {
