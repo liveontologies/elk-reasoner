@@ -3,7 +3,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
 	<id>${elk-protege.assembly-id}</id>
-	<baseDirectory>${elk-protege.file}</baseDirectory>	
+	<baseDirectory>${elk-protege.file}</baseDirectory>
 	<formats>
 		<!-- the type of the archive -->
 		<format>zip</format>
@@ -25,12 +25,12 @@
 	</files>
 	<dependencySets>
 		<!-- the description of the maven packages to be bundled in the archive -->
-		<dependencySet>
+		<dependencySet>			
 			<includes>
 				<include>*:elk-protege:*</include>
 			</includes>
-			<!-- we omit the version numbers in the included artifact names -->
-			<outputFileNameMapping>${elk-protege.base}.jar</outputFileNameMapping>
+			<!-- verify that all filters worked -->
+			<useStrictFiltering>true</useStrictFiltering>
 			<!-- don't include the artifact for this project -->
 			<useProjectArtifact>false</useProjectArtifact>
 		</dependencySet>

@@ -1,5 +1,7 @@
 package org.semanticweb.elk.owl.inferences;
 
+import java.util.Collection;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -55,7 +57,7 @@ public class ModifiableElkInferenceSetImpl
 	}
 
 	@Override
-	public Iterable<? extends ElkInference> get(ElkAxiom conclusion) {
+	public Collection<? extends ElkInference> get(ElkAxiom conclusion) {
 		// assumes structural equality and hash of conclusions
 		return inferenceMap_.get(conclusion);
 	}

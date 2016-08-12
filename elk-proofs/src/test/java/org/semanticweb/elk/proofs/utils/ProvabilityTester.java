@@ -85,7 +85,7 @@ public class ProvabilityTester {
 
 	/**
 	 * a map from (currently unprovable) axioms to list of inferences in which
-	 * this axiom is used as a premise; these axioms are "watching" for this
+	 * this axiom is used as a premise; these inferences are "watching" for this
 	 * axiom to be proved
 	 */
 	private final Map<ElkAxiom, List<ElkInference>> watchedInferences_ = new HashMap<ElkAxiom, List<ElkInference>>();

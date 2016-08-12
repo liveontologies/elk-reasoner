@@ -18,7 +18,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<log4j.lower.version>1.2</log4j.lower.version>
 		<log4j.upper.version>2</log4j.upper.version>
-		<protege.lower.version>4.2</protege.lower.version>
+		<protege.lower.version>5</protege.lower.version>
 		<protege.upper.version>6</protege.upper.version>
 	</properties>
 
@@ -57,10 +57,18 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>owlapi-proofs</artifactId>
-			<version>${project.version}</version>
+			<groupId>org.liveontologies</groupId>
+			<artifactId>owlapi-proof</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
 			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.liveontologies</groupId>
+			<artifactId>protege-proof-explanation</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+			<scope>provided</scope>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -110,13 +118,11 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Implementation-Title>ELK Reasoner</Implementation-Title>
+						<Implementation-Title>${project.parent.name}</Implementation-Title>
 						<Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
 						<Implementation-Version>${project.version}.${maven.build.timestamp}</Implementation-Version>
-						<Import-Package>*</Import-Package>
-						<Export-Package>!*</Export-Package>
 						<Bundle-SymbolicName>${project.groupId};singleton:=true</Bundle-SymbolicName>
-						<Bundle-Activator>org.protege.editor.core.plugin.DefaultPluginActivator</Bundle-Activator>
+						<Export-Package>!*</Export-Package>
 						<Embed-Dependency>*;scope=!provided;scope=compile|runtime;inline=false</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<Embed-Directory>target/dependency</Embed-Directory>
@@ -182,6 +188,8 @@
 						</executions>
 						<configuration>
 							<excludeScope>provided</excludeScope>
+							<includeScope>compile</includeScope>
+							<includeScope>runtime</includeScope>
 						</configuration>
 					</plugin>
 				</plugins>

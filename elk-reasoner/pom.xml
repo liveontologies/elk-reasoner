@@ -10,8 +10,8 @@
 	<artifactId>elk-reasoner</artifactId>
 	<packaging>jar</packaging>
 
-	<name>ELK Reasoner</name>
-	<description>ELK consequence-based reasoning engine</description>
+	<name>ELK Reasoner Core</name>
+	<description>The core ELK Reasoner package</description>
 
 	<dependencies>
 		<dependency>

@@ -37,8 +37,8 @@
 			<includes>
 				<include>*:elk-owlapi-standalone:jar:bin</include>
 			</includes>
-			<!-- we omit the version numbers in the included artifact names -->
-			<outputFileNameMapping>${elk-owlapi.base}.jar</outputFileNameMapping>
+			<!-- verify that all filters worked -->
+			<useStrictFiltering>true</useStrictFiltering>
 			<!-- don't include the artifact for this project -->
 			<useProjectArtifact>false</useProjectArtifact>
 		</dependencySet>
@@ -47,8 +47,8 @@
 			<includes>
 				<include>*:elk-owlapi-standalone:jar:src</include>
 			</includes>
-			<!-- we omit the version numbers in the included artifact names -->
-			<outputFileNameMapping>${elk-owlapi.base}-sources.jar</outputFileNameMapping>
+			<!-- verify that all filters worked -->
+			<useStrictFiltering>true</useStrictFiltering>
 			<!-- don't include the artifact for this project -->
 			<useProjectArtifact>false</useProjectArtifact>
 		</dependencySet>
@@ -64,6 +64,8 @@
 				</excludes>
 			</unpackOptions>
 			<outputDirectory>lib</outputDirectory>
+			<!-- verify that all filters worked -->
+			<useStrictFiltering>true</useStrictFiltering>
 			<!-- don't include the artifact for this project -->
 			<useProjectArtifact>false</useProjectArtifact>
 		</dependencySet>

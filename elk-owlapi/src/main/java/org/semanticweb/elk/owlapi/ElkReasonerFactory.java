@@ -27,7 +27,6 @@ package org.semanticweb.elk.owlapi;
 
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.IllegalConfigurationException;
-import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.slf4j.Logger;
@@ -52,21 +51,21 @@ public class ElkReasonerFactory implements OWLReasonerFactory {
 	}
 
 	@Override
-	public OWLReasoner createNonBufferingReasoner(OWLOntology ontology) {
+	public ElkReasoner createNonBufferingReasoner(OWLOntology ontology) {
 		LOGGER_.trace("createNonBufferingReasoner(OWLOntology)");
 		
 		return createElkReasoner(ontology, false, null);
 	}
 
 	@Override
-	public OWLReasoner createReasoner(OWLOntology ontology) {
+	public ElkReasoner createReasoner(OWLOntology ontology) {
 		LOGGER_.trace("createReasoner(OWLOntology)");
 		
 		return createElkReasoner(ontology, true, null);
 	}
 
 	@Override
-	public OWLReasoner createNonBufferingReasoner(OWLOntology ontology,
+	public ElkReasoner createNonBufferingReasoner(OWLOntology ontology,
 			OWLReasonerConfiguration config)
 			throws IllegalConfigurationException {
 		LOGGER_.trace("createNonBufferingReasoner(OWLOntology, OWLReasonerConfiguration)");
@@ -75,7 +74,7 @@ public class ElkReasonerFactory implements OWLReasonerFactory {
 	}
 
 	@Override
-	public OWLReasoner createReasoner(OWLOntology ontology,
+	public ElkReasoner createReasoner(OWLOntology ontology,
 			OWLReasonerConfiguration config)
 			throws IllegalConfigurationException {
 		LOGGER_.trace("createReasoner(OWLOntology, OWLReasonerConfiguration)");

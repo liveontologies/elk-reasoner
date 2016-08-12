@@ -15,7 +15,7 @@ will appear in the produced result.
 		<title>ELK Reasoner Project</title>
 	</properties>
 	<body>
-	    <release version="${release.version}" date="${buildDate}" description="">
+	    <release version="${release.version}" date="${buildDate}" description="Changes since the last release">
 		</release>
 		<release version="0.4.3" date="2016-01-11" description="Third maintenance relase after the fourth public release">
 			<action dev="petesko" type="update">

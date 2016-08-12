@@ -16,5 +16,10 @@
 	<class value="org.semanticweb.elk.protege.ElkProtegePluginInstance"/>
 	<editorKitId value="OWLEditorKit"/>
 </extension>
+
+<extension id="elk.proofs" point="org.liveontologies.protege.explanation.proof.service">
+   <name value="ELK Prover"/>
+   <class value="org.semanticweb.elk.protege.ElkProofService"/>
+</extension>
     
 </plugin>

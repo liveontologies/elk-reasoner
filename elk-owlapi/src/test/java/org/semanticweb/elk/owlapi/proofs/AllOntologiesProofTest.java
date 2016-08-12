@@ -31,6 +31,7 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.liveontologies.owlapi.proof.OWLProver;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
 import org.semanticweb.elk.reasoner.tracing.TracingTestManifest;
@@ -49,7 +50,6 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.reasoner.InconsistentOntologyException;
 import org.semanticweb.owlapi.reasoner.InferenceType;
-import org.semanticweb.owlapitools.proofs.ExplainingOWLReasoner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,24 +94,17 @@ public class AllOntologiesProofTest extends BaseProofTest {
 		// loading and classifying via the OWL API
 		final OWLOntology ontology = loadOntology(manifest_.getInput()
 				.getUrl().openStream());
-		final ExplainingOWLReasoner reasoner = OWLAPITestUtils
-				.createReasoner(ontology);
+		final OWLProver prover = OWLAPITestUtils.createProver(ontology);
 
 		try {
-			reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+			prover.precomputeInferences(InferenceType.CLASS_HIERARCHY);
 		} catch (InconsistentOntologyException e) {
 			// we will explain it, too
 		}
 
 		try {
-			// now do testing
-			// this visitor checks binding of premises to axioms in the source
-			// ontology
-			final OWLInferenceVisitor bindingChecker = ProofTestUtils
-					.getAxiomBindingChecker(ontology);
-
-			ProofTestUtils.visitAllSubsumptionsForProofTests(reasoner,
-					factory, new ProofTestVisitor<Exception>() {
+			ProofTestUtils.visitAllSubsumptionsForProofTests(prover,
+					factory, new ProofTestVisitor() {
 
 						@Override
 						public void visit(OWLClassExpression subsumee,
@@ -122,9 +115,7 @@ public class AllOntologiesProofTest extends BaseProofTest {
 								OWLSubClassOfAxiom axiom = factory
 										.getOWLSubClassOfAxiom(subsumee,
 												subsumer);
-								ProofTestUtils.provabilityTest(reasoner, axiom);
-								RecursiveInferenceVisitor.visitInferences(
-										reasoner, axiom, bindingChecker, true);
+								ProofTestUtils.provabilityTest(prover, axiom);
 							} catch (Exception e) {
 								throw new RuntimeException(e);
 							}
@@ -132,7 +123,7 @@ public class AllOntologiesProofTest extends BaseProofTest {
 
 					});
 		} finally {
-			reasoner.dispose();
+			prover.dispose();
 		}
 	}
 

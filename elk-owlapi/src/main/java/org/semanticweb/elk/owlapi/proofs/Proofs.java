@@ -27,62 +27,57 @@ package org.semanticweb.elk.owlapi.proofs;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.liveontologies.owlapi.proof.OWLProofNode;
+import org.liveontologies.owlapi.proof.OWLProofStep;
+import org.liveontologies.owlapi.proof.OWLProver;
+import org.liveontologies.owlapi.proof.util.ProofNode;
 import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapitools.proofs.ExplainingOWLReasoner;
-import org.semanticweb.owlapitools.proofs.OWLInference;
-import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
-import org.semanticweb.owlapitools.proofs.expressions.OWLAxiomExpression;
-import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
-import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionVisitor;
-import org.semanticweb.owlapitools.proofs.expressions.OWLLemmaExpression;
+import org.semanticweb.owlapi.model.parameters.Imports;
 
 /**
  * Utilities for working with proofs.
  * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
  */
 public class Proofs {
 
 	/**
-	 * Returns all ontology axioms used in all or some proof(s) for the given entailment.
-	 * 
 	 * @param reasoner
 	 * @param entailment
 	 * @param allProofs
-	 * @return
-	 * @throws ProofGenerationException
+	 * @return all ontology axioms used in all or some proof(s) for the given
+	 *         entailment.
 	 */
-	public static Set<OWLAxiom> getUsedAxioms(ExplainingOWLReasoner reasoner, OWLAxiom entailment, boolean allProofs) throws ProofGenerationException {
+	public static Set<OWLAxiom> getUsedAxioms(OWLProver reasoner,
+			OWLAxiom entailment, final boolean allProofs) {
 		final Set<OWLAxiom> usedAxioms = new HashSet<OWLAxiom>();
-		
-		RecursiveInferenceVisitor.visitInferences(reasoner, entailment, new OWLInferenceVisitor() {
-			
-			@Override
-			public void visit(OWLInference inference) {
-				for (OWLExpression premise : inference.getPremises()) {
-					premise.accept(new OWLExpressionVisitor<Void>() {
+		final Set<OWLAxiom> stated = reasoner.getRootOntology()
+				.getAxioms(Imports.INCLUDED);
 
-						@Override
-						public Void visit(OWLAxiomExpression expression) {
-							if (expression.isAsserted()) {
-								usedAxioms.add(expression.getAxiom());
+		ProofExplorer.visitInferences(reasoner.getProof(entailment),
+				new ProofExplorer.Controller() {
+
+					@Override
+					public boolean nodeVisited(OWLProofNode node) {
+						return false;
+					}
+
+					@Override
+					public boolean inferenceVisited(OWLProofStep inference) {
+						for (ProofNode<OWLAxiom> premise : inference
+								.getPremises()) {
+							OWLAxiom member = premise.getMember();
+							if (stated.contains(member)) {
+								usedAxioms.add(member);
 							}
-							return null;
 						}
+						return !allProofs;
+					}
 
-						@Override
-						public Void visit(OWLLemmaExpression expression) {
-							return null;
-						}
-						
-					});
-				}
-			}
-			
-		}, allProofs);
-		
+				});
+
 		return usedAxioms;
 	}
 }

@@ -24,7 +24,7 @@ package org.semanticweb.elk.owlapi.proofs;
  * #L%
  */
 
-import org.semanticweb.owlapitools.proofs.OWLInference;
+import org.liveontologies.owlapi.proof.OWLProofStep;
 
 /**
  * Used for testing only
@@ -35,5 +35,5 @@ import org.semanticweb.owlapitools.proofs.OWLInference;
  */
 public interface OWLInferenceVisitor {
 
-	public void visit(OWLInference inference);
+	public void visit(OWLProofStep inference);
 }

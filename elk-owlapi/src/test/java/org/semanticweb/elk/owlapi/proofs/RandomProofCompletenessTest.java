@@ -36,6 +36,8 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.liveontologies.owlapi.proof.OWLProver;
+import org.liveontologies.owlapi.proof.util.ProofNode;
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
@@ -60,9 +62,6 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.model.RemoveAxiom;
 import org.semanticweb.owlapi.reasoner.InconsistentOntologyException;
 import org.semanticweb.owlapi.reasoner.InferenceType;
-import org.semanticweb.owlapitools.proofs.ExplainingOWLReasoner;
-import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
-import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 
 /**
  * For some conclusions tries to randomly break all collected proofs by removing
@@ -114,10 +113,9 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 		// loading and classifying via the OWL API
 		final OWLOntology ontology =
 				loadOntology(manifest_.getInput().getUrl().openStream());
-		final ExplainingOWLReasoner reasoner =
-				OWLAPITestUtils.createReasoner(ontology);
+		final OWLProver prover = OWLAPITestUtils.createProver(ontology);
 		try {
-			reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+			prover.precomputeInferences(InferenceType.CLASS_HIERARCHY);
 		} catch (final InconsistentOntologyException e) {
 			// we will explain it, too
 		}
@@ -125,14 +123,13 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 		try {
 			// now do testing
 	        
-	        ProofTestUtils.visitAllSubsumptionsForProofTests(reasoner, factory,
-	        		new ProofTestVisitor<ProofGenerationException>() {
+	        ProofTestUtils.visitAllSubsumptionsForProofTests(prover, factory,
+	        		new ProofTestVisitor() {
 				
 				@Override
 				public void visit(final OWLClassExpression subsumee,
-						final OWLClassExpression subsumer)
-								throws ProofGenerationException {
-					randomProofCompletenessTest(reasoner,
+						final OWLClassExpression subsumer) {
+					randomProofCompletenessTest(prover,
 							factory.getOWLSubClassOfAxiom(subsumee, subsumer),
 							ontology, random, seed);
 				}
@@ -142,17 +139,16 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		} finally {
-			reasoner.dispose();
+			prover.dispose();
 		}
 		
 	}
 	
 	private void randomProofCompletenessTest(
-			final ExplainingOWLReasoner reasoner,
+			final OWLProver prover,
 			final OWLSubClassOfAxiom conclusion, final OWLOntology ontology,
-			final Random random, final long seed)
-					throws ProofGenerationException {
-		final OWLExpression expr = reasoner.getDerivedExpression(conclusion);
+			final Random random, final long seed) {
+		final ProofNode<OWLAxiom> expr = prover.getProof(conclusion);
 		
 		final Set<OWLAxiom> proofBreaker =
 				ProofTestUtils.collectProofBreaker(expr, ontology, random);
@@ -168,7 +164,7 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 		manager_.applyChanges(deletions);
 		
 		final boolean conclusionDerived =
-				reasoner.getSuperClasses(conclusion.getSubClass(), false)
+				prover.getSuperClasses(conclusion.getSubClass(), false)
 				.containsEntity((OWLClass) conclusion.getSuperClass());
 		
 		manager_.applyChanges(additions);
