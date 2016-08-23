@@ -28,8 +28,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.GenericTaxonomyNode;
@@ -41,6 +39,8 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 import org.semanticweb.elk.util.collections.LazySetUnion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A generic implementation of class taxonomy.
@@ -151,7 +151,7 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 	@Override
 	public UN getCreateNode(final Collection<? extends T> members) {
 		return nodeStore_.getCreateNode(members, members.size(), nodeFactory_);
-	};
+	}
 
 	@Override
 	public boolean setCreateDirectSupernodes(
@@ -225,9 +225,9 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 		if (nodeStore_.removeNode(member)) {
 			LOGGER_.trace("removed node with member: {}", member);
 			return true;
-		} else {
-			return false;
 		}
+		// else
+		return false;
 	}
 
 	@Override

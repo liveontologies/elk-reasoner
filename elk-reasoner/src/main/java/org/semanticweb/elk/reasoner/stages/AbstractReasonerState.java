@@ -730,8 +730,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	public void visitDerivedConclusionsForSubsumption(ElkClassExpression subClass,
 			ElkClassExpression superClass,
 			DerivedClassConclusionVisitor visitor) throws ElkException {
-		isInconsistent();
-		complete(stageManager.classSaturationStage);
+		isInconsistent();		
 		// checking owl:Thing consistency
 		if (consistencyCheckingState.isOwlThingInconsistent()) {
 			if (!visitor.inconsistentOwlThing(
@@ -753,6 +752,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		if (root == null) {
 			return;
 		}
+		getTaxonomyQuietly(); // ensure classes are saturated
 		ClassInconsistency conclusion = checkDerived(
 				factory_.getContradiction(root));
 		if (conclusion != null && !visitor.inconsistentSubClass(conclusion)) {
@@ -802,7 +802,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		for (ClassConclusion conclusion : conclusions) {
 			toTrace(conclusion);
 		}
-		getStageExecutor().complete(stageManager.classSaturationStage);
+		getTaxonomyQuietly(); // ensure classes are saturated
+//		getStageExecutor().complete(stageManager.classSaturationStage);
 		getStageExecutor().complete(stageManager.inferenceTracingStage);
 
 		return traceState_;
