@@ -667,21 +667,18 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	}
 
 	/**
-	 * Check if the given {@link ElkClassExpression} is satisfiable, that is, if
-	 * it can possibly have instances. {@link ElkClassExpression}s are not
-	 * satisfiable if they are equivalent to {@code owl:Nothing}. A satisfiable
-	 * {@link ElkClassExpression} is also called consistent or coherent.
+	 * Decides whether the supplied (possibly complex) class expression is
+	 * satisfiable. The query state is updated accordingly.
 	 * 
 	 * @param classExpression
-	 *            the {@link ElkClassExpression} for which to check
-	 *            satisfiability
-	 * @return {@code true} if the given input is satisfiable
+	 *            The queried class expression.
+	 * @return whether the supplied class expression is satisfiable.
 	 * @throws ElkInconsistentOntologyException
 	 *             if the ontology is inconsistent
 	 * @throws ElkException
-	 *             if the result cannot be computed
+	 *             if the reasoning process cannot be completed successfully
 	 */
-	public synchronized boolean isSatisfiable(
+	protected boolean querySatisfiability(
 			final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 
@@ -692,29 +689,6 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			return true;
 		}
 
-	}
-
-	/**
-	 * Check if the given {@link ElkClassExpression} is satisfiable, that is, if
-	 * it can possibly have instances. {@link ElkClassExpression}s are not
-	 * satisfiable if they are equivalent to {@code owl:Nothing}. A satisfiable
-	 * {@link ElkClassExpression} is also called consistent or coherent.
-	 * 
-	 * @param classExpression
-	 *            the {@link ElkClassExpression} for which to check
-	 *            satisfiability
-	 * @return {@code true} if the given input is satisfiable
-	 * @throws ElkException
-	 *             if the result cannot be computed
-	 */
-	public synchronized boolean isSatisfiableQuietly(
-			final ElkClassExpression classExpression) throws ElkException {
-		try {
-			return isSatisfiable(classExpression);
-		} catch (final ElkInconsistentOntologyException e) {
-			// Any class is unsatisfiable.
-			return false;
-		}
 	}
 
 	/**

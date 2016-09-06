@@ -695,6 +695,58 @@ public class Reasoner extends AbstractReasonerState {
 	}
 
 	/**
+	 * Check if the given {@link ElkClassExpression} is satisfiable, that is, if
+	 * it can possibly have instances. {@link ElkClassExpression}s are not
+	 * satisfiable if they are equivalent to {@code owl:Nothing}. A satisfiable
+	 * {@link ElkClassExpression} is also called consistent or coherent. Calling
+	 * of this method may trigger the computation of the taxonomy, if it has not
+	 * been done yet.
+	 * 
+	 * @param classExpression
+	 *            the {@link ElkClassExpression} for which to check
+	 *            satisfiability
+	 * @return {@code true} if the given input is satisfiable
+	 * @throws ElkException
+	 *             if the result cannot be computed
+	 */
+	public synchronized boolean isSatisfiable(
+			ElkClassExpression classExpression) throws ElkException {
+
+		if (classExpression instanceof ElkClass) {
+			final TaxonomyNode<ElkClass> queryNode = getTaxonomyNode(
+					(ElkClass) classExpression);
+			return !queryNode.contains(getElkFactory().getOwlNothing());
+		}
+
+		return querySatisfiability(classExpression);
+	}
+
+	/**
+	 * Check if the given {@link ElkClassExpression} is satisfiable, that is, if
+	 * it can possibly have instances. {@link ElkClassExpression}s are not
+	 * satisfiable if they are equivalent to {@code owl:Nothing}. A satisfiable
+	 * {@link ElkClassExpression} is also called consistent or coherent. Calling
+	 * of this method may trigger the computation of the taxonomy, if it has not
+	 * been done yet.
+	 * 
+	 * @param classExpression
+	 *            the {@link ElkClassExpression} for which to check
+	 *            satisfiability
+	 * @return {@code true} if the given input is satisfiable
+	 * @throws ElkException
+	 *             if the result cannot be computed
+	 */
+	public synchronized boolean isSatisfiableQuietly(
+			final ElkClassExpression classExpression) throws ElkException {
+		try {
+			return isSatisfiable(classExpression);
+		} catch (final ElkInconsistentOntologyException e) {
+			// Any class is unsatisfiable.
+			return false;
+		}
+	}
+
+	/**
 	 * @param materializedQuery
 	 *            An {@link ElkAxiom} introduced for the query
 	 * @param addition
