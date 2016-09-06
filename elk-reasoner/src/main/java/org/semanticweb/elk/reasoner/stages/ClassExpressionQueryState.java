@@ -21,6 +21,7 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -31,8 +32,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
+import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
+import org.semanticweb.elk.owl.visitors.DummyElkObjectVisitor;
+import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 import org.semanticweb.elk.reasoner.indexing.classes.BaseModifiableIndexedObjectFactory;
+import org.semanticweb.elk.reasoner.indexing.classes.DummyIndexedObjectVisitor;
 import org.semanticweb.elk.reasoner.indexing.classes.UpdatingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
@@ -40,6 +48,10 @@ import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionCon
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectComplementOf;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectUnionOf;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.query.ElkQueryException;
@@ -57,6 +69,10 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.semanticweb.elk.util.logging.LoggerWrap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Keeps track of class expressions that were queried for satisfiability,
@@ -65,6 +81,9 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  * @author Peter Skocovsky
  */
 public class ClassExpressionQueryState {
+
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(ClassExpressionQueryState.class);
 
 	/**
 	 * Maps class expressions that were queried and added to the index to the
@@ -111,6 +130,8 @@ public class ClassExpressionQueryState {
 	 */
 	private final Map<ElkClass, Collection<IndexedClassExpression>> queriesByRelated_ = new ConcurrentHashMap<ElkClass, Collection<IndexedClassExpression>>();
 
+	private final ModifiableOntologyIndex ontologyIndex_;
+
 	private final SaturationState<? extends Context> saturationState_;
 
 	private final ElkPolarityExpressionConverter updatingExpressionConverter_;
@@ -125,11 +146,13 @@ public class ClassExpressionQueryState {
 			final ModifiableOntologyIndex ontologyIndex,
 			final ClassInconsistency.Factory conclusionFactory) {
 		this.saturationState_ = saturationState;
+		this.ontologyIndex_ = ontologyIndex;
 		this.updatingExpressionConverter_ = new ElkPolarityExpressionConverterImpl(
 				elkFactory,
 				new UpdatingModifiableIndexedObjectFactory(
 						new BaseModifiableIndexedObjectFactory(), ontologyIndex,
-						OccurrenceIncrement.getDualIncrement(1)));
+						OccurrenceIncrement.getDualIncrement(1)),
+				ontologyIndex);
 		this.resolvingExpressionConverter_ = new ElkPolarityExpressionConverterImpl(
 				elkFactory, ontologyIndex);
 		this.conclusionFactory_ = conclusionFactory;
@@ -186,11 +209,10 @@ public class ClassExpressionQueryState {
 	 * {@link ElkQueryException} for class expressions that were not registered.
 	 * 
 	 * @param classExpression
-	 * @throws ElkIndexingUnsupportedException
-	 *             when the queried class expression is not supported.
+	 * @return {@code true} when the indexing was successful, {@code false}
+	 *         otherwise.
 	 */
-	void indexQuery(final ElkClassExpression classExpression)
-			throws ElkIndexingUnsupportedException {
+	boolean indexQuery(final ElkClassExpression classExpression) {
 		/* @formatter:off
 		 * 
 		 * If it was already queried, do nothing. Otherwise:
@@ -200,13 +222,50 @@ public class ClassExpressionQueryState {
 		 * @formatter:on
 		 */
 
+		final List<ModifiableIndexedObject> unsupportedIndexed = new ArrayList<ModifiableIndexedObject>();
+		final List<ElkObject> unsupportedElk = new ArrayList<ElkObject>();
+		final ModifiableOntologyIndex.IndexingUnsupportedListener listener = new ModifiableOntologyIndex.IndexingUnsupportedListener() {
+			@Override
+			public void indexingUnsupported(
+					final ModifiableIndexedObject indexedObject,
+					final OccurrenceIncrement increment) {
+				unsupportedIndexed.add(indexedObject);
+			}
+
+			@Override
+			public void indexingUnsupported(final ElkObject elkObject) {
+				unsupportedElk.add(elkObject);
+			}
+		};
+
 		IndexedClassExpression ice;
 		synchronized (queried_) {
 			ice = queried_.get(classExpression);
 			if (ice != null) {
-				return;
+				return true;
 			}
-			ice = classExpression.accept(updatingExpressionConverter_);
+			try {
+				ontologyIndex_.addIndexingUnsupportedListener(listener);
+				ice = classExpression.accept(updatingExpressionConverter_);
+			} catch (final ElkIndexingUnsupportedException e) {
+				if (LOGGER_.isWarnEnabled()) {
+					LoggerWrap.log(LOGGER_, LogLevel.WARN,
+							"reasoner.indexing.queryIgnored",
+							e.getMessage()
+									+ " Query results may be incomplete:\n"
+									+ OwlFunctionalStylePrinter
+											.toString(classExpression));
+				}
+				return false;
+			} finally {
+				ontologyIndex_.removeIndexingUnsupportedListener(listener);
+				for (final ModifiableIndexedObject obj : unsupportedIndexed) {
+					obj.accept(INDEXING_UNSUPPORTED_INDEXED_OBJECT_VISITOR_);
+				}
+				for (final ElkObject obj : unsupportedElk) {
+					obj.accept(INDEXING_UNSUPPORTED_ELK_OBJECT_VISITOR_);
+				}
+			}
 			queried_.put(classExpression, ice);
 		}
 
@@ -221,6 +280,7 @@ public class ClassExpressionQueryState {
 			notComputed_.add(ice);
 		}
 
+		return true;
 	}
 
 	private final TransitiveReductionOutputVisitor<IndexedClassExpression> transitiveReductionOutputProcessor_ = new TransitiveReductionOutputVisitor<IndexedClassExpression>() {
@@ -484,5 +544,53 @@ public class ClassExpressionQueryState {
 		}
 		return Collections.unmodifiableSet(result);
 	}
+
+	private static final ElkObjectVisitor<Void> INDEXING_UNSUPPORTED_ELK_OBJECT_VISITOR_ = new DummyElkObjectVisitor<Void>() {
+
+		@Override
+		public Void visit(final ElkDataHasValue obj) {
+			if (LOGGER_.isWarnEnabled()) {
+				LoggerWrap.log(LOGGER_, LogLevel.WARN,
+						"reasoner.indexing.dataHasValue",
+						"ELK supports DataHasValue only partially. Query results may be incomplete!");
+			}
+			return super.visit(obj);
+		}
+
+		@Override
+		public Void visit(final ElkObjectOneOf obj) {
+			if (LOGGER_.isWarnEnabled()) {
+				LoggerWrap.log(LOGGER_, LogLevel.WARN,
+						"reasoner.indexing.objectOneOf",
+						"ELK supports ObjectOneOf only partially. Query results may be incomplete!");
+			}
+			return super.visit(obj);
+		}
+
+	};
+
+	private static final IndexedObject.Visitor<Void> INDEXING_UNSUPPORTED_INDEXED_OBJECT_VISITOR_ = new DummyIndexedObjectVisitor<Void>() {
+
+		@Override
+		public Void visit(final IndexedObjectComplementOf element) {
+			if (LOGGER_.isWarnEnabled()) {
+				LoggerWrap.log(LOGGER_, LogLevel.WARN,
+						"reasoner.indexing.IndexedObjectComplementOf",
+						"ELK does not support querying equivalent classes and subclasses of ObjectComplementOf. Query results may be incomplete!");
+			}
+			return super.visit(element);
+		}
+
+		@Override
+		public Void visit(final IndexedObjectUnionOf element) {
+			if (LOGGER_.isWarnEnabled()) {
+				LoggerWrap.log(LOGGER_, LogLevel.WARN,
+						"reasoner.indexing.IndexedObjectUnionOf",
+						"ELK does not support querying equivalent classes and superclasses of ObjectUnionOf or ObjectOneOf. Reasoning might be incomplete!");
+			}
+			return super.visit(element);
+		}
+
+	};
 
 }

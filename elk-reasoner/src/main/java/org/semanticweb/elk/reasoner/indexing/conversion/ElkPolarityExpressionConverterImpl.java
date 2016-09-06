@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.indexing.conversion;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.indexing.conversion;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.indexing.conversion;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,12 +42,8 @@ import org.semanticweb.elk.reasoner.indexing.classes.ResolvingModifiableIndexedO
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObject;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
-import org.semanticweb.elk.util.logging.LogLevel;
-import org.semanticweb.elk.util.logging.LoggerWrap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 
 /**
  * 
@@ -62,24 +57,24 @@ import org.slf4j.LoggerFactory;
 public class ElkPolarityExpressionConverterImpl extends
 		FailingElkPolarityExpressionConverter {
 
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ElkPolarityExpressionConverterImpl.class);
-
 	private final PredefinedElkClassFactory elkFactory_;
 	
 	private final ModifiableIndexedObject.Factory factory_;
 
 	private final ElkPolarityExpressionConverter complementaryConverter_;
 
+	private final ModifiableOntologyIndex index_;
+
 	ElkPolarityExpressionConverterImpl(ElkPolarity polarity,
 			PredefinedElkClassFactory elkFactory,
 			ModifiableIndexedObject.Factory factory,
-			ElkPolarityExpressionConverter complementaryConverter) {
+			ElkPolarityExpressionConverter complementaryConverter,
+			final ModifiableOntologyIndex index) {
 		super(polarity);
 		this.elkFactory_ = elkFactory;
 		this.factory_ = factory;
 		this.complementaryConverter_ = complementaryConverter;
+		this.index_ = index;
 	}
 
 	/**
@@ -102,13 +97,15 @@ public class ElkPolarityExpressionConverterImpl extends
 	public ElkPolarityExpressionConverterImpl(ElkPolarity polarity,
 			PredefinedElkClassFactory elkFactory,
 			ModifiableIndexedObject.Factory factory,
-			ModifiableIndexedObject.Factory complementaryFactory) {
+			ModifiableIndexedObject.Factory complementaryFactory,
+			final ModifiableOntologyIndex index) {
 		super(polarity);
 		this.elkFactory_ = elkFactory;
 		this.factory_ = factory;
 		this.complementaryConverter_ = new ElkPolarityExpressionConverterImpl(
 				polarity.getComplementary(), elkFactory, complementaryFactory,
-				this);
+				this, index);
+		this.index_ = index;
 	}
 
 	/**
@@ -125,17 +122,20 @@ public class ElkPolarityExpressionConverterImpl extends
 	 */
 	public ElkPolarityExpressionConverterImpl(
 			PredefinedElkClassFactory elkFactory,
-			ModifiableIndexedObject.Factory dualFactory) {
+			ModifiableIndexedObject.Factory dualFactory,
+			final ModifiableOntologyIndex index) {
 		super(ElkPolarity.DUAL);
 		this.elkFactory_ = elkFactory;
 		this.factory_ = dualFactory;
 		this.complementaryConverter_ = this;
+		this.index_ = index;
 	}
 
 	public ElkPolarityExpressionConverterImpl(
 			PredefinedElkClassFactory elkFactory,
-			ModifiableIndexedObjectCache cache) {
-		this(elkFactory, new ResolvingModifiableIndexedObjectFactory(cache));
+			ModifiableOntologyIndex index) {
+		this(elkFactory, new ResolvingModifiableIndexedObjectFactory(index),
+				index);
 	}
 
 	@Override
@@ -213,12 +213,7 @@ public class ElkPolarityExpressionConverterImpl extends
 		case 0:
 			return factory_.getIndexedClass(elkFactory_.getOwlNothing());
 		case 1:
-			if (LOGGER_.isWarnEnabled()) {
-				LoggerWrap
-						.log(LOGGER_, LogLevel.WARN,
-								"reasoner.indexing.objectOneOf",
-								"ELK supports ObjectOneOf only partially. Reasoning might be incomplete!");
-			}
+			index_.fireIndexingUnsupported(elkObjectOneOf);
 			return elkObjectOneOf.getIndividuals().iterator().next()
 					.accept(this);
 		default:
@@ -255,12 +250,7 @@ public class ElkPolarityExpressionConverterImpl extends
 	@Override
 	public ModifiableIndexedClassExpression visit(
 			ElkDataHasValue elkDataHasValue) {
-		if (LOGGER_.isWarnEnabled()) {
-			LoggerWrap
-					.log(LOGGER_, LogLevel.WARN,
-							"reasoner.indexing.dataHasValue",
-							"ELK supports DataHasValue only partially. Reasoning might be incomplete!");
-		}
+		index_.fireIndexingUnsupported(elkDataHasValue);
 		return factory_.getIndexedDataHasValue(elkDataHasValue);
 	}
 

@@ -26,12 +26,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.predefined.PredefinedElkEntityFactory;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlNothing;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlThing;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
@@ -59,11 +61,14 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl
 
 	private final List<OntologyIndex.ChangeListener> listeners_;
 
+	private final List<ModifiableOntologyIndex.IndexingUnsupportedListener> indexingUnsupportedListeners_;
+
 	public DirectIndex(final PredefinedElkEntityFactory elkFactory) {
 		super(elkFactory);
 		this.reflexiveObjectProperties_ = new HashListMultimap<IndexedObjectProperty, ElkAxiom>(
 				64);
 		this.listeners_ = new ArrayList<OntologyIndex.ChangeListener>();
+		this.indexingUnsupportedListeners_ = new ArrayList<ModifiableOntologyIndex.IndexingUnsupportedListener>();
 		// the context root initialization rule is always registered
 		RootContextInitializationRule.addRuleFor(this);
 		// owl:Thing and owl:Nothing always occur
@@ -255,6 +260,34 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl
 		}
 		// else
 		return true;
+	}
+
+	@Override
+	public boolean addIndexingUnsupportedListener(
+			final ModifiableOntologyIndex.IndexingUnsupportedListener listener) {
+		return indexingUnsupportedListeners_.add(listener);
+	}
+
+	@Override
+	public boolean removeIndexingUnsupportedListener(
+			final ModifiableOntologyIndex.IndexingUnsupportedListener listener) {
+		return indexingUnsupportedListeners_.remove(listener);
+	}
+
+	@Override
+	public void fireIndexingUnsupported(
+			final ModifiableIndexedObject indexedObject,
+			final OccurrenceIncrement increment) {
+		for (final IndexingUnsupportedListener listener : indexingUnsupportedListeners_) {
+			listener.indexingUnsupported(indexedObject, increment);
+		}
+	}
+
+	@Override
+	public void fireIndexingUnsupported(final ElkObject elkObject) {
+		for (final IndexingUnsupportedListener listener : indexingUnsupportedListeners_) {
+			listener.indexingUnsupported(elkObject);
+		}
 	}
 
 }

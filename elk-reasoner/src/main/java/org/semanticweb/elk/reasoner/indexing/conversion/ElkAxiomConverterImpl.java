@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.indexing.conversion;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.indexing.conversion;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.indexing.conversion;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -170,18 +169,19 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 			ModifiableIndexedObject.Factory neutralFactory,
 			ModifiableIndexedObject.Factory positiveFactory,
 			ModifiableIndexedObject.Factory negativeFactory,
-			ModifiableIndexedObject.Factory dualFactory) {
+			ModifiableIndexedObject.Factory dualFactory,
+			final ModifiableOntologyIndex index) {
 		this.elkFactory_ = elkFactory;
 		this.axiomFactory_ = neutralFactory;
 		this.positiveFactory_ = positiveFactory;
 		this.negativeFactory_ = negativeFactory;
 		this.positiveConverter_ = new ElkPolarityExpressionConverterImpl(
 				ElkPolarity.POSITIVE, elkFactory, positiveFactory,
-				negativeFactory);
+				negativeFactory, index);
 		this.negativeConverter_ = positiveConverter_
 				.getComplementaryConverter();
 		this.dualConverter_ = new ElkPolarityExpressionConverterImpl(elkFactory,
-				dualFactory);
+				dualFactory, index);
 		this.entityConverter_ = new ElkEntityConverterImpl(neutralFactory);
 	}
 
@@ -200,8 +200,9 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	 *            conversion of {@link ElkAxiom}s.
 	 */
 	public ElkAxiomConverterImpl(PredefinedElkClassFactory elkFactory,
-			ModifiableIndexedObject.Factory factory) {
-		this(elkFactory, factory, factory, factory, factory);
+			ModifiableIndexedObject.Factory factory,
+			final ModifiableOntologyIndex index) {
+		this(elkFactory, factory, factory, factory, factory, index);
 	}
 
 	/**
@@ -218,13 +219,14 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	 * @param elkFactory
 	 *            used to create auxiliary {@link ElkObject}s
 	 * 
-	 * @param cache
+	 * @param index
 	 *            the {@link ModifiableIndexedObjectCache} from which all
 	 *            {@link ModifiableIndexedObject}s are used.
 	 */
 	public ElkAxiomConverterImpl(PredefinedElkClassFactory elkFactory,
-			ModifiableIndexedObjectCache cache) {
-		this(elkFactory, new ResolvingModifiableIndexedObjectFactory(cache));
+			ModifiableOntologyIndex index) {
+		this(elkFactory, new ResolvingModifiableIndexedObjectFactory(index),
+				index);
 	}
 
 	<F extends CachedIndexedObject.Factory & ModifiableIndexedObject.Factory> ElkAxiomConverterImpl(
@@ -238,7 +240,8 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 				new UpdatingModifiableIndexedObjectFactory(baseFactory, index,
 						OccurrenceIncrement.getNegativeIncrement(increment)),
 				new UpdatingModifiableIndexedObjectFactory(baseFactory, index,
-						OccurrenceIncrement.getDualIncrement(increment)));
+						OccurrenceIncrement.getDualIncrement(increment)),
+				index);
 	}
 
 	/**

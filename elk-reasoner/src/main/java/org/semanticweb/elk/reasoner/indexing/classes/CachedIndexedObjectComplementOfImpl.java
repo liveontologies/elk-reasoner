@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.indexing.classes;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectComplementOf;
@@ -29,10 +28,6 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpress
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
-import org.semanticweb.elk.util.logging.LogLevel;
-import org.semanticweb.elk.util.logging.LoggerWrap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implements {@link CachedIndexedObjectComplementOf}
@@ -43,10 +38,6 @@ import org.slf4j.LoggerFactory;
 class CachedIndexedObjectComplementOfImpl extends
 		CachedIndexedComplexClassExpressionImpl<CachedIndexedObjectComplementOf>
 		implements CachedIndexedObjectComplementOf {
-
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(CachedIndexedObjectComplementOfImpl.class);
 
 	private final ModifiableIndexedClassExpression negated_;
 
@@ -80,11 +71,7 @@ class CachedIndexedObjectComplementOfImpl extends
 
 		if (negativeOccurrenceNo == 0 && increment.negativeIncrement > 0) {
 			// first negative occurrence of this expression
-			if (LOGGER_.isWarnEnabled()) {
-				LoggerWrap.log(LOGGER_, LogLevel.WARN,
-						"reasoner.indexing.IndexedObjectComplementOf",
-						"ELK does not support negative occurrences of ObjectComplementOf. Reasoning might be incomplete!");
-			}
+			index.fireIndexingUnsupported(this, increment);
 		}
 
 		positiveOccurrenceNo += increment.positiveIncrement;
