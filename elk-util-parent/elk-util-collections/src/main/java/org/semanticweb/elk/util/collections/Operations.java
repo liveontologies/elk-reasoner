@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -821,4 +822,53 @@ public class Operations {
 		
 		return builder.toString();
 	}
+
+	/**
+	 * @param elementComparator
+	 * @return {@link Comparator} that compares iterables according to lexical
+	 *         order w.r.t. element ordering defined by the provided element
+	 *         {@link Comparator}.
+	 */
+	public static final <T> Comparator<? super Iterable<T>> lexicalOrder(
+			final Comparator<? super T> elementComparator) {
+		return new Comparator<Iterable<T>>() {
+			@Override
+			public int compare(final Iterable<T> o1, final Iterable<T> o2) {
+
+				final Iterator<T> list1 = o1 == null
+						? Collections.<T> emptyList().iterator()
+						: o1.iterator();
+				final Iterator<T> list2 = o2 == null
+						? Collections.<T> emptyList().iterator()
+						: o2.iterator();
+
+				while (list1.hasNext() || list2.hasNext()) {
+
+					// index did not exceed the size of at least one list.
+					if (!list1.hasNext()) {
+						// list1 is shorter and coincides on its elements.
+						return -1;
+					}
+					if (!list2.hasNext()) {
+						// list2 is shorter and coincides on its elements.
+						return 1;
+					}
+					// index exceeded the size of none of the lists.
+
+					final int cmp = elementComparator.compare(list1.next(),
+							list2.next());
+					if (cmp != 0) {
+						return cmp;
+					}
+
+				}
+				/*
+				 * index exceeded size of both lists and no difference was
+				 * found, so the lists are the same.
+				 */
+				return 0;
+			}
+		};
+	}
+
 }

@@ -42,7 +42,8 @@ public class ReasonerStageManager {
 			incrementalTaxonomyCleaningStage,
 			incrementalClassTaxonomyComputationStage,
 			instanceTaxonomyComputationStage,
-			incrementalInstanceTaxonomyComputationStage, inferenceTracingStage;
+			incrementalInstanceTaxonomyComputationStage, inferenceTracingStage,
+			classExpressionQueryStage;
 
 	ReasonerStageManager(AbstractReasonerState reasoner) {
 
@@ -114,5 +115,11 @@ public class ReasonerStageManager {
 		/* Tracing stages */
 
 		this.inferenceTracingStage = new InferenceTracingStage(reasoner);
+
+		/* Query stages */
+
+		this.classExpressionQueryStage = new ClassExpressionQueryStage(
+				reasoner);
+
 	}
 }

@@ -20,9 +20,6 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
 package org.semanticweb.elk.reasoner;
 
 import java.io.IOException;
@@ -34,8 +31,8 @@ import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.HashTestOutput;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
-import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.io.URLTestIO;
+import org.semanticweb.elk.testing.TestManifestWithOutput;
+import org.semanticweb.elk.testing.UrlTestInput;
 
 /**
  * Loads a hash-based configuration
@@ -49,11 +46,11 @@ public class HashConfigurationUtils {
 	static <AO extends TaxonomyTestOutput<?>> Configuration loadConfiguration(
 			String location) throws URISyntaxException, IOException {
 		return ConfigurationUtils.loadFileBasedTestConfiguration(location,
-				HashClassificationCorrectnessTest.class, "owl",
+				HashConfigurationUtils.class, "owl",
 				"expected.hash",
-				new TestManifestCreator<URLTestIO, HashTestOutput, AO>() {
+				new TestManifestCreator<UrlTestInput, HashTestOutput, AO>() {
 					@Override
-					public TestManifest<URLTestIO, HashTestOutput, AO> create(
+					public TestManifestWithOutput<UrlTestInput, HashTestOutput, AO> create(
 							URL input, URL output) throws IOException {
 						// input is an OWL ontology, expected output is a hash
 						// code

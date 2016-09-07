@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -71,7 +70,6 @@ public class ComplexClassQueryTest {
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
 		loader.add(objectFactory.getSubClassOfAxiom(A,
 				objectFactory.getOwlNothing()));
-		reasoner.isInconsistent();
 		ElkObjectProperty R = objectFactory.getObjectProperty(new ElkFullIri(
 				":R"));
 		assertFalse(reasoner.isSatisfiable(objectFactory
@@ -89,7 +87,6 @@ public class ComplexClassQueryTest {
 		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
 		loader.add(objectFactory.getSubClassOfAxiom(A, B));
-		reasoner.getTaxonomy();
 		ElkObjectProperty R = objectFactory.getObjectProperty(new ElkFullIri(
 				":R"));
 		assertFalse(reasoner.isSatisfiable(objectFactory
@@ -115,7 +112,6 @@ public class ComplexClassQueryTest {
 		ElkClass C = objectFactory.getClass(new ElkFullIri(":C"));
 		loader.add(objectFactory.getSubClassOfAxiom(A, B)).add(
 				(objectFactory.getSubClassOfAxiom(B, C)));
-		reasoner.getTaxonomy();
 
 		Set<? extends Node<ElkClass>> superClasses = reasoner.getSuperClasses(
 				objectFactory.getObjectIntersectionOf(B, C), true);
@@ -147,4 +143,40 @@ public class ComplexClassQueryTest {
 		// the following has reproduced Issue 23:
 		assertEquals(0, reasoner.getEquivalentClasses(queryExpression).size());
 	}
+
+	/**
+	 * This test is supposed to reproduce error where a partially supported
+	 * complex class was considered to be equivalent to {@code owl:Thing} by
+	 * transitive reduction, because the class and its subsumer
+	 * {@code owl:Thing} had the same number of subsumers.
+	 * 
+	 * @throws ElkException
+	 */
+	@Test
+	public void testPartiallySupportedExpression() throws ElkException {
+		TestLoader loader = new TestLoader();
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
+				new SimpleStageExecutor());
+
+		final ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
+		final ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
+		final ElkClass C = objectFactory.getClass(new ElkFullIri(":C"));
+		final ElkClass D = objectFactory.getClass(new ElkFullIri(":D"));
+		final ElkClass top = objectFactory.getOwlThing();
+		final ElkClassExpression query = objectFactory.getObjectUnionOf(A, B);
+
+		loader.add(objectFactory.getSubClassOfAxiom(A, C));
+		loader.add(objectFactory.getSubClassOfAxiom(B, C));
+		// negative occurrence of top, so that it is added to composed subsumers
+		loader.add(objectFactory.getSubClassOfAxiom(top, D));
+
+		final Set<? extends Node<ElkClass>> subClasses = reasoner
+				.getSubClasses(query, true);
+		assertEquals(2, subClasses.size());
+		for (final Node<ElkClass> node : subClasses) {
+			assertEquals(1, node.size());
+			assertTrue(node.contains(A) != node.contains(B));
+		}
+	}
+
 }

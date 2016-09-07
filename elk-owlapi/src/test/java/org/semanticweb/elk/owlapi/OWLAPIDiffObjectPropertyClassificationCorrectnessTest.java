@@ -22,16 +22,14 @@
  */
 package org.semanticweb.elk.owlapi;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.owl.parsing.Owl2ParseException;
-import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.DiffObjectPropertyClassificationCorrectnessTest;
-import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
+import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestInput;
 
@@ -50,13 +48,21 @@ public class OWLAPIDiffObjectPropertyClassificationCorrectnessTest
 
 	public OWLAPIDiffObjectPropertyClassificationCorrectnessTest(
 			final ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> testManifest) {
-		super(testManifest);
-	}
+		super(testManifest,
+				new OwlApiReasoningTestDelegate<TaxonomyTestOutput<?>>(
+						testManifest) {
 
-	@Override
-	protected Reasoner createReasoner(final InputStream input)
-			throws IOException, Owl2ParseException {
-		return OWLAPITestUtils.createReasoner(input).getInternalReasoner();
+					@Override
+					public TaxonomyTestOutput<?> getActualOutput()
+							throws Exception {
+						final Taxonomy<ElkObjectProperty> taxonomy = reasoner_
+								.getInternalReasoner()
+								.getObjectPropertyTaxonomyQuietly();
+						return new TaxonomyTestOutput<Taxonomy<ElkObjectProperty>>(
+								taxonomy);
+					}
+
+				});
 	}
 
 	@Override

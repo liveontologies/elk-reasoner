@@ -22,17 +22,32 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
+import org.semanticweb.elk.owl.visitors.DummyElkObjectVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 import org.semanticweb.elk.reasoner.incremental.NonIncrementalChangeListener;
 import org.semanticweb.elk.reasoner.indexing.classes.ChangeIndexingProcessor;
+import org.semanticweb.elk.reasoner.indexing.classes.DummyIndexedObjectVisitor;
 import org.semanticweb.elk.reasoner.indexing.classes.NonIncrementalElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectComplementOf;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectUnionOf;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +81,21 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 	private ElkAxiomProcessor axiomInsertionProcessor_,
 			axiomDeletionProcessor_;
 
+	/**
+	 * the ontology index where the loaded and indexed axioms are stored.
+	 */
+	private ModifiableOntologyIndex ontologyIndex_;
+
+	/**
+	 * the listener notified about expressions whose indexing is unsupported
+	 */
+	private IndexingUnsupportedListener indexingUnsupportedListener_;
+
+	/**
+	 * whether {@link #indexingUnsupportedListener_} was successfully registered
+	 */
+	private boolean isIndexingUnsupportedListenerRegistered_;
+
 	public AxiomLoadingStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
 		super(reasoner, preStages);
@@ -78,6 +108,7 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 
 	@Override
 	public boolean preExecute() {
+		isIndexingUnsupportedListenerRegistered_ = false;
 		if (!super.preExecute())
 			return false;
 		if (!firstLoad_) {
@@ -88,14 +119,17 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 			return true;
 		}
 
-		ModifiableOntologyIndex ontologyIndex = reasoner
-				.getModifiableOntologyIndex();
+		ontologyIndex_ = reasoner.getModifiableOntologyIndex();
 		ElkObject.Factory elkFactory = reasoner.getElkFactory();
 
+		indexingUnsupportedListener_ = new IndexingUnsupportedListener();
+		isIndexingUnsupportedListenerRegistered_ = ontologyIndex_
+				.addIndexingUnsupportedListener(indexingUnsupportedListener_);
+
 		ElkAxiomConverter axiomInserter = new ElkAxiomConverterImpl(elkFactory,
-				ontologyIndex, 1);
+				ontologyIndex_, 1);
 		ElkAxiomConverter axiomDeleter = new ElkAxiomConverterImpl(elkFactory,
-				ontologyIndex, -1);
+				ontologyIndex_, -1);
 
 		/*
 		 * wrapping both the inserter and the deleter to receive notifications
@@ -140,8 +174,15 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;	
+		if (isIndexingUnsupportedListenerRegistered_) {
+			ontologyIndex_.removeIndexingUnsupportedListener(
+					indexingUnsupportedListener_);
+			indexingUnsupportedListener_.processEvents();
+		}
 		this.firstLoad_ = false;
 		this.loader_ = null;
+		this.ontologyIndex_ = null;
+		this.indexingUnsupportedListener_ = null;
 		this.axiomInsertionProcessor_ = null;
 		this.axiomDeletionProcessor_ = null;
 		return true;
@@ -157,5 +198,88 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 		super.setInterrupt(flag);
 		setInterrupt(loader_, flag);
 	}
+
+	private static class IndexingUnsupportedListener
+			implements ModifiableOntologyIndex.IndexingUnsupportedListener {
+
+		private final Queue<ModifiableIndexedObject> unsupportedIndexed_ = new ConcurrentLinkedQueue<ModifiableIndexedObject>();
+		private final Queue<ElkObject> unsupportedElk_ = new ConcurrentLinkedQueue<ElkObject>();
+
+		@Override
+		public void indexingUnsupported(
+				final ModifiableIndexedObject indexedObject,
+				final OccurrenceIncrement increment) {
+			unsupportedIndexed_.add(indexedObject);
+		}
+
+		@Override
+		public void indexingUnsupported(final ElkObject elkObject) {
+			unsupportedElk_.add(elkObject);
+		}
+
+		public void processEvents() {
+
+			ModifiableIndexedObject indexedObject;
+			while ((indexedObject = unsupportedIndexed_.poll()) != null) {
+				indexedObject
+						.accept(INDEXING_UNSUPPORTED_INDEXED_OBJECT_VISITOR_);
+			}
+
+			ElkObject elkObject;
+			while ((elkObject = unsupportedElk_.poll()) != null) {
+				elkObject.accept(INDEXING_UNSUPPORTED_ELK_OBJECT_VISITOR_);
+			}
+
+		}
+
+	}
+
+	private static final ElkObjectVisitor<Void> INDEXING_UNSUPPORTED_ELK_OBJECT_VISITOR_ = new DummyElkObjectVisitor<Void>() {
+
+		@Override
+		public Void visit(final ElkDataHasValue obj) {
+			if (LOGGER_.isWarnEnabled()) {
+				LoggerWrap.log(LOGGER_, LogLevel.WARN,
+						"reasoner.indexing.dataHasValue",
+						"ELK supports DataHasValue only partially. Reasoning might be incomplete!");
+			}
+			return super.visit(obj);
+		}
+
+		@Override
+		public Void visit(final ElkObjectOneOf obj) {
+			if (LOGGER_.isWarnEnabled()) {
+				LoggerWrap.log(LOGGER_, LogLevel.WARN,
+						"reasoner.indexing.objectOneOf",
+						"ELK supports ObjectOneOf only partially. Reasoning might be incomplete!");
+			}
+			return super.visit(obj);
+		}
+
+	};
+
+	private static final IndexedObject.Visitor<Void> INDEXING_UNSUPPORTED_INDEXED_OBJECT_VISITOR_ = new DummyIndexedObjectVisitor<Void>() {
+
+		@Override
+		public Void visit(final IndexedObjectComplementOf element) {
+			if (LOGGER_.isWarnEnabled()) {
+				LoggerWrap.log(LOGGER_, LogLevel.WARN,
+						"reasoner.indexing.IndexedObjectComplementOf",
+						"ELK does not support negative occurrences of ObjectComplementOf. Reasoning might be incomplete!");
+			}
+			return super.visit(element);
+		}
+
+		@Override
+		public Void visit(final IndexedObjectUnionOf element) {
+			if (LOGGER_.isWarnEnabled()) {
+				LoggerWrap.log(LOGGER_, LogLevel.WARN,
+						"reasoner.indexing.IndexedObjectUnionOf",
+						"ELK does not support positive occurrences of ObjectUnionOf or ObjectOneOf. Reasoning might be incomplete!");
+			}
+			return super.visit(element);
+		}
+
+	};
 
 }

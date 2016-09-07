@@ -22,103 +22,28 @@
  */
 package org.semanticweb.elk.reasoner;
 
-import static org.junit.Assert.fail;
-
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.exceptions.ElkException;
-import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestOutput;
-import org.semanticweb.elk.testing.TestResultComparisonException;
+import org.semanticweb.elk.testing.UrlTestInput;
 
 /**
- * Runs pbject property classification tests for all test input in the test
+ * Runs object property classification tests for all test input in the test
  * directory.
  * 
  * @author Peter Skocovsky
  */
 @RunWith(PolySuite.class)
 public abstract class BaseObjectPropertyClassificationCorrectnessTest<EO extends TestOutput>
-		extends BaseReasoningCorrectnessTest<EO, TaxonomyTestOutput<?>> {
+		extends
+		ReasoningCorrectnessTestWithInterrupts<UrlTestInput, EO, TaxonomyTestOutput<?>, ReasoningTestManifest<EO, TaxonomyTestOutput<?>>, ReasoningTestWithInterruptsDelegate<TaxonomyTestOutput<?>>> {
 
 	final static String INPUT_DATA_LOCATION = "property_classification_test_input";
 
 	public BaseObjectPropertyClassificationCorrectnessTest(
-			final ReasoningTestManifest<EO, TaxonomyTestOutput<?>> testManifest) {
-		super(testManifest);
-	}
-
-	/**
-	 * Checks that the computed taxonomy is correct and complete
-	 * 
-	 * @throws TestResultComparisonException
-	 *             in case the comparison fails
-	 * @throws ElkException
-	 */
-	@Test
-	public void classify() throws TestResultComparisonException, ElkException {
-		final Taxonomy<ElkObjectProperty> taxonomy = reasoner
-				.getObjectPropertyTaxonomyQuietly();
-
-		manifest.compare(
-				new TaxonomyTestOutput<Taxonomy<ElkObjectProperty>>(taxonomy));
-	}
-
-	/**
-	 * Compute the taxonomy using interruptions and checks that the computed
-	 * taxonomy is correct and complete
-	 * 
-	 * @throws TestResultComparisonException
-	 *             in case the comparison fails
-	 * @throws ElkException
-	 */
-	@Test
-	public void classifyWithInterruptions()
-			throws TestResultComparisonException, ElkException {
-		ReasoningProcess reasoningProcess = new ReasoningProcess();
-		Thread reasonerThread = new Thread(reasoningProcess,
-				"test-elk-reasoner-thread");
-		reasonerThread.start();
-
-		while (reasonerThread.isAlive()) {
-			// interrupt every millisecond
-			reasoner.interrupt();
-			try {
-				Thread.sleep(1);
-			} catch (InterruptedException e) {
-				fail();
-			}
-		}
-
-		if (reasoningProcess.exception != null)
-			throw reasoningProcess.exception;
-		manifest.compare(new TaxonomyTestOutput<Taxonomy<ElkObjectProperty>>(
-				reasoningProcess.taxonomy));
-
-	}
-
-	/**
-	 * A simple class for running a reasoner in a separate thread and query the
-	 * result.
-	 * 
-	 * @author Peter Skocovsky
-	 */
-	class ReasoningProcess implements Runnable {
-
-		Taxonomy<ElkObjectProperty> taxonomy = null;
-		ElkException exception = null;
-
-		@Override
-		public void run() {
-			try {
-				taxonomy = reasoner.getObjectPropertyTaxonomyQuietly();
-			} catch (ElkException e) {
-				exception = e;
-			}
-		}
-
+			final ReasoningTestManifest<EO, TaxonomyTestOutput<?>> testManifest,
+			final ReasoningTestWithInterruptsDelegate<TaxonomyTestOutput<?>> testDelegate) {
+		super(testManifest, testDelegate);
 	}
 
 }

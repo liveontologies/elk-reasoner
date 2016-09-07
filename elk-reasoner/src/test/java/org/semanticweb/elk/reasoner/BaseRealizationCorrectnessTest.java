@@ -20,23 +20,12 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
 package org.semanticweb.elk.reasoner;
 
-import java.util.Arrays;
-
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.exceptions.ElkException;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestOutput;
-import org.semanticweb.elk.testing.TestResultComparisonException;
+import org.semanticweb.elk.testing.UrlTestInput;
 
 /**
  * Runs ABox realization tests for all test input in the test directory
@@ -48,44 +37,15 @@ import org.semanticweb.elk.testing.TestResultComparisonException;
  */
 @RunWith(PolySuite.class)
 public abstract class BaseRealizationCorrectnessTest<EO extends TestOutput>
-		extends BaseReasoningCorrectnessTest<EO, InstanceTaxonomyTestOutput<?>> {
+		extends
+		ReasoningCorrectnessTestWithOutput<UrlTestInput, EO, InstanceTaxonomyTestOutput<?>, ReasoningTestManifest<EO, InstanceTaxonomyTestOutput<?>>, ReasoningTestDelegate<InstanceTaxonomyTestOutput<?>>> {
 
 	final static String INPUT_DATA_LOCATION = "realization_test_input";
 
-	static final String[] IGNORE_LIST = { "AssertionsPropertyRanges.owl",
-			"Inconsistent.owl" };
-
-	static {
-		Arrays.sort(IGNORE_LIST);
-	}
-
 	public BaseRealizationCorrectnessTest(
-			ReasoningTestManifest<EO, InstanceTaxonomyTestOutput<?>> testManifest) {
-		super(testManifest);
-	}
-
-	/*
-	 * Tests
-	 */
-	/**
-	 * Checks that the computed taxonomy with instances is correct and complete
-	 * 
-	 * @throws TestResultComparisonException
-	 *             in case the comparison fails
-	 * @throws ElkException
-	 */
-	@Test
-	public void realize() throws TestResultComparisonException, ElkException {
-		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy;
-		taxonomy = reasoner.getInstanceTaxonomyQuietly();
-		manifest.compare(new InstanceTaxonomyTestOutput<InstanceTaxonomy<ElkClass, ElkNamedIndividual>>(
-				taxonomy));
-	}
-
-	@Override
-	protected boolean ignore(TestInput input) {
-		return super.ignore(input)
-				|| Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
+			final ReasoningTestManifest<EO, InstanceTaxonomyTestOutput<?>> testManifest,
+			final ReasoningTestDelegate<InstanceTaxonomyTestOutput<?>> testDelegate) {
+		super(testManifest, testDelegate);
 	}
 
 }

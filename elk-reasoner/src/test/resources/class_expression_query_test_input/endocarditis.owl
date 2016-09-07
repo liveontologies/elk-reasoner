@@ -1,0 +1,28 @@
+Prefix(:=<http://www.test.com/schema#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+Ontology(
+
+SubObjectPropertyOf(:part-of :contained-in)
+
+SubClassOf(:Endocarditis ObjectIntersectionOf(:Inflammation ObjectSomeValuesFrom(:has-location :Endocardium)))
+
+SubClassOf(:Endocardium ObjectIntersectionOf(:Tissue ObjectSomeValuesFrom(:contained-in :HeartValve)))
+
+SubClassOf(:HeartValve ObjectIntersectionOf(:BodyValve ObjectSomeValuesFrom(:part-of :Heart)))
+
+SubClassOf(:Inflammation ObjectIntersectionOf(:Disease ObjectSomeValuesFrom(:acts-on :Tissue)))
+
+SubClassOf(:Pericarditis ObjectIntersectionOf(:Inflammation ObjectSomeValuesFrom(:has-location :Pericardium)))
+
+SubClassOf(:Pericardium ObjectIntersectionOf(:Tissue ObjectSomeValuesFrom(:contained-in :Heart)))
+
+SubClassOf(ObjectIntersectionOf(ObjectIntersectionOf(:Disease ObjectSomeValuesFrom(:has-location :Heart)) ObjectSomeValuesFrom(:has-location :HeartValve)) :IsStateNeedsTreatment)
+
+SubObjectPropertyOf(ObjectPropertyChain(:has-location :contained-in) :has-location)
+
+)

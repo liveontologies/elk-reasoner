@@ -1,0 +1,25 @@
+Prefix(:=<http://www.test.com/schema#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+Ontology(
+
+ObjectPropertyDomain(:has-child :Human)
+ObjectPropertyRange(:has-child :Human)
+
+SubClassOf(:Beast ObjectIntersectionOf(:Animal :Irrational))
+
+SubClassOf(:Human ObjectIntersectionOf(:Animal :Rational))
+
+DisjointClasses(:Irrational :Rational)
+
+SubClassOf(:Kangaroo :Beast)
+
+SubClassOf(:KangarooInfant ObjectIntersectionOf(:Kangaroo ObjectSomeValuesFrom(:lives-in :Pouch)))
+
+EquivalentClasses(:Parent ObjectSomeValuesFrom(:has-child owl:Thing))
+
+)

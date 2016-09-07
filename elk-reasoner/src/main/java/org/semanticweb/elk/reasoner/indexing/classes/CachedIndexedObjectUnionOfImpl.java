@@ -1,7 +1,3 @@
-package org.semanticweb.elk.reasoner.indexing.classes;
-
-import java.util.ArrayList;
-
 /*
  * #%L
  * ELK Reasoner
@@ -23,7 +19,9 @@ import java.util.ArrayList;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.indexing.classes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpression;
@@ -33,10 +31,6 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpress
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
-import org.semanticweb.elk.util.logging.LogLevel;
-import org.semanticweb.elk.util.logging.LoggerWrap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implements {@link CachedIndexedObjectUnionOf}
@@ -47,10 +41,6 @@ import org.slf4j.LoggerFactory;
 class CachedIndexedObjectUnionOfImpl extends
 		CachedIndexedComplexClassExpressionImpl<CachedIndexedObjectUnionOf>
 		implements CachedIndexedObjectUnionOf {
-
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(CachedIndexedObjectUnionOfImpl.class);
 
 	private final List<ModifiableIndexedClassExpression> disjuncts_;
 
@@ -100,13 +90,7 @@ class CachedIndexedObjectUnionOfImpl extends
 
 		if (positiveOccurrenceNo == 0 && increment.positiveIncrement > 0) {
 			// first positive occurrence of this expression
-			if (LOGGER_.isWarnEnabled()) {
-				LoggerWrap
-						.log(LOGGER_,
-								LogLevel.WARN,
-								"reasoner.indexing.IndexedObjectUnionOf",
-								"ELK does not support positive occurrences of ObjectUnionOf or ObjectOneOf. Reasoning might be incomplete!");
-			}
+			index.fireIndexingUnsupported(this, increment);
 		}
 
 		positiveOccurrenceNo += increment.positiveIncrement;

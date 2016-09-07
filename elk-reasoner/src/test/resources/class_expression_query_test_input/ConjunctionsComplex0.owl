@@ -1,0 +1,30 @@
+Prefix(: = <http://example.org/>)
+Prefix(rdf: = <http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs: = <http://www.w3.org/2000/01/rdf-schema#>)
+Prefix(xsd: = <http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl: = <http://www.w3.org/2002/07/owl#>)
+Ontology(
+
+SubClassOf(:A :B) 
+SubClassOf(:A :C)
+SubClassOf(:A :D)
+
+SubClassOf(ObjectIntersectionOf(:B :B) :BB)
+SubClassOf(ObjectIntersectionOf(:C :C) :CC)
+SubClassOf(ObjectIntersectionOf(:D :D) :DD)
+
+SubClassOf(ObjectIntersectionOf(:B :C) :BC)
+SubClassOf(ObjectIntersectionOf(:B :D) :BD)
+SubClassOf(ObjectIntersectionOf(:C :B) :CB)
+SubClassOf(ObjectIntersectionOf(:C :D) :CD)
+SubClassOf(ObjectIntersectionOf(:D :C) :DC)
+SubClassOf(ObjectIntersectionOf(:D :B) :DB)
+
+SubClassOf(ObjectIntersectionOf(:B :C :D) :BCD)
+SubClassOf(ObjectIntersectionOf(:B :D :C) :BDC)
+SubClassOf(ObjectIntersectionOf(:C :B :D) :CBD)
+SubClassOf(ObjectIntersectionOf(:C :D :B) :CDB)
+SubClassOf(ObjectIntersectionOf(:D :B :C) :DBC)
+SubClassOf(ObjectIntersectionOf(:D :C :B) :DCB)
+
+)

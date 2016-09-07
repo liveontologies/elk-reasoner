@@ -39,8 +39,8 @@ import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
-import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.io.URLTestIO;
+import org.semanticweb.elk.testing.TestManifestWithOutput;
+import org.semanticweb.elk.testing.UrlTestInput;
 
 /**
  * 
@@ -52,8 +52,9 @@ public abstract class DiffClassificationCorrectnessTest extends
 		BaseClassificationCorrectnessTest<TaxonomyTestOutput<?>> {
 
 	public DiffClassificationCorrectnessTest(
-			ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> testManifest) {
-		super(testManifest);
+			final ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> testManifest,
+			final ReasoningTestWithInterruptsDelegate<TaxonomyTestOutput<?>> testDelegate) {
+		super(testManifest, testDelegate);
 	}
 
 	/*
@@ -68,10 +69,9 @@ public abstract class DiffClassificationCorrectnessTest extends
 						DiffClassificationCorrectnessTest.class,
 						"owl",
 						"expected",
-						new TestManifestCreator<URLTestIO, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>() {
-							@SuppressWarnings("resource")
+						new TestManifestCreator<UrlTestInput, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>() {
 							@Override
-							public TestManifest<URLTestIO, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> create(
+							public TestManifestWithOutput<UrlTestInput, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> create(
 									URL input, URL output) throws IOException {
 								// input and expected output are OWL ontologies
 								InputStream stream = null;

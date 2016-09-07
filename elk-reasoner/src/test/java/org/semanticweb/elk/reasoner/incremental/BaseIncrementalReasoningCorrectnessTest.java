@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.incremental;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,14 +19,9 @@ package org.semanticweb.elk.reasoner.incremental;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.incremental;
 
-import static org.junit.Assume.assumeTrue;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
 import org.junit.Before;
@@ -39,14 +29,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.exceptions.ElkException;
-import org.semanticweb.elk.io.IOUtils;
-import org.semanticweb.elk.owl.parsing.Owl2ParseException;
-import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.ReasoningTestManifest;
+import org.semanticweb.elk.reasoner.BaseReasoningCorrectnessTest;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestInput;
+import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestOutput;
-import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,9 +42,11 @@ import org.slf4j.LoggerFactory;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
 @RunWith(PolySuite.class)
-public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends TestOutput, AO extends TestOutput> {
+public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInput, A, EO extends TestOutput, AO extends TestOutput, TD extends IncrementalReasoningTestDelegate<A, EO, AO>>
+		extends BaseReasoningCorrectnessTest<I, AO, TestManifest<I>, TD> {
 
 	// logger for this class
 	protected static final Logger LOGGER_ = LoggerFactory
@@ -66,39 +55,20 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends Test
 	final static int REPEAT_NUMBER = 5;
 	final static double DELETE_RATIO = 0.2;
 
-	protected final ReasoningTestManifest<EO, AO> manifest;
-	protected List<T> staticAxioms = null;
-	protected OnOffVector<T> changingAxioms = null;
+	protected OnOffVector<A> changingAxioms = null;
 
 	public BaseIncrementalReasoningCorrectnessTest(
-			ReasoningTestManifest<EO, AO> testManifest) {
-		manifest = testManifest;
+			final TestManifest<I> testManifest, final TD testDelegate) {
+		super(testManifest, testDelegate);
 	}
 
 	@Before
-	public void before() throws IOException, Owl2ParseException {
-		assumeTrue(!ignore(manifest.getInput()));
+	public void before() throws Exception {
 
-		InputStream stream = null;
+		changingAxioms = new OnOffVector<A>(15);
+		changingAxioms.addAll(delegate_.loadAxioms());
 
-		try {
-			stream = manifest.getInput().getInputStream();
-			staticAxioms = new ArrayList<T>(15);
-			changingAxioms = new OnOffVector<T>(15);
-			loadAxioms(stream, staticAxioms, changingAxioms);
-		} finally {
-			IOUtils.closeQuietly(stream);
-		}
-
-	}
-
-	/**
-	 * @param input
-	 *            dummy parameter
-	 */
-	@SuppressWarnings("static-method")
-	protected boolean ignore(TestInput input) {
-		return false;
+		super.before();
 	}
 
 	/**
@@ -107,23 +77,15 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends Test
 	 * @throws ElkException
 	 */
 	@Test
-	public void incrementalReasoning() throws ElkException {
+	public void incrementalReasoning() throws Exception {
 		changingAxioms.setAllOn();
 
-		@SuppressWarnings("unchecked")
-		Reasoner standardReasoner = getReasoner(Operations.concat(staticAxioms,
-				changingAxioms.getOnElements()));
-		@SuppressWarnings("unchecked")
-		Reasoner incrementalReasoner = getReasoner(Operations.concat(
-				staticAxioms, changingAxioms.getOnElements()));
+		final long seed = RandomSeedProvider.VALUE;
+		final Random rnd = new Random(seed);
 
-		standardReasoner.setAllowIncrementalMode(false);
-		incrementalReasoner.setAllowIncrementalMode(true);
 		// initial correctness check
-		correctnessCheck(standardReasoner, incrementalReasoner, -1);
-
-		long seed = RandomSeedProvider.VALUE;
-		Random rnd = new Random(seed);
+		correctnessCheck(delegate_.getActualOutput(),
+				delegate_.getExpectedOutput(), seed);
 
 		for (int i = 0; i < REPEAT_NUMBER; i++) {
 			changingAxioms.setAllOff();
@@ -132,34 +94,33 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends Test
 			randomFlip(changingAxioms, rnd, DELETE_RATIO);
 
 			if (LOGGER_.isDebugEnabled()) {
-				for (T del : changingAxioms.getOnElements()) {
-					dumpChangeToLog(del, LogLevel.DEBUG);
+				for (A del : changingAxioms.getOnElements()) {
+					delegate_.dumpChangeToLog(del, LOGGER_, LogLevel.DEBUG);
 				}
 			}
 
 			// incremental changes
-			applyChanges(standardReasoner, changingAxioms.getOnElements(),
-					IncrementalChangeType.DELETE);
-			applyChanges(incrementalReasoner, changingAxioms.getOnElements(),
+			delegate_.applyChanges(changingAxioms.getOnElements(),
 					IncrementalChangeType.DELETE);
 
 			LOGGER_.info("===DELETIONS===");
 
-			correctnessCheck(standardReasoner, incrementalReasoner, seed);
+			correctnessCheck(delegate_.getActualOutput(),
+					delegate_.getExpectedOutput(), seed);
 
 			// add the axioms back
-			applyChanges(standardReasoner, changingAxioms.getOnElements(),
-					IncrementalChangeType.ADD);
-			applyChanges(incrementalReasoner, changingAxioms.getOnElements(),
+			delegate_.applyChanges(changingAxioms.getOnElements(),
 					IncrementalChangeType.ADD);
 
 			LOGGER_.info("===ADDITIONS===");
 
-			correctnessCheck(standardReasoner, incrementalReasoner, seed);
+			correctnessCheck(delegate_.getActualOutput(),
+					delegate_.getExpectedOutput(), seed);
 		}
 	}
 
-	protected void randomFlip(OnOffVector<T> axioms, Random rnd, double fraction) {
+	protected void randomFlip(OnOffVector<A> axioms, Random rnd,
+			double fraction) {
 		Collections.shuffle(axioms, rnd);
 
 		int flipped = 0;
@@ -171,17 +132,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends Test
 		}
 	}
 
-	protected abstract void applyChanges(Reasoner reasoner,
-			Iterable<T> changes, IncrementalChangeType type);
+	protected abstract void correctnessCheck(AO actualOutput, EO expectedOutput,
+			long seed) throws Exception;
 
-	protected abstract void dumpChangeToLog(T change, LogLevel level);
-
-	protected abstract void loadAxioms(InputStream stream,
-			List<T> staticAxiomsInput, OnOffVector<T> changingAxiomsInput)
-			throws IOException, Owl2ParseException;
-
-	protected abstract Reasoner getReasoner(Iterable<T> axioms);
-
-	protected abstract void correctnessCheck(Reasoner standardReasoner,
-			Reasoner incrementalReasoner, long seed) throws ElkException;
 }

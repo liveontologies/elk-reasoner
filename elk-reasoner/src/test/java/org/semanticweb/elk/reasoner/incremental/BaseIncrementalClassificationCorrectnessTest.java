@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.incremental;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +19,7 @@ package org.semanticweb.elk.reasoner.incremental;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.incremental;
 
 import static org.junit.Assert.fail;
 
@@ -33,12 +29,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.exceptions.ElkException;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
-import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TaxonomyDiffManifest;
+import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
@@ -48,7 +40,8 @@ import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.io.URLTestIO;
+import org.semanticweb.elk.testing.TestManifestWithOutput;
+import org.semanticweb.elk.testing.UrlTestInput;
 
 /**
  * Implements the correctness check based on comparing expected and obtained
@@ -60,28 +53,25 @@ import org.semanticweb.elk.testing.io.URLTestIO;
  * @author Peter Skocovsky
  */
 @RunWith(PolySuite.class)
-public abstract class BaseIncrementalClassificationCorrectnessTest<T>
-		extends
-		BaseIncrementalReasoningCorrectnessTest<T, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> {
+public abstract class BaseIncrementalClassificationCorrectnessTest<A> extends
+		BaseIncrementalReasoningCorrectnessTest<UrlTestInput, A, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>, IncrementalReasoningTestDelegate<A, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>> {
 
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
 
 	public BaseIncrementalClassificationCorrectnessTest(
-			ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> testManifest) {
-		super(testManifest);
+			final TestManifest<UrlTestInput> testManifest,
+			final IncrementalReasoningTestDelegate<A, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> testDelegate) {
+		super(testManifest, testDelegate);
 	}
 
 	@Override
-	protected void correctnessCheck(Reasoner standardReasoner,
-			Reasoner incrementalReasoner, long seed) throws ElkException {
-		LOGGER_.trace("======= Computing Expected Taxonomy =======");
+	protected void correctnessCheck(final TaxonomyTestOutput<?> actualOutput,
+			final TaxonomyTestOutput<?> expectedOutput, final long seed)
+			throws Exception {
 
-		Taxonomy<ElkClass> expected = standardReasoner.getTaxonomyQuietly();
+		final Taxonomy<?> expected = expectedOutput.getTaxonomy();
 
-		LOGGER_.trace("======= Computing Incremental Taxonomy =======");
-
-		Taxonomy<ElkClass> incremental = incrementalReasoner
-				.getTaxonomyQuietly();
+		final Taxonomy<?> incremental = actualOutput.getTaxonomy();
 
 		if (TaxonomyHasher.hash(expected) != TaxonomyHasher.hash(incremental)
 				|| !expected.equals(incremental)) {
@@ -103,23 +93,21 @@ public abstract class BaseIncrementalClassificationCorrectnessTest<T>
 	}
 
 	@Config
-	public static Configuration getConfig() throws URISyntaxException,
-			IOException {
-		return ConfigurationUtils
-				.loadFileBasedTestConfiguration(
-						INPUT_DATA_LOCATION,
-						IncrementalClassificationCorrectnessTest.class,
-						"owl",
-						"expected",
-						new TestManifestCreator<URLTestIO, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>() {
-							@Override
-							public TestManifest<URLTestIO, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> create(
-									URL input, URL output) throws IOException {
-								// don't need an expected output for these tests
-								return new TaxonomyDiffManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>(
-										input, null);
-							}
-						});
+	public static Configuration getConfig()
+			throws URISyntaxException, IOException {
+		return ConfigurationUtils.loadFileBasedTestConfiguration(
+				INPUT_DATA_LOCATION,
+				IncrementalClassificationCorrectnessTest.class, "owl",
+				"expected",
+				new TestManifestCreator<UrlTestInput, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>() {
+					@Override
+					public TestManifestWithOutput<UrlTestInput, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> create(
+							URL input, URL output) throws IOException {
+						// don't need an expected output for these tests
+						return new TaxonomyDiffManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>(
+								input, null);
+					}
+				});
 	}
 
 }

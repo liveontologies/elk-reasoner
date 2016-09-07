@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.owlapi;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +19,7 @@ package org.semanticweb.elk.owlapi;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.owlapi;
 
 import static org.junit.Assume.assumeTrue;
 
@@ -45,10 +41,10 @@ import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
-import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TaxonomyDiffManifest;
+import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.incremental.IncrementalChange;
 import org.semanticweb.elk.reasoner.incremental.IncrementalClassificationCorrectnessTest;
 import org.semanticweb.elk.reasoner.incremental.OnOffVector;
@@ -62,8 +58,8 @@ import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestInput;
-import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.io.URLTestIO;
+import org.semanticweb.elk.testing.TestManifestWithOutput;
+import org.semanticweb.elk.testing.UrlTestInput;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
@@ -138,7 +134,7 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 		OWLOntology ontology = null;
 		
 		try {
-			stream = manifest.getInput().getInputStream();
+			stream = manifest.getInput().getUrl().openStream();
 			
 			try {
 				ontology = manager_.loadOntologyFromOntologyDocument(stream);
@@ -177,9 +173,9 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 						IncrementalClassificationCorrectnessTest.class,
 						"owl",
 						"expected",
-						new TestManifestCreator<URLTestIO, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>() {
+						new TestManifestCreator<UrlTestInput, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>() {
 							@Override
-							public TestManifest<URLTestIO, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> create(
+							public TestManifestWithOutput<UrlTestInput, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> create(
 									URL input, URL output) throws IOException {
 								// don't need an expected output for these tests
 								return new TaxonomyDiffManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>(

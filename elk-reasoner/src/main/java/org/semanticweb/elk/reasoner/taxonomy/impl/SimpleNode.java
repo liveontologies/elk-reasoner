@@ -84,7 +84,8 @@ public class SimpleNode<T> implements Node<T> {
 	 * @param comparatorKeyProvider
 	 *            The key provider for the members.
 	 */
-	public SimpleNode(final ComparatorKeyProvider<T> comparatorKeyProvider) {
+	public SimpleNode(
+			final ComparatorKeyProvider<? super T> comparatorKeyProvider) {
 		this(null, 0, comparatorKeyProvider);
 	}
 

@@ -53,6 +53,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpress
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
+import org.semanticweb.elk.reasoner.query.QueryNode;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
@@ -74,6 +75,7 @@ import org.semanticweb.elk.reasoner.taxonomy.OrphanTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.SingletoneInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.SingletoneTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 import org.semanticweb.elk.reasoner.tracing.TraceState;
@@ -150,6 +152,10 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 */
 	final ObjectPropertyTaxonomyState objectPropertyTaxonomyState;
 	/**
+	 * Stores information about queried class expressions.
+	 */
+	final ClassExpressionQueryState classExpressionQueryState_;
+	/**
 	 * Defines reasoning stages and dependencies between them
 	 */
 	final ReasonerStageManager stageManager;
@@ -208,6 +214,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 				ontologyIndex);
 		this.traceState_ = new TraceState(saturationState,
 				propertyHierarchyCompositionState_, elkFactory, ontologyIndex);
+		this.classExpressionQueryState_ = new ClassExpressionQueryState(
+				saturationState, elkFactory, ontologyIndex, factory_);
 	}
 
 	protected AbstractReasonerState(ElkObject.Factory elkFactory,
@@ -608,6 +616,167 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		}
 
 		return result;
+	}
+
+	/**
+	 * Indexes the supplied class expression and, if successful, computes the
+	 * query so that the results for this expressions are ready in
+	 * {@link #classExpressionQueryState_}.
+	 * 
+	 * @param classExpression
+	 * @return <code>true</code> if the query was indexed successfully,
+	 *         <code>false</code> otherwise.
+	 * @throws ElkInconsistentOntologyException
+	 * @throws ElkException
+	 */
+	private boolean computeQuery(final ElkClassExpression classExpression)
+			throws ElkInconsistentOntologyException, ElkException {
+
+		// Load the query
+		if (!classExpressionQueryState_.indexQuery(classExpression)) {
+			return false;
+		}
+
+		// Invalidate stages that depend on axiom loading stage
+		stageManager.contextInitializationStage.invalidateRecursive();
+		stageManager.incrementalCompletionStage.invalidateRecursive();
+
+		// Complete all stages
+		getTaxonomy();
+		stageManager.classExpressionQueryStage.invalidateRecursive();
+		complete(stageManager.classExpressionQueryStage);
+
+		return true;
+	}
+
+	/**
+	 * Decides whether the supplied (possibly complex) class expression is
+	 * satisfiable. The query state is updated accordingly.
+	 * 
+	 * @param classExpression
+	 *            The queried class expression.
+	 * @return whether the supplied class expression is satisfiable.
+	 * @throws ElkInconsistentOntologyException
+	 *             if the ontology is inconsistent
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
+	 */
+	protected boolean querySatisfiability(
+			final ElkClassExpression classExpression)
+			throws ElkInconsistentOntologyException, ElkException {
+
+		if (computeQuery(classExpression)) {
+			return classExpressionQueryState_.isSatisfiable(classExpression);
+		} else {
+			// classExpression couldn't be indexed; pretend it is a fresh class
+			return true;
+		}
+
+	}
+
+	/**
+	 * Computes all atomic classes that are equivalent to the supplied (possibly
+	 * complex) class expression. The query state is updated accordingly.
+	 * 
+	 * @param classExpression
+	 *            The queried class expression.
+	 * @return all atomic classes that are equivalent to the supplied class
+	 *         expression.
+	 * @throws ElkInconsistentOntologyException
+	 *             if the ontology is inconsistent
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
+	 */
+	protected Node<ElkClass> queryEquivalentClasses(
+			final ElkClassExpression classExpression)
+			throws ElkInconsistentOntologyException, ElkException {
+
+		if (computeQuery(classExpression)) {
+
+			final Node<ElkClass> result = classExpressionQueryState_
+					.getEquivalentClasses(classExpression);
+			if (result == null) {
+				return getTaxonomy().getBottomNode();
+			} else {
+				return result;
+			}
+
+		} else {
+			// classExpression couldn't be indexed; pretend it is a fresh class
+
+			return new QueryNode<ElkClass>(ElkClassKeyProvider.INSTANCE);
+		}
+
+	}
+
+	/**
+	 * Computes all atomic direct super-classes of the supplied (possibly
+	 * complex) class expression. The query state is updated accordingly.
+	 * 
+	 * @param classExpression
+	 *            The queried class expression.
+	 * @return all atomic direct super-classes of the supplied class expression.
+	 * @throws ElkInconsistentOntologyException
+	 *             if the ontology is inconsistent
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
+	 */
+	protected Set<? extends Node<ElkClass>> queryDirectSuperClasses(
+			final ElkClassExpression classExpression)
+			throws ElkInconsistentOntologyException, ElkException {
+
+		if (computeQuery(classExpression)) {
+
+			final Set<? extends Node<ElkClass>> result = classExpressionQueryState_
+					.getDirectSuperClasses(classExpression);
+			if (result == null) {
+				return getTaxonomy().getBottomNode().getDirectSuperNodes();
+			} else {
+				return result;
+			}
+
+		} else {
+			// classExpression couldn't be indexed; pretend it is a fresh class
+
+			return Collections.singleton(getTaxonomy().getTopNode());
+		}
+
+	}
+
+	/**
+	 * Computes all atomic direct sub-classes of the supplied (possibly complex)
+	 * class expression. The query state is updated accordingly.
+	 * 
+	 * @param classExpression
+	 *            The queried class expression.
+	 * @return all atomic direct sub-classes of the supplied class expression.
+	 * @throws ElkInconsistentOntologyException
+	 *             if the ontology is inconsistent
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
+	 */
+	protected Set<? extends Node<ElkClass>> queryDirectSubClasses(
+			final ElkClassExpression classExpression)
+			throws ElkInconsistentOntologyException, ElkException {
+
+		if (computeQuery(classExpression)) {
+
+			final Taxonomy<ElkClass> taxonomy = getTaxonomy();
+
+			final Set<? extends Node<ElkClass>> result = classExpressionQueryState_
+					.getDirectSubClasses(classExpression, taxonomy);
+			if (result == null) {
+				return taxonomy.getBottomNode().getDirectSubNodes();
+			} else {
+				return result;
+			}
+
+		} else {
+			// classExpression couldn't be indexed; pretend it is a fresh class
+
+			return Collections.singleton(getTaxonomy().getBottomNode());
+		}
+
 	}
 
 	/**

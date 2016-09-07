@@ -20,67 +20,64 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
 package org.semanticweb.elk.reasoner;
 
 import static org.junit.Assume.assumeTrue;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.io.IOUtils;
-import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestInput;
+import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestOutput;
 
 /**
+ * Base class for reasoning tests that are run with {@link PolySuite}.
+ * Subclasses of this class specify order of steps that are performed during a
+ * tests, the test delegate passed to the constructor implements these steps,
+ * and the test manifest passed to the constructor describes input and output of
+ * the test.
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
- * @param <EO>
+ * @author Peter Skocovsky
+ *
+ * @param <I>
+ *            The type of test input.
  * @param <AO>
+ *            The type of actual test output.
+ * @param <TM>
+ *            The type of test manifest.
+ * @param <TD>
+ *            The type of test delegate.
  */
 @RunWith(PolySuite.class)
-public abstract class BaseReasoningCorrectnessTest<EO extends TestOutput, AO extends TestOutput> {
+public abstract class BaseReasoningCorrectnessTest<I extends TestInput, AO extends TestOutput, TM extends TestManifest<I>, TD extends ReasoningTestDelegate<AO>> {
 
-	protected final ReasoningTestManifest<EO, AO> manifest;
-	private InputStream inputStream;
-	protected Reasoner reasoner;
+	protected final TM manifest;
+	protected final TD delegate_;
 
-	public BaseReasoningCorrectnessTest(
-			ReasoningTestManifest<EO, AO> testManifest) {
-		manifest = testManifest;
+	public BaseReasoningCorrectnessTest(final TM testManifest,
+			final TD testDelegate) {
+		this.manifest = testManifest;
+		this.delegate_ = testDelegate;
 	}
 
 	@Before
-	public void before() throws IOException, Owl2ParseException {
+	public void before() throws Exception {
 		assumeTrue(!ignore(manifest.getInput()));
-
-		inputStream = manifest.getInput().getInputStream();
-		reasoner = createReasoner(inputStream);
+		delegate_.init();
 	}
 
 	@After
 	public void after() {
-		IOUtils.closeQuietly(inputStream);
+		delegate_.dispose();
 	}
 
-	/**
-	 * @param input
-	 *            dummy parameter
-	 */
-	@SuppressWarnings("static-method")
 	protected boolean ignore(TestInput input) {
 		return false;
 	}
-
-	protected abstract Reasoner createReasoner(final InputStream input)
-			throws IOException, Owl2ParseException;
 
 }

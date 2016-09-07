@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.incremental;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +19,7 @@ package org.semanticweb.elk.reasoner.incremental;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.incremental;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -33,17 +29,17 @@ import java.util.List;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TaxonomyDiffManifest;
+import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.incremental.RandomWalkRunnerIO.ElkAPIBasedIO;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
-import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.io.URLTestIO;
+import org.semanticweb.elk.testing.TestManifestWithOutput;
+import org.semanticweb.elk.testing.UrlTestInput;
 
 /**
  * @author "Yevgeny Kazakov"
@@ -84,9 +80,9 @@ public class RandomWalkIncrementalClassificationCorrectnessTest extends
 						RandomWalkIncrementalClassificationCorrectnessTest.class,
 						"owl",
 						"expected",
-						new TestManifestCreator<URLTestIO, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>() {
+						new TestManifestCreator<UrlTestInput, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>() {
 							@Override
-							public TestManifest<URLTestIO, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> create(
+							public TestManifestWithOutput<UrlTestInput, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> create(
 									URL input, URL output) throws IOException {
 								// don't need an expected output for these tests
 								return new TaxonomyDiffManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>(

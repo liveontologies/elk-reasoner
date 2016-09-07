@@ -20,9 +20,6 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
 package org.semanticweb.elk.reasoner;
 
 import java.io.IOException;
@@ -43,8 +40,8 @@ import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
-import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.io.URLTestIO;
+import org.semanticweb.elk.testing.TestManifestWithOutput;
+import org.semanticweb.elk.testing.UrlTestInput;
 
 /**
  * @author Pavel Klinov
@@ -55,8 +52,9 @@ public abstract class DiffRealizationCorrectnessTest extends
 		BaseRealizationCorrectnessTest<InstanceTaxonomyTestOutput<?>> {
 
 	public DiffRealizationCorrectnessTest(
-			ReasoningTestManifest<InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>> testManifest) {
-		super(testManifest);
+			final ReasoningTestManifest<InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>> testManifest,
+			final ReasoningTestDelegate<InstanceTaxonomyTestOutput<?>> testDelegate) {
+		super(testManifest, testDelegate);
 	}
 
 	/*
@@ -71,10 +69,9 @@ public abstract class DiffRealizationCorrectnessTest extends
 						DiffRealizationCorrectnessTest.class,
 						"owl",
 						"expected",
-						new TestManifestCreator<URLTestIO, InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>>() {
-							@SuppressWarnings("resource")
+						new TestManifestCreator<UrlTestInput, InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>>() {
 							@Override
-							public TestManifest<URLTestIO, InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>> create(
+							public TestManifestWithOutput<UrlTestInput, InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>> create(
 									URL input, URL output) throws IOException {
 								// input and expected output are OWL ontologies
 								InputStream stream = null;

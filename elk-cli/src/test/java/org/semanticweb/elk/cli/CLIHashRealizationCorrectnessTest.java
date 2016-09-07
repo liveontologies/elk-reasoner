@@ -25,19 +25,12 @@
  */
 package org.semanticweb.elk.cli;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.semanticweb.elk.loading.AxiomLoader;
-import org.semanticweb.elk.loading.Owl2StreamLoader;
-import org.semanticweb.elk.owl.parsing.Owl2ParseException;
-import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.HashRealizationCorrectnessTest;
 import org.semanticweb.elk.reasoner.InstanceTaxonomyTestOutput;
-import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
-import org.semanticweb.elk.reasoner.stages.RestartingStageExecutor;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.testing.HashTestOutput;
 
 /**
@@ -47,20 +40,26 @@ import org.semanticweb.elk.testing.HashTestOutput;
  * 
  *         pavel.klinov@uni-ulm.de
  */
+
 public class CLIHashRealizationCorrectnessTest extends
 		HashRealizationCorrectnessTest {
 
 	public CLIHashRealizationCorrectnessTest(
 			final ReasoningTestManifest<HashTestOutput, InstanceTaxonomyTestOutput<?>> testManifest) {
-		super(testManifest);
+		super(testManifest,
+				new CliReasoningTestDelegate<InstanceTaxonomyTestOutput<?>>(
+						testManifest) {
+
+					@Override
+					public InstanceTaxonomyTestOutput<?> getActualOutput()
+							throws Exception {
+						final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = reasoner_
+								.getInstanceTaxonomyQuietly();
+						return new InstanceTaxonomyTestOutput<InstanceTaxonomy<ElkClass, ElkNamedIndividual>>(
+								taxonomy);
+					}
+
+				});
 	}
 
-	@Override
-	protected Reasoner createReasoner(final InputStream input)
-			throws Owl2ParseException, IOException {
-		AxiomLoader loader = new Owl2StreamLoader(
-				new Owl2FunctionalStyleParserFactory(), input);
-		return new ReasonerFactory().createReasoner(loader,
-				new RestartingStageExecutor());
-	}
 }

@@ -39,7 +39,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedAxiomInference;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectCache;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateDummyChangeListener;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
@@ -87,18 +87,18 @@ public class TraceState implements
 	public <C extends Context> TraceState(
 			final SaturationState<C> saturationState,
 			final PropertyHierarchyCompositionState propertySaturationState,
-			ElkObject.Factory elkFactory, ModifiableIndexedObjectCache cache) {
+			ElkObject.Factory elkFactory, ModifiableOntologyIndex index) {
 		// the axiom converter that resolves indexed axioms from the given cache
 		// and additionally saves the inferences that produced them
 		this.elkAxiomConverter_ = new ElkAxiomConverterImpl(elkFactory,
-				new ResolvingModifiableIndexedObjectFactory(cache) {
+				new ResolvingModifiableIndexedObjectFactory(index) {
 					@Override
 					protected <T extends ModifiableIndexedAxiomInference> T filter(
 							T input) {
 						indexedAxiomInferences_.produce(input);
 						return input;
 					}
-				});
+				}, index);
 
 		saturationState
 				.addListener(new SaturationStateDummyChangeListener<C>() {

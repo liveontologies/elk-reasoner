@@ -38,7 +38,6 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
 import org.semanticweb.elk.reasoner.taxonomy.impl.AbstractInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.impl.ConcurrentNodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.impl.IndividualNode;
-import org.semanticweb.elk.reasoner.taxonomy.impl.TaxonomyNodeUtils;
 import org.semanticweb.elk.reasoner.taxonomy.impl.UpdateableInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.impl.UpdateableNodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.impl.UpdateableTypeNode;
