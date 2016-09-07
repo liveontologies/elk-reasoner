@@ -3,13 +3,13 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-/*
+/*-
  * #%L
- * ELK Reasoner
+ * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,15 +25,9 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
-import java.util.Collection;
-
 import org.semanticweb.elk.exceptions.ElkException;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.tracing.RecursiveTracingComputation;
 import org.semanticweb.elk.reasoner.tracing.TraceState;
-import org.semanticweb.elk.reasoner.tracing.factories.ProofUnwindingJob;
-import org.semanticweb.elk.util.collections.Operations;
-import org.semanticweb.elk.util.collections.Operations.Transformation;
 
 /**
  * Executes {@link RecursiveTracingComputation} to trace inferences queued in
@@ -68,22 +62,9 @@ public class InferenceTracingStage extends AbstractReasonerStage {
 		if (!super.preExecute()) {
 			return false;
 		}
-
-		TraceState traceState = reasoner.getTraceState();
-		Collection<ProofUnwindingJob<ClassConclusion>> inputs = Operations
-				.map(traceState.getToTrace(),
-						new Transformation<ClassConclusion, ProofUnwindingJob<ClassConclusion>>() {
-							@Override
-							public ProofUnwindingJob<ClassConclusion> transform(
-									ClassConclusion conclusion) {
-								return new ProofUnwindingJob<ClassConclusion>(
-										conclusion);
-							}
-						});
-		computation_ = new RecursiveTracingComputation(inputs,
+		computation_ = new RecursiveTracingComputation(
 				reasoner.getProcessExecutor(), reasoner.getNumberOfWorkers(),
-				reasoner.getProgressMonitor(), reasoner.saturationState,
-				traceState);
+				reasoner.saturationState, reasoner.getTraceState());
 		return true;
 	}
 
@@ -97,7 +78,6 @@ public class InferenceTracingStage extends AbstractReasonerStage {
 		if (!super.postExecute()) {
 			return false;
 		}
-		reasoner.getTraceState().clearToTrace();
 		this.computation_ = null;
 		return true;
 	}

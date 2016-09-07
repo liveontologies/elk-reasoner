@@ -115,12 +115,6 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	final boolean BIND_AXIOMS = true;
 	
 	/**
-	 * If true, try to reuse inferences computed for tracing of the previous
-	 * conclusions whenever possible
-	 */
-	final boolean CACHE_INFERENCES = false;
-
-	/**
 	 * The factory for creating auxiliary ElkObjects
 	 */
 	private final ElkObject.Factory elkFactory_;
@@ -144,7 +138,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	/**
 	 * Manages information about property hierarchy computation.
 	 */
-	final PropertyHierarchyCompositionState propertyHierarchyCompositionState_ = new PropertyHierarchyCompositionState();
+	final PropertyHierarchyCompositionState propertyHierarchyCompositionState_;
 	/**
 	 * Stores (partial) information about consistency checking computation
 	 */
@@ -201,6 +195,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	protected AbstractReasonerState(ElkObject.Factory elkFactory) {
 		this.elkFactory_ = elkFactory;
 		this.ontologyIndex = new DifferentialIndex(elkFactory);
+		this.propertyHierarchyCompositionState_ = new PropertyHierarchyCompositionState();
 		this.saturationState = SaturationStateFactory
 				.createSaturationState(ontologyIndex);
 		this.consistencyCheckingState = ConsistencyCheckingState
@@ -217,7 +212,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 				elkFactory, ontologyIndex);
 		this.subPropertyConverter_ = new ElkAxiomConverterImpl(elkFactory,
 				ontologyIndex);
-		this.traceState_ = new TraceState(elkFactory, ontologyIndex);
+		this.traceState_ = new TraceState(saturationState,
+				propertyHierarchyCompositionState_, elkFactory, ontologyIndex);
 		this.classExpressionQueryState_ = new ClassExpressionQueryState(
 				saturationState, elkFactory, ontologyIndex, factory_);
 	}
@@ -899,8 +895,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	public void visitDerivedConclusionsForSubsumption(ElkClassExpression subClass,
 			ElkClassExpression superClass,
 			DerivedClassConclusionVisitor visitor) throws ElkException {
-		isInconsistent();
-		complete(stageManager.classSaturationStage);
+		isInconsistent();		
 		// checking owl:Thing consistency
 		if (consistencyCheckingState.isOwlThingInconsistent()) {
 			if (!visitor.inconsistentOwlThing(
@@ -922,6 +917,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		if (root == null) {
 			return;
 		}
+		getTaxonomyQuietly(); // ensure classes are saturated
 		ClassInconsistency conclusion = checkDerived(
 				factory_.getContradiction(root));
 		if (conclusion != null && !visitor.inconsistentSubClass(conclusion)) {
@@ -951,29 +947,15 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		return null;
 	}
 
-	@SuppressWarnings("unused")
-	private void toTrace(ClassConclusion conclusion) {
-		if (CACHE_INFERENCES
-				&& traceState_.getInferences(conclusion).iterator().hasNext()) {
-			// already traced
-			return;
-		}
-		// else
-		// FIXME: need to clear to avoid duplicate inferences
-		traceState_.clearClassInferences();
-		traceState_.clearIndexedAxiomInferences();
-		stageManager.inferenceTracingStage.invalidateRecursive();
-		traceState_.addToTrace(conclusion);
-	}
-
-	public TracingInferenceSet explainConclusions(Iterable<? extends ClassConclusion> conclusions)
+	public TracingInferenceSet explainConclusions(
+			Iterable<? extends ClassConclusion> conclusions)
 			throws ElkException {
 		for (ClassConclusion conclusion : conclusions) {
-			toTrace(conclusion);
+			traceState_.toTrace(conclusion);
 		}
-		getStageExecutor().complete(stageManager.classSaturationStage);
+		stageManager.inferenceTracingStage.invalidateRecursive();
+		getTaxonomyQuietly(); // ensure that classes are saturated
 		getStageExecutor().complete(stageManager.inferenceTracingStage);
-
 		return traceState_;
 	}
 	

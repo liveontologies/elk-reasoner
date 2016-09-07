@@ -74,15 +74,6 @@ public class PropertyHierarchyCompositionComputationStage extends
 		this.computation_ = null;
 		return true;
 	}
-
-	@Override
-	boolean invalidate() {
-		boolean invalidated = super.invalidate();
-		if (invalidated) {
-			reasoner.getTraceState().clearObjectPropertyInferences();
-		}
-		return invalidated;
-	}
 	
 	@Override
 	public void printInfo() {

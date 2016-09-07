@@ -65,5 +65,17 @@ public class ModifiableTracingInferenceSetImpl<I extends TracingInference>
 		// assumes structural equality and hash of conclusions
 		return inferenceMap_.get(conclusion);
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for (Conclusion key : inferenceMap_.keySet()) {
+			for (I inf : inferenceMap_.get(key)) {
+				sb.append(inf.toString());
+				sb.append('\n');
+			}
+		}
+		return sb.toString();
+	}
 
 }

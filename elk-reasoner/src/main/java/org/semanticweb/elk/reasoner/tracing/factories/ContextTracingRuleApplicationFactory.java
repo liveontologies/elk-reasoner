@@ -3,13 +3,13 @@
  */
 package org.semanticweb.elk.reasoner.tracing.factories;
 
-/*
+/*-
  * #%L
- * ELK Reasoner
+ * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.tracing.factories;
  * #L%
  */
 
-import org.semanticweb.elk.ModifiableReference;
 import org.semanticweb.elk.Reference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
@@ -37,8 +36,10 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionInsertionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.classes.DummyClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.TracingRuleApplicationClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference.Visitor;
@@ -51,10 +52,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.AbstractRuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
-import org.semanticweb.elk.reasoner.saturation.rules.factories.WorkerLocalTodo;
 import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
-import org.semanticweb.elk.util.concurrent.computation.DelegatingInputProcessor;
-import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
  * A {@link RuleApplicationFactory} that applies inference rules to
@@ -99,7 +97,7 @@ public class ContextTracingRuleApplicationFactory
 	@SuppressWarnings("unchecked")
 	protected Visitor<Boolean> getInferenceProcessor(
 			Reference<Context> activeContext, RuleVisitor<?> ruleVisitor,
-			SaturationStateWriter<? extends ExtendedContext> localWriter,
+			final SaturationStateWriter<? extends ExtendedContext> localWriter,
 			SaturationStatistics localStatistics) {
 
 		return SaturationUtils.compose(
@@ -117,38 +115,28 @@ public class ContextTracingRuleApplicationFactory
 								// saturation state
 								new TracingRuleApplicationClassConclusionVisitor(
 										mainSaturationState_, activeContext,
-										ruleVisitor, localWriter))));
-	}
-
-	@Override
-	protected InputProcessor<RuleApplicationInput> getEngine(
-			ModifiableReference<Context> activeContext,
-			ClassInference.Visitor<Boolean> inferenceProcessor,
-			final SaturationStateWriter<? extends ExtendedContext> saturationStateWriter,
-			WorkerLocalTodo localTodo, SaturationStatistics localStatistics) {
-		final InputProcessor<RuleApplicationInput> defaultEngine = super.getEngine(
-				activeContext, inferenceProcessor, saturationStateWriter,
-				localTodo, localStatistics);
-		return new DelegatingInputProcessor<RuleApplicationInput>(
-				defaultEngine) {
-			@Override
-			public void submit(RuleApplicationInput job) {
-				defaultEngine.submit(job);
-				// additionally initialize all sub-contexts present in the main
-				// saturation state
-				IndexedContextRoot root = job.getRoot();
-				Context mainContext = mainSaturationState_.getContext(root);
-				if (mainContext == null) {
-					System.err.println(root);
-				}
-				for (IndexedObjectProperty subRoot : mainContext
-						.getSubContextPremisesByObjectProperty().keySet()) {
-					saturationStateWriter.produce(
-							new SubContextInitializationNoPremises(root,
-									subRoot));
-				}
-			}
-		};
+										ruleVisitor, localWriter),
+								// initializing all sub-contexts when contexts are initialized
+								// this is needed to ensure that all sub-contexts are fully traced
+								new DummyClassConclusionVisitor<Boolean>() {
+									@Override
+									protected Boolean defaultVisit(ClassConclusion conclusion) {
+										return true;
+									}									
+									@Override
+									public Boolean visit(ContextInitialization conclusion) {
+										IndexedContextRoot root = conclusion.getTraceRoot();
+										Context mainContext = mainSaturationState_.getContext(root);
+										for (IndexedObjectProperty subRoot : mainContext
+												.getSubContextPremisesByObjectProperty().keySet()) {
+											localWriter.produce(
+													new SubContextInitializationNoPremises(root,
+															subRoot));
+										}
+										return true;
+									}
+								}								
+								)));
 	}
 
 	/**

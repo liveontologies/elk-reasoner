@@ -46,7 +46,6 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
-import org.semanticweb.elk.reasoner.tracing.TraceState;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.slf4j.Logger;
@@ -194,17 +193,6 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 		// TODO
 	}
 	
-	@Override
-	boolean invalidate() {
-		boolean invalidated = super.invalidate();
-		if (invalidated) {
-			TraceState traceState = reasoner.getTraceState();
-			traceState.clearIndexedAxiomInferences();
-			traceState.clearClassInferences();
-		}
-		return invalidated;
-	}
-
 	@Override
 	public void setInterrupt(boolean flag) {
 		super.setInterrupt(flag);
