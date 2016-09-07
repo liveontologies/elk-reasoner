@@ -381,7 +381,9 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			 */
 			int candidateSubsumersSize = candidateSubsumers.size();
 
-			if (candidateSubsumersSize == state.subsumerCount) {
+			if (candidateSubsumersSize == state.subsumerCount
+					&& candidateSubsumers
+							.contains(state.initiatorJob.getInput())) {
 				state.rootEquivalent.add(candidate.getElkEntity());
 				return;
 			}
@@ -520,10 +522,12 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 								.size()
 								&& candidateSubsumers
 										.contains(prunedSubsumer)) {
-							/* candidate subsumes the pruned subsumer */
+							/* candidate is subsumed by the pruned subsumer */
 							iteratorPrunedSubsumers.remove();
 							if (candidateSubsumersSize == prunedSubsumerSubsumers
-									.size()) {
+									.size()
+									&& prunedSubsumerSubsumers
+											.contains(candidate)) {
 								/* candidate equivalent to pruned subsumer */
 								candidateEquivalent
 										.add(prunedSubsumer.getElkEntity());
@@ -549,11 +553,15 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 								.getContext(prunedSubsumer)
 								.getComposedSubsumers();
 						if (candidateSubsumersSize >= prunedSubsumerSubsumers
-								.size()) {
-							/* candidate subsumes the pruned subsumer */
+								.size()
+								&& candidateSubsumers
+										.contains(prunedSubsumer)) {
+							/* candidate is subsumed by the pruned subsumer */
 							state.prunedSubsumers.remove(candidateSubsumer);
 							if (candidateSubsumersSize == prunedSubsumerSubsumers
-									.size()) {
+									.size()
+									&& prunedSubsumerSubsumers
+											.contains(candidate)) {
 								/* candidate equivalent to pruned subsumer */
 								candidateEquivalent
 										.add(prunedSubsumer.getElkEntity());
