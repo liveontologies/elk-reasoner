@@ -3,13 +3,13 @@
  */
 package org.semanticweb.elk.reasoner.tracing;
 
-/*
+/*-
  * #%L
- * ELK Reasoner
+ * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,17 +25,10 @@ package org.semanticweb.elk.reasoner.tracing;
  * #L%
  */
 
-import java.util.Collection;
-
-import org.semanticweb.elk.reasoner.ProgressMonitor;
-import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
+import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.tracing.factories.ProofUnwindingFactory;
-import org.semanticweb.elk.reasoner.tracing.factories.ProofUnwindingJob;
-import org.semanticweb.elk.reasoner.tracing.factories.ProofUnwindingListener;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**
@@ -45,26 +38,18 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Yevgeny Kazakov
  */
 public class RecursiveTracingComputation
-		extends
-			ReasonerComputationWithInputs<ProofUnwindingJob<ClassConclusion>, ProofUnwindingFactory<ClassConclusion, ProofUnwindingJob<ClassConclusion>>> {
+		extends ReasonerComputation<ProofUnwindingFactory> {
 
-	public RecursiveTracingComputation(
-			Collection<? extends ProofUnwindingJob<ClassConclusion>> inputs,
-			ComputationExecutor executor, int maxWorkers,
-			ProgressMonitor progressMonitor, SaturationState<?> saturationState,
-			TracingInferenceProducer<? super ClassInference> inferenceProducer) {
-		super(inputs,
-				new ProofUnwindingFactory<ClassConclusion, ProofUnwindingJob<ClassConclusion>>(
-						saturationState, inferenceProducer, maxWorkers,
-						ProofUnwindingListener.Helper.<ClassConclusion, ProofUnwindingJob<ClassConclusion>>dummyListener()),
-				executor, maxWorkers, progressMonitor);
+	public RecursiveTracingComputation(ComputationExecutor executor,
+			int maxWorkers, SaturationState<?> saturationState,
+			TraceState traceState) {
+		super(new ProofUnwindingFactory(saturationState, traceState,
+				maxWorkers), executor, maxWorkers);
 	}
 
-	/**
-	 * Print statistics about taxonomy computation
-	 */
 	public void printStatistics() {
 		processorFactory.printStatistics();
 	}

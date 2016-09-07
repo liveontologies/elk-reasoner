@@ -176,9 +176,13 @@ public class TracingTest {
 									.explainConclusion(conclusion);
 							TracingInferenceSetMetrics proofStats = TracingInferenceSetMetrics
 									.getStatistics(inferences, conclusion);
+							boolean provable = proofStats.isProvable();
+							if (!provable) {
+								System.out.println(TracingTestUtils.print(inferences, conclusion));
+							}
 							assertTrue(
 									"Conclusion is not provable " + conclusion,
-									proofStats.isProvable());
+									provable);
 							TracingInferenceSetMetrics previous = proofsStats_
 									.put(conclusion, proofStats);
 							if (previous != null) {

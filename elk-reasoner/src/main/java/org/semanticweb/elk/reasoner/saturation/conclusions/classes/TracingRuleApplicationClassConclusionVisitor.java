@@ -51,7 +51,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitors;
  * @author "Yevgeny Kazakov"
  * 
  * @see Rule#isTracingRule()
- * @see RuleApplicationClassConclusion.Visitor
  */
 public class TracingRuleApplicationClassConclusionVisitor
 		extends
