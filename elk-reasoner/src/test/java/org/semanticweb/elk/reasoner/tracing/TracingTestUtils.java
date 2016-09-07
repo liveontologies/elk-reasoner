@@ -247,6 +247,62 @@ public class TracingTestUtils {
 		return sideConditions;
 	}
 
+	public static String print(TracingInferenceSet inferences, Conclusion conclusion) {
+		StringBuilder builder = new StringBuilder();		
+		print(inferences, conclusion, builder, new HashSet<Conclusion>(), 0);
+		return builder.toString();
+	}
+
+	private static void printIndent(StringBuilder builder, int depth) {
+		for (int i = 0; i < depth; i++) {
+			builder.append("   ");
+		}
+	}
+	
+	private static void print(final TracingInferenceSet inferences,
+			Conclusion conclusion, final StringBuilder builder,
+			final Set<Conclusion> done, final int depth) {
+		
+		printIndent(builder, depth);
+
+		builder.append(conclusion);
+
+		if (done.add(conclusion)) {
+			builder.append('\n');
+		} else {
+			builder.append("*\n");
+			return;
+		}
+
+		for (TracingInference inf : inferences.getInferences(conclusion)) {
+			for (int i = 0; i < depth + 1; i++) {
+				builder.append("   ");
+			}
+
+			builder.append(inf.getClass().getSimpleName()).append('\n');
+
+			inf.accept(new TracingInferencePremiseVisitor<Void>(
+					new ConclusionBaseFactory(),
+					new DummyConclusionVisitor<Void>() {
+						@Override
+						protected Void defaultVisit(Conclusion premise) {
+							print(inferences, premise, builder, done,
+									depth + 2);
+							return null;
+						}
+					}, new DummyElkAxiomVisitor<Void>() {
+						@Override
+						protected Void defaultVisit(ElkAxiom axiom) {
+							printIndent(builder, depth + 2);
+							builder.append(": ");
+							builder.append(axiom);
+							builder.append('\n');
+							return null;
+						}
+					}));
+		}
+	}
+	
 	// //////////////////////////////////////////////////////////////////////
 	// some dummy utility visitors
 	// //////////////////////////////////////////////////////////////////////
