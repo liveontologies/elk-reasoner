@@ -165,8 +165,8 @@ public class ClassExpressionQueryState {
 						if (root instanceof IndexedClassExpression) {
 							final IndexedClassExpression ice = (IndexedClassExpression) root;
 							/*
-							 * Saturation and "un-saturation" should not happen
-							 * on the same time, so this should be thread-safe.
+							 * Saturation and context clean should not happen
+							 * at the same time, so this should be thread-safe.
 							 */
 							if (computed_.remove(ice)) {
 								notComputed_.add(ice);
@@ -193,7 +193,6 @@ public class ClassExpressionQueryState {
 
 					@Override
 					public void contextsClear() {
-						// TODO: does this need to be more thread-safe ??
 						notComputed_.addAll(computed_);
 						computed_.clear();
 						satisfiable_.clear();
@@ -209,8 +208,10 @@ public class ClassExpressionQueryState {
 	 * {@link ElkQueryException} for class expressions that were not registered.
 	 * 
 	 * @param classExpression
-	 * @return {@code true} when the indexing was successful, {@code false}
-	 *         otherwise.
+	 * @return {@code true} when the query result is cashed, {@code false}
+	 *         otherwise, i.e., the query result needs to be computed
+	 * @throws ElkIndexingUnsupportedException
+	 *             when the class expression is not supported
 	 */
 	boolean indexQuery(final ElkClassExpression classExpression) {
 		/* @formatter:off
@@ -242,7 +243,7 @@ public class ClassExpressionQueryState {
 		synchronized (queried_) {
 			ice = queried_.get(classExpression);
 			if (ice != null) {
-				return true;
+				return computed_.contains(ice);
 			}
 			try {
 				ontologyIndex_.addIndexingUnsupportedListener(listener);
@@ -256,7 +257,7 @@ public class ClassExpressionQueryState {
 									+ OwlFunctionalStylePrinter
 											.toString(classExpression));
 				}
-				return false;
+				throw e;
 			} finally {
 				ontologyIndex_.removeIndexingUnsupportedListener(listener);
 				for (final ModifiableIndexedObject obj : unsupportedIndexed) {
@@ -275,12 +276,13 @@ public class ClassExpressionQueryState {
 						conclusionFactory_.getContradiction(ice))) {
 			// If the query is unsatisfiable, it is already computed ...
 			computed_.add(ice);
+			return true;
 		} else {
 			// ... otherwise we need to compute the equivalent and super-classes
 			notComputed_.add(ice);
+			return false;
 		}
 
-		return true;
 	}
 
 	private final TransitiveReductionOutputVisitor<IndexedClassExpression> transitiveReductionOutputProcessor_ = new TransitiveReductionOutputVisitor<IndexedClassExpression>() {

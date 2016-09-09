@@ -42,6 +42,7 @@ import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyCheckingState;
 import org.semanticweb.elk.reasoner.indexing.classes.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
@@ -619,13 +620,14 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	}
 
 	/**
-	 * Indexes the supplied class expression and, if successful, computes the
-	 * query so that the results for this expressions are ready in
-	 * {@link #classExpressionQueryState_}.
+	 * If the query results are not cached yet, indexes the supplied class
+	 * expression and, if successful, computes the query so that the results for
+	 * this expressions are ready in {@link #classExpressionQueryState_}.
 	 * 
 	 * @param classExpression
 	 * @return <code>true</code> if the query was indexed successfully,
-	 *         <code>false</code> otherwise.
+	 *         <code>false</code> otherwise, i.e., when the class expression is
+	 *         not supported
 	 * @throws ElkInconsistentOntologyException
 	 * @throws ElkException
 	 */
@@ -633,7 +635,19 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			throws ElkInconsistentOntologyException, ElkException {
 
 		// Load the query
-		if (!classExpressionQueryState_.indexQuery(classExpression)) {
+		try {
+			if (classExpressionQueryState_.indexQuery(classExpression)
+					&& stageManager.axiomLoadingStage.isCompleted()) {
+				/*
+				 * If query result are cashed, but there were some changes to
+				 * the ontology, they may not be up to date. Whether they are
+				 * will be checked during stages that clean contexts. So if
+				 * axiom loading stage is not completed, we still execute all
+				 * the stages.
+				 */
+				return true;
+			}
+		} catch (final ElkIndexingUnsupportedException e) {
 			return false;
 		}
 
