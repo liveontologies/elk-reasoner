@@ -33,7 +33,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.liveontologies.owlapi.proof.OWLProver;
-import org.liveontologies.owlapi.proof.util.OWLProofUtils;
+import org.liveontologies.owlapi.proof.util.ProofNodes;
 import org.liveontologies.owlapi.proof.util.ProofNode;
 import org.liveontologies.owlapi.proof.util.ProofStep;
 import org.semanticweb.elk.proofs.utils.TestUtils;
@@ -64,7 +64,7 @@ public class ProofTestUtils {
 	public static void provabilityTest(OWLProver prover,
 			OWLSubClassOfAxiom axiom) {
 		assertTrue(String.format("Entailment %s not derivable!", axiom),
-				OWLProofUtils.isDerivable(prover.getProof(axiom),
+				ProofNodes.isDerivable(prover.getProof(axiom),
 						prover.getRootOntology().getAxioms(Imports.INCLUDED)));
 	}
 
