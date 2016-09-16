@@ -69,6 +69,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.collections.RecencyQueue;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.slf4j.Logger;
@@ -85,11 +86,20 @@ public class ClassExpressionQueryState {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ClassExpressionQueryState.class);
 
+	public static final int CACHE_CAPACITY = 512;
+	public static final float EVICTION_FACTOR = 0.5f;
+
 	/**
 	 * Maps class expressions that were queried and added to the index to the
 	 * result of indexing.
 	 */
 	private final Map<ElkClassExpression, IndexedClassExpression> queried_ = new ConcurrentHashMap<ElkClassExpression, IndexedClassExpression>();
+
+	/**
+	 * Contains the same class expressions as {@link #queried_} in the order in
+	 * which they were queried.
+	 */
+	private final RecencyQueue<ElkClassExpression> recentlyQueried_ = new RecencyQueue<ElkClassExpression>();
 
 	/**
 	 * Contains indexed class expressions that were queried and added to the
@@ -136,6 +146,8 @@ public class ClassExpressionQueryState {
 
 	private final ElkPolarityExpressionConverter updatingExpressionConverter_;
 
+	private final ElkPolarityExpressionConverter removingExpressionConverter_;
+
 	private final ElkPolarityExpressionConverter resolvingExpressionConverter_;
 
 	private final ClassInconsistency.Factory conclusionFactory_;
@@ -153,6 +165,12 @@ public class ClassExpressionQueryState {
 						new BaseModifiableIndexedObjectFactory(), ontologyIndex,
 						OccurrenceIncrement.getDualIncrement(1)),
 				ontologyIndex);
+		this.removingExpressionConverter_ = new ElkPolarityExpressionConverterImpl(
+				elkFactory,
+				new UpdatingModifiableIndexedObjectFactory(
+						new BaseModifiableIndexedObjectFactory(), ontologyIndex,
+						OccurrenceIncrement.getDualIncrement(-1)),
+				ontologyIndex);
 		this.resolvingExpressionConverter_ = new ElkPolarityExpressionConverterImpl(
 				elkFactory, ontologyIndex);
 		this.conclusionFactory_ = conclusionFactory;
@@ -165,12 +183,13 @@ public class ClassExpressionQueryState {
 						if (root instanceof IndexedClassExpression) {
 							final IndexedClassExpression ice = (IndexedClassExpression) root;
 							/*
-							 * Saturation and context clean should not happen
-							 * at the same time, so this should be thread-safe.
+							 * Saturation and context clean should not happen at
+							 * the same time, so this should be thread-safe.
 							 */
 							if (computed_.remove(ice)) {
 								notComputed_.add(ice);
 								satisfiable_.remove(ice);
+								// TODO .: clean queriesByRelated_
 							}
 
 							if (ice instanceof IndexedClass) {
@@ -183,6 +202,7 @@ public class ClassExpressionQueryState {
 										if (computed_.remove(queryClass)) {
 											notComputed_.add(queryClass);
 											satisfiable_.remove(queryClass);
+											// TODO .: clean queriesByRelated_
 										}
 									}
 								}
@@ -268,6 +288,8 @@ public class ClassExpressionQueryState {
 				}
 			}
 			queried_.put(classExpression, ice);
+			recentlyQueried_.offer(classExpression);
+			evictIfExceeded();
 		}
 
 		final Context context = saturationState_.getContext(ice);
@@ -281,6 +303,40 @@ public class ClassExpressionQueryState {
 			// ... otherwise we need to compute the equivalent and super-classes
 			notComputed_.add(ice);
 			return false;
+		}
+
+	}
+
+	private void evictIfExceeded() {
+		if (recentlyQueried_.size() <= CACHE_CAPACITY) {
+			return;
+		}
+
+		// @formatter:off
+		final int desiredCapacity = Math.max(
+				Math.min(
+						(int) (recentlyQueried_.size() * EVICTION_FACTOR),
+						CACHE_CAPACITY),
+				1);
+		// @formatter:on
+
+		while (recentlyQueried_.size() > desiredCapacity) {
+			final ElkClassExpression classExpression = recentlyQueried_.poll();
+			/*
+			 * While desiredCapacity is at least 1, at least the last query will
+			 * remain cached.
+			 */
+
+			classExpression.accept(removingExpressionConverter_);
+
+			final IndexedClassExpression ice = queried_.remove(classExpression);
+			if (computed_.remove(ice)) {
+				satisfiable_.remove(ice);
+				// TODO .: clean queriesByRelated_
+			} else {
+				notComputed_.remove(ice);
+			}
+
 		}
 
 	}
