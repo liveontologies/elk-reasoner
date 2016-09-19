@@ -179,35 +179,27 @@ public class ClassExpressionQueryState {
 
 					@Override
 					public void contextMarkNonSaturated(final C context) {
+						/*
+						 * Saturation and context clean should not happen at the
+						 * same time, so this should be thread-safe.
+						 */
 						final IndexedContextRoot root = context.getRoot();
-						if (root instanceof IndexedClassExpression) {
-							final IndexedClassExpression ice = (IndexedClassExpression) root;
-							/*
-							 * Saturation and context clean should not happen at
-							 * the same time, so this should be thread-safe.
-							 */
-							if (computed_.remove(ice)) {
-								notComputed_.add(ice);
-								satisfiable_.remove(ice);
-								// TODO .: clean queriesByRelated_
-							}
+						if (root instanceof IndexedClass) {
+							final IndexedClass ic = (IndexedClass) root;
 
-							if (ice instanceof IndexedClass) {
-								final IndexedClass ic = (IndexedClass) ice;
-
+							synchronized (queriesByRelated_) {
 								final Collection<IndexedClassExpression> queryClasses = queriesByRelated_
 										.remove(ic.getElkEntity());
 								if (queryClasses != null) {
 									for (final IndexedClassExpression queryClass : queryClasses) {
-										if (computed_.remove(queryClass)) {
-											notComputed_.add(queryClass);
-											satisfiable_.remove(queryClass);
-											// TODO .: clean queriesByRelated_
-										}
+										markNotComputed(queryClass);
 									}
 								}
-
 							}
+
+						} else if (root instanceof IndexedClassExpression) {
+							final IndexedClassExpression ice = (IndexedClassExpression) root;
+							markNotComputed(ice);
 						}
 					}
 
@@ -220,6 +212,41 @@ public class ClassExpressionQueryState {
 					}
 
 				});
+	}
+
+	/**
+	 * Marks the specified query as computed. Does <strong>not</strong> modify
+	 * the cached query results.
+	 * 
+	 * @param queryClass
+	 * @return {@code true} iff the query was not-computed just before the call
+	 *         and was marked computed by this call.
+	 */
+	private boolean markComputed(final IndexedClassExpression queryClass) {
+		if (!notComputed_.remove(queryClass)) {
+			return false;
+		}
+		computed_.add(queryClass);
+		return true;
+	}
+
+	/**
+	 * Marks the specified query as not-computed and deletes the query results.
+	 * 
+	 * @param queryClass
+	 * @return {@code true} iff the query was computed just before the call and
+	 *         was marked not-computed by this call.
+	 */
+	private boolean markNotComputed(final IndexedClassExpression queryClass) {
+		if (!computed_.remove(queryClass)) {
+			return false;
+		}
+		notComputed_.add(queryClass);
+		final QueryNode<ElkClass> node = satisfiable_.remove(queryClass);
+		if (node != null) {
+			removeAllRelated(queryClass, node);
+		}
+		return true;
 	}
 
 	/**
@@ -331,8 +358,10 @@ public class ClassExpressionQueryState {
 
 			final IndexedClassExpression ice = queried_.remove(classExpression);
 			if (computed_.remove(ice)) {
-				satisfiable_.remove(ice);
-				// TODO .: clean queriesByRelated_
+				final QueryNode<ElkClass> node = satisfiable_.remove(ice);
+				if (node != null) {
+					removeAllRelated(ice, node);
+				}
 			} else {
 				notComputed_.remove(ice);
 			}
@@ -352,10 +381,9 @@ public class ClassExpressionQueryState {
 			 * Saturation and "un-saturation" should not happen at the same
 			 * time, so this should be thread-safe.
 			 */
-			if (!notComputed_.remove(ice)) {
+			if (!markComputed(ice)) {
 				return;
 			}
-			computed_.add(ice);
 
 			final List<ElkClass> equivalent = output.getEquivalent();
 			final Collection<? extends List<ElkClass>> directSubsumers = output
@@ -363,9 +391,6 @@ public class ClassExpressionQueryState {
 
 			final QueryNode<ElkClass> node = new QueryNode<ElkClass>(equivalent,
 					equivalent.size(), ElkClassKeyProvider.INSTANCE);
-			for (final ElkClass elkClass : equivalent) {
-				addRelated(ice, elkClass);
-			}
 
 			for (final List<ElkClass> directSubs : directSubsumers) {
 				// direct subsumers should not be empty
@@ -373,11 +398,9 @@ public class ClassExpressionQueryState {
 						directSubs, directSubs.size(),
 						ElkClassKeyProvider.INSTANCE);
 				node.addDirectSuperNode(directSuperNode);
-				for (final ElkClass elkClass : directSubs) {
-					addRelated(ice, elkClass);
-				}
 			}
 
+			addAllRelated(ice, node);
 			satisfiable_.put(ice, node);
 		}
 
@@ -390,10 +413,7 @@ public class ClassExpressionQueryState {
 			 * Saturation and "un-saturation" should not happen at the same
 			 * time, so this should be thread-safe.
 			 */
-			if (!notComputed_.remove(ice)) {
-				return;
-			}
-			computed_.add(ice);
+			markComputed(ice);
 		}
 
 		@Override
@@ -406,17 +426,62 @@ public class ClassExpressionQueryState {
 
 	};
 
+	private void addAllRelated(final IndexedClassExpression queryClass,
+			final QueryNode<ElkClass> queryNode) {
+		synchronized (queriesByRelated_) {
+			// equivalent
+			for (final ElkClass related : queryNode) {
+				addRelated(queryClass, related);
+			}
+			// superclasses
+			for (final Node<ElkClass> superNode : queryNode
+					.getDirectSuperNodes()) {
+				for (final ElkClass related : superNode) {
+					addRelated(queryClass, related);
+				}
+			}
+		}
+	}
+
 	private void addRelated(final IndexedClassExpression queryClass,
 			final ElkClass related) {
-		// More fine-grained synchronization is possible but not necessary.
+		// Synchronized on queriesByRelated_ by caller.
+		Collection<IndexedClassExpression> queryClasses = queriesByRelated_
+				.get(related);
+		if (queryClasses == null) {
+			queryClasses = new ArrayHashSet<IndexedClassExpression>();
+			queriesByRelated_.put(related, queryClasses);
+		}
+		queryClasses.add(queryClass);
+	}
+
+	private void removeAllRelated(final IndexedClassExpression queryClass,
+			final QueryNode<ElkClass> queryNode) {
 		synchronized (queriesByRelated_) {
-			Collection<IndexedClassExpression> queryClasses = queriesByRelated_
-					.get(related);
-			if (queryClasses == null) {
-				queryClasses = new ArrayHashSet<IndexedClassExpression>();
-				queriesByRelated_.put(related, queryClasses);
+			// equivalent
+			for (final ElkClass related : queryNode) {
+				removeRelated(queryClass, related);
 			}
-			queryClasses.add(queryClass);
+			// superclasses
+			for (final Node<ElkClass> superNode : queryNode
+					.getDirectSuperNodes()) {
+				for (final ElkClass related : superNode) {
+					removeRelated(queryClass, related);
+				}
+			}
+		}
+	}
+
+	private void removeRelated(final IndexedClassExpression queryClass,
+			final ElkClass related) {
+		// Synchronized on queriesByRelated_ by caller.
+		Collection<IndexedClassExpression> queryClasses = queriesByRelated_
+				.get(related);
+		if (queryClasses != null) {
+			queryClasses.remove(queryClass);
+			if (queryClasses.isEmpty()) {
+				queriesByRelated_.remove(related);
+			}
 		}
 	}
 
