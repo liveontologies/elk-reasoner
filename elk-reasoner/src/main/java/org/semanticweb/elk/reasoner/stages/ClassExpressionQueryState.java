@@ -69,6 +69,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.RecencyQueue;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
@@ -91,9 +92,15 @@ public class ClassExpressionQueryState {
 
 	/**
 	 * Maps class expressions that were queried and added to the index to the
-	 * result of indexing.
+	 * states of their query. Must contain the same values as {@link #indexed_}.
 	 */
-	private final Map<ElkClassExpression, IndexedClassExpression> queried_ = new ConcurrentHashMap<ElkClassExpression, IndexedClassExpression>();
+	private final Map<ElkClassExpression, QueryState> queried_ = new ConcurrentHashMap<ElkClassExpression, QueryState>();
+
+	/**
+	 * Maps results of indexing of queried class expressions to the states of
+	 * their query. Must contain the same values as {@link #queried_}.
+	 */
+	private final Map<IndexedClassExpression, QueryState> indexed_ = new ConcurrentHashMap<IndexedClassExpression, QueryState>();
 
 	/**
 	 * Contains the same class expressions as {@link #queried_} in the order in
@@ -102,36 +109,29 @@ public class ClassExpressionQueryState {
 	private final RecencyQueue<ElkClassExpression> recentlyQueried_ = new RecencyQueue<ElkClassExpression>();
 
 	/**
-	 * Contains indexed class expressions that were queried and added to the
-	 * index, but not computed.
+	 * State of query of a particular class expression.
 	 * 
-	 * Computed means that output of transitive reduction was received by
-	 * {@link #transitiveReductionOutputProcessor_}.
-	 * 
-	 * @see #computed_
+	 * @author Peter Skocovsky
 	 */
-	private final Set<IndexedClassExpression> notComputed_ = Collections
-			.newSetFromMap(
-					new ConcurrentHashMap<IndexedClassExpression, Boolean>());
+	private static class QueryState {
+		/**
+		 * The queried indexed class expression.
+		 */
+		final IndexedClassExpression query;
+		/**
+		 * Whether the query was computed.
+		 */
+		boolean isComputed = false;
+		/**
+		 * The result of the query. If {@link #isComputed} is {@code true} and
+		 * this field is {@code null}, the query is unsatisfiable.
+		 */
+		QueryNode<ElkClass> node = null;
 
-	/**
-	 * Contains indexed class expressions that were queried, added to the index
-	 * and computed.
-	 * 
-	 * @see #notComputed_
-	 */
-	private final Set<IndexedClassExpression> computed_ = Collections
-			.newSetFromMap(
-					new ConcurrentHashMap<IndexedClassExpression, Boolean>());
-
-	/**
-	 * Maps indexed class expressions that were queried, added to the index,
-	 * computed and are satisfiable to the nodes with their equivalent classes.
-	 * 
-	 * @see #notComputed_
-	 * @see #computed_
-	 */
-	private final Map<IndexedClassExpression, QueryNode<ElkClass>> satisfiable_ = new ConcurrentHashMap<IndexedClassExpression, QueryNode<ElkClass>>();
+		public QueryState(final IndexedClassExpression query) {
+			this.query = query;
+		}
+	}
 
 	/**
 	 * Maps atomic classes to queried indexed class expressions to which they
@@ -205,9 +205,10 @@ public class ClassExpressionQueryState {
 
 					@Override
 					public void contextsClear() {
-						notComputed_.addAll(computed_);
-						computed_.clear();
-						satisfiable_.clear();
+						for (final QueryState state : indexed_.values()) {
+							state.isComputed = false;
+							state.node = null;
+						}
 						queriesByRelated_.clear();
 					}
 
@@ -219,34 +220,39 @@ public class ClassExpressionQueryState {
 	 * the cached query results.
 	 * 
 	 * @param queryClass
-	 * @return {@code true} iff the query was not-computed just before the call
-	 *         and was marked computed by this call.
+	 * @return query state iff the parameter was not queried or the query was
+	 *         not-computed just before the call and was marked computed by this
+	 *         call, otherwise {@code null}.
 	 */
-	private boolean markComputed(final IndexedClassExpression queryClass) {
-		if (!notComputed_.remove(queryClass)) {
-			return false;
+	private QueryState markComputed(final IndexedClassExpression queryClass) {
+		final QueryState state = indexed_.get(queryClass);
+		if (state == null || state.isComputed) {
+			return null;
 		}
-		computed_.add(queryClass);
-		return true;
+		state.isComputed = true;
+		return state;
 	}
 
 	/**
 	 * Marks the specified query as not-computed and deletes the query results.
 	 * 
 	 * @param queryClass
-	 * @return {@code true} iff the query was computed just before the call and
-	 *         was marked not-computed by this call.
+	 * @return query state iff the parameter was not queried or the query was
+	 *         computed just before the call and was marked not-computed by this
+	 *         call, otherwise {@code null}.
 	 */
-	private boolean markNotComputed(final IndexedClassExpression queryClass) {
-		if (!computed_.remove(queryClass)) {
-			return false;
+	private QueryState markNotComputed(
+			final IndexedClassExpression queryClass) {
+		final QueryState state = indexed_.get(queryClass);
+		if (state == null || !state.isComputed) {
+			return null;
 		}
-		notComputed_.add(queryClass);
-		final QueryNode<ElkClass> node = satisfiable_.remove(queryClass);
-		if (node != null) {
-			removeAllRelated(queryClass, node);
+		state.isComputed = false;
+		if (state.node != null) {
+			removeAllRelated(queryClass, state.node);
+			state.node = null;
 		}
-		return true;
+		return state;
 	}
 
 	/**
@@ -286,15 +292,17 @@ public class ClassExpressionQueryState {
 			}
 		};
 
-		IndexedClassExpression ice;
+		QueryState state;
 		synchronized (queried_) {
-			ice = queried_.get(classExpression);
-			if (ice != null) {
-				return computed_.contains(ice);
+			state = queried_.get(classExpression);
+			if (state != null) {
+				return state.isComputed;
 			}
 			try {
 				ontologyIndex_.addIndexingUnsupportedListener(listener);
-				ice = classExpression.accept(updatingExpressionConverter_);
+				final IndexedClassExpression ice = classExpression
+						.accept(updatingExpressionConverter_);
+				state = new QueryState(ice);
 			} catch (final ElkIndexingUnsupportedException e) {
 				if (LOGGER_.isWarnEnabled()) {
 					LoggerWrap.log(LOGGER_, LogLevel.WARN,
@@ -314,24 +322,24 @@ public class ClassExpressionQueryState {
 					obj.accept(INDEXING_UNSUPPORTED_ELK_OBJECT_VISITOR_);
 				}
 			}
-			queried_.put(classExpression, ice);
+			queried_.put(classExpression, state);
+			indexed_.put(state.query, state);
 			recentlyQueried_.offer(classExpression);
 			evictIfExceeded();
 		}
 
-		final Context context = saturationState_.getContext(ice);
+		final Context context = saturationState_.getContext(state.query);
 		if (context != null && context.isInitialized() && context.isSaturated()
 				&& context.containsConclusion(
-						conclusionFactory_.getContradiction(ice))) {
+						conclusionFactory_.getContradiction(state.query))) {
 			// If the query is unsatisfiable, it is already computed ...
-			computed_.add(ice);
-			return true;
+			state.isComputed = true;
 		} else {
 			// ... otherwise we need to compute the equivalent and super-classes
-			notComputed_.add(ice);
-			return false;
+			state.isComputed = false;
 		}
 
+		return state.isComputed;
 	}
 
 	private void evictIfExceeded() {
@@ -356,14 +364,13 @@ public class ClassExpressionQueryState {
 
 			classExpression.accept(removingExpressionConverter_);
 
-			final IndexedClassExpression ice = queried_.remove(classExpression);
-			if (computed_.remove(ice)) {
-				final QueryNode<ElkClass> node = satisfiable_.remove(ice);
-				if (node != null) {
-					removeAllRelated(ice, node);
+			final QueryState state = queried_.remove(classExpression);
+			queried_.remove(state.query);
+			if (state.isComputed) {
+				if (state.node != null) {
+					removeAllRelated(state.query, state.node);
+					state.node = null;
 				}
-			} else {
-				notComputed_.remove(ice);
 			}
 
 		}
@@ -381,7 +388,8 @@ public class ClassExpressionQueryState {
 			 * Saturation and "un-saturation" should not happen at the same
 			 * time, so this should be thread-safe.
 			 */
-			if (!markComputed(ice)) {
+			final QueryState state = markComputed(ice);
+			if (state == null) {
 				return;
 			}
 
@@ -401,7 +409,7 @@ public class ClassExpressionQueryState {
 			}
 
 			addAllRelated(ice, node);
-			satisfiable_.put(ice, node);
+			state.node = node;
 		}
 
 		@Override
@@ -493,21 +501,31 @@ public class ClassExpressionQueryState {
 		return transitiveReductionOutputProcessor_;
 	}
 
+	private final static Operations.Transformation<QueryState, IndexedClassExpression> notComputedIces_ = new Operations.Transformation<QueryState, IndexedClassExpression>() {
+		@Override
+		public IndexedClassExpression transform(final QueryState element) {
+			if (element.isComputed) {
+				return null;
+			}
+			return element.query;
+		}
+	};
+
 	/**
 	 * @return indexed class expressions that were queried and added to the
 	 *         index, but not saturated.
 	 */
 	public Collection<IndexedClassExpression> getNotSaturatedQueriedClassExpressions() {
-		return notComputed_;
+		return Operations.map(indexed_.values(), notComputedIces_);
 	}
 
-	private IndexedClassExpression checkComputed(
-			final ElkClassExpression classExpression) throws ElkQueryException {
+	private QueryState checkComputed(final ElkClassExpression classExpression)
+			throws ElkQueryException {
 
-		final IndexedClassExpression ice = queried_.get(classExpression);
+		final QueryState state = queried_.get(classExpression);
 
-		if (ice != null && computed_.contains(ice)) {
-			return ice;
+		if (state != null && state.isComputed) {
+			return state;
 		}
 
 		throw new ElkQueryException(
@@ -527,8 +545,8 @@ public class ClassExpressionQueryState {
 	 */
 	boolean isSatisfiable(final ElkClassExpression classExpression)
 			throws ElkQueryException {
-		final IndexedClassExpression ice = checkComputed(classExpression);
-		return satisfiable_.containsKey(ice);
+		final QueryState state = checkComputed(classExpression);
+		return state.node != null;
 	}
 
 	/**
@@ -546,8 +564,8 @@ public class ClassExpressionQueryState {
 	 */
 	Node<ElkClass> getEquivalentClasses(
 			final ElkClassExpression classExpression) throws ElkQueryException {
-		final IndexedClassExpression ice = checkComputed(classExpression);
-		return satisfiable_.get(ice);
+		final QueryState state = checkComputed(classExpression);
+		return state.node;
 	}
 
 	/**
@@ -566,12 +584,11 @@ public class ClassExpressionQueryState {
 	 */
 	Set<? extends Node<ElkClass>> getDirectSuperClasses(
 			final ElkClassExpression classExpression) throws ElkQueryException {
-		final IndexedClassExpression ice = checkComputed(classExpression);
-		final QueryNode<ElkClass> node = satisfiable_.get(ice);
-		if (node == null) {
+		final QueryState state = checkComputed(classExpression);
+		if (state.node == null) {
 			return null;
 		} else {
-			return node.getDirectSuperNodes();
+			return state.node.getDirectSuperNodes();
 		}
 	}
 
@@ -594,15 +611,13 @@ public class ClassExpressionQueryState {
 			final ElkClassExpression classExpression,
 			final Taxonomy<ElkClass> taxonomy) throws ElkQueryException {
 
-		final IndexedClassExpression ice = checkComputed(classExpression);
-
-		final QueryNode<ElkClass> node = satisfiable_.get(ice);
-		if (node == null) {
+		final QueryState state = checkComputed(classExpression);
+		if (state.node == null) {
 			return null;
 		}
 		// else
 
-		final Iterator<ElkClass> iter = node.iterator();
+		final Iterator<ElkClass> iter = state.node.iterator();
 		if (iter.hasNext()) {
 			final ElkClass cls = iter.next();
 			return taxonomy.getNode(cls).getDirectSubNodes();
@@ -622,7 +637,7 @@ public class ClassExpressionQueryState {
 		for (final IndexedClass ic : allClasses) {
 			final Set<IndexedClassExpression> subsumers = ic.getContext()
 					.getComposedSubsumers();
-			if (subsumers.contains(ice) && ice.getContext()
+			if (subsumers.contains(state.query) && state.query.getContext()
 					.getComposedSubsumers().size() != subsumers.size()) {
 				// is subclass, but not equivalent
 				strictSubclasses.add(ic);
