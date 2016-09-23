@@ -67,24 +67,25 @@ public class TaxonomyNodeUtils {
 		return Collections.unmodifiableSet(result);
 	}
 	
-	public static <N, O> Set<O> getAllReachable(
-					final N node,
+	public static <N, O> Set<O> collectFromAllReachable(
+					final Collection<? extends N> direct,
+					final Collection<? extends O> init,
 					final Functor<N, Set<? extends N>> succ,
 					final Functor<N, Set<? extends O>> collect) {
 		
 		final Set<O> result = new ArrayHashSet<O>();
-		final Set<N> done = new ArrayHashSet<N>();
-		final Queue<N> todo = new LinkedList<N>();
-		result.addAll(collect.apply(node));
-		done.add(node);
-		todo.add(node);
+		result.addAll(init);
+		final Set<N> queued = new ArrayHashSet<N>();
+		queued.addAll(direct);
+		final Queue<N> todo = new LinkedList<N>(direct);
 		
 		while (!todo.isEmpty()) {
 			final N next = todo.poll();
 			
+			result.addAll(collect.apply(next));
+			
 			for (final N succNode : succ.apply(next)) {
-				if (done.add(succNode)) {
-					result.addAll(collect.apply(succNode));
+				if (queued.add(succNode)) {
 					todo.add(succNode);
 				}
 			}
@@ -142,7 +143,9 @@ public class TaxonomyNodeUtils {
 	 */
 	public static <T extends ElkEntity, I extends ElkEntity, TN extends GenericTypeNode<T, I, TN, IN>, IN extends GenericInstanceNode<T, I, TN, IN>>
 			Set<? extends IN> getAllInstanceNodes(final GenericTypeNode<T, I, TN, IN> node) {
-		return TaxonomyNodeUtils.getAllReachable(node,
+		return TaxonomyNodeUtils.collectFromAllReachable(
+				node.getDirectSubNodes(),
+				node.getDirectInstanceNodes(),
 				new Operations.Functor<GenericTypeNode<T, I, TN, IN>, Set<? extends GenericTypeNode<T, I, TN, IN>>>() {
 					@Override
 					public Set<? extends TN> apply(final GenericTypeNode<T, I, TN, IN> node) {

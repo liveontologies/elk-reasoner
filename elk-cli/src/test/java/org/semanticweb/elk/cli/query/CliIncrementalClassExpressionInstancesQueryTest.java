@@ -21,7 +21,6 @@
  */
 package org.semanticweb.elk.cli.query;
 
-import java.util.Arrays;
 import java.util.Set;
 
 import org.junit.runner.RunWith;
@@ -33,30 +32,13 @@ import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
 
 @RunWith(PolySuite.class)
-public class CliIncrementalClassExpressionSuperClassesQueryTest extends
+public class CliIncrementalClassExpressionInstancesQueryTest extends
 		CliIncrementalClassExpressionQueryTest<RelatedEntitiesTestOutput<ElkClass>> {
 
-	// @formatter:off
-	static final String[] IGNORE_LIST = {
-			"Disjunctions.owl",// Disjuctions not supported
-			"OneOf.owl",// Disjuctions not supported
-		};
-	// @formatter:on
-
-	static {
-		Arrays.sort(IGNORE_LIST);
-	}
-
-	@Override
-	protected boolean ignore(final TestInput input) {
-		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
-	}
-
-	public CliIncrementalClassExpressionSuperClassesQueryTest(
+	public CliIncrementalClassExpressionInstancesQueryTest(
 			final TestManifest<ClassQueryTestInput<ElkClassExpression>> manifest) {
 		super(manifest,
 				new CliIncrementalReasoningTestDelegate<RelatedEntitiesTestOutput<ElkClass>, RelatedEntitiesTestOutput<ElkClass>>(
@@ -66,7 +48,7 @@ public class CliIncrementalClassExpressionSuperClassesQueryTest extends
 					public RelatedEntitiesTestOutput<ElkClass> getExpectedOutput()
 							throws Exception {
 						final Set<? extends Node<ElkClass>> subNodes = standardReasoner_
-								.getSuperClassesQuietly(
+								.getSubClassesQuietly(
 										manifest.getInput().getClassQuery(),
 										true);
 						return new CliRelatedEntitiesTestOutput<ElkClass>(
@@ -77,7 +59,7 @@ public class CliIncrementalClassExpressionSuperClassesQueryTest extends
 					public RelatedEntitiesTestOutput<ElkClass> getActualOutput()
 							throws Exception {
 						final Set<? extends Node<ElkClass>> subNodes = incrementalReasoner_
-								.getSuperClassesQuietly(
+								.getSubClassesQuietly(
 										manifest.getInput().getClassQuery(),
 										true);
 						return new CliRelatedEntitiesTestOutput<ElkClass>(

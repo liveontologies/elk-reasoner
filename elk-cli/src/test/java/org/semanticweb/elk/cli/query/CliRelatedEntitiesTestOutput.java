@@ -25,9 +25,9 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.semanticweb.elk.cli.CliTestUtil;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
-import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -36,25 +36,26 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * 
  * @author Peter Skocovsky
  */
-public class CliRelatedEntitiesTestOutput
-		implements RelatedEntitiesTestOutput<ElkClass> {
+public class CliRelatedEntitiesTestOutput<E extends ElkEntity>
+		implements RelatedEntitiesTestOutput<E> {
 
-	private final Iterable<? extends Iterable<ElkClass>> related_;
+	private final Iterable<? extends Iterable<E>> related_;
 
 	public CliRelatedEntitiesTestOutput(
-			final Collection<? extends Collection<ElkClass>> related) {
+			final Collection<? extends Collection<E>> related,
+			final ComparatorKeyProvider<? super E> keyProvider) {
 		this.related_ = CliTestUtil.related2Equalable(related,
-				ElkClassKeyProvider.INSTANCE.getComparator());
+				keyProvider.getComparator());
 	}
 
-	public CliRelatedEntitiesTestOutput(
-			final Set<? extends Node<ElkClass>> related) {
+	public CliRelatedEntitiesTestOutput(final Set<? extends Node<E>> related,
+			final ComparatorKeyProvider<? super E> keyProvider) {
 		this.related_ = CliTestUtil.relatedNodes2Equalable(related,
-				ElkClassKeyProvider.INSTANCE.getComparator());
+				keyProvider.getComparator());
 	}
 
 	@Override
-	public Iterable<? extends Iterable<ElkClass>> getSubEntities() {
+	public Iterable<? extends Iterable<E>> getSubEntities() {
 		return related_;
 	}
 
@@ -63,6 +64,7 @@ public class CliRelatedEntitiesTestOutput
 		return HashGenerator.combinedHashCode(getClass(), related_);
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public boolean equals(final Object obj) {
 		if (obj == null) {

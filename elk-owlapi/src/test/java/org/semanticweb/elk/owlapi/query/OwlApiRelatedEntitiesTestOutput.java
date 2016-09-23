@@ -23,7 +23,7 @@ package org.semanticweb.elk.owlapi.query;
 
 import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.util.hashing.HashGenerator;
-import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLLogicalEntity;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 
 /**
@@ -31,17 +31,17 @@ import org.semanticweb.owlapi.reasoner.NodeSet;
  * 
  * @author Peter Skocovsky
  */
-public class OwlApiRelatedEntitiesTestOutput
-		implements RelatedEntitiesTestOutput<OWLClass> {
+public class OwlApiRelatedEntitiesTestOutput<E extends OWLLogicalEntity>
+		implements RelatedEntitiesTestOutput<E> {
 
-	private final NodeSet<OWLClass> related_;
+	private final NodeSet<E> related_;
 
-	public OwlApiRelatedEntitiesTestOutput(final NodeSet<OWLClass> related) {
+	public OwlApiRelatedEntitiesTestOutput(final NodeSet<E> related) {
 		this.related_ = related;
 	}
 
 	@Override
-	public Iterable<? extends Iterable<OWLClass>> getSubEntities() {
+	public Iterable<? extends Iterable<E>> getSubEntities() {
 		return related_;
 	}
 
@@ -50,6 +50,7 @@ public class OwlApiRelatedEntitiesTestOutput
 		return HashGenerator.combinedHashCode(getClass(), related_);
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public boolean equals(final Object obj) {
 		if (obj == null) {

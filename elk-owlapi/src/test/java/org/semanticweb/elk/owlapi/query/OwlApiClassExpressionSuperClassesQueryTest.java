@@ -56,6 +56,7 @@ public class OwlApiClassExpressionSuperClassesQueryTest extends
 			"Disjunctions.owl",// Disjuctions not supported
 			"OneOf.owl",// Disjuctions not supported
 			"Inconsistent.owl",// Throwing InconsistentOntologyException
+			"InconsistentInstances.owl",// Throwing InconsistentOntologyException
 		};
 	// @formatter:on
 
@@ -81,7 +82,8 @@ public class OwlApiClassExpressionSuperClassesQueryTest extends
 								.getSuperClasses(
 										manifest.getInput().getClassQuery(),
 										true);
-						return new OwlApiRelatedEntitiesTestOutput(superNodes);
+						return new OwlApiRelatedEntitiesTestOutput<OWLClass>(
+								superNodes);
 					}
 
 				});

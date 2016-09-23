@@ -38,15 +38,21 @@ import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
+import org.semanticweb.owlapi.model.OWLIndividual;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLSameIndividualAxiom;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.impl.OWLClassNode;
 import org.semanticweb.owlapi.reasoner.impl.OWLClassNodeSet;
+import org.semanticweb.owlapi.reasoner.impl.OWLNamedIndividualNode;
+import org.semanticweb.owlapi.reasoner.impl.OWLNamedIndividualNodeSet;
 import org.semanticweb.owlapi.util.OWLAxiomVisitorAdapter;
 
 /**
@@ -67,7 +73,8 @@ public class ExpectedTestOutputLoader {
 	 * equivalence axiom if there is more than one class in the set. Whether
 	 * such a set contains super- or sub-classes of the query class should be
 	 * expressed by a single subclass axiom of the query class with one of the
-	 * related classes.
+	 * related classes. Analogously for individuals: grouped by same individuals
+	 * axioms and related by class assertion axioms.
 	 * 
 	 * @param expectedOutput
 	 *            contains the ontology that encode the expected output
@@ -87,6 +94,8 @@ public class ExpectedTestOutputLoader {
 			final Map<OWLClassExpression, OWLClassNode> equivalent = new HashMap<OWLClassExpression, OWLClassNode>();
 			final Multimap<OWLClassExpression, OWLClass> superClasses = new HashSetMultimap<OWLClassExpression, OWLClass>();
 			final Multimap<OWLClassExpression, OWLClass> subClasses = new HashSetMultimap<OWLClassExpression, OWLClass>();
+			final Map<OWLIndividual, OWLNamedIndividualNode> same = new HashMap<OWLIndividual, OWLNamedIndividualNode>();
+			final Multimap<OWLClassExpression, OWLNamedIndividual> instances = new HashSetMultimap<OWLClassExpression, OWLNamedIndividual>();
 
 			for (final OWLAxiom axiom : expectedOnt.getAxioms()) {
 				axiom.accept(new OWLAxiomVisitorAdapter() {
@@ -125,6 +134,33 @@ public class ExpectedTestOutputLoader {
 						}
 					}
 
+					@Override
+					public void visit(final OWLSameIndividualAxiom axiom) {
+						final Set<OWLNamedIndividual> individuals = new HashSet<OWLNamedIndividual>();
+						for (final OWLIndividual i : axiom.getIndividuals()) {
+							if (i instanceof OWLNamedIndividual) {
+								individuals.add((OWLNamedIndividual) i);
+							}
+						}
+						final OWLNamedIndividualNode node = new OWLNamedIndividualNode(
+								individuals);
+						for (final OWLIndividual i : axiom.getIndividuals()) {
+							same.put(i, node);
+						}
+					}
+
+					@Override
+					public void visit(final OWLClassAssertionAxiom axiom) {
+						if (axiom
+								.getIndividual() instanceof OWLNamedIndividual) {
+							instances.add(axiom.getClassExpression(),
+									(OWLNamedIndividual) axiom.getIndividual());
+						}
+						if (!(axiom.getClassExpression() instanceof OWLClass)) {
+							complex.add(axiom.getClassExpression());
+						}
+					}
+
 				});
 			}
 
@@ -136,7 +172,8 @@ public class ExpectedTestOutputLoader {
 
 			return new ExpectedTestOutputLoader(complexClass, equivalent,
 					superClasses.get(complexClass),
-					subClasses.get(complexClass));
+					subClasses.get(complexClass), same,
+					instances.get(complexClass));
 
 		} catch (final OWLOntologyCreationException e) {
 			throw new IllegalArgumentException(e);
@@ -148,15 +185,21 @@ public class ExpectedTestOutputLoader {
 	private final Map<OWLClassExpression, OWLClassNode> equivalent_;
 	private final Collection<OWLClass> superClasses_;
 	private final Collection<OWLClass> subClasses_;
+	private final Map<OWLIndividual, OWLNamedIndividualNode> same_;
+	private final Collection<OWLNamedIndividual> instances_;
 
 	private ExpectedTestOutputLoader(final OWLClassExpression queryClass,
 			final Map<OWLClassExpression, OWLClassNode> equivalent,
 			final Collection<OWLClass> superClasses,
-			final Collection<OWLClass> subClasses) {
+			final Collection<OWLClass> subClasses,
+			final Map<OWLIndividual, OWLNamedIndividualNode> same,
+			final Collection<OWLNamedIndividual> instances) {
 		this.queryClass_ = queryClass;
 		this.equivalent_ = equivalent;
 		this.superClasses_ = superClasses;
 		this.subClasses_ = subClasses;
+		this.same_ = same;
+		this.instances_ = instances;
 	}
 
 	public OWLClassExpression getQueryClass() {
@@ -192,7 +235,7 @@ public class ExpectedTestOutputLoader {
 					}
 				});
 
-		return new OwlApiRelatedEntitiesTestOutput(
+		return new OwlApiRelatedEntitiesTestOutput<OWLClass>(
 				new OWLClassNodeSet(new HashSet<Node<OWLClass>>(superNodes)));
 	}
 
@@ -211,8 +254,30 @@ public class ExpectedTestOutputLoader {
 					}
 				});
 
-		return new OwlApiRelatedEntitiesTestOutput(
+		return new OwlApiRelatedEntitiesTestOutput<OWLClass>(
 				new OWLClassNodeSet(new HashSet<Node<OWLClass>>(subNodes)));
+	}
+
+	public RelatedEntitiesTestOutput<OWLNamedIndividual> getInstancesTestOutput() {
+
+		final Collection<OWLNamedIndividualNode> instances = Operations.map(
+				instances_,
+				new Operations.Transformation<OWLNamedIndividual, OWLNamedIndividualNode>() {
+					@Override
+					public OWLNamedIndividualNode transform(
+							final OWLNamedIndividual ind) {
+						final OWLNamedIndividualNode result = same_.get(ind);
+						if (result != null) {
+							return result;
+						}
+						// else
+						return new OWLNamedIndividualNode(ind);
+					}
+				});
+
+		return new OwlApiRelatedEntitiesTestOutput<OWLNamedIndividual>(
+				new OWLNamedIndividualNodeSet(
+						new HashSet<Node<OWLNamedIndividual>>(instances)));
 	}
 
 }

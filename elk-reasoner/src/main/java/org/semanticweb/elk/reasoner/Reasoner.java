@@ -26,18 +26,13 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.semanticweb.elk.exceptions.ElkException;
-import org.semanticweb.elk.loading.AbstractAxiomLoader;
 import org.semanticweb.elk.loading.AxiomLoader;
-import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.owl.iris.ElkFullIri;
-import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
-import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.stages.AbstractReasonerState;
@@ -47,6 +42,7 @@ import org.semanticweb.elk.reasoner.taxonomy.FreshTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.FreshTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyNodeUtils;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
@@ -646,27 +642,104 @@ public class Reasoner extends AbstractReasonerState {
 	 * @return the set of {@link Node}s for direct or indirect instances of the
 	 *         given {@link ElkClassExpression} according to the specified
 	 *         parameter
+	 * @throws ElkInconsistentOntologyException
+	 *             if the ontology is inconsistent
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
 	public synchronized Set<? extends Node<ElkNamedIndividual>> getInstances(
 			ElkClassExpression classExpression, boolean direct)
-			throws ElkException {
+			throws ElkInconsistentOntologyException, ElkException {
 
-		TypeNode<ElkClass, ElkNamedIndividual> queryNode;
 		if (classExpression instanceof ElkClass) {
-			queryNode = getTypeNode((ElkClass) classExpression);
-		} else {
-			ElkClass queryClass = getElkFactory().getClass(new ElkFullIri(
-					OwlFunctionalStylePrinter.toString(classExpression)));
-			ElkAxiom materializedQuery = getElkFactory().getSubClassOfAxiom(
-					classExpression, queryClass);
-			queryNode = getQueryTypeNode(queryClass, materializedQuery);
+			final TypeNode<ElkClass, ElkNamedIndividual> queryNode = getTypeNode(
+					(ElkClass) classExpression);
+			return direct ? queryNode.getDirectInstanceNodes()
+					: queryNode.getAllInstanceNodes();
 		}
 
-		return direct ? queryNode.getDirectInstanceNodes() : queryNode
-				.getAllInstanceNodes();
+		final Set<? extends Node<ElkNamedIndividual>> instances = queryDirectInstances(
+				classExpression);
+		if (direct) {
+			return instances;
+		}
+		// else all instances
 
+		final Set<? extends Node<ElkClass>> subNodes = queryDirectSubClasses(
+				classExpression);
+		final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = getInstanceTaxonomy();
+
+		return TaxonomyNodeUtils.collectFromAllReachable(Operations.map(
+				subNodes,
+				new Operations.Transformation<Node<ElkClass>, TypeNode<ElkClass, ElkNamedIndividual>>() {
+
+					@Override
+					public TypeNode<ElkClass, ElkNamedIndividual> transform(
+							final Node<ElkClass> node) {
+						return taxonomy.getNode(node.getCanonicalMember());
+					}
+
+				}), Operations.map(instances,
+						new Operations.Transformation<Node<ElkNamedIndividual>, InstanceNode<ElkClass, ElkNamedIndividual>>() {
+
+							@Override
+							public InstanceNode<ElkClass, ElkNamedIndividual> transform(
+									final Node<ElkNamedIndividual> node) {
+								return taxonomy.getInstanceNode(
+										node.getCanonicalMember());
+							}
+
+						}),
+				new Operations.Functor<TypeNode<ElkClass, ElkNamedIndividual>, Set<? extends TypeNode<ElkClass, ElkNamedIndividual>>>() {
+
+					@Override
+					public Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> apply(
+							final TypeNode<ElkClass, ElkNamedIndividual> node) {
+						return node.getDirectSubNodes();
+					}
+
+				},
+				new Operations.Functor<TypeNode<ElkClass, ElkNamedIndividual>, Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>>>() {
+
+					@Override
+					public Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>> apply(
+							final TypeNode<ElkClass, ElkNamedIndividual> node) {
+						return node.getDirectInstanceNodes();
+					}
+
+				});
+	}
+
+	/**
+	 * Return the (direct or indirect) instances of the given
+	 * {@link ElkClassExpression} as specified by the parameter. The method
+	 * returns a set of {@link Node}s, each of which representing an equivalent
+	 * class of instances. Calling of this method may trigger the computation of
+	 * the realization, if it has not been done yet.
+	 * 
+	 * @param classExpression
+	 *            the {@link ElkClassExpression} for which to return the
+	 *            instances {@link Node}s
+	 * @param direct
+	 *            if {@code true}, only direct instances are returned
+	 * @return the set of {@link Node}s for direct or indirect instances of the
+	 *         given {@link ElkClassExpression} according to the specified
+	 *         parameter
+	 * @throws ElkException
+	 *             if the result cannot be computed
+	 */
+	public synchronized Set<? extends Node<ElkNamedIndividual>> getInstancesQuietly(
+			ElkClassExpression classExpression, boolean direct)
+			throws ElkException {
+		try {
+			return getInstances(classExpression, direct);
+		} catch (final ElkInconsistentOntologyException e) {
+			// All classes are equivalent to each other, so also to owl:Nothing.
+			final TypeNode<ElkClass, ElkNamedIndividual> node = getInstanceTaxonomyQuietly()
+					.getBottomNode();
+			return direct ? node.getDirectInstanceNodes()
+					: node.getAllInstanceNodes();
+		}
 	}
 
 	/**
@@ -743,72 +816,6 @@ public class Reasoner extends AbstractReasonerState {
 		} catch (final ElkInconsistentOntologyException e) {
 			// Any class is unsatisfiable.
 			return false;
-		}
-	}
-
-	/**
-	 * @param materializedQuery
-	 *            An {@link ElkAxiom} introduced for the query
-	 * @param addition
-	 *            {@code true} if the axiom should be added, {@code false} if it
-	 *            should be removed
-	 * @return an {@code AxiomLoader} that performs addition, or respectively,
-	 *         removal of the given axiom
-	 */
-	static AxiomLoader getQueryLoader(final ElkAxiom materializedQuery,
-			final boolean addition) {
-
-		return new AbstractAxiomLoader() {
-
-			boolean finished = false;
-
-			@Override
-			public void load(ElkAxiomProcessor axiomInserter,
-					ElkAxiomProcessor axiomDeleter) throws ElkLoadingException {
-				(addition ? axiomInserter : axiomDeleter)
-						.visit(materializedQuery);
-				if (LOGGER_.isTraceEnabled())
-					LOGGER_.trace((addition ? "adding materialized quiery axiom: "
-							: "removing materialized quiery axiom: ")
-							+ OwlFunctionalStylePrinter
-									.toString(materializedQuery));
-				finished = true;
-			}
-
-			@Override
-			public boolean isLoadingFinished() {
-				return finished;
-			}
-		};
-
-	}
-
-	/**
-	 * Compute a {@link TypeNode} for the given {@link ElkClass} in the taxonomy
-	 * resulted from adding the given {@link ElkAxiom}
-	 * 
-	 * @param queryClass
-	 *            the {@link ElkClass} for which to return the node
-	 * @param materializedQuery
-	 *            the {@link ElkAxiom} that should be added to the ontology
-	 *            before computing the {@link TypeNode}
-	 * @return the {@link TypeNode} for the given {@link ElkClass} in the
-	 *         taxonomy resulted from adding the given {@link ElkAxiom}
-	 * @throws ElkException
-	 *             if the result cannot be computed
-	 */
-	TypeNode<ElkClass, ElkNamedIndividual> getQueryTypeNode(
-			ElkClass queryClass, final ElkAxiom materializedQuery)
-			throws ElkException {
-
-		boolean oldIsAllowIncrementalMode = isAllowIncrementalMode();
-		setAllowIncrementalMode(true);
-		registerAxiomLoader(getQueryLoader(materializedQuery, true));
-		try {
-			return getTypeNode(queryClass);
-		} finally {
-			registerAxiomLoader(getQueryLoader(materializedQuery, false));
-			setAllowIncrementalMode(oldIsAllowIncrementalMode);
 		}
 	}
 

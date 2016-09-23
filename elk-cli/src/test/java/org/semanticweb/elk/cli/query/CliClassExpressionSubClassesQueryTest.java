@@ -36,6 +36,7 @@ import org.semanticweb.elk.reasoner.query.BaseClassExpressionQueryTest;
 import org.semanticweb.elk.reasoner.query.ClassExpressionQueryTestManifest;
 import org.semanticweb.elk.reasoner.query.ClassQueryTestInput;
 import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
+import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
@@ -61,7 +62,8 @@ public class CliClassExpressionSubClassesQueryTest extends
 								.getSubClassesQuietly(
 										manifest.getInput().getClassQuery(),
 										true);
-						return new CliRelatedEntitiesTestOutput(subNodes);
+						return new CliRelatedEntitiesTestOutput<ElkClass>(
+								subNodes, ElkClassKeyProvider.INSTANCE);
 					}
 
 				});

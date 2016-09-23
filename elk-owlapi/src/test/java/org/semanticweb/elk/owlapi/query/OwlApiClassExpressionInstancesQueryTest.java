@@ -39,17 +39,17 @@ import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
+import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
-import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 
 @RunWith(PolySuite.class)
-public class OwlApiClassExpressionSubClassesQueryTest extends
-		BaseClassExpressionQueryTest<OWLClassExpression, RelatedEntitiesTestOutput<OWLClass>> {
+public class OwlApiClassExpressionInstancesQueryTest extends
+		BaseClassExpressionQueryTest<OWLClassExpression, RelatedEntitiesTestOutput<OWLNamedIndividual>> {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
@@ -67,20 +67,20 @@ public class OwlApiClassExpressionSubClassesQueryTest extends
 		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
 	}
 
-	public OwlApiClassExpressionSubClassesQueryTest(
-			final TestManifestWithOutput<ClassQueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>, RelatedEntitiesTestOutput<OWLClass>> manifest) {
+	public OwlApiClassExpressionInstancesQueryTest(
+			final TestManifestWithOutput<ClassQueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLNamedIndividual>, RelatedEntitiesTestOutput<OWLNamedIndividual>> manifest) {
 		super(manifest,
-				new OwlApiReasoningTestDelegate<RelatedEntitiesTestOutput<OWLClass>>(
+				new OwlApiReasoningTestDelegate<RelatedEntitiesTestOutput<OWLNamedIndividual>>(
 						manifest) {
 
 					@Override
-					public RelatedEntitiesTestOutput<OWLClass> getActualOutput()
+					public RelatedEntitiesTestOutput<OWLNamedIndividual> getActualOutput()
 							throws Exception {
-						final NodeSet<OWLClass> subNodes = reasoner_
-								.getSubClasses(
+						final NodeSet<OWLNamedIndividual> subNodes = reasoner_
+								.getInstances(
 										manifest.getInput().getClassQuery(),
 										true);
-						return new OwlApiRelatedEntitiesTestOutput<OWLClass>(
+						return new OwlApiRelatedEntitiesTestOutput<OWLNamedIndividual>(
 								subNodes);
 					}
 
@@ -94,10 +94,10 @@ public class OwlApiClassExpressionSubClassesQueryTest extends
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION, BaseClassExpressionQueryTest.class, "owl",
 				"expected",
-				new TestManifestCreator<ClassQueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>, RelatedEntitiesTestOutput<OWLClass>>() {
+				new TestManifestCreator<ClassQueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLNamedIndividual>, RelatedEntitiesTestOutput<OWLNamedIndividual>>() {
 
 					@Override
-					public TestManifestWithOutput<ClassQueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>, RelatedEntitiesTestOutput<OWLClass>> create(
+					public TestManifestWithOutput<ClassQueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLNamedIndividual>, RelatedEntitiesTestOutput<OWLNamedIndividual>> create(
 							final URL input, final URL output)
 							throws IOException {
 
@@ -107,9 +107,9 @@ public class OwlApiClassExpressionSubClassesQueryTest extends
 							final ExpectedTestOutputLoader expected = ExpectedTestOutputLoader
 									.load(outputIS);
 
-							return new ClassExpressionQueryTestManifest<OWLClassExpression, RelatedEntitiesTestOutput<OWLClass>>(
+							return new ClassExpressionQueryTestManifest<OWLClassExpression, RelatedEntitiesTestOutput<OWLNamedIndividual>>(
 									input, expected.getQueryClass(),
-									expected.getSubEntitiesTestOutput());
+									expected.getInstancesTestOutput());
 
 						} finally {
 							IOUtils.closeQuietly(outputIS);

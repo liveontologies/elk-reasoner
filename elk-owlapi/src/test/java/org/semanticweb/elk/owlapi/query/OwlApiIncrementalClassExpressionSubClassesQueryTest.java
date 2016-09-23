@@ -41,6 +41,7 @@ public class OwlApiIncrementalClassExpressionSubClassesQueryTest extends
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
 			"Inconsistent.owl",// Throwing InconsistentOntologyException
+			"InconsistentInstances.owl",// Throwing InconsistentOntologyException
 		};
 	// @formatter:on
 
@@ -66,7 +67,8 @@ public class OwlApiIncrementalClassExpressionSubClassesQueryTest extends
 								.getSubClasses(
 										manifest.getInput().getClassQuery(),
 										true);
-						return new OwlApiRelatedEntitiesTestOutput(subNodes);
+						return new OwlApiRelatedEntitiesTestOutput<OWLClass>(
+								subNodes);
 					}
 
 					@Override
@@ -76,7 +78,8 @@ public class OwlApiIncrementalClassExpressionSubClassesQueryTest extends
 								.getSubClasses(
 										manifest.getInput().getClassQuery(),
 										true);
-						return new OwlApiRelatedEntitiesTestOutput(subNodes);
+						return new OwlApiRelatedEntitiesTestOutput<OWLClass>(
+								subNodes);
 					}
 				});
 	}

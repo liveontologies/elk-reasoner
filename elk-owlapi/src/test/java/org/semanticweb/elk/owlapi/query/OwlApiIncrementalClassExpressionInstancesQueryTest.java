@@ -30,18 +30,16 @@ import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 
 @RunWith(PolySuite.class)
-public class OwlApiIncrementalClassExpressionSuperClassesQueryTest extends
-		OwlApiIncrementalClassExpressionQueryTest<RelatedEntitiesTestOutput<OWLClass>> {
+public class OwlApiIncrementalClassExpressionInstancesQueryTest extends
+		OwlApiIncrementalClassExpressionQueryTest<RelatedEntitiesTestOutput<OWLNamedIndividual>> {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
-			"Disjunctions.owl",// Disjuctions not supported
-			"OneOf.owl",// Disjuctions not supported
 			"Inconsistent.owl",// Throwing InconsistentOntologyException
 			"InconsistentInstances.owl",// Throwing InconsistentOntologyException
 		};
@@ -56,34 +54,33 @@ public class OwlApiIncrementalClassExpressionSuperClassesQueryTest extends
 		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
 	}
 
-	public OwlApiIncrementalClassExpressionSuperClassesQueryTest(
+	public OwlApiIncrementalClassExpressionInstancesQueryTest(
 			final TestManifest<ClassQueryTestInput<OWLClassExpression>> manifest) {
 		super(manifest,
-				new OwlApiIncrementalReasoningTestDelegate<RelatedEntitiesTestOutput<OWLClass>, RelatedEntitiesTestOutput<OWLClass>>(
+				new OwlApiIncrementalReasoningTestDelegate<RelatedEntitiesTestOutput<OWLNamedIndividual>, RelatedEntitiesTestOutput<OWLNamedIndividual>>(
 						manifest) {
 
 					@Override
-					public RelatedEntitiesTestOutput<OWLClass> getExpectedOutput()
+					public RelatedEntitiesTestOutput<OWLNamedIndividual> getExpectedOutput()
 							throws Exception {
-						final NodeSet<OWLClass> subNodes = standardReasoner_
-								.getSuperClasses(
+						final NodeSet<OWLNamedIndividual> subNodes = standardReasoner_
+								.getInstances(
 										manifest.getInput().getClassQuery(),
 										true);
-						return new OwlApiRelatedEntitiesTestOutput<OWLClass>(
+						return new OwlApiRelatedEntitiesTestOutput<OWLNamedIndividual>(
 								subNodes);
 					}
 
 					@Override
-					public RelatedEntitiesTestOutput<OWLClass> getActualOutput()
+					public RelatedEntitiesTestOutput<OWLNamedIndividual> getActualOutput()
 							throws Exception {
-						final NodeSet<OWLClass> subNodes = incrementalReasoner_
-								.getSuperClasses(
+						final NodeSet<OWLNamedIndividual> subNodes = incrementalReasoner_
+								.getInstances(
 										manifest.getInput().getClassQuery(),
 										true);
-						return new OwlApiRelatedEntitiesTestOutput<OWLClass>(
+						return new OwlApiRelatedEntitiesTestOutput<OWLNamedIndividual>(
 								subNodes);
 					}
-
 				});
 	}
 

@@ -53,6 +53,7 @@ public class OwlApiClassExpressionSatisfiabilityQueryTest extends
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
 			"Inconsistent.owl",// Throwing InconsistentOntologyException
+			"InconsistentInstances.owl",// Throwing InconsistentOntologyException
 		};
 	// @formatter:on
 

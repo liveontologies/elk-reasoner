@@ -19,69 +19,51 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.owlapi.query;
+package org.semanticweb.elk.cli.query;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Arrays;
+import java.util.Set;
 
-import org.junit.Ignore;
-import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.cli.CliReasoningTestDelegate;
 import org.semanticweb.elk.io.IOUtils;
-import org.semanticweb.elk.owlapi.OwlApiReasoningTestDelegate;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.query.BaseClassExpressionQueryTest;
 import org.semanticweb.elk.reasoner.query.ClassExpressionQueryTestManifest;
 import org.semanticweb.elk.reasoner.query.ClassQueryTestInput;
 import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
+import org.semanticweb.elk.reasoner.taxonomy.ElkIndividualKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.reasoner.NodeSet;
 
 @RunWith(PolySuite.class)
-public class OwlApiClassExpressionSubClassesQueryTest extends
-		BaseClassExpressionQueryTest<OWLClassExpression, RelatedEntitiesTestOutput<OWLClass>> {
+public class CliClassExpressionInstancesQueryTest extends
+		BaseClassExpressionQueryTest<ElkClassExpression, RelatedEntitiesTestOutput<ElkNamedIndividual>> {
 
-	// @formatter:off
-	static final String[] IGNORE_LIST = {
-			"Inconsistent.owl",// Throwing InconsistentOntologyException
-			"InconsistentInstances.owl",// Throwing InconsistentOntologyException
-		};
-	// @formatter:on
-
-	static {
-		Arrays.sort(IGNORE_LIST);
-	}
-
-	@Override
-	protected boolean ignore(final TestInput input) {
-		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
-	}
-
-	public OwlApiClassExpressionSubClassesQueryTest(
-			final TestManifestWithOutput<ClassQueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>, RelatedEntitiesTestOutput<OWLClass>> manifest) {
+	public CliClassExpressionInstancesQueryTest(
+			final TestManifestWithOutput<ClassQueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkNamedIndividual>, RelatedEntitiesTestOutput<ElkNamedIndividual>> manifest) {
 		super(manifest,
-				new OwlApiReasoningTestDelegate<RelatedEntitiesTestOutput<OWLClass>>(
+				new CliReasoningTestDelegate<RelatedEntitiesTestOutput<ElkNamedIndividual>>(
 						manifest) {
 
 					@Override
-					public RelatedEntitiesTestOutput<OWLClass> getActualOutput()
+					public RelatedEntitiesTestOutput<ElkNamedIndividual> getActualOutput()
 							throws Exception {
-						final NodeSet<OWLClass> subNodes = reasoner_
-								.getSubClasses(
+						final Set<? extends Node<ElkNamedIndividual>> subNodes = reasoner_
+								.getInstancesQuietly(
 										manifest.getInput().getClassQuery(),
 										true);
-						return new OwlApiRelatedEntitiesTestOutput<OWLClass>(
-								subNodes);
+						return new CliRelatedEntitiesTestOutput<ElkNamedIndividual>(
+								subNodes, ElkIndividualKeyProvider.INSTANCE);
 					}
 
 				});
@@ -94,10 +76,10 @@ public class OwlApiClassExpressionSubClassesQueryTest extends
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION, BaseClassExpressionQueryTest.class, "owl",
 				"expected",
-				new TestManifestCreator<ClassQueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>, RelatedEntitiesTestOutput<OWLClass>>() {
+				new TestManifestCreator<ClassQueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkNamedIndividual>, RelatedEntitiesTestOutput<ElkNamedIndividual>>() {
 
 					@Override
-					public TestManifestWithOutput<ClassQueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>, RelatedEntitiesTestOutput<OWLClass>> create(
+					public TestManifestWithOutput<ClassQueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkNamedIndividual>, RelatedEntitiesTestOutput<ElkNamedIndividual>> create(
 							final URL input, final URL output)
 							throws IOException {
 
@@ -107,9 +89,9 @@ public class OwlApiClassExpressionSubClassesQueryTest extends
 							final ExpectedTestOutputLoader expected = ExpectedTestOutputLoader
 									.load(outputIS);
 
-							return new ClassExpressionQueryTestManifest<OWLClassExpression, RelatedEntitiesTestOutput<OWLClass>>(
+							return new ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkNamedIndividual>>(
 									input, expected.getQueryClass(),
-									expected.getSubEntitiesTestOutput());
+									expected.getInstancesTestOutput());
 
 						} finally {
 							IOUtils.closeQuietly(outputIS);
@@ -119,13 +101,6 @@ public class OwlApiClassExpressionSubClassesQueryTest extends
 
 				});
 
-	}
-
-	@Test
-	@Ignore
-	@Override
-	public void testWithInterruptions() throws Exception {
-		super.testWithInterruptions();
 	}
 
 }

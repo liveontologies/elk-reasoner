@@ -794,6 +794,42 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	}
 
 	/**
+	 * Computes all direct instances of the supplied (possibly complex) class
+	 * expression. The query state is updated accordingly.
+	 * 
+	 * @param classExpression
+	 *            The queried class expression.
+	 * @return all direct instances of the supplied class expression.
+	 * @throws ElkInconsistentOntologyException
+	 *             if the ontology is inconsistent
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
+	 */
+	protected Set<? extends Node<ElkNamedIndividual>> queryDirectInstances(
+			final ElkClassExpression classExpression)
+			throws ElkInconsistentOntologyException, ElkException {
+
+		if (computeQuery(classExpression)) {
+
+			final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = getInstanceTaxonomy();
+
+			final Set<? extends Node<ElkNamedIndividual>> result = classExpressionQueryState_
+					.getDirectInstances(classExpression, taxonomy);
+			if (result == null) {
+				return taxonomy.getBottomNode().getDirectInstanceNodes();
+			} else {
+				return result;
+			}
+
+		} else {
+			// classExpression couldn't be indexed; pretend it is a fresh class
+
+			return Collections.emptySet();
+		}
+
+	}
+
+	/**
 	 * @return all {@link ElkClass}es occurring in the ontology
 	 */
 	public synchronized Set<ElkClass> getAllClasses() {

@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
@@ -48,6 +49,7 @@ import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionCon
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectUnionOf;
@@ -65,9 +67,12 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateDummyChangeListene
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.RecencyQueue;
@@ -680,6 +685,91 @@ public class ClassExpressionQueryState {
 			 */
 			result.add(taxonomy.getBottomNode());
 		}
+		return Collections.unmodifiableSet(result);
+	}
+
+	/**
+	 * Returns set of {@link Node}s containing all {@link ElkNamedIndividual}s
+	 * that are direct instances of the supplied class expression, if it is
+	 * satisfiable. Returns <code>null</code> otherwise. If the class expression
+	 * was not registered by {@link #indexQuery(ElkClassExpression)} or the
+	 * appropriate stage was not completed yet, throws {@link ElkQueryException}
+	 * .
+	 * 
+	 * @param classExpression
+	 * @param taxonomy
+	 * @return direct instances of the supplied class expression, if it is
+	 *         satisfiable, otherwise <code>null</code>.
+	 * @throws ElkQueryException
+	 *             if the result is not ready
+	 */
+	Set<? extends Node<ElkNamedIndividual>> getDirectInstances(
+			final ElkClassExpression classExpression,
+			final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy)
+			throws ElkQueryException {
+
+		final QueryState state = checkComputed(classExpression);
+		if (state.node == null) {
+			return null;
+		}
+		// else
+
+		final Iterator<ElkClass> iter = state.node.iterator();
+		if (iter.hasNext()) {
+			final ElkClass cls = iter.next();
+			return taxonomy.getNode(cls).getDirectInstanceNodes();
+		}
+		/*
+		 * Else, if classExpression is not equivalent to any atomic class,
+		 * direct instances of classExpression are instances that have
+		 * classExpression among their subsumers, but no other of their strict
+		 * subsumers have classExpression among its subsumers.
+		 */
+
+		final Collection<? extends IndexedIndividual> allIndividuals = saturationState_
+				.getOntologyIndex().getIndividuals();
+		final Set<IndexedIndividual> instances = new ArrayHashSet<IndexedIndividual>(
+				allIndividuals.size());
+
+		for (final IndexedIndividual ii : allIndividuals) {
+			final Set<IndexedClassExpression> subsumers = ii.getContext()
+					.getComposedSubsumers();
+			if (subsumers.contains(state.query)) {
+				instances.add(ii);
+			}
+		}
+
+		final Set<InstanceNode<ElkClass, ElkNamedIndividual>> result = new ArrayHashSet<InstanceNode<ElkClass, ElkNamedIndividual>>();
+
+		for (final IndexedIndividual instance : instances) {
+			/*
+			 * If some type of instance is a strict subclass of classExpression,
+			 * instance is not direct.
+			 * 
+			 * It is sufficient to check only direct types of instance.
+			 */
+			boolean isDirect = true;
+			for (final TypeNode<ElkClass, ElkNamedIndividual> typeNode : taxonomy
+					.getInstanceNode(instance.getElkEntity())
+					.getDirectTypeNodes()) {
+				final IndexedClassExpression type = typeNode
+						.getCanonicalMember()
+						.accept(resolvingExpressionConverter_);
+				final Set<IndexedClassExpression> subsumers = type.getContext()
+						.getComposedSubsumers();
+				if (subsumers.contains(state.query) && state.query.getContext()
+						.getComposedSubsumers().size() != subsumers.size()) {
+					// is subclass, but not equivalent
+					isDirect = false;
+					break;
+				}
+			}
+
+			if (isDirect) {
+				result.add(taxonomy.getInstanceNode(instance.getElkEntity()));
+			}
+		}
+
 		return Collections.unmodifiableSet(result);
 	}
 
