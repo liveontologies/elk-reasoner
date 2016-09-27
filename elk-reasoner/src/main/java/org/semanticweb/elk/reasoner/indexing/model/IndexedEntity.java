@@ -23,6 +23,8 @@ package org.semanticweb.elk.reasoner.indexing.model;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.reasoner.indexing.SerializationContext;
+import org.semanticweb.elk.serialization.Deserializable;
 
 /**
  * Represents all occurrences of an {@link ElkEntity} in an ontology.
@@ -30,7 +32,8 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  * @author "Yevgeny Kazakov"
  *
  */
-public interface IndexedEntity extends IndexedObject {
+public interface IndexedEntity
+		extends IndexedObject, Deserializable<SerializationContext> {
 
 	/**
 	 * @return The {@link ElkEntity} represented by this {@link IndexedEntity}

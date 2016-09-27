@@ -22,6 +22,11 @@
  */
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+import org.semanticweb.elk.reasoner.indexing.SerializationContext;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
@@ -29,6 +34,9 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProper
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
+import org.semanticweb.elk.serialization.Deserializer;
+import org.semanticweb.elk.serialization.Deserializers;
+import org.semanticweb.elk.serialization.ElkSerializationException;
 
 /**
  * Implements {@link CachedIndexedComplexPropertyChain}
@@ -130,6 +138,53 @@ final class CachedIndexedComplexPropertyChainImpl
 	public CachedIndexedComplexPropertyChain accept(
 			CachedIndexedPropertyChain.Filter filter) {
 		return filter.filter(this);
+	}
+
+	private static final Deserializer<SerializationContext> DESERIALIZER = new Deserializer<SerializationContext>() {
+
+		@Override
+		public byte getSerialId() {
+			return 6;
+		}
+
+		@Override
+		public Object read(final DataInputStream input,
+				final SerializationContext context)
+				throws IOException, ElkSerializationException {
+
+			final ModifiableIndexedObjectProperty leftProperty = Deserializers
+					.read(input, ModifiableIndexedObjectProperty.class,
+							context);
+
+			final ModifiableIndexedPropertyChain rightProperty = Deserializers
+					.read(input, ModifiableIndexedPropertyChain.class, context);
+
+			return context.getIndexedObjectFactory()
+					.getIndexedComplexPropertyChain(leftProperty,
+							rightProperty);
+		}
+
+	};
+
+	static {
+		Deserializers.register(DESERIALIZER);
+	}
+
+	@Override
+	public Deserializer<SerializationContext> getDeserializer() {
+		return DESERIALIZER;
+	}
+
+	@Override
+	public void write(final DataOutputStream output)
+			throws IOException, ElkSerializationException {
+
+		output.writeByte(getDeserializer().getSerialId());
+
+		getFirstProperty().write(output);
+
+		getSuffixChain().write(output);
+
 	}
 
 }

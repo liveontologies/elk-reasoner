@@ -30,7 +30,9 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.reasoner.indexing.SerializationContext;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
+import org.semanticweb.elk.serialization.Deserializable;
 
 /**
  * Represents occurrences of an {@link ElkSubObjectPropertyExpression} in an
@@ -41,7 +43,8 @@ import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface IndexedPropertyChain extends IndexedObject {
+public interface IndexedPropertyChain
+		extends IndexedObject, Deserializable<SerializationContext> {
 
 	/**
 	 * @return The representations of all {@link ElkObjectProperty}s occurring

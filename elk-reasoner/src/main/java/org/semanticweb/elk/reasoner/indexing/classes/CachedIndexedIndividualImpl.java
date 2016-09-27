@@ -22,12 +22,22 @@
  */
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.elk.reasoner.indexing.SerializationContext;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedEntity;
+import org.semanticweb.elk.serialization.Deserializer;
+import org.semanticweb.elk.serialization.Deserializers;
+import org.semanticweb.elk.serialization.ElkSerializationException;
 
 /**
  * Implements {@link CachedIndexedIndividual}
@@ -78,6 +88,48 @@ class CachedIndexedIndividualImpl extends
 	public CachedIndexedIndividual accept(
 			CachedIndexedClassExpression.Filter filter) {
 		return filter.filter(this);
+	}
+
+	private static final Deserializer<SerializationContext> DESERIALIZER = new Deserializer<SerializationContext>() {
+
+		@Override
+		public byte getSerialId() {
+			return 9;
+		}
+
+		@Override
+		public Object read(final DataInputStream input,
+				final SerializationContext context)
+				throws IOException, ElkSerializationException {
+
+			final ElkIri iri = new ElkFullIri(input.readUTF());
+
+			final ElkNamedIndividual entity = context.getElkFactory()
+					.getNamedIndividual(iri);
+
+			return context.getIndexedObjectFactory()
+					.getIndexedIndividual(entity);
+		}
+
+	};
+
+	static {
+		Deserializers.register(DESERIALIZER);
+	}
+
+	@Override
+	public Deserializer<SerializationContext> getDeserializer() {
+		return DESERIALIZER;
+	}
+
+	@Override
+	public void write(final DataOutputStream output)
+			throws IOException, ElkSerializationException {
+
+		output.writeByte(getDeserializer().getSerialId());
+
+		output.writeUTF(getElkEntity().getIri().getFullIriAsString());
+
 	}
 
 }

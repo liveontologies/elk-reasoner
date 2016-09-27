@@ -23,8 +23,10 @@
 package org.semanticweb.elk.reasoner.indexing.model;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.reasoner.indexing.SerializationContext;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
+import org.semanticweb.elk.serialization.Deserializable;
 
 /**
  * Represents occurrences of an {@link ElkClassExpression} in an ontology.
@@ -34,7 +36,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRul
  * @author "Yevgeny Kazakov"
  * @author Pavel Klinov
  */
-public interface IndexedClassExpression extends IndexedContextRoot {
+public interface IndexedClassExpression
+		extends IndexedContextRoot, Deserializable<SerializationContext> {
 
 	/**
 	 * @return the first composition rule assigned to this

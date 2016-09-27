@@ -21,6 +21,11 @@
  */
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+import org.semanticweb.elk.reasoner.indexing.SerializationContext;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
@@ -28,6 +33,9 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpress
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
+import org.semanticweb.elk.serialization.Deserializer;
+import org.semanticweb.elk.serialization.Deserializers;
+import org.semanticweb.elk.serialization.ElkSerializationException;
 
 /**
  * Implements {@link CachedIndexedObjectComplementOf}
@@ -100,6 +108,46 @@ class CachedIndexedObjectComplementOfImpl extends
 	public CachedIndexedObjectComplementOf accept(
 			CachedIndexedClassExpression.Filter filter) {
 		return filter.filter(this);
+	}
+
+	private static final Deserializer<SerializationContext> DESERIALIZER = new Deserializer<SerializationContext>() {
+
+		@Override
+		public byte getSerialId() {
+			return 5;
+		}
+
+		@Override
+		public Object read(final DataInputStream input,
+				final SerializationContext context)
+				throws IOException, ElkSerializationException {
+
+			final ModifiableIndexedClassExpression negated = Deserializers.read(
+					input, ModifiableIndexedClassExpression.class, context);
+
+			return context.getIndexedObjectFactory()
+					.getIndexedObjectComplementOf(negated);
+		}
+
+	};
+
+	static {
+		Deserializers.register(DESERIALIZER);
+	}
+
+	@Override
+	public Deserializer<SerializationContext> getDeserializer() {
+		return DESERIALIZER;
+	}
+
+	@Override
+	public void write(final DataOutputStream output)
+			throws IOException, ElkSerializationException {
+
+		output.writeByte(getDeserializer().getSerialId());
+
+		getNegated().write(output);
+
 	}
 
 }

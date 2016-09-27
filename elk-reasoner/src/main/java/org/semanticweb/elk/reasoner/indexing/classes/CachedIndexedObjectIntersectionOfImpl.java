@@ -22,6 +22,11 @@
  */
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+import org.semanticweb.elk.reasoner.indexing.SerializationContext;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
@@ -30,6 +35,9 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromFirstConjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromSecondConjunctRule;
+import org.semanticweb.elk.serialization.Deserializer;
+import org.semanticweb.elk.serialization.Deserializers;
+import org.semanticweb.elk.serialization.ElkSerializationException;
 
 /**
  * Implements {@link CachedIndexedObjectIntersectionOf}
@@ -122,6 +130,53 @@ class CachedIndexedObjectIntersectionOfImpl
 	public CachedIndexedObjectIntersectionOf accept(
 			CachedIndexedClassExpression.Filter filter) {
 		return filter.filter(this);
+	}
+
+	private static final Deserializer<SerializationContext> DESERIALIZER = new Deserializer<SerializationContext>() {
+
+		@Override
+		public byte getSerialId() {
+			return 2;
+		}
+
+		@Override
+		public Object read(final DataInputStream input,
+				final SerializationContext context)
+				throws IOException, ElkSerializationException {
+
+			final ModifiableIndexedClassExpression conjunctA = Deserializers
+					.read(input, ModifiableIndexedClassExpression.class,
+							context);
+
+			final ModifiableIndexedClassExpression conjunctB = Deserializers
+					.read(input, ModifiableIndexedClassExpression.class,
+							context);
+
+			return context.getIndexedObjectFactory()
+					.getIndexedObjectIntersectionOf(conjunctA, conjunctB);
+		}
+
+	};
+
+	static {
+		Deserializers.register(DESERIALIZER);
+	}
+
+	@Override
+	public Deserializer<SerializationContext> getDeserializer() {
+		return DESERIALIZER;
+	}
+
+	@Override
+	public void write(final DataOutputStream output)
+			throws IOException, ElkSerializationException {
+
+		output.writeByte(getDeserializer().getSerialId());
+
+		getFirstConjunct().write(output);
+
+		getSecondConjunct().write(output);
+
 	}
 
 }

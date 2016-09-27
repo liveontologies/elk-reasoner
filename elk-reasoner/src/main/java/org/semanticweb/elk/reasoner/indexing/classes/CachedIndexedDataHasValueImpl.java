@@ -22,14 +22,25 @@
  */
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
+import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.elk.reasoner.indexing.SerializationContext;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
+import org.semanticweb.elk.serialization.Deserializer;
+import org.semanticweb.elk.serialization.Deserializers;
+import org.semanticweb.elk.serialization.ElkSerializationException;
 
 /**
  * Implements {@link CachedIndexedDataHasValue}
@@ -93,6 +104,58 @@ class CachedIndexedDataHasValueImpl
 	public CachedIndexedDataHasValue accept(
 			CachedIndexedClassExpression.Filter filter) {
 		return filter.filter(this);
+	}
+
+	private static final Deserializer<SerializationContext> DESERIALIZER = new Deserializer<SerializationContext>() {
+
+		@Override
+		public byte getSerialId() {
+			return 11;
+		}
+
+		@Override
+		public Object read(final DataInputStream input,
+				final SerializationContext context)
+				throws IOException, ElkSerializationException {
+
+			final ElkIri iri = new ElkFullIri(input.readUTF());
+			final ElkDataProperty property = context.getElkFactory()
+					.getDataProperty(iri);
+
+			final String lexicalForm = input.readUTF();
+			final ElkDatatype datatype = context.getElkFactory()
+					.getDatatype(new ElkFullIri(input.readUTF()));
+			final ElkLiteral filler = context.getElkFactory()
+					.getLiteral(lexicalForm, datatype);
+
+			return context.getIndexedObjectFactory().getIndexedDataHasValue(
+					context.getElkFactory().getDataHasValue(property, filler));
+		}
+
+	};
+
+	static {
+		Deserializers.register(DESERIALIZER);
+	}
+
+	@Override
+	public Deserializer<SerializationContext> getDeserializer() {
+		return DESERIALIZER;
+	}
+
+	@Override
+	public void write(final DataOutputStream output)
+			throws IOException, ElkSerializationException {
+
+		output.writeByte(getDeserializer().getSerialId());
+
+		output.writeUTF(getRelation().getIri().getFullIriAsString());
+
+		output.writeUTF(getFiller().getLexicalForm());
+
+		output.writeUTF(
+				getFiller().getDatatype().getIri().getFullIriAsString());
+
 	}
 
 }

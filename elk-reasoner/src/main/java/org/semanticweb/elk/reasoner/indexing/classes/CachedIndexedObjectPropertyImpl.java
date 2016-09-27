@@ -22,12 +22,18 @@
  */
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.elk.reasoner.indexing.SerializationContext;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
@@ -36,6 +42,9 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedEntity;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
+import org.semanticweb.elk.serialization.Deserializer;
+import org.semanticweb.elk.serialization.Deserializers;
+import org.semanticweb.elk.serialization.ElkSerializationException;
 
 /**
  * Implements {@link CachedIndexedObjectProperty}
@@ -253,6 +262,48 @@ final class CachedIndexedObjectPropertyImpl
 	public CachedIndexedObjectProperty accept(
 			CachedIndexedPropertyChain.Filter filter) {
 		return filter.filter(this);
+	}
+
+	private static final Deserializer<SerializationContext> DESERIALIZER = new Deserializer<SerializationContext>() {
+
+		@Override
+		public byte getSerialId() {
+			return 10;
+		}
+
+		@Override
+		public Object read(final DataInputStream input,
+				final SerializationContext context)
+				throws IOException, ElkSerializationException {
+
+			final ElkIri iri = new ElkFullIri(input.readUTF());
+
+			final ElkObjectProperty entity = context.getElkFactory()
+					.getObjectProperty(iri);
+
+			return context.getIndexedObjectFactory()
+					.getIndexedObjectProperty(entity);
+		}
+
+	};
+
+	static {
+		Deserializers.register(DESERIALIZER);
+	}
+
+	@Override
+	public Deserializer<SerializationContext> getDeserializer() {
+		return DESERIALIZER;
+	}
+
+	@Override
+	public void write(final DataOutputStream output)
+			throws IOException, ElkSerializationException {
+
+		output.writeByte(getDeserializer().getSerialId());
+
+		output.writeUTF(getElkEntity().getIri().getFullIriAsString());
+
 	}
 
 }
