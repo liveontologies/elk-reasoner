@@ -634,6 +634,14 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	private boolean computeQuery(final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 
+		if (stageManager.axiomLoadingStage.isCompleted()) {
+			/*
+			 * First loading definitely occurred. If the condition is false, the
+			 * axiom loading stage will take care of the mode switch.
+			 */
+			trySetIncrementalMode();
+		}
+
 		// Load the query
 		try {
 			if (classExpressionQueryState_.indexQuery(classExpression)
@@ -657,6 +665,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 
 		// Complete all stages
 		getTaxonomy();
+		trySetIncrementalMode();// Computing taxonomy may swith the modes.
 		stageManager.classExpressionQueryStage.invalidateRecursive();
 		complete(stageManager.classExpressionQueryStage);
 
