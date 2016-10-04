@@ -130,6 +130,7 @@ public class TraceState implements
 					public void propertyBecameNotSaturated(
 							IndexedPropertyChain chain) {
 						clearObjectPropertyInferences();
+						clearIndexedAxiomInferences();
 					}
 				});
 	}

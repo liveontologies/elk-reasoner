@@ -31,12 +31,12 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
-import org.semanticweb.elk.reasoner.incremental.NonIncrementalChangeListener;
+import org.semanticweb.elk.reasoner.incremental.AxiomLoadingListener;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverter;
 
 /**
  * A delegating visitor which notifies the provided
- * {@link NonIncrementalChangeListener} that some axiom represents a change
+ * {@link AxiomLoadingListener} that some axiom represents a change
  * which cannot be processed incrementally by the reasoner
  * 
  * @author Pavel Klinov
@@ -46,10 +46,10 @@ import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverter;
 public class NonIncrementalElkAxiomVisitor extends DelegatingElkAxiomVisitor<Void>
 		implements ElkAxiomConverter {
 
-	private final NonIncrementalChangeListener<ElkAxiom> listener_;
+	private final AxiomLoadingListener<ElkAxiom> listener_;
 
 	public NonIncrementalElkAxiomVisitor(ElkAxiomConverter visitor,
-			NonIncrementalChangeListener<ElkAxiom> listener) {
+			AxiomLoadingListener<ElkAxiom> listener) {
 		super(visitor);
 		listener_ = listener;
 	}

@@ -1,14 +1,15 @@
 /**
  * 
  */
-package org.semanticweb.elk.loading;
+package org.semanticweb.elk.reasoner.incremental;
+
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,29 +28,21 @@ package org.semanticweb.elk.loading;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 
 /**
+ * TODO doc
+ * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-public class SimpleElkAxiomChange implements ElkAxiomChange {
+public interface AxiomLoadingListener<T> {
 
-	private final ElkAxiom axiom_;
-	
-	private final int multiplicity_;
-	
-	public SimpleElkAxiomChange(final ElkAxiom axiom, final int m) {
-		axiom_ = axiom;
-		multiplicity_ = m;
-	}
-	
-	@Override
-	public ElkAxiom getAxiom() {
-		return axiom_;
-	}
+	public void notify(T axiom);
 
-	@Override
-	public int getMultiplicity() {
-		return multiplicity_;
-	}
+	public static AxiomLoadingListener<ElkAxiom> DUMMY = new AxiomLoadingListener<ElkAxiom>() {
 
+		@Override
+		public void notify(ElkAxiom axiom) {
+			// does nothing
+		}
+	};
 }
