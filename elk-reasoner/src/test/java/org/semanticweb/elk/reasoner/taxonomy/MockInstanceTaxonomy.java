@@ -243,7 +243,6 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 		// the final cleanup
 		parentMap.remove(node);
 		childrenMap.remove(node);
-		instanceTypeMap.remove(node);
 	}
 
 	/**

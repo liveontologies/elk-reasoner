@@ -149,7 +149,7 @@ public class ConclusionPrinter implements Conclusion.Visitor<String> {
 
 	@Override
 	public String visit(SubContextInitialization conclusion) {
-		return String.format("![C:R]", conclusion.getDestination(),
+		return String.format("![%s:%s]", conclusion.getDestination(),
 				conclusion.getSubDestination());
 	}
 

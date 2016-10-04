@@ -114,7 +114,7 @@ public class ObjectIntersectionFromFirstConjunctRule extends
 		if (rule == null)
 			return false;
 		boolean success = removeFrom(rule);
-		if (success & rule.isEmpty()) {
+		if (success && rule.isEmpty()) {
 			ruleChain.remove(MATCHER_);
 		}
 		return success;

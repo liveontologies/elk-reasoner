@@ -144,7 +144,7 @@ public class Reasoner extends AbstractReasonerState {
 	}
 
 	@Override
-	protected int getNumberOfWorkers() {
+	protected synchronized int getNumberOfWorkers() {
 		return workerNo_;
 	}
 
@@ -187,7 +187,7 @@ public class Reasoner extends AbstractReasonerState {
 	}
 
 	@Override
-	protected ProgressMonitor getProgressMonitor() {
+	protected synchronized ProgressMonitor getProgressMonitor() {
 		return progressMonitor;
 	}
 
