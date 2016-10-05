@@ -370,7 +370,7 @@ public class ClassExpressionQueryState {
 			classExpression.accept(removingExpressionConverter_);
 
 			final QueryState state = queried_.remove(classExpression);
-			queried_.remove(state.query);
+			indexed_.remove(state.query);
 			if (state.isComputed) {
 				if (state.node != null) {
 					removeAllRelated(state.query, state.node);
