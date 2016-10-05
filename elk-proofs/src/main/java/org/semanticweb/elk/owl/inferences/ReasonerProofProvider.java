@@ -112,7 +112,7 @@ public class ReasonerProofProvider
 					Matcher matcher = new Matcher(
 							reasoner_.explainConclusion(conclusion),
 							elkFactory_, inferences);
-					matcher.trace(conclusion);
+					matcher.trace(conclusion, elkFactory_.getOwlThing());
 					return true;
 				}
 
@@ -126,7 +126,7 @@ public class ReasonerProofProvider
 					Matcher matcher = new Matcher(
 							reasoner_.explainConclusion(conclusion),
 							elkFactory_, inferences);
-					matcher.trace(conclusion);
+					matcher.trace(conclusion, entity);
 					return true;
 				}
 
@@ -141,7 +141,7 @@ public class ReasonerProofProvider
 					Matcher matcher = new Matcher(
 							reasoner_.explainConclusion(conclusion),
 							elkFactory_, inferences);
-					matcher.trace(conclusion);
+					matcher.trace(conclusion, subClass);
 					return true;
 				}
 
@@ -152,7 +152,7 @@ public class ReasonerProofProvider
 					Matcher matcher = new Matcher(
 							reasoner_.explainConclusion(conclusion),
 							elkFactory_, inferences);
-					matcher.trace(conclusion);
+					matcher.trace(conclusion, subClass, superClass);
 					return true;
 				}
 
