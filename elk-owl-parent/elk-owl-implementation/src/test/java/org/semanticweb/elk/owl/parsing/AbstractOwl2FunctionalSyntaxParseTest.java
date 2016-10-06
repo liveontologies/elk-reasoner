@@ -374,7 +374,7 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 	@Test
 	public void testSWRL() throws Owl2ParseException {
 		String testString = "Prefix(:=<www.example.org>) "
-				+ "Ontology(<www.example.org#swrl-rule-test> " + "DLSafeRule( "
+				+ "Ontology(<http://www.example.org#swrl-rule-test> " + "DLSafeRule( "
 				+ "Body( " + "ClassAtom(:A Variable(:x)) " + ") " + "Head( "
 				+ "ClassAtom(:B Variable(:x) ) ) ) )";
 

@@ -303,7 +303,7 @@ public class ElkReasonerTest {
 			// ************************************
 
 			OWLImportsDeclaration importA = new OWLImportsDeclarationImpl(
-					IRI.create("/impA"));
+					IRI.create("http://www.example.com#impA"));
 			OWLOntologyChange change = new RemoveImport(root, importA);
 			man.applyChange(change);
 			reasoner.flush();
@@ -373,11 +373,11 @@ public class ElkReasonerTest {
 			// ************************************
 
 			OWLImportsDeclaration importA = new OWLImportsDeclarationImpl(
-					IRI.create("/impA"));
+					IRI.create("http://www.example.com#impA"));
 			OWLOntologyChange change = new RemoveImport(root, importA);
 			man.applyChange(change);
 			OWLImportsDeclaration importB = new OWLImportsDeclarationImpl(
-					IRI.create("/impB"));
+					IRI.create("http://www.example.com#impB"));
 			change = new AddImport(root, importB);
 			man.applyChange(change);
 			OWLSubClassOfAxiom axiom = dataFactory.getOWLSubClassOfAxiom(mainY, extB);
@@ -540,7 +540,7 @@ public class ElkReasonerTest {
 		@Override
 		public IRI getDocumentIRI(IRI ontologyIRI) {
 			// and the prefix to the ontology
-			return IRI.create(root + "/" + ontologyIRI + ".owl");
+			return IRI.create(root + "/" + ontologyIRI.getShortForm() + ".owl");
 		}
 	}
 }
