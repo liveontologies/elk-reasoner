@@ -35,27 +35,25 @@ public class CachedTimeThread extends Thread {
 	 */
 	private static final int UPDATE_FREQUENCY_ = 1;
 
+	private static final CachedTimeThread INSTANCE_ = new CachedTimeThread("elk-timer-thread"); 
+	
 	/**
 	 * the current time in milliseconds delayed by at most 10 milliseconds the
 	 * value that would be returned by {@link System#currentTimeMillis()}
 	 */
-	public static volatile long currentTimeMillis = System.currentTimeMillis();
+	private volatile long currentTimeMillis_ = System.currentTimeMillis();
 
-	CachedTimeThread() {
-		setDaemon(true);
-	}
-
-	CachedTimeThread(String name) {
+	private CachedTimeThread(String name) {
 		super(name);
 		setDaemon(true);
 	}
 
 	static {
-		new CachedTimeThread("elk-timer-thread").start();
+		INSTANCE_.start();
 	}
 
 	public static long getCurrentTimeMillis() {
-		return currentTimeMillis;
+		return INSTANCE_.currentTimeMillis_;
 	}
 
 	@Override
@@ -63,8 +61,8 @@ public class CachedTimeThread extends Thread {
 		for (;;) {
 			long newTime = System.currentTimeMillis();
 			// make sure the time changes monotonically
-			if (newTime > currentTimeMillis)
-				currentTimeMillis = newTime;
+			if (newTime > currentTimeMillis_)
+				currentTimeMillis_ = newTime;
 
 			try {
 				Thread.sleep(UPDATE_FREQUENCY_);

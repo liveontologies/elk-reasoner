@@ -111,10 +111,14 @@ public class IOUtils {
 
 	public static List<String> getResourceNamesFromDir(File dir,
 			String extension) {
+		String[] dirContent = dir
+				.list(FileUtils.getExtBasedFilenameFilter(extension));
+		if (dirContent == null) {
+			throw new RuntimeException("Not a directory: " + dir);
+		}
 		List<String> testResources = new ArrayList<String>();
 
-		for (String fileName : dir.list(FileUtils
-				.getExtBasedFilenameFilter(extension))) {
+		for (String fileName : dirContent) {
 			testResources.add(dir.getName() + "/" + fileName);
 		}
 
@@ -178,6 +182,10 @@ public class IOUtils {
 
 		} finally {
 			closeQuietly(stream);
+		}
+		
+		if (line == null) {
+			throw new IOException("Cannot read from " + src);
 		}
 
 		return Integer.parseInt(line, radix);

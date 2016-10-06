@@ -485,8 +485,12 @@ public class ElkTimer {
 	public static ElkTimer getNamedTimer(String timerName, int todoFlags,
 			long threadId) {
 		ElkTimer key = new ElkTimer(timerName, todoFlags, threadId);
-		registeredTimers.putIfAbsent(key, key);
-		return registeredTimers.get(key);
+		ElkTimer previous = registeredTimers.putIfAbsent(key, key);
+		if (previous != null) {
+			return previous;
+		}
+		// else
+		return key;
 	}
 
 	/**

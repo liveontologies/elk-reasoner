@@ -251,10 +251,10 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		/*
 		 * waking up all waiting workers
 		 */
-		synchronized (countContextsSaturatedLower_) {
+		synchronized (this) {
 			if (workersWaiting_) {
 				workersWaiting_ = false;
-				countContextsSaturatedLower_.notifyAll();
+				notifyAll();
 			}
 		}
 	}
@@ -351,9 +351,9 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 			/*
 			 * waking up all workers waiting for new saturated contexts
 			 */
-			synchronized (countContextsSaturatedLower_) {
+			synchronized (this) {
 				workersWaiting_ = false;
-				countContextsSaturatedLower_.notifyAll();
+				notifyAll();
 			}
 		}
 		/*
@@ -546,7 +546,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				int snapshotCountSaturated = countContextsSaturatedLower_.get();
 				if (saturationState_.getContextMarkNonSaturatedCount()
 						- snapshotCountSaturated > threshold_) {
-					synchronized (countContextsSaturatedLower_) {
+					synchronized (this) {
 						workersWaiting_ = true;
 						stats_.locks++;
 						/*
@@ -561,10 +561,10 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 							 * workers should be notified
 							 */
 							workersWaiting_ = false;
-							countContextsSaturatedLower_.notifyAll();
+							notifyAll();
 							continue;
 						}
-						countContextsSaturatedLower_.wait();
+						wait();
 						continue;
 					}
 				}

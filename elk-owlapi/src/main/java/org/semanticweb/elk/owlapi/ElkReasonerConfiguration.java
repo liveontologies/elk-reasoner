@@ -28,6 +28,7 @@ package org.semanticweb.elk.owlapi;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.FreshEntityPolicy;
 import org.semanticweb.owlapi.reasoner.IndividualNodeSetPolicy;
+import org.semanticweb.owlapi.reasoner.NullReasonerProgressMonitor;
 import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.ReasonerProgressMonitor;
 import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
@@ -54,7 +55,7 @@ public class ElkReasonerConfiguration implements OWLReasonerConfiguration {
 	}
 
 	public ElkReasonerConfiguration() {
-		this(getDefaultOwlReasonerConfiguration(null), ReasonerConfiguration
+		this(getDefaultOwlReasonerConfiguration(), ReasonerConfiguration
 				.getConfiguration());
 	}
 
@@ -71,6 +72,11 @@ public class ElkReasonerConfiguration implements OWLReasonerConfiguration {
 			ReasonerProgressMonitor monitor) {
 		return new SimpleConfiguration(monitor, FreshEntityPolicy.ALLOW, 0,
 				IndividualNodeSetPolicy.BY_NAME);
+	}
+	
+	public static OWLReasonerConfiguration getDefaultOwlReasonerConfiguration() {
+		return getDefaultOwlReasonerConfiguration(
+				new NullReasonerProgressMonitor());
 	}
 
 	@Override
