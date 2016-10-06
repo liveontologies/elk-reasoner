@@ -88,9 +88,11 @@ public class OwlChangesLoader extends AbstractAxiomLoader implements
 					throw exception;
 				}
 
-				ElkLoadingException error = change
-						.accept(new OwlOntologyChangeProcessorVisitor(
-								axiomInserter, axiomDeleter));
+				OwlOntologyChangeProcessorVisitor loader = new OwlOntologyChangeProcessorVisitor(
+						axiomInserter, axiomDeleter);
+
+				change.accept(loader);
+				ElkLoadingException error = loader.getError();
 
 				if (error != null) {
 					LOGGER_.error(error.getMessage(), error);

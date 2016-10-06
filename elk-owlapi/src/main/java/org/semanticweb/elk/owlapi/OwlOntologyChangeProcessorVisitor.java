@@ -29,7 +29,7 @@ import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.AddImport;
 import org.semanticweb.owlapi.model.AddOntologyAnnotation;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
-import org.semanticweb.owlapi.model.OWLOntologyChangeVisitorEx;
+import org.semanticweb.owlapi.model.OWLOntologyChangeVisitor;
 import org.semanticweb.owlapi.model.RemoveAxiom;
 import org.semanticweb.owlapi.model.RemoveImport;
 import org.semanticweb.owlapi.model.RemoveOntologyAnnotation;
@@ -38,7 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 class OwlOntologyChangeProcessorVisitor implements
-		OWLOntologyChangeVisitorEx<ElkLoadingException> {
+		OWLOntologyChangeVisitor {
 
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
@@ -48,6 +48,8 @@ class OwlOntologyChangeProcessorVisitor implements
 			.getInstance();
 
 	private final ElkAxiomProcessor axiomInserter_, axiomDeleter_;
+	
+	private ElkLoadingException error_ = null;
 
 	OwlOntologyChangeProcessorVisitor(ElkAxiomProcessor axiomInserter,
 			ElkAxiomProcessor axiomDeleter) {
@@ -55,13 +57,17 @@ class OwlOntologyChangeProcessorVisitor implements
 		this.axiomDeleter_ = axiomDeleter;
 	}
 
-	protected static ElkLoadingException defaultVisit(OWLOntologyChange change) {
-		return new ElkLoadingException("Ontology change " + change.toString()
-				+ " is not supported");
+	protected void defaultVisit(OWLOntologyChange change) {
+		error_ = new ElkLoadingException(
+				"Ontology change " + change.toString() + " is not supported");
+	}
+	
+	public ElkLoadingException getError() {
+		return error_;
 	}
 
 	@Override
-	public ElkLoadingException visit(RemoveAxiom arg) {
+	public void visit(RemoveAxiom arg) {
 		ElkAxiom elkAxiom = OWL_CONVERTER_.convert(arg.getAxiom());
 
 		axiomDeleter_.visit(elkAxiom);
@@ -69,11 +75,10 @@ class OwlOntologyChangeProcessorVisitor implements
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace("removing " + arg.getAxiom());
 
-		return null;
 	}
 
 	@Override
-	public ElkLoadingException visit(AddAxiom arg) {
+	public void visit(AddAxiom arg) {
 		ElkAxiom elkAxiom = OWL_CONVERTER_.convert(arg.getAxiom());
 
 		axiomInserter_.visit(elkAxiom);
@@ -81,32 +86,31 @@ class OwlOntologyChangeProcessorVisitor implements
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace("adding " + arg.getAxiom());
 
-		return null;
 	}
 
 	@Override
-	public ElkLoadingException visit(SetOntologyID change) {
-		return defaultVisit(change);
+	public void visit(SetOntologyID change) {
+		defaultVisit(change);
 	}
 
 	@Override
-	public ElkLoadingException visit(AddImport change) {
-		return defaultVisit(change);
+	public void visit(AddImport change) {
+		defaultVisit(change);
 	}
 
 	@Override
-	public ElkLoadingException visit(RemoveImport change) {
-		return defaultVisit(change);
+	public void visit(RemoveImport change) {
+		defaultVisit(change);
 	}
 
 	@Override
-	public ElkLoadingException visit(AddOntologyAnnotation change) {
-		return defaultVisit(change);
+	public void visit(AddOntologyAnnotation change) {
+		defaultVisit(change);
 	}
 
 	@Override
-	public ElkLoadingException visit(RemoveOntologyAnnotation change) {
-		return defaultVisit(change);
+	public void visit(RemoveOntologyAnnotation change) {
+		defaultVisit(change);
 	}
 
 }
