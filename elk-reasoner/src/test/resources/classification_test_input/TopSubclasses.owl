@@ -2,8 +2,8 @@ Prefix(rdf: = <http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
 Prefix(rdfs: = <http://www.w3.org/2000/01/rdf-schema#>)
 Prefix(xsd: = <http://www.w3.org/2001/XMLSchema#>)
 Prefix(owl: = <http://www.w3.org/2002/07/owl#>)
-Prefix(: = <www.example.org#>)
-Ontology(<www.example.org/top_subclasses>
+Prefix(: = <http://example.org#>)
+Ontology(<http://example.org/top_subclasses>
    SubClassOf(:A :B)
    SubClassOf(:A owl:Thing)
 )

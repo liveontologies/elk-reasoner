@@ -34,7 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.owl.visitors.DummyElkObjectVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
-import org.semanticweb.elk.reasoner.incremental.NonIncrementalChangeListener;
+import org.semanticweb.elk.reasoner.incremental.AxiomLoadingListener;
 import org.semanticweb.elk.reasoner.indexing.classes.ChangeIndexingProcessor;
 import org.semanticweb.elk.reasoner.indexing.classes.DummyIndexedObjectVisitor;
 import org.semanticweb.elk.reasoner.indexing.classes.NonIncrementalElkAxiomVisitor;
@@ -139,7 +139,7 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 		 * The listener used to count axioms and detect if the axiom cannot be
 		 * loaded incrementally
 		 */
-		NonIncrementalChangeListener<ElkAxiom> listener = new NonIncrementalChangeListener<ElkAxiom>() {
+		AxiomLoadingListener<ElkAxiom> listener = new AxiomLoadingListener<ElkAxiom>() {
 
 			boolean resetDone = false;
 

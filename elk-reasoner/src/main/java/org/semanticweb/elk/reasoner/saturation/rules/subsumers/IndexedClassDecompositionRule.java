@@ -107,7 +107,7 @@ public class IndexedClassDecompositionRule extends
 		// else
 		boolean success = index.tryRemoveDefinition(definedClass, definition,
 				reason);
-		if (success & LOGGER_.isTraceEnabled()) {
+		if (success && LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace("{}: removed definition {} from {}", definedClass,
 					definition, reason);
 		}

@@ -139,7 +139,7 @@ public class EmptyImportTest {
 		@Override
 		public IRI getDocumentIRI(IRI ontologyIRI) {
 			// and the prefix to the ontology
-			return IRI.create(root + "/" + ontologyIRI + ".owl");
+			return IRI.create(root + "/" + ontologyIRI.getShortForm() + ".owl");
 		}
 	}
 

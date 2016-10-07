@@ -40,52 +40,59 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.DerivedClassCon
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 
 public class ReasonerProofProvider
-		extends DummyElkAxiomVisitor<ElkInferenceSet> {
+		extends DummyElkAxiomVisitor<Void> {
 
 	private final Reasoner reasoner_;
 
 	private final ElkObject.Factory elkFactory_;
 
 	private final ElkInference.Factory inferenceFactory_ = new ElkInferenceBaseFactory();
+	
+	private final ModifiableElkInferenceSet inferenceCache_;
 
 	public ReasonerProofProvider(Reasoner reasoner,
 			ElkObject.Factory elkFactory) {
 		this.reasoner_ = reasoner;
 		this.elkFactory_ = elkFactory;
+		this.inferenceCache_ = new ModifiableElkInferenceSetImpl(elkFactory_);
 	}
 
 	public ElkInferenceSet getInferences(ElkAxiom axiom) {
-		return axiom.accept(this);
+		if (inferenceCache_.get(axiom).isEmpty()) {
+			// compute
+			axiom.accept(this);	
+		}
+		return inferenceCache_;		
 	}
 
 	@Override
-	public ElkInferenceSet defaultVisit(ElkAxiom axiom) {
+	public Void defaultVisit(ElkAxiom axiom) {
 		throw new ElkRuntimeException("Cannot generate proof for " + axiom);
 	}
 
 	@Override
-	public ElkInferenceSet visit(ElkSubClassOfAxiom axiom) {
-		final ModifiableElkInferenceSet result = new ModifiableElkInferenceSetImpl(
-				elkFactory_);
-		addInferencesForSubsumption(result, axiom.getSubClassExpression(),
+	public Void visit(ElkSubClassOfAxiom axiom) {
+		addInferencesForSubsumption(inferenceCache_, axiom.getSubClassExpression(),
 				axiom.getSuperClassExpression());
-		return result;
+		return null;
 	}
 
 	@Override
-	public ElkInferenceSet visit(ElkEquivalentClassesAxiom axiom) {
-		final ModifiableElkInferenceSet result = new ModifiableElkInferenceSetImpl(
-				elkFactory_);
+	public Void visit(ElkEquivalentClassesAxiom axiom) {
 		List<? extends ElkClassExpression> equivalent = axiom
 				.getClassExpressions();
 		ElkClassExpression first = equivalent.get(equivalent.size() - 1);
 		for (ElkClassExpression second : equivalent) {
-			addInferencesForSubsumption(result, first, second);
+			addInferencesForSubsumption(inferenceCache_, first, second);
 			first = second;
 		}
-		result.produce(
+		inferenceCache_.produce(
 				inferenceFactory_.getElkEquivalentClassesCycle(equivalent));
-		return result;
+		return null;
+	}
+	
+	public void clearInferenceCache() {
+		inferenceCache_.clear();		
 	}
 
 	private void addInferencesForSubsumption(
@@ -105,7 +112,7 @@ public class ReasonerProofProvider
 					Matcher matcher = new Matcher(
 							reasoner_.explainConclusion(conclusion),
 							elkFactory_, inferences);
-					matcher.trace(conclusion);
+					matcher.trace(conclusion, elkFactory_.getOwlThing());
 					return true;
 				}
 
@@ -119,7 +126,7 @@ public class ReasonerProofProvider
 					Matcher matcher = new Matcher(
 							reasoner_.explainConclusion(conclusion),
 							elkFactory_, inferences);
-					matcher.trace(conclusion);
+					matcher.trace(conclusion, entity);
 					return true;
 				}
 
@@ -134,7 +141,7 @@ public class ReasonerProofProvider
 					Matcher matcher = new Matcher(
 							reasoner_.explainConclusion(conclusion),
 							elkFactory_, inferences);
-					matcher.trace(conclusion);
+					matcher.trace(conclusion, subClass);
 					return true;
 				}
 
@@ -145,7 +152,7 @@ public class ReasonerProofProvider
 					Matcher matcher = new Matcher(
 							reasoner_.explainConclusion(conclusion),
 							elkFactory_, inferences);
-					matcher.trace(conclusion);
+					matcher.trace(conclusion, subClass, superClass);
 					return true;
 				}
 

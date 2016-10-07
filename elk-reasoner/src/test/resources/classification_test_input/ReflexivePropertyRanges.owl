@@ -3,7 +3,7 @@ Prefix(rdf: = <http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
 Prefix(rdfs: = <http://www.w3.org/2000/01/rdf-schema#>)
 Prefix(xsd: = <http://www.w3.org/2001/XMLSchema#>)
 Prefix(owl: = <http://www.w3.org/2002/07/owl#>)
-Ontology(<www.example.org#reflexive_property_ranges>
+Ontology(<http://example.org#reflexive_property_ranges>
 Annotation(rdfs:label ":S is reflexive since it is a super-property of a reflexive property; since it has range :A then :A should be equivalent to owl:Thing")
 
 SubObjectPropertyOf(:R :S)

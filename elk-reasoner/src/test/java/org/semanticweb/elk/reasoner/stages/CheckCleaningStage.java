@@ -62,11 +62,11 @@ public class CheckCleaningStage extends BasePostProcessingStage {
 
 	@Override
 	public void execute() throws ElkException {
-		Set<Context> cleanedContexts = new ArrayHashSet<Context>(1024);
+		Set<IndexedContextRoot> cleanedContexts = new ArrayHashSet<IndexedContextRoot>(1024);
 		// checking subsumers of cleaned contexts
 		for (Context context : reasoner_.saturationState
 				.getNotSaturatedContexts()) {
-			cleanedContexts.add(context);
+			cleanedContexts.add(context.getRoot());
 			if (!context.getComposedSubsumers().isEmpty()) {
 				LOGGER_.error(
 						"{}: context not cleaned: there are {} subsumers: {}",

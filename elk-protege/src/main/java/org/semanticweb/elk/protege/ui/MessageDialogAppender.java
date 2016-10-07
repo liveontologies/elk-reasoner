@@ -80,9 +80,7 @@ public class MessageDialogAppender extends AppenderBase<ILoggingEvent> implement
 	@Override
 	public void stop() {
 		super.stop();
-		synchronized (eventBuffer_) {
-			eventBuffer_.clear(); // shoot the messenger
-		}
+		eventBuffer_.clear(); // shoot the messenger
 	}
 
 	/**
@@ -151,11 +149,12 @@ public class MessageDialogAppender extends AppenderBase<ILoggingEvent> implement
 				.getFormattedMessage());
 		String messageType = null;
 
-		if (elkMessage != null) {
-			messageType = elkMessage.getMessageType();
-			if (supperssedMessages_.checkSuppressed(messageType))
-				return false;
+		if (elkMessage == null) {
+			return false;
 		}
+		messageType = elkMessage.getMessageType();
+		if (supperssedMessages_.checkSuppressed(messageType))
+			return false;
 
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));

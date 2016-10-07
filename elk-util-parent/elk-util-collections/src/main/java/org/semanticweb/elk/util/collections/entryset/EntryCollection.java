@@ -124,7 +124,7 @@ public class EntryCollection<E extends Entry<?, E>>
 	 * field is used to make iterators on Collection-views of the HashMap
 	 * fail-fast. (See ConcurrentModificationException).
 	 */
-	transient volatile int modCount;
+	transient int modCount;
 
 	/**
 	 * Constructs an empty {@link EntryCollection} with the specified initial
@@ -193,7 +193,7 @@ public class EntryCollection<E extends Entry<?, E>>
 		this.overloadFactor = DEFAULT_OVERLOAD_FACTOR;
 		undersize = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_UNDERLOAD_FACTOR);
 		oversize = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_OVERLOAD_FACTOR);
-		buckets = (E[]) new Object[DEFAULT_INITIAL_CAPACITY];
+		buckets = (E[]) new Entry[DEFAULT_INITIAL_CAPACITY];
 		init();
 	}
 

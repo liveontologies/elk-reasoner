@@ -73,20 +73,18 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProper
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
 
 /**
- * A {@link ModifiableIndexedObject.Factory} which can only create object present
- * in the provided {@link ModifiableIndexedObjectCache} or (new) not cacheable
- * objects. If a created object is cacheable and there is no structurally
- * equivalent object in the provided {@link ModifiableIndexedObjectCache},
- * {@code null} is returned.
+ * A {@link ModifiableIndexedObject.Factory} which can only create objects
+ * present in the provided {@link ModifiableIndexedObjectCache} or (new) not
+ * cacheable objects. If a created object is cacheable and there is no
+ * structurally equivalent object in the provided
+ * {@link ModifiableIndexedObjectCache}, {@code null} is returned.
  * 
  * @author "Yevgeny Kazakov"
  *
  */
 public class ResolvingModifiableIndexedObjectFactory
-		extends
-			ResolvingCachedIndexedObjectFactory
-		implements
-			ModifiableIndexedObject.Factory {
+		extends ResolvingCachedIndexedObjectFactory
+		implements ModifiableIndexedObject.Factory {
 
 	private final ModifiableIndexedObject.Factory baseFactory_;
 
@@ -98,7 +96,7 @@ public class ResolvingModifiableIndexedObjectFactory
 
 	public ResolvingModifiableIndexedObjectFactory(
 			ModifiableIndexedObjectCache cache) {
-		this(new BaseModifiableIndexedObjectFactory(), cache);
+		this(new NullableModifiableIndexedObjectFactory(), cache);
 	}
 
 	@SuppressWarnings("static-method")
@@ -179,8 +177,9 @@ public class ResolvingModifiableIndexedObjectFactory
 			ElkDisjointUnionAxiom originalAxiom,
 			ModifiableIndexedClass definedClass,
 			ModifiableIndexedClassExpression definition) {
-		return filter(baseFactory_.getElkDisjointUnionAxiomEquivalenceConversion(
-				originalAxiom, definedClass, definition));
+		return filter(
+				baseFactory_.getElkDisjointUnionAxiomEquivalenceConversion(
+						originalAxiom, definedClass, definition));
 	}
 
 	@Override
@@ -196,9 +195,8 @@ public class ResolvingModifiableIndexedObjectFactory
 			ElkDisjointUnionAxiom originalAxiom,
 			ModifiableIndexedClass definedClass,
 			ModifiableIndexedClass bottom) {
-		return filter(baseFactory_
-				.getElkDisjointUnionAxiomOwlNothingConversion(
-						originalAxiom, definedClass, bottom));
+		return filter(baseFactory_.getElkDisjointUnionAxiomOwlNothingConversion(
+				originalAxiom, definedClass, bottom));
 	}
 
 	@Override
@@ -213,12 +211,13 @@ public class ResolvingModifiableIndexedObjectFactory
 	@Override
 	public ModifiableElkEquivalentClassesAxiomEquivalenceConversion getElkEquivalentClassesAxiomEquivalenceConversion(
 			ElkEquivalentClassesAxiom originalAxiom, int definedClassPosition,
-			int secondMemberPosition, ModifiableIndexedClassExpression firstMember,
+			int secondMemberPosition,
+			ModifiableIndexedClassExpression firstMember,
 			ModifiableIndexedClassExpression secondMember) {
 		return filter(
 				baseFactory_.getElkEquivalentClassesAxiomEquivalenceConversion(
-						originalAxiom, definedClassPosition, secondMemberPosition,
-						firstMember, secondMember));
+						originalAxiom, definedClassPosition,
+						secondMemberPosition, firstMember, secondMember));
 	}
 
 	@Override

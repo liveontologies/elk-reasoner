@@ -61,7 +61,7 @@ public class RetrievingProofsForEntailment {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 
 		// Load your ontology.
-		OWLOntology ont = manager.loadOntologyFromOntologyDocument(new File("/home/pavel/ulm/data/galens/EL-GALEN.owl"));
+		OWLOntology ont = manager.loadOntologyFromOntologyDocument(new File("/path/to/your/ontology/ontology.owl"));
 		
 		// Create an instance of ELK
 		ElkProverFactory proverFactory = new ElkProverFactory();

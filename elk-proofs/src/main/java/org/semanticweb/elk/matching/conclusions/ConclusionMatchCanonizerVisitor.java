@@ -25,6 +25,7 @@ package org.semanticweb.elk.matching.conclusions;
 import java.util.Collections;
 import java.util.List;
 
+import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.subsumers.SubsumerEmptyObjectIntersectionOfMatch;
 import org.semanticweb.elk.matching.subsumers.SubsumerEmptyObjectOneOfMatch;
@@ -87,7 +88,7 @@ public class ConclusionMatchCanonizerVisitor
 			@Override
 			protected Boolean defaultVisit(SubsumerNonCanonicalMatch match) {
 				// fail fast if some case is forgotten
-				return null;
+				throw new ElkRuntimeException(match + ": missing case");
 			}
 
 			@Override
@@ -229,7 +230,7 @@ public class ConclusionMatchCanonizerVisitor
 			@Override
 			protected Boolean defaultVisit(SubsumerNonCanonicalMatch match) {
 				// fail fast if some case is forgotten
-				return null;
+				throw new ElkRuntimeException(match + ": mssing case");
 			}
 
 			@Override

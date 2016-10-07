@@ -9,7 +9,7 @@ Prefix(B:=<http://www.example.com/B#>)
 
 Ontology(<http://www.example.com/A>
 
-Import(</impB>)
+Import(<http://www.example.com#impB>)
 
 SubClassOf(A:A B:B)
 

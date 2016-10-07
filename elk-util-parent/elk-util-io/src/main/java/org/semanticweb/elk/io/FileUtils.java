@@ -76,8 +76,9 @@ public class FileUtils {
 
 	public static void deleteRecursively(File file, boolean deleteOnExit)
 			throws IOException {
-		if (file.isDirectory()) {
-			for (File c : file.listFiles())
+		File[] directoryFiles;
+		if ((directoryFiles = file.listFiles()) != null) {
+			for (File c : directoryFiles)
 				deleteRecursively(c);
 		}
 

@@ -116,8 +116,14 @@ public class ComputeExpectedTaxonomies {
 		configuraion.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS,
 				"1");
 
-		for (File ontFile : srcDir.listFiles(FileUtils
-				.getExtBasedFilenameFilter("owl"))) {
+		File[] ontFiles = srcDir.listFiles(FileUtils
+				.getExtBasedFilenameFilter("owl"));
+		
+		if (ontFiles == null) {
+			throw new RuntimeException("Not a directory: " + path);
+		}
+		
+		for (File ontFile : ontFiles) {
 
 			System.err.println(ontFile.getName());
 

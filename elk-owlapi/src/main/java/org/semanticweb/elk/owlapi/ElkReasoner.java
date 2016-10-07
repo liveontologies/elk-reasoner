@@ -1082,6 +1082,8 @@ public class ElkReasoner implements OWLReasoner {
 					ontologyReloadRequired_ = true;
 				} else {
 					bufferedChangesLoader_.registerChange(change);
+					// proofs should be recomputed
+					elkProofProvider_.clearInferenceCache();
 				}
 			}
 			if (!isBufferingMode_)

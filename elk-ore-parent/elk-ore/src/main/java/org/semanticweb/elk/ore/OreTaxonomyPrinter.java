@@ -261,7 +261,7 @@ public class OreTaxonomyPrinter {
 		}
 
 		for (ElkClass elkSubClass : orderedSubClasses)
-			if (!elkSubClass.getIri().equals(objectFactory.getOwlNothing())) {
+			if (!elkSubClass.getIri().equals(PredefinedElkIris.OWL_NOTHING)) {
 				ElkSubClassOfAxiom elkSubClassAxiom = objectFactory
 						.getSubClassOfAxiom(elkSubClass, elkClass);
 				OwlFunctionalStylePrinter

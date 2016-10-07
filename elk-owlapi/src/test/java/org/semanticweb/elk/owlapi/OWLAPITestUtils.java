@@ -75,7 +75,7 @@ public class OWLAPITestUtils {
 			ReasonerConfiguration config) {
 		return new ElkReasoner(ontology, false,
 				new ElkReasonerConfiguration(ElkReasonerConfiguration
-						.getDefaultOwlReasonerConfiguration(null), config));
+						.getDefaultOwlReasonerConfiguration(), config));
 
 	}
 

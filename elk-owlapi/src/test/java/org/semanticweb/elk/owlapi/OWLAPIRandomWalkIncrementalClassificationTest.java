@@ -156,7 +156,9 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 		} catch (Exception e) {
 			throw new ElkRuntimeException("Seed " + seed, e);
 		} finally {
-			incrementalReasoner.dispose();
+			if (incrementalReasoner != null) {
+				incrementalReasoner.dispose();
+			}
 			if (ontology != null) {
 				manager_.removeOntology(ontology);
 			}

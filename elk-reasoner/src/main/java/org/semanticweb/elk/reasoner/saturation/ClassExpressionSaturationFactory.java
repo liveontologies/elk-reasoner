@@ -25,6 +25,8 @@ package org.semanticweb.elk.reasoner.saturation;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
@@ -168,6 +170,11 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 */
 	private final ThisStatistics aggregatedStats_;
 
+	private final ReentrantLock stopWorkersLock_ = new ReentrantLock();
+
+	private final Condition thereAreContextsToProcess_ = stopWorkersLock_
+			.newCondition();
+
 	/**
 	 * Creates a new {@link ClassExpressionSaturationFactory} using the given
 	 * {@link RuleApplicationFactory}for applying the rules, the maximal number
@@ -251,11 +258,14 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		/*
 		 * waking up all waiting workers
 		 */
-		synchronized (countContextsSaturatedLower_) {
+		stopWorkersLock_.lock();
+		try {
 			if (workersWaiting_) {
 				workersWaiting_ = false;
-				countContextsSaturatedLower_.notifyAll();
+				thereAreContextsToProcess_.signalAll();
 			}
+		} finally {
+			stopWorkersLock_.unlock();
 		}
 	}
 
@@ -351,9 +361,12 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 			/*
 			 * waking up all workers waiting for new saturated contexts
 			 */
-			synchronized (countContextsSaturatedLower_) {
+			stopWorkersLock_.lock();
+			try {
 				workersWaiting_ = false;
-				countContextsSaturatedLower_.notifyAll();
+				thereAreContextsToProcess_.signalAll();
+			} finally {
+				stopWorkersLock_.unlock();
 			}
 		}
 		/*
@@ -546,7 +559,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				int snapshotCountSaturated = countContextsSaturatedLower_.get();
 				if (saturationState_.getContextMarkNonSaturatedCount()
 						- snapshotCountSaturated > threshold_) {
-					synchronized (countContextsSaturatedLower_) {
+					stopWorkersLock_.lock();
+					try {
 						workersWaiting_ = true;
 						stats_.locks++;
 						/*
@@ -561,11 +575,13 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 							 * workers should be notified
 							 */
 							workersWaiting_ = false;
-							countContextsSaturatedLower_.notifyAll();
+							thereAreContextsToProcess_.signalAll();
 							continue;
 						}
-						countContextsSaturatedLower_.wait();
+						thereAreContextsToProcess_.await();
 						continue;
+					} finally {
+						stopWorkersLock_.unlock();
 					}
 				}
 				J nextJob = jobsToDo_.poll();
