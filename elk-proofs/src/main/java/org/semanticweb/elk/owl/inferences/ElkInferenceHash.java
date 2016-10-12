@@ -128,7 +128,6 @@ public class ElkInferenceHash implements ElkInference.Visitor<Integer> {
 		return combinedHashCode(
 				hashCode(
 						ElkClassInclusionObjectIntersectionOfDecomposition.class),
-				hashCode(inference.getSubExpression()),
 				hashCode(inference.getConjuncts()),
 				hashCode(inference.getConjunctPos()));
 	}

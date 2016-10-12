@@ -1026,7 +1026,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 	@Override
 	public Void visit(ElkSubClassOfAxiomConversionMatch1 inferenceMatch1) {
 		inferenceMatch1.getConclusionMatch(conclusionFactory_);
-		
+
 		// creating ELK inferences
 		ElkSubClassOfAxiomConversion parent = inferenceMatch1.getParent();
 		ElkSubClassOfAxiom originalAxiom = parent.getOriginalAxiom();
@@ -1474,12 +1474,16 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		SubClassInclusionDecomposedFirstConjunctMatch1 inferenceMatch1 = inferenceMatch2
 				.getParent();
 		IndexedContextRootMatch originMatch = inferenceMatch1.getOriginMatch();
-
+		List<? extends ElkClassExpression> conjuncts = fullSubsumerMatch
+				.getClassExpressions();
+		int pos = 0; // of the decomposed conjunct
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
+				toElkExpression(originMatch),
+				conclusionFactory_.getObjectIntersectionOf(conjuncts),
+				conjuncts.get(pos));
 		elkInferenceFactory_
 				.getElkClassInclusionObjectIntersectionOfDecomposition(
-						toElkExpression(originMatch),
-						fullSubsumerMatch.getClassExpressions(), 0);
-
+						conjuncts, pos);
 		return null;
 	}
 
@@ -1511,12 +1515,16 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 				.getParent();
 		IndexedContextRootMatch originMatch = inferenceMatch1.getOriginMatch();
 
+		List<? extends ElkClassExpression> conjuncts = fullSubsumerMatch
+				.getClassExpressions();
+		int pos = subsumerPrefixLength - 1; // of the decomposed conjunct
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
+				toElkExpression(originMatch),
+				conclusionFactory_.getObjectIntersectionOf(conjuncts),
+				conjuncts.get(pos));
 		elkInferenceFactory_
 				.getElkClassInclusionObjectIntersectionOfDecomposition(
-						toElkExpression(originMatch),
-						fullSubsumerMatch.getClassExpressions(),
-						subsumerPrefixLength - 1);
-
+						conjuncts, pos);
 		return null;
 	}
 

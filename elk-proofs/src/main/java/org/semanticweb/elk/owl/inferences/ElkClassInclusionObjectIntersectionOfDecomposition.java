@@ -33,9 +33,8 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  * Represents the inference:
  * 
  * <pre>
- *  C ⊑ D1 ⊓ ... ⊓ Dn
  * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
- *       C ⊑ Di
+ *  D1 ⊓ ... ⊓ Dn ⊑ Di
  * </pre>
  * 
  * @author Yevgeny Kazakov
@@ -45,23 +44,15 @@ public class ElkClassInclusionObjectIntersectionOfDecomposition
 		extends AbstractElkInference {
 
 	private final static String NAME_ = "Conjunction Decomposition";
-	
-	private final ElkClassExpression subExpression_;
 
 	private final List<? extends ElkClassExpression> conjuncts_;
 
 	private final int conjunctPos_;
 
 	ElkClassInclusionObjectIntersectionOfDecomposition(
-			ElkClassExpression subExpression,
 			List<? extends ElkClassExpression> conjuncts, int conjunctPos) {
-		this.subExpression_ = subExpression;
 		this.conjuncts_ = conjuncts;
 		this.conjunctPos_ = conjunctPos;
-	}
-
-	public ElkClassExpression getSubExpression() {
-		return subExpression_;
 	}
 
 	public List<? extends ElkClassExpression> getConjuncts() {
@@ -76,29 +67,21 @@ public class ElkClassInclusionObjectIntersectionOfDecomposition
 	public String getName() {
 		return NAME_;
 	}
-	
+
 	@Override
 	public int getPremiseCount() {
-		return 1;
+		return 0;
 	}
 
 	@Override
 	public ElkAxiom getPremise(int index, ElkObject.Factory factory) {
-		if (index == 0) {
-			return getPremise(factory);
-		}
-		// else
 		return failGetPremise(index);
-	}
-
-	public ElkSubClassOfAxiom getPremise(ElkObject.Factory factory) {
-		return factory.getSubClassOfAxiom(subExpression_,
-				factory.getObjectIntersectionOf(conjuncts_));
 	}
 
 	@Override
 	public ElkSubClassOfAxiom getConclusion(ElkObject.Factory factory) {
-		return factory.getSubClassOfAxiom(subExpression_,
+		return factory.getSubClassOfAxiom(
+				factory.getObjectIntersectionOf(conjuncts_),
 				conjuncts_.get(conjunctPos_));
 	}
 
@@ -116,7 +99,6 @@ public class ElkClassInclusionObjectIntersectionOfDecomposition
 	public interface Factory {
 
 		ElkClassInclusionObjectIntersectionOfDecomposition getElkClassInclusionObjectIntersectionOfDecomposition(
-				ElkClassExpression subExpression,
 				List<? extends ElkClassExpression> conjuncts, int conjunctPos);
 
 	}

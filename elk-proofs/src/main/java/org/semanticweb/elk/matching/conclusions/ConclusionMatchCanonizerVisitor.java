@@ -303,11 +303,16 @@ public class ConclusionMatchCanonizerVisitor
 						.getClassExpressions().get(0);
 				conclusionFactory_.getSubClassInclusionDecomposedMatch2(parent,
 						conjunct);
-				// create ELK inference
+				// create ELK inferences
+				List<ElkClassExpression> conjuncts = Collections
+						.singletonList(conjunct);
+				elkInferenceFactory_.getElkClassInclusionHierarchy(
+						toElkExpression(destinationMatch),
+						conclusionFactory_.getObjectIntersectionOf(conjuncts),
+						conjunct);
 				elkInferenceFactory_
 						.getElkClassInclusionObjectIntersectionOfDecomposition(
-								toElkExpression(destinationMatch),
-								Collections.singletonList(conjunct), 0);
+								conjuncts, 0);
 				return true;
 			}
 

@@ -140,11 +140,10 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 
 	@Override
 	public ElkClassInclusionObjectIntersectionOfDecomposition getElkClassInclusionObjectIntersectionOfDecomposition(
-			ElkClassExpression subExpression,
 			List<? extends ElkClassExpression> conjuncts, int conjunctPos) {
 		return filter(mainFactory_
 				.getElkClassInclusionObjectIntersectionOfDecomposition(
-						subExpression, conjuncts, conjunctPos));
+						conjuncts, conjunctPos));
 	}
 
 	@Override

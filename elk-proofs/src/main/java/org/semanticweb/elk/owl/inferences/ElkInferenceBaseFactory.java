@@ -119,10 +119,9 @@ public class ElkInferenceBaseFactory implements ElkInference.Factory {
 
 	@Override
 	public ElkClassInclusionObjectIntersectionOfDecomposition getElkClassInclusionObjectIntersectionOfDecomposition(
-			ElkClassExpression subExpression,
 			List<? extends ElkClassExpression> conjuncts, int conjunctPos) {
-		return new ElkClassInclusionObjectIntersectionOfDecomposition(
-				subExpression, conjuncts, conjunctPos);
+		return new ElkClassInclusionObjectIntersectionOfDecomposition(conjuncts,
+				conjunctPos);
 	}
 
 	@Override

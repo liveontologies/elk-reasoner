@@ -176,10 +176,7 @@ public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 			@Override
 			public Boolean visit(
 					ElkClassInclusionObjectIntersectionOfDecomposition other) {
-				return equals(other.getSubExpression(),
-						inference.getSubExpression())
-						&& equals(other.getConjuncts(),
-								inference.getConjuncts())
+				return equals(other.getConjuncts(), inference.getConjuncts())
 						&& equals(other.getConjunctPos(),
 								inference.getConjunctPos());
 			}
