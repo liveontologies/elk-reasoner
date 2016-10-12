@@ -29,6 +29,7 @@ import org.liveontologies.owlapi.proof.OWLProofStep;
 
 import org.semanticweb.elk.owl.inferences.ElkInference;
 import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
+import org.semanticweb.elk.owl.inferences.ElkToldAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.util.collections.Operations;
@@ -65,6 +66,11 @@ public class ElkOWLProofNode implements OWLProofNode {
 
 					@Override
 					public OWLProofStep transform(ElkInference element) {
+						if (element instanceof ElkToldAxiom) {
+							// don't transform told axioms
+							return null;
+						}
+						// else
 						return new ElkOWLProofStep(element, elkInferences_,
 								elkFactory_);
 					}

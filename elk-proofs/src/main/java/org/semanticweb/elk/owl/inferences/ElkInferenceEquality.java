@@ -510,4 +510,14 @@ public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 		});
 	}
 
+	@Override
+	public Boolean visit(final ElkToldAxiom inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(ElkToldAxiom other) {
+				return equals(other.getAxiom(), inference.getAxiom());
+			}
+		});
+	}
+
 }

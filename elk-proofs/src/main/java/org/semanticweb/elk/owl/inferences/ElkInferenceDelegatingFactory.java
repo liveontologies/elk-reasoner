@@ -24,6 +24,7 @@ package org.semanticweb.elk.owl.inferences;
 
 import java.util.List;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
@@ -368,6 +369,11 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 			ElkObjectPropertyExpression subProperty) {
 		return filter(mainFactory_.getElkPropertyRangePropertyUnfolding(
 				superProperty, range, subProperty));
+	}
+
+	@Override
+	public ElkToldAxiom getElkToldAxiom(ElkAxiom axiom) {
+		return filter(mainFactory_.getElkToldAxiom(axiom));
 	}
 
 }

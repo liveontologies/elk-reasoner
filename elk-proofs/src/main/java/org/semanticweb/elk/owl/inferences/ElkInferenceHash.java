@@ -338,4 +338,10 @@ public class ElkInferenceHash implements ElkInference.Visitor<Integer> {
 				hashCode(inference.getRange()));
 	}
 
+	@Override
+	public Integer visit(ElkToldAxiom inference) {
+		return combinedHashCode(hashCode(ElkToldAxiom.class),
+				hashCode(inference.getAxiom()));
+	}
+
 }

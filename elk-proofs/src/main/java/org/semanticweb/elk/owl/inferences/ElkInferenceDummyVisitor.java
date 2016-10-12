@@ -225,4 +225,9 @@ public class ElkInferenceDummyVisitor<O> implements ElkInference.Visitor<O> {
 		return defaultVisit(inference);
 	}
 
+	@Override
+	public O visit(ElkToldAxiom inference) {
+		return defaultVisit(inference);
+	}
+
 }

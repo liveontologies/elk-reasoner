@@ -169,13 +169,16 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.model.ElkClassAssertionAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDifferentIndividualsAxiomBinaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDifferentIndividualsAxiomNaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointClassesAxiomBinaryConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointClassesAxiomNaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomBinaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDisjointUnionAxiomNaryConversion;
@@ -186,6 +189,8 @@ import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentClassesAxiomSubC
 import org.semanticweb.elk.reasoner.indexing.model.ElkEquivalentObjectPropertiesAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkObjectPropertyAssertionAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkSameIndividualAxiomConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkSubClassOfAxiomConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ElkSubObjectPropertyOfAxiomConversion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfDisjointSubsumers;
 
 class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
@@ -685,6 +690,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		elkInferenceFactory_.getElkClassInclusionOfClassAssertion(
 				originalAxiom.getIndividual(),
 				originalAxiom.getClassExpression());
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -710,6 +716,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		elkInferenceFactory_.getElkClassInclusionOfDisjointClasses(disjoint,
 				parent.getFirstIndividualPosition(),
 				parent.getSecondIndividualPosition());
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -732,6 +739,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		}
 		elkInferenceFactory_
 				.getElkDisjointClassesOfDifferentIndividuals(different);
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -748,6 +756,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 				originalAxiom.getClassExpressions(),
 				parent.getFirstClassPosition(),
 				parent.getSecondClassPosition());
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -756,7 +765,11 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 			ElkDisjointClassesAxiomNaryConversionMatch1 inferenceMatch1) {
 		inferenceMatch1.getConclusionMatch(conclusionFactory_);
 
-		// no ELK inferences
+		// creating ELK inferences
+		ElkDisjointClassesAxiomNaryConversion parent = inferenceMatch1
+				.getParent();
+		ElkDisjointClassesAxiom originalAxiom = parent.getOriginalAxiom();
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -776,6 +789,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 				originalAxiom.getClassExpressions(),
 				parent.getFirstDisjunctPosition(),
 				parent.getSecondDisjunctPosition());
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -807,6 +821,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 				conclusionFactory_.getObjectUnionOf(disjoint), defined);
 		elkInferenceFactory_.getElkClassInclusionHierarchy(defined,
 				conclusionFactory_.getObjectUnionOf(disjoint), member);
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -822,6 +837,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		elkInferenceFactory_.getElkDisjointClassesOfDisjointUnion(
 				originalAxiom.getDefinedClass(),
 				originalAxiom.getClassExpressions());
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -845,6 +861,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 				conclusionFactory_.getObjectUnionOf(disjoint),
 				conclusionFactory_.getOwlNothing());
 		elkInferenceFactory_.getElkClassInclusionEmptyObjectUnionOfOwlNothing();
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 
 	}
@@ -871,6 +888,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 				disjoint, disjunctPos);
 		elkInferenceFactory_.getElkClassInclusionHierarchy(
 				disjoint.get(disjunctPos), union, defined);
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -892,6 +910,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 				originalAxiom.getClassExpressions(),
 				parent.getSecondMemberPosition(),
 				parent.getFirstMemberPosition());
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -907,6 +926,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		elkInferenceFactory_.getElkClassInclusionOfEquivaletClasses(
 				originalAxiom.getClassExpressions(),
 				parent.getSubClassPosition(), parent.getSuperClassPosition());
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -924,6 +944,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 				originalAxiom.getObjectPropertyExpressions(),
 				parent.getSubPropertyPosition(),
 				parent.getSuperPropertyPosition());
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -940,6 +961,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		elkInferenceFactory_.getElkClassInclusionOfObjectPropertyAssertion(
 				originalAxiom.getSubject(), originalAxiom.getProperty(),
 				originalAxiom.getObject());
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -953,6 +975,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 				.getOriginalAxiom();
 		elkInferenceFactory_.getElkClassInclusionOfObjectPropertyDomain(
 				originalAxiom.getProperty(), originalAxiom.getDomain());
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -973,6 +996,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 				.getParent().getOriginalAxiom();
 		elkInferenceFactory_.getElkClassInclusionOfReflexiveObjectProperty(
 				originalAxiom.getProperty());
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 
 	}
@@ -995,13 +1019,18 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		elkInferenceFactory_.getElkClassInclusionOfEquivaletClasses(equivalent,
 				parent.getSubIndividualPosition(),
 				parent.getSuperIndividualPosition());
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
 	@Override
 	public Void visit(ElkSubClassOfAxiomConversionMatch1 inferenceMatch1) {
 		inferenceMatch1.getConclusionMatch(conclusionFactory_);
-		// no ELK inference necessary
+		
+		// creating ELK inferences
+		ElkSubClassOfAxiomConversion parent = inferenceMatch1.getParent();
+		ElkSubClassOfAxiom originalAxiom = parent.getOriginalAxiom();
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -1010,7 +1039,11 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 			ElkSubObjectPropertyOfAxiomConversionMatch1 inferenceMatch1) {
 		inferenceMatch1.getConclusionMatch(conclusionFactory_);
 
-		// no ELK inference necessary
+		// creating ELK inferences
+		ElkSubObjectPropertyOfAxiomConversion parent = inferenceMatch1
+				.getParent();
+		ElkSubObjectPropertyOfAxiom originalAxiom = parent.getOriginalAxiom();
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -1024,6 +1057,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 				.getParent().getOriginalAxiom();
 		elkInferenceFactory_.getElkPropertyInclusionOfTransitiveObjectProperty(
 				originalAxiom.getProperty());
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
