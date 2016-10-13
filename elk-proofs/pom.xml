@@ -41,7 +41,12 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-util-common</artifactId>
 			<version>${project.version}</version>
-		</dependency>		
+		</dependency>
+		<dependency>
+			<groupId>org.liveontologies</groupId>
+			<artifactId>owlapi-proof</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-util-testing</artifactId>

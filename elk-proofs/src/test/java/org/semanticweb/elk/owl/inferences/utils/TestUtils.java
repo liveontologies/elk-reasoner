@@ -26,8 +26,11 @@ package org.semanticweb.elk.owl.inferences.utils;
 
 import java.util.Set;
 
+import org.liveontologies.owlapi.proof.util.InferenceDerivabilityChecker;
+import org.liveontologies.owlapi.proof.util.InferenceSet;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
+import org.semanticweb.elk.owl.inferences.ElkInferenceSetAdapter;
 import org.semanticweb.elk.owl.inferences.ReasonerProofProvider;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
@@ -53,16 +56,20 @@ public class TestUtils {
 			ElkAxiom goal) throws ElkException {
 
 		LOGGER_.debug("Provability test: {}", goal);
-		ElkInferenceSet inferences = new ReasonerProofProvider(reasoner,
+		ElkInferenceSet elkInferences = new ReasonerProofProvider(reasoner,
 				factory).getInferences(goal);
-		ProvabilityTester tester = new ProvabilityTester(inferences, ontology);
-		if (!tester.isProvable(goal)) {
-			throw new AssertionError(String.format("%s: not provable", goal));
+		InferenceSet<ElkAxiom> inferences = new ElkInferenceSetAdapter(
+				elkInferences);
+		InferenceDerivabilityChecker<ElkAxiom> checker = new InferenceDerivabilityChecker<ElkAxiom>(
+				inferences);
+		if (!checker.isDerivable(goal)) {
+			throw new AssertionError(String.format("%s: not derivable", goal));
 		}
-		Set<? extends ElkAxiom> unproved = tester.getUnprovedLemmas();
-		if (!unproved.isEmpty()) {
+		Set<? extends ElkAxiom> nonDerivable = checker
+				.getNonDerivableConclusions();
+		if (!nonDerivable.isEmpty()) {
 			throw new AssertionError(
-					String.format("%s: unproved lemmas", unproved));
+					String.format("%s: not derivable", nonDerivable));
 
 		}
 	}
