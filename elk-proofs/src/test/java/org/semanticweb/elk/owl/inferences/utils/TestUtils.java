@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.utils;
+package org.semanticweb.elk.owl.inferences.utils;
 /*
  * #%L
  * ELK Proofs Package
