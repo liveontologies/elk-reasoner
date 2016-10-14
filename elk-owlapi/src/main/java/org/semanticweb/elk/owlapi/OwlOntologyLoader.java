@@ -141,7 +141,9 @@ public class OwlOntologyLoader extends AbstractAxiomLoader implements
 
 	@Override
 	public boolean isLoadingFinished() {
-		return axiomsIterator_ == null && importsClosureIterator_ == null;
+		return axiomsIterator_ != null && !axiomsIterator_.hasNext()
+				&& importsClosureIterator_ != null
+				&& !importsClosureIterator_.hasNext();
 	}
 
 	@Override
