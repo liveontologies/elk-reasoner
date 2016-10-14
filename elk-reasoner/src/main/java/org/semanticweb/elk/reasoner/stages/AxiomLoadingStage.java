@@ -26,6 +26,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.semanticweb.elk.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
@@ -174,6 +175,9 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;	
+		if (!loader_.isLoadingFinished()) {
+			throw new ElkRuntimeException("Loading not finished!");
+		}
 		if (isIndexingUnsupportedListenerRegistered_) {
 			ontologyIndex_.removeIndexingUnsupportedListener(
 					indexingUnsupportedListener_);
