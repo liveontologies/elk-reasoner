@@ -905,11 +905,16 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	}
 
 	@Override
-	public synchronized void setInterrupt(boolean flag) {
-		super.setInterrupt(flag);
+	public void setInterrupt(boolean flag) {
 		ReasonerStageExecutor stageExecutor = getStageExecutor();
-		if (stageExecutor != null)
-			stageExecutor.setInterrupt(flag);
+		if (stageExecutor != null) {
+			synchronized (stageExecutor) {
+				super.setInterrupt(flag);
+				stageExecutor.setInterrupt(flag);
+			}
+		} else {
+			super.setInterrupt(flag);
+		}
 		// this flag will be cleared after ElkInterruptedException is thrown
 	}
 
