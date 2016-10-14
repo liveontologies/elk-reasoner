@@ -60,7 +60,6 @@ import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.elk.testing.UrlTestInput;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -70,6 +69,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.parameters.OntologyCopy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -203,27 +203,17 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 		}
 
 		@Override
-		public Reasoner createReasoner(Iterable<OWLAxiom> axioms) {
-			Set<OWLAxiom> axSet = new ArrayHashSet<OWLAxiom>();
-			OWLOntologyManager manager = ontology_.getOWLOntologyManager();
-			OWLOntology ontology = null;
-			
-			for (OWLAxiom axiom : axioms) {
-				axSet.add(axiom);
-			}
-
+		public Reasoner createReasoner(Iterable<OWLAxiom> axioms) {					
 			try {
-				ontology = manager.createOntology(axSet);
+				return new ElkReasoner(
+						OWLManager.createOWLOntologyManager()
+								.copyOntology(ontology_, OntologyCopy.SHALLOW),
+						false, new SimpleStageExecutor()).getInternalReasoner();
 			} catch (OWLOntologyCreationIOException e) {
 				throw new RuntimeException(e);
 			} catch (OWLOntologyCreationException e) {
 				throw new RuntimeException(e);
 			}
-			
-			Reasoner result = new ElkReasoner(ontology, false,
-					new SimpleStageExecutor()).getInternalReasoner();
-			manager.removeOntology(ontology);
-			return result;
 		}
 
 		@Override
@@ -291,7 +281,6 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 	@SuppressWarnings("unused")
 	private static class PropertyAxiomFilter implements AxiomFilter {
 
-		@SuppressWarnings("unchecked")
 		final Set<AxiomType<?>> STATIC_AXIOM_TYPES = new HashSet<AxiomType<?>>(
 				Arrays.asList(AxiomType.TRANSITIVE_OBJECT_PROPERTY,
 						AxiomType.SUB_PROPERTY_CHAIN_OF,
