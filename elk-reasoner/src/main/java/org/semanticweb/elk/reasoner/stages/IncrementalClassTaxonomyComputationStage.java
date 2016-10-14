@@ -104,7 +104,7 @@ public class IncrementalClassTaxonomyComputationStage extends
 	}
 
 	@Override
-	public void setInterrupt(boolean flag) {
+	public synchronized void setInterrupt(boolean flag) {
 		super.setInterrupt(flag);
 		setInterrupt(computation_, flag);
 	}

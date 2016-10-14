@@ -66,7 +66,7 @@ public class ComposedAxiomLoader extends SimpleInterrupter implements
 	}
 
 	@Override
-	public void setInterrupt(boolean flag) {
+	public synchronized void setInterrupt(boolean flag) {
 		super.setInterrupt(flag);
 		firstLoader_.setInterrupt(flag);
 		secondLoader_.setInterrupt(flag);

@@ -85,7 +85,7 @@ public class ClassExpressionQueryComputationFactory extends SimpleInterrupter
 	}
 
 	@Override
-	public void setInterrupt(boolean flag) {
+	public synchronized void setInterrupt(boolean flag) {
 		super.setInterrupt(flag);
 		transitiveReductionShared_.setInterrupt(flag);
 	}

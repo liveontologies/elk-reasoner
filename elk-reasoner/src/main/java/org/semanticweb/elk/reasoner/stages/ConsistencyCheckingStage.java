@@ -91,7 +91,7 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void setInterrupt(boolean flag) {
+	public synchronized void setInterrupt(boolean flag) {
 		super.setInterrupt(flag);
 		setInterrupt(computation, flag);
 	}

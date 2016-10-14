@@ -92,7 +92,7 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void setInterrupt(boolean flag) {
+	public synchronized void setInterrupt(boolean flag) {
 		super.setInterrupt(flag);
 		setInterrupt(completion_, flag);
 	}

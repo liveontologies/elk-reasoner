@@ -905,7 +905,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	}
 
 	@Override
-	public void setInterrupt(boolean flag) {
+	public synchronized void setInterrupt(boolean flag) {
 		super.setInterrupt(flag);
 		ReasonerStageExecutor stageExecutor = getStageExecutor();
 		if (stageExecutor != null)

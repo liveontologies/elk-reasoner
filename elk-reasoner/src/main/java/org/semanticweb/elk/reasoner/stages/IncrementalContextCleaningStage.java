@@ -86,7 +86,7 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public void setInterrupt(boolean flag) {
+	public synchronized void setInterrupt(boolean flag) {
 		super.setInterrupt(flag);
 		setInterrupt(cleaning_, flag);
 	}

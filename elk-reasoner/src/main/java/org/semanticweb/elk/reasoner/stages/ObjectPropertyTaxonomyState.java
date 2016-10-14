@@ -177,7 +177,7 @@ public class ObjectPropertyTaxonomyState {
 			}
 
 			@Override
-			public void setInterrupt(final boolean flag) {
+			public synchronized void setInterrupt(final boolean flag) {
 				super.setInterrupt(flag);
 				setInterrupt(computation_, flag);
 			}

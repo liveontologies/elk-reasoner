@@ -167,7 +167,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	}
 
 	@Override
-	public void setInterrupt(boolean flag) {
+	public synchronized void setInterrupt(boolean flag) {
 		super.setInterrupt(flag);
 		saturationFactory_.setInterrupt(flag);
 	}

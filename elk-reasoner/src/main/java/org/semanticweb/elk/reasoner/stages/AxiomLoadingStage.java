@@ -194,7 +194,7 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 	}
 	
 	@Override
-	public void setInterrupt(boolean flag) {
+	public synchronized void setInterrupt(boolean flag) {
 		super.setInterrupt(flag);
 		setInterrupt(loader_, flag);
 	}

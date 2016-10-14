@@ -91,7 +91,7 @@ public class ConcurrentComputation<F extends ProcessorFactory<?>> extends
 	}
 
 	@Override
-	public final void setInterrupt(boolean interrupt) {
+	public synchronized final void setInterrupt(boolean interrupt) {
 		super.setInterrupt(interrupt);
 		processorFactory.setInterrupt(interrupt);		
 	}
