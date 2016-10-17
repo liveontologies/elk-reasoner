@@ -54,5 +54,9 @@ public abstract class ElkObjectWrap<T> extends AbstractElkObject implements ElkO
 	public ElkObjectWrap(T owlObject) {
 		this.owlObject = owlObject;
 	}
+	
+	public T getOwlObject() {
+		return owlObject;
+	}
 
 }

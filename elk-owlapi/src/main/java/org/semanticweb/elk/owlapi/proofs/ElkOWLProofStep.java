@@ -23,7 +23,6 @@ package org.semanticweb.elk.owlapi.proofs;
  */
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.liveontologies.owlapi.proof.OWLProofNode;
@@ -32,8 +31,6 @@ import org.semanticweb.elk.owl.inferences.ElkInference;
 import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.owlapi.wrapper.ElkAxiomWrap;
-import org.semanticweb.owlapi.model.OWLAxiom;
 
 public class ElkOWLProofStep implements OWLProofStep {
 
@@ -63,7 +60,7 @@ public class ElkOWLProofStep implements OWLProofStep {
 	}
 
 	@Override
-	public Collection<? extends OWLProofNode> getPremises() {
+	public List<? extends OWLProofNode> getPremises() {
 		List<OWLProofNode> result = new ArrayList<OWLProofNode>();
 		for (int i = 0; i < elkInference_.getPremiseCount(); i++) {
 			result.add(convert(elkInference_.getPremise(i, elkFactory_)));
@@ -101,11 +98,8 @@ public class ElkOWLProofStep implements OWLProofStep {
 		return elkInference_.toString();
 	}
 
-	@SuppressWarnings("unchecked")
 	private OWLProofNode convert(ElkAxiom conclusion) {
-		return new ElkOWLProofNode(
-				((ElkAxiomWrap<OWLAxiom>) conclusion).getOWLAxiom(),
-				elkInferences_, elkFactory_);
+		return new ElkOWLProofNode(conclusion, elkInferences_, elkFactory_);
 	}
 
 }

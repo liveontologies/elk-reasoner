@@ -44,7 +44,7 @@ public class ElkProver extends DelegatingOWLReasoner<ElkReasoner>
 		ElkClassAxiom elkAxiom = entailment
 				.accept(OwlClassAxiomConverterVisitor.getInstance());
 		ElkReasoner elkReasoner = getDelegate();
-		return new ElkOWLProofNode(entailment,
+		return new ElkOWLProofNode(elkAxiom,
 				elkReasoner.getElkProofProvider().getInferences(elkAxiom),
 				elkReasoner.getElkObjectFactory());
 	}
