@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.owl.inferences.utils;
+package org.semanticweb.elk.owl.inferences;
 /*
  * #%L
  * ELK Proofs Package
@@ -29,9 +29,6 @@ import java.util.Set;
 import org.liveontologies.owlapi.proof.util.InferenceDerivabilityChecker;
 import org.liveontologies.owlapi.proof.util.InferenceSet;
 import org.semanticweb.elk.exceptions.ElkException;
-import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
-import org.semanticweb.elk.owl.inferences.ElkInferenceSetAdapter;
-import org.semanticweb.elk.owl.inferences.ReasonerProofProvider;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.Reasoner;
