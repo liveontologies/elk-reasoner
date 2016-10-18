@@ -29,6 +29,7 @@ import org.protege.editor.owl.model.inference.AbstractProtegeOWLReasonerInfo;
 import org.semanticweb.elk.owlapi.ElkReasonerConfiguration;
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
 import org.semanticweb.elk.protege.preferences.ElkGeneralPreferences;
+import org.semanticweb.elk.protege.preferences.ElkPreferences;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
 import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
@@ -66,8 +67,8 @@ public class ProtegeReasonerFactory extends AbstractProtegeOWLReasonerInfo {
 			ReasonerProgressMonitor monitor) {
 		OWLReasonerConfiguration defaultOwlConfig = ElkReasonerConfiguration
 				.getDefaultOwlReasonerConfiguration(monitor);
-		return new ElkReasonerConfiguration(defaultOwlConfig, elkProtegePrefs_
-				.load().getElkConfig());
+		return new ElkReasonerConfiguration(defaultOwlConfig,
+				ElkPreferences.getElkConfig());
 	}
 
 	@Override

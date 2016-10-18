@@ -128,7 +128,7 @@ public class ElkReasoner implements OWLReasoner {
 	/** this object is used to load pending changes */
 	private volatile OwlChangesLoader bufferedChangesLoader_;
 	/** configurations required for ELK reasoner */
-	private final ReasonerConfiguration config_;
+	private ReasonerConfiguration config_;
 	private final boolean isAllowFreshEntities;
 	private final ReasonerStageExecutor stageExecutor_;
 	/** the ELK reasoner instance used for reasoning */
@@ -244,7 +244,12 @@ public class ElkReasoner implements OWLReasoner {
 		return reasoner_;
 	}
 
+	public ReasonerConfiguration getConfigurationOptions() {
+		return config_;
+	}
+	
 	public void setConfigurationOptions(ReasonerConfiguration config) {
+		this.config_ = config;
 		reasoner_.setConfigurationOptions(config);
 	}
 
