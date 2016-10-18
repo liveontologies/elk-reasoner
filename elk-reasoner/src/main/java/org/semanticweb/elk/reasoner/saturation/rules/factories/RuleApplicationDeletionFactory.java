@@ -1,10 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.saturation.rules.factories;
-
-import org.semanticweb.elk.Reference;
-
 /*
  * #%L
  * ELK Reasoner
@@ -26,7 +19,9 @@ import org.semanticweb.elk.Reference;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
+import org.semanticweb.elk.Reference;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextExistenceCheckingWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
@@ -43,6 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference.Visitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInferenceConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
 /**
  * A {@link RuleApplicationFactory} that deletes the produced
@@ -62,8 +58,9 @@ public class RuleApplicationDeletionFactory
 			AbstractRuleApplicationFactory<Context, RuleApplicationInput> {
 
 	public RuleApplicationDeletionFactory(
+			final InterruptMonitor interrupter,
 			SaturationState<? extends Context> saturationState) {
-		super(saturationState);
+		super(interrupter, saturationState);
 	}
 
 	@Override

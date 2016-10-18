@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.incremental;
 import java.util.Collections;
 import java.util.Random;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.RandomSeedProvider;
@@ -62,15 +61,6 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInpu
 		super(testManifest, testDelegate);
 	}
 
-	@Before
-	public void before() throws Exception {
-
-		changingAxioms = new OnOffVector<A>(15);
-		changingAxioms.addAll(delegate_.loadAxioms());
-
-		super.before();
-	}
-
 	/**
 	 * The main test method
 	 * 
@@ -78,6 +68,8 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInpu
 	 */
 	@Test
 	public void incrementalReasoning() throws Exception {
+		changingAxioms = new OnOffVector<A>(15);
+		changingAxioms.addAll(delegate_.initIncremental());
 		changingAxioms.setAllOn();
 
 		final long seed = RandomSeedProvider.VALUE;

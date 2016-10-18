@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.tracing.factories;
-
 /*-
  * #%L
  * ELK Reasoner Core
@@ -24,6 +19,7 @@ package org.semanticweb.elk.reasoner.tracing.factories;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.tracing.factories;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -40,9 +36,9 @@ import org.semanticweb.elk.reasoner.tracing.ModifiableTracingInferenceSetImpl;
 import org.semanticweb.elk.reasoner.tracing.TraceState;
 import org.semanticweb.elk.reasoner.tracing.TracingInference;
 import org.semanticweb.elk.reasoner.tracing.TracingInferencePremiseVisitor;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 import org.semanticweb.elk.util.concurrent.computation.Processor;
 import org.semanticweb.elk.util.concurrent.computation.ProcessorFactory;
-import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +55,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class ProofUnwindingFactory extends SimpleInterrupter
+public class ProofUnwindingFactory
 		implements ProcessorFactory<ProofUnwindingFactory.Engine> {
 
 	private static final Logger LOGGER_ = LoggerFactory
@@ -80,10 +76,12 @@ public class ProofUnwindingFactory extends SimpleInterrupter
 	 */
 	private final ConcurrentMap<IndexedContextRoot, ModifiableTracingInferenceSet<ClassInference>> inferencesByContext_;
 
-	public ProofUnwindingFactory(SaturationState<?> mainSaturationState,
+	public ProofUnwindingFactory(final InterruptMonitor interrupter,
+			SaturationState<?> mainSaturationState,
 			TraceState traceState, int maxWorkers) {
 		traceState_ = traceState;
 		contextTracingFactory_ = new ContextTracingFactory<IndexedContextRoot, ContextTracingJobForProofUnwinding>(
+				interrupter,
 				mainSaturationState, maxWorkers,
 				new ThisContextTracingListener());
 		inferencesByContext_ = new ConcurrentHashMap<IndexedContextRoot, ModifiableTracingInferenceSet<ClassInference>>();
@@ -97,6 +95,11 @@ public class ProofUnwindingFactory extends SimpleInterrupter
 	@Override
 	public void finish() {
 		contextTracingFactory_.finish();
+	}
+
+	@Override
+	public boolean isInterrupted() {
+		return contextTracingFactory_.isInterrupted();
 	}
 
 	public void printStatistics() {

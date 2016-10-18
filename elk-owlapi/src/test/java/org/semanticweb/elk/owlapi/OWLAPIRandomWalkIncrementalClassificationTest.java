@@ -144,7 +144,7 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 				throw new Owl2ParseException(e);
 			}
 
-			incrementalReasoner = new ElkReasoner(ontology, true,
+			incrementalReasoner = OWLAPITestUtils.createReasoner(ontology, true,
 					new PostProcessingStageExecutor());
 			
 			// let the runner run..
@@ -205,7 +205,7 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 		@Override
 		public Reasoner createReasoner(Iterable<OWLAxiom> axioms) {					
 			try {
-				return new ElkReasoner(
+				return OWLAPITestUtils.createReasoner(
 						OWLManager.createOWLOntologyManager()
 								.copyOntology(ontology_, OntologyCopy.SHALLOW),
 						false, new SimpleStageExecutor()).getInternalReasoner();

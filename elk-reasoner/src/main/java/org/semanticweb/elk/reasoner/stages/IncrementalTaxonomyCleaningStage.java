@@ -77,9 +77,10 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 		LOGGER_.trace("{}: removed classes", removedClasses);
 		LOGGER_.trace("{}: removed individuals", removedIndividuals);
 
-		cleaning_ = new TaxonomyCleaning(inputs, reasoner.classTaxonomyState,
-				reasoner.instanceTaxonomyState, reasoner.getProcessExecutor(),
-				workerNo, reasoner.getProgressMonitor());
+		cleaning_ = new TaxonomyCleaning(inputs, reasoner.getInterrupter(),
+				reasoner.classTaxonomyState, reasoner.instanceTaxonomyState,
+				reasoner.getProcessExecutor(), workerNo,
+				reasoner.getProgressMonitor());
 
 		return true;
 	}
@@ -121,12 +122,6 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 	@Override
 	public void printInfo() {
 		// TODO
-	}
-
-	@Override
-	public synchronized void setInterrupt(boolean flag) {
-		super.setInterrupt(flag);
-		setInterrupt(cleaning_, flag);
 	}
 
 }

@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.stages;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +19,7 @@ package org.semanticweb.elk.reasoner.stages;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
@@ -66,7 +62,8 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 			return false;
 		completion_ = new ClassExpressionSaturationNoInput(
 				reasoner.getProcessExecutor(), workerNo,
-				new RuleApplicationAdditionFactory<RuleApplicationInput>(reasoner.saturationState),
+				new RuleApplicationAdditionFactory<RuleApplicationInput>(
+						reasoner.getInterrupter(), reasoner.saturationState),
 				ContextModificationListener.DUMMY);
 		return true;
 	}
@@ -89,12 +86,6 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 	@Override
 	public void printInfo() {
 		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public synchronized void setInterrupt(boolean flag) {
-		super.setInterrupt(flag);
-		setInterrupt(completion_, flag);
 	}
 
 }

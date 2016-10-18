@@ -22,8 +22,6 @@
  */
 package org.semanticweb.elk.reasoner;
 
-import static org.junit.Assert.fail;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.testing.PolySuite;
@@ -62,46 +60,9 @@ public abstract class ReasoningCorrectnessTestWithInterrupts<I extends TestInput
 	 */
 	@Test
 	public void testWithInterruptions() throws Exception {
-		final ReasoningProcess reasoningProcess = new ReasoningProcess();
-		final Thread reasonerThread = new Thread(reasoningProcess,
-				"test-elk-reasoner-thread");
-		reasonerThread.start();
-
-		while (reasonerThread.isAlive()) {
-			// interrupt every millisecond
-			delegate_.interrupt();
-			try {
-				Thread.sleep(1);
-			} catch (InterruptedException e) {
-				fail();
-			}
-		}
-
-		if (reasoningProcess.exception != null)
-			throw reasoningProcess.exception;
-		manifest.compare(reasoningProcess.actualOutput_);
-	}
-
-	/**
-	 * A simple class for running a reasoner in a separate thread and query the
-	 * result
-	 * 
-	 * @author "Yevgeny Kazakov"
-	 */
-	private class ReasoningProcess implements Runnable {
-
-		Exception exception = null;
-		AO actualOutput_ = null;
-
-		@Override
-		public void run() {
-			try {
-				actualOutput_ = delegate_.getActualOutput();
-			} catch (final Exception e) {
-				exception = e;
-			}
-		}
-
+		delegate_.initWithInterrupts();
+		final AO actualOutput = delegate_.getActualOutput();// TODO: repeat this until no interruption exception is thrown!
+		manifest.compare(actualOutput);
 	}
 
 }

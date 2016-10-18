@@ -253,23 +253,6 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	}
 
 	@Override
-	public void setInterrupt(boolean flag) {
-		ruleApplicationFactory_.setInterrupt(flag);
-		/*
-		 * waking up all waiting workers
-		 */
-		stopWorkersLock_.lock();
-		try {
-			if (workersWaiting_) {
-				workersWaiting_ = false;
-				thereAreContextsToProcess_.signalAll();
-			}
-		} finally {
-			stopWorkersLock_.unlock();
-		}
-	}
-
-	@Override
 	public boolean isInterrupted() {
 		return ruleApplicationFactory_.isInterrupted();
 	}
@@ -554,6 +537,19 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 
 			for (;;) {
 				if (isInterrupted()) {
+					// TODO: This may be not necessary, try to remove it.
+					/*
+					 * waking up all waiting workers
+					 */
+					stopWorkersLock_.lock();
+					try {
+						if (workersWaiting_) {
+							workersWaiting_ = false;
+							thereAreContextsToProcess_.signalAll();
+						}
+					} finally {
+						stopWorkersLock_.unlock();
+					}
 					return;
 				}
 				int snapshotCountSaturated = countContextsSaturatedLower_.get();

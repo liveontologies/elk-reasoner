@@ -43,7 +43,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAd
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
-import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,8 +78,6 @@ import org.slf4j.LoggerFactory;
  * @see TransitiveReductionListener
  */
 public class TransitiveReductionFactory<R extends IndexedClassExpression, J extends TransitiveReductionJob<R>>
-		extends
-			SimpleInterrupter
 		implements
 			InputProcessorFactory<J, TransitiveReductionFactory<R, J>.Engine> {
 
@@ -146,7 +144,8 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	 *            the listener object implementing callback functions for this
 	 *            engine
 	 */
-	public TransitiveReductionFactory(SaturationState<?> saturationState,
+	public TransitiveReductionFactory(final InterruptMonitor interrupter,
+			SaturationState<?> saturationState,
 			int maxWorkers, TransitiveReductionListener<J> listener) {
 		this.listener_ = listener;
 		this.auxJobQueue_ = new ConcurrentLinkedQueue<SaturationJobSuperClass<R, J>>();
@@ -154,7 +153,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		this.saturationState_ = saturationState;
 		this.saturationFactory_ = new ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>(
 				new RuleApplicationAdditionFactory<RuleApplicationInput>(
-						saturationState),
+						interrupter, saturationState),
 				maxWorkers, new ThisClassExpressionSaturationListener());
 		this.owlThing_ = saturationState.getOntologyIndex().getOwlThing();
 		this.defaultTopOutput_ = new ArrayList<ElkClass>(1);
@@ -167,14 +166,13 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	}
 
 	@Override
-	public synchronized void setInterrupt(boolean flag) {
-		super.setInterrupt(flag);
-		saturationFactory_.setInterrupt(flag);
+	public void finish() {
+		saturationFactory_.finish();
 	}
 
 	@Override
-	public void finish() {
-		saturationFactory_.finish();
+	public boolean isInterrupted() {
+		return saturationFactory_.isInterrupted();
 	}
 
 	/**

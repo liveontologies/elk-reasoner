@@ -23,7 +23,7 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.exceptions.ElkException;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
 /**
  * A basic computation unit that can be executed by a reasoner. A
@@ -33,7 +33,7 @@ import org.semanticweb.elk.util.concurrent.computation.Interrupter;
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface ReasonerStage extends Interrupter {
+public interface ReasonerStage extends InterruptMonitor {
 
 	/**
 	 * @return a string identifier of this stage

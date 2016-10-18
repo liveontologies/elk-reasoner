@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
-import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
 /**
  * The factory for engines that concurrently saturate and transitively reduce
@@ -39,7 +39,7 @@ import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
  * 
  * @author Peter Skocovsky
  */
-public class ClassExpressionQueryComputationFactory extends SimpleInterrupter
+public class ClassExpressionQueryComputationFactory
 		implements
 		InputProcessorFactory<IndexedClassExpression, ClassExpressionQueryComputationFactory.Engine> {
 
@@ -53,10 +53,11 @@ public class ClassExpressionQueryComputationFactory extends SimpleInterrupter
 	private final TransitiveReductionOutputVisitor<IndexedClassExpression> outputProcessor_;
 
 	public ClassExpressionQueryComputationFactory(
+			final InterruptMonitor interrupter,
 			final SaturationState<?> saturationState, final int maxWorkers,
 			final TransitiveReductionOutputVisitor<IndexedClassExpression> outputProcessor) {
 		this.transitiveReductionShared_ = new TransitiveReductionFactory<IndexedClassExpression, TransitiveReductionJob<IndexedClassExpression>>(
-				saturationState, maxWorkers,
+				interrupter, saturationState, maxWorkers,
 				new ThisTransitiveReductionListener());
 		this.outputProcessor_ = outputProcessor;
 	}
@@ -85,14 +86,13 @@ public class ClassExpressionQueryComputationFactory extends SimpleInterrupter
 	}
 
 	@Override
-	public synchronized void setInterrupt(boolean flag) {
-		super.setInterrupt(flag);
-		transitiveReductionShared_.setInterrupt(flag);
+	public void finish() {
+		transitiveReductionShared_.finish();
 	}
 
 	@Override
-	public void finish() {
-		transitiveReductionShared_.finish();
+	public boolean isInterrupted() {
+		return transitiveReductionShared_.isInterrupted();
 	}
 
 	/**

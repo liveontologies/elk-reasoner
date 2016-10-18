@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.stages;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.stages;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
@@ -66,7 +65,7 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 		RuleApplicationFactory<Context, RuleApplicationInput> ruleFactory = null;
 
 		ruleFactory = new RuleApplicationAdditionFactory<RuleApplicationInput>(
-				reasoner.saturationState);
+				reasoner.getInterrupter(), reasoner.saturationState);
 
 		this.computation_ = new ClassExpressionSaturation<IndexedClass>(
 				reasoner.ontologyIndex.getClasses(),
@@ -95,12 +94,6 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 	public void printInfo() {
 		if (computation_ != null)
 			computation_.printStatistics();
-	}
-
-	@Override
-	public synchronized void setInterrupt(boolean flag) {
-		super.setInterrupt(flag);
-		setInterrupt(computation_, flag);
 	}
 
 }

@@ -42,6 +42,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.concurrent.computation.DummyInterruptMonitor;
 
 import junit.framework.TestCase;
 
@@ -101,7 +102,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		SaturationState<?> saturationState = SaturationStateFactory
 				.createSaturationState(index);
 		final TestClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new TestClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
-				executor, 16, saturationState);
+				DummyInterruptMonitor.INSTANCE, executor, 16, saturationState);
 
 		propertySaturation.start();
 		propertySaturation.submit(R);
@@ -150,7 +151,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		SaturationState<?> saturationState = SaturationStateFactory
 				.createSaturationState(index);
 		final TestClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new TestClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
-				executor, 16, saturationState);
+				DummyInterruptMonitor.INSTANCE, executor, 16, saturationState);
 
 		classExpressionSaturation.start();
 		classExpressionSaturation

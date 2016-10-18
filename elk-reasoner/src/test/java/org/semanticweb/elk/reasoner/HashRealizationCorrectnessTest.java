@@ -45,7 +45,7 @@ public abstract class HashRealizationCorrectnessTest extends
 
 	public HashRealizationCorrectnessTest(
 			final ReasoningTestManifest<HashTestOutput, InstanceTaxonomyTestOutput<?>> testManifest,
-			final ReasoningTestDelegate<InstanceTaxonomyTestOutput<?>> testDelegate) {
+			final ReasoningTestWithOutputDelegate<InstanceTaxonomyTestOutput<?>> testDelegate) {
 		super(testManifest, testDelegate);
 	}
 

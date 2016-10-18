@@ -34,7 +34,6 @@ import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.testing.UrlTestInput;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -54,8 +53,6 @@ public abstract class OwlApiIncrementalReasoningTestDelegate<EO extends TestOutp
 
 	protected final TestManifest<? extends UrlTestInput> manifest_;
 
-	protected Set<OWLAxiom> inputAxioms_;
-
 	protected OWLOntology testOntology_;
 	protected ElkReasoner standardReasoner_;
 	protected ElkReasoner incrementalReasoner_;
@@ -66,44 +63,34 @@ public abstract class OwlApiIncrementalReasoningTestDelegate<EO extends TestOutp
 	}
 
 	@Override
-	public Collection<OWLAxiom> loadAxioms() throws Exception {
+	public Collection<OWLAxiom> initIncremental() throws Exception {
 
-		this.inputAxioms_ = new ArrayHashSet<OWLAxiom>();
 		final ArrayList<OWLAxiom> changingAxioms = new ArrayList<OWLAxiom>();
 
 		final OWLOntologyManager manager = OWLManager
 				.createOWLOntologyManager();
 
 		final InputStream stream = manifest_.getInput().getUrl().openStream();
-		final OWLOntology ontology = manager
-				.loadOntologyFromOntologyDocument(stream);
+		testOntology_ = manager.loadOntologyFromOntologyDocument(stream);
 
-		for (OWLAxiom axiom : ontology.getLogicalAxioms()) {
+		for (OWLAxiom axiom : testOntology_.getLogicalAxioms()) {
 			if (DYNAMIC_AXIOM_TYPES.contains(axiom.getAxiomType())) {
 				changingAxioms.add(axiom);
 			}
-			inputAxioms_.add(axiom);
 		}
 
-		return changingAxioms;
-	}
-
-	@Override
-	public void init() throws Exception {
-		final OWLOntologyManager manager = OWLManager
-				.createOWLOntologyManager();
-
-		testOntology_ = manager.createOntology(inputAxioms_);
 		// important to use the buffering mode here
 		// otherwise we'd need to issue a query to the ElkReasoner
 		// before we could use the internal reasoner directly in the tests
-		standardReasoner_ = new ElkReasoner(testOntology_, true,
+		standardReasoner_ = OWLAPITestUtils.createReasoner(testOntology_, true,
 				new PostProcessingStageExecutor());
 		standardReasoner_.getInternalReasoner().setAllowIncrementalMode(false);
-		incrementalReasoner_ = new ElkReasoner(testOntology_, true,
-				new PostProcessingStageExecutor());
+		incrementalReasoner_ = OWLAPITestUtils.createReasoner(testOntology_,
+				true, new PostProcessingStageExecutor());
 		incrementalReasoner_.getInternalReasoner()
 				.setAllowIncrementalMode(true);
+
+		return changingAxioms;
 	}
 
 	@Override
@@ -135,7 +122,12 @@ public abstract class OwlApiIncrementalReasoningTestDelegate<EO extends TestOutp
 	}
 
 	@Override
-	public void dispose() {
+	public void before() throws Exception {
+		// Empty.
+	}
+
+	@Override
+	public void after() {
 		// Empty.
 	}
 

@@ -36,14 +36,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.exceptions.ElkException;
-import org.semanticweb.elk.loading.AxiomLoader;
-import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
-import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
@@ -89,16 +86,14 @@ public class TracingTest {
 	}
 
 	@SuppressWarnings("static-method")
-	protected boolean ignore(@SuppressWarnings("unused") TestInput input) {
+	protected boolean ignore(TestInput input) {
 		return false;
 	}
 
 	@Test
 	public void tracingTest() throws Exception {
-		AxiomLoader fileLoader = new Owl2StreamLoader(
-				new Owl2FunctionalStyleParserFactory(),
-				manifest.getInput().getUrl().openStream());
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(fileLoader,
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
+				manifest.getInput().getUrl().openStream(),
 				new PostProcessingStageExecutor());
 
 		try {

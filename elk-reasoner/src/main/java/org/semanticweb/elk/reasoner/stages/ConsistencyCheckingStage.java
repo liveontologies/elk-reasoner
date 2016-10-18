@@ -60,7 +60,7 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(),
 				new RuleApplicationAdditionFactory<RuleApplicationInput>(
-						reasoner.saturationState));
+						reasoner.getInterrupter(), reasoner.saturationState));
 		return true;
 	}
 
@@ -90,9 +90,4 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 			computation.printStatistics();
 	}
 
-	@Override
-	public synchronized void setInterrupt(boolean flag) {
-		super.setInterrupt(flag);
-		setInterrupt(computation, flag);
-	}
 }

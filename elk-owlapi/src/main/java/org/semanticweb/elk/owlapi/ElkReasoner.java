@@ -45,6 +45,7 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
+import org.semanticweb.elk.reasoner.stages.ReasonerInterrupter;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
@@ -126,11 +127,12 @@ public class ElkReasoner implements OWLReasoner {
 	/** Converter from ELK OWL to OWL API */
 	private final ElkConverter elkConverter_;
 	/** this object is used to load pending changes */
-	private volatile OwlChangesLoader bufferedChangesLoader_;
+	private volatile OwlChangesLoaderFactory bufferedChangesLoader_;
 	/** configurations required for ELK reasoner */
 	private final ReasonerConfiguration config_;
 	private final boolean isAllowFreshEntities;
 	private final ReasonerStageExecutor stageExecutor_;
+	private final ReasonerInterrupter interrupter_;
 	/** the ELK reasoner instance used for reasoning */
 	private Reasoner reasoner_;
 	/** Inferences for derived ELK axioms */
@@ -149,6 +151,7 @@ public class ElkReasoner implements OWLReasoner {
 
 	ElkReasoner(OWLOntology ontology, boolean isBufferingMode,
 			ElkReasonerConfiguration elkConfig,
+			final ReasonerInterrupter interrupter,
 			ReasonerStageExecutor stageExecutor) {
 		this.owlOntology_ = ontology;
 		this.owlOntologymanager_ = ontology.getOWLOntologyManager();
@@ -168,10 +171,11 @@ public class ElkReasoner implements OWLReasoner {
 
 		this.config_ = elkConfig.getElkConfiguration();
 		this.stageExecutor_ = stageExecutor;
+		this.interrupter_ = interrupter;
 		this.isAllowFreshEntities = elkConfig.getFreshEntityPolicy() == FreshEntityPolicy.ALLOW;
 
 		reCreateReasoner();
-		this.bufferedChangesLoader_ = new OwlChangesLoader(
+		this.bufferedChangesLoader_ = new OwlChangesLoaderFactory(
 				this.mainProgressMonitor_);
 		if (!isBufferingMode_) {
 			// register the change loader only in non-buffering mode;
@@ -184,26 +188,29 @@ public class ElkReasoner implements OWLReasoner {
 
 	ElkReasoner(OWLOntology ontology, boolean isBufferingMode,
 			ElkReasonerConfiguration elkConfig) {
-		this(ontology, isBufferingMode, elkConfig, new LoggingStageExecutor());
+		this(ontology, isBufferingMode, elkConfig, new ReasonerInterrupter(),
+				new LoggingStageExecutor());
 	}
 
 	ElkReasoner(OWLOntology ontology, boolean isBufferingMode,
+			final ReasonerInterrupter interrupter,
 			ReasonerStageExecutor stageExecutor,
 			ReasonerProgressMonitor progressMonitor) {
 		this(ontology, isBufferingMode, new ElkReasonerConfiguration(
-				progressMonitor), stageExecutor);
+				progressMonitor), interrupter, stageExecutor);
 
 	}
 
 	ElkReasoner(OWLOntology ontology, boolean isBufferingMode,
+			final ReasonerInterrupter interrupter,
 			ReasonerStageExecutor stageExecutor) {
 		this(ontology, isBufferingMode, new ElkReasonerConfiguration(),
-				stageExecutor);
+				interrupter, stageExecutor);
 	}
 
 	ElkReasoner(OWLOntology ontology, boolean isBufferingMode) {
 		this(ontology, isBufferingMode, new ElkReasonerConfiguration(),
-				new LoggingStageExecutor());
+				new ReasonerInterrupter(), new LoggingStageExecutor());
 	}
 
 	OWLOntology getOWLOntology() {
@@ -227,8 +234,9 @@ public class ElkReasoner implements OWLReasoner {
 		this.reasoner_ = new ReasonerFactory().createReasoner(
 				new ElkObjectWrapFactory(
 						owlOntologymanager_.getOWLDataFactory()),
-				new OwlOntologyLoader(owlOntology_, this.mainProgressMonitor_),
-				stageExecutor_, config_);
+				new OwlOntologyLoader.Factory(owlOntology_,
+						this.mainProgressMonitor_),
+				interrupter_, stageExecutor_, config_);
 		this.reasoner_.setAllowFreshEntities(isAllowFreshEntities);
 		// use the secondary progress monitor by default, when necessary, we
 		// switch to the primary progress monitor; this is to avoid bugs with
@@ -321,7 +329,7 @@ public class ElkReasoner implements OWLReasoner {
 	 *             if the reasoner is in the interrupted state, throws
 	 */
 	private void checkInterrupted() throws ReasonerInterruptedException {
-		if (reasoner_.isInterrupted())
+		if (reasoner_.getInterrupter().isInterrupted())
 			throw new ReasonerInterruptedException("ELK was interrupted");
 	}
 
@@ -360,7 +368,7 @@ public class ElkReasoner implements OWLReasoner {
 		try {
 			if (ontologyReloadRequired_) {
 				reCreateReasoner();
-				bufferedChangesLoader_ = new OwlChangesLoader(
+				bufferedChangesLoader_ = new OwlChangesLoaderFactory(
 						this.secondaryProgressMonitor_);
 				ontologyReloadRequired_ = false;
 			} else if (!bufferedChangesLoader_.isLoadingFinished()) {
@@ -371,7 +379,7 @@ public class ElkReasoner implements OWLReasoner {
 					// so, we need to register the buffer with the reasoner
 					// and create a new one
 					reasoner_.registerAxiomLoader(bufferedChangesLoader_);
-					bufferedChangesLoader_ = new OwlChangesLoader(
+					bufferedChangesLoader_ = new OwlChangesLoaderFactory(
 							this.secondaryProgressMonitor_);
 				} else {
 					// in non-buffering node the changes loader is already

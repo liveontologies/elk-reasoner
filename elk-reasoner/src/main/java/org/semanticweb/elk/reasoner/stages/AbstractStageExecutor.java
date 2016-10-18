@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.stages;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,9 +19,9 @@ package org.semanticweb.elk.reasoner.stages;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.exceptions.ElkException;
-import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 
 /**
  * An abstract base class which implements a very simple logic of executing
@@ -36,11 +31,9 @@ import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
-public abstract class AbstractStageExecutor extends SimpleInterrupter implements
-		ReasonerStageExecutor {
-
-	private volatile ReasonerStage stageInProgress_;
+public abstract class AbstractStageExecutor implements ReasonerStageExecutor {
 
 	@Override
 	public void complete(ReasonerStage stage) throws ElkException {
@@ -50,23 +43,9 @@ public abstract class AbstractStageExecutor extends SimpleInterrupter implements
 			for (ReasonerStage dependentStage : stage.getPreStages()) {
 				complete(dependentStage);
 			}
-			try {
-				stageInProgress_ = stage;
-				execute(stage);
-			} finally {
-				stageInProgress_ = null;
-			}
+			execute(stage);
 		}
 
-	}
-
-	@Override
-	public synchronized void setInterrupt(boolean flag) {
-		super.setInterrupt(flag);
-		ReasonerStage interrupter = stageInProgress_;
-		if (interrupter != null) {
-			interrupter.setInterrupt(flag);
-		}
 	}
 
 	protected abstract void execute(ReasonerStage stage) throws ElkException;

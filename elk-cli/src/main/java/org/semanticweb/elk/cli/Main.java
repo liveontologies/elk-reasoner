@@ -49,6 +49,7 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
+import org.semanticweb.elk.reasoner.stages.ReasonerInterrupter;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
@@ -174,10 +175,10 @@ public class Main {
 		// create reasoner
 		ReasonerFactory reasoningFactory = new ReasonerFactory();
 		Owl2ParserFactory parserFactory = new Owl2FunctionalStyleParserFactory();
-		AxiomLoader loader = new Owl2StreamLoader(parserFactory,
+		AxiomLoader.Factory loader = new Owl2StreamLoader.Factory(parserFactory,
 				options.valueOf(inputFile));
 		Reasoner reasoner = reasoningFactory.createReasoner(loader,
-				new LoggingStageExecutor(), configuration);
+				new ReasonerInterrupter(), new LoggingStageExecutor(), configuration);
 
 		try {
 			if (options.has(satisfiable)) {

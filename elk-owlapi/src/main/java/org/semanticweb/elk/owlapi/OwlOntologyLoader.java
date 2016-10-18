@@ -31,6 +31,7 @@ import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.ReasonerProgressMonitor;
@@ -95,8 +96,9 @@ public class OwlOntologyLoader extends AbstractAxiomLoader implements
 	 */
 	private int axiomsProcessed_;
 
-	public OwlOntologyLoader(OWLOntology owlOntology,
-			ProgressMonitor progressMonitor) {
+	public OwlOntologyLoader(final InterruptMonitor interrupter,
+			OWLOntology owlOntology, ProgressMonitor progressMonitor) {
+		super(interrupter);
 		this.owlOntology_ = owlOntology;
 		this.progressMonitor_ = progressMonitor;
 		initImportsClosure();
@@ -180,6 +182,27 @@ public class OwlOntologyLoader extends AbstractAxiomLoader implements
 			status = ReasonerProgressMonitor.LOADING + " "
 					+ (importsClosureProcessed_ + 1) + " of "
 					+ importsClosureCount_;
+	}
+
+	public static class Factory implements AxiomLoader.Factory {
+
+		private final OWLOntology owlOntology_;
+
+		private final ProgressMonitor progressMonitor_;
+
+		public Factory(final OWLOntology owlOntology,
+				final ProgressMonitor progressMonitor) {
+			this.owlOntology_ = owlOntology;
+			this.progressMonitor_ = progressMonitor;
+		}
+
+		@Override
+		public OwlOntologyLoader getAxiomLoader(
+				final InterruptMonitor interrupter) {
+			return new OwlOntologyLoader(interrupter, owlOntology_,
+					progressMonitor_);
+		}
+
 	}
 
 }

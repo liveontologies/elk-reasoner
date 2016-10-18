@@ -26,6 +26,8 @@ import java.util.Random;
 import org.junit.Test;
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.exceptions.ElkException;
+import org.semanticweb.elk.loading.TestAxiomLoaderFactory;
+import org.semanticweb.elk.loading.TestChangesLoader;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
@@ -106,7 +108,6 @@ public class TaxonomyCleaningDeadlockTest {
 
 			reasoner.setAllowIncrementalMode(true);
 			TestChangesLoader changeLoader = new TestChangesLoader();
-			reasoner.registerAxiomLoader(changeLoader);
 
 			for (int superIndex = 0; superIndex < nSuperNodes; superIndex++) {
 				if (random.nextDouble() < pRemove) {
@@ -116,6 +117,9 @@ public class TaxonomyCleaningDeadlockTest {
 					}
 				}
 			}
+
+			reasoner.registerAxiomLoader(
+					new TestAxiomLoaderFactory(changeLoader));
 
 			LOGGER_.trace(
 					"********** Taxonomy re-computation after incremental change ************");

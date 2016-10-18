@@ -1,11 +1,10 @@
-package org.semanticweb.elk.loading;
-/*
+/*-
  * #%L
- * ELK Reasoner
+ * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,28 +19,24 @@ package org.semanticweb.elk.loading;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner;
 
-import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import static org.junit.Assert.fail;
+
+import org.semanticweb.elk.reasoner.stages.ReasonerInterrupter;
 
 /**
- * An {@link AxiomLoader} that loads nothing
+ * Fails on interrupt.
  * 
- * @author "Yevgeny Kazakov"
- * 
+ * @author Peter Skocovsky
  */
-public class EmptyAxiomLoader extends AbstractAxiomLoader implements
-		AxiomLoader {
+public class FailingReasonerInterrupter extends ReasonerInterrupter {
+
+	public static final FailingReasonerInterrupter INSTANCE = new FailingReasonerInterrupter();
 
 	@Override
-	public void load(ElkAxiomProcessor axiomInserter,
-			ElkAxiomProcessor axiomDeleter) throws ElkLoadingException {
-		// does nothing
-
-	}
-
-	@Override
-	public boolean isLoadingFinished() {
-		return true;
+	public void interrupt() {
+		fail();
 	}
 
 }

@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.tracing.factories;
-
 /*-
  * #%L
  * ELK Reasoner Core
@@ -24,6 +19,7 @@ package org.semanticweb.elk.reasoner.tracing.factories;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.tracing.factories;
 
 import org.semanticweb.elk.Reference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
@@ -53,6 +49,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.factories.AbstractRuleAppli
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
 import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
 /**
  * A {@link RuleApplicationFactory} that applies inference rules to
@@ -77,9 +74,10 @@ public class ContextTracingRuleApplicationFactory
 	private final TracingInferenceProducer<ClassInference> inferenceProducer_;
 
 	public ContextTracingRuleApplicationFactory(
+			final InterruptMonitor interrupter,
 			SaturationState<?> mainSaturationState,
 			TracingInferenceProducer<ClassInference> inferenceProducer) {
-		super(new MapSaturationState<ExtendedContext>(
+		super(interrupter, new MapSaturationState<ExtendedContext>(
 				mainSaturationState.getOntologyIndex(),
 				new MainContextFactory()));
 		mainSaturationState_ = mainSaturationState;

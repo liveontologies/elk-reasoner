@@ -67,6 +67,7 @@ public class IncrementalInstanceTaxonomyComputationStage extends
 				.getModified();
 
 		this.computation_ = new InstanceTaxonomyComputation(modified,
+				reasoner.getInterrupter(),
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), reasoner.saturationState,
 				reasoner.instanceTaxonomyState.getTaxonomy());
@@ -103,12 +104,6 @@ public class IncrementalInstanceTaxonomyComputationStage extends
 		if (computation_ != null) {
 			computation_.printStatistics();
 		}
-	}
-
-	@Override
-	public synchronized void setInterrupt(boolean flag) {
-		super.setInterrupt(flag);
-		setInterrupt(computation_, flag);
 	}
 
 }

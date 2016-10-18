@@ -25,18 +25,11 @@
  */
 package org.semanticweb.elk.owlapi;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.semanticweb.elk.owl.parsing.Owl2ParseException;
-import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
+import org.semanticweb.elk.reasoner.FailingReasonerInterrupter;
+import org.semanticweb.elk.reasoner.stages.ReasonerInterrupter;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
-import org.semanticweb.elk.reasoner.stages.RestartingStageExecutor;
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
+import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 /**
  * A collection of utility methods to be used in OWL API related tests
@@ -44,45 +37,46 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
 public class OWLAPITestUtils {
 
-	public static ElkReasoner createReasoner(InputStream stream)
-			throws IOException, Owl2ParseException {
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		OWLOntology ontology = null;
-
-		try {
-			ontology = manager.loadOntologyFromOntologyDocument(stream);
-		} catch (OWLOntologyCreationIOException e) {
-			throw new IOException(e);
-		} catch (OWLOntologyCreationException e) {
-			throw new Owl2ParseException(e);
-		}
-
-		return new ElkReasoner(ontology, false, new RestartingStageExecutor());
+	public static ElkReasoner createReasoner(final OWLOntology ontology,
+			final boolean isBufferingMode,
+			final ReasonerInterrupter interrupter,
+			final ReasonerStageExecutor stageExecutor) {
+		return new ElkReasoner(ontology, isBufferingMode, interrupter,
+				stageExecutor);
 	}
 
-	public static ElkReasoner createReasoner(OWLOntology ontology) {
-		return new ElkReasoner(ontology, false, new RestartingStageExecutor());
+	/**
+	 * Created a reasoner that fails on interrupt.
+	 * 
+	 * @param ontology
+	 * @param isBufferingMode
+	 * @param stageExecutor
+	 * @return
+	 */
+	public static ElkReasoner createReasoner(final OWLOntology ontology,
+			final boolean isBufferingMode,
+			final ReasonerStageExecutor stageExecutor) {
+		return createReasoner(ontology, isBufferingMode,
+				FailingReasonerInterrupter.INSTANCE, stageExecutor);
+	}
+
+	/**
+	 * Created a reasoner that fails on interrupt.
+	 * 
+	 * @param ontology
+	 * @return
+	 */
+	public static ElkReasoner createReasoner(final OWLOntology ontology) {
+		return createReasoner(ontology, false,
+				FailingReasonerInterrupter.INSTANCE, new SimpleStageExecutor());
 	}
 	
 	public static ElkProver createProver(OWLOntology ontology) {
 		return new ElkProver(createReasoner(ontology));
-	}
-
-	public static ElkReasoner createReasoner(OWLOntology ontology,
-			ReasonerConfiguration config) {
-		return new ElkReasoner(ontology, false,
-				new ElkReasonerConfiguration(ElkReasonerConfiguration
-						.getDefaultOwlReasonerConfiguration(), config));
-
-	}
-
-	public static ElkReasoner createReasoner(final OWLOntology ontology,
-			final boolean isBufferingMode,
-			final ReasonerStageExecutor stageExecutor) {
-		return new ElkReasoner(ontology, isBufferingMode, stageExecutor);
 	}
 
 }

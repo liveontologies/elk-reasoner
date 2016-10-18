@@ -37,15 +37,16 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
-import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
+import org.semanticweb.elk.util.concurrent.computation.DelegateInterruptMonitor;
 
 /**
  * Computes object property taxonomy.
  * 
  * @author Peter Skocovsky
  */
-public class ObjectPropertyTaxonomyComputationFactory extends SimpleInterrupter
-		implements
+public class ObjectPropertyTaxonomyComputationFactory
+		extends DelegateInterruptMonitor implements
 		InputProcessorFactory<IndexedObjectProperty, ObjectPropertyTaxonomyComputationFactory.Engine> {
 
 	/**
@@ -60,9 +61,11 @@ public class ObjectPropertyTaxonomyComputationFactory extends SimpleInterrupter
 	private final Collection<? extends Collection<? extends ElkObjectProperty>> defaultDirectSubproperties_;
 
 	public ObjectPropertyTaxonomyComputationFactory(
+			final InterruptMonitor interrupter,
 			final TransitiveReductionOutputVisitor<ElkObjectProperty> outputProcessor,
 			final OntologyIndex index,
 			final PredefinedElkObjectPropertyFactory predefinedFactory) {
+		super(interrupter);
 		this.outputProcessor_ = outputProcessor;
 		this.indexedTopProperty_ = index.getOwlTopObjectProperty();
 		this.indexedBottomProperty_ = index.getOwlBottomObjectProperty();

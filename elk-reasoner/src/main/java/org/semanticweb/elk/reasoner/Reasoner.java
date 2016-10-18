@@ -36,6 +36,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.stages.AbstractReasonerState;
+import org.semanticweb.elk.reasoner.stages.ReasonerInterrupter;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.FreshInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.FreshTaxonomyNode;
@@ -95,10 +96,12 @@ public class Reasoner extends AbstractReasonerState {
 	/**
 	 * Constructor. In most cases, Reasoners should be created by the
 	 * {@link ReasonerFactory}.
-	 * */
-	protected Reasoner(ElkObject.Factory elkFactory, AxiomLoader axiomLoader,
+	 */
+	protected Reasoner(ElkObject.Factory elkFactory,
+			AxiomLoader.Factory axiomLoaderFactory,
+			final ReasonerInterrupter interrupter,
 			ReasonerStageExecutor stageExecutor, ReasonerConfiguration config) {
-		super(elkFactory, axiomLoader);
+		super(elkFactory, axiomLoaderFactory, interrupter);
 
 		this.stageExecutor_ = stageExecutor;
 		this.progressMonitor = new DummyProgressMonitor();

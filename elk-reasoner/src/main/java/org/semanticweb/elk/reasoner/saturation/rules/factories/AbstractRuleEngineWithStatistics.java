@@ -1,7 +1,3 @@
-package org.semanticweb.elk.reasoner.saturation.rules.factories;
-
-import org.semanticweb.elk.ModifiableReference;
-
 /*
  * #%L
  * ELK Reasoner
@@ -23,12 +19,14 @@ import org.semanticweb.elk.ModifiableReference;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
+import org.semanticweb.elk.ModifiableReference;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextStatistics;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
@@ -64,7 +62,7 @@ public abstract class AbstractRuleEngineWithStatistics<I extends RuleApplication
 	public AbstractRuleEngineWithStatistics(
 			ModifiableReference<Context> activeContext,
 			ClassInference.Visitor<?> inferenceProcessor,
-			WorkerLocalTodo localTodo, Interrupter interrupter,
+			WorkerLocalTodo localTodo, InterruptMonitor interrupter,
 			SaturationStatistics aggregatedStats,
 			SaturationStatistics localStatistics) {
 		super(activeContext, inferenceProcessor, localTodo, interrupter);

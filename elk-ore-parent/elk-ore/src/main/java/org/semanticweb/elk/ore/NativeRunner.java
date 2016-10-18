@@ -40,6 +40,7 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
+import org.semanticweb.elk.reasoner.stages.ReasonerInterrupter;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
@@ -107,9 +108,10 @@ public class NativeRunner {
 		// create reasoner
 		ReasonerFactory reasoningFactory = new ReasonerFactory();
 		Owl2ParserFactory parserFactory = new Owl2FunctionalStyleParserFactory();
-		AxiomLoader loader = new Owl2StreamLoader(parserFactory, input);
-		Reasoner reasoner = reasoningFactory.createReasoner(loader,
-				new SimpleStageExecutor());
+		AxiomLoader.Factory loaderFactory = new Owl2StreamLoader.Factory(
+				parserFactory, input);
+		Reasoner reasoner = reasoningFactory.createReasoner(loaderFactory,
+				new ReasonerInterrupter(), new SimpleStageExecutor());
 
 		boolean printedStarted = false, printedTime = false;
 		

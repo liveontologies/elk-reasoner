@@ -30,6 +30,9 @@ import org.slf4j.LoggerFactory;
  * A {@link ReasonerStageExecutor} which refuses to interrupt: it will restart
  * any interrupted stage.
  * 
+ * <pre>
+ * TODO: remove this and implement the loop in the tests where it is used!
+ * </pre>
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -47,7 +50,6 @@ public class RestartingStageExecutor extends SimpleStageExecutor {
 				super.complete(stage);
 			} catch (ElkInterruptedException e) {
 				LOGGER_.info("{} restarted", stage);
-				stage.setInterrupt(false);
 				continue;
 			}
 			break;

@@ -1,4 +1,3 @@
-package org.semanticweb.elk.util.concurrent.computation;
 /*
  * #%L
  * ELK Utilities for Concurrency
@@ -20,6 +19,7 @@ package org.semanticweb.elk.util.concurrent.computation;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.util.concurrent.computation;
 
 import static org.junit.Assert.fail;
 
@@ -28,7 +28,8 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class TestInputProcessorFactory extends SimpleInterrupter implements
+public class TestInputProcessorFactory extends DelegateInterruptMonitor
+		implements
 		InputProcessorFactory<Integer, TestInputProcessorFactory.Engene> {
 
 	private final int seepInterval_, sleepIntervalDelta_;
@@ -37,7 +38,9 @@ public class TestInputProcessorFactory extends SimpleInterrupter implements
 
 	private final AtomicInteger aggregatedSum_ = new AtomicInteger(0);
 
-	public TestInputProcessorFactory(int sleepInterval, int sleepIntervalDelta) {
+	public TestInputProcessorFactory(final InterruptMonitor interrupter,
+			int sleepInterval, int sleepIntervalDelta) {
+		super(interrupter);
 		this.seepInterval_ = sleepInterval;
 		this.sleepIntervalDelta_ = sleepIntervalDelta;
 	}

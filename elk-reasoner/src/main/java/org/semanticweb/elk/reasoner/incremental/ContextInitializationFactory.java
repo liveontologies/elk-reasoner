@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.incremental;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.incremental;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.incremental;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -45,7 +44,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SubsumerDecomposi
 import org.semanticweb.elk.util.concurrent.computation.BaseInputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
-import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
+import org.semanticweb.elk.util.concurrent.computation.DelegateInterruptMonitor;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-class ContextInitializationFactory extends SimpleInterrupter
+class ContextInitializationFactory extends DelegateInterruptMonitor
 		implements
 			InputProcessorFactory<ArrayList<Context>, InputProcessor<ArrayList<Context>>> {
 
@@ -75,13 +75,14 @@ class ContextInitializationFactory extends SimpleInterrupter
 
 	private final SubsumerDecompositionRule<IndexedClass> classDecomposition_;
 
-	public ContextInitializationFactory(SaturationState<?> state,
+	public ContextInitializationFactory(final InterruptMonitor interrupter,
+			SaturationState<?> state,
 			LinkedContextInitRule changedContextInitRuleHead,
 			Map<? extends IndexedClassExpression, ? extends LinkedSubsumerRule> changedCompositionRules,
 			final Map<? extends IndexedClass, ? extends IndexedClassExpression> changedDefinitions,
 			final Map<? extends IndexedClass, ? extends ElkAxiom> changedDefinitionReasons,
 			SaturationStatistics stageStats) {
-
+		super(interrupter);
 		saturationState_ = state;
 		contextInitFactory_ = new SaturationConclusionBaseFactory();
 		changedCompositionRules_ = changedCompositionRules;
@@ -329,18 +330,6 @@ class ContextInitializationFactory extends SimpleInterrupter
 			// no need to add the local stats to the stage-level stats, as it's
 			// done by the caller
 		}
-	}
-
-	@Override
-	public void setInterrupt(boolean flag) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public boolean isInterrupted() {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 }

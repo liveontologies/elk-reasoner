@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.incremental;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +19,7 @@ package org.semanticweb.elk.reasoner.incremental;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.incremental;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,6 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
 /**
  * Goes through the input class expressions and puts each context's superclass
@@ -57,6 +54,7 @@ public class IncrementalChangesInitialization
 
 	public IncrementalChangesInitialization(
 			Collection<ArrayList<Context>> inputs,
+			final InterruptMonitor interrupter,
 			LinkedContextInitRule changedInitRules,
 			Map<? extends IndexedClassExpression, ? extends LinkedSubsumerRule> changedCompositionRules,
 			Map<? extends IndexedClass, ? extends IndexedClassExpression> changedDefinitions,
@@ -64,9 +62,9 @@ public class IncrementalChangesInitialization
 			SaturationState<?> state, ComputationExecutor executor,
 			SaturationStatistics stageStats, int maxWorkers,
 			ProgressMonitor progressMonitor) {
-		super(inputs, new ContextInitializationFactory(state, changedInitRules,
-				changedCompositionRules, changedDefinitions,
-				changedDefinitionReasons, stageStats), executor, maxWorkers,
-				progressMonitor);
+		super(inputs, new ContextInitializationFactory(interrupter,
+				state, changedInitRules, changedCompositionRules,
+				changedDefinitions, changedDefinitionReasons, stageStats),
+				executor, maxWorkers, progressMonitor);
 	}
 }

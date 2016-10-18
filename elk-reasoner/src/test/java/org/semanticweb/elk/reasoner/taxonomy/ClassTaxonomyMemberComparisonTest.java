@@ -35,8 +35,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.io.IOUtils;
-import org.semanticweb.elk.loading.AxiomLoader;
-import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.iris.ElkAbbreviatedIri;
@@ -46,7 +44,7 @@ import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.stages.FailingOnInterruptStageExecutor;
+import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.testing.PolySuite;
@@ -78,21 +76,12 @@ public class ClassTaxonomyMemberComparisonTest {
 		@Override
 		public Taxonomy<ElkClass> getTaxonomy(final String resource) throws ElkException {
 
-			InputStream stream = null;
+			final Reasoner reasoner = TestReasonerUtils.createTestReasoner(
+					getClass().getClassLoader().getResourceAsStream(resource),
+					new SimpleStageExecutor(), 1);
 
-			try {
-				stream = getClass().getClassLoader().getResourceAsStream(resource);
-				final AxiomLoader streamLoader =
-						new Owl2StreamLoader(new Owl2FunctionalStyleParserFactory(), stream);
+			return reasoner.getTaxonomy();
 
-				final Reasoner reasoner = TestReasonerUtils.createTestReasoner(streamLoader,
-						new FailingOnInterruptStageExecutor(), 1);
-
-				return reasoner.getTaxonomy();
-			} finally {
-				IOUtils.closeQuietly(stream);
-			}
-			
 		}
 		@Override
 		public String toString() {

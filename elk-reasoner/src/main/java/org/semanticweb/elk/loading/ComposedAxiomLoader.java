@@ -1,8 +1,3 @@
-package org.semanticweb.elk.loading;
-
-import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
-import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +19,9 @@ import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.loading;
+
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
  * A {@link AxiomLoader} that consists of two given {@link AxiomLoader}s. When
@@ -31,14 +29,14 @@ import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
  * , and then using the second one.
  * 
  * @author "Yevgeny Kazakov"
- * 
+ * @author Peter Skocovsky
  */
-public class ComposedAxiomLoader extends SimpleInterrupter implements
-		AxiomLoader {
+public class ComposedAxiomLoader implements AxiomLoader {
 
 	private final AxiomLoader firstLoader_, secondLoader_;
 
-	public ComposedAxiomLoader(AxiomLoader firstLoader, AxiomLoader secondLoader) {
+	public ComposedAxiomLoader(AxiomLoader firstLoader,
+			AxiomLoader secondLoader) {
 		this.firstLoader_ = firstLoader;
 		this.secondLoader_ = secondLoader;
 	}
@@ -68,10 +66,9 @@ public class ComposedAxiomLoader extends SimpleInterrupter implements
 	}
 
 	@Override
-	public synchronized void setInterrupt(boolean flag) {
-		super.setInterrupt(flag);
-		firstLoader_.setInterrupt(flag);
-		secondLoader_.setInterrupt(flag);
+	public boolean isInterrupted() {
+		// Does not need to check for interruptions.
+		return false;
 	}
 
 }

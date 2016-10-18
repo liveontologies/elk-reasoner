@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.incremental;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +19,7 @@ package org.semanticweb.elk.reasoner.incremental;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.incremental;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -36,6 +32,8 @@ import java.util.List;
 
 import org.junit.Test;
 import org.semanticweb.elk.exceptions.ElkException;
+import org.semanticweb.elk.loading.TestAxiomLoaderFactory;
+import org.semanticweb.elk.loading.TestChangesLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
@@ -96,7 +94,7 @@ public class IncrementalModeSwitchTest {
 
 		reasoner.setAllowIncrementalMode(true);
 		TestChangesLoader changeLoader = new TestChangesLoader();
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		changeLoader.add(axTransR);
 
@@ -139,7 +137,7 @@ public class IncrementalModeSwitchTest {
 		reasoner.setAllowIncrementalMode(true);
 
 		TestChangesLoader changeLoader = new TestChangesLoader();
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		for (ElkAxiom add : additions) {
 			changeLoader.add(add);

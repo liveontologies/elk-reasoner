@@ -84,9 +84,4 @@ abstract class AbstractIncrementalChangesInitializationStage extends
 		// TODO
 	}
 
-	@Override
-	public synchronized void setInterrupt(boolean flag) {
-		super.setInterrupt(flag);
-		setInterrupt(initialization, flag);
-	}
 }

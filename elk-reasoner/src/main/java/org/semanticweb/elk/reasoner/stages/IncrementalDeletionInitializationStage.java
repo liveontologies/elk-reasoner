@@ -85,6 +85,7 @@ public class IncrementalDeletionInitializationStage
 		// System.err.println(changedRulesByCE.keySet().size());
 
 		this.initialization = new IncrementalChangesInitialization(inputs,
+				reasoner.getInterrupter(),
 				changedInitRules, changedRulesByCE, changedDefinitions,
 				changedDefinitionReasons, reasoner.saturationState,
 				reasoner.getProcessExecutor(), stageStatistics, workerNo,

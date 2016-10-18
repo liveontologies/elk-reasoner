@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.stages;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.stages;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.stages;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -158,6 +157,7 @@ public class IncrementalAdditionInitializationStage
 		}
 
 		this.initialization = new IncrementalChangesInitialization(inputs,
+				reasoner.getInterrupter(),
 				changedInitRules, changedRulesByCE, changedDefinitions,
 				changedDefinitionReasons, reasoner.saturationState,
 				reasoner.getProcessExecutor(), stageStatistics, workerNo,

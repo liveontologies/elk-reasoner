@@ -1,11 +1,10 @@
 /*
  * #%L
- * ELK Utilities for Concurrency
- * 
- * $Id$
- * $HeadURL$
+ * ELK Reasoner
+ * $Id:$
+ * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,29 +19,26 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.util.concurrent.computation;
+package org.semanticweb.elk.reasoner;
+
+import org.semanticweb.elk.testing.TestOutput;
 
 /**
- * A simple interrupter, which uses a flag about the interrupt status
+ * A test delegate for tests with output.
  * 
- * @author "Yevgeny Kazakov"
- * 
+ * @author Peter Skocovsky
+ *
+ * @param <AO>
+ *            The type of actual test output.
  */
-public class SimpleInterrupter implements Interrupter {
+public interface ReasoningTestWithOutputDelegate<AO extends TestOutput>
+		extends ReasoningTestDelegate<AO> {
 
 	/**
-	 * the interrupt status of this interrupter
+	 * Called at the beginning of the test with output.
+	 * 
+	 * @throws Exception
 	 */
-	private volatile boolean isInterrupted_ = false;
-
-	@Override
-	public void setInterrupt(boolean flag) {
-		this.isInterrupted_ = flag;
-	}
-
-	@Override
-	public boolean isInterrupted() {
-		return isInterrupted_;
-	}
+	void initWithOutput() throws Exception;
 
 }

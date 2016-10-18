@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,61 +19,28 @@ package org.semanticweb.elk.reasoner;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.loading;
 
-import java.util.LinkedList;
-import java.util.Queue;
-
-import org.semanticweb.elk.loading.AbstractAxiomLoader;
-import org.semanticweb.elk.loading.AxiomLoader;
-import org.semanticweb.elk.loading.ElkLoadingException;
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
- * A simple {@link AxiomLoader} which internally keeps sets of axioms to be
- * added
- * 
- * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
+ * An {@link AxiomLoader} that loads nothing
  * 
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  */
-public class TestLoader extends AbstractAxiomLoader implements AxiomLoader {
-
-	// axioms to be added
-	private final Queue<ElkAxiom> axioms_ = new LinkedList<ElkAxiom>();
-
-	public TestLoader() {
-
-	}
-
-	public TestLoader(Iterable<ElkAxiom> axioms) {
-		for (ElkAxiom axiom : axioms) {
-			add(axiom);
-		}
-	}
-
-	public TestLoader add(final ElkAxiom axiom) {
-		axioms_.add(axiom);
-		return this;
-	}
+public class EmptyAxiomLoader extends TestAxiomLoader {
 
 	@Override
 	public void load(ElkAxiomProcessor axiomInserter,
 			ElkAxiomProcessor axiomDeleter) throws ElkLoadingException {
-		for (;;) {
-			ElkAxiom axiom = axioms_.poll();
-			if (axiom == null)
-				break;
-			axiomInserter.visit(axiom);
-		}
+		// does nothing
 
 	}
 
 	@Override
 	public boolean isLoadingFinished() {
-		return axioms_.isEmpty();
+		return true;
 	}
 
 }

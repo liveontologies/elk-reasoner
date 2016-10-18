@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.incremental;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +19,7 @@ package org.semanticweb.elk.reasoner.incremental;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.incremental;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -32,6 +28,8 @@ import java.io.IOException;
 
 import org.junit.Test;
 import org.semanticweb.elk.exceptions.ElkException;
+import org.semanticweb.elk.loading.TestAxiomLoaderFactory;
+import org.semanticweb.elk.loading.TestChangesLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
@@ -81,7 +79,7 @@ public class LowLevelIncrementalABoxTest {
 		reasoner.setAllowIncrementalMode(true);
 		
 		TestChangesLoader changeLoader = new TestChangesLoader();
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		//changeLoader.clear();
 		changeLoader.remove(axASubB);
@@ -102,7 +100,7 @@ public class LowLevelIncrementalABoxTest {
 				.createTestReasoner(loader, new PostProcessingStageExecutor());
 
 		reasoner.setAllowIncrementalMode(false);
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
@@ -153,7 +151,7 @@ public class LowLevelIncrementalABoxTest {
 		reasoner.setAllowIncrementalMode(true);
 
 		TestChangesLoader changeLoader = new TestChangesLoader();
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 		
 		//changeLoader.clear();
 		changeLoader.remove(axiInstA);
@@ -165,7 +163,7 @@ public class LowLevelIncrementalABoxTest {
 		//check that the individual properly re-appears
 		//changeLoader.clear();
 		
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 		
 		changeLoader.add(axiInstA);
 		
@@ -201,7 +199,7 @@ public class LowLevelIncrementalABoxTest {
 		
 		reasoner.setAllowIncrementalMode(true);		
 		TestChangesLoader changeLoader = new TestChangesLoader();
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		//changeLoader.clear();
 		changeLoader.add(axNewInstB);

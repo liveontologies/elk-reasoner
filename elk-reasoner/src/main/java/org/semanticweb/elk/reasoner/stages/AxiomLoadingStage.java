@@ -196,12 +196,6 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 	public void printInfo() {
 		// TODO
 	}
-	
-	@Override
-	public synchronized void setInterrupt(boolean flag) {
-		super.setInterrupt(flag);
-		setInterrupt(loader_, flag);
-	}
 
 	private static class IndexingUnsupportedListener
 			implements ModifiableOntologyIndex.IndexingUnsupportedListener {

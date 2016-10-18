@@ -27,7 +27,9 @@ import java.net.URL;
 import java.util.List;
 
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.loading.AllAxiomTrackingOntologyLoader;
 import org.semanticweb.elk.loading.AxiomLoader;
+import org.semanticweb.elk.loading.TestAxiomLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TaxonomyDiffManifest;
@@ -64,7 +66,7 @@ public class RandomWalkIncrementalClassificationCorrectnessTest extends
 	}
 
 	@Override
-	protected AxiomLoader getAxiomTrackingLoader(AxiomLoader fileLoader,
+	protected TestAxiomLoader getAxiomTrackingLoader(AxiomLoader fileLoader,
 			OnOffVector<ElkAxiom> changingAxioms, List<ElkAxiom> staticAxioms) {
 		// return new ClassAxiomTrackingOntologyLoader(fileLoader,
 		// changingAxioms, staticAxioms);

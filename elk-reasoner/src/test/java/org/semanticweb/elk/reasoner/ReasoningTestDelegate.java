@@ -38,7 +38,7 @@ public interface ReasoningTestDelegate<AO extends TestOutput> {
 	 * 
 	 * @throws Exception
 	 */
-	void init() throws Exception;
+	void before() throws Exception;
 
 	/**
 	 * Computes and returns the actual test output.
@@ -51,6 +51,6 @@ public interface ReasoningTestDelegate<AO extends TestOutput> {
 	/**
 	 * Called after the test is run.
 	 */
-	void dispose();
+	void after();
 
 }

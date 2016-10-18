@@ -1,11 +1,10 @@
-/*
+/*-
  * #%L
  * ELK Utilities for Concurrency
- * 
- * $Id$
- * $HeadURL$
+ * $Id:$
+ * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,25 +21,25 @@
  */
 package org.semanticweb.elk.util.concurrent.computation;
 
-import static org.junit.Assert.fail;
+public class TestInterrupter implements Interrupter {
 
-/**
- * An interrupter to be used in unit tests, which always fails for interruption
- * attempts
- * 
- * @author "Yevgeny Kazakov"
- * 
- */
-public class FailingInterrupter implements Interrupter {
+	/**
+	 * The interruption status of this interrupter.
+	 */
+	private volatile boolean isInterrupted_ = false;
 
 	@Override
-	public void setInterrupt(boolean flag) {
-		fail();
+	public void interrupt() {
+		isInterrupted_ = true;
 	}
 
 	@Override
 	public boolean isInterrupted() {
-		return false;
+		return isInterrupted_;
+	}
+
+	public void clearInterrupt() {
+		isInterrupted_ = false;
 	}
 
 }

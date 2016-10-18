@@ -83,7 +83,6 @@ import org.semanticweb.elk.reasoner.tracing.TraceState;
 import org.semanticweb.elk.reasoner.tracing.TracingInferenceSet;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
-import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,7 +95,7 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  * @author Peter Skocovsky
  */
-public abstract class AbstractReasonerState extends SimpleInterrupter {
+public abstract class AbstractReasonerState {
 
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
@@ -119,6 +118,12 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 * The factory for creating auxiliary ElkObjects
 	 */
 	private final ElkObject.Factory elkFactory_;
+
+	/**
+	 * The object that is notified and propagates the information about
+	 * interruption.
+	 */
+	private final ReasonerInterrupter interrupter_;
 
 	final SaturationState<? extends Context> saturationState;
 
@@ -193,8 +198,10 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 
 	private final ElkSubObjectPropertyExpressionVisitor<ModifiableIndexedPropertyChain> subPropertyConverter_;
 
-	protected AbstractReasonerState(ElkObject.Factory elkFactory) {
+	protected AbstractReasonerState(ElkObject.Factory elkFactory,
+			final ReasonerInterrupter interrupter) {
 		this.elkFactory_ = elkFactory;
+		this.interrupter_ = interrupter;
 		this.ontologyIndex = new DifferentialIndex(elkFactory);
 		this.propertyHierarchyCompositionState_ = new PropertyHierarchyCompositionState();
 		this.saturationState = SaturationStateFactory
@@ -220,23 +227,26 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	}
 
 	protected AbstractReasonerState(ElkObject.Factory elkFactory,
-			AxiomLoader axiomLoader) {
-		this(elkFactory);
-		registerAxiomLoader(axiomLoader);
+			AxiomLoader.Factory axiomLoaderFactory,
+			final ReasonerInterrupter interrupter) {
+		this(elkFactory, interrupter);
+		registerAxiomLoader(axiomLoaderFactory);
 	}
 
 	public ElkObject.Factory getElkFactory() {
 		return elkFactory_;
 	}
-	
+
+	/**
+	 * @return The object that is notified and propagates the information about
+	 *         interruption.
+	 */
+	public ReasonerInterrupter getInterrupter() {
+		return interrupter_;
+	}
+
 	protected void complete(ReasonerStage stage) throws ElkException {
-		try {
-			getStageExecutor().complete(stage);
-		} catch (ElkInterruptedException e) {
-			// clear the interrupt flag
-			setInterrupt(false);
-			throw e;
-		}
+		getStageExecutor().complete(stage);
 	}
 
 	public synchronized void setAllowIncrementalMode(boolean allow) {
@@ -321,16 +331,21 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 				.invalidateRecursive();
 	}
 
-	public synchronized void registerAxiomLoader(AxiomLoader newAxiomLoader) {
+	public synchronized void registerAxiomLoader(
+			final AxiomLoader.Factory axiomLoaderFactory) {
 		LOGGER_.trace("Registering new axiom loader");
 
 		resetAxiomLoading();
 
-		if (axiomLoader_ == null || axiomLoader_.isLoadingFinished())
+		final AxiomLoader newAxiomLoader = axiomLoaderFactory
+				.getAxiomLoader(getInterrupter());
+
+		if (axiomLoader_ == null || axiomLoader_.isLoadingFinished()) {
 			axiomLoader_ = newAxiomLoader;
-		else
+		} else {
 			axiomLoader_ = new ComposedAxiomLoader(axiomLoader_,
 					newAxiomLoader);
+		}
 	}
 
 	/**
@@ -384,7 +399,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 */
 	public void interrupt() {
 		LOGGER_.debug("Interrupt requested");
-		setInterrupt(true);
+		interrupter_.interrupt();
 	}
 
 	/**
@@ -904,20 +919,6 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 				.isCompleted();
 	}
 
-	@Override
-	public void setInterrupt(boolean flag) {
-		ReasonerStageExecutor stageExecutor = getStageExecutor();
-		if (stageExecutor != null) {
-			synchronized (stageExecutor) {
-				super.setInterrupt(flag);
-				stageExecutor.setInterrupt(flag);
-			}
-		} else {
-			super.setInterrupt(flag);
-		}
-		// this flag will be cleared after ElkInterruptedException is thrown
-	}
-
 	/**
 	 * Compute the index representation of the given ontology if it has not been
 	 * done yet.
@@ -1019,7 +1020,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		}
 		stageManager.inferenceTracingStage.invalidateRecursive();
 		getTaxonomyQuietly(); // ensure that classes are saturated
-		getStageExecutor().complete(stageManager.inferenceTracingStage);
+		complete(stageManager.inferenceTracingStage);
 		return traceState_;
 	}
 	

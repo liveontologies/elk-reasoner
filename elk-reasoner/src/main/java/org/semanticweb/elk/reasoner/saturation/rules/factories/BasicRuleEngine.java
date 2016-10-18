@@ -22,13 +22,12 @@
 package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
 import org.semanticweb.elk.ModifiableReference;
-import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContextInitializationNoPremises;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
 /**
  * An {@link AbstractRuleEngine} which produces {@link ClassInference}s and
@@ -49,7 +48,7 @@ public class BasicRuleEngine<I extends RuleApplicationInput>
 
 	protected BasicRuleEngine(ModifiableReference<Context> activeContext,
 			ClassInference.Visitor<Boolean> inferenceProcessor,
-			WorkerLocalTodo localTodo, Interrupter interrupter,
+			WorkerLocalTodo localTodo, InterruptMonitor interrupter,
 			SaturationStateWriter<?> writer,
 			SaturationStatistics aggregatedStatistics,
 			SaturationStatistics localStatistics) {

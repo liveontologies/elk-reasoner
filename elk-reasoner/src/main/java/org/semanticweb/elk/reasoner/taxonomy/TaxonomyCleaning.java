@@ -43,7 +43,8 @@ import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
-import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
+import org.semanticweb.elk.util.concurrent.computation.DelegateInterruptMonitor;
 
 /**
  * Cleans both class and instance taxonomies concurrently
@@ -57,12 +58,15 @@ public class TaxonomyCleaning
 		ReasonerComputationWithInputs<IndexedClassEntity, TaxonomyCleaningFactory> {
 
 	public TaxonomyCleaning(Collection<IndexedClassEntity> inputs,
+			final InterruptMonitor interrupter,
 			ClassTaxonomyState classTaxonomyState,
 			InstanceTaxonomyState instanceTaxonomyState,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor) {
-		super(inputs, new TaxonomyCleaningFactory(classTaxonomyState,
-				instanceTaxonomyState), executor, maxWorkers, progressMonitor);
+		super(inputs,
+				new TaxonomyCleaningFactory(interrupter, classTaxonomyState,
+						instanceTaxonomyState),
+				executor, maxWorkers, progressMonitor);
 	}
 
 }
@@ -74,7 +78,7 @@ public class TaxonomyCleaning
  *         pavel.klinov@uni-ulm.de
  * @author Peter Skocovsky
  */
-class TaxonomyCleaningFactory extends SimpleInterrupter
+class TaxonomyCleaningFactory extends DelegateInterruptMonitor
 		implements
 		InputProcessorFactory<IndexedClassEntity, InputProcessor<IndexedClassEntity>> {
 
@@ -86,8 +90,10 @@ class TaxonomyCleaningFactory extends SimpleInterrupter
 	private final ClassTaxonomyState classTaxonomyState_;
 	private final InstanceTaxonomyState instanceTaxonomyState_;
 
-	TaxonomyCleaningFactory(final ClassTaxonomyState classTaxonomyState,
+	TaxonomyCleaningFactory(final InterruptMonitor interrupter,
+			final ClassTaxonomyState classTaxonomyState,
 			final InstanceTaxonomyState instanceTaxonomyState) {
+		super(interrupter);
 		classTaxonomyState_ = classTaxonomyState;
 		instanceTaxonomyState_ = instanceTaxonomyState;
 	}

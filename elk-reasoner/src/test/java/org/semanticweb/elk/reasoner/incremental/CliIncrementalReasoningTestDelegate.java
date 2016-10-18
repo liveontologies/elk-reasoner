@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.semanticweb.elk.io.IOUtils;
+import org.semanticweb.elk.loading.TestAxiomLoaderFactory;
+import org.semanticweb.elk.loading.TestChangesLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
@@ -48,8 +50,6 @@ public abstract class CliIncrementalReasoningTestDelegate<EO extends TestOutput,
 
 	protected final TestManifest<? extends UrlTestInput> manifest_;
 
-	protected Collection<ElkAxiom> allAxioms_;
-
 	protected Reasoner standardReasoner_;
 	protected Reasoner incrementalReasoner_;
 
@@ -59,9 +59,9 @@ public abstract class CliIncrementalReasoningTestDelegate<EO extends TestOutput,
 	}
 
 	@Override
-	public Collection<ElkAxiom> loadAxioms() throws Exception {
+	public Collection<ElkAxiom> initIncremental() throws Exception {
 
-		this.allAxioms_ = new ArrayList<ElkAxiom>();
+		final Collection<ElkAxiom> allAxioms = new ArrayList<ElkAxiom>();
 		final Collection<ElkAxiom> changingAxioms = new ArrayList<ElkAxiom>();
 
 		InputStream stream = null;
@@ -83,7 +83,7 @@ public abstract class CliIncrementalReasoningTestDelegate<EO extends TestOutput,
 				public void visit(ElkAxiom elkAxiom) throws Owl2ParseException {
 					// all axioms are dynamic
 					changingAxioms.add(elkAxiom);
-					allAxioms_.add(elkAxiom);
+					allAxioms.add(elkAxiom);
 				}
 
 				@Override
@@ -93,6 +93,17 @@ public abstract class CliIncrementalReasoningTestDelegate<EO extends TestOutput,
 
 			});
 
+			standardReasoner_ = TestReasonerUtils.createTestReasoner(
+					new TestChangesLoader(allAxioms,
+							IncrementalChangeType.ADD),
+					new PostProcessingStageExecutor());
+			standardReasoner_.setAllowIncrementalMode(false);
+			incrementalReasoner_ = TestReasonerUtils.createTestReasoner(
+					new TestChangesLoader(allAxioms,
+							IncrementalChangeType.ADD),
+					new PostProcessingStageExecutor());
+			incrementalReasoner_.setAllowIncrementalMode(true);
+
 			return changingAxioms;
 
 		} finally {
@@ -101,24 +112,12 @@ public abstract class CliIncrementalReasoningTestDelegate<EO extends TestOutput,
 	}
 
 	@Override
-	public void init() throws Exception {
-		standardReasoner_ = TestReasonerUtils.createTestReasoner(
-				new TestChangesLoader(allAxioms_, IncrementalChangeType.ADD),
-				new PostProcessingStageExecutor());
-		standardReasoner_.setAllowIncrementalMode(false);
-		incrementalReasoner_ = TestReasonerUtils.createTestReasoner(
-				new TestChangesLoader(allAxioms_, IncrementalChangeType.ADD),
-				new PostProcessingStageExecutor());
-		incrementalReasoner_.setAllowIncrementalMode(true);
-	}
-
-	@Override
 	public void applyChanges(final Iterable<ElkAxiom> changes,
 			final IncrementalChangeType type) {
-		standardReasoner_
-				.registerAxiomLoader(new TestChangesLoader(changes, type));
-		incrementalReasoner_
-				.registerAxiomLoader(new TestChangesLoader(changes, type));
+		standardReasoner_.registerAxiomLoader(new TestAxiomLoaderFactory(
+				new TestChangesLoader(changes, type)));
+		incrementalReasoner_.registerAxiomLoader(new TestAxiomLoaderFactory(
+				new TestChangesLoader(changes, type)));
 	}
 
 	@Override
@@ -129,7 +128,12 @@ public abstract class CliIncrementalReasoningTestDelegate<EO extends TestOutput,
 	}
 
 	@Override
-	public void dispose() {
+	public void before() throws Exception {
+		// Empty.
+	}
+
+	@Override
+	public void after() {
 		// Empty.
 	}
 

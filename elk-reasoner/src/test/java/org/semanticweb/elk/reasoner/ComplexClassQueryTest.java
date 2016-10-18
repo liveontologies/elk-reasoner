@@ -30,6 +30,7 @@ import java.util.Set;
 import org.junit.Test;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.loading.EmptyAxiomLoader;
+import org.semanticweb.elk.loading.TestLoader;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObject;

@@ -1,4 +1,3 @@
-package org.semanticweb.elk.reasoner.incremental;
 /*
  * #%L
  * ELK Reasoner
@@ -20,6 +19,7 @@ package org.semanticweb.elk.reasoner.incremental;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.incremental;
 
 import java.util.ArrayList;
 
@@ -27,7 +27,7 @@ import org.semanticweb.elk.reasoner.incremental.ContextInitializationFactory.Con
 import org.semanticweb.elk.reasoner.incremental.ContextInitializationFactory.TimedContextProcessor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.concurrent.computation.BaseInputProcessor;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
@@ -45,13 +45,14 @@ class TimedContextCollectionProcessor extends
 
 	private final IncrementalProcessingStatistics localStats_ = new IncrementalProcessingStatistics();
 
-	private final Interrupter interrupter_;
+	private final InterruptMonitor interrupter_;
 	
 	private int procNumber_ = 0;
 		
 
 	TimedContextCollectionProcessor(ContextProcessor baseProcessor,
-			IncrementalProcessingStatistics stageStats, Interrupter interrupter) {
+			IncrementalProcessingStatistics stageStats,
+			InterruptMonitor interrupter) {
 		contextProcessor_ = new TimedContextProcessor(baseProcessor,
 				localStats_);
 		stageStats_ = stageStats;
