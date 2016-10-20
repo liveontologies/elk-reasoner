@@ -42,10 +42,10 @@ public class ElkGeneralPreferences {
 	public ElkGeneralPreferences() {
 		ReasonerConfiguration elkDefaults = ReasonerConfiguration
 				.getConfiguration();
-		defaultNumberOfWorkers_ = elkDefaults
-				.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS);
-		defaultIncrementalMode_ = elkDefaults
-				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_MODE_ALLOWED);
+		defaultNumberOfWorkers_ = elkDefaults.getParameterAsInt(
+				ReasonerConfiguration.NUM_OF_WORKING_THREADS);
+		defaultIncrementalMode_ = elkDefaults.getParameterAsBoolean(
+				ReasonerConfiguration.INCREMENTAL_MODE_ALLOWED);
 		defaultAutoSynchronization_ = false;
 	}
 
@@ -79,20 +79,6 @@ public class ElkGeneralPreferences {
 		incrementalMode = defaultIncrementalMode_;
 		autoSynchronization = defaultAutoSynchronization_;
 		return this;
-	}
-
-	/**
-	 * @return the {@link ReasonerConfiguration} with the settings from this
-	 *         {@link ElkGeneralPreferences}
-	 */
-	public ReasonerConfiguration getElkConfig() {
-		ReasonerConfiguration elkConfig = ReasonerConfiguration
-				.getConfiguration();
-		elkConfig.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS,
-				String.valueOf(numberOfWorkers));
-		elkConfig.setParameter(ReasonerConfiguration.INCREMENTAL_MODE_ALLOWED,
-				String.valueOf(incrementalMode));
-		return elkConfig;
 	}
 
 }

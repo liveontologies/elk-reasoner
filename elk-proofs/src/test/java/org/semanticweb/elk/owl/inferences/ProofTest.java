@@ -36,7 +36,6 @@ import org.junit.runner.RunWith;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.loading.TestLoader;
-import org.semanticweb.elk.owl.inferences.utils.TestUtils;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObject;

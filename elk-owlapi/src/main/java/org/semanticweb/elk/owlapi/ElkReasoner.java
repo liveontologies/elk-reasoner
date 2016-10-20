@@ -36,7 +36,7 @@ import org.semanticweb.elk.owl.inferences.ReasonerProofProvider;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.owlapi.wrapper.ElkObjectWrapFactory;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.reasoner.DummyProgressMonitor;
 import org.semanticweb.elk.reasoner.ElkUnsupportedReasoningTaskException;
@@ -129,7 +129,7 @@ public class ElkReasoner implements OWLReasoner {
 	/** this object is used to load pending changes */
 	private volatile OwlChangesLoaderFactory bufferedChangesLoader_;
 	/** configurations required for ELK reasoner */
-	private final ReasonerConfiguration config_;
+	private ReasonerConfiguration config_;
 	private final boolean isAllowFreshEntities;
 	private final ReasonerStageExecutor stageExecutor_;
 	private final ReasonerInterrupter interrupter_;
@@ -165,7 +165,7 @@ public class ElkReasoner implements OWLReasoner {
 		this.ontologyChangeProgressListener_ = new OntologyChangeProgressListener();
 		this.owlOntologymanager_
 				.addOntologyChangeProgessListener(ontologyChangeProgressListener_);
-		this.objectFactory_ = new ElkObjectWrapFactory(owlOntologymanager_.getOWLDataFactory());
+		this.objectFactory_ = new ElkObjectEntityRecyclingFactory();
 		this.owlConverter_ = OwlConverter.getInstance();
 		this.elkConverter_ = ElkConverter.getInstance();
 
@@ -232,8 +232,7 @@ public class ElkReasoner implements OWLReasoner {
 	 */
 	private void reCreateReasoner() {
 		this.reasoner_ = new ReasonerFactory().createReasoner(
-				new ElkObjectWrapFactory(
-						owlOntologymanager_.getOWLDataFactory()),
+				new ElkObjectEntityRecyclingFactory(),
 				new OwlOntologyLoader.Factory(owlOntology_,
 						this.mainProgressMonitor_),
 				interrupter_, stageExecutor_, config_);
@@ -253,7 +252,12 @@ public class ElkReasoner implements OWLReasoner {
 		return reasoner_;
 	}
 
+	public ReasonerConfiguration getConfigurationOptions() {
+		return config_;
+	}
+	
 	public void setConfigurationOptions(ReasonerConfiguration config) {
+		this.config_ = config;
 		reasoner_.setConfigurationOptions(config);
 	}
 

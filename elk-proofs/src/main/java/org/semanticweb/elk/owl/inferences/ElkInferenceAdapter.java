@@ -23,7 +23,6 @@ package org.semanticweb.elk.owl.inferences;
  */
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.liveontologies.owlapi.proof.util.Inference;
@@ -41,6 +40,10 @@ public class ElkInferenceAdapter implements Inference<ElkAxiom> {
 		this.elkInference_ = elkInference;
 	}
 
+	public ElkInference getElkInference() {
+		return elkInference_;
+	}
+
 	@Override
 	public String getName() {
 		return elkInference_.getName();
@@ -52,7 +55,7 @@ public class ElkInferenceAdapter implements Inference<ElkAxiom> {
 	}
 
 	@Override
-	public Collection<? extends ElkAxiom> getPremises() {
+	public List<? extends ElkAxiom> getPremises() {
 		int premiseCount = elkInference_.getPremiseCount();
 		List<ElkAxiom> result = new ArrayList<ElkAxiom>(premiseCount);
 		for (int i = 0; i < premiseCount; i++) {

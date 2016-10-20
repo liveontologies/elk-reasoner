@@ -30,15 +30,16 @@ import org.liveontologies.owlapi.proof.OWLProofStep;
 import org.semanticweb.elk.owl.inferences.ElkInference;
 import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
 import org.semanticweb.elk.owl.inferences.ElkToldAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
+import org.semanticweb.elk.owlapi.ElkConverter;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.Operations.Transformation;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
 public class ElkOWLProofNode implements OWLProofNode {
 
-	private final OWLAxiom member_;
+	private final ElkAxiom member_;
 
 	private final ElkInferenceSet elkInferences_;
 
@@ -46,22 +47,22 @@ public class ElkOWLProofNode implements OWLProofNode {
 
 	private int hash_ = 0;
 
-	public ElkOWLProofNode(OWLAxiom member, ElkInferenceSet elkInferences,
+	public ElkOWLProofNode(ElkAxiom member, ElkInferenceSet elkInferences,
 			ElkObject.Factory elkFactory) {
-		this.member_ = member.getAxiomWithoutAnnotations();
+		this.member_ = member;
 		this.elkInferences_ = elkInferences;
 		this.elkFactory_ = elkFactory;
 	}
 
 	@Override
 	public OWLAxiom getMember() {
-		return member_;
+		return ElkConverter.getInstance().convert(member_);
 	}
 
 	@Override
 	public Collection<? extends OWLProofStep> getInferences() {
 		return Operations.map(
-				elkInferences_.get(OwlConverter.getInstance().convert(member_)),
+				elkInferences_.get(member_),
 				new Transformation<ElkInference, OWLProofStep>() {
 
 					@Override

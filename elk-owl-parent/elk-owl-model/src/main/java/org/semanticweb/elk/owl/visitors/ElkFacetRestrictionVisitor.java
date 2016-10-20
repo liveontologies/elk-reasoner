@@ -35,6 +35,6 @@ import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
  */
 public interface ElkFacetRestrictionVisitor<O> {
 
-	O visit(ElkFacetRestriction restricition);
+	O visit(ElkFacetRestriction restriction);
 
 }

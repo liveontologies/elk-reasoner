@@ -2,6 +2,8 @@ package org.semanticweb.elk.owlapi;
 
 import org.liveontologies.owlapi.proof.OWLProofNode;
 import org.liveontologies.owlapi.proof.OWLProver;
+import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
+import org.semanticweb.elk.owl.inferences.FlattenedElkInferenceSet;
 
 /*
  * #%L
@@ -28,6 +30,7 @@ import org.liveontologies.owlapi.proof.OWLProver;
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owlapi.proofs.ElkOWLProofNode;
 import org.semanticweb.elk.owlapi.wrapper.OwlClassAxiomConverterVisitor;
+import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.UnsupportedEntailmentTypeException;
 
@@ -41,11 +44,18 @@ public class ElkProver extends DelegatingOWLReasoner<ElkReasoner>
 	@Override
 	public OWLProofNode getProof(OWLAxiom entailment)
 			throws UnsupportedEntailmentTypeException {
+		ReasonerConfiguration config = getDelegate().getConfigurationOptions();
+		boolean flattenInferences = config.getParameterAsBoolean(
+				ReasonerConfiguration.FLATTEN_INFERENCES);
 		ElkClassAxiom elkAxiom = entailment
 				.accept(OwlClassAxiomConverterVisitor.getInstance());
 		ElkReasoner elkReasoner = getDelegate();
-		return new ElkOWLProofNode(entailment,
-				elkReasoner.getElkProofProvider().getInferences(elkAxiom),
+		ElkInferenceSet elkInferences = elkReasoner.getElkProofProvider()
+				.getInferences(elkAxiom);
+		if (flattenInferences) {
+			elkInferences = new FlattenedElkInferenceSet(elkInferences);
+		}
+		return new ElkOWLProofNode(elkAxiom, elkInferences,
 				elkReasoner.getElkObjectFactory());
 	}
 

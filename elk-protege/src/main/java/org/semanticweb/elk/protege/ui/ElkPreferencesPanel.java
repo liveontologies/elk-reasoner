@@ -34,8 +34,8 @@ import org.protege.editor.owl.ui.preferences.OWLPreferencesPanel;
 import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.elk.protege.ElkProtegeLogAppender;
 import org.semanticweb.elk.protege.ProtegeSuppressedMessages;
-import org.semanticweb.elk.protege.preferences.ElkGeneralPreferences;
 import org.semanticweb.elk.protege.preferences.ElkLogPreferences;
+import org.semanticweb.elk.protege.preferences.ElkPreferences;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 /**
@@ -51,7 +51,8 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 
 	private static final long serialVersionUID = -5568211860560307648L;
 
-	private ElkPanel generalPrefsPane_, warningPrefsPane_, logPane_;
+	private ElkPanel generalPrefsPane_, proofPrefsPane_, warningPrefsPane_,
+			logPane_;
 
 	@Override
 	public void initialise() throws Exception {
@@ -64,6 +65,9 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 		generalPrefsPane_ = new ElkGeneralPreferencesPanel().initialize();
 		tabbedPane.addTab("General", null, generalPrefsPane_,
 				"General ELK settings");
+		proofPrefsPane_ = new ElkProofPreferencesPanel().initialize();
+		tabbedPane.addTab("Proofs", null, proofPrefsPane_,
+				"Settings for ELK proofs for debugging");
 		warningPrefsPane_ = new ElkWarningPreferencesPanel().initialize();
 		tabbedPane.addTab("Warnings", null, warningPrefsPane_,
 				"Settings for ELK warning messages");
@@ -80,6 +84,7 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 	@Override
 	public void applyChanges() {
 		generalPrefsPane_.applyChanges();
+		proofPrefsPane_.applyChanges();
 		warningPrefsPane_.applyChanges();
 		logPane_.applyChanges();
 	}
@@ -92,10 +97,8 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 				.getCurrentReasoner();
 		if (!(reasoner instanceof ElkReasoner))
 			return;
-		ElkGeneralPreferences elkGeneralPrefs = new ElkGeneralPreferences()
-				.load();
-		((ElkReasoner) reasoner).setConfigurationOptions(elkGeneralPrefs
-				.getElkConfig());
+		((ElkReasoner) reasoner)
+				.setConfigurationOptions(ElkPreferences.getElkConfig());
 		ProtegeSuppressedMessages.getInstance().reload();
 
 		ElkLogPreferences elkLogPrefs = new ElkLogPreferences().load();
