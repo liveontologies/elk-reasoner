@@ -32,7 +32,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
-import org.semanticweb.elk.owl.inferences.ReasonerProofProvider;
+import org.semanticweb.elk.owl.inferences.ReasonerElkInferenceSet;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
@@ -134,7 +134,7 @@ public class ElkReasoner implements OWLReasoner {
 	/** the ELK reasoner instance used for reasoning */
 	private Reasoner reasoner_;
 	/** Inferences for derived ELK axioms */
-	private ReasonerProofProvider elkProofProvider_;
+	private ReasonerElkInferenceSet elkInferenceSet_;
 
 	/**
 	 * {@code true} if the ontology should be loaded before any changes are
@@ -214,8 +214,8 @@ public class ElkReasoner implements OWLReasoner {
 		return objectFactory_;
 	}
 	
-	ReasonerProofProvider getElkProofProvider() {
-		return elkProofProvider_;
+	ReasonerElkInferenceSet getElkInferenceSet() {
+		return elkInferenceSet_;
 	}
 	
 	/**
@@ -233,12 +233,12 @@ public class ElkReasoner implements OWLReasoner {
 		// switch to the primary progress monitor; this is to avoid bugs with
 		// progress monitors in Protege
 		this.reasoner_.setProgressMonitor(this.secondaryProgressMonitor_);
-		this.elkProofProvider_ = new ReasonerProofProvider(reasoner_,
+		this.elkInferenceSet_ = new ReasonerElkInferenceSet(reasoner_,
 				objectFactory_);
 	}
 
 	/**
-	 * Exposes the ELK reasoner used internally in this OWL API wrapper.
+	 * @return the ELK reasoner used internally in this OWL API wrapper.
 	 */
 	public Reasoner getInternalReasoner() {
 		return reasoner_;
@@ -384,6 +384,8 @@ public class ElkReasoner implements OWLReasoner {
 					reasoner_.resetAxiomLoading();
 				}
 			}
+			// proofs should be recomputed
+			elkInferenceSet_.clear();
 		} catch (ElkRuntimeException e) {
 			throw elkConverter_.convert(e);
 		}
@@ -1085,9 +1087,7 @@ public class ElkReasoner implements OWLReasoner {
 					// cannot handle non-axiom changes incrementally
 					ontologyReloadRequired_ = true;
 				} else {
-					bufferedChangesLoader_.registerChange(change);
-					// proofs should be recomputed
-					elkProofProvider_.clearInferenceCache();
+					bufferedChangesLoader_.registerChange(change);					
 				}
 			}
 			if (!isBufferingMode_)

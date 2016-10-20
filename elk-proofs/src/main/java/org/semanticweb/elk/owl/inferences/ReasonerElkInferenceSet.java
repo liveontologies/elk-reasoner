@@ -1,5 +1,6 @@
 package org.semanticweb.elk.owl.inferences;
 
+import java.util.Collection;
 import java.util.List;
 
 /*
@@ -34,73 +35,55 @@ import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DerivedClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 
-public class ReasonerProofProvider
-		extends DummyElkAxiomVisitor<Void> {
+/**
+ * A view for inferences over {@link ElkAxiom}s provided by {@link Reasoner}.
+ * The inferences are computed lazily on request.
+ * 
+ * @author Yevgeny Kazakov
+ */
+public class ReasonerElkInferenceSet extends ModifiableElkInferenceSetImpl {
 
 	private final Reasoner reasoner_;
 
 	private final ElkObject.Factory elkFactory_;
 
 	private final ElkInference.Factory inferenceFactory_ = new ElkInferenceBaseFactory();
-	
-	private final ModifiableElkInferenceSet inferenceCache_;
 
-	public ReasonerProofProvider(Reasoner reasoner,
+	private final ElkAxiomVisitor<Void> inferenceGenerator_ = new InferenceGenerator();
+
+	public ReasonerElkInferenceSet(Reasoner reasoner,
 			ElkObject.Factory elkFactory) {
+		super(elkFactory);
 		this.reasoner_ = reasoner;
 		this.elkFactory_ = elkFactory;
-		this.inferenceCache_ = new ModifiableElkInferenceSetImpl(elkFactory_);
 	}
 
-	public ElkInferenceSet getInferences(ElkAxiom axiom) {
-		if (inferenceCache_.get(axiom).isEmpty()) {
-			// compute
-			axiom.accept(this);	
+	@Override
+	public Collection<? extends ElkInference> get(ElkAxiom conclusion) {
+		if (getInferences(conclusion).isEmpty() && !isQuieried(conclusion)) {
+			// the inferences were not computed yet
+			conclusion.accept(inferenceGenerator_);
 		}
-		return inferenceCache_;		
+		return super.get(conclusion);
 	}
 
-	@Override
-	public Void defaultVisit(ElkAxiom axiom) {
-		throw new ElkRuntimeException("Cannot generate proof for " + axiom);
-	}
-
-	@Override
-	public Void visit(ElkSubClassOfAxiom axiom) {
-		addInferencesForSubsumption(inferenceCache_, axiom.getSubClassExpression(),
-				axiom.getSuperClassExpression());
-		return null;
-	}
-
-	@Override
-	public Void visit(ElkEquivalentClassesAxiom axiom) {
-		List<? extends ElkClassExpression> equivalent = axiom
-				.getClassExpressions();
-		ElkClassExpression first = equivalent.get(equivalent.size() - 1);
-		for (ElkClassExpression second : equivalent) {
-			addInferencesForSubsumption(inferenceCache_, first, second);
-			first = second;
-		}
-		inferenceCache_.produce(
-				inferenceFactory_.getElkEquivalentClassesCycle(equivalent));
-		return null;
-	}
-	
-	public void clearInferenceCache() {
-		inferenceCache_.clear();		
+	private void addInferencesForSubsumption(final ElkClassExpression subClass,
+			final ElkClassExpression superClass) {
+		addInferencesForSubsumption(this, subClass, superClass);
 	}
 
 	private void addInferencesForSubsumption(
-			final ModifiableElkInferenceSet inferences,
+			final ElkInferenceProducer producer,
 			final ElkClassExpression subClass,
 			final ElkClassExpression superClass) {
 		if (superClass.equals(elkFactory_.getOwlThing())) {
-			inferences.produce(
+			producer.produce(
 					inferenceFactory_.getElkClassInclusionOwlThing(subClass));
 		}
 		try {
@@ -111,7 +94,7 @@ public class ReasonerProofProvider
 						ClassInconsistency conclusion) throws ElkException {
 					Matcher matcher = new Matcher(
 							reasoner_.explainConclusion(conclusion),
-							elkFactory_, inferences);
+							elkFactory_, producer);
 					matcher.trace(conclusion, elkFactory_.getOwlThing());
 					return true;
 				}
@@ -120,12 +103,12 @@ public class ReasonerProofProvider
 				public boolean inconsistentIndividual(
 						ClassInconsistency conclusion, ElkIndividual entity)
 						throws ElkException {
-					inferences.produce(inferenceFactory_
+					producer.produce(inferenceFactory_
 							.getElkClassInclusionOfInconsistentIndividual(
 									entity));
 					Matcher matcher = new Matcher(
 							reasoner_.explainConclusion(conclusion),
-							elkFactory_, inferences);
+							elkFactory_, producer);
 					matcher.trace(conclusion, entity);
 					return true;
 				}
@@ -133,14 +116,14 @@ public class ReasonerProofProvider
 				@Override
 				public boolean inconsistentSubClass(
 						ClassInconsistency conclusion) throws ElkException {
-					inferences.produce(inferenceFactory_
+					producer.produce(inferenceFactory_
 							.getElkClassInclusionOwlNothing(superClass));
-					inferences.produce(inferenceFactory_
+					producer.produce(inferenceFactory_
 							.getElkClassInclusionHierarchy(subClass,
 									elkFactory_.getOwlNothing(), superClass));
 					Matcher matcher = new Matcher(
 							reasoner_.explainConclusion(conclusion),
-							elkFactory_, inferences);
+							elkFactory_, producer);
 					matcher.trace(conclusion, subClass);
 					return true;
 				}
@@ -151,17 +134,46 @@ public class ReasonerProofProvider
 						throws ElkException {
 					Matcher matcher = new Matcher(
 							reasoner_.explainConclusion(conclusion),
-							elkFactory_, inferences);
+							elkFactory_, producer);
 					matcher.trace(conclusion, subClass, superClass);
 					return true;
 				}
 
 			};
-			reasoner_.visitDerivedConclusionsForSubsumption(subClass, superClass,
-					conclusionVisitor);
+			reasoner_.visitDerivedConclusionsForSubsumption(subClass,
+					superClass, conclusionVisitor);
 		} catch (ElkException e) {
 			throw new ElkRuntimeException(e);
 		}
+	}
+
+	private class InferenceGenerator extends DummyElkAxiomVisitor<Void> {
+
+		@Override
+		public Void defaultVisit(ElkAxiom axiom) {
+			throw new ElkRuntimeException("Cannot generate proof for " + axiom);
+		}
+
+		@Override
+		public Void visit(ElkSubClassOfAxiom axiom) {
+			addInferencesForSubsumption(axiom.getSubClassExpression(),
+					axiom.getSuperClassExpression());
+			return null;
+		}
+
+		@Override
+		public Void visit(ElkEquivalentClassesAxiom axiom) {
+			List<? extends ElkClassExpression> equivalent = axiom
+					.getClassExpressions();
+			ElkClassExpression first = equivalent.get(equivalent.size() - 1);
+			for (ElkClassExpression second : equivalent) {
+				addInferencesForSubsumption(first, second);
+				first = second;
+			}
+			produce(inferenceFactory_.getElkEquivalentClassesCycle(equivalent));
+			return null;
+		}
+
 	}
 
 }

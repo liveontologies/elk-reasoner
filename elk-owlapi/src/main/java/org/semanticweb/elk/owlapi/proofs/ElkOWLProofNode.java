@@ -61,8 +61,7 @@ public class ElkOWLProofNode implements OWLProofNode {
 
 	@Override
 	public Collection<? extends OWLProofStep> getInferences() {
-		return Operations.map(
-				elkInferences_.get(member_),
+		return Operations.map(elkInferences_.get(member_),
 				new Transformation<ElkInference, OWLProofStep>() {
 
 					@Override
@@ -106,6 +105,46 @@ public class ElkOWLProofNode implements OWLProofNode {
 	@Override
 	public String toString() {
 		return member_.toString();
+	}
+
+	@Override
+	public void addListener(ChangeListener listener) {
+		elkInferences_.add(new ListenerDelegator(listener));
+	}
+
+	@Override
+	public void removeListener(ChangeListener listener) {
+		elkInferences_.remove(new ListenerDelegator(listener));
+	}
+
+	private static class ListenerDelegator implements ElkInferenceSet.ChangeListener {
+
+		private final OWLProofNode.ChangeListener nodeListener_;
+
+		ListenerDelegator(OWLProofNode.ChangeListener nodeListener) {
+			this.nodeListener_ = nodeListener;
+		}
+
+		@Override
+		public void inferencesChanged() {
+			nodeListener_.nodeChanged();
+		}
+
+		@Override
+		public int hashCode() {
+			return nodeListener_.hashCode();
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (o instanceof ListenerDelegator) {
+				return nodeListener_
+						.equals(((ListenerDelegator) o).nodeListener_);
+			}
+			// else
+			return false;
+		}
+
 	}
 
 }

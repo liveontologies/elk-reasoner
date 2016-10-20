@@ -40,7 +40,7 @@ import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 
 public class FlattenedElkInferenceSet
 		extends DummyElkAxiomVisitor<Collection<? extends ElkInference>>
-		implements ElkInferenceSet {
+		implements ElkInferenceSet, ElkInferenceSet.ChangeListener {
 
 	private final ElkInferenceSet originalInferences_;
 
@@ -50,8 +50,11 @@ public class FlattenedElkInferenceSet
 
 	private List<ElkClassExpression> currentPremises_ = new ArrayList<ElkClassExpression>();
 
+	private final List<ChangeListener> listeners_ = new ArrayList<ChangeListener>();
+
 	public FlattenedElkInferenceSet(ElkInferenceSet inferences) {
 		this.originalInferences_ = inferences;
+		inferences.add(this);
 	}
 
 	@Override
@@ -153,6 +156,28 @@ public class FlattenedElkInferenceSet
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public void add(ChangeListener listener) {
+		listeners_.add(listener);
+	}
+
+	@Override
+	public void remove(ChangeListener listener) {
+		listeners_.remove(listener);
+	}
+
+	public void dispose() {
+		originalInferences_.remove(this);
+	}
+
+	@Override
+	public void inferencesChanged() {
+		transformed_.clear();
+		for (ChangeListener listener : listeners_) {
+			listener.inferencesChanged();
+		}
 	}
 
 }

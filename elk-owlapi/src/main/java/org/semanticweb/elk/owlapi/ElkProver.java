@@ -50,8 +50,7 @@ public class ElkProver extends DelegatingOWLReasoner<ElkReasoner>
 		ElkClassAxiom elkAxiom = entailment
 				.accept(OwlClassAxiomConverterVisitor.getInstance());
 		ElkReasoner elkReasoner = getDelegate();
-		ElkInferenceSet elkInferences = elkReasoner.getElkProofProvider()
-				.getInferences(elkAxiom);
+		ElkInferenceSet elkInferences = elkReasoner.getElkInferenceSet();
 		if (flattenInferences) {
 			elkInferences = new FlattenedElkInferenceSet(elkInferences);
 		}
