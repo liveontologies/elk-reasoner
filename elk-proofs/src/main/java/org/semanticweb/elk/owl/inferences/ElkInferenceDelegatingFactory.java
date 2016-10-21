@@ -56,12 +56,12 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 	}
 
 	@Override
-	public ElkClassInclusionExistentialFillerExpansion getElkClassInclusionExistentialFillerUnfolding(
-			ElkClassExpression subClass, ElkObjectPropertyExpression property,
-			ElkClassExpression subFiller, ElkClassExpression superFiller) {
+	public ElkClassInclusionExistentialFillerExpansion getElkClassInclusionExistentialFillerExpansion(
+			ElkClassExpression subClass, ElkClassExpression superClass,
+			ElkObjectPropertyExpression property) {
 		return filter(
-				mainFactory_.getElkClassInclusionExistentialFillerUnfolding(
-						subClass, property, subFiller, superFiller));
+				mainFactory_.getElkClassInclusionExistentialFillerExpansion(
+						subClass, superClass, property));
 	}
 
 	@Override
