@@ -266,8 +266,9 @@ public class ClassExpressionQueryState {
 	 * {@link ElkQueryException} for class expressions that were not registered.
 	 * 
 	 * @param classExpression
-	 * @return {@code true} when the query result is cashed, {@code false}
-	 *         otherwise, i.e., the query result needs to be computed
+	 * @return {@code true} if the index change as a result of calling this
+	 *         method, i.e., the class expression has just been indexed.
+	 *         {@code false} if the class expression was already indexed.
 	 * @throws ElkIndexingUnsupportedException
 	 *             when the class expression is not supported
 	 */
@@ -301,7 +302,7 @@ public class ClassExpressionQueryState {
 		synchronized (queried_) {
 			state = queried_.get(classExpression);
 			if (state != null) {
-				return state.isComputed;
+				return false;
 			}
 			try {
 				ontologyIndex_.addIndexingUnsupportedListener(listener);
@@ -344,7 +345,7 @@ public class ClassExpressionQueryState {
 			state.isComputed = false;
 		}
 
-		return state.isComputed;
+		return true;
 	}
 
 	private void evictIfExceeded() {
@@ -522,6 +523,16 @@ public class ClassExpressionQueryState {
 	 */
 	public Collection<IndexedClassExpression> getNotSaturatedQueriedClassExpressions() {
 		return Operations.map(indexed_.values(), notComputedIces_);
+	}
+
+	/**
+	 * @param classExpression
+	 * @return whether the query result for the supplied class expression was
+	 *         already computed.
+	 */
+	public boolean isComputed(final ElkClassExpression classExpression) {
+		final QueryState state = queried_.get(classExpression);
+		return state != null && state.isComputed;
 	}
 
 	private QueryState checkComputed(final ElkClassExpression classExpression)

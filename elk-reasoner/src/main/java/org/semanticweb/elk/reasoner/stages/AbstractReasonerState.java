@@ -39,6 +39,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
+import org.semanticweb.elk.reasoner.ReasonerInterrupter;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyCheckingState;
 import org.semanticweb.elk.reasoner.indexing.classes.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
@@ -119,12 +120,6 @@ public abstract class AbstractReasonerState {
 	 */
 	private final ElkObject.Factory elkFactory_;
 
-	/**
-	 * The object that is notified and propagates the information about
-	 * interruption.
-	 */
-	private final ReasonerInterrupter interrupter_;
-
 	final SaturationState<? extends Context> saturationState;
 
 	/**
@@ -198,10 +193,8 @@ public abstract class AbstractReasonerState {
 
 	private final ElkSubObjectPropertyExpressionVisitor<ModifiableIndexedPropertyChain> subPropertyConverter_;
 
-	protected AbstractReasonerState(ElkObject.Factory elkFactory,
-			final ReasonerInterrupter interrupter) {
+	protected AbstractReasonerState(ElkObject.Factory elkFactory) {
 		this.elkFactory_ = elkFactory;
-		this.interrupter_ = interrupter;
 		this.ontologyIndex = new DifferentialIndex(elkFactory);
 		this.propertyHierarchyCompositionState_ = new PropertyHierarchyCompositionState();
 		this.saturationState = SaturationStateFactory
@@ -226,23 +219,8 @@ public abstract class AbstractReasonerState {
 				saturationState, elkFactory, ontologyIndex, factory_);
 	}
 
-	protected AbstractReasonerState(ElkObject.Factory elkFactory,
-			AxiomLoader.Factory axiomLoaderFactory,
-			final ReasonerInterrupter interrupter) {
-		this(elkFactory, interrupter);
-		registerAxiomLoader(axiomLoaderFactory);
-	}
-
 	public ElkObject.Factory getElkFactory() {
 		return elkFactory_;
-	}
-
-	/**
-	 * @return The object that is notified and propagates the information about
-	 *         interruption.
-	 */
-	public ReasonerInterrupter getInterrupter() {
-		return interrupter_;
 	}
 
 	protected void complete(ReasonerStage stage) throws ElkException {
@@ -379,6 +357,12 @@ public abstract class AbstractReasonerState {
 	protected abstract ReasonerStageExecutor getStageExecutor();
 
 	/**
+	 * @return The object that is notified and propagates the information about
+	 *         interruption.
+	 */
+	protected abstract ReasonerInterrupter getInterrupter();
+
+	/**
 	 * @return the {@link ComputationExecutor} that is used for execution of
 	 *         reasoning processes
 	 */
@@ -399,7 +383,22 @@ public abstract class AbstractReasonerState {
 	 */
 	public void interrupt() {
 		LOGGER_.debug("Interrupt requested");
-		interrupter_.interrupt();
+		getInterrupter().interrupt();
+	}
+
+	/**
+	 * If interrupted, clears the interruption status and throws
+	 * ElkInterruptedException.
+	 * <p>
+	 * This method should be called only from inside of the reasoner. Also it
+	 * must be called from the same thread as the one on which the reasoning
+	 * methods run. Otherwise it blocks until the reasoning method exits.
+	 * 
+	 * @throws ElkInterruptedException
+	 *             if interrupted
+	 */
+	public synchronized void checkInterrupt() throws ElkInterruptedException {
+		getInterrupter().checkInterrupt();
 	}
 
 	/**
@@ -649,38 +648,37 @@ public abstract class AbstractReasonerState {
 	private boolean computeQuery(final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 
-		if (stageManager.axiomLoadingStage.isCompleted()) {
-			/*
-			 * First loading definitely occurred. If the condition is false, the
-			 * axiom loading stage will take care of the mode switch.
-			 */
+		if (stageManager.axiomLoadingStage.isFirstLoad()) {
 			trySetIncrementalMode();
 		}
 
 		// Load the query
+		final boolean indexChanged;
 		try {
-			if (classExpressionQueryState_.indexQuery(classExpression)
-					&& stageManager.axiomLoadingStage.isCompleted()) {
-				/*
-				 * If query result are cashed, but there were some changes to
-				 * the ontology, they may not be up to date. Whether they are
-				 * will be checked during stages that clean contexts. So if
-				 * axiom loading stage is not completed, we still execute all
-				 * the stages.
-				 */
-				return true;
-			}
+			indexChanged = classExpressionQueryState_
+					.indexQuery(classExpression);
 		} catch (final ElkIndexingUnsupportedException e) {
 			return false;
 		}
+		if (classExpressionQueryState_.isComputed(classExpression)
+				&& stageManager.axiomLoadingStage.isCompleted()) {
+			/*
+			 * If query result are cashed, but there were some changes to the
+			 * ontology, they may not be up to date. Whether they are will be
+			 * checked during stages that clean contexts. So if axiom loading
+			 * stage is not completed, we still execute all the stages.
+			 */
+			return true;
+		}
 
-		// Invalidate stages that depend on axiom loading stage
-		stageManager.contextInitializationStage.invalidateRecursive();
-		stageManager.incrementalCompletionStage.invalidateRecursive();
+		if (indexChanged) {
+			// Invalidate stages that depend on axiom loading stage
+			stageManager.contextInitializationStage.invalidateRecursive();
+			stageManager.incrementalCompletionStage.invalidateRecursive();
+		}
 
 		// Complete all stages
 		getTaxonomy();
-		trySetIncrementalMode();// Computing taxonomy may swith the modes.
 		stageManager.classExpressionQueryStage.invalidateRecursive();
 		complete(stageManager.classExpressionQueryStage);
 

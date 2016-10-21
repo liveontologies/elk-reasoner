@@ -28,7 +28,7 @@ import org.semanticweb.elk.reasoner.RandomReasonerInterrupter;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasoningTestWithInterruptsDelegate;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.stages.RestartingStageExecutor;
+import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestOutput;
@@ -61,7 +61,12 @@ public abstract class CliReasoningTestDelegate<AO extends TestOutput>
 		reasoner_ = TestReasonerUtils.createTestReasoner(
 				manifest_.getInput().getUrl().openStream(),
 				new RandomReasonerInterrupter(random, INTERRUPTION_CHANCE),
-				new RestartingStageExecutor());
+				new SimpleStageExecutor());
+	}
+
+	@Override
+	public Class<? extends Exception> getInterruptionExceptionClass() {
+		return ElkInterruptedException.class;
 	}
 
 	@Override

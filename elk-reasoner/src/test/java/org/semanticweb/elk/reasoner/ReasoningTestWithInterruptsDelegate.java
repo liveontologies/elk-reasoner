@@ -41,4 +41,10 @@ public interface ReasoningTestWithInterruptsDelegate<AO extends TestOutput>
 	 */
 	void initWithInterrupts() throws Exception;
 
+	/**
+	 * @return Class of exception that is thrown when the process executed in
+	 *         {@link #getActualOutput()} is interrupted.
+	 */
+	Class<? extends Exception> getInterruptionExceptionClass();
+
 }

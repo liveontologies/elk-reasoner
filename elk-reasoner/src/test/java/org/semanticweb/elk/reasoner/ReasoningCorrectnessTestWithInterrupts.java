@@ -61,7 +61,18 @@ public abstract class ReasoningCorrectnessTestWithInterrupts<I extends TestInput
 	@Test
 	public void testWithInterruptions() throws Exception {
 		delegate_.initWithInterrupts();
-		final AO actualOutput = delegate_.getActualOutput();// TODO: repeat this until no interruption exception is thrown!
+		AO actualOutput;
+		while (true) {
+			try {
+				actualOutput = delegate_.getActualOutput();
+			} catch (final Exception e) {
+				if (delegate_.getInterruptionExceptionClass().isInstance(e)) {
+					continue;
+				}
+				throw e;
+			}
+			break;
+		}
 		manifest.compare(actualOutput);
 	}
 

@@ -192,6 +192,10 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 		return true;
 	}
 
+	public boolean isFirstLoad() {
+		return firstLoad_;
+	}
+
 	@Override
 	public void printInfo() {
 		// TODO

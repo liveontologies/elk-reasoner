@@ -23,8 +23,6 @@ package org.semanticweb.elk.reasoner;
 
 import java.util.Random;
 
-import org.semanticweb.elk.reasoner.stages.ReasonerInterrupter;
-
 public class RandomReasonerInterrupter extends ReasonerInterrupter {
 
 	private final Random random_;

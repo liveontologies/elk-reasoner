@@ -43,7 +43,6 @@ import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
-import org.semanticweb.elk.reasoner.stages.ReasonerInterrupter;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 
 /**
@@ -188,6 +187,14 @@ public class TestReasonerUtils {
 				new Owl2FunctionalStyleParserFactory(), stream);
 		return createTestReasoner(axiomLoaderFactory, interrupter,
 				stageExecutor, ReasonerConfiguration.getConfiguration());
+	}
+
+	public static Reasoner createTestReasoner(
+			final ReasonerInterrupter interrupter,
+			final ReasonerStageExecutor stageExecutor,
+			final ReasonerConfiguration config) {
+		return new ReasonerFactory().createReasoner(interrupter, stageExecutor,
+				config);
 	}
 
 	public static Reasoner loadAndClassify(Set<? extends ElkAxiom> ontology)

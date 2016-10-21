@@ -26,7 +26,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.semanticweb.elk.exceptions.ElkException;
-import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -36,7 +35,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.stages.AbstractReasonerState;
-import org.semanticweb.elk.reasoner.stages.ReasonerInterrupter;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.FreshInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.FreshTaxonomyNode;
@@ -78,6 +76,11 @@ public class Reasoner extends AbstractReasonerState {
 	 */
 	private final ReasonerStageExecutor stageExecutor_;
 	/**
+	 * The object that is notified and propagates the information about
+	 * interruption.
+	 */
+	private final ReasonerInterrupter interrupter_;
+	/**
 	 * the executor used for concurrent tasks
 	 */
 	private final ComputationExecutor executor_;
@@ -98,12 +101,12 @@ public class Reasoner extends AbstractReasonerState {
 	 * {@link ReasonerFactory}.
 	 */
 	protected Reasoner(ElkObject.Factory elkFactory,
-			AxiomLoader.Factory axiomLoaderFactory,
 			final ReasonerInterrupter interrupter,
 			ReasonerStageExecutor stageExecutor, ReasonerConfiguration config) {
-		super(elkFactory, axiomLoaderFactory, interrupter);
+		super(elkFactory);
 
 		this.stageExecutor_ = stageExecutor;
+		this.interrupter_ = interrupter;
 		this.progressMonitor = new DummyProgressMonitor();
 		this.allowFreshEntities = true;
 		setConfigurationOptions(config);
@@ -187,6 +190,11 @@ public class Reasoner extends AbstractReasonerState {
 	@Override
 	protected ReasonerStageExecutor getStageExecutor() {
 		return stageExecutor_;
+	}
+
+	@Override
+	protected ReasonerInterrupter getInterrupter() {
+		return interrupter_;
 	}
 
 	@Override

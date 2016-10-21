@@ -27,8 +27,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 
-import org.junit.Ignore;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owlapi.OwlApiReasoningTestDelegate;
@@ -40,11 +38,12 @@ import org.semanticweb.elk.reasoner.query.SatisfiabilityTestOutput;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
+import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 
 @RunWith(PolySuite.class)
 public class OwlApiClassExpressionSatisfiabilityQueryTest extends
@@ -78,6 +77,11 @@ public class OwlApiClassExpressionSatisfiabilityQueryTest extends
 						final boolean isSatisfiable = reasoner_.isSatisfiable(
 								manifest.getInput().getClassQuery());
 						return new BaseSatisfiabilityTestOutput(isSatisfiable);
+					}
+
+					@Override
+					public Class<? extends Exception> getInterruptionExceptionClass() {
+						return ReasonerInterruptedException.class;
 					}
 
 				});
@@ -115,13 +119,6 @@ public class OwlApiClassExpressionSatisfiabilityQueryTest extends
 
 				});
 
-	}
-
-	@Test
-	@Ignore
-	@Override
-	public void testWithInterruptions() throws Exception {
-		super.testWithInterruptions();
 	}
 
 }

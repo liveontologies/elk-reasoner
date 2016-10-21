@@ -32,10 +32,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import joptsimple.OptionSpec;
-
 import org.apache.log4j.Level;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.loading.AxiomLoader;
@@ -49,7 +45,6 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
-import org.semanticweb.elk.reasoner.stages.ReasonerInterrupter;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
@@ -58,6 +53,10 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.util.logging.Statistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+import joptsimple.OptionSpec;
 
 /**
  * 
@@ -178,7 +177,7 @@ public class Main {
 		AxiomLoader.Factory loader = new Owl2StreamLoader.Factory(parserFactory,
 				options.valueOf(inputFile));
 		Reasoner reasoner = reasoningFactory.createReasoner(loader,
-				new ReasonerInterrupter(), new LoggingStageExecutor(), configuration);
+				new LoggingStageExecutor(), configuration);
 
 		try {
 			if (options.has(satisfiable)) {

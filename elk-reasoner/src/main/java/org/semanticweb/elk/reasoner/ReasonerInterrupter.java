@@ -21,20 +21,43 @@
  */
 package org.semanticweb.elk.reasoner;
 
-import static org.junit.Assert.fail;
+import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
+import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
- * Fails on interrupt.
+ * A simple interrupter, which uses a flag about the interrupt status.
  * 
+ * @author "Yevgeny Kazakov"
  * @author Peter Skocovsky
  */
-public class FailingReasonerInterrupter extends ReasonerInterrupter {
+public class ReasonerInterrupter implements Interrupter {
 
-	public static final FailingReasonerInterrupter INSTANCE = new FailingReasonerInterrupter();
+	/**
+	 * The interruption status of this interrupter.
+	 */
+	private volatile boolean isInterrupted_ = false;
 
 	@Override
 	public void interrupt() {
-		fail();
+		isInterrupted_ = true;
+	}
+
+	@Override
+	public boolean isInterrupted() {
+		return isInterrupted_;
+	}
+
+	/**
+	 * If interrupted, clears the flag and throws ElkInterruptedException
+	 * 
+	 * @throws ElkInterruptedException
+	 *             if interrupted
+	 */
+	public void checkInterrupt() throws ElkInterruptedException {
+		if (isInterrupted()) {
+			isInterrupted_ = false;
+			throw new ElkInterruptedException();
+		}
 	}
 
 }

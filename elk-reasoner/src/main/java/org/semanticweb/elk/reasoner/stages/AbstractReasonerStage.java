@@ -30,7 +30,6 @@ import java.util.Queue;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -205,9 +204,9 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 		isCompleted_ = true;
 		return true;
 	}
-	
+
 	protected void checkInterrupt() throws ElkInterruptedException {
-		((StageInterrupter) reasoner.getInterrupter()).checkInterrupt();
+		reasoner.getInterrupter().checkInterrupt();
 	}
 
 	protected void markAllContextsAsSaturated() {
@@ -226,44 +225,6 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	@Override
 	public boolean isInterrupted() {
 		return reasoner.getInterrupter().isInterrupted();
-	}
-
-	/**
-	 * A simple interrupter, which uses a flag about the interrupt status.
-	 * 
-	 * @author "Yevgeny Kazakov"
-	 * @author Peter Skocovsky
-	 */
-	public static class StageInterrupter implements Interrupter {
-
-		/**
-		 * The interruption status of this interrupter.
-		 */
-		private volatile boolean isInterrupted_ = false;
-
-		@Override
-		public void interrupt() {
-			isInterrupted_ = true;
-		}
-
-		@Override
-		public boolean isInterrupted() {
-			return isInterrupted_;
-		}
-
-		/**
-		 * If interrupted, clears the flag and throws ElkInterruptedException
-		 * 
-		 * @throws ElkInterruptedException
-		 *             if interrupted
-		 */
-		private void checkInterrupt() throws ElkInterruptedException {
-			if (isInterrupted()) {
-				isInterrupted_ = false;
-				throw new ElkInterruptedException();
-			}
-		}
-
 	}
 
 }

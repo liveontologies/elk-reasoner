@@ -30,7 +30,13 @@ package org.semanticweb.elk.reasoner.stages;
  */
 public class ReasonerStageManager {
 
-	final AbstractReasonerStage axiomLoadingStage, propertyInitializationStage,
+	/* 
+	 * TODO: This is a temporary solution so that the query loading has access
+	 * to the information from the loading stage. Ideally, query loading should
+	 * be done during the loading stage.
+	 */
+	final AxiomLoadingStage axiomLoadingStage;
+	final AbstractReasonerStage propertyInitializationStage,
 			propertyHierarchyCompositionComputationStage,
 			objectPropertyTaxonomyComputationStage, contextInitializationStage,
 			consistencyCheckingStage, classSaturationStage,
