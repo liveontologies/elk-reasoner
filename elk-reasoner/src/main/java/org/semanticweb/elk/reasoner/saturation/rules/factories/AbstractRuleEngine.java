@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.saturation.rules.factories;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,12 +19,14 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
 import org.semanticweb.elk.ModifiableReference;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.util.concurrent.computation.DelegateInterruptMonitor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public abstract class AbstractRuleEngine<I extends RuleApplicationInput>
+		extends DelegateInterruptMonitor
 		implements
 			InputProcessor<I> {
 
@@ -66,26 +67,21 @@ public abstract class AbstractRuleEngine<I extends RuleApplicationInput>
 	 */
 	private final WorkerLocalTodo workerLocalTodo_;
 
-	/**
-	 * The {@link Interrupter} that can interrupt processing
-	 */
-	private final Interrupter interrupter_;
-
 	public AbstractRuleEngine(
 			ModifiableReference<Context> activeContext,
 			ClassInference.Visitor<?> inferenceProcessor,
-			WorkerLocalTodo localizedProducer, Interrupter interrupter) {
+			WorkerLocalTodo localizedProducer, InterruptMonitor interrupter) {
+		super(interrupter);
 		this.activeContext_ = activeContext;
 		this.inferenceProcessor_ = inferenceProcessor;
 		this.workerLocalTodo_ = localizedProducer;
-		this.interrupter_ = interrupter;
 	}
 
 	@Override
 	public void process() throws InterruptedException {
 		try {
 			for (;;) {
-				if (interrupter_.isInterrupted()) {
+				if (isInterrupted()) {
 					LOGGER_.trace("Rule application interrupted");
 
 					break;

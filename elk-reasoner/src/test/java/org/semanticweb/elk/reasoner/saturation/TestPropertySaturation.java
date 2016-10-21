@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.saturation;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.saturation;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.saturation;
 
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
@@ -29,13 +28,14 @@ import org.semanticweb.elk.reasoner.stages.PropertyHierarchyCompositionState;
 import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputationWithInputs;
+import org.semanticweb.elk.util.concurrent.computation.DummyInterruptMonitor;
 
 /**
  * A {@link ReasonerComputationWithInputs} that computes relevant sub-properties
  * and composition maps
  * 
  * @author Yevgeny Kazakov
- * 
+ * @author Peter Skocovsky
  */
 public class TestPropertySaturation
 		extends
@@ -43,6 +43,7 @@ public class TestPropertySaturation
 
 	public TestPropertySaturation(ComputationExecutor executor, int maxWorkers) {
 		super(new PropertyHierarchyCompositionComputationFactory(
+				DummyInterruptMonitor.INSTANCE,
 				TracingInferenceProducer.DUMMY,
 				PropertyHierarchyCompositionState.Dispatcher.DUMMY), executor,
 				maxWorkers);

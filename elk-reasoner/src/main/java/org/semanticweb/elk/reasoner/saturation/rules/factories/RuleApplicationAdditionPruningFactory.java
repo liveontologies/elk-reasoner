@@ -1,10 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.saturation.rules.factories;
-
-import org.semanticweb.elk.Reference;
-
 /*
  * #%L
  * ELK Reasoner
@@ -26,7 +19,9 @@ import org.semanticweb.elk.Reference;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
+import org.semanticweb.elk.Reference;
 import org.semanticweb.elk.reasoner.saturation.ExtendedContext;
 import org.semanticweb.elk.reasoner.saturation.MainContextFactory;
 import org.semanticweb.elk.reasoner.saturation.MapSaturationState;
@@ -44,6 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference.Visitor
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInferenceConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.CombinedConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
 /**
  * A {@link RuleApplicationFactory} that applies rules to
@@ -67,6 +63,7 @@ public class RuleApplicationAdditionPruningFactory
 	private final SaturationState<? extends Context> mainSaturationState_;
 
 	public RuleApplicationAdditionPruningFactory(
+			final InterruptMonitor interrupter,
 			SaturationState<? extends Context> mainSaturationState) {
 		/**
 		 * We use a "local" {@link SaturationState} to iterate over
@@ -76,7 +73,7 @@ public class RuleApplicationAdditionPruningFactory
 		 * {@link SaturationState} to keep track of {@link Context}s to which
 		 * the rules are already applied.
 		 */
-		super(new MapSaturationState<ExtendedContext>(
+		super(interrupter, new MapSaturationState<ExtendedContext>(
 				mainSaturationState.getOntologyIndex(),
 				new MainContextFactory()));
 		this.mainSaturationState_ = mainSaturationState;

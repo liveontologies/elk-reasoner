@@ -28,11 +28,8 @@ import java.util.List;
 import java.util.Queue;
 
 import org.semanticweb.elk.exceptions.ElkException;
-import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
-import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,10 +37,9 @@ import org.slf4j.LoggerFactory;
  * A common implementation of {@link ReasonerStage}s for a given reasoner.
  * 
  * @author "Yevgeny Kazakov"
- * 
+ * @author Peter Skocovsky
  */
-abstract class AbstractReasonerStage extends SimpleInterrupter implements
-		ReasonerStage {
+abstract class AbstractReasonerStage implements ReasonerStage {
 
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
@@ -208,23 +204,9 @@ abstract class AbstractReasonerStage extends SimpleInterrupter implements
 		isCompleted_ = true;
 		return true;
 	}
-	
-	protected void checkInterrupt() throws ElkInterruptedException {
-		if (isInterrupted()) {
-			LOGGER_.info("{}: interrupted", this);
-			throw new ElkInterruptedException(this + " interrupted");
-		}
-	}
 
-	protected void setInterrupt(Interrupter interrupter, boolean flag) {
-		if (interrupter == null) {
-			if (!flag)
-				throw new ElkRuntimeException(
-						this + ": cannot clear interrupt!");
-			return;
-		}
-		// else
-		interrupter.setInterrupt(flag);
+	protected void checkInterrupt() throws ElkInterruptedException {
+		reasoner.getInterrupter().checkInterrupt();
 	}
 
 	protected void markAllContextsAsSaturated() {
@@ -239,4 +221,10 @@ abstract class AbstractReasonerStage extends SimpleInterrupter implements
 	protected SaturationStatistics getRuleAndConclusionStatistics() {
 		return reasoner.ruleAndConclusionStats;
 	}
+
+	@Override
+	public boolean isInterrupted() {
+		return reasoner.getInterrupter().isInterrupted();
+	}
+
 }

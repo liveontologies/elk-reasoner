@@ -54,7 +54,7 @@ public class PropertyHierarchyCompositionComputationStage extends
 		TracingInferenceProducer<? super ObjectPropertyInference> inferenceProducer = reasoner.getTraceState();
 
 		computation_ = new PropertyHierarchyCompositionComputation(
-				reasoner.ontologyIndex, inferenceProducer,
+				reasoner.ontologyIndex, reasoner.getInterrupter(), inferenceProducer,
 				reasoner.propertyHierarchyCompositionState_.getDispatcher(),
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor());
@@ -79,12 +79,6 @@ public class PropertyHierarchyCompositionComputationStage extends
 	public void printInfo() {
 		// TODO Auto-generated method stub
 
-	}
-
-	@Override
-	public synchronized void setInterrupt(boolean flag) {
-		super.setInterrupt(flag);
-		setInterrupt(computation_, flag);
 	}
 
 }

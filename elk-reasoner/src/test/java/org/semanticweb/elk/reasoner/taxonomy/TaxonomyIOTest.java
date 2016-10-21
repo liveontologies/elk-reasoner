@@ -37,8 +37,6 @@ import java.io.StringWriter;
 import org.junit.Test;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.io.IOUtils;
-import org.semanticweb.elk.loading.AxiomLoader;
-import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
@@ -53,7 +51,7 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.stages.FailingOnInterruptStageExecutor;
+import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
@@ -229,43 +227,21 @@ public class TaxonomyIOTest {
 	private InstanceTaxonomy<ElkClass,ElkNamedIndividual> loadAndClassify(String resource) throws IOException,
 			Owl2ParseException, ElkInconsistentOntologyException, ElkException {
 
-		InputStream stream = null;
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
+				getClass().getClassLoader().getResourceAsStream(resource),
+				new SimpleStageExecutor(), 1);
 
-		try {
-			stream = getClass().getClassLoader().getResourceAsStream(resource);
-			AxiomLoader streamLoader = new Owl2StreamLoader(
-					new Owl2FunctionalStyleParserFactory(), stream);
-
-			Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-					streamLoader, new FailingOnInterruptStageExecutor(), 1);
-
-			return reasoner.getInstanceTaxonomy();
-		} finally {
-			if (stream != null) {
-				IOUtils.closeQuietly(stream);
-			}
-		}
+		return reasoner.getInstanceTaxonomy();
 	}
 
 	private Taxonomy<ElkObjectProperty> loadAndClassifyObjectProperties(String resource) throws IOException,
 			Owl2ParseException, ElkInconsistentOntologyException, ElkException {
 
-		InputStream stream = null;
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
+				getClass().getClassLoader().getResourceAsStream(resource),
+				new SimpleStageExecutor(), 1);
 
-		try {
-			stream = getClass().getClassLoader().getResourceAsStream(resource);
-			AxiomLoader streamLoader = new Owl2StreamLoader(
-					new Owl2FunctionalStyleParserFactory(), stream);
-
-			Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-					streamLoader, new FailingOnInterruptStageExecutor(), 1);
-
-			return reasoner.getObjectPropertyTaxonomy();
-		} finally {
-			if (stream != null) {
-				IOUtils.closeQuietly(stream);
-			}
-		}
+		return reasoner.getObjectPropertyTaxonomy();
 	}
 
 	private Taxonomy<ElkClass> load(String resource) throws IOException,

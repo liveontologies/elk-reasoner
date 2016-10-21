@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.saturation.rules.factories;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
@@ -29,7 +28,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
 /**
  * A common interface for factories for worker engines that process a
@@ -48,7 +47,7 @@ import org.semanticweb.elk.util.concurrent.computation.Interrupter;
  *            the type of the input processed by this factory
  */
 public interface RuleApplicationFactory<C extends Context, I extends RuleApplicationInput>
-		extends Interrupter {
+		extends InterruptMonitor {
 
 	/**
 	 * @return the {@link SaturationState} with which this

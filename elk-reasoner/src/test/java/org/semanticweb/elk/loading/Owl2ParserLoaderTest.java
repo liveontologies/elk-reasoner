@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.loading;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +19,7 @@ package org.semanticweb.elk.loading;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.loading;
 
 import java.io.StringReader;
 
@@ -32,6 +28,7 @@ import org.junit.Test;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import org.semanticweb.elk.util.concurrent.computation.DummyInterruptMonitor;
 
 /**
  * Simple tests for the async. parser
@@ -46,6 +43,7 @@ public class Owl2ParserLoaderTest {
 		StringReader reader = new StringReader(ontology);
 		try {
 			Owl2ParserLoader loader = new Owl2ParserLoader(
+					DummyInterruptMonitor.INSTANCE,
 					new Owl2FunctionalStyleParserFactory().getParser(reader));
 
 			ElkAxiomProcessor dummyProcessor = new ElkAxiomProcessor() {

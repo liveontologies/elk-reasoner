@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,13 +19,11 @@ package org.semanticweb.elk.reasoner;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.loading;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
-import org.semanticweb.elk.loading.AbstractAxiomLoader;
-import org.semanticweb.elk.loading.AxiomLoader;
-import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
@@ -41,13 +37,13 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class TestLoader extends AbstractAxiomLoader implements AxiomLoader {
+public class TestLoader extends TestAxiomLoader {
 
 	// axioms to be added
 	private final Queue<ElkAxiom> axioms_ = new LinkedList<ElkAxiom>();
 
 	public TestLoader() {
-
+		// Empty.
 	}
 
 	public TestLoader(Iterable<ElkAxiom> axioms) {

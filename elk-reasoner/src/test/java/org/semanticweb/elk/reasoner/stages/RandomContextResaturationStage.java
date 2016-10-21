@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.stages;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +19,7 @@ package org.semanticweb.elk.reasoner.stages;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.stages;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -80,7 +76,7 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 		initContexts(contexts);
 		// and now clean then up
 		RuleApplicationFactory<?, RuleApplicationInput> cleaningFactory = new RuleApplicationDeletionNotSaturatedFactory(
-				reasoner.saturationState);
+				reasoner.getInterrupter(), reasoner.saturationState);
 
 		LOGGER_.trace("Starting random contexts cleaning");
 
@@ -93,7 +89,7 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 		initContexts(contexts);
 		// re-saturate
 		RuleApplicationAdditionFactory<RuleApplicationInput> resatFactory = new RuleApplicationAdditionFactory<RuleApplicationInput>(
-				reasoner.saturationState);
+				reasoner.getInterrupter(), reasoner.saturationState);
 
 		ClassExpressionSaturationNoInput saturation = new ClassExpressionSaturationNoInput(
 				reasoner.getProcessExecutor(), reasoner.getNumberOfWorkers(),

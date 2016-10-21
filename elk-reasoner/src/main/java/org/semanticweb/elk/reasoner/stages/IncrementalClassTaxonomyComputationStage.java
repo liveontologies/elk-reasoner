@@ -65,7 +65,8 @@ public class IncrementalClassTaxonomyComputationStage extends
 		final Collection<IndexedClass> modified = reasoner.classTaxonomyState.getModified();
 
 		this.computation_ = new ClassTaxonomyComputation(
-				Operations.split(modified, 64), reasoner.getProcessExecutor(),
+				Operations.split(modified, 64), reasoner.getInterrupter(),
+				reasoner.getProcessExecutor(),
 				workerNo, reasoner.getProgressMonitor(),
 				reasoner.saturationState,
 				reasoner.classTaxonomyState.getTaxonomy());
@@ -103,9 +104,4 @@ public class IncrementalClassTaxonomyComputationStage extends
 			computation_.printStatistics();
 	}
 
-	@Override
-	public synchronized void setInterrupt(boolean flag) {
-		super.setInterrupt(flag);
-		setInterrupt(computation_, flag);
-	}
 }

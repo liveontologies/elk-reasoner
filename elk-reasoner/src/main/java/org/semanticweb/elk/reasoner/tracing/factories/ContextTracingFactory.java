@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.tracing.factories;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +19,7 @@ package org.semanticweb.elk.reasoner.tracing.factories;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.tracing.factories;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
-import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +60,7 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  */
 public class ContextTracingFactory<R extends IndexedContextRoot, J extends ContextTracingJob<R>>
-		extends SimpleInterrupter implements
+		implements
 		InputProcessorFactory<J, ContextTracingFactory<R, J>.Engine> {
 
 	private static final Logger LOGGER_ = LoggerFactory
@@ -86,13 +82,14 @@ public class ContextTracingFactory<R extends IndexedContextRoot, J extends Conte
 	 */
 	private final ContextTracingListener<R, J> listener_;
 
-	public ContextTracingFactory(SaturationState<?> saturationState,
-			int maxWorkers, ContextTracingListener<R, J> listener) {
+	public ContextTracingFactory(final InterruptMonitor interrupter,
+			SaturationState<?> saturationState, int maxWorkers,
+			ContextTracingListener<R, J> listener) {
 		// applying all local rules, saving the inferences using the class inference producer
 		this.saturationFactory_ = new ClassExpressionSaturationFactory<SaturationJobForContextTracing<R, J>>(
-				new ContextTracingRuleApplicationFactory(saturationState,
-						new ThisClassInferenceProducer()), maxWorkers,
-				new ThisClassExpressionSaturationListener());
+				new ContextTracingRuleApplicationFactory(interrupter,
+						saturationState, new ThisClassInferenceProducer()),
+				maxWorkers, new ThisClassExpressionSaturationListener());
 		this.listener_ = listener;
 		this.tracedInferences_ = new ConcurrentHashMap<IndexedContextRoot, Queue<ClassInference>>();
 	}
@@ -103,13 +100,13 @@ public class ContextTracingFactory<R extends IndexedContextRoot, J extends Conte
 	}
 
 	@Override
-	public void setInterrupt(boolean flag) {
-		saturationFactory_.setInterrupt(flag);
+	public void finish() {
+		saturationFactory_.finish();
 	}
 
 	@Override
-	public void finish() {
-		saturationFactory_.finish();
+	public boolean isInterrupted() {
+		return saturationFactory_.isInterrupted();
 	}
 
 	public void printStatistics() {

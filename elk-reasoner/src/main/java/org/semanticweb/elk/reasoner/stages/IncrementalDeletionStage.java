@@ -59,7 +59,8 @@ public class IncrementalDeletionStage extends AbstractReasonerStage {
 			return false;
 		desaturation_ = new ClassExpressionSaturationNoInput(
 				reasoner.getProcessExecutor(), workerNo,
-				new RuleApplicationDeletionFactory(reasoner.saturationState),
+				new RuleApplicationDeletionFactory(reasoner.getInterrupter(),
+						reasoner.saturationState),
 				ContextModificationListener.DUMMY);
 		return true;
 	}
@@ -87,12 +88,6 @@ public class IncrementalDeletionStage extends AbstractReasonerStage {
 	public void printInfo() {
 		if (desaturation_ != null)
 			desaturation_.printStatistics();
-	}
-
-	@Override
-	public synchronized void setInterrupt(boolean flag) {
-		super.setInterrupt(flag);
-		setInterrupt(desaturation_, flag);
 	}
 
 }

@@ -33,6 +33,7 @@ import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
@@ -42,30 +43,34 @@ import org.slf4j.LoggerFactory;
 
 /**
  * An {@link AxiomLoader} that accumulates the {@link OWLOntologyChange} and
- * provides them by converting through {@link OwlConverter}
+ * provides them by converting through {@link OwlConverter}.
+ * <p>
+ * One instance of this class may be registered with the reasoner only
+ * <strong>once</strong>!
  * 
  * @author "Yevgeny Kazakov"
- * 
+ * @author Peter Skocovsky
  */
-public class OwlChangesLoader extends AbstractAxiomLoader implements
-		AxiomLoader {
+class OwlChangesLoaderFactory implements AxiomLoader.Factory {
 
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(OwlChangesLoader.class);
+			.getLogger(OwlChangesLoaderFactory.class);
 
 	private final ProgressMonitor progressMonitor;
 
 	/** list to accumulate the unprocessed changes to the ontology */
 	private final LinkedList<OWLOntologyChange> pendingChanges_;
 
-	OwlChangesLoader(ProgressMonitor progressMonitor) {
+	private Loader loader_ = null;
+
+	OwlChangesLoaderFactory(final ProgressMonitor progressMonitor) {
 		this.progressMonitor = progressMonitor;
 		this.pendingChanges_ = new LinkedList<OWLOntologyChange>();
 	}
 
-	@Override
-	public synchronized void load(final ElkAxiomProcessor axiomInserter,
+	private synchronized void load(final InterruptMonitor interrupter,
+			final ElkAxiomProcessor axiomInserter,
 			final ElkAxiomProcessor axiomDeleter) throws ElkLoadingException {
 		if (!pendingChanges_.isEmpty()) {
 			String status = "Loading of Changes";
@@ -76,7 +81,7 @@ public class OwlChangesLoader extends AbstractAxiomLoader implements
 			
 			int currentAxiom = 0;
 			for (;;) {
-				if (isInterrupted())
+				if (interrupter.isInterrupted())
 					break;
 				OWLOntologyChange change = pendingChanges_.poll();
 				if (change == null)
@@ -106,8 +111,7 @@ public class OwlChangesLoader extends AbstractAxiomLoader implements
 		}
 	}
 
-	@Override
-	public synchronized boolean isLoadingFinished() {
+	synchronized boolean isLoadingFinished() {
 		return pendingChanges_.isEmpty();
 	}
 
@@ -139,6 +143,35 @@ public class OwlChangesLoader extends AbstractAxiomLoader implements
 
 	List<OWLOntologyChange> getPendingChanges() {
 		return pendingChanges_;
+	}
+
+	private class Loader extends AbstractAxiomLoader {
+
+		public Loader(final InterruptMonitor interrupter) {
+			super(interrupter);
+		}
+
+		@Override
+		public void load(final ElkAxiomProcessor axiomInserter,
+				final ElkAxiomProcessor axiomDeleter)
+				throws ElkLoadingException {
+			OwlChangesLoaderFactory.this.load(this, axiomInserter,
+					axiomDeleter);
+		}
+
+		@Override
+		public boolean isLoadingFinished() {
+			return OwlChangesLoaderFactory.this.isLoadingFinished();
+		}
+
+	}
+
+	@Override
+	public AxiomLoader getAxiomLoader(final InterruptMonitor interrupter) {
+		if (loader_ == null) {
+			loader_ = new Loader(interrupter);
+		}
+		return loader_;
 	}
 
 }

@@ -22,14 +22,23 @@
 package org.semanticweb.elk.owlapi;
 
 import java.io.InputStream;
+import java.util.Random;
 
+import org.semanticweb.elk.RandomSeedProvider;
+import org.semanticweb.elk.reasoner.RandomReasonerInterrupter;
 import org.semanticweb.elk.reasoner.ReasoningTestWithInterruptsDelegate;
+import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.testing.UrlTestInput;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 public abstract class OwlApiReasoningTestDelegate<AO extends TestOutput>
 		implements ReasoningTestWithInterruptsDelegate<AO> {
+
+	public static final double INTERRUPTION_CHANCE = 0.3;
 
 	protected final TestManifest<? extends UrlTestInput> manifest_;
 
@@ -41,18 +50,33 @@ public abstract class OwlApiReasoningTestDelegate<AO extends TestOutput>
 	}
 
 	@Override
-	public void init() throws Exception {
+	public void initWithOutput() throws Exception {
 		final InputStream input = manifest_.getInput().getUrl().openStream();
-		reasoner_ = OWLAPITestUtils.createReasoner(input);
+		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		OWLOntology ontology = manager.loadOntologyFromOntologyDocument(input);
+
+		reasoner_ = OWLAPITestUtils.createReasoner(ontology);
 	}
 
 	@Override
-	public void interrupt() {
-		reasoner_.getInternalReasoner().interrupt();
+	public void initWithInterrupts() throws Exception {
+		final InputStream input = manifest_.getInput().getUrl().openStream();
+		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		OWLOntology ontology = manager.loadOntologyFromOntologyDocument(input);
+
+		final Random random = new Random(RandomSeedProvider.VALUE);
+		reasoner_ = OWLAPITestUtils.createReasoner(ontology, false,
+				new RandomReasonerInterrupter(random, INTERRUPTION_CHANCE),
+				new SimpleStageExecutor());
 	}
 
 	@Override
-	public void dispose() {
+	public void before() throws Exception {
+		// Empty.
+	}
+
+	@Override
+	public void after() {
 		// Empty.
 	}
 

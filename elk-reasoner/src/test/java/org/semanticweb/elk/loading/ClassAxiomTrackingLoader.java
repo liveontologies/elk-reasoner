@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.incremental;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,16 +19,15 @@ package org.semanticweb.elk.reasoner.incremental;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.loading;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.semanticweb.elk.loading.AbstractAxiomLoader;
-import org.semanticweb.elk.loading.AxiomLoader;
-import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import org.semanticweb.elk.reasoner.incremental.OnOffVector;
 
 /**
  * An {@link AxiomLoader} that additionally saves the loaded axioms into two
@@ -40,10 +37,9 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
  * The first collection contains only instances of {@link ElkClassAxiom}
  * 
  * @author "Yevgeny Kazakov"
- * 
+ * @author Peter Skocovsky
  */
-public class ClassAxiomTrackingLoader extends AbstractAxiomLoader
-		implements AxiomLoader {
+public class ClassAxiomTrackingLoader extends TestAxiomLoader {
 
 	protected final AxiomLoader loader_;
 	/**

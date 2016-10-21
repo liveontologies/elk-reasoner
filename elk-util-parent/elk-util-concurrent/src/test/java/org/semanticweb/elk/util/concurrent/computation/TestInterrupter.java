@@ -1,11 +1,10 @@
-/*
+/*-
  * #%L
- * ELK Reasoner
- * 
- * $Id$
- * $HeadURL$
+ * ELK Utilities for Concurrency
+ * $Id:$
+ * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,23 +19,27 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.stages;
+package org.semanticweb.elk.util.concurrent.computation;
 
-import static org.junit.Assert.fail;
+public class TestInterrupter implements Interrupter {
 
-/**
- * A simple {@link ReasonerStageExecutor} for unit tests. If a stage has not
- * been done, first, all its dependencies are executed, and then this stage
- * itself. If a stage was interrupted, the test fails.
- * 
- * @author "Yevgeny Kazakov"
- * 
- */
-public class FailingOnInterruptStageExecutor extends SimpleStageExecutor {
+	/**
+	 * The interruption status of this interrupter.
+	 */
+	private volatile boolean isInterrupted_ = false;
 
 	@Override
-	public void setInterrupt(boolean flag) {
-		fail();
+	public void interrupt() {
+		isInterrupted_ = true;
+	}
+
+	@Override
+	public boolean isInterrupted() {
+		return isInterrupted_;
+	}
+
+	public void clearInterrupt() {
+		isInterrupted_ = false;
 	}
 
 }

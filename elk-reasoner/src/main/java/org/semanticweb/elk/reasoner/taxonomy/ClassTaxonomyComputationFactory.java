@@ -43,7 +43,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
-import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  */
-public class ClassTaxonomyComputationFactory extends SimpleInterrupter
+public class ClassTaxonomyComputationFactory
 		implements InputProcessorFactory<Collection<IndexedClass>, Engine> {
 
 	// logger for this class
@@ -84,6 +84,8 @@ public class ClassTaxonomyComputationFactory extends SimpleInterrupter
 	 * that have been made before. For this to work, the taxonomy object must
 	 * originate from an earlier run of this engine on the same ontology.
 	 * 
+	 * @param interrupter
+	 *            the {@link InterruptMonitor} that is checked for interruptions
 	 * @param saturationState
 	 *            the saturation state of the reasoner
 	 * @param maxWorkers
@@ -92,11 +94,12 @@ public class ClassTaxonomyComputationFactory extends SimpleInterrupter
 	 *            the (partially pre-computed) class taxonomy object to store
 	 *            results in
 	 */
-	public ClassTaxonomyComputationFactory(SaturationState<?> saturationState,
-			int maxWorkers, UpdateableTaxonomy<ElkClass> partialTaxonomy) {
+	public ClassTaxonomyComputationFactory(final InterruptMonitor interrupter,
+			SaturationState<?> saturationState, int maxWorkers,
+			UpdateableTaxonomy<ElkClass> partialTaxonomy) {
 		this.taxonomy_ = partialTaxonomy;
 		this.transitiveReductionShared_ = new TransitiveReductionFactory<IndexedClass, TransitiveReductionJob<IndexedClass>>(
-				saturationState, maxWorkers,
+				interrupter, saturationState, maxWorkers,
 				new ThisTransitiveReductionListener());
 		this.outputProcessor_ = new TransitiveReductionOutputProcessor();
 	}
@@ -104,6 +107,8 @@ public class ClassTaxonomyComputationFactory extends SimpleInterrupter
 	/**
 	 * Create a new class taxonomy engine for the input ontology index.
 	 * 
+	 * @param interrupter
+	 *            the {@link InterruptMonitor} that is checked for interruptions
 	 * @param elkFactory
 	 *            a factory for creating owl:Thing and owl:Nothing
 	 * @param saturationState
@@ -111,10 +116,12 @@ public class ClassTaxonomyComputationFactory extends SimpleInterrupter
 	 * @param maxWorkers
 	 *            the maximum number of workers that can use this factory
 	 */
-	public ClassTaxonomyComputationFactory(PredefinedElkClassFactory elkFactory,
+	public ClassTaxonomyComputationFactory(final InterruptMonitor interrupter,
+			PredefinedElkClassFactory elkFactory,
 			SaturationState<?> saturationState, int maxWorkers) {
-		this(saturationState, maxWorkers, new ConcurrentClassTaxonomy(
-				elkFactory, ElkClassKeyProvider.INSTANCE));
+		this(interrupter, saturationState, maxWorkers,
+				new ConcurrentClassTaxonomy(elkFactory,
+						ElkClassKeyProvider.INSTANCE));
 	}
 
 	/**
@@ -196,14 +203,13 @@ public class ClassTaxonomyComputationFactory extends SimpleInterrupter
 	}
 
 	@Override
-	public synchronized void setInterrupt(boolean flag) {
-		super.setInterrupt(flag);
-		transitiveReductionShared_.setInterrupt(flag);
+	public void finish() {
+		transitiveReductionShared_.finish();
 	}
 
 	@Override
-	public void finish() {
-		transitiveReductionShared_.finish();
+	public boolean isInterrupted() {
+		return transitiveReductionShared_.isInterrupted();
 	}
 
 	/**

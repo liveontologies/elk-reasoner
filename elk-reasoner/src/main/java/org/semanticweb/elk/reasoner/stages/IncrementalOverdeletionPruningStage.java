@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.stages;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +19,7 @@ package org.semanticweb.elk.reasoner.stages;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Collection;
 
@@ -73,12 +69,12 @@ public class IncrementalOverdeletionPruningStage extends AbstractReasonerStage {
 		}
 
 		RuleApplicationFactory<?, RuleApplicationInput> ruleAppFactory = new RuleApplicationAdditionPruningFactory(
-				reasoner.saturationState);
+				reasoner.getInterrupter(), reasoner.saturationState);
 		Collection<IndexedContextRoot> inputs = new ContextRootCollection(
 				reasoner.saturationState.getNotSaturatedContexts());
 
-		completion_ = new ClassExpressionSaturation<IndexedContextRoot>(
-				inputs, reasoner.getProcessExecutor(), workerNo,
+		completion_ = new ClassExpressionSaturation<IndexedContextRoot>(inputs,
+				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), ruleAppFactory);
 
 		return true;
@@ -98,12 +94,6 @@ public class IncrementalOverdeletionPruningStage extends AbstractReasonerStage {
 				.getRuleAndConclusionStatistics());
 		this.completion_ = null;
 		return true;
-	}
-
-	@Override
-	public synchronized void setInterrupt(boolean flag) {
-		super.setInterrupt(flag);
-		setInterrupt(completion_, flag);
 	}
 
 }

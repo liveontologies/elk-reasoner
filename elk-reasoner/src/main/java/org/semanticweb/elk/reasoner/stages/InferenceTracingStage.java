@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.stages;
-
 /*-
  * #%L
  * ELK Reasoner Core
@@ -24,6 +19,7 @@ package org.semanticweb.elk.reasoner.stages;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.tracing.RecursiveTracingComputation;
@@ -62,7 +58,7 @@ public class InferenceTracingStage extends AbstractReasonerStage {
 		if (!super.preExecute()) {
 			return false;
 		}
-		computation_ = new RecursiveTracingComputation(
+		computation_ = new RecursiveTracingComputation(reasoner.getInterrupter(),
 				reasoner.getProcessExecutor(), reasoner.getNumberOfWorkers(),
 				reasoner.saturationState, reasoner.getTraceState());
 		return true;

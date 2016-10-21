@@ -1,4 +1,3 @@
-package org.semanticweb.elk.loading;
 /*
  * #%L
  * ELK Reasoner
@@ -20,6 +19,7 @@ package org.semanticweb.elk.loading;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.loading;
 
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
@@ -27,10 +27,9 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
  * An {@link AxiomLoader} that loads nothing
  * 
  * @author "Yevgeny Kazakov"
- * 
+ * @author Peter Skocovsky
  */
-public class EmptyAxiomLoader extends AbstractAxiomLoader implements
-		AxiomLoader {
+public class EmptyAxiomLoader extends TestAxiomLoader {
 
 	@Override
 	public void load(ElkAxiomProcessor axiomInserter,

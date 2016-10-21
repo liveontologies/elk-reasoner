@@ -42,6 +42,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
 /*
  * TODO: current implementation does not support equivalent individuals,
@@ -90,11 +91,12 @@ public class InstanceTaxonomyComputationFactory
 	 *            results in
 	 */
 	public InstanceTaxonomyComputationFactory(
+			final InterruptMonitor interrupter,
 			SaturationState<?> saturationState, int maxWorkers,
 			UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> partialTaxonomy) {
 		this.taxonomy_ = partialTaxonomy;
 		this.transitiveReductionShared_ = new TransitiveReductionFactory<IndexedIndividual, TransitiveReductionJob<IndexedIndividual>>(
-				saturationState, maxWorkers,
+				interrupter, saturationState, maxWorkers,
 				new ThisTransitiveReductionListener());
 		this.outputProcessor_ = new TransitiveReductionOutputProcessor();
 	}
@@ -173,11 +175,6 @@ public class InstanceTaxonomyComputationFactory
 	public Engine getEngine() {
 		return new Engine();
 
-	}
-
-	@Override
-	public void setInterrupt(boolean flag) {
-		transitiveReductionShared_.setInterrupt(flag);
 	}
 
 	@Override

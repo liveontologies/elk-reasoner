@@ -35,6 +35,7 @@ import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
+import org.semanticweb.elk.loading.TestAxiomLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
@@ -45,6 +46,7 @@ import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestInput;
+import org.semanticweb.elk.util.concurrent.computation.DummyInterruptMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,10 +105,10 @@ public abstract class BaseRandomWalkIncrementalCorrectnessTest {
 		LOGGER_.info("Initial load of test axioms");
 
 		InputStream stream = manifest.getInput().getUrl().openStream();
-		AxiomLoader fileLoader = new Owl2StreamLoader(
+		AxiomLoader fileLoader = new Owl2StreamLoader.Factory(
 				new Owl2FunctionalStyleParserFactory(),
-				stream);
-		AxiomLoader trackingLoader = getAxiomTrackingLoader(fileLoader,
+				stream).getAxiomLoader(DummyInterruptMonitor.INSTANCE);
+		TestAxiomLoader trackingLoader = getAxiomTrackingLoader(fileLoader,
 				changingAxioms, staticAxioms);
 		incrementalReasoner = TestReasonerUtils.createTestReasoner(
 				trackingLoader, new PostProcessingStageExecutor());
@@ -126,7 +128,7 @@ public abstract class BaseRandomWalkIncrementalCorrectnessTest {
 		}
 	}
 
-	protected abstract AxiomLoader getAxiomTrackingLoader(
+	protected abstract TestAxiomLoader getAxiomTrackingLoader(
 			AxiomLoader fileLoader, OnOffVector<ElkAxiom> changingAxioms,
 			List<ElkAxiom> staticAxioms);
 

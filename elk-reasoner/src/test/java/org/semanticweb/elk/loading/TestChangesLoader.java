@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.incremental;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,15 +19,14 @@ package org.semanticweb.elk.reasoner.incremental;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.loading;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
-import org.semanticweb.elk.loading.AbstractAxiomLoader;
-import org.semanticweb.elk.loading.AxiomLoader;
-import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import org.semanticweb.elk.reasoner.incremental.IncrementalChangeType;
 
 /**
  * A simple {@link AxiomLoader} which internally keeps sets of axioms to be
@@ -43,9 +37,9 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
  *         pavel.klinov@uni-ulm.de
  * 
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  */
-public class TestChangesLoader extends AbstractAxiomLoader implements
-		AxiomLoader {
+public class TestChangesLoader extends TestAxiomLoader {
 
 	// axioms that are coming in the changes
 	private final Queue<ElkAxiom> axioms_ = new LinkedList<ElkAxiom>();
@@ -53,7 +47,7 @@ public class TestChangesLoader extends AbstractAxiomLoader implements
 	private final Queue<Boolean> changes_ = new LinkedList<Boolean>();
 
 	public TestChangesLoader() {
-
+		// Empty.
 	}
 
 	public TestChangesLoader(Iterable<ElkAxiom> axioms,

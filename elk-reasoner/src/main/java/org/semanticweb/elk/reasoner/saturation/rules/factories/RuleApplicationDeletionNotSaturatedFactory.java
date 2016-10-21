@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.saturation.rules.factories;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,11 +19,13 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
 import org.semanticweb.elk.reasoner.saturation.SaturationCheckingWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
 /**
  * A {@link RuleApplicationFactory} that works similarly to
@@ -46,8 +43,9 @@ public class RuleApplicationDeletionNotSaturatedFactory extends
 		RuleApplicationDeletionFactory {
 
 	public RuleApplicationDeletionNotSaturatedFactory(
+			final InterruptMonitor interrupter,
 			final SaturationState<? extends Context> saturationState) {
-		super(saturationState);
+		super(interrupter, saturationState);
 	}
 
 	@Override

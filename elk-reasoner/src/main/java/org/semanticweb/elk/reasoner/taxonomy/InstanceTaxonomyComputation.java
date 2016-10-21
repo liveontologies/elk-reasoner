@@ -32,6 +32,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
 // TODO: documentation
 
@@ -49,14 +50,15 @@ public class InstanceTaxonomyComputation
 
 	public InstanceTaxonomyComputation(
 			Collection<? extends IndexedIndividual> inputs,
+			final InterruptMonitor interrupter,
 			ComputationExecutor executor,
 			int maxWorkers,
 			ProgressMonitor progressMonitor,
 			SaturationState<?> saturationState,
 			UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> partialTaxonomy) {
-		super(inputs, new InstanceTaxonomyComputationFactory(saturationState,
-				maxWorkers, partialTaxonomy), executor, maxWorkers,
-				progressMonitor);
+		super(inputs, new InstanceTaxonomyComputationFactory(
+				interrupter, saturationState, maxWorkers, partialTaxonomy),
+				executor, maxWorkers, progressMonitor);
 	}
 
 	/**

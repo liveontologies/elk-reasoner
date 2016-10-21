@@ -21,16 +21,15 @@
  */
 package org.semanticweb.elk.cli;
 
-import java.io.InputStream;
+import java.util.Random;
 
-import org.semanticweb.elk.io.IOUtils;
-import org.semanticweb.elk.loading.AxiomLoader;
-import org.semanticweb.elk.loading.Owl2StreamLoader;
-import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
+import org.semanticweb.elk.RandomSeedProvider;
+import org.semanticweb.elk.reasoner.RandomReasonerInterrupter;
 import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.ReasoningTestWithInterruptsDelegate;
-import org.semanticweb.elk.reasoner.stages.RestartingStageExecutor;
+import org.semanticweb.elk.reasoner.TestReasonerUtils;
+import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
+import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.testing.UrlTestInput;
@@ -38,9 +37,10 @@ import org.semanticweb.elk.testing.UrlTestInput;
 public abstract class CliReasoningTestDelegate<AO extends TestOutput>
 		implements ReasoningTestWithInterruptsDelegate<AO> {
 
+	public static final double INTERRUPTION_CHANCE = 0.3;
+
 	protected final TestManifest<? extends UrlTestInput> manifest_;
 
-	private InputStream input_ = null;
 	protected Reasoner reasoner_;
 
 	public CliReasoningTestDelegate(
@@ -49,22 +49,34 @@ public abstract class CliReasoningTestDelegate<AO extends TestOutput>
 	}
 
 	@Override
-	public void init() throws Exception {
-		input_ = manifest_.getInput().getUrl().openStream();
-		final AxiomLoader loader = new Owl2StreamLoader(
-				new Owl2FunctionalStyleParserFactory(), input_);
-		reasoner_ = new ReasonerFactory().createReasoner(loader,
-				new RestartingStageExecutor());
+	public void initWithOutput() throws Exception {
+		reasoner_ = TestReasonerUtils.createTestReasoner(
+				manifest_.getInput().getUrl().openStream(),
+				new SimpleStageExecutor());
 	}
 
 	@Override
-	public void interrupt() {
-		reasoner_.interrupt();
+	public void initWithInterrupts() throws Exception {
+		final Random random = new Random(RandomSeedProvider.VALUE);
+		reasoner_ = TestReasonerUtils.createTestReasoner(
+				manifest_.getInput().getUrl().openStream(),
+				new RandomReasonerInterrupter(random, INTERRUPTION_CHANCE),
+				new SimpleStageExecutor());
 	}
 
 	@Override
-	public void dispose() {
-		IOUtils.closeQuietly(input_);
+	public Class<? extends Exception> getInterruptionExceptionClass() {
+		return ElkInterruptedException.class;
+	}
+
+	@Override
+	public void before() throws Exception {
+		// Empty.
+	}
+
+	@Override
+	public void after() {
+		// Empty.
 	}
 
 }

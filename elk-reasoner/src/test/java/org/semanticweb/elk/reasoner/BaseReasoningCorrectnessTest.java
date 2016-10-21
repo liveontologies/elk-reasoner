@@ -68,12 +68,12 @@ public abstract class BaseReasoningCorrectnessTest<I extends TestInput, AO exten
 	@Before
 	public void before() throws Exception {
 		assumeTrue(!ignore(manifest.getInput()));
-		delegate_.init();
+		delegate_.before();
 	}
 
 	@After
 	public void after() {
-		delegate_.dispose();
+		delegate_.after();
 	}
 
 	protected boolean ignore(TestInput input) {

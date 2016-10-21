@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.incremental;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +19,7 @@ package org.semanticweb.elk.reasoner.incremental;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.incremental;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -45,6 +41,8 @@ import java.util.List;
 import org.junit.Test;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.io.IOUtils;
+import org.semanticweb.elk.loading.TestAxiomLoaderFactory;
+import org.semanticweb.elk.loading.TestChangesLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
@@ -123,7 +121,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		reasoner.setAllowIncrementalMode(true);
 		TestChangesLoader changeLoader = new TestChangesLoader();
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		changeLoader.remove(objectFactory.getSubClassOfAxiom(b, d));
 
@@ -170,7 +168,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		reasoner.setAllowIncrementalMode(true);
 		TestChangesLoader changeLoader = new TestChangesLoader();
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 		changeLoader.remove(posExistential);
 
 		LOGGER_.trace("********** Taxonomy re-computation after incremental change ************");
@@ -211,7 +209,7 @@ public class LowLevelIncrementalTBoxTest {
 		reasoner.setAllowIncrementalMode(true);
 
 		TestChangesLoader changeLoader = new TestChangesLoader();
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		// this should not change anything
 		changeLoader.remove(axAandBsubC).add(axAandBsubC);
@@ -227,7 +225,7 @@ public class LowLevelIncrementalTBoxTest {
 				.contains(taxonomy.getNode(c)));
 		assertEquals(2, taxonomy.getNode(a).getDirectSuperNodes().size());
 
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		// this again should not change anything
 		changeLoader.remove(axAandBsubC).add(axAandBsubC);
@@ -243,7 +241,7 @@ public class LowLevelIncrementalTBoxTest {
 				.contains(taxonomy.getNode(c)));
 		assertEquals(2, taxonomy.getNode(a).getDirectSuperNodes().size());
 
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		// when this axiom removed, we loose node C
 		changeLoader.remove(axAandBsubC);
@@ -254,7 +252,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		assertEquals(1, taxonomy.getNode(a).getDirectSuperNodes().size());
 
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		// this should not change anything
 
@@ -266,7 +264,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		assertEquals(1, taxonomy.getNode(a).getDirectSuperNodes().size());
 
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		// this again should not change anything
 
@@ -304,7 +302,7 @@ public class LowLevelIncrementalTBoxTest {
 		reasoner.setAllowIncrementalMode(true);
 
 		TestChangesLoader changeLoader = new TestChangesLoader();
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		// this should not change anything
 		changeLoader.remove(axAeqB).add(axAeqB);
@@ -315,7 +313,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		assertEquals(2, taxonomy.getNode(a).size());
 
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		// when this axiom removed, we loose A=B
 		changeLoader.remove(axAeqB);
@@ -326,7 +324,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		assertEquals(1, taxonomy.getNode(a).size());
 
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		// this should not change anything
 
@@ -338,7 +336,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		assertEquals(1, taxonomy.getNode(a).size());
 
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		// this should change it back
 
@@ -376,7 +374,7 @@ public class LowLevelIncrementalTBoxTest {
 		reasoner.setAllowIncrementalMode(true);
 
 		TestChangesLoader changeLoader = new TestChangesLoader();
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		ElkClass c = createElkClass("C");
 		ElkClass d = createElkClass("D");
@@ -439,7 +437,7 @@ public class LowLevelIncrementalTBoxTest {
 
 			reasoner.setAllowIncrementalMode(true);
 			TestChangesLoader changeLoader = new TestChangesLoader();
-			reasoner.registerAxiomLoader(changeLoader);
+			reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 			for (ElkAxiom del : deletions) {
 				changeLoader.remove(del);
@@ -500,7 +498,7 @@ public class LowLevelIncrementalTBoxTest {
 
 			reasoner.setAllowIncrementalMode(true);
 			TestChangesLoader changeLoader = new TestChangesLoader();
-			reasoner.registerAxiomLoader(changeLoader);
+			reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 			for (ElkAxiom del : deletions) {
 				changeLoader.remove(del);
@@ -514,7 +512,7 @@ public class LowLevelIncrementalTBoxTest {
 					taxonomy.getNode(maternityKangaroo));
 
 			reasoner.setAllowIncrementalMode(true);
-			reasoner.registerAxiomLoader(changeLoader);
+			reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 			for (ElkAxiom del : deletions) {
 				changeLoader.add(del);
@@ -558,7 +556,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		reasoner.setAllowIncrementalMode(true);
 		TestChangesLoader changeLoader = new TestChangesLoader();
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		changeLoader.add(objectFactory.getSubClassOfAxiom(a, b));
 
@@ -572,7 +570,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		// now delete it the second time
 
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 		changeLoader.add(objectFactory.getSubClassOfAxiom(a, b));
 
 		LOGGER_.trace("********* Taxonomy re-computation after incremental deletions **********");
@@ -612,7 +610,7 @@ public class LowLevelIncrementalTBoxTest {
 		// make a non-incremental change
 
 		loader = new TestChangesLoader();
-		reasoner.registerAxiomLoader(loader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(loader));
 
 		loader.remove(objectFactory.getSubClassOfAxiom(a, b))
 				// use owl:Nothing to make consistency computation non-trivial
@@ -634,7 +632,7 @@ public class LowLevelIncrementalTBoxTest {
 		// make an incremental change
 		
 		loader = new TestChangesLoader();
-		reasoner.registerAxiomLoader(loader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(loader));
 
 		// just to trigger loading
 		loader.add(objectFactory.getSubClassOfAxiom(a, a));		
@@ -675,7 +673,7 @@ public class LowLevelIncrementalTBoxTest {
 		reasoner.setAllowIncrementalMode(true);
 
 		TestChangesLoader changeLoader = new TestChangesLoader();
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		changeLoader.add(objectFactory.getSubClassOfAxiom(a, b))
 				.add(objectFactory.getSubClassOfAxiom(b, d));
@@ -708,7 +706,7 @@ public class LowLevelIncrementalTBoxTest {
 				new PostProcessingStageExecutor(), 1);
 
 		reasoner.setAllowIncrementalMode(false);
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		ElkClass a = createElkClass("A");
 		ElkClass b = createElkClass("B");
@@ -780,7 +778,7 @@ public class LowLevelIncrementalTBoxTest {
 		reasoner.setAllowIncrementalMode(true);
 
 		TestChangesLoader changeLoader = new TestChangesLoader();
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		changeLoader.remove(disjCB);
 
@@ -791,7 +789,7 @@ public class LowLevelIncrementalTBoxTest {
 		assertTrue(taxonomy.getNode(a) == taxonomy.getBottomNode());
 
 		// delete another disjointness, A should become satisfiable again
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 		changeLoader.remove(disjBC);
 
 		LOGGER_.trace("********* Taxonomy re-computation after incremental deletions **********");
@@ -835,7 +833,7 @@ public class LowLevelIncrementalTBoxTest {
 			// now delete one disjointness, A should is still unsatisfiable
 			reasoner.setAllowIncrementalMode(true);
 			TestChangesLoader changeLoader = new TestChangesLoader();
-			reasoner.registerAxiomLoader(changeLoader);
+			reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 			changeLoader.remove(disjABCD);
 			
@@ -847,7 +845,7 @@ public class LowLevelIncrementalTBoxTest {
 
 			// now delete the other disjointness, A should is become satisfiable
 			changeLoader.remove(disjACBD);
-			reasoner.registerAxiomLoader(changeLoader);
+			reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 			
 			LOGGER_.trace("********* Taxonomy re-computation after incremental deletions **********");
 			
@@ -890,7 +888,7 @@ public class LowLevelIncrementalTBoxTest {
 		// A should be deleted, E should appear, D should be a subclass of C now
 		reasoner.setAllowIncrementalMode(true);
 		TestChangesLoader changeLoader = new TestChangesLoader();
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		changeLoader.remove(objectFactory.getSubClassOfAxiom(d, a))
 				.remove(objectFactory.getSubClassOfAxiom(a,
@@ -944,7 +942,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		reasoner.setAllowIncrementalMode(true);
 		TestChangesLoader changeLoader = new TestChangesLoader();
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		changeLoader.add(axAsubRsomeB);
 
@@ -992,7 +990,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		reasoner.setAllowIncrementalMode(true);
 		TestChangesLoader changeLoader = new TestChangesLoader();
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		LOGGER_.trace("********* Taxonomy re-computation after incremental additions **********");
 		
@@ -1039,7 +1037,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		reasoner.setAllowIncrementalMode(true);
 		TestChangesLoader changeLoader = new TestChangesLoader();
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		changeLoader.add(axYsubRsomeB);
 
@@ -1093,7 +1091,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		reasoner.setAllowIncrementalMode(true);
 		TestChangesLoader changeLoader = new TestChangesLoader();
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		changeLoader.remove(toDelete).add(toAdd1).add(toAdd2);
 
@@ -1169,7 +1167,7 @@ public class LowLevelIncrementalTBoxTest {
 		for (ElkAxiom axiom : changes) {
 			changeLoader.add(axiom);
 		}
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 		
 		LOGGER_.trace("********* Taxonomy re-computation after incremental additions **********");
 		
@@ -1184,7 +1182,7 @@ public class LowLevelIncrementalTBoxTest {
 		for (ElkAxiom axiom : changes) {
 			changeLoader.remove(axiom);
 		}
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		LOGGER_.trace("********* Taxonomy re-computation after incremental deletions **********");
 		
@@ -1245,7 +1243,7 @@ public class LowLevelIncrementalTBoxTest {
 		reasoner.setAllowIncrementalMode(true);
 
 		TestChangesLoader changeLoader = new TestChangesLoader();
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		for (ElkAxiom axiom : additions) {
 			changeLoader.add(axiom);
@@ -1263,7 +1261,7 @@ public class LowLevelIncrementalTBoxTest {
 				+ "SubClassOf(:C :E) " + ")";
 		List<ElkAxiom> deletions = loadAxioms(new StringReader(toDelete));
 
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		for (ElkAxiom axiom : deletions) {
 			changeLoader.remove(axiom);
@@ -1281,7 +1279,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		deletions = loadAxioms(new StringReader(toDelete));
 
-		reasoner.registerAxiomLoader(changeLoader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		for (ElkAxiom axiom : deletions) {
 			changeLoader.remove(axiom);

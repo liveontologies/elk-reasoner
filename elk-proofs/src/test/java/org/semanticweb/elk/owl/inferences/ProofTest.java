@@ -35,15 +35,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
-import org.semanticweb.elk.loading.AxiomLoader;
-import org.semanticweb.elk.loading.Owl2StreamLoader;
+import org.semanticweb.elk.loading.TestLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.owl.interfaces.ElkObjectDelegatingFactory;
 import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
-import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
@@ -60,7 +57,6 @@ import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.elk.testing.UrlTestInput;
 import org.semanticweb.elk.testing.VoidTestOutput;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 /**
  * Tests tracing and axiom binding for all atomic subsumption inferences in all
@@ -99,28 +95,12 @@ public class ProofTest {
 
 	@Test
 	public void provabilityTest() throws Exception {
-		ElkObject.Factory elkFactory = new ElkObjectEntityRecyclingFactory();
 		// to save all loaded axioms
-		final Set<ElkAxiom> ontology = new ArrayHashSet<ElkAxiom>();
-		ElkObject.Factory axiomSavingFactory = new ElkObjectDelegatingFactory(
-				elkFactory) {
+		final Set<ElkAxiom> ontology = TestReasonerUtils
+				.loadAxioms(manifest.getInput().getUrl().openStream());
+		final TestLoader loader = new TestLoader(ontology);
 
-			@Override
-			protected <C extends ElkObject> C filter(C candidate) {
-				if (candidate instanceof ElkAxiom) {
-					ontology.add((ElkAxiom) candidate);
-				}
-				return candidate;
-			}
-		};
-
-		AxiomLoader fileLoader = new Owl2StreamLoader(
-				new Owl2FunctionalStyleParserFactory(axiomSavingFactory),
-				manifest.getInput().getUrl().openStream()) {
-
-		};
-
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(fileLoader,
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new PostProcessingStageExecutor());
 
 		try {

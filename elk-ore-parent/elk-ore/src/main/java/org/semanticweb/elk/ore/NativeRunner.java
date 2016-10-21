@@ -107,8 +107,9 @@ public class NativeRunner {
 		// create reasoner
 		ReasonerFactory reasoningFactory = new ReasonerFactory();
 		Owl2ParserFactory parserFactory = new Owl2FunctionalStyleParserFactory();
-		AxiomLoader loader = new Owl2StreamLoader(parserFactory, input);
-		Reasoner reasoner = reasoningFactory.createReasoner(loader,
+		AxiomLoader.Factory loaderFactory = new Owl2StreamLoader.Factory(
+				parserFactory, input);
+		Reasoner reasoner = reasoningFactory.createReasoner(loaderFactory,
 				new SimpleStageExecutor());
 
 		boolean printedStarted = false, printedTime = false;

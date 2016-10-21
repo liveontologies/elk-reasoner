@@ -36,7 +36,8 @@ import org.semanticweb.elk.util.collections.AbstractHashMultimap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
-import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
+import org.semanticweb.elk.util.concurrent.computation.DelegateInterruptMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class PropertyHierarchyCompositionComputationFactory extends
-		SimpleInterrupter
+		DelegateInterruptMonitor
 		implements
 		InputProcessorFactory<IndexedPropertyChain, PropertyHierarchyCompositionComputationFactory.Engine> {
 
@@ -68,8 +69,10 @@ public class PropertyHierarchyCompositionComputationFactory extends
 	private final PropertyHierarchyCompositionState.Dispatcher dispatcher_;
 	
 	public PropertyHierarchyCompositionComputationFactory(
+			final InterruptMonitor interrupter,
 			TracingInferenceProducer<? super ObjectPropertyInference> inferenceProducer,
 			final PropertyHierarchyCompositionState.Dispatcher dispatcher) {
+		super(interrupter);
 		this.inferenceProducer_ = inferenceProducer;
 		this.dispatcher_ = dispatcher;
 	}

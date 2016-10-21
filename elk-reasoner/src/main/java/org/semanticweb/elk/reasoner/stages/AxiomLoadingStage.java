@@ -192,15 +192,13 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 		return true;
 	}
 
+	public boolean isFirstLoad() {
+		return firstLoad_;
+	}
+
 	@Override
 	public void printInfo() {
 		// TODO
-	}
-	
-	@Override
-	public synchronized void setInterrupt(boolean flag) {
-		super.setInterrupt(flag);
-		setInterrupt(loader_, flag);
 	}
 
 	private static class IndexingUnsupportedListener

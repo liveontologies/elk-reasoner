@@ -1,5 +1,3 @@
-package org.semanticweb.elk.loading;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,9 +19,11 @@ package org.semanticweb.elk.loading;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.loading;
 
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
-import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
+import org.semanticweb.elk.util.concurrent.computation.DelegateInterruptMonitor;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
 /**
  * A skeletal implementation of the {@link AxiomLoader} that minimizes the
@@ -32,8 +32,12 @@ import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
  * @author "Yevgeny Kazakov"
  * 
  */
-public abstract class AbstractAxiomLoader extends SimpleInterrupter implements
+public abstract class AbstractAxiomLoader extends DelegateInterruptMonitor implements
 		AxiomLoader {
+
+	public AbstractAxiomLoader(final InterruptMonitor interrupter) {
+		super(interrupter);
+	}
 
 	@Override
 	public abstract void load(ElkAxiomProcessor axiomInserter,

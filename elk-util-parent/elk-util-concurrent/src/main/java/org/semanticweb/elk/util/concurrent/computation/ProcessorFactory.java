@@ -37,7 +37,8 @@ package org.semanticweb.elk.util.concurrent.computation;
  *            the type of the {@link Processor}s produced by this
  *            {@link ProcessorFactory}
  */
-public interface ProcessorFactory<P extends Processor> extends Interrupter {
+public interface ProcessorFactory<P extends Processor>
+		extends InterruptMonitor {
 
 	/**
 	 * @return a new {@link Processor} of the given type

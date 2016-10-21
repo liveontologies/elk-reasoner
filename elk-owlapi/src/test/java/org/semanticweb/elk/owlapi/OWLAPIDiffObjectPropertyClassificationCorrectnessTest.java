@@ -29,6 +29,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.DiffObjectPropertyClassificationCorrectnessTest;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
+import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestInput;
@@ -60,6 +61,11 @@ public class OWLAPIDiffObjectPropertyClassificationCorrectnessTest
 								.getObjectPropertyTaxonomyQuietly();
 						return new TaxonomyTestOutput<Taxonomy<ElkObjectProperty>>(
 								taxonomy);
+					}
+
+					@Override
+					public Class<? extends Exception> getInterruptionExceptionClass() {
+						return ElkInterruptedException.class;
 					}
 
 				});

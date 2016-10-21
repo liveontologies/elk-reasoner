@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner;
 import org.semanticweb.elk.testing.TestOutput;
 
 /**
- * A test delegate that can interrupt the tested computation.
+ * A test delegate for tests with interrupts.
  * 
  * @author Peter Skocovsky
  *
@@ -32,11 +32,19 @@ import org.semanticweb.elk.testing.TestOutput;
  *            The type of actual test output.
  */
 public interface ReasoningTestWithInterruptsDelegate<AO extends TestOutput>
-		extends ReasoningTestDelegate<AO> {
+		extends ReasoningTestWithOutputDelegate<AO> {
 
 	/**
-	 * Interrupts the tested computation.
+	 * Called at the beginning of the test with interrupts.
+	 * 
+	 * @throws Exception
 	 */
-	void interrupt();
+	void initWithInterrupts() throws Exception;
+
+	/**
+	 * @return Class of exception that is thrown when the process executed in
+	 *         {@link #getActualOutput()} is interrupted.
+	 */
+	Class<? extends Exception> getInterruptionExceptionClass();
 
 }

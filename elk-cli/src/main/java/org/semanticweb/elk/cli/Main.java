@@ -32,10 +32,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import joptsimple.OptionSpec;
-
 import org.apache.log4j.Level;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.loading.AxiomLoader;
@@ -57,6 +53,10 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.util.logging.Statistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+import joptsimple.OptionSpec;
 
 /**
  * 
@@ -174,7 +174,7 @@ public class Main {
 		// create reasoner
 		ReasonerFactory reasoningFactory = new ReasonerFactory();
 		Owl2ParserFactory parserFactory = new Owl2FunctionalStyleParserFactory();
-		AxiomLoader loader = new Owl2StreamLoader(parserFactory,
+		AxiomLoader.Factory loader = new Owl2StreamLoader.Factory(parserFactory,
 				options.valueOf(inputFile));
 		Reasoner reasoner = reasoningFactory.createReasoner(loader,
 				new LoggingStageExecutor(), configuration);

@@ -59,6 +59,7 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 
 		this.computation_ = new ClassTaxonomyComputation(
 				Operations.split(reasoner.ontologyIndex.getClasses(), 64),
+				reasoner.getInterrupter(),
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), reasoner.saturationState,
 				reasoner.classTaxonomyState.getTaxonomy());
@@ -88,9 +89,4 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 			computation_.printStatistics();
 	}
 
-	@Override
-	public synchronized void setInterrupt(boolean flag) {
-		super.setInterrupt(flag);
-		setInterrupt(computation_, flag);
-	}
 }

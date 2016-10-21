@@ -56,9 +56,9 @@ class ClassExpressionQueryStage extends AbstractReasonerStage {
 		this.computation_ = new ClassExpressionQueryComputation(
 				reasoner.classExpressionQueryState_
 						.getNotSaturatedQueriedClassExpressions(),
-				reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor(), reasoner.saturationState,
-				reasoner.classExpressionQueryState_
+				reasoner.getInterrupter(), reasoner.getProcessExecutor(),
+				workerNo, reasoner.getProgressMonitor(),
+				reasoner.saturationState, reasoner.classExpressionQueryState_
 						.getTransitiveReductionOutputProcessor());
 
 		return true;
@@ -85,12 +85,6 @@ class ClassExpressionQueryStage extends AbstractReasonerStage {
 		if (computation_ != null) {
 			computation_.printStatistics();
 		}
-	}
-
-	@Override
-	public synchronized void setInterrupt(boolean flag) {
-		super.setInterrupt(flag);
-		setInterrupt(computation_, flag);
 	}
 
 }

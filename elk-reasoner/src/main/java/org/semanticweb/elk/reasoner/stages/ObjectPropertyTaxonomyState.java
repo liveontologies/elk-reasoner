@@ -139,7 +139,7 @@ public class ObjectPropertyTaxonomyState {
 				initTaxonomy();
 
 				computation_ = new ObjectPropertyTaxonomyComputation(
-						reasoner.ontologyIndex,
+						reasoner.ontologyIndex, reasoner.getInterrupter(),
 						transitiveReductionOutputProcessor_,
 						reasoner.getElkFactory(), reasoner.getProcessExecutor(),
 						workerNo, reasoner.getProgressMonitor());
@@ -174,12 +174,6 @@ public class ObjectPropertyTaxonomyState {
 			public void printInfo() {
 				// TODO Auto-generated method stub
 
-			}
-
-			@Override
-			public synchronized void setInterrupt(final boolean flag) {
-				super.setInterrupt(flag);
-				setInterrupt(computation_, flag);
 			}
 
 		};

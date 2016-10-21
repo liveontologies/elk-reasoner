@@ -23,7 +23,6 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.exceptions.ElkException;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
  * An abstract interface for defining how reasoner stages are executed by the
@@ -34,7 +33,7 @@ import org.semanticweb.elk.util.concurrent.computation.Interrupter;
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface ReasonerStageExecutor extends Interrupter {
+public interface ReasonerStageExecutor {
 
 	/**
 	 * Makes sure that the given stage is completed; it might not necessarily

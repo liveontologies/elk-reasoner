@@ -35,6 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInferenceConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
 /**
  * A {@link RuleApplicationFactory} that adds the produced
@@ -55,8 +56,9 @@ public class RuleApplicationAdditionFactory<I extends RuleApplicationInput>
 		extends
 			AbstractRuleApplicationFactory<Context, I> {
 
-	public RuleApplicationAdditionFactory(SaturationState<?> saturationState) {
-		super(saturationState);
+	public RuleApplicationAdditionFactory(final InterruptMonitor interrupter,
+			SaturationState<?> saturationState) {
+		super(interrupter, saturationState);
 	}
 
 	@Override

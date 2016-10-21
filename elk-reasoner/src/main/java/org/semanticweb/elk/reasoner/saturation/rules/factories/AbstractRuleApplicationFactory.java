@@ -37,7 +37,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
-import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
+import org.semanticweb.elk.util.concurrent.computation.DelegateInterruptMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +54,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractRuleApplicationFactory<C extends Context, I extends RuleApplicationInput>
 		extends
-			SimpleInterrupter
+			DelegateInterruptMonitor
 		implements RuleApplicationFactory<C, I> {
 
 	// logger for this class
@@ -70,8 +71,9 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 	 */
 	private final SaturationStatistics aggregatedStats_;
 
-	public AbstractRuleApplicationFactory(
+	public AbstractRuleApplicationFactory(final InterruptMonitor interrupter,
 			final SaturationState<? extends C> saturationState) {
+		super(interrupter);
 		this.saturationState_ = saturationState;
 		this.aggregatedStats_ = new SaturationStatistics();
 	}

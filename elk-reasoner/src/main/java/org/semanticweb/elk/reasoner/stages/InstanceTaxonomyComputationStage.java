@@ -64,6 +64,7 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 
 			computation_ = new InstanceTaxonomyComputation(
 					reasoner.ontologyIndex.getIndividuals(),
+					reasoner.getInterrupter(),
 					reasoner.getProcessExecutor(), workerNo,
 					reasoner.getProgressMonitor(), reasoner.saturationState,
 					reasoner.instanceTaxonomyState.getTaxonomy());
@@ -93,12 +94,6 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 	public void printInfo() {
 		if (computation_ != null)
 			computation_.printStatistics();
-	}
-
-	@Override
-	public synchronized void setInterrupt(boolean flag) {
-		super.setInterrupt(flag);
-		setInterrupt(computation_, flag);
 	}
 
 }

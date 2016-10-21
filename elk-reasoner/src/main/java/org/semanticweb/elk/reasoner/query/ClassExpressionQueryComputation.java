@@ -31,14 +31,11 @@ import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
 /**
  * Computes the direct super-, direct sub-, and equivalent classes of the class
  * expressions supplied as input.
- * 
- * <pre>
- * TODO: The sub-classes!
- * </pre>
  * 
  * @author Peter Skocovsky
  */
@@ -47,13 +44,14 @@ public class ClassExpressionQueryComputation extends
 
 	public ClassExpressionQueryComputation(
 			final Collection<IndexedClassExpression> inputs,
+			final InterruptMonitor interrupter,
 			final ComputationExecutor executor, final int maxWorkers,
 			final ProgressMonitor progressMonitor,
 			final SaturationState<?> saturationState,
 			final TransitiveReductionOutputVisitor<IndexedClassExpression> outputProcessor) {
 		super(inputs,
-				new ClassExpressionQueryComputationFactory(saturationState,
-						maxWorkers, outputProcessor),
+				new ClassExpressionQueryComputationFactory(interrupter,
+						saturationState, maxWorkers, outputProcessor),
 				executor, maxWorkers, progressMonitor);
 	}
 

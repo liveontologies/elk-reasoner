@@ -28,17 +28,19 @@ package org.semanticweb.elk.util.concurrent.computation;
  * {@link Processor} created by the {@link ProcessorFactory}. Processing starts
  * by calling {@link #start()}, which creates a specified number of working
  * threads and starts concurrent processing. All workers can be interrupted by
- * calling {@link #setInterrupt(boolean)} with {@code false}. When
- * {@link #finish()} is called, the current thread blocks until everything is
- * processed by the workers or all workers have been interrupted.
+ * interrupting the {@link InterruptMonitor} passed to this computation and the
+ * {@link ProcessorFactory}. When {@link #finish()} is called, the current
+ * thread blocks until everything is processed by the workers or all workers
+ * have been interrupted.
  * 
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  * 
  * @param <F>
  *            the type of the factory for the input processors
  */
-public class ConcurrentComputation<F extends ProcessorFactory<?>> extends
-		SimpleInterrupter {
+public class ConcurrentComputation<F extends ProcessorFactory<?>> implements
+		InterruptMonitor {
 	/**
 	 * the factory for the input processor engines
 	 */
@@ -90,12 +92,6 @@ public class ConcurrentComputation<F extends ProcessorFactory<?>> extends
 		return executor.start(worker, maxWorkers);
 	}
 
-	@Override
-	public synchronized final void setInterrupt(boolean interrupt) {
-		super.setInterrupt(interrupt);
-		processorFactory.setInterrupt(interrupt);		
-	}
-
 	protected synchronized void waitWorkers() throws InterruptedException {
 		executor.waitDone();
 	}
@@ -115,6 +111,11 @@ public class ConcurrentComputation<F extends ProcessorFactory<?>> extends
 		if (!isInterrupted()) {
 			processorFactory.finish();
 		}
+	}
+
+	@Override
+	public boolean isInterrupted() {
+		return processorFactory.isInterrupted();
 	}
 
 	Runnable getWorker() {

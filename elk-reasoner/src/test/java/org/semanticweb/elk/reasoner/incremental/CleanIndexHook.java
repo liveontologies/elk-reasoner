@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.incremental;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,10 +19,13 @@ package org.semanticweb.elk.reasoner.incremental;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.incremental;
 
 import java.util.List;
 
 import org.semanticweb.elk.exceptions.ElkException;
+import org.semanticweb.elk.loading.TestAxiomLoaderFactory;
+import org.semanticweb.elk.loading.TestChangesLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyDomainAxiom;
@@ -75,7 +73,7 @@ public class CleanIndexHook implements RandomWalkTestHook {
 
 		LOGGER_.debug("Cleaning the index...");
 
-		reasoner.registerAxiomLoader(loader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(loader));
 		reasoner.setAllowIncrementalMode(false);
 		// trigger removal
 		reasoner.getTaxonomyQuietly();
@@ -95,7 +93,7 @@ public class CleanIndexHook implements RandomWalkTestHook {
 			}
 		}
 
-		reasoner.registerAxiomLoader(loader);
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(loader));
 		reasoner.getTaxonomyQuietly();
 
 		cnt = getIndexSize(reasoner);

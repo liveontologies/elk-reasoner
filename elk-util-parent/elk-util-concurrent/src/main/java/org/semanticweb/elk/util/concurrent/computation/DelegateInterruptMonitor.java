@@ -23,26 +23,33 @@
 package org.semanticweb.elk.util.concurrent.computation;
 
 /**
- * A simple interrupter, which uses a flag about the interrupt status
+ * A {@link InterruptMonitor} that delegates the calls to the delegate specified
+ * in the constructor.
  * 
- * @author "Yevgeny Kazakov"
- * 
+ * @author Peter Skocovsky
  */
-public class SimpleInterrupter implements Interrupter {
+public class DelegateInterruptMonitor implements InterruptMonitor {
 
 	/**
-	 * the interrupt status of this interrupter
+	 * The {@link InterruptMonitor} that is checked for interruptions.
 	 */
-	private volatile boolean isInterrupted_ = false;
+	protected final InterruptMonitor interrupter_;
 
-	@Override
-	public void setInterrupt(boolean flag) {
-		this.isInterrupted_ = flag;
+	/**
+	 * @param interrupter
+	 *            The {@link InterruptMonitor} to which the calls are delegated.
+	 *            Must <strong>not</strong> be {@code null}!
+	 */
+	public DelegateInterruptMonitor(final InterruptMonitor interrupter) {
+		if (interrupter == null) {
+			throw new IllegalArgumentException("delegate must not be null!");
+		}
+		this.interrupter_ = interrupter;
 	}
 
 	@Override
 	public boolean isInterrupted() {
-		return isInterrupted_;
+		return interrupter_.isInterrupted();
 	}
 
 }

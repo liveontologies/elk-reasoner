@@ -26,6 +26,7 @@
 package org.semanticweb.elk.cli.util;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -33,17 +34,14 @@ import java.io.Writer;
 
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.io.FileUtils;
-import org.semanticweb.elk.loading.AxiomLoader;
-import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
-import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
-import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
-import org.semanticweb.elk.reasoner.stages.FailingOnInterruptStageExecutor;
+import org.semanticweb.elk.reasoner.TestReasonerUtils;
+import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
@@ -110,12 +108,6 @@ public class ComputeExpectedTaxonomies {
 			InterruptedException {
 		File srcDir = new File(path);
 
-		ReasonerConfiguration configuraion = ReasonerConfiguration
-				.getConfiguration();
-		// use just one worker to minimize the risk of errors
-		configuraion.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS,
-				"1");
-
 		File[] ontFiles = srcDir.listFiles(FileUtils
 				.getExtBasedFilenameFilter("owl"));
 		
@@ -127,10 +119,9 @@ public class ComputeExpectedTaxonomies {
 
 			System.err.println(ontFile.getName());
 
-			AxiomLoader loader = new Owl2StreamLoader(
-					new Owl2FunctionalStyleParserFactory(), ontFile);
-			Reasoner reasoner = reasonerFactory.createReasoner(loader,
-					new FailingOnInterruptStageExecutor(), configuraion);
+			// use just one worker to minimize the risk of errors
+			Reasoner reasoner = TestReasonerUtils.createTestReasoner(
+					new FileInputStream(ontFile), new SimpleStageExecutor(), 1);
 
 			Taxonomy<ElkClass> taxonomy = gt.getTaxonomy(reasoner);
 			// create the expected result file

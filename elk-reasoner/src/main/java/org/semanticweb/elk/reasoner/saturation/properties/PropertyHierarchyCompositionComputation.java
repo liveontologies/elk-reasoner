@@ -31,6 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPrope
 import org.semanticweb.elk.reasoner.stages.PropertyHierarchyCompositionState;
 import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
 /**
  * A {@link ReasonerComputationWithInputs} that computes relevant sub-properties
@@ -44,14 +45,15 @@ public class PropertyHierarchyCompositionComputation
 		ReasonerComputationWithInputs<IndexedPropertyChain, PropertyHierarchyCompositionComputationFactory> {
 
 	public PropertyHierarchyCompositionComputation(OntologyIndex ontIndex,
+			final InterruptMonitor interrupter,
 			TracingInferenceProducer<? super ObjectPropertyInference> inferenceProducer,
 			final PropertyHierarchyCompositionState.Dispatcher dispatcher,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor) {
 		this(ontIndex.getPropertyChains(),
-				new PropertyHierarchyCompositionComputationFactory(
-						inferenceProducer, dispatcher), executor, maxWorkers,
-				progressMonitor);
+				new PropertyHierarchyCompositionComputationFactory(interrupter,
+						inferenceProducer, dispatcher),
+				executor, maxWorkers, progressMonitor);
 	}
 
 	PropertyHierarchyCompositionComputation(

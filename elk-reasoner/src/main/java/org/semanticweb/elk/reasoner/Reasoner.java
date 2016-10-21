@@ -26,7 +26,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.semanticweb.elk.exceptions.ElkException;
-import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -77,6 +76,11 @@ public class Reasoner extends AbstractReasonerState {
 	 */
 	private final ReasonerStageExecutor stageExecutor_;
 	/**
+	 * The object that is notified and propagates the information about
+	 * interruption.
+	 */
+	private final ReasonerInterrupter interrupter_;
+	/**
 	 * the executor used for concurrent tasks
 	 */
 	private final ComputationExecutor executor_;
@@ -95,12 +99,14 @@ public class Reasoner extends AbstractReasonerState {
 	/**
 	 * Constructor. In most cases, Reasoners should be created by the
 	 * {@link ReasonerFactory}.
-	 * */
-	protected Reasoner(ElkObject.Factory elkFactory, AxiomLoader axiomLoader,
+	 */
+	protected Reasoner(ElkObject.Factory elkFactory,
+			final ReasonerInterrupter interrupter,
 			ReasonerStageExecutor stageExecutor, ReasonerConfiguration config) {
-		super(elkFactory, axiomLoader);
+		super(elkFactory);
 
 		this.stageExecutor_ = stageExecutor;
+		this.interrupter_ = interrupter;
 		this.progressMonitor = new DummyProgressMonitor();
 		this.allowFreshEntities = true;
 		setConfigurationOptions(config);
@@ -184,6 +190,11 @@ public class Reasoner extends AbstractReasonerState {
 	@Override
 	protected ReasonerStageExecutor getStageExecutor() {
 		return stageExecutor_;
+	}
+
+	@Override
+	protected ReasonerInterrupter getInterrupter() {
+		return interrupter_;
 	}
 
 	@Override

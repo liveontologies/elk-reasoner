@@ -1,4 +1,3 @@
-package org.semanticweb.elk.util.concurrent.computation;
 /*
  * #%L
  * ELK Utilities for Concurrency
@@ -20,6 +19,7 @@ package org.semanticweb.elk.util.concurrent.computation;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.util.concurrent.computation;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -35,27 +35,36 @@ public class ConcurrentComputationWithInputsTest {
 
 	private static int ROUNDS_ = 8;
 
+	private static final double INTERRUPTION_CHANCE = 0.15;
+
 	private final Random random = new Random();
+
+	private TestInterrupter interrupter_ = new TestInterrupter();
 
 	private TestInputProcessorFactory factory_;
 
 	private ConcurrentComputationWithInputs<Integer, ?> computation_;
 
-	void setup(int round) {
+	void setup(int round, final InterruptMonitor interrupter) {
 		int workers = round + 1;
 		ComputationExecutor executor = new ComputationExecutor(workers,
 				"test-worker", 1, TimeUnit.SECONDS);
-		factory_ = new TestInputProcessorFactory(MAX_INPUT, workers);
+		factory_ = new TestInputProcessorFactory(interrupter, MAX_INPUT,
+				workers);
 		computation_ = new ConcurrentComputationWithInputs<Integer, TestInputProcessorFactory>(
 				factory_, executor, workers, workers);
 	}
 
 	@Test
 	public void test() {
+		run(interrupter_);
+	}
 
+	public void run(final InterruptMonitor interruptMonitor) {
+		
 		int jobs = 1;
 		for (int round = 0; round < ROUNDS_; round++) {
-			setup(round);
+			setup(round, interruptMonitor);
 			jobs = 1 << random.nextInt(ROUNDS_);
 			int sumExpected = 0;
 			if (!computation_.start())
@@ -73,7 +82,7 @@ public class ConcurrentComputationWithInputsTest {
 							fail();
 						computation_.finish();
 						// restart computation
-						computation_.setInterrupt(false);
+						interrupter_.clearInterrupt();
 						if (!computation_.start())
 							fail();
 					}
@@ -88,7 +97,7 @@ public class ConcurrentComputationWithInputsTest {
 					if (!computation_.isInterrupted())
 						break;
 					// else restart
-					computation_.setInterrupt(false);
+					interrupter_.clearInterrupt();
 					if (!computation_.start())
 						fail();
 				}
@@ -102,27 +111,8 @@ public class ConcurrentComputationWithInputsTest {
 
 	@Test
 	public void testWithInterrupts() {
-		Thread terminator = new Thread(new Terminator(), "terminator");
-		terminator.setDaemon(true);
-		terminator.start();
-		test();
-	}
-
-	class Terminator implements Runnable {
-
-		@Override
-		public void run() {
-			for (;;) {
-				try {
-					Thread.sleep(10);
-				} catch (InterruptedException ignore) {
-				}
-				Interrupter interrupter = computation_;
-				if (interrupter != null) {
-					interrupter.setInterrupt(true);
-				}
-			}
-		}
+		run(new RandomInterruptMonitor(interrupter_, random,
+				INTERRUPTION_CHANCE));
 	}
 
 }

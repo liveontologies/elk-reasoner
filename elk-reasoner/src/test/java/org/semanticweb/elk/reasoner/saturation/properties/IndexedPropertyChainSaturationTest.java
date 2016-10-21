@@ -49,6 +49,7 @@ import org.semanticweb.elk.reasoner.saturation.properties.VerifySymmetricPropert
 import org.semanticweb.elk.reasoner.stages.PropertyHierarchyCompositionState;
 import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.concurrent.computation.DummyInterruptMonitor;
 
 /**
  * Tests for saturation of indexed property chains
@@ -196,6 +197,7 @@ public class IndexedPropertyChainSaturationTest {
 		PropertyHierarchyCompositionComputation computation = new PropertyHierarchyCompositionComputation(
 				Arrays.asList(H, S3, S2, S1, P3, P2, P1, R, RR),
 				new PropertyHierarchyCompositionComputationFactory(
+						DummyInterruptMonitor.INSTANCE,
 						TracingInferenceProducer.DUMMY,
 						PropertyHierarchyCompositionState.Dispatcher.DUMMY),
 				new ComputationExecutor(maxThreads,

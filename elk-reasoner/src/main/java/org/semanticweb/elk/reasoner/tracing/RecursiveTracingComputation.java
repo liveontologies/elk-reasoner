@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.tracing;
-
 /*-
  * #%L
  * ELK Reasoner Core
@@ -24,12 +19,14 @@ package org.semanticweb.elk.reasoner.tracing;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.tracing;
 
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.tracing.factories.ProofUnwindingFactory;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
 /**
  * A reasoner computation for recursive tracing. Uses
@@ -43,11 +40,12 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 public class RecursiveTracingComputation
 		extends ReasonerComputation<ProofUnwindingFactory> {
 
-	public RecursiveTracingComputation(ComputationExecutor executor,
+	public RecursiveTracingComputation(final InterruptMonitor interrupter,
+			ComputationExecutor executor,
 			int maxWorkers, SaturationState<?> saturationState,
 			TraceState traceState) {
-		super(new ProofUnwindingFactory(saturationState, traceState,
-				maxWorkers), executor, maxWorkers);
+		super(new ProofUnwindingFactory(interrupter, saturationState,
+				traceState, maxWorkers), executor, maxWorkers);
 	}
 
 	public void printStatistics() {
