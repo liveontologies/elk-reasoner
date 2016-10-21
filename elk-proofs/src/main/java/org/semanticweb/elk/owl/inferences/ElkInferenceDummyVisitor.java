@@ -68,6 +68,11 @@ public class ElkInferenceDummyVisitor<O> implements ElkInference.Visitor<O> {
 	}
 
 	@Override
+	public O visit(ElkClassInclusionExistentialTransitivity inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
 	public O visit(ElkClassInclusionHierarchy inference) {
 		return defaultVisit(inference);
 	}

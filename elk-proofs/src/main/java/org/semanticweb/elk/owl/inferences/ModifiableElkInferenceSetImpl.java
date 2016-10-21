@@ -1,6 +1,10 @@
 package org.semanticweb.elk.owl.inferences;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /*
  * #%L
@@ -39,6 +43,14 @@ public class ModifiableElkInferenceSetImpl
 
 	private final Multimap<ElkAxiom, ElkInference> inferenceMap_ = new HashSetMultimap<ElkAxiom, ElkInference>();
 
+	/**
+	 * axioms for which {@link #get(ElkAxiom)} was called after the last
+	 * inference for this axiom was added
+	 */
+	private final Set<ElkAxiom> queried_ = new HashSet<ElkAxiom>();
+
+	private final List<ChangeListener> listeners_ = new ArrayList<ChangeListener>();
+
 	private final ElkObject.Factory elkFactory_;
 
 	public ModifiableElkInferenceSetImpl(ElkObject.Factory elkFactory) {
@@ -48,18 +60,48 @@ public class ModifiableElkInferenceSetImpl
 	@Override
 	public void produce(ElkInference inference) {
 		LOGGER_.trace("{}: inference produced", inference);
-		inferenceMap_.add(inference.getConclusion(elkFactory_), inference);
+		ElkAxiom conclusion = inference.getConclusion(elkFactory_);
+		inferenceMap_.add(conclusion, inference);
+		if (queried_.remove(conclusion)) {
+			fireChanged();
+		}
 	}
 
 	@Override
 	public void clear() {
 		inferenceMap_.clear();
+		queried_.clear();
+		fireChanged();
+	}
+
+	Collection<? extends ElkInference> getInferences(ElkAxiom conclusion) {
+		return inferenceMap_.get(conclusion);
 	}
 
 	@Override
 	public Collection<? extends ElkInference> get(ElkAxiom conclusion) {
-		// assumes structural equality and hash of conclusions
-		return inferenceMap_.get(conclusion);
+		queried_.add(conclusion);
+		return getInferences(conclusion);
+	}
+
+	@Override
+	public void add(ChangeListener listener) {
+		listeners_.add(listener);
+	}
+
+	@Override
+	public void remove(ChangeListener listener) {
+		listeners_.remove(listener);
+	}
+
+	void fireChanged() {
+		for (ChangeListener listener : listeners_) {
+			listener.inferencesChanged();
+		}
+	}
+
+	boolean isQuieried(ElkAxiom conclusion) {
+		return queried_.contains(conclusion);
 	}
 
 }

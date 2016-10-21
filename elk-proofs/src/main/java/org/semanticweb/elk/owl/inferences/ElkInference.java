@@ -72,6 +72,7 @@ public interface ElkInference {
 			ElkClassInclusionExistentialOfObjectHasSelf.Factory,
 			ElkClassInclusionExistentialOwlNothing.Factory,
 			ElkClassInclusionExistentialPropertyExpansion.Factory,
+			ElkClassInclusionExistentialTransitivity.Factory,
 			ElkClassInclusionHierarchy.Factory,
 			ElkClassInclusionNegationClash.Factory,
 			ElkClassInclusionObjectIntersectionOfComposition.Factory,
@@ -101,8 +102,7 @@ public interface ElkInference {
 			ElkPropertyInclusionOfEquivalence.Factory,
 			ElkPropertyInclusionOfTransitiveObjectProperty.Factory,
 			ElkPropertyInclusionTautology.Factory,
-			ElkPropertyRangePropertyExpansion.Factory,
-			ElkToldAxiom.Factory {
+			ElkPropertyRangePropertyExpansion.Factory, ElkToldAxiom.Factory {
 
 		// combined interface
 
@@ -124,6 +124,7 @@ public interface ElkInference {
 			ElkClassInclusionExistentialOfObjectHasSelf.Visitor<O>,
 			ElkClassInclusionExistentialOwlNothing.Visitor<O>,
 			ElkClassInclusionExistentialPropertyExpansion.Visitor<O>,
+			ElkClassInclusionExistentialTransitivity.Visitor<O>,
 			ElkClassInclusionHierarchy.Visitor<O>,
 			ElkClassInclusionNegationClash.Visitor<O>,
 			ElkClassInclusionObjectIntersectionOfComposition.Visitor<O>,

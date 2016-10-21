@@ -30,8 +30,6 @@ import org.liveontologies.owlapi.proof.OWLProofStep;
 import org.liveontologies.owlapi.proof.OWLProver;
 import org.liveontologies.owlapi.proof.util.LeafProofNode;
 import org.liveontologies.protege.explanation.proof.service.ProofService;
-import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
-import org.protege.editor.owl.model.event.OWLModelManagerListener;
 import org.semanticweb.elk.owlapi.ElkProver;
 import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -40,21 +38,18 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.UnsupportedEntailmentTypeException;
 
-public class ElkProofService extends ProofService
-		implements OWLModelManagerListener {
+public class ElkProofService extends ProofService {
 
 	private OWLProver prover_ = null;
 
 	@Override
 	public void initialise() throws Exception {
-		getEditorKit().getOWLModelManager().addListener(this);
+		// nothing
 	}
 
 	@Override
 	public void dispose() {
 		prover_ = null;
-		getEditorKit().getOWLModelManager().removeListener(this);
-		fireProofChanged();
 	}
 
 	@Override
@@ -81,19 +76,6 @@ public class ElkProofService extends ProofService
 		return prover_.getProof(entailment);
 	}
 
-	@Override
-	public void handleChange(OWLModelManagerChangeEvent event) {
-		switch (event.getType()) {
-
-		case ONTOLOGY_CLASSIFIED:
-			fireProofChanged();
-
-		default:
-			break;
-		}
-
-	}
-
 	static class LeafOwlProofNode extends LeafProofNode<OWLAxiom>
 			implements OWLProofNode {
 
@@ -104,6 +86,16 @@ public class ElkProofService extends ProofService
 		@Override
 		public Collection<? extends OWLProofStep> getInferences() {
 			return Collections.emptyList();
+		}
+
+		@Override
+		public void addListener(ChangeListener listener) {
+			// ignore, nothing can change anyway
+		}
+
+		@Override
+		public void removeListener(ChangeListener listener) {
+			// ignore, nothing can change anyway
 		}
 
 	}

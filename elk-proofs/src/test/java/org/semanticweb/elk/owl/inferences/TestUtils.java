@@ -53,8 +53,8 @@ public class TestUtils {
 			ElkAxiom goal) throws ElkException {
 
 		LOGGER_.debug("Provability test: {}", goal);
-		ElkInferenceSet elkInferences = new ReasonerProofProvider(reasoner,
-				factory).getInferences(goal);
+		ElkInferenceSet elkInferences = new ReasonerElkInferenceSet(reasoner,
+				factory);
 		InferenceSet<ElkAxiom> inferences = new ElkInferenceSetAdapter(
 				elkInferences);
 		InferenceDerivabilityChecker<ElkAxiom> checker = new InferenceDerivabilityChecker<ElkAxiom>(
