@@ -100,6 +100,14 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 	}
 
 	@Override
+	public ElkClassInclusionExistentialTransitivity getElkClassInclusionExistentialTransitivity(
+			List<? extends ElkClassExpression> classExpressions,
+			ElkObjectPropertyExpression transitiveProperty) {
+		return mainFactory_.getElkClassInclusionExistentialTransitivity(
+				classExpressions, transitiveProperty);
+	}
+
+	@Override
 	public ElkClassInclusionHierarchy getElkClassInclusionHierarchy(
 			ElkClassExpression first, ElkClassExpression second,
 			ElkClassExpression third) {

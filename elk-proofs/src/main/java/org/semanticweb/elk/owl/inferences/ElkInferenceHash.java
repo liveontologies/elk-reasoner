@@ -101,6 +101,14 @@ public class ElkInferenceHash implements ElkInference.Visitor<Integer> {
 	}
 
 	@Override
+	public Integer visit(ElkClassInclusionExistentialTransitivity inference) {
+		return combinedHashCode(
+				hashCode(ElkClassInclusionExistentialTransitivity.class),
+				hashCode(inference.getClassExpressions()),
+				hashCode(inference.getTransitiveProperty()));
+	}
+
+	@Override
 	public Integer visit(ElkClassInclusionHierarchy inference) {
 		return combinedHashCode(hashCode(ElkClassInclusionHierarchy.class),
 				hashCode(inference.getExpressions()));

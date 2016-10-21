@@ -1,4 +1,4 @@
-package org.semanticweb.elk.owl.inferences;
+package org.semanticweb.elk.owl.inferences.rewriting;
 
 /*-
  * #%L
@@ -28,6 +28,8 @@ import java.util.List;
 import org.liveontologies.owlapi.proof.util.ProofNode;
 import org.liveontologies.owlapi.proof.util.ProofStep;
 import org.semanticweb.elk.owl.implementation.ElkObjectBaseFactory;
+import org.semanticweb.elk.owl.inferences.ElkInference;
+import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 

@@ -1,11 +1,6 @@
 package org.semanticweb.elk.owlapi.proofs;
 
-import java.util.Collection;
-
-import org.liveontologies.owlapi.proof.OWLProofNode;
-import org.liveontologies.owlapi.proof.OWLProofStep;
-
-/*
+/*-
  * #%L
  * ELK OWL API Binding
  * $Id:$
@@ -27,6 +22,10 @@ import org.liveontologies.owlapi.proof.OWLProofStep;
  * #L%
  */
 
+import java.util.Collection;
+
+import org.liveontologies.owlapi.proof.OWLProofNode;
+import org.liveontologies.owlapi.proof.OWLProofStep;
 import org.semanticweb.elk.owl.inferences.ElkInference;
 import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
 import org.semanticweb.elk.owl.inferences.ElkToldAxiom;

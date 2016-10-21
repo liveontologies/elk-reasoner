@@ -83,6 +83,14 @@ public class ElkInferenceBaseFactory implements ElkInference.Factory {
 	}
 
 	@Override
+	public ElkClassInclusionExistentialTransitivity getElkClassInclusionExistentialTransitivity(
+			List<? extends ElkClassExpression> classExpressions,
+			ElkObjectPropertyExpression transitiveProperty) {
+		return new ElkClassInclusionExistentialTransitivity(classExpressions,
+				transitiveProperty);
+	}
+
+	@Override
 	public ElkClassInclusionHierarchy getElkClassInclusionHierarchy(
 			ElkClassExpression first, ElkClassExpression second,
 			ElkClassExpression third) {

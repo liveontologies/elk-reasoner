@@ -3,7 +3,7 @@ package org.semanticweb.elk.owlapi;
 import org.liveontologies.owlapi.proof.OWLProofNode;
 import org.liveontologies.owlapi.proof.OWLProver;
 import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
-import org.semanticweb.elk.owl.inferences.FlattenedElkInferenceSet;
+import org.semanticweb.elk.owl.inferences.rewriting.FlattenedElkInferenceSet;
 
 /*
  * #%L
