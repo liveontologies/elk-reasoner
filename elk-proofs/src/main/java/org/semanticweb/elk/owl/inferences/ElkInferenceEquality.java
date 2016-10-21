@@ -84,11 +84,9 @@ public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 			public Boolean visit(
 					ElkClassInclusionExistentialFillerExpansion other) {
 				return equals(other.getSubClass(), inference.getSubClass())
-						&& equals(other.getProperty(), inference.getProperty())
-						&& equals(other.getSubFiller(),
-								inference.getSubFiller())
-						&& equals(other.getSuperFiller(),
-								inference.getSuperFiller());
+						&& equals(other.getSuperClass(),
+								inference.getSuperClass())
+						&& equals(other.getProperty(), inference.getProperty());
 			}
 		});
 	}

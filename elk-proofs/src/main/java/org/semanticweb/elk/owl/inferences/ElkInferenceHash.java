@@ -69,9 +69,8 @@ public class ElkInferenceHash implements ElkInference.Visitor<Integer> {
 		return combinedHashCode(
 				hashCode(ElkClassInclusionExistentialFillerExpansion.class),
 				hashCode(inference.getSubClass()),
-				hashCode(inference.getProperty()),
-				hashCode(inference.getSubFiller()),
-				hashCode(inference.getSuperFiller()));
+				hashCode(inference.getSuperClass()),
+				hashCode(inference.getProperty()));
 	}
 
 	@Override

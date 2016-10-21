@@ -644,17 +644,21 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 				.getParent();
 		IndexedContextRootMatch destinationMatch = inferenceMatch1
 				.getDestinationMatch();
-		elkInferenceFactory_.getElkClassInclusionExistentialFillerUnfolding(
-				toElkExpression(destinationMatch), premiseRelationMatch,
+
+		elkInferenceFactory_.getElkClassInclusionExistentialFillerExpansion(
 				toElkExpression(originMatch),
-				conclusionFactory_.getOwlNothing());
+				conclusionFactory_.getOwlNothing(), premiseRelationMatch);
 		elkInferenceFactory_.getElkClassInclusionExistentialOwlNothing(
 				premiseRelationMatch);
-		elkInferenceFactory_.getElkClassInclusionHierarchy(
-				toElkExpression(destinationMatch),
-				conclusionFactory_.getObjectSomeValuesFrom(premiseRelationMatch,
-						conclusionFactory_.getOwlNothing()),
-				conclusionFactory_.getOwlNothing());
+		List<ElkClassExpression> expressions = new ArrayList<ElkClassExpression>(
+				4);
+		expressions.add(toElkExpression(destinationMatch));
+		expressions.add(conclusionFactory_.getObjectSomeValuesFrom(
+				premiseRelationMatch, toElkExpression(originMatch)));
+		expressions.add(conclusionFactory_.getObjectSomeValuesFrom(
+				premiseRelationMatch, conclusionFactory_.getOwlNothing()));
+		expressions.add(conclusionFactory_.getOwlNothing());
+		elkInferenceFactory_.getElkClassInclusionHierarchy(expressions);
 		return null;
 	}
 
@@ -1382,9 +1386,15 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 					}
 				});
 
-		elkInferenceFactory_.getElkClassInclusionExistentialFillerUnfolding(
-				toElkExpression(destinationMatch), propagationRelationMatch,
-				toElkExpression(originMatch), fillerMatch);
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
+				toElkExpression(destinationMatch),
+				conclusionFactory_.getObjectSomeValuesFrom(
+						propagationRelationMatch, toElkExpression(originMatch)),
+				conclusionFactory_.getObjectSomeValuesFrom(
+						propagationRelationMatch, fillerMatch));
+		elkInferenceFactory_.getElkClassInclusionExistentialFillerExpansion(
+				toElkExpression(originMatch), fillerMatch,
+				propagationRelationMatch);
 		elkInferenceFactory_.getElkClassInclusionExistentialPropertyUnfolding(
 				toElkExpression(destinationMatch), propagationRelationMatch,
 				fillerMatch, conclusionSubsumerMatch.getPropertyMatch());

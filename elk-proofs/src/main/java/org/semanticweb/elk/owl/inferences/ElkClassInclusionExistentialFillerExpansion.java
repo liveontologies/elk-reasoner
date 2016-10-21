@@ -33,10 +33,9 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  * Represents the inference:
  * 
  * <pre>
- *   (1)       (2)
- *  C ⊑ ∃R.D  D ⊑ E
- * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
- *     C ⊑ ∃R.E
+ *    C ⊑ D  
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ * ∃R.C ⊑ ∃R.D
  * </pre>
  * 
  * @author Yevgeny Kazakov
@@ -44,38 +43,33 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  */
 public class ElkClassInclusionExistentialFillerExpansion
 		extends AbstractElkInference {
-	
+
 	private final static String NAME_ = "Existential Filler Expansion";
 
-	private final ElkClassExpression subClass_, subFiller_, superFiller_;
+	private final ElkClassExpression subClass_, superClass_;
 
 	private final ElkObjectPropertyExpression property_;
 
 	ElkClassInclusionExistentialFillerExpansion(ElkClassExpression subClass,
-			ElkObjectPropertyExpression property, ElkClassExpression subFiller,
-			ElkClassExpression superFiller) {
+			ElkClassExpression superClass,
+			ElkObjectPropertyExpression property) {
 		this.subClass_ = subClass;
+		this.superClass_ = superClass;
 		this.property_ = property;
-		this.subFiller_ = subFiller;
-		this.superFiller_ = superFiller;
 	}
 
 	public ElkClassExpression getSubClass() {
 		return subClass_;
 	}
 
+	public ElkClassExpression getSuperClass() {
+		return superClass_;
+	}
+
 	public ElkObjectPropertyExpression getProperty() {
 		return property_;
 	}
 
-	public ElkClassExpression getSubFiller() {
-		return subFiller_;
-	}
-
-	public ElkClassExpression getSuperFiller() {
-		return superFiller_;
-	}
-	
 	@Override
 	public String getName() {
 		return NAME_;
@@ -83,34 +77,28 @@ public class ElkClassInclusionExistentialFillerExpansion
 
 	@Override
 	public int getPremiseCount() {
-		return 2;
+		return 1;
 	}
 
 	@Override
 	public ElkAxiom getPremise(int index, ElkObject.Factory factory) {
 		switch (index) {
 		case 0:
-			return getFirstPremise(factory);
-		case 1:
-			return getSecondPremise(factory);
+			return getPremise(factory);
 		default:
 			return failGetPremise(index);
 		}
 	}
 
-	public ElkSubClassOfAxiom getFirstPremise(ElkObject.Factory factory) {
-		return factory.getSubClassOfAxiom(subClass_,
-				factory.getObjectSomeValuesFrom(property_, subFiller_));
-	}
-
-	public ElkSubClassOfAxiom getSecondPremise(ElkObject.Factory factory) {
-		return factory.getSubClassOfAxiom(subFiller_, superFiller_);
+	public ElkSubClassOfAxiom getPremise(ElkObject.Factory factory) {
+		return factory.getSubClassOfAxiom(subClass_, superClass_);
 	}
 
 	@Override
 	public ElkSubClassOfAxiom getConclusion(ElkObject.Factory factory) {
-		return factory.getSubClassOfAxiom(subClass_,
-				factory.getObjectSomeValuesFrom(property_, superFiller_));
+		return factory.getSubClassOfAxiom(
+				factory.getObjectSomeValuesFrom(property_, subClass_),
+				factory.getObjectSomeValuesFrom(property_, superClass_));
 
 	}
 
@@ -127,10 +115,9 @@ public class ElkClassInclusionExistentialFillerExpansion
 	 */
 	public interface Factory {
 
-		ElkClassInclusionExistentialFillerExpansion getElkClassInclusionExistentialFillerUnfolding(
-				ElkClassExpression subClass,
-				ElkObjectPropertyExpression property,
-				ElkClassExpression subFiller, ElkClassExpression superFiller);
+		ElkClassInclusionExistentialFillerExpansion getElkClassInclusionExistentialFillerExpansion(
+				ElkClassExpression subClass, ElkClassExpression superClass,
+				ElkObjectPropertyExpression property);
 
 	}
 
