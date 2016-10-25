@@ -30,7 +30,6 @@ import org.liveontologies.owlapi.proof.util.ProofNode;
 import org.liveontologies.owlapi.proof.util.ProofStep;
 import org.semanticweb.elk.owl.inferences.ElkClassInclusionHierarchy;
 import org.semanticweb.elk.owl.inferences.ElkInference;
-import org.semanticweb.elk.owl.inferences.ElkInferenceProducer;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 
@@ -74,32 +73,26 @@ class ElkClassInclusionHierarchyFlattener implements ElkInferenceFlattener {
 	private final ElkInference.Factory factory_;
 
 	/**
-	 * the object using which the new inferences are produced
-	 */
-	private final ElkInferenceProducer producer_;
-
-	/**
 	 * a temporary list to accumulate the parameters of the resulting
 	 * {@link ElkClassInclusionHierarchy} inference
 	 */
 	private List<ElkClassExpression> classExpressions_;
 
 	ElkClassInclusionHierarchyFlattener(ElkClassInclusionHierarchy inference,
-			ElkInference.Factory factory, ElkInferenceProducer producer) {
+			ElkInference.Factory factory) {
 		this.inference_ = inference;
 		this.factory_ = factory;
-		this.producer_ = producer;
 	}
 
 	@Override
-	public void flatten(ProofStep<ElkAxiom> step) {
+	public boolean flatten(ProofStep<ElkAxiom> step) {
 		classExpressions_ = new ArrayList<ElkClassExpression>();
 		flatten(inference_, step);
 		List<? extends ElkClassExpression> expressions = inference_
 				.getExpressions();
 		classExpressions_.add(expressions.get(expressions.size() - 1));
-		producer_.produce(
-				factory_.getElkClassInclusionHierarchy(classExpressions_));
+		factory_.getElkClassInclusionHierarchy(classExpressions_);
+		return true;
 	}
 
 	/**

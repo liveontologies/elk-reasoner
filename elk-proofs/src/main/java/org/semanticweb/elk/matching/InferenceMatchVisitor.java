@@ -365,23 +365,30 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		// unfolding the first premise under the second premise
 		List<? extends ElkObjectPropertyExpression> compositionList = toList(
 				compositionMatch);
-		elkInferenceFactory_.getElkClassInclusionExistentialPropertyUnfolding(
+		ElkClassExpression originExpression = toElkExpression(originMatch);
+		ElkObjectPropertyExpression compositionHead = compositionList.get(0);
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
 				toElkExpression(conclusionSourceMatch),
-				premiseBackwardRelationMatch, toElkExpression(originMatch),
-				compositionList.get(0));
+				conclusionFactory_.getObjectSomeValuesFrom(
+						premiseBackwardRelationMatch, originExpression),
+				conclusionFactory_.getObjectSomeValuesFrom(compositionHead,
+						originExpression));
+		elkInferenceFactory_.getElkClassInclusionExistentialPropertyExpansion(
+				premiseBackwardRelationMatch, compositionHead,
+				originExpression);
 		List<? extends ElkObjectPropertyExpression> forwardChainList = toList(
 				premiseFullForwardChainMatch);
 		if (premiseForwardChainStartPos == 0) {
 			// composing and unfolding the third premise with the fourth premise
 			elkInferenceFactory_
-					.getElkClassInclusionExistentialPropertyUnfolding(
+					.getElkClassInclusionExistentialComposition(
 							toList(originMatch, intermediateRoots,
 									destinationMatch),
 							forwardChainList, compositionList.get(1));
 			// composing the unfolded first premise with the result under the
 			// fifth premise
 			elkInferenceFactory_
-					.getElkClassInclusionExistentialPropertyUnfolding(
+					.getElkClassInclusionExistentialComposition(
 							toList(conclusionSourceMatch, originMatch,
 									destinationMatch),
 							compositionList, conclusionRelationMatch);
@@ -389,7 +396,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 			// composing the unfolded first premise with the third premise under
 			// the fifth premise
 			elkInferenceFactory_
-					.getElkClassInclusionExistentialPropertyUnfolding(
+					.getElkClassInclusionExistentialComposition(
 							toList(conclusionSourceMatch, originMatch,
 									intermediateRoots, destinationMatch),
 							compositionList, conclusionRelationMatch);
@@ -492,7 +499,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		BackwardLinkReversedExpandedMatch1 inferenceMatch1 = inferenceMatch2
 				.getParent();
 		IndexedContextRootMatch originMatch = inferenceMatch1.getOriginMatch();
-		elkInferenceFactory_.getElkClassInclusionExistentialPropertyUnfolding(
+		elkInferenceFactory_.getElkClassInclusionExistentialComposition(
 				toList(originMatch, intermediateRoots, destinationMatch),
 				toList(subChainMatch), relationMatch);
 		return null;
@@ -650,15 +657,13 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 				conclusionFactory_.getOwlNothing(), premiseRelationMatch);
 		elkInferenceFactory_.getElkClassInclusionExistentialOwlNothing(
 				premiseRelationMatch);
-		List<ElkClassExpression> expressions = new ArrayList<ElkClassExpression>(
-				4);
-		expressions.add(toElkExpression(destinationMatch));
-		expressions.add(conclusionFactory_.getObjectSomeValuesFrom(
-				premiseRelationMatch, toElkExpression(originMatch)));
-		expressions.add(conclusionFactory_.getObjectSomeValuesFrom(
-				premiseRelationMatch, conclusionFactory_.getOwlNothing()));
-		expressions.add(conclusionFactory_.getOwlNothing());
-		elkInferenceFactory_.getElkClassInclusionHierarchy(expressions);
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
+				toElkExpression(destinationMatch),
+				conclusionFactory_.getObjectSomeValuesFrom(premiseRelationMatch,
+						toElkExpression(originMatch)),
+				conclusionFactory_.getObjectSomeValuesFrom(premiseRelationMatch,
+						conclusionFactory_.getOwlNothing()),
+				conclusionFactory_.getOwlNothing());
 		return null;
 	}
 
@@ -1149,16 +1154,24 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		// unfolding the first premise under the second premise
 		List<? extends ElkObjectPropertyExpression> fullCompositionList = toList(
 				fullCompositionMatch);
-		elkInferenceFactory_.getElkClassInclusionExistentialPropertyUnfolding(
-				toElkExpression(destinationMatch), premiseBackwardRelationMatch,
-				toElkExpression(originMatch),
-				fullCompositionList.get(compositionStartPos));
+		ElkClassExpression originExpression = toElkExpression(originMatch);
+		ElkObjectPropertyExpression compositionStart = fullCompositionList
+				.get(compositionStartPos);
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
+				toElkExpression(destinationMatch),
+				conclusionFactory_.getObjectSomeValuesFrom(
+						premiseBackwardRelationMatch, originExpression),
+				conclusionFactory_.getObjectSomeValuesFrom(compositionStart,
+						originExpression));
+		elkInferenceFactory_.getElkClassInclusionExistentialPropertyExpansion(
+				premiseBackwardRelationMatch, compositionStart,
+				originExpression);
 		List<? extends ElkObjectPropertyExpression> forwardChainList = toList(
 				premiseFullForwardChainMatch);
 		if (premiseForwardChainStartPos == 0) {
 			// composing and unfolding the third premise with the fourth premise
 			elkInferenceFactory_
-					.getElkClassInclusionExistentialPropertyUnfolding(
+					.getElkClassInclusionExistentialComposition(
 							toList(originMatch, premiseIntermediateRoots,
 									conclusionTargetMatch),
 							forwardChainList,
@@ -1395,10 +1408,16 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		elkInferenceFactory_.getElkClassInclusionExistentialFillerExpansion(
 				toElkExpression(originMatch), fillerMatch,
 				propagationRelationMatch);
-		elkInferenceFactory_.getElkClassInclusionExistentialPropertyUnfolding(
-				toElkExpression(destinationMatch), propagationRelationMatch,
-				fillerMatch, conclusionSubsumerMatch.getPropertyMatch());
-
+		ElkObjectPropertyExpression conclusionPropertyMatch = conclusionSubsumerMatch
+				.getPropertyMatch();
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
+				toElkExpression(destinationMatch),
+				conclusionFactory_.getObjectSomeValuesFrom(
+						propagationRelationMatch, fillerMatch),
+				conclusionFactory_.getObjectSomeValuesFrom(
+						conclusionPropertyMatch, fillerMatch));
+		elkInferenceFactory_.getElkClassInclusionExistentialPropertyExpansion(
+				propagationRelationMatch, conclusionPropertyMatch, fillerMatch);
 		return null;
 	}
 

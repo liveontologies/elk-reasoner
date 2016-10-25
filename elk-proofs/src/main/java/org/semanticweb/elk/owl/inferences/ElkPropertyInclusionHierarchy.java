@@ -1,6 +1,6 @@
 package org.semanticweb.elk.owl.inferences;
 
-/*
+/*-
  * #%L
  * ELK Proofs Package
  * $Id:$
@@ -22,7 +22,7 @@ package org.semanticweb.elk.owl.inferences;
  * #L%
  */
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkObject;
@@ -46,7 +46,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 public class ElkPropertyInclusionHierarchy extends AbstractElkInference {
 
 	private final static String NAME_ = "Property Hierarchy";
-	
+
 	private final ElkSubObjectPropertyExpression subExpression_;
 
 	private final List<? extends ElkObjectPropertyExpression> expressions_;
@@ -57,15 +57,9 @@ public class ElkPropertyInclusionHierarchy extends AbstractElkInference {
 		this.expressions_ = expressions;
 	}
 
-	ElkPropertyInclusionHierarchy(ElkSubObjectPropertyExpression first,
-			ElkObjectPropertyExpression second,
-			ElkObjectPropertyExpression third) {
-		subExpression_ = first;
-		List<ElkObjectPropertyExpression> expressions = new ArrayList<ElkObjectPropertyExpression>(
-				2);
-		expressions.add(second);
-		expressions.add(third);
-		this.expressions_ = expressions;
+	ElkPropertyInclusionHierarchy(ElkSubObjectPropertyExpression subExpression,
+			ElkObjectPropertyExpression... expressions) {
+		this(subExpression, Arrays.asList(expressions));
 	}
 
 	public ElkSubObjectPropertyExpression getSubExpression() {
@@ -80,7 +74,7 @@ public class ElkPropertyInclusionHierarchy extends AbstractElkInference {
 	public String getName() {
 		return NAME_;
 	}
-	
+
 	@Override
 	public int getPremiseCount() {
 		return expressions_.size();
@@ -102,7 +96,8 @@ public class ElkPropertyInclusionHierarchy extends AbstractElkInference {
 	}
 
 	@Override
-	public ElkSubObjectPropertyOfAxiom getConclusion(ElkObject.Factory factory) {
+	public ElkSubObjectPropertyOfAxiom getConclusion(
+			ElkObject.Factory factory) {
 		return factory.getSubObjectPropertyOfAxiom(subExpression_,
 				expressions_.get(expressions_.size() - 1));
 	}
@@ -126,12 +121,11 @@ public class ElkPropertyInclusionHierarchy extends AbstractElkInference {
 
 		ElkPropertyInclusionHierarchy getElkPropertyInclusionHierarchy(
 				ElkSubObjectPropertyExpression subExpression,
-				List<? extends ElkObjectPropertyExpression> expressions);
+				ElkObjectPropertyExpression... expressions);
 
 		ElkPropertyInclusionHierarchy getElkPropertyInclusionHierarchy(
-				ElkSubObjectPropertyExpression first,
-				ElkObjectPropertyExpression second,
-				ElkObjectPropertyExpression third);
+				ElkSubObjectPropertyExpression subExpression,
+				List<? extends ElkObjectPropertyExpression> expressions);
 
 	}
 

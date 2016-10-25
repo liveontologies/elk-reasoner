@@ -43,7 +43,9 @@ interface ElkInferenceFlattener {
 	 * at most ones.
 	 * 
 	 * @param step
+	 * @return {@code true} if the step can be rewritten and {@code false}
+	 *         otherwise
 	 */
-	void flatten(ProofStep<ElkAxiom> step);
+	boolean flatten(ProofStep<ElkAxiom> step);
 
 }

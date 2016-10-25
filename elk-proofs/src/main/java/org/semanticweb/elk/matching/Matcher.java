@@ -31,8 +31,9 @@ import org.semanticweb.elk.matching.conclusions.ConclusionMatch;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchCanonizerVisitor;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
+import org.semanticweb.elk.owl.inferences.ElkInference;
+import org.semanticweb.elk.owl.inferences.ElkInferenceOptimizedProducingFactory;
 import org.semanticweb.elk.owl.inferences.ElkInferenceProducer;
-import org.semanticweb.elk.owl.inferences.ElkInferenceProducingFactory;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
@@ -61,7 +62,7 @@ public class Matcher {
 
 	public Matcher(TracingInferenceSet inferences,
 			ElkObject.Factory elkObjectFactory,
-			ElkInferenceProducer elkInferenceProducer) {
+			ElkInference.Factory elkInferenceFactory) {
 		toDoInferences_ = new LinkedList<InferenceMatch>();
 		toDoConclusions_ = new LinkedList<ConclusionMatch>();
 		InferenceMatch.Factory inferenceMatchFactory = new InferenceMatchBufferringFactory(
@@ -73,13 +74,19 @@ public class Matcher {
 				inferences);
 		conclusionMatcher_ = new ConclusionMatcherVisitor(inferenceMatchFactory,
 				matchedInferences);
-		ElkInferenceProducingFactory elkInferenceFactory = new ElkInferenceProducingFactory(
-				elkInferenceProducer);
 		conclusionCanonizer_ = new ConclusionMatchCanonizerVisitor(
 				conclusionMatchFactory_, elkInferenceFactory);
 		inferenceMatcher_ = new InferenceMatchVisitor(matchedInferences,
 				hierarchy, conclusionMatchFactory_, inferenceMatchFactory,
 				elkInferenceFactory);
+	}
+
+	public Matcher(TracingInferenceSet inferences,
+			ElkObject.Factory elkObjectFactory,
+			ElkInferenceProducer elkInferenceProducer) {
+		this(inferences, elkObjectFactory,
+				new ElkInferenceOptimizedProducingFactory(elkInferenceProducer,
+						elkObjectFactory));
 	}
 
 	public void trace(SubClassInclusionComposed conclusion,

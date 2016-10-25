@@ -53,7 +53,7 @@ public class ReasonerElkInferenceSet extends ModifiableElkInferenceSetImpl {
 
 	private final ElkObject.Factory elkFactory_;
 
-	private final ElkInference.Factory inferenceFactory_ = new ElkInferenceBaseFactory();
+	private final ElkInference.Factory inferenceFactory_;
 
 	private final ElkAxiomVisitor<Void> inferenceGenerator_ = new InferenceGenerator();
 
@@ -62,6 +62,8 @@ public class ReasonerElkInferenceSet extends ModifiableElkInferenceSetImpl {
 		super(elkFactory);
 		this.reasoner_ = reasoner;
 		this.elkFactory_ = elkFactory;
+		this.inferenceFactory_ = new ElkInferenceOptimizedProducingFactory(this,
+				elkFactory);
 	}
 
 	@Override
@@ -75,16 +77,8 @@ public class ReasonerElkInferenceSet extends ModifiableElkInferenceSetImpl {
 
 	private void addInferencesForSubsumption(final ElkClassExpression subClass,
 			final ElkClassExpression superClass) {
-		addInferencesForSubsumption(this, subClass, superClass);
-	}
-
-	private void addInferencesForSubsumption(
-			final ElkInferenceProducer producer,
-			final ElkClassExpression subClass,
-			final ElkClassExpression superClass) {
 		if (superClass.equals(elkFactory_.getOwlThing())) {
-			producer.produce(
-					inferenceFactory_.getElkClassInclusionOwlThing(subClass));
+			inferenceFactory_.getElkClassInclusionOwlThing(subClass);
 		}
 		try {
 			DerivedClassConclusionVisitor conclusionVisitor = new DerivedClassConclusionVisitor() {
@@ -94,7 +88,7 @@ public class ReasonerElkInferenceSet extends ModifiableElkInferenceSetImpl {
 						ClassInconsistency conclusion) throws ElkException {
 					Matcher matcher = new Matcher(
 							reasoner_.explainConclusion(conclusion),
-							elkFactory_, producer);
+							elkFactory_, inferenceFactory_);
 					matcher.trace(conclusion, elkFactory_.getOwlThing());
 					return true;
 				}
@@ -103,12 +97,12 @@ public class ReasonerElkInferenceSet extends ModifiableElkInferenceSetImpl {
 				public boolean inconsistentIndividual(
 						ClassInconsistency conclusion, ElkIndividual entity)
 						throws ElkException {
-					producer.produce(inferenceFactory_
+					inferenceFactory_
 							.getElkClassInclusionOfInconsistentIndividual(
-									entity));
+									entity);
 					Matcher matcher = new Matcher(
 							reasoner_.explainConclusion(conclusion),
-							elkFactory_, producer);
+							elkFactory_, inferenceFactory_);
 					matcher.trace(conclusion, entity);
 					return true;
 				}
@@ -116,14 +110,13 @@ public class ReasonerElkInferenceSet extends ModifiableElkInferenceSetImpl {
 				@Override
 				public boolean inconsistentSubClass(
 						ClassInconsistency conclusion) throws ElkException {
-					producer.produce(inferenceFactory_
-							.getElkClassInclusionOwlNothing(superClass));
-					producer.produce(inferenceFactory_
-							.getElkClassInclusionHierarchy(subClass,
-									elkFactory_.getOwlNothing(), superClass));
+					inferenceFactory_
+							.getElkClassInclusionOwlNothing(superClass);
+					inferenceFactory_.getElkClassInclusionHierarchy(subClass,
+							elkFactory_.getOwlNothing(), superClass);
 					Matcher matcher = new Matcher(
 							reasoner_.explainConclusion(conclusion),
-							elkFactory_, producer);
+							elkFactory_, inferenceFactory_);
 					matcher.trace(conclusion, subClass);
 					return true;
 				}
@@ -134,7 +127,7 @@ public class ReasonerElkInferenceSet extends ModifiableElkInferenceSetImpl {
 						throws ElkException {
 					Matcher matcher = new Matcher(
 							reasoner_.explainConclusion(conclusion),
-							elkFactory_, producer);
+							elkFactory_, inferenceFactory_);
 					matcher.trace(conclusion, subClass, superClass);
 					return true;
 				}
@@ -170,7 +163,7 @@ public class ReasonerElkInferenceSet extends ModifiableElkInferenceSetImpl {
 				addInferencesForSubsumption(first, second);
 				first = second;
 			}
-			produce(inferenceFactory_.getElkEquivalentClassesCycle(equivalent));
+			inferenceFactory_.getElkEquivalentClassesCycle(equivalent);
 			return null;
 		}
 

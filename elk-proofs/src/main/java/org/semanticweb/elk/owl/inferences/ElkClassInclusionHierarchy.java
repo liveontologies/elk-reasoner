@@ -1,6 +1,6 @@
 package org.semanticweb.elk.owl.inferences;
 
-/*
+/*-
  * #%L
  * ELK Proofs Package
  * $Id:$
@@ -22,7 +22,7 @@ package org.semanticweb.elk.owl.inferences;
  * #L%
  */
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -52,14 +52,8 @@ public class ElkClassInclusionHierarchy extends AbstractElkInference {
 		this.expressions_ = expressions;
 	}
 
-	ElkClassInclusionHierarchy(ElkClassExpression first,
-			ElkClassExpression second, ElkClassExpression third) {
-		List<ElkClassExpression> expressions = new ArrayList<ElkClassExpression>(
-				3);
-		expressions.add(first);
-		expressions.add(second);
-		expressions.add(third);
-		this.expressions_ = expressions;
+	ElkClassInclusionHierarchy(ElkClassExpression... expressions) {
+		this.expressions_ = Arrays.asList(expressions);
 	}
 
 	public List<? extends ElkClassExpression> getExpressions() {
@@ -70,7 +64,7 @@ public class ElkClassInclusionHierarchy extends AbstractElkInference {
 	public String getName() {
 		return NAME_;
 	}
-	
+
 	@Override
 	public int getPremiseCount() {
 		return expressions_.size() - 1;
@@ -104,11 +98,10 @@ public class ElkClassInclusionHierarchy extends AbstractElkInference {
 	public interface Factory {
 
 		ElkClassInclusionHierarchy getElkClassInclusionHierarchy(
-				List<? extends ElkClassExpression> expressions);
+				ElkClassExpression... expressions);
 
 		ElkClassInclusionHierarchy getElkClassInclusionHierarchy(
-				ElkClassExpression first, ElkClassExpression second,
-				ElkClassExpression third);
+				List<? extends ElkClassExpression> expressions);
 
 	}
 

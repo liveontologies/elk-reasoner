@@ -44,6 +44,15 @@ public class ElkInferenceBaseFactory implements ElkInference.Factory {
 	}
 
 	@Override
+	public ElkClassInclusionExistentialComposition getElkClassInclusionExistentialComposition(
+			List<? extends ElkClassExpression> classExpressions,
+			List<? extends ElkObjectPropertyExpression> subChain,
+			ElkObjectPropertyExpression superProperty) {
+		return new ElkClassInclusionExistentialComposition(classExpressions,
+				subChain, superProperty);
+	}
+
+	@Override
 	public ElkClassInclusionExistentialFillerExpansion getElkClassInclusionExistentialFillerExpansion(
 			ElkClassExpression subClass, ElkClassExpression superClass,
 			ElkObjectPropertyExpression property) {
@@ -65,36 +74,34 @@ public class ElkInferenceBaseFactory implements ElkInference.Factory {
 	}
 
 	@Override
-	public ElkClassInclusionExistentialPropertyExpansion getElkClassInclusionExistentialPropertyUnfolding(
-			ElkClassExpression subExpression,
-			ElkObjectPropertyExpression subProperty, ElkClassExpression filler,
-			ElkObjectPropertyExpression superProperty) {
-		return new ElkClassInclusionExistentialPropertyExpansion(subExpression,
-				subProperty, filler, superProperty);
-	}
-
-	@Override
-	public ElkClassInclusionExistentialPropertyExpansion getElkClassInclusionExistentialPropertyUnfolding(
-			List<? extends ElkClassExpression> classExpressions,
-			List<? extends ElkObjectPropertyExpression> subChain,
-			ElkObjectPropertyExpression superProperty) {
-		return new ElkClassInclusionExistentialPropertyExpansion(
-				classExpressions, subChain, superProperty);
+	public ElkClassInclusionExistentialPropertyExpansion getElkClassInclusionExistentialPropertyExpansion(
+			ElkObjectPropertyExpression subProperty,
+			ElkObjectPropertyExpression superProperty,
+			ElkClassExpression filler) {
+		return new ElkClassInclusionExistentialPropertyExpansion(subProperty,
+				superProperty, filler);
 	}
 
 	@Override
 	public ElkClassInclusionExistentialTransitivity getElkClassInclusionExistentialTransitivity(
-			List<? extends ElkClassExpression> classExpressions,
-			ElkObjectPropertyExpression transitiveProperty) {
-		return new ElkClassInclusionExistentialTransitivity(classExpressions,
-				transitiveProperty);
+			ElkObjectPropertyExpression transitiveProperty,
+			ElkClassExpression... classExpressions) {
+		return new ElkClassInclusionExistentialTransitivity(transitiveProperty,
+				classExpressions);
+	}
+
+	@Override
+	public ElkClassInclusionExistentialTransitivity getElkClassInclusionExistentialTransitivity(
+			ElkObjectPropertyExpression transitiveProperty,
+			List<? extends ElkClassExpression> classExpressions) {
+		return new ElkClassInclusionExistentialTransitivity(transitiveProperty,
+				classExpressions);
 	}
 
 	@Override
 	public ElkClassInclusionHierarchy getElkClassInclusionHierarchy(
-			ElkClassExpression first, ElkClassExpression second,
-			ElkClassExpression third) {
-		return new ElkClassInclusionHierarchy(first, second, third);
+			ElkClassExpression... expressions) {
+		return new ElkClassInclusionHierarchy(expressions);
 	}
 
 	@Override
@@ -291,10 +298,9 @@ public class ElkInferenceBaseFactory implements ElkInference.Factory {
 
 	@Override
 	public ElkPropertyInclusionHierarchy getElkPropertyInclusionHierarchy(
-			ElkSubObjectPropertyExpression first,
-			ElkObjectPropertyExpression second,
-			ElkObjectPropertyExpression third) {
-		return new ElkPropertyInclusionHierarchy(first, second, third);
+			ElkSubObjectPropertyExpression subExpression,
+			ElkObjectPropertyExpression... expressions) {
+		return new ElkPropertyInclusionHierarchy(subExpression, expressions);
 	}
 
 	@Override

@@ -28,10 +28,9 @@ import java.util.List;
 
 import org.liveontologies.owlapi.proof.util.ProofNode;
 import org.liveontologies.owlapi.proof.util.ProofStep;
-import org.semanticweb.elk.owl.inferences.ElkClassInclusionExistentialPropertyExpansion;
+import org.semanticweb.elk.owl.inferences.ElkClassInclusionExistentialComposition;
 import org.semanticweb.elk.owl.inferences.ElkClassInclusionExistentialTransitivity;
 import org.semanticweb.elk.owl.inferences.ElkInference;
-import org.semanticweb.elk.owl.inferences.ElkInferenceProducer;
 import org.semanticweb.elk.owl.inferences.ElkPropertyInclusionOfTransitiveObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -39,7 +38,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 
 /**
  * A transformation that rewrites nested
- * {@link ElkClassInclusionExistentialPropertyExpansion} inferences into one
+ * {@link ElkClassInclusionExistentialComposition} inferences into one
  * {@link ElkClassInclusionExistentialTransitivity} inference.
  * 
  * For example the sequence of inferences
@@ -65,8 +64,8 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
  * </pre>
  * 
  * The replacement is done provided there is only one inference deriving the
- * each premise of the inference and these premises are derived by either
- * similar {@link ElkClassInclusionExistentialPropertyExpansion} inference or
+ * each premise of the inference and these premises are derived by either a
+ * similar {@link ElkClassInclusionExistentialComposition} inference or
  * {@link ElkPropertyInclusionOfTransitiveObjectProperty} (if it is the last
  * premise).
  * 
@@ -78,17 +77,12 @@ class ElkClassInclusionExistentialPropertyExpansionFlattener
 	/**
 	 * the inference to be rewritten
 	 */
-	private final ElkClassInclusionExistentialPropertyExpansion inference_;
+	private final ElkClassInclusionExistentialComposition inference_;
 
 	/**
 	 * the factory for creating rewritten inferences
 	 */
 	private final ElkInference.Factory factory_;
-
-	/**
-	 * the object using which the new inferences are produced
-	 */
-	private final ElkInferenceProducer producer_;
 
 	/**
 	 * the property in the existential restriction of the conclusion of
@@ -103,26 +97,25 @@ class ElkClassInclusionExistentialPropertyExpansionFlattener
 	private List<ElkClassExpression> classExpressions_;
 
 	ElkClassInclusionExistentialPropertyExpansionFlattener(
-			ElkClassInclusionExistentialPropertyExpansion inference,
-			ElkInference.Factory factory, ElkInferenceProducer producer) {
+			ElkClassInclusionExistentialComposition inference,
+			ElkInference.Factory factory) {
 		this.inference_ = inference;
 		this.factory_ = factory;
-		this.producer_ = producer;
 		this.transitiveProperty_ = inference.getSuperProperty();
 	}
 
 	@Override
-	public void flatten(ProofStep<ElkAxiom> step) {
+	public boolean flatten(ProofStep<ElkAxiom> step) {
 		classExpressions_ = new ArrayList<ElkClassExpression>();
 		if (!flatten(inference_, step)) {
-			producer_.produce(inference_);
-			return;
+			return false;
 		}
 		List<? extends ElkClassExpression> expressions = inference_
 				.getClassExpressions();
 		classExpressions_.add(expressions.get(expressions.size() - 1));
-		producer_.produce(factory_.getElkClassInclusionExistentialTransitivity(
-				classExpressions_, transitiveProperty_));
+		factory_.getElkClassInclusionExistentialTransitivity(transitiveProperty_,
+				classExpressions_);
+		return true;
 	}
 
 	/**
@@ -134,7 +127,7 @@ class ElkClassInclusionExistentialPropertyExpansionFlattener
 	 * @return {@code true} if the inference can be transformed and
 	 *         {@code false} otherwise
 	 */
-	boolean flatten(ElkClassInclusionExistentialPropertyExpansion inf,
+	boolean flatten(ElkClassInclusionExistentialComposition inf,
 			ProofStep<ElkAxiom> step) {
 		// check if the last premise is only derived from the transitivity axiom
 		List<? extends ProofNode<ElkAxiom>> premises = step.getPremises();
@@ -170,9 +163,8 @@ class ElkClassInclusionExistentialPropertyExpansionFlattener
 		}
 		for (ProofStep<ElkAxiom> step : steps) {
 			ElkInference inf = FlattenedElkInferenceSet.getInference(step);
-			if (inf instanceof ElkClassInclusionExistentialPropertyExpansion
-					&& flatten(
-							(ElkClassInclusionExistentialPropertyExpansion) inf,
+			if (inf instanceof ElkClassInclusionExistentialComposition
+					&& flatten((ElkClassInclusionExistentialComposition) inf,
 							step)) {
 				return true;
 			}

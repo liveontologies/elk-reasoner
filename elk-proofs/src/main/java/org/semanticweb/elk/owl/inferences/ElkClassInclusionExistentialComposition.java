@@ -1,7 +1,5 @@
 package org.semanticweb.elk.owl.inferences;
 
-import java.util.Arrays;
-
 /*-
  * #%L
  * ELK Proofs Package
@@ -31,52 +29,57 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 
 /**
  * Represents the inference:
  * 
  * <pre>
  *   (1)           (2)               (n)              (n+1)
- *  C0 ⊑ ∃T.C1  C1 ⊑ ∃T.C2 ... Cn-1 ⊑ ∃T.Cn  TransitiveObjectProperty(T)
- * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
- *                         C0 ⊑ ∃T.Cn
+ *  C0 ⊑ ∃R1.C1  C1 ⊑ ∃R2.C2 ... Cn-1 ⊑ ∃Rn.Cn  R1...Rn ⊑ S
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *                         C0 ⊑ ∃S.Cn
  * </pre>
  * 
  * @author Yevgeny Kazakov
  *
  */
-public class ElkClassInclusionExistentialTransitivity
+public class ElkClassInclusionExistentialComposition
 		extends AbstractElkInference {
 
-	private final static String NAME_ = "Existential Transitivity Composition";
+	private final static String NAME_ = "Existential Composition";
 
 	private final List<? extends ElkClassExpression> classExpressions_;
 
-	private final ElkObjectPropertyExpression transitiveProperty_;
+	private final List<? extends ElkObjectPropertyExpression> subChain_;
 
-	ElkClassInclusionExistentialTransitivity(
-			ElkObjectPropertyExpression transitiveProperty,
-			List<? extends ElkClassExpression> classExpressions) {
-		if (classExpressions.size() < 3) {
-			throw new IllegalArgumentException(classExpressions.toString());
+	private final ElkObjectPropertyExpression superProperty_;
+
+	ElkClassInclusionExistentialComposition(
+			List<? extends ElkClassExpression> classExpressions,
+			List<? extends ElkObjectPropertyExpression> subChain,
+			ElkObjectPropertyExpression superProperty) {
+		int chainLength = subChain.size();
+		if (classExpressions.size() != chainLength + 1) {
+			throw new IllegalArgumentException(classExpressions.toString()
+					+ " is expected to contain one more element than "
+					+ subChain.toString());
 		}
 		this.classExpressions_ = classExpressions;
-		this.transitiveProperty_ = transitiveProperty;
-	}
-
-	ElkClassInclusionExistentialTransitivity(
-			ElkObjectPropertyExpression transitiveProperty,
-			ElkClassExpression... classExpressions) {
-		this(transitiveProperty, Arrays.asList(classExpressions));
+		this.subChain_ = subChain;
+		this.superProperty_ = superProperty;
 	}
 
 	public List<? extends ElkClassExpression> getClassExpressions() {
 		return classExpressions_;
 	}
 
-	public ElkObjectPropertyExpression getTransitiveProperty() {
-		return transitiveProperty_;
+	public List<? extends ElkObjectPropertyExpression> getSubChain() {
+		return subChain_;
+	}
+
+	public ElkObjectPropertyExpression getSuperProperty() {
+		return superProperty_;
 	}
 
 	@Override
@@ -111,19 +114,22 @@ public class ElkClassInclusionExistentialTransitivity
 		}
 		// else
 		return factory.getSubClassOfAxiom(classExpressions_.get(index),
-				factory.getObjectSomeValuesFrom(transitiveProperty_,
+				factory.getObjectSomeValuesFrom(subChain_.get(index),
 						classExpressions_.get(index + 1)));
 	}
 
-	public ElkTransitiveObjectPropertyAxiom getLastPremise(
+	public ElkSubObjectPropertyOfAxiom getLastPremise(
 			ElkObject.Factory factory) {
-		return factory.getTransitiveObjectPropertyAxiom(transitiveProperty_);
+		return factory.getSubObjectPropertyOfAxiom(
+				subChain_.size() == 1 ? subChain_.get(0)
+						: factory.getObjectPropertyChain(subChain_),
+				superProperty_);
 	}
 
 	@Override
 	public ElkSubClassOfAxiom getConclusion(ElkObject.Factory factory) {
 		return factory.getSubClassOfAxiom(classExpressions_.get(0),
-				factory.getObjectSomeValuesFrom(transitiveProperty_,
+				factory.getObjectSomeValuesFrom(superProperty_,
 						classExpressions_.get(classExpressions_.size() - 1)));
 
 	}
@@ -141,13 +147,10 @@ public class ElkClassInclusionExistentialTransitivity
 	 */
 	public interface Factory {
 
-		ElkClassInclusionExistentialTransitivity getElkClassInclusionExistentialTransitivity(
-				ElkObjectPropertyExpression transitiveProperty,
-				ElkClassExpression... classExpressions);
-
-		ElkClassInclusionExistentialTransitivity getElkClassInclusionExistentialTransitivity(
-				ElkObjectPropertyExpression transitiveProperty,
-				List<? extends ElkClassExpression> classExpressions);
+		ElkClassInclusionExistentialComposition getElkClassInclusionExistentialComposition(
+				List<? extends ElkClassExpression> classExpressions,
+				List<? extends ElkObjectPropertyExpression> subChain,
+				ElkObjectPropertyExpression superProperty);
 
 	}
 
@@ -161,7 +164,7 @@ public class ElkClassInclusionExistentialTransitivity
 	 */
 	interface Visitor<O> {
 
-		O visit(ElkClassInclusionExistentialTransitivity inference);
+		O visit(ElkClassInclusionExistentialComposition inference);
 
 	}
 

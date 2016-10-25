@@ -56,6 +56,15 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 	}
 
 	@Override
+	public ElkClassInclusionExistentialComposition getElkClassInclusionExistentialComposition(
+			List<? extends ElkClassExpression> classExpressions,
+			List<? extends ElkObjectPropertyExpression> subChain,
+			ElkObjectPropertyExpression superProperty) {
+		return filter(mainFactory_.getElkClassInclusionExistentialComposition(
+				classExpressions, subChain, superProperty));
+	}
+
+	@Override
 	public ElkClassInclusionExistentialFillerExpansion getElkClassInclusionExistentialFillerExpansion(
 			ElkClassExpression subClass, ElkClassExpression superClass,
 			ElkObjectPropertyExpression property) {
@@ -80,39 +89,35 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 	}
 
 	@Override
-	public ElkClassInclusionExistentialPropertyExpansion getElkClassInclusionExistentialPropertyUnfolding(
-			ElkClassExpression subExpression,
-			ElkObjectPropertyExpression subProperty, ElkClassExpression filler,
-			ElkObjectPropertyExpression superProperty) {
+	public ElkClassInclusionExistentialPropertyExpansion getElkClassInclusionExistentialPropertyExpansion(
+			ElkObjectPropertyExpression subProperty,
+			ElkObjectPropertyExpression superProperty,
+			ElkClassExpression filler) {
 		return filter(
-				mainFactory_.getElkClassInclusionExistentialPropertyUnfolding(
-						subExpression, subProperty, filler, superProperty));
-	}
-
-	@Override
-	public ElkClassInclusionExistentialPropertyExpansion getElkClassInclusionExistentialPropertyUnfolding(
-			List<? extends ElkClassExpression> classExpressions,
-			List<? extends ElkObjectPropertyExpression> subChain,
-			ElkObjectPropertyExpression superProperty) {
-		return filter(
-				mainFactory_.getElkClassInclusionExistentialPropertyUnfolding(
-						classExpressions, subChain, superProperty));
+				mainFactory_.getElkClassInclusionExistentialPropertyExpansion(
+						subProperty, superProperty, filler));
 	}
 
 	@Override
 	public ElkClassInclusionExistentialTransitivity getElkClassInclusionExistentialTransitivity(
-			List<? extends ElkClassExpression> classExpressions,
-			ElkObjectPropertyExpression transitiveProperty) {
-		return mainFactory_.getElkClassInclusionExistentialTransitivity(
-				classExpressions, transitiveProperty);
+			ElkObjectPropertyExpression transitiveProperty,
+			ElkClassExpression... classExpressions) {
+		return filter(mainFactory_.getElkClassInclusionExistentialTransitivity(
+				transitiveProperty, classExpressions));
+	}
+
+	@Override
+	public ElkClassInclusionExistentialTransitivity getElkClassInclusionExistentialTransitivity(
+			ElkObjectPropertyExpression transitiveProperty,
+			List<? extends ElkClassExpression> classExpressions) {
+		return filter(mainFactory_.getElkClassInclusionExistentialTransitivity(
+				transitiveProperty, classExpressions));
 	}
 
 	@Override
 	public ElkClassInclusionHierarchy getElkClassInclusionHierarchy(
-			ElkClassExpression first, ElkClassExpression second,
-			ElkClassExpression third) {
-		return filter(mainFactory_.getElkClassInclusionHierarchy(first, second,
-				third));
+			ElkClassExpression... expressions) {
+		return filter(mainFactory_.getElkClassInclusionHierarchy(expressions));
 	}
 
 	@Override
@@ -325,11 +330,10 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 
 	@Override
 	public ElkPropertyInclusionHierarchy getElkPropertyInclusionHierarchy(
-			ElkSubObjectPropertyExpression first,
-			ElkObjectPropertyExpression second,
-			ElkObjectPropertyExpression third) {
-		return filter(mainFactory_.getElkPropertyInclusionHierarchy(first,
-				second, third));
+			ElkSubObjectPropertyExpression subExpression,
+			ElkObjectPropertyExpression... expressions) {
+		return filter(mainFactory_
+				.getElkPropertyInclusionHierarchy(subExpression, expressions));
 	}
 
 	@Override

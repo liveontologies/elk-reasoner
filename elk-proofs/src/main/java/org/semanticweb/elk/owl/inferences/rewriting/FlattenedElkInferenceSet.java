@@ -35,11 +35,11 @@ import org.liveontologies.owlapi.proof.util.Delegator;
 import org.liveontologies.owlapi.proof.util.ProofNode;
 import org.liveontologies.owlapi.proof.util.ProofNodes;
 import org.liveontologies.owlapi.proof.util.ProofStep;
-import org.semanticweb.elk.owl.inferences.ElkClassInclusionExistentialPropertyExpansion;
+import org.semanticweb.elk.owl.inferences.ElkClassInclusionExistentialComposition;
 import org.semanticweb.elk.owl.inferences.ElkClassInclusionHierarchy;
 import org.semanticweb.elk.owl.inferences.ElkInference;
-import org.semanticweb.elk.owl.inferences.ElkInferenceBaseFactory;
 import org.semanticweb.elk.owl.inferences.ElkInferenceDummyVisitor;
+import org.semanticweb.elk.owl.inferences.ElkInferenceOptimizedProducingFactory;
 import org.semanticweb.elk.owl.inferences.ElkInferenceProducer;
 import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
 import org.semanticweb.elk.owl.inferences.ElkPropertyInclusionHierarchy;
@@ -68,11 +68,6 @@ public class FlattenedElkInferenceSet
 	 * the inferences being transformed
 	 */
 	private final ElkInferenceSet originalInferences_;
-
-	/**
-	 * the factory used for creating the transformed inferences
-	 */
-	private final ElkInference.Factory inferenceFactory_ = new ElkInferenceBaseFactory();
 
 	/**
 	 * the new inferences indexed by conclusions
@@ -148,7 +143,10 @@ public class FlattenedElkInferenceSet
 				conclusionInferences_.add(inf);
 			} else {
 				LOGGER_.trace("{}: processing", inf);
-				flattener.flatten(step);
+				if (!flattener.flatten(step)) {
+					LOGGER_.trace("{}: cannot flatten", inf);
+					conclusionInferences_.add(inf);
+				}
 			}
 		}
 	}
@@ -197,25 +195,31 @@ public class FlattenedElkInferenceSet
 			extends ElkInferenceDummyVisitor<ElkInferenceFlattener>
 			implements ElkInferenceProducer {
 
+		/**
+		 * the factory used for creating the transformed inferences
+		 */
+		private final ElkInference.Factory inferenceFactory_ = new ElkInferenceOptimizedProducingFactory(
+				this);
+
 		@Override
 		public ElkInferenceFlattener visit(
 				ElkClassInclusionHierarchy inference) {
 			return new ElkClassInclusionHierarchyFlattener(inference,
-					inferenceFactory_, this);
+					inferenceFactory_);
 		}
 
 		@Override
 		public ElkInferenceFlattener visit(
-				ElkClassInclusionExistentialPropertyExpansion inference) {
+				ElkClassInclusionExistentialComposition inference) {
 			return new ElkClassInclusionExistentialPropertyExpansionFlattener(
-					inference, inferenceFactory_, this);
+					inference, inferenceFactory_);
 		}
 
 		@Override
 		public ElkInferenceFlattener visit(
 				ElkPropertyInclusionHierarchy inference) {
 			return new ElkPropertyInclusionHierarchyFlattener(inference,
-					inferenceFactory_, this);
+					inferenceFactory_);
 		}
 
 		@Override

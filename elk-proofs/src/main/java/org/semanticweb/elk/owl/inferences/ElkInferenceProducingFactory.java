@@ -24,6 +24,14 @@ package org.semanticweb.elk.owl.inferences;
 
 import org.semanticweb.elk.owl.inferences.ElkInference.Factory;
 
+/**
+ * A {@link ElkInference.Factory} which methods return {@code null} and instead
+ * produce the constructed inferences using the provided
+ * {@link ElkInferenceProducer}.
+ * 
+ * @author Yevgeny Kazakov
+ *
+ */
 public class ElkInferenceProducingFactory
 		extends ElkInferenceDelegatingFactory {
 
@@ -43,7 +51,7 @@ public class ElkInferenceProducingFactory
 	@Override
 	protected <I extends ElkInference> I filter(I inference) {
 		inferenceProducer_.produce(inference);
-		return inference;
+		return null;
 	}
 
 }

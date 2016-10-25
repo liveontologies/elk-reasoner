@@ -1,5 +1,7 @@
 package org.semanticweb.elk.owl.inferences;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -22,10 +24,6 @@ package org.semanticweb.elk.owl.inferences;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
@@ -36,10 +34,9 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
  * Represents the inference:
  * 
  * <pre>
- *   (1)           (2)               (n)              (n+1)
- *  C0 ⊑ ∃R1.C1  C1 ⊑ ∃R2.C2 ... Cn-1 ⊑ ∃Rn.Cn  R1...Rn ⊑ S
- * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
- *                         C0 ⊑ ∃S.Cn
+ *    R ⊑ S  
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ * ∃R.C ⊑ ∃S.C
  * </pre>
  * 
  * @author Yevgeny Kazakov
@@ -47,112 +44,64 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
  */
 public class ElkClassInclusionExistentialPropertyExpansion
 		extends AbstractElkInference {
-	
-	private final static String NAME_SIMPLE_ = "Existential Property Expansion";
-	
-	private final static String NAME_COMPLEX_ = "Existential Composition";
 
-	private final List<? extends ElkClassExpression> classExpressions_;
+	private final static String NAME_ = "Existential Property Expansion";
 
-	private final List<? extends ElkObjectPropertyExpression> subChain_;
+	private final ElkObjectPropertyExpression subProperty_, superProperty_;
 
-	private final ElkObjectPropertyExpression superProperty_;
+	private final ElkClassExpression filler_;
 
 	ElkClassInclusionExistentialPropertyExpansion(
-			List<? extends ElkClassExpression> classExpressions,
-			List<? extends ElkObjectPropertyExpression> subChain,
-			ElkObjectPropertyExpression superProperty) {
-		if (classExpressions.size() != subChain.size() + 1) {
-			throw new IllegalArgumentException(
-					classExpressions.toString() + ", " + subChain.toString());
-		}
-		this.classExpressions_ = classExpressions;
-		this.subChain_ = subChain;
+			ElkObjectPropertyExpression subProperty,
+			ElkObjectPropertyExpression superProperty,
+			ElkClassExpression filler) {
+		this.subProperty_ = subProperty;
 		this.superProperty_ = superProperty;
+		this.filler_ = filler;
 	}
 
-	ElkClassInclusionExistentialPropertyExpansion(
-			ElkClassExpression subExpression,
-			ElkObjectPropertyExpression subProperty, ElkClassExpression filler,
-			ElkObjectPropertyExpression superProperty) {
-		List<ElkClassExpression> classExpressions = new ArrayList<ElkClassExpression>(
-				2);
-		classExpressions.add(subExpression);
-		classExpressions.add(filler);
-		this.classExpressions_ = classExpressions;
-		List<ElkObjectPropertyExpression> subChain = new ArrayList<ElkObjectPropertyExpression>(
-				1);
-		subChain.add(subProperty);
-		this.subChain_ = subChain;
-		this.superProperty_ = superProperty;
-
-	}
-
-	public List<? extends ElkClassExpression> getClassExpressions() {
-		return classExpressions_;
-	}
-
-	public List<? extends ElkObjectPropertyExpression> getSubChain() {
-		return subChain_;
+	public ElkObjectPropertyExpression getSubProperty() {
+		return subProperty_;
 	}
 
 	public ElkObjectPropertyExpression getSuperProperty() {
 		return superProperty_;
 	}
-	
+
+	public ElkClassExpression getFiller() {
+		return filler_;
+	}
+
 	@Override
 	public String getName() {
-		if (subChain_.size() == 1) {
-			return NAME_SIMPLE_;
-		}
-		// else
-		return NAME_COMPLEX_;
+		return NAME_;
 	}
-	
+
 	@Override
 	public int getPremiseCount() {
-		return classExpressions_.size();
+		return 1;
 	}
 
 	@Override
 	public ElkAxiom getPremise(int index, ElkObject.Factory factory) {
-		checkPremiseIndex(index);
-		if (index < getExistentialPremiseCount()) {
-			return getExistentialPremise(index, factory);
+		switch (index) {
+		case 0:
+			return getPremise(factory);
+		default:
+			return failGetPremise(index);
 		}
-		// else
-		return getLastPremise(factory);
 	}
 
-	public int getExistentialPremiseCount() {
-		return classExpressions_.size() - 1;
-	}
-
-	public ElkSubClassOfAxiom getExistentialPremise(int index,
-			ElkObject.Factory factory) {
-		if (index < 0 || index >= getExistentialPremiseCount()) {
-			throw new IndexOutOfBoundsException(
-					"No existential premise with index: " + index);
-		}
-		// else
-		return factory.getSubClassOfAxiom(classExpressions_.get(index),
-				factory.getObjectSomeValuesFrom(subChain_.get(index),
-						classExpressions_.get(index + 1)));
-	}
-
-	public ElkSubObjectPropertyOfAxiom getLastPremise(
-			ElkObject.Factory factory) {
-		return factory.getSubObjectPropertyOfAxiom(
-				subChain_.size() == 1 ? subChain_.get(0)
-						: factory.getObjectPropertyChain(subChain_),
+	public ElkSubObjectPropertyOfAxiom getPremise(ElkObject.Factory factory) {
+		return factory.getSubObjectPropertyOfAxiom(subProperty_,
 				superProperty_);
 	}
 
 	@Override
 	public ElkSubClassOfAxiom getConclusion(ElkObject.Factory factory) {
-		return factory.getSubClassOfAxiom(classExpressions_.get(0),
-				factory.getObjectSomeValuesFrom(superProperty_,
-						classExpressions_.get(classExpressions_.size() - 1)));
+		return factory.getSubClassOfAxiom(
+				factory.getObjectSomeValuesFrom(subProperty_, filler_),
+				factory.getObjectSomeValuesFrom(superProperty_, filler_));
 
 	}
 
@@ -169,16 +118,10 @@ public class ElkClassInclusionExistentialPropertyExpansion
 	 */
 	public interface Factory {
 
-		ElkClassInclusionExistentialPropertyExpansion getElkClassInclusionExistentialPropertyUnfolding(
-				List<? extends ElkClassExpression> classExpressions,
-				List<? extends ElkObjectPropertyExpression> subChain,
-				ElkObjectPropertyExpression superProperty);
-
-		ElkClassInclusionExistentialPropertyExpansion getElkClassInclusionExistentialPropertyUnfolding(
-				ElkClassExpression subExpression,
+		ElkClassInclusionExistentialPropertyExpansion getElkClassInclusionExistentialPropertyExpansion(
 				ElkObjectPropertyExpression subProperty,
-				ElkClassExpression filler,
-				ElkObjectPropertyExpression superProperty);
+				ElkObjectPropertyExpression superProperty,
+				ElkClassExpression filler);
 
 	}
 
