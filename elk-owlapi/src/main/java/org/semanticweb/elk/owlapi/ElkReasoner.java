@@ -361,7 +361,7 @@ public class ElkReasoner implements OWLReasoner {
 					// in non-buffering node the changes loader is already
 					// registered, so we just need to
 					// notify the reasoner about new axioms
-					reasoner_.resetAxiomLoading();
+					reasoner_.resetInputLoading();
 				}
 			}
 			// proofs should be recomputed

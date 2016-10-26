@@ -30,13 +30,7 @@ package org.semanticweb.elk.reasoner.stages;
  */
 public class ReasonerStageManager {
 
-	/* 
-	 * TODO: This is a temporary solution so that the query loading has access
-	 * to the information from the loading stage. Ideally, query loading should
-	 * be done during the loading stage.
-	 */
-	final AxiomLoadingStage axiomLoadingStage;
-	final AbstractReasonerStage propertyInitializationStage,
+	final AbstractReasonerStage inputLoadingStage, propertyInitializationStage,
 			propertyHierarchyCompositionComputationStage,
 			objectPropertyTaxonomyComputationStage, contextInitializationStage,
 			consistencyCheckingStage, classSaturationStage,
@@ -57,7 +51,7 @@ public class ReasonerStageManager {
 
 		/* Non-Incremental stages */
 
-		this.axiomLoadingStage = new AxiomLoadingStage(reasoner);
+		this.inputLoadingStage = new InputLoadingStage(reasoner);
 
 		this.propertyInitializationStage = new PropertyInitializationStage(
 				reasoner);
@@ -70,11 +64,11 @@ public class ReasonerStageManager {
 						propertyHierarchyCompositionComputationStage);
 
 		this.contextInitializationStage = new ContextAssignmentResetStage(
-				reasoner, axiomLoadingStage,
+				reasoner, inputLoadingStage,
 				propertyHierarchyCompositionComputationStage);
 
 		this.consistencyCheckingStage = new ConsistencyCheckingStage(reasoner,
-				axiomLoadingStage, contextInitializationStage);
+				inputLoadingStage, contextInitializationStage);
 
 		this.classSaturationStage = new ClassSaturationStage(reasoner,
 				consistencyCheckingStage);
@@ -88,7 +82,7 @@ public class ReasonerStageManager {
 		/* Incremental stages */
 
 		this.incrementalCompletionStage = new IncrementalCompletionStage(
-				reasoner, axiomLoadingStage,
+				reasoner, inputLoadingStage,
 				propertyHierarchyCompositionComputationStage);
 
 		this.incrementalDeletionInitializationStage = new IncrementalDeletionInitializationStage(

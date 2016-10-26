@@ -30,6 +30,7 @@ import java.util.Set;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.ComposedAxiomLoader;
+import org.semanticweb.elk.loading.QueryLoader;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
@@ -43,7 +44,6 @@ import org.semanticweb.elk.reasoner.ReasonerInterrupter;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyCheckingState;
 import org.semanticweb.elk.reasoner.indexing.classes.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
-import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
@@ -168,7 +168,11 @@ public abstract class AbstractReasonerState {
 	/**
 	 * The source where axioms and changes in ontology can be loaded
 	 */
-	private AxiomLoader axiomLoader_;
+	private AxiomLoader axiomLoader_ = null;
+	/**
+	 * Indexes the registered queries.
+	 */
+	private QueryLoader queryLoader_ = null;
 	/**
 	 * if {@code true}, reasoning will be done incrementally whenever possible
 	 */
@@ -275,9 +279,9 @@ public abstract class AbstractReasonerState {
 	/**
 	 * Reset the axiom loading stage and all subsequent stages
 	 */
-	public synchronized void resetAxiomLoading() {
+	public synchronized void resetInputLoading() {
 		LOGGER_.trace("Reset axiom loading");
-		stageManager.axiomLoadingStage.invalidateRecursive();
+		stageManager.inputLoadingStage.invalidateRecursive();
 	}
 
 	/**
@@ -313,7 +317,7 @@ public abstract class AbstractReasonerState {
 			final AxiomLoader.Factory axiomLoaderFactory) {
 		LOGGER_.trace("Registering new axiom loader");
 
-		resetAxiomLoading();
+		resetInputLoading();
 
 		final AxiomLoader newAxiomLoader = axiomLoaderFactory
 				.getAxiomLoader(getInterrupter());
@@ -335,13 +339,21 @@ public abstract class AbstractReasonerState {
 	}
 
 	/**
+	 * @return the {@link QueryLoader} currently registered for loading of
+	 *         queries or {@code null} if no loader is registered
+	 */
+	public QueryLoader getQueryLoader() {
+		return queryLoader_;
+	}
+
+	/**
 	 * Forces loading of all axioms from the registered {@link AxiomLoader}s.
 	 * Typically, loading lazily when reasoning tasks are requested.
 	 * 
 	 * @throws ElkException
 	 */
 	public synchronized void forceLoading() throws ElkException {
-		complete(stageManager.axiomLoadingStage);
+		complete(stageManager.inputLoadingStage);
 	}
 
 	/**
@@ -648,37 +660,31 @@ public abstract class AbstractReasonerState {
 	private boolean computeQuery(final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 
-		if (stageManager.axiomLoadingStage.isFirstLoad()) {
-			trySetIncrementalMode();
-		}
-
 		// Load the query
-		final boolean indexChanged;
-		try {
-			indexChanged = classExpressionQueryState_
-					.indexQuery(classExpression);
-		} catch (final ElkIndexingUnsupportedException e) {
-			return false;
-		}
-		if (classExpressionQueryState_.isComputed(classExpression)
-				&& stageManager.axiomLoadingStage.isCompleted()) {
-			/*
-			 * If query result are cashed, but there were some changes to the
-			 * ontology, they may not be up to date. Whether they are will be
-			 * checked during stages that clean contexts. So if axiom loading
-			 * stage is not completed, we still execute all the stages.
-			 */
-			return true;
+		if (classExpressionQueryState_.registerQuery(classExpression)) {
+			resetInputLoading();
+			if (queryLoader_ == null) {
+				queryLoader_ = classExpressionQueryState_
+						.getQueryLoader(getInterrupter());
+			}
 		}
 
-		if (indexChanged) {
-			// Invalidate stages that depend on axiom loading stage
-			stageManager.contextInitializationStage.invalidateRecursive();
-			stageManager.incrementalCompletionStage.invalidateRecursive();
+		forceLoading();
+		if (!classExpressionQueryState_.isIndexed(classExpression)) {
+			return false;
 		}
 
 		// Complete all stages
 		getTaxonomy();
+		/*
+		 * If query result is cashed, but there were some changes to the
+		 * ontology, it may not be up to date. Whether it is is checked during
+		 * stages that clean contexts. These are run, if necessary, by the call
+		 * above.
+		 */
+		if (classExpressionQueryState_.isComputed(classExpression)) {
+			return true;
+		}
 		stageManager.classExpressionQueryStage.invalidateRecursive();
 		complete(stageManager.classExpressionQueryStage);
 

@@ -92,7 +92,7 @@ public class IgnoreChangesInNonImportedOntologiesTest {
 
 			AbstractReasonerState state = reasoner.getInternalReasoner();
 
-			assertTrue(state.stageManager.axiomLoadingStage.isCompleted());
+			assertTrue(state.stageManager.inputLoadingStage.isCompleted());
 		} finally {
 			reasoner.dispose();
 		}

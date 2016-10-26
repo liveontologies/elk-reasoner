@@ -38,12 +38,15 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.owl.predefined.ElkPolarity;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
+import org.semanticweb.elk.reasoner.indexing.classes.BaseModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.ResolvingModifiableIndexedObjectFactory;
+import org.semanticweb.elk.reasoner.indexing.classes.UpdatingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 
 /**
  * 
@@ -112,12 +115,12 @@ public class ElkPolarityExpressionConverterImpl extends
 	 * Creates an {@link ElkPolarityExpressionConverter} of polarity
 	 * {@link ElkPolarity#DUAL}, which uses the given
 	 * {@link ModifiableIndexedObject.Factory} for creating the
-	 * {@link ModifiableIndexedObject.Factory}s (of the dual polarity). This
-	 * converter returns itself as the complementary converter.
+	 * {@link ModifiableIndexedObject}s (of the dual polarity). This converter
+	 * returns itself as the complementary converter.
 	 * 
 	 * @param dualFactory
 	 *            {@link ModifiableIndexedObject.Factory} used for creating the
-	 *            {@link ModifiableIndexedObject.Factory}s of this converter
+	 *            {@link ModifiableIndexedObject}s of this converter
 	 * 
 	 */
 	public ElkPolarityExpressionConverterImpl(
@@ -131,6 +134,37 @@ public class ElkPolarityExpressionConverterImpl extends
 		this.index_ = index;
 	}
 
+	/**
+	 * Creates an {@link ElkPolarityExpressionConverter} of polarity
+	 * {@link ElkPolarity#DUAL}, which uses
+	 * {@link UpdatingModifiableIndexedObjectFactory} that increments the number
+	 * of occurrences of the created {@link ModifiableIndexedObject}s by the
+	 * specified increment. This converter returns itself as the complementary
+	 * converter.
+	 * 
+	 * @param elkFactory
+	 * @param index
+	 * @param increment
+	 */
+	public ElkPolarityExpressionConverterImpl(
+			final PredefinedElkClassFactory elkFactory,
+			final ModifiableOntologyIndex index, final int increment) {
+		this(elkFactory,
+				new UpdatingModifiableIndexedObjectFactory(
+						new BaseModifiableIndexedObjectFactory(), index,
+						OccurrenceIncrement.getDualIncrement(increment)),
+				index);
+	}
+
+	/**
+	 * Creates an {@link ElkPolarityExpressionConverter} of polarity
+	 * {@link ElkPolarity#DUAL}, which uses
+	 * {@link ResolvingModifiableIndexedObjectFactory} for creating the
+	 * {@link ModifiableIndexedObject}s.
+	 * 
+	 * @param elkFactory
+	 * @param index
+	 */
 	public ElkPolarityExpressionConverterImpl(
 			PredefinedElkClassFactory elkFactory,
 			ModifiableOntologyIndex index) {
