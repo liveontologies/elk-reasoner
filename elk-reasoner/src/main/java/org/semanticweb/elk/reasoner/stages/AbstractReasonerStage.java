@@ -29,7 +29,6 @@ import java.util.Queue;
 
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -210,12 +209,7 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	}
 
 	protected void markAllContextsAsSaturated() {
-		for (;;) {
-			Context context = reasoner.saturationState
-					.setNextContextSaturated();
-			if (context == null)
-				return;
-		}
+		reasoner.saturationState.setContextsSaturated(Integer.MAX_VALUE);
 	}
 
 	protected SaturationStatistics getRuleAndConclusionStatistics() {

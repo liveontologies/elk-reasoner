@@ -38,7 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
- *         
+ * 
  * @author "Yevgeny Kazakov"
  *
  * @param <C>
@@ -78,33 +78,39 @@ public interface SaturationState<C extends Context> {
 	public Collection<C> getNotSaturatedContexts();
 
 	/**
-	 * @return the total number of times a {@link Context} was marked as
-	 *         non-saturated using this {@link SaturationState}, i.e., the
-	 *         number of times a method
-	 *         {@link SaturationStateWriter#markAsNotSaturated(IndexedContextRoot)}
-	 *         returned {@code true}. It can only increase over time.
+	 * @return the value of the counter that is incremented right after a
+	 *         context becomes marked as non-saturated, e.g., as the result of
+	 *         calling
+	 *         {@link SaturationStateWriter#markAsNotSaturated(IndexedContextRoot)}.
+	 *         The value never decreases and is never greater than the value of
+	 *         #getContextSetSaturatedCount().
 	 */
 	int getContextMarkNonSaturatedCount();
 
 	/**
-	 * @return the total number of times a {@link Context} was set as saturated
-	 *         using this {@link SaturationState}, i.e., the number of times a
-	 *         method {@link #setNextContextSaturated} returned not {@link null}
-	 *         . It can only increase over time. This should always be smaller
-	 *         than the value of #getContextMarkNonSaturatedCount().
+	 * @return the value of the counter that is incremented right after a
+	 *         context becomes marked as saturated, e.g., as the result of
+	 *         calling {@link #setContextsSaturated(int)}. The value never
+	 *         decreases and is never smaller than the value of
+	 *         #getContextMarkNonSaturatedCount().
 	 */
 	int getContextSetSaturatedCount();
 
 	/**
-	 * Sets one of the {@link Context}s as saturated and returns it. The
-	 * {@link Context}s are set in the order in which they become non-saturated
-	 * or created.
-	 * 
-	 * @return the {@link Context} that was set as saturated.
+	 * Marks non-saturated contexts of this {@link SaturationState} as saturated
+	 * until the value of {@link #getContextSetSaturatedCount()} reaches the
+	 * given limit or all contexts are marked as saturated. The {@link Context}s
+	 * are set in the order in which they become non-saturated or created.
+	 *
+	 * @param saturatedContextLimit
+	 *            the limit on the value {@link #getContextSetSaturatedCount()}
+	 *            that can be achieved after calling this method. If this method
+	 *            is called concurrently from multiple threads, the maximal of
+	 *            the set limits apply.
 	 * 
 	 * @see Context#isSaturated()
 	 */
-	public Context setNextContextSaturated();
+	public void setContextsSaturated(int saturatedContextLimit);
 
 	/**
 	 * @param contextModificationListener

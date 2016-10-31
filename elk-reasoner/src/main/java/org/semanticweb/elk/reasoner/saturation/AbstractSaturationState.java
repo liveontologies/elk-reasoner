@@ -70,15 +70,21 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 	private final Queue<EC> notSaturatedContexts_ = new ConcurrentLinkedQueue<EC>();
 
 	/**
-	 * increments every time a {@link Context} is marked as non-saturated
+	 * increments after a {@link Context} is marked as non-saturated
 	 */
-	private final AtomicInteger countextMarkNonSaturatedCount_ = new AtomicInteger(
+	private final AtomicInteger countextMarkNonSaturatedLower_ = new AtomicInteger(
 			0);
 
 	/**
-	 * increments every time a {@link Context} is marked as saturated
+	 * increments before a {@link Context} is marked as saturated
 	 */
-	private final AtomicInteger contextSetSaturatedCount_ = new AtomicInteger(
+	private final AtomicInteger contextSetSaturatedUpper_ = new AtomicInteger(
+			0);
+
+	/**
+	 * increments after a {@link Context} is marked as saturated
+	 */
+	private final AtomicInteger contextSetSaturatedLower_ = new AtomicInteger(
 			0);
 
 	private final ContextFactory<EC> contextFactory;
@@ -106,38 +112,53 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 
 			@Override
 			public int size() {
-				return countextMarkNonSaturatedCount_.get()
-						- contextSetSaturatedCount_.get();
+				return countextMarkNonSaturatedLower_.get()
+						- contextSetSaturatedLower_.get();
 			}
 		});
 	}
 
 	@Override
 	public int getContextMarkNonSaturatedCount() {
-		return countextMarkNonSaturatedCount_.get();
+		return countextMarkNonSaturatedLower_.get();
 	}
 
 	@Override
 	public int getContextSetSaturatedCount() {
-		return contextSetSaturatedCount_.get();
+		return contextSetSaturatedLower_.get();
 	}
 
 	@Override
-	public Context setNextContextSaturated() {
-		EC next = notSaturatedContexts_.poll();
-
-		if (next == null)
-			return null;
-		// else
-		if (next.setSaturated(true)) {
-			LOGGER_.error("{}: was marked as saturated already");
-		}	
-		LOGGER_.trace("{}: marked as saturated", next);
-		contextSetSaturatedCount_.incrementAndGet();
-		for (int i = 0; i < listeners_.size(); i++) {
-			listeners_.get(i).contextMarkSaturated(next);
+	public void setContextsSaturated(int saturatedContextLimit) {
+		for (;;) {
+			int contextSetSaturatedUpperSnapshot = contextSetSaturatedUpper_
+					.get();
+			if (contextSetSaturatedUpperSnapshot >= saturatedContextLimit) {
+				return;
+			}
+			if (contextSetSaturatedUpperSnapshot >= countextMarkNonSaturatedLower_
+					.get()) {
+				EC next = notSaturatedContexts_.peek();
+				if (next != null) {
+					LOGGER_.error("{}: was not marked as saturated", next);
+				}
+				return;
+			}
+			if (!contextSetSaturatedUpper_.compareAndSet(
+					contextSetSaturatedUpperSnapshot,
+					contextSetSaturatedUpperSnapshot + 1)) {
+				continue;
+			}
+			EC next = notSaturatedContexts_.poll();
+			if (next.setSaturated(true)) {
+				LOGGER_.error("{}: was marked as saturated already", next);
+			}
+			LOGGER_.trace("{}: marked as saturated", next);
+			contextSetSaturatedLower_.incrementAndGet();
+			for (int i = 0; i < listeners_.size(); i++) {
+				listeners_.get(i).contextMarkSaturated(next);
+			}
 		}
-		return next;
 	}
 
 	@Override
@@ -239,7 +260,7 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 		void markAsNotSaturatedInternal(EC context) {
 			LOGGER_.trace("{}: marked as non-saturated", context);
 			notSaturatedContexts_.add(context);
-			countextMarkNonSaturatedCount_.incrementAndGet();
+			countextMarkNonSaturatedLower_.incrementAndGet();
 			contextModificationListener_.notifyContextModification(context);
 			for (int i = 0; i < listeners_.size(); i++) {
 				listeners_.get(i).contextMarkNonSaturated(context);
