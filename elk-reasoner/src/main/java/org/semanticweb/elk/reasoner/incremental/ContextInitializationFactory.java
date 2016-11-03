@@ -23,7 +23,9 @@ package org.semanticweb.elk.reasoner.incremental;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
@@ -41,11 +43,11 @@ import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextIn
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SubsumerDecompositionRule;
-import org.semanticweb.elk.util.concurrent.computation.BaseInputProcessor;
+import org.semanticweb.elk.util.concurrent.computation.DelegateInterruptMonitor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
+import org.semanticweb.elk.util.concurrent.computation.InputProcessorListenerNotifyFinishedJob;
 import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
-import org.semanticweb.elk.util.concurrent.computation.DelegateInterruptMonitor;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +57,7 @@ import org.slf4j.LoggerFactory;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
 class ContextInitializationFactory extends DelegateInterruptMonitor
 		implements
@@ -62,6 +65,13 @@ class ContextInitializationFactory extends DelegateInterruptMonitor
 
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ContextInitializationFactory.class);
+
+	/**
+	 * The buffer for jobs that need to be processed, i.e., those for which the
+	 * method {@link BaseInputProcessor#submit(ArrayList)} was executed but
+	 * processing of jobs has not been started yet.
+	 */
+	private final Queue<ArrayList<Context>> jobsToDo_ = new ConcurrentLinkedQueue<ArrayList<Context>>();
 
 	private final SaturationState<?> saturationState_;
 	private final ContextInitialization.Factory contextInitFactory_;
@@ -246,14 +256,140 @@ class ContextInitializationFactory extends DelegateInterruptMonitor
 	}
 
 	/**
+	 * Implements basic job queueing and lets subclasses focus on processing
+	 * single jobs
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 *         pavel.klinov@uni-ulm.de
+	 * @author Peter Skocovsky
+	 */
+	private abstract class BaseInputProcessor
+			implements InputProcessor<ArrayList<Context>> {
+
+		private final InputProcessorListenerNotifyFinishedJob<ArrayList<Context>> listener_;
+
+		public BaseInputProcessor() {
+			this(null);
+		}
+
+		public BaseInputProcessor(
+				final InputProcessorListenerNotifyFinishedJob<ArrayList<Context>> listener) {
+			listener_ = listener;
+		}
+
+		@Override
+		public void submit(ArrayList<Context> job) {
+			jobsToDo_.add(job);
+		}
+
+		@Override
+		public void process() throws InterruptedException {
+			for (;;) {
+				if (isInterrupted()) {
+					break;
+				}
+
+				ArrayList<Context> nextJob = jobsToDo_.poll();
+
+				if (nextJob == null) {
+					break;
+				}
+
+				process(nextJob);
+
+				if (listener_ != null) {
+					listener_.notifyFinished(nextJob);
+				}
+			}
+		}
+
+		@Override
+		public void finish() {
+		}
+
+		protected abstract boolean isInterrupted();
+
+		protected abstract void process(ArrayList<Context> job);
+	}
+
+	/**
+	 * @author Pavel Klinov
+	 * 
+	 *         pavel.klinov@uni-ulm.de
+	 */
+	private class TimedContextCollectionProcessor extends BaseInputProcessor {
+
+		private final ContextProcessor contextProcessor_;
+
+		private final IncrementalProcessingStatistics stageStats_;
+
+		private final IncrementalProcessingStatistics localStats_ = new IncrementalProcessingStatistics();
+
+		private final InterruptMonitor interrupter_;
+
+		private int procNumber_ = 0;
+
+		public TimedContextCollectionProcessor(ContextProcessor baseProcessor,
+				IncrementalProcessingStatistics stageStats,
+				InterruptMonitor interrupter) {
+			contextProcessor_ = new TimedContextProcessor(baseProcessor,
+					localStats_);
+			stageStats_ = stageStats;
+			interrupter_ = interrupter;
+			localStats_.startMeasurements();
+		}
+
+		@Override
+		protected void process(ArrayList<Context> contexts) {
+			long ts = CachedTimeThread.getCurrentTimeMillis();
+			int contextCount = 0;
+			int subsumerCount = 0;
+
+			procNumber_++;
+
+			for (Context context : contexts) {
+				contextProcessor_.process(context);
+				contextCount++;
+				subsumerCount += context.getComposedSubsumers().size();
+			}
+
+			localStats_.changeInitContextCollectionProcessingTime += (CachedTimeThread
+					.getCurrentTimeMillis() - ts);
+			localStats_.countContexts += contextCount;
+
+			if (contextCount > 0) {
+				localStats_.countContextSubsumers += (subsumerCount
+						/ contextCount);
+			}
+		}
+
+		@Override
+		public void finish() {
+			super.finish();
+			contextProcessor_.finish();
+
+			if (procNumber_ > 0) {
+				localStats_.countContextSubsumers /= procNumber_;
+			}
+
+			stageStats_.add(localStats_);
+		}
+
+		@Override
+		protected boolean isInterrupted() {
+			return interrupter_.isInterrupted();
+		}
+
+	}
+
+	/**
 	 * 
 	 * @author Pavel Klinov
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	private class ContextCollectionProcessor
-			extends
-				BaseInputProcessor<ArrayList<Context>> {
+	private class ContextCollectionProcessor extends BaseInputProcessor {
 
 		private final ContextProcessor contextProcessor_;
 
