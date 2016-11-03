@@ -71,11 +71,6 @@ public class DummyClassInferenceVisitor<O>
 	}
 
 	@Override
-	public O visit(BackwardLinkReversed inference) {
-		return defaultVisit(inference);
-	}
-
-	@Override
 	public O visit(BackwardLinkReversedExpanded inference) {
 		return defaultVisit(inference);
 	}

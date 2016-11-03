@@ -24,7 +24,6 @@ package org.semanticweb.elk.matching;
 
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2;
-import org.semanticweb.elk.matching.inferences.BackwardLinkReversedMatch1;
 import org.semanticweb.elk.matching.inferences.ForwardLinkCompositionMatch1;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
 
@@ -35,12 +34,6 @@ class ForwardLinkMatch2InferenceVisitor
 	ForwardLinkMatch2InferenceVisitor(InferenceMatch.Factory factory,
 			ForwardLinkMatch2 child) {
 		super(factory, child);
-	}
-
-	@Override
-	public Void visit(BackwardLinkReversedMatch1 inferenceMatch1) {
-		factory.getBackwardLinkReversedMatch2(inferenceMatch1, child);
-		return null;
 	}
 
 	@Override

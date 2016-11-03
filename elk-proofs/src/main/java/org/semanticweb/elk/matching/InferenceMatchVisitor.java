@@ -63,9 +63,6 @@ import org.semanticweb.elk.matching.inferences.BackwardLinkOfObjectSomeValuesFro
 import org.semanticweb.elk.matching.inferences.BackwardLinkReversedExpandedMatch1;
 import org.semanticweb.elk.matching.inferences.BackwardLinkReversedExpandedMatch2;
 import org.semanticweb.elk.matching.inferences.BackwardLinkReversedExpandedMatch3;
-import org.semanticweb.elk.matching.inferences.BackwardLinkReversedMatch1;
-import org.semanticweb.elk.matching.inferences.BackwardLinkReversedMatch2;
-import org.semanticweb.elk.matching.inferences.BackwardLinkReversedMatch3;
 import org.semanticweb.elk.matching.inferences.ClassInconsistencyOfDisjointSubsumersMatch1;
 import org.semanticweb.elk.matching.inferences.ClassInconsistencyOfDisjointSubsumersMatch2;
 import org.semanticweb.elk.matching.inferences.ClassInconsistencyOfObjectComplementOfMatch1;
@@ -502,37 +499,6 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		elkInferenceFactory_.getElkClassInclusionExistentialComposition(
 				toList(originMatch, intermediateRoots, destinationMatch),
 				toList(subChainMatch), relationMatch);
-		return null;
-	}
-
-	@Override
-	public Void visit(BackwardLinkReversedMatch1 inferenceMatch1) {
-		ForwardLinkMatch1 premiseMatch1 = inferenceMatch1
-				.getPremiseMatch(conclusionFactory_);
-		inferences_.add(premiseMatch1, inferenceMatch1);
-		for (ForwardLinkMatch2 child : hierarchy_.getChildren(premiseMatch1)) {
-			(new ForwardLinkMatch2InferenceVisitor(inferenceFactory_, child))
-					.visit(inferenceMatch1);
-		}
-		return null;
-	}
-
-	@Override
-	public Void visit(BackwardLinkReversedMatch2 inferenceMatch2) {
-		ForwardLinkMatch2 premiseMatch2 = inferenceMatch2
-				.getPremiseMatch(conclusionFactory_);
-		inferences_.add(premiseMatch2, inferenceMatch2);
-		for (ForwardLinkMatch3 child : hierarchy_.getChildren(premiseMatch2)) {
-			(new ForwardLinkMatch3InferenceVisitor(inferenceFactory_, child))
-					.visit(inferenceMatch2);
-		}
-		return null;
-	}
-
-	@Override
-	public Void visit(BackwardLinkReversedMatch3 inferenceMatch2) {
-		inferenceMatch2.getConclusionMatch(conclusionFactory_);
-		// no ELK inferences
 		return null;
 	}
 

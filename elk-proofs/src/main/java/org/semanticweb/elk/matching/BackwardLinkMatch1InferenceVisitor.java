@@ -28,7 +28,6 @@ import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkCompositio
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectHasSelf;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversed;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversedExpanded;
 
 class BackwardLinkMatch1InferenceVisitor
@@ -57,12 +56,6 @@ class BackwardLinkMatch1InferenceVisitor
 	@Override
 	public Void visit(BackwardLinkOfObjectSomeValuesFrom inference) {
 		factory.getBackwardLinkOfObjectSomeValuesFromMatch1(inference, child);
-		return null;
-	}
-
-	@Override
-	public Void visit(BackwardLinkReversed inference) {
-		factory.getBackwardLinkReversedMatch1(inference, child);
 		return null;
 	}
 

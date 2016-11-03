@@ -30,7 +30,6 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversed;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversedExpanded;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 
@@ -60,16 +59,16 @@ public class BackwardLinkFromForwardLinkRule extends AbstractForwardLinkRule {
 			ClassInferenceProducer producer) {
 		IndexedPropertyChain relation = premise.getChain();
 		if (relation instanceof IndexedObjectProperty) {
-			producer.produce(new BackwardLinkReversed(premise));
-		} else {
-			List<IndexedObjectProperty> superProperties = relation
-					.getToldSuperProperties();
-			List<ElkAxiom> superPropertiesReasons = relation
-					.getToldSuperPropertiesReasons();
-			for (int i = 0; i < superProperties.size(); i++) {
-				producer.produce(new BackwardLinkReversedExpanded(premise,
-						superProperties.get(i), superPropertiesReasons.get(i)));
-			}
+			return;
+		}
+		// else
+		List<IndexedObjectProperty> superProperties = relation
+				.getToldSuperProperties();
+		List<ElkAxiom> superPropertiesReasons = relation
+				.getToldSuperPropertiesReasons();
+		for (int i = 0; i < superProperties.size(); i++) {
+			producer.produce(new BackwardLinkReversedExpanded(premise,
+					superProperties.get(i), superPropertiesReasons.get(i)));
 		}
 	}
 

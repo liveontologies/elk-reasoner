@@ -63,12 +63,6 @@ public class ClassInferenceConclusionVisitor<O>
 	}
 
 	@Override
-	public O visit(BackwardLinkReversed inference) {
-		return conclusionVisitor_
-				.visit(inference.getConclusion(conclusionFactory_));
-	}
-
-	@Override
 	public O visit(BackwardLinkReversedExpanded inference) {
 		return conclusionVisitor_
 				.visit(inference.getConclusion(conclusionFactory_));

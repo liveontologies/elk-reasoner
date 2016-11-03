@@ -127,13 +127,10 @@ public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		public static void produceDecomposedExistentialLink(
 				ClassInferenceProducer producer, IndexedContextRoot root,
 				IndexedObjectSomeValuesFrom subsumer) {
-			SaturatedPropertyChain propertySaturation = subsumer.getProperty()
-					.getSaturated();
-			if (propertySaturation.getNonRedundantCompositionsByLeftSubProperty()
-					.isEmpty()) {
-				producer.produce(
-						new BackwardLinkOfObjectSomeValuesFrom(root, subsumer));
-			} else {
+			producer.produce(
+					new BackwardLinkOfObjectSomeValuesFrom(root, subsumer));
+			if (!subsumer.getProperty().getSaturated()
+					.getNonRedundantCompositionsByLeftSubProperty().isEmpty()) {
 				producer.produce(
 						new ForwardLinkOfObjectSomeValuesFrom(root, subsumer));
 			}

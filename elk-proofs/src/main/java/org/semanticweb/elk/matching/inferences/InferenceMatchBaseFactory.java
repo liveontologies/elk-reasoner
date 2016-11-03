@@ -72,7 +72,6 @@ import org.semanticweb.elk.reasoner.indexing.model.ElkTransitiveObjectPropertyAx
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkComposition;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectHasSelf;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversed;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversedExpanded;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfDisjointSubsumers;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfObjectComplementOf;
@@ -190,24 +189,6 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 			ForwardLinkMatch3 firstPremiseMatch) {
 		return new BackwardLinkReversedExpandedMatch3(parent,
 				firstPremiseMatch);
-	}
-
-	@Override
-	public BackwardLinkReversedMatch1 getBackwardLinkReversedMatch1(
-			BackwardLinkReversed parent, BackwardLinkMatch1 conclusionMatch) {
-		return new BackwardLinkReversedMatch1(parent, conclusionMatch);
-	}
-
-	@Override
-	public BackwardLinkReversedMatch2 getBackwardLinkReversedMatch2(
-			BackwardLinkReversedMatch1 parent, ForwardLinkMatch2 premiseMatch) {
-		return new BackwardLinkReversedMatch2(parent, premiseMatch);
-	}
-
-	@Override
-	public BackwardLinkReversedMatch3 getBackwardLinkReversedMatch3(
-			BackwardLinkReversedMatch2 parent, ForwardLinkMatch3 premiseMatch) {
-		return new BackwardLinkReversedMatch3(parent, premiseMatch);
 	}
 
 	@Override

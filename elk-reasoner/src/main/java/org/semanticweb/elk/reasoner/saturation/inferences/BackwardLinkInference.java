@@ -43,12 +43,10 @@ public interface BackwardLinkInference extends ClassInference {
 	 *            the type of the output
 	 */
 	public static interface Visitor<O>
-			extends
-				BackwardLinkComposition.Visitor<O>,
-				BackwardLinkOfObjectHasSelf.Visitor<O>,
-				BackwardLinkOfObjectSomeValuesFrom.Visitor<O>,
-				BackwardLinkReversed.Visitor<O>,
-				BackwardLinkReversedExpanded.Visitor<O> {
+			extends BackwardLinkComposition.Visitor<O>,
+			BackwardLinkOfObjectHasSelf.Visitor<O>,
+			BackwardLinkOfObjectSomeValuesFrom.Visitor<O>,
+			BackwardLinkReversedExpanded.Visitor<O> {
 
 		// combined interface
 

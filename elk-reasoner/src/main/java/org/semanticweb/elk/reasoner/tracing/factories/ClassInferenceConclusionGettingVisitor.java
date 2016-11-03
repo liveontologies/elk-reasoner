@@ -29,7 +29,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkComposition;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectHasSelf;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversed;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversedExpanded;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfDisjointSubsumers;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfObjectComplementOf;
@@ -88,11 +87,6 @@ public class ClassInferenceConclusionGettingVisitor
 
 	@Override
 	public ClassConclusion visit(BackwardLinkOfObjectSomeValuesFrom inference) {
-		return inference.getConclusion(conclusionFactory_);
-	}
-
-	@Override
-	public ClassConclusion visit(BackwardLinkReversed inference) {
 		return inference.getConclusion(conclusionFactory_);
 	}
 

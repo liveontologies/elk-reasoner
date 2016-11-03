@@ -78,13 +78,10 @@ public interface IndexedObjectHasSelf extends IndexedClassExpression {
 		public static void produceDecomposedExistentialLink(
 				ClassInferenceProducer producer, IndexedContextRoot root,
 				IndexedObjectHasSelf subsumer) {
-			SaturatedPropertyChain propertySaturation = subsumer.getProperty()
-					.getSaturated();
-			if (propertySaturation.getNonRedundantCompositionsByLeftSubProperty()
-					.isEmpty()) {
-				producer.produce(
-						new BackwardLinkOfObjectHasSelf(root, subsumer));
-			} else {
+			producer.produce(
+					new BackwardLinkOfObjectHasSelf(root, subsumer));
+			if (!subsumer.getProperty().getSaturated()
+					.getNonRedundantCompositionsByLeftSubProperty().isEmpty()) {
 				producer.produce(
 						new ForwardLinkOfObjectHasSelf(root, subsumer));
 			}

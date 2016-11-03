@@ -47,7 +47,6 @@ import org.semanticweb.elk.reasoner.indexing.model.ElkTransitiveObjectPropertyAx
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkComposition;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectHasSelf;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversed;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkReversedExpanded;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfDisjointSubsumers;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfObjectComplementOf;
@@ -116,12 +115,6 @@ public class TracingInferencePrinter implements TracingInference.Visitor<String>
 
 	@Override
 	public String visit(BackwardLinkOfObjectSomeValuesFrom inference) {
-		return String.format("%s -| %s", inference.getConclusion(factory_),
-				inference.getPremise(factory_));
-	}
-
-	@Override
-	public String visit(BackwardLinkReversed inference) {
 		return String.format("%s -| %s", inference.getConclusion(factory_),
 				inference.getPremise(factory_));
 	}

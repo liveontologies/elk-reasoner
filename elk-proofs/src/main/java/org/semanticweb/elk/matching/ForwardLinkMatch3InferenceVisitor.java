@@ -26,7 +26,6 @@ import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2Watch;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch3;
 import org.semanticweb.elk.matching.inferences.BackwardLinkCompositionMatch4;
 import org.semanticweb.elk.matching.inferences.BackwardLinkReversedExpandedMatch2;
-import org.semanticweb.elk.matching.inferences.BackwardLinkReversedMatch2;
 import org.semanticweb.elk.matching.inferences.ForwardLinkCompositionMatch4;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
 
@@ -48,12 +47,6 @@ class ForwardLinkMatch3InferenceVisitor
 	@Override
 	public Void visit(BackwardLinkReversedExpandedMatch2 inferenceMatch2) {
 		factory.getBackwardLinkReversedExpandedMatch3(inferenceMatch2, child);
-		return null;
-	}
-
-	@Override
-	public Void visit(BackwardLinkReversedMatch2 inferenceMatch2) {
-		factory.getBackwardLinkReversedMatch3(inferenceMatch2, child);
 		return null;
 	}
 

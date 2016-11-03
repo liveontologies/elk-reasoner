@@ -102,21 +102,6 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	}
 
 	@Override
-	public String visit(BackwardLinkReversedMatch1 inferenceMatch1) {
-		return inferenceMatch1.getParent() + " | ";
-	}
-
-	@Override
-	public String visit(BackwardLinkReversedMatch2 inferenceMatch2) {
-		return inferenceMatch2.getParent() + " | ";
-	}
-
-	@Override
-	public String visit(BackwardLinkReversedMatch3 inferenceMatch3) {
-		return inferenceMatch3.getParent() + " | ";
-	}
-
-	@Override
 	public String visit(
 			ClassInconsistencyOfDisjointSubsumersMatch1 inferenceMatch1) {
 		return inferenceMatch1.getParent() + " | ";

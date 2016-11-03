@@ -89,15 +89,6 @@ public class ComposedClassInferenceVisitor
 	}
 
 	@Override
-	public Boolean visit(BackwardLinkReversed inference) {
-		for (int i = 0; i < visitors_.length; i++) {
-			if (!visitors_[i].visit(inference))
-				return false;
-		}
-		return true;
-	}
-
-	@Override
 	public Boolean visit(BackwardLinkReversedExpanded inference) {
 		for (int i = 0; i < visitors_.length; i++) {
 			if (!visitors_[i].visit(inference))
