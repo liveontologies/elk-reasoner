@@ -277,14 +277,6 @@ public abstract class AbstractReasonerState {
 	}
 
 	/**
-	 * Reset the axiom loading stage and all subsequent stages
-	 */
-	public synchronized void resetInputLoading() {
-		LOGGER_.trace("Reset axiom loading");
-		stageManager.inputLoadingStage.invalidateRecursive();
-	}
-
-	/**
 	 * Reset the property saturation stage and all subsequent stages
 	 */
 	public synchronized void resetPropertySaturation() {
@@ -316,8 +308,6 @@ public abstract class AbstractReasonerState {
 	public synchronized void registerAxiomLoader(
 			final AxiomLoader.Factory axiomLoaderFactory) {
 		LOGGER_.trace("Registering new axiom loader");
-
-		resetInputLoading();
 
 		final AxiomLoader newAxiomLoader = axiomLoaderFactory
 				.getAxiomLoader(getInterrupter());
@@ -354,6 +344,33 @@ public abstract class AbstractReasonerState {
 	 */
 	public synchronized void forceLoading() throws ElkException {
 		complete(stageManager.inputLoadingStage);
+	}
+
+	/**
+	 * @return {@code true} if there is no input pending loading, {@code false}
+	 *         otherwise.
+	 */
+	protected synchronized boolean isLoadingFinished() {
+		return (axiomLoader_ == null || axiomLoader_.isLoadingFinished())
+				&& (queryLoader_ == null || queryLoader_.isLoadingFinished());
+	}
+
+	/**
+	 * Flushes index, if needed, and completes loading if there is new input.
+	 * 
+	 * @throws ElkException
+	 */
+	protected synchronized void ensureLoading() throws ElkException {
+
+		if (!isLoadingFinished()) {
+			if (!ontologyIndex.isFullyCommitted()) {
+				complete(stageManager.incrementalAdditionStage);
+			}
+			LOGGER_.trace("Reset axiom loading");
+			stageManager.inputLoadingStage.invalidateRecursive();
+			complete(stageManager.inputLoadingStage);
+		}
+
 	}
 
 	/**
@@ -424,7 +441,7 @@ public abstract class AbstractReasonerState {
 	public synchronized boolean isInconsistent() throws ElkException {
 
 		ruleAndConclusionStats.reset();
-		forceLoading();
+		ensureLoading();
 
 		if (isIncrementalMode() && !saturationState.getContexts().isEmpty()) {
 			LOGGER_.trace("Consistency checking [incremental]");
@@ -662,14 +679,13 @@ public abstract class AbstractReasonerState {
 
 		// Load the query
 		if (classExpressionQueryState_.registerQuery(classExpression)) {
-			resetInputLoading();
 			if (queryLoader_ == null) {
 				queryLoader_ = classExpressionQueryState_
 						.getQueryLoader(getInterrupter());
 			}
 		}
+		ensureLoading();
 
-		forceLoading();
 		if (!classExpressionQueryState_.isIndexed(classExpression)) {
 			return false;
 		}
@@ -932,7 +948,7 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	protected OntologyIndex getOntologyIndex() throws ElkException {
-		forceLoading();
+		ensureLoading();
 		return ontologyIndex;
 	}
 

@@ -700,13 +700,11 @@ public class LowLevelIncrementalTBoxTest {
 	@Test
 	public void testCleanObsoleteContexts() throws ElkException {
 		TestChangesLoader loader = new TestChangesLoader();
-		TestChangesLoader changeLoader = new TestChangesLoader();
 
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new PostProcessingStageExecutor(), 1);
 
 		reasoner.setAllowIncrementalMode(false);
-		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		ElkClass a = createElkClass("A");
 		ElkClass b = createElkClass("B");
@@ -730,6 +728,9 @@ public class LowLevelIncrementalTBoxTest {
 		reasoner.getTaxonomy();
 
 		reasoner.setAllowIncrementalMode(true);
+
+		TestChangesLoader changeLoader = new TestChangesLoader();
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		changeLoader.remove(axiom1);
 
