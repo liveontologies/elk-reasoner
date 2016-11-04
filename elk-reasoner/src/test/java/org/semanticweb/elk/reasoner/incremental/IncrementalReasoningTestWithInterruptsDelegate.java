@@ -19,32 +19,26 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner;
+package org.semanticweb.elk.reasoner.incremental;
 
+import org.semanticweb.elk.reasoner.ReasoningTestWithInterruptsDelegate;
 import org.semanticweb.elk.testing.TestOutput;
 
 /**
- * A test delegate for tests with interrupts.
+ * Test delegate for incremental tests with interrupts.
  * 
  * @author Peter Skocovsky
  *
+ * @param <A>
+ *            The type of axioms that are added or removed from the input
+ *            ontology.
+ * @param <EO>
+ *            The type of expected output.
  * @param <AO>
- *            The type of actual test output.
+ *            The type of actual output.
  */
-public interface ReasoningTestWithInterruptsDelegate<AO extends TestOutput>
-		extends ReasoningTestDelegate<AO> {
-
-	/**
-	 * Called at the beginning of the test with interrupts.
-	 * 
-	 * @throws Exception
-	 */
-	void initWithInterrupts() throws Exception;
-
-	/**
-	 * @return Class of exception that is thrown when the process executed in
-	 *         {@link #getActualOutput()} is interrupted.
-	 */
-	Class<? extends Exception> getInterruptionExceptionClass();
+public interface IncrementalReasoningTestWithInterruptsDelegate<A, EO extends TestOutput, AO extends TestOutput>
+		extends IncrementalReasoningTestDelegate<A, EO, AO>,
+		ReasoningTestWithInterruptsDelegate<AO> {
 
 }

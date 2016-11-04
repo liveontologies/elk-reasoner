@@ -26,7 +26,7 @@ import java.util.Random;
 
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.reasoner.RandomReasonerInterrupter;
-import org.semanticweb.elk.reasoner.ReasoningTestWithInterruptsDelegate;
+import org.semanticweb.elk.reasoner.ReasoningTestWithOutputAndInterruptsDelegate;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestOutput;
@@ -36,7 +36,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 public abstract class OwlApiReasoningTestDelegate<AO extends TestOutput>
-		implements ReasoningTestWithInterruptsDelegate<AO> {
+		implements ReasoningTestWithOutputAndInterruptsDelegate<AO> {
 
 	public static final double INTERRUPTION_CHANCE = 0.3;
 

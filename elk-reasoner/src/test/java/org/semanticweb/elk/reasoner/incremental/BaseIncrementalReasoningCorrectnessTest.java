@@ -61,6 +61,12 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInpu
 		super(testManifest, testDelegate);
 	}
 
+	protected void load() throws Exception {
+		changingAxioms = new OnOffVector<A>(15);
+		changingAxioms.addAll(delegate_.load());
+		changingAxioms.setAllOn();
+	}
+
 	/**
 	 * The main test method
 	 * 
@@ -68,18 +74,22 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInpu
 	 */
 	@Test
 	public void incrementalReasoning() throws Exception {
-		changingAxioms = new OnOffVector<A>(15);
-		changingAxioms.addAll(delegate_.initIncremental());
-		changingAxioms.setAllOn();
+		load();
+
+		delegate_.initIncremental();
+
+		run(new OutputChecker());
+	}
+
+	public void run(final OutputChecker outputChecker) throws Exception {
 
 		final long seed = RandomSeedProvider.VALUE;
 		final Random rnd = new Random(seed);
 
-		// initial correctness check
-		correctnessCheck(delegate_.getActualOutput(),
-				delegate_.getExpectedOutput(), seed);
-
 		for (int i = 0; i < REPEAT_NUMBER; i++) {
+
+			outputChecker.check(seed);
+
 			changingAxioms.setAllOff();
 			// delete some axioms
 
@@ -97,21 +107,32 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInpu
 
 			LOGGER_.info("===DELETIONS===");
 
-			correctnessCheck(delegate_.getActualOutput(),
-					delegate_.getExpectedOutput(), seed);
+			outputChecker.check(seed);
 
 			// add the axioms back
 			delegate_.applyChanges(changingAxioms.getOnElements(),
 					IncrementalChangeType.ADD);
 
 			LOGGER_.info("===ADDITIONS===");
+		}
 
+		outputChecker.finalCheck(seed);
+	}
+
+	protected class OutputChecker {
+
+		public void check(final long seed) throws Exception {
 			correctnessCheck(delegate_.getActualOutput(),
 					delegate_.getExpectedOutput(), seed);
 		}
+
+		public void finalCheck(final long seed) throws Exception {
+			check(seed);
+		}
+
 	}
 
-	protected void randomFlip(OnOffVector<A> axioms, Random rnd,
+	private void randomFlip(OnOffVector<A> axioms, Random rnd,
 			double fraction) {
 		Collections.shuffle(axioms, rnd);
 

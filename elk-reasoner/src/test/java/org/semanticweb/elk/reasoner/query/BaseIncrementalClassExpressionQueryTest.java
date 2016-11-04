@@ -22,20 +22,20 @@
 package org.semanticweb.elk.reasoner.query;
 
 import org.junit.Assert;
-import org.semanticweb.elk.reasoner.incremental.BaseIncrementalReasoningCorrectnessTest;
-import org.semanticweb.elk.reasoner.incremental.IncrementalReasoningTestDelegate;
+import org.semanticweb.elk.reasoner.incremental.IncrementalReasoningCorrectnessTestWithInterrupts;
+import org.semanticweb.elk.reasoner.incremental.IncrementalReasoningTestWithInterruptsDelegate;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestOutput;
 
 public abstract class BaseIncrementalClassExpressionQueryTest<C, A, O extends TestOutput>
 		extends
-		BaseIncrementalReasoningCorrectnessTest<ClassQueryTestInput<C>, A, O, O, IncrementalReasoningTestDelegate<A, O, O>> {
+		IncrementalReasoningCorrectnessTestWithInterrupts<ClassQueryTestInput<C>, A, O, O, IncrementalReasoningTestWithInterruptsDelegate<A, O, O>> {
 
 	public final static String INPUT_DATA_LOCATION = "class_expression_query_test_input";
 
 	public BaseIncrementalClassExpressionQueryTest(
 			final TestManifest<ClassQueryTestInput<C>> testManifest,
-			final IncrementalReasoningTestDelegate<A, O, O> testDelegate) {
+			final IncrementalReasoningTestWithInterruptsDelegate<A, O, O> testDelegate) {
 		super(testManifest, testDelegate);
 	}
 

@@ -44,7 +44,7 @@ import org.semanticweb.elk.testing.TestOutput;
  *            The type of actual test output.
  */
 @RunWith(PolySuite.class)
-public abstract class ReasoningCorrectnessTestWithInterrupts<I extends TestInput, EO extends TestOutput, AO extends TestOutput, TM extends TestManifestWithOutput<I, EO, AO>, TD extends ReasoningTestWithInterruptsDelegate<AO>>
+public abstract class ReasoningCorrectnessTestWithInterrupts<I extends TestInput, EO extends TestOutput, AO extends TestOutput, TM extends TestManifestWithOutput<I, EO, AO>, TD extends ReasoningTestWithOutputAndInterruptsDelegate<AO>>
 		extends ReasoningCorrectnessTestWithOutput<I, EO, AO, TM, TD> {
 
 	public ReasoningCorrectnessTestWithInterrupts(final TM testManifest,

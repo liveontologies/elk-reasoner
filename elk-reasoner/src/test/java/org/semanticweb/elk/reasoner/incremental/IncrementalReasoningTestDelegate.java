@@ -45,13 +45,21 @@ public interface IncrementalReasoningTestDelegate<A, EO extends TestOutput, AO e
 		extends ReasoningTestDelegate<AO> {
 
 	/**
-	 * Called at the beginning of the incremental test. Loads test input and
-	 * selects axioms that may be added or removed from the input ontology.
+	 * Called at the beginning of the test. Loads test input and selects axioms
+	 * that may be added or removed from the input ontology.
 	 * 
 	 * @return A collection of changing axioms.
 	 * @throws Exception
 	 */
-	Collection<A> initIncremental() throws Exception;
+	Collection<A> load() throws Exception;
+
+	/**
+	 * Called at the beginning of the incremental test, but after
+	 * {@link #load()}.
+	 * 
+	 * @throws Exception
+	 */
+	void initIncremental() throws Exception;
 
 	/**
 	 * Applies the supplied changes.

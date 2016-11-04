@@ -63,6 +63,44 @@ public class TestReasonerUtils {
 	}
 
 	/**
+	 * Created a reasoner that uses default config.
+	 * 
+	 * @param axiomLoaderFactory
+	 * @param interrupter
+	 * @param stageExecutor
+	 * @return
+	 */
+	public static Reasoner createTestReasoner(
+			final AxiomLoader.Factory axiomLoaderFactory,
+			final ReasonerInterrupter interrupter,
+			final ReasonerStageExecutor stageExecutor) {
+		return new ReasonerFactory().createReasoner(axiomLoaderFactory,
+				interrupter, stageExecutor,
+				ReasonerConfiguration.getConfiguration());
+	}
+
+	/**
+	 * Created a reasoner that uses specified number of workers.
+	 * 
+	 * @param axiomLoaderFactory
+	 * @param interrupter
+	 * @param stageExecutor
+	 * @return
+	 */
+	public static Reasoner createTestReasoner(
+			final AxiomLoader.Factory axiomLoaderFactory,
+			final ReasonerInterrupter interrupter,
+			final ReasonerStageExecutor stageExecutor, final int maxWorkers) {
+		ReasonerConfiguration config = ReasonerConfiguration.getConfiguration();
+
+		config.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS,
+				String.valueOf(maxWorkers));
+
+		return new ReasonerFactory().createReasoner(axiomLoaderFactory,
+				interrupter, stageExecutor, config);
+	}
+
+	/**
 	 * Created a reasoner that fails on interrupt.
 	 * 
 	 * @param axiomLoaderFactory
@@ -187,6 +225,23 @@ public class TestReasonerUtils {
 				new Owl2FunctionalStyleParserFactory(), stream);
 		return createTestReasoner(axiomLoaderFactory, interrupter,
 				stageExecutor, ReasonerConfiguration.getConfiguration());
+	}
+
+	/**
+	 * Created a reasoner that uses specified number of workers.
+	 * 
+	 * @param stream
+	 * @param interrupter
+	 * @param stageExecutor
+	 * @return
+	 */
+	public static Reasoner createTestReasoner(final InputStream stream,
+			final ReasonerInterrupter interrupter,
+			final ReasonerStageExecutor stageExecutor, final int maxWorkers) {
+		final AxiomLoader.Factory axiomLoaderFactory = new Owl2StreamLoader.Factory(
+				new Owl2FunctionalStyleParserFactory(), stream);
+		return createTestReasoner(axiomLoaderFactory, interrupter,
+				stageExecutor, maxWorkers);
 	}
 
 	public static Reasoner createTestReasoner(

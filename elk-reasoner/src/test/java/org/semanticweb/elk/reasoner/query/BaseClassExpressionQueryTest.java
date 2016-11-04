@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.query;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.reasoner.ReasoningCorrectnessTestWithInterrupts;
-import org.semanticweb.elk.reasoner.ReasoningTestWithInterruptsDelegate;
+import org.semanticweb.elk.reasoner.ReasoningTestWithOutputAndInterruptsDelegate;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.elk.testing.TestOutput;
@@ -31,13 +31,13 @@ import org.semanticweb.elk.testing.TestOutput;
 @RunWith(PolySuite.class)
 public abstract class BaseClassExpressionQueryTest<C, O extends TestOutput>
 		extends
-		ReasoningCorrectnessTestWithInterrupts<ClassQueryTestInput<C>, O, O, TestManifestWithOutput<ClassQueryTestInput<C>, O, O>, ReasoningTestWithInterruptsDelegate<O>> {
+		ReasoningCorrectnessTestWithInterrupts<ClassQueryTestInput<C>, O, O, TestManifestWithOutput<ClassQueryTestInput<C>, O, O>, ReasoningTestWithOutputAndInterruptsDelegate<O>> {
 
 	public final static String INPUT_DATA_LOCATION = "class_expression_query_test_input";
 
 	public BaseClassExpressionQueryTest(
 			final TestManifestWithOutput<ClassQueryTestInput<C>, O, O> manifest,
-			final ReasoningTestWithInterruptsDelegate<O> delegate) {
+			final ReasoningTestWithOutputAndInterruptsDelegate<O> delegate) {
 		super(manifest, delegate);
 	}
 

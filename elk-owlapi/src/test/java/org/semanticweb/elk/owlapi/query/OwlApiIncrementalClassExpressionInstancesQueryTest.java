@@ -33,6 +33,7 @@ import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.reasoner.NodeSet;
+import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 
 @RunWith(PolySuite.class)
 public class OwlApiIncrementalClassExpressionInstancesQueryTest extends
@@ -81,6 +82,12 @@ public class OwlApiIncrementalClassExpressionInstancesQueryTest extends
 						return new OwlApiRelatedEntitiesTestOutput<OWLNamedIndividual>(
 								subNodes);
 					}
+
+					@Override
+					public Class<? extends Exception> getInterruptionExceptionClass() {
+						return ReasonerInterruptedException.class;
+					}
+
 				});
 	}
 
