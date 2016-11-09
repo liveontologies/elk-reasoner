@@ -1,5 +1,7 @@
 package org.semanticweb.elk.matching.inferences;
 
+import org.semanticweb.elk.matching.ElkMatchException;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -22,7 +24,6 @@ package org.semanticweb.elk.matching.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.matching.ElkMatchException;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch2;
 import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch2;
@@ -32,31 +33,41 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 public class PropertyRangeInheritedMatch3
 		extends AbstractInferenceMatch<PropertyRangeInheritedMatch2> {
 
-	private final ElkObjectProperty superPropertyMatch_;
+	private final ElkObjectProperty subPropertyMatch_;
 
 	PropertyRangeInheritedMatch3(PropertyRangeInheritedMatch2 parent,
 			SubPropertyChainMatch2 firstPremiseMatch) {
 		super(parent);
-		ElkSubObjectPropertyExpression subChainMatch = firstPremiseMatch
+		ElkSubObjectPropertyExpression fullSubChainMatch = firstPremiseMatch
 				.getFullSubChainMatch();
 		int subChainStartPos = firstPremiseMatch.getSubChainStartPos();
-		if (subChainMatch instanceof ElkObjectProperty
+		if (fullSubChainMatch instanceof ElkObjectProperty
 				&& subChainStartPos == 0) {
-			superPropertyMatch_ = (ElkObjectProperty) subChainMatch;
+			this.subPropertyMatch_ = (ElkObjectProperty) fullSubChainMatch;
 		} else {
 			throw new ElkMatchException(
-					firstPremiseMatch.getParent().getParent().getSubChain(),
-					subChainMatch, subChainStartPos);
+					parent.getParent().getParent().getSubProperty(),
+					fullSubChainMatch, subChainStartPos);
 		}
+		checkEquals(firstPremiseMatch, getFirstPremiseMatch(DEBUG_FACTORY));
 	}
 
-	public ElkObjectProperty getSuperPropertyMatch() {
-		return superPropertyMatch_;
+	public ElkObjectProperty getSubPropertyMatch() {
+		return subPropertyMatch_;
+	}
+
+	SubPropertyChainMatch2 getFirstPremiseMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getSubPropertyChainMatch2(
+				getParent().getFirstPremiseMatch(factory),
+				getSubPropertyMatch(), 0);
 	}
 
 	public PropertyRangeMatch2 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return getParent().getConclusionMatch(factory);
+		return factory.getPropertyRangeMatch2(
+				getParent().getParent().getConclusionMatch(factory),
+				getSubPropertyMatch(), getParent().getRangeMatch());
 	}
 
 	@Override

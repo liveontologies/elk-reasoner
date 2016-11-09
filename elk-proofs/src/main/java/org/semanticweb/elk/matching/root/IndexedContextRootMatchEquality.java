@@ -50,7 +50,8 @@ public class IndexedContextRootMatchEquality
 		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(IndexedContextRootClassExpressionMatch other) {
-				return equals(other.getValue(), match.getValue());
+				return equals(other.getValue(), match.getValue()) && equals(
+						other.getRangeMatches(), match.getRangeMatches());
 			}
 		});
 	}
@@ -60,29 +61,8 @@ public class IndexedContextRootMatchEquality
 		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(IndexedContextRootIndividualMatch other) {
-				return equals(other.getValue(), match.getValue());
-			}
-		});
-	}
-
-	@Override
-	public Boolean visit(final IndexedContextRootRangeHasValueMatch match) {
-		return other_.accept(new DefaultVisitor() {
-			@Override
-			public Boolean visit(IndexedContextRootRangeHasValueMatch other) {
-				return equals(other.getValue(), match.getValue());
-			}
-		});
-	}
-
-	@Override
-	public Boolean visit(
-			final IndexedContextRootRangeSomeValuesFromMatch match) {
-		return other_.accept(new DefaultVisitor() {
-			@Override
-			public Boolean visit(
-					IndexedContextRootRangeSomeValuesFromMatch other) {
-				return equals(other.getValue(), match.getValue());
+				return equals(other.getValue(), match.getValue()) && equals(
+						other.getRangeMatches(), match.getRangeMatches());
 			}
 		});
 	}

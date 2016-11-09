@@ -35,40 +35,40 @@ public class ClassInconsistencyOfObjectComplementOfMatch1
 
 	private final IndexedContextRootMatch originMatch_;
 
-	private ClassInconsistencyOfObjectComplementOfMatch1(
-			ClassInconsistencyOfObjectComplementOf parent,
-			IndexedContextRootMatch originMatch) {
-		super(parent);
-		this.originMatch_ = originMatch;
-	}
-
 	ClassInconsistencyOfObjectComplementOfMatch1(
 			ClassInconsistencyOfObjectComplementOf parent,
 			ClassInconsistencyMatch1 conclusionMatch) {
-		this(parent, conclusionMatch.getDestinationMatch());
+		super(parent);
+		this.originMatch_ = conclusionMatch.getDestinationMatch();
+		checkEquals(conclusionMatch, getConclusionMatch(DEBUG_FACTORY));
 	}
 
-	public IndexedContextRootMatch getOriginMatch() {
+	IndexedContextRootMatch getOriginMatch() {
 		return originMatch_;
+	}
+
+	ClassInconsistencyMatch1 getConclusionMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getClassInconsistencyMatch1(
+				getParent().getConclusion(factory), getOriginMatch());
 	}
 
 	public SubClassInclusionDecomposedMatch1 getSecondPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getSubClassInclusionDecomposedMatch1(
-				getParent().getSecondPremise(factory), originMatch_);
+				getParent().getSecondPremise(factory), getOriginMatch());
 	}
 
 	@Override
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	@Override
 	public <O> O accept(
 			SubClassInclusionDecomposedMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
-
 
 	/**
 	 * The visitor pattern for instances

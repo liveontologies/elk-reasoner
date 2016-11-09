@@ -1,6 +1,6 @@
-package org.semanticweb.elk.matching.root;
+package org.semanticweb.elk.matching.inferences;
 
-/*
+/*-
  * #%L
  * ELK Proofs Package
  * $Id:$
@@ -22,30 +22,19 @@ package org.semanticweb.elk.matching.root;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch2;
 
-public class IndexedContextRootRangeSomeValuesFromMatch
-		extends AbstractIndexedContextRootRangeMatch<ElkObjectSomeValuesFrom> {
+public class SubClassInclusionComposedEmptyObjectIntersectionOfMatch2 extends
+		AbstractSubClassInclusionComposedCanonizerMatch2<SubClassInclusionComposedEmptyObjectIntersectionOfMatch1> {
 
-	IndexedContextRootRangeSomeValuesFromMatch(ElkObjectSomeValuesFrom value) {
-		super(value);
+	SubClassInclusionComposedEmptyObjectIntersectionOfMatch2(
+			SubClassInclusionComposedEmptyObjectIntersectionOfMatch1 parent,
+			SubClassInclusionComposedMatch2 premiseMatch) {
+		super(parent, premiseMatch);
 	}
 
 	@Override
-	public ElkObjectSomeValuesFrom getValue() {
-		return super.getValue();
-	}
-
-	@Override
-	ElkClassExpression getFillerAsElkClassExpression(
-			ElkObject.Factory factory) {
-		return getValue().getFiller();
-	}
-
-	@Override
-	public <O> O accept(IndexedContextRootRangeMatch.Visitor<O> visitor) {
+	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
@@ -57,9 +46,9 @@ public class IndexedContextRootRangeSomeValuesFromMatch
 	 * @param <O>
 	 *            the type of the output
 	 */
-	interface Visitor<O> {
+	public interface Visitor<O> {
 
-		O visit(IndexedContextRootRangeSomeValuesFromMatch match);
+		O visit(SubClassInclusionComposedEmptyObjectIntersectionOfMatch2 inferenceMatch2);
 
 	}
 
@@ -71,8 +60,9 @@ public class IndexedContextRootRangeSomeValuesFromMatch
 	 */
 	public interface Factory {
 
-		IndexedContextRootRangeSomeValuesFromMatch getIndexedContextRootRangeSomeValuesFromMatch(
-				ElkObjectSomeValuesFrom value);
+		SubClassInclusionComposedEmptyObjectIntersectionOfMatch2 getSubClassInclusionComposedEmptyObjectIntersectionOfMatch2(
+				SubClassInclusionComposedEmptyObjectIntersectionOfMatch1 parent,
+				SubClassInclusionComposedMatch2 premiseMatch);
 
 	}
 

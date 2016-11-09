@@ -23,17 +23,27 @@ package org.semanticweb.elk.matching.inferences;
  */
 
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch2;
+import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch2Watch;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 
 public class BackwardLinkOfObjectHasSelfMatch2
 		extends LinkOfObjectHasSelfMatch2<BackwardLinkOfObjectHasSelfMatch1>
-		implements InferenceMatch {
+		implements InferenceMatch, BackwardLinkMatch2Watch {
+
+	private final IndexedContextRootMatch extendedOriginMatch_;
 
 	BackwardLinkOfObjectHasSelfMatch2(BackwardLinkOfObjectHasSelfMatch1 parent,
 			SubClassInclusionDecomposedMatch2 premiseMatch) {
 		super(parent, premiseMatch);
+		this.extendedOriginMatch_ = premiseMatch.getExtendedDestinationMatch();
+		checkEquals(premiseMatch, getPremiseMatch(DEBUG_FACTORY));
+	}
+
+	public IndexedContextRootMatch getExtendedOriginMatch() {
+		return extendedOriginMatch_;
 	}
 
 	public ElkObjectProperty getRelationMatch() {
@@ -41,15 +51,27 @@ public class BackwardLinkOfObjectHasSelfMatch2
 				.getDecomposedExistential().getProperty());
 	}
 
+	SubClassInclusionDecomposedMatch2 getPremiseMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getSubClassInclusionDecomposedMatch2(
+				getParent().getPremiseMatch(factory), getExtendedOriginMatch(),
+				getPremiseSuperExpressionMatch());
+	}
+
 	public BackwardLinkMatch2 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getBackwardLinkMatch2(
 				getParent().getConclusionMatch(factory),
-				getRelationMatch(), getParent().getOriginMatch());
+				getRelationMatch(), getExtendedOriginMatch());
 	}
 
 	@Override
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(BackwardLinkMatch2Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

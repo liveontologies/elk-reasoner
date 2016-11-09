@@ -2,7 +2,7 @@ package org.semanticweb.elk.matching.subsumers;
 
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch.Factory;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 
 /*
  * #%L
@@ -42,10 +42,10 @@ public class SubsumerObjectHasValueMatch
 	}
 
 	@Override
-	public ElkObject getFillerMatch() {
+	public ElkIndividual getFillerMatch() {
 		return getValue().getFiller();
 	}
-	
+
 	@Override
 	public IndexedContextRootMatch getFillerRootMatch(Factory factory) {
 		return factory
@@ -54,9 +54,9 @@ public class SubsumerObjectHasValueMatch
 
 	@Override
 	public IndexedContextRootMatch getRangeRootMatch(Factory factory) {
-		return factory.getIndexedContextRootRangeHasValueMatch(getValue());
+		return factory.getIndexedContextRootIndividualMatch(getFillerMatch());
 	}
-	
+
 	@Override
 	public <O> O accept(IndexedObjectSomeValuesFromMatch.Visitor<O> visitor) {
 		return visitor.visit(this);

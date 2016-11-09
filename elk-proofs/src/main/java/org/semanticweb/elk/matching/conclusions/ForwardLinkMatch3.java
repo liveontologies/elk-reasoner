@@ -1,7 +1,6 @@
 package org.semanticweb.elk.matching.conclusions;
 
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
-import org.semanticweb.elk.matching.root.IndexedContextRootMatchChain;
 
 /*
  * #%L
@@ -28,24 +27,16 @@ import org.semanticweb.elk.matching.root.IndexedContextRootMatchChain;
 public class ForwardLinkMatch3
 		extends AbstractClassConclusionMatch<ForwardLinkMatch2> {
 
-	private final IndexedContextRootMatchChain intermediateRoots_;
-
-	private final IndexedContextRootMatch targetMatch_;
+	private final IndexedContextRootMatch extendedTargetMatch_;
 
 	ForwardLinkMatch3(ForwardLinkMatch2 parent,
-			IndexedContextRootMatchChain intermediateRoots,
-			IndexedContextRootMatch targetMatch) {
+			IndexedContextRootMatch extendedTargetMatch) {
 		super(parent);
-		this.intermediateRoots_ = intermediateRoots;
-		this.targetMatch_ = targetMatch;
+		this.extendedTargetMatch_ = extendedTargetMatch;
 	}
 
-	public IndexedContextRootMatchChain getIntermediateRoots() {
-		return intermediateRoots_;
-	}
-
-	public IndexedContextRootMatch getTargetMatch() {
-		return targetMatch_;
+	public IndexedContextRootMatch getExtendedTargetMatch() {
+		return extendedTargetMatch_;
 	}
 
 	@Override
@@ -62,8 +53,7 @@ public class ForwardLinkMatch3
 	public interface Factory {
 
 		ForwardLinkMatch3 getForwardLinkMatch3(ForwardLinkMatch2 parent,
-				IndexedContextRootMatchChain intermediateRoots,
-				IndexedContextRootMatch targetMatch);
+				IndexedContextRootMatch extendedTargetMatch);
 
 	}
 

@@ -1,5 +1,7 @@
 package org.semanticweb.elk.matching.root;
 
+import java.util.List;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -28,18 +30,25 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
 public class IndexedContextRootClassExpressionMatch
 		extends AbstractIndexedContextRootMatch<ElkClassExpression> {
 
+	private IndexedContextRootClassExpressionMatch(ElkClassExpression value,
+			List<? extends ElkClassExpression> rangeMatches) {
+		super(value, rangeMatches);
+	}
+
 	IndexedContextRootClassExpressionMatch(ElkClassExpression value) {
 		super(value);
 	}
 
 	@Override
-	public ElkClassExpression getValue() {
-		return super.getValue();
+	public ElkClassExpression getMainFillerMatch(ElkObject.Factory factory) {
+		return getValue();
 	}
 
 	@Override
-	public ElkClassExpression toElkExpression(ElkObject.Factory factory) {
-		return getValue();
+	public IndexedContextRootClassExpressionMatch extend(
+			ElkClassExpression rangeMatch) {
+		return new IndexedContextRootClassExpressionMatch(getValue(),
+				extendRangeMatches(rangeMatch));
 	}
 
 	@Override

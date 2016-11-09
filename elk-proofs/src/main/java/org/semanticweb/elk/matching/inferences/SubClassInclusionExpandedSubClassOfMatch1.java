@@ -40,13 +40,14 @@ public class SubClassInclusionExpandedSubClassOfMatch1
 			SubClassInclusionDecomposedMatch1 conclusionMatch) {
 		super(parent);
 		originMatch_ = conclusionMatch.getDestinationMatch();
+		checkEquals(conclusionMatch, getConclusionMatch(DEBUG_FACTORY));
 	}
 
-	public IndexedContextRootMatch getOriginMatch() {
+	IndexedContextRootMatch getOriginMatch() {
 		return originMatch_;
 	}
 
-	public SubClassInclusionDecomposedMatch1 getConclusionMatch(
+	SubClassInclusionDecomposedMatch1 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getSubClassInclusionDecomposedMatch1(
 				getParent().getConclusion(factory), originMatch_);

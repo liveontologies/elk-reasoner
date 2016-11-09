@@ -40,13 +40,14 @@ public class BackwardLinkOfObjectSomeValuesFromMatch1
 			BackwardLinkMatch1 conclusionMatch) {
 		super(parent);
 		originMatch_ = conclusionMatch.getSourceMatch();
+		checkEquals(conclusionMatch, getConclusionMatch(DEBUG_FACTORY));
 	}
 
-	public IndexedContextRootMatch getOriginMatch() {
+	IndexedContextRootMatch getOriginMatch() {
 		return originMatch_;
 	}
 
-	public BackwardLinkMatch1 getConclusionMatch(
+	BackwardLinkMatch1 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getBackwardLinkMatch1(getParent().getConclusion(factory),
 				originMatch_);

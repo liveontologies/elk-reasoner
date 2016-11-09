@@ -24,7 +24,7 @@ package org.semanticweb.elk.matching.subsumers;
 
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch.Factory;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 
@@ -39,23 +39,24 @@ public class SubsumerObjectSomeValuesFromMatch extends
 	public ElkObjectPropertyExpression getPropertyMatch() {
 		return getValue().getProperty();
 	}
-	
+
 	@Override
-	public ElkObject getFillerMatch() {
+	public ElkClassExpression getFillerMatch() {
 		return getValue().getFiller();
 	}
-	
+
 	@Override
 	public IndexedContextRootMatch getFillerRootMatch(Factory factory) {
-		return factory
-				.getIndexedContextRootClassExpressionMatch(getValue().getFiller());
+		return factory.getIndexedContextRootClassExpressionMatch(
+				getValue().getFiller());
 	}
-	
+
 	@Override
 	public IndexedContextRootMatch getRangeRootMatch(Factory factory) {
-		return factory.getIndexedContextRootRangeSomeValuesFromMatch(getValue());
+		return factory
+				.getIndexedContextRootClassExpressionMatch(getFillerMatch());
 	}
-	
+
 	@Override
 	public <O> O accept(IndexedObjectSomeValuesFromMatch.Visitor<O> visitor) {
 		return visitor.visit(this);

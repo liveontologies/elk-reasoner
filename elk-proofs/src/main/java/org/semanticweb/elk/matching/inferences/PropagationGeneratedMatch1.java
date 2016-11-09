@@ -25,6 +25,7 @@ package org.semanticweb.elk.matching.inferences;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.PropagationMatch1;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
+import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.subsumers.IndexedObjectSomeValuesFromMatch;
@@ -33,7 +34,8 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagationGenerated;
 
 public class PropagationGeneratedMatch1
-		extends AbstractInferenceMatch<PropagationGenerated> {
+		extends AbstractInferenceMatch<PropagationGenerated>
+		implements SubClassInclusionComposedMatch1Watch {
 
 	private final IndexedContextRootMatch destinationMatch_;
 
@@ -47,9 +49,10 @@ public class PropagationGeneratedMatch1
 		this.destinationMatch_ = conclusionMatch.getDestinationMatch();
 		this.subDestinationMatch_ = conclusionMatch.getSubDestinationMatch();
 		this.conclusionCarryMatch_ = conclusionMatch.getCarryMatch();
+		checkEquals(conclusionMatch, getConclusionMatch(DEBUG_FACTORY));
 	}
 
-	public IndexedContextRootMatch getDestinationMatch() {
+	IndexedContextRootMatch getDestinationMatch() {
 		return destinationMatch_;
 	}
 
@@ -61,7 +64,7 @@ public class PropagationGeneratedMatch1
 		return conclusionCarryMatch_;
 	}
 
-	public PropagationMatch1 getConclusionMatch(
+	PropagationMatch1 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getPropagationMatch1(getParent().getConclusion(factory),
 				destinationMatch_, subDestinationMatch_, conclusionCarryMatch_);
@@ -84,6 +87,12 @@ public class PropagationGeneratedMatch1
 
 	@Override
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(
+			SubClassInclusionComposedMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

@@ -144,6 +144,18 @@ public class ElkInferenceOptimizedProducingFactory
 		return null;
 	}
 
+	@Override
+	public ElkClassInclusionExistentialRange getElkClassInclusionExistentialRange(
+			ElkObjectPropertyExpression property, ElkClassExpression filler,
+			List<? extends ElkClassExpression> ranges) {
+		if (ranges.isEmpty()) {
+			return null;
+		}
+		// else
+		super.getElkClassInclusionExistentialRange(property, filler, ranges);
+		return null;
+	}
+
 	/**
 	 * @param input
 	 * @return The list obtained from the input list by repeatedly removing

@@ -26,6 +26,12 @@ import java.util.Collection;
 
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1Watch;
+import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch2;
+import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch2Watch;
+import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch3;
+import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch3Watch;
+import org.semanticweb.elk.matching.conclusions.ClassInconsistencyMatch1;
+import org.semanticweb.elk.matching.conclusions.ClassInconsistencyMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatch;
 import org.semanticweb.elk.matching.conclusions.DisjointSubsumerMatch1;
 import org.semanticweb.elk.matching.conclusions.DisjointSubsumerMatch1Watch;
@@ -33,6 +39,8 @@ import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2Watch;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch3;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch3Watch;
 import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1;
@@ -43,8 +51,12 @@ import org.semanticweb.elk.matching.conclusions.IndexedSubClassOfAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedSubClassOfAxiomMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.IndexedSubObjectPropertyOfAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedSubObjectPropertyOfAxiomMatch1Watch;
+import org.semanticweb.elk.matching.conclusions.PropagationMatch1;
+import org.semanticweb.elk.matching.conclusions.PropagationMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch1;
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch1Watch;
+import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
+import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1;
@@ -104,6 +116,24 @@ class InferenceMatchMapImpl
 	}
 
 	@Override
+	public void add(BackwardLinkMatch2 conclusion,
+			BackwardLinkMatch2Watch inference) {
+		watchedInferences_.add(conclusion, inference);
+	}
+
+	@Override
+	public void add(BackwardLinkMatch3 conclusion,
+			BackwardLinkMatch3Watch inference) {
+		watchedInferences_.add(conclusion, inference);
+	}
+
+	@Override
+	public void add(ClassInconsistencyMatch1 conclusion,
+			ClassInconsistencyMatch1Watch inference) {
+		watchedInferences_.add(conclusion, inference);
+	}
+
+	@Override
 	public void add(DisjointSubsumerMatch1 conclusion,
 			DisjointSubsumerMatch1Watch inference) {
 		watchedInferences_.add(conclusion, inference);
@@ -120,6 +150,12 @@ class InferenceMatchMapImpl
 	@Override
 	public void add(ForwardLinkMatch2 conclusion,
 			ForwardLinkMatch2Watch inference) {
+		watchedInferences_.add(conclusion, inference);
+	}
+
+	@Override
+	public void add(ForwardLinkMatch3 conclusion,
+			ForwardLinkMatch3Watch inference) {
 		watchedInferences_.add(conclusion, inference);
 	}
 
@@ -158,10 +194,22 @@ class InferenceMatchMapImpl
 	}
 
 	@Override
+	public void add(PropagationMatch1 conclusion,
+			PropagationMatch1Watch inference) {
+		watchedInferences_.add(conclusion, inference);
+	}
+
+	@Override
 	public void add(PropertyRangeMatch1 conclusion,
 			PropertyRangeMatch1Watch inference) {
 		watchedInferences_.add(conclusion, inference);
 
+	}
+
+	@Override
+	public void add(SubClassInclusionComposedMatch1 conclusion,
+			SubClassInclusionComposedMatch1Watch inference) {
+		watchedInferences_.add(conclusion, inference);
 	}
 
 	@Override
@@ -193,10 +241,31 @@ class InferenceMatchMapImpl
 	}
 
 	@Override
+	public Iterable<? extends BackwardLinkMatch2Watch> get(
+			BackwardLinkMatch2 conclusion) {
+		return (Iterable<? extends BackwardLinkMatch2Watch>) getWatchInferences(
+				conclusion);
+	}
+
+	@Override
+	public Iterable<? extends BackwardLinkMatch3Watch> get(
+			BackwardLinkMatch3 conclusion) {
+		return (Iterable<? extends BackwardLinkMatch3Watch>) getWatchInferences(
+				conclusion);
+	}
+
+	@Override
 	public Iterable<? extends ClassInconsistencyInference> get(
 			ClassInconsistency conclusion) {
 		return (Iterable<? extends ClassInconsistencyInference>) inferences_
 				.getInferences(conclusion);
+	}
+
+	@Override
+	public Iterable<? extends ClassInconsistencyMatch1Watch> get(
+			ClassInconsistencyMatch1 conclusion) {
+		return (Collection<? extends ClassInconsistencyMatch1Watch>) getWatchInferences(
+				conclusion);
 	}
 
 	@Override
@@ -231,6 +300,13 @@ class InferenceMatchMapImpl
 	public Iterable<? extends ForwardLinkMatch2Watch> get(
 			ForwardLinkMatch2 conclusion) {
 		return (Collection<? extends ForwardLinkMatch2Watch>) getWatchInferences(
+				conclusion);
+	}
+
+	@Override
+	public Iterable<? extends ForwardLinkMatch3Watch> get(
+			ForwardLinkMatch3 conclusion) {
+		return (Collection<? extends ForwardLinkMatch3Watch>) getWatchInferences(
 				conclusion);
 	}
 
@@ -319,6 +395,13 @@ class InferenceMatchMapImpl
 	}
 
 	@Override
+	public Iterable<? extends PropagationMatch1Watch> get(
+			PropagationMatch1 conclusion) {
+		return (Collection<? extends PropagationMatch1Watch>) getWatchInferences(
+				conclusion);
+	}
+
+	@Override
 	public Iterable<? extends PropertyRangeInference> get(
 			PropertyRange conclusion) {
 		return (Iterable<? extends PropertyRangeInference>) inferences_
@@ -337,6 +420,13 @@ class InferenceMatchMapImpl
 			SubClassInclusionComposed conclusion) {
 		return (Iterable<? extends SubClassInclusionComposedInference>) inferences_
 				.getInferences(conclusion);
+	}
+
+	@Override
+	public Iterable<? extends SubClassInclusionComposedMatch1Watch> get(
+			SubClassInclusionComposedMatch1 conclusion) {
+		return (Collection<? extends SubClassInclusionComposedMatch1Watch>) getWatchInferences(
+				conclusion);
 	}
 
 	@Override

@@ -30,7 +30,7 @@ public class BackwardLinkMatch2
 		extends AbstractClassConclusionMatch<BackwardLinkMatch1> {
 
 	private final ElkObjectProperty relationMatch_;
-	
+
 	private final IndexedContextRootMatch destinationMatch_;
 
 	BackwardLinkMatch2(BackwardLinkMatch1 parent,
@@ -47,7 +47,7 @@ public class BackwardLinkMatch2
 	public ElkObjectProperty getRelationMatch() {
 		return relationMatch_;
 	}
-	
+
 	public IndexedContextRootMatch getDestinationMatch() {
 		return destinationMatch_;
 	}

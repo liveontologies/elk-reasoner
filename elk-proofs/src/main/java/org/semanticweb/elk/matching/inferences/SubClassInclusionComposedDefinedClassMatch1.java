@@ -44,9 +44,10 @@ public class SubClassInclusionComposedDefinedClassMatch1
 		super(parent);
 		this.originMatch_ = conclusionMatch.getDestinationMatch();
 		definedClassMatch_ = conclusionMatch.getSubsumerElkClassMatch();
+		checkEquals(conclusionMatch, getConclusionMatch(DEBUG_FACTORY));
 	}
 
-	public IndexedContextRootMatch getOriginMatch() {
+	IndexedContextRootMatch getOriginMatch() {
 		return originMatch_;
 	}
 
@@ -54,11 +55,11 @@ public class SubClassInclusionComposedDefinedClassMatch1
 		return definedClassMatch_;
 	}
 
-	public SubClassInclusionComposedMatch1 getConclusionMatch(
+	SubClassInclusionComposedMatch1 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getSubClassInclusionComposedMatch1(
-				getParent().getConclusion(factory), originMatch_,
-				definedClassMatch_);
+				getParent().getConclusion(factory), getOriginMatch(),
+				getDefinedClassMatch());
 	}
 
 	public IndexedEquivalentClassesAxiomMatch1 getSecondPremiseMatch(

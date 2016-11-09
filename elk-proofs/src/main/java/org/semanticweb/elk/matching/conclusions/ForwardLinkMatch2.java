@@ -1,6 +1,6 @@
 package org.semanticweb.elk.matching.conclusions;
 
-import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 
 /*
  * #%L
@@ -25,30 +25,20 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
  */
 
 public class ForwardLinkMatch2
-		extends
-			AbstractClassConclusionMatch<ForwardLinkMatch1> {
+		extends AbstractClassConclusionMatch<ForwardLinkMatch1> {
 
-	private final ElkSubObjectPropertyExpression fullForwardChainMatch_;
+	private final IndexedContextRootMatch targetMatch_;
 
-	private final int forwardChainStartPos_;
-	
 	ForwardLinkMatch2(ForwardLinkMatch1 parent,
-			ElkSubObjectPropertyExpression fullForwardChainMatch,
-			int forwardChainStartPos) {
+			IndexedContextRootMatch targetMatch) {
 		super(parent);
-		checkChainMatch(fullForwardChainMatch, forwardChainStartPos);
-		this.fullForwardChainMatch_ = fullForwardChainMatch;
-		this.forwardChainStartPos_ = forwardChainStartPos;
-	}
-	
-	public ElkSubObjectPropertyExpression getFullChainMatch() {
-		return fullForwardChainMatch_;
+		this.targetMatch_ = targetMatch;
 	}
 
-	public int getChainStartPos() {
-		return forwardChainStartPos_;
+	public IndexedContextRootMatch getTargetMatch() {
+		return targetMatch_;
 	}
-	
+
 	@Override
 	public <O> O accept(ClassConclusionMatch.Visitor<O> visitor) {
 		return visitor.visit(this);
@@ -63,8 +53,7 @@ public class ForwardLinkMatch2
 	public interface Factory {
 
 		ForwardLinkMatch2 getForwardLinkMatch2(ForwardLinkMatch1 parent,
-				ElkSubObjectPropertyExpression fullForwardChainMatch,
-				int forwardChainStartPos);
+				IndexedContextRootMatch targetMatch);
 
 	}
 

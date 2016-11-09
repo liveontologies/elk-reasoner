@@ -39,13 +39,14 @@ public class SubClassInclusionDecomposedFirstConjunctMatch1
 			SubClassInclusionDecomposedMatch1 conclusionMatch) {
 		super(parent);
 		originMatch_ = conclusionMatch.getDestinationMatch();
+		checkEquals(conclusionMatch, getConclusionMatch(DEBUG_FACTORY));
 	}
 
 	public IndexedContextRootMatch getOriginMatch() {
 		return originMatch_;
 	}
 
-	public SubClassInclusionDecomposedMatch1 getConclusionMatch(
+	SubClassInclusionDecomposedMatch1 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getSubClassInclusionDecomposedMatch1(
 				getParent().getConclusion(factory), originMatch_);
@@ -58,13 +59,13 @@ public class SubClassInclusionDecomposedFirstConjunctMatch1
 	}
 
 	@Override
-	public <O> O accept(
-			SubClassInclusionDecomposedMatch1Watch.Visitor<O> visitor) {
+	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
 	@Override
-	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
+	public <O> O accept(
+			SubClassInclusionDecomposedMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

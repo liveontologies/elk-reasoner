@@ -99,6 +99,22 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 	}
 
 	@Override
+	public ElkClassInclusionExistentialRange getElkClassInclusionExistentialRange(
+			ElkObjectPropertyExpression property, ElkClassExpression filler,
+			ElkClassExpression... ranges) {
+		return filter(mainFactory_.getElkClassInclusionExistentialRange(
+				property, filler, ranges));
+	}
+
+	@Override
+	public ElkClassInclusionExistentialRange getElkClassInclusionExistentialRange(
+			ElkObjectPropertyExpression property, ElkClassExpression filler,
+			List<? extends ElkClassExpression> ranges) {
+		return filter(mainFactory_.getElkClassInclusionExistentialRange(
+				property, filler, ranges));
+	}
+
+	@Override
 	public ElkClassInclusionExistentialTransitivity getElkClassInclusionExistentialTransitivity(
 			ElkObjectPropertyExpression transitiveProperty,
 			ElkClassExpression... classExpressions) {
@@ -157,6 +173,15 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 		return filter(mainFactory_
 				.getElkClassInclusionObjectIntersectionOfDecomposition(
 						conjuncts, conjunctPos));
+	}
+
+	@Override
+	public ElkClassInclusionObjectIntersectionOfInclusion getElkClassInclusionObjectIntersectionOfInclusion(
+			List<? extends ElkClassExpression> subClasses,
+			List<Integer> subPositions) {
+		return filter(
+				mainFactory_.getElkClassInclusionObjectIntersectionOfInclusion(
+						subClasses, subPositions));
 	}
 
 	@Override

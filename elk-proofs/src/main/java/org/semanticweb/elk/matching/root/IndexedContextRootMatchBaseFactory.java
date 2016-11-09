@@ -24,8 +24,6 @@ package org.semanticweb.elk.matching.root;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
-import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
-import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 
 public class IndexedContextRootMatchBaseFactory
 		implements IndexedContextRootMatch.Factory {
@@ -40,18 +38,6 @@ public class IndexedContextRootMatchBaseFactory
 	public IndexedContextRootIndividualMatch getIndexedContextRootIndividualMatch(
 			ElkIndividual value) {
 		return new IndexedContextRootIndividualMatch(value);
-	}
-
-	@Override
-	public IndexedContextRootRangeHasValueMatch getIndexedContextRootRangeHasValueMatch(
-			ElkObjectHasValue value) {
-		return new IndexedContextRootRangeHasValueMatch(value);
-	}
-
-	@Override
-	public IndexedContextRootRangeSomeValuesFromMatch getIndexedContextRootRangeSomeValuesFromMatch(
-			ElkObjectSomeValuesFrom value) {
-		return new IndexedContextRootRangeSomeValuesFromMatch(value);
 	}
 
 }

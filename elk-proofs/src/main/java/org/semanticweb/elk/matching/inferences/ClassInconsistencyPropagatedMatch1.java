@@ -35,33 +35,34 @@ public class ClassInconsistencyPropagatedMatch1
 
 	private final IndexedContextRootMatch destinationMatch_;
 
-	private ClassInconsistencyPropagatedMatch1(
-			ClassInconsistencyPropagated parent,
-			IndexedContextRootMatch originMatch) {
-		super(parent);
-		this.destinationMatch_ = originMatch;
-	}
-
 	ClassInconsistencyPropagatedMatch1(ClassInconsistencyPropagated parent,
 			ClassInconsistencyMatch1 conclusionMatch) {
-		this(parent, conclusionMatch.getDestinationMatch());
+		super(parent);
+		this.destinationMatch_ = conclusionMatch.getDestinationMatch();
+		checkEquals(conclusionMatch, getConclusionMatch(DEBUG_FACTORY));
 	}
 
-	public IndexedContextRootMatch getDestinationMatch() {
+	IndexedContextRootMatch getDestinationMatch() {
 		return destinationMatch_;
+	}
+
+	ClassInconsistencyMatch1 getConclusionMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getClassInconsistencyMatch1(
+				getParent().getConclusion(factory), getDestinationMatch());
 	}
 
 	public BackwardLinkMatch1 getFirstPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getBackwardLinkMatch1(
-				getParent().getFirstPremise(factory), destinationMatch_);
+				getParent().getFirstPremise(factory), getDestinationMatch());
 	}
 
 	@Override
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	@Override
 	public <O> O accept(BackwardLinkMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
@@ -93,6 +94,6 @@ public class ClassInconsistencyPropagatedMatch1
 				ClassInconsistencyPropagated parent,
 				ClassInconsistencyMatch1 conclusionMatch);
 
-	}	
+	}
 
 }

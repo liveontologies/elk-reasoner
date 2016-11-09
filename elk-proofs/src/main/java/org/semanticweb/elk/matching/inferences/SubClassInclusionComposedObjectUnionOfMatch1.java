@@ -24,6 +24,7 @@ package org.semanticweb.elk.matching.inferences;
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
+import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1Watch;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.subsumers.IndexedObjectUnionOfMatch;
 import org.semanticweb.elk.matching.subsumers.SubsumerObjectOneOfMatch;
@@ -32,7 +33,8 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectUnionOf;
 
 public class SubClassInclusionComposedObjectUnionOfMatch1
-		extends AbstractInferenceMatch<SubClassInclusionComposedObjectUnionOf> {
+		extends AbstractInferenceMatch<SubClassInclusionComposedObjectUnionOf>
+		implements SubClassInclusionComposedMatch1Watch {
 
 	private final IndexedContextRootMatch originMatch_;
 
@@ -45,6 +47,7 @@ public class SubClassInclusionComposedObjectUnionOfMatch1
 		this.originMatch_ = conclusionMatch.getDestinationMatch();
 		conclusionSubsumerMatch_ = conclusionMatch
 				.getSubsumerIndexedObjectUnionOfMatch();
+		checkEquals(conclusionMatch, getConclusionMatch(DEBUG_FACTORY));
 	}
 
 	public IndexedContextRootMatch getOriginMatch() {
@@ -59,7 +62,7 @@ public class SubClassInclusionComposedObjectUnionOfMatch1
 		return getParent().getPosition();
 	}
 
-	public SubClassInclusionComposedMatch1 getConclusionMatch(
+	SubClassInclusionComposedMatch1 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getSubClassInclusionComposedMatch1(
 				getParent().getConclusion(factory), originMatch_,
@@ -98,6 +101,12 @@ public class SubClassInclusionComposedObjectUnionOfMatch1
 
 	@Override
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(
+			SubClassInclusionComposedMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

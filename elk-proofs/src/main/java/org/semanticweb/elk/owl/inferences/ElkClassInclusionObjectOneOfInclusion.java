@@ -51,7 +51,7 @@ public class ElkClassInclusionObjectOneOfInclusion
 	private final List<? extends ElkIndividual> superIndividuals_;
 
 	/**
-	 * corresponding positions of elements in L2 within L2
+	 * corresponding positions of elements in L1 within L2
 	 */
 	private final List<Integer> subIndividualPositions_;
 

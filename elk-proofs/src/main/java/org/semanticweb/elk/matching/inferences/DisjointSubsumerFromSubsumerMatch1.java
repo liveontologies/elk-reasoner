@@ -35,23 +35,18 @@ public class DisjointSubsumerFromSubsumerMatch1
 
 	private final IndexedContextRootMatch originMatch_;
 
-	private DisjointSubsumerFromSubsumerMatch1(
-			DisjointSubsumerFromSubsumer parent,
-			IndexedContextRootMatch originMatch) {
-		super(parent);
-		this.originMatch_ = originMatch;
-	}
-
 	DisjointSubsumerFromSubsumerMatch1(DisjointSubsumerFromSubsumer parent,
 			DisjointSubsumerMatch1 conclusionMatch) {
-		this(parent, conclusionMatch.getDestinationMatch());
+		super(parent);
+		this.originMatch_ = conclusionMatch.getDestinationMatch();
+		checkEquals(conclusionMatch, getConclusionMatch(DEBUG_FACTORY));
 	}
 
-	public IndexedContextRootMatch getOriginMatch() {
+	IndexedContextRootMatch getOriginMatch() {
 		return originMatch_;
 	}
-	
-	public DisjointSubsumerMatch1 getConclusionMatch(
+
+	DisjointSubsumerMatch1 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getDisjointSubsumerMatch1(
 				getParent().getConclusion(factory), getOriginMatch());
@@ -67,7 +62,7 @@ public class DisjointSubsumerFromSubsumerMatch1
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	@Override
 	public <O> O accept(
 			IndexedDisjointClassesAxiomMatch1Watch.Visitor<O> visitor) {
@@ -100,6 +95,6 @@ public class DisjointSubsumerFromSubsumerMatch1
 				DisjointSubsumerFromSubsumer parent,
 				DisjointSubsumerMatch1 conclusionMatch);
 
-	}	
+	}
 
 }

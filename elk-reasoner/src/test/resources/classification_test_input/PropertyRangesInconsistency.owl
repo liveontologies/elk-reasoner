@@ -1,0 +1,14 @@
+Prefix(: = <http://example.org/>)
+Prefix(rdf: = <http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs: = <http://www.w3.org/2000/01/rdf-schema#>)
+Prefix(xsd: = <http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl: = <http://www.w3.org/2002/07/owl#>)
+Ontology(<http://example.org#property_ranges_inconsistency>
+Annotation(rdfs:label ":R has two disjoint range restrictions :C and :D. Hence :A is inconsistent")
+
+SubClassOf(:A ObjectSomeValuesFrom(:R :B))
+ObjectPropertyRange(:R :C)
+ObjectPropertyRange(:R :D)
+SubClassOf(ObjectIntersectionOf(:C :D) owl:Nothing)
+
+)

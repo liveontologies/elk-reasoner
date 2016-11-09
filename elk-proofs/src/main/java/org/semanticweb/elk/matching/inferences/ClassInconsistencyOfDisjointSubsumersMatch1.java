@@ -48,21 +48,27 @@ public class ClassInconsistencyOfDisjointSubsumersMatch1
 		this(parent, conclusionMatch.getDestinationMatch());
 	}
 
-	public IndexedContextRootMatch getOriginMatch() {
+	IndexedContextRootMatch getOriginMatch() {
 		return originMatch_;
+	}
+
+	ClassInconsistencyMatch1 getConclusionMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getClassInconsistencyMatch1(
+				getParent().getConclusion(factory), getOriginMatch());
 	}
 
 	public DisjointSubsumerMatch1 getFirstPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getDisjointSubsumerMatch1(
-				getParent().getFirstPremise(factory), originMatch_);
+				getParent().getFirstPremise(factory), getOriginMatch());
 	}
 
 	@Override
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	@Override
 	public <O> O accept(DisjointSubsumerMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
@@ -95,7 +101,5 @@ public class ClassInconsistencyOfDisjointSubsumersMatch1
 				ClassInconsistencyMatch1 conclusionMatch);
 
 	}
-
-	
 
 }

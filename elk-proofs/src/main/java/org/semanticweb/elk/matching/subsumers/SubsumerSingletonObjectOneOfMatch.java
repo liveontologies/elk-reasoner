@@ -1,5 +1,7 @@
 package org.semanticweb.elk.matching.subsumers;
 
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -33,6 +35,10 @@ public class SubsumerSingletonObjectOneOfMatch
 			throw new IllegalArgumentException(
 					"ElkObjectOneOf must be singleton: " + value);
 		}
+	}
+
+	public ElkIndividual getMember() {
+		return getValue().getIndividuals().get(0);
 	}
 
 	@Override

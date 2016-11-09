@@ -39,13 +39,14 @@ public class SubClassInclusionDecomposedSecondConjunctMatch1 extends
 			SubClassInclusionDecomposedMatch1 conclusionMatch) {
 		super(parent);
 		originMatch_ = conclusionMatch.getDestinationMatch();
+		checkEquals(conclusionMatch, getConclusionMatch(DEBUG_FACTORY));
 	}
 
 	public IndexedContextRootMatch getOriginMatch() {
 		return originMatch_;
 	}
 
-	public SubClassInclusionDecomposedMatch1 getConclusionMatch(
+	SubClassInclusionDecomposedMatch1 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getSubClassInclusionDecomposedMatch1(
 				getParent().getConclusion(factory), originMatch_);

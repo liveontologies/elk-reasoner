@@ -1,8 +1,5 @@
 package org.semanticweb.elk.matching.inferences;
 
-import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1;
-import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1Watch;
-
 /*
  * #%L
  * ELK Proofs Package
@@ -25,86 +22,59 @@ import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1Watch;
  * #L%
  */
 
+import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch2;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2;
+import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1;
+import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1Watch;
+import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch2;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
-import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
-import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
-import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 
 public class ForwardLinkCompositionMatch2
 		extends AbstractInferenceMatch<ForwardLinkCompositionMatch1>
-		implements BackwardLinkMatch1Watch {
+		implements SubPropertyChainMatch1Watch {
 
-	private final IndexedContextRootMatch destinationMatch_;
+	private final ElkObjectProperty premiseBackwardRelationMatch_;
 
-	private final ElkSubObjectPropertyExpression fullCompositionMatch_;
-
-	private final int compositionStartPos_;
+	private final IndexedContextRootMatch originMatch_;
 
 	ForwardLinkCompositionMatch2(ForwardLinkCompositionMatch1 parent,
-			ForwardLinkMatch2 conclusionMatch) {
+			BackwardLinkMatch2 firstPremiseMatch) {
 		super(parent);
-		this.destinationMatch_ = conclusionMatch.getParent()
-				.getDestinationMatch();
-		this.fullCompositionMatch_ = conclusionMatch.getFullChainMatch();
-		this.compositionStartPos_ = conclusionMatch.getChainStartPos();
+		this.premiseBackwardRelationMatch_ = firstPremiseMatch
+				.getRelationMatch();
+		this.originMatch_ = firstPremiseMatch.getDestinationMatch();
+		checkEquals(firstPremiseMatch, getFirstPremiseMatch(DEBUG_FACTORY));
 	}
 
-	public IndexedContextRootMatch getDestinationMatch() {
-		return destinationMatch_;
+	public ElkObjectProperty getPremiseBackwardRelationMatch() {
+		return premiseBackwardRelationMatch_;
 	}
 
-	public ElkSubObjectPropertyExpression getFullCompositionMatch() {
-		return fullCompositionMatch_;
+	IndexedContextRootMatch getOriginMatch() {
+		return originMatch_;
 	}
 
-	public int getCompositionStartPos() {
-		return compositionStartPos_;
-	}
-
-	public ForwardLinkMatch2 getConclusionMatch(
+	BackwardLinkMatch2 getFirstPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getForwardLinkMatch2(
-				getParent().getConclusionMatch(factory),
-				getFullCompositionMatch(), getCompositionStartPos());
+		return factory.getBackwardLinkMatch2(
+				getParent().getFirstPremiseMatch(factory),
+				getPremiseBackwardRelationMatch(), getOriginMatch());
 	}
 
-	ElkObjectPropertyExpression getFirstProperty() {
-		final int startPos = getCompositionStartPos();
-		// TODO: more rigorous matching checks
-		return getFullCompositionMatch().accept(
-				new ElkSubObjectPropertyExpressionVisitor<ElkObjectPropertyExpression>() {
-
-					@Override
-					public ElkObjectPropertyExpression visit(
-							ElkObjectPropertyChain expression) {
-						return expression.getObjectPropertyExpressions()
-								.get(startPos);
-					}
-
-					@Override
-					public ElkObjectPropertyExpression visit(
-							ElkObjectInverseOf expression) {
-						return expression;
-					}
-
-					@Override
-					public ElkObjectPropertyExpression visit(
-							ElkObjectProperty expression) {
-						return expression;
-					}
-				});
-	}
-
-	public BackwardLinkMatch1 getFirstPremiseMatch(
+	public SubPropertyChainMatch2 getSecondPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getBackwardLinkMatch1(
-				getParent().getParent().getFirstPremise(factory),
-				getDestinationMatch());
+		return factory.getSubPropertyChainMatch2(
+				getParent().getSecondPremiseMatch(factory),
+				getPremiseBackwardRelationMatch(), 0);
+	}
+
+	public SubPropertyChainMatch1 getFourthPremiseMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getSubPropertyChainMatch1(
+				getParent().getParent().getFourthPremise(factory),
+				getParent().getFullCompositionMatch(),
+				getParent().getCompositionStartPos() + 1);
 	}
 
 	@Override
@@ -113,7 +83,7 @@ public class ForwardLinkCompositionMatch2
 	}
 
 	@Override
-	public <O> O accept(BackwardLinkMatch1Watch.Visitor<O> visitor) {
+	public <O> O accept(SubPropertyChainMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
@@ -141,7 +111,7 @@ public class ForwardLinkCompositionMatch2
 
 		ForwardLinkCompositionMatch2 getForwardLinkCompositionMatch2(
 				ForwardLinkCompositionMatch1 parent,
-				ForwardLinkMatch2 conclusionMatch);
+				BackwardLinkMatch2 firstPremiseMatch);
 
 	}
 

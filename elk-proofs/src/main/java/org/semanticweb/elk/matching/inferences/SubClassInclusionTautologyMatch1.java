@@ -25,13 +25,7 @@ package org.semanticweb.elk.matching.inferences;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
-import org.semanticweb.elk.matching.root.IndexedContextRootClassExpressionMatch;
-import org.semanticweb.elk.matching.root.IndexedContextRootIndividualMatch;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
-import org.semanticweb.elk.matching.root.IndexedContextRootRangeHasValueMatch;
-import org.semanticweb.elk.matching.root.IndexedContextRootRangeSomeValuesFromMatch;
-import org.semanticweb.elk.matching.subsumers.SubsumerMatch;
-import org.semanticweb.elk.matching.subsumers.SubsumerMatches;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionTautology;
 
 public class SubClassInclusionTautologyMatch1
@@ -43,51 +37,24 @@ public class SubClassInclusionTautologyMatch1
 			SubClassInclusionDecomposedMatch1 conclusionMatch) {
 		super(parent);
 		originMatch_ = conclusionMatch.getDestinationMatch();
+		checkEquals(conclusionMatch, getParentConclusionMatch(DEBUG_FACTORY));
 	}
 
 	public IndexedContextRootMatch getOriginMatch() {
 		return originMatch_;
 	}
 
-	SubsumerMatch getSubsumerMatch() {
-		return originMatch_
-				.accept(new IndexedContextRootMatch.Visitor<SubsumerMatch>() {
-
-					@Override
-					public SubsumerMatch visit(
-							IndexedContextRootClassExpressionMatch match) {
-						return SubsumerMatches.create(match.getValue());
-					}
-
-					@Override
-					public SubsumerMatch visit(
-							IndexedContextRootIndividualMatch match) {
-						return SubsumerMatches.create(match.getValue());
-					}
-
-					@Override
-					public SubsumerMatch visit(
-							IndexedContextRootRangeHasValueMatch match) {
-						return SubsumerMatches
-								.create(match.getValue().getFiller());
-					}
-
-					@Override
-					public SubsumerMatch visit(
-							IndexedContextRootRangeSomeValuesFromMatch match) {
-						return SubsumerMatches
-								.create(match.getValue().getFiller());
-					}
-
-				});
+	public SubClassInclusionDecomposedMatch1 getParentConclusionMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getSubClassInclusionDecomposedMatch1(
+				getParent().getConclusion(factory), getOriginMatch());
 	}
 
 	public SubClassInclusionDecomposedMatch2 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getSubClassInclusionDecomposedMatch2(
-				factory.getSubClassInclusionDecomposedMatch1(
-						getParent().getConclusion(factory), originMatch_),
-				getSubsumerMatch());
+				getParentConclusionMatch(factory), getOriginMatch(),
+				getOriginMatch().getMainFillerMatch(factory));
 	}
 
 	@Override

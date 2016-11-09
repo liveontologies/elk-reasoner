@@ -1,8 +1,6 @@
-package org.semanticweb.elk.matching.root;
+package org.semanticweb.elk.matching.inferences;
 
-import java.util.Collections;
-
-/*
+/*-
  * #%L
  * ELK Proofs Package
  * $Id:$
@@ -24,31 +22,19 @@ import java.util.Collections;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
+import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch2;
 
-public class IndexedContextRootRangeHasValueMatch
-		extends AbstractIndexedContextRootRangeMatch<ElkObjectHasValue> {
+public class SubClassInclusionComposedEmptyObjectUnionOfMatch2 extends
+		AbstractSubClassInclusionComposedCanonizerMatch2<SubClassInclusionComposedEmptyObjectUnionOfMatch1> {
 
-	IndexedContextRootRangeHasValueMatch(ElkObjectHasValue value) {
-		super(value);
+	SubClassInclusionComposedEmptyObjectUnionOfMatch2(
+			SubClassInclusionComposedEmptyObjectUnionOfMatch1 parent,
+			SubClassInclusionComposedMatch2 premiseMatch) {
+		super(parent, premiseMatch);
 	}
 
 	@Override
-	public ElkObjectHasValue getValue() {
-		return super.getValue();
-	}
-
-	@Override
-	ElkClassExpression getFillerAsElkClassExpression(
-			ElkObject.Factory factory) {
-		return factory.getObjectOneOf(
-				Collections.singletonList(getValue().getFiller()));
-	}
-
-	@Override
-	public <O> O accept(IndexedContextRootRangeMatch.Visitor<O> visitor) {
+	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
@@ -60,9 +46,9 @@ public class IndexedContextRootRangeHasValueMatch
 	 * @param <O>
 	 *            the type of the output
 	 */
-	interface Visitor<O> {
+	public interface Visitor<O> {
 
-		O visit(IndexedContextRootRangeHasValueMatch match);
+		O visit(SubClassInclusionComposedEmptyObjectUnionOfMatch2 inferenceMatch2);
 
 	}
 
@@ -74,8 +60,9 @@ public class IndexedContextRootRangeHasValueMatch
 	 */
 	public interface Factory {
 
-		IndexedContextRootRangeHasValueMatch getIndexedContextRootRangeHasValueMatch(
-				ElkObjectHasValue value);
+		SubClassInclusionComposedEmptyObjectUnionOfMatch2 getSubClassInclusionComposedEmptyObjectUnionOfMatch2(
+				SubClassInclusionComposedEmptyObjectUnionOfMatch1 parent,
+				SubClassInclusionComposedMatch2 premiseMatch);
 
 	}
 

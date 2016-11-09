@@ -26,6 +26,7 @@ import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch2;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1;
 import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1Watch;
+import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch2;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 
@@ -43,21 +44,29 @@ public class BackwardLinkCompositionMatch3
 		this.premiseBackwardRelationMatch_ = firstPremiseMatch
 				.getRelationMatch();
 		this.originMatch_ = firstPremiseMatch.getDestinationMatch();
+		checkEquals(firstPremiseMatch, getFirstPremiseMatch(DEBUG_FACTORY));
 	}
 
 	public ElkObjectProperty getPremiseBackwardRelationMatch() {
 		return premiseBackwardRelationMatch_;
 	}
 
-	public IndexedContextRootMatch getOriginMatch() {
+	IndexedContextRootMatch getOriginMatch() {
 		return originMatch_;
 	}
 
-	public BackwardLinkMatch2 getFirstPremiseMatch(
+	BackwardLinkMatch2 getFirstPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getBackwardLinkMatch2(
 				getParent().getFirstPremiseMatch(factory),
 				getPremiseBackwardRelationMatch(), getOriginMatch());
+	}
+
+	public SubPropertyChainMatch2 getSecondPremiseMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getSubPropertyChainMatch2(
+				getParent().getSecondPremiseMatch(factory),
+				getPremiseBackwardRelationMatch(), 0);
 	}
 
 	public SubPropertyChainMatch1 getFourthPremiseMatch(

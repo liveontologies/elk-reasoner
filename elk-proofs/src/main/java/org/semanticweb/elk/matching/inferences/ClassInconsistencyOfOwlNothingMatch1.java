@@ -25,39 +25,48 @@ package org.semanticweb.elk.matching.inferences;
 import org.semanticweb.elk.matching.conclusions.ClassInconsistencyMatch1;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
+import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1Watch;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfOwlNothing;
 
 public class ClassInconsistencyOfOwlNothingMatch1
-		extends AbstractInferenceMatch<ClassInconsistencyOfOwlNothing> {
+		extends AbstractInferenceMatch<ClassInconsistencyOfOwlNothing>
+		implements SubClassInclusionComposedMatch1Watch {
 
 	private final IndexedContextRootMatch originMatch_;
 
-	private ClassInconsistencyOfOwlNothingMatch1(
-			ClassInconsistencyOfOwlNothing parent,
-			IndexedContextRootMatch originMatch) {
-		super(parent);
-		this.originMatch_ = originMatch;
-	}
-
 	ClassInconsistencyOfOwlNothingMatch1(ClassInconsistencyOfOwlNothing parent,
 			ClassInconsistencyMatch1 conclusionMatch) {
-		this(parent, conclusionMatch.getDestinationMatch());
+		super(parent);
+		this.originMatch_ = conclusionMatch.getDestinationMatch();
+		checkEquals(conclusionMatch, getConclusionMatch(DEBUG_FACTORY));
 	}
 
-	public IndexedContextRootMatch getOriginMatch() {
+	IndexedContextRootMatch getOriginMatch() {
 		return originMatch_;
+	}
+
+	ClassInconsistencyMatch1 getConclusionMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getClassInconsistencyMatch1(
+				getParent().getConclusion(factory), getOriginMatch());
 	}
 
 	public SubClassInclusionComposedMatch1 getPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getSubClassInclusionComposedMatch1(
-				getParent().getPremise(factory), originMatch_,
+				getParent().getPremise(factory), getOriginMatch(),
 				factory.getOwlNothing());
 	}
 
 	@Override
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(
+			SubClassInclusionComposedMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

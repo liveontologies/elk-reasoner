@@ -1,5 +1,7 @@
 package org.semanticweb.elk.matching.inferences;
 
+import org.semanticweb.elk.matching.ElkMatchException;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -27,6 +29,8 @@ import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1Watch;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkOfObjectHasSelf;
 
 public class ForwardLinkOfObjectHasSelfMatch1
@@ -35,20 +39,38 @@ public class ForwardLinkOfObjectHasSelfMatch1
 
 	private final IndexedContextRootMatch originMatch_;
 
+	private final ElkObjectProperty forwardRelationMatch_;
+
 	ForwardLinkOfObjectHasSelfMatch1(ForwardLinkOfObjectHasSelf parent,
 			ForwardLinkMatch1 conclusionMatch) {
 		super(parent);
-		originMatch_ = conclusionMatch.getDestinationMatch();
+		this.originMatch_ = conclusionMatch.getDestinationMatch();
+		ElkSubObjectPropertyExpression fullChainMatch = conclusionMatch
+				.getFullChainMatch();
+		int startPos = conclusionMatch.getChainStartPos();
+		if (fullChainMatch instanceof ElkObjectProperty
+				&& conclusionMatch.getChainStartPos() == 0) {
+			this.forwardRelationMatch_ = (ElkObjectProperty) fullChainMatch;
+		} else {
+			throw new ElkMatchException(
+					getParent().getDecomposedExistential().getProperty(),
+					fullChainMatch, startPos);
+		}
+		checkEquals(conclusionMatch, getConclusionMatch(DEBUG_FACTORY));
 	}
 
-	public IndexedContextRootMatch getOriginMatch() {
+	IndexedContextRootMatch getOriginMatch() {
 		return originMatch_;
 	}
 
-	public ForwardLinkMatch1 getConclusionMatch(
+	public ElkObjectProperty getForwardRelationMatch() {
+		return forwardRelationMatch_;
+	}
+
+	ForwardLinkMatch1 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getForwardLinkMatch1(getParent().getConclusion(factory),
-				originMatch_);
+				getOriginMatch(), getForwardRelationMatch(), 0);
 	}
 
 	public SubClassInclusionDecomposedMatch1 getPremiseMatch(

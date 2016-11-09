@@ -28,7 +28,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatch;
-import org.semanticweb.elk.matching.conclusions.ConclusionMatchCanonizerVisitor;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
 import org.semanticweb.elk.owl.inferences.ElkInference;
@@ -54,8 +53,6 @@ public class Matcher {
 
 	private final ConclusionMatch.Visitor<Void> conclusionMatcher_;
 
-	private final ConclusionMatch.Visitor<Boolean> conclusionCanonizer_;
-
 	private final InferenceMatch.Visitor<Void> inferenceMatcher_;
 
 	private final ConclusionMatchExpressionFactory conclusionMatchFactory_;
@@ -74,8 +71,6 @@ public class Matcher {
 				inferences);
 		conclusionMatcher_ = new ConclusionMatcherVisitor(inferenceMatchFactory,
 				matchedInferences);
-		conclusionCanonizer_ = new ConclusionMatchCanonizerVisitor(
-				conclusionMatchFactory_, elkInferenceFactory);
 		inferenceMatcher_ = new InferenceMatchVisitor(matchedInferences,
 				hierarchy, conclusionMatchFactory_, inferenceMatchFactory,
 				elkInferenceFactory);
@@ -125,9 +120,7 @@ public class Matcher {
 			ConclusionMatch conclusion = toDoConclusions_.poll();
 			if (conclusion != null) {
 				LOGGER_.trace("{}: process", conclusion);
-				if (!conclusion.accept(conclusionCanonizer_)) {
-					conclusion.accept(conclusionMatcher_);
-				}
+				conclusion.accept(conclusionMatcher_);
 				continue;
 			}
 			InferenceMatch inference = toDoInferences_.poll();

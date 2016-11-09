@@ -114,7 +114,7 @@ public abstract class AbstractReasonerState {
 	 * certain memory overhead because otherwise we don't store asserted axioms.
 	 */
 	final boolean BIND_AXIOMS = true;
-	
+
 	/**
 	 * The factory for creating auxiliary ElkObjects
 	 */
@@ -243,7 +243,7 @@ public abstract class AbstractReasonerState {
 		if (!allow) {
 			setNonIncrementalMode();
 		}
-		
+
 	}
 
 	public synchronized boolean isAllowIncrementalMode() {
@@ -269,7 +269,7 @@ public abstract class AbstractReasonerState {
 		if (!allowIncrementalMode_) {
 			// switching to incremental mode not allowed
 			return false;
-		}	
+		}
 		// else
 		ontologyIndex.setIncrementalMode(true);
 		return true;
@@ -291,18 +291,18 @@ public abstract class AbstractReasonerState {
 		LOGGER_.trace("Reset property saturation");
 		stageManager.propertyInitializationStage.invalidateRecursive();
 	}
-	
+
 	public synchronized void resetTaxonomy() {
 		LOGGER_.trace("Reset class taxonomy");
 		// force non-incremental taxonomy computation
-		classTaxonomyState.getWriter().clearTaxonomy(); 
+		classTaxonomyState.getWriter().clearTaxonomy();
 		stageManager.classTaxonomyComputationStage.invalidateRecursive();
 	}
-	
+
 	public synchronized void resetInstanceTaxonomy() {
 		LOGGER_.trace("Reset instance taxonomy");
 		// force non-incremental taxonomy computation
-		instanceTaxonomyState.getWriter().clearTaxonomy(); 
+		instanceTaxonomyState.getWriter().clearTaxonomy();
 		stageManager.instanceTaxonomyComputationStage.invalidateRecursive();
 	}
 
@@ -486,8 +486,7 @@ public abstract class AbstractReasonerState {
 			LOGGER_.debug("Ontology is inconsistent");
 
 			result = new SingletoneTaxonomy<ElkClass, OrphanTaxonomyNode<ElkClass>>(
-					ElkClassKeyProvider.INSTANCE,
-					getAllClasses(),
+					ElkClassKeyProvider.INSTANCE, getAllClasses(),
 					new TaxonomyNodeFactory<ElkClass, OrphanTaxonomyNode<ElkClass>, Taxonomy<ElkClass>>() {
 						@Override
 						public OrphanTaxonomyNode<ElkClass> createNode(
@@ -568,17 +567,17 @@ public abstract class AbstractReasonerState {
 									.iterator();
 							if (namedIndividualIterator.hasNext()) {
 								// there is at least one individual
-								node.addInstanceNode(new OrphanInstanceNode<ElkClass, ElkNamedIndividual>(
-										allNamedIndividuals,
-										allNamedIndividuals.size(),
-										namedIndividualIterator.next(),
-										ElkIndividualKeyProvider.INSTANCE,
-										node));
+								node.addInstanceNode(
+										new OrphanInstanceNode<ElkClass, ElkNamedIndividual>(
+												allNamedIndividuals,
+												allNamedIndividuals.size(),
+												namedIndividualIterator.next(),
+												ElkIndividualKeyProvider.INSTANCE,
+												node));
 							}
 							return node;
 						}
-					},
-					ElkIndividualKeyProvider.INSTANCE);
+					}, ElkIndividualKeyProvider.INSTANCE);
 		}
 
 		return result;
@@ -627,7 +626,8 @@ public abstract class AbstractReasonerState {
 			LOGGER_.debug("Ontology is inconsistent");
 
 			result = new SingletoneTaxonomy<ElkObjectProperty, OrphanTaxonomyNode<ElkObjectProperty>>(
-					ElkObjectPropertyKeyProvider.INSTANCE, getAllObjectProperties(),
+					ElkObjectPropertyKeyProvider.INSTANCE,
+					getAllObjectProperties(),
 					new TaxonomyNodeFactory<ElkObjectProperty, OrphanTaxonomyNode<ElkObjectProperty>, Taxonomy<ElkObjectProperty>>() {
 						@Override
 						public OrphanTaxonomyNode<ElkObjectProperty> createNode(
@@ -942,8 +942,9 @@ public abstract class AbstractReasonerState {
 	}
 
 	public synchronized void initInstanceTaxonomy() {
-		instanceTaxonomyState.getWriter().setTaxonomy(
-				new ConcurrentInstanceTaxonomy(classTaxonomyState.getTaxonomy(),
+		instanceTaxonomyState.getWriter()
+				.setTaxonomy(new ConcurrentInstanceTaxonomy(
+						classTaxonomyState.getTaxonomy(),
 						ElkIndividualKeyProvider.INSTANCE));
 	}
 
@@ -961,10 +962,10 @@ public abstract class AbstractReasonerState {
 	 * TRACING METHODS
 	 *---------------------------------------------------*/
 
-	public void visitDerivedConclusionsForSubsumption(ElkClassExpression subClass,
-			ElkClassExpression superClass,
+	public void visitDerivedConclusionsForSubsumption(
+			ElkClassExpression subClass, ElkClassExpression superClass,
 			DerivedClassConclusionVisitor visitor) throws ElkException {
-		isInconsistent();		
+		isInconsistent();
 		// checking owl:Thing consistency
 		if (consistencyCheckingState.isOwlThingInconsistent()) {
 			if (!visitor.inconsistentOwlThing(
@@ -1027,8 +1028,10 @@ public abstract class AbstractReasonerState {
 		complete(stageManager.inferenceTracingStage);
 		return traceState_;
 	}
-	
-	public TracingInferenceSet explainConclusion(ClassConclusion conclusion) throws ElkException {
+
+	public TracingInferenceSet explainConclusion(ClassConclusion conclusion)
+			throws ElkException {
+		LOGGER_.debug("{}: explaining", conclusion);
 		return explainConclusions(Collections.singleton(conclusion));
 	}
 

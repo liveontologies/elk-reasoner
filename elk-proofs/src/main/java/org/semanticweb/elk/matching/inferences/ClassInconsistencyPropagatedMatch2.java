@@ -2,6 +2,7 @@ package org.semanticweb.elk.matching.inferences;
 
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch2;
 import org.semanticweb.elk.matching.conclusions.ClassInconsistencyMatch1;
+import org.semanticweb.elk.matching.conclusions.ClassInconsistencyMatch1Watch;
 
 /*
  * #%L
@@ -30,10 +31,11 @@ import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 
 public class ClassInconsistencyPropagatedMatch2
-		extends AbstractInferenceMatch<ClassInconsistencyPropagatedMatch1> {
+		extends AbstractInferenceMatch<ClassInconsistencyPropagatedMatch1>
+		implements ClassInconsistencyMatch1Watch {
 
 	private final ElkObjectProperty premiseRelationMatch_;
-	
+
 	private final IndexedContextRootMatch originMatch_;
 
 	ClassInconsistencyPropagatedMatch2(
@@ -41,15 +43,23 @@ public class ClassInconsistencyPropagatedMatch2
 			BackwardLinkMatch2 firstPremiseMatch) {
 		super(parent);
 		this.premiseRelationMatch_ = firstPremiseMatch.getRelationMatch();
-		this.originMatch_ = firstPremiseMatch.getDestinationMatch();		
+		this.originMatch_ = firstPremiseMatch.getDestinationMatch();
+		checkEquals(firstPremiseMatch, getFirstPremiseMatch(DEBUG_FACTORY));
 	}
-	
+
 	public ElkObjectProperty getPremiseRelationMatch() {
 		return premiseRelationMatch_;
 	}
 
-	public IndexedContextRootMatch getOriginMatch() {
+	IndexedContextRootMatch getOriginMatch() {
 		return originMatch_;
+	}
+
+	BackwardLinkMatch2 getFirstPremiseMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getBackwardLinkMatch2(
+				getParent().getFirstPremiseMatch(factory),
+				getPremiseRelationMatch(), getOriginMatch());
 	}
 
 	public ClassInconsistencyMatch1 getSecondPremiseMatch(
@@ -61,6 +71,11 @@ public class ClassInconsistencyPropagatedMatch2
 
 	@Override
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(ClassInconsistencyMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

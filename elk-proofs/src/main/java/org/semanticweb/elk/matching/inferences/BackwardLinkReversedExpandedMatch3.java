@@ -23,32 +23,34 @@ package org.semanticweb.elk.matching.inferences;
  */
 
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch2;
+import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch2Watch;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch3;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
-import org.semanticweb.elk.matching.root.IndexedContextRootMatchChain;
 
 public class BackwardLinkReversedExpandedMatch3
-		extends AbstractInferenceMatch<BackwardLinkReversedExpandedMatch2> {
-
-	private IndexedContextRootMatchChain intermediateRoots_;
+		extends AbstractInferenceMatch<BackwardLinkReversedExpandedMatch2>
+		implements BackwardLinkMatch2Watch {
 
 	private final IndexedContextRootMatch destinationMatch_;
 
 	BackwardLinkReversedExpandedMatch3(
 			BackwardLinkReversedExpandedMatch2 parent,
-			ForwardLinkMatch3 firstPremiseMatch) {
+			ForwardLinkMatch2 firstPremiseMatch) {
 		super(parent);
-		intermediateRoots_ = firstPremiseMatch.getIntermediateRoots();
-		destinationMatch_ = firstPremiseMatch.getTargetMatch();
+		this.destinationMatch_ = firstPremiseMatch.getTargetMatch();
+		checkEquals(firstPremiseMatch, getFirstPremiseMatch(DEBUG_FACTORY));
 	}
 
-	public IndexedContextRootMatchChain getIntermediateRoots() {
-		return intermediateRoots_;
-	}
-
-	public IndexedContextRootMatch getDestinationMatch() {
+	IndexedContextRootMatch getDestinationMatch() {
 		return destinationMatch_;
+	}
+
+	ForwardLinkMatch2 getFirstPremiseMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getForwardLinkMatch2(
+				getParent().getFirstPremiseMatch(factory),
+				getDestinationMatch());
 	}
 
 	public BackwardLinkMatch2 getConclusionMatch(
@@ -60,6 +62,11 @@ public class BackwardLinkReversedExpandedMatch3
 
 	@Override
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(BackwardLinkMatch2Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
@@ -87,7 +94,7 @@ public class BackwardLinkReversedExpandedMatch3
 
 		BackwardLinkReversedExpandedMatch3 getBackwardLinkReversedExpandedMatch3(
 				BackwardLinkReversedExpandedMatch2 parent,
-				ForwardLinkMatch3 firstPremiseMatch);
+				ForwardLinkMatch2 firstPremiseMatch);
 
 	}
 

@@ -83,6 +83,20 @@ public class ElkInferenceBaseFactory implements ElkInference.Factory {
 	}
 
 	@Override
+	public ElkClassInclusionExistentialRange getElkClassInclusionExistentialRange(
+			ElkObjectPropertyExpression property, ElkClassExpression filler,
+			ElkClassExpression... ranges) {
+		return new ElkClassInclusionExistentialRange(property, filler, ranges);
+	}
+
+	@Override
+	public ElkClassInclusionExistentialRange getElkClassInclusionExistentialRange(
+			ElkObjectPropertyExpression property, ElkClassExpression filler,
+			List<? extends ElkClassExpression> ranges) {
+		return new ElkClassInclusionExistentialRange(property, filler, ranges);
+	}
+
+	@Override
 	public ElkClassInclusionExistentialTransitivity getElkClassInclusionExistentialTransitivity(
 			ElkObjectPropertyExpression transitiveProperty,
 			ElkClassExpression... classExpressions) {
@@ -137,6 +151,14 @@ public class ElkInferenceBaseFactory implements ElkInference.Factory {
 			List<? extends ElkClassExpression> conjuncts, int conjunctPos) {
 		return new ElkClassInclusionObjectIntersectionOfDecomposition(conjuncts,
 				conjunctPos);
+	}
+
+	@Override
+	public ElkClassInclusionObjectIntersectionOfInclusion getElkClassInclusionObjectIntersectionOfInclusion(
+			List<? extends ElkClassExpression> subClasses,
+			List<Integer> subPositions) {
+		return new ElkClassInclusionObjectIntersectionOfInclusion(subClasses,
+				subPositions);
 	}
 
 	@Override

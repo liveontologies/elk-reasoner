@@ -23,15 +23,15 @@ package org.semanticweb.elk.matching.inferences;
  */
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2;
-import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2Watch;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.IndexedSubObjectPropertyOfAxiomMatch2;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 
 public class BackwardLinkReversedExpandedMatch2
 		extends AbstractInferenceMatch<BackwardLinkReversedExpandedMatch1>
-		implements ForwardLinkMatch2Watch {
+		implements ForwardLinkMatch1Watch {
 
 	private final ElkSubObjectPropertyExpression subChainMatch_;
 
@@ -43,6 +43,8 @@ public class BackwardLinkReversedExpandedMatch2
 		super(parent);
 		this.subChainMatch_ = secondPremiseMatch.getSubPropertyChainMatch();
 		this.relationMatch_ = secondPremiseMatch.getSuperPropertyMatch();
+		checkEquals(secondPremiseMatch,
+				getSecondPremiseMatch(DEBUG_FACTORY));
 	}
 
 	public ElkSubObjectPropertyExpression getSubChainMatch() {
@@ -53,14 +55,18 @@ public class BackwardLinkReversedExpandedMatch2
 		return relationMatch_;
 	}
 
-	public ForwardLinkMatch2 getFirstPremiseMatch(
+	public ForwardLinkMatch1 getFirstPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory
-				.getForwardLinkMatch2(
-						factory.getForwardLinkMatch1(getParent().getParent()
-								.getFirstPremise(factory),
-								getParent().getOriginMatch()),
-						subChainMatch_, 0);
+		return factory.getForwardLinkMatch1(
+				getParent().getParent().getFirstPremise(factory),
+				getParent().getOriginMatch(), subChainMatch_, 0);
+	}
+
+	IndexedSubObjectPropertyOfAxiomMatch2 getSecondPremiseMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getIndexedSubObjectPropertyOfAxiomMatch2(
+				getParent().getSecondPremiseMatch(factory), getSubChainMatch(),
+				getRelationMatch());
 	}
 
 	@Override
@@ -69,7 +75,7 @@ public class BackwardLinkReversedExpandedMatch2
 	}
 
 	@Override
-	public <O> O accept(ForwardLinkMatch2Watch.Visitor<O> visitor) {
+	public <O> O accept(ForwardLinkMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

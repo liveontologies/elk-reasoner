@@ -25,6 +25,7 @@ package org.semanticweb.elk.matching;
 import org.semanticweb.elk.matching.conclusions.DisjointSubsumerMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.DisjointSubsumerMatch2;
 import org.semanticweb.elk.matching.inferences.ClassInconsistencyOfDisjointSubsumersMatch1;
+import org.semanticweb.elk.matching.inferences.ClassInconsistencyOfDisjointSubsumersMatch2;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
 
 class DisjointSubsumerMatch2InferenceVisitor
@@ -44,5 +45,12 @@ class DisjointSubsumerMatch2InferenceVisitor
 		return null;
 	}
 
+	@Override
+	public Void visit(
+			ClassInconsistencyOfDisjointSubsumersMatch2 inferenceMatch2) {
+		factory.getClassInconsistencyOfDisjointSubsumersMatch3(inferenceMatch2,
+				child);
+		return null;
+	}
 
 }

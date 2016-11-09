@@ -1,6 +1,6 @@
 package org.semanticweb.elk.matching.conclusions;
 
-/*
+/*-
  * #%L
  * ELK Proofs Package
  * $Id:$
@@ -22,21 +22,13 @@ package org.semanticweb.elk.matching.conclusions;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.PropertyRange;
 
 public class PropertyRangeMatch1
 		extends AbstractObjectPropertyConclusionMatch<PropertyRange> {
 
-	private final ElkObjectProperty propertyMatch_;
-
-	PropertyRangeMatch1(PropertyRange parent, ElkObjectProperty propertyMatch) {
+	PropertyRangeMatch1(PropertyRange parent) {
 		super(parent);
-		this.propertyMatch_ = propertyMatch;
-	}
-
-	public ElkObjectProperty getPropertyMatch() {
-		return this.propertyMatch_;
 	}
 
 	@Override
@@ -52,8 +44,7 @@ public class PropertyRangeMatch1
 	 */
 	public interface Factory {
 
-		PropertyRangeMatch1 getPropertyRangeMatch1(PropertyRange parent,
-				ElkObjectProperty propertyMatch);
+		PropertyRangeMatch1 getPropertyRangeMatch1(PropertyRange parent);
 
 	}
 

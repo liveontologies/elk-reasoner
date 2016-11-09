@@ -1,8 +1,6 @@
 package org.semanticweb.elk.matching.root;
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
-
-/*
+/*-
  * #%L
  * ELK Proofs Package
  * $Id:$
@@ -24,7 +22,8 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.owl.implementation.ElkObjectBaseFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 public class IndexedContextRootMatchPrinter
 		implements IndexedContextRootMatch.Visitor<String> {
@@ -39,30 +38,20 @@ public class IndexedContextRootMatchPrinter
 		return match.accept(INSTANCE_);
 	}
 
+	private final ElkObject.Factory factory_ = new ElkObjectBaseFactory();
+
 	private IndexedContextRootMatchPrinter() {
 
 	}
 
 	@Override
 	public String visit(IndexedContextRootClassExpressionMatch match) {
-		return match.getValue().toString();
+		return match.toElkExpression(factory_).toString();
 	}
 
 	@Override
 	public String visit(IndexedContextRootIndividualMatch match) {
-		return match.getValue().toString();
-	}
-
-	@Override
-	public String visit(IndexedContextRootRangeHasValueMatch match) {
-		ElkObjectHasValue value = match.getValue();
-		return "{" + value.getFiller() + "} ⊓ ∃" + value.getProperty() + "-.";
-	}
-
-	@Override
-	public String visit(IndexedContextRootRangeSomeValuesFromMatch match) {
-		ElkObjectSomeValuesFrom value = match.getValue();
-		return value.getFiller() + " ⊓ ∃" + value.getProperty() + "-.";
+		return match.toElkExpression(factory_).toString();
 	}
 
 }

@@ -1,6 +1,8 @@
 package org.semanticweb.elk.matching.conclusions;
 
-import org.semanticweb.elk.matching.inferences.ForwardLinkCompositionMatch1;
+import org.semanticweb.elk.matching.inferences.BackwardLinkCompositionMatch4;
+import org.semanticweb.elk.matching.inferences.BackwardLinkReversedExpandedMatch2;
+import org.semanticweb.elk.matching.inferences.ForwardLinkCompositionMatch3;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
 
 /*
@@ -37,7 +39,9 @@ public interface ForwardLinkMatch1Watch extends InferenceMatch {
 	 * @param <O>
 	 *            the type of the output
 	 */
-	interface Visitor<O> extends ForwardLinkCompositionMatch1.Visitor<O> {
+	interface Visitor<O> extends BackwardLinkCompositionMatch4.Visitor<O>,
+			BackwardLinkReversedExpandedMatch2.Visitor<O>,
+			ForwardLinkCompositionMatch3.Visitor<O> {
 
 		// combined interface
 

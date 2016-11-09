@@ -25,11 +25,13 @@ package org.semanticweb.elk.matching.inferences;
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch2;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.PropagationMatch1;
+import org.semanticweb.elk.matching.conclusions.PropagationMatch1Watch;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 
 public class SubClassInclusionComposedObjectSomeValuesFromMatch2 extends
-		AbstractInferenceMatch<SubClassInclusionComposedObjectSomeValuesFromMatch1> {
+		AbstractInferenceMatch<SubClassInclusionComposedObjectSomeValuesFromMatch1>
+		implements PropagationMatch1Watch {
 
 	private final ElkObjectProperty propagationRelationMatch_;
 
@@ -37,21 +39,22 @@ public class SubClassInclusionComposedObjectSomeValuesFromMatch2 extends
 
 	SubClassInclusionComposedObjectSomeValuesFromMatch2(
 			SubClassInclusionComposedObjectSomeValuesFromMatch1 parent,
-			BackwardLinkMatch2 secondPremiseMatch) {
+			BackwardLinkMatch2 firstPremiseMatch) {
 		super(parent);
-		this.propagationRelationMatch_ = secondPremiseMatch.getRelationMatch();
-		this.originMatch_ = secondPremiseMatch.getDestinationMatch();
+		this.propagationRelationMatch_ = firstPremiseMatch.getRelationMatch();
+		this.originMatch_ = firstPremiseMatch.getDestinationMatch();
+		checkEquals(firstPremiseMatch, getFirstPremiseMatch(DEBUG_FACTORY));
 	}
 
 	public ElkObjectProperty getPropagationRelationMatch() {
 		return propagationRelationMatch_;
 	}
 
-	public IndexedContextRootMatch getOriginMatch() {
+	IndexedContextRootMatch getOriginMatch() {
 		return originMatch_;
 	}
 
-	public BackwardLinkMatch2 getFirstPremiseMatch(
+	BackwardLinkMatch2 getFirstPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory
 				.getBackwardLinkMatch2(
@@ -59,19 +62,24 @@ public class SubClassInclusionComposedObjectSomeValuesFromMatch2 extends
 								getParent().getParent()
 										.getFirstPremise(factory),
 								getParent().getDestinationMatch()),
-						propagationRelationMatch_, originMatch_);
+						getPropagationRelationMatch(), getOriginMatch());
 	}
 
 	public PropagationMatch1 getSecondPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getPropagationMatch1(
-				getParent().getParent().getSecondPremise(factory), originMatch_,
-				propagationRelationMatch_,
+				getParent().getParent().getSecondPremise(factory),
+				getOriginMatch(), getPropagationRelationMatch(),
 				getParent().getConclusionSubsumerMatch());
 	}
 
 	@Override
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(PropagationMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
