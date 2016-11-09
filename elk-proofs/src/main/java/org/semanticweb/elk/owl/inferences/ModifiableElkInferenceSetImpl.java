@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.semanticweb.elk.exceptions.ElkRuntimeException;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -61,6 +63,13 @@ public class ModifiableElkInferenceSetImpl
 	public void produce(ElkInference inference) {
 		LOGGER_.trace("{}: inference produced", inference);
 		ElkAxiom conclusion = inference.getConclusion(elkFactory_);
+		for (int i = 0; i < inference.getPremiseCount(); i++) {
+			ElkAxiom premise = inference.getPremise(i, elkFactory_);
+			if (!inferenceMap_.keySet().contains(premise)) {
+				throw new ElkRuntimeException(
+						inference + ": premise not derived: " + premise);
+			}
+		}
 		inferenceMap_.add(conclusion, inference);
 		if (queried_.remove(conclusion)) {
 			fireChanged();

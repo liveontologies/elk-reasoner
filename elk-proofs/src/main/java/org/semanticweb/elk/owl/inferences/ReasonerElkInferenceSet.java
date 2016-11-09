@@ -97,27 +97,27 @@ public class ReasonerElkInferenceSet extends ModifiableElkInferenceSetImpl {
 				public boolean inconsistentIndividual(
 						ClassInconsistency conclusion, ElkIndividual entity)
 						throws ElkException {
-					inferenceFactory_
-							.getElkClassInclusionOfInconsistentIndividual(
-									entity);
 					Matcher matcher = new Matcher(
 							reasoner_.explainConclusion(conclusion),
 							elkFactory_, inferenceFactory_);
 					matcher.trace(conclusion, entity);
+					inferenceFactory_
+							.getElkClassInclusionOfInconsistentIndividual(
+									entity);
 					return true;
 				}
 
 				@Override
 				public boolean inconsistentSubClass(
 						ClassInconsistency conclusion) throws ElkException {
-					inferenceFactory_
-							.getElkClassInclusionOwlNothing(superClass);
-					inferenceFactory_.getElkClassInclusionHierarchy(subClass,
-							elkFactory_.getOwlNothing(), superClass);
 					Matcher matcher = new Matcher(
 							reasoner_.explainConclusion(conclusion),
 							elkFactory_, inferenceFactory_);
 					matcher.trace(conclusion, subClass);
+					inferenceFactory_
+							.getElkClassInclusionOwlNothing(superClass);
+					inferenceFactory_.getElkClassInclusionHierarchy(subClass,
+							elkFactory_.getOwlNothing(), superClass);
 					return true;
 				}
 
