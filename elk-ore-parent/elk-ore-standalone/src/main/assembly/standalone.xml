@@ -5,21 +5,19 @@
 	<id>elk-ore-standalone</id>
 	<baseDirectory>elk-ore-standalone</baseDirectory>
 	<formats>
-		<!-- the type of the archive -->
 		<format>jar</format>
 	</formats>
-  <includeBaseDirectory>false</includeBaseDirectory>
+	<files>
+		<file>
+			<source>${basedir}/src/main/resources/log4j.properties</source>
+		</file>
+	</files>
+	<includeBaseDirectory>false</includeBaseDirectory>
 	<dependencySets>
-		<!-- the description of the maven packages to be bundled in the archive -->
 		<dependencySet>
-      <excludes>
-        <exclude>org.slf4j:slf4j-api</exclude>
-        <exclude>log4j:log4j</exclude>
-      </excludes>
-      <outputDirectory>/</outputDirectory>
-      <useProjectArtifact>false</useProjectArtifact>
-      <unpack>true</unpack>
-      <scope>runtime</scope>
+			<unpack>true</unpack>
+			<scope>runtime</scope>
+			<useProjectArtifact>false</useProjectArtifact>
 		</dependencySet>
 	</dependencySets>
 </assembly>

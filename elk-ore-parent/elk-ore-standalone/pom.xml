@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -26,12 +27,9 @@
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
-          <finalName>elk-ore</finalName>
-					<!--descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs-->
-          <descriptors>
-  					<descriptor>${basedir}/src/main/assembly/standalone.xml</descriptor>
+					<finalName>elk-ore</finalName>
+					<descriptors>
+						<descriptor>${basedir}/src/main/assembly/standalone.xml</descriptor>
 					</descriptors>
 					<archive>
 						<manifestEntries>
@@ -41,9 +39,6 @@
 						<manifest>
 							<mainClass>org.semanticweb.elk.ore.NativeRunner</mainClass>
 						</manifest>
-            <manifestEntries>
-              <Class-Path>./lib/log4j-1.2.17.jar ./lib/slf4j-api-1.7.6.jar ./lib/slf4j-log4j12-1.7.6.jar</Class-Path>
-            </manifestEntries>
 					</archive>
 					<appendAssemblyId>false</appendAssemblyId>
 				</configuration>

@@ -13,21 +13,10 @@
 	<name>ELK Common Utilities</name>
 	<description>ELK utilities that are not (yet) organized into independent modules</description>
 
-
 	<dependencies>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<scope>test</scope>
-		</dependency>
 		<dependency> 
         	<groupId>org.slf4j</groupId>
         	<artifactId>slf4j-api</artifactId>
-      	</dependency>
-      	<dependency> 
-        	<groupId>org.slf4j</groupId>
-        	<artifactId>slf4j-log4j12</artifactId>
-        	<scope>test</scope>
       	</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>

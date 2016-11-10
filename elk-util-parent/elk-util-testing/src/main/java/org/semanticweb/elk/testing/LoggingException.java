@@ -1,20 +1,12 @@
-/**
- * 
- */
-/**
- * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- */
-package org.semanticweb.elk;
+package org.semanticweb.elk.testing;
 
-/*
+/*-
  * #%L
- * ELK Common Utilities
+ * ELK Utilities for Testing
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,3 +21,16 @@ package org.semanticweb.elk;
  * limitations under the License.
  * #L%
  */
+
+public class LoggingException extends RuntimeException {
+
+	public LoggingException(String message) {
+		super(message);
+	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4054922720143939698L;
+
+}
