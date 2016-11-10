@@ -43,6 +43,7 @@ public class SubPropertyChainTautologyMatch1
 		super(parent);
 		fullChainMatch_ = conclusionMatch.getFullSuperChainMatch();
 		chainStartPos_ = conclusionMatch.getSuperChainStartPos();
+		checkEquals(conclusionMatch, getParentConclusionMatch(DEBUG_FACTORY));
 	}
 
 	public ElkObjectPropertyExpression getPropertyExpressionMatch() {
@@ -70,14 +71,18 @@ public class SubPropertyChainTautologyMatch1
 		return chainStartPos_;
 	}
 
+	public SubPropertyChainMatch1 getParentConclusionMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getSubPropertyChainMatch1(
+				getParent().getConclusion(factory), fullChainMatch_,
+				chainStartPos_);
+	}
+
 	public SubPropertyChainMatch2 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory
-				.getSubPropertyChainMatch2(
-						factory.getSubPropertyChainMatch1(
-								getParent().getConclusion(factory),
-								fullChainMatch_, chainStartPos_),
-						fullChainMatch_, chainStartPos_);
+		return factory.getSubPropertyChainMatch2(
+				getParentConclusionMatch(factory), fullChainMatch_,
+				chainStartPos_);
 	}
 
 	@Override

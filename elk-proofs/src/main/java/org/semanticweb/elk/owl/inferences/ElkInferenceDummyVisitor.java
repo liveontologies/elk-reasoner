@@ -73,6 +73,11 @@ public class ElkInferenceDummyVisitor<O> implements ElkInference.Visitor<O> {
 	}
 
 	@Override
+	public O visit(ElkClassInclusionExistentialRange inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
 	public O visit(ElkClassInclusionExistentialTransitivity inference) {
 		return defaultVisit(inference);
 	}
@@ -95,6 +100,11 @@ public class ElkInferenceDummyVisitor<O> implements ElkInference.Visitor<O> {
 	@Override
 	public O visit(
 			ElkClassInclusionObjectIntersectionOfDecomposition inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(ElkClassInclusionObjectIntersectionOfInclusion inference) {
 		return defaultVisit(inference);
 	}
 

@@ -1,6 +1,7 @@
 package org.semanticweb.elk.matching;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -28,6 +29,10 @@ import java.util.List;
 
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch2;
+import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch3;
+import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch4;
+import org.semanticweb.elk.matching.conclusions.ClassInconsistencyMatch1;
+import org.semanticweb.elk.matching.conclusions.ClassInconsistencyMatch2;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchHierarchy;
 import org.semanticweb.elk.matching.conclusions.DisjointSubsumerMatch1;
@@ -35,6 +40,7 @@ import org.semanticweb.elk.matching.conclusions.DisjointSubsumerMatch2;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch3;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch4;
 import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch2;
 import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1;
@@ -45,97 +51,17 @@ import org.semanticweb.elk.matching.conclusions.IndexedSubClassOfAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedSubClassOfAxiomMatch2;
 import org.semanticweb.elk.matching.conclusions.IndexedSubObjectPropertyOfAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedSubObjectPropertyOfAxiomMatch2;
+import org.semanticweb.elk.matching.conclusions.PropagationMatch1;
+import org.semanticweb.elk.matching.conclusions.PropagationMatch2;
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch1;
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch2;
+import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
+import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch2;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
 import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1;
 import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch2;
-import org.semanticweb.elk.matching.inferences.BackwardLinkCompositionMatch1;
-import org.semanticweb.elk.matching.inferences.BackwardLinkCompositionMatch2;
-import org.semanticweb.elk.matching.inferences.BackwardLinkCompositionMatch3;
-import org.semanticweb.elk.matching.inferences.BackwardLinkCompositionMatch4;
-import org.semanticweb.elk.matching.inferences.BackwardLinkCompositionMatch5;
-import org.semanticweb.elk.matching.inferences.BackwardLinkOfObjectHasSelfMatch1;
-import org.semanticweb.elk.matching.inferences.BackwardLinkOfObjectHasSelfMatch2;
-import org.semanticweb.elk.matching.inferences.BackwardLinkOfObjectSomeValuesFromMatch1;
-import org.semanticweb.elk.matching.inferences.BackwardLinkOfObjectSomeValuesFromMatch2;
-import org.semanticweb.elk.matching.inferences.BackwardLinkReversedExpandedMatch1;
-import org.semanticweb.elk.matching.inferences.BackwardLinkReversedExpandedMatch2;
-import org.semanticweb.elk.matching.inferences.BackwardLinkReversedExpandedMatch3;
-import org.semanticweb.elk.matching.inferences.ClassInconsistencyOfDisjointSubsumersMatch1;
-import org.semanticweb.elk.matching.inferences.ClassInconsistencyOfDisjointSubsumersMatch2;
-import org.semanticweb.elk.matching.inferences.ClassInconsistencyOfObjectComplementOfMatch1;
-import org.semanticweb.elk.matching.inferences.ClassInconsistencyOfObjectComplementOfMatch2;
-import org.semanticweb.elk.matching.inferences.ClassInconsistencyOfOwlNothingMatch1;
-import org.semanticweb.elk.matching.inferences.ClassInconsistencyPropagatedMatch1;
-import org.semanticweb.elk.matching.inferences.ClassInconsistencyPropagatedMatch2;
-import org.semanticweb.elk.matching.inferences.DisjointSubsumerFromSubsumerMatch1;
-import org.semanticweb.elk.matching.inferences.DisjointSubsumerFromSubsumerMatch2;
-import org.semanticweb.elk.matching.inferences.ElkClassAssertionAxiomConversionMatch1;
-import org.semanticweb.elk.matching.inferences.ElkDifferentIndividualsAxiomBinaryConversionMatch1;
-import org.semanticweb.elk.matching.inferences.ElkDifferentIndividualsAxiomNaryConversionMatch1;
-import org.semanticweb.elk.matching.inferences.ElkDisjointClassesAxiomBinaryConversionMatch1;
-import org.semanticweb.elk.matching.inferences.ElkDisjointClassesAxiomNaryConversionMatch1;
-import org.semanticweb.elk.matching.inferences.ElkDisjointUnionAxiomBinaryConversionMatch1;
-import org.semanticweb.elk.matching.inferences.ElkDisjointUnionAxiomEquivalenceConversionMatch1;
-import org.semanticweb.elk.matching.inferences.ElkDisjointUnionAxiomNaryConversionMatch1;
-import org.semanticweb.elk.matching.inferences.ElkDisjointUnionAxiomOwlNothingConversionMatch1;
-import org.semanticweb.elk.matching.inferences.ElkDisjointUnionAxiomSubClassConversionMatch1;
-import org.semanticweb.elk.matching.inferences.ElkEquivalentClassesAxiomEquivalenceConversionMatch1;
-import org.semanticweb.elk.matching.inferences.ElkEquivalentClassesAxiomSubClassConversionMatch1;
-import org.semanticweb.elk.matching.inferences.ElkEquivalentObjectPropertiesAxiomConversionMatch1;
-import org.semanticweb.elk.matching.inferences.ElkObjectPropertyAssertionAxiomConversionMatch1;
-import org.semanticweb.elk.matching.inferences.ElkObjectPropertyDomainAxiomConversionMatch1;
-import org.semanticweb.elk.matching.inferences.ElkObjectPropertyRangeAxiomConversionMatch1;
-import org.semanticweb.elk.matching.inferences.ElkReflexiveObjectPropertyAxiomConversionMatch1;
-import org.semanticweb.elk.matching.inferences.ElkSameIndividualAxiomConversionMatch1;
-import org.semanticweb.elk.matching.inferences.ElkSubClassOfAxiomConversionMatch1;
-import org.semanticweb.elk.matching.inferences.ElkSubObjectPropertyOfAxiomConversionMatch1;
-import org.semanticweb.elk.matching.inferences.ElkTransitiveObjectPropertyAxiomConversionMatch1;
-import org.semanticweb.elk.matching.inferences.ForwardLinkCompositionMatch1;
-import org.semanticweb.elk.matching.inferences.ForwardLinkCompositionMatch2;
-import org.semanticweb.elk.matching.inferences.ForwardLinkCompositionMatch3;
-import org.semanticweb.elk.matching.inferences.ForwardLinkCompositionMatch4;
-import org.semanticweb.elk.matching.inferences.ForwardLinkCompositionMatch5;
-import org.semanticweb.elk.matching.inferences.ForwardLinkOfObjectHasSelfMatch1;
-import org.semanticweb.elk.matching.inferences.ForwardLinkOfObjectHasSelfMatch2;
-import org.semanticweb.elk.matching.inferences.ForwardLinkOfObjectSomeValuesFromMatch1;
-import org.semanticweb.elk.matching.inferences.ForwardLinkOfObjectSomeValuesFromMatch2;
-import org.semanticweb.elk.matching.inferences.InferenceMatch;
-import org.semanticweb.elk.matching.inferences.PropagationGeneratedMatch1;
-import org.semanticweb.elk.matching.inferences.PropertyRangeInheritedMatch1;
-import org.semanticweb.elk.matching.inferences.PropertyRangeInheritedMatch2;
-import org.semanticweb.elk.matching.inferences.PropertyRangeInheritedMatch3;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionComposedDefinedClassMatch1;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionComposedDefinedClassMatch2;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionComposedEntityMatch1;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionComposedObjectIntersectionOfMatch1;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionComposedObjectSomeValuesFromMatch1;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionComposedObjectSomeValuesFromMatch2;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionComposedObjectUnionOfMatch1;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionDecomposedFirstConjunctMatch1;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionDecomposedFirstConjunctMatch2;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionDecomposedSecondConjunctMatch1;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionDecomposedSecondConjunctMatch2;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionExpandedDefinitionMatch1;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionExpandedDefinitionMatch2;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionExpandedFirstEquivalentClassMatch1;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionExpandedFirstEquivalentClassMatch2;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionExpandedSecondEquivalentClassMatch1;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionExpandedSecondEquivalentClassMatch2;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionExpandedSubClassOfMatch1;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionExpandedSubClassOfMatch2;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionObjectHasSelfPropertyRangeMatch1;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionObjectHasSelfPropertyRangeMatch2;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionObjectHasSelfPropertyRangeMatch3;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionOwlThingMatch1;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionRangeMatch1;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionRangeMatch2;
-import org.semanticweb.elk.matching.inferences.SubClassInclusionTautologyMatch1;
-import org.semanticweb.elk.matching.inferences.SubPropertyChainExpandedSubObjectPropertyOfMatch1;
-import org.semanticweb.elk.matching.inferences.SubPropertyChainExpandedSubObjectPropertyOfMatch2;
-import org.semanticweb.elk.matching.inferences.SubPropertyChainTautologyMatch1;
+import org.semanticweb.elk.matching.inferences.*;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatchChain;
 import org.semanticweb.elk.matching.subsumers.IndexedObjectSomeValuesFromMatch;
@@ -155,6 +81,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
+import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
@@ -163,6 +90,8 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyDomainAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
@@ -214,7 +143,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		this.elkInferenceFactory_ = elkInferenceFactory;
 	}
 
-	List<ElkClassExpression> addToList(List<ElkClassExpression> result,
+	private List<ElkClassExpression> addToList(List<ElkClassExpression> result,
 			IndexedContextRootMatchChain intermediate,
 			IndexedContextRootMatch last) {
 		for (IndexedContextRootMatchChain todo = intermediate; todo != null; todo = todo
@@ -225,11 +154,75 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		return result;
 	}
 
-	ElkClassExpression toElkExpression(IndexedContextRootMatch rootMatch) {
+	/**
+	 * Generates inferences for SubClassInclusion(extendedRootMatchExpression
+	 * rootMatchExpression ) where the arguments correspond to the values of
+	 * respectively extendedRootMatch and rootMatch under
+	 * {@link #toElkExpression(IndexedContextRootMatch)}
+	 * 
+	 * @param extendedRootMatch
+	 *            must be an extension of rootMatch (i.e., obtained by sequence
+	 *            of calls
+	 *            {@link IndexedContextRootMatch#extend(ElkClassExpression)}
+	 * @param rootMatch
+	 */
+	private void deriveInclusion(IndexedContextRootMatch extendedRootMatch,
+			IndexedContextRootMatch rootMatch) {
+		if (rootMatch.equals(extendedRootMatch)) {
+			// nothing to do
+			return;
+		}
+		List<? extends ElkClassExpression> rootFillers = getFillerRanges(
+				rootMatch);
+		List<? extends ElkClassExpression> extendedRootFillers = getFillerRanges(
+				extendedRootMatch);
+		int rootFillersCount = rootFillers.size();
+		if (rootFillersCount == 1) {
+			elkInferenceFactory_
+					.getElkClassInclusionObjectIntersectionOfDecomposition(
+							extendedRootFillers, 0);
+		} else {
+			List<Integer> positions = new ArrayList<Integer>(rootFillersCount);
+			for (int i = 0; i < rootFillersCount; i++) {
+				positions.add(i);
+			}
+			elkInferenceFactory_
+					.getElkClassInclusionObjectIntersectionOfInclusion(
+							extendedRootFillers, positions);
+		}
+	}
+
+	private ElkClassExpression getFillerMatch(
+			IndexedObjectSomeValuesFromMatch match) {
+		return match.accept(
+				new IndexedObjectSomeValuesFromMatch.Visitor<ElkClassExpression>() {
+
+					@Override
+					public ElkClassExpression visit(
+							SubsumerObjectHasValueMatch match) {
+						return conclusionFactory_.getObjectOneOf(Collections
+								.singletonList(match.getValue().getFiller()));
+					}
+
+					@Override
+					public ElkClassExpression visit(
+							SubsumerObjectSomeValuesFromMatch match) {
+						return match.getValue().getFiller();
+					}
+				});
+	}
+
+	private List<? extends ElkClassExpression> getFillerRanges(
+			IndexedContextRootMatch rootMatch) {
+		return rootMatch.getFillerMatches(conclusionFactory_);
+	}
+
+	private ElkClassExpression toElkExpression(
+			IndexedContextRootMatch rootMatch) {
 		return rootMatch.toElkExpression(conclusionFactory_);
 	}
 
-	List<? extends ElkObjectPropertyExpression> toList(
+	private List<? extends ElkObjectPropertyExpression> toList(
 			ElkSubObjectPropertyExpression chain) {
 		return chain.accept(
 				new ElkSubObjectPropertyExpressionVisitor<List<? extends ElkObjectPropertyExpression>>() {
@@ -255,27 +248,26 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 				});
 	}
 
-	List<? extends ElkClassExpression> toList(IndexedContextRootMatch first,
-			IndexedContextRootMatch second, IndexedContextRootMatch last) {
-		return toList(first, second, null, last);
-	}
-
-	List<? extends ElkClassExpression> toList(IndexedContextRootMatch first,
-			IndexedContextRootMatch second,
-			IndexedContextRootMatchChain intermediate,
+	private List<? extends ElkClassExpression> toList(
+			IndexedContextRootMatch first, IndexedContextRootMatch second,
 			IndexedContextRootMatch last) {
-		List<ElkClassExpression> result = new ArrayList<ElkClassExpression>();
-		result.add(toElkExpression(first));
-		result.add(toElkExpression(second));
-		return addToList(result, intermediate, last);
+		return Arrays.asList(toElkExpression(first), toElkExpression(second),
+				toElkExpression(last));
 	}
 
-	List<? extends ElkClassExpression> toList(IndexedContextRootMatch first,
+	private List<? extends ElkClassExpression> toList(
+			IndexedContextRootMatch first,
 			IndexedContextRootMatchChain intermediate,
 			IndexedContextRootMatch last) {
 		List<ElkClassExpression> result = new ArrayList<ElkClassExpression>();
 		result.add(toElkExpression(first));
 		return addToList(result, intermediate, last);
+	}
+
+	private List<? extends ElkClassExpression> toList(
+			IndexedContextRootMatchChain chain, IndexedContextRootMatch last) {
+		List<ElkClassExpression> result = new ArrayList<ElkClassExpression>();
+		return addToList(result, chain, last);
 	}
 
 	@Override
@@ -305,6 +297,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(BackwardLinkCompositionMatch3 inferenceMatch3) {
+		inferenceMatch3.getSecondPremiseMatch(conclusionFactory_);
 		SubPropertyChainMatch1 premiseMatch1 = inferenceMatch3
 				.getFourthPremiseMatch(conclusionFactory_);
 		inferences_.add(premiseMatch1, inferenceMatch3);
@@ -318,11 +311,11 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(BackwardLinkCompositionMatch4 inferenceMatch4) {
-		ForwardLinkMatch2 premiseMatch2 = inferenceMatch4
+		ForwardLinkMatch1 premiseMatch2 = inferenceMatch4
 				.getThirdPremiseMatch(conclusionFactory_);
 		inferences_.add(premiseMatch2, inferenceMatch4);
-		for (ForwardLinkMatch3 child : hierarchy_.getChildren(premiseMatch2)) {
-			(new ForwardLinkMatch3InferenceVisitor(inferenceFactory_, child))
+		for (ForwardLinkMatch2 child : hierarchy_.getChildren(premiseMatch2)) {
+			(new ForwardLinkMatch2InferenceVisitor(inferenceFactory_, child))
 					.visit(inferenceMatch4);
 		}
 		return null;
@@ -330,77 +323,117 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(BackwardLinkCompositionMatch5 inferenceMatch5) {
-		inferenceMatch5.getSecondPremiseMatch(conclusionFactory_);
-		inferenceMatch5.getConclusionMatch(conclusionFactory_);
+		BackwardLinkMatch2 conclusionMatch2 = inferenceMatch5
+				.getConclusionMatch(conclusionFactory_);
+		inferences_.add(conclusionMatch2, inferenceMatch5);
+		for (BackwardLinkMatch3 child : hierarchy_
+				.getChildren(conclusionMatch2)) {
+			(new BackwardLinkMatch3InferenceVisitor(inferenceFactory_, child))
+					.visit(inferenceMatch5);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(BackwardLinkCompositionMatch6 inferenceMatch6) {
+		ForwardLinkMatch3 premiseMatch3 = inferenceMatch6
+				.getThirdPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch3, inferenceMatch6);
+		for (ForwardLinkMatch4 child : hierarchy_.getChildren(premiseMatch3)) {
+			(new ForwardLinkMatch4InferenceVisitor(inferenceFactory_, child))
+					.visit(inferenceMatch6);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(BackwardLinkCompositionMatch7 inferenceMatch7) {
+		BackwardLinkMatch3 premiseMatch3 = inferenceMatch7
+				.getFirstPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch3, inferenceMatch7);
+		for (BackwardLinkMatch4 child : hierarchy_.getChildren(premiseMatch3)) {
+			(new BackwardLinkMatch4InferenceVisitor(inferenceFactory_, child))
+					.visit(inferenceMatch7);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(BackwardLinkCompositionMatch8 inferenceMatch8) {
+		inferenceMatch8.getConclusionMatch(conclusionFactory_);
 
 		// creating ELK inferences
-		IndexedContextRootMatch destinationMatch = inferenceMatch5
-				.getDestinationMatch();
-		IndexedContextRootMatchChain intermediateRoots = inferenceMatch5
-				.getIntermediateRoots();
+		IndexedContextRootMatch extendedConclusionSourceMatch = inferenceMatch8
+				.getExtendedConclusionSourceMatch();
+		BackwardLinkCompositionMatch7 inferenceMatch7 = inferenceMatch8
+				.getParent();
+		IndexedContextRootMatchChain forwardChainExtendedDomains = inferenceMatch7
+				.getForwardChainExtendedDomains();
+		BackwardLinkCompositionMatch6 inferenceMatch6 = inferenceMatch7
+				.getParent();
+		IndexedContextRootMatch extendedDestinationMatch = inferenceMatch6
+				.getExtendedDestinationMatch();
+		BackwardLinkCompositionMatch5 inferenceMatch5 = inferenceMatch6
+				.getParent();
 		BackwardLinkCompositionMatch4 inferenceMatch4 = inferenceMatch5
 				.getParent();
-		int premiseForwardChainStartPos = inferenceMatch4
-				.getPremiseForwardChainStartPos();
 		ElkSubObjectPropertyExpression premiseFullForwardChainMatch = inferenceMatch4
 				.getPremiseFullForwardChainMatch();
+		int premiseForwardChainStartPos = inferenceMatch4
+				.getPremiseForwardChainStartPos();
 		BackwardLinkCompositionMatch3 inferenceMatch3 = inferenceMatch4
-				.getParent();
-		IndexedContextRootMatch originMatch = inferenceMatch3.getOriginMatch();
-		BackwardLinkCompositionMatch2 inferenceMatch2 = inferenceMatch3
 				.getParent();
 		ElkObjectProperty premiseBackwardRelationMatch = inferenceMatch3
 				.getPremiseBackwardRelationMatch();
+		BackwardLinkCompositionMatch2 inferenceMatch2 = inferenceMatch3
+				.getParent();
 		ElkSubObjectPropertyExpression compositionMatch = inferenceMatch2
 				.getCompositionMatch();
 		ElkObjectProperty conclusionRelationMatch = inferenceMatch2
 				.getConclusionRelationMatch();
-		BackwardLinkCompositionMatch1 inferenceMatch1 = inferenceMatch2
-				.getParent();
-		IndexedContextRootMatch conclusionSourceMatch = inferenceMatch1
-				.getConclusionSourceMatch();
+
 		// unfolding the first premise under the second premise
 		List<? extends ElkObjectPropertyExpression> compositionList = toList(
 				compositionMatch);
-		ElkClassExpression originExpression = toElkExpression(originMatch);
+		IndexedContextRootMatch extendedOriginMatch = forwardChainExtendedDomains
+				.getHead();
+		ElkClassExpression extendedOriginExpression = toElkExpression(
+				extendedOriginMatch);
 		ElkObjectPropertyExpression compositionHead = compositionList.get(0);
-		elkInferenceFactory_.getElkClassInclusionHierarchy(
-				toElkExpression(conclusionSourceMatch),
-				conclusionFactory_.getObjectSomeValuesFrom(
-						premiseBackwardRelationMatch, originExpression),
-				conclusionFactory_.getObjectSomeValuesFrom(compositionHead,
-						originExpression));
 		elkInferenceFactory_.getElkClassInclusionExistentialPropertyExpansion(
 				premiseBackwardRelationMatch, compositionHead,
-				originExpression);
+				extendedOriginExpression);
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
+				toElkExpression(extendedConclusionSourceMatch),
+				conclusionFactory_.getObjectSomeValuesFrom(
+						premiseBackwardRelationMatch, extendedOriginExpression),
+				conclusionFactory_.getObjectSomeValuesFrom(compositionHead,
+						extendedOriginExpression));
 		List<? extends ElkObjectPropertyExpression> forwardChainList = toList(
 				premiseFullForwardChainMatch);
 		if (premiseForwardChainStartPos == 0) {
 			// composing and unfolding the third premise with the fourth premise
-			elkInferenceFactory_
-					.getElkClassInclusionExistentialComposition(
-							toList(originMatch, intermediateRoots,
-									destinationMatch),
-							forwardChainList, compositionList.get(1));
+			elkInferenceFactory_.getElkClassInclusionExistentialComposition(
+					toList(forwardChainExtendedDomains,
+							extendedDestinationMatch),
+					forwardChainList, compositionList.get(1));
 			// composing the unfolded first premise with the result under the
 			// fifth premise
-			elkInferenceFactory_
-					.getElkClassInclusionExistentialComposition(
-							toList(conclusionSourceMatch, originMatch,
-									destinationMatch),
-							compositionList, conclusionRelationMatch);
+			elkInferenceFactory_.getElkClassInclusionExistentialComposition(
+					toList(extendedConclusionSourceMatch, extendedOriginMatch,
+							extendedDestinationMatch),
+					compositionList, conclusionRelationMatch);
 		} else {
 			// composing the unfolded first premise with the third premise under
 			// the fifth premise
-			elkInferenceFactory_
-					.getElkClassInclusionExistentialComposition(
-							toList(conclusionSourceMatch, originMatch,
-									intermediateRoots, destinationMatch),
-							compositionList, conclusionRelationMatch);
+			elkInferenceFactory_.getElkClassInclusionExistentialComposition(
+					toList(extendedConclusionSourceMatch,
+							forwardChainExtendedDomains,
+							extendedDestinationMatch),
+					compositionList, conclusionRelationMatch);
 		}
 
 		return null;
-
 	}
 
 	@Override
@@ -418,16 +451,41 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(BackwardLinkOfObjectHasSelfMatch2 inferenceMatch2) {
-		inferenceMatch2.getConclusionMatch(conclusionFactory_);
+		BackwardLinkMatch2 conclusionMatch2 = inferenceMatch2
+				.getConclusionMatch(conclusionFactory_);
+		inferences_.add(conclusionMatch2, inferenceMatch2);
+		for (BackwardLinkMatch3 child : hierarchy_
+				.getChildren(conclusionMatch2)) {
+			(new BackwardLinkMatch3InferenceVisitor(inferenceFactory_, child))
+					.visit(inferenceMatch2);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(BackwardLinkOfObjectHasSelfMatch3 inferenceMatch3) {
+		inferenceMatch3.getConclusionMatch(conclusionFactory_);
 
 		// creating ELK inferences
-		ElkObjectProperty relationMatch = inferenceMatch2.getRelationMatch();
-		BackwardLinkOfObjectHasSelfMatch1 inferenceMatch1 = inferenceMatch2
+		IndexedContextRootMatch extendedTargetMatch = inferenceMatch3
+				.getExtendedTargetMatch();
+		BackwardLinkOfObjectHasSelfMatch2 inferenceMatch2 = inferenceMatch3
 				.getParent();
-		IndexedContextRootMatch originMatch = inferenceMatch1.getOriginMatch();
+		IndexedContextRootMatch extendedOriginMatch = inferenceMatch2
+				.getExtendedOriginMatch();
+		ElkObjectProperty relationMatch = inferenceMatch2.getRelationMatch();
+		ElkClassExpression extendedOriginExpression = toElkExpression(
+				extendedOriginMatch);
+		ElkClassExpression extendedTargetMatchExpression = toElkExpression(
+				extendedTargetMatch);
 
+		deriveInclusion(extendedTargetMatch, extendedOriginMatch);
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
+				extendedTargetMatchExpression, extendedOriginExpression,
+				conclusionFactory_.getObjectHasSelf(relationMatch));
 		elkInferenceFactory_.getElkClassInclusionExistentialOfObjectHasSelf(
-				toElkExpression(originMatch), relationMatch);
+				extendedTargetMatchExpression, relationMatch);
+
 		return null;
 	}
 
@@ -448,9 +506,44 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 	@Override
 	public Void visit(
 			BackwardLinkOfObjectSomeValuesFromMatch2 inferenceMatch2) {
-		inferenceMatch2.getConclusionMatch(conclusionFactory_);
+		BackwardLinkMatch2 conclusionMatch2 = inferenceMatch2
+				.getConclusionMatch(conclusionFactory_);
+		inferences_.add(conclusionMatch2, inferenceMatch2);
+		for (BackwardLinkMatch3 child : hierarchy_
+				.getChildren(conclusionMatch2)) {
+			(new BackwardLinkMatch3InferenceVisitor(inferenceFactory_, child))
+					.visit(inferenceMatch2);
+		}
+		return null;
+	}
 
-		// no ELK inferences
+	@Override
+	public Void visit(
+			BackwardLinkOfObjectSomeValuesFromMatch3 inferenceMatch3) {
+		inferenceMatch3.getConclusionMatch(conclusionFactory_);
+
+		// creating ELK inferences
+		IndexedContextRootMatch extendedDestinationMatch = inferenceMatch3
+				.getExtendedDestinationMatch();
+		BackwardLinkOfObjectSomeValuesFromMatch2 inferenceMatch2 = inferenceMatch3
+				.getParent();
+		IndexedObjectSomeValuesFromMatch premiseSuperExpressionMatch = inferenceMatch2
+				.getPremiseSuperExpressionMatch();
+		IndexedContextRootMatch extendedOriginMatch = inferenceMatch2
+				.getExtendedOriginMatch();
+		ElkObjectPropertyExpression propertyMatch = premiseSuperExpressionMatch
+				.getPropertyMatch();
+		ElkClassExpression fillerMatch = getFillerMatch(
+				premiseSuperExpressionMatch);
+
+		elkInferenceFactory_.getElkClassInclusionExistentialRange(propertyMatch,
+				fillerMatch, extendedDestinationMatch.getRangeMatches());
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
+				toElkExpression(extendedOriginMatch),
+				conclusionFactory_.getObjectSomeValuesFrom(propertyMatch,
+						fillerMatch),
+				conclusionFactory_.getObjectSomeValuesFrom(propertyMatch,
+						toElkExpression(extendedDestinationMatch)));
 		return null;
 	}
 
@@ -469,11 +562,11 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(BackwardLinkReversedExpandedMatch2 inferenceMatch2) {
-		ForwardLinkMatch2 premiseMatch1 = inferenceMatch2
+		ForwardLinkMatch1 premiseMatch1 = inferenceMatch2
 				.getFirstPremiseMatch(conclusionFactory_);
 		inferences_.add(premiseMatch1, inferenceMatch2);
-		for (ForwardLinkMatch3 child : hierarchy_.getChildren(premiseMatch1)) {
-			(new ForwardLinkMatch3InferenceVisitor(inferenceFactory_, child))
+		for (ForwardLinkMatch2 child : hierarchy_.getChildren(premiseMatch1)) {
+			(new ForwardLinkMatch2InferenceVisitor(inferenceFactory_, child))
 					.visit(inferenceMatch2);
 		}
 		return null;
@@ -481,23 +574,49 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(BackwardLinkReversedExpandedMatch3 inferenceMatch3) {
-		inferenceMatch3.getConclusionMatch(conclusionFactory_);
+		BackwardLinkMatch2 concluisonMatch2 = inferenceMatch3
+				.getConclusionMatch(conclusionFactory_);
+		inferences_.add(concluisonMatch2, inferenceMatch3);
+		for (BackwardLinkMatch3 child : hierarchy_
+				.getChildren(concluisonMatch2)) {
+			(new BackwardLinkMatch3InferenceVisitor(inferenceFactory_, child))
+					.visit(inferenceMatch3);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(BackwardLinkReversedExpandedMatch4 inferenceMatch4) {
+		ForwardLinkMatch3 premiseMatch3 = inferenceMatch4
+				.getFirstPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch3, inferenceMatch4);
+		for (ForwardLinkMatch4 child : hierarchy_.getChildren(premiseMatch3)) {
+			(new ForwardLinkMatch4InferenceVisitor(inferenceFactory_, child))
+					.visit(inferenceMatch4);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(BackwardLinkReversedExpandedMatch5 inferenceMatch5) {
+		inferenceMatch5.getConclusionMatch(conclusionFactory_);
 
 		// creating ELK inferences
-		IndexedContextRootMatchChain intermediateRoots = inferenceMatch3
-				.getIntermediateRoots();
-		IndexedContextRootMatch destinationMatch = inferenceMatch3
-				.getDestinationMatch();
+		IndexedContextRootMatchChain extendedDomains = inferenceMatch5
+				.getExtendedDomains();
+		BackwardLinkReversedExpandedMatch4 inferenceMatch4 = inferenceMatch5
+				.getParent();
+		IndexedContextRootMatch extendedDestinationMatch = inferenceMatch4
+				.getExtendedDestinationMatch();
+		BackwardLinkReversedExpandedMatch3 inferenceMatch3 = inferenceMatch4
+				.getParent();
 		BackwardLinkReversedExpandedMatch2 inferenceMatch2 = inferenceMatch3
 				.getParent();
 		ElkSubObjectPropertyExpression subChainMatch = inferenceMatch2
 				.getSubChainMatch();
 		ElkObjectProperty relationMatch = inferenceMatch2.getRelationMatch();
-		BackwardLinkReversedExpandedMatch1 inferenceMatch1 = inferenceMatch2
-				.getParent();
-		IndexedContextRootMatch originMatch = inferenceMatch1.getOriginMatch();
 		elkInferenceFactory_.getElkClassInclusionExistentialComposition(
-				toList(originMatch, intermediateRoots, destinationMatch),
+				toList(extendedDomains, extendedDestinationMatch),
 				toList(subChainMatch), relationMatch);
 		return null;
 	}
@@ -519,28 +638,52 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 	@Override
 	public Void visit(
 			ClassInconsistencyOfDisjointSubsumersMatch2 inferenceMatch2) {
-		inferenceMatch2.getSecondPremiseMatch(conclusionFactory_);
+		DisjointSubsumerMatch1 premiseMatch1 = inferenceMatch2
+				.getSecondPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch2);
+		for (DisjointSubsumerMatch2 child : hierarchy_
+				.getChildren(premiseMatch1)) {
+			(new DisjointSubsumerMatch2InferenceVisitor(inferenceFactory_,
+					child)).visit(inferenceMatch2);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			ClassInconsistencyOfDisjointSubsumersMatch3 inferenceMatch3) {
+		inferenceMatch3.getConclusionMatch(conclusionFactory_);
 
 		// creating ELK inferences
+		IndexedContextRootMatch extendedExtendedOriginMatch = inferenceMatch3
+				.getExtendedExtendedOriginMatch();
+		ClassInconsistencyOfDisjointSubsumersMatch2 inferenceMatch2 = inferenceMatch3
+				.getParent();
+		IndexedContextRootMatch extendedOriginMatch = inferenceMatch2
+				.getExtendedOriginMatch();
 		List<? extends ElkClassExpression> disjoint = inferenceMatch2
 				.getDisjointExpressionsMatch();
 		ClassInconsistencyOfDisjointSubsumersMatch1 inferenceMatch1 = inferenceMatch2
 				.getParent();
-		IndexedContextRootMatch originMatch = inferenceMatch1.getOriginMatch();
 		ClassInconsistencyOfDisjointSubsumers parent = inferenceMatch1
 				.getParent();
 		int firstPos = parent.getFirstDisjointPosition();
 		int secondPos = parent.getSecondDisjointPosition();
 		ElkClassExpression firstDisjoint = disjoint.get(firstPos);
 		ElkClassExpression secondDisjoint = disjoint.get(secondPos);
-		ElkClassExpression subExpression = toElkExpression(originMatch);
+		ElkClassExpression subExpression = toElkExpression(extendedOriginMatch);
+		ElkClassExpression extendedSubExpression = toElkExpression(
+				extendedExtendedOriginMatch);
+		deriveInclusion(extendedExtendedOriginMatch, extendedOriginMatch);
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
+				extendedSubExpression, subExpression, firstDisjoint);
 		elkInferenceFactory_
 				.getElkClassInclusionObjectIntersectionOfComposition(
-						subExpression, firstDisjoint, secondDisjoint);
+						extendedSubExpression, firstDisjoint, secondDisjoint);
 		elkInferenceFactory_.getElkClassInclusionOfDisjointClasses(disjoint,
 				firstPos, secondPos);
 		elkInferenceFactory_.getElkClassInclusionHierarchy(
-				subExpression, conclusionFactory_
+				extendedSubExpression, conclusionFactory_
 						.getObjectIntersectionOf(firstDisjoint, secondDisjoint),
 				conclusionFactory_.getOwlNothing());
 		return null;
@@ -563,22 +706,46 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 	@Override
 	public Void visit(
 			ClassInconsistencyOfObjectComplementOfMatch2 inferenceMatch2) {
-		inferenceMatch2.getFirstPremiseMatch(conclusionFactory_);
+		SubClassInclusionComposedMatch1 premiseMatch1 = inferenceMatch2
+				.getFirstPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch2);
+		for (SubClassInclusionComposedMatch2 child : hierarchy_
+				.getChildren(premiseMatch1)) {
+			(new SubClassInclusionComposedMatch2InferenceVisitor(
+					inferenceFactory_, child)).visit(inferenceMatch2);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			ClassInconsistencyOfObjectComplementOfMatch3 inferenceMatch3) {
+		inferenceMatch3.getConclusionMatch(conclusionFactory_);
 
 		// creating ELK inferences
+		IndexedContextRootMatch extendedExtendedOriginMatch = inferenceMatch3
+				.getExtendedExtendedOriginMatch();
+		ClassInconsistencyOfObjectComplementOfMatch2 inferenceMatch2 = inferenceMatch3
+				.getParent();
+		IndexedContextRootMatch extendedOriginMatch = inferenceMatch2
+				.getExtendedOriginMatch();
 		ElkObjectComplementOf negationMatch = inferenceMatch2
 				.getNegationMatch();
-		ClassInconsistencyOfObjectComplementOfMatch1 inferenceMatch1 = inferenceMatch2
-				.getParent();
-		IndexedContextRootMatch originMatch = inferenceMatch1.getOriginMatch();
-		ElkClassExpression subExpression = toElkExpression(originMatch);
+		ElkClassExpression subExpression = toElkExpression(extendedOriginMatch);
+		ElkClassExpression extendedSubExpression = toElkExpression(
+				extendedExtendedOriginMatch);
+		deriveInclusion(extendedExtendedOriginMatch, extendedOriginMatch);
+
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
+				extendedSubExpression, subExpression, negationMatch);
 		elkInferenceFactory_
 				.getElkClassInclusionObjectIntersectionOfComposition(
-						subExpression, negationMatch.getClassExpression(),
-						negationMatch);
+						extendedSubExpression,
+						negationMatch.getClassExpression(), negationMatch);
 		elkInferenceFactory_.getElkClassInclusionNegationClash(
 				negationMatch.getClassExpression());
-		elkInferenceFactory_.getElkClassInclusionHierarchy(subExpression,
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
+				extendedSubExpression,
 				conclusionFactory_.getObjectIntersectionOf(
 						negationMatch.getClassExpression(), negationMatch),
 				conclusionFactory_.getOwlNothing());
@@ -587,7 +754,20 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(ClassInconsistencyOfOwlNothingMatch1 inferenceMatch1) {
-		inferenceMatch1.getPremiseMatch(conclusionFactory_);
+		SubClassInclusionComposedMatch1 premiseMatch1 = inferenceMatch1
+				.getPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch1);
+		for (SubClassInclusionComposedMatch2 child : hierarchy_
+				.getChildren(premiseMatch1)) {
+			(new SubClassInclusionComposedMatch2InferenceVisitor(
+					inferenceFactory_, child)).visit(inferenceMatch1);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(ClassInconsistencyOfOwlNothingMatch2 inferenceMatch2) {
+		inferenceMatch2.getConclusionMatch(conclusionFactory_);
 
 		// no ELK inferences
 		return null;
@@ -607,29 +787,58 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(ClassInconsistencyPropagatedMatch2 inferenceMatch2) {
-		inferenceMatch2.getSecondPremiseMatch(conclusionFactory_);
+		ClassInconsistencyMatch1 premiseMatch1 = inferenceMatch2
+				.getSecondPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch2);
+		for (ClassInconsistencyMatch2 child : hierarchy_
+				.getChildren(premiseMatch1)) {
+			(new ClassInconsistencyMatch2InferenceVisitor(inferenceFactory_,
+					child)).visit(inferenceMatch2);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(ClassInconsistencyPropagatedMatch3 inferenceMatch3) {
+		BackwardLinkMatch3 premiseMatch3 = inferenceMatch3
+				.getFirstPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch3, inferenceMatch3);
+		for (BackwardLinkMatch4 child : hierarchy_.getChildren(premiseMatch3)) {
+			(new BackwardLinkMatch4InferenceVisitor(inferenceFactory_, child))
+					.visit(inferenceMatch3);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(ClassInconsistencyPropagatedMatch4 inferenceMatch4) {
+		inferenceMatch4.getConclusionMatch(conclusionFactory_);
 
 		// creating ELK inferences
-		IndexedContextRootMatch originMatch = inferenceMatch2.getOriginMatch();
+		IndexedContextRootMatch extendedDestinationMatch = inferenceMatch4
+				.getExtendedDestinationMatch();
+		ClassInconsistencyPropagatedMatch3 inferenceMatch3 = inferenceMatch4
+				.getParent();
+		IndexedContextRootMatch extendedOriginMatch = inferenceMatch3
+				.getExtendedOriginMatch();
+		ClassInconsistencyPropagatedMatch2 inferenceMatch2 = inferenceMatch3
+				.getParent();
 		ElkObjectProperty premiseRelationMatch = inferenceMatch2
 				.getPremiseRelationMatch();
-		ClassInconsistencyPropagatedMatch1 inferenceMatch1 = inferenceMatch2
-				.getParent();
-		IndexedContextRootMatch destinationMatch = inferenceMatch1
-				.getDestinationMatch();
 
 		elkInferenceFactory_.getElkClassInclusionExistentialFillerExpansion(
-				toElkExpression(originMatch),
+				toElkExpression(extendedOriginMatch),
 				conclusionFactory_.getOwlNothing(), premiseRelationMatch);
 		elkInferenceFactory_.getElkClassInclusionExistentialOwlNothing(
 				premiseRelationMatch);
 		elkInferenceFactory_.getElkClassInclusionHierarchy(
-				toElkExpression(destinationMatch),
+				toElkExpression(extendedDestinationMatch),
 				conclusionFactory_.getObjectSomeValuesFrom(premiseRelationMatch,
-						toElkExpression(originMatch)),
+						toElkExpression(extendedOriginMatch)),
 				conclusionFactory_.getObjectSomeValuesFrom(premiseRelationMatch,
 						conclusionFactory_.getOwlNothing()),
 				conclusionFactory_.getOwlNothing());
+
 		return null;
 	}
 
@@ -648,8 +857,20 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(DisjointSubsumerFromSubsumerMatch2 inferenceMatch2) {
-		inferenceMatch2.getFirstPremiseMatch(conclusionFactory_);
-		inferenceMatch2.getConclusionMatch(conclusionFactory_);
+		SubClassInclusionComposedMatch1 premiseMatch1 = inferenceMatch2
+				.getFirstPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch2);
+		for (SubClassInclusionComposedMatch2 child : hierarchy_
+				.getChildren(premiseMatch1)) {
+			(new SubClassInclusionComposedMatch2InferenceVisitor(
+					inferenceFactory_, child)).visit(inferenceMatch2);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(DisjointSubsumerFromSubsumerMatch3 inferenceMatch3) {
+		inferenceMatch3.getConclusionMatch(conclusionFactory_);
 
 		// no ELK inferences
 		return null;
@@ -662,10 +883,10 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		// creating ELK inferences
 		ElkClassAssertionAxiomConversion parent = inferenceMatch1.getParent();
 		ElkClassAssertionAxiom originalAxiom = parent.getOriginalAxiom();
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		elkInferenceFactory_.getElkClassInclusionOfClassAssertion(
 				originalAxiom.getIndividual(),
 				originalAxiom.getClassExpression());
-		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -686,12 +907,12 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 			disjoint.add(conclusionFactory_
 					.getObjectOneOf(Collections.singletonList(ind)));
 		}
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		elkInferenceFactory_
 				.getElkDisjointClassesOfDifferentIndividuals(different);
 		elkInferenceFactory_.getElkClassInclusionOfDisjointClasses(disjoint,
 				parent.getFirstIndividualPosition(),
 				parent.getSecondIndividualPosition());
-		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -712,9 +933,9 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 			disjoint.add(conclusionFactory_
 					.getObjectOneOf(Collections.singletonList(ind)));
 		}
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		elkInferenceFactory_
 				.getElkDisjointClassesOfDifferentIndividuals(different);
-		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -727,11 +948,11 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		ElkDisjointClassesAxiomBinaryConversion parent = inferenceMatch1
 				.getParent();
 		ElkDisjointClassesAxiom originalAxiom = parent.getOriginalAxiom();
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		elkInferenceFactory_.getElkClassInclusionOfDisjointClasses(
 				originalAxiom.getClassExpressions(),
 				parent.getFirstClassPosition(),
 				parent.getSecondClassPosition());
-		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -757,6 +978,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		ElkDisjointUnionAxiomBinaryConversion parent = inferenceMatch1
 				.getParent();
 		ElkDisjointUnionAxiom originalAxiom = parent.getOriginalAxiom();
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		elkInferenceFactory_.getElkDisjointClassesOfDisjointUnion(
 				originalAxiom.getDefinedClass(),
 				originalAxiom.getClassExpressions());
@@ -764,7 +986,6 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 				originalAxiom.getClassExpressions(),
 				parent.getFirstDisjunctPosition(),
 				parent.getSecondDisjunctPosition());
-		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -781,6 +1002,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		List<? extends ElkClassExpression> disjoint = originalAxiom
 				.getClassExpressions();
 		ElkClassExpression member = disjoint.get(0);
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		elkInferenceFactory_.getElkEquivalentClassesOfDisjointUnion(defined,
 				disjoint);
 		elkInferenceFactory_.getElkClassInclusionOfEquivaletClasses(defined,
@@ -796,7 +1018,6 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 				conclusionFactory_.getObjectUnionOf(disjoint), defined);
 		elkInferenceFactory_.getElkClassInclusionHierarchy(defined,
 				conclusionFactory_.getObjectUnionOf(disjoint), member);
-		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -809,10 +1030,10 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		ElkDisjointUnionAxiomNaryConversion parent = inferenceMatch1
 				.getParent();
 		ElkDisjointUnionAxiom originalAxiom = parent.getOriginalAxiom();
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		elkInferenceFactory_.getElkDisjointClassesOfDisjointUnion(
 				originalAxiom.getDefinedClass(),
 				originalAxiom.getClassExpressions());
-		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -828,15 +1049,15 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		ElkClass defined = originalAxiom.getDefinedClass();
 		List<? extends ElkClassExpression> disjoint = originalAxiom
 				.getClassExpressions();
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		elkInferenceFactory_.getElkEquivalentClassesOfDisjointUnion(defined,
 				disjoint);
 		elkInferenceFactory_.getElkClassInclusionOfEquivaletClasses(defined,
 				conclusionFactory_.getObjectUnionOf(disjoint), true);
+		elkInferenceFactory_.getElkClassInclusionEmptyObjectUnionOfOwlNothing();
 		elkInferenceFactory_.getElkClassInclusionHierarchy(defined,
 				conclusionFactory_.getObjectUnionOf(disjoint),
 				conclusionFactory_.getOwlNothing());
-		elkInferenceFactory_.getElkClassInclusionEmptyObjectUnionOfOwlNothing();
-		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 
 	}
@@ -855,6 +1076,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 				.getClassExpressions();
 		int disjunctPos = parent.getDisjunctPosition();
 		ElkObjectUnionOf union = conclusionFactory_.getObjectUnionOf(disjoint);
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		elkInferenceFactory_.getElkEquivalentClassesOfDisjointUnion(defined,
 				disjoint);
 		elkInferenceFactory_.getElkClassInclusionOfEquivaletClasses(defined,
@@ -863,7 +1085,6 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 				disjoint, disjunctPos);
 		elkInferenceFactory_.getElkClassInclusionHierarchy(
 				disjoint.get(disjunctPos), union, defined);
-		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -876,6 +1097,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		ElkEquivalentClassesAxiomEquivalenceConversion parent = inferenceMatch1
 				.getParent();
 		ElkEquivalentClassesAxiom originalAxiom = parent.getOriginalAxiom();
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		// we do not know which direction is going to be used
 		elkInferenceFactory_.getElkClassInclusionOfEquivaletClasses(
 				originalAxiom.getClassExpressions(),
@@ -885,7 +1107,6 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 				originalAxiom.getClassExpressions(),
 				parent.getSecondMemberPosition(),
 				parent.getFirstMemberPosition());
-		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -898,10 +1119,10 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		ElkEquivalentClassesAxiomSubClassConversion parent = inferenceMatch1
 				.getParent();
 		ElkEquivalentClassesAxiom originalAxiom = parent.getOriginalAxiom();
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		elkInferenceFactory_.getElkClassInclusionOfEquivaletClasses(
 				originalAxiom.getClassExpressions(),
 				parent.getSubClassPosition(), parent.getSuperClassPosition());
-		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -915,11 +1136,11 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 				.getParent();
 		ElkEquivalentObjectPropertiesAxiom originalAxiom = parent
 				.getOriginalAxiom();
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		elkInferenceFactory_.getElkPropertyInclusionOfEquivalence(
 				originalAxiom.getObjectPropertyExpressions(),
 				parent.getSubPropertyPosition(),
 				parent.getSuperPropertyPosition());
-		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -933,10 +1154,10 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 				.getParent();
 		ElkObjectPropertyAssertionAxiom originalAxiom = parent
 				.getOriginalAxiom();
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		elkInferenceFactory_.getElkClassInclusionOfObjectPropertyAssertion(
 				originalAxiom.getSubject(), originalAxiom.getProperty(),
 				originalAxiom.getObject());
-		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -948,16 +1169,21 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		// creating ELK inferences
 		ElkObjectPropertyDomainAxiom originalAxiom = inferenceMatch1.getParent()
 				.getOriginalAxiom();
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		elkInferenceFactory_.getElkClassInclusionOfObjectPropertyDomain(
 				originalAxiom.getProperty(), originalAxiom.getDomain());
-		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
 	@Override
 	public Void visit(
 			ElkObjectPropertyRangeAxiomConversionMatch1 inferenceMatch1) {
-		// TODO Auto-generated method stub
+		inferenceMatch1.getConclusionMatch(conclusionFactory_);
+
+		// creating ELK inferences
+		ElkObjectPropertyRangeAxiom originalAxiom = inferenceMatch1.getParent()
+				.getOriginalAxiom();
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -969,9 +1195,9 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		// creating ELK inferences
 		ElkReflexiveObjectPropertyAxiom originalAxiom = inferenceMatch1
 				.getParent().getOriginalAxiom();
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		elkInferenceFactory_.getElkClassInclusionOfReflexiveObjectProperty(
 				originalAxiom.getProperty());
-		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 
 	}
@@ -990,11 +1216,11 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 			equivalent.add(conclusionFactory_
 					.getObjectOneOf(Collections.singletonList(ind)));
 		}
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		elkInferenceFactory_.getElkEquivalentClassesOfSameIndividual(same);
 		elkInferenceFactory_.getElkClassInclusionOfEquivaletClasses(equivalent,
 				parent.getSubIndividualPosition(),
 				parent.getSuperIndividualPosition());
-		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
@@ -1030,20 +1256,20 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		// creating ELK inferences
 		ElkTransitiveObjectPropertyAxiom originalAxiom = inferenceMatch1
 				.getParent().getOriginalAxiom();
+		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		elkInferenceFactory_.getElkPropertyInclusionOfTransitiveObjectProperty(
 				originalAxiom.getProperty());
-		elkInferenceFactory_.getElkToldAxiom(originalAxiom);
 		return null;
 	}
 
 	@Override
 	public Void visit(ForwardLinkCompositionMatch1 inferenceMatch1) {
-		ForwardLinkMatch1 conclusionMatch1 = inferenceMatch1
-				.getConclusionMatch(conclusionFactory_);
+		BackwardLinkMatch1 conclusionMatch1 = inferenceMatch1
+				.getFirstPremiseMatch(conclusionFactory_);
 		inferences_.add(conclusionMatch1, inferenceMatch1);
-		for (ForwardLinkMatch2 child : hierarchy_
+		for (BackwardLinkMatch2 child : hierarchy_
 				.getChildren(conclusionMatch1)) {
-			(new ForwardLinkMatch2InferenceVisitor(inferenceFactory_, child))
+			(new BackwardLinkMatch2InferenceVisitor(inferenceFactory_, child))
 					.visit(inferenceMatch1);
 		}
 		return null;
@@ -1051,35 +1277,37 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(ForwardLinkCompositionMatch2 inferenceMatch2) {
-		BackwardLinkMatch1 premiseMatch1 = inferenceMatch2
-				.getFirstPremiseMatch(conclusionFactory_);
+		inferenceMatch2.getSecondPremiseMatch(conclusionFactory_);
+		SubPropertyChainMatch1 premiseMatch1 = inferenceMatch2
+				.getFourthPremiseMatch(conclusionFactory_);
 		inferences_.add(premiseMatch1, inferenceMatch2);
-		for (BackwardLinkMatch2 child : hierarchy_.getChildren(premiseMatch1)) {
-			(new BackwardLinkMatch2InferenceVisitor(inferenceFactory_, child))
-					.visit(inferenceMatch2);
+		for (SubPropertyChainMatch2 child : hierarchy_
+				.getChildren(premiseMatch1)) {
+			(new SubPropertyChainMatch2InferenceVisitor(inferenceFactory_,
+					child)).visit(inferenceMatch2);
 		}
 		return null;
 	}
 
 	@Override
 	public Void visit(ForwardLinkCompositionMatch3 inferenceMatch3) {
-		SubPropertyChainMatch1 premiseMatch1 = inferenceMatch3
-				.getFourthPremiseMatch(conclusionFactory_);
-		inferences_.add(premiseMatch1, inferenceMatch3);
-		for (SubPropertyChainMatch2 child : hierarchy_
-				.getChildren(premiseMatch1)) {
-			(new SubPropertyChainMatch2InferenceVisitor(inferenceFactory_,
-					child)).visit(inferenceMatch3);
+		ForwardLinkMatch1 premiseMatch2 = inferenceMatch3
+				.getThirdPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch2, inferenceMatch3);
+		for (ForwardLinkMatch2 child : hierarchy_.getChildren(premiseMatch2)) {
+			(new ForwardLinkMatch2InferenceVisitor(inferenceFactory_, child))
+					.visit(inferenceMatch3);
 		}
 		return null;
 	}
 
 	@Override
 	public Void visit(ForwardLinkCompositionMatch4 inferenceMatch4) {
-		ForwardLinkMatch2 premiseMatch2 = inferenceMatch4
-				.getThirdPremiseMatch(conclusionFactory_);
-		inferences_.add(premiseMatch2, inferenceMatch4);
-		for (ForwardLinkMatch3 child : hierarchy_.getChildren(premiseMatch2)) {
+		ForwardLinkMatch2 conclusionMatch2 = inferenceMatch4
+				.getConclusionMatch(conclusionFactory_);
+		inferences_.add(conclusionMatch2, inferenceMatch4);
+		for (ForwardLinkMatch3 child : hierarchy_
+				.getChildren(conclusionMatch2)) {
 			(new ForwardLinkMatch3InferenceVisitor(inferenceFactory_, child))
 					.visit(inferenceMatch4);
 		}
@@ -1088,62 +1316,91 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(ForwardLinkCompositionMatch5 inferenceMatch5) {
-		inferenceMatch5.getSecondPremiseMatch(conclusionFactory_);
-		inferenceMatch5.getConclusionMatch(conclusionFactory_);
+		ForwardLinkMatch3 conclusionMatch2 = inferenceMatch5
+				.getThirdPremiseMatch(conclusionFactory_);
+		inferences_.add(conclusionMatch2, inferenceMatch5);
+		for (ForwardLinkMatch4 child : hierarchy_
+				.getChildren(conclusionMatch2)) {
+			(new ForwardLinkMatch4InferenceVisitor(inferenceFactory_, child))
+					.visit(inferenceMatch5);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(ForwardLinkCompositionMatch6 inferenceMatch6) {
+		BackwardLinkMatch3 conclusionMatch2 = inferenceMatch6
+				.getFirstPremiseMatch(conclusionFactory_);
+		inferences_.add(conclusionMatch2, inferenceMatch6);
+		for (BackwardLinkMatch4 child : hierarchy_
+				.getChildren(conclusionMatch2)) {
+			(new BackwardLinkMatch4InferenceVisitor(inferenceFactory_, child))
+					.visit(inferenceMatch6);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(ForwardLinkCompositionMatch7 inferenceMatch7) {
+		inferenceMatch7.getConclusionMatch(conclusionFactory_);
 
 		// creating ELK inferences
-		IndexedContextRootMatchChain premiseIntermediateRoots = inferenceMatch5
-				.getPremiseIntermediateRoots();
-		IndexedContextRootMatch conclusionTargetMatch = inferenceMatch5
-				.getConclusionTargetMatch();
+		IndexedContextRootMatch extendedDestinationMatch = inferenceMatch7
+				.getExtendedDestinationMatch();
+		ForwardLinkCompositionMatch6 inferenceMatch6 = inferenceMatch7
+				.getParent();
+		IndexedContextRootMatchChain forwardChainExtendedDomains = inferenceMatch6
+				.getForwardChainExtendedDomains();
+		ForwardLinkCompositionMatch5 inferenceMatch5 = inferenceMatch6
+				.getParent();
+		IndexedContextRootMatch conclusionExtendedTargetMatch = inferenceMatch5
+				.getConclusionExtendedTargetMatch();
 		ForwardLinkCompositionMatch4 inferenceMatch4 = inferenceMatch5
 				.getParent();
-		int premiseForwardChainStartPos = inferenceMatch4
-				.getPremiseForwardChainStartPos();
-		ElkSubObjectPropertyExpression premiseFullForwardChainMatch = inferenceMatch4
-				.getPremiseFullForwardChainMatch();
 		ForwardLinkCompositionMatch3 inferenceMatch3 = inferenceMatch4
 				.getParent();
-		ElkObjectProperty premiseBackwardRelationMatch = inferenceMatch3
-				.getPremiseBackwardRelationMatch();
-		IndexedContextRootMatch originMatch = inferenceMatch3.getOriginMatch();
+		ElkSubObjectPropertyExpression premiseFullForwardChainMatch = inferenceMatch3
+				.getPremiseFullForwardChainMatch();
+		int premiseForwardChainStartPos = inferenceMatch3
+				.getPremiseForwardChainStartPos();
 		ForwardLinkCompositionMatch2 inferenceMatch2 = inferenceMatch3
 				.getParent();
-		int compositionStartPos = inferenceMatch2.getCompositionStartPos();
-		ElkSubObjectPropertyExpression fullCompositionMatch = inferenceMatch2
-				.getFullCompositionMatch();
+		ElkObjectProperty premiseBackwardRelationMatch = inferenceMatch2
+				.getPremiseBackwardRelationMatch();
 		ForwardLinkCompositionMatch1 inferenceMatch1 = inferenceMatch2
 				.getParent();
-		IndexedContextRootMatch destinationMatch = inferenceMatch1
-				.getDestinationMatch();
+		ElkSubObjectPropertyExpression fullCompositionMatch = inferenceMatch1
+				.getFullCompositionMatch();
+		int compositionStartPos = inferenceMatch1.getCompositionStartPos();
 
 		// unfolding the first premise under the second premise
 		List<? extends ElkObjectPropertyExpression> fullCompositionList = toList(
 				fullCompositionMatch);
-		ElkClassExpression originExpression = toElkExpression(originMatch);
-		ElkObjectPropertyExpression compositionStart = fullCompositionList
+		ElkObjectPropertyExpression compositionHead = fullCompositionList
 				.get(compositionStartPos);
-		elkInferenceFactory_.getElkClassInclusionHierarchy(
-				toElkExpression(destinationMatch),
-				conclusionFactory_.getObjectSomeValuesFrom(
-						premiseBackwardRelationMatch, originExpression),
-				conclusionFactory_.getObjectSomeValuesFrom(compositionStart,
-						originExpression));
+		IndexedContextRootMatch extendedOriginMatch = forwardChainExtendedDomains
+				.getHead();
+		ElkClassExpression extendedOriginExpression = toElkExpression(
+				extendedOriginMatch);
 		elkInferenceFactory_.getElkClassInclusionExistentialPropertyExpansion(
-				premiseBackwardRelationMatch, compositionStart,
-				originExpression);
+				premiseBackwardRelationMatch, compositionHead,
+				extendedOriginExpression);
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
+				toElkExpression(extendedDestinationMatch),
+				conclusionFactory_.getObjectSomeValuesFrom(
+						premiseBackwardRelationMatch, extendedOriginExpression),
+				conclusionFactory_.getObjectSomeValuesFrom(compositionHead,
+						extendedOriginExpression));
 		List<? extends ElkObjectPropertyExpression> forwardChainList = toList(
 				premiseFullForwardChainMatch);
 		if (premiseForwardChainStartPos == 0) {
 			// composing and unfolding the third premise with the fourth premise
-			elkInferenceFactory_
-					.getElkClassInclusionExistentialComposition(
-							toList(originMatch, premiseIntermediateRoots,
-									conclusionTargetMatch),
-							forwardChainList,
-							fullCompositionList.get(compositionStartPos + 1));
+			elkInferenceFactory_.getElkClassInclusionExistentialComposition(
+					toList(forwardChainExtendedDomains,
+							conclusionExtendedTargetMatch),
+					forwardChainList,
+					fullCompositionList.get(compositionStartPos + 1));
 		}
-
 		return null;
 	}
 
@@ -1162,17 +1419,43 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(ForwardLinkOfObjectHasSelfMatch2 inferenceMatch2) {
-		inferenceMatch2.getConclusionMatch(conclusionFactory_);
+		ForwardLinkMatch2 conclusionMatch2 = inferenceMatch2
+				.getConclusionMatch(conclusionFactory_);
+		inferences_.add(conclusionMatch2, inferenceMatch2);
+		for (ForwardLinkMatch3 child : hierarchy_
+				.getChildren(conclusionMatch2)) {
+			(new ForwardLinkMatch3InferenceVisitor(inferenceFactory_, child))
+					.visit(inferenceMatch2);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(ForwardLinkOfObjectHasSelfMatch3 inferenceMatch3) {
+		inferenceMatch3.getConclusionMatch(conclusionFactory_);
 
 		// creating ELK inferences
-		ElkObjectProperty relationMatch = inferenceMatch2.getRelationMatch();
+		IndexedContextRootMatch extendedTargetMatch = inferenceMatch3
+				.getExtendedTargetMatch();
+		ForwardLinkOfObjectHasSelfMatch2 inferenceMatch2 = inferenceMatch3
+				.getParent();
+		IndexedContextRootMatch extendedOriginMatch = inferenceMatch2
+				.getExtendedOriginMatch();
 		ForwardLinkOfObjectHasSelfMatch1 inferenceMatch1 = inferenceMatch2
 				.getParent();
-		IndexedContextRootMatch originMatch = inferenceMatch1.getOriginMatch();
+		ElkObjectProperty forwardRelationMatch = inferenceMatch1
+				.getForwardRelationMatch();
 
+		ElkClassExpression extendedTargetMatchExpression = toElkExpression(
+				extendedTargetMatch);
+		ElkClassExpression extendedOriginExpression = toElkExpression(
+				extendedOriginMatch);
+		deriveInclusion(extendedTargetMatch, extendedOriginMatch);
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
+				extendedTargetMatchExpression, extendedOriginExpression,
+				conclusionFactory_.getObjectHasSelf(forwardRelationMatch));
 		elkInferenceFactory_.getElkClassInclusionExistentialOfObjectHasSelf(
-				toElkExpression(originMatch), relationMatch);
-
+				extendedTargetMatchExpression, forwardRelationMatch);
 		return null;
 	}
 
@@ -1191,16 +1474,64 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(ForwardLinkOfObjectSomeValuesFromMatch2 inferenceMatch2) {
-		inferenceMatch2.getConclusionMatch(conclusionFactory_);
+		ForwardLinkMatch2 conclusionMatch2 = inferenceMatch2
+				.getConclusionMatch(conclusionFactory_);
+		inferences_.add(conclusionMatch2, inferenceMatch2);
+		for (ForwardLinkMatch3 child : hierarchy_
+				.getChildren(conclusionMatch2)) {
+			(new ForwardLinkMatch3InferenceVisitor(inferenceFactory_, child))
+					.visit(inferenceMatch2);
+		}
+		return null;
+	}
 
-		// no ELK inferences
+	@Override
+	public Void visit(ForwardLinkOfObjectSomeValuesFromMatch3 inferenceMatch3) {
+		inferenceMatch3.getConclusionMatch(conclusionFactory_);
+
+		// creating ELK inferences
+		IndexedContextRootMatch extendedTargetMatch = inferenceMatch3
+				.getExtendedTargetMatch();
+		ForwardLinkOfObjectSomeValuesFromMatch2 inferenceMatch2 = inferenceMatch3
+				.getParent();
+		IndexedObjectSomeValuesFromMatch premiseSuperExpressionMatch = inferenceMatch2
+				.getPremiseSuperExpressionMatch();
+		IndexedContextRootMatch extendedOriginMatch = inferenceMatch2
+				.getExtendedOriginMatch();
+		ElkObjectPropertyExpression propertyMatch = premiseSuperExpressionMatch
+				.getPropertyMatch();
+		ElkClassExpression fillerMatch = getFillerMatch(
+				premiseSuperExpressionMatch);
+
+		elkInferenceFactory_.getElkClassInclusionExistentialRange(propertyMatch,
+				fillerMatch, extendedTargetMatch.getRangeMatches());
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
+				toElkExpression(extendedOriginMatch),
+				conclusionFactory_.getObjectSomeValuesFrom(propertyMatch,
+						fillerMatch),
+				conclusionFactory_.getObjectSomeValuesFrom(propertyMatch,
+						toElkExpression(extendedTargetMatch)));
 		return null;
 	}
 
 	@Override
 	public Void visit(PropagationGeneratedMatch1 inferenceMatch1) {
-		inferenceMatch1.getSecondPremiseMatch(conclusionFactory_);
 		inferenceMatch1.getThirdPremiseMatch(conclusionFactory_);
+
+		SubClassInclusionComposedMatch1 premiseMatch1 = inferenceMatch1
+				.getSecondPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch1);
+		for (SubClassInclusionComposedMatch2 child : hierarchy_
+				.getChildren(premiseMatch1)) {
+			(new SubClassInclusionComposedMatch2InferenceVisitor(
+					inferenceFactory_, child)).visit(inferenceMatch1);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(PropagationGeneratedMatch2 inferenceMatch2) {
+		inferenceMatch2.getConclusionMatch(conclusionFactory_);
 
 		// no ELK inferences
 		return null;
@@ -1237,19 +1568,18 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		inferenceMatch3.getConclusionMatch(conclusionFactory_);
 
 		// creating ELK inferences
-		ElkObjectProperty superPropertyMatch = inferenceMatch3
-				.getSuperPropertyMatch();
+		ElkObjectProperty subPropertyMatch = inferenceMatch3
+				.getSubPropertyMatch();
 		PropertyRangeInheritedMatch2 inferenceMatch2 = inferenceMatch3
 				.getParent();
+		ElkObjectProperty superPropertyMatch = inferenceMatch2
+				.getSuperPropertyMatch();
 		ElkClassExpression rangeMatch = inferenceMatch2.getRangeMatch();
-		PropertyRangeInheritedMatch1 inferenceMatch1 = inferenceMatch2
-				.getParent();
-		ElkObjectProperty subPropertyMatch = inferenceMatch1
-				.getSubPropertyMatch();
 
 		elkInferenceFactory_.getElkPropertyRangePropertyUnfolding(
 				superPropertyMatch, rangeMatch, subPropertyMatch);
 		return null;
+
 	}
 
 	@Override
@@ -1269,52 +1599,264 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 	@Override
 	public Void visit(
 			SubClassInclusionComposedDefinedClassMatch2 inferenceMatch2) {
-		inferenceMatch2.getFirstPremiseMatch(conclusionFactory_);
+		SubClassInclusionComposedMatch1 premiseMatch1 = inferenceMatch2
+				.getFirstPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch2);
+		for (SubClassInclusionComposedMatch2 child : hierarchy_
+				.getChildren(premiseMatch1)) {
+			(new SubClassInclusionComposedMatch2InferenceVisitor(
+					inferenceFactory_, child)).visit(inferenceMatch2);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionComposedDefinedClassMatch3 inferenceMatch3) {
+		inferenceMatch3.getConclusionMatch(conclusionFactory_);
 
 		// creating ELK inferences
+		IndexedContextRootMatch extendedOriginMatch = inferenceMatch3
+				.getExtendedOriginMatch();
+		SubClassInclusionComposedDefinedClassMatch2 inferenceMatch2 = inferenceMatch3
+				.getParent();
 		ElkClassExpression definitionMatch = inferenceMatch2
 				.getDefinitionMatch();
 		SubClassInclusionComposedDefinedClassMatch1 inferenceMatch1 = inferenceMatch2
 				.getParent();
 		ElkClass definedClassMatch = inferenceMatch1.getDefinedClassMatch();
-		IndexedContextRootMatch originMatch = inferenceMatch1.getOriginMatch();
 
 		elkInferenceFactory_.getElkClassInclusionHierarchy(
-				toElkExpression(originMatch), definitionMatch,
+				toElkExpression(extendedOriginMatch), definitionMatch,
 				definedClassMatch);
 
+		return null;
+
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionComposedEmptyObjectIntersectionOfMatch1 inferenceMatch1) {
+		SubClassInclusionComposedMatch1 premiseMatch1 = inferenceMatch1
+				.getPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch1);
+		for (SubClassInclusionComposedMatch2 child : hierarchy_
+				.getChildren(premiseMatch1)) {
+			(new SubClassInclusionComposedMatch2InferenceVisitor(
+					inferenceFactory_, child)).visit(inferenceMatch1);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionComposedEmptyObjectIntersectionOfMatch2 inferenceMatch2) {
+		inferenceMatch2.getConclusionMatch(conclusionFactory_);
+
+		// create ELK inferences
+		IndexedContextRootMatch extendedDestinationMatch = inferenceMatch2
+				.getExtendedDestinationMatch();
+		ElkClassExpression subExpression = toElkExpression(
+				extendedDestinationMatch);
+		elkInferenceFactory_.getElkClassInclusionOwlThing(subExpression);
+		elkInferenceFactory_
+				.getElkClassInclusionOwlThingEmptyObjectIntersectionOf();
+		elkInferenceFactory_.getElkClassInclusionHierarchy(subExpression,
+				conclusionFactory_.getOwlThing(),
+				conclusionFactory_.getObjectIntersectionOf(
+						Collections.<ElkClassExpression> emptyList()));
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionComposedEmptyObjectOneOfMatch1 inferenceMatch1) {
+		SubClassInclusionComposedMatch1 premiseMatch1 = inferenceMatch1
+				.getPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch1);
+		for (SubClassInclusionComposedMatch2 child : hierarchy_
+				.getChildren(premiseMatch1)) {
+			(new SubClassInclusionComposedMatch2InferenceVisitor(
+					inferenceFactory_, child)).visit(inferenceMatch1);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionComposedEmptyObjectOneOfMatch2 inferenceMatch2) {
+		inferenceMatch2.getConclusionMatch(conclusionFactory_);
+
+		// create ELK inferences
+		IndexedContextRootMatch extendedDestinationMatch = inferenceMatch2
+				.getExtendedDestinationMatch();
+		ElkClassExpression subExpression = toElkExpression(
+				extendedDestinationMatch);
+		ElkObjectOneOf emptyOneOf = conclusionFactory_
+				.getObjectOneOf(Collections.<ElkIndividual> emptyList());
+		elkInferenceFactory_.getElkClassInclusionOwlNothing(emptyOneOf);
+		elkInferenceFactory_.getElkClassInclusionHierarchy(subExpression,
+				conclusionFactory_.getOwlNothing(), emptyOneOf);
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionComposedEmptyObjectUnionOfMatch1 inferenceMatch1) {
+		SubClassInclusionComposedMatch1 premiseMatch1 = inferenceMatch1
+				.getPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch1);
+		for (SubClassInclusionComposedMatch2 child : hierarchy_
+				.getChildren(premiseMatch1)) {
+			(new SubClassInclusionComposedMatch2InferenceVisitor(
+					inferenceFactory_, child)).visit(inferenceMatch1);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionComposedEmptyObjectUnionOfMatch2 inferenceMatch2) {
+		inferenceMatch2.getConclusionMatch(conclusionFactory_);
+
+		// create ELK inferences
+		IndexedContextRootMatch extendedDestinationMatch = inferenceMatch2
+				.getExtendedDestinationMatch();
+		ElkClassExpression subExpression = toElkExpression(
+				extendedDestinationMatch);
+		ElkObjectUnionOf emptyUnionOf = conclusionFactory_
+				.getObjectUnionOf(Collections.<ElkClassExpression> emptyList());
+		elkInferenceFactory_.getElkClassInclusionOwlNothing(emptyUnionOf);
+		elkInferenceFactory_.getElkClassInclusionHierarchy(subExpression,
+				conclusionFactory_.getOwlNothing(), emptyUnionOf);
 		return null;
 	}
 
 	@Override
 	public Void visit(SubClassInclusionComposedEntityMatch1 inferenceMatch1) {
-		inferenceMatch1.getPremiseMatch(conclusionFactory_);
+		SubClassInclusionDecomposedMatch1 premiseMatch2 = inferenceMatch1
+				.getPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch2, inferenceMatch1);
+		for (SubClassInclusionDecomposedMatch2 child : hierarchy_
+				.getChildren(premiseMatch2)) {
+			(new SubClassInclusionDecomposedMatch2InferenceVisitor(
+					inferenceFactory_, child)).visit(inferenceMatch1);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(SubClassInclusionComposedEntityMatch2 inferenceMatch2) {
+		inferenceMatch2.getConclusionMatch(conclusionFactory_);
+
 		// no ELK inferences
 		return null;
 	}
 
 	@Override
 	public Void visit(
+			SubClassInclusionComposedObjectHasValueMatch1 inferenceMatch1) {
+		SubClassInclusionComposedMatch1 premiseMatch1 = inferenceMatch1
+				.getPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch1);
+		for (SubClassInclusionComposedMatch2 child : hierarchy_
+				.getChildren(premiseMatch1)) {
+			(new SubClassInclusionComposedMatch2InferenceVisitor(
+					inferenceFactory_, child)).visit(inferenceMatch1);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionComposedObjectHasValueMatch2 inferenceMatch2) {
+		inferenceMatch2.getConclusionMatch(conclusionFactory_);
+
+		// create ELK inferences
+		IndexedContextRootMatch extendedDestinationMatch = inferenceMatch2
+				.getExtendedDestinationMatch();
+		SubClassInclusionComposedObjectHasValueMatch1 inferenceMatch1 = inferenceMatch2
+				.getParent();
+		ElkObjectHasValue conclusionSubsumer = inferenceMatch1
+				.getConclusionSubsumerMatch();
+		ElkObjectPropertyExpression property = conclusionSubsumer.getProperty();
+		ElkIndividual value = conclusionSubsumer.getFiller();
+		ElkObjectSomeValuesFrom premiseSubsumer = conclusionFactory_
+				.getObjectSomeValuesFrom(property,
+						conclusionFactory_.getObjectOneOf(value));
+		elkInferenceFactory_.getElkEquivalentClassesObjectHasValue(property,
+				value);
+		elkInferenceFactory_.getElkClassInclusionOfEquivaletClasses(
+				conclusionSubsumer, premiseSubsumer, false);
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
+				toElkExpression(extendedDestinationMatch), premiseSubsumer,
+				conclusionSubsumer);
+		return null;
+	}
+
+	@Override
+	public Void visit(
 			SubClassInclusionComposedObjectIntersectionOfMatch1 inferenceMatch1) {
-		inferenceMatch1.getFirstPremiseMatch(conclusionFactory_);
-		inferenceMatch1.getSecondPremiseMatch(conclusionFactory_);
+		SubClassInclusionComposedMatch1 premiseMatch1 = inferenceMatch1
+				.getSecondPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch1);
+		for (SubClassInclusionComposedMatch2 child : hierarchy_
+				.getChildren(premiseMatch1)) {
+			(new SubClassInclusionComposedMatch2InferenceVisitor(
+					inferenceFactory_, child)).visit(inferenceMatch1);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionComposedObjectIntersectionOfMatch2 inferenceMatch2) {
+		SubClassInclusionComposedMatch1 premiseMatch1 = inferenceMatch2
+				.getFirstPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch2);
+		for (SubClassInclusionComposedMatch2 child : hierarchy_
+				.getChildren(premiseMatch1)) {
+			(new SubClassInclusionComposedMatch2InferenceVisitor(
+					inferenceFactory_, child)).visit(inferenceMatch2);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionComposedObjectIntersectionOfMatch3 inferenceMatch3) {
+		inferenceMatch3.getConclusionMatch(conclusionFactory_);
 
 		// creating ELK inferences
+		IndexedContextRootMatch extendedExtendedOriginMatch = inferenceMatch3
+				.getExtendedExtendedOriginMatch();
+		SubClassInclusionComposedObjectIntersectionOfMatch2 inferenceMatch2 = inferenceMatch3
+				.getParent();
+		IndexedContextRootMatch extendedOriginMatch = inferenceMatch2
+				.getExtendedOriginMatch();
+		SubClassInclusionComposedObjectIntersectionOfMatch1 inferenceMatch1 = inferenceMatch2
+				.getParent();
 		int prefixLength = inferenceMatch1.getConclusionSubsumerPrefixLength();
 		ElkObjectIntersectionOf fullSubsumerMatch = inferenceMatch1
 				.getFullSubsumerMatch();
 		List<? extends ElkClassExpression> conjuncts = fullSubsumerMatch
 				.getClassExpressions();
 
+		deriveInclusion(extendedExtendedOriginMatch, extendedOriginMatch);
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
+				toElkExpression(extendedExtendedOriginMatch),
+				toElkExpression(extendedOriginMatch),
+				conjuncts.get(prefixLength - 1));
+
 		if (prefixLength < conjuncts.size()) {
 			// the conjunction is not fully composed yet
 			return null;
 		}
 		// else
-		IndexedContextRootMatch originMatch = inferenceMatch1.getOriginMatch();
 		elkInferenceFactory_
 				.getElkClassInclusionObjectIntersectionOfComposition(
-						toElkExpression(originMatch), conjuncts);
+						toElkExpression(extendedExtendedOriginMatch),
+						conjuncts);
 
 		return null;
 	}
@@ -1335,70 +1877,105 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 	@Override
 	public Void visit(
 			SubClassInclusionComposedObjectSomeValuesFromMatch2 inferenceMatch2) {
-		inferenceMatch2.getSecondPremiseMatch(conclusionFactory_);
+		PropagationMatch1 premiseMatch1 = inferenceMatch2
+				.getSecondPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch2);
+		for (PropagationMatch2 child : hierarchy_.getChildren(premiseMatch1)) {
+			(new PropagationMatch2InferenceVisitor(inferenceFactory_, child))
+					.visit(inferenceMatch2);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionComposedObjectSomeValuesFromMatch3 inferenceMatch3) {
+		BackwardLinkMatch3 premiseMatch1 = inferenceMatch3
+				.getFirstPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch3);
+		for (BackwardLinkMatch4 child : hierarchy_.getChildren(premiseMatch1)) {
+			(new BackwardLinkMatch4InferenceVisitor(inferenceFactory_, child))
+					.visit(inferenceMatch3);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionComposedObjectSomeValuesFromMatch4 inferenceMatch4) {
+		inferenceMatch4.getConclusionMatch(conclusionFactory_);
 
 		// creating ELK inferences
-		IndexedContextRootMatch originMatch = inferenceMatch2.getOriginMatch();
+		IndexedContextRootMatch extendedDestinationMatch = inferenceMatch4
+				.getExtendedDestinationMatch();
+		SubClassInclusionComposedObjectSomeValuesFromMatch3 inferenceMatch3 = inferenceMatch4
+				.getParent();
+		IndexedContextRootMatch extendedOriginMatch = inferenceMatch3
+				.getExtendedOriginMatch();
+		SubClassInclusionComposedObjectSomeValuesFromMatch2 inferenceMatch2 = inferenceMatch3
+				.getParent();
 		ElkObjectProperty propagationRelationMatch = inferenceMatch2
 				.getPropagationRelationMatch();
 		SubClassInclusionComposedObjectSomeValuesFromMatch1 inferenceMatch1 = inferenceMatch2
 				.getParent();
-		IndexedContextRootMatch destinationMatch = inferenceMatch1
-				.getDestinationMatch();
 		IndexedObjectSomeValuesFromMatch conclusionSubsumerMatch = inferenceMatch1
 				.getConclusionSubsumerMatch();
 
-		ElkClassExpression fillerMatch = conclusionSubsumerMatch.accept(
-				new IndexedObjectSomeValuesFromMatch.Visitor<ElkClassExpression>() {
+		ElkClassExpression fillerMatch = getFillerMatch(
+				conclusionSubsumerMatch);
 
-					@Override
-					public ElkClassExpression visit(
-							SubsumerObjectHasValueMatch match) {
-						return conclusionFactory_.getObjectOneOf(Collections
-								.singletonList(match.getValue().getFiller()));
-					}
+		ElkClassExpression extendedOriginExpression = toElkExpression(
+				extendedOriginMatch);
+		ElkClassExpression extendedDestinationExpression = toElkExpression(
+				extendedDestinationMatch);
 
-					@Override
-					public ElkClassExpression visit(
-							SubsumerObjectSomeValuesFromMatch match) {
-						return match.getValue().getFiller();
-					}
-				});
-
-		elkInferenceFactory_.getElkClassInclusionHierarchy(
-				toElkExpression(destinationMatch),
-				conclusionFactory_.getObjectSomeValuesFrom(
-						propagationRelationMatch, toElkExpression(originMatch)),
-				conclusionFactory_.getObjectSomeValuesFrom(
-						propagationRelationMatch, fillerMatch));
 		elkInferenceFactory_.getElkClassInclusionExistentialFillerExpansion(
-				toElkExpression(originMatch), fillerMatch,
+				extendedOriginExpression, fillerMatch,
 				propagationRelationMatch);
 		ElkObjectPropertyExpression conclusionPropertyMatch = conclusionSubsumerMatch
 				.getPropertyMatch();
+		elkInferenceFactory_.getElkClassInclusionExistentialPropertyExpansion(
+				propagationRelationMatch, conclusionPropertyMatch, fillerMatch);
 		elkInferenceFactory_.getElkClassInclusionHierarchy(
-				toElkExpression(destinationMatch),
+				extendedDestinationExpression,
+				conclusionFactory_.getObjectSomeValuesFrom(
+						propagationRelationMatch, extendedOriginExpression),
 				conclusionFactory_.getObjectSomeValuesFrom(
 						propagationRelationMatch, fillerMatch),
 				conclusionFactory_.getObjectSomeValuesFrom(
 						conclusionPropertyMatch, fillerMatch));
-		elkInferenceFactory_.getElkClassInclusionExistentialPropertyExpansion(
-				propagationRelationMatch, conclusionPropertyMatch, fillerMatch);
 		return null;
 	}
 
 	@Override
 	public Void visit(
 			SubClassInclusionComposedObjectUnionOfMatch1 inferenceMatch1) {
-		inferenceMatch1.getPremiseMatch(conclusionFactory_);
+		SubClassInclusionComposedMatch1 premiseMatch1 = inferenceMatch1
+				.getPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch1);
+		for (SubClassInclusionComposedMatch2 child : hierarchy_
+				.getChildren(premiseMatch1)) {
+			(new SubClassInclusionComposedMatch2InferenceVisitor(
+					inferenceFactory_, child)).visit(inferenceMatch1);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionComposedObjectUnionOfMatch2 inferenceMatch2) {
+		inferenceMatch2.getConclusionMatch(conclusionFactory_);
 
 		// creating ELK inferences
-		final IndexedContextRootMatch originMatch = inferenceMatch1
-				.getOriginMatch();
+		IndexedContextRootMatch extendedOriginMatch = inferenceMatch2
+				.getExtendedOriginMatch();
+		SubClassInclusionComposedObjectUnionOfMatch1 inferenceMatch1 = inferenceMatch2
+				.getParent();
 		IndexedObjectUnionOfMatch disjunctionMatch = inferenceMatch1
 				.getConclusionSubsumerMatch();
 		final int pos = inferenceMatch1.getPosition();
-		final ElkClassExpression subExpression = toElkExpression(originMatch);
+		final ElkClassExpression subExpression = toElkExpression(
+				extendedOriginMatch);
 		disjunctionMatch.accept(new IndexedObjectUnionOfMatch.Visitor<Void>() {
 
 			@Override
@@ -1438,6 +2015,144 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(
+			SubClassInclusionComposedSingletonObjectIntersectionOfMatch1 inferenceMatch1) {
+		SubClassInclusionComposedMatch1 premiseMatch1 = inferenceMatch1
+				.getPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch1);
+		for (SubClassInclusionComposedMatch2 child : hierarchy_
+				.getChildren(premiseMatch1)) {
+			(new SubClassInclusionComposedMatch2InferenceVisitor(
+					inferenceFactory_, child)).visit(inferenceMatch1);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionComposedSingletonObjectIntersectionOfMatch2 inferenceMatch2) {
+		inferenceMatch2.getConclusionMatch(conclusionFactory_);
+
+		// create ELK inference
+		IndexedContextRootMatch extendedDestinationMatch = inferenceMatch2
+				.getExtendedDestinationMatch();
+		SubClassInclusionComposedSingletonObjectIntersectionOfMatch1 inferenceMatch1 = inferenceMatch2
+				.getParent();
+		ElkClassExpression conjunctMatch = inferenceMatch1.getConjunctMatch();
+		elkInferenceFactory_
+				.getElkClassInclusionObjectIntersectionOfComposition(
+						toElkExpression(extendedDestinationMatch),
+						Collections.singletonList(conjunctMatch));
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionComposedSingletonObjectOneOfMatch1 inferenceMatch1) {
+		SubClassInclusionComposedMatch1 premiseMatch1 = inferenceMatch1
+				.getPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch1);
+		for (SubClassInclusionComposedMatch2 child : hierarchy_
+				.getChildren(premiseMatch1)) {
+			(new SubClassInclusionComposedMatch2InferenceVisitor(
+					inferenceFactory_, child)).visit(inferenceMatch1);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionComposedSingletonObjectOneOfMatch2 inferenceMatch2) {
+		inferenceMatch2.getConclusionMatch(conclusionFactory_);
+
+		// no ELK inferences since indexed individuals are
+		// converted to ObjectOneOf
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionComposedSingletonObjectUnionOfMatch1 inferenceMatch1) {
+		SubClassInclusionComposedMatch1 premiseMatch1 = inferenceMatch1
+				.getPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch1);
+		for (SubClassInclusionComposedMatch2 child : hierarchy_
+				.getChildren(premiseMatch1)) {
+			(new SubClassInclusionComposedMatch2InferenceVisitor(
+					inferenceFactory_, child)).visit(inferenceMatch1);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionComposedSingletonObjectUnionOfMatch2 inferenceMatch2) {
+		inferenceMatch2.getConclusionMatch(conclusionFactory_);
+
+		// create ELK inferences
+		IndexedContextRootMatch extendedDestinationMatch = inferenceMatch2
+				.getExtendedDestinationMatch();
+		SubClassInclusionComposedSingletonObjectUnionOfMatch1 inferenceMatch1 = inferenceMatch2
+				.getParent();
+		ElkClassExpression disjunctMatch = inferenceMatch1.getDisjunctMatch();
+		List<ElkClassExpression> disjuncts = Collections
+				.singletonList(disjunctMatch);
+		elkInferenceFactory_
+				.getElkClassInclusionObjectUnionOfComposition(disjuncts, 0);
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
+				toElkExpression(extendedDestinationMatch), disjunctMatch,
+				conclusionFactory_.getObjectUnionOf(disjuncts));
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionDecomposedEmptyObjectIntersectionOfMatch1 inferenceMatch1) {
+		inferenceMatch1.getConclusionMatch(conclusionFactory_);
+
+		// create ELK inference
+		IndexedContextRootMatch extendedDestinationMatch = inferenceMatch1
+				.getExtendedDestinationMatch();
+		elkInferenceFactory_.getElkClassInclusionOwlThing(
+				toElkExpression(extendedDestinationMatch));
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionDecomposedEmptyObjectOneOfMatch1 inferenceMatch1) {
+		inferenceMatch1.getConclusionMatch(conclusionFactory_);
+
+		// create ELK inference
+		IndexedContextRootMatch extendedDestinationMatch = inferenceMatch1
+				.getExtendedDestinationMatch();
+		elkInferenceFactory_.getElkClassInclusionEmptyObjectOneOfOwlNothing();
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
+				toElkExpression(extendedDestinationMatch),
+				conclusionFactory_.getObjectOneOf(
+						Collections.<ElkIndividual> emptyList()),
+				conclusionFactory_.getOwlNothing());
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionDecomposedEmptyObjectUnionOfMatch1 inferenceMatch1) {
+		inferenceMatch1.getConclusionMatch(conclusionFactory_);
+
+		// create ELK inferences
+		IndexedContextRootMatch extendedDestinationMatch = inferenceMatch1
+				.getExtendedDestinationMatch();
+		elkInferenceFactory_.getElkClassInclusionEmptyObjectUnionOfOwlNothing();
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
+				toElkExpression(extendedDestinationMatch),
+				conclusionFactory_.getObjectUnionOf(
+						Collections.<ElkClassExpression> emptyList()),
+				conclusionFactory_.getOwlNothing());
+		return null;
+	}
+
+	@Override
+	public Void visit(
 			SubClassInclusionDecomposedFirstConjunctMatch1 inferenceMatch1) {
 		SubClassInclusionDecomposedMatch1 premiseMatch1 = inferenceMatch1
 				.getPremiseMatch(conclusionFactory_);
@@ -1466,19 +2181,43 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 		ElkObjectIntersectionOf fullSubsumerMatch = inferenceMatch2
 				.getFullSubsumerMatch();
-		SubClassInclusionDecomposedFirstConjunctMatch1 inferenceMatch1 = inferenceMatch2
-				.getParent();
-		IndexedContextRootMatch originMatch = inferenceMatch1.getOriginMatch();
+		IndexedContextRootMatch extendedOriginMatch = inferenceMatch2
+				.getExtendedOriginMatch();
 		List<? extends ElkClassExpression> conjuncts = fullSubsumerMatch
 				.getClassExpressions();
 		int pos = 0; // of the decomposed conjunct
-		elkInferenceFactory_.getElkClassInclusionHierarchy(
-				toElkExpression(originMatch),
-				conclusionFactory_.getObjectIntersectionOf(conjuncts),
-				conjuncts.get(pos));
 		elkInferenceFactory_
 				.getElkClassInclusionObjectIntersectionOfDecomposition(
 						conjuncts, pos);
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
+				toElkExpression(extendedOriginMatch),
+				conclusionFactory_.getObjectIntersectionOf(conjuncts),
+				conjuncts.get(pos));
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionDecomposedObjectHasValueMatch1 inferenceMatch1) {
+		inferenceMatch1.getConclusionMatch(conclusionFactory_);
+
+		// create ELK inferences
+		IndexedContextRootMatch extendedDestinationMatch = inferenceMatch1
+				.getExtendedDestinationMatch();
+		ElkObjectHasValue premiseSubsumer = inferenceMatch1
+				.getPremiseSubsumerMatch();
+		ElkObjectPropertyExpression property = premiseSubsumer.getProperty();
+		ElkIndividual value = premiseSubsumer.getFiller();
+		ElkObjectSomeValuesFrom conclusionSubsumer = conclusionFactory_
+				.getObjectSomeValuesFrom(property,
+						conclusionFactory_.getObjectOneOf(value));
+		elkInferenceFactory_.getElkEquivalentClassesObjectHasValue(property,
+				value);
+		elkInferenceFactory_.getElkClassInclusionOfEquivaletClasses(
+				premiseSubsumer, conclusionSubsumer, true);
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
+				toElkExpression(extendedDestinationMatch), premiseSubsumer,
+				conclusionSubsumer);
 		return null;
 	}
 
@@ -1506,20 +2245,61 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 				.getFullSubsumerMatch();
 		int subsumerPrefixLength = inferenceMatch2
 				.getPremiseSubsumerPrefixLength();
-		SubClassInclusionDecomposedSecondConjunctMatch1 inferenceMatch1 = inferenceMatch2
-				.getParent();
-		IndexedContextRootMatch originMatch = inferenceMatch1.getOriginMatch();
-
+		IndexedContextRootMatch extendedOriginMatch = inferenceMatch2
+				.getExtendedOriginMatch();
 		List<? extends ElkClassExpression> conjuncts = fullSubsumerMatch
 				.getClassExpressions();
 		int pos = subsumerPrefixLength - 1; // of the decomposed conjunct
-		elkInferenceFactory_.getElkClassInclusionHierarchy(
-				toElkExpression(originMatch),
-				conclusionFactory_.getObjectIntersectionOf(conjuncts),
-				conjuncts.get(pos));
 		elkInferenceFactory_
 				.getElkClassInclusionObjectIntersectionOfDecomposition(
 						conjuncts, pos);
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
+				toElkExpression(extendedOriginMatch),
+				conclusionFactory_.getObjectIntersectionOf(conjuncts),
+				conjuncts.get(pos));
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionDecomposedSingletonObjectIntersectionOfMatch1 inferenceMatch1) {
+		inferenceMatch1.getConclusionMatch(conclusionFactory_);
+
+		// create ELK inferences
+		IndexedContextRootMatch extendedDestinationMatch = inferenceMatch1
+				.getExtendedDestinationMatch();
+		ElkClassExpression conjunct = inferenceMatch1.getConjunctMatch();
+		List<ElkClassExpression> conjuncts = Collections
+				.singletonList(conjunct);
+		elkInferenceFactory_
+				.getElkClassInclusionObjectIntersectionOfDecomposition(
+						conjuncts, 0);
+		elkInferenceFactory_.getElkClassInclusionHierarchy(
+				toElkExpression(extendedDestinationMatch),
+				conclusionFactory_.getObjectIntersectionOf(conjuncts),
+				conjunct);
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionDecomposedSingletonObjectOneOfMatch1 inferenceMatch1) {
+		inferenceMatch1.getConclusionMatch(conclusionFactory_);
+
+		// no ELK inferences
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionDecomposedSingletonObjectUnionOfMatch1 inferenceMatch1) {
+		inferenceMatch1.getConclusionMatch(conclusionFactory_);
+
+		// create ELK inference
+		ElkClassExpression disjunct = inferenceMatch1.getDisjunctMatch();
+		elkInferenceFactory_
+				.getElkClassInclusionSingletonObjectUnionOfDecomposition(
+						disjunct);
 		return null;
 	}
 
@@ -1540,19 +2320,33 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 	@Override
 	public Void visit(
 			SubClassInclusionExpandedDefinitionMatch2 inferenceMatch2) {
-		inferenceMatch2.getFirstPremiseMatch(conclusionFactory_);
-		inferenceMatch2.getConclusionMatch(conclusionFactory_);
+		SubClassInclusionDecomposedMatch1 premiseMatch1 = inferenceMatch2
+				.getFirstPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch2);
+		for (SubClassInclusionDecomposedMatch2 child : hierarchy_
+				.getChildren(premiseMatch1)) {
+			(new SubClassInclusionDecomposedMatch2InferenceVisitor(
+					inferenceFactory_, child)).visit(inferenceMatch2);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionExpandedDefinitionMatch3 inferenceMatch3) {
+		inferenceMatch3.getConclusionMatch(conclusionFactory_);
 
 		// creating ELK inferences
+		IndexedContextRootMatch extendedOriginMatch = inferenceMatch3
+				.getExtendedOriginMatch();
+		SubClassInclusionExpandedDefinitionMatch2 inferenceMatch2 = inferenceMatch3
+				.getParent();
 		ElkClass definedClassMatch = inferenceMatch2.getDefinedClassMatch();
 		ElkClassExpression definitionMatch = inferenceMatch2
 				.getDefinitionMatch();
-		SubClassInclusionExpandedDefinitionMatch1 inferenceMatch1 = inferenceMatch2
-				.getParent();
-		IndexedContextRootMatch originMatch = inferenceMatch1.getOriginMatch();
 
 		elkInferenceFactory_.getElkClassInclusionHierarchy(
-				toElkExpression(originMatch), definedClassMatch,
+				toElkExpression(extendedOriginMatch), definedClassMatch,
 				definitionMatch);
 
 		return null;
@@ -1575,23 +2369,38 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 	@Override
 	public Void visit(
 			SubClassInclusionExpandedFirstEquivalentClassMatch2 inferenceMatch2) {
-		inferenceMatch2.getFirstPremiseMatch(conclusionFactory_);
-		inferenceMatch2.getConclusionMatch(conclusionFactory_);
+		SubClassInclusionComposedMatch1 premiseMatch1 = inferenceMatch2
+				.getFirstPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch2);
+		for (SubClassInclusionComposedMatch2 child : hierarchy_
+				.getChildren(premiseMatch1)) {
+			(new SubClassInclusionComposedMatch2InferenceVisitor(
+					inferenceFactory_, child)).visit(inferenceMatch2);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionExpandedFirstEquivalentClassMatch3 inferenceMatch3) {
+		inferenceMatch3.getConclusionMatch(conclusionFactory_);
 
 		// creating ELK inferences
+		IndexedContextRootMatch extendedOriginMatch = inferenceMatch3
+				.getExtendedOriginMatch();
+		SubClassInclusionExpandedFirstEquivalentClassMatch2 inferenceMatch2 = inferenceMatch3
+				.getParent();
 		ElkClassExpression conclusionSubsumerMatch = inferenceMatch2
 				.getConclusionSubsumerMatch();
 		ElkClassExpression premiseSubsumerMatch = inferenceMatch2
 				.getPremiseSubsumerMatch();
-		SubClassInclusionExpandedFirstEquivalentClassMatch1 inferenceMatch1 = inferenceMatch2
-				.getParent();
-		IndexedContextRootMatch originMatch = inferenceMatch1.getOriginMatch();
 
 		elkInferenceFactory_.getElkClassInclusionHierarchy(
-				toElkExpression(originMatch), premiseSubsumerMatch,
+				toElkExpression(extendedOriginMatch), premiseSubsumerMatch,
 				conclusionSubsumerMatch);
 
 		return null;
+
 	}
 
 	@Override
@@ -1611,23 +2420,38 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 	@Override
 	public Void visit(
 			SubClassInclusionExpandedSecondEquivalentClassMatch2 inferenceMatch2) {
-		inferenceMatch2.getFirstPremiseMatch(conclusionFactory_);
-		inferenceMatch2.getConclusionMatch(conclusionFactory_);
+		SubClassInclusionComposedMatch1 premiseMatch1 = inferenceMatch2
+				.getFirstPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch2);
+		for (SubClassInclusionComposedMatch2 child : hierarchy_
+				.getChildren(premiseMatch1)) {
+			(new SubClassInclusionComposedMatch2InferenceVisitor(
+					inferenceFactory_, child)).visit(inferenceMatch2);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionExpandedSecondEquivalentClassMatch3 inferenceMatch3) {
+		inferenceMatch3.getConclusionMatch(conclusionFactory_);
 
 		// creating ELK inferences
+		IndexedContextRootMatch extendedOriginMatch = inferenceMatch3
+				.getExtendedOriginMatch();
+		SubClassInclusionExpandedSecondEquivalentClassMatch2 inferenceMatch2 = inferenceMatch3
+				.getParent();
 		ElkClassExpression conclusionSubsumerMatch = inferenceMatch2
 				.getConclusionSubsumerMatch();
 		ElkClassExpression premiseSubsumerMatch = inferenceMatch2
 				.getPremiseSubsumerMatch();
-		SubClassInclusionExpandedSecondEquivalentClassMatch1 inferenceMatch1 = inferenceMatch2
-				.getParent();
-		IndexedContextRootMatch originMatch = inferenceMatch1.getOriginMatch();
 
 		elkInferenceFactory_.getElkClassInclusionHierarchy(
-				toElkExpression(originMatch), premiseSubsumerMatch,
+				toElkExpression(extendedOriginMatch), premiseSubsumerMatch,
 				conclusionSubsumerMatch);
 
 		return null;
+
 	}
 
 	@Override
@@ -1647,20 +2471,34 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 	@Override
 	public Void visit(
 			SubClassInclusionExpandedSubClassOfMatch2 inferenceMatch2) {
-		inferenceMatch2.getFirstPremiseMatch(conclusionFactory_);
-		inferenceMatch2.getConclusionMatch(conclusionFactory_);
+		SubClassInclusionComposedMatch1 premiseMatch1 = inferenceMatch2
+				.getFirstPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch2);
+		for (SubClassInclusionComposedMatch2 child : hierarchy_
+				.getChildren(premiseMatch1)) {
+			(new SubClassInclusionComposedMatch2InferenceVisitor(
+					inferenceFactory_, child)).visit(inferenceMatch2);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionExpandedSubClassOfMatch3 inferenceMatch3) {
+		inferenceMatch3.getConclusionMatch(conclusionFactory_);
 
 		// creating ELK inferences
+		IndexedContextRootMatch extendedOriginMatch = inferenceMatch3
+				.getExtendedOriginMatch();
+		SubClassInclusionExpandedSubClassOfMatch2 inferenceMatch2 = inferenceMatch3
+				.getParent();
 		ElkClassExpression conclusionSubsumerMatch = inferenceMatch2
 				.getConclusionSubsumerMatch();
 		ElkClassExpression premiseSubsumerMatch = inferenceMatch2
 				.getPremiseSubsumerMatch();
-		SubClassInclusionExpandedSubClassOfMatch1 inferenceMatch1 = inferenceMatch2
-				.getParent();
-		IndexedContextRootMatch originMatch = inferenceMatch1.getOriginMatch();
 
 		elkInferenceFactory_.getElkClassInclusionHierarchy(
-				toElkExpression(originMatch), premiseSubsumerMatch,
+				toElkExpression(extendedOriginMatch), premiseSubsumerMatch,
 				conclusionSubsumerMatch);
 
 		return null;
@@ -1703,13 +2541,13 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		ElkClassExpression rangeMatch = inferenceMatch3.getRangeMatch();
 		SubClassInclusionObjectHasSelfPropertyRangeMatch2 inferenceMatch2 = inferenceMatch3
 				.getParent();
+		IndexedContextRootMatch extendedOriginMatch = inferenceMatch2
+				.getExtendedOriginMatch();
 		ElkObjectProperty propertyMatch = inferenceMatch2.getPropertyMatch();
-		SubClassInclusionObjectHasSelfPropertyRangeMatch1 inferenceMatch1 = inferenceMatch2
-				.getParent();
-		IndexedContextRootMatch originMatch = inferenceMatch1.getOriginMatch();
 
 		elkInferenceFactory_.getElkClassInclusionReflexivePropertyRange(
-				toElkExpression(originMatch), propertyMatch, rangeMatch);
+				toElkExpression(extendedOriginMatch), propertyMatch,
+				rangeMatch);
 
 		return null;
 	}
@@ -1729,7 +2567,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 	@Override
 	public Void visit(SubClassInclusionRangeMatch1 inferenceMatch1) {
 		PropertyRangeMatch1 premiseMatch1 = inferenceMatch1
-				.getPremiseMatch(conclusionFactory_);
+				.getSecondPremiseMatch(conclusionFactory_);
 		inferences_.add(premiseMatch1, inferenceMatch1);
 		for (PropertyRangeMatch2 child : hierarchy_
 				.getChildren(premiseMatch1)) {
@@ -1744,7 +2582,22 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		inferenceMatch2.getConclusionMatch(conclusionFactory_);
 
 		// creating ELK inferences
-		// TODO
+		ElkClassExpression conclusionSubsumerMatch = inferenceMatch2
+				.getConclusionSubsumerMatch();
+		SubClassInclusionRangeMatch1 inferenceMatch1 = inferenceMatch2
+				.getParent();
+		IndexedContextRootMatch originMatch = inferenceMatch1.getOriginMatch();
+		List<? extends ElkClassExpression> rangeMatches = originMatch
+				.getRangeMatches();
+		List<ElkClassExpression> fillerRanges = new ArrayList<ElkClassExpression>(
+				rangeMatches.size() + 2);
+		fillerRanges.add(originMatch.getMainFillerMatch(conclusionFactory_));
+		fillerRanges.addAll(originMatch.getRangeMatches());
+		fillerRanges.add(conclusionSubsumerMatch);
+		elkInferenceFactory_
+				.getElkClassInclusionObjectIntersectionOfDecomposition(
+						fillerRanges, fillerRanges.size() - 1);
+
 		return null;
 	}
 
@@ -1755,8 +2608,14 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		// creating ELK inferences
 		IndexedContextRootMatch originMatch = inferenceMatch1.getOriginMatch();
 
-		elkInferenceFactory_
-				.getElkClassInclusionTautology(toElkExpression(originMatch));
+		if (originMatch.getRangeMatches().isEmpty()) {
+			elkInferenceFactory_.getElkClassInclusionTautology(
+					toElkExpression(originMatch));
+		} else {
+			elkInferenceFactory_
+					.getElkClassInclusionObjectIntersectionOfDecomposition(
+							getFillerRanges(originMatch), 0);
+		}
 		return null;
 	}
 

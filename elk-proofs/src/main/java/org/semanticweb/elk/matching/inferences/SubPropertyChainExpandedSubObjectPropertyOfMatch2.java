@@ -41,6 +41,7 @@ public class SubPropertyChainExpandedSubObjectPropertyOfMatch2 extends
 		super(parent);
 		subChainMatch_ = firstPremiseMatch.getSubPropertyChainMatch();
 		interPropertyMatch_ = firstPremiseMatch.getSuperPropertyMatch();
+		checkEquals(firstPremiseMatch, getFirstPremiseMatch(DEBUG_FACTORY));
 	}
 
 	public ElkSubObjectPropertyExpression getSubChainMatch() {
@@ -51,17 +52,24 @@ public class SubPropertyChainExpandedSubObjectPropertyOfMatch2 extends
 		return interPropertyMatch_;
 	}
 
+	public IndexedSubObjectPropertyOfAxiomMatch2 getFirstPremiseMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getIndexedSubObjectPropertyOfAxiomMatch2(
+				getParent().getFirstPremiseMatch(factory), getSubChainMatch(),
+				getInterPropertyMatch());
+	}
+
 	public SubPropertyChainMatch2 getSecondPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getSubPropertyChainMatch2(
-				getParent().getSecondPremiseMatch(factory), interPropertyMatch_,
-				0);
+				getParent().getSecondPremiseMatch(factory),
+				getInterPropertyMatch(), 0);
 	}
 
 	public SubPropertyChainMatch2 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getSubPropertyChainMatch2(
-				getParent().getConclusionMatch(factory), subChainMatch_, 0);
+				getParent().getConclusionMatch(factory), getSubChainMatch(), 0);
 	}
 
 	@Override

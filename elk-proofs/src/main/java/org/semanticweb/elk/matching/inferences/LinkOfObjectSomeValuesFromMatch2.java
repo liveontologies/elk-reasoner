@@ -37,22 +37,22 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedRangeFiller;
 abstract class LinkOfObjectSomeValuesFromMatch2<P>
 		extends AbstractInferenceMatch<P> {
 
-	private final IndexedObjectSomeValuesFromMatch premiseSubsumerMatch_;
+	private final IndexedObjectSomeValuesFromMatch premiseSuperExpressionMatch_;
 
 	public LinkOfObjectSomeValuesFromMatch2(P parent,
 			SubClassInclusionDecomposedMatch2 premiseMatch) {
 		super(parent);
-		this.premiseSubsumerMatch_ = premiseMatch
+		this.premiseSuperExpressionMatch_ = premiseMatch
 				.getSubsumerIndexedObjectSomeValuesFromMatch();
 	}
 
-	public IndexedObjectSomeValuesFromMatch getPremiseSubsumerMatch() {
-		return premiseSubsumerMatch_;
+	public IndexedObjectSomeValuesFromMatch getPremiseSuperExpressionMatch() {
+		return premiseSuperExpressionMatch_;
 	}
 
 	ElkObjectProperty getPremisePropertyMatch(
 			IndexedObjectProperty premiseProperty) {
-		ElkObjectPropertyExpression premisePropertyMatch = premiseSubsumerMatch_
+		ElkObjectPropertyExpression premisePropertyMatch = premiseSuperExpressionMatch_
 				.getPropertyMatch();
 		if (premisePropertyMatch instanceof ElkObjectProperty) {
 			return (ElkObjectProperty) premisePropertyMatch;
@@ -69,14 +69,15 @@ abstract class LinkOfObjectSomeValuesFromMatch2<P>
 					@Override
 					protected IndexedContextRootMatch defaultVisit(
 							IndexedClassExpression element) {
-						return premiseSubsumerMatch_
+						return premiseSuperExpressionMatch_
 								.getFillerRootMatch(factory);
 					}
 
 					@Override
 					public IndexedContextRootMatch visit(
 							IndexedRangeFiller element) {
-						return premiseSubsumerMatch_.getRangeRootMatch(factory);
+						return premiseSuperExpressionMatch_
+								.getRangeRootMatch(factory);
 					}
 
 				});

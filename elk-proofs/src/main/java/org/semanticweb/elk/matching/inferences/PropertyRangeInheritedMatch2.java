@@ -24,7 +24,6 @@ package org.semanticweb.elk.matching.inferences;
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.IndexedObjectPropertyRangeAxiomMatch2;
-import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch2;
 import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1;
 import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1Watch;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -43,6 +42,7 @@ public class PropertyRangeInheritedMatch2
 		super(parent);
 		this.superPropertyMatch_ = secondPremiseMatch.getPropertyMatch();
 		this.rangeMatch_ = secondPremiseMatch.getRangeMatch();
+		checkEquals(secondPremiseMatch, getSecondPremiseMatch(DEBUG_FACTORY));
 	}
 
 	public ElkObjectProperty getSuperPropertyMatch() {
@@ -60,10 +60,11 @@ public class PropertyRangeInheritedMatch2
 				superPropertyMatch_, 0);
 	}
 
-	public PropertyRangeMatch2 getConclusionMatch(
+	IndexedObjectPropertyRangeAxiomMatch2 getSecondPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getPropertyRangeMatch2(
-				getParent().getConclusionMatch(factory), rangeMatch_);
+		return factory.getIndexedObjectPropertyRangeAxiomMatch2(
+				getParent().getSecondPremiseMatch(factory),
+				getSuperPropertyMatch(), getRangeMatch());
 	}
 
 	@Override

@@ -25,11 +25,12 @@ package org.semanticweb.elk.matching.inferences;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch2;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
-import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
+import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1Watch;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 
 public class SubClassInclusionExpandedSecondEquivalentClassMatch2 extends
-		AbstractInferenceMatch<SubClassInclusionExpandedSecondEquivalentClassMatch1> {
+		AbstractInferenceMatch<SubClassInclusionExpandedSecondEquivalentClassMatch1>
+		implements SubClassInclusionComposedMatch1Watch {
 
 	private final ElkClassExpression premiseSubsumerMatch_,
 			conclusionSubsumerMatch_;
@@ -38,16 +39,18 @@ public class SubClassInclusionExpandedSecondEquivalentClassMatch2 extends
 			SubClassInclusionExpandedSecondEquivalentClassMatch1 parent,
 			IndexedEquivalentClassesAxiomMatch2 secondPremiseMatch) {
 		super(parent);
+		this.conclusionSubsumerMatch_ = secondPremiseMatch
+				.getFirstMemberMatch();
 		this.premiseSubsumerMatch_ = secondPremiseMatch.getSecondMemberMatch();
-		this.conclusionSubsumerMatch_ = secondPremiseMatch.getFirstMemberMatch();
-	}
-
-	public ElkClassExpression getPremiseSubsumerMatch() {
-		return premiseSubsumerMatch_;
+		checkEquals(secondPremiseMatch, getSecondPremiseMatch(DEBUG_FACTORY));
 	}
 
 	public ElkClassExpression getConclusionSubsumerMatch() {
 		return conclusionSubsumerMatch_;
+	}
+
+	public ElkClassExpression getPremiseSubsumerMatch() {
+		return premiseSubsumerMatch_;
 	}
 
 	public SubClassInclusionComposedMatch1 getFirstPremiseMatch(
@@ -57,16 +60,21 @@ public class SubClassInclusionExpandedSecondEquivalentClassMatch2 extends
 				getParent().getOriginMatch(), getPremiseSubsumerMatch());
 	}
 
-	public SubClassInclusionDecomposedMatch2 getConclusionMatch(
+	IndexedEquivalentClassesAxiomMatch2 getSecondPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getSubClassInclusionDecomposedMatch2(
-				getParent().getConclusionMatch(factory),
-				getConclusionSubsumerMatch());
-
+		return factory.getIndexedEquivalentClassesAxiomMatch2(
+				getParent().getSecondPremiseMatch(factory),
+				getConclusionSubsumerMatch(), getPremiseSubsumerMatch());
 	}
 
 	@Override
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(
+			SubClassInclusionComposedMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

@@ -39,22 +39,23 @@ public class SubClassInclusionObjectHasSelfPropertyRangeMatch1 extends
 			SubClassInclusionDecomposedMatch1 conclusionMatch) {
 		super(parent);
 		originMatch_ = conclusionMatch.getDestinationMatch();
+		checkEquals(conclusionMatch, getConclusionMatch(DEBUG_FACTORY));
 	}
 
-	public IndexedContextRootMatch getOriginMatch() {
+	IndexedContextRootMatch getOriginMatch() {
 		return originMatch_;
-	}
-
-	public SubClassInclusionDecomposedMatch1 getConclusionMatch(
-			ConclusionMatchExpressionFactory factory) {
-		return factory.getSubClassInclusionDecomposedMatch1(
-				getParent().getConclusion(factory), originMatch_);
 	}
 
 	public SubClassInclusionDecomposedMatch1 getFirstPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getSubClassInclusionDecomposedMatch1(
-				getParent().getFirstPremise(factory), originMatch_);
+				getParent().getFirstPremise(factory), getOriginMatch());
+	}
+
+	SubClassInclusionDecomposedMatch1 getConclusionMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getSubClassInclusionDecomposedMatch1(
+				getParent().getConclusion(factory), getOriginMatch());
 	}
 
 	@Override

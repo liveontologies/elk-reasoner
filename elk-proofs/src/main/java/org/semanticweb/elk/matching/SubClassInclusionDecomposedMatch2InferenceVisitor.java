@@ -30,8 +30,10 @@ import org.semanticweb.elk.matching.inferences.ClassInconsistencyOfObjectComplem
 import org.semanticweb.elk.matching.inferences.ForwardLinkOfObjectHasSelfMatch1;
 import org.semanticweb.elk.matching.inferences.ForwardLinkOfObjectSomeValuesFromMatch1;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
+import org.semanticweb.elk.matching.inferences.SubClassInclusionComposedEntityMatch1;
 import org.semanticweb.elk.matching.inferences.SubClassInclusionDecomposedFirstConjunctMatch1;
 import org.semanticweb.elk.matching.inferences.SubClassInclusionDecomposedSecondConjunctMatch1;
+import org.semanticweb.elk.matching.inferences.SubClassInclusionExpandedDefinitionMatch2;
 import org.semanticweb.elk.matching.inferences.SubClassInclusionObjectHasSelfPropertyRangeMatch1;
 
 class SubClassInclusionDecomposedMatch2InferenceVisitor extends
@@ -61,8 +63,8 @@ class SubClassInclusionDecomposedMatch2InferenceVisitor extends
 	@Override
 	public Void visit(
 			ClassInconsistencyOfObjectComplementOfMatch1 inferenceMatch1) {
-		factory.getClassInconsistencyOfObjectComplementOfMatch2(
-				inferenceMatch1, child);
+		factory.getClassInconsistencyOfObjectComplementOfMatch2(inferenceMatch1,
+				child);
 		return null;
 	}
 
@@ -80,6 +82,13 @@ class SubClassInclusionDecomposedMatch2InferenceVisitor extends
 	}
 
 	@Override
+	public Void visit(SubClassInclusionComposedEntityMatch1 inferenceMatch1) {
+		factory.getSubClassInclusionComposedEntityMatch2(inferenceMatch1,
+				child);
+		return null;
+	}
+
+	@Override
 	public Void visit(
 			SubClassInclusionDecomposedFirstConjunctMatch1 inferenceMatch1) {
 		factory.getSubClassInclusionDecomposedFirstConjunctMatch2(
@@ -92,6 +101,14 @@ class SubClassInclusionDecomposedMatch2InferenceVisitor extends
 			SubClassInclusionDecomposedSecondConjunctMatch1 inferenceMatch1) {
 		factory.getSubClassInclusionDecomposedSecondConjunctMatch2(
 				inferenceMatch1, child);
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubClassInclusionExpandedDefinitionMatch2 inferenceMatch2) {
+		factory.getSubClassInclusionExpandedDefinitionMatch3(inferenceMatch2,
+				child);
 		return null;
 	}
 

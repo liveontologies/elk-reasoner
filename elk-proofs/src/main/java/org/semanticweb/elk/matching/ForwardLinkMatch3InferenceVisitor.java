@@ -24,9 +24,9 @@ package org.semanticweb.elk.matching;
 
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2Watch;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch3;
-import org.semanticweb.elk.matching.inferences.BackwardLinkCompositionMatch4;
-import org.semanticweb.elk.matching.inferences.BackwardLinkReversedExpandedMatch2;
 import org.semanticweb.elk.matching.inferences.ForwardLinkCompositionMatch4;
+import org.semanticweb.elk.matching.inferences.ForwardLinkOfObjectHasSelfMatch2;
+import org.semanticweb.elk.matching.inferences.ForwardLinkOfObjectSomeValuesFromMatch2;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
 
 class ForwardLinkMatch3InferenceVisitor
@@ -39,20 +39,21 @@ class ForwardLinkMatch3InferenceVisitor
 	}
 
 	@Override
-	public Void visit(BackwardLinkCompositionMatch4 inferenceMatch4) {
-		factory.getBackwardLinkCompositionMatch5(inferenceMatch4, child);
-		return null;
-	}
-
-	@Override
-	public Void visit(BackwardLinkReversedExpandedMatch2 inferenceMatch2) {
-		factory.getBackwardLinkReversedExpandedMatch3(inferenceMatch2, child);
-		return null;
-	}
-
-	@Override
 	public Void visit(ForwardLinkCompositionMatch4 inferenceMatch4) {
 		factory.getForwardLinkCompositionMatch5(inferenceMatch4, child);
+		return null;
+	}
+
+	@Override
+	public Void visit(ForwardLinkOfObjectHasSelfMatch2 inferenceMatch2) {
+		factory.getForwardLinkOfObjectHasSelfMatch3(inferenceMatch2, child);
+		return null;
+	}
+
+	@Override
+	public Void visit(ForwardLinkOfObjectSomeValuesFromMatch2 inferenceMatch2) {
+		factory.getForwardLinkOfObjectSomeValuesFromMatch3(inferenceMatch2,
+				child);
 		return null;
 	}
 

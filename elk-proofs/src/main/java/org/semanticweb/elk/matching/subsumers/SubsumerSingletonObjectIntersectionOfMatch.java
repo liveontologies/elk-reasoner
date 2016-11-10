@@ -1,5 +1,7 @@
 package org.semanticweb.elk.matching.subsumers;
 
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -33,6 +35,10 @@ public class SubsumerSingletonObjectIntersectionOfMatch
 			throw new IllegalArgumentException(
 					"ElkObjectIntersectionOf must be singleton: " + value);
 		}
+	}
+
+	public ElkClassExpression getMember() {
+		return getValue().getClassExpressions().get(0);
 	}
 
 	@Override

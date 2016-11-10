@@ -32,17 +32,19 @@ public class ConclusionMatchEquality
 
 		static boolean equals(IndexedContextRootMatchChain first,
 				IndexedContextRootMatchChain second) {
-			boolean result = false;
 			for (;;) {
 				if (first == null) {
-					return (second == null) && result;
+					return (second == null);
 				}
 				// else
 				if (second == null) {
 					return false;
 				}
 				// else
-				result &= equals(first.getHead(), second.getHead());
+				if (!equals(first.getHead(), second.getHead())) {
+					return false;
+				}
+				// else
 				first = first.getTail();
 				second = second.getTail();
 			}
@@ -101,6 +103,30 @@ public class ConclusionMatchEquality
 	}
 
 	@Override
+	public Boolean visit(final BackwardLinkMatch3 conclusionMatch) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(BackwardLinkMatch3 other) {
+				return equals(other.getParent(), conclusionMatch.getParent())
+						&& equals(other.getExtendedDestinationMatch(),
+								conclusionMatch.getExtendedDestinationMatch());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(final BackwardLinkMatch4 conclusionMatch) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(BackwardLinkMatch4 other) {
+				return equals(other.getParent(), conclusionMatch.getParent())
+						&& equals(other.getExtendedSourceMatch(),
+								conclusionMatch.getExtendedSourceMatch());
+			}
+		});
+	}
+
+	@Override
 	public Boolean visit(final ClassInconsistencyMatch1 conclusionMatch) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
@@ -108,6 +134,18 @@ public class ConclusionMatchEquality
 				return equals(other.getParent(), conclusionMatch.getParent())
 						&& equals(other.getDestinationMatch(),
 								conclusionMatch.getDestinationMatch());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(final ClassInconsistencyMatch2 conclusionMatch) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(ClassInconsistencyMatch2 other) {
+				return equals(other.getParent(), conclusionMatch.getParent())
+						&& equals(other.getExtendedDestinationMatch(),
+								conclusionMatch.getExtendedDestinationMatch());
 			}
 		});
 	}
@@ -130,6 +168,8 @@ public class ConclusionMatchEquality
 			@Override
 			public Boolean visit(DisjointSubsumerMatch2 other) {
 				return equals(other.getParent(), conclusionMatch.getParent())
+						&& equals(other.getExtendedDestinationMatch(),
+								conclusionMatch.getExtendedDestinationMatch())
 						&& equals(other.getDisjointExpressionsMatch(),
 								conclusionMatch.getDisjointExpressionsMatch());
 			}
@@ -143,7 +183,11 @@ public class ConclusionMatchEquality
 			public Boolean visit(ForwardLinkMatch1 other) {
 				return equals(other.getParent(), conclusionMatch.getParent())
 						&& equals(other.getDestinationMatch(),
-								conclusionMatch.getDestinationMatch());
+								conclusionMatch.getDestinationMatch())
+						&& equals(other.getFullChainMatch(),
+								conclusionMatch.getFullChainMatch())
+						&& equals(other.getChainStartPos(),
+								conclusionMatch.getChainStartPos());
 			}
 		});
 	}
@@ -154,10 +198,8 @@ public class ConclusionMatchEquality
 			@Override
 			public Boolean visit(ForwardLinkMatch2 other) {
 				return equals(other.getParent(), conclusionMatch.getParent())
-						&& equals(other.getChainStartPos(),
-								conclusionMatch.getChainStartPos())
-						&& equals(other.getFullChainMatch(),
-								conclusionMatch.getFullChainMatch());
+						&& equals(other.getTargetMatch(),
+								conclusionMatch.getTargetMatch());
 			}
 		});
 	}
@@ -168,10 +210,20 @@ public class ConclusionMatchEquality
 			@Override
 			public Boolean visit(ForwardLinkMatch3 other) {
 				return equals(other.getParent(), conclusionMatch.getParent())
-						&& equals(other.getTargetMatch(),
-								conclusionMatch.getTargetMatch())
-						&& equals(other.getIntermediateRoots(),
-								conclusionMatch.getIntermediateRoots());
+						&& equals(other.getExtendedTargetMatch(),
+								conclusionMatch.getExtendedTargetMatch());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(final ForwardLinkMatch4 conclusionMatch) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(ForwardLinkMatch4 other) {
+				return equals(other.getParent(), conclusionMatch.getParent())
+						&& equals(other.getExtendedDomains(),
+								conclusionMatch.getExtendedDomains());
 			}
 		});
 	}
@@ -319,13 +371,23 @@ public class ConclusionMatchEquality
 	}
 
 	@Override
+	public Boolean visit(final PropagationMatch2 conclusionMatch) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(PropagationMatch2 other) {
+				return equals(other.getParent(), conclusionMatch.getParent())
+						&& equals(other.getExtendedDestinationMatch(),
+								conclusionMatch.getExtendedDestinationMatch());
+			}
+		});
+	}
+
+	@Override
 	public Boolean visit(final PropertyRangeMatch1 conclusionMatch) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(PropertyRangeMatch1 other) {
-				return equals(other.getParent(), conclusionMatch.getParent())
-						&& equals(other.getPropertyMatch(),
-								conclusionMatch.getPropertyMatch());
+				return equals(other.getParent(), conclusionMatch.getParent());
 			}
 		});
 	}
@@ -336,6 +398,8 @@ public class ConclusionMatchEquality
 			@Override
 			public Boolean visit(PropertyRangeMatch2 other) {
 				return equals(other.getParent(), conclusionMatch.getParent())
+						&& equals(other.getPropertyMatch(),
+								conclusionMatch.getPropertyMatch())
 						&& equals(other.getRangeMatch(),
 								conclusionMatch.getRangeMatch());
 			}
@@ -353,6 +417,19 @@ public class ConclusionMatchEquality
 								conclusionMatch.getDestinationMatch())
 						&& equals(other.getSubsumerMatch(),
 								conclusionMatch.getSubsumerMatch());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(
+			final SubClassInclusionComposedMatch2 conclusionMatch) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(SubClassInclusionComposedMatch2 other) {
+				return equals(other.getParent(), conclusionMatch.getParent())
+						&& equals(other.getExtendedDestinationMatch(),
+								conclusionMatch.getExtendedDestinationMatch());
 			}
 		});
 	}
@@ -377,6 +454,8 @@ public class ConclusionMatchEquality
 			@Override
 			public Boolean visit(SubClassInclusionDecomposedMatch2 other) {
 				return equals(other.getParent(), conclusionMatch.getParent())
+						&& equals(other.getParent(),
+								conclusionMatch.getParent())
 						&& equals(other.getSubsumerMatch(),
 								conclusionMatch.getSubsumerMatch());
 			}

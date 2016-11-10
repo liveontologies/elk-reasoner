@@ -6,8 +6,10 @@ import org.semanticweb.elk.matching.inferences.ClassInconsistencyOfObjectComplem
 import org.semanticweb.elk.matching.inferences.ForwardLinkOfObjectHasSelfMatch1;
 import org.semanticweb.elk.matching.inferences.ForwardLinkOfObjectSomeValuesFromMatch1;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
+import org.semanticweb.elk.matching.inferences.SubClassInclusionComposedEntityMatch1;
 import org.semanticweb.elk.matching.inferences.SubClassInclusionDecomposedFirstConjunctMatch1;
 import org.semanticweb.elk.matching.inferences.SubClassInclusionDecomposedSecondConjunctMatch1;
+import org.semanticweb.elk.matching.inferences.SubClassInclusionExpandedDefinitionMatch2;
 import org.semanticweb.elk.matching.inferences.SubClassInclusionObjectHasSelfPropertyRangeMatch1;
 
 /*
@@ -49,8 +51,10 @@ public interface SubClassInclusionDecomposedMatch1Watch extends InferenceMatch {
 			ClassInconsistencyOfObjectComplementOfMatch1.Visitor<O>,
 			ForwardLinkOfObjectHasSelfMatch1.Visitor<O>,
 			ForwardLinkOfObjectSomeValuesFromMatch1.Visitor<O>,
+			SubClassInclusionComposedEntityMatch1.Visitor<O>,
 			SubClassInclusionDecomposedFirstConjunctMatch1.Visitor<O>,
 			SubClassInclusionDecomposedSecondConjunctMatch1.Visitor<O>,
+			SubClassInclusionExpandedDefinitionMatch2.Visitor<O>,
 			SubClassInclusionObjectHasSelfPropertyRangeMatch1.Visitor<O> {
 
 		// combined interface

@@ -41,7 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * <pre>
  *   ![C]
  * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
- *  [C] ⊑ C
+ *  [C] ⊑ -C
  * </pre>
  * 
  * The parameters can be obtained as follows:<br>

@@ -24,13 +24,15 @@ package org.semanticweb.elk.matching.inferences;
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
+import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1Watch;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.subsumers.IndexedObjectIntersectionOfMatch;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectIntersectionOf;
 
 public class SubClassInclusionComposedObjectIntersectionOfMatch1 extends
-		AbstractInferenceMatch<SubClassInclusionComposedObjectIntersectionOf> {
+		AbstractInferenceMatch<SubClassInclusionComposedObjectIntersectionOf>
+		implements SubClassInclusionComposedMatch1Watch {
 
 	private final IndexedContextRootMatch originMatch_;
 	private final ElkObjectIntersectionOf fullSubsumerMatch_;
@@ -46,6 +48,7 @@ public class SubClassInclusionComposedObjectIntersectionOfMatch1 extends
 		fullSubsumerMatch_ = conclusionSubsumerMatch.getFullValue();
 		conclusionSubsumerPrefixLength_ = conclusionSubsumerMatch
 				.getPrefixLength();
+		checkEquals(conclusionMatch, getConclusionMatch(DEBUG_FACTORY));
 	}
 
 	public IndexedContextRootMatch getOriginMatch() {
@@ -60,23 +63,29 @@ public class SubClassInclusionComposedObjectIntersectionOfMatch1 extends
 		return conclusionSubsumerPrefixLength_;
 	}
 
-	public SubClassInclusionComposedMatch1 getFirstPremiseMatch(
-			ConclusionMatchExpressionFactory factory) {
-		return factory.getSubClassInclusionComposedMatch1(
-				getParent().getFirstPremise(factory), originMatch_,
-				fullSubsumerMatch_, conclusionSubsumerPrefixLength_ - 1);
-	}
-
 	public SubClassInclusionComposedMatch1 getSecondPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getSubClassInclusionComposedMatch1(
-				getParent().getSecondPremise(factory), originMatch_,
-				fullSubsumerMatch_.getClassExpressions()
-						.get(conclusionSubsumerPrefixLength_ - 1));
+				getParent().getSecondPremise(factory), getOriginMatch(),
+				getFullSubsumerMatch().getClassExpressions()
+						.get(getConclusionSubsumerPrefixLength() - 1));
+	}
+
+	SubClassInclusionComposedMatch1 getConclusionMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getSubClassInclusionComposedMatch1(
+				getParent().getConclusion(factory), getOriginMatch(),
+				getFullSubsumerMatch(), getConclusionSubsumerPrefixLength());
 	}
 
 	@Override
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(
+			SubClassInclusionComposedMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

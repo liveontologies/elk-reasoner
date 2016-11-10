@@ -1,6 +1,7 @@
 package org.semanticweb.elk.matching.conclusions;
 
 import org.semanticweb.elk.matching.inferences.ClassInconsistencyOfDisjointSubsumersMatch1;
+import org.semanticweb.elk.matching.inferences.ClassInconsistencyOfDisjointSubsumersMatch2;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
 
 /*
@@ -38,7 +39,8 @@ public interface DisjointSubsumerMatch1Watch extends InferenceMatch {
 	 *            the type of the output
 	 */
 	interface Visitor<O>
-			extends ClassInconsistencyOfDisjointSubsumersMatch1.Visitor<O> {
+			extends ClassInconsistencyOfDisjointSubsumersMatch1.Visitor<O>,
+			ClassInconsistencyOfDisjointSubsumersMatch2.Visitor<O> {
 
 		// combined interface
 

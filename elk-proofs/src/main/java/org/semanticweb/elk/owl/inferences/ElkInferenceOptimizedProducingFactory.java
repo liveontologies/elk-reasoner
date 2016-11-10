@@ -74,11 +74,11 @@ public class ElkInferenceOptimizedProducingFactory
 			ElkObjectPropertyExpression subProperty = subChain.get(0);
 			ElkClassExpression subClass = classExpressions.get(0);
 			ElkClassExpression filler = classExpressions.get(1);
+			super.getElkClassInclusionExistentialPropertyExpansion(subProperty,
+					superProperty, filler);
 			super.getElkClassInclusionHierarchy(subClass,
 					elkFactory_.getObjectSomeValuesFrom(subProperty, filler),
 					elkFactory_.getObjectSomeValuesFrom(superProperty, filler));
-			super.getElkClassInclusionExistentialPropertyExpansion(subProperty,
-					superProperty, filler);
 			return null;
 		default:
 			super.getElkClassInclusionExistentialComposition(classExpressions,
@@ -141,6 +141,18 @@ public class ElkInferenceOptimizedProducingFactory
 		if (expressions.size() > 1) {// otherwise the inference is trivial
 			super.getElkPropertyInclusionHierarchy(subExpression, expressions);
 		}
+		return null;
+	}
+
+	@Override
+	public ElkClassInclusionExistentialRange getElkClassInclusionExistentialRange(
+			ElkObjectPropertyExpression property, ElkClassExpression filler,
+			List<? extends ElkClassExpression> ranges) {
+		if (ranges.isEmpty()) {
+			return null;
+		}
+		// else
+		super.getElkClassInclusionExistentialRange(property, filler, ranges);
 		return null;
 	}
 

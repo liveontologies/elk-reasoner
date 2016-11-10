@@ -71,8 +71,7 @@ public class ProofTest {
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
 
 	// remove when proofs for ranges are supported
-	static final String[] IGNORE_LIST = { "kangaroo.owl",
-			"PropertyRangesHierarchy.owl", "ReflexivePropertyRanges.owl" };
+	static final String[] IGNORE_LIST = {};
 
 	static {
 		Arrays.sort(IGNORE_LIST);

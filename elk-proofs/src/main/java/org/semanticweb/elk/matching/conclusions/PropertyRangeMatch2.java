@@ -23,17 +23,24 @@ package org.semanticweb.elk.matching.conclusions;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 
 public class PropertyRangeMatch2
-		extends
-			AbstractObjectPropertyConclusionMatch<PropertyRangeMatch1> {
+		extends AbstractObjectPropertyConclusionMatch<PropertyRangeMatch1> {
+
+	private final ElkObjectProperty propertyMatch_;
 
 	private final ElkClassExpression rangeMatch_;
 
 	PropertyRangeMatch2(PropertyRangeMatch1 parent,
-			ElkClassExpression rangeMatch) {
+			ElkObjectProperty propertyMatch, ElkClassExpression rangeMatch) {
 		super(parent);
+		this.propertyMatch_ = propertyMatch;
 		this.rangeMatch_ = rangeMatch;
+	}
+
+	public ElkObjectProperty getPropertyMatch() {
+		return propertyMatch_;
 	}
 
 	public ElkClassExpression getRangeMatch() {
@@ -54,7 +61,7 @@ public class PropertyRangeMatch2
 	public interface Factory {
 
 		PropertyRangeMatch2 getPropertyRangeMatch2(PropertyRangeMatch1 parent,
-				ElkClassExpression rangeMatch);
+				ElkObjectProperty propertyMatch, ElkClassExpression rangeMatch);
 
 	}
 

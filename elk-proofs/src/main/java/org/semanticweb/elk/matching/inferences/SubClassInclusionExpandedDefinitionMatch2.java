@@ -27,12 +27,13 @@ import org.semanticweb.elk.matching.ElkMatchException;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch2;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1;
-import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
+import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1Watch;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 
 public class SubClassInclusionExpandedDefinitionMatch2 extends
-		AbstractInferenceMatch<SubClassInclusionExpandedDefinitionMatch1> {
+		AbstractInferenceMatch<SubClassInclusionExpandedDefinitionMatch1>
+		implements SubClassInclusionDecomposedMatch1Watch {
 
 	private final ElkClass definedClassMatch_;
 
@@ -52,6 +53,7 @@ public class SubClassInclusionExpandedDefinitionMatch2 extends
 					firstMemberMatch);
 		}
 		this.definitionMatch_ = secondPremiseMatch.getSecondMemberMatch();
+		checkEquals(secondPremiseMatch, getSecondPremiseMatch(DEBUG_FACTORY));
 	}
 
 	public ElkClass getDefinedClassMatch() {
@@ -69,14 +71,21 @@ public class SubClassInclusionExpandedDefinitionMatch2 extends
 				getParent().getOriginMatch());
 	}
 
-	public SubClassInclusionDecomposedMatch2 getConclusionMatch(
+	IndexedEquivalentClassesAxiomMatch2 getSecondPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getSubClassInclusionDecomposedMatch2(
-				getParent().getConclusionMatch(factory), getDefinitionMatch());
+		return factory.getIndexedEquivalentClassesAxiomMatch2(
+				getParent().getSecondPremiseMatch(factory),
+				getDefinedClassMatch(), getDefinitionMatch());
 	}
 
 	@Override
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(
+			SubClassInclusionDecomposedMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

@@ -29,19 +29,16 @@ import org.semanticweb.elk.matching.root.IndexedContextRootIndividualMatch;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatchBaseFactory;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatchChain;
-import org.semanticweb.elk.matching.root.IndexedContextRootRangeHasValueMatch;
-import org.semanticweb.elk.matching.root.IndexedContextRootRangeSomeValuesFromMatch;
 import org.semanticweb.elk.matching.subsumers.IndexedObjectSomeValuesFromMatch;
 import org.semanticweb.elk.matching.subsumers.SubsumerMatch;
+import org.semanticweb.elk.owl.implementation.ElkObjectBaseFactory;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectDelegatingFactory;
-import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
@@ -78,6 +75,10 @@ public class ConclusionMatchExpressionDelegatingFactory extends
 	private final ConclusionMatch.Factory conclusionMatchFactory_;
 
 	private final IndexedContextRootMatch.Factory rootMatchFactory_;
+
+	public ConclusionMatchExpressionDelegatingFactory() {
+		this(new ElkObjectBaseFactory());
+	}
 
 	public ConclusionMatchExpressionDelegatingFactory(
 			ElkObject.Factory elkObjectFactory) {
@@ -138,11 +139,33 @@ public class ConclusionMatchExpressionDelegatingFactory extends
 	}
 
 	@Override
+	public BackwardLinkMatch3 getBackwardLinkMatch3(BackwardLinkMatch2 parent,
+			IndexedContextRootMatch extendedDestinationMatch) {
+		return filter(conclusionMatchFactory_.getBackwardLinkMatch3(parent,
+				extendedDestinationMatch));
+	}
+
+	@Override
+	public BackwardLinkMatch4 getBackwardLinkMatch4(BackwardLinkMatch3 parent,
+			IndexedContextRootMatch extendedSourceMatch) {
+		return filter(conclusionMatchFactory_.getBackwardLinkMatch4(parent,
+				extendedSourceMatch));
+	}
+
+	@Override
 	public ClassInconsistencyMatch1 getClassInconsistencyMatch1(
 			ClassInconsistency parent,
 			IndexedContextRootMatch destinationMatch) {
 		return filter(conclusionMatchFactory_
 				.getClassInconsistencyMatch1(parent, destinationMatch));
+	}
+
+	@Override
+	public ClassInconsistencyMatch2 getClassInconsistencyMatch2(
+			ClassInconsistencyMatch1 parent,
+			IndexedContextRootMatch extendedDestinationMatch) {
+		return filter(conclusionMatchFactory_
+				.getClassInconsistencyMatch2(parent, extendedDestinationMatch));
 	}
 
 	@Override
@@ -174,9 +197,10 @@ public class ConclusionMatchExpressionDelegatingFactory extends
 	@Override
 	public DisjointSubsumerMatch2 getDisjointSubsumerMatch2(
 			DisjointSubsumerMatch1 parent,
+			IndexedContextRootMatch extendedDestinationMatch,
 			List<? extends ElkClassExpression> disjointExpressionsMatch) {
 		return filter(conclusionMatchFactory_.getDisjointSubsumerMatch2(parent,
-				disjointExpressionsMatch));
+				extendedDestinationMatch, disjointExpressionsMatch));
 	}
 
 	@Override
@@ -188,25 +212,32 @@ public class ConclusionMatchExpressionDelegatingFactory extends
 
 	@Override
 	public ForwardLinkMatch1 getForwardLinkMatch1(ForwardLink parent,
-			IndexedContextRootMatch destinationMatch) {
+			IndexedContextRootMatch destinationMatch,
+			ElkSubObjectPropertyExpression fullForwardChainMatch,
+			int forwardChainStartPos) {
 		return filter(conclusionMatchFactory_.getForwardLinkMatch1(parent,
-				destinationMatch));
+				destinationMatch, fullForwardChainMatch, forwardChainStartPos));
 	}
 
 	@Override
 	public ForwardLinkMatch2 getForwardLinkMatch2(ForwardLinkMatch1 parent,
-			ElkSubObjectPropertyExpression fullForwardChainMatch,
-			int forwardChainStartPos) {
+			IndexedContextRootMatch targetMatch) {
 		return filter(conclusionMatchFactory_.getForwardLinkMatch2(parent,
-				fullForwardChainMatch, forwardChainStartPos));
+				targetMatch));
 	}
 
 	@Override
 	public ForwardLinkMatch3 getForwardLinkMatch3(ForwardLinkMatch2 parent,
-			IndexedContextRootMatchChain intermediateRoots,
-			IndexedContextRootMatch targetMatch) {
+			IndexedContextRootMatch extendedTargetMatch) {
 		return filter(conclusionMatchFactory_.getForwardLinkMatch3(parent,
-				intermediateRoots, targetMatch));
+				extendedTargetMatch));
+	}
+
+	@Override
+	public ForwardLinkMatch4 getForwardLinkMatch4(ForwardLinkMatch3 parent,
+			IndexedContextRootMatchChain extendedDomains) {
+		return filter(conclusionMatchFactory_.getForwardLinkMatch4(parent,
+				extendedDomains));
 	}
 
 	@Override
@@ -221,20 +252,6 @@ public class ConclusionMatchExpressionDelegatingFactory extends
 			ElkIndividual value) {
 		return filter(
 				rootMatchFactory_.getIndexedContextRootIndividualMatch(value));
-	}
-
-	@Override
-	public IndexedContextRootRangeHasValueMatch getIndexedContextRootRangeHasValueMatch(
-			ElkObjectHasValue value) {
-		return filter(rootMatchFactory_
-				.getIndexedContextRootRangeHasValueMatch(value));
-	}
-
-	@Override
-	public IndexedContextRootRangeSomeValuesFromMatch getIndexedContextRootRangeSomeValuesFromMatch(
-			ElkObjectSomeValuesFrom value) {
-		return filter(rootMatchFactory_
-				.getIndexedContextRootRangeSomeValuesFromMatch(value));
 	}
 
 	@Override
@@ -381,23 +398,29 @@ public class ConclusionMatchExpressionDelegatingFactory extends
 	}
 
 	@Override
+	public PropagationMatch2 getPropagationMatch2(PropagationMatch1 parent,
+			IndexedContextRootMatch extendedDestinationMatch) {
+		return filter(conclusionMatchFactory_.getPropagationMatch2(parent,
+				extendedDestinationMatch));
+	}
+
+	@Override
 	public PropertyRange getPropertyRange(IndexedObjectProperty property,
 			IndexedClassExpression range) {
 		return filter(conclusionFactory_.getPropertyRange(property, range));
 	}
 
 	@Override
-	public PropertyRangeMatch1 getPropertyRangeMatch1(PropertyRange parent,
-			ElkObjectProperty propertyMatch) {
-		return filter(conclusionMatchFactory_.getPropertyRangeMatch1(parent,
-				propertyMatch));
+	public PropertyRangeMatch1 getPropertyRangeMatch1(PropertyRange parent) {
+		return filter(conclusionMatchFactory_.getPropertyRangeMatch1(parent));
 	}
 
 	@Override
 	public PropertyRangeMatch2 getPropertyRangeMatch2(
-			PropertyRangeMatch1 parent, ElkClassExpression rangeMatch) {
+			PropertyRangeMatch1 parent, ElkObjectProperty propertyMatch,
+			ElkClassExpression rangeMatch) {
 		return filter(conclusionMatchFactory_.getPropertyRangeMatch2(parent,
-				rangeMatch));
+				propertyMatch, rangeMatch));
 	}
 
 	@Override
@@ -449,6 +472,15 @@ public class ConclusionMatchExpressionDelegatingFactory extends
 	}
 
 	@Override
+	public SubClassInclusionComposedMatch2 getSubClassInclusionComposedMatch2(
+			SubClassInclusionComposedMatch1 parent,
+			IndexedContextRootMatch extendedDestinationMatch) {
+		return filter(
+				conclusionMatchFactory_.getSubClassInclusionComposedMatch2(
+						parent, extendedDestinationMatch));
+	}
+
+	@Override
 	public SubClassInclusionDecomposed getSubClassInclusionDecomposed(
 			IndexedContextRoot destination, IndexedClassExpression subsumer) {
 		return filter(conclusionFactory_
@@ -467,37 +499,43 @@ public class ConclusionMatchExpressionDelegatingFactory extends
 	@Override
 	public SubClassInclusionDecomposedMatch2 getSubClassInclusionDecomposedMatch2(
 			SubClassInclusionDecomposedMatch1 parent,
+			IndexedContextRootMatch extendedDestinationMatch,
 			ElkClassExpression subsumerMatch) {
-		return filter(conclusionMatchFactory_
-				.getSubClassInclusionDecomposedMatch2(parent, subsumerMatch));
+		return filter(
+				conclusionMatchFactory_.getSubClassInclusionDecomposedMatch2(
+						parent, extendedDestinationMatch, subsumerMatch));
 	}
 
 	@Override
 	public SubClassInclusionDecomposedMatch2 getSubClassInclusionDecomposedMatch2(
 			SubClassInclusionDecomposedMatch1 parent,
+			IndexedContextRootMatch extendedDestinationMatch,
 			ElkIndividual subsumerMatchValue) {
 		return filter(
 				conclusionMatchFactory_.getSubClassInclusionDecomposedMatch2(
-						parent, subsumerMatchValue));
+						parent, extendedDestinationMatch, subsumerMatchValue));
 	}
 
 	@Override
 	public SubClassInclusionDecomposedMatch2 getSubClassInclusionDecomposedMatch2(
 			SubClassInclusionDecomposedMatch1 parent,
+			IndexedContextRootMatch extendedDestinationMatch,
 			ElkObjectIntersectionOf subsumerFullConjunctionMatch,
 			int subsumerConjunctionPrefixLength) {
-		return filter(
-				conclusionMatchFactory_.getSubClassInclusionDecomposedMatch2(
-						parent, subsumerFullConjunctionMatch,
+		return filter(conclusionMatchFactory_
+				.getSubClassInclusionDecomposedMatch2(parent,
+						extendedDestinationMatch, subsumerFullConjunctionMatch,
 						subsumerConjunctionPrefixLength));
 	}
 
 	@Override
 	public SubClassInclusionDecomposedMatch2 getSubClassInclusionDecomposedMatch2(
 			SubClassInclusionDecomposedMatch1 parent,
+			IndexedContextRootMatch extendedDestinationMatch,
 			SubsumerMatch subsumerMatch) {
-		return filter(conclusionMatchFactory_
-				.getSubClassInclusionDecomposedMatch2(parent, subsumerMatch));
+		return filter(
+				conclusionMatchFactory_.getSubClassInclusionDecomposedMatch2(
+						parent, extendedDestinationMatch, subsumerMatch));
 	}
 
 	@Override

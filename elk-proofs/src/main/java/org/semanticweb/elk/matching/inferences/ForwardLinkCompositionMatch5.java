@@ -24,54 +24,48 @@ package org.semanticweb.elk.matching.inferences;
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch3;
-import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch3Watch;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
-import org.semanticweb.elk.matching.root.IndexedContextRootMatchChain;
 
 public class ForwardLinkCompositionMatch5
-		extends AbstractInferenceMatch<ForwardLinkCompositionMatch4> {
+		extends AbstractInferenceMatch<ForwardLinkCompositionMatch4>
+		implements ForwardLinkMatch3Watch {
 
-	private IndexedContextRootMatchChain premiseIntermediateRoots_;
-
-	private final IndexedContextRootMatch conclusionTargetMatch_;
+	private final IndexedContextRootMatch conclusionExtendedTargetMatch_;
 
 	ForwardLinkCompositionMatch5(ForwardLinkCompositionMatch4 parent,
-			ForwardLinkMatch3 thirdPremiseMatch) {
+			ForwardLinkMatch3 conclusionMatch) {
 		super(parent);
-		this.premiseIntermediateRoots_ = thirdPremiseMatch
-				.getIntermediateRoots();
-		this.conclusionTargetMatch_ = thirdPremiseMatch.getTargetMatch();
+		this.conclusionExtendedTargetMatch_ = conclusionMatch
+				.getExtendedTargetMatch();
+		checkEquals(conclusionMatch, getConclusionMatch(DEBUG_FACTORY));
 	}
 
-	public IndexedContextRootMatchChain getPremiseIntermediateRoots() {
-		return premiseIntermediateRoots_;
+	public IndexedContextRootMatch getConclusionExtendedTargetMatch() {
+		return conclusionExtendedTargetMatch_;
 	}
 
-	public IndexedContextRootMatch getConclusionTargetMatch() {
-		return conclusionTargetMatch_;
-	}
-
-	public SubPropertyChainMatch1 getSecondPremiseMatch(
-			ConclusionMatchExpressionFactory factory) {
-		return factory.getSubPropertyChainMatch1(
-				getParent().getParent().getParent().getParent().getParent()
-						.getSecondPremise(factory),
-				getParent().getParent().getParent().getFirstProperty(), 0);
-	}
-
-	public ForwardLinkMatch3 getConclusionMatch(
+	ForwardLinkMatch3 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getForwardLinkMatch3(
-				getParent().getParent().getParent().getConclusionMatch(factory),
-				new IndexedContextRootMatchChain(
-						getParent().getParent().getOriginMatch(),
-						getParent().getPremiseForwardChainStartPos() == 0 ? null
-								: premiseIntermediateRoots_),
-				conclusionTargetMatch_);
+				getParent().getConclusionMatch(factory),
+				getConclusionExtendedTargetMatch());
+	}
+
+	public ForwardLinkMatch3 getThirdPremiseMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getForwardLinkMatch3(
+				getParent().getThirdPremiseMatch(factory),
+				getConclusionExtendedTargetMatch());
 	}
 
 	@Override
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(ForwardLinkMatch3Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
@@ -99,7 +93,7 @@ public class ForwardLinkCompositionMatch5
 
 		ForwardLinkCompositionMatch5 getForwardLinkCompositionMatch5(
 				ForwardLinkCompositionMatch4 parent,
-				ForwardLinkMatch3 thirdPremiseMatch);
+				ForwardLinkMatch3 conclusionMatch);
 
 	}
 

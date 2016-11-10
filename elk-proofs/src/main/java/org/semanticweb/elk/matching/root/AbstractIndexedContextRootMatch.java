@@ -1,5 +1,10 @@
 package org.semanticweb.elk.matching.root;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /*
@@ -29,21 +34,54 @@ abstract class AbstractIndexedContextRootMatch<V extends ElkObject>
 
 	private final V value_;
 
-	AbstractIndexedContextRootMatch(V value) {
-		this.value_ = value;
-	}
-
-	V getValue() {
-		return value_;
-	}
+	private final List<? extends ElkClassExpression> rangeMatches_;
 
 	/**
 	 * hash code, computed on demand
 	 */
 	private int hashCode_ = 0;
 
+	AbstractIndexedContextRootMatch(V value,
+			List<? extends ElkClassExpression> rangeMatches) {
+		this.value_ = value;
+		this.rangeMatches_ = rangeMatches;
+	}
+
+	AbstractIndexedContextRootMatch(V value) {
+		this(value, Collections.<ElkClassExpression> emptyList());
+	}
+
+	public final V getValue() {
+		return value_;
+	}
+
 	@Override
-	public int hashCode() {
+	public final List<? extends ElkClassExpression> getRangeMatches() {
+		return rangeMatches_;
+	}
+
+	@Override
+	public final List<? extends ElkClassExpression> getFillerMatches(
+			ElkObject.Factory factory) {
+		List<ElkClassExpression> result = new ArrayList<ElkClassExpression>(
+				rangeMatches_.size() + 1);
+		result.add(getMainFillerMatch(factory));
+		result.addAll(getRangeMatches());
+		return result;
+	}
+
+	@Override
+	public final ElkClassExpression toElkExpression(ElkObject.Factory factory) {
+		ElkClassExpression filler = getMainFillerMatch(factory);
+		if (getRangeMatches().isEmpty()) {
+			return filler;
+		}
+		// else
+		return factory.getObjectIntersectionOf(getFillerMatches(factory));
+	}
+
+	@Override
+	public final int hashCode() {
 		if (hashCode_ == 0) {
 			hashCode_ = IndexedContextRootMatchHash.hashCode(this);
 		}
@@ -52,7 +90,7 @@ abstract class AbstractIndexedContextRootMatch<V extends ElkObject>
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public final boolean equals(Object o) {
 		if (this == o) {
 			return true;
 		}
@@ -67,8 +105,23 @@ abstract class AbstractIndexedContextRootMatch<V extends ElkObject>
 	}
 
 	@Override
-	public String toString() {
+	public final String toString() {
 		return IndexedContextRootMatchPrinter.toString(this);
+	}
+
+	List<ElkClassExpression> extendRangeMatches(
+			ElkClassExpression newRangeMatch) {
+		List<ElkClassExpression> newRangeMatches = new ArrayList<ElkClassExpression>(
+				rangeMatches_.size() + 1);
+		for (ElkClassExpression previous : rangeMatches_) {
+			if (newRangeMatch.equals(previous)) {
+				// nothing changes
+				return null;
+			}
+			newRangeMatches.add(previous);
+		}
+		newRangeMatches.add(newRangeMatch);
+		return newRangeMatches;
 	}
 
 }

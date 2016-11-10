@@ -1,5 +1,7 @@
 package org.semanticweb.elk.matching;
 
+import java.util.List;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -32,15 +34,17 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 
 /**
- * Exception thrown when to signal that {@link IndexedContextRootClassExpressionMatch} is
- * invalid, that is, the {@link IndexedClassExpression} in the match cannot be
- * obtained from the corresponding {@link ElkClassExpression}
+ * Exception thrown when to signal that
+ * {@link IndexedContextRootClassExpressionMatch} is invalid, that is, the
+ * {@link IndexedClassExpression} in the match cannot be obtained from the
+ * corresponding {@link ElkClassExpression}
  * 
  * @author "Yevgeny Kazakov"
  *
@@ -50,14 +54,14 @@ public class ElkMatchException extends ElkRuntimeException {
 	private static final long serialVersionUID = 7910516380668620176L;
 
 	private ElkMatchException(IndexedObject expression, Object match) {
-		super("Invalid match: " + expression + "::" + match);
+		super("Invalid match: " + expression + " :: " + match);
 	}
 
 	public ElkMatchException(IndexedClassExpression expression,
 			ElkObject match) {
 		this((IndexedObject) expression, match);
 	}
-	
+
 	public ElkMatchException(IndexedClassExpression expression,
 			SubsumerMatch match) {
 		this((IndexedObject) expression, match);
@@ -72,6 +76,11 @@ public class ElkMatchException extends ElkRuntimeException {
 			ElkSubObjectPropertyExpression match, int startPos) {
 		this((IndexedObject) expression,
 				startPos == 0 ? match : match + "[" + startPos + 1 + "-]");
+	}
+
+	public ElkMatchException(IndexedClassExpressionList expression,
+			List<? extends ElkClassExpression> match) {
+		this((IndexedObject) expression, match);
 	}
 
 	public ElkMatchException(IndexedContextRoot expression,

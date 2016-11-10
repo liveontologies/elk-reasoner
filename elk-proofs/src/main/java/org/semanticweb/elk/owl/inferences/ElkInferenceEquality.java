@@ -148,6 +148,18 @@ public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 	}
 
 	@Override
+	public Boolean visit(final ElkClassInclusionExistentialRange inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(ElkClassInclusionExistentialRange other) {
+				return equals(other.getFiller(), inference.getFiller())
+						&& equals(other.getProperty(), inference.getProperty())
+						&& equals(other.getRanges(), inference.getRanges());
+			}
+		});
+	}
+
+	@Override
 	public Boolean visit(
 			final ElkClassInclusionExistentialTransitivity inference) {
 		return other_.accept(new DefaultVisitor() {
@@ -208,6 +220,20 @@ public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 				return equals(other.getConjuncts(), inference.getConjuncts())
 						&& equals(other.getConjunctPos(),
 								inference.getConjunctPos());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(
+			final ElkClassInclusionObjectIntersectionOfInclusion inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(
+					ElkClassInclusionObjectIntersectionOfInclusion other) {
+				return equals(other.getSubClasses(), inference.getSubClasses())
+						&& equals(other.getSuperPositions(),
+								inference.getSuperPositions());
 			}
 		});
 	}

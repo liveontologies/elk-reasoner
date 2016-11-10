@@ -26,29 +26,22 @@ import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory
 import org.semanticweb.elk.matching.conclusions.IndexedObjectPropertyRangeAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedObjectPropertyRangeAxiomMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch1;
-import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.PropertyRangeInherited;
 
 public class PropertyRangeInheritedMatch1
 		extends AbstractInferenceMatch<PropertyRangeInherited>
 		implements IndexedObjectPropertyRangeAxiomMatch1Watch {
 
-	private final ElkObjectProperty subPropertyMatch_;
-
 	PropertyRangeInheritedMatch1(PropertyRangeInherited parent,
 			PropertyRangeMatch1 conclusionMatch) {
 		super(parent);
-		subPropertyMatch_ = conclusionMatch.getPropertyMatch();
+		checkEquals(conclusionMatch, getConclusionMatch(DEBUG_FACTORY));
 	}
 
-	public ElkObjectProperty getSubPropertyMatch() {
-		return subPropertyMatch_;
-	}
-
-	public PropertyRangeMatch1 getConclusionMatch(
+	PropertyRangeMatch1 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getPropertyRangeMatch1(
-				getParent().getConclusion(factory), subPropertyMatch_);
+		return factory
+				.getPropertyRangeMatch1(getParent().getConclusion(factory));
 	}
 
 	public IndexedObjectPropertyRangeAxiomMatch1 getSecondPremiseMatch(

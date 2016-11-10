@@ -39,10 +39,6 @@ public class IndexedContextRootMatchDummyVisitor<O>
 		return null;
 	}
 
-	protected O defaultVisit(IndexedContextRootRangeMatch match) {
-		return defaultVisit((IndexedContextRootMatch) match);
-	}
-
 	@Override
 	public O visit(IndexedContextRootClassExpressionMatch match) {
 		return defaultVisit(match);
@@ -50,16 +46,6 @@ public class IndexedContextRootMatchDummyVisitor<O>
 
 	@Override
 	public O visit(IndexedContextRootIndividualMatch match) {
-		return defaultVisit(match);
-	}
-
-	@Override
-	public O visit(IndexedContextRootRangeHasValueMatch match) {
-		return defaultVisit(match);
-	}
-
-	@Override
-	public O visit(IndexedContextRootRangeSomeValuesFromMatch match) {
 		return defaultVisit(match);
 	}
 

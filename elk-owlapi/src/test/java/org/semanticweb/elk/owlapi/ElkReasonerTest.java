@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AddImport;
@@ -198,11 +197,8 @@ public class ElkReasonerTest {
 	 * <p>
 	 * This test is ignored, because as of OWL API 4.1.3 the removal
 	 * of the axiom is broadcasted even though the axiom is not removed.
-	 * 
-	 * TODO: file a bug report
 	 */
 	@Test
-	@Ignore
 	public void testRemovingAB() throws Exception {
 
 		OWLOntologyManager man = OWLManager.createOWLOntologyManager();

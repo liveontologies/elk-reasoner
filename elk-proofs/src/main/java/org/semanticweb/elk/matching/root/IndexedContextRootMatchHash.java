@@ -61,28 +61,14 @@ public class IndexedContextRootMatchHash
 	public Integer visit(IndexedContextRootClassExpressionMatch match) {
 		return combinedHashCode(
 				hashCode(IndexedContextRootClassExpressionMatch.class),
-				hashCode(match.getValue()));
+				hashCode(match.getValue()), hashCode(match.getRangeMatches()));
 	}
 
 	@Override
 	public Integer visit(IndexedContextRootIndividualMatch match) {
 		return combinedHashCode(
 				hashCode(IndexedContextRootIndividualMatch.class),
-				hashCode(match.getValue()));
-	}
-
-	@Override
-	public Integer visit(IndexedContextRootRangeHasValueMatch match) {
-		return combinedHashCode(
-				hashCode(IndexedContextRootRangeHasValueMatch.class),
-				hashCode(match.getValue()));
-	}
-
-	@Override
-	public Integer visit(IndexedContextRootRangeSomeValuesFromMatch match) {
-		return combinedHashCode(
-				hashCode(IndexedContextRootRangeSomeValuesFromMatch.class),
-				hashCode(match.getValue()));
+				hashCode(match.getValue()), hashCode(match.getRangeMatches()));
 	}
 
 }

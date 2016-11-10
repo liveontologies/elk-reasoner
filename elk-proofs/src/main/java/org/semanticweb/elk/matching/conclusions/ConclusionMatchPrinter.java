@@ -77,7 +77,7 @@ public class ConclusionMatchPrinter implements ConclusionMatch.Visitor<String> {
 	@Override
 	public String visit(BackwardLinkMatch1 conclusionMatch) {
 		BackwardLink conclusion = conclusionMatch.getParent();
-		return conclusion + MATCH_LEVEL_//
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
 				+ conclusion.getSource() + MATCH_
 				+ conclusionMatch.getSourceMatch();
 	}
@@ -85,7 +85,7 @@ public class ConclusionMatchPrinter implements ConclusionMatch.Visitor<String> {
 	@Override
 	public String visit(BackwardLinkMatch2 conclusionMatch) {
 		BackwardLink conclusion = conclusionMatch.getParent().getParent();
-		return conclusion + MATCH_LEVEL_//
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
 				+ conclusion.getRelation() + MATCH_
 				+ conclusionMatch.getRelationMatch() + MATCH_SEP_
 				+ conclusion.getDestination() + MATCH_
@@ -93,17 +93,43 @@ public class ConclusionMatchPrinter implements ConclusionMatch.Visitor<String> {
 	}
 
 	@Override
+	public String visit(BackwardLinkMatch3 conclusionMatch) {
+		BackwardLink conclusion = conclusionMatch.getParent().getParent()
+				.getParent();
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
+				+ conclusion.getDestination() + MATCH_
+				+ conclusionMatch.getExtendedDestinationMatch();
+	}
+
+	@Override
+	public String visit(BackwardLinkMatch4 conclusionMatch) {
+		BackwardLink conclusion = conclusionMatch.getParent().getParent()
+				.getParent().getParent();
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
+				+ conclusion.getSource() + MATCH_
+				+ conclusionMatch.getExtendedSourceMatch();
+	}
+
+	@Override
 	public String visit(ClassInconsistencyMatch1 conclusionMatch) {
 		ClassInconsistency conclusion = conclusionMatch.getParent();
-		return conclusion + MATCH_LEVEL_//
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
 				+ conclusion.getDestination() + MATCH_
 				+ conclusionMatch.getDestinationMatch();
 	}
 
 	@Override
+	public String visit(ClassInconsistencyMatch2 conclusionMatch) {
+		ClassInconsistency conclusion = conclusionMatch.getParent().getParent();
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
+				+ conclusion.getDestination() + MATCH_
+				+ conclusionMatch.getExtendedDestinationMatch();
+	}
+
+	@Override
 	public String visit(DisjointSubsumerMatch1 conclusionMatch) {
 		DisjointSubsumer conclusion = conclusionMatch.getParent();
-		return conclusion + MATCH_LEVEL_//
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
 				+ conclusion.getDestination() + MATCH_
 				+ conclusionMatch.getDestinationMatch();
 	}
@@ -111,7 +137,9 @@ public class ConclusionMatchPrinter implements ConclusionMatch.Visitor<String> {
 	@Override
 	public String visit(DisjointSubsumerMatch2 conclusionMatch) {
 		DisjointSubsumer conclusion = conclusionMatch.getParent().getParent();
-		return conclusion + MATCH_LEVEL_//
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
+				+ conclusion.getDestination() + MATCH_
+				+ conclusionMatch.getExtendedDestinationMatch() + MATCH_SEP_
 				+ conclusion.getDisjointExpressions() + MATCH_
 				+ conclusionMatch.getDisjointExpressionsMatch();
 	}
@@ -119,28 +147,38 @@ public class ConclusionMatchPrinter implements ConclusionMatch.Visitor<String> {
 	@Override
 	public String visit(ForwardLinkMatch1 conclusionMatch) {
 		ForwardLink conclusion = conclusionMatch.getParent();
-		return conclusion + MATCH_LEVEL_//
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
 				+ conclusion.getDestination() + MATCH_
-				+ conclusionMatch.getDestinationMatch();
-	}
-
-	@Override
-	public String visit(ForwardLinkMatch2 conclusionMatch) {
-		ForwardLink conclusion = conclusionMatch.getParent().getParent();
-		return conclusion + MATCH_LEVEL_//
+				+ conclusionMatch.getDestinationMatch() + MATCH_SEP_
 				+ conclusion.getChain() + MATCH_
 				+ chainMatch(conclusionMatch.getFullChainMatch(),
 						conclusionMatch.getChainStartPos());
 	}
 
 	@Override
+	public String visit(ForwardLinkMatch2 conclusionMatch) {
+		ForwardLink conclusion = conclusionMatch.getParent().getParent();
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
+				+ conclusion.getTarget() + MATCH_
+				+ conclusionMatch.getTargetMatch();
+	}
+
+	@Override
 	public String visit(ForwardLinkMatch3 conclusionMatch) {
 		ForwardLink conclusion = conclusionMatch.getParent().getParent()
 				.getParent();
-		return conclusion + MATCH_LEVEL_//
-				+ toString(conclusionMatch.getIntermediateRoots()) + MATCH_SEP_
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
 				+ conclusion.getTarget() + MATCH_
-				+ conclusionMatch.getTargetMatch();
+				+ conclusionMatch.getExtendedTargetMatch();
+	}
+
+	@Override
+	public String visit(ForwardLinkMatch4 conclusionMatch) {
+		ForwardLink conclusion = conclusionMatch.getParent().getParent()
+				.getParent().getParent();
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
+				+ conclusion.getDestination() + MATCH_
+				+ toString(conclusionMatch.getExtendedDomains());
 	}
 
 	@Override
@@ -152,7 +190,7 @@ public class ConclusionMatchPrinter implements ConclusionMatch.Visitor<String> {
 	public String visit(IndexedDisjointClassesAxiomMatch2 conclusionMatch) {
 		IndexedDisjointClassesAxiom conclusion = conclusionMatch.getParent()
 				.getParent();
-		return conclusion + MATCH_LEVEL_//
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
 				+ conclusion.getMembers() + MATCH_
 				+ conclusionMatch.getMemberMatches();
 	}
@@ -166,7 +204,7 @@ public class ConclusionMatchPrinter implements ConclusionMatch.Visitor<String> {
 	public String visit(IndexedEquivalentClassesAxiomMatch2 conclusionMatch) {
 		IndexedEquivalentClassesAxiom conclusion = conclusionMatch.getParent()
 				.getParent();
-		return conclusion + MATCH_LEVEL_//
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
 				+ conclusion.getFirstMember() + MATCH_
 				+ conclusionMatch.getFirstMemberMatch() + MATCH_SEP_
 				+ conclusion.getSecondMember() + MATCH_
@@ -182,7 +220,7 @@ public class ConclusionMatchPrinter implements ConclusionMatch.Visitor<String> {
 	public String visit(IndexedObjectPropertyRangeAxiomMatch2 conclusionMatch) {
 		IndexedObjectPropertyRangeAxiom conclusion = conclusionMatch.getParent()
 				.getParent();
-		return conclusion + MATCH_LEVEL_//
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
 				+ conclusion.getProperty() + MATCH_
 				+ conclusionMatch.getPropertyMatch() + MATCH_SEP_
 				+ conclusion.getRange() + MATCH_
@@ -198,7 +236,7 @@ public class ConclusionMatchPrinter implements ConclusionMatch.Visitor<String> {
 	public String visit(IndexedSubClassOfAxiomMatch2 conclusionMatch) {
 		IndexedSubClassOfAxiom conclusion = conclusionMatch.getParent()
 				.getParent();
-		return conclusion + MATCH_LEVEL_//
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
 				+ conclusion.getSubClass() + MATCH_
 				+ conclusionMatch.getSubClassMatch() + MATCH_SEP_
 				+ conclusion.getSuperClass() + MATCH_
@@ -214,7 +252,7 @@ public class ConclusionMatchPrinter implements ConclusionMatch.Visitor<String> {
 	public String visit(IndexedSubObjectPropertyOfAxiomMatch2 conclusionMatch) {
 		IndexedSubObjectPropertyOfAxiom conclusion = conclusionMatch.getParent()
 				.getParent();
-		return conclusion + MATCH_LEVEL_//
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
 				+ conclusion.getSubPropertyChain() + MATCH_
 				+ conclusionMatch.getSubPropertyChainMatch() + MATCH_SEP_
 				+ conclusion.getSuperProperty() + MATCH_
@@ -224,7 +262,7 @@ public class ConclusionMatchPrinter implements ConclusionMatch.Visitor<String> {
 	@Override
 	public String visit(PropagationMatch1 conclusionMatch) {
 		Propagation conclusion = conclusionMatch.getParent();
-		return conclusion + MATCH_LEVEL_//
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
 				+ conclusion.getDestination() + MATCH_
 				+ conclusionMatch.getDestinationMatch() + MATCH_SEP_
 				+ conclusion.getSubDestination() + MATCH_
@@ -234,17 +272,24 @@ public class ConclusionMatchPrinter implements ConclusionMatch.Visitor<String> {
 	}
 
 	@Override
+	public String visit(PropagationMatch2 conclusionMatch) {
+		Propagation conclusion = conclusionMatch.getParent().getParent();
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
+				+ conclusion.getDestination() + MATCH_
+				+ conclusionMatch.getExtendedDestinationMatch();
+	}
+
+	@Override
 	public String visit(PropertyRangeMatch1 conclusionMatch) {
-		PropertyRange conclusion = conclusionMatch.getParent();
-		return conclusion + MATCH_LEVEL_//
-				+ conclusion.getProperty() + MATCH_
-				+ conclusionMatch.getPropertyMatch();
+		return conclusionMatch.getParent() + MATCH_LEVEL_;//
 	}
 
 	@Override
 	public String visit(PropertyRangeMatch2 conclusionMatch) {
 		PropertyRange conclusion = conclusionMatch.getParent().getParent();
-		return conclusion + MATCH_LEVEL_//
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
+				+ conclusion.getProperty() + MATCH_
+				+ conclusionMatch.getPropertyMatch() + MATCH_SEP_
 				+ conclusion.getRange() + MATCH_
 				+ conclusionMatch.getRangeMatch();
 	}
@@ -252,7 +297,7 @@ public class ConclusionMatchPrinter implements ConclusionMatch.Visitor<String> {
 	@Override
 	public String visit(SubClassInclusionComposedMatch1 conclusionMatch) {
 		SubClassInclusionComposed conclusion = conclusionMatch.getParent();
-		return conclusion + MATCH_LEVEL_//
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
 				+ conclusion.getDestination() + MATCH_
 				+ conclusionMatch.getDestinationMatch() + MATCH_SEP_
 				+ conclusion.getSubsumer() + MATCH_
@@ -260,9 +305,18 @@ public class ConclusionMatchPrinter implements ConclusionMatch.Visitor<String> {
 	}
 
 	@Override
+	public String visit(SubClassInclusionComposedMatch2 conclusionMatch) {
+		SubClassInclusionComposed conclusion = conclusionMatch.getParent()
+				.getParent();
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
+				+ conclusion.getDestination() + MATCH_
+				+ conclusionMatch.getExtendedDestinationMatch();
+	}
+
+	@Override
 	public String visit(SubClassInclusionDecomposedMatch1 conclusionMatch) {
 		SubClassInclusionDecomposed conclusion = conclusionMatch.getParent();
-		return conclusion + MATCH_LEVEL_//
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
 				+ conclusion.getDestination() + MATCH_
 				+ conclusionMatch.getDestinationMatch();
 	}
@@ -271,7 +325,9 @@ public class ConclusionMatchPrinter implements ConclusionMatch.Visitor<String> {
 	public String visit(SubClassInclusionDecomposedMatch2 conclusionMatch) {
 		SubClassInclusionDecomposed conclusion = conclusionMatch.getParent()
 				.getParent();
-		return conclusion + MATCH_LEVEL_//
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
+				+ conclusion.getDestination() + MATCH_
+				+ conclusionMatch.getExtendedDestinationMatch() + MATCH_SEP_
 				+ conclusion.getSubsumer() + MATCH_
 				+ conclusionMatch.getSubsumerMatch();
 	}
@@ -279,7 +335,7 @@ public class ConclusionMatchPrinter implements ConclusionMatch.Visitor<String> {
 	@Override
 	public String visit(SubPropertyChainMatch1 conclusionMatch) {
 		SubPropertyChain conclusion = conclusionMatch.getParent();
-		return conclusion + MATCH_LEVEL_//
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
 				+ conclusion.getSuperChain() + MATCH_
 				+ chainMatch(conclusionMatch.getFullSuperChainMatch(),
 						+conclusionMatch.getSuperChainStartPos());
@@ -288,7 +344,7 @@ public class ConclusionMatchPrinter implements ConclusionMatch.Visitor<String> {
 	@Override
 	public String visit(SubPropertyChainMatch2 conclusionMatch) {
 		SubPropertyChain conclusion = conclusionMatch.getParent().getParent();
-		return conclusion + MATCH_LEVEL_//
+		return conclusionMatch.getParent() + MATCH_LEVEL_//
 				+ conclusion.getSubChain() + MATCH_
 				+ chainMatch(conclusionMatch.getFullSubChainMatch(),
 						+conclusionMatch.getSubChainStartPos());

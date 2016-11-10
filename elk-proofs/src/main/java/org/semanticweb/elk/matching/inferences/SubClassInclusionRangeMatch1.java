@@ -1,6 +1,6 @@
 package org.semanticweb.elk.matching.inferences;
 
-/*
+/*-
  * #%L
  * ELK Proofs Package
  * $Id:$
@@ -22,16 +22,11 @@ package org.semanticweb.elk.matching.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.matching.ElkMatchException;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch1;
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
-import org.semanticweb.elk.matching.root.IndexedContextRootMatchDummyVisitor;
-import org.semanticweb.elk.matching.root.IndexedContextRootRangeMatch;
-import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionRange;
 
 public class SubClassInclusionRangeMatch1
@@ -44,47 +39,23 @@ public class SubClassInclusionRangeMatch1
 			SubClassInclusionDecomposedMatch1 conclusionMatch) {
 		super(parent);
 		originMatch_ = conclusionMatch.getDestinationMatch();
+		checkEquals(conclusionMatch, getConclusionMatch(DEBUG_FACTORY));
 	}
 
 	public IndexedContextRootMatch getOriginMatch() {
 		return originMatch_;
 	}
 
-	ElkObjectProperty getPropertyMatch() {
-		return originMatch_.accept(
-				new IndexedContextRootMatchDummyVisitor<ElkObjectProperty>() {
-
-					@Override
-					protected ElkObjectProperty defaultVisit(
-							IndexedContextRootMatch match) {
-						throw new ElkMatchException(getParent().getOrigin(),
-								match);
-					}
-
-					@Override
-					protected ElkObjectProperty defaultVisit(
-							IndexedContextRootRangeMatch match) {
-						ElkObjectPropertyExpression property = match
-								.getPropertyMatch();
-						if (property instanceof ElkObjectProperty) {
-							return (ElkObjectProperty) property;
-						}
-						// else
-						return defaultVisit((IndexedContextRootMatch) match);
-					}
-				});
+	public PropertyRangeMatch1 getSecondPremiseMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory
+				.getPropertyRangeMatch1(getParent().getSecondPremise(factory));
 	}
 
-	public SubClassInclusionDecomposedMatch1 getConclusionMatch(
+	SubClassInclusionDecomposedMatch1 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getSubClassInclusionDecomposedMatch1(
 				getParent().getConclusion(factory), originMatch_);
-	}
-
-	public PropertyRangeMatch1 getPremiseMatch(
-			ConclusionMatchExpressionFactory factory) {
-		return factory.getPropertyRangeMatch1(
-				getParent().getSecondPremise(factory), getPropertyMatch());
 	}
 
 	@Override

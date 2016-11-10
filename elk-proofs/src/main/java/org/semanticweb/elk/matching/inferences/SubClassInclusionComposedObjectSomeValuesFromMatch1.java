@@ -45,6 +45,7 @@ public class SubClassInclusionComposedObjectSomeValuesFromMatch1 extends
 		this.destinationMatch_ = conclusionMatch.getDestinationMatch();
 		this.conclusionSubsumerMatch_ = conclusionMatch
 				.getSubsumerIndexedObjectSomeValuesFromMatch();
+		checkEquals(conclusionMatch, getConclusionMatch(DEBUG_FACTORY));
 	}
 
 	public IndexedContextRootMatch getDestinationMatch() {
@@ -55,7 +56,7 @@ public class SubClassInclusionComposedObjectSomeValuesFromMatch1 extends
 		return conclusionSubsumerMatch_;
 	}
 
-	public SubClassInclusionComposedMatch1 getConclusionMatch(
+	SubClassInclusionComposedMatch1 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getSubClassInclusionComposedMatch1(
 				getParent().getConclusion(factory), destinationMatch_,

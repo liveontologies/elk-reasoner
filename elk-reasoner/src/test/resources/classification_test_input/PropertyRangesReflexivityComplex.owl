@@ -1,0 +1,16 @@
+Prefix(: = <http://example.org/>)
+Prefix(rdf: = <http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs: = <http://www.w3.org/2000/01/rdf-schema#>)
+Prefix(xsd: = <http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl: = <http://www.w3.org/2002/07/owl#>)
+Ontology(<http://example.org#property_ranges_reflexivity_complex>
+Annotation(rdfs:label "since :C and :D are ranges of :R and :S is a reflexive, :A has an :R-successor, which has an :S-successor that satisfies :B, :C, and :D")
+
+SubClassOf(:A ObjectSomeValuesFrom(:R :B))
+ReflexiveObjectProperty(:S)
+ObjectPropertyRange(:R :C)
+ObjectPropertyRange(:R :D)
+SubClassOf(ObjectSomeValuesFrom(:R ObjectSomeValuesFrom(:S ObjectIntersectionOf(:B :C :D))) :E)
+
+
+)

@@ -65,6 +65,21 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	}
 
 	@Override
+	public String visit(BackwardLinkCompositionMatch6 inferenceMatch6) {
+		return inferenceMatch6.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(BackwardLinkCompositionMatch7 inferenceMatch7) {
+		return inferenceMatch7.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(BackwardLinkCompositionMatch8 inferenceMatch8) {
+		return inferenceMatch8.getParent() + " | ";
+	}
+
+	@Override
 	public String visit(BackwardLinkOfObjectHasSelfMatch1 inferenceMatch1) {
 		return inferenceMatch1.getParent() + " | ";
 	}
@@ -72,6 +87,11 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	@Override
 	public String visit(BackwardLinkOfObjectHasSelfMatch2 inferenceMatch2) {
 		return inferenceMatch2.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(BackwardLinkOfObjectHasSelfMatch3 inferenceMatch3) {
+		return inferenceMatch3.getParent() + " | ";
 	}
 
 	@Override
@@ -84,6 +104,12 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	public String visit(
 			BackwardLinkOfObjectSomeValuesFromMatch2 inferenceMatch2) {
 		return inferenceMatch2.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			BackwardLinkOfObjectSomeValuesFromMatch3 inferenceMatch3) {
+		return inferenceMatch3.getParent() + " | ";
 	}
 
 	@Override
@@ -102,6 +128,16 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	}
 
 	@Override
+	public String visit(BackwardLinkReversedExpandedMatch4 inferenceMatch4) {
+		return inferenceMatch4.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(BackwardLinkReversedExpandedMatch5 inferenceMatch5) {
+		return inferenceMatch5.getParent() + " | ";
+	}
+
+	@Override
 	public String visit(
 			ClassInconsistencyOfDisjointSubsumersMatch1 inferenceMatch1) {
 		return inferenceMatch1.getParent() + " | ";
@@ -111,6 +147,12 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	public String visit(
 			ClassInconsistencyOfDisjointSubsumersMatch2 inferenceMatch2) {
 		return inferenceMatch2.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			ClassInconsistencyOfDisjointSubsumersMatch3 inferenceMatch3) {
+		return inferenceMatch3.getParent() + " | ";
 	}
 
 	@Override
@@ -126,8 +168,19 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	}
 
 	@Override
+	public String visit(
+			ClassInconsistencyOfObjectComplementOfMatch3 inferenceMatch3) {
+		return inferenceMatch3.getParent() + " | ";
+	}
+
+	@Override
 	public String visit(ClassInconsistencyOfOwlNothingMatch1 inferenceMatch1) {
 		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(ClassInconsistencyOfOwlNothingMatch2 inferenceMatch2) {
+		return inferenceMatch2.getParent() + " | ";
 	}
 
 	@Override
@@ -141,6 +194,16 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	}
 
 	@Override
+	public String visit(ClassInconsistencyPropagatedMatch3 inferenceMatch3) {
+		return inferenceMatch3.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(ClassInconsistencyPropagatedMatch4 inferenceMatch4) {
+		return inferenceMatch4.getParent() + " | ";
+	}
+
+	@Override
 	public String visit(DisjointSubsumerFromSubsumerMatch1 inferenceMatch1) {
 		return inferenceMatch1.getParent() + " | ";
 	}
@@ -148,6 +211,11 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	@Override
 	public String visit(DisjointSubsumerFromSubsumerMatch2 inferenceMatch2) {
 		return inferenceMatch2.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(DisjointSubsumerFromSubsumerMatch3 inferenceMatch3) {
+		return inferenceMatch3.getParent() + " | ";
 	}
 
 	@Override
@@ -286,18 +354,28 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	}
 
 	@Override
-	public String visit(ForwardLinkCompositionMatch3 inferenceMatch3) {
-		return inferenceMatch3.getParent() + " | ";
+	public String visit(ForwardLinkCompositionMatch3 inferenceMatch4) {
+		return inferenceMatch4.getParent() + " | ";
 	}
 
 	@Override
-	public String visit(ForwardLinkCompositionMatch4 inferenceMatch4) {
-		return inferenceMatch4.getParent() + " | ";
+	public String visit(ForwardLinkCompositionMatch4 inferenceMatch5) {
+		return inferenceMatch5.getParent() + " | ";
 	}
 
 	@Override
 	public String visit(ForwardLinkCompositionMatch5 inferenceMatch5) {
 		return inferenceMatch5.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(ForwardLinkCompositionMatch6 inferenceMatch6) {
+		return inferenceMatch6.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(ForwardLinkCompositionMatch7 inferenceMatch7) {
+		return inferenceMatch7.getParent() + " | ";
 	}
 
 	@Override
@@ -308,6 +386,11 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	@Override
 	public String visit(ForwardLinkOfObjectHasSelfMatch2 inferenceMatch2) {
 		return inferenceMatch2.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(ForwardLinkOfObjectHasSelfMatch3 inferenceMatch3) {
+		return inferenceMatch3.getParent() + " | ";
 	}
 
 	@Override
@@ -323,8 +406,19 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	}
 
 	@Override
+	public String visit(
+			ForwardLinkOfObjectSomeValuesFromMatch3 inferenceMatch3) {
+		return inferenceMatch3.getParent() + " | ";
+	}
+
+	@Override
 	public String visit(PropagationGeneratedMatch1 inferenceMatch1) {
 		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(PropagationGeneratedMatch2 inferenceMatch2) {
+		return inferenceMatch2.getParent() + " | ";
 	}
 
 	@Override
@@ -355,14 +449,85 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	}
 
 	@Override
+	public String visit(
+			SubClassInclusionComposedDefinedClassMatch3 inferenceMatch3) {
+		return inferenceMatch3.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionComposedEmptyObjectIntersectionOfMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionComposedEmptyObjectIntersectionOfMatch2 inferenceMatch2) {
+		return inferenceMatch2.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionComposedEmptyObjectOneOfMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionComposedEmptyObjectOneOfMatch2 inferenceMatch2) {
+		return inferenceMatch2.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionComposedEmptyObjectUnionOfMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionComposedEmptyObjectUnionOfMatch2 inferenceMatch2) {
+		return inferenceMatch2.getParent() + " | ";
+	}
+
+	@Override
 	public String visit(SubClassInclusionComposedEntityMatch1 inferenceMatch1) {
 		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(SubClassInclusionComposedEntityMatch2 inferenceMatch2) {
+		return inferenceMatch2.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionComposedObjectHasValueMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionComposedObjectHasValueMatch2 inferenceMatch2) {
+		return inferenceMatch2.getParent() + " | ";
 	}
 
 	@Override
 	public String visit(
 			SubClassInclusionComposedObjectIntersectionOfMatch1 inferenceMatch1) {
 		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionComposedObjectIntersectionOfMatch2 inferenceMatch2) {
+		return inferenceMatch2.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionComposedObjectIntersectionOfMatch3 inferenceMatch3) {
+		return inferenceMatch3.getParent() + " | ";
 	}
 
 	@Override
@@ -379,7 +544,79 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 
 	@Override
 	public String visit(
+			SubClassInclusionComposedObjectSomeValuesFromMatch3 inferenceMatch3) {
+		return inferenceMatch3.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionComposedObjectSomeValuesFromMatch4 inferenceMatch4) {
+		return inferenceMatch4.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
 			SubClassInclusionComposedObjectUnionOfMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionComposedObjectUnionOfMatch2 inferenceMatch2) {
+		return inferenceMatch2.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionComposedSingletonObjectIntersectionOfMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionComposedSingletonObjectIntersectionOfMatch2 inferenceMatch2) {
+		return inferenceMatch2.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionComposedSingletonObjectOneOfMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionComposedSingletonObjectOneOfMatch2 inferenceMatch2) {
+		return inferenceMatch2.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionComposedSingletonObjectUnionOfMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionComposedSingletonObjectUnionOfMatch2 inferenceMatch2) {
+		return inferenceMatch2.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionDecomposedEmptyObjectIntersectionOfMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionDecomposedEmptyObjectOneOfMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionDecomposedEmptyObjectUnionOfMatch1 inferenceMatch1) {
 		return inferenceMatch1.getParent() + " | ";
 	}
 
@@ -397,6 +634,12 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 
 	@Override
 	public String visit(
+			SubClassInclusionDecomposedObjectHasValueMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
 			SubClassInclusionDecomposedSecondConjunctMatch1 inferenceMatch1) {
 		return inferenceMatch1.getParent() + " | ";
 	}
@@ -405,6 +648,24 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	public String visit(
 			SubClassInclusionDecomposedSecondConjunctMatch2 inferenceMatch2) {
 		return inferenceMatch2.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionDecomposedSingletonObjectIntersectionOfMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionDecomposedSingletonObjectOneOfMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionDecomposedSingletonObjectUnionOfMatch1 inferenceMatch1) {
+		return inferenceMatch1.getParent() + " | ";
 	}
 
 	@Override
@@ -421,6 +682,12 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 
 	@Override
 	public String visit(
+			SubClassInclusionExpandedDefinitionMatch3 inferenceMatch3) {
+		return inferenceMatch3.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
 			SubClassInclusionExpandedFirstEquivalentClassMatch1 inferenceMatch1) {
 		return inferenceMatch1.getParent() + " | ";
 	}
@@ -429,6 +696,12 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	public String visit(
 			SubClassInclusionExpandedFirstEquivalentClassMatch2 inferenceMatch2) {
 		return inferenceMatch2.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionExpandedFirstEquivalentClassMatch3 inferenceMatch3) {
+		return inferenceMatch3.getParent() + " | ";
 	}
 
 	@Override
@@ -445,6 +718,12 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 
 	@Override
 	public String visit(
+			SubClassInclusionExpandedSecondEquivalentClassMatch3 inferenceMatch3) {
+		return inferenceMatch3.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
 			SubClassInclusionExpandedSubClassOfMatch1 inferenceMatch1) {
 		return inferenceMatch1.getParent() + " | ";
 	}
@@ -453,6 +732,12 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	public String visit(
 			SubClassInclusionExpandedSubClassOfMatch2 inferenceMatch2) {
 		return inferenceMatch2.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubClassInclusionExpandedSubClassOfMatch3 inferenceMatch3) {
+		return inferenceMatch3.getParent() + " | ";
 	}
 
 	@Override

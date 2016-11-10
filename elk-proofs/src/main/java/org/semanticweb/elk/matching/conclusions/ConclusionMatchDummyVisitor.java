@@ -48,7 +48,22 @@ public class ConclusionMatchDummyVisitor<O>
 	}
 
 	@Override
+	public O visit(BackwardLinkMatch3 conclusionMatch) {
+		return defaultVisit(conclusionMatch);
+	}
+
+	@Override
+	public O visit(BackwardLinkMatch4 conclusionMatch) {
+		return defaultVisit(conclusionMatch);
+	}
+
+	@Override
 	public O visit(ClassInconsistencyMatch1 conclusionMatch) {
+		return defaultVisit(conclusionMatch);
+	}
+
+	@Override
+	public O visit(ClassInconsistencyMatch2 conclusionMatch) {
 		return defaultVisit(conclusionMatch);
 	}
 
@@ -74,6 +89,11 @@ public class ConclusionMatchDummyVisitor<O>
 
 	@Override
 	public O visit(ForwardLinkMatch3 conclusionMatch) {
+		return defaultVisit(conclusionMatch);
+	}
+
+	@Override
+	public O visit(ForwardLinkMatch4 conclusionMatch) {
 		return defaultVisit(conclusionMatch);
 	}
 
@@ -133,6 +153,11 @@ public class ConclusionMatchDummyVisitor<O>
 	}
 
 	@Override
+	public O visit(PropagationMatch2 conclusionMatch) {
+		return defaultVisit(conclusionMatch);
+	}
+
+	@Override
 	public O visit(PropertyRangeMatch1 conclusionMatch) {
 		return defaultVisit(conclusionMatch);
 	}
@@ -144,6 +169,11 @@ public class ConclusionMatchDummyVisitor<O>
 
 	@Override
 	public O visit(SubClassInclusionComposedMatch1 conclusionMatch) {
+		return defaultVisit(conclusionMatch);
+	}
+
+	@Override
+	public O visit(SubClassInclusionComposedMatch2 conclusionMatch) {
 		return defaultVisit(conclusionMatch);
 	}
 

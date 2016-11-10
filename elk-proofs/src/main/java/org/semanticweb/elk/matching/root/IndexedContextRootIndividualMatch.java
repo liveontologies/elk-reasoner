@@ -1,6 +1,7 @@
 package org.semanticweb.elk.matching.root;
 
 import java.util.Collections;
+import java.util.List;
 
 /*
  * #%L
@@ -31,18 +32,25 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
 public class IndexedContextRootIndividualMatch
 		extends AbstractIndexedContextRootMatch<ElkIndividual> {
 
+	private IndexedContextRootIndividualMatch(ElkIndividual value,
+			List<? extends ElkClassExpression> rangeMatches) {
+		super(value, rangeMatches);
+	}
+
 	IndexedContextRootIndividualMatch(ElkIndividual value) {
 		super(value);
 	}
 
 	@Override
-	public ElkIndividual getValue() {
-		return super.getValue();
+	public ElkClassExpression getMainFillerMatch(ElkObject.Factory factory) {
+		return factory.getObjectOneOf(Collections.singletonList(getValue()));
 	}
 
 	@Override
-	public ElkClassExpression toElkExpression(ElkObject.Factory factory) {
-		return factory.getObjectOneOf(Collections.singletonList(getValue()));
+	public IndexedContextRootIndividualMatch extend(
+			ElkClassExpression rangeMatch) {
+		return new IndexedContextRootIndividualMatch(getValue(),
+				extendRangeMatches(rangeMatch));
 	}
 
 	@Override

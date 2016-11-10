@@ -24,11 +24,14 @@ package org.semanticweb.elk.matching.inferences;
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.subsumers.IndexedObjectIntersectionOfMatch;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 
 public class SubClassInclusionDecomposedSecondConjunctMatch2 extends
 		AbstractInferenceMatch<SubClassInclusionDecomposedSecondConjunctMatch1> {
+
+	private final IndexedContextRootMatch extendedOriginMatch_;
 
 	private final ElkObjectIntersectionOf fullSubsumerMatch_;
 
@@ -38,11 +41,17 @@ public class SubClassInclusionDecomposedSecondConjunctMatch2 extends
 			SubClassInclusionDecomposedSecondConjunctMatch1 parent,
 			SubClassInclusionDecomposedMatch2 premiseMatch) {
 		super(parent);
+		this.extendedOriginMatch_ = premiseMatch.getExtendedDestinationMatch();
 		IndexedObjectIntersectionOfMatch premiseSubsumerMatch = premiseMatch
 				.getSubsumerIndexedObjectIntersectionOfMatch();
 		this.fullSubsumerMatch_ = premiseSubsumerMatch.getFullValue();
 		this.premiseSubsumerPrefixLength_ = premiseSubsumerMatch
 				.getPrefixLength();
+		checkEquals(premiseMatch, getPremiseMatch(DEBUG_FACTORY));
+	}
+
+	public IndexedContextRootMatch getExtendedOriginMatch() {
+		return extendedOriginMatch_;
 	}
 
 	public ElkObjectIntersectionOf getFullSubsumerMatch() {
@@ -53,12 +62,20 @@ public class SubClassInclusionDecomposedSecondConjunctMatch2 extends
 		return premiseSubsumerPrefixLength_;
 	}
 
+	SubClassInclusionDecomposedMatch2 getPremiseMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getSubClassInclusionDecomposedMatch2(
+				getParent().getPremiseMatch(factory), getExtendedOriginMatch(),
+				getFullSubsumerMatch(), getPremiseSubsumerPrefixLength());
+	}
+
 	public SubClassInclusionDecomposedMatch2 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getSubClassInclusionDecomposedMatch2(
 				getParent().getConclusionMatch(factory),
-				fullSubsumerMatch_.getClassExpressions()
-						.get(premiseSubsumerPrefixLength_ - 1));
+				getExtendedOriginMatch(),
+				getFullSubsumerMatch().getClassExpressions()
+						.get(getPremiseSubsumerPrefixLength() - 1));
 	}
 
 	@Override

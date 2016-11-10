@@ -79,10 +79,31 @@ public class ConclusionMatchHash implements ConclusionMatch.Visitor<Integer> {
 	}
 
 	@Override
+	public Integer visit(BackwardLinkMatch3 conclusionMatch) {
+		return combinedHashCode(hashCode(BackwardLinkMatch3.class),
+				hashCode(conclusionMatch.getParent()),
+				hashCode(conclusionMatch.getExtendedDestinationMatch()));
+	}
+
+	@Override
+	public Integer visit(BackwardLinkMatch4 conclusionMatch) {
+		return combinedHashCode(hashCode(BackwardLinkMatch4.class),
+				hashCode(conclusionMatch.getParent()),
+				hashCode(conclusionMatch.getExtendedSourceMatch()));
+	}
+
+	@Override
 	public Integer visit(ClassInconsistencyMatch1 conclusionMatch) {
 		return combinedHashCode(hashCode(ClassInconsistencyMatch1.class),
 				hashCode(conclusionMatch.getParent()),
 				hashCode(conclusionMatch.getDestinationMatch()));
+	}
+
+	@Override
+	public Integer visit(ClassInconsistencyMatch2 conclusionMatch) {
+		return combinedHashCode(hashCode(ClassInconsistencyMatch2.class),
+				hashCode(conclusionMatch.getParent()),
+				hashCode(conclusionMatch.getExtendedDestinationMatch()));
 	}
 
 	@Override
@@ -96,6 +117,7 @@ public class ConclusionMatchHash implements ConclusionMatch.Visitor<Integer> {
 	public Integer visit(DisjointSubsumerMatch2 conclusionMatch) {
 		return combinedHashCode(hashCode(DisjointSubsumerMatch2.class),
 				hashCode(conclusionMatch.getParent()),
+				hashCode(conclusionMatch.getExtendedDestinationMatch()),
 				hashCode(conclusionMatch.getDisjointExpressionsMatch()));
 	}
 
@@ -103,23 +125,29 @@ public class ConclusionMatchHash implements ConclusionMatch.Visitor<Integer> {
 	public Integer visit(ForwardLinkMatch1 conclusionMatch) {
 		return combinedHashCode(hashCode(ForwardLinkMatch1.class),
 				hashCode(conclusionMatch.getParent()),
-				hashCode(conclusionMatch.getDestinationMatch()));
+				hashCode(conclusionMatch.getDestinationMatch()),
+				hashCode(conclusionMatch.getFullChainMatch()),
+				hashCode(conclusionMatch.getChainStartPos()));
 	}
 
 	@Override
 	public Integer visit(ForwardLinkMatch2 conclusionMatch) {
 		return combinedHashCode(hashCode(ForwardLinkMatch2.class),
 				hashCode(conclusionMatch.getParent()),
-				hashCode(conclusionMatch.getChainStartPos()),
-				hashCode(conclusionMatch.getFullChainMatch()));
+				hashCode(conclusionMatch.getTargetMatch()));
 	}
 
 	@Override
 	public Integer visit(ForwardLinkMatch3 conclusionMatch) {
 		return combinedHashCode(hashCode(ForwardLinkMatch3.class),
 				hashCode(conclusionMatch.getParent()),
-				hashCode(conclusionMatch.getTargetMatch()),
-				hashCode(conclusionMatch.getIntermediateRoots()));
+				hashCode(conclusionMatch.getExtendedTargetMatch()));
+	}
+
+	@Override
+	public Integer visit(ForwardLinkMatch4 conclusionMatch) {
+		return combinedHashCode(hashCode(ForwardLinkMatch4.class),
+				hashCode(conclusionMatch.getExtendedDomains()));
 	}
 
 	@Override
@@ -213,16 +241,23 @@ public class ConclusionMatchHash implements ConclusionMatch.Visitor<Integer> {
 	}
 
 	@Override
+	public Integer visit(PropagationMatch2 conclusionMatch) {
+		return combinedHashCode(hashCode(PropagationMatch2.class),
+				hashCode(conclusionMatch.getParent()),
+				hashCode(conclusionMatch.getExtendedDestinationMatch()));
+	}
+
+	@Override
 	public Integer visit(PropertyRangeMatch1 conclusionMatch) {
 		return combinedHashCode(hashCode(PropertyRangeMatch1.class),
-				hashCode(conclusionMatch.getParent()),
-				hashCode(conclusionMatch.getPropertyMatch()));
+				hashCode(conclusionMatch.getParent()));
 	}
 
 	@Override
 	public Integer visit(PropertyRangeMatch2 conclusionMatch) {
 		return combinedHashCode(hashCode(PropertyRangeMatch2.class),
 				hashCode(conclusionMatch.getParent()),
+				hashCode(conclusionMatch.getPropertyMatch()),
 				hashCode(conclusionMatch.getRangeMatch()));
 	}
 
@@ -232,6 +267,13 @@ public class ConclusionMatchHash implements ConclusionMatch.Visitor<Integer> {
 				hashCode(conclusionMatch.getParent()),
 				hashCode(conclusionMatch.getDestinationMatch()),
 				hashCode(conclusionMatch.getSubsumerMatch()));
+	}
+
+	@Override
+	public Integer visit(SubClassInclusionComposedMatch2 conclusionMatch) {
+		return combinedHashCode(hashCode(SubClassInclusionComposedMatch2.class),
+				hashCode(conclusionMatch.getParent()),
+				hashCode(conclusionMatch.getExtendedDestinationMatch()));
 	}
 
 	@Override
@@ -247,6 +289,7 @@ public class ConclusionMatchHash implements ConclusionMatch.Visitor<Integer> {
 		return combinedHashCode(
 				hashCode(SubClassInclusionDecomposedMatch2.class),
 				hashCode(conclusionMatch.getParent()),
+				hashCode(conclusionMatch.getExtendedDestinationMatch()),
 				hashCode(conclusionMatch.getSubsumerMatch()));
 	}
 

@@ -64,10 +64,29 @@ public class ConclusionMatchBaseFactory implements ConclusionMatch.Factory {
 	}
 
 	@Override
+	public BackwardLinkMatch3 getBackwardLinkMatch3(BackwardLinkMatch2 parent,
+			IndexedContextRootMatch extendedDestinationMatch) {
+		return new BackwardLinkMatch3(parent, extendedDestinationMatch);
+	}
+
+	@Override
+	public BackwardLinkMatch4 getBackwardLinkMatch4(BackwardLinkMatch3 parent,
+			IndexedContextRootMatch extendedSourceMatch) {
+		return new BackwardLinkMatch4(parent, extendedSourceMatch);
+	}
+
+	@Override
 	public ClassInconsistencyMatch1 getClassInconsistencyMatch1(
 			ClassInconsistency parent,
 			IndexedContextRootMatch destinationMatch) {
 		return new ClassInconsistencyMatch1(parent, destinationMatch);
+	}
+
+	@Override
+	public ClassInconsistencyMatch2 getClassInconsistencyMatch2(
+			ClassInconsistencyMatch1 parent,
+			IndexedContextRootMatch extendedDestinationMatch) {
+		return new ClassInconsistencyMatch2(parent, extendedDestinationMatch);
 	}
 
 	@Override
@@ -79,29 +98,37 @@ public class ConclusionMatchBaseFactory implements ConclusionMatch.Factory {
 	@Override
 	public DisjointSubsumerMatch2 getDisjointSubsumerMatch2(
 			DisjointSubsumerMatch1 parent,
+			IndexedContextRootMatch extendedDestinationMatch,
 			List<? extends ElkClassExpression> disjointExpressionsMatch) {
-		return new DisjointSubsumerMatch2(parent, disjointExpressionsMatch);
+		return new DisjointSubsumerMatch2(parent, extendedDestinationMatch,
+				disjointExpressionsMatch);
 	}
 
 	@Override
 	public ForwardLinkMatch1 getForwardLinkMatch1(ForwardLink parent,
-			IndexedContextRootMatch destinationMatch) {
-		return new ForwardLinkMatch1(parent, destinationMatch);
+			IndexedContextRootMatch destinationMatch,
+			ElkSubObjectPropertyExpression fullForwardChainMatch,
+			int forwardChainStartPos) {
+		return new ForwardLinkMatch1(parent, destinationMatch,
+				fullForwardChainMatch, forwardChainStartPos);
 	}
 
 	@Override
 	public ForwardLinkMatch2 getForwardLinkMatch2(ForwardLinkMatch1 parent,
-			ElkSubObjectPropertyExpression fullForwardChainMatch,
-			int forwardChainStartPos) {
-		return new ForwardLinkMatch2(parent, fullForwardChainMatch,
-				forwardChainStartPos);
+			IndexedContextRootMatch targetMatch) {
+		return new ForwardLinkMatch2(parent, targetMatch);
 	}
 
 	@Override
 	public ForwardLinkMatch3 getForwardLinkMatch3(ForwardLinkMatch2 parent,
-			IndexedContextRootMatchChain intermediateRoots,
-			IndexedContextRootMatch targetMatch) {
-		return new ForwardLinkMatch3(parent, intermediateRoots, targetMatch);
+			IndexedContextRootMatch extendedTargetMatch) {
+		return new ForwardLinkMatch3(parent, extendedTargetMatch);
+	}
+
+	@Override
+	public ForwardLinkMatch4 getForwardLinkMatch4(ForwardLinkMatch3 parent,
+			IndexedContextRootMatchChain extendedDomains) {
+		return new ForwardLinkMatch4(parent, extendedDomains);
 	}
 
 	@Override
@@ -186,15 +213,21 @@ public class ConclusionMatchBaseFactory implements ConclusionMatch.Factory {
 	}
 
 	@Override
-	public PropertyRangeMatch1 getPropertyRangeMatch1(PropertyRange parent,
-			ElkObjectProperty propertyMatch) {
-		return new PropertyRangeMatch1(parent, propertyMatch);
+	public PropagationMatch2 getPropagationMatch2(PropagationMatch1 parent,
+			IndexedContextRootMatch extendedDestinationMatch) {
+		return new PropagationMatch2(parent, extendedDestinationMatch);
+	}
+
+	@Override
+	public PropertyRangeMatch1 getPropertyRangeMatch1(PropertyRange parent) {
+		return new PropertyRangeMatch1(parent);
 	}
 
 	@Override
 	public PropertyRangeMatch2 getPropertyRangeMatch2(
-			PropertyRangeMatch1 parent, ElkClassExpression rangeMatch) {
-		return new PropertyRangeMatch2(parent, rangeMatch);
+			PropertyRangeMatch1 parent, ElkObjectProperty propertyMatch,
+			ElkClassExpression rangeMatch) {
+		return new PropertyRangeMatch2(parent, propertyMatch, rangeMatch);
 	}
 
 	@Override
@@ -235,6 +268,14 @@ public class ConclusionMatchBaseFactory implements ConclusionMatch.Factory {
 	}
 
 	@Override
+	public SubClassInclusionComposedMatch2 getSubClassInclusionComposedMatch2(
+			SubClassInclusionComposedMatch1 parent,
+			IndexedContextRootMatch extendedDestinationMatch) {
+		return new SubClassInclusionComposedMatch2(parent,
+				extendedDestinationMatch);
+	}
+
+	@Override
 	public SubClassInclusionDecomposedMatch1 getSubClassInclusionDecomposedMatch1(
 			SubClassInclusionDecomposed parent,
 			IndexedContextRootMatch destinationMatch) {
@@ -244,32 +285,39 @@ public class ConclusionMatchBaseFactory implements ConclusionMatch.Factory {
 	@Override
 	public SubClassInclusionDecomposedMatch2 getSubClassInclusionDecomposedMatch2(
 			SubClassInclusionDecomposedMatch1 parent,
+			IndexedContextRootMatch extendedDestinationMatch,
 			ElkClassExpression subsumerMatch) {
-		return new SubClassInclusionDecomposedMatch2(parent, subsumerMatch);
+		return new SubClassInclusionDecomposedMatch2(parent,
+				extendedDestinationMatch, subsumerMatch);
 	}
 
 	@Override
 	public SubClassInclusionDecomposedMatch2 getSubClassInclusionDecomposedMatch2(
 			SubClassInclusionDecomposedMatch1 parent,
+			IndexedContextRootMatch extendedDestinationMatch,
 			ElkIndividual subsumerMatchValue) {
 		return new SubClassInclusionDecomposedMatch2(parent,
-				subsumerMatchValue);
+				extendedDestinationMatch, subsumerMatchValue);
 	}
 
 	@Override
 	public SubClassInclusionDecomposedMatch2 getSubClassInclusionDecomposedMatch2(
 			SubClassInclusionDecomposedMatch1 parent,
+			IndexedContextRootMatch extendedDestinationMatch,
 			ElkObjectIntersectionOf subsumerFullConjunctionMatch,
 			int subsumerConjunctionPrefixLength) {
 		return new SubClassInclusionDecomposedMatch2(parent,
-				subsumerFullConjunctionMatch, subsumerConjunctionPrefixLength);
+				extendedDestinationMatch, subsumerFullConjunctionMatch,
+				subsumerConjunctionPrefixLength);
 	}
 
 	@Override
 	public SubClassInclusionDecomposedMatch2 getSubClassInclusionDecomposedMatch2(
 			SubClassInclusionDecomposedMatch1 parent,
+			IndexedContextRootMatch extendedDestinationMatch,
 			SubsumerMatch subsumerMatch) {
-		return new SubClassInclusionDecomposedMatch2(parent, subsumerMatch);
+		return new SubClassInclusionDecomposedMatch2(parent,
+				extendedDestinationMatch, subsumerMatch);
 	}
 
 	@Override

@@ -1,6 +1,6 @@
-package org.semanticweb.elk.matching.root;
+package org.semanticweb.elk.matching.inferences;
 
-/*
+/*-
  * #%L
  * ELK Proofs Package
  * $Id:$
@@ -22,13 +22,21 @@ package org.semanticweb.elk.matching.root;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch2;
 
-public interface IndexedContextRootRangeMatch extends IndexedContextRootMatch {
+public class SubClassInclusionComposedObjectHasValueMatch2 extends
+		AbstractSubClassInclusionComposedCanonizerMatch2<SubClassInclusionComposedObjectHasValueMatch1> {
 
-	ElkObjectPropertyExpression getPropertyMatch();
-	
-	abstract <O> O accept(Visitor<O> visitor);
+	SubClassInclusionComposedObjectHasValueMatch2(
+			SubClassInclusionComposedObjectHasValueMatch1 parent,
+			SubClassInclusionComposedMatch2 premiseMatch) {
+		super(parent, premiseMatch);
+	}
+
+	@Override
+	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
 
 	/**
 	 * The visitor pattern for instances
@@ -38,11 +46,9 @@ public interface IndexedContextRootRangeMatch extends IndexedContextRootMatch {
 	 * @param <O>
 	 *            the type of the output
 	 */
-	interface Visitor<O>
-			extends IndexedContextRootRangeHasValueMatch.Visitor<O>,
-			IndexedContextRootRangeSomeValuesFromMatch.Visitor<O> {
+	public interface Visitor<O> {
 
-		// combined interface
+		O visit(SubClassInclusionComposedObjectHasValueMatch2 inferenceMatch2);
 
 	}
 
@@ -52,11 +58,11 @@ public interface IndexedContextRootRangeMatch extends IndexedContextRootMatch {
 	 * @author Yevgeny Kazakov
 	 *
 	 */
-	public interface Factory
-			extends IndexedContextRootRangeHasValueMatch.Factory,
-			IndexedContextRootRangeSomeValuesFromMatch.Factory {
+	public interface Factory {
 
-		// combined interface
+		SubClassInclusionComposedObjectHasValueMatch2 getSubClassInclusionComposedObjectHasValueMatch2(
+				SubClassInclusionComposedObjectHasValueMatch1 parent,
+				SubClassInclusionComposedMatch2 premiseMatch);
 
 	}
 

@@ -34,6 +34,10 @@ public class IndexedContextRootMatchChain {
 		this.tail_ = tail;
 	}
 
+	public IndexedContextRootMatchChain(IndexedContextRootMatch head) {
+		this(head, null);
+	}
+
 	public IndexedContextRootMatch getHead() {
 		return head_;
 	}

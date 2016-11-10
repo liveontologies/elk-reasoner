@@ -39,13 +39,14 @@ public class BackwardLinkCompositionMatch1
 			BackwardLinkMatch1 conclusionMatch) {
 		super(parent);
 		this.conclusionSourceMatch_ = conclusionMatch.getSourceMatch();
+		checkEquals(conclusionMatch, getConclusionMatch(DEBUG_FACTORY));
 	}
 
-	public IndexedContextRootMatch getConclusionSourceMatch() {
+	IndexedContextRootMatch getConclusionSourceMatch() {
 		return conclusionSourceMatch_;
 	}
 
-	public BackwardLinkMatch1 getConclusionMatch(
+	BackwardLinkMatch1 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getBackwardLinkMatch1(getParent().getConclusion(factory),
 				getConclusionSourceMatch());

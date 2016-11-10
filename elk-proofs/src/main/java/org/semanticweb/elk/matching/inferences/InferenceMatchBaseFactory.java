@@ -24,12 +24,16 @@ package org.semanticweb.elk.matching.inferences;
 
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch2;
+import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch3;
+import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch4;
 import org.semanticweb.elk.matching.conclusions.ClassInconsistencyMatch1;
+import org.semanticweb.elk.matching.conclusions.ClassInconsistencyMatch2;
 import org.semanticweb.elk.matching.conclusions.DisjointSubsumerMatch1;
 import org.semanticweb.elk.matching.conclusions.DisjointSubsumerMatch2;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch3;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch4;
 import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedDisjointClassesAxiomMatch2;
 import org.semanticweb.elk.matching.conclusions.IndexedEquivalentClassesAxiomMatch1;
@@ -41,13 +45,19 @@ import org.semanticweb.elk.matching.conclusions.IndexedSubClassOfAxiomMatch2;
 import org.semanticweb.elk.matching.conclusions.IndexedSubObjectPropertyOfAxiomMatch1;
 import org.semanticweb.elk.matching.conclusions.IndexedSubObjectPropertyOfAxiomMatch2;
 import org.semanticweb.elk.matching.conclusions.PropagationMatch1;
+import org.semanticweb.elk.matching.conclusions.PropagationMatch2;
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch1;
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch2;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
+import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch2;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
 import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1;
 import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch2;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.reasoner.indexing.model.ElkClassAssertionAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDifferentIndividualsAxiomBinaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkDifferentIndividualsAxiomNaryConversion;
@@ -69,6 +79,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ElkSameIndividualAxiomConvers
 import org.semanticweb.elk.reasoner.indexing.model.ElkSubClassOfAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkSubObjectPropertyOfAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ElkTransitiveObjectPropertyAxiomConversion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkComposition;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectHasSelf;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectSomeValuesFrom;
@@ -134,8 +145,29 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 	@Override
 	public BackwardLinkCompositionMatch5 getBackwardLinkCompositionMatch5(
 			BackwardLinkCompositionMatch4 parent,
-			ForwardLinkMatch3 thirdPremiseMatch) {
+			ForwardLinkMatch2 thirdPremiseMatch) {
 		return new BackwardLinkCompositionMatch5(parent, thirdPremiseMatch);
+	}
+
+	@Override
+	public BackwardLinkCompositionMatch6 getBackwardLinkCompositionMatch6(
+			BackwardLinkCompositionMatch5 parent,
+			BackwardLinkMatch3 conclusionMatch) {
+		return new BackwardLinkCompositionMatch6(parent, conclusionMatch);
+	}
+
+	@Override
+	public BackwardLinkCompositionMatch7 getBackwardLinkCompositionMatch7(
+			BackwardLinkCompositionMatch6 parent,
+			ForwardLinkMatch4 thirdPremiseMatch) {
+		return new BackwardLinkCompositionMatch7(parent, thirdPremiseMatch);
+	}
+
+	@Override
+	public BackwardLinkCompositionMatch8 getBackwardLinkCompositionMatch8(
+			BackwardLinkCompositionMatch7 parent,
+			BackwardLinkMatch4 firstPremiseMatch) {
+		return new BackwardLinkCompositionMatch8(parent, firstPremiseMatch);
 	}
 
 	@Override
@@ -153,6 +185,13 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 	}
 
 	@Override
+	public BackwardLinkOfObjectHasSelfMatch3 getBackwardLinkOfObjectHasSelfMatch3(
+			BackwardLinkOfObjectHasSelfMatch2 parent,
+			BackwardLinkMatch3 conclusionMatch) {
+		return new BackwardLinkOfObjectHasSelfMatch3(parent, conclusionMatch);
+	}
+
+	@Override
 	public BackwardLinkOfObjectSomeValuesFromMatch1 getBackwardLinkOfObjectSomeValuesFromMatch1(
 			BackwardLinkOfObjectSomeValuesFrom parent,
 			BackwardLinkMatch1 conclusionMatch) {
@@ -166,6 +205,14 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 			SubClassInclusionDecomposedMatch2 premiseMatch) {
 		return new BackwardLinkOfObjectSomeValuesFromMatch2(parent,
 				premiseMatch);
+	}
+
+	@Override
+	public BackwardLinkOfObjectSomeValuesFromMatch3 getBackwardLinkOfObjectSomeValuesFromMatch3(
+			BackwardLinkOfObjectSomeValuesFromMatch2 parent,
+			BackwardLinkMatch3 conclusionMatch) {
+		return new BackwardLinkOfObjectSomeValuesFromMatch3(parent,
+				conclusionMatch);
 	}
 
 	@Override
@@ -186,8 +233,23 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 	@Override
 	public BackwardLinkReversedExpandedMatch3 getBackwardLinkReversedExpandedMatch3(
 			BackwardLinkReversedExpandedMatch2 parent,
-			ForwardLinkMatch3 firstPremiseMatch) {
+			ForwardLinkMatch2 firstPremiseMatch) {
 		return new BackwardLinkReversedExpandedMatch3(parent,
+				firstPremiseMatch);
+	}
+
+	@Override
+	public BackwardLinkReversedExpandedMatch4 getBackwardLinkReversedExpandedMatch4(
+			BackwardLinkReversedExpandedMatch3 parent,
+			BackwardLinkMatch3 conclusionMatch) {
+		return new BackwardLinkReversedExpandedMatch4(parent, conclusionMatch);
+	}
+
+	@Override
+	public BackwardLinkReversedExpandedMatch5 getBackwardLinkReversedExpandedMatch5(
+			BackwardLinkReversedExpandedMatch4 parent,
+			ForwardLinkMatch4 firstPremiseMatch) {
+		return new BackwardLinkReversedExpandedMatch5(parent,
 				firstPremiseMatch);
 	}
 
@@ -208,6 +270,14 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 	}
 
 	@Override
+	public ClassInconsistencyOfDisjointSubsumersMatch3 getClassInconsistencyOfDisjointSubsumersMatch3(
+			ClassInconsistencyOfDisjointSubsumersMatch2 parent,
+			DisjointSubsumerMatch2 secondPremiseMatch) {
+		return new ClassInconsistencyOfDisjointSubsumersMatch3(parent,
+				secondPremiseMatch);
+	}
+
+	@Override
 	public ClassInconsistencyOfObjectComplementOfMatch1 getClassInconsistencyOfObjectComplementOfMatch1(
 			ClassInconsistencyOfObjectComplementOf parent,
 			ClassInconsistencyMatch1 conclusionMatch) {
@@ -224,11 +294,26 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 	}
 
 	@Override
+	public ClassInconsistencyOfObjectComplementOfMatch3 getClassInconsistencyOfObjectComplementOfMatch3(
+			ClassInconsistencyOfObjectComplementOfMatch2 parent,
+			SubClassInclusionComposedMatch2 firstPremiseMatch) {
+		return new ClassInconsistencyOfObjectComplementOfMatch3(parent,
+				firstPremiseMatch);
+	}
+
+	@Override
 	public ClassInconsistencyOfOwlNothingMatch1 getClassInconsistencyOfOwlNothingMatch1(
 			ClassInconsistencyOfOwlNothing parent,
 			ClassInconsistencyMatch1 conclusionMatch) {
 		return new ClassInconsistencyOfOwlNothingMatch1(parent,
 				conclusionMatch);
+	}
+
+	@Override
+	public ClassInconsistencyOfOwlNothingMatch2 getClassInconsistencyOfOwlNothingMatch2(
+			ClassInconsistencyOfOwlNothingMatch1 parent,
+			SubClassInclusionComposedMatch2 premiseMatch) {
+		return new ClassInconsistencyOfOwlNothingMatch2(parent, premiseMatch);
 	}
 
 	@Override
@@ -247,6 +332,22 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 	}
 
 	@Override
+	public ClassInconsistencyPropagatedMatch3 getClassInconsistencyPropagatedMatch3(
+			ClassInconsistencyPropagatedMatch2 parent,
+			ClassInconsistencyMatch2 secondPremiseMatch) {
+		return new ClassInconsistencyPropagatedMatch3(parent,
+				secondPremiseMatch);
+	}
+
+	@Override
+	public ClassInconsistencyPropagatedMatch4 getClassInconsistencyPropagatedMatch4(
+			ClassInconsistencyPropagatedMatch3 parent,
+			BackwardLinkMatch4 firstPremiseMatch) {
+		return new ClassInconsistencyPropagatedMatch4(parent,
+				firstPremiseMatch);
+	}
+
+	@Override
 	public DisjointSubsumerFromSubsumerMatch1 getDisjointSubsumerFromSubsumerMatch1(
 			DisjointSubsumerFromSubsumer parent,
 			DisjointSubsumerMatch1 conclusionMatch) {
@@ -259,6 +360,14 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 			IndexedDisjointClassesAxiomMatch2 secondPremiseMatch) {
 		return new DisjointSubsumerFromSubsumerMatch2(parent,
 				secondPremiseMatch);
+	}
+
+	@Override
+	public DisjointSubsumerFromSubsumerMatch3 getDisjointSubsumerFromSubsumerMatch3(
+			DisjointSubsumerFromSubsumerMatch2 parent,
+			SubClassInclusionComposedMatch2 firstPremiseMatch) {
+		return new DisjointSubsumerFromSubsumerMatch3(parent,
+				firstPremiseMatch);
 	}
 
 	@Override
@@ -437,29 +546,43 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 	@Override
 	public ForwardLinkCompositionMatch2 getForwardLinkCompositionMatch2(
 			ForwardLinkCompositionMatch1 parent,
-			ForwardLinkMatch2 conclusionMatch) {
-		return new ForwardLinkCompositionMatch2(parent, conclusionMatch);
+			BackwardLinkMatch2 firstPremiseMatch) {
+		return new ForwardLinkCompositionMatch2(parent, firstPremiseMatch);
 	}
 
 	@Override
 	public ForwardLinkCompositionMatch3 getForwardLinkCompositionMatch3(
 			ForwardLinkCompositionMatch2 parent,
-			BackwardLinkMatch2 firstPremiseMatch) {
-		return new ForwardLinkCompositionMatch3(parent, firstPremiseMatch);
+			SubPropertyChainMatch2 fourthPremiseMatch) {
+		return new ForwardLinkCompositionMatch3(parent, fourthPremiseMatch);
 	}
 
 	@Override
 	public ForwardLinkCompositionMatch4 getForwardLinkCompositionMatch4(
 			ForwardLinkCompositionMatch3 parent,
-			SubPropertyChainMatch2 fourthPremiseMatch) {
-		return new ForwardLinkCompositionMatch4(parent, fourthPremiseMatch);
+			ForwardLinkMatch2 thirdPremiseMatch) {
+		return new ForwardLinkCompositionMatch4(parent, thirdPremiseMatch);
 	}
 
 	@Override
 	public ForwardLinkCompositionMatch5 getForwardLinkCompositionMatch5(
 			ForwardLinkCompositionMatch4 parent,
-			ForwardLinkMatch3 thirdPremiseMatch) {
-		return new ForwardLinkCompositionMatch5(parent, thirdPremiseMatch);
+			ForwardLinkMatch3 conclusionMatch) {
+		return new ForwardLinkCompositionMatch5(parent, conclusionMatch);
+	}
+
+	@Override
+	public ForwardLinkCompositionMatch6 getForwardLinkCompositionMatch6(
+			ForwardLinkCompositionMatch5 parent,
+			ForwardLinkMatch4 thirdPremiseMatch) {
+		return new ForwardLinkCompositionMatch6(parent, thirdPremiseMatch);
+	}
+
+	@Override
+	public ForwardLinkCompositionMatch7 getForwardLinkCompositionMatch7(
+			ForwardLinkCompositionMatch6 parent,
+			BackwardLinkMatch4 firstPremiseMatch) {
+		return new ForwardLinkCompositionMatch7(parent, firstPremiseMatch);
 	}
 
 	@Override
@@ -474,6 +597,13 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 			ForwardLinkOfObjectHasSelfMatch1 parent,
 			SubClassInclusionDecomposedMatch2 premiseMatch) {
 		return new ForwardLinkOfObjectHasSelfMatch2(parent, premiseMatch);
+	}
+
+	@Override
+	public ForwardLinkOfObjectHasSelfMatch3 getForwardLinkOfObjectHasSelfMatch3(
+			ForwardLinkOfObjectHasSelfMatch2 parent,
+			ForwardLinkMatch3 conclusionMatch) {
+		return new ForwardLinkOfObjectHasSelfMatch3(parent, conclusionMatch);
 	}
 
 	@Override
@@ -493,9 +623,24 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 	}
 
 	@Override
+	public ForwardLinkOfObjectSomeValuesFromMatch3 getForwardLinkOfObjectSomeValuesFromMatch3(
+			ForwardLinkOfObjectSomeValuesFromMatch2 parent,
+			ForwardLinkMatch3 conclusionMatch) {
+		return new ForwardLinkOfObjectSomeValuesFromMatch3(parent,
+				conclusionMatch);
+	}
+
+	@Override
 	public PropagationGeneratedMatch1 getPropagationGeneratedMatch1(
 			PropagationGenerated parent, PropagationMatch1 conclusionMatch) {
 		return new PropagationGeneratedMatch1(parent, conclusionMatch);
+	}
+
+	@Override
+	public PropagationGeneratedMatch2 getPropagationGeneratedMatch2(
+			PropagationGeneratedMatch1 parent,
+			SubClassInclusionComposedMatch2 secondPremiseMatch) {
+		return new PropagationGeneratedMatch2(parent, secondPremiseMatch);
 	}
 
 	@Override
@@ -536,6 +681,62 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 	}
 
 	@Override
+	public SubClassInclusionComposedDefinedClassMatch3 getSubClassInclusionComposedDefinedClassMatch3(
+			SubClassInclusionComposedDefinedClassMatch2 parent,
+			SubClassInclusionComposedMatch2 firstPremiseMatch) {
+		return new SubClassInclusionComposedDefinedClassMatch3(parent,
+				firstPremiseMatch);
+	}
+
+	@Override
+	public SubClassInclusionComposedEmptyObjectIntersectionOfMatch1 getSubClassInclusionComposedEmptyObjectIntersectionOfMatch1(
+			SubClassInclusionComposed parent,
+			IndexedContextRootMatch destinationMatch) {
+		return new SubClassInclusionComposedEmptyObjectIntersectionOfMatch1(
+				parent, destinationMatch);
+	}
+
+	@Override
+	public SubClassInclusionComposedEmptyObjectIntersectionOfMatch2 getSubClassInclusionComposedEmptyObjectIntersectionOfMatch2(
+			SubClassInclusionComposedEmptyObjectIntersectionOfMatch1 parent,
+			SubClassInclusionComposedMatch2 premiseMatch) {
+		return new SubClassInclusionComposedEmptyObjectIntersectionOfMatch2(
+				parent, premiseMatch);
+	}
+
+	@Override
+	public SubClassInclusionComposedEmptyObjectOneOfMatch1 getSubClassInclusionComposedEmptyObjectOneOfMatch1(
+			SubClassInclusionComposed parent,
+			IndexedContextRootMatch destinationMatch) {
+		return new SubClassInclusionComposedEmptyObjectOneOfMatch1(parent,
+				destinationMatch);
+	}
+
+	@Override
+	public SubClassInclusionComposedEmptyObjectOneOfMatch2 getSubClassInclusionComposedEmptyObjectOneOfMatch2(
+			SubClassInclusionComposedEmptyObjectOneOfMatch1 parent,
+			SubClassInclusionComposedMatch2 premiseMatch) {
+		return new SubClassInclusionComposedEmptyObjectOneOfMatch2(parent,
+				premiseMatch);
+	}
+
+	@Override
+	public SubClassInclusionComposedEmptyObjectUnionOfMatch1 getSubClassInclusionComposedEmptyObjectUnionOfMatch1(
+			SubClassInclusionComposed parent,
+			IndexedContextRootMatch destinationMatch) {
+		return new SubClassInclusionComposedEmptyObjectUnionOfMatch1(parent,
+				destinationMatch);
+	}
+
+	@Override
+	public SubClassInclusionComposedEmptyObjectUnionOfMatch2 getSubClassInclusionComposedEmptyObjectUnionOfMatch2(
+			SubClassInclusionComposedEmptyObjectUnionOfMatch1 parent,
+			SubClassInclusionComposedMatch2 premiseMatch) {
+		return new SubClassInclusionComposedEmptyObjectUnionOfMatch2(parent,
+				premiseMatch);
+	}
+
+	@Override
 	public SubClassInclusionComposedEntityMatch1 getSubClassInclusionComposedEntityMatch1(
 			SubClassInclusionComposedEntity parent,
 			SubClassInclusionComposedMatch1 conclusionMatch) {
@@ -544,11 +745,51 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 	}
 
 	@Override
+	public SubClassInclusionComposedEntityMatch2 getSubClassInclusionComposedEntityMatch2(
+			SubClassInclusionComposedEntityMatch1 parent,
+			SubClassInclusionDecomposedMatch2 premiseMatch) {
+		return new SubClassInclusionComposedEntityMatch2(parent, premiseMatch);
+	}
+
+	@Override
+	public SubClassInclusionComposedObjectHasValueMatch1 getSubClassInclusionComposedObjectHasValueMatch1(
+			SubClassInclusionComposed parent,
+			IndexedContextRootMatch destinationMatch,
+			ElkObjectHasValue conclusionSubsumerMatch) {
+		return new SubClassInclusionComposedObjectHasValueMatch1(parent,
+				destinationMatch, conclusionSubsumerMatch);
+	}
+
+	@Override
+	public SubClassInclusionComposedObjectHasValueMatch2 getSubClassInclusionComposedObjectHasValueMatch2(
+			SubClassInclusionComposedObjectHasValueMatch1 parent,
+			SubClassInclusionComposedMatch2 premiseMatch) {
+		return new SubClassInclusionComposedObjectHasValueMatch2(parent,
+				premiseMatch);
+	}
+
+	@Override
 	public SubClassInclusionComposedObjectIntersectionOfMatch1 getSubClassInclusionComposedObjectIntersectionOfMatch1(
 			SubClassInclusionComposedObjectIntersectionOf parent,
 			SubClassInclusionComposedMatch1 conclusionMatch) {
 		return new SubClassInclusionComposedObjectIntersectionOfMatch1(parent,
 				conclusionMatch);
+	}
+
+	@Override
+	public SubClassInclusionComposedObjectIntersectionOfMatch2 getSubClassInclusionComposedObjectIntersectionOfMatch2(
+			SubClassInclusionComposedObjectIntersectionOfMatch1 parent,
+			SubClassInclusionComposedMatch2 secondPremiseMatch) {
+		return new SubClassInclusionComposedObjectIntersectionOfMatch2(parent,
+				secondPremiseMatch);
+	}
+
+	@Override
+	public SubClassInclusionComposedObjectIntersectionOfMatch3 getSubClassInclusionComposedObjectIntersectionOfMatch3(
+			SubClassInclusionComposedObjectIntersectionOfMatch2 parent,
+			SubClassInclusionComposedMatch2 firstPremiseMatch) {
+		return new SubClassInclusionComposedObjectIntersectionOfMatch3(parent,
+				firstPremiseMatch);
 	}
 
 	@Override
@@ -568,11 +809,110 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 	}
 
 	@Override
+	public SubClassInclusionComposedObjectSomeValuesFromMatch3 getSubClassInclusionComposedObjectSomeValuesFromMatch3(
+			SubClassInclusionComposedObjectSomeValuesFromMatch2 parent,
+			PropagationMatch2 secondPremiseMatch) {
+		return new SubClassInclusionComposedObjectSomeValuesFromMatch3(parent,
+				secondPremiseMatch);
+	}
+
+	@Override
+	public SubClassInclusionComposedObjectSomeValuesFromMatch4 getSubClassInclusionComposedObjectSomeValuesFromMatch4(
+			SubClassInclusionComposedObjectSomeValuesFromMatch3 parent,
+			BackwardLinkMatch4 firstPremiseMatch) {
+		return new SubClassInclusionComposedObjectSomeValuesFromMatch4(parent,
+				firstPremiseMatch);
+	}
+
+	@Override
 	public SubClassInclusionComposedObjectUnionOfMatch1 getSubClassInclusionComposedObjectUnionOfMatch1(
 			SubClassInclusionComposedObjectUnionOf parent,
 			SubClassInclusionComposedMatch1 conclusionMatch) {
 		return new SubClassInclusionComposedObjectUnionOfMatch1(parent,
 				conclusionMatch);
+	}
+
+	@Override
+	public SubClassInclusionComposedObjectUnionOfMatch2 getSubClassInclusionComposedObjectUnionOfMatch2(
+			SubClassInclusionComposedObjectUnionOfMatch1 parent,
+			SubClassInclusionComposedMatch2 premiseMatch) {
+		return new SubClassInclusionComposedObjectUnionOfMatch2(parent,
+				premiseMatch);
+	}
+
+	@Override
+	public SubClassInclusionComposedSingletonObjectIntersectionOfMatch1 getSubClassInclusionComposedSingletonObjectIntersectionOfMatch1(
+			SubClassInclusionComposed parent,
+			IndexedContextRootMatch destinationMatch,
+			ElkClassExpression conjunctMatch) {
+		return new SubClassInclusionComposedSingletonObjectIntersectionOfMatch1(
+				parent, destinationMatch, conjunctMatch);
+	}
+
+	@Override
+	public SubClassInclusionComposedSingletonObjectIntersectionOfMatch2 getSubClassInclusionComposedSingletonObjectIntersectionOfMatch2(
+			SubClassInclusionComposedSingletonObjectIntersectionOfMatch1 parent,
+			SubClassInclusionComposedMatch2 premiseMatch) {
+		return new SubClassInclusionComposedSingletonObjectIntersectionOfMatch2(
+				parent, premiseMatch);
+	}
+
+	@Override
+	public SubClassInclusionComposedSingletonObjectOneOfMatch1 getSubClassInclusionComposedSingletonObjectOneOfMatch1(
+			SubClassInclusionComposed parent,
+			IndexedContextRootMatch destinationMatch,
+			ElkIndividual memberMatch) {
+		return new SubClassInclusionComposedSingletonObjectOneOfMatch1(parent,
+				destinationMatch, memberMatch);
+	}
+
+	@Override
+	public SubClassInclusionComposedSingletonObjectOneOfMatch2 getSubClassInclusionComposedSingletonObjectOneOfMatch2(
+			SubClassInclusionComposedSingletonObjectOneOfMatch1 parent,
+			SubClassInclusionComposedMatch2 premiseMatch) {
+		return new SubClassInclusionComposedSingletonObjectOneOfMatch2(parent,
+				premiseMatch);
+	}
+
+	@Override
+	public SubClassInclusionComposedSingletonObjectUnionOfMatch1 getSubClassInclusionComposedSingletonObjectUnionOfMatch1(
+			SubClassInclusionComposed parent,
+			IndexedContextRootMatch destinationMatch,
+			ElkClassExpression disjunctMatch) {
+		return new SubClassInclusionComposedSingletonObjectUnionOfMatch1(parent,
+				destinationMatch, disjunctMatch);
+	}
+
+	@Override
+	public SubClassInclusionComposedSingletonObjectUnionOfMatch2 getSubClassInclusionComposedSingletonObjectUnionOfMatch2(
+			SubClassInclusionComposedSingletonObjectUnionOfMatch1 parent,
+			SubClassInclusionComposedMatch2 premiseMatch) {
+		return new SubClassInclusionComposedSingletonObjectUnionOfMatch2(parent,
+				premiseMatch);
+	}
+
+	@Override
+	public SubClassInclusionDecomposedEmptyObjectIntersectionOfMatch1 getSubClassInclusionDecomposedEmptyObjectIntersectionOfMatch1(
+			SubClassInclusionDecomposedMatch1 parent,
+			IndexedContextRootMatch extendedDestinationMatch) {
+		return new SubClassInclusionDecomposedEmptyObjectIntersectionOfMatch1(
+				parent, extendedDestinationMatch);
+	}
+
+	@Override
+	public SubClassInclusionDecomposedEmptyObjectOneOfMatch1 getSubClassInclusionDecomposedEmptyObjectOneOfMatch1(
+			SubClassInclusionDecomposedMatch1 parent,
+			IndexedContextRootMatch extendedDestinationMatch) {
+		return new SubClassInclusionDecomposedEmptyObjectOneOfMatch1(parent,
+				extendedDestinationMatch);
+	}
+
+	@Override
+	public SubClassInclusionDecomposedEmptyObjectUnionOfMatch1 getSubClassInclusionDecomposedEmptyObjectUnionOfMatch1(
+			SubClassInclusionDecomposedMatch1 parent,
+			IndexedContextRootMatch extendedDestinationMatch) {
+		return new SubClassInclusionDecomposedEmptyObjectUnionOfMatch1(parent,
+				extendedDestinationMatch);
 	}
 
 	@Override
@@ -592,6 +932,15 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 	}
 
 	@Override
+	public SubClassInclusionDecomposedObjectHasValueMatch1 getSubClassInclusionDecomposedObjectHasValueMatch1(
+			SubClassInclusionDecomposedMatch1 parent,
+			IndexedContextRootMatch extendedDestinationMatch,
+			ElkObjectHasValue premiseSubsumerMatch) {
+		return new SubClassInclusionDecomposedObjectHasValueMatch1(parent,
+				extendedDestinationMatch, premiseSubsumerMatch);
+	}
+
+	@Override
 	public SubClassInclusionDecomposedSecondConjunctMatch1 getSubClassInclusionDecomposedSecondConjunctMatch1(
 			SubClassInclusionDecomposedSecondConjunct parent,
 			SubClassInclusionDecomposedMatch1 conclusionMatch) {
@@ -605,6 +954,33 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 			SubClassInclusionDecomposedMatch2 premiseMatch) {
 		return new SubClassInclusionDecomposedSecondConjunctMatch2(parent,
 				premiseMatch);
+	}
+
+	@Override
+	public SubClassInclusionDecomposedSingletonObjectIntersectionOfMatch1 getSubClassInclusionDecomposedSingletonObjectIntersectionOfMatch1(
+			SubClassInclusionDecomposedMatch1 parent,
+			IndexedContextRootMatch extendedDestinationMatch,
+			ElkClassExpression conjunctMatch) {
+		return new SubClassInclusionDecomposedSingletonObjectIntersectionOfMatch1(
+				parent, extendedDestinationMatch, conjunctMatch);
+	}
+
+	@Override
+	public SubClassInclusionDecomposedSingletonObjectOneOfMatch1 getSubClassInclusionDecomposedSingletonObjectOneOfMatch1(
+			SubClassInclusionDecomposedMatch1 parent,
+			IndexedContextRootMatch extendedDestinationMatch,
+			ElkIndividual memberMatch) {
+		return new SubClassInclusionDecomposedSingletonObjectOneOfMatch1(parent,
+				extendedDestinationMatch, memberMatch);
+	}
+
+	@Override
+	public SubClassInclusionDecomposedSingletonObjectUnionOfMatch1 getSubClassInclusionDecomposedSingletonObjectUnionOfMatch1(
+			SubClassInclusionDecomposedMatch1 parent,
+			IndexedContextRootMatch extendedDestinationMatch,
+			ElkClassExpression disjunctMatch) {
+		return new SubClassInclusionDecomposedSingletonObjectUnionOfMatch1(
+				parent, extendedDestinationMatch, disjunctMatch);
 	}
 
 	@Override
@@ -624,6 +1000,14 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 	}
 
 	@Override
+	public SubClassInclusionExpandedDefinitionMatch3 getSubClassInclusionExpandedDefinitionMatch3(
+			SubClassInclusionExpandedDefinitionMatch2 parent,
+			SubClassInclusionDecomposedMatch2 firstPremiseMatch) {
+		return new SubClassInclusionExpandedDefinitionMatch3(parent,
+				firstPremiseMatch);
+	}
+
+	@Override
 	public SubClassInclusionExpandedFirstEquivalentClassMatch1 getSubClassInclusionExpandedFirstEquivalentClassMatch1(
 			SubClassInclusionExpandedFirstEquivalentClass parent,
 			SubClassInclusionDecomposedMatch1 conclusionMatch) {
@@ -637,6 +1021,14 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 			IndexedEquivalentClassesAxiomMatch2 secondPremiseMatch) {
 		return new SubClassInclusionExpandedFirstEquivalentClassMatch2(parent,
 				secondPremiseMatch);
+	}
+
+	@Override
+	public SubClassInclusionExpandedFirstEquivalentClassMatch3 getSubClassInclusionExpandedFirstEquivalentClassMatch3(
+			SubClassInclusionExpandedFirstEquivalentClassMatch2 parent,
+			SubClassInclusionComposedMatch2 firstPremiseMatch) {
+		return new SubClassInclusionExpandedFirstEquivalentClassMatch3(parent,
+				firstPremiseMatch);
 	}
 
 	@Override
@@ -656,6 +1048,14 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 	}
 
 	@Override
+	public SubClassInclusionExpandedSecondEquivalentClassMatch3 getSubClassInclusionExpandedSecondEquivalentClassMatch3(
+			SubClassInclusionExpandedSecondEquivalentClassMatch2 parent,
+			SubClassInclusionComposedMatch2 firstPremiseMatch) {
+		return new SubClassInclusionExpandedSecondEquivalentClassMatch3(parent,
+				firstPremiseMatch);
+	}
+
+	@Override
 	public SubClassInclusionExpandedSubClassOfMatch1 getSubClassInclusionExpandedSubClassOfMatch1(
 			SubClassInclusionExpandedSubClassOf parent,
 			SubClassInclusionDecomposedMatch1 conclusionMatch) {
@@ -669,6 +1069,14 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 			IndexedSubClassOfAxiomMatch2 secondPremiseMatch) {
 		return new SubClassInclusionExpandedSubClassOfMatch2(parent,
 				secondPremiseMatch);
+	}
+
+	@Override
+	public SubClassInclusionExpandedSubClassOfMatch3 getSubClassInclusionExpandedSubClassOfMatch3(
+			SubClassInclusionExpandedSubClassOfMatch2 parent,
+			SubClassInclusionComposedMatch2 firstPremiseMatch) {
+		return new SubClassInclusionExpandedSubClassOfMatch3(parent,
+				firstPremiseMatch);
 	}
 
 	@Override
@@ -712,8 +1120,8 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 	@Override
 	public SubClassInclusionRangeMatch2 getSubClassInclusionRangeMatch2(
 			SubClassInclusionRangeMatch1 parent,
-			PropertyRangeMatch2 premiseMatch) {
-		return new SubClassInclusionRangeMatch2(parent, premiseMatch);
+			PropertyRangeMatch2 secondPremiseMatch) {
+		return new SubClassInclusionRangeMatch2(parent, secondPremiseMatch);
 	}
 
 	@Override

@@ -25,50 +25,37 @@ package org.semanticweb.elk.matching.inferences;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2Watch;
-import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch2;
-import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 
 public class ForwardLinkCompositionMatch4
 		extends AbstractInferenceMatch<ForwardLinkCompositionMatch3>
 		implements ForwardLinkMatch2Watch {
 
-	private final ElkSubObjectPropertyExpression fullPremiseForwardChainMatch_;
-
-	private final int premiseForwardChainStartPos_;
+	private final IndexedContextRootMatch conclusionTargetMatch_;
 
 	ForwardLinkCompositionMatch4(ForwardLinkCompositionMatch3 parent,
-			SubPropertyChainMatch2 fourthPremiseMatch) {
+			ForwardLinkMatch2 thirdPremiseMatch) {
 		super(parent);
-		this.fullPremiseForwardChainMatch_ = fourthPremiseMatch
-				.getFullSubChainMatch();
-		this.premiseForwardChainStartPos_ = fourthPremiseMatch
-				.getSubChainStartPos();
+		this.conclusionTargetMatch_ = thirdPremiseMatch.getTargetMatch();
+		checkEquals(thirdPremiseMatch, getThirdPremiseMatch(DEBUG_FACTORY));
 	}
 
-	public ElkSubObjectPropertyExpression getPremiseFullForwardChainMatch() {
-		return fullPremiseForwardChainMatch_;
+	IndexedContextRootMatch getConclusionTargetMatch() {
+		return conclusionTargetMatch_;
 	}
 
-	public int getPremiseForwardChainStartPos() {
-		return premiseForwardChainStartPos_;
-	}
-
-	public SubPropertyChainMatch2 getFourthPremiseMatch(
-			ConclusionMatchExpressionFactory factory) {
-		return factory.getSubPropertyChainMatch2(
-				getParent().getFourthPremiseMatch(factory),
-				getPremiseFullForwardChainMatch(),
-				getPremiseForwardChainStartPos());
-	}
-
-	public ForwardLinkMatch2 getThirdPremiseMatch(
+	ForwardLinkMatch2 getThirdPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getForwardLinkMatch2(
-				factory.getForwardLinkMatch1(
-						getParent().getParent().getParent().getParent()
-								.getThirdPremise(factory),
-						getParent().getOriginMatch()),
-				fullPremiseForwardChainMatch_, premiseForwardChainStartPos_);
+				getParent().getThirdPremiseMatch(factory),
+				getConclusionTargetMatch());
+	}
+
+	public ForwardLinkMatch2 getConclusionMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getForwardLinkMatch2(
+				getParent().getParent().getParent().getConclusionMatch(factory),
+				getConclusionTargetMatch());
 	}
 
 	@Override
@@ -105,7 +92,7 @@ public class ForwardLinkCompositionMatch4
 
 		ForwardLinkCompositionMatch4 getForwardLinkCompositionMatch4(
 				ForwardLinkCompositionMatch3 parent,
-				SubPropertyChainMatch2 fourthPremiseMatch);
+				ForwardLinkMatch2 thirdPremiseMatch);
 
 	}
 

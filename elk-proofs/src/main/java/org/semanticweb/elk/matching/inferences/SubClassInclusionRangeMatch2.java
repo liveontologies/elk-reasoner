@@ -26,22 +26,45 @@ import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch2;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 
 public class SubClassInclusionRangeMatch2
 		extends AbstractInferenceMatch<SubClassInclusionRangeMatch1> {
 
-	private final ElkClassExpression superExpressionMatch_;
+	private final ElkObjectProperty propertyMatch_;
+
+	private final ElkClassExpression conclusionSubsumerMatch_;
 
 	SubClassInclusionRangeMatch2(SubClassInclusionRangeMatch1 parent,
-			PropertyRangeMatch2 premiseMatch) {
+			PropertyRangeMatch2 secondPremiseMatch) {
 		super(parent);
-		superExpressionMatch_ = premiseMatch.getRangeMatch();
+		this.propertyMatch_ = secondPremiseMatch.getPropertyMatch();
+		this.conclusionSubsumerMatch_ = secondPremiseMatch.getRangeMatch();
+		checkEquals(secondPremiseMatch, getSecondPremiseMatch(DEBUG_FACTORY));
+	}
+
+	public ElkClassExpression getConclusionSubsumerMatch() {
+		return conclusionSubsumerMatch_;
+	}
+
+	public ElkObjectProperty getPropertyMatch() {
+		return propertyMatch_;
+	}
+
+	PropertyRangeMatch2 getSecondPremiseMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getPropertyRangeMatch2(
+				getParent().getSecondPremiseMatch(factory), getPropertyMatch(),
+				getConclusionSubsumerMatch());
 	}
 
 	public SubClassInclusionDecomposedMatch2 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getSubClassInclusionDecomposedMatch2(
-				getParent().getConclusionMatch(factory), superExpressionMatch_);
+				getParent().getConclusionMatch(factory),
+				getParent().getOriginMatch()
+						.extend(getConclusionSubsumerMatch()),
+				getConclusionSubsumerMatch());
 	}
 
 	@Override
@@ -73,7 +96,7 @@ public class SubClassInclusionRangeMatch2
 
 		SubClassInclusionRangeMatch2 getSubClassInclusionRangeMatch2(
 				SubClassInclusionRangeMatch1 parent,
-				PropertyRangeMatch2 premiseMatch);
+				PropertyRangeMatch2 secondPremiseMatch);
 
 	}
 

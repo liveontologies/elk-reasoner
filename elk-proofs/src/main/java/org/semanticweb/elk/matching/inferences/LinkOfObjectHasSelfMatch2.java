@@ -31,22 +31,22 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 
 abstract class LinkOfObjectHasSelfMatch2<P> extends AbstractInferenceMatch<P> {
 
-	private final ElkObjectHasSelf premiseSubsumerMatch_;
+	private final ElkObjectHasSelf premiseSuperExpressionMatch_;
 
 	public LinkOfObjectHasSelfMatch2(P parent,
 			SubClassInclusionDecomposedMatch2 premiseMatch) {
 		super(parent);
-		this.premiseSubsumerMatch_ = premiseMatch
+		this.premiseSuperExpressionMatch_ = premiseMatch
 				.getSubsumerIndexedObjectHasSelfMatch();
 	}
 
 	ElkObjectHasSelf getPremiseSuperExpressionMatch() {
-		return premiseSubsumerMatch_;
+		return premiseSuperExpressionMatch_;
 	}
 
 	ElkObjectProperty getPremisePropertyMatch(
 			IndexedObjectProperty premiseProperty) {
-		ElkObjectPropertyExpression premisePropertyMatch = premiseSubsumerMatch_
+		ElkObjectPropertyExpression premisePropertyMatch = premiseSuperExpressionMatch_
 				.getProperty();
 		if (premisePropertyMatch instanceof ElkObjectProperty) {
 			return (ElkObjectProperty) premisePropertyMatch;

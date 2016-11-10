@@ -1,6 +1,7 @@
 package org.semanticweb.elk.matching.conclusions;
 
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 
 /*
  * #%L
@@ -29,16 +30,33 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 public class ForwardLinkMatch1
 		extends AbstractClassConclusionMatch<ForwardLink> {
 
-	private final IndexedContextRootMatch destinationMatch_;	
+	private final IndexedContextRootMatch destinationMatch_;
+
+	private final ElkSubObjectPropertyExpression fullForwardChainMatch_;
+
+	private final int forwardChainStartPos_;
 
 	ForwardLinkMatch1(ForwardLink parent,
-			IndexedContextRootMatch destinationMatch) {
-		super(parent);		
+			IndexedContextRootMatch destinationMatch,
+			ElkSubObjectPropertyExpression fullForwardChainMatch,
+			int forwardChainStartPos) {
+		super(parent);
+		checkChainMatch(fullForwardChainMatch, forwardChainStartPos);
 		this.destinationMatch_ = destinationMatch;
+		this.fullForwardChainMatch_ = fullForwardChainMatch;
+		this.forwardChainStartPos_ = forwardChainStartPos;
 	}
 
 	public IndexedContextRootMatch getDestinationMatch() {
 		return destinationMatch_;
+	}
+
+	public ElkSubObjectPropertyExpression getFullChainMatch() {
+		return fullForwardChainMatch_;
+	}
+
+	public int getChainStartPos() {
+		return forwardChainStartPos_;
 	}
 
 	@Override
@@ -55,7 +73,9 @@ public class ForwardLinkMatch1
 	public interface Factory {
 
 		ForwardLinkMatch1 getForwardLinkMatch1(ForwardLink parent,
-				IndexedContextRootMatch destinationMatch);
+				IndexedContextRootMatch destinationMatch,
+				ElkSubObjectPropertyExpression fullForwardChainMatch,
+				int forwardChainStartPos);
 
 	}
 

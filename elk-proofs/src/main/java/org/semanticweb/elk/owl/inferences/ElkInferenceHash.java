@@ -109,6 +109,15 @@ public class ElkInferenceHash implements ElkInference.Visitor<Integer> {
 	}
 
 	@Override
+	public Integer visit(ElkClassInclusionExistentialRange inference) {
+		return combinedHashCode(
+				hashCode(ElkClassInclusionExistentialRange.class),
+				hashCode(inference.getProperty()),
+				hashCode(inference.getFiller()),
+				hashCode(inference.getRanges()));
+	}
+
+	@Override
 	public Integer visit(ElkClassInclusionExistentialTransitivity inference) {
 		return combinedHashCode(
 				hashCode(ElkClassInclusionExistentialTransitivity.class),
@@ -146,6 +155,15 @@ public class ElkInferenceHash implements ElkInference.Visitor<Integer> {
 						ElkClassInclusionObjectIntersectionOfDecomposition.class),
 				hashCode(inference.getConjuncts()),
 				hashCode(inference.getConjunctPos()));
+	}
+
+	@Override
+	public Integer visit(
+			ElkClassInclusionObjectIntersectionOfInclusion inference) {
+		return combinedHashCode(
+				hashCode(ElkClassInclusionObjectIntersectionOfInclusion.class),
+				hashCode(inference.getSubClasses()),
+				hashCode(inference.getSuperPositions()));
 	}
 
 	@Override

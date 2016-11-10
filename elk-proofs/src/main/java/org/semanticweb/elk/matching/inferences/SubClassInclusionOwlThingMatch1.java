@@ -26,6 +26,7 @@ import org.semanticweb.elk.matching.ElkMatchException;
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
+import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch2;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIris;
@@ -45,17 +46,24 @@ public class SubClassInclusionOwlThingMatch1
 			throw new ElkMatchException(parent.getConclusionSubsumer(),
 					subsumerMatch);
 		}
+		checkEquals(conclusionMatch, getParentConclusionMatch(DEBUG_FACTORY));
 	}
 
 	public IndexedContextRootMatch getOriginMatch() {
 		return originMatch_;
 	}
 
-	public SubClassInclusionComposedMatch1 getConclusionMatch(
+	public SubClassInclusionComposedMatch1 getParentConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getSubClassInclusionComposedMatch1(
-				getParent().getConclusion(factory), originMatch_,
+				getParent().getConclusion(factory), getOriginMatch(),
 				factory.getOwlThing());
+	}
+
+	public SubClassInclusionComposedMatch2 getConclusionMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getSubClassInclusionComposedMatch2(
+				getParentConclusionMatch(factory), getOriginMatch());
 	}
 
 	@Override

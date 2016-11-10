@@ -27,6 +27,7 @@ import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch1;
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
+import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
@@ -35,12 +36,16 @@ public class SubClassInclusionObjectHasSelfPropertyRangeMatch2 extends
 		AbstractInferenceMatch<SubClassInclusionObjectHasSelfPropertyRangeMatch1>
 		implements PropertyRangeMatch1Watch {
 
+	private final IndexedContextRootMatch extendedOriginMatch_;
+
 	private final ElkObjectProperty propertyMatch_;
 
 	SubClassInclusionObjectHasSelfPropertyRangeMatch2(
 			SubClassInclusionObjectHasSelfPropertyRangeMatch1 parent,
 			SubClassInclusionDecomposedMatch2 firstPremiseMatch) {
 		super(parent);
+		this.extendedOriginMatch_ = firstPremiseMatch
+				.getExtendedDestinationMatch();
 		ElkObjectHasSelf premiseSubsumerMatch = firstPremiseMatch
 				.getSubsumerIndexedObjectHasSelfMatch();
 		ElkObjectPropertyExpression premisePropertyMatch = premiseSubsumerMatch
@@ -51,17 +56,29 @@ public class SubClassInclusionObjectHasSelfPropertyRangeMatch2 extends
 			throw new ElkMatchException(parent.getParent().getSubsumer(),
 					premiseSubsumerMatch);
 		}
+		checkEquals(firstPremiseMatch, getFirstPremiseMatch(DEBUG_FACTORY));
+	}
+
+	public IndexedContextRootMatch getExtendedOriginMatch() {
+		return extendedOriginMatch_;
 	}
 
 	public ElkObjectProperty getPropertyMatch() {
 		return propertyMatch_;
 	}
 
+	SubClassInclusionDecomposedMatch2 getFirstPremiseMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getSubClassInclusionDecomposedMatch2(
+				getParent().getFirstPremiseMatch(factory),
+				getExtendedOriginMatch(),
+				factory.getObjectHasSelf(getPropertyMatch()));
+	}
+
 	public PropertyRangeMatch1 getSecondPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getPropertyRangeMatch1(
-				getParent().getParent().getSecondPremise(factory),
-				propertyMatch_);
+				getParent().getParent().getSecondPremise(factory));
 	}
 
 	@Override

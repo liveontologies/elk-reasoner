@@ -1,5 +1,7 @@
 package org.semanticweb.elk.matching.inferences;
 
+import org.semanticweb.elk.matching.ElkMatchException;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -26,6 +28,7 @@ import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory
 import org.semanticweb.elk.matching.conclusions.PropertyRangeMatch2;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 
 public class SubClassInclusionObjectHasSelfPropertyRangeMatch3 extends
 		AbstractInferenceMatch<SubClassInclusionObjectHasSelfPropertyRangeMatch2> {
@@ -37,17 +40,30 @@ public class SubClassInclusionObjectHasSelfPropertyRangeMatch3 extends
 			PropertyRangeMatch2 secondPremiseMatch) {
 		super(parent);
 		this.rangeMatch_ = secondPremiseMatch.getRangeMatch();
+		ElkObjectProperty propertyMatch = secondPremiseMatch.getPropertyMatch();
+		if (!parent.getPropertyMatch().equals(propertyMatch)) {
+			throw new ElkMatchException(parent.getParent().getParent()
+					.getPremiseSubsumer().getProperty(), propertyMatch);
+		}
+		checkEquals(secondPremiseMatch, getSecondPremiseMatch(DEBUG_FACTORY));
 	}
 
 	public ElkClassExpression getRangeMatch() {
 		return rangeMatch_;
 	}
 
+	PropertyRangeMatch2 getSecondPremiseMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getPropertyRangeMatch2(
+				getParent().getSecondPremiseMatch(factory),
+				getParent().getPropertyMatch(), getRangeMatch());
+	}
+
 	public SubClassInclusionDecomposedMatch2 getConclusionMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getSubClassInclusionDecomposedMatch2(
 				getParent().getParent().getConclusionMatch(factory),
-				rangeMatch_);
+				getParent().getExtendedOriginMatch(), getRangeMatch());
 	}
 
 	@Override

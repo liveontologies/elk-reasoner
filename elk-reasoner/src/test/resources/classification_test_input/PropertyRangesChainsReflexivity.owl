@@ -1,0 +1,17 @@
+Prefix(: = <http://example.org/>)
+Prefix(rdf: = <http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs: = <http://www.w3.org/2000/01/rdf-schema#>)
+Prefix(xsd: = <http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl: = <http://www.w3.org/2002/07/owl#>)
+Ontology(<http://example.org#property_ranges_chains_reflexivity>
+Annotation(rdfs:label "Due to property ranges and reflexivity of S, A has an outgoing R-S-H chain")
+
+SubClassOf(:A ObjectSomeValuesFrom(:R :B))
+ReflexiveObjectProperty(:S)
+ObjectPropertyRange(:S :RS)
+SubClassOf(ObjectIntersectionOf(:B :RS) ObjectSomeValuesFrom(:H :C))
+ObjectPropertyRange(:H :RH)
+SubObjectPropertyOf(ObjectPropertyChain(:R :S :H) :V)
+SubClassOf(ObjectSomeValuesFrom(:V ObjectIntersectionOf(:C :RH)) :D)
+
+)
