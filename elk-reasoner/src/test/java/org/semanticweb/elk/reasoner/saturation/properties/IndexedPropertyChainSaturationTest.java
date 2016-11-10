@@ -32,7 +32,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
@@ -62,7 +61,6 @@ public class IndexedPropertyChainSaturationTest {
 
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void testPropertyCompositionSymmetry() {		
 		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 		ModifiableOntologyIndex index = new DirectIndex(factory);
