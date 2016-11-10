@@ -334,8 +334,6 @@ public class ElkReasoner implements OWLReasoner {
 	public void flush() {
 		LOGGER_.trace("flush()");
 
-		checkInterrupted();
-
 		try {
 			if (ontologyReloadRequired_) {
 				/**

@@ -702,7 +702,23 @@ public abstract class AbstractReasonerState {
 			return true;
 		}
 		stageManager.classExpressionQueryStage.invalidateRecursive();
-		complete(stageManager.classExpressionQueryStage);
+		try {
+			complete(stageManager.classExpressionQueryStage);
+		} catch (final ElkInterruptedException e) {
+			if (classExpressionQueryState_.isComputed(classExpression)) {
+				/*
+				 * If the stage was interrupted, but the query is already
+				 * computed, completing the stage will not be attempted during
+				 * the next call. We need to call postExecute() manually, so
+				 * that the stage wouldn't stay initialized with computation
+				 * that already processed all its inputs (or at least the
+				 * queried class).
+				 */
+				stageManager.classExpressionQueryStage.postExecute();
+			} else {
+				throw e;
+			}
+		}
 
 		return true;
 	}
