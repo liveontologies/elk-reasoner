@@ -48,7 +48,7 @@ public abstract class IncrementalReasoningCorrectnessTestWithInterrupts<I extend
 	protected class CheckerWithInterrupts extends OutputChecker {
 
 		@Override
-		public void check(final long seed) throws Exception {
+		public void check() throws Exception {
 			AO actualOutput;
 			try {
 				actualOutput = delegate_.getActualOutput();
@@ -58,11 +58,11 @@ public abstract class IncrementalReasoningCorrectnessTestWithInterrupts<I extend
 				}
 				throw e;
 			}
-			correctnessCheck(actualOutput, delegate_.getExpectedOutput(), seed);
+			correctnessCheck(actualOutput, delegate_.getExpectedOutput());
 		}
 
 		@Override
-		public void finalCheck(final long seed) throws Exception {
+		public void finalCheck() throws Exception {
 			AO actualOutput;
 			while (true) {
 				try {
@@ -76,7 +76,7 @@ public abstract class IncrementalReasoningCorrectnessTestWithInterrupts<I extend
 				}
 				break;
 			}
-			correctnessCheck(actualOutput, delegate_.getExpectedOutput(), seed);
+			correctnessCheck(actualOutput, delegate_.getExpectedOutput());
 		}
 
 	}

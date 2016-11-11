@@ -69,7 +69,7 @@ public abstract class BaseIncrementalRealizationCorrectnessTest<A> extends
 	@Override
 	protected void correctnessCheck(
 			final InstanceTaxonomyTestOutput<?> actualOutput,
-			final InstanceTaxonomyTestOutput<?> expectedOutput, final long seed)
+			final InstanceTaxonomyTestOutput<?> expectedOutput)
 			throws ElkException {
 
 		final InstanceTaxonomy<?, ?> expected = expectedOutput.getTaxonomy();
@@ -91,7 +91,7 @@ public abstract class BaseIncrementalRealizationCorrectnessTest<A> extends
 				// TODO
 			}
 
-			fail("Seed: " + seed + "\n" + writer.getBuffer().toString());
+			fail(writer.getBuffer().toString());
 		}
 	}
 

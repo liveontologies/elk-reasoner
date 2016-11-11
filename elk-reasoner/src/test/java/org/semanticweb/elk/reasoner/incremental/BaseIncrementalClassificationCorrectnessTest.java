@@ -66,8 +66,7 @@ public abstract class BaseIncrementalClassificationCorrectnessTest<A> extends
 
 	@Override
 	protected void correctnessCheck(final TaxonomyTestOutput<?> actualOutput,
-			final TaxonomyTestOutput<?> expectedOutput, final long seed)
-			throws Exception {
+			final TaxonomyTestOutput<?> expectedOutput) throws Exception {
 
 		final Taxonomy<?> expected = expectedOutput.getTaxonomy();
 
@@ -87,7 +86,7 @@ public abstract class BaseIncrementalClassificationCorrectnessTest<A> extends
 				// TODO
 			}
 
-			fail("Seed: " + seed + "\n" + writer.getBuffer().toString());
+			fail(writer.getBuffer().toString());
 		}
 
 	}

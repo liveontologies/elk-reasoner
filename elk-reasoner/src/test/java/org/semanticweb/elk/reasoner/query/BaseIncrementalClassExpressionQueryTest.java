@@ -41,7 +41,7 @@ public abstract class BaseIncrementalClassExpressionQueryTest<C, A, O extends Te
 
 	@Override
 	protected void correctnessCheck(final O actualOutput,
-			final O expectedOutput, final long seed) throws Exception {
+			final O expectedOutput) throws Exception {
 
 		if (expectedOutput == null ? actualOutput != null
 				: !expectedOutput.equals(actualOutput)) {
@@ -49,7 +49,6 @@ public abstract class BaseIncrementalClassExpressionQueryTest<C, A, O extends Te
 			// @formatter:off
 			final String message = "Actual output is not equal to the expected output\n"
 					+ "Input: " + manifest.getInput().getName() + "\n"
-					+ "Seed: " + seed + "\n"
 					+ "Expected:\n" + expectedOutput + "\n"
 					+ "Actual:\n" + actualOutput + "\n";
 			// @formatter:on

@@ -86,48 +86,55 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInpu
 		final long seed = RandomSeedProvider.VALUE;
 		final Random rnd = new Random(seed);
 
-		for (int i = 0; i < REPEAT_NUMBER; i++) {
+		try {
 
-			outputChecker.check(seed);
+			for (int i = 0; i < REPEAT_NUMBER; i++) {
 
-			changingAxioms.setAllOff();
-			// delete some axioms
+				outputChecker.check();
 
-			randomFlip(changingAxioms, rnd, DELETE_RATIO);
+				changingAxioms.setAllOff();
+				// delete some axioms
 
-			if (LOGGER_.isDebugEnabled()) {
-				for (A del : changingAxioms.getOnElements()) {
-					delegate_.dumpChangeToLog(del, LOGGER_, LogLevel.DEBUG);
+				randomFlip(changingAxioms, rnd, DELETE_RATIO);
+
+				if (LOGGER_.isDebugEnabled()) {
+					for (A del : changingAxioms.getOnElements()) {
+						delegate_.dumpChangeToLog(del, LOGGER_, LogLevel.DEBUG);
+					}
 				}
+
+				// incremental changes
+				delegate_.applyChanges(changingAxioms.getOnElements(),
+						IncrementalChangeType.DELETE);
+
+				LOGGER_.info("===DELETIONS===");
+
+				outputChecker.check();
+
+				// add the axioms back
+				delegate_.applyChanges(changingAxioms.getOnElements(),
+						IncrementalChangeType.ADD);
+
+				LOGGER_.info("===ADDITIONS===");
 			}
 
-			// incremental changes
-			delegate_.applyChanges(changingAxioms.getOnElements(),
-					IncrementalChangeType.DELETE);
+			outputChecker.finalCheck();
 
-			LOGGER_.info("===DELETIONS===");
-
-			outputChecker.check(seed);
-
-			// add the axioms back
-			delegate_.applyChanges(changingAxioms.getOnElements(),
-					IncrementalChangeType.ADD);
-
-			LOGGER_.info("===ADDITIONS===");
+		} catch (final Throwable e) {
+			throw new RuntimeException("Random seed: " + seed, e);
 		}
 
-		outputChecker.finalCheck(seed);
 	}
 
 	protected class OutputChecker {
 
-		public void check(final long seed) throws Exception {
+		public void check() throws Exception {
 			correctnessCheck(delegate_.getActualOutput(),
-					delegate_.getExpectedOutput(), seed);
+					delegate_.getExpectedOutput());
 		}
 
-		public void finalCheck(final long seed) throws Exception {
-			check(seed);
+		public void finalCheck() throws Exception {
+			check();
 		}
 
 	}
@@ -145,7 +152,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInpu
 		}
 	}
 
-	protected abstract void correctnessCheck(AO actualOutput, EO expectedOutput,
-			long seed) throws Exception;
+	protected abstract void correctnessCheck(AO actualOutput, EO expectedOutput)
+			throws Exception;
 
 }
