@@ -109,6 +109,12 @@ public class ElkClassInclusionOfDisjointClasses extends AbstractElkInference {
 	}
 
 	@Override
+	public ElkInference getExample() {
+		return new ElkClassInclusionOfDisjointClasses(
+				getClasses("C", expressions_.size()), firstPos_, secondPos_);
+	}
+
+	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

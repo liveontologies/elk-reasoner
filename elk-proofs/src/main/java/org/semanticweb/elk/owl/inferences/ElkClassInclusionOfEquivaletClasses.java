@@ -44,7 +44,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  *
  */
 public class ElkClassInclusionOfEquivaletClasses extends AbstractElkInference {
-	
+
 	private final static String NAME_ = "Equivalent Classes Decomposition";
 
 	private final List<? extends ElkClassExpression> expressions_;
@@ -89,7 +89,7 @@ public class ElkClassInclusionOfEquivaletClasses extends AbstractElkInference {
 	public int getSuperPos() {
 		return superPos_;
 	}
-	
+
 	@Override
 	public String getName() {
 		return NAME_;
@@ -117,6 +117,12 @@ public class ElkClassInclusionOfEquivaletClasses extends AbstractElkInference {
 	public ElkSubClassOfAxiom getConclusion(ElkObject.Factory factory) {
 		return factory.getSubClassOfAxiom(expressions_.get(subPos_),
 				expressions_.get(superPos_));
+	}
+
+	@Override
+	public ElkInference getExample() {
+		return new ElkClassInclusionOfEquivaletClasses(
+				getClasses("C", expressions_.size()), subPos_, superPos_);
 	}
 
 	@Override

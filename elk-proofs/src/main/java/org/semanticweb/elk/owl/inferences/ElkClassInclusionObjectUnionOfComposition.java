@@ -42,7 +42,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  */
 public class ElkClassInclusionObjectUnionOfComposition
 		extends AbstractElkInference {
-	
+
 	private final static String NAME_ = "Union From Disjunct";
 
 	private final List<? extends ElkClassExpression> disjuncts_;
@@ -67,7 +67,7 @@ public class ElkClassInclusionObjectUnionOfComposition
 	public String getName() {
 		return NAME_;
 	}
-	
+
 	@Override
 	public int getPremiseCount() {
 		return 0;
@@ -82,6 +82,12 @@ public class ElkClassInclusionObjectUnionOfComposition
 	public ElkSubClassOfAxiom getConclusion(ElkObject.Factory factory) {
 		return factory.getSubClassOfAxiom(disjuncts_.get(disjunctPos_),
 				factory.getObjectUnionOf(disjuncts_));
+	}
+
+	@Override
+	public ElkInference getExample() {
+		return new ElkClassInclusionObjectUnionOfComposition(
+				getClasses("C", disjuncts_.size()), disjunctPos_);
 	}
 
 	@Override

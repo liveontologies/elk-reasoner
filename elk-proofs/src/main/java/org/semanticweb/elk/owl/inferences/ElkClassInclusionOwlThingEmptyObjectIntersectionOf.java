@@ -70,6 +70,11 @@ public class ElkClassInclusionOwlThingEmptyObjectIntersectionOf
 	}
 
 	@Override
+	public ElkInference getExample() {
+		return new ElkClassInclusionOwlThingEmptyObjectIntersectionOf();
+	}
+
+	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

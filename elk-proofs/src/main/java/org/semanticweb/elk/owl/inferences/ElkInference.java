@@ -1,5 +1,6 @@
 package org.semanticweb.elk.owl.inferences;
 
+import org.liveontologies.owlapi.proof.util.Inference;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 
@@ -25,11 +26,9 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * #L%
  */
 
-public interface ElkInference {
+public interface ElkInference extends Inference<ElkAxiom> {
 
-	/**
-	 * @return the name of this inference
-	 */
+	@Override
 	String getName();
 
 	/**
@@ -55,6 +54,13 @@ public interface ElkInference {
 	 * @return the conclusion of this inference
 	 */
 	ElkAxiom getConclusion(ElkObject.Factory factory);
+
+	/**
+	 * @return an example of this inference, which can be used for explanation
+	 *         purpose. Usually it is an inference instantiated with some
+	 *         generic parameters. If {@code null}, no example is provided.
+	 */
+	ElkInference getExample();
 
 	<O> O accept(Visitor<O> visitor);
 

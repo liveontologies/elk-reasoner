@@ -93,6 +93,12 @@ public class ElkEquivalentClassesCycle extends AbstractElkInference {
 	}
 
 	@Override
+	public ElkInference getExample() {
+		return new ElkEquivalentClassesCycle(
+				getClasses("C", expressions_.size()));
+	}
+
+	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

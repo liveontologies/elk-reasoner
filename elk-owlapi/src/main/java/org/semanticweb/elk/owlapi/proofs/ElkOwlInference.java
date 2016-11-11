@@ -1,6 +1,6 @@
 package org.semanticweb.elk.owlapi.proofs;
 
-/*
+/*-
  * #%L
  * ELK OWL API Binding
  * $Id:$
@@ -25,30 +25,22 @@ package org.semanticweb.elk.owlapi.proofs;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.liveontologies.owlapi.proof.OWLProofNode;
-import org.liveontologies.owlapi.proof.OWLProofStep;
 import org.liveontologies.owlapi.proof.util.Inference;
 import org.semanticweb.elk.owl.inferences.ElkInference;
-import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owlapi.ElkConverter;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
-public class ElkOWLProofStep implements OWLProofStep {
+public class ElkOwlInference implements Inference<OWLAxiom> {
 
 	private final ElkInference elkInference_;
 
-	private final ElkInferenceSet elkInferences_;
-
-	private final ElkObject.Factory elkFactory_;
-
-	private int hash_ = 0;
-
-	ElkOWLProofStep(ElkInference elkInference, ElkInferenceSet elkInferences,
-			ElkObject.Factory elkFactory) {
+	public ElkOwlInference(ElkInference elkInference) {
 		this.elkInference_ = elkInference;
-		this.elkInferences_ = elkInferences;
-		this.elkFactory_ = elkFactory;
+	}
+
+	public ElkInference getElkInference() {
+		return elkInference_;
 	}
 
 	@Override
@@ -57,44 +49,33 @@ public class ElkOWLProofStep implements OWLProofStep {
 	}
 
 	@Override
-	public OWLProofNode getConclusion() {
-		return convert(elkInference_.getConclusion(elkFactory_));
+	public OWLAxiom getConclusion() {
+		return convert(elkInference_.getConclusion());
 	}
 
 	@Override
-	public List<? extends OWLProofNode> getPremises() {
-		List<OWLProofNode> result = new ArrayList<OWLProofNode>();
+	public List<? extends OWLAxiom> getPremises() {
+		List<OWLAxiom> result = new ArrayList<OWLAxiom>();
+		List<? extends ElkAxiom> premises = elkInference_.getPremises();
 		for (int i = 0; i < elkInference_.getPremiseCount(); i++) {
-			result.add(convert(elkInference_.getPremise(i, elkFactory_)));
+			result.add(convert(premises.get(i)));
 		}
 		return result;
 	}
 
 	@Override
-	public Inference<OWLAxiom> getExample() {
-		return new ElkOwlInference(elkInference_.getExample());
-	}
-
-	@Override
 	public int hashCode() {
-		if (hash_ == 0) {
-			hash_ = elkInference_.hashCode() + elkInferences_.hashCode();
-		}
-		return hash_;
+		return ElkOwlInference.class.hashCode() + elkInference_.hashCode();
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) {
+		if (o == this) {
 			return true;
 		}
-		if (o == null) {
-			return false;
-		}
-		if (o instanceof ElkOWLProofStep) {
-			ElkOWLProofStep other = (ElkOWLProofStep) o;
-			return elkInference_.equals(other.elkInference_)
-					&& elkInferences_.equals(other.elkInferences_);
+		// else
+		if (o instanceof ElkOwlInference) {
+			return elkInference_.equals(((ElkOwlInference) o).elkInference_);
 		}
 		// else
 		return false;
@@ -105,8 +86,8 @@ public class ElkOWLProofStep implements OWLProofStep {
 		return elkInference_.toString();
 	}
 
-	private OWLProofNode convert(ElkAxiom conclusion) {
-		return new ElkOWLProofNode(conclusion, elkInferences_, elkFactory_);
+	private static OWLAxiom convert(ElkAxiom axiom) {
+		return ElkConverter.getInstance().convert(axiom);
 	}
 
 }

@@ -46,7 +46,7 @@ public class ElkClassInclusionOfObjectPropertyDomain
 		extends AbstractElkInference {
 
 	private final static String NAME_ = "Property Domain Transaltion";
-	
+
 	private final ElkObjectPropertyExpression property_;
 
 	private final ElkClassExpression domain_;
@@ -64,7 +64,7 @@ public class ElkClassInclusionOfObjectPropertyDomain
 	public ElkClassExpression getDomain() {
 		return domain_;
 	}
-	
+
 	@Override
 	public String getName() {
 		return NAME_;
@@ -92,6 +92,12 @@ public class ElkClassInclusionOfObjectPropertyDomain
 	public ElkSubClassOfAxiom getConclusion(ElkObject.Factory factory) {
 		return factory.getSubClassOfAxiom(factory.getObjectSomeValuesFrom(
 				property_, factory.getOwlThing()), domain_);
+	}
+
+	@Override
+	public ElkInference getExample() {
+		return new ElkClassInclusionOfObjectPropertyDomain(
+				getObjectProperty("R"), getClass("C"));
 	}
 
 	@Override

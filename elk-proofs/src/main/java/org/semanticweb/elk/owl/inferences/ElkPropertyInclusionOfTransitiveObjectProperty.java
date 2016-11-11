@@ -46,7 +46,7 @@ public class ElkPropertyInclusionOfTransitiveObjectProperty
 		extends AbstractElkInference {
 
 	private final static String NAME_ = "Transitive Property Translation";
-	
+
 	private final ElkObjectPropertyExpression property_;
 
 	ElkPropertyInclusionOfTransitiveObjectProperty(
@@ -62,7 +62,7 @@ public class ElkPropertyInclusionOfTransitiveObjectProperty
 	public String getName() {
 		return NAME_;
 	}
-	
+
 	@Override
 	public int getPremiseCount() {
 		return 1;
@@ -83,12 +83,19 @@ public class ElkPropertyInclusionOfTransitiveObjectProperty
 	}
 
 	@Override
-	public ElkSubObjectPropertyOfAxiom getConclusion(ElkObject.Factory factory) {
+	public ElkSubObjectPropertyOfAxiom getConclusion(
+			ElkObject.Factory factory) {
 		return factory
 				.getSubObjectPropertyOfAxiom(
 						factory.getObjectPropertyChain(
 								Arrays.asList(property_, property_)),
 						property_);
+	}
+
+	@Override
+	public ElkInference getExample() {
+		return new ElkPropertyInclusionOfTransitiveObjectProperty(
+				getObjectProperty("R"));
 	}
 
 	@Override

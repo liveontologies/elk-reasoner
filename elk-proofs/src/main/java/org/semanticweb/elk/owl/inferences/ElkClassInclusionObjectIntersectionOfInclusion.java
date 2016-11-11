@@ -98,6 +98,12 @@ public class ElkClassInclusionObjectIntersectionOfInclusion
 	}
 
 	@Override
+	public ElkInference getExample() {
+		return new ElkClassInclusionObjectIntersectionOfInclusion(
+				getClasses("C", subClasses_.size()), superPositions_);
+	}
+
+	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

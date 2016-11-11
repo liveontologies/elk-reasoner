@@ -46,7 +46,8 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
  * @author Yevgeny Kazakov
  *
  */
-public class ElkDisjointClassesOfDifferentIndividuals extends AbstractElkInference {
+public class ElkDisjointClassesOfDifferentIndividuals
+		extends AbstractElkInference {
 
 	private final static String NAME_ = "Different Individuals Translation";
 
@@ -93,6 +94,12 @@ public class ElkDisjointClassesOfDifferentIndividuals extends AbstractElkInferen
 					.getObjectOneOf(Collections.singletonList(individual)));
 		}
 		return factory.getDisjointClassesAxiom(disjoint);
+	}
+
+	@Override
+	public ElkInference getExample() {
+		return new ElkDisjointClassesOfDifferentIndividuals(
+				getIndividuals("a", different_.size()));
 	}
 
 	@Override

@@ -25,6 +25,7 @@ package org.semanticweb.elk.owl.inferences.rewriting;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.liveontologies.owlapi.proof.util.Inference;
 import org.liveontologies.owlapi.proof.util.ProofNode;
 import org.liveontologies.owlapi.proof.util.ProofStep;
 import org.semanticweb.elk.owl.implementation.ElkObjectBaseFactory;
@@ -41,8 +42,7 @@ public class ElkProofStep implements ProofStep<ElkAxiom> {
 
 	private final ElkInferenceSet inferenceSet_;
 
-	public ElkProofStep(ElkInference inference,
-			ElkInferenceSet inferenceSet) {
+	public ElkProofStep(ElkInference inference, ElkInferenceSet inferenceSet) {
 		this.inference_ = inference;
 		this.inferenceSet_ = inferenceSet;
 	}
@@ -62,8 +62,8 @@ public class ElkProofStep implements ProofStep<ElkAxiom> {
 
 	@Override
 	public ProofNode<ElkAxiom> getConclusion() {
-		return new ElkProofNode(
-				inference_.getConclusion(CONCLUSION_FACTORY_), inferenceSet_);
+		return new ElkProofNode(inference_.getConclusion(CONCLUSION_FACTORY_),
+				inferenceSet_);
 	}
 
 	@Override
@@ -98,6 +98,11 @@ public class ElkProofStep implements ProofStep<ElkAxiom> {
 	@Override
 	public String toString() {
 		return inference_.toString();
+	}
+
+	@Override
+	public Inference<ElkAxiom> getExample() {
+		return inference_.getExample();
 	}
 
 }

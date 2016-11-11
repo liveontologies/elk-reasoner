@@ -52,8 +52,7 @@ public class ElkEquivalentClassesOfSameIndividual extends AbstractElkInference {
 
 	private final List<? extends ElkIndividual> same_;
 
-	ElkEquivalentClassesOfSameIndividual(
-			List<? extends ElkIndividual> same) {
+	ElkEquivalentClassesOfSameIndividual(List<? extends ElkIndividual> same) {
 		this.same_ = same;
 	}
 
@@ -93,6 +92,12 @@ public class ElkEquivalentClassesOfSameIndividual extends AbstractElkInference {
 					.getObjectOneOf(Collections.singletonList(individual)));
 		}
 		return factory.getEquivalentClassesAxiom(equivalent);
+	}
+
+	@Override
+	public ElkInference getExample() {
+		return new ElkEquivalentClassesOfSameIndividual(
+				getIndividuals("a", same_.size()));
 	}
 
 	@Override

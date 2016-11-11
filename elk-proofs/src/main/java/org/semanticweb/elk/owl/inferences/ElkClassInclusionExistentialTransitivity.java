@@ -129,6 +129,13 @@ public class ElkClassInclusionExistentialTransitivity
 	}
 
 	@Override
+	public ElkInference getExample() {
+		return new ElkClassInclusionExistentialTransitivity(
+				getObjectProperty("T"),
+				getClasses("C", classExpressions_.size()));
+	}
+
+	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

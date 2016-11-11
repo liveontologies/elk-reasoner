@@ -361,10 +361,10 @@ public class ElkInferenceBaseFactory implements ElkInference.Factory {
 
 	@Override
 	public ElkPropertyRangePropertyExpansion getElkPropertyRangePropertyUnfolding(
-			ElkObjectPropertyExpression superProperty, ElkClassExpression range,
-			ElkObjectPropertyExpression subProperty) {
-		return new ElkPropertyRangePropertyExpansion(superProperty, range,
-				subProperty);
+			ElkObjectPropertyExpression subProperty, ElkObjectPropertyExpression superProperty,
+			ElkClassExpression range) {
+		return new ElkPropertyRangePropertyExpansion(subProperty, superProperty,
+				range);
 	}
 
 	@Override

@@ -1619,7 +1619,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 		ElkClassExpression rangeMatch = inferenceMatch2.getRangeMatch();
 
 		elkInferenceFactory_.getElkPropertyRangePropertyUnfolding(
-				superPropertyMatch, rangeMatch, subPropertyMatch);
+				subPropertyMatch, superPropertyMatch, rangeMatch);
 		return null;
 
 	}

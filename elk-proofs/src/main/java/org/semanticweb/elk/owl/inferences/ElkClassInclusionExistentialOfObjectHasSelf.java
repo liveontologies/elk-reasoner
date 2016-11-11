@@ -45,7 +45,7 @@ public class ElkClassInclusionExistentialOfObjectHasSelf
 		extends AbstractElkInference {
 
 	private final static String NAME_ = "Reflexive Existential";
-	
+
 	private final ElkClassExpression subClass_;
 
 	private final ElkObjectPropertyExpression property_;
@@ -68,7 +68,7 @@ public class ElkClassInclusionExistentialOfObjectHasSelf
 	public String getName() {
 		return NAME_;
 	}
-	
+
 	@Override
 	public int getPremiseCount() {
 		return 1;
@@ -92,6 +92,12 @@ public class ElkClassInclusionExistentialOfObjectHasSelf
 	public ElkSubClassOfAxiom getConclusion(ElkObject.Factory factory) {
 		return factory.getSubClassOfAxiom(subClass_,
 				factory.getObjectSomeValuesFrom(property_, subClass_));
+	}
+
+	@Override
+	public ElkInference getExample() {
+		return new ElkClassInclusionExistentialOfObjectHasSelf(getClass("C"),
+				getObjectProperty("R"));
 	}
 
 	@Override

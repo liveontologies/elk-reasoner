@@ -88,6 +88,12 @@ public class ElkEquivalentClassesObjectHasValue extends AbstractElkInference {
 	}
 
 	@Override
+	public ElkInference getExample() {
+		return new ElkEquivalentClassesObjectHasValue(getObjectProperty("R"),
+				getIndividual("a"));
+	}
+
+	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

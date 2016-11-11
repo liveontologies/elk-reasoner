@@ -135,6 +135,14 @@ public class ElkClassInclusionExistentialComposition
 	}
 
 	@Override
+	public ElkInference getExample() {
+		return new ElkClassInclusionExistentialComposition(
+				getClasses("C", classExpressions_.size()),
+				getObjectProperties("R", subChain_.size()),
+				getObjectProperty("S"));
+	}
+
+	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

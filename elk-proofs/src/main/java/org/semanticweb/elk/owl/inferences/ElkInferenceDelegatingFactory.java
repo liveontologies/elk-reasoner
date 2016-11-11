@@ -401,10 +401,10 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 
 	@Override
 	public ElkPropertyRangePropertyExpansion getElkPropertyRangePropertyUnfolding(
-			ElkObjectPropertyExpression superProperty, ElkClassExpression range,
-			ElkObjectPropertyExpression subProperty) {
+			ElkObjectPropertyExpression subProperty, ElkObjectPropertyExpression superProperty,
+			ElkClassExpression range) {
 		return filter(mainFactory_.getElkPropertyRangePropertyUnfolding(
-				superProperty, range, subProperty));
+				subProperty, superProperty, range));
 	}
 
 	@Override

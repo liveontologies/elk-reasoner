@@ -102,6 +102,12 @@ public class ElkClassInclusionOfObjectPropertyAssertion
 	}
 
 	@Override
+	public ElkInference getExample() {
+		return new ElkClassInclusionOfObjectPropertyAssertion(
+				getIndividual("a"), getObjectProperty("R"), getIndividual("b"));
+	}
+
+	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

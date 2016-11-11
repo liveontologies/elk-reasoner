@@ -45,7 +45,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 public class ElkClassInclusionHierarchy extends AbstractElkInference {
 
 	private final static String NAME_ = "Class Hierarchy";
-	
+
 	private final List<? extends ElkClassExpression> expressions_;
 
 	ElkClassInclusionHierarchy(List<? extends ElkClassExpression> expressions) {
@@ -82,6 +82,12 @@ public class ElkClassInclusionHierarchy extends AbstractElkInference {
 	public ElkSubClassOfAxiom getConclusion(ElkObject.Factory factory) {
 		return factory.getSubClassOfAxiom(expressions_.get(0),
 				expressions_.get(expressions_.size() - 1));
+	}
+
+	@Override
+	public ElkInference getExample() {
+		return new ElkClassInclusionHierarchy(
+				getClasses("C", expressions_.size()));
 	}
 
 	@Override
