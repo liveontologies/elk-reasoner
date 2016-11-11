@@ -36,29 +36,20 @@ public abstract class IncrementalReasoningCorrectnessTestWithInterrupts<I extend
 	}
 
 	@Test
-	@Ignore
-	public void incrementalReasoningWithInterrupts() throws Exception {
+	public void completingIncrementalReasoningWithInterrupts()
+			throws Exception {
 		load();
 
 		delegate_.initWithInterrupts();
 
-		run(new CheckerWithInterrupts());
+		run(new CompletingCheckerWithInterrupts());
 	}
 
-	protected class CheckerWithInterrupts extends OutputChecker {
+	protected class CompletingCheckerWithInterrupts extends OutputChecker {
 
 		@Override
 		public void check() throws Exception {
-			AO actualOutput;
-			try {
-				actualOutput = delegate_.getActualOutput();
-			} catch (final Exception e) {
-				if (delegate_.getInterruptionExceptionClass().isInstance(e)) {
-					return;
-				}
-				throw e;
-			}
-			correctnessCheck(actualOutput, delegate_.getExpectedOutput());
+			finalCheck();
 		}
 
 		@Override
@@ -75,6 +66,35 @@ public abstract class IncrementalReasoningCorrectnessTestWithInterrupts<I extend
 					throw e;
 				}
 				break;
+			}
+			correctnessCheck(actualOutput, delegate_.getExpectedOutput());
+		}
+
+	}
+
+	@Test
+	@Ignore
+	public void incrementalReasoningWithInterrupts() throws Exception {
+		load();
+
+		delegate_.initWithInterrupts();
+
+		run(new NoncompletingCheckerWithInterrupts());
+	}
+
+	protected class NoncompletingCheckerWithInterrupts
+			extends CompletingCheckerWithInterrupts {
+
+		@Override
+		public void check() throws Exception {
+			AO actualOutput;
+			try {
+				actualOutput = delegate_.getActualOutput();
+			} catch (final Exception e) {
+				if (delegate_.getInterruptionExceptionClass().isInstance(e)) {
+					return;
+				}
+				throw e;
 			}
 			correctnessCheck(actualOutput, delegate_.getExpectedOutput());
 		}
