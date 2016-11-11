@@ -370,7 +370,7 @@ public abstract class AbstractElkObjectConverter
 
 	@Override
 	public IRI visit(ElkAbbreviatedIri iri) {
-		return IRI.create(iri.getPrefix().getIri().toString(),
+		return IRI.create(iri.getPrefix().getIri().getFullIriAsString(),
 				iri.getLocalName());
 	}
 
