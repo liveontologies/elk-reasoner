@@ -24,12 +24,14 @@ package org.semanticweb.elk.matching.inferences;
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.IndexedSubObjectPropertyOfAxiomMatch2;
-import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch2;
+import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1;
+import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1Watch;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 
 public class SubPropertyChainExpandedSubObjectPropertyOfMatch2 extends
-		AbstractInferenceMatch<SubPropertyChainExpandedSubObjectPropertyOfMatch1> {
+		AbstractInferenceMatch<SubPropertyChainExpandedSubObjectPropertyOfMatch1>
+		implements SubPropertyChainMatch1Watch {
 
 	private final ElkSubObjectPropertyExpression subChainMatch_;
 
@@ -52,28 +54,28 @@ public class SubPropertyChainExpandedSubObjectPropertyOfMatch2 extends
 		return interPropertyMatch_;
 	}
 
-	public IndexedSubObjectPropertyOfAxiomMatch2 getFirstPremiseMatch(
+	IndexedSubObjectPropertyOfAxiomMatch2 getFirstPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
 		return factory.getIndexedSubObjectPropertyOfAxiomMatch2(
 				getParent().getFirstPremiseMatch(factory), getSubChainMatch(),
 				getInterPropertyMatch());
 	}
 
-	public SubPropertyChainMatch2 getSecondPremiseMatch(
+	public SubPropertyChainMatch1 getSecondPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getSubPropertyChainMatch2(
-				getParent().getSecondPremiseMatch(factory),
-				getInterPropertyMatch(), 0);
-	}
-
-	public SubPropertyChainMatch2 getConclusionMatch(
-			ConclusionMatchExpressionFactory factory) {
-		return factory.getSubPropertyChainMatch2(
-				getParent().getConclusionMatch(factory), getSubChainMatch(), 0);
+		return factory.getSubPropertyChainMatch1(
+				getParent().getParent().getSecondPremise(factory),
+				getParent().getFullSuperChainMatch(),
+				getParent().getSuperChainStartPos());
 	}
 
 	@Override
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(SubPropertyChainMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
@@ -101,7 +103,7 @@ public class SubPropertyChainExpandedSubObjectPropertyOfMatch2 extends
 
 		SubPropertyChainExpandedSubObjectPropertyOfMatch2 getSubPropertyChainExpandedSubObjectPropertyOfMatch2(
 				SubPropertyChainExpandedSubObjectPropertyOfMatch1 parent,
-				IndexedSubObjectPropertyOfAxiomMatch2 secondPremiseMatch);
+				IndexedSubObjectPropertyOfAxiomMatch2 firstPremiseMatch);
 
 	}
 

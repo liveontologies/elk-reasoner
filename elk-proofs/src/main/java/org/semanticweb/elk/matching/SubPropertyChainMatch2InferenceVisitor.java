@@ -27,7 +27,9 @@ import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch2;
 import org.semanticweb.elk.matching.inferences.BackwardLinkCompositionMatch3;
 import org.semanticweb.elk.matching.inferences.ForwardLinkCompositionMatch2;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
+import org.semanticweb.elk.matching.inferences.PropagationGeneratedMatch2;
 import org.semanticweb.elk.matching.inferences.PropertyRangeInheritedMatch2;
+import org.semanticweb.elk.matching.inferences.SubPropertyChainExpandedSubObjectPropertyOfMatch2;
 
 class SubPropertyChainMatch2InferenceVisitor
 		extends AbstractConclusionMatchInferenceVisitor<SubPropertyChainMatch2>
@@ -51,8 +53,22 @@ class SubPropertyChainMatch2InferenceVisitor
 	}
 
 	@Override
+	public Void visit(PropagationGeneratedMatch2 inferenceMatch2) {
+		factory.getPropagationGeneratedMatch3(inferenceMatch2, child);
+		return null;
+	}
+
+	@Override
 	public Void visit(PropertyRangeInheritedMatch2 inferenceMatch2) {
 		factory.getPropertyRangeInheritedMatch3(inferenceMatch2, child);
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			SubPropertyChainExpandedSubObjectPropertyOfMatch2 inferenceMatch2) {
+		factory.getSubPropertyChainExpandedSubObjectPropertyOfMatch3(
+				inferenceMatch2, child);
 		return null;
 	}
 

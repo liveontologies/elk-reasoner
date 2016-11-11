@@ -68,13 +68,6 @@ public class SubPropertyChainExpandedSubObjectPropertyOfMatch1 extends
 				getParent().getFirstPremise(factory));
 	}
 
-	SubPropertyChainMatch1 getSecondPremiseMatch(
-			ConclusionMatchExpressionFactory factory) {
-		return factory.getSubPropertyChainMatch1(
-				getParent().getSecondPremise(factory), getFullSuperChainMatch(),
-				getSuperChainStartPos());
-	}
-
 	@Override
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
 		return visitor.visit(this);

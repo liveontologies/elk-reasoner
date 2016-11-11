@@ -73,6 +73,7 @@
 			<exclusions>
 				<exclusion>
 					<groupId>${project.groupId}</groupId>
+					<artifactId>*</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -80,6 +81,12 @@
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-distribution</artifactId>
 			<version>${owlapi.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.liveontologies</groupId>
+			<artifactId>owlapi-proof</artifactId>
+			<version>${owlapi-proof.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

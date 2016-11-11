@@ -3,7 +3,9 @@ package org.semanticweb.elk.matching.conclusions;
 import org.semanticweb.elk.matching.inferences.BackwardLinkCompositionMatch3;
 import org.semanticweb.elk.matching.inferences.ForwardLinkCompositionMatch2;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
+import org.semanticweb.elk.matching.inferences.PropagationGeneratedMatch2;
 import org.semanticweb.elk.matching.inferences.PropertyRangeInheritedMatch2;
+import org.semanticweb.elk.matching.inferences.SubPropertyChainExpandedSubObjectPropertyOfMatch2;
 
 /*
  * #%L
@@ -41,7 +43,9 @@ public interface SubPropertyChainMatch1Watch extends InferenceMatch {
 	 */
 	interface Visitor<O> extends BackwardLinkCompositionMatch3.Visitor<O>,
 			ForwardLinkCompositionMatch2.Visitor<O>,
-			PropertyRangeInheritedMatch2.Visitor<O> {
+			PropagationGeneratedMatch2.Visitor<O>,
+			PropertyRangeInheritedMatch2.Visitor<O>,
+			SubPropertyChainExpandedSubObjectPropertyOfMatch2.Visitor<O> {
 
 		// combined interface
 

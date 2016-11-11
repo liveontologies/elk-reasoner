@@ -23,12 +23,14 @@ package org.semanticweb.elk.matching.inferences;
  */
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.PropagationMatch2;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch2;
+import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1;
+import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1Watch;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 
 public class PropagationGeneratedMatch2
-		extends AbstractInferenceMatch<PropagationGeneratedMatch1> {
+		extends AbstractInferenceMatch<PropagationGeneratedMatch1>
+		implements SubPropertyChainMatch1Watch {
 
 	private final IndexedContextRootMatch extendedDestinationMatch_;
 
@@ -51,15 +53,20 @@ public class PropagationGeneratedMatch2
 				getExtendedDestinationMatch());
 	}
 
-	public PropagationMatch2 getConclusionMatch(
+	public SubPropertyChainMatch1 getThirdPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getPropagationMatch2(
-				getParent().getConclusionMatch(factory),
-				getExtendedDestinationMatch());
+		return factory.getSubPropertyChainMatch1(
+				getParent().getParent().getThirdPremise(factory),
+				getParent().getConclusionCarryMatch().getPropertyMatch(), 0);
 	}
 
 	@Override
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(SubPropertyChainMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
