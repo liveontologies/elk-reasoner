@@ -54,10 +54,10 @@ public class ElkInferenceBaseFactory implements ElkInference.Factory {
 
 	@Override
 	public ElkClassInclusionExistentialFillerExpansion getElkClassInclusionExistentialFillerExpansion(
-			ElkClassExpression subClass, ElkClassExpression superClass,
-			ElkObjectPropertyExpression property) {
-		return new ElkClassInclusionExistentialFillerExpansion(subClass,
-				superClass, property);
+			ElkObjectPropertyExpression property, ElkClassExpression subClass,
+			ElkClassExpression superClass) {
+		return new ElkClassInclusionExistentialFillerExpansion(property,
+				subClass, superClass);
 	}
 
 	@Override

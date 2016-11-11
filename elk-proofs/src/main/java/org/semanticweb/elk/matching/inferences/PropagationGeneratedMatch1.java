@@ -26,7 +26,6 @@ import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory
 import org.semanticweb.elk.matching.conclusions.PropagationMatch1;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1Watch;
-import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.subsumers.IndexedObjectSomeValuesFromMatch;
 import org.semanticweb.elk.matching.subsumers.SubsumerMatches;
@@ -76,14 +75,7 @@ public class PropagationGeneratedMatch1
 				getParent().getSecondPremise(factory), destinationMatch_,
 				SubsumerMatches
 						.create(getConclusionCarryMatch().getFillerMatch()));
-	}
-
-	public SubPropertyChainMatch1 getThirdPremiseMatch(
-			ConclusionMatchExpressionFactory factory) {
-		return factory.getSubPropertyChainMatch1(
-				getParent().getThirdPremise(factory),
-				getConclusionCarryMatch().getPropertyMatch(), 0);
-	}
+	}	
 
 	@Override
 	public <O> O accept(InferenceMatch.Visitor<O> visitor) {

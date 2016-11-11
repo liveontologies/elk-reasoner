@@ -102,6 +102,7 @@ public interface InferenceMatch {
 			ForwardLinkOfObjectSomeValuesFromMatch3.Factory,
 			PropagationGeneratedMatch1.Factory,
 			PropagationGeneratedMatch2.Factory,
+			PropagationGeneratedMatch3.Factory,
 			PropertyRangeInheritedMatch1.Factory,
 			PropertyRangeInheritedMatch2.Factory,
 			PropertyRangeInheritedMatch3.Factory,
@@ -165,6 +166,7 @@ public interface InferenceMatch {
 			SubClassInclusionTautologyMatch1.Factory,
 			SubPropertyChainExpandedSubObjectPropertyOfMatch1.Factory,
 			SubPropertyChainExpandedSubObjectPropertyOfMatch2.Factory,
+			SubPropertyChainExpandedSubObjectPropertyOfMatch3.Factory,
 			SubPropertyChainTautologyMatch1.Factory {
 
 		// combined interface
@@ -249,6 +251,7 @@ public interface InferenceMatch {
 			ForwardLinkOfObjectSomeValuesFromMatch3.Visitor<O>,
 			PropagationGeneratedMatch1.Visitor<O>,
 			PropagationGeneratedMatch2.Visitor<O>,
+			PropagationGeneratedMatch3.Visitor<O>,
 			PropertyRangeInheritedMatch1.Visitor<O>,
 			PropertyRangeInheritedMatch2.Visitor<O>,
 			PropertyRangeInheritedMatch3.Visitor<O>,
@@ -312,6 +315,7 @@ public interface InferenceMatch {
 			SubClassInclusionTautologyMatch1.Visitor<O>,
 			SubPropertyChainExpandedSubObjectPropertyOfMatch1.Visitor<O>,
 			SubPropertyChainExpandedSubObjectPropertyOfMatch2.Visitor<O>,
+			SubPropertyChainExpandedSubObjectPropertyOfMatch3.Visitor<O>,
 			SubPropertyChainTautologyMatch1.Visitor<O> {
 
 		// combined interface

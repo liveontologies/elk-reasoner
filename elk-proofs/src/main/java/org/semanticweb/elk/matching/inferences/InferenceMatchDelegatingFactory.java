@@ -707,6 +707,14 @@ public class InferenceMatchDelegatingFactory implements InferenceMatch.Factory {
 	}
 
 	@Override
+	public PropagationGeneratedMatch3 getPropagationGeneratedMatch3(
+			PropagationGeneratedMatch2 parent,
+			SubPropertyChainMatch2 thirdPremiseMatch) {
+		return filter(mainFactory_.getPropagationGeneratedMatch3(parent,
+				thirdPremiseMatch));
+	}
+
+	@Override
 	public PropertyRangeInheritedMatch1 getPropertyRangeInheritedMatch1(
 			PropertyRangeInherited parent,
 			PropertyRangeMatch1 conclusionMatch) {
@@ -1263,6 +1271,15 @@ public class InferenceMatchDelegatingFactory implements InferenceMatch.Factory {
 			IndexedSubObjectPropertyOfAxiomMatch2 secondPremiseMatch) {
 		return filter(mainFactory_
 				.getSubPropertyChainExpandedSubObjectPropertyOfMatch2(parent,
+						secondPremiseMatch));
+	}
+
+	@Override
+	public SubPropertyChainExpandedSubObjectPropertyOfMatch3 getSubPropertyChainExpandedSubObjectPropertyOfMatch3(
+			SubPropertyChainExpandedSubObjectPropertyOfMatch2 parent,
+			SubPropertyChainMatch2 secondPremiseMatch) {
+		return filter(mainFactory_
+				.getSubPropertyChainExpandedSubObjectPropertyOfMatch3(parent,
 						secondPremiseMatch));
 	}
 

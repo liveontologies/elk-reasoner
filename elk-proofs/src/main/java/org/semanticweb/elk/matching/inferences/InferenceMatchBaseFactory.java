@@ -644,6 +644,13 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 	}
 
 	@Override
+	public PropagationGeneratedMatch3 getPropagationGeneratedMatch3(
+			PropagationGeneratedMatch2 parent,
+			SubPropertyChainMatch2 thirdPremiseMatch) {
+		return new PropagationGeneratedMatch3(parent, thirdPremiseMatch);
+	}
+
+	@Override
 	public PropertyRangeInheritedMatch1 getPropertyRangeInheritedMatch1(
 			PropertyRangeInherited parent,
 			PropertyRangeMatch1 conclusionMatch) {
@@ -1144,6 +1151,14 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 			SubPropertyChainExpandedSubObjectPropertyOfMatch1 parent,
 			IndexedSubObjectPropertyOfAxiomMatch2 secondPremiseMatch) {
 		return new SubPropertyChainExpandedSubObjectPropertyOfMatch2(parent,
+				secondPremiseMatch);
+	}
+
+	@Override
+	public SubPropertyChainExpandedSubObjectPropertyOfMatch3 getSubPropertyChainExpandedSubObjectPropertyOfMatch3(
+			SubPropertyChainExpandedSubObjectPropertyOfMatch2 parent,
+			SubPropertyChainMatch2 secondPremiseMatch) {
+		return new SubPropertyChainExpandedSubObjectPropertyOfMatch3(parent,
 				secondPremiseMatch);
 	}
 

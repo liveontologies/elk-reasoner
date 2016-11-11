@@ -50,9 +50,9 @@ public class ElkClassInclusionExistentialFillerExpansion
 
 	private final ElkObjectPropertyExpression property_;
 
-	ElkClassInclusionExistentialFillerExpansion(ElkClassExpression subClass,
-			ElkClassExpression superClass,
-			ElkObjectPropertyExpression property) {
+	ElkClassInclusionExistentialFillerExpansion(
+			ElkObjectPropertyExpression property, ElkClassExpression subClass,
+			ElkClassExpression superClass) {
 		this.subClass_ = subClass;
 		this.superClass_ = superClass;
 		this.property_ = property;
@@ -116,8 +116,8 @@ public class ElkClassInclusionExistentialFillerExpansion
 	public interface Factory {
 
 		ElkClassInclusionExistentialFillerExpansion getElkClassInclusionExistentialFillerExpansion(
-				ElkClassExpression subClass, ElkClassExpression superClass,
-				ElkObjectPropertyExpression property);
+				ElkObjectPropertyExpression property,
+				ElkClassExpression subClass, ElkClassExpression superClass);
 
 	}
 

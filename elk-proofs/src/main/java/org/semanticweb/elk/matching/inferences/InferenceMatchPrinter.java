@@ -422,6 +422,11 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	}
 
 	@Override
+	public String visit(PropagationGeneratedMatch3 inferenceMatch3) {
+		return inferenceMatch3.getParent() + " | ";
+	}
+
+	@Override
 	public String visit(PropertyRangeInheritedMatch1 inferenceMatch1) {
 		return inferenceMatch1.getParent() + " | ";
 	}
@@ -788,6 +793,12 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	public String visit(
 			SubPropertyChainExpandedSubObjectPropertyOfMatch2 inferenceMatch2) {
 		return inferenceMatch2.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(
+			SubPropertyChainExpandedSubObjectPropertyOfMatch3 inferenceMatch3) {
+		return inferenceMatch3.getParent() + " | ";
 	}
 
 	@Override
