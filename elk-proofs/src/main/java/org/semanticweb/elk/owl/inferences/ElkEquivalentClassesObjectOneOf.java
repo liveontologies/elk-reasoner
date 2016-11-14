@@ -91,12 +91,6 @@ public class ElkEquivalentClassesObjectOneOf extends AbstractElkInference {
 	}
 
 	@Override
-	public ElkInference getExample() {
-		return new ElkEquivalentClassesObjectOneOf(
-				getIndividuals("a", members_.size()));
-	}
-
-	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

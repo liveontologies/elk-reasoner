@@ -89,12 +89,6 @@ public class ElkClassInclusionOfInconsistentIndividual
 	}
 
 	@Override
-	public ElkInference getExample() {
-		return new ElkClassInclusionOfInconsistentIndividual(
-				getIndividual("a"));
-	}
-
-	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

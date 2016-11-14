@@ -86,12 +86,6 @@ public class ElkClassInclusionObjectIntersectionOfDecomposition
 	}
 
 	@Override
-	public ElkInference getExample() {
-		return new ElkClassInclusionObjectIntersectionOfDecomposition(
-				getClasses("C", conjuncts_.size()), conjunctPos_);
-	}
-
-	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

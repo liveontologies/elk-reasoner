@@ -110,12 +110,6 @@ public class ElkPropertyRangePropertyExpansion extends AbstractElkInference {
 		return factory.getObjectPropertyRangeAxiom(subProperty_, range_);
 	}
 
-	@Override
-	public ElkInference getExample() {
-		return new ElkPropertyRangePropertyExpansion(getObjectProperty("R"),
-				getObjectProperty("S"), getClass("C"));
-	}
-
 	public <O> O accept(Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
@@ -133,7 +127,7 @@ public class ElkPropertyRangePropertyExpansion extends AbstractElkInference {
 	 */
 	public interface Factory {
 
-		ElkPropertyRangePropertyExpansion getElkPropertyRangePropertyUnfolding(
+		ElkPropertyRangePropertyExpansion getElkPropertyRangePropertyExpansion(
 				ElkObjectPropertyExpression subProperty,
 				ElkObjectPropertyExpression superProperty,
 				ElkClassExpression range);

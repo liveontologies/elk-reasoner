@@ -102,12 +102,6 @@ public class ElkClassInclusionObjectIntersectionOfComposition
 	}
 
 	@Override
-	public ElkInference getExample() {
-		return new ElkClassInclusionObjectIntersectionOfComposition(
-				getClass("C"), getClasses("D", conjuncts_.size()));
-	}
-
-	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

@@ -121,12 +121,6 @@ public class ElkClassInclusionExistentialRange extends AbstractElkInference {
 	}
 
 	@Override
-	public ElkInference getExample() {
-		return new ElkClassInclusionExistentialRange(getObjectProperty("R"),
-				getClass("D"), getClasses("E", ranges_.size()));
-	}
-
-	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

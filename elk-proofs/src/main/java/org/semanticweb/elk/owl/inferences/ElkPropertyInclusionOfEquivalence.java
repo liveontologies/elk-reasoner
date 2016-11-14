@@ -122,13 +122,6 @@ public class ElkPropertyInclusionOfEquivalence extends AbstractElkInference {
 	}
 
 	@Override
-	public ElkInference getExample() {
-		return new ElkPropertyInclusionOfEquivalence(
-				getObjectProperties("R", expressions_.size()), subPos_,
-				subPos_);
-	}
-
-	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

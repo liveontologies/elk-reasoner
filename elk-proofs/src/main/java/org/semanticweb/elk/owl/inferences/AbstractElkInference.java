@@ -1,20 +1,11 @@
 package org.semanticweb.elk.owl.inferences;
 
 import java.util.AbstractList;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.semanticweb.elk.owl.implementation.ElkObjectBaseFactory;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.owl.iris.ElkAbbreviatedIri;
-import org.semanticweb.elk.owl.iris.ElkFullIri;
-import org.semanticweb.elk.owl.iris.ElkIri;
-import org.semanticweb.elk.owl.iris.ElkPrefix;
-import org.semanticweb.elk.owl.iris.ElkPrefixImpl;
 
 /*
  * #%L
@@ -105,51 +96,6 @@ public abstract class AbstractElkInference implements ElkInference {
 	@Override
 	public String toString() {
 		return ElkInferencePrinter.toString(this);
-	}
-
-	private final static ElkPrefix EXAMPLE_PREFIX = new ElkPrefixImpl("",
-			new ElkFullIri("http://org.example/"));
-
-	static ElkIri getIri(String name) {
-		return new ElkAbbreviatedIri(EXAMPLE_PREFIX, name);
-	}
-
-	static ElkClass getClass(String name) {
-		return ELK_FACTORY_.getClass(getIri(name));
-	}
-
-	static ElkObjectProperty getObjectProperty(String name) {
-		return ELK_FACTORY_.getObjectProperty(getIri(name));
-	}
-
-	static ElkIndividual getIndividual(String name) {
-		return ELK_FACTORY_.getNamedIndividual(getIri(name));
-	}
-
-	static List<ElkClass> getClasses(String prefix, int count) {
-		List<ElkClass> result = new ArrayList<ElkClass>(count);
-		for (int i = 1; i <= count; i++) {
-			result.add(getClass(prefix + i));
-		}
-		return result;
-	}
-
-	static List<ElkObjectProperty> getObjectProperties(String prefix,
-			int count) {
-		List<ElkObjectProperty> result = new ArrayList<ElkObjectProperty>(
-				count);
-		for (int i = 1; i <= count; i++) {
-			result.add(getObjectProperty(prefix + i));
-		}
-		return result;
-	}
-
-	static List<ElkIndividual> getIndividuals(String prefix, int count) {
-		List<ElkIndividual> result = new ArrayList<ElkIndividual>(count);
-		for (int i = 1; i <= count; i++) {
-			result.add(getIndividual(prefix + i));
-		}
-		return result;
 	}
 
 }

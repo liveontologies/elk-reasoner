@@ -78,12 +78,6 @@ public class ElkClassInclusionExistentialOwlNothing
 	}
 
 	@Override
-	public ElkInference getExample() {
-		return new ElkClassInclusionExistentialOwlNothing(
-				getObjectProperty("R"));
-	}
-
-	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

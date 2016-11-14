@@ -98,13 +98,6 @@ public class ElkClassInclusionObjectOneOfInclusion
 	}
 
 	@Override
-	public ElkInference getExample() {
-		return new ElkClassInclusionObjectOneOfInclusion(
-				getIndividuals("a", superIndividuals_.size()),
-				subIndividualPositions_);
-	}
-
-	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

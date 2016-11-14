@@ -103,12 +103,6 @@ public class ElkClassInclusionExistentialFillerExpansion
 	}
 
 	@Override
-	public ElkInference getExample() {
-		return new ElkClassInclusionExistentialFillerExpansion(
-				getObjectProperty("R"), getClass("C"), getClass("D"));
-	}
-
-	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

@@ -94,12 +94,6 @@ public class ElkDisjointClassesOfDisjointUnion extends AbstractElkInference {
 	}
 
 	@Override
-	public ElkInference getExample() {
-		return new ElkDisjointClassesOfDisjointUnion(getClass("C"),
-				getClasses("C", disjoint_.size()));
-	}
-
-	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

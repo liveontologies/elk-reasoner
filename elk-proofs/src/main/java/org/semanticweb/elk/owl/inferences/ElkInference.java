@@ -55,13 +55,6 @@ public interface ElkInference extends Inference<ElkAxiom> {
 	 */
 	ElkAxiom getConclusion(ElkObject.Factory factory);
 
-	/**
-	 * @return an example of this inference, which can be used for explanation
-	 *         purpose. Usually it is an inference instantiated with some
-	 *         generic parameters. If {@code null}, no example is provided.
-	 */
-	ElkInference getExample();
-
 	<O> O accept(Visitor<O> visitor);
 
 	/**

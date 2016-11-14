@@ -95,12 +95,6 @@ public class ElkClassInclusionExistentialOfObjectHasSelf
 	}
 
 	@Override
-	public ElkInference getExample() {
-		return new ElkClassInclusionExistentialOfObjectHasSelf(getClass("C"),
-				getObjectProperty("R"));
-	}
-
-	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

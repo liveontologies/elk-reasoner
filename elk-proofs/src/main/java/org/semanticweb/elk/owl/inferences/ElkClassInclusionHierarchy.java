@@ -85,12 +85,6 @@ public class ElkClassInclusionHierarchy extends AbstractElkInference {
 	}
 
 	@Override
-	public ElkInference getExample() {
-		return new ElkClassInclusionHierarchy(
-				getClasses("C", expressions_.size()));
-	}
-
-	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

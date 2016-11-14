@@ -109,12 +109,6 @@ public class ElkClassInclusionReflexivePropertyRange
 	}
 
 	@Override
-	public ElkInference getExample() {
-		return new ElkClassInclusionReflexivePropertyRange(getClass("C"),
-				getObjectProperty("R"), getClass("D"));
-	}
-
-	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

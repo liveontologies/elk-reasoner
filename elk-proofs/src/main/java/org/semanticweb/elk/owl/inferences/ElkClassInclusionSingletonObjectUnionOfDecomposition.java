@@ -79,12 +79,6 @@ public class ElkClassInclusionSingletonObjectUnionOfDecomposition
 	}
 
 	@Override
-	public ElkInference getExample() {
-		return new ElkClassInclusionSingletonObjectUnionOfDecomposition(
-				getClass("C"));
-	}
-
-	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

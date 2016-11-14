@@ -120,12 +120,6 @@ public class ElkClassInclusionOfEquivaletClasses extends AbstractElkInference {
 	}
 
 	@Override
-	public ElkInference getExample() {
-		return new ElkClassInclusionOfEquivaletClasses(
-				getClasses("C", expressions_.size()), subPos_, superPos_);
-	}
-
-	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

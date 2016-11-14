@@ -87,12 +87,6 @@ public class ElkClassInclusionOfReflexiveObjectProperty
 	}
 
 	@Override
-	public ElkInference getExample() {
-		return new ElkClassInclusionOfReflexiveObjectProperty(
-				getObjectProperty("R"));
-	}
-
-	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

@@ -71,12 +71,6 @@ public class ElkToldAxiom extends AbstractElkInference {
 		return axiom_;
 	}
 
-	@Override
-	public ElkInference getExample() {
-		// should not be normally used
-		return null;
-	}
-
 	public <O> O accept(Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

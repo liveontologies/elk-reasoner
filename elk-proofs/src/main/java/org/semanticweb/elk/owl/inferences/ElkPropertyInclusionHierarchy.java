@@ -102,12 +102,6 @@ public class ElkPropertyInclusionHierarchy extends AbstractElkInference {
 				expressions_.get(expressions_.size() - 1));
 	}
 
-	@Override
-	public ElkInference getExample() {
-		return new ElkPropertyInclusionHierarchy(getObjectProperty("R"),
-				getObjectProperties("S", expressions_.size()));
-	}
-
 	public <O> O accept(Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

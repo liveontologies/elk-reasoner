@@ -79,11 +79,6 @@ public class ElkClassInclusionNegationClash extends AbstractElkInference {
 		return visitor.visit(this);
 	}
 
-	@Override
-	public ElkInference getExample() {
-		return new ElkClassInclusionNegationClash(getClass("C"));
-	}
-
 	/**
 	 * A factory for creating instances
 	 * 

@@ -71,11 +71,6 @@ public class ElkClassInclusionEmptyObjectOneOfOwlNothing
 	}
 
 	@Override
-	public ElkInference getExample() {
-		return new ElkClassInclusionEmptyObjectOneOfOwlNothing();
-	}
-
-	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

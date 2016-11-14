@@ -95,12 +95,6 @@ public class ElkClassInclusionOfObjectPropertyDomain
 	}
 
 	@Override
-	public ElkInference getExample() {
-		return new ElkClassInclusionOfObjectPropertyDomain(
-				getObjectProperty("R"), getClass("C"));
-	}
-
-	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

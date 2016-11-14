@@ -30,6 +30,7 @@ import org.liveontologies.owlapi.proof.util.ProofNode;
 import org.liveontologies.owlapi.proof.util.ProofStep;
 import org.semanticweb.elk.owl.implementation.ElkObjectBaseFactory;
 import org.semanticweb.elk.owl.inferences.ElkInference;
+import org.semanticweb.elk.owl.inferences.ElkInferenceExamples;
 import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
@@ -102,7 +103,7 @@ public class ElkProofStep implements ProofStep<ElkAxiom> {
 
 	@Override
 	public Inference<ElkAxiom> getExample() {
-		return inference_.getExample();
+		return ElkInferenceExamples.getExample(inference_);
 	}
 
 }

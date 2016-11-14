@@ -74,11 +74,6 @@ public class ElkClassInclusionTautology extends AbstractElkInference {
 		return factory.getSubClassOfAxiom(expression_, expression_);
 	}
 
-	@Override
-	public ElkInference getExample() {
-		return new ElkClassInclusionTautology(getClass("C"));
-	}
-
 	public <O> O accept(Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

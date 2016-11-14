@@ -75,11 +75,6 @@ public class ElkClassInclusionOwlThing extends AbstractElkInference {
 	}
 
 	@Override
-	public ElkInference getExample() {
-		return new ElkClassInclusionOwlThing(getClass("C"));
-	}
-
-	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

@@ -85,12 +85,6 @@ public class ElkClassInclusionObjectUnionOfComposition
 	}
 
 	@Override
-	public ElkInference getExample() {
-		return new ElkClassInclusionObjectUnionOfComposition(
-				getClasses("C", disjuncts_.size()), disjunctPos_);
-	}
-
-	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

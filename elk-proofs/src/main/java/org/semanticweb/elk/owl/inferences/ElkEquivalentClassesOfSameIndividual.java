@@ -95,12 +95,6 @@ public class ElkEquivalentClassesOfSameIndividual extends AbstractElkInference {
 	}
 
 	@Override
-	public ElkInference getExample() {
-		return new ElkEquivalentClassesOfSameIndividual(
-				getIndividuals("a", same_.size()));
-	}
-
-	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}

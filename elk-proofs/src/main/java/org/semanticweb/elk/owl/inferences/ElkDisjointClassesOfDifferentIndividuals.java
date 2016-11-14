@@ -97,12 +97,6 @@ public class ElkDisjointClassesOfDifferentIndividuals
 	}
 
 	@Override
-	public ElkInference getExample() {
-		return new ElkDisjointClassesOfDifferentIndividuals(
-				getIndividuals("a", different_.size()));
-	}
-
-	@Override
 	public <O> O accept(ElkInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
