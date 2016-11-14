@@ -7,12 +7,16 @@ import org.semanticweb.elk.owl.implementation.ElkObjectBaseFactory;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.iris.ElkAbbreviatedIri;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.iris.ElkPrefixImpl;
+import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 
 /**
  * An {@link ElkInference.Visitor} that produces simple examples for the visited
@@ -68,10 +72,15 @@ public class ElkInferenceExamples
 
 	private List<ElkObjectProperty> getObjectProperties(String prefix,
 			int count) {
+		return getObjectProperties(prefix, 0, count);
+	}
+
+	private List<ElkObjectProperty> getObjectProperties(String prefix,
+			int suffix, int count) {
 		List<ElkObjectProperty> result = new ArrayList<ElkObjectProperty>(
 				count);
 		for (int i = 1; i <= count; i++) {
-			result.add(getObjectProperty(prefix + i));
+			result.add(getObjectProperty(prefix + suffix++));
 		}
 		return result;
 	}
@@ -352,10 +361,47 @@ public class ElkInferenceExamples
 
 	@Override
 	public ElkPropertyInclusionHierarchy visit(
-			ElkPropertyInclusionHierarchy inference) {
-		return inferenceFactory_.getElkPropertyInclusionHierarchy(
-				getObjectProperty("R"),
-				getObjectProperties("S", inference.getExpressions().size()));
+			final ElkPropertyInclusionHierarchy inference) {
+		final int hierarchySize = inference.getExpressions().size();
+		return inference.getSubExpression().accept(
+				new ElkSubObjectPropertyExpressionVisitor<ElkPropertyInclusionHierarchy>() {
+
+					ElkPropertyInclusionHierarchy defaultVisit(
+							ElkObjectPropertyExpression expression) {
+						return inferenceFactory_
+								.getElkPropertyInclusionHierarchy(
+										getObjectProperty("R1"),
+										getObjectProperties("R", 2,
+												hierarchySize));
+					}
+
+					@Override
+					public ElkPropertyInclusionHierarchy visit(
+							ElkObjectPropertyChain expression) {
+						int chainSize = expression
+								.getObjectPropertyExpressions().size();
+						return inferenceFactory_
+								.getElkPropertyInclusionHierarchy(
+										elkFactory_.getObjectPropertyChain(
+												getObjectProperties("R",
+														chainSize)),
+										getObjectProperties("S",
+												hierarchySize));
+					}
+
+					@Override
+					public ElkPropertyInclusionHierarchy visit(
+							ElkObjectInverseOf expression) {
+						return defaultVisit(expression);
+					}
+
+					@Override
+					public ElkPropertyInclusionHierarchy visit(
+							ElkObjectProperty expression) {
+						return defaultVisit(expression);
+					}
+				});
+
 	}
 
 	@Override
