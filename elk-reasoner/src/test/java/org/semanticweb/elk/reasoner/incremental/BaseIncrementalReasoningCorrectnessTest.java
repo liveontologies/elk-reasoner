@@ -74,6 +74,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInpu
 	 */
 	@Test
 	public void incrementalReasoning() throws Exception {
+		LOGGER_.debug("incrementalReasoning({})", manifest.getName());
 		load();
 
 		delegate_.initIncremental();
@@ -98,6 +99,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInpu
 				randomFlip(changingAxioms, rnd, DELETE_RATIO);
 
 				if (LOGGER_.isDebugEnabled()) {
+					LOGGER_.debug("Round {} of {}", i+1, REPEAT_NUMBER);
 					for (A del : changingAxioms.getOnElements()) {
 						delegate_.dumpChangeToLog(del, LOGGER_, LogLevel.DEBUG);
 					}

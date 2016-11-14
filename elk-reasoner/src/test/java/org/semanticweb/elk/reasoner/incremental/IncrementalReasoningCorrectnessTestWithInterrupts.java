@@ -26,9 +26,14 @@ import org.junit.Test;
 import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestOutput;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class IncrementalReasoningCorrectnessTestWithInterrupts<I extends TestInput, A, EO extends TestOutput, AO extends TestOutput, TD extends IncrementalReasoningTestWithInterruptsDelegate<A, EO, AO>>
 		extends BaseIncrementalReasoningCorrectnessTest<I, A, EO, AO, TD> {
+
+	protected static final Logger LOGGER_ = LoggerFactory
+			.getLogger(IncrementalReasoningCorrectnessTestWithInterrupts.class);
 
 	public IncrementalReasoningCorrectnessTestWithInterrupts(
 			final TestManifest<I> testManifest, final TD testDelegate) {
@@ -38,6 +43,8 @@ public abstract class IncrementalReasoningCorrectnessTestWithInterrupts<I extend
 	@Test
 	public void completingIncrementalReasoningWithInterrupts()
 			throws Exception {
+		LOGGER_.debug("completingIncrementalReasoningWithInterrupts({})",
+				manifest.getName());
 		load();
 
 		delegate_.initWithInterrupts();
@@ -75,6 +82,8 @@ public abstract class IncrementalReasoningCorrectnessTestWithInterrupts<I extend
 	@Test
 	@Ignore
 	public void incrementalReasoningWithInterrupts() throws Exception {
+		LOGGER_.debug("incrementalReasoningWithInterrupts({})",
+				manifest.getName());
 		load();
 
 		delegate_.initWithInterrupts();

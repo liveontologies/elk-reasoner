@@ -363,7 +363,8 @@ public abstract class AbstractReasonerState {
 	protected synchronized void ensureLoading() throws ElkException {
 
 		if (!isLoadingFinished()) {
-			if (!ontologyIndex.isFullyCommitted()) {
+			if (isIncrementalMode()
+					&& !stageManager.incrementalAdditionStage.isCompleted()) {
 				complete(stageManager.incrementalAdditionStage);
 			}
 			LOGGER_.trace("Reset axiom loading");
