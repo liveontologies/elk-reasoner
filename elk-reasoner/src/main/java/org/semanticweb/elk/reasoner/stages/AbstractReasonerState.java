@@ -669,13 +669,17 @@ public abstract class AbstractReasonerState {
 	 * this expressions are ready in {@link #classExpressionQueryState_}.
 	 * 
 	 * @param classExpression
+	 * @param computeInstanceTaxonomy
+	 *            if {@code false}, only class taxonomy is computed, if
+	 *            {@code true}, also instance taxonomy is computed.
 	 * @return <code>true</code> if the query was indexed successfully,
 	 *         <code>false</code> otherwise, i.e., when the class expression is
 	 *         not supported
 	 * @throws ElkInconsistentOntologyException
 	 * @throws ElkException
 	 */
-	private boolean computeQuery(final ElkClassExpression classExpression)
+	private boolean computeQuery(final ElkClassExpression classExpression,
+			final boolean computeInstanceTaxonomy)
 			throws ElkInconsistentOntologyException, ElkException {
 
 		// Load the query
@@ -692,7 +696,11 @@ public abstract class AbstractReasonerState {
 		}
 
 		// Complete all stages
-		getTaxonomy();
+		if (computeInstanceTaxonomy) {
+			getInstanceTaxonomy();
+		} else {
+			getTaxonomy();
+		}
 		/*
 		 * If query result is cashed, but there were some changes to the
 		 * ontology, it may not be up to date. Whether it is is checked during
@@ -740,7 +748,7 @@ public abstract class AbstractReasonerState {
 			final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 
-		if (computeQuery(classExpression)) {
+		if (computeQuery(classExpression, false)) {
 			return classExpressionQueryState_.isSatisfiable(classExpression);
 		} else {
 			// classExpression couldn't be indexed; pretend it is a fresh class
@@ -766,7 +774,7 @@ public abstract class AbstractReasonerState {
 			final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 
-		if (computeQuery(classExpression)) {
+		if (computeQuery(classExpression, false)) {
 
 			final Node<ElkClass> result = classExpressionQueryState_
 					.getEquivalentClasses(classExpression);
@@ -800,7 +808,7 @@ public abstract class AbstractReasonerState {
 			final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 
-		if (computeQuery(classExpression)) {
+		if (computeQuery(classExpression, false)) {
 
 			final Set<? extends Node<ElkClass>> result = classExpressionQueryState_
 					.getDirectSuperClasses(classExpression);
@@ -834,7 +842,7 @@ public abstract class AbstractReasonerState {
 			final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 
-		if (computeQuery(classExpression)) {
+		if (computeQuery(classExpression, false)) {
 
 			final Taxonomy<ElkClass> taxonomy = getTaxonomy();
 
@@ -870,7 +878,7 @@ public abstract class AbstractReasonerState {
 			final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 
-		if (computeQuery(classExpression)) {
+		if (computeQuery(classExpression, true)) {
 
 			final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = getInstanceTaxonomy();
 

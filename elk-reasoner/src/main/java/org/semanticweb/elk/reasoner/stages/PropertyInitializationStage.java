@@ -82,7 +82,14 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 	@Override
 	public void executeStage() throws ElkInterruptedException {
 		for (;;) {
-			checkInterrupt();
+			/* 
+			 * TODO: Cannot be interrupted, because it remembers iterator over
+			 * properties and if some property disappears before restarted,
+			 * ConcurrentModificationException is thrown. For other stages this
+			 * is solved by invalidating when input changes, but here we do not
+			 * want to invalidate when a property only disappears.
+			 */
+			// checkInterrupt();
 			if (!todo_.hasNext())
 				break;
 			IndexedPropertyChain ipc = todo_.next();
