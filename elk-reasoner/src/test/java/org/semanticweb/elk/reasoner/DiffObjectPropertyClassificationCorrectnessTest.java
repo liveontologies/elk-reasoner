@@ -50,7 +50,7 @@ public abstract class DiffObjectPropertyClassificationCorrectnessTest extends
 
 	public DiffObjectPropertyClassificationCorrectnessTest(
 			final ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> testManifest,
-			final ReasoningTestWithInterruptsDelegate<TaxonomyTestOutput<?>> testDelegate) {
+			final ReasoningTestWithOutputAndInterruptsDelegate<TaxonomyTestOutput<?>> testDelegate) {
 		super(testManifest, testDelegate);
 	}
 

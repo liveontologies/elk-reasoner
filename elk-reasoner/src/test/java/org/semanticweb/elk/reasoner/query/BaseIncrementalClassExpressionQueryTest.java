@@ -22,26 +22,26 @@
 package org.semanticweb.elk.reasoner.query;
 
 import org.junit.Assert;
-import org.semanticweb.elk.reasoner.incremental.BaseIncrementalReasoningCorrectnessTest;
-import org.semanticweb.elk.reasoner.incremental.IncrementalReasoningTestDelegate;
+import org.semanticweb.elk.reasoner.incremental.IncrementalReasoningCorrectnessTestWithInterrupts;
+import org.semanticweb.elk.reasoner.incremental.IncrementalReasoningTestWithInterruptsDelegate;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestOutput;
 
 public abstract class BaseIncrementalClassExpressionQueryTest<C, A, O extends TestOutput>
 		extends
-		BaseIncrementalReasoningCorrectnessTest<ClassQueryTestInput<C>, A, O, O, IncrementalReasoningTestDelegate<A, O, O>> {
+		IncrementalReasoningCorrectnessTestWithInterrupts<ClassQueryTestInput<C>, A, O, O, IncrementalReasoningTestWithInterruptsDelegate<A, O, O>> {
 
 	public final static String INPUT_DATA_LOCATION = "class_expression_query_test_input";
 
 	public BaseIncrementalClassExpressionQueryTest(
 			final TestManifest<ClassQueryTestInput<C>> testManifest,
-			final IncrementalReasoningTestDelegate<A, O, O> testDelegate) {
+			final IncrementalReasoningTestWithInterruptsDelegate<A, O, O> testDelegate) {
 		super(testManifest, testDelegate);
 	}
 
 	@Override
 	protected void correctnessCheck(final O actualOutput,
-			final O expectedOutput, final long seed) throws Exception {
+			final O expectedOutput) throws Exception {
 
 		if (expectedOutput == null ? actualOutput != null
 				: !expectedOutput.equals(actualOutput)) {
@@ -49,8 +49,8 @@ public abstract class BaseIncrementalClassExpressionQueryTest<C, A, O extends Te
 			// @formatter:off
 			final String message = "Actual output is not equal to the expected output\n"
 					+ "Input: " + getManifest().getInput().getName() + "\n"
-					+ "Seed: " + seed + "\n" + "Expected:\n" + expectedOutput
-					+ "\n" + "Actual:\n" + actualOutput + "\n";
+					+ "Expected:\n" + expectedOutput + "\n"
+					+ "Actual:\n" + actualOutput + "\n";
 			// @formatter:on
 
 			Assert.fail(message);

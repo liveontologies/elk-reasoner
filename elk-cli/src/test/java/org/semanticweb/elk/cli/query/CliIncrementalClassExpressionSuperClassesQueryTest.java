@@ -41,10 +41,10 @@ public class CliIncrementalClassExpressionSuperClassesQueryTest extends
 		CliIncrementalClassExpressionQueryTest<RelatedEntitiesTestOutput<ElkClass>> {
 
 	// @formatter:off
-	static final String[] IGNORE_LIST = { "Disjunctions.owl", // Disjuctions not
-																// supported
+	static final String[] IGNORE_LIST = {
+			"Disjunctions.owl",// Disjuctions not supported
 			"OneOf.owl",// Disjuctions not supported
-	};
+		};
 	// @formatter:on
 
 	static {

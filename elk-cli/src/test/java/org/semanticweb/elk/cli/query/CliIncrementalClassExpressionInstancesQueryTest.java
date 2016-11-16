@@ -24,46 +24,46 @@ package org.semanticweb.elk.cli.query;
 import java.util.Set;
 
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.incremental.CliIncrementalReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.ClassQueryTestInput;
 import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
-import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
+import org.semanticweb.elk.reasoner.taxonomy.ElkIndividualKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestManifest;
 
 @RunWith(PolySuite.class)
 public class CliIncrementalClassExpressionInstancesQueryTest extends
-		CliIncrementalClassExpressionQueryTest<RelatedEntitiesTestOutput<ElkClass>> {
+		CliIncrementalClassExpressionQueryTest<RelatedEntitiesTestOutput<ElkNamedIndividual>> {
 
 	public CliIncrementalClassExpressionInstancesQueryTest(
 			final TestManifest<ClassQueryTestInput<ElkClassExpression>> manifest) {
 		super(manifest,
-				new CliIncrementalReasoningTestDelegate<RelatedEntitiesTestOutput<ElkClass>, RelatedEntitiesTestOutput<ElkClass>>(
+				new CliIncrementalReasoningTestDelegate<RelatedEntitiesTestOutput<ElkNamedIndividual>, RelatedEntitiesTestOutput<ElkNamedIndividual>>(
 						manifest) {
 
 					@Override
-					public RelatedEntitiesTestOutput<ElkClass> getExpectedOutput()
+					public RelatedEntitiesTestOutput<ElkNamedIndividual> getExpectedOutput()
 							throws Exception {
-						final Set<? extends Node<ElkClass>> subNodes = getStandardReasoner()
-								.getSubClassesQuietly(
+						final Set<? extends Node<ElkNamedIndividual>> subNodes = getStandardReasoner()
+								.getInstancesQuietly(
 										manifest.getInput().getClassQuery(),
 										true);
-						return new CliRelatedEntitiesTestOutput<ElkClass>(
-								subNodes, ElkClassKeyProvider.INSTANCE);
+						return new CliRelatedEntitiesTestOutput<ElkNamedIndividual>(
+								subNodes, ElkIndividualKeyProvider.INSTANCE);
 					}
 
 					@Override
-					public RelatedEntitiesTestOutput<ElkClass> getActualOutput()
+					public RelatedEntitiesTestOutput<ElkNamedIndividual> getActualOutput()
 							throws Exception {
-						final Set<? extends Node<ElkClass>> subNodes = getIncrementalReasoner()
-								.getSubClassesQuietly(
+						final Set<? extends Node<ElkNamedIndividual>> subNodes = getIncrementalReasoner()
+								.getInstancesQuietly(
 										manifest.getInput().getClassQuery(),
 										true);
-						return new CliRelatedEntitiesTestOutput<ElkClass>(
-								subNodes, ElkClassKeyProvider.INSTANCE);
+						return new CliRelatedEntitiesTestOutput<ElkNamedIndividual>(
+								subNodes, ElkIndividualKeyProvider.INSTANCE);
 					}
 
 				});

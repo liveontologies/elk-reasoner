@@ -54,20 +54,19 @@ import org.semanticweb.elk.testing.UrlTestInput;
  */
 @RunWith(PolySuite.class)
 public abstract class BaseIncrementalClassificationCorrectnessTest<A> extends
-		BaseIncrementalReasoningCorrectnessTest<UrlTestInput, A, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>, IncrementalReasoningTestDelegate<A, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>> {
+		IncrementalReasoningCorrectnessTestWithInterrupts<UrlTestInput, A, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>, IncrementalReasoningTestWithInterruptsDelegate<A, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>> {
 
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
 
 	public BaseIncrementalClassificationCorrectnessTest(
 			final TestManifest<UrlTestInput> testManifest,
-			final IncrementalReasoningTestDelegate<A, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> testDelegate) {
+			final IncrementalReasoningTestWithInterruptsDelegate<A, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> testDelegate) {
 		super(testManifest, testDelegate);
 	}
 
 	@Override
 	protected void correctnessCheck(final TaxonomyTestOutput<?> actualOutput,
-			final TaxonomyTestOutput<?> expectedOutput, final long seed)
-			throws Exception {
+			final TaxonomyTestOutput<?> expectedOutput) throws Exception {
 
 		final Taxonomy<?> expected = expectedOutput.getTaxonomy();
 
@@ -87,7 +86,7 @@ public abstract class BaseIncrementalClassificationCorrectnessTest<A> extends
 				// TODO
 			}
 
-			fail("Seed: " + seed + "\n" + writer.getBuffer().toString());
+			fail(writer.getBuffer().toString());
 		}
 
 	}

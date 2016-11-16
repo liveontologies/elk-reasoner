@@ -142,7 +142,6 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	@Override
 	public void execute() throws ElkException {
 		LOGGER_.info("{} using {} workers", this, workerNo);
-		LOGGER_.info("=== {} using {} workers  ===", this, workerNo);
 		reasoner.getProgressMonitor().start(getName());
 
 		try {
@@ -166,10 +165,12 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	 *         if this stage was already invalidated before the call
 	 */
 	boolean invalidate() {
-		if (!isCompleted_)
+		if (!isCompleted_ && !isInitialized_) {
 			return false;
+		}
 		LOGGER_.trace("{}: invalidated", this);
-		isCompleted_ = false;		
+		isCompleted_ = false;
+		isInitialized_ = false;
 		return true;
 	}
 	

@@ -95,12 +95,10 @@ public class LowLevelIncrementalABoxTest {
 	@Test
 	public void testInvalidTaxonomyAfterInconsistency() throws ElkException, IOException {
 		TestChangesLoader loader = new TestChangesLoader();
-		TestChangesLoader changeLoader = new TestChangesLoader();
 		Reasoner reasoner = TestReasonerUtils
 				.createTestReasoner(loader, new PostProcessingStageExecutor());
 
 		reasoner.setAllowIncrementalMode(false);
-		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
 
 		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
@@ -114,6 +112,10 @@ public class LowLevelIncrementalABoxTest {
 		reasoner.getInstanceTaxonomyQuietly();
 		
 		reasoner.setAllowIncrementalMode(true);
+		
+		TestChangesLoader changeLoader = new TestChangesLoader();
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
+		
 		changeLoader.remove(axTopSubB);
 		
 		reasoner.getInstanceTaxonomyQuietly();
@@ -147,12 +149,12 @@ public class LowLevelIncrementalABoxTest {
 		
 		assertTrue(taxonomy.getNode(A).getDirectInstanceNodes().size() == 1);
 		assertTrue(taxonomy.getNode(B).getAllInstanceNodes().size() == 1);
-		
+
 		reasoner.setAllowIncrementalMode(true);
 
 		TestChangesLoader changeLoader = new TestChangesLoader();
 		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(changeLoader));
-		
+
 		//changeLoader.clear();
 		changeLoader.remove(axiInstA);
 

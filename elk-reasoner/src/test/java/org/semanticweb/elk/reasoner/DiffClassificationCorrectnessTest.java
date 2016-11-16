@@ -53,7 +53,7 @@ public abstract class DiffClassificationCorrectnessTest extends
 
 	public DiffClassificationCorrectnessTest(
 			final ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> testManifest,
-			final ReasoningTestWithInterruptsDelegate<TaxonomyTestOutput<?>> testDelegate) {
+			final ReasoningTestWithOutputAndInterruptsDelegate<TaxonomyTestOutput<?>> testDelegate) {
 		super(testManifest, testDelegate);
 	}
 

@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -198,17 +199,21 @@ public abstract class AbstractReasonerState {
 	private final ElkSubObjectPropertyExpressionVisitor<ModifiableIndexedPropertyChain> subPropertyConverter_;
 
 	protected AbstractReasonerState(ElkObject.Factory elkFactory) {
+		final ClassTaxonomyState.Builder classTaxonomyStateBuilder = new ClassTaxonomyState.Builder();
+		final InstanceTaxonomyState.Builder instanceTaxonomyStateBuilder = new InstanceTaxonomyState.Builder();
 		this.elkFactory_ = elkFactory;
-		this.ontologyIndex = new DifferentialIndex(elkFactory);
+		this.ontologyIndex = new DifferentialIndex(elkFactory,
+				Arrays.asList(classTaxonomyStateBuilder.getOntologyListener(),
+						instanceTaxonomyStateBuilder.getOntologyListener()));
 		this.propertyHierarchyCompositionState_ = new PropertyHierarchyCompositionState();
 		this.saturationState = SaturationStateFactory
 				.createSaturationState(ontologyIndex);
 		this.consistencyCheckingState = ConsistencyCheckingState
 				.create(saturationState, propertyHierarchyCompositionState_);
-		this.classTaxonomyState = new ClassTaxonomyState(saturationState,
-				ontologyIndex, elkFactory);
-		this.instanceTaxonomyState = new InstanceTaxonomyState(saturationState,
-				ontologyIndex, elkFactory);
+		this.classTaxonomyState = classTaxonomyStateBuilder
+				.build(saturationState, ontologyIndex, elkFactory);
+		this.instanceTaxonomyState = instanceTaxonomyStateBuilder
+				.build(saturationState, ontologyIndex, elkFactory);
 		this.objectPropertyTaxonomyState = new ObjectPropertyTaxonomyState(
 				elkFactory);
 		this.ruleAndConclusionStats = new SaturationStatistics();
@@ -277,14 +282,6 @@ public abstract class AbstractReasonerState {
 	}
 
 	/**
-	 * Reset the axiom loading stage and all subsequent stages
-	 */
-	public synchronized void resetInputLoading() {
-		LOGGER_.trace("Reset axiom loading");
-		stageManager.inputLoadingStage.invalidateRecursive();
-	}
-
-	/**
 	 * Reset the property saturation stage and all subsequent stages
 	 */
 	public synchronized void resetPropertySaturation() {
@@ -316,8 +313,6 @@ public abstract class AbstractReasonerState {
 	public synchronized void registerAxiomLoader(
 			final AxiomLoader.Factory axiomLoaderFactory) {
 		LOGGER_.trace("Registering new axiom loader");
-
-		resetInputLoading();
 
 		final AxiomLoader newAxiomLoader = axiomLoaderFactory
 				.getAxiomLoader(getInterrupter());
@@ -354,6 +349,34 @@ public abstract class AbstractReasonerState {
 	 */
 	public synchronized void forceLoading() throws ElkException {
 		complete(stageManager.inputLoadingStage);
+	}
+
+	/**
+	 * @return {@code true} if there is no input pending loading, {@code false}
+	 *         otherwise.
+	 */
+	protected synchronized boolean isLoadingFinished() {
+		return (axiomLoader_ == null || axiomLoader_.isLoadingFinished())
+				&& (queryLoader_ == null || queryLoader_.isLoadingFinished());
+	}
+
+	/**
+	 * Flushes index, if needed, and completes loading if there is new input.
+	 * 
+	 * @throws ElkException
+	 */
+	protected synchronized void ensureLoading() throws ElkException {
+
+		if (!isLoadingFinished()) {
+			if (isIncrementalMode()
+					&& !stageManager.incrementalAdditionStage.isCompleted()) {
+				complete(stageManager.incrementalAdditionStage);
+			}
+			LOGGER_.trace("Reset axiom loading");
+			stageManager.inputLoadingStage.invalidateRecursive();
+			complete(stageManager.inputLoadingStage);
+		}
+
 	}
 
 	/**
@@ -424,7 +447,7 @@ public abstract class AbstractReasonerState {
 	public synchronized boolean isInconsistent() throws ElkException {
 
 		ruleAndConclusionStats.reset();
-		forceLoading();
+		ensureLoading();
 
 		if (isIncrementalMode() && !saturationState.getContexts().isEmpty()) {
 			LOGGER_.trace("Consistency checking [incremental]");
@@ -651,31 +674,38 @@ public abstract class AbstractReasonerState {
 	 * this expressions are ready in {@link #classExpressionQueryState_}.
 	 * 
 	 * @param classExpression
+	 * @param computeInstanceTaxonomy
+	 *            if {@code false}, only class taxonomy is computed, if
+	 *            {@code true}, also instance taxonomy is computed.
 	 * @return <code>true</code> if the query was indexed successfully,
 	 *         <code>false</code> otherwise, i.e., when the class expression is
 	 *         not supported
 	 * @throws ElkInconsistentOntologyException
 	 * @throws ElkException
 	 */
-	private boolean computeQuery(final ElkClassExpression classExpression)
+	private boolean computeQuery(final ElkClassExpression classExpression,
+			final boolean computeInstanceTaxonomy)
 			throws ElkInconsistentOntologyException, ElkException {
 
 		// Load the query
 		if (classExpressionQueryState_.registerQuery(classExpression)) {
-			resetInputLoading();
 			if (queryLoader_ == null) {
 				queryLoader_ = classExpressionQueryState_
 						.getQueryLoader(getInterrupter());
 			}
 		}
+		ensureLoading();
 
-		forceLoading();
 		if (!classExpressionQueryState_.isIndexed(classExpression)) {
 			return false;
 		}
 
 		// Complete all stages
-		getTaxonomy();
+		if (computeInstanceTaxonomy) {
+			getInstanceTaxonomy();
+		} else {
+			getTaxonomy();
+		}
 		/*
 		 * If query result is cashed, but there were some changes to the
 		 * ontology, it may not be up to date. Whether it is is checked during
@@ -686,7 +716,23 @@ public abstract class AbstractReasonerState {
 			return true;
 		}
 		stageManager.classExpressionQueryStage.invalidateRecursive();
-		complete(stageManager.classExpressionQueryStage);
+		try {
+			complete(stageManager.classExpressionQueryStage);
+		} catch (final ElkInterruptedException e) {
+			if (classExpressionQueryState_.isComputed(classExpression)) {
+				/*
+				 * If the stage was interrupted, but the query is already
+				 * computed, completing the stage will not be attempted during
+				 * the next call. We need to call postExecute() manually, so
+				 * that the stage wouldn't stay initialized with computation
+				 * that already processed all its inputs (or at least the
+				 * queried class).
+				 */
+				stageManager.classExpressionQueryStage.postExecute();
+			} else {
+				throw e;
+			}
+		}
 
 		return true;
 	}
@@ -707,7 +753,7 @@ public abstract class AbstractReasonerState {
 			final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 
-		if (computeQuery(classExpression)) {
+		if (computeQuery(classExpression, false)) {
 			return classExpressionQueryState_.isSatisfiable(classExpression);
 		} else {
 			// classExpression couldn't be indexed; pretend it is a fresh class
@@ -733,7 +779,7 @@ public abstract class AbstractReasonerState {
 			final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 
-		if (computeQuery(classExpression)) {
+		if (computeQuery(classExpression, false)) {
 
 			final Node<ElkClass> result = classExpressionQueryState_
 					.getEquivalentClasses(classExpression);
@@ -767,7 +813,7 @@ public abstract class AbstractReasonerState {
 			final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 
-		if (computeQuery(classExpression)) {
+		if (computeQuery(classExpression, false)) {
 
 			final Set<? extends Node<ElkClass>> result = classExpressionQueryState_
 					.getDirectSuperClasses(classExpression);
@@ -801,7 +847,7 @@ public abstract class AbstractReasonerState {
 			final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 
-		if (computeQuery(classExpression)) {
+		if (computeQuery(classExpression, false)) {
 
 			final Taxonomy<ElkClass> taxonomy = getTaxonomy();
 
@@ -837,7 +883,7 @@ public abstract class AbstractReasonerState {
 			final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 
-		if (computeQuery(classExpression)) {
+		if (computeQuery(classExpression, true)) {
 
 			final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = getInstanceTaxonomy();
 
@@ -932,7 +978,7 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	protected OntologyIndex getOntologyIndex() throws ElkException {
-		forceLoading();
+		ensureLoading();
 		return ontologyIndex;
 	}
 

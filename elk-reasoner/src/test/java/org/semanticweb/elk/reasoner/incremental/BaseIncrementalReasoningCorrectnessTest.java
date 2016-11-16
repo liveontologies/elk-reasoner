@@ -50,14 +50,20 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInpu
 	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(BaseIncrementalReasoningCorrectnessTest.class);
 
-	private final static int REPEAT_NUMBER_ = 5;
-	private final static double DELETE_RATIO_ = 0.2;
+	private final static int REPEAT_NUMBER = 5;
+	private final static double DELETE_RATIO = 0.2;
 
 	private OnOffVector<A> changingAxioms_ = null;
 
 	public BaseIncrementalReasoningCorrectnessTest(
 			final TestManifest<I> testManifest, final TD testDelegate) {
 		super(testManifest, testDelegate);
+	}
+
+	protected void load() throws Exception {
+		changingAxioms_ = new OnOffVector<A>(15);
+		changingAxioms_.addAll(getDelegate().load());
+		changingAxioms_.setAllOn();
 	}
 
 	public OnOffVector<A> getChangingAxioms() {
@@ -71,50 +77,75 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInpu
 	 */
 	@Test
 	public void incrementalReasoning() throws Exception {
-		changingAxioms_ = new OnOffVector<A>(15);
-		changingAxioms_.addAll(getDelegate().initIncremental());
-		changingAxioms_.setAllOn();
+		LOGGER_.debug("incrementalReasoning({})", getManifest().getName());
+		load();
+
+		getDelegate().initIncremental();
+
+		run(new OutputChecker());
+	}
+
+	public void run(final OutputChecker outputChecker) throws Exception {
 
 		final long seed = RandomSeedProvider.VALUE;
 		final Random rnd = new Random(seed);
 
-		// initial correctness check
-		correctnessCheck(getDelegate().getActualOutput(),
-				getDelegate().getExpectedOutput(), seed);
+		try {
 
-		for (int i = 0; i < REPEAT_NUMBER_; i++) {
-			changingAxioms_.setAllOff();
-			// delete some axioms
+			for (int i = 0; i < REPEAT_NUMBER; i++) {
 
-			randomFlip(changingAxioms_, rnd, DELETE_RATIO_);
+				outputChecker.check();
 
-			if (LOGGER_.isDebugEnabled()) {
-				for (A del : changingAxioms_.getOnElements()) {
-					getDelegate().dumpChangeToLog(del, LOGGER_, LogLevel.DEBUG);
+				changingAxioms_.setAllOff();
+				// delete some axioms
+
+				randomFlip(changingAxioms_, rnd, DELETE_RATIO);
+
+				if (LOGGER_.isDebugEnabled()) {
+					LOGGER_.debug("Round {} of {}", i + 1, REPEAT_NUMBER);
+					for (A del : changingAxioms_.getOnElements()) {
+						getDelegate().dumpChangeToLog(del, LOGGER_,
+								LogLevel.DEBUG);
+					}
 				}
+
+				// incremental changes
+				getDelegate().applyChanges(changingAxioms_.getOnElements(),
+						IncrementalChangeType.DELETE);
+
+				LOGGER_.info("===DELETIONS===");
+
+				outputChecker.check();
+
+				// add the axioms back
+				getDelegate().applyChanges(getChangingAxioms().getOnElements(),
+						IncrementalChangeType.ADD);
+
+				LOGGER_.info("===ADDITIONS===");
 			}
 
-			// incremental changes
-			getDelegate().applyChanges(changingAxioms_.getOnElements(),
-					IncrementalChangeType.DELETE);
+			outputChecker.finalCheck();
 
-			LOGGER_.info("===DELETIONS===");
-
-			correctnessCheck(getDelegate().getActualOutput(),
-					getDelegate().getExpectedOutput(), seed);
-
-			// add the axioms back
-			getDelegate().applyChanges(changingAxioms_.getOnElements(),
-					IncrementalChangeType.ADD);
-
-			LOGGER_.info("===ADDITIONS===");
-
-			correctnessCheck(getDelegate().getActualOutput(),
-					getDelegate().getExpectedOutput(), seed);
+		} catch (final Throwable e) {
+			throw new RuntimeException("Random seed: " + seed, e);
 		}
+
 	}
 
-	protected void randomFlip(OnOffVector<A> axioms, Random rnd,
+	protected class OutputChecker {
+
+		public void check() throws Exception {
+			correctnessCheck(getDelegate().getActualOutput(),
+					getDelegate().getExpectedOutput());
+		}
+
+		public void finalCheck() throws Exception {
+			check();
+		}
+
+	}
+
+	private void randomFlip(OnOffVector<A> axioms, Random rnd,
 			double fraction) {
 		Collections.shuffle(axioms, rnd);
 
@@ -127,7 +158,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInpu
 		}
 	}
 
-	protected abstract void correctnessCheck(AO actualOutput, EO expectedOutput,
-			long seed) throws Exception;
+	protected abstract void correctnessCheck(AO actualOutput, EO expectedOutput)
+			throws Exception;
 
 }

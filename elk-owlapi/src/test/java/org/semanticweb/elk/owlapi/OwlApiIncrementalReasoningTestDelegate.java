@@ -26,11 +26,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
+import org.semanticweb.elk.RandomSeedProvider;
+import org.semanticweb.elk.reasoner.RandomReasonerInterrupter;
 import org.semanticweb.elk.reasoner.incremental.IncrementalChangeType;
-import org.semanticweb.elk.reasoner.incremental.IncrementalReasoningTestDelegate;
+import org.semanticweb.elk.reasoner.incremental.IncrementalReasoningTestWithInterruptsDelegate;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
+import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.testing.UrlTestInput;
@@ -44,7 +48,9 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.slf4j.Logger;
 
 public abstract class OwlApiIncrementalReasoningTestDelegate<EO extends TestOutput, AO extends TestOutput>
-		implements IncrementalReasoningTestDelegate<OWLAxiom, EO, AO> {
+		implements IncrementalReasoningTestWithInterruptsDelegate<OWLAxiom, EO, AO> {
+
+	public static final double INTERRUPTION_CHANCE = 0.01;
 
 	@SuppressWarnings("unchecked")
 	private static final Set<AxiomType<?>> DYNAMIC_AXIOM_TYPES = new HashSet<AxiomType<?>>(
@@ -75,7 +81,7 @@ public abstract class OwlApiIncrementalReasoningTestDelegate<EO extends TestOutp
 	}
 
 	@Override
-	public Collection<OWLAxiom> initIncremental() throws Exception {
+	public Collection<OWLAxiom> load() throws Exception {
 
 		final ArrayList<OWLAxiom> changingAxioms = new ArrayList<OWLAxiom>();
 
@@ -91,6 +97,12 @@ public abstract class OwlApiIncrementalReasoningTestDelegate<EO extends TestOutp
 			}
 		}
 
+		return changingAxioms;
+	}
+
+	@Override
+	public void initIncremental() throws Exception {
+
 		// important to use the buffering mode here
 		// otherwise we'd need to issue a query to the ElkReasoner
 		// before we could use the internal reasoner directly in the tests
@@ -102,7 +114,28 @@ public abstract class OwlApiIncrementalReasoningTestDelegate<EO extends TestOutp
 		incrementalReasoner_.getInternalReasoner()
 				.setAllowIncrementalMode(true);
 
-		return changingAxioms;
+	}
+
+	@Override
+	public void initWithInterrupts() throws Exception {
+
+		/*
+		 * important to use the buffering mode here otherwise we'd need to issue
+		 * a query to the ElkReasoner before we could use the internal reasoner
+		 * directly in the tests
+		 * 
+		 */
+		standardReasoner_ = OWLAPITestUtils.createReasoner(testOntology_, true,
+				new PostProcessingStageExecutor());
+		standardReasoner_.getInternalReasoner().setAllowIncrementalMode(false);
+		final Random random = new Random(RandomSeedProvider.VALUE);
+		incrementalReasoner_ = OWLAPITestUtils.createReasoner(testOntology_,
+				false,
+				new RandomReasonerInterrupter(random, INTERRUPTION_CHANCE),
+				new SimpleStageExecutor());
+		incrementalReasoner_.getInternalReasoner()
+				.setAllowIncrementalMode(true);
+
 	}
 
 	@Override

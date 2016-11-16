@@ -24,6 +24,7 @@ package org.semanticweb.elk.owlapi;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.incremental.BaseIncrementalClassificationCorrectnessTest;
+import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.UrlTestInput;
@@ -64,6 +65,11 @@ public class OWLAPIIncrementalClassificationCorrectnessTest
 								.getInternalReasoner().getTaxonomyQuietly();
 						return new TaxonomyTestOutput<Taxonomy<ElkClass>>(
 								taxonomy);
+					}
+
+					@Override
+					public Class<? extends Exception> getInterruptionExceptionClass() {
+						return ElkInterruptedException.class;
 					}
 
 				});

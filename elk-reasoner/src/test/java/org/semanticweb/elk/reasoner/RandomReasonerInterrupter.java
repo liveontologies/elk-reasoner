@@ -23,10 +23,16 @@ package org.semanticweb.elk.reasoner;
 
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class RandomReasonerInterrupter extends ReasonerInterrupter {
 
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(ReasonerInterrupter.class);
+
 	private final Random random_;
-	private final double chance_;
+	private double chance_;
 
 	public RandomReasonerInterrupter(final Random random, final double chance) {
 		if (chance < 0 || chance > 1) {
@@ -40,9 +46,26 @@ public class RandomReasonerInterrupter extends ReasonerInterrupter {
 	@Override
 	public boolean isInterrupted() {
 		if (random_.nextDouble() < chance_) {
+			LOGGER_.debug("========== INTERRUPT ==========");
 			interrupt();
 		}
 		return super.isInterrupted();
+	}
+
+	public double getChance() {
+		return chance_;
+	}
+
+	public void setChance(final double chance) {
+		if (chance < 0 || chance > 1) {
+			throw new IllegalArgumentException(
+					"chance must be between 0 and 1 inclusive!");
+		}
+		this.chance_ = chance;
+	}
+
+	public Random getRandom() {
+		return random_;
 	}
 
 }

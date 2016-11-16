@@ -72,7 +72,7 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 	/**
 	 * increments after a {@link Context} is marked as non-saturated
 	 */
-	private final AtomicInteger countextMarkNonSaturatedLower_ = new AtomicInteger(
+	private final AtomicInteger contextMarkNonSaturatedLower_ = new AtomicInteger(
 			0);
 
 	/**
@@ -112,7 +112,7 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 
 			@Override
 			public int size() {
-				return countextMarkNonSaturatedLower_.get()
+				return contextMarkNonSaturatedLower_.get()
 						- contextSetSaturatedLower_.get();
 			}
 		});
@@ -120,7 +120,7 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 
 	@Override
 	public int getContextMarkNonSaturatedCount() {
-		return countextMarkNonSaturatedLower_.get();
+		return contextMarkNonSaturatedLower_.get();
 	}
 
 	@Override
@@ -136,7 +136,7 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 			if (contextSetSaturatedUpperSnapshot >= saturatedContextLimit) {
 				return;
 			}
-			if (contextSetSaturatedUpperSnapshot >= countextMarkNonSaturatedLower_
+			if (contextSetSaturatedUpperSnapshot >= contextMarkNonSaturatedLower_
 					.get()) {
 				EC next = notSaturatedContexts_.peek();
 				if (next != null) {
@@ -209,6 +209,15 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 
 	abstract void resetContexts();
 
+	private void reset() {
+		resetContexts();
+		activeContexts_.clear();
+		notSaturatedContexts_.clear();
+		contextMarkNonSaturatedLower_.set(0);
+		contextSetSaturatedUpper_.set(0);
+		contextSetSaturatedLower_.set(0);
+	}
+
 	/**
 	 * Adds the given {@link ExtendedContext} to this {@link SaturationState} if
 	 * no {@link ExtendedContext} was assigned for its root
@@ -260,7 +269,7 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 		void markAsNotSaturatedInternal(EC context) {
 			LOGGER_.trace("{}: marked as non-saturated", context);
 			notSaturatedContexts_.add(context);
-			countextMarkNonSaturatedLower_.incrementAndGet();
+			contextMarkNonSaturatedLower_.incrementAndGet();
 			contextModificationListener_.notifyContextModification(context);
 			for (int i = 0; i < listeners_.size(); i++) {
 				listeners_.get(i).contextMarkNonSaturated(context);
@@ -284,7 +293,7 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 
 		@Override
 		public void resetContexts() {
-			AbstractSaturationState.this.resetContexts();
+			AbstractSaturationState.this.reset();
 		}
 
 		@Override
