@@ -53,7 +53,7 @@ public class CliClassExpressionSatisfiabilityQueryTest extends
 
 			@Override
 			public SatisfiabilityTestOutput getActualOutput() throws Exception {
-				final boolean isSatisfiable = reasoner_.isSatisfiableQuietly(
+				final boolean isSatisfiable = getReasoner().isSatisfiableQuietly(
 						manifest.getInput().getClassQuery());
 				return new BaseSatisfiabilityTestOutput(isSatisfiable);
 			}

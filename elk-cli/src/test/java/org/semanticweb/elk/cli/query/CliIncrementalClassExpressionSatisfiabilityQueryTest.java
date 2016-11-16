@@ -43,7 +43,7 @@ public class CliIncrementalClassExpressionSatisfiabilityQueryTest extends
 					@Override
 					public SatisfiabilityTestOutput getExpectedOutput()
 							throws Exception {
-						final boolean isSatisfiable = standardReasoner_
+						final boolean isSatisfiable = getStandardReasoner()
 								.isSatisfiableQuietly(
 										manifest.getInput().getClassQuery());
 						return new BaseSatisfiabilityTestOutput(isSatisfiable);
@@ -52,7 +52,7 @@ public class CliIncrementalClassExpressionSatisfiabilityQueryTest extends
 					@Override
 					public SatisfiabilityTestOutput getActualOutput()
 							throws Exception {
-						final boolean isSatisfiable = incrementalReasoner_
+						final boolean isSatisfiable = getIncrementalReasoner()
 								.isSatisfiableQuietly(
 										manifest.getInput().getClassQuery());
 						return new BaseSatisfiabilityTestOutput(isSatisfiable);

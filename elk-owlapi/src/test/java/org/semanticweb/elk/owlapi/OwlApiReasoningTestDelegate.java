@@ -40,13 +40,21 @@ public abstract class OwlApiReasoningTestDelegate<AO extends TestOutput>
 
 	public static final double INTERRUPTION_CHANCE = 0.3;
 
-	protected final TestManifest<? extends UrlTestInput> manifest_;
+	private final TestManifest<? extends UrlTestInput> manifest_;
 
-	protected ElkReasoner reasoner_;
+	private ElkReasoner reasoner_;
 
 	public OwlApiReasoningTestDelegate(
 			final TestManifest<? extends UrlTestInput> manifest) {
 		this.manifest_ = manifest;
+	}
+
+	public TestManifest<? extends UrlTestInput> getManifest() {
+		return manifest_;
+	}
+
+	public ElkReasoner getReasoner() {
+		return reasoner_;
 	}
 
 	@Override
@@ -77,7 +85,7 @@ public abstract class OwlApiReasoningTestDelegate<AO extends TestOutput>
 
 	@Override
 	public void after() {
-		// Empty.
+		reasoner_.dispose();
 	}
 
 }

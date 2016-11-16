@@ -75,7 +75,7 @@ public class OwlApiClassExpressionEquivalentClassesQueryTest extends
 					@Override
 					public EquivalentEntitiesTestOutput<OWLClass> getActualOutput()
 							throws Exception {
-						final Node<OWLClass> equivalent = reasoner_
+						final Node<OWLClass> equivalent = getReasoner()
 								.getEquivalentClasses(
 										manifest.getInput().getClassQuery());
 						return new OwlApiEquivalentEntitiesTestOutput(

@@ -60,20 +60,21 @@ public abstract class ReasoningCorrectnessTestWithInterrupts<I extends TestInput
 	 */
 	@Test
 	public void testWithInterruptions() throws Exception {
-		delegate_.initWithInterrupts();
+		getDelegate().initWithInterrupts();
 		AO actualOutput;
 		while (true) {
 			try {
-				actualOutput = delegate_.getActualOutput();
+				actualOutput = getDelegate().getActualOutput();
 			} catch (final Exception e) {
-				if (delegate_.getInterruptionExceptionClass().isInstance(e)) {
+				if (getDelegate().getInterruptionExceptionClass()
+						.isInstance(e)) {
 					continue;
 				}
 				throw e;
 			}
 			break;
 		}
-		manifest.compare(actualOutput);
+		getManifest().compare(actualOutput);
 	}
 
 }

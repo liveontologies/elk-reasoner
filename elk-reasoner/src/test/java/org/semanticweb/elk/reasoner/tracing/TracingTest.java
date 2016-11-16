@@ -105,7 +105,7 @@ public class TracingTest {
 			tests.accept(testVisitor);
 			tests.accept(testVisitor);
 		} finally {
-			reasoner.shutdown();
+			assertTrue(reasoner.shutdown());
 		}
 	}
 

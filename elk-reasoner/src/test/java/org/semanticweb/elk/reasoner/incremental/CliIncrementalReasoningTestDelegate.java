@@ -21,6 +21,9 @@
  */
 package org.semanticweb.elk.reasoner.incremental;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,14 +51,26 @@ import org.slf4j.Logger;
 public abstract class CliIncrementalReasoningTestDelegate<EO extends TestOutput, AO extends TestOutput>
 		implements IncrementalReasoningTestDelegate<ElkAxiom, EO, AO> {
 
-	protected final TestManifest<? extends UrlTestInput> manifest_;
+	private final TestManifest<? extends UrlTestInput> manifest_;
 
-	protected Reasoner standardReasoner_;
-	protected Reasoner incrementalReasoner_;
+	private Reasoner standardReasoner_;
+	private Reasoner incrementalReasoner_;
 
 	public CliIncrementalReasoningTestDelegate(
 			TestManifest<? extends UrlTestInput> manifest) {
 		this.manifest_ = manifest;
+	}
+
+	public TestManifest<? extends UrlTestInput> getManifest() {
+		return manifest_;
+	}
+
+	public Reasoner getStandardReasoner() {
+		return standardReasoner_;
+	}
+
+	public Reasoner getIncrementalReasoner() {
+		return incrementalReasoner_;
 	}
 
 	@Override
@@ -92,23 +107,21 @@ public abstract class CliIncrementalReasoningTestDelegate<EO extends TestOutput,
 				}
 
 			});
-
-			standardReasoner_ = TestReasonerUtils.createTestReasoner(
-					new TestChangesLoader(allAxioms,
-							IncrementalChangeType.ADD),
-					new PostProcessingStageExecutor());
-			standardReasoner_.setAllowIncrementalMode(false);
-			incrementalReasoner_ = TestReasonerUtils.createTestReasoner(
-					new TestChangesLoader(allAxioms,
-							IncrementalChangeType.ADD),
-					new PostProcessingStageExecutor());
-			incrementalReasoner_.setAllowIncrementalMode(true);
-
-			return changingAxioms;
-
 		} finally {
 			IOUtils.closeQuietly(stream);
 		}
+
+		standardReasoner_ = TestReasonerUtils.createTestReasoner(
+				new TestChangesLoader(allAxioms, IncrementalChangeType.ADD),
+				new PostProcessingStageExecutor());
+		standardReasoner_.setAllowIncrementalMode(false);
+		incrementalReasoner_ = TestReasonerUtils.createTestReasoner(
+				new TestChangesLoader(allAxioms, IncrementalChangeType.ADD),
+				new PostProcessingStageExecutor());
+		incrementalReasoner_.setAllowIncrementalMode(true);
+
+		return changingAxioms;
+
 	}
 
 	@Override
@@ -134,7 +147,12 @@ public abstract class CliIncrementalReasoningTestDelegate<EO extends TestOutput,
 
 	@Override
 	public void after() {
-		// Empty.
+		try {
+			assertTrue(standardReasoner_.shutdown());
+			assertTrue(incrementalReasoner_.shutdown());
+		} catch (InterruptedException e) {
+			fail();
+		}
 	}
 
 }

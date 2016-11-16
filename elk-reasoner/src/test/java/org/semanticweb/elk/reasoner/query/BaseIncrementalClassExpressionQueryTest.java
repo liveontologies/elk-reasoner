@@ -48,10 +48,9 @@ public abstract class BaseIncrementalClassExpressionQueryTest<C, A, O extends Te
 
 			// @formatter:off
 			final String message = "Actual output is not equal to the expected output\n"
-					+ "Input: " + manifest.getInput().getName() + "\n"
-					+ "Seed: " + seed + "\n"
-					+ "Expected:\n" + expectedOutput + "\n"
-					+ "Actual:\n" + actualOutput + "\n";
+					+ "Input: " + getManifest().getInput().getName() + "\n"
+					+ "Seed: " + seed + "\n" + "Expected:\n" + expectedOutput
+					+ "\n" + "Actual:\n" + actualOutput + "\n";
 			// @formatter:on
 
 			Assert.fail(message);

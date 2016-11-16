@@ -22,8 +22,6 @@
  */
 package org.semanticweb.elk.reasoner;
 
-import static org.junit.Assume.assumeTrue;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -56,26 +54,39 @@ import org.semanticweb.elk.testing.TestOutput;
 @RunWith(PolySuite.class)
 public abstract class BaseReasoningCorrectnessTest<I extends TestInput, AO extends TestOutput, TM extends TestManifest<I>, TD extends ReasoningTestDelegate<AO>> {
 
-	protected final TM manifest;
-	protected final TD delegate_;
+	private final TM manifest_;
+	private final TD delegate_;
 
 	public BaseReasoningCorrectnessTest(final TM testManifest,
 			final TD testDelegate) {
-		this.manifest = testManifest;
+		this.manifest_ = testManifest;
 		this.delegate_ = testDelegate;
+	}
+
+	public TM getManifest() {
+		return manifest_;
+	}
+
+	public TD getDelegate() {
+		return delegate_;
 	}
 
 	@Before
 	public void before() throws Exception {
-		assumeTrue(!ignore(manifest.getInput()));
+		org.junit.Assume.assumeFalse(ignore(manifest_.getInput()));
 		delegate_.before();
 	}
 
 	@After
 	public void after() {
+		if (ignore(manifest_.getInput())) {
+			return;
+		}
+		// else
 		delegate_.after();
 	}
 
+	@SuppressWarnings("static-method")
 	protected boolean ignore(TestInput input) {
 		return false;
 	}

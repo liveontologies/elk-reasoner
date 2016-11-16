@@ -21,6 +21,7 @@
  */
 package org.semanticweb.elk.reasoner.incremental;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
@@ -39,9 +40,9 @@ import org.semanticweb.elk.loading.TestAxiomLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
-import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
+import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.testing.PolySuite;
@@ -124,7 +125,7 @@ public abstract class BaseRandomWalkIncrementalCorrectnessTest {
 			throw new ElkRuntimeException("Seed " + seed, e);
 		} finally {
 			stream.close();
-			incrementalReasoner.shutdown();
+			assertTrue(incrementalReasoner.shutdown());
 		}
 	}
 

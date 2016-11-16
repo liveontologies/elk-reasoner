@@ -44,7 +44,7 @@ public class CliIncrementalClassExpressionEquivalentClassesQueryTest extends
 					@Override
 					public EquivalentEntitiesTestOutput<ElkClass> getExpectedOutput()
 							throws Exception {
-						final Node<ElkClass> equivalent = standardReasoner_
+						final Node<ElkClass> equivalent = getStandardReasoner()
 								.getEquivalentClassesQuietly(
 										manifest.getInput().getClassQuery());
 						return new CliEquivalentEntitiesTestOutput(equivalent);
@@ -53,7 +53,7 @@ public class CliIncrementalClassExpressionEquivalentClassesQueryTest extends
 					@Override
 					public EquivalentEntitiesTestOutput<ElkClass> getActualOutput()
 							throws Exception {
-						final Node<ElkClass> equivalent = incrementalReasoner_
+						final Node<ElkClass> equivalent = getIncrementalReasoner()
 								.getEquivalentClassesQuietly(
 										manifest.getInput().getClassQuery());
 						return new CliEquivalentEntitiesTestOutput(equivalent);

@@ -27,7 +27,6 @@ import java.util.Random;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.RandomSeedProvider;
-import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.BaseReasoningCorrectnessTest;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestInput;
@@ -51,63 +50,67 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInpu
 	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(BaseIncrementalReasoningCorrectnessTest.class);
 
-	final static int REPEAT_NUMBER = 5;
-	final static double DELETE_RATIO = 0.2;
+	private final static int REPEAT_NUMBER_ = 5;
+	private final static double DELETE_RATIO_ = 0.2;
 
-	protected OnOffVector<A> changingAxioms = null;
+	private OnOffVector<A> changingAxioms_ = null;
 
 	public BaseIncrementalReasoningCorrectnessTest(
 			final TestManifest<I> testManifest, final TD testDelegate) {
 		super(testManifest, testDelegate);
 	}
 
+	public OnOffVector<A> getChangingAxioms() {
+		return changingAxioms_;
+	}
+
 	/**
 	 * The main test method
 	 * 
-	 * @throws ElkException
+	 * @throws Exception
 	 */
 	@Test
 	public void incrementalReasoning() throws Exception {
-		changingAxioms = new OnOffVector<A>(15);
-		changingAxioms.addAll(delegate_.initIncremental());
-		changingAxioms.setAllOn();
+		changingAxioms_ = new OnOffVector<A>(15);
+		changingAxioms_.addAll(getDelegate().initIncremental());
+		changingAxioms_.setAllOn();
 
 		final long seed = RandomSeedProvider.VALUE;
 		final Random rnd = new Random(seed);
 
 		// initial correctness check
-		correctnessCheck(delegate_.getActualOutput(),
-				delegate_.getExpectedOutput(), seed);
+		correctnessCheck(getDelegate().getActualOutput(),
+				getDelegate().getExpectedOutput(), seed);
 
-		for (int i = 0; i < REPEAT_NUMBER; i++) {
-			changingAxioms.setAllOff();
+		for (int i = 0; i < REPEAT_NUMBER_; i++) {
+			changingAxioms_.setAllOff();
 			// delete some axioms
 
-			randomFlip(changingAxioms, rnd, DELETE_RATIO);
+			randomFlip(changingAxioms_, rnd, DELETE_RATIO_);
 
 			if (LOGGER_.isDebugEnabled()) {
-				for (A del : changingAxioms.getOnElements()) {
-					delegate_.dumpChangeToLog(del, LOGGER_, LogLevel.DEBUG);
+				for (A del : changingAxioms_.getOnElements()) {
+					getDelegate().dumpChangeToLog(del, LOGGER_, LogLevel.DEBUG);
 				}
 			}
 
 			// incremental changes
-			delegate_.applyChanges(changingAxioms.getOnElements(),
+			getDelegate().applyChanges(changingAxioms_.getOnElements(),
 					IncrementalChangeType.DELETE);
 
 			LOGGER_.info("===DELETIONS===");
 
-			correctnessCheck(delegate_.getActualOutput(),
-					delegate_.getExpectedOutput(), seed);
+			correctnessCheck(getDelegate().getActualOutput(),
+					getDelegate().getExpectedOutput(), seed);
 
 			// add the axioms back
-			delegate_.applyChanges(changingAxioms.getOnElements(),
+			getDelegate().applyChanges(changingAxioms_.getOnElements(),
 					IncrementalChangeType.ADD);
 
 			LOGGER_.info("===ADDITIONS===");
 
-			correctnessCheck(delegate_.getActualOutput(),
-					delegate_.getExpectedOutput(), seed);
+			correctnessCheck(getDelegate().getActualOutput(),
+					getDelegate().getExpectedOutput(), seed);
 		}
 	}
 

@@ -52,10 +52,10 @@ public class CliClassExpressionSuperClassesQueryTest extends
 		BaseClassExpressionQueryTest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>> {
 
 	// @formatter:off
-	static final String[] IGNORE_LIST = {
-			"Disjunctions.owl",// Disjuctions not supported
+	static final String[] IGNORE_LIST = { "Disjunctions.owl", // Disjuctions not
+																// supported
 			"OneOf.owl",// Disjuctions not supported
-		};
+	};
 	// @formatter:on
 
 	static {
@@ -76,7 +76,7 @@ public class CliClassExpressionSuperClassesQueryTest extends
 					@Override
 					public RelatedEntitiesTestOutput<ElkClass> getActualOutput()
 							throws Exception {
-						final Set<? extends Node<ElkClass>> subNodes = reasoner_
+						final Set<? extends Node<ElkClass>> subNodes = getReasoner()
 								.getSuperClassesQuietly(
 										manifest.getInput().getClassQuery(),
 										true);

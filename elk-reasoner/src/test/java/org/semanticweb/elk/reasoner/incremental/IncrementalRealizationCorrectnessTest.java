@@ -52,7 +52,7 @@ public class IncrementalRealizationCorrectnessTest
 							throws Exception {
 						LOGGER_.trace(
 								"======= Computing Expected Taxonomy =======");
-						final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = standardReasoner_
+						final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = getStandardReasoner()
 								.getInstanceTaxonomyQuietly();
 						return new InstanceTaxonomyTestOutput<InstanceTaxonomy<ElkClass, ElkNamedIndividual>>(
 								taxonomy);
@@ -63,7 +63,7 @@ public class IncrementalRealizationCorrectnessTest
 							throws Exception {
 						LOGGER_.trace(
 								"======= Computing Incremental Taxonomy =======");
-						final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = incrementalReasoner_
+						final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = getIncrementalReasoner()
 								.getInstanceTaxonomyQuietly();
 						return new InstanceTaxonomyTestOutput<InstanceTaxonomy<ElkClass, ElkNamedIndividual>>(
 								taxonomy);

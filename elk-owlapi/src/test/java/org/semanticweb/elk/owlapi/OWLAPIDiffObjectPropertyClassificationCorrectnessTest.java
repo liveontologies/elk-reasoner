@@ -56,7 +56,7 @@ public class OWLAPIDiffObjectPropertyClassificationCorrectnessTest
 					@Override
 					public TaxonomyTestOutput<?> getActualOutput()
 							throws Exception {
-						final Taxonomy<ElkObjectProperty> taxonomy = reasoner_
+						final Taxonomy<ElkObjectProperty> taxonomy = getReasoner()
 								.getInternalReasoner()
 								.getObjectPropertyTaxonomyQuietly();
 						return new TaxonomyTestOutput<Taxonomy<ElkObjectProperty>>(

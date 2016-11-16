@@ -49,7 +49,7 @@ public class OWLAPIIncrementalClassificationCorrectnessTest
 							throws Exception {
 						LOGGER_.trace(
 								"======= Computing Expected Taxonomy =======");
-						final Taxonomy<ElkClass> taxonomy = standardReasoner_
+						final Taxonomy<ElkClass> taxonomy = getStandardReasoner()
 								.getInternalReasoner().getTaxonomyQuietly();
 						return new TaxonomyTestOutput<Taxonomy<ElkClass>>(
 								taxonomy);
@@ -60,7 +60,7 @@ public class OWLAPIIncrementalClassificationCorrectnessTest
 							throws Exception {
 						LOGGER_.trace(
 								"======= Computing Incremental Taxonomy =======");
-						final Taxonomy<ElkClass> taxonomy = incrementalReasoner_
+						final Taxonomy<ElkClass> taxonomy = getIncrementalReasoner()
 								.getInternalReasoner().getTaxonomyQuietly();
 						return new TaxonomyTestOutput<Taxonomy<ElkClass>>(
 								taxonomy);

@@ -51,15 +51,27 @@ public abstract class OwlApiIncrementalReasoningTestDelegate<EO extends TestOutp
 			Arrays.asList(AxiomType.SUBCLASS_OF, AxiomType.EQUIVALENT_CLASSES,
 					AxiomType.DISJOINT_CLASSES));
 
-	protected final TestManifest<? extends UrlTestInput> manifest_;
+	private final TestManifest<? extends UrlTestInput> manifest_;
 
-	protected OWLOntology testOntology_;
-	protected ElkReasoner standardReasoner_;
-	protected ElkReasoner incrementalReasoner_;
+	private OWLOntology testOntology_;
+	private ElkReasoner standardReasoner_;
+	private ElkReasoner incrementalReasoner_;
 
 	public OwlApiIncrementalReasoningTestDelegate(
 			TestManifest<? extends UrlTestInput> manifest) {
 		this.manifest_ = manifest;
+	}
+	
+	public TestManifest<? extends UrlTestInput> getManifest() {
+		return manifest_;
+	}
+	
+	public ElkReasoner getStandardReasoner() {
+		return standardReasoner_;
+	}
+	
+	public ElkReasoner getIncrementalReasoner() {
+		return incrementalReasoner_;
 	}
 
 	@Override
@@ -128,7 +140,8 @@ public abstract class OwlApiIncrementalReasoningTestDelegate<EO extends TestOutp
 
 	@Override
 	public void after() {
-		// Empty.
+		standardReasoner_.dispose();
+		incrementalReasoner_.dispose();
 	}
 
 }

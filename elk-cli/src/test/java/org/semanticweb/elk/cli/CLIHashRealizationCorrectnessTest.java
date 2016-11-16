@@ -41,8 +41,8 @@ import org.semanticweb.elk.testing.HashTestOutput;
  *         pavel.klinov@uni-ulm.de
  */
 
-public class CLIHashRealizationCorrectnessTest extends
-		HashRealizationCorrectnessTest {
+public class CLIHashRealizationCorrectnessTest
+		extends HashRealizationCorrectnessTest {
 
 	public CLIHashRealizationCorrectnessTest(
 			final ReasoningTestManifest<HashTestOutput, InstanceTaxonomyTestOutput<?>> testManifest) {
@@ -53,7 +53,7 @@ public class CLIHashRealizationCorrectnessTest extends
 					@Override
 					public InstanceTaxonomyTestOutput<?> getActualOutput()
 							throws Exception {
-						final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = reasoner_
+						final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = getReasoner()
 								.getInstanceTaxonomyQuietly();
 						return new InstanceTaxonomyTestOutput<InstanceTaxonomy<ElkClass, ElkNamedIndividual>>(
 								taxonomy);

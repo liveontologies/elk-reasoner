@@ -62,7 +62,7 @@ public class OwlApiIncrementalClassExpressionSatisfiabilityQueryTest extends
 					@Override
 					public SatisfiabilityTestOutput getExpectedOutput()
 							throws Exception {
-						final boolean isSatisfiable = standardReasoner_
+						final boolean isSatisfiable = getStandardReasoner()								
 								.isSatisfiable(
 										manifest.getInput().getClassQuery());
 						return new BaseSatisfiabilityTestOutput(isSatisfiable);
@@ -71,7 +71,7 @@ public class OwlApiIncrementalClassExpressionSatisfiabilityQueryTest extends
 					@Override
 					public SatisfiabilityTestOutput getActualOutput()
 							throws Exception {
-						final boolean isSatisfiable = incrementalReasoner_
+						final boolean isSatisfiable = getIncrementalReasoner()
 								.isSatisfiable(
 										manifest.getInput().getClassQuery());
 						return new BaseSatisfiabilityTestOutput(isSatisfiable);
