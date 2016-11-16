@@ -47,7 +47,7 @@ public class ElkClassInclusionObjectIntersectionOfComposition
 		extends AbstractElkInference {
 
 	private final static String NAME_ = "Intersection Composition";
-	
+
 	private final ElkClassExpression subExpression_;
 
 	private final List<? extends ElkClassExpression> conjuncts_;
@@ -58,7 +58,7 @@ public class ElkClassInclusionObjectIntersectionOfComposition
 		this.subExpression_ = subExpression;
 		this.conjuncts_ = conjuncts;
 	}
-	
+
 	ElkClassInclusionObjectIntersectionOfComposition(
 			ElkClassExpression subExpression, ElkClassExpression firstConjunct,
 			ElkClassExpression secondConjunct) {
@@ -82,7 +82,7 @@ public class ElkClassInclusionObjectIntersectionOfComposition
 	public String getName() {
 		return NAME_;
 	}
-	
+
 	@Override
 	public int getPremiseCount() {
 		return conjuncts_.size();
@@ -117,7 +117,7 @@ public class ElkClassInclusionObjectIntersectionOfComposition
 		ElkClassInclusionObjectIntersectionOfComposition getElkClassInclusionObjectIntersectionOfComposition(
 				ElkClassExpression subExpression,
 				List<? extends ElkClassExpression> conjuncts);
-		
+
 		ElkClassInclusionObjectIntersectionOfComposition getElkClassInclusionObjectIntersectionOfComposition(
 				ElkClassExpression subExpression,
 				ElkClassExpression firstConjunct,

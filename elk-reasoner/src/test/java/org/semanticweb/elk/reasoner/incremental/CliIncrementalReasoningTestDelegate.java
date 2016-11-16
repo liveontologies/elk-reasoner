@@ -21,6 +21,9 @@
  */
 package org.semanticweb.elk.reasoner.incremental;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -51,19 +54,32 @@ import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.slf4j.Logger;
 
 public abstract class CliIncrementalReasoningTestDelegate<EO extends TestOutput, AO extends TestOutput>
-		implements IncrementalReasoningTestWithInterruptsDelegate<ElkAxiom, EO, AO> {
+		implements
+		IncrementalReasoningTestWithInterruptsDelegate<ElkAxiom, EO, AO> {
 
 	public static final double INTERRUPTION_CHANCE = 0.01;
 
-	protected final TestManifest<? extends UrlTestInput> manifest_;
+	private final TestManifest<? extends UrlTestInput> manifest_;
 
-	protected final Collection<ElkAxiom> allAxioms_ = new ArrayList<ElkAxiom>();
-	protected Reasoner standardReasoner_;
-	protected Reasoner incrementalReasoner_;
+	private final Collection<ElkAxiom> allAxioms_ = new ArrayList<ElkAxiom>();
+	private Reasoner standardReasoner_;
+	private Reasoner incrementalReasoner_;
 
 	public CliIncrementalReasoningTestDelegate(
 			TestManifest<? extends UrlTestInput> manifest) {
 		this.manifest_ = manifest;
+	}
+
+	public TestManifest<? extends UrlTestInput> getManifest() {
+		return manifest_;
+	}
+
+	public Reasoner getStandardReasoner() {
+		return standardReasoner_;
+	}
+
+	public Reasoner getIncrementalReasoner() {
+		return incrementalReasoner_;
 	}
 
 	@Override
@@ -136,7 +152,7 @@ public abstract class CliIncrementalReasoningTestDelegate<EO extends TestOutput,
 		incrementalReasoner_.setAllowIncrementalMode(true);
 
 	}
-	
+
 	@Override
 	public void applyChanges(final Iterable<ElkAxiom> changes,
 			final IncrementalChangeType type) {
@@ -165,7 +181,12 @@ public abstract class CliIncrementalReasoningTestDelegate<EO extends TestOutput,
 
 	@Override
 	public void after() {
-		// Empty.
+		try {
+			assertTrue(standardReasoner_.shutdown());
+			assertTrue(incrementalReasoner_.shutdown());
+		} catch (InterruptedException e) {
+			fail();
+		}
 	}
 
 }

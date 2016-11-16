@@ -57,9 +57,9 @@ public class ElkClassInclusionObjectIntersectionOfInclusion
 
 	ElkClassInclusionObjectIntersectionOfInclusion(
 			List<? extends ElkClassExpression> subClasses,
-			List<Integer> subPositions) {
+			List<Integer> superPositions) {
 		this.subClasses_ = subClasses;
-		this.superPositions_ = subPositions;
+		this.superPositions_ = superPositions;
 	}
 
 	public List<? extends ElkClassExpression> getSubClasses() {
@@ -112,7 +112,7 @@ public class ElkClassInclusionObjectIntersectionOfInclusion
 
 		ElkClassInclusionObjectIntersectionOfInclusion getElkClassInclusionObjectIntersectionOfInclusion(
 				List<? extends ElkClassExpression> subClasses,
-				List<Integer> subPositions);
+				List<Integer> superPositions);
 
 	}
 

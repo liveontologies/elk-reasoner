@@ -26,6 +26,7 @@ package org.semanticweb.elk.reasoner.incremental;
  */
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -152,7 +153,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 			}
 
 			
-			standardReasoner.shutdown();
+			assertTrue(standardReasoner.shutdown());
 
 			LOGGER_.trace("Reverting the changes");
 

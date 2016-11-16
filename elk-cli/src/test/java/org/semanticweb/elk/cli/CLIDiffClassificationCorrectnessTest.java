@@ -52,7 +52,7 @@ public class CLIDiffClassificationCorrectnessTest
 
 			@Override
 			public TaxonomyTestOutput<?> getActualOutput() throws Exception {
-				final Taxonomy<ElkClass> taxonomy = reasoner_
+				final Taxonomy<ElkClass> taxonomy = getReasoner()
 						.getTaxonomyQuietly();
 				return new TaxonomyTestOutput<Taxonomy<ElkClass>>(taxonomy);
 			}

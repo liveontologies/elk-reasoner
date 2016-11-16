@@ -34,10 +34,10 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
  * Represents the inference:
  * 
  * <pre>
- *           (1)               (2)
- *  ObjectPropertyRange(R C)  S ⊑ R
+ *   (1)               (2)
+ *  R ⊑ S  ObjectPropertyRange(S C)  
  * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
- *    ObjectPropertyRange(S C)
+ *    ObjectPropertyRange(R C)
  * </pre>
  * 
  * @author Yevgeny Kazakov
@@ -46,13 +46,14 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 public class ElkPropertyRangePropertyExpansion extends AbstractElkInference {
 
 	private final static String NAME_ = "Property Range Expansion";
-	
+
 	private final ElkObjectPropertyExpression subProperty_, superProperty_;
 
 	private final ElkClassExpression range_;
 
-	ElkPropertyRangePropertyExpansion(ElkObjectPropertyExpression superProperty,
-			ElkClassExpression range, ElkObjectPropertyExpression subProperty) {
+	ElkPropertyRangePropertyExpansion(ElkObjectPropertyExpression subProperty,
+			ElkObjectPropertyExpression superProperty,
+			ElkClassExpression range) {
 		this.superProperty_ = superProperty;
 		this.range_ = range;
 		this.subProperty_ = subProperty;
@@ -74,7 +75,7 @@ public class ElkPropertyRangePropertyExpansion extends AbstractElkInference {
 	public String getName() {
 		return NAME_;
 	}
-	
+
 	@Override
 	public int getPremiseCount() {
 		return 2;
@@ -92,19 +93,20 @@ public class ElkPropertyRangePropertyExpansion extends AbstractElkInference {
 		}
 	}
 
-	public ElkObjectPropertyRangeAxiom getFirstPremise(
-			ElkObject.Factory factory) {
-		return factory.getObjectPropertyRangeAxiom(superProperty_, range_);
-	}
-
-	public ElkSubObjectPropertyOfAxiom getSecondPremise(
+	public ElkSubObjectPropertyOfAxiom getFirstPremise(
 			ElkObject.Factory factory) {
 		return factory.getSubObjectPropertyOfAxiom(subProperty_,
 				superProperty_);
 	}
 
+	public ElkObjectPropertyRangeAxiom getSecondPremise(
+			ElkObject.Factory factory) {
+		return factory.getObjectPropertyRangeAxiom(superProperty_, range_);
+	}
+
 	@Override
-	public ElkObjectPropertyRangeAxiom getConclusion(ElkObject.Factory factory) {
+	public ElkObjectPropertyRangeAxiom getConclusion(
+			ElkObject.Factory factory) {
 		return factory.getObjectPropertyRangeAxiom(subProperty_, range_);
 	}
 
@@ -125,10 +127,10 @@ public class ElkPropertyRangePropertyExpansion extends AbstractElkInference {
 	 */
 	public interface Factory {
 
-		ElkPropertyRangePropertyExpansion getElkPropertyRangePropertyUnfolding(
+		ElkPropertyRangePropertyExpansion getElkPropertyRangePropertyExpansion(
+				ElkObjectPropertyExpression subProperty,
 				ElkObjectPropertyExpression superProperty,
-				ElkClassExpression range,
-				ElkObjectPropertyExpression subProperty);
+				ElkClassExpression range);
 
 	}
 

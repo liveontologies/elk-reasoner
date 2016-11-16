@@ -27,7 +27,6 @@ import java.util.Random;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.RandomSeedProvider;
-import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.BaseReasoningCorrectnessTest;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestInput;
@@ -51,10 +50,10 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInpu
 	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(BaseIncrementalReasoningCorrectnessTest.class);
 
-	final static int REPEAT_NUMBER = 5;
-	final static double DELETE_RATIO = 0.2;
+	private final static int REPEAT_NUMBER = 5;
+	private final static double DELETE_RATIO = 0.2;
 
-	protected OnOffVector<A> changingAxioms = null;
+	private OnOffVector<A> changingAxioms_ = null;
 
 	public BaseIncrementalReasoningCorrectnessTest(
 			final TestManifest<I> testManifest, final TD testDelegate) {
@@ -62,22 +61,26 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInpu
 	}
 
 	protected void load() throws Exception {
-		changingAxioms = new OnOffVector<A>(15);
-		changingAxioms.addAll(delegate_.load());
-		changingAxioms.setAllOn();
+		changingAxioms_ = new OnOffVector<A>(15);
+		changingAxioms_.addAll(getDelegate().load());
+		changingAxioms_.setAllOn();
+	}
+
+	public OnOffVector<A> getChangingAxioms() {
+		return changingAxioms_;
 	}
 
 	/**
 	 * The main test method
 	 * 
-	 * @throws ElkException
+	 * @throws Exception
 	 */
 	@Test
 	public void incrementalReasoning() throws Exception {
-		LOGGER_.debug("incrementalReasoning({})", manifest.getName());
+		LOGGER_.debug("incrementalReasoning({})", getManifest().getName());
 		load();
 
-		delegate_.initIncremental();
+		getDelegate().initIncremental();
 
 		run(new OutputChecker());
 	}
@@ -93,20 +96,21 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInpu
 
 				outputChecker.check();
 
-				changingAxioms.setAllOff();
+				changingAxioms_.setAllOff();
 				// delete some axioms
 
-				randomFlip(changingAxioms, rnd, DELETE_RATIO);
+				randomFlip(changingAxioms_, rnd, DELETE_RATIO);
 
 				if (LOGGER_.isDebugEnabled()) {
-					LOGGER_.debug("Round {} of {}", i+1, REPEAT_NUMBER);
-					for (A del : changingAxioms.getOnElements()) {
-						delegate_.dumpChangeToLog(del, LOGGER_, LogLevel.DEBUG);
+					LOGGER_.debug("Round {} of {}", i + 1, REPEAT_NUMBER);
+					for (A del : changingAxioms_.getOnElements()) {
+						getDelegate().dumpChangeToLog(del, LOGGER_,
+								LogLevel.DEBUG);
 					}
 				}
 
 				// incremental changes
-				delegate_.applyChanges(changingAxioms.getOnElements(),
+				getDelegate().applyChanges(changingAxioms_.getOnElements(),
 						IncrementalChangeType.DELETE);
 
 				LOGGER_.info("===DELETIONS===");
@@ -114,7 +118,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInpu
 				outputChecker.check();
 
 				// add the axioms back
-				delegate_.applyChanges(changingAxioms.getOnElements(),
+				getDelegate().applyChanges(getChangingAxioms().getOnElements(),
 						IncrementalChangeType.ADD);
 
 				LOGGER_.info("===ADDITIONS===");
@@ -131,8 +135,8 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInpu
 	protected class OutputChecker {
 
 		public void check() throws Exception {
-			correctnessCheck(delegate_.getActualOutput(),
-					delegate_.getExpectedOutput());
+			correctnessCheck(getDelegate().getActualOutput(),
+					getDelegate().getExpectedOutput());
 		}
 
 		public void finalCheck() throws Exception {

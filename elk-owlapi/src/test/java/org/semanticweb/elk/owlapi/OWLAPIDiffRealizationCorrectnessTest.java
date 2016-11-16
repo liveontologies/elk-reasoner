@@ -62,7 +62,7 @@ public class OWLAPIDiffRealizationCorrectnessTest extends
 					@Override
 					public InstanceTaxonomyTestOutput<?> getActualOutput()
 							throws Exception {
-						final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = reasoner_
+						final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = getReasoner()
 								.getInternalReasoner()
 								.getInstanceTaxonomyQuietly();
 						return new InstanceTaxonomyTestOutput<InstanceTaxonomy<ElkClass, ElkNamedIndividual>>(

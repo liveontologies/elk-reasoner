@@ -64,7 +64,7 @@ public class OwlApiIncrementalClassExpressionInstancesQueryTest extends
 					@Override
 					public RelatedEntitiesTestOutput<OWLNamedIndividual> getExpectedOutput()
 							throws Exception {
-						final NodeSet<OWLNamedIndividual> subNodes = standardReasoner_
+						final NodeSet<OWLNamedIndividual> subNodes = getStandardReasoner()
 								.getInstances(
 										manifest.getInput().getClassQuery(),
 										true);
@@ -75,7 +75,7 @@ public class OwlApiIncrementalClassExpressionInstancesQueryTest extends
 					@Override
 					public RelatedEntitiesTestOutput<OWLNamedIndividual> getActualOutput()
 							throws Exception {
-						final NodeSet<OWLNamedIndividual> subNodes = incrementalReasoner_
+						final NodeSet<OWLNamedIndividual> subNodes = getIncrementalReasoner()
 								.getInstances(
 										manifest.getInput().getClassQuery(),
 										true);

@@ -42,10 +42,10 @@ public abstract class IncrementalReasoningCorrectnessTestWithInterrupts<I extend
 	@Test
 	public void incrementalReasoningWithInterrupts() throws Exception {
 		LOGGER_.debug("incrementalReasoningWithInterrupts({})",
-				manifest.getName());
+				getManifest().getName());
 		load();
 
-		delegate_.initWithInterrupts();
+		getDelegate().initWithInterrupts();
 
 		run(new CheckerWithInterrupts());
 	}
@@ -62,9 +62,9 @@ public abstract class IncrementalReasoningCorrectnessTestWithInterrupts<I extend
 			AO actualOutput;
 			while (true) {
 				try {
-					actualOutput = delegate_.getActualOutput();
+					actualOutput = getDelegate().getActualOutput();
 				} catch (final Exception e) {
-					if (delegate_.getInterruptionExceptionClass()
+					if (getDelegate().getInterruptionExceptionClass()
 							.isInstance(e)) {
 						continue;
 					}
@@ -72,7 +72,7 @@ public abstract class IncrementalReasoningCorrectnessTestWithInterrupts<I extend
 				}
 				break;
 			}
-			correctnessCheck(actualOutput, delegate_.getExpectedOutput());
+			correctnessCheck(actualOutput, getDelegate().getExpectedOutput());
 		}
 
 	}

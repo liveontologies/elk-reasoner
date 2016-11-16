@@ -58,7 +58,7 @@ public class CliClassExpressionInstancesQueryTest extends
 					@Override
 					public RelatedEntitiesTestOutput<ElkNamedIndividual> getActualOutput()
 							throws Exception {
-						final Set<? extends Node<ElkNamedIndividual>> subNodes = reasoner_
+						final Set<? extends Node<ElkNamedIndividual>> subNodes = getReasoner()
 								.getInstancesQuietly(
 										manifest.getInput().getClassQuery(),
 										true);

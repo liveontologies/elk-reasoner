@@ -1,5 +1,12 @@
 package org.semanticweb.elk.owl.inferences;
 
+import java.util.AbstractList;
+import java.util.List;
+
+import org.semanticweb.elk.owl.implementation.ElkObjectBaseFactory;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -24,6 +31,8 @@ package org.semanticweb.elk.owl.inferences;
 
 public abstract class AbstractElkInference implements ElkInference {
 
+	private final static ElkObject.Factory ELK_FACTORY_ = new ElkObjectBaseFactory();
+
 	/**
 	 * hash code, computed on demand
 	 */
@@ -37,6 +46,28 @@ public abstract class AbstractElkInference implements ElkInference {
 		if (index < 0 || index >= getPremiseCount()) {
 			failGetPremise(index);
 		}
+	}
+
+	@Override
+	public ElkAxiom getConclusion() {
+		return getConclusion(ELK_FACTORY_);
+	}
+
+	@Override
+	public List<? extends ElkAxiom> getPremises() {
+		return new AbstractList<ElkAxiom>() {
+
+			@Override
+			public ElkAxiom get(int index) {
+				return getPremise(index, ELK_FACTORY_);
+			}
+
+			@Override
+			public int size() {
+				return getPremiseCount();
+			}
+
+		};
 	}
 
 	@Override

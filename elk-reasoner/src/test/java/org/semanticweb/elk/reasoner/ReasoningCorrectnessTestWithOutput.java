@@ -58,9 +58,9 @@ public abstract class ReasoningCorrectnessTestWithOutput<I extends TestInput, EO
 	 */
 	@Test
 	public void test() throws Exception {
-		delegate_.initWithOutput();
-		final AO actualOutput = delegate_.getActualOutput();
-		manifest.compare(actualOutput);
+		getDelegate().initWithOutput();
+		final AO actualOutput = getDelegate().getActualOutput();
+		getManifest().compare(actualOutput);
 	}
 
 }

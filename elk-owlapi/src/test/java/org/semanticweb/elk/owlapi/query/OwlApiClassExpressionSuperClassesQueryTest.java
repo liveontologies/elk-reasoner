@@ -77,7 +77,7 @@ public class OwlApiClassExpressionSuperClassesQueryTest extends
 					@Override
 					public RelatedEntitiesTestOutput<OWLClass> getActualOutput()
 							throws Exception {
-						final NodeSet<OWLClass> superNodes = reasoner_
+						final NodeSet<OWLClass> superNodes = getReasoner()
 								.getSuperClasses(
 										manifest.getInput().getClassQuery(),
 										true);

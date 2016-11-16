@@ -21,6 +21,9 @@
  */
 package org.semanticweb.elk.cli;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Random;
 
 import org.semanticweb.elk.RandomSeedProvider;
@@ -39,13 +42,21 @@ public abstract class CliReasoningTestDelegate<AO extends TestOutput>
 
 	public static final double INTERRUPTION_CHANCE = 0.3;
 
-	protected final TestManifest<? extends UrlTestInput> manifest_;
+	private final TestManifest<? extends UrlTestInput> manifest_;
 
-	protected Reasoner reasoner_;
+	private Reasoner reasoner_;
 
 	public CliReasoningTestDelegate(
 			final TestManifest<? extends UrlTestInput> manifest) {
 		this.manifest_ = manifest;
+	}
+
+	public TestManifest<? extends UrlTestInput> getManifest() {
+		return manifest_;
+	}
+
+	public Reasoner getReasoner() {
+		return reasoner_;
 	}
 
 	@Override
@@ -76,7 +87,11 @@ public abstract class CliReasoningTestDelegate<AO extends TestOutput>
 
 	@Override
 	public void after() {
-		// Empty.
+		try {
+			assertTrue(reasoner_.shutdown());
+		} catch (InterruptedException e) {
+			fail();
+		}
 	}
 
 }

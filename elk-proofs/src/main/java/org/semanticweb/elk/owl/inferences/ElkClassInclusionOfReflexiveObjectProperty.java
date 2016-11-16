@@ -44,7 +44,7 @@ public class ElkClassInclusionOfReflexiveObjectProperty
 		extends AbstractElkInference {
 
 	private final static String NAME_ = "Reflexive Property Transaltion";
-	
+
 	private final ElkObjectPropertyExpression property_;
 
 	ElkClassInclusionOfReflexiveObjectProperty(
@@ -60,7 +60,7 @@ public class ElkClassInclusionOfReflexiveObjectProperty
 	public String getName() {
 		return NAME_;
 	}
-	
+
 	@Override
 	public int getPremiseCount() {
 		return 1;

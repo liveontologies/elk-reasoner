@@ -178,10 +178,10 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 	@Override
 	public ElkClassInclusionObjectIntersectionOfInclusion getElkClassInclusionObjectIntersectionOfInclusion(
 			List<? extends ElkClassExpression> subClasses,
-			List<Integer> subPositions) {
+			List<Integer> superPositions) {
 		return filter(
 				mainFactory_.getElkClassInclusionObjectIntersectionOfInclusion(
-						subClasses, subPositions));
+						subClasses, superPositions));
 	}
 
 	@Override
@@ -400,11 +400,11 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 	}
 
 	@Override
-	public ElkPropertyRangePropertyExpansion getElkPropertyRangePropertyUnfolding(
-			ElkObjectPropertyExpression superProperty, ElkClassExpression range,
-			ElkObjectPropertyExpression subProperty) {
-		return filter(mainFactory_.getElkPropertyRangePropertyUnfolding(
-				superProperty, range, subProperty));
+	public ElkPropertyRangePropertyExpansion getElkPropertyRangePropertyExpansion(
+			ElkObjectPropertyExpression subProperty, ElkObjectPropertyExpression superProperty,
+			ElkClassExpression range) {
+		return filter(mainFactory_.getElkPropertyRangePropertyExpansion(
+				subProperty, superProperty, range));
 	}
 
 	@Override

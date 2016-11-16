@@ -56,7 +56,7 @@ public class CliClassExpressionEquivalentClassesQueryTest extends
 					@Override
 					public EquivalentEntitiesTestOutput<ElkClass> getActualOutput()
 							throws Exception {
-						final Node<ElkClass> equivalent = reasoner_
+						final Node<ElkClass> equivalent = getReasoner()
 								.getEquivalentClassesQuietly(
 										manifest.getInput().getClassQuery());
 						return new CliEquivalentEntitiesTestOutput(equivalent);

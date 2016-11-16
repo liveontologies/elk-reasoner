@@ -43,7 +43,7 @@ public class ElkClassInclusionExistentialOwlNothing
 	private final static String NAME_ = "Existential of Bottom";
 
 	private final ElkObjectPropertyExpression property_;
-	
+
 	ElkClassInclusionExistentialOwlNothing(
 			ElkObjectPropertyExpression property) {
 		this.property_ = property;
@@ -52,7 +52,7 @@ public class ElkClassInclusionExistentialOwlNothing
 	public ElkObjectPropertyExpression getProperty() {
 		return property_;
 	}
-	
+
 	@Override
 	public String getName() {
 		return NAME_;

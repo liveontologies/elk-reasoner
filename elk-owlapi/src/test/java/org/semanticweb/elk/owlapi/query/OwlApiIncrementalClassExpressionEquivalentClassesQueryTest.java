@@ -64,7 +64,7 @@ public class OwlApiIncrementalClassExpressionEquivalentClassesQueryTest extends
 					@Override
 					public EquivalentEntitiesTestOutput<OWLClass> getExpectedOutput()
 							throws Exception {
-						final Node<OWLClass> equivalent = standardReasoner_
+						final Node<OWLClass> equivalent = getStandardReasoner()
 								.getEquivalentClasses(
 										manifest.getInput().getClassQuery());
 						return new OwlApiEquivalentEntitiesTestOutput(
@@ -74,7 +74,7 @@ public class OwlApiIncrementalClassExpressionEquivalentClassesQueryTest extends
 					@Override
 					public EquivalentEntitiesTestOutput<OWLClass> getActualOutput()
 							throws Exception {
-						final Node<OWLClass> equivalent = incrementalReasoner_
+						final Node<OWLClass> equivalent = getIncrementalReasoner()
 								.getEquivalentClasses(
 										manifest.getInput().getClassQuery());
 						return new OwlApiEquivalentEntitiesTestOutput(

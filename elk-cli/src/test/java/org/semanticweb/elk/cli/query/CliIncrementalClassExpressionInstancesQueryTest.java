@@ -47,7 +47,7 @@ public class CliIncrementalClassExpressionInstancesQueryTest extends
 					@Override
 					public RelatedEntitiesTestOutput<ElkNamedIndividual> getExpectedOutput()
 							throws Exception {
-						final Set<? extends Node<ElkNamedIndividual>> subNodes = standardReasoner_
+						final Set<? extends Node<ElkNamedIndividual>> subNodes = getStandardReasoner()
 								.getInstancesQuietly(
 										manifest.getInput().getClassQuery(),
 										true);
@@ -58,7 +58,7 @@ public class CliIncrementalClassExpressionInstancesQueryTest extends
 					@Override
 					public RelatedEntitiesTestOutput<ElkNamedIndividual> getActualOutput()
 							throws Exception {
-						final Set<? extends Node<ElkNamedIndividual>> subNodes = incrementalReasoner_
+						final Set<? extends Node<ElkNamedIndividual>> subNodes = getIncrementalReasoner()
 								.getInstancesQuietly(
 										manifest.getInput().getClassQuery(),
 										true);

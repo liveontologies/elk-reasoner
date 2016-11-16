@@ -37,8 +37,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  * @author Yevgeny Kazakov
  *
  */
-public class ElkClassInclusionNegationClash
-		extends AbstractElkInference {
+public class ElkClassInclusionNegationClash extends AbstractElkInference {
 
 	private final static String NAME_ = "Negation Clash";
 

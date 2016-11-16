@@ -45,7 +45,7 @@ public class ElkClassInclusionExistentialOfObjectHasSelf
 		extends AbstractElkInference {
 
 	private final static String NAME_ = "Reflexive Existential";
-	
+
 	private final ElkClassExpression subClass_;
 
 	private final ElkObjectPropertyExpression property_;
@@ -68,7 +68,7 @@ public class ElkClassInclusionExistentialOfObjectHasSelf
 	public String getName() {
 		return NAME_;
 	}
-	
+
 	@Override
 	public int getPremiseCount() {
 		return 1;

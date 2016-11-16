@@ -43,7 +43,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 public class ElkClassInclusionTautology extends AbstractElkInference {
 
 	private final static String NAME_ = "Class Inclusion Tautology";
-	
+
 	private final ElkClassExpression expression_;
 
 	ElkClassInclusionTautology(ElkClassExpression expression) {
@@ -53,7 +53,7 @@ public class ElkClassInclusionTautology extends AbstractElkInference {
 	public ElkClassExpression getExpression() {
 		return expression_;
 	}
-	
+
 	@Override
 	public String getName() {
 		return NAME_;

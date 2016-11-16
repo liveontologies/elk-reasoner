@@ -74,7 +74,7 @@ public class OwlApiClassExpressionSatisfiabilityQueryTest extends
 					@Override
 					public SatisfiabilityTestOutput getActualOutput()
 							throws Exception {
-						final boolean isSatisfiable = reasoner_.isSatisfiable(
+						final boolean isSatisfiable = getReasoner().isSatisfiable(
 								manifest.getInput().getClassQuery());
 						return new BaseSatisfiabilityTestOutput(isSatisfiable);
 					}

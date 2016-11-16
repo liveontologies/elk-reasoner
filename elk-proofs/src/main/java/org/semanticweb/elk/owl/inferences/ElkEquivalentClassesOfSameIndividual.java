@@ -52,8 +52,7 @@ public class ElkEquivalentClassesOfSameIndividual extends AbstractElkInference {
 
 	private final List<? extends ElkIndividual> same_;
 
-	ElkEquivalentClassesOfSameIndividual(
-			List<? extends ElkIndividual> same) {
+	ElkEquivalentClassesOfSameIndividual(List<? extends ElkIndividual> same) {
 		this.same_ = same;
 	}
 

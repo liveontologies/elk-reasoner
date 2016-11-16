@@ -27,10 +27,13 @@ import java.util.List;
 
 import org.liveontologies.owlapi.proof.OWLProofNode;
 import org.liveontologies.owlapi.proof.OWLProofStep;
+import org.liveontologies.owlapi.proof.util.Inference;
 import org.semanticweb.elk.owl.inferences.ElkInference;
+import org.semanticweb.elk.owl.inferences.ElkInferenceExamples;
 import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.owlapi.model.OWLAxiom;
 
 public class ElkOWLProofStep implements OWLProofStep {
 
@@ -66,6 +69,12 @@ public class ElkOWLProofStep implements OWLProofStep {
 			result.add(convert(elkInference_.getPremise(i, elkFactory_)));
 		}
 		return result;
+	}
+
+	@Override
+	public Inference<OWLAxiom> getExample() {
+		return new ElkOwlInference(
+				ElkInferenceExamples.getExample(elkInference_));
 	}
 
 	@Override
