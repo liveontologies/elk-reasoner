@@ -90,7 +90,8 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 	private final List<IndexedObjectCache.ChangeListener> listeners_;
 
 	public ModifiableIndexedObjectCacheImpl(
-			final PredefinedElkEntityFactory elkFactory, int initialSize) {
+			final PredefinedElkEntityFactory elkFactory, int initialSize,
+			final Collection<? extends IndexedObjectCache.ChangeListener> listeners) {
 		this.cachedComplexClassExpressions_ = new EntryCollection<CachedIndexedComplexClassExpression<?>>(
 				initialSize);
 		this.cachedBinaryPropertyChains_ = new EntryCollection<CachedIndexedComplexPropertyChain>(
@@ -115,7 +116,8 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 				elkFactory.getOwlTopObjectProperty());
 		this.owlBottomObjectProperty_ = new CachedIndexedObjectPropertyImpl(
 				elkFactory.getOwlBottomObjectProperty());
-		this.listeners_ = new ArrayList<IndexedObjectCache.ChangeListener>();
+		this.listeners_ = new ArrayList<IndexedObjectCache.ChangeListener>(
+				listeners);
 		add(owlThing_);
 		add(owlNothing_);
 		add(owlTopObjectProperty_);
@@ -123,8 +125,9 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 	}
 
 	public ModifiableIndexedObjectCacheImpl(
-			final PredefinedElkEntityFactory elkFactory) {
-		this(elkFactory, 1024);
+			final PredefinedElkEntityFactory elkFactory,
+			final Collection<? extends IndexedObjectCache.ChangeListener> listeners) {
+		this(elkFactory, 1024, listeners);
 	}
 
 	@Override

@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -198,17 +199,21 @@ public abstract class AbstractReasonerState {
 	private final ElkSubObjectPropertyExpressionVisitor<ModifiableIndexedPropertyChain> subPropertyConverter_;
 
 	protected AbstractReasonerState(ElkObject.Factory elkFactory) {
+		final ClassTaxonomyState.Builder classTaxonomyStateBuilder = new ClassTaxonomyState.Builder();
+		final InstanceTaxonomyState.Builder instanceTaxonomyStateBuilder = new InstanceTaxonomyState.Builder();
 		this.elkFactory_ = elkFactory;
-		this.ontologyIndex = new DifferentialIndex(elkFactory);
+		this.ontologyIndex = new DifferentialIndex(elkFactory,
+				Arrays.asList(classTaxonomyStateBuilder.getOntologyListener(),
+						instanceTaxonomyStateBuilder.getOntologyListener()));
 		this.propertyHierarchyCompositionState_ = new PropertyHierarchyCompositionState();
 		this.saturationState = SaturationStateFactory
 				.createSaturationState(ontologyIndex);
 		this.consistencyCheckingState = ConsistencyCheckingState
 				.create(saturationState, propertyHierarchyCompositionState_);
-		this.classTaxonomyState = new ClassTaxonomyState(saturationState,
-				ontologyIndex, elkFactory);
-		this.instanceTaxonomyState = new InstanceTaxonomyState(saturationState,
-				ontologyIndex, elkFactory);
+		this.classTaxonomyState = classTaxonomyStateBuilder
+				.build(saturationState, ontologyIndex, elkFactory);
+		this.instanceTaxonomyState = instanceTaxonomyStateBuilder
+				.build(saturationState, ontologyIndex, elkFactory);
 		this.objectPropertyTaxonomyState = new ObjectPropertyTaxonomyState(
 				elkFactory);
 		this.ruleAndConclusionStats = new SaturationStatistics();
