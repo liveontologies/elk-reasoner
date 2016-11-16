@@ -57,7 +57,7 @@ public class ConcurrentComputation<F extends ProcessorFactory<?>> implements
 	 * {@code true} the workers should stop either as soon as possible (if the
 	 * computation has been terminated) or after {@link #finish()} is called
 	 */
-	protected boolean termination;
+	protected volatile boolean termination;
 	/**
 	 * the worker instance used to process the jobs
 	 */

@@ -45,10 +45,11 @@ public class ConcurrentComputationWithInputsTest {
 
 	private ConcurrentComputationWithInputs<Integer, ?> computation_;
 
+	private final ComputationExecutor executor = new ComputationExecutor(
+			ROUNDS_, "test-worker", 1, TimeUnit.SECONDS);
+
 	void setup(int round, final InterruptMonitor interrupter) {
-		int workers = round + 1;
-		ComputationExecutor executor = new ComputationExecutor(workers,
-				"test-worker", 1, TimeUnit.SECONDS);
+		int workers = random.nextInt(round + 1) + 1;
 		factory_ = new TestInputProcessorFactory(interrupter, MAX_INPUT,
 				workers);
 		computation_ = new ConcurrentComputationWithInputs<Integer, TestInputProcessorFactory>(
