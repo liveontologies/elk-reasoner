@@ -21,7 +21,6 @@
  */
 package org.semanticweb.elk.reasoner.incremental;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
@@ -41,18 +40,17 @@ public abstract class IncrementalReasoningCorrectnessTestWithInterrupts<I extend
 	}
 
 	@Test
-	public void completingIncrementalReasoningWithInterrupts()
-			throws Exception {
-		LOGGER_.debug("completingIncrementalReasoningWithInterrupts({})",
+	public void incrementalReasoningWithInterrupts() throws Exception {
+		LOGGER_.debug("incrementalReasoningWithInterrupts({})",
 				manifest.getName());
 		load();
 
 		delegate_.initWithInterrupts();
 
-		run(new CompletingCheckerWithInterrupts());
+		run(new CheckerWithInterrupts());
 	}
 
-	protected class CompletingCheckerWithInterrupts extends OutputChecker {
+	protected class CheckerWithInterrupts extends OutputChecker {
 
 		@Override
 		public void check() throws Exception {
@@ -73,37 +71,6 @@ public abstract class IncrementalReasoningCorrectnessTestWithInterrupts<I extend
 					throw e;
 				}
 				break;
-			}
-			correctnessCheck(actualOutput, delegate_.getExpectedOutput());
-		}
-
-	}
-
-	@Test
-	@Ignore
-	public void incrementalReasoningWithInterrupts() throws Exception {
-		LOGGER_.debug("incrementalReasoningWithInterrupts({})",
-				manifest.getName());
-		load();
-
-		delegate_.initWithInterrupts();
-
-		run(new NoncompletingCheckerWithInterrupts());
-	}
-
-	protected class NoncompletingCheckerWithInterrupts
-			extends CompletingCheckerWithInterrupts {
-
-		@Override
-		public void check() throws Exception {
-			AO actualOutput;
-			try {
-				actualOutput = delegate_.getActualOutput();
-			} catch (final Exception e) {
-				if (delegate_.getInterruptionExceptionClass().isInstance(e)) {
-					return;
-				}
-				throw e;
 			}
 			correctnessCheck(actualOutput, delegate_.getExpectedOutput());
 		}
