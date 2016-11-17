@@ -368,9 +368,14 @@ public abstract class AbstractReasonerState {
 	protected synchronized void ensureLoading() throws ElkException {
 
 		if (!isLoadingFinished()) {
-			if (isIncrementalMode()
-					&& !stageManager.incrementalAdditionStage.isCompleted()) {
-				complete(stageManager.incrementalAdditionStage);
+			if (isIncrementalMode()) {
+				if (!stageManager.incrementalAdditionStage.isCompleted()) {
+					complete(stageManager.incrementalAdditionStage);
+				}
+			} else {
+				if (!stageManager.contextInitializationStage.isCompleted()) {
+					complete(stageManager.contextInitializationStage);
+				}
 			}
 			LOGGER_.trace("Reset axiom loading");
 			stageManager.inputLoadingStage.invalidateRecursive();

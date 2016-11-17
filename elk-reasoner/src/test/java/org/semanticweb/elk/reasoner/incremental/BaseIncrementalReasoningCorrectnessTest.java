@@ -80,15 +80,15 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInpu
 		LOGGER_.debug("incrementalReasoning({})", getManifest().getName());
 		load();
 
+		final Random random = new Random(RandomSeedProvider.VALUE);
+
 		getDelegate().initIncremental();
 
-		run(new OutputChecker());
+		run(random, new OutputChecker());
 	}
 
-	public void run(final OutputChecker outputChecker) throws Exception {
-
-		final long seed = RandomSeedProvider.VALUE;
-		final Random rnd = new Random(seed);
+	public void run(final Random random, final OutputChecker outputChecker)
+			throws Exception {
 
 		try {
 
@@ -99,7 +99,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInpu
 				changingAxioms_.setAllOff();
 				// delete some axioms
 
-				randomFlip(changingAxioms_, rnd, DELETE_RATIO);
+				randomFlip(changingAxioms_, random, DELETE_RATIO);
 
 				if (LOGGER_.isDebugEnabled()) {
 					LOGGER_.debug("Round {} of {}", i + 1, REPEAT_NUMBER);
@@ -127,7 +127,8 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInpu
 			outputChecker.finalCheck();
 
 		} catch (final Throwable e) {
-			throw new RuntimeException("Random seed: " + seed, e);
+			throw new RuntimeException(
+					"Random seed: " + RandomSeedProvider.VALUE, e);
 		}
 
 	}

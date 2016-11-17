@@ -50,7 +50,7 @@ import org.slf4j.Logger;
 public abstract class OwlApiIncrementalReasoningTestDelegate<EO extends TestOutput, AO extends TestOutput>
 		implements IncrementalReasoningTestWithInterruptsDelegate<OWLAxiom, EO, AO> {
 
-	public static final double INTERRUPTION_CHANCE = 0.01;
+	public static final double INTERRUPTION_CHANCE = 0.1;
 
 	@SuppressWarnings("unchecked")
 	private static final Set<AxiomType<?>> DYNAMIC_AXIOM_TYPES = new HashSet<AxiomType<?>>(
