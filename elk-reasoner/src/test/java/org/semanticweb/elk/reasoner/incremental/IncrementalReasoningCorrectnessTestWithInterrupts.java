@@ -21,7 +21,10 @@
  */
 package org.semanticweb.elk.reasoner.incremental;
 
+import java.util.Random;
+
 import org.junit.Test;
+import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestOutput;
@@ -34,6 +37,8 @@ public abstract class IncrementalReasoningCorrectnessTestWithInterrupts<I extend
 	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IncrementalReasoningCorrectnessTestWithInterrupts.class);
 
+	private final static double COMPLETE_CHECK_CHANCE = 0.25;
+
 	public IncrementalReasoningCorrectnessTestWithInterrupts(
 			final TestManifest<I> testManifest, final TD testDelegate) {
 		super(testManifest, testDelegate);
@@ -45,20 +50,45 @@ public abstract class IncrementalReasoningCorrectnessTestWithInterrupts<I extend
 				getManifest().getName());
 		load();
 
+		final Random random = new Random(RandomSeedProvider.VALUE);
+
 		getDelegate().initWithInterrupts();
 
-		run(new CheckerWithInterrupts());
+		run(random, new CheckerWithInterrupts(random));
 	}
 
 	protected class CheckerWithInterrupts extends OutputChecker {
 
+		private final Random random_;
+
+		public CheckerWithInterrupts(final Random random) {
+			this.random_ = random;
+		}
+
 		@Override
 		public void check() throws Exception {
-			finalCheck();
+			if (random_.nextDouble() < COMPLETE_CHECK_CHANCE) {
+				finalCheck();
+				return;
+			}
+			// else
+			LOGGER_.debug("partial check");
+			AO actualOutput;
+			try {
+				actualOutput = getDelegate().getActualOutput();
+			} catch (final Exception e) {
+				if (getDelegate().getInterruptionExceptionClass()
+						.isInstance(e)) {
+					return;
+				}
+				throw e;
+			}
+			correctnessCheck(actualOutput, getDelegate().getExpectedOutput());
 		}
 
 		@Override
 		public void finalCheck() throws Exception {
+			LOGGER_.debug("complete check");
 			AO actualOutput;
 			while (true) {
 				try {

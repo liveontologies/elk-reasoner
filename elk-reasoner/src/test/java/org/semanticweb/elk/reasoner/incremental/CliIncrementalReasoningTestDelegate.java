@@ -57,7 +57,7 @@ public abstract class CliIncrementalReasoningTestDelegate<EO extends TestOutput,
 		implements
 		IncrementalReasoningTestWithInterruptsDelegate<ElkAxiom, EO, AO> {
 
-	public static final double INTERRUPTION_CHANCE = 0.01;
+	public static final double INTERRUPTION_CHANCE = 0.1;
 
 	private final TestManifest<? extends UrlTestInput> manifest_;
 
