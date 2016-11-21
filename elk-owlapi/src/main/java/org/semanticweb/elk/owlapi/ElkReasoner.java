@@ -1079,7 +1079,7 @@ public class ElkReasoner implements OWLReasoner {
 			if (isBufferingMode_ && loadBeforeChanges_) {
 				try {
 					LOGGER_.trace("force initial loading");
-					reasoner_.forceLoading();
+					reasoner_.ensureLoading();
 					loadBeforeChanges_ = false;
 				} catch (ElkException e) {
 					throw elkConverter_.convert(e);

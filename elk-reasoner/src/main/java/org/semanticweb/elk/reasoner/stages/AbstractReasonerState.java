@@ -342,16 +342,6 @@ public abstract class AbstractReasonerState {
 	}
 
 	/**
-	 * Forces loading of all axioms from the registered {@link AxiomLoader}s.
-	 * Typically, loading lazily when reasoning tasks are requested.
-	 * 
-	 * @throws ElkException
-	 */
-	public synchronized void forceLoading() throws ElkException {
-		complete(stageManager.inputLoadingStage);
-	}
-
-	/**
 	 * @return {@code true} if there is no input pending loading, {@code false}
 	 *         otherwise.
 	 */
@@ -365,7 +355,7 @@ public abstract class AbstractReasonerState {
 	 * 
 	 * @throws ElkException
 	 */
-	protected synchronized void ensureLoading() throws ElkException {
+	public synchronized void ensureLoading() throws ElkException {
 
 		if (!isLoadingFinished()) {
 			if (isIncrementalMode()) {
@@ -379,6 +369,9 @@ public abstract class AbstractReasonerState {
 			}
 			LOGGER_.trace("Reset axiom loading");
 			stageManager.inputLoadingStage.invalidateRecursive();
+			// Invalidate stages at the beginnings of the dependency chains.
+			stageManager.contextInitializationStage.invalidateRecursive();
+			stageManager.incrementalCompletionStage.invalidateRecursive();
 			complete(stageManager.inputLoadingStage);
 		}
 

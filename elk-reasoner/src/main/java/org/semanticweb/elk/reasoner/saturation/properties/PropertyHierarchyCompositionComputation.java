@@ -21,6 +21,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation.properties;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.semanticweb.elk.reasoner.ProgressMonitor;
@@ -50,7 +51,8 @@ public class PropertyHierarchyCompositionComputation
 			final PropertyHierarchyCompositionState.Dispatcher dispatcher,
 			ConcurrentExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor) {
-		this(ontIndex.getPropertyChains(),
+		// TODO: temporary solution against concurrent modification exception
+		this(new ArrayList<IndexedPropertyChain>(ontIndex.getPropertyChains()),
 				new PropertyHierarchyCompositionComputationFactory(interrupter,
 						inferenceProducer, dispatcher),
 				executor, maxWorkers, progressMonitor);

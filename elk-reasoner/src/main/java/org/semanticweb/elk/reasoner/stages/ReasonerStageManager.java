@@ -64,11 +64,11 @@ public class ReasonerStageManager {
 						propertyHierarchyCompositionComputationStage);
 
 		this.contextInitializationStage = new ContextAssignmentResetStage(
-				reasoner, inputLoadingStage,
-				propertyHierarchyCompositionComputationStage);
+				reasoner);
 
 		this.consistencyCheckingStage = new ConsistencyCheckingStage(reasoner,
-				inputLoadingStage, contextInitializationStage);
+				contextInitializationStage,
+				propertyHierarchyCompositionComputationStage);
 
 		this.classSaturationStage = new ClassSaturationStage(reasoner,
 				consistencyCheckingStage);
@@ -82,8 +82,7 @@ public class ReasonerStageManager {
 		/* Incremental stages */
 
 		this.incrementalCompletionStage = new IncrementalCompletionStage(
-				reasoner, inputLoadingStage,
-				propertyHierarchyCompositionComputationStage);
+				reasoner, propertyHierarchyCompositionComputationStage);
 
 		this.incrementalDeletionInitializationStage = new IncrementalDeletionInitializationStage(
 				reasoner, incrementalCompletionStage);
