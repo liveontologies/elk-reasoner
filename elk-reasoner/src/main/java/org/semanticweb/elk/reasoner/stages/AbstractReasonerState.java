@@ -84,7 +84,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 import org.semanticweb.elk.reasoner.tracing.TraceState;
 import org.semanticweb.elk.reasoner.tracing.TracingInferenceSet;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
-import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.concurrent.computation.ConcurrentExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -403,10 +403,10 @@ public abstract class AbstractReasonerState {
 	protected abstract ReasonerInterrupter getInterrupter();
 
 	/**
-	 * @return the {@link ComputationExecutor} that is used for execution of
+	 * @return the {@link ConcurrentExecutor} that is used for execution of
 	 *         reasoning processes
 	 */
-	protected abstract ComputationExecutor getProcessExecutor();
+	protected abstract ConcurrentExecutor getProcessExecutor();
 
 	/**
 	 * @return the {@link ProgressMonitor} that is used for reporting progress

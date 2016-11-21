@@ -40,11 +40,11 @@ import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
-import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.concurrent.computation.ConcurrentExecutor;
+import org.semanticweb.elk.util.concurrent.computation.DelegateInterruptMonitor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
-import org.semanticweb.elk.util.concurrent.computation.DelegateInterruptMonitor;
 
 /**
  * Cleans both class and instance taxonomies concurrently
@@ -61,7 +61,7 @@ public class TaxonomyCleaning
 			final InterruptMonitor interrupter,
 			ClassTaxonomyState classTaxonomyState,
 			InstanceTaxonomyState instanceTaxonomyState,
-			ComputationExecutor executor, int maxWorkers,
+			ConcurrentExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor) {
 		super(inputs,
 				new TaxonomyCleaningFactory(interrupter, classTaxonomyState,

@@ -45,8 +45,8 @@ public class ConcurrentComputationWithInputsTest {
 
 	private ConcurrentComputationWithInputs<Integer, ?> computation_;
 
-	private final ComputationExecutor executor = new ComputationExecutor(
-			ROUNDS_, "test-worker", 1, TimeUnit.SECONDS);
+	private final ConcurrentExecutor executor = ConcurrentExecutors
+			.create("test-worker");
 
 	void setup(int round, final InterruptMonitor interrupter) {
 		int workers = random.nextInt(round + 1) + 1;
@@ -62,7 +62,7 @@ public class ConcurrentComputationWithInputsTest {
 	}
 
 	public void run(final InterruptMonitor interruptMonitor) {
-		
+
 		int jobs = 1;
 		for (int round = 0; round < ROUNDS_; round++) {
 			setup(round, interruptMonitor);

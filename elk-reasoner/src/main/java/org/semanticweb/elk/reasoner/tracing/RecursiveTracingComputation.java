@@ -25,7 +25,7 @@ import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.tracing.factories.ProofUnwindingFactory;
-import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.concurrent.computation.ConcurrentExecutor;
 import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
 /**
@@ -41,7 +41,7 @@ public class RecursiveTracingComputation
 		extends ReasonerComputation<ProofUnwindingFactory> {
 
 	public RecursiveTracingComputation(final InterruptMonitor interrupter,
-			ComputationExecutor executor,
+			ConcurrentExecutor executor,
 			int maxWorkers, SaturationState<?> saturationState,
 			TraceState traceState) {
 		super(new ProofUnwindingFactory(interrupter, saturationState,

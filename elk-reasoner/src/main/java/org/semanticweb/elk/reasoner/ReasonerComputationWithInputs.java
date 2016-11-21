@@ -25,12 +25,12 @@ package org.semanticweb.elk.reasoner;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
-import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.concurrent.computation.ConcurrentExecutor;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputationWithInputs;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ConcurrentComputationWithInputs} used for executing of reasoner
@@ -72,7 +72,7 @@ public class ReasonerComputationWithInputs<I, F extends InputProcessorFactory<I,
 	I nextInput;
 
 	public ReasonerComputationWithInputs(Collection<? extends I> inputs,
-			F inputProcessorFactory, ComputationExecutor executor,
+			F inputProcessorFactory, ConcurrentExecutor executor,
 			int maxWorkers, ProgressMonitor progressMonitor) {
 		super(inputProcessorFactory, executor, maxWorkers);
 		this.progressMonitor = progressMonitor;

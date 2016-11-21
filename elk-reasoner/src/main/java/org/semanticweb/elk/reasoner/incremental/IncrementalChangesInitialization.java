@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
-import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.concurrent.computation.ConcurrentExecutor;
 import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
 /**
@@ -59,7 +59,7 @@ public class IncrementalChangesInitialization
 			Map<? extends IndexedClassExpression, ? extends LinkedSubsumerRule> changedCompositionRules,
 			Map<? extends IndexedClass, ? extends IndexedClassExpression> changedDefinitions,
 			Map<? extends IndexedClass, ? extends ElkAxiom> changedDefinitionReasons,
-			SaturationState<?> state, ComputationExecutor executor,
+			SaturationState<?> state, ConcurrentExecutor executor,
 			SaturationStatistics stageStats, int maxWorkers,
 			ProgressMonitor progressMonitor) {
 		super(inputs, new ContextInitializationFactory(interrupter,

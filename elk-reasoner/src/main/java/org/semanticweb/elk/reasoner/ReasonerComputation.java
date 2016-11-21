@@ -23,8 +23,8 @@
 package org.semanticweb.elk.reasoner;
 
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
-import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
+import org.semanticweb.elk.util.concurrent.computation.ConcurrentExecutor;
 import org.semanticweb.elk.util.concurrent.computation.ProcessorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +45,7 @@ public class ReasonerComputation<F extends ProcessorFactory<?>> extends
 			.getLogger(ReasonerComputation.class);
 
 	public ReasonerComputation(F inputProcessorFactory,
-			ComputationExecutor executor, int maxWorkers) {
+			ConcurrentExecutor executor, int maxWorkers) {
 		super(inputProcessorFactory, executor, maxWorkers);
 	}
 

@@ -47,7 +47,8 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.util.collections.Operations;
-import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.concurrent.computation.ConcurrentExecutor;
+import org.semanticweb.elk.util.concurrent.computation.ConcurrentExecutors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +69,12 @@ public class Reasoner extends AbstractReasonerState {
 			.getLogger(Reasoner.class);
 
 	/**
+	 * the executor used for concurrent tasks
+	 */
+	private final static ConcurrentExecutor EXECUTOR_ = ConcurrentExecutors
+			.create("elk-reasoner");
+
+	/**
 	 * The progress monitor that is used for reporting progress.
 	 */
 	protected ProgressMonitor progressMonitor;
@@ -80,10 +87,6 @@ public class Reasoner extends AbstractReasonerState {
 	 * interruption.
 	 */
 	private final ReasonerInterrupter interrupter_;
-	/**
-	 * the executor used for concurrent tasks
-	 */
-	private final ComputationExecutor executor_;
 	/**
 	 * Number of workers for concurrent jobs.
 	 */
@@ -110,9 +113,6 @@ public class Reasoner extends AbstractReasonerState {
 		this.progressMonitor = new DummyProgressMonitor();
 		this.allowFreshEntities = true;
 		setConfigurationOptions(config);
-		this.executor_ = new ComputationExecutor(workerNo_, "elk-reasoner", 1,
-				TimeUnit.SECONDS);
-
 		LOGGER_.info("ELK reasoner was created");
 	}
 
@@ -177,14 +177,11 @@ public class Reasoner extends AbstractReasonerState {
 		setAllowIncrementalMode(config
 				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_MODE_ALLOWED));
 
-		if (executor_ != null) {// could be null during initialization
-			executor_.setPoolSize(workerNo_);
-		}
 	}
 
 	@Override
-	protected ComputationExecutor getProcessExecutor() {
-		return executor_;
+	protected ConcurrentExecutor getProcessExecutor() {
+		return EXECUTOR_;
 	}
 
 	@Override
@@ -215,7 +212,7 @@ public class Reasoner extends AbstractReasonerState {
 	 */
 	public synchronized boolean shutdown(long timeout, TimeUnit unit)
 			throws InterruptedException {
-		boolean success = executor_.shutdown(timeout, unit);
+		boolean success = true;
 		if (success) {
 			LOGGER_.info("ELK reasoner has shut down");
 		} else {

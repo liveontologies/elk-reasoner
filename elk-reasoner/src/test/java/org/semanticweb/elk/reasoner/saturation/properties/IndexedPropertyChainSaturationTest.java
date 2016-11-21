@@ -47,7 +47,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.properties.VerifySymmetricPropertySaturation.AsymmetricCompositionHook;
 import org.semanticweb.elk.reasoner.stages.PropertyHierarchyCompositionState;
 import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
-import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.concurrent.computation.ConcurrentExecutors;
 import org.semanticweb.elk.util.concurrent.computation.DummyInterruptMonitor;
 
 /**
@@ -198,8 +198,8 @@ public class IndexedPropertyChainSaturationTest {
 						DummyInterruptMonitor.INSTANCE,
 						TracingInferenceProducer.DUMMY,
 						PropertyHierarchyCompositionState.Dispatcher.DUMMY),
-				new ComputationExecutor(maxThreads,
-						"test-hierarchy-compositions"), maxThreads,
+				ConcurrentExecutors.create("test-hierarchy-compositions"),
+				maxThreads,
 				new DummyProgressMonitor());
 
 		computation.process();

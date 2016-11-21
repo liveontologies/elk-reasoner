@@ -76,7 +76,7 @@ public class ConcurrentComputationWithInputs<I, F extends InputProcessorFactory<
 	 *            available
 	 */
 	public ConcurrentComputationWithInputs(F inputProcessorFactory,
-			ComputationExecutor executor, int maxWorkers, int bufferCapacity) {
+			ConcurrentExecutor executor, int maxWorkers, int bufferCapacity) {
 		super(inputProcessorFactory, executor, maxWorkers);
 		if (bufferCapacity <= maxWorkers) {
 			// we need poisons from the workers plus one input to fit in the
@@ -98,7 +98,7 @@ public class ConcurrentComputationWithInputs<I, F extends InputProcessorFactory<
 	 *            the maximal number of concurrent workers processing the jobs
 	 */
 	public ConcurrentComputationWithInputs(F inputProcessorFactory,
-			ComputationExecutor executor, int maxWorkers) {
+			ConcurrentExecutor executor, int maxWorkers) {
 		this(inputProcessorFactory, executor, maxWorkers, 512 + 32 * maxWorkers);
 	}
 

@@ -26,7 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
-import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.concurrent.computation.ConcurrentExecutor;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputationWithInputs;
 import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
@@ -35,7 +35,7 @@ public class TestClassExpressionSaturation<J extends SaturationJob<? extends Ind
 		ConcurrentComputationWithInputs<J, ClassExpressionSaturationFactory<J>> {
 
 	public TestClassExpressionSaturation(final InterruptMonitor interrupter,
-			ComputationExecutor executor, int maxWorkers,
+			ConcurrentExecutor executor, int maxWorkers,
 			SaturationState<?> saturationState) {
 		super(new ClassExpressionSaturationFactory<J>(
 				new RuleApplicationAdditionFactory<RuleApplicationInput>(
@@ -44,7 +44,7 @@ public class TestClassExpressionSaturation<J extends SaturationJob<? extends Ind
 	}
 
 	public TestClassExpressionSaturation(final InterruptMonitor interrupter,
-			ComputationExecutor executor, int maxWorkers,
+			ConcurrentExecutor executor, int maxWorkers,
 			OntologyIndex ontologyIndex) {
 		super(new ClassExpressionSaturationFactory<J>(
 				new RuleApplicationAdditionFactory<RuleApplicationInput>(

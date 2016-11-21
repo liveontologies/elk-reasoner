@@ -52,7 +52,7 @@ public class ConcurrentComputation<F extends ProcessorFactory<?>> implements
 	/**
 	 * the executor used internally to run the jobs
 	 */
-	protected final ComputationExecutor executor;
+	protected final ConcurrentExecutor executor;
 	/**
 	 * {@code true} the workers should stop either as soon as possible (if the
 	 * computation has been terminated) or after {@link #finish()} is called
@@ -62,6 +62,11 @@ public class ConcurrentComputation<F extends ProcessorFactory<?>> implements
 	 * the worker instance used to process the jobs
 	 */
 	protected final Runnable worker;
+
+	/**
+	 * the object to monitor progress of the job
+	 */
+	protected JobMonitor jobMonitor;
 
 	/**
 	 * Creating a {@link ConcurrentComputation} instance.
@@ -74,7 +79,7 @@ public class ConcurrentComputation<F extends ProcessorFactory<?>> implements
 	 *            the maximal number of concurrent workers processing the jobs
 	 */
 	public ConcurrentComputation(F processorFactory,
-			ComputationExecutor executor, int maxWorkers) {
+			ConcurrentExecutor executor, int maxWorkers) {
 		this.processorFactory = processorFactory;
 		this.termination = false;
 		this.worker = getWorker();
@@ -89,11 +94,16 @@ public class ConcurrentComputation<F extends ProcessorFactory<?>> implements
 	 */
 	public synchronized boolean start() {
 		termination = false;
-		return executor.start(worker, maxWorkers);
+		jobMonitor = executor.submit(worker, maxWorkers);
+		return true;
 	}
 
 	protected synchronized void waitWorkers() throws InterruptedException {
-		executor.waitDone();
+		if (jobMonitor == null) {
+			return;
+		}
+		// else
+		jobMonitor.waitDone();
 	}
 
 	/**

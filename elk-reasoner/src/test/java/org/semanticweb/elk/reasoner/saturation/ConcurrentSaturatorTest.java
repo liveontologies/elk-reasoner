@@ -41,7 +41,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.concurrent.computation.ConcurrentExecutor;
+import org.semanticweb.elk.util.concurrent.computation.ConcurrentExecutors;
 import org.semanticweb.elk.util.concurrent.computation.DummyInterruptMonitor;
 
 import junit.framework.TestCase;
@@ -73,11 +74,8 @@ public class ConcurrentSaturatorTest extends TestCase {
 				"S"));
 
 		ModifiableOntologyIndex index = new DirectIndex(objectFactory);
-		ComputationExecutor executor = new ComputationExecutor(16, "test", 0,
+		ConcurrentExecutor executor = ConcurrentExecutors.create("test", 1,
 				TimeUnit.NANOSECONDS);
-//		ComputationExecutor executor = new ComputationExecutor(16, "test");
-//		ComputationExecutor executor = new ComputationExecutor(16, "test", 1,
-//				TimeUnit.SECONDS);
 
 		final ElkAxiomProcessor inserter = new ChangeIndexingProcessor(
 				new ElkAxiomConverterImpl(objectFactory, index, 1),
@@ -127,7 +125,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
 
 		final ModifiableOntologyIndex index = new DirectIndex(objectFactory);
-		ComputationExecutor executor = new ComputationExecutor(16, "test", 0,
+		ConcurrentExecutor executor = ConcurrentExecutors.create("test", 1,
 				TimeUnit.NANOSECONDS);
 		final ElkAxiomProcessor inserter = new ChangeIndexingProcessor(
 				new ElkAxiomConverterImpl(objectFactory, index, 1),

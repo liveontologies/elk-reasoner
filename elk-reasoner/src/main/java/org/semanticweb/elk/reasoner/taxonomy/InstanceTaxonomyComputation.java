@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
-import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.concurrent.computation.ConcurrentExecutor;
 import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
 // TODO: documentation
@@ -51,7 +51,7 @@ public class InstanceTaxonomyComputation
 	public InstanceTaxonomyComputation(
 			Collection<? extends IndexedIndividual> inputs,
 			final InterruptMonitor interrupter,
-			ComputationExecutor executor,
+			ConcurrentExecutor executor,
 			int maxWorkers,
 			ProgressMonitor progressMonitor,
 			SaturationState<?> saturationState,
