@@ -367,14 +367,15 @@ public class ClassExpressionQueryState implements QueryLoader.Factory {
 			/*
 			 * If the cache size is exceeded, evict old entries.
 			 */
-			// @formatter:off
-			final int goalCapacity = Math.max(
-					Math.min(
-							(int) (recentlyQueried_.size() * EVICTION_FACTOR),
-							CACHE_CAPACITY),
-					lastQuerySize_);
-			// @formatter:on
-			if (recentlyQueried_.size() > goalCapacity) {
+			if (recentlyQueried_.size() > CACHE_CAPACITY) {
+
+				// @formatter:off
+				final int goalCapacity = Math.max(
+						Math.min(
+								(int) (recentlyQueried_.size() * EVICTION_FACTOR),
+								CACHE_CAPACITY),
+						lastQuerySize_);
+				// @formatter:on
 
 				while (recentlyQueried_.size() > goalCapacity) {
 					classExpression = recentlyQueried_.poll();
@@ -387,14 +388,14 @@ public class ClassExpressionQueryState implements QueryLoader.Factory {
 					if (state.isLoaded) {
 						deleter.visit(classExpression);
 						if (state.indexed != null) {
-							indexed_.remove(state.indexed);
-							state.indexed = null;
 							if (state.isComputed) {
 								if (state.node != null) {
 									removeAllRelated(state.indexed, state.node);
 									state.node = null;
 								}
 							}
+							indexed_.remove(state.indexed);
+							state.indexed = null;
 						}
 					}
 
