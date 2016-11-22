@@ -57,21 +57,18 @@ public class ReasonerElkInferenceSet extends ModifiableElkInferenceSetImpl {
 
 	private final ElkAxiomVisitor<Void> inferenceGenerator_ = new InferenceGenerator();
 
-	public ReasonerElkInferenceSet(Reasoner reasoner,
+	public ReasonerElkInferenceSet(Reasoner reasoner, ElkAxiom goal,
 			ElkObject.Factory elkFactory) {
 		super(elkFactory);
 		this.reasoner_ = reasoner;
 		this.elkFactory_ = elkFactory;
 		this.inferenceFactory_ = new ElkInferenceOptimizedProducingFactory(this,
 				elkFactory);
+		goal.accept(inferenceGenerator_);
 	}
 
 	@Override
 	public Collection<? extends ElkInference> get(ElkAxiom conclusion) {
-		if (getInferences(conclusion).isEmpty() && !isQuieried(conclusion)) {
-			// the inferences were not computed yet
-			conclusion.accept(inferenceGenerator_);
-		}
 		return super.get(conclusion);
 	}
 

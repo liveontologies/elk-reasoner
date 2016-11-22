@@ -32,7 +32,6 @@ import java.util.Set;
 
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
-import org.semanticweb.elk.owl.inferences.ReasonerElkInferenceSet;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
@@ -129,8 +128,6 @@ public class ElkReasoner implements OWLReasoner {
 	private final boolean isAllowFreshEntities;
 	/** the ELK reasoner instance used for reasoning */
 	private Reasoner reasoner_;
-	/** Inferences for derived ELK axioms */
-	private ReasonerElkInferenceSet elkInferenceSet_;
 
 	/**
 	 * {@code true} if the ontology should be loaded before any changes are
@@ -192,10 +189,6 @@ public class ElkReasoner implements OWLReasoner {
 		return objectFactory_;
 	}
 	
-	ReasonerElkInferenceSet getElkInferenceSet() {
-		return elkInferenceSet_;
-	}
-
 	private void initReasoner(final Reasoner reasoner) {
 		this.reasoner_ = reasoner;
 		this.reasoner_.registerAxiomLoader(new OwlOntologyLoader.Factory(
@@ -205,8 +198,7 @@ public class ElkReasoner implements OWLReasoner {
 		// switch to the primary progress monitor; this is to avoid bugs with
 		// progress monitors in Protege
 		this.reasoner_.setProgressMonitor(this.secondaryProgressMonitor_);
-		this.elkInferenceSet_ = new ReasonerElkInferenceSet(reasoner_,
-				objectFactory_);
+		// TODO: invalidate explanations		
 	}
 
 	/**
@@ -358,7 +350,7 @@ public class ElkReasoner implements OWLReasoner {
 				}
 			}
 			// proofs should be recomputed
-			elkInferenceSet_.clear();
+			// TODO: invalidate explanations
 		} catch (ElkRuntimeException e) {
 			throw elkConverter_.convert(e);
 		}

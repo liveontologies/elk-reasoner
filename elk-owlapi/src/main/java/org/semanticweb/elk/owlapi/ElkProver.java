@@ -3,6 +3,7 @@ package org.semanticweb.elk.owlapi;
 import org.liveontologies.owlapi.proof.OWLProofNode;
 import org.liveontologies.owlapi.proof.OWLProver;
 import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
+import org.semanticweb.elk.owl.inferences.ReasonerElkInferenceSet;
 import org.semanticweb.elk.owl.inferences.rewriting.FlattenedElkInferenceSet;
 
 /*
@@ -44,13 +45,15 @@ public class ElkProver extends DelegatingOWLReasoner<ElkReasoner>
 	@Override
 	public OWLProofNode getProof(OWLAxiom entailment)
 			throws UnsupportedEntailmentTypeException {
-		ReasonerConfiguration config = getDelegate().getConfigurationOptions();
+		ElkReasoner elkReasoner = getDelegate();
+		ReasonerConfiguration config = elkReasoner.getConfigurationOptions();
 		boolean flattenInferences = config.getParameterAsBoolean(
 				ReasonerConfiguration.FLATTEN_INFERENCES);
 		ElkClassAxiom elkAxiom = entailment
 				.accept(OwlClassAxiomConverterVisitor.getInstance());
-		ElkReasoner elkReasoner = getDelegate();
-		ElkInferenceSet elkInferences = elkReasoner.getElkInferenceSet();
+		ElkInferenceSet elkInferences = new ReasonerElkInferenceSet(
+				elkReasoner.getInternalReasoner(), elkAxiom,
+				elkReasoner.getElkObjectFactory());
 		if (flattenInferences) {
 			elkInferences = new FlattenedElkInferenceSet(elkInferences);
 		}
