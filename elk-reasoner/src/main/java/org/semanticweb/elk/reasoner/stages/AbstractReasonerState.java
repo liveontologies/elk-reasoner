@@ -103,19 +103,6 @@ public abstract class AbstractReasonerState {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractReasonerState.class);
 
-	// TODO create reasoner configuration options instead of these flags?
-	/**
-	 * If true, all inferences will be stored in the trace store.
-	 */
-	final boolean FULL_TRACING = false;
-	/**
-	 * If true, the reasoner will bind asserted axioms to the inference rules
-	 * which use them as side conditions. As a result, it'll be possible to
-	 * access the axioms when exploring traced inferences. It will cause a
-	 * certain memory overhead because otherwise we don't store asserted axioms.
-	 */
-	final boolean BIND_AXIOMS = true;
-
 	/**
 	 * The factory for creating auxiliary ElkObjects
 	 */
@@ -1079,6 +1066,10 @@ public abstract class AbstractReasonerState {
 		return explainConclusions(Collections.singleton(conclusion));
 	}
 
+	public TracingInferenceSet getTracingInferences() {
+		return traceState_;
+	}
+	
 	@Deprecated
 	IndexedClassExpression transform(ElkClassExpression ce) {
 		return ce.accept(expressionConverter_);

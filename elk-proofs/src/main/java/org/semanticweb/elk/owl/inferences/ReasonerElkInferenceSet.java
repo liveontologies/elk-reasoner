@@ -40,36 +40,86 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DerivedClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
+import org.semanticweb.elk.reasoner.tracing.TracingInferenceSet;
 
 /**
  * A view for inferences over {@link ElkAxiom}s provided by {@link Reasoner}.
- * The inferences are computed lazily on request.
+ * The inferences are computed lazily on request. If {@link Reasoner} is changed
+ * by calling {@link #setReasoner(Reasoner)}, the inferences are recomputed (the
+ * registered {@link ElkInferenceSet.ChangeListener}s will receive a
+ * notification).
  * 
  * @author Yevgeny Kazakov
  */
-public class ReasonerElkInferenceSet extends ModifiableElkInferenceSetImpl {
+public class ReasonerElkInferenceSet extends ModifiableElkInferenceSetImpl
+		implements TracingInferenceSet.ChangeListener {
 
-	private final Reasoner reasoner_;
+	private final ElkAxiom goal_;
 
 	private final ElkObject.Factory elkFactory_;
+
+	private Reasoner reasoner_;
 
 	private final ElkInference.Factory inferenceFactory_;
 
 	private final ElkAxiomVisitor<Void> inferenceGenerator_ = new InferenceGenerator();
 
-	public ReasonerElkInferenceSet(Reasoner reasoner, ElkAxiom goal,
+	/**
+	 * {@code true} when the inferences are retrieved from the reasoner
+	 */
+	private boolean initialized_ = false;
+
+	public ReasonerElkInferenceSet(ElkAxiom goal,
 			ElkObject.Factory elkFactory) {
 		super(elkFactory);
-		this.reasoner_ = reasoner;
+		this.goal_ = goal;
 		this.elkFactory_ = elkFactory;
 		this.inferenceFactory_ = new ElkInferenceOptimizedProducingFactory(this,
 				elkFactory);
-		goal.accept(inferenceGenerator_);
+	}
+
+	public void setReasoner(Reasoner reasoner) {
+		synchronized (this) {
+			if (reasoner_ != null) {
+				reasoner_.getTracingInferences().remove(this);
+			}
+			this.reasoner_ = reasoner;
+			reasoner.getTracingInferences().add(this);
+		}
+		reset();
 	}
 
 	@Override
-	public Collection<? extends ElkInference> get(ElkAxiom conclusion) {
+	public synchronized Collection<? extends ElkInference> get(
+			ElkAxiom conclusion) {
+		initialize();
 		return super.get(conclusion);
+	}
+
+	void reset() {
+		synchronized (this) {
+			if (!initialized_) {
+				return;
+			}
+			// else
+			initialized_ = false;
+		}
+		fireChanged();
+	}
+
+	synchronized void initialize() {
+		if (initialized_) {
+			return;
+		}
+		// else
+		clear();
+		goal_.accept(inferenceGenerator_);
+		initialized_ = true;
+	}
+
+	@Override
+	public void inferencesChanged() {
+		reset();
 	}
 
 	private void addInferencesForSubsumption(final ElkClassExpression subClass,

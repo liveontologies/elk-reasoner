@@ -25,6 +25,11 @@ package org.semanticweb.elk.owl.inferences;
 public interface ModifiableElkInferenceSet
 		extends ElkInferenceSet, ElkInferenceProducer {
 
-	public void clear();
+	/**
+	 * Removes all inferences from this set
+	 * 
+	 * @return {@code true} if this set has changed
+	 */
+	public boolean clear();
 
 }

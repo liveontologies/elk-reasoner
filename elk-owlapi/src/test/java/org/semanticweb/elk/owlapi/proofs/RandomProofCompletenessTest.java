@@ -148,7 +148,7 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 			final OWLProver prover,
 			final OWLSubClassOfAxiom conclusion, final OWLOntology ontology,
 			final Random random, final long seed) {
-		final ProofNode<OWLAxiom> expr = prover.getProof(conclusion);
+		final ProofNode<OWLAxiom> expr = prover.getProof(conclusion).getRoot();
 		
 		final Set<OWLAxiom> proofBreaker =
 				ProofTestUtils.collectProofBreaker(expr, ontology, random);

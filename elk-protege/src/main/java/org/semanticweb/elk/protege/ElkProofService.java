@@ -1,9 +1,6 @@
 package org.semanticweb.elk.protege;
 
-import java.util.Collection;
-import java.util.Collections;
-
-/*
+/*-
  * #%L
  * ELK Reasoner Protege Plug-in
  * $Id:$
@@ -25,12 +22,17 @@ import java.util.Collections;
  * #L%
  */
 
-import org.liveontologies.owlapi.proof.OWLProofNode;
-import org.liveontologies.owlapi.proof.OWLProofStep;
-import org.liveontologies.owlapi.proof.OWLProver;
-import org.liveontologies.owlapi.proof.util.LeafProofNode;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.liveontologies.owlapi.proof.DelegatingOwlProof;
+import org.liveontologies.owlapi.proof.DummyOWLProof;
+import org.liveontologies.owlapi.proof.OWLProof;
 import org.liveontologies.protege.explanation.proof.service.ProofService;
-import org.semanticweb.elk.owlapi.ElkProver;
+import org.protege.editor.owl.model.event.EventType;
+import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
+import org.protege.editor.owl.model.event.OWLModelManagerListener;
+import org.semanticweb.elk.owlapi.ElkProof;
 import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
@@ -38,64 +40,99 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.UnsupportedEntailmentTypeException;
 
-public class ElkProofService extends ProofService {
+public class ElkProofService extends ProofService
+		implements OWLModelManagerListener {
 
-	private OWLProver prover_ = null;
+	private ElkReasoner reasoner_ = null;
+
+	private final List<ChangeListener> listeners_ = new ArrayList<ChangeListener>();
 
 	@Override
 	public void initialise() throws Exception {
-		// nothing
+		changeReasoner();
+		getEditorKit().getOWLModelManager().addListener(this);
 	}
 
 	@Override
 	public void dispose() {
-		prover_ = null;
+		reasoner_ = null;
+		getEditorKit().getOWLModelManager().removeListener(this);
 	}
 
 	@Override
 	public boolean hasProof(OWLAxiom entailment) {
-		OWLReasoner reasoner = getEditorKit().getOWLModelManager()
-				.getOWLReasonerManager().getCurrentReasoner();
-		if (reasoner instanceof ElkReasoner) {
-			prover_ = new ElkProver((ElkReasoner) reasoner);
-			return entailment instanceof OWLSubClassOfAxiom
-					|| entailment instanceof OWLEquivalentClassesAxiom;
-		}
-		// else
-		prover_ = null;
-		return false;
+		return (reasoner_ != null && entailment instanceof OWLSubClassOfAxiom
+				|| entailment instanceof OWLEquivalentClassesAxiom);
 	}
 
 	@Override
-	public OWLProofNode getProof(final OWLAxiom entailment)
+	public OWLProof getProof(final OWLAxiom entailment)
 			throws UnsupportedEntailmentTypeException {
-		if (prover_ == null) {
-			return new LeafOwlProofNode(entailment);
-		}
-		// else
-		return prover_.getProof(entailment);
+		return new DynamicOwlProof(entailment);
 	}
 
-	static class LeafOwlProofNode extends LeafProofNode<OWLAxiom>
-			implements OWLProofNode {
+	@Override
+	public void handleChange(OWLModelManagerChangeEvent event) {
+		if (event.isType(EventType.REASONER_CHANGED)) {
+			changeReasoner();
+		}
+	}
 
-		public LeafOwlProofNode(OWLAxiom member) {
-			super(member);
+	void changeReasoner() {
+		ElkReasoner newReasoner = null;
+		OWLReasoner reasoner = getEditorKit().getOWLModelManager()
+				.getOWLReasonerManager().getCurrentReasoner();
+		if (reasoner instanceof ElkReasoner) {
+			newReasoner = (ElkReasoner) reasoner;
+		}
+		if (newReasoner == reasoner_) {
+			return;
+		}
+		// else
+		if (reasoner_ != null && reasoner_.equals(newReasoner)) {
+			return;
+		}
+		// else
+		reasoner_ = newReasoner;
+		for (ChangeListener listener : listeners_) {
+			listener.reasonerChanged();
+		}
+	}
+
+	private static interface ChangeListener {
+
+		void reasonerChanged();
+
+	}
+
+	static OWLProof createProof(ElkReasoner reasoner, OWLAxiom entailment) {
+		if (reasoner == null) {
+			return new DummyOWLProof(entailment);
+		} else {
+			return new ElkProof(reasoner, entailment);
+		}
+	}
+
+	private class DynamicOwlProof extends DelegatingOwlProof
+			implements ChangeListener {
+
+		private final OWLAxiom entailment_;
+
+		DynamicOwlProof(OWLAxiom entailment) {
+			super(createProof(reasoner_, entailment));
+			this.entailment_ = entailment;
+			ElkProofService.this.listeners_.add(this);
 		}
 
 		@Override
-		public Collection<? extends OWLProofStep> getInferences() {
-			return Collections.emptyList();
+		public void reasonerChanged() {
+			setDelegate(createProof(reasoner_, entailment_));
 		}
 
 		@Override
-		public void addListener(ChangeListener listener) {
-			// ignore, nothing can change anyway
-		}
-
-		@Override
-		public void removeListener(ChangeListener listener) {
-			// ignore, nothing can change anyway
+		public void dispose() {
+			super.dispose();
+			ElkProofService.this.listeners_.remove(this);
 		}
 
 	}

@@ -74,7 +74,7 @@ public class RetrievingProofsForEntailment {
 		OWLAxiom entailment = getEntailment();
 		
 		// Get the first derivable expression which corresponds to the entailment. "Derivable" means that it can provide access to inferences which directly derived it. 
-		OWLProofNode derived = prover.getProof(entailment);
+		OWLProofNode derived = prover.getProof(entailment).getRoot();
 		
 		// Now we can recursively request inferences and their premises. Print them to std.out in this example.
 		unwindProofs(derived);

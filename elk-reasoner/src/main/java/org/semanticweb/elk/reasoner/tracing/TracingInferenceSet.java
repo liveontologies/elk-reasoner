@@ -24,8 +24,8 @@ package org.semanticweb.elk.reasoner.tracing;
 
 /**
  * 
- * An object which can be used to retrieve {@link TracingInference}s producing a given
- * {@link Conclusion}.
+ * An object which can be used to retrieve {@link TracingInference}s producing a
+ * given {@link Conclusion}.
  * 
  * @author "Yevgeny Kazakov"
  */
@@ -33,9 +33,31 @@ public interface TracingInferenceSet {
 
 	/**
 	 * @param conclusion
-	 * @return all {@link TracingInference}s stored in this {@link TracingInferenceSet}
-	 *         producing the given {@link Conclusion}
+	 * @return all {@link TracingInference}s stored in this
+	 *         {@link TracingInferenceSet} producing the given
+	 *         {@link Conclusion}
 	 */
-	public Iterable<? extends TracingInference> getInferences(Conclusion conclusion);
+	public Iterable<? extends TracingInference> getInferences(
+			Conclusion conclusion);
+
+	public void add(ChangeListener listener);
+
+	public void remove(ChangeListener listener);
+
+	/**
+	 * A listener to monitor if inferences for axioms have changed
+	 * 
+	 * @author Yevgeny Kazakov
+	 */
+	public interface ChangeListener {
+
+		/**
+		 * called when the inferences for some conclusion may have changed,
+		 * i.e., calling {@link TracingInferenceSet#getInferences(Conclusion)}
+		 * for the same conclusion may produce a different result
+		 */
+		void inferencesChanged();
+
+	}
 
 }

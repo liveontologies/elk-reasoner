@@ -3,6 +3,8 @@
  */
 package org.semanticweb.elk.reasoner.tracing;
 
+import java.util.ArrayList;
+
 /*-
  * #%L
  * ELK Reasoner Core
@@ -26,6 +28,7 @@ package org.semanticweb.elk.reasoner.tracing;
  */
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -84,6 +87,8 @@ public class TraceState implements
 
 	private final ElkAxiomConverter elkAxiomConverter_;
 
+	private final List<ChangeListener> listeners_ = new ArrayList<ChangeListener>();
+
 	public <C extends Context> TraceState(
 			final SaturationState<C> saturationState,
 			final PropertyHierarchyCompositionState propertySaturationState,
@@ -141,22 +146,50 @@ public class TraceState implements
 		}
 	}
 
+	@Override
+	public synchronized void add(ChangeListener listener) {
+		listeners_.add(listener);
+	}
+
+	@Override
+	public synchronized void remove(ChangeListener listener) {
+		listeners_.remove(listener);
+	}
+
 	public ClassConclusion pollToTrace() {
 		return toTrace_.poll();
 	}
 
-	private void clearClassInferences() {
-		classInferences_.clear();
-		traced_.clear();
+	private boolean clearClassInferences() {
+		boolean changed = classInferences_.clear();
+		if (!traced_.isEmpty()) {
+			traced_.clear();
+			changed = true;
+		}
+		if (changed) {
+			fireChanged();
+		}
+		return changed;
 	}
 
-	private void clearObjectPropertyInferences() {
-		objectPropertyInferences_.clear();
+	private boolean clearObjectPropertyInferences() {
+		boolean changed = objectPropertyInferences_.clear();
+		if (changed) {
+			fireChanged();
+		}
+		return changed;
 	}
 
-	private void clearIndexedAxiomInferences() {
-		indexedAxioms_.clear();
-		indexedAxiomInferences_.clear();
+	private boolean clearIndexedAxiomInferences() {
+		boolean changed = indexedAxiomInferences_.clear();
+		if (!indexedAxioms_.isEmpty()) {
+			indexedAxioms_.clear();
+			changed = true;
+		}
+		if (changed) {
+			fireChanged();
+		}
+		return changed;
 	}
 
 	@Override
@@ -177,6 +210,12 @@ public class TraceState implements
 		}
 		// else index axiom
 		axiom.accept(elkAxiomConverter_);
+	}
+
+	synchronized void fireChanged() {
+		for (ChangeListener listener : listeners_) {
+			listener.inferencesChanged();
+		}
 	}
 
 	/**

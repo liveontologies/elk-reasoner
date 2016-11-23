@@ -50,8 +50,8 @@ public class SynchronizedModifiableTracingInferenceSet<I extends TracingInferenc
 	}
 
 	@Override
-	public synchronized void clear() {
-		super.clear();
+	public synchronized boolean clear() {
+		return super.clear();
 	}
 
 }

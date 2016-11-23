@@ -3,6 +3,9 @@
  */
 package org.semanticweb.elk.reasoner.tracing;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*
  * #%L
  * ELK Reasoner
@@ -46,8 +49,10 @@ public class ModifiableTracingInferenceSetImpl<I extends TracingInference>
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ModifiableTracingInferenceSetImpl.class);
-	
+
 	private final Multimap<Conclusion, I> inferenceMap_ = new HashListMultimap<Conclusion, I>();
+
+	private final List<ChangeListener> listeners_ = new ArrayList<ChangeListener>();
 
 	@Override
 	public void produce(I inference) {
@@ -56,8 +61,13 @@ public class ModifiableTracingInferenceSetImpl<I extends TracingInference>
 	}
 
 	@Override
-	public void clear() {
+	public boolean clear() {
+		if (inferenceMap_.isEmpty()) {
+			return false;
+		}
 		inferenceMap_.clear();
+		fireChanged();
+		return true;
 	}
 
 	@Override
@@ -65,7 +75,7 @@ public class ModifiableTracingInferenceSetImpl<I extends TracingInference>
 		// assumes structural equality and hash of conclusions
 		return inferenceMap_.get(conclusion);
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -76,6 +86,22 @@ public class ModifiableTracingInferenceSetImpl<I extends TracingInference>
 			}
 		}
 		return sb.toString();
+	}
+
+	@Override
+	public void add(ChangeListener listener) {
+		listeners_.add(listener);
+	}
+
+	@Override
+	public void remove(ChangeListener listener) {
+		listeners_.remove(listener);
+	}
+
+	synchronized void fireChanged() {
+		for (ChangeListener listener : listeners_) {
+			listener.inferencesChanged();
+		}
 	}
 
 }

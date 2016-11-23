@@ -46,8 +46,8 @@ public class ModifiableElkInferenceSetImpl
 	private final Multimap<ElkAxiom, ElkInference> inferenceMap_ = new HashSetMultimap<ElkAxiom, ElkInference>();
 
 	/**
-	 * axioms for which {@link #get(ElkAxiom)} was called after the last
-	 * inference for this axiom was added
+	 * axioms for which {@link #get(ElkAxiom)} was called and the result did not
+	 * change since then
 	 */
 	private final Set<ElkAxiom> queried_ = new HashSet<ElkAxiom>();
 
@@ -77,10 +77,20 @@ public class ModifiableElkInferenceSetImpl
 	}
 
 	@Override
-	public void clear() {
-		inferenceMap_.clear();
-		queried_.clear();
-		fireChanged();
+	public boolean clear() {
+		boolean changed = false;
+		if (!inferenceMap_.isEmpty()) {
+			inferenceMap_.clear();
+			changed = true;
+		}
+		if (!queried_.isEmpty()) {
+			queried_.clear();
+			changed = true;
+		}
+		if (changed) {
+			fireChanged();
+		}
+		return changed;
 	}
 
 	Collection<? extends ElkInference> getInferences(ElkAxiom conclusion) {

@@ -27,6 +27,11 @@ public interface ModifiableTracingInferenceSet<I extends TracingInference> exten
 	@Override
 	public Iterable<? extends I> getInferences(Conclusion conclusion);
 
-	public void clear();
+	/**
+	 * Removes all inferences from this set
+	 * 
+	 * @return {@code true} if this set has changed
+	 */
+	public boolean clear();
 
 }

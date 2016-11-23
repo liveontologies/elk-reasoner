@@ -56,7 +56,7 @@ public class Proofs {
 		final Set<OWLAxiom> stated = reasoner.getRootOntology()
 				.getAxioms(Imports.INCLUDED);
 
-		ProofExplorer.visitInferences(reasoner.getProof(entailment),
+		ProofExplorer.visitInferences(reasoner.getProof(entailment).getRoot(),
 				new ProofExplorer.Controller() {
 
 					@Override

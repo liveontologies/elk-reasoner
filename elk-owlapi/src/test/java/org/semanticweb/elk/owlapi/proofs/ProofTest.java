@@ -285,7 +285,7 @@ public class ProofTest {
 	void printInferences(OWLProver prover, OWLClassExpression sub,
 			OWLClassExpression sup) {
 		ProofExplorer.visitInferences(
-				prover.getProof(factory.getOWLSubClassOfAxiom(sub, sup)),
+				prover.getProof(factory.getOWLSubClassOfAxiom(sub, sup)).getRoot(),
 				new ProofExplorer.Controller() {
 
 					@Override

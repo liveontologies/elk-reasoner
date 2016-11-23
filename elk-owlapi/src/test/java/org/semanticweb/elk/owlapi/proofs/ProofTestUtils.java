@@ -64,7 +64,7 @@ public class ProofTestUtils {
 	public static void provabilityTest(OWLProver prover,
 			OWLSubClassOfAxiom axiom) {
 		assertTrue(String.format("Entailment %s not derivable!", axiom),
-				ProofNodes.isDerivable(prover.getProof(axiom),
+				ProofNodes.isDerivable(prover.getProof(axiom).getRoot(),
 						prover.getRootOntology().getAxioms(Imports.INCLUDED)));
 	}
 
