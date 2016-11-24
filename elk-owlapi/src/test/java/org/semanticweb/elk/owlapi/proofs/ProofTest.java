@@ -41,6 +41,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -114,6 +115,70 @@ public class ProofTest {
 
 		ProofTestUtils.provabilityTest(prover,
 				factory.getOWLSubClassOfAxiom(sub, sup));
+	}
+
+	@Test
+	public void inconsistentOwlThing() throws Exception {
+		OWLOntologyManager owlManager = OWLManager
+				.createConcurrentOWLOntologyManager();
+		// creating an ontology
+		final OWLOntology ontology = owlManager.createOntology();
+		OWLClass a = factory.getOWLClass(IRI.create("http://example.org/A"));
+		OWLClass b = factory.getOWLClass(IRI.create("http://example.org/B"));
+		// top subclass bottom => inconsistent
+		owlManager.addAxiom(ontology, factory.getOWLSubClassOfAxiom(
+				factory.getOWLThing(), factory.getOWLNothing()));
+
+		final OWLProver prover = OWLAPITestUtils.createProver(ontology);
+
+		ProofTestUtils.provabilityTest(prover,
+				factory.getOWLSubClassOfAxiom(a, b));
+		ProofTestUtils.provabilityTest(prover,
+				factory.getOWLSubClassOfAxiom(
+						factory.getOWLObjectIntersectionOf(a, b),
+						factory.getOWLNothing()));
+	}
+
+	@Test
+	public void inconsistentIndividual() throws Exception {
+		OWLOntologyManager owlManager = OWLManager
+				.createConcurrentOWLOntologyManager();
+		// creating an ontology
+		final OWLOntology ontology = owlManager.createOntology();
+		OWLNamedIndividual ind = factory
+				.getOWLNamedIndividual(IRI.create("http://example.org/i"));
+		OWLClass a = factory.getOWLClass(IRI.create("http://example.org/A"));
+		OWLClass b = factory.getOWLClass(IRI.create("http://example.org/B"));
+		// ind instance of bottom => inconsistent
+		owlManager.addAxiom(ontology, factory
+				.getOWLClassAssertionAxiom(factory.getOWLNothing(), ind));
+
+		final OWLProver prover = OWLAPITestUtils.createProver(ontology);
+
+		ProofTestUtils.provabilityTest(prover,
+				factory.getOWLSubClassOfAxiom(a, b));
+		ProofTestUtils.provabilityTest(prover,
+				factory.getOWLSubClassOfAxiom(
+						factory.getOWLObjectIntersectionOf(a, b),
+						factory.getOWLNothing()));
+	}
+
+	@Test
+	public void inconsistentClass() throws Exception {
+		OWLOntologyManager owlManager = OWLManager
+				.createConcurrentOWLOntologyManager();
+		// creating an ontology
+		final OWLOntology ontology = owlManager.createOntology();
+		OWLClass a = factory.getOWLClass(IRI.create("http://example.org/A"));
+		OWLClass b = factory.getOWLClass(IRI.create("http://example.org/B"));
+		// A subclass of bottom => A is inconsistent
+		owlManager.addAxiom(ontology,
+				factory.getOWLSubClassOfAxiom(a, factory.getOWLNothing()));
+
+		final OWLProver prover = OWLAPITestUtils.createProver(ontology);
+
+		ProofTestUtils.provabilityTest(prover,
+				factory.getOWLSubClassOfAxiom(a, b));
 	}
 
 	@Test
@@ -284,8 +349,8 @@ public class ProofTest {
 
 	void printInferences(OWLProver prover, OWLClassExpression sub,
 			OWLClassExpression sup) {
-		ProofExplorer.visitInferences(
-				prover.getProof(factory.getOWLSubClassOfAxiom(sub, sup)).getRoot(),
+		ProofExplorer.visitInferences(prover
+				.getProof(factory.getOWLSubClassOfAxiom(sub, sup)).getRoot(),
 				new ProofExplorer.Controller() {
 
 					@Override

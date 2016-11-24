@@ -1040,8 +1040,13 @@ public abstract class AbstractReasonerState {
 
 	private <C extends ClassConclusion> C checkDerived(C conclusion)
 			throws ElkException {
-		if (saturationState.getContext(conclusion.getDestination())
-				.containsConclusion(conclusion)) {
+		Context context = saturationState.getContext(conclusion.getDestination());
+		if (context == null) {
+			// not derived
+			return null;
+		}
+		// else
+		if (context.containsConclusion(conclusion)) {
 			return conclusion;
 		}
 		// else not derived

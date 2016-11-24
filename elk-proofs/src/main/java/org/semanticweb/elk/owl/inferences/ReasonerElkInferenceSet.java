@@ -137,6 +137,12 @@ public class ReasonerElkInferenceSet extends ModifiableElkInferenceSetImpl
 							reasoner_.explainConclusion(conclusion),
 							elkFactory_, inferenceFactory_);
 					matcher.trace(conclusion, elkFactory_.getOwlThing());
+					inferenceFactory_.getElkClassInclusionOwlThing(subClass);
+					inferenceFactory_
+							.getElkClassInclusionOwlNothing(superClass);
+					inferenceFactory_.getElkClassInclusionHierarchy(subClass,
+							elkFactory_.getOwlThing(),
+							elkFactory_.getOwlNothing(), superClass);
 					return true;
 				}
 
@@ -148,9 +154,15 @@ public class ReasonerElkInferenceSet extends ModifiableElkInferenceSetImpl
 							reasoner_.explainConclusion(conclusion),
 							elkFactory_, inferenceFactory_);
 					matcher.trace(conclusion, entity);
+					inferenceFactory_.getElkClassInclusionOwlThing(subClass);
 					inferenceFactory_
 							.getElkClassInclusionOfInconsistentIndividual(
 									entity);
+					inferenceFactory_
+							.getElkClassInclusionOwlNothing(superClass);
+					inferenceFactory_.getElkClassInclusionHierarchy(subClass,
+							elkFactory_.getOwlThing(),
+							elkFactory_.getOwlNothing(), superClass);
 					return true;
 				}
 
