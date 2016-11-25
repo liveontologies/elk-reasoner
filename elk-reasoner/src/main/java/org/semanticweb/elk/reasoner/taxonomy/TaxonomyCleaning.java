@@ -169,24 +169,23 @@ class TaxonomyCleaningFactory extends DelegateInterruptMonitor
 					TypeNode<ElkClass, ElkNamedIndividual> typeNode = instanceTaxonomy
 							.getNode(elkClass);
 
-					if (typeNode == null) {
-						// could be deleted meanwhile in another thread
-						return;
-					}
-					// else
-					List<InstanceNode<ElkClass, ElkNamedIndividual>> directInstances = null;
+					// could be deleted meanwhile in another thread
+					if (typeNode != null) {
+						List<InstanceNode<ElkClass, ElkNamedIndividual>> directInstances = null;
 
-					synchronized (typeNode) {
-						directInstances = new LinkedList<InstanceNode<ElkClass, ElkNamedIndividual>>(
-								typeNode.getDirectInstanceNodes());
-					}
+						synchronized (typeNode) {
+							directInstances = new LinkedList<InstanceNode<ElkClass, ElkNamedIndividual>>(
+									typeNode.getDirectInstanceNodes());
+						}
 
-					for (InstanceNode<ElkClass, ElkNamedIndividual> instanceNode : directInstances) {
-						if (instanceTaxonomy.removeDirectTypes(instanceNode)) {
-							instanceTaxonomy.removeInstanceNode(instanceNode
-									.getCanonicalMember());
+						for (InstanceNode<ElkClass, ElkNamedIndividual> instanceNode : directInstances) {
+							if (instanceTaxonomy.removeDirectTypes(instanceNode)) {
+								instanceTaxonomy.removeInstanceNode(instanceNode
+										.getCanonicalMember());
+							}
 						}
 					}
+
 				}
 
 				/*

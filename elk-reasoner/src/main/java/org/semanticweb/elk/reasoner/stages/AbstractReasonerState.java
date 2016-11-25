@@ -359,8 +359,9 @@ public abstract class AbstractReasonerState {
 			// Invalidate stages at the beginnings of the dependency chains.
 			stageManager.contextInitializationStage.invalidateRecursive();
 			stageManager.incrementalCompletionStage.invalidateRecursive();
-			complete(stageManager.inputLoadingStage);
 		}
+
+		complete(stageManager.inputLoadingStage);
 
 	}
 
