@@ -59,7 +59,7 @@ public class ProofUnwindingFactory
 		implements ProcessorFactory<ProofUnwindingFactory.Engine> {
 
 	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ContextTracingFactory.class);
+			.getLogger(ProofUnwindingFactory.class);
 	
 	/**
 	 * the object where the traced inferences are stored

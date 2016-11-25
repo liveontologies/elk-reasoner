@@ -203,10 +203,6 @@ public class ElkReasoner implements OWLReasoner {
 		// switch to the primary progress monitor; this is to avoid bugs with
 		// progress monitors in Protege
 		this.reasoner_.setProgressMonitor(this.secondaryProgressMonitor_);
-		// TODO: invalidate explanations
-		for (ChangeListener listener : changeListeners_) {
-			listener.internalReasonerChanged();
-		}
 	}
 
 	/**
@@ -345,20 +341,21 @@ public class ElkReasoner implements OWLReasoner {
 				bufferedChangesLoader_ = new OwlChangesLoaderFactory(
 						this.secondaryProgressMonitor_);
 				ontologyReloadRequired_ = false;
-			} else if (!bufferedChangesLoader_.isLoadingFinished()) {
-				// there is something new in the buffer
-				if (isBufferingMode_) {
-					// in buffering mode, new changes need to be buffered
-					// separately in order not to mix with the old changes
-					// so, we need to register the buffer with the reasoner
-					// and create a new one
-					reasoner_.registerAxiomLoader(bufferedChangesLoader_);
-					bufferedChangesLoader_ = new OwlChangesLoaderFactory(
-							this.secondaryProgressMonitor_);
-				}
+			} else if (bufferedChangesLoader_.isLoadingFinished()) {
+				// no changes
+				return;
+			} else if (isBufferingMode_) {
+				// in buffering mode, new changes need to be buffered
+				// separately in order not to mix them with the flushed 
+				// changes that now need to be loaded
+				reasoner_.registerAxiomLoader(bufferedChangesLoader_);
+				bufferedChangesLoader_ = new OwlChangesLoaderFactory(
+						this.secondaryProgressMonitor_);
 			}
-			// proofs should be recomputed
-			// TODO: invalidate explanations
+			// notify about the changes
+			for (ChangeListener listener : changeListeners_) {
+				listener.ontologyChanged();
+			}
 		} catch (ElkRuntimeException e) {
 			throw elkConverter_.convert(e);
 		}
@@ -1127,8 +1124,7 @@ public class ElkReasoner implements OWLReasoner {
 	}
 
 	/**
-	 * A listener to monitor changes for the output values of the methods of
-	 * {@link ElkReasoner}
+	 * A listener to monitor changes for {@link ElkReasoner}
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
@@ -1136,12 +1132,15 @@ public class ElkReasoner implements OWLReasoner {
 	public static interface ChangeListener {
 
 		/**
-		 * Called when the value of {@link ElkReasoner#getInternalReasoner()}
-		 * has changed
-		 * 
-		 * @param reasoner
+		 * Called when the ontology maintained by the reasoner has changed and
+		 * the changes were made visible to the reasoner (e.g., by calling
+		 * {@link OWLReasoner#flush()}). This signals that the logical
+		 * entailments produced by the reasoner may change. Note that if the
+		 * reasoner buffering mode is {@link BufferingMode.NON_BUFFERING} then
+		 * this method is called only after {@link OWLReasoner#flush()} is
+		 * called.
 		 */
-		void internalReasonerChanged();
+		void ontologyChanged();
 
 	}
 

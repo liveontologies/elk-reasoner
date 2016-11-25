@@ -40,24 +40,4 @@ public interface TracingInferenceSet {
 	public Iterable<? extends TracingInference> getInferences(
 			Conclusion conclusion);
 
-	public void add(ChangeListener listener);
-
-	public void remove(ChangeListener listener);
-
-	/**
-	 * A listener to monitor if inferences for axioms have changed
-	 * 
-	 * @author Yevgeny Kazakov
-	 */
-	public interface ChangeListener {
-
-		/**
-		 * called when the inferences for some conclusion may have changed,
-		 * i.e., calling {@link TracingInferenceSet#getInferences(Conclusion)}
-		 * for the same conclusion may produce a different result
-		 */
-		void inferencesChanged();
-
-	}
-
 }

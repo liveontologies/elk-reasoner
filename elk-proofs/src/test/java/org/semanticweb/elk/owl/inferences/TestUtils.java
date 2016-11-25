@@ -54,8 +54,7 @@ public class TestUtils {
 
 		LOGGER_.debug("Provability test: {}", goal);
 		ReasonerElkInferenceSet elkInferences = new ReasonerElkInferenceSet(
-				goal, factory);
-		elkInferences.setReasoner(reasoner);
+				reasoner, goal, factory);
 		InferenceSet<ElkAxiom> inferences = new ElkInferenceSetAdapter(
 				elkInferences);
 		InferenceDerivabilityChecker<ElkAxiom> checker = new InferenceDerivabilityChecker<ElkAxiom>(

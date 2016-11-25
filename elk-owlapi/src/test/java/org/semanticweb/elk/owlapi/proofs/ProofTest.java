@@ -21,6 +21,10 @@ package org.semanticweb.elk.owlapi.proofs;
  * #L%
  */
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -28,9 +32,11 @@ import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.liveontologies.owlapi.proof.OWLProof;
 import org.liveontologies.owlapi.proof.OWLProofNode;
 import org.liveontologies.owlapi.proof.OWLProofStep;
 import org.liveontologies.owlapi.proof.OWLProver;
+import org.liveontologies.owlapi.proof.ProofChangeListener;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -347,6 +353,91 @@ public class ProofTest {
 				factory.getOWLSubClassOfAxiom(sub, sup));
 	}
 
+	@Test
+	public void proofListener() throws Exception {
+		OWLOntologyManager owlManager = OWLManager
+				.createConcurrentOWLOntologyManager();
+		OWLClass a = factory.getOWLClass(IRI.create("http://example.org/A"));
+		OWLClass b = factory.getOWLClass(IRI.create("http://example.org/B"));
+		OWLClass c = factory.getOWLClass(IRI.create("http://example.org/C"));
+		OWLObjectProperty r = factory
+				.getOWLObjectProperty(IRI.create("http://example.org/R"));
+		OWLObjectProperty s = factory
+				.getOWLObjectProperty(IRI.create("http://example.org/S"));
+		OWLAxiom ax1 = factory.getOWLSubClassOfAxiom(a, c);
+		OWLAxiom ax2 = factory.getOWLSubClassOfAxiom(c, b);
+		OWLAxiom ax3 = factory.getOWLSubClassOfAxiom(a,
+				factory.getOWLObjectSomeValuesFrom(r, c));
+		OWLAxiom ax4 = factory.getOWLSubClassOfAxiom(
+				factory.getOWLObjectSomeValuesFrom(s, c), b);
+		OWLAxiom ax5 = factory.getOWLSubObjectPropertyOfAxiom(r, s);
+
+		boolean changed = false; // means entailment has changed
+
+		for (boolean bufferringMode : Arrays.asList(true, false)) {
+			// creating an ontology
+			final OWLOntology ontology = owlManager.createOntology();
+
+			final OWLProver prover = OWLAPITestUtils.createProver(
+					OWLAPITestUtils.createReasoner(ontology, bufferringMode));
+			OWLProof proofAB = prover
+					.getProof(factory.getOWLSubClassOfAxiom(a, b));
+			ProofChangeTracker tracker = new ProofChangeTracker();
+			proofAB.addListener(tracker);
+
+			assertFalse(
+					ProofTestUtils.isDerivable(proofAB.getRoot(), ontology));
+
+			// add ax1 and ax2 => ENTAIL
+			owlManager.applyChanges(Arrays.asList(new AddAxiom(ontology, ax1),
+					new AddAxiom(ontology, ax2)));
+
+			// derivable only in non-buffering mode
+			changed = tracker.changed();
+			assertEquals(!bufferringMode, changed);
+			assertEquals(!bufferringMode,
+					ProofTestUtils.isDerivable(proofAB.getRoot(), ontology));
+			// but always derivable after flush
+			prover.flush();
+			changed |= tracker.changed();
+			assertTrue(changed);
+			assertTrue(ProofTestUtils.isDerivable(proofAB.getRoot(), ontology));
+
+			// remove ax1, add ax3, ax4 => NOT ENTAIL
+			owlManager.applyChanges(Arrays.asList(
+					new RemoveAxiom(ontology, ax1), new AddAxiom(ontology, ax3),
+					new AddAxiom(ontology, ax4)));
+
+			// not derivable even in the  mode since ontology changed
+			changed = tracker.changed();
+			assertEquals(!bufferringMode, changed);
+			assertFalse(
+					ProofTestUtils.isDerivable(proofAB.getRoot(), ontology));
+			// still not derivable after flush
+			prover.flush();
+			changed |= tracker.changed();
+			assertTrue(changed);
+			assertFalse(
+					ProofTestUtils.isDerivable(proofAB.getRoot(), ontology));
+
+			// add ax5 => ENTAIL
+			owlManager.applyChanges(Arrays.asList(new AddAxiom(ontology, ax5)));
+
+			// derivable only in non-buffering mode
+			changed = tracker.changed();
+			assertEquals(!bufferringMode, changed);
+			assertEquals(!bufferringMode,
+					ProofTestUtils.isDerivable(proofAB.getRoot(), ontology));
+			// but always derivable after flush
+			prover.flush();
+			changed |= tracker.changed();
+			assertTrue(changed);
+			assertTrue(ProofTestUtils.isDerivable(proofAB.getRoot(), ontology));
+
+		}
+
+	}
+
 	void printInferences(OWLProver prover, OWLClassExpression sub,
 			OWLClassExpression sup) {
 		ProofExplorer.visitInferences(prover
@@ -381,5 +472,22 @@ public class ProofTest {
 		}
 
 		return ontology;
+	}
+
+	private static class ProofChangeTracker implements ProofChangeListener {
+
+		private boolean changed_ = false;
+
+		@Override
+		public void proofChanged() {
+			this.changed_ = true;
+		}
+
+		boolean changed() {
+			boolean result = changed_;
+			changed_ = false;
+			return result;
+		}
+
 	}
 }

@@ -22,6 +22,9 @@ package org.semanticweb.elk.owlapi;
  * #L%
  */
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.liveontologies.owlapi.proof.OWLProof;
 import org.liveontologies.owlapi.proof.OWLProofNode;
 import org.liveontologies.owlapi.proof.ProofChangeListener;
@@ -50,7 +53,9 @@ public class ElkProof implements OWLProof, ElkReasoner.ChangeListener {
 
 	private final ElkAxiom elkEntailment_;
 
-	private final ReasonerElkInferenceSet reasonerInferences_;
+	private final List<ProofChangeListener> listeners_ = new ArrayList<ProofChangeListener>();
+
+	private OWLProofNode root_;
 
 	/**
 	 * if {@code true}, the inferences returned by the reasoner will be
@@ -62,9 +67,6 @@ public class ElkProof implements OWLProof, ElkReasoner.ChangeListener {
 		this.elkReasoner_ = elkReasoner;
 		this.elkEntailment_ = entailment
 				.accept(OwlClassAxiomConverterVisitor.getInstance());
-		reasonerInferences_ = new ReasonerElkInferenceSet(elkEntailment_,
-				elkReasoner.getElkObjectFactory());
-		setInternalReasoner();
 		elkReasoner_.addListener(this);
 		ReasonerConfiguration config = elkReasoner.getConfigurationOptions();
 		this.flattenInferences_ = config.getParameterAsBoolean(
@@ -73,70 +75,44 @@ public class ElkProof implements OWLProof, ElkReasoner.ChangeListener {
 
 	@Override
 	public OWLProofNode getRoot() {
-		ElkInferenceSet processedInferences = reasonerInferences_;
-		if (flattenInferences_) {
-			processedInferences = new FlattenedElkInferenceSet(
-					processedInferences);
+		if (root_ == null) {
+			// compute
+			ReasonerElkInferenceSet reasonerInferences_ = new ReasonerElkInferenceSet(
+					elkReasoner_.getInternalReasoner(), elkEntailment_,
+					elkReasoner_.getElkObjectFactory());
+			ElkInferenceSet processedInferences = reasonerInferences_;
+			if (flattenInferences_) {
+				processedInferences = new FlattenedElkInferenceSet(
+						processedInferences);
+			}
+			root_ = new ElkOWLProofNode(elkEntailment_, processedInferences,
+					elkReasoner_.getElkObjectFactory());
 		}
-		return new ElkOWLProofNode(elkEntailment_, processedInferences,
-				elkReasoner_.getElkObjectFactory());
-	}
-
-	@Override
-	public void internalReasonerChanged() {
-		setInternalReasoner();
+		return root_;
 	}
 
 	@Override
 	public void addListener(ProofChangeListener listener) {
-		reasonerInferences_.add(new ChangeListenerAdapter(listener));
+		listeners_.add(listener);
 
 	}
 
 	@Override
 	public void removeListener(ProofChangeListener listener) {
-		reasonerInferences_.remove(new ChangeListenerAdapter(listener));
+		listeners_.remove(listener);
+	}
+
+	@Override
+	public void ontologyChanged() {
+		root_ = null;
+		for (ProofChangeListener listener : listeners_) {
+			listener.proofChanged();
+		}
 	}
 
 	@Override
 	public void dispose() {
 		elkReasoner_.removeListener(this);
-	}
-
-	private void setInternalReasoner() {
-		reasonerInferences_.setReasoner(elkReasoner_.getInternalReasoner());
-	}
-
-	private static class ChangeListenerAdapter
-			implements ElkInferenceSet.ChangeListener {
-
-		private final ProofChangeListener proofListener_;
-
-		ChangeListenerAdapter(ProofChangeListener proofListener) {
-			this.proofListener_ = proofListener;
-		}
-
-		@Override
-		public void inferencesChanged() {
-			proofListener_.proofChanged();
-			;
-		}
-
-		@Override
-		public int hashCode() {
-			return proofListener_.hashCode();
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			if (o instanceof ChangeListenerAdapter) {
-				return proofListener_
-						.equals(((ChangeListenerAdapter) o).proofListener_);
-			}
-			// else
-			return false;
-		}
-
 	}
 
 }

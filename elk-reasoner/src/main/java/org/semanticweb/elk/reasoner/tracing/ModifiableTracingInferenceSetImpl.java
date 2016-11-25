@@ -3,9 +3,6 @@
  */
 package org.semanticweb.elk.reasoner.tracing;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /*
  * #%L
  * ELK Reasoner
@@ -52,8 +49,6 @@ public class ModifiableTracingInferenceSetImpl<I extends TracingInference>
 
 	private final Multimap<Conclusion, I> inferenceMap_ = new HashListMultimap<Conclusion, I>();
 
-	private final List<ChangeListener> listeners_ = new ArrayList<ChangeListener>();
-
 	@Override
 	public void produce(I inference) {
 		LOGGER_.trace("{}: inference produced", inference);
@@ -61,13 +56,8 @@ public class ModifiableTracingInferenceSetImpl<I extends TracingInference>
 	}
 
 	@Override
-	public boolean clear() {
-		if (inferenceMap_.isEmpty()) {
-			return false;
-		}
+	public void clear() {
 		inferenceMap_.clear();
-		fireChanged();
-		return true;
 	}
 
 	@Override
@@ -86,22 +76,6 @@ public class ModifiableTracingInferenceSetImpl<I extends TracingInference>
 			}
 		}
 		return sb.toString();
-	}
-
-	@Override
-	public void add(ChangeListener listener) {
-		listeners_.add(listener);
-	}
-
-	@Override
-	public void remove(ChangeListener listener) {
-		listeners_.remove(listener);
-	}
-
-	synchronized void fireChanged() {
-		for (ChangeListener listener : listeners_) {
-			listener.inferencesChanged();
-		}
 	}
 
 }

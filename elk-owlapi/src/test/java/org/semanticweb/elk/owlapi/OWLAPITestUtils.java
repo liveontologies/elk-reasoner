@@ -77,6 +77,12 @@ public class OWLAPITestUtils {
 				FailingReasonerInterrupter.INSTANCE, stageExecutor);
 	}
 
+	public static ElkReasoner createReasoner(final OWLOntology ontology,
+			final boolean isBufferingMode) {
+		return createReasoner(ontology, isBufferingMode,
+				new SimpleStageExecutor());
+	}
+
 	/**
 	 * Created a reasoner that fails on interrupt.
 	 * 
@@ -87,9 +93,13 @@ public class OWLAPITestUtils {
 		return createReasoner(ontology, false,
 				FailingReasonerInterrupter.INSTANCE, new SimpleStageExecutor());
 	}
-	
+
+	public static ElkProver createProver(ElkReasoner reasoner) {
+		return new ElkProver(reasoner);
+	}
+
 	public static ElkProver createProver(OWLOntology ontology) {
-		return new ElkProver(createReasoner(ontology));
+		return createProver(createReasoner(ontology));
 	}
 
 }

@@ -3,8 +3,6 @@
  */
 package org.semanticweb.elk.reasoner.tracing;
 
-import java.util.ArrayList;
-
 /*-
  * #%L
  * ELK Reasoner Core
@@ -28,7 +26,6 @@ import java.util.ArrayList;
  */
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -53,6 +50,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.stages.PropertyHierarchyCompositionState;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A collections of objects for tracing contexts and keeping the relevant
@@ -68,6 +67,10 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  */
 public class TraceState implements
 		TracingInferenceProducer<SaturationInference>, TracingInferenceSet {
+
+	// logger for this class
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(TraceState.class);
 
 	private final Queue<ClassConclusion> toTrace_ = new ConcurrentLinkedQueue<ClassConclusion>();
 
@@ -86,8 +89,6 @@ public class TraceState implements
 	private final Conclusion.Visitor<Iterable<? extends TracingInference>> inferenceGetter_ = new InferenceGetter();
 
 	private final ElkAxiomConverter elkAxiomConverter_;
-
-	private final List<ChangeListener> listeners_ = new ArrayList<ChangeListener>();
 
 	public <C extends Context> TraceState(
 			final SaturationState<C> saturationState,
@@ -142,54 +143,27 @@ public class TraceState implements
 
 	public synchronized void toTrace(ClassConclusion conclusion) {
 		if (traced_.add(conclusion)) {
+			LOGGER_.trace("{}: to trace", conclusion);
 			toTrace_.add(conclusion);
 		}
-	}
-
-	@Override
-	public synchronized void add(ChangeListener listener) {
-		listeners_.add(listener);
-	}
-
-	@Override
-	public synchronized void remove(ChangeListener listener) {
-		listeners_.remove(listener);
 	}
 
 	public ClassConclusion pollToTrace() {
 		return toTrace_.poll();
 	}
 
-	private boolean clearClassInferences() {
-		boolean changed = classInferences_.clear();
-		if (!traced_.isEmpty()) {
-			traced_.clear();
-			changed = true;
-		}
-		if (changed) {
-			fireChanged();
-		}
-		return changed;
+	private void clearClassInferences() {
+		classInferences_.clear();
+		traced_.clear();
 	}
 
-	private boolean clearObjectPropertyInferences() {
-		boolean changed = objectPropertyInferences_.clear();
-		if (changed) {
-			fireChanged();
-		}
-		return changed;
+	private void clearObjectPropertyInferences() {
+		objectPropertyInferences_.clear();
 	}
 
-	private boolean clearIndexedAxiomInferences() {
-		boolean changed = indexedAxiomInferences_.clear();
-		if (!indexedAxioms_.isEmpty()) {
-			indexedAxioms_.clear();
-			changed = true;
-		}
-		if (changed) {
-			fireChanged();
-		}
-		return changed;
+	private void clearIndexedAxiomInferences() {
+		indexedAxiomInferences_.clear();
+		indexedAxioms_.clear();
 	}
 
 	@Override
@@ -210,12 +184,6 @@ public class TraceState implements
 		}
 		// else index axiom
 		axiom.accept(elkAxiomConverter_);
-	}
-
-	synchronized void fireChanged() {
-		for (ChangeListener listener : listeners_) {
-			listener.inferencesChanged();
-		}
 	}
 
 	/**
