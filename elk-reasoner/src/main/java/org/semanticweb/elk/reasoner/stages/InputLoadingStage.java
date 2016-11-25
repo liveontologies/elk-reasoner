@@ -30,6 +30,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
 import org.semanticweb.elk.owl.visitors.DummyElkObjectVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionProcessor;
@@ -269,7 +270,7 @@ public class InputLoadingStage extends AbstractReasonerStage {
 	}
 
 	private static final ElkObjectVisitor<Void> AXIOM_UNSUPPORTED_ELK_OBJECT_VISITOR_ = new DummyElkObjectVisitor<Void>() {
-
+		
 		@Override
 		public Void visit(final ElkDataHasValue obj) {
 			if (LOGGER_.isWarnEnabled()) {
@@ -289,6 +290,16 @@ public class InputLoadingStage extends AbstractReasonerStage {
 			}
 			return super.visit(obj);
 		}
+		
+		@Override
+		public Void visit(final ElkObjectPropertyRangeAxiom obj) {
+			if (LOGGER_.isWarnEnabled()) {
+				LoggerWrap.log(LOGGER_, LogLevel.WARN,
+						"reasoner.indexing.objectPropertyRangeAxiom",
+						"ELK supports ObjectPropertyRangeAxiom only partially. Reasoning might be incomplete!");
+			}
+			return super.visit(obj);
+		}		
 
 	};
 
