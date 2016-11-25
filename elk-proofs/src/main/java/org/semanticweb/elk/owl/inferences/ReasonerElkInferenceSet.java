@@ -33,6 +33,9 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
+import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
+import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
@@ -104,14 +107,40 @@ public class ReasonerElkInferenceSet extends ModifiableElkInferenceSetImpl {
 							reasoner_.explainConclusion(conclusion),
 							elkFactory_, inferenceFactory_);
 					matcher.trace(conclusion, entity);
+
 					inferenceFactory_.getElkClassInclusionOwlThing(subClass);
+
 					inferenceFactory_
-							.getElkClassInclusionOfInconsistentIndividual(
-									entity);
+							.getElkClassInclusionTopObjectHasValue(entity);
+
+					inferenceFactory_.getElkEquivalentClassesObjectHasValue(
+							elkFactory_.getOwlTopObjectProperty(), entity);
+					ElkObjectHasValue hasValue = elkFactory_.getObjectHasValue(
+							elkFactory_.getOwlTopObjectProperty(), entity);
+					ElkObjectOneOf nominal = elkFactory_.getObjectOneOf(entity);
+					ElkObjectSomeValuesFrom existential = elkFactory_
+							.getObjectSomeValuesFrom(
+									elkFactory_.getOwlTopObjectProperty(),
+									nominal);
+					inferenceFactory_.getElkClassInclusionOfEquivaletClasses(
+							hasValue, existential, true);
+
+					inferenceFactory_
+							.getElkClassInclusionExistentialFillerExpansion(
+									elkFactory_.getOwlTopObjectProperty(),
+									nominal, elkFactory_.getOwlNothing());
+
+					inferenceFactory_.getElkClassInclusionExistentialOwlNothing(
+							elkFactory_.getOwlTopObjectProperty());
+
 					inferenceFactory_
 							.getElkClassInclusionOwlNothing(superClass);
+
 					inferenceFactory_.getElkClassInclusionHierarchy(subClass,
-							elkFactory_.getOwlThing(),
+							elkFactory_.getOwlThing(), hasValue, existential,
+							elkFactory_.getObjectSomeValuesFrom(
+									elkFactory_.getOwlTopObjectProperty(),
+									elkFactory_.getOwlNothing()),
 							elkFactory_.getOwlNothing(), superClass);
 					return true;
 				}

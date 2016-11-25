@@ -53,35 +53,23 @@ public class ElkInferenceExamples
 
 	private final static ElkInferenceExamples INSTANCE_ = new ElkInferenceExamples();
 
-	private final ElkObject.Factory elkFactory_ = new ElkObjectBaseFactory();
+	public static ElkInference getExample(ElkInference inference) {
+		return inference.accept(INSTANCE_);
+	}
 
-	private final ElkInference.Factory inferenceFactory_ = new ElkInferenceBaseFactory();
+	private final ElkObject.Factory elkFactory_ = new ElkObjectBaseFactory();
 
 	private final ElkPrefix examplePrefix = new ElkPrefixImpl("",
 			new ElkFullIri("http://org.example/"));
+
+	private final ElkInference.Factory inferenceFactory_ = new ElkInferenceBaseFactory();
 
 	private ElkInferenceExamples() {
 
 	}
 
-	public static ElkInference getExample(ElkInference inference) {
-		return inference.accept(INSTANCE_);
-	}
-
-	private ElkIri getIri(String name) {
-		return new ElkAbbreviatedIri(examplePrefix, name);
-	}
-
 	private ElkClass getClass(String name) {
 		return elkFactory_.getClass(getIri(name));
-	}
-
-	private ElkObjectProperty getObjectProperty(String name) {
-		return elkFactory_.getObjectProperty(getIri(name));
-	}
-
-	private ElkIndividual getIndividual(String name) {
-		return elkFactory_.getNamedIndividual(getIri(name));
 	}
 
 	private List<ElkClass> getClasses(String prefix, int count) {
@@ -90,6 +78,22 @@ public class ElkInferenceExamples
 			result.add(getClass(prefix + i));
 		}
 		return result;
+	}
+
+	private ElkIndividual getIndividual(String name) {
+		return elkFactory_.getNamedIndividual(getIri(name));
+	}
+
+	private List<ElkIndividual> getIndividuals(String prefix, int count) {
+		List<ElkIndividual> result = new ArrayList<ElkIndividual>(count);
+		for (int i = 1; i <= count; i++) {
+			result.add(getIndividual(prefix + i));
+		}
+		return result;
+	}
+
+	private ElkIri getIri(String name) {
+		return new ElkAbbreviatedIri(examplePrefix, name);
 	}
 
 	private List<ElkObjectProperty> getObjectProperties(String prefix,
@@ -107,19 +111,8 @@ public class ElkInferenceExamples
 		return result;
 	}
 
-	private List<ElkIndividual> getIndividuals(String prefix, int count) {
-		List<ElkIndividual> result = new ArrayList<ElkIndividual>(count);
-		for (int i = 1; i <= count; i++) {
-			result.add(getIndividual(prefix + i));
-		}
-		return result;
-	}
-
-	@Override
-	public ElkClassInclusionOwlThingEmptyObjectIntersectionOf visit(
-			ElkClassInclusionOwlThingEmptyObjectIntersectionOf inference) {
-		return inferenceFactory_
-				.getElkClassInclusionOwlThingEmptyObjectIntersectionOf();
+	private ElkObjectProperty getObjectProperty(String name) {
+		return elkFactory_.getObjectProperty(getIri(name));
 	}
 
 	@Override
@@ -272,13 +265,6 @@ public class ElkInferenceExamples
 	}
 
 	@Override
-	public ElkClassInclusionOfInconsistentIndividual visit(
-			ElkClassInclusionOfInconsistentIndividual inference) {
-		return inferenceFactory_.getElkClassInclusionOfInconsistentIndividual(
-				getIndividual("a"));
-	}
-
-	@Override
 	public ElkClassInclusionOfObjectPropertyAssertion visit(
 			ElkClassInclusionOfObjectPropertyAssertion inference) {
 		return inferenceFactory_.getElkClassInclusionOfObjectPropertyAssertion(
@@ -312,6 +298,13 @@ public class ElkInferenceExamples
 	}
 
 	@Override
+	public ElkClassInclusionOwlThingEmptyObjectIntersectionOf visit(
+			ElkClassInclusionOwlThingEmptyObjectIntersectionOf inference) {
+		return inferenceFactory_
+				.getElkClassInclusionOwlThingEmptyObjectIntersectionOf();
+	}
+
+	@Override
 	public ElkClassInclusionReflexivePropertyRange visit(
 			ElkClassInclusionReflexivePropertyRange inference) {
 		return inferenceFactory_.getElkClassInclusionReflexivePropertyRange(
@@ -330,6 +323,13 @@ public class ElkInferenceExamples
 	public ElkClassInclusionTautology visit(
 			ElkClassInclusionTautology inference) {
 		return inferenceFactory_.getElkClassInclusionTautology(getClass("C"));
+	}
+
+	@Override
+	public ElkClassInclusionTopObjectHasValue visit(
+			ElkClassInclusionTopObjectHasValue inference) {
+		return inferenceFactory_
+				.getElkClassInclusionTopObjectHasValue(getIndividual("a"));
 	}
 
 	@Override
@@ -399,6 +399,18 @@ public class ElkInferenceExamples
 
 					@Override
 					public ElkPropertyInclusionHierarchy visit(
+							ElkObjectInverseOf expression) {
+						return defaultVisit(expression);
+					}
+
+					@Override
+					public ElkPropertyInclusionHierarchy visit(
+							ElkObjectProperty expression) {
+						return defaultVisit(expression);
+					}
+
+					@Override
+					public ElkPropertyInclusionHierarchy visit(
 							ElkObjectPropertyChain expression) {
 						int chainSize = expression
 								.getObjectPropertyExpressions().size();
@@ -409,18 +421,6 @@ public class ElkInferenceExamples
 														chainSize)),
 										getObjectProperties("S",
 												hierarchySize));
-					}
-
-					@Override
-					public ElkPropertyInclusionHierarchy visit(
-							ElkObjectInverseOf expression) {
-						return defaultVisit(expression);
-					}
-
-					@Override
-					public ElkPropertyInclusionHierarchy visit(
-							ElkObjectProperty expression) {
-						return defaultVisit(expression);
 					}
 				});
 

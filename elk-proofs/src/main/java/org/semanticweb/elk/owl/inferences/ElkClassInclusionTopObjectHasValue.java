@@ -1,6 +1,6 @@
 package org.semanticweb.elk.owl.inferences;
 
-/*
+/*-
  * #%L
  * ELK Proofs Package
  * $Id:$
@@ -22,9 +22,6 @@ package org.semanticweb.elk.owl.inferences;
  * #L%
  */
 
-import java.util.Collections;
-
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
@@ -33,27 +30,25 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  * Represents the inference:
  * 
  * <pre>
- * {a} ⊑ ⊥
- * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
- *   ⊤ ⊑ ⊥
+ * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+ *  ⊤ ⊑ ObjectHasValue(⊤ a)
  * </pre>
  * 
  * @author Yevgeny Kazakov
  *
  */
-public class ElkClassInclusionOfInconsistentIndividual
-		extends AbstractElkInference {
+public class ElkClassInclusionTopObjectHasValue extends AbstractElkInference {
 
-	private final static String NAME_ = "Inconsistent Individual";
+	private final static String NAME_ = "Top Object Property Value";
 
-	private final ElkIndividual inconsistent_;
+	private final ElkIndividual value_;
 
-	ElkClassInclusionOfInconsistentIndividual(ElkIndividual inconsistent) {
-		this.inconsistent_ = inconsistent;
+	ElkClassInclusionTopObjectHasValue(ElkIndividual value) {
+		this.value_ = value;
 	}
 
-	public ElkIndividual getInconsistent() {
-		return inconsistent_;
+	public ElkIndividual getValue() {
+		return value_;
 	}
 
 	@Override
@@ -63,29 +58,19 @@ public class ElkClassInclusionOfInconsistentIndividual
 
 	@Override
 	public int getPremiseCount() {
-		return 1;
+		return 0;
 	}
 
 	@Override
-	public ElkAxiom getPremise(int index, ElkObject.Factory factory) {
-		if (index == 0) {
-			return getPremise(factory);
-		}
-		// else
+	public ElkSubClassOfAxiom getPremise(int index, ElkObject.Factory factory) {
 		return failGetPremise(index);
-	}
-
-	public ElkSubClassOfAxiom getPremise(ElkObject.Factory factory) {
-		return factory.getSubClassOfAxiom(
-				factory.getObjectOneOf(
-						Collections.singletonList(inconsistent_)),
-				factory.getOwlNothing());
 	}
 
 	@Override
 	public ElkSubClassOfAxiom getConclusion(ElkObject.Factory factory) {
 		return factory.getSubClassOfAxiom(factory.getOwlThing(),
-				factory.getOwlNothing());
+				factory.getObjectHasValue(factory.getOwlTopObjectProperty(),
+						getValue()));
 	}
 
 	@Override
@@ -101,8 +86,9 @@ public class ElkClassInclusionOfInconsistentIndividual
 	 */
 	public interface Factory {
 
-		ElkClassInclusionOfInconsistentIndividual getElkClassInclusionOfInconsistentIndividual(
-				ElkIndividual inconsistent);
+		ElkClassInclusionTopObjectHasValue getElkClassInclusionTopObjectHasValue(
+				ElkIndividual value);
+
 	}
 
 	/**
@@ -115,7 +101,7 @@ public class ElkClassInclusionOfInconsistentIndividual
 	 */
 	interface Visitor<O> {
 
-		O visit(ElkClassInclusionOfInconsistentIndividual inference);
+		O visit(ElkClassInclusionTopObjectHasValue inference);
 
 	}
 

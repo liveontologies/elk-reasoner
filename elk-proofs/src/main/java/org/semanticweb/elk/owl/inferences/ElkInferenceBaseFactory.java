@@ -207,12 +207,6 @@ public class ElkInferenceBaseFactory implements ElkInference.Factory {
 	}
 
 	@Override
-	public ElkClassInclusionOfInconsistentIndividual getElkClassInclusionOfInconsistentIndividual(
-			ElkIndividual inconsistent) {
-		return new ElkClassInclusionOfInconsistentIndividual(inconsistent);
-	}
-
-	@Override
 	public ElkClassInclusionOfObjectPropertyAssertion getElkClassInclusionOfObjectPropertyAssertion(
 			ElkIndividual subject, ElkObjectPropertyExpression property,
 			ElkIndividual object) {
@@ -268,6 +262,12 @@ public class ElkInferenceBaseFactory implements ElkInference.Factory {
 	public ElkClassInclusionTautology getElkClassInclusionTautology(
 			ElkClassExpression expression) {
 		return new ElkClassInclusionTautology(expression);
+	}
+
+	@Override
+	public ElkClassInclusionTopObjectHasValue getElkClassInclusionTopObjectHasValue(
+			ElkIndividual value) {
+		return new ElkClassInclusionTopObjectHasValue(value);
 	}
 
 	@Override

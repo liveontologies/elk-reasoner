@@ -306,19 +306,6 @@ public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 
 	@Override
 	public Boolean visit(
-			final ElkClassInclusionOfInconsistentIndividual inference) {
-		return other_.accept(new DefaultVisitor() {
-			@Override
-			public Boolean visit(
-					ElkClassInclusionOfInconsistentIndividual other) {
-				return equals(other.getInconsistent(),
-						inference.getInconsistent());
-			}
-		});
-	}
-
-	@Override
-	public Boolean visit(
 			final ElkClassInclusionOfObjectPropertyAssertion inference) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
@@ -420,6 +407,16 @@ public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 			@Override
 			public Boolean visit(ElkClassInclusionTautology other) {
 				return equals(other.getExpression(), inference.getExpression());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(final ElkClassInclusionTopObjectHasValue inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(ElkClassInclusionTopObjectHasValue other) {
+				return equals(other.getValue(), inference.getValue());
 			}
 		});
 	}

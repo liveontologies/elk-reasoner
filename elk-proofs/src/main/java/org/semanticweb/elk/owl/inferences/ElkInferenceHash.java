@@ -209,13 +209,6 @@ public class ElkInferenceHash implements ElkInference.Visitor<Integer> {
 	}
 
 	@Override
-	public Integer visit(ElkClassInclusionOfInconsistentIndividual inference) {
-		return combinedHashCode(
-				hashCode(ElkClassInclusionOfInconsistentIndividual.class),
-				hashCode(inference.getInconsistent()));
-	}
-
-	@Override
 	public Integer visit(ElkClassInclusionOfObjectPropertyAssertion inference) {
 		return combinedHashCode(
 				hashCode(ElkClassInclusionOfObjectPropertyAssertion.class),
@@ -280,6 +273,13 @@ public class ElkInferenceHash implements ElkInference.Visitor<Integer> {
 	public Integer visit(ElkClassInclusionTautology inference) {
 		return combinedHashCode(hashCode(ElkClassInclusionTautology.class),
 				hashCode(inference.getExpression()));
+	}
+
+	@Override
+	public Integer visit(ElkClassInclusionTopObjectHasValue inference) {
+		return combinedHashCode(
+				hashCode(ElkClassInclusionTopObjectHasValue.class),
+				hashCode(inference.getValue()));
 	}
 
 	@Override
