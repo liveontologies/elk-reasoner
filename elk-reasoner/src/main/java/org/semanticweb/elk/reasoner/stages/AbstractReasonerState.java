@@ -997,6 +997,7 @@ public abstract class AbstractReasonerState {
 	public void visitDerivedConclusionsForSubsumption(
 			ElkClassExpression subClass, ElkClassExpression superClass,
 			DerivedClassConclusionVisitor visitor) throws ElkException {
+		// ensure checking consistency is done
 		isInconsistent();
 		// checking owl:Thing consistency
 		if (consistencyCheckingState.isOwlThingInconsistent()) {
@@ -1012,6 +1013,18 @@ public abstract class AbstractReasonerState {
 					ind.getElkEntity())) {
 				return;
 			}
+		}		
+		// a workaround to ensure that subClass and superClass are properly
+		// indexed and saturated TODO: support using entailment queries
+		try {
+			if (!(subClass instanceof ElkClass)) {
+				querySatisfiability(subClass);
+			}
+			if (!(superClass instanceof ElkClass)) {
+				querySatisfiability(superClass);
+			}
+		} catch (ElkInconsistentOntologyException ignore) {
+			// ignore
 		}
 		// checking inconsistency of subClass
 		ModifiableIndexedClassExpression root = subClass
