@@ -23,7 +23,6 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,7 +40,6 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ChainableContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
@@ -119,15 +117,9 @@ public class DifferentialIndex extends DirectIndex {
 	private Map<ModifiableIndexedClass, ElkAxiom> addedDefinitionReasons_,
 			removedDefinitionReasons_;
 
-	public DifferentialIndex(final PredefinedElkEntityFactory elkFactory,
-			final Collection<? extends OntologyIndex.ChangeListener> listeners) {
-		super(elkFactory, listeners);
-		init();
-	}
-
 	public DifferentialIndex(final PredefinedElkEntityFactory elkFactory) {
-		this(elkFactory,
-				Collections.<OntologyIndex.ChangeListener> emptyList());
+		super(elkFactory);
+		init();
 	}
 
 	/**

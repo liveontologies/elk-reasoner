@@ -64,78 +64,40 @@ public class ClassTaxonomyState {
 	 * Contains at least all classes that are in ontology, but either are
 	 * removed from taxonomy or their super-nodes in taxonomy were removed.
 	 */
-	private final Queue<IndexedClass> modified_;
+	private final Queue<IndexedClass> modified_ = new ConcurrentLinkedQueue<IndexedClass>();
 
 	/**
 	 * Contains at least all classes that are in taxonomy, but either are
 	 * removed from ontology or their context became not saturated.
 	 */
-	private final Queue<IndexedClass> removed_;
+	private final Queue<IndexedClass> removed_ = new ConcurrentLinkedQueue<IndexedClass>();
 
 	private final OntologyIndex ontologyIndex_;
 
-	private final SaturationState<?> saturationState_;
-
 	private final ElkPolarityExpressionConverter converter_;
 
-	public static class Builder {
-		
-		private final Queue<IndexedClass> modified_ = new ConcurrentLinkedQueue<IndexedClass>();
-		private final Queue<IndexedClass> removed_ = new ConcurrentLinkedQueue<IndexedClass>();
-		private final OntologyIndex.ChangeListener ontologyListener_;
-		
-		private boolean isBuilt_ = false;
-		
-		public Builder() {
-			this.ontologyListener_ = new OntologyIndexDummyChangeListener() {
-
-				@Override
-				public void classAddition(final IndexedClass cls) {
-					modified_.add(cls);
-				}
-
-				@Override
-				public void classRemoval(final IndexedClass cls) {
-					removed_.add(cls);
-				}
-
-			};
-		}
-		
-		public OntologyIndex.ChangeListener getOntologyListener() {
-			return ontologyListener_;
-		}
-		
-		public <C extends Context> ClassTaxonomyState build(
-				final SaturationState<C> saturationState,
-				final DifferentialIndex ontologyIndex,
-				final ElkObject.Factory elkFactory) {
-			
-			if (isBuilt_) {
-				throw new IllegalStateException(
-						ClassTaxonomyState.class.getSimpleName()
-								+ " can be built only once!");
-			}
-			isBuilt_ = true;
-			
-			return new ClassTaxonomyState(modified_, removed_, saturationState, ontologyIndex, elkFactory);
-		}
-		
-	}
-	
-	private <C extends Context> ClassTaxonomyState(
-			final Queue<IndexedClass> modified,
-			final Queue<IndexedClass> removed,
+	public <C extends Context> ClassTaxonomyState(
 			final SaturationState<C> saturationState,
 			final DifferentialIndex ontologyIndex,
 			final ElkObject.Factory elkFactory) {
 
-		this.modified_ = modified;
-		this.removed_ = removed;
 		this.ontologyIndex_ = ontologyIndex;
-		this.saturationState_ = saturationState;
 		this.converter_ = new ElkPolarityExpressionConverterImpl(elkFactory,
 				ontologyIndex);
+
+		ontologyIndex.addListener(new OntologyIndexDummyChangeListener() {
+
+			@Override
+			public void classAddition(final IndexedClass cls) {
+				modified_.add(cls);
+			}
+
+			@Override
+			public void classRemoval(final IndexedClass cls) {
+				removed_.add(cls);
+			}
+
+		});
 
 		saturationState
 				.addListener(new SaturationStateDummyChangeListener<C>() {
@@ -188,13 +150,6 @@ public class ClassTaxonomyState {
 		}
 	}
 
-	/**
-	 * Prunes the queue of modified classes.
-	 * <p>
-	 * <strong>{@code taxonomy_} must not be {@code null}!</strong>
-	 * 
-	 * @return The resulting size of the queue of modified classes.
-	 */
 	private int pruneModified() {
 		final Iterator<IndexedClass> iter = modified_.iterator();
 		int size = 0;
@@ -214,10 +169,8 @@ public class ClassTaxonomyState {
 				continue;
 			}
 			// else
-			final Context context = saturationState_.getContext(cls);
-			if (context == null || !context.isInitialized()
-					|| !context.isSaturated()) {
-				// it is not saturated.
+			if (taxonomy_ == null) {
+				// it is not in taxonomy
 				size++;
 				continue;
 			}
@@ -255,11 +208,6 @@ public class ClassTaxonomyState {
 	 *         super-nodes in taxonomy were removed.
 	 */
 	Collection<IndexedClass> getModified() {
-		if (taxonomy_ == null) {
-			// No class can be pruned from modified.
-			return modified_;
-		}
-		// else
 		final int size = pruneModified();
 		/*
 		 * since getting the size of the queue is a linear operation, use the
@@ -269,17 +217,6 @@ public class ClassTaxonomyState {
 	}
 
 	private int pruneRemoved() {
-		if (taxonomy_ == null) {// TODO: Never set taxonomy_ to null !!!
-			// none of removed classes is in taxonomy
-			IndexedClass cls;
-			while ((cls = removed_.poll()) != null) {
-				if (cls.occurs()) {
-					modified_.offer(cls);
-				}
-			}
-			return 0;
-		}
-		// else
 		final Iterator<IndexedClass> iter = removed_.iterator();
 		int size = 0;
 		while (iter.hasNext()) {
@@ -292,6 +229,15 @@ public class ClassTaxonomyState {
 			 * 
 			 * @formatter:on
 			 */
+			if (taxonomy_ == null) {// TODO: Never set taxonomy_ to null !!!
+				// it is not in taxonomy
+				iter.remove();
+				if (cls.occurs()) {
+					modified_.add(cls);
+				}
+				continue;
+			}
+			// else
 			final TaxonomyNode<ElkClass> node = taxonomy_
 					.getNode(cls.getElkEntity());
 			if (node == null) {
@@ -358,11 +304,6 @@ public class ClassTaxonomyState {
 		}
 
 		public void clearTaxonomy() {
-
-			// All classes are removed from taxonomy
-			modified_.clear();
-			modified_.addAll(ontologyIndex_.getClasses());
-
 			if (taxonomy_ != null) {
 				taxonomy_.removeListener(nodeStoreListener_);
 				taxonomy_.removeListener(taxonomyListener_);

@@ -23,8 +23,6 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
@@ -65,13 +63,11 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl
 
 	private final List<ModifiableOntologyIndex.IndexingUnsupportedListener> indexingUnsupportedListeners_;
 
-	public DirectIndex(final PredefinedElkEntityFactory elkFactory,
-			final Collection<? extends OntologyIndex.ChangeListener> listeners) {
-		super(elkFactory, listeners);
+	public DirectIndex(final PredefinedElkEntityFactory elkFactory) {
+		super(elkFactory);
 		this.reflexiveObjectProperties_ = new HashListMultimap<IndexedObjectProperty, ElkAxiom>(
 				64);
-		this.listeners_ = new ArrayList<OntologyIndex.ChangeListener>(
-				listeners);
+		this.listeners_ = new ArrayList<OntologyIndex.ChangeListener>();
 		this.indexingUnsupportedListeners_ = new ArrayList<ModifiableOntologyIndex.IndexingUnsupportedListener>();
 		// the context root initialization rule is always registered
 		RootContextInitializationRule.addRuleFor(this);
@@ -118,11 +114,6 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl
 
 			}
 		});
-	}
-
-	public DirectIndex(final PredefinedElkEntityFactory elkFactory) {
-		this(elkFactory,
-				Collections.<OntologyIndex.ChangeListener> emptyList());
 	}
 
 	/* read-only methods required by the interface */

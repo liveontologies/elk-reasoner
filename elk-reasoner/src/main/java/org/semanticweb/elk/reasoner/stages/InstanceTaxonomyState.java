@@ -36,7 +36,6 @@ import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionCon
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateDummyChangeListener;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -66,73 +65,37 @@ public class InstanceTaxonomyState {
 	 * Contains at least all individuals that are in ontology, but either are
 	 * removed from taxonomy or their type nodes in taxonomy were removed.
 	 */
-	private final Queue<IndexedIndividual> modified_;
+	private final Queue<IndexedIndividual> modified_ = new ConcurrentLinkedQueue<IndexedIndividual>();
 
 	/**
 	 * Contains at least all individuals that are in taxonomy, but either are
 	 * removed from ontology or their context became not saturated.
 	 */
-	private final Queue<IndexedIndividual> removed_;
+	private final Queue<IndexedIndividual> removed_ = new ConcurrentLinkedQueue<IndexedIndividual>();
 
 	private final ElkPolarityExpressionConverter converter_;
 
-	public static class Builder {
-
-		private final Queue<IndexedIndividual> modified_ = new ConcurrentLinkedQueue<IndexedIndividual>();
-		private final Queue<IndexedIndividual> removed_ = new ConcurrentLinkedQueue<IndexedIndividual>();
-		private final OntologyIndex.ChangeListener ontologyListener_;
-
-		private boolean isBuilt_ = false;
-
-		public Builder() {
-			this.ontologyListener_ = new OntologyIndexDummyChangeListener() {
-
-				@Override
-				public void individualAddition(final IndexedIndividual ind) {
-					modified_.add(ind);
-				}
-
-				@Override
-				public void individualRemoval(final IndexedIndividual ind) {
-					removed_.add(ind);
-				}
-
-			};
-		}
-
-		public OntologyIndex.ChangeListener getOntologyListener() {
-			return ontologyListener_;
-		}
-
-		public <C extends Context> InstanceTaxonomyState build(
-				final SaturationState<C> saturationState,
-				final DifferentialIndex ontologyIndex,
-				final ElkObject.Factory elkFactory) {
-
-			if (isBuilt_) {
-				throw new IllegalStateException(
-						InstanceTaxonomyState.class.getSimpleName()
-								+ " can be built only once!");
-			}
-			isBuilt_ = true;
-
-			return new InstanceTaxonomyState(modified_, removed_,
-					saturationState, ontologyIndex, elkFactory);
-		}
-
-	}
-
-	private <C extends Context> InstanceTaxonomyState(
-			final Queue<IndexedIndividual> modified,
-			final Queue<IndexedIndividual> removed,
+	public <C extends Context> InstanceTaxonomyState(
 			final SaturationState<C> saturationState,
 			final DifferentialIndex ontologyIndex,
 			final ElkObject.Factory elkFactory) {
 
-		this.modified_ = modified;
-		this.removed_ = removed;
 		this.converter_ = new ElkPolarityExpressionConverterImpl(elkFactory,
 				ontologyIndex);
+
+		ontologyIndex.addListener(new OntologyIndexDummyChangeListener() {
+
+			@Override
+			public void individualAddition(final IndexedIndividual ind) {
+				modified_.add(ind);
+			}
+
+			@Override
+			public void individualRemoval(final IndexedIndividual ind) {
+				removed_.add(ind);
+			}
+
+		});
 
 		saturationState
 				.addListener(new SaturationStateDummyChangeListener<C>() {
