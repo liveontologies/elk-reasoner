@@ -39,6 +39,7 @@ import org.liveontologies.owlapi.proof.OWLProver;
 import org.liveontologies.owlapi.proof.ProofChangeListener;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
+import org.semanticweb.elk.owlapi.TestOWLManager;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
 import org.semanticweb.owlapi.model.AddAxiom;
@@ -460,7 +461,7 @@ public class ProofTest {
 
 	private OWLOntology loadOntology(InputStream stream)
 			throws IOException, Owl2ParseException {
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		OWLOntologyManager manager = TestOWLManager.createOWLOntologyManager();
 		OWLOntology ontology = null;
 
 		try {

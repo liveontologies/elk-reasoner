@@ -62,7 +62,6 @@ import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.elk.testing.UrlTestInput;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -101,7 +100,7 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 
 	protected final ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> manifest;
 	
-	private final OWLOntologyManager manager_ = OWLManager.createOWLOntologyManager();
+	private final OWLOntologyManager manager_ = TestOWLManager.createOWLOntologyManager();
 	
 	public OWLAPIRandomWalkIncrementalClassificationTest(
 			ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> testManifest) {
@@ -206,7 +205,7 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 		public Reasoner createReasoner(Iterable<OWLAxiom> axioms) {					
 			try {
 				return OWLAPITestUtils.createReasoner(
-						OWLManager.createOWLOntologyManager()
+						TestOWLManager.createOWLOntologyManager()
 								.copyOntology(ontology_, OntologyCopy.SHALLOW),
 						false, new SimpleStageExecutor()).getInternalReasoner();
 			} catch (OWLOntologyCreationIOException e) {

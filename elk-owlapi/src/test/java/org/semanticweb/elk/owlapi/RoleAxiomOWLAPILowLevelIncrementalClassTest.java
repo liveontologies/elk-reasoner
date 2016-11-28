@@ -29,7 +29,6 @@ import static org.junit.Assert.fail;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -60,7 +59,7 @@ public class RoleAxiomOWLAPILowLevelIncrementalClassTest extends
 		OWLAxiom axReflR = factory.getOWLReflexiveObjectPropertyAxiom(R);
 		axRsubS = factory.getOWLSubObjectPropertyOfAxiom(R, S);
 		// from these three axioms it should follow A subclass B
-		ontologyManager = OWLManager.createOWLOntologyManager();
+		ontologyManager = TestOWLManager.createOWLOntologyManager();
 		try {
 			ont = ontologyManager.createOntology(new HashSet<OWLAxiom>(Arrays
 					.asList(axExSsomeAsubB, axReflR, axRsubS)));

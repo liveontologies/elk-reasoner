@@ -34,7 +34,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AddImport;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -71,7 +70,7 @@ public class ElkReasonerTest {
 	@Test
 	public void testNoChanges() throws Exception {
 
-		OWLOntologyManager man = OWLManager.createOWLOntologyManager();
+		OWLOntologyManager man = TestOWLManager.createOWLOntologyManager();
 		OWLDataFactory dataFactory = man.getOWLDataFactory();
 
 		// set up resolution of prefixes
@@ -129,7 +128,7 @@ public class ElkReasonerTest {
 	@Test
 	public void testRemovingXY() throws Exception {
 
-		OWLOntologyManager man = OWLManager.createOWLOntologyManager();
+		OWLOntologyManager man = TestOWLManager.createOWLOntologyManager();
 		OWLDataFactory dataFactory = man.getOWLDataFactory();
 
 		// set up resolution of prefixes
@@ -201,7 +200,7 @@ public class ElkReasonerTest {
 	@Test
 	public void testRemovingAB() throws Exception {
 
-		OWLOntologyManager man = OWLManager.createOWLOntologyManager();
+		OWLOntologyManager man = TestOWLManager.createOWLOntologyManager();
 		OWLDataFactory dataFactory = man.getOWLDataFactory();
 
 		// set up resolution of prefixes
@@ -269,7 +268,7 @@ public class ElkReasonerTest {
 	@Test
 	public void testRemovingImpA() throws Exception {
 
-		OWLOntologyManager man = OWLManager.createOWLOntologyManager();
+		OWLOntologyManager man = TestOWLManager.createOWLOntologyManager();
 		OWLDataFactory dataFactory = man.getOWLDataFactory();
 
 		// set up resolution of prefixes
@@ -338,7 +337,7 @@ public class ElkReasonerTest {
 	@Test
 	public void testRemovingImpAAddingImpBRemovingYB() throws Exception {
 
-		OWLOntologyManager man = OWLManager.createOWLOntologyManager();
+		OWLOntologyManager man = TestOWLManager.createOWLOntologyManager();
 		OWLDataFactory dataFactory = man.getOWLDataFactory();
 
 		// set up resolution of prefixes
@@ -412,7 +411,7 @@ public class ElkReasonerTest {
 	@Test
 	public void testChangesToOtherOntologies() throws Exception {
 
-		OWLOntologyManager man = OWLManager.createOWLOntologyManager();
+		OWLOntologyManager man = TestOWLManager.createOWLOntologyManager();
 		OWLDataFactory dataFactory = man.getOWLDataFactory();
 
 		// set up resolution of prefixes

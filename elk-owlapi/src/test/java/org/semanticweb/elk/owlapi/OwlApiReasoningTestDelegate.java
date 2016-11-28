@@ -31,7 +31,6 @@ import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.testing.UrlTestInput;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
@@ -60,7 +59,7 @@ public abstract class OwlApiReasoningTestDelegate<AO extends TestOutput>
 	@Override
 	public void initWithOutput() throws Exception {
 		final InputStream input = manifest_.getInput().getUrl().openStream();
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		OWLOntologyManager manager = TestOWLManager.createOWLOntologyManager();
 		OWLOntology ontology = manager.loadOntologyFromOntologyDocument(input);
 
 		reasoner_ = OWLAPITestUtils.createReasoner(ontology);
@@ -69,7 +68,7 @@ public abstract class OwlApiReasoningTestDelegate<AO extends TestOutput>
 	@Override
 	public void initWithInterrupts() throws Exception {
 		final InputStream input = manifest_.getInput().getUrl().openStream();
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		OWLOntologyManager manager = TestOWLManager.createOWLOntologyManager();
 		OWLOntology ontology = manager.loadOntologyFromOntologyDocument(input);
 
 		final Random random = new Random(RandomSeedProvider.VALUE);

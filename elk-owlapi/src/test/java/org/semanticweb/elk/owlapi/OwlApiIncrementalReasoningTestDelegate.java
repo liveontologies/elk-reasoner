@@ -40,7 +40,6 @@ import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.testing.UrlTestInput;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -85,7 +84,7 @@ public abstract class OwlApiIncrementalReasoningTestDelegate<EO extends TestOutp
 
 		final ArrayList<OWLAxiom> changingAxioms = new ArrayList<OWLAxiom>();
 
-		final OWLOntologyManager manager = OWLManager
+		final OWLOntologyManager manager = TestOWLManager
 				.createOWLOntologyManager();
 
 		final InputStream stream = manifest_.getInput().getUrl().openStream();

@@ -28,9 +28,9 @@ import java.io.InputStream;
 
 import org.junit.Before;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
+import org.semanticweb.elk.owlapi.TestOWLManager;
 import org.semanticweb.elk.reasoner.tracing.TracingTestManifest;
 import org.semanticweb.elk.testing.TestInput;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -48,7 +48,7 @@ public class BaseProofTest {
 
 	public BaseProofTest(final TracingTestManifest manifest) {
 		this.manifest_ = manifest;
-		this.manager_ = OWLManager.createOWLOntologyManager();
+		this.manager_ = TestOWLManager.createOWLOntologyManager();
 	}
 
 	@Before

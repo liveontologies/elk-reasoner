@@ -31,7 +31,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -57,7 +56,7 @@ public class EmptyImportTest {
 	public void testImport() throws OWLOntologyCreationException,
 			URISyntaxException {
 
-		OWLOntologyManager man = OWLManager.createOWLOntologyManager();
+		OWLOntologyManager man = TestOWLManager.createOWLOntologyManager();
 
 		// loading the root ontology
 		OWLOntology root = loadOntology(man, "root.owl");

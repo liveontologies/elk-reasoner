@@ -32,7 +32,7 @@ import java.util.Collections;
 import org.junit.Test;
 import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
-import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.elk.owlapi.TestOWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -61,7 +61,7 @@ public class IgnoreChangesInNonImportedOntologiesTest {
 	@Test
 	public void ignoreChangesInNonImportedOntologies() throws Exception {
 
-		OWLOntologyManager man = OWLManager.createOWLOntologyManager();
+		OWLOntologyManager man = TestOWLManager.createOWLOntologyManager();
 		OWLDataFactory dataFactory = man.getOWLDataFactory();
 
 		// set up resolution of prefixes

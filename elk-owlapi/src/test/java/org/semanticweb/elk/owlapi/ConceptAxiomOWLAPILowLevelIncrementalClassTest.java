@@ -29,7 +29,6 @@ import static org.junit.Assert.fail;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -55,7 +54,7 @@ public class ConceptAxiomOWLAPILowLevelIncrementalClassTest extends
 		B = factory.getOWLClass(IRI.create("B"));
 		axAsubB = factory.getOWLSubClassOfAxiom(A, B);
 		axBsubA = factory.getOWLSubClassOfAxiom(B, A);
-		ontologyManager = OWLManager.createOWLOntologyManager();
+		ontologyManager = TestOWLManager.createOWLOntologyManager();
 		try {
 			ont = ontologyManager.createOntology(new HashSet<OWLAxiom>(Arrays
 					.asList(axAsubB, axBsubA)));

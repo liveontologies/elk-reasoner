@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.semanticweb.elk.owlapi.TestOWLManager;
 import org.semanticweb.elk.reasoner.query.BaseSatisfiabilityTestOutput;
 import org.semanticweb.elk.reasoner.query.EquivalentEntitiesTestOutput;
 import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
@@ -35,7 +36,6 @@ import org.semanticweb.elk.reasoner.query.SatisfiabilityTestOutput;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
@@ -83,7 +83,7 @@ public class ExpectedTestOutputLoader {
 	public static ExpectedTestOutputLoader load(
 			final InputStream expectedOutput) {
 
-		final OWLOntologyManager manager = OWLManager
+		final OWLOntologyManager manager = TestOWLManager
 				.createOWLOntologyManager();
 		try {
 
