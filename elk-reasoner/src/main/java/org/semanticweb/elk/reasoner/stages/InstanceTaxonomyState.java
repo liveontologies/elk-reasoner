@@ -22,6 +22,7 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -36,17 +37,21 @@ import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionCon
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateDummyChangeListener;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.taxonomy.ConcurrentInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.DummyInstanceTaxonomyListener;
 import org.semanticweb.elk.reasoner.taxonomy.DummyNodeStoreListener;
+import org.semanticweb.elk.reasoner.taxonomy.ElkIndividualKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.NodeStore;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
@@ -65,13 +70,17 @@ public class InstanceTaxonomyState {
 	 * Contains at least all individuals that are in ontology, but either are
 	 * removed from taxonomy or their type nodes in taxonomy were removed.
 	 */
-	private final Queue<IndexedIndividual> modified_ = new ConcurrentLinkedQueue<IndexedIndividual>();
+	private final Queue<IndexedIndividual> toAdd_ = new ConcurrentLinkedQueue<IndexedIndividual>();
 
 	/**
 	 * Contains at least all individuals that are in taxonomy, but either are
 	 * removed from ontology or their context became not saturated.
 	 */
-	private final Queue<IndexedIndividual> removed_ = new ConcurrentLinkedQueue<IndexedIndividual>();
+	private final Queue<IndexedIndividual> toRemove_ = new ConcurrentLinkedQueue<IndexedIndividual>();
+
+	private final OntologyIndex ontologyIndex_;
+
+	private final SaturationState<?> saturationState_;
 
 	private final ElkPolarityExpressionConverter converter_;
 
@@ -80,6 +89,8 @@ public class InstanceTaxonomyState {
 			final DifferentialIndex ontologyIndex,
 			final ElkObject.Factory elkFactory) {
 
+		this.ontologyIndex_ = ontologyIndex;
+		this.saturationState_ = saturationState;
 		this.converter_ = new ElkPolarityExpressionConverterImpl(elkFactory,
 				ontologyIndex);
 
@@ -87,12 +98,12 @@ public class InstanceTaxonomyState {
 
 			@Override
 			public void individualAddition(final IndexedIndividual ind) {
-				modified_.add(ind);
+				toAdd_.add(ind);
 			}
 
 			@Override
 			public void individualRemoval(final IndexedIndividual ind) {
-				removed_.add(ind);
+				toRemove_.add(ind);
 			}
 
 		});
@@ -105,7 +116,7 @@ public class InstanceTaxonomyState {
 						final IndexedContextRoot root = context.getRoot();
 						if (root instanceof IndexedIndividual) {
 							final IndexedIndividual ind = (IndexedIndividual) root;
-							removed_.add(ind);
+							toRemove_.add(ind);
 						}
 					}
 
@@ -118,7 +129,7 @@ public class InstanceTaxonomyState {
 		@Override
 		public void memberForNodeDisappeared(final ElkNamedIndividual member,
 				final Node<ElkNamedIndividual> node) {
-			addModified(member);
+			addToAdd(member);
 		}
 
 	};
@@ -130,7 +141,7 @@ public class InstanceTaxonomyState {
 				InstanceNode<ElkClass, ElkNamedIndividual> instanceNode,
 				Collection<? extends TypeNode<ElkClass, ElkNamedIndividual>> typeNodes) {
 			for (final ElkNamedIndividual elkIndividual : instanceNode) {
-				addModified(elkIndividual);
+				addToAdd(elkIndividual);
 			}
 		};
 
@@ -140,17 +151,24 @@ public class InstanceTaxonomyState {
 		return taxonomy_;
 	}
 
-	private void addModified(final ElkNamedIndividual elkIndividual) {
+	private void addToAdd(final ElkNamedIndividual elkIndividual) {
 		ModifiableIndexedClassExpression converted = elkIndividual
 				.accept(converter_);
 		if (converted != null && (converted instanceof IndexedIndividual)) {
 			final IndexedIndividual ind = (IndexedIndividual) converted;
-			modified_.add(ind);
+			toAdd_.add(ind);
 		}
 	}
 
-	private int pruneModified() {
-		final Iterator<IndexedIndividual> iter = modified_.iterator();
+	/**
+	 * Prunes {@link #toAdd_}.
+	 * <p>
+	 * <strong>{@code taxonomy_} must not be {@code null}!</strong>
+	 * 
+	 * @return The resulting size of {@link #toAdd_}.
+	 */
+	private int pruneToAdd() {
+		final Iterator<IndexedIndividual> iter = toAdd_.iterator();
 		int size = 0;
 		while (iter.hasNext()) {
 			final IndexedIndividual ind = iter.next();
@@ -167,8 +185,10 @@ public class InstanceTaxonomyState {
 				continue;
 			}
 			// else
-			if (taxonomy_ == null) {
-				// it is not in taxonomy
+			final Context context = saturationState_.getContext(ind);
+			if (context == null || !context.isInitialized()
+					|| !context.isSaturated()) {
+				// it is not saturated.
 				size++;
 				continue;
 			}
@@ -200,17 +220,29 @@ public class InstanceTaxonomyState {
 	 *         ontology, but either are removed from taxonomy or their type
 	 *         nodes in taxonomy were removed.
 	 */
-	Collection<IndexedIndividual> getModified() {
-		final int size = pruneModified();
+	Collection<IndexedIndividual> getToAdd() {
+		if (taxonomy_ == null) {
+			// No individual can be pruned.
+			return toAdd_;
+		}
+		// else
+		final int size = pruneToAdd();
 		/*
 		 * since getting the size of the queue is a linear operation, use the
 		 * computed size
 		 */
-		return Operations.getCollection(modified_, size);
+		return Operations.getCollection(toAdd_, size);
 	}
 
-	private int pruneRemoved() {
-		final Iterator<IndexedIndividual> iter = removed_.iterator();
+	/**
+	 * Prunes {@link #toRemove_}.
+	 * <p>
+	 * <strong>{@code taxonomy_} must not be {@code null}!</strong>
+	 * 
+	 * @return The resulting size of {@link #toRemove_}.
+	 */
+	private int pruneToRemove() {
+		final Iterator<IndexedIndividual> iter = toRemove_.iterator();
 		int size = 0;
 		while (iter.hasNext()) {
 			final IndexedIndividual cls = iter.next();
@@ -221,21 +253,12 @@ public class InstanceTaxonomyState {
 			 * 
 			 * @formatter:on
 			 */
-			if (taxonomy_ == null) {// TODO: Never set taxonomy_ to null !!!
-				// it is not in taxonomy
-				iter.remove();
-				if (cls.occurs()) {
-					modified_.add(cls);
-				}
-				continue;
-			}
-			// else
 			final InstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy_
 					.getInstanceNode(cls.getElkEntity());
 			if (node == null) {
 				iter.remove();
 				if (cls.occurs()) {
-					modified_.add(cls);
+					toAdd_.add(cls);
 				}
 				continue;
 			}
@@ -254,13 +277,24 @@ public class InstanceTaxonomyState {
 	 *         taxonomy, but either are removed from ontology or their context
 	 *         became not saturated.
 	 */
-	Collection<IndexedIndividual> getRemoved() {
-		final int size = pruneRemoved();
+	Collection<IndexedIndividual> getToRemove() {
+		if (taxonomy_ == null) {// TODO: Never set taxonomy_ to null !!!
+			// no individuals are in taxonomy
+			IndexedIndividual cls;
+			while ((cls = toRemove_.poll()) != null) {
+				if (cls.occurs()) {
+					toAdd_.offer(cls);
+				}
+			}
+			return Collections.emptyList();
+		}
+		// else
+		final int size = pruneToRemove();
 		/*
 		 * since getting the size of the queue is a linear operation, use the
 		 * computed size
 		 */
-		return Operations.getCollection(removed_, size);
+		return Operations.getCollection(toRemove_, size);
 	}
 
 	public Writer getWriter() {
@@ -276,20 +310,32 @@ public class InstanceTaxonomyState {
 	 */
 	public class Writer {
 
-		void setTaxonomy(
-				final UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy) {
+		void initTaxonomy(final UpdateableTaxonomy<ElkClass> classTaxonomy) {
 			if (taxonomy_ != null) {
 				taxonomy_.removeInstanceListener(nodeStoreListener_);
 				taxonomy_.removeInstanceListener(taxonomyListener_);
 			}
-			taxonomy_ = instanceTaxonomy;
+			taxonomy_ = new ConcurrentInstanceTaxonomy(classTaxonomy,
+					ElkIndividualKeyProvider.INSTANCE);
 			if (taxonomy_ != null) {
 				taxonomy_.addInstanceListener(nodeStoreListener_);
 				taxonomy_.addInstanceListener(taxonomyListener_);
 			}
+
+			// All individuals need to be added to the taxonomy
+			toRemove_.clear();
+			toAdd_.clear();
+			toAdd_.addAll(ontologyIndex_.getIndividuals());
+
 		}
 
 		public void clearTaxonomy() {
+
+			// All individuals need to be added to the taxonomy
+			toRemove_.clear();
+			toAdd_.clear();
+			toAdd_.addAll(ontologyIndex_.getIndividuals());
+
 			if (taxonomy_ != null) {
 				taxonomy_.removeInstanceListener(nodeStoreListener_);
 				taxonomy_.removeInstanceListener(taxonomyListener_);

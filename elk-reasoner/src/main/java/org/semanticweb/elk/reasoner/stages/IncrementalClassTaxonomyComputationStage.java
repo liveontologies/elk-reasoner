@@ -62,7 +62,7 @@ public class IncrementalClassTaxonomyComputationStage extends
 		if (!super.preExecute())
 			return false;
 		
-		final Collection<IndexedClass> modified = reasoner.classTaxonomyState.getModified();
+		final Collection<IndexedClass> modified = reasoner.classTaxonomyState.getToAdd();
 
 		this.computation_ = new ClassTaxonomyComputation(
 				Operations.split(modified, 64), reasoner.getInterrupter(),
@@ -85,7 +85,7 @@ public class IncrementalClassTaxonomyComputationStage extends
 			return false;
 		}
 		final Collection<IndexedClass> modified = reasoner.classTaxonomyState
-				.getModified();
+				.getToAdd();
 		if (!modified.isEmpty()) {
 			throw new ElkRuntimeException(
 					ClassTaxonomyComputation.class.getSimpleName()

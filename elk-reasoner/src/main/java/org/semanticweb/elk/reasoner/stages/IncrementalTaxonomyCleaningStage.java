@@ -66,9 +66,9 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 		}
 
 		final Collection<IndexedClass> removedClasses = reasoner.classTaxonomyState
-				.getRemoved();
+				.getToRemove();
 		final Collection<IndexedIndividual> removedIndividuals = reasoner.instanceTaxonomyState
-				.getRemoved();
+				.getToRemove();
 		@SuppressWarnings("unchecked")
 		Collection<IndexedClassEntity> inputs = Operations.getCollection(
 				Operations.concat(removedClasses, removedIndividuals),
@@ -101,13 +101,13 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 			return false;
 		}
 		final Collection<IndexedClass> removedClasses = reasoner.classTaxonomyState
-				.getRemoved();
+				.getToRemove();
 		if (!removedClasses.isEmpty()) {
 			throw new ElkRuntimeException(TaxonomyCleaning.class.getSimpleName()
 					+ " did not consume all removed classes!");
 		}
 		final Collection<IndexedIndividual> removedIndividuals = reasoner.instanceTaxonomyState
-				.getRemoved();
+				.getToRemove();
 		if (!removedIndividuals.isEmpty()) {
 			throw new ElkRuntimeException(TaxonomyCleaning.class.getSimpleName()
 					+ " did not consume all removed individuals!");

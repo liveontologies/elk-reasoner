@@ -64,7 +64,7 @@ public class IncrementalInstanceTaxonomyComputationStage extends
 			return false;
 
 		final Collection<IndexedIndividual> modified = reasoner.instanceTaxonomyState
-				.getModified();
+				.getToAdd();
 
 		this.computation_ = new InstanceTaxonomyComputation(modified,
 				reasoner.getInterrupter(),
@@ -86,7 +86,7 @@ public class IncrementalInstanceTaxonomyComputationStage extends
 		}
 
 		final Collection<IndexedIndividual> modified = reasoner.instanceTaxonomyState
-				.getModified();
+				.getToAdd();
 		if (!modified.isEmpty()) {
 			throw new ElkRuntimeException(
 					InstanceTaxonomyComputation.class.getSimpleName()

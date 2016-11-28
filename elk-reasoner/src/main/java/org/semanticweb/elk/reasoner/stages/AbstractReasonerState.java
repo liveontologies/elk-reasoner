@@ -66,8 +66,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.DerivedClassCon
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.ConcurrentInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.ElkIndividualKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.ElkObjectPropertyKeyProvider;
@@ -964,15 +962,12 @@ public abstract class AbstractReasonerState {
 	}
 
 	public synchronized void initClassTaxonomy() {
-		classTaxonomyState.getWriter().setTaxonomy(new ConcurrentClassTaxonomy(
-				elkFactory_, ElkClassKeyProvider.INSTANCE));
+		classTaxonomyState.getWriter().initTaxonomy();
 	}
 
 	public synchronized void initInstanceTaxonomy() {
 		instanceTaxonomyState.getWriter()
-				.setTaxonomy(new ConcurrentInstanceTaxonomy(
-						classTaxonomyState.getTaxonomy(),
-						ElkIndividualKeyProvider.INSTANCE));
+				.initTaxonomy(classTaxonomyState.getTaxonomy());
 	}
 
 	@Deprecated
