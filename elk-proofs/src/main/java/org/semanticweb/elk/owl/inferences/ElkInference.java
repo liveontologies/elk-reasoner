@@ -1,6 +1,6 @@
 package org.semanticweb.elk.owl.inferences;
 
-import org.liveontologies.owlapi.proof.util.Inference;
+import org.liveontologies.proof.util.Inference;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 

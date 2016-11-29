@@ -34,9 +34,9 @@ import java.util.Set;
 
 import org.liveontologies.owlapi.proof.OWLProofNode;
 import org.liveontologies.owlapi.proof.OWLProver;
-import org.liveontologies.owlapi.proof.util.ProofNode;
-import org.liveontologies.owlapi.proof.util.ProofNodes;
-import org.liveontologies.owlapi.proof.util.ProofStep;
+import org.liveontologies.proof.util.ProofNode;
+import org.liveontologies.proof.util.ProofNodes;
+import org.liveontologies.proof.util.ProofStep;
 import org.semanticweb.elk.owl.inferences.TestUtils;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;

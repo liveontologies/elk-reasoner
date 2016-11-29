@@ -34,7 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.liveontologies.owlapi.proof.OWLProver;
-import org.liveontologies.owlapi.proof.util.ProofNodes;
+import org.liveontologies.proof.util.ProofNodes;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
 import org.semanticweb.elk.reasoner.tracing.TracingTestManifest;

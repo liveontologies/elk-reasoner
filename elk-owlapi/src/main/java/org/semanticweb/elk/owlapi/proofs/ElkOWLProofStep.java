@@ -27,7 +27,7 @@ import java.util.List;
 
 import org.liveontologies.owlapi.proof.OWLProofNode;
 import org.liveontologies.owlapi.proof.OWLProofStep;
-import org.liveontologies.owlapi.proof.util.Inference;
+import org.liveontologies.proof.util.Inference;
 import org.semanticweb.elk.owl.inferences.ElkInference;
 import org.semanticweb.elk.owl.inferences.ElkInferenceExamples;
 import org.semanticweb.elk.owl.inferences.ElkInferenceSet;

@@ -37,7 +37,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.liveontologies.owlapi.proof.OWLProver;
-import org.liveontologies.owlapi.proof.util.ProofNode;
+import org.liveontologies.proof.util.ProofNode;
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;

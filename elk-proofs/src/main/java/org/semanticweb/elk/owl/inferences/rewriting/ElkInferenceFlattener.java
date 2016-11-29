@@ -22,7 +22,7 @@ package org.semanticweb.elk.owl.inferences.rewriting;
  * #L%
  */
 
-import org.liveontologies.owlapi.proof.util.ProofStep;
+import org.liveontologies.proof.util.ProofStep;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 
 /**

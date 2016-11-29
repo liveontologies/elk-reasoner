@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.liveontologies.owlapi.proof.util.ProofNode;
-import org.liveontologies.owlapi.proof.util.ProofStep;
+import org.liveontologies.proof.util.ProofNode;
+import org.liveontologies.proof.util.ProofStep;
 import org.semanticweb.elk.owl.inferences.ElkInference;
 import org.semanticweb.elk.owl.inferences.ElkPropertyInclusionHierarchy;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;

@@ -30,7 +30,7 @@ import java.util.Set;
 import org.liveontologies.owlapi.proof.OWLProofNode;
 import org.liveontologies.owlapi.proof.OWLProofStep;
 import org.liveontologies.owlapi.proof.OWLProver;
-import org.liveontologies.owlapi.proof.util.ProofNode;
+import org.liveontologies.proof.util.ProofNode;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.parameters.Imports;
 

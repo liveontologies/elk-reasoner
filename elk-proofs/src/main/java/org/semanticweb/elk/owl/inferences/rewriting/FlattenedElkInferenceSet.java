@@ -31,10 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.liveontologies.owlapi.proof.util.Delegator;
-import org.liveontologies.owlapi.proof.util.ProofNode;
-import org.liveontologies.owlapi.proof.util.ProofNodes;
-import org.liveontologies.owlapi.proof.util.ProofStep;
+import org.liveontologies.proof.util.Delegator;
+import org.liveontologies.proof.util.ProofNode;
+import org.liveontologies.proof.util.ProofNodes;
+import org.liveontologies.proof.util.ProofStep;
 import org.semanticweb.elk.owl.inferences.ElkClassInclusionExistentialComposition;
 import org.semanticweb.elk.owl.inferences.ElkClassInclusionHierarchy;
 import org.semanticweb.elk.owl.inferences.ElkInference;

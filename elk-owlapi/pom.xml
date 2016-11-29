@@ -35,8 +35,15 @@
 		</dependency>
 		<dependency>
 			<groupId>org.liveontologies</groupId>
+			<artifactId>proof-utils</artifactId>
+			<version>${proof-utils.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.liveontologies</groupId>
 			<artifactId>owlapi-proof</artifactId>
-			<version>0.1.0-SNAPSHOT</version>
+			<version>${owlapi-proof.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>

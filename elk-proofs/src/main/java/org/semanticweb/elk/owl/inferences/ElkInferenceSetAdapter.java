@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.liveontologies.owlapi.proof.util.Inference;
-import org.liveontologies.owlapi.proof.util.InferenceSet;
+import org.liveontologies.proof.util.Inference;
+import org.liveontologies.proof.util.InferenceSet;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 
 public class ElkInferenceSetAdapter implements InferenceSet<ElkAxiom> {

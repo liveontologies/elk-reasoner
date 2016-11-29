@@ -25,9 +25,9 @@ package org.semanticweb.elk.owl.inferences.rewriting;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.liveontologies.owlapi.proof.util.Inference;
-import org.liveontologies.owlapi.proof.util.ProofNode;
-import org.liveontologies.owlapi.proof.util.ProofStep;
+import org.liveontologies.proof.util.Inference;
+import org.liveontologies.proof.util.ProofNode;
+import org.liveontologies.proof.util.ProofStep;
 import org.semanticweb.elk.owl.implementation.ElkObjectBaseFactory;
 import org.semanticweb.elk.owl.inferences.ElkInference;
 import org.semanticweb.elk.owl.inferences.ElkInferenceExamples;
