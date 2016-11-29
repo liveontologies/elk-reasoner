@@ -152,40 +152,48 @@ public class InferenceMatchDelegatingFactory implements InferenceMatch.Factory {
 	@Override
 	public BackwardLinkCompositionMatch4 getBackwardLinkCompositionMatch4(
 			BackwardLinkCompositionMatch3 parent,
-			SubPropertyChainMatch2 fourthPremiseMatch) {
+			SubPropertyChainMatch2 secondPremiseMatch) {
 		return filter(mainFactory_.getBackwardLinkCompositionMatch4(parent,
-				fourthPremiseMatch));
+				secondPremiseMatch));
 	}
 
 	@Override
 	public BackwardLinkCompositionMatch5 getBackwardLinkCompositionMatch5(
 			BackwardLinkCompositionMatch4 parent,
-			ForwardLinkMatch2 thirdPremiseMatch) {
+			SubPropertyChainMatch2 fourthPremiseMatch) {
 		return filter(mainFactory_.getBackwardLinkCompositionMatch5(parent,
-				thirdPremiseMatch));
+				fourthPremiseMatch));
 	}
 
 	@Override
 	public BackwardLinkCompositionMatch6 getBackwardLinkCompositionMatch6(
 			BackwardLinkCompositionMatch5 parent,
-			BackwardLinkMatch3 conclusionMatch) {
+			ForwardLinkMatch2 thirdPremiseMatch) {
 		return filter(mainFactory_.getBackwardLinkCompositionMatch6(parent,
-				conclusionMatch));
+				thirdPremiseMatch));
 	}
 
 	@Override
 	public BackwardLinkCompositionMatch7 getBackwardLinkCompositionMatch7(
 			BackwardLinkCompositionMatch6 parent,
-			ForwardLinkMatch4 thirdPremiseMatch) {
+			BackwardLinkMatch3 conclusionMatch) {
 		return filter(mainFactory_.getBackwardLinkCompositionMatch7(parent,
-				thirdPremiseMatch));
+				conclusionMatch));
 	}
 
 	@Override
 	public BackwardLinkCompositionMatch8 getBackwardLinkCompositionMatch8(
 			BackwardLinkCompositionMatch7 parent,
-			BackwardLinkMatch4 firstPremiseMatch) {
+			ForwardLinkMatch4 thirdPremiseMatch) {
 		return filter(mainFactory_.getBackwardLinkCompositionMatch8(parent,
+				thirdPremiseMatch));
+	}
+
+	@Override
+	public BackwardLinkCompositionMatch9 getBackwardLinkCompositionMatch9(
+			BackwardLinkCompositionMatch8 parent,
+			BackwardLinkMatch4 firstPremiseMatch) {
+		return filter(mainFactory_.getBackwardLinkCompositionMatch9(parent,
 				firstPremiseMatch));
 	}
 
@@ -606,40 +614,48 @@ public class InferenceMatchDelegatingFactory implements InferenceMatch.Factory {
 	@Override
 	public ForwardLinkCompositionMatch3 getForwardLinkCompositionMatch3(
 			ForwardLinkCompositionMatch2 parent,
-			SubPropertyChainMatch2 fourthPremiseMatch) {
+			SubPropertyChainMatch2 secondPremiseMatch) {
 		return filter(mainFactory_.getForwardLinkCompositionMatch3(parent,
-				fourthPremiseMatch));
+				secondPremiseMatch));
 	}
 
 	@Override
 	public ForwardLinkCompositionMatch4 getForwardLinkCompositionMatch4(
 			ForwardLinkCompositionMatch3 parent,
-			ForwardLinkMatch2 thirdPremiseMatch) {
+			SubPropertyChainMatch2 fourthPremiseMatch) {
 		return filter(mainFactory_.getForwardLinkCompositionMatch4(parent,
-				thirdPremiseMatch));
+				fourthPremiseMatch));
 	}
 
 	@Override
 	public ForwardLinkCompositionMatch5 getForwardLinkCompositionMatch5(
 			ForwardLinkCompositionMatch4 parent,
-			ForwardLinkMatch3 conclusionMatch) {
+			ForwardLinkMatch2 thirdPremiseMatch) {
 		return filter(mainFactory_.getForwardLinkCompositionMatch5(parent,
-				conclusionMatch));
+				thirdPremiseMatch));
 	}
 
 	@Override
 	public ForwardLinkCompositionMatch6 getForwardLinkCompositionMatch6(
 			ForwardLinkCompositionMatch5 parent,
-			ForwardLinkMatch4 thirdPremiseMatch) {
+			ForwardLinkMatch3 conclusionMatch) {
 		return filter(mainFactory_.getForwardLinkCompositionMatch6(parent,
-				thirdPremiseMatch));
+				conclusionMatch));
 	}
 
 	@Override
 	public ForwardLinkCompositionMatch7 getForwardLinkCompositionMatch7(
 			ForwardLinkCompositionMatch6 parent,
-			BackwardLinkMatch4 firstPremiseMatch) {
+			ForwardLinkMatch4 thirdPremiseMatch) {
 		return filter(mainFactory_.getForwardLinkCompositionMatch7(parent,
+				thirdPremiseMatch));
+	}
+
+	@Override
+	public ForwardLinkCompositionMatch8 getForwardLinkCompositionMatch8(
+			ForwardLinkCompositionMatch7 parent,
+			BackwardLinkMatch4 firstPremiseMatch) {
+		return filter(mainFactory_.getForwardLinkCompositionMatch8(parent,
 				firstPremiseMatch));
 	}
 

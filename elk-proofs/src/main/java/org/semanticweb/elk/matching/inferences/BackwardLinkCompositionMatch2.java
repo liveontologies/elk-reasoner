@@ -26,7 +26,6 @@ import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.IndexedSubObjectPropertyOfAxiomMatch2;
-import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1;
 import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
@@ -88,14 +87,7 @@ public class BackwardLinkCompositionMatch2
 		return factory.getBackwardLinkMatch1(
 				getParent().getParent().getFirstPremise(factory),
 				getParent().getConclusionSourceMatch());
-	}
-
-	SubPropertyChainMatch1 getSecondPremiseMatch(
-			ConclusionMatchExpressionFactory factory) {
-		return factory.getSubPropertyChainMatch1(
-				getParent().getParent().getSecondPremise(factory),
-				getFirstProperty(), 0);
-	}
+	}	
 
 	IndexedSubObjectPropertyOfAxiomMatch2 getFifthPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {

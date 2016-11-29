@@ -138,36 +138,43 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 	@Override
 	public BackwardLinkCompositionMatch4 getBackwardLinkCompositionMatch4(
 			BackwardLinkCompositionMatch3 parent,
-			SubPropertyChainMatch2 fourthPremiseMatch) {
-		return new BackwardLinkCompositionMatch4(parent, fourthPremiseMatch);
+			SubPropertyChainMatch2 secondPremiseMatch) {
+		return new BackwardLinkCompositionMatch4(parent, secondPremiseMatch);
 	}
 
 	@Override
 	public BackwardLinkCompositionMatch5 getBackwardLinkCompositionMatch5(
 			BackwardLinkCompositionMatch4 parent,
-			ForwardLinkMatch2 thirdPremiseMatch) {
-		return new BackwardLinkCompositionMatch5(parent, thirdPremiseMatch);
+			SubPropertyChainMatch2 fourthPremiseMatch) {
+		return new BackwardLinkCompositionMatch5(parent, fourthPremiseMatch);
 	}
 
 	@Override
 	public BackwardLinkCompositionMatch6 getBackwardLinkCompositionMatch6(
 			BackwardLinkCompositionMatch5 parent,
-			BackwardLinkMatch3 conclusionMatch) {
-		return new BackwardLinkCompositionMatch6(parent, conclusionMatch);
+			ForwardLinkMatch2 thirdPremiseMatch) {
+		return new BackwardLinkCompositionMatch6(parent, thirdPremiseMatch);
 	}
 
 	@Override
 	public BackwardLinkCompositionMatch7 getBackwardLinkCompositionMatch7(
 			BackwardLinkCompositionMatch6 parent,
-			ForwardLinkMatch4 thirdPremiseMatch) {
-		return new BackwardLinkCompositionMatch7(parent, thirdPremiseMatch);
+			BackwardLinkMatch3 conclusionMatch) {
+		return new BackwardLinkCompositionMatch7(parent, conclusionMatch);
 	}
 
 	@Override
 	public BackwardLinkCompositionMatch8 getBackwardLinkCompositionMatch8(
 			BackwardLinkCompositionMatch7 parent,
+			ForwardLinkMatch4 thirdPremiseMatch) {
+		return new BackwardLinkCompositionMatch8(parent, thirdPremiseMatch);
+	}
+
+	@Override
+	public BackwardLinkCompositionMatch9 getBackwardLinkCompositionMatch9(
+			BackwardLinkCompositionMatch8 parent,
 			BackwardLinkMatch4 firstPremiseMatch) {
-		return new BackwardLinkCompositionMatch8(parent, firstPremiseMatch);
+		return new BackwardLinkCompositionMatch9(parent, firstPremiseMatch);
 	}
 
 	@Override
@@ -553,36 +560,43 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 	@Override
 	public ForwardLinkCompositionMatch3 getForwardLinkCompositionMatch3(
 			ForwardLinkCompositionMatch2 parent,
-			SubPropertyChainMatch2 fourthPremiseMatch) {
-		return new ForwardLinkCompositionMatch3(parent, fourthPremiseMatch);
+			SubPropertyChainMatch2 secondPremiseMatch) {
+		return new ForwardLinkCompositionMatch3(parent, secondPremiseMatch);
 	}
 
 	@Override
 	public ForwardLinkCompositionMatch4 getForwardLinkCompositionMatch4(
 			ForwardLinkCompositionMatch3 parent,
-			ForwardLinkMatch2 thirdPremiseMatch) {
-		return new ForwardLinkCompositionMatch4(parent, thirdPremiseMatch);
+			SubPropertyChainMatch2 fourthPremiseMatch) {
+		return new ForwardLinkCompositionMatch4(parent, fourthPremiseMatch);
 	}
 
 	@Override
 	public ForwardLinkCompositionMatch5 getForwardLinkCompositionMatch5(
 			ForwardLinkCompositionMatch4 parent,
-			ForwardLinkMatch3 conclusionMatch) {
-		return new ForwardLinkCompositionMatch5(parent, conclusionMatch);
+			ForwardLinkMatch2 thirdPremiseMatch) {
+		return new ForwardLinkCompositionMatch5(parent, thirdPremiseMatch);
 	}
 
 	@Override
 	public ForwardLinkCompositionMatch6 getForwardLinkCompositionMatch6(
 			ForwardLinkCompositionMatch5 parent,
-			ForwardLinkMatch4 thirdPremiseMatch) {
-		return new ForwardLinkCompositionMatch6(parent, thirdPremiseMatch);
+			ForwardLinkMatch3 conclusionMatch) {
+		return new ForwardLinkCompositionMatch6(parent, conclusionMatch);
 	}
 
 	@Override
 	public ForwardLinkCompositionMatch7 getForwardLinkCompositionMatch7(
 			ForwardLinkCompositionMatch6 parent,
+			ForwardLinkMatch4 thirdPremiseMatch) {
+		return new ForwardLinkCompositionMatch7(parent, thirdPremiseMatch);
+	}
+
+	@Override
+	public ForwardLinkCompositionMatch8 getForwardLinkCompositionMatch8(
+			ForwardLinkCompositionMatch7 parent,
 			BackwardLinkMatch4 firstPremiseMatch) {
-		return new ForwardLinkCompositionMatch7(parent, firstPremiseMatch);
+		return new ForwardLinkCompositionMatch8(parent, firstPremiseMatch);
 	}
 
 	@Override

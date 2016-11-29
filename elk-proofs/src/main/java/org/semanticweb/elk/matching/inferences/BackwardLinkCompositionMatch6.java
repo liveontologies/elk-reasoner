@@ -22,42 +22,44 @@ package org.semanticweb.elk.matching.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch3;
+import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch2;
+import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch2Watch;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch3;
-import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch3Watch;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 
 public class BackwardLinkCompositionMatch6
 		extends AbstractInferenceMatch<BackwardLinkCompositionMatch5>
-		implements ForwardLinkMatch3Watch {
+		implements BackwardLinkMatch2Watch {
 
-	private final IndexedContextRootMatch extendedDestinationMatch_;
+	private final IndexedContextRootMatch destinationMatch_;
 
 	BackwardLinkCompositionMatch6(BackwardLinkCompositionMatch5 parent,
-			BackwardLinkMatch3 conclusionMatch) {
+			ForwardLinkMatch2 thirdPremiseMatch) {
 		super(parent);
-		this.extendedDestinationMatch_ = conclusionMatch
-				.getExtendedDestinationMatch();
-		checkEquals(conclusionMatch, getConclusionMatch(DEBUG_FACTORY));
+		this.destinationMatch_ = thirdPremiseMatch.getTargetMatch();
+		checkEquals(thirdPremiseMatch, getThirdPremiseMatch(DEBUG_FACTORY));
 	}
 
-	public IndexedContextRootMatch getExtendedDestinationMatch() {
-		return extendedDestinationMatch_;
+	IndexedContextRootMatch getDestinationMatch() {
+		return destinationMatch_;
 	}
 
-	BackwardLinkMatch3 getConclusionMatch(
+	ForwardLinkMatch2 getThirdPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getBackwardLinkMatch3(
-				getParent().getConclusionMatch(factory),
-				getExtendedDestinationMatch());
-	}
-
-	public ForwardLinkMatch3 getThirdPremiseMatch(
-			ConclusionMatchExpressionFactory factory) {
-		return factory.getForwardLinkMatch3(
+		return factory.getForwardLinkMatch2(
 				getParent().getThirdPremiseMatch(factory),
-				getExtendedDestinationMatch());
+				getDestinationMatch());
+	}
+
+	public BackwardLinkMatch2 getConclusionMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getBackwardLinkMatch2(
+				getParent().getParent().getParent().getParent().getParent()
+						.getConclusionMatch(factory),
+				getParent().getParent().getParent().getParent()
+						.getConclusionRelationMatch(),
+				getDestinationMatch());
 	}
 
 	@Override
@@ -66,7 +68,7 @@ public class BackwardLinkCompositionMatch6
 	}
 
 	@Override
-	public <O> O accept(ForwardLinkMatch3Watch.Visitor<O> visitor) {
+	public <O> O accept(BackwardLinkMatch2Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
@@ -94,7 +96,7 @@ public class BackwardLinkCompositionMatch6
 
 		BackwardLinkCompositionMatch6 getBackwardLinkCompositionMatch6(
 				BackwardLinkCompositionMatch5 parent,
-				BackwardLinkMatch3 conclusionMatch);
+				ForwardLinkMatch2 thirdPremiseMatch);
 
 	}
 

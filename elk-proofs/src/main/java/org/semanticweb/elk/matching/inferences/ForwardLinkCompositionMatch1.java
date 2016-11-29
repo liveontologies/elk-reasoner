@@ -27,7 +27,6 @@ import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1Watch;
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch1;
-import org.semanticweb.elk.matching.conclusions.SubPropertyChainMatch1;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
@@ -66,12 +65,6 @@ public class ForwardLinkCompositionMatch1
 
 	public int getCompositionStartPos() {
 		return compositionStartPos_;
-	}
-
-	SubPropertyChainMatch1 getSecondPremiseMatch(
-			ConclusionMatchExpressionFactory factory) {
-		return factory.getSubPropertyChainMatch1(
-				getParent().getSecondPremise(factory), getFirstProperty(), 0);
 	}
 
 	ForwardLinkMatch1 getConclusionMatch(

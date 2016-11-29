@@ -23,40 +23,40 @@ package org.semanticweb.elk.matching.inferences;
  */
 
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch3;
-import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch3Watch;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2;
+import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2Watch;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 
 public class ForwardLinkCompositionMatch5
 		extends AbstractInferenceMatch<ForwardLinkCompositionMatch4>
-		implements ForwardLinkMatch3Watch {
+		implements ForwardLinkMatch2Watch {
 
-	private final IndexedContextRootMatch conclusionExtendedTargetMatch_;
+	private final IndexedContextRootMatch conclusionTargetMatch_;
 
 	ForwardLinkCompositionMatch5(ForwardLinkCompositionMatch4 parent,
-			ForwardLinkMatch3 conclusionMatch) {
+			ForwardLinkMatch2 thirdPremiseMatch) {
 		super(parent);
-		this.conclusionExtendedTargetMatch_ = conclusionMatch
-				.getExtendedTargetMatch();
-		checkEquals(conclusionMatch, getConclusionMatch(DEBUG_FACTORY));
+		this.conclusionTargetMatch_ = thirdPremiseMatch.getTargetMatch();
+		checkEquals(thirdPremiseMatch, getThirdPremiseMatch(DEBUG_FACTORY));
 	}
 
-	public IndexedContextRootMatch getConclusionExtendedTargetMatch() {
-		return conclusionExtendedTargetMatch_;
+	IndexedContextRootMatch getConclusionTargetMatch() {
+		return conclusionTargetMatch_;
 	}
 
-	ForwardLinkMatch3 getConclusionMatch(
+	ForwardLinkMatch2 getThirdPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getForwardLinkMatch3(
-				getParent().getConclusionMatch(factory),
-				getConclusionExtendedTargetMatch());
-	}
-
-	public ForwardLinkMatch3 getThirdPremiseMatch(
-			ConclusionMatchExpressionFactory factory) {
-		return factory.getForwardLinkMatch3(
+		return factory.getForwardLinkMatch2(
 				getParent().getThirdPremiseMatch(factory),
-				getConclusionExtendedTargetMatch());
+				getConclusionTargetMatch());
+	}
+
+	public ForwardLinkMatch2 getConclusionMatch(
+			ConclusionMatchExpressionFactory factory) {
+		return factory.getForwardLinkMatch2(
+				getParent().getParent().getParent().getParent()
+						.getConclusionMatch(factory),
+				getConclusionTargetMatch());
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class ForwardLinkCompositionMatch5
 	}
 
 	@Override
-	public <O> O accept(ForwardLinkMatch3Watch.Visitor<O> visitor) {
+	public <O> O accept(ForwardLinkMatch2Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
@@ -93,7 +93,7 @@ public class ForwardLinkCompositionMatch5
 
 		ForwardLinkCompositionMatch5 getForwardLinkCompositionMatch5(
 				ForwardLinkCompositionMatch4 parent,
-				ForwardLinkMatch3 conclusionMatch);
+				ForwardLinkMatch2 thirdPremiseMatch);
 
 	}
 

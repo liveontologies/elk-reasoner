@@ -80,6 +80,11 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	}
 
 	@Override
+	public String visit(BackwardLinkCompositionMatch9 inferenceMatch9) {
+		return inferenceMatch9.getParent() + " | ";
+	}
+
+	@Override
 	public String visit(BackwardLinkOfObjectHasSelfMatch1 inferenceMatch1) {
 		return inferenceMatch1.getParent() + " | ";
 	}
@@ -354,13 +359,13 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	}
 
 	@Override
-	public String visit(ForwardLinkCompositionMatch3 inferenceMatch4) {
-		return inferenceMatch4.getParent() + " | ";
+	public String visit(ForwardLinkCompositionMatch3 inferenceMatch3) {
+		return inferenceMatch3.getParent() + " | ";
 	}
 
 	@Override
-	public String visit(ForwardLinkCompositionMatch4 inferenceMatch5) {
-		return inferenceMatch5.getParent() + " | ";
+	public String visit(ForwardLinkCompositionMatch4 inferenceMatch4) {
+		return inferenceMatch4.getParent() + " | ";
 	}
 
 	@Override
@@ -375,6 +380,11 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 
 	@Override
 	public String visit(ForwardLinkCompositionMatch7 inferenceMatch7) {
+		return inferenceMatch7.getParent() + " | ";
+	}
+
+	@Override
+	public String visit(ForwardLinkCompositionMatch8 inferenceMatch7) {
 		return inferenceMatch7.getParent() + " | ";
 	}
 

@@ -24,7 +24,7 @@ package org.semanticweb.elk.matching;
 
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch2Watch;
 import org.semanticweb.elk.matching.conclusions.ForwardLinkMatch3;
-import org.semanticweb.elk.matching.inferences.ForwardLinkCompositionMatch4;
+import org.semanticweb.elk.matching.inferences.ForwardLinkCompositionMatch5;
 import org.semanticweb.elk.matching.inferences.ForwardLinkOfObjectHasSelfMatch2;
 import org.semanticweb.elk.matching.inferences.ForwardLinkOfObjectSomeValuesFromMatch2;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
@@ -39,8 +39,8 @@ class ForwardLinkMatch3InferenceVisitor
 	}
 
 	@Override
-	public Void visit(ForwardLinkCompositionMatch4 inferenceMatch4) {
-		factory.getForwardLinkCompositionMatch5(inferenceMatch4, child);
+	public Void visit(ForwardLinkCompositionMatch5 inferenceMatch5) {
+		factory.getForwardLinkCompositionMatch6(inferenceMatch5, child);
 		return null;
 	}
 

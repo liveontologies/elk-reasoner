@@ -24,9 +24,9 @@ package org.semanticweb.elk.matching;
 
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch3Watch;
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch4;
-import org.semanticweb.elk.matching.inferences.BackwardLinkCompositionMatch7;
+import org.semanticweb.elk.matching.inferences.BackwardLinkCompositionMatch8;
 import org.semanticweb.elk.matching.inferences.ClassInconsistencyPropagatedMatch3;
-import org.semanticweb.elk.matching.inferences.ForwardLinkCompositionMatch6;
+import org.semanticweb.elk.matching.inferences.ForwardLinkCompositionMatch7;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
 import org.semanticweb.elk.matching.inferences.SubClassInclusionComposedObjectSomeValuesFromMatch3;
 
@@ -40,8 +40,8 @@ class BackwardLinkMatch4InferenceVisitor
 	}
 
 	@Override
-	public Void visit(BackwardLinkCompositionMatch7 inferenceMatch7) {
-		factory.getBackwardLinkCompositionMatch8(inferenceMatch7, child);
+	public Void visit(BackwardLinkCompositionMatch8 inferenceMatch8) {
+		factory.getBackwardLinkCompositionMatch9(inferenceMatch8, child);
 		return null;
 	}
 
@@ -52,8 +52,8 @@ class BackwardLinkMatch4InferenceVisitor
 	}
 
 	@Override
-	public Void visit(ForwardLinkCompositionMatch6 inferenceMatch6) {
-		factory.getForwardLinkCompositionMatch7(inferenceMatch6, child);
+	public Void visit(ForwardLinkCompositionMatch7 inferenceMatch7) {
+		factory.getForwardLinkCompositionMatch8(inferenceMatch7, child);
 		return null;
 	}
 

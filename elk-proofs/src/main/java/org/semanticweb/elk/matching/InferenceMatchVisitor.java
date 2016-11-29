@@ -297,9 +297,8 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(BackwardLinkCompositionMatch3 inferenceMatch3) {
-		inferenceMatch3.getSecondPremiseMatch(conclusionFactory_);
 		SubPropertyChainMatch1 premiseMatch1 = inferenceMatch3
-				.getFourthPremiseMatch(conclusionFactory_);
+				.getSecondPremiseMatch(conclusionFactory_);
 		inferences_.add(premiseMatch1, inferenceMatch3);
 		for (SubPropertyChainMatch2 child : hierarchy_
 				.getChildren(premiseMatch1)) {
@@ -311,24 +310,24 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(BackwardLinkCompositionMatch4 inferenceMatch4) {
-		ForwardLinkMatch1 premiseMatch2 = inferenceMatch4
-				.getThirdPremiseMatch(conclusionFactory_);
-		inferences_.add(premiseMatch2, inferenceMatch4);
-		for (ForwardLinkMatch2 child : hierarchy_.getChildren(premiseMatch2)) {
-			(new ForwardLinkMatch2InferenceVisitor(inferenceFactory_, child))
-					.visit(inferenceMatch4);
+		SubPropertyChainMatch1 premiseMatch1 = inferenceMatch4
+				.getFourthPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch4);
+		for (SubPropertyChainMatch2 child : hierarchy_
+				.getChildren(premiseMatch1)) {
+			(new SubPropertyChainMatch2InferenceVisitor(inferenceFactory_,
+					child)).visit(inferenceMatch4);
 		}
 		return null;
 	}
 
 	@Override
 	public Void visit(BackwardLinkCompositionMatch5 inferenceMatch5) {
-		BackwardLinkMatch2 conclusionMatch2 = inferenceMatch5
-				.getConclusionMatch(conclusionFactory_);
-		inferences_.add(conclusionMatch2, inferenceMatch5);
-		for (BackwardLinkMatch3 child : hierarchy_
-				.getChildren(conclusionMatch2)) {
-			(new BackwardLinkMatch3InferenceVisitor(inferenceFactory_, child))
+		ForwardLinkMatch1 premiseMatch2 = inferenceMatch5
+				.getThirdPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch2, inferenceMatch5);
+		for (ForwardLinkMatch2 child : hierarchy_.getChildren(premiseMatch2)) {
+			(new ForwardLinkMatch2InferenceVisitor(inferenceFactory_, child))
 					.visit(inferenceMatch5);
 		}
 		return null;
@@ -336,11 +335,12 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(BackwardLinkCompositionMatch6 inferenceMatch6) {
-		ForwardLinkMatch3 premiseMatch3 = inferenceMatch6
-				.getThirdPremiseMatch(conclusionFactory_);
-		inferences_.add(premiseMatch3, inferenceMatch6);
-		for (ForwardLinkMatch4 child : hierarchy_.getChildren(premiseMatch3)) {
-			(new ForwardLinkMatch4InferenceVisitor(inferenceFactory_, child))
+		BackwardLinkMatch2 conclusionMatch2 = inferenceMatch6
+				.getConclusionMatch(conclusionFactory_);
+		inferences_.add(conclusionMatch2, inferenceMatch6);
+		for (BackwardLinkMatch3 child : hierarchy_
+				.getChildren(conclusionMatch2)) {
+			(new BackwardLinkMatch3InferenceVisitor(inferenceFactory_, child))
 					.visit(inferenceMatch6);
 		}
 		return null;
@@ -348,11 +348,11 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(BackwardLinkCompositionMatch7 inferenceMatch7) {
-		BackwardLinkMatch3 premiseMatch3 = inferenceMatch7
-				.getFirstPremiseMatch(conclusionFactory_);
+		ForwardLinkMatch3 premiseMatch3 = inferenceMatch7
+				.getThirdPremiseMatch(conclusionFactory_);
 		inferences_.add(premiseMatch3, inferenceMatch7);
-		for (BackwardLinkMatch4 child : hierarchy_.getChildren(premiseMatch3)) {
-			(new BackwardLinkMatch4InferenceVisitor(inferenceFactory_, child))
+		for (ForwardLinkMatch4 child : hierarchy_.getChildren(premiseMatch3)) {
+			(new ForwardLinkMatch4InferenceVisitor(inferenceFactory_, child))
 					.visit(inferenceMatch7);
 		}
 		return null;
@@ -360,27 +360,41 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(BackwardLinkCompositionMatch8 inferenceMatch8) {
-		inferenceMatch8.getConclusionMatch(conclusionFactory_);
+		BackwardLinkMatch3 premiseMatch3 = inferenceMatch8
+				.getFirstPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch3, inferenceMatch8);
+		for (BackwardLinkMatch4 child : hierarchy_.getChildren(premiseMatch3)) {
+			(new BackwardLinkMatch4InferenceVisitor(inferenceFactory_, child))
+					.visit(inferenceMatch8);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(BackwardLinkCompositionMatch9 inferenceMatch9) {
+		inferenceMatch9.getConclusionMatch(conclusionFactory_);
 
 		// creating ELK inferences
-		IndexedContextRootMatch extendedConclusionSourceMatch = inferenceMatch8
+		IndexedContextRootMatch extendedConclusionSourceMatch = inferenceMatch9
 				.getExtendedConclusionSourceMatch();
+		BackwardLinkCompositionMatch8 inferenceMatch8 = inferenceMatch9
+				.getParent();
+		IndexedContextRootMatchChain forwardChainExtendedDomains = inferenceMatch8
+				.getForwardChainExtendedDomains();
 		BackwardLinkCompositionMatch7 inferenceMatch7 = inferenceMatch8
 				.getParent();
-		IndexedContextRootMatchChain forwardChainExtendedDomains = inferenceMatch7
-				.getForwardChainExtendedDomains();
+		IndexedContextRootMatch extendedDestinationMatch = inferenceMatch7
+				.getExtendedDestinationMatch();
 		BackwardLinkCompositionMatch6 inferenceMatch6 = inferenceMatch7
 				.getParent();
-		IndexedContextRootMatch extendedDestinationMatch = inferenceMatch6
-				.getExtendedDestinationMatch();
 		BackwardLinkCompositionMatch5 inferenceMatch5 = inferenceMatch6
 				.getParent();
+		ElkSubObjectPropertyExpression premiseFullForwardChainMatch = inferenceMatch5
+				.getPremiseFullForwardChainMatch();
+		int premiseForwardChainStartPos = inferenceMatch5
+				.getPremiseForwardChainStartPos();
 		BackwardLinkCompositionMatch4 inferenceMatch4 = inferenceMatch5
 				.getParent();
-		ElkSubObjectPropertyExpression premiseFullForwardChainMatch = inferenceMatch4
-				.getPremiseFullForwardChainMatch();
-		int premiseForwardChainStartPos = inferenceMatch4
-				.getPremiseForwardChainStartPos();
 		BackwardLinkCompositionMatch3 inferenceMatch3 = inferenceMatch4
 				.getParent();
 		ElkObjectProperty premiseBackwardRelationMatch = inferenceMatch3
@@ -1277,9 +1291,8 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(ForwardLinkCompositionMatch2 inferenceMatch2) {
-		inferenceMatch2.getSecondPremiseMatch(conclusionFactory_);
 		SubPropertyChainMatch1 premiseMatch1 = inferenceMatch2
-				.getFourthPremiseMatch(conclusionFactory_);
+				.getSecondPremiseMatch(conclusionFactory_);
 		inferences_.add(premiseMatch1, inferenceMatch2);
 		for (SubPropertyChainMatch2 child : hierarchy_
 				.getChildren(premiseMatch1)) {
@@ -1291,24 +1304,24 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(ForwardLinkCompositionMatch3 inferenceMatch3) {
-		ForwardLinkMatch1 premiseMatch2 = inferenceMatch3
-				.getThirdPremiseMatch(conclusionFactory_);
-		inferences_.add(premiseMatch2, inferenceMatch3);
-		for (ForwardLinkMatch2 child : hierarchy_.getChildren(premiseMatch2)) {
-			(new ForwardLinkMatch2InferenceVisitor(inferenceFactory_, child))
-					.visit(inferenceMatch3);
+		SubPropertyChainMatch1 premiseMatch1 = inferenceMatch3
+				.getFourthPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch1, inferenceMatch3);
+		for (SubPropertyChainMatch2 child : hierarchy_
+				.getChildren(premiseMatch1)) {
+			(new SubPropertyChainMatch2InferenceVisitor(inferenceFactory_,
+					child)).visit(inferenceMatch3);
 		}
 		return null;
 	}
 
 	@Override
 	public Void visit(ForwardLinkCompositionMatch4 inferenceMatch4) {
-		ForwardLinkMatch2 conclusionMatch2 = inferenceMatch4
-				.getConclusionMatch(conclusionFactory_);
-		inferences_.add(conclusionMatch2, inferenceMatch4);
-		for (ForwardLinkMatch3 child : hierarchy_
-				.getChildren(conclusionMatch2)) {
-			(new ForwardLinkMatch3InferenceVisitor(inferenceFactory_, child))
+		ForwardLinkMatch1 premiseMatch2 = inferenceMatch4
+				.getThirdPremiseMatch(conclusionFactory_);
+		inferences_.add(premiseMatch2, inferenceMatch4);
+		for (ForwardLinkMatch2 child : hierarchy_.getChildren(premiseMatch2)) {
+			(new ForwardLinkMatch2InferenceVisitor(inferenceFactory_, child))
 					.visit(inferenceMatch4);
 		}
 		return null;
@@ -1316,12 +1329,12 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(ForwardLinkCompositionMatch5 inferenceMatch5) {
-		ForwardLinkMatch3 conclusionMatch2 = inferenceMatch5
-				.getThirdPremiseMatch(conclusionFactory_);
+		ForwardLinkMatch2 conclusionMatch2 = inferenceMatch5
+				.getConclusionMatch(conclusionFactory_);
 		inferences_.add(conclusionMatch2, inferenceMatch5);
-		for (ForwardLinkMatch4 child : hierarchy_
+		for (ForwardLinkMatch3 child : hierarchy_
 				.getChildren(conclusionMatch2)) {
-			(new ForwardLinkMatch4InferenceVisitor(inferenceFactory_, child))
+			(new ForwardLinkMatch3InferenceVisitor(inferenceFactory_, child))
 					.visit(inferenceMatch5);
 		}
 		return null;
@@ -1329,12 +1342,12 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(ForwardLinkCompositionMatch6 inferenceMatch6) {
-		BackwardLinkMatch3 conclusionMatch2 = inferenceMatch6
-				.getFirstPremiseMatch(conclusionFactory_);
+		ForwardLinkMatch3 conclusionMatch2 = inferenceMatch6
+				.getThirdPremiseMatch(conclusionFactory_);
 		inferences_.add(conclusionMatch2, inferenceMatch6);
-		for (BackwardLinkMatch4 child : hierarchy_
+		for (ForwardLinkMatch4 child : hierarchy_
 				.getChildren(conclusionMatch2)) {
-			(new BackwardLinkMatch4InferenceVisitor(inferenceFactory_, child))
+			(new ForwardLinkMatch4InferenceVisitor(inferenceFactory_, child))
 					.visit(inferenceMatch6);
 		}
 		return null;
@@ -1342,27 +1355,42 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(ForwardLinkCompositionMatch7 inferenceMatch7) {
-		inferenceMatch7.getConclusionMatch(conclusionFactory_);
+		BackwardLinkMatch3 conclusionMatch2 = inferenceMatch7
+				.getFirstPremiseMatch(conclusionFactory_);
+		inferences_.add(conclusionMatch2, inferenceMatch7);
+		for (BackwardLinkMatch4 child : hierarchy_
+				.getChildren(conclusionMatch2)) {
+			(new BackwardLinkMatch4InferenceVisitor(inferenceFactory_, child))
+					.visit(inferenceMatch7);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(ForwardLinkCompositionMatch8 inferenceMatch8) {
+		inferenceMatch8.getConclusionMatch(conclusionFactory_);
 
 		// creating ELK inferences
-		IndexedContextRootMatch extendedDestinationMatch = inferenceMatch7
+		IndexedContextRootMatch extendedDestinationMatch = inferenceMatch8
 				.getExtendedDestinationMatch();
+		ForwardLinkCompositionMatch7 inferenceMatch7 = inferenceMatch8
+				.getParent();
+		IndexedContextRootMatchChain forwardChainExtendedDomains = inferenceMatch7
+				.getForwardChainExtendedDomains();
 		ForwardLinkCompositionMatch6 inferenceMatch6 = inferenceMatch7
 				.getParent();
-		IndexedContextRootMatchChain forwardChainExtendedDomains = inferenceMatch6
-				.getForwardChainExtendedDomains();
+		IndexedContextRootMatch conclusionExtendedTargetMatch = inferenceMatch6
+				.getConclusionExtendedTargetMatch();
 		ForwardLinkCompositionMatch5 inferenceMatch5 = inferenceMatch6
 				.getParent();
-		IndexedContextRootMatch conclusionExtendedTargetMatch = inferenceMatch5
-				.getConclusionExtendedTargetMatch();
 		ForwardLinkCompositionMatch4 inferenceMatch4 = inferenceMatch5
 				.getParent();
+		ElkSubObjectPropertyExpression premiseFullForwardChainMatch = inferenceMatch4
+				.getPremiseFullForwardChainMatch();
+		int premiseForwardChainStartPos = inferenceMatch4
+				.getPremiseForwardChainStartPos();
 		ForwardLinkCompositionMatch3 inferenceMatch3 = inferenceMatch4
 				.getParent();
-		ElkSubObjectPropertyExpression premiseFullForwardChainMatch = inferenceMatch3
-				.getPremiseFullForwardChainMatch();
-		int premiseForwardChainStartPos = inferenceMatch3
-				.getPremiseForwardChainStartPos();
 		ForwardLinkCompositionMatch2 inferenceMatch2 = inferenceMatch3
 				.getParent();
 		ElkObjectProperty premiseBackwardRelationMatch = inferenceMatch2
