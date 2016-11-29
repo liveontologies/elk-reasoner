@@ -21,17 +21,20 @@
  */
 package org.semanticweb.elk.owlapi.proofs;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.liveontologies.owlapi.proof.OWLProver;
+import org.liveontologies.owlapi.proof.util.ProofNodes;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
 import org.semanticweb.elk.reasoner.tracing.TracingTestManifest;
@@ -44,10 +47,12 @@ import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.elk.testing.UrlTestInput;
 import org.semanticweb.elk.testing.VoidTestOutput;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.reasoner.InconsistentOntologyException;
 import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.slf4j.Logger;
@@ -95,6 +100,7 @@ public class AllOntologiesProofTest extends BaseProofTest {
 		final OWLOntology ontology = loadOntology(manifest_.getInput()
 				.getUrl().openStream());
 		final OWLProver prover = OWLAPITestUtils.createProver(ontology);
+		final Set<OWLAxiom> axioms = ontology.getAxioms(Imports.INCLUDED);
 
 		try {
 			prover.precomputeInferences(InferenceType.CLASS_HIERARCHY);
@@ -115,9 +121,18 @@ public class AllOntologiesProofTest extends BaseProofTest {
 								OWLSubClassOfAxiom axiom = factory
 										.getOWLSubClassOfAxiom(subsumee,
 												subsumer);
-								ProofTestUtils.provabilityTest(prover, axiom);
+								assertTrue(String.format(
+										"Entailment %s not derivable!", axiom),
+										ProofNodes
+												.isDerivable(
+														prover.getProof(axiom)
+																.getRoot(),
+														axioms));
 							} catch (Exception e) {
-								throw new RuntimeException(e);
+								throw new RuntimeException(
+										"Exception while running proof test: "
+												+ subsumee + " ⊑ " + subsumer,
+										e);
 							}
 						}
 
