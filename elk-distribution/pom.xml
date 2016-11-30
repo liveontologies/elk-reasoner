@@ -159,6 +159,7 @@
 						<configuration>
 							<name>currentYear</name>
 							<pattern>yyyy</pattern>
+							<locale>en,US</locale>
 						</configuration>
 					</execution>
 					<execution>
@@ -171,6 +172,7 @@
 						<configuration>
 							<name>buildDate</name>
 							<pattern>yyyy-MM-dd</pattern>
+							<locale>en,US</locale>
 						</configuration>
 					</execution>
 				</executions>
