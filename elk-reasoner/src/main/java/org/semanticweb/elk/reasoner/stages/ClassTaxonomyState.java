@@ -21,9 +21,11 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -50,6 +52,8 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.util.collections.Operations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Stores information about the state of the class taxonomy
@@ -60,6 +64,9 @@ import org.semanticweb.elk.util.collections.Operations;
  * @author Peter Skocovsky
  */
 public class ClassTaxonomyState {
+
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(ClassTaxonomyState.class);
 
 	private UpdateableTaxonomy<ElkClass> taxonomy_ = null;
 
@@ -83,16 +90,22 @@ public class ClassTaxonomyState {
 
 	private final ElkPolarityExpressionConverter converter_;
 
-	public <C extends Context> ClassTaxonomyState(
+	private final List<Listener> listeners_ = new ArrayList<Listener>();
+
+	<C extends Context> ClassTaxonomyState(
 			final SaturationState<C> saturationState,
 			final DifferentialIndex ontologyIndex,
-			final ElkObject.Factory elkFactory) {
+			final ElkObject.Factory elkFactory,
+			final Collection<Listener> listeners) {
 
 		this.elkFactory_ = elkFactory;
 		this.ontologyIndex_ = ontologyIndex;
 		this.saturationState_ = saturationState;
 		this.converter_ = new ElkPolarityExpressionConverterImpl(elkFactory,
 				ontologyIndex);
+		this.listeners_.addAll(listeners);
+
+		resetTaxonomy();
 
 		ontologyIndex.addListener(new OntologyIndexDummyChangeListener() {
 
@@ -120,8 +133,22 @@ public class ClassTaxonomyState {
 						}
 					}
 
+					@Override
+					public void contextsClear() {
+						// The whole taxonomy must be computed from scratch.
+						resetTaxonomy();
+					}
+
 				});
 
+	}
+
+	public <C extends Context> ClassTaxonomyState(
+			final SaturationState<C> saturationState,
+			final DifferentialIndex ontologyIndex,
+			final ElkObject.Factory elkFactory) {
+		this(saturationState, ontologyIndex, elkFactory,
+				Collections.<Listener> emptyList());
 	}
 
 	private final NodeStore.Listener<ElkClass> nodeStoreListener_ = new DummyNodeStoreListener<ElkClass>() {
@@ -226,11 +253,6 @@ public class ClassTaxonomyState {
 	 *         super-nodes in taxonomy were removed.
 	 */
 	Collection<IndexedClass> getToAdd() {
-		if (taxonomy_ == null) {
-			// No class can be pruned.
-			return toAdd_;
-		}
-		// else
 		final int size = pruneToAdd();
 		/*
 		 * since getting the size of the queue is a linear operation, use the
@@ -263,17 +285,11 @@ public class ClassTaxonomyState {
 					.getNode(cls.getElkEntity());
 			if (node == null) {
 				iter.remove();
-				if (cls.occurs()) {
-					toAdd_.add(cls);
-				}
 				continue;
 			}
 			// else
 			if (cls == ontologyIndex_.getOwlNothing()) {
 				iter.remove();
-				if (cls.occurs()) {
-					toAdd_.add(cls);
-				}
 				continue;
 			}
 			size++;
@@ -291,17 +307,6 @@ public class ClassTaxonomyState {
 	 *         became not saturated.
 	 */
 	Collection<IndexedClass> getToRemove() {
-		if (taxonomy_ == null) {// TODO: Never set taxonomy_ to null !!!
-			// no classes are in taxonomy
-			IndexedClass cls;
-			while ((cls = toRemove_.poll()) != null) {
-				if (cls.occurs()) {
-					toAdd_.offer(cls);
-				}
-			}
-			return Collections.emptyList();
-		}
-		// else
 		final int size = pruneToRemove();
 		/*
 		 * since getting the size of the queue is a linear operation, use the
@@ -310,51 +315,52 @@ public class ClassTaxonomyState {
 		return Operations.getCollection(toRemove_, size);
 	}
 
-	public Writer getWriter() {
-		return new Writer();
+	void resetTaxonomy() {
+		LOGGER_.trace("Reset class taxonomy");
+
+		final UpdateableTaxonomy<ElkClass> old = taxonomy_;
+		if (taxonomy_ != null) {
+			taxonomy_.removeListener(nodeStoreListener_);
+			taxonomy_.removeListener(taxonomyListener_);
+		}
+		taxonomy_ = new ConcurrentClassTaxonomy(elkFactory_,
+				ElkClassKeyProvider.INSTANCE);
+		for (final Listener listener : listeners_) {
+			listener.taxonomyReset(old, taxonomy_);
+		}
+		taxonomy_.addListener(nodeStoreListener_);
+		taxonomy_.addListener(taxonomyListener_);
+
+		// All classes need to be added to the taxonomy
+		toRemove_.clear();
+		toAdd_.clear();
+		toAdd_.addAll(ontologyIndex_.getClasses());
+
 	}
 
-	/**
-	 * Groups all methods to change the state
-	 * 
-	 * @author Pavel Klinov
-	 * 
-	 *         pavel.klinov@uni-ulm.de
-	 */
-	public class Writer {
+	void addListener(final Listener listener) {
+		listeners_.add(listener);
+	}
 
-		void initTaxonomy() {
-			if (taxonomy_ != null) {
-				taxonomy_.removeListener(nodeStoreListener_);
-				taxonomy_.removeListener(taxonomyListener_);
-			}
-			taxonomy_ = new ConcurrentClassTaxonomy(elkFactory_,
-					ElkClassKeyProvider.INSTANCE);
-			if (taxonomy_ != null) {
-				taxonomy_.addListener(nodeStoreListener_);
-				taxonomy_.addListener(taxonomyListener_);
-			}
+	void removeListener(final Listener listener) {
+		listeners_.remove(listener);
+	}
 
-			// All classes need to be added to the taxonomy
-			toRemove_.clear();
-			toAdd_.clear();
-			toAdd_.addAll(ontologyIndex_.getClasses());
+	static interface Listener {
 
-		}
-
-		public void clearTaxonomy() {
-
-			// All classes need to be added to the taxonomy
-			toRemove_.clear();
-			toAdd_.clear();
-			toAdd_.addAll(ontologyIndex_.getClasses());
-
-			if (taxonomy_ != null) {
-				taxonomy_.removeListener(nodeStoreListener_);
-				taxonomy_.removeListener(taxonomyListener_);
-			}
-			taxonomy_ = null;
-		}
+		/**
+		 * Called immediately after the result of calling
+		 * {@link ClassTaxonomyState#getTaxonomy()} changes.
+		 * 
+		 * @param oldTaxonomy
+		 *            value of {@link ClassTaxonomyState#getTaxonomy()} before
+		 *            the change
+		 * @param newTaxonomy
+		 *            value of {@link ClassTaxonomyState#getTaxonomy()} after
+		 *            the change
+		 */
+		void taxonomyReset(UpdateableTaxonomy<ElkClass> oldTaxonomy,
+				UpdateableTaxonomy<ElkClass> newTaxonomy);
 
 	}
 

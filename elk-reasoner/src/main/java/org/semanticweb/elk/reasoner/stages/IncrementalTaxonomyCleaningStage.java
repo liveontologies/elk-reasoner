@@ -35,12 +35,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Used to clean both class and instance taxonomies (removed nodes which
- * super-nodes or types need to be recomputed)
+ * Used to clean both class and instance taxonomy. Removes nodes with classes or
+ * individuals that became not saturated. {@link ClassTaxonomyState} and
+ * {@link InstanceTaxonomyState} keep track of these classes and individuals.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
 public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 
@@ -65,20 +67,21 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 			return false;
 		}
 
-		final Collection<IndexedClass> removedClasses = reasoner.classTaxonomyState
+		final Collection<IndexedClass> classesToRemove = reasoner.classTaxonomyState
 				.getToRemove();
-		final Collection<IndexedIndividual> removedIndividuals = reasoner.instanceTaxonomyState
+		final Collection<IndexedIndividual> individualsToRemove = reasoner.instanceTaxonomyState
 				.getToRemove();
 		@SuppressWarnings("unchecked")
 		Collection<IndexedClassEntity> inputs = Operations.getCollection(
-				Operations.concat(removedClasses, removedIndividuals),
-				removedClasses.size() + removedIndividuals.size());
+				Operations.concat(classesToRemove, individualsToRemove),
+				classesToRemove.size() + individualsToRemove.size());
 
-		LOGGER_.trace("{}: removed classes", removedClasses);
-		LOGGER_.trace("{}: removed individuals", removedIndividuals);
+		LOGGER_.trace("{}: classes to remove", classesToRemove);
+		LOGGER_.trace("{}: individuals to remove", individualsToRemove);
 
 		cleaning_ = new TaxonomyCleaning(inputs, reasoner.getInterrupter(),
-				reasoner.classTaxonomyState, reasoner.instanceTaxonomyState,
+				reasoner.classTaxonomyState.getTaxonomy(),
+				reasoner.instanceTaxonomyState.getTaxonomy(),
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor());
 
@@ -87,11 +90,6 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 
 	@Override
 	public void executeStage() throws ElkException {
-
-		if (reasoner.classTaxonomyState.getTaxonomy() == null) {
-			// nothing to do
-			return;
-		}
 		cleaning_.process();
 	}
 
@@ -100,20 +98,18 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 		if (!super.postExecute()) {
 			return false;
 		}
-		final Collection<IndexedClass> removedClasses = reasoner.classTaxonomyState
+		final Collection<IndexedClass> classesToRemove = reasoner.classTaxonomyState
 				.getToRemove();
-		if (!removedClasses.isEmpty()) {
+		if (!classesToRemove.isEmpty()) {
 			throw new ElkRuntimeException(TaxonomyCleaning.class.getSimpleName()
-					+ " did not consume all removed classes!");
+					+ " did not remove some classes from the taxonomy!");
 		}
-		final Collection<IndexedIndividual> removedIndividuals = reasoner.instanceTaxonomyState
+		final Collection<IndexedIndividual> individualsToRemove = reasoner.instanceTaxonomyState
 				.getToRemove();
-		if (!removedIndividuals.isEmpty()) {
+		if (!individualsToRemove.isEmpty()) {
 			throw new ElkRuntimeException(TaxonomyCleaning.class.getSimpleName()
-					+ " did not consume all removed individuals!");
+					+ " did not remove some individuals from the taxonomy!");
 		}
-		// at this point we're done with unsaturated contexts
-		markAllContextsAsSaturated();
 		this.cleaning_ = null;
 
 		return true;

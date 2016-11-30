@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -190,10 +191,11 @@ public abstract class AbstractReasonerState {
 				.createSaturationState(ontologyIndex);
 		this.consistencyCheckingState = ConsistencyCheckingState
 				.create(saturationState, propertyHierarchyCompositionState_);
-		this.classTaxonomyState = new ClassTaxonomyState(saturationState,
-				ontologyIndex, elkFactory);
 		this.instanceTaxonomyState = new InstanceTaxonomyState(saturationState,
 				ontologyIndex, elkFactory);
+		this.classTaxonomyState = new ClassTaxonomyState(saturationState,
+				ontologyIndex, elkFactory, Arrays.asList(
+						instanceTaxonomyState.getClassTaxonomyStateListener()));
 		this.objectPropertyTaxonomyState = new ObjectPropertyTaxonomyState(
 				elkFactory);
 		this.ruleAndConclusionStats = new SaturationStatistics();
@@ -244,10 +246,6 @@ public abstract class AbstractReasonerState {
 			return;
 		}
 		ontologyIndex.setIncrementalMode(false);
-		// delete existing taxonomies as they cannot be updated incrementally
-		resetTaxonomy();
-		resetInstanceTaxonomy();
-		resetObjectPropertyTaxonomy();
 	}
 
 	boolean trySetIncrementalMode() {
@@ -259,35 +257,6 @@ public abstract class AbstractReasonerState {
 		ontologyIndex.setIncrementalMode(true);
 		return true;
 
-	}
-
-	/**
-	 * Reset the property saturation stage and all subsequent stages
-	 */
-	public synchronized void resetPropertySaturation() {
-		LOGGER_.trace("Reset property saturation");
-		stageManager.propertyInitializationStage.invalidateRecursive();
-	}
-
-	public synchronized void resetTaxonomy() {
-		LOGGER_.trace("Reset class taxonomy");
-		// force non-incremental taxonomy computation
-		classTaxonomyState.getWriter().clearTaxonomy();
-		stageManager.classTaxonomyComputationStage.invalidateRecursive();
-	}
-
-	public synchronized void resetInstanceTaxonomy() {
-		LOGGER_.trace("Reset instance taxonomy");
-		// force non-incremental taxonomy computation
-		instanceTaxonomyState.getWriter().clearTaxonomy();
-		stageManager.instanceTaxonomyComputationStage.invalidateRecursive();
-	}
-
-	public synchronized void resetObjectPropertyTaxonomy() {
-		LOGGER_.trace("Reset object property taxonomy");
-		// force non-incremental taxonomy computation
-		stageManager.objectPropertyTaxonomyComputationStage
-				.invalidateRecursive();
 	}
 
 	public synchronized void registerAxiomLoader(
@@ -332,6 +301,7 @@ public abstract class AbstractReasonerState {
 
 	/**
 	 * Flushes index, if needed, and completes loading if there is new input.
+	 * Incremental mode should be changed only during completing loading.
 	 * 
 	 * @throws ElkException
 	 */
@@ -356,6 +326,32 @@ public abstract class AbstractReasonerState {
 
 		complete(stageManager.inputLoadingStage);
 
+	}
+
+	/**
+	 * Completes stages necessary for restoring saturation and cleaning
+	 * taxonomies.
+	 * 
+	 * @return Whether some stages were completed, i.e., they were not completed
+	 *         before calling this method.
+	 * @throws ElkException
+	 */
+	private boolean restoreSaturation() throws ElkException {
+
+		ensureLoading();
+
+		final boolean changed;
+
+		if (isIncrementalMode()) {
+			changed = !stageManager.incrementalTaxonomyCleaningStage
+					.isCompleted();
+			complete(stageManager.incrementalTaxonomyCleaningStage);
+		} else {
+			changed = !stageManager.contextInitializationStage.isCompleted();
+			complete(stageManager.contextInitializationStage);
+		}
+
+		return changed;
 	}
 
 	/**
@@ -426,16 +422,10 @@ public abstract class AbstractReasonerState {
 	public synchronized boolean isInconsistent() throws ElkException {
 
 		ruleAndConclusionStats.reset();
-		ensureLoading();
-
-		if (isIncrementalMode() && !saturationState.getContexts().isEmpty()) {
-			LOGGER_.trace("Consistency checking [incremental]");
-			complete(stageManager.incrementalConsistencyCheckingStage);
-		} else {
-			LOGGER_.trace("Consistency checking [non-incremental]");
-			setNonIncrementalMode();
-			complete(stageManager.consistencyCheckingStage);
+		if (restoreSaturation()) {
+			stageManager.consistencyCheckingStage.invalidateRecursive();
 		}
+		complete(stageManager.consistencyCheckingStage);
 
 		return consistencyCheckingState.isInconsistent();
 	}
@@ -455,17 +445,12 @@ public abstract class AbstractReasonerState {
 
 		ruleAndConclusionStats.reset();
 
-		if (isInconsistent())
+		// also restores saturation and cleans the taxonomy if necessary
+		if (isInconsistent()) {
 			throw new ElkInconsistentOntologyException();
-
-		if (isIncrementalMode() && classTaxonomyState.getTaxonomy() != null) {
-			LOGGER_.trace("Taxonomy computation [incremental]");
-			complete(stageManager.incrementalClassTaxonomyComputationStage);
-		} else {
-			LOGGER_.trace("Taxonomy computation [non-incremental]");
-			setNonIncrementalMode();
-			complete(stageManager.classTaxonomyComputationStage);
 		}
+
+		complete(stageManager.classTaxonomyComputationStage);
 
 		return classTaxonomyState.getTaxonomy();
 	}
@@ -520,18 +505,12 @@ public abstract class AbstractReasonerState {
 
 		ruleAndConclusionStats.reset();
 
-		if (isInconsistent())
+		// also restores saturation and cleans the taxonomy if necessary
+		if (isInconsistent()) {
 			throw new ElkInconsistentOntologyException();
-
-		if (isIncrementalMode()
-				&& instanceTaxonomyState.getTaxonomy() != null) {
-			LOGGER_.trace("Instance taxonomy computation [incremental]");
-			complete(stageManager.incrementalInstanceTaxonomyComputationStage);
-		} else {
-			LOGGER_.trace("Instance taxonomy computation [non-incremental]");
-			setNonIncrementalMode();
-			complete(stageManager.instanceTaxonomyComputationStage);
 		}
+
+		complete(stageManager.instanceTaxonomyComputationStage);
 
 		return instanceTaxonomyState.getTaxonomy();
 	}
@@ -928,9 +907,7 @@ public abstract class AbstractReasonerState {
 	 * @return {@code true} if the class taxonomy has been computed
 	 */
 	public synchronized boolean doneTaxonomy() {
-		return stageManager.classTaxonomyComputationStage.isCompleted()
-				|| stageManager.incrementalClassTaxonomyComputationStage
-						.isCompleted();
+		return stageManager.classTaxonomyComputationStage.isCompleted();
 	}
 
 	/**
@@ -959,15 +936,6 @@ public abstract class AbstractReasonerState {
 	protected OntologyIndex getOntologyIndex() throws ElkException {
 		ensureLoading();
 		return ontologyIndex;
-	}
-
-	public synchronized void initClassTaxonomy() {
-		classTaxonomyState.getWriter().initTaxonomy();
-	}
-
-	public synchronized void initInstanceTaxonomy() {
-		instanceTaxonomyState.getWriter()
-				.initTaxonomy(classTaxonomyState.getTaxonomy());
 	}
 
 	@Deprecated

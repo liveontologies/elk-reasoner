@@ -55,8 +55,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link ReasonerStage} during which the input ontology is loaded into the
- * reasoner.
+ * A {@link ReasonerStage} during which the input is loaded into the reasoner.
+ * Input consists of ontology, changes to the ontology, or queried classes. This
+ * stage is also responsible for setting the incremental mode.
  * 
  * @author "Yevgeny Kazakov"
  * @author Peter Skocovsky
@@ -116,7 +117,7 @@ public class InputLoadingStage extends AbstractReasonerStage {
 		if (!super.preExecute()) {
 			return false;
 		}
-		if (!firstLoad_) {
+		if (!firstLoad_ && !reasoner.saturationState.getContexts().isEmpty()) {
 			reasoner.trySetIncrementalMode();
 		}
 		loader_ = reasoner.getAxiomLoader();
@@ -151,7 +152,8 @@ public class InputLoadingStage extends AbstractReasonerStage {
 						return;
 					LOGGER_.debug("{}: axiom not supported in incremental mode",
 							axiom);
-					reasoner.resetPropertySaturation();
+					reasoner.stageManager.propertyInitializationStage
+							.invalidateRecursive();
 					reasoner.setNonIncrementalMode();
 					resetDone = true;
 				}

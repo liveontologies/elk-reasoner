@@ -22,8 +22,8 @@
 package org.semanticweb.elk.reasoner.stages;
 
 /**
- * Defines all {@link ReasonerStage}s used by the reasoner and dependencies
- * between them.
+ * Defines all {@link ReasonerStage}s used by the reasoner and static
+ * dependencies between them. Dynamic dependencies are maintained manually.
  * 
  * @author "Yevgeny Kazakov"
  * @author Peter Skocovsky
@@ -34,24 +34,23 @@ public class ReasonerStageManager {
 			propertyHierarchyCompositionComputationStage,
 			objectPropertyTaxonomyComputationStage, contextInitializationStage,
 			consistencyCheckingStage, classSaturationStage,
-			classTaxonomyComputationStage, incrementalCompletionStage,
-			incrementalDeletionInitializationStage, incrementalDeletionStage,
-			incrementalContextGapFillingStage,
+			incrementalCompletionStage, incrementalDeletionInitializationStage,
+			incrementalDeletionStage, incrementalContextGapFillingStage,
 			incrementalAdditionInitializationStage, incrementalAdditionStage,
-			incrementalConsistencyCheckingStage,
 			incrementalTaxonomyCleaningStage,
-			incrementalClassTaxonomyComputationStage,
-			instanceTaxonomyComputationStage,
-			incrementalInstanceTaxonomyComputationStage, inferenceTracingStage,
+			classTaxonomyComputationStage,
+			instanceTaxonomyComputationStage, inferenceTracingStage,
 			classExpressionQueryStage;
 
 	ReasonerStageManager(AbstractReasonerState reasoner) {
 
 		// Java will not allow to define stages with cyclic dependencies
 
-		/* Non-Incremental stages */
+		/* Loading stages */
 
 		this.inputLoadingStage = new InputLoadingStage(reasoner);
+
+		/* Property stages */
 
 		this.propertyInitializationStage = new PropertyInitializationStage(
 				reasoner);
@@ -63,23 +62,12 @@ public class ReasonerStageManager {
 				.createStage(reasoner,
 						propertyHierarchyCompositionComputationStage);
 
+		/* Non-Incremental saturation restoration stages */
+
 		this.contextInitializationStage = new ContextAssignmentResetStage(
 				reasoner);
 
-		this.consistencyCheckingStage = new ConsistencyCheckingStage(reasoner,
-				contextInitializationStage,
-				propertyHierarchyCompositionComputationStage);
-
-		this.classSaturationStage = new ClassSaturationStage(reasoner,
-				consistencyCheckingStage);
-
-		this.classTaxonomyComputationStage = new ClassTaxonomyComputationStage(
-				reasoner, consistencyCheckingStage);
-
-		this.instanceTaxonomyComputationStage = new InstanceTaxonomyComputationStage(
-				reasoner, classTaxonomyComputationStage);
-
-		/* Incremental stages */
+		/* Incremental saturation restoration stages */
 
 		this.incrementalCompletionStage = new IncrementalCompletionStage(
 				reasoner, propertyHierarchyCompositionComputationStage);
@@ -94,7 +82,7 @@ public class ReasonerStageManager {
 				reasoner, incrementalDeletionStage);
 
 		this.incrementalAdditionInitializationStage = new IncrementalAdditionInitializationStage(
-				reasoner, incrementalContextGapFillingStage/* initializeContextsAfterCleaningStage */);
+				reasoner, incrementalContextGapFillingStage);
 
 		this.incrementalAdditionStage = new IncrementalAdditionStage(reasoner,
 				incrementalAdditionInitializationStage);
@@ -102,14 +90,19 @@ public class ReasonerStageManager {
 		this.incrementalTaxonomyCleaningStage = new IncrementalTaxonomyCleaningStage(
 				reasoner, incrementalAdditionStage);
 
-		this.incrementalConsistencyCheckingStage = new IncrementalConsistencyCheckingStage(
-				reasoner, incrementalTaxonomyCleaningStage);
+		/* Reasoning task stages */
 
-		this.incrementalClassTaxonomyComputationStage = new IncrementalClassTaxonomyComputationStage(
-				reasoner, incrementalConsistencyCheckingStage);
+		this.consistencyCheckingStage = new ConsistencyCheckingStage(reasoner,
+				propertyHierarchyCompositionComputationStage);
 
-		this.incrementalInstanceTaxonomyComputationStage = new IncrementalInstanceTaxonomyComputationStage(
-				reasoner, incrementalClassTaxonomyComputationStage);
+		this.classSaturationStage = new ClassSaturationStage(reasoner,
+				consistencyCheckingStage);
+
+		this.classTaxonomyComputationStage = new ClassTaxonomyComputationStage(
+				reasoner, consistencyCheckingStage);
+
+		this.instanceTaxonomyComputationStage = new InstanceTaxonomyComputationStage(
+				reasoner, classTaxonomyComputationStage);
 
 		/* Tracing stages */
 

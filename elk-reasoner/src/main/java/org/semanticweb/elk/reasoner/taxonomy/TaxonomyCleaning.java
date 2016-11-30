@@ -33,8 +33,6 @@ import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
-import org.semanticweb.elk.reasoner.stages.ClassTaxonomyState;
-import org.semanticweb.elk.reasoner.stages.InstanceTaxonomyState;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
@@ -47,25 +45,26 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
 /**
- * Cleans both class and instance taxonomies concurrently
+ * Cleans both class and instance taxonomy concurrently.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
 public class TaxonomyCleaning
 		extends
 		ReasonerComputationWithInputs<IndexedClassEntity, TaxonomyCleaningFactory> {
 
-	public TaxonomyCleaning(Collection<IndexedClassEntity> inputs,
+	public TaxonomyCleaning(final Collection<IndexedClassEntity> inputs,
 			final InterruptMonitor interrupter,
-			ClassTaxonomyState classTaxonomyState,
-			InstanceTaxonomyState instanceTaxonomyState,
-			ConcurrentExecutor executor, int maxWorkers,
-			ProgressMonitor progressMonitor) {
+			final UpdateableTaxonomy<ElkClass> classTaxonomy,
+			final UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy,
+			final ConcurrentExecutor executor, final int maxWorkers,
+			final ProgressMonitor progressMonitor) {
 		super(inputs,
-				new TaxonomyCleaningFactory(interrupter, classTaxonomyState,
-						instanceTaxonomyState),
+				new TaxonomyCleaningFactory(interrupter, classTaxonomy,
+						instanceTaxonomy),
 				executor, maxWorkers, progressMonitor);
 	}
 
@@ -82,20 +81,15 @@ class TaxonomyCleaningFactory extends DelegateInterruptMonitor
 		implements
 		InputProcessorFactory<IndexedClassEntity, InputProcessor<IndexedClassEntity>> {
 
-	/*
-	 * private static final Logger LOGGER_ = Logger
-	 * .getLogger(TaxonomyCleaningFactory.class);
-	 */
-
-	private final ClassTaxonomyState classTaxonomyState_;
-	private final InstanceTaxonomyState instanceTaxonomyState_;
+	private final UpdateableTaxonomy<ElkClass> classTaxonomy_;
+	private final UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy_;
 
 	TaxonomyCleaningFactory(final InterruptMonitor interrupter,
-			final ClassTaxonomyState classTaxonomyState,
-			final InstanceTaxonomyState instanceTaxonomyState) {
+			final UpdateableTaxonomy<ElkClass> classTaxonomy,
+			final UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy) {
 		super(interrupter);
-		classTaxonomyState_ = classTaxonomyState;
-		instanceTaxonomyState_ = instanceTaxonomyState;
+		classTaxonomy_ = classTaxonomy;
+		instanceTaxonomy_ = instanceTaxonomy;
 	}
 
 	@Override
@@ -123,14 +117,10 @@ class TaxonomyCleaningFactory extends DelegateInterruptMonitor
 			}
 
 			private void submitClass(IndexedClass indexedClass) {
-				ElkClass elkClass = indexedClass.getElkEntity();
-				UpdateableTaxonomy<ElkClass> classTaxonomy = classTaxonomyState_
-						.getTaxonomy();
-				UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy = instanceTaxonomyState_
-						.getTaxonomy();
+				final ElkClass elkClass = indexedClass.getElkEntity();
 
-				if (elkClass == classTaxonomy.getBottomNode().getCanonicalMember()) {
-					// classStateWriter_.markClassesForModifiedNode(classTaxonomy.getBottomNode());
+				if (elkClass == classTaxonomy_.getBottomNode()
+						.getCanonicalMember()) {
 					return;
 				}
 
@@ -138,20 +128,20 @@ class TaxonomyCleaningFactory extends DelegateInterruptMonitor
 				 * shouldn't modify the set of members and iterate over them (to
 				 * mark as modified) at the same time
 				 */
-				synchronized (classTaxonomy.getBottomNode()) {
-					if (classTaxonomy.removeFromBottomNode(elkClass)) {
+				synchronized (classTaxonomy_.getBottomNode()) {
+					if (classTaxonomy_.removeFromBottomNode(elkClass)) {
 						return;
 					}
 				}
 
-				final NonBottomTaxonomyNode<ElkClass> node = classTaxonomy
+				final NonBottomTaxonomyNode<ElkClass> node = classTaxonomy_
 						.getNonBottomNode(elkClass);
 
 				if (node == null) {
 					return;
 				}
 
-				classTaxonomy.removeDirectSupernodes(node);
+				classTaxonomy_.removeDirectSupernodes(node);
 
 				// add all its direct satisfiable sub-nodes to the queue
 				final List<NonBottomTaxonomyNode<ElkClass>> subNodes;
@@ -160,13 +150,15 @@ class TaxonomyCleaningFactory extends DelegateInterruptMonitor
 							node.getDirectNonBottomSubNodes());
 				}
 				for (NonBottomTaxonomyNode<ElkClass> subNode : subNodes) {
-					classTaxonomy.removeDirectSupernodes(subNode);
+					classTaxonomy_.removeDirectSupernodes(subNode);
 				}
 
-				// delete all direct instance nodes of the type node being
-				// removed
-				if (instanceTaxonomy != null) {
-					TypeNode<ElkClass, ElkNamedIndividual> typeNode = instanceTaxonomy
+				/*
+				 * delete all direct instance nodes of the type node being
+				 * removed
+				 */
+				if (instanceTaxonomy_ != null) {
+					final TypeNode<ElkClass, ElkNamedIndividual> typeNode = instanceTaxonomy_
 							.getNode(elkClass);
 
 					// could be deleted meanwhile in another thread
@@ -179,9 +171,10 @@ class TaxonomyCleaningFactory extends DelegateInterruptMonitor
 						}
 
 						for (InstanceNode<ElkClass, ElkNamedIndividual> instanceNode : directInstances) {
-							if (instanceTaxonomy.removeDirectTypes(instanceNode)) {
-								instanceTaxonomy.removeInstanceNode(instanceNode
-										.getCanonicalMember());
+							if (instanceTaxonomy_
+									.removeDirectTypes(instanceNode)) {
+								instanceTaxonomy_.removeInstanceNode(
+										instanceNode.getCanonicalMember());
 							}
 						}
 					}
@@ -193,25 +186,23 @@ class TaxonomyCleaningFactory extends DelegateInterruptMonitor
 				 * have only one copy of each class node but it's not guaranteed
 				 * so we still remove it from both taxonomies.
 				 */
-				classTaxonomy.removeNode(node.getCanonicalMember());
+				classTaxonomy_.removeNode(node.getCanonicalMember());
 
-				if (instanceTaxonomy != null) {
-					instanceTaxonomy.removeNode(node.getCanonicalMember());
+				if (instanceTaxonomy_ != null) {
+					instanceTaxonomy_.removeNode(node.getCanonicalMember());
 				}
 			}
 
 			private void submitIndividual(IndexedIndividual indexedIndividual) {
-				if (instanceTaxonomyState_ != null
-						&& instanceTaxonomyState_.getTaxonomy() != null) {
-					UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = instanceTaxonomyState_
-							.getTaxonomy();
-					ElkNamedIndividual individual = indexedIndividual
+				if (instanceTaxonomy_ != null) {
+					final ElkNamedIndividual individual = indexedIndividual
 							.getElkEntity();
-					InstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy
+					final InstanceNode<ElkClass, ElkNamedIndividual> node = instanceTaxonomy_
 							.getInstanceNode(individual);
 
-					if (node != null && taxonomy.removeDirectTypes(node)) {
-						taxonomy.removeInstanceNode(individual);
+					if (node != null
+							&& instanceTaxonomy_.removeDirectTypes(node)) {
+						instanceTaxonomy_.removeInstanceNode(individual);
 					}
 				} else {
 					/*

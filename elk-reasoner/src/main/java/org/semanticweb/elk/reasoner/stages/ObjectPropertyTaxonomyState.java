@@ -34,14 +34,18 @@ import org.semanticweb.elk.reasoner.taxonomy.ReverseObjectPropertyTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ReverseTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Keeps track of state of the object property taxonomy. Currently contains only
- * the taxonomy.
+ * Keeps track of state of the object property taxonomy.
  * 
  * @author Peter Skocovsky
  */
 public class ObjectPropertyTaxonomyState {
+
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(ObjectPropertyTaxonomyState.class);
 
 	private final PredefinedElkObjectPropertyFactory elkFactory_;
 
@@ -57,19 +61,17 @@ public class ObjectPropertyTaxonomyState {
 	public ObjectPropertyTaxonomyState(
 			final PredefinedElkObjectPropertyFactory elkFactory) {
 		this.elkFactory_ = elkFactory;
+		resetTaxonomy();
 	}
 
 	public Taxonomy<ElkObjectProperty> getTaxonomy() {
 		return new ReverseTaxonomy<ElkObjectProperty>(taxonomy_);
 	}
 
-	private void initTaxonomy() {
+	private void resetTaxonomy() {
+		LOGGER_.trace("Reset object property taxonomy");
 		taxonomy_ = new ReverseObjectPropertyTaxonomy(elkFactory_,
 				ElkObjectPropertyKeyProvider.INSTANCE);
-	}
-
-	private void clearTaxonomy() {
-		taxonomy_ = null;
 	}
 
 	/**
@@ -136,7 +138,7 @@ public class ObjectPropertyTaxonomyState {
 					return false;
 				}
 
-				initTaxonomy();
+				resetTaxonomy();
 
 				computation_ = new ObjectPropertyTaxonomyComputation(
 						reasoner.ontologyIndex, reasoner.getInterrupter(),
@@ -159,15 +161,6 @@ public class ObjectPropertyTaxonomyState {
 				}
 				this.computation_ = null;
 				return true;
-			}
-
-			@Override
-			boolean invalidate() {
-				final boolean invalidated = super.invalidate();
-				if (invalidated) {
-					clearTaxonomy();
-				}
-				return invalidated;
 			}
 
 			@Override

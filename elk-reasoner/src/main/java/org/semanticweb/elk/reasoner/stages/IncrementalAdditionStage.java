@@ -73,6 +73,8 @@ public class IncrementalAdditionStage extends AbstractReasonerStage {
 			return false;
 		reasoner.ruleAndConclusionStats.add(saturation_
 				.getRuleAndConclusionStatistics());
+		// at this point we're done with unsaturated contexts
+		markAllContextsAsSaturated();
 		this.saturation_ = null;
 		return true;
 	}

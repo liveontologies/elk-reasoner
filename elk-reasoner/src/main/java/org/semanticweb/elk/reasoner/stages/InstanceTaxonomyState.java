@@ -53,6 +53,8 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.util.collections.Operations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Stores information about the state of the instance taxonomy
@@ -63,6 +65,9 @@ import org.semanticweb.elk.util.collections.Operations;
  * @author Peter Skocovsky
  */
 public class InstanceTaxonomyState {
+
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(InstanceTaxonomyState.class);
 
 	private UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy_ = null;
 
@@ -257,9 +262,6 @@ public class InstanceTaxonomyState {
 					.getInstanceNode(cls.getElkEntity());
 			if (node == null) {
 				iter.remove();
-				if (cls.occurs()) {
-					toAdd_.add(cls);
-				}
 				continue;
 			}
 			// else
@@ -280,12 +282,7 @@ public class InstanceTaxonomyState {
 	Collection<IndexedIndividual> getToRemove() {
 		if (taxonomy_ == null) {// TODO: Never set taxonomy_ to null !!!
 			// no individuals are in taxonomy
-			IndexedIndividual cls;
-			while ((cls = toRemove_.poll()) != null) {
-				if (cls.occurs()) {
-					toAdd_.offer(cls);
-				}
-			}
+			toRemove_.clear();
 			return Collections.emptyList();
 		}
 		// else
@@ -297,52 +294,39 @@ public class InstanceTaxonomyState {
 		return Operations.getCollection(toRemove_, size);
 	}
 
-	public Writer getWriter() {
-		return new Writer();
+	private void resetTaxonomy(
+			final UpdateableTaxonomy<ElkClass> classTaxonomy) {
+		LOGGER_.trace("Reset instance taxonomy");
+
+		if (taxonomy_ != null) {
+			taxonomy_.removeInstanceListener(nodeStoreListener_);
+			taxonomy_.removeInstanceListener(taxonomyListener_);
+		}
+		taxonomy_ = new ConcurrentInstanceTaxonomy(classTaxonomy,
+				ElkIndividualKeyProvider.INSTANCE);
+		taxonomy_.addInstanceListener(nodeStoreListener_);
+		taxonomy_.addInstanceListener(taxonomyListener_);
+
+		// All individuals need to be added to the taxonomy
+		toRemove_.clear();
+		toAdd_.clear();
+		toAdd_.addAll(ontologyIndex_.getIndividuals());
+
 	}
 
-	/**
-	 * Groups all methods to change the state
-	 * 
-	 * @author Pavel Klinov
-	 * 
-	 *         pavel.klinov@uni-ulm.de
-	 */
-	public class Writer {
+	private final ClassTaxonomyState.Listener CLASS_TAXONOMY_STATE_LISTENER = new ClassTaxonomyState.Listener() {
 
-		void initTaxonomy(final UpdateableTaxonomy<ElkClass> classTaxonomy) {
-			if (taxonomy_ != null) {
-				taxonomy_.removeInstanceListener(nodeStoreListener_);
-				taxonomy_.removeInstanceListener(taxonomyListener_);
-			}
-			taxonomy_ = new ConcurrentInstanceTaxonomy(classTaxonomy,
-					ElkIndividualKeyProvider.INSTANCE);
-			if (taxonomy_ != null) {
-				taxonomy_.addInstanceListener(nodeStoreListener_);
-				taxonomy_.addInstanceListener(taxonomyListener_);
-			}
-
-			// All individuals need to be added to the taxonomy
-			toRemove_.clear();
-			toAdd_.clear();
-			toAdd_.addAll(ontologyIndex_.getIndividuals());
-
+		@Override
+		public void taxonomyReset(
+				final UpdateableTaxonomy<ElkClass> oldTaxonomy,
+				final UpdateableTaxonomy<ElkClass> newTaxonomy) {
+			resetTaxonomy(newTaxonomy);
 		}
 
-		public void clearTaxonomy() {
+	};
 
-			// All individuals need to be added to the taxonomy
-			toRemove_.clear();
-			toAdd_.clear();
-			toAdd_.addAll(ontologyIndex_.getIndividuals());
-
-			if (taxonomy_ != null) {
-				taxonomy_.removeInstanceListener(nodeStoreListener_);
-				taxonomy_.removeInstanceListener(taxonomyListener_);
-			}
-			taxonomy_ = null;
-		}
-
+	public ClassTaxonomyState.Listener getClassTaxonomyStateListener() {
+		return CLASS_TAXONOMY_STATE_LISTENER;
 	}
 
 }

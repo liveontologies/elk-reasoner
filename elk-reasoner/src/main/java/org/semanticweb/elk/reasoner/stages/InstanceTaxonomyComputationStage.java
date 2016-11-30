@@ -1,11 +1,10 @@
 /*
  * #%L
  * ELK Reasoner
- * 
- * $Id$
- * $HeadURL$
+ * $Id:$
+ * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,28 +21,30 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import java.util.Collection;
+
+import org.semanticweb.elk.exceptions.ElkRuntimeException;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * A {@link ReasonerStage} during which the instance taxonomy of the current
- * ontology is computed
+ * Incrementally updates the instance taxonomy by creating nodes for individuals
+ * whose contexts have been either created or modified.
+ * {@link InstanceTaxonomyState} keeps track of these individuals.
  * 
- * @author "Yevgeny Kazakov"
+ * @author Pavel Klinov
  * 
+ *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
-class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
+public class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 
-	// logger for this class
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(InstanceTaxonomyComputationStage.class);
-
-	/**
-	 * the computation used for this stage
-	 */
 	private InstanceTaxonomyComputation computation_ = null;
 
+	/**
+	 * @param reasoner
+	 * @param preStages
+	 */
 	public InstanceTaxonomyComputationStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
 		super(reasoner, preStages);
@@ -59,18 +60,14 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 		if (!super.preExecute())
 			return false;
 
-		if (reasoner.doneTaxonomy()) {
-			reasoner.initInstanceTaxonomy();
+		final Collection<IndexedIndividual> toAdd = reasoner.instanceTaxonomyState
+				.getToAdd();
 
-			computation_ = new InstanceTaxonomyComputation(
-					reasoner.ontologyIndex.getIndividuals(),
-					reasoner.getInterrupter(),
-					reasoner.getProcessExecutor(), workerNo,
-					reasoner.getProgressMonitor(), reasoner.saturationState,
-					reasoner.instanceTaxonomyState.getTaxonomy());
-		}
-
-		LOGGER_.info("{} using {} workers", this, workerNo);
+		this.computation_ = new InstanceTaxonomyComputation(toAdd,
+				reasoner.getInterrupter(), reasoner.getProcessExecutor(),
+				workerNo, reasoner.getProgressMonitor(),
+				reasoner.saturationState,
+				reasoner.instanceTaxonomyState.getTaxonomy());
 
 		return true;
 	}
@@ -82,9 +79,19 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 
 	@Override
 	public boolean postExecute() {
-		if (!super.postExecute())
+		if (!super.postExecute()) {
 			return false;
+		}
 
+		final Collection<IndexedIndividual> toAdd = reasoner.instanceTaxonomyState
+				.getToAdd();
+		if (!toAdd.isEmpty()) {
+			throw new ElkRuntimeException(
+					InstanceTaxonomyComputation.class.getSimpleName()
+							+ " did not add all individuals to the taxonomy!");
+		}
+		reasoner.ontologyIndex.initIndividualChanges();
+		// reasoner.ruleAndConclusionStats.add(computation_.getRuleAndConclusionStatistics());
 		this.computation_ = null;
 
 		return true;
@@ -92,8 +99,9 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 
 	@Override
 	public void printInfo() {
-		if (computation_ != null)
+		if (computation_ != null) {
 			computation_.printStatistics();
+		}
 	}
 
 }

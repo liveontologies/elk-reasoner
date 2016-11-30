@@ -1,9 +1,8 @@
 /*
  * #%L
  * ELK Reasoner
- * 
- * $Id$
- * $HeadURL$
+ * $Id:$
+ * $HeadURL:$
  * %%
  * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
@@ -22,21 +21,25 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import java.util.Collection;
+
+import org.semanticweb.elk.exceptions.ElkRuntimeException;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
- * A {@link ReasonerStage} during which the class taxonomy of the current
- * ontology is computed
+ * Incrementally updates the class taxonomy by creating nodes for named classes
+ * whose contexts have been either created or modified.
+ * {@link ClassTaxonomyState} keeps track of these classes.
  * 
- * @author "Yevgeny Kazakov"
+ * @author Pavel Klinov
  * 
+ *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
-class ClassTaxonomyComputationStage extends AbstractReasonerStage {
+public class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 
-	/**
-	 * the computation used for this stage
-	 */
 	protected ClassTaxonomyComputation computation_ = null;
 
 	public ClassTaxonomyComputationStage(AbstractReasonerState reasoner,
@@ -46,23 +49,23 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 
 	@Override
 	public String getName() {
-		return "Class Taxonomy Computation";
+		return "Taxonomy Construction";
 	}
 
 	@Override
 	public boolean preExecute() {
-		if (!super.preExecute()) {
+		if (!super.preExecute())
 			return false;
-		}
 
-		reasoner.initClassTaxonomy();
+		final Collection<IndexedClass> toAdd = reasoner.classTaxonomyState
+				.getToAdd();
 
 		this.computation_ = new ClassTaxonomyComputation(
-				Operations.split(reasoner.ontologyIndex.getClasses(), 64),
-				reasoner.getInterrupter(),
+				Operations.split(toAdd, 64), reasoner.getInterrupter(),
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), reasoner.saturationState,
 				reasoner.classTaxonomyState.getTaxonomy());
+
 		return true;
 	}
 
@@ -73,10 +76,19 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 
 	@Override
 	public boolean postExecute() {
-		if (!super.postExecute())
+		if (!super.postExecute()) {
 			return false;
-		reasoner.ruleAndConclusionStats.add(computation_
-				.getRuleAndConclusionStatistics());
+		}
+		final Collection<IndexedClass> toAdd = reasoner.classTaxonomyState
+				.getToAdd();
+		if (!toAdd.isEmpty()) {
+			throw new ElkRuntimeException(
+					ClassTaxonomyComputation.class.getSimpleName()
+							+ " did not add all classes to the taxonomy!");
+		}
+		reasoner.ontologyIndex.initClassChanges();
+		reasoner.ruleAndConclusionStats
+				.add(computation_.getRuleAndConclusionStatistics());
 		this.computation_ = null;
 		return true;
 	}

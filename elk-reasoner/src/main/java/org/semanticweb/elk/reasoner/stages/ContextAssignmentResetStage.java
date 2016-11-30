@@ -28,8 +28,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link ReasonerStage} which purpose is to ensure that no context is
- * assigned to {@link IndexedClassExpression}s of the current ontology
+ * A {@link ReasonerStage} ensuring that no context is assigned to
+ * {@link IndexedClassExpression}s of the current ontology and that the
+ * taxonomies are reset.
  * 
  * @author "Yevgeny Kazakov"
  * 
