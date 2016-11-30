@@ -111,11 +111,11 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<owlapi.version>4.2.6</owlapi.version>
+		<owlapi.version>4.2.7</owlapi.version>
 		<proof-utils.version>0.1.0-SNAPSHOT</proof-utils.version>
 		<owlapi-proof.version>0.1.0-SNAPSHOT</owlapi-proof.version>
 		<protege-proof-explanation.version>0.1.0-SNAPSHOT</protege-proof-explanation.version>
-		<protege.version>5.0.0</protege.version>
+		<protege.version>5.1.0</protege.version>
 		<java.required.version>6</java.required.version>
 		<slf4j.version>1.7.12</slf4j.version>
 		<logback.version>1.0.13</logback.version>
