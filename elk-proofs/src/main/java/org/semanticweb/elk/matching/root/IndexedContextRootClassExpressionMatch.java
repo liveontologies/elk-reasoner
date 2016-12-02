@@ -47,6 +47,10 @@ public class IndexedContextRootClassExpressionMatch
 	@Override
 	public IndexedContextRootClassExpressionMatch extend(
 			ElkClassExpression rangeMatch) {
+		if (getValue().equals(rangeMatch)) {
+			return this;
+		}
+		// else
 		return new IndexedContextRootClassExpressionMatch(getValue(),
 				extendRangeMatches(rangeMatch));
 	}

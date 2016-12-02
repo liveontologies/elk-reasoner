@@ -28,6 +28,7 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 
 public class IndexedContextRootIndividualMatch
 		extends AbstractIndexedContextRootMatch<ElkIndividual> {
@@ -49,6 +50,14 @@ public class IndexedContextRootIndividualMatch
 	@Override
 	public IndexedContextRootIndividualMatch extend(
 			ElkClassExpression rangeMatch) {
+		if (rangeMatch instanceof ElkObjectOneOf) {
+			List<? extends ElkIndividual> individuals = ((ElkObjectOneOf) rangeMatch)
+					.getIndividuals();
+			if (individuals.size() == 1
+					&& getValue().equals(individuals.get(0))) {
+				return this;
+			}
+		}
 		return new IndexedContextRootIndividualMatch(getValue(),
 				extendRangeMatches(rangeMatch));
 	}
