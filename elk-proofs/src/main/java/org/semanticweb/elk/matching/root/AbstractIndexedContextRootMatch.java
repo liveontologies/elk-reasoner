@@ -109,14 +109,14 @@ abstract class AbstractIndexedContextRootMatch<V extends ElkObject>
 		return IndexedContextRootMatchPrinter.toString(this);
 	}
 
-	List<ElkClassExpression> extendRangeMatches(
+	List<? extends ElkClassExpression> extendRangeMatches(
 			ElkClassExpression newRangeMatch) {
 		List<ElkClassExpression> newRangeMatches = new ArrayList<ElkClassExpression>(
 				rangeMatches_.size() + 1);
 		for (ElkClassExpression previous : rangeMatches_) {
 			if (newRangeMatch.equals(previous)) {
 				// nothing changes
-				return null;
+				return rangeMatches_;
 			}
 			newRangeMatches.add(previous);
 		}
