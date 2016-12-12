@@ -123,11 +123,7 @@ public class RecencyQueue<E> extends AbstractQueue<E> {
 			return null;
 		}
 
-		entries_.remove(entry.getElement());
-
-		// Disconnect.
-		connect(entry.getPrevious(), entry.getNext());
-		nullify(entry);
+		remove(entry.getElement());
 
 		return entry.getElement();
 	}
@@ -146,6 +142,7 @@ public class RecencyQueue<E> extends AbstractQueue<E> {
 	public Iterator<E> iterator() {
 		return new Iterator<E>() {
 
+			private Entry<E> current_ = null;
 			private Entry<E> next_ = head_.getNext();
 
 			@Override
@@ -159,13 +156,14 @@ public class RecencyQueue<E> extends AbstractQueue<E> {
 					throw new NoSuchElementException();
 				}
 				final E result = next_.getElement();
+				current_ = next_;
 				next_ = next_.getNext();
 				return result;
 			}
 
 			@Override
 			public void remove() {
-				throw new UnsupportedOperationException();
+				RecencyQueue.this.remove(current_.getElement());
 			}
 
 		};

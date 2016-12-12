@@ -1,10 +1,10 @@
-/*
+/*-
  * #%L
- * ELK Reasoner
+ * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,27 +19,21 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.loading;
+package org.semanticweb.elk.reasoner.entailments.model;
 
-import org.semanticweb.elk.util.concurrent.computation.DelegateInterruptMonitor;
-import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
+import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 
 /**
- * A skeletal implementation of the {@link QueryLoader} that minimizes the
- * effort to implement the interface.
+ * Instances of this interface represent an entailment of
+ * {@link ElkSubClassOfAxiom}.
  * 
  * @author Peter Skocovsky
  */
-public abstract class AbstractQueryLoader extends DelegateInterruptMonitor
-		implements QueryLoader {
+public interface SubClassOfAxiomEntailment
+		extends AxiomEntailment<ElkSubClassOfAxiom> {
 
-	public AbstractQueryLoader(final InterruptMonitor interrupter) {
-		super(interrupter);
-	}
-
-	@Override
-	public void dispose() {
-		// does nothing
+	public static interface Visitor<O> {
+		O visit(SubClassOfAxiomEntailment subClassOfAxiomEntailment);
 	}
 
 }

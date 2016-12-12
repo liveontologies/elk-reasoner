@@ -22,7 +22,11 @@
  */
 package org.semanticweb.elk.owlapi.wrapper;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
@@ -78,6 +82,7 @@ import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNegativeDataPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkNegativeObjectPropertyAssertionAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinality;
@@ -162,6 +167,7 @@ import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLNegativeDataPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLNegativeObjectPropertyAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLObjectAllValuesFrom;
 import org.semanticweb.owlapi.model.OWLObjectComplementOf;
 import org.semanticweb.owlapi.model.OWLObjectExactCardinality;
@@ -779,4 +785,52 @@ public class OwlConverter {
 	public ElkSWRLRule convert(SWRLRule rule) {
 		return new ElkSWRLRuleWrap<SWRLRule>(rule);
 	}
+
+	public Set<? extends ElkAxiom> convertAxiomSet(
+			final Set<? extends OWLAxiom> owlAxioms) {
+		final Set<ElkAxiom> result = new HashSet<ElkAxiom>(owlAxioms.size());
+		for (final OWLAxiom owlAxiom : owlAxioms) {
+			result.add(convert(owlAxiom));
+		}
+		return result;
+	}
+
+	/**
+	 * One-parameter, public, non-static methods called "convert" and declared
+	 * in this class specify mapping between {@link OWLObject} subclasses
+	 * (parameter) and {@link ElkObject} subclasses (return type). This method
+	 * returns a subclass of {@link ElkObject} to which the subclass of
+	 * {@link OWLObject} specified as the parameter is mapped, or {@code null}
+	 * if it is not mapped.
+	 * 
+	 * @param owlClass
+	 * @return
+	 */
+	public static Class<? extends ElkObject> convertType(
+			final Class<?> owlClass) {
+
+		if (!OWLObject.class.isAssignableFrom(owlClass)) {
+			return null;
+		}
+
+		for (final Method declaredMethod : OwlConverter.class
+				.getDeclaredMethods()) {
+
+			final int mod = declaredMethod.getModifiers();
+			final Class<?>[] parameterTypes = declaredMethod
+					.getParameterTypes();
+			final Class<?> returnType = declaredMethod.getReturnType();
+			if ("convert".equals(declaredMethod.getName())
+					&& Modifier.isPublic(mod) && !Modifier.isStatic(mod)
+					&& parameterTypes.length == 1
+					&& parameterTypes[0].equals(owlClass)
+					&& ElkObject.class.isAssignableFrom(returnType)) {
+				return returnType.asSubclass(ElkObject.class);
+			}
+
+		}
+
+		return null;
+	}
+
 }

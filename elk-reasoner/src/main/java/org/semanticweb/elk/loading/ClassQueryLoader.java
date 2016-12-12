@@ -26,12 +26,12 @@ import org.semanticweb.elk.owl.visitors.ElkClassExpressionProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
 /**
- * An object through which class expression queries can be added or removed to
- * the index.
+ * An object through which class expression queries can be added to or removed
+ * from the index.
  * 
  * @author Peter Skocovsky
  */
-public interface QueryLoader extends InterruptMonitor {
+public interface ClassQueryLoader extends InterruptMonitor {
 
 	/**
 	 * Loads pending queries using the provided {@code  inserter} for inserting
@@ -52,19 +52,19 @@ public interface QueryLoader extends InterruptMonitor {
 
 	/**
 	 * @return {@code true} if the loading is finished, i.e., calling
-	 *         {@link QueryLoader#load(ElkClassExpressionProcessor, ElkClassExpressionProcessor)}
+	 *         {@link ClassQueryLoader#load(ElkClassExpressionProcessor, ElkClassExpressionProcessor)}
 	 *         will have no effect
 	 */
 	public boolean isLoadingFinished();
 
 	/**
-	 * Close resources used by this {@link QueryLoader}
+	 * Close resources used by this {@link ClassQueryLoader}
 	 */
 	public void dispose();
 
 	public static interface Factory {
 
-		QueryLoader getQueryLoader(InterruptMonitor interrupter);
+		ClassQueryLoader getQueryLoader(InterruptMonitor interrupter);
 
 	}
 

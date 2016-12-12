@@ -31,9 +31,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.semanticweb.elk.loading.AbstractQueryLoader;
+import org.semanticweb.elk.loading.AbstractClassQueryLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
-import org.semanticweb.elk.loading.QueryLoader;
+import org.semanticweb.elk.loading.ClassQueryLoader;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
@@ -77,7 +77,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Peter Skocovsky
  */
-public class ClassExpressionQueryState implements QueryLoader.Factory {
+public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ClassExpressionQueryState.class);
@@ -156,11 +156,6 @@ public class ClassExpressionQueryState implements QueryLoader.Factory {
 	 * direct super-classes.
 	 */
 	private final Map<ElkClass, Collection<IndexedClassExpression>> queriesByRelated_ = new ConcurrentHashMap<ElkClass, Collection<IndexedClassExpression>>();
-
-	/**
-	 * {@code false} iff there are pending changes to the index.
-	 */
-	private boolean isQueryLoadingFinished_ = false;
 
 	/**
 	 * The number of class expressions that were queried by the last call.
@@ -279,7 +274,7 @@ public class ClassExpressionQueryState implements QueryLoader.Factory {
 	 */
 	boolean registerQuery(final ElkClassExpression classExpression) {
 
-		LOGGER_.trace("query registered {}", classExpression);
+		LOGGER_.trace("class expression query registered {}", classExpression);
 
 		recentlyQueried_.offer(classExpression);
 		lastQuerySize_ = 1;
@@ -292,17 +287,16 @@ public class ClassExpressionQueryState implements QueryLoader.Factory {
 		state = new QueryState();
 		queried_.put(classExpression, state);
 		toLoad_.offer(classExpression);
-		isQueryLoadingFinished_ = false;
 
 		return true;
 	}
 
 	@Override
-	public QueryLoader getQueryLoader(final InterruptMonitor interrupter) {
+	public ClassQueryLoader getQueryLoader(final InterruptMonitor interrupter) {
 		return new Loader(interrupter);
 	}
 
-	private class Loader extends AbstractQueryLoader {
+	private class Loader extends AbstractClassQueryLoader {
 
 		public Loader(final InterruptMonitor interrupter) {
 			super(interrupter);
@@ -406,12 +400,11 @@ public class ClassExpressionQueryState implements QueryLoader.Factory {
 
 			}
 
-			isQueryLoadingFinished_ = true;
 		}
 
 		@Override
 		public boolean isLoadingFinished() {
-			return isQueryLoadingFinished_;
+			return toLoad_.isEmpty();
 		}
 
 	}
@@ -593,8 +586,8 @@ public class ClassExpressionQueryState implements QueryLoader.Factory {
 	/**
 	 * Checks whether the supplied class expression is satisfiable, if the
 	 * result was already computed. If the class expression was not registered
-	 * by {@link #indexQuery(ElkClassExpression)} or the appropriate stage was
-	 * not completed yet, throws {@link ElkQueryException}.
+	 * by {@link #registerQuery(ElkClassExpression)} or the appropriate stage
+	 * was not completed yet, throws {@link ElkQueryException}.
 	 * 
 	 * @param classExpression
 	 * @return whether the supplied class expression is satisfiable.
@@ -611,8 +604,8 @@ public class ClassExpressionQueryState implements QueryLoader.Factory {
 	 * Returns {@link Node} containing all {@link ElkClass}es equivalent to the
 	 * supplied class expression, if it is satisfiable. Returns
 	 * <code>null</code> otherwise. If the class expression was not registered
-	 * by {@link #indexQuery(ElkClassExpression)} or the appropriate stage was
-	 * not completed yet, throws {@link ElkQueryException}.
+	 * by {@link #registerQuery(ElkClassExpression)} or the appropriate stage
+	 * was not completed yet, throws {@link ElkQueryException}.
 	 * 
 	 * @param classExpression
 	 * @return atomic classes equivalent to the supplied class expression, if it
@@ -630,7 +623,7 @@ public class ClassExpressionQueryState implements QueryLoader.Factory {
 	 * Returns set of {@link Node}s containing all {@link ElkClass}es that are
 	 * direct strict super-classes of the supplied class expression, if it is
 	 * satisfiable. Returns <code>null</code> otherwise. If the class expression
-	 * was not registered by {@link #indexQuery(ElkClassExpression)} or the
+	 * was not registered by {@link #registerQuery(ElkClassExpression)} or the
 	 * appropriate stage was not completed yet, throws {@link ElkQueryException}
 	 * .
 	 * 
@@ -654,7 +647,7 @@ public class ClassExpressionQueryState implements QueryLoader.Factory {
 	 * Returns set of {@link Node}s containing all {@link ElkClass}es that are
 	 * direct strict sub-classes of the supplied class expression, if it is
 	 * satisfiable. Returns <code>null</code> otherwise. If the class expression
-	 * was not registered by {@link #indexQuery(ElkClassExpression)} or the
+	 * was not registered by {@link #registerQuery(ElkClassExpression)} or the
 	 * appropriate stage was not completed yet, throws {@link ElkQueryException}
 	 * .
 	 * 
@@ -745,7 +738,7 @@ public class ClassExpressionQueryState implements QueryLoader.Factory {
 	 * Returns set of {@link Node}s containing all {@link ElkNamedIndividual}s
 	 * that are direct instances of the supplied class expression, if it is
 	 * satisfiable. Returns <code>null</code> otherwise. If the class expression
-	 * was not registered by {@link #indexQuery(ElkClassExpression)} or the
+	 * was not registered by {@link #registerQuery(ElkClassExpression)} or the
 	 * appropriate stage was not completed yet, throws {@link ElkQueryException}
 	 * .
 	 * 

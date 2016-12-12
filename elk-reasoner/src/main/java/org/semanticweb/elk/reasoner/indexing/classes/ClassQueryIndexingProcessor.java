@@ -35,10 +35,11 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Peter Skocovsky
  */
-public class QueryIndexingProcessor implements ElkClassExpressionProcessor {
+public class ClassQueryIndexingProcessor
+		implements ElkClassExpressionProcessor {
 
 	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(QueryIndexingProcessor.class);
+			.getLogger(ClassQueryIndexingProcessor.class);
 
 	public static final String ADDITION = "addition", REMOVAL = "removal";
 
@@ -46,8 +47,8 @@ public class QueryIndexingProcessor implements ElkClassExpressionProcessor {
 
 	private final String type_;
 
-	public QueryIndexingProcessor(final ElkPolarityExpressionConverter indexer,
-			final String type) {
+	public ClassQueryIndexingProcessor(
+			final ElkPolarityExpressionConverter indexer, final String type) {
 		this.indexer_ = indexer;
 		this.type_ = type;
 	}

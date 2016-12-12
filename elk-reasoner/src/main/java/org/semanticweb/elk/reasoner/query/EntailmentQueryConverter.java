@@ -1,0 +1,177 @@
+/*-
+ * #%L
+ * ELK Reasoner Core
+ * $Id:$
+ * $HeadURL:$
+ * %%
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+package org.semanticweb.elk.reasoner.query;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.owl.predefined.ElkPolarity;
+import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
+import org.semanticweb.elk.reasoner.entailments.impl.ClassAssertionAxiomEntailmentImpl;
+import org.semanticweb.elk.reasoner.entailments.impl.EquivalentClassesAxiomEntailmentImpl;
+import org.semanticweb.elk.reasoner.entailments.impl.SubClassOfAxiomEntailmentImpl;
+import org.semanticweb.elk.reasoner.entailments.model.Entailment;
+import org.semanticweb.elk.reasoner.indexing.classes.BaseModifiableIndexedObjectFactory;
+import org.semanticweb.elk.reasoner.indexing.classes.UpdatingModifiableIndexedObjectFactory;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
+
+/**
+ * Indexes axiom entailment queries. All supported axiom entailment queries
+ * should be indexed by this converter, so it also serves the purpose of list of
+ * supported queries ({@link #isEntailmentCheckingSupported(Class)}).
+ * 
+ * @author Peter Skocovsky
+ */
+public class EntailmentQueryConverter extends
+		DummyElkAxiomVisitor<IndexedEntailmentQuery<? extends Entailment>> {
+
+	private final ElkObject.Factory elkFactory_;
+	private final ElkPolarityExpressionConverter positiveConverter_;
+	private final ElkPolarityExpressionConverter negativeConverter_;
+	private final ElkPolarityExpressionConverter dualConverter_;
+
+	/**
+	 * @param elkFactory
+	 *            {@link ElkObject} factory.
+	 * @param index
+	 *            Indexed queries are inserted into/deleted from this index.
+	 * @param increment
+	 *            How should occurrence counts of indexed object change.
+	 */
+	public EntailmentQueryConverter(final ElkObject.Factory elkFactory,
+			final ModifiableOntologyIndex index, final int increment) {
+		this.elkFactory_ = elkFactory;
+		final BaseModifiableIndexedObjectFactory baseFactory = new BaseModifiableIndexedObjectFactory();
+		final ModifiableIndexedObject.Factory positiveFactory = new UpdatingModifiableIndexedObjectFactory(
+				baseFactory, index,
+				OccurrenceIncrement.getPositiveIncrement(increment));
+		final ModifiableIndexedObject.Factory negativeFactory = new UpdatingModifiableIndexedObjectFactory(
+				baseFactory, index,
+				OccurrenceIncrement.getNegativeIncrement(increment));
+		final ModifiableIndexedObject.Factory dualFactory = new UpdatingModifiableIndexedObjectFactory(
+				baseFactory, index,
+				OccurrenceIncrement.getDualIncrement(increment));
+		this.positiveConverter_ = new ElkPolarityExpressionConverterImpl(
+				ElkPolarity.POSITIVE, elkFactory, positiveFactory,
+				negativeFactory, index);
+		this.negativeConverter_ = positiveConverter_
+				.getComplementaryConverter();
+		this.dualConverter_ = new ElkPolarityExpressionConverterImpl(elkFactory,
+				dualFactory, index);
+	}
+
+	@Override
+	protected IndexedEntailmentQuery<? extends Entailment> defaultVisit(
+			final ElkAxiom axiom) {
+		throw new ElkIndexingUnsupportedException(axiom);
+	}
+
+	@Override
+	public IndexedEntailmentQuery<? extends Entailment> visit(
+			final ElkSubClassOfAxiom axiom) {
+		final IndexedClassExpression subClass = axiom.getSubClassExpression()
+				.accept(negativeConverter_);
+		final IndexedClassExpression superClass = axiom
+				.getSuperClassExpression().accept(positiveConverter_);
+
+		return new SubClassOfEntailmentQuery(
+				new SubClassOfAxiomEntailmentImpl(axiom), subClass, superClass);
+	}
+
+	@Override
+	public IndexedEntailmentQuery<? extends Entailment> visit(
+			final ElkEquivalentClassesAxiom axiom) {
+		final List<? extends ElkClassExpression> elkClassExpressions = axiom
+				.getClassExpressions();
+		final List<IndexedClassExpression> equivalentClasses = new ArrayList<IndexedClassExpression>(
+				elkClassExpressions.size());
+		for (final ElkClassExpression elkClassExpression : elkClassExpressions) {
+			equivalentClasses.add(elkClassExpression.accept(dualConverter_));
+		}
+
+		return new EquivalentClassesEntailmentQuery(
+				new EquivalentClassesAxiomEntailmentImpl(axiom),
+				equivalentClasses, elkFactory_);
+	}
+
+	@Override
+	public IndexedEntailmentQuery<? extends Entailment> visit(
+			final ElkClassAssertionAxiom axiom) {
+		final IndexedIndividual individual = axiom.getIndividual()
+				.accept(negativeConverter_);
+		final IndexedClassExpression classExpression = axiom
+				.getClassExpression().accept(positiveConverter_);
+
+		return new ClassAssertionEntailmentQuery(
+				new ClassAssertionAxiomEntailmentImpl(axiom), individual,
+				classExpression);
+	}
+
+	/**
+	 * One-parameter, public, non-static methods called "visit" and declared in
+	 * this class enumerate subclasses of {@link ElkAxiom} (parameter) for which
+	 * entailment queries are supported. This method returns {@code true} iff
+	 * the subclass of {@link ElkAxiom} specified as the parameter is a
+	 * parameter type of some of these methods, e.g., whether entailment query
+	 * of such an {@link ElkAxiom} is supported.
+	 * 
+	 * @param axiomClass
+	 * @return
+	 */
+	public static boolean isEntailmentCheckingSupported(
+			final Class<? extends ElkAxiom> axiomClass) {
+
+		for (final Method declaredMethod : EntailmentQueryConverter.class
+				.getDeclaredMethods()) {
+
+			final int mod = declaredMethod.getModifiers();
+			final Class<?>[] parameterTypes = declaredMethod
+					.getParameterTypes();
+			if ("visit".equals(declaredMethod.getName())
+					&& Modifier.isPublic(mod) && !Modifier.isStatic(mod)
+					&& parameterTypes.length == 1
+					&& parameterTypes[0].isAssignableFrom(axiomClass)) {
+				// There is a declared visit method that accepts axiomClass
+				return true;
+			}
+
+		}
+
+		return false;
+	}
+
+}

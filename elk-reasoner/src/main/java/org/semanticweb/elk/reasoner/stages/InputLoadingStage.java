@@ -25,7 +25,8 @@ package org.semanticweb.elk.reasoner.stages;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.loading.AxiomLoader;
-import org.semanticweb.elk.loading.QueryLoader;
+import org.semanticweb.elk.loading.ClassQueryLoader;
+import org.semanticweb.elk.loading.EntailmentQueryLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
@@ -33,13 +34,15 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
 import org.semanticweb.elk.owl.visitors.DummyElkObjectVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionProcessor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
+import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.incremental.AxiomLoadingListener;
 import org.semanticweb.elk.reasoner.indexing.classes.ChangeIndexingProcessor;
 import org.semanticweb.elk.reasoner.indexing.classes.DummyIndexedObjectVisitor;
 import org.semanticweb.elk.reasoner.indexing.classes.NonIncrementalElkAxiomVisitor;
-import org.semanticweb.elk.reasoner.indexing.classes.QueryIndexingProcessor;
+import org.semanticweb.elk.reasoner.indexing.classes.ClassQueryIndexingProcessor;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
@@ -49,6 +52,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
+import org.semanticweb.elk.reasoner.query.EntailmentQueryIndexingProcessor;
+import org.semanticweb.elk.reasoner.query.IndexedEntailmentQuery;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.slf4j.Logger;
@@ -74,10 +79,16 @@ public class InputLoadingStage extends AbstractReasonerStage {
 	private volatile AxiomLoader loader_;
 
 	/**
-	 * the {@link QueryLoader} using which the queries are loaded
+	 * the {@link ClassQueryLoader} using which the class queries are loaded
 	 */
-	private volatile QueryLoader queryLoader_;
-	
+	private volatile ClassQueryLoader classQueryLoader_;
+
+	/**
+	 * the {@link EntailmentQueryLoader} using which the entailment queries are
+	 * loaded
+	 */
+	private volatile EntailmentQueryLoader entailmentQueryLoader_;
+
 	/**
 	 * {@code true} if this stage was not yet successfully completed before
 	 */
@@ -91,11 +102,17 @@ public class InputLoadingStage extends AbstractReasonerStage {
 			axiomDeletionProcessor_;
 
 	/**
-	 * the {@link ElkClassExpressionProcessor}s using which the queries are
-	 * inserted and deleted
+	 * the {@link ElkClassExpressionProcessor}s using which the class queries
+	 * are inserted and deleted
 	 */
-	private ElkClassExpressionProcessor queryInsertionProcessor_,
-			queryDeletionProcessor_;
+	private ElkClassExpressionProcessor classQueryInsertionProcessor_,
+			classQueryDeletionProcessor_;
+
+	/**
+	 * used to insert and delete entailment queries
+	 */
+	private ElkAxiomVisitor<IndexedEntailmentQuery<? extends Entailment>> entailmentQueryInserter_,
+			entailmentQueryDeleter_;
 
 	/**
 	 * the ontology index where the loaded and indexed axioms are stored.
@@ -121,7 +138,8 @@ public class InputLoadingStage extends AbstractReasonerStage {
 			reasoner.trySetIncrementalMode();
 		}
 		loader_ = reasoner.getAxiomLoader();
-		queryLoader_ = reasoner.getQueryLoader();
+		classQueryLoader_ = reasoner.getClassQueryLoader();
+		entailmentQueryLoader_ = reasoner.getEntailmentQueryLoader();
 
 		ontologyIndex_ = reasoner.getModifiableOntologyIndex();
 		ElkObject.Factory elkFactory = reasoner.getElkFactory();
@@ -171,16 +189,29 @@ public class InputLoadingStage extends AbstractReasonerStage {
 
 		}
 
-		if (queryLoader_ != null && !queryLoader_.isLoadingFinished()) {
+		if (classQueryLoader_ != null
+				&& !classQueryLoader_.isLoadingFinished()) {
 
-			queryInsertionProcessor_ = new QueryIndexingProcessor(
+			classQueryInsertionProcessor_ = new ClassQueryIndexingProcessor(
 					new ElkPolarityExpressionConverterImpl(elkFactory,
 							ontologyIndex_, 1),
-					QueryIndexingProcessor.ADDITION);
-			queryDeletionProcessor_ = new QueryIndexingProcessor(
+					ClassQueryIndexingProcessor.ADDITION);
+			classQueryDeletionProcessor_ = new ClassQueryIndexingProcessor(
 					new ElkPolarityExpressionConverterImpl(elkFactory,
 							ontologyIndex_, -1),
-					QueryIndexingProcessor.REMOVAL);
+					ClassQueryIndexingProcessor.REMOVAL);
+
+		}
+
+		if (entailmentQueryLoader_ != null
+				&& !entailmentQueryLoader_.isLoadingFinished()) {
+
+			entailmentQueryInserter_ = new EntailmentQueryIndexingProcessor(
+					elkFactory, ontologyIndex_,
+					EntailmentQueryIndexingProcessor.ADDITION);
+			entailmentQueryDeleter_ = new EntailmentQueryIndexingProcessor(
+					elkFactory, ontologyIndex_,
+					EntailmentQueryIndexingProcessor.REMOVAL);
 
 		}
 
@@ -202,13 +233,30 @@ public class InputLoadingStage extends AbstractReasonerStage {
 				}
 			}
 		}
-		if (queryLoader_ != null && !queryLoader_.isLoadingFinished()) {
+		if (classQueryLoader_ != null
+				&& !classQueryLoader_.isLoadingFinished()) {
 			final boolean registered = ontologyIndex_
 					.addIndexingUnsupportedListener(
 							QUERY_INDEXING_UNSUPPORTED_LISTENER);
 			try {
-				queryLoader_.load(queryInsertionProcessor_,
-						queryDeletionProcessor_);
+				classQueryLoader_.load(classQueryInsertionProcessor_,
+						classQueryDeletionProcessor_);
+			} finally {
+				if (registered) {
+					ontologyIndex_.removeIndexingUnsupportedListener(
+							QUERY_INDEXING_UNSUPPORTED_LISTENER);
+				}
+			}
+		}
+		if (entailmentQueryLoader_ != null
+				&& !entailmentQueryLoader_.isLoadingFinished()) {
+			// TODO: messages for the user
+			final boolean registered = ontologyIndex_
+					.addIndexingUnsupportedListener(
+							QUERY_INDEXING_UNSUPPORTED_LISTENER);
+			try {
+				entailmentQueryLoader_.load(entailmentQueryInserter_,
+						entailmentQueryDeleter_);
 			} finally {
 				if (registered) {
 					ontologyIndex_.removeIndexingUnsupportedListener(
@@ -225,17 +273,26 @@ public class InputLoadingStage extends AbstractReasonerStage {
 		if (loader_ != null && !loader_.isLoadingFinished()) {
 			throw new ElkRuntimeException("Axiom loading not finished!");
 		}
-		if (queryLoader_ != null && !queryLoader_.isLoadingFinished()) {
-			throw new ElkRuntimeException("Query loading not finished!");
+		if (classQueryLoader_ != null
+				&& !classQueryLoader_.isLoadingFinished()) {
+			throw new ElkRuntimeException("Class query loading not finished!");
+		}
+		if (entailmentQueryLoader_ != null
+				&& !entailmentQueryLoader_.isLoadingFinished()) {
+			throw new ElkRuntimeException(
+					"Entailment query loading not finished!");
 		}
 		this.firstLoad_ = false;
 		this.loader_ = null;
-		this.queryLoader_ = null;
+		this.classQueryLoader_ = null;
+		this.entailmentQueryLoader_ = null;
 		this.ontologyIndex_ = null;
 		this.axiomInsertionProcessor_ = null;
 		this.axiomDeletionProcessor_ = null;
-		this.queryInsertionProcessor_ = null;
-		this.queryDeletionProcessor_ = null;
+		this.classQueryInsertionProcessor_ = null;
+		this.classQueryDeletionProcessor_ = null;
+		this.entailmentQueryInserter_ = null;
+		this.entailmentQueryDeleter_ = null;
 		return true;
 	}
 
