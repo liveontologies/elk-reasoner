@@ -142,7 +142,7 @@ public class ElkLogPreferencesPanel extends ElkPanel {
 	}
 
 	private Component buildLogComponent() {
-		logTextArea_ = new JTextArea(25, 50);
+		logTextArea_ = new JTextArea(20, 50);
 		logTextArea_.setFont(new Font("monospaced", Font.PLAIN, 12));
 		JScrollPane scrollPane = new JScrollPane(logTextArea_);
 		logTextArea_.setEditable(false);
