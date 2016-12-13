@@ -80,7 +80,9 @@ public class ElkProofPreferencesPanel extends ElkPanel {
 	@Override
 	public ElkPanel applyChanges() {
 		ElkProofPreferences prefs = new ElkProofPreferences().load();
-		prefs.flattenInferences = flattenInferencesCheckbox_.isSelected();
+		if (flattenInferencesCheckbox_ != null) {
+			prefs.flattenInferences = flattenInferencesCheckbox_.isSelected();
+		}
 		prefs.save();
 		return this;
 	}
