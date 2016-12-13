@@ -26,16 +26,16 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owlapi.OwlApiReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.BaseClassExpressionQueryTest;
-import org.semanticweb.elk.reasoner.query.ClassExpressionQueryTestManifest;
 import org.semanticweb.elk.reasoner.query.ClassQueryTestInput;
 import org.semanticweb.elk.reasoner.query.EquivalentEntitiesTestOutput;
 import org.semanticweb.elk.testing.ConfigurationUtils;
-import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
+import org.semanticweb.elk.testing.ConfigurationUtils.MultiManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
@@ -97,22 +97,19 @@ public class OwlApiClassExpressionEquivalentClassesQueryTest extends
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION, BaseClassExpressionQueryTest.class, "owl",
 				"expected",
-				new TestManifestCreator<ClassQueryTestInput<OWLClassExpression>, EquivalentEntitiesTestOutput<OWLClass>, EquivalentEntitiesTestOutput<OWLClass>>() {
+				new MultiManifestCreator<ClassQueryTestInput<OWLClassExpression>, EquivalentEntitiesTestOutput<OWLClass>, EquivalentEntitiesTestOutput<OWLClass>>() {
 
 					@Override
-					public TestManifestWithOutput<ClassQueryTestInput<OWLClassExpression>, EquivalentEntitiesTestOutput<OWLClass>, EquivalentEntitiesTestOutput<OWLClass>> create(
+					public Collection<? extends TestManifestWithOutput<ClassQueryTestInput<OWLClassExpression>, EquivalentEntitiesTestOutput<OWLClass>, EquivalentEntitiesTestOutput<OWLClass>>> createManifests(
 							final URL input, final URL output)
 							throws IOException {
 
 						InputStream outputIS = null;
 						try {
 							outputIS = output.openStream();
-							final ExpectedTestOutputLoader expected = ExpectedTestOutputLoader
-									.load(outputIS);
 
-							return new ClassExpressionQueryTestManifest<OWLClassExpression, EquivalentEntitiesTestOutput<OWLClass>>(
-									input, expected.getQueryClass(),
-									expected.getEquivalentEntitiesTestOutput());
+							return OwlExpectedTestOutputLoader.load(outputIS)
+									.getEquivalentEntitiesManifests(input);
 
 						} finally {
 							IOUtils.closeQuietly(outputIS);

@@ -25,4 +25,13 @@ SubClassOf(ObjectIntersectionOf(:B :C :D) :CDB)
 SubClassOf(ObjectIntersectionOf(:B :C :D) :DBC)
 SubClassOf(ObjectIntersectionOf(:B :C :D) :DCB)
 
+SubClassOf(owl:Nothing ObjectIntersectionOf(:B :C :E))
+
+SubClassOf(ObjectIntersectionOf(:B :C :E) :B) 
+SubClassOf(ObjectIntersectionOf(:B :C :E) :C)
+SubClassOf(ObjectIntersectionOf(:B :C :E) :E)
+
+SubClassOf(ObjectIntersectionOf(:B :C :E) :BC)
+SubClassOf(ObjectIntersectionOf(:B :C :E) :CB)
+
 )

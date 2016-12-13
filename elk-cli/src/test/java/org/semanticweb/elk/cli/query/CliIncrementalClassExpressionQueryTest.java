@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collection;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.io.IOUtils;
@@ -32,10 +33,9 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.incremental.CliIncrementalReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.BaseIncrementalClassExpressionQueryTest;
-import org.semanticweb.elk.reasoner.query.ClassExpressionQueryTestManifest;
 import org.semanticweb.elk.reasoner.query.ClassQueryTestInput;
 import org.semanticweb.elk.testing.ConfigurationUtils;
-import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
+import org.semanticweb.elk.testing.ConfigurationUtils.MultiManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
@@ -62,22 +62,20 @@ public abstract class CliIncrementalClassExpressionQueryTest<O extends TestOutpu
 				INPUT_DATA_LOCATION,
 				BaseIncrementalClassExpressionQueryTest.class, "owl",
 				"expected",
-				new TestManifestCreator<ClassQueryTestInput<ElkClassExpression>, TestOutput, TestOutput>() {
+				new MultiManifestCreator<ClassQueryTestInput<ElkClassExpression>, TestOutput, TestOutput>() {
 
 					@Override
-					public TestManifestWithOutput<ClassQueryTestInput<ElkClassExpression>, TestOutput, TestOutput> create(
+					public Collection<? extends TestManifestWithOutput<ClassQueryTestInput<ElkClassExpression>, TestOutput, TestOutput>> createManifests(
 							final URL input, final URL output)
 							throws IOException {
 
 						InputStream outputIS = null;
 						try {
 							outputIS = output.openStream();
-							final ExpectedTestOutputLoader expected = ExpectedTestOutputLoader
-									.load(outputIS);
 
 							// don't need an expected output for these tests
-							return new ClassExpressionQueryTestManifest<ElkClassExpression, TestOutput>(
-									input, expected.getQueryClass(), null);
+							return CliExpectedTestOutputLoader.load(outputIS)
+									.getNoOutputManifests(input);
 
 						} finally {
 							IOUtils.closeQuietly(outputIS);

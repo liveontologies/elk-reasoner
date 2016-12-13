@@ -26,17 +26,17 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owlapi.OwlApiReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.BaseClassExpressionQueryTest;
 import org.semanticweb.elk.reasoner.query.BaseSatisfiabilityTestOutput;
-import org.semanticweb.elk.reasoner.query.ClassExpressionQueryTestManifest;
 import org.semanticweb.elk.reasoner.query.ClassQueryTestInput;
 import org.semanticweb.elk.reasoner.query.SatisfiabilityTestOutput;
 import org.semanticweb.elk.testing.ConfigurationUtils;
-import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
+import org.semanticweb.elk.testing.ConfigurationUtils.MultiManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
@@ -74,8 +74,9 @@ public class OwlApiClassExpressionSatisfiabilityQueryTest extends
 					@Override
 					public SatisfiabilityTestOutput getActualOutput()
 							throws Exception {
-						final boolean isSatisfiable = getReasoner().isSatisfiable(
-								manifest.getInput().getClassQuery());
+						final boolean isSatisfiable = getReasoner()
+								.isSatisfiable(
+										manifest.getInput().getClassQuery());
 						return new BaseSatisfiabilityTestOutput(isSatisfiable);
 					}
 
@@ -94,22 +95,19 @@ public class OwlApiClassExpressionSatisfiabilityQueryTest extends
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION, BaseClassExpressionQueryTest.class, "owl",
 				"expected",
-				new TestManifestCreator<ClassQueryTestInput<OWLClassExpression>, SatisfiabilityTestOutput, SatisfiabilityTestOutput>() {
+				new MultiManifestCreator<ClassQueryTestInput<OWLClassExpression>, SatisfiabilityTestOutput, SatisfiabilityTestOutput>() {
 
 					@Override
-					public TestManifestWithOutput<ClassQueryTestInput<OWLClassExpression>, SatisfiabilityTestOutput, SatisfiabilityTestOutput> create(
+					public Collection<? extends TestManifestWithOutput<ClassQueryTestInput<OWLClassExpression>, SatisfiabilityTestOutput, SatisfiabilityTestOutput>> createManifests(
 							final URL input, final URL output)
 							throws IOException {
 
 						InputStream outputIS = null;
 						try {
 							outputIS = output.openStream();
-							final ExpectedTestOutputLoader expected = ExpectedTestOutputLoader
-									.load(outputIS);
 
-							return new ClassExpressionQueryTestManifest<OWLClassExpression, SatisfiabilityTestOutput>(
-									input, expected.getQueryClass(),
-									expected.getSatisfiabilityTestOutput());
+							return OwlExpectedTestOutputLoader.load(outputIS)
+									.getSatisfiabilityManifests(input);
 
 						} finally {
 							IOUtils.closeQuietly(outputIS);

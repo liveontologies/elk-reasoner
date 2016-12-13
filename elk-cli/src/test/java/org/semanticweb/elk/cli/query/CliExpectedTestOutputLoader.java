@@ -22,10 +22,13 @@
 package org.semanticweb.elk.cli.query;
 
 import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,25 +51,27 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkIris;
 import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.query.BaseSatisfiabilityTestOutput;
+import org.semanticweb.elk.reasoner.query.ClassExpressionQueryTestManifest;
 import org.semanticweb.elk.reasoner.query.EquivalentEntitiesTestOutput;
 import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.reasoner.query.SatisfiabilityTestOutput;
 import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.ElkIndividualKeyProvider;
+import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
 
-public class ExpectedTestOutputLoader {
+public class CliExpectedTestOutputLoader {
 
 	/**
 	 * Loads an expected output of a class query test.
 	 * <p>
 	 * The expected output should be stored in an ontology that is loaded from
-	 * the supplied argument. There should be only one complex class that will
-	 * be recognized as the query class. Classes equivalent to the query class
+	 * the supplied argument. The complex classes in this ontology will be
+	 * recognized as query classes. Classes equivalent to each query class
 	 * should be in single equivalence axiom with the query class. Direct
-	 * super(sub)-classes of the query class should be partitioned into sets of
+	 * super(sub)-classes of each query class should be partitioned into sets of
 	 * equivalent classes, each of which should be expressed by a single
 	 * equivalence axiom if there is more than one class in the set. Whether
 	 * such a set contains super- or sub-classes of the query class should be
@@ -78,7 +83,7 @@ public class ExpectedTestOutputLoader {
 	 *            contains the ontology that encode the expected output
 	 * @return an object providing the leaded exected test output
 	 */
-	public static ExpectedTestOutputLoader load(
+	public static CliExpectedTestOutputLoader load(
 			final InputStream expectedOutput) {
 
 		final Set<ElkClassExpression> complex = new HashSet<ElkClassExpression>();
@@ -192,16 +197,8 @@ public class ExpectedTestOutputLoader {
 
 			});
 
-			if (complex.size() != 1) {
-				throw new IllegalArgumentException(
-						"There must be exactly 1 complex class in the expected result!");
-			}
-			final ElkClassExpression complexClass = complex.iterator().next();
-
-			return new ExpectedTestOutputLoader(complexClass, equivalent,
-					superClasses.get(complexClass),
-					subClasses.get(complexClass), same,
-					instances.get(complexClass));
+			return new CliExpectedTestOutputLoader(complex, equivalent,
+					superClasses, subClasses, same, instances);
 
 		} catch (final Owl2ParseException e) {
 			throw new IllegalArgumentException(e);
@@ -209,20 +206,21 @@ public class ExpectedTestOutputLoader {
 
 	}
 
-	private final ElkClassExpression queryClass_;
+	private final Set<ElkClassExpression> queryClasses_;
 	private final Map<ElkClassExpression, Map<ElkIri, ElkClass>> equivalent_;
-	private final Collection<ElkClass> superClasses_;
-	private final Collection<ElkClass> subClasses_;
+	private final Multimap<ElkClassExpression, ElkClass> superClasses_;
+	private final Multimap<ElkClassExpression, ElkClass> subClasses_;
 	private final Map<ElkIndividual, Map<ElkIri, ElkNamedIndividual>> same_;
-	private final Collection<ElkNamedIndividual> instances_;
+	private final Multimap<ElkClassExpression, ElkNamedIndividual> instances_;
 
-	private ExpectedTestOutputLoader(final ElkClassExpression queryClass,
+	private CliExpectedTestOutputLoader(
+			final Set<ElkClassExpression> queryClasses,
 			final Map<ElkClassExpression, Map<ElkIri, ElkClass>> equivalent,
-			final Collection<ElkClass> superClasses,
-			final Collection<ElkClass> subClasses,
+			final Multimap<ElkClassExpression, ElkClass> superClasses,
+			final Multimap<ElkClassExpression, ElkClass> subClasses,
 			final Map<ElkIndividual, Map<ElkIri, ElkNamedIndividual>> same,
-			final Collection<ElkNamedIndividual> instances) {
-		this.queryClass_ = queryClass;
+			final Multimap<ElkClassExpression, ElkNamedIndividual> instances) {
+		this.queryClasses_ = queryClasses;
 		this.equivalent_ = equivalent;
 		this.superClasses_ = superClasses;
 		this.subClasses_ = subClasses;
@@ -230,85 +228,161 @@ public class ExpectedTestOutputLoader {
 		this.instances_ = instances;
 	}
 
-	public ElkClassExpression getQueryClass() {
-		return queryClass_;
+	public Collection<ClassExpressionQueryTestManifest<ElkClassExpression, TestOutput>> getNoOutputManifests(
+			final URL input) {
+
+		final List<ClassExpressionQueryTestManifest<ElkClassExpression, TestOutput>> result = new ArrayList<ClassExpressionQueryTestManifest<ElkClassExpression, TestOutput>>(
+				queryClasses_.size());
+
+		for (final ElkClassExpression queryClass : queryClasses_) {
+			result.add(
+					new ClassExpressionQueryTestManifest<ElkClassExpression, TestOutput>(
+							input, queryClass, null));
+		}
+
+		return result;
 	}
 
-	public SatisfiabilityTestOutput getSatisfiabilityTestOutput() {
-		final Map<ElkIri, ElkClass> node = equivalent_.get(queryClass_);
-		// If the query class is equivalent to bottom, node is NOT null!
-		return new BaseSatisfiabilityTestOutput(node == null
-				|| !node.containsKey(PredefinedElkIris.OWL_NOTHING));
+	public Collection<ClassExpressionQueryTestManifest<ElkClassExpression, SatisfiabilityTestOutput>> getSatisfiabilityManifests(
+			final URL input) {
+
+		final List<ClassExpressionQueryTestManifest<ElkClassExpression, SatisfiabilityTestOutput>> result = new ArrayList<ClassExpressionQueryTestManifest<ElkClassExpression, SatisfiabilityTestOutput>>(
+				queryClasses_.size());
+
+		for (final ElkClassExpression queryClass : queryClasses_) {
+			final Map<ElkIri, ElkClass> node = equivalent_.get(queryClass);
+			// If the query class is equivalent to bottom, node is NOT null!
+			result.add(
+					new ClassExpressionQueryTestManifest<ElkClassExpression, SatisfiabilityTestOutput>(
+							input, queryClass,
+							new BaseSatisfiabilityTestOutput(
+									node == null || !node.containsKey(
+											PredefinedElkIris.OWL_NOTHING))));
+		}
+
+		return result;
 	}
 
-	public EquivalentEntitiesTestOutput<ElkClass> getEquivalentEntitiesTestOutput() {
-		final Map<ElkIri, ElkClass> node = equivalent_.get(queryClass_);
-		return new CliEquivalentEntitiesTestOutput(node == null
-				? Collections.<ElkClass> emptySet() : node.values());
+	public Collection<ClassExpressionQueryTestManifest<ElkClassExpression, EquivalentEntitiesTestOutput<ElkClass>>> getEquivalentEntitiesManifests(
+			final URL input) {
+
+		final List<ClassExpressionQueryTestManifest<ElkClassExpression, EquivalentEntitiesTestOutput<ElkClass>>> result = new ArrayList<ClassExpressionQueryTestManifest<ElkClassExpression, EquivalentEntitiesTestOutput<ElkClass>>>(
+				queryClasses_.size());
+
+		for (final ElkClassExpression queryClass : queryClasses_) {
+			final Map<ElkIri, ElkClass> node = equivalent_.get(queryClass);
+			result.add(
+					new ClassExpressionQueryTestManifest<ElkClassExpression, EquivalentEntitiesTestOutput<ElkClass>>(
+							input, queryClass,
+							new CliEquivalentEntitiesTestOutput(node == null
+									? Collections.<ElkClass> emptySet()
+									: node.values())));
+		}
+
+		return result;
 	}
 
-	public RelatedEntitiesTestOutput<ElkClass> getSuperEntitiesTestOutput() {
+	public Collection<ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>> getSuperEntitiesManifests(
+			final URL input) {
 
-		final Collection<Collection<ElkClass>> superNodes = Operations.map(
-				superClasses_,
-				new Operations.Transformation<ElkClass, Collection<ElkClass>>() {
-					@Override
-					public Collection<ElkClass> transform(final ElkClass cls) {
-						final Map<ElkIri, ElkClass> result = equivalent_
-								.get(cls);
-						if (result != null) {
-							return result.values();
-						}
-						// else
-						return Collections.singleton(cls);
-					}
-				});
+		final List<ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>> result = new ArrayList<ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>>(
+				queryClasses_.size());
 
-		return new CliRelatedEntitiesTestOutput<ElkClass>(superNodes,
-				ElkClassKeyProvider.INSTANCE);
-	}
+		for (final ElkClassExpression queryClass : queryClasses_) {
 
-	public RelatedEntitiesTestOutput<ElkClass> getSubEntitiesTestOutput() {
-
-		final Collection<Collection<ElkClass>> subNodes = Operations.map(
-				subClasses_,
-				new Operations.Transformation<ElkClass, Collection<ElkClass>>() {
-					@Override
-					public Collection<ElkClass> transform(final ElkClass cls) {
-						final Map<ElkIri, ElkClass> result = equivalent_
-								.get(cls);
-						if (result != null) {
-							return result.values();
-						}
-						// else
-						return Collections.singleton(cls);
-					}
-				});
-
-		return new CliRelatedEntitiesTestOutput<ElkClass>(subNodes,
-				ElkClassKeyProvider.INSTANCE);
-	}
-
-	public RelatedEntitiesTestOutput<ElkNamedIndividual> getInstancesTestOutput() {
-
-		final Collection<Collection<ElkNamedIndividual>> instances = Operations
-				.map(instances_,
-						new Operations.Transformation<ElkNamedIndividual, Collection<ElkNamedIndividual>>() {
-							@Override
-							public Collection<ElkNamedIndividual> transform(
-									final ElkNamedIndividual ind) {
-								final Map<ElkIri, ElkNamedIndividual> result = same_
-										.get(ind);
-								if (result != null) {
-									return result.values();
-								}
-								// else
-								return Collections.singleton(ind);
+			final Collection<Collection<ElkClass>> superNodes = Operations.map(
+					superClasses_.get(queryClass),
+					new Operations.Transformation<ElkClass, Collection<ElkClass>>() {
+						@Override
+						public Collection<ElkClass> transform(
+								final ElkClass cls) {
+							final Map<ElkIri, ElkClass> result = equivalent_
+									.get(cls);
+							if (result != null) {
+								return result.values();
 							}
-						});
+							// else
+							return Collections.singleton(cls);
+						}
+					});
 
-		return new CliRelatedEntitiesTestOutput<ElkNamedIndividual>(instances,
-				ElkIndividualKeyProvider.INSTANCE);
+			result.add(
+					new ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>(
+							input, queryClass,
+							new CliRelatedEntitiesTestOutput<ElkClass>(
+									superNodes, ElkClassKeyProvider.INSTANCE)));
+		}
+
+		return result;
+	}
+
+	public Collection<ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>> getSubEntitiesManifests(
+			final URL input) {
+
+		final List<ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>> result = new ArrayList<ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>>(
+				queryClasses_.size());
+
+		for (final ElkClassExpression queryClass : queryClasses_) {
+
+			final Collection<Collection<ElkClass>> subNodes = Operations.map(
+					subClasses_.get(queryClass),
+					new Operations.Transformation<ElkClass, Collection<ElkClass>>() {
+						@Override
+						public Collection<ElkClass> transform(
+								final ElkClass cls) {
+							final Map<ElkIri, ElkClass> result = equivalent_
+									.get(cls);
+							if (result != null) {
+								return result.values();
+							}
+							// else
+							return Collections.singleton(cls);
+						}
+					});
+
+			result.add(
+					new ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>(
+							input, queryClass,
+							new CliRelatedEntitiesTestOutput<ElkClass>(subNodes,
+									ElkClassKeyProvider.INSTANCE)));
+		}
+
+		return result;
+	}
+
+	public Collection<ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkNamedIndividual>>> getInstancesManifests(
+			final URL input) {
+
+		final List<ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkNamedIndividual>>> result = new ArrayList<ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkNamedIndividual>>>(
+				queryClasses_.size());
+
+		for (final ElkClassExpression queryClass : queryClasses_) {
+
+			final Collection<Collection<ElkNamedIndividual>> instances = Operations
+					.map(instances_.get(queryClass),
+							new Operations.Transformation<ElkNamedIndividual, Collection<ElkNamedIndividual>>() {
+								@Override
+								public Collection<ElkNamedIndividual> transform(
+										final ElkNamedIndividual ind) {
+									final Map<ElkIri, ElkNamedIndividual> result = same_
+											.get(ind);
+									if (result != null) {
+										return result.values();
+									}
+									// else
+									return Collections.singleton(ind);
+								}
+							});
+
+			result.add(
+					new ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkNamedIndividual>>(
+							input, queryClass,
+							new CliRelatedEntitiesTestOutput<ElkNamedIndividual>(
+									instances,
+									ElkIndividualKeyProvider.INSTANCE)));
+		}
+
+		return result;
 	}
 
 }

@@ -4,7 +4,13 @@ Prefix(rdfs: = <http://www.w3.org/2000/01/rdf-schema#>)
 Prefix(xsd: = <http://www.w3.org/2001/XMLSchema#>)
 Prefix(owl: = <http://www.w3.org/2002/07/owl#>)
 Ontology(<http://example.org#assertions_existentials#taxonomy>
+
 SubClassOf(owl:Nothing ObjectSomeValuesFrom(:R :B))
-SubClassOf(ObjectSomeValuesFrom(:R :B) owl:Thing)
+SubClassOf(ObjectSomeValuesFrom(:R :B) :C)
 ClassAssertion(ObjectSomeValuesFrom(:R :B) :a)
+
+SubClassOf(owl:Nothing ObjectSomeValuesFrom(:S :C))
+SubClassOf(ObjectSomeValuesFrom(:S :C) owl:Thing)
+ClassAssertion(ObjectSomeValuesFrom(:S :C) :b)
+
 )

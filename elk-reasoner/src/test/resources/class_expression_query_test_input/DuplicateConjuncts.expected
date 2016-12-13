@@ -18,4 +18,17 @@ SubClassOf(
 	:B
 	)
 
+SubClassOf(
+	:A
+	ObjectIntersectionOf(:B ObjectIntersectionOf(:B ObjectIntersectionOf(:B :B :B) :B))
+	)
+EquivalentClasses(
+	ObjectIntersectionOf(:B ObjectIntersectionOf(:B ObjectIntersectionOf(:B :B :B) :B))
+	:B
+	)
+SubClassOf(
+	ObjectIntersectionOf(:B ObjectIntersectionOf(:B ObjectIntersectionOf(:B :B :B) :B))
+	owl:Thing
+	)
+
 )

@@ -71,8 +71,8 @@ public class ClassExpressionQueryTestManifest<C, O extends TestOutput>
 	 */
 	public ClassExpressionQueryTestManifest(final URL input, final C queryClass,
 			final O expectedOutput) {
-		this(FileUtils.getFileName(FileUtils.dropExtension(input.getPath())),
-				input, queryClass, expectedOutput);
+		this(FileUtils.getFileName(FileUtils.dropExtension(input.getPath()))
+				+ " " + queryClass, input, queryClass, expectedOutput);
 	}
 
 }
