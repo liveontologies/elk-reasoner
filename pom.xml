@@ -253,6 +253,10 @@
 					<version>2.6</version>
 				</plugin>
 				<plugin>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.5.1</version>
+				</plugin>
+				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
 					<version>2.10</version>
@@ -352,7 +356,6 @@
 			<!-- ensure the required java version is used -->
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.5.1</version>
 				<configuration>
 					<source>1.${java.required.version}</source>
 					<target>1.${java.required.version}</target>

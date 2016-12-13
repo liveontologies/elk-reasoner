@@ -67,10 +67,10 @@ public class ElkProofPreferencesPanel extends ElkPanel {
 	public ElkPanel initialize() {
 		ElkProofPreferences prefs = new ElkProofPreferences().load();
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-		if (getProofPluginBundle().isPresent()) {
-			add(buildFlattenInferencesComponent(prefs.flattenInferences));
-		} else {
+		if (getProofPluginBundle() == null) {
 			add(buildInstallPluginComponent());
+		} else {
+			add(buildFlattenInferencesComponent(prefs.flattenInferences));			
 		}
 		add(Box.createVerticalGlue());
 		add(buildResetComponent());
@@ -131,7 +131,7 @@ public class ElkProofPreferencesPanel extends ElkPanel {
 		flattenInferencesCheckbox_.setSelected(prefs.flattenInferences);
 	}
 
-	private Optional<Bundle> getProofPluginBundle() {
+	private Bundle getProofPluginBundle() {
 		BundleContext context = PluginUtilities.getInstance()
 				.getApplicationContext();
 		Bundle[] bundles = context.getBundles();
@@ -143,11 +143,11 @@ public class ElkProofPreferencesPanel extends ElkPanel {
 				continue;
 			}
 			if (updateLocation.equals(PROOF_PLUGIN_UPDATE_URL_)) {
-				return Optional.of(bundle);
+				return bundle;
 			}
 		}
 		// not found
-		return Optional.empty();
+		return null;
 	}
 
 	private void installPlugin(JButton button) {
