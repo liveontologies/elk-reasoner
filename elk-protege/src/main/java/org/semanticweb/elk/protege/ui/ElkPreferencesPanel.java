@@ -32,9 +32,7 @@ import javax.swing.JTabbedPane;
 
 import org.protege.editor.owl.ui.preferences.OWLPreferencesPanel;
 import org.semanticweb.elk.owlapi.ElkReasoner;
-import org.semanticweb.elk.protege.ElkProtegeLogAppender;
 import org.semanticweb.elk.protege.ProtegeSuppressedMessages;
-import org.semanticweb.elk.protege.preferences.ElkLogPreferences;
 import org.semanticweb.elk.protege.preferences.ElkPreferences;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
@@ -51,8 +49,7 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 
 	private static final long serialVersionUID = -5568211860560307648L;
 
-	private ElkPanel generalPrefsPane_, proofPrefsPane_, warningPrefsPane_,
-			logPane_;
+	private ElkPanel generalPrefsPane_, proofPrefsPane_, warningPrefsPane_;
 
 	@Override
 	public void initialise() throws Exception {
@@ -71,9 +68,6 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 		warningPrefsPane_ = new ElkWarningPreferencesPanel().initialize();
 		tabbedPane.addTab("Warnings", null, warningPrefsPane_,
 				"Settings for ELK warning messages");
-		logPane_ = new ElkLogPreferencesPanel().initialize();
-		tabbedPane.addTab("Log", null, logPane_,
-				"Settings for ELK log messages");
 
 		setLayout(new BorderLayout());
 
@@ -86,7 +80,6 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 		generalPrefsPane_.applyChanges();
 		proofPrefsPane_.applyChanges();
 		warningPrefsPane_.applyChanges();
-		logPane_.applyChanges();
 	}
 
 	@Override
@@ -100,11 +93,6 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 		((ElkReasoner) reasoner)
 				.setConfigurationOptions(ElkPreferences.getElkConfig());
 		ProtegeSuppressedMessages.getInstance().reload();
-
-		ElkLogPreferences elkLogPrefs = new ElkLogPreferences().load();
-		ElkProtegeLogAppender.getInstance()
-				.setLogLevel(elkLogPrefs.getLogLevel())
-				.setBufferSize(elkLogPrefs.logBufferSize);
 	}
 
 }
