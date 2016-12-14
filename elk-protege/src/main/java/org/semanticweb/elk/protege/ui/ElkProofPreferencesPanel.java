@@ -91,7 +91,7 @@ public class ElkProofPreferencesPanel extends ElkPanel {
 		flattenInferencesCheckbox_ = new JCheckBox("Flatten inferences",
 				incrementalMode);
 		flattenInferencesCheckbox_.setToolTipText(
-				"If checked, nested inferences will be rewritten into one, if possible");
+				"If checked, nested inferences will be rewritten into one, if possible (could be slow)");
 		return flattenInferencesCheckbox_;
 	}
 

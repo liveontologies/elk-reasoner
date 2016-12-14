@@ -64,7 +64,7 @@ public class QueryIndexingProcessor implements ElkClassExpressionProcessor {
 		} catch (final ElkIndexingUnsupportedException e) {
 			LoggerWrap.log(LOGGER_, LogLevel.WARN,
 					"reasoner.indexing.queryIgnored",
-					e.getMessage() + " Query results may be incomplete:\n"
+					e.getMessage() + " Query results may be incomplete: "
 							+ OwlFunctionalStylePrinter
 									.toString(elkClassExpression));
 		}

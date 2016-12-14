@@ -123,6 +123,15 @@ public class MessageDialogAppender extends AppenderBase<ILoggingEvent> implement
 	protected String getCheckboxMessage(ILoggingEvent event) {
 		return "Do not show further messages of this kind";
 	}
+	
+	/**
+	 * @param event
+	 * @return the additional message that should be shown in the footer, or
+	 *         {@code null} if nothing should be shown
+	 */
+	protected String getFooterMessage(ILoggingEvent event) {
+		return null;
+	}
 
 	/**
 	 * Display a dialog window to inform the user about one message event.
@@ -180,13 +189,14 @@ public class MessageDialogAppender extends AppenderBase<ILoggingEvent> implement
 			panel.add(ignoreMessageButton);
 		}
 
-		// // Later, it could be possible to abort the reasoner here:
-		// Object[] options = { "Continue", "Abort Reasoner" };
-		// int result = JOptionPane.showOptionDialog(null, radioPanel,
-		// messageTitle,
-		// JOptionPane.DEFAULT_OPTION, messageLevel, null, options,
-		// options[0]);
-
+		String footerMessage = getFooterMessage(event);
+		if (footerMessage != null) {
+			WrappingLabel footerLabel = new WrappingLabel(footerMessage, 600);
+			footerLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+			panel.add(Box.createRigidArea(new Dimension(0,10)));
+			panel.add(footerLabel);
+		}		
+		
 		JOptionPane.showMessageDialog(null, panel, messageTitle, messageLevel);
 
 		if (ignoreMessageButton.isSelected()) {
