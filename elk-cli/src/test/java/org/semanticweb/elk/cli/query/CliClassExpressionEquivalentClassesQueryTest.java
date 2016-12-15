@@ -32,8 +32,8 @@ import org.semanticweb.elk.cli.CliReasoningTestDelegate;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.reasoner.query.BaseClassExpressionQueryTest;
-import org.semanticweb.elk.reasoner.query.ClassQueryTestInput;
+import org.semanticweb.elk.reasoner.query.BaseQueryTest;
+import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.reasoner.query.EquivalentEntitiesTestOutput;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.ConfigurationUtils;
@@ -45,10 +45,10 @@ import org.semanticweb.elk.testing.TestManifestWithOutput;
 
 @RunWith(PolySuite.class)
 public class CliClassExpressionEquivalentClassesQueryTest extends
-		BaseClassExpressionQueryTest<ElkClassExpression, EquivalentEntitiesTestOutput<ElkClass>> {
+		BaseQueryTest<ElkClassExpression, EquivalentEntitiesTestOutput<ElkClass>> {
 
 	public CliClassExpressionEquivalentClassesQueryTest(
-			final TestManifestWithOutput<ClassQueryTestInput<ElkClassExpression>, EquivalentEntitiesTestOutput<ElkClass>, EquivalentEntitiesTestOutput<ElkClass>> manifest) {
+			final TestManifestWithOutput<QueryTestInput<ElkClassExpression>, EquivalentEntitiesTestOutput<ElkClass>, EquivalentEntitiesTestOutput<ElkClass>> manifest) {
 		super(manifest,
 				new CliReasoningTestDelegate<EquivalentEntitiesTestOutput<ElkClass>>(
 						manifest) {
@@ -58,7 +58,7 @@ public class CliClassExpressionEquivalentClassesQueryTest extends
 							throws Exception {
 						final Node<ElkClass> equivalent = getReasoner()
 								.getEquivalentClassesQuietly(
-										manifest.getInput().getClassQuery());
+										manifest.getInput().getQuery());
 						return new CliEquivalentEntitiesTestOutput(equivalent);
 					}
 
@@ -70,12 +70,12 @@ public class CliClassExpressionEquivalentClassesQueryTest extends
 			throws IOException, URISyntaxException {
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION, BaseClassExpressionQueryTest.class, "owl",
+				INPUT_DATA_LOCATION, BaseQueryTest.class, "owl",
 				"expected",
-				new MultiManifestCreator<ClassQueryTestInput<ElkClassExpression>, EquivalentEntitiesTestOutput<ElkClass>, EquivalentEntitiesTestOutput<ElkClass>>() {
+				new MultiManifestCreator<QueryTestInput<ElkClassExpression>, EquivalentEntitiesTestOutput<ElkClass>, EquivalentEntitiesTestOutput<ElkClass>>() {
 
 					@Override
-					public Collection<? extends TestManifestWithOutput<ClassQueryTestInput<ElkClassExpression>, EquivalentEntitiesTestOutput<ElkClass>, EquivalentEntitiesTestOutput<ElkClass>>> createManifests(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, EquivalentEntitiesTestOutput<ElkClass>, EquivalentEntitiesTestOutput<ElkClass>>> createManifests(
 							final URL input, final URL output)
 							throws IOException {
 

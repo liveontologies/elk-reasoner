@@ -28,25 +28,25 @@ import org.semanticweb.elk.testing.BasicTestManifest;
 import org.semanticweb.elk.testing.TestOutput;
 
 /**
- * Test manifest for complex class query tests.
+ * Test manifest for query tests.
  * 
  * @author Peter Skocovsky
  *
- * @param <C>
- *            Type of the query class.
+ * @param <Q>
+ *            Type of the query.
  * @param <O>
  *            Type of the test output.
  */
-public class ClassExpressionQueryTestManifest<C, O extends TestOutput>
-		extends BasicTestManifest<ClassQueryTestInput<C>, O, O> {
+public class QueryTestManifest<Q, O extends TestOutput>
+		extends BasicTestManifest<QueryTestInput<Q>, O, O> {
 
-	public ClassExpressionQueryTestManifest(final String testName,
-			final URL input, final C queryClass, final O expectedOutput) {
-		super(testName, new ClassQueryTestInput<C>() {
+	public QueryTestManifest(final String testName, final URL input,
+			final Q query, final O expectedOutput) {
+		super(testName, new QueryTestInput<Q>() {
 
 			@Override
 			public String getName() {
-				return FileUtils.getFileName(input.getPath());
+				return FileUtils.getFileName(input.getPath()) + " " + query;
 			}
 
 			@Override
@@ -55,24 +55,30 @@ public class ClassExpressionQueryTestManifest<C, O extends TestOutput>
 			}
 
 			@Override
-			public C getClassQuery() {
-				return queryClass;
+			public Q getQuery() {
+				return query;
 			}
 
 		}, expectedOutput);
 	}
 
 	/**
-	 * Constructor that extract test name from the input URL.
+	 * Constructor that extract test name from the input URL and the query.
 	 * 
 	 * @param input
-	 * @param queryClass
+	 * @param query
 	 * @param expectedOutput
 	 */
-	public ClassExpressionQueryTestManifest(final URL input, final C queryClass,
+	public QueryTestManifest(final URL input, final Q query,
 			final O expectedOutput) {
-		this(FileUtils.getFileName(FileUtils.dropExtension(input.getPath()))
-				+ " " + queryClass, input, queryClass, expectedOutput);
+		this(getTestName(input, query), input, query, expectedOutput);
+	}
+
+	private static <Q> String getTestName(final URL input, final Q query) {
+		final String testName = FileUtils.getFileName(
+				FileUtils.dropExtension(input.getPath())) + " " + query;
+		return testName.length() <= 80 ? testName
+				: testName.substring(0, 76) + " ...";
 	}
 
 }

@@ -328,7 +328,7 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 		}
 	};
 
-	private final Operations.Transformation<QueryState, Iterable<? extends IndexedContextRoot>> NEGATIVELY_INDEXED = new Operations.Transformation<QueryState, Iterable<? extends IndexedContextRoot>>() {
+	private final Operations.Transformation<QueryState, Iterable<? extends IndexedContextRoot>> POSITIVELY_INDEXED = new Operations.Transformation<QueryState, Iterable<? extends IndexedContextRoot>>() {
 		@Override
 		public Iterable<? extends IndexedContextRoot> transform(
 				final QueryState state) {
@@ -337,7 +337,7 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 			}
 			// else
 			final Collection<? extends IndexedContextRoot> roots = state.indexed
-					.getNegativelyIndexed();
+					.getPositivelyIndexed();
 			return Operations.filter(roots, IS_NOT_SATURATED);
 		}
 	};
@@ -346,15 +346,15 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 	 * @return {@link IndexedContextRoot} that are needed to answer the
 	 *         registered entailment queries and not saturated.
 	 */
-	Collection<IndexedContextRoot> getNotSaturatedNegativelyIndexedRoots() {
+	Collection<IndexedContextRoot> getNotSaturatedPositivelyIndexedRoots() {
 		int sizeUpper = 0;
 		for (final QueryState state : queried_.values()) {
 			if (state.indexed != null) {
-				sizeUpper += state.indexed.getNegativelyIndexed().size();
+				sizeUpper += state.indexed.getPositivelyIndexed().size();
 			}
 		}
 		final Iterable<IndexedContextRoot> result = Operations
-				.concat(Operations.map(queried_.values(), NEGATIVELY_INDEXED));
+				.concat(Operations.map(queried_.values(), POSITIVELY_INDEXED));
 		return Operations.getCollection(result, sizeUpper);
 	}
 

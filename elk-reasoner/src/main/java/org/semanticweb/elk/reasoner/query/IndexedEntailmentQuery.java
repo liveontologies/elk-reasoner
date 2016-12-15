@@ -47,7 +47,7 @@ public interface IndexedEntailmentQuery<E extends Entailment> {
 	 * @return negatively indexed {@link IndexedContextRoot}s obtained by
 	 *         indexing this query.
 	 */
-	Collection<? extends IndexedContextRoot> getNegativelyIndexed();
+	Collection<? extends IndexedContextRoot> getPositivelyIndexed();
 
 	/**
 	 * Explains why the queried entailment is entailed. If it is not entailed,

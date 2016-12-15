@@ -27,16 +27,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.entailments.impl.DerivedClassInclusionCycleEntailsEquivalentClassesAxiomImpl;
-import org.semanticweb.elk.reasoner.entailments.impl.SubClassOfAxiomEntailmentImpl;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;
 import org.semanticweb.elk.reasoner.entailments.model.EquivalentClassesAxiomEntailment;
 import org.semanticweb.elk.reasoner.entailments.model.SubClassOfAxiomEntailment;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
@@ -53,10 +50,6 @@ import org.semanticweb.elk.util.collections.ArrayHashMap;
 public class EquivalentClassesEntailmentQuery extends
 		AbstractIndexedEntailmentQuery<EquivalentClassesAxiomEntailment> {
 
-	/**
-	 * Indexed classes that should be equivalent to each other.
-	 */
-	private final List<? extends IndexedClassExpression> equivalentClasses_;
 	/**
 	 * {@link SubClassOfEntailmentQuery}-s over all the classes from
 	 * {@link #equivalentClasses_}, such that superclass of one is the subclass
@@ -75,45 +68,22 @@ public class EquivalentClassesEntailmentQuery extends
 	 */
 	public EquivalentClassesEntailmentQuery(
 			final EquivalentClassesAxiomEntailment query,
-			final List<? extends IndexedClassExpression> equivalentClasses,
-			final ElkObject.Factory elkFactory) {
+			final List<SubClassOfEntailmentQuery> subsumptionCycle) {
 		super(query);
-		this.equivalentClasses_ = equivalentClasses;
-
-		final List<SubClassOfEntailmentQuery> subsumptionCycle = new ArrayList<SubClassOfEntailmentQuery>(
-				equivalentClasses.size());
-
-		if (equivalentClasses.size() < 2) {
-			// The query is trivially entailed, so the list of premises is empty
-			this.subsumptionCycle_ = subsumptionCycle;
-			return;
-		}
-		// else
-
-		final List<? extends ElkClassExpression> elkClasses = query.getAxiom()
-				.getClassExpressions();
-		ElkClassExpression elkSubclass = elkClasses.get(elkClasses.size() - 1);
-		IndexedClassExpression subclass = equivalentClasses
-				.get(equivalentClasses.size() - 1);
-		for (int i = 0; i < elkClasses.size(); i++) {
-			final ElkClassExpression elkSuperclass = elkClasses.get(i);
-			final IndexedClassExpression superclass = equivalentClasses.get(i);
-
-			subsumptionCycle.add(new SubClassOfEntailmentQuery(
-					new SubClassOfAxiomEntailmentImpl(elkFactory
-							.getSubClassOfAxiom(elkSubclass, elkSuperclass)),
-					subclass, superclass));
-
-			elkSubclass = elkSuperclass;
-			subclass = superclass;
-		}
-
 		this.subsumptionCycle_ = subsumptionCycle;
 	}
 
 	@Override
-	public Collection<? extends IndexedContextRoot> getNegativelyIndexed() {
-		return equivalentClasses_;
+	public Collection<? extends IndexedContextRoot> getPositivelyIndexed() {
+
+		final Collection<IndexedContextRoot> result = new ArrayList<IndexedContextRoot>(
+				subsumptionCycle_.size());
+
+		for (final SubClassOfEntailmentQuery subsumption : subsumptionCycle_) {
+			result.addAll(subsumption.getPositivelyIndexed());
+		}
+
+		return result;
 	}
 
 	@Override
@@ -130,6 +100,18 @@ public class EquivalentClassesEntailmentQuery extends
 			final Collection<? extends EntailmentInference> infs = subsumption
 					.getEvidence(atMostOne, saturationState, conclusionFactory)
 					.getInferences(entailment);
+			if (infs == null || infs.isEmpty()) {
+				// Not entailed!
+				return new EntailmentInferenceSet() {
+
+					@Override
+					public Collection<? extends EntailmentInference> getInferences(
+							final Entailment conclusion) {
+						return Collections.emptySet();
+					}
+
+				};
+			}
 			premiseEvidence.put(entailment, infs);
 			premises.add(entailment);
 		}

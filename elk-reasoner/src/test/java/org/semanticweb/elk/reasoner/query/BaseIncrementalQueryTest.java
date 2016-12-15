@@ -22,19 +22,21 @@
 package org.semanticweb.elk.reasoner.query;
 
 import org.junit.Assert;
+import org.semanticweb.elk.io.FileUtils;
 import org.semanticweb.elk.reasoner.incremental.IncrementalReasoningCorrectnessTestWithInterrupts;
 import org.semanticweb.elk.reasoner.incremental.IncrementalReasoningTestWithInterruptsDelegate;
+import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestOutput;
 
-public abstract class BaseIncrementalClassExpressionQueryTest<C, A, O extends TestOutput>
+public abstract class BaseIncrementalQueryTest<Q, A, O extends TestOutput>
 		extends
-		IncrementalReasoningCorrectnessTestWithInterrupts<ClassQueryTestInput<C>, A, O, O, IncrementalReasoningTestWithInterruptsDelegate<A, O, O>> {
+		IncrementalReasoningCorrectnessTestWithInterrupts<QueryTestInput<Q>, A, O, O, IncrementalReasoningTestWithInterruptsDelegate<A, O, O>> {
 
-	public final static String INPUT_DATA_LOCATION = "class_expression_query_test_input";
+	public final static String INPUT_DATA_LOCATION = "query_test_input";
 
-	public BaseIncrementalClassExpressionQueryTest(
-			final TestManifest<ClassQueryTestInput<C>> testManifest,
+	public BaseIncrementalQueryTest(
+			final TestManifest<QueryTestInput<Q>> testManifest,
 			final IncrementalReasoningTestWithInterruptsDelegate<A, O, O> testDelegate) {
 		super(testManifest, testDelegate);
 	}
@@ -57,5 +59,15 @@ public abstract class BaseIncrementalClassExpressionQueryTest<C, A, O extends Te
 		}
 
 	}
+
+	@Override
+	protected boolean ignore(final TestInput in) {
+		final QueryTestInput<Q> input = getManifest().getInput();
+		return ignoreInputFile(FileUtils.getFileName(input.getUrl().getPath()));
+	}
+
+	protected boolean ignoreInputFile(final String fileName) {
+		return false;
+	};
 
 }

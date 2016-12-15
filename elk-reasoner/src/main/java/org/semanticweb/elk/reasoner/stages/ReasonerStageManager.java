@@ -113,7 +113,8 @@ public class ReasonerStageManager {
 		this.classExpressionQueryStage = new ClassExpressionQueryStage(
 				reasoner);
 
-		this.entailmentQueryStage = new EntailmentQueryStage(reasoner);
+		this.entailmentQueryStage = new EntailmentQueryStage(reasoner,
+				propertyHierarchyCompositionComputationStage);
 
 	}
 }

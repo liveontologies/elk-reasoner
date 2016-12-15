@@ -27,7 +27,7 @@ import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.incremental.CliIncrementalReasoningTestDelegate;
-import org.semanticweb.elk.reasoner.query.ClassQueryTestInput;
+import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.reasoner.taxonomy.ElkIndividualKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
@@ -39,7 +39,7 @@ public class CliIncrementalClassExpressionInstancesQueryTest extends
 		CliIncrementalClassExpressionQueryTest<RelatedEntitiesTestOutput<ElkNamedIndividual>> {
 
 	public CliIncrementalClassExpressionInstancesQueryTest(
-			final TestManifest<ClassQueryTestInput<ElkClassExpression>> manifest) {
+			final TestManifest<QueryTestInput<ElkClassExpression>> manifest) {
 		super(manifest,
 				new CliIncrementalReasoningTestDelegate<RelatedEntitiesTestOutput<ElkNamedIndividual>, RelatedEntitiesTestOutput<ElkNamedIndividual>>(
 						manifest) {
@@ -49,7 +49,7 @@ public class CliIncrementalClassExpressionInstancesQueryTest extends
 							throws Exception {
 						final Set<? extends Node<ElkNamedIndividual>> subNodes = getStandardReasoner()
 								.getInstancesQuietly(
-										manifest.getInput().getClassQuery(),
+										manifest.getInput().getQuery(),
 										true);
 						return new CliRelatedEntitiesTestOutput<ElkNamedIndividual>(
 								subNodes, ElkIndividualKeyProvider.INSTANCE);
@@ -60,7 +60,7 @@ public class CliIncrementalClassExpressionInstancesQueryTest extends
 							throws Exception {
 						final Set<? extends Node<ElkNamedIndividual>> subNodes = getIncrementalReasoner()
 								.getInstancesQuietly(
-										manifest.getInput().getClassQuery(),
+										manifest.getInput().getQuery(),
 										true);
 						return new CliRelatedEntitiesTestOutput<ElkNamedIndividual>(
 								subNodes, ElkIndividualKeyProvider.INSTANCE);

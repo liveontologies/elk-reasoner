@@ -25,20 +25,20 @@ import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.UrlTestInput;
 
 /**
- * A {@link TestInput} of a class query test. The class returned by
- * {@link #getClassQuery()} should be queried with respect to the ontology
- * loaded from the test input.
+ * A {@link TestInput} of a query test. The query returned by
+ * {@link #getQuery()} should be queried with respect to the ontology loaded
+ * from the test input.
  * 
  * @author Peter Skocovsky
  *
- * @param <C>
- *            the type of the class
+ * @param <Q>
+ *            The type of the query.
  */
-public interface ClassQueryTestInput<C> extends UrlTestInput {
+public interface QueryTestInput<Q> extends UrlTestInput {
 
 	/**
-	 * @return the class that should be queried.
+	 * @return The query.
 	 */
-	C getClassQuery();
+	Q getQuery();
 
 }

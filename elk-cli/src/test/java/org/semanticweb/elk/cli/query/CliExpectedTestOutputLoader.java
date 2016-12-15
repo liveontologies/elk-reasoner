@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.semanticweb.elk.owl.implementation.ElkObjectBaseFactory;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
@@ -39,6 +40,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.iris.ElkIri;
@@ -51,7 +53,9 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkIris;
 import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.query.BaseSatisfiabilityTestOutput;
-import org.semanticweb.elk.reasoner.query.ClassExpressionQueryTestManifest;
+import org.semanticweb.elk.reasoner.query.EntailmentQueryTestManifest;
+import org.semanticweb.elk.reasoner.query.EntailmentQueryTestOutput;
+import org.semanticweb.elk.reasoner.query.QueryTestManifest;
 import org.semanticweb.elk.reasoner.query.EquivalentEntitiesTestOutput;
 import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.reasoner.query.SatisfiabilityTestOutput;
@@ -228,32 +232,31 @@ public class CliExpectedTestOutputLoader {
 		this.instances_ = instances;
 	}
 
-	public Collection<ClassExpressionQueryTestManifest<ElkClassExpression, TestOutput>> getNoOutputManifests(
+	public Collection<QueryTestManifest<ElkClassExpression, TestOutput>> getNoOutputManifests(
 			final URL input) {
 
-		final List<ClassExpressionQueryTestManifest<ElkClassExpression, TestOutput>> result = new ArrayList<ClassExpressionQueryTestManifest<ElkClassExpression, TestOutput>>(
+		final List<QueryTestManifest<ElkClassExpression, TestOutput>> result = new ArrayList<QueryTestManifest<ElkClassExpression, TestOutput>>(
 				queryClasses_.size());
 
 		for (final ElkClassExpression queryClass : queryClasses_) {
-			result.add(
-					new ClassExpressionQueryTestManifest<ElkClassExpression, TestOutput>(
-							input, queryClass, null));
+			result.add(new QueryTestManifest<ElkClassExpression, TestOutput>(
+					input, queryClass, null));
 		}
 
 		return result;
 	}
 
-	public Collection<ClassExpressionQueryTestManifest<ElkClassExpression, SatisfiabilityTestOutput>> getSatisfiabilityManifests(
+	public Collection<QueryTestManifest<ElkClassExpression, SatisfiabilityTestOutput>> getSatisfiabilityManifests(
 			final URL input) {
 
-		final List<ClassExpressionQueryTestManifest<ElkClassExpression, SatisfiabilityTestOutput>> result = new ArrayList<ClassExpressionQueryTestManifest<ElkClassExpression, SatisfiabilityTestOutput>>(
+		final List<QueryTestManifest<ElkClassExpression, SatisfiabilityTestOutput>> result = new ArrayList<QueryTestManifest<ElkClassExpression, SatisfiabilityTestOutput>>(
 				queryClasses_.size());
 
 		for (final ElkClassExpression queryClass : queryClasses_) {
 			final Map<ElkIri, ElkClass> node = equivalent_.get(queryClass);
 			// If the query class is equivalent to bottom, node is NOT null!
 			result.add(
-					new ClassExpressionQueryTestManifest<ElkClassExpression, SatisfiabilityTestOutput>(
+					new QueryTestManifest<ElkClassExpression, SatisfiabilityTestOutput>(
 							input, queryClass,
 							new BaseSatisfiabilityTestOutput(
 									node == null || !node.containsKey(
@@ -263,16 +266,16 @@ public class CliExpectedTestOutputLoader {
 		return result;
 	}
 
-	public Collection<ClassExpressionQueryTestManifest<ElkClassExpression, EquivalentEntitiesTestOutput<ElkClass>>> getEquivalentEntitiesManifests(
+	public Collection<QueryTestManifest<ElkClassExpression, EquivalentEntitiesTestOutput<ElkClass>>> getEquivalentEntitiesManifests(
 			final URL input) {
 
-		final List<ClassExpressionQueryTestManifest<ElkClassExpression, EquivalentEntitiesTestOutput<ElkClass>>> result = new ArrayList<ClassExpressionQueryTestManifest<ElkClassExpression, EquivalentEntitiesTestOutput<ElkClass>>>(
+		final List<QueryTestManifest<ElkClassExpression, EquivalentEntitiesTestOutput<ElkClass>>> result = new ArrayList<QueryTestManifest<ElkClassExpression, EquivalentEntitiesTestOutput<ElkClass>>>(
 				queryClasses_.size());
 
 		for (final ElkClassExpression queryClass : queryClasses_) {
 			final Map<ElkIri, ElkClass> node = equivalent_.get(queryClass);
 			result.add(
-					new ClassExpressionQueryTestManifest<ElkClassExpression, EquivalentEntitiesTestOutput<ElkClass>>(
+					new QueryTestManifest<ElkClassExpression, EquivalentEntitiesTestOutput<ElkClass>>(
 							input, queryClass,
 							new CliEquivalentEntitiesTestOutput(node == null
 									? Collections.<ElkClass> emptySet()
@@ -282,10 +285,10 @@ public class CliExpectedTestOutputLoader {
 		return result;
 	}
 
-	public Collection<ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>> getSuperEntitiesManifests(
+	public Collection<QueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>> getSuperEntitiesManifests(
 			final URL input) {
 
-		final List<ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>> result = new ArrayList<ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>>(
+		final List<QueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>> result = new ArrayList<QueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>>(
 				queryClasses_.size());
 
 		for (final ElkClassExpression queryClass : queryClasses_) {
@@ -307,7 +310,7 @@ public class CliExpectedTestOutputLoader {
 					});
 
 			result.add(
-					new ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>(
+					new QueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>(
 							input, queryClass,
 							new CliRelatedEntitiesTestOutput<ElkClass>(
 									superNodes, ElkClassKeyProvider.INSTANCE)));
@@ -316,10 +319,10 @@ public class CliExpectedTestOutputLoader {
 		return result;
 	}
 
-	public Collection<ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>> getSubEntitiesManifests(
+	public Collection<QueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>> getSubEntitiesManifests(
 			final URL input) {
 
-		final List<ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>> result = new ArrayList<ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>>(
+		final List<QueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>> result = new ArrayList<QueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>>(
 				queryClasses_.size());
 
 		for (final ElkClassExpression queryClass : queryClasses_) {
@@ -341,7 +344,7 @@ public class CliExpectedTestOutputLoader {
 					});
 
 			result.add(
-					new ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>(
+					new QueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>(
 							input, queryClass,
 							new CliRelatedEntitiesTestOutput<ElkClass>(subNodes,
 									ElkClassKeyProvider.INSTANCE)));
@@ -350,10 +353,10 @@ public class CliExpectedTestOutputLoader {
 		return result;
 	}
 
-	public Collection<ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkNamedIndividual>>> getInstancesManifests(
+	public Collection<QueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkNamedIndividual>>> getInstancesManifests(
 			final URL input) {
 
-		final List<ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkNamedIndividual>>> result = new ArrayList<ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkNamedIndividual>>>(
+		final List<QueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkNamedIndividual>>> result = new ArrayList<QueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkNamedIndividual>>>(
 				queryClasses_.size());
 
 		for (final ElkClassExpression queryClass : queryClasses_) {
@@ -375,7 +378,7 @@ public class CliExpectedTestOutputLoader {
 							});
 
 			result.add(
-					new ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkNamedIndividual>>(
+					new QueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkNamedIndividual>>(
 							input, queryClass,
 							new CliRelatedEntitiesTestOutput<ElkNamedIndividual>(
 									instances,
@@ -383,6 +386,141 @@ public class CliExpectedTestOutputLoader {
 		}
 
 		return result;
+	}
+
+	public Collection<EntailmentQueryTestManifest<ElkAxiom>> getEntailmentManifests(
+			final URL input) {
+
+		final ElkObject.Factory elkFactory = new ElkObjectBaseFactory();
+
+		final List<ElkAxiom> query = new ArrayList<ElkAxiom>();
+		final Map<ElkAxiom, Boolean> output = new HashMap<ElkAxiom, Boolean>();
+
+		for (final ElkClassExpression queryClass : queryClasses_) {
+
+			// Equivalent to queryClass.
+
+			final Map<ElkIri, ElkClass> equivalent = equivalent_
+					.get(queryClass);
+			if (equivalent != null && !equivalent.isEmpty()) {
+
+				final List<ElkClassExpression> equivalentClasses = new ArrayList<ElkClassExpression>(
+						1 + equivalent.size());
+				equivalentClasses.add(queryClass);
+				equivalentClasses.addAll(equivalent.values());
+
+				final ElkAxiom axiom = elkFactory
+						.getEquivalentClassesAxiom(equivalentClasses);
+				query.add(axiom);
+				output.put(axiom, true);
+
+			}
+
+			// Superclasses of queryClass.
+
+			final Collection<ElkClass> superClasses = superClasses_
+					.get(queryClass);
+			if (superClasses != null && !superClasses.isEmpty()) {
+				final ElkClass superClass = superClasses.iterator().next();
+
+				ElkAxiom axiom = elkFactory.getSubClassOfAxiom(queryClass,
+						superClass);
+				query.add(axiom);
+				output.put(axiom, true);
+
+				axiom = elkFactory.getSubClassOfAxiom(superClass, queryClass);
+				query.add(axiom);
+				output.put(axiom, false);
+
+				if (equivalent != null && !equivalent.isEmpty()) {
+					final List<ElkClassExpression> equivalentClasses = new ArrayList<ElkClassExpression>(
+							2 + equivalent.size());
+					equivalentClasses.add(queryClass);
+					equivalentClasses.add(superClass);
+					equivalentClasses.addAll(equivalent.values());
+					axiom = elkFactory
+							.getEquivalentClassesAxiom(equivalentClasses);
+					query.add(axiom);
+					output.put(axiom, false);
+				}
+
+			}
+
+			// Subclasses of queryClass.
+
+			final Collection<ElkClass> subClasses = subClasses_.get(queryClass);
+			if (subClasses != null && !subClasses.isEmpty()) {
+				final ElkClass subClass = subClasses.iterator().next();
+
+				ElkAxiom axiom = elkFactory.getSubClassOfAxiom(subClass,
+						queryClass);
+				query.add(axiom);
+				output.put(axiom, true);
+
+				axiom = elkFactory.getSubClassOfAxiom(queryClass, subClass);
+				query.add(axiom);
+				output.put(axiom, false);
+
+				if (equivalent != null && !equivalent.isEmpty()) {
+					final List<ElkClassExpression> equivalentClasses = new ArrayList<ElkClassExpression>(
+							2 + equivalent.size());
+					equivalentClasses.add(queryClass);
+					equivalentClasses.add(subClass);
+					equivalentClasses.addAll(equivalent.values());
+					axiom = elkFactory
+							.getEquivalentClassesAxiom(equivalentClasses);
+					query.add(axiom);
+					output.put(axiom, false);
+				}
+
+			}
+
+			// Instances of queryClass.
+
+			final Collection<ElkNamedIndividual> instances = instances_
+					.get(queryClass);
+			if (instances != null && !instances.isEmpty()) {
+				final ElkNamedIndividual instance = instances.iterator().next();
+
+				ElkAxiom axiom = elkFactory.getClassAssertionAxiom(queryClass,
+						instance);
+				query.add(axiom);
+				output.put(axiom, true);
+
+				// Find individual that is not an instance.
+				ElkNamedIndividual notInstance = null;
+				for (final ElkClassExpression type : instances_.keySet()) {
+					for (final ElkNamedIndividual individual : instances_
+							.get(type)) {
+						if (!instances.contains(individual)) {
+							notInstance = individual;
+							break;
+						}
+					}
+					if (notInstance != null) {
+						break;
+					}
+				}
+				if (notInstance != null) {
+
+					axiom = elkFactory.getClassAssertionAxiom(queryClass,
+							notInstance);
+					query.add(axiom);
+					output.put(axiom, false);
+
+				}
+
+			}
+
+		}
+
+		if (query.isEmpty()) {
+			return Collections.emptySet();
+		}
+		// else
+
+		return Collections.singleton(new EntailmentQueryTestManifest<ElkAxiom>(
+				input, query, new EntailmentQueryTestOutput<ElkAxiom>(output)));
 	}
 
 }

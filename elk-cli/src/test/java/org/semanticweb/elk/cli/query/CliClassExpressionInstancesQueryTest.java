@@ -33,8 +33,8 @@ import org.semanticweb.elk.cli.CliReasoningTestDelegate;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.query.BaseClassExpressionQueryTest;
-import org.semanticweb.elk.reasoner.query.ClassQueryTestInput;
+import org.semanticweb.elk.reasoner.query.BaseQueryTest;
+import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.reasoner.taxonomy.ElkIndividualKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
@@ -47,10 +47,10 @@ import org.semanticweb.elk.testing.TestManifestWithOutput;
 
 @RunWith(PolySuite.class)
 public class CliClassExpressionInstancesQueryTest extends
-		BaseClassExpressionQueryTest<ElkClassExpression, RelatedEntitiesTestOutput<ElkNamedIndividual>> {
+		BaseQueryTest<ElkClassExpression, RelatedEntitiesTestOutput<ElkNamedIndividual>> {
 
 	public CliClassExpressionInstancesQueryTest(
-			final TestManifestWithOutput<ClassQueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkNamedIndividual>, RelatedEntitiesTestOutput<ElkNamedIndividual>> manifest) {
+			final TestManifestWithOutput<QueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkNamedIndividual>, RelatedEntitiesTestOutput<ElkNamedIndividual>> manifest) {
 		super(manifest,
 				new CliReasoningTestDelegate<RelatedEntitiesTestOutput<ElkNamedIndividual>>(
 						manifest) {
@@ -60,7 +60,7 @@ public class CliClassExpressionInstancesQueryTest extends
 							throws Exception {
 						final Set<? extends Node<ElkNamedIndividual>> subNodes = getReasoner()
 								.getInstancesQuietly(
-										manifest.getInput().getClassQuery(),
+										manifest.getInput().getQuery(),
 										true);
 						return new CliRelatedEntitiesTestOutput<ElkNamedIndividual>(
 								subNodes, ElkIndividualKeyProvider.INSTANCE);
@@ -74,12 +74,12 @@ public class CliClassExpressionInstancesQueryTest extends
 			throws IOException, URISyntaxException {
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION, BaseClassExpressionQueryTest.class, "owl",
+				INPUT_DATA_LOCATION, BaseQueryTest.class, "owl",
 				"expected",
-				new MultiManifestCreator<ClassQueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkNamedIndividual>, RelatedEntitiesTestOutput<ElkNamedIndividual>>() {
+				new MultiManifestCreator<QueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkNamedIndividual>, RelatedEntitiesTestOutput<ElkNamedIndividual>>() {
 
 					@Override
-					public Collection<? extends TestManifestWithOutput<ClassQueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkNamedIndividual>, RelatedEntitiesTestOutput<ElkNamedIndividual>>> createManifests(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkNamedIndividual>, RelatedEntitiesTestOutput<ElkNamedIndividual>>> createManifests(
 							final URL input, final URL output)
 							throws IOException {
 

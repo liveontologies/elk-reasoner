@@ -61,7 +61,7 @@ class EntailmentQueryStage extends AbstractReasonerStage {
 		}
 
 		final Collection<IndexedContextRoot> queries = reasoner.entailmentQueryState_
-				.getNotSaturatedNegativelyIndexedRoots();
+				.getNotSaturatedPositivelyIndexedRoots();
 		final Collection<? extends IndexedClassEntity> consistencyTestEntities = reasoner.consistencyCheckingState
 				.getTestEntitites();
 

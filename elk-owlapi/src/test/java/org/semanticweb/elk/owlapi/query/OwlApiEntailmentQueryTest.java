@@ -27,32 +27,35 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owlapi.OwlApiReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.BaseQueryTest;
+import org.semanticweb.elk.reasoner.query.EntailmentQueryTestOutput;
 import org.semanticweb.elk.reasoner.query.QueryTestInput;
-import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.MultiManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
-import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLNamedIndividual;
-import org.semanticweb.owlapi.reasoner.NodeSet;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 
 @RunWith(PolySuite.class)
-public class OwlApiClassExpressionInstancesQueryTest extends
-		BaseQueryTest<OWLClassExpression, RelatedEntitiesTestOutput<OWLNamedIndividual>> {
+public class OwlApiEntailmentQueryTest extends
+		BaseQueryTest<Collection<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>> {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
+			"Disjunctions.owl",// Disjuctions not fully supported
+			"OneOf.owl",// Disjuctions not fully supported
 			"Inconsistent.owl",// Throwing InconsistentOntologyException
 			"InconsistentInstances.owl",// Throwing InconsistentOntologyException
+			"UnsupportedQueryIndexing.owl",// Unsupported class expression
 		};
 	// @formatter:on
 
@@ -60,26 +63,29 @@ public class OwlApiClassExpressionInstancesQueryTest extends
 		Arrays.sort(IGNORE_LIST);
 	}
 
+	public static final double INTERRUPTION_CHANCE = 0.03;
+
 	@Override
 	protected boolean ignoreInputFile(final String fileName) {
 		return Arrays.binarySearch(IGNORE_LIST, fileName) >= 0;
 	}
 
-	public OwlApiClassExpressionInstancesQueryTest(
-			final TestManifestWithOutput<QueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLNamedIndividual>, RelatedEntitiesTestOutput<OWLNamedIndividual>> manifest) {
+	public OwlApiEntailmentQueryTest(
+			final TestManifestWithOutput<QueryTestInput<Collection<OWLAxiom>>, EntailmentQueryTestOutput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>> manifest) {
 		super(manifest,
-				new OwlApiReasoningTestDelegate<RelatedEntitiesTestOutput<OWLNamedIndividual>>(
-						manifest) {
+				new OwlApiReasoningTestDelegate<EntailmentQueryTestOutput<OWLAxiom>>(
+						manifest, INTERRUPTION_CHANCE) {
 
 					@Override
-					public RelatedEntitiesTestOutput<OWLNamedIndividual> getActualOutput()
+					public EntailmentQueryTestOutput<OWLAxiom> getActualOutput()
 							throws Exception {
-						final NodeSet<OWLNamedIndividual> subNodes = getReasoner()
-								.getInstances(
-										manifest.getInput().getQuery(),
-										true);
-						return new OwlApiRelatedEntitiesTestOutput<OWLNamedIndividual>(
-								subNodes);
+						final Map<OWLAxiom, Boolean> output = new HashMap<OWLAxiom, Boolean>();
+						for (final OWLAxiom owlAxiom : manifest.getInput()
+								.getQuery()) {
+							output.put(owlAxiom,
+									getReasoner().isEntailed(owlAxiom));
+						}
+						return new EntailmentQueryTestOutput<OWLAxiom>(output);
 					}
 
 					@Override
@@ -95,12 +101,11 @@ public class OwlApiClassExpressionInstancesQueryTest extends
 			throws IOException, URISyntaxException {
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION, BaseQueryTest.class, "owl",
-				"expected",
-				new MultiManifestCreator<QueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLNamedIndividual>, RelatedEntitiesTestOutput<OWLNamedIndividual>>() {
+				INPUT_DATA_LOCATION, BaseQueryTest.class, "owl", "expected",
+				new MultiManifestCreator<QueryTestInput<Collection<OWLAxiom>>, EntailmentQueryTestOutput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>>() {
 
 					@Override
-					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLNamedIndividual>, RelatedEntitiesTestOutput<OWLNamedIndividual>>> createManifests(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<Collection<OWLAxiom>>, EntailmentQueryTestOutput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>>> createManifests(
 							final URL input, final URL output)
 							throws IOException {
 
@@ -109,7 +114,7 @@ public class OwlApiClassExpressionInstancesQueryTest extends
 							outputIS = output.openStream();
 
 							return OwlExpectedTestOutputLoader.load(outputIS)
-									.getInstancesManifests(input);
+									.getEntailmentManifests(input);
 
 						} finally {
 							IOUtils.closeQuietly(outputIS);

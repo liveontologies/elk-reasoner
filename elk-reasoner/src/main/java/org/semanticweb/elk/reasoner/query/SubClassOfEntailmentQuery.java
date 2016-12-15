@@ -76,7 +76,7 @@ public class SubClassOfEntailmentQuery
 	}
 
 	@Override
-	public Collection<? extends IndexedContextRoot> getNegativelyIndexed() {
+	public Collection<? extends IndexedContextRoot> getPositivelyIndexed() {
 		return Collections.singleton(subClass_);
 	}
 

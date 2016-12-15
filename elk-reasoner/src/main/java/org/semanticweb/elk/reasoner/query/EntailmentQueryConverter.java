@@ -62,7 +62,6 @@ public class EntailmentQueryConverter extends
 	private final ElkObject.Factory elkFactory_;
 	private final ElkPolarityExpressionConverter positiveConverter_;
 	private final ElkPolarityExpressionConverter negativeConverter_;
-	private final ElkPolarityExpressionConverter dualConverter_;
 
 	/**
 	 * @param elkFactory
@@ -82,16 +81,11 @@ public class EntailmentQueryConverter extends
 		final ModifiableIndexedObject.Factory negativeFactory = new UpdatingModifiableIndexedObjectFactory(
 				baseFactory, index,
 				OccurrenceIncrement.getNegativeIncrement(increment));
-		final ModifiableIndexedObject.Factory dualFactory = new UpdatingModifiableIndexedObjectFactory(
-				baseFactory, index,
-				OccurrenceIncrement.getDualIncrement(increment));
 		this.positiveConverter_ = new ElkPolarityExpressionConverterImpl(
 				ElkPolarity.POSITIVE, elkFactory, positiveFactory,
 				negativeFactory, index);
 		this.negativeConverter_ = positiveConverter_
 				.getComplementaryConverter();
-		this.dualConverter_ = new ElkPolarityExpressionConverterImpl(elkFactory,
-				dualFactory, index);
 	}
 
 	@Override
@@ -101,40 +95,58 @@ public class EntailmentQueryConverter extends
 	}
 
 	@Override
-	public IndexedEntailmentQuery<? extends Entailment> visit(
-			final ElkSubClassOfAxiom axiom) {
+	public SubClassOfEntailmentQuery visit(final ElkSubClassOfAxiom axiom) {
 		final IndexedClassExpression subClass = axiom.getSubClassExpression()
-				.accept(negativeConverter_);
+				.accept(positiveConverter_);
 		final IndexedClassExpression superClass = axiom
-				.getSuperClassExpression().accept(positiveConverter_);
+				.getSuperClassExpression().accept(negativeConverter_);
 
 		return new SubClassOfEntailmentQuery(
 				new SubClassOfAxiomEntailmentImpl(axiom), subClass, superClass);
 	}
 
 	@Override
-	public IndexedEntailmentQuery<? extends Entailment> visit(
+	public EquivalentClassesEntailmentQuery visit(
 			final ElkEquivalentClassesAxiom axiom) {
 		final List<? extends ElkClassExpression> elkClassExpressions = axiom
 				.getClassExpressions();
-		final List<IndexedClassExpression> equivalentClasses = new ArrayList<IndexedClassExpression>(
+
+		final List<SubClassOfEntailmentQuery> subsumptionCycle = new ArrayList<SubClassOfEntailmentQuery>(
 				elkClassExpressions.size());
-		for (final ElkClassExpression elkClassExpression : elkClassExpressions) {
-			equivalentClasses.add(elkClassExpression.accept(dualConverter_));
+
+		if (elkClassExpressions.size() < 2) {
+			// The query is trivially entailed, so the list of premises is empty
+			return new EquivalentClassesEntailmentQuery(
+					new EquivalentClassesAxiomEntailmentImpl(axiom),
+					subsumptionCycle);
+		}
+		// else
+
+		ElkClassExpression elkSubclass = elkClassExpressions
+				.get(elkClassExpressions.size() - 1);
+		for (int i = 0; i < elkClassExpressions.size(); i++) {
+			final ElkClassExpression elkSuperclass = elkClassExpressions.get(i);
+
+			final SubClassOfEntailmentQuery subsumption = visit(
+					elkFactory_.getSubClassOfAxiom(elkSubclass, elkSuperclass));
+
+			subsumptionCycle.add(subsumption);
+
+			elkSubclass = elkSuperclass;
 		}
 
 		return new EquivalentClassesEntailmentQuery(
 				new EquivalentClassesAxiomEntailmentImpl(axiom),
-				equivalentClasses, elkFactory_);
+				subsumptionCycle);
 	}
 
 	@Override
-	public IndexedEntailmentQuery<? extends Entailment> visit(
+	public ClassAssertionEntailmentQuery visit(
 			final ElkClassAssertionAxiom axiom) {
 		final IndexedIndividual individual = axiom.getIndividual()
-				.accept(negativeConverter_);
+				.accept(positiveConverter_);
 		final IndexedClassExpression classExpression = axiom
-				.getClassExpression().accept(positiveConverter_);
+				.getClassExpression().accept(negativeConverter_);
 
 		return new ClassAssertionEntailmentQuery(
 				new ClassAssertionAxiomEntailmentImpl(axiom), individual,
