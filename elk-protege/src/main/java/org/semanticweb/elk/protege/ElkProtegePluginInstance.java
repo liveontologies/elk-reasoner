@@ -26,7 +26,6 @@
 package org.semanticweb.elk.protege;
 
 import org.protege.editor.core.editorkit.plugin.EditorKitHook;
-import org.semanticweb.elk.protege.preferences.ElkLogPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,11 +53,6 @@ public class ElkProtegePluginInstance extends EditorKitHook {
 
 	@Override
 	public void initialise() throws Exception {
-		ElkProtegeLogAppender preferenceLogAppender = ElkProtegeLogAppender
-				.getInstance();
-		ElkLogPreferences elkLogPrefs = new ElkLogPreferences().load();
-		preferenceLogAppender.setLogLevel(elkLogPrefs.getLogLevel());
-		preferenceLogAppender.setBufferSize(elkLogPrefs.logBufferSize);
 		Logger logger = LoggerFactory.getLogger(ELK_PACKAGE_);
 		if (logger instanceof ch.qos.logback.classic.Logger) {
 			ch.qos.logback.classic.Logger logbackLogger = (ch.qos.logback.classic.Logger) logger;

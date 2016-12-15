@@ -81,7 +81,7 @@ public class ConfigurationFactory {
 		}
 
 		if (bundle == null) {
-			LOGGER_.info("Loading default configuration parameters for "
+			LOGGER_.debug("Loading default configuration parameters for "
 					+ configClass);
 		} else {
 			// copy parameters from the bundle

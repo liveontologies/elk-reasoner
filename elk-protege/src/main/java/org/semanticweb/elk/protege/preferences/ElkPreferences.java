@@ -23,8 +23,13 @@ package org.semanticweb.elk.protege.preferences;
  */
 
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
 public class ElkPreferences {
+
+	public static final Marker MARKER = MarkerFactory
+			.getMarker("ELK-preferences");
 
 	/**
 	 * @return the {@link ReasonerConfiguration} with the settings from this ELK

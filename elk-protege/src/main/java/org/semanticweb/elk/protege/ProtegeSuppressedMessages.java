@@ -50,6 +50,8 @@ public class ProtegeSuppressedMessages {
 	/**
 	 * Loads the suppressed message types from the preferences, keeping the
 	 * counters if there were any
+	 * 
+	 * @return the loaded messages
 	 */
 	public ProtegeSuppressedMessages reload() {
 		ElkWarningPreferences prefs = new ElkWarningPreferences().load();

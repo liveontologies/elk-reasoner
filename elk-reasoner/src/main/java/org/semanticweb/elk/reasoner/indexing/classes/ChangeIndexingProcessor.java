@@ -75,7 +75,7 @@ public class ChangeIndexingProcessor implements ElkAxiomProcessor {
 			if (LOGGER_.isWarnEnabled()) {
 				LoggerWrap.log(LOGGER_, LogLevel.WARN,
 						"reasoner.indexing.axiomIgnored", e.getMessage()
-								+ " Axiom ignored:\n"
+								+ " Axiom ignored: "
 								+ OwlFunctionalStylePrinter.toString(elkAxiom));
 			}
 		}

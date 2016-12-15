@@ -66,19 +66,15 @@ public class ProtegeMessageAppender extends MessageDialogAppender {
 		super();
 	}
 
-	/**
-	 * Generate the additional check box message specific to the given event
-	 * 
-	 * @param event
-	 *            the event for which the check box message should be generated
-	 * @return the generated check box message
-	 */
 	@Override
 	protected String getCheckboxMessage(ILoggingEvent event) {
 		return "<html><div style=\"width:%dpx;\">"
-				+ "<p>Do not show further messages of this kind in this session</p>"
-				+ "<p>(the messages can still be seen in the console if Prot&eacute;g&eacute; was started from the command line)</p>"
+				+ "<p>Do not show further messages of this kind</p>"
 				+ "</div></html>";
+	}
+	
+	protected String getFooterMessage(ILoggingEvent event) {
+		return "ELK warnings can be configured in: Reasoner > Configure... > ELK > Warnings";
 	}
 
 	@Override
@@ -102,7 +98,6 @@ public class ProtegeMessageAppender extends MessageDialogAppender {
 							+ "<p>"
 							+ "Please go to <b>Reasoner -> Configure -> Displayed Inferences</b> and uncheck:"
 							+ "<li><b>Disjoint Classes</b> in <b>Displayed Class Inferences</b>"
-							+ "<li>All <b>Displayed Object Property Inferences</b>"
 							+ "<li>All <b>Displayed Data Property Inferences</b>"
 							+ "<li>Everything except <b>Types</b> in <b>Displayed Individual Inferences</b>"
 							+ "</ul></p>" + "</div></html>", 500);

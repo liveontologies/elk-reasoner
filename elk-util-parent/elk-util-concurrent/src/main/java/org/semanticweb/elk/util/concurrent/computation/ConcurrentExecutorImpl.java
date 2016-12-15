@@ -48,7 +48,6 @@ class ConcurrentExecutorImpl implements ConcurrentExecutor {
 		ThreadPoolExecutor executor = new ThreadPoolExecutor(cores,
 				Integer.MAX_VALUE, timeout, unit,
 				new LinkedBlockingQueue<Runnable>());
-		executor.allowCoreThreadTimeOut(true);
 		executor.setThreadFactory(new JobThreadFactory(prefix));
 		this.executor_ = executor;
 	}
@@ -115,17 +114,21 @@ class ConcurrentExecutorImpl implements ConcurrentExecutor {
 
 	private static class JobThreadFactory implements ThreadFactory {
 
-		private final String prefix_;
+		private final ThreadGroup group_;
 
 		private int threadId_ = 0;
 
 		JobThreadFactory(String prefix) {
-			this.prefix_ = prefix;
+			this.group_ = new ThreadGroup(prefix);
+			group_.setDaemon(true);
 		}
 
 		@Override
 		public Thread newThread(Runnable r) {
-			return new Thread(r, prefix_ + "-thread-" + ++threadId_);
+			Thread result = new Thread(group_, r,
+					group_.getName() + "-thread-" + ++threadId_);
+			result.setDaemon(true);
+			return result;
 		}
 
 	}

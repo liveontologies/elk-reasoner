@@ -69,7 +69,7 @@ public class EntailmentQueryIndexingProcessor extends
 			// TODO: messages for user !!!
 			LoggerWrap.log(LOGGER_, LogLevel.WARN,
 					"reasoner.indexing.queryIgnored",
-					e.getMessage() + " Query results may be incomplete:\n"
+					e.getMessage() + " Query results may be incomplete: "
 							+ OwlFunctionalStylePrinter.toString(axiom));
 			return null;
 		}

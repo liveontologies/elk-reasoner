@@ -10,9 +10,11 @@ matrix:
    - jdk: openjdk6
      env: OPTIONS='-pl !elk-owlapi,!elk-owlapi-standalone,!elk-protege,!elk-distribution'
    - jdk: oraclejdk7
-     env: DEPLOY=true
+     env: OPTIONS='-pl !elk-protege,!elk-distribution'
    - jdk: openjdk7
+     env: OPTIONS='-pl !elk-protege,!elk-distribution'
    - jdk: oraclejdk8
+     env: DEPLOY=true
 
 install: mvn install -DskipTests=true $OPTIONS
 
