@@ -881,8 +881,8 @@ public abstract class AbstractReasonerState {
 	 * 
 	 * @param axioms
 	 *            Entailment of what axioms is queried.
-	 * @return A map from each queried axiom to the result of entailment query
-	 *         for that axiom.
+	 * @return A map from each queried axiom to the
+	 *         {@link EntailmentQueryResult} for that axiom.
 	 * @throws ElkException
 	 */
 	public synchronized Map<ElkAxiom, EntailmentQueryResult> isEntailed(
@@ -896,6 +896,20 @@ public abstract class AbstractReasonerState {
 		complete(stageManager.entailmentQueryStage);
 
 		return entailmentQueryState_.isEntailed(axioms);
+	}
+
+	/**
+	 * Decides whether the supplied {@code axiom} is entailed by the currently
+	 * loaded ontology.
+	 * 
+	 * @param axiom
+	 *            The queries axiom.
+	 * @return the {@link EntailmentQueryResult} for the queried axiom.
+	 * @throws ElkException
+	 */
+	public synchronized EntailmentQueryResult isEntailed(final ElkAxiom axiom)
+			throws ElkException {
+		return isEntailed(Collections.singleton(axiom)).get(axiom);
 	}
 
 	/**
