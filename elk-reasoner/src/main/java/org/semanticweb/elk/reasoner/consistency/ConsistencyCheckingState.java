@@ -29,6 +29,12 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.semanticweb.elk.reasoner.entailments.impl.IndividualInconsistencyEntailsOntologyInconsistencyImpl;
+import org.semanticweb.elk.reasoner.entailments.impl.OntologyInconsistencyImpl;
+import org.semanticweb.elk.reasoner.entailments.impl.OwlThingInconsistencyEntailsOntologyInconsistencyImpl;
+import org.semanticweb.elk.reasoner.entailments.model.Entailment;
+import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;
+import org.semanticweb.elk.reasoner.entailments.model.OntologyInconsistencyEntailmentInference;
 import org.semanticweb.elk.reasoner.indexing.classes.OntologyIndexDummyChangeListener;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
@@ -64,6 +70,10 @@ public class ConsistencyCheckingState {
 	 */
 	private final SaturationState<?> saturationState_;
 
+	private final ClassInconsistency.Factory conclusionFactory_ = new SaturationConclusionBaseFactory();
+
+	private final IndexedClass owlThing_;
+
 	/**
 	 * {@code true} if the ontology is consistent due to some syntactic
 	 * sufficient conditions
@@ -94,6 +104,7 @@ public class ConsistencyCheckingState {
 			final PropertyHierarchyCompositionState propertHierarchyState) {
 		this.saturationState_ = saturationState;
 		final OntologyIndex index = saturationState.getOntologyIndex();
+		this.owlThing_ = index.getOwlThing();
 		toDoEntities_ = new ConcurrentLinkedQueue<IndexedClassEntity>(
 				index.getIndividuals());
 		toDoEntities_.add(index.getOwlThing());
@@ -126,10 +137,6 @@ public class ConsistencyCheckingState {
 		saturationState
 				.addListener(new SaturationStateDummyChangeListener<C>() {
 
-					private final IndexedClass owlThing_ = index.getOwlThing();
-
-					private final ClassInconsistency.Factory factory_ = new SaturationConclusionBaseFactory();
-
 					@Override
 					public void contextsClear() {						
 						toDoEntities_.addAll(index.getIndividuals());
@@ -156,7 +163,7 @@ public class ConsistencyCheckingState {
 
 						IndexedContextRoot root = context.getRoot();
 						if (!context.containsConclusion(
-								factory_.getContradiction(root))) {
+								conclusionFactory_.getContradiction(root))) {
 							return;
 						}
 						// else
@@ -310,5 +317,75 @@ public class ConsistencyCheckingState {
 	public Collection<? extends IndexedIndividual> getInconsistentIndividuals() {
 		return inconsistentIndividuals_;
 	}
+
+	/**
+	 * Explains why an ontology inconsistency is entailed. If it is not
+	 * entailed, the returned inference set is empty.
+	 * 
+	 * @param atMostOne
+	 *            Whether at most one explanation should be returned.
+	 * @return An evidence of entailment of ontology inconsistency.
+	 */
+	public EntailmentInferenceSet getEvidence(final boolean atMostOne) {
+
+		return new EntailmentInferenceSet() {
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public Collection<OntologyInconsistencyEntailmentInference> getInferences(
+					final Entailment conclusion) {
+
+				if (!OntologyInconsistencyImpl.INSTANCE.equals(conclusion)) {
+					return Collections.emptyList();
+				}
+				// else
+
+				final Collection<? extends IndexedIndividual> inconsistentIndividuals = getInconsistentIndividuals();
+				Iterable<OntologyInconsistencyEntailmentInference> result = Operations
+						.map(inconsistentIndividuals,
+								INDIVIDUAL_TO_ENTAILMENT_INFERENCE);
+				int size = inconsistentIndividuals.size();
+
+				if (isOwlThingInconsistent_) {
+					result = Operations.concat(Operations
+							.<OntologyInconsistencyEntailmentInference> singleton(
+									new OwlThingInconsistencyEntailsOntologyInconsistencyImpl(
+											conclusionFactory_.getContradiction(
+													owlThing_))),
+							result);
+					size++;
+				}
+
+				// TODO: inconsistent due to properties !!!
+
+				if (atMostOne) {
+					final Iterator<OntologyInconsistencyEntailmentInference> iter = result
+							.iterator();
+					if (!iter.hasNext()) {
+						return Collections.emptyList();
+					}
+					// else
+					return Collections.singleton(iter.next());
+				}
+				// else
+
+				return Operations.getCollection(result, size);
+			}
+
+		};
+
+	}
+
+	private final Operations.Transformation<IndexedIndividual, OntologyInconsistencyEntailmentInference> INDIVIDUAL_TO_ENTAILMENT_INFERENCE = new Operations.Transformation<IndexedIndividual, OntologyInconsistencyEntailmentInference>() {
+
+		@Override
+		public OntologyInconsistencyEntailmentInference transform(
+				final IndexedIndividual ind) {
+			return new IndividualInconsistencyEntailsOntologyInconsistencyImpl(
+					conclusionFactory_.getContradiction(ind),
+					ind.getElkEntity());
+		}
+
+	};
 
 }

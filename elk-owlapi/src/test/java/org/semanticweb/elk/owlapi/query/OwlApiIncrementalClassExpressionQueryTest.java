@@ -25,15 +25,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collection;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owlapi.OwlApiIncrementalReasoningTestDelegate;
-import org.semanticweb.elk.reasoner.query.BaseIncrementalClassExpressionQueryTest;
-import org.semanticweb.elk.reasoner.query.ClassExpressionQueryTestManifest;
-import org.semanticweb.elk.reasoner.query.ClassQueryTestInput;
+import org.semanticweb.elk.reasoner.query.BaseIncrementalQueryTest;
+import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.testing.ConfigurationUtils;
-import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
+import org.semanticweb.elk.testing.ConfigurationUtils.MultiManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
@@ -46,10 +46,10 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 @RunWith(PolySuite.class)
 public abstract class OwlApiIncrementalClassExpressionQueryTest<O extends TestOutput>
 		extends
-		BaseIncrementalClassExpressionQueryTest<OWLClassExpression, OWLAxiom, O> {
+		BaseIncrementalQueryTest<OWLClassExpression, OWLAxiom, O> {
 
 	public OwlApiIncrementalClassExpressionQueryTest(
-			final TestManifest<ClassQueryTestInput<OWLClassExpression>> manifest,
+			final TestManifest<QueryTestInput<OWLClassExpression>> manifest,
 			final OwlApiIncrementalReasoningTestDelegate<O, O> delegate) {
 		super(manifest, delegate);
 	}
@@ -60,24 +60,22 @@ public abstract class OwlApiIncrementalClassExpressionQueryTest<O extends TestOu
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION,
-				BaseIncrementalClassExpressionQueryTest.class, "owl",
+				BaseIncrementalQueryTest.class, "owl",
 				"expected",
-				new TestManifestCreator<ClassQueryTestInput<OWLClassExpression>, TestOutput, TestOutput>() {
+				new MultiManifestCreator<QueryTestInput<OWLClassExpression>, TestOutput, TestOutput>() {
 
 					@Override
-					public TestManifestWithOutput<ClassQueryTestInput<OWLClassExpression>, TestOutput, TestOutput> create(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, TestOutput, TestOutput>> createManifests(
 							final URL input, final URL output)
 							throws IOException {
 
 						InputStream outputIS = null;
 						try {
 							outputIS = output.openStream();
-							final ExpectedTestOutputLoader expected = ExpectedTestOutputLoader
-									.load(outputIS);
 
 							// don't need an expected output for these tests
-							return new ClassExpressionQueryTestManifest<OWLClassExpression, TestOutput>(
-									input, expected.getQueryClass(), null);
+							return OwlExpectedTestOutputLoader.load(outputIS)
+									.getNoOutputManifests(input);
 
 						} finally {
 							IOUtils.closeQuietly(outputIS);

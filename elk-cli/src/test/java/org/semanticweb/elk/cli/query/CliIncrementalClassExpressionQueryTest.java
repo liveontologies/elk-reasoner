@@ -25,17 +25,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collection;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.incremental.CliIncrementalReasoningTestDelegate;
-import org.semanticweb.elk.reasoner.query.BaseIncrementalClassExpressionQueryTest;
-import org.semanticweb.elk.reasoner.query.ClassExpressionQueryTestManifest;
-import org.semanticweb.elk.reasoner.query.ClassQueryTestInput;
+import org.semanticweb.elk.reasoner.query.BaseIncrementalQueryTest;
+import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.testing.ConfigurationUtils;
-import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
+import org.semanticweb.elk.testing.ConfigurationUtils.MultiManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
@@ -46,10 +46,10 @@ import org.semanticweb.elk.testing.TestOutput;
 @RunWith(PolySuite.class)
 public abstract class CliIncrementalClassExpressionQueryTest<O extends TestOutput>
 		extends
-		BaseIncrementalClassExpressionQueryTest<ElkClassExpression, ElkAxiom, O> {
+		BaseIncrementalQueryTest<ElkClassExpression, ElkAxiom, O> {
 
 	public CliIncrementalClassExpressionQueryTest(
-			final TestManifest<ClassQueryTestInput<ElkClassExpression>> manifest,
+			final TestManifest<QueryTestInput<ElkClassExpression>> manifest,
 			final CliIncrementalReasoningTestDelegate<O, O> testDelegate) {
 		super(manifest, testDelegate);
 	}
@@ -60,24 +60,22 @@ public abstract class CliIncrementalClassExpressionQueryTest<O extends TestOutpu
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION,
-				BaseIncrementalClassExpressionQueryTest.class, "owl",
+				BaseIncrementalQueryTest.class, "owl",
 				"expected",
-				new TestManifestCreator<ClassQueryTestInput<ElkClassExpression>, TestOutput, TestOutput>() {
+				new MultiManifestCreator<QueryTestInput<ElkClassExpression>, TestOutput, TestOutput>() {
 
 					@Override
-					public TestManifestWithOutput<ClassQueryTestInput<ElkClassExpression>, TestOutput, TestOutput> create(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, TestOutput, TestOutput>> createManifests(
 							final URL input, final URL output)
 							throws IOException {
 
 						InputStream outputIS = null;
 						try {
 							outputIS = output.openStream();
-							final ExpectedTestOutputLoader expected = ExpectedTestOutputLoader
-									.load(outputIS);
 
 							// don't need an expected output for these tests
-							return new ClassExpressionQueryTestManifest<ElkClassExpression, TestOutput>(
-									input, expected.getQueryClass(), null);
+							return CliExpectedTestOutputLoader.load(outputIS)
+									.getNoOutputManifests(input);
 
 						} finally {
 							IOUtils.closeQuietly(outputIS);

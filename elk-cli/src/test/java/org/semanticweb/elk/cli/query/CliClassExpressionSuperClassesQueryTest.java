@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Set;
 
 import org.junit.runner.RunWith;
@@ -33,23 +34,21 @@ import org.semanticweb.elk.cli.CliReasoningTestDelegate;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.reasoner.query.BaseClassExpressionQueryTest;
-import org.semanticweb.elk.reasoner.query.ClassExpressionQueryTestManifest;
-import org.semanticweb.elk.reasoner.query.ClassQueryTestInput;
+import org.semanticweb.elk.reasoner.query.BaseQueryTest;
+import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.ConfigurationUtils;
-import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
+import org.semanticweb.elk.testing.ConfigurationUtils.MultiManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
-import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
 
 @RunWith(PolySuite.class)
 public class CliClassExpressionSuperClassesQueryTest extends
-		BaseClassExpressionQueryTest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>> {
+		BaseQueryTest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>> {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
@@ -63,12 +62,12 @@ public class CliClassExpressionSuperClassesQueryTest extends
 	}
 
 	@Override
-	protected boolean ignore(final TestInput input) {
-		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
+	protected boolean ignoreInputFile(final String fileName) {
+		return Arrays.binarySearch(IGNORE_LIST, fileName) >= 0;
 	}
 
 	public CliClassExpressionSuperClassesQueryTest(
-			final TestManifestWithOutput<ClassQueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkClass>, RelatedEntitiesTestOutput<ElkClass>> manifest) {
+			final TestManifestWithOutput<QueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkClass>, RelatedEntitiesTestOutput<ElkClass>> manifest) {
 		super(manifest,
 				new CliReasoningTestDelegate<RelatedEntitiesTestOutput<ElkClass>>(
 						manifest) {
@@ -78,7 +77,7 @@ public class CliClassExpressionSuperClassesQueryTest extends
 							throws Exception {
 						final Set<? extends Node<ElkClass>> subNodes = getReasoner()
 								.getSuperClassesQuietly(
-										manifest.getInput().getClassQuery(),
+										manifest.getInput().getQuery(),
 										true);
 						return new CliRelatedEntitiesTestOutput<ElkClass>(
 								subNodes, ElkClassKeyProvider.INSTANCE);
@@ -92,24 +91,21 @@ public class CliClassExpressionSuperClassesQueryTest extends
 			throws IOException, URISyntaxException {
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION, BaseClassExpressionQueryTest.class, "owl",
+				INPUT_DATA_LOCATION, BaseQueryTest.class, "owl",
 				"expected",
-				new TestManifestCreator<ClassQueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkClass>, RelatedEntitiesTestOutput<ElkClass>>() {
+				new MultiManifestCreator<QueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkClass>, RelatedEntitiesTestOutput<ElkClass>>() {
 
 					@Override
-					public TestManifestWithOutput<ClassQueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkClass>, RelatedEntitiesTestOutput<ElkClass>> create(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkClass>, RelatedEntitiesTestOutput<ElkClass>>> createManifests(
 							final URL input, final URL output)
 							throws IOException {
 
 						InputStream outputIS = null;
 						try {
 							outputIS = output.openStream();
-							final ExpectedTestOutputLoader expected = ExpectedTestOutputLoader
-									.load(outputIS);
 
-							return new ClassExpressionQueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>(
-									input, expected.getQueryClass(),
-									expected.getSuperEntitiesTestOutput());
+							return CliExpectedTestOutputLoader.load(outputIS)
+									.getSuperEntitiesManifests(input);
 
 						} finally {
 							IOUtils.closeQuietly(outputIS);

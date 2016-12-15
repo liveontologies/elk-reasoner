@@ -26,20 +26,19 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owlapi.OwlApiReasoningTestDelegate;
-import org.semanticweb.elk.reasoner.query.BaseClassExpressionQueryTest;
-import org.semanticweb.elk.reasoner.query.ClassExpressionQueryTestManifest;
-import org.semanticweb.elk.reasoner.query.ClassQueryTestInput;
+import org.semanticweb.elk.reasoner.query.BaseQueryTest;
+import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.testing.ConfigurationUtils;
-import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
+import org.semanticweb.elk.testing.ConfigurationUtils.MultiManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
-import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
@@ -48,7 +47,7 @@ import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 
 @RunWith(PolySuite.class)
 public class OwlApiClassExpressionInstancesQueryTest extends
-		BaseClassExpressionQueryTest<OWLClassExpression, RelatedEntitiesTestOutput<OWLNamedIndividual>> {
+		BaseQueryTest<OWLClassExpression, RelatedEntitiesTestOutput<OWLNamedIndividual>> {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
@@ -62,12 +61,12 @@ public class OwlApiClassExpressionInstancesQueryTest extends
 	}
 
 	@Override
-	protected boolean ignore(final TestInput input) {
-		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
+	protected boolean ignoreInputFile(final String fileName) {
+		return Arrays.binarySearch(IGNORE_LIST, fileName) >= 0;
 	}
 
 	public OwlApiClassExpressionInstancesQueryTest(
-			final TestManifestWithOutput<ClassQueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLNamedIndividual>, RelatedEntitiesTestOutput<OWLNamedIndividual>> manifest) {
+			final TestManifestWithOutput<QueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLNamedIndividual>, RelatedEntitiesTestOutput<OWLNamedIndividual>> manifest) {
 		super(manifest,
 				new OwlApiReasoningTestDelegate<RelatedEntitiesTestOutput<OWLNamedIndividual>>(
 						manifest) {
@@ -77,7 +76,7 @@ public class OwlApiClassExpressionInstancesQueryTest extends
 							throws Exception {
 						final NodeSet<OWLNamedIndividual> subNodes = getReasoner()
 								.getInstances(
-										manifest.getInput().getClassQuery(),
+										manifest.getInput().getQuery(),
 										true);
 						return new OwlApiRelatedEntitiesTestOutput<OWLNamedIndividual>(
 								subNodes);
@@ -96,24 +95,21 @@ public class OwlApiClassExpressionInstancesQueryTest extends
 			throws IOException, URISyntaxException {
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION, BaseClassExpressionQueryTest.class, "owl",
+				INPUT_DATA_LOCATION, BaseQueryTest.class, "owl",
 				"expected",
-				new TestManifestCreator<ClassQueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLNamedIndividual>, RelatedEntitiesTestOutput<OWLNamedIndividual>>() {
+				new MultiManifestCreator<QueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLNamedIndividual>, RelatedEntitiesTestOutput<OWLNamedIndividual>>() {
 
 					@Override
-					public TestManifestWithOutput<ClassQueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLNamedIndividual>, RelatedEntitiesTestOutput<OWLNamedIndividual>> create(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLNamedIndividual>, RelatedEntitiesTestOutput<OWLNamedIndividual>>> createManifests(
 							final URL input, final URL output)
 							throws IOException {
 
 						InputStream outputIS = null;
 						try {
 							outputIS = output.openStream();
-							final ExpectedTestOutputLoader expected = ExpectedTestOutputLoader
-									.load(outputIS);
 
-							return new ClassExpressionQueryTestManifest<OWLClassExpression, RelatedEntitiesTestOutput<OWLNamedIndividual>>(
-									input, expected.getQueryClass(),
-									expected.getInstancesTestOutput());
+							return OwlExpectedTestOutputLoader.load(outputIS)
+									.getInstancesManifests(input);
 
 						} finally {
 							IOUtils.closeQuietly(outputIS);

@@ -37,15 +37,24 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 public abstract class OwlApiReasoningTestDelegate<AO extends TestOutput>
 		implements ReasoningTestWithOutputAndInterruptsDelegate<AO> {
 
-	public static final double INTERRUPTION_CHANCE = 0.3;
+	public static final double DEFAULT_INTERRUPTION_CHANCE = 0.3;
 
 	private final TestManifest<? extends UrlTestInput> manifest_;
+
+	private final double interruptionChance_;
 
 	private ElkReasoner reasoner_;
 
 	public OwlApiReasoningTestDelegate(
-			final TestManifest<? extends UrlTestInput> manifest) {
+			final TestManifest<? extends UrlTestInput> manifest,
+			final double interruptionChance) {
 		this.manifest_ = manifest;
+		this.interruptionChance_ = interruptionChance;
+	}
+
+	public OwlApiReasoningTestDelegate(
+			final TestManifest<? extends UrlTestInput> manifest) {
+		this(manifest, DEFAULT_INTERRUPTION_CHANCE);
 	}
 
 	public TestManifest<? extends UrlTestInput> getManifest() {
@@ -73,7 +82,7 @@ public abstract class OwlApiReasoningTestDelegate<AO extends TestOutput>
 
 		final Random random = new Random(RandomSeedProvider.VALUE);
 		reasoner_ = OWLAPITestUtils.createReasoner(ontology, false,
-				new RandomReasonerInterrupter(random, INTERRUPTION_CHANCE),
+				new RandomReasonerInterrupter(random, interruptionChance_),
 				new SimpleStageExecutor());
 	}
 

@@ -26,12 +26,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.ComposedAxiomLoader;
-import org.semanticweb.elk.loading.QueryLoader;
+import org.semanticweb.elk.loading.EntailmentQueryLoader;
+import org.semanticweb.elk.loading.ClassQueryLoader;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
@@ -56,6 +59,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpress
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
+import org.semanticweb.elk.reasoner.query.EntailmentQueryResult;
 import org.semanticweb.elk.reasoner.query.QueryNode;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
@@ -143,6 +147,10 @@ public abstract class AbstractReasonerState {
 	 */
 	final ClassExpressionQueryState classExpressionQueryState_;
 	/**
+	 * Stores information about entailment queries.
+	 */
+	final EntailmentQueryState entailmentQueryState_;
+	/**
 	 * Defines reasoning stages and dependencies between them
 	 */
 	final ReasonerStageManager stageManager;
@@ -155,10 +163,6 @@ public abstract class AbstractReasonerState {
 	 * The source where axioms and changes in ontology can be loaded
 	 */
 	private AxiomLoader axiomLoader_ = null;
-	/**
-	 * Indexes the registered queries.
-	 */
-	private QueryLoader queryLoader_ = null;
 	/**
 	 * if {@code true}, reasoning will be done incrementally whenever possible
 	 */
@@ -208,6 +212,8 @@ public abstract class AbstractReasonerState {
 				propertyHierarchyCompositionState_, elkFactory, ontologyIndex);
 		this.classExpressionQueryState_ = new ClassExpressionQueryState(
 				saturationState, elkFactory, ontologyIndex, factory_);
+		this.entailmentQueryState_ = new EntailmentQueryState(saturationState,
+				consistencyCheckingState, factory_);
 	}
 
 	public ElkObject.Factory getElkFactory() {
@@ -283,11 +289,20 @@ public abstract class AbstractReasonerState {
 	}
 
 	/**
-	 * @return the {@link QueryLoader} currently registered for loading of
-	 *         queries or {@code null} if no loader is registered
+	 * @return the {@link ClassQueryLoader} currently registered for loading of
+	 *         class queries or {@code null} if no loader is registered
 	 */
-	public QueryLoader getQueryLoader() {
-		return queryLoader_;
+	public ClassQueryLoader getClassQueryLoader() {
+		return classExpressionQueryState_.getQueryLoader(getInterrupter());
+	}
+
+	/**
+	 * @return the {@link EntailmentQueryLoader} currently registered for
+	 *         loading of entailment queries or {@code null} if no loader is
+	 *         registered
+	 */
+	public EntailmentQueryLoader getEntailmentQueryLoader() {
+		return entailmentQueryState_.getQueryLoader(getInterrupter());
 	}
 
 	/**
@@ -295,8 +310,13 @@ public abstract class AbstractReasonerState {
 	 *         otherwise.
 	 */
 	protected synchronized boolean isLoadingFinished() {
+		final ClassQueryLoader classQueryLoader = getClassQueryLoader();
+		final EntailmentQueryLoader entailmentQueryLoader = getEntailmentQueryLoader();
 		return (axiomLoader_ == null || axiomLoader_.isLoadingFinished())
-				&& (queryLoader_ == null || queryLoader_.isLoadingFinished());
+				&& (classQueryLoader == null
+						|| classQueryLoader.isLoadingFinished())
+				&& (entailmentQueryLoader == null
+						|| entailmentQueryLoader.isLoadingFinished());
 	}
 
 	/**
@@ -329,14 +349,12 @@ public abstract class AbstractReasonerState {
 	}
 
 	/**
-	 * Completes stages necessary for restoring saturation and cleaning
-	 * taxonomies.
+	 * Ensures that saturation is restored and taxonomies are cleaned. Also
+	 * invalidates stages that depend on the saturation if it changed.
 	 * 
-	 * @return Whether some stages were completed, i.e., they were not completed
-	 *         before calling this method.
 	 * @throws ElkException
 	 */
-	private boolean restoreSaturation() throws ElkException {
+	private void restoreSaturation() throws ElkException {
 
 		ensureLoading();
 
@@ -351,7 +369,10 @@ public abstract class AbstractReasonerState {
 			complete(stageManager.contextInitializationStage);
 		}
 
-		return changed;
+		if (changed) {
+			stageManager.consistencyCheckingStage.invalidateRecursive();
+		}
+
 	}
 
 	/**
@@ -422,9 +443,7 @@ public abstract class AbstractReasonerState {
 	public synchronized boolean isInconsistent() throws ElkException {
 
 		ruleAndConclusionStats.reset();
-		if (restoreSaturation()) {
-			stageManager.consistencyCheckingStage.invalidateRecursive();
-		}
+		restoreSaturation();
 		complete(stageManager.consistencyCheckingStage);
 
 		return consistencyCheckingState.isInconsistent();
@@ -646,12 +665,7 @@ public abstract class AbstractReasonerState {
 			throws ElkInconsistentOntologyException, ElkException {
 
 		// Load the query
-		if (classExpressionQueryState_.registerQuery(classExpression)) {
-			if (queryLoader_ == null) {
-				queryLoader_ = classExpressionQueryState_
-						.getQueryLoader(getInterrupter());
-			}
-		}
+		classExpressionQueryState_.registerQuery(classExpression);
 		ensureLoading();
 
 		if (!classExpressionQueryState_.isIndexed(classExpression)) {
@@ -859,6 +873,43 @@ public abstract class AbstractReasonerState {
 			return Collections.emptySet();
 		}
 
+	}
+
+	/**
+	 * Decides whether the supplied {@code axioms} are entailed by the currently
+	 * loaded ontology.
+	 * 
+	 * @param axioms
+	 *            Entailment of what axioms is queried.
+	 * @return A map from each queried axiom to the
+	 *         {@link EntailmentQueryResult} for that axiom.
+	 * @throws ElkException
+	 */
+	public synchronized Map<ElkAxiom, EntailmentQueryResult> isEntailed(
+			final Iterable<? extends ElkAxiom> axioms) throws ElkException {
+
+		entailmentQueryState_.registerQueries(axioms);
+
+		restoreSaturation();
+
+		stageManager.entailmentQueryStage.invalidateRecursive();
+		complete(stageManager.entailmentQueryStage);
+
+		return entailmentQueryState_.isEntailed(axioms);
+	}
+
+	/**
+	 * Decides whether the supplied {@code axiom} is entailed by the currently
+	 * loaded ontology.
+	 * 
+	 * @param axiom
+	 *            The queries axiom.
+	 * @return the {@link EntailmentQueryResult} for the queried axiom.
+	 * @throws ElkException
+	 */
+	public synchronized EntailmentQueryResult isEntailed(final ElkAxiom axiom)
+			throws ElkException {
+		return isEntailed(Collections.singleton(axiom)).get(axiom);
 	}
 
 	/**

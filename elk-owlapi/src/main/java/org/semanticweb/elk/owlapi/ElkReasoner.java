@@ -27,12 +27,15 @@ package org.semanticweb.elk.owlapi;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
@@ -43,6 +46,12 @@ import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
+import org.semanticweb.elk.reasoner.query.ElkQueryException;
+import org.semanticweb.elk.reasoner.query.EntailmentQueryConverter;
+import org.semanticweb.elk.reasoner.query.EntailmentQueryResult;
+import org.semanticweb.elk.reasoner.query.ProperEntailmentQueryResult;
+import org.semanticweb.elk.reasoner.query.UnsupportedIndexingEntailmentQueryResult;
+import org.semanticweb.elk.reasoner.query.UnsupportedQueryTypeEntailmentQueryResult;
 import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
@@ -953,34 +962,100 @@ public class ElkReasoner implements OWLReasoner {
 		}
 	}
 
+	private final EntailmentQueryResult.Visitor<Boolean> ENTAILMENT_QUERY_RESULT_CONVERTER = new EntailmentQueryResult.Visitor<Boolean>() {
+
+		@Override
+		public Boolean visit(final ProperEntailmentQueryResult properResult)
+				throws ElkQueryException {
+			return properResult.isEntailed();
+		}
+
+		@Override
+		public Boolean visit(
+				final UnsupportedIndexingEntailmentQueryResult unsupportedIndexing) {
+			/*
+			 * Returning an incomplete result. The warning should be logged
+			 * during loading.
+			 */
+			return false;
+		}
+
+		@Override
+		public Boolean visit(
+				final UnsupportedQueryTypeEntailmentQueryResult unsupportedQueryType) {
+			throw new UnsupportedEntailmentTypeException(
+					elkConverter_.convert(unsupportedQueryType.getQuery()));
+		}
+
+	};
+
 	@Override
-	public boolean isEntailed(OWLAxiom arg0)
+	public boolean isEntailed(final OWLAxiom owlAxiom)
 			throws ReasonerInterruptedException,
 			UnsupportedEntailmentTypeException, TimeOutException,
 			AxiomNotInProfileException, FreshEntitiesException,
 			InconsistentOntologyException {
 		LOGGER_.trace("isEntailed(OWLAxiom)");
 		checkInterrupted();
-		// TODO Provide implementation
-		throw unsupportedOwlApiMethod("isEntailed(OWLAxiom)");
+		try {
+
+			final ElkAxiom elkAxiom = owlConverter_.convert(owlAxiom);
+			final Map<ElkAxiom, EntailmentQueryResult> result = reasoner_
+					.isEntailed(Collections.singleton(elkAxiom));
+			return result.get(elkAxiom)
+					.accept(ENTAILMENT_QUERY_RESULT_CONVERTER);
+
+		} catch (final ElkUnsupportedReasoningTaskException e) {
+			throw unsupportedOwlApiMethod("isEntailed(OWLAxiom)",
+					e.getMessage());
+		} catch (final ElkException e) {
+			throw elkConverter_.convert(e);
+		} catch (final ElkRuntimeException e) {
+			throw elkConverter_.convert(e);
+		}
 	}
 
 	@Override
-	public boolean isEntailed(Set<? extends OWLAxiom> arg0)
+	public boolean isEntailed(final Set<? extends OWLAxiom> owlAxioms)
 			throws ReasonerInterruptedException,
 			UnsupportedEntailmentTypeException, TimeOutException,
 			AxiomNotInProfileException, FreshEntitiesException,
 			InconsistentOntologyException {
 		LOGGER_.trace("isEntailed(Set<? extends OWLAxiom>)");
 		checkInterrupted();
-		// TODO Provide implementation
-		throw unsupportedOwlApiMethod("isEntailed(Set<? extends OWLAxiom>)");
+		try {
+
+			final Map<ElkAxiom, EntailmentQueryResult> results = reasoner_
+					.isEntailed(owlConverter_.convertAxiomSet(owlAxioms));
+			for (final EntailmentQueryResult result : results.values()) {
+				if (!result.accept(ENTAILMENT_QUERY_RESULT_CONVERTER)) {
+					return false;
+				}
+			}
+			return true;
+
+		} catch (final ElkUnsupportedReasoningTaskException e) {
+			throw unsupportedOwlApiMethod("isEntailed(Set<? extends OWLAxiom>)",
+					e.getMessage());
+		} catch (final ElkException e) {
+			throw elkConverter_.convert(e);
+		} catch (final ElkRuntimeException e) {
+			throw elkConverter_.convert(e);
+		}
 	}
 
 	@Override
-	public boolean isEntailmentCheckingSupported(AxiomType<?> arg0) {
-		LOGGER_.trace("isEntailmentCheckingSupported(AxiomType<?>)");
-		return false;
+	public boolean isEntailmentCheckingSupported(final AxiomType<?> axiomType) {
+		Class<? extends ElkObject> elkAxiomClass = OwlConverter
+				.convertType(axiomType.getActualClass());
+		if (elkAxiomClass == null
+				|| !ElkAxiom.class.isAssignableFrom(elkAxiomClass)) {
+			// not supported
+			return false;
+		}
+		// else
+		return EntailmentQueryConverter.isEntailmentCheckingSupported(
+				elkAxiomClass.asSubclass(ElkAxiom.class));
 	}
 
 	@Override

@@ -25,10 +25,9 @@ import java.util.Arrays;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owlapi.OwlApiIncrementalReasoningTestDelegate;
-import org.semanticweb.elk.reasoner.query.ClassQueryTestInput;
+import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -51,12 +50,12 @@ public class OwlApiIncrementalClassExpressionSubClassesQueryTest extends
 	}
 
 	@Override
-	protected boolean ignore(final TestInput input) {
-		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
+	protected boolean ignoreInputFile(final String fileName) {
+		return Arrays.binarySearch(IGNORE_LIST, fileName) >= 0;
 	}
 
 	public OwlApiIncrementalClassExpressionSubClassesQueryTest(
-			final TestManifest<ClassQueryTestInput<OWLClassExpression>> manifest) {
+			final TestManifest<QueryTestInput<OWLClassExpression>> manifest) {
 		super(manifest,
 				new OwlApiIncrementalReasoningTestDelegate<RelatedEntitiesTestOutput<OWLClass>, RelatedEntitiesTestOutput<OWLClass>>(
 						manifest) {
@@ -65,8 +64,7 @@ public class OwlApiIncrementalClassExpressionSubClassesQueryTest extends
 					public RelatedEntitiesTestOutput<OWLClass> getExpectedOutput()
 							throws Exception {
 						final NodeSet<OWLClass> subNodes = getStandardReasoner()
-								.getSubClasses(
-										manifest.getInput().getClassQuery(),
+								.getSubClasses(manifest.getInput().getQuery(),
 										true);
 						return new OwlApiRelatedEntitiesTestOutput<OWLClass>(
 								subNodes);
@@ -76,8 +74,7 @@ public class OwlApiIncrementalClassExpressionSubClassesQueryTest extends
 					public RelatedEntitiesTestOutput<OWLClass> getActualOutput()
 							throws Exception {
 						final NodeSet<OWLClass> subNodes = getIncrementalReasoner()
-								.getSubClasses(
-										manifest.getInput().getClassQuery(),
+								.getSubClasses(manifest.getInput().getQuery(),
 										true);
 						return new OwlApiRelatedEntitiesTestOutput<OWLClass>(
 								subNodes);

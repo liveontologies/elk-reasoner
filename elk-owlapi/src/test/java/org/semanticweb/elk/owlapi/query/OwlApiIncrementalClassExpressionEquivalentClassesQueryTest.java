@@ -25,10 +25,9 @@ import java.util.Arrays;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owlapi.OwlApiIncrementalReasoningTestDelegate;
-import org.semanticweb.elk.reasoner.query.ClassQueryTestInput;
 import org.semanticweb.elk.reasoner.query.EquivalentEntitiesTestOutput;
+import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -51,12 +50,12 @@ public class OwlApiIncrementalClassExpressionEquivalentClassesQueryTest extends
 	}
 
 	@Override
-	protected boolean ignore(final TestInput input) {
-		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
+	protected boolean ignoreInputFile(final String fileName) {
+		return Arrays.binarySearch(IGNORE_LIST, fileName) >= 0;
 	}
 
 	public OwlApiIncrementalClassExpressionEquivalentClassesQueryTest(
-			final TestManifest<ClassQueryTestInput<OWLClassExpression>> manifest) {
+			final TestManifest<QueryTestInput<OWLClassExpression>> manifest) {
 		super(manifest,
 				new OwlApiIncrementalReasoningTestDelegate<EquivalentEntitiesTestOutput<OWLClass>, EquivalentEntitiesTestOutput<OWLClass>>(
 						manifest) {
@@ -66,7 +65,7 @@ public class OwlApiIncrementalClassExpressionEquivalentClassesQueryTest extends
 							throws Exception {
 						final Node<OWLClass> equivalent = getStandardReasoner()
 								.getEquivalentClasses(
-										manifest.getInput().getClassQuery());
+										manifest.getInput().getQuery());
 						return new OwlApiEquivalentEntitiesTestOutput(
 								equivalent);
 					}
@@ -76,7 +75,7 @@ public class OwlApiIncrementalClassExpressionEquivalentClassesQueryTest extends
 							throws Exception {
 						final Node<OWLClass> equivalent = getIncrementalReasoner()
 								.getEquivalentClasses(
-										manifest.getInput().getClassQuery());
+										manifest.getInput().getQuery());
 						return new OwlApiEquivalentEntitiesTestOutput(
 								equivalent);
 					}

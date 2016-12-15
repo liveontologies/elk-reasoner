@@ -25,7 +25,7 @@ import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.incremental.CliIncrementalReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.BaseSatisfiabilityTestOutput;
-import org.semanticweb.elk.reasoner.query.ClassQueryTestInput;
+import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.reasoner.query.SatisfiabilityTestOutput;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestManifest;
@@ -35,7 +35,7 @@ public class CliIncrementalClassExpressionSatisfiabilityQueryTest extends
 		CliIncrementalClassExpressionQueryTest<SatisfiabilityTestOutput> {
 
 	public CliIncrementalClassExpressionSatisfiabilityQueryTest(
-			final TestManifest<ClassQueryTestInput<ElkClassExpression>> manifest) {
+			final TestManifest<QueryTestInput<ElkClassExpression>> manifest) {
 		super(manifest,
 				new CliIncrementalReasoningTestDelegate<SatisfiabilityTestOutput, SatisfiabilityTestOutput>(
 						manifest) {
@@ -45,7 +45,7 @@ public class CliIncrementalClassExpressionSatisfiabilityQueryTest extends
 							throws Exception {
 						final boolean isSatisfiable = getStandardReasoner()
 								.isSatisfiableQuietly(
-										manifest.getInput().getClassQuery());
+										manifest.getInput().getQuery());
 						return new BaseSatisfiabilityTestOutput(isSatisfiable);
 					}
 
@@ -54,7 +54,7 @@ public class CliIncrementalClassExpressionSatisfiabilityQueryTest extends
 							throws Exception {
 						final boolean isSatisfiable = getIncrementalReasoner()
 								.isSatisfiableQuietly(
-										manifest.getInput().getClassQuery());
+										manifest.getInput().getQuery());
 						return new BaseSatisfiabilityTestOutput(isSatisfiable);
 					}
 

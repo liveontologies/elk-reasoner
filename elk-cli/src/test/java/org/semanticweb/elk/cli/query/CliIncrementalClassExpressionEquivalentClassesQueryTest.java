@@ -25,7 +25,7 @@ import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.incremental.CliIncrementalReasoningTestDelegate;
-import org.semanticweb.elk.reasoner.query.ClassQueryTestInput;
+import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.reasoner.query.EquivalentEntitiesTestOutput;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.PolySuite;
@@ -36,7 +36,7 @@ public class CliIncrementalClassExpressionEquivalentClassesQueryTest extends
 		CliIncrementalClassExpressionQueryTest<EquivalentEntitiesTestOutput<ElkClass>> {
 
 	public CliIncrementalClassExpressionEquivalentClassesQueryTest(
-			final TestManifest<ClassQueryTestInput<ElkClassExpression>> manifest) {
+			final TestManifest<QueryTestInput<ElkClassExpression>> manifest) {
 		super(manifest,
 				new CliIncrementalReasoningTestDelegate<EquivalentEntitiesTestOutput<ElkClass>, EquivalentEntitiesTestOutput<ElkClass>>(
 						manifest) {
@@ -46,7 +46,7 @@ public class CliIncrementalClassExpressionEquivalentClassesQueryTest extends
 							throws Exception {
 						final Node<ElkClass> equivalent = getStandardReasoner()
 								.getEquivalentClassesQuietly(
-										manifest.getInput().getClassQuery());
+										manifest.getInput().getQuery());
 						return new CliEquivalentEntitiesTestOutput(equivalent);
 					}
 
@@ -55,7 +55,7 @@ public class CliIncrementalClassExpressionEquivalentClassesQueryTest extends
 							throws Exception {
 						final Node<ElkClass> equivalent = getIncrementalReasoner()
 								.getEquivalentClassesQuietly(
-										manifest.getInput().getClassQuery());
+										manifest.getInput().getQuery());
 						return new CliEquivalentEntitiesTestOutput(equivalent);
 					}
 

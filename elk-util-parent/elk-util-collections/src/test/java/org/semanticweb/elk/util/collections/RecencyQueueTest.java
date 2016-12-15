@@ -94,14 +94,20 @@ public class RecencyQueueTest {
 		queue.offer(1);
 		queue.offer(6);
 
+		Assert.assertEquals(7, queue.size());
+
 		final Iterator<Integer> iter = queue.iterator();
 
 		Assert.assertTrue(iter.hasNext());
 		Assert.assertEquals(2, iter.next().intValue());
+		iter.remove();
+		Assert.assertEquals(6, queue.size());
 		Assert.assertTrue(iter.hasNext());
 		Assert.assertEquals(4, iter.next().intValue());
 		Assert.assertTrue(iter.hasNext());
 		Assert.assertEquals(5, iter.next().intValue());
+		iter.remove();
+		Assert.assertEquals(5, queue.size());
 		Assert.assertTrue(iter.hasNext());
 		Assert.assertEquals(3, iter.next().intValue());
 		Assert.assertTrue(iter.hasNext());
@@ -110,6 +116,8 @@ public class RecencyQueueTest {
 		Assert.assertEquals(1, iter.next().intValue());
 		Assert.assertTrue(iter.hasNext());
 		Assert.assertEquals(6, iter.next().intValue());
+		iter.remove();
+		Assert.assertEquals(4, queue.size());
 
 		Assert.assertFalse(iter.hasNext());
 		boolean caught = false;
@@ -120,6 +128,7 @@ public class RecencyQueueTest {
 		}
 		Assert.assertTrue(caught);
 
+		checkPoll(Arrays.asList(4, 3, 0, 1), queue);
 	}
 
 	@Test

@@ -28,6 +28,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -43,7 +44,7 @@ import org.semanticweb.elk.testing.PolySuite.Configuration;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
- * 
+ * @author Peter Skocovsky
  */
 public class ConfigurationUtils {
 
@@ -64,7 +65,7 @@ public class ConfigurationUtils {
 	public static <I extends TestInput, EO extends TestOutput, AO extends TestOutput> Configuration loadFileBasedTestConfiguration(
 			final String path, final Class<?> srcClass,
 			final String inputFileExt, final String outputFileExt,
-			final TestManifestCreator<I, EO, AO> creator)
+			final MultiManifestCreator<I, EO, AO> creator)
 			throws IOException, URISyntaxException {
 		final URI srcURI = srcClass.getClassLoader().getResource(path).toURI();
 		// Load inputs and expected results
@@ -103,11 +104,12 @@ public class ConfigurationUtils {
 							nextInput);
 					URL resultURL = srcClass.getClassLoader().getResource(
 							nextResult);
-					TestManifestWithOutput<I, EO, AO> manifest = creator.create(
-							inputURL, resultURL);
+					final Collection<? extends TestManifestWithOutput<I, EO, AO>> manifs = creator
+							.createManifests(inputURL, resultURL);
 
-					if (manifest != null)
-						manifests.add(manifest);
+					if (manifs != null) {
+						manifests.addAll(manifs);
+					}
 
 					if (endOfData(inputIter, resultIter))
 						break;
@@ -146,7 +148,7 @@ public class ConfigurationUtils {
 	public static <I extends TestInput, EO extends TestOutput, AO extends TestOutput> Configuration loadFileBasedTestConfiguration(
 			final String path, final Class<?> srcClass,
 			final String inputFileExt,
-			final TestManifestCreator<I, EO, AO> creator)
+			final MultiManifestCreator<I, EO, AO> creator)
 			throws IOException, URISyntaxException {
 		final URI srcURI = srcClass.getClassLoader().getResource(path).toURI();
 		// Load inputs
@@ -160,11 +162,12 @@ public class ConfigurationUtils {
 
 		for (String input : inputs) {
 			URL inputURL = srcClass.getClassLoader().getResource(input);
-			TestManifestWithOutput<I, EO, AO> manifest = creator.create(inputURL,
-					null);
+			final Collection<? extends TestManifestWithOutput<I, EO, AO>> manifs = creator
+					.createManifests(inputURL, null);
 
-			if (manifest != null)
-				manifests.add(manifest);
+			if (manifs != null) {
+				manifests.addAll(manifs);
+			}
 		}
 
 		return new SimpleConfiguration<I, EO, AO>(manifests);
@@ -176,19 +179,44 @@ public class ConfigurationUtils {
 	}
 
 	/**
-	 * Interface for classes which create test manifest from provided arguments
+	 * Creates possibly multiple manifests from provided arguments.
+	 * 
+	 * @author Peter Skocovsky
+	 *
+	 * @param <I>
+	 * @param <EO>
+	 * @param <AO>
+	 */
+	public interface MultiManifestCreator<I extends TestInput, EO extends TestOutput, AO extends TestOutput> {
+
+		public Collection<? extends TestManifestWithOutput<I, EO, AO>> createManifests(
+				URL input, URL output) throws IOException;
+
+	}
+
+	/**
+	 * Creates single test manifest from provided arguments.
 	 * 
 	 * @author Pavel Klinov
 	 * 
 	 *         pavel.klinov@uni-ulm.de
-	 * @param <I> 
-	 * @param <EO> 
-	 * @param <AO> 
-	 * 
+	 * @author Peter Skocovsky
+	 * @param <I>
+	 * @param <EO>
+	 * @param <AO>
 	 */
-	public interface TestManifestCreator<I extends TestInput, EO extends TestOutput, AO extends TestOutput> {
+	public static abstract class TestManifestCreator<I extends TestInput, EO extends TestOutput, AO extends TestOutput>
+			implements MultiManifestCreator<I, EO, AO> {
 
-		public TestManifestWithOutput<I, EO, AO> create(URL input, URL output)
-				throws IOException;
+		@Override
+		public Collection<? extends TestManifestWithOutput<I, EO, AO>> createManifests(
+				final URL input, final URL output) throws IOException {
+			return Collections.singleton(create(input, output));
+		}
+
+		public abstract TestManifestWithOutput<I, EO, AO> create(URL input,
+				URL output) throws IOException;
+
 	}
+
 }
