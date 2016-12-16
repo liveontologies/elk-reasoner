@@ -1,5 +1,7 @@
 package org.semanticweb.elk.owlapi.proofs;
 
+import java.util.ArrayList;
+
 /*-
  * #%L
  * ELK OWL API Binding
@@ -23,6 +25,7 @@ package org.semanticweb.elk.owlapi.proofs;
  */
 
 import java.util.Collection;
+import java.util.List;
 
 import org.liveontologies.owlapi.proof.OWLProofNode;
 import org.liveontologies.owlapi.proof.OWLProofStep;
@@ -32,8 +35,6 @@ import org.semanticweb.elk.owl.inferences.ElkToldAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owlapi.ElkConverter;
-import org.semanticweb.elk.util.collections.Operations;
-import org.semanticweb.elk.util.collections.Operations.Transformation;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
 public class ElkOWLProofNode implements OWLProofNode {
@@ -60,20 +61,18 @@ public class ElkOWLProofNode implements OWLProofNode {
 
 	@Override
 	public Collection<? extends OWLProofStep> getInferences() {
-		return Operations.map(elkInferences_.get(member_),
-				new Transformation<ElkInference, OWLProofStep>() {
-
-					@Override
-					public OWLProofStep transform(ElkInference element) {
-						if (element instanceof ElkToldAxiom) {
-							// don't transform told axioms
-							return null;
-						}
-						// else
-						return new ElkOWLProofStep(element, elkInferences_,
-								elkFactory_);
-					}
-				});
+		Collection<? extends ElkInference> original = elkInferences_
+				.get(member_);
+		List<OWLProofStep> result = new ArrayList<OWLProofStep>(
+				original.size());
+		for (ElkInference inf : original) {
+			if (inf instanceof ElkToldAxiom) {
+				// don't transform told axioms
+				continue;
+			}
+			result.add(new ElkOWLProofStep(inf, elkInferences_, elkFactory_));
+		}
+		return result;
 	}
 
 	@Override

@@ -64,8 +64,9 @@ public class ElkOWLProofStep implements OWLProofStep {
 
 	@Override
 	public List<? extends OWLProofNode> getPremises() {
-		List<OWLProofNode> result = new ArrayList<OWLProofNode>();
-		for (int i = 0; i < elkInference_.getPremiseCount(); i++) {
+		int size = elkInference_.getPremiseCount();
+		List<OWLProofNode> result = new ArrayList<OWLProofNode>(size);
+		for (int i = 0; i < size; i++) {
 			result.add(convert(elkInference_.getPremise(i, elkFactory_)));
 		}
 		return result;
