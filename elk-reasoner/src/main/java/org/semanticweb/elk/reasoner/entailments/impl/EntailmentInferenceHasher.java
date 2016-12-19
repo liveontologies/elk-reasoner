@@ -29,6 +29,7 @@ import org.semanticweb.elk.reasoner.entailments.model.IndividualInconsistencyEnt
 import org.semanticweb.elk.reasoner.entailments.model.OntologyInconsistencyEntailsAnyAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.OwlThingInconsistencyEntailsOntologyInconsistency;
 import org.semanticweb.elk.reasoner.entailments.model.SubClassInconsistencyEntailsSubClassOfAxiom;
+import org.semanticweb.elk.reasoner.entailments.model.TopObjectPropertyInBottomEntailsOntologyInconsistency;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 import org.semanticweb.elk.util.hashing.Hasher;
 
@@ -69,6 +70,16 @@ class EntailmentInferenceHasher implements Hasher<EntailmentInference>,
 				hashCode(
 						OwlThingInconsistencyEntailsOntologyInconsistency.class),
 				hashCode(owlThingInconsistencyEntailsOntologyInconsistency
+						.getReason()));
+	}
+
+	@Override
+	public Integer visit(
+			final TopObjectPropertyInBottomEntailsOntologyInconsistency topObjectPropertyInBottomEntailsOntologyInconsistency) {
+		return combinedHashCode(
+				hashCode(
+						TopObjectPropertyInBottomEntailsOntologyInconsistency.class),
+				hashCode(topObjectPropertyInBottomEntailsOntologyInconsistency
 						.getReason()));
 	}
 

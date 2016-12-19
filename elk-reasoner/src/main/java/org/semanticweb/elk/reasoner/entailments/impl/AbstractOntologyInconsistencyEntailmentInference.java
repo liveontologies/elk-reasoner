@@ -28,17 +28,14 @@ import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.HasReason;
 import org.semanticweb.elk.reasoner.entailments.model.OntologyInconsistency;
 import org.semanticweb.elk.reasoner.entailments.model.OntologyInconsistencyEntailmentInference;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 
-abstract class AbstractOntologyInconsistencyEntailmentInference
+abstract class AbstractOntologyInconsistencyEntailmentInference<C>
 		extends AbstractEntailmentInference
-		implements OntologyInconsistencyEntailmentInference,
-		HasReason<ClassInconsistency> {
+		implements OntologyInconsistencyEntailmentInference, HasReason<C> {
 
-	private final ClassInconsistency reason_;
+	private final C reason_;
 
-	public AbstractOntologyInconsistencyEntailmentInference(
-			final ClassInconsistency reason) {
+	public AbstractOntologyInconsistencyEntailmentInference(final C reason) {
 		this.reason_ = reason;
 	}
 
@@ -53,7 +50,7 @@ abstract class AbstractOntologyInconsistencyEntailmentInference
 	}
 
 	@Override
-	public ClassInconsistency getReason() {
+	public C getReason() {
 		return reason_;
 	}
 

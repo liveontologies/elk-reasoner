@@ -21,22 +21,24 @@
  */
 package org.semanticweb.elk.reasoner.entailments.model;
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
+
 /**
- * How was {@link OntologyInconsistency} entailed.
+ * {@link OntologyInconsistency} is entailed because inclusion of
+ * {@code owl:topObjectProperty} in {@code owl:bottomObjectProperty} was
+ * derived.
+ * <p>
+ * {@link #getReason()} returns a {@link SubPropertyChain} with
+ * {@link SubPropertyChain#getSubChain()} = {@code owl:topObjectProperty} and
+ * {@link SubPropertyChain#getSuperChain()} = {@code owl:bottomObjectProperty}.
  * 
  * @author Peter Skocovsky
  */
-public interface OntologyInconsistencyEntailmentInference
-		extends EntailmentInference {
+public interface TopObjectPropertyInBottomEntailsOntologyInconsistency extends
+		OntologyInconsistencyEntailmentInference, HasReason<SubPropertyChain> {
 
-	@Override
-	OntologyInconsistency getConclusion();
-
-	public static interface Visitor<O> extends
-			OwlThingInconsistencyEntailsOntologyInconsistency.Visitor<O>,
-			TopObjectPropertyInBottomEntailsOntologyInconsistency.Visitor<O>,
-			IndividualInconsistencyEntailsOntologyInconsistency.Visitor<O> {
-		// combined visitor
+	public static interface Visitor<O> {
+		O visit(TopObjectPropertyInBottomEntailsOntologyInconsistency topObjectPropertyInBottomEntailsOntologyInconsistency);
 	}
 
 }

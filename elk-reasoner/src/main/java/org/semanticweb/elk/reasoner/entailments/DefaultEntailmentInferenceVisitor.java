@@ -33,6 +33,7 @@ import org.semanticweb.elk.reasoner.entailments.model.OntologyInconsistencyEntai
 import org.semanticweb.elk.reasoner.entailments.model.OwlThingInconsistencyEntailsOntologyInconsistency;
 import org.semanticweb.elk.reasoner.entailments.model.SubClassInconsistencyEntailsSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.SubClassOfAxiomEntailmentInference;
+import org.semanticweb.elk.reasoner.entailments.model.TopObjectPropertyInBottomEntailsOntologyInconsistency;
 
 public class DefaultEntailmentInferenceVisitor<O>
 		implements EntailmentInference.Visitor<O> {
@@ -62,6 +63,13 @@ public class DefaultEntailmentInferenceVisitor<O>
 			final OwlThingInconsistencyEntailsOntologyInconsistency owlThingInconsistencyEntailsOntologyInconsistency) {
 		return defaultOntologyInconsistencyEntailmentInferenceVisit(
 				owlThingInconsistencyEntailsOntologyInconsistency);
+	}
+
+	@Override
+	public O visit(
+			final TopObjectPropertyInBottomEntailsOntologyInconsistency topObjectPropertyInBottomEntailsOntologyInconsistency) {
+		return defaultOntologyInconsistencyEntailmentInferenceVisit(
+				topObjectPropertyInBottomEntailsOntologyInconsistency);
 	}
 
 	@Override

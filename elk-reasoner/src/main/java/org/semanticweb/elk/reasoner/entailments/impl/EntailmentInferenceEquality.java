@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.entailments.model.IndividualInconsistencyEnt
 import org.semanticweb.elk.reasoner.entailments.model.OntologyInconsistencyEntailsAnyAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.OwlThingInconsistencyEntailsOntologyInconsistency;
 import org.semanticweb.elk.reasoner.entailments.model.SubClassInconsistencyEntailsSubClassOfAxiom;
+import org.semanticweb.elk.reasoner.entailments.model.TopObjectPropertyInBottomEntailsOntologyInconsistency;
 
 class EntailmentInferenceEquality
 		implements EntailmentInference.Visitor<Boolean> {
@@ -68,6 +69,20 @@ class EntailmentInferenceEquality
 					final OwlThingInconsistencyEntailsOntologyInconsistency other) {
 				return equals(other.getReason(),
 						owlThingInconsistencyEntailsOntologyInconsistency
+								.getReason());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(
+			final TopObjectPropertyInBottomEntailsOntologyInconsistency topObjectPropertyInBottomEntailsOntologyInconsistency) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(
+					final TopObjectPropertyInBottomEntailsOntologyInconsistency other) {
+				return equals(other.getReason(),
+						topObjectPropertyInBottomEntailsOntologyInconsistency
 								.getReason());
 			}
 		});

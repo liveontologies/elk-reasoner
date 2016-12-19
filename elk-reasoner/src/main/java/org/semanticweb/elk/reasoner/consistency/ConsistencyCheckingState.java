@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.semanticweb.elk.reasoner.entailments.impl.IndividualInconsistencyEntailsOntologyInconsistencyImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.OntologyInconsistencyImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.OwlThingInconsistencyEntailsOntologyInconsistencyImpl;
+import org.semanticweb.elk.reasoner.entailments.impl.TopObjectPropertyInBottomEntailsOntologyInconsistencyImpl;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;
 import org.semanticweb.elk.reasoner.entailments.model.OntologyInconsistencyEntailmentInference;
@@ -47,6 +48,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateDummyChangeListener;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.stages.PropertyHierarchyCompositionState;
 import org.semanticweb.elk.util.collections.Operations;
@@ -70,9 +72,13 @@ public class ConsistencyCheckingState {
 	 */
 	private final SaturationState<?> saturationState_;
 
-	private final ClassInconsistency.Factory conclusionFactory_ = new SaturationConclusionBaseFactory();
+	private final SaturationConclusion.Factory conclusionFactory_ = new SaturationConclusionBaseFactory();
 
 	private final IndexedClass owlThing_;
+
+	private final IndexedObjectProperty bottomProperty_;
+
+	private final IndexedObjectProperty topProperty_;
 
 	/**
 	 * {@code true} if the ontology is consistent due to some syntactic
@@ -105,6 +111,8 @@ public class ConsistencyCheckingState {
 		this.saturationState_ = saturationState;
 		final OntologyIndex index = saturationState.getOntologyIndex();
 		this.owlThing_ = index.getOwlThing();
+		this.bottomProperty_ = index.getOwlBottomObjectProperty();
+		this.topProperty_ = index.getOwlTopObjectProperty();
 		toDoEntities_ = new ConcurrentLinkedQueue<IndexedClassEntity>(
 				index.getIndividuals());
 		toDoEntities_.add(index.getOwlThing());
@@ -180,12 +188,6 @@ public class ConsistencyCheckingState {
 		// listening to changes in the property hierarchy state
 		propertHierarchyState
 				.addListener(new PropertyHierarchyCompositionState.Listener() {
-
-					private final IndexedObjectProperty bottomProperty_ = index
-							.getOwlBottomObjectProperty();
-
-					private final IndexedObjectProperty topProperty_ = index
-							.getOwlTopObjectProperty();
 
 					@Override
 					public void propertyBecameSaturated(
@@ -346,6 +348,19 @@ public class ConsistencyCheckingState {
 								INDIVIDUAL_TO_ENTAILMENT_INFERENCE);
 				int size = inconsistentIndividuals.size();
 
+				if (isTopObjectPropertyInBottom_) {
+					result = Operations.concat(
+							Operations
+									.<OntologyInconsistencyEntailmentInference> singleton(
+											new TopObjectPropertyInBottomEntailsOntologyInconsistencyImpl(
+													conclusionFactory_
+															.getSubPropertyChain(
+																	topProperty_,
+																	bottomProperty_))),
+							result);
+					size++;
+				}
+
 				if (isOwlThingInconsistent_) {
 					result = Operations.concat(Operations
 							.<OntologyInconsistencyEntailmentInference> singleton(
@@ -355,8 +370,6 @@ public class ConsistencyCheckingState {
 							result);
 					size++;
 				}
-
-				// TODO: inconsistent due to properties !!!
 
 				if (atMostOne) {
 					final Iterator<OntologyInconsistencyEntailmentInference> iter = result
