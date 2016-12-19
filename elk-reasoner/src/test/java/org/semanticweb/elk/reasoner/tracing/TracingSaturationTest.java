@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.tracing;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,12 +19,19 @@ package org.semanticweb.elk.reasoner.tracing;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.tracing;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
+import org.semanticweb.elk.loading.TestAxiomLoaderFactory;
+import org.semanticweb.elk.loading.TestChangesLoader;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
@@ -193,6 +195,39 @@ public class TracingSaturationTest {
 		ElkClass a1 = factory.getClass(new ElkFullIri("http://example.org/A1"));
 
 		TracingTestUtils.checkTracingCompleteness(a, a1, reasoner);		
+	}
+
+	@Test
+	public void testAddingFreshTrivialProperty() throws Exception {
+		final ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
+
+		final ElkClass a = factory
+				.getClass(new ElkFullIri("http://example.org/A"));
+		final ElkClass b = factory
+				.getClass(new ElkFullIri("http://example.org/B"));
+		final ElkClass c = factory
+				.getClass(new ElkFullIri("http://example.org/C"));
+		final ElkClass d = factory
+				.getClass(new ElkFullIri("http://example.org/D"));
+
+		final ElkObjectProperty r = factory
+				.getObjectProperty(new ElkFullIri("http://example.org/R"));
+
+		final Set<ElkAxiom> initial = new HashSet<ElkAxiom>();
+		initial.add(factory.getSubClassOfAxiom(b, c));
+
+		final Reasoner reasoner = TestReasonerUtils.loadAndClassify(initial);
+		reasoner.setAllowIncrementalMode(true);
+
+		final TestChangesLoader loader = new TestChangesLoader();
+		loader.add(factory.getSubClassOfAxiom(a,
+				factory.getObjectSomeValuesFrom(r, b)));
+		loader.add(factory
+				.getSubClassOfAxiom(factory.getObjectSomeValuesFrom(r, c), d));
+
+		reasoner.registerAxiomLoader(new TestAxiomLoaderFactory(loader));
+
+		TracingTestUtils.checkTracingCompleteness(a, d, reasoner);
 	}
 
 }

@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.tracing;
-
 /*-
  * #%L
  * ELK Reasoner Core
@@ -24,7 +19,9 @@ package org.semanticweb.elk.reasoner.tracing;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.tracing;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
@@ -44,10 +41,12 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateDummyChangeListener;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainTautology;
 import org.semanticweb.elk.reasoner.stages.PropertyHierarchyCompositionState;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.slf4j.Logger;
@@ -204,6 +203,29 @@ public class TraceState implements
 		protected Iterable<? extends ObjectPropertyInference> defaultVisit(
 				ObjectPropertyConclusion conclusion) {
 			return objectPropertyInferences_.getInferences(conclusion);
+		}
+
+		@Override
+		public Iterable<? extends TracingInference> visit(
+				final SubPropertyChain conclusion) {
+			/*
+			 * Tautologies over trivial properties may not be recorded, so they
+			 * should be added to the result.
+			 */
+			final Iterable<? extends TracingInference> infs = super.visit(
+					conclusion);
+			if (infs.iterator().hasNext()) {
+				// If some inferences are recorded, they should be complete.
+				return infs;
+			}
+			// else
+			final IndexedPropertyChain subChain = conclusion.getSubChain();
+			if (conclusion.getSuperChain().equals(subChain)) {
+				return Collections
+						.singleton(new SubPropertyChainTautology(subChain));
+			}
+			// else
+			return infs;
 		}
 
 		@Override
