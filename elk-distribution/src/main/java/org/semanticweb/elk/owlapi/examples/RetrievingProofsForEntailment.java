@@ -30,9 +30,9 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
-import org.liveontologies.owlapi.proof.OWLProofNode;
-import org.liveontologies.owlapi.proof.OWLProofStep;
 import org.liveontologies.owlapi.proof.OWLProver;
+import org.liveontologies.proof.util.Inference;
+import org.liveontologies.proof.util.InferenceSet;
 import org.semanticweb.elk.owlapi.ElkProverFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
@@ -73,35 +73,35 @@ public class RetrievingProofsForEntailment {
 		// Pick the entailment for which we are interested in proofs
 		OWLAxiom entailment = getEntailment();
 		
-		// Get the first derivable expression which corresponds to the entailment. "Derivable" means that it can provide access to inferences which directly derived it. 
-		OWLProofNode derived = prover.getProof(entailment).getRoot();
+		// Get the inferences used to prove the entailment 
+		InferenceSet<OWLAxiom> inferences = prover.getProof(entailment);
 		
 		// Now we can recursively request inferences and their premises. Print them to std.out in this example.
-		unwindProofs(derived);
+		unwindProofs(inferences, entailment);
 
 		// Terminate the worker threads used by the reasoner.
 		prover.dispose();
 	}
 
-	private static void unwindProofs(OWLProofNode expression) {
+	private static <C> void unwindProofs(InferenceSet<C> inferences, C entailment) {
 		// Start recursive unwinding
-		LinkedList<OWLProofNode> toDo = new LinkedList<OWLProofNode>();
-		Set<OWLProofNode> done = new HashSet<OWLProofNode>();
+		LinkedList<C> toDo = new LinkedList<C>();
+		Set<C> done = new HashSet<C>();
 		
-		toDo.add(expression);
-		done.add(expression);
+		toDo.add(entailment);
+		done.add(entailment);
 		
 		for (;;) {
-			OWLProofNode next = toDo.poll();
+			C next = toDo.poll();
 			
 			if (next == null) {
 				break;
 			}
 			
-			for (OWLProofStep inf : next.getInferences()) {
+			for (Inference<C> inf : inferences.getInferences(next)) {
 				System.out.println(inf);
 				// Recursively unwind premise inferences
-				for (OWLProofNode premise : inf.getPremises()) {
+				for (C premise : inf.getPremises()) {
 					
 					if (done.add(premise)) {
 						toDo.addFirst(premise);

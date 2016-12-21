@@ -38,6 +38,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.liveontologies.owlapi.proof.OWLProver;
 import org.liveontologies.proof.util.ProofNode;
+import org.liveontologies.proof.util.ProofNodes;
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
@@ -148,10 +149,11 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 			final OWLProver prover,
 			final OWLSubClassOfAxiom conclusion, final OWLOntology ontology,
 			final Random random, final long seed) {
-		final ProofNode<OWLAxiom> expr = prover.getProof(conclusion).getRoot();
+		final ProofNode<OWLAxiom> root = ProofNodes
+				.create(prover.getProof(conclusion), conclusion);
 		
 		final Set<OWLAxiom> proofBreaker =
-				ProofTestUtils.collectProofBreaker(expr, ontology, random);
+				ProofTestUtils.collectProofBreaker(root, ontology, random);
 		final List<OWLOntologyChange> deletions =
 				new ArrayList<OWLOntologyChange>();
 		final List<OWLOntologyChange> additions =

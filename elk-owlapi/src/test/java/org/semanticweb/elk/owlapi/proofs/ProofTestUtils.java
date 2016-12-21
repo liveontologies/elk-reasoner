@@ -32,10 +32,10 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 
-import org.liveontologies.owlapi.proof.OWLProofNode;
 import org.liveontologies.owlapi.proof.OWLProver;
+import org.liveontologies.proof.util.InferenceSet;
+import org.liveontologies.proof.util.InferenceSets;
 import org.liveontologies.proof.util.ProofNode;
-import org.liveontologies.proof.util.ProofNodes;
 import org.liveontologies.proof.util.ProofStep;
 import org.semanticweb.elk.owl.inferences.TestUtils;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -65,12 +65,13 @@ public class ProofTestUtils {
 	public static void provabilityTest(OWLProver prover,
 			OWLSubClassOfAxiom axiom) {
 		assertTrue(String.format("Entailment %s not derivable!", axiom),
-				isDerivable(prover.getProof(axiom).getRoot(),
+				isDerivable(prover.getProof(axiom), axiom,
 						prover.getRootOntology()));
 	}
 
-	public static boolean isDerivable(OWLProofNode root, OWLOntology ontology) {
-		return ProofNodes.isDerivable(root,
+	public static boolean isDerivable(InferenceSet<OWLAxiom> proof,
+			OWLAxiom conclusion, OWLOntology ontology) {
+		return InferenceSets.isDerivable(proof, conclusion,
 				ontology.getAxioms(Imports.INCLUDED));
 	}
 
@@ -159,8 +160,8 @@ public class ProofTestUtils {
 	public static Set<OWLAxiom> collectProofBreaker(
 			final ProofNode<OWLAxiom> conclusion,
 			final Set<ProofNode<OWLAxiom>> visited,
-			final Set<ProofNode<OWLAxiom>> tautologies, final OWLOntology ontology,
-			final Random random) {
+			final Set<ProofNode<OWLAxiom>> tautologies,
+			final OWLOntology ontology, final Random random) {
 
 		/*
 		 * If the expressions in visited are not provable and the result of this

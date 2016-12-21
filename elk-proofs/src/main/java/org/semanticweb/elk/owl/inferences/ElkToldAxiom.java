@@ -39,7 +39,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  */
 public class ElkToldAxiom extends AbstractElkInference {
 
-	private final static String NAME_ = "Axiom";
+	public final static String NAME = "Axiom";
 
 	private final ElkAxiom axiom_;
 
@@ -53,7 +53,7 @@ public class ElkToldAxiom extends AbstractElkInference {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

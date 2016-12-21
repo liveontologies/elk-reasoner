@@ -22,8 +22,9 @@ package org.semanticweb.elk.owlapi;
  * #L%
  */
 
-import org.liveontologies.owlapi.proof.OWLProof;
 import org.liveontologies.owlapi.proof.OWLProver;
+import org.liveontologies.proof.util.DynamicInferenceSet;
+import org.semanticweb.elk.owlapi.proofs.ElkOwlInferenceSet;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.UnsupportedEntailmentTypeException;
 
@@ -35,9 +36,9 @@ public class ElkProver extends DelegatingOWLReasoner<ElkReasoner>
 	}
 
 	@Override
-	public OWLProof getProof(OWLAxiom entailment)
+	public DynamicInferenceSet<OWLAxiom> getProof(OWLAxiom entailment)
 			throws UnsupportedEntailmentTypeException {
-		return new ElkProof(getDelegate(), entailment);
+		return ElkOwlInferenceSet.create(getDelegate(), entailment);
 	}
 
 }

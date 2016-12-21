@@ -25,12 +25,10 @@ package org.semanticweb.elk.owl.inferences.rewriting;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.liveontologies.proof.util.Inference;
 import org.liveontologies.proof.util.ProofNode;
 import org.liveontologies.proof.util.ProofStep;
 import org.semanticweb.elk.owl.implementation.ElkObjectBaseFactory;
 import org.semanticweb.elk.owl.inferences.ElkInference;
-import org.semanticweb.elk.owl.inferences.ElkInferenceExamples;
 import org.semanticweb.elk.owl.inferences.ElkInferenceSet;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
@@ -48,7 +46,8 @@ public class ElkProofStep implements ProofStep<ElkAxiom> {
 		this.inferenceSet_ = inferenceSet;
 	}
 
-	public ElkInference getElkInference() {
+	@Override
+	public ElkInference getInference() {
 		return inference_;
 	}
 
@@ -99,11 +98,6 @@ public class ElkProofStep implements ProofStep<ElkAxiom> {
 	@Override
 	public String toString() {
 		return inference_.toString();
-	}
-
-	@Override
-	public Inference<ElkAxiom> getExample() {
-		return ElkInferenceExamples.getExample(inference_);
 	}
 
 }

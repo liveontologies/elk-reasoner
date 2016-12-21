@@ -22,7 +22,7 @@ package org.semanticweb.elk.owlapi.proofs;
  * #L%
  */
 
-import java.util.ArrayList;
+import java.util.AbstractList;
 import java.util.List;
 
 import org.liveontologies.proof.util.Inference;
@@ -55,12 +55,20 @@ public class ElkOwlInference implements Inference<OWLAxiom> {
 
 	@Override
 	public List<? extends OWLAxiom> getPremises() {
-		List<OWLAxiom> result = new ArrayList<OWLAxiom>();
-		List<? extends ElkAxiom> premises = elkInference_.getPremises();
-		for (int i = 0; i < elkInference_.getPremiseCount(); i++) {
-			result.add(convert(premises.get(i)));
-		}
-		return result;
+		final List<? extends ElkAxiom> original = elkInference_.getPremises();
+		return new AbstractList<OWLAxiom>() {
+
+			@Override
+			public OWLAxiom get(int index) {
+				return convert(original.get(index));
+			}
+
+			@Override
+			public int size() {
+				return original.size();
+			}
+
+		};
 	}
 
 	@Override

@@ -34,7 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.liveontologies.owlapi.proof.OWLProver;
-import org.liveontologies.proof.util.ProofNodes;
+import org.liveontologies.proof.util.InferenceSets;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
 import org.semanticweb.elk.reasoner.tracing.TracingTestManifest;
@@ -123,11 +123,7 @@ public class AllOntologiesProofTest extends BaseProofTest {
 												subsumer);
 								assertTrue(String.format(
 										"Entailment %s not derivable!", axiom),
-										ProofNodes
-												.isDerivable(
-														prover.getProof(axiom)
-																.getRoot(),
-														axioms));
+										InferenceSets.isDerivable(prover.getProof(axiom), axiom, axioms));
 							} catch (Exception e) {
 								throw new RuntimeException(
 										"Exception while running proof test: "

@@ -27,10 +27,10 @@ package org.semanticweb.elk.owlapi.proofs;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.liveontologies.owlapi.proof.OWLProofNode;
-import org.liveontologies.owlapi.proof.OWLProofStep;
 import org.liveontologies.owlapi.proof.OWLProver;
 import org.liveontologies.proof.util.ProofNode;
+import org.liveontologies.proof.util.ProofNodes;
+import org.liveontologies.proof.util.ProofStep;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.parameters.Imports;
 
@@ -56,16 +56,18 @@ public class Proofs {
 		final Set<OWLAxiom> stated = reasoner.getRootOntology()
 				.getAxioms(Imports.INCLUDED);
 
-		ProofExplorer.visitInferences(reasoner.getProof(entailment).getRoot(),
+		ProofExplorer.visitInferences(
+				ProofNodes.create(reasoner.getProof(entailment), entailment),
 				new ProofExplorer.Controller() {
 
 					@Override
-					public boolean nodeVisited(OWLProofNode node) {
+					public boolean nodeVisited(ProofNode<OWLAxiom> node) {
 						return false;
 					}
 
 					@Override
-					public boolean inferenceVisited(OWLProofStep inference) {
+					public boolean inferenceVisited(
+							ProofStep<OWLAxiom> inference) {
 						for (ProofNode<OWLAxiom> premise : inference
 								.getPremises()) {
 							OWLAxiom member = premise.getMember();

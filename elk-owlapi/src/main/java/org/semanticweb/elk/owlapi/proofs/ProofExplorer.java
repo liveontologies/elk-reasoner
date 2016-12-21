@@ -29,8 +29,9 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-import org.liveontologies.owlapi.proof.OWLProofNode;
-import org.liveontologies.owlapi.proof.OWLProofStep;
+import org.liveontologies.proof.util.ProofNode;
+import org.liveontologies.proof.util.ProofStep;
+import org.semanticweb.owlapi.model.OWLAxiom;
 
 /**
  * 
@@ -50,19 +51,19 @@ public class ProofExplorer {
 	/**
 	 * nodes to be visited yet
 	 */
-	private final Queue<OWLProofNode> toDo_ = new LinkedList<OWLProofNode>();
+	private final Queue<ProofNode<OWLAxiom>> toDo_ = new LinkedList<ProofNode<OWLAxiom>>();
 
 	/**
 	 * all nodes ever encountered
 	 */
-	private final Set<OWLProofNode> all_ = new HashSet<OWLProofNode>();
+	private final Set<ProofNode<OWLAxiom>> all_ = new HashSet<ProofNode<OWLAxiom>>();
 
-	ProofExplorer(OWLProofNode root, Controller listener) {
+	ProofExplorer(ProofNode<OWLAxiom> root, Controller listener) {
 		this.controller_ = listener;
 		toDo(root);
 	}
 
-	boolean toDo(OWLProofNode node) {
+	boolean toDo(ProofNode<OWLAxiom> node) {
 		if (all_.add(node)) {
 			toDo_.add(node);
 			return true;
@@ -73,16 +74,16 @@ public class ProofExplorer {
 
 	void process() {
 		for (;;) {
-			OWLProofNode next = toDo_.poll();
+			ProofNode<OWLAxiom> next = toDo_.poll();
 
 			if (next == null) {
 				break;
 			}
 
-			for (OWLProofStep inf : next.getInferences()) {
+			for (ProofStep<OWLAxiom> inf : next.getInferences()) {
 
 				// recursively unwind premise inferences
-				for (OWLProofNode premise : inf.getPremises()) {
+				for (ProofNode<OWLAxiom> premise : inf.getPremises()) {
 					// proof reader guarantees equality for structurally
 					// equivalent expressions so we avoid infinite loops here
 					toDo(premise);
@@ -100,7 +101,7 @@ public class ProofExplorer {
 		}
 	}
 
-	public static void visitInferences(OWLProofNode root,
+	public static void visitInferences(ProofNode<OWLAxiom> root,
 			Controller controller) {
 		new ProofExplorer(root, controller).process();
 	}
@@ -114,7 +115,7 @@ public class ProofExplorer {
 		 * @return {@code true} if no further nodes should be visited and
 		 *         {@code false} otherwise
 		 */
-		boolean nodeVisited(OWLProofNode node);
+		boolean nodeVisited(ProofNode<OWLAxiom> node);
 
 		/**
 		 * Signals that an inference of a node is visited
@@ -123,7 +124,7 @@ public class ProofExplorer {
 		 * @return {@code true} if no further inferences of this node should be
 		 *         visited and {@code false} otherwise
 		 */
-		boolean inferenceVisited(OWLProofStep inference);
+		boolean inferenceVisited(ProofStep<OWLAxiom> inference);
 
 	}
 }

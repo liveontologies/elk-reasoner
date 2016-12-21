@@ -154,7 +154,7 @@ public class FlattenedElkInferenceSet
 	static ElkInference getInference(ProofStep<?> step) {
 		for (;;) {
 			if (step instanceof ElkProofStep) {
-				return ((ElkProofStep) step).getElkInference();
+				return ((ElkProofStep) step).getInference();
 			}
 			// else
 			if (step instanceof Delegator<?>) {
