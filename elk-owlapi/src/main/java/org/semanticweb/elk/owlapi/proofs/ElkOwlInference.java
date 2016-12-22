@@ -26,20 +26,19 @@ import java.util.AbstractList;
 import java.util.List;
 
 import org.liveontologies.proof.util.Inference;
-import org.semanticweb.elk.owl.inferences.ElkInference;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owlapi.ElkConverter;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
 public class ElkOwlInference implements Inference<OWLAxiom> {
 
-	private final ElkInference elkInference_;
+	private final Inference<ElkAxiom> elkInference_;
 
-	public ElkOwlInference(ElkInference elkInference) {
+	public ElkOwlInference(Inference<ElkAxiom> elkInference) {
 		this.elkInference_ = elkInference;
 	}
 
-	public ElkInference getElkInference() {
+	public Inference<ElkAxiom> getElkInference() {
 		return elkInference_;
 	}
 

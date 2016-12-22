@@ -37,6 +37,7 @@ import org.protege.editor.owl.model.event.EventType;
 import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
 import org.semanticweb.elk.owlapi.ElkReasoner;
+import org.semanticweb.elk.owlapi.proofs.ElkOwlInferenceExamples;
 import org.semanticweb.elk.owlapi.proofs.ElkOwlInferenceSet;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
@@ -175,8 +176,7 @@ public class ElkProofService extends ProofService
 
 	@Override
 	public InferenceExampleProvider<OWLAxiom> getExampleProvider() {
-		// TODO Auto-generated method stub
-		return null;
+		return new ElkOwlInferenceExamples();
 	}
 
 }

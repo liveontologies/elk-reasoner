@@ -25,7 +25,10 @@ package org.semanticweb.elk.owl.inferences;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.liveontologies.proof.util.Inference;
+import org.liveontologies.proof.util.InferenceExampleProvider;
 import org.semanticweb.elk.owl.implementation.ElkObjectBaseFactory;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
@@ -48,14 +51,8 @@ import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
  * 
  * @author Yevgeny Kazakov
  */
-public class ElkInferenceExamples
-		implements ElkInference.Visitor<ElkInference> {
-
-	private final static ElkInferenceExamples INSTANCE_ = new ElkInferenceExamples();
-
-	public static ElkInference getExample(ElkInference inference) {
-		return inference.accept(INSTANCE_);
-	}
+public class ElkInferenceExamples implements InferenceExampleProvider<ElkAxiom>,
+		ElkInference.Visitor<ElkInference> {
 
 	private final ElkObject.Factory elkFactory_ = new ElkObjectBaseFactory();
 
@@ -64,8 +61,13 @@ public class ElkInferenceExamples
 
 	private final ElkInference.Factory inferenceFactory_ = new ElkInferenceBaseFactory();
 
-	private ElkInferenceExamples() {
-
+	@Override
+	public Inference<ElkAxiom> getExample(Inference<ElkAxiom> inference) {
+		if (inference instanceof ElkInference) {
+			return ((ElkInference) inference).accept(this);
+		}
+		// else
+		return null;
 	}
 
 	private ElkClass getClass(String name) {
