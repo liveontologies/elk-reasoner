@@ -31,9 +31,9 @@ import java.util.Set;
 
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.loading.AxiomLoader;
+import org.semanticweb.elk.loading.ClassQueryLoader;
 import org.semanticweb.elk.loading.ComposedAxiomLoader;
 import org.semanticweb.elk.loading.EntailmentQueryLoader;
-import org.semanticweb.elk.loading.ClassQueryLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -55,7 +55,6 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
@@ -66,10 +65,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.DerivedClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.ElkIndividualKeyProvider;
@@ -83,6 +79,8 @@ import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
+import org.semanticweb.elk.reasoner.tracing.DummyConclusionVisitor;
 import org.semanticweb.elk.reasoner.tracing.TraceState;
 import org.semanticweb.elk.reasoner.tracing.TracingInferenceSet;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -1003,84 +1001,17 @@ public abstract class AbstractReasonerState {
 	 * TRACING METHODS
 	 *---------------------------------------------------*/
 
-	public void visitDerivedConclusionsForSubsumption(
-			ElkClassExpression subClass, ElkClassExpression superClass,
-			DerivedClassConclusionVisitor visitor) throws ElkException {
-		// ensure checking consistency is done
-		isInconsistent();
-		// checking owl:Thing consistency
-		if (consistencyCheckingState.isOwlThingInconsistent()) {
-			if (!visitor.inconsistentOwlThing(
-					factory_.getContradiction(ontologyIndex.getOwlThing()))) {
-				return;
-			}
-		}
-		// processing inconsistent individuals
-		for (IndexedIndividual ind : consistencyCheckingState
-				.getInconsistentIndividuals()) {
-			if (!visitor.inconsistentIndividual(factory_.getContradiction(ind),
-					ind.getElkEntity())) {
-				return;
-			}
-		}		
-		// a workaround to ensure that subClass and superClass are properly
-		// indexed and saturated TODO: support using entailment queries
-		try {
-			if (!(subClass instanceof ElkClass)) {
-				querySatisfiability(subClass);
-			}
-			if (!(superClass instanceof ElkClass)) {
-				querySatisfiability(superClass);
-			}
-		} catch (ElkInconsistentOntologyException ignore) {
-			// ignore
-		}
-		// checking inconsistency of subClass
-		ModifiableIndexedClassExpression root = subClass
-				.accept(expressionConverter_);
-		if (root == null) {
-			return;
-		}
-		getTaxonomyQuietly(); // ensure classes are saturated
-		ClassInconsistency conclusion = checkDerived(
-				factory_.getContradiction(root));
-		if (conclusion != null && !visitor.inconsistentSubClass(conclusion)) {
-			return;
-		}
-		// checking subsumption
-		IndexedClassExpression superExpression = superClass
-				.accept(expressionConverter_);
-		if (superExpression == null) {
-			return;
-		}
-		SubClassInclusionComposed subsumption = checkDerived(
-				factory_.getSubClassInclusionComposed(root, superExpression));
-		if (subsumption != null
-				&& !visitor.derivedClassInclusion(subsumption)) {
-			return;
-		}
-	}
-
-	private <C extends ClassConclusion> C checkDerived(C conclusion)
-			throws ElkException {
-		Context context = saturationState.getContext(conclusion.getDestination());
-		if (context == null) {
-			// not derived
-			return null;
-		}
-		// else
-		if (context.containsConclusion(conclusion)) {
-			return conclusion;
-		}
-		// else not derived
-		return null;
-	}
-
 	public TracingInferenceSet explainConclusions(
-			Iterable<? extends ClassConclusion> conclusions)
+			final Iterable<? extends Conclusion> conclusions)
 			throws ElkException {
-		for (ClassConclusion conclusion : conclusions) {
-			traceState_.toTrace(conclusion);
+		for (final Conclusion conclusion : conclusions) {
+			conclusion.accept(new DummyConclusionVisitor<Void>() {
+				@Override
+				protected Void defaultVisit(final ClassConclusion conclusion) {
+					traceState_.toTrace(conclusion);
+					return null;
+				}
+			});
 		}
 		stageManager.inferenceTracingStage.invalidateRecursive();
 		getTaxonomyQuietly(); // ensure that classes are saturated
@@ -1088,7 +1019,7 @@ public abstract class AbstractReasonerState {
 		return traceState_;
 	}
 
-	public TracingInferenceSet explainConclusion(ClassConclusion conclusion)
+	public TracingInferenceSet explainConclusion(final Conclusion conclusion)
 			throws ElkException {
 		LOGGER_.debug("{}: explaining", conclusion);
 		return explainConclusions(Collections.singleton(conclusion));

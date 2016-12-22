@@ -1,7 +1,3 @@
-package org.semanticweb.elk.matching;
-
-import java.util.Collections;
-
 /*
  * #%L
  * ELK Proofs Package
@@ -23,7 +19,9 @@ import java.util.Collections;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.matching;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -36,8 +34,10 @@ import org.semanticweb.elk.owl.inferences.ElkInferenceProducer;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 import org.semanticweb.elk.reasoner.tracing.TracingInferenceSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,6 +112,17 @@ public class Matcher {
 								conclusionMatchFactory_
 										.getObjectOneOf(Collections
 												.singletonList(inconsistent))));
+		process();
+	}
+
+	public void trace(final SubPropertyChain conclusion,
+			final ElkSubObjectPropertyExpression subChainMatch,
+			final ElkSubObjectPropertyExpression superPropertyMatch) {
+		conclusionMatchFactory_
+				.getSubPropertyChainMatch2(
+						conclusionMatchFactory_.getSubPropertyChainMatch1(
+								conclusion, superPropertyMatch, 0),
+						subChainMatch, 0);
 		process();
 	}
 

@@ -90,6 +90,7 @@ public class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 					InstanceTaxonomyComputation.class.getSimpleName()
 							+ " did not add all individuals to the taxonomy!");
 		}
+		reasoner.instanceTaxonomyState.taxonomyComplete();
 		reasoner.ontologyIndex.initIndividualChanges();
 		// reasoner.ruleAndConclusionStats.add(computation_.getRuleAndConclusionStatistics());
 		this.computation_ = null;

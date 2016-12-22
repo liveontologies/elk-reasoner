@@ -120,6 +120,16 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 		}
 
 		@Override
+		public Entailment getEntailment() throws ElkQueryException {
+			if (indexed == null) {
+				throw new ElkQueryException(
+						"Query was not indexed: " + getQuery());
+			}
+			// else
+			return indexed.getQuery();
+		}
+
+		@Override
 		public boolean isEntailed() throws ElkQueryException {
 			if (indexed == null) {
 				throw new ElkQueryException(

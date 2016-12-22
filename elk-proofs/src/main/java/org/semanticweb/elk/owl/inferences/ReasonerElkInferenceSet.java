@@ -1,8 +1,3 @@
-package org.semanticweb.elk.owl.inferences;
-
-import java.util.Collection;
-import java.util.List;
-
 /*
  * #%L
  * ELK Proofs Package
@@ -24,36 +19,32 @@ import java.util.List;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.owl.inferences;
+
+import java.util.Collection;
 
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
-import org.semanticweb.elk.matching.Matcher;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
-import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
-import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
-import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.DerivedClassConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
+import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;
+import org.semanticweb.elk.reasoner.query.ElkQueryException;
+import org.semanticweb.elk.reasoner.query.EntailmentQueryResult;
+import org.semanticweb.elk.reasoner.query.ProperEntailmentQueryResult;
+import org.semanticweb.elk.reasoner.query.UnsupportedIndexingEntailmentQueryResult;
+import org.semanticweb.elk.reasoner.query.UnsupportedQueryTypeEntailmentQueryResult;
 
 /**
  * A set of inferences necessary to derive a given {@link ElkAxiom}s provided by
  * {@link Reasoner}.
  * 
  * @author Yevgeny Kazakov
+ * @author Peter Skocovsky
  */
 public class ReasonerElkInferenceSet extends ModifiableElkInferenceSetImpl {
 
 	private final Reasoner reasoner_;
-
-	private final ElkObject.Factory elkFactory_;
 
 	private final ElkInference.Factory inferenceFactory_;
 
@@ -61,11 +52,15 @@ public class ReasonerElkInferenceSet extends ModifiableElkInferenceSetImpl {
 			ElkObject.Factory elkFactory) {
 		super(elkFactory);
 		this.reasoner_ = reasoner;
-		this.elkFactory_ = elkFactory;
 		this.inferenceFactory_ = new ElkInferenceOptimizedProducingFactory(this,
 				elkFactory);
 		synchronized (this) {
-			goal.accept(new InferenceGenerator());
+			try {
+				generateInferences(goal);
+			} catch (final ElkException e) {
+				// TODO: Maybe add throws declaration instead!
+				throw new ElkRuntimeException(e);
+			}
 		}
 	}
 
@@ -75,135 +70,47 @@ public class ReasonerElkInferenceSet extends ModifiableElkInferenceSetImpl {
 		return super.get(conclusion);
 	}
 
-	private void addInferencesForSubsumption(final ElkClassExpression subClass,
-			final ElkClassExpression superClass) {
-		if (superClass.equals(elkFactory_.getOwlThing())) {
-			inferenceFactory_.getElkClassInclusionOwlThing(subClass);
-		}
-		try {
-			DerivedClassConclusionVisitor conclusionVisitor = new DerivedClassConclusionVisitor() {
+	private void generateInferences(final ElkAxiom goal) throws ElkException {
 
-				@Override
-				public boolean inconsistentOwlThing(
-						ClassInconsistency conclusion) throws ElkException {
-					Matcher matcher = new Matcher(
-							reasoner_.explainConclusion(conclusion),
-							elkFactory_, inferenceFactory_);
-					matcher.trace(conclusion, elkFactory_.getOwlThing());
-					inferenceFactory_.getElkClassInclusionOwlThing(subClass);
-					inferenceFactory_
-							.getElkClassInclusionOwlNothing(superClass);
-					inferenceFactory_.getElkClassInclusionHierarchy(subClass,
-							elkFactory_.getOwlThing(),
-							elkFactory_.getOwlNothing(), superClass);
-					return true;
+		final EntailmentQueryResult result = reasoner_.isEntailed(goal);
+
+		result.accept(new EntailmentQueryResult.Visitor<Void>() {
+
+			@Override
+			public Void visit(final ProperEntailmentQueryResult result)
+					throws ElkQueryException {
+
+				try {
+					final EntailmentInferenceSet evidence = result
+							.getEvidence(false);
+					new ElkProofGenerator(evidence, reasoner_,
+							inferenceFactory_).generate(result.getEntailment());
+				} finally {
+					result.unlock();
 				}
 
-				@Override
-				public boolean inconsistentIndividual(
-						ClassInconsistency conclusion, ElkIndividual entity)
-						throws ElkException {
-					Matcher matcher = new Matcher(
-							reasoner_.explainConclusion(conclusion),
-							elkFactory_, inferenceFactory_);
-					matcher.trace(conclusion, entity);
-
-					inferenceFactory_.getElkClassInclusionOwlThing(subClass);
-
-					inferenceFactory_
-							.getElkClassInclusionTopObjectHasValue(entity);
-
-					inferenceFactory_.getElkEquivalentClassesObjectHasValue(
-							elkFactory_.getOwlTopObjectProperty(), entity);
-					ElkObjectHasValue hasValue = elkFactory_.getObjectHasValue(
-							elkFactory_.getOwlTopObjectProperty(), entity);
-					ElkObjectOneOf nominal = elkFactory_.getObjectOneOf(entity);
-					ElkObjectSomeValuesFrom existential = elkFactory_
-							.getObjectSomeValuesFrom(
-									elkFactory_.getOwlTopObjectProperty(),
-									nominal);
-					inferenceFactory_.getElkClassInclusionOfEquivaletClasses(
-							hasValue, existential, true);
-
-					inferenceFactory_
-							.getElkClassInclusionExistentialFillerExpansion(
-									elkFactory_.getOwlTopObjectProperty(),
-									nominal, elkFactory_.getOwlNothing());
-
-					inferenceFactory_.getElkClassInclusionExistentialOwlNothing(
-							elkFactory_.getOwlTopObjectProperty());
-
-					inferenceFactory_
-							.getElkClassInclusionOwlNothing(superClass);
-
-					inferenceFactory_.getElkClassInclusionHierarchy(subClass,
-							elkFactory_.getOwlThing(), hasValue, existential,
-							elkFactory_.getObjectSomeValuesFrom(
-									elkFactory_.getOwlTopObjectProperty(),
-									elkFactory_.getOwlNothing()),
-							elkFactory_.getOwlNothing(), superClass);
-					return true;
-				}
-
-				@Override
-				public boolean inconsistentSubClass(
-						ClassInconsistency conclusion) throws ElkException {
-					Matcher matcher = new Matcher(
-							reasoner_.explainConclusion(conclusion),
-							elkFactory_, inferenceFactory_);
-					matcher.trace(conclusion, subClass);
-					inferenceFactory_
-							.getElkClassInclusionOwlNothing(superClass);
-					inferenceFactory_.getElkClassInclusionHierarchy(subClass,
-							elkFactory_.getOwlNothing(), superClass);
-					return true;
-				}
-
-				@Override
-				public boolean derivedClassInclusion(
-						SubClassInclusionComposed conclusion)
-						throws ElkException {
-					Matcher matcher = new Matcher(
-							reasoner_.explainConclusion(conclusion),
-							elkFactory_, inferenceFactory_);
-					matcher.trace(conclusion, subClass, superClass);
-					return true;
-				}
-
-			};
-			reasoner_.visitDerivedConclusionsForSubsumption(subClass,
-					superClass, conclusionVisitor);
-		} catch (ElkException e) {
-			throw new ElkRuntimeException(e);
-		}
-	}
-
-	private class InferenceGenerator extends DummyElkAxiomVisitor<Void> {
-
-		@Override
-		public Void defaultVisit(ElkAxiom axiom) {
-			throw new ElkRuntimeException("Cannot generate proof for " + axiom);
-		}
-
-		@Override
-		public Void visit(ElkSubClassOfAxiom axiom) {
-			addInferencesForSubsumption(axiom.getSubClassExpression(),
-					axiom.getSuperClassExpression());
-			return null;
-		}
-
-		@Override
-		public Void visit(ElkEquivalentClassesAxiom axiom) {
-			List<? extends ElkClassExpression> equivalent = axiom
-					.getClassExpressions();
-			ElkClassExpression first = equivalent.get(equivalent.size() - 1);
-			for (ElkClassExpression second : equivalent) {
-				addInferencesForSubsumption(first, second);
-				first = second;
+				return null;
 			}
-			inferenceFactory_.getElkEquivalentClassesCycle(equivalent);
-			return null;
-		}
+
+			@Override
+			public Void visit(
+					final UnsupportedIndexingEntailmentQueryResult result) {
+				/*
+				 * Indexing of some subexpression of the entailment is not
+				 * supported, so we can generate only empty proof. The warning
+				 * should be logged during loading of the entailment query.
+				 */
+				return null;
+			}
+
+			@Override
+			public Void visit(
+					final UnsupportedQueryTypeEntailmentQueryResult result) {
+				throw new ElkRuntimeException(
+						"Cannot check entailment: " + goal);
+			}
+
+		});
 
 	}
 

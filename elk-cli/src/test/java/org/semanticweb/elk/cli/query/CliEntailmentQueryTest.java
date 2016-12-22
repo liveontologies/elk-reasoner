@@ -183,7 +183,11 @@ public class CliEntailmentQueryTest extends
 		public Boolean visit(
 				final ProperEntailmentQueryResult properEntailmentQueryResult)
 				throws ElkQueryException {
-			return properEntailmentQueryResult.isEntailed();
+			try {
+				return properEntailmentQueryResult.isEntailed();
+			} finally {
+				properEntailmentQueryResult.unlock();
+			}
 		}
 
 		@Override

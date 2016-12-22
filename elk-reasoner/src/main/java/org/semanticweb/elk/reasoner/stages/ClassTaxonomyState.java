@@ -71,14 +71,16 @@ public class ClassTaxonomyState {
 	private UpdateableTaxonomy<ElkClass> taxonomy_ = null;
 
 	/**
-	 * Contains at least all classes that are in ontology, but either are
-	 * removed from taxonomy or their super-nodes in taxonomy were removed.
+	 * Contains at least all classes that are in ontology, but either were
+	 * removed from taxonomy or their super-nodes in taxonomy were removed since
+	 * the last completed construction of the taxonomy.
 	 */
 	private final Queue<IndexedClass> toAdd_ = new ConcurrentLinkedQueue<IndexedClass>();
 
 	/**
-	 * Contains at least all classes that are in taxonomy, but either are
-	 * removed from ontology or their context became not saturated.
+	 * Contains at least all classes that are in taxonomy, but either were
+	 * removed from ontology or their context became not saturated since the
+	 * last completed construction of the taxonomy.
 	 */
 	private final Queue<IndexedClass> toRemove_ = new ConcurrentLinkedQueue<IndexedClass>();
 
@@ -336,6 +338,16 @@ public class ClassTaxonomyState {
 		toAdd_.clear();
 		toAdd_.addAll(ontologyIndex_.getClasses());
 
+	}
+
+	/**
+	 * Notifies this {@link ClassTaxonomyState} that the taxonomy has just been
+	 * completely construction.
+	 */
+	void taxonomyComplete() {
+		// Clear pending classes.
+		toRemove_.clear();
+		toAdd_.clear();
 	}
 
 	void addListener(final Listener listener) {

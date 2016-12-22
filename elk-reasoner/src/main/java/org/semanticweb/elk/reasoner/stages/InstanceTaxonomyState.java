@@ -72,14 +72,16 @@ public class InstanceTaxonomyState {
 	private UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy_ = null;
 
 	/**
-	 * Contains at least all individuals that are in ontology, but either are
-	 * removed from taxonomy or their type nodes in taxonomy were removed.
+	 * Contains at least all individuals that are in ontology, but either were
+	 * removed from taxonomy or their type nodes in taxonomy were removed since
+	 * the last completed construction of the taxonomy.
 	 */
 	private final Queue<IndexedIndividual> toAdd_ = new ConcurrentLinkedQueue<IndexedIndividual>();
 
 	/**
-	 * Contains at least all individuals that are in taxonomy, but either are
-	 * removed from ontology or their context became not saturated.
+	 * Contains at least all individuals that are in taxonomy, but either were
+	 * removed from ontology or their context became not saturated since the
+	 * last completed construction of the taxonomy.
 	 */
 	private final Queue<IndexedIndividual> toRemove_ = new ConcurrentLinkedQueue<IndexedIndividual>();
 
@@ -312,6 +314,16 @@ public class InstanceTaxonomyState {
 		toAdd_.clear();
 		toAdd_.addAll(ontologyIndex_.getIndividuals());
 
+	}
+
+	/**
+	 * Notifies this {@link InstanceTaxonomyState} that the taxonomy has just
+	 * been completely construction.
+	 */
+	void taxonomyComplete() {
+		// Clear pending individuals.
+		toRemove_.clear();
+		toAdd_.clear();
 	}
 
 	private final ClassTaxonomyState.Listener CLASS_TAXONOMY_STATE_LISTENER = new ClassTaxonomyState.Listener() {

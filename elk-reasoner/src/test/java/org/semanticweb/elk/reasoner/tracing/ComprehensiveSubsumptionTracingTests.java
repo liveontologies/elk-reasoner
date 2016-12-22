@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.tracing;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,8 +19,10 @@ package org.semanticweb.elk.reasoner.tracing;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.tracing;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,6 +46,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
  *         pavel.klinov@uni-ulm.de
  * 
  * @author Yevgeny Kazakov
+ * @author Peter Skocovsky
  */
 public class ComprehensiveSubsumptionTracingTests implements TracingTests {
 
@@ -70,6 +68,13 @@ public class ComprehensiveSubsumptionTracingTests implements TracingTests {
 		// else
 
 		Taxonomy<ElkClass> classTaxonomy = reasoner_.getTaxonomy();
+		/*
+		 * Store a copy of the taxonomy, because it may change during the
+		 * reasoning.
+		 */
+		final Collection<List<ElkClass>> equivalences = new ArrayList<List<ElkClass>>();
+		final List<ElkClass> subClasses = new ArrayList<ElkClass>();
+		final List<ElkClass> superClasses = new ArrayList<ElkClass>();
 		Set<TaxonomyNode<ElkClass>> visited = new HashSet<TaxonomyNode<ElkClass>>();
 		Queue<TaxonomyNode<ElkClass>> toDo = new LinkedList<TaxonomyNode<ElkClass>>();
 
@@ -79,7 +84,7 @@ public class ComprehensiveSubsumptionTracingTests implements TracingTests {
 			TaxonomyNode<ElkClass> next = toDo.poll();
 
 			if (next == null) {
-				return;
+				break;
 			}
 
 			int nextSize = next.size();
@@ -88,17 +93,27 @@ public class ComprehensiveSubsumptionTracingTests implements TracingTests {
 				for (ElkClass member : next) {
 					equivalent.add(member);
 				}
-				visitor.testEquivalence(equivalent);
+				equivalences.add(equivalent);
 			}
 
 			for (TaxonomyNode<ElkClass> subNode : next.getDirectSubNodes()) {
-				visitor.testSubsumption(subNode.getCanonicalMember(),
-						next.getCanonicalMember());
+				subClasses.add(subNode.getCanonicalMember());
+				superClasses.add(next.getCanonicalMember());
 				if (visited.add(subNode)) {
 					toDo.add(subNode);
 				}
 			}
 		}
+
+		for (final List<ElkClass> equivalence : equivalences) {
+			visitor.testEquivalence(equivalence);
+		}
+
+		for (int index = 0; index < subClasses.size(); index++) {
+			visitor.testSubsumption(subClasses.get(index),
+					superClasses.get(index));
+		}
+
 	}
 
 }

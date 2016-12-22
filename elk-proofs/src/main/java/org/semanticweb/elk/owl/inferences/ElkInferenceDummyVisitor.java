@@ -1,5 +1,3 @@
-package org.semanticweb.elk.owl.inferences;
-
 /*
  * #%L
  * ELK Proofs Package
@@ -21,6 +19,7 @@ package org.semanticweb.elk.owl.inferences;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.owl.inferences;
 
 /**
  * A {@link ElkInference.Visitor} that always returns {@code null}. Can be used
@@ -35,6 +34,11 @@ public class ElkInferenceDummyVisitor<O> implements ElkInference.Visitor<O> {
 
 	protected O defaultVisit(ElkInference inference) {
 		return null;
+	}
+
+	@Override
+	public O visit(final ElkClassAssertionOfClassInclusion inference) {
+		return defaultVisit(inference);
 	}
 
 	@Override
@@ -149,12 +153,22 @@ public class ElkInferenceDummyVisitor<O> implements ElkInference.Visitor<O> {
 	}
 
 	@Override
+	public O visit(final ElkClassInclusionOwlBottomObjectProperty inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
 	public O visit(ElkClassInclusionOwlNothing inference) {
 		return defaultVisit(inference);
 	}
 
 	@Override
 	public O visit(ElkClassInclusionOwlThing inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
+	public O visit(final ElkClassInclusionOwlTopObjectProperty inference) {
 		return defaultVisit(inference);
 	}
 

@@ -1,5 +1,3 @@
-package org.semanticweb.elk.owl.inferences;
-
 /*
  * #%L
  * ELK Proofs Package
@@ -21,6 +19,7 @@ package org.semanticweb.elk.owl.inferences;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.owl.inferences;
 
 public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 
@@ -50,6 +49,17 @@ public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 
 	ElkInferenceEquality(ElkInference other) {
 		this.other_ = other;
+	}
+
+	@Override
+	public Boolean visit(final ElkClassAssertionOfClassInclusion inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(ElkClassAssertionOfClassInclusion other) {
+				return equals(other.getInstance(), inference.getInstance())
+						&& equals(other.getType(), inference.getType());
+			}
+		});
 	}
 
 	@Override
@@ -344,6 +354,18 @@ public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 	}
 
 	@Override
+	public Boolean visit(
+			final ElkClassInclusionOwlBottomObjectProperty inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(
+					final ElkClassInclusionOwlBottomObjectProperty other) {
+				return true;
+			}
+		});
+	}
+
+	@Override
 	public Boolean visit(final ElkClassInclusionOwlNothing inference) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
@@ -359,6 +381,18 @@ public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 			@Override
 			public Boolean visit(ElkClassInclusionOwlThing other) {
 				return equals(other.getSubClass(), inference.getSubClass());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(
+			final ElkClassInclusionOwlTopObjectProperty inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(
+					final ElkClassInclusionOwlTopObjectProperty other) {
+				return true;
 			}
 		});
 	}

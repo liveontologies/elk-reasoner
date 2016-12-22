@@ -1,5 +1,3 @@
-package org.semanticweb.elk.owl.inferences;
-
 /*-
  * #%L
  * ELK Proofs Package
@@ -21,6 +19,7 @@ package org.semanticweb.elk.owl.inferences;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.owl.inferences;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -115,6 +114,13 @@ public class ElkInferenceExamples implements InferenceExampleProvider<ElkAxiom>,
 
 	private ElkObjectProperty getObjectProperty(String name) {
 		return elkFactory_.getObjectProperty(getIri(name));
+	}
+
+	@Override
+	public ElkClassAssertionOfClassInclusion visit(
+			final ElkClassAssertionOfClassInclusion inference) {
+		return inferenceFactory_.getElkClassAssertionOfClassInclusion(
+				getIndividual("a"), getClass("C"));
 	}
 
 	@Override
@@ -288,6 +294,12 @@ public class ElkInferenceExamples implements InferenceExampleProvider<ElkAxiom>,
 	}
 
 	@Override
+	public ElkInference visit(
+			final ElkClassInclusionOwlBottomObjectProperty inference) {
+		return inferenceFactory_.getElkClassInclusionOwlBottomObjectProperty();
+	}
+
+	@Override
 	public ElkClassInclusionOwlNothing visit(
 			ElkClassInclusionOwlNothing inference) {
 		return inferenceFactory_.getElkClassInclusionOwlNothing(getClass("C"));
@@ -297,6 +309,12 @@ public class ElkInferenceExamples implements InferenceExampleProvider<ElkAxiom>,
 	public ElkClassInclusionOwlThing visit(
 			ElkClassInclusionOwlThing inference) {
 		return inferenceFactory_.getElkClassInclusionOwlThing(getClass("C"));
+	}
+
+	@Override
+	public ElkInference visit(
+			final ElkClassInclusionOwlTopObjectProperty inference) {
+		return inferenceFactory_.getElkClassInclusionOwlTopObjectProperty();
 	}
 
 	@Override

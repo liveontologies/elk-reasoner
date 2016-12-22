@@ -1,5 +1,3 @@
-package org.semanticweb.elk.owlapi.proofs;
-
 /*-
  * #%L
  * ELK OWL API Binding
@@ -21,19 +19,29 @@ package org.semanticweb.elk.owlapi.proofs;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.owlapi.proofs;
 
 import java.util.Collection;
 
 import org.liveontologies.proof.util.BaseInferenceSet;
 import org.liveontologies.proof.util.DynamicInferenceSet;
 import org.liveontologies.proof.util.Inference;
+import org.semanticweb.elk.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.inferences.ElkInference;
 import org.semanticweb.elk.owl.inferences.ElkInferenceOptimizedProducingFactory;
 import org.semanticweb.elk.owl.inferences.ElkInferenceProducer;
 import org.semanticweb.elk.owl.inferences.ElkProofGenerator;
-import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owlapi.ElkConverter;
 import org.semanticweb.elk.owlapi.ElkReasoner;
-import org.semanticweb.elk.owlapi.wrapper.OwlClassAxiomConverterVisitor;
+import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
+import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;
+import org.semanticweb.elk.reasoner.query.ElkQueryException;
+import org.semanticweb.elk.reasoner.query.EntailmentQueryResult;
+import org.semanticweb.elk.reasoner.query.ProperEntailmentQueryResult;
+import org.semanticweb.elk.reasoner.query.UnsupportedIndexingEntailmentQueryResult;
+import org.semanticweb.elk.reasoner.query.UnsupportedQueryTypeEntailmentQueryResult;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.UnsupportedEntailmentTypeException;
 
@@ -42,11 +50,11 @@ public class ElkOwlInferenceSet extends BaseInferenceSet<OWLAxiom>
 
 	private final ElkReasoner elkReasoner_;
 
-	private final ElkClassAxiom elkEntailment_;
+	private final OWLAxiom owlEntailment_;
 
 	/**
 	 * true if the inferences in this set are in sync with the inferences
-	 * deriving {@link #elkEntailment_} by {@link #elkReasoner_}
+	 * deriving {@link #owlEntailment_} by {@link #elkReasoner_}
 	 */
 	private boolean inSync_ = false;
 
@@ -56,21 +64,25 @@ public class ElkOwlInferenceSet extends BaseInferenceSet<OWLAxiom>
 	 * @param elkReasoner
 	 */
 	private ElkOwlInferenceSet(ElkReasoner elkReasoner,
-			ElkClassAxiom elkEntailment) {
+			OWLAxiom elkEntailment) {
 		this.elkReasoner_ = elkReasoner;
-		this.elkEntailment_ = elkEntailment;
+		this.owlEntailment_ = elkEntailment;
 		elkReasoner.addListener(this);
 	}
 
 	@Override
 	public synchronized Collection<? extends Inference<OWLAxiom>> getInferences(
 			OWLAxiom conclusion) {
+		ensureSync();
+		return super.getInferences(conclusion);
+	}
+
+	synchronized void ensureSync() {
 		if (!inSync_) {
 			clear();
 			generate();
 			inSync_ = true;
 		}
-		return super.getInferences(conclusion);
 	}
 
 	@Override
@@ -85,24 +97,71 @@ public class ElkOwlInferenceSet extends BaseInferenceSet<OWLAxiom>
 		elkReasoner_.removeListener(this);
 	}
 
-	void generate() {
-		ElkInferenceProducer producer = new ElkInferenceConvertingProducer(
-				this);
-		ElkInference.Factory factory = new ElkInferenceOptimizedProducingFactory(
-				producer);
-		elkEntailment_.accept(new ElkProofGenerator(
-				elkReasoner_.getInternalReasoner(), factory));
+	private void generate() {
+		final OwlConverter owlConverter = OwlConverter.getInstance();
+		final ElkConverter elkConverter = ElkConverter.getInstance();
+		try {
+
+			final ElkAxiom elkAxiom = owlConverter.convert(owlEntailment_);
+			final EntailmentQueryResult result = elkReasoner_
+					.getInternalReasoner().isEntailed(elkAxiom);
+			result.accept(ENTAILMENT_QUERY_RESULT_VISITOR);
+
+		} catch (final ElkException e) {
+			throw elkConverter.convert(e);
+		} catch (final ElkRuntimeException e) {
+			throw elkConverter.convert(e);
+		}
+
 	}
+
+	private final EntailmentQueryResult.Visitor<Void> ENTAILMENT_QUERY_RESULT_VISITOR = new EntailmentQueryResult.Visitor<Void>() {
+
+		@Override
+		public Void visit(final ProperEntailmentQueryResult properResult)
+				throws ElkQueryException {
+			try {
+				final ElkInferenceProducer producer = new ElkInferenceConvertingProducer(
+						ElkOwlInferenceSet.this);
+				final ElkInference.Factory factory = new ElkInferenceOptimizedProducingFactory(
+						producer);
+				final EntailmentInferenceSet evidence = properResult
+						.getEvidence(false);
+				new ElkProofGenerator(evidence,
+						elkReasoner_.getInternalReasoner(), factory)
+								.generate(properResult.getEntailment());
+				return null;
+			} finally {
+				properResult.unlock();
+			}
+		}
+
+		@Override
+		public Void visit(
+				final UnsupportedIndexingEntailmentQueryResult unsupportedIndexing) {
+			/*
+			 * Indexing of some subexpression of the entailment is not
+			 * supported, so we can generate only empty proof. The warning
+			 * should be logged during loading of the entailment query.
+			 */
+			return null;
+		}
+
+		@Override
+		public Void visit(
+				final UnsupportedQueryTypeEntailmentQueryResult unsupportedQueryType) {
+			throw new UnsupportedEntailmentTypeException(owlEntailment_);
+		}
+
+	};
 
 	public static ElkOwlInferenceSet create(ElkReasoner reasoner,
 			OWLAxiom entailment) throws UnsupportedEntailmentTypeException {
-		try {
-			return new ElkOwlInferenceSet(reasoner, entailment
-					.accept(OwlClassAxiomConverterVisitor.getInstance()));
-		} catch (IllegalArgumentException e) {
-			throw new UnsupportedEntailmentTypeException(entailment);
-		}
-
+		final ElkOwlInferenceSet inferenceSet = new ElkOwlInferenceSet(reasoner,
+				entailment);
+		// If the entailment is not supported, throw the exceptions now.
+		inferenceSet.ensureSync();
+		return inferenceSet;
 	}
 
 }

@@ -1,5 +1,3 @@
-package org.semanticweb.elk.owl.inferences;
-
 /*
  * #%L
  * ELK Proofs Package
@@ -21,6 +19,7 @@ package org.semanticweb.elk.owl.inferences;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.owl.inferences;
 
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -47,6 +46,14 @@ public class ElkInferenceHash implements ElkInference.Visitor<Integer> {
 	// forbid construction; only static methods should be used
 	private ElkInferenceHash() {
 
+	}
+
+	@Override
+	public Integer visit(final ElkClassAssertionOfClassInclusion inference) {
+		return combinedHashCode(
+				hashCode(ElkClassAssertionOfClassInclusion.class),
+				hashCode(inference.getInstance()),
+				hashCode(inference.getType()));
 	}
 
 	@Override
@@ -233,6 +240,13 @@ public class ElkInferenceHash implements ElkInference.Visitor<Integer> {
 	}
 
 	@Override
+	public Integer visit(
+			final ElkClassInclusionOwlBottomObjectProperty inference) {
+		return combinedHashCode(
+				hashCode(ElkClassInclusionOwlBottomObjectProperty.class));
+	}
+
+	@Override
 	public Integer visit(ElkClassInclusionOwlNothing inference) {
 		return combinedHashCode(hashCode(ElkClassInclusionOwlNothing.class),
 				hashCode(inference.getSuperClass()));
@@ -242,6 +256,13 @@ public class ElkInferenceHash implements ElkInference.Visitor<Integer> {
 	public Integer visit(ElkClassInclusionOwlThing inference) {
 		return combinedHashCode(hashCode(ElkClassInclusionOwlThing.class),
 				hashCode(inference.getSubClass()));
+	}
+
+	@Override
+	public Integer visit(
+			final ElkClassInclusionOwlTopObjectProperty inference) {
+		return combinedHashCode(
+				hashCode(ElkClassInclusionOwlTopObjectProperty.class));
 	}
 
 	@Override

@@ -1,11 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.tracing;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 /*
  * #%L
  * ELK Reasoner
@@ -27,26 +19,43 @@ import static org.junit.Assert.assertTrue;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.tracing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.MutableBoolean;
 import org.semanticweb.elk.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.entailments.model.Entailment;
+import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
+import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;
+import org.semanticweb.elk.reasoner.entailments.model.HasReason;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.query.ElkQueryException;
+import org.semanticweb.elk.reasoner.query.EntailmentQueryResult;
+import org.semanticweb.elk.reasoner.query.ProperEntailmentQueryResult;
+import org.semanticweb.elk.reasoner.query.UnsupportedIndexingEntailmentQueryResult;
+import org.semanticweb.elk.reasoner.query.UnsupportedQueryTypeEntailmentQueryResult;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.DerivedClassConclusionDummyVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
@@ -54,6 +63,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyC
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,6 +90,86 @@ public class TracingTestUtils {
 
 	private static final SaturationConclusion.Factory FACTORY_ = new SaturationConclusionBaseFactory();
 
+	public static Collection<Conclusion> getDerivedConclusionsForSubsumption(
+			final ElkClassExpression subClass,
+			final ElkClassExpression superClass, final Reasoner reasoner)
+			throws ElkException {
+
+		final ElkObject.Factory elkFactory = reasoner.getElkFactory();
+
+		final Collection<Conclusion> conclusions = new ArrayList<Conclusion>();
+
+		final EntailmentQueryResult result = reasoner.isEntailed(
+				elkFactory.getSubClassOfAxiom(subClass, superClass));
+		result.accept(new EntailmentQueryResult.Visitor<Void>() {
+
+			@Override
+			public Void visit(final ProperEntailmentQueryResult result)
+					throws ElkQueryException {
+				try {
+					collectReasons(result.getEntailment(),
+							result.getEvidence(false), conclusions);
+				} finally {
+					result.unlock();
+				}
+				return null;
+			}
+
+			@Override
+			public Void visit(
+					final UnsupportedIndexingEntailmentQueryResult result) {
+				throw new ElkRuntimeException(
+						UnsupportedIndexingEntailmentQueryResult.class
+								.getSimpleName());
+			}
+
+			@Override
+			public Void visit(
+					final UnsupportedQueryTypeEntailmentQueryResult result) {
+				throw new ElkRuntimeException(
+						UnsupportedQueryTypeEntailmentQueryResult.class
+								.getSimpleName());
+			}
+
+		});
+
+		return conclusions;
+	}
+
+	private static void collectReasons(final Entailment goal,
+			final EntailmentInferenceSet evidence,
+			final Collection<Conclusion> result) {
+
+		final Set<Entailment> done = new ArrayHashSet<Entailment>();
+		final Queue<Entailment> toDo = new LinkedList<Entailment>();
+
+		if (done.add(goal)) {
+			toDo.offer(goal);
+		}
+
+		Entailment entailment;
+		while ((entailment = toDo.poll()) != null) {
+			for (final EntailmentInference inf : evidence
+					.getInferences(entailment)) {
+
+				if (inf instanceof HasReason) {
+					final Object reason = ((HasReason<?>) inf).getReason();
+					if (reason instanceof Conclusion) {
+						result.add((Conclusion) reason);
+					}
+				}
+
+				for (final Entailment premise : inf.getPremises()) {
+					if (done.add(premise)) {
+						toDo.offer(premise);
+					}
+				}
+
+			}
+		}
+
+	}
+
 	static ClassConclusion getConclusionToTrace(Context context,
 			IndexedClassExpression subsumer) {
 		if (context != null) {
@@ -98,18 +188,8 @@ public class TracingTestUtils {
 	public static void checkTracingCompleteness(ElkClassExpression subClass,
 			ElkClassExpression superClass, final Reasoner reasoner)
 			throws ElkException {
-		final List<ClassConclusion> conclusions = new ArrayList<ClassConclusion>();
-		reasoner.visitDerivedConclusionsForSubsumption(subClass, superClass,
-				new DerivedClassConclusionDummyVisitor() {
-
-					@Override
-					protected boolean defaultVisit(ClassConclusion conclusion) {
-						conclusions.add(conclusion);
-						return true;
-					}
-
-				});
-
+		final Collection<Conclusion> conclusions = getDerivedConclusionsForSubsumption(
+				subClass, superClass, reasoner);
 		if (conclusions.isEmpty()) {			
 			fail(subClass + " ⊑ " + superClass + " not provable!");
 		}
@@ -127,7 +207,7 @@ public class TracingTestUtils {
 
 		TestTraceUnwinder explorer = new TestTraceUnwinder(traceState,
 				UNTRACED_LISTENER);
-		for (ClassConclusion conclusion: conclusions) {
+		for (final Conclusion conclusion: conclusions) {
 			explorer.accept(conclusion, counter);				
 		}
 	}

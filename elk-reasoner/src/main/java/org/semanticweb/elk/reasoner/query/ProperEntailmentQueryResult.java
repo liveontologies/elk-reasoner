@@ -22,6 +22,7 @@
 package org.semanticweb.elk.reasoner.query;
 
 import org.semanticweb.elk.Lock;
+import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;
 
 /**
@@ -55,6 +56,15 @@ public interface ProperEntailmentQueryResult
 	 */
 	EntailmentInferenceSet getEvidence(boolean atMostOne)
 			throws ElkQueryException;
+
+	/**
+	 * Returns the entailment of the query. This should be the root of
+	 * {@link #getEvidence(boolean)}.
+	 * 
+	 * @return The entailment of the query.
+	 * @throws ElkQueryException
+	 */
+	Entailment getEntailment() throws ElkQueryException;
 
 	<O> O accept(Visitor<O> visitor) throws ElkQueryException;
 

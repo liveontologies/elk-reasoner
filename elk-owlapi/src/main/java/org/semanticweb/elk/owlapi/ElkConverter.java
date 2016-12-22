@@ -215,7 +215,7 @@ public class ElkConverter extends AbstractElkObjectConverter {
 		else if (e instanceof ElkInterruptedException)
 			return convert((ElkInterruptedException) e);
 		else
-			return new ReasonerInterruptedException(e);
+			return new OWLRuntimeException(e);
 	}
 
 	@Override

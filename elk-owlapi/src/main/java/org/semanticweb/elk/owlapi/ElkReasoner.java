@@ -27,7 +27,6 @@ package org.semanticweb.elk.owlapi;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -967,7 +966,11 @@ public class ElkReasoner implements OWLReasoner {
 		@Override
 		public Boolean visit(final ProperEntailmentQueryResult properResult)
 				throws ElkQueryException {
-			return properResult.isEntailed();
+			try {
+				return properResult.isEntailed();
+			} finally {
+				properResult.unlock();
+			}
 		}
 
 		@Override
@@ -1000,10 +1003,8 @@ public class ElkReasoner implements OWLReasoner {
 		try {
 
 			final ElkAxiom elkAxiom = owlConverter_.convert(owlAxiom);
-			final Map<ElkAxiom, EntailmentQueryResult> result = reasoner_
-					.isEntailed(Collections.singleton(elkAxiom));
-			return result.get(elkAxiom)
-					.accept(ENTAILMENT_QUERY_RESULT_CONVERTER);
+			final EntailmentQueryResult result = reasoner_.isEntailed(elkAxiom);
+			return result.accept(ENTAILMENT_QUERY_RESULT_CONVERTER);
 
 		} catch (final ElkUnsupportedReasoningTaskException e) {
 			throw unsupportedOwlApiMethod("isEntailed(OWLAxiom)",

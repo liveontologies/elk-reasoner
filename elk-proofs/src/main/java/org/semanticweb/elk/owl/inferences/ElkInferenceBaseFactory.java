@@ -1,5 +1,3 @@
-package org.semanticweb.elk.owl.inferences;
-
 /*
  * #%L
  * ELK Proofs Package
@@ -21,6 +19,7 @@ package org.semanticweb.elk.owl.inferences;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.owl.inferences;
 
 import java.util.List;
 
@@ -32,6 +31,12 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 
 public class ElkInferenceBaseFactory implements ElkInference.Factory {
+
+	@Override
+	public ElkClassAssertionOfClassInclusion getElkClassAssertionOfClassInclusion(
+			final ElkIndividual instance, final ElkClassExpression type) {
+		return new ElkClassAssertionOfClassInclusion(instance, type);
+	}
 
 	@Override
 	public ElkClassInclusionEmptyObjectOneOfOwlNothing getElkClassInclusionEmptyObjectOneOfOwlNothing() {
@@ -227,6 +232,11 @@ public class ElkInferenceBaseFactory implements ElkInference.Factory {
 	}
 
 	@Override
+	public ElkClassInclusionOwlBottomObjectProperty getElkClassInclusionOwlBottomObjectProperty() {
+		return ElkClassInclusionOwlBottomObjectProperty.INSTANCE;
+	}
+
+	@Override
 	public ElkClassInclusionOwlNothing getElkClassInclusionOwlNothing(
 			ElkClassExpression superClass) {
 		return new ElkClassInclusionOwlNothing(superClass);
@@ -236,6 +246,11 @@ public class ElkInferenceBaseFactory implements ElkInference.Factory {
 	public ElkClassInclusionOwlThing getElkClassInclusionOwlThing(
 			ElkClassExpression subClass) {
 		return new ElkClassInclusionOwlThing(subClass);
+	}
+
+	@Override
+	public ElkClassInclusionOwlTopObjectProperty getElkClassInclusionOwlTopObjectProperty() {
+		return ElkClassInclusionOwlTopObjectProperty.INSTANCE;
 	}
 
 	@Override

@@ -86,6 +86,7 @@ public class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 					ClassTaxonomyComputation.class.getSimpleName()
 							+ " did not add all classes to the taxonomy!");
 		}
+		reasoner.classTaxonomyState.taxonomyComplete();
 		reasoner.ontologyIndex.initClassChanges();
 		reasoner.ruleAndConclusionStats
 				.add(computation_.getRuleAndConclusionStatistics());

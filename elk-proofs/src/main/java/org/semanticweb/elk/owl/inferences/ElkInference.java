@@ -1,9 +1,3 @@
-package org.semanticweb.elk.owl.inferences;
-
-import org.liveontologies.proof.util.Inference;
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
-
 /*
  * #%L
  * ELK Proofs Package
@@ -25,6 +19,11 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.owl.inferences;
+
+import org.liveontologies.proof.util.Inference;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 public interface ElkInference extends Inference<ElkAxiom> {
 
@@ -61,10 +60,10 @@ public interface ElkInference extends Inference<ElkAxiom> {
 	 * A factory for creating instances
 	 * 
 	 * @author Yevgeny Kazakov
-	 *
+	 * @author Peter Skocovsky
 	 */
-	interface Factory
-			extends ElkClassInclusionOwlThingEmptyObjectIntersectionOf.Factory,
+	interface Factory extends ElkClassAssertionOfClassInclusion.Factory,
+			ElkClassInclusionOwlThingEmptyObjectIntersectionOf.Factory,
 			ElkClassInclusionEmptyObjectOneOfOwlNothing.Factory,
 			ElkClassInclusionEmptyObjectUnionOfOwlNothing.Factory,
 			ElkClassInclusionExistentialComposition.Factory,
@@ -87,8 +86,10 @@ public interface ElkInference extends Inference<ElkAxiom> {
 			ElkClassInclusionOfObjectPropertyAssertion.Factory,
 			ElkClassInclusionOfObjectPropertyDomain.Factory,
 			ElkClassInclusionOfReflexiveObjectProperty.Factory,
+			ElkClassInclusionOwlBottomObjectProperty.Factory,
 			ElkClassInclusionOwlNothing.Factory,
 			ElkClassInclusionOwlThing.Factory,
+			ElkClassInclusionOwlTopObjectProperty.Factory,
 			ElkClassInclusionReflexivePropertyRange.Factory,
 			ElkClassInclusionSingletonObjectUnionOfDecomposition.Factory,
 			ElkClassInclusionTautology.Factory,
@@ -114,11 +115,12 @@ public interface ElkInference extends Inference<ElkAxiom> {
 	 * The visitor pattern for instances
 	 * 
 	 * @author Yevgeny Kazakov
+	 * @author Peter Skocovsky
 	 *
 	 * @param <O>
 	 *            the type of the output
 	 */
-	interface Visitor<O> extends
+	interface Visitor<O> extends ElkClassAssertionOfClassInclusion.Visitor<O>,
 			ElkClassInclusionOwlThingEmptyObjectIntersectionOf.Visitor<O>,
 			ElkClassInclusionEmptyObjectOneOfOwlNothing.Visitor<O>,
 			ElkClassInclusionEmptyObjectUnionOfOwlNothing.Visitor<O>,
@@ -142,8 +144,10 @@ public interface ElkInference extends Inference<ElkAxiom> {
 			ElkClassInclusionOfObjectPropertyAssertion.Visitor<O>,
 			ElkClassInclusionOfObjectPropertyDomain.Visitor<O>,
 			ElkClassInclusionOfReflexiveObjectProperty.Visitor<O>,
+			ElkClassInclusionOwlBottomObjectProperty.Visitor<O>,
 			ElkClassInclusionOwlNothing.Visitor<O>,
 			ElkClassInclusionOwlThing.Visitor<O>,
+			ElkClassInclusionOwlTopObjectProperty.Visitor<O>,
 			ElkClassInclusionReflexivePropertyRange.Visitor<O>,
 			ElkClassInclusionSingletonObjectUnionOfDecomposition.Visitor<O>,
 			ElkClassInclusionTautology.Visitor<O>,
