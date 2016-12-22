@@ -47,7 +47,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 public class ElkClassInclusionExistentialComposition
 		extends AbstractElkInference {
 
-	private final static String NAME_ = "Existential Composition";
+	public final static String NAME = "Existential Composition";
 
 	private final List<? extends ElkClassExpression> classExpressions_;
 
@@ -84,7 +84,7 @@ public class ElkClassInclusionExistentialComposition
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

@@ -43,7 +43,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 public class ElkClassInclusionObjectOneOfInclusion
 		extends AbstractElkInference {
 
-	private final static String NAME_ = "Sub-Enumeration";
+	public final static String NAME = "Sub-Enumeration";
 
 	/**
 	 * list L2 that contain all individuals
@@ -72,7 +72,7 @@ public class ElkClassInclusionObjectOneOfInclusion
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

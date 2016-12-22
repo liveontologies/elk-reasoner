@@ -43,7 +43,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 public class ElkClassInclusionObjectIntersectionOfDecomposition
 		extends AbstractElkInference {
 
-	private final static String NAME_ = "Intersection Decomposition";
+	public final static String NAME = "Intersection Decomposition";
 
 	private final List<? extends ElkClassExpression> conjuncts_;
 
@@ -65,7 +65,7 @@ public class ElkClassInclusionObjectIntersectionOfDecomposition
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

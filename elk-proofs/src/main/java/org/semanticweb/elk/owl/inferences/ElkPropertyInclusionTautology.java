@@ -41,7 +41,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
  */
 public class ElkPropertyInclusionTautology extends AbstractElkInference {
 
-	private final static String NAME_ = "Property Inclusion Tautology";
+	public final static String NAME = "Property Inclusion Tautology";
 
 	private final ElkObjectPropertyExpression expression_;
 
@@ -55,7 +55,7 @@ public class ElkPropertyInclusionTautology extends AbstractElkInference {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

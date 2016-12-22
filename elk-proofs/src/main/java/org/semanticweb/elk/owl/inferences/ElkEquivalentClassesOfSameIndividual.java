@@ -48,7 +48,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
  */
 public class ElkEquivalentClassesOfSameIndividual extends AbstractElkInference {
 
-	private final static String NAME_ = "Same Individual Translation";
+	public final static String NAME = "Same Individual Translation";
 
 	private final List<? extends ElkIndividual> same_;
 
@@ -62,7 +62,7 @@ public class ElkEquivalentClassesOfSameIndividual extends AbstractElkInference {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

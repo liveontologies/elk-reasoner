@@ -43,7 +43,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 public class ElkClassInclusionObjectUnionOfComposition
 		extends AbstractElkInference {
 
-	private final static String NAME_ = "Union From Disjunct";
+	public final static String NAME = "Union From Disjunct";
 
 	private final List<? extends ElkClassExpression> disjuncts_;
 
@@ -65,7 +65,7 @@ public class ElkClassInclusionObjectUnionOfComposition
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

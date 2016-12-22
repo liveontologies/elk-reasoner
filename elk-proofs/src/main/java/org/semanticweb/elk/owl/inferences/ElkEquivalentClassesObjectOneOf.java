@@ -45,7 +45,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  */
 public class ElkEquivalentClassesObjectOneOf extends AbstractElkInference {
 
-	private final static String NAME_ = "ObjectOneOf Translation";
+	public final static String NAME = "ObjectOneOf Translation";
 
 	private final List<? extends ElkIndividual> members_;
 
@@ -70,7 +70,7 @@ public class ElkEquivalentClassesObjectOneOf extends AbstractElkInference {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

@@ -46,7 +46,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 public class ElkClassInclusionReflexivePropertyRange
 		extends AbstractElkInference {
 
-	private final static String NAME_ = "Reflexive Property Range";
+	public final static String NAME = "Reflexive Property Range";
 
 	private final ElkClassExpression subClass_, range_;
 
@@ -73,7 +73,7 @@ public class ElkClassInclusionReflexivePropertyRange
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

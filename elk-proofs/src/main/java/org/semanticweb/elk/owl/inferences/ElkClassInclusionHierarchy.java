@@ -44,7 +44,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  */
 public class ElkClassInclusionHierarchy extends AbstractElkInference {
 
-	private final static String NAME_ = "Class Hierarchy";
+	public final static String NAME = "Class Hierarchy";
 
 	private final List<? extends ElkClassExpression> expressions_;
 
@@ -62,7 +62,7 @@ public class ElkClassInclusionHierarchy extends AbstractElkInference {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

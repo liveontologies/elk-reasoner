@@ -45,7 +45,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 public class ElkClassInclusionOfObjectPropertyDomain
 		extends AbstractElkInference {
 
-	private final static String NAME_ = "Property Domain Transaltion";
+	private final static String NAME = "Property Domain Transaltion";
 
 	private final ElkObjectPropertyExpression property_;
 
@@ -67,7 +67,7 @@ public class ElkClassInclusionOfObjectPropertyDomain
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

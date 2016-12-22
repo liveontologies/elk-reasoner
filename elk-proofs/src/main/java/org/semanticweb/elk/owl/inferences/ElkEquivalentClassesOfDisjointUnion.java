@@ -45,7 +45,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  */
 public class ElkEquivalentClassesOfDisjointUnion extends AbstractElkInference {
 
-	private final static String NAME_ = "Disjoint Union to Equivalent Classes";
+	public final static String NAME = "Disjoint Union to Equivalent Classes";
 
 	private final ElkClass defined_;
 
@@ -67,7 +67,7 @@ public class ElkEquivalentClassesOfDisjointUnion extends AbstractElkInference {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

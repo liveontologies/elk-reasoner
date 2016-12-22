@@ -43,7 +43,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 public class ElkClassInclusionSingletonObjectUnionOfDecomposition
 		extends AbstractElkInference {
 
-	private final static String NAME_ = "Singleton Disjunction Decomposition";
+	public final static String NAME = "Singleton Disjunction Decomposition";
 
 	private final ElkClassExpression disjunct_;
 
@@ -58,7 +58,7 @@ public class ElkClassInclusionSingletonObjectUnionOfDecomposition
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

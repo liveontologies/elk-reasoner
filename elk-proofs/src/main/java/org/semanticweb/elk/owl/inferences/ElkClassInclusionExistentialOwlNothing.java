@@ -40,7 +40,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 public class ElkClassInclusionExistentialOwlNothing
 		extends AbstractElkInference {
 
-	private final static String NAME_ = "Existential of Bottom";
+	public final static String NAME = "Existential of Bottom";
 
 	private final ElkObjectPropertyExpression property_;
 
@@ -55,7 +55,7 @@ public class ElkClassInclusionExistentialOwlNothing
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

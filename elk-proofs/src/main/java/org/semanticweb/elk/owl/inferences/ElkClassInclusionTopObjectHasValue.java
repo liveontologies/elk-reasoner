@@ -39,7 +39,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  */
 public class ElkClassInclusionTopObjectHasValue extends AbstractElkInference {
 
-	private final static String NAME_ = "Top Object Property Value";
+	public final static String NAME = "Top Object Property Value";
 
 	private final ElkIndividual value_;
 
@@ -53,7 +53,7 @@ public class ElkClassInclusionTopObjectHasValue extends AbstractElkInference {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

@@ -44,7 +44,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  */
 public class ElkClassInclusionOfDisjointClasses extends AbstractElkInference {
 
-	private final static String NAME_ = "Disjoint Classes Translation";
+	public final static String NAME = "Disjoint Classes Translation";
 
 	private final List<? extends ElkClassExpression> expressions_;
 
@@ -79,7 +79,7 @@ public class ElkClassInclusionOfDisjointClasses extends AbstractElkInference {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

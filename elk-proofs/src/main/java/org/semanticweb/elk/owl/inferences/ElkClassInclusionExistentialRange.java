@@ -49,7 +49,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  */
 public class ElkClassInclusionExistentialRange extends AbstractElkInference {
 
-	private final static String NAME_ = "Existential Range Intersection";
+	public final static String NAME = "Existential Range Intersection";
 
 	private final ElkObjectPropertyExpression property_;
 
@@ -87,7 +87,7 @@ public class ElkClassInclusionExistentialRange extends AbstractElkInference {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

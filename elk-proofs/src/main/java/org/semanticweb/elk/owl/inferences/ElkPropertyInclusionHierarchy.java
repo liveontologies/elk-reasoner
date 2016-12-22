@@ -45,7 +45,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
  */
 public class ElkPropertyInclusionHierarchy extends AbstractElkInference {
 
-	private final static String NAME_ = "Property Hierarchy";
+	public final static String NAME = "Property Hierarchy";
 
 	private final ElkSubObjectPropertyExpression subExpression_;
 
@@ -72,7 +72,7 @@ public class ElkPropertyInclusionHierarchy extends AbstractElkInference {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

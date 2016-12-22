@@ -43,7 +43,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 public class ElkClassInclusionObjectIntersectionOfInclusion
 		extends AbstractElkInference {
 
-	private final static String NAME_ = "Super-Intersection";
+	public final static String NAME = "Super-Intersection";
 
 	/**
 	 * list L1 that contain all class expressions
@@ -72,7 +72,7 @@ public class ElkClassInclusionObjectIntersectionOfInclusion
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

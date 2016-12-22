@@ -43,7 +43,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  */
 public class ElkEquivalentClassesObjectHasValue extends AbstractElkInference {
 
-	private final static String NAME_ = "ObjectHasValue Translation";
+	public final static String NAME = "ObjectHasValue Translation";
 
 	private final ElkObjectPropertyExpression property_;
 
@@ -65,7 +65,7 @@ public class ElkEquivalentClassesObjectHasValue extends AbstractElkInference {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

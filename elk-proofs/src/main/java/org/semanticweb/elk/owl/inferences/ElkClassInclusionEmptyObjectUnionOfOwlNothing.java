@@ -43,14 +43,14 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 public class ElkClassInclusionEmptyObjectUnionOfOwlNothing
 		extends AbstractElkInference {
 
-	private final static String NAME_ = "Empty Disjunction";
+	public final static String NAME = "Empty Disjunction";
 
 	ElkClassInclusionEmptyObjectUnionOfOwlNothing() {
 	}
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

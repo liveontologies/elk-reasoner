@@ -45,7 +45,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
  */
 public class ElkPropertyRangePropertyExpansion extends AbstractElkInference {
 
-	private final static String NAME_ = "Property Range Expansion";
+	public final static String NAME = "Property Range Expansion";
 
 	private final ElkObjectPropertyExpression subProperty_, superProperty_;
 
@@ -73,7 +73,7 @@ public class ElkPropertyRangePropertyExpansion extends AbstractElkInference {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

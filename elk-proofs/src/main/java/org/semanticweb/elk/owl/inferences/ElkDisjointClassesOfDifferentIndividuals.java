@@ -49,7 +49,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 public class ElkDisjointClassesOfDifferentIndividuals
 		extends AbstractElkInference {
 
-	private final static String NAME_ = "Different Individuals Translation";
+	public final static String NAME = "Different Individuals Translation";
 
 	private final List<? extends ElkIndividual> different_;
 
@@ -64,7 +64,7 @@ public class ElkDisjointClassesOfDifferentIndividuals
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

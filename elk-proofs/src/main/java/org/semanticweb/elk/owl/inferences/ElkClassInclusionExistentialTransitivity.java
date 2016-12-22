@@ -49,7 +49,7 @@ import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 public class ElkClassInclusionExistentialTransitivity
 		extends AbstractElkInference {
 
-	private final static String NAME_ = "Existential Transitivity Composition";
+	public final static String NAME = "Existential Transitivity Composition";
 
 	private final List<? extends ElkClassExpression> classExpressions_;
 
@@ -81,7 +81,7 @@ public class ElkClassInclusionExistentialTransitivity
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

@@ -45,7 +45,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
  */
 public class ElkPropertyInclusionOfEquivalence extends AbstractElkInference {
 
-	private final static String NAME_ = "Equivalent Properties Decomposition";
+	public final static String NAME = "Equivalent Properties Decomposition";
 
 	private final List<? extends ElkObjectPropertyExpression> expressions_;
 
@@ -92,7 +92,7 @@ public class ElkPropertyInclusionOfEquivalence extends AbstractElkInference {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

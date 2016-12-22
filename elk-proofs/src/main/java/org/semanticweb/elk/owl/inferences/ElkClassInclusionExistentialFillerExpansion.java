@@ -44,7 +44,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 public class ElkClassInclusionExistentialFillerExpansion
 		extends AbstractElkInference {
 
-	private final static String NAME_ = "Existential Filler Expansion";
+	public final static String NAME = "Existential Filler Expansion";
 
 	private final ElkClassExpression subClass_, superClass_;
 
@@ -72,7 +72,7 @@ public class ElkClassInclusionExistentialFillerExpansion
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

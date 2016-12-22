@@ -44,7 +44,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 public class ElkClassInclusionExistentialOfObjectHasSelf
 		extends AbstractElkInference {
 
-	private final static String NAME_ = "Reflexive Existential";
+	public final static String NAME = "Reflexive Existential";
 
 	private final ElkClassExpression subClass_;
 
@@ -66,7 +66,7 @@ public class ElkClassInclusionExistentialOfObjectHasSelf
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

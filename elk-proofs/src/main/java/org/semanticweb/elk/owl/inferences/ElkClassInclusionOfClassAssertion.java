@@ -44,7 +44,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  */
 public class ElkClassInclusionOfClassAssertion extends AbstractElkInference {
 
-	private final static String NAME_ = "Class Assertion Transaltion";
+	public final static String NAME = "Class Assertion Transaltion";
 
 	private final ElkIndividual instance_;
 
@@ -66,7 +66,7 @@ public class ElkClassInclusionOfClassAssertion extends AbstractElkInference {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

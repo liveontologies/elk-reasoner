@@ -43,7 +43,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 public class ElkClassInclusionOfReflexiveObjectProperty
 		extends AbstractElkInference {
 
-	private final static String NAME_ = "Reflexive Property Transaltion";
+	public final static String NAME = "Reflexive Property Transaltion";
 
 	private final ElkObjectPropertyExpression property_;
 
@@ -58,7 +58,7 @@ public class ElkClassInclusionOfReflexiveObjectProperty
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

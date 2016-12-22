@@ -45,7 +45,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  */
 public class ElkEquivalentClassesCycle extends AbstractElkInference {
 
-	private final static String NAME_ = "Class Inclusion Cycle";
+	public final static String NAME = "Class Inclusion Cycle";
 
 	private final List<? extends ElkClassExpression> expressions_;
 
@@ -68,7 +68,7 @@ public class ElkEquivalentClassesCycle extends AbstractElkInference {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

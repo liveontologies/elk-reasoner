@@ -45,7 +45,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 public class ElkClassInclusionExistentialPropertyExpansion
 		extends AbstractElkInference {
 
-	private final static String NAME_ = "Existential Property Expansion";
+	public final static String NAME = "Existential Property Expansion";
 
 	private final ElkObjectPropertyExpression subProperty_, superProperty_;
 
@@ -74,7 +74,7 @@ public class ElkClassInclusionExistentialPropertyExpansion
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

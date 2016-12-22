@@ -46,7 +46,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 public class ElkClassInclusionObjectIntersectionOfComposition
 		extends AbstractElkInference {
 
-	private final static String NAME_ = "Intersection Composition";
+	public final static String NAME = "Intersection Composition";
 
 	private final ElkClassExpression subExpression_;
 
@@ -80,7 +80,7 @@ public class ElkClassInclusionObjectIntersectionOfComposition
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override
