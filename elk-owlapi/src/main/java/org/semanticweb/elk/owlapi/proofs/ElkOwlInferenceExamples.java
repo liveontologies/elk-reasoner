@@ -36,8 +36,8 @@ public class ElkOwlInferenceExamples
 	@Override
 	public Inference<OWLAxiom> getExample(Inference<OWLAxiom> inference) {
 		if (inference instanceof ElkOwlInference) {
-			return new ElkOwlInference(elkInferenceExamples_.getExample(
-					((ElkOwlInference) inference).getElkInference()));
+			return new ElkOwlInference(elkInferenceExamples_
+					.getExample(((ElkOwlInference) inference).getInput()));
 
 		}
 		// else
