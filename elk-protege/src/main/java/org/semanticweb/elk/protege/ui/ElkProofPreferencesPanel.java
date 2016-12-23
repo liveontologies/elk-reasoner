@@ -61,7 +61,7 @@ public class ElkProofPreferencesPanel extends ElkPanel {
 
 	private static final String PROOF_PLUGIN_UPDATE_URL_ = "https://raw.githubusercontent.com/liveontologies/protege-proof-explanation/release/p5.update.properties";
 
-	private JCheckBox flattenInferencesCheckbox_;
+	private JCheckBox inlineInferencesCheckbox_;
 
 	@Override
 	public ElkPanel initialize() {
@@ -70,7 +70,7 @@ public class ElkProofPreferencesPanel extends ElkPanel {
 		if (getProofPluginBundle() == null) {
 			add(buildInstallPluginComponent());
 		} else {
-			add(buildFlattenInferencesComponent(prefs.flattenInferences));			
+			add(buildFlattenInferencesComponent(prefs.inlineInferences));
 		}
 		add(Box.createVerticalGlue());
 		add(buildResetComponent());
@@ -80,19 +80,19 @@ public class ElkProofPreferencesPanel extends ElkPanel {
 	@Override
 	public ElkPanel applyChanges() {
 		ElkProofPreferences prefs = new ElkProofPreferences().load();
-		if (flattenInferencesCheckbox_ != null) {
-			prefs.flattenInferences = flattenInferencesCheckbox_.isSelected();
+		if (inlineInferencesCheckbox_ != null) {
+			prefs.inlineInferences = inlineInferencesCheckbox_.isSelected();
 		}
 		prefs.save();
 		return this;
 	}
 
 	private Component buildFlattenInferencesComponent(boolean incrementalMode) {
-		flattenInferencesCheckbox_ = new JCheckBox("Flatten inferences",
+		inlineInferencesCheckbox_ = new JCheckBox("Inline inferences",
 				incrementalMode);
-		flattenInferencesCheckbox_.setToolTipText(
-				"If checked, nested inferences will be rewritten into one, if possible (could be slow)");
-		return flattenInferencesCheckbox_;
+		inlineInferencesCheckbox_.setToolTipText(
+				"If checked, try to rewrite nested inferences into one");
+		return inlineInferencesCheckbox_;
 	}
 
 	private Component buildInstallPluginComponent() {
@@ -130,7 +130,7 @@ public class ElkProofPreferencesPanel extends ElkPanel {
 
 	private void reset() {
 		ElkProofPreferences prefs = new ElkProofPreferences().reset();
-		flattenInferencesCheckbox_.setSelected(prefs.flattenInferences);
+		inlineInferencesCheckbox_.setSelected(prefs.inlineInferences);
 	}
 
 	private Bundle getProofPluginBundle() {

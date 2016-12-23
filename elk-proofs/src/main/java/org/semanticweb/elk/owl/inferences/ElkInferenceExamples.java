@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.liveontologies.proof.util.Inference;
-import org.liveontologies.proof.util.InferenceExampleProvider;
 import org.semanticweb.elk.owl.implementation.ElkObjectBaseFactory;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -50,8 +49,10 @@ import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
  * 
  * @author Yevgeny Kazakov
  */
-public class ElkInferenceExamples implements InferenceExampleProvider<ElkAxiom>,
-		ElkInference.Visitor<ElkInference> {
+public class ElkInferenceExamples
+		implements ElkInference.Visitor<ElkInference> {
+
+	private final static ElkInferenceExamples INSTANCE_ = new ElkInferenceExamples();
 
 	private final ElkObject.Factory elkFactory_ = new ElkObjectBaseFactory();
 
@@ -60,10 +61,14 @@ public class ElkInferenceExamples implements InferenceExampleProvider<ElkAxiom>,
 
 	private final ElkInference.Factory inferenceFactory_ = new ElkInferenceBaseFactory();
 
-	@Override
-	public Inference<ElkAxiom> getExample(Inference<ElkAxiom> inference) {
+	private ElkInferenceExamples() {
+
+	}
+
+	public static Inference<ElkAxiom> getExample(
+			Inference<ElkAxiom> inference) {
 		if (inference instanceof ElkInference) {
-			return ((ElkInference) inference).accept(this);
+			return ((ElkInference) inference).accept(INSTANCE_);
 		}
 		// else
 		return null;

@@ -1,4 +1,4 @@
-package org.semanticweb.elk.protege;
+package org.semanticweb.elk.protege.proof;
 
 /*-
  * #%L
@@ -30,14 +30,13 @@ import java.util.Set;
 
 import org.liveontologies.proof.util.DynamicInferenceSet;
 import org.liveontologies.proof.util.Inference;
-import org.liveontologies.proof.util.InferenceExampleProvider;
 import org.liveontologies.proof.util.InferenceSets;
+import org.liveontologies.proof.util.ProofNode;
 import org.liveontologies.protege.explanation.proof.service.ProofService;
 import org.protege.editor.owl.model.event.EventType;
 import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
 import org.semanticweb.elk.owlapi.ElkReasoner;
-import org.semanticweb.elk.owlapi.proofs.ElkOwlInferenceExamples;
 import org.semanticweb.elk.owlapi.proofs.ElkOwlInferenceSet;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
@@ -175,8 +174,13 @@ public class ElkProofService extends ProofService
 	}
 
 	@Override
-	public InferenceExampleProvider<OWLAxiom> getExampleProvider() {
-		return new ElkOwlInferenceExamples();
+	public Inference<OWLAxiom> getExample(Inference<OWLAxiom> inference) {
+		return ElkOwlInferenceExamples.getExample(inference);
+	}
+
+	@Override
+	public ProofNode<OWLAxiom> postProcess(ProofNode<OWLAxiom> node) {
+		return new InlinedOwlProofNode(node);
 	}
 
 }

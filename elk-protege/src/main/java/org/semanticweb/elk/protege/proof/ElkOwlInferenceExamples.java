@@ -1,4 +1,4 @@
-package org.semanticweb.elk.owlapi.proofs;
+package org.semanticweb.elk.protege.proof;
 
 /*-
  * #%L
@@ -23,20 +23,16 @@ package org.semanticweb.elk.owlapi.proofs;
  */
 
 import org.liveontologies.proof.util.Inference;
-import org.liveontologies.proof.util.InferenceExampleProvider;
 import org.semanticweb.elk.owl.inferences.ElkInferenceExamples;
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owlapi.proofs.ElkOwlInference;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
-public class ElkOwlInferenceExamples
-		implements InferenceExampleProvider<OWLAxiom> {
+public class ElkOwlInferenceExamples {
 
-	private final InferenceExampleProvider<ElkAxiom> elkInferenceExamples_ = new ElkInferenceExamples();
-
-	@Override
-	public Inference<OWLAxiom> getExample(Inference<OWLAxiom> inference) {
+	public static Inference<OWLAxiom> getExample(
+			Inference<OWLAxiom> inference) {
 		if (inference instanceof ElkOwlInference) {
-			return new ElkOwlInference(elkInferenceExamples_
+			return new ElkOwlInference(ElkInferenceExamples
 					.getExample(((ElkOwlInference) inference).getInput()));
 
 		}

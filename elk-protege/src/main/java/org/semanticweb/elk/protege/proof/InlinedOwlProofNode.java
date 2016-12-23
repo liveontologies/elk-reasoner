@@ -1,4 +1,4 @@
-package org.semanticweb.elk.owlapi.proofs;
+package org.semanticweb.elk.protege.proof;
 
 /*-
  * #%L
@@ -22,23 +22,24 @@ package org.semanticweb.elk.owlapi.proofs;
  * #L%
  */
 
-import org.liveontologies.proof.util.AbstractConvertedInference;
-import org.liveontologies.proof.util.Inference;
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owlapi.ElkConverter;
+import org.liveontologies.proof.util.ConvertedProofNode;
+import org.liveontologies.proof.util.ConvertedProofStep;
+import org.liveontologies.proof.util.ProofNode;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
-public class ElkOwlInference
-		extends AbstractConvertedInference<ElkAxiom, OWLAxiom>
-		implements Inference<OWLAxiom> {
+public class InlinedOwlProofNode extends ConvertedProofNode<OWLAxiom> {
 
-	public ElkOwlInference(Inference<ElkAxiom> elkInference) {
-		super(elkInference);
+	public InlinedOwlProofNode(ProofNode<OWLAxiom> delegate) {
+		super(delegate);
 	}
 
 	@Override
-	protected OWLAxiom convert(ElkAxiom axiom) {
-		return ElkConverter.getInstance().convert(axiom);
+	final protected void convert(ConvertedProofStep<OWLAxiom> step) {
+		convert(new InlinedOwlProofStep(step.getDelegate()));
+	}
+
+	void convert(InlinedOwlProofStep step) {
+		super.convert(step);
 	}
 
 }

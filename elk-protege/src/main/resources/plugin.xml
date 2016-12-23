@@ -19,7 +19,7 @@
 
 <extension id="elk.proofs" point="org.liveontologies.protege.explanation.proof.service">
    <name value="ELK Prover"/>
-   <class value="org.semanticweb.elk.protege.ElkProofService"/>
+   <class value="org.semanticweb.elk.protege.proof.ElkProofService"/>
 </extension>
     
 </plugin>

@@ -24,22 +24,18 @@ package org.semanticweb.elk.protege.preferences;
 
 import org.protege.editor.core.prefs.Preferences;
 import org.protege.editor.core.prefs.PreferencesManager;
-import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 
 public class ElkProofPreferences {
 
 	private static final String ELK_PROOF_PREFS_KEY = "ELK_PROOF_PREFS",
-			FLATTEN_INFERENCES_KEY = "ELK_FLATTEN_INFERENCES";
+			INLINE_INFERENCES_KEY = "ELK_INLINE_INFERENCES";
 
-	public boolean flattenInferences;
+	public boolean inlineInferences;
 
-	private final boolean defaultFlattenInferences_;
+	private final boolean defaultInlineInferences_;
 
 	public ElkProofPreferences() {
-		ReasonerConfiguration elkDefaults = ReasonerConfiguration
-				.getConfiguration();
-		defaultFlattenInferences_ = elkDefaults.getParameterAsBoolean(
-				ReasonerConfiguration.FLATTEN_INFERENCES);
+		defaultInlineInferences_ = true;
 	}
 
 	private static Preferences getPrefs() {
@@ -50,19 +46,19 @@ public class ElkProofPreferences {
 
 	public ElkProofPreferences load() {
 		Preferences prefs = getPrefs();
-		flattenInferences = prefs.getBoolean(FLATTEN_INFERENCES_KEY,
-				defaultFlattenInferences_);
+		inlineInferences = prefs.getBoolean(INLINE_INFERENCES_KEY,
+				defaultInlineInferences_);
 		return this;
 	}
 
 	public ElkProofPreferences save() {
 		Preferences prefs = getPrefs();
-		prefs.putBoolean(FLATTEN_INFERENCES_KEY, flattenInferences);
+		prefs.putBoolean(INLINE_INFERENCES_KEY, inlineInferences);
 		return this;
 	}
 
 	public ElkProofPreferences reset() {
-		flattenInferences = defaultFlattenInferences_;
+		inlineInferences = defaultInlineInferences_;
 		return this;
 	}
 

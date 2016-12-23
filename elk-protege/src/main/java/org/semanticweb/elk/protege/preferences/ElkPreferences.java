@@ -44,9 +44,6 @@ public class ElkPreferences {
 				String.valueOf(elkGeneralPrefs.numberOfWorkers));
 		elkConfig.setParameter(ReasonerConfiguration.INCREMENTAL_MODE_ALLOWED,
 				String.valueOf(elkGeneralPrefs.incrementalMode));
-		ElkProofPreferences elkProofPrefs = new ElkProofPreferences().load();
-		elkConfig.setParameter(ReasonerConfiguration.FLATTEN_INFERENCES,
-				String.valueOf(elkProofPrefs.flattenInferences));
 		return elkConfig;
 	}
 
