@@ -26,6 +26,7 @@ import java.util.Collection;
 import org.liveontologies.proof.util.BaseInferenceSet;
 import org.liveontologies.proof.util.DynamicInferenceSet;
 import org.liveontologies.proof.util.Inference;
+import org.liveontologies.proof.util.InferenceSets;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.inferences.ElkInference;
@@ -155,8 +156,12 @@ public class ElkOwlInferenceSet extends BaseInferenceSet<OWLAxiom>
 
 	};
 
-	public static ElkOwlInferenceSet create(ElkReasoner reasoner,
+	public static DynamicInferenceSet<OWLAxiom> create(ElkReasoner reasoner,
 			OWLAxiom entailment) throws UnsupportedEntailmentTypeException {
+		if (reasoner == null) { 
+			return InferenceSets.emptyInferenceSet();
+		}	
+		// else		
 		final ElkOwlInferenceSet inferenceSet = new ElkOwlInferenceSet(reasoner,
 				entailment);
 		// If the entailment is not supported, throw the exceptions now.

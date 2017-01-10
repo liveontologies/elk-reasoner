@@ -30,7 +30,6 @@ import java.util.Set;
 
 import org.liveontologies.proof.util.DynamicInferenceSet;
 import org.liveontologies.proof.util.Inference;
-import org.liveontologies.proof.util.InferenceSets;
 import org.liveontologies.proof.util.ProofNode;
 import org.liveontologies.protege.explanation.proof.service.ProofService;
 import org.protege.editor.owl.model.event.EventType;
@@ -78,7 +77,8 @@ public class ElkProofService extends ProofService
 
 	@Override
 	public void handleChange(OWLModelManagerChangeEvent event) {
-		if (event.isType(EventType.REASONER_CHANGED)) {
+		if (event.isType(EventType.REASONER_CHANGED)
+				|| event.isType(EventType.ACTIVE_ONTOLOGY_CHANGED)) {
 			changeReasoner();
 		}
 	}
@@ -108,15 +108,6 @@ public class ElkProofService extends ProofService
 
 		void reasonerChanged();
 
-	}
-
-	static DynamicInferenceSet<OWLAxiom> createProof(ElkReasoner reasoner,
-			OWLAxiom entailment) {
-		if (reasoner == null) {
-			return InferenceSets.emptyInferenceSet();
-		} else {
-			return ElkOwlInferenceSet.create(reasoner, entailment);
-		}
 	}
 
 	private class DynamicOwlProof
