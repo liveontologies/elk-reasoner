@@ -38,6 +38,7 @@ import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
 import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.elk.owlapi.proofs.ElkOwlInferenceSet;
+import org.semanticweb.elk.protege.preferences.ElkProofPreferences;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
@@ -180,7 +181,12 @@ public class ElkProofService extends ProofService
 
 	@Override
 	public ProofNode<OWLAxiom> postProcess(ProofNode<OWLAxiom> node) {
-		return new InlinedOwlProofNode(node);
+		ElkProofPreferences prefs = new ElkProofPreferences().load();
+		if (prefs.inlineInferences) {
+			return new InlinedOwlProofNode(node);
+		}
+		// else
+		return node;
 	}
 
 }
