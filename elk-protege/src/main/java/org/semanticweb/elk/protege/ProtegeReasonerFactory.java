@@ -28,8 +28,6 @@ package org.semanticweb.elk.protege;
 import org.protege.editor.owl.model.inference.AbstractProtegeOWLReasonerInfo;
 import org.semanticweb.elk.owlapi.ElkReasonerConfiguration;
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
-import org.semanticweb.elk.protege.preferences.ElkGeneralPreferences;
-import org.semanticweb.elk.protege.preferences.ElkPreferences;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
 import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
@@ -47,7 +45,7 @@ public class ProtegeReasonerFactory extends AbstractProtegeOWLReasonerInfo {
 
 	private final OWLReasonerFactory factory_ = new ElkReasonerFactory();
 
-	private final ElkGeneralPreferences elkProtegePrefs_ = new ElkGeneralPreferences();
+	private final ElkPreferences elkProtegePrefs_ = new ElkPreferences();
 
 	@Override
 	public BufferingMode getRecommendedBuffering() {

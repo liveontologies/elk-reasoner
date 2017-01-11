@@ -24,8 +24,6 @@ package org.semanticweb.elk.protege;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.semanticweb.elk.protege.preferences.ElkWarningPreferences;
-
 /**
  * Manages ELK warning messages that are suppressed, i.e., should not be
  * presented to the user
@@ -54,7 +52,7 @@ public class ProtegeSuppressedMessages {
 	 * @return the loaded messages
 	 */
 	public ProtegeSuppressedMessages reload() {
-		ElkWarningPreferences prefs = new ElkWarningPreferences().load();
+		ElkPreferences prefs = new ElkPreferences().load();
 		suppressedWarningCounts_.keySet().retainAll(
 				prefs.suppressedWarningTypes);
 		for (String warningType : prefs.suppressedWarningTypes) {
@@ -67,7 +65,7 @@ public class ProtegeSuppressedMessages {
 
 	public void addWarningType(String newWarningType) {
 		suppressedWarningCounts_.put(newWarningType, 0);
-		ElkWarningPreferences prefs = new ElkWarningPreferences().load();
+		ElkPreferences prefs = new ElkPreferences().load();
 		prefs.suppressedWarningTypes.add(newWarningType);
 		prefs.save();
 	}

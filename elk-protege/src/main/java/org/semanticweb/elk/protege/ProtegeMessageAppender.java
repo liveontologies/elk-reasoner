@@ -74,7 +74,7 @@ public class ProtegeMessageAppender extends MessageDialogAppender {
 	}
 	
 	protected String getFooterMessage(ILoggingEvent event) {
-		return "ELK warnings can be configured in: Reasoner > Configure... > ELK > Warnings";
+		return "ELK warnings can be configured in: Reasoner > Configure... > ELK";
 	}
 
 	@Override
