@@ -26,7 +26,7 @@
 		<!-- the description of the maven packages to be bundled in the archive -->
 		<dependencySet>
 			<includes>
-				<include>*:elk-standalone:*</include>
+				<include>${project.groupId}:elk-standalone:jar</include>
 			</includes>
 			<!-- verify that all filters worked -->
 			<useStrictFiltering>true</useStrictFiltering>

@@ -35,7 +35,7 @@
 		<dependencySet>
 			<!-- including the binaries -->
 			<includes>
-				<include>*:elk-owlapi-standalone:jar:bin</include>
+				<include>${project.groupId}:elk-owlapi-standalone:jar:bin</include>
 			</includes>
 			<!-- verify that all filters worked -->
 			<useStrictFiltering>true</useStrictFiltering>
@@ -45,7 +45,7 @@
 		<dependencySet>
 			<!-- including the sources -->
 			<includes>
-				<include>*:elk-owlapi-standalone:jar:src</include>
+				<include>${project.groupId}:elk-owlapi-standalone:jar:src</include>
 			</includes>
 			<!-- verify that all filters worked -->
 			<useStrictFiltering>true</useStrictFiltering>
@@ -55,7 +55,7 @@
 		<dependencySet>
 			<!-- including the third-party libaries -->
 			<includes>
-				<include>*:elk-owlapi-standalone:jar:lib</include>
+				<include>${project.groupId}:elk-owlapi-standalone:jar:lib</include>
 			</includes>
 			<unpack>true</unpack>
 			<unpackOptions>

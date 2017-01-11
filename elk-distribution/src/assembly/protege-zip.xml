@@ -25,9 +25,10 @@
 	</files>
 	<dependencySets>
 		<!-- the description of the maven packages to be bundled in the archive -->
-		<dependencySet>			
+		<dependencySet>
 			<includes>
-				<include>*:elk-protege:*</include>
+				<include>${project.groupId}:elk-protege:jar</include>
+				<include>org.liveontologies:proof-utils:jar</include>
 			</includes>
 			<!-- verify that all filters worked -->
 			<useStrictFiltering>true</useStrictFiltering>
