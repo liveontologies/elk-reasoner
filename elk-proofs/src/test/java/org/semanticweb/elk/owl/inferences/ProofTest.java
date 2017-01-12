@@ -43,7 +43,6 @@ import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.reasoner.tracing.ComprehensiveSubsumptionTracingTests;
 import org.semanticweb.elk.reasoner.tracing.TracingTestManifest;
 import org.semanticweb.elk.reasoner.tracing.TracingTestVisitor;
@@ -99,8 +98,7 @@ public class ProofTest {
 				.loadAxioms(manifest.getInput().getUrl().openStream());
 		final TestLoader loader = new TestLoader(ontology);
 
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
-				new PostProcessingStageExecutor());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
 
 		try {
 			// reasoner.getTaxonomy();

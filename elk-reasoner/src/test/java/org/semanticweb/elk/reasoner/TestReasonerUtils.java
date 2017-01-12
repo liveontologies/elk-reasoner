@@ -42,7 +42,7 @@ import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
-import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
+import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 
 /**
@@ -53,13 +53,14 @@ import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
  */
 public class TestReasonerUtils {
 
+	final static ReasonerStageExecutor DEFAULT_STAGE_EXECUTOR = new PostProcessingStageExecutor();
+
 	public static Reasoner createTestReasoner(
 			final AxiomLoader.Factory axiomLoaderFactory,
 			final ReasonerInterrupter interrupter,
-			final ReasonerStageExecutor stageExecutor,
 			final ReasonerConfiguration config) {
 		return new ReasonerFactory().createReasoner(axiomLoaderFactory,
-				interrupter, stageExecutor, config);
+				interrupter, DEFAULT_STAGE_EXECUTOR, config);
 	}
 
 	/**
@@ -67,15 +68,13 @@ public class TestReasonerUtils {
 	 * 
 	 * @param axiomLoaderFactory
 	 * @param interrupter
-	 * @param stageExecutor
 	 * @return
 	 */
 	public static Reasoner createTestReasoner(
 			final AxiomLoader.Factory axiomLoaderFactory,
-			final ReasonerInterrupter interrupter,
-			final ReasonerStageExecutor stageExecutor) {
+			final ReasonerInterrupter interrupter) {
 		return new ReasonerFactory().createReasoner(axiomLoaderFactory,
-				interrupter, stageExecutor,
+				interrupter, DEFAULT_STAGE_EXECUTOR,
 				ReasonerConfiguration.getConfiguration());
 	}
 
@@ -84,78 +83,68 @@ public class TestReasonerUtils {
 	 * 
 	 * @param axiomLoaderFactory
 	 * @param interrupter
-	 * @param stageExecutor
 	 * @return
 	 */
 	public static Reasoner createTestReasoner(
 			final AxiomLoader.Factory axiomLoaderFactory,
-			final ReasonerInterrupter interrupter,
-			final ReasonerStageExecutor stageExecutor, final int maxWorkers) {
+			final ReasonerInterrupter interrupter, final int maxWorkers) {
 		ReasonerConfiguration config = ReasonerConfiguration.getConfiguration();
 
 		config.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS,
 				String.valueOf(maxWorkers));
 
 		return new ReasonerFactory().createReasoner(axiomLoaderFactory,
-				interrupter, stageExecutor, config);
+				interrupter, DEFAULT_STAGE_EXECUTOR, config);
 	}
 
 	/**
 	 * Created a reasoner that fails on interrupt.
 	 * 
 	 * @param axiomLoaderFactory
-	 * @param stageExecutor
 	 * @param config
 	 * @return
 	 */
 	public static Reasoner createTestReasoner(
 			final AxiomLoader.Factory axiomLoaderFactory,
-			final ReasonerStageExecutor stageExecutor,
 			final ReasonerConfiguration config) {
 		return createTestReasoner(axiomLoaderFactory,
-				FailingReasonerInterrupter.INSTANCE, stageExecutor, config);
+				FailingReasonerInterrupter.INSTANCE, config);
 	}
 
 	/**
 	 * Created a reasoner that fails on interrupt and uses default config.
 	 * 
 	 * @param axiomLoaderFactory
-	 * @param stageExecutor
 	 * @return
 	 */
 	public static Reasoner createTestReasoner(
-			final AxiomLoader.Factory axiomLoaderFactory,
-			final ReasonerStageExecutor stageExecutor) {
-		return createTestReasoner(axiomLoaderFactory, stageExecutor,
+			final AxiomLoader.Factory axiomLoaderFactory) {
+		return createTestReasoner(axiomLoaderFactory,
 				ReasonerConfiguration.getConfiguration());
 	}
-	
+
 	/**
 	 * Created a reasoner that fails on interrupt and uses default config.
 	 * 
 	 * @param axiomLoader
-	 * @param stageExecutor
 	 * @return
 	 */
-	public static Reasoner createTestReasoner(final TestAxiomLoader axiomLoader,
-			final ReasonerStageExecutor stageExecutor) {
-		return createTestReasoner(new TestAxiomLoaderFactory(axiomLoader),
-				stageExecutor);
+	public static Reasoner createTestReasoner(
+			final TestAxiomLoader axiomLoader) {
+		return createTestReasoner(new TestAxiomLoaderFactory(axiomLoader));
 	}
-	
+
 	/**
 	 * Created a reasoner that fails on interrupt and uses default config.
 	 * Closes the stream.
 	 * 
 	 * @param stream
-	 * @param stageExecutor
 	 * @return
 	 */
-	public static Reasoner createTestReasoner(final InputStream stream,
-			final ReasonerStageExecutor stageExecutor) {
+	public static Reasoner createTestReasoner(final InputStream stream) {
 		final AxiomLoader.Factory axiomLoaderFactory = new Owl2StreamLoader.Factory(
 				new Owl2FunctionalStyleParserFactory(), stream);
-		return createTestReasoner(axiomLoaderFactory, stageExecutor);
+		return createTestReasoner(axiomLoaderFactory);
 	}
 
 	/**
@@ -163,19 +152,18 @@ public class TestReasonerUtils {
 	 * workers.
 	 * 
 	 * @param axiomLoaderFactory
-	 * @param stageExecutor
 	 * @param maxWorkers
 	 * @return
 	 */
 	public static Reasoner createTestReasoner(
 			final AxiomLoader.Factory axiomLoaderFactory,
-			final ReasonerStageExecutor stageExecutor, final int maxWorkers) {
+			final int maxWorkers) {
 		ReasonerConfiguration config = ReasonerConfiguration.getConfiguration();
 
 		config.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS,
 				String.valueOf(maxWorkers));
 
-		return createTestReasoner(axiomLoaderFactory, stageExecutor, config);
+		return createTestReasoner(axiomLoaderFactory, config);
 	}
 
 	/**
@@ -183,14 +171,13 @@ public class TestReasonerUtils {
 	 * workers.
 	 * 
 	 * @param axiomLoader
-	 * @param stageExecutor
 	 * @param maxWorkers
 	 * @return
 	 */
 	public static Reasoner createTestReasoner(final TestAxiomLoader axiomLoader,
-			final ReasonerStageExecutor stageExecutor, final int maxWorkers) {
+			final int maxWorkers) {
 		return createTestReasoner(new TestAxiomLoaderFactory(axiomLoader),
-				stageExecutor, maxWorkers);
+				maxWorkers);
 	}
 
 	/**
@@ -198,16 +185,14 @@ public class TestReasonerUtils {
 	 * workers. Closes the stream.
 	 * 
 	 * @param stream
-	 * @param stageExecutor
 	 * @param maxWorkers
 	 * @return
 	 */
 	public static Reasoner createTestReasoner(final InputStream stream,
-			final ReasonerStageExecutor stageExecutor, final int maxWorkers) {
+			final int maxWorkers) {
 		final AxiomLoader.Factory axiomLoaderFactory = new Owl2StreamLoader.Factory(
 				new Owl2FunctionalStyleParserFactory(), stream);
-		return createTestReasoner(axiomLoaderFactory, stageExecutor,
-				maxWorkers);
+		return createTestReasoner(axiomLoaderFactory, maxWorkers);
 	}
 
 	/**
@@ -215,16 +200,14 @@ public class TestReasonerUtils {
 	 * 
 	 * @param stream
 	 * @param interrupter
-	 * @param stageExecutor
 	 * @return
 	 */
 	public static Reasoner createTestReasoner(final InputStream stream,
-			final ReasonerInterrupter interrupter,
-			final ReasonerStageExecutor stageExecutor) {
+			final ReasonerInterrupter interrupter) {
 		final AxiomLoader.Factory axiomLoaderFactory = new Owl2StreamLoader.Factory(
 				new Owl2FunctionalStyleParserFactory(), stream);
 		return createTestReasoner(axiomLoaderFactory, interrupter,
-				stageExecutor, ReasonerConfiguration.getConfiguration());
+				ReasonerConfiguration.getConfiguration());
 	}
 
 	/**
@@ -232,7 +215,6 @@ public class TestReasonerUtils {
 	 * 
 	 * @param stream
 	 * @param interrupter
-	 * @param stageExecutor
 	 * @return
 	 */
 	public static Reasoner createTestReasoner(final InputStream stream,
@@ -240,26 +222,22 @@ public class TestReasonerUtils {
 			final ReasonerStageExecutor stageExecutor, final int maxWorkers) {
 		final AxiomLoader.Factory axiomLoaderFactory = new Owl2StreamLoader.Factory(
 				new Owl2FunctionalStyleParserFactory(), stream);
-		return createTestReasoner(axiomLoaderFactory, interrupter,
-				stageExecutor, maxWorkers);
+		return createTestReasoner(axiomLoaderFactory, interrupter, maxWorkers);
 	}
 
 	public static Reasoner createTestReasoner(
 			final ReasonerInterrupter interrupter,
-			final ReasonerStageExecutor stageExecutor,
 			final ReasonerConfiguration config) {
-		return new ReasonerFactory().createReasoner(interrupter, stageExecutor,
-				config);
+		return new ReasonerFactory().createReasoner(interrupter,
+				DEFAULT_STAGE_EXECUTOR, config);
 	}
 
 	public static Reasoner loadAndClassify(Set<? extends ElkAxiom> ontology)
 			throws Exception {
 
 		TestChangesLoader initialLoader = new TestChangesLoader();
-		ReasonerStageExecutor executor = new LoggingStageExecutor();
 
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(initialLoader,
-				executor);
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(initialLoader);
 
 		for (ElkAxiom axiom : ontology) {
 			initialLoader.add(axiom);

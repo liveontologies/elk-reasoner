@@ -1,11 +1,3 @@
-package org.semanticweb.elk.reasoner.taxonomy;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
 /*
  * #%L
  * ELK Reasoner
@@ -27,6 +19,13 @@ import static org.junit.Assert.assertTrue;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.taxonomy;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
 import java.util.Set;
@@ -44,7 +43,6 @@ import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.testing.PolySuite;
@@ -78,7 +76,7 @@ public class ClassTaxonomyMemberComparisonTest {
 
 			final Reasoner reasoner = TestReasonerUtils.createTestReasoner(
 					getClass().getClassLoader().getResourceAsStream(resource),
-					new SimpleStageExecutor(), 1);
+					1);
 
 			return reasoner.getTaxonomy();
 

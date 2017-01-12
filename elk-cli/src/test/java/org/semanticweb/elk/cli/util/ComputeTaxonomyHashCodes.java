@@ -39,7 +39,6 @@ import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
@@ -122,7 +121,7 @@ public class ComputeTaxonomyHashCodes {
 
 			// use just one worker to minimize the risk of errors
 			Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-					new FileInputStream(ontFile), new SimpleStageExecutor(), 1);
+					new FileInputStream(ontFile), 1);
 
 			int hash = hasher.hash(reasoner);
 			// create the expected result file

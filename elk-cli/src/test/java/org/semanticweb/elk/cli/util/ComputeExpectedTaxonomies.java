@@ -41,7 +41,6 @@ import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
@@ -121,7 +120,7 @@ public class ComputeExpectedTaxonomies {
 
 			// use just one worker to minimize the risk of errors
 			Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-					new FileInputStream(ontFile), new SimpleStageExecutor(), 1);
+					new FileInputStream(ontFile), 1);
 
 			Taxonomy<ElkClass> taxonomy = gt.getTaxonomy(reasoner);
 			// create the expected result file

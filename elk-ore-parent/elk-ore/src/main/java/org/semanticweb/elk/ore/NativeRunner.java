@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.ore;
-
 /*
  * #%L
  * ELK Command Line Interface
@@ -24,6 +19,7 @@ package org.semanticweb.elk.ore;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.ore;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -40,7 +36,6 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
-import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
@@ -109,8 +104,7 @@ public class NativeRunner {
 		Owl2ParserFactory parserFactory = new Owl2FunctionalStyleParserFactory();
 		AxiomLoader.Factory loaderFactory = new Owl2StreamLoader.Factory(
 				parserFactory, input);
-		Reasoner reasoner = reasoningFactory.createReasoner(loaderFactory,
-				new SimpleStageExecutor());
+		Reasoner reasoner = reasoningFactory.createReasoner(loaderFactory);
 
 		boolean printedStarted = false, printedTime = false;
 		

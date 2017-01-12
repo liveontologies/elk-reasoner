@@ -44,7 +44,6 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.util.concurrent.computation.DummyInterruptMonitor;
@@ -112,7 +111,7 @@ public abstract class BaseRandomWalkIncrementalCorrectnessTest {
 		TestAxiomLoader trackingLoader = getAxiomTrackingLoader(fileLoader,
 				changingAxioms, staticAxioms);
 		incrementalReasoner = TestReasonerUtils.createTestReasoner(
-				trackingLoader, new PostProcessingStageExecutor());
+				trackingLoader);
 		incrementalReasoner.setAllowIncrementalMode(true);
 
 		try {

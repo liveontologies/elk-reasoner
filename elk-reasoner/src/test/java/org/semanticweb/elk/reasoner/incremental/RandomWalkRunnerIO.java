@@ -27,7 +27,6 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.slf4j.Logger;
@@ -62,8 +61,7 @@ public interface RandomWalkRunnerIO<T> {
 		@Override
 		public Reasoner createReasoner(Iterable<ElkAxiom> axioms) {
 			Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-					new TestChangesLoader(axioms, IncrementalChangeType.ADD),
-					new SimpleStageExecutor());
+					new TestChangesLoader(axioms, IncrementalChangeType.ADD));
 
 			reasoner.setAllowIncrementalMode(false);
 

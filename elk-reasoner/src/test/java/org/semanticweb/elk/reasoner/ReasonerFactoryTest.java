@@ -49,8 +49,7 @@ public class ReasonerFactoryTest {
 	@Test
 	public void createReasonerDefaultConfig() {
 		Reasoner reasoner = new ReasonerFactory().createReasoner(
-				new TestAxiomLoaderFactory(new EmptyAxiomLoader()),
-				new SimpleStageExecutor());
+				new TestAxiomLoaderFactory(new EmptyAxiomLoader()));
 
 		assertEquals(Runtime.getRuntime().availableProcessors(),
 				reasoner.getNumberOfWorkers());

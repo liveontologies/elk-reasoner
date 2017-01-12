@@ -38,7 +38,6 @@ import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 
 /**
@@ -55,8 +54,7 @@ public class LowLevelIncrementalABoxTest {
 	@Test
 	public void testBasicDeletion() throws ElkException, IOException {
 		TestChangesLoader loader = new TestChangesLoader();		
-		Reasoner reasoner = TestReasonerUtils
-				.createTestReasoner(loader, new PostProcessingStageExecutor());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
 
 		reasoner.setAllowIncrementalMode(false);		
 
@@ -95,8 +93,7 @@ public class LowLevelIncrementalABoxTest {
 	@Test
 	public void testInvalidTaxonomyAfterInconsistency() throws ElkException, IOException {
 		TestChangesLoader loader = new TestChangesLoader();
-		Reasoner reasoner = TestReasonerUtils
-				.createTestReasoner(loader, new PostProcessingStageExecutor());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
 
 		reasoner.setAllowIncrementalMode(false);
 
@@ -132,8 +129,7 @@ public class LowLevelIncrementalABoxTest {
 	@Test
 	public void testRemoveIndividual() throws ElkException, IOException {
 		TestChangesLoader loader = new TestChangesLoader();		
-		Reasoner reasoner = TestReasonerUtils
-				.createTestReasoner(loader, new PostProcessingStageExecutor());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
 
 		reasoner.setAllowIncrementalMode(false);		
 
@@ -178,8 +174,7 @@ public class LowLevelIncrementalABoxTest {
 	@Test
 	public void testNewIndividual() throws ElkException, IOException {
 		TestChangesLoader loader = new TestChangesLoader();		
-		Reasoner reasoner = TestReasonerUtils
-				.createTestReasoner(loader, new PostProcessingStageExecutor());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
 
 		reasoner.setAllowIncrementalMode(false);
 		

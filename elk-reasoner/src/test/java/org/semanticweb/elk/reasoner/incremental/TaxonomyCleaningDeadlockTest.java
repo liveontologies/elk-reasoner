@@ -37,7 +37,6 @@ import org.semanticweb.elk.owl.iris.ElkPrefixImpl;
 import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.slf4j.Logger;
@@ -79,7 +78,7 @@ public class TaxonomyCleaningDeadlockTest {
 			final TestChangesLoader loader = new TestChangesLoader();
 
 			final Reasoner reasoner = TestReasonerUtils
-					.createTestReasoner(loader, new LoggingStageExecutor());
+					.createTestReasoner(loader);
 			reasoner.setAllowIncrementalMode(false);
 
 			final Multimap<Integer, ElkSubClassOfAxiom> axiomsPerSuperClass = new HashSetMultimap<Integer, ElkSubClassOfAxiom>();

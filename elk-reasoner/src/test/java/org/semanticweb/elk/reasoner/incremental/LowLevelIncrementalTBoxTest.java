@@ -59,8 +59,6 @@ import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
-import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,8 +92,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		TestChangesLoader loader = new TestChangesLoader();
 
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
-				new LoggingStageExecutor());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
 		reasoner.setAllowIncrementalMode(false);
 
 		ElkClass a = createElkClass("A");
@@ -137,8 +134,7 @@ public class LowLevelIncrementalTBoxTest {
 	public void testDeletePositiveExistential() throws ElkException {
 		TestChangesLoader loader = new TestChangesLoader();
 
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
-				new LoggingStageExecutor());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
 
 		reasoner.setAllowIncrementalMode(false);
 
@@ -183,8 +179,7 @@ public class LowLevelIncrementalTBoxTest {
 	public void testDeleteAddConjunction() throws ElkException {
 		TestChangesLoader loader = new TestChangesLoader();
 
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
-				new LoggingStageExecutor(), 1);
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader, 1);
 
 		reasoner.setAllowIncrementalMode(false);
 
@@ -282,8 +277,7 @@ public class LowLevelIncrementalTBoxTest {
 	public void testEquivalence() throws ElkException {
 		TestChangesLoader loader = new TestChangesLoader();
 
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
-				new LoggingStageExecutor(), 1);
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader, 1);
 
 		reasoner.setAllowIncrementalMode(false);
 
@@ -354,8 +348,7 @@ public class LowLevelIncrementalTBoxTest {
 	public void testNewClassUnsatisfiable() throws ElkException {
 		TestChangesLoader loader = new TestChangesLoader();
 
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
-				new LoggingStageExecutor());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
 
 		reasoner.setAllowIncrementalMode(false);
 
@@ -420,7 +413,7 @@ public class LowLevelIncrementalTBoxTest {
 			TestChangesLoader initialLoader = new TestChangesLoader();
 
 			Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-					initialLoader, new LoggingStageExecutor());
+					initialLoader);
 
 			reasoner.setAllowIncrementalMode(false);
 
@@ -482,7 +475,7 @@ public class LowLevelIncrementalTBoxTest {
 			TestChangesLoader initialLoader = new TestChangesLoader();
 
 			Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-					initialLoader, new LoggingStageExecutor());
+					initialLoader);
 			reasoner.setAllowIncrementalMode(false);
 
 			for (ElkAxiom axiom : ontology) {
@@ -534,8 +527,7 @@ public class LowLevelIncrementalTBoxTest {
 	public void testDuplicateSubclassAxioms() throws ElkException {
 		TestChangesLoader loader = new TestChangesLoader();
 
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
-				new LoggingStageExecutor());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
 		reasoner.setAllowIncrementalMode(false);
 
 		ElkClass a = createElkClass("A");
@@ -586,8 +578,7 @@ public class LowLevelIncrementalTBoxTest {
 	public void testTaxonomyIncrementalConsistencyTaxonomy() throws ElkException {
 		TestChangesLoader loader = new TestChangesLoader();
 
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
-				new LoggingStageExecutor());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
 		reasoner.setAllowIncrementalMode(true);
 		
 		ElkClass a = objectFactory.getClass(new ElkAbbreviatedIri(p, "A"));
@@ -653,8 +644,7 @@ public class LowLevelIncrementalTBoxTest {
 	public void testPropositionalAdditions() throws ElkException {
 		TestChangesLoader loader = new TestChangesLoader();
 
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
-				new LoggingStageExecutor());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
 
 		reasoner.setAllowIncrementalMode(false);
 
@@ -701,8 +691,7 @@ public class LowLevelIncrementalTBoxTest {
 	public void testCleanObsoleteContexts() throws ElkException {
 		TestChangesLoader loader = new TestChangesLoader();
 
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
-				new PostProcessingStageExecutor(), 1);
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader, 1);
 
 		reasoner.setAllowIncrementalMode(false);
 
@@ -749,8 +738,7 @@ public class LowLevelIncrementalTBoxTest {
 	public void testDeleteBinaryDisjointness() throws ElkException {
 		TestChangesLoader loader = new TestChangesLoader();
 
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
-				new LoggingStageExecutor());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
 
 		reasoner.setAllowIncrementalMode(false);
 
@@ -805,8 +793,7 @@ public class LowLevelIncrementalTBoxTest {
 		try {
 			TestChangesLoader loader = new TestChangesLoader();
 
-			Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
-					new LoggingStageExecutor());
+			Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
 
 			reasoner.setAllowIncrementalMode(false);
 
@@ -862,8 +849,7 @@ public class LowLevelIncrementalTBoxTest {
 	public void testAddClassRemoveClass() throws ElkException {
 		TestChangesLoader loader = new TestChangesLoader();
 
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
-				new LoggingStageExecutor());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
 
 		reasoner.setAllowIncrementalMode(false);
 
@@ -913,8 +899,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		TestChangesLoader loader = new TestChangesLoader();
 
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
-				new LoggingStageExecutor(), 1);
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader, 1);
 
 		reasoner.setAllowIncrementalMode(false);
 
@@ -969,8 +954,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		TestChangesLoader loader = new TestChangesLoader();
 
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
-				new LoggingStageExecutor(), 1);
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader, 1);
 
 		reasoner.setAllowIncrementalMode(false);
 
@@ -1009,8 +993,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		TestChangesLoader loader = new TestChangesLoader();
 
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
-				new LoggingStageExecutor(), 1);
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader, 1);
 
 		reasoner.setAllowIncrementalMode(false);
 
@@ -1060,8 +1043,7 @@ public class LowLevelIncrementalTBoxTest {
 			throws ElkException {
 		TestChangesLoader loader = new TestChangesLoader();
 
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
-				new LoggingStageExecutor());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
 
 		reasoner.setAllowIncrementalMode(false);
 
@@ -1136,8 +1118,7 @@ public class LowLevelIncrementalTBoxTest {
 		List<ElkAxiom> axioms = loadAxioms(new StringReader(ontology));
 		TestChangesLoader initialLoader = new TestChangesLoader();
 
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(initialLoader,
-				new LoggingStageExecutor());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(initialLoader);
 
 		reasoner.setAllowIncrementalMode(false);
 
@@ -1216,8 +1197,7 @@ public class LowLevelIncrementalTBoxTest {
 		List<ElkAxiom> axioms = loadAxioms(new StringReader(ontology));
 		TestChangesLoader initialLoader = new TestChangesLoader();
 
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(initialLoader,
-				new LoggingStageExecutor());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(initialLoader);
 
 		reasoner.setAllowIncrementalMode(false);
 

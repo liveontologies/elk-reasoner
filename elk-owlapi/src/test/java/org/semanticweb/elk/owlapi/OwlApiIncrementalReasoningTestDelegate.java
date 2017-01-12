@@ -33,8 +33,6 @@ import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.reasoner.RandomReasonerInterrupter;
 import org.semanticweb.elk.reasoner.incremental.IncrementalChangeType;
 import org.semanticweb.elk.reasoner.incremental.IncrementalReasoningTestWithInterruptsDelegate;
-import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
-import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.testing.UrlTestInput;
@@ -113,11 +111,10 @@ public abstract class OwlApiIncrementalReasoningTestDelegate<EO extends TestOutp
 		// important to use the buffering mode here
 		// otherwise we'd need to issue a query to the ElkReasoner
 		// before we could use the internal reasoner directly in the tests
-		standardReasoner_ = OWLAPITestUtils.createReasoner(testOntology_, true,
-				new PostProcessingStageExecutor());
+		standardReasoner_ = OWLAPITestUtils.createReasoner(testOntology_, true);
 		standardReasoner_.getInternalReasoner().setAllowIncrementalMode(false);
 		incrementalReasoner_ = OWLAPITestUtils.createReasoner(testOntology_,
-				true, new PostProcessingStageExecutor());
+				true);
 		incrementalReasoner_.getInternalReasoner()
 				.setAllowIncrementalMode(true);
 
@@ -132,14 +129,12 @@ public abstract class OwlApiIncrementalReasoningTestDelegate<EO extends TestOutp
 		 * directly in the tests
 		 * 
 		 */
-		standardReasoner_ = OWLAPITestUtils.createReasoner(testOntology_, true,
-				new PostProcessingStageExecutor());
+		standardReasoner_ = OWLAPITestUtils.createReasoner(testOntology_, true);
 		standardReasoner_.getInternalReasoner().setAllowIncrementalMode(false);
 		final Random random = new Random(RandomSeedProvider.VALUE);
 		incrementalReasoner_ = OWLAPITestUtils.createReasoner(testOntology_,
 				false,
-				new RandomReasonerInterrupter(random, interruptionChance_),
-				new SimpleStageExecutor());
+				new RandomReasonerInterrupter(random, interruptionChance_));
 		incrementalReasoner_.getInternalReasoner()
 				.setAllowIncrementalMode(true);
 

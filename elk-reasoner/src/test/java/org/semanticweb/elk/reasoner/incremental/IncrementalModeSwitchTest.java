@@ -47,8 +47,6 @@ import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
-import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
 /**
@@ -66,8 +64,7 @@ public class IncrementalModeSwitchTest {
 	@Test
 	public void testAddedTransitivity() throws ElkException {
 		TestChangesLoader loader = new TestChangesLoader();
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
-				new PostProcessingStageExecutor());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
 
 		reasoner.setAllowIncrementalMode(false);
 
@@ -120,8 +117,7 @@ public class IncrementalModeSwitchTest {
 		List<ElkAxiom> additions = loadAxioms(new StringReader(toAdd));
 		TestChangesLoader initialLoader = new TestChangesLoader();
 
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(initialLoader,
-				new LoggingStageExecutor());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(initialLoader);
 
 		reasoner.setAllowIncrementalMode(false);
 

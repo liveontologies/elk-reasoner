@@ -50,8 +50,6 @@ import org.semanticweb.elk.reasoner.incremental.IncrementalClassificationCorrect
 import org.semanticweb.elk.reasoner.incremental.OnOffVector;
 import org.semanticweb.elk.reasoner.incremental.RandomWalkIncrementalClassificationRunner;
 import org.semanticweb.elk.reasoner.incremental.RandomWalkRunnerIO;
-import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
-import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
@@ -143,8 +141,8 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 				throw new Owl2ParseException(e);
 			}
 
-			incrementalReasoner = OWLAPITestUtils.createReasoner(ontology, true,
-					new PostProcessingStageExecutor());
+			incrementalReasoner = OWLAPITestUtils.createReasoner(ontology,
+					true);
 			
 			// let the runner run..
 			RandomWalkRunnerIO<OWLAxiom> io = new OWLAPIBasedIO(ontology, incrementalReasoner);
@@ -207,7 +205,7 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 				return OWLAPITestUtils.createReasoner(
 						TestOWLManager.createOWLOntologyManager()
 								.copyOntology(ontology_, OntologyCopy.SHALLOW),
-						false, new SimpleStageExecutor()).getInternalReasoner();
+						false).getInternalReasoner();
 			} catch (OWLOntologyCreationIOException e) {
 				throw new RuntimeException(e);
 			} catch (OWLOntologyCreationException e) {

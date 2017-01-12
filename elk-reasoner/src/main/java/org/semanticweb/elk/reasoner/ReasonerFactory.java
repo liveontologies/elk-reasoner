@@ -29,8 +29,8 @@ import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
+import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
-import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,24 +49,19 @@ public class ReasonerFactory {
 	final static Logger LOGGER_ = LoggerFactory
 			.getLogger(ReasonerFactory.class);
 
-	final static ReasonerStageExecutor DEFAULT_STAGE_EXECUTOR = new SimpleStageExecutor();
+	final static ReasonerStageExecutor DEFAULT_STAGE_EXECUTOR = new LoggingStageExecutor();
 
 	final static ReasonerInterrupter DEFAULT_INTERRUPTER = new ReasonerInterrupter();
 
 	public Reasoner createReasoner(AxiomLoader.Factory axiomLoaderFactory) {
-		return createReasoner(axiomLoaderFactory, DEFAULT_STAGE_EXECUTOR);
-	}
-
-	public Reasoner createReasoner(AxiomLoader.Factory axiomLoaderFactory,
-			ReasonerStageExecutor stageExecutor) {
-		return createReasoner(axiomLoaderFactory, stageExecutor,
+		return createReasoner(axiomLoaderFactory,
 				ReasonerConfiguration.getConfiguration());
 	}
 
 	public Reasoner createReasoner(AxiomLoader.Factory axiomLoaderFactory,
-			ReasonerStageExecutor stageExecutor, ReasonerConfiguration config) {
+			ReasonerConfiguration config) {
 		return createReasoner(axiomLoaderFactory, DEFAULT_INTERRUPTER,
-				stageExecutor, config);
+				DEFAULT_STAGE_EXECUTOR, config);
 	}
 
 	Reasoner createReasoner(AxiomLoader.Factory axiomLoaderFactory,

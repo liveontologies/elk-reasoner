@@ -51,7 +51,6 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
@@ -228,8 +227,7 @@ public class TaxonomyIOTest {
 			Owl2ParseException, ElkInconsistentOntologyException, ElkException {
 
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				getClass().getClassLoader().getResourceAsStream(resource),
-				new SimpleStageExecutor(), 1);
+				getClass().getClassLoader().getResourceAsStream(resource), 1);
 
 		return reasoner.getInstanceTaxonomy();
 	}
@@ -238,8 +236,7 @@ public class TaxonomyIOTest {
 			Owl2ParseException, ElkInconsistentOntologyException, ElkException {
 
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				getClass().getClassLoader().getResourceAsStream(resource),
-				new SimpleStageExecutor(), 1);
+				getClass().getClassLoader().getResourceAsStream(resource), 1);
 
 		return reasoner.getObjectPropertyTaxonomy();
 	}

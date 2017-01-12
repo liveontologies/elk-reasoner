@@ -42,7 +42,6 @@ import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
@@ -88,8 +87,7 @@ public class TracingTest {
 	@Test
 	public void tracingTest() throws Exception {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				manifest.getInput().getUrl().openStream(),
-				new PostProcessingStageExecutor());
+				manifest.getInput().getUrl().openStream());
 
 		try {
 			TracingTests tests = getTracingTests(reasoner);

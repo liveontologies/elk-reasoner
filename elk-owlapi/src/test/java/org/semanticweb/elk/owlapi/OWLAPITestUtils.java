@@ -29,8 +29,6 @@ import org.semanticweb.elk.reasoner.FailingReasonerInterrupter;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerInterrupter;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
-import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 /**
@@ -53,11 +51,10 @@ public class OWLAPITestUtils {
 
 	public static ElkReasoner createReasoner(final OWLOntology ontology,
 			final boolean isBufferingMode,
-			final ReasonerInterrupter interrupter,
-			final ReasonerStageExecutor stageExecutor) {
+			final ReasonerInterrupter interrupter) {
 		final ElkReasonerConfiguration elkConfig = new ElkReasonerConfiguration();
 		final Reasoner internalReasoner = TestReasonerUtils.createTestReasoner(
-				interrupter, stageExecutor, elkConfig.getElkConfiguration());
+				interrupter, elkConfig.getElkConfiguration());
 		return createReasoner(ontology, isBufferingMode, elkConfig,
 				internalReasoner);
 	}
@@ -67,20 +64,12 @@ public class OWLAPITestUtils {
 	 * 
 	 * @param ontology
 	 * @param isBufferingMode
-	 * @param stageExecutor
 	 * @return
 	 */
 	public static ElkReasoner createReasoner(final OWLOntology ontology,
-			final boolean isBufferingMode,
-			final ReasonerStageExecutor stageExecutor) {
-		return createReasoner(ontology, isBufferingMode,
-				FailingReasonerInterrupter.INSTANCE, stageExecutor);
-	}
-
-	public static ElkReasoner createReasoner(final OWLOntology ontology,
 			final boolean isBufferingMode) {
 		return createReasoner(ontology, isBufferingMode,
-				new SimpleStageExecutor());
+				FailingReasonerInterrupter.INSTANCE);
 	}
 
 	/**
@@ -91,7 +80,7 @@ public class OWLAPITestUtils {
 	 */
 	public static ElkReasoner createReasoner(final OWLOntology ontology) {
 		return createReasoner(ontology, false,
-				FailingReasonerInterrupter.INSTANCE, new SimpleStageExecutor());
+				FailingReasonerInterrupter.INSTANCE);
 	}
 
 	public static ElkProver createProver(ElkReasoner reasoner) {

@@ -44,7 +44,6 @@ import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
-import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
@@ -177,7 +176,7 @@ public class Main {
 		AxiomLoader.Factory loader = new Owl2StreamLoader.Factory(parserFactory,
 				options.valueOf(inputFile));
 		Reasoner reasoner = reasoningFactory.createReasoner(loader,
-				new LoggingStageExecutor(), configuration);
+				configuration);
 
 		try {
 			if (options.has(satisfiable)) {

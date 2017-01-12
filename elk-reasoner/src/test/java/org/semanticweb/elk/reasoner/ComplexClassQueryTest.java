@@ -37,7 +37,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
-import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 
 public class ComplexClassQueryTest {
@@ -47,8 +46,7 @@ public class ComplexClassQueryTest {
 	@Test
 	public void testSimpleSubsumption() throws ElkException {
 		TestLoader loader = new TestLoader();
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
-				new SimpleStageExecutor());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
 
 		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
@@ -64,8 +62,7 @@ public class ComplexClassQueryTest {
 	@Test
 	public void testSatisfiabilityExistential() throws ElkException {
 		TestLoader loader = new TestLoader();
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
-				new SimpleStageExecutor());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
 
 		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
@@ -82,8 +79,7 @@ public class ComplexClassQueryTest {
 	@Test
 	public void testSatisfiabilityExistentialSubsumption() throws ElkException {
 		TestLoader loader = new TestLoader();
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
-				new SimpleStageExecutor());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
 
 		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
@@ -105,8 +101,7 @@ public class ComplexClassQueryTest {
 	@Test
 	public void testSupSubClassConjunction() throws ElkException {
 		TestLoader loader = new TestLoader();
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
-				new SimpleStageExecutor());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
 
 		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
@@ -133,7 +128,7 @@ public class ComplexClassQueryTest {
 	@Test
 	public void testEquivalentClasses() throws ElkException {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				new EmptyAxiomLoader(), new SimpleStageExecutor());
+				new EmptyAxiomLoader());
 
 		// empty ontology, query for conjunction
 		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
@@ -156,8 +151,7 @@ public class ComplexClassQueryTest {
 	@Test
 	public void testPartiallySupportedExpression() throws ElkException {
 		TestLoader loader = new TestLoader();
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
-				new SimpleStageExecutor());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
 
 		final ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
 		final ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
