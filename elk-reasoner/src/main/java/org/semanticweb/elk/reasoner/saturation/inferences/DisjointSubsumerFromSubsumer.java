@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.saturation.inferences;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +19,7 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
@@ -61,15 +57,22 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
 public class DisjointSubsumerFromSubsumer
 		extends AbstractDisjointSubsumerInference {
 
+	private final ElkAxiom reason_;
+
 	public DisjointSubsumerFromSubsumer(IndexedContextRoot inferenceRoot,
 			IndexedClassExpressionList disjoint, int position,
 			ElkAxiom reason) {
-		super(inferenceRoot, disjoint, position, reason);
+		super(inferenceRoot, disjoint, position);
+		this.reason_ = reason;
 	}
 
 	@Override
 	public IndexedContextRoot getOrigin() {
 		return getDestination();
+	}
+
+	public ElkAxiom getReason() {
+		return reason_;
 	}
 
 	public SubClassInclusionComposed getFirstPremise(

@@ -158,7 +158,6 @@ public class TracingInferencePremiseVisitor<O>
 		conclusionVisitor_.visit(inference.getFirstPremise(conclusionFactory_));
 		conclusionVisitor_
 				.visit(inference.getSecondPremise(conclusionFactory_));
-		conclusionVisitor_.visit(inference.getThirdPremise(conclusionFactory_));
 		return null;
 	}
 

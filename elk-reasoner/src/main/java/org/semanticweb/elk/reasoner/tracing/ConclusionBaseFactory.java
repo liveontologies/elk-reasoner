@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.tracing;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.tracing;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.tracing;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.classes.IndexedAxiomBaseFactory;
@@ -85,10 +84,9 @@ public class ConclusionBaseFactory implements Conclusion.Factory {
 
 	@Override
 	public DisjointSubsumer getDisjointSubsumer(IndexedContextRoot root,
-			IndexedClassExpressionList disjointExpressions, int position,
-			ElkAxiom reason) {
+			IndexedClassExpressionList disjointExpressions, int position) {
 		return saturationConclusionFactory_.getDisjointSubsumer(root,
-				disjointExpressions, position, reason);
+				disjointExpressions, position);
 	}
 
 	@Override

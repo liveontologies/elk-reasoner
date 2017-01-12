@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.saturation.conclusions.model;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,8 +19,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.model;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.saturation.conclusions.model;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 
@@ -70,12 +68,6 @@ public interface DisjointSubsumer extends ClassConclusion {
 	 */
 	public int getPosition();
 
-	/**
-	 * @return the {@link ElkAxiom} that is responsible for the
-	 *         {@link IndexedClassExpressionList}
-	 */
-	public ElkAxiom getReason();
-
 	public <O> O accept(Visitor<O> visitor);
 
 	/**
@@ -87,8 +79,7 @@ public interface DisjointSubsumer extends ClassConclusion {
 	interface Factory {
 
 		DisjointSubsumer getDisjointSubsumer(IndexedContextRoot root,
-				IndexedClassExpressionList disjointExpressions, int position,
-				ElkAxiom reason);
+				IndexedClassExpressionList disjointExpressions, int position);
 
 	}
 

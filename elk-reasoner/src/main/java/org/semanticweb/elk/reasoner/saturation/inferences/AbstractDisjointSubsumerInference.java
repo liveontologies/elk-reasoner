@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.saturation.inferences;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,8 +19,8 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.saturation.inferences;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.DisjointSubsumerImpl;
@@ -34,9 +32,8 @@ abstract class AbstractDisjointSubsumerInference extends DisjointSubsumerImpl
 		implements DisjointSubsumerInference {
 
 	public AbstractDisjointSubsumerInference(IndexedContextRoot root,
-			IndexedClassExpressionList disjoint, int position,
-			ElkAxiom reason) {
-		super(root, disjoint, position, reason);
+			IndexedClassExpressionList disjoint, int position) {
+		super(root, disjoint, position);
 	}
 
 	/**
@@ -47,7 +44,7 @@ abstract class AbstractDisjointSubsumerInference extends DisjointSubsumerImpl
 	 */
 	public final DisjointSubsumer getConclusion(DisjointSubsumer.Factory factory) {
 		return factory.getDisjointSubsumer(getDestination(),
-				getDisjointExpressions(), getPosition(), getReason());
+				getDisjointExpressions(), getPosition());
 	}
 
 	@Override

@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,8 +19,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
@@ -30,8 +28,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -71,10 +69,8 @@ public class SaturationConclusionBaseFactory
 
 	@Override
 	public DisjointSubsumer getDisjointSubsumer(IndexedContextRoot root,
-			IndexedClassExpressionList disjointExpressions, int position,
-			ElkAxiom reason) {
-		return new DisjointSubsumerImpl(root, disjointExpressions, position,
-				reason);
+			IndexedClassExpressionList disjointExpressions, int position) {
+		return new DisjointSubsumerImpl(root, disjointExpressions, position);
 	}
 
 	@Override

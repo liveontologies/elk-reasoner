@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.tracing;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.tracing;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.tracing;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
@@ -121,8 +120,8 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 						conclusion.getDestination())
 						&& equals(other.getDisjointExpressions(),
 								conclusion.getDisjointExpressions())
-						&& equals(other.getPosition(), conclusion.getPosition())
-						&& equals(other.getReason(), conclusion.getReason());
+						&& equals(other.getPosition(),
+								conclusion.getPosition());
 			}
 		});
 	}

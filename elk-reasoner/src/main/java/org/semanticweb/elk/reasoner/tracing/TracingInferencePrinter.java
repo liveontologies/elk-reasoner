@@ -131,8 +131,7 @@ public class TracingInferencePrinter implements TracingInference.Visitor<String>
 		return String.format("%s -| %s; %s; %s",
 				inference.getConclusion(factory_),
 				inference.getFirstPremise(factory_),
-				inference.getSecondPremise(factory_),
-				inference.getThirdPremise(factory_));
+				inference.getSecondPremise(factory_));
 	}
 
 	@Override

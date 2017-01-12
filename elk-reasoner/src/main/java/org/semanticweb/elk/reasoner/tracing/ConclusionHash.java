@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.tracing;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.tracing;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.tracing;
 
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiom;
@@ -112,8 +111,7 @@ public class ConclusionHash
 		return combinedHashCode(hashCode(DisjointSubsumer.class),
 				hashCode(conclusion.getDestination()),
 				hashCode(conclusion.getDisjointExpressions()),
-				hashCode(conclusion.getPosition()),
-				hashCode(conclusion.getReason()));
+				hashCode(conclusion.getPosition()));
 	}
 
 	@Override

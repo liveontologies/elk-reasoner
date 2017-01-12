@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.saturation.inferences;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,12 +19,11 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.saturation.inferences;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 
@@ -76,22 +70,12 @@ public class ClassInconsistencyOfDisjointSubsumers
 	 */
 	private final Integer firstPosition_, secondPosition_;
 
-	/**
-	 * The original {@link ElkAxiom} due to which this axiom was indexed
-	 */
-	private final ElkAxiom reason_;
-
 	public ClassInconsistencyOfDisjointSubsumers(DisjointSubsumer premise,
 			Integer otherPos) {
 		super(premise.getDestination());
 		this.disjointExpressions_ = premise.getDisjointExpressions();
 		this.firstPosition_ = premise.getPosition();
 		this.secondPosition_ = otherPos;
-		this.reason_ = premise.getReason();
-	}
-
-	public ElkAxiom getReason() {
-		return reason_;
 	}
 
 	@Override
@@ -113,18 +97,12 @@ public class ClassInconsistencyOfDisjointSubsumers
 
 	public DisjointSubsumer getFirstPremise(DisjointSubsumer.Factory factory) {
 		return factory.getDisjointSubsumer(getOrigin(), disjointExpressions_,
-				firstPosition_, reason_);
+				firstPosition_);
 	}
 
 	public DisjointSubsumer getSecondPremise(DisjointSubsumer.Factory factory) {
 		return factory.getDisjointSubsumer(getOrigin(), disjointExpressions_,
-				secondPosition_, reason_);
-	}
-
-	public IndexedDisjointClassesAxiom getThirdPremise(
-			IndexedDisjointClassesAxiom.Factory factory) {
-		return factory.getIndexedDisjointClassesAxiom(reason_,
-				disjointExpressions_);
+				secondPosition_);
 	}
 
 	@Override

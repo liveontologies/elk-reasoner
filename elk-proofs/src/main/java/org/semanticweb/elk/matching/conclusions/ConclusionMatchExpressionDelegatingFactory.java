@@ -181,10 +181,9 @@ public class ConclusionMatchExpressionDelegatingFactory extends
 
 	@Override
 	public DisjointSubsumer getDisjointSubsumer(IndexedContextRoot root,
-			IndexedClassExpressionList disjointExpressions, int position,
-			ElkAxiom reason) {
+			IndexedClassExpressionList disjointExpressions, int position) {
 		return filter(conclusionFactory_.getDisjointSubsumer(root,
-				disjointExpressions, position, reason));
+				disjointExpressions, position));
 	}
 
 	@Override
