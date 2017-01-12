@@ -26,10 +26,8 @@
 package org.semanticweb.elk.reasoner.indexing.model;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
-import org.semanticweb.elk.util.collections.Multimap;
 
 /**
  * An object representing the logical structure of the ontology that enables
@@ -47,13 +45,6 @@ import org.semanticweb.elk.util.collections.Multimap;
  * 
  */
 public interface OntologyIndex extends IndexedObjectCache {
-
-	/**
-	 * @return the assignment of {@link IndexedObjectProperty}s to
-	 *         {@link ElkAxiom}s stating reflexivity of the corresponding
-	 *         {@link ElkObjectProperty}.
-	 */
-	Multimap<IndexedObjectProperty, ElkAxiom> getReflexiveObjectProperties();
 
 	/**
 	 * @return the first context initialization rule assigned to this

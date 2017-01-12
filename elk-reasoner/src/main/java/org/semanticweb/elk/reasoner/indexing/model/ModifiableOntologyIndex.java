@@ -41,36 +41,6 @@ public interface ModifiableOntologyIndex
 		extends OntologyIndex, ModifiableIndexedObjectCache {
 
 	/**
-	 * Assert reflexivity of the given {@link IndexedObjectProperty}
-	 * 
-	 * @param property
-	 *            the {@link IndexedObjectProperty} which should be asserted
-	 *            reflexive
-	 * @param reason
-	 *            the {@link ElkAxiom} that is responsible for reflexivity of
-	 *            this property
-	 * @return {@code true} if the operation is successful and {@code false} if
-	 *         not; if {@code false} is return, the index remains unchanged
-	 */
-	boolean addReflexiveProperty(IndexedObjectProperty property,
-			ElkAxiom reason);
-
-	/**
-	 * Retracts reflexivity of the given {@link IndexedObjectProperty}
-	 * 
-	 * @param property
-	 *            the {@link IndexedObjectProperty} which should not be
-	 *            reflexive anymore
-	 * @param reason
-	 *            the {@link ElkAxiom} that is responsible for reflexivity of
-	 *            this property
-	 * @return {@code true} if the operation is successful and {@code false} if
-	 *         not; if {@code false} is return, the index remains unchanged
-	 */
-	boolean removeReflexiveProperty(IndexedObjectProperty property,
-			ElkAxiom reason);
-
-	/**
 	 * Adds a new context initialization for this {@link OntologyIndex}.
 	 * 
 	 * @param newRule

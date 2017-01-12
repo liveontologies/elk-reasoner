@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.indexing.classes;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +19,7 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.classes.CachedIndexedComplexPropertyChainImpl;
@@ -45,7 +41,7 @@ public class IndexedObjectsCreator {
 	public static ModifiableIndexedObjectProperty createIndexedObjectProperty(
 			ModifiableOntologyIndex index, ElkObjectProperty prop,
 			ModifiableIndexedPropertyChain[] toldSubs,
-			ModifiableIndexedObjectProperty[] toldSupers, boolean reflexive) {
+			ModifiableIndexedObjectProperty[] toldSupers) {
 
 		ModifiableIndexedObjectProperty property = new CachedIndexedObjectPropertyImpl(
 				prop);
@@ -58,10 +54,6 @@ public class IndexedObjectsCreator {
 		for (ModifiableIndexedObjectProperty sup : toldSupers) {
 			property.addToldSuperObjectProperty(sup, null);
 			sup.addToldSubPropertyChain(property, null);
-		}
-
-		if (reflexive) {
-			index.addReflexiveProperty(property, null);
 		}
 
 		return property;

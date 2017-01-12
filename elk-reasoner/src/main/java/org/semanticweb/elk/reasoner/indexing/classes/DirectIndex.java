@@ -30,7 +30,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.predefined.PredefinedElkEntityFactory;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlNothing;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlThing;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObject;
@@ -41,8 +40,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ChainableContex
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
-import org.semanticweb.elk.util.collections.HashListMultimap;
-import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 
@@ -57,16 +54,12 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl
 
 	private ChainableContextInitRule contextInitRules_;
 
-	private final Multimap<IndexedObjectProperty, ElkAxiom> reflexiveObjectProperties_;
-
 	private final List<OntologyIndex.ChangeListener> listeners_;
 
 	private final List<ModifiableOntologyIndex.IndexingUnsupportedListener> indexingUnsupportedListeners_;
 
 	public DirectIndex(final PredefinedElkEntityFactory elkFactory) {
 		super(elkFactory);
-		this.reflexiveObjectProperties_ = new HashListMultimap<IndexedObjectProperty, ElkAxiom>(
-				64);
 		this.listeners_ = new ArrayList<OntologyIndex.ChangeListener>();
 		this.indexingUnsupportedListeners_ = new ArrayList<ModifiableOntologyIndex.IndexingUnsupportedListener>();
 		// the context root initialization rule is always registered
@@ -123,12 +116,6 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl
 		return contextInitRules_;
 	}
 
-	@Override
-	public final Multimap<IndexedObjectProperty, ElkAxiom> getReflexiveObjectProperties() {
-		// TODO: make unmodifiable
-		return reflexiveObjectProperties_;
-	}
-
 	/* read-write methods required by the interface */
 
 	@Override
@@ -151,32 +138,6 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl
 	public boolean remove(ModifiableIndexedClassExpression target,
 			ChainableSubsumerRule rule) {
 		return rule.removeFrom(target.getCompositionRuleChain());
-	}
-
-	@Override
-	public boolean addReflexiveProperty(IndexedObjectProperty property,
-			ElkAxiom reason) {
-		boolean success = reflexiveObjectProperties_.add(property, reason);
-		if (success) {
-			for (int i = 0; i < listeners_.size(); i++) {
-				listeners_.get(i).reflexiveObjectPropertyAddition(property,
-						reason);
-			}
-		}
-		return success;
-	}
-
-	@Override
-	public boolean removeReflexiveProperty(IndexedObjectProperty property,
-			ElkAxiom reason) {
-		boolean success = reflexiveObjectProperties_.remove(property, reason);
-		if (success) {
-			for (int i = 0; i < listeners_.size(); i++) {
-				listeners_.get(i).reflexiveObjectPropertyRemoval(property,
-						reason);
-			}
-		}
-		return success;
 	}
 
 	@Override

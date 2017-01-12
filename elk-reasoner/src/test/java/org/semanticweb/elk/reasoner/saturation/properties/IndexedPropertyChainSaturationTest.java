@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.saturation.properties;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +19,7 @@ package org.semanticweb.elk.reasoner.saturation.properties;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.saturation.properties;
 
 import static org.junit.Assert.assertTrue;
 
@@ -70,19 +66,19 @@ public class IndexedPropertyChainSaturationTest {
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/R1")),
 						new ModifiableIndexedPropertyChain[] {},
-						new ModifiableIndexedObjectProperty[] {}, false);
+						new ModifiableIndexedObjectProperty[] {});
 		ModifiableIndexedObjectProperty R2 = IndexedObjectsCreator
 				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/R2")),
 						new ModifiableIndexedPropertyChain[] { R1 },
-						new ModifiableIndexedObjectProperty[] {}, false);
+						new ModifiableIndexedObjectProperty[] {});
 		ModifiableIndexedObjectProperty R3 = IndexedObjectsCreator
 				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/R3")),
 						new ModifiableIndexedPropertyChain[] { R2 },
-						new ModifiableIndexedObjectProperty[] {}, false);
+						new ModifiableIndexedObjectProperty[] {});
 
 		ModifiableIndexedPropertyChain R1R2 = IndexedObjectsCreator
 				.createIndexedChain(R1, R2,
@@ -140,52 +136,52 @@ public class IndexedPropertyChainSaturationTest {
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/H")),
 						new ModifiableIndexedPropertyChain[] {},
-						new ModifiableIndexedObjectProperty[] {}, false);
+						new ModifiableIndexedObjectProperty[] {});
 		// S1 -> S2 -> S3
 		ModifiableIndexedObjectProperty S3 = IndexedObjectsCreator
 				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/S3")),
 						new ModifiableIndexedPropertyChain[] {},
-						new ModifiableIndexedObjectProperty[] {}, false);
+						new ModifiableIndexedObjectProperty[] {});
 		ModifiableIndexedObjectProperty S2 = IndexedObjectsCreator
 				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/S2")),
 						new ModifiableIndexedPropertyChain[] {},
-						new ModifiableIndexedObjectProperty[] { S3 }, false);
+						new ModifiableIndexedObjectProperty[] { S3 });
 		ModifiableIndexedObjectProperty S1 = IndexedObjectsCreator
 				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/S1")),
 						new ModifiableIndexedPropertyChain[] {},
-						new ModifiableIndexedObjectProperty[] { S2 }, false);
+						new ModifiableIndexedObjectProperty[] { S2 });
 		// P1 -> P2 -> P3
 		ModifiableIndexedObjectProperty P3 = IndexedObjectsCreator
 				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/P3")),
 						new ModifiableIndexedPropertyChain[] {},
-						new ModifiableIndexedObjectProperty[] {}, false);
+						new ModifiableIndexedObjectProperty[] {});
 		ModifiableIndexedObjectProperty P2 = IndexedObjectsCreator
 				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/P2")),
 						new ModifiableIndexedPropertyChain[] {},
-						new ModifiableIndexedObjectProperty[] { P3 }, false);
+						new ModifiableIndexedObjectProperty[] { P3 });
 		ModifiableIndexedObjectProperty P1 = IndexedObjectsCreator
 				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/P1")),
 						new ModifiableIndexedPropertyChain[] {},
-						new ModifiableIndexedObjectProperty[] { P2 }, false);
+						new ModifiableIndexedObjectProperty[] { P2 });
 		// S3 -> R, R -> S1, R -> P1
 		ModifiableIndexedObjectProperty R = IndexedObjectsCreator
 				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/R")),
 						new ModifiableIndexedPropertyChain[] { S3 },
-						new ModifiableIndexedObjectProperty[] { S1, P1 }, false);
+						new ModifiableIndexedObjectProperty[] { S1, P1 });
 		// R o R -> H
 		ModifiableIndexedPropertyChain RR = IndexedObjectsCreator
 				.createIndexedChain(R, R,
