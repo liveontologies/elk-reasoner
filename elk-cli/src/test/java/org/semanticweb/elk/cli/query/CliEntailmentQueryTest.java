@@ -27,9 +27,13 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,9 +41,12 @@ import org.junit.runner.RunWith;
 import org.semanticweb.elk.cli.CliReasoningTestDelegate;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.parsing.Owl2ParseException;
+import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.query.BaseQueryTest;
 import org.semanticweb.elk.reasoner.query.ElkQueryException;
 import org.semanticweb.elk.reasoner.query.EntailmentQueryResult;
+import org.semanticweb.elk.reasoner.query.EntailmentQueryTestManifest;
 import org.semanticweb.elk.reasoner.query.EntailmentQueryTestOutput;
 import org.semanticweb.elk.reasoner.query.ProperEntailmentQueryResult;
 import org.semanticweb.elk.reasoner.query.QueryTestInput;
@@ -90,36 +97,6 @@ public class CliEntailmentQueryTest extends
 					}
 
 				});
-	}
-
-	@Config
-	public static Configuration getConfig()
-			throws IOException, URISyntaxException {
-
-		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION, BaseQueryTest.class, "owl", "expected",
-				new MultiManifestCreator<QueryTestInput<Collection<ElkAxiom>>, EntailmentQueryTestOutput<ElkAxiom>, EntailmentQueryTestOutput<ElkAxiom>>() {
-
-					@Override
-					public Collection<? extends TestManifestWithOutput<QueryTestInput<Collection<ElkAxiom>>, EntailmentQueryTestOutput<ElkAxiom>, EntailmentQueryTestOutput<ElkAxiom>>> createManifests(
-							final URL input, final URL output)
-							throws IOException {
-
-						InputStream outputIS = null;
-						try {
-							outputIS = output.openStream();
-
-							return CliExpectedTestOutputLoader.load(outputIS)
-									.getEntailmentManifests(input);
-
-						} finally {
-							IOUtils.closeQuietly(outputIS);
-						}
-
-					}
-
-				});
-
 	}
 
 	static Map<ElkAxiom, Boolean> resultToOutput(
@@ -205,5 +182,97 @@ public class CliEntailmentQueryTest extends
 		}
 
 	};
+
+	public static final String ENTAILMENT_QUERY_INPUT_DIR = "entailment_query_test_input";
+
+	private static final ConfigurationUtils.ManifestCreator<QueryTestInput<Collection<ElkAxiom>>, EntailmentQueryTestOutput<ElkAxiom>, EntailmentQueryTestOutput<ElkAxiom>> ENTAILMENT_QUERY_TEST_MANIFEST_CREATOR_ = new ConfigurationUtils.ManifestCreator<QueryTestInput<Collection<ElkAxiom>>, EntailmentQueryTestOutput<ElkAxiom>, EntailmentQueryTestOutput<ElkAxiom>>() {
+
+		@Override
+		public Collection<? extends TestManifestWithOutput<QueryTestInput<Collection<ElkAxiom>>, EntailmentQueryTestOutput<ElkAxiom>, EntailmentQueryTestOutput<ElkAxiom>>> createManifests(
+				final List<URL> urls) throws IOException {
+
+			if (urls.size() < 3) {
+				throw new IllegalArgumentException("Need at least 3 URLs!");
+			}
+
+			final URL input = urls.get(0);
+			InputStream entailedIS = null;
+			InputStream notEntailedIS = null;
+			try {
+				entailedIS = urls.get(1).openStream();
+				notEntailedIS = urls.get(2).openStream();
+
+				final List<ElkAxiom> query = new ArrayList<ElkAxiom>();
+				final Map<ElkAxiom, Boolean> output = new HashMap<ElkAxiom, Boolean>();
+
+				final Set<ElkAxiom> entailed = TestReasonerUtils
+						.loadAxioms(entailedIS);
+				final Set<ElkAxiom> notEntailed = TestReasonerUtils
+						.loadAxioms(notEntailedIS);
+				query.addAll(entailed);
+				query.addAll(notEntailed);
+				for (final ElkAxiom elkAxiom : entailed) {
+					output.put(elkAxiom, true);
+				}
+				for (final ElkAxiom elkAxiom : notEntailed) {
+					output.put(elkAxiom, false);
+				}
+
+				return Collections.singleton(
+						new EntailmentQueryTestManifest<ElkAxiom>(input, query,
+								new EntailmentQueryTestOutput<ElkAxiom>(
+										output)));
+
+			} catch (final Owl2ParseException e) {
+				throw new IOException(e);
+			} finally {
+				IOUtils.closeQuietly(entailedIS);
+				IOUtils.closeQuietly(notEntailedIS);
+			}
+
+		}
+
+	};
+
+	private static final MultiManifestCreator<QueryTestInput<Collection<ElkAxiom>>, EntailmentQueryTestOutput<ElkAxiom>, EntailmentQueryTestOutput<ElkAxiom>> CLASS_QUERY_TEST_MANIFEST_CREATOR_ = new MultiManifestCreator<QueryTestInput<Collection<ElkAxiom>>, EntailmentQueryTestOutput<ElkAxiom>, EntailmentQueryTestOutput<ElkAxiom>>() {
+
+		@Override
+		public Collection<? extends TestManifestWithOutput<QueryTestInput<Collection<ElkAxiom>>, EntailmentQueryTestOutput<ElkAxiom>, EntailmentQueryTestOutput<ElkAxiom>>> createManifests(
+				final URL input, final URL output) throws IOException {
+
+			InputStream outputIS = null;
+			try {
+				outputIS = output.openStream();
+
+				return CliExpectedTestOutputLoader.load(outputIS)
+						.getEntailmentManifests(input);
+
+			} finally {
+				IOUtils.closeQuietly(outputIS);
+			}
+
+		}
+
+	};
+
+	@Config
+	public static Configuration getConfig()
+			throws IOException, URISyntaxException {
+
+		final Configuration classConfiguration = ConfigurationUtils
+				.loadFileBasedTestConfiguration(INPUT_DATA_LOCATION,
+						BaseQueryTest.class, "owl", "expected",
+						CLASS_QUERY_TEST_MANIFEST_CREATOR_);
+
+		final Configuration entailmentConfiguration = ConfigurationUtils
+				.loadFileBasedTestConfiguration(ENTAILMENT_QUERY_INPUT_DIR,
+						BaseQueryTest.class,
+						ENTAILMENT_QUERY_TEST_MANIFEST_CREATOR_, "owl",
+						"entailed", "notentailed");
+
+		return ConfigurationUtils.combine(classConfiguration,
+				entailmentConfiguration);
+
+	}
 
 }
