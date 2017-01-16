@@ -113,7 +113,7 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 		 * Whether the query is locked. While this is true and {@link #indexed}
 		 * is not {@code null}, the query results must be available.
 		 */
-		private volatile boolean isLocked_ = true;
+		private int lockedCount_ = 0;
 
 		public QueryState(final ElkAxiom query) {
 			super(query);
@@ -165,19 +165,25 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 					entailmentEvidence);
 		}
 
-		@Override
-		public boolean isLocked() {
-			return isLocked_;
+		public synchronized boolean lock() {
+			final boolean wasLocked = isLocked();
+			lockedCount_++;
+			return wasLocked != isLocked();
 		}
 
 		@Override
-		public boolean unlock() {
-			if (isLocked_) {
-				isLocked_ = false;
-				return true;
+		public synchronized boolean isLocked() {
+			return lockedCount_ > 0;
+		}
+
+		@Override
+		public synchronized boolean unlock() {
+			if (!isLocked()) {
+				return false;
 			}
 			// else
-			return false;
+			lockedCount_--;
+			return !isLocked();
 		}
 
 	}
@@ -410,6 +416,7 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 				continue;
 			}
 			// else
+			state.lock();
 			results.put(axiom, state);
 		}
 

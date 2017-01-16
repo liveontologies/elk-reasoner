@@ -22,7 +22,9 @@
 package org.semanticweb.elk;
 
 /**
- * Instances of this interface may be in two states: locked and unlocked.
+ * This interface represents a lock that may be locked multiple times
+ * (internally). It becomes unlocked only if it is unlocked the same number of
+ * times.
  * 
  * @author Peter Skocovsky
  */
@@ -34,10 +36,11 @@ public interface Lock {
 	boolean isLocked();
 
 	/**
-	 * Changes the state to unlocked.
+	 * Decrements the number of times this lock is locked. It becomes unlocked
+	 * when this method is called at least as many times the lock is locked.
 	 * 
-	 * @return {@code true} if the state changed, {@code false} if the state
-	 *         stayed the same.
+	 * @return {@code true} if the lock was unlocked by this call, {@code false}
+	 *         otherwise.
 	 */
 	boolean unlock();
 
