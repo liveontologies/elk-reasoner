@@ -32,15 +32,15 @@ public class UnsupportedQueryTypeEntailmentQueryResultImpl
 	}
 
 	@Override
-	public <O> O accept(
-			final UnsupportedQueryTypeEntailmentQueryResult.Visitor<O> visitor)
-			throws ElkQueryException {
-		return accept((EntailmentQueryResult.Visitor<O>) visitor);
+	public <O, T extends Throwable> O accept(
+			final UnsupportedQueryTypeEntailmentQueryResult.Visitor<O, T> visitor)
+			throws T {
+		return accept((EntailmentQueryResult.Visitor<O, T>) visitor);
 	}
 
 	@Override
-	public <O> O accept(final EntailmentQueryResult.Visitor<O> visitor)
-			throws ElkQueryException {
+	public <O, T extends Throwable> O accept(
+			final EntailmentQueryResult.Visitor<O, T> visitor) throws T {
 		return visitor.visit(this);
 	}
 

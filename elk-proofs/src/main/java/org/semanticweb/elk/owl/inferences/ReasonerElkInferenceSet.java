@@ -29,7 +29,6 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;
-import org.semanticweb.elk.reasoner.query.ElkQueryException;
 import org.semanticweb.elk.reasoner.query.EntailmentQueryResult;
 import org.semanticweb.elk.reasoner.query.ProperEntailmentQueryResult;
 import org.semanticweb.elk.reasoner.query.UnsupportedIndexingEntailmentQueryResult;
@@ -49,18 +48,13 @@ public class ReasonerElkInferenceSet extends ModifiableElkInferenceSetImpl {
 	private final ElkInference.Factory inferenceFactory_;
 
 	public ReasonerElkInferenceSet(Reasoner reasoner, ElkAxiom goal,
-			ElkObject.Factory elkFactory) {
+			ElkObject.Factory elkFactory) throws ElkException {
 		super(elkFactory);
 		this.reasoner_ = reasoner;
 		this.inferenceFactory_ = new ElkInferenceOptimizedProducingFactory(this,
 				elkFactory);
 		synchronized (this) {
-			try {
-				generateInferences(goal);
-			} catch (final ElkException e) {
-				// TODO: Maybe add throws declaration instead!
-				throw new ElkRuntimeException(e);
-			}
+			generateInferences(goal);
 		}
 	}
 
@@ -74,11 +68,11 @@ public class ReasonerElkInferenceSet extends ModifiableElkInferenceSetImpl {
 
 		final EntailmentQueryResult result = reasoner_.isEntailed(goal);
 
-		result.accept(new EntailmentQueryResult.Visitor<Void>() {
+		result.accept(new EntailmentQueryResult.Visitor<Void, ElkException>() {
 
 			@Override
 			public Void visit(final ProperEntailmentQueryResult result)
-					throws ElkQueryException {
+					throws ElkException {
 
 				try {
 					final EntailmentInferenceSet evidence = result

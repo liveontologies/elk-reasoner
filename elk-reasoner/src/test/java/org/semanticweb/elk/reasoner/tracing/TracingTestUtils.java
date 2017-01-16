@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -56,7 +55,6 @@ import org.semanticweb.elk.reasoner.query.EntailmentQueryResult;
 import org.semanticweb.elk.reasoner.query.ProperEntailmentQueryResult;
 import org.semanticweb.elk.reasoner.query.UnsupportedIndexingEntailmentQueryResult;
 import org.semanticweb.elk.reasoner.query.UnsupportedQueryTypeEntailmentQueryResult;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.DerivedClassConclusionDummyVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
@@ -101,37 +99,38 @@ public class TracingTestUtils {
 
 		final EntailmentQueryResult result = reasoner.isEntailed(
 				elkFactory.getSubClassOfAxiom(subClass, superClass));
-		result.accept(new EntailmentQueryResult.Visitor<Void>() {
+		result.accept(
+				new EntailmentQueryResult.Visitor<Void, ElkQueryException>() {
 
-			@Override
-			public Void visit(final ProperEntailmentQueryResult result)
-					throws ElkQueryException {
-				try {
-					collectReasons(result.getEntailment(),
-							result.getEvidence(false), conclusions);
-				} finally {
-					result.unlock();
-				}
-				return null;
-			}
+					@Override
+					public Void visit(final ProperEntailmentQueryResult result)
+							throws ElkQueryException {
+						try {
+							collectReasons(result.getEntailment(),
+									result.getEvidence(false), conclusions);
+						} finally {
+							result.unlock();
+						}
+						return null;
+					}
 
-			@Override
-			public Void visit(
-					final UnsupportedIndexingEntailmentQueryResult result) {
-				throw new ElkRuntimeException(
-						UnsupportedIndexingEntailmentQueryResult.class
-								.getSimpleName());
-			}
+					@Override
+					public Void visit(
+							final UnsupportedIndexingEntailmentQueryResult result) {
+						throw new ElkRuntimeException(
+								UnsupportedIndexingEntailmentQueryResult.class
+										.getSimpleName());
+					}
 
-			@Override
-			public Void visit(
-					final UnsupportedQueryTypeEntailmentQueryResult result) {
-				throw new ElkRuntimeException(
-						UnsupportedQueryTypeEntailmentQueryResult.class
-								.getSimpleName());
-			}
+					@Override
+					public Void visit(
+							final UnsupportedQueryTypeEntailmentQueryResult result) {
+						throw new ElkRuntimeException(
+								UnsupportedQueryTypeEntailmentQueryResult.class
+										.getSimpleName());
+					}
 
-		});
+				});
 
 		return conclusions;
 	}

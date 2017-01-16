@@ -29,10 +29,11 @@ package org.semanticweb.elk.reasoner.query;
 public interface UnsupportedQueryTypeEntailmentQueryResult
 		extends EntailmentQueryResult {
 
-	<O> O accept(Visitor<O> visitor) throws ElkQueryException;
+	<O, T extends Throwable> O accept(Visitor<O, T> visitor) throws T;
 
-	public static interface Visitor<O> {
-		O visit(UnsupportedQueryTypeEntailmentQueryResult unsupportedQueryTypeEntailmentQueryResult);
+	public static interface Visitor<O, T extends Throwable> {
+		O visit(UnsupportedQueryTypeEntailmentQueryResult unsupportedQueryTypeEntailmentQueryResult)
+				throws T;
 	}
 
 }

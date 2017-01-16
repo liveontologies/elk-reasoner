@@ -67,6 +67,8 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 
 	private final ElkInference.Factory inferenceFactory_;
 
+	private ElkException caughtException_;
+
 	public ElkProofGenerator(final EntailmentInferenceSet evidence,
 			final Reasoner reasoner, final ElkObject.Factory elkFactory,
 			final ElkInference.Factory inferenceFactory) {
@@ -74,6 +76,7 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 		this.reasoner_ = reasoner;
 		this.elkFactory_ = elkFactory;
 		this.inferenceFactory_ = inferenceFactory;
+		this.caughtException_ = null;
 	}
 
 	public ElkProofGenerator(final EntailmentInferenceSet evidence,
@@ -82,10 +85,13 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 		this(evidence, reasoner, reasoner.getElkFactory(), inferenceFactory);
 	}
 
-	public void generate(final Entailment goalEntailment) {
+	public void generate(final Entailment goalEntailment) throws ElkException {
 		for (final EntailmentInference inf : evidence_
 				.getInferences(goalEntailment)) {
 			inf.accept(this);
+		}
+		if (caughtException_ != null) {
+			throw caughtException_;
 		}
 	}
 
@@ -101,10 +107,10 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 			matcher.trace(conclusion, elkFactory_.getOwlThing());
 			inferenceFactory_.getElkClassInclusionHierarchy(
 					elkFactory_.getOwlThing(), elkFactory_.getOwlNothing());
-			return null;
 		} catch (final ElkException e) {
-			throw new ElkRuntimeException(e);
+			caughtException_ = e;
 		}
+		return null;
 	}
 
 	@Override
@@ -137,10 +143,10 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 							elkFactory_.getOwlThing()),
 					elkFactory_.getOwlNothing());
 
-			return null;
 		} catch (final ElkException e) {
-			throw new ElkRuntimeException(e);
+			caughtException_ = e;
 		}
+		return null;
 	}
 
 	@Override
@@ -183,10 +189,10 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 							elkFactory_.getOwlNothing()),
 					elkFactory_.getOwlNothing());
 
-			return null;
 		} catch (final ElkException e) {
-			throw new ElkRuntimeException(e);
+			caughtException_ = e;
 		}
+		return null;
 	}
 
 	@Override
@@ -284,10 +290,10 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 			inferenceFactory_.getElkClassInclusionOwlNothing(superClass);
 			inferenceFactory_.getElkClassInclusionHierarchy(subClass,
 					elkFactory_.getOwlNothing(), superClass);
-			return null;
 		} catch (final ElkException e) {
-			throw new ElkRuntimeException(e);
+			caughtException_ = e;
 		}
+		return null;
 	}
 
 	@Override
@@ -304,10 +310,10 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 					reasoner_.explainConclusion(conclusion), elkFactory_,
 					inferenceFactory_);
 			matcher.trace(conclusion, subClass, superClass);
-			return null;
 		} catch (final ElkException e) {
-			throw new ElkRuntimeException(e);
+			caughtException_ = e;
 		}
+		return null;
 	}
 
 	@Override
@@ -343,10 +349,10 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 			matcher.trace(conclusion, nominal, type);
 			inferenceFactory_.getElkClassAssertionOfClassInclusion(instance,
 					type);
-			return null;
 		} catch (final ElkException e) {
-			throw new ElkRuntimeException(e);
+			caughtException_ = e;
 		}
+		return null;
 	}
 
 }

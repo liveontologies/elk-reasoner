@@ -35,12 +35,12 @@ public interface EntailmentQueryResult {
 	 */
 	ElkAxiom getQuery();
 
-	<O> O accept(Visitor<O> visitor) throws ElkQueryException;
+	<O, T extends Throwable> O accept(Visitor<O, T> visitor) throws T;
 
-	public static interface Visitor<O>
-			extends ProperEntailmentQueryResult.Visitor<O>,
-			UnsupportedIndexingEntailmentQueryResult.Visitor<O>,
-			UnsupportedQueryTypeEntailmentQueryResult.Visitor<O> {
+	public static interface Visitor<O, T extends Throwable>
+			extends ProperEntailmentQueryResult.Visitor<O, T>,
+			UnsupportedIndexingEntailmentQueryResult.Visitor<O, T>,
+			UnsupportedQueryTypeEntailmentQueryResult.Visitor<O, T> {
 		// combined interface
 	}
 

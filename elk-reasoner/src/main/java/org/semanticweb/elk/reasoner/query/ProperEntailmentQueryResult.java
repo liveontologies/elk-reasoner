@@ -66,11 +66,11 @@ public interface ProperEntailmentQueryResult
 	 */
 	Entailment getEntailment() throws ElkQueryException;
 
-	<O> O accept(Visitor<O> visitor) throws ElkQueryException;
+	<O, T extends Throwable> O accept(Visitor<O, T> visitor) throws T;
 
-	public static interface Visitor<O> {
+	public static interface Visitor<O, T extends Throwable> {
 		O visit(ProperEntailmentQueryResult properEntailmentQueryResult)
-				throws ElkQueryException;
+				throws T;
 	}
 
 }

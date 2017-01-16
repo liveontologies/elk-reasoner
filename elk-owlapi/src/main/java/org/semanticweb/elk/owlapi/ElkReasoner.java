@@ -961,7 +961,7 @@ public class ElkReasoner implements OWLReasoner {
 		}
 	}
 
-	private final EntailmentQueryResult.Visitor<Boolean> ENTAILMENT_QUERY_RESULT_CONVERTER = new EntailmentQueryResult.Visitor<Boolean>() {
+	private final EntailmentQueryResult.Visitor<Boolean, ElkQueryException> ENTAILMENT_QUERY_RESULT_CONVERTER = new EntailmentQueryResult.Visitor<Boolean, ElkQueryException>() {
 
 		@Override
 		public Boolean visit(final ProperEntailmentQueryResult properResult)

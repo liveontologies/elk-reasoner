@@ -38,7 +38,6 @@ import org.semanticweb.elk.owlapi.ElkConverter;
 import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;
-import org.semanticweb.elk.reasoner.query.ElkQueryException;
 import org.semanticweb.elk.reasoner.query.EntailmentQueryResult;
 import org.semanticweb.elk.reasoner.query.ProperEntailmentQueryResult;
 import org.semanticweb.elk.reasoner.query.UnsupportedIndexingEntailmentQueryResult;
@@ -116,11 +115,11 @@ public class ElkOwlInferenceSet extends BaseInferenceSet<OWLAxiom>
 
 	}
 
-	private final EntailmentQueryResult.Visitor<Void> ENTAILMENT_QUERY_RESULT_VISITOR = new EntailmentQueryResult.Visitor<Void>() {
+	private final EntailmentQueryResult.Visitor<Void, ElkException> ENTAILMENT_QUERY_RESULT_VISITOR = new EntailmentQueryResult.Visitor<Void, ElkException>() {
 
 		@Override
 		public Void visit(final ProperEntailmentQueryResult properResult)
-				throws ElkQueryException {
+				throws ElkException {
 			try {
 				final ElkInferenceProducer producer = new ElkInferenceConvertingProducer(
 						ElkOwlInferenceSet.this);

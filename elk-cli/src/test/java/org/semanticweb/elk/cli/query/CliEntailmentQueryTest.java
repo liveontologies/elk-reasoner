@@ -154,7 +154,7 @@ public class CliEntailmentQueryTest extends
 
 	};
 
-	private static final EntailmentQueryResult.Visitor<Boolean> RESULT_VISITOR = new EntailmentQueryResult.Visitor<Boolean>() {
+	private static final EntailmentQueryResult.Visitor<Boolean, ElkQueryException> RESULT_VISITOR = new EntailmentQueryResult.Visitor<Boolean, ElkQueryException>() {
 
 		@Override
 		public Boolean visit(
