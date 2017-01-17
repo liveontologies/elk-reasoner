@@ -489,8 +489,16 @@ public class OwlExpectedTestOutputLoader {
 		}
 		// else
 
-		return Collections.singleton(new EntailmentQueryTestManifest<OWLAxiom>(
-				input, query, new EntailmentQueryTestOutput<OWLAxiom>(output)));
+		// OWL API interface can query only one axiom at once.
+		final Collection<EntailmentQueryTestManifest<OWLAxiom>> manifests = new ArrayList<EntailmentQueryTestManifest<OWLAxiom>>(
+				query.size());
+		for (final OWLAxiom axiom : query) {
+			manifests.add(new EntailmentQueryTestManifest<OWLAxiom>(
+					input, Collections.singleton(axiom),
+					new EntailmentQueryTestOutput<OWLAxiom>(Collections
+							.singletonMap(axiom, output.get(axiom)))));
+		}
+		return manifests;
 	}
 
 }

@@ -72,8 +72,6 @@ public class OwlApiEntailmentQueryTest extends
 		Arrays.sort(IGNORE_LIST);
 	}
 
-	public static final double INTERRUPTION_CHANCE = 0.03;
-
 	@Override
 	protected boolean ignoreInputFile(final String fileName) {
 		return Arrays.binarySearch(IGNORE_LIST, fileName) >= 0;
@@ -83,7 +81,7 @@ public class OwlApiEntailmentQueryTest extends
 			final TestManifestWithOutput<QueryTestInput<Collection<OWLAxiom>>, EntailmentQueryTestOutput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>> manifest) {
 		super(manifest,
 				new OwlApiReasoningTestDelegate<EntailmentQueryTestOutput<OWLAxiom>>(
-						manifest, INTERRUPTION_CHANCE) {
+						manifest) {
 
 					@Override
 					public EntailmentQueryTestOutput<OWLAxiom> getActualOutput()
@@ -145,10 +143,17 @@ public class OwlApiEntailmentQueryTest extends
 					output.put(elkAxiom, false);
 				}
 
-				return Collections.singleton(
-						new EntailmentQueryTestManifest<OWLAxiom>(input, query,
-								new EntailmentQueryTestOutput<OWLAxiom>(
-										output)));
+				// OWL API interface can query only one axiom at once.
+				final Collection<EntailmentQueryTestManifest<OWLAxiom>> manifests = new ArrayList<EntailmentQueryTestManifest<OWLAxiom>>(
+						query.size());
+				for (final OWLAxiom axiom : query) {
+					manifests.add(new EntailmentQueryTestManifest<OWLAxiom>(
+							input, Collections.singleton(axiom),
+							new EntailmentQueryTestOutput<OWLAxiom>(Collections
+									.singletonMap(axiom, output.get(axiom)))));
+				}
+
+				return manifests;
 
 			} catch (final OWLOntologyCreationException e) {
 				throw new IOException(e);
