@@ -35,6 +35,12 @@ public interface ReasoningTestWithInterruptsDelegate<AO extends TestOutput>
 		extends ReasoningTestDelegate<AO> {
 
 	/**
+	 * @return The probability that the reasoning is interrupted when checked
+	 *         for interrupts.
+	 */
+	double getInterruptionChance();
+
+	/**
 	 * Called at the beginning of the test with interrupts.
 	 * 
 	 * @throws Exception

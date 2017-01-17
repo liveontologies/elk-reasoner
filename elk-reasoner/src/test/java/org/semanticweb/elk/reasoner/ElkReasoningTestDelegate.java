@@ -36,15 +36,24 @@ import org.semanticweb.elk.testing.UrlTestInput;
 public abstract class ElkReasoningTestDelegate<AO extends TestOutput>
 		implements ReasoningTestWithOutputAndInterruptsDelegate<AO> {
 
-	public static final double INTERRUPTION_CHANCE = 0.3;
+	public static final double DEFAULT_INTERRUPTION_CHANCE = 0.3;
 
 	private final TestManifest<? extends UrlTestInput> manifest_;
+
+	private final double interruptionChance_;
 
 	private Reasoner reasoner_;
 
 	public ElkReasoningTestDelegate(
-			final TestManifest<? extends UrlTestInput> manifest) {
+			final TestManifest<? extends UrlTestInput> manifest,
+			final double interruptionChance) {
 		this.manifest_ = manifest;
+		this.interruptionChance_ = interruptionChance;
+	}
+
+	public ElkReasoningTestDelegate(
+			final TestManifest<? extends UrlTestInput> manifest) {
+		this(manifest, DEFAULT_INTERRUPTION_CHANCE);
 	}
 
 	public TestManifest<? extends UrlTestInput> getManifest() {
@@ -57,8 +66,13 @@ public abstract class ElkReasoningTestDelegate<AO extends TestOutput>
 
 	@Override
 	public void initWithOutput() throws Exception {
-		reasoner_ = TestReasonerUtils.createTestReasoner(
-				manifest_.getInput().getUrl().openStream());
+		reasoner_ = TestReasonerUtils
+				.createTestReasoner(manifest_.getInput().getUrl().openStream());
+	}
+
+	@Override
+	public double getInterruptionChance() {
+		return interruptionChance_;
 	}
 
 	@Override
@@ -66,7 +80,7 @@ public abstract class ElkReasoningTestDelegate<AO extends TestOutput>
 		final Random random = new Random(RandomSeedProvider.VALUE);
 		reasoner_ = TestReasonerUtils.createTestReasoner(
 				manifest_.getInput().getUrl().openStream(),
-				new RandomReasonerInterrupter(random, INTERRUPTION_CHANCE));
+				new RandomReasonerInterrupter(random, getInterruptionChance()));
 	}
 
 	@Override

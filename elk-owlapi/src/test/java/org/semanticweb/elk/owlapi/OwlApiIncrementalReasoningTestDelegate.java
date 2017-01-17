@@ -45,7 +45,8 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.slf4j.Logger;
 
 public abstract class OwlApiIncrementalReasoningTestDelegate<EO extends TestOutput, AO extends TestOutput>
-		implements IncrementalReasoningTestWithInterruptsDelegate<OWLAxiom, EO, AO> {
+		implements
+		IncrementalReasoningTestWithInterruptsDelegate<OWLAxiom, EO, AO> {
 
 	public static final double DEFAULT_INTERRUPTION_CHANCE = 0.1;
 
@@ -56,7 +57,7 @@ public abstract class OwlApiIncrementalReasoningTestDelegate<EO extends TestOutp
 
 	private final TestManifest<? extends UrlTestInput> manifest_;
 	private final double interruptionChance_;
-	
+
 	private OWLOntology testOntology_;
 	private ElkReasoner standardReasoner_;
 	private ElkReasoner incrementalReasoner_;
@@ -72,15 +73,15 @@ public abstract class OwlApiIncrementalReasoningTestDelegate<EO extends TestOutp
 			final TestManifest<? extends UrlTestInput> manifest) {
 		this(manifest, DEFAULT_INTERRUPTION_CHANCE);
 	}
-	
+
 	public TestManifest<? extends UrlTestInput> getManifest() {
 		return manifest_;
 	}
-	
+
 	public ElkReasoner getStandardReasoner() {
 		return standardReasoner_;
 	}
-	
+
 	public ElkReasoner getIncrementalReasoner() {
 		return incrementalReasoner_;
 	}
@@ -121,6 +122,11 @@ public abstract class OwlApiIncrementalReasoningTestDelegate<EO extends TestOutp
 	}
 
 	@Override
+	public double getInterruptionChance() {
+		return interruptionChance_;
+	}
+
+	@Override
 	public void initWithInterrupts() throws Exception {
 
 		/*
@@ -134,7 +140,7 @@ public abstract class OwlApiIncrementalReasoningTestDelegate<EO extends TestOutp
 		final Random random = new Random(RandomSeedProvider.VALUE);
 		incrementalReasoner_ = OWLAPITestUtils.createReasoner(testOntology_,
 				false,
-				new RandomReasonerInterrupter(random, interruptionChance_));
+				new RandomReasonerInterrupter(random, getInterruptionChance()));
 		incrementalReasoner_.getInternalReasoner()
 				.setAllowIncrementalMode(true);
 
@@ -157,7 +163,7 @@ public abstract class OwlApiIncrementalReasoningTestDelegate<EO extends TestOutp
 				break;
 			}
 		}
-		
+
 		standardReasoner_.flush();
 		incrementalReasoner_.flush();
 	}

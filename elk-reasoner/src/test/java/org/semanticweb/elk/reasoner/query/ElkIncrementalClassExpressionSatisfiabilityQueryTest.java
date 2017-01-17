@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.query;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.reasoner.incremental.CliIncrementalReasoningTestDelegate;
+import org.semanticweb.elk.reasoner.incremental.ElkIncrementalReasoningTestDelegate;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestManifest;
 
@@ -34,7 +34,7 @@ public class ElkIncrementalClassExpressionSatisfiabilityQueryTest extends
 	public ElkIncrementalClassExpressionSatisfiabilityQueryTest(
 			final TestManifest<QueryTestInput<ElkClassExpression>> manifest) {
 		super(manifest,
-				new CliIncrementalReasoningTestDelegate<SatisfiabilityTestOutput, SatisfiabilityTestOutput>(
+				new ElkIncrementalReasoningTestDelegate<SatisfiabilityTestOutput, SatisfiabilityTestOutput>(
 						manifest) {
 
 					@Override

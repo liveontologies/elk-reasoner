@@ -27,7 +27,7 @@ import java.util.Set;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.reasoner.incremental.CliIncrementalReasoningTestDelegate;
+import org.semanticweb.elk.reasoner.incremental.ElkIncrementalReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.PolySuite;
@@ -56,7 +56,7 @@ public class ElkIncrementalClassExpressionSuperClassesQueryTest extends
 	public ElkIncrementalClassExpressionSuperClassesQueryTest(
 			final TestManifest<QueryTestInput<ElkClassExpression>> manifest) {
 		super(manifest,
-				new CliIncrementalReasoningTestDelegate<RelatedEntitiesTestOutput<ElkClass>, RelatedEntitiesTestOutput<ElkClass>>(
+				new ElkIncrementalReasoningTestDelegate<RelatedEntitiesTestOutput<ElkClass>, RelatedEntitiesTestOutput<ElkClass>>(
 						manifest) {
 
 					@Override

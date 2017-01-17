@@ -74,6 +74,11 @@ public abstract class OwlApiReasoningTestDelegate<AO extends TestOutput>
 	}
 
 	@Override
+	public double getInterruptionChance() {
+		return interruptionChance_;
+	}
+
+	@Override
 	public void initWithInterrupts() throws Exception {
 		final InputStream input = manifest_.getInput().getUrl().openStream();
 		OWLOntologyManager manager = TestOWLManager.createOWLOntologyManager();
@@ -81,7 +86,7 @@ public abstract class OwlApiReasoningTestDelegate<AO extends TestOutput>
 
 		final Random random = new Random(RandomSeedProvider.VALUE);
 		reasoner_ = OWLAPITestUtils.createReasoner(ontology, false,
-				new RandomReasonerInterrupter(random, interruptionChance_));
+				new RandomReasonerInterrupter(random, getInterruptionChance()));
 	}
 
 	@Override

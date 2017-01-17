@@ -31,7 +31,7 @@ import org.junit.runner.RunWith;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.reasoner.incremental.CliIncrementalReasoningTestDelegate;
+import org.semanticweb.elk.reasoner.incremental.ElkIncrementalReasoningTestDelegate;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.MultiManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
@@ -48,7 +48,7 @@ public abstract class ElkIncrementalClassExpressionQueryTest<O extends TestOutpu
 
 	public ElkIncrementalClassExpressionQueryTest(
 			final TestManifest<QueryTestInput<ElkClassExpression>> manifest,
-			final CliIncrementalReasoningTestDelegate<O, O> testDelegate) {
+			final ElkIncrementalReasoningTestDelegate<O, O> testDelegate) {
 		super(manifest, testDelegate);
 	}
 

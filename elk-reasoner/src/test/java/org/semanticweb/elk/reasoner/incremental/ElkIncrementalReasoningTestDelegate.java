@@ -51,21 +51,30 @@ import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.slf4j.Logger;
 
-public abstract class CliIncrementalReasoningTestDelegate<EO extends TestOutput, AO extends TestOutput>
+public abstract class ElkIncrementalReasoningTestDelegate<EO extends TestOutput, AO extends TestOutput>
 		implements
 		IncrementalReasoningTestWithInterruptsDelegate<ElkAxiom, EO, AO> {
 
-	public static final double INTERRUPTION_CHANCE = 0.1;
+	public static final double DEFAULT_INTERRUPTION_CHANCE = 0.1;
 
 	private final TestManifest<? extends UrlTestInput> manifest_;
+
+	private final double interruptionChance_;
 
 	private final Collection<ElkAxiom> allAxioms_ = new ArrayList<ElkAxiom>();
 	private Reasoner standardReasoner_;
 	private Reasoner incrementalReasoner_;
 
-	public CliIncrementalReasoningTestDelegate(
-			TestManifest<? extends UrlTestInput> manifest) {
+	public ElkIncrementalReasoningTestDelegate(
+			TestManifest<? extends UrlTestInput> manifest,
+			final double interruptionChance) {
 		this.manifest_ = manifest;
+		this.interruptionChance_ = interruptionChance;
+	}
+
+	public ElkIncrementalReasoningTestDelegate(
+			TestManifest<? extends UrlTestInput> manifest) {
+		this(manifest, DEFAULT_INTERRUPTION_CHANCE);
 	}
 
 	public TestManifest<? extends UrlTestInput> getManifest() {
@@ -134,6 +143,11 @@ public abstract class CliIncrementalReasoningTestDelegate<EO extends TestOutput,
 	}
 
 	@Override
+	public double getInterruptionChance() {
+		return interruptionChance_;
+	}
+
+	@Override
 	public void initWithInterrupts() throws Exception {
 
 		standardReasoner_ = TestReasonerUtils.createTestReasoner(
@@ -142,7 +156,7 @@ public abstract class CliIncrementalReasoningTestDelegate<EO extends TestOutput,
 		final Random random = new Random(RandomSeedProvider.VALUE);
 		incrementalReasoner_ = TestReasonerUtils.createTestReasoner(
 				manifest_.getInput().getUrl().openStream(),
-				new RandomReasonerInterrupter(random, INTERRUPTION_CHANCE));
+				new RandomReasonerInterrupter(random, getInterruptionChance()));
 		incrementalReasoner_.setAllowIncrementalMode(true);
 
 	}

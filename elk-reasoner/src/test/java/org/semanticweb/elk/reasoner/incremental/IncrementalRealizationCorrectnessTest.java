@@ -44,7 +44,7 @@ public class IncrementalRealizationCorrectnessTest
 	public IncrementalRealizationCorrectnessTest(
 			final TestManifest<UrlTestInput> testManifest) {
 		super(testManifest,
-				new CliIncrementalReasoningTestDelegate<InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>>(
+				new ElkIncrementalReasoningTestDelegate<InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>>(
 						testManifest) {
 
 					@Override

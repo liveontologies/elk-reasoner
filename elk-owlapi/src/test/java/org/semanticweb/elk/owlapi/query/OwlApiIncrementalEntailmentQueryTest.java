@@ -58,13 +58,11 @@ import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 public class OwlApiIncrementalEntailmentQueryTest<O extends TestOutput> extends
 		BaseIncrementalQueryTest<Collection<OWLAxiom>, OWLAxiom, EntailmentQueryTestOutput<OWLAxiom>> {
 
-	public static final double INTERRUPTION_CHANCE = 0.01;
-
 	public OwlApiIncrementalEntailmentQueryTest(
 			final TestManifest<QueryTestInput<Collection<OWLAxiom>>> manifest) {
 		super(manifest,
 				new OwlApiIncrementalReasoningTestDelegate<EntailmentQueryTestOutput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>>(
-						manifest, INTERRUPTION_CHANCE) {
+						manifest) {
 
 					@Override
 					public EntailmentQueryTestOutput<OWLAxiom> getExpectedOutput()
@@ -129,9 +127,15 @@ public class OwlApiIncrementalEntailmentQueryTest<O extends TestOutput> extends
 						manager.loadOntologyFromOntologyDocument(notEntailedIS)
 								.getLogicalAxioms());
 
-				return Collections.singleton(
-						new EntailmentQueryTestManifest<OWLAxiom>(input, query,
-								null));
+				// OWL API interface can query only one axiom at once.
+				final Collection<EntailmentQueryTestManifest<OWLAxiom>> manifests = new ArrayList<EntailmentQueryTestManifest<OWLAxiom>>(
+						query.size());
+				for (final OWLAxiom axiom : query) {
+					manifests.add(new EntailmentQueryTestManifest<OWLAxiom>(
+							input, Collections.singleton(axiom), null));
+				}
+
+				return manifests;
 
 			} catch (final OWLOntologyCreationException e) {
 				throw new IOException(e);

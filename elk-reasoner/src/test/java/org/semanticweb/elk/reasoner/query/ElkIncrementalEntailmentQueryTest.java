@@ -36,7 +36,7 @@ import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.incremental.CliIncrementalReasoningTestDelegate;
+import org.semanticweb.elk.reasoner.incremental.ElkIncrementalReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.EntailmentQueryResult;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.MultiManifestCreator;
@@ -53,7 +53,7 @@ public class ElkIncrementalEntailmentQueryTest extends
 	public ElkIncrementalEntailmentQueryTest(
 			final TestManifest<QueryTestInput<Collection<ElkAxiom>>> manifest) {
 		super(manifest,
-				new CliIncrementalReasoningTestDelegate<EntailmentQueryTestOutput<ElkAxiom>, EntailmentQueryTestOutput<ElkAxiom>>(
+				new ElkIncrementalReasoningTestDelegate<EntailmentQueryTestOutput<ElkAxiom>, EntailmentQueryTestOutput<ElkAxiom>>(
 						manifest) {
 
 					@Override
