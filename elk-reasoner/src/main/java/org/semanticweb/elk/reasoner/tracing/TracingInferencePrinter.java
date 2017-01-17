@@ -128,7 +128,7 @@ public class TracingInferencePrinter implements TracingInference.Visitor<String>
 
 	@Override
 	public String visit(ClassInconsistencyOfDisjointSubsumers inference) {
-		return String.format("%s -| %s; %s; %s",
+		return String.format("%s -| %s; %s",
 				inference.getConclusion(factory_),
 				inference.getFirstPremise(factory_),
 				inference.getSecondPremise(factory_));

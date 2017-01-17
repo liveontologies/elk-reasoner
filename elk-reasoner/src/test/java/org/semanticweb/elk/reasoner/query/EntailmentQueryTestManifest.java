@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.query;
 
 import java.net.URL;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -47,8 +48,13 @@ public class EntailmentQueryTestManifest<A>
 			final StringBuilder message = new StringBuilder(
 					"Actual output is not equal to the expected output\n");
 			message.append("Input: ").append(getInput().getName()).append("\n");
-			writeMapDiff(expOutput.getOutput(), actualOutput.getOutput(),
-					message);
+			final Map<A, Boolean> expMap = expOutput == null
+					? Collections.<A, Boolean> emptyMap()
+					: expOutput.getOutput();
+			final Map<A, Boolean> actMap = actualOutput == null
+					? Collections.<A, Boolean> emptyMap()
+					: actualOutput.getOutput();
+			writeMapDiff(expMap, actMap, message);
 
 			throw new TestResultComparisonException(message.toString(),
 					expOutput, actualOutput);
