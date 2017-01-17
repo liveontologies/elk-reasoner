@@ -19,7 +19,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.cli;
+package org.semanticweb.elk.reasoner;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -27,16 +27,13 @@ import static org.junit.Assert.fail;
 import java.util.Random;
 
 import org.semanticweb.elk.RandomSeedProvider;
-import org.semanticweb.elk.reasoner.RandomReasonerInterrupter;
 import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.ReasoningTestWithOutputAndInterruptsDelegate;
-import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.testing.UrlTestInput;
 
-public abstract class CliReasoningTestDelegate<AO extends TestOutput>
+public abstract class ElkReasoningTestDelegate<AO extends TestOutput>
 		implements ReasoningTestWithOutputAndInterruptsDelegate<AO> {
 
 	public static final double INTERRUPTION_CHANCE = 0.3;
@@ -45,7 +42,7 @@ public abstract class CliReasoningTestDelegate<AO extends TestOutput>
 
 	private Reasoner reasoner_;
 
-	public CliReasoningTestDelegate(
+	public ElkReasoningTestDelegate(
 			final TestManifest<? extends UrlTestInput> manifest) {
 		this.manifest_ = manifest;
 	}

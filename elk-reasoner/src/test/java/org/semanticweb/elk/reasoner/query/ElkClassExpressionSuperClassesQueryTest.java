@@ -19,7 +19,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.cli.query;
+package org.semanticweb.elk.reasoner.query;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,13 +30,10 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.cli.CliReasoningTestDelegate;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.reasoner.query.BaseQueryTest;
-import org.semanticweb.elk.reasoner.query.QueryTestInput;
-import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
+import org.semanticweb.elk.reasoner.ElkReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.ConfigurationUtils;
@@ -47,7 +44,7 @@ import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
 
 @RunWith(PolySuite.class)
-public class CliClassExpressionSuperClassesQueryTest extends
+public class ElkClassExpressionSuperClassesQueryTest extends
 		BaseQueryTest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>> {
 
 	// @formatter:off
@@ -66,10 +63,10 @@ public class CliClassExpressionSuperClassesQueryTest extends
 		return Arrays.binarySearch(IGNORE_LIST, fileName) >= 0;
 	}
 
-	public CliClassExpressionSuperClassesQueryTest(
+	public ElkClassExpressionSuperClassesQueryTest(
 			final TestManifestWithOutput<QueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkClass>, RelatedEntitiesTestOutput<ElkClass>> manifest) {
 		super(manifest,
-				new CliReasoningTestDelegate<RelatedEntitiesTestOutput<ElkClass>>(
+				new ElkReasoningTestDelegate<RelatedEntitiesTestOutput<ElkClass>>(
 						manifest) {
 
 					@Override
@@ -79,7 +76,7 @@ public class CliClassExpressionSuperClassesQueryTest extends
 								.getSuperClassesQuietly(
 										manifest.getInput().getQuery(),
 										true);
-						return new CliRelatedEntitiesTestOutput<ElkClass>(
+						return new ElkRelatedEntitiesTestOutput<ElkClass>(
 								subNodes, ElkClassKeyProvider.INSTANCE);
 					}
 
@@ -104,7 +101,7 @@ public class CliClassExpressionSuperClassesQueryTest extends
 						try {
 							outputIS = output.openStream();
 
-							return CliExpectedTestOutputLoader.load(outputIS)
+							return ElkExpectedTestOutputLoader.load(outputIS)
 									.getSuperEntitiesManifests(input);
 
 						} finally {

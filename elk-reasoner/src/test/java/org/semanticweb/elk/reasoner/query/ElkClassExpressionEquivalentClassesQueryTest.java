@@ -19,24 +19,19 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.cli.query;
+package org.semanticweb.elk.reasoner.query;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
-import java.util.Set;
 
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.cli.CliReasoningTestDelegate;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.reasoner.query.BaseQueryTest;
-import org.semanticweb.elk.reasoner.query.QueryTestInput;
-import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
-import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
+import org.semanticweb.elk.reasoner.ElkReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.MultiManifestCreator;
@@ -46,24 +41,22 @@ import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
 
 @RunWith(PolySuite.class)
-public class CliClassExpressionSubClassesQueryTest extends
-		BaseQueryTest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>> {
+public class ElkClassExpressionEquivalentClassesQueryTest extends
+		BaseQueryTest<ElkClassExpression, EquivalentEntitiesTestOutput<ElkClass>> {
 
-	public CliClassExpressionSubClassesQueryTest(
-			final TestManifestWithOutput<QueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkClass>, RelatedEntitiesTestOutput<ElkClass>> manifest) {
+	public ElkClassExpressionEquivalentClassesQueryTest(
+			final TestManifestWithOutput<QueryTestInput<ElkClassExpression>, EquivalentEntitiesTestOutput<ElkClass>, EquivalentEntitiesTestOutput<ElkClass>> manifest) {
 		super(manifest,
-				new CliReasoningTestDelegate<RelatedEntitiesTestOutput<ElkClass>>(
+				new ElkReasoningTestDelegate<EquivalentEntitiesTestOutput<ElkClass>>(
 						manifest) {
 
 					@Override
-					public RelatedEntitiesTestOutput<ElkClass> getActualOutput()
+					public EquivalentEntitiesTestOutput<ElkClass> getActualOutput()
 							throws Exception {
-						final Set<? extends Node<ElkClass>> subNodes = getReasoner()
-								.getSubClassesQuietly(
-										manifest.getInput().getQuery(),
-										true);
-						return new CliRelatedEntitiesTestOutput<ElkClass>(
-								subNodes, ElkClassKeyProvider.INSTANCE);
+						final Node<ElkClass> equivalent = getReasoner()
+								.getEquivalentClassesQuietly(
+										manifest.getInput().getQuery());
+						return new ElkEquivalentEntitiesTestOutput(equivalent);
 					}
 
 				});
@@ -76,10 +69,10 @@ public class CliClassExpressionSubClassesQueryTest extends
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION, BaseQueryTest.class, "owl",
 				"expected",
-				new MultiManifestCreator<QueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkClass>, RelatedEntitiesTestOutput<ElkClass>>() {
+				new MultiManifestCreator<QueryTestInput<ElkClassExpression>, EquivalentEntitiesTestOutput<ElkClass>, EquivalentEntitiesTestOutput<ElkClass>>() {
 
 					@Override
-					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkClass>, RelatedEntitiesTestOutput<ElkClass>>> createManifests(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, EquivalentEntitiesTestOutput<ElkClass>, EquivalentEntitiesTestOutput<ElkClass>>> createManifests(
 							final URL input, final URL output)
 							throws IOException {
 
@@ -87,8 +80,8 @@ public class CliClassExpressionSubClassesQueryTest extends
 						try {
 							outputIS = output.openStream();
 
-							return CliExpectedTestOutputLoader.load(outputIS)
-									.getSubEntitiesManifests(input);
+							return ElkExpectedTestOutputLoader.load(outputIS)
+									.getEquivalentEntitiesManifests(input);
 
 						} finally {
 							IOUtils.closeQuietly(outputIS);

@@ -19,7 +19,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.cli.query;
+package org.semanticweb.elk.reasoner.query;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -52,13 +52,6 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIris;
 import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
-import org.semanticweb.elk.reasoner.query.BaseSatisfiabilityTestOutput;
-import org.semanticweb.elk.reasoner.query.EntailmentQueryTestManifest;
-import org.semanticweb.elk.reasoner.query.EntailmentQueryTestOutput;
-import org.semanticweb.elk.reasoner.query.QueryTestManifest;
-import org.semanticweb.elk.reasoner.query.EquivalentEntitiesTestOutput;
-import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
-import org.semanticweb.elk.reasoner.query.SatisfiabilityTestOutput;
 import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.ElkIndividualKeyProvider;
 import org.semanticweb.elk.testing.TestOutput;
@@ -66,7 +59,7 @@ import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
 
-public class CliExpectedTestOutputLoader {
+public class ElkExpectedTestOutputLoader {
 
 	/**
 	 * Loads an expected output of a class query test.
@@ -87,7 +80,7 @@ public class CliExpectedTestOutputLoader {
 	 *            contains the ontology that encode the expected output
 	 * @return an object providing the leaded exected test output
 	 */
-	public static CliExpectedTestOutputLoader load(
+	public static ElkExpectedTestOutputLoader load(
 			final InputStream expectedOutput) {
 
 		final Set<ElkClassExpression> complex = new HashSet<ElkClassExpression>();
@@ -201,7 +194,7 @@ public class CliExpectedTestOutputLoader {
 
 			});
 
-			return new CliExpectedTestOutputLoader(complex, equivalent,
+			return new ElkExpectedTestOutputLoader(complex, equivalent,
 					superClasses, subClasses, same, instances);
 
 		} catch (final Owl2ParseException e) {
@@ -217,7 +210,7 @@ public class CliExpectedTestOutputLoader {
 	private final Map<ElkIndividual, Map<ElkIri, ElkNamedIndividual>> same_;
 	private final Multimap<ElkClassExpression, ElkNamedIndividual> instances_;
 
-	private CliExpectedTestOutputLoader(
+	private ElkExpectedTestOutputLoader(
 			final Set<ElkClassExpression> queryClasses,
 			final Map<ElkClassExpression, Map<ElkIri, ElkClass>> equivalent,
 			final Multimap<ElkClassExpression, ElkClass> superClasses,
@@ -277,7 +270,7 @@ public class CliExpectedTestOutputLoader {
 			result.add(
 					new QueryTestManifest<ElkClassExpression, EquivalentEntitiesTestOutput<ElkClass>>(
 							input, queryClass,
-							new CliEquivalentEntitiesTestOutput(node == null
+							new ElkEquivalentEntitiesTestOutput(node == null
 									? Collections.<ElkClass> emptySet()
 									: node.values())));
 		}
@@ -312,7 +305,7 @@ public class CliExpectedTestOutputLoader {
 			result.add(
 					new QueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>(
 							input, queryClass,
-							new CliRelatedEntitiesTestOutput<ElkClass>(
+							new ElkRelatedEntitiesTestOutput<ElkClass>(
 									superNodes, ElkClassKeyProvider.INSTANCE)));
 		}
 
@@ -346,7 +339,7 @@ public class CliExpectedTestOutputLoader {
 			result.add(
 					new QueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>(
 							input, queryClass,
-							new CliRelatedEntitiesTestOutput<ElkClass>(subNodes,
+							new ElkRelatedEntitiesTestOutput<ElkClass>(subNodes,
 									ElkClassKeyProvider.INSTANCE)));
 		}
 
@@ -380,7 +373,7 @@ public class CliExpectedTestOutputLoader {
 			result.add(
 					new QueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkNamedIndividual>>(
 							input, queryClass,
-							new CliRelatedEntitiesTestOutput<ElkNamedIndividual>(
+							new ElkRelatedEntitiesTestOutput<ElkNamedIndividual>(
 									instances,
 									ElkIndividualKeyProvider.INSTANCE)));
 		}

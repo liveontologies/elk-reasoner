@@ -19,15 +19,13 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.cli.query;
+package org.semanticweb.elk.reasoner.query;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
-import org.semanticweb.elk.cli.CliTestUtil;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.query.EquivalentEntitiesTestOutput;
-import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -36,32 +34,35 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * 
  * @author Peter Skocovsky
  */
-public class CliEquivalentEntitiesTestOutput
-		implements EquivalentEntitiesTestOutput<ElkClass> {
+public class ElkRelatedEntitiesTestOutput<E extends ElkEntity>
+		implements RelatedEntitiesTestOutput<E> {
 
-	private final List<ElkClass> equivalent_;
+	private final Iterable<? extends Iterable<E>> related_;
 
-	public CliEquivalentEntitiesTestOutput(
-			final Collection<ElkClass> equivalent) {
-		this.equivalent_ = CliTestUtil.entities2Equalable(equivalent,
-				ElkClassKeyProvider.INSTANCE.getComparator());
+	public ElkRelatedEntitiesTestOutput(
+			final Collection<? extends Collection<E>> related,
+			final ComparatorKeyProvider<? super E> keyProvider) {
+		this.related_ = QueryTestUtils.related2Equalable(related,
+				keyProvider.getComparator());
 	}
 
-	public CliEquivalentEntitiesTestOutput(final Node<ElkClass> equivalent) {
-		this.equivalent_ = CliTestUtil.entities2Equalable(equivalent,
-				ElkClassKeyProvider.INSTANCE.getComparator());
+	public ElkRelatedEntitiesTestOutput(final Set<? extends Node<E>> related,
+			final ComparatorKeyProvider<? super E> keyProvider) {
+		this.related_ = QueryTestUtils.relatedNodes2Equalable(related,
+				keyProvider.getComparator());
 	}
 
 	@Override
-	public Iterable<ElkClass> getEquivalent() {
-		return equivalent_;
+	public Iterable<? extends Iterable<E>> getSubEntities() {
+		return related_;
 	}
 
 	@Override
 	public int hashCode() {
-		return HashGenerator.combinedHashCode(getClass(), equivalent_);
+		return HashGenerator.combinedHashCode(getClass(), related_);
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public boolean equals(final Object obj) {
 		if (obj == null) {
@@ -74,13 +75,12 @@ public class CliEquivalentEntitiesTestOutput
 			return false;
 		}
 
-		return equivalent_
-				.equals(((CliEquivalentEntitiesTestOutput) obj).equivalent_);
+		return related_.equals(((ElkRelatedEntitiesTestOutput) obj).related_);
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "(" + equivalent_ + ")";
+		return getClass().getSimpleName() + "(" + related_ + ")";
 	}
 
 }

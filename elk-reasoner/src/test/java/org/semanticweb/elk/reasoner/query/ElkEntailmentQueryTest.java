@@ -19,7 +19,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.cli.query;
+package org.semanticweb.elk.reasoner.query;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,18 +38,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.cli.CliReasoningTestDelegate;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
+import org.semanticweb.elk.reasoner.ElkReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.query.BaseQueryTest;
 import org.semanticweb.elk.reasoner.query.ElkQueryException;
 import org.semanticweb.elk.reasoner.query.EntailmentQueryResult;
-import org.semanticweb.elk.reasoner.query.EntailmentQueryTestManifest;
-import org.semanticweb.elk.reasoner.query.EntailmentQueryTestOutput;
 import org.semanticweb.elk.reasoner.query.ProperEntailmentQueryResult;
-import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.reasoner.query.UnsupportedIndexingEntailmentQueryResult;
 import org.semanticweb.elk.reasoner.query.UnsupportedQueryTypeEntailmentQueryResult;
 import org.semanticweb.elk.testing.ConfigurationUtils;
@@ -61,7 +57,7 @@ import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.elk.util.collections.Operations;
 
 @RunWith(PolySuite.class)
-public class CliEntailmentQueryTest extends
+public class ElkEntailmentQueryTest extends
 		BaseQueryTest<Collection<ElkAxiom>, EntailmentQueryTestOutput<ElkAxiom>> {
 
 	// @formatter:off
@@ -81,10 +77,10 @@ public class CliEntailmentQueryTest extends
 		return Arrays.binarySearch(IGNORE_LIST, fileName) >= 0;
 	}
 
-	public CliEntailmentQueryTest(
+	public ElkEntailmentQueryTest(
 			final TestManifestWithOutput<QueryTestInput<Collection<ElkAxiom>>, EntailmentQueryTestOutput<ElkAxiom>, EntailmentQueryTestOutput<ElkAxiom>> manifest) {
 		super(manifest,
-				new CliReasoningTestDelegate<EntailmentQueryTestOutput<ElkAxiom>>(
+				new ElkReasoningTestDelegate<EntailmentQueryTestOutput<ElkAxiom>>(
 						manifest) {
 
 					@Override
@@ -244,7 +240,7 @@ public class CliEntailmentQueryTest extends
 			try {
 				outputIS = output.openStream();
 
-				return CliExpectedTestOutputLoader.load(outputIS)
+				return ElkExpectedTestOutputLoader.load(outputIS)
 						.getEntailmentManifests(input);
 
 			} finally {

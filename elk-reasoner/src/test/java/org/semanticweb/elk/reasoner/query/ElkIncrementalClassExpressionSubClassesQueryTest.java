@@ -19,44 +19,49 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.cli.query;
+package org.semanticweb.elk.reasoner.query;
+
+import java.util.Set;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.incremental.CliIncrementalReasoningTestDelegate;
-import org.semanticweb.elk.reasoner.query.QueryTestInput;
-import org.semanticweb.elk.reasoner.query.EquivalentEntitiesTestOutput;
+import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestManifest;
 
 @RunWith(PolySuite.class)
-public class CliIncrementalClassExpressionEquivalentClassesQueryTest extends
-		CliIncrementalClassExpressionQueryTest<EquivalentEntitiesTestOutput<ElkClass>> {
+public class ElkIncrementalClassExpressionSubClassesQueryTest extends
+		ElkIncrementalClassExpressionQueryTest<RelatedEntitiesTestOutput<ElkClass>> {
 
-	public CliIncrementalClassExpressionEquivalentClassesQueryTest(
+	public ElkIncrementalClassExpressionSubClassesQueryTest(
 			final TestManifest<QueryTestInput<ElkClassExpression>> manifest) {
 		super(manifest,
-				new CliIncrementalReasoningTestDelegate<EquivalentEntitiesTestOutput<ElkClass>, EquivalentEntitiesTestOutput<ElkClass>>(
+				new CliIncrementalReasoningTestDelegate<RelatedEntitiesTestOutput<ElkClass>, RelatedEntitiesTestOutput<ElkClass>>(
 						manifest) {
 
 					@Override
-					public EquivalentEntitiesTestOutput<ElkClass> getExpectedOutput()
+					public RelatedEntitiesTestOutput<ElkClass> getExpectedOutput()
 							throws Exception {
-						final Node<ElkClass> equivalent = getStandardReasoner()
-								.getEquivalentClassesQuietly(
-										manifest.getInput().getQuery());
-						return new CliEquivalentEntitiesTestOutput(equivalent);
+						final Set<? extends Node<ElkClass>> subNodes = getStandardReasoner()
+								.getSuperClassesQuietly(
+										manifest.getInput().getQuery(),
+										true);
+						return new ElkRelatedEntitiesTestOutput<ElkClass>(
+								subNodes, ElkClassKeyProvider.INSTANCE);
 					}
 
 					@Override
-					public EquivalentEntitiesTestOutput<ElkClass> getActualOutput()
+					public RelatedEntitiesTestOutput<ElkClass> getActualOutput()
 							throws Exception {
-						final Node<ElkClass> equivalent = getIncrementalReasoner()
-								.getEquivalentClassesQuietly(
-										manifest.getInput().getQuery());
-						return new CliEquivalentEntitiesTestOutput(equivalent);
+						final Set<? extends Node<ElkClass>> subNodes = getIncrementalReasoner()
+								.getSuperClassesQuietly(
+										manifest.getInput().getQuery(),
+										true);
+						return new ElkRelatedEntitiesTestOutput<ElkClass>(
+								subNodes, ElkClassKeyProvider.INSTANCE);
 					}
 
 				});

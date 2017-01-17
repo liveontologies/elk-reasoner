@@ -19,7 +19,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.cli.query;
+package org.semanticweb.elk.reasoner.query;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,12 +37,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.incremental.CliIncrementalReasoningTestDelegate;
-import org.semanticweb.elk.reasoner.query.BaseIncrementalQueryTest;
-import org.semanticweb.elk.reasoner.query.BaseQueryTest;
 import org.semanticweb.elk.reasoner.query.EntailmentQueryResult;
-import org.semanticweb.elk.reasoner.query.EntailmentQueryTestManifest;
-import org.semanticweb.elk.reasoner.query.EntailmentQueryTestOutput;
-import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.MultiManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
@@ -52,10 +47,10 @@ import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
 
 @RunWith(PolySuite.class)
-public class CliIncrementalEntailmentQueryTest extends
+public class ElkIncrementalEntailmentQueryTest extends
 		BaseIncrementalQueryTest<Collection<ElkAxiom>, ElkAxiom, EntailmentQueryTestOutput<ElkAxiom>> {
 
-	public CliIncrementalEntailmentQueryTest(
+	public ElkIncrementalEntailmentQueryTest(
 			final TestManifest<QueryTestInput<Collection<ElkAxiom>>> manifest) {
 		super(manifest,
 				new CliIncrementalReasoningTestDelegate<EntailmentQueryTestOutput<ElkAxiom>, EntailmentQueryTestOutput<ElkAxiom>>(
@@ -67,7 +62,7 @@ public class CliIncrementalEntailmentQueryTest extends
 						final Map<ElkAxiom, EntailmentQueryResult> result = getStandardReasoner()
 								.isEntailed(manifest.getInput().getQuery());
 						return new EntailmentQueryTestOutput<ElkAxiom>(
-								CliEntailmentQueryTest.resultToOutput(result));
+								ElkEntailmentQueryTest.resultToOutput(result));
 					}
 
 					@Override
@@ -76,7 +71,7 @@ public class CliIncrementalEntailmentQueryTest extends
 						final Map<ElkAxiom, EntailmentQueryResult> result = getIncrementalReasoner()
 								.isEntailed(manifest.getInput().getQuery());
 						return new EntailmentQueryTestOutput<ElkAxiom>(
-								CliEntailmentQueryTest.resultToOutput(result));
+								ElkEntailmentQueryTest.resultToOutput(result));
 					}
 
 				});
@@ -131,7 +126,7 @@ public class CliIncrementalEntailmentQueryTest extends
 			try {
 				outputIS = output.openStream();
 
-				return CliExpectedTestOutputLoader.load(outputIS)
+				return ElkExpectedTestOutputLoader.load(outputIS)
 						.getEntailmentManifests(input);
 
 			} finally {

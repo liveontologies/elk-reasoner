@@ -19,7 +19,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.cli.query;
+package org.semanticweb.elk.reasoner.query;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,41 +28,28 @@ import java.net.URL;
 import java.util.Collection;
 
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.cli.CliReasoningTestDelegate;
 import org.semanticweb.elk.io.IOUtils;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.reasoner.query.BaseQueryTest;
-import org.semanticweb.elk.reasoner.query.QueryTestInput;
-import org.semanticweb.elk.reasoner.query.EquivalentEntitiesTestOutput;
-import org.semanticweb.elk.reasoner.taxonomy.model.Node;
+import org.semanticweb.elk.reasoner.incremental.CliIncrementalReasoningTestDelegate;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.MultiManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
+import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
+import org.semanticweb.elk.testing.TestOutput;
 
 @RunWith(PolySuite.class)
-public class CliClassExpressionEquivalentClassesQueryTest extends
-		BaseQueryTest<ElkClassExpression, EquivalentEntitiesTestOutput<ElkClass>> {
+public abstract class ElkIncrementalClassExpressionQueryTest<O extends TestOutput>
+		extends
+		BaseIncrementalQueryTest<ElkClassExpression, ElkAxiom, O> {
 
-	public CliClassExpressionEquivalentClassesQueryTest(
-			final TestManifestWithOutput<QueryTestInput<ElkClassExpression>, EquivalentEntitiesTestOutput<ElkClass>, EquivalentEntitiesTestOutput<ElkClass>> manifest) {
-		super(manifest,
-				new CliReasoningTestDelegate<EquivalentEntitiesTestOutput<ElkClass>>(
-						manifest) {
-
-					@Override
-					public EquivalentEntitiesTestOutput<ElkClass> getActualOutput()
-							throws Exception {
-						final Node<ElkClass> equivalent = getReasoner()
-								.getEquivalentClassesQuietly(
-										manifest.getInput().getQuery());
-						return new CliEquivalentEntitiesTestOutput(equivalent);
-					}
-
-				});
+	public ElkIncrementalClassExpressionQueryTest(
+			final TestManifest<QueryTestInput<ElkClassExpression>> manifest,
+			final CliIncrementalReasoningTestDelegate<O, O> testDelegate) {
+		super(manifest, testDelegate);
 	}
 
 	@Config
@@ -70,12 +57,13 @@ public class CliClassExpressionEquivalentClassesQueryTest extends
 			throws IOException, URISyntaxException {
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION, BaseQueryTest.class, "owl",
+				INPUT_DATA_LOCATION,
+				BaseIncrementalQueryTest.class, "owl",
 				"expected",
-				new MultiManifestCreator<QueryTestInput<ElkClassExpression>, EquivalentEntitiesTestOutput<ElkClass>, EquivalentEntitiesTestOutput<ElkClass>>() {
+				new MultiManifestCreator<QueryTestInput<ElkClassExpression>, TestOutput, TestOutput>() {
 
 					@Override
-					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, EquivalentEntitiesTestOutput<ElkClass>, EquivalentEntitiesTestOutput<ElkClass>>> createManifests(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, TestOutput, TestOutput>> createManifests(
 							final URL input, final URL output)
 							throws IOException {
 
@@ -83,8 +71,9 @@ public class CliClassExpressionEquivalentClassesQueryTest extends
 						try {
 							outputIS = output.openStream();
 
-							return CliExpectedTestOutputLoader.load(outputIS)
-									.getEquivalentEntitiesManifests(input);
+							// don't need an expected output for these tests
+							return ElkExpectedTestOutputLoader.load(outputIS)
+									.getNoOutputManifests(input);
 
 						} finally {
 							IOUtils.closeQuietly(outputIS);

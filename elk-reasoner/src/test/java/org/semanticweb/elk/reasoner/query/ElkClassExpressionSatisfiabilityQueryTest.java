@@ -19,7 +19,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.cli.query;
+package org.semanticweb.elk.reasoner.query;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,13 +28,9 @@ import java.net.URL;
 import java.util.Collection;
 
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.cli.CliReasoningTestDelegate;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.reasoner.query.BaseQueryTest;
-import org.semanticweb.elk.reasoner.query.BaseSatisfiabilityTestOutput;
-import org.semanticweb.elk.reasoner.query.QueryTestInput;
-import org.semanticweb.elk.reasoner.query.SatisfiabilityTestOutput;
+import org.semanticweb.elk.reasoner.ElkReasoningTestDelegate;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.MultiManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
@@ -43,12 +39,12 @@ import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
 
 @RunWith(PolySuite.class)
-public class CliClassExpressionSatisfiabilityQueryTest extends
+public class ElkClassExpressionSatisfiabilityQueryTest extends
 		BaseQueryTest<ElkClassExpression, SatisfiabilityTestOutput> {
 
-	public CliClassExpressionSatisfiabilityQueryTest(
+	public ElkClassExpressionSatisfiabilityQueryTest(
 			final TestManifestWithOutput<QueryTestInput<ElkClassExpression>, SatisfiabilityTestOutput, SatisfiabilityTestOutput> manifest) {
-		super(manifest, new CliReasoningTestDelegate<SatisfiabilityTestOutput>(
+		super(manifest, new ElkReasoningTestDelegate<SatisfiabilityTestOutput>(
 				manifest) {
 
 			@Override
@@ -80,7 +76,7 @@ public class CliClassExpressionSatisfiabilityQueryTest extends
 						try {
 							outputIS = output.openStream();
 
-							return CliExpectedTestOutputLoader.load(outputIS)
+							return ElkExpectedTestOutputLoader.load(outputIS)
 									.getSatisfiabilityManifests(input);
 
 						} finally {

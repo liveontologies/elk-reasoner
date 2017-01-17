@@ -19,7 +19,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.cli;
+package org.semanticweb.elk.reasoner.query;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,9 +31,9 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.util.collections.Operations;
 
-public final class CliTestUtil {
+public final class QueryTestUtils {
 
-	private CliTestUtil() {
+	private QueryTestUtils() {
 		// Empty.
 	}
 

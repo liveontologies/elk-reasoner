@@ -19,43 +19,42 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.cli.query;
+package org.semanticweb.elk.reasoner.query;
 
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.incremental.CliIncrementalReasoningTestDelegate;
-import org.semanticweb.elk.reasoner.query.BaseSatisfiabilityTestOutput;
-import org.semanticweb.elk.reasoner.query.QueryTestInput;
-import org.semanticweb.elk.reasoner.query.SatisfiabilityTestOutput;
+import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestManifest;
 
 @RunWith(PolySuite.class)
-public class CliIncrementalClassExpressionSatisfiabilityQueryTest extends
-		CliIncrementalClassExpressionQueryTest<SatisfiabilityTestOutput> {
+public class ElkIncrementalClassExpressionEquivalentClassesQueryTest extends
+		ElkIncrementalClassExpressionQueryTest<EquivalentEntitiesTestOutput<ElkClass>> {
 
-	public CliIncrementalClassExpressionSatisfiabilityQueryTest(
+	public ElkIncrementalClassExpressionEquivalentClassesQueryTest(
 			final TestManifest<QueryTestInput<ElkClassExpression>> manifest) {
 		super(manifest,
-				new CliIncrementalReasoningTestDelegate<SatisfiabilityTestOutput, SatisfiabilityTestOutput>(
+				new CliIncrementalReasoningTestDelegate<EquivalentEntitiesTestOutput<ElkClass>, EquivalentEntitiesTestOutput<ElkClass>>(
 						manifest) {
 
 					@Override
-					public SatisfiabilityTestOutput getExpectedOutput()
+					public EquivalentEntitiesTestOutput<ElkClass> getExpectedOutput()
 							throws Exception {
-						final boolean isSatisfiable = getStandardReasoner()
-								.isSatisfiableQuietly(
+						final Node<ElkClass> equivalent = getStandardReasoner()
+								.getEquivalentClassesQuietly(
 										manifest.getInput().getQuery());
-						return new BaseSatisfiabilityTestOutput(isSatisfiable);
+						return new ElkEquivalentEntitiesTestOutput(equivalent);
 					}
 
 					@Override
-					public SatisfiabilityTestOutput getActualOutput()
+					public EquivalentEntitiesTestOutput<ElkClass> getActualOutput()
 							throws Exception {
-						final boolean isSatisfiable = getIncrementalReasoner()
-								.isSatisfiableQuietly(
+						final Node<ElkClass> equivalent = getIncrementalReasoner()
+								.getEquivalentClassesQuietly(
 										manifest.getInput().getQuery());
-						return new BaseSatisfiabilityTestOutput(isSatisfiable);
+						return new ElkEquivalentEntitiesTestOutput(equivalent);
 					}
 
 				});

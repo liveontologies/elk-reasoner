@@ -38,13 +38,13 @@ import org.semanticweb.elk.testing.UrlTestInput;
 @RunWith(PolySuite.class)
 public abstract class BaseRealizationCorrectnessTest<EO extends TestOutput>
 		extends
-		ReasoningCorrectnessTestWithOutput<UrlTestInput, EO, InstanceTaxonomyTestOutput<?>, ReasoningTestManifest<EO, InstanceTaxonomyTestOutput<?>>, ReasoningTestWithOutputDelegate<InstanceTaxonomyTestOutput<?>>> {
+		ReasoningCorrectnessTestWithInterrupts<UrlTestInput, EO, InstanceTaxonomyTestOutput<?>, ReasoningTestManifest<EO, InstanceTaxonomyTestOutput<?>>, ReasoningTestWithOutputAndInterruptsDelegate<InstanceTaxonomyTestOutput<?>>> {
 
 	final static String INPUT_DATA_LOCATION = "realization_test_input";
 
 	public BaseRealizationCorrectnessTest(
 			final ReasoningTestManifest<EO, InstanceTaxonomyTestOutput<?>> testManifest,
-			final ReasoningTestWithOutputDelegate<InstanceTaxonomyTestOutput<?>> testDelegate) {
+			final ReasoningTestWithOutputAndInterruptsDelegate<InstanceTaxonomyTestOutput<?>> testDelegate) {
 		super(testManifest, testDelegate);
 	}
 

@@ -19,7 +19,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.cli.query;
+package org.semanticweb.elk.reasoner.query;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,13 +29,10 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.cli.CliReasoningTestDelegate;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.query.BaseQueryTest;
-import org.semanticweb.elk.reasoner.query.QueryTestInput;
-import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
+import org.semanticweb.elk.reasoner.ElkReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.taxonomy.ElkIndividualKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.ConfigurationUtils;
@@ -46,13 +43,13 @@ import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
 
 @RunWith(PolySuite.class)
-public class CliClassExpressionInstancesQueryTest extends
+public class ElkClassExpressionInstancesQueryTest extends
 		BaseQueryTest<ElkClassExpression, RelatedEntitiesTestOutput<ElkNamedIndividual>> {
 
-	public CliClassExpressionInstancesQueryTest(
+	public ElkClassExpressionInstancesQueryTest(
 			final TestManifestWithOutput<QueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkNamedIndividual>, RelatedEntitiesTestOutput<ElkNamedIndividual>> manifest) {
 		super(manifest,
-				new CliReasoningTestDelegate<RelatedEntitiesTestOutput<ElkNamedIndividual>>(
+				new ElkReasoningTestDelegate<RelatedEntitiesTestOutput<ElkNamedIndividual>>(
 						manifest) {
 
 					@Override
@@ -62,7 +59,7 @@ public class CliClassExpressionInstancesQueryTest extends
 								.getInstancesQuietly(
 										manifest.getInput().getQuery(),
 										true);
-						return new CliRelatedEntitiesTestOutput<ElkNamedIndividual>(
+						return new ElkRelatedEntitiesTestOutput<ElkNamedIndividual>(
 								subNodes, ElkIndividualKeyProvider.INSTANCE);
 					}
 
@@ -87,7 +84,7 @@ public class CliClassExpressionInstancesQueryTest extends
 						try {
 							outputIS = output.openStream();
 
-							return CliExpectedTestOutputLoader.load(outputIS)
+							return ElkExpectedTestOutputLoader.load(outputIS)
 									.getInstancesManifests(input);
 
 						} finally {

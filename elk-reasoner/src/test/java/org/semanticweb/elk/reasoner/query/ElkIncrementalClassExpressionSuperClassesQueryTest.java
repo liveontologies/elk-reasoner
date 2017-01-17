@@ -19,7 +19,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.cli.query;
+package org.semanticweb.elk.reasoner.query;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -28,16 +28,14 @@ import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.incremental.CliIncrementalReasoningTestDelegate;
-import org.semanticweb.elk.reasoner.query.QueryTestInput;
-import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestManifest;
 
 @RunWith(PolySuite.class)
-public class CliIncrementalClassExpressionSuperClassesQueryTest extends
-		CliIncrementalClassExpressionQueryTest<RelatedEntitiesTestOutput<ElkClass>> {
+public class ElkIncrementalClassExpressionSuperClassesQueryTest extends
+		ElkIncrementalClassExpressionQueryTest<RelatedEntitiesTestOutput<ElkClass>> {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
@@ -55,7 +53,7 @@ public class CliIncrementalClassExpressionSuperClassesQueryTest extends
 		return Arrays.binarySearch(IGNORE_LIST, fileName) >= 0;
 	}
 
-	public CliIncrementalClassExpressionSuperClassesQueryTest(
+	public ElkIncrementalClassExpressionSuperClassesQueryTest(
 			final TestManifest<QueryTestInput<ElkClassExpression>> manifest) {
 		super(manifest,
 				new CliIncrementalReasoningTestDelegate<RelatedEntitiesTestOutput<ElkClass>, RelatedEntitiesTestOutput<ElkClass>>(
@@ -67,7 +65,7 @@ public class CliIncrementalClassExpressionSuperClassesQueryTest extends
 						final Set<? extends Node<ElkClass>> subNodes = getStandardReasoner()
 								.getSuperClassesQuietly(
 										manifest.getInput().getQuery(), true);
-						return new CliRelatedEntitiesTestOutput<ElkClass>(
+						return new ElkRelatedEntitiesTestOutput<ElkClass>(
 								subNodes, ElkClassKeyProvider.INSTANCE);
 					}
 
@@ -77,7 +75,7 @@ public class CliIncrementalClassExpressionSuperClassesQueryTest extends
 						final Set<? extends Node<ElkClass>> subNodes = getIncrementalReasoner()
 								.getSuperClassesQuietly(
 										manifest.getInput().getQuery(), true);
-						return new CliRelatedEntitiesTestOutput<ElkClass>(
+						return new ElkRelatedEntitiesTestOutput<ElkClass>(
 								subNodes, ElkClassKeyProvider.INSTANCE);
 					}
 

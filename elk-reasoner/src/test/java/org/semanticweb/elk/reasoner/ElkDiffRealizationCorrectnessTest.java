@@ -20,15 +20,12 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.cli;
+package org.semanticweb.elk.reasoner;
 
 import java.util.Arrays;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.DiffRealizationCorrectnessTest;
-import org.semanticweb.elk.reasoner.InstanceTaxonomyTestOutput;
-import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.testing.TestInput;
 
@@ -37,7 +34,7 @@ import org.semanticweb.elk.testing.TestInput;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class CLIDiffRealizationCorrectnessTest extends
+public class ElkDiffRealizationCorrectnessTest extends
 		DiffRealizationCorrectnessTest {
 
 	static final String[] IGNORE_LIST = {
@@ -49,10 +46,10 @@ public class CLIDiffRealizationCorrectnessTest extends
 		Arrays.sort(IGNORE_LIST);
 	}
 
-	public CLIDiffRealizationCorrectnessTest(
+	public ElkDiffRealizationCorrectnessTest(
 			final ReasoningTestManifest<InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>> testManifest) {
 		super(testManifest,
-				new CliReasoningTestDelegate<InstanceTaxonomyTestOutput<?>>(
+				new ElkReasoningTestDelegate<InstanceTaxonomyTestOutput<?>>(
 						testManifest) {
 
 					@Override

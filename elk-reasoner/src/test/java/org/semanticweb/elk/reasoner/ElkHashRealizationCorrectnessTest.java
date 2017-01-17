@@ -23,13 +23,10 @@
 /**
  * 
  */
-package org.semanticweb.elk.cli;
+package org.semanticweb.elk.reasoner;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.HashRealizationCorrectnessTest;
-import org.semanticweb.elk.reasoner.InstanceTaxonomyTestOutput;
-import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.testing.HashTestOutput;
 
@@ -41,13 +38,13 @@ import org.semanticweb.elk.testing.HashTestOutput;
  *         pavel.klinov@uni-ulm.de
  */
 
-public class CLIHashRealizationCorrectnessTest
+public class ElkHashRealizationCorrectnessTest
 		extends HashRealizationCorrectnessTest {
 
-	public CLIHashRealizationCorrectnessTest(
+	public ElkHashRealizationCorrectnessTest(
 			final ReasoningTestManifest<HashTestOutput, InstanceTaxonomyTestOutput<?>> testManifest) {
 		super(testManifest,
-				new CliReasoningTestDelegate<InstanceTaxonomyTestOutput<?>>(
+				new ElkReasoningTestDelegate<InstanceTaxonomyTestOutput<?>>(
 						testManifest) {
 
 					@Override

@@ -53,7 +53,7 @@ public abstract class DiffRealizationCorrectnessTest extends
 
 	public DiffRealizationCorrectnessTest(
 			final ReasoningTestManifest<InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>> testManifest,
-			final ReasoningTestWithOutputDelegate<InstanceTaxonomyTestOutput<?>> testDelegate) {
+			final ReasoningTestWithOutputAndInterruptsDelegate<InstanceTaxonomyTestOutput<?>> testDelegate) {
 		super(testManifest, testDelegate);
 	}
 
