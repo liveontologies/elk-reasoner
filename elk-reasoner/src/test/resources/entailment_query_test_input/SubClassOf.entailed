@@ -11,4 +11,6 @@ SubClassOf(:A :D)
 
 SubClassOf(ObjectIntersectionOf(:E :C) ObjectSomeValuesFrom(:R :D))
 
+SubClassOf(:F ObjectSomeValuesFrom(:R :E))
+
 )

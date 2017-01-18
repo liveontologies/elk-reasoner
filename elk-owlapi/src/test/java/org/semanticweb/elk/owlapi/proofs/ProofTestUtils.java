@@ -21,6 +21,7 @@
  */
 package org.semanticweb.elk.owlapi.proofs;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -36,13 +37,17 @@ import org.liveontologies.owlapi.proof.OWLProver;
 import org.liveontologies.proof.util.InferenceSet;
 import org.liveontologies.proof.util.InferenceSets;
 import org.liveontologies.proof.util.ProofNode;
+import org.liveontologies.proof.util.ProofNodes;
 import org.liveontologies.proof.util.ProofStep;
 import org.semanticweb.elk.owl.inferences.TestUtils;
+import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.RemoveAxiom;
 import org.semanticweb.owlapi.model.parameters.AxiomAnnotations;
 import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.reasoner.Node;
@@ -62,8 +67,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
  */
 public class ProofTestUtils {
 
-	public static void provabilityTest(OWLProver prover,
-			OWLSubClassOfAxiom axiom) {
+	public static void provabilityTest(OWLProver prover, final OWLAxiom axiom) {
 		assertTrue(String.format("Entailment %s not derivable!", axiom),
 				isDerivable(prover.getProof(axiom), axiom,
 						prover.getRootOntology()));
@@ -146,6 +150,34 @@ public class ProofTestUtils {
 				}
 			}
 		}
+	}
+
+	public static void randomProofCompletenessTest(final OWLProver prover,
+			final OWLAxiom conclusion, final Random random, final long seed) {
+		final ProofNode<OWLAxiom> root = ProofNodes
+				.create(prover.getProof(conclusion), conclusion);
+
+		final OWLOntology ontology = prover.getRootOntology();
+		final OWLOntologyManager manager = ontology.getOWLOntologyManager();
+
+		final Set<OWLAxiom> proofBreaker = ProofTestUtils
+				.collectProofBreaker(root, ontology, random);
+		final List<OWLOntologyChange> deletions = new ArrayList<OWLOntologyChange>();
+		final List<OWLOntologyChange> additions = new ArrayList<OWLOntologyChange>();
+		for (final OWLAxiom axiom : proofBreaker) {
+			deletions.add(new RemoveAxiom(ontology, axiom));
+			additions.add(new AddAxiom(ontology, axiom));
+		}
+
+		manager.applyChanges(deletions);
+
+		final boolean conclusionDerived = prover.isEntailed(conclusion);
+
+		manager.applyChanges(additions);
+
+		assertFalse("Not all proofs were found!\n" + "Seed: " + seed + "\n"
+				+ "Conclusion: " + conclusion + "\n" + "Proof Breaker: "
+				+ proofBreaker, conclusionDerived);
 	}
 
 	public static Set<OWLAxiom> collectProofBreaker(

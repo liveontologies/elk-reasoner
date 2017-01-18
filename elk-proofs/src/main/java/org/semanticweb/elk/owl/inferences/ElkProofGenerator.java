@@ -67,8 +67,6 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 
 	private final ElkInference.Factory inferenceFactory_;
 
-	private ElkException caughtException_;
-
 	public ElkProofGenerator(final EntailmentInferenceSet evidence,
 			final Reasoner reasoner, final ElkObject.Factory elkFactory,
 			final ElkInference.Factory inferenceFactory) {
@@ -76,7 +74,6 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 		this.reasoner_ = reasoner;
 		this.elkFactory_ = elkFactory;
 		this.inferenceFactory_ = inferenceFactory;
-		this.caughtException_ = null;
 	}
 
 	public ElkProofGenerator(final EntailmentInferenceSet evidence,
@@ -86,12 +83,16 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 	}
 
 	public void generate(final Entailment goalEntailment) throws ElkException {
-		for (final EntailmentInference inf : evidence_
-				.getInferences(goalEntailment)) {
-			inf.accept(this);
-		}
-		if (caughtException_ != null) {
-			throw caughtException_;
+		try {
+			for (final EntailmentInference inf : evidence_
+					.getInferences(goalEntailment)) {
+				inf.accept(this);
+			}
+		} catch (final TunnelingException e) {
+			final ElkException elkException = e.getElkException();
+			if (elkException != null) {
+				throw e.getElkException();
+			}
 		}
 	}
 
@@ -108,7 +109,7 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 			inferenceFactory_.getElkClassInclusionHierarchy(
 					elkFactory_.getOwlThing(), elkFactory_.getOwlNothing());
 		} catch (final ElkException e) {
-			caughtException_ = e;
+			throw new TunnelingException(e);
 		}
 		return null;
 	}
@@ -144,7 +145,7 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 					elkFactory_.getOwlNothing());
 
 		} catch (final ElkException e) {
-			caughtException_ = e;
+			throw new TunnelingException(e);
 		}
 		return null;
 	}
@@ -190,7 +191,7 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 					elkFactory_.getOwlNothing());
 
 		} catch (final ElkException e) {
-			caughtException_ = e;
+			throw new TunnelingException(e);
 		}
 		return null;
 	}
@@ -291,7 +292,7 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 			inferenceFactory_.getElkClassInclusionHierarchy(subClass,
 					elkFactory_.getOwlNothing(), superClass);
 		} catch (final ElkException e) {
-			caughtException_ = e;
+			throw new TunnelingException(e);
 		}
 		return null;
 	}
@@ -311,7 +312,7 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 					inferenceFactory_);
 			matcher.trace(conclusion, subClass, superClass);
 		} catch (final ElkException e) {
-			caughtException_ = e;
+			throw new TunnelingException(e);
 		}
 		return null;
 	}
@@ -350,9 +351,34 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 			inferenceFactory_.getElkClassAssertionOfClassInclusion(instance,
 					type);
 		} catch (final ElkException e) {
-			caughtException_ = e;
+			throw new TunnelingException(e);
 		}
 		return null;
+	}
+
+	/**
+	 * A {@link RuntimeException} used for reporting {@link ElkException}s
+	 * thrown in the visit methods.
+	 * 
+	 * @author Peter Skocovsky
+	 */
+	public static class TunnelingException extends RuntimeException {
+		private static final long serialVersionUID = -4095792570657375629L;
+
+		private final ElkException elkException_;
+
+		public TunnelingException(final ElkException cause) {
+			super(cause);
+			this.elkException_ = cause;
+		}
+
+		/**
+		 * @return The {@link ElkException} thrown in a visit method.
+		 */
+		public ElkException getElkException() {
+			return elkException_;
+		}
+
 	}
 
 }

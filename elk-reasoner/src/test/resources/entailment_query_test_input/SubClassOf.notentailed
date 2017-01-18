@@ -5,7 +5,7 @@ Prefix(xsd: = <http://www.w3.org/2001/XMLSchema#>)
 Prefix(owl: = <http://www.w3.org/2002/07/owl#>)
 Ontology(
 
-SubClassOf(:A owl:Nothing)
+SubClassOf(:A :F)
 SubClassOf(:B :C)
 SubClassOf(:D :A)
 

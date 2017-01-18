@@ -21,24 +21,18 @@
  */
 package org.semanticweb.elk.owlapi.proofs;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.liveontologies.owlapi.proof.OWLProver;
-import org.liveontologies.proof.util.ProofNode;
-import org.liveontologies.proof.util.ProofNodes;
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
@@ -52,15 +46,9 @@ import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.elk.testing.UrlTestInput;
 import org.semanticweb.elk.testing.VoidTestOutput;
-import org.semanticweb.owlapi.model.AddAxiom;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyChange;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
-import org.semanticweb.owlapi.model.RemoveAxiom;
 import org.semanticweb.owlapi.reasoner.InconsistentOntologyException;
 import org.semanticweb.owlapi.reasoner.InferenceType;
 
@@ -130,9 +118,9 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 				@Override
 				public void visit(final OWLClassExpression subsumee,
 						final OWLClassExpression subsumer) {
-					randomProofCompletenessTest(prover,
+					ProofTestUtils.randomProofCompletenessTest(prover,
 							factory.getOWLSubClassOfAxiom(subsumee, subsumer),
-							ontology, random, seed);
+							random, seed);
 				}
 				
 			});
@@ -143,40 +131,6 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 			prover.dispose();
 		}
 		
-	}
-	
-	private void randomProofCompletenessTest(
-			final OWLProver prover,
-			final OWLSubClassOfAxiom conclusion, final OWLOntology ontology,
-			final Random random, final long seed) {
-		final ProofNode<OWLAxiom> root = ProofNodes
-				.create(prover.getProof(conclusion), conclusion);
-		
-		final Set<OWLAxiom> proofBreaker =
-				ProofTestUtils.collectProofBreaker(root, ontology, random);
-		final List<OWLOntologyChange> deletions =
-				new ArrayList<OWLOntologyChange>();
-		final List<OWLOntologyChange> additions =
-				new ArrayList<OWLOntologyChange>();
-		for (final OWLAxiom axiom : proofBreaker) {
-			deletions.add(new RemoveAxiom(ontology, axiom));
-			additions.add(new AddAxiom(ontology, axiom));
-		}
-		
-		manager_.applyChanges(deletions);
-		
-		final boolean conclusionDerived =
-				prover.getSuperClasses(conclusion.getSubClass(), false)
-				.containsEntity((OWLClass) conclusion.getSuperClass());
-		
-		manager_.applyChanges(additions);
-		
-		assertFalse("Not all proofs were found!\n"
-						+ "Seed: " + seed + "\n"
-						+ "Conclusion: " + conclusion + "\n"
-						+ "Proof Breaker: " + proofBreaker,
-				conclusionDerived
-		);
 	}
 	
 	@Config

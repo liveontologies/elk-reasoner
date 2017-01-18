@@ -44,9 +44,9 @@ public class ElkObjectPropertyAssertionAxiomConversionMatch1 extends
 		return factory.getIndexedSubClassOfAxiomMatch2(
 				factory.getIndexedSubClassOfAxiomMatch1(
 						parent.getConclusion(factory)),
-				factory.getObjectOneOf(premise.getObject()),
+				factory.getObjectOneOf(premise.getSubject()),
 				factory.getObjectSomeValuesFrom(premise.getProperty(),
-						factory.getObjectOneOf(premise.getSubject())));
+						factory.getObjectOneOf(premise.getObject())));
 	}
 
 	@Override

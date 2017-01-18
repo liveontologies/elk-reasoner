@@ -4,14 +4,10 @@ Prefix(rdfs: = <http://www.w3.org/2000/01/rdf-schema#>)
 Prefix(xsd: = <http://www.w3.org/2001/XMLSchema#>)
 Prefix(owl: = <http://www.w3.org/2002/07/owl#>)
 Ontology(
-
-SubClassOf(:A :B)
-SubClassOf(:A :C)
-SubClassOf(:B :D)
-SubClassOf(:C :D)
-
-SubClassOf(:E ObjectSomeValuesFrom(:R :B))
-
-SubClassOf(:F owl:Nothing)
-
+EquivalentClasses(:A :C)
+SubClassOf(owl:Thing ObjectSomeValuesFrom(:R :B))
+SubClassOf(ObjectSomeValuesFrom(:S :B) :A)
+SubObjectPropertyOf(:R :S)
+SubClassOf(:C ObjectSomeValuesFrom(:T :B))
+ObjectPropertyDomain(:T owl:Nothing)
 )

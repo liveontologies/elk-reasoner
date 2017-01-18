@@ -278,8 +278,12 @@ public class ConfigurationUtils {
 		@Override
 		public Collection<? extends TestManifestWithOutput<I, EO, AO>> createManifests(
 				final List<URL> urls) throws IOException {
-			if (urls.size() < 2) {
+			if (urls.isEmpty()) {
 				return Collections.emptyList();
+			}
+			// else
+			if (urls.size() < 2) {
+				return createManifests(urls.get(0), null);
 			}
 			// else
 			return createManifests(urls.get(0), urls.get(1));

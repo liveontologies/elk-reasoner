@@ -1013,7 +1013,15 @@ public abstract class AbstractReasonerState {
 				}
 			});
 		}
-		stageManager.inferenceTracingStage.invalidateRecursive();
+		if (stageManager.inferenceTracingStage.isCompleted()) {
+			/*
+			 * The tracing stage should be invalidated only when it is not
+			 * completed, so that jobs that could be submitted during the
+			 * previous call are not lost when the stage is initialized with a
+			 * new computation.
+			 */
+			stageManager.inferenceTracingStage.invalidateRecursive();
+		}
 		getTaxonomyQuietly(); // ensure that classes are saturated
 		complete(stageManager.inferenceTracingStage);
 		return traceState_;
