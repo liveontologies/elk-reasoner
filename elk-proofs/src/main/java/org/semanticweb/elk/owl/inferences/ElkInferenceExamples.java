@@ -358,6 +358,14 @@ public class ElkInferenceExamples
 	}
 
 	@Override
+	public ElkInference visit(
+			final ElkDisjointClassesIntersectionInconsistencies inference) {
+		return inferenceFactory_
+				.getElkDisjointClassesIntersectionInconsistencies(
+						getClasses("C", inference.getExpressions().size()));
+	}
+
+	@Override
 	public ElkDisjointClassesOfDifferentIndividuals visit(
 			ElkDisjointClassesOfDifferentIndividuals inference) {
 		return inferenceFactory_.getElkDisjointClassesOfDifferentIndividuals(

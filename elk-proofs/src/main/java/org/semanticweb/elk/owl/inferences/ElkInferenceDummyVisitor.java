@@ -200,6 +200,12 @@ public class ElkInferenceDummyVisitor<O> implements ElkInference.Visitor<O> {
 	}
 
 	@Override
+	public O visit(
+			final ElkDisjointClassesIntersectionInconsistencies inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
 	public O visit(ElkDisjointClassesOfDifferentIndividuals inference) {
 		return defaultVisit(inference);
 	}

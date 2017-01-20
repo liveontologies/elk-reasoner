@@ -19,31 +19,24 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.entailments.model;
+package org.semanticweb.elk.reasoner.entailments.impl;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.entailments.model.DisjointClassesAxiomEntailment;
+import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 
-/**
- * Instances of this interface represent an entailment of an axiom.
- * 
- * @author Peter Skocovsky
- *
- * @param <A>
- *            The type of the axiom.
- */
-public interface AxiomEntailment<A extends ElkAxiom> extends Entailment {
+public class DisjointClassesAxiomEntailmentImpl
+		extends AbstractAxiomEntailment<ElkDisjointClassesAxiom>
+		implements DisjointClassesAxiomEntailment {
 
-	/**
-	 * @return The axiom that is entailed.
-	 */
-	A getAxiom();
+	public DisjointClassesAxiomEntailmentImpl(
+			final ElkDisjointClassesAxiom axiom) {
+		super(axiom);
+	}
 
-	public static interface Visitor<O>
-			extends SubClassOfAxiomEntailment.Visitor<O>,
-			EquivalentClassesAxiomEntailment.Visitor<O>,
-			ClassAssertionAxiomEntailment.Visitor<O>,
-			DisjointClassesAxiomEntailment.Visitor<O> {
-		// combined visitor
+	@Override
+	public <O> O accept(final Entailment.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 }

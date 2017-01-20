@@ -457,6 +457,19 @@ public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 
 	@Override
 	public Boolean visit(
+			final ElkDisjointClassesIntersectionInconsistencies inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(
+					ElkDisjointClassesIntersectionInconsistencies other) {
+				return equals(other.getExpressions(),
+						inference.getExpressions());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(
 			final ElkDisjointClassesOfDifferentIndividuals inference) {
 		return other_.accept(new DefaultVisitor() {
 			@Override

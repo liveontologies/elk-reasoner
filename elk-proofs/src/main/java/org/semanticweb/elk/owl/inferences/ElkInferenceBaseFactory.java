@@ -286,6 +286,18 @@ public class ElkInferenceBaseFactory implements ElkInference.Factory {
 	}
 
 	@Override
+	public ElkDisjointClassesIntersectionInconsistencies getElkDisjointClassesIntersectionInconsistencies(
+			final List<? extends ElkClassExpression> expressions) {
+		return new ElkDisjointClassesIntersectionInconsistencies(expressions);
+	}
+
+	@Override
+	public ElkDisjointClassesIntersectionInconsistencies getElkDisjointClassesIntersectionInconsistencies(
+			final ElkClassExpression... expressions) {
+		return new ElkDisjointClassesIntersectionInconsistencies(expressions);
+	}
+
+	@Override
 	public ElkDisjointClassesOfDifferentIndividuals getElkDisjointClassesOfDifferentIndividuals(
 			List<? extends ElkIndividual> different) {
 		return new ElkDisjointClassesOfDifferentIndividuals(different);

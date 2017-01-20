@@ -304,6 +304,14 @@ public class ElkInferenceHash implements ElkInference.Visitor<Integer> {
 	}
 
 	@Override
+	public Integer visit(
+			final ElkDisjointClassesIntersectionInconsistencies inference) {
+		return combinedHashCode(
+				hashCode(ElkDisjointClassesIntersectionInconsistencies.class),
+				hashCode(inference.getExpressions()));
+	}
+
+	@Override
 	public Integer visit(ElkDisjointClassesOfDifferentIndividuals inference) {
 		return combinedHashCode(
 				hashCode(ElkDisjointClassesOfDifferentIndividuals.class),

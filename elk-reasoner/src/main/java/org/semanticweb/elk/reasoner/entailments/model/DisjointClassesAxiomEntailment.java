@@ -21,29 +21,19 @@
  */
 package org.semanticweb.elk.reasoner.entailments.model;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 
 /**
- * How was some {@link AxiomEntailment} entailed.
+ * Instances of this interface represent an entailment of
+ * {@link ElkDisjointClassesAxiom}.
  * 
  * @author Peter Skocovsky
- *
- * @param <A>
- *            The type of the axiom.
  */
-public interface AxiomEntailmentInference<A extends ElkAxiom>
-		extends EntailmentInference {
+public interface DisjointClassesAxiomEntailment
+		extends AxiomEntailment<ElkDisjointClassesAxiom> {
 
-	@Override
-	AxiomEntailment<? extends A> getConclusion();
-
-	public static interface Visito<O>
-			extends OntologyInconsistencyEntailsAnyAxiom.Visitor<O>,
-			SubClassOfAxiomEntailmentInference.Visitor<O>,
-			DerivedClassInclusionCycleEntailsEquivalentClassesAxiom.Visitor<O>,
-			DerivedClassInclusionEntailsClassAssertionAxiom.Visitor<O>,
-			DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom.Visitor<O> {
-		// combined interface
+	public static interface Visitor<O> {
+		O visit(DisjointClassesAxiomEntailment disjointClassesAxiomEntailment);
 	}
 
 }

@@ -29,12 +29,14 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.predefined.ElkPolarity;
 import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.entailments.impl.ClassAssertionAxiomEntailmentImpl;
+import org.semanticweb.elk.reasoner.entailments.impl.DisjointClassesAxiomEntailmentImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.EquivalentClassesAxiomEntailmentImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.SubClassOfAxiomEntailmentImpl;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
@@ -114,14 +116,6 @@ public class EntailmentQueryConverter extends
 		final List<SubClassOfEntailmentQuery> subsumptionCycle = new ArrayList<SubClassOfEntailmentQuery>(
 				elkClassExpressions.size());
 
-		if (elkClassExpressions.size() < 2) {
-			// The query is trivially entailed, so the list of premises is empty
-			return new EquivalentClassesEntailmentQuery(
-					new EquivalentClassesAxiomEntailmentImpl(axiom),
-					subsumptionCycle);
-		}
-		// else
-
 		ElkClassExpression elkSubclass = elkClassExpressions
 				.get(elkClassExpressions.size() - 1);
 		for (int i = 0; i < elkClassExpressions.size(); i++) {
@@ -151,6 +145,33 @@ public class EntailmentQueryConverter extends
 		return new ClassAssertionEntailmentQuery(
 				new ClassAssertionAxiomEntailmentImpl(axiom), individual,
 				classExpression);
+	}
+
+	@Override
+	public IndexedEntailmentQuery<? extends Entailment> visit(
+			final ElkDisjointClassesAxiom axiom) {
+
+		final List<? extends ElkClassExpression> disjoint = axiom
+				.getClassExpressions();
+		final int size = disjoint.size();
+		final List<SubClassOfEntailmentQuery> premises = new ArrayList<SubClassOfEntailmentQuery>(
+				size);
+
+		for (int first = 0; first < size - 1; first++) {
+			for (int second = first + 1; second < size; second++) {
+
+				final SubClassOfEntailmentQuery subsumption = visit(elkFactory_
+						.getSubClassOfAxiom(elkFactory_.getObjectIntersectionOf(
+								disjoint.get(first), disjoint.get(second)),
+								elkFactory_.getOwlNothing()));
+
+				premises.add(subsumption);
+
+			}
+		}
+
+		return new DisjointClassesEntailmentQuery(
+				new DisjointClassesAxiomEntailmentImpl(axiom), premises);
 	}
 
 	/**

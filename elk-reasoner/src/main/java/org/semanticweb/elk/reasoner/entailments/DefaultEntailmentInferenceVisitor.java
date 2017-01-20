@@ -26,6 +26,7 @@ import org.semanticweb.elk.reasoner.entailments.model.AxiomEntailmentInference;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionCycleEntailsEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsClassAssertionAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsSubClassOfAxiom;
+import org.semanticweb.elk.reasoner.entailments.model.DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.entailments.model.IndividualInconsistencyEntailsOntologyInconsistency;
 import org.semanticweb.elk.reasoner.entailments.model.OntologyInconsistencyEntailmentInference;
@@ -112,6 +113,13 @@ public class DefaultEntailmentInferenceVisitor<O>
 			final DerivedClassInclusionEntailsClassAssertionAxiom derivedClassInclusionEntailsClassAssertionAxiom) {
 		return defaultAxiomEntailmentInferenceVisit(
 				derivedClassInclusionEntailsClassAssertionAxiom);
+	}
+
+	@Override
+	public O visit(
+			final DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom derivedIntersectionInconsistencyEntailsDisjointClassesAxiom) {
+		return defaultAxiomEntailmentInferenceVisit(
+				derivedIntersectionInconsistencyEntailsDisjointClassesAxiom);
 	}
 
 }

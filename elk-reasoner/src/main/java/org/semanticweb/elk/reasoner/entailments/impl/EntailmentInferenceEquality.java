@@ -25,6 +25,7 @@ import org.semanticweb.elk.reasoner.entailments.DefaultEntailmentInferenceVisito
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionCycleEntailsEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsClassAssertionAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsSubClassOfAxiom;
+import org.semanticweb.elk.reasoner.entailments.model.DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.entailments.model.IndividualInconsistencyEntailsOntologyInconsistency;
 import org.semanticweb.elk.reasoner.entailments.model.OntologyInconsistencyEntailsAnyAxiom;
@@ -182,6 +183,23 @@ class EntailmentInferenceEquality
 						&& equals(other.getReason(),
 								derivedClassInclusionEntailsClassAssertionAxiom
 										.getReason());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(
+			final DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom derivedIntersectionInconsistencyEntailsDisjointClassesAxiom) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(
+					final DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom other) {
+				return equals(other.getConclusion(),
+						derivedIntersectionInconsistencyEntailsDisjointClassesAxiom
+								.getConclusion())
+						&& equals(other.getPremises(),
+								derivedIntersectionInconsistencyEntailsDisjointClassesAxiom
+										.getPremises());
 			}
 		});
 	}

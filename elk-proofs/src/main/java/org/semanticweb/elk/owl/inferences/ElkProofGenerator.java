@@ -43,6 +43,7 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionCycleEntailsEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsClassAssertionAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsSubClassOfAxiom;
+import org.semanticweb.elk.reasoner.entailments.model.DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;
@@ -353,6 +354,22 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 		} catch (final ElkException e) {
 			throw new TunnelingException(e);
 		}
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			final DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom entailmentInference) {
+		for (final SubClassOfAxiomEntailment premise : entailmentInference
+				.getPremises()) {
+			for (final EntailmentInference inf : evidence_
+					.getInferences(premise)) {
+				inf.accept(this);
+			}
+		}
+		inferenceFactory_.getElkDisjointClassesIntersectionInconsistencies(
+				entailmentInference.getConclusion().getAxiom()
+						.getClassExpressions());
 		return null;
 	}
 

@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.entailments.impl;
 
 import org.semanticweb.elk.reasoner.entailments.DefaultEntailmentVisitor;
 import org.semanticweb.elk.reasoner.entailments.model.ClassAssertionAxiomEntailment;
+import org.semanticweb.elk.reasoner.entailments.model.DisjointClassesAxiomEntailment;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EquivalentClassesAxiomEntailment;
 import org.semanticweb.elk.reasoner.entailments.model.OntologyInconsistency;
@@ -98,6 +99,18 @@ class EntailmentEquality implements Entailment.Visitor<Boolean> {
 			public Boolean visit(final ClassAssertionAxiomEntailment other) {
 				return equals(other.getAxiom(),
 						classAssertionAxiomEntailment.getAxiom());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(
+			final DisjointClassesAxiomEntailment disjointClassesAxiomEntailment) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(final DisjointClassesAxiomEntailment other) {
+				return equals(other.getAxiom(),
+						disjointClassesAxiomEntailment.getAxiom());
 			}
 		});
 	}
