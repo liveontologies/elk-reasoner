@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.entailments.impl;
 
 import org.semanticweb.elk.reasoner.entailments.DefaultEntailmentInferenceVisitor;
 import org.semanticweb.elk.reasoner.entailments.model.EntailedClassInclusionCycleEntailsEquivalentClassesAxiom;
+import org.semanticweb.elk.reasoner.entailments.model.EntailedDisjointClassesEntailsDifferentIndividualsAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsClassAssertionAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.EntailedIntersectionInconsistencyEntailsDisjointClassesAxiom;
@@ -115,16 +116,16 @@ class EntailmentInferenceEquality
 
 	@Override
 	public Boolean visit(
-			final EntailedIntersectionInconsistencyEntailsDisjointClassesAxiom derivedIntersectionInconsistencyEntailsDisjointClassesAxiom) {
+			final EntailedDisjointClassesEntailsDifferentIndividualsAxiom entailedDisjointClassesEntailsDifferentIndividualsAxiom) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(
-					final EntailedIntersectionInconsistencyEntailsDisjointClassesAxiom other) {
+					final EntailedDisjointClassesEntailsDifferentIndividualsAxiom other) {
 				return equals(other.getConclusion(),
-						derivedIntersectionInconsistencyEntailsDisjointClassesAxiom
+						entailedDisjointClassesEntailsDifferentIndividualsAxiom
 								.getConclusion())
 						&& equals(other.getPremises(),
-								derivedIntersectionInconsistencyEntailsDisjointClassesAxiom
+								entailedDisjointClassesEntailsDifferentIndividualsAxiom
 										.getPremises());
 			}
 		});
@@ -142,6 +143,23 @@ class EntailmentInferenceEquality
 								.getConclusion())
 						&& equals(other.getPremises(),
 								entailedEquivalentClassesEntailsSameIndividualAxiom
+										.getPremises());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(
+			final EntailedIntersectionInconsistencyEntailsDisjointClassesAxiom derivedIntersectionInconsistencyEntailsDisjointClassesAxiom) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(
+					final EntailedIntersectionInconsistencyEntailsDisjointClassesAxiom other) {
+				return equals(other.getConclusion(),
+						derivedIntersectionInconsistencyEntailsDisjointClassesAxiom
+								.getConclusion())
+						&& equals(other.getPremises(),
+								derivedIntersectionInconsistencyEntailsDisjointClassesAxiom
 										.getPremises());
 			}
 		});

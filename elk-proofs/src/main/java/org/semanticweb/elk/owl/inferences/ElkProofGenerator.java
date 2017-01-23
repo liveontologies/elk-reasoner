@@ -21,6 +21,7 @@
  */
 package org.semanticweb.elk.owl.inferences;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,21 +31,26 @@ import org.semanticweb.elk.matching.Matcher;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.entailments.model.EntailedClassInclusionCycleEntailsEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsClassAssertionAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsSubClassOfAxiom;
-import org.semanticweb.elk.reasoner.entailments.model.EntailedIntersectionInconsistencyEntailsDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.entailments.model.DisjointClassesAxiomEntailment;
+import org.semanticweb.elk.reasoner.entailments.model.EntailedClassInclusionCycleEntailsEquivalentClassesAxiom;
+import org.semanticweb.elk.reasoner.entailments.model.EntailedDisjointClassesEntailsDifferentIndividualsAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.EntailedEquivalentClassesEntailsSameIndividualAxiom;
+import org.semanticweb.elk.reasoner.entailments.model.EntailedIntersectionInconsistencyEntailsDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;
@@ -101,16 +107,22 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 
 	@Override
 	public Void visit(
-			final OwlThingInconsistencyEntailsOntologyInconsistency entailmentInference) {
+			final DerivedClassInclusionEntailsClassAssertionAxiom entailmentInference) {
 		try {
-			final ClassInconsistency conclusion = entailmentInference
+			final SubClassInclusionComposed conclusion = entailmentInference
 					.getReason();
+			final ElkIndividual instance = entailmentInference.getConclusion()
+					.getAxiom().getIndividual();
+			final ElkClassExpression nominal = elkFactory_
+					.getObjectOneOf(instance);
+			final ElkClassExpression type = entailmentInference.getConclusion()
+					.getAxiom().getClassExpression();
 			final Matcher matcher = new Matcher(
 					reasoner_.explainConclusion(conclusion), elkFactory_,
 					inferenceFactory_);
-			matcher.trace(conclusion, elkFactory_.getOwlThing());
-			inferenceFactory_.getElkClassInclusionHierarchy(
-					elkFactory_.getOwlThing(), elkFactory_.getOwlNothing());
+			matcher.trace(conclusion, nominal, type);
+			inferenceFactory_.getElkClassAssertionOfClassInclusion(instance,
+					type);
 		} catch (final ElkException e) {
 			throw new TunnelingException(e);
 		}
@@ -119,37 +131,84 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 
 	@Override
 	public Void visit(
-			final TopObjectPropertyInBottomEntailsOntologyInconsistency entailmentInference) {
-		final SubPropertyChain conclusion = entailmentInference.getReason();
+			final DerivedClassInclusionEntailsSubClassOfAxiom entailmentInference) {
 		try {
-
+			final SubClassInclusionComposed conclusion = entailmentInference
+					.getReason();
+			final ElkClassExpression subClass = entailmentInference
+					.getConclusion().getAxiom().getSubClassExpression();
+			final ElkClassExpression superClass = entailmentInference
+					.getConclusion().getAxiom().getSuperClassExpression();
 			final Matcher matcher = new Matcher(
 					reasoner_.explainConclusion(conclusion), elkFactory_,
 					inferenceFactory_);
-			matcher.trace(conclusion, elkFactory_.getOwlTopObjectProperty(),
-					elkFactory_.getOwlBottomObjectProperty());
-
-			inferenceFactory_.getElkClassInclusionOwlTopObjectProperty();
-			inferenceFactory_.getElkClassInclusionExistentialOfObjectHasSelf(
-					elkFactory_.getOwlThing(),
-					elkFactory_.getOwlTopObjectProperty());
-			inferenceFactory_.getElkClassInclusionExistentialComposition(
-					Arrays.asList(elkFactory_.getOwlThing(),
-							elkFactory_.getOwlThing()),
-					Arrays.asList(elkFactory_.getOwlTopObjectProperty()),
-					elkFactory_.getOwlBottomObjectProperty());
-
-			inferenceFactory_.getElkClassInclusionOwlBottomObjectProperty();
-			inferenceFactory_.getElkClassInclusionHierarchy(
-					elkFactory_.getOwlThing(),
-					elkFactory_.getObjectSomeValuesFrom(
-							elkFactory_.getOwlBottomObjectProperty(),
-							elkFactory_.getOwlThing()),
-					elkFactory_.getOwlNothing());
-
+			matcher.trace(conclusion, subClass, superClass);
 		} catch (final ElkException e) {
 			throw new TunnelingException(e);
 		}
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			final EntailedClassInclusionCycleEntailsEquivalentClassesAxiom entailmentInference) {
+		for (final SubClassOfAxiomEntailment premise : entailmentInference
+				.getPremises()) {
+			for (final EntailmentInference inf : evidence_
+					.getInferences(premise)) {
+				inf.accept(this);
+			}
+		}
+		inferenceFactory_.getElkEquivalentClassesCycle(entailmentInference
+				.getConclusion().getAxiom().getClassExpressions());
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			final EntailedDisjointClassesEntailsDifferentIndividualsAxiom entailmentInference) {
+		for (final DisjointClassesAxiomEntailment premise : entailmentInference
+				.getPremises()) {
+			for (final EntailmentInference inf : evidence_
+					.getInferences(premise)) {
+				inf.accept(this);
+			}
+		}
+		inferenceFactory_
+				.getElkDifferentIndividualsOfDisjointClasses(entailmentInference
+						.getConclusion().getAxiom().getIndividuals());
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			final EntailedEquivalentClassesEntailsSameIndividualAxiom entailmentInference) {
+		for (final EquivalentClassesAxiomEntailment premise : entailmentInference
+				.getPremises()) {
+			for (final EntailmentInference inf : evidence_
+					.getInferences(premise)) {
+				inf.accept(this);
+			}
+		}
+		inferenceFactory_
+				.getElkSameIndividualOfEquivalentClasses(entailmentInference
+						.getConclusion().getAxiom().getIndividuals());
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			final EntailedIntersectionInconsistencyEntailsDisjointClassesAxiom entailmentInference) {
+		for (final SubClassOfAxiomEntailment premise : entailmentInference
+				.getPremises()) {
+			for (final EntailmentInference inf : evidence_
+					.getInferences(premise)) {
+				inf.accept(this);
+			}
+		}
+		inferenceFactory_.getElkDisjointClassesIntersectionInconsistencies(
+				entailmentInference.getConclusion().getAxiom()
+						.getClassExpressions());
 		return null;
 	}
 
@@ -222,16 +281,63 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 			}
 
 			@Override
-			public Void visit(final ElkSubClassOfAxiom axiom) {
-				final ElkClassExpression subClass = axiom
-						.getSubClassExpression();
-				final ElkClassExpression superClass = axiom
-						.getSuperClassExpression();
-				inferenceFactory_.getElkClassInclusionOwlThing(subClass);
-				inferenceFactory_.getElkClassInclusionOwlNothing(superClass);
-				inferenceFactory_.getElkClassInclusionHierarchy(subClass,
+			public Void visit(final ElkClassAssertionAxiom axiom) {
+				final ElkIndividual instance = axiom.getIndividual();
+				final ElkClassExpression nominal = elkFactory_
+						.getObjectOneOf(instance);
+				final ElkClassExpression type = axiom.getClassExpression();
+				inferenceFactory_.getElkClassInclusionOwlThing(nominal);
+				inferenceFactory_.getElkClassInclusionOwlNothing(type);
+				inferenceFactory_.getElkClassInclusionHierarchy(nominal,
 						elkFactory_.getOwlThing(), elkFactory_.getOwlNothing(),
-						superClass);
+						type);
+				inferenceFactory_.getElkClassAssertionOfClassInclusion(instance,
+						type);
+				return null;
+			}
+
+			@Override
+			public Void visit(final ElkDifferentIndividualsAxiom axiom) {
+
+				final List<? extends ElkIndividual> individuals = axiom
+						.getIndividuals();
+				final List<ElkClassExpression> nominals = new ArrayList<ElkClassExpression>(
+						individuals.size());
+				for (final ElkIndividual individual : individuals) {
+					nominals.add(elkFactory_.getObjectOneOf(individual));
+				}
+
+				elkFactory_.getDisjointClassesAxiom(nominals).accept(this);
+
+				inferenceFactory_.getElkDifferentIndividualsOfDisjointClasses(
+						individuals);
+				return null;
+			}
+
+			@Override
+			public Void visit(final ElkDisjointClassesAxiom axiom) {
+				final List<? extends ElkClassExpression> disjoint = axiom
+						.getClassExpressions();
+				final int size = disjoint.size();
+
+				for (int first = 0; first < size - 1; first++) {
+					for (int second = first + 1; second < size; second++) {
+
+						final ElkClassExpression intersection = elkFactory_
+								.getObjectIntersectionOf(disjoint.get(first),
+										disjoint.get(second));
+
+						inferenceFactory_
+								.getElkClassInclusionOwlThing(intersection);
+						inferenceFactory_.getElkClassInclusionHierarchy(
+								intersection, elkFactory_.getOwlThing(),
+								elkFactory_.getOwlNothing());
+					}
+				}
+
+				inferenceFactory_
+						.getElkDisjointClassesIntersectionInconsistencies(
+								disjoint);
 				return null;
 			}
 
@@ -255,18 +361,34 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 			}
 
 			@Override
-			public Void visit(final ElkClassAssertionAxiom axiom) {
-				final ElkIndividual instance = axiom.getIndividual();
-				final ElkClassExpression nominal = elkFactory_
-						.getObjectOneOf(instance);
-				final ElkClassExpression type = axiom.getClassExpression();
-				inferenceFactory_.getElkClassInclusionOwlThing(nominal);
-				inferenceFactory_.getElkClassInclusionOwlNothing(type);
-				inferenceFactory_.getElkClassInclusionHierarchy(nominal,
+			public Void visit(final ElkSameIndividualAxiom axiom) {
+
+				final List<? extends ElkIndividual> individuals = axiom
+						.getIndividuals();
+				final List<ElkClassExpression> nominals = new ArrayList<ElkClassExpression>(
+						individuals.size());
+				for (final ElkIndividual individual : individuals) {
+					nominals.add(elkFactory_.getObjectOneOf(individual));
+				}
+
+				elkFactory_.getEquivalentClassesAxiom(nominals).accept(this);
+
+				inferenceFactory_
+						.getElkSameIndividualOfEquivalentClasses(individuals);
+				return null;
+			}
+
+			@Override
+			public Void visit(final ElkSubClassOfAxiom axiom) {
+				final ElkClassExpression subClass = axiom
+						.getSubClassExpression();
+				final ElkClassExpression superClass = axiom
+						.getSuperClassExpression();
+				inferenceFactory_.getElkClassInclusionOwlThing(subClass);
+				inferenceFactory_.getElkClassInclusionOwlNothing(superClass);
+				inferenceFactory_.getElkClassInclusionHierarchy(subClass,
 						elkFactory_.getOwlThing(), elkFactory_.getOwlNothing(),
-						type);
-				inferenceFactory_.getElkClassAssertionOfClassInclusion(instance,
-						type);
+						superClass);
 				return null;
 			}
 
@@ -274,6 +396,24 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 
 		entailmentInference.getConclusion().getAxiom().accept(axiomVisitor);
 
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			final OwlThingInconsistencyEntailsOntologyInconsistency entailmentInference) {
+		try {
+			final ClassInconsistency conclusion = entailmentInference
+					.getReason();
+			final Matcher matcher = new Matcher(
+					reasoner_.explainConclusion(conclusion), elkFactory_,
+					inferenceFactory_);
+			matcher.trace(conclusion, elkFactory_.getOwlThing());
+			inferenceFactory_.getElkClassInclusionHierarchy(
+					elkFactory_.getOwlThing(), elkFactory_.getOwlNothing());
+		} catch (final ElkException e) {
+			throw new TunnelingException(e);
+		}
 		return null;
 	}
 
@@ -302,92 +442,37 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 
 	@Override
 	public Void visit(
-			final DerivedClassInclusionEntailsSubClassOfAxiom entailmentInference) {
+			final TopObjectPropertyInBottomEntailsOntologyInconsistency entailmentInference) {
+		final SubPropertyChain conclusion = entailmentInference.getReason();
 		try {
-			final SubClassInclusionComposed conclusion = entailmentInference
-					.getReason();
-			final ElkClassExpression subClass = entailmentInference
-					.getConclusion().getAxiom().getSubClassExpression();
-			final ElkClassExpression superClass = entailmentInference
-					.getConclusion().getAxiom().getSuperClassExpression();
+
 			final Matcher matcher = new Matcher(
 					reasoner_.explainConclusion(conclusion), elkFactory_,
 					inferenceFactory_);
-			matcher.trace(conclusion, subClass, superClass);
+			matcher.trace(conclusion, elkFactory_.getOwlTopObjectProperty(),
+					elkFactory_.getOwlBottomObjectProperty());
+
+			inferenceFactory_.getElkClassInclusionOwlTopObjectProperty();
+			inferenceFactory_.getElkClassInclusionExistentialOfObjectHasSelf(
+					elkFactory_.getOwlThing(),
+					elkFactory_.getOwlTopObjectProperty());
+			inferenceFactory_.getElkClassInclusionExistentialComposition(
+					Arrays.asList(elkFactory_.getOwlThing(),
+							elkFactory_.getOwlThing()),
+					Arrays.asList(elkFactory_.getOwlTopObjectProperty()),
+					elkFactory_.getOwlBottomObjectProperty());
+
+			inferenceFactory_.getElkClassInclusionOwlBottomObjectProperty();
+			inferenceFactory_.getElkClassInclusionHierarchy(
+					elkFactory_.getOwlThing(),
+					elkFactory_.getObjectSomeValuesFrom(
+							elkFactory_.getOwlBottomObjectProperty(),
+							elkFactory_.getOwlThing()),
+					elkFactory_.getOwlNothing());
+
 		} catch (final ElkException e) {
 			throw new TunnelingException(e);
 		}
-		return null;
-	}
-
-	@Override
-	public Void visit(
-			final EntailedClassInclusionCycleEntailsEquivalentClassesAxiom entailmentInference) {
-		for (final SubClassOfAxiomEntailment premise : entailmentInference
-				.getPremises()) {
-			for (final EntailmentInference inf : evidence_
-					.getInferences(premise)) {
-				inf.accept(this);
-			}
-		}
-		inferenceFactory_.getElkEquivalentClassesCycle(entailmentInference
-				.getConclusion().getAxiom().getClassExpressions());
-		return null;
-	}
-
-	@Override
-	public Void visit(
-			final DerivedClassInclusionEntailsClassAssertionAxiom entailmentInference) {
-		try {
-			final SubClassInclusionComposed conclusion = entailmentInference
-					.getReason();
-			final ElkIndividual instance = entailmentInference.getConclusion()
-					.getAxiom().getIndividual();
-			final ElkClassExpression nominal = elkFactory_
-					.getObjectOneOf(instance);
-			final ElkClassExpression type = entailmentInference.getConclusion()
-					.getAxiom().getClassExpression();
-			final Matcher matcher = new Matcher(
-					reasoner_.explainConclusion(conclusion), elkFactory_,
-					inferenceFactory_);
-			matcher.trace(conclusion, nominal, type);
-			inferenceFactory_.getElkClassAssertionOfClassInclusion(instance,
-					type);
-		} catch (final ElkException e) {
-			throw new TunnelingException(e);
-		}
-		return null;
-	}
-
-	@Override
-	public Void visit(
-			final EntailedIntersectionInconsistencyEntailsDisjointClassesAxiom entailmentInference) {
-		for (final SubClassOfAxiomEntailment premise : entailmentInference
-				.getPremises()) {
-			for (final EntailmentInference inf : evidence_
-					.getInferences(premise)) {
-				inf.accept(this);
-			}
-		}
-		inferenceFactory_.getElkDisjointClassesIntersectionInconsistencies(
-				entailmentInference.getConclusion().getAxiom()
-						.getClassExpressions());
-		return null;
-	}
-
-	@Override
-	public Void visit(
-			final EntailedEquivalentClassesEntailsSameIndividualAxiom entailmentInference) {
-		for (final EquivalentClassesAxiomEntailment premise : entailmentInference
-				.getPremises()) {
-			for (final EntailmentInference inf : evidence_
-					.getInferences(premise)) {
-				inf.accept(this);
-			}
-		}
-		inferenceFactory_
-				.getElkSameIndividualOfEquivalentClasses(entailmentInference
-						.getConclusion().getAxiom().getIndividuals());
 		return null;
 	}
 

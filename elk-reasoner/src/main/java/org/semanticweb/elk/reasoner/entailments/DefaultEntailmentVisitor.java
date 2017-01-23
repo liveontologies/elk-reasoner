@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.entailments;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.AxiomEntailment;
 import org.semanticweb.elk.reasoner.entailments.model.ClassAssertionAxiomEntailment;
+import org.semanticweb.elk.reasoner.entailments.model.DifferentIndividualsAxiomEntailment;
 import org.semanticweb.elk.reasoner.entailments.model.DisjointClassesAxiomEntailment;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EquivalentClassesAxiomEntailment;
@@ -46,6 +47,12 @@ public class DefaultEntailmentVisitor<O> implements Entailment.Visitor<O> {
 	public O visit(
 			final ClassAssertionAxiomEntailment classAssertionAxiomEntailment) {
 		return defaultAxiomEntailmentVisit(classAssertionAxiomEntailment);
+	}
+
+	@Override
+	public O visit(
+			final DifferentIndividualsAxiomEntailment differentIndividualsEntailment) {
+		return defaultAxiomEntailmentVisit(differentIndividualsEntailment);
 	}
 
 	@Override

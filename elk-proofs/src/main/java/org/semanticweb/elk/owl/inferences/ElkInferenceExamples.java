@@ -359,6 +359,13 @@ public class ElkInferenceExamples
 
 	@Override
 	public ElkInference visit(
+			final ElkDifferentIndividualsOfDisjointClasses inference) {
+		return inferenceFactory_.getElkDifferentIndividualsOfDisjointClasses(
+				getIndividuals("a", inference.getDifferent().size()));
+	}
+
+	@Override
+	public ElkInference visit(
 			final ElkDisjointClassesIntersectionInconsistencies inference) {
 		return inferenceFactory_
 				.getElkDisjointClassesIntersectionInconsistencies(

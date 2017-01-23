@@ -3,20 +3,9 @@ Prefix(rdf: = <http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
 Prefix(rdfs: = <http://www.w3.org/2000/01/rdf-schema#>)
 Prefix(xsd: = <http://www.w3.org/2001/XMLSchema#>)
 Prefix(owl: = <http://www.w3.org/2002/07/owl#>)
+
 Ontology(
 
-SubClassOf(owl:Thing owl:Nothing)
-
-ClassAssertion(:D :a)
-
-DifferentIndividuals(:a :b :c)
-
-DisjointClasses(:A :B :C)
-
-EquivalentClasses(:B ObjectSomeValuesFrom(:R :D) ObjectSomeValuesFrom(:R :C) :E)
-
-SameIndividual(:a :b :c)
-
-SubClassOf(:B :A)
+DifferentIndividuals(:a :b :e)
 
 )

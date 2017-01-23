@@ -66,7 +66,7 @@ public class EntailmentProofTest
 		return Arrays.binarySearch(IGNORE_LIST, fileName) >= 0;
 	}
 
-	public static final double INTERRUPTION_CHANCE = 0.03;
+	public static final double INTERRUPTION_CHANCE = 0.003;
 
 	public EntailmentProofTest(
 			final TestManifestWithOutput<QueryTestInput<ElkAxiom>, VoidTestOutput, VoidTestOutput> manifest) {

@@ -29,6 +29,7 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
@@ -38,6 +39,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.predefined.ElkPolarity;
 import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.entailments.impl.ClassAssertionAxiomEntailmentImpl;
+import org.semanticweb.elk.reasoner.entailments.impl.DifferentIndividualsAxiomEntailmentImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.DisjointClassesAxiomEntailmentImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.EquivalentClassesAxiomEntailmentImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.SameIndividualAxiomEntailmentImpl;
@@ -100,44 +102,6 @@ public class EntailmentQueryConverter extends
 	}
 
 	@Override
-	public SubClassOfEntailmentQuery visit(final ElkSubClassOfAxiom axiom) {
-		final IndexedClassExpression subClass = axiom.getSubClassExpression()
-				.accept(positiveConverter_);
-		final IndexedClassExpression superClass = axiom
-				.getSuperClassExpression().accept(negativeConverter_);
-
-		return new SubClassOfEntailmentQuery(
-				new SubClassOfAxiomEntailmentImpl(axiom), subClass, superClass);
-	}
-
-	@Override
-	public EquivalentClassesEntailmentQuery visit(
-			final ElkEquivalentClassesAxiom axiom) {
-		final List<? extends ElkClassExpression> elkClassExpressions = axiom
-				.getClassExpressions();
-
-		final List<SubClassOfEntailmentQuery> subsumptionCycle = new ArrayList<SubClassOfEntailmentQuery>(
-				elkClassExpressions.size());
-
-		ElkClassExpression elkSubclass = elkClassExpressions
-				.get(elkClassExpressions.size() - 1);
-		for (int i = 0; i < elkClassExpressions.size(); i++) {
-			final ElkClassExpression elkSuperclass = elkClassExpressions.get(i);
-
-			final SubClassOfEntailmentQuery subsumption = visit(
-					elkFactory_.getSubClassOfAxiom(elkSubclass, elkSuperclass));
-
-			subsumptionCycle.add(subsumption);
-
-			elkSubclass = elkSuperclass;
-		}
-
-		return new EquivalentClassesEntailmentQuery(
-				new EquivalentClassesAxiomEntailmentImpl(axiom),
-				subsumptionCycle);
-	}
-
-	@Override
 	public ClassAssertionEntailmentQuery visit(
 			final ElkClassAssertionAxiom axiom) {
 		final IndexedIndividual individual = axiom.getIndividual()
@@ -148,6 +112,25 @@ public class EntailmentQueryConverter extends
 		return new ClassAssertionEntailmentQuery(
 				new ClassAssertionAxiomEntailmentImpl(axiom), individual,
 				classExpression);
+	}
+
+	@Override
+	public IndexedEntailmentQuery<? extends Entailment> visit(
+			final ElkDifferentIndividualsAxiom axiom) {
+
+		final List<? extends ElkIndividual> individuals = axiom
+				.getIndividuals();
+		final List<ElkClassExpression> nominals = new ArrayList<ElkClassExpression>(
+				individuals.size());
+		for (final ElkIndividual individual : individuals) {
+			nominals.add(elkFactory_.getObjectOneOf(individual));
+		}
+		final DisjointClassesEntailmentQuery disjointness = visit(
+				elkFactory_.getDisjointClassesAxiom(nominals));
+
+		return new DifferentIndividualsEntailmentQuery(
+				new DifferentIndividualsAxiomEntailmentImpl(axiom),
+				disjointness);
 	}
 
 	@Override
@@ -178,6 +161,33 @@ public class EntailmentQueryConverter extends
 	}
 
 	@Override
+	public EquivalentClassesEntailmentQuery visit(
+			final ElkEquivalentClassesAxiom axiom) {
+		final List<? extends ElkClassExpression> elkClassExpressions = axiom
+				.getClassExpressions();
+
+		final List<SubClassOfEntailmentQuery> subsumptionCycle = new ArrayList<SubClassOfEntailmentQuery>(
+				elkClassExpressions.size());
+
+		ElkClassExpression elkSubclass = elkClassExpressions
+				.get(elkClassExpressions.size() - 1);
+		for (int i = 0; i < elkClassExpressions.size(); i++) {
+			final ElkClassExpression elkSuperclass = elkClassExpressions.get(i);
+
+			final SubClassOfEntailmentQuery subsumption = visit(
+					elkFactory_.getSubClassOfAxiom(elkSubclass, elkSuperclass));
+
+			subsumptionCycle.add(subsumption);
+
+			elkSubclass = elkSuperclass;
+		}
+
+		return new EquivalentClassesEntailmentQuery(
+				new EquivalentClassesAxiomEntailmentImpl(axiom),
+				subsumptionCycle);
+	}
+
+	@Override
 	public IndexedEntailmentQuery<? extends Entailment> visit(
 			final ElkSameIndividualAxiom axiom) {
 
@@ -193,6 +203,17 @@ public class EntailmentQueryConverter extends
 
 		return new SameIndividualEntailmentQuery(
 				new SameIndividualAxiomEntailmentImpl(axiom), equivalence);
+	}
+
+	@Override
+	public SubClassOfEntailmentQuery visit(final ElkSubClassOfAxiom axiom) {
+		final IndexedClassExpression subClass = axiom.getSubClassExpression()
+				.accept(positiveConverter_);
+		final IndexedClassExpression superClass = axiom
+				.getSuperClassExpression().accept(negativeConverter_);
+
+		return new SubClassOfEntailmentQuery(
+				new SubClassOfAxiomEntailmentImpl(axiom), subClass, superClass);
 	}
 
 	/**

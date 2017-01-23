@@ -21,31 +21,30 @@
  */
 package org.semanticweb.elk.reasoner.entailments.model;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import java.util.List;
+
+import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
 
 /**
- * How was some {@link AxiomEntailment} entailed.
+ * {@link ElkDifferentIndividualsAxiom} was entailed because an
+ * {@link org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom
+ * ElkDisjointClassesAxiom} asserting that nominals of
+ * {@link ElkDifferentIndividualsAxiom#getIndividuals()} are disjoint was
+ * entailed.
  * 
  * @author Peter Skocovsky
- *
- * @param <A>
- *            The type of the axiom.
  */
-public interface AxiomEntailmentInference<A extends ElkAxiom>
-		extends EntailmentInference {
+public interface EntailedDisjointClassesEntailsDifferentIndividualsAxiom
+		extends AxiomEntailmentInference<ElkDifferentIndividualsAxiom> {
 
 	@Override
-	AxiomEntailment<? extends A> getConclusion();
+	DifferentIndividualsAxiomEntailment getConclusion();
 
-	public static interface Visito<O>
-			extends DerivedClassInclusionEntailsClassAssertionAxiom.Visitor<O>,
-			EntailedClassInclusionCycleEntailsEquivalentClassesAxiom.Visitor<O>,
-			EntailedDisjointClassesEntailsDifferentIndividualsAxiom.Visitor<O>,
-			EntailedEquivalentClassesEntailsSameIndividualAxiom.Visitor<O>,
-			EntailedIntersectionInconsistencyEntailsDisjointClassesAxiom.Visitor<O>,
-			OntologyInconsistencyEntailsAnyAxiom.Visitor<O>,
-			SubClassOfAxiomEntailmentInference.Visitor<O> {
-		// combined interface
+	@Override
+	List<? extends DisjointClassesAxiomEntailment> getPremises();
+
+	public static interface Visitor<O> {
+		O visit(EntailedDisjointClassesEntailsDifferentIndividualsAxiom entailedDisjointClassesEntailsDifferentIndividualsAxiom);
 	}
 
 }

@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.entailments.impl;
 
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.entailments.model.ClassAssertionAxiomEntailment;
+import org.semanticweb.elk.reasoner.entailments.model.DifferentIndividualsAxiomEntailment;
 import org.semanticweb.elk.reasoner.entailments.model.DisjointClassesAxiomEntailment;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EquivalentClassesAxiomEntailment;
@@ -67,6 +68,14 @@ class EntailmentHasher
 			final ClassAssertionAxiomEntailment classAssertionAxiomEntailment) {
 		return combinedHashCode(hashCode(ClassAssertionAxiomEntailment.class),
 				hashCode(classAssertionAxiomEntailment.getAxiom()));
+	}
+
+	@Override
+	public Integer visit(
+			final DifferentIndividualsAxiomEntailment differentIndividualsEntailment) {
+		return combinedHashCode(
+				hashCode(DifferentIndividualsAxiomEntailment.class),
+				hashCode(differentIndividualsEntailment.getAxiom()));
 	}
 
 	@Override

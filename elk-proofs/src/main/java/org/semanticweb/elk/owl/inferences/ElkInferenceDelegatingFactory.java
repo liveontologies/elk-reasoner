@@ -318,6 +318,13 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 	}
 
 	@Override
+	public ElkDifferentIndividualsOfDisjointClasses getElkDifferentIndividualsOfDisjointClasses(
+			final List<? extends ElkIndividual> different) {
+		return filter(mainFactory_
+				.getElkDifferentIndividualsOfDisjointClasses(different));
+	}
+
+	@Override
 	public ElkDisjointClassesIntersectionInconsistencies getElkDisjointClassesIntersectionInconsistencies(
 			List<? extends ElkClassExpression> expressions) {
 		return filter(mainFactory_

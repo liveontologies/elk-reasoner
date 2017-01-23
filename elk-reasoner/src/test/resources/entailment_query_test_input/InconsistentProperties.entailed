@@ -7,6 +7,16 @@ Ontology(
 
 SubClassOf(owl:Thing owl:Nothing)
 
-SubClassOf(:A :C)
+ClassAssertion(:D :a)
+
+DifferentIndividuals(:a :b :c)
+
+DisjointClasses(:A :B :C)
+
+EquivalentClasses(:B ObjectSomeValuesFrom(:R :D) ObjectSomeValuesFrom(:R :C) :E)
+
+SameIndividual(:a :b :c)
+
+SubClassOf(:B :A)
 
 )
