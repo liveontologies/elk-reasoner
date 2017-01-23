@@ -432,10 +432,18 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 
 	@Override
 	public ElkPropertyRangePropertyExpansion getElkPropertyRangePropertyExpansion(
-			ElkObjectPropertyExpression subProperty, ElkObjectPropertyExpression superProperty,
+			ElkObjectPropertyExpression subProperty,
+			ElkObjectPropertyExpression superProperty,
 			ElkClassExpression range) {
 		return filter(mainFactory_.getElkPropertyRangePropertyExpansion(
 				subProperty, superProperty, range));
+	}
+
+	@Override
+	public ElkSameIndividualOfEquivalentClasses getElkSameIndividualOfEquivalentClasses(
+			final List<? extends ElkIndividual> same) {
+		return filter(
+				mainFactory_.getElkSameIndividualOfEquivalentClasses(same));
 	}
 
 	@Override

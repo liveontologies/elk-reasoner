@@ -25,6 +25,7 @@ import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionCycle
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsClassAssertionAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.entailments.model.EntailedEquivalentClassesEntailsSameIndividualAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.entailments.model.IndividualInconsistencyEntailsOntologyInconsistency;
 import org.semanticweb.elk.reasoner.entailments.model.OntologyInconsistencyEntailsAnyAxiom;
@@ -161,6 +162,18 @@ class EntailmentInferenceHasher implements Hasher<EntailmentInference>,
 				hashCode(
 						derivedIntersectionInconsistencyEntailsDisjointClassesAxiom
 								.getPremises()));
+	}
+
+	@Override
+	public Integer visit(
+			final EntailedEquivalentClassesEntailsSameIndividualAxiom entailedEquivalentClassesEntailsSameIndividualAxiom) {
+		return combinedHashCode(
+				hashCode(
+						EntailedEquivalentClassesEntailsSameIndividualAxiom.class),
+				hashCode(entailedEquivalentClassesEntailsSameIndividualAxiom
+						.getConclusion()),
+				hashCode(entailedEquivalentClassesEntailsSameIndividualAxiom
+						.getPremises()));
 	}
 
 }

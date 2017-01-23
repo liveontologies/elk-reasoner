@@ -31,13 +31,16 @@ import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.predefined.ElkPolarity;
 import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.entailments.impl.ClassAssertionAxiomEntailmentImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.DisjointClassesAxiomEntailmentImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.EquivalentClassesAxiomEntailmentImpl;
+import org.semanticweb.elk.reasoner.entailments.impl.SameIndividualAxiomEntailmentImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.SubClassOfAxiomEntailmentImpl;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.indexing.classes.BaseModifiableIndexedObjectFactory;
@@ -148,7 +151,7 @@ public class EntailmentQueryConverter extends
 	}
 
 	@Override
-	public IndexedEntailmentQuery<? extends Entailment> visit(
+	public DisjointClassesEntailmentQuery visit(
 			final ElkDisjointClassesAxiom axiom) {
 
 		final List<? extends ElkClassExpression> disjoint = axiom
@@ -172,6 +175,24 @@ public class EntailmentQueryConverter extends
 
 		return new DisjointClassesEntailmentQuery(
 				new DisjointClassesAxiomEntailmentImpl(axiom), premises);
+	}
+
+	@Override
+	public IndexedEntailmentQuery<? extends Entailment> visit(
+			final ElkSameIndividualAxiom axiom) {
+
+		final List<? extends ElkIndividual> individuals = axiom
+				.getIndividuals();
+		final List<ElkClassExpression> nominals = new ArrayList<ElkClassExpression>(
+				individuals.size());
+		for (final ElkIndividual individual : individuals) {
+			nominals.add(elkFactory_.getObjectOneOf(individual));
+		}
+		final EquivalentClassesEntailmentQuery equivalence = visit(
+				elkFactory_.getEquivalentClassesAxiom(nominals));
+
+		return new SameIndividualEntailmentQuery(
+				new SameIndividualAxiomEntailmentImpl(axiom), equivalence);
 	}
 
 	/**

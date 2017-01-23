@@ -21,30 +21,19 @@
  */
 package org.semanticweb.elk.reasoner.entailments.model;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 
 /**
- * Instances of this interface represent an entailment of an axiom.
+ * Instances of this interface represent an entailment of
+ * {@link ElkSameIndividualAxiom}.
  * 
  * @author Peter Skocovsky
- *
- * @param <A>
- *            The type of the axiom.
  */
-public interface AxiomEntailment<A extends ElkAxiom> extends Entailment {
+public interface SameIndividualAxiomEntailment
+		extends AxiomEntailment<ElkSameIndividualAxiom> {
 
-	/**
-	 * @return The axiom that is entailed.
-	 */
-	A getAxiom();
-
-	public static interface Visitor<O>
-			extends SubClassOfAxiomEntailment.Visitor<O>,
-			EquivalentClassesAxiomEntailment.Visitor<O>,
-			ClassAssertionAxiomEntailment.Visitor<O>,
-			DisjointClassesAxiomEntailment.Visitor<O>,
-			SameIndividualAxiomEntailment.Visitor<O> {
-		// combined visitor
+	public static interface Visitor<O> {
+		O visit(SameIndividualAxiomEntailment sameIndividualAxiomEntailment);
 	}
 
 }

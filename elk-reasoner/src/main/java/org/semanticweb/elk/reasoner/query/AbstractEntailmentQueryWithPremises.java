@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
+import org.semanticweb.elk.reasoner.entailments.CombinedEntailmentInferenceSet;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;
@@ -34,7 +34,6 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.util.collections.ArrayHashMap;
 
 /**
  * An {@link IndexedEntailmentQuery} that first checks entailment of its
@@ -94,40 +93,18 @@ public abstract class AbstractEntailmentQueryWithPremises<E extends Entailment, 
 			final SaturationConclusion.Factory conclusionFactory)
 			throws ElkQueryException {
 
-		final Map<Entailment, Collection<? extends EntailmentInference>> premiseEvidence = new ArrayHashMap<Entailment, Collection<? extends EntailmentInference>>();
+		final Collection<EntailmentInferenceSet> inferenceSets = new ArrayList<EntailmentInferenceSet>();
 
-		for (final P subsumption : premises_) {
-			final Entailment entailment = subsumption.getQuery();
-			final Collection<? extends EntailmentInference> infs = subsumption
-					.getEvidence(atMostOne, saturationState, conclusionFactory)
-					.getInferences(entailment);
-			if (infs == null || infs.isEmpty()) {
-				// Not entailed!
-				return new EntailmentInferenceSet() {
-
-					@Override
-					public Collection<? extends EntailmentInference> getInferences(
-							final Entailment conclusion) {
-						return Collections.emptySet();
-					}
-
-				};
-			}
-			premiseEvidence.put(entailment, infs);
+		for (final P premise : premises_) {
+			inferenceSets.add(premise.getEvidence(atMostOne, saturationState,
+					conclusionFactory));
 		}
 
-		return new EntailmentInferenceSet() {
+		inferenceSets.add(new EntailmentInferenceSet() {
 
 			@Override
 			public Collection<? extends EntailmentInference> getInferences(
 					final Entailment conclusion) {
-
-				final Collection<? extends EntailmentInference> result = premiseEvidence
-						.get(conclusion);
-				if (result != null) {
-					return result;
-				}
-				// else
 
 				if (!getQuery().equals(conclusion)) {
 					return Collections.emptyList();
@@ -137,7 +114,9 @@ public abstract class AbstractEntailmentQueryWithPremises<E extends Entailment, 
 				return getEntailmentInference();
 			}
 
-		};
+		});
+
+		return new CombinedEntailmentInferenceSet(inferenceSets);
 	}
 
 	/**

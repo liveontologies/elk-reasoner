@@ -607,6 +607,16 @@ public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 	}
 
 	@Override
+	public Boolean visit(final ElkSameIndividualOfEquivalentClasses inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(ElkSameIndividualOfEquivalentClasses other) {
+				return equals(other.getSame(), inference.getSame());
+			}
+		});
+	}
+
+	@Override
 	public Boolean visit(final ElkToldAxiom inference) {
 		return other_.accept(new DefaultVisitor() {
 			@Override

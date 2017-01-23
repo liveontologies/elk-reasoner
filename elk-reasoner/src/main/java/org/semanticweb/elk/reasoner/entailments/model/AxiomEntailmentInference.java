@@ -42,7 +42,8 @@ public interface AxiomEntailmentInference<A extends ElkAxiom>
 			SubClassOfAxiomEntailmentInference.Visitor<O>,
 			DerivedClassInclusionCycleEntailsEquivalentClassesAxiom.Visitor<O>,
 			DerivedClassInclusionEntailsClassAssertionAxiom.Visitor<O>,
-			DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom.Visitor<O> {
+			DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom.Visitor<O>,
+			EntailedEquivalentClassesEntailsSameIndividualAxiom.Visitor<O> {
 		// combined interface
 	}
 

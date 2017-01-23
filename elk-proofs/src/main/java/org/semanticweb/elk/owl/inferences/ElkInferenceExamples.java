@@ -490,6 +490,13 @@ public class ElkInferenceExamples
 	}
 
 	@Override
+	public ElkInference visit(
+			final ElkSameIndividualOfEquivalentClasses inference) {
+		return inferenceFactory_.getElkSameIndividualOfEquivalentClasses(
+				getIndividuals("a", inference.getSame().size()));
+	}
+
+	@Override
 	public ElkToldAxiom visit(ElkToldAxiom inference) {
 		// this inference should not be normally shown
 		return null;

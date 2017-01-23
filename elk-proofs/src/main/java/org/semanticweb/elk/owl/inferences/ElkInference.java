@@ -106,7 +106,8 @@ public interface ElkInference extends Inference<ElkAxiom> {
 			ElkPropertyInclusionOfEquivalence.Factory,
 			ElkPropertyInclusionOfTransitiveObjectProperty.Factory,
 			ElkPropertyInclusionTautology.Factory,
-			ElkPropertyRangePropertyExpansion.Factory, ElkToldAxiom.Factory {
+			ElkPropertyRangePropertyExpansion.Factory,
+			ElkSameIndividualOfEquivalentClasses.Factory, ElkToldAxiom.Factory {
 
 		// combined interface
 
@@ -166,6 +167,7 @@ public interface ElkInference extends Inference<ElkAxiom> {
 			ElkPropertyInclusionOfTransitiveObjectProperty.Visitor<O>,
 			ElkPropertyInclusionTautology.Visitor<O>,
 			ElkPropertyRangePropertyExpansion.Visitor<O>,
+			ElkSameIndividualOfEquivalentClasses.Visitor<O>,
 			ElkToldAxiom.Visitor<O> {
 
 		// combined interface

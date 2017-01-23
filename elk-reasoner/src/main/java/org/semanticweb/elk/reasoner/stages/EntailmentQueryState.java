@@ -28,7 +28,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.liveontologies.proof.util.Inference;
+import org.liveontologies.proof.util.InferenceDerivabilityChecker;
 import org.semanticweb.elk.loading.AbstractEntailmentQueryLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.loading.EntailmentQueryLoader;
@@ -136,9 +136,8 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 						"Query was not indexed: " + getQuery());
 			}
 			// else
-			final Collection<? extends Inference<Entailment>> infs = getEvidence(
-					true).getInferences(indexed.getQuery());
-			return infs != null && !infs.isEmpty();
+			return new InferenceDerivabilityChecker<Entailment>(
+					getEvidence(true)).isDerivable(indexed.getQuery());
 		}
 
 		@Override

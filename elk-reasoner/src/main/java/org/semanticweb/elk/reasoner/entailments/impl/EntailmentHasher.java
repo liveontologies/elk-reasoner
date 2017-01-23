@@ -27,6 +27,7 @@ import org.semanticweb.elk.reasoner.entailments.model.DisjointClassesAxiomEntail
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EquivalentClassesAxiomEntailment;
 import org.semanticweb.elk.reasoner.entailments.model.OntologyInconsistency;
+import org.semanticweb.elk.reasoner.entailments.model.SameIndividualAxiomEntailment;
 import org.semanticweb.elk.reasoner.entailments.model.SubClassOfAxiomEntailment;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 import org.semanticweb.elk.util.hashing.Hasher;
@@ -94,6 +95,13 @@ class EntailmentHasher
 			final DisjointClassesAxiomEntailment disjointClassesAxiomEntailment) {
 		return combinedHashCode(hashCode(DisjointClassesAxiomEntailment.class),
 				hashCode(disjointClassesAxiomEntailment.getAxiom()));
+	}
+
+	@Override
+	public Integer visit(
+			final SameIndividualAxiomEntailment sameIndividualAxiomEntailment) {
+		return combinedHashCode(hashCode(SameIndividualAxiomEntailment.class),
+				hashCode(sameIndividualAxiomEntailment.getAxiom()));
 	}
 
 }

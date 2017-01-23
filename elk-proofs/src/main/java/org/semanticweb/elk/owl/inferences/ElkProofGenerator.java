@@ -44,9 +44,11 @@ import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionCycle
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsClassAssertionAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.entailments.model.EntailedEquivalentClassesEntailsSameIndividualAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;
+import org.semanticweb.elk.reasoner.entailments.model.EquivalentClassesAxiomEntailment;
 import org.semanticweb.elk.reasoner.entailments.model.IndividualInconsistencyEntailsOntologyInconsistency;
 import org.semanticweb.elk.reasoner.entailments.model.OntologyInconsistency;
 import org.semanticweb.elk.reasoner.entailments.model.OntologyInconsistencyEntailsAnyAxiom;
@@ -370,6 +372,22 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 		inferenceFactory_.getElkDisjointClassesIntersectionInconsistencies(
 				entailmentInference.getConclusion().getAxiom()
 						.getClassExpressions());
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			final EntailedEquivalentClassesEntailsSameIndividualAxiom entailmentInference) {
+		for (final EquivalentClassesAxiomEntailment premise : entailmentInference
+				.getPremises()) {
+			for (final EntailmentInference inf : evidence_
+					.getInferences(premise)) {
+				inf.accept(this);
+			}
+		}
+		inferenceFactory_
+				.getElkSameIndividualOfEquivalentClasses(entailmentInference
+						.getConclusion().getAxiom().getIndividuals());
 		return null;
 	}
 

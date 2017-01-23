@@ -401,6 +401,13 @@ public class ElkInferenceHash implements ElkInference.Visitor<Integer> {
 	}
 
 	@Override
+	public Integer visit(final ElkSameIndividualOfEquivalentClasses inference) {
+		return combinedHashCode(
+				hashCode(ElkSameIndividualOfEquivalentClasses.class),
+				hashCode(inference.getSame()));
+	}
+
+	@Override
 	public Integer visit(ElkToldAxiom inference) {
 		return combinedHashCode(hashCode(ElkToldAxiom.class),
 				hashCode(inference.getAxiom()));

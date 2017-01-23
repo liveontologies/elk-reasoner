@@ -21,30 +21,29 @@
  */
 package org.semanticweb.elk.reasoner.entailments.model;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import java.util.List;
+
+import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 
 /**
- * Instances of this interface represent an entailment of an axiom.
+ * {@link ElkSameIndividualAxiom} was entailed because an
+ * {@link org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom
+ * ElkEquivalentClassesAxiom} asserting that nominals of
+ * {@link ElkSameIndividualAxiom#getIndividuals()} are equivalent was entailed.
  * 
  * @author Peter Skocovsky
- *
- * @param <A>
- *            The type of the axiom.
  */
-public interface AxiomEntailment<A extends ElkAxiom> extends Entailment {
+public interface EntailedEquivalentClassesEntailsSameIndividualAxiom
+		extends AxiomEntailmentInference<ElkSameIndividualAxiom> {
 
-	/**
-	 * @return The axiom that is entailed.
-	 */
-	A getAxiom();
+	@Override
+	SameIndividualAxiomEntailment getConclusion();
 
-	public static interface Visitor<O>
-			extends SubClassOfAxiomEntailment.Visitor<O>,
-			EquivalentClassesAxiomEntailment.Visitor<O>,
-			ClassAssertionAxiomEntailment.Visitor<O>,
-			DisjointClassesAxiomEntailment.Visitor<O>,
-			SameIndividualAxiomEntailment.Visitor<O> {
-		// combined visitor
+	@Override
+	List<? extends EquivalentClassesAxiomEntailment> getPremises();
+
+	public static interface Visitor<O> {
+		O visit(EntailedEquivalentClassesEntailsSameIndividualAxiom entailedEquivalentClassesEntailsSameIndividualAxiom);
 	}
 
 }
