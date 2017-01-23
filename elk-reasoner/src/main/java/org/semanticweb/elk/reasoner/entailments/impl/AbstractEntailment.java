@@ -43,5 +43,10 @@ abstract class AbstractEntailment implements Entailment {
 		// else
 		return false;
 	}
-	
+
+	@Override
+	public String toString() {
+		return EntailmentPrinter.toString(this);
+	}
+
 }

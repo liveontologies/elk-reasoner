@@ -40,10 +40,10 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionCycleEntailsEquivalentClassesAxiom;
+import org.semanticweb.elk.reasoner.entailments.model.EntailedClassInclusionCycleEntailsEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsClassAssertionAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsSubClassOfAxiom;
-import org.semanticweb.elk.reasoner.entailments.model.DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.entailments.model.EntailedIntersectionInconsistencyEntailsDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.EntailedEquivalentClassesEntailsSameIndividualAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
@@ -322,7 +322,7 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 
 	@Override
 	public Void visit(
-			final DerivedClassInclusionCycleEntailsEquivalentClassesAxiom entailmentInference) {
+			final EntailedClassInclusionCycleEntailsEquivalentClassesAxiom entailmentInference) {
 		for (final SubClassOfAxiomEntailment premise : entailmentInference
 				.getPremises()) {
 			for (final EntailmentInference inf : evidence_
@@ -361,7 +361,7 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 
 	@Override
 	public Void visit(
-			final DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom entailmentInference) {
+			final EntailedIntersectionInconsistencyEntailsDisjointClassesAxiom entailmentInference) {
 		for (final SubClassOfAxiomEntailment premise : entailmentInference
 				.getPremises()) {
 			for (final EntailmentInference inf : evidence_

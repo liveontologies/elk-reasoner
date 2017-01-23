@@ -32,9 +32,8 @@ public interface Entailment {
 
 	<O> O accept(Visitor<O> visitor);
 
-	public static interface Visitor<O>
-			extends OntologyInconsistency.Visitor<O>,
-			AxiomEntailment.Visitor<O> {
+	public static interface Visitor<O> extends AxiomEntailment.Visitor<O>,
+			OntologyInconsistency.Visitor<O> {
 		// combined interface
 	}
 

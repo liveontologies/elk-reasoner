@@ -36,8 +36,8 @@ public interface EntailmentInference extends Inference<Entailment> {
 	<O> O accept(Visitor<O> visitor);
 
 	public static interface Visitor<O>
-			extends OntologyInconsistencyEntailmentInference.Visitor<O>,
-			AxiomEntailmentInference.Visito<O> {
+			extends AxiomEntailmentInference.Visito<O>,
+			OntologyInconsistencyEntailmentInference.Visitor<O> {
 		// combined interface
 	}
 

@@ -23,30 +23,31 @@ package org.semanticweb.elk.reasoner.entailments.model;
 
 import java.util.List;
 
-import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 
 /**
- * {@link ElkDisjointClassesAxiom} was entailed because inconsistencies of pairwise
- * intersections of classes from {@link ElkDisjointClassesAxiom#getClassExpressions()} were
- * entailed.
+ * {@link ElkEquivalentClassesAxiom} was entailed because a cyclic inclusion of
+ * classes from {@link ElkEquivalentClassesAxiom#getClassExpressions()} was
+ * derived.
  * <p>
- * {@link #getPremises()} returns {@link SubClassOfAxiomEntailment}-s where
- * subclasses are all pairwise intersections of classes from {@link ElkDisjointClassesAxiom#getClassExpressions()}
- * and superclasses are {@code owl:Nothing}.
+ * {@link #getPremises()} returns {@link SubClassOfAxiomEntailment}-s over all
+ * the classes from {@link ElkEquivalentClassesAxiom#getClassExpressions()},
+ * such that superclass of one is the subclass of the next one and superclass of
+ * the last one is the subclass of the first one.
  * 
  * @author Peter Skocovsky
  */
-public interface DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom
-		extends AxiomEntailmentInference<ElkDisjointClassesAxiom> {
+public interface EntailedClassInclusionCycleEntailsEquivalentClassesAxiom
+		extends AxiomEntailmentInference<ElkEquivalentClassesAxiom> {
 
 	@Override
-	DisjointClassesAxiomEntailment getConclusion();
+	EquivalentClassesAxiomEntailment getConclusion();
 
 	@Override
 	List<? extends SubClassOfAxiomEntailment> getPremises();
 
 	public static interface Visitor<O> {
-		O visit(DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom derivedIntersectionInconsistencyEntailsDisjointClassesAxiom);
+		O visit(EntailedClassInclusionCycleEntailsEquivalentClassesAxiom derivedClassInclusionCycleEntailsEquivalentClassesAxiom);
 	}
 
 }

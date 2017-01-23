@@ -23,10 +23,10 @@ package org.semanticweb.elk.reasoner.entailments;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.AxiomEntailmentInference;
-import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionCycleEntailsEquivalentClassesAxiom;
+import org.semanticweb.elk.reasoner.entailments.model.EntailedClassInclusionCycleEntailsEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsClassAssertionAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsSubClassOfAxiom;
-import org.semanticweb.elk.reasoner.entailments.model.DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.entailments.model.EntailedIntersectionInconsistencyEntailsDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.EntailedEquivalentClassesEntailsSameIndividualAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.entailments.model.IndividualInconsistencyEntailsOntologyInconsistency;
@@ -62,16 +62,37 @@ public class DefaultEntailmentInferenceVisitor<O>
 
 	@Override
 	public O visit(
-			final OwlThingInconsistencyEntailsOntologyInconsistency owlThingInconsistencyEntailsOntologyInconsistency) {
-		return defaultOntologyInconsistencyEntailmentInferenceVisit(
-				owlThingInconsistencyEntailsOntologyInconsistency);
+			final DerivedClassInclusionEntailsClassAssertionAxiom derivedClassInclusionEntailsClassAssertionAxiom) {
+		return defaultAxiomEntailmentInferenceVisit(
+				derivedClassInclusionEntailsClassAssertionAxiom);
 	}
 
 	@Override
 	public O visit(
-			final TopObjectPropertyInBottomEntailsOntologyInconsistency topObjectPropertyInBottomEntailsOntologyInconsistency) {
-		return defaultOntologyInconsistencyEntailmentInferenceVisit(
-				topObjectPropertyInBottomEntailsOntologyInconsistency);
+			final DerivedClassInclusionEntailsSubClassOfAxiom derivedClassInclusionEntailsSubClassOfAxiom) {
+		return defaultSubClassOfAxiomEntailmentInferenceVisit(
+				derivedClassInclusionEntailsSubClassOfAxiom);
+	}
+
+	@Override
+	public O visit(
+			final EntailedClassInclusionCycleEntailsEquivalentClassesAxiom derivedClassInclusionCycleEntailsEquivalentClassesAxiom) {
+		return defaultAxiomEntailmentInferenceVisit(
+				derivedClassInclusionCycleEntailsEquivalentClassesAxiom);
+	}
+
+	@Override
+	public O visit(
+			final EntailedEquivalentClassesEntailsSameIndividualAxiom entailedEquivalentClassesEntailsSameIndividualAxiom) {
+		return defaultAxiomEntailmentInferenceVisit(
+				entailedEquivalentClassesEntailsSameIndividualAxiom);
+	}
+
+	@Override
+	public O visit(
+			final EntailedIntersectionInconsistencyEntailsDisjointClassesAxiom derivedIntersectionInconsistencyEntailsDisjointClassesAxiom) {
+		return defaultAxiomEntailmentInferenceVisit(
+				derivedIntersectionInconsistencyEntailsDisjointClassesAxiom);
 	}
 
 	@Override
@@ -90,6 +111,13 @@ public class DefaultEntailmentInferenceVisitor<O>
 
 	@Override
 	public O visit(
+			final OwlThingInconsistencyEntailsOntologyInconsistency owlThingInconsistencyEntailsOntologyInconsistency) {
+		return defaultOntologyInconsistencyEntailmentInferenceVisit(
+				owlThingInconsistencyEntailsOntologyInconsistency);
+	}
+
+	@Override
+	public O visit(
 			final SubClassInconsistencyEntailsSubClassOfAxiom subClassInconsistencyEntailsSubClassOfAxiom) {
 		return defaultSubClassOfAxiomEntailmentInferenceVisit(
 				subClassInconsistencyEntailsSubClassOfAxiom);
@@ -97,37 +125,9 @@ public class DefaultEntailmentInferenceVisitor<O>
 
 	@Override
 	public O visit(
-			final DerivedClassInclusionEntailsSubClassOfAxiom derivedClassInclusionEntailsSubClassOfAxiom) {
-		return defaultSubClassOfAxiomEntailmentInferenceVisit(
-				derivedClassInclusionEntailsSubClassOfAxiom);
-	}
-
-	@Override
-	public O visit(
-			final DerivedClassInclusionCycleEntailsEquivalentClassesAxiom derivedClassInclusionCycleEntailsEquivalentClassesAxiom) {
-		return defaultAxiomEntailmentInferenceVisit(
-				derivedClassInclusionCycleEntailsEquivalentClassesAxiom);
-	}
-
-	@Override
-	public O visit(
-			final DerivedClassInclusionEntailsClassAssertionAxiom derivedClassInclusionEntailsClassAssertionAxiom) {
-		return defaultAxiomEntailmentInferenceVisit(
-				derivedClassInclusionEntailsClassAssertionAxiom);
-	}
-
-	@Override
-	public O visit(
-			final DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom derivedIntersectionInconsistencyEntailsDisjointClassesAxiom) {
-		return defaultAxiomEntailmentInferenceVisit(
-				derivedIntersectionInconsistencyEntailsDisjointClassesAxiom);
-	}
-
-	@Override
-	public O visit(
-			final EntailedEquivalentClassesEntailsSameIndividualAxiom entailedEquivalentClassesEntailsSameIndividualAxiom) {
-		return defaultAxiomEntailmentInferenceVisit(
-				entailedEquivalentClassesEntailsSameIndividualAxiom);
+			final TopObjectPropertyInBottomEntailsOntologyInconsistency topObjectPropertyInBottomEntailsOntologyInconsistency) {
+		return defaultOntologyInconsistencyEntailmentInferenceVisit(
+				topObjectPropertyInBottomEntailsOntologyInconsistency);
 	}
 
 }

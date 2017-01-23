@@ -21,10 +21,10 @@
  */
 package org.semanticweb.elk.reasoner.entailments.impl;
 
-import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionCycleEntailsEquivalentClassesAxiom;
+import org.semanticweb.elk.reasoner.entailments.model.EntailedClassInclusionCycleEntailsEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsClassAssertionAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsSubClassOfAxiom;
-import org.semanticweb.elk.reasoner.entailments.model.DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.entailments.model.EntailedIntersectionInconsistencyEntailsDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.EntailedEquivalentClassesEntailsSameIndividualAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.entailments.model.IndividualInconsistencyEntailsOntologyInconsistency;
@@ -67,22 +67,62 @@ class EntailmentInferenceHasher implements Hasher<EntailmentInference>,
 
 	@Override
 	public Integer visit(
-			final OwlThingInconsistencyEntailsOntologyInconsistency owlThingInconsistencyEntailsOntologyInconsistency) {
+			final DerivedClassInclusionEntailsClassAssertionAxiom derivedClassInclusionEntailsClassAssertionAxiom) {
 		return combinedHashCode(
-				hashCode(
-						OwlThingInconsistencyEntailsOntologyInconsistency.class),
-				hashCode(owlThingInconsistencyEntailsOntologyInconsistency
+				hashCode(DerivedClassInclusionEntailsClassAssertionAxiom.class),
+				hashCode(derivedClassInclusionEntailsClassAssertionAxiom
+						.getConclusion()),
+				hashCode(derivedClassInclusionEntailsClassAssertionAxiom
 						.getReason()));
 	}
 
 	@Override
 	public Integer visit(
-			final TopObjectPropertyInBottomEntailsOntologyInconsistency topObjectPropertyInBottomEntailsOntologyInconsistency) {
+			final DerivedClassInclusionEntailsSubClassOfAxiom derivedClassInclusionEntailsSubClassOfAxiom) {
+		return combinedHashCode(
+				hashCode(DerivedClassInclusionEntailsSubClassOfAxiom.class),
+				hashCode(derivedClassInclusionEntailsSubClassOfAxiom
+						.getConclusion()),
+				hashCode(derivedClassInclusionEntailsSubClassOfAxiom
+						.getReason()));
+	}
+
+	@Override
+	public Integer visit(
+			final EntailedClassInclusionCycleEntailsEquivalentClassesAxiom derivedClassInclusionCycleEntailsEquivalentClassesAxiom) {
 		return combinedHashCode(
 				hashCode(
-						TopObjectPropertyInBottomEntailsOntologyInconsistency.class),
-				hashCode(topObjectPropertyInBottomEntailsOntologyInconsistency
-						.getReason()));
+						EntailedClassInclusionCycleEntailsEquivalentClassesAxiom.class),
+				hashCode(derivedClassInclusionCycleEntailsEquivalentClassesAxiom
+						.getConclusion()),
+				hashCode(derivedClassInclusionCycleEntailsEquivalentClassesAxiom
+						.getPremises()));
+	}
+
+	@Override
+	public Integer visit(
+			final EntailedEquivalentClassesEntailsSameIndividualAxiom entailedEquivalentClassesEntailsSameIndividualAxiom) {
+		return combinedHashCode(
+				hashCode(
+						EntailedEquivalentClassesEntailsSameIndividualAxiom.class),
+				hashCode(entailedEquivalentClassesEntailsSameIndividualAxiom
+						.getConclusion()),
+				hashCode(entailedEquivalentClassesEntailsSameIndividualAxiom
+						.getPremises()));
+	}
+
+	@Override
+	public Integer visit(
+			final EntailedIntersectionInconsistencyEntailsDisjointClassesAxiom derivedIntersectionInconsistencyEntailsDisjointClassesAxiom) {
+		return combinedHashCode(
+				hashCode(
+						EntailedIntersectionInconsistencyEntailsDisjointClassesAxiom.class),
+				hashCode(
+						derivedIntersectionInconsistencyEntailsDisjointClassesAxiom
+								.getConclusion()),
+				hashCode(
+						derivedIntersectionInconsistencyEntailsDisjointClassesAxiom
+								.getPremises()));
 	}
 
 	@Override
@@ -107,6 +147,16 @@ class EntailmentInferenceHasher implements Hasher<EntailmentInference>,
 
 	@Override
 	public Integer visit(
+			final OwlThingInconsistencyEntailsOntologyInconsistency owlThingInconsistencyEntailsOntologyInconsistency) {
+		return combinedHashCode(
+				hashCode(
+						OwlThingInconsistencyEntailsOntologyInconsistency.class),
+				hashCode(owlThingInconsistencyEntailsOntologyInconsistency
+						.getReason()));
+	}
+
+	@Override
+	public Integer visit(
 			final SubClassInconsistencyEntailsSubClassOfAxiom subClassInconsistencyEntailsSubClassOfAxiom) {
 		return combinedHashCode(
 				hashCode(SubClassInconsistencyEntailsSubClassOfAxiom.class),
@@ -118,62 +168,12 @@ class EntailmentInferenceHasher implements Hasher<EntailmentInference>,
 
 	@Override
 	public Integer visit(
-			final DerivedClassInclusionEntailsSubClassOfAxiom derivedClassInclusionEntailsSubClassOfAxiom) {
+			final TopObjectPropertyInBottomEntailsOntologyInconsistency topObjectPropertyInBottomEntailsOntologyInconsistency) {
 		return combinedHashCode(
-				hashCode(DerivedClassInclusionEntailsSubClassOfAxiom.class),
-				hashCode(derivedClassInclusionEntailsSubClassOfAxiom
-						.getConclusion()),
-				hashCode(derivedClassInclusionEntailsSubClassOfAxiom
+				hashCode(
+						TopObjectPropertyInBottomEntailsOntologyInconsistency.class),
+				hashCode(topObjectPropertyInBottomEntailsOntologyInconsistency
 						.getReason()));
-	}
-
-	@Override
-	public Integer visit(
-			final DerivedClassInclusionCycleEntailsEquivalentClassesAxiom derivedClassInclusionCycleEntailsEquivalentClassesAxiom) {
-		return combinedHashCode(
-				hashCode(
-						DerivedClassInclusionCycleEntailsEquivalentClassesAxiom.class),
-				hashCode(derivedClassInclusionCycleEntailsEquivalentClassesAxiom
-						.getConclusion()),
-				hashCode(derivedClassInclusionCycleEntailsEquivalentClassesAxiom
-						.getPremises()));
-	}
-
-	@Override
-	public Integer visit(
-			final DerivedClassInclusionEntailsClassAssertionAxiom derivedClassInclusionEntailsClassAssertionAxiom) {
-		return combinedHashCode(
-				hashCode(DerivedClassInclusionEntailsClassAssertionAxiom.class),
-				hashCode(derivedClassInclusionEntailsClassAssertionAxiom
-						.getConclusion()),
-				hashCode(derivedClassInclusionEntailsClassAssertionAxiom
-						.getReason()));
-	}
-
-	@Override
-	public Integer visit(
-			final DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom derivedIntersectionInconsistencyEntailsDisjointClassesAxiom) {
-		return combinedHashCode(
-				hashCode(
-						DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom.class),
-				hashCode(
-						derivedIntersectionInconsistencyEntailsDisjointClassesAxiom
-								.getConclusion()),
-				hashCode(
-						derivedIntersectionInconsistencyEntailsDisjointClassesAxiom
-								.getPremises()));
-	}
-
-	@Override
-	public Integer visit(
-			final EntailedEquivalentClassesEntailsSameIndividualAxiom entailedEquivalentClassesEntailsSameIndividualAxiom) {
-		return combinedHashCode(
-				hashCode(
-						EntailedEquivalentClassesEntailsSameIndividualAxiom.class),
-				hashCode(entailedEquivalentClassesEntailsSameIndividualAxiom
-						.getConclusion()),
-				hashCode(entailedEquivalentClassesEntailsSameIndividualAxiom
-						.getPremises()));
 	}
 
 }

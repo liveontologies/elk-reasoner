@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.semanticweb.elk.reasoner.entailments.impl.DerivedClassInclusionCycleEntailsEquivalentClassesAxiomImpl;
+import org.semanticweb.elk.reasoner.entailments.impl.EntailedClassInclusionCycleEntailsEquivalentClassesAxiomImpl;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.entailments.model.EquivalentClassesAxiomEntailment;
 import org.semanticweb.elk.reasoner.entailments.model.SubClassOfAxiomEntailment;
@@ -70,7 +70,7 @@ public class EquivalentClassesEntailmentQuery extends
 		}
 
 		return Collections.singleton(
-				new DerivedClassInclusionCycleEntailsEquivalentClassesAxiomImpl(
+				new EntailedClassInclusionCycleEntailsEquivalentClassesAxiomImpl(
 						getQuery(), premises));
 	}
 

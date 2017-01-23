@@ -64,27 +64,6 @@ class EntailmentHasher
 
 	@Override
 	public Integer visit(
-			final OntologyInconsistency inconsistentOntologyEntailment) {
-		return combinedHashCode(hashCode(OntologyInconsistency.class));
-	}
-
-	@Override
-	public Integer visit(
-			final SubClassOfAxiomEntailment subClassOfAxiomEntailment) {
-		return combinedHashCode(hashCode(SubClassOfAxiomEntailment.class),
-				hashCode(subClassOfAxiomEntailment.getAxiom()));
-	}
-
-	@Override
-	public Integer visit(
-			final EquivalentClassesAxiomEntailment equivalentClassesAxiomEntailment) {
-		return combinedHashCode(
-				hashCode(EquivalentClassesAxiomEntailment.class),
-				hashCode(equivalentClassesAxiomEntailment.getAxiom()));
-	}
-
-	@Override
-	public Integer visit(
 			final ClassAssertionAxiomEntailment classAssertionAxiomEntailment) {
 		return combinedHashCode(hashCode(ClassAssertionAxiomEntailment.class),
 				hashCode(classAssertionAxiomEntailment.getAxiom()));
@@ -99,9 +78,30 @@ class EntailmentHasher
 
 	@Override
 	public Integer visit(
+			final EquivalentClassesAxiomEntailment equivalentClassesAxiomEntailment) {
+		return combinedHashCode(
+				hashCode(EquivalentClassesAxiomEntailment.class),
+				hashCode(equivalentClassesAxiomEntailment.getAxiom()));
+	}
+
+	@Override
+	public Integer visit(
+			final OntologyInconsistency inconsistentOntologyEntailment) {
+		return combinedHashCode(hashCode(OntologyInconsistency.class));
+	}
+
+	@Override
+	public Integer visit(
 			final SameIndividualAxiomEntailment sameIndividualAxiomEntailment) {
 		return combinedHashCode(hashCode(SameIndividualAxiomEntailment.class),
 				hashCode(sameIndividualAxiomEntailment.getAxiom()));
+	}
+
+	@Override
+	public Integer visit(
+			final SubClassOfAxiomEntailment subClassOfAxiomEntailment) {
+		return combinedHashCode(hashCode(SubClassOfAxiomEntailment.class),
+				hashCode(subClassOfAxiomEntailment.getAxiom()));
 	}
 
 }

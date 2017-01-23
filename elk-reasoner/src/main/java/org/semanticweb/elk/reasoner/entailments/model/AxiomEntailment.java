@@ -39,11 +39,11 @@ public interface AxiomEntailment<A extends ElkAxiom> extends Entailment {
 	A getAxiom();
 
 	public static interface Visitor<O>
-			extends SubClassOfAxiomEntailment.Visitor<O>,
-			EquivalentClassesAxiomEntailment.Visitor<O>,
-			ClassAssertionAxiomEntailment.Visitor<O>,
+			extends ClassAssertionAxiomEntailment.Visitor<O>,
 			DisjointClassesAxiomEntailment.Visitor<O>,
-			SameIndividualAxiomEntailment.Visitor<O> {
+			EquivalentClassesAxiomEntailment.Visitor<O>,
+			SameIndividualAxiomEntailment.Visitor<O>,
+			SubClassOfAxiomEntailment.Visitor<O> {
 		// combined visitor
 	}
 

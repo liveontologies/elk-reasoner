@@ -43,22 +43,6 @@ public class DefaultEntailmentVisitor<O> implements Entailment.Visitor<O> {
 	}
 
 	@Override
-	public O visit(final OntologyInconsistency inconsistentOntologyEntailment) {
-		return defaultVisit(inconsistentOntologyEntailment);
-	}
-
-	@Override
-	public O visit(final SubClassOfAxiomEntailment subClassOfAxiomEntailment) {
-		return defaultAxiomEntailmentVisit(subClassOfAxiomEntailment);
-	}
-
-	@Override
-	public O visit(
-			final EquivalentClassesAxiomEntailment equivalentClassesAxiomEntailment) {
-		return defaultAxiomEntailmentVisit(equivalentClassesAxiomEntailment);
-	}
-
-	@Override
 	public O visit(
 			final ClassAssertionAxiomEntailment classAssertionAxiomEntailment) {
 		return defaultAxiomEntailmentVisit(classAssertionAxiomEntailment);
@@ -72,8 +56,24 @@ public class DefaultEntailmentVisitor<O> implements Entailment.Visitor<O> {
 
 	@Override
 	public O visit(
+			final EquivalentClassesAxiomEntailment equivalentClassesAxiomEntailment) {
+		return defaultAxiomEntailmentVisit(equivalentClassesAxiomEntailment);
+	}
+
+	@Override
+	public O visit(final OntologyInconsistency inconsistentOntologyEntailment) {
+		return defaultVisit(inconsistentOntologyEntailment);
+	}
+
+	@Override
+	public O visit(
 			final SameIndividualAxiomEntailment sameIndividualAxiomEntailment) {
 		return defaultAxiomEntailmentVisit(sameIndividualAxiomEntailment);
+	}
+
+	@Override
+	public O visit(final SubClassOfAxiomEntailment subClassOfAxiomEntailment) {
+		return defaultAxiomEntailmentVisit(subClassOfAxiomEntailment);
 	}
 
 }

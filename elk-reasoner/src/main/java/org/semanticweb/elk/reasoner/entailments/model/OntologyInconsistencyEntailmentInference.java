@@ -33,9 +33,9 @@ public interface OntologyInconsistencyEntailmentInference
 	OntologyInconsistency getConclusion();
 
 	public static interface Visitor<O> extends
+			IndividualInconsistencyEntailsOntologyInconsistency.Visitor<O>,
 			OwlThingInconsistencyEntailsOntologyInconsistency.Visitor<O>,
-			TopObjectPropertyInBottomEntailsOntologyInconsistency.Visitor<O>,
-			IndividualInconsistencyEntailsOntologyInconsistency.Visitor<O> {
+			TopObjectPropertyInBottomEntailsOntologyInconsistency.Visitor<O> {
 		// combined visitor
 	}
 

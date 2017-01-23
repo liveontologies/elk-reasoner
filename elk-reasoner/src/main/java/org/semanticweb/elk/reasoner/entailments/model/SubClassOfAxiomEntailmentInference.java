@@ -35,8 +35,8 @@ public interface SubClassOfAxiomEntailmentInference
 	SubClassOfAxiomEntailment getConclusion();
 
 	public static interface Visitor<O>
-			extends SubClassInconsistencyEntailsSubClassOfAxiom.Visitor<O>,
-			DerivedClassInclusionEntailsSubClassOfAxiom.Visitor<O> {
+			extends DerivedClassInclusionEntailsSubClassOfAxiom.Visitor<O>,
+			SubClassInconsistencyEntailsSubClassOfAxiom.Visitor<O> {
 		// combined visitor
 	}
 

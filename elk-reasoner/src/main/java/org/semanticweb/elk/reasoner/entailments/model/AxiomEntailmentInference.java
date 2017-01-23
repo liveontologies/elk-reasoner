@@ -38,12 +38,12 @@ public interface AxiomEntailmentInference<A extends ElkAxiom>
 	AxiomEntailment<? extends A> getConclusion();
 
 	public static interface Visito<O>
-			extends OntologyInconsistencyEntailsAnyAxiom.Visitor<O>,
-			SubClassOfAxiomEntailmentInference.Visitor<O>,
-			DerivedClassInclusionCycleEntailsEquivalentClassesAxiom.Visitor<O>,
-			DerivedClassInclusionEntailsClassAssertionAxiom.Visitor<O>,
-			DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom.Visitor<O>,
-			EntailedEquivalentClassesEntailsSameIndividualAxiom.Visitor<O> {
+			extends DerivedClassInclusionEntailsClassAssertionAxiom.Visitor<O>,
+			EntailedClassInclusionCycleEntailsEquivalentClassesAxiom.Visitor<O>,
+			EntailedEquivalentClassesEntailsSameIndividualAxiom.Visitor<O>,
+			EntailedIntersectionInconsistencyEntailsDisjointClassesAxiom.Visitor<O>,
+			OntologyInconsistencyEntailsAnyAxiom.Visitor<O>,
+			SubClassOfAxiomEntailmentInference.Visitor<O> {
 		// combined interface
 	}
 

@@ -22,10 +22,10 @@
 package org.semanticweb.elk.reasoner.entailments.impl;
 
 import org.semanticweb.elk.reasoner.entailments.DefaultEntailmentInferenceVisitor;
-import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionCycleEntailsEquivalentClassesAxiom;
+import org.semanticweb.elk.reasoner.entailments.model.EntailedClassInclusionCycleEntailsEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsClassAssertionAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsSubClassOfAxiom;
-import org.semanticweb.elk.reasoner.entailments.model.DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.entailments.model.EntailedIntersectionInconsistencyEntailsDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.EntailedEquivalentClassesEntailsSameIndividualAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.entailments.model.IndividualInconsistencyEntailsOntologyInconsistency;
@@ -64,28 +64,85 @@ class EntailmentInferenceEquality
 
 	@Override
 	public Boolean visit(
-			final OwlThingInconsistencyEntailsOntologyInconsistency owlThingInconsistencyEntailsOntologyInconsistency) {
+			final DerivedClassInclusionEntailsClassAssertionAxiom derivedClassInclusionEntailsClassAssertionAxiom) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(
-					final OwlThingInconsistencyEntailsOntologyInconsistency other) {
-				return equals(other.getReason(),
-						owlThingInconsistencyEntailsOntologyInconsistency
-								.getReason());
+					final DerivedClassInclusionEntailsClassAssertionAxiom other) {
+				return equals(other.getConclusion(),
+						derivedClassInclusionEntailsClassAssertionAxiom
+								.getConclusion())
+						&& equals(other.getReason(),
+								derivedClassInclusionEntailsClassAssertionAxiom
+										.getReason());
 			}
 		});
 	}
 
 	@Override
 	public Boolean visit(
-			final TopObjectPropertyInBottomEntailsOntologyInconsistency topObjectPropertyInBottomEntailsOntologyInconsistency) {
+			final DerivedClassInclusionEntailsSubClassOfAxiom derivedClassInclusionEntailsSubClassOfAxiom) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(
-					final TopObjectPropertyInBottomEntailsOntologyInconsistency other) {
-				return equals(other.getReason(),
-						topObjectPropertyInBottomEntailsOntologyInconsistency
-								.getReason());
+					final DerivedClassInclusionEntailsSubClassOfAxiom other) {
+				return equals(other.getConclusion(),
+						derivedClassInclusionEntailsSubClassOfAxiom
+								.getConclusion())
+						&& equals(other.getReason(),
+								derivedClassInclusionEntailsSubClassOfAxiom
+										.getReason());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(
+			final EntailedClassInclusionCycleEntailsEquivalentClassesAxiom derivedClassInclusionCycleEntailsEquivalentClassesAxiom) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(
+					final EntailedClassInclusionCycleEntailsEquivalentClassesAxiom other) {
+				return equals(other.getConclusion(),
+						derivedClassInclusionCycleEntailsEquivalentClassesAxiom
+								.getConclusion())
+						&& equals(other.getPremises(),
+								derivedClassInclusionCycleEntailsEquivalentClassesAxiom
+										.getPremises());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(
+			final EntailedIntersectionInconsistencyEntailsDisjointClassesAxiom derivedIntersectionInconsistencyEntailsDisjointClassesAxiom) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(
+					final EntailedIntersectionInconsistencyEntailsDisjointClassesAxiom other) {
+				return equals(other.getConclusion(),
+						derivedIntersectionInconsistencyEntailsDisjointClassesAxiom
+								.getConclusion())
+						&& equals(other.getPremises(),
+								derivedIntersectionInconsistencyEntailsDisjointClassesAxiom
+										.getPremises());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(
+			final EntailedEquivalentClassesEntailsSameIndividualAxiom entailedEquivalentClassesEntailsSameIndividualAxiom) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(
+					final EntailedEquivalentClassesEntailsSameIndividualAxiom other) {
+				return equals(other.getConclusion(),
+						entailedEquivalentClassesEntailsSameIndividualAxiom
+								.getConclusion())
+						&& equals(other.getPremises(),
+								entailedEquivalentClassesEntailsSameIndividualAxiom
+										.getPremises());
 			}
 		});
 	}
@@ -122,6 +179,20 @@ class EntailmentInferenceEquality
 
 	@Override
 	public Boolean visit(
+			final OwlThingInconsistencyEntailsOntologyInconsistency owlThingInconsistencyEntailsOntologyInconsistency) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(
+					final OwlThingInconsistencyEntailsOntologyInconsistency other) {
+				return equals(other.getReason(),
+						owlThingInconsistencyEntailsOntologyInconsistency
+								.getReason());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(
 			final SubClassInconsistencyEntailsSubClassOfAxiom subClassInconsistencyEntailsSubClassOfAxiom) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
@@ -139,85 +210,14 @@ class EntailmentInferenceEquality
 
 	@Override
 	public Boolean visit(
-			final DerivedClassInclusionEntailsSubClassOfAxiom derivedClassInclusionEntailsSubClassOfAxiom) {
+			final TopObjectPropertyInBottomEntailsOntologyInconsistency topObjectPropertyInBottomEntailsOntologyInconsistency) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(
-					final DerivedClassInclusionEntailsSubClassOfAxiom other) {
-				return equals(other.getConclusion(),
-						derivedClassInclusionEntailsSubClassOfAxiom
-								.getConclusion())
-						&& equals(other.getReason(),
-								derivedClassInclusionEntailsSubClassOfAxiom
-										.getReason());
-			}
-		});
-	}
-
-	@Override
-	public Boolean visit(
-			final DerivedClassInclusionCycleEntailsEquivalentClassesAxiom derivedClassInclusionCycleEntailsEquivalentClassesAxiom) {
-		return other_.accept(new DefaultVisitor() {
-			@Override
-			public Boolean visit(
-					final DerivedClassInclusionCycleEntailsEquivalentClassesAxiom other) {
-				return equals(other.getConclusion(),
-						derivedClassInclusionCycleEntailsEquivalentClassesAxiom
-								.getConclusion())
-						&& equals(other.getPremises(),
-								derivedClassInclusionCycleEntailsEquivalentClassesAxiom
-										.getPremises());
-			}
-		});
-	}
-
-	@Override
-	public Boolean visit(
-			final DerivedClassInclusionEntailsClassAssertionAxiom derivedClassInclusionEntailsClassAssertionAxiom) {
-		return other_.accept(new DefaultVisitor() {
-			@Override
-			public Boolean visit(
-					final DerivedClassInclusionEntailsClassAssertionAxiom other) {
-				return equals(other.getConclusion(),
-						derivedClassInclusionEntailsClassAssertionAxiom
-								.getConclusion())
-						&& equals(other.getReason(),
-								derivedClassInclusionEntailsClassAssertionAxiom
-										.getReason());
-			}
-		});
-	}
-
-	@Override
-	public Boolean visit(
-			final DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom derivedIntersectionInconsistencyEntailsDisjointClassesAxiom) {
-		return other_.accept(new DefaultVisitor() {
-			@Override
-			public Boolean visit(
-					final DerivedIntersectionInconsistencyEntailsDisjointClassesAxiom other) {
-				return equals(other.getConclusion(),
-						derivedIntersectionInconsistencyEntailsDisjointClassesAxiom
-								.getConclusion())
-						&& equals(other.getPremises(),
-								derivedIntersectionInconsistencyEntailsDisjointClassesAxiom
-										.getPremises());
-			}
-		});
-	}
-
-	@Override
-	public Boolean visit(
-			final EntailedEquivalentClassesEntailsSameIndividualAxiom entailedEquivalentClassesEntailsSameIndividualAxiom) {
-		return other_.accept(new DefaultVisitor() {
-			@Override
-			public Boolean visit(
-					final EntailedEquivalentClassesEntailsSameIndividualAxiom other) {
-				return equals(other.getConclusion(),
-						entailedEquivalentClassesEntailsSameIndividualAxiom
-								.getConclusion())
-						&& equals(other.getPremises(),
-								entailedEquivalentClassesEntailsSameIndividualAxiom
-										.getPremises());
+					final TopObjectPropertyInBottomEntailsOntologyInconsistency other) {
+				return equals(other.getReason(),
+						topObjectPropertyInBottomEntailsOntologyInconsistency
+								.getReason());
 			}
 		});
 	}

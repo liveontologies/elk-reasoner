@@ -59,41 +59,6 @@ class EntailmentEquality implements Entailment.Visitor<Boolean> {
 
 	@Override
 	public Boolean visit(
-			final OntologyInconsistency inconsistentOntologyEntailment) {
-		return other_.accept(new DefaultVisitor() {
-			@Override
-			public Boolean visit(final OntologyInconsistency other) {
-				return true;
-			}
-		});
-	}
-
-	@Override
-	public Boolean visit(
-			final SubClassOfAxiomEntailment subClassOfAxiomEntailment) {
-		return other_.accept(new DefaultVisitor() {
-			@Override
-			public Boolean visit(final SubClassOfAxiomEntailment other) {
-				return equals(other.getAxiom(),
-						subClassOfAxiomEntailment.getAxiom());
-			}
-		});
-	}
-
-	@Override
-	public Boolean visit(
-			final EquivalentClassesAxiomEntailment equivalentClassesAxiomEntailment) {
-		return other_.accept(new DefaultVisitor() {
-			@Override
-			public Boolean visit(final EquivalentClassesAxiomEntailment other) {
-				return equals(other.getAxiom(),
-						equivalentClassesAxiomEntailment.getAxiom());
-			}
-		});
-	}
-
-	@Override
-	public Boolean visit(
 			final ClassAssertionAxiomEntailment classAssertionAxiomEntailment) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
@@ -118,12 +83,47 @@ class EntailmentEquality implements Entailment.Visitor<Boolean> {
 
 	@Override
 	public Boolean visit(
+			final EquivalentClassesAxiomEntailment equivalentClassesAxiomEntailment) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(final EquivalentClassesAxiomEntailment other) {
+				return equals(other.getAxiom(),
+						equivalentClassesAxiomEntailment.getAxiom());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(
+			final OntologyInconsistency inconsistentOntologyEntailment) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(final OntologyInconsistency other) {
+				return true;
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(
 			final SameIndividualAxiomEntailment sameIndividualAxiomEntailment) {
 		return other_.accept(new DefaultVisitor() {
 			@Override
 			public Boolean visit(final SameIndividualAxiomEntailment other) {
 				return equals(other.getAxiom(),
 						sameIndividualAxiomEntailment.getAxiom());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(
+			final SubClassOfAxiomEntailment subClassOfAxiomEntailment) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(final SubClassOfAxiomEntailment other) {
+				return equals(other.getAxiom(),
+						subClassOfAxiomEntailment.getAxiom());
 			}
 		});
 	}

@@ -49,4 +49,9 @@ abstract class AbstractEntailmentInference implements EntailmentInference {
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return EntailmentInferencePrinter.toString(this);
+	}
+
 }
