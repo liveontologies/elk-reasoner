@@ -39,6 +39,7 @@ public interface AxiomEntailmentInference<A extends ElkAxiom>
 
 	public static interface Visito<O>
 			extends DerivedClassInclusionEntailsClassAssertionAxiom.Visitor<O>,
+			DerivedClassInclusionEntailsObjectPropertyAssertionAxiom.Visitor<O>,
 			EntailedClassInclusionCycleEntailsEquivalentClassesAxiom.Visitor<O>,
 			EntailedDisjointClassesEntailsDifferentIndividualsAxiom.Visitor<O>,
 			EntailedEquivalentClassesEntailsSameIndividualAxiom.Visitor<O>,

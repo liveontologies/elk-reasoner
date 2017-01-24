@@ -28,6 +28,7 @@ import org.semanticweb.elk.reasoner.entailments.model.DifferentIndividualsAxiomE
 import org.semanticweb.elk.reasoner.entailments.model.DisjointClassesAxiomEntailment;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EquivalentClassesAxiomEntailment;
+import org.semanticweb.elk.reasoner.entailments.model.ObjectPropertyAssertionAxiomEntailment;
 import org.semanticweb.elk.reasoner.entailments.model.OntologyInconsistency;
 import org.semanticweb.elk.reasoner.entailments.model.SameIndividualAxiomEntailment;
 import org.semanticweb.elk.reasoner.entailments.model.SubClassOfAxiomEntailment;
@@ -65,6 +66,13 @@ public class DefaultEntailmentVisitor<O> implements Entailment.Visitor<O> {
 	public O visit(
 			final EquivalentClassesAxiomEntailment equivalentClassesAxiomEntailment) {
 		return defaultAxiomEntailmentVisit(equivalentClassesAxiomEntailment);
+	}
+
+	@Override
+	public O visit(
+			final ObjectPropertyAssertionAxiomEntailment objectPropertyAssertionAxiomEntailment) {
+		return defaultAxiomEntailmentVisit(
+				objectPropertyAssertionAxiomEntailment);
 	}
 
 	@Override

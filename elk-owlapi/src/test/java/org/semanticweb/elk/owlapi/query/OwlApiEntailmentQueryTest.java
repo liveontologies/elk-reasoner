@@ -62,8 +62,6 @@ public class OwlApiEntailmentQueryTest extends
 	static final String[] IGNORE_LIST = {
 			"Disjunctions.owl",// Disjuctions not fully supported
 			"OneOf.owl",// Disjuctions not fully supported
-			"Inconsistent.owl",// Throwing InconsistentOntologyException
-			"InconsistentInstances.owl",// Throwing InconsistentOntologyException
 			"UnsupportedQueryIndexing.owl",// Unsupported class expression
 		};
 	// @formatter:on

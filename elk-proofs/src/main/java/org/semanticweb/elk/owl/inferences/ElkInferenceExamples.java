@@ -422,6 +422,13 @@ public class ElkInferenceExamples
 	}
 
 	@Override
+	public ElkInference visit(
+			final ElkObjectPropertyAssertionOfClassInclusion inference) {
+		return inferenceFactory_.getElkObjectPropertyAssertionOfClassInclusion(
+				getIndividual("a"), getObjectProperty("R"), getIndividual("b"));
+	}
+
+	@Override
 	public ElkPropertyInclusionHierarchy visit(
 			final ElkPropertyInclusionHierarchy inference) {
 		final int hierarchySize = inference.getExpressions().size();

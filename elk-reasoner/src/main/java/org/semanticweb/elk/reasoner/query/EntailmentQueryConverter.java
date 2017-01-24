@@ -34,6 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.predefined.ElkPolarity;
@@ -42,6 +43,7 @@ import org.semanticweb.elk.reasoner.entailments.impl.ClassAssertionAxiomEntailme
 import org.semanticweb.elk.reasoner.entailments.impl.DifferentIndividualsAxiomEntailmentImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.DisjointClassesAxiomEntailmentImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.EquivalentClassesAxiomEntailmentImpl;
+import org.semanticweb.elk.reasoner.entailments.impl.ObjectPropertyAssertionAxiomEntailmentImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.SameIndividualAxiomEntailmentImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.SubClassOfAxiomEntailmentImpl;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
@@ -115,7 +117,7 @@ public class EntailmentQueryConverter extends
 	}
 
 	@Override
-	public IndexedEntailmentQuery<? extends Entailment> visit(
+	public DifferentIndividualsEntailmentQuery visit(
 			final ElkDifferentIndividualsAxiom axiom) {
 
 		final List<? extends ElkIndividual> individuals = axiom
@@ -188,7 +190,23 @@ public class EntailmentQueryConverter extends
 	}
 
 	@Override
-	public IndexedEntailmentQuery<? extends Entailment> visit(
+	public ObjectPropertyAssertionEntailmentQuery visit(
+			final ElkObjectPropertyAssertionAxiom axiom) {
+
+		final IndexedIndividual subject = axiom.getSubject()
+				.accept(positiveConverter_);
+		final IndexedClassExpression ovjectExistential = elkFactory_
+				.getObjectSomeValuesFrom(axiom.getProperty(),
+						elkFactory_.getObjectOneOf(axiom.getObject()))
+				.accept(negativeConverter_);
+
+		return new ObjectPropertyAssertionEntailmentQuery(
+				new ObjectPropertyAssertionAxiomEntailmentImpl(axiom), subject,
+				ovjectExistential);
+	}
+
+	@Override
+	public SameIndividualEntailmentQuery visit(
 			final ElkSameIndividualAxiom axiom) {
 
 		final List<? extends ElkIndividual> individuals = axiom

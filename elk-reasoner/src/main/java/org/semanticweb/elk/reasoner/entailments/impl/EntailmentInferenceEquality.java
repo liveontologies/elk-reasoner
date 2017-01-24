@@ -25,6 +25,7 @@ import org.semanticweb.elk.reasoner.entailments.DefaultEntailmentInferenceVisito
 import org.semanticweb.elk.reasoner.entailments.model.EntailedClassInclusionCycleEntailsEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.EntailedDisjointClassesEntailsDifferentIndividualsAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsClassAssertionAxiom;
+import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsObjectPropertyAssertionAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.EntailedIntersectionInconsistencyEntailsDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.EntailedEquivalentClassesEntailsSameIndividualAxiom;
@@ -75,6 +76,23 @@ class EntailmentInferenceEquality
 								.getConclusion())
 						&& equals(other.getReason(),
 								derivedClassInclusionEntailsClassAssertionAxiom
+										.getReason());
+			}
+		});
+	}
+
+	@Override
+	public Boolean visit(
+			final DerivedClassInclusionEntailsObjectPropertyAssertionAxiom derivedClassInclusionEntailsObjectPropertyAssertionAxiom) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(
+					final DerivedClassInclusionEntailsObjectPropertyAssertionAxiom other) {
+				return equals(other.getConclusion(),
+						derivedClassInclusionEntailsObjectPropertyAssertionAxiom
+								.getConclusion())
+						&& equals(other.getReason(),
+								derivedClassInclusionEntailsObjectPropertyAssertionAxiom
 										.getReason());
 			}
 		});
