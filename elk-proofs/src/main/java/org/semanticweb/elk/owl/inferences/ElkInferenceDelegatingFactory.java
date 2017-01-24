@@ -402,6 +402,14 @@ public class ElkInferenceDelegatingFactory implements ElkInference.Factory {
 	}
 
 	@Override
+	public ElkObjectPropertyDomainOfClassInclusion getElkObjectPropertyDomainOfClassInclusion(
+			final ElkObjectPropertyExpression property,
+			final ElkClassExpression domain) {
+		return filter(mainFactory_
+				.getElkObjectPropertyDomainOfClassInclusion(property, domain));
+	}
+
+	@Override
 	public ElkPropertyInclusionHierarchy getElkPropertyInclusionHierarchy(
 			ElkSubObjectPropertyExpression subExpression,
 			ElkObjectPropertyExpression... expressions) {

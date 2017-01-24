@@ -380,6 +380,15 @@ public class ElkInferenceHash implements ElkInference.Visitor<Integer> {
 	}
 
 	@Override
+	public Integer visit(
+			final ElkObjectPropertyDomainOfClassInclusion inference) {
+		return combinedHashCode(
+				hashCode(ElkObjectPropertyDomainOfClassInclusion.class),
+				hashCode(inference.getProperty()),
+				hashCode(inference.getDomain()));
+	}
+
+	@Override
 	public Integer visit(ElkPropertyInclusionHierarchy inference) {
 		return combinedHashCode(hashCode(ElkPropertyInclusionHierarchy.class),
 				hashCode(inference.getSubExpression()),

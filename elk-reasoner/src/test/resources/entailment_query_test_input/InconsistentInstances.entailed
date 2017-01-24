@@ -17,6 +17,8 @@ EquivalentClasses(:B ObjectSomeValuesFrom(:R :D) ObjectSomeValuesFrom(:R :C) :E)
 
 ObjectPropertyAssertion(:R :a :c)
 
+ObjectPropertyDomain(:R :D)
+
 SameIndividual(:a :b :c)
 
 SubClassOf(:B :A)

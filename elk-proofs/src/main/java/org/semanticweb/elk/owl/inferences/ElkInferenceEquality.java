@@ -571,6 +571,19 @@ public class ElkInferenceEquality implements ElkInference.Visitor<Boolean> {
 	}
 
 	@Override
+	public Boolean visit(
+			final ElkObjectPropertyDomainOfClassInclusion inference) {
+		return other_.accept(new DefaultVisitor() {
+			@Override
+			public Boolean visit(
+					ElkObjectPropertyDomainOfClassInclusion other) {
+				return equals(other.getProperty(), inference.getProperty())
+						&& equals(other.getDomain(), inference.getDomain());
+			}
+		});
+	}
+
+	@Override
 	public Boolean visit(final ElkPropertyInclusionHierarchy inference) {
 		return other_.accept(new DefaultVisitor() {
 			@Override

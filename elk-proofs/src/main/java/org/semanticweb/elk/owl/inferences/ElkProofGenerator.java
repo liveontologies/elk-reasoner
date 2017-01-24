@@ -39,6 +39,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAssertionAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyDomainAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
@@ -48,6 +49,7 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsClassAssertionAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsObjectPropertyAssertionAxiom;
+import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsObjectPropertyDomainAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DisjointClassesAxiomEntailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailedClassInclusionCycleEntailsEquivalentClassesAxiom;
@@ -160,6 +162,37 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 
 			inferenceFactory_.getElkObjectPropertyAssertionOfClassInclusion(
 					subject, property, object);
+
+		} catch (final ElkException e) {
+			throw new TunnelingException(e);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(
+			final DerivedClassInclusionEntailsObjectPropertyDomainAxiom entailmentInference) {
+		try {
+
+			final SubClassInclusionComposed conclusion = entailmentInference
+					.getReason();
+
+			final ElkObjectPropertyExpression property = entailmentInference
+					.getConclusion().getAxiom().getProperty();
+			final ElkClassExpression domain = entailmentInference
+					.getConclusion().getAxiom().getDomain();
+
+			final ElkClassExpression subClass = elkFactory_
+					.getObjectSomeValuesFrom(property,
+							elkFactory_.getOwlThing());
+
+			final Matcher matcher = new Matcher(
+					reasoner_.explainConclusion(conclusion), elkFactory_,
+					inferenceFactory_);
+			matcher.trace(conclusion, subClass, domain);
+
+			inferenceFactory_.getElkObjectPropertyDomainOfClassInclusion(
+					property, domain);
 
 		} catch (final ElkException e) {
 			throw new TunnelingException(e);
@@ -420,6 +453,28 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 
 				inferenceFactory_.getElkObjectPropertyAssertionOfClassInclusion(
 						subject, property, object);
+				return null;
+			}
+
+			@Override
+			public Void visit(final ElkObjectPropertyDomainAxiom axiom) {
+
+				final ElkObjectPropertyExpression property = axiom
+						.getProperty();
+				final ElkClassExpression domain = axiom.getDomain();
+
+				final ElkClassExpression subClass = elkFactory_
+						.getObjectSomeValuesFrom(property,
+								elkFactory_.getOwlThing());
+
+				inferenceFactory_.getElkClassInclusionOwlThing(subClass);
+				inferenceFactory_.getElkClassInclusionOwlNothing(domain);
+				inferenceFactory_.getElkClassInclusionHierarchy(subClass,
+						elkFactory_.getOwlThing(), elkFactory_.getOwlNothing(),
+						domain);
+
+				inferenceFactory_.getElkObjectPropertyDomainOfClassInclusion(
+						property, domain);
 				return null;
 			}
 

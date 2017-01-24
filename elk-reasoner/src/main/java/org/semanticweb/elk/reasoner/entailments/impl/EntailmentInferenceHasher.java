@@ -25,6 +25,7 @@ import org.semanticweb.elk.reasoner.entailments.model.EntailedClassInclusionCycl
 import org.semanticweb.elk.reasoner.entailments.model.EntailedDisjointClassesEntailsDifferentIndividualsAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsClassAssertionAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsObjectPropertyAssertionAxiom;
+import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsObjectPropertyDomainAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.DerivedClassInclusionEntailsSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.EntailedIntersectionInconsistencyEntailsDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.EntailedEquivalentClassesEntailsSameIndividualAxiom;
@@ -90,6 +91,18 @@ class EntailmentInferenceHasher implements Hasher<EntailmentInference>,
 				hashCode(
 						derivedClassInclusionEntailsObjectPropertyAssertionAxiom
 								.getReason()));
+	}
+
+	@Override
+	public Integer visit(
+			final DerivedClassInclusionEntailsObjectPropertyDomainAxiom derivedClassInclusionEntailsObjectPropertyDomainAxiom) {
+		return combinedHashCode(
+				hashCode(
+						DerivedClassInclusionEntailsObjectPropertyDomainAxiom.class),
+				hashCode(derivedClassInclusionEntailsObjectPropertyDomainAxiom
+						.getConclusion()),
+				hashCode(derivedClassInclusionEntailsObjectPropertyDomainAxiom
+						.getReason()));
 	}
 
 	@Override

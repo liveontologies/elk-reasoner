@@ -251,6 +251,11 @@ public class ElkInferenceDummyVisitor<O> implements ElkInference.Visitor<O> {
 	}
 
 	@Override
+	public O visit(final ElkObjectPropertyDomainOfClassInclusion inference) {
+		return defaultVisit(inference);
+	}
+
+	@Override
 	public O visit(ElkPropertyInclusionHierarchy inference) {
 		return defaultVisit(inference);
 	}

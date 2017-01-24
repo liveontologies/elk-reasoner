@@ -361,6 +361,13 @@ public class ElkInferenceBaseFactory implements ElkInference.Factory {
 	}
 
 	@Override
+	public ElkObjectPropertyDomainOfClassInclusion getElkObjectPropertyDomainOfClassInclusion(
+			final ElkObjectPropertyExpression property,
+			final ElkClassExpression domain) {
+		return new ElkObjectPropertyDomainOfClassInclusion(property, domain);
+	}
+
+	@Override
 	public ElkPropertyInclusionHierarchy getElkPropertyInclusionHierarchy(
 			ElkSubObjectPropertyExpression subExpression,
 			ElkObjectPropertyExpression... expressions) {
