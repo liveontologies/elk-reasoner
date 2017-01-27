@@ -71,7 +71,7 @@ public abstract class BaseClassificationCorrectnessTest extends
 			throws URISyntaxException, IOException {
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION, BaseClassificationCorrectnessTest.class,
-				new ConfigurationUtils.ManifestCreator<UrlTestInput, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<UrlTestInput, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>>() {
 					@Override
 					public Collection<? extends TestManifestWithOutput<UrlTestInput, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>> createManifests(
 							final List<URL> urls) throws IOException {

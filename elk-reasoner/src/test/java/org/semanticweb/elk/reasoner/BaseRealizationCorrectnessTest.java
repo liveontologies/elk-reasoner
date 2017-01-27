@@ -72,7 +72,7 @@ public abstract class BaseRealizationCorrectnessTest extends
 			throws URISyntaxException, IOException {
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION, BaseRealizationCorrectnessTest.class,
-				new ConfigurationUtils.ManifestCreator<UrlTestInput, InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<UrlTestInput, InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>>>() {
 					@Override
 					public Collection<? extends TestManifestWithOutput<UrlTestInput, InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>>> createManifests(
 							final List<URL> urls) throws IOException {

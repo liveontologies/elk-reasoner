@@ -95,7 +95,7 @@ public class OwlApiEntailmentQueryTest
 
 	public static final String ENTAILMENT_QUERY_INPUT_DIR = "entailment_query_test_input";
 
-	public static final ConfigurationUtils.ManifestCreator<QueryTestInput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>> CLASS_QUERY_TEST_MANIFEST_CREATOR = new ConfigurationUtils.ManifestCreator<QueryTestInput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>>() {
+	public static final ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>>> CLASS_QUERY_TEST_MANIFEST_CREATOR = new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>>>() {
 
 		@Override
 		public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>>> createManifests(

@@ -96,7 +96,7 @@ public class OwlApiClassExpressionEquivalentClassesQueryTest extends
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION, BaseQueryTest.class,
-				new ConfigurationUtils.ManifestCreator<QueryTestInput<OWLClassExpression>, EquivalentEntitiesTestOutput<OWLClass>, EquivalentEntitiesTestOutput<OWLClass>>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLClassExpression>, EquivalentEntitiesTestOutput<OWLClass>, EquivalentEntitiesTestOutput<OWLClass>>>() {
 
 					@Override
 					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, EquivalentEntitiesTestOutput<OWLClass>, EquivalentEntitiesTestOutput<OWLClass>>> createManifests(

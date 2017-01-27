@@ -44,7 +44,7 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 public class EntailmentTestManifestCreator implements
-		ConfigurationUtils.ManifestCreator<QueryTestInput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>> {
+		ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>>> {
 
 	public static final EntailmentTestManifestCreator INSTANCE = new EntailmentTestManifestCreator();
 

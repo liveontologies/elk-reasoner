@@ -26,30 +26,27 @@ import java.util.List;
 
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 
-
 /**
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
- * @param <I> 
- * @param <EO> 
- * @param <AO> 
+ *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
-public class SimpleConfiguration<I extends TestInput, EO extends TestOutput, AO extends TestOutput> implements Configuration {
+public class SimpleConfiguration implements Configuration {
 
-	private final List<TestManifestWithOutput<I, EO, AO>> manifests;
-	
-	SimpleConfiguration(List<TestManifestWithOutput<I, EO, AO>> manifests) {
+	private final List<? extends TestManifest<?>> manifests;
+
+	SimpleConfiguration(final List<? extends TestManifest<?>> manifests) {
 		this.manifests = manifests;
 	}
-	
+
 	@Override
 	public int size() {
 		return manifests.size();
 	}
 
 	@Override
-	public TestManifestWithOutput<I, EO, AO> getTestValue(int index) {
+	public Object getTestValue(final int index) {
 		return manifests.get(index);
 	}
 
@@ -57,4 +54,5 @@ public class SimpleConfiguration<I extends TestInput, EO extends TestOutput, AO 
 	public String getTestName(int index) {
 		return "test" + manifests.get(index).getName();
 	}
+
 }

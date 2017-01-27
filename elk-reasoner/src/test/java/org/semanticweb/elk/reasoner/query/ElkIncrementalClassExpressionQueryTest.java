@@ -58,7 +58,7 @@ public abstract class ElkIncrementalClassExpressionQueryTest<O extends TestOutpu
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION, BaseIncrementalQueryTest.class,
-				new ConfigurationUtils.ManifestCreator<QueryTestInput<ElkClassExpression>, TestOutput, TestOutput>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkClassExpression>, TestOutput, TestOutput>>() {
 
 					@Override
 					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, TestOutput, TestOutput>> createManifests(

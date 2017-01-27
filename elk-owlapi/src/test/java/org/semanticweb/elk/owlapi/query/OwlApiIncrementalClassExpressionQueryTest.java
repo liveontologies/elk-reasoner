@@ -60,7 +60,7 @@ public abstract class OwlApiIncrementalClassExpressionQueryTest<O extends TestOu
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION, BaseIncrementalQueryTest.class,
-				new ConfigurationUtils.ManifestCreator<QueryTestInput<OWLClassExpression>, TestOutput, TestOutput>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLClassExpression>, TestOutput, TestOutput>>() {
 
 					@Override
 					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, TestOutput, TestOutput>> createManifests(

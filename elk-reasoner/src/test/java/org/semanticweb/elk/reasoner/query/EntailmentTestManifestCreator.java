@@ -40,7 +40,7 @@ import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
 
 public class EntailmentTestManifestCreator implements
-		ConfigurationUtils.ManifestCreator<QueryTestInput<Collection<ElkAxiom>>, EntailmentQueryTestOutput<ElkAxiom>, EntailmentQueryTestOutput<ElkAxiom>> {
+		ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<Collection<ElkAxiom>>, EntailmentQueryTestOutput<ElkAxiom>, EntailmentQueryTestOutput<ElkAxiom>>> {
 
 	public static final EntailmentTestManifestCreator INSTANCE = new EntailmentTestManifestCreator();
 

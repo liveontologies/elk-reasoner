@@ -93,7 +93,7 @@ public class OwlApiClassExpressionSatisfiabilityQueryTest
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION, BaseQueryTest.class,
-				new ConfigurationUtils.ManifestCreator<QueryTestInput<OWLClassExpression>, SatisfiabilityTestOutput, SatisfiabilityTestOutput>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLClassExpression>, SatisfiabilityTestOutput, SatisfiabilityTestOutput>>() {
 
 					@Override
 					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, SatisfiabilityTestOutput, SatisfiabilityTestOutput>> createManifests(

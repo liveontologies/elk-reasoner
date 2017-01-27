@@ -71,15 +71,15 @@ public class ConfigurationUtils {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	public static <I extends TestInput, EO extends TestOutput, AO extends TestOutput> Configuration loadFileBasedTestConfiguration(
+	public static Configuration loadFileBasedTestConfiguration(
 			final String inputDir, final Class<?> srcClass,
-			final ManifestCreator<I, EO, AO> creator, final String... fileExts)
+			final ManifestCreator<?> creator, final String... fileExts)
 			throws IOException, URISyntaxException {
 
-		final List<TestManifestWithOutput<I, EO, AO>> manifests = new ArrayList<TestManifestWithOutput<I, EO, AO>>();
+		final List<TestManifest<?>> manifests = new ArrayList<TestManifest<?>>();
 
 		if (fileExts == null || fileExts.length <= 0) {
-			return new SimpleConfiguration<I, EO, AO>(manifests);
+			return new SimpleConfiguration(manifests);
 		}
 
 		final URI srcURI = srcClass.getClassLoader().getResource(inputDir)
@@ -130,7 +130,7 @@ public class ConfigurationUtils {
 				urls.set(index, srcClass.getClassLoader()
 						.getResource(files.get(index)));
 			}
-			final Collection<? extends TestManifestWithOutput<I, EO, AO>> manifs = creator
+			final Collection<? extends TestManifest<?>> manifs = creator
 					.createManifests(urls);
 			if (manifs != null) {
 				manifests.addAll(manifs);
@@ -149,7 +149,7 @@ public class ConfigurationUtils {
 
 		}
 
-		return new SimpleConfiguration<I, EO, AO>(manifests);
+		return new SimpleConfiguration(manifests);
 	}
 
 	/**
@@ -215,14 +215,13 @@ public class ConfigurationUtils {
 	 * 
 	 * @author Peter Skocovsky
 	 *
-	 * @param <I>
-	 * @param <EO>
-	 * @param <AO>
+	 * @param <M>
+	 *            The type of created manifests.
 	 */
-	public interface ManifestCreator<I extends TestInput, EO extends TestOutput, AO extends TestOutput> {
+	public interface ManifestCreator<M extends TestManifest<?>> {
 
-		public Collection<? extends TestManifestWithOutput<I, EO, AO>> createManifests(
-				List<URL> urls) throws IOException;
+		public Collection<? extends M> createManifests(List<URL> urls)
+				throws IOException;
 
 	}
 

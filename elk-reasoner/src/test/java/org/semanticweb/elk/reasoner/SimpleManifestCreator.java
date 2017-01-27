@@ -33,7 +33,7 @@ import org.semanticweb.elk.testing.UrlTestInput;
 import org.semanticweb.elk.testing.VoidTestOutput;
 
 public class SimpleManifestCreator implements
-		ManifestCreator<UrlTestInput, VoidTestOutput, VoidTestOutput> {
+		ManifestCreator<TestManifestWithOutput<UrlTestInput, VoidTestOutput, VoidTestOutput>> {
 
 	public static final SimpleManifestCreator INSTANCE = new SimpleManifestCreator();
 

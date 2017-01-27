@@ -64,7 +64,7 @@ public class ElkClassExpressionSatisfiabilityQueryTest
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION, BaseQueryTest.class,
-				new ConfigurationUtils.ManifestCreator<QueryTestInput<ElkClassExpression>, SatisfiabilityTestOutput, SatisfiabilityTestOutput>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkClassExpression>, SatisfiabilityTestOutput, SatisfiabilityTestOutput>>() {
 
 					@Override
 					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, SatisfiabilityTestOutput, SatisfiabilityTestOutput>> createManifests(

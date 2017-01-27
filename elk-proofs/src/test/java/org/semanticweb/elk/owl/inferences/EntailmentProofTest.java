@@ -91,7 +91,7 @@ public class EntailmentProofTest
 
 	public static final String ENTAILMENT_QUERY_INPUT_DIR = "entailment_query_test_input";
 
-	private static final ConfigurationUtils.ManifestCreator<QueryTestInput<ElkAxiom>, VoidTestOutput, VoidTestOutput> ENTAILMENT_QUERY_TEST_MANIFEST_CREATOR_ = new ConfigurationUtils.ManifestCreator<QueryTestInput<ElkAxiom>, VoidTestOutput, VoidTestOutput>() {
+	private static final ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkAxiom>, VoidTestOutput, VoidTestOutput>> ENTAILMENT_QUERY_TEST_MANIFEST_CREATOR_ = new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkAxiom>, VoidTestOutput, VoidTestOutput>>() {
 
 		@Override
 		public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkAxiom>, VoidTestOutput, VoidTestOutput>> createManifests(
