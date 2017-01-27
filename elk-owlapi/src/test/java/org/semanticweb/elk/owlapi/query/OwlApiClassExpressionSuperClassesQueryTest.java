@@ -27,6 +27,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.io.IOUtils;
@@ -35,7 +37,6 @@ import org.semanticweb.elk.reasoner.query.BaseQueryTest;
 import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.testing.ConfigurationUtils;
-import org.semanticweb.elk.testing.ConfigurationUtils.MultiManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
@@ -77,8 +78,7 @@ public class OwlApiClassExpressionSuperClassesQueryTest extends
 					public RelatedEntitiesTestOutput<OWLClass> getActualOutput()
 							throws Exception {
 						final NodeSet<OWLClass> superNodes = getReasoner()
-								.getSuperClasses(
-										manifest.getInput().getQuery(),
+								.getSuperClasses(manifest.getInput().getQuery(),
 										true);
 						return new OwlApiRelatedEntitiesTestOutput<OWLClass>(
 								superNodes);
@@ -97,21 +97,29 @@ public class OwlApiClassExpressionSuperClassesQueryTest extends
 			throws IOException, URISyntaxException {
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION, BaseQueryTest.class, "owl",
-				"expected",
-				new MultiManifestCreator<QueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>, RelatedEntitiesTestOutput<OWLClass>>() {
+				INPUT_DATA_LOCATION, BaseQueryTest.class,
+				new ConfigurationUtils.ManifestCreator<QueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>, RelatedEntitiesTestOutput<OWLClass>>() {
 
 					@Override
 					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>, RelatedEntitiesTestOutput<OWLClass>>> createManifests(
-							final URL input, final URL output)
-							throws IOException {
+							final List<URL> urls) throws IOException {
+
+						if (urls == null || urls.size() < 2) {
+							// Not enough inputs. Probably forgot something.
+							throw new IllegalArgumentException(
+									"Need at least 2 URL-s!");
+						}
+						if (urls.get(0) == null || urls.get(1) == null) {
+							// No inputs, no manifests.
+							return Collections.emptySet();
+						}
 
 						InputStream outputIS = null;
 						try {
-							outputIS = output.openStream();
+							outputIS = urls.get(1).openStream();
 
 							return OwlExpectedTestOutputLoader.load(outputIS)
-									.getSuperEntitiesManifests(input);
+									.getSuperEntitiesManifests(urls.get(0));
 
 						} finally {
 							IOUtils.closeQuietly(outputIS);
@@ -119,7 +127,7 @@ public class OwlApiClassExpressionSuperClassesQueryTest extends
 
 					}
 
-				});
+				}, "owl", "expected");
 
 	}
 

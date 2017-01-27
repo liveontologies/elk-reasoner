@@ -41,11 +41,11 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.ReasoningTestManifest;
-import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestInput;
+import org.semanticweb.elk.testing.TestManifest;
+import org.semanticweb.elk.testing.UrlTestInput;
 import org.semanticweb.elk.util.concurrent.computation.DummyInterruptMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,10 +72,10 @@ public abstract class BaseRandomWalkIncrementalCorrectnessTest {
 	 */
 	static int ITERATIONS = 5;
 
-	protected final ReasoningTestManifest<? extends TaxonomyTestOutput<?>, ? extends TaxonomyTestOutput<?>> manifest;
+	protected final TestManifest<UrlTestInput> manifest;
 
 	public BaseRandomWalkIncrementalCorrectnessTest(
-			ReasoningTestManifest<? extends TaxonomyTestOutput<?>, ? extends TaxonomyTestOutput<?>> testManifest) {
+			final TestManifest<UrlTestInput> testManifest) {
 		manifest = testManifest;
 	}
 

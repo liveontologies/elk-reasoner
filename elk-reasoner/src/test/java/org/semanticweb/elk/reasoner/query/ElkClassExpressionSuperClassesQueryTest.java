@@ -27,6 +27,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.runner.RunWith;
@@ -37,7 +39,6 @@ import org.semanticweb.elk.reasoner.ElkReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.ConfigurationUtils;
-import org.semanticweb.elk.testing.ConfigurationUtils.MultiManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
@@ -74,8 +75,7 @@ public class ElkClassExpressionSuperClassesQueryTest extends
 							throws Exception {
 						final Set<? extends Node<ElkClass>> subNodes = getReasoner()
 								.getSuperClassesQuietly(
-										manifest.getInput().getQuery(),
-										true);
+										manifest.getInput().getQuery(), true);
 						return new ElkRelatedEntitiesTestOutput<ElkClass>(
 								subNodes, ElkClassKeyProvider.INSTANCE);
 					}
@@ -88,21 +88,29 @@ public class ElkClassExpressionSuperClassesQueryTest extends
 			throws IOException, URISyntaxException {
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION, BaseQueryTest.class, "owl",
-				"expected",
-				new MultiManifestCreator<QueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkClass>, RelatedEntitiesTestOutput<ElkClass>>() {
+				INPUT_DATA_LOCATION, BaseQueryTest.class,
+				new ConfigurationUtils.ManifestCreator<QueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkClass>, RelatedEntitiesTestOutput<ElkClass>>() {
 
 					@Override
 					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkClass>, RelatedEntitiesTestOutput<ElkClass>>> createManifests(
-							final URL input, final URL output)
-							throws IOException {
+							final List<URL> urls) throws IOException {
+
+						if (urls == null || urls.size() < 2) {
+							// Not enough inputs. Probably forgot something.
+							throw new IllegalArgumentException(
+									"Need at least 2 URL-s!");
+						}
+						if (urls.get(0) == null || urls.get(1) == null) {
+							// No inputs, no manifests.
+							return Collections.emptySet();
+						}
 
 						InputStream outputIS = null;
 						try {
-							outputIS = output.openStream();
+							outputIS = urls.get(1).openStream();
 
 							return ElkExpectedTestOutputLoader.load(outputIS)
-									.getSuperEntitiesManifests(input);
+									.getSuperEntitiesManifests(urls.get(0));
 
 						} finally {
 							IOUtils.closeQuietly(outputIS);
@@ -110,7 +118,7 @@ public class ElkClassExpressionSuperClassesQueryTest extends
 
 					}
 
-				});
+				}, "owl", "expected");
 
 	}
 

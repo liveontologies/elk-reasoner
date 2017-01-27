@@ -22,31 +22,19 @@
 package org.semanticweb.elk.owlapi.proofs;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Set;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.liveontologies.owlapi.proof.OWLProver;
 import org.liveontologies.proof.util.InferenceSets;
-import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
-import org.semanticweb.elk.reasoner.tracing.TracingTestManifest;
-import org.semanticweb.elk.testing.ConfigurationUtils;
-import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.PolySuite.Config;
-import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestInput;
-import org.semanticweb.elk.testing.TestManifestWithOutput;
+import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.UrlTestInput;
-import org.semanticweb.elk.testing.VoidTestOutput;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -67,7 +55,6 @@ import org.slf4j.LoggerFactory;
 @RunWith(PolySuite.class)
 public class AllOntologiesProofTest extends BaseProofTest {
 
-	final static String INPUT_DATA_LOCATION = "classification_test_input";
 	private static final Logger LOGGER_ = LoggerFactory.getLogger(AllOntologiesProofTest.class);
 
 	static final String[] IGNORE_LIST = { "AssertionDisjoint.owl",
@@ -78,14 +65,9 @@ public class AllOntologiesProofTest extends BaseProofTest {
 		Arrays.sort(IGNORE_LIST);
 	}
 
-	public AllOntologiesProofTest(TracingTestManifest testManifest) {
+	public AllOntologiesProofTest(
+			final TestManifest<UrlTestInput> testManifest) {
 		super(testManifest);
-	}
-
-	@Override
-	@Before
-	public void before() throws IOException, Owl2ParseException {
-		assumeTrue(!ignore(manifest_.getInput()));
 	}
 
 	@Override
@@ -138,21 +120,4 @@ public class AllOntologiesProofTest extends BaseProofTest {
 		}
 	}
 
-	@Config
-	public static Configuration getConfig() throws URISyntaxException,
-			IOException {
-		return ConfigurationUtils
-				.loadFileBasedTestConfiguration(
-						INPUT_DATA_LOCATION,
-						TracingTestManifest.class,
-						"owl",
-						new TestManifestCreator<UrlTestInput, VoidTestOutput, VoidTestOutput>() {
-							@Override
-							public TestManifestWithOutput<UrlTestInput, VoidTestOutput, VoidTestOutput> create(
-									URL input, URL output) throws IOException {
-								// don't need an expected output for these tests
-								return new TracingTestManifest(input);
-							}
-						});
-	}
 }

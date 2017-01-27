@@ -25,12 +25,19 @@ import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 
 import org.junit.Before;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.TestOWLManager;
+import org.semanticweb.elk.reasoner.SimpleManifestCreator;
 import org.semanticweb.elk.reasoner.tracing.TracingTestManifest;
+import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.TestInput;
+import org.semanticweb.elk.testing.TestManifest;
+import org.semanticweb.elk.testing.UrlTestInput;
+import org.semanticweb.elk.testing.PolySuite.Config;
+import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -43,10 +50,12 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
  */
 public class BaseProofTest {
 
-	protected final TracingTestManifest manifest_;
+	final static String INPUT_DATA_LOCATION = "classification_test_input";
+
+	protected final TestManifest<UrlTestInput> manifest_;
 	protected final OWLOntologyManager manager_;
 
-	public BaseProofTest(final TracingTestManifest manifest) {
+	public BaseProofTest(final TestManifest<UrlTestInput> manifest) {
 		this.manifest_ = manifest;
 		this.manager_ = TestOWLManager.createOWLOntologyManager();
 	}
@@ -70,6 +79,14 @@ public class BaseProofTest {
 		} catch (OWLOntologyCreationException e) {
 			throw new Owl2ParseException(e);
 		}
+	}
+
+	@Config
+	public static Configuration getConfig()
+			throws URISyntaxException, IOException {
+		return ConfigurationUtils.loadFileBasedTestConfiguration(
+				INPUT_DATA_LOCATION, TracingTestManifest.class,
+				SimpleManifestCreator.INSTANCE, "owl");
 	}
 
 }

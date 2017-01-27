@@ -34,7 +34,7 @@ import org.semanticweb.elk.testing.TestInput;
  *         pavel.klinov@uni-ulm.de
  */
 public class ElkDiffClassificationCorrectnessTest
-		extends DiffClassificationCorrectnessTest {
+		extends BaseClassificationCorrectnessTest {
 
 	static final String[] IGNORE_LIST = {};
 

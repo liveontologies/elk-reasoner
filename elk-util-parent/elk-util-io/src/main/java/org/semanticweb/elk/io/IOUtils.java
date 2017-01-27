@@ -20,23 +20,19 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
 package org.semanticweb.elk.io;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URL;
 import java.security.CodeSource;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -45,7 +41,7 @@ import java.util.zip.ZipInputStream;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
- * 
+ * @author Peter Skocovsky
  */
 public class IOUtils {
 
@@ -109,19 +105,43 @@ public class IOUtils {
 		return count;
 	}
 
+	private static void collectResourceNamesFromDir(final File file,
+			final String prefix, final String extension,
+			final Collection<String> result) {
+
+		final String fileName = file.getName();
+
+		if (file.isDirectory()) {
+			final File[] innerFiles = file.listFiles();
+			if (innerFiles == null) {
+				throw new RuntimeException("Error listing directory " + file);
+			}
+			// else
+			for (final File innerFile : innerFiles) {
+				collectResourceNamesFromDir(innerFile,
+						prefix + fileName + File.separator, extension, result);
+			}
+			return;
+		}
+		// else file is not a directory
+
+		if (fileName.endsWith("." + extension)) {
+			result.add(prefix + fileName);
+		}
+
+	}
+
+	/**
+	 * @param dir
+	 * @param extension
+	 * @return A list of paths relative to {@code dir} of the files from
+	 *         {@code dir} with the provided filename extension. The directory
+	 *         is traversed recursively.
+	 */
 	public static List<String> getResourceNamesFromDir(File dir,
 			String extension) {
-		String[] dirContent = dir
-				.list(FileUtils.getExtBasedFilenameFilter(extension));
-		if (dirContent == null) {
-			throw new RuntimeException("Not a directory: " + dir);
-		}
 		List<String> testResources = new ArrayList<String>();
-
-		for (String fileName : dirContent) {
-			testResources.add(dir.getName() + "/" + fileName);
-		}
-
+		collectResourceNamesFromDir(dir, "", extension, testResources);
 		return testResources;
 	}
 
@@ -168,26 +188,4 @@ public class IOUtils {
 		return testResources;
 	}
 
-	public static int readInteger(URL src, int radix) throws IOException {
-		String line = null;
-		InputStream stream = null;
-
-		try {
-			stream = src.openStream();
-
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					stream));
-
-			line = reader.readLine();
-
-		} finally {
-			closeQuietly(stream);
-		}
-		
-		if (line == null) {
-			throw new IOException("Cannot read from " + src);
-		}
-
-		return Integer.parseInt(line, radix);
-	}
 }

@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.incremental;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.List;
 
 import org.junit.runner.RunWith;
@@ -31,16 +30,13 @@ import org.semanticweb.elk.loading.AllAxiomTrackingOntologyLoader;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.TestAxiomLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.ReasoningTestManifest;
-import org.semanticweb.elk.reasoner.TaxonomyDiffManifest;
-import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
+import org.semanticweb.elk.reasoner.SimpleManifestCreator;
 import org.semanticweb.elk.reasoner.incremental.RandomWalkRunnerIO.ElkAPIBasedIO;
 import org.semanticweb.elk.testing.ConfigurationUtils;
-import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
-import org.semanticweb.elk.testing.TestManifestWithOutput;
+import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.UrlTestInput;
 
 /**
@@ -54,7 +50,7 @@ public class RandomWalkIncrementalClassificationCorrectnessTest extends
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
 
 	public RandomWalkIncrementalClassificationCorrectnessTest(
-			ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> testManifest) {
+			final TestManifest<UrlTestInput> testManifest) {
 		super(testManifest);
 	}
 
@@ -74,23 +70,12 @@ public class RandomWalkIncrementalClassificationCorrectnessTest extends
 	}
 
 	@Config
-	public static Configuration getConfig() throws URISyntaxException,
-			IOException {
-		return ConfigurationUtils
-				.loadFileBasedTestConfiguration(
-						INPUT_DATA_LOCATION,
-						RandomWalkIncrementalClassificationCorrectnessTest.class,
-						"owl",
-						"expected",
-						new TestManifestCreator<UrlTestInput, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>() {
-							@Override
-							public TestManifestWithOutput<UrlTestInput, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> create(
-									URL input, URL output) throws IOException {
-								// don't need an expected output for these tests
-								return new TaxonomyDiffManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>(
-										input, null);
-							}
-						});
+	public static Configuration getConfig()
+			throws URISyntaxException, IOException {
+		return ConfigurationUtils.loadFileBasedTestConfiguration(
+				INPUT_DATA_LOCATION,
+				RandomWalkIncrementalClassificationCorrectnessTest.class,
+				SimpleManifestCreator.INSTANCE, "owl");
 	}
 
 }

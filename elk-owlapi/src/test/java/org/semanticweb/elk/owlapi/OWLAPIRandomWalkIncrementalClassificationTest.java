@@ -26,7 +26,6 @@ import static org.junit.Assume.assumeTrue;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -42,21 +41,18 @@ import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.ReasoningTestManifest;
-import org.semanticweb.elk.reasoner.TaxonomyDiffManifest;
-import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
+import org.semanticweb.elk.reasoner.SimpleManifestCreator;
 import org.semanticweb.elk.reasoner.incremental.IncrementalChange;
 import org.semanticweb.elk.reasoner.incremental.IncrementalClassificationCorrectnessTest;
 import org.semanticweb.elk.reasoner.incremental.OnOffVector;
 import org.semanticweb.elk.reasoner.incremental.RandomWalkIncrementalClassificationRunner;
 import org.semanticweb.elk.reasoner.incremental.RandomWalkRunnerIO;
 import org.semanticweb.elk.testing.ConfigurationUtils;
-import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestInput;
-import org.semanticweb.elk.testing.TestManifestWithOutput;
+import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.UrlTestInput;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
@@ -96,12 +92,12 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 	
 	private final static AxiomFilter axiomFilter_ = new DummyAxiomFilter();//new PropertyAxiomFilter();
 
-	protected final ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> manifest;
-	
+	protected final TestManifest<UrlTestInput> manifest;
+
 	private final OWLOntologyManager manager_ = TestOWLManager.createOWLOntologyManager();
-	
+
 	public OWLAPIRandomWalkIncrementalClassificationTest(
-			ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> testManifest) {
+			final TestManifest<UrlTestInput> testManifest) {
 		manifest = testManifest;
 	}
 
@@ -164,23 +160,12 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 	}
 
 	@Config
-	public static Configuration getConfig() throws URISyntaxException,
-			IOException {
-		return ConfigurationUtils
-				.loadFileBasedTestConfiguration(
-						INPUT_DATA_LOCATION,
-						IncrementalClassificationCorrectnessTest.class,
-						"owl",
-						"expected",
-						new TestManifestCreator<UrlTestInput, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>() {
-							@Override
-							public TestManifestWithOutput<UrlTestInput, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> create(
-									URL input, URL output) throws IOException {
-								// don't need an expected output for these tests
-								return new TaxonomyDiffManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>(
-										input, null);
-							}
-						});
+	public static Configuration getConfig()
+			throws URISyntaxException, IOException {
+		return ConfigurationUtils.loadFileBasedTestConfiguration(
+				INPUT_DATA_LOCATION,
+				IncrementalClassificationCorrectnessTest.class,
+				SimpleManifestCreator.INSTANCE, "owl");
 	}
 
 	/**

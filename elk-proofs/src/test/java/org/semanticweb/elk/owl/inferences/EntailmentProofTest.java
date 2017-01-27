@@ -28,6 +28,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -96,8 +97,13 @@ public class EntailmentProofTest
 		public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkAxiom>, VoidTestOutput, VoidTestOutput>> createManifests(
 				final List<URL> urls) throws IOException {
 
-			if (urls.size() < 2) {
-				throw new IllegalArgumentException("Need at least 2 URLs!");
+			if (urls == null || urls.size() < 2) {
+				// Not enough inputs. Something was probably forgotten.
+				throw new IllegalArgumentException("Need at least 2 URL-s!");
+			}
+			if (urls.get(0) == null || urls.get(1) == null) {
+				// No inputs, no manifests.
+				return Collections.emptySet();
 			}
 
 			final URL input = urls.get(0);

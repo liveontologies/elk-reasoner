@@ -24,8 +24,6 @@ package org.semanticweb.elk.owlapi.proofs;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -36,16 +34,10 @@ import org.liveontologies.owlapi.proof.OWLProver;
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
-import org.semanticweb.elk.reasoner.tracing.TracingTestManifest;
-import org.semanticweb.elk.testing.ConfigurationUtils;
-import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.PolySuite.Config;
-import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestInput;
-import org.semanticweb.elk.testing.TestManifestWithOutput;
+import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.UrlTestInput;
-import org.semanticweb.elk.testing.VoidTestOutput;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -63,8 +55,6 @@ import org.semanticweb.owlapi.reasoner.InferenceType;
 @RunWith(PolySuite.class)
 public class RandomProofCompletenessTest extends BaseProofTest {
 
-	final static String INPUT_DATA_LOCATION = "classification_test_input";
-
 	static final String[] IGNORE_LIST = { "AssertionDisjoint.owl",
 			"ConjunctionsComplex.owl", "DifferentSameIndividual.owl",
 			"Inconsistent.owl", "OneOf.owl", "PropertyRangesHierarchy.owl",
@@ -74,8 +64,9 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 	static {
 		Arrays.sort(IGNORE_LIST);
 	}
-	
-	public RandomProofCompletenessTest(final TracingTestManifest testManifest) {
+
+	public RandomProofCompletenessTest(
+			final TestManifest<UrlTestInput> testManifest) {
 		super(testManifest);
 	}
 	
@@ -132,22 +123,5 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 		}
 		
 	}
-	
-	@Config
-	public static Configuration getConfig() throws URISyntaxException,
-			IOException {
-		return ConfigurationUtils
-				.loadFileBasedTestConfiguration(
-						INPUT_DATA_LOCATION,
-						TracingTestManifest.class,
-						"owl",
-						new TestManifestCreator<UrlTestInput, VoidTestOutput, VoidTestOutput>() {
-							@Override
-							public TestManifestWithOutput<UrlTestInput, VoidTestOutput, VoidTestOutput> create(
-									final URL input, final URL output) throws IOException {
-								// don't need an expected output for these tests
-								return new TracingTestManifest(input);
-							}
-						});
-	}
+
 }

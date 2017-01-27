@@ -32,7 +32,7 @@ import org.semanticweb.elk.testing.TestInput;
  * @author Peter Skocovsky
  */
 public class ElkDiffObjectPropertyClassificationCorrectnessTest
-		extends DiffObjectPropertyClassificationCorrectnessTest {
+		extends BaseObjectPropertyClassificationCorrectnessTest {
 
 	static final String[] IGNORE_LIST = {};
 

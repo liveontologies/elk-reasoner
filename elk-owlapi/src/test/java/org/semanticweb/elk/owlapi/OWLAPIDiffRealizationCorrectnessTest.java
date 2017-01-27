@@ -27,7 +27,7 @@ import java.util.Arrays;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.DiffRealizationCorrectnessTest;
+import org.semanticweb.elk.reasoner.BaseRealizationCorrectnessTest;
 import org.semanticweb.elk.reasoner.InstanceTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
@@ -41,8 +41,8 @@ import org.semanticweb.elk.testing.TestInput;
  *         pavel.klinov@uni-ulm.de
  */
 @RunWith(PolySuite.class)
-public class OWLAPIDiffRealizationCorrectnessTest extends
-		DiffRealizationCorrectnessTest {
+public class OWLAPIDiffRealizationCorrectnessTest
+		extends BaseRealizationCorrectnessTest {
 
 	static final String[] IGNORE_LIST = {
 			"AssertionsPropertyRanges.owl",

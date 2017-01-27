@@ -27,7 +27,6 @@ import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,16 +40,15 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.SimpleManifestCreator;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils;
-import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestInput;
-import org.semanticweb.elk.testing.TestManifestWithOutput;
+import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.UrlTestInput;
-import org.semanticweb.elk.testing.VoidTestOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,9 +66,9 @@ public class TracingTest {
 	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(TracingTest.class);
 
-	protected final TracingTestManifest manifest;
+	protected final TestManifest<UrlTestInput> manifest;
 
-	public TracingTest(TracingTestManifest testManifest) {
+	public TracingTest(final TestManifest<UrlTestInput> testManifest) {
 		manifest = testManifest;
 	}
 
@@ -179,14 +177,8 @@ public class TracingTest {
 	public static Configuration getConfig()
 			throws URISyntaxException, IOException {
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION, TracingTest.class, "owl",
-				new TestManifestCreator<UrlTestInput, VoidTestOutput, VoidTestOutput>() {
-					@Override
-					public TestManifestWithOutput<UrlTestInput, VoidTestOutput, VoidTestOutput> create(
-							URL input, URL output) throws IOException {
-						// don't need an expected output for these tests
-						return new TracingTestManifest(input);
-					}
-				});
+				INPUT_DATA_LOCATION, TracingTest.class,
+				SimpleManifestCreator.INSTANCE, "owl");
 	}
+
 }

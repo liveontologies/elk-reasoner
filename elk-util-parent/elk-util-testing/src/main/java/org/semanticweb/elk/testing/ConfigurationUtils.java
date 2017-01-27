@@ -51,10 +51,15 @@ public class ConfigurationUtils {
 
 	/**
 	 * Loads configuration from files in the specified input directory. The
-	 * specified creator is used to create test manifests for each tuple of
-	 * files that have the same name without the file extension; one tuple
-	 * contains one file for each of the specified file name extensions in the
-	 * same order.
+	 * directory is traversed recursively. The specified creator is used to
+	 * create test manifests for each tuple of files, such that:
+	 * <ul>
+	 * <li/>these files have the same name without the file extension,
+	 * <li/>file at some position in the tuple has file extension that is at
+	 * this position in the specified tuple file extensions,
+	 * <li/>if file with some file extension is missing, {@code null} is at the
+	 * position of this extension.
+	 * </ul>
 	 * 
 	 * @param inputDir
 	 *            The input directory.
@@ -95,104 +100,56 @@ public class ConfigurationUtils {
 
 		// Create manifests for tuples of the same file names without extension.
 
-		List<String> files = everyNext(fileNameIters);
+		final List<Integer> minIndices = new ArrayList<Integer>(
+				fileExts.length);
+		boolean everyHasNext = true;
+		final List<String> files = everyNext(fileNameIters);
 		if (files == null) {
-			return new SimpleConfiguration<I, EO, AO>(manifests);
+			everyHasNext = false;
 		}
 
-		while (true) {
+		while (everyHasNext) {
 
-			final int nonMaxIndex = getNonMaxIndex(files,
-					new Comparator<String>() {
+			// Get indices of files with minimal name.
+			collectMinIndices(files, new Comparator<String>() {
 
-						@Override
-						public int compare(final String o1, final String o2) {
-							return FileUtils.dropExtension(o1)
-									.compareTo(FileUtils.dropExtension(o2));
-						}
-
-					});
-
-			if (nonMaxIndex < 0) {
-				// The files have the same name.
-
-				final List<URL> urls = new ArrayList<URL>(files.size());
-				for (final String file : files) {
-					urls.add(srcClass.getClassLoader().getResource(file));
+				@Override
+				public int compare(final String o1, final String o2) {
+					return FileUtils.dropExtension(o1)
+							.compareTo(FileUtils.dropExtension(o2));
 				}
 
-				final Collection<? extends TestManifestWithOutput<I, EO, AO>> manifs = creator
-						.createManifests(urls);
-				if (manifs != null) {
-					manifests.addAll(manifs);
-				}
+			}, minIndices);
 
-				files = everyNext(fileNameIters);
-				if (files == null) {
-					break;
-				}
+			// Create manifests from these files.
+			final List<URL> urls = new ArrayList<URL>(fileExts.length);
+			for (int i = 0; i < fileExts.length; i++) {
+				urls.add(null);
+			}
+			for (final Integer index : minIndices) {
+				urls.set(index, srcClass.getClassLoader()
+						.getResource(files.get(index)));
+			}
+			final Collection<? extends TestManifestWithOutput<I, EO, AO>> manifs = creator
+					.createManifests(urls);
+			if (manifs != null) {
+				manifests.addAll(manifs);
+			}
 
-			} else {
-				// The file on the index nonMaxIndex has smaller name.
-
-				final Iterator<String> iter = fileNameIters.get(nonMaxIndex);
+			// Advance iterators on the minimal indices.
+			for (final Integer index : minIndices) {
+				final Iterator<String> iter = fileNameIters.get(index);
 				if (!iter.hasNext()) {
+					everyHasNext = false;
 					break;
 				}
-				files.set(nonMaxIndex, iter.next());
-
+				// else
+				files.set(index, iter.next());
 			}
 
 		}
 
 		return new SimpleConfiguration<I, EO, AO>(manifests);
-	}
-
-	/**
-	 * Loads configuration from a set of files by passing both input and
-	 * expected output URLs to the test manifest creator
-	 * 
-	 * @param path
-	 * @param srcClass
-	 * @param inputFileExt
-	 * @param outputFileExt
-	 * @param creator
-	 * 
-	 * @return the loaded configuration
-	 * @throws IOException
-	 * @throws URISyntaxException
-	 */
-	public static <I extends TestInput, EO extends TestOutput, AO extends TestOutput> Configuration loadFileBasedTestConfiguration(
-			final String path, final Class<?> srcClass,
-			final String inputFileExt, final String outputFileExt,
-			final ManifestCreator<I, EO, AO> creator)
-			throws IOException, URISyntaxException {
-
-		return loadFileBasedTestConfiguration(path, srcClass, creator, inputFileExt, outputFileExt);
-
-	}
-
-	/**
-	 * In case there're no expected results
-	 * 
-	 * @param path
-	 * @param srcClass
-	 * @param inputFileExt
-	 * @param creator
-	 * 
-	 * @return the loaded test cofiguration
-	 * @throws IOException
-	 * @throws URISyntaxException
-	 */
-	public static <I extends TestInput, EO extends TestOutput, AO extends TestOutput> Configuration loadFileBasedTestConfiguration(
-			final String path, final Class<?> srcClass,
-			final String inputFileExt,
-			final ManifestCreator<I, EO, AO> creator)
-			throws IOException, URISyntaxException {
-
-		return loadFileBasedTestConfiguration(path, srcClass, creator,
-				inputFileExt);
-
 	}
 
 	/**
@@ -213,38 +170,44 @@ public class ConfigurationUtils {
 	}
 
 	/**
+	 * After this method successfully returns, {@code result} contains indices
+	 * of minimal elements from {@code list} according to {@code comparator}.
+	 * 
 	 * @param list
 	 * @param comparator
-	 * @return Index of the element that is not maximal, or {@code -1} if it
-	 *         does not exist.
+	 * @param result
 	 */
-	private static <T> int getNonMaxIndex(final List<? extends T> list,
-			final Comparator<? super T> comparator) {
+	private static <T> void collectMinIndices(final List<? extends T> list,
+			final Comparator<? super T> comparator,
+			final List<Integer> result) {
+
+		result.clear();
 
 		final Iterator<? extends T> iter = list.iterator();
 
 		if (!iter.hasNext()) {
-			return -1;
+			return;
 		}
 
-		final T first = iter.next();
+		T min = iter.next();
 		int index = 0;
+		result.add(index);
 		while (iter.hasNext()) {
 			final T current = iter.next();
 			index++;
-			final int cmp = comparator.compare(first, current);
-			if (cmp < 0) {
-				// first < current; first is not maximal, return its index
-				return 0;
-			} else if (cmp > 0) {
-				// first > current; current is not maximal, return its index
-				return index;
+			final int cmp = comparator.compare(min, current);
+			if (cmp > 0) {
+				// min > current; min is not minimal, reset result
+				min = current;
+				result.clear();
+				result.add(index);
+			} else if (cmp == 0) {
+				// min == current; current is minimal, add to result
+				result.add(index);
 			}
-			// else first == current; do nothing
+			// else min < current; do nothing
 		}
 
-		// all elements are the same
-		return -1;
 	}
 
 	/**
@@ -260,62 +223,6 @@ public class ConfigurationUtils {
 
 		public Collection<? extends TestManifestWithOutput<I, EO, AO>> createManifests(
 				List<URL> urls) throws IOException;
-
-	}
-
-	/**
-	 * Creates possibly multiple manifests from provided arguments.
-	 * 
-	 * @author Peter Skocovsky
-	 *
-	 * @param <I>
-	 * @param <EO>
-	 * @param <AO>
-	 */
-	public static abstract class MultiManifestCreator<I extends TestInput, EO extends TestOutput, AO extends TestOutput>
-			implements ManifestCreator<I, EO, AO> {
-
-		@Override
-		public Collection<? extends TestManifestWithOutput<I, EO, AO>> createManifests(
-				final List<URL> urls) throws IOException {
-			if (urls.isEmpty()) {
-				return Collections.emptyList();
-			}
-			// else
-			if (urls.size() < 2) {
-				return createManifests(urls.get(0), null);
-			}
-			// else
-			return createManifests(urls.get(0), urls.get(1));
-		}
-
-		public abstract Collection<? extends TestManifestWithOutput<I, EO, AO>> createManifests(
-				URL input, URL output) throws IOException;
-
-	}
-
-	/**
-	 * Creates single test manifest from provided arguments.
-	 * 
-	 * @author Pavel Klinov
-	 * 
-	 *         pavel.klinov@uni-ulm.de
-	 * @author Peter Skocovsky
-	 * @param <I>
-	 * @param <EO>
-	 * @param <AO>
-	 */
-	public static abstract class TestManifestCreator<I extends TestInput, EO extends TestOutput, AO extends TestOutput>
-			extends MultiManifestCreator<I, EO, AO> {
-
-		@Override
-		public Collection<? extends TestManifestWithOutput<I, EO, AO>> createManifests(
-				final URL input, final URL output) throws IOException {
-			return Collections.singleton(create(input, output));
-		}
-
-		public abstract TestManifestWithOutput<I, EO, AO> create(URL input,
-				URL output) throws IOException;
 
 	}
 

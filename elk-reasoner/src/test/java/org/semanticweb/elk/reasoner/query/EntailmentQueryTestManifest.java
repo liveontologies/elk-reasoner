@@ -22,18 +22,16 @@
 package org.semanticweb.elk.reasoner.query;
 
 import java.net.URL;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.semanticweb.elk.testing.TestResultComparisonException;
 
-public class EntailmentQueryTestManifest<A>
-		extends QueryTestManifest<Collection<A>, EntailmentQueryTestOutput<A>> {
+public class EntailmentQueryTestManifest<Q, A>
+		extends QueryTestManifest<Q, EntailmentQueryTestOutput<A>> {
 
-	public EntailmentQueryTestManifest(final URL input,
-			final Collection<A> query,
+	public EntailmentQueryTestManifest(final URL input, final Q query,
 			final EntailmentQueryTestOutput<A> expectedOutput) {
 		super(input, query, expectedOutput);
 	}

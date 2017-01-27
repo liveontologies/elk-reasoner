@@ -26,21 +26,18 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.reasoner.TaxonomyDiffManifest;
+import org.semanticweb.elk.reasoner.SimpleManifestCreator;
 import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.ConfigurationUtils;
-import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.elk.testing.UrlTestInput;
 
 /**
@@ -96,17 +93,8 @@ public abstract class BaseIncrementalClassificationCorrectnessTest<A> extends
 			throws URISyntaxException, IOException {
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION,
-				IncrementalClassificationCorrectnessTest.class, "owl",
-				"expected",
-				new TestManifestCreator<UrlTestInput, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>() {
-					@Override
-					public TestManifestWithOutput<UrlTestInput, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> create(
-							URL input, URL output) throws IOException {
-						// don't need an expected output for these tests
-						return new TaxonomyDiffManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>(
-								input, null);
-					}
-				});
+				IncrementalClassificationCorrectnessTest.class,
+				SimpleManifestCreator.INSTANCE, "owl");
 	}
 
 }

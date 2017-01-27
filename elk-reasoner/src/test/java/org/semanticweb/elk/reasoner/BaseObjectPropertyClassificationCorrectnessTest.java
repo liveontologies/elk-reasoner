@@ -22,9 +22,28 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.io.IOUtils;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
+import org.semanticweb.elk.owl.parsing.Owl2ParseException;
+import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
+import org.semanticweb.elk.reasoner.taxonomy.MockObjectPropertyTaxonomyLoader;
+import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestOutput;
+import org.semanticweb.elk.testing.PolySuite.Config;
+import org.semanticweb.elk.testing.PolySuite.Configuration;
+import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.elk.testing.UrlTestInput;
 
 /**
@@ -34,16 +53,63 @@ import org.semanticweb.elk.testing.UrlTestInput;
  * @author Peter Skocovsky
  */
 @RunWith(PolySuite.class)
-public abstract class BaseObjectPropertyClassificationCorrectnessTest<EO extends TestOutput>
-		extends
-		ReasoningCorrectnessTestWithInterrupts<UrlTestInput, EO, TaxonomyTestOutput<?>, ReasoningTestManifest<EO, TaxonomyTestOutput<?>>, ReasoningTestWithOutputAndInterruptsDelegate<TaxonomyTestOutput<?>>> {
+public abstract class BaseObjectPropertyClassificationCorrectnessTest extends
+		ReasoningCorrectnessTestWithInterrupts<UrlTestInput, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>, ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>, ReasoningTestWithOutputAndInterruptsDelegate<TaxonomyTestOutput<?>>> {
 
 	final static String INPUT_DATA_LOCATION = "property_classification_test_input";
 
 	public BaseObjectPropertyClassificationCorrectnessTest(
-			final ReasoningTestManifest<EO, TaxonomyTestOutput<?>> testManifest,
+			final ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> testManifest,
 			final ReasoningTestWithOutputAndInterruptsDelegate<TaxonomyTestOutput<?>> testDelegate) {
 		super(testManifest, testDelegate);
+	}
+
+	@Config
+	public static Configuration getConfig()
+			throws URISyntaxException, IOException {
+		return ConfigurationUtils.loadFileBasedTestConfiguration(
+				INPUT_DATA_LOCATION,
+				BaseObjectPropertyClassificationCorrectnessTest.class,
+				new ConfigurationUtils.ManifestCreator<UrlTestInput, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>() {
+					@Override
+					public Collection<? extends TestManifestWithOutput<UrlTestInput, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>> createManifests(
+							final List<URL> urls) throws IOException {
+
+						if (urls == null || urls.size() < 2) {
+							// Not enough inputs. Probably forgot something.
+							throw new IllegalArgumentException(
+									"Need at least 2 URL-s!");
+						}
+						if (urls.get(0) == null || urls.get(1) == null) {
+							// No inputs, no manifests.
+							return Collections.emptySet();
+						}
+
+						// input and expected output are OWL ontologies
+						final ElkObject.Factory objectFactory = new ElkObjectEntityRecyclingFactory();
+						InputStream stream = null;
+						try {
+							stream = urls.get(1).openStream();
+							final Taxonomy<ElkObjectProperty> expectedTaxonomy = MockObjectPropertyTaxonomyLoader
+									.load(objectFactory,
+											new Owl2FunctionalStyleParserFactory(
+													objectFactory)
+															.getParser(stream));
+
+							return Collections.singleton(
+									new TaxonomyDiffManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>(
+											urls.get(0),
+											new TaxonomyTestOutput<Taxonomy<ElkObjectProperty>>(
+													expectedTaxonomy)));
+
+						} catch (final Owl2ParseException e) {
+							throw new IOException(e);
+						} finally {
+							IOUtils.closeQuietly(stream);
+						}
+
+					}
+				}, "owl", "expected");
 	}
 
 }

@@ -26,7 +26,7 @@ import java.util.Arrays;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.DiffClassificationCorrectnessTest;
+import org.semanticweb.elk.reasoner.BaseClassificationCorrectnessTest;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
@@ -36,7 +36,7 @@ import org.semanticweb.elk.testing.TestInput;
 
 @RunWith(PolySuite.class)
 public class OWLAPIDiffClassificationCorrectnessTest
-		extends DiffClassificationCorrectnessTest {
+		extends BaseClassificationCorrectnessTest {
 
 	static final String[] IGNORE_LIST = { "DisjointSelf.owl",
 			"CompositionReflexivityComplex.owl" };

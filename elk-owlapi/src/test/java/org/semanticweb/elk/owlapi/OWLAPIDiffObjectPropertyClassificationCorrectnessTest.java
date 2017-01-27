@@ -26,7 +26,7 @@ import java.util.Arrays;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.reasoner.DiffObjectPropertyClassificationCorrectnessTest;
+import org.semanticweb.elk.reasoner.BaseObjectPropertyClassificationCorrectnessTest;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
@@ -39,7 +39,7 @@ import org.semanticweb.elk.testing.TestInput;
  */
 @RunWith(PolySuite.class)
 public class OWLAPIDiffObjectPropertyClassificationCorrectnessTest
-		extends DiffObjectPropertyClassificationCorrectnessTest {
+		extends BaseObjectPropertyClassificationCorrectnessTest {
 
 	static final String[] IGNORE_LIST = {};
 

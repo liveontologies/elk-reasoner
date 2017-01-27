@@ -26,6 +26,8 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.io.IOUtils;
@@ -33,7 +35,6 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.incremental.ElkIncrementalReasoningTestDelegate;
 import org.semanticweb.elk.testing.ConfigurationUtils;
-import org.semanticweb.elk.testing.ConfigurationUtils.MultiManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
@@ -43,8 +44,7 @@ import org.semanticweb.elk.testing.TestOutput;
 
 @RunWith(PolySuite.class)
 public abstract class ElkIncrementalClassExpressionQueryTest<O extends TestOutput>
-		extends
-		BaseIncrementalQueryTest<ElkClassExpression, ElkAxiom, O> {
+		extends BaseIncrementalQueryTest<ElkClassExpression, ElkAxiom, O> {
 
 	public ElkIncrementalClassExpressionQueryTest(
 			final TestManifest<QueryTestInput<ElkClassExpression>> manifest,
@@ -57,23 +57,30 @@ public abstract class ElkIncrementalClassExpressionQueryTest<O extends TestOutpu
 			throws IOException, URISyntaxException {
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION,
-				BaseIncrementalQueryTest.class, "owl",
-				"expected",
-				new MultiManifestCreator<QueryTestInput<ElkClassExpression>, TestOutput, TestOutput>() {
+				INPUT_DATA_LOCATION, BaseIncrementalQueryTest.class,
+				new ConfigurationUtils.ManifestCreator<QueryTestInput<ElkClassExpression>, TestOutput, TestOutput>() {
 
 					@Override
 					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, TestOutput, TestOutput>> createManifests(
-							final URL input, final URL output)
-							throws IOException {
+							final List<URL> urls) throws IOException {
+
+						if (urls == null || urls.size() < 2) {
+							// Not enough inputs. Probably forgot something.
+							throw new IllegalArgumentException(
+									"Need at least 2 URL-s!");
+						}
+						if (urls.get(0) == null || urls.get(1) == null) {
+							// No inputs, no manifests.
+							return Collections.emptySet();
+						}
 
 						InputStream outputIS = null;
 						try {
-							outputIS = output.openStream();
+							outputIS = urls.get(1).openStream();
 
 							// don't need an expected output for these tests
 							return ElkExpectedTestOutputLoader.load(outputIS)
-									.getNoOutputManifests(input);
+									.getNoOutputManifests(urls.get(0));
 
 						} finally {
 							IOUtils.closeQuietly(outputIS);
@@ -81,7 +88,7 @@ public abstract class ElkIncrementalClassExpressionQueryTest<O extends TestOutpu
 
 					}
 
-				});
+				}, "owl", "expected");
 
 	}
 

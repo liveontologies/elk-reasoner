@@ -22,39 +22,27 @@
 package org.semanticweb.elk.owlapi.proofs;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.io.FileUtils;
-import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owlapi.ElkProver;
+import org.semanticweb.elk.owlapi.EntailmentTestManifestCreator;
 import org.semanticweb.elk.owlapi.OwlApiReasoningTestDelegate;
-import org.semanticweb.elk.owlapi.TestOWLManager;
 import org.semanticweb.elk.reasoner.BaseReasoningCorrectnessTest;
 import org.semanticweb.elk.reasoner.query.QueryTestInput;
-import org.semanticweb.elk.reasoner.query.QueryTestManifest;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.elk.testing.VoidTestOutput;
 import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 @RunWith(PolySuite.class)
 public class EntailmentProofCompletenessTest extends
@@ -116,55 +104,13 @@ public class EntailmentProofCompletenessTest extends
 
 	public static final String ENTAILMENT_QUERY_INPUT_DIR = "entailment_query_test_input";
 
-	private static final ConfigurationUtils.ManifestCreator<QueryTestInput<OWLAxiom>, VoidTestOutput, VoidTestOutput> ENTAILMENT_QUERY_TEST_MANIFEST_CREATOR_ = new ConfigurationUtils.ManifestCreator<QueryTestInput<OWLAxiom>, VoidTestOutput, VoidTestOutput>() {
-
-		@Override
-		public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLAxiom>, VoidTestOutput, VoidTestOutput>> createManifests(
-				final List<URL> urls) throws IOException {
-
-			if (urls.size() < 2) {
-				throw new IllegalArgumentException("Need at least 2 URLs!");
-			}
-
-			final OWLOntologyManager manager = TestOWLManager
-					.createOWLOntologyManager();
-
-			final URL input = urls.get(0);
-			InputStream entailedIS = null;
-			try {
-				entailedIS = urls.get(1).openStream();
-
-				final Set<OWLLogicalAxiom> query = manager
-						.loadOntologyFromOntologyDocument(entailedIS)
-						.getLogicalAxioms();
-
-				final Collection<QueryTestManifest<OWLAxiom, VoidTestOutput>> manifests = new ArrayList<QueryTestManifest<OWLAxiom, VoidTestOutput>>(
-						query.size());
-				for (final OWLAxiom axiom : query) {
-					manifests
-							.add(new QueryTestManifest<OWLAxiom, VoidTestOutput>(
-									input, axiom, null));
-				}
-
-				return manifests;
-
-			} catch (final OWLOntologyCreationException e) {
-				throw new IOException(e);
-			} finally {
-				IOUtils.closeQuietly(entailedIS);
-			}
-
-		}
-
-	};
-
 	@Config
 	public static Configuration getConfig()
 			throws IOException, URISyntaxException {
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				ENTAILMENT_QUERY_INPUT_DIR, BaseReasoningCorrectnessTest.class,
-				ENTAILMENT_QUERY_TEST_MANIFEST_CREATOR_, "owl", "entailed");
+				EntailmentTestManifestCreator.INSTANCE, "owl", "entailed");
 
 	}
 

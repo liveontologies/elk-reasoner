@@ -34,8 +34,8 @@ import org.semanticweb.elk.testing.TestInput;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ElkDiffRealizationCorrectnessTest extends
-		DiffRealizationCorrectnessTest {
+public class ElkDiffRealizationCorrectnessTest
+		extends BaseRealizationCorrectnessTest {
 
 	static final String[] IGNORE_LIST = {
 			"AssertionsPropertyRanges.owl",

@@ -381,7 +381,7 @@ public class ElkExpectedTestOutputLoader {
 		return result;
 	}
 
-	public Collection<EntailmentQueryTestManifest<ElkAxiom>> getEntailmentManifests(
+	public Collection<EntailmentQueryTestManifest<Collection<ElkAxiom>, ElkAxiom>> getEntailmentManifests(
 			final URL input) {
 
 		final ElkObject.Factory elkFactory = new ElkObjectBaseFactory();
@@ -512,8 +512,10 @@ public class ElkExpectedTestOutputLoader {
 		}
 		// else
 
-		return Collections.singleton(new EntailmentQueryTestManifest<ElkAxiom>(
-				input, query, new EntailmentQueryTestOutput<ElkAxiom>(output)));
+		return Collections.singleton(
+				new EntailmentQueryTestManifest<Collection<ElkAxiom>, ElkAxiom>(
+						input, query,
+						new EntailmentQueryTestOutput<ElkAxiom>(output)));
 	}
 
 }

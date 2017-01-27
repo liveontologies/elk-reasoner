@@ -25,7 +25,6 @@ import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -42,20 +41,19 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.SimpleManifestCreator;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.tracing.ComprehensiveSubsumptionTracingTests;
 import org.semanticweb.elk.reasoner.tracing.TracingTestManifest;
 import org.semanticweb.elk.reasoner.tracing.TracingTestVisitor;
 import org.semanticweb.elk.reasoner.tracing.TracingTests;
 import org.semanticweb.elk.testing.ConfigurationUtils;
-import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestInput;
-import org.semanticweb.elk.testing.TestManifestWithOutput;
+import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.UrlTestInput;
-import org.semanticweb.elk.testing.VoidTestOutput;
 
 /**
  * Tests tracing and axiom binding for all atomic subsumption inferences in all
@@ -76,9 +74,9 @@ public class ProofTest {
 		Arrays.sort(IGNORE_LIST);
 	}
 
-	protected final TracingTestManifest manifest;
+	protected final TestManifest<UrlTestInput> manifest;
 
-	public ProofTest(TracingTestManifest testManifest) {
+	public ProofTest(final TestManifest<UrlTestInput> testManifest) {
 		manifest = testManifest;
 	}
 
@@ -155,15 +153,8 @@ public class ProofTest {
 	public static Configuration getConfig()
 			throws URISyntaxException, IOException {
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION, TracingTestManifest.class, "owl",
-				new TestManifestCreator<UrlTestInput, VoidTestOutput, VoidTestOutput>() {
-					@Override
-					public TestManifestWithOutput<UrlTestInput, VoidTestOutput, VoidTestOutput> create(
-							URL input, URL output) throws IOException {
-						// don't need an expected output for these tests
-						return new TracingTestManifest(input);
-					}
-				});
+				INPUT_DATA_LOCATION, TracingTestManifest.class,
+				SimpleManifestCreator.INSTANCE, "owl");
 	}
 
 }
