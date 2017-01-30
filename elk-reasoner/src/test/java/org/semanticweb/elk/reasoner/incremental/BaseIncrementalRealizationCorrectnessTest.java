@@ -52,13 +52,13 @@ import org.semanticweb.elk.testing.UrlTestInput;
  */
 @RunWith(PolySuite.class)
 public abstract class BaseIncrementalRealizationCorrectnessTest<A> extends
-		IncrementalReasoningCorrectnessTestWithInterrupts<UrlTestInput, A, InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>, IncrementalReasoningTestWithInterruptsDelegate<A, InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>>> {
+		IncrementalReasoningCorrectnessTestWithInterrupts<UrlTestInput, A, InstanceTaxonomyTestOutput<?>, IncrementalReasoningTestWithInterruptsDelegate<A, InstanceTaxonomyTestOutput<?>>> {
 
 	final static String INPUT_DATA_LOCATION = "realization_test_input";
 
 	public BaseIncrementalRealizationCorrectnessTest(
 			final TestManifest<UrlTestInput> testManifest,
-			final IncrementalReasoningTestWithInterruptsDelegate<A, InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>> testDelegate) {
+			final IncrementalReasoningTestWithInterruptsDelegate<A, InstanceTaxonomyTestOutput<?>> testDelegate) {
 		super(testManifest, testDelegate);
 	}
 

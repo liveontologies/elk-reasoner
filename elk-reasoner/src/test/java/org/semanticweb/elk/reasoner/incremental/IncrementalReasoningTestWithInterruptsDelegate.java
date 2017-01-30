@@ -32,13 +32,11 @@ import org.semanticweb.elk.testing.TestOutput;
  * @param <A>
  *            The type of axioms that are added or removed from the input
  *            ontology.
- * @param <EO>
- *            The type of expected output.
- * @param <AO>
- *            The type of actual output.
+ * @param <O>
+ *            The type of test output.
  */
-public interface IncrementalReasoningTestWithInterruptsDelegate<A, EO extends TestOutput, AO extends TestOutput>
-		extends IncrementalReasoningTestDelegate<A, EO, AO>,
-		ReasoningTestWithInterruptsDelegate<AO> {
+public interface IncrementalReasoningTestWithInterruptsDelegate<A, O extends TestOutput>
+		extends IncrementalReasoningTestDelegate<A, O>,
+		ReasoningTestWithInterruptsDelegate<O> {
 
 }

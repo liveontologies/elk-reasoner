@@ -36,13 +36,11 @@ import org.slf4j.Logger;
  * @param <A>
  *            The type of axioms that are added or removed from the input
  *            ontology.
- * @param <EO>
- *            The type of expected output.
- * @param <AO>
- *            The type of actual output.
+ * @param <O>
+ *            The type of test output.
  */
-public interface IncrementalReasoningTestDelegate<A, EO extends TestOutput, AO extends TestOutput>
-		extends ReasoningTestDelegate<AO> {
+public interface IncrementalReasoningTestDelegate<A, O extends TestOutput>
+		extends ReasoningTestDelegate<O> {
 
 	/**
 	 * Called at the beginning of the test. Loads test input and selects axioms
@@ -79,6 +77,6 @@ public interface IncrementalReasoningTestDelegate<A, EO extends TestOutput, AO e
 	 * @return the expected output.
 	 * @throws Exception
 	 */
-	EO getExpectedOutput() throws Exception;
+	O getExpectedOutput() throws Exception;
 
 }

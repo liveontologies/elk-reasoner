@@ -38,7 +38,7 @@ import org.semanticweb.elk.testing.TestOutput;
  *            Type of the test output.
  */
 public class QueryTestManifest<Q, O extends TestOutput>
-		extends BasicTestManifest<QueryTestInput<Q>, O, O> {
+		extends BasicTestManifest<QueryTestInput<Q>, O> {
 
 	public QueryTestManifest(final String testName, final URL input,
 			final Q query, final O expectedOutput) {

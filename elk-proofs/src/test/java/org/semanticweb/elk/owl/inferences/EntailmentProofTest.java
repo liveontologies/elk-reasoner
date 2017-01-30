@@ -70,7 +70,7 @@ public class EntailmentProofTest
 	public static final double INTERRUPTION_CHANCE = 0.003;
 
 	public EntailmentProofTest(
-			final TestManifestWithOutput<QueryTestInput<ElkAxiom>, VoidTestOutput, VoidTestOutput> manifest) {
+			final TestManifestWithOutput<QueryTestInput<ElkAxiom>, VoidTestOutput> manifest) {
 		super(manifest, new ElkReasoningTestDelegate<VoidTestOutput>(manifest,
 				INTERRUPTION_CHANCE) {
 
@@ -91,10 +91,10 @@ public class EntailmentProofTest
 
 	public static final String ENTAILMENT_QUERY_INPUT_DIR = "entailment_query_test_input";
 
-	private static final ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkAxiom>, VoidTestOutput, VoidTestOutput>> ENTAILMENT_QUERY_TEST_MANIFEST_CREATOR_ = new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkAxiom>, VoidTestOutput, VoidTestOutput>>() {
+	private static final ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkAxiom>, VoidTestOutput>> ENTAILMENT_QUERY_TEST_MANIFEST_CREATOR_ = new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkAxiom>, VoidTestOutput>>() {
 
 		@Override
-		public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkAxiom>, VoidTestOutput, VoidTestOutput>> createManifests(
+		public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkAxiom>, VoidTestOutput>> createManifests(
 				final List<URL> urls) throws IOException {
 
 			if (urls == null || urls.size() < 2) {

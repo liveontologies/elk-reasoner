@@ -44,12 +44,12 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 public class EntailmentTestManifestCreator implements
-		ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>>> {
+		ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>>> {
 
 	public static final EntailmentTestManifestCreator INSTANCE = new EntailmentTestManifestCreator();
 
 	@Override
-	public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>>> createManifests(
+	public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>>> createManifests(
 			final List<URL> urls) throws IOException {
 
 		final Collection<EntailmentQueryTestManifest<OWLAxiom, OWLAxiom>> manifests = new ArrayList<EntailmentQueryTestManifest<OWLAxiom, OWLAxiom>>();

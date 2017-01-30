@@ -48,7 +48,7 @@ public class OWLAPIDiffObjectPropertyClassificationCorrectnessTest
 	}
 
 	public OWLAPIDiffObjectPropertyClassificationCorrectnessTest(
-			final ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> testManifest) {
+			final ReasoningTestManifest<TaxonomyTestOutput<?>> testManifest) {
 		super(testManifest,
 				new OwlApiReasoningTestDelegate<TaxonomyTestOutput<?>>(
 						testManifest) {

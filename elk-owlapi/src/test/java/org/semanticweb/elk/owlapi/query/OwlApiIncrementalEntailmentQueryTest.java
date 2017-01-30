@@ -38,18 +38,17 @@ import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 
 @RunWith(PolySuite.class)
-public class OwlApiIncrementalEntailmentQueryTest<O extends TestOutput> extends
+public class OwlApiIncrementalEntailmentQueryTest extends
 		BaseIncrementalQueryTest<OWLAxiom, OWLAxiom, EntailmentQueryTestOutput<OWLAxiom>> {
 
 	public OwlApiIncrementalEntailmentQueryTest(
 			final TestManifest<QueryTestInput<OWLAxiom>> manifest) {
 		super(manifest,
-				new OwlApiIncrementalReasoningTestDelegate<EntailmentQueryTestOutput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>>(
+				new OwlApiIncrementalReasoningTestDelegate<EntailmentQueryTestOutput<OWLAxiom>>(
 						manifest) {
 
 					@Override

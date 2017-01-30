@@ -42,7 +42,7 @@ public class ElkIncrementalEntailmentQueryTest extends
 	public ElkIncrementalEntailmentQueryTest(
 			final TestManifest<QueryTestInput<Collection<ElkAxiom>>> manifest) {
 		super(manifest,
-				new ElkIncrementalReasoningTestDelegate<EntailmentQueryTestOutput<ElkAxiom>, EntailmentQueryTestOutput<ElkAxiom>>(
+				new ElkIncrementalReasoningTestDelegate<EntailmentQueryTestOutput<ElkAxiom>>(
 						manifest) {
 
 					@Override

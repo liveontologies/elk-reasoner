@@ -67,7 +67,7 @@ public class OwlApiClassExpressionSubClassesQueryTest extends
 	}
 
 	public OwlApiClassExpressionSubClassesQueryTest(
-			final TestManifestWithOutput<QueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>, RelatedEntitiesTestOutput<OWLClass>> manifest) {
+			final TestManifestWithOutput<QueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>> manifest) {
 		super(manifest,
 				new OwlApiReasoningTestDelegate<RelatedEntitiesTestOutput<OWLClass>>(
 						manifest) {
@@ -96,10 +96,10 @@ public class OwlApiClassExpressionSubClassesQueryTest extends
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION, BaseQueryTest.class,
-				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>, RelatedEntitiesTestOutput<OWLClass>>>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>>>() {
 
 					@Override
-					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>, RelatedEntitiesTestOutput<OWLClass>>> createManifests(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>>> createManifests(
 							final List<URL> urls) throws IOException {
 
 						if (urls == null || urls.size() < 2) {

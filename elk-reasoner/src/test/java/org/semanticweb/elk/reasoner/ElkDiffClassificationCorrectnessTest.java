@@ -43,7 +43,7 @@ public class ElkDiffClassificationCorrectnessTest
 	}
 
 	public ElkDiffClassificationCorrectnessTest(
-			final ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> testManifest) {
+			final ReasoningTestManifest<TaxonomyTestOutput<?>> testManifest) {
 		super(testManifest, new ElkReasoningTestDelegate<TaxonomyTestOutput<?>>(
 				testManifest) {
 

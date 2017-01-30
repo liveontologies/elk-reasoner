@@ -42,7 +42,7 @@ public class OWLAPIIncrementalClassificationCorrectnessTest
 	public OWLAPIIncrementalClassificationCorrectnessTest(
 			final TestManifest<UrlTestInput> testManifest) {
 		super(testManifest,
-				new OwlApiIncrementalReasoningTestDelegate<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>(
+				new OwlApiIncrementalReasoningTestDelegate<TaxonomyTestOutput<?>>(
 						testManifest) {
 
 					@Override

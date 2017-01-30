@@ -57,12 +57,12 @@ import org.semanticweb.elk.testing.UrlTestInput;
  */
 @RunWith(PolySuite.class)
 public abstract class BaseRealizationCorrectnessTest extends
-		ReasoningCorrectnessTestWithInterrupts<UrlTestInput, InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>, ReasoningTestManifest<InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>>, ReasoningTestWithOutputAndInterruptsDelegate<InstanceTaxonomyTestOutput<?>>> {
+		ReasoningCorrectnessTestWithInterrupts<UrlTestInput, InstanceTaxonomyTestOutput<?>, ReasoningTestManifest<InstanceTaxonomyTestOutput<?>>, ReasoningTestWithOutputAndInterruptsDelegate<InstanceTaxonomyTestOutput<?>>> {
 
 	final static String INPUT_DATA_LOCATION = "realization_test_input";
 
 	public BaseRealizationCorrectnessTest(
-			final ReasoningTestManifest<InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>> testManifest,
+			final ReasoningTestManifest<InstanceTaxonomyTestOutput<?>> testManifest,
 			final ReasoningTestWithOutputAndInterruptsDelegate<InstanceTaxonomyTestOutput<?>> testDelegate) {
 		super(testManifest, testDelegate);
 	}
@@ -72,9 +72,9 @@ public abstract class BaseRealizationCorrectnessTest extends
 			throws URISyntaxException, IOException {
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION, BaseRealizationCorrectnessTest.class,
-				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<UrlTestInput, InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>>>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<UrlTestInput, InstanceTaxonomyTestOutput<?>>>() {
 					@Override
-					public Collection<? extends TestManifestWithOutput<UrlTestInput, InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>>> createManifests(
+					public Collection<? extends TestManifestWithOutput<UrlTestInput, InstanceTaxonomyTestOutput<?>>> createManifests(
 							final List<URL> urls) throws IOException {
 
 						if (urls == null || urls.size() < 2) {
@@ -99,7 +99,7 @@ public abstract class BaseRealizationCorrectnessTest extends
 															.getParser(stream));
 
 							return Collections.singleton(
-									new TaxonomyDiffManifest<InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>>(
+									new TaxonomyDiffManifest<InstanceTaxonomyTestOutput<?>>(
 											urls.get(0),
 											new InstanceTaxonomyTestOutput<InstanceTaxonomy<ElkClass, ElkNamedIndividual>>(
 													expectedTaxonomy)));

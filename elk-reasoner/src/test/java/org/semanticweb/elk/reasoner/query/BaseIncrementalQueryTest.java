@@ -31,13 +31,13 @@ import org.semanticweb.elk.testing.TestOutput;
 
 public abstract class BaseIncrementalQueryTest<Q, A, O extends TestOutput>
 		extends
-		IncrementalReasoningCorrectnessTestWithInterrupts<QueryTestInput<Q>, A, O, O, IncrementalReasoningTestWithInterruptsDelegate<A, O, O>> {
+		IncrementalReasoningCorrectnessTestWithInterrupts<QueryTestInput<Q>, A, O, IncrementalReasoningTestWithInterruptsDelegate<A, O>> {
 
 	public final static String INPUT_DATA_LOCATION = "query_test_input";
 
 	public BaseIncrementalQueryTest(
 			final TestManifest<QueryTestInput<Q>> testManifest,
-			final IncrementalReasoningTestWithInterruptsDelegate<A, O, O> testDelegate) {
+			final IncrementalReasoningTestWithInterruptsDelegate<A, O> testDelegate) {
 		super(testManifest, testDelegate);
 	}
 

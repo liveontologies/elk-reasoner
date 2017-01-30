@@ -44,7 +44,6 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.SimpleManifestCreator;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.tracing.ComprehensiveSubsumptionTracingTests;
-import org.semanticweb.elk.reasoner.tracing.TracingTestManifest;
 import org.semanticweb.elk.reasoner.tracing.TracingTestVisitor;
 import org.semanticweb.elk.reasoner.tracing.TracingTests;
 import org.semanticweb.elk.testing.ConfigurationUtils;
@@ -153,7 +152,7 @@ public class ProofTest {
 	public static Configuration getConfig()
 			throws URISyntaxException, IOException {
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION, TracingTestManifest.class,
+				INPUT_DATA_LOCATION, SimpleManifestCreator.class,
 				SimpleManifestCreator.INSTANCE, "owl");
 	}
 

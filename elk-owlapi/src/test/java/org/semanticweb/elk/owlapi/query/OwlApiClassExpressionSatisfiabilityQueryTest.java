@@ -66,7 +66,7 @@ public class OwlApiClassExpressionSatisfiabilityQueryTest
 	}
 
 	public OwlApiClassExpressionSatisfiabilityQueryTest(
-			final TestManifestWithOutput<QueryTestInput<OWLClassExpression>, SatisfiabilityTestOutput, SatisfiabilityTestOutput> manifest) {
+			final TestManifestWithOutput<QueryTestInput<OWLClassExpression>, SatisfiabilityTestOutput> manifest) {
 		super(manifest,
 				new OwlApiReasoningTestDelegate<SatisfiabilityTestOutput>(
 						manifest) {
@@ -93,10 +93,10 @@ public class OwlApiClassExpressionSatisfiabilityQueryTest
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION, BaseQueryTest.class,
-				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLClassExpression>, SatisfiabilityTestOutput, SatisfiabilityTestOutput>>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLClassExpression>, SatisfiabilityTestOutput>>() {
 
 					@Override
-					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, SatisfiabilityTestOutput, SatisfiabilityTestOutput>> createManifests(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, SatisfiabilityTestOutput>> createManifests(
 							final List<URL> urls) throws IOException {
 
 						if (urls == null || urls.size() < 2) {

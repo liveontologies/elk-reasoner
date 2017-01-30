@@ -54,7 +54,7 @@ public class OWLAPIDiffRealizationCorrectnessTest
 	}
 
 	public OWLAPIDiffRealizationCorrectnessTest(
-			final ReasoningTestManifest<InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>> testManifest) {
+			final ReasoningTestManifest<InstanceTaxonomyTestOutput<?>> testManifest) {
 		super(testManifest,
 				new OwlApiReasoningTestDelegate<InstanceTaxonomyTestOutput<?>>(
 						testManifest) {

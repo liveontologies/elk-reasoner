@@ -33,12 +33,12 @@ import org.semanticweb.elk.testing.UrlTestInput;
 import org.semanticweb.elk.testing.VoidTestOutput;
 
 public class SimpleManifestCreator implements
-		ManifestCreator<TestManifestWithOutput<UrlTestInput, VoidTestOutput, VoidTestOutput>> {
+		ManifestCreator<TestManifestWithOutput<UrlTestInput, VoidTestOutput>> {
 
 	public static final SimpleManifestCreator INSTANCE = new SimpleManifestCreator();
 
 	@Override
-	public Collection<? extends TestManifestWithOutput<UrlTestInput, VoidTestOutput, VoidTestOutput>> createManifests(
+	public Collection<? extends TestManifestWithOutput<UrlTestInput, VoidTestOutput>> createManifests(
 			final List<URL> urls) throws IOException {
 		if (urls == null || urls.isEmpty()) {
 			// Not enough inputs. Something was probably forgotten.
@@ -49,7 +49,7 @@ public class SimpleManifestCreator implements
 			return Collections.emptySet();
 		}
 		return Collections.singleton(
-				new ReasoningTestManifest<VoidTestOutput, VoidTestOutput>(
+				new ReasoningTestManifest<VoidTestOutput>(
 						urls.get(0), null));
 	}
 

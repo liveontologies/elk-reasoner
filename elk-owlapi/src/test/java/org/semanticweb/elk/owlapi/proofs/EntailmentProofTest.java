@@ -62,7 +62,7 @@ public class EntailmentProofTest
 	public static final double INTERRUPTION_CHANCE = 0.003;
 
 	public EntailmentProofTest(
-			final TestManifestWithOutput<QueryTestInput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>> manifest) {
+			final TestManifestWithOutput<QueryTestInput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>> manifest) {
 		super(manifest,
 				new OwlApiReasoningTestDelegate<EntailmentQueryTestOutput<OWLAxiom>>(
 						manifest, INTERRUPTION_CHANCE) {

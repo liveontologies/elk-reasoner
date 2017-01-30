@@ -34,7 +34,7 @@ public class ElkIncrementalClassExpressionSatisfiabilityQueryTest extends
 	public ElkIncrementalClassExpressionSatisfiabilityQueryTest(
 			final TestManifest<QueryTestInput<ElkClassExpression>> manifest) {
 		super(manifest,
-				new ElkIncrementalReasoningTestDelegate<SatisfiabilityTestOutput, SatisfiabilityTestOutput>(
+				new ElkIncrementalReasoningTestDelegate<SatisfiabilityTestOutput>(
 						manifest) {
 
 					@Override

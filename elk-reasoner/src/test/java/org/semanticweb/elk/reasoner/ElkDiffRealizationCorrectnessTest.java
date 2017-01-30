@@ -47,7 +47,7 @@ public class ElkDiffRealizationCorrectnessTest
 	}
 
 	public ElkDiffRealizationCorrectnessTest(
-			final ReasoningTestManifest<InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>> testManifest) {
+			final ReasoningTestManifest<InstanceTaxonomyTestOutput<?>> testManifest) {
 		super(testManifest,
 				new ElkReasoningTestDelegate<InstanceTaxonomyTestOutput<?>>(
 						testManifest) {

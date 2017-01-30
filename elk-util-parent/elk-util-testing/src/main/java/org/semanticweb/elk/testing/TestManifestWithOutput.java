@@ -23,22 +23,32 @@
 package org.semanticweb.elk.testing;
 
 /**
- * The base interface for a test instance which defines:
- * - the input
- * - the expected output
- * - the method of comparison
+ * The base interface for a test instance which defines the input, the expected
+ * output and the method of comparison.
  * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
- * @param <I> 
- * @param <EO> 
- * @param <AO> 
- *
+ *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
+ * @param <I>
+ *            The type of test input.
+ * @param <O>
+ *            The type of test output.
  */
-public interface TestManifestWithOutput<I extends TestInput, EO extends TestOutput, AO extends TestOutput>
+public interface TestManifestWithOutput<I extends TestInput, O extends TestOutput>
 		extends TestManifest<I> {
 
-	public EO getExpectedOutput();
-	public void compare(AO actualOutput) throws TestResultComparisonException;
+	/**
+	 * @return The expected output.
+	 */
+	public O getExpectedOutput();
+
+	/**
+	 * Compares {@link #getExpectedOutput()} and the provided actual output.
+	 * 
+	 * @param actualOutput
+	 * @throws TestResultComparisonException
+	 */
+	public void compare(O actualOutput) throws TestResultComparisonException;
+
 }

@@ -43,8 +43,8 @@ import org.slf4j.LoggerFactory;
  * @author Peter Skocovsky
  */
 @RunWith(PolySuite.class)
-public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInput, A, EO extends TestOutput, AO extends TestOutput, TD extends IncrementalReasoningTestDelegate<A, EO, AO>>
-		extends BaseReasoningCorrectnessTest<I, AO, TestManifest<I>, TD> {
+public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInput, A, O extends TestOutput, TD extends IncrementalReasoningTestDelegate<A, O>>
+		extends BaseReasoningCorrectnessTest<I, O, TestManifest<I>, TD> {
 
 	// logger for this class
 	protected static final Logger LOGGER_ = LoggerFactory
@@ -159,7 +159,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInpu
 		}
 	}
 
-	protected abstract void correctnessCheck(AO actualOutput, EO expectedOutput)
+	protected abstract void correctnessCheck(O actualOutput, O expectedOutput)
 			throws Exception;
 
 }

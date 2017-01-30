@@ -31,8 +31,8 @@ import org.semanticweb.elk.testing.TestOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class IncrementalReasoningCorrectnessTestWithInterrupts<I extends TestInput, A, EO extends TestOutput, AO extends TestOutput, TD extends IncrementalReasoningTestWithInterruptsDelegate<A, EO, AO>>
-		extends BaseIncrementalReasoningCorrectnessTest<I, A, EO, AO, TD> {
+public abstract class IncrementalReasoningCorrectnessTestWithInterrupts<I extends TestInput, A, O extends TestOutput, TD extends IncrementalReasoningTestWithInterruptsDelegate<A, O>>
+		extends BaseIncrementalReasoningCorrectnessTest<I, A, O, TD> {
 
 	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IncrementalReasoningCorrectnessTestWithInterrupts.class);
@@ -73,7 +73,7 @@ public abstract class IncrementalReasoningCorrectnessTestWithInterrupts<I extend
 			}
 			// else
 			LOGGER_.debug("partial check");
-			AO actualOutput;
+			O actualOutput;
 			try {
 				actualOutput = getDelegate().getActualOutput();
 			} catch (final Exception e) {
@@ -89,7 +89,7 @@ public abstract class IncrementalReasoningCorrectnessTestWithInterrupts<I extend
 		@Override
 		public void finalCheck() throws Exception {
 			LOGGER_.debug("complete check");
-			AO actualOutput;
+			O actualOutput;
 			while (true) {
 				try {
 					actualOutput = getDelegate().getActualOutput();

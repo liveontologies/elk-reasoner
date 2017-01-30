@@ -42,7 +42,7 @@ public class IncrementalClassificationCorrectnessTest
 	public IncrementalClassificationCorrectnessTest(
 			final TestManifest<UrlTestInput> testManifest) {
 		super(testManifest,
-				new ElkIncrementalReasoningTestDelegate<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>(
+				new ElkIncrementalReasoningTestDelegate<TaxonomyTestOutput<?>>(
 						testManifest) {
 
 					@Override

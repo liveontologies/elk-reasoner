@@ -56,12 +56,12 @@ import org.semanticweb.elk.testing.UrlTestInput;
  */
 @RunWith(PolySuite.class)
 public abstract class BaseClassificationCorrectnessTest extends
-		ReasoningCorrectnessTestWithInterrupts<UrlTestInput, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>, ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>, ReasoningTestWithOutputAndInterruptsDelegate<TaxonomyTestOutput<?>>> {
+		ReasoningCorrectnessTestWithInterrupts<UrlTestInput, TaxonomyTestOutput<?>, ReasoningTestManifest<TaxonomyTestOutput<?>>, ReasoningTestWithOutputAndInterruptsDelegate<TaxonomyTestOutput<?>>> {
 
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
 
 	public BaseClassificationCorrectnessTest(
-			final ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> testManifest,
+			final ReasoningTestManifest<TaxonomyTestOutput<?>> testManifest,
 			final ReasoningTestWithOutputAndInterruptsDelegate<TaxonomyTestOutput<?>> testDelegate) {
 		super(testManifest, testDelegate);
 	}
@@ -71,9 +71,9 @@ public abstract class BaseClassificationCorrectnessTest extends
 			throws URISyntaxException, IOException {
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION, BaseClassificationCorrectnessTest.class,
-				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<UrlTestInput, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<UrlTestInput, TaxonomyTestOutput<?>>>() {
 					@Override
-					public Collection<? extends TestManifestWithOutput<UrlTestInput, TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>> createManifests(
+					public Collection<? extends TestManifestWithOutput<UrlTestInput, TaxonomyTestOutput<?>>> createManifests(
 							final List<URL> urls) throws IOException {
 
 						if (urls == null || urls.size() < 2) {
@@ -98,7 +98,7 @@ public abstract class BaseClassificationCorrectnessTest extends
 															.getParser(stream));
 
 							return Collections.singleton(
-									new TaxonomyDiffManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>>(
+									new TaxonomyDiffManifest<TaxonomyTestOutput<?>>(
 											urls.get(0),
 											new TaxonomyTestOutput<Taxonomy<ElkClass>>(
 													expectedTaxonomy)));

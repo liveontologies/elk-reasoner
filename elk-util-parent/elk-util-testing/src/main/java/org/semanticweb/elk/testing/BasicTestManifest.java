@@ -28,18 +28,17 @@ package org.semanticweb.elk.testing;
  *         pavel.klinov@uni-ulm.de
  * @author Peter Skocovsky
  * @param <I>
- * @param <EO>
- * @param <AO>
+ * @param <O>
  * 
  */
-public class BasicTestManifest<I extends TestInput, EO extends TestOutput, AO extends TestOutput>
-		implements TestManifestWithOutput<I, EO, AO> {
+public class BasicTestManifest<I extends TestInput, O extends TestOutput>
+		implements TestManifestWithOutput<I, O> {
 
 	private final String name;
 	private final I input;
-	private final EO expOutput;
+	private final O expOutput;
 
-	public BasicTestManifest(String name, I input, EO expOutput) {
+	public BasicTestManifest(String name, I input, O expOutput) {
 		this.name = name;
 		this.input = input;
 		this.expOutput = expOutput;
@@ -56,7 +55,7 @@ public class BasicTestManifest<I extends TestInput, EO extends TestOutput, AO ex
 	}
 
 	@Override
-	public EO getExpectedOutput() {
+	public O getExpectedOutput() {
 		return expOutput;
 	}
 
@@ -67,7 +66,7 @@ public class BasicTestManifest<I extends TestInput, EO extends TestOutput, AO ex
 	}
 
 	@Override
-	public void compare(final AO actualOutput)
+	public void compare(final O actualOutput)
 			throws TestResultComparisonException {
 		if (expOutput == null ? actualOutput != null
 				: !expOutput.equals(actualOutput)) {

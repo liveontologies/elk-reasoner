@@ -37,14 +37,12 @@ import org.semanticweb.elk.testing.TestOutput;
  * 
  *         pavel.klinov@uni-ulm.de
  * @author Peter Skocovsky
- * @param <EO>
- *            The type of expected test output.
- * @param <AO>
- *            The type of actual test output.
+ * @param <O>
+ *            The type of test output.
  */
 @RunWith(PolySuite.class)
-public abstract class ReasoningCorrectnessTestWithOutput<I extends TestInput, EO extends TestOutput, AO extends TestOutput, TM extends TestManifestWithOutput<I, EO, AO>, TD extends ReasoningTestWithOutputDelegate<AO>>
-		extends BaseReasoningCorrectnessTest<I, AO, TM, TD> {
+public abstract class ReasoningCorrectnessTestWithOutput<I extends TestInput, O extends TestOutput, TM extends TestManifestWithOutput<I, O>, TD extends ReasoningTestWithOutputDelegate<O>>
+		extends BaseReasoningCorrectnessTest<I, O, TM, TD> {
 
 	public ReasoningCorrectnessTestWithOutput(final TM testManifest,
 			final TD testDelegate) {
@@ -59,7 +57,7 @@ public abstract class ReasoningCorrectnessTestWithOutput<I extends TestInput, EO
 	@Test
 	public void test() throws Exception {
 		getDelegate().initWithOutput();
-		final AO actualOutput = getDelegate().getActualOutput();
+		final O actualOutput = getDelegate().getActualOutput();
 		getManifest().compare(actualOutput);
 	}
 

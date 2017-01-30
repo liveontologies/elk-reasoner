@@ -59,7 +59,7 @@ public class OwlApiIncrementalClassExpressionSuperClassesQueryTest extends
 	public OwlApiIncrementalClassExpressionSuperClassesQueryTest(
 			final TestManifest<QueryTestInput<OWLClassExpression>> manifest) {
 		super(manifest,
-				new OwlApiIncrementalReasoningTestDelegate<RelatedEntitiesTestOutput<OWLClass>, RelatedEntitiesTestOutput<OWLClass>>(
+				new OwlApiIncrementalReasoningTestDelegate<RelatedEntitiesTestOutput<OWLClass>>(
 						manifest) {
 
 					@Override

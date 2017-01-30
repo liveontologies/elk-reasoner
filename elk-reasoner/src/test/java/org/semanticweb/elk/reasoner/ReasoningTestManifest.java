@@ -35,13 +35,11 @@ import org.semanticweb.elk.testing.io.URLTestIO;
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
- * @param <EO> 
- * @param <AO> 
- *
+ * @param <O> 
  */
-public class ReasoningTestManifest<EO extends TestOutput, AO extends TestOutput> extends BasicTestManifest<UrlTestInput, EO, AO> {
+public class ReasoningTestManifest<O extends TestOutput> extends BasicTestManifest<UrlTestInput, O> {
 
-	public ReasoningTestManifest(URL input, EO expOutput) {
+	public ReasoningTestManifest(URL input, O expOutput) {
 		super(FileUtils.getFileName(FileUtils.dropExtension(input.toString())), new URLTestIO(input), expOutput);
 	}
 }

@@ -41,7 +41,7 @@ public class ElkDiffObjectPropertyClassificationCorrectnessTest
 	}
 
 	public ElkDiffObjectPropertyClassificationCorrectnessTest(
-			final ReasoningTestManifest<TaxonomyTestOutput<?>, TaxonomyTestOutput<?>> testManifest) {
+			final ReasoningTestManifest<TaxonomyTestOutput<?>> testManifest) {
 		super(testManifest, new ElkReasoningTestDelegate<TaxonomyTestOutput<?>>(
 				testManifest) {
 

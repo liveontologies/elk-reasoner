@@ -50,7 +50,7 @@ public abstract class OwlApiIncrementalClassExpressionQueryTest<O extends TestOu
 
 	public OwlApiIncrementalClassExpressionQueryTest(
 			final TestManifest<QueryTestInput<OWLClassExpression>> manifest,
-			final OwlApiIncrementalReasoningTestDelegate<O, O> delegate) {
+			final OwlApiIncrementalReasoningTestDelegate<O> delegate) {
 		super(manifest, delegate);
 	}
 
@@ -60,10 +60,10 @@ public abstract class OwlApiIncrementalClassExpressionQueryTest<O extends TestOu
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION, BaseIncrementalQueryTest.class,
-				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLClassExpression>, TestOutput, TestOutput>>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLClassExpression>, TestOutput>>() {
 
 					@Override
-					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, TestOutput, TestOutput>> createManifests(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, TestOutput>> createManifests(
 							final List<URL> urls) throws IOException {
 
 						if (urls == null || urls.size() < 2) {

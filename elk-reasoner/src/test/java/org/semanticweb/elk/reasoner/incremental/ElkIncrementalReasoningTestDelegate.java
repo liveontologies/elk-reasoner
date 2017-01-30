@@ -51,9 +51,9 @@ import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.slf4j.Logger;
 
-public abstract class ElkIncrementalReasoningTestDelegate<EO extends TestOutput, AO extends TestOutput>
+public abstract class ElkIncrementalReasoningTestDelegate<O extends TestOutput>
 		implements
-		IncrementalReasoningTestWithInterruptsDelegate<ElkAxiom, EO, AO> {
+		IncrementalReasoningTestWithInterruptsDelegate<ElkAxiom, O> {
 
 	public static final double DEFAULT_INTERRUPTION_CHANCE = 0.1;
 

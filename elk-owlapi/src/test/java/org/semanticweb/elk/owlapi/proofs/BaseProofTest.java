@@ -31,13 +31,12 @@ import org.junit.Before;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.TestOWLManager;
 import org.semanticweb.elk.reasoner.SimpleManifestCreator;
-import org.semanticweb.elk.reasoner.tracing.TracingTestManifest;
 import org.semanticweb.elk.testing.ConfigurationUtils;
+import org.semanticweb.elk.testing.PolySuite.Config;
+import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.UrlTestInput;
-import org.semanticweb.elk.testing.PolySuite.Config;
-import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -85,7 +84,7 @@ public class BaseProofTest {
 	public static Configuration getConfig()
 			throws URISyntaxException, IOException {
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION, TracingTestManifest.class,
+				INPUT_DATA_LOCATION, SimpleManifestCreator.class,
 				SimpleManifestCreator.INSTANCE, "owl");
 	}
 

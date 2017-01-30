@@ -360,7 +360,7 @@ public class OwlExpectedTestOutputLoader {
 		return result;
 	}
 
-	public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>>> getEntailmentManifests(
+	public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>>> getEntailmentManifests(
 			final URL input) {
 
 		final OWLDataFactory owlFactory = TestOWLManager.getOWLDataFactory();

@@ -44,15 +44,15 @@ import org.semanticweb.elk.testing.TestOutput;
  *
  * @param <I>
  *            The type of test input.
- * @param <AO>
- *            The type of actual test output.
+ * @param <O>
+ *            The type of test output.
  * @param <TM>
  *            The type of test manifest.
  * @param <TD>
  *            The type of test delegate.
  */
 @RunWith(PolySuite.class)
-public abstract class BaseReasoningCorrectnessTest<I extends TestInput, AO extends TestOutput, TM extends TestManifest<I>, TD extends ReasoningTestDelegate<AO>> {
+public abstract class BaseReasoningCorrectnessTest<I extends TestInput, O extends TestOutput, TM extends TestManifest<I>, TD extends ReasoningTestDelegate<O>> {
 
 	private final TM manifest_;
 	private final TD delegate_;

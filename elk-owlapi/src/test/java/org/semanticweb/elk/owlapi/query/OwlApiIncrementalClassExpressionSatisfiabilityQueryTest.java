@@ -56,7 +56,7 @@ public class OwlApiIncrementalClassExpressionSatisfiabilityQueryTest extends
 	public OwlApiIncrementalClassExpressionSatisfiabilityQueryTest(
 			final TestManifest<QueryTestInput<OWLClassExpression>> manifest) {
 		super(manifest,
-				new OwlApiIncrementalReasoningTestDelegate<SatisfiabilityTestOutput, SatisfiabilityTestOutput>(
+				new OwlApiIncrementalReasoningTestDelegate<SatisfiabilityTestOutput>(
 						manifest) {
 
 					@Override

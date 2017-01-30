@@ -48,7 +48,7 @@ public abstract class ElkIncrementalClassExpressionQueryTest<O extends TestOutpu
 
 	public ElkIncrementalClassExpressionQueryTest(
 			final TestManifest<QueryTestInput<ElkClassExpression>> manifest,
-			final ElkIncrementalReasoningTestDelegate<O, O> testDelegate) {
+			final ElkIncrementalReasoningTestDelegate<O> testDelegate) {
 		super(manifest, testDelegate);
 	}
 
@@ -58,10 +58,10 @@ public abstract class ElkIncrementalClassExpressionQueryTest<O extends TestOutpu
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION, BaseIncrementalQueryTest.class,
-				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkClassExpression>, TestOutput, TestOutput>>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkClassExpression>, TestOutput>>() {
 
 					@Override
-					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, TestOutput, TestOutput>> createManifests(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, TestOutput>> createManifests(
 							final List<URL> urls) throws IOException {
 
 						if (urls == null || urls.size() < 2) {

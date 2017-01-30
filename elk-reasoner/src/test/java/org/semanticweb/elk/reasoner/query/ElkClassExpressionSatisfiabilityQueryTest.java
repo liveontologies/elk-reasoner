@@ -44,7 +44,7 @@ public class ElkClassExpressionSatisfiabilityQueryTest
 		extends BaseQueryTest<ElkClassExpression, SatisfiabilityTestOutput> {
 
 	public ElkClassExpressionSatisfiabilityQueryTest(
-			final TestManifestWithOutput<QueryTestInput<ElkClassExpression>, SatisfiabilityTestOutput, SatisfiabilityTestOutput> manifest) {
+			final TestManifestWithOutput<QueryTestInput<ElkClassExpression>, SatisfiabilityTestOutput> manifest) {
 		super(manifest, new ElkReasoningTestDelegate<SatisfiabilityTestOutput>(
 				manifest) {
 
@@ -64,10 +64,10 @@ public class ElkClassExpressionSatisfiabilityQueryTest
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION, BaseQueryTest.class,
-				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkClassExpression>, SatisfiabilityTestOutput, SatisfiabilityTestOutput>>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkClassExpression>, SatisfiabilityTestOutput>>() {
 
 					@Override
-					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, SatisfiabilityTestOutput, SatisfiabilityTestOutput>> createManifests(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, SatisfiabilityTestOutput>> createManifests(
 							final List<URL> urls) throws IOException {
 
 						if (urls == null || urls.size() < 2) {

@@ -44,9 +44,9 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.slf4j.Logger;
 
-public abstract class OwlApiIncrementalReasoningTestDelegate<EO extends TestOutput, AO extends TestOutput>
+public abstract class OwlApiIncrementalReasoningTestDelegate<O extends TestOutput>
 		implements
-		IncrementalReasoningTestWithInterruptsDelegate<OWLAxiom, EO, AO> {
+		IncrementalReasoningTestWithInterruptsDelegate<OWLAxiom, O> {
 
 	public static final double DEFAULT_INTERRUPTION_CHANCE = 0.1;
 

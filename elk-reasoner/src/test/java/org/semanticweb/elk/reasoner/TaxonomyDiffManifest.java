@@ -26,15 +26,15 @@ import java.net.URL;
 
 import org.semanticweb.elk.testing.TestResultComparisonException;
 
-public class TaxonomyDiffManifest<EO extends TaxonomyTestOutput<?>, AO extends TaxonomyTestOutput<?>>
-		extends ReasoningTestManifest<EO, AO> {
+public class TaxonomyDiffManifest<O extends TaxonomyTestOutput<?>>
+		extends ReasoningTestManifest<O> {
 
-	public TaxonomyDiffManifest(URL input, EO expOutput) {
+	public TaxonomyDiffManifest(URL input, O expOutput) {
 		super(input, expOutput);
 	}
 
 	@Override
-	public void compare(AO actualOutput) throws TestResultComparisonException {
+	public void compare(O actualOutput) throws TestResultComparisonException {
 
 		// FIXME Implement taxonomy comparison and diff
 		int expectedHash = getExpectedOutput().getHashCode();

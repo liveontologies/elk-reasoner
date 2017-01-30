@@ -36,7 +36,7 @@ public class ElkIncrementalClassExpressionEquivalentClassesQueryTest extends
 	public ElkIncrementalClassExpressionEquivalentClassesQueryTest(
 			final TestManifest<QueryTestInput<ElkClassExpression>> manifest) {
 		super(manifest,
-				new ElkIncrementalReasoningTestDelegate<EquivalentEntitiesTestOutput<ElkClass>, EquivalentEntitiesTestOutput<ElkClass>>(
+				new ElkIncrementalReasoningTestDelegate<EquivalentEntitiesTestOutput<ElkClass>>(
 						manifest) {
 
 					@Override

@@ -38,14 +38,12 @@ import org.semanticweb.elk.testing.TestOutput;
  *         pavel.klinov@uni-ulm.de
  * @author Peter Skocovsky
  *
- * @param <EO>
- *            The type of expected test output.
- * @param <AO>
- *            The type of actual test output.
+ * @param <O>
+ *            The type of test output.
  */
 @RunWith(PolySuite.class)
-public abstract class ReasoningCorrectnessTestWithInterrupts<I extends TestInput, EO extends TestOutput, AO extends TestOutput, TM extends TestManifestWithOutput<I, EO, AO>, TD extends ReasoningTestWithOutputAndInterruptsDelegate<AO>>
-		extends ReasoningCorrectnessTestWithOutput<I, EO, AO, TM, TD> {
+public abstract class ReasoningCorrectnessTestWithInterrupts<I extends TestInput, O extends TestOutput, TM extends TestManifestWithOutput<I, O>, TD extends ReasoningTestWithOutputAndInterruptsDelegate<O>>
+		extends ReasoningCorrectnessTestWithOutput<I, O, TM, TD> {
 
 	public ReasoningCorrectnessTestWithInterrupts(final TM testManifest,
 			final TD testDelegate) {
@@ -61,7 +59,7 @@ public abstract class ReasoningCorrectnessTestWithInterrupts<I extends TestInput
 	@Test
 	public void testWithInterruptions() throws Exception {
 		getDelegate().initWithInterrupts();
-		AO actualOutput;
+		O actualOutput;
 		while (true) {
 			try {
 				actualOutput = getDelegate().getActualOutput();
