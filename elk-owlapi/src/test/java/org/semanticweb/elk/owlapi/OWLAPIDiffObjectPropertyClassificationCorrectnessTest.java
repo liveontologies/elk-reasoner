@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestInput;
+import org.semanticweb.elk.testing.UrlTestInput;
 
 /**
  * @author Peter Skocovsky
@@ -72,7 +72,7 @@ public class OWLAPIDiffObjectPropertyClassificationCorrectnessTest
 	}
 
 	@Override
-	protected boolean ignore(TestInput input) {
+	protected boolean ignore(final UrlTestInput input) {
 		return super.ignore(input)
 				|| Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
 	}

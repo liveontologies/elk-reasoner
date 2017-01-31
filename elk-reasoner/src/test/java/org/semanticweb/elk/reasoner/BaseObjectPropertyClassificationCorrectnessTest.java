@@ -97,7 +97,7 @@ public abstract class BaseObjectPropertyClassificationCorrectnessTest extends
 															.getParser(stream));
 
 							return Collections.singleton(
-									new TaxonomyDiffManifest<TaxonomyTestOutput<?>>(
+									new ReasoningTestManifest<TaxonomyTestOutput<?>>(
 											urls.get(0),
 											new TaxonomyTestOutput<Taxonomy<ElkObjectProperty>>(
 													expectedTaxonomy)));

@@ -65,7 +65,7 @@ public class ElkClassExpressionSuperClassesQueryTest extends
 	}
 
 	public ElkClassExpressionSuperClassesQueryTest(
-			final TestManifestWithOutput<QueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkClass>> manifest) {
+			final QueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>> manifest) {
 		super(manifest,
 				new ElkReasoningTestDelegate<RelatedEntitiesTestOutput<ElkClass>>(
 						manifest) {

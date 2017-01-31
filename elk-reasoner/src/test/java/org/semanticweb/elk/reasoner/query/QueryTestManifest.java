@@ -39,9 +39,9 @@ import org.semanticweb.elk.testing.BasicTestManifest;
 public class QueryTestManifest<Q, O>
 		extends BasicTestManifest<QueryTestInput<Q>, O> {
 
-	public QueryTestManifest(final String testName, final URL input,
-			final Q query, final O expectedOutput) {
-		super(testName, new QueryTestInput<Q>() {
+	public QueryTestManifest(final URL input, final Q query,
+			final O expectedOutput) {
+		super(new QueryTestInput<Q>() {
 
 			@Override
 			public String getName() {
@@ -61,19 +61,10 @@ public class QueryTestManifest<Q, O>
 		}, expectedOutput);
 	}
 
-	/**
-	 * Constructor that extract test name from the input URL and the query.
-	 * 
-	 * @param input
-	 * @param query
-	 * @param expectedOutput
-	 */
-	public QueryTestManifest(final URL input, final Q query,
-			final O expectedOutput) {
-		this(getTestName(input, query), input, query, expectedOutput);
-	}
-
-	private static <Q> String getTestName(final URL input, final Q query) {
+	@Override
+	public String getName() {
+		final URL input = getInput().getUrl();
+		final Q query = getInput().getQuery();
 		final String testName = FileUtils.getFileName(
 				FileUtils.dropExtension(input.getPath())) + " " + query;
 		return testName.length() <= 80 ? testName

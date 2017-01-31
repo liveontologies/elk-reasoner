@@ -36,6 +36,7 @@ import org.semanticweb.elk.owlapi.OwlApiReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.BaseQueryTest;
 import org.semanticweb.elk.reasoner.query.BaseSatisfiabilityTestOutput;
 import org.semanticweb.elk.reasoner.query.QueryTestInput;
+import org.semanticweb.elk.reasoner.query.QueryTestManifest;
 import org.semanticweb.elk.reasoner.query.SatisfiabilityTestOutput;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.PolySuite;
@@ -66,7 +67,7 @@ public class OwlApiClassExpressionSatisfiabilityQueryTest
 	}
 
 	public OwlApiClassExpressionSatisfiabilityQueryTest(
-			final TestManifestWithOutput<QueryTestInput<OWLClassExpression>, SatisfiabilityTestOutput> manifest) {
+			final QueryTestManifest<OWLClassExpression, SatisfiabilityTestOutput> manifest) {
 		super(manifest,
 				new OwlApiReasoningTestDelegate<SatisfiabilityTestOutput>(
 						manifest) {

@@ -29,16 +29,23 @@ import org.semanticweb.elk.testing.BasicTestManifest;
 import org.semanticweb.elk.testing.UrlTestInput;
 import org.semanticweb.elk.testing.io.URLTestIO;
 
-
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  * @param <O> 
  */
 public class ReasoningTestManifest<O> extends BasicTestManifest<UrlTestInput, O> {
 
 	public ReasoningTestManifest(URL input, O expOutput) {
-		super(FileUtils.getFileName(FileUtils.dropExtension(input.toString())), new URLTestIO(input), expOutput);
+		super(new URLTestIO(input), expOutput);
 	}
+
+	@Override
+	public String getName() {
+		return FileUtils.dropExtension(
+				FileUtils.getFileName(getInput().getUrl().getPath()));
+	}
+
 }

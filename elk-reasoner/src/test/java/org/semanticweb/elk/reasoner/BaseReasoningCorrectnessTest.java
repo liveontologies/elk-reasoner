@@ -86,7 +86,7 @@ public abstract class BaseReasoningCorrectnessTest<I extends TestInput, O, TM ex
 	}
 
 	@SuppressWarnings("static-method")
-	protected boolean ignore(TestInput input) {
+	protected boolean ignore(I input) {
 		return false;
 	}
 

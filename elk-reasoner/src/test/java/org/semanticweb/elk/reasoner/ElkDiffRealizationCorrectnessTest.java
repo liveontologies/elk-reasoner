@@ -27,7 +27,7 @@ import java.util.Arrays;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
-import org.semanticweb.elk.testing.TestInput;
+import org.semanticweb.elk.testing.UrlTestInput;
 
 /**
  * @author Pavel Klinov
@@ -65,7 +65,7 @@ public class ElkDiffRealizationCorrectnessTest
 	}
 
 	@Override
-	protected boolean ignore(TestInput input) {
+	protected boolean ignore(final UrlTestInput input) {
 		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
 	}
 

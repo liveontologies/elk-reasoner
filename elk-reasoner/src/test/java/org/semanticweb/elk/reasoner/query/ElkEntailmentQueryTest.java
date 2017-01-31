@@ -68,7 +68,7 @@ public class ElkEntailmentQueryTest extends
 	}
 
 	public ElkEntailmentQueryTest(
-			final TestManifestWithOutput<QueryTestInput<Collection<ElkAxiom>>, EntailmentQueryTestOutput<ElkAxiom>> manifest) {
+			final QueryTestManifest<Collection<ElkAxiom>, EntailmentQueryTestOutput<ElkAxiom>> manifest) {
 		super(manifest,
 				new ElkReasoningTestDelegate<EntailmentQueryTestOutput<ElkAxiom>>(
 						manifest) {

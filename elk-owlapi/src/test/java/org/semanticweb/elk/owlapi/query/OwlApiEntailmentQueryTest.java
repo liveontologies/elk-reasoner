@@ -28,28 +28,24 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owlapi.EntailmentTestManifestCreator;
 import org.semanticweb.elk.owlapi.OwlApiReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.BaseQueryTest;
-import org.semanticweb.elk.reasoner.query.EntailmentQueryTestOutput;
-import org.semanticweb.elk.reasoner.query.QueryTestInput;
+import org.semanticweb.elk.reasoner.query.QueryTestManifest;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
-import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 
 @RunWith(PolySuite.class)
 public class OwlApiEntailmentQueryTest
-		extends BaseQueryTest<OWLAxiom, EntailmentQueryTestOutput<OWLAxiom>> {
+		extends BaseQueryTest<OWLAxiom, Boolean> {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
@@ -69,36 +65,28 @@ public class OwlApiEntailmentQueryTest
 	}
 
 	public OwlApiEntailmentQueryTest(
-			final TestManifestWithOutput<QueryTestInput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>> manifest) {
-		super(manifest,
-				new OwlApiReasoningTestDelegate<EntailmentQueryTestOutput<OWLAxiom>>(
-						manifest) {
+			final QueryTestManifest<OWLAxiom, Boolean> manifest) {
+		super(manifest, new OwlApiReasoningTestDelegate<Boolean>(manifest) {
 
-					@Override
-					public EntailmentQueryTestOutput<OWLAxiom> getActualOutput()
-							throws Exception {
-						final Map<OWLAxiom, Boolean> output = new HashMap<OWLAxiom, Boolean>();
-						final OWLAxiom owlAxiom = manifest.getInput()
-								.getQuery();
-						output.put(owlAxiom,
-								getReasoner().isEntailed(owlAxiom));
-						return new EntailmentQueryTestOutput<OWLAxiom>(output);
-					}
+			@Override
+			public Boolean getActualOutput() throws Exception {
+				return getReasoner().isEntailed(manifest.getInput().getQuery());
+			}
 
-					@Override
-					public Class<? extends Exception> getInterruptionExceptionClass() {
-						return ReasonerInterruptedException.class;
-					}
+			@Override
+			public Class<? extends Exception> getInterruptionExceptionClass() {
+				return ReasonerInterruptedException.class;
+			}
 
-				});
+		});
 	}
 
 	public static final String ENTAILMENT_QUERY_INPUT_DIR = "entailment_query_test_input";
 
-	public static final ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>>> CLASS_QUERY_TEST_MANIFEST_CREATOR = new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>>>() {
+	public static final ConfigurationUtils.ManifestCreator<QueryTestManifest<OWLAxiom, Boolean>> CLASS_QUERY_TEST_MANIFEST_CREATOR = new ConfigurationUtils.ManifestCreator<QueryTestManifest<OWLAxiom, Boolean>>() {
 
 		@Override
-		public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>>> createManifests(
+		public Collection<? extends QueryTestManifest<OWLAxiom, Boolean>> createManifests(
 				final List<URL> urls) throws IOException {
 
 			if (urls == null || urls.size() < 2) {

@@ -98,7 +98,7 @@ public abstract class BaseClassificationCorrectnessTest extends
 															.getParser(stream));
 
 							return Collections.singleton(
-									new TaxonomyDiffManifest<TaxonomyTestOutput<?>>(
+									new ReasoningTestManifest<TaxonomyTestOutput<?>>(
 											urls.get(0),
 											new TaxonomyTestOutput<Taxonomy<ElkClass>>(
 													expectedTaxonomy)));

@@ -26,24 +26,21 @@ import org.semanticweb.elk.io.FileUtils;
 import org.semanticweb.elk.reasoner.ReasoningCorrectnessTestWithInterrupts;
 import org.semanticweb.elk.reasoner.ReasoningTestWithOutputAndInterruptsDelegate;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestInput;
-import org.semanticweb.elk.testing.TestManifestWithOutput;
 
 @RunWith(PolySuite.class)
 public abstract class BaseQueryTest<Q, O> extends
-		ReasoningCorrectnessTestWithInterrupts<QueryTestInput<Q>, O, TestManifestWithOutput<QueryTestInput<Q>, O>, ReasoningTestWithOutputAndInterruptsDelegate<O>> {
+		ReasoningCorrectnessTestWithInterrupts<QueryTestInput<Q>, O, QueryTestManifest<Q, O>, ReasoningTestWithOutputAndInterruptsDelegate<O>> {
 
 	public final static String INPUT_DATA_LOCATION = "query_test_input";
 
 	public BaseQueryTest(
-			final TestManifestWithOutput<QueryTestInput<Q>, O> manifest,
+			final QueryTestManifest<Q, O> manifest,
 			final ReasoningTestWithOutputAndInterruptsDelegate<O> delegate) {
 		super(manifest, delegate);
 	}
 
 	@Override
-	protected boolean ignore(final TestInput in) {
-		final QueryTestInput<Q> input = getManifest().getInput();
+	protected boolean ignore(final QueryTestInput<Q> input) {
 		return ignoreInputFile(FileUtils.getFileName(input.getUrl().getPath()));
 	}
 

@@ -99,7 +99,7 @@ public abstract class BaseRealizationCorrectnessTest extends
 															.getParser(stream));
 
 							return Collections.singleton(
-									new TaxonomyDiffManifest<InstanceTaxonomyTestOutput<?>>(
+									new ReasoningTestManifest<InstanceTaxonomyTestOutput<?>>(
 											urls.get(0),
 											new InstanceTaxonomyTestOutput<InstanceTaxonomy<ElkClass, ElkNamedIndividual>>(
 													expectedTaxonomy)));

@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestInput;
+import org.semanticweb.elk.testing.UrlTestInput;
 
 /**
  * @author Pavel Klinov
@@ -78,7 +78,7 @@ public class OWLAPIDiffRealizationCorrectnessTest
 	}
 
 	@Override
-	protected boolean ignore(TestInput input) {
+	protected boolean ignore(final UrlTestInput input) {
 		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
 	}
 

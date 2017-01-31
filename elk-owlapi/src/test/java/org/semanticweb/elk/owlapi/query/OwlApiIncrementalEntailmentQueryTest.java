@@ -23,15 +23,12 @@ package org.semanticweb.elk.owlapi.query;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owlapi.EntailmentTestManifestCreator;
 import org.semanticweb.elk.owlapi.OwlApiIncrementalReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.BaseIncrementalQueryTest;
 import org.semanticweb.elk.reasoner.query.BaseQueryTest;
-import org.semanticweb.elk.reasoner.query.EntailmentQueryTestOutput;
 import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.PolySuite;
@@ -42,35 +39,24 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 
 @RunWith(PolySuite.class)
-public class OwlApiIncrementalEntailmentQueryTest extends
-		BaseIncrementalQueryTest<OWLAxiom, OWLAxiom, EntailmentQueryTestOutput<OWLAxiom>> {
+public class OwlApiIncrementalEntailmentQueryTest
+		extends BaseIncrementalQueryTest<OWLAxiom, OWLAxiom, Boolean> {
 
 	public OwlApiIncrementalEntailmentQueryTest(
 			final TestManifest<QueryTestInput<OWLAxiom>> manifest) {
 		super(manifest,
-				new OwlApiIncrementalReasoningTestDelegate<EntailmentQueryTestOutput<OWLAxiom>>(
-						manifest) {
+				new OwlApiIncrementalReasoningTestDelegate<Boolean>(manifest) {
 
 					@Override
-					public EntailmentQueryTestOutput<OWLAxiom> getExpectedOutput()
-							throws Exception {
-						final Map<OWLAxiom, Boolean> output = new HashMap<OWLAxiom, Boolean>();
-						final OWLAxiom owlAxiom = manifest.getInput()
-								.getQuery();
-						output.put(owlAxiom,
-								getStandardReasoner().isEntailed(owlAxiom));
-						return new EntailmentQueryTestOutput<OWLAxiom>(output);
+					public Boolean getExpectedOutput() throws Exception {
+						return getStandardReasoner()
+								.isEntailed(manifest.getInput().getQuery());
 					}
 
 					@Override
-					public EntailmentQueryTestOutput<OWLAxiom> getActualOutput()
-							throws Exception {
-						final Map<OWLAxiom, Boolean> output = new HashMap<OWLAxiom, Boolean>();
-						final OWLAxiom owlAxiom = manifest.getInput()
-								.getQuery();
-						output.put(owlAxiom,
-								getIncrementalReasoner().isEntailed(owlAxiom));
-						return new EntailmentQueryTestOutput<OWLAxiom>(output);
+					public Boolean getActualOutput() throws Exception {
+						return getIncrementalReasoner()
+								.isEntailed(manifest.getInput().getQuery());
 					}
 
 					@Override

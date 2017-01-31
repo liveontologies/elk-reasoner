@@ -26,8 +26,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.semanticweb.elk.testing.TestResultComparisonException;
-
 public class EntailmentQueryTestManifest<Q, A>
 		extends QueryTestManifest<Q, EntailmentQueryTestOutput<A>> {
 
@@ -37,26 +35,15 @@ public class EntailmentQueryTestManifest<Q, A>
 	}
 
 	@Override
-	public void compare(final EntailmentQueryTestOutput<A> actualOutput)
-			throws TestResultComparisonException {
+	protected void appendDiff(final EntailmentQueryTestOutput<A> actualOutput,
+			final StringBuilder result) {
 		final EntailmentQueryTestOutput<A> expOutput = getExpectedOutput();
-		if (expOutput == null ? actualOutput != null
-				: !expOutput.equals(actualOutput)) {
-
-			final StringBuilder message = new StringBuilder(
-					"Actual output is not equal to the expected output\n");
-			message.append("Input: ").append(getInput().getName()).append("\n");
-			final Map<A, Boolean> expMap = expOutput == null
-					? Collections.<A, Boolean> emptyMap()
-					: expOutput.getOutput();
-			final Map<A, Boolean> actMap = actualOutput == null
-					? Collections.<A, Boolean> emptyMap()
-					: actualOutput.getOutput();
-			writeMapDiff(expMap, actMap, message);
-
-			throw new TestResultComparisonException(message.toString(),
-					expOutput, actualOutput);
-		}
+		final Map<A, Boolean> expMap = expOutput == null
+				? Collections.<A, Boolean> emptyMap() : expOutput.getOutput();
+		final Map<A, Boolean> actMap = actualOutput == null
+				? Collections.<A, Boolean> emptyMap()
+				: actualOutput.getOutput();
+		writeMapDiff(expMap, actMap, result);
 	}
 
 	private static <K, V> void writeMapDiff(final Map<K, V> expected,
@@ -85,6 +72,12 @@ public class EntailmentQueryTestManifest<Q, A>
 			}
 		}
 
+	}
+
+	@Override
+	protected void appendOutput(final EntailmentQueryTestOutput<A> output,
+			final StringBuilder result) {
+		// Do not write output!
 	}
 
 }

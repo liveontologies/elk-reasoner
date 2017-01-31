@@ -48,7 +48,7 @@ public class ElkClassExpressionInstancesQueryTest extends
 		BaseQueryTest<ElkClassExpression, RelatedEntitiesTestOutput<ElkNamedIndividual>> {
 
 	public ElkClassExpressionInstancesQueryTest(
-			final TestManifestWithOutput<QueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkNamedIndividual>> manifest) {
+			final QueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkNamedIndividual>> manifest) {
 		super(manifest,
 				new ElkReasoningTestDelegate<RelatedEntitiesTestOutput<ElkNamedIndividual>>(
 						manifest) {

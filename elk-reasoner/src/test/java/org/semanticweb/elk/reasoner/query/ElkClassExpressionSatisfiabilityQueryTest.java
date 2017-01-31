@@ -44,7 +44,7 @@ public class ElkClassExpressionSatisfiabilityQueryTest
 		extends BaseQueryTest<ElkClassExpression, SatisfiabilityTestOutput> {
 
 	public ElkClassExpressionSatisfiabilityQueryTest(
-			final TestManifestWithOutput<QueryTestInput<ElkClassExpression>, SatisfiabilityTestOutput> manifest) {
+			final QueryTestManifest<ElkClassExpression, SatisfiabilityTestOutput> manifest) {
 		super(manifest, new ElkReasoningTestDelegate<SatisfiabilityTestOutput>(
 				manifest) {
 

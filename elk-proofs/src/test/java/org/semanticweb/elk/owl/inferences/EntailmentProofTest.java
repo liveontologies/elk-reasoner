@@ -68,7 +68,7 @@ public class EntailmentProofTest extends BaseQueryTest<ElkAxiom, Void> {
 	public static final double INTERRUPTION_CHANCE = 0.003;
 
 	public EntailmentProofTest(
-			final TestManifestWithOutput<QueryTestInput<ElkAxiom>, Void> manifest) {
+			final QueryTestManifest<ElkAxiom, Void> manifest) {
 		super(manifest, new ElkReasoningTestDelegate<Void>(manifest,
 				INTERRUPTION_CHANCE) {
 

@@ -35,6 +35,7 @@ import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owlapi.OwlApiReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.BaseQueryTest;
 import org.semanticweb.elk.reasoner.query.QueryTestInput;
+import org.semanticweb.elk.reasoner.query.QueryTestManifest;
 import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.PolySuite;
@@ -67,7 +68,7 @@ public class OwlApiClassExpressionInstancesQueryTest extends
 	}
 
 	public OwlApiClassExpressionInstancesQueryTest(
-			final TestManifestWithOutput<QueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLNamedIndividual>> manifest) {
+			final QueryTestManifest<OWLClassExpression, RelatedEntitiesTestOutput<OWLNamedIndividual>> manifest) {
 		super(manifest,
 				new OwlApiReasoningTestDelegate<RelatedEntitiesTestOutput<OWLNamedIndividual>>(
 						manifest) {

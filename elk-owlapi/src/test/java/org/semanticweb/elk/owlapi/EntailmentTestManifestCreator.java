@@ -33,26 +33,23 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.elk.io.IOUtils;
-import org.semanticweb.elk.reasoner.query.EntailmentQueryTestManifest;
-import org.semanticweb.elk.reasoner.query.EntailmentQueryTestOutput;
-import org.semanticweb.elk.reasoner.query.QueryTestInput;
+import org.semanticweb.elk.reasoner.query.QueryTestManifest;
 import org.semanticweb.elk.testing.ConfigurationUtils;
-import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 public class EntailmentTestManifestCreator implements
-		ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>>> {
+		ConfigurationUtils.ManifestCreator<QueryTestManifest<OWLAxiom, Boolean>> {
 
 	public static final EntailmentTestManifestCreator INSTANCE = new EntailmentTestManifestCreator();
 
 	@Override
-	public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>>> createManifests(
+	public Collection<? extends QueryTestManifest<OWLAxiom, Boolean>> createManifests(
 			final List<URL> urls) throws IOException {
 
-		final Collection<EntailmentQueryTestManifest<OWLAxiom, OWLAxiom>> manifests = new ArrayList<EntailmentQueryTestManifest<OWLAxiom, OWLAxiom>>();
+		final Collection<QueryTestManifest<OWLAxiom, Boolean>> manifests = new ArrayList<QueryTestManifest<OWLAxiom, Boolean>>();
 
 		if (urls == null || urls.isEmpty()) {
 			// No input files. Fail, while something was probably forgotten.
@@ -97,12 +94,8 @@ public class EntailmentTestManifestCreator implements
 
 			// OWL API interface can query only one axiom at once.
 			for (final OWLAxiom axiom : query) {
-				manifests
-						.add(new EntailmentQueryTestManifest<OWLAxiom, OWLAxiom>(
-								input, axiom,
-								new EntailmentQueryTestOutput<OWLAxiom>(
-										Collections.singletonMap(axiom,
-												output.get(axiom)))));
+				manifests.add(new QueryTestManifest<OWLAxiom, Boolean>(input,
+						axiom, output.get(axiom)));
 			}
 
 			return manifests;

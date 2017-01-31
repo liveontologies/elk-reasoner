@@ -39,7 +39,6 @@ import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
-import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
@@ -57,8 +56,7 @@ public class EntailmentProofCompletenessTest extends
 	}
 
 	@Override
-	protected boolean ignore(final TestInput in) {
-		final QueryTestInput<OWLAxiom> input = getManifest().getInput();
+	protected boolean ignore(final QueryTestInput<OWLAxiom> input) {
 		return ignoreInputFile(FileUtils.getFileName(input.getUrl().getPath()));
 	}
 

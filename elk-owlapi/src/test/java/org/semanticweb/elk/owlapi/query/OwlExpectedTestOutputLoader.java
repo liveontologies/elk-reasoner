@@ -34,14 +34,10 @@ import java.util.Set;
 
 import org.semanticweb.elk.owlapi.TestOWLManager;
 import org.semanticweb.elk.reasoner.query.BaseSatisfiabilityTestOutput;
-import org.semanticweb.elk.reasoner.query.EntailmentQueryTestManifest;
-import org.semanticweb.elk.reasoner.query.EntailmentQueryTestOutput;
 import org.semanticweb.elk.reasoner.query.EquivalentEntitiesTestOutput;
-import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.reasoner.query.QueryTestManifest;
 import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.reasoner.query.SatisfiabilityTestOutput;
-import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
@@ -359,7 +355,7 @@ public class OwlExpectedTestOutputLoader {
 		return result;
 	}
 
-	public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLAxiom>, EntailmentQueryTestOutput<OWLAxiom>>> getEntailmentManifests(
+	public Collection<? extends QueryTestManifest<OWLAxiom, Boolean>> getEntailmentManifests(
 			final URL input) {
 
 		final OWLDataFactory owlFactory = TestOWLManager.getOWLDataFactory();
@@ -491,13 +487,11 @@ public class OwlExpectedTestOutputLoader {
 		// else
 
 		// OWL API interface can query only one axiom at once.
-		final Collection<EntailmentQueryTestManifest<OWLAxiom, OWLAxiom>> manifests = new ArrayList<EntailmentQueryTestManifest<OWLAxiom, OWLAxiom>>(
+		final Collection<QueryTestManifest<OWLAxiom, Boolean>> manifests = new ArrayList<QueryTestManifest<OWLAxiom, Boolean>>(
 				query.size());
 		for (final OWLAxiom axiom : query) {
-			manifests.add(new EntailmentQueryTestManifest<OWLAxiom, OWLAxiom>(
-					input, axiom,
-					new EntailmentQueryTestOutput<OWLAxiom>(Collections
-							.singletonMap(axiom, output.get(axiom)))));
+			manifests.add(new QueryTestManifest<OWLAxiom, Boolean>(input, axiom,
+					output.get(axiom)));
 		}
 		return manifests;
 	}
