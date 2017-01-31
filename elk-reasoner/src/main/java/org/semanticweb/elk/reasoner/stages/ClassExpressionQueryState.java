@@ -187,10 +187,10 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 						 * same time, so this should be thread-safe.
 						 */
 						final IndexedContextRoot root = context.getRoot();
-						if (root instanceof IndexedClass) {
-							final IndexedClass ic = (IndexedClass) root;
+						synchronized (queriesByRelated_) {
+							if (root instanceof IndexedClass) {
+								final IndexedClass ic = (IndexedClass) root;
 
-							synchronized (queriesByRelated_) {
 								final Collection<IndexedClassExpression> queryClasses = queriesByRelated_
 										.remove(ic.getElkEntity());
 								if (queryClasses != null) {
@@ -198,11 +198,11 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 										markNotComputed(queryClass);
 									}
 								}
-							}
 
-						} else if (root instanceof IndexedClassExpression) {
-							final IndexedClassExpression ice = (IndexedClassExpression) root;
-							markNotComputed(ice);
+							} else if (root instanceof IndexedClassExpression) {
+								final IndexedClassExpression ice = (IndexedClassExpression) root;
+								markNotComputed(ice);
+							}
 						}
 					}
 
