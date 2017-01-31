@@ -31,7 +31,6 @@ import org.semanticweb.elk.reasoner.BaseReasoningCorrectnessTest;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * @author Peter Skocovsky
  */
 @RunWith(PolySuite.class)
-public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInput, A, O extends TestOutput, TD extends IncrementalReasoningTestDelegate<A, O>>
+public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInput, A, O, TD extends IncrementalReasoningTestDelegate<A, O>>
 		extends BaseReasoningCorrectnessTest<I, O, TestManifest<I>, TD> {
 
 	// logger for this class

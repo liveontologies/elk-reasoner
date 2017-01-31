@@ -40,12 +40,11 @@ import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
-import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 
 @RunWith(PolySuite.class)
-public abstract class OwlApiIncrementalClassExpressionQueryTest<O extends TestOutput>
+public abstract class OwlApiIncrementalClassExpressionQueryTest<O>
 		extends BaseIncrementalQueryTest<OWLClassExpression, OWLAxiom, O> {
 
 	public OwlApiIncrementalClassExpressionQueryTest(
@@ -60,10 +59,10 @@ public abstract class OwlApiIncrementalClassExpressionQueryTest<O extends TestOu
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION, BaseIncrementalQueryTest.class,
-				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLClassExpression>, TestOutput>>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLClassExpression>, Void>>() {
 
 					@Override
-					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, TestOutput>> createManifests(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, Void>> createManifests(
 							final List<URL> urls) throws IOException {
 
 						if (urls == null || urls.size() < 2) {

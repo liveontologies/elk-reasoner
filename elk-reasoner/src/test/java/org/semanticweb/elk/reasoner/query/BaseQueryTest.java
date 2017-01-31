@@ -28,10 +28,9 @@ import org.semanticweb.elk.reasoner.ReasoningTestWithOutputAndInterruptsDelegate
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
-import org.semanticweb.elk.testing.TestOutput;
 
 @RunWith(PolySuite.class)
-public abstract class BaseQueryTest<Q, O extends TestOutput> extends
+public abstract class BaseQueryTest<Q, O> extends
 		ReasoningCorrectnessTestWithInterrupts<QueryTestInput<Q>, O, TestManifestWithOutput<QueryTestInput<Q>, O>, ReasoningTestWithOutputAndInterruptsDelegate<O>> {
 
 	public final static String INPUT_DATA_LOCATION = "query_test_input";

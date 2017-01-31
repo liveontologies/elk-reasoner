@@ -27,9 +27,8 @@ import org.semanticweb.elk.reasoner.incremental.IncrementalReasoningCorrectnessT
 import org.semanticweb.elk.reasoner.incremental.IncrementalReasoningTestWithInterruptsDelegate;
 import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.TestOutput;
 
-public abstract class BaseIncrementalQueryTest<Q, A, O extends TestOutput>
+public abstract class BaseIncrementalQueryTest<Q, A, O>
 		extends
 		IncrementalReasoningCorrectnessTestWithInterrupts<QueryTestInput<Q>, A, O, IncrementalReasoningTestWithInterruptsDelegate<A, O>> {
 

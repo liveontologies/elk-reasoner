@@ -47,12 +47,27 @@ public class InstanceTaxonomyTestOutput<T extends InstanceTaxonomy<ElkClass, Elk
 	}
 
 	@Override
-	int getHashCode() {
+	public int hashCode() {
 		return InstanceTaxonomyHasher.hash(getTaxonomy());
 	}
 
 	@Override
-	void dumpTaxonomy(Writer writer) throws IOException {
+	public boolean equals(final Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		return getTaxonomy()
+				.equals(((TaxonomyTestOutput<?>) obj).getTaxonomy());
+	}
+
+	@Override
+	protected void dumpTaxonomy(final Writer writer) throws IOException {
 		TaxonomyPrinter.dumpInstanceTaxomomy(getTaxonomy(), writer, false);
 	}
 

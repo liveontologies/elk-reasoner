@@ -27,14 +27,12 @@ import static org.junit.Assert.fail;
 import java.util.Random;
 
 import org.semanticweb.elk.RandomSeedProvider;
-import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
 import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.testing.UrlTestInput;
 
-public abstract class ElkReasoningTestDelegate<AO extends TestOutput>
-		implements ReasoningTestWithOutputAndInterruptsDelegate<AO> {
+public abstract class ElkReasoningTestDelegate<O>
+		implements ReasoningTestWithOutputAndInterruptsDelegate<O> {
 
 	public static final double DEFAULT_INTERRUPTION_CHANCE = 0.3;
 

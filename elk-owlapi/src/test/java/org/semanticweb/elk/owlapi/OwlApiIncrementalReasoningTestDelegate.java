@@ -34,7 +34,6 @@ import org.semanticweb.elk.reasoner.RandomReasonerInterrupter;
 import org.semanticweb.elk.reasoner.incremental.IncrementalChangeType;
 import org.semanticweb.elk.reasoner.incremental.IncrementalReasoningTestWithInterruptsDelegate;
 import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.testing.UrlTestInput;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
@@ -44,7 +43,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.slf4j.Logger;
 
-public abstract class OwlApiIncrementalReasoningTestDelegate<O extends TestOutput>
+public abstract class OwlApiIncrementalReasoningTestDelegate<O>
 		implements
 		IncrementalReasoningTestWithInterruptsDelegate<OWLAxiom, O> {
 

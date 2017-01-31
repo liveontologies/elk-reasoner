@@ -35,7 +35,7 @@ package org.semanticweb.elk.testing;
  * @param <O>
  *            The type of test output.
  */
-public interface TestManifestWithOutput<I extends TestInput, O extends TestOutput>
+public interface TestManifestWithOutput<I extends TestInput, O>
 		extends TestManifest<I> {
 
 	/**

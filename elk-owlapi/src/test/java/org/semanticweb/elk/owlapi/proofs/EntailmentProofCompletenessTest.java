@@ -41,12 +41,11 @@ import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.VoidTestOutput;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
 @RunWith(PolySuite.class)
 public class EntailmentProofCompletenessTest extends
-		BaseReasoningCorrectnessTest<QueryTestInput<OWLAxiom>, VoidTestOutput, TestManifest<QueryTestInput<OWLAxiom>>, OwlApiReasoningTestDelegate<VoidTestOutput>> {
+		BaseReasoningCorrectnessTest<QueryTestInput<OWLAxiom>, Void, TestManifest<QueryTestInput<OWLAxiom>>, OwlApiReasoningTestDelegate<Void>> {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
@@ -71,11 +70,11 @@ public class EntailmentProofCompletenessTest extends
 
 	public EntailmentProofCompletenessTest(
 			final TestManifest<QueryTestInput<OWLAxiom>> manifest) {
-		super(manifest, new OwlApiReasoningTestDelegate<VoidTestOutput>(
-				manifest, INTERRUPTION_CHANCE) {
+		super(manifest, new OwlApiReasoningTestDelegate<Void>(manifest,
+				INTERRUPTION_CHANCE) {
 
 			@Override
-			public VoidTestOutput getActualOutput() throws Exception {
+			public Void getActualOutput() throws Exception {
 				// No output should be needed.
 				throw new UnsupportedOperationException();
 			}

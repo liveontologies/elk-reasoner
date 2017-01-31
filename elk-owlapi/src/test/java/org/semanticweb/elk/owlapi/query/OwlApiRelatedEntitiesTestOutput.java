@@ -41,7 +41,7 @@ public class OwlApiRelatedEntitiesTestOutput<E extends OWLLogicalEntity>
 	}
 
 	@Override
-	public Iterable<? extends Iterable<E>> getSubEntities() {
+	public Iterable<? extends Iterable<E>> getRelatedEntities() {
 		return related_;
 	}
 

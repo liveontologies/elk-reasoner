@@ -28,17 +28,16 @@ import java.util.Collections;
 import java.util.List;
 
 import org.semanticweb.elk.testing.ConfigurationUtils.ManifestCreator;
-import org.semanticweb.elk.testing.TestManifestWithOutput;
+import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.UrlTestInput;
-import org.semanticweb.elk.testing.VoidTestOutput;
 
-public class SimpleManifestCreator implements
-		ManifestCreator<TestManifestWithOutput<UrlTestInput, VoidTestOutput>> {
+public class SimpleManifestCreator
+		implements ManifestCreator<TestManifest<UrlTestInput>> {
 
 	public static final SimpleManifestCreator INSTANCE = new SimpleManifestCreator();
 
 	@Override
-	public Collection<? extends TestManifestWithOutput<UrlTestInput, VoidTestOutput>> createManifests(
+	public Collection<? extends TestManifest<UrlTestInput>> createManifests(
 			final List<URL> urls) throws IOException {
 		if (urls == null || urls.isEmpty()) {
 			// Not enough inputs. Something was probably forgotten.
@@ -48,9 +47,8 @@ public class SimpleManifestCreator implements
 			// No inputs, no manifests.
 			return Collections.emptySet();
 		}
-		return Collections.singleton(
-				new ReasoningTestManifest<VoidTestOutput>(
-						urls.get(0), null));
+		return Collections
+				.singleton(new ReasoningTestManifest<Void>(urls.get(0), null));
 	}
 
 }

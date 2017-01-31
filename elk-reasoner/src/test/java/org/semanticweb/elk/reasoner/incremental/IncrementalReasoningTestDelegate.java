@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.incremental;
 import java.util.Collection;
 
 import org.semanticweb.elk.reasoner.ReasoningTestDelegate;
-import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.slf4j.Logger;
 
@@ -39,7 +38,7 @@ import org.slf4j.Logger;
  * @param <O>
  *            The type of test output.
  */
-public interface IncrementalReasoningTestDelegate<A, O extends TestOutput>
+public interface IncrementalReasoningTestDelegate<A, O>
 		extends ReasoningTestDelegate<O> {
 
 	/**

@@ -45,13 +45,12 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
 import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.testing.UrlTestInput;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.slf4j.Logger;
 
-public abstract class ElkIncrementalReasoningTestDelegate<O extends TestOutput>
+public abstract class ElkIncrementalReasoningTestDelegate<O>
 		implements
 		IncrementalReasoningTestWithInterruptsDelegate<ElkAxiom, O> {
 

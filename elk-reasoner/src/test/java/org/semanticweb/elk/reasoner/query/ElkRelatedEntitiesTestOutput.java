@@ -53,7 +53,7 @@ public class ElkRelatedEntitiesTestOutput<E extends ElkEntity>
 	}
 
 	@Override
-	public Iterable<? extends Iterable<E>> getSubEntities() {
+	public Iterable<? extends Iterable<E>> getRelatedEntities() {
 		return related_;
 	}
 

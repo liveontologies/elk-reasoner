@@ -25,7 +25,6 @@ package org.semanticweb.elk.testing.io;
 import java.net.URL;
 
 import org.semanticweb.elk.io.FileUtils;
-import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.testing.UrlTestInput;
 
 /**
@@ -34,7 +33,7 @@ import org.semanticweb.elk.testing.UrlTestInput;
  *         pavel.klinov@uni-ulm.de
  * @author Peter Skocovsky
  */
-public class URLTestIO implements UrlTestInput, TestOutput {
+public class URLTestIO implements UrlTestInput {
 
 	private final URL url;
 

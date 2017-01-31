@@ -35,23 +35,23 @@ package org.semanticweb.elk.testing;
  */
 public class TestResultComparisonException extends AssertionError {
 
-	private TestOutput expOutput;
-	private TestOutput actualOutput;
+	private Object expOutput;
+	private Object actualOutput;
 	
 	public TestResultComparisonException() {}
 	
-	public TestResultComparisonException(String msg, TestOutput expected, TestOutput actual) {
+	public TestResultComparisonException(String msg, Object expected, Object actual) {
 		super(msg);
 		
 		expOutput = expected;
 		actualOutput = actual;
 	}
 	
-	public TestOutput getExpectedOutput() {
+	public Object getExpectedOutput() {
 		return expOutput;
 	}
 
-	public TestOutput getActualOutput() {
+	public Object getActualOutput() {
 		return actualOutput;
 	}
 

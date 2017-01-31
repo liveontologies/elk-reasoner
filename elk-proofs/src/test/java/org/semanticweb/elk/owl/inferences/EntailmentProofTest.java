@@ -47,11 +47,9 @@ import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
-import org.semanticweb.elk.testing.VoidTestOutput;
 
 @RunWith(PolySuite.class)
-public class EntailmentProofTest
-		extends BaseQueryTest<ElkAxiom, VoidTestOutput> {
+public class EntailmentProofTest extends BaseQueryTest<ElkAxiom, Void> {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
@@ -70,12 +68,12 @@ public class EntailmentProofTest
 	public static final double INTERRUPTION_CHANCE = 0.003;
 
 	public EntailmentProofTest(
-			final TestManifestWithOutput<QueryTestInput<ElkAxiom>, VoidTestOutput> manifest) {
-		super(manifest, new ElkReasoningTestDelegate<VoidTestOutput>(manifest,
+			final TestManifestWithOutput<QueryTestInput<ElkAxiom>, Void> manifest) {
+		super(manifest, new ElkReasoningTestDelegate<Void>(manifest,
 				INTERRUPTION_CHANCE) {
 
 			@Override
-			public VoidTestOutput getActualOutput() throws Exception {
+			public Void getActualOutput() throws Exception {
 
 				final Reasoner reasoner = getReasoner();
 
@@ -91,10 +89,10 @@ public class EntailmentProofTest
 
 	public static final String ENTAILMENT_QUERY_INPUT_DIR = "entailment_query_test_input";
 
-	private static final ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkAxiom>, VoidTestOutput>> ENTAILMENT_QUERY_TEST_MANIFEST_CREATOR_ = new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkAxiom>, VoidTestOutput>>() {
+	private static final ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkAxiom>, Void>> ENTAILMENT_QUERY_TEST_MANIFEST_CREATOR_ = new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkAxiom>, Void>>() {
 
 		@Override
-		public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkAxiom>, VoidTestOutput>> createManifests(
+		public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkAxiom>, Void>> createManifests(
 				final List<URL> urls) throws IOException {
 
 			if (urls == null || urls.size() < 2) {
@@ -114,12 +112,11 @@ public class EntailmentProofTest
 				final Set<ElkAxiom> query = TestReasonerUtils
 						.loadAxioms(entailedIS);
 
-				final Collection<QueryTestManifest<ElkAxiom, VoidTestOutput>> manifests = new ArrayList<QueryTestManifest<ElkAxiom, VoidTestOutput>>(
+				final Collection<QueryTestManifest<ElkAxiom, Void>> manifests = new ArrayList<QueryTestManifest<ElkAxiom, Void>>(
 						query.size());
 				for (final ElkAxiom axiom : query) {
-					manifests
-							.add(new QueryTestManifest<ElkAxiom, VoidTestOutput>(
-									input, axiom, null));
+					manifests.add(new QueryTestManifest<ElkAxiom, Void>(input,
+							axiom, null));
 				}
 
 				return manifests;

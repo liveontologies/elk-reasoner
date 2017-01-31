@@ -40,10 +40,9 @@ import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
-import org.semanticweb.elk.testing.TestOutput;
 
 @RunWith(PolySuite.class)
-public abstract class ElkIncrementalClassExpressionQueryTest<O extends TestOutput>
+public abstract class ElkIncrementalClassExpressionQueryTest<O>
 		extends BaseIncrementalQueryTest<ElkClassExpression, ElkAxiom, O> {
 
 	public ElkIncrementalClassExpressionQueryTest(
@@ -58,10 +57,10 @@ public abstract class ElkIncrementalClassExpressionQueryTest<O extends TestOutpu
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				INPUT_DATA_LOCATION, BaseIncrementalQueryTest.class,
-				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkClassExpression>, TestOutput>>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkClassExpression>, Void>>() {
 
 					@Override
-					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, TestOutput>> createManifests(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, Void>> createManifests(
 							final List<URL> urls) throws IOException {
 
 						if (urls == null || urls.size() < 2) {

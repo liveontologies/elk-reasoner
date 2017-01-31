@@ -24,9 +24,7 @@ package org.semanticweb.elk.reasoner.query;
 import java.util.Collections;
 import java.util.Map;
 
-import org.semanticweb.elk.testing.TestOutput;
-
-public class EntailmentQueryTestOutput<A> implements TestOutput {
+public class EntailmentQueryTestOutput<A> {
 
 	private final Map<A, Boolean> output_;
 

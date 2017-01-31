@@ -21,14 +21,12 @@
  */
 package org.semanticweb.elk.reasoner.query;
 
-import org.semanticweb.elk.testing.TestOutput;
-
 /**
- * A {@link TestOutput} of a satisfiability check.
+ * A test output of a satisfiability check.
  * 
  * @author Peter Skocovsky
  */
-public interface SatisfiabilityTestOutput extends TestOutput {
+public interface SatisfiabilityTestOutput {
 
 	/**
 	 * @return whether the output is satisfiable.

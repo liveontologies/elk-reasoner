@@ -28,7 +28,6 @@ import org.junit.runner.RunWith;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.TestOutput;
 
 /**
  * Base class for reasoning tests that are run with {@link PolySuite}.
@@ -52,7 +51,7 @@ import org.semanticweb.elk.testing.TestOutput;
  *            The type of test delegate.
  */
 @RunWith(PolySuite.class)
-public abstract class BaseReasoningCorrectnessTest<I extends TestInput, O extends TestOutput, TM extends TestManifest<I>, TD extends ReasoningTestDelegate<O>> {
+public abstract class BaseReasoningCorrectnessTest<I extends TestInput, O, TM extends TestManifest<I>, TD extends ReasoningTestDelegate<O>> {
 
 	private final TM manifest_;
 	private final TD delegate_;

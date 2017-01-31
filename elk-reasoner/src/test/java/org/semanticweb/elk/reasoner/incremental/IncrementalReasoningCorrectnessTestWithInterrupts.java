@@ -27,11 +27,10 @@ import org.junit.Test;
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.TestOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class IncrementalReasoningCorrectnessTestWithInterrupts<I extends TestInput, A, O extends TestOutput, TD extends IncrementalReasoningTestWithInterruptsDelegate<A, O>>
+public abstract class IncrementalReasoningCorrectnessTestWithInterrupts<I extends TestInput, A, O, TD extends IncrementalReasoningTestWithInterruptsDelegate<A, O>>
 		extends BaseIncrementalReasoningCorrectnessTest<I, A, O, TD> {
 
 	protected static final Logger LOGGER_ = LoggerFactory

@@ -24,8 +24,6 @@ package org.semanticweb.elk.reasoner;
 
 import java.net.URL;
 
-import org.semanticweb.elk.testing.TestResultComparisonException;
-
 public class TaxonomyDiffManifest<O extends TaxonomyTestOutput<?>>
 		extends ReasoningTestManifest<O> {
 
@@ -33,21 +31,4 @@ public class TaxonomyDiffManifest<O extends TaxonomyTestOutput<?>>
 		super(input, expOutput);
 	}
 
-	@Override
-	public void compare(O actualOutput) throws TestResultComparisonException {
-
-		// FIXME Implement taxonomy comparison and diff
-		int expectedHash = getExpectedOutput().getHashCode();
-		int actualHash = actualOutput.getHashCode();
-		if (expectedHash != actualHash
-				|| !getExpectedOutput().getTaxonomy().equals(actualOutput.getTaxonomy())) {
-			// FIXME: where do I see the expected and actual values (if I do not
-			// print them myself as below)?
-			throw new TestResultComparisonException("\n"
-					+ "EXPECTED TAXONOMY: (hash=" + expectedHash + ")\n"
-					+ getExpectedOutput() + "ACTUAL TAXONOMY: (hash="
-					+ actualHash + ")\n" + actualOutput, getExpectedOutput(),
-					actualOutput);
-		}
-	}
 }

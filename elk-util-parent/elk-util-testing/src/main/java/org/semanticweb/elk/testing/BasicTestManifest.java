@@ -28,10 +28,11 @@ package org.semanticweb.elk.testing;
  *         pavel.klinov@uni-ulm.de
  * @author Peter Skocovsky
  * @param <I>
+ *            The type of test input.
  * @param <O>
- * 
+ *            The type of test output.
  */
-public class BasicTestManifest<I extends TestInput, O extends TestOutput>
+public class BasicTestManifest<I extends TestInput, O>
 		implements TestManifestWithOutput<I, O> {
 
 	private final String name;
@@ -69,18 +70,45 @@ public class BasicTestManifest<I extends TestInput, O extends TestOutput>
 	public void compare(final O actualOutput)
 			throws TestResultComparisonException {
 		if (expOutput == null ? actualOutput != null
-				: !expOutput.equals(actualOutput)) {
+				: expOutput.hashCode() != actualOutput.hashCode()
+						|| !expOutput.equals(actualOutput)) {
 
-			// @formatter:off
-			final String message = "Actual output is not equal to the expected output\n"
-					+ "Input: " + getInput().getName() + "\n"
-					+ "expected:\n" + expOutput + "\n"
-					+ "actual:\n" + actualOutput + "\n";
-			// @formatter:on
+			final StringBuilder message = new StringBuilder(
+					"Actual output is not equal to the expected output");
+			message.append("\nInput: ").append(getInput().getName());
+			appendDiff(actualOutput, message.append("\nDiff:\n"));
+			appendOutput(expOutput, message.append("\nExpected:\n"));
+			appendOutput(actualOutput, message.append("\nActual:\n"));
 
-			throw new TestResultComparisonException(message, expOutput,
-					actualOutput);
+			throw new TestResultComparisonException(message.toString(),
+					expOutput, actualOutput);
 		}
+	}
+
+	/**
+	 * Writes the difference of {@link #getExpectedOutput()} and the specified
+	 * actual output to the provided {@link StringBuilder}.
+	 * <p>
+	 * Default implementation writes nothing.
+	 * 
+	 * @param actualOutput
+	 * @param result
+	 */
+	protected void appendDiff(final O actualOutput,
+			final StringBuilder result) {
+		// Empty by default.
+	}
+
+	/**
+	 * Writes the specified output to the provided {@link StringBuilder}.
+	 * <p>
+	 * Default implementation writes {@link #toString()} of the output.
+	 * 
+	 * @param output
+	 * @param result
+	 */
+	protected void appendOutput(final O output, final StringBuilder result) {
+		result.append(output.toString());
 	}
 
 }

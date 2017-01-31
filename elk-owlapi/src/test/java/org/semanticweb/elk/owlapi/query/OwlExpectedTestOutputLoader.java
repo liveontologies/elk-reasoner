@@ -42,7 +42,6 @@ import org.semanticweb.elk.reasoner.query.QueryTestManifest;
 import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.reasoner.query.SatisfiabilityTestOutput;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
-import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
@@ -206,15 +205,15 @@ public class OwlExpectedTestOutputLoader {
 		this.instances_ = instances;
 	}
 
-	public Collection<QueryTestManifest<OWLClassExpression, TestOutput>> getNoOutputManifests(
+	public Collection<QueryTestManifest<OWLClassExpression, Void>> getNoOutputManifests(
 			final URL input) {
 
-		final List<QueryTestManifest<OWLClassExpression, TestOutput>> result = new ArrayList<QueryTestManifest<OWLClassExpression, TestOutput>>(
+		final List<QueryTestManifest<OWLClassExpression, Void>> result = new ArrayList<QueryTestManifest<OWLClassExpression, Void>>(
 				queryClasses_.size());
 
 		for (final OWLClassExpression queryClass : queryClasses_) {
-			result.add(new QueryTestManifest<OWLClassExpression, TestOutput>(
-					input, queryClass, null));
+			result.add(new QueryTestManifest<OWLClassExpression, Void>(input,
+					queryClass, null));
 		}
 
 		return result;

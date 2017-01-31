@@ -21,18 +21,16 @@
  */
 package org.semanticweb.elk.reasoner;
 
-import org.semanticweb.elk.testing.TestOutput;
-
 /**
  * A test delegate for tests with interrupts.
  * 
  * @author Peter Skocovsky
  *
- * @param <AO>
- *            The type of actual test output.
+ * @param <O>
+ *            The type of test output.
  */
-public interface ReasoningTestWithInterruptsDelegate<AO extends TestOutput>
-		extends ReasoningTestDelegate<AO> {
+public interface ReasoningTestWithInterruptsDelegate<O>
+		extends ReasoningTestDelegate<O> {
 
 	/**
 	 * @return The probability that the reasoning is interrupted when checked

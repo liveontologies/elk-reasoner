@@ -21,22 +21,19 @@
  */
 package org.semanticweb.elk.reasoner.query;
 
-import org.semanticweb.elk.testing.TestOutput;
-
 /**
- * A {@link TestOutput} of a query for super-entities.
+ * A test output of a query for related entities.
  * 
  * @author Peter Skocovsky
  *
  * @param <E>
  *            the type of entities.
  */
-public interface RelatedEntitiesTestOutput<E>
-		extends TestOutput {
+public interface RelatedEntitiesTestOutput<E> {
 
 	/**
-	 * @return the super-entities.
+	 * @return the related entities.
 	 */
-	Iterable<? extends Iterable<E>> getSubEntities();
+	Iterable<? extends Iterable<E>> getRelatedEntities();
 
 }

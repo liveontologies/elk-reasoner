@@ -30,10 +30,8 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
-import org.semanticweb.elk.testing.TestOutput;
 
-public class TaxonomyTestOutput<T extends Taxonomy<? extends ElkEntity>> implements
-		TestOutput {
+public class TaxonomyTestOutput<T extends Taxonomy<? extends ElkEntity>> {
 
 	private final T taxonomy_;
 
@@ -45,14 +43,29 @@ public class TaxonomyTestOutput<T extends Taxonomy<? extends ElkEntity>> impleme
 		return this.taxonomy_;
 	}
 
-	int getHashCode() {
+	@Override
+	public int hashCode() {
 		return TaxonomyHasher.hash(taxonomy_);
 	}
 
-	void dumpTaxonomy(Writer writer) throws IOException {
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		return taxonomy_.equals(((TaxonomyTestOutput<?>) obj).taxonomy_);
+	}
+
+	protected void dumpTaxonomy(final Writer writer) throws IOException {
 		TaxonomyPrinter.dumpTaxomomy(taxonomy_, writer, false);
 	}
-	
+
 	@Override
 	public String toString() {
 
@@ -60,12 +73,10 @@ public class TaxonomyTestOutput<T extends Taxonomy<? extends ElkEntity>> impleme
 		try {
 			dumpTaxonomy(writer);
 		} catch (IOException e) {
-			// TODO: what to return?
-			return e.toString();
+			throw new RuntimeException(e);
 		}
 		return writer.toString();
 
-		// return String.valueOf(getHashCode());
 	}
 
 }

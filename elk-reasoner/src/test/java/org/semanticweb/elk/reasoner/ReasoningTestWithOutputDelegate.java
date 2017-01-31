@@ -21,18 +21,16 @@
  */
 package org.semanticweb.elk.reasoner;
 
-import org.semanticweb.elk.testing.TestOutput;
-
 /**
  * A test delegate for tests with output.
  * 
  * @author Peter Skocovsky
  *
- * @param <AO>
- *            The type of actual test output.
+ * @param <O>
+ *            The type of test output.
  */
-public interface ReasoningTestWithOutputDelegate<AO extends TestOutput>
-		extends ReasoningTestDelegate<AO> {
+public interface ReasoningTestWithOutputDelegate<O>
+		extends ReasoningTestDelegate<O> {
 
 	/**
 	 * Called at the beginning of the test with output.

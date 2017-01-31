@@ -25,7 +25,6 @@ import java.net.URL;
 
 import org.semanticweb.elk.io.FileUtils;
 import org.semanticweb.elk.testing.BasicTestManifest;
-import org.semanticweb.elk.testing.TestOutput;
 
 /**
  * Test manifest for query tests.
@@ -37,7 +36,7 @@ import org.semanticweb.elk.testing.TestOutput;
  * @param <O>
  *            Type of the test output.
  */
-public class QueryTestManifest<Q, O extends TestOutput>
+public class QueryTestManifest<Q, O>
 		extends BasicTestManifest<QueryTestInput<Q>, O> {
 
 	public QueryTestManifest(final String testName, final URL input,

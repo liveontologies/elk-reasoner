@@ -21,17 +21,15 @@
  */
 package org.semanticweb.elk.reasoner;
 
-import org.semanticweb.elk.testing.TestOutput;
-
 /**
  * Specific steps of generic tests are delegated to instances of this interface.
  * 
  * @author Peter Skocovsky
  *
- * @param <AO>
- *            The type of actual test output.
+ * @param <O>
+ *            The type of test output.
  */
-public interface ReasoningTestDelegate<AO extends TestOutput> {
+public interface ReasoningTestDelegate<O> {
 
 	/**
 	 * Called before the test is run.
@@ -46,7 +44,7 @@ public interface ReasoningTestDelegate<AO extends TestOutput> {
 	 * @return the actual test output
 	 * @throws Exception
 	 */
-	AO getActualOutput() throws Exception;
+	O getActualOutput() throws Exception;
 
 	/**
 	 * Called after the test is run.

@@ -54,7 +54,6 @@ import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.ElkIndividualKeyProvider;
-import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
@@ -225,15 +224,15 @@ public class ElkExpectedTestOutputLoader {
 		this.instances_ = instances;
 	}
 
-	public Collection<QueryTestManifest<ElkClassExpression, TestOutput>> getNoOutputManifests(
+	public Collection<QueryTestManifest<ElkClassExpression, Void>> getNoOutputManifests(
 			final URL input) {
 
-		final List<QueryTestManifest<ElkClassExpression, TestOutput>> result = new ArrayList<QueryTestManifest<ElkClassExpression, TestOutput>>(
+		final List<QueryTestManifest<ElkClassExpression, Void>> result = new ArrayList<QueryTestManifest<ElkClassExpression, Void>>(
 				queryClasses_.size());
 
 		for (final ElkClassExpression queryClass : queryClasses_) {
-			result.add(new QueryTestManifest<ElkClassExpression, TestOutput>(
-					input, queryClass, null));
+			result.add(new QueryTestManifest<ElkClassExpression, Void>(input,
+					queryClass, null));
 		}
 
 		return result;

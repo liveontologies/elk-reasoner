@@ -21,18 +21,15 @@
  */
 package org.semanticweb.elk.reasoner.query;
 
-import org.semanticweb.elk.testing.TestOutput;
-
 /**
- * A {@link TestOutput} of a query for equivalent entities.
+ * A test output of a query for equivalent entities.
  * 
  * @author Peter Skocovsky
  *
  * @param <E>
  *            the type of entities.
  */
-public interface EquivalentEntitiesTestOutput<E>
-		extends TestOutput {
+public interface EquivalentEntitiesTestOutput<E> {
 
 	/**
 	 * @return the equivalent entities.

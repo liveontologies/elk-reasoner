@@ -22,7 +22,6 @@
 package org.semanticweb.elk.reasoner.incremental;
 
 import org.semanticweb.elk.reasoner.ReasoningTestWithInterruptsDelegate;
-import org.semanticweb.elk.testing.TestOutput;
 
 /**
  * Test delegate for incremental tests with interrupts.
@@ -35,7 +34,7 @@ import org.semanticweb.elk.testing.TestOutput;
  * @param <O>
  *            The type of test output.
  */
-public interface IncrementalReasoningTestWithInterruptsDelegate<A, O extends TestOutput>
+public interface IncrementalReasoningTestWithInterruptsDelegate<A, O>
 		extends IncrementalReasoningTestDelegate<A, O>,
 		ReasoningTestWithInterruptsDelegate<O> {
 
