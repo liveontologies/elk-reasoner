@@ -38,7 +38,7 @@ public class SimpleManifestCreator
 
 	@Override
 	public Collection<? extends TestManifest<UrlTestInput>> createManifests(
-			final List<URL> urls) throws IOException {
+			final String name, final List<URL> urls) throws IOException {
 		if (urls == null || urls.isEmpty()) {
 			// Not enough inputs. Something was probably forgotten.
 			throw new IllegalArgumentException("No test inputs!");
@@ -47,8 +47,8 @@ public class SimpleManifestCreator
 			// No inputs, no manifests.
 			return Collections.emptySet();
 		}
-		return Collections
-				.singleton(new ReasoningTestManifest<Void>(urls.get(0), null));
+		return Collections.singleton(
+				new ReasoningTestManifest<Void>(name, urls.get(0), null));
 	}
 
 }

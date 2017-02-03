@@ -35,9 +35,11 @@ import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owlapi.EntailmentTestManifestCreator;
 import org.semanticweb.elk.owlapi.OwlApiReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.BaseQueryTest;
+import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.reasoner.query.QueryTestManifest;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.PolySuite;
+import org.semanticweb.elk.testing.TestUtils;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -49,9 +51,9 @@ public class OwlApiEntailmentQueryTest
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
-			"Disjunctions.owl",// Disjuctions not fully supported
-			"OneOf.owl",// Disjuctions not fully supported
-			"UnsupportedQueryIndexing.owl",// Unsupported class expression
+			INPUT_DATA_LOCATION + "/Disjunctions.owl",// Disjuctions not fully supported
+			INPUT_DATA_LOCATION + "/OneOf.owl",// Disjuctions not fully supported
+			INPUT_DATA_LOCATION + "/UnsupportedQueryIndexing.owl",// Unsupported class expression
 		};
 	// @formatter:on
 
@@ -60,8 +62,9 @@ public class OwlApiEntailmentQueryTest
 	}
 
 	@Override
-	protected boolean ignoreInputFile(final String fileName) {
-		return Arrays.binarySearch(IGNORE_LIST, fileName) >= 0;
+	protected boolean ignore(final QueryTestInput<OWLAxiom> input) {
+		return super.ignore(input)
+				|| TestUtils.ignore(input, INPUT_DATA_LOCATION, IGNORE_LIST);
 	}
 
 	public OwlApiEntailmentQueryTest(
@@ -87,7 +90,7 @@ public class OwlApiEntailmentQueryTest
 
 		@Override
 		public Collection<? extends QueryTestManifest<OWLAxiom, Boolean>> createManifests(
-				final List<URL> urls) throws IOException {
+				final String name, final List<URL> urls) throws IOException {
 
 			if (urls == null || urls.size() < 2) {
 				// Not enough inputs. Probably forgot something.
@@ -103,7 +106,7 @@ public class OwlApiEntailmentQueryTest
 				outputIS = urls.get(1).openStream();
 
 				return OwlExpectedTestOutputLoader.load(outputIS)
-						.getEntailmentManifests(urls.get(0));
+						.getEntailmentManifests(name, urls.get(0));
 
 			} finally {
 				IOUtils.closeQuietly(outputIS);

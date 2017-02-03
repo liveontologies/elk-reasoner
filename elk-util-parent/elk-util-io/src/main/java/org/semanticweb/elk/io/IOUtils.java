@@ -33,7 +33,9 @@ import java.net.URL;
 import java.security.CodeSource;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Stack;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -186,6 +188,153 @@ public class IOUtils {
 		}
 
 		return testResources;
+	}
+
+	public static void traverseDirectoryTree(final File root,
+			final PathVisitor visitor) {
+		traverseDirectoryTree(root, "", visitor);
+	}
+
+	private static void traverseDirectoryTree(final File file,
+			final String relativePath, final PathVisitor visitor) {
+
+		final String path = relativePath + file.getName();
+
+		visitor.visitBefore(path);
+
+		if (file.isDirectory()) {
+			final File[] innerFiles = file.listFiles();
+			if (innerFiles == null) {
+				throw new RuntimeException("Error listing directory " + file);
+			}
+			// else
+			for (final File innerFile : innerFiles) {
+				traverseDirectoryTree(innerFile, path + File.separator,
+						visitor);
+			}
+		}
+
+		visitor.visitAfter(path);
+
+	}
+
+	public static void traverseJarContentTree(final String rootPath,
+			final Class<?> srcClass, final PathVisitor visitor)
+			throws IOException {
+
+		// Make sure that root is a directory (by appending '/').
+		final String root = rootPath.endsWith("/") ? rootPath : rootPath + "/";
+
+		final CodeSource src = srcClass.getProtectionDomain().getCodeSource();
+		if (src == null) {
+			throw new IOException("Unable to get code source for "
+					+ srcClass.getSimpleName());
+		}
+
+		// Collect zip entries starting with rootPath.
+		final List<String> paths = new ArrayList<String>();
+		boolean haveRootPath = false;
+		ZipInputStream zip = null;
+		try {
+			zip = new ZipInputStream(src.getLocation().openStream());
+
+			ZipEntry ze = null;
+			while ((ze = zip.getNextEntry()) != null) {
+				final String entryName = ze.getName();
+				if (entryName.startsWith(root)) {
+					paths.add(entryName);
+					if (entryName.length() == root.length()) {
+						haveRootPath = true;
+					}
+				}
+			}
+		} finally {
+			closeQuietly(zip);
+		}
+
+		// Simulate recursive traversal.
+		/*
+		 * If nodes in a file tree are the file paths, then any predecessor of a
+		 * node is its prefix. We iterate over such nodes in the alphabetical
+		 * order and remember the current branch in a stack. When the top of the
+		 * stack is a prefix of the current node, we are descending in the tree
+		 * (pushing the current node). When it is not, we are ascending by
+		 * popping until the top is a prefix again, which is the previous case.
+		 */
+		if (!haveRootPath) {
+			// So that there is only one root.
+			paths.add(root);
+		}
+		Collections.sort(paths);
+
+		final Stack<String> currentBranch = new Stack<String>();
+
+		for (final String path : paths) {
+			final String[] pathComponents = path.split("/");
+
+			if (currentBranch.isEmpty()) {
+				// The first element.
+				visitor.visitBefore(path);
+				currentBranch.push(path);
+				continue;
+			}
+			// Else, not the first element.
+
+			String top = currentBranch.peek();
+			String[] topComponents = top.split("/");
+			if (startsWith(pathComponents, topComponents)) {
+				// Descending.
+				visitor.visitBefore(path);
+				currentBranch.push(path);
+				continue;
+			}
+			// else, ascending.
+
+			do {
+				currentBranch.pop();
+				visitor.visitAfter(top);
+				/*
+				 * The stack shouldn't be empty, because the root is prefix of
+				 * every node and it is on the bottom of the stack.
+				 */
+				top = currentBranch.peek();
+				topComponents = top.split("/");
+			} while (!startsWith(pathComponents, topComponents));
+
+			// Descending again.
+			visitor.visitBefore(path);
+			currentBranch.push(path);
+
+		}
+
+		// Ascend back to the root.
+		while (!currentBranch.isEmpty()) {
+			final String top = currentBranch.pop();
+			visitor.visitAfter(top);
+		}
+
+	}
+
+	private static <E> boolean startsWith(final E[] array, final E[] prefix) {
+		if (prefix.length > array.length) {
+			return false;
+		}
+		// else
+		for (int i = 0; i < prefix.length; i++) {
+			if (prefix[i] == null ? array[i] != null
+					: !prefix[i].equals(array[i])) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public static interface PathVisitor {
+
+		void visitBefore(String path);
+
+		void visitAfter(String path);
+
 	}
 
 }

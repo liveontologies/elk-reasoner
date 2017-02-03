@@ -27,6 +27,7 @@ package org.semanticweb.elk.testing;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.semanticweb.elk.io.FileUtils;
 
@@ -85,4 +86,21 @@ public class TestUtils {
 			}
 		}
 	}
+
+	/**
+	 * @param input
+	 * @param inputDataLocation
+	 * @param sortedIgnoredPaths
+	 * @return Whether the suffix of the path of the input URL starting at the
+	 *         last occurrence of the input data location is in sorted ignored
+	 *         paths.
+	 */
+	public static boolean ignore(final UrlTestInput input,
+			final String inputDataLocation, final String[] sortedIgnoredPaths) {
+		final String path = input.getUrl().getPath();
+		final int index = path.lastIndexOf(inputDataLocation);
+		final String relativePath = path.substring(index);
+		return Arrays.binarySearch(sortedIgnoredPaths, relativePath) >= 0;
+	}
+
 }

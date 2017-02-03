@@ -43,6 +43,7 @@ import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
+import org.semanticweb.elk.testing.TestUtils;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 
@@ -52,8 +53,8 @@ public class OwlApiClassExpressionSatisfiabilityQueryTest
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
-			"Inconsistent.owl",// Throwing InconsistentOntologyException
-			"InconsistentInstances.owl",// Throwing InconsistentOntologyException
+			INPUT_DATA_LOCATION + "/Inconsistent.owl",// Throwing InconsistentOntologyException
+			INPUT_DATA_LOCATION + "/InconsistentInstances.owl",// Throwing InconsistentOntologyException
 		};
 	// @formatter:on
 
@@ -62,8 +63,9 @@ public class OwlApiClassExpressionSatisfiabilityQueryTest
 	}
 
 	@Override
-	protected boolean ignoreInputFile(final String fileName) {
-		return Arrays.binarySearch(IGNORE_LIST, fileName) >= 0;
+	protected boolean ignore(final QueryTestInput<OWLClassExpression> input) {
+		return super.ignore(input)
+				|| TestUtils.ignore(input, INPUT_DATA_LOCATION, IGNORE_LIST);
 	}
 
 	public OwlApiClassExpressionSatisfiabilityQueryTest(
@@ -98,7 +100,8 @@ public class OwlApiClassExpressionSatisfiabilityQueryTest
 
 					@Override
 					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, SatisfiabilityTestOutput>> createManifests(
-							final List<URL> urls) throws IOException {
+							final String name, final List<URL> urls)
+							throws IOException {
 
 						if (urls == null || urls.size() < 2) {
 							// Not enough inputs. Probably forgot something.
@@ -115,7 +118,8 @@ public class OwlApiClassExpressionSatisfiabilityQueryTest
 							outputIS = urls.get(1).openStream();
 
 							return OwlExpectedTestOutputLoader.load(outputIS)
-									.getSatisfiabilityManifests(urls.get(0));
+									.getSatisfiabilityManifests(name,
+											urls.get(0));
 
 						} finally {
 							IOUtils.closeQuietly(outputIS);

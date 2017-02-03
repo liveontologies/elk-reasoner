@@ -22,7 +22,6 @@
 package org.semanticweb.elk.reasoner.query;
 
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.io.FileUtils;
 import org.semanticweb.elk.reasoner.ReasoningCorrectnessTestWithInterrupts;
 import org.semanticweb.elk.reasoner.ReasoningTestWithOutputAndInterruptsDelegate;
 import org.semanticweb.elk.testing.PolySuite;
@@ -38,14 +37,5 @@ public abstract class BaseQueryTest<Q, O> extends
 			final ReasoningTestWithOutputAndInterruptsDelegate<O> delegate) {
 		super(manifest, delegate);
 	}
-
-	@Override
-	protected boolean ignore(final QueryTestInput<Q> input) {
-		return ignoreInputFile(FileUtils.getFileName(input.getUrl().getPath()));
-	}
-
-	protected boolean ignoreInputFile(final String fileName) {
-		return false;
-	};
 
 }

@@ -46,7 +46,7 @@ public class EntailmentTestManifestCreator implements
 
 	@Override
 	public Collection<? extends TestManifestWithOutput<QueryTestInput<Collection<ElkAxiom>>, EntailmentQueryTestOutput<ElkAxiom>>> createManifests(
-			final List<URL> urls) throws IOException {
+			final String name, final List<URL> urls) throws IOException {
 
 		if (urls == null || urls.isEmpty()) {
 			// No input files. Fail, while something was probably forgotten.
@@ -86,7 +86,7 @@ public class EntailmentTestManifestCreator implements
 
 			return Collections.singleton(
 					new EntailmentQueryTestManifest<Collection<ElkAxiom>, ElkAxiom>(
-							input, query,
+							name, input, query,
 							new EntailmentQueryTestOutput<ElkAxiom>(output)));
 
 		} catch (final Owl2ParseException e) {

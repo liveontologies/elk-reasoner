@@ -30,9 +30,11 @@ import org.semanticweb.elk.owlapi.ElkProver;
 import org.semanticweb.elk.owlapi.EntailmentTestManifestCreator;
 import org.semanticweb.elk.owlapi.OwlApiReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.BaseQueryTest;
+import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.reasoner.query.QueryTestManifest;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.PolySuite;
+import org.semanticweb.elk.testing.TestUtils;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -51,8 +53,9 @@ public class EntailmentProofTest extends BaseQueryTest<OWLAxiom, Boolean> {
 	}
 
 	@Override
-	protected boolean ignoreInputFile(final String fileName) {
-		return Arrays.binarySearch(IGNORE_LIST, fileName) >= 0;
+	protected boolean ignore(final QueryTestInput<OWLAxiom> input) {
+		return super.ignore(input)
+				|| TestUtils.ignore(input, INPUT_DATA_LOCATION, IGNORE_LIST);
 	}
 
 	public static final double INTERRUPTION_CHANCE = 0.003;

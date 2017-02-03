@@ -68,7 +68,8 @@ public class ElkClassExpressionSatisfiabilityQueryTest
 
 					@Override
 					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, SatisfiabilityTestOutput>> createManifests(
-							final List<URL> urls) throws IOException {
+							final String name, final List<URL> urls)
+							throws IOException {
 
 						if (urls == null || urls.size() < 2) {
 							// Not enough inputs. Probably forgot something.
@@ -85,7 +86,8 @@ public class ElkClassExpressionSatisfiabilityQueryTest
 							outputIS = urls.get(1).openStream();
 
 							return ElkExpectedTestOutputLoader.load(outputIS)
-									.getSatisfiabilityManifests(urls.get(0));
+									.getSatisfiabilityManifests(name,
+											urls.get(0));
 
 						} finally {
 							IOUtils.closeQuietly(outputIS);

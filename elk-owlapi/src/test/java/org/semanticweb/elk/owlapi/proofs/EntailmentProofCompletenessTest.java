@@ -29,7 +29,6 @@ import java.util.Random;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.RandomSeedProvider;
-import org.semanticweb.elk.io.FileUtils;
 import org.semanticweb.elk.owlapi.ElkProver;
 import org.semanticweb.elk.owlapi.EntailmentTestManifestCreator;
 import org.semanticweb.elk.owlapi.OwlApiReasoningTestDelegate;
@@ -40,6 +39,7 @@ import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifest;
+import org.semanticweb.elk.testing.TestUtils;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
 @RunWith(PolySuite.class)
@@ -57,11 +57,8 @@ public class EntailmentProofCompletenessTest extends
 
 	@Override
 	protected boolean ignore(final QueryTestInput<OWLAxiom> input) {
-		return ignoreInputFile(FileUtils.getFileName(input.getUrl().getPath()));
-	}
-
-	protected boolean ignoreInputFile(final String fileName) {
-		return Arrays.binarySearch(IGNORE_LIST, fileName) >= 0;
+		return super.ignore(input) || TestUtils.ignore(input,
+				ENTAILMENT_QUERY_INPUT_DIR, IGNORE_LIST);
 	}
 
 	public static final double INTERRUPTION_CHANCE = 0.03;

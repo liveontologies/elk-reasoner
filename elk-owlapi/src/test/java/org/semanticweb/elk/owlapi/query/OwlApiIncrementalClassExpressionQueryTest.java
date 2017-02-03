@@ -63,7 +63,8 @@ public abstract class OwlApiIncrementalClassExpressionQueryTest<O>
 
 					@Override
 					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, Void>> createManifests(
-							final List<URL> urls) throws IOException {
+							final String name, final List<URL> urls)
+							throws IOException {
 
 						if (urls == null || urls.size() < 2) {
 							// Not enough inputs. Probably forgot something.
@@ -81,7 +82,7 @@ public abstract class OwlApiIncrementalClassExpressionQueryTest<O>
 
 							// don't need an expected output for these tests
 							return OwlExpectedTestOutputLoader.load(outputIS)
-									.getNoOutputManifests(urls.get(0));
+									.getNoOutputManifests(name, urls.get(0));
 
 						} finally {
 							IOUtils.closeQuietly(outputIS);

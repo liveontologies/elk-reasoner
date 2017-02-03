@@ -20,9 +20,6 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
 package org.semanticweb.elk.io;
 
 import java.io.File;
@@ -33,6 +30,7 @@ import java.io.IOException;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
 public class FileUtils {
 
@@ -65,6 +63,22 @@ public class FileUtils {
 			return filename.substring(0, index);
 		}
 	}	
+
+	/**
+	 * @param filename
+	 * @return The file extension of the provided file name, or {@code null}
+	 *         when it does not have an extension. A file extension is a
+	 *         substring of the name starting immediately after the last
+	 *         {@code '.'} and ending at the end of the name.
+	 */
+	public static String getExtension(final String filename) {
+		final int index = filename.lastIndexOf('.');
+		if (index < 0) {
+			return null;
+		} else {
+			return filename.substring(index + 1, filename.length());
+		}
+	}
 
 	public static String getFileName(String path) {
 		return new File(path).getName();

@@ -33,6 +33,7 @@ import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.testing.PolySuite;
+import org.semanticweb.elk.testing.TestUtils;
 import org.semanticweb.elk.testing.UrlTestInput;
 
 /**
@@ -45,9 +46,9 @@ public class OWLAPIDiffRealizationCorrectnessTest
 		extends BaseRealizationCorrectnessTest {
 
 	static final String[] IGNORE_LIST = {
-			"AssertionsPropertyRanges.owl",
-			"Inconsistent.owl",
-			"MultipleInconsistencies.owl" };
+			INPUT_DATA_LOCATION + "/AssertionsPropertyRanges.owl",
+			INPUT_DATA_LOCATION + "/Inconsistent.owl",
+			INPUT_DATA_LOCATION + "/MultipleInconsistencies.owl" };
 
 	static {
 		Arrays.sort(IGNORE_LIST);
@@ -79,7 +80,8 @@ public class OWLAPIDiffRealizationCorrectnessTest
 
 	@Override
 	protected boolean ignore(final UrlTestInput input) {
-		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
+		return super.ignore(input)
+				|| TestUtils.ignore(input, INPUT_DATA_LOCATION, IGNORE_LIST);
 	}
 
 }

@@ -61,8 +61,9 @@ public class EntailmentProofTest extends BaseQueryTest<ElkAxiom, Void> {
 	}
 
 	@Override
-	protected boolean ignoreInputFile(final String fileName) {
-		return Arrays.binarySearch(IGNORE_LIST, fileName) >= 0;
+	protected boolean ignore(final QueryTestInput<ElkAxiom> input) {
+		return super.ignore(input) || org.semanticweb.elk.testing.TestUtils
+				.ignore(input, INPUT_DATA_LOCATION, IGNORE_LIST);
 	}
 
 	public static final double INTERRUPTION_CHANCE = 0.003;
@@ -93,7 +94,7 @@ public class EntailmentProofTest extends BaseQueryTest<ElkAxiom, Void> {
 
 		@Override
 		public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkAxiom>, Void>> createManifests(
-				final List<URL> urls) throws IOException {
+				final String name, final List<URL> urls) throws IOException {
 
 			if (urls == null || urls.size() < 2) {
 				// Not enough inputs. Something was probably forgotten.
@@ -115,8 +116,8 @@ public class EntailmentProofTest extends BaseQueryTest<ElkAxiom, Void> {
 				final Collection<QueryTestManifest<ElkAxiom, Void>> manifests = new ArrayList<QueryTestManifest<ElkAxiom, Void>>(
 						query.size());
 				for (final ElkAxiom axiom : query) {
-					manifests.add(new QueryTestManifest<ElkAxiom, Void>(input,
-							axiom, null));
+					manifests.add(new QueryTestManifest<ElkAxiom, Void>(name,
+							input, axiom, null));
 				}
 
 				return manifests;

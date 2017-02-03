@@ -28,6 +28,9 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -50,6 +53,8 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
+import org.semanticweb.elk.testing.TestInput;
+import org.semanticweb.elk.testing.TestManifest;
 
 /**
  * Tests whether members of various implementations of taxonomy
@@ -67,7 +72,28 @@ public class InstanceTaxonomyMemberComparisonTest {
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy(String resource)
 				throws ElkException;
 	}
-	
+
+	static class Manifest implements TestManifest<TestInput> {
+
+		public final InstanceTaxonomyProvider instanceTaxonomyProvider;
+
+		public Manifest(
+				final InstanceTaxonomyProvider instanceTaxonomyProvider) {
+			this.instanceTaxonomyProvider = instanceTaxonomyProvider;
+		}
+
+		@Override
+		public String getName() {
+			return instanceTaxonomyProvider.toString();
+		}
+
+		@Override
+		public TestInput getInput() {
+			return null;
+		}
+
+	}
+
 	/**
 	 * Loads ontology from the <code>source</code>, classifies it with the reasoner
 	 * and returns its taxonomy. This ensures that the returned taxonomy is the one used
@@ -116,23 +142,27 @@ public class InstanceTaxonomyMemberComparisonTest {
 		};
 	};
 	
-	static final Object[] DATA = {
-			REASONER_TAXONOMY,
-			MOCK_TAXONOMY,
+	static final Manifest[] DATA = {
+			new Manifest(REASONER_TAXONOMY),
+			new Manifest(MOCK_TAXONOMY),
 	};
 	
 	static final Configuration CONFIG = new Configuration() {
 		@Override
-		public int size() {
-			return DATA.length;
+		public String getName() {
+			return ClassTaxonomyMemberComparisonTest.class.getName();
 		}
 		@Override
-		public Object getTestValue(final int index) {
-			return DATA[index];
+		public Collection<? extends TestManifest<?>> getManifests() {
+			return Arrays.asList(DATA);
 		}
 		@Override
-		public String getTestName(final int index) {
-			return "test on " + DATA[index].toString();
+		public Collection<? extends Configuration> getChildren() {
+			return Collections.emptyList();
+		}
+		@Override
+		public boolean isEmpty() {
+			return DATA.length <= 0;
 		}
 	};
 	
@@ -146,9 +176,8 @@ public class InstanceTaxonomyMemberComparisonTest {
 	 */
 	private final InstanceTaxonomyProvider instanceTaxonomyProvider_;
 	
-	public InstanceTaxonomyMemberComparisonTest(
-			final InstanceTaxonomyProvider instanceTaxonomyProvider) {
-		this.instanceTaxonomyProvider_ = instanceTaxonomyProvider;
+	public InstanceTaxonomyMemberComparisonTest(final Manifest manifest) {
+		this.instanceTaxonomyProvider_ = manifest.instanceTaxonomyProvider;
 	}
 	
 	@Test

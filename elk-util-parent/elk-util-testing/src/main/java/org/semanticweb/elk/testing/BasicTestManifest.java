@@ -32,7 +32,7 @@ package org.semanticweb.elk.testing;
  * @param <O>
  *            The type of test output.
  */
-public abstract class BasicTestManifest<I extends TestInput, O>
+public class BasicTestManifest<I extends TestInput, O>
 		implements TestManifestWithOutput<I, O> {
 
 	private final I input;
@@ -41,6 +41,11 @@ public abstract class BasicTestManifest<I extends TestInput, O>
 	public BasicTestManifest(I input, O expOutput) {
 		this.input = input;
 		this.expOutput = expOutput;
+	}
+
+	@Override
+	public String getName() {
+		return input.getName();
 	}
 
 	@Override
@@ -63,7 +68,8 @@ public abstract class BasicTestManifest<I extends TestInput, O>
 	public void compare(final O actualOutput)
 			throws TestResultComparisonException {
 		if (expOutput == null ? actualOutput != null
-				: !expOutput.equals(actualOutput)) {
+				: expOutput.hashCode() != actualOutput.hashCode()
+						|| !expOutput.equals(actualOutput)) {
 
 			final StringBuilder message = new StringBuilder(
 					"Actual output is not equal to the expected output");
@@ -100,7 +106,7 @@ public abstract class BasicTestManifest<I extends TestInput, O>
 	 * @param result
 	 */
 	protected void appendOutput(final O output, final StringBuilder result) {
-		result.append(output);
+		result.append(output.toString());
 	}
 
 }

@@ -22,8 +22,9 @@
 package org.semanticweb.elk.reasoner.query;
 
 import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.semanticweb.elk.io.FileUtils;
 import org.semanticweb.elk.testing.BasicTestManifest;
 
 /**
@@ -39,13 +40,32 @@ import org.semanticweb.elk.testing.BasicTestManifest;
 public class QueryTestManifest<Q, O>
 		extends BasicTestManifest<QueryTestInput<Q>, O> {
 
-	public QueryTestManifest(final URL input, final Q query,
+	private static final Pattern IRI_REGEXP_ = Pattern
+			.compile("<[^>]*/([^/>]+)>");
+	private static final int MAX_NAME_LENGTH_ = 100;
+	private static final String LONG_NAME_SUFFIX_ = " ...";
+
+	public QueryTestManifest(final String name, final URL input, final Q query,
 			final O expectedOutput) {
 		super(new QueryTestInput<Q>() {
 
 			@Override
 			public String getName() {
-				return FileUtils.getFileName(input.getPath()) + " " + query;
+				String queryName = query.toString();
+				/*
+				 * This is a workaround so that Eclipse displays results for all
+				 * tests. Eclipse seems to identify the tests by their names,
+				 * but if the names are truncated, it may happen that two tests
+				 * have the same names.
+				 */
+				final Matcher matcher = IRI_REGEXP_.matcher(queryName);
+				queryName = matcher.replaceAll("<*$1>");
+				final String testName = name + " " + queryName;
+				final int testNameHash = testName.hashCode();
+				return testName.length() <= MAX_NAME_LENGTH_ ? testName
+						: testName.substring(0,
+								MAX_NAME_LENGTH_ - LONG_NAME_SUFFIX_.length())
+								+ LONG_NAME_SUFFIX_ + testNameHash;
 			}
 
 			@Override
@@ -59,16 +79,6 @@ public class QueryTestManifest<Q, O>
 			}
 
 		}, expectedOutput);
-	}
-
-	@Override
-	public String getName() {
-		final URL input = getInput().getUrl();
-		final Q query = getInput().getQuery();
-		final String testName = FileUtils.getFileName(
-				FileUtils.dropExtension(input.getPath())) + " " + query;
-		return testName.length() <= 80 ? testName
-				: testName.substring(0, 76) + " ...";
 	}
 
 }

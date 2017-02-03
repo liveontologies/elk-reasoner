@@ -24,7 +24,6 @@ package org.semanticweb.elk.testing.io;
 
 import java.net.URL;
 
-import org.semanticweb.elk.io.FileUtils;
 import org.semanticweb.elk.testing.UrlTestInput;
 
 /**
@@ -35,9 +34,11 @@ import org.semanticweb.elk.testing.UrlTestInput;
  */
 public class URLTestIO implements UrlTestInput {
 
+	private final String name_;
 	private final URL url;
 
-	public URLTestIO(final URL file) {
+	public URLTestIO(final String name, final URL file) {
+		this.name_ = name;
 		this.url = file;
 	}
 
@@ -48,12 +49,12 @@ public class URLTestIO implements UrlTestInput {
 
 	@Override
 	public String toString() {
-		return url.toString();
+		return name_ + " " + url.toString();
 	}
 
 	@Override
 	public String getName() {
-		return FileUtils.getFileName(url.getPath());
+		return name_;
 	}
 
 }

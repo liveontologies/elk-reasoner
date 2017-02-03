@@ -29,6 +29,7 @@ import org.semanticweb.elk.reasoner.query.EquivalentEntitiesTestOutput;
 import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestManifest;
+import org.semanticweb.elk.testing.TestUtils;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.reasoner.Node;
@@ -40,8 +41,8 @@ public class OwlApiIncrementalClassExpressionEquivalentClassesQueryTest extends
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
-			"Inconsistent.owl",// Throwing InconsistentOntologyException
-			"InconsistentInstances.owl",// Throwing InconsistentOntologyException
+			INPUT_DATA_LOCATION + "/Inconsistent.owl",// Throwing InconsistentOntologyException
+			INPUT_DATA_LOCATION + "/InconsistentInstances.owl",// Throwing InconsistentOntologyException
 		};
 	// @formatter:on
 
@@ -50,8 +51,9 @@ public class OwlApiIncrementalClassExpressionEquivalentClassesQueryTest extends
 	}
 
 	@Override
-	protected boolean ignoreInputFile(final String fileName) {
-		return Arrays.binarySearch(IGNORE_LIST, fileName) >= 0;
+	protected boolean ignore(final QueryTestInput<OWLClassExpression> input) {
+		return super.ignore(input)
+				|| TestUtils.ignore(input, INPUT_DATA_LOCATION, IGNORE_LIST);
 	}
 
 	public OwlApiIncrementalClassExpressionEquivalentClassesQueryTest(

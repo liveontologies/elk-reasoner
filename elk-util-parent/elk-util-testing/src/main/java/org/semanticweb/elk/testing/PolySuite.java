@@ -28,6 +28,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -70,17 +71,19 @@ public class PolySuite extends Suite {
   public static @interface Config {
   }
 
-  public static interface Configuration {
-    int size();
-    
-    Object getTestValue(int index);
-    String getTestName(int index);
-  }
+	public static interface Configuration {
 
-  // //////////////////////////////
-  // Fields
+		String getName();
 
-  private final List<Runner> runners;
+		Collection<? extends TestManifest<?>> getManifests();
+
+		Collection<? extends Configuration> getChildren();
+
+		boolean isEmpty();
+
+	}
+
+	private final String name_;
 
   // //////////////////////////////
   // Constructor
@@ -91,31 +94,40 @@ public class PolySuite extends Suite {
    * @throws Throwable if something bad happens
    */
   public PolySuite(Class<?> c) throws Throwable {
-    super(c, Collections.<Runner>emptyList());
-    
-    TestClass testClass = getTestClass();
-    Class<?> jTestClass = testClass.getJavaClass();
-    Configuration configuration = getConfiguration(testClass);
-    List<Runner> runners = new ArrayList<Runner>();
-    
-    for (int i = 0, size = configuration.size(); i < size; i++) {
-      SingleRunner runner = new SingleRunner(jTestClass, configuration.getTestValue(i), configuration.getTestName(i));
-      
-      runners.add(runner);
-    }
-    this.runners = runners;
+    super(c, Collections.<Runner>singletonList(new PolySuite(c, getConfiguration(c))));
+    this.name_ = c.getName();
   }
 
-  // //////////////////////////////
-  // Overrides
+	public PolySuite(final Class<?> klass, final Configuration configuration)
+			throws Throwable {
+		super(klass, config2Runners(klass, configuration));
+		this.name_ = configuration.getName();
+	}
 
-  @Override
-  protected List<Runner> getChildren() {
-    return runners;
-  }
+	private static List<Runner> config2Runners(final Class<?> klass,
+			final Configuration configuration) throws Throwable {
+		final List<Runner> runners = new ArrayList<Runner>();
+		for (final Configuration child : configuration.getChildren()) {
+			runners.add(new PolySuite(klass, child));
+		}
+		for (final TestManifest<?> manifest : configuration.getManifests()) {
+			runners.add(new SingleRunner(klass, manifest, manifest.getName()));
+		}
+		return runners;
+	}
+
+	@Override
+	protected String getName() {
+		return name_;
+	}
 
   // //////////////////////////////
   // Private
+
+	private static Configuration getConfiguration(final Class<?> klass)
+			throws Throwable {
+		return getConfiguration(new TestClass(klass));
+	}
 
   private static Configuration getConfiguration(TestClass testClass) throws Throwable {
     return (Configuration) getConfigMethod(testClass).invokeExplosively(null);
@@ -158,12 +170,17 @@ public class PolySuite extends Suite {
 
     @Override
     protected String getName() {
-      return testName;
+		/*
+		 * Replacing the parentheses is a workaround, so that Eclipse
+		 * displays the whole test name. Otherwise Eclipse cuts everything
+		 * before the last '(' and after the last ')'.
+		 */
+      return testName.replace('(', '{').replace(')', '}');
     }
 
     @Override
     protected String testName(FrameworkMethod method) {
-      return testName + ": " + method.getName();
+      return method.getName() + ": " + testName;
     }
 
     @Override

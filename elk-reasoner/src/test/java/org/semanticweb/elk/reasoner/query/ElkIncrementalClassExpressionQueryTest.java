@@ -61,7 +61,8 @@ public abstract class ElkIncrementalClassExpressionQueryTest<O>
 
 					@Override
 					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, Void>> createManifests(
-							final List<URL> urls) throws IOException {
+							final String name, final List<URL> urls)
+							throws IOException {
 
 						if (urls == null || urls.size() < 2) {
 							// Not enough inputs. Probably forgot something.
@@ -79,7 +80,7 @@ public abstract class ElkIncrementalClassExpressionQueryTest<O>
 
 							// don't need an expected output for these tests
 							return ElkExpectedTestOutputLoader.load(outputIS)
-									.getNoOutputManifests(urls.get(0));
+									.getNoOutputManifests(name, urls.get(0));
 
 						} finally {
 							IOUtils.closeQuietly(outputIS);

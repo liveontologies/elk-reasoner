@@ -25,15 +25,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.AbstractMap;
-import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.io.IOUtils;
@@ -44,7 +41,7 @@ import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
-import org.semanticweb.elk.util.collections.Operations;
+import org.semanticweb.elk.testing.TestUtils;
 
 @RunWith(PolySuite.class)
 public class ElkEntailmentQueryTest extends
@@ -52,9 +49,9 @@ public class ElkEntailmentQueryTest extends
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
-			"Disjunctions.owl",// Disjuctions not fully supported
-			"OneOf.owl",// Disjuctions not fully supported
-			"UnsupportedQueryIndexing.owl",// Unsupported class expression
+			INPUT_DATA_LOCATION + "/Disjunctions.owl",// Disjuctions not fully supported
+			INPUT_DATA_LOCATION + "/OneOf.owl",// Disjuctions not fully supported
+			INPUT_DATA_LOCATION + "/UnsupportedQueryIndexing.owl",// Unsupported class expression
 		};
 	// @formatter:on
 
@@ -63,8 +60,9 @@ public class ElkEntailmentQueryTest extends
 	}
 
 	@Override
-	protected boolean ignoreInputFile(final String fileName) {
-		return Arrays.binarySearch(IGNORE_LIST, fileName) >= 0;
+	protected boolean ignore(final QueryTestInput<Collection<ElkAxiom>> input) {
+		return super.ignore(input)
+				|| TestUtils.ignore(input, INPUT_DATA_LOCATION, IGNORE_LIST);
 	}
 
 	public ElkEntailmentQueryTest(
@@ -86,59 +84,15 @@ public class ElkEntailmentQueryTest extends
 	}
 
 	static Map<ElkAxiom, Boolean> resultToOutput(
-			final Map<ElkAxiom, EntailmentQueryResult> result) {
-		return new AbstractMap<ElkAxiom, Boolean>() {
-			@Override
-			public Set<Map.Entry<ElkAxiom, Boolean>> entrySet() {
-				return new AbstractSet<Map.Entry<ElkAxiom, Boolean>>() {
-
-					@Override
-					public Iterator<Map.Entry<ElkAxiom, Boolean>> iterator() {
-						return Operations.map(result.entrySet().iterator(),
-								RESULT_TO_OUTPUT);
-					}
-
-					@Override
-					public int size() {
-						return result.size();
-					}
-
-				};
-			}
-		};
-	}
-
-	private static final Operations.Transformation<Map.Entry<ElkAxiom, EntailmentQueryResult>, Map.Entry<ElkAxiom, Boolean>> RESULT_TO_OUTPUT = new Operations.Transformation<Map.Entry<ElkAxiom, EntailmentQueryResult>, Map.Entry<ElkAxiom, Boolean>>() {
-
-		@Override
-		public Map.Entry<ElkAxiom, Boolean> transform(
-				final Map.Entry<ElkAxiom, EntailmentQueryResult> element) {
-
-			return new Map.Entry<ElkAxiom, Boolean>() {
-
-				@Override
-				public ElkAxiom getKey() {
-					return element.getKey();
-				}
-
-				@Override
-				public Boolean getValue() {
-					try {
-						return element.getValue().accept(RESULT_VISITOR);
-					} catch (final ElkQueryException e) {
-						throw new RuntimeException(e);
-					}
-				}
-
-				@Override
-				public Boolean setValue(final Boolean value) {
-					throw new UnsupportedOperationException();
-				}
-
-			};
+			final Map<ElkAxiom, EntailmentQueryResult> result)
+			throws ElkQueryException {
+		final Map<ElkAxiom, Boolean> output = new HashMap<ElkAxiom, Boolean>();
+		for (final Map.Entry<ElkAxiom, EntailmentQueryResult> e : result
+				.entrySet()) {
+			output.put(e.getKey(), e.getValue().accept(RESULT_VISITOR));
 		}
-
-	};
+		return output;
+	}
 
 	private static final EntailmentQueryResult.Visitor<Boolean, ElkQueryException> RESULT_VISITOR = new EntailmentQueryResult.Visitor<Boolean, ElkQueryException>() {
 
@@ -175,12 +129,11 @@ public class ElkEntailmentQueryTest extends
 
 		@Override
 		public Collection<? extends TestManifestWithOutput<QueryTestInput<Collection<ElkAxiom>>, EntailmentQueryTestOutput<ElkAxiom>>> createManifests(
-				final List<URL> urls) throws IOException {
+				final String name, final List<URL> urls) throws IOException {
 
 			if (urls == null || urls.size() < 2) {
 				// Not enough inputs. Probably forgot something.
-				throw new IllegalArgumentException(
-						"Need at least 2 URL-s!");
+				throw new IllegalArgumentException("Need at least 2 URL-s!");
 			}
 			if (urls.get(0) == null || urls.get(1) == null) {
 				// No inputs, no manifests.
@@ -192,7 +145,7 @@ public class ElkEntailmentQueryTest extends
 				outputIS = urls.get(1).openStream();
 
 				return ElkExpectedTestOutputLoader.load(outputIS)
-						.getEntailmentManifests(urls.get(0));
+						.getEntailmentManifests(name, urls.get(0));
 
 			} finally {
 				IOUtils.closeQuietly(outputIS);

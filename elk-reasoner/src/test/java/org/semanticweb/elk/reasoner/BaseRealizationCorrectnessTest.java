@@ -59,7 +59,7 @@ import org.semanticweb.elk.testing.UrlTestInput;
 public abstract class BaseRealizationCorrectnessTest extends
 		ReasoningCorrectnessTestWithInterrupts<UrlTestInput, InstanceTaxonomyTestOutput<?>, ReasoningTestManifest<InstanceTaxonomyTestOutput<?>>, ReasoningTestWithOutputAndInterruptsDelegate<InstanceTaxonomyTestOutput<?>>> {
 
-	final static String INPUT_DATA_LOCATION = "realization_test_input";
+	public final static String INPUT_DATA_LOCATION = "realization_test_input";
 
 	public BaseRealizationCorrectnessTest(
 			final ReasoningTestManifest<InstanceTaxonomyTestOutput<?>> testManifest,
@@ -75,7 +75,8 @@ public abstract class BaseRealizationCorrectnessTest extends
 				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<UrlTestInput, InstanceTaxonomyTestOutput<?>>>() {
 					@Override
 					public Collection<? extends TestManifestWithOutput<UrlTestInput, InstanceTaxonomyTestOutput<?>>> createManifests(
-							final List<URL> urls) throws IOException {
+							final String name, final List<URL> urls)
+							throws IOException {
 
 						if (urls == null || urls.size() < 2) {
 							// Not enough inputs. Probably forgot something.
@@ -100,7 +101,7 @@ public abstract class BaseRealizationCorrectnessTest extends
 
 							return Collections.singleton(
 									new ReasoningTestManifest<InstanceTaxonomyTestOutput<?>>(
-											urls.get(0),
+											name, urls.get(0),
 											new InstanceTaxonomyTestOutput<InstanceTaxonomy<ElkClass, ElkNamedIndividual>>(
 													expectedTaxonomy)));
 

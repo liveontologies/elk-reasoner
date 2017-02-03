@@ -56,7 +56,7 @@ import org.semanticweb.elk.testing.UrlTestInput;
 public abstract class BaseObjectPropertyClassificationCorrectnessTest extends
 		ReasoningCorrectnessTestWithInterrupts<UrlTestInput, TaxonomyTestOutput<?>, ReasoningTestManifest<TaxonomyTestOutput<?>>, ReasoningTestWithOutputAndInterruptsDelegate<TaxonomyTestOutput<?>>> {
 
-	final static String INPUT_DATA_LOCATION = "property_classification_test_input";
+	public final static String INPUT_DATA_LOCATION = "property_classification_test_input";
 
 	public BaseObjectPropertyClassificationCorrectnessTest(
 			final ReasoningTestManifest<TaxonomyTestOutput<?>> testManifest,
@@ -73,7 +73,8 @@ public abstract class BaseObjectPropertyClassificationCorrectnessTest extends
 				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<UrlTestInput, TaxonomyTestOutput<?>>>() {
 					@Override
 					public Collection<? extends TestManifestWithOutput<UrlTestInput, TaxonomyTestOutput<?>>> createManifests(
-							final List<URL> urls) throws IOException {
+							final String name, final List<URL> urls)
+							throws IOException {
 
 						if (urls == null || urls.size() < 2) {
 							// Not enough inputs. Probably forgot something.
@@ -98,7 +99,7 @@ public abstract class BaseObjectPropertyClassificationCorrectnessTest extends
 
 							return Collections.singleton(
 									new ReasoningTestManifest<TaxonomyTestOutput<?>>(
-											urls.get(0),
+											name, urls.get(0),
 											new TaxonomyTestOutput<Taxonomy<ElkObjectProperty>>(
 													expectedTaxonomy)));
 

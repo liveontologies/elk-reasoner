@@ -29,9 +29,9 @@ import java.util.Map.Entry;
 public class EntailmentQueryTestManifest<Q, A>
 		extends QueryTestManifest<Q, EntailmentQueryTestOutput<A>> {
 
-	public EntailmentQueryTestManifest(final URL input, final Q query,
-			final EntailmentQueryTestOutput<A> expectedOutput) {
-		super(input, query, expectedOutput);
+	public EntailmentQueryTestManifest(final String name, final URL input,
+			final Q query, final EntailmentQueryTestOutput<A> expectedOutput) {
+		super(name, input, query, expectedOutput);
 	}
 
 	@Override

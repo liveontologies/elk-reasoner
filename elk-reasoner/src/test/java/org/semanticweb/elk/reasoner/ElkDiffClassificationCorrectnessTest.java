@@ -26,6 +26,7 @@ import java.util.Arrays;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.testing.TestUtils;
 import org.semanticweb.elk.testing.UrlTestInput;
 
 /**
@@ -60,7 +61,7 @@ public class ElkDiffClassificationCorrectnessTest
 	@Override
 	protected boolean ignore(final UrlTestInput input) {
 		return super.ignore(input)
-				|| Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
+				|| TestUtils.ignore(input, INPUT_DATA_LOCATION, IGNORE_LIST);
 	}
 
 }

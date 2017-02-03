@@ -43,6 +43,7 @@ import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
+import org.semanticweb.elk.testing.TestUtils;
 
 @RunWith(PolySuite.class)
 public class ElkClassExpressionSuperClassesQueryTest extends
@@ -50,8 +51,8 @@ public class ElkClassExpressionSuperClassesQueryTest extends
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
-			"Disjunctions.owl",// Disjuctions not supported
-			"OneOf.owl",// Disjuctions not supported
+			INPUT_DATA_LOCATION + "/Disjunctions.owl",// Disjuctions not supported
+			INPUT_DATA_LOCATION + "/OneOf.owl",// Disjuctions not supported
 		};
 	// @formatter:on
 
@@ -60,8 +61,9 @@ public class ElkClassExpressionSuperClassesQueryTest extends
 	}
 
 	@Override
-	protected boolean ignoreInputFile(final String fileName) {
-		return Arrays.binarySearch(IGNORE_LIST, fileName) >= 0;
+	protected boolean ignore(final QueryTestInput<ElkClassExpression> input) {
+		return super.ignore(input)
+				|| TestUtils.ignore(input, INPUT_DATA_LOCATION, IGNORE_LIST);
 	}
 
 	public ElkClassExpressionSuperClassesQueryTest(
@@ -93,7 +95,8 @@ public class ElkClassExpressionSuperClassesQueryTest extends
 
 					@Override
 					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkClass>>> createManifests(
-							final List<URL> urls) throws IOException {
+							final String name, final List<URL> urls)
+							throws IOException {
 
 						if (urls == null || urls.size() < 2) {
 							// Not enough inputs. Probably forgot something.
@@ -110,7 +113,8 @@ public class ElkClassExpressionSuperClassesQueryTest extends
 							outputIS = urls.get(1).openStream();
 
 							return ElkExpectedTestOutputLoader.load(outputIS)
-									.getSuperEntitiesManifests(urls.get(0));
+									.getSuperEntitiesManifests(name,
+											urls.get(0));
 
 						} finally {
 							IOUtils.closeQuietly(outputIS);

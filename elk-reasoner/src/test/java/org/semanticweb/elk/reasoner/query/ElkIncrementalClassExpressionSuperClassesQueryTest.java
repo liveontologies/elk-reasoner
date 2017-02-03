@@ -32,6 +32,7 @@ import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestManifest;
+import org.semanticweb.elk.testing.TestUtils;
 
 @RunWith(PolySuite.class)
 public class ElkIncrementalClassExpressionSuperClassesQueryTest extends
@@ -39,8 +40,8 @@ public class ElkIncrementalClassExpressionSuperClassesQueryTest extends
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
-			"Disjunctions.owl",// Disjuctions not supported
-			"OneOf.owl",// Disjuctions not supported
+			INPUT_DATA_LOCATION + "/Disjunctions.owl",// Disjuctions not supported
+			INPUT_DATA_LOCATION + "/OneOf.owl",// Disjuctions not supported
 		};
 	// @formatter:on
 
@@ -49,8 +50,9 @@ public class ElkIncrementalClassExpressionSuperClassesQueryTest extends
 	}
 
 	@Override
-	protected boolean ignoreInputFile(final String fileName) {
-		return Arrays.binarySearch(IGNORE_LIST, fileName) >= 0;
+	protected boolean ignore(final QueryTestInput<ElkClassExpression> input) {
+		return super.ignore(input)
+				|| TestUtils.ignore(input, INPUT_DATA_LOCATION, IGNORE_LIST);
 	}
 
 	public ElkIncrementalClassExpressionSuperClassesQueryTest(

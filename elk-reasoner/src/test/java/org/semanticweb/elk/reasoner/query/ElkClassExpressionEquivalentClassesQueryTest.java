@@ -73,7 +73,8 @@ public class ElkClassExpressionEquivalentClassesQueryTest extends
 
 					@Override
 					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, EquivalentEntitiesTestOutput<ElkClass>>> createManifests(
-							final List<URL> urls) throws IOException {
+							final String name, final List<URL> urls)
+							throws IOException {
 
 						if (urls == null || urls.size() < 2) {
 							// Not enough inputs. Probably forgot something.
@@ -90,7 +91,7 @@ public class ElkClassExpressionEquivalentClassesQueryTest extends
 							outputIS = urls.get(1).openStream();
 
 							return ElkExpectedTestOutputLoader.load(outputIS)
-									.getEquivalentEntitiesManifests(
+									.getEquivalentEntitiesManifests(name,
 											urls.get(0));
 
 						} finally {

@@ -22,7 +22,6 @@
 package org.semanticweb.elk.reasoner.query;
 
 import org.junit.Assert;
-import org.semanticweb.elk.io.FileUtils;
 import org.semanticweb.elk.reasoner.incremental.IncrementalReasoningCorrectnessTestWithInterrupts;
 import org.semanticweb.elk.reasoner.incremental.IncrementalReasoningTestWithInterruptsDelegate;
 import org.semanticweb.elk.testing.TestManifest;
@@ -57,14 +56,5 @@ public abstract class BaseIncrementalQueryTest<Q, A, O>
 		}
 
 	}
-
-	@Override
-	protected boolean ignore(final QueryTestInput<Q> input) {
-		return ignoreInputFile(FileUtils.getFileName(input.getUrl().getPath()));
-	}
-
-	protected boolean ignoreInputFile(final String fileName) {
-		return false;
-	};
 
 }

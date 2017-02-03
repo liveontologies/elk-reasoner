@@ -47,7 +47,7 @@ public class EntailmentTestManifestCreator implements
 
 	@Override
 	public Collection<? extends QueryTestManifest<OWLAxiom, Boolean>> createManifests(
-			final List<URL> urls) throws IOException {
+			final String name, final List<URL> urls) throws IOException {
 
 		final Collection<QueryTestManifest<OWLAxiom, Boolean>> manifests = new ArrayList<QueryTestManifest<OWLAxiom, Boolean>>();
 
@@ -94,8 +94,8 @@ public class EntailmentTestManifestCreator implements
 
 			// OWL API interface can query only one axiom at once.
 			for (final OWLAxiom axiom : query) {
-				manifests.add(new QueryTestManifest<OWLAxiom, Boolean>(input,
-						axiom, output.get(axiom)));
+				manifests.add(new QueryTestManifest<OWLAxiom, Boolean>(name,
+						input, axiom, output.get(axiom)));
 			}
 
 			return manifests;

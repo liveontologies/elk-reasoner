@@ -32,14 +32,16 @@ import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.PolySuite;
+import org.semanticweb.elk.testing.TestUtils;
 import org.semanticweb.elk.testing.UrlTestInput;
 
 @RunWith(PolySuite.class)
 public class OWLAPIDiffClassificationCorrectnessTest
 		extends BaseClassificationCorrectnessTest {
 
-	static final String[] IGNORE_LIST = { "DisjointSelf.owl",
-			"CompositionReflexivityComplex.owl" };
+	static final String[] IGNORE_LIST = {
+			INPUT_DATA_LOCATION + "/DisjointSelf.owl",
+			INPUT_DATA_LOCATION + "/CompositionReflexivityComplex.owl" };
 
 	static {
 		Arrays.sort(IGNORE_LIST);
@@ -71,7 +73,7 @@ public class OWLAPIDiffClassificationCorrectnessTest
 	@Override
 	protected boolean ignore(final UrlTestInput input) {
 		return super.ignore(input)
-				|| Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
+				|| TestUtils.ignore(input, INPUT_DATA_LOCATION, IGNORE_LIST);
 	}
 
 }

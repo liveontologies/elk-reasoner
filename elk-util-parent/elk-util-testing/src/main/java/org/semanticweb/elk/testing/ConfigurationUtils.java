@@ -27,14 +27,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Stack;
 
-import org.semanticweb.elk.io.FileUtils;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 
@@ -73,139 +72,112 @@ public class ConfigurationUtils {
 	 */
 	public static Configuration loadFileBasedTestConfiguration(
 			final String inputDir, final Class<?> srcClass,
-			final ManifestCreator<?> creator, final String... fileExts)
-			throws IOException, URISyntaxException {
+			final ManifestCreator<?> creator, final String fileExt,
+			final String... fileExts) throws IOException, URISyntaxException {
 
-		final List<TestManifest<?>> manifests = new ArrayList<TestManifest<?>>();
-
-		if (fileExts == null || fileExts.length <= 0) {
-			return new SimpleConfiguration(manifests);
-		}
+		final BuildingVisitor buildingVisitor = new BuildingVisitor(srcClass,
+				creator, fileExt, fileExts);
 
 		final URI srcURI = srcClass.getClassLoader().getResource(inputDir)
 				.toURI();
 
-		// Get names of files in the input directory and sort them.
-		final List<Iterator<String>> fileNameIters = new ArrayList<Iterator<String>>(
-				fileExts.length);
-		for (final String fileExt : fileExts) {
-			final List<String> fileNames = srcURI.isOpaque()
-					? IOUtils.getResourceNamesFromJAR(inputDir, fileExt,
-							srcClass)
-					: IOUtils.getResourceNamesFromDir(new File(srcURI),
-							fileExt);
-			Collections.sort(fileNames);
-			fileNameIters.add(fileNames.iterator());
+		if (srcURI.isOpaque()) {
+			IOUtils.traverseJarContentTree(inputDir, srcClass, buildingVisitor);
+		} else {
+			IOUtils.traverseDirectoryTree(new File(srcURI), buildingVisitor);
 		}
 
-		// Create manifests for tuples of the same file names without extension.
-
-		final List<Integer> minIndices = new ArrayList<Integer>(
-				fileExts.length);
-		boolean everyHasNext = true;
-		final List<String> files = everyNext(fileNameIters);
-		if (files == null) {
-			everyHasNext = false;
+		if (buildingVisitor.getException() != null) {
+			throw buildingVisitor.getException();
 		}
+		// else
 
-		while (everyHasNext) {
-
-			// Get indices of files with minimal name.
-			collectMinIndices(files, new Comparator<String>() {
-
-				@Override
-				public int compare(final String o1, final String o2) {
-					return FileUtils.dropExtension(o1)
-							.compareTo(FileUtils.dropExtension(o2));
-				}
-
-			}, minIndices);
-
-			// Create manifests from these files.
-			final List<URL> urls = new ArrayList<URL>(fileExts.length);
-			for (int i = 0; i < fileExts.length; i++) {
-				urls.add(null);
-			}
-			for (final Integer index : minIndices) {
-				urls.set(index, srcClass.getClassLoader()
-						.getResource(files.get(index)));
-			}
-			final Collection<? extends TestManifest<?>> manifs = creator
-					.createManifests(urls);
-			if (manifs != null) {
-				manifests.addAll(manifs);
-			}
-
-			// Advance iterators on the minimal indices.
-			for (final Integer index : minIndices) {
-				final Iterator<String> iter = fileNameIters.get(index);
-				if (!iter.hasNext()) {
-					everyHasNext = false;
-					break;
-				}
-				// else
-				files.set(index, iter.next());
-			}
-
-		}
-
-		return new SimpleConfiguration(manifests);
+		return buildingVisitor.getResult();
 	}
 
-	/**
-	 * @param iterators
-	 * @return Next element from every iterator, or {@code null} if some
-	 *         iterator does not have a next element.
-	 */
-	private static <E> List<E> everyNext(
-			final Collection<? extends Iterator<E>> iterators) {
-		final List<E> result = new ArrayList<E>(iterators.size());
-		for (final Iterator<E> iterator : iterators) {
-			if (!iterator.hasNext()) {
+	private static class BuildingVisitor implements IOUtils.PathVisitor {
+
+		private final Class<?> srcClass;
+		private final ManifestCreator<?> creator;
+		private final String fileExt;
+		private final String[] fileExts;
+
+		private final Stack<ConfigurationBuilder> currentBranch = new Stack<ConfigurationBuilder>();
+
+		private Configuration result_ = null;
+		private IOException exception_ = null;
+
+		public BuildingVisitor(final Class<?> srcClass,
+				final ManifestCreator<?> creator, final String fileExt,
+				final String... fileExts) {
+			this.srcClass = srcClass;
+			this.creator = creator;
+			this.fileExt = fileExt;
+			this.fileExts = fileExts;
+		}
+
+		public Configuration getResult() {
+			return result_;
+		}
+
+		public IOException getException() {
+			return exception_;
+		}
+
+		@Override
+		public void visitBefore(final String path) {
+			if (exception_ != null) {
+				return;
+			}
+			// else
+			currentBranch.push(new ConfigurationBuilder(srcClass, creator,
+					fileExt, fileExts).setName(path));
+		}
+
+		@Override
+		public void visitAfter(final String path) {
+			if (exception_ != null) {
+				return;
+			}
+			// else
+			final ConfigurationBuilder currentBuilder = currentBranch.pop();
+
+			if (currentBranch.isEmpty()) {
+				/*
+				 * We've just returned to the root. Even if no relevant content
+				 * was collected, build and return.
+				 */
+				result_ = build(currentBuilder);
+				return;
+			}
+
+			if (currentBuilder.isEmpty()) {
+				/*
+				 * Either a file or a directory with no files with specified
+				 * extensions. Add it as a file to parent, if it is a directory,
+				 * it wouldn't have any of the extensions.
+				 */
+				currentBranch.peek().addFileName(path);
+			} else {
+				/*
+				 * A directory with some relevant content. Build and add to the
+				 * parent.
+				 */
+				final Configuration child = build(currentBuilder);
+				if (exception_ == null) {
+					currentBranch.peek().addChild(child);
+				}
+			}
+
+		}
+
+		private Configuration build(final ConfigurationBuilder builder) {
+			try {
+				return builder.build();
+			} catch (final IOException e) {
+				exception_ = e;
 				return null;
 			}
-			result.add(iterator.next());
-		}
-		return result;
-	}
-
-	/**
-	 * After this method successfully returns, {@code result} contains indices
-	 * of minimal elements from {@code list} according to {@code comparator}.
-	 * 
-	 * @param list
-	 * @param comparator
-	 * @param result
-	 */
-	private static <T> void collectMinIndices(final List<? extends T> list,
-			final Comparator<? super T> comparator,
-			final List<Integer> result) {
-
-		result.clear();
-
-		final Iterator<? extends T> iter = list.iterator();
-
-		if (!iter.hasNext()) {
-			return;
-		}
-
-		T min = iter.next();
-		int index = 0;
-		result.add(index);
-		while (iter.hasNext()) {
-			final T current = iter.next();
-			index++;
-			final int cmp = comparator.compare(min, current);
-			if (cmp > 0) {
-				// min > current; min is not minimal, reset result
-				min = current;
-				result.clear();
-				result.add(index);
-			} else if (cmp == 0) {
-				// min == current; current is minimal, add to result
-				result.add(index);
-			}
-			// else min < current; do nothing
 		}
 
 	}
@@ -220,36 +192,142 @@ public class ConfigurationUtils {
 	 */
 	public interface ManifestCreator<M extends TestManifest<?>> {
 
-		public Collection<? extends M> createManifests(List<URL> urls)
-				throws IOException;
+		public Collection<? extends M> createManifests(String name,
+				List<URL> urls) throws IOException;
 
+	}
+
+	public static Configuration empty() {
+		return new Configuration() {
+
+			@Override
+			public String getName() {
+				return "∅";
+			}
+
+			@Override
+			public Collection<? extends TestManifest<?>> getManifests() {
+				return Collections.emptySet();
+			}
+
+			@Override
+			public Collection<? extends Configuration> getChildren() {
+				return Collections.emptySet();
+			}
+
+			@Override
+			public boolean isEmpty() {
+				return true;
+			}
+
+		};
 	}
 
 	public static Configuration combine(final Configuration first,
 			final Configuration second) {
-		if (first == null || first.size() <= 0) {
-			return second;
+		final Configuration sec = second == null ? empty() : second;
+		if (first == null || first.isEmpty()) {
+			return sec;
 		}
 		// else
 		return new Configuration() {
 
 			@Override
-			public int size() {
-				return first.size() + second.size();
+			public String getName() {
+				return first.getName() + "+" + sec.getName();
 			}
 
 			@Override
-			public Object getTestValue(final int index) {
-				final int firstSize = first.size();
-				return index < firstSize ? first.getTestValue(index)
-						: second.getTestValue(index - firstSize);
+			public Collection<? extends TestManifest<?>> getManifests() {
+				return new AbstractCollection<TestManifest<?>>() {
+
+					@Override
+					public Iterator<TestManifest<?>> iterator() {
+						final Iterator<? extends TestManifest<?>> firstIter = first
+								.getManifests().iterator();
+						final Iterator<? extends TestManifest<?>> secondIter = sec
+								.getManifests().iterator();
+						return new Iterator<TestManifest<?>>() {
+
+							@Override
+							public boolean hasNext() {
+								return firstIter.hasNext()
+										|| secondIter.hasNext();
+							}
+
+							@Override
+							public TestManifest<?> next() {
+								if (firstIter.hasNext()) {
+									return firstIter.next();
+								}
+								// else
+								return secondIter.next();
+							}
+
+							@Override
+							public void remove() {
+								throw new UnsupportedOperationException();
+							}
+
+						};
+					}
+
+					@Override
+					public int size() {
+						return first.getManifests().size()
+								+ sec.getManifests().size();
+					}
+
+				};
 			}
 
 			@Override
-			public String getTestName(final int index) {
-				final int firstSize = first.size();
-				return index < firstSize ? first.getTestName(index)
-						: second.getTestName(index - firstSize);
+			public Collection<? extends Configuration> getChildren() {
+				return new AbstractCollection<Configuration>() {
+
+					@Override
+					public Iterator<Configuration> iterator() {
+						final Iterator<? extends Configuration> firstIter = first
+								.getChildren().iterator();
+						final Iterator<? extends Configuration> secondIter = sec
+								.getChildren().iterator();
+						return new Iterator<Configuration>() {
+
+							@Override
+							public boolean hasNext() {
+								return firstIter.hasNext()
+										|| secondIter.hasNext();
+							}
+
+							@Override
+							public Configuration next() {
+								if (firstIter.hasNext()) {
+									return firstIter.next();
+								}
+								// else
+								return secondIter.next();
+							}
+
+							@Override
+							public void remove() {
+								throw new UnsupportedOperationException();
+							}
+
+						};
+					}
+
+					@Override
+					public int size() {
+						return first.getManifests().size()
+								+ sec.getManifests().size();
+					}
+
+				};
+			}
+
+			@Override
+			public boolean isEmpty() {
+				return first.isEmpty() && sec.isEmpty();
 			}
 
 		};
