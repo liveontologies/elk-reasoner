@@ -151,7 +151,12 @@ public class ConfigurationUtils {
 				return;
 			}
 
-			if (currentBuilder.isEmpty()) {
+			final Configuration child = build(currentBuilder);
+			if (exception_ != null) {
+				return;
+			}
+			// else
+			if (child.isEmpty()) {
 				/*
 				 * Either a file or a directory with no files with specified
 				 * extensions. Add it as a file to parent, if it is a directory,
@@ -163,10 +168,7 @@ public class ConfigurationUtils {
 				 * A directory with some relevant content. Build and add to the
 				 * parent.
 				 */
-				final Configuration child = build(currentBuilder);
-				if (exception_ == null) {
-					currentBranch.peek().addChild(child);
-				}
+				currentBranch.peek().addChild(child);
 			}
 
 		}

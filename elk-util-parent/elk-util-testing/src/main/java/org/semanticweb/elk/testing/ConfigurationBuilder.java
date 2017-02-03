@@ -90,19 +90,6 @@ public class ConfigurationBuilder {
 		return this;
 	}
 
-	public boolean isEmpty() {
-		if (!children_.isEmpty()) {
-			return false;
-		}
-		// else
-		for (final List<String> fileNames : fileNamesPerExtension_.values()) {
-			if (!fileNames.isEmpty()) {
-				return false;
-			}
-		}
-		return true;
-	}
-
 	public PolySuite.Configuration build() throws IOException {
 
 		// Check required fields.
