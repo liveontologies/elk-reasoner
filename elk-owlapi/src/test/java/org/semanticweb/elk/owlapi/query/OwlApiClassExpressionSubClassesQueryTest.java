@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owlapi.OwlApiReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.BaseQueryTest;
@@ -54,8 +55,8 @@ public class OwlApiClassExpressionSubClassesQueryTest extends
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
-			INPUT_DATA_LOCATION + "/Inconsistent.owl",// Throwing InconsistentOntologyException
-			INPUT_DATA_LOCATION + "/InconsistentInstances.owl",// Throwing InconsistentOntologyException
+			ElkTestUtils.TEST_INPUT_LOCATION + "/query/class/Inconsistent.owl",// Throwing InconsistentOntologyException
+			ElkTestUtils.TEST_INPUT_LOCATION + "/query/class/InconsistentInstances.owl",// Throwing InconsistentOntologyException
 		};
 	// @formatter:on
 
@@ -65,8 +66,8 @@ public class OwlApiClassExpressionSubClassesQueryTest extends
 
 	@Override
 	protected boolean ignore(final QueryTestInput<OWLClassExpression> input) {
-		return super.ignore(input)
-				|| TestUtils.ignore(input, INPUT_DATA_LOCATION, IGNORE_LIST);
+		return super.ignore(input) || TestUtils.ignore(input,
+				ElkTestUtils.TEST_INPUT_LOCATION, IGNORE_LIST);
 	}
 
 	public OwlApiClassExpressionSubClassesQueryTest(
@@ -98,7 +99,7 @@ public class OwlApiClassExpressionSubClassesQueryTest extends
 			throws IOException, URISyntaxException {
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION, BaseQueryTest.class,
+				ElkTestUtils.TEST_INPUT_LOCATION, BaseQueryTest.class,
 				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>>>() {
 
 					@Override
@@ -129,7 +130,7 @@ public class OwlApiClassExpressionSubClassesQueryTest extends
 
 					}
 
-				}, "owl", "expected");
+				}, "owl", "classquery");
 
 	}
 

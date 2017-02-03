@@ -30,10 +30,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.liveontologies.owlapi.proof.OWLProver;
 import org.liveontologies.proof.util.InferenceSets;
+import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
+import org.semanticweb.elk.testing.TestUtils;
 import org.semanticweb.elk.testing.UrlTestInput;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -57,9 +58,15 @@ public class AllOntologiesProofTest extends BaseProofTest {
 
 	private static final Logger LOGGER_ = LoggerFactory.getLogger(AllOntologiesProofTest.class);
 
-	static final String[] IGNORE_LIST = { "AssertionDisjoint.owl",
-			"DifferentSameIndividual.owl", "Inconsistent.owl",
-			"PropertyRangesHierarchy.owl", "ReflexivePropertyRanges.owl" };
+	// @formatter:off
+	static final String[] IGNORE_LIST = {
+			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/AssertionDisjoint.owl",
+			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/DifferentSameIndividual.owl",
+			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/Inconsistent.owl",
+			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/PropertyRangesHierarchy.owl",
+			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/ReflexivePropertyRanges.owl",
+		};
+	// @formatter:on
 
 	static {
 		Arrays.sort(IGNORE_LIST);
@@ -71,8 +78,9 @@ public class AllOntologiesProofTest extends BaseProofTest {
 	}
 
 	@Override
-	protected boolean ignore(TestInput input) {
-		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
+	protected boolean ignore(final UrlTestInput input) {
+		return super.ignore(input) || TestUtils.ignore(input,
+				ElkTestUtils.TEST_INPUT_LOCATION, IGNORE_LIST);
 	}
 
 	@Test

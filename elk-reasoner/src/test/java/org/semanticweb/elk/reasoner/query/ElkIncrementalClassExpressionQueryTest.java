@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -56,7 +57,8 @@ public abstract class ElkIncrementalClassExpressionQueryTest<O>
 			throws IOException, URISyntaxException {
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION, BaseIncrementalQueryTest.class,
+				ElkTestUtils.TEST_INPUT_LOCATION,
+				BaseIncrementalQueryTest.class,
 				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkClassExpression>, Void>>() {
 
 					@Override
@@ -88,7 +90,7 @@ public abstract class ElkIncrementalClassExpressionQueryTest<O>
 
 					}
 
-				}, "owl", "expected");
+				}, "owl", "classquery");
 
 	}
 

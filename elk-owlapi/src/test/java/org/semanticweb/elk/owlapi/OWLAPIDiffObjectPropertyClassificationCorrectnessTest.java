@@ -25,6 +25,7 @@ package org.semanticweb.elk.owlapi;
 import java.util.Arrays;
 
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.BaseObjectPropertyClassificationCorrectnessTest;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
@@ -74,8 +75,8 @@ public class OWLAPIDiffObjectPropertyClassificationCorrectnessTest
 
 	@Override
 	protected boolean ignore(final UrlTestInput input) {
-		return super.ignore(input)
-				|| TestUtils.ignore(input, INPUT_DATA_LOCATION, IGNORE_LIST);
+		return super.ignore(input) || TestUtils.ignore(input,
+				ElkTestUtils.TEST_INPUT_LOCATION, IGNORE_LIST);
 	}
 
 }

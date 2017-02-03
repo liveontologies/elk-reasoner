@@ -32,6 +32,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.loading.TestLoader;
@@ -63,8 +64,6 @@ import org.semanticweb.elk.testing.UrlTestInput;
  */
 @RunWith(PolySuite.class)
 public class ProofTest {
-
-	final static String INPUT_DATA_LOCATION = "classification_test_input";
 
 	// remove when proofs for ranges are supported
 	static final String[] IGNORE_LIST = {};
@@ -152,7 +151,7 @@ public class ProofTest {
 	public static Configuration getConfig()
 			throws URISyntaxException, IOException {
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION, SimpleManifestCreator.class,
+				ElkTestUtils.TEST_INPUT_LOCATION, SimpleManifestCreator.class,
 				SimpleManifestCreator.INSTANCE, "owl");
 	}
 

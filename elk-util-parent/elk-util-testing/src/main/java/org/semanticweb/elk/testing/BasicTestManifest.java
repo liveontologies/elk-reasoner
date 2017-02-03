@@ -106,7 +106,7 @@ public class BasicTestManifest<I extends TestInput, O>
 	 * @param result
 	 */
 	protected void appendOutput(final O output, final StringBuilder result) {
-		result.append(output.toString());
+		result.append(output);
 	}
 
 }

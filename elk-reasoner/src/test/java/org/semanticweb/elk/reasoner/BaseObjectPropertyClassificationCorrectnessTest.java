@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
@@ -56,8 +57,6 @@ import org.semanticweb.elk.testing.UrlTestInput;
 public abstract class BaseObjectPropertyClassificationCorrectnessTest extends
 		ReasoningCorrectnessTestWithInterrupts<UrlTestInput, TaxonomyTestOutput<?>, ReasoningTestManifest<TaxonomyTestOutput<?>>, ReasoningTestWithOutputAndInterruptsDelegate<TaxonomyTestOutput<?>>> {
 
-	public final static String INPUT_DATA_LOCATION = "property_classification_test_input";
-
 	public BaseObjectPropertyClassificationCorrectnessTest(
 			final ReasoningTestManifest<TaxonomyTestOutput<?>> testManifest,
 			final ReasoningTestWithOutputAndInterruptsDelegate<TaxonomyTestOutput<?>> testDelegate) {
@@ -68,7 +67,7 @@ public abstract class BaseObjectPropertyClassificationCorrectnessTest extends
 	public static Configuration getConfig()
 			throws URISyntaxException, IOException {
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION,
+				ElkTestUtils.TEST_INPUT_LOCATION,
 				BaseObjectPropertyClassificationCorrectnessTest.class,
 				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<UrlTestInput, TaxonomyTestOutput<?>>>() {
 					@Override
@@ -110,7 +109,7 @@ public abstract class BaseObjectPropertyClassificationCorrectnessTest extends
 						}
 
 					}
-				}, "owl", "expected");
+				}, "owl", "propertytaxonomy");
 	}
 
 }

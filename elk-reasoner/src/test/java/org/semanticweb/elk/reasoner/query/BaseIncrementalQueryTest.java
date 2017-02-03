@@ -30,8 +30,6 @@ public abstract class BaseIncrementalQueryTest<Q, A, O>
 		extends
 		IncrementalReasoningCorrectnessTestWithInterrupts<QueryTestInput<Q>, A, O, IncrementalReasoningTestWithInterruptsDelegate<A, O>> {
 
-	public final static String INPUT_DATA_LOCATION = "query_test_input";
-
 	public BaseIncrementalQueryTest(
 			final TestManifest<QueryTestInput<Q>> testManifest,
 			final IncrementalReasoningTestWithInterruptsDelegate<A, O> testDelegate) {

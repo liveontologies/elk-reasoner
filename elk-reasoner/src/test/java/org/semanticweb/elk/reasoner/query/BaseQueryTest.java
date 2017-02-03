@@ -30,8 +30,6 @@ import org.semanticweb.elk.testing.PolySuite;
 public abstract class BaseQueryTest<Q, O> extends
 		ReasoningCorrectnessTestWithInterrupts<QueryTestInput<Q>, O, QueryTestManifest<Q, O>, ReasoningTestWithOutputAndInterruptsDelegate<O>> {
 
-	public final static String INPUT_DATA_LOCATION = "query_test_input";
-
 	public BaseQueryTest(
 			final QueryTestManifest<Q, O> manifest,
 			final ReasoningTestWithOutputAndInterruptsDelegate<O> delegate) {

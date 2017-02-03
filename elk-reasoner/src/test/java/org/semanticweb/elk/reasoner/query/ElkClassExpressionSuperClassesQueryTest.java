@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -51,8 +52,8 @@ public class ElkClassExpressionSuperClassesQueryTest extends
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
-			INPUT_DATA_LOCATION + "/Disjunctions.owl",// Disjuctions not supported
-			INPUT_DATA_LOCATION + "/OneOf.owl",// Disjuctions not supported
+			ElkTestUtils.TEST_INPUT_LOCATION + "/query/class/Disjunctions.owl",// Disjuctions not supported
+			ElkTestUtils.TEST_INPUT_LOCATION + "/query/class/OneOf.owl",// Disjuctions not supported
 		};
 	// @formatter:on
 
@@ -62,8 +63,8 @@ public class ElkClassExpressionSuperClassesQueryTest extends
 
 	@Override
 	protected boolean ignore(final QueryTestInput<ElkClassExpression> input) {
-		return super.ignore(input)
-				|| TestUtils.ignore(input, INPUT_DATA_LOCATION, IGNORE_LIST);
+		return super.ignore(input) || TestUtils.ignore(input,
+				ElkTestUtils.TEST_INPUT_LOCATION, IGNORE_LIST);
 	}
 
 	public ElkClassExpressionSuperClassesQueryTest(
@@ -90,7 +91,7 @@ public class ElkClassExpressionSuperClassesQueryTest extends
 			throws IOException, URISyntaxException {
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION, BaseQueryTest.class,
+				ElkTestUtils.TEST_INPUT_LOCATION, BaseQueryTest.class,
 				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkClass>>>() {
 
 					@Override
@@ -122,7 +123,7 @@ public class ElkClassExpressionSuperClassesQueryTest extends
 
 					}
 
-				}, "owl", "expected");
+				}, "owl", "classquery");
 
 	}
 

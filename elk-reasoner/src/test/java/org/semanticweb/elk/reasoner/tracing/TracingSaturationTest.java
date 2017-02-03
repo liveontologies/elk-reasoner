@@ -29,6 +29,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
+import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.loading.TestAxiomLoaderFactory;
 import org.semanticweb.elk.loading.TestChangesLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
@@ -83,8 +84,9 @@ public class TracingSaturationTest {
 	@Test
 	@SuppressWarnings("static-method")
 	public void testInconsistency() throws Exception {
-		Reasoner reasoner = TestReasonerUtils
-				.loadAndClassify(TestReasonerUtils.loadAxioms("classification_test_input/Inconsistent.owl"));
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify(
+				TestReasonerUtils.loadAxioms(ElkTestUtils.TEST_INPUT_LOCATION
+						+ "/classification/Inconsistent.owl"));
 		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 
 		TracingTestUtils.checkTracingCompleteness(factory.getOwlThing(),

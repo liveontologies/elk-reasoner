@@ -36,6 +36,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.io.IOUtils;
@@ -78,8 +79,6 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 	// logger for this class
 	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(OWLAPIRandomWalkIncrementalClassificationTest.class);
-
-	final static String INPUT_DATA_LOCATION = "classification_test_input";
 
 	/**
 	 * the maximum number of rounds used
@@ -163,7 +162,7 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 	public static Configuration getConfig()
 			throws URISyntaxException, IOException {
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION,
+				ElkTestUtils.TEST_INPUT_LOCATION,
 				IncrementalClassificationCorrectnessTest.class,
 				SimpleManifestCreator.INSTANCE, "owl");
 	}

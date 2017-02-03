@@ -25,6 +25,7 @@ package org.semanticweb.elk.owlapi;
 import java.util.Arrays;
 
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.BaseRealizationCorrectnessTest;
@@ -45,10 +46,13 @@ import org.semanticweb.elk.testing.UrlTestInput;
 public class OWLAPIDiffRealizationCorrectnessTest
 		extends BaseRealizationCorrectnessTest {
 
+	// @formatter:off
 	static final String[] IGNORE_LIST = {
-			INPUT_DATA_LOCATION + "/AssertionsPropertyRanges.owl",
-			INPUT_DATA_LOCATION + "/Inconsistent.owl",
-			INPUT_DATA_LOCATION + "/MultipleInconsistencies.owl" };
+			ElkTestUtils.TEST_INPUT_LOCATION + "/realization/AssertionsPropertyRanges.owl",
+			ElkTestUtils.TEST_INPUT_LOCATION + "/realization/Inconsistent.owl",
+			ElkTestUtils.TEST_INPUT_LOCATION + "/realization/MultipleInconsistencies.owl",
+		};
+	// @formatter:on
 
 	static {
 		Arrays.sort(IGNORE_LIST);
@@ -80,8 +84,8 @@ public class OWLAPIDiffRealizationCorrectnessTest
 
 	@Override
 	protected boolean ignore(final UrlTestInput input) {
-		return super.ignore(input)
-				|| TestUtils.ignore(input, INPUT_DATA_LOCATION, IGNORE_LIST);
+		return super.ignore(input) || TestUtils.ignore(input,
+				ElkTestUtils.TEST_INPUT_LOCATION, IGNORE_LIST);
 	}
 
 }

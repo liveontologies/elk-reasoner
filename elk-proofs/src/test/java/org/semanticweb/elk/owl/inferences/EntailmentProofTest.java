@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
@@ -63,7 +64,7 @@ public class EntailmentProofTest extends BaseQueryTest<ElkAxiom, Void> {
 	@Override
 	protected boolean ignore(final QueryTestInput<ElkAxiom> input) {
 		return super.ignore(input) || org.semanticweb.elk.testing.TestUtils
-				.ignore(input, INPUT_DATA_LOCATION, IGNORE_LIST);
+				.ignore(input, ElkTestUtils.TEST_INPUT_LOCATION, IGNORE_LIST);
 	}
 
 	public static final double INTERRUPTION_CHANCE = 0.003;
@@ -87,8 +88,6 @@ public class EntailmentProofTest extends BaseQueryTest<ElkAxiom, Void> {
 
 		});
 	}
-
-	public static final String ENTAILMENT_QUERY_INPUT_DIR = "entailment_query_test_input";
 
 	private static final ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkAxiom>, Void>> ENTAILMENT_QUERY_TEST_MANIFEST_CREATOR_ = new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkAxiom>, Void>>() {
 
@@ -137,7 +136,7 @@ public class EntailmentProofTest extends BaseQueryTest<ElkAxiom, Void> {
 			throws IOException, URISyntaxException {
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				ENTAILMENT_QUERY_INPUT_DIR, BaseQueryTest.class,
+				ElkTestUtils.TEST_INPUT_LOCATION, BaseQueryTest.class,
 				ENTAILMENT_QUERY_TEST_MANIFEST_CREATOR_, "owl", "entailed");
 
 	}

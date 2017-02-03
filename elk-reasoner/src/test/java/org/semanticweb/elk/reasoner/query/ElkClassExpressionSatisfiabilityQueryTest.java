@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.ElkReasoningTestDelegate;
@@ -63,7 +64,7 @@ public class ElkClassExpressionSatisfiabilityQueryTest
 			throws IOException, URISyntaxException {
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION, BaseQueryTest.class,
+				ElkTestUtils.TEST_INPUT_LOCATION, BaseQueryTest.class,
 				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkClassExpression>, SatisfiabilityTestOutput>>() {
 
 					@Override
@@ -95,7 +96,7 @@ public class ElkClassExpressionSatisfiabilityQueryTest
 
 					}
 
-				}, "owl", "expected");
+				}, "owl", "classquery");
 
 	}
 

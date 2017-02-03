@@ -37,6 +37,7 @@ import org.liveontologies.proof.util.DynamicInferenceSet;
 import org.liveontologies.proof.util.ProofNode;
 import org.liveontologies.proof.util.ProofNodes;
 import org.liveontologies.proof.util.ProofStep;
+import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
 import org.semanticweb.elk.owlapi.TestOWLManager;
@@ -75,8 +76,9 @@ public class ProofTest {
 	public void reflexiveRoles() throws Exception {
 		// loading and classifying via the OWL API
 		final OWLOntology ontology = loadOntology(
-				ProofTest.class.getClassLoader().getResourceAsStream(
-						"classification_test_input/ReflexiveRole.owl"));
+				ProofTest.class.getClassLoader()
+						.getResourceAsStream(ElkTestUtils.TEST_INPUT_LOCATION
+								+ "/classification/ReflexiveRole.owl"));
 		final OWLProver prover = OWLAPITestUtils.createProver(ontology);
 
 		prover.precomputeInferences(InferenceType.CLASS_HIERARCHY);
@@ -93,8 +95,9 @@ public class ProofTest {
 	@Test
 	public void reflexiveRoles2() throws Exception {
 		final OWLOntology ontology = loadOntology(
-				ProofTest.class.getClassLoader().getResourceAsStream(
-						"classification_test_input/ReflexiveRole.owl"));
+				ProofTest.class.getClassLoader()
+						.getResourceAsStream(ElkTestUtils.TEST_INPUT_LOCATION
+								+ "/classification/ReflexiveRole.owl"));
 		final OWLProver prover = OWLAPITestUtils.createProver(ontology);
 
 		prover.precomputeInferences(InferenceType.CLASS_HIERARCHY);
@@ -109,9 +112,10 @@ public class ProofTest {
 	@Test
 	public void compositionReflexivity() throws Exception {
 		// loading and classifying via the OWL API
-		final OWLOntology ontology = loadOntology(
-				ProofTest.class.getClassLoader().getResourceAsStream(
-						"classification_test_input/CompositionReflexivity.owl"));
+		final OWLOntology ontology = loadOntology(ProofTest.class
+				.getClassLoader()
+				.getResourceAsStream(ElkTestUtils.TEST_INPUT_LOCATION
+						+ "/classification/CompositionReflexivity.owl"));
 		final OWLProver prover = OWLAPITestUtils.createProver(ontology);
 
 		prover.precomputeInferences(InferenceType.CLASS_HIERARCHY);

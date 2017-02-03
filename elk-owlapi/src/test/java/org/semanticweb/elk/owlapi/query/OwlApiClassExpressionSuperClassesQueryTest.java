@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owlapi.OwlApiReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.BaseQueryTest;
@@ -54,10 +55,10 @@ public class OwlApiClassExpressionSuperClassesQueryTest extends
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
-			INPUT_DATA_LOCATION + "/Disjunctions.owl",// Disjuctions not supported
-			INPUT_DATA_LOCATION + "/OneOf.owl",// Disjuctions not supported
-			INPUT_DATA_LOCATION + "/Inconsistent.owl",// Throwing InconsistentOntologyException
-			INPUT_DATA_LOCATION + "/InconsistentInstances.owl",// Throwing InconsistentOntologyException
+			ElkTestUtils.TEST_INPUT_LOCATION + "/query/class/Disjunctions.owl",// Disjuctions not supported
+			ElkTestUtils.TEST_INPUT_LOCATION + "/query/class/OneOf.owl",// Disjuctions not supported
+			ElkTestUtils.TEST_INPUT_LOCATION + "/query/class/Inconsistent.owl",// Throwing InconsistentOntologyException
+			ElkTestUtils.TEST_INPUT_LOCATION + "/query/class/InconsistentInstances.owl",// Throwing InconsistentOntologyException
 		};
 	// @formatter:on
 
@@ -67,8 +68,8 @@ public class OwlApiClassExpressionSuperClassesQueryTest extends
 
 	@Override
 	protected boolean ignore(final QueryTestInput<OWLClassExpression> input) {
-		return super.ignore(input)
-				|| TestUtils.ignore(input, INPUT_DATA_LOCATION, IGNORE_LIST);
+		return super.ignore(input) || TestUtils.ignore(input,
+				ElkTestUtils.TEST_INPUT_LOCATION, IGNORE_LIST);
 	}
 
 	public OwlApiClassExpressionSuperClassesQueryTest(
@@ -100,7 +101,7 @@ public class OwlApiClassExpressionSuperClassesQueryTest extends
 			throws IOException, URISyntaxException {
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION, BaseQueryTest.class,
+				ElkTestUtils.TEST_INPUT_LOCATION, BaseQueryTest.class,
 				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>>>() {
 
 					@Override
@@ -132,7 +133,7 @@ public class OwlApiClassExpressionSuperClassesQueryTest extends
 
 					}
 
-				}, "owl", "expected");
+				}, "owl", "classquery");
 
 	}
 

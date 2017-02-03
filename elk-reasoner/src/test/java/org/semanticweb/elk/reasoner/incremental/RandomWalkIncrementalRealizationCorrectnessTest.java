@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.loading.AllAxiomTrackingOntologyLoader;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.TestAxiomLoader;
@@ -44,8 +45,6 @@ import org.semanticweb.elk.testing.UrlTestInput;
  */
 public class RandomWalkIncrementalRealizationCorrectnessTest extends
 		BaseRandomWalkIncrementalCorrectnessTest {
-
-	final static String INPUT_DATA_LOCATION = "realization_test_input";
 
 	public RandomWalkIncrementalRealizationCorrectnessTest(
 			final TestManifest<UrlTestInput> testManifest) {
@@ -70,7 +69,7 @@ public class RandomWalkIncrementalRealizationCorrectnessTest extends
 	public static Configuration getConfig()
 			throws URISyntaxException, IOException {
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION,
+				ElkTestUtils.TEST_INPUT_LOCATION,
 				RandomWalkIncrementalClassificationCorrectnessTest.class,
 				SimpleManifestCreator.INSTANCE, "owl");
 	}

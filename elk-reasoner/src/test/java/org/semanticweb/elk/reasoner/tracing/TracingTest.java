@@ -34,6 +34,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
@@ -62,7 +63,6 @@ import org.slf4j.LoggerFactory;
 @RunWith(PolySuite.class)
 public class TracingTest {
 
-	final static String INPUT_DATA_LOCATION = "classification_test_input";
 	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(TracingTest.class);
 
@@ -177,7 +177,7 @@ public class TracingTest {
 	public static Configuration getConfig()
 			throws URISyntaxException, IOException {
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION, TracingTest.class,
+				ElkTestUtils.TEST_INPUT_LOCATION, TracingTest.class,
 				SimpleManifestCreator.INSTANCE, "owl");
 	}
 

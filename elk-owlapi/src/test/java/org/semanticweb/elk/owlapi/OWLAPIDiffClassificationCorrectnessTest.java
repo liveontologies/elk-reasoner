@@ -25,6 +25,7 @@ package org.semanticweb.elk.owlapi;
 import java.util.Arrays;
 
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.BaseClassificationCorrectnessTest;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
@@ -39,9 +40,12 @@ import org.semanticweb.elk.testing.UrlTestInput;
 public class OWLAPIDiffClassificationCorrectnessTest
 		extends BaseClassificationCorrectnessTest {
 
+	// @formatter:off
 	static final String[] IGNORE_LIST = {
-			INPUT_DATA_LOCATION + "/DisjointSelf.owl",
-			INPUT_DATA_LOCATION + "/CompositionReflexivityComplex.owl" };
+			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/DisjointSelf.owl",
+			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/CompositionReflexivityComplex.owl",
+		};
+	// @formatter:on
 
 	static {
 		Arrays.sort(IGNORE_LIST);
@@ -72,8 +76,8 @@ public class OWLAPIDiffClassificationCorrectnessTest
 
 	@Override
 	protected boolean ignore(final UrlTestInput input) {
-		return super.ignore(input)
-				|| TestUtils.ignore(input, INPUT_DATA_LOCATION, IGNORE_LIST);
+		return super.ignore(input) || TestUtils.ignore(input,
+				ElkTestUtils.TEST_INPUT_LOCATION, IGNORE_LIST);
 	}
 
 }

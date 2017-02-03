@@ -26,6 +26,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.owlapi.ElkProver;
 import org.semanticweb.elk.owlapi.EntailmentTestManifestCreator;
 import org.semanticweb.elk.owlapi.OwlApiReasoningTestDelegate;
@@ -54,8 +55,8 @@ public class EntailmentProofTest extends BaseQueryTest<OWLAxiom, Boolean> {
 
 	@Override
 	protected boolean ignore(final QueryTestInput<OWLAxiom> input) {
-		return super.ignore(input)
-				|| TestUtils.ignore(input, INPUT_DATA_LOCATION, IGNORE_LIST);
+		return super.ignore(input) || TestUtils.ignore(input,
+				ElkTestUtils.TEST_INPUT_LOCATION, IGNORE_LIST);
 	}
 
 	public static final double INTERRUPTION_CHANCE = 0.003;
@@ -85,14 +86,12 @@ public class EntailmentProofTest extends BaseQueryTest<OWLAxiom, Boolean> {
 		});
 	}
 
-	public static final String ENTAILMENT_QUERY_INPUT_DIR = "entailment_query_test_input";
-
 	@Config
 	public static Configuration getConfig()
 			throws IOException, URISyntaxException {
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				ENTAILMENT_QUERY_INPUT_DIR, BaseQueryTest.class,
+				ElkTestUtils.TEST_INPUT_LOCATION, BaseQueryTest.class,
 				EntailmentTestManifestCreator.INSTANCE, "owl", "entailed");
 
 	}

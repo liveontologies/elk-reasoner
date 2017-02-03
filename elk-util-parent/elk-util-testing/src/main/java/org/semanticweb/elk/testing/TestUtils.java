@@ -99,6 +99,10 @@ public class TestUtils {
 			final String inputDataLocation, final String[] sortedIgnoredPaths) {
 		final String path = input.getUrl().getPath();
 		final int index = path.lastIndexOf(inputDataLocation);
+		if (index < 0) {
+			throw new IllegalArgumentException("\"" + inputDataLocation
+					+ "\" does not occur in \"" + path + "\"");
+		}
 		final String relativePath = path.substring(index);
 		return Arrays.binarySearch(sortedIgnoredPaths, relativePath) >= 0;
 	}

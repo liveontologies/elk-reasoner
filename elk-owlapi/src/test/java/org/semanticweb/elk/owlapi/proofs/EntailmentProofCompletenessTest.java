@@ -28,6 +28,7 @@ import java.util.Random;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.owlapi.ElkProver;
 import org.semanticweb.elk.owlapi.EntailmentTestManifestCreator;
@@ -58,7 +59,7 @@ public class EntailmentProofCompletenessTest extends
 	@Override
 	protected boolean ignore(final QueryTestInput<OWLAxiom> input) {
 		return super.ignore(input) || TestUtils.ignore(input,
-				ENTAILMENT_QUERY_INPUT_DIR, IGNORE_LIST);
+				ElkTestUtils.TEST_INPUT_LOCATION, IGNORE_LIST);
 	}
 
 	public static final double INTERRUPTION_CHANCE = 0.03;
@@ -96,14 +97,13 @@ public class EntailmentProofCompletenessTest extends
 
 	}
 
-	public static final String ENTAILMENT_QUERY_INPUT_DIR = "entailment_query_test_input";
-
 	@Config
 	public static Configuration getConfig()
 			throws IOException, URISyntaxException {
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				ENTAILMENT_QUERY_INPUT_DIR, BaseReasoningCorrectnessTest.class,
+				ElkTestUtils.TEST_INPUT_LOCATION,
+				BaseReasoningCorrectnessTest.class,
 				EntailmentTestManifestCreator.INSTANCE, "owl", "entailed");
 
 	}

@@ -28,13 +28,13 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 
 import org.junit.Before;
+import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.TestOWLManager;
 import org.semanticweb.elk.reasoner.SimpleManifestCreator;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
-import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.UrlTestInput;
 import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
@@ -49,8 +49,6 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
  */
 public class BaseProofTest {
 
-	final static String INPUT_DATA_LOCATION = "classification_test_input";
-
 	protected final TestManifest<UrlTestInput> manifest_;
 	protected final OWLOntologyManager manager_;
 
@@ -64,7 +62,7 @@ public class BaseProofTest {
 		assumeTrue(!ignore(manifest_.getInput()));
 	}
 
-	protected boolean ignore(final TestInput input) {
+	protected boolean ignore(final UrlTestInput input) {
 		return false;
 	}
 
@@ -84,7 +82,7 @@ public class BaseProofTest {
 	public static Configuration getConfig()
 			throws URISyntaxException, IOException {
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION, SimpleManifestCreator.class,
+				ElkTestUtils.TEST_INPUT_LOCATION, SimpleManifestCreator.class,
 				SimpleManifestCreator.INSTANCE, "owl");
 	}
 

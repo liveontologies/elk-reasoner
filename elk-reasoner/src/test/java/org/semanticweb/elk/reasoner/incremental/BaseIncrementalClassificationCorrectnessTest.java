@@ -28,6 +28,7 @@ import java.io.StringWriter;
 import java.net.URISyntaxException;
 
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.reasoner.SimpleManifestCreator;
 import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
@@ -52,8 +53,6 @@ import org.semanticweb.elk.testing.UrlTestInput;
 @RunWith(PolySuite.class)
 public abstract class BaseIncrementalClassificationCorrectnessTest<A> extends
 		IncrementalReasoningCorrectnessTestWithInterrupts<UrlTestInput, A, TaxonomyTestOutput<?>, IncrementalReasoningTestWithInterruptsDelegate<A, TaxonomyTestOutput<?>>> {
-
-	final static String INPUT_DATA_LOCATION = "classification_test_input";
 
 	public BaseIncrementalClassificationCorrectnessTest(
 			final TestManifest<UrlTestInput> testManifest,
@@ -92,7 +91,7 @@ public abstract class BaseIncrementalClassificationCorrectnessTest<A> extends
 	public static Configuration getConfig()
 			throws URISyntaxException, IOException {
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
-				INPUT_DATA_LOCATION,
+				ElkTestUtils.TEST_INPUT_LOCATION,
 				IncrementalClassificationCorrectnessTest.class,
 				SimpleManifestCreator.INSTANCE, "owl");
 	}

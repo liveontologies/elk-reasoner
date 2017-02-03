@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.incremental.ElkIncrementalReasoningTestDelegate;
 import org.semanticweb.elk.testing.ConfigurationUtils;
@@ -66,21 +67,19 @@ public class ElkIncrementalEntailmentQueryTest extends
 				});
 	}
 
-	public static final String ENTAILMENT_QUERY_INPUT_DIR = "entailment_query_test_input";
-
 	@Config
 	public static Configuration getConfig()
 			throws IOException, URISyntaxException {
 
 		final Configuration classConfiguration = ConfigurationUtils
-				.loadFileBasedTestConfiguration(INPUT_DATA_LOCATION,
-						BaseQueryTest.class,
+				.loadFileBasedTestConfiguration(
+						ElkTestUtils.TEST_INPUT_LOCATION, BaseQueryTest.class,
 						ElkEntailmentQueryTest.CLASS_QUERY_TEST_MANIFEST_CREATOR,
-						"owl", "expected");
+						"owl", "classquery");
 
 		final Configuration entailmentConfiguration = ConfigurationUtils
-				.loadFileBasedTestConfiguration(ENTAILMENT_QUERY_INPUT_DIR,
-						BaseQueryTest.class,
+				.loadFileBasedTestConfiguration(
+						ElkTestUtils.TEST_INPUT_LOCATION, BaseQueryTest.class,
 						EntailmentTestManifestCreator.INSTANCE, "owl",
 						"entailed", "notentailed");
 

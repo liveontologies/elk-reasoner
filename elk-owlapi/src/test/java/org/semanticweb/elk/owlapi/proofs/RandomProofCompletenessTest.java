@@ -31,12 +31,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.liveontologies.owlapi.proof.OWLProver;
+import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
+import org.semanticweb.elk.testing.TestUtils;
 import org.semanticweb.elk.testing.UrlTestInput;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -55,11 +56,20 @@ import org.semanticweb.owlapi.reasoner.InferenceType;
 @RunWith(PolySuite.class)
 public class RandomProofCompletenessTest extends BaseProofTest {
 
-	static final String[] IGNORE_LIST = { "AssertionDisjoint.owl",
-			"ConjunctionsComplex.owl", "DifferentSameIndividual.owl",
-			"Inconsistent.owl", "OneOf.owl", "PropertyRangesHierarchy.owl",
-			"SameIndividual.owl", "forest.owl", "TransitivePropertyChain.owl",
-			"TransitivityByChain.owl" };
+	// @formatter:off
+	static final String[] IGNORE_LIST = {
+			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/AssertionDisjoint.owl",
+			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/ConjunctionsComplex.owl",
+			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/DifferentSameIndividual.owl",
+			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/Inconsistent.owl",
+			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/OneOf.owl",
+			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/PropertyRangesHierarchy.owl",
+			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/SameIndividual.owl",
+			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/forest.owl",
+			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/TransitivePropertyChain.owl",
+			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/TransitivityByChain.owl",
+		};
+	// @formatter:on
 
 	static {
 		Arrays.sort(IGNORE_LIST);
@@ -77,8 +87,9 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 	}
 
 	@Override
-	protected boolean ignore(TestInput input) {
-		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
+	protected boolean ignore(final UrlTestInput input) {
+		return super.ignore(input) || TestUtils.ignore(input,
+				ElkTestUtils.TEST_INPUT_LOCATION, IGNORE_LIST);
 	}
 
 	@Test

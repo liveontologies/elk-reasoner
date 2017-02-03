@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.runner.RunWith;
+import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.ElkReasoningTestDelegate;
@@ -49,9 +50,9 @@ public class ElkEntailmentQueryTest extends
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
-			INPUT_DATA_LOCATION + "/Disjunctions.owl",// Disjuctions not fully supported
-			INPUT_DATA_LOCATION + "/OneOf.owl",// Disjuctions not fully supported
-			INPUT_DATA_LOCATION + "/UnsupportedQueryIndexing.owl",// Unsupported class expression
+			ElkTestUtils.TEST_INPUT_LOCATION + "/query/class/Disjunctions.owl",// Disjuctions not fully supported
+			ElkTestUtils.TEST_INPUT_LOCATION + "/query/class/OneOf.owl",// Disjuctions not fully supported
+			ElkTestUtils.TEST_INPUT_LOCATION + "/query/class/UnsupportedQueryIndexing.owl",// Unsupported class expression
 		};
 	// @formatter:on
 
@@ -61,8 +62,8 @@ public class ElkEntailmentQueryTest extends
 
 	@Override
 	protected boolean ignore(final QueryTestInput<Collection<ElkAxiom>> input) {
-		return super.ignore(input)
-				|| TestUtils.ignore(input, INPUT_DATA_LOCATION, IGNORE_LIST);
+		return super.ignore(input) || TestUtils.ignore(input,
+				ElkTestUtils.TEST_INPUT_LOCATION, IGNORE_LIST);
 	}
 
 	public ElkEntailmentQueryTest(
@@ -123,8 +124,6 @@ public class ElkEntailmentQueryTest extends
 
 	};
 
-	public static final String ENTAILMENT_QUERY_INPUT_DIR = "entailment_query_test_input";
-
 	public static final ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<Collection<ElkAxiom>>, EntailmentQueryTestOutput<ElkAxiom>>> CLASS_QUERY_TEST_MANIFEST_CREATOR = new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<Collection<ElkAxiom>>, EntailmentQueryTestOutput<ElkAxiom>>>() {
 
 		@Override
@@ -160,13 +159,13 @@ public class ElkEntailmentQueryTest extends
 			throws IOException, URISyntaxException {
 
 		final Configuration classConfiguration = ConfigurationUtils
-				.loadFileBasedTestConfiguration(INPUT_DATA_LOCATION,
-						BaseQueryTest.class, CLASS_QUERY_TEST_MANIFEST_CREATOR,
-						"owl", "expected");
+				.loadFileBasedTestConfiguration(
+						ElkTestUtils.TEST_INPUT_LOCATION, BaseQueryTest.class,
+						CLASS_QUERY_TEST_MANIFEST_CREATOR, "owl", "classquery");
 
 		final Configuration entailmentConfiguration = ConfigurationUtils
-				.loadFileBasedTestConfiguration(ENTAILMENT_QUERY_INPUT_DIR,
-						BaseQueryTest.class,
+				.loadFileBasedTestConfiguration(
+						ElkTestUtils.TEST_INPUT_LOCATION, BaseQueryTest.class,
 						EntailmentTestManifestCreator.INSTANCE, "owl",
 						"entailed", "notentailed");
 
