@@ -141,14 +141,15 @@ public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				IndexedObjectProperty backwardRelation,
 				IndexedContextRoot inferenceRoot,
 				IndexedPropertyChain forwardRelation, IndexedContextRoot target,
-				IndexedComplexPropertyChain composition, boolean tracingMode) {
+				IndexedComplexPropertyChain composition) {
 
 			if (composition.getSaturated()
 					.getNonRedundantCompositionsByLeftSubProperty().isEmpty()
-					// check also redundant inferences in tracing mode
-					&& (!tracingMode || composition.getSaturated()
+					&& composition.getSaturated()
 							.getRedundantCompositionsByLeftSubProperty()
-							.isEmpty())) {
+							.isEmpty()) {
+				// composition cannot be composed further, even using redundant
+				// compositions (tracing); create only backward links
 				List<IndexedObjectProperty> toldSuperProperties = composition
 						.getToldSuperProperties();
 				List<ElkAxiom> toldSuperPropertiesReasons = composition

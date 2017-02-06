@@ -50,8 +50,8 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class BackwardLinkChainFromBackwardLinkRule extends
-		AbstractLinkableBackwardLinkRule {
+public class BackwardLinkChainFromBackwardLinkRule
+		extends AbstractLinkableBackwardLinkRule {
 
 	// logger for events
 	/*
@@ -68,7 +68,8 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 	 */
 	private final Multimap<IndexedPropertyChain, IndexedContextRoot> forwardLinksByObjectProperty_;
 
-	private BackwardLinkChainFromBackwardLinkRule(LinkableBackwardLinkRule tail) {
+	private BackwardLinkChainFromBackwardLinkRule(
+			LinkableBackwardLinkRule tail) {
 		super(tail);
 		this.forwardLinksByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, IndexedContextRoot>(
 				3);
@@ -136,7 +137,7 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 	private void apply(
 			Multimap<IndexedPropertyChain, IndexedComplexPropertyChain> compsByForwardRelations,
 			BackwardLink link, ContextPremises premises,
-			ClassInferenceProducer producer, boolean tracingMode) {
+			ClassInferenceProducer producer) {
 		/* compose the link with all forward links */
 		if (compsByForwardRelations == null)
 			return;
@@ -152,10 +153,10 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 			for (IndexedComplexPropertyChain composition : compositions)
 				for (IndexedContextRoot forwardTarget : forwardTargets)
 					IndexedObjectSomeValuesFrom.Helper.produceComposedLink(
-							producer, link.getTraceRoot(),
-							link.getRelation(), premises.getRoot(),
-							forwardRelation, forwardTarget, composition, tracingMode);
-		}		
+							producer, link.getTraceRoot(), link.getRelation(),
+							premises.getRoot(), forwardRelation, forwardTarget,
+							composition);
+		}
 	}
 	
 	@Override
@@ -163,7 +164,7 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 			ClassInferenceProducer producer) {
 		apply(link.getRelation().getSaturated()
 				.getNonRedundantCompositionsByRightSubProperty(), link,
-				premises, producer, false);		
+				premises, producer);
 	}
 	
 	@Override
@@ -171,10 +172,10 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 			ClassInferenceProducer producer) {
 		apply(link.getRelation().getSaturated()
 				.getNonRedundantCompositionsByRightSubProperty(), link,
-				premises, producer, true);
+				premises, producer);
 		apply(link.getRelation().getSaturated()
-				.getRedundantCompositionsByRightSubProperty(), link,
-				premises, producer, true);
+				.getRedundantCompositionsByRightSubProperty(), link, premises,
+				producer);
 	}
 
 	@Override

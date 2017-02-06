@@ -82,7 +82,7 @@ public class NonReflexiveBackwardLinkCompositionRule
 
 	private void apply(
 			final Multimap<IndexedObjectProperty, IndexedComplexPropertyChain> compsByBackwardRelation,
-			ContextPremises premises, ClassInferenceProducer producer, boolean tracingMode) {
+			ContextPremises premises, ClassInferenceProducer producer) {
 		/* compose the link with all non-reflexive backward links */
 		final Map<IndexedObjectProperty, ? extends SubContextPremises> subContextMap = premises
 				.getSubContextPremisesByObjectProperty();
@@ -100,7 +100,7 @@ public class NonReflexiveBackwardLinkCompositionRule
 					IndexedObjectSomeValuesFrom.Helper.produceComposedLink(
 							producer, source, backwardRelation,
 							premises.getRoot(), forwardLink_.getChain(),
-							forwardLink_.getTarget(), composition, tracingMode);
+							forwardLink_.getTarget(), composition);
 				}
 		}
 	}
@@ -110,7 +110,7 @@ public class NonReflexiveBackwardLinkCompositionRule
 			ClassInferenceProducer producer) {
 		apply(forwardLink_.getChain().getSaturated()
 				.getNonRedundantCompositionsByLeftSubProperty(), premises,
-				producer, false);
+				producer);
 	}
 
 	@Override
@@ -118,10 +118,10 @@ public class NonReflexiveBackwardLinkCompositionRule
 			ClassInferenceProducer producer) {
 		apply(forwardLink_.getChain().getSaturated()
 				.getNonRedundantCompositionsByLeftSubProperty(), premises,
-				producer, true);
+				producer);
 		apply(forwardLink_.getChain().getSaturated()
 				.getRedundantCompositionsByLeftSubProperty(), premises,
-				producer, true);
+				producer);
 	}
 
 	@Override
