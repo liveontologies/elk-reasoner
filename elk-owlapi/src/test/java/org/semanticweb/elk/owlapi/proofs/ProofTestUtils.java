@@ -23,6 +23,7 @@ package org.semanticweb.elk.owlapi.proofs;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeNotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -162,6 +163,12 @@ public class ProofTestUtils {
 
 		final Set<OWLAxiom> proofBreaker = ProofTestUtils
 				.collectProofBreaker(root, ontology, random);
+		/*
+		 * If proofBreaker is null, the conclusion cannot be broken and nothing
+		 * can be tested!
+		 */
+		assumeNotNull(proofBreaker);
+		// else
 		final List<OWLOntologyChange> deletions = new ArrayList<OWLOntologyChange>();
 		final List<OWLOntologyChange> additions = new ArrayList<OWLOntologyChange>();
 		for (final OWLAxiom axiom : proofBreaker) {
@@ -185,25 +192,37 @@ public class ProofTestUtils {
 			final Random random) {
 		final Set<ProofNode<OWLAxiom>> visited = new HashSet<ProofNode<OWLAxiom>>();
 		final Set<ProofNode<OWLAxiom>> tautologies = new HashSet<ProofNode<OWLAxiom>>();
-		return collectProofBreaker(conclusion, visited, tautologies, ontology,
-				random);
+		return collectProofBreaker(conclusion, visited, tautologies,
+				new HashSet<ProofNode<OWLAxiom>>(), ontology, random);
 	}
 
 	public static Set<OWLAxiom> collectProofBreaker(
 			final ProofNode<OWLAxiom> conclusion,
 			final Set<ProofNode<OWLAxiom>> visited,
 			final Set<ProofNode<OWLAxiom>> tautologies,
+			final Set<ProofNode<OWLAxiom>> currentBranch,
 			final OWLOntology ontology, final Random random) {
-
 		/*
-		 * If the expressions in visited are not provable and the result of this
-		 * method is removed from the ontology, conclusion is not provable.
-		 * TODO: Except if some expression is a tautology !!!
+		 * If the expressions in visited are not provable or tautologies, and
+		 * the result of this method is not null and removed from the ontology,
+		 * then conclusion is not provable.
 		 */
 
-		final Set<OWLAxiom> collected = new HashSet<OWLAxiom>();
+		if (currentBranch.contains(conclusion)) {
+			/*
+			 * Cycle detected. Cannot make sure that the conclusion is not a
+			 * tautology, so assume that it is.
+			 */
+			return null;
+		}
 
+		if (tautologies.contains(conclusion)) {
+			// We've already found out that the conclusion is a tautology.
+			return null;
+		}
+		final Set<OWLAxiom> collected = new HashSet<OWLAxiom>();
 		if (!visited.add(conclusion)) {
+			// If already visited, its proof breaker was already collected.
 			return collected;
 		}
 
@@ -214,47 +233,55 @@ public class ProofTestUtils {
 			collected.add(ax);
 		}
 
+		/*
+		 * Even if the conclusion is an axiom, it may still be derived from
+		 * other axioms. So we still need to break its proof.
+		 */
+
 		// For all inferences break proofs of one of their premises.
+		final Set<ProofNode<OWLAxiom>> newBranch = new HashSet<ProofNode<OWLAxiom>>(
+				currentBranch);
+		newBranch.add(conclusion);
 		for (final ProofStep<OWLAxiom> inf : conclusion.getInferences()) {
 
 			final List<ProofNode<OWLAxiom>> premises = new ArrayList<ProofNode<OWLAxiom>>(
 					inf.getPremises());
 			Collections.shuffle(premises, random);
 
-			boolean inferenceIsBroken = false;
+			boolean isSomePremiseBroken = false;
 			for (final ProofNode<OWLAxiom> premise : premises) {
 
 				final Set<OWLAxiom> premiseBreaker = collectProofBreaker(
-						premise, visited, tautologies, ontology, random);
+						premise, visited, tautologies, newBranch, ontology,
+						random);
 
-				if (tautologies.contains(premise)) {
-					// The premise is a tautology and we need to break a
-					// different premise!
-				} else if (premiseBreaker.isEmpty()) {
-					// The premise was already visited, so this inference is
-					// already broken.
-					inferenceIsBroken = true;
-					break;
+				if (premiseBreaker == null) {
+					/*
+					 * The premise may be a tautology and we need to break a
+					 * different premise!
+					 */
 				} else {
 					collected.addAll(premiseBreaker);
+					isSomePremiseBroken = true;
 					break;
 				}
 
 			}
-			if (!inferenceIsBroken && collected.isEmpty()) {
+			if (!isSomePremiseBroken) {
 				/*
-				 * None of the premises of this inference is already broken and
-				 * no axioms were collected, so conclusion is a tautology.
-				 * 
-				 * TODO: This is not complete, because some tautology may be
-				 * asserted!
+				 * There is an inference whose all premises may be tautologies,
+				 * hence also the conclusion may be a tautology.
 				 */
 				tautologies.add(conclusion);
-				return Collections.emptySet();
+				return null;
 			}
 
 		}
 
+		/*
+		 * We are sure that no inference has all premises that are tautologies,
+		 * hence collected contains a proof breaker of conclusion.
+		 */
 		return collected;
 	}
 
