@@ -26,15 +26,35 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
-import org.semanticweb.elk.reasoner.tracing.TracingInference;
-import org.semanticweb.elk.reasoner.tracing.TracingInferencePrinter;
 
 abstract class AbstractForwardLinkInference<R extends IndexedPropertyChain>
-		extends ForwardLinkImpl<R> implements ForwardLinkInference {
+		extends AbstractClassInference implements ForwardLinkInference {
 
-	public AbstractForwardLinkInference(IndexedContextRoot root, R relation,
-			IndexedContextRoot target) {
-		super(root, relation, target);
+	/**
+	 * the {@link IndexedPropertyChain} in the existential restriction
+	 * corresponding to this {@link ForwardLinkImpl}
+	 */
+	private final R forwardChain_;
+
+	/**
+	 * the {@link IndexedContextRoot} corresponding to the filler of the
+	 * existential restriction corresponding to this {@link ForwardLinkImpl}
+	 */
+	private final IndexedContextRoot target_;
+
+	public AbstractForwardLinkInference(IndexedContextRoot destination,
+			R forwardChain, IndexedContextRoot target) {
+		super(destination);
+		this.forwardChain_ = forwardChain;
+		this.target_ = target;
+	}
+
+	public R getChain() {
+		return forwardChain_;
+	}
+
+	public IndexedContextRoot getTarget() {
+		return target_;
 	}
 
 	/**
@@ -46,31 +66,6 @@ abstract class AbstractForwardLinkInference<R extends IndexedPropertyChain>
 	public final ForwardLink getConclusion(ForwardLink.Factory factory) {
 		return factory.getForwardLink(getDestination(), getChain(),
 				getTarget());
-	}
-
-	@Override
-	public final int hashCode() {
-		return System.identityHashCode(this);
-	}
-
-	@Override
-	public final boolean equals(Object o) {
-		return this == o;
-	}
-
-	@Override
-	public final String toString() {
-		return TracingInferencePrinter.toString(this);		
-	}
-	
-	@Override
-	public final <O> O accept(TracingInference.Visitor<O> visitor) {
-		return accept((ForwardLinkInference.Visitor<O>) visitor);
-	}
-
-	@Override
-	public final <O> O accept(SaturationInference.Visitor<O> visitor) {
-		return accept((ForwardLinkInference.Visitor<O>) visitor);
 	}
 
 	@Override

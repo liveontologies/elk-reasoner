@@ -21,6 +21,7 @@
  */
 package org.semanticweb.elk.reasoner.tracing.factories;
 
+import org.liveontologies.proof.util.Producer;
 import org.semanticweb.elk.Reference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
@@ -48,7 +49,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.AbstractRuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
-import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
 import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
 /**
@@ -56,8 +56,7 @@ import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
  * {@link ClassConclusion}s currently stored in the {@link Context}s of the main
  * {@link SaturationState}. This {@link SaturationState} is not modified. The
  * inferences producing the {@link ClassConclusion}s in this
- * {@link SaturationState} are produced using the supplied
- * {@link TracingInferenceProducer}.
+ * {@link SaturationState} are produced using the supplied {@link Producer}.
  * 
  * @author Pavel Klinov
  * 
@@ -65,21 +64,21 @@ import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class ContextTracingRuleApplicationFactory
-		extends
-			AbstractRuleApplicationFactory<ExtendedContext, RuleApplicationInput> {
+public class ContextTracingRuleApplicationFactory extends
+		AbstractRuleApplicationFactory<ExtendedContext, RuleApplicationInput> {
 
 	private final SaturationState<?> mainSaturationState_;
 
-	private final TracingInferenceProducer<ClassInference> inferenceProducer_;
+	private final Producer<ClassInference> inferenceProducer_;
 
 	public ContextTracingRuleApplicationFactory(
 			final InterruptMonitor interrupter,
 			SaturationState<?> mainSaturationState,
-			TracingInferenceProducer<ClassInference> inferenceProducer) {
-		super(interrupter, new MapSaturationState<ExtendedContext>(
-				mainSaturationState.getOntologyIndex(),
-				new MainContextFactory()));
+			Producer<ClassInference> inferenceProducer) {
+		super(interrupter,
+				new MapSaturationState<ExtendedContext>(
+						mainSaturationState.getOntologyIndex(),
+						new MainContextFactory()));
 		mainSaturationState_ = mainSaturationState;
 		inferenceProducer_ = inferenceProducer;
 	}
@@ -114,27 +113,34 @@ public class ContextTracingRuleApplicationFactory
 								new TracingRuleApplicationClassConclusionVisitor(
 										mainSaturationState_, activeContext,
 										ruleVisitor, localWriter),
-								// initializing all sub-contexts when contexts are initialized
-								// this is needed to ensure that all sub-contexts are fully traced
+								// initializing all sub-contexts when contexts
+								// are initialized
+								// this is needed to ensure that all
+								// sub-contexts are fully traced
 								new DummyClassConclusionVisitor<Boolean>() {
 									@Override
-									protected Boolean defaultVisit(ClassConclusion conclusion) {
+									protected Boolean defaultVisit(
+											ClassConclusion conclusion) {
 										return true;
-									}									
+									}
+
 									@Override
-									public Boolean visit(ContextInitialization conclusion) {
-										IndexedContextRoot root = conclusion.getTraceRoot();
-										Context mainContext = mainSaturationState_.getContext(root);
+									public Boolean visit(
+											ContextInitialization conclusion) {
+										IndexedContextRoot root = conclusion
+												.getTraceRoot();
+										Context mainContext = mainSaturationState_
+												.getContext(root);
 										for (IndexedObjectProperty subRoot : mainContext
-												.getSubContextPremisesByObjectProperty().keySet()) {
+												.getSubContextPremisesByObjectProperty()
+												.keySet()) {
 											localWriter.produce(
-													new SubContextInitializationNoPremises(root,
-															subRoot));
+													new SubContextInitializationNoPremises(
+															root, subRoot));
 										}
 										return true;
 									}
-								}								
-								)));
+								})));
 	}
 
 	/**
@@ -146,8 +152,7 @@ public class ContextTracingRuleApplicationFactory
 	 *         pavel.klinov@uni-ulm.de
 	 */
 	private class InferenceProducingVisitor
-			extends
-				DummyClassInferenceVisitor<Boolean> {
+			extends DummyClassInferenceVisitor<Boolean> {
 
 		@Override
 		protected Boolean defaultVisit(final ClassInference inference) {

@@ -31,10 +31,13 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
+import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
 
 /**
  * A {@link ClassInference} producing a {@link SubClassInclusionDecomposed} from
- * a {@link SubClassInclusionComposed} and {@link IndexedEquivalentClassesAxiom}:<br>
+ * a {@link SubClassInclusionComposed} and
+ * {@link IndexedEquivalentClassesAxiom}:<br>
  * 
  * <pre>
  *     (1)      (2)
@@ -58,7 +61,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
 public class SubClassInclusionExpandedFirstEquivalentClass
 		extends AbstractSubClassInclusionExpansionInference {
 
-	public SubClassInclusionExpandedFirstEquivalentClass(IndexedContextRoot inferenceRoot,
+	public SubClassInclusionExpandedFirstEquivalentClass(
+			IndexedContextRoot inferenceRoot,
 			IndexedClassExpression premiseSubsumer,
 			IndexedClassExpression conclusionSubsumer, ElkAxiom reason) {
 		super(inferenceRoot, premiseSubsumer, conclusionSubsumer, reason);
@@ -66,8 +70,25 @@ public class SubClassInclusionExpandedFirstEquivalentClass
 
 	public IndexedEquivalentClassesAxiom getSecondPremise(
 			IndexedEquivalentClassesAxiom.Factory factory) {
-		return factory.getIndexedEquivalentClassesAxiom(getReason(), 
+		return factory.getIndexedEquivalentClassesAxiom(getReason(),
 				getPremiseSubsumer(), getConclusionSubsumer());
+	}
+
+	@Override
+	public int getPremiseCount() {
+		return 2;
+	}
+
+	@Override
+	public Conclusion getPremise(int index, Factory factory) {
+		switch (index) {
+		case 0:
+			return getFirstPremise(factory);
+		case 1:
+			return getSecondPremise(factory);
+		default:
+			return failGetPremise(index);
+		}
 	}
 
 	@Override

@@ -31,6 +31,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
+import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
 
 /**
  * A {@link ClassInference} producing a {@link SubClassInclusionDecomposed} from
@@ -68,6 +70,23 @@ public class SubClassInclusionExpandedSubClassOf
 			IndexedSubClassOfAxiom.Factory factory) {
 		return factory.getIndexedSubClassOfAxiom(getReason(),
 				getPremiseSubsumer(), getConclusionSubsumer());
+	}
+
+	@Override
+	public int getPremiseCount() {
+		return 2;
+	}
+
+	@Override
+	public Conclusion getPremise(int index, Factory factory) {
+		switch (index) {
+		case 0:
+			return getFirstPremise(factory);
+		case 1:
+			return getSecondPremise(factory);
+		default:
+			return failGetPremise(index);
+		}
 	}
 
 	@Override

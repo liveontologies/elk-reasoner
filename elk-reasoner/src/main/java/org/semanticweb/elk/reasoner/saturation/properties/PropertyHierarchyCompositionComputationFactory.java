@@ -26,18 +26,18 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import org.liveontologies.proof.util.Producer;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.stages.PropertyHierarchyCompositionState;
-import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
 import org.semanticweb.elk.util.collections.AbstractHashMultimap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.concurrent.computation.DelegateInterruptMonitor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
-import org.semanticweb.elk.util.concurrent.computation.DelegateInterruptMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +60,7 @@ public class PropertyHierarchyCompositionComputationFactory extends
 	/**
 	 * used to record sub-property inferences
 	 */
-	private final TracingInferenceProducer<? super ObjectPropertyInference> inferenceProducer_;
+	private final Producer<? super ObjectPropertyInference> inferenceProducer_;
 
 	/**
 	 * The dispatcher of events over derived property hierarchy and
@@ -70,7 +70,7 @@ public class PropertyHierarchyCompositionComputationFactory extends
 	
 	public PropertyHierarchyCompositionComputationFactory(
 			final InterruptMonitor interrupter,
-			TracingInferenceProducer<? super ObjectPropertyInference> inferenceProducer,
+			Producer<? super ObjectPropertyInference> inferenceProducer,
 			final PropertyHierarchyCompositionState.Dispatcher dispatcher) {
 		super(interrupter);
 		this.inferenceProducer_ = inferenceProducer;

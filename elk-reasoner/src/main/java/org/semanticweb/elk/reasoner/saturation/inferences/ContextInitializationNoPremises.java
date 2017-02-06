@@ -27,6 +27,8 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
+import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
 
 /**
  * A {@link ClassInference} producing a {@link ContextInitialization} conclusion
@@ -45,8 +47,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitiali
  * @author "Yevgeny Kazakov"
  */
 public class ContextInitializationNoPremises
-		extends
-			AbstractContextInitializationInference {
+		extends AbstractContextInitializationInference {
 
 	public ContextInitializationNoPremises(IndexedContextRoot root) {
 		super(root);
@@ -55,6 +56,16 @@ public class ContextInitializationNoPremises
 	@Override
 	public IndexedContextRoot getOrigin() {
 		return null;
+	}
+
+	@Override
+	public int getPremiseCount() {
+		return 0;
+	}
+
+	@Override
+	public Conclusion getPremise(int index, Factory factory) {
+		return failGetPremise(index);
 	}
 
 	@Override

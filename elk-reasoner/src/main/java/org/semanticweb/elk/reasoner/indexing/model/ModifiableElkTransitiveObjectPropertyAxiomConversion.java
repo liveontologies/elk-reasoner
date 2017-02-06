@@ -32,9 +32,8 @@ import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
  * @author "Yevgeny Kazakov"
  */
 public interface ModifiableElkTransitiveObjectPropertyAxiomConversion
-		extends
-			ElkTransitiveObjectPropertyAxiomConversion,
-			ModifiableIndexedSubObjectPropertyOfAxiomInference {
+		extends ElkTransitiveObjectPropertyAxiomConversion,
+		ModifiableIndexedSubObjectPropertyOfAxiomInference {
 
 	/**
 	 * A factory for creating instances
@@ -48,6 +47,20 @@ public interface ModifiableElkTransitiveObjectPropertyAxiomConversion
 				ElkTransitiveObjectPropertyAxiom originalAxiom,
 				ModifiableIndexedPropertyChain subPropertyChain,
 				ModifiableIndexedObjectProperty superProperty);
+
+	}
+
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(ModifiableElkTransitiveObjectPropertyAxiomConversion inference);
 
 	}
 

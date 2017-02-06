@@ -23,16 +23,10 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
-import org.semanticweb.elk.reasoner.tracing.TracingInference;
-import org.semanticweb.elk.reasoner.tracing.TracingInferencePrinter;
 
-abstract class AbstractContextInitializationInference
-		extends
-			ContextInitializationImpl
-		implements
-			ContextInitializationInference {
+abstract class AbstractContextInitializationInference extends
+		AbstractClassInference implements ContextInitializationInference {
 
 	protected AbstractContextInitializationInference(IndexedContextRoot root) {
 		super(root);
@@ -47,31 +41,6 @@ abstract class AbstractContextInitializationInference
 	public final ContextInitialization getConclusion(
 			ContextInitialization.Factory factory) {
 		return factory.getContextInitialization(getDestination());
-	}
-
-	@Override
-	public final int hashCode() {
-		return System.identityHashCode(this);
-	}
-
-	@Override
-	public final boolean equals(Object o) {
-		return this == o;
-	}
-
-	@Override
-	public final String toString() {
-		return TracingInferencePrinter.toString(this);		
-	}
-	
-	@Override
-	public final <O> O accept(TracingInference.Visitor<O> visitor) {
-		return accept((ContextInitializationInference.Visitor<O>) visitor);
-	}
-
-	@Override
-	public final <O> O accept(SaturationInference.Visitor<O> visitor) {
-		return accept((ContextInitializationInference.Visitor<O>) visitor);
 	}
 
 	@Override

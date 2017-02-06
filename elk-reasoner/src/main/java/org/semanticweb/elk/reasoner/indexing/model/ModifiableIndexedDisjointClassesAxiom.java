@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.model;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+
 /*
  * #%L
  * ELK Reasoner
@@ -30,11 +32,37 @@ package org.semanticweb.elk.reasoner.indexing.model;
  *
  */
 public interface ModifiableIndexedDisjointClassesAxiom
-		extends
-			ModifiableIndexedAxiom,
-			IndexedDisjointClassesAxiom {
+		extends ModifiableIndexedAxiom, IndexedDisjointClassesAxiom {
 
 	@Override
 	ModifiableIndexedClassExpressionList getMembers();
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		ModifiableIndexedDisjointClassesAxiom getIndexedDisjointClassesAxiom(
+				ElkAxiom originalAxiom,
+				ModifiableIndexedClassExpressionList members);
+
+	}
+
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(ModifiableIndexedDisjointClassesAxiom axiom);
+
+	}
 
 }

@@ -28,6 +28,8 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
+import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
 
 /**
  * A {@link ClassInference} producing a {@link SubClassInclusionComposed} with
@@ -89,6 +91,21 @@ public class SubClassInclusionComposedObjectUnionOf extends
 			SubClassInclusionComposed.Factory factory) {
 		return factory.getSubClassInclusionComposed(getOrigin(),
 				getSubsumer().getDisjuncts().get(position_));
+	}
+
+	@Override
+	public int getPremiseCount() {
+		return 1;
+	}
+
+	@Override
+	public Conclusion getPremise(int index, Factory factory) {
+		switch (index) {
+		case 0:
+			return getPremise(factory);
+		default:
+			return failGetPremise(index);
+		}
 	}
 
 	@Override

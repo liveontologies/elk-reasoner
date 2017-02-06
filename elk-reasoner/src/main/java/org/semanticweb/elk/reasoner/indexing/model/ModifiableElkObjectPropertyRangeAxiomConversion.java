@@ -32,9 +32,8 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
  * @author "Yevgeny Kazakov"
  */
 public interface ModifiableElkObjectPropertyRangeAxiomConversion
-		extends
-			ElkObjectPropertyRangeAxiomConversion,
-			ModifiableIndexedObjectPropertyRangeAxiomInference {
+		extends ElkObjectPropertyRangeAxiomConversion,
+		ModifiableIndexedObjectPropertyRangeAxiomInference {
 
 	/**
 	 * A factory for creating instances
@@ -48,6 +47,20 @@ public interface ModifiableElkObjectPropertyRangeAxiomConversion
 				ElkObjectPropertyRangeAxiom originalAxiom,
 				ModifiableIndexedObjectProperty property,
 				ModifiableIndexedClassExpression range);
+
+	}
+
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(ModifiableElkObjectPropertyRangeAxiomConversion inference);
 
 	}
 

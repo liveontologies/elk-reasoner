@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.properties.inferences;
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
+
 /*
  * #%L
  * ELK Reasoner
@@ -37,12 +39,12 @@ import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 public class SubPropertyChainInferenceConclusionVisitor<O>
 		implements SubPropertyChainInference.Visitor<O> {
 
-	private final SubPropertyChain.Factory conclusionFactory_;
+	private final ObjectPropertyConclusion.Factory conclusionFactory_;
 
 	private final SubPropertyChain.Visitor<O> conclusionVisitor_;
 
 	public SubPropertyChainInferenceConclusionVisitor(
-			SubPropertyChain.Factory conclusionFactory,
+			ObjectPropertyConclusion.Factory conclusionFactory,
 			SubPropertyChain.Visitor<O> conclusionVisitor) {
 		this.conclusionFactory_ = conclusionFactory;
 		this.conclusionVisitor_ = conclusionVisitor;

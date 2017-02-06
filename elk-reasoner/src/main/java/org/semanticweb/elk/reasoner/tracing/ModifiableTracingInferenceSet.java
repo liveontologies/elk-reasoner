@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.tracing;
 
+import org.liveontologies.proof.util.Producer;
+
 /*
  * #%L
  * ELK Reasoner
@@ -22,7 +24,8 @@ package org.semanticweb.elk.reasoner.tracing;
  * #L%
  */
 
-public interface ModifiableTracingInferenceSet<I extends TracingInference> extends TracingInferenceSet, TracingInferenceProducer<I> {
+public interface ModifiableTracingInferenceSet<I extends TracingInference>
+		extends TracingInferenceSet, Producer<I> {
 
 	@Override
 	public Iterable<? extends I> getInferences(Conclusion conclusion);

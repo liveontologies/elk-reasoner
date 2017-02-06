@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.model;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+
 /*
  * #%L
  * ELK Reasoner
@@ -29,13 +31,42 @@ package org.semanticweb.elk.reasoner.indexing.model;
  * @author "Yevgeny Kazakov"
  *
  */
-public interface ModifiableIndexedSubClassOfAxiom extends
-		ModifiableIndexedAxiom, IndexedSubClassOfAxiom {
+public interface ModifiableIndexedSubClassOfAxiom
+		extends ModifiableIndexedAxiom, IndexedSubClassOfAxiom {
 
 	@Override
 	ModifiableIndexedClassExpression getSubClass();
 
 	@Override
 	ModifiableIndexedClassExpression getSuperClass();
+
+	/**
+	 * A factory for creating instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 */
+	interface Factory {
+
+		public ModifiableIndexedSubClassOfAxiom getIndexedSubClassOfAxiom(
+				ElkAxiom originalAxiom,
+				ModifiableIndexedClassExpression subClass,
+				ModifiableIndexedClassExpression superClass);
+
+	}
+
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(ModifiableIndexedSubClassOfAxiom axiom);
+
+	}
 
 }

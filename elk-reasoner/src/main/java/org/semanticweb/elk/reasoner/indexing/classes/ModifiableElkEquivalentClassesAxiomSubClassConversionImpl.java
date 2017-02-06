@@ -26,17 +26,16 @@ import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkEquivalentClassesAxiomSubClassConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedSubClassOfAxiomInference;
 
 /**
  * Implements {@link ModifiableElkEquivalentClassesAxiomSubClassConversion}
  * 
  * @author "Yevgeny Kazakov"
  */
-class ModifiableElkEquivalentClassesAxiomSubClassConversionImpl
-		extends
-			ModifiableIndexedSubClassOfAxiomInferenceImpl<ElkEquivalentClassesAxiom>
-		implements
-			ModifiableElkEquivalentClassesAxiomSubClassConversion {
+class ModifiableElkEquivalentClassesAxiomSubClassConversionImpl extends
+		AbstractModifiableIndexedSubClassOfAxiomInference<ElkEquivalentClassesAxiom>
+		implements ModifiableElkEquivalentClassesAxiomSubClassConversion {
 
 	private final int subClassPosition_, superClassPosition_;
 
@@ -62,6 +61,12 @@ class ModifiableElkEquivalentClassesAxiomSubClassConversionImpl
 	@Override
 	public final <O> O accept(
 			IndexedSubClassOfAxiomInference.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public final <O> O accept(
+			ModifiableIndexedSubClassOfAxiomInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

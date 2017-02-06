@@ -25,17 +25,25 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
-import org.semanticweb.elk.reasoner.tracing.TracingInference;
-import org.semanticweb.elk.reasoner.tracing.TracingInferencePrinter;
 
-abstract class AbstractPropagationInference extends PropagationImpl
+abstract class AbstractPropagationInference extends AbstractSubClassInference
 		implements PropagationInference {
+
+	private final IndexedObjectSomeValuesFrom carry_;
 
 	public AbstractPropagationInference(IndexedContextRoot root,
 			IndexedObjectProperty relation, IndexedObjectSomeValuesFrom carry) {
-		super(root, relation, carry);
+		super(root, relation);
+		this.carry_ = carry;
+	}
+
+	public IndexedObjectProperty getRelation() {
+		return getSubDestination();
+	}
+
+	public IndexedObjectSomeValuesFrom getCarry() {
+		return this.carry_;
 	}
 
 	public IndexedObjectSomeValuesFrom getConclusionCarry() {
@@ -54,32 +62,7 @@ abstract class AbstractPropagationInference extends PropagationImpl
 	}
 
 	@Override
-	public final int hashCode() {
-		return System.identityHashCode(this);
-	}
-
-	@Override
-	public final boolean equals(Object o) {
-		return this == o;
-	}
-	
-	@Override
-	public final String toString() {
-		return TracingInferencePrinter.toString(this);		
-	}
-
-	@Override
-	public final <O> O accept(TracingInference.Visitor<O> visitor) {
-		return accept((PropagationInference.Visitor<O>) visitor);
-	}
-
-	@Override
-	public final <O> O accept(SaturationInference.Visitor<O> visitor) {
-		return accept((PropagationInference.Visitor<O>) visitor);
-	}
-
-	@Override
-	public final <O> O accept(ClassInference.Visitor<O> visitor) {
+	public final <O> O accept(SubClassInference.Visitor<O> visitor) {
 		return accept((PropagationInference.Visitor<O>) visitor);
 	}
 

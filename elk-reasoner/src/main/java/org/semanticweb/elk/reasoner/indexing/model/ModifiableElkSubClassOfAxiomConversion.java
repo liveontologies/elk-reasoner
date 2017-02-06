@@ -31,9 +31,8 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  * @author "Yevgeny Kazakov"
  */
 public interface ModifiableElkSubClassOfAxiomConversion
-		extends
-			ElkSubClassOfAxiomConversion,
-			ModifiableIndexedSubClassOfAxiomInference {
+		extends ElkSubClassOfAxiomConversion,
+		ModifiableIndexedSubClassOfAxiomInference {
 
 	/**
 	 * A factory for creating instances
@@ -47,6 +46,20 @@ public interface ModifiableElkSubClassOfAxiomConversion
 				ElkSubClassOfAxiom originalAxiom,
 				ModifiableIndexedClassExpression subClass,
 				ModifiableIndexedClassExpression superClass);
+
+	}
+
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(ModifiableElkSubClassOfAxiomConversion inference);
 
 	}
 

@@ -29,29 +29,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import org.liveontologies.proof.util.Producer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.DummyConclusionVisitor;
 import org.semanticweb.elk.reasoner.tracing.ModifiableTracingInferenceSet;
 import org.semanticweb.elk.reasoner.tracing.TracingInference;
-import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An {@link TracingInferenceProducer} that filters out the unnecessary
- * {@link ClassInference}s and saves the remaining ones into the provided
- * {@link ModifiableTracingInferenceSet}. A {@link ClassInference} is unnecessary if
- * one of the local premises of the inference is either its conclusion (cycle of
- * length one) or can only be a conclusion of inferences in the provided
- * {@link ModifiableTracingInferenceSet} which have this conclusion as one of the
- * premises (cycle of length two).
+ * An {@link Producer} that filters out the unnecessary {@link ClassInference}s
+ * and saves the remaining ones into the provided
+ * {@link ModifiableTracingInferenceSet}. A {@link ClassInference} is
+ * unnecessary if one of the local premises of the inference is either its
+ * conclusion (cycle of length one) or can only be a conclusion of inferences in
+ * the provided {@link ModifiableTracingInferenceSet} which have this conclusion
+ * as one of the premises (cycle of length two).
  * 
  * @author Yevgeny Kazakov
  */
-class ClassInferenceBlockingFilter
-		implements TracingInferenceProducer<ClassInference> {
+class ClassInferenceBlockingFilter implements Producer<ClassInference> {
 
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ClassInferenceBlockingFilter.class);

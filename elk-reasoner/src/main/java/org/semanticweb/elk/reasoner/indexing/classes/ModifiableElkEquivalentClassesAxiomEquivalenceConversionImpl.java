@@ -26,6 +26,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkEquivalentClassesAxiomEquivalenceConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedEquivalentClassesAxiomInference;
 
 /**
  * Implements {@link ModifiableElkEquivalentClassesAxiomEquivalenceConversion}
@@ -33,7 +34,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpress
  * @author "Yevgeny Kazakov"
  */
 class ModifiableElkEquivalentClassesAxiomEquivalenceConversionImpl extends
-		ModifiableIndexedEquivalentClassesAxiomInferenceImpl<ElkEquivalentClassesAxiom>
+		AbstractModifiableIndexedEquivalentClassesAxiomInference<ElkEquivalentClassesAxiom>
 		implements ModifiableElkEquivalentClassesAxiomEquivalenceConversion {
 
 	private final int firstMemberPosition_, secondMemberPosition_;
@@ -61,6 +62,12 @@ class ModifiableElkEquivalentClassesAxiomEquivalenceConversionImpl extends
 	@Override
 	public final <O> O accept(
 			IndexedEquivalentClassesAxiomInference.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public final <O> O accept(
+			ModifiableIndexedEquivalentClassesAxiomInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

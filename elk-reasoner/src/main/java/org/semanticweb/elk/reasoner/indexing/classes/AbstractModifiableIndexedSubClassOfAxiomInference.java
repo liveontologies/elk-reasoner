@@ -26,58 +26,63 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiomInference;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedSubClassOfAxiomInference;
-import org.semanticweb.elk.reasoner.tracing.TracingInference;
-import org.semanticweb.elk.reasoner.tracing.TracingInferencePrinter;
 
 /**
  * Implements {@link ModifiableIndexedSubClassOfAxiomInference}
  * 
  * @author "Yevgeny Kazakov"
  */
-abstract class ModifiableIndexedSubClassOfAxiomInferenceImpl<A extends ElkAxiom>
-		extends
-			ModifiableIndexedSubClassOfAxiomImpl<A>
-		implements
-			ModifiableIndexedSubClassOfAxiomInference {
+abstract class AbstractModifiableIndexedSubClassOfAxiomInference<A extends ElkAxiom>
+		extends AbstractIndexedAxiomInference<A>
+		implements ModifiableIndexedSubClassOfAxiomInference {
 
-	ModifiableIndexedSubClassOfAxiomInferenceImpl(A originalAxiom,
+	private final ModifiableIndexedClassExpression subClass_, superClass_;
+
+	AbstractModifiableIndexedSubClassOfAxiomInference(A originalAxiom,
 			ModifiableIndexedClassExpression subClass,
 			ModifiableIndexedClassExpression superClass) {
-		super(originalAxiom, subClass, superClass);
+		super(originalAxiom);
+		this.subClass_ = subClass;
+		this.superClass_ = superClass;
+
+	}
+
+	public final ModifiableIndexedClassExpression getSubClass() {
+		return this.subClass_;
+	}
+
+	public final ModifiableIndexedClassExpression getSuperClass() {
+		return this.superClass_;
 	}
 
 	@Override
-	public final IndexedSubClassOfAxiom getConclusion(
-			IndexedSubClassOfAxiom.Factory factory) {
+	public final ModifiableIndexedSubClassOfAxiom getConclusion(
+			ModifiableIndexedSubClassOfAxiom.Factory factory) {
 		return factory.getIndexedSubClassOfAxiom(getOriginalAxiom(),
 				getSubClass(), getSuperClass());
 	}
-	
-	@Override
-	public int hashCode() {
-		return System.identityHashCode(this);
-	}
 
 	@Override
-	public boolean equals(Object o) {
-		return this == o;
-	}
-	
-	@Override
-	public String toString() {
-		return TracingInferencePrinter.toString(this);		
-	}
-	
-	@Override
-	public final <O> O accept(TracingInference.Visitor<O> visitor) {
-		return accept((IndexedSubClassOfAxiomInference.Visitor<O>) visitor);
+	public IndexedSubClassOfAxiom getConclusion(
+			IndexedSubClassOfAxiom.Factory factory) {
+		return factory.getIndexedSubClassOfAxiom(getOriginalAxiom(),
+				getSubClass(), getSuperClass());
 	}
 
 	@Override
 	public final <O> O accept(IndexedAxiomInference.Visitor<O> visitor) {
 		return accept((IndexedSubClassOfAxiomInference.Visitor<O>) visitor);
+	}
+
+	@Override
+	public final <O> O accept(
+			ModifiableIndexedAxiomInference.Visitor<O> visitor) {
+		return accept(
+				(ModifiableIndexedSubClassOfAxiomInference.Visitor<O>) visitor);
 	}
 
 }

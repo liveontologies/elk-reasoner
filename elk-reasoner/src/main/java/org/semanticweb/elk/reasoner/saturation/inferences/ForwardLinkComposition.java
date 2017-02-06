@@ -32,6 +32,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
+import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
 
 /**
  * A {@link ClassInference} producing a {@link ForwardLink} from a
@@ -52,8 +54,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
  * D = {@link #getOrigin()}<br>
  * P1 = {@link #getPremiseForwardChain()}<br>
  * E = {@link #getPremiseTarget()}<br>
- * R2P2 = {@link #getComposition()} = {@link #getChain()} (from which R2 and
- * P2 can be obtained)<br>
+ * R2P2 = {@link #getComposition()} = {@link #getChain()} (from which R2 and P2
+ * can be obtained)<br>
  * 
  * @author "Yevgeny Kazakov"
  */
@@ -129,6 +131,27 @@ public class ForwardLinkComposition
 	public SubPropertyChain getFourthPremise(SubPropertyChain.Factory factory) {
 		return factory.getSubPropertyChain(forwardChain_,
 				getComposition().getSuffixChain());
+	}
+
+	@Override
+	public int getPremiseCount() {
+		return 4;
+	}
+
+	@Override
+	public Conclusion getPremise(int index, Factory factory) {
+		switch (index) {
+		case 0:
+			return getFirstPremise(factory);
+		case 1:
+			return getSecondPremise(factory);
+		case 2:
+			return getThirdPremise(factory);
+		case 3:
+			return getFourthPremise(factory);
+		default:
+			return failGetPremise(index);
+		}
 	}
 
 	@Override

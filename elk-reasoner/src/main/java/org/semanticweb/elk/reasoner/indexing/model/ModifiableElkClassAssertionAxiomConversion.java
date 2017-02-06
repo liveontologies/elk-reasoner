@@ -32,9 +32,8 @@ import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
  *
  */
 public interface ModifiableElkClassAssertionAxiomConversion
-		extends
-			ElkClassAssertionAxiomConversion,
-			ModifiableIndexedSubClassOfAxiomInference {
+		extends ElkClassAssertionAxiomConversion,
+		ModifiableIndexedSubClassOfAxiomInference {
 
 	/**
 	 * A factory for creating instances
@@ -48,6 +47,20 @@ public interface ModifiableElkClassAssertionAxiomConversion
 				ElkClassAssertionAxiom originalAxiom,
 				ModifiableIndexedIndividual instance,
 				ModifiableIndexedClassExpression type);
+
+	}
+
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(ModifiableElkClassAssertionAxiomConversion inference);
 
 	}
 

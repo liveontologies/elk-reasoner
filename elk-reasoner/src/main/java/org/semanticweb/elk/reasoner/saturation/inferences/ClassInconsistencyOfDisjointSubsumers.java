@@ -26,6 +26,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
+import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
 
 /**
  * A {@link ClassInference} producing a {@link ClassInconsistency} from two
@@ -103,6 +105,23 @@ public class ClassInconsistencyOfDisjointSubsumers
 	public DisjointSubsumer getSecondPremise(DisjointSubsumer.Factory factory) {
 		return factory.getDisjointSubsumer(getOrigin(), disjointExpressions_,
 				secondPosition_);
+	}
+
+	@Override
+	public int getPremiseCount() {
+		return 2;
+	}
+
+	@Override
+	public Conclusion getPremise(int index, Factory factory) {
+		switch (index) {
+		case 0:
+			return getFirstPremise(factory);
+		case 1:
+			return getSecondPremise(factory);
+		default:
+			return failGetPremise(index);
+		}
 	}
 
 	@Override

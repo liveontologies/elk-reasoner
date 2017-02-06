@@ -50,8 +50,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * @author "Yevgeny Kazakov"
  */
 public class SubClassInclusionDecomposedFirstConjunct
-		extends
-			SubClassInclusionDecomposedConjunct {
+		extends SubClassInclusionDecomposedConjunct {
 
 	public SubClassInclusionDecomposedFirstConjunct(IndexedContextRoot root,
 			IndexedObjectIntersectionOf subsumer) {

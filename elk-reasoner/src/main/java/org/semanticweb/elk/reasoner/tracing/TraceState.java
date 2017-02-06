@@ -27,6 +27,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.liveontologies.proof.util.Producer;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.indexing.classes.ResolvingModifiableIndexedObjectFactory;
@@ -35,7 +36,6 @@ import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateDummyChangeListener;
@@ -64,8 +64,8 @@ import org.slf4j.LoggerFactory;
  * 
  *         TODO: filter out cyclic inferences
  */
-public class TraceState implements
-		TracingInferenceProducer<SaturationInference>, TracingInferenceSet {
+public class TraceState
+		implements Producer<SaturationInference>, TracingInferenceSet {
 
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
@@ -96,14 +96,8 @@ public class TraceState implements
 		// the axiom converter that resolves indexed axioms from the given cache
 		// and additionally saves the inferences that produced them
 		this.elkAxiomConverter_ = new ElkAxiomConverterImpl(elkFactory,
-				new ResolvingModifiableIndexedObjectFactory(index) {
-					@Override
-					protected <T extends ModifiableIndexedAxiomInference> T filter(
-							T input) {
-						indexedAxiomInferences_.produce(input);
-						return input;
-					}
-				}, index);
+				new ResolvingModifiableIndexedObjectFactory(index), index,
+				indexedAxiomInferences_);
 
 		saturationState
 				.addListener(new SaturationStateDummyChangeListener<C>() {

@@ -31,6 +31,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.PropertyRange;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
+import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
 
 /**
  * An {@link ObjectPropertyInference} producing a {@link PropertyRange} from a
@@ -91,6 +93,23 @@ public class PropertyRangeInherited extends AbstractPropertyRangeInference {
 			IndexedObjectPropertyRangeAxiom.Factory factory) {
 		return factory.getIndexedObjectPropertyRangeAxiom(reason_,
 				getSuperProperty(), getRange());
+	}
+
+	@Override
+	public int getPremiseCount() {
+		return 2;
+	}
+
+	@Override
+	public Conclusion getPremise(int index, Factory factory) {
+		switch (index) {
+		case 0:
+			return getFirstPremise(factory);
+		case 1:
+			return getSecondPremise(factory);
+		default:
+			return failGetPremise(index);
+		}
 	}
 
 	@Override

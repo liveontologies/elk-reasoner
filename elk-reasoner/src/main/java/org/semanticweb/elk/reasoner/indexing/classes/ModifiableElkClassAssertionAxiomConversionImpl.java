@@ -27,29 +27,34 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiomInferen
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkClassAssertionAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedSubClassOfAxiomInference;
 
 /**
  * Implements {@link ModifiableElkClassAssertionAxiomConversion}
  * 
  * @author "Yevgeny Kazakov"
  */
-class ModifiableElkClassAssertionAxiomConversionImpl
-		extends
-			ModifiableIndexedSubClassOfAxiomInferenceImpl<ElkClassAssertionAxiom>
-		implements
-			ModifiableElkClassAssertionAxiomConversion {
+class ModifiableElkClassAssertionAxiomConversionImpl extends
+		AbstractModifiableIndexedSubClassOfAxiomInference<ElkClassAssertionAxiom>
+		implements ModifiableElkClassAssertionAxiomConversion {
 
 	ModifiableElkClassAssertionAxiomConversionImpl(
 			ElkClassAssertionAxiom originalAxiom,
 			ModifiableIndexedIndividual instance,
 			ModifiableIndexedClassExpression type) {
 		super(originalAxiom, instance, type);
-	}	
+	}
 
 	@Override
 	public final <O> O accept(
 			IndexedSubClassOfAxiomInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
+
+	@Override
+	public <O> O accept(
+			ModifiableIndexedSubClassOfAxiomInference.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}	
 
 }

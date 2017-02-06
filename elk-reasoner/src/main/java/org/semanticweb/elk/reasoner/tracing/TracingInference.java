@@ -1,5 +1,6 @@
 package org.semanticweb.elk.reasoner.tracing;
 
+import org.liveontologies.proof.util.Inference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
 
@@ -32,7 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
  * @author Yevgeny Kazakov
  *
  */
-public interface TracingInference {
+public interface TracingInference extends Inference<Conclusion> {
 
 	public <O> O accept(Visitor<O> visitor);
 

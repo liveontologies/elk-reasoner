@@ -27,13 +27,13 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
+import org.liveontologies.proof.util.Producer;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.PropertyRangeInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.PropertyRangeInherited;
-import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,12 +70,12 @@ public class RangeExplorer {
 	/**
 	 * used to record {@link PropertyRangeInference}
 	 */
-	final private TracingInferenceProducer<? super PropertyRangeInference> inferenceProducer_;
+	final private Producer<? super PropertyRangeInference> inferenceProducer_;
 
 	RangeExplorer(IndexedObjectProperty input,
 			Set<IndexedObjectProperty> currentSuperProperties,
 			Set<IndexedClassExpression> currentRanges,
-			TracingInferenceProducer<? super PropertyRangeInference> inferenceProducer) {
+			Producer<? super PropertyRangeInference> inferenceProducer) {
 		this.input_ = input;
 		this.superProperties_ = currentSuperProperties;
 		this.ranges_ = currentRanges;
@@ -115,7 +115,7 @@ public class RangeExplorer {
 			IndexedObjectProperty property,
 			Set<IndexedObjectProperty> currentSuperProperties,
 			Set<IndexedClassExpression> currentRanges,
-			TracingInferenceProducer<? super PropertyRangeInference> inferenceProducer) {
+			Producer<? super PropertyRangeInference> inferenceProducer) {
 		new RangeExplorer(property, currentSuperProperties, currentRanges,
 				inferenceProducer).process();
 		if (LOGGER_.isTraceEnabled()) {
@@ -126,7 +126,7 @@ public class RangeExplorer {
 
 	private static SaturatedPropertyChain computeRanges(
 			IndexedObjectProperty element,
-			TracingInferenceProducer<? super PropertyRangeInference> inferenceProducer) {
+			Producer<? super PropertyRangeInference> inferenceProducer) {
 		SaturatedPropertyChain saturation = element.getSaturated();
 		if (saturation.derivedRangesComputed)
 			return saturation;
@@ -154,7 +154,7 @@ public class RangeExplorer {
 	 *         {@link IndexedPropertyChain}
 	 */
 	static Set<IndexedClassExpression> getRanges(IndexedObjectProperty element,
-			TracingInferenceProducer<? super PropertyRangeInference> inferenceProducer) {
+			Producer<? super PropertyRangeInference> inferenceProducer) {
 		return computeRanges(element, inferenceProducer).getRanges();
 	}
 }

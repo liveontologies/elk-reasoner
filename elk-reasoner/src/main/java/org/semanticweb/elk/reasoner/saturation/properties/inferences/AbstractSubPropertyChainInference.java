@@ -23,55 +23,32 @@ package org.semanticweb.elk.reasoner.saturation.properties.inferences;
  */
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SubPropertyChainImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
-import org.semanticweb.elk.reasoner.tracing.TracingInference;
-import org.semanticweb.elk.reasoner.tracing.TracingInferencePrinter;
 
-public abstract class AbstractSubPropertyChainInference
-		extends SubPropertyChainImpl implements SubPropertyChainInference {
+public abstract class AbstractSubPropertyChainInference extends
+		AbstractObjectPropertyInference implements SubPropertyChainInference {
+
+	private final IndexedPropertyChain subChain_, superChain_;
 
 	public AbstractSubPropertyChainInference(IndexedPropertyChain subChain,
 			IndexedPropertyChain superChain) {
-		super(subChain, superChain);
+		subChain_ = subChain;
+		superChain_ = superChain;
 	}
 
-	/**
-	 * @param factory
-	 *            the factory for creating conclusions
-	 * 
-	 * @return the conclusion produced by this inference
-	 */
-	public SubPropertyChain getConclusion(SubPropertyChain.Factory factory) {
+	public IndexedPropertyChain getSubChain() {
+		return subChain_;
+	}
+
+	public IndexedPropertyChain getSuperChain() {
+		return superChain_;
+	}
+
+	@Override
+	public SubPropertyChain getConclusion(
+			ObjectPropertyConclusion.Factory factory) {
 		return factory.getSubPropertyChain(getSubChain(), getSuperChain());
-	}
-
-	// we assume that different objects represent different inferences
-
-	@Override
-	public int hashCode() {
-		return System.identityHashCode(this);
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		return this == o;
-	}
-	
-	@Override
-	public String toString() {
-		return TracingInferencePrinter.toString(this);		
-	}
-
-	@Override
-	public final <O> O accept(TracingInference.Visitor<O> visitor) {
-		return accept((SubPropertyChainInference.Visitor<O>) visitor);
-	}
-
-	@Override
-	public final <O> O accept(SaturationInference.Visitor<O> visitor) {
-		return accept((SubPropertyChainInference.Visitor<O>) visitor);
 	}
 
 	@Override

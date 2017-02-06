@@ -21,13 +21,13 @@
  */
 package org.semanticweb.elk.reasoner.saturation;
 
+import org.liveontologies.proof.util.Producer;
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.properties.PropertyHierarchyCompositionComputationFactory;
 import org.semanticweb.elk.reasoner.stages.PropertyHierarchyCompositionState;
-import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
-import org.semanticweb.elk.util.concurrent.computation.ConcurrentExecutor;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputationWithInputs;
+import org.semanticweb.elk.util.concurrent.computation.ConcurrentExecutor;
 import org.semanticweb.elk.util.concurrent.computation.DummyInterruptMonitor;
 
 /**
@@ -44,7 +44,7 @@ public class TestPropertySaturation
 	public TestPropertySaturation(ConcurrentExecutor executor, int maxWorkers) {
 		super(new PropertyHierarchyCompositionComputationFactory(
 				DummyInterruptMonitor.INSTANCE,
-				TracingInferenceProducer.DUMMY,
+				Producer.Dummy.get(),
 				PropertyHierarchyCompositionState.Dispatcher.DUMMY), executor,
 				maxWorkers);
 	}

@@ -32,9 +32,8 @@ import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
  * @author "Yevgeny Kazakov"
  */
 public interface ModifiableElkReflexiveObjectPropertyAxiomConversion
-		extends
-			ElkReflexiveObjectPropertyAxiomConversion,
-			ModifiableIndexedSubClassOfAxiomInference {
+		extends ElkReflexiveObjectPropertyAxiomConversion,
+		ModifiableIndexedSubClassOfAxiomInference {
 
 	/**
 	 * A factory for creating instances
@@ -48,6 +47,20 @@ public interface ModifiableElkReflexiveObjectPropertyAxiomConversion
 				ElkReflexiveObjectPropertyAxiom originalAxiom,
 				ModifiableIndexedClassExpression subClass,
 				ModifiableIndexedClassExpression superClass);
+
+	}
+
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(ModifiableElkReflexiveObjectPropertyAxiomConversion inference);
 
 	}
 

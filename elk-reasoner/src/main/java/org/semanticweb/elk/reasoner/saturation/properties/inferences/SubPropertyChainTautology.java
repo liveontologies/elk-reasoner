@@ -27,6 +27,8 @@ package org.semanticweb.elk.reasoner.saturation.properties.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
+import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
 
 /**
  * An {@link ObjectPropertyInference} producing a tautological
@@ -47,8 +49,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
  * @author "Yevgeny Kazakov"
  */
 public class SubPropertyChainTautology
-		extends
-			AbstractSubPropertyChainInference {
+		extends AbstractSubPropertyChainInference {
 
 	public SubPropertyChainTautology(IndexedPropertyChain chain) {
 		super(chain, chain);
@@ -56,6 +57,16 @@ public class SubPropertyChainTautology
 
 	public IndexedPropertyChain getChain() {
 		return super.getSubChain();
+	}
+
+	@Override
+	public int getPremiseCount() {
+		return 0;
+	}
+
+	@Override
+	public Conclusion getPremise(int index, Factory factory) {
+		return failGetPremise(index);
 	}
 
 	@Override

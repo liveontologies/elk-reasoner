@@ -1,12 +1,12 @@
 package org.semanticweb.elk.reasoner.tracing;
 
-/*
+/*-
  * #%L
- * ELK Reasoner
+ * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2017 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,28 +22,24 @@ package org.semanticweb.elk.reasoner.tracing;
  * #L%
  */
 
-/**
- * An object using which {@link TracingInference}s can be produced
- * 
- * @author "Yevgeny Kazakov"
- *
- * @param <I>
- *            the type of produced inferences
- */
-public interface TracingInferenceProducer<I extends TracingInference> {
+class TracingInferenceConclusionGetter
+		extends TracingInferenceConclusionVisitor<Conclusion> {
 
-	/**
-	 * Notifies about a new {@link TracingInference}.
-	 * 
-	 * @param inference
-	 */
-	public void produce(I inference);
+	TracingInferenceConclusionGetter(Conclusion.Factory factory) {
+		super(factory, new TrivialConclusionVisitor());
+	}
 
-	public static TracingInferenceProducer<TracingInference> DUMMY = new TracingInferenceProducer<TracingInference>() {
+	TracingInferenceConclusionGetter() {
+		this(ConclusionBaseFactory.getInstance());
+	}
+
+	static class TrivialConclusionVisitor
+			extends DummyConclusionVisitor<Conclusion> {
+
 		@Override
-		public void produce(TracingInference inference) {
-			// no-op
+		protected Conclusion defaultVisit(Conclusion conclusion) {
+			return conclusion;
 		}
-	};
+	}
 
 }

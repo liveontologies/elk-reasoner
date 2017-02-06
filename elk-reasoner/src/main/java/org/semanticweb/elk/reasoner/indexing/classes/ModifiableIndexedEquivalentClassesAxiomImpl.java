@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
@@ -102,6 +103,11 @@ public class ModifiableIndexedEquivalentClassesAxiomImpl<A extends ElkAxiom>
 		// all failed
 		return false;
 
+	}
+	
+	@Override
+	public <O> O accept(ModifiableIndexedAxiom.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 }

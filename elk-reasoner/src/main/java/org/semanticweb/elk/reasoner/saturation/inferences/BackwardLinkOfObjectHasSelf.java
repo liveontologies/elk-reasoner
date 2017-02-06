@@ -29,6 +29,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
+import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
 
 /**
  * A {@link ClassInference} producing a {@link BackwardLink} from a
@@ -44,8 +46,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusi
  * 
  * The parameters can be obtained as follows:<br>
  * 
- * C = {@link #getOrigin()} = {@link #getSource()}= {@link #getDestination()}
- * <br>
+ * C = {@link #getOrigin()} = {@link #getConclusionSource()}=
+ * {@link #getDestination()} <br>
  * ∃R.Self = {@link #getDecomposedExistential()} (from which R can be obtained)
  * 
  * @author "Yevgeny Kazakov"
@@ -73,6 +75,21 @@ public class BackwardLinkOfObjectHasSelf extends AbstractBackwardLinkInference {
 			SubClassInclusionDecomposed.Factory factory) {
 		return factory.getSubClassInclusionDecomposed(getOrigin(),
 				existential_);
+	}
+
+	@Override
+	public int getPremiseCount() {
+		return 1;
+	}
+
+	@Override
+	public Conclusion getPremise(int index, Factory factory) {
+		switch (index) {
+		case 0:
+			return getPremise(factory);
+		default:
+			return failGetPremise(index);
+		}
 	}
 
 	@Override

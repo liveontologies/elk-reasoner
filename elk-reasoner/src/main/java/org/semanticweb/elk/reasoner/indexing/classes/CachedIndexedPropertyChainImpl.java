@@ -59,8 +59,8 @@ import org.slf4j.LoggerFactory;
  * 
  */
 abstract class CachedIndexedPropertyChainImpl<T extends CachedIndexedPropertyChain<T> & Entry<T, N>, N>
-		extends CachedIndexedObjectImpl<T, N> implements
-		CachedIndexedPropertyChain<T>, Entry<T, N> {
+		extends CachedIndexedObjectImpl<T, N>
+		implements CachedIndexedPropertyChain<T>, Entry<T, N> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -117,30 +117,30 @@ abstract class CachedIndexedPropertyChainImpl<T extends CachedIndexedPropertyCha
 	@Override
 	public final ArrayList<IndexedObjectProperty> getToldSuperProperties() {
 		if (toldSuperProperties_ == null) {
-			final ArrayList<IndexedObjectProperty> result =
-					CachedIndexedPropertyChainImpl.emptyArrayList();
+			final ArrayList<IndexedObjectProperty> result = CachedIndexedPropertyChainImpl
+					.emptyArrayList();
 			return result;
-		} else {
-			return toldSuperProperties_;
 		}
+		// else
+		return toldSuperProperties_;
 	}
 
 	@Override
 	public ArrayList<ElkAxiom> getToldSuperPropertiesReasons() {
 		if (toldSuperPropertiesReasons_ == null) {
-			final ArrayList<ElkAxiom> result =
-					CachedIndexedPropertyChainImpl.emptyArrayList();
+			final ArrayList<ElkAxiom> result = CachedIndexedPropertyChainImpl
+					.emptyArrayList();
 			return result;
-		} else {
-			return toldSuperPropertiesReasons_;
 		}
+		// else
+		return toldSuperPropertiesReasons_;
 	}
 
 	@Override
 	public final Collection<IndexedComplexPropertyChain> getRightChains() {
-		return rightChains_ == null ? Collections
-				.<IndexedComplexPropertyChain> emptySet() : Collections
-				.unmodifiableCollection(rightChains_);
+		return rightChains_ == null
+				? Collections.<IndexedComplexPropertyChain> emptySet()
+				: Collections.unmodifiableCollection(rightChains_);
 	}
 
 	@Override
@@ -241,8 +241,9 @@ abstract class CachedIndexedPropertyChainImpl<T extends CachedIndexedPropertyCha
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace(this + " occurences: " + printOccurrenceNumbers());
 		if (totalOccurrenceNo < 0)
-			throw new ElkUnexpectedIndexingException(this
-					+ " has a negative occurrence: " + printOccurrenceNumbers());
+			throw new ElkUnexpectedIndexingException(
+					this + " has a negative occurrence: "
+							+ printOccurrenceNumbers());
 	}
 
 	public final boolean updateAndCheckOccurrenceNumbers(

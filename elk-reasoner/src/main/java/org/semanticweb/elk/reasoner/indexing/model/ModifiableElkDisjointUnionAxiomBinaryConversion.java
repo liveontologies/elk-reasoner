@@ -32,9 +32,8 @@ import org.semanticweb.elk.owl.interfaces.ElkDisjointUnionAxiom;
  * @author "Yevgeny Kazakov"
  */
 public interface ModifiableElkDisjointUnionAxiomBinaryConversion
-		extends
-			ElkDisjointUnionAxiomBinaryConversion,
-			ModifiableIndexedSubClassOfAxiomInference {
+		extends ElkDisjointUnionAxiomBinaryConversion,
+		ModifiableIndexedSubClassOfAxiomInference {
 
 	/**
 	 * A factory for creating instances
@@ -43,13 +42,27 @@ public interface ModifiableElkDisjointUnionAxiomBinaryConversion
 	 *
 	 */
 	interface Factory {
-		
+
 		ModifiableElkDisjointUnionAxiomBinaryConversion getElkDisjointUnionAxiomBinaryConversion(
 				ElkDisjointUnionAxiom originalAxiom, int firstDisjunctPosition,
 				int secondDisjunctPosition,
 				ModifiableIndexedObjectIntersectionOf conjunction,
 				ModifiableIndexedClass bottom);
-		
+
+	}
+
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(ModifiableElkDisjointUnionAxiomBinaryConversion inference);
+
 	}
 
 }

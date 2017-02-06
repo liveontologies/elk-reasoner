@@ -29,6 +29,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
+import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
 
 /**
  * A {@link ClassInference} producing a {@link BackwardLink} from a
@@ -45,7 +47,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
  * 
  * C = {@link #getOrigin()} = {@link #getConclusionSource()} <br>
  * P = {@link #getSubChain()}<br>
- * R = {@link #getRelation()}<br>
+ * R = {@link #getConclusionRelation()}<br>
  * D = {@link #getDestination()}<br>
  * 
  * @see ForwardLink#getChain()
@@ -80,10 +82,6 @@ public class BackwardLinkReversedExpanded
 		return getTraceRoot();
 	}
 
-	public IndexedContextRoot getConclusionSource() {
-		return getSource();
-	}
-
 	public IndexedPropertyChain getSubChain() {
 		return this.subChain_;
 	}
@@ -99,7 +97,24 @@ public class BackwardLinkReversedExpanded
 	public IndexedSubObjectPropertyOfAxiom getSecondPremise(
 			IndexedSubObjectPropertyOfAxiom.Factory factory) {
 		return factory.getIndexedSubObjectPropertyOfAxiom(reason_, subChain_,
-				getRelation());
+				getConclusionRelation());
+	}
+
+	@Override
+	public int getPremiseCount() {
+		return 2;
+	}
+
+	@Override
+	public Conclusion getPremise(int index, Factory factory) {
+		switch (index) {
+		case 0:
+			return getFirstPremise(factory);
+		case 1:
+			return getSecondPremise(factory);
+		default:
+			return failGetPremise(index);
+		}
 	}
 
 	@Override

@@ -29,6 +29,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
+import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
 
 //TODO: split on two inferences
 /**
@@ -75,10 +77,6 @@ public class BackwardLinkOfObjectSomeValuesFrom
 		return getTraceRoot();
 	}
 
-	public IndexedContextRoot getConclusionSource() {
-		return getSource();
-	}
-
 	public IndexedObjectSomeValuesFrom getDecomposedExistential() {
 		return this.existential_;
 	}
@@ -87,6 +85,21 @@ public class BackwardLinkOfObjectSomeValuesFrom
 			SubClassInclusionDecomposed.Factory factory) {
 		return factory.getSubClassInclusionDecomposed(getOrigin(),
 				existential_);
+	}
+
+	@Override
+	public int getPremiseCount() {
+		return 1;
+	}
+
+	@Override
+	public Conclusion getPremise(int index, Factory factory) {
+		switch (index) {
+		case 0:
+			return getPremise(factory);
+		default:
+			return failGetPremise(index);
+		}
 	}
 
 	@Override

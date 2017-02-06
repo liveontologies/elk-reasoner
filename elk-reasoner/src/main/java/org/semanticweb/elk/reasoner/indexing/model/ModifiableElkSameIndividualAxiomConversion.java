@@ -31,9 +31,8 @@ import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
  * @author "Yevgeny Kazakov"
  */
 public interface ModifiableElkSameIndividualAxiomConversion
-		extends
-			ElkSameIndividualAxiomConversion,
-			ModifiableIndexedSubClassOfAxiomInference {
+		extends ElkSameIndividualAxiomConversion,
+		ModifiableIndexedSubClassOfAxiomInference {
 
 	/**
 	 * A factory for creating instances
@@ -48,6 +47,20 @@ public interface ModifiableElkSameIndividualAxiomConversion
 				int superIndividualPosition,
 				ModifiableIndexedIndividual subIndividual,
 				ModifiableIndexedIndividual superIndividual);
+
+	}
+
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(ModifiableElkSameIndividualAxiomConversion inference);
 
 	}
 

@@ -27,17 +27,16 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiomInferen
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointClassesAxiomBinaryConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectIntersectionOf;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedSubClassOfAxiomInference;
 
 /**
  * Implements {@link ModifiableElkDisjointClassesAxiomBinaryConversion}
  * 
  * @author "Yevgeny Kazakov"
  */
-class ModifiableElkDisjointClassesAxiomBinaryConversionImpl
-		extends
-			ModifiableIndexedSubClassOfAxiomInferenceImpl<ElkDisjointClassesAxiom>
-		implements
-			ModifiableElkDisjointClassesAxiomBinaryConversion {
+class ModifiableElkDisjointClassesAxiomBinaryConversionImpl extends
+		AbstractModifiableIndexedSubClassOfAxiomInference<ElkDisjointClassesAxiom>
+		implements ModifiableElkDisjointClassesAxiomBinaryConversion {
 
 	private final int firstClassPosition_, secondClassPosition_;
 
@@ -69,6 +68,12 @@ class ModifiableElkDisjointClassesAxiomBinaryConversionImpl
 	@Override
 	public final <O> O accept(
 			IndexedSubClassOfAxiomInference.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public final <O> O accept(
+			ModifiableIndexedSubClassOfAxiomInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

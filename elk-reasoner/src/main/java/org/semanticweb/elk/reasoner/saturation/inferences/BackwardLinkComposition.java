@@ -34,6 +34,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxi
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
+import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
 
 /**
  * A {@link ClassInference} producing a {@link BackwardLink} from a
@@ -119,14 +121,6 @@ public class BackwardLinkComposition extends AbstractBackwardLinkInference
 		return composition_;
 	}
 
-	public IndexedContextRoot getConclusionSource() {
-		return getSource();
-	}
-
-	public IndexedObjectProperty getConclusionRelation() {
-		return getRelation();
-	}
-
 	/**
 	 * @return the {@link ElkAxiom} responsible for the fifth premise
 	 */
@@ -161,7 +155,30 @@ public class BackwardLinkComposition extends AbstractBackwardLinkInference
 	public IndexedSubObjectPropertyOfAxiom getFifthPremise(
 			IndexedSubObjectPropertyOfAxiom.Factory factory) {
 		return factory.getIndexedSubObjectPropertyOfAxiom(reason_, composition_,
-				getRelation());
+				getConclusionRelation());
+	}
+
+	@Override
+	public int getPremiseCount() {
+		return 5;
+	}
+
+	@Override
+	public Conclusion getPremise(int index, Factory factory) {
+		switch (index) {
+		case 0:
+			return getFirstPremise(factory);
+		case 1:
+			return getSecondPremise(factory);
+		case 2:
+			return getThirdPremise(factory);
+		case 3:
+			return getFourthPremise(factory);
+		case 4:
+			return getFifthPremise(factory);
+		default:
+			return failGetPremise(index);
+		}
 	}
 
 	@Override

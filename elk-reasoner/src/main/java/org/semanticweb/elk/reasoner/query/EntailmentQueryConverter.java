@@ -49,7 +49,7 @@ import org.semanticweb.elk.reasoner.entailments.impl.ObjectPropertyDomainAxiomEn
 import org.semanticweb.elk.reasoner.entailments.impl.SameIndividualAxiomEntailmentImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.SubClassOfAxiomEntailmentImpl;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
-import org.semanticweb.elk.reasoner.indexing.classes.BaseModifiableIndexedObjectFactory;
+import org.semanticweb.elk.reasoner.indexing.classes.ModifiableIndexedObjectBaseFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.UpdatingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
@@ -85,7 +85,7 @@ public class EntailmentQueryConverter extends
 	public EntailmentQueryConverter(final ElkObject.Factory elkFactory,
 			final ModifiableOntologyIndex index, final int increment) {
 		this.elkFactory_ = elkFactory;
-		final BaseModifiableIndexedObjectFactory baseFactory = new BaseModifiableIndexedObjectFactory();
+		final ModifiableIndexedObjectBaseFactory baseFactory = new ModifiableIndexedObjectBaseFactory();
 		final ModifiableIndexedObject.Factory positiveFactory = new UpdatingModifiableIndexedObjectFactory(
 				baseFactory, index,
 				OccurrenceIncrement.getPositiveIncrement(increment));

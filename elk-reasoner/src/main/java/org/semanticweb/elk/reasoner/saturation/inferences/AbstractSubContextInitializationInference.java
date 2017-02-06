@@ -24,20 +24,15 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SubContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
-import org.semanticweb.elk.reasoner.tracing.TracingInference;
-import org.semanticweb.elk.reasoner.tracing.TracingInferencePrinter;
 
-abstract class AbstractSubContextInitializationInference
-		extends
-			SubContextInitializationImpl
-		implements
-			SubContextInitializationInference {
+abstract class AbstractSubContextInitializationInference extends
+		AbstractSubClassInference implements SubContextInitializationInference {
 
-	protected AbstractSubContextInitializationInference(IndexedContextRoot root,
-			IndexedObjectProperty subRoot) {
-		super(root, subRoot);
+	protected AbstractSubContextInitializationInference(
+			IndexedContextRoot destination,
+			IndexedObjectProperty subDestination) {
+		super(destination, subDestination);
 	}
 
 	/**
@@ -53,32 +48,7 @@ abstract class AbstractSubContextInitializationInference
 	}
 
 	@Override
-	public final int hashCode() {
-		return System.identityHashCode(this);
-	}
-
-	@Override
-	public final boolean equals(Object o) {
-		return this == o;
-	}
-	
-	@Override
-	public final String toString() {
-		return TracingInferencePrinter.toString(this);		
-	}
-
-	@Override
-	public final <O> O accept(TracingInference.Visitor<O> visitor) {
-		return accept((SubContextInitializationInference.Visitor<O>) visitor);
-	}
-
-	@Override
-	public final <O> O accept(SaturationInference.Visitor<O> visitor) {
-		return accept((SubContextInitializationInference.Visitor<O>) visitor);
-	}
-
-	@Override
-	public final <O> O accept(ClassInference.Visitor<O> visitor) {
+	public final <O> O accept(SubClassInference.Visitor<O> visitor) {
 		return accept((SubContextInitializationInference.Visitor<O>) visitor);
 	}
 

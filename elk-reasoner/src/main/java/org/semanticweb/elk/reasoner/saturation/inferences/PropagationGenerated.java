@@ -32,6 +32,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
+import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
 
 /**
  * A {@link ClassInference} producing a {@link Propagation} from a
@@ -86,6 +88,25 @@ public class PropagationGenerated extends AbstractPropagationInference {
 	public SubPropertyChain getThirdPremise(SubPropertyChain.Factory factory) {
 		return factory.getSubPropertyChain(getSubDestination(),
 				getCarry().getProperty());
+	}
+
+	@Override
+	public int getPremiseCount() {
+		return 3;
+	}
+
+	@Override
+	public Conclusion getPremise(int index, Factory factory) {
+		switch (index) {
+		case 0:
+			return getFirstPremise(factory);
+		case 1:
+			return getSecondPremise(factory);
+		case 2:
+			return getThirdPremise(factory);
+		default:
+			return failGetPremise(index);
+		}
 	}
 
 	@Override

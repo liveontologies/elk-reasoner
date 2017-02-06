@@ -36,27 +36,27 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassConclus
 public abstract class AbstractSubClassConclusion extends AbstractClassConclusion
 		implements SubClassConclusion {
 
-	private final IndexedObjectProperty subRoot_;
+	private final IndexedObjectProperty subDestination_;
 
 	protected AbstractSubClassConclusion(IndexedContextRoot destination,
-			IndexedObjectProperty subRoot) {
+			IndexedObjectProperty subDestination) {
 		super(destination);
-		this.subRoot_ = subRoot;
+		this.subDestination_ = subDestination;
 	}
 
 	@Override
 	public IndexedObjectProperty getSubDestination() {
-		return this.subRoot_;
+		return this.subDestination_;
 	}
 
 	@Override
 	public IndexedObjectProperty getTraceSubRoot() {
-		return this.subRoot_;
+		return this.subDestination_;
 	}
 
 	@Override
 	public <O> O accept(ClassConclusion.Visitor<O> visitor) {
 		return accept((SubClassConclusion.Visitor<O>) visitor);
 	}
-	
+
 }

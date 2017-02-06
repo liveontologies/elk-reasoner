@@ -26,29 +26,54 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxiomInference;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectPropertyRangeAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectPropertyRangeAxiomInference;
-import org.semanticweb.elk.reasoner.tracing.TracingInference;
-import org.semanticweb.elk.reasoner.tracing.TracingInferencePrinter;
 
 /**
  * Implements {@link ModifiableIndexedObjectPropertyRangeAxiomInference}
  * 
  * @author "Yevgeny Kazakov"
  */
-abstract class ModifiableIndexedObjectPropertyRangeAxiomInferenceImpl<A extends ElkAxiom>
-		extends
-			ModifiableIndexedObjectPropertyRangeAxiomImpl<A>
-		implements
-			ModifiableIndexedObjectPropertyRangeAxiomInference {
+abstract class AbstractModifiableIndexedObjectPropertyRangeAxiomInference<A extends ElkAxiom>
+		extends AbstractIndexedAxiomInference<A>
+		implements ModifiableIndexedObjectPropertyRangeAxiomInference {
 
-	ModifiableIndexedObjectPropertyRangeAxiomInferenceImpl(A originalAxiom,
+	private final ModifiableIndexedObjectProperty property_;
+
+	private final ModifiableIndexedClassExpression range_;
+
+	AbstractModifiableIndexedObjectPropertyRangeAxiomInference(A originalAxiom,
 			ModifiableIndexedObjectProperty property,
 			ModifiableIndexedClassExpression range) {
-		super(originalAxiom, property, range);
+		super(originalAxiom);
+		this.property_ = property;
+		this.range_ = range;
 	}
-	
+
+	public final ModifiableIndexedObjectProperty getProperty() {
+		return this.property_;
+	}
+
+	public final ModifiableIndexedClassExpression getRange() {
+		return this.range_;
+	}
+
+	@Override
+	public final <O> O accept(IndexedAxiomInference.Visitor<O> visitor) {
+		return accept(
+				(IndexedObjectPropertyRangeAxiomInference.Visitor<O>) visitor);
+	}
+
+	@Override
+	public final <O> O accept(
+			ModifiableIndexedAxiomInference.Visitor<O> visitor) {
+		return accept(
+				(ModifiableIndexedObjectPropertyRangeAxiomInference.Visitor<O>) visitor);
+	}
+
 	@Override
 	public final IndexedObjectPropertyRangeAxiom getConclusion(
 			IndexedObjectPropertyRangeAxiom.Factory factory) {
@@ -57,30 +82,10 @@ abstract class ModifiableIndexedObjectPropertyRangeAxiomInferenceImpl<A extends 
 	}
 
 	@Override
-	public int hashCode() {
-		return System.identityHashCode(this);
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		return this == o;
-	}
-	
-	@Override
-	public String toString() {
-		return TracingInferencePrinter.toString(this);		
-	}
-	
-	@Override
-	public final <O> O accept(TracingInference.Visitor<O> visitor) {
-		return accept(
-				(IndexedObjectPropertyRangeAxiomInference.Visitor<O>) visitor);
-	}
-
-	@Override
-	public final <O> O accept(IndexedAxiomInference.Visitor<O> visitor) {
-		return accept(
-				(IndexedObjectPropertyRangeAxiomInference.Visitor<O>) visitor);
+	public final ModifiableIndexedObjectPropertyRangeAxiom getConclusion(
+			ModifiableIndexedObjectPropertyRangeAxiom.Factory factory) {
+		return factory.getIndexedObjectPropertyRangeAxiom(getOriginalAxiom(),
+				getProperty(), getRange());
 	}
 
 }

@@ -27,6 +27,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxi
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkTransitiveObjectPropertyAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedSubObjectPropertyOfAxiomInference;
 
 /**
  * Implements {@link ModifiableElkTransitiveObjectPropertyAxiomConversion}
@@ -34,7 +35,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChai
  * @author "Yevgeny Kazakov"
  */
 class ModifiableElkTransitiveObjectPropertyAxiomConversionImpl extends
-		ModifiableIndexedSubObjectPropertyOfAxiomInferenceImpl<ElkTransitiveObjectPropertyAxiom>
+		AbstractModifiableIndexedSubObjectPropertyOfAxiomInference<ElkTransitiveObjectPropertyAxiom>
 		implements ModifiableElkTransitiveObjectPropertyAxiomConversion {
 
 	ModifiableElkTransitiveObjectPropertyAxiomConversionImpl(
@@ -47,6 +48,12 @@ class ModifiableElkTransitiveObjectPropertyAxiomConversionImpl extends
 	@Override
 	public final <O> O accept(
 			IndexedSubObjectPropertyOfAxiomInference.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public final <O> O accept(
+			ModifiableIndexedSubObjectPropertyOfAxiomInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

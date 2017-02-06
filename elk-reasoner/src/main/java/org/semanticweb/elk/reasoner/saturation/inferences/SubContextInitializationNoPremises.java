@@ -28,6 +28,8 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
+import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
 
 /**
  * A {@link SubContextInitializationInference} that produces a
@@ -47,8 +49,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextIniti
  * @author "Yevgeny Kazakov"
  */
 public class SubContextInitializationNoPremises
-		extends
-			AbstractSubContextInitializationInference {
+		extends AbstractSubContextInitializationInference {
 
 	public SubContextInitializationNoPremises(IndexedContextRoot root,
 			IndexedObjectProperty subRoot) {
@@ -61,8 +62,13 @@ public class SubContextInitializationNoPremises
 	}
 
 	@Override
-	public final <O> O accept(SubClassInference.Visitor<O> visitor) {
-		return visitor.visit(this);
+	public int getPremiseCount() {
+		return 0;
+	}
+
+	@Override
+	public Conclusion getPremise(int index, Factory factory) {
+		return failGetPremise(index);
 	}
 
 	@Override

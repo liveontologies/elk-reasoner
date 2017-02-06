@@ -26,6 +26,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDisjointUnionAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDisjointUnionAxiomOwlNothingConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedSubClassOfAxiomInference;
 
 /**
  * Implements {@link ModifiableElkDisjointUnionAxiomOwlNothingConversion}
@@ -33,7 +34,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
  * @author "Yevgeny Kazakov"
  */
 class ModifiableElkDisjointUnionAxiomOwlNothingConversionImpl extends
-		ModifiableIndexedSubClassOfAxiomInferenceImpl<ElkDisjointUnionAxiom>
+		AbstractModifiableIndexedSubClassOfAxiomInference<ElkDisjointUnionAxiom>
 		implements ModifiableElkDisjointUnionAxiomOwlNothingConversion {
 
 	ModifiableElkDisjointUnionAxiomOwlNothingConversionImpl(
@@ -46,6 +47,12 @@ class ModifiableElkDisjointUnionAxiomOwlNothingConversionImpl extends
 	@Override
 	public final <O> O accept(
 			IndexedSubClassOfAxiomInference.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public final <O> O accept(
+			ModifiableIndexedSubClassOfAxiomInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

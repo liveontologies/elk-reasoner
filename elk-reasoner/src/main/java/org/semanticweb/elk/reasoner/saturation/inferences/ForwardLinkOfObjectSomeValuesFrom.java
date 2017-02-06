@@ -27,8 +27,11 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
+import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
 
 // TODO: split on two inferences
 /**
@@ -78,7 +81,7 @@ public class ForwardLinkOfObjectSomeValuesFrom extends AbstractClassInference
 	 * 
 	 * @return the conclusion produced by this inference
 	 */
-	public ForwardLink getConclusion(ForwardLink.Factory factory) {
+	public ForwardLink getConclusion(ClassConclusion.Factory factory) {
 		return factory.getForwardLink(getDestination(),
 				existential_.getProperty(),
 				IndexedObjectSomeValuesFrom.Helper.getTarget(existential_));
@@ -87,6 +90,21 @@ public class ForwardLinkOfObjectSomeValuesFrom extends AbstractClassInference
 	@Override
 	public IndexedContextRoot getOrigin() {
 		return getDestination();
+	}
+
+	@Override
+	public int getPremiseCount() {
+		return 1;
+	}
+
+	@Override
+	public Conclusion getPremise(int index, Factory factory) {
+		switch (index) {
+		case 0:
+			return getPremise(factory);
+		default:
+			return failGetPremise(index);
+		}
 	}
 
 	@Override

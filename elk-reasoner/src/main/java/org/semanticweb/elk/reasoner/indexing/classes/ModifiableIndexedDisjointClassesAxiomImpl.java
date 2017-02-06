@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpressionList;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
@@ -65,6 +66,11 @@ public class ModifiableIndexedDisjointClassesAxiomImpl<A extends ElkAxiom>
 			return false;
 		}
 		return true;
+	}
+	
+	@Override
+	public <O> O accept(ModifiableIndexedAxiom.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 }

@@ -1,12 +1,12 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
-/*
+/*-
  * #%L
- * ELK Reasoner
+ * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2017 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,19 +22,13 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  * #L%
  */
 
-import java.util.List;
-
-import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointUnionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyDomainAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
@@ -43,18 +37,6 @@ import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClass;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpressionList;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedDataHasValue;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedIndividual;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObject;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectComplementOf;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectHasSelf;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkClassAssertionAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDeclarationAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkDifferentIndividualsAxiomBinaryConversion;
@@ -77,28 +59,18 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkSameIndividualAx
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkSubClassOfAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkSubObjectPropertyOfAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkTransitiveObjectPropertyAxiomConversion;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedEntity;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedIndividual;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
 
-/**
- * Implements {@link ModifiableIndexedObject.Factory} and
- * {@link CachedIndexedObject.Factory}. The occurrences of the created objects
- * are not modified.
- * 
- * @author "Yevgeny Kazakov"
- *
- */
-public class BaseModifiableIndexedObjectFactory
-		implements
-			ModifiableIndexedObject.Factory,
-			CachedIndexedObject.Factory {
+public class ModifiableIndexedAxiomInferenceBaseFactory
+		implements ModifiableIndexedAxiomInference.Factory {
 
 	@Override
 	public ModifiableElkClassAssertionAxiomConversion getElkClassAssertionAxiomConversion(
@@ -194,7 +166,8 @@ public class BaseModifiableIndexedObjectFactory
 	@Override
 	public ModifiableElkEquivalentClassesAxiomEquivalenceConversion getElkEquivalentClassesAxiomEquivalenceConversion(
 			ElkEquivalentClassesAxiom originalAxiom, int firstMemberPosition,
-			int secondMemberPosition, ModifiableIndexedClassExpression firstMember,
+			int secondMemberPosition,
+			ModifiableIndexedClassExpression firstMember,
 			ModifiableIndexedClassExpression secondMember) {
 		return new ModifiableElkEquivalentClassesAxiomEquivalenceConversionImpl(
 				originalAxiom, firstMemberPosition, secondMemberPosition,
@@ -294,75 +267,6 @@ public class BaseModifiableIndexedObjectFactory
 			ModifiableIndexedObjectProperty superProperty) {
 		return new ModifiableElkTransitiveObjectPropertyAxiomConversionImpl(
 				originalAxiom, subPropertyChain, superProperty);
-	}
-
-	@Override
-	public CachedIndexedClass getIndexedClass(ElkClass elkClass) {
-		return new CachedIndexedClassImpl(elkClass);
-	}
-
-	@Override
-	public CachedIndexedClassExpressionList getIndexedClassExpressionList(
-			List<? extends ModifiableIndexedClassExpression> elements) {
-		return new CachedIndexedClassExpressionListImpl(elements);
-	}
-
-	@Override
-	public CachedIndexedComplexPropertyChain getIndexedComplexPropertyChain(
-			ModifiableIndexedObjectProperty leftProperty,
-			ModifiableIndexedPropertyChain rightProperty) {
-		return new CachedIndexedComplexPropertyChainImpl(leftProperty,
-				rightProperty);
-	}
-
-	@Override
-	public CachedIndexedDataHasValue getIndexedDataHasValue(
-			ElkDataHasValue elkDataHasValue) {
-		return new CachedIndexedDataHasValueImpl(elkDataHasValue);
-	}
-
-	@Override
-	public CachedIndexedIndividual getIndexedIndividual(
-			ElkNamedIndividual elkNamedIndividual) {
-		return new CachedIndexedIndividualImpl(elkNamedIndividual);
-	}
-
-	@Override
-	public CachedIndexedObjectComplementOf getIndexedObjectComplementOf(
-			ModifiableIndexedClassExpression negated) {
-		return new CachedIndexedObjectComplementOfImpl(negated);
-	}
-
-	@Override
-	public CachedIndexedObjectHasSelf getIndexedObjectHasSelf(
-			ModifiableIndexedObjectProperty property) {
-		return new CachedIndexedObjectHasSelfImpl(property);
-	}
-
-	@Override
-	public CachedIndexedObjectIntersectionOf getIndexedObjectIntersectionOf(
-			ModifiableIndexedClassExpression conjunctA,
-			ModifiableIndexedClassExpression conjunctB) {
-		return new CachedIndexedObjectIntersectionOfImpl(conjunctA, conjunctB);
-	}
-
-	@Override
-	public CachedIndexedObjectProperty getIndexedObjectProperty(
-			ElkObjectProperty elkObjectProperty) {
-		return new CachedIndexedObjectPropertyImpl(elkObjectProperty);
-	}
-
-	@Override
-	public CachedIndexedObjectSomeValuesFrom getIndexedObjectSomeValuesFrom(
-			ModifiableIndexedObjectProperty property,
-			ModifiableIndexedClassExpression filler) {
-		return new CachedIndexedObjectSomeValuesFromImpl(property, filler);
-	}
-
-	@Override
-	public CachedIndexedObjectUnionOf getIndexedObjectUnionOf(
-			List<? extends ModifiableIndexedClassExpression> disjuncts) {
-		return new CachedIndexedObjectUnionOfImpl(disjuncts);
 	}
 
 	@Override

@@ -24,18 +24,33 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.BackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
-import org.semanticweb.elk.reasoner.tracing.TracingInference;
-import org.semanticweb.elk.reasoner.tracing.TracingInferencePrinter;
 
-abstract class AbstractBackwardLinkInference extends BackwardLinkImpl
-		implements
-			BackwardLinkInference {
+abstract class AbstractBackwardLinkInference extends AbstractClassInference
+		implements BackwardLinkInference {
 
-	public AbstractBackwardLinkInference(IndexedContextRoot root,
+	private final IndexedObjectProperty conclusionRelation_;
+
+	private final IndexedContextRoot conclusionSource_;
+
+	public AbstractBackwardLinkInference(IndexedContextRoot destination,
 			IndexedObjectProperty relation, IndexedContextRoot source) {
-		super(root, relation, source);
+		super(destination);
+		this.conclusionRelation_ = relation;
+		this.conclusionSource_ = source;
+	}
+
+	public IndexedObjectProperty getConclusionRelation() {
+		return conclusionRelation_;
+	}
+
+	public IndexedContextRoot getConclusionSource() {
+		return conclusionSource_;
+	}
+
+	@Override
+	public IndexedContextRoot getTraceRoot() {
+		return conclusionSource_;
 	}
 
 	/**
@@ -45,33 +60,8 @@ abstract class AbstractBackwardLinkInference extends BackwardLinkImpl
 	 * @return the conclusion produced by this inference
 	 */
 	public BackwardLink getConclusion(BackwardLink.Factory factory) {
-		return factory.getBackwardLink(getDestination(), getRelation(),
-				getSource());
-	}
-
-	@Override
-	public final int hashCode() {
-		return System.identityHashCode(this);
-	}
-
-	@Override
-	public final boolean equals(Object o) {
-		return this == o;
-	}
-	
-	@Override
-	public final String toString() {
-		return TracingInferencePrinter.toString(this);		
-	}
-
-	@Override
-	public final <O> O accept(TracingInference.Visitor<O> visitor) {
-		return accept((BackwardLinkInference.Visitor<O>) visitor);
-	}
-
-	@Override
-	public final <O> O accept(SaturationInference.Visitor<O> visitor) {
-		return accept((BackwardLinkInference.Visitor<O>) visitor);
+		return factory.getBackwardLink(getDestination(), conclusionRelation_,
+				conclusionSource_);
 	}
 
 	@Override

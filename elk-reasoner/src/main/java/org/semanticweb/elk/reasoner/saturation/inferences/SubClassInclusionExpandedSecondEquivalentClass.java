@@ -31,10 +31,13 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
+import org.semanticweb.elk.reasoner.tracing.Conclusion;
+import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
 
 /**
  * A {@link ClassInference} producing a {@link SubClassInclusionDecomposed} from
- * a {@link SubClassInclusionComposed} and {@link IndexedEquivalentClassesAxiom}:<br>
+ * a {@link SubClassInclusionComposed} and
+ * {@link IndexedEquivalentClassesAxiom}:<br>
  * 
  * <pre>
  *     (1)      (2)
@@ -63,8 +66,25 @@ public class SubClassInclusionExpandedSecondEquivalentClass
 
 	public IndexedEquivalentClassesAxiom getSecondPremise(
 			IndexedEquivalentClassesAxiom.Factory factory) {
-		return factory.getIndexedEquivalentClassesAxiom(getReason(), getConclusionSubsumer(),
-				getPremiseSubsumer());
+		return factory.getIndexedEquivalentClassesAxiom(getReason(),
+				getConclusionSubsumer(), getPremiseSubsumer());
+	}
+
+	@Override
+	public int getPremiseCount() {
+		return 2;
+	}
+
+	@Override
+	public Conclusion getPremise(int index, Factory factory) {
+		switch (index) {
+		case 0:
+			return getFirstPremise(factory);
+		case 1:
+			return getSecondPremise(factory);
+		default:
+			return failGetPremise(index);
+		}
 	}
 
 	@Override
@@ -83,7 +103,8 @@ public class SubClassInclusionExpandedSecondEquivalentClass
 	 */
 	public static interface Visitor<O> {
 
-		public O visit(SubClassInclusionExpandedSecondEquivalentClass inference);
+		public O visit(
+				SubClassInclusionExpandedSecondEquivalentClass inference);
 
 	}
 

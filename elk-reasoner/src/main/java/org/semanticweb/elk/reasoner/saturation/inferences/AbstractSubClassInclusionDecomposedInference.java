@@ -24,23 +24,16 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SubClassInclusionDecomposedImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
-import org.semanticweb.elk.reasoner.tracing.TracingInference;
-import org.semanticweb.elk.reasoner.tracing.TracingInferencePrinter;
 
 abstract class AbstractSubClassInclusionDecomposedInference
-		extends SubClassInclusionDecomposedImpl
+		extends AbstractSubClassInclusionInference<IndexedClassExpression>
 		implements SubClassInclusionDecomposedInference {
 
 	public AbstractSubClassInclusionDecomposedInference(
 			IndexedContextRoot subExpression,
 			IndexedClassExpression superExpression) {
 		super(subExpression, superExpression);
-	}
-
-	public final IndexedClassExpression getConclusionSubsumer() {
-		return getSubsumer();
 	}
 
 	/**
@@ -53,39 +46,6 @@ abstract class AbstractSubClassInclusionDecomposedInference
 			SubClassInclusionDecomposed.Factory factory) {
 		return factory.getSubClassInclusionDecomposed(getDestination(),
 				getSubsumer());
-	}
-
-	@Override
-	public final int hashCode() {
-		return System.identityHashCode(this);
-	}
-
-	@Override
-	public final boolean equals(Object o) {
-		return this == o;
-	}
-	
-	@Override
-	public final String toString() {
-		return TracingInferencePrinter.toString(this);		
-	}
-
-	@Override
-	public final <O> O accept(TracingInference.Visitor<O> visitor) {
-		return accept(
-				(SubClassInclusionDecomposedInference.Visitor<O>) visitor);
-	}
-
-	@Override
-	public final <O> O accept(SaturationInference.Visitor<O> visitor) {
-		return accept(
-				(SubClassInclusionDecomposedInference.Visitor<O>) visitor);
-	}
-
-	@Override
-	public final <O> O accept(ClassInference.Visitor<O> visitor) {
-		return accept(
-				(SubClassInclusionDecomposedInference.Visitor<O>) visitor);
 	}
 
 	@Override

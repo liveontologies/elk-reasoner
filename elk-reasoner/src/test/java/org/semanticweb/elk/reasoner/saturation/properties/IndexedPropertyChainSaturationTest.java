@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.liveontologies.proof.util.Producer;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
@@ -42,7 +43,6 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChai
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.properties.VerifySymmetricPropertySaturation.AsymmetricCompositionHook;
 import org.semanticweb.elk.reasoner.stages.PropertyHierarchyCompositionState;
-import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentExecutors;
 import org.semanticweb.elk.util.concurrent.computation.DummyInterruptMonitor;
 
@@ -57,26 +57,26 @@ public class IndexedPropertyChainSaturationTest {
 
 	@SuppressWarnings("static-method")
 	@Test
-	public void testPropertyCompositionSymmetry() {		
+	public void testPropertyCompositionSymmetry() {
 		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 		ModifiableOntologyIndex index = new DirectIndex(factory);
 
 		ModifiableIndexedObjectProperty R1 = IndexedObjectsCreator
 				.createIndexedObjectProperty(index,
-						factory.getObjectProperty(new ElkFullIri(
-								"http://test.com/R1")),
+						factory.getObjectProperty(
+								new ElkFullIri("http://test.com/R1")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] {});
 		ModifiableIndexedObjectProperty R2 = IndexedObjectsCreator
 				.createIndexedObjectProperty(index,
-						factory.getObjectProperty(new ElkFullIri(
-								"http://test.com/R2")),
+						factory.getObjectProperty(
+								new ElkFullIri("http://test.com/R2")),
 						new ModifiableIndexedPropertyChain[] { R1 },
 						new ModifiableIndexedObjectProperty[] {});
 		ModifiableIndexedObjectProperty R3 = IndexedObjectsCreator
 				.createIndexedObjectProperty(index,
-						factory.getObjectProperty(new ElkFullIri(
-								"http://test.com/R3")),
+						factory.getObjectProperty(
+								new ElkFullIri("http://test.com/R3")),
 						new ModifiableIndexedPropertyChain[] { R2 },
 						new ModifiableIndexedObjectProperty[] {});
 
@@ -133,53 +133,53 @@ public class IndexedPropertyChainSaturationTest {
 
 		ModifiableIndexedObjectProperty H = IndexedObjectsCreator
 				.createIndexedObjectProperty(index,
-						factory.getObjectProperty(new ElkFullIri(
-								"http://test.com/H")),
+						factory.getObjectProperty(
+								new ElkFullIri("http://test.com/H")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] {});
 		// S1 -> S2 -> S3
 		ModifiableIndexedObjectProperty S3 = IndexedObjectsCreator
 				.createIndexedObjectProperty(index,
-						factory.getObjectProperty(new ElkFullIri(
-								"http://test.com/S3")),
+						factory.getObjectProperty(
+								new ElkFullIri("http://test.com/S3")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] {});
 		ModifiableIndexedObjectProperty S2 = IndexedObjectsCreator
 				.createIndexedObjectProperty(index,
-						factory.getObjectProperty(new ElkFullIri(
-								"http://test.com/S2")),
+						factory.getObjectProperty(
+								new ElkFullIri("http://test.com/S2")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] { S3 });
 		ModifiableIndexedObjectProperty S1 = IndexedObjectsCreator
 				.createIndexedObjectProperty(index,
-						factory.getObjectProperty(new ElkFullIri(
-								"http://test.com/S1")),
+						factory.getObjectProperty(
+								new ElkFullIri("http://test.com/S1")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] { S2 });
 		// P1 -> P2 -> P3
 		ModifiableIndexedObjectProperty P3 = IndexedObjectsCreator
 				.createIndexedObjectProperty(index,
-						factory.getObjectProperty(new ElkFullIri(
-								"http://test.com/P3")),
+						factory.getObjectProperty(
+								new ElkFullIri("http://test.com/P3")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] {});
 		ModifiableIndexedObjectProperty P2 = IndexedObjectsCreator
 				.createIndexedObjectProperty(index,
-						factory.getObjectProperty(new ElkFullIri(
-								"http://test.com/P2")),
+						factory.getObjectProperty(
+								new ElkFullIri("http://test.com/P2")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] { P3 });
 		ModifiableIndexedObjectProperty P1 = IndexedObjectsCreator
 				.createIndexedObjectProperty(index,
-						factory.getObjectProperty(new ElkFullIri(
-								"http://test.com/P1")),
+						factory.getObjectProperty(
+								new ElkFullIri("http://test.com/P1")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] { P2 });
 		// S3 -> R, R -> S1, R -> P1
 		ModifiableIndexedObjectProperty R = IndexedObjectsCreator
 				.createIndexedObjectProperty(index,
-						factory.getObjectProperty(new ElkFullIri(
-								"http://test.com/R")),
+						factory.getObjectProperty(
+								new ElkFullIri("http://test.com/R")),
 						new ModifiableIndexedPropertyChain[] { S3 },
 						new ModifiableIndexedObjectProperty[] { S1, P1 });
 		// R o R -> H
@@ -191,19 +191,19 @@ public class IndexedPropertyChainSaturationTest {
 		PropertyHierarchyCompositionComputation computation = new PropertyHierarchyCompositionComputation(
 				Arrays.asList(H, S3, S2, S1, P3, P2, P1, R, RR),
 				new PropertyHierarchyCompositionComputationFactory(
-						DummyInterruptMonitor.INSTANCE,
-						TracingInferenceProducer.DUMMY,
+						DummyInterruptMonitor.INSTANCE, Producer.Dummy.get(),
 						PropertyHierarchyCompositionState.Dispatcher.DUMMY),
 				ConcurrentExecutors.create("test-hierarchy-compositions"),
-				maxThreads,
-				new DummyProgressMonitor());
+				maxThreads, new DummyProgressMonitor());
 
 		computation.process();
 
-		assertTrue(R.getSaturated().getNonRedundantCompositionsByLeftSubProperty().get(R)
-				.contains(RR));
-		assertTrue(R.getSaturated().getNonRedundantCompositionsByRightSubProperty().get(R)
-				.contains(RR));
+		assertTrue(
+				R.getSaturated().getNonRedundantCompositionsByLeftSubProperty()
+						.get(R).contains(RR));
+		assertTrue(
+				R.getSaturated().getNonRedundantCompositionsByRightSubProperty()
+						.get(R).contains(RR));
 	}
 
 }

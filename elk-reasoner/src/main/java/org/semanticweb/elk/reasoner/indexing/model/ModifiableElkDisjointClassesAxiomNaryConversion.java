@@ -32,9 +32,8 @@ import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
  * @author "Yevgeny Kazakov"
  */
 public interface ModifiableElkDisjointClassesAxiomNaryConversion
-		extends
-			ElkDisjointClassesAxiomNaryConversion,
-			ModifiableIndexedDisjointClassesAxiomInference {
+		extends ElkDisjointClassesAxiomNaryConversion,
+		ModifiableIndexedDisjointClassesAxiomInference {
 
 	/**
 	 * A factory for creating instances
@@ -47,6 +46,20 @@ public interface ModifiableElkDisjointClassesAxiomNaryConversion
 		ModifiableElkDisjointClassesAxiomNaryConversion getElkDisjointClassesAxiomNaryConversion(
 				ElkDisjointClassesAxiom originalAxiom,
 				ModifiableIndexedClassExpressionList disjointClasses);
+
+	}
+
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(ModifiableElkDisjointClassesAxiomNaryConversion inference);
 
 	}
 

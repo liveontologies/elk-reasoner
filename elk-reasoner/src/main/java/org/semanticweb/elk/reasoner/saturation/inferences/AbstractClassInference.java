@@ -23,8 +23,8 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.tracing.AbstractTracingInference;
 import org.semanticweb.elk.reasoner.tracing.TracingInference;
-import org.semanticweb.elk.reasoner.tracing.TracingInferencePrinter;
 
 /**
  * A skeleton implementation of {@link ClassInference}
@@ -32,7 +32,8 @@ import org.semanticweb.elk.reasoner.tracing.TracingInferencePrinter;
  * @author Yevgeny Kazakov
  *
  */
-abstract class AbstractClassInference implements ClassInference {
+abstract class AbstractClassInference extends AbstractTracingInference
+		implements ClassInference {
 
 	private final IndexedContextRoot destination_;
 
@@ -46,15 +47,8 @@ abstract class AbstractClassInference implements ClassInference {
 	}
 
 	@Override
-	public final IndexedContextRoot getTraceRoot() {
+	public IndexedContextRoot getTraceRoot() {
 		return this.destination_;
-	}
-
-	// we assume that different objects represent different inferences
-	
-	@Override
-	public final String toString() {
-		return TracingInferencePrinter.toString(this);		
 	}
 
 	@Override

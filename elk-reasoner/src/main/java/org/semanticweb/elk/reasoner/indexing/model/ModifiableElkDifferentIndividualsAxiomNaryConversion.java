@@ -32,9 +32,8 @@ import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
  * @author "Yevgeny Kazakov"
  */
 public interface ModifiableElkDifferentIndividualsAxiomNaryConversion
-		extends
-			ElkDifferentIndividualsAxiomNaryConversion,
-			ModifiableIndexedDisjointClassesAxiomInference {
+		extends ElkDifferentIndividualsAxiomNaryConversion,
+		ModifiableIndexedDisjointClassesAxiomInference {
 
 	/**
 	 * A factory for creating instances
@@ -47,6 +46,20 @@ public interface ModifiableElkDifferentIndividualsAxiomNaryConversion
 		ModifiableElkDifferentIndividualsAxiomNaryConversion getElkDifferentIndividualsAxiomNaryConversion(
 				ElkDifferentIndividualsAxiom originalAxiom,
 				ModifiableIndexedClassExpressionList differentIndividuals);
+
+	}
+
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(ModifiableElkDifferentIndividualsAxiomNaryConversion inference);
 
 	}
 

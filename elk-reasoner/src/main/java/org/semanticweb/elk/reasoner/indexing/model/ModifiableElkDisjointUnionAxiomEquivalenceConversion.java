@@ -50,4 +50,18 @@ public interface ModifiableElkDisjointUnionAxiomEquivalenceConversion
 
 	}
 
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O> {
+
+		O visit(ModifiableElkDisjointUnionAxiomEquivalenceConversion inference);
+
+	}
+
 }

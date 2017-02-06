@@ -38,32 +38,37 @@ public interface ModifiableIndexedAxiomInference extends IndexedAxiomInference {
 	 *
 	 */
 	interface Factory
-			extends
-				ModifiableElkClassAssertionAxiomConversion.Factory,
-				ModifiableElkDeclarationAxiomConversion.Factory,
-				ModifiableElkDifferentIndividualsAxiomBinaryConversion.Factory,
-				ModifiableElkDifferentIndividualsAxiomNaryConversion.Factory,
-				ModifiableElkDisjointClassesAxiomBinaryConversion.Factory,
-				ModifiableElkDisjointClassesAxiomNaryConversion.Factory,
-				ModifiableElkDisjointUnionAxiomBinaryConversion.Factory,
-				ModifiableElkDisjointUnionAxiomEquivalenceConversion.Factory,
-				ModifiableElkDisjointUnionAxiomNaryConversion.Factory,
-				ModifiableElkDisjointUnionAxiomOwlNothingConversion.Factory,
-				ModifiableElkDisjointUnionAxiomSubClassConversion.Factory,
-				ModifiableElkEquivalentClassesAxiomEquivalenceConversion.Factory,
-				ModifiableElkEquivalentClassesAxiomSubClassConversion.Factory,
-				ModifiableElkEquivalentObjectPropertiesAxiomConversion.Factory,
-				ModifiableElkObjectPropertyAssertionAxiomConversion.Factory,
-				ModifiableElkObjectPropertyDomainAxiomConversion.Factory,
-				ModifiableElkObjectPropertyRangeAxiomConversion.Factory,
-				ModifiableElkReflexiveObjectPropertyAxiomConversion.Factory,
-				ModifiableElkSameIndividualAxiomConversion.Factory,
-				ModifiableElkSubClassOfAxiomConversion.Factory,
-				ModifiableElkSubObjectPropertyOfAxiomConversion.Factory,
-				ModifiableElkTransitiveObjectPropertyAxiomConversion.Factory {
+			extends ModifiableIndexedDisjointClassesAxiomInference.Factory,
+			ModifiableIndexedSubClassOfAxiomInference.Factory,
+			ModifiableIndexedEquivalentClassesAxiomInference.Factory,
+			ModifiableIndexedSubObjectPropertyOfAxiomInference.Factory,
+			ModifiableIndexedObjectPropertyRangeAxiomInference.Factory,
+			ModifiableIndexedDeclarationAxiomInference.Factory {
 
 		// combined interface
 
 	}
+
+	/**
+	 * The visitor pattern for instances
+	 * 
+	 * @author Yevgeny Kazakov
+	 *
+	 * @param <O>
+	 *            the type of the output
+	 */
+	interface Visitor<O>
+			extends ModifiableIndexedDisjointClassesAxiomInference.Visitor<O>,
+			ModifiableIndexedSubClassOfAxiomInference.Visitor<O>,
+			ModifiableIndexedEquivalentClassesAxiomInference.Visitor<O>,
+			ModifiableIndexedSubObjectPropertyOfAxiomInference.Visitor<O>,
+			ModifiableIndexedObjectPropertyRangeAxiomInference.Visitor<O>,
+			ModifiableIndexedDeclarationAxiomInference.Visitor<O> {
+
+		// combined interface
+
+	}
+
+	<O> O accept(Visitor<O> visitor);
 
 }

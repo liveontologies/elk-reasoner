@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 
+import org.liveontologies.proof.util.Producer;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
@@ -33,7 +34,6 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
@@ -45,9 +45,9 @@ import org.slf4j.LoggerFactory;
  * conclusions in a given {@link SaturationState}. The engines accept instances
  * of {@link ContextTracingJob} with the input {@link IndexedContextRoot}
  * origin; when this job is processed, its output will contain all inferences
- * with the given origin that are applicable to {@link ClassConclusion}s stored in
- * the {@link SaturationState} and produce {@link ClassConclusion}s present in the
- * {@link SaturationState}.
+ * with the given origin that are applicable to {@link ClassConclusion}s stored
+ * in the {@link SaturationState} and produce {@link ClassConclusion}s present
+ * in the {@link SaturationState}.
  * 
  * As usual, to this engine factory it is possible to attach a
  * {@link ContextTracingListener} using which one can perform actions upon
@@ -85,7 +85,8 @@ public class ContextTracingFactory<R extends IndexedContextRoot, J extends Conte
 	public ContextTracingFactory(final InterruptMonitor interrupter,
 			SaturationState<?> saturationState, int maxWorkers,
 			ContextTracingListener<R, J> listener) {
-		// applying all local rules, saving the inferences using the class inference producer
+		// applying all local rules, saving the inferences using the class
+		// inference producer
 		this.saturationFactory_ = new ClassExpressionSaturationFactory<SaturationJobForContextTracing<R, J>>(
 				new ContextTracingRuleApplicationFactory(interrupter,
 						saturationState, new ThisClassInferenceProducer()),
@@ -132,8 +133,8 @@ public class ContextTracingFactory<R extends IndexedContextRoot, J extends Conte
 		@Override
 		public void submit(J job) {
 			LOGGER_.trace("{}: job submitted", job);
-			saturationEngine_.submit(new SaturationJobForContextTracing<R, J>(
-					job));
+			saturationEngine_
+					.submit(new SaturationJobForContextTracing<R, J>(job));
 		}
 
 		@Override
@@ -147,7 +148,8 @@ public class ContextTracingFactory<R extends IndexedContextRoot, J extends Conte
 		}
 	}
 
-	private class ThisClassInferenceProducer implements TracingInferenceProducer<ClassInference> {
+	private class ThisClassInferenceProducer
+			implements Producer<ClassInference> {
 
 		@Override
 		public void produce(ClassInference inference) {
@@ -156,8 +158,8 @@ public class ContextTracingFactory<R extends IndexedContextRoot, J extends Conte
 					.get(originRoot);
 			if (inferencesByOrigin == null) {
 				inferencesByOrigin = new ConcurrentLinkedQueue<ClassInference>();
-				Queue<ClassInference> previous = tracedInferences_.putIfAbsent(
-						originRoot, inferencesByOrigin);
+				Queue<ClassInference> previous = tracedInferences_
+						.putIfAbsent(originRoot, inferencesByOrigin);
 				if (previous != null)
 					inferencesByOrigin = previous;
 			}
@@ -176,8 +178,7 @@ public class ContextTracingFactory<R extends IndexedContextRoot, J extends Conte
 	 *         pavel.klinov@uni-ulm.de
 	 * @author "Yevgeny Kazakov"
 	 */
-	private class ThisClassExpressionSaturationListener
-			implements
+	private class ThisClassExpressionSaturationListener implements
 			ClassExpressionSaturationListener<SaturationJobForContextTracing<R, J>> {
 
 		@Override

@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedDeclarationAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedEntity;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
@@ -37,10 +38,8 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
  * 
  */
 class ModifiableIndexedDeclarationAxiomImpl<A extends ElkAxiom>
-		extends
-			IndexedDeclarationAxiomImpl<A, ModifiableIndexedEntity>
-		implements
-			ModifiableIndexedDeclarationAxiom {
+		extends IndexedDeclarationAxiomImpl<A, ModifiableIndexedEntity>
+		implements ModifiableIndexedDeclarationAxiom {
 
 	ModifiableIndexedDeclarationAxiomImpl(A originalAxiom,
 			ModifiableIndexedEntity entity) {
@@ -60,6 +59,11 @@ class ModifiableIndexedDeclarationAxiomImpl<A extends ElkAxiom>
 	@Override
 	public boolean removeOccurrence(ModifiableOntologyIndex index) {
 		return true;
+	}
+
+	@Override
+	public <O> O accept(ModifiableIndexedAxiom.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 }

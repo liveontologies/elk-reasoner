@@ -32,8 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
  *
  */
 public interface ElkClassAssertionAxiomConversion
-		extends
-			IndexedSubClassOfAxiomInference {
+		extends IndexedSubClassOfAxiomInference {
 
 	@Override
 	ElkClassAssertionAxiom getOriginalAxiom();

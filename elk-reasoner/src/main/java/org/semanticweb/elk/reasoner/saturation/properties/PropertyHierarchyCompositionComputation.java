@@ -24,13 +24,13 @@ package org.semanticweb.elk.reasoner.saturation.properties;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.liveontologies.proof.util.Producer;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.stages.PropertyHierarchyCompositionState;
-import org.semanticweb.elk.reasoner.tracing.TracingInferenceProducer;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentExecutor;
 import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
@@ -41,13 +41,12 @@ import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
  * @author Yevgeny Kazakov
  * 
  */
-public class PropertyHierarchyCompositionComputation
-		extends
+public class PropertyHierarchyCompositionComputation extends
 		ReasonerComputationWithInputs<IndexedPropertyChain, PropertyHierarchyCompositionComputationFactory> {
 
 	public PropertyHierarchyCompositionComputation(OntologyIndex ontIndex,
 			final InterruptMonitor interrupter,
-			TracingInferenceProducer<? super ObjectPropertyInference> inferenceProducer,
+			Producer<? super ObjectPropertyInference> inferenceProducer,
 			final PropertyHierarchyCompositionState.Dispatcher dispatcher,
 			ConcurrentExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor) {

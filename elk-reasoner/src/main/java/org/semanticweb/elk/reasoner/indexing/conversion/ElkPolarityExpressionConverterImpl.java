@@ -38,7 +38,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.owl.predefined.ElkPolarity;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
-import org.semanticweb.elk.reasoner.indexing.classes.BaseModifiableIndexedObjectFactory;
+import org.semanticweb.elk.reasoner.indexing.classes.ModifiableIndexedObjectBaseFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.ResolvingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.UpdatingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
@@ -151,7 +151,7 @@ public class ElkPolarityExpressionConverterImpl extends
 			final ModifiableOntologyIndex index, final int increment) {
 		this(elkFactory,
 				new UpdatingModifiableIndexedObjectFactory(
-						new BaseModifiableIndexedObjectFactory(), index,
+						new ModifiableIndexedObjectBaseFactory(), index,
 						OccurrenceIncrement.getDualIncrement(increment)),
 				index);
 	}

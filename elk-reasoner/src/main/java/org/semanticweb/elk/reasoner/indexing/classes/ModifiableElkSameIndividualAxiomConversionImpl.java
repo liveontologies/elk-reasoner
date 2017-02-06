@@ -26,17 +26,16 @@ import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableElkSameIndividualAxiomConversion;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedSubClassOfAxiomInference;
 
 /**
  * Implements {@link ModifiableElkSameIndividualAxiomConversion}
  * 
  * @author "Yevgeny Kazakov"
  */
-class ModifiableElkSameIndividualAxiomConversionImpl
-		extends
-			ModifiableIndexedSubClassOfAxiomInferenceImpl<ElkSameIndividualAxiom>
-		implements
-			ModifiableElkSameIndividualAxiomConversion {
+class ModifiableElkSameIndividualAxiomConversionImpl extends
+		AbstractModifiableIndexedSubClassOfAxiomInference<ElkSameIndividualAxiom>
+		implements ModifiableElkSameIndividualAxiomConversion {
 
 	private final int subIndividualPosition_, superIndividualPosition_;
 
@@ -63,6 +62,12 @@ class ModifiableElkSameIndividualAxiomConversionImpl
 	@Override
 	public final <O> O accept(
 			IndexedSubClassOfAxiomInference.Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public final <O> O accept(
+			ModifiableIndexedSubClassOfAxiomInference.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

@@ -23,17 +23,28 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.DisjointSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
-import org.semanticweb.elk.reasoner.tracing.TracingInference;
-import org.semanticweb.elk.reasoner.tracing.TracingInferencePrinter;
 
-abstract class AbstractDisjointSubsumerInference extends DisjointSubsumerImpl
+abstract class AbstractDisjointSubsumerInference extends AbstractClassInference
 		implements DisjointSubsumerInference {
 
-	public AbstractDisjointSubsumerInference(IndexedContextRoot root,
-			IndexedClassExpressionList disjoint, int position) {
-		super(root, disjoint, position);
+	private final IndexedClassExpressionList disjointExpressions_;
+
+	private final int position_;
+
+	public AbstractDisjointSubsumerInference(IndexedContextRoot destination,
+			IndexedClassExpressionList disjointExpressions, int position) {
+		super(destination);
+		this.disjointExpressions_ = disjointExpressions;
+		this.position_ = position;
+	}
+
+	public IndexedClassExpressionList getDisjointExpressions() {
+		return disjointExpressions_;
+	}
+
+	public int getPosition() {
+		return position_;
 	}
 
 	/**
@@ -42,34 +53,10 @@ abstract class AbstractDisjointSubsumerInference extends DisjointSubsumerImpl
 	 * 
 	 * @return the conclusion produced by this inference
 	 */
-	public final DisjointSubsumer getConclusion(DisjointSubsumer.Factory factory) {
+	public final DisjointSubsumer getConclusion(
+			DisjointSubsumer.Factory factory) {
 		return factory.getDisjointSubsumer(getDestination(),
 				getDisjointExpressions(), getPosition());
-	}
-
-	@Override
-	public final int hashCode() {
-		return System.identityHashCode(this);
-	}
-
-	@Override
-	public final boolean equals(Object o) {
-		return this == o;
-	}
-	
-	@Override
-	public final String toString() {
-		return TracingInferencePrinter.toString(this);		
-	}
-
-	@Override
-	public final <O> O accept(TracingInference.Visitor<O> visitor) {
-		return accept((DisjointSubsumerInference.Visitor<O>) visitor);
-	}
-
-	@Override
-	public final <O> O accept(SaturationInference.Visitor<O> visitor) {
-		return accept((DisjointSubsumerInference.Visitor<O>) visitor);
 	}
 
 	@Override
