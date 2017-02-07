@@ -127,8 +127,6 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 				
 			});
 			
-		} catch (final Exception e) {
-			throw new RuntimeException(e);
 		} finally {
 			prover.dispose();
 		}

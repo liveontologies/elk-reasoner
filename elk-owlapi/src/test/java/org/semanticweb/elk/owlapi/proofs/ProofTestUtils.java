@@ -191,42 +191,29 @@ public class ProofTestUtils {
 			final ProofNode<OWLAxiom> conclusion, final OWLOntology ontology,
 			final Random random) {
 		final Set<ProofNode<OWLAxiom>> visited = new HashSet<ProofNode<OWLAxiom>>();
-		final Set<ProofNode<OWLAxiom>> tautologies = new HashSet<ProofNode<OWLAxiom>>();
-		return collectProofBreaker(conclusion, visited, tautologies,
-				new HashSet<ProofNode<OWLAxiom>>(), ontology, random);
+		return collectProofBreaker(conclusion, visited, ontology, random);
 	}
 
 	public static Set<OWLAxiom> collectProofBreaker(
 			final ProofNode<OWLAxiom> conclusion,
-			final Set<ProofNode<OWLAxiom>> visited,
-			final Set<ProofNode<OWLAxiom>> tautologies,
-			final Set<ProofNode<OWLAxiom>> currentBranch,
-			final OWLOntology ontology, final Random random) {
+			final Set<ProofNode<OWLAxiom>> visited, final OWLOntology ontology,
+			final Random random) {
 		/*
 		 * If the expressions in visited are not provable or tautologies, and
 		 * the result of this method is not null and removed from the ontology,
 		 * then conclusion is not provable.
 		 */
 
-		if (currentBranch.contains(conclusion)) {
+		if (!visited.add(conclusion)) {
 			/*
-			 * Cycle detected. Cannot make sure that the conclusion is not a
-			 * tautology, so assume that it is.
+			 * Repetition detected. Cannot make sure that the conclusion is not
+			 * a tautology, so assume that it is.
 			 */
 			return null;
 		}
 
-		if (tautologies.contains(conclusion)) {
-			// We've already found out that the conclusion is a tautology.
-			return null;
-		}
-		final Set<OWLAxiom> collected = new HashSet<OWLAxiom>();
-		if (!visited.add(conclusion)) {
-			// If already visited, its proof breaker was already collected.
-			return collected;
-		}
-
 		// If conclusion is asserted, it must be collected.
+		final Set<OWLAxiom> collected = new HashSet<OWLAxiom>();
 		final OWLAxiom ax = conclusion.getMember();
 		if (ontology.containsAxiom(ax, Imports.INCLUDED,
 				AxiomAnnotations.IGNORE_AXIOM_ANNOTATIONS)) {
@@ -239,9 +226,6 @@ public class ProofTestUtils {
 		 */
 
 		// For all inferences break proofs of one of their premises.
-		final Set<ProofNode<OWLAxiom>> newBranch = new HashSet<ProofNode<OWLAxiom>>(
-				currentBranch);
-		newBranch.add(conclusion);
 		for (final ProofStep<OWLAxiom> inf : conclusion.getInferences()) {
 
 			final List<ProofNode<OWLAxiom>> premises = new ArrayList<ProofNode<OWLAxiom>>(
@@ -252,8 +236,7 @@ public class ProofTestUtils {
 			for (final ProofNode<OWLAxiom> premise : premises) {
 
 				final Set<OWLAxiom> premiseBreaker = collectProofBreaker(
-						premise, visited, tautologies, newBranch, ontology,
-						random);
+						premise, visited, ontology, random);
 
 				if (premiseBreaker == null) {
 					/*
@@ -272,7 +255,6 @@ public class ProofTestUtils {
 				 * There is an inference whose all premises may be tautologies,
 				 * hence also the conclusion may be a tautology.
 				 */
-				tautologies.add(conclusion);
 				return null;
 			}
 
