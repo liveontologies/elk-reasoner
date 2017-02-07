@@ -1,0 +1,19 @@
+Prefix(: = <http://example.org/>)
+Prefix(rdf: = <http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs: = <http://www.w3.org/2000/01/rdf-schema#>)
+Prefix(xsd: = <http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl: = <http://www.w3.org/2002/07/owl#>)
+
+Ontology(
+
+SubClassOf(:A ObjectSomeValuesFrom(:T :D))
+
+SubClassOf(:A ObjectSomeValuesFrom(:T :F))
+
+SubClassOf(:B ObjectSomeValuesFrom(:T :B))
+
+EquivalentClasses(ObjectSomeValuesFrom(:T :B) ObjectSomeValuesFrom(:T :C) ObjectSomeValuesFrom(:T :D))
+
+SubClassOf(:D ObjectSomeValuesFrom(:T :E))
+
+)

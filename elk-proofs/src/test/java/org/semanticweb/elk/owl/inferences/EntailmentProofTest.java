@@ -54,6 +54,8 @@ public class EntailmentProofTest extends BaseQueryTest<ElkAxiom, Void> {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
+			ElkTestUtils.TEST_INPUT_LOCATION + "/query/entailment/AssertionRanges.owl",// Ranges not supported with assertions
+			ElkTestUtils.TEST_INPUT_LOCATION + "/query/entailment/HasValueRanges.owl",// Ranges not supported with ObjectHasValue
 		};
 	// @formatter:on
 

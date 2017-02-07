@@ -1,0 +1,29 @@
+Prefix(: = <http://example.org/>)
+Prefix(rdf: = <http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs: = <http://www.w3.org/2000/01/rdf-schema#>)
+Prefix(xsd: = <http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl: = <http://www.w3.org/2002/07/owl#>)
+
+Ontology(
+
+SubClassOf(ObjectIntersectionOf(:A :B :C) ObjectIntersectionOf(:C :A))
+
+EquivalentClasses(ObjectIntersectionOf(:A :B :A) ObjectIntersectionOf(:B :A))
+
+EquivalentClasses(ObjectIntersectionOf(:A :B :C) ObjectIntersectionOf(:A :C :B) ObjectIntersectionOf(:B :A :C) ObjectIntersectionOf(:C :B :C :A))
+
+EquivalentClasses(ObjectIntersectionOf(ObjectIntersectionOf(:A :B) :C) ObjectIntersectionOf(:A ObjectIntersectionOf(:C :B)))
+
+EquivalentClasses(ObjectIntersectionOf(:A owl:Nothing) owl:Nothing)
+
+EquivalentClasses(ObjectIntersectionOf(:A owl:Thing) :A)
+
+EquivalentClasses(ObjectSomeValuesFrom(:R owl:Nothing) owl:Nothing)
+
+EquivalentClasses(ObjectHasValue(:R :a) ObjectSomeValuesFrom(:R ObjectOneOf(:a)))
+
+SubClassOf(ObjectSomeValuesFrom(:R ObjectIntersectionOf(:A :B)) ObjectIntersectionOf(ObjectSomeValuesFrom(:R :A) ObjectSomeValuesFrom(:R :B)))
+
+EquivalentClasses(ObjectSomeValuesFrom(:R ObjectIntersectionOf(:A :B)) ObjectSomeValuesFrom(:R ObjectIntersectionOf(:B :A)))
+
+)
