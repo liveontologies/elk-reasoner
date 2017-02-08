@@ -32,8 +32,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.liveontologies</groupId>
-			<artifactId>proof-utils</artifactId>
-			<version>${proof-utils.version}</version>
+			<artifactId>puli</artifactId>
+			<version>${puli.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.liveontologies</groupId>

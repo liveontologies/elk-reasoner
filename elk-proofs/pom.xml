@@ -64,8 +64,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.liveontologies</groupId>
-			<artifactId>proof-utils</artifactId>
-			<version>0.1.0-SNAPSHOT</version>
+			<artifactId>puli</artifactId>
+			<version>${puli.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>

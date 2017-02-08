@@ -28,7 +28,7 @@
 		<dependencySet>
 			<includes>
 				<include>${project.groupId}:elk-protege:jar</include>
-				<include>org.liveontologies:proof-utils:jar</include>
+				<include>org.liveontologies:puli:jar</include>
 			</includes>
 			<!-- verify that all filters worked -->
 			<useStrictFiltering>true</useStrictFiltering>
