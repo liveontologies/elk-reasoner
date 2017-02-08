@@ -1,7 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.owl.inferences;
 /*
  * #%L
  * ELK Proofs Package
@@ -23,11 +19,11 @@ package org.semanticweb.elk.owl.inferences;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.owl.inferences;
 
 import java.util.Set;
 
 import org.liveontologies.proof.util.InferenceDerivabilityChecker;
-import org.liveontologies.proof.util.InferenceSet;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
@@ -53,12 +49,10 @@ public class TestUtils {
 			ElkAxiom goal) throws ElkException {
 
 		LOGGER_.debug("Provability test: {}", goal);
-		ReasonerElkInferenceSet elkInferences = new ReasonerElkInferenceSet(
-				reasoner, goal, factory);
-		InferenceSet<ElkAxiom> inferences = new ElkInferenceSetAdapter(
-				elkInferences);
+		ReasonerElkInferenceSet elkInferences = ReasonerElkInferenceSet
+				.create(reasoner, goal, factory);
 		InferenceDerivabilityChecker<ElkAxiom> checker = new InferenceDerivabilityChecker<ElkAxiom>(
-				inferences);
+				elkInferences);
 		if (!checker.isDerivable(goal)) {
 			throw new AssertionError(String.format("%s: not derivable", goal));
 		}

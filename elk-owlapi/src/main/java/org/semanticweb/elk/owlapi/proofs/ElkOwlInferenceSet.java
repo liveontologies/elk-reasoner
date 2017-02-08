@@ -45,7 +45,7 @@ import org.semanticweb.elk.reasoner.query.UnsupportedQueryTypeEntailmentQueryRes
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.UnsupportedEntailmentTypeException;
 
-public class ElkOwlInferenceSet extends BaseInferenceSet<OWLAxiom>
+public class ElkOwlInferenceSet extends BaseInferenceSet.Projection<OWLAxiom>
 		implements DynamicInferenceSet<OWLAxiom>, ElkReasoner.ChangeListener {
 
 	private final ElkReasoner elkReasoner_;

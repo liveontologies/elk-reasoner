@@ -1,5 +1,3 @@
-package org.semanticweb.elk.owl.inferences;
-
 /*
  * #%L
  * ELK Proofs Package
@@ -21,15 +19,12 @@ package org.semanticweb.elk.owl.inferences;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.owl.inferences;
 
-public interface ModifiableElkInferenceSet
-		extends ElkInferenceSet, ElkInferenceProducer {
+import org.liveontologies.proof.util.ModifiableInferenceSet;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 
-	/**
-	 * Removes all inferences from this set
-	 * 
-	 * @return {@code true} if this set has changed
-	 */
-	public boolean clear();
+public interface ModifiableElkInferenceSet extends ElkInferenceSet,
+		ModifiableInferenceSet<ElkAxiom, ElkInference>, ElkInferenceProducer {
 
 }

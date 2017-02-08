@@ -1,7 +1,3 @@
-package org.semanticweb.elk.owl.inferences;
-
-import java.util.Collection;
-
 /*
  * #%L
  * ELK Proofs Package
@@ -23,38 +19,11 @@ import java.util.Collection;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.owl.inferences;
 
+import org.liveontologies.proof.util.InferenceSet;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 
-public interface ElkInferenceSet {
-
-	/**
-	 * @param conclusion
-	 * @return all inferences producing the given conclusion or {@code null} if
-	 *         those have not been computed yet
-	 */
-	Collection<? extends ElkInference> get(ElkAxiom conclusion);
-
-	public void add(ChangeListener listener);
-
-	public void remove(ChangeListener listener);
-
-	/**
-	 * A listener to monitor if inferences for axioms have changed
-	 * 
-	 * @author Yevgeny Kazakov
-	 *
-	 */
-	public interface ChangeListener {
-
-		/**
-		 * called whenever the inferences already returned for some conclusions
-		 * by {@link ElkInferenceSet#get(ElkAxiom)} may have changed, i.e.,
-		 * calling this method again with the same input may produce a different
-		 * result
-		 */
-		void inferencesChanged();
-
-	}
+public interface ElkInferenceSet extends InferenceSet<ElkAxiom> {
 
 }

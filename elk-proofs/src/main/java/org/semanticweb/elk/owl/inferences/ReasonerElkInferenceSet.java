@@ -21,8 +21,7 @@
  */
 package org.semanticweb.elk.owl.inferences;
 
-import java.util.Collection;
-
+import org.liveontologies.proof.util.ChronologicalInferenceSet;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
@@ -41,27 +40,30 @@ import org.semanticweb.elk.reasoner.query.UnsupportedQueryTypeEntailmentQueryRes
  * @author Yevgeny Kazakov
  * @author Peter Skocovsky
  */
-public class ReasonerElkInferenceSet extends ModifiableElkInferenceSetImpl {
+public class ReasonerElkInferenceSet
+		extends ChronologicalInferenceSet<ElkAxiom, ElkInference>
+		implements ModifiableElkInferenceSet {
 
 	private final Reasoner reasoner_;
 
 	private final ElkInference.Factory inferenceFactory_;
 
-	public ReasonerElkInferenceSet(Reasoner reasoner, ElkAxiom goal,
+	private ReasonerElkInferenceSet(Reasoner reasoner, ElkAxiom goal,
 			ElkObject.Factory elkFactory) throws ElkException {
-		super(elkFactory);
 		this.reasoner_ = reasoner;
 		this.inferenceFactory_ = new ElkInferenceOptimizedProducingFactory(this,
 				elkFactory);
-		synchronized (this) {
-			generateInferences(goal);
-		}
 	}
 
-	@Override
-	public synchronized Collection<? extends ElkInference> get(
-			ElkAxiom conclusion) {
-		return super.get(conclusion);
+	public static ReasonerElkInferenceSet create(final Reasoner reasoner,
+			final ElkAxiom goal, final ElkObject.Factory elkFactory)
+			throws ElkException {
+		final ReasonerElkInferenceSet inferenceSet = new ReasonerElkInferenceSet(
+				reasoner, goal, elkFactory);
+		synchronized (inferenceSet) {
+			inferenceSet.generateInferences(goal);
+		}
+		return inferenceSet;
 	}
 
 	private void generateInferences(final ElkAxiom goal) throws ElkException {

@@ -21,7 +21,7 @@
  */
 package org.semanticweb.elk.reasoner.entailments.model;
 
-import org.semanticweb.elk.reasoner.entailments.GenericInferenceSet;
+import org.liveontologies.proof.util.GenericInferenceSet;
 
 public interface EntailmentInferenceSet
 		extends GenericInferenceSet<Entailment, EntailmentInference> {

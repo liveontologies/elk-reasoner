@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.entailments;
 
 import java.util.Arrays;
 
+import org.liveontologies.proof.util.CombinedInferenceSet;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;

@@ -1,5 +1,3 @@
-package org.semanticweb.elk.owl.inferences;
-
 /*
  * #%L
  * ELK Proofs Package
@@ -21,28 +19,15 @@ package org.semanticweb.elk.owl.inferences;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.owl.inferences;
 
-import org.semanticweb.elk.reasoner.tracing.TracingInference;
+import org.liveontologies.proof.util.Producer;
 
 /**
  * An object using which {@link ElkInference}s can be produced
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface ElkInferenceProducer {
-
-	/**
-	 * Notifies about a new {@link TracingInference}.
-	 * 
-	 * @param inference
-	 */
-	public void produce(ElkInference inference);
-
-	public static ElkInferenceProducer DUMMY = new ElkInferenceProducer() {
-		@Override
-		public void produce(ElkInference inference) {
-			// no-op
-		}
-	};
+public interface ElkInferenceProducer extends Producer<ElkInference> {
 
 }
