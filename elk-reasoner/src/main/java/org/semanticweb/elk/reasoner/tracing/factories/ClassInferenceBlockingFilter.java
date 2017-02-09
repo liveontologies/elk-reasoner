@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-import org.liveontologies.proof.util.Producer;
+import org.liveontologies.puli.Producer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;

@@ -21,7 +21,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation;
 
-import org.liveontologies.proof.util.Producer;
+import org.liveontologies.puli.Producer;
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.properties.PropertyHierarchyCompositionComputationFactory;

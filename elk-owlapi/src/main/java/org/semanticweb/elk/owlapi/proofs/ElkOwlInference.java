@@ -6,7 +6,7 @@ package org.semanticweb.elk.owlapi.proofs;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2017 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ package org.semanticweb.elk.owlapi.proofs;
  * #L%
  */
 
-import org.liveontologies.proof.util.AbstractConvertedInference;
-import org.liveontologies.proof.util.Inference;
+import org.liveontologies.puli.AbstractConvertedInference;
+import org.liveontologies.puli.Inference;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owlapi.ElkConverter;
 import org.semanticweb.owlapi.model.OWLAxiom;

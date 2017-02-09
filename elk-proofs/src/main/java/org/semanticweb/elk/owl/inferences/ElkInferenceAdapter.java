@@ -25,7 +25,7 @@ package org.semanticweb.elk.owl.inferences;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.liveontologies.proof.util.Inference;
+import org.liveontologies.puli.Inference;
 import org.semanticweb.elk.owl.implementation.ElkObjectBaseFactory;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;

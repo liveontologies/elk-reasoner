@@ -21,7 +21,7 @@
  */
 package org.semanticweb.elk.reasoner.tracing;
 
-import org.liveontologies.proof.util.GenericInferenceSet;
+import org.liveontologies.puli.GenericInferenceSet;
 
 /**
  * An object which can be used to retrieve {@link TracingInference}s producing a

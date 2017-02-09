@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.entailments;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.liveontologies.proof.util.Inference;
+import org.liveontologies.puli.Inference;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.entailments.impl.OntologyInconsistencyEntailsAnyAxiomImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.OntologyInconsistencyImpl;

@@ -21,7 +21,7 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.liveontologies.proof.util.Producer;
+import org.liveontologies.puli.Producer;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.saturation.properties.PropertyHierarchyCompositionComputation;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;

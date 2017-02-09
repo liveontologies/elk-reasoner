@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 
-import org.liveontologies.proof.util.Producer;
+import org.liveontologies.puli.Producer;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;

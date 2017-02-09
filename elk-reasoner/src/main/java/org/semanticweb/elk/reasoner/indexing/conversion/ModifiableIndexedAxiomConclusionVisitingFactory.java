@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.indexing.conversion;
  * #L%
  */
 
-import org.liveontologies.proof.util.Producer;
+import org.liveontologies.puli.Producer;
 import org.semanticweb.elk.reasoner.indexing.classes.ModifiableIndexedAxiomInferenceBaseFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.ModifiableIndexedAxiomInferenceConclusionVisitor;
 import org.semanticweb.elk.reasoner.indexing.classes.ModifiableIndexedAxiomInferenceDelegatingFactory;

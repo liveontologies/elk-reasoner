@@ -24,9 +24,9 @@ package org.semanticweb.elk.protege.proof;
 
 import java.util.AbstractList;
 
-import org.liveontologies.proof.util.Inference;
-import org.liveontologies.proof.util.ProofNode;
-import org.liveontologies.proof.util.ProofStep;
+import org.liveontologies.puli.Inference;
+import org.liveontologies.puli.ProofNode;
+import org.liveontologies.puli.ProofStep;
 import org.semanticweb.elk.owl.inferences.ElkClassInclusionHierarchy;
 import org.semanticweb.elk.owl.inferences.ElkPropertyInclusionHierarchy;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;

@@ -21,8 +21,8 @@
  */
 package org.semanticweb.elk.owl.inferences;
 
-import org.liveontologies.proof.util.ChronologicalInferenceSet;
-import org.liveontologies.proof.util.GenericDynamicInferenceSet;
+import org.liveontologies.puli.ChronologicalInferenceSet;
+import org.liveontologies.puli.GenericDynamicInferenceSet;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;

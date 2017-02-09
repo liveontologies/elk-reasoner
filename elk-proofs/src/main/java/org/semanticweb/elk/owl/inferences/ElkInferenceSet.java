@@ -21,7 +21,7 @@
  */
 package org.semanticweb.elk.owl.inferences;
 
-import org.liveontologies.proof.util.InferenceSet;
+import org.liveontologies.puli.InferenceSet;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 
 public interface ElkInferenceSet extends InferenceSet<ElkAxiom> {

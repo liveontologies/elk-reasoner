@@ -26,9 +26,9 @@ import java.util.AbstractList;
 import java.util.Collection;
 import java.util.List;
 
-import org.liveontologies.proof.util.Inference;
-import org.liveontologies.proof.util.ProofNode;
-import org.liveontologies.proof.util.ProofStep;
+import org.liveontologies.puli.Inference;
+import org.liveontologies.puli.ProofNode;
+import org.liveontologies.puli.ProofStep;
 import org.semanticweb.elk.owl.inferences.ElkClassInclusionExistentialComposition;
 import org.semanticweb.elk.owl.inferences.ElkClassInclusionExistentialTransitivity;
 import org.semanticweb.elk.owl.inferences.ElkPropertyInclusionOfTransitiveObjectProperty;

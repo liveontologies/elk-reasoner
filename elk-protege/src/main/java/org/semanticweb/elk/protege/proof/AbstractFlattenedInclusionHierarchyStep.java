@@ -25,8 +25,8 @@ package org.semanticweb.elk.protege.proof;
 import java.util.Collection;
 import java.util.List;
 
-import org.liveontologies.proof.util.ProofNode;
-import org.liveontologies.proof.util.ProofStep;
+import org.liveontologies.puli.ProofNode;
+import org.liveontologies.puli.ProofStep;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
 abstract class AbstractFlattenedInclusionHierarchyStep

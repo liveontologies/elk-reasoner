@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.liveontologies.proof.util.Producer;
+import org.liveontologies.puli.Producer;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;

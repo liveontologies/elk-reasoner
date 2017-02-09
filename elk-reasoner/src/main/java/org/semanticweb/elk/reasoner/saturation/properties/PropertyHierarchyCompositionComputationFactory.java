@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import org.liveontologies.proof.util.Producer;
+import org.liveontologies.puli.Producer;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;

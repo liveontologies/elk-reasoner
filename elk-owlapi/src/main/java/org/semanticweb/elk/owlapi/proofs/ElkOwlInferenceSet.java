@@ -23,9 +23,9 @@ package org.semanticweb.elk.owlapi.proofs;
 
 import java.util.Collection;
 
-import org.liveontologies.proof.util.BaseInferenceSet;
-import org.liveontologies.proof.util.GenericDynamicInferenceSet;
-import org.liveontologies.proof.util.InferenceSets;
+import org.liveontologies.puli.BaseInferenceSet;
+import org.liveontologies.puli.GenericDynamicInferenceSet;
+import org.liveontologies.puli.InferenceSets;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.inferences.ElkInference;

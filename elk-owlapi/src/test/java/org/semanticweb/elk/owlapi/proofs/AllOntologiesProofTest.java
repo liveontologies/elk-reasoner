@@ -29,7 +29,7 @@ import java.util.Set;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.liveontologies.owlapi.proof.OWLProver;
-import org.liveontologies.proof.util.InferenceSets;
+import org.liveontologies.puli.InferenceSets;
 import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
 import org.semanticweb.elk.testing.PolySuite;

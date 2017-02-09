@@ -21,8 +21,8 @@
  */
 package org.semanticweb.elk.owlapi.proofs;
 
-import org.liveontologies.proof.util.Inference;
-import org.liveontologies.proof.util.Producer;
+import org.liveontologies.puli.Inference;
+import org.liveontologies.puli.Producer;
 import org.semanticweb.elk.owl.inferences.ElkInference;
 import org.semanticweb.elk.owl.inferences.ElkInferenceProducer;
 import org.semanticweb.elk.owl.inferences.ElkToldAxiom;

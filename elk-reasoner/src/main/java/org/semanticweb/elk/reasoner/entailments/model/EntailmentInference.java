@@ -21,7 +21,7 @@
  */
 package org.semanticweb.elk.reasoner.entailments.model;
 
-import org.liveontologies.proof.util.Inference;
+import org.liveontologies.puli.Inference;
 
 /**
  * Instances of this interface explain how was some {@link Entailment} entailed.

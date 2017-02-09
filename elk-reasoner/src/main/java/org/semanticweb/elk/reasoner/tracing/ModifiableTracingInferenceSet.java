@@ -21,7 +21,7 @@
  */
 package org.semanticweb.elk.reasoner.tracing;
 
-import org.liveontologies.proof.util.ModifiableInferenceSet;
+import org.liveontologies.puli.ModifiableInferenceSet;
 
 public interface ModifiableTracingInferenceSet<I extends TracingInference>
 		extends GenericTracingInferenceSet<I>, ModifiableInferenceSet<Conclusion, I> {

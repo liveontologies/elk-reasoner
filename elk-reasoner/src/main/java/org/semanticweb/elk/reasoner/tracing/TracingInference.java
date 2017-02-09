@@ -1,6 +1,6 @@
 package org.semanticweb.elk.reasoner.tracing;
 
-import org.liveontologies.proof.util.Inference;
+import org.liveontologies.puli.Inference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
 

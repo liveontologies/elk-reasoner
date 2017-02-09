@@ -23,7 +23,7 @@ package org.semanticweb.elk.owlapi;
  */
 
 import org.liveontologies.owlapi.proof.OWLProver;
-import org.liveontologies.proof.util.DynamicInferenceSet;
+import org.liveontologies.puli.DynamicInferenceSet;
 import org.semanticweb.elk.owlapi.proofs.ElkOwlInferenceSet;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.UnsupportedEntailmentTypeException;

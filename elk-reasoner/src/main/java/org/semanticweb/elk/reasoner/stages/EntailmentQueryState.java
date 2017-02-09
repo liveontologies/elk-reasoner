@@ -28,7 +28,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.liveontologies.proof.util.InferenceDerivabilityChecker;
+import org.liveontologies.puli.InferenceDerivabilityChecker;
 import org.semanticweb.elk.loading.AbstractEntailmentQueryLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.loading.EntailmentQueryLoader;

@@ -23,8 +23,8 @@ package org.semanticweb.elk.owl.inferences;
 
 import java.util.Set;
 
-import org.liveontologies.proof.util.InferenceDerivabilityChecker;
-import org.liveontologies.proof.util.InferenceSet;
+import org.liveontologies.puli.InferenceDerivabilityChecker;
+import org.liveontologies.puli.InferenceSet;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;

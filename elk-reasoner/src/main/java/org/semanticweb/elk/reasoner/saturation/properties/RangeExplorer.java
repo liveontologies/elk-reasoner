@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
-import org.liveontologies.proof.util.Producer;
+import org.liveontologies.puli.Producer;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;

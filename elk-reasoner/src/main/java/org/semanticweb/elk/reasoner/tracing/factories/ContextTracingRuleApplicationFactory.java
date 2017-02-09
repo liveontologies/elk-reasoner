@@ -21,7 +21,7 @@
  */
 package org.semanticweb.elk.reasoner.tracing.factories;
 
-import org.liveontologies.proof.util.Producer;
+import org.liveontologies.puli.Producer;
 import org.semanticweb.elk.Reference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;

@@ -35,11 +35,11 @@ import java.util.Random;
 import java.util.Set;
 
 import org.liveontologies.owlapi.proof.OWLProver;
-import org.liveontologies.proof.util.InferenceSet;
-import org.liveontologies.proof.util.InferenceSets;
-import org.liveontologies.proof.util.ProofNode;
-import org.liveontologies.proof.util.ProofNodes;
-import org.liveontologies.proof.util.ProofStep;
+import org.liveontologies.puli.InferenceSet;
+import org.liveontologies.puli.InferenceSets;
+import org.liveontologies.puli.ProofNode;
+import org.liveontologies.puli.ProofNodes;
+import org.liveontologies.puli.ProofStep;
 import org.semanticweb.elk.owl.inferences.TestUtils;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.OWLAxiom;

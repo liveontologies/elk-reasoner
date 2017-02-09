@@ -29,8 +29,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-import org.liveontologies.proof.util.ProofNode;
-import org.liveontologies.proof.util.ProofStep;
+import org.liveontologies.puli.ProofNode;
+import org.liveontologies.puli.ProofStep;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
 /**

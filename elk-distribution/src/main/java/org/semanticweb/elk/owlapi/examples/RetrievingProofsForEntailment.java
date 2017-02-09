@@ -31,8 +31,8 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import org.liveontologies.owlapi.proof.OWLProver;
-import org.liveontologies.proof.util.Inference;
-import org.liveontologies.proof.util.InferenceSet;
+import org.liveontologies.puli.Inference;
+import org.liveontologies.puli.InferenceSet;
 import org.semanticweb.elk.owlapi.ElkProverFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
