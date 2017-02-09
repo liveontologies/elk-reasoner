@@ -24,6 +24,7 @@ package org.semanticweb.elk.owl.inferences;
 import java.util.Set;
 
 import org.liveontologies.proof.util.InferenceDerivabilityChecker;
+import org.liveontologies.proof.util.InferenceSet;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
@@ -49,7 +50,7 @@ public class TestUtils {
 			ElkAxiom goal) throws ElkException {
 
 		LOGGER_.debug("Provability test: {}", goal);
-		ReasonerElkInferenceSet elkInferences = ReasonerElkInferenceSet
+		InferenceSet<ElkAxiom> elkInferences = ReasonerElkInferenceSet
 				.create(reasoner, goal, factory);
 		InferenceDerivabilityChecker<ElkAxiom> checker = new InferenceDerivabilityChecker<ElkAxiom>(
 				elkInferences);

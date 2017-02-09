@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.tracing;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +19,9 @@ package org.semanticweb.elk.reasoner.tracing;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.tracing;
+
+import java.util.Collection;
 
 /**
  * A {@link ModifiableTracingInferenceSet} in which the access methods are
@@ -39,7 +37,7 @@ public class SynchronizedModifiableTracingInferenceSet<I extends TracingInferenc
 		extends ModifiableTracingInferenceSetImpl<I> {
 
 	@Override
-	public synchronized Iterable<? extends I> getInferences(
+	public synchronized Collection<? extends I> getInferences(
 			Conclusion conclusion) {
 		return super.getInferences(conclusion);
 	}

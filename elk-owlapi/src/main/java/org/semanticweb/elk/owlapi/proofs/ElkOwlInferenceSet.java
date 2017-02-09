@@ -24,8 +24,7 @@ package org.semanticweb.elk.owlapi.proofs;
 import java.util.Collection;
 
 import org.liveontologies.proof.util.BaseInferenceSet;
-import org.liveontologies.proof.util.DynamicInferenceSet;
-import org.liveontologies.proof.util.Inference;
+import org.liveontologies.proof.util.GenericDynamicInferenceSet;
 import org.liveontologies.proof.util.InferenceSets;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
@@ -45,8 +44,9 @@ import org.semanticweb.elk.reasoner.query.UnsupportedQueryTypeEntailmentQueryRes
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.UnsupportedEntailmentTypeException;
 
-public class ElkOwlInferenceSet extends BaseInferenceSet.Projection<OWLAxiom>
-		implements DynamicInferenceSet<OWLAxiom>, ElkReasoner.ChangeListener {
+public class ElkOwlInferenceSet
+		extends BaseInferenceSet<OWLAxiom, ElkOwlInference>
+		implements ElkReasoner.ChangeListener {
 
 	private final ElkReasoner elkReasoner_;
 
@@ -71,7 +71,7 @@ public class ElkOwlInferenceSet extends BaseInferenceSet.Projection<OWLAxiom>
 	}
 
 	@Override
-	public synchronized Collection<? extends Inference<OWLAxiom>> getInferences(
+	public synchronized Collection<? extends ElkOwlInference> getInferences(
 			OWLAxiom conclusion) {
 		ensureSync();
 		return super.getInferences(conclusion);
@@ -155,12 +155,13 @@ public class ElkOwlInferenceSet extends BaseInferenceSet.Projection<OWLAxiom>
 
 	};
 
-	public static DynamicInferenceSet<OWLAxiom> create(ElkReasoner reasoner,
-			OWLAxiom entailment) throws UnsupportedEntailmentTypeException {
-		if (reasoner == null) { 
+	public static GenericDynamicInferenceSet<OWLAxiom, ElkOwlInference> create(
+			ElkReasoner reasoner, OWLAxiom entailment)
+			throws UnsupportedEntailmentTypeException {
+		if (reasoner == null) {
 			return InferenceSets.emptyInferenceSet();
-		}	
-		// else		
+		}
+		// else
 		final ElkOwlInferenceSet inferenceSet = new ElkOwlInferenceSet(reasoner,
 				entailment);
 		// If the entailment is not supported, throw the exceptions now.

@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.tracing;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,23 +19,15 @@ package org.semanticweb.elk.reasoner.tracing;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.tracing;
 
 /**
- * 
  * An object which can be used to retrieve {@link TracingInference}s producing a
  * given {@link Conclusion}.
  * 
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  */
-public interface TracingInferenceSet {
-
-	/**
-	 * @param conclusion
-	 * @return all {@link TracingInference}s stored in this
-	 *         {@link TracingInferenceSet} producing the given
-	 *         {@link Conclusion}
-	 */
-	public Iterable<? extends TracingInference> getInferences(
-			Conclusion conclusion);
-
+public interface TracingInferenceSet extends GenericTracingInferenceSet<TracingInference> {
+	// Just a projection.
 }

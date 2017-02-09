@@ -1,5 +1,3 @@
-package org.semanticweb.elk.owlapi.proofs;
-
 /*-
  * #%L
  * ELK OWL API Binding
@@ -21,6 +19,7 @@ package org.semanticweb.elk.owlapi.proofs;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.owlapi.proofs;
 
 import org.liveontologies.proof.util.Inference;
 import org.liveontologies.proof.util.Producer;
@@ -37,10 +36,10 @@ import org.semanticweb.owlapi.model.OWLAxiom;
  */
 public class ElkInferenceConvertingProducer implements ElkInferenceProducer {
 
-	private final Producer<Inference<OWLAxiom>> targetProducer_;
+	private final Producer<ElkOwlInference> targetProducer_;
 
 	public ElkInferenceConvertingProducer(
-			Producer<Inference<OWLAxiom>> targetProducer) {
+			final Producer<ElkOwlInference> targetProducer) {
 		this.targetProducer_ = targetProducer;
 	}
 

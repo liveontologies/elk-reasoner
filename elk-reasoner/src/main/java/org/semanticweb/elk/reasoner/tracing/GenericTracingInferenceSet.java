@@ -1,10 +1,10 @@
-/*
+/*-
  * #%L
- * ELK Reasoner
+ * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2017 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,18 @@
  */
 package org.semanticweb.elk.reasoner.tracing;
 
-import org.liveontologies.proof.util.ModifiableInferenceSet;
+import org.liveontologies.proof.util.GenericInferenceSet;
 
-public interface ModifiableTracingInferenceSet<I extends TracingInference>
-		extends GenericTracingInferenceSet<I>, ModifiableInferenceSet<Conclusion, I> {
+/**
+ * An object which can be used to retrieve {@link TracingInference}s producing a
+ * given {@link Conclusion}.
+ * 
+ * @author Peter Skocovsky
+ *
+ * @param <I>
+ *            The type of the inferences.
+ */
+public interface GenericTracingInferenceSet<I extends TracingInference>
+		extends GenericInferenceSet<Conclusion, I> {
 	// Just a projection.
 }

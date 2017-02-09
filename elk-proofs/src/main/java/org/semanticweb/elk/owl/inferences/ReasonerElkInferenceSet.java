@@ -22,6 +22,7 @@
 package org.semanticweb.elk.owl.inferences;
 
 import org.liveontologies.proof.util.ChronologicalInferenceSet;
+import org.liveontologies.proof.util.GenericDynamicInferenceSet;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
@@ -55,9 +56,9 @@ public class ReasonerElkInferenceSet
 				elkFactory);
 	}
 
-	public static ReasonerElkInferenceSet create(final Reasoner reasoner,
-			final ElkAxiom goal, final ElkObject.Factory elkFactory)
-			throws ElkException {
+	public static GenericDynamicInferenceSet<ElkAxiom, ElkInference> create(
+			final Reasoner reasoner, final ElkAxiom goal,
+			final ElkObject.Factory elkFactory) throws ElkException {
 		final ReasonerElkInferenceSet inferenceSet = new ReasonerElkInferenceSet(
 				reasoner, goal, elkFactory);
 		synchronized (inferenceSet) {

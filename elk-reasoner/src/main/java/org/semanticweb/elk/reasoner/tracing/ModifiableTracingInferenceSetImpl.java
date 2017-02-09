@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.tracing;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +19,9 @@ package org.semanticweb.elk.reasoner.tracing;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.tracing;
+
+import java.util.Collection;
 
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -61,7 +59,7 @@ public class ModifiableTracingInferenceSetImpl<I extends TracingInference>
 	}
 
 	@Override
-	public Iterable<? extends I> getInferences(Conclusion conclusion) {
+	public Collection<? extends I> getInferences(Conclusion conclusion) {
 		// assumes structural equality and hash of conclusions
 		return inferenceMap_.get(conclusion);
 	}

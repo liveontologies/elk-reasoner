@@ -21,6 +21,7 @@
  */
 package org.semanticweb.elk.reasoner.tracing;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Queue;
@@ -85,7 +86,7 @@ public class TraceState
 
 	private final SaturationInference.Visitor<Void> inferenceProducer_ = new InferenceProducer();
 
-	private final Conclusion.Visitor<Iterable<? extends TracingInference>> inferenceGetter_ = new InferenceGetter();
+	private final Conclusion.Visitor<Collection<? extends TracingInference>> inferenceGetter_ = new InferenceGetter();
 
 	private final ElkAxiomConverter elkAxiomConverter_;
 
@@ -160,7 +161,7 @@ public class TraceState
 	}
 
 	@Override
-	public Iterable<? extends TracingInference> getInferences(
+	public Collection<? extends TracingInference> getInferences(
 			Conclusion conclusion) {
 		return conclusion.accept(inferenceGetter_);
 	}
@@ -185,28 +186,28 @@ public class TraceState
 	 * @author Yevgeny Kazakov
 	 */
 	private class InferenceGetter extends
-			DummyConclusionVisitor<Iterable<? extends TracingInference>> {
+			DummyConclusionVisitor<Collection<? extends TracingInference>> {
 
 		@Override
-		protected Iterable<? extends ClassInference> defaultVisit(
+		protected Collection<? extends ClassInference> defaultVisit(
 				ClassConclusion conclusion) {
 			return classInferences_.getInferences(conclusion);
 		}
 
 		@Override
-		protected Iterable<? extends ObjectPropertyInference> defaultVisit(
+		protected Collection<? extends ObjectPropertyInference> defaultVisit(
 				ObjectPropertyConclusion conclusion) {
 			return objectPropertyInferences_.getInferences(conclusion);
 		}
 
 		@Override
-		public Iterable<? extends TracingInference> visit(
+		public Collection<? extends TracingInference> visit(
 				final SubPropertyChain conclusion) {
 			/*
 			 * Tautologies over trivial properties may not be recorded, so they
 			 * should be added to the result.
 			 */
-			final Iterable<? extends TracingInference> infs = super.visit(
+			final Collection<? extends TracingInference> infs = super.visit(
 					conclusion);
 			if (infs.iterator().hasNext()) {
 				// If some inferences are recorded, they should be complete.
@@ -223,7 +224,7 @@ public class TraceState
 		}
 
 		@Override
-		protected Iterable<? extends IndexedAxiomInference> defaultVisit(
+		protected Collection<? extends IndexedAxiomInference> defaultVisit(
 				IndexedAxiom conclusion) {
 			// compute inferences on demand
 			indexAxiom(conclusion.getOriginalAxiom());
