@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.saturation.properties.inferences;
-
 /*-
  * #%L
  * ELK Reasoner Core
@@ -21,7 +19,12 @@ package org.semanticweb.elk.reasoner.saturation.properties.inferences;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.saturation.properties.inferences;
 
+import java.util.Collections;
+import java.util.Set;
+
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
@@ -46,6 +49,11 @@ abstract class AbstractObjectPropertyInference extends AbstractTracingInference
 	 */
 	abstract <F extends ObjectPropertyConclusion.Factory> Conclusion getConclusion(
 			F factory);
+
+	@Override
+	public Set<? extends ElkAxiom> getJustification() {
+		return Collections.emptySet();
+	}
 
 //	@Override
 //	public final Conclusion getConclusion(Conclusion.Factory factory) {

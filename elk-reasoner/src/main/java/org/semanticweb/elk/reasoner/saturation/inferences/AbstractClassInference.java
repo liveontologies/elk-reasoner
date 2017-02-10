@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.saturation.inferences;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,7 +19,12 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.saturation.inferences;
 
+import java.util.Collections;
+import java.util.Set;
+
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.tracing.AbstractTracingInference;
 import org.semanticweb.elk.reasoner.tracing.TracingInference;
@@ -49,6 +52,11 @@ abstract class AbstractClassInference extends AbstractTracingInference
 	@Override
 	public IndexedContextRoot getTraceRoot() {
 		return this.destination_;
+	}
+
+	@Override
+	public Set<? extends ElkAxiom> getJustification() {
+		return Collections.emptySet();
 	}
 
 	@Override
