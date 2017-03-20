@@ -21,5 +21,10 @@
    <name value="ELK Prover"/>
    <class value="org.semanticweb.elk.protege.proof.ElkProofService"/>
 </extension>
-    
+
+<extension id="elk.prover" point="not.org.saa.protege.justifications.ProverService">
+   <name value="ELK Prover Service"/>
+   <class value="org.semanticweb.elk.protege.proof.ElkProverService"/>
+</extension>
+
 </plugin>
