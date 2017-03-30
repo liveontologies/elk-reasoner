@@ -1,3 +1,9 @@
+package org.semanticweb.elk.reasoner.tracing;
+
+import org.liveontologies.puli.Inference;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
+
 /*
  * #%L
  * ELK Reasoner
@@ -19,12 +25,6 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.tracing;
-
-import org.liveontologies.puli.JustifiedInference;
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
-import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
 
 /**
  * An operation producing {@link Conclusion}s from other {@link Conclusion}s
@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
  * @author Yevgeny Kazakov
  *
  */
-public interface TracingInference extends JustifiedInference<Conclusion, ElkAxiom> {
+public interface TracingInference extends Inference<Conclusion> {
 
 	public <O> O accept(Visitor<O> visitor);
 

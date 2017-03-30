@@ -1,3 +1,5 @@
+package org.semanticweb.elk.reasoner.indexing.classes;
+
 /*-
  * #%L
  * ELK Reasoner Core
@@ -19,10 +21,6 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing.classes;
-
-import java.util.Collections;
-import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
@@ -52,11 +50,6 @@ abstract class AbstractIndexedAxiomInference<A extends ElkAxiom>
 	@Override
 	public Conclusion getPremise(int index, Conclusion.Factory factory) {
 		return failGetPremise(index);
-	}
-
-	@Override
-	public Set<? extends ElkAxiom> getJustification() {
-		return Collections.singleton(getOriginalAxiom());
 	}
 
 	@Override
