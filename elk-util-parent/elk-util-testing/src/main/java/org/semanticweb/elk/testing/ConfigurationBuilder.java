@@ -21,6 +21,7 @@
  */
 package org.semanticweb.elk.testing;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -137,8 +138,14 @@ public class ConfigurationBuilder {
 			}
 			String file = null;
 			for (final Integer index : minIndices) {
-				urls.set(index, srcClass_.getClassLoader()
-						.getResource(files.get(index)));
+				/*
+				 * A file name uses different separator on different platform,
+				 * but here it is used as a URL, which uses '/' as a separator.
+				 */
+				final String fileName = files.get(index)
+						.replace(File.separatorChar, '/');
+				urls.set(index,
+						srcClass_.getClassLoader().getResource(fileName));
 				file = files.get(index);
 			}
 			final Collection<? extends TestManifest<?>> manifs = creator_
