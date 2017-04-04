@@ -89,6 +89,13 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
+			<groupId>org.liveontologies</groupId>
+			<artifactId>protege-proof-justification-explanation</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<scope>provided</scope>
