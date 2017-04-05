@@ -26,89 +26,80 @@
 		<dependency>
 			<groupId>edu.stanford.protege</groupId>
 			<artifactId>protege-editor-core</artifactId>
-			<version>${protege.version}</version>
-			<scope>provided</scope>
+			<version>${protege.version}</version>			
 		</dependency>
 		<dependency>
 			<groupId>edu.stanford.protege</groupId>
 			<artifactId>protege-editor-owl</artifactId>
 			<version>${protege.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-apibinding</artifactId>
 			<version>${owlapi.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-api</artifactId>
 			<version>${owlapi.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-impl</artifactId>
 			<version>${owlapi.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-owlapi</artifactId>
 			<version>${project.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-reasoner</artifactId>
 			<version>${project.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-util-logging</artifactId>
 			<version>${project.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.liveontologies</groupId>
 			<artifactId>puli</artifactId>
 			<version>${puli.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.liveontologies</groupId>
 			<artifactId>owlapi-proof</artifactId>
 			<version>${owlapi-proof.version}</version>
-			<scope>provided</scope>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.liveontologies</groupId>
 			<artifactId>protege-proof-explanation</artifactId>
 			<version>${protege-proof-explanation.version}</version>
-			<scope>provided</scope>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.liveontologies</groupId>
 			<artifactId>protege-proof-justification-explanation</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
-			<scope>provided</scope>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-core</artifactId>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -156,7 +147,7 @@
 						<Implementation-Version>${project.version}.${maven.build.timestamp}</Implementation-Version>
 						<Bundle-SymbolicName>${project.groupId};singleton:=true</Bundle-SymbolicName>
 						<Export-Package>!*</Export-Package>
-						<Embed-Dependency>*;scope=!provided;scope=compile|runtime;inline=false</Embed-Dependency>
+						<Embed-Dependency>*;scope=provided;inline=true</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<Embed-Directory>target/dependency</Embed-Directory>
 						<Embed-StripGroup>true</Embed-StripGroup>
@@ -212,17 +203,16 @@
 						<artifactId>maven-dependency-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>copy-dependencies</id>
+								<id>include-non-bundle-dependencies</id>
 								<phase>package</phase>
 								<goals>
-									<goal>copy-dependencies</goal>
+									<goal>unpack-dependencies</goal>
 								</goals>
 							</execution>
 						</executions>
 						<configuration>
-							<excludeScope>provided</excludeScope>
-							<includeScope>compile</includeScope>
-							<includeScope>runtime</includeScope>
+							<includeScope>provided</includeScope>
+							<outputDirectory>${project.build.directory}/classes</outputDirectory>
 						</configuration>
 					</plugin>
 				</plugins>
