@@ -22,6 +22,11 @@
    <class value="org.semanticweb.elk.protege.proof.ElkProofService"/>
 </extension>
 
+<extension id="elk.proofs.preferences" point="org.liveontologies.protege.explanation.proof.preferences">
+    <label value="ELK Proofs"/>
+    <class value="org.semanticweb.elk.protege.ui.ElkProofPreferencesPanel"/>
+</extension>
+
 <extension id="elk.prover" point="org.liveontologies.protege.explanation.justification.proof.ProverService">
    <name value="ELK Prover Service"/>
    <class value="org.semanticweb.elk.protege.proof.ElkProverService"/>

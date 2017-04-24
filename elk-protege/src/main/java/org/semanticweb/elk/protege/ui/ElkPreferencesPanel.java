@@ -83,14 +83,10 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 
 	private static final long serialVersionUID = -5568211860560307648L;
 
-	// TODO: get those values from the dependencies
-	private static final String PROOF_PLUGIN_NAME_ = "Protege Proof-Based Explanation",
-			PROOF_PLUGIN_UPDATE_URL_ = "https://raw.githubusercontent.com/liveontologies/protege-proof-explanation/release/p5.update.properties";
-
 	private SpinnerNumberModel numberOfWorkersModel_;
 
 	private JCheckBox incrementalCheckbox_, syncCheckbox_,
-			inlineInferencesCheckbox_, suppressAllWarningsCheckbox_;
+			suppressAllWarningsCheckbox_;
 
 	private WarningTableModel warningTypes_;
 
@@ -128,30 +124,6 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 			}
 		});
 		panel.addGroupComponent(syncCheckbox_);
-		panel.addSeparator();
-
-		panel.addGroup("Proof-based explanations");
-		if (getProofPluginBundle() == null) {
-			final JButton button = new JButton();
-			button.addActionListener(new AbstractAction() {
-				private static final long serialVersionUID = 8292735589343462276L;
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					installPlugin(button);
-				}
-			});
-			button.setText("Install Plugin");
-			button.setToolTipText("Install the " + PROOF_PLUGIN_NAME_
-					+ " plugin to display proofs provided by ELK");
-			panel.addGroupComponent(button);
-		} else {
-			inlineInferencesCheckbox_ = new JCheckBox("Inline inferences",
-					prefs.inlineInferences);
-			inlineInferencesCheckbox_.setToolTipText(
-					"If checked, try to rewrite nested inferences into one");
-			panel.addGroupComponent(inlineInferencesCheckbox_);
-		}
 		panel.addSeparator();
 
 		panel.addGroup("Suppressed warning types");
@@ -242,9 +214,6 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 		prefs.numberOfWorkers = numberOfWorkersModel_.getNumber().intValue();
 		prefs.incrementalMode = incrementalCheckbox_.isSelected();
 		prefs.autoSynchronization = syncCheckbox_.isSelected();
-		if (inlineInferencesCheckbox_ != null) {
-			prefs.inlineInferences = inlineInferencesCheckbox_.isSelected();
-		}
 		prefs.suppressedWarningTypes = new ArrayList<String>(
 				warningTypes_.getRowCount());
 		for (int i = 0; i < warningTypes_.getRowCount(); i++) {
@@ -265,48 +234,6 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 		((ElkReasoner) reasoner)
 				.setConfigurationOptions(ElkPreferences.getElkConfig());
 		ProtegeSuppressedMessages.getInstance().reload();
-	}
-
-	private Bundle getProofPluginBundle() {
-		BundleContext context = PluginUtilities.getInstance()
-				.getApplicationContext();
-		Bundle[] bundles = context.getBundles();
-		for (int i = 0; i < bundles.length; i++) {
-			Bundle bundle = bundles[i];
-			String updateLocation = (String) bundle.getHeaders()
-					.get(PluginRegistryImpl.UPDATE_URL);
-			if (updateLocation == null) {
-				continue;
-			}
-			if (updateLocation.equals(PROOF_PLUGIN_UPDATE_URL_)) {
-				return bundle;
-			}
-		}
-		// not found
-		return null;
-	}
-
-	private void installPlugin(JButton button) {
-		try {
-			final PluginInfoDocumentParser pluginInfoDocumentParser = new PluginInfoDocumentParser(
-					new URL(PROOF_PLUGIN_UPDATE_URL_));
-			PluginInfo info = pluginInfoDocumentParser
-					.parseDocument(Optional.<Bundle> empty());
-			PluginInstaller installer = new PluginInstaller(
-					Collections.singletonList(info));
-			installer.run();
-			button.setEnabled(false);
-		} catch (PluginDocumentParseException e) {
-			JOptionPane.showMessageDialog(this,
-					"<html><body width='350'>" + e.getMessage()
-							+ "</body></html>",
-					"Plugin Installation error", JOptionPane.ERROR_MESSAGE);
-		} catch (MalformedURLException e) {
-			// this should not happen
-			LOGGER_.error(ElkPreferences.MARKER,
-					"The update URL for {} plugin is malformed: {}",
-					PROOF_PLUGIN_NAME_, e);
-		}
 	}
 
 }
