@@ -18,12 +18,12 @@
 </extension>
 
 <extension id="elk.proofs" point="org.liveontologies.protege.explanation.proof.service">
-   <name value="ELK Prover"/>
+   <name value="ELK"/>
    <class value="org.semanticweb.elk.protege.proof.ElkProofService"/>
 </extension>
 
 <extension id="elk.proofs.preferences" point="org.liveontologies.protege.explanation.proof.preferences">
-    <label value="ELK Proofs"/>
+    <label value="ELK"/>
     <class value="org.semanticweb.elk.protege.ui.ElkProofPreferencesPanel"/>
 </extension>
 
