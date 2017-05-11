@@ -25,14 +25,12 @@ import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Random;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.liveontologies.owlapi.proof.OWLProver;
 import org.semanticweb.elk.ElkTestUtils;
-import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
 import org.semanticweb.elk.testing.PolySuite;
@@ -46,15 +44,14 @@ import org.semanticweb.owlapi.reasoner.InconsistentOntologyException;
 import org.semanticweb.owlapi.reasoner.InferenceType;
 
 /**
- * For some conclusions tries to randomly break all collected proofs by removing
- * required axioms; if the conclusion is still derived by the reasoner,
- * we missed some proof.
+ * Finds all repairs from proofs of a conclusion. For every repair, tries to
+ * remove the repair from the ontology. If the conclusion is still derived by
+ * the reasoner, we missed some proof.
  * 
  * @author Peter Skocovsky
- * 
  */
 @RunWith(PolySuite.class)
-public class RandomProofCompletenessTest extends BaseProofTest {
+public class ProofCompletenessTest extends BaseProofTest {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
@@ -75,11 +72,11 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 		Arrays.sort(IGNORE_LIST);
 	}
 
-	public RandomProofCompletenessTest(
+	public ProofCompletenessTest(
 			final TestManifest<UrlTestInput> testManifest) {
 		super(testManifest);
 	}
-	
+
 	@Override
 	@Before
 	public void before() throws IOException, Owl2ParseException {
@@ -94,16 +91,12 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 
 	@Test
 	public void proofCompletenessTest() throws Exception {
-		final long seed = RandomSeedProvider.VALUE;
-//		final long seed = 1459433444278L; // problem with property chain optimization
-//		final long seed = 1459864883969L; // problem with incremental mode 
-		final Random random = new Random(seed);
-		
+
 		final OWLDataFactory factory = manager_.getOWLDataFactory();
-		
+
 		// loading and classifying via the OWL API
-		final OWLOntology ontology =
-				loadOntology(manifest_.getInput().getUrl().openStream());
+		final OWLOntology ontology = loadOntology(
+				manifest_.getInput().getUrl().openStream());
 		final OWLProver prover = OWLAPITestUtils.createProver(ontology);
 		try {
 			prover.precomputeInferences(InferenceType.CLASS_HIERARCHY);
@@ -113,24 +106,23 @@ public class RandomProofCompletenessTest extends BaseProofTest {
 
 		try {
 			// now do testing
-	        
-	        ProofTestUtils.visitAllSubsumptionsForProofTests(prover, factory,
-	        		new ProofTestVisitor() {
-				
-				@Override
-				public void visit(final OWLClassExpression subsumee,
-						final OWLClassExpression subsumer) {
-					ProofTestUtils.randomProofCompletenessTest(prover,
-							factory.getOWLSubClassOfAxiom(subsumee, subsumer),
-							random, seed);
-				}
-				
-			});
-			
+
+			ProofTestUtils.visitAllSubsumptionsForProofTests(prover, factory,
+					new ProofTestVisitor() {
+
+						@Override
+						public void visit(final OWLClassExpression subsumee,
+								final OWLClassExpression subsumer) {
+							ProofTestUtils.proofCompletenessTest(prover, factory
+									.getOWLSubClassOfAxiom(subsumee, subsumer));
+						}
+
+					});
+
 		} finally {
 			prover.dispose();
 		}
-		
+
 	}
 
 }

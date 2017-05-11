@@ -24,12 +24,10 @@ package org.semanticweb.elk.owlapi.proofs;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.Random;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
-import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.owlapi.ElkProver;
 import org.semanticweb.elk.owlapi.EntailmentTestManifestCreator;
 import org.semanticweb.elk.owlapi.OwlApiReasoningTestDelegate;
@@ -87,13 +85,11 @@ public class EntailmentProofCompletenessTest extends
 	@Test
 	public void proofCompletenessTest() throws Exception {
 		getDelegate().initWithOutput();
-		final long seed = RandomSeedProvider.VALUE;
-		final Random random = new Random(seed);
 
 		final ElkProver prover = getDelegate().getProver();
 
-		ProofTestUtils.randomProofCompletenessTest(prover,
-				getManifest().getInput().getQuery(), random, seed);
+		ProofTestUtils.proofCompletenessTest(prover,
+				getManifest().getInput().getQuery());
 
 	}
 

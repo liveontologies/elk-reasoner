@@ -23,23 +23,21 @@ package org.semanticweb.elk.owlapi.proofs;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeNotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.Random;
 import java.util.Set;
 
 import org.liveontologies.owlapi.proof.OWLProver;
+import org.liveontologies.puli.InferenceJustifier;
 import org.liveontologies.puli.InferenceSet;
 import org.liveontologies.puli.InferenceSets;
-import org.liveontologies.puli.ProofNode;
-import org.liveontologies.puli.ProofNodes;
-import org.liveontologies.puli.ProofStep;
+import org.liveontologies.puli.justifications.InterruptMonitor;
+import org.liveontologies.puli.justifications.MinimalSubsetCollector;
+import org.liveontologies.puli.justifications.TopDownRepairComputation;
 import org.semanticweb.elk.owl.inferences.TestUtils;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -49,7 +47,6 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.RemoveAxiom;
-import org.semanticweb.owlapi.model.parameters.AxiomAnnotations;
 import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -153,118 +150,45 @@ public class ProofTestUtils {
 		}
 	}
 
-	public static void randomProofCompletenessTest(final OWLProver prover,
-			final OWLAxiom conclusion, final Random random, final long seed) {
-		final ProofNode<OWLAxiom> root = ProofNodes
-				.create(prover.getProof(conclusion), conclusion);
+	public static void proofCompletenessTest(final OWLProver prover,
+			final OWLAxiom conclusion) {
 
 		final OWLOntology ontology = prover.getRootOntology();
 		final OWLOntologyManager manager = ontology.getOWLOntologyManager();
 
-		final Set<OWLAxiom> proofBreaker = ProofTestUtils
-				.collectProofBreaker(root, ontology, random);
-		/*
-		 * If proofBreaker is null, the conclusion cannot be broken and nothing
-		 * can be tested!
-		 */
-		assumeNotNull(proofBreaker);
-		// else
-		final List<OWLOntologyChange> deletions = new ArrayList<OWLOntologyChange>();
-		final List<OWLOntologyChange> additions = new ArrayList<OWLOntologyChange>();
-		for (final OWLAxiom axiom : proofBreaker) {
-			deletions.add(new RemoveAxiom(ontology, axiom));
-			additions.add(new AddAxiom(ontology, axiom));
-		}
+		// compute repairs
+		final InferenceSet<OWLAxiom> inferenceSet = InferenceSets
+				.addAssertedInferences(prover.getProof(conclusion),
+						ontology.getAxioms(Imports.INCLUDED));
+		final InferenceJustifier<OWLAxiom, ? extends Set<? extends OWLAxiom>> justifier = InferenceSets
+				.justifyAssertedInferences();
 
-		manager.applyChanges(deletions);
+		final Set<Set<? extends OWLAxiom>> repairs = new HashSet<Set<? extends OWLAxiom>>();
+		TopDownRepairComputation.<OWLAxiom, OWLAxiom> getFactory()
+				.create(inferenceSet, justifier, InterruptMonitor.DUMMY)
+				.newEnumerator(conclusion)
+				.enumerate(new MinimalSubsetCollector<OWLAxiom>(repairs));
 
-		final boolean conclusionDerived = prover.isEntailed(conclusion);
+		for (final Set<? extends OWLAxiom> repair : repairs) {
 
-		manager.applyChanges(additions);
-
-		assertFalse("Not all proofs were found!\n" + "Seed: " + seed + "\n"
-				+ "Conclusion: " + conclusion + "\n" + "Proof Breaker: "
-				+ proofBreaker, conclusionDerived);
-	}
-
-	public static Set<OWLAxiom> collectProofBreaker(
-			final ProofNode<OWLAxiom> conclusion, final OWLOntology ontology,
-			final Random random) {
-		final Set<ProofNode<OWLAxiom>> visited = new HashSet<ProofNode<OWLAxiom>>();
-		return collectProofBreaker(conclusion, visited, ontology, random);
-	}
-
-	public static Set<OWLAxiom> collectProofBreaker(
-			final ProofNode<OWLAxiom> conclusion,
-			final Set<ProofNode<OWLAxiom>> visited, final OWLOntology ontology,
-			final Random random) {
-		/*
-		 * If the expressions in visited are not provable or tautologies, and
-		 * the result of this method is not null and removed from the ontology,
-		 * then conclusion is not provable.
-		 */
-
-		if (!visited.add(conclusion)) {
-			/*
-			 * Repetition detected. Cannot make sure that the conclusion is not
-			 * a tautology, so assume that it is.
-			 */
-			return null;
-		}
-
-		// If conclusion is asserted, it must be collected.
-		final Set<OWLAxiom> collected = new HashSet<OWLAxiom>();
-		final OWLAxiom ax = conclusion.getMember();
-		if (ontology.containsAxiom(ax, Imports.INCLUDED,
-				AxiomAnnotations.IGNORE_AXIOM_ANNOTATIONS)) {
-			collected.add(ax);
-		}
-
-		/*
-		 * Even if the conclusion is an axiom, it may still be derived from
-		 * other axioms. So we still need to break its proof.
-		 */
-
-		// For all inferences break proofs of one of their premises.
-		for (final ProofStep<OWLAxiom> inf : conclusion.getInferences()) {
-
-			final List<ProofNode<OWLAxiom>> premises = new ArrayList<ProofNode<OWLAxiom>>(
-					inf.getPremises());
-			Collections.shuffle(premises, random);
-
-			boolean isSomePremiseBroken = false;
-			for (final ProofNode<OWLAxiom> premise : premises) {
-
-				final Set<OWLAxiom> premiseBreaker = collectProofBreaker(
-						premise, visited, ontology, random);
-
-				if (premiseBreaker == null) {
-					/*
-					 * The premise may be a tautology and we need to break a
-					 * different premise!
-					 */
-				} else {
-					collected.addAll(premiseBreaker);
-					isSomePremiseBroken = true;
-					break;
-				}
-
-			}
-			if (!isSomePremiseBroken) {
-				/*
-				 * There is an inference whose all premises may be tautologies,
-				 * hence also the conclusion may be a tautology.
-				 */
-				return null;
+			final List<OWLOntologyChange> deletions = new ArrayList<OWLOntologyChange>();
+			final List<OWLOntologyChange> additions = new ArrayList<OWLOntologyChange>();
+			for (final OWLAxiom axiom : repair) {
+				deletions.add(new RemoveAxiom(ontology, axiom));
+				additions.add(new AddAxiom(ontology, axiom));
 			}
 
+			manager.applyChanges(deletions);
+
+			final boolean conclusionDerived = prover.isEntailed(conclusion);
+
+			manager.applyChanges(additions);
+
+			assertFalse("Not all proofs were found!\n" + "Conclusion: "
+					+ conclusion + "\n" + "Repair: " + repair,
+					conclusionDerived);
 		}
 
-		/*
-		 * We are sure that no inference has all premises that are tautologies,
-		 * hence collected contains a proof breaker of conclusion.
-		 */
-		return collected;
 	}
 
 }
