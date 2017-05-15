@@ -62,6 +62,6 @@ public class ElkProverService extends ProverService {
 
 	@Override
 	public String getName() {
-		return "Elk Prover";
+		return "Elk";
 	}
 }
