@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.tracing;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +19,7 @@ package org.semanticweb.elk.reasoner.tracing;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.tracing;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -35,12 +34,12 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Basic statistical information about the proofs for {@link Conclusion}s in
- * {@link TracingInferenceSet}s
+ * {@link TracingProof}s
  * 
  * @author Yevgeny Kazakov
  *
  */
-public class TracingInferenceSetMetrics {
+public class TracingProofMetrics {
 
 	/**
 	 * true if all premises used in the proofs can be derived
@@ -95,7 +94,7 @@ public class TracingInferenceSetMetrics {
 
 	@Override
 	public int hashCode() {
-		return HashGenerator.combinedHashCode(TracingInferenceSetMetrics.class,
+		return HashGenerator.combinedHashCode(TracingProofMetrics.class,
 				provable_, countConclusions_, countInferences_, countAxioms_);
 	}
 
@@ -104,8 +103,8 @@ public class TracingInferenceSetMetrics {
 		if (obj == this) {
 			return true;
 		}
-		if (obj instanceof TracingInferenceSetMetrics) {
-			TracingInferenceSetMetrics other = (TracingInferenceSetMetrics) obj;
+		if (obj instanceof TracingProofMetrics) {
+			TracingProofMetrics other = (TracingProofMetrics) obj;
 			return provable_ == other.provable_
 					&& countConclusions_ == other.countConclusions_
 					&& countInferences_ == other.countInferences_
@@ -126,10 +125,10 @@ public class TracingInferenceSetMetrics {
 	 * @param inferences
 	 * @param conclusion
 	 * @return the statistics about the proofs for the given
-	 *         {@linkplain Conclusion} in the given {@link TracingInferenceSet}
+	 *         {@linkplain Conclusion} in the given {@link TracingProof}
 	 */
-	public static TracingInferenceSetMetrics getStatistics(
-			TracingInferenceSet inferences, Conclusion conclusion) {
+	public static TracingProofMetrics getStatistics(TracingProof inferences,
+			Conclusion conclusion) {
 		Computation comp = new Computation(inferences);
 		comp.toDo(conclusion);
 		comp.process();
@@ -140,9 +139,9 @@ public class TracingInferenceSetMetrics {
 
 		// logger for this class
 		private static final Logger LOGGER_ = LoggerFactory
-				.getLogger(TracingInferenceSetMetrics.Computation.class);
-		
-		private final TracingInferenceSet inferences_;
+				.getLogger(TracingProofMetrics.Computation.class);
+
+		private final TracingProof inferences_;
 
 		Queue<Conclusion> toDo_ = new LinkedList<Conclusion>();
 
@@ -150,12 +149,12 @@ public class TracingInferenceSetMetrics {
 
 		Set<ElkAxiom> axioms_ = new HashSet<ElkAxiom>();
 
-		TracingInferenceSetMetrics statistics_ = new TracingInferenceSetMetrics();
+		TracingProofMetrics statistics_ = new TracingProofMetrics();
 
 		TracingInference.Visitor<Void> infVisitor_ = new TracingInferencePremiseVisitor<Void>(
 				new InferencePremiseProcessor(), new InferenceAxiomProcessor());
 
-		Computation(TracingInferenceSet inferences) {
+		Computation(TracingProof inferences) {
 			this.inferences_ = inferences;
 		}
 

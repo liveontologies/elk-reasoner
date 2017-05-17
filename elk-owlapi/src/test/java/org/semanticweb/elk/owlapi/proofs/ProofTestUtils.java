@@ -33,8 +33,8 @@ import java.util.Set;
 
 import org.liveontologies.owlapi.proof.OWLProver;
 import org.liveontologies.puli.InferenceJustifier;
-import org.liveontologies.puli.InferenceSet;
-import org.liveontologies.puli.InferenceSets;
+import org.liveontologies.puli.Proof;
+import org.liveontologies.puli.Proofs;
 import org.liveontologies.puli.justifications.InterruptMonitor;
 import org.liveontologies.puli.justifications.MinimalSubsetCollector;
 import org.liveontologies.puli.justifications.TopDownRepairComputation;
@@ -71,9 +71,9 @@ public class ProofTestUtils {
 						prover.getRootOntology()));
 	}
 
-	public static boolean isDerivable(InferenceSet<OWLAxiom> proof,
+	public static boolean isDerivable(Proof<OWLAxiom> proof,
 			OWLAxiom conclusion, OWLOntology ontology) {
-		return InferenceSets.isDerivable(proof, conclusion,
+		return Proofs.isDerivable(proof, conclusion,
 				ontology.getAxioms(Imports.INCLUDED));
 	}
 
@@ -157,15 +157,15 @@ public class ProofTestUtils {
 		final OWLOntologyManager manager = ontology.getOWLOntologyManager();
 
 		// compute repairs
-		final InferenceSet<OWLAxiom> inferenceSet = InferenceSets
-				.addAssertedInferences(prover.getProof(conclusion),
-						ontology.getAxioms(Imports.INCLUDED));
-		final InferenceJustifier<OWLAxiom, ? extends Set<? extends OWLAxiom>> justifier = InferenceSets
+		final Proof<OWLAxiom> proof = Proofs.addAssertedInferences(
+				prover.getProof(conclusion),
+				ontology.getAxioms(Imports.INCLUDED));
+		final InferenceJustifier<OWLAxiom, ? extends Set<? extends OWLAxiom>> justifier = Proofs
 				.justifyAssertedInferences();
 
 		final Set<Set<? extends OWLAxiom>> repairs = new HashSet<Set<? extends OWLAxiom>>();
 		TopDownRepairComputation.<OWLAxiom, OWLAxiom> getFactory()
-				.create(inferenceSet, justifier, InterruptMonitor.DUMMY)
+				.create(proof, justifier, InterruptMonitor.DUMMY)
 				.newEnumerator(conclusion)
 				.enumerate(new MinimalSubsetCollector<OWLAxiom>(repairs));
 

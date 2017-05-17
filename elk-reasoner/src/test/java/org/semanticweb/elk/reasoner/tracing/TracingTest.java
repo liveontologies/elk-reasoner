@@ -84,8 +84,8 @@ public class TracingTest {
 
 	@Test
 	public void tracingTest() throws Exception {
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				manifest.getInput().getUrl().openStream());
+		Reasoner reasoner = TestReasonerUtils
+				.createTestReasoner(manifest.getInput().getUrl().openStream());
 
 		try {
 			TracingTests tests = getTracingTests(reasoner);
@@ -109,7 +109,7 @@ public class TracingTest {
 			 * collect statistics about the proofs for conclusions to match
 			 * results
 			 */
-			private final Map<Conclusion, TracingInferenceSetMetrics> proofsStats_ = new HashMap<Conclusion, TracingInferenceSetMetrics>();
+			private final Map<Conclusion, TracingProofMetrics> proofsStats_ = new HashMap<Conclusion, TracingProofMetrics>();
 
 			@Override
 			public void testSubsumption(ElkClass subsumee, ElkClass subsumer) {
@@ -126,9 +126,9 @@ public class TracingTest {
 					for (final Conclusion conclusion : TracingTestUtils
 							.getDerivedConclusionsForSubsumption(subsumee,
 									subsumer, reasoner)) {
-						TracingInferenceSet inferences = reasoner
+						TracingProof inferences = reasoner
 								.explainConclusion(conclusion);
-						TracingInferenceSetMetrics proofStats = TracingInferenceSetMetrics
+						TracingProofMetrics proofStats = TracingProofMetrics
 								.getStatistics(inferences, conclusion);
 						boolean provable = proofStats.isProvable();
 						if (!provable) {
@@ -137,7 +137,7 @@ public class TracingTest {
 						}
 						assertTrue("Conclusion is not provable " + conclusion,
 								provable);
-						TracingInferenceSetMetrics previous = proofsStats_
+						TracingProofMetrics previous = proofsStats_
 								.put(conclusion, proofStats);
 						if (previous != null) {
 							assertEquals("Previous proof does not match!",

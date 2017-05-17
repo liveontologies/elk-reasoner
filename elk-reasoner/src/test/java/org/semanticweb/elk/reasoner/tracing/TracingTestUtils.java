@@ -44,7 +44,7 @@ import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
-import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;
+import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
 import org.semanticweb.elk.reasoner.entailments.model.HasReason;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
@@ -136,7 +136,7 @@ public class TracingTestUtils {
 	}
 
 	private static void collectReasons(final Entailment goal,
-			final EntailmentInferenceSet evidence,
+			final EntailmentProof evidence,
 			final Collection<Conclusion> result) {
 
 		final Set<Entailment> done = new ArrayHashSet<Entailment>();
@@ -189,7 +189,7 @@ public class TracingTestUtils {
 			throws ElkException {
 		final Collection<Conclusion> conclusions = getDerivedConclusionsForSubsumption(
 				subClass, superClass, reasoner);
-		if (conclusions.isEmpty()) {			
+		if (conclusions.isEmpty()) {
 			fail(subClass + " ⊑ " + superClass + " not provable!");
 		}
 		reasoner.explainConclusions(conclusions);
@@ -206,8 +206,8 @@ public class TracingTestUtils {
 
 		TestTraceUnwinder explorer = new TestTraceUnwinder(traceState,
 				UNTRACED_LISTENER);
-		for (final Conclusion conclusion: conclusions) {
-			explorer.accept(conclusion, counter);				
+		for (final Conclusion conclusion : conclusions) {
+			explorer.accept(conclusion, counter);
 		}
 	}
 
@@ -326,8 +326,8 @@ public class TracingTestUtils {
 		return sideConditions;
 	}
 
-	public static String print(TracingInferenceSet inferences, Conclusion conclusion) {
-		StringBuilder builder = new StringBuilder();		
+	public static String print(TracingProof inferences, Conclusion conclusion) {
+		StringBuilder builder = new StringBuilder();
 		print(inferences, conclusion, builder, new HashSet<Conclusion>(), 0);
 		return builder.toString();
 	}
@@ -337,11 +337,11 @@ public class TracingTestUtils {
 			builder.append("   ");
 		}
 	}
-	
-	private static void print(final TracingInferenceSet inferences,
+
+	private static void print(final TracingProof inferences,
 			Conclusion conclusion, final StringBuilder builder,
 			final Set<Conclusion> done, final int depth) {
-		
+
 		printIndent(builder, depth);
 
 		builder.append(conclusion);
@@ -381,7 +381,7 @@ public class TracingTestUtils {
 					}));
 		}
 	}
-	
+
 	// //////////////////////////////////////////////////////////////////////
 	// some dummy utility visitors
 	// //////////////////////////////////////////////////////////////////////

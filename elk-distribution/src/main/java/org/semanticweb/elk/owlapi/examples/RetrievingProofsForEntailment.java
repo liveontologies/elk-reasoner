@@ -32,7 +32,7 @@ import java.util.Set;
 
 import org.liveontologies.owlapi.proof.OWLProver;
 import org.liveontologies.puli.Inference;
-import org.liveontologies.puli.InferenceSet;
+import org.liveontologies.puli.Proof;
 import org.semanticweb.elk.owlapi.ElkProverFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
@@ -74,7 +74,7 @@ public class RetrievingProofsForEntailment {
 		OWLAxiom entailment = getEntailment();
 		
 		// Get the inferences used to prove the entailment 
-		InferenceSet<OWLAxiom> inferences = prover.getProof(entailment);
+		Proof<OWLAxiom> inferences = prover.getProof(entailment);
 		
 		// Now we can recursively request inferences and their premises. Print them to std.out in this example.
 		unwindProofs(inferences, entailment);
@@ -83,7 +83,7 @@ public class RetrievingProofsForEntailment {
 		prover.dispose();
 	}
 
-	private static <C> void unwindProofs(InferenceSet<C> inferences, C entailment) {
+	private static <C> void unwindProofs(Proof<C> inferences, C entailment) {
 		// Start recursive unwinding
 		LinkedList<C> toDo = new LinkedList<C>();
 		Set<C> done = new HashSet<C>();

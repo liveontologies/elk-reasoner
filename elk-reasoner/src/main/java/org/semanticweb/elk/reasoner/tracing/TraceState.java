@@ -65,8 +65,7 @@ import org.slf4j.LoggerFactory;
  * 
  *         TODO: filter out cyclic inferences
  */
-public class TraceState
-		implements Producer<SaturationInference>, TracingInferenceSet {
+public class TraceState implements Producer<SaturationInference>, TracingProof {
 
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
@@ -78,11 +77,11 @@ public class TraceState
 
 	private final Set<ElkAxiom> indexedAxioms_ = new ArrayHashSet<ElkAxiom>();
 
-	private final ModifiableTracingInferenceSet<ClassInference> classInferences_ = new SynchronizedModifiableTracingInferenceSet<ClassInference>();
+	private final ModifiableTracingProof<ClassInference> classInferences_ = new SynchronizedModifiableTracingProof<ClassInference>();
 
-	private final ModifiableTracingInferenceSet<ObjectPropertyInference> objectPropertyInferences_ = new SynchronizedModifiableTracingInferenceSet<ObjectPropertyInference>();
+	private final ModifiableTracingProof<ObjectPropertyInference> objectPropertyInferences_ = new SynchronizedModifiableTracingProof<ObjectPropertyInference>();
 
-	private final ModifiableTracingInferenceSet<IndexedAxiomInference> indexedAxiomInferences_ = new SynchronizedModifiableTracingInferenceSet<IndexedAxiomInference>();
+	private final ModifiableTracingProof<IndexedAxiomInference> indexedAxiomInferences_ = new SynchronizedModifiableTracingProof<IndexedAxiomInference>();
 
 	private final SaturationInference.Visitor<Void> inferenceProducer_ = new InferenceProducer();
 
@@ -181,7 +180,7 @@ public class TraceState
 	}
 
 	/**
-	 * Delegates getting inferences to the corresponding inference set
+	 * Delegates getting inferences to the corresponding proof
 	 * 
 	 * @author Yevgeny Kazakov
 	 */
@@ -234,7 +233,7 @@ public class TraceState
 	}
 
 	/**
-	 * Delegates saving inferences to the corresponding inference set
+	 * Delegates saving inferences to the corresponding proof
 	 * 
 	 * @author Yevgeny Kazakov
 	 */

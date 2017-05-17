@@ -82,7 +82,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 import org.semanticweb.elk.reasoner.tracing.Conclusion;
 import org.semanticweb.elk.reasoner.tracing.DummyConclusionVisitor;
 import org.semanticweb.elk.reasoner.tracing.TraceState;
-import org.semanticweb.elk.reasoner.tracing.TracingInferenceSet;
+import org.semanticweb.elk.reasoner.tracing.TracingProof;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentExecutor;
 import org.slf4j.Logger;
@@ -1001,7 +1001,7 @@ public abstract class AbstractReasonerState {
 	 * TRACING METHODS
 	 *---------------------------------------------------*/
 
-	public TracingInferenceSet explainConclusions(
+	public TracingProof explainConclusions(
 			final Iterable<? extends Conclusion> conclusions)
 			throws ElkException {
 		for (final Conclusion conclusion : conclusions) {
@@ -1027,16 +1027,16 @@ public abstract class AbstractReasonerState {
 		return traceState_;
 	}
 
-	public TracingInferenceSet explainConclusion(final Conclusion conclusion)
+	public TracingProof explainConclusion(final Conclusion conclusion)
 			throws ElkException {
 		LOGGER_.debug("{}: explaining", conclusion);
 		return explainConclusions(Collections.singleton(conclusion));
 	}
 
-	public TracingInferenceSet getTracingInferences() {
+	public TracingProof getTracingInferences() {
 		return traceState_;
 	}
-	
+
 	@Deprecated
 	IndexedClassExpression transform(ElkClassExpression ce) {
 		return ce.accept(expressionConverter_);

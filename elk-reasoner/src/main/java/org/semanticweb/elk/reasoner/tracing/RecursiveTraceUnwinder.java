@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.tracing;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +19,7 @@ package org.semanticweb.elk.reasoner.tracing;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.tracing;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -44,12 +40,12 @@ import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
  */
 public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 
-	private final TracingInferenceSet inferenceSet_;
+	private final TracingProof proof_;
 
 	private final Queue<TracingInference> innferencesToDo_ = new LinkedList<TracingInference>();
 
-	public RecursiveTraceUnwinder(TracingInferenceSet inferenceSet) {
-		this.inferenceSet_ = inferenceSet;
+	public RecursiveTraceUnwinder(TracingProof proof) {
+		this.proof_ = proof;
 	}
 
 	@Override
@@ -67,8 +63,7 @@ public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 						addToQueue(newConclusion, seenInferences);
 						return null;
 					}
-				},
-				new DummyElkAxiomVisitor<Void>());
+				}, new DummyElkAxiomVisitor<Void>());
 
 		for (;;) {
 			// take the first element
@@ -93,7 +88,7 @@ public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 		// finding all inferences that produced the given conclusion (if we are
 		// here, the inference must have premises, i.e. it's not an
 		// initialization inference)
-		for (TracingInference inference : inferenceSet_.getInferences(conclusion)) {
+		for (TracingInference inference : proof_.getInferences(conclusion)) {
 			if (!seenInferences.contains(inference)) {
 				seenInferences.add(inference);
 				innferencesToDo_.add(inference);

@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.entailments.impl.OntologyInconsistencyImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.OwlThingInconsistencyEntailsOntologyInconsistencyImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.TopObjectPropertyInBottomEntailsOntologyInconsistencyImpl;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
-import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;
+import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
 import org.semanticweb.elk.reasoner.entailments.model.OntologyInconsistencyEntailmentInference;
 import org.semanticweb.elk.reasoner.indexing.classes.OntologyIndexDummyChangeListener;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
@@ -146,7 +146,7 @@ public class ConsistencyCheckingState {
 				.addListener(new SaturationStateDummyChangeListener<C>() {
 
 					@Override
-					public void contextsClear() {						
+					public void contextsClear() {
 						toDoEntities_.addAll(index.getIndividuals());
 						toDoEntities_.add(owlThing_);
 						inconsistentIndividuals_.clear();
@@ -322,15 +322,15 @@ public class ConsistencyCheckingState {
 
 	/**
 	 * Explains why an ontology inconsistency is entailed. If it is not
-	 * entailed, the returned inference set is empty.
+	 * entailed, the returned proof is empty.
 	 * 
 	 * @param atMostOne
 	 *            Whether at most one explanation should be returned.
 	 * @return An evidence of entailment of ontology inconsistency.
 	 */
-	public EntailmentInferenceSet getEvidence(final boolean atMostOne) {
+	public EntailmentProof getEvidence(final boolean atMostOne) {
 
-		return new EntailmentInferenceSet() {
+		return new EntailmentProof() {
 
 			@SuppressWarnings("unchecked")
 			@Override

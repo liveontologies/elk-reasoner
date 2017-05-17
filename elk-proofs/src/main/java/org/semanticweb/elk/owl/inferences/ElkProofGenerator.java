@@ -58,7 +58,7 @@ import org.semanticweb.elk.reasoner.entailments.model.EntailedEquivalentClassesE
 import org.semanticweb.elk.reasoner.entailments.model.EntailedIntersectionInconsistencyEntailsDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
-import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;
+import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
 import org.semanticweb.elk.reasoner.entailments.model.EquivalentClassesAxiomEntailment;
 import org.semanticweb.elk.reasoner.entailments.model.IndividualInconsistencyEntailsOntologyInconsistency;
 import org.semanticweb.elk.reasoner.entailments.model.OntologyInconsistency;
@@ -73,7 +73,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
 
 public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 
-	private final EntailmentInferenceSet evidence_;
+	private final EntailmentProof evidence_;
 
 	private final Reasoner reasoner_;
 
@@ -81,7 +81,7 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 
 	private final ElkInference.Factory inferenceFactory_;
 
-	public ElkProofGenerator(final EntailmentInferenceSet evidence,
+	public ElkProofGenerator(final EntailmentProof evidence,
 			final Reasoner reasoner, final ElkObject.Factory elkFactory,
 			final ElkInference.Factory inferenceFactory) {
 		this.evidence_ = evidence;
@@ -90,7 +90,7 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 		this.inferenceFactory_ = inferenceFactory;
 	}
 
-	public ElkProofGenerator(final EntailmentInferenceSet evidence,
+	public ElkProofGenerator(final EntailmentProof evidence,
 			final Reasoner reasoner,
 			final ElkInference.Factory inferenceFactory) {
 		this(evidence, reasoner, reasoner.getElkFactory(), inferenceFactory);

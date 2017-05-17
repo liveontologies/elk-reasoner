@@ -21,14 +21,14 @@
  */
 package org.semanticweb.elk.owl.inferences;
 
-import org.liveontologies.puli.ChronologicalInferenceSet;
-import org.liveontologies.puli.GenericDynamicInferenceSet;
+import org.liveontologies.puli.ChronologicalProof;
+import org.liveontologies.puli.GenericDynamicProof;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;
+import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
 import org.semanticweb.elk.reasoner.query.EntailmentQueryResult;
 import org.semanticweb.elk.reasoner.query.ProperEntailmentQueryResult;
 import org.semanticweb.elk.reasoner.query.UnsupportedIndexingEntailmentQueryResult;
@@ -41,30 +41,29 @@ import org.semanticweb.elk.reasoner.query.UnsupportedQueryTypeEntailmentQueryRes
  * @author Yevgeny Kazakov
  * @author Peter Skocovsky
  */
-public class ReasonerElkInferenceSet
-		extends ChronologicalInferenceSet<ElkAxiom, ElkInference>
-		implements ModifiableElkInferenceSet {
+public class ReasonerElkProof extends ChronologicalProof<ElkAxiom, ElkInference>
+		implements ModifiableElkProof {
 
 	private final Reasoner reasoner_;
 
 	private final ElkInference.Factory inferenceFactory_;
 
-	private ReasonerElkInferenceSet(Reasoner reasoner, ElkAxiom goal,
+	private ReasonerElkProof(Reasoner reasoner, ElkAxiom goal,
 			ElkObject.Factory elkFactory) throws ElkException {
 		this.reasoner_ = reasoner;
 		this.inferenceFactory_ = new ElkInferenceOptimizedProducingFactory(this,
 				elkFactory);
 	}
 
-	public static GenericDynamicInferenceSet<ElkAxiom, ElkInference> create(
+	public static GenericDynamicProof<ElkAxiom, ElkInference> create(
 			final Reasoner reasoner, final ElkAxiom goal,
 			final ElkObject.Factory elkFactory) throws ElkException {
-		final ReasonerElkInferenceSet inferenceSet = new ReasonerElkInferenceSet(
-				reasoner, goal, elkFactory);
-		synchronized (inferenceSet) {
-			inferenceSet.generateInferences(goal);
+		final ReasonerElkProof proof = new ReasonerElkProof(reasoner, goal,
+				elkFactory);
+		synchronized (proof) {
+			proof.generateInferences(goal);
 		}
-		return inferenceSet;
+		return proof;
 	}
 
 	private void generateInferences(final ElkAxiom goal) throws ElkException {
@@ -78,8 +77,7 @@ public class ReasonerElkInferenceSet
 					throws ElkException {
 
 				try {
-					final EntailmentInferenceSet evidence = result
-							.getEvidence(false);
+					final EntailmentProof evidence = result.getEvidence(false);
 					new ElkProofGenerator(evidence, reasoner_,
 							inferenceFactory_).generate(result.getEntailment());
 				} finally {

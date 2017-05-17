@@ -28,7 +28,7 @@ import org.semanticweb.elk.reasoner.entailments.impl.DerivedClassInclusionEntail
 import org.semanticweb.elk.reasoner.entailments.model.ClassAssertionAxiomEntailment;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
-import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;
+import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
@@ -83,11 +83,11 @@ public class ClassAssertionEntailmentQuery
 	}
 
 	@Override
-	public <C extends Context> EntailmentInferenceSet getEvidence(
+	public <C extends Context> EntailmentProof getEvidence(
 			final boolean atMostOne, final SaturationState<C> saturationState,
 			final SaturationConclusion.Factory conclusionFactory)
 			throws ElkQueryException {
-		return new EntailmentInferenceSet() {
+		return new EntailmentProof() {
 
 			@Override
 			public Collection<? extends EntailmentInference> getInferences(

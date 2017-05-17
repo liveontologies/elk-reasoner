@@ -1,6 +1,6 @@
-/*
+/*-
  * #%L
- * ELK Proofs Package
+ * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
@@ -19,11 +19,11 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.owl.inferences;
+package org.semanticweb.elk.reasoner.entailments.model;
 
-import org.liveontologies.puli.InferenceSet;
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.liveontologies.puli.GenericProof;
 
-public interface ElkInferenceSet extends InferenceSet<ElkAxiom> {
+public interface EntailmentProof
+		extends GenericProof<Entailment, EntailmentInference> {
 
 }

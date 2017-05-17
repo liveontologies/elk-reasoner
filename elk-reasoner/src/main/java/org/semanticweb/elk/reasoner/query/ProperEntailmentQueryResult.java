@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.query;
 
 import org.semanticweb.elk.Lock;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
-import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;
+import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
 
 /**
  * An {@link EntailmentQueryResult} of a successfully computed query.
@@ -47,15 +47,14 @@ public interface ProperEntailmentQueryResult
 
 	/**
 	 * Explains why the queried entailment is entailed. If it is not entailed,
-	 * the returned inference set is empty.
+	 * the returned proof is empty.
 	 * 
 	 * @param atMostOne
 	 *            Whether at most one explanation should be returned.
 	 * @return An evidence that the queried entailment is entailed.
 	 * @throws ElkQueryException
 	 */
-	EntailmentInferenceSet getEvidence(boolean atMostOne)
-			throws ElkQueryException;
+	EntailmentProof getEvidence(boolean atMostOne) throws ElkQueryException;
 
 	/**
 	 * Returns the entailment of the query. This should be the root of

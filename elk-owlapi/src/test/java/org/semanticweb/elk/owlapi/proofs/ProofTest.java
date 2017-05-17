@@ -1,4 +1,3 @@
-package org.semanticweb.elk.owlapi.proofs;
 /*
  * #%L
  * ELK OWL API Binding
@@ -20,6 +19,7 @@ package org.semanticweb.elk.owlapi.proofs;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.owlapi.proofs;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -33,7 +33,7 @@ import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
 import org.liveontologies.owlapi.proof.OWLProver;
-import org.liveontologies.puli.DynamicInferenceSet;
+import org.liveontologies.puli.DynamicProof;
 import org.liveontologies.puli.ProofNode;
 import org.liveontologies.puli.ProofNodes;
 import org.liveontologies.puli.ProofStep;
@@ -387,7 +387,7 @@ public class ProofTest {
 			final OWLProver prover = OWLAPITestUtils.createProver(
 					OWLAPITestUtils.createReasoner(ontology, bufferringMode));
 			OWLSubClassOfAxiom entailment = factory.getOWLSubClassOfAxiom(a, b);
-			DynamicInferenceSet<OWLAxiom> proof = prover.getProof(entailment);
+			DynamicProof<OWLAxiom> proof = prover.getProof(entailment);
 			ProofChangeTracker tracker = new ProofChangeTracker();
 			proof.addListener(tracker);
 
@@ -483,7 +483,7 @@ public class ProofTest {
 	}
 
 	private static class ProofChangeTracker
-			implements DynamicInferenceSet.ChangeListener {
+			implements DynamicProof.ChangeListener {
 
 		private boolean changed_ = false;
 

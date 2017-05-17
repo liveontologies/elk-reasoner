@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.tracing;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +19,7 @@ package org.semanticweb.elk.reasoner.tracing;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.tracing;
 
 /**
  * Recursively visits all conclusions which were used to produce a given
@@ -43,7 +39,7 @@ public class TestTraceUnwinder extends RecursiveTraceUnwinder {
 
 	private final UntracedConclusionListener listener_;
 
-	public TestTraceUnwinder(TracingInferenceSet inferences,
+	public TestTraceUnwinder(TracingProof inferences,
 			UntracedConclusionListener listener) {
 		super(inferences);
 		listener_ = listener;

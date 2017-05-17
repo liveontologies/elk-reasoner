@@ -1,7 +1,3 @@
-package org.semanticweb.elk.matching;
-
-import java.util.Collection;
-
 /*
  * #%L
  * ELK Proofs Package
@@ -23,6 +19,9 @@ import java.util.Collection;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.matching;
+
+import java.util.Collection;
 
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1;
 import org.semanticweb.elk.matching.conclusions.BackwardLinkMatch1Watch;
@@ -92,7 +91,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionCompo
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionDecomposedInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.PropertyRangeInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainInference;
-import org.semanticweb.elk.reasoner.tracing.TracingInferenceSet;
+import org.semanticweb.elk.reasoner.tracing.TracingProof;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 
@@ -101,11 +100,11 @@ import org.semanticweb.elk.util.collections.Multimap;
 class InferenceMatchMapImpl
 		implements InferenceMap, InferenceMatchMap, InferenceMatchMapWriter {
 
-	private final TracingInferenceSet inferences_;
+	private final TracingProof inferences_;
 
 	private final Multimap<ConclusionMatch, InferenceMatch> watchedInferences_ = new HashListMultimap<ConclusionMatch, InferenceMatch>();
 
-	InferenceMatchMapImpl(TracingInferenceSet inferences) {
+	InferenceMatchMapImpl(TracingProof inferences) {
 		this.inferences_ = inferences;
 	}
 

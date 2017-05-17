@@ -35,10 +35,10 @@ import org.semanticweb.elk.loading.EntailmentQueryLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyCheckingState;
-import org.semanticweb.elk.reasoner.entailments.CombinedEntailmentInferenceSet;
-import org.semanticweb.elk.reasoner.entailments.InconsistencyInferenceSetWrapper;
+import org.semanticweb.elk.reasoner.entailments.CombinedEntailmentProof;
+import org.semanticweb.elk.reasoner.entailments.InconsistencyProofWrapper;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
-import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;
+import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.query.AbstractProperEntailmentQueryResult;
 import org.semanticweb.elk.reasoner.query.ElkQueryException;
@@ -141,7 +141,7 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 		}
 
 		@Override
-		public EntailmentInferenceSet getEvidence(final boolean onlyOne)
+		public EntailmentProof getEvidence(final boolean onlyOne)
 				throws ElkQueryException {
 			if (indexed == null) {
 				throw new ElkQueryException(
@@ -149,7 +149,7 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 			}
 			// else
 
-			final EntailmentInferenceSet inconsistencyEvidence = new InconsistencyInferenceSetWrapper(
+			final EntailmentProof inconsistencyEvidence = new InconsistencyProofWrapper(
 					consistencyCheckingState_.getEvidence(onlyOne));
 
 			if (consistencyCheckingState_.isInconsistent() && onlyOne) {
@@ -157,10 +157,10 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 			}
 			// else
 
-			final EntailmentInferenceSet entailmentEvidence = indexed
+			final EntailmentProof entailmentEvidence = indexed
 					.getEvidence(onlyOne, saturationState_, conclusionFactory_);
 
-			return new CombinedEntailmentInferenceSet(inconsistencyEvidence,
+			return new CombinedEntailmentProof(inconsistencyEvidence,
 					entailmentEvidence);
 		}
 

@@ -38,7 +38,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
-import org.semanticweb.elk.reasoner.tracing.TracingInferenceSet;
+import org.semanticweb.elk.reasoner.tracing.TracingProof;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,8 +57,7 @@ public class Matcher {
 
 	private final ConclusionMatchExpressionFactory conclusionMatchFactory_;
 
-	public Matcher(TracingInferenceSet inferences,
-			ElkObject.Factory elkObjectFactory,
+	public Matcher(TracingProof inferences, ElkObject.Factory elkObjectFactory,
 			ElkInference.Factory elkInferenceFactory) {
 		toDoInferences_ = new LinkedList<InferenceMatch>();
 		toDoConclusions_ = new LinkedList<ConclusionMatch>();
@@ -76,8 +75,7 @@ public class Matcher {
 				elkInferenceFactory);
 	}
 
-	public Matcher(TracingInferenceSet inferences,
-			ElkObject.Factory elkObjectFactory,
+	public Matcher(TracingProof inferences, ElkObject.Factory elkObjectFactory,
 			ElkInferenceProducer elkInferenceProducer) {
 		this(inferences, elkObjectFactory,
 				new ElkInferenceOptimizedProducingFactory(elkInferenceProducer,

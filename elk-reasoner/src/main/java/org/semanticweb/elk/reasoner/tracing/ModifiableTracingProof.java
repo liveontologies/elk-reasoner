@@ -21,35 +21,9 @@
  */
 package org.semanticweb.elk.reasoner.tracing;
 
-import java.util.Collection;
+import org.liveontologies.puli.ModifiableProof;
 
-/**
- * A {@link ModifiableTracingInferenceSet} in which the access methods are
- * synchronized.
- * 
- * @author "Yevgeny Kazakov"
- *
- * @param <I>
- *            the type of inferences stored in this
- *            {@link ModifiableTracingInferenceSet}
- */
-public class SynchronizedModifiableTracingInferenceSet<I extends TracingInference>
-		extends ModifiableTracingInferenceSetImpl<I> {
-
-	@Override
-	public synchronized Collection<? extends I> getInferences(
-			Conclusion conclusion) {
-		return super.getInferences(conclusion);
-	}
-
-	@Override
-	public synchronized void produce(I inference) {
-		super.produce(inference);
-	}
-
-	@Override
-	public synchronized void clear() {
-		super.clear();
-	}
-
+public interface ModifiableTracingProof<I extends TracingInference>
+		extends GenericTracingProof<I>, ModifiableProof<Conclusion, I> {
+	// Just a projection.
 }

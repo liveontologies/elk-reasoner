@@ -1,5 +1,3 @@
-package org.semanticweb.elk.protege.proof;
-
 /*-
  * #%L
  * ELK Reasoner Protege Plug-in
@@ -21,6 +19,7 @@ package org.semanticweb.elk.protege.proof;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.protege.proof;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,14 +28,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.liveontologies.protege.explanation.proof.service.ProofService;
-import org.liveontologies.puli.DynamicInferenceSet;
+import org.liveontologies.puli.DynamicProof;
 import org.liveontologies.puli.Inference;
 import org.liveontologies.puli.ProofNode;
 import org.protege.editor.owl.model.event.EventType;
 import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
 import org.semanticweb.elk.owlapi.ElkReasoner;
-import org.semanticweb.elk.owlapi.proofs.ElkOwlInferenceSet;
+import org.semanticweb.elk.owlapi.proofs.ElkOwlProof;
 import org.semanticweb.elk.protege.ElkPreferences;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
@@ -70,7 +69,7 @@ public class ElkProofService extends ProofService
 	}
 
 	@Override
-	public DynamicInferenceSet<OWLAxiom> getProof(final OWLAxiom entailment)
+	public DynamicProof<OWLAxiom> getProof(final OWLAxiom entailment)
 			throws UnsupportedEntailmentTypeException {
 		return new DynamicOwlProof(entailment);
 	}
@@ -111,27 +110,27 @@ public class ElkProofService extends ProofService
 	}
 
 	private class DynamicOwlProof
-			implements DynamicInferenceSet<OWLAxiom>, ChangeListener {
+			implements DynamicProof<OWLAxiom>, ChangeListener {
 
 		private final OWLAxiom entailment_;
 
-		private DynamicInferenceSet<OWLAxiom> proof_;
+		private DynamicProof<OWLAxiom> proof_;
 
-		private final Set<DynamicInferenceSet.ChangeListener> listeners_ = new HashSet<DynamicInferenceSet.ChangeListener>();
+		private final Set<DynamicProof.ChangeListener> listeners_ = new HashSet<DynamicProof.ChangeListener>();
 
 		DynamicOwlProof(OWLAxiom entailment) {
 			this.entailment_ = entailment;
-			this.proof_ = ElkOwlInferenceSet.create(reasoner_, entailment);
+			this.proof_ = ElkOwlProof.create(reasoner_, entailment);
 			ElkProofService.this.listeners_.add(this);
 		}
 
 		@Override
 		public void reasonerChanged() {
-			for (DynamicInferenceSet.ChangeListener listener : listeners_) {
+			for (DynamicProof.ChangeListener listener : listeners_) {
 				proof_.removeListener(listener);
 			}
-			this.proof_ = ElkOwlInferenceSet.create(reasoner_, entailment_);
-			for (DynamicInferenceSet.ChangeListener listener : listeners_) {
+			this.proof_ = ElkOwlProof.create(reasoner_, entailment_);
+			for (DynamicProof.ChangeListener listener : listeners_) {
 				proof_.addListener(listener);
 			}
 		}
@@ -149,15 +148,14 @@ public class ElkProofService extends ProofService
 		}
 
 		@Override
-		public void addListener(DynamicInferenceSet.ChangeListener listener) {
+		public void addListener(DynamicProof.ChangeListener listener) {
 			if (listeners_.add(listener)) {
 				proof_.addListener(listener);
 			}
 		}
 
 		@Override
-		public void removeListener(
-				DynamicInferenceSet.ChangeListener listener) {
+		public void removeListener(DynamicProof.ChangeListener listener) {
 			if (listeners_.remove(listener)) {
 				proof_.removeListener(listener);
 			}

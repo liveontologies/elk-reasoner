@@ -29,21 +29,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An implementation of {@link ModifiableTracingInferenceSet} backed by a
+ * An implementation of {@link ModifiableTracingProof} backed by a
  * {@link Multimap}.
  * 
  * @author "Yevgeny Kazakov"
  *
  * @param <I>
  *            the type of inferences stored in this
- *            {@link ModifiableTracingInferenceSet}
+ *            {@link ModifiableTracingProof}
  */
-public class ModifiableTracingInferenceSetImpl<I extends TracingInference>
-		implements ModifiableTracingInferenceSet<I> {
+public class ModifiableTracingProofImpl<I extends TracingInference>
+		implements ModifiableTracingProof<I> {
 
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ModifiableTracingInferenceSetImpl.class);
+			.getLogger(ModifiableTracingProofImpl.class);
 
 	private final Multimap<Conclusion, I> inferenceMap_ = new HashListMultimap<Conclusion, I>();
 

@@ -19,11 +19,26 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.entailments.model;
+package org.semanticweb.elk.reasoner.entailments;
 
-import org.liveontologies.puli.GenericInferenceSet;
+import java.util.Arrays;
 
-public interface EntailmentInferenceSet
-		extends GenericInferenceSet<Entailment, EntailmentInference> {
+import org.liveontologies.puli.CombinedProof;
+import org.semanticweb.elk.reasoner.entailments.model.Entailment;
+import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
+import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
+
+public class CombinedEntailmentProof
+		extends CombinedProof<Entailment, EntailmentInference>
+		implements EntailmentProof {
+
+	public CombinedEntailmentProof(
+			final Iterable<? extends EntailmentProof> proofs) {
+		super(proofs);
+	}
+
+	public CombinedEntailmentProof(final EntailmentProof... proofs) {
+		this(Arrays.asList(proofs));
+	}
 
 }

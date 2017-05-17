@@ -31,8 +31,8 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.tracing.DummyConclusionVisitor;
-import org.semanticweb.elk.reasoner.tracing.ModifiableTracingInferenceSet;
-import org.semanticweb.elk.reasoner.tracing.ModifiableTracingInferenceSetImpl;
+import org.semanticweb.elk.reasoner.tracing.ModifiableTracingProof;
+import org.semanticweb.elk.reasoner.tracing.ModifiableTracingProofImpl;
 import org.semanticweb.elk.reasoner.tracing.TraceState;
 import org.semanticweb.elk.reasoner.tracing.TracingInference;
 import org.semanticweb.elk.reasoner.tracing.TracingInferencePremiseVisitor;
@@ -60,7 +60,7 @@ public class ProofUnwindingFactory
 
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ProofUnwindingFactory.class);
-	
+
 	/**
 	 * the object where the traced inferences are stored
 	 */
@@ -74,17 +74,16 @@ public class ProofUnwindingFactory
 	/**
 	 * the traced inferences stored by context; not all of them may be needed
 	 */
-	private final ConcurrentMap<IndexedContextRoot, ModifiableTracingInferenceSet<ClassInference>> inferencesByContext_;
+	private final ConcurrentMap<IndexedContextRoot, ModifiableTracingProof<ClassInference>> inferencesByContext_;
 
 	public ProofUnwindingFactory(final InterruptMonitor interrupter,
-			SaturationState<?> mainSaturationState,
-			TraceState traceState, int maxWorkers) {
+			SaturationState<?> mainSaturationState, TraceState traceState,
+			int maxWorkers) {
 		traceState_ = traceState;
 		contextTracingFactory_ = new ContextTracingFactory<IndexedContextRoot, ContextTracingJobForProofUnwinding>(
-				interrupter,
-				mainSaturationState, maxWorkers,
+				interrupter, mainSaturationState, maxWorkers,
 				new ThisContextTracingListener());
-		inferencesByContext_ = new ConcurrentHashMap<IndexedContextRoot, ModifiableTracingInferenceSet<ClassInference>>();
+		inferencesByContext_ = new ConcurrentHashMap<IndexedContextRoot, ModifiableTracingProof<ClassInference>>();
 	}
 
 	@Override
@@ -161,17 +160,16 @@ public class ProofUnwindingFactory
 		@Override
 		public void notifyFinished(ContextTracingJobForProofUnwinding job) {
 			IndexedContextRoot root = job.getInput();
-			ModifiableTracingInferenceSet<ClassInference> inferenceSet = inferencesByContext_
+			ModifiableTracingProof<ClassInference> proof = inferencesByContext_
 					.get(root);
-			if (inferenceSet == null) {
-				ModifiableTracingInferenceSet<ClassInference> newInferenceSet = new ModifiableTracingInferenceSetImpl<ClassInference>();
-				synchronized (newInferenceSet) {
-					inferenceSet = inferencesByContext_.putIfAbsent(root,
-							newInferenceSet);
-					if (inferenceSet == null) {
-						inferenceSet = newInferenceSet;
+			if (proof == null) {
+				ModifiableTracingProof<ClassInference> newProof = new ModifiableTracingProofImpl<ClassInference>();
+				synchronized (newProof) {
+					proof = inferencesByContext_.putIfAbsent(root, newProof);
+					if (proof == null) {
+						proof = newProof;
 						ClassInferenceBlockingFilter filter = new ClassInferenceBlockingFilter(
-								inferenceSet);
+								proof);
 						for (ClassInference inference : job.getOutput()) {
 							filter.produce(inference);
 						}
@@ -179,8 +177,8 @@ public class ProofUnwindingFactory
 				}
 			}
 			Iterable<? extends ClassInference> inferences;
-			synchronized (inferenceSet) {
-				inferences = inferenceSet.getInferences(job.tracedConclusion);
+			synchronized (proof) {
+				inferences = proof.getInferences(job.tracedConclusion);
 			}
 			boolean provable = false;
 			for (ClassInference inference : inferences) {
@@ -189,7 +187,8 @@ public class ProofUnwindingFactory
 				inference.accept(inferencePremiseInsertionVisitor);
 			}
 			if (!provable) {
-				LOGGER_.error("{}: no inferences traced!", job.tracedConclusion);
+				LOGGER_.error("{}: no inferences traced!",
+						job.tracedConclusion);
 			}
 		}
 	}

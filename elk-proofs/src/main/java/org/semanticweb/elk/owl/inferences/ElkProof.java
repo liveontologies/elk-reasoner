@@ -1,10 +1,10 @@
-/*-
+/*
  * #%L
- * ELK Reasoner Core
+ * ELK Proofs Package
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2017 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,20 +19,11 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.tracing;
+package org.semanticweb.elk.owl.inferences;
 
-import org.liveontologies.puli.GenericInferenceSet;
+import org.liveontologies.puli.Proof;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 
-/**
- * An object which can be used to retrieve {@link TracingInference}s producing a
- * given {@link Conclusion}.
- * 
- * @author Peter Skocovsky
- *
- * @param <I>
- *            The type of the inferences.
- */
-public interface GenericTracingInferenceSet<I extends TracingInference>
-		extends GenericInferenceSet<Conclusion, I> {
-	// Just a projection.
+public interface ElkProof extends Proof<ElkAxiom> {
+
 }

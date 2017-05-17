@@ -1,5 +1,3 @@
-package org.semanticweb.elk.owlapi;
-
 /*-
  * #%L
  * ELK OWL API Binding
@@ -21,10 +19,11 @@ package org.semanticweb.elk.owlapi;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.owlapi;
 
 import org.liveontologies.owlapi.proof.OWLProver;
-import org.liveontologies.puli.DynamicInferenceSet;
-import org.semanticweb.elk.owlapi.proofs.ElkOwlInferenceSet;
+import org.liveontologies.puli.DynamicProof;
+import org.semanticweb.elk.owlapi.proofs.ElkOwlProof;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.UnsupportedEntailmentTypeException;
 
@@ -36,9 +35,9 @@ public class ElkProver extends DelegatingOWLReasoner<ElkReasoner>
 	}
 
 	@Override
-	public DynamicInferenceSet<OWLAxiom> getProof(OWLAxiom entailment)
+	public DynamicProof<OWLAxiom> getProof(OWLAxiom entailment)
 			throws UnsupportedEntailmentTypeException {
-		return ElkOwlInferenceSet.create(getDelegate(), entailment);
+		return ElkOwlProof.create(getDelegate(), entailment);
 	}
 
 }

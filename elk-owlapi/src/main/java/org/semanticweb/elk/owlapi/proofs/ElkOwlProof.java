@@ -23,9 +23,9 @@ package org.semanticweb.elk.owlapi.proofs;
 
 import java.util.Collection;
 
-import org.liveontologies.puli.BaseInferenceSet;
-import org.liveontologies.puli.GenericDynamicInferenceSet;
-import org.liveontologies.puli.InferenceSets;
+import org.liveontologies.puli.BaseProof;
+import org.liveontologies.puli.GenericDynamicProof;
+import org.liveontologies.puli.Proofs;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.inferences.ElkInference;
@@ -36,7 +36,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owlapi.ElkConverter;
 import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
-import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;
+import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
 import org.semanticweb.elk.reasoner.query.EntailmentQueryResult;
 import org.semanticweb.elk.reasoner.query.ProperEntailmentQueryResult;
 import org.semanticweb.elk.reasoner.query.UnsupportedIndexingEntailmentQueryResult;
@@ -44,8 +44,7 @@ import org.semanticweb.elk.reasoner.query.UnsupportedQueryTypeEntailmentQueryRes
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.UnsupportedEntailmentTypeException;
 
-public class ElkOwlInferenceSet
-		extends BaseInferenceSet<OWLAxiom, ElkOwlInference>
+public class ElkOwlProof extends BaseProof<OWLAxiom, ElkOwlInference>
 		implements ElkReasoner.ChangeListener {
 
 	private final ElkReasoner elkReasoner_;
@@ -63,8 +62,7 @@ public class ElkOwlInferenceSet
 	 * 
 	 * @param elkReasoner
 	 */
-	private ElkOwlInferenceSet(ElkReasoner elkReasoner,
-			OWLAxiom elkEntailment) {
+	private ElkOwlProof(ElkReasoner elkReasoner, OWLAxiom elkEntailment) {
 		this.elkReasoner_ = elkReasoner;
 		this.owlEntailment_ = elkEntailment;
 		elkReasoner.addListener(this);
@@ -122,10 +120,10 @@ public class ElkOwlInferenceSet
 				throws ElkException {
 			try {
 				final ElkInferenceProducer producer = new ElkInferenceConvertingProducer(
-						ElkOwlInferenceSet.this);
+						ElkOwlProof.this);
 				final ElkInference.Factory factory = new ElkInferenceOptimizedProducingFactory(
 						producer);
-				final EntailmentInferenceSet evidence = properResult
+				final EntailmentProof evidence = properResult
 						.getEvidence(false);
 				new ElkProofGenerator(evidence,
 						elkReasoner_.getInternalReasoner(), factory)
@@ -155,18 +153,17 @@ public class ElkOwlInferenceSet
 
 	};
 
-	public static GenericDynamicInferenceSet<OWLAxiom, ElkOwlInference> create(
+	public static GenericDynamicProof<OWLAxiom, ElkOwlInference> create(
 			ElkReasoner reasoner, OWLAxiom entailment)
 			throws UnsupportedEntailmentTypeException {
 		if (reasoner == null) {
-			return InferenceSets.emptyInferenceSet();
+			return Proofs.emptyProof();
 		}
 		// else
-		final ElkOwlInferenceSet inferenceSet = new ElkOwlInferenceSet(reasoner,
-				entailment);
+		final ElkOwlProof proof = new ElkOwlProof(reasoner, entailment);
 		// If the entailment is not supported, throw the exceptions now.
-		inferenceSet.ensureSync();
-		return inferenceSet;
+		proof.ensureSync();
+		return proof;
 	}
 
 }

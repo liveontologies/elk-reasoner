@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.query;
 import java.util.Collection;
 
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
-import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;
+import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
@@ -51,7 +51,7 @@ public interface IndexedEntailmentQuery<E extends Entailment> {
 
 	/**
 	 * Explains why the queried entailment is entailed. If it is not entailed,
-	 * it is not provable by the inferences from the returned inference set.
+	 * it is not provable by the inferences from the returned proof.
 	 * 
 	 * @param atMostOne
 	 *            Whether at most one explanation should be returned.
@@ -60,7 +60,7 @@ public interface IndexedEntailmentQuery<E extends Entailment> {
 	 * @return An evidence that the queried entailment is entailed.
 	 * @throws ElkQueryException
 	 */
-	<C extends Context> EntailmentInferenceSet getEvidence(boolean atMostOne,
+	<C extends Context> EntailmentProof getEvidence(boolean atMostOne,
 			SaturationState<C> saturationState,
 			SaturationConclusion.Factory conclusionFactory)
 			throws ElkQueryException;

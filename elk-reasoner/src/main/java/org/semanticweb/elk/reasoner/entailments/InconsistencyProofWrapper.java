@@ -31,10 +31,10 @@ import org.semanticweb.elk.reasoner.entailments.impl.OntologyInconsistencyImpl;
 import org.semanticweb.elk.reasoner.entailments.model.AxiomEntailment;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
-import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;
+import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
 
 /**
- * This class is intended to be a wrapper of hte inference set returned by
+ * This class is intended to be a wrapper of the proof returned by
  * {@link org.semanticweb.elk.reasoner.consistency.ConsistencyCheckingState#getEvidence(boolean)
  * ConsistencyCheckingState.getEvidence(boolean)}. It adds
  * {@link org.semanticweb.elk.reasoner.entailments.model.OntologyInconsistencyEntailsAnyAxiom
@@ -47,13 +47,12 @@ import org.semanticweb.elk.reasoner.entailments.model.EntailmentInferenceSet;
  * 
  * @author Peter Skocovsky
  */
-public class InconsistencyInferenceSetWrapper
-		implements EntailmentInferenceSet {
+public class InconsistencyProofWrapper implements EntailmentProof {
 
-	private final EntailmentInferenceSet inconsistencyEvidence_;
+	private final EntailmentProof inconsistencyEvidence_;
 
-	public InconsistencyInferenceSetWrapper(
-			final EntailmentInferenceSet inconsistencyEvidence) {
+	public InconsistencyProofWrapper(
+			final EntailmentProof inconsistencyEvidence) {
 		this.inconsistencyEvidence_ = inconsistencyEvidence;
 	}
 
@@ -64,8 +63,7 @@ public class InconsistencyInferenceSetWrapper
 				.getInferences(OntologyInconsistencyImpl.INSTANCE);
 		if (infs == null || infs.isEmpty()) {
 			/*
-			 * If ontology inconsistency is not entailed, this inference set is
-			 * empty.
+			 * If ontology inconsistency is not entailed, this proof is empty.
 			 */
 			return Collections.emptyList();
 		}
