@@ -18,24 +18,22 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-owlapi</artifactId>
 			<version>${project.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-apibinding</artifactId>
 			<version>${owlapi.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-api</artifactId>
 			<version>${owlapi.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-impl</artifactId>
 			<version>${owlapi.version}</version>
-			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
@@ -60,7 +58,8 @@
 						</goals>
 						<configuration>
 							<includeGroupIds>${project.groupId}</includeGroupIds>
-							<outputDirectory>${project.build.directory}/classes</outputDirectory>
+							<includeScope>provided</includeScope>
+							<outputDirectory>${project.build.directory}/classes</outputDirectory>							
 						</configuration>
 					</execution>
 					<execution>
@@ -71,6 +70,7 @@
 						</goals>
 						<configuration>
 							<includeGroupIds>${project.groupId}</includeGroupIds>
+							<includeScope>provided</includeScope>
 							<classifier>sources</classifier>
 							<outputDirectory>${project.build.directory}/sources</outputDirectory>
 						</configuration>
@@ -83,7 +83,7 @@
 						</goals>
 						<configuration>
 							<excludeGroupIds>${project.groupId}</excludeGroupIds>
-							<excludeClassifiers>provided</excludeClassifiers>
+							<includeScope>provided</includeScope>							
 							<outputDirectory>${project.build.directory}/lib</outputDirectory>
 						</configuration>
 					</execution>
@@ -95,9 +95,9 @@
 						</goals>
 						<configuration>
 							<excludeGroupIds>${project.groupId}</excludeGroupIds>
-							<excludeClassifiers>provided</excludeClassifiers>
-							<outputDirectory>${project.build.directory}/lib</outputDirectory>
-							<classifier>sources</classifier>
+							<includeScope>provided</includeScope>
+							<classifier>sources</classifier>						
+							<outputDirectory>${project.build.directory}/lib</outputDirectory>							
 						</configuration>
 					</execution>
 				</executions>

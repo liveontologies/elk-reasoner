@@ -15,7 +15,7 @@
 	<dependencySets>
 		<dependencySet>
 			<unpack>true</unpack>
-			<scope>runtime</scope>
+			<scope>provided</scope>			
 			<useProjectArtifact>false</useProjectArtifact>
 		</dependencySet>
 	</dependencySets>

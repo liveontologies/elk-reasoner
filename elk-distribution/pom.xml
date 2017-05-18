@@ -72,7 +72,7 @@
 			<classifier>lib</classifier>
 			<exclusions>
 				<exclusion>
-					<groupId>${project.groupId}</groupId>
+					<groupId>*</groupId>
 					<artifactId>*</artifactId>
 				</exclusion>
 			</exclusions>
