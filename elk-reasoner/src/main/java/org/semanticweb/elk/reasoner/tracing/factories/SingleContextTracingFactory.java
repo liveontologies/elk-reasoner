@@ -97,6 +97,7 @@ public class SingleContextTracingFactory
 	@Override
 	public void finish() {
 		saturationFactory_.finish();
+		tracingState_.getTracingListener().notifyComputationFinished();
 	}
 
 	@Override
@@ -171,7 +172,7 @@ public class SingleContextTracingFactory
 			final IndexedContextRoot root = job.getInput();
 			tracedInferences_.get(root);
 			LOGGER_.trace("{}: job finished", job);
-			tracingState_.getTracingListener().notifyFinished(
+			tracingState_.getTracingListener().notifyJobFinished(
 					job.getGoalConclusion(), tracedInferences_.get(root));
 		}
 

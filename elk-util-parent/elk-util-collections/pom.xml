@@ -15,6 +15,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>org.liveontologies</groupId>
+			<artifactId>puli</artifactId>
+			<version>${puli.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>

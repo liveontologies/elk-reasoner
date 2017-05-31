@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.liveontologies.puli.statistics.NestedStats;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.loading.AxiomLoader;
@@ -1077,8 +1078,9 @@ public abstract class AbstractReasonerState implements TracingProof {
 		return traceState_.getInferences(conclusion);
 	}
 
-	public TracingProof getTracingInferences() {
-		return traceState_;// TODO [trace single context] remove this
+	@NestedStats(name = "traceState")
+	public Object getStatsNestedInTraceSate() {
+		return traceState_.getStats();
 	}
 
 	@Deprecated

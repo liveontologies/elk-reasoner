@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
+ * TODO: replace this with a LinkedHashMap !!!
+ * 
  * Contains each element at most once. Each time an element is added, it is
  * first removed from this queue, if it is already in it, and then it is added
  * to the tail.

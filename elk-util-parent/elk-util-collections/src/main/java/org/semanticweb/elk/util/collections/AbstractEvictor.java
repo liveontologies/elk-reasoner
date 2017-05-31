@@ -1,6 +1,6 @@
 /*-
  * #%L
- * ELK Reasoner Core
+ * ELK Utilities Collections
  * $Id:$
  * $HeadURL:$
  * %%
@@ -19,26 +19,24 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.tracing.factories;
+package org.semanticweb.elk.util.collections;
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import java.util.Iterator;
 
-public interface TracingJobListener {
+import com.google.common.base.Predicates;
 
-	/**
-	 * called when tracing of the {@link ClassConclusion#getTraceRoot()}
-	 * finished producing the {@link ClassInference}s.
-	 * 
-	 * @param conclusion
-	 * @param inferences
-	 */
-	public void notifyJobFinished(ClassConclusion conclusion,
-			Iterable<? extends ClassInference> inferences);
+public abstract class AbstractEvictor<E> implements Evictor<E> {
 
-	/**
-	 * called when tracing of all contexts finished.
-	 */
-	public void notifyComputationFinished();
+	@Override
+	public Iterator<E> addAndEvict(final E element) {
+		return addAndEvict(element, Predicates.<E> alwaysFalse());
+	}
+
+	protected Object stats = null;
+
+	@Override
+	public Object getStats() {
+		return stats;
+	}
 
 }
