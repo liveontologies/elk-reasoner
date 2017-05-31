@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.elk.exceptions.ElkException;
+import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.ClassQueryLoader;
 import org.semanticweb.elk.loading.ComposedAxiomLoader;
@@ -82,6 +83,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 import org.semanticweb.elk.reasoner.tracing.Conclusion;
 import org.semanticweb.elk.reasoner.tracing.DummyConclusionVisitor;
 import org.semanticweb.elk.reasoner.tracing.TraceState;
+import org.semanticweb.elk.reasoner.tracing.TracingInference;
 import org.semanticweb.elk.reasoner.tracing.TracingProof;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentExecutor;
@@ -97,7 +99,7 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  * @author Peter Skocovsky
  */
-public abstract class AbstractReasonerState {
+public abstract class AbstractReasonerState implements TracingProof {
 
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
@@ -220,6 +222,27 @@ public abstract class AbstractReasonerState {
 
 	protected void complete(ReasonerStage stage) throws ElkException {
 		getStageExecutor().complete(stage);
+	}
+
+	/**
+	 * Completes the provided stage despite interruptions, if it was not
+	 * completed yet.
+	 * 
+	 * @param stage
+	 *            The stage that should be completed.
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
+	 */
+	protected void completeUninterruptibly(final ReasonerStage stage)
+			throws ElkException {
+		while (true) {
+			try {
+				complete(stage);
+				break;
+			} catch (final ElkInterruptedException e) {
+				continue;
+			}
+		}
 	}
 
 	public synchronized void setAllowIncrementalMode(boolean allow) {
@@ -505,6 +528,25 @@ public abstract class AbstractReasonerState {
 		}
 
 		return result;
+	}
+
+	/**
+	 * Compute the inferred taxonomy of the named classes for the given ontology
+	 * despite interruptions if it has not been computed yet.
+	 * 
+	 * @return the class taxonomy implied by the current ontology
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
+	 */
+	public synchronized Taxonomy<ElkClass> getTaxonomyQuietlyUninterruptibly()
+			throws ElkException {
+		while (true) {
+			try {
+				return getTaxonomyQuietly();
+			} catch (final ElkInterruptedException e) {
+				continue;
+			}
+		}
 	}
 
 	/**
@@ -1001,40 +1043,42 @@ public abstract class AbstractReasonerState {
 	 * TRACING METHODS
 	 *---------------------------------------------------*/
 
-	public TracingProof explainConclusions(
-			final Iterable<? extends Conclusion> conclusions)
-			throws ElkException {
-		for (final Conclusion conclusion : conclusions) {
-			conclusion.accept(new DummyConclusionVisitor<Void>() {
-				@Override
-				protected Void defaultVisit(final ClassConclusion conclusion) {
-					traceState_.toTrace(conclusion);
-					return null;
-				}
-			});
-		}
-		if (stageManager.inferenceTracingStage.isCompleted()) {
-			/*
-			 * The tracing stage should be invalidated only when it is not
-			 * completed, so that jobs that could be submitted during the
-			 * previous call are not lost when the stage is initialized with a
-			 * new computation.
-			 */
-			stageManager.inferenceTracingStage.invalidateRecursive();
-		}
-		getTaxonomyQuietly(); // ensure that classes are saturated
-		complete(stageManager.inferenceTracingStage);
-		return traceState_;
+	public TracingProof getProof() {
+		return this;
 	}
 
-	public TracingProof explainConclusion(final Conclusion conclusion)
-			throws ElkException {
-		LOGGER_.debug("{}: explaining", conclusion);
-		return explainConclusions(Collections.singleton(conclusion));
+	@Override
+	public Collection<? extends TracingInference> getInferences(
+			final Conclusion conclusion) {
+		try {
+			// Ensure that classes are saturated.
+			getTaxonomyQuietlyUninterruptibly();
+			final boolean isNotComputed = conclusion
+					.accept(new DummyConclusionVisitor<Boolean>() {
+						@Override
+						protected Boolean defaultVisit(
+								final Conclusion conclusion) {
+							return false;
+						}
+
+						@Override
+						protected Boolean defaultVisit(
+								final ClassConclusion conclusion) {
+							return traceState_.toTrace(conclusion);
+						}
+					});
+			if (isNotComputed) {
+				stageManager.inferenceTracingStage.invalidateRecursive();
+				completeUninterruptibly(stageManager.inferenceTracingStage);
+			}
+		} catch (final ElkException e) {
+			throw new ElkRuntimeException(e);
+		}
+		return traceState_.getInferences(conclusion);
 	}
 
 	public TracingProof getTracingInferences() {
-		return traceState_;
+		return traceState_;// TODO [trace single context] remove this
 	}
 
 	@Deprecated
@@ -1052,7 +1096,7 @@ public abstract class AbstractReasonerState {
 		return ce.accept(subPropertyConverter_);
 	}
 
-	TraceState getTraceState() {
+	TraceState getTraceState() {// TODO [trace single context] remove this
 		return traceState_;
 	}
 

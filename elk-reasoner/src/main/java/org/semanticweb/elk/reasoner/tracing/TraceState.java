@@ -23,12 +23,14 @@ package org.semanticweb.elk.reasoner.tracing;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentMap;
 
 import org.liveontologies.puli.Producer;
+import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.indexing.classes.ResolvingModifiableIndexedObjectFactory;
@@ -36,6 +38,7 @@ import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
@@ -49,6 +52,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainTautology;
 import org.semanticweb.elk.reasoner.stages.PropertyHierarchyCompositionState;
+import org.semanticweb.elk.reasoner.tracing.factories.ClassInferenceBlockingFilter;
+import org.semanticweb.elk.reasoner.tracing.factories.TracingJobListener;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +70,8 @@ import org.slf4j.LoggerFactory;
  * 
  *         TODO: filter out cyclic inferences
  */
-public class TraceState implements Producer<SaturationInference>, TracingProof {
+public class TraceState
+		implements Producer<ObjectPropertyInference>, TracingProof {
 
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
@@ -73,11 +79,9 @@ public class TraceState implements Producer<SaturationInference>, TracingProof {
 
 	private final Queue<ClassConclusion> toTrace_ = new ConcurrentLinkedQueue<ClassConclusion>();
 
-	private final Set<ClassConclusion> traced_ = new HashSet<ClassConclusion>();
+	private final ConcurrentMap<IndexedContextRoot, ModifiableTracingProof<ClassInference>> tracedContexts_ = new ConcurrentHashMap<IndexedContextRoot, ModifiableTracingProof<ClassInference>>();
 
 	private final Set<ElkAxiom> indexedAxioms_ = new ArrayHashSet<ElkAxiom>();
-
-	private final ModifiableTracingProof<ClassInference> classInferences_ = new SynchronizedModifiableTracingProof<ClassInference>();
 
 	private final ModifiableTracingProof<ObjectPropertyInference> objectPropertyInferences_ = new SynchronizedModifiableTracingProof<ObjectPropertyInference>();
 
@@ -134,20 +138,58 @@ public class TraceState implements Producer<SaturationInference>, TracingProof {
 				});
 	}
 
-	public synchronized void toTrace(ClassConclusion conclusion) {
-		if (traced_.add(conclusion)) {
-			LOGGER_.trace("{}: to trace", conclusion);
-			toTrace_.add(conclusion);
+	/**
+	 * @param conclusion
+	 * @return Whether the queue changed.
+	 */
+	public synchronized boolean toTrace(ClassConclusion conclusion) {
+		final IndexedContextRoot root = conclusion.getTraceRoot();
+		if (tracedContexts_.get(root) != null) {
+			return false;
 		}
+		// else
+		LOGGER_.trace("{}: to trace", conclusion);
+		toTrace_.add(conclusion);
+		return true;
 	}
 
 	public ClassConclusion pollToTrace() {
 		return toTrace_.poll();
 	}
 
+	private final TracingJobListener tracingListener_ = new TracingJobListener() {
+
+		@Override
+		public void notifyFinished(final ClassConclusion conclusion,
+				final Iterable<? extends ClassInference> output) {
+
+			final IndexedContextRoot root = conclusion.getTraceRoot();
+
+			ModifiableTracingProof<ClassInference> proof = tracedContexts_
+					.get(root);
+			if (proof == null) {
+				ModifiableTracingProof<ClassInference> newProof = new ModifiableTracingProofImpl<ClassInference>();
+				proof = tracedContexts_.putIfAbsent(root, newProof);
+				if (proof == null) {
+					proof = newProof;
+					final ClassInferenceBlockingFilter filter = new ClassInferenceBlockingFilter(
+							proof);
+					for (final ClassInference inference : output) {
+						filter.produce(inference);
+					}
+				}
+			}
+
+		}
+
+	};
+
+	public TracingJobListener getTracingListener() {
+		return tracingListener_;
+	}
+
 	private void clearClassInferences() {
-		classInferences_.clear();
-		traced_.clear();
+		tracedContexts_.clear();
 	}
 
 	private void clearObjectPropertyInferences() {
@@ -166,7 +208,7 @@ public class TraceState implements Producer<SaturationInference>, TracingProof {
 	}
 
 	@Override
-	public void produce(SaturationInference inference) {
+	public void produce(ObjectPropertyInference inference) {
 		inference.accept(inferenceProducer_);
 	}
 
@@ -190,7 +232,14 @@ public class TraceState implements Producer<SaturationInference>, TracingProof {
 		@Override
 		protected Collection<? extends ClassInference> defaultVisit(
 				ClassConclusion conclusion) {
-			return classInferences_.getInferences(conclusion);
+			final IndexedContextRoot root = conclusion.getTraceRoot();
+			final ModifiableTracingProof<ClassInference> proof = tracedContexts_
+					.get(root);
+			if (proof == null) {
+				throw new ElkRuntimeException("Context not traced: " + root);
+			}
+			// else
+			return proof.getInferences(conclusion);
 		}
 
 		@Override
@@ -238,12 +287,6 @@ public class TraceState implements Producer<SaturationInference>, TracingProof {
 	 * @author Yevgeny Kazakov
 	 */
 	private class InferenceProducer extends TracingInferenceDummyVisitor<Void> {
-
-		@Override
-		protected Void defaultVisit(ClassInference inference) {
-			classInferences_.produce(inference);
-			return null;
-		}
 
 		@Override
 		protected Void defaultVisit(ObjectPropertyInference inference) {

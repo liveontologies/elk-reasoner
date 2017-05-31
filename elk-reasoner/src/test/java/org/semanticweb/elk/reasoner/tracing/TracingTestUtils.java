@@ -21,7 +21,6 @@
  */
 package org.semanticweb.elk.reasoner.tracing;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -39,17 +38,14 @@ import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
 import org.semanticweb.elk.reasoner.entailments.model.HasReason;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.query.ElkQueryException;
 import org.semanticweb.elk.reasoner.query.EntailmentQueryResult;
 import org.semanticweb.elk.reasoner.query.ProperEntailmentQueryResult;
@@ -57,7 +53,6 @@ import org.semanticweb.elk.reasoner.query.UnsupportedIndexingEntailmentQueryResu
 import org.semanticweb.elk.reasoner.query.UnsupportedQueryTypeEntailmentQueryResult;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
@@ -192,9 +187,8 @@ public class TracingTestUtils {
 		if (conclusions.isEmpty()) {
 			fail(subClass + " ⊑ " + superClass + " not provable!");
 		}
-		reasoner.explainConclusions(conclusions);
+		final TracingProof proof = reasoner.getProof();
 		final AtomicInteger conclusionCount = new AtomicInteger(0);
-		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
 		TracingInference.Visitor<Boolean> counter = new DummyInferenceChecker() {
 
 			@Override
@@ -204,65 +198,11 @@ public class TracingTestUtils {
 			}
 		};
 
-		TestTraceUnwinder explorer = new TestTraceUnwinder(traceState,
+		TestTraceUnwinder explorer = new TestTraceUnwinder(proof,
 				UNTRACED_LISTENER);
 		for (final Conclusion conclusion : conclusions) {
 			explorer.accept(conclusion, counter);
 		}
-	}
-
-	public static void checkTracingCompleteness(ClassConclusion conclusion,
-			Reasoner reasoner) {
-		final AtomicInteger conclusionCount = new AtomicInteger(0);
-		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
-		TracingInference.Visitor<Boolean> counter = new DummyInferenceChecker() {
-
-			@Override
-			protected Boolean defaultVisit(TracingInference inference) {
-				conclusionCount.incrementAndGet();
-				return true;
-			}
-		};
-
-		TestTraceUnwinder explorer = new TestTraceUnwinder(traceState,
-				UNTRACED_LISTENER);
-
-		explorer.accept(conclusion, counter);
-	}
-
-	/*
-	 * checking that the number of inferences for the given class subsumption is
-	 * as expected
-	 */
-	public static void checkNumberOfInferences(ClassConclusion conclusion,
-			Reasoner reasoner, int expected) {
-		int actual = 0;
-		for (@SuppressWarnings("unused")
-		TracingInference ignore : ReasonerStateAccessor.getTraceState(reasoner)
-				.getInferences(conclusion)) {
-			actual++;
-		}
-		assertEquals(expected, actual);
-	}
-
-	/*
-	 * checking that the number of inferences for the given property subsumption
-	 * is as expected
-	 */
-	public static void checkNumberOfInferences(ElkObjectProperty sub,
-			ElkObjectProperty sup, Reasoner reasoner, int expected) {
-		final IndexedObjectProperty subsumee = ReasonerStateAccessor
-				.transform(reasoner, sub);
-		final IndexedObjectProperty subsumer = ReasonerStateAccessor
-				.transform(reasoner, sup);
-		ObjectPropertyConclusion conclusion = FACTORY_
-				.getSubPropertyChain(subsumee, subsumer);
-		int actual = 0;
-		for (TracingInference ignore : ReasonerStateAccessor
-				.getTraceState(reasoner).getInferences(conclusion)) {
-			actual++;
-		}
-		assertEquals(expected, actual);
 	}
 
 	/*
@@ -273,16 +213,17 @@ public class TracingTestUtils {
 	 */
 	public static void checkConditionOverUsedInferences(ElkClassExpression sub,
 			ElkClassExpression sup, Reasoner reasoner,
-			final TracingInference.Visitor<Boolean> inferenceVisitor) {
+			final TracingInference.Visitor<Boolean> inferenceVisitor)
+			throws ElkException {
 		final IndexedClassExpression subsumee = ReasonerStateAccessor
 				.transform(reasoner, sub);
 		SaturationConclusion conclusion = getConclusionToTrace(
 				ReasonerStateAccessor.getContext(reasoner, subsumee),
 				ReasonerStateAccessor.transform(reasoner, sup));
 		final MutableBoolean inferenceCondition = new MutableBoolean(false);
-		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
+		final TracingProof proof = reasoner.getProof();
 
-		new TestTraceUnwinder(traceState, UNTRACED_LISTENER).accept(conclusion,
+		new TestTraceUnwinder(proof, UNTRACED_LISTENER).accept(conclusion,
 				new DummyInferenceChecker() {
 
 					@Override
@@ -297,33 +238,6 @@ public class TracingTestUtils {
 
 		assertTrue("The condition didn't succeed on any used inference",
 				inferenceCondition.get());
-	}
-
-	/*
-	 */
-	public static Set<ElkAxiom> getSideConditions(ElkClassExpression sub,
-			ElkClassExpression sup, Reasoner reasoner) {
-		final Set<ElkAxiom> sideConditions = new HashSet<ElkAxiom>();
-		final IndexedClassExpression subsumee = ReasonerStateAccessor
-				.transform(reasoner, sub);
-		ClassConclusion conclusion = getConclusionToTrace(
-				ReasonerStateAccessor.getContext(reasoner, subsumee),
-				ReasonerStateAccessor.transform(reasoner, sup));
-		TracingInference.Visitor<?> sideConditionVisitor = new TracingInferencePremiseVisitor<Void>(
-				new DummyConclusionVisitor<Void>() {
-					@Override
-					protected Void defaultVisit(IndexedAxiom newConclusion) {
-						sideConditions.add(newConclusion.getOriginalAxiom());
-						return null;
-					}
-				}, new DummyElkAxiomVisitor<Void>());
-
-		for (TracingInference inference : ReasonerStateAccessor
-				.getTraceState(reasoner).getInferences(conclusion)) {
-			inference.accept(sideConditionVisitor);
-		}
-
-		return sideConditions;
 	}
 
 	public static String print(TracingProof inferences, Conclusion conclusion) {

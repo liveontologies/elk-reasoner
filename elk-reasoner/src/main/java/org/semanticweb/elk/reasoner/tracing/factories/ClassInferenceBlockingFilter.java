@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Yevgeny Kazakov
  */
-class ClassInferenceBlockingFilter implements Producer<ClassInference> {
+public class ClassInferenceBlockingFilter implements Producer<ClassInference> {
 
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ClassInferenceBlockingFilter.class);
@@ -75,7 +75,7 @@ class ClassInferenceBlockingFilter implements Producer<ClassInference> {
 	 */
 	private final Queue<ClassInference> unblocked_ = new LinkedList<ClassInference>();
 
-	ClassInferenceBlockingFilter(
+	public ClassInferenceBlockingFilter(
 			ModifiableTracingProof<ClassInference> output) {
 		this.output_ = output;
 	}

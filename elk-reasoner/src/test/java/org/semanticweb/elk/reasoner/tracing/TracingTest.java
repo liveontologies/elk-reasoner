@@ -127,7 +127,7 @@ public class TracingTest {
 							.getDerivedConclusionsForSubsumption(subsumee,
 									subsumer, reasoner)) {
 						TracingProof inferences = reasoner
-								.explainConclusion(conclusion);
+								.getProof();
 						TracingProofMetrics proofStats = TracingProofMetrics
 								.getStatistics(inferences, conclusion);
 						boolean provable = proofStats.isProvable();

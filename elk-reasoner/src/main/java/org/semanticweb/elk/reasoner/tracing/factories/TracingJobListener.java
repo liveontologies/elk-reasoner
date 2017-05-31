@@ -1,12 +1,10 @@
-package org.semanticweb.elk.reasoner.tracing.factories;
-
-/*
+/*-
  * #%L
- * ELK Reasoner
+ * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2017 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,18 +19,21 @@ package org.semanticweb.elk.reasoner.tracing.factories;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.tracing.factories;
 
-import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 
-class ContextTracingJobForProofUnwinding
-		extends ContextTracingJob<IndexedContextRoot> {
+public interface TracingJobListener {
 
-	final ClassConclusion tracedConclusion;
-
-	ContextTracingJobForProofUnwinding(ClassConclusion tracedConclusion) {
-		super(tracedConclusion.getTraceRoot());
-		this.tracedConclusion = tracedConclusion;
-	}
+	/**
+	 * called when tracing of the {@link ClassConclusion#getTraceRoot()}
+	 * finished producing the {@link ClassInference}s.
+	 * 
+	 * @param conclusion
+	 * @param inferences
+	 */
+	public void notifyFinished(ClassConclusion conclusion,
+			Iterable<? extends ClassInference> inferences);
 
 }

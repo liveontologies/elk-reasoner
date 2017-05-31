@@ -39,7 +39,6 @@ import org.liveontologies.puli.InferenceJustifier;
 import org.liveontologies.puli.Inferences;
 import org.liveontologies.puli.ModifiableProof;
 import org.liveontologies.puli.Proof;
-import org.liveontologies.puli.Proofs;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
@@ -58,7 +57,6 @@ import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.DummyConclusionVisitor;
 import org.semanticweb.elk.reasoner.tracing.TracingInference;
 import org.semanticweb.elk.reasoner.tracing.TracingInferencePremiseVisitor;
-import org.semanticweb.elk.reasoner.tracing.TracingProof;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 import com.google.common.base.Functions;
@@ -125,8 +123,6 @@ public class InternalProof implements Proof<Object>,
 	private void processEntailment(final Entailment goal,
 			final EntailmentProof evidence) throws ElkException {
 
-		final List<TracingProof> tracingProofs = new ArrayList<TracingProof>();
-
 		final Set<Entailment> entailmentDone = new ArrayHashSet<Entailment>();
 		final Queue<Entailment> entailmentToDo = new LinkedList<Entailment>();
 		final Set<Conclusion> tracingDone = new ArrayHashSet<Conclusion>();
@@ -151,7 +147,6 @@ public class InternalProof implements Proof<Object>,
 				if (reason != null) {
 					if (tracingDone.add(reason)) {
 						tracingToDo.add(reason);
-						tracingProofs.add(reasoner_.explainConclusion(reason));
 					}
 					newPremises.add(reason);
 				}
@@ -168,16 +163,8 @@ public class InternalProof implements Proof<Object>,
 			}
 		}
 
-		/*
-		 * TODO: Change tracing caching is finished.
-		 * 
-		 * This is to avoid completing tracing stage each time tracing
-		 * inferences are requested. After tracing caching is finished, tracing
-		 * stage will not be completed if the inferences are cached, so
-		 * reasoner_.explainConclusion() can be called on demand.
-		 */
-		final GenericProof<Conclusion, TracingInference> tracingProof = Proofs
-				.union(tracingProofs);
+		final GenericProof<Conclusion, TracingInference> tracingProof = reasoner_
+				.getProof();
 
 		Conclusion conclusion;
 		while ((conclusion = tracingToDo.poll()) != null) {

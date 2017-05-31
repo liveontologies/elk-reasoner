@@ -22,23 +22,20 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.exceptions.ElkException;
-import org.semanticweb.elk.reasoner.tracing.RecursiveTracingComputation;
-import org.semanticweb.elk.reasoner.tracing.TraceState;
+import org.semanticweb.elk.reasoner.tracing.TracingComputation;
 
 /**
- * Executes {@link RecursiveTracingComputation} to trace inferences queued in
- * {@link TraceState}
+ * Executes {@link TracingComputation} to trace inferences queued in
+ * {@link TracingState}
  * 
- * @author Pavel Klinov
- *
- *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
-public class InferenceTracingStage extends AbstractReasonerStage {
+public class TracingStage extends AbstractReasonerStage {
 
-	private RecursiveTracingComputation computation_ = null;
+	private TracingComputation computation_ = null;
 
-	public InferenceTracingStage(AbstractReasonerState reasoner,
-			AbstractReasonerStage... preStages) {
+	public TracingStage(final AbstractReasonerState reasoner,
+			final AbstractReasonerStage... preStages) {
 		super(reasoner, preStages);
 	}
 
@@ -49,8 +46,9 @@ public class InferenceTracingStage extends AbstractReasonerStage {
 
 	@Override
 	public void printInfo() {
-		if (computation_ != null)
+		if (computation_ != null) {
 			computation_.printStatistics();
+		}
 	}
 
 	@Override
@@ -58,9 +56,9 @@ public class InferenceTracingStage extends AbstractReasonerStage {
 		if (!super.preExecute()) {
 			return false;
 		}
-		computation_ = new RecursiveTracingComputation(reasoner.getInterrupter(),
-				reasoner.getProcessExecutor(), reasoner.getNumberOfWorkers(),
-				reasoner.saturationState, reasoner.getTraceState());
+		computation_ = new TracingComputation(reasoner.getTraceState(),
+				reasoner.getInterrupter(), reasoner.getProcessExecutor(),
+				reasoner.getNumberOfWorkers(), reasoner.saturationState);
 		return true;
 	}
 

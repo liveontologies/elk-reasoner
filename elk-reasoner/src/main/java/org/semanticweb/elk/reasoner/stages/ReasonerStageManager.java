@@ -106,7 +106,7 @@ public class ReasonerStageManager {
 
 		/* Tracing stages */
 
-		this.inferenceTracingStage = new InferenceTracingStage(reasoner);
+		this.inferenceTracingStage = new TracingStage(reasoner);
 
 		/* Query stages */
 
