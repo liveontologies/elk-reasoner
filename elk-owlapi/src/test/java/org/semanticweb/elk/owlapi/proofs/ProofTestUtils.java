@@ -65,6 +65,17 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
  */
 public class ProofTestUtils {
 
+	public static <C> void provabilityTest(final Proof<C> proof,
+			final C conclusion) {
+		assertTrue(String.format("Conclusion %s not derivable!", conclusion),
+				isDerivable(proof, conclusion));
+	}
+
+	public static <C> boolean isDerivable(final Proof<C> proof,
+			final C conclusion) {
+		return Proofs.isDerivable(proof, conclusion);
+	}
+
 	public static void provabilityTest(OWLProver prover, final OWLAxiom axiom) {
 		assertTrue(String.format("Entailment %s not derivable!", axiom),
 				isDerivable(prover.getProof(axiom), axiom,
@@ -152,19 +163,26 @@ public class ProofTestUtils {
 
 	public static void proofCompletenessTest(final OWLProver prover,
 			final OWLAxiom conclusion) {
-
 		final OWLOntology ontology = prover.getRootOntology();
-		final OWLOntologyManager manager = ontology.getOWLOntologyManager();
-
-		// compute repairs
 		final Proof<OWLAxiom> proof = Proofs.addAssertedInferences(
 				prover.getProof(conclusion),
 				ontology.getAxioms(Imports.INCLUDED));
 		final InferenceJustifier<OWLAxiom, ? extends Set<? extends OWLAxiom>> justifier = Proofs
 				.justifyAssertedInferences();
+		proofCompletenessTest(prover, conclusion, conclusion, proof, justifier);
+	}
+
+	public static <C> void proofCompletenessTest(final OWLProver prover,
+			final OWLAxiom entailment, final C conclusion, final Proof<C> proof,
+			final InferenceJustifier<C, ? extends Set<? extends OWLAxiom>> justifier) {
+
+		final OWLOntology ontology = prover.getRootOntology();
+		final OWLOntologyManager manager = ontology.getOWLOntologyManager();
+
+		// compute repairs
 
 		final Set<Set<? extends OWLAxiom>> repairs = new HashSet<Set<? extends OWLAxiom>>();
-		TopDownRepairComputation.<OWLAxiom, OWLAxiom> getFactory()
+		TopDownRepairComputation.<C, OWLAxiom> getFactory()
 				.create(proof, justifier, InterruptMonitor.DUMMY)
 				.newEnumerator(conclusion)
 				.enumerate(new MinimalSubsetCollector<OWLAxiom>(repairs));
@@ -180,7 +198,7 @@ public class ProofTestUtils {
 
 			manager.applyChanges(deletions);
 
-			final boolean conclusionDerived = prover.isEntailed(conclusion);
+			final boolean conclusionDerived = prover.isEntailed(entailment);
 
 			manager.applyChanges(additions);
 
