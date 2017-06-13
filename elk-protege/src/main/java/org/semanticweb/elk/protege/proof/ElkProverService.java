@@ -1,5 +1,7 @@
 package org.semanticweb.elk.protege.proof;
 
+import java.util.Set;
+
 /*-
  * #%L
  * ELK Reasoner Protege Plug-in
@@ -26,15 +28,45 @@ package org.semanticweb.elk.protege.proof;
  * Date: 27-02-2017
  */
 
-import org.liveontologies.owlapi.proof.OWLProver;
 import org.liveontologies.protege.explanation.justification.proof.service.ProverService;
+import org.liveontologies.puli.InferenceJustifier;
+import org.liveontologies.puli.Proof;
 import org.protege.editor.owl.OWLEditorKit;
-import org.semanticweb.elk.owlapi.ElkProver;
-import org.semanticweb.elk.owlapi.ElkProverFactory;
 import org.semanticweb.elk.owlapi.ElkReasoner;
+import org.semanticweb.elk.owlapi.ElkReasonerFactory;
+import org.semanticweb.elk.owlapi.proofs.TracingProofAdapter;
+import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 public class ElkProverService extends ProverService {
+
+	private TracingProofAdapter proofAdapter;
+
+	@Override
+	public Proof getProof(OWLEditorKit ek, OWLAxiom axiom) {
+		OWLReasoner owlReasoner = ek.getOWLModelManager()
+				.getOWLReasonerManager().getCurrentReasoner();
+		ElkReasoner elkReasoner = (owlReasoner instanceof ElkReasoner)
+				? (ElkReasoner) owlReasoner
+				: new ElkReasonerFactory().createReasoner(
+						ek.getModelManager().getActiveOntology());
+		Reasoner reasoner = elkReasoner.getInternalReasoner();
+
+		proofAdapter = new TracingProofAdapter(reasoner, axiom);
+
+		return proofAdapter;
+	}
+
+	@Override
+	public InferenceJustifier<TracingProofAdapter.ConclusionAdapter, Set<? extends OWLAxiom>> getJustifier() {
+		return proofAdapter;
+	}
+
+	@Override
+	public Object convertQuery(OWLAxiom entailment) {
+		return null;
+	}
 
 	@Override
 	public void initialise() throws Exception {
@@ -42,22 +74,6 @@ public class ElkProverService extends ProverService {
 
 	@Override
 	public void dispose() throws Exception {
-	}
-
-	@Override
-	public OWLProver getProver(OWLEditorKit ek) {
-		OWLProver proverElk = null;
-		OWLReasoner reasoner = ek.getOWLModelManager()
-				.getOWLReasonerManager().getCurrentReasoner();
-		if (reasoner instanceof ElkReasoner) {
-			proverElk = new ElkProver((ElkReasoner) reasoner);
-		}
-		else
-		{
-			ElkProverFactory factory = new ElkProverFactory();
-			proverElk = factory.createReasoner(ek.getModelManager().getActiveOntology());
-		}
-		return proverElk;
 	}
 
 	@Override
