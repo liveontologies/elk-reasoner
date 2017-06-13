@@ -27,7 +27,7 @@
     <class value="org.semanticweb.elk.protege.ui.ElkProofPreferencesPanel"/>
 </extension>
 
-<extension id="elk.prover" point="org.liveontologies.protege.explanation.justification.proof.ProverService">
+<extension id="elk.prover" point="org.liveontologies.protege.justification.proof.ProverService">
    <name value="ELK Prover Service"/>
    <class value="org.semanticweb.elk.protege.proof.ElkProverService"/>
 </extension>

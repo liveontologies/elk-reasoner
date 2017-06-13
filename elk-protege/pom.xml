@@ -85,7 +85,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.liveontologies</groupId>
-			<artifactId>protege-proof-justification-explanation</artifactId>
+			<artifactId>protege-proof-justification</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<optional>true</optional>
 		</dependency>

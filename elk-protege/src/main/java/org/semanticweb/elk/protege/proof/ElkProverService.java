@@ -1,7 +1,5 @@
 package org.semanticweb.elk.protege.proof;
 
-import java.util.Set;
-
 /*-
  * #%L
  * ELK Reasoner Protege Plug-in
@@ -24,11 +22,9 @@ import java.util.Set;
  * #L%
  */
 
-/** 
- * Date: 27-02-2017
- */
+import java.util.Set;
 
-import org.liveontologies.protege.explanation.justification.proof.service.ProverService;
+import org.liveontologies.protege.justification.proof.service.ProverService;
 import org.liveontologies.puli.InferenceJustifier;
 import org.liveontologies.puli.Proof;
 import org.protege.editor.owl.OWLEditorKit;
@@ -38,6 +34,10 @@ import org.semanticweb.elk.owlapi.proofs.TracingProofAdapter;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
+
+/**
+ * Date: 27-02-2017
+ */
 
 public class ElkProverService extends ProverService {
 
