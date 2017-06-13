@@ -65,7 +65,9 @@ public class ElkProverService extends ProverService {
 
 	@Override
 	public Object convertQuery(OWLAxiom entailment) {
-		return null;
+		if (proofAdapter == null)
+			return null;
+		return proofAdapter.getConvertedQuery();
 	}
 
 	@Override
