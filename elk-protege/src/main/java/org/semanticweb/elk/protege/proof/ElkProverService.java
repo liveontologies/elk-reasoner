@@ -39,12 +39,15 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
  * Date: 27-02-2017
  */
 
-public class ElkProverService extends ProverService {
+public class ElkProverService
+		extends ProverService<TracingProofAdapter.ConclusionAdapter> {
 
 	private TracingProofAdapter proofAdapter;
 
 	@Override
-	public Proof getProof(OWLEditorKit ek, OWLAxiom axiom) {
+	public Proof<TracingProofAdapter.ConclusionAdapter> getProof(
+			OWLAxiom axiom) {
+		OWLEditorKit ek = getEditorKit();
 		OWLReasoner owlReasoner = ek.getOWLModelManager()
 				.getOWLReasonerManager().getCurrentReasoner();
 		ElkReasoner elkReasoner = (owlReasoner instanceof ElkReasoner)
@@ -64,7 +67,8 @@ public class ElkProverService extends ProverService {
 	}
 
 	@Override
-	public Object convertQuery(OWLAxiom entailment) {
+	public TracingProofAdapter.ConclusionAdapter convertQuery(
+			OWLAxiom entailment) {
 		if (proofAdapter == null)
 			return null;
 		return proofAdapter.getConvertedQuery();
