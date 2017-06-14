@@ -22,6 +22,7 @@
 package org.semanticweb.elk.owlapi.proofs;
 
 import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -33,10 +34,12 @@ import java.util.Set;
 import org.liveontologies.puli.BaseInference;
 import org.liveontologies.puli.BaseProof;
 import org.liveontologies.puli.Delegator;
+import org.liveontologies.puli.GenericProof;
 import org.liveontologies.puli.Inference;
 import org.liveontologies.puli.InferenceJustifier;
 import org.liveontologies.puli.ModifiableProof;
 import org.liveontologies.puli.Proof;
+import org.liveontologies.puli.Proofs;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
@@ -57,6 +60,7 @@ import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.tracing.DummyConclusionVisitor;
 import org.semanticweb.elk.reasoner.tracing.TracingInference;
 import org.semanticweb.elk.reasoner.tracing.TracingInferencePremiseVisitor;
+import org.semanticweb.elk.reasoner.tracing.TracingProof;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -78,6 +82,7 @@ public class TracingProofAdapter
 	private final ElkConverter elkConverter_ = ElkConverter.getInstance();
 
 	private final Reasoner reasoner_;
+	private GenericProof<Conclusion, TracingInference> tracingProof_;
 	private final ConclusionAdapter convertedQuery_;
 	private final ModifiableProof<ConclusionAdapter, Inference<ConclusionAdapter>> entailmentProof_ = new BaseProof<ConclusionAdapter, Inference<ConclusionAdapter>>();
 
@@ -136,6 +141,8 @@ public class TracingProofAdapter
 	private void convertEntailmentInferences(final Entailment goal,
 			final EntailmentProof evidence) {
 
+		final List<TracingProof> tracingProofs = new ArrayList<TracingProof>();
+
 		final Set<Entailment> done = new ArrayHashSet<Entailment>();
 		final Queue<Entailment> toDo = new LinkedList<Entailment>();
 
@@ -149,6 +156,14 @@ public class TracingProofAdapter
 					.getInferences(entailment)) {
 
 				entailmentProof_.produce(wrapEntailmentInference(inf));
+				final Conclusion reason = getReason(inf);
+				if (reason != null) {
+					try {
+						tracingProofs.add(reasoner_.explainConclusion(reason));
+					} catch (final ElkException e) {
+						throw new ElkRuntimeException(e);
+					}
+				}
 
 				for (final Entailment premise : inf.getPremises()) {
 					if (done.add(premise)) {
@@ -158,6 +173,16 @@ public class TracingProofAdapter
 
 			}
 		}
+
+		/*
+		 * TODO: Remove after tracing caching is finished.
+		 * 
+		 * This is to avoid completing tracing stage each time tracing
+		 * inferences are requested. After tracing caching is finished, tracing
+		 * stage will not be completed if the inferences are cached, so
+		 * reasoner_.explainConclusion() can be called on demand.
+		 */
+		this.tracingProof_ = Proofs.combine(tracingProofs);
 
 	}
 
@@ -257,14 +282,7 @@ public class TracingProofAdapter
 	private Inference<ConclusionAdapter> wrapEntailmentInference(
 			final EntailmentInference inf) {
 		final List<? extends Entailment> premises = inf.getPremises();
-		Conclusion re = null;
-		if (inf instanceof HasReason) {
-			final Object r = ((HasReason<?>) inf).getReason();
-			if (r instanceof Conclusion) {
-				re = (Conclusion) r;
-			}
-		}
-		final Conclusion reason = re;
+		final Conclusion reason = getReason(inf);
 		return new BaseInference<ConclusionAdapter>(inf.getName(),
 				new EntailmentConclusion(inf.getConclusion()),
 				new AbstractList<ConclusionAdapter>() {
@@ -285,6 +303,18 @@ public class TracingProofAdapter
 				});
 	}
 
+	private Conclusion getReason(
+			final EntailmentInference entailmentInference) {
+		Conclusion reason = null;
+		if (entailmentInference instanceof HasReason) {
+			final Object r = ((HasReason<?>) entailmentInference).getReason();
+			if (r instanceof Conclusion) {
+				reason = (Conclusion) r;
+			}
+		}
+		return reason;
+	}
+
 	@Override
 	public Collection<? extends Inference<ConclusionAdapter>> getInferences(
 			final ConclusionAdapter conclusion) {
@@ -302,15 +332,10 @@ public class TracingProofAdapter
 		@Override
 		public Collection<? extends Inference<ConclusionAdapter>> visit(
 				final InternalConclusion internalConclusion) {
-			try {
-				final Conclusion conclusion = internalConclusion.getDelegate();
-				final Collection<? extends TracingInference> infs = reasoner_
-						.explainConclusion(conclusion)
-						.getInferences(internalConclusion.getDelegate());
-				return Operations.map(infs, transformInternalInference_);
-			} catch (final ElkException e) {
-				throw new ElkRuntimeException(e);
-			}
+			final Conclusion conclusion = internalConclusion.getDelegate();
+			final Collection<? extends TracingInference> infs = tracingProof_
+					.getInferences(conclusion);
+			return Operations.map(infs, transformInternalInference_);
 		}
 
 		@Override
