@@ -22,15 +22,13 @@ package org.semanticweb.elk.protege.proof;
  * #L%
  */
 
-import java.util.Set;
-
+import org.liveontologies.protege.justification.proof.service.JustificationCompleteProof;
 import org.liveontologies.protege.justification.proof.service.ProverService;
-import org.liveontologies.puli.InferenceJustifier;
-import org.liveontologies.puli.Proof;
 import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
 import org.semanticweb.elk.owlapi.proofs.TracingProofAdapter;
+import org.semanticweb.elk.owlapi.proofs.TracingProofAdapter.ConclusionAdapter;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -42,11 +40,9 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 public class ElkProverService
 		extends ProverService<TracingProofAdapter.ConclusionAdapter> {
 
-	private TracingProofAdapter proofAdapter;
-
 	@Override
-	public Proof<TracingProofAdapter.ConclusionAdapter> getProof(
-			OWLAxiom axiom) {
+	public JustificationCompleteProof<ConclusionAdapter> getJustificationCompleteProof(
+			OWLAxiom entailment) {
 		OWLEditorKit ek = getEditorKit();
 		OWLReasoner owlReasoner = ek.getOWLModelManager()
 				.getOWLReasonerManager().getCurrentReasoner();
@@ -56,22 +52,7 @@ public class ElkProverService
 						ek.getModelManager().getActiveOntology());
 		Reasoner reasoner = elkReasoner.getInternalReasoner();
 
-		proofAdapter = new TracingProofAdapter(reasoner, axiom);
-
-		return proofAdapter;
-	}
-
-	@Override
-	public InferenceJustifier<TracingProofAdapter.ConclusionAdapter, Set<? extends OWLAxiom>> getJustifier() {
-		return proofAdapter;
-	}
-
-	@Override
-	public TracingProofAdapter.ConclusionAdapter convertQuery(
-			OWLAxiom entailment) {
-		if (proofAdapter == null)
-			return null;
-		return proofAdapter.getConvertedQuery();
+		return new JustificationCompleteTracingProofAdapter(reasoner, entailment);
 	}
 
 	@Override
