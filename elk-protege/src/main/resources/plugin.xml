@@ -28,8 +28,13 @@
 </extension>
 
 <extension id="elk.prover" point="org.liveontologies.protege.justification.proof.ProverService">
-   <name value="ELK Prover Service"/>
-   <class value="org.semanticweb.elk.protege.proof.ElkProverService"/>
+   <name value="ELK OWL Proof Service"/>
+   <class value="org.semanticweb.elk.protege.proof.ElkOwlJustificationProofService"/>
+</extension>
+
+<extension id="elk.prover" point="org.liveontologies.protege.justification.proof.ProverService">
+   <name value="ELK Internal Proof Service"/>
+   <class value="org.semanticweb.elk.protege.proof.ElkInternalJustificationProofService"/>
 </extension>
 
 </plugin>

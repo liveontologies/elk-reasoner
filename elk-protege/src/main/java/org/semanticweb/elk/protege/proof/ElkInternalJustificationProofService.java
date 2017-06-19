@@ -23,7 +23,7 @@ package org.semanticweb.elk.protege.proof;
  */
 
 import org.liveontologies.protege.justification.proof.service.JustificationCompleteProof;
-import org.liveontologies.protege.justification.proof.service.ProverService;
+import org.liveontologies.protege.justification.proof.service.JustificationProofService;
 import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
@@ -34,22 +34,23 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 /**
  * Date: 27-02-2017
  */
-
-public class ElkProverService extends ProverService {
+public class ElkInternalJustificationProofService
+		extends JustificationProofService {
 
 	@Override
 	public JustificationCompleteProof<?> getJustificationCompleteProof(
 			OWLAxiom entailment) {
-		OWLEditorKit ek = getEditorKit();
-		OWLReasoner owlReasoner = ek.getOWLModelManager()
+		OWLEditorKit kit = getEditorKit();
+		OWLReasoner owlReasoner = kit.getOWLModelManager()
 				.getOWLReasonerManager().getCurrentReasoner();
 		ElkReasoner elkReasoner = (owlReasoner instanceof ElkReasoner)
 				? (ElkReasoner) owlReasoner
 				: new ElkReasonerFactory().createReasoner(
-						ek.getModelManager().getActiveOntology());
+						kit.getModelManager().getActiveOntology());
 		Reasoner reasoner = elkReasoner.getInternalReasoner();
 
-		return new JustificationCompleteTracingProofAdapter(reasoner, entailment);
+		return new JustificationCompleteTracingProofAdapter(reasoner,
+				entailment);
 	}
 
 	@Override
@@ -62,6 +63,6 @@ public class ElkProverService extends ProverService {
 
 	@Override
 	public String getName() {
-		return "Elk";
+		return "ELK Internal Proof";
 	}
 }
