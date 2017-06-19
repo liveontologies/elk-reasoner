@@ -27,8 +27,6 @@ import org.liveontologies.protege.justification.proof.service.ProverService;
 import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
-import org.semanticweb.elk.owlapi.proofs.TracingProofAdapter;
-import org.semanticweb.elk.owlapi.proofs.TracingProofAdapter.ConclusionAdapter;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -37,11 +35,10 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
  * Date: 27-02-2017
  */
 
-public class ElkProverService
-		extends ProverService<TracingProofAdapter.ConclusionAdapter> {
+public class ElkProverService extends ProverService {
 
 	@Override
-	public JustificationCompleteProof<ConclusionAdapter> getJustificationCompleteProof(
+	public JustificationCompleteProof<?> getJustificationCompleteProof(
 			OWLAxiom entailment) {
 		OWLEditorKit ek = getEditorKit();
 		OWLReasoner owlReasoner = ek.getOWLModelManager()
