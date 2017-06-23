@@ -23,46 +23,29 @@ package org.semanticweb.elk.protege.proof;
  */
 
 import org.liveontologies.protege.justification.proof.service.JustificationCompleteProof;
-import org.liveontologies.protege.justification.proof.service.JustificationProofService;
-import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.elk.owlapi.ElkReasoner;
-import org.semanticweb.elk.owlapi.ElkReasonerFactory;
-import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 /**
  * Date: 27-02-2017
  */
 public class ElkInternalJustificationProofService
-		extends JustificationProofService {
+		extends ElkJustificationProofService {
 
 	@Override
-	public JustificationCompleteProof<?> getJustificationCompleteProof(
-			OWLAxiom entailment) {
-		OWLEditorKit kit = getEditorKit();
-		OWLReasoner owlReasoner = kit.getOWLModelManager()
-				.getOWLReasonerManager().getCurrentReasoner();
-		ElkReasoner elkReasoner = (owlReasoner instanceof ElkReasoner)
-				? (ElkReasoner) owlReasoner
-				: new ElkReasonerFactory().createReasoner(
-						kit.getModelManager().getActiveOntology());
-		Reasoner reasoner = elkReasoner.getInternalReasoner();
-
-		return new JustificationCompleteTracingProofAdapter(reasoner,
-				entailment);
-	}
-
-	@Override
-	public void initialise() throws Exception {
-	}
-
-	@Override
-	public void dispose() throws Exception {
+	public JustificationCompleteProof<?> computeProof(OWLAxiom entailment) {
+		ElkReasoner elkReasoner = getCurrentElkReasoner();
+		if (elkReasoner == null) {
+			return null;
+		}
+		// else
+		return new JustificationCompleteTracingProofAdapter(
+				elkReasoner.getInternalReasoner(), entailment);
 	}
 
 	@Override
 	public String getName() {
 		return "ELK Internal Proof";
 	}
+
 }
