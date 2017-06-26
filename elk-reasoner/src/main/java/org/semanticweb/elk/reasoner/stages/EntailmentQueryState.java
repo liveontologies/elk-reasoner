@@ -35,7 +35,7 @@ import org.semanticweb.elk.loading.EntailmentQueryLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyCheckingState;
-import org.semanticweb.elk.reasoner.entailments.CombinedEntailmentProof;
+import org.semanticweb.elk.reasoner.entailments.EntailmentProofUnion;
 import org.semanticweb.elk.reasoner.entailments.InconsistencyProofWrapper;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
@@ -160,7 +160,7 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 			final EntailmentProof entailmentEvidence = indexed
 					.getEvidence(onlyOne, saturationState_, conclusionFactory_);
 
-			return new CombinedEntailmentProof(inconsistencyEvidence,
+			return new EntailmentProofUnion(inconsistencyEvidence,
 					entailmentEvidence);
 		}
 

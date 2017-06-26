@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.semanticweb.elk.reasoner.entailments.CombinedEntailmentProof;
+import org.semanticweb.elk.reasoner.entailments.EntailmentProofUnion;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
@@ -116,7 +116,7 @@ public abstract class AbstractEntailmentQueryWithPremises<E extends Entailment, 
 
 		});
 
-		return new CombinedEntailmentProof(proofs);
+		return new EntailmentProofUnion(proofs);
 	}
 
 	/**

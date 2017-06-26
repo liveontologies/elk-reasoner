@@ -23,21 +23,21 @@ package org.semanticweb.elk.reasoner.entailments;
 
 import java.util.Arrays;
 
-import org.liveontologies.puli.CombinedProof;
+import org.liveontologies.puli.ProofUnion;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
 
-public class CombinedEntailmentProof
-		extends CombinedProof<Entailment, EntailmentInference>
+public class EntailmentProofUnion
+		extends ProofUnion<Entailment, EntailmentInference>
 		implements EntailmentProof {
 
-	public CombinedEntailmentProof(
+	public EntailmentProofUnion(
 			final Iterable<? extends EntailmentProof> proofs) {
 		super(proofs);
 	}
 
-	public CombinedEntailmentProof(final EntailmentProof... proofs) {
+	public EntailmentProofUnion(final EntailmentProof... proofs) {
 		this(Arrays.asList(proofs));
 	}
 

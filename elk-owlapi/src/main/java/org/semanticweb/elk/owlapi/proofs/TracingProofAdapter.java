@@ -182,7 +182,7 @@ public class TracingProofAdapter
 		 * stage will not be completed if the inferences are cached, so
 		 * reasoner_.explainConclusion() can be called on demand.
 		 */
-		this.tracingProof_ = Proofs.combine(tracingProofs);
+		this.tracingProof_ = Proofs.union(tracingProofs);
 
 	}
 
