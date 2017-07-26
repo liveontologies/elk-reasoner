@@ -22,6 +22,7 @@
 package org.semanticweb.elk.protege.proof;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 import org.liveontologies.protege.justification.proof.service.JustificationCompleteProof;
@@ -34,35 +35,62 @@ import org.semanticweb.elk.owlapi.ElkProver;
 import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
+import com.google.common.base.Function;
+
 public class ElkOwlJustificationProofService
 		extends ElkJustificationProofService {
 
 	@Override
-	public JustificationCompleteProof<?> computeProof(OWLAxiom entailment) {
+	public JustificationCompleteProof computeProof(OWLAxiom entailment) {
 		ElkReasoner elkReasoner = getCurrentElkReasoner();
 		if (elkReasoner == null) {
 			return null;
 		}
 		// else
 		ElkProver elkProver = new ElkProver(elkReasoner);
-		final Proof<OWLAxiom> proof = Proofs.addAssertedInferences(
+		final Proof<OWLAxiom> OwlProof = Proofs.addAssertedInferences(
 				elkProver.getProof(entailment), getEditorKit()
 						.getOWLModelManager().getActiveOntology().getAxioms());
-		final InferenceJustifier<OWLAxiom, ? extends Set<? extends OWLAxiom>> justifier = InferenceJustifiers
-				.justifyAssertedInferences();
-		return new JustificationCompleteProof<OWLAxiom>() {
+		final Proof<Object> proof = Proofs.transform(OwlProof,
+				new Function<OWLAxiom, Object>() {
+					@Override
+					public Object apply(final OWLAxiom input) {
+						return input;
+					}
+				}, new Function<Object, OWLAxiom>() {
+					@Override
+					public OWLAxiom apply(final Object input) {
+						// This is safe, because only OWLAxioms will be queried.
+						return (OWLAxiom) input;
+					}
+				});
+		InferenceJustifier<Object, ? extends Set<? extends OWLAxiom>> justifier = InferenceJustifiers
+				.transform(InferenceJustifiers.justifyAssertedInferences(),
+						new Function<Object, OWLAxiom>() {
+							@Override
+							public OWLAxiom apply(Object input) {
+								/*
+								 * This is safe, because the inferences are
+								 * justified only by OWLAxioms.
+								 */
+								return (OWLAxiom) input;
+							}
+						});
+		return new JustificationCompleteProof() {
 
 			@Override
-			public Collection<? extends Inference<OWLAxiom>> getInferences(
-					OWLAxiom conclusion) {
-				Collection<? extends Inference<OWLAxiom>> result = proof
-						.getInferences(conclusion);
-				return result;
+			public Collection<? extends Inference<Object>> getInferences(
+					Object conclusion) {
+				if (!(conclusion instanceof OWLAxiom)) {
+					return Collections.emptyList();
+				}
+				// else
+				return proof.getInferences((OWLAxiom) conclusion);
 			}
 
 			@Override
 			public Set<? extends OWLAxiom> getJustification(
-					Inference<OWLAxiom> inference) {
+					Inference<Object> inference) {
 				return justifier.getJustification(inference);
 			}
 

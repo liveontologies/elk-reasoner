@@ -1,5 +1,3 @@
-package org.semanticweb.elk.protege.proof;
-
 /*-
  * #%L
  * ELK Reasoner Protege Plug-in
@@ -21,25 +19,23 @@ package org.semanticweb.elk.protege.proof;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.protege.proof;
 
 import org.liveontologies.protege.justification.proof.service.JustificationCompleteProof;
 import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
-/**
- * Date: 27-02-2017
- */
 public class ElkInternalJustificationProofService
 		extends ElkJustificationProofService {
 
 	@Override
-	public JustificationCompleteProof<?> computeProof(OWLAxiom entailment) {
+	public JustificationCompleteProof computeProof(OWLAxiom entailment) {
 		ElkReasoner elkReasoner = getCurrentElkReasoner();
 		if (elkReasoner == null) {
 			return null;
 		}
 		// else
-		return new JustificationCompleteTracingProofAdapter(
+		return new JustificationCompleteInternalProof(
 				elkReasoner.getInternalReasoner(), entailment);
 	}
 

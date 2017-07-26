@@ -48,7 +48,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 @RunWith(PolySuite.class)
-public class TracingProofAdapterTest {
+public class OwlInternalProofTest {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
@@ -65,9 +65,9 @@ public class TracingProofAdapterTest {
 
 	private ElkProver prover_ = null;
 	private OWLAxiom query_ = null;
-	private TracingProofAdapter adapter_ = null;
+	private OwlInternalProof adapter_ = null;
 
-	public TracingProofAdapterTest(
+	public OwlInternalProofTest(
 			final QueryTestManifest<OWLAxiom, Boolean> manifest) {
 		this.manifest_ = manifest;
 	}
@@ -85,19 +85,19 @@ public class TracingProofAdapterTest {
 
 		this.query_ = manifest_.getInput().getQuery();
 
-		this.adapter_ = new TracingProofAdapter(
+		this.adapter_ = new OwlInternalProof(
 				prover_.getDelegate().getInternalReasoner(), query_);
 	}
 
 	@Test
 	public void testProvability() throws Exception {
-		ProofTestUtils.provabilityTest(adapter_, adapter_.getConvertedQuery());
+		ProofTestUtils.provabilityTest(adapter_, adapter_.getGoal());
 	}
 
 	@Test
 	public void testProofCompleteness() throws Exception {
 		ProofTestUtils.proofCompletenessTest(prover_, query_,
-				adapter_.getConvertedQuery(), adapter_, adapter_);
+				adapter_.getGoal(), adapter_, adapter_);
 	}
 
 	@Config
