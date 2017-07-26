@@ -55,10 +55,14 @@ public class OwlInternalProofTest {
 			ElkTestUtils.TEST_INPUT_LOCATION + "/query/entailment/AssertionRanges.owl",// Ranges not supported with assertions
 			ElkTestUtils.TEST_INPUT_LOCATION + "/query/entailment/HasValueRanges.owl",// Ranges not supported with ObjectHasValue
 		};
+	static final String[] IGNORE_COMPLETENESS_LIST = {
+			ElkTestUtils.TEST_INPUT_LOCATION + "/query/entailment/EmptyOntology.owl",// All entailments are tautologies.
+		};
 	// @formatter:on
 
 	static {
 		Arrays.sort(IGNORE_LIST);
+		Arrays.sort(IGNORE_COMPLETENESS_LIST);
 	}
 
 	private final QueryTestManifest<OWLAxiom, Boolean> manifest_;
@@ -96,8 +100,10 @@ public class OwlInternalProofTest {
 
 	@Test
 	public void testProofCompleteness() throws Exception {
+		Assume.assumeFalse(TestUtils.ignore(manifest_.getInput(),
+				ElkTestUtils.TEST_INPUT_LOCATION, IGNORE_COMPLETENESS_LIST));
 		ProofTestUtils.proofCompletenessTest(prover_, query_,
-				adapter_.getGoal(), adapter_, adapter_);
+				adapter_.getGoal(), adapter_, adapter_, true);
 	}
 
 	@Config

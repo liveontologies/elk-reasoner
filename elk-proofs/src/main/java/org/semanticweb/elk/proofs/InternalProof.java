@@ -141,14 +141,23 @@ public class InternalProof implements Proof<Object>,
 			for (final EntailmentInference inf : evidence
 					.getInferences(entailment)) {
 
-				proof_.produce(Inferences.transform(inf, Functions.identity()));
 				final Conclusion reason = getReason(inf);
+
+				final List<? extends Entailment> premises = inf.getPremises();
+				final List<Object> newPremises = new ArrayList<Object>(
+						premises.size() + (reason == null ? 0 : 1));
+				newPremises.addAll(premises);
+
 				if (reason != null) {
 					if (tracingDone.add(reason)) {
 						tracingToDo.add(reason);
 						tracingProofs.add(reasoner_.explainConclusion(reason));
 					}
+					newPremises.add(reason);
 				}
+
+				proof_.produce(Inferences.create(inf.getName(),
+						inf.getConclusion(), newPremises));
 
 				for (final Entailment premise : inf.getPremises()) {
 					if (entailmentDone.add(premise)) {

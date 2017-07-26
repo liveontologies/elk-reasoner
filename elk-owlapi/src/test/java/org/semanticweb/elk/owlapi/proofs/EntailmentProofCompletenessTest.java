@@ -47,6 +47,7 @@ public class EntailmentProofCompletenessTest extends
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
+			ElkTestUtils.TEST_INPUT_LOCATION + "/query/entailment/EmptyOntology.owl",// All entailments are tautologies.
 		};
 	// @formatter:on
 
@@ -89,7 +90,7 @@ public class EntailmentProofCompletenessTest extends
 		final ElkProver prover = getDelegate().getProver();
 
 		ProofTestUtils.proofCompletenessTest(prover,
-				getManifest().getInput().getQuery());
+				getManifest().getInput().getQuery(), true);
 
 	}
 

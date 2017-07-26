@@ -33,11 +33,12 @@ import java.util.Set;
 
 import org.liveontologies.owlapi.proof.OWLProver;
 import org.liveontologies.puli.InferenceJustifier;
+import org.liveontologies.puli.InferenceJustifiers;
 import org.liveontologies.puli.Proof;
 import org.liveontologies.puli.Proofs;
 import org.liveontologies.puli.pinpointing.InterruptMonitor;
 import org.liveontologies.puli.pinpointing.MinimalSubsetCollector;
-import org.liveontologies.puli.pinpointing.TopDownRepairComputation;
+import org.liveontologies.puli.pinpointing.MinimalSubsetEnumerators;
 import org.semanticweb.elk.owl.inferences.TestUtils;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -163,18 +164,32 @@ public class ProofTestUtils {
 
 	public static void proofCompletenessTest(final OWLProver prover,
 			final OWLAxiom conclusion) {
+		proofCompletenessTest(prover, conclusion, false);
+	}
+
+	public static void proofCompletenessTest(final OWLProver prover,
+			final OWLAxiom conclusion, final boolean mustNotBeATautology) {
 		final OWLOntology ontology = prover.getRootOntology();
 		final Proof<OWLAxiom> proof = Proofs.addAssertedInferences(
 				prover.getProof(conclusion),
 				ontology.getAxioms(Imports.INCLUDED));
-		final InferenceJustifier<OWLAxiom, ? extends Set<? extends OWLAxiom>> justifier = Proofs
+		final InferenceJustifier<OWLAxiom, ? extends Set<? extends OWLAxiom>> justifier = InferenceJustifiers
 				.justifyAssertedInferences();
-		proofCompletenessTest(prover, conclusion, conclusion, proof, justifier);
+		proofCompletenessTest(prover, conclusion, conclusion, proof, justifier,
+				mustNotBeATautology);
 	}
 
 	public static <C> void proofCompletenessTest(final OWLProver prover,
 			final OWLAxiom entailment, final C conclusion, final Proof<C> proof,
 			final InferenceJustifier<C, ? extends Set<? extends OWLAxiom>> justifier) {
+		proofCompletenessTest(prover, entailment, conclusion, proof, justifier,
+				false);
+	}
+
+	public static <C> void proofCompletenessTest(final OWLProver prover,
+			final OWLAxiom entailment, final C conclusion, final Proof<C> proof,
+			final InferenceJustifier<C, ? extends Set<? extends OWLAxiom>> justifier,
+			final boolean mustNotBeATautology) {
 
 		final OWLOntology ontology = prover.getRootOntology();
 		final OWLOntologyManager manager = ontology.getOWLOntologyManager();
@@ -182,10 +197,14 @@ public class ProofTestUtils {
 		// compute repairs
 
 		final Set<Set<? extends OWLAxiom>> repairs = new HashSet<Set<? extends OWLAxiom>>();
-		TopDownRepairComputation.<C, OWLAxiom> getFactory()
-				.create(proof, justifier, InterruptMonitor.DUMMY)
-				.newEnumerator(conclusion)
-				.enumerate(new MinimalSubsetCollector<OWLAxiom>(repairs));
+		MinimalSubsetEnumerators.enumerateRepairs(conclusion, proof, justifier,
+				InterruptMonitor.DUMMY,
+				new MinimalSubsetCollector<OWLAxiom>(repairs));
+
+		if (mustNotBeATautology) {
+			assertFalse("Entailment is a tautology; there are no repairs!",
+					repairs.isEmpty());
+		}
 
 		for (final Set<? extends OWLAxiom> repair : repairs) {
 
