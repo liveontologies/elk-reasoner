@@ -392,8 +392,8 @@
 	</build>
 
 	<profiles>
-		<!-- these actions will be activated only when staging a release -->
 		<profile>
+			<!-- activated only when staging a release -->
 			<id>release</id>
 			<build>
 				<plugins>
@@ -431,6 +431,13 @@
 					</plugin>
 				</plugins>
 			</build>
+		</profile>
+		<profile>
+			<!-- use OWL API v 5.x -->
+			<id>owlapi5</id>
+			<properties>
+				<owlapi.version>5.1.1</owlapi.version>
+			</properties>
 		</profile>
 	</profiles>
 
