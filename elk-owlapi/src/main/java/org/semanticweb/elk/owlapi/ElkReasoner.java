@@ -1136,8 +1136,7 @@ public class ElkReasoner implements OWLReasoner {
 	protected class OntologyChangeListener
 			implements OWLOntologyChangeListener {
 		@Override
-		public void ontologiesChanged(List<? extends OWLOntologyChange> changes)
-				throws OWLException {
+		public void ontologiesChanged(List<? extends OWLOntologyChange> changes) {
 			Set<OWLOntology> importClosure = null;
 			for (OWLOntologyChange change : changes) {
 				OWLOntology changedOntology = change.getOntology();
