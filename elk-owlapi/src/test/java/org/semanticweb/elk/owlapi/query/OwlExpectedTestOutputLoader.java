@@ -59,7 +59,6 @@ import org.semanticweb.owlapi.reasoner.impl.OWLClassNode;
 import org.semanticweb.owlapi.reasoner.impl.OWLClassNodeSet;
 import org.semanticweb.owlapi.reasoner.impl.OWLNamedIndividualNode;
 import org.semanticweb.owlapi.reasoner.impl.OWLNamedIndividualNodeSet;
-import org.semanticweb.owlapi.util.OWLAxiomVisitorAdapter;
 
 /**
  * @author Peter Skocovsky
@@ -104,7 +103,7 @@ public class OwlExpectedTestOutputLoader {
 			final Multimap<OWLClassExpression, OWLNamedIndividual> instances = new HashSetMultimap<OWLClassExpression, OWLNamedIndividual>();
 
 			for (final OWLAxiom axiom : expectedOnt.getAxioms()) {
-				axiom.accept(new OWLAxiomVisitorAdapter() {
+				axiom.accept(new FailingOwlAxiomVisitor() {
 
 					@Override
 					public void visit(final OWLEquivalentClassesAxiom axiom) {
