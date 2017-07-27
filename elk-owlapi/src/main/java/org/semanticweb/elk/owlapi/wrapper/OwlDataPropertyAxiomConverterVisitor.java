@@ -32,14 +32,12 @@ import org.semanticweb.owlapi.model.OWLSubDataPropertyOfAxiom;
 
 /**
  * An implementation of the visitor pattern for OWL axioms to convert OWL data
- * property axioms to the corresponding ELK data property axioms. Conversion of
- * unsupported axioms throws an {@link IllegalArgumentException}.
+ * property axioms to the corresponding ELK data property axioms.
  * 
  * @author "Yevgeny Kazakov"
- * 
  */
-public class OwlDataPropertyAxiomConverterVisitor extends
-		AbstractOwlAxiomConverterVisitor<ElkDataPropertyAxiom> {
+public class OwlDataPropertyAxiomConverterVisitor
+		extends AbstractOwlAxiomConverterVisitor<ElkDataPropertyAxiom> {
 
 	private static OwlDataPropertyAxiomConverterVisitor INSTANCE_ = new OwlDataPropertyAxiomConverterVisitor();
 

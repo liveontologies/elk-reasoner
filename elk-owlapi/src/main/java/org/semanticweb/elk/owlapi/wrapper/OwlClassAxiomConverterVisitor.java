@@ -31,8 +31,7 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 /**
  * 
  * An implementation of the visitor pattern for OWL axioms to convert OWL class
- * axioms to the corresponding ELK class axioms. Conversion of unsupported
- * axioms throws an {@link IllegalArgumentException}.
+ * axioms to the corresponding ELK class axioms.
  * 
  * @author "Yevgeny Kazakov"
  * 

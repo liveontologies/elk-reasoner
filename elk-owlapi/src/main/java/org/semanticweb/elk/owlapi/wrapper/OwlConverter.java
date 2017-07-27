@@ -213,9 +213,6 @@ public class OwlConverter {
 		return INSTANCE_;
 	}
 
-	protected static OwlCorrespondingObjectConverterVisitor CONVERTER = OwlCorrespondingObjectConverterVisitor
-			.getInstance();
-
 	protected static OwlAxiomConverterVisitor OWL_AXIOM_CONVERTER = OwlAxiomConverterVisitor
 			.getInstance();
 
@@ -234,10 +231,22 @@ public class OwlConverter {
 	protected static OwlIndividualAxiomConverterVisitor OWL_INDIVIDUAL_AXIOM_CONVERTER = OwlIndividualAxiomConverterVisitor
 			.getInstance();
 
+	protected static OwlClassExpressionConverterVisitor OWL_CLASS_EXPRESSION_CONVERTER = OwlClassExpressionConverterVisitor
+			.getInstance();
+
+	protected static OwlDataRangeConverterVisitor OWL_DATA_RANGE_CONVERTER = OwlDataRangeConverterVisitor
+			.getInstance();
+
 	protected static OwlObjectPropertyExpressionConverterVisitor OWL_OBJECT_PROPERTY_EXPRESSION_CONVERTER = OwlObjectPropertyExpressionConverterVisitor
 			.getInstance();
 
+	protected static OwlIndividualConverterVisitor OWL_INDIVIDUAL_CONVERTER = OwlIndividualConverterVisitor
+			.getInstance();
+
 	protected static OwlAnnotationSubjectValueVisitor OWL_ANNOTATION_CONVERTER = OwlAnnotationSubjectValueVisitor
+			.getInstance();
+
+	protected static OwlEntityConverterVisitor OWL_ENTITY_CONVERTER = OwlEntityConverterVisitor
 			.getInstance();
 
 	@SuppressWarnings("static-method")
@@ -290,7 +299,7 @@ public class OwlConverter {
 
 	@SuppressWarnings("static-method")
 	public ElkClassExpression convert(OWLClassExpression owlClassExpression) {
-		return owlClassExpression.accept(CONVERTER);
+		return owlClassExpression.accept(OWL_CLASS_EXPRESSION_CONVERTER);
 	}
 
 	@SuppressWarnings("static-method")
@@ -401,7 +410,7 @@ public class OwlConverter {
 
 	@SuppressWarnings("static-method")
 	public ElkDataRange convert(OWLDataRange owlDataRange) {
-		return owlDataRange.accept(CONVERTER);
+		return owlDataRange.accept(OWL_DATA_RANGE_CONVERTER);
 	}
 
 	@SuppressWarnings("static-method")
@@ -479,7 +488,7 @@ public class OwlConverter {
 
 	@SuppressWarnings("static-method")
 	public ElkEntity convert(OWLEntity owlEntity) {
-		return owlEntity.accept(CONVERTER);
+		return owlEntity.accept(OWL_ENTITY_CONVERTER);
 	}
 
 	@SuppressWarnings("static-method")
@@ -526,7 +535,7 @@ public class OwlConverter {
 
 	@SuppressWarnings("static-method")
 	public ElkIndividual convert(OWLIndividual owlIndividual) {
-		return owlIndividual.accept(CONVERTER);
+		return owlIndividual.accept(OWL_INDIVIDUAL_CONVERTER);
 	}
 
 	@SuppressWarnings("static-method")

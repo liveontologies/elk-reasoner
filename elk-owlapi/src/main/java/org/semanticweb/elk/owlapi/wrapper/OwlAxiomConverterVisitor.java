@@ -65,8 +65,7 @@ import org.semanticweb.owlapi.model.SWRLRule;
 
 /**
  * An implementation of the visitor pattern for OWL axioms to convert OWL axioms
- * to ELK axioms. Conversion of unsupported axioms throws an
- * {@link IllegalArgumentException}.
+ * to ELK axioms.
  * 
  * @author "Yevgeny Kazakov"
  * 
