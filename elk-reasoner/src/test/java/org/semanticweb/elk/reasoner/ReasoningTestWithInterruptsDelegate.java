@@ -33,10 +33,16 @@ public interface ReasoningTestWithInterruptsDelegate<O>
 		extends ReasoningTestDelegate<O> {
 
 	/**
-	 * @return The probability that the reasoning is interrupted when checked
-	 *         for interrupts.
+	 * @return The probability that the reasoning is interrupted within the
+	 *         interval provided by {@link #getInterruptionIntervalNanos()}.
 	 */
 	double getInterruptionChance();
+
+	/**
+	 * @return The interval in nanoseconds within which the interruption chance
+	 *         is {@link #getInterruptionChance()}.
+	 */
+	long getInterruptionIntervalNanos();
 
 	/**
 	 * Called at the beginning of the test with interrupts.

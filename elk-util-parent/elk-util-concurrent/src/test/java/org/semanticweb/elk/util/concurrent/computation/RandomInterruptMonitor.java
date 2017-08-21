@@ -23,32 +23,53 @@ package org.semanticweb.elk.util.concurrent.computation;
 
 import java.util.Random;
 
-import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
-
+/**
+ * Behaves as if interruption happened randomly with the provided chance in the
+ * provided intervals. If the time between two consecutive calls to
+ * {@link #isInterrupted()} is <em>t</em>, then the probability that the second
+ * one returns {@code true} is the probability that some of the trials happening
+ * during this time was successful. The number of the trials is how many
+ * intervals of the provided length fit into <em>t</em> and the probability that
+ * a trial is successful is the provided chance.
+ * 
+ * @author Peter Skocovsky
+ */
 public class RandomInterruptMonitor implements InterruptMonitor {
 
-	private final Interrupter interrupter_;
 	private final Random random_;
 	private final double chance_;
+	private final long intervalNanos_;
 
-	public RandomInterruptMonitor(final Interrupter interrupter,
-			final Random random, final double chance) {
+	private long lastTrialTimeNanos_;
+
+	public RandomInterruptMonitor(final Random random, final double chance,
+			final long intervalNanos) {
 		if (chance < 0 || chance > 1) {
 			throw new IllegalArgumentException(
 					"chance must be between 0 and 1 inclusive!");
 		}
-		this.interrupter_ = interrupter;
+		if (intervalNanos <= 0) {
+			throw new IllegalArgumentException("interval must be positive!");
+		}
 		this.random_ = random;
 		this.chance_ = chance;
+		this.intervalNanos_ = intervalNanos;
+		this.lastTrialTimeNanos_ = System.nanoTime();
 	}
 
 	@Override
-	public boolean isInterrupted() {
-		if (random_.nextDouble() < chance_) {
-			interrupter_.interrupt();
+	public synchronized boolean isInterrupted() {
+		final long timeSinceLastTrial = System.nanoTime() - lastTrialTimeNanos_;
+		final long nTrials = timeSinceLastTrial / intervalNanos_;
+		if (nTrials > 0) {
+			lastTrialTimeNanos_ += nTrials * intervalNanos_;
+			final double chanceNow = 1 - Math.pow((1 - chance_), nTrials);
+			if (random_.nextDouble() < chanceNow) {
+				return true;
+			}
 		}
-		return interrupter_.isInterrupted();
+		// else
+		return false;
 	}
 
 }

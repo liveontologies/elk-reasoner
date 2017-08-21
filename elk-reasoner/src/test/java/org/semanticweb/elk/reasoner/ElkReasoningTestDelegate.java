@@ -30,32 +30,17 @@ import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.UrlTestInput;
+import org.semanticweb.elk.util.concurrent.computation.RandomInterruptMonitor;
 
 public abstract class ElkReasoningTestDelegate<O>
+		extends AbstractReasoningTestWithInterruptsDelegate<O>
 		implements ReasoningTestWithOutputAndInterruptsDelegate<O> {
-
-	public static final double DEFAULT_INTERRUPTION_CHANCE = 0.3;
-
-	private final TestManifest<? extends UrlTestInput> manifest_;
-
-	private final double interruptionChance_;
 
 	private Reasoner reasoner_;
 
 	public ElkReasoningTestDelegate(
-			final TestManifest<? extends UrlTestInput> manifest,
-			final double interruptionChance) {
-		this.manifest_ = manifest;
-		this.interruptionChance_ = interruptionChance;
-	}
-
-	public ElkReasoningTestDelegate(
 			final TestManifest<? extends UrlTestInput> manifest) {
-		this(manifest, DEFAULT_INTERRUPTION_CHANCE);
-	}
-
-	public TestManifest<? extends UrlTestInput> getManifest() {
-		return manifest_;
+		super(manifest);
 	}
 
 	public Reasoner getReasoner() {
@@ -64,21 +49,18 @@ public abstract class ElkReasoningTestDelegate<O>
 
 	@Override
 	public void initWithOutput() throws Exception {
-		reasoner_ = TestReasonerUtils
-				.createTestReasoner(manifest_.getInput().getUrl().openStream());
-	}
-
-	@Override
-	public double getInterruptionChance() {
-		return interruptionChance_;
+		reasoner_ = TestReasonerUtils.createTestReasoner(
+				getManifest().getInput().getUrl().openStream());
 	}
 
 	@Override
 	public void initWithInterrupts() throws Exception {
 		final Random random = new Random(RandomSeedProvider.VALUE);
 		reasoner_ = TestReasonerUtils.createTestReasoner(
-				manifest_.getInput().getUrl().openStream(),
-				new RandomReasonerInterrupter(random, getInterruptionChance()));
+				getManifest().getInput().getUrl().openStream(),
+				new TestReasonerInterrupter(new RandomInterruptMonitor(random,
+						getInterruptionChance(),
+						getInterruptionIntervalNanos())));
 	}
 
 	@Override

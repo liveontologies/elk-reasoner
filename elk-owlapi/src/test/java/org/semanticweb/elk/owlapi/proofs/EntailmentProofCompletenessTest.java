@@ -61,12 +61,9 @@ public class EntailmentProofCompletenessTest extends
 				ElkTestUtils.TEST_INPUT_LOCATION, IGNORE_LIST);
 	}
 
-	public static final double INTERRUPTION_CHANCE = 0.03;
-
 	public EntailmentProofCompletenessTest(
 			final TestManifest<QueryTestInput<OWLAxiom>> manifest) {
-		super(manifest, new OwlApiReasoningTestDelegate<Void>(manifest,
-				INTERRUPTION_CHANCE) {
+		super(manifest, new OwlApiReasoningTestDelegate<Void>(manifest) {
 
 			@Override
 			public Void getActualOutput() throws Exception {

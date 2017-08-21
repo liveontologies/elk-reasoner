@@ -30,11 +30,13 @@ import java.util.Random;
 import java.util.Set;
 
 import org.semanticweb.elk.RandomSeedProvider;
-import org.semanticweb.elk.reasoner.RandomReasonerInterrupter;
+import org.semanticweb.elk.reasoner.AbstractReasoningTestWithInterruptsDelegate;
+import org.semanticweb.elk.reasoner.TestReasonerInterrupter;
 import org.semanticweb.elk.reasoner.incremental.IncrementalChangeType;
 import org.semanticweb.elk.reasoner.incremental.IncrementalReasoningTestWithInterruptsDelegate;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.UrlTestInput;
+import org.semanticweb.elk.util.concurrent.computation.RandomInterruptMonitor;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.semanticweb.owlapi.model.AxiomType;
@@ -44,37 +46,21 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.slf4j.Logger;
 
 public abstract class OwlApiIncrementalReasoningTestDelegate<O>
-		implements
-		IncrementalReasoningTestWithInterruptsDelegate<OWLAxiom, O> {
-
-	public static final double DEFAULT_INTERRUPTION_CHANCE = 0.1;
+		extends AbstractReasoningTestWithInterruptsDelegate<O>
+		implements IncrementalReasoningTestWithInterruptsDelegate<OWLAxiom, O> {
 
 	@SuppressWarnings("unchecked")
 	private static final Set<AxiomType<?>> DYNAMIC_AXIOM_TYPES = new HashSet<AxiomType<?>>(
 			Arrays.asList(AxiomType.SUBCLASS_OF, AxiomType.EQUIVALENT_CLASSES,
 					AxiomType.DISJOINT_CLASSES));
 
-	private final TestManifest<? extends UrlTestInput> manifest_;
-	private final double interruptionChance_;
-
 	private OWLOntology testOntology_;
 	private ElkReasoner standardReasoner_;
 	private ElkReasoner incrementalReasoner_;
 
 	public OwlApiIncrementalReasoningTestDelegate(
-			final TestManifest<? extends UrlTestInput> manifest,
-			final double interruptionChance) {
-		this.manifest_ = manifest;
-		this.interruptionChance_ = interruptionChance;
-	}
-
-	public OwlApiIncrementalReasoningTestDelegate(
 			final TestManifest<? extends UrlTestInput> manifest) {
-		this(manifest, DEFAULT_INTERRUPTION_CHANCE);
-	}
-
-	public TestManifest<? extends UrlTestInput> getManifest() {
-		return manifest_;
+		super(manifest);
 	}
 
 	public ElkReasoner getStandardReasoner() {
@@ -93,7 +79,8 @@ public abstract class OwlApiIncrementalReasoningTestDelegate<O>
 		final OWLOntologyManager manager = TestOWLManager
 				.createOWLOntologyManager();
 
-		final InputStream stream = manifest_.getInput().getUrl().openStream();
+		final InputStream stream = getManifest().getInput().getUrl()
+				.openStream();
 		testOntology_ = manager.loadOntologyFromOntologyDocument(stream);
 
 		for (OWLAxiom axiom : testOntology_.getLogicalAxioms()) {
@@ -121,11 +108,6 @@ public abstract class OwlApiIncrementalReasoningTestDelegate<O>
 	}
 
 	@Override
-	public double getInterruptionChance() {
-		return interruptionChance_;
-	}
-
-	@Override
 	public void initWithInterrupts() throws Exception {
 
 		/*
@@ -139,7 +121,9 @@ public abstract class OwlApiIncrementalReasoningTestDelegate<O>
 		final Random random = new Random(RandomSeedProvider.VALUE);
 		incrementalReasoner_ = OWLAPITestUtils.createReasoner(testOntology_,
 				false,
-				new RandomReasonerInterrupter(random, getInterruptionChance()));
+				new TestReasonerInterrupter(new RandomInterruptMonitor(random,
+						getInterruptionChance(),
+						getInterruptionIntervalNanos())));
 		incrementalReasoner_.getInternalReasoner()
 				.setAllowIncrementalMode(true);
 

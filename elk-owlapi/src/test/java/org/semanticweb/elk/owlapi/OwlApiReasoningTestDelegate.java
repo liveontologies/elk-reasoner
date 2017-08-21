@@ -25,38 +25,24 @@ import java.io.InputStream;
 import java.util.Random;
 
 import org.semanticweb.elk.RandomSeedProvider;
-import org.semanticweb.elk.reasoner.RandomReasonerInterrupter;
+import org.semanticweb.elk.reasoner.AbstractReasoningTestWithInterruptsDelegate;
+import org.semanticweb.elk.reasoner.TestReasonerInterrupter;
 import org.semanticweb.elk.reasoner.ReasoningTestWithOutputAndInterruptsDelegate;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.UrlTestInput;
+import org.semanticweb.elk.util.concurrent.computation.RandomInterruptMonitor;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 public abstract class OwlApiReasoningTestDelegate<O>
+		extends AbstractReasoningTestWithInterruptsDelegate<O>
 		implements ReasoningTestWithOutputAndInterruptsDelegate<O> {
-
-	public static final double DEFAULT_INTERRUPTION_CHANCE = 0.3;
-
-	private final TestManifest<? extends UrlTestInput> manifest_;
-
-	private final double interruptionChance_;
 
 	private ElkReasoner reasoner_;
 
 	public OwlApiReasoningTestDelegate(
-			final TestManifest<? extends UrlTestInput> manifest,
-			final double interruptionChance) {
-		this.manifest_ = manifest;
-		this.interruptionChance_ = interruptionChance;
-	}
-
-	public OwlApiReasoningTestDelegate(
 			final TestManifest<? extends UrlTestInput> manifest) {
-		this(manifest, DEFAULT_INTERRUPTION_CHANCE);
-	}
-
-	public TestManifest<? extends UrlTestInput> getManifest() {
-		return manifest_;
+		super(manifest);
 	}
 
 	public ElkReasoner getReasoner() {
@@ -69,7 +55,8 @@ public abstract class OwlApiReasoningTestDelegate<O>
 
 	@Override
 	public void initWithOutput() throws Exception {
-		final InputStream input = manifest_.getInput().getUrl().openStream();
+		final InputStream input = getManifest().getInput().getUrl()
+				.openStream();
 		OWLOntologyManager manager = TestOWLManager.createOWLOntologyManager();
 		OWLOntology ontology = manager.loadOntologyFromOntologyDocument(input);
 
@@ -77,19 +64,17 @@ public abstract class OwlApiReasoningTestDelegate<O>
 	}
 
 	@Override
-	public double getInterruptionChance() {
-		return interruptionChance_;
-	}
-
-	@Override
 	public void initWithInterrupts() throws Exception {
-		final InputStream input = manifest_.getInput().getUrl().openStream();
+		final InputStream input = getManifest().getInput().getUrl()
+				.openStream();
 		OWLOntologyManager manager = TestOWLManager.createOWLOntologyManager();
 		OWLOntology ontology = manager.loadOntologyFromOntologyDocument(input);
 
 		final Random random = new Random(RandomSeedProvider.VALUE);
 		reasoner_ = OWLAPITestUtils.createReasoner(ontology, false,
-				new RandomReasonerInterrupter(random, getInterruptionChance()));
+				new TestReasonerInterrupter(new RandomInterruptMonitor(random,
+						getInterruptionChance(),
+						getInterruptionIntervalNanos())));
 	}
 
 	@Override

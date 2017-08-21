@@ -40,44 +40,29 @@ import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
-import org.semanticweb.elk.reasoner.RandomReasonerInterrupter;
+import org.semanticweb.elk.reasoner.AbstractReasoningTestWithInterruptsDelegate;
+import org.semanticweb.elk.reasoner.TestReasonerInterrupter;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.UrlTestInput;
+import org.semanticweb.elk.util.concurrent.computation.RandomInterruptMonitor;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.slf4j.Logger;
 
 public abstract class ElkIncrementalReasoningTestDelegate<O>
-		implements
-		IncrementalReasoningTestWithInterruptsDelegate<ElkAxiom, O> {
-
-	public static final double DEFAULT_INTERRUPTION_CHANCE = 0.1;
-
-	private final TestManifest<? extends UrlTestInput> manifest_;
-
-	private final double interruptionChance_;
+		extends AbstractReasoningTestWithInterruptsDelegate<O>
+		implements IncrementalReasoningTestWithInterruptsDelegate<ElkAxiom, O> {
 
 	private final Collection<ElkAxiom> allAxioms_ = new ArrayList<ElkAxiom>();
 	private Reasoner standardReasoner_;
 	private Reasoner incrementalReasoner_;
 
 	public ElkIncrementalReasoningTestDelegate(
-			TestManifest<? extends UrlTestInput> manifest,
-			final double interruptionChance) {
-		this.manifest_ = manifest;
-		this.interruptionChance_ = interruptionChance;
-	}
-
-	public ElkIncrementalReasoningTestDelegate(
 			TestManifest<? extends UrlTestInput> manifest) {
-		this(manifest, DEFAULT_INTERRUPTION_CHANCE);
-	}
-
-	public TestManifest<? extends UrlTestInput> getManifest() {
-		return manifest_;
+		super(manifest);
 	}
 
 	public Reasoner getStandardReasoner() {
@@ -96,7 +81,7 @@ public abstract class ElkIncrementalReasoningTestDelegate<O>
 		InputStream stream = null;
 
 		try {
-			stream = manifest_.getInput().getUrl().openStream();
+			stream = getManifest().getInput().getUrl().openStream();
 
 			final Owl2Parser parser = new Owl2FunctionalStyleParserFactory()
 					.getParser(stream);
@@ -142,11 +127,6 @@ public abstract class ElkIncrementalReasoningTestDelegate<O>
 	}
 
 	@Override
-	public double getInterruptionChance() {
-		return interruptionChance_;
-	}
-
-	@Override
 	public void initWithInterrupts() throws Exception {
 
 		standardReasoner_ = TestReasonerUtils.createTestReasoner(
@@ -154,8 +134,10 @@ public abstract class ElkIncrementalReasoningTestDelegate<O>
 		standardReasoner_.setAllowIncrementalMode(false);
 		final Random random = new Random(RandomSeedProvider.VALUE);
 		incrementalReasoner_ = TestReasonerUtils.createTestReasoner(
-				manifest_.getInput().getUrl().openStream(),
-				new RandomReasonerInterrupter(random, getInterruptionChance()));
+				getManifest().getInput().getUrl().openStream(),
+				new TestReasonerInterrupter(new RandomInterruptMonitor(random,
+						getInterruptionChance(),
+						getInterruptionIntervalNanos())));
 		incrementalReasoner_.setAllowIncrementalMode(true);
 
 	}

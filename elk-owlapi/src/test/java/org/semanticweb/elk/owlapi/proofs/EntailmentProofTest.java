@@ -61,12 +61,9 @@ public class EntailmentProofTest extends BaseQueryTest<OWLAxiom, Boolean> {
 				ElkTestUtils.TEST_INPUT_LOCATION, IGNORE_LIST);
 	}
 
-	public static final double INTERRUPTION_CHANCE = 0.003;
-
 	public EntailmentProofTest(
 			final QueryTestManifest<OWLAxiom, Boolean> manifest) {
-		super(manifest, new OwlApiReasoningTestDelegate<Boolean>(manifest,
-				INTERRUPTION_CHANCE) {
+		super(manifest, new OwlApiReasoningTestDelegate<Boolean>(manifest) {
 
 			@Override
 			public Boolean getActualOutput() throws Exception {

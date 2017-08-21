@@ -23,10 +23,20 @@ package org.semanticweb.elk.util.concurrent.computation;
 
 public class TestInterrupter implements Interrupter {
 
+	private final InterruptMonitor interruptMonitor_;
+
 	/**
 	 * The interruption status of this interrupter.
 	 */
 	private volatile boolean isInterrupted_ = false;
+
+	public TestInterrupter(final InterruptMonitor interruptMonitor) {
+		this.interruptMonitor_ = interruptMonitor;
+	}
+
+	public TestInterrupter() {
+		this(DummyInterruptMonitor.INSTANCE);
+	}
 
 	@Override
 	public void interrupt() {
@@ -35,6 +45,9 @@ public class TestInterrupter implements Interrupter {
 
 	@Override
 	public boolean isInterrupted() {
+		if (interruptMonitor_.isInterrupted()) {
+			interrupt();
+		}
 		return isInterrupted_;
 	}
 

@@ -69,12 +69,9 @@ public class EntailmentProofTest extends BaseQueryTest<ElkAxiom, Void> {
 				.ignore(input, ElkTestUtils.TEST_INPUT_LOCATION, IGNORE_LIST);
 	}
 
-	public static final double INTERRUPTION_CHANCE = 0.003;
-
 	public EntailmentProofTest(
 			final QueryTestManifest<ElkAxiom, Void> manifest) {
-		super(manifest, new ElkReasoningTestDelegate<Void>(manifest,
-				INTERRUPTION_CHANCE) {
+		super(manifest, new ElkReasoningTestDelegate<Void>(manifest) {
 
 			@Override
 			public Void getActualOutput() throws Exception {

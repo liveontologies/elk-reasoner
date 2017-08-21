@@ -25,7 +25,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
@@ -36,10 +35,9 @@ public class ConcurrentComputationWithInputsTest {
 	private static int ROUNDS_ = 8;
 
 	private static final double INTERRUPTION_CHANCE = 0.15;
+	private static final long INTERRUPTION_INTERVAL_NANOS = 10000l;
 
 	private final Random random = new Random();
-
-	private TestInterrupter interrupter_ = new TestInterrupter();
 
 	private TestInputProcessorFactory factory_;
 
@@ -58,14 +56,14 @@ public class ConcurrentComputationWithInputsTest {
 
 	@Test
 	public void test() {
-		run(interrupter_);
+		run(new TestInterrupter());
 	}
 
-	public void run(final InterruptMonitor interruptMonitor) {
+	public void run(final TestInterrupter interrupter) {
 
 		int jobs = 1;
 		for (int round = 0; round < ROUNDS_; round++) {
-			setup(round, interruptMonitor);
+			setup(round, interrupter);
 			jobs = 1 << random.nextInt(ROUNDS_);
 			int sumExpected = 0;
 			if (!computation_.start())
@@ -83,7 +81,7 @@ public class ConcurrentComputationWithInputsTest {
 							fail();
 						computation_.finish();
 						// restart computation
-						interrupter_.clearInterrupt();
+						interrupter.clearInterrupt();
 						if (!computation_.start())
 							fail();
 					}
@@ -98,7 +96,7 @@ public class ConcurrentComputationWithInputsTest {
 					if (!computation_.isInterrupted())
 						break;
 					// else restart
-					interrupter_.clearInterrupt();
+					interrupter.clearInterrupt();
 					if (!computation_.start())
 						fail();
 				}
@@ -112,8 +110,8 @@ public class ConcurrentComputationWithInputsTest {
 
 	@Test
 	public void testWithInterrupts() {
-		run(new RandomInterruptMonitor(interrupter_, random,
-				INTERRUPTION_CHANCE));
+		run(new TestInterrupter(new RandomInterruptMonitor(random,
+				INTERRUPTION_CHANCE, INTERRUPTION_INTERVAL_NANOS)));
 	}
 
 }
