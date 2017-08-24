@@ -21,12 +21,9 @@
  */
 package org.semanticweb.elk.util.collections;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import org.liveontologies.puli.statistics.Stat;
-
-import com.google.common.base.Predicate;
 
 /**
  * An {@link RecencyEvictor} that balances its capacity so that some proportion
@@ -74,8 +71,7 @@ public class CapacityBalancingEvictor<E> extends RecencyEvictor<E> {
 	}
 
 	@Override
-	protected Iterator<E> protectedAddAndEvict(final E element,
-			final Predicate<E> retain) {
+	public void add(final E element) {
 		final Integer lastQueryTick = lastQueryTicks_.get(element);
 		if (lastQueryTick != null) {
 			nRepeatedQueriesToBalance_--;
@@ -90,8 +86,8 @@ public class CapacityBalancingEvictor<E> extends RecencyEvictor<E> {
 		}
 		lastQueryTicks_.put(element, tick_);
 		tick_++;
-		// Add and evict
-		return super.protectedAddAndEvict(element, retain);
+		// Actual add.
+		super.add(element);
 	}
 
 	private static class QuantileEstimator {

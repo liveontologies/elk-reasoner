@@ -161,7 +161,9 @@ public class CountingEvictorTest {
 		// When something new is added 3-times and everything should be
 		// retained, nothing is evicted.
 		evicted = evictor.addAndEvict(10);
+		checkEvicted(Arrays.asList(10), evicted);
 		evicted = evictor.addAndEvict(10);
+		checkEvicted(Arrays.asList(10), evicted);
 		evicted = evictor.addAndEvict(10, new Predicate<Integer>() {
 			@Override
 			public boolean apply(final Integer e) {
@@ -172,9 +174,11 @@ public class CountingEvictorTest {
 
 		// Adding another thing 3-times without retainment, evicts elements.
 		evicted = evictor.addAndEvict(11);
+		checkEvicted(Arrays.asList(0, 11), evicted);
 		evicted = evictor.addAndEvict(11);
+		checkEvicted(Arrays.asList(11), evicted);
 		evicted = evictor.addAndEvict(11);
-		checkEvicted(Arrays.asList(0, 1), evicted);
+		checkEvicted(Arrays.asList(1), evicted);
 
 	}
 

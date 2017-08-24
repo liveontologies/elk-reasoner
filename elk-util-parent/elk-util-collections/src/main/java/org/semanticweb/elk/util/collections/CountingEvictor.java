@@ -27,6 +27,7 @@ import java.util.Map;
 import org.liveontologies.puli.statistics.Stat;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.Iterators;
 
 /**
  * Acts as {@link RecencyEvictor} for elements that have been added more times
@@ -59,8 +60,7 @@ public class CountingEvictor<E> extends RecencyEvictor<E> {
 	}
 
 	@Override
-	protected Iterator<E> protectedAddAndEvict(final E element,
-			final Predicate<E> retain) {
+	public void add(final E element) {
 		ElementRecord record = elementRecords_.get(element);
 		if (record == null) {
 			record = new ElementRecord();
@@ -68,10 +68,17 @@ public class CountingEvictor<E> extends RecencyEvictor<E> {
 		}
 		record.addCount++;
 		if (record.addCount >= evictBeforeAddCount_) {
-			return super.protectedAddAndEvict(element, retain);
+			super.add(element);
+		} else {
+			// Immediately evict, unless it should be retained.
+			immediatelyEvicted_.add(element);
 		}
-		// else immediately evict, unless it should be retained.
-		return immediatelyEvicted_.protectedAddAndEvict(element, retain);
+	}
+
+	@Override
+	public Iterator<E> evict(final Predicate<E> retain) {
+		return Iterators.concat(super.evict(retain),
+				immediatelyEvicted_.evict(retain));
 	}
 
 	private static class ElementRecord {

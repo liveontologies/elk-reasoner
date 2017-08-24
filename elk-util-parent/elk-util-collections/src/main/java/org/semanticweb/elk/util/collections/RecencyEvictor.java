@@ -62,19 +62,13 @@ public class RecencyEvictor<E> extends AbstractEvictor<E> {
 	}
 
 	@Override
-	public Iterator<E> addAndEvict(final E element, final Predicate<E> retain) {
-		Preconditions.checkNotNull(retain);
-		// else
-		return protectedAddAndEvict(element, retain);
-	}
-
-	protected Iterator<E> protectedAddAndEvict(final E element,
-			final Predicate<E> retain) {
+	public void add(final E element) {
 		elements_.put(element, true);
-		return evict(retain);
 	}
 
-	private Iterator<E> evict(final Predicate<E> retain) {
+	@Override
+	public Iterator<E> evict(final Predicate<E> retain) {
+		Preconditions.checkNotNull(retain);
 
 		if (elements_.size() <= capacity_) {
 			// Evict nothing.

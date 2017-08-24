@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 
 /**
@@ -69,12 +70,7 @@ public class NQEvictor<E> extends AbstractEvictor<E> {
 	}
 
 	@Override
-	public Iterator<E> addAndEvict(final E element, final Predicate<E> retain) {
-		add(element);
-		return evict(retain);
-	}
-
-	private void add(final E element) {
+	public void add(final E element) {
 		// If element is in some queue but the last one, upgrade it.
 		for (int i = 0; i < elements_.size() - 1; i++) {
 			final LinkedHashMap<E, Boolean> iThQueue = elements_.get(i);
@@ -94,7 +90,9 @@ public class NQEvictor<E> extends AbstractEvictor<E> {
 		elements_.get(0).put(element, true);
 	}
 
-	private Iterator<E> evict(final Predicate<E> retain) {
+	@Override
+	public Iterator<E> evict(final Predicate<E> retain) {
+		Preconditions.checkNotNull(retain);
 
 		final List<E> evicted = new ArrayList<E>();
 
