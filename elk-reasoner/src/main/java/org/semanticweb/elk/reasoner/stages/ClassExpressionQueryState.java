@@ -32,8 +32,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.semanticweb.elk.loading.AbstractClassQueryLoader;
-import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.loading.ClassQueryLoader;
+import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
@@ -65,11 +65,14 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.collections.Evictor;
+import org.semanticweb.elk.util.collections.NQEvictor;
 import org.semanticweb.elk.util.collections.Operations;
-import org.semanticweb.elk.util.collections.RecencyQueue;
 import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Predicate;
 
 /**
  * Keeps track of class expressions that were queried for satisfiability,
@@ -106,10 +109,15 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 	private final Map<IndexedClassExpression, QueryState> indexed_ = new ConcurrentHashMap<IndexedClassExpression, QueryState>();
 
 	/**
-	 * Contains the same class expressions as {@link #queried_} in the order in
-	 * which they were queried.
+	 * Manages eviction from {@link #queried_}. TODO: build from config!
 	 */
-	private final RecencyQueue<ElkClassExpression> recentlyQueried_ = new RecencyQueue<ElkClassExpression>();
+	private final Evictor<ElkClassExpression> recentlyQueried_ = new NQEvictor.Builder()
+			.addLevel(CACHE_CAPACITY, EVICTION_FACTOR).build();
+
+	/**
+	 * The class expressions that were registered by the last call.
+	 */
+	private final Set<ElkClassExpression> lastQueries_ = new ArrayHashSet<ElkClassExpression>();
 
 	/**
 	 * State of the query of a particular class expression. There are four
@@ -156,11 +164,6 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 	 * direct super-classes.
 	 */
 	private final Map<ElkClass, Collection<IndexedClassExpression>> queriesByRelated_ = new ConcurrentHashMap<ElkClass, Collection<IndexedClassExpression>>();
-
-	/**
-	 * The number of class expressions that were queried by the last call.
-	 */
-	private int lastQuerySize_ = 0;
 
 	private final SaturationState<? extends Context> saturationState_;
 
@@ -276,8 +279,9 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 
 		LOGGER_.trace("class expression query registered {}", classExpression);
 
-		recentlyQueried_.offer(classExpression);
-		lastQuerySize_ = 1;
+		lastQueries_.clear();
+		recentlyQueried_.add(classExpression);
+		lastQueries_.add(classExpression);
 
 		QueryState state = queried_.get(classExpression);
 		if (state != null) {
@@ -306,6 +310,27 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 		public void load(final ElkClassExpressionProcessor inserter,
 				final ElkClassExpressionProcessor deleter)
 				throws ElkLoadingException {
+
+			// First evict and unload.
+			final Iterator<ElkClassExpression> evicted = recentlyQueried_
+					.evict(doNotEvict_);
+			while (evicted.hasNext()) {
+				final ElkClassExpression classExpression = evicted.next();
+				final QueryState state = queried_.remove(classExpression);
+				if (state.isLoaded) {
+					deleter.visit(classExpression);
+					if (state.indexed != null) {
+						if (state.isComputed) {
+							if (state.node != null) {
+								removeAllRelated(state.indexed, state.node);
+								state.node = null;
+							}
+						}
+						indexed_.remove(state.indexed);
+						state.indexed = null;
+					}
+				}
+			}
 
 			/*
 			 * Load all registered queries that are not loaded and assign
@@ -358,48 +383,6 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 				}
 			}
 
-			/*
-			 * If the cache size is exceeded, evict old entries.
-			 */
-			if (recentlyQueried_.size() > CACHE_CAPACITY) {
-
-				// @formatter:off
-				final int goalCapacity = Math.max(
-						Math.min(
-								(int) (recentlyQueried_.size() * EVICTION_FACTOR),
-								CACHE_CAPACITY),
-						lastQuerySize_);
-				// @formatter:on
-
-				while (recentlyQueried_.size() > goalCapacity) {
-					classExpression = recentlyQueried_.poll();
-					/*
-					 * While desiredCapacity is at least lastQuerySize, at least
-					 * the last lastQuerySize queries will remain cached.
-					 */
-
-					final QueryState state = queried_.remove(classExpression);
-					if (state.isLoaded) {
-						deleter.visit(classExpression);
-						if (state.indexed != null) {
-							if (state.isComputed) {
-								if (state.node != null) {
-									removeAllRelated(state.indexed, state.node);
-									state.node = null;
-								}
-							}
-							indexed_.remove(state.indexed);
-							state.indexed = null;
-						}
-					}
-
-					if (isInterrupted()) {
-						return;
-					}
-				}
-
-			}
-
 		}
 
 		@Override
@@ -408,6 +391,13 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 		}
 
 	}
+
+	private final Predicate<ElkClassExpression> doNotEvict_ = new Predicate<ElkClassExpression>() {
+		@Override
+		public boolean apply(final ElkClassExpression ce) {
+			return lastQueries_.contains(ce);
+		}
+	};
 
 	private final TransitiveReductionOutputVisitor<IndexedClassExpression> transitiveReductionOutputProcessor_ = new TransitiveReductionOutputVisitor<IndexedClassExpression>() {
 

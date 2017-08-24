@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -51,12 +52,16 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Condition;
+import org.semanticweb.elk.util.collections.Evictor;
+import org.semanticweb.elk.util.collections.NQEvictor;
 import org.semanticweb.elk.util.collections.Operations;
-import org.semanticweb.elk.util.collections.RecencyQueue;
 import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Predicate;
 
 /**
  * Keeps track of axioms that were queried for entailment.
@@ -82,10 +87,15 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 	private final Queue<ElkAxiom> toLoad_ = new ConcurrentLinkedQueue<ElkAxiom>();
 
 	/**
-	 * Contains the same states as {@link #queried_} in the order in which they
-	 * were queried.
+	 * Manages eviction from {@link #queried_}. TODO: build from config!
 	 */
-	private final RecencyQueue<QueryState> recentlyQueried_ = new RecencyQueue<QueryState>();
+	private final Evictor<QueryState> queriedEvictor_ = new NQEvictor.Builder()
+			.addLevel(CACHE_CAPACITY, EVICTION_FACTOR).build();
+
+	/**
+	 * The axioms that were registered by the last call.
+	 */
+	private final Set<ElkAxiom> lastQueries_ = new ArrayHashSet<ElkAxiom>();
 
 	/**
 	 * State of the query of a particular axiom. There are two forbidden states:
@@ -187,11 +197,6 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 
 	}
 
-	/**
-	 * The number of axioms that were registered by the last call.
-	 */
-	private int lastQuerySize_ = 0;
-
 	private final SaturationState<? extends Context> saturationState_;
 
 	private final ConsistencyCheckingState consistencyCheckingState_;
@@ -221,27 +226,25 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 	 */
 	void registerQueries(final Iterable<? extends ElkAxiom> axioms) {
 
-		int axiomCount = 0;
+		lastQueries_.clear();
 		for (final ElkAxiom axiom : axioms) {
 
 			LOGGER_.trace("entailment query registered {}", axiom);
 
-			axiomCount++;
+			lastQueries_.add(axiom);
 
 			QueryState state = queried_.get(axiom);
 			if (state != null) {
-				recentlyQueried_.offer(state);
+				queriedEvictor_.add(state);
 				continue;
 			}
 			// Create query state.
 			state = new QueryState(axiom);
 			queried_.put(axiom, state);
-			recentlyQueried_.offer(state);
+			queriedEvictor_.add(state);
 			toLoad_.offer(axiom);
 
 		}
-
-		lastQuerySize_ = axiomCount;
 
 	}
 
@@ -263,6 +266,19 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 				final ElkAxiomVisitor<IndexedEntailmentQuery<? extends Entailment>> deleter)
 				throws ElkLoadingException {
 
+			// First evict and unload.
+			final Iterator<QueryState> evicted = queriedEvictor_
+					.evict(doNotEvict_);
+			while (evicted.hasNext()) {
+				final QueryState state = evicted.next();
+				queried_.remove(state.getQuery());
+				if (state.isLoaded) {
+					state.getQuery().accept(deleter);
+					state.indexed = null;
+					state.isLoaded = false;
+				}
+			}
+
 			/*
 			 * Load all registered queries that are not loaded and assign
 			 * state.indexed if successful.
@@ -282,49 +298,6 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 				}
 			}
 
-			/*
-			 * If the cache size is exceeded, evict old entries.
-			 */
-			if (recentlyQueried_.size() > CACHE_CAPACITY) {
-
-				// @formatter:off
-				final int goalCapacity = Math.max(
-						Math.min(
-								(int) (recentlyQueried_.size() * EVICTION_FACTOR),
-								CACHE_CAPACITY),
-						lastQuerySize_);
-				// @formatter:on
-
-				final Iterator<QueryState> iter = recentlyQueried_.iterator();
-				while (iter.hasNext()
-						&& recentlyQueried_.size() > goalCapacity) {
-					final QueryState state = iter.next();
-					/*
-					 * While goalCapacity is at least lastQuerySize_, at least
-					 * the last lastQuerySize_ queries will remain cached.
-					 */
-
-					if (state.isLocked()) {
-						// Do not evict.
-						continue;
-					}
-					// else evict
-
-					iter.remove();
-					queried_.remove(state.getQuery());
-					if (state.isLoaded) {
-						state.getQuery().accept(deleter);
-						state.indexed = null;
-						state.isLoaded = false;
-					}
-
-					if (isInterrupted()) {
-						return;
-					}
-				}
-
-			}
-
 		}
 
 		@Override
@@ -333,6 +306,13 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 		}
 
 	}
+
+	private final Predicate<QueryState> doNotEvict_ = new Predicate<QueryState>() {
+		@Override
+		public boolean apply(final QueryState state) {
+			return state.isLocked() || lastQueries_.contains(state.getQuery());
+		}
+	};
 
 	private final Condition<IndexedContextRoot> IS_NOT_SATURATED = new Condition<IndexedContextRoot>() {
 		@Override
