@@ -21,8 +21,6 @@
  */
 package org.semanticweb.elk.reasoner.tracing;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -41,6 +39,7 @@ import org.liveontologies.puli.statistics.Stat;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.classes.ResolvingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
@@ -64,7 +63,6 @@ import org.semanticweb.elk.reasoner.tracing.factories.ClassInferenceBlockingFilt
 import org.semanticweb.elk.reasoner.tracing.factories.TracingJobListener;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Evictor;
-import org.semanticweb.elk.util.collections.NQEvictor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,36 +87,6 @@ public class TraceState
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(TraceState.class);
-
-	public static final int DEFAULT_CONTEXT_CACHE_CAPACITY = 256;
-	public static final String PROPERTY_PREFIX_CONTEXT_CACHE_CAPACITY = "org.semanticweb.elk.reasoner.tracing.contextcache.capacity.level";
-	public static final double DEFAULT_CONTEXT_CACHE_LOAD_FACTOR = 0.75;
-	public static final String PROPERTY_PREFIX_CONTEXT_CACHE_LOAD_FACTOR = "org.semanticweb.elk.reasoner.tracing.contextcache.loadfactor.level";
-
-	public static final int DEFAULT_CONCLUSION_CACHE_CAPACITY = 65536;
-	public static final String PROPERTY_PREFIX_CONCLUSION_CACHE_CAPACITY = "org.semanticweb.elk.reasoner.tracing.conclusioncache.capacity.level";
-	public static final double DEFAULT_CONCLUSION_CACHE_LOAD_FACTOR = 0.75;
-	public static final String PROPERTY_PREFIX_CONCLUSION_CACHE_LOAD_FACTOR = "org.semanticweb.elk.reasoner.tracing.conclusioncache.loadfactor.level";
-
-	public static final int getCapacity(final String propName,
-			final int defaultValue) {
-		final int cacheCapacity = getProperty(propName, Integer.class,
-				defaultValue);
-		return cacheCapacity < 0 ? Integer.MAX_VALUE : cacheCapacity;
-	}
-
-	public static final int getEvictBeforeAddCount(final String propName,
-			final int defaultValue) {
-		final int value = getProperty(propName, Integer.class, defaultValue);
-		return value < 0 ? defaultValue : value;
-	}
-
-	public static final double getLoadFactor(final String propName,
-			final double defaultValue) {
-		final double loadFactor = getProperty(propName, Double.class,
-				defaultValue);
-		return loadFactor < 0 || loadFactor > 1 ? 1 : loadFactor;
-	}
 
 	private final Queue<ClassConclusion> toTrace_ = new ConcurrentLinkedQueue<ClassConclusion>();
 	private final Set<ClassConclusion> currentlyTraced_ = new ArrayHashSet<ClassConclusion>();
@@ -181,7 +149,7 @@ public class TraceState
 		return stats_;
 	}
 
-	public <C extends Context> TraceState(
+	public <C extends Context> TraceState(final ReasonerConfiguration config,
 			final SaturationState<C> saturationState,
 			final PropertyHierarchyCompositionState propertySaturationState,
 			ElkObject.Factory elkFactory, ModifiableOntologyIndex index) {
@@ -225,55 +193,17 @@ public class TraceState
 					}
 				});
 
-		this.recentContexts_ = buildCache(
-				PROPERTY_PREFIX_CONTEXT_CACHE_CAPACITY,
-				DEFAULT_CONTEXT_CACHE_CAPACITY,
-				PROPERTY_PREFIX_CONTEXT_CACHE_LOAD_FACTOR,
-				DEFAULT_CONTEXT_CACHE_LOAD_FACTOR);
-		this.recentConclusions_ = buildCache(
-				PROPERTY_PREFIX_CONCLUSION_CACHE_CAPACITY,
-				DEFAULT_CONCLUSION_CACHE_CAPACITY,
-				PROPERTY_PREFIX_CONCLUSION_CACHE_LOAD_FACTOR,
-				DEFAULT_CONCLUSION_CACHE_LOAD_FACTOR);
+		Object builder = config
+				.getParameter(ReasonerConfiguration.TRACING_CONTEXT_EVICTOR);
+		LOGGER_.info("{} = {}", ReasonerConfiguration.TRACING_CONTEXT_EVICTOR,
+				builder);
+		this.recentContexts_ = ((Evictor.Builder) builder).build();
+		builder = config
+				.getParameter(ReasonerConfiguration.TRACING_CONCLUSION_EVICTOR);
+		LOGGER_.info("{} = {}",
+				ReasonerConfiguration.TRACING_CONCLUSION_EVICTOR, builder);
+		this.recentConclusions_ = ((Evictor.Builder) builder).build();
 
-	}
-
-	private static <E> Evictor<E> buildCache(
-			final String capacityPropertyPrefix, final int defaultCapacity,
-			final String loadFactorPropertyPrefix,
-			final double defaultLoadFactor) {
-		final NQEvictor.Builder conclusionCacheBuilder = new NQEvictor.Builder();
-		boolean noProperty = true;
-		for (int level = 1;; level++) {
-			final Integer capacityValue = getProperty(
-					capacityPropertyPrefix + level, Integer.class, null);
-			final Double loadFactorValue = getProperty(
-					loadFactorPropertyPrefix + level, Double.class, null);
-			if (capacityValue == null && loadFactorValue == null) {
-				break;
-			}
-			noProperty = false;
-			LOGGER_.info("{}{} = {}", capacityPropertyPrefix, level,
-					capacityValue);
-			LOGGER_.info("{}{} = {}", loadFactorPropertyPrefix, level,
-					loadFactorValue);
-
-			final int capacity = capacityValue == null ? defaultCapacity
-					: (capacityValue < 0 ? Integer.MAX_VALUE : capacityValue);
-			final double loadFactor = loadFactorValue == null
-					? defaultLoadFactor
-					: (loadFactorValue < 0 || loadFactorValue > 1 ? 1
-							: loadFactorValue);
-
-			conclusionCacheBuilder.addLevel(capacity, loadFactor);
-		}
-		if (noProperty) {
-			LOGGER_.info("{}1 = {}", capacityPropertyPrefix, defaultCapacity);
-			LOGGER_.info("{}1 = {}", loadFactorPropertyPrefix,
-					defaultLoadFactor);
-			conclusionCacheBuilder.addLevel(defaultCapacity, defaultLoadFactor);
-		}
-		return conclusionCacheBuilder.build();
 	}
 
 	/**
@@ -497,40 +427,6 @@ public class TraceState
 			return null;
 		}
 
-	}
-
-	public static <T> T getProperty(final String property,
-			final Class<T> valueClass, final T defaultValue) {
-		final String value = System.getProperty(property);
-		if (value == null) {
-			return defaultValue;
-		}
-		// else
-		if (valueClass == null) {
-			return defaultValue;
-		}
-		try {
-			final Method valueOf = valueClass.getMethod("valueOf",
-					String.class);
-			final int mod = valueOf.getModifiers();
-			if (!valueClass.isAssignableFrom(valueOf.getReturnType())
-					|| !Modifier.isStatic(mod) || !Modifier.isPublic(mod)) {
-				return defaultValue;
-			}
-			// else
-			@SuppressWarnings("unchecked")
-			final T result = (T) valueOf.invoke(null, value);
-			return result;
-		} catch (final Exception e) {
-			// Return defaultValue.
-		}
-		// else
-		return defaultValue;
-	}
-
-	public static <T> T getProperty(final String property,
-			final Class<T> valueClass) {
-		return getProperty(property, valueClass, null);
 	}
 
 }

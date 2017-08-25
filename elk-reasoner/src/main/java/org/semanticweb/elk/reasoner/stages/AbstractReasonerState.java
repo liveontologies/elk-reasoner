@@ -47,6 +47,7 @@ import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerInterrupter;
+import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyCheckingState;
 import org.semanticweb.elk.reasoner.indexing.classes.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
@@ -188,7 +189,8 @@ public abstract class AbstractReasonerState implements TracingProof {
 
 	private final ElkSubObjectPropertyExpressionVisitor<ModifiableIndexedPropertyChain> subPropertyConverter_;
 
-	protected AbstractReasonerState(ElkObject.Factory elkFactory) {
+	protected AbstractReasonerState(ElkObject.Factory elkFactory,
+			final ReasonerConfiguration config) {
 		this.elkFactory_ = elkFactory;
 		this.ontologyIndex = new DifferentialIndex(elkFactory);
 		this.propertyHierarchyCompositionState_ = new PropertyHierarchyCompositionState();
@@ -209,12 +211,12 @@ public abstract class AbstractReasonerState implements TracingProof {
 				elkFactory, ontologyIndex);
 		this.subPropertyConverter_ = new ElkAxiomConverterImpl(elkFactory,
 				ontologyIndex);
-		this.traceState_ = new TraceState(saturationState,
+		this.traceState_ = new TraceState(config, saturationState,
 				propertyHierarchyCompositionState_, elkFactory, ontologyIndex);
-		this.classExpressionQueryState_ = new ClassExpressionQueryState(
+		this.classExpressionQueryState_ = new ClassExpressionQueryState(config,
 				saturationState, elkFactory, ontologyIndex, factory_);
-		this.entailmentQueryState_ = new EntailmentQueryState(saturationState,
-				consistencyCheckingState, factory_);
+		this.entailmentQueryState_ = new EntailmentQueryState(config,
+				saturationState, consistencyCheckingState, factory_);
 	}
 
 	public ElkObject.Factory getElkFactory() {

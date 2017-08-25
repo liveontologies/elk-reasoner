@@ -24,9 +24,12 @@ package org.semanticweb.elk.reasoner;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Random;
 
 import org.semanticweb.elk.RandomSeedProvider;
+import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.UrlTestInput;
@@ -49,18 +52,45 @@ public abstract class ElkReasoningTestDelegate<O>
 
 	@Override
 	public void initWithOutput() throws Exception {
+		final ReasonerConfiguration config = ReasonerConfiguration
+				.getConfiguration();
+		config.setParameters(additionalConfigWithOutput());
 		reasoner_ = TestReasonerUtils.createTestReasoner(
-				getManifest().getInput().getUrl().openStream());
+				getManifest().getInput().getUrl().openStream(), config);
+	}
+
+	/**
+	 * Augments the configuration with the returned key-value pairs before
+	 * {@link #initWithOutput()}.
+	 * 
+	 * @return The additional configuration.
+	 */
+	protected Map<String, String> additionalConfigWithOutput() {
+		return Collections.emptyMap();
 	}
 
 	@Override
 	public void initWithInterrupts() throws Exception {
+		final ReasonerConfiguration config = ReasonerConfiguration
+				.getConfiguration();
+		config.setParameters(additionalConfigWithInterrupts());
 		final Random random = new Random(RandomSeedProvider.VALUE);
 		reasoner_ = TestReasonerUtils.createTestReasoner(
 				getManifest().getInput().getUrl().openStream(),
 				new TestReasonerInterrupter(new RandomInterruptMonitor(random,
 						getInterruptionChance(),
-						getInterruptionIntervalNanos())));
+						getInterruptionIntervalNanos())),
+				config);
+	}
+
+	/**
+	 * Augments the configuration with the returned key-value pairs before
+	 * {@link #initWithInterrupts()}.
+	 * 
+	 * @return The additional configuration.
+	 */
+	protected Map<String, String> additionalConfigWithInterrupts() {
+		return Collections.emptyMap();
 	}
 
 	@Override

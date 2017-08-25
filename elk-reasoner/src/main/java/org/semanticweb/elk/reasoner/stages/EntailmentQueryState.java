@@ -35,6 +35,7 @@ import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.loading.EntailmentQueryLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
+import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyCheckingState;
 import org.semanticweb.elk.reasoner.entailments.EntailmentProofUnion;
 import org.semanticweb.elk.reasoner.entailments.InconsistencyProofWrapper;
@@ -55,7 +56,6 @@ import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Condition;
 import org.semanticweb.elk.util.collections.Evictor;
-import org.semanticweb.elk.util.collections.NQEvictor;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 import org.slf4j.Logger;
@@ -71,7 +71,7 @@ import com.google.common.base.Predicate;
 public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 
 	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ClassExpressionQueryState.class);
+			.getLogger(EntailmentQueryState.class);
 
 	public static final int CACHE_CAPACITY = 512;
 	public static final float EVICTION_FACTOR = 0.5f;
@@ -87,10 +87,9 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 	private final Queue<ElkAxiom> toLoad_ = new ConcurrentLinkedQueue<ElkAxiom>();
 
 	/**
-	 * Manages eviction from {@link #queried_}. TODO: build from config!
+	 * Manages eviction from {@link #queried_}.
 	 */
-	private final Evictor<QueryState> queriedEvictor_ = new NQEvictor.Builder()
-			.addLevel(CACHE_CAPACITY, EVICTION_FACTOR).build();
+	private final Evictor<QueryState> queriedEvictor_;
 
 	/**
 	 * The axioms that were registered by the last call.
@@ -204,12 +203,18 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 	private final SaturationConclusion.Factory conclusionFactory_;
 
 	public <C extends Context> EntailmentQueryState(
+			final ReasonerConfiguration config,
 			final SaturationState<C> saturationState,
 			final ConsistencyCheckingState consistencyCheckingState,
 			final SaturationConclusion.Factory factory) {
 		this.saturationState_ = saturationState;
 		this.consistencyCheckingState_ = consistencyCheckingState;
 		this.conclusionFactory_ = factory;
+		final Object builder = config
+				.getParameter(ReasonerConfiguration.ENTAILMENT_QUERY_EVICTOR);
+		LOGGER_.info("{} = {}", ReasonerConfiguration.ENTAILMENT_QUERY_EVICTOR,
+				builder);
+		this.queriedEvictor_ = ((Evictor.Builder) builder).build();
 	}
 
 	/**

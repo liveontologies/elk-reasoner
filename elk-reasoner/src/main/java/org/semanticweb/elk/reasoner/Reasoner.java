@@ -106,7 +106,7 @@ public class Reasoner extends AbstractReasonerState {
 	protected Reasoner(ElkObject.Factory elkFactory,
 			final ReasonerInterrupter interrupter,
 			ReasonerStageExecutor stageExecutor, ReasonerConfiguration config) {
-		super(elkFactory);
+		super(elkFactory, config);
 
 		this.stageExecutor_ = stageExecutor;
 		this.interrupter_ = interrupter;

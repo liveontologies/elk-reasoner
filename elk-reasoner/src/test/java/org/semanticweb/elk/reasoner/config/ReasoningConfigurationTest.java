@@ -30,11 +30,13 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.semanticweb.elk.config.ConfigurationException;
+import org.semanticweb.elk.util.collections.Evictor;
 
 /**
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
 public class ReasoningConfigurationTest {
 
@@ -47,12 +49,33 @@ public class ReasoningConfigurationTest {
 				ReasonerConfiguration.NUM_OF_WORKING_THREADS));
 		assertTrue(config.getParameterNames().contains(
 				ReasonerConfiguration.UNSUPPORTED_FEATURE_TREATMENT));
+		assertTrue(config.getParameterNames().contains(
+				ReasonerConfiguration.INCREMENTAL_MODE_ALLOWED));
+		assertTrue(config.getParameterNames().contains(
+				ReasonerConfiguration.TRACING_CONTEXT_EVICTOR));
+		assertTrue(config.getParameterNames().contains(
+				ReasonerConfiguration.TRACING_CONCLUSION_EVICTOR));
+		assertTrue(config.getParameterNames().contains(
+				ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR));
+		assertTrue(config.getParameterNames().contains(
+				ReasonerConfiguration.ENTAILMENT_QUERY_EVICTOR));
 		assertEquals(
 				Runtime.getRuntime().availableProcessors(),
 				config.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS));
 		assertEquals(
-				UnsupportedFeatureTreatment.IGNORE.toString(),
+				UnsupportedFeatureTreatment.IGNORE,
 				config.getParameter(ReasonerConfiguration.UNSUPPORTED_FEATURE_TREATMENT));
+		assertEquals(
+				true,
+				config.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_MODE_ALLOWED));
+		Object value = config.getParameter(ReasonerConfiguration.TRACING_CONTEXT_EVICTOR);
+		assertTrue(value instanceof Evictor.Builder);
+		value = config.getParameter(ReasonerConfiguration.TRACING_CONTEXT_EVICTOR);
+		assertTrue(value instanceof Evictor.Builder);
+		value = config.getParameter(ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR);
+		assertTrue(value instanceof Evictor.Builder);
+		value = config.getParameter(ReasonerConfiguration.ENTAILMENT_QUERY_EVICTOR);
+		assertTrue(value instanceof Evictor.Builder);
 	}
 
 	@SuppressWarnings("static-method")
@@ -73,4 +96,5 @@ public class ReasoningConfigurationTest {
 		config.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS,
 				"not an integer");
 	}
+
 }

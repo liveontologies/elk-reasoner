@@ -21,16 +21,20 @@
  */
 package org.semanticweb.elk.reasoner.query;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.incremental.ElkIncrementalReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestManifest;
+
+import com.google.common.collect.ImmutableMap;
 
 @RunWith(PolySuite.class)
 public class ElkIncrementalClassExpressionSubClassesQueryTest extends
@@ -62,6 +66,22 @@ public class ElkIncrementalClassExpressionSubClassesQueryTest extends
 										true);
 						return new ElkRelatedEntitiesTestOutput<ElkClass>(
 								subNodes, ElkClassKeyProvider.INSTANCE);
+					}
+
+					@Override
+					protected Map<String, String> additionalConfigIncremental() {
+						return ImmutableMap.<String, String> builder()
+								.put(ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
+										"NQEvictor(0, 0.75)")
+								.build();
+					}
+
+					@Override
+					protected Map<String, String> additionalConfigWithInterrupts() {
+						return ImmutableMap.<String, String> builder()
+								.put(ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
+										"NQEvictor(0, 0.75)")
+								.build();
 					}
 
 				});

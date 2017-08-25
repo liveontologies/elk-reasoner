@@ -27,6 +27,8 @@ import static org.junit.Assert.fail;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Random;
 
 import org.semanticweb.elk.RandomSeedProvider;
@@ -44,6 +46,7 @@ import org.semanticweb.elk.reasoner.AbstractReasoningTestWithInterruptsDelegate;
 import org.semanticweb.elk.reasoner.TestReasonerInterrupter;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
+import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.UrlTestInput;
@@ -120,10 +123,25 @@ public abstract class ElkIncrementalReasoningTestDelegate<O>
 		standardReasoner_ = TestReasonerUtils.createTestReasoner(
 				new TestChangesLoader(allAxioms_, IncrementalChangeType.ADD));
 		standardReasoner_.setAllowIncrementalMode(false);
+
+		final ReasonerConfiguration config = ReasonerConfiguration
+				.getConfiguration();
+		config.setParameters(additionalConfigIncremental());
 		incrementalReasoner_ = TestReasonerUtils.createTestReasoner(
-				new TestChangesLoader(allAxioms_, IncrementalChangeType.ADD));
+				new TestChangesLoader(allAxioms_, IncrementalChangeType.ADD),
+				config);
 		incrementalReasoner_.setAllowIncrementalMode(true);
 
+	}
+
+	/**
+	 * Augments the configuration with the returned key-value pairs before
+	 * {@link #initIncremental()}.
+	 * 
+	 * @return The additional configuration.
+	 */
+	protected Map<String, String> additionalConfigIncremental() {
+		return Collections.emptyMap();
 	}
 
 	@Override
@@ -132,14 +150,29 @@ public abstract class ElkIncrementalReasoningTestDelegate<O>
 		standardReasoner_ = TestReasonerUtils.createTestReasoner(
 				new TestChangesLoader(allAxioms_, IncrementalChangeType.ADD));
 		standardReasoner_.setAllowIncrementalMode(false);
+
+		final ReasonerConfiguration config = ReasonerConfiguration
+				.getConfiguration();
+		config.setParameters(additionalConfigWithInterrupts());
 		final Random random = new Random(RandomSeedProvider.VALUE);
 		incrementalReasoner_ = TestReasonerUtils.createTestReasoner(
 				getManifest().getInput().getUrl().openStream(),
 				new TestReasonerInterrupter(new RandomInterruptMonitor(random,
 						getInterruptionChance(),
-						getInterruptionIntervalNanos())));
+						getInterruptionIntervalNanos())),
+				config);
 		incrementalReasoner_.setAllowIncrementalMode(true);
 
+	}
+
+	/**
+	 * Augments the configuration with the returned key-value pairs before
+	 * {@link #initWithInterrupts()}.
+	 * 
+	 * @return The additional configuration.
+	 */
+	protected Map<String, String> additionalConfigWithInterrupts() {
+		return Collections.emptyMap();
 	}
 
 	@Override

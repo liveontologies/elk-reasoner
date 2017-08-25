@@ -122,7 +122,7 @@ public class RecencyEvictor<E> extends AbstractEvictor<E> {
 		 * @throws IllegalArgumentException
 		 *             When the argument is negative.
 		 */
-		public B capacity(final int capacity) {
+		public B capacity(final int capacity) throws IllegalArgumentException {
 			if (0 > capacity) {
 				throw new IllegalArgumentException(
 						"Capacity cannot be negative!");
@@ -145,7 +145,8 @@ public class RecencyEvictor<E> extends AbstractEvictor<E> {
 		 * @throws IllegalArgumentException
 		 *             When the argument is not between 0 and 1 inclusive.
 		 */
-		public B loadFactor(final double loadFactor) {
+		public B loadFactor(final double loadFactor)
+				throws IllegalArgumentException {
 			if (0 > loadFactor || loadFactor > 1) {
 				throw new IllegalArgumentException(
 						"Load factor must be between 0 and 1 inclusive!");
@@ -162,11 +163,32 @@ public class RecencyEvictor<E> extends AbstractEvictor<E> {
 
 	}
 
-	public static class Builder extends ProtectedBuilder<Builder> {
+	public static class Builder extends ProtectedBuilder<Builder>
+			implements Evictor.Builder {
 
 		@Override
 		protected Builder convertThis() {
 			return this;
+		}
+
+		public static Builder valueOf(final String value) {
+			final String[] args = Evictors.parseArgs(value,
+					RecencyEvictor.class, 2);
+			final String capacityArg = args[0].trim();
+			final String loadFactorArg = args[1].trim();
+			final int capacity = capacityArg.isEmpty() ? DEFAULT_CAPACITY
+					: Integer.valueOf(capacityArg);
+			final double loadFactor = loadFactorArg.isEmpty()
+					? DEFAULT_LOAD_FACTOR : Double.valueOf(loadFactorArg);
+			return new Builder()
+					.capacity(capacity < 0 ? Integer.MAX_VALUE : capacity)
+					.loadFactor(loadFactor);
+		}
+
+		@Override
+		public String toString() {
+			return String.format("%s(%d, %f)", RecencyEvictor.class.getName(),
+					capacity_, loadFactor_);
 		}
 
 	}

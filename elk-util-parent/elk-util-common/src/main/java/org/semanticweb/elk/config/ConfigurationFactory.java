@@ -88,6 +88,8 @@ public class ConfigurationFactory {
 			copyParameters(prefix, config, bundle);
 		}
 
+		copyParameters(prefix, config, System.getProperties());
+
 		return config;
 	}
 
@@ -100,6 +102,8 @@ public class ConfigurationFactory {
 		BaseConfiguration config = instantiate(configClass);
 
 		copyParameters(prefix, config, bundle);
+
+		copyParameters(prefix, config, System.getProperties());
 
 		return config;
 	}
@@ -167,7 +171,7 @@ public class ConfigurationFactory {
 	private static void copyParameters(BaseConfiguration config,
 			Properties diskProps) {
 		for (String key : config.getParameterNames()) {
-			diskProps.setProperty(key, config.getParameter(key));
+			diskProps.setProperty(key, config.getParameter(key).toString());
 		}
 	}
 
@@ -176,6 +180,16 @@ public class ConfigurationFactory {
 		for (String key : bundle.keySet()) {
 			if (key.startsWith(prefix)) {
 				config.setParameter(key, bundle.getString(key));
+			}
+		}
+	}
+
+	private static void copyParameters(final String prefix,
+			final BaseConfiguration config, final Properties properties) {
+		for (final Object key : properties.keySet()) {
+			final String property = key.toString();
+			if (property.startsWith(prefix)) {
+				config.setParameter(property, properties.getProperty(property));
 			}
 		}
 	}
@@ -198,4 +212,5 @@ public class ConfigurationFactory {
 							+ configClass);
 		}
 	}
+
 }

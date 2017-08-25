@@ -153,8 +153,12 @@ public class NQEvictor<E> extends AbstractEvictor<E> {
 		 * @param capacity
 		 * @param loadFactor
 		 * @return This builder.
+		 * @throws IllegalArgumentException
+		 *             When capacity is negative or load factor is not between 0
+		 *             and 1 inclusive.
 		 */
-		public B addLevel(final int capacity, final double loadFactor) {
+		public B addLevel(final int capacity, final double loadFactor)
+				throws IllegalArgumentException {
 			if (0 > capacity) {
 				throw new IllegalArgumentException(
 						"Capacity cannot be negative!");
@@ -175,8 +179,10 @@ public class NQEvictor<E> extends AbstractEvictor<E> {
 		 * 
 		 * @param capacity
 		 * @return This builder.
+		 * @throws IllegalArgumentException
+		 *             When capacity is negative.
 		 */
-		public B addLevel(final int capacity) {
+		public B addLevel(final int capacity) throws IllegalArgumentException {
 			return addLevel(capacity, DEFAULT_LOAD_FACTOR);
 		}
 
@@ -187,8 +193,11 @@ public class NQEvictor<E> extends AbstractEvictor<E> {
 		 * 
 		 * @param loadFactor
 		 * @return This builder.
+		 * @throws IllegalArgumentException
+		 *             When load factor is not between 0 and 1 inclusive.
 		 */
-		public B addLevel(final double loadFactor) {
+		public B addLevel(final double loadFactor)
+				throws IllegalArgumentException {
 			return addLevel(DEFAULT_CAPACITY, loadFactor);
 		}
 
@@ -221,13 +230,54 @@ public class NQEvictor<E> extends AbstractEvictor<E> {
 
 	}
 
-	public static class Builder extends ProtectedBuilder<Builder> {
+	public static class Builder extends ProtectedBuilder<Builder>
+			implements Evictor.Builder {
 
 		@Override
 		protected Builder convertThis() {
 			return this;
 		}
 
+		public static Builder valueOf(final String value) {
+			final String[] args = Evictors.parseArgs(value, NQEvictor.class,
+					null);
+			if (args.length % 2 != 0) {
+				throw new IllegalArgumentException(
+						"The number of arguments must be even! value: "
+								+ value);
+			}
+			final Builder builder = new Builder();
+			for (int i = 0; i < args.length; i += 2) {
+				final String capacityArg = args[i].trim();
+				final String loadFactorArg = args[i + 1].trim();
+				final int capacity = capacityArg.isEmpty() ? DEFAULT_CAPACITY
+						: Integer.valueOf(capacityArg);
+				final double loadFactor = loadFactorArg.isEmpty()
+						? DEFAULT_LOAD_FACTOR : Double.valueOf(loadFactorArg);
+				builder.addLevel(capacity < 0 ? Integer.MAX_VALUE : capacity,
+						loadFactor);
+			}
+			return builder;
+		}
+
+		@Override
+		public String toString() {
+			final StringBuilder result = new StringBuilder(
+					NQEvictor.class.getName()).append("(");
+			for (int i = 0; i < capacities.size(); i++) {
+				if (i > 0) {
+					result.append(", ");
+				}
+				result.append(capacities.get(i)).append(", ")
+						.append(loadFactors.get(i));
+			}
+			return result.append(")").toString();
+		}
+
+	}
+
+	public static Builder builder() {
+		return new Builder();
 	}
 
 	// Stats.

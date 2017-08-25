@@ -90,7 +90,7 @@ public class CountingEvictor<E> extends RecencyEvictor<E> {
 
 		public static final int DEFAULT_EVICT_BEFORE_ADD_COUNT = 3;
 
-		private int evictBeforeAddCount_ = DEFAULT_EVICT_BEFORE_ADD_COUNT;
+		protected int evictBeforeAddCount_ = DEFAULT_EVICT_BEFORE_ADD_COUNT;
 
 		/**
 		 * The number of times an element must be added so that it is not
@@ -103,7 +103,8 @@ public class CountingEvictor<E> extends RecencyEvictor<E> {
 		 * @throws IllegalArgumentException
 		 *             When the argument is negative.
 		 */
-		public B evictBeforeAddCount(final int evictBeforeAddCount) {
+		public B evictBeforeAddCount(final int evictBeforeAddCount)
+				throws IllegalArgumentException {
 			if (0 > evictBeforeAddCount) {
 				throw new IllegalArgumentException(
 						"Cannot add an element negative number of times!");
@@ -122,13 +123,44 @@ public class CountingEvictor<E> extends RecencyEvictor<E> {
 
 	}
 
-	public static class Builder extends ProtectedBuilder<Builder> {
+	public static class Builder extends ProtectedBuilder<Builder>
+			implements Evictor.Builder {
 
 		@Override
 		protected Builder convertThis() {
 			return this;
 		}
 
+		public static Builder valueOf(final String value) {
+			final String[] args = Evictors.parseArgs(value,
+					CountingEvictor.class, 3);
+			final String capacityArg = args[0].trim();
+			final String loadFactorArg = args[1].trim();
+			final String evictBeforeAddCountArg = args[2].trim();
+			final int capacity = capacityArg.isEmpty() ? DEFAULT_CAPACITY
+					: Integer.valueOf(capacityArg);
+			final double loadFactor = loadFactorArg.isEmpty()
+					? DEFAULT_LOAD_FACTOR : Double.valueOf(loadFactorArg);
+			final int evictBeforeAddCount = evictBeforeAddCountArg.isEmpty()
+					? DEFAULT_EVICT_BEFORE_ADD_COUNT
+					: Integer.valueOf(evictBeforeAddCountArg);
+			return new Builder()
+					.capacity(capacity < 0 ? Integer.MAX_VALUE : capacity)
+					.loadFactor(loadFactor)
+					.evictBeforeAddCount(evictBeforeAddCount);
+		}
+
+		@Override
+		public String toString() {
+			return String.format("%s(%d, %f, %d)",
+					CountingEvictor.class.getName(), capacity_, loadFactor_,
+					evictBeforeAddCount_);
+		}
+
+	}
+
+	public static Builder builder() {
+		return new Builder();
 	}
 
 	// Stats.

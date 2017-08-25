@@ -32,6 +32,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,23 +50,22 @@ import java.util.Set;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author Peter Skocovsky
  */
 public class BaseConfiguration {
 
-	/**
-	 * 
-	 */
 	private final Map<String, Validator> validators = new HashMap<String, Validator>();
 
-	private final Map<String, String> paramMap = new HashMap<String, String>();
+	private final Map<String, Object> paramMap = new HashMap<String, Object>();
 
-	public BaseConfiguration() {}
-	
+	public BaseConfiguration() {
+	}
+
 	protected BaseConfiguration(BaseConfiguration config) {
 		this.paramMap.putAll(config.paramMap);
 		this.validators.putAll(config.validators);
 	}
-	
+
 	protected void initConfiguration() {
 		Field[] allFields = getClass().getDeclaredFields();
 
@@ -73,65 +73,64 @@ public class BaseConfiguration {
 			if (field.isAnnotationPresent(Parameter.class)) {
 				// create the parameter with its default value
 				Parameter annotation = field.getAnnotation(Parameter.class);
-				Class<?> paramClass = null;
-				Validator validator = null;
-				String paramValue = null;
-				String paramName = null;
 
 				try {
-					paramClass = Class.forName(annotation.type());
-					validator = new Validator(paramClass);
-					paramName = field.get(null).toString();
-					paramValue = validator.create(annotation.value())
-							.toString();
+					Class<?> paramClass = Class.forName(annotation.type());
+					Validator validator = newValidator(paramClass);
+					String paramName = field.get(null).toString();
+					Object paramValue = validator.create(annotation.value());
+
+					paramMap.put(paramName, paramValue);
+					// attach a validator to this parameter
+					validators.put(paramName, validator);
 
 				} catch (Throwable e) {
 					throw new ConfigurationException(
 							"Perhaps incorrect declaration of the configuration parameter "
-									+ field.getName(), e);
+									+ field.getName(),
+							e);
 				}
-
-				paramMap.put(paramName, paramValue);
-				// attach a validator to this parameter
-				validators.put(paramName, validator);
 			}
 		}
 
 	}
 
-	public String getParameter(String name) {
+	public Object getParameter(final String name) {
 		return paramMap.get(name);
 	}
 
-	public int getParameterAsInt(String name) {
-		return Integer.valueOf(paramMap.get(name));
+	public int getParameterAsInt(final String name) {
+		return Integer.valueOf("" + paramMap.get(name));
 	}
-	
-	public boolean getParameterAsBoolean(String name) {
-		return Boolean.valueOf(paramMap.get(name));
-	}	
 
-	public BaseConfiguration setParameter(String name, String value) {
-		if (!validate(name, value))
-			throw new ConfigurationException("Wrong value " + value
-					+ " for parameter " + name);
+	public boolean getParameterAsBoolean(final String name) {
+		return Boolean.valueOf("" + paramMap.get(name));
+	}
 
-		paramMap.put(name, value);
-		
+	public BaseConfiguration setParameter(final String name,
+			final String value) {
+		final Validator validator = validators.get(name);
+		final Object createdValue;
+		if (validator == null) {
+			createdValue = value;
+		} else {
+			try {
+				createdValue = validator.create(value);
+			} catch (final Exception e) {
+				throw new ConfigurationException(
+						"Wrong value " + value + " for parameter " + name, e);
+			}
+		}
+		paramMap.put(name, createdValue);
 		return this;
 	}
 
-	private boolean validate(String name, String value) {
-		Validator validator = validators.get(name);
-
-		try {
-			if (validator != null)
-				validator.create(value);
-		} catch (Throwable e) {
-			return false;
+	public BaseConfiguration setParameters(
+			final Map<String, String> parameters) {
+		for (final Map.Entry<String, String> e : parameters.entrySet()) {
+			setParameter(e.getKey(), e.getValue());
 		}
-
-		return true;
+		return this;
 	}
 
 	public Set<String> getParameterNames() {
@@ -149,42 +148,94 @@ public class BaseConfiguration {
 
 		String value() default "";
 	}
-}
 
-/**
- * Validates the string-based representation of each parameter by trying to
- * instantiate it
- * 
- * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
- */
-class Validator {
-
-	final Class<?> clazz;
-	final Constructor<?> constructor;
-	final Method valueOf;
-
-	Validator(Class<?> clazz) throws Exception {
-		this.clazz = clazz;
-
-		if (clazz.isEnum()) {
-			constructor = null;
-			valueOf = clazz.getMethod("valueOf",
-					new Class<?>[] { String.class });
-		} else {
-			constructor = clazz.getConstructor(new Class<?>[] { String.class });
-			this.valueOf = null;
+	public static Method getValueOfMethod(final Class<?> clazz) {
+		try {
+			final Method method = clazz.getMethod("valueOf", String.class);
+			final int mods = method.getModifiers();
+			final Class<?>[] params = method.getParameterTypes();
+			if (Modifier.isPublic(mods) && Modifier.isStatic(mods)
+					&& params.length == 1 && params[0].equals(String.class)) {
+				return method;
+			}
+		} catch (final NoSuchMethodException e) {
+			// Return null at the end.
 		}
+		return null;
 	}
 
-	Object create(String value) throws Exception {
-		assert constructor != null || valueOf != null;
+	public static Constructor<?> getStringConstructorMethod(
+			final Class<?> clazz) {
+		try {
+			final Constructor<?> constructor = clazz
+					.getConstructor(String.class);
+			final int mods = constructor.getModifiers();
+			if (Modifier.isPublic(mods)) {
+				return constructor;
+			}
+		} catch (final NoSuchMethodException e) {
+			// Return null at the end.
+		}
+		return null;
+	}
 
+	private static Validator newValidator(final Class<?> clazz)
+			throws IllegalArgumentException {
+		final Method valueOf = getValueOfMethod(clazz);
+		if (valueOf != null) {
+			return new ValueOfValidator(valueOf);
+		}
+		final Constructor<?> constructor = getStringConstructorMethod(clazz);
 		if (constructor != null) {
-			return constructor.newInstance(value);
-		} else {
+			return new ConstructorValidator(constructor);
+		}
+		throw new IllegalArgumentException(
+				"The class does not have valueOf method nor a constructor that accepts a String.");
+	}
+
+	/**
+	 * Validates the string-based representation of each parameter by trying to
+	 * instantiate it
+	 * 
+	 * @author Pavel Klinov
+	 * 
+	 *         pavel.klinov@uni-ulm.de
+	 * @author Peter Skocovsky
+	 */
+	private static interface Validator {
+
+		Object create(String value) throws Exception;
+
+	}
+
+	private static class ValueOfValidator implements Validator {
+
+		private final Method valueOf;
+
+		public ValueOfValidator(final Method valueOf) {
+			this.valueOf = valueOf;
+		}
+
+		@Override
+		public Object create(final String value) throws Exception {
 			return valueOf.invoke(null, value);
 		}
+
 	}
+
+	private static class ConstructorValidator implements Validator {
+
+		private final Constructor<?> constructor;
+
+		public ConstructorValidator(final Constructor<?> constructor) {
+			this.constructor = constructor;
+		}
+
+		@Override
+		public Object create(final String value) throws Exception {
+			return constructor.newInstance(value);
+		}
+
+	}
+
 }

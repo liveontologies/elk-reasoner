@@ -88,4 +88,8 @@ public interface Evictor<E> extends HasStats {
 	 */
 	Iterator<E> addAndEvict(E element, Predicate<E> retain);
 
+	public static interface Builder {
+		<E> Evictor<E> build();
+	}
+
 }

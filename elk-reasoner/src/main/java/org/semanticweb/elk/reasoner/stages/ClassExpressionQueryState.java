@@ -39,6 +39,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionProcessor;
+import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
@@ -66,7 +67,6 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Evictor;
-import org.semanticweb.elk.util.collections.NQEvictor;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 import org.slf4j.Logger;
@@ -109,10 +109,9 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 	private final Map<IndexedClassExpression, QueryState> indexed_ = new ConcurrentHashMap<IndexedClassExpression, QueryState>();
 
 	/**
-	 * Manages eviction from {@link #queried_}. TODO: build from config!
+	 * Manages eviction from {@link #queried_}.
 	 */
-	private final Evictor<ElkClassExpression> recentlyQueried_ = new NQEvictor.Builder()
-			.addLevel(CACHE_CAPACITY, EVICTION_FACTOR).build();
+	private final Evictor<ElkClassExpression> queriedEvictor_;
 
 	/**
 	 * The class expressions that were registered by the last call.
@@ -172,6 +171,7 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 	private final ClassInconsistency.Factory conclusionFactory_;
 
 	public <C extends Context> ClassExpressionQueryState(
+			final ReasonerConfiguration config,
 			final SaturationState<C> saturationState,
 			final PredefinedElkClassFactory elkFactory,
 			final ModifiableOntologyIndex ontologyIndex,
@@ -219,6 +219,12 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 					}
 
 				});
+
+		final Object builder = config.getParameter(
+				ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR);
+		LOGGER_.info("{} = {}",
+				ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR, builder);
+		this.queriedEvictor_ = ((Evictor.Builder) builder).build();
 	}
 
 	/**
@@ -280,7 +286,7 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 		LOGGER_.trace("class expression query registered {}", classExpression);
 
 		lastQueries_.clear();
-		recentlyQueried_.add(classExpression);
+		queriedEvictor_.add(classExpression);
 		lastQueries_.add(classExpression);
 
 		QueryState state = queried_.get(classExpression);
@@ -312,7 +318,7 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 				throws ElkLoadingException {
 
 			// First evict and unload.
-			final Iterator<ElkClassExpression> evicted = recentlyQueried_
+			final Iterator<ElkClassExpression> evicted = queriedEvictor_
 					.evict(doNotEvict_);
 			while (evicted.hasNext()) {
 				final ElkClassExpression classExpression = evicted.next();

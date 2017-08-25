@@ -60,7 +60,7 @@ public class ConfigurationFactoryTest {
 	@Test
 	public void getDefaultConfiguration() {
 		BaseConfiguration defaultConfig = new ConfigurationFactory()
-				.getConfiguration("", BaseConfiguration.class);
+				.getConfiguration("elk", BaseConfiguration.class);
 
 		assertEquals(3, defaultConfig.getParameterNames().size());
 	}
@@ -89,7 +89,7 @@ public class ConfigurationFactoryTest {
 					.getResourceAsStream("elk.properties");
 
 			BaseConfiguration config = new ConfigurationFactory()
-					.getConfiguration(stream, "", BaseConfiguration.class);
+					.getConfiguration(stream, "elk", BaseConfiguration.class);
 
 			assertEquals(3, config.getParameterNames().size());
 		} finally {
@@ -101,7 +101,7 @@ public class ConfigurationFactoryTest {
 	@Test
 	public void roundtrip() throws ConfigurationException, IOException {
 		ConfigurationFactory factory = new ConfigurationFactory();
-		BaseConfiguration defaultConfig = factory.getConfiguration("",
+		BaseConfiguration defaultConfig = factory.getConfiguration("elk",
 				BaseConfiguration.class);
 		InputStream stream = null;
 		File testFile = new File(TestUtils.TEST_ROOT + "/test.properties");
@@ -111,7 +111,7 @@ public class ConfigurationFactoryTest {
 		try {
 			stream = new FileInputStream(testFile);
 
-			BaseConfiguration loaded = factory.getConfiguration(stream, "",
+			BaseConfiguration loaded = factory.getConfiguration(stream, "elk",
 					BaseConfiguration.class);
 
 			assertNotNull(loaded);

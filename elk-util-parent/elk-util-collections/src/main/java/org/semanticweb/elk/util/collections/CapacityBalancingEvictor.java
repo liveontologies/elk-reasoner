@@ -136,8 +136,8 @@ public class CapacityBalancingEvictor<E> extends RecencyEvictor<E> {
 		public static final double DEFAULT_BALANCE = 0.8;
 		public static final int DEFAULT_BALANCE_AFTER_N_REPEATED_QUERIES = 100;
 
-		private double balance_ = DEFAULT_BALANCE;
-		private int balanceAfterNRepeatedQueries_ = DEFAULT_BALANCE_AFTER_N_REPEATED_QUERIES;
+		protected double balance_ = DEFAULT_BALANCE;
+		protected int balanceAfterNRepeatedQueries_ = DEFAULT_BALANCE_AFTER_N_REPEATED_QUERIES;
 
 		/**
 		 * Capacity should be set so that this proportion of repeatedly added
@@ -151,7 +151,7 @@ public class CapacityBalancingEvictor<E> extends RecencyEvictor<E> {
 		 * @throws IllegalArgumentException
 		 *             When the argument is not between 0 and 1 inclusive.
 		 */
-		public B balance(final double balance) {
+		public B balance(final double balance) throws IllegalArgumentException {
 			if (0 > balance || balance > 1) {
 				throw new IllegalArgumentException(
 						"Balance must be between 0 and 1 inclusive!");
@@ -173,7 +173,8 @@ public class CapacityBalancingEvictor<E> extends RecencyEvictor<E> {
 		 *             If the value is not positive.
 		 */
 		public B balanceAfterNRepeatedQueries(
-				final int balanceAfterNRepeatedQueries) {
+				final int balanceAfterNRepeatedQueries)
+				throws IllegalArgumentException {
 			if (1 > balanceAfterNRepeatedQueries) {
 				throw new IllegalArgumentException(
 						"Capacity can be balanced only after positive number of repeated queries!");
@@ -192,13 +193,47 @@ public class CapacityBalancingEvictor<E> extends RecencyEvictor<E> {
 
 	}
 
-	public static class Builder extends ProtectedBuilder<Builder> {
+	public static class Builder extends ProtectedBuilder<Builder>
+			implements Evictor.Builder {
 
 		@Override
 		protected Builder convertThis() {
 			return this;
 		}
 
+		public static Builder valueOf(final String value) {
+			final String[] args = Evictors.parseArgs(value,
+					CapacityBalancingEvictor.class, 4);
+			final String capacityArg = args[0].trim();
+			final String loadFactorArg = args[1].trim();
+			final String balanceArg = args[2].trim();
+			final String balanceAfterNRepeatedQueriesArg = args[3].trim();
+			final int capacity = capacityArg.isEmpty() ? DEFAULT_CAPACITY
+					: Integer.valueOf(capacityArg);
+			final double loadFactor = loadFactorArg.isEmpty()
+					? DEFAULT_LOAD_FACTOR : Double.valueOf(loadFactorArg);
+			final double balance = balanceArg.isEmpty() ? DEFAULT_BALANCE
+					: Double.valueOf(balanceArg);
+			final int balanceAfterNRepeatedQueries = balanceAfterNRepeatedQueriesArg
+					.isEmpty() ? DEFAULT_BALANCE_AFTER_N_REPEATED_QUERIES
+							: Integer.valueOf(balanceAfterNRepeatedQueriesArg);
+			return new Builder()
+					.capacity(capacity < 0 ? Integer.MAX_VALUE : capacity)
+					.loadFactor(loadFactor).balance(balance)
+					.balanceAfterNRepeatedQueries(balanceAfterNRepeatedQueries);
+		}
+
+		@Override
+		public String toString() {
+			return String.format("%s(%d, %f, %f, %d)",
+					CapacityBalancingEvictor.class.getName(), capacity_,
+					loadFactor_, balance_, balanceAfterNRepeatedQueries_);
+		}
+
+	}
+
+	public static Builder builder() {
+		return new Builder();
 	}
 
 	// Stats.

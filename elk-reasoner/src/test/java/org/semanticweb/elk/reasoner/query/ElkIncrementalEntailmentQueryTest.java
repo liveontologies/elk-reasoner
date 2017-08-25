@@ -29,11 +29,15 @@ import java.util.Map;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.incremental.ElkIncrementalReasoningTestDelegate;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
+
+import com.google.common.collect.ImmutableMap;
+
 import org.semanticweb.elk.testing.TestManifest;
 
 @RunWith(PolySuite.class)
@@ -62,6 +66,22 @@ public class ElkIncrementalEntailmentQueryTest extends
 								.isEntailed(manifest.getInput().getQuery());
 						return new EntailmentQueryTestOutput<ElkAxiom>(
 								ElkEntailmentQueryTest.resultToOutput(result));
+					}
+
+					@Override
+					protected Map<String, String> additionalConfigIncremental() {
+						return ImmutableMap.<String, String> builder()
+								.put(ReasonerConfiguration.ENTAILMENT_QUERY_EVICTOR,
+										"NQEvictor(0, 0.75)")
+								.build();
+					}
+
+					@Override
+					protected Map<String, String> additionalConfigWithInterrupts() {
+						return ImmutableMap.<String, String> builder()
+								.put(ReasonerConfiguration.ENTAILMENT_QUERY_EVICTOR,
+										"NQEvictor(0, 0.75)")
+								.build();
 					}
 
 				});
