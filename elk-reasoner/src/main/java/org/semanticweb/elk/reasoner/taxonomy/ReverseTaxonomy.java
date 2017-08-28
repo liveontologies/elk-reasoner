@@ -21,7 +21,9 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
@@ -46,6 +48,8 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 public class ReverseTaxonomy<T extends ElkEntity> extends AbstractTaxonomy<T> {
 
 	protected final Taxonomy<T> original_;
+
+	protected final List<Taxonomy.Listener<T>> taxonomyListeners_ = new ArrayList<Taxonomy.Listener<T>>();
 
 	public ReverseTaxonomy(final Taxonomy<T> original) {
 		this.original_ = original;
@@ -88,16 +92,27 @@ public class ReverseTaxonomy<T extends ElkEntity> extends AbstractTaxonomy<T> {
 
 	@Override
 	public boolean addListener(final Taxonomy.Listener<T> listener) {
-		// FIXME: This cannot be implemented with the current listener, change
-		// the listener !!!
-		return false;
+		final boolean wasEmpty = taxonomyListeners_.isEmpty();
+		final boolean ret = taxonomyListeners_.add(listener);
+		if (wasEmpty && ret) {
+			if (!original_.addListener(reverseListener_)) {
+				taxonomyListeners_.remove(listener);
+				return false;
+			}
+		}
+		return ret;
 	}
 
 	@Override
 	public boolean removeListener(final Taxonomy.Listener<T> listener) {
-		// FIXME: This cannot be implemented with the current listener, change
-		// the listener !!!
-		return false;
+		final boolean ret = taxonomyListeners_.remove(listener);
+		if (taxonomyListeners_.isEmpty() && ret) {
+			if (!original_.removeListener(reverseListener_)) {
+				taxonomyListeners_.add(listener);
+				return false;
+			}
+		}
+		return ret;
 	}
 
 	private final FunctorEx<TaxonomyNode<T>, ReverseTaxonomyNode> wrapNode_ = new FunctorEx<TaxonomyNode<T>, ReverseTaxonomyNode>() {
@@ -215,5 +230,37 @@ public class ReverseTaxonomy<T extends ElkEntity> extends AbstractTaxonomy<T> {
 		}
 
 	}
+
+	private final Taxonomy.Listener<T> reverseListener_ = new Taxonomy.Listener<T>() {
+
+		@Override
+		public void directSuperNodesAppeared(final TaxonomyNode<T> subNode) {
+			for (final Taxonomy.Listener<T> listener : taxonomyListeners_) {
+				listener.directSubNodesAppeared(subNode);
+			}
+		}
+
+		@Override
+		public void directSuperNodesDisappeared(final TaxonomyNode<T> subNode) {
+			for (final Taxonomy.Listener<T> listener : taxonomyListeners_) {
+				listener.directSubNodesDisappeared(subNode);
+			}
+		}
+
+		@Override
+		public void directSubNodesAppeared(final TaxonomyNode<T> superNode) {
+			for (final Taxonomy.Listener<T> listener : taxonomyListeners_) {
+				listener.directSuperNodesAppeared(superNode);
+			}
+		}
+
+		@Override
+		public void directSubNodesDisappeared(final TaxonomyNode<T> superNode) {
+			for (final Taxonomy.Listener<T> listener : taxonomyListeners_) {
+				listener.directSuperNodesDisappeared(superNode);
+			}
+		}
+
+	};
 
 }

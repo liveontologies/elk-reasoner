@@ -1100,7 +1100,7 @@ public abstract class AbstractReasonerState implements TracingProof {
 		return ce.accept(subPropertyConverter_);
 	}
 
-	TraceState getTraceState() {// TODO [trace single context] remove this
+	TraceState getTraceState() {
 		return traceState_;
 	}
 

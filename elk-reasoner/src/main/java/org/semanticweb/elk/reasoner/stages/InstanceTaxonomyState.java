@@ -49,7 +49,6 @@ import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.NodeStore;
-import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.util.collections.Operations;
@@ -144,9 +143,8 @@ public class InstanceTaxonomyState {
 	private final InstanceTaxonomy.Listener<ElkClass, ElkNamedIndividual> taxonomyListener_ = new DummyInstanceTaxonomyListener<ElkClass, ElkNamedIndividual>() {
 
 		@Override
-		public void directTypeRemoval(
-				InstanceNode<ElkClass, ElkNamedIndividual> instanceNode,
-				Collection<? extends TypeNode<ElkClass, ElkNamedIndividual>> typeNodes) {
+		public void directTypeNodesDisappeared(
+				final InstanceNode<ElkClass, ElkNamedIndividual> instanceNode) {
 			for (final ElkNamedIndividual elkIndividual : instanceNode) {
 				addToAdd(elkIndividual);
 			}

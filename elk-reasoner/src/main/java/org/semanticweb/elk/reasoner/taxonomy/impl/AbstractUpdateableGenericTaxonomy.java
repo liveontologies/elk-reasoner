@@ -306,14 +306,20 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 	protected void fireDirectSupernodeAssignment(final TaxonomyNode<T> subNode,
 			final Collection<? extends TaxonomyNode<T>> superNodes) {
 		for (final Taxonomy.Listener<T> listener : taxonomyListeners_) {
-			listener.directSupernodeAssignment(subNode, superNodes);
+			listener.directSuperNodesAppeared(subNode);
+			for (final TaxonomyNode<T> superNode : superNodes) {
+				listener.directSubNodesAppeared(superNode);
+			}
 		}
 	}
 
 	protected void fireDirectSupernodeRemoval(final TaxonomyNode<T> subNode,
 			final Collection<? extends TaxonomyNode<T>> superNodes) {
 		for (final Taxonomy.Listener<T> listener : taxonomyListeners_) {
-			listener.directSupernodeRemoval(subNode, superNodes);
+			listener.directSuperNodesDisappeared(subNode);
+			for (final TaxonomyNode<T> superNode : superNodes) {
+				listener.directSubNodesDisappeared(superNode);
+			}
 		}
 	}
 

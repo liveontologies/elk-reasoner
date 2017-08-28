@@ -25,7 +25,6 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy.model;
 
-import java.util.Collection;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
@@ -101,28 +100,36 @@ public interface Taxonomy<T extends ElkEntity>
 	interface Listener<T extends ElkEntity> {
 
 		/**
-		 * Called just after the links to super-nodes of <code>subNode</code>
-		 * are assigned.
+		 * Called just after some super-nodes of {@code subNode} appear.
 		 * 
 		 * @param subNode
-		 *            The node whose links to super-nodes are being added.
-		 * @param superNodes
-		 *            The super-nodes links to which were assigned.
+		 *            The node whose super-nodes appeared.
 		 */
-		void directSupernodeAssignment(TaxonomyNode<T> subNode,
-				Collection<? extends TaxonomyNode<T>> superNodes);
+		void directSuperNodesAppeared(TaxonomyNode<T> subNode);
 
 		/**
-		 * Called just after the links to super-nodes of <code>subNode</code>
-		 * are deleted.
+		 * Called just after some super-nodes of {@code subNode} disappear.
 		 * 
 		 * @param subNode
-		 *            The node whose links to super-nodes are being deleted.
-		 * @param superNodes
-		 *            The super-nodes links to which were removed.
+		 *            The node whose super-nodes disappeared.
 		 */
-		void directSupernodeRemoval(TaxonomyNode<T> subNode,
-				Collection<? extends TaxonomyNode<T>> superNodes);
+		void directSuperNodesDisappeared(TaxonomyNode<T> subNode);
+
+		/**
+		 * Called just after some sub-nodes of {@code superNode} appear.
+		 * 
+		 * @param superNode
+		 *            The node whose sub-nodes appeared.
+		 */
+		void directSubNodesAppeared(TaxonomyNode<T> superNode);
+
+		/**
+		 * Called just after some sub-nodes of {@code superNode} disappear.
+		 * 
+		 * @param superNode
+		 *            The node whose sub-nodes disappeared.
+		 */
+		void directSubNodesDisappeared(TaxonomyNode<T> superNode);
 
 	}
 

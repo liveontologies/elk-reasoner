@@ -21,8 +21,6 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.Collection;
-
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
@@ -40,14 +38,22 @@ public class DummyTaxonomyListener<T extends ElkEntity>
 		implements Taxonomy.Listener<T> {
 
 	@Override
-	public void directSupernodeAssignment(final TaxonomyNode<T> subNode,
-			final Collection<? extends TaxonomyNode<T>> superNodes) {
+	public void directSuperNodesAppeared(final TaxonomyNode<T> subNode) {
 		// Empty.
 	}
 
 	@Override
-	public void directSupernodeRemoval(final TaxonomyNode<T> subNode,
-			final Collection<? extends TaxonomyNode<T>> superNodes) {
+	public void directSuperNodesDisappeared(final TaxonomyNode<T> subNode) {
+		// Empty.
+	}
+
+	@Override
+	public void directSubNodesAppeared(final TaxonomyNode<T> superNode) {
+		// Empty.
+	}
+
+	@Override
+	public void directSubNodesDisappeared(final TaxonomyNode<T> superNode) {
 		// Empty.
 	}
 

@@ -62,23 +62,16 @@ import org.semanticweb.elk.util.collections.LazySetUnion;
  * @param <UIN>
  *            The mutable type of instance nodes in this taxonomy.
  */
-public abstract class AbstractUpdateableGenericInstanceTaxonomy<
-				T extends ElkEntity,
-				I extends ElkEntity,
-				TN extends GenericTypeNode<T, I, TN, IN>,
-				IN extends GenericInstanceNode<T, I, TN, IN>,
-				UTN extends UpdateableTaxonomyTypeNode<T, I, TN, IN, UTN, UIN>,
-				UIN extends UpdateableInstanceNode<T, I, TN, IN, UTN, UIN>
-		>
+public abstract class AbstractUpdateableGenericInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity, TN extends GenericTypeNode<T, I, TN, IN>, IN extends GenericInstanceNode<T, I, TN, IN>, UTN extends UpdateableTaxonomyTypeNode<T, I, TN, IN, UTN, UIN>, UIN extends UpdateableInstanceNode<T, I, TN, IN, UTN, UIN>>
 		extends AbstractUpdateableGenericTaxonomy<T, TN, UTN>
 		implements UpdateableInstanceTaxonomy<T, I> {
-	
+
 	/** Factory that creates instance nodes. */
 	private final NodeFactory<I, UIN> instanceNodeFactory_;
-	
+
 	/** The store containing instance nodes of this taxonomy. */
 	protected final UpdateableNodeStore<I, UIN> instanceNodeStore_;
-	
+
 	/** The listeners notified about the changes to instance taxonomy. */
 	protected final List<InstanceTaxonomy.Listener<T, I>> instanceListeners_;
 
@@ -180,9 +173,7 @@ public abstract class AbstractUpdateableGenericInstanceTaxonomy<
 		}
 	}
 
-	private void addDirectType(
-			final UTN typeNode,
-			final UIN instanceNode) {
+	private void addDirectType(final UTN typeNode, final UIN instanceNode) {
 		instanceNode.addDirectTypeNode(typeNode);
 		typeNode.addDirectInstanceNode(instanceNode);
 	}
@@ -266,13 +257,13 @@ public abstract class AbstractUpdateableGenericInstanceTaxonomy<
 			final NodeStore.Listener<I> listener) {
 		return instanceNodeStore_.removeListener(listener);
 	}
-	
+
 	@Override
 	public boolean addInstanceListener(
 			final InstanceTaxonomy.Listener<T, I> listener) {
 		return instanceListeners_.add(listener);
 	}
-	
+
 	@Override
 	public boolean removeInstanceListener(
 			final InstanceTaxonomy.Listener<T, I> listener) {
@@ -283,14 +274,20 @@ public abstract class AbstractUpdateableGenericInstanceTaxonomy<
 			final InstanceNode<T, I> instanceNode,
 			final Collection<? extends TypeNode<T, I>> typeNodes) {
 		for (final InstanceTaxonomy.Listener<T, I> listener : instanceListeners_) {
-			listener.directTypeAssignment(instanceNode, typeNodes);
+			listener.directTypeNodesAppeared(instanceNode);
+			for (final TypeNode<T, I> typeNode : typeNodes) {
+				listener.directInstanceNodesAppeared(typeNode);
+			}
 		}
 	}
 
 	protected void fireDirectTypeRemoval(final InstanceNode<T, I> instanceNode,
 			final Collection<? extends TypeNode<T, I>> typeNodes) {
 		for (final InstanceTaxonomy.Listener<T, I> listener : instanceListeners_) {
-			listener.directTypeRemoval(instanceNode, typeNodes);
+			listener.directTypeNodesDisappeared(instanceNode);
+			for (final TypeNode<T, I> typeNode : typeNodes) {
+				listener.directInstanceNodesDisappeared(typeNode);
+			}
 		}
 	}
 

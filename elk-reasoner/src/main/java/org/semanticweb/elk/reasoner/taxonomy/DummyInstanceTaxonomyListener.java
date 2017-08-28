@@ -21,8 +21,6 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.Collection;
-
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
@@ -44,14 +42,23 @@ public class DummyInstanceTaxonomyListener<T extends ElkEntity, I extends ElkEnt
 		implements InstanceTaxonomy.Listener<T, I> {
 
 	@Override
-	public void directTypeAssignment(final InstanceNode<T, I> instanceNode,
-			final Collection<? extends TypeNode<T, I>> typeNodes) {
+	public void directTypeNodesAppeared(final InstanceNode<T, I> instanceNode) {
 		// Empty.
 	}
 
 	@Override
-	public void directTypeRemoval(final InstanceNode<T, I> instanceNode,
-			final Collection<? extends TypeNode<T, I>> typeNodes) {
+	public void directTypeNodesDisappeared(
+			final InstanceNode<T, I> instanceNode) {
+		// Empty.
+	}
+
+	@Override
+	public void directInstanceNodesAppeared(final TypeNode<T, I> typeNode) {
+		// Empty.
+	}
+
+	@Override
+	public void directInstanceNodesDisappeared(final TypeNode<T, I> typeNode) {
 		// Empty.
 	}
 

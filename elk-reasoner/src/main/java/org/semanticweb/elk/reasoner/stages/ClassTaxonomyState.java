@@ -166,8 +166,8 @@ public class ClassTaxonomyState {
 	private final Taxonomy.Listener<ElkClass> taxonomyListener_ = new DummyTaxonomyListener<ElkClass>() {
 
 		@Override
-		public void directSupernodeRemoval(final TaxonomyNode<ElkClass> subNode,
-				final Collection<? extends TaxonomyNode<ElkClass>> superNodes) {
+		public void directSuperNodesDisappeared(
+				final TaxonomyNode<ElkClass> subNode) {
 			for (final ElkClass elkClass : subNode) {
 				addToAdd(elkClass);
 			}

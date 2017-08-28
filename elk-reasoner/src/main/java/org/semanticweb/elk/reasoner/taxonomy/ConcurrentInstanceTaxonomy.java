@@ -100,8 +100,7 @@ public class ConcurrentInstanceTaxonomy
 	/** The listeners notified about the changes to instance taxonomy. */
 	protected final List<InstanceTaxonomy.Listener<ElkClass, ElkNamedIndividual>> instanceListeners_;
 
-	public ConcurrentInstanceTaxonomy(
-			PredefinedElkClassFactory elkFactory,
+	public ConcurrentInstanceTaxonomy(PredefinedElkClassFactory elkFactory,
 			final ComparatorKeyProvider<ElkEntity> classKeyProvider,
 			final ComparatorKeyProvider<ElkEntity> individualKeyProvider) {
 		this(new ConcurrentClassTaxonomy(elkFactory, classKeyProvider),
@@ -651,7 +650,10 @@ public class ConcurrentInstanceTaxonomy
 			final InstanceNode<ElkClass, ElkNamedIndividual> instanceNode,
 			final Collection<? extends TypeNode<ElkClass, ElkNamedIndividual>> typeNodes) {
 		for (final InstanceTaxonomy.Listener<ElkClass, ElkNamedIndividual> listener : instanceListeners_) {
-			listener.directTypeAssignment(instanceNode, typeNodes);
+			listener.directTypeNodesAppeared(instanceNode);
+			for (final TypeNode<ElkClass, ElkNamedIndividual> typeNode : typeNodes) {
+				listener.directInstanceNodesAppeared(typeNode);
+			}
 		}
 	}
 
@@ -659,7 +661,10 @@ public class ConcurrentInstanceTaxonomy
 			final InstanceNode<ElkClass, ElkNamedIndividual> instanceNode,
 			final Collection<? extends TypeNode<ElkClass, ElkNamedIndividual>> typeNodes) {
 		for (final InstanceTaxonomy.Listener<ElkClass, ElkNamedIndividual> listener : instanceListeners_) {
-			listener.directTypeRemoval(instanceNode, typeNodes);
+			listener.directTypeNodesDisappeared(instanceNode);
+			for (final TypeNode<ElkClass, ElkNamedIndividual> typeNode : typeNodes) {
+				listener.directInstanceNodesDisappeared(typeNode);
+			}
 		}
 	}
 

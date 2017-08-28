@@ -22,7 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy.model;
 
-import java.util.Collection;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
@@ -107,7 +106,7 @@ public interface InstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 	boolean removeInstanceListener(NodeStore.Listener<I> listener);
 
 	/**
-	 * Registers the given {@link Taxonomy.Listener} with this instance
+	 * Registers the given {@link InstanceTaxonomy.Listener} with this instance
 	 * taxonomy. The registered listener will be notified about changes in
 	 * relations between instance and type nodes.
 	 * 
@@ -120,7 +119,8 @@ public interface InstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 	boolean addInstanceListener(InstanceTaxonomy.Listener<T, I> listener);
 
 	/**
-	 * Removes the given {@link Taxonomy.Listener} from this instance taxonomy.
+	 * Removes the given {@link InstanceTaxonomy.Listener} from this instance
+	 * taxonomy.
 	 * 
 	 * @param listener
 	 *            The listener that should be removed.
@@ -148,28 +148,36 @@ public interface InstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 	interface Listener<T extends ElkEntity, I extends ElkEntity> {
 
 		/**
-		 * Called just after the links to type nodes of
-		 * <code>instanceNode</code> are assigned.
+		 * Called just after some type nodes of {@code instanceNode} appear.
 		 * 
 		 * @param instanceNode
-		 *            The node whose links to type nodes are being added.
-		 * @param typeNodes
-		 *            The type nodes links to which were assigned.
+		 *            The instance node whose type nodes appeared.
 		 */
-		void directTypeAssignment(InstanceNode<T, I> instanceNode,
-				Collection<? extends TypeNode<T, I>> typeNodes);
+		void directTypeNodesAppeared(InstanceNode<T, I> instanceNode);
 
 		/**
-		 * Called just after the links to type nodes of
-		 * <code>instanceNode</code> are deleted.
+		 * Called just after some type nodes of {@code instanceNode} disappear.
 		 * 
 		 * @param instanceNode
-		 *            The node whose links to type nodes are being deleted.
-		 * @param typeNodes
-		 *            The type nodes links to which were removed.
+		 *            The instance node whose type nodes disappeared.
 		 */
-		void directTypeRemoval(InstanceNode<T, I> instanceNode,
-				Collection<? extends TypeNode<T, I>> typeNodes);
+		void directTypeNodesDisappeared(InstanceNode<T, I> instanceNode);
+
+		/**
+		 * Called just after some instance nodes of {@code typeNode} appear.
+		 * 
+		 * @param typeNode
+		 *            The node whose instance nodes appeared.
+		 */
+		void directInstanceNodesAppeared(TypeNode<T, I> typeNode);
+
+		/**
+		 * Called just after some instance nodes of {@code typeNode} disappear.
+		 * 
+		 * @param typeNode
+		 *            The node whose instance nodes disappeared.
+		 */
+		void directInstanceNodesDisappeared(TypeNode<T, I> typeNode);
 
 	}
 
