@@ -49,7 +49,7 @@ public class ReasonerConfiguration extends BaseConfiguration {
 	@Parameter(type = "java.lang.Boolean", value = "true")
 	public static final String INCREMENTAL_MODE_ALLOWED = "elk.reasoner.incremental.allowed";
 
-	@Parameter(type = "org.semanticweb.elk.reasoner.config.EvictorBuilder", value = "NQEvictor(256, 0.75)")
+	@Parameter(type = "org.semanticweb.elk.reasoner.config.EvictorBuilder", value = "NQEvictor(25600, 0.75)")
 	public static final String TRACING_CONTEXT_EVICTOR = "elk.reasoner.tracing.contextevictor";
 
 	@Parameter(type = "org.semanticweb.elk.reasoner.config.EvictorBuilder", value = "NQEvictor(65536, 0.75)")

@@ -22,6 +22,7 @@
 package org.semanticweb.elk.reasoner.tracing;
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -62,6 +63,11 @@ public class ModifiableTracingProofImpl<I extends TracingInference>
 	public Collection<? extends I> getInferences(Conclusion conclusion) {
 		// assumes structural equality and hash of conclusions
 		return inferenceMap_.get(conclusion);
+	}
+
+	@Override
+	public Set<? extends Conclusion> getAllConclusions() {
+		return inferenceMap_.keySet();
 	}
 
 	@Override

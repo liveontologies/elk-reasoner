@@ -23,18 +23,19 @@ package org.semanticweb.elk.reasoner.tracing.factories;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.tracing.ModifiableTracingProof;
 
 public interface TracingJobListener {
 
 	/**
 	 * called when tracing of the {@link ClassConclusion#getTraceRoot()}
-	 * finished producing the {@link ClassInference}s.
+	 * finished producing the inferences in the {@link ModifiableTracingProof}.
 	 * 
 	 * @param conclusion
-	 * @param inferences
+	 * @param proof
 	 */
 	public void notifyJobFinished(ClassConclusion conclusion,
-			Iterable<? extends ClassInference> inferences);
+			ModifiableTracingProof<ClassInference> proof);
 
 	/**
 	 * called when tracing of all contexts finished.

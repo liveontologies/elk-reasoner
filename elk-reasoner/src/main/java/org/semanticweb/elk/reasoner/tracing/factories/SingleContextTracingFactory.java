@@ -34,6 +34,8 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.tracing.ModifiableTracingProof;
+import org.semanticweb.elk.reasoner.tracing.ModifiableTracingProofImpl;
 import org.semanticweb.elk.reasoner.tracing.TraceState;
 import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 import org.semanticweb.elk.util.concurrent.computation.Processor;
@@ -170,10 +172,15 @@ public class SingleContextTracingFactory
 				throws InterruptedException {
 			// all inferences for this job are computed
 			final IndexedContextRoot root = job.getInput();
-			tracedInferences_.get(root);
 			LOGGER_.trace("{}: job finished", job);
-			tracingState_.getTracingListener().notifyJobFinished(
-					job.getGoalConclusion(), tracedInferences_.get(root));
+			final ModifiableTracingProof<ClassInference> proof = new ModifiableTracingProofImpl<ClassInference>();
+			final ClassInferenceBlockingFilter filter = new ClassInferenceBlockingFilter(
+					proof);
+			for (final ClassInference inference : tracedInferences_.get(root)) {
+				filter.produce(inference);
+			}
+			tracingState_.getTracingListener()
+					.notifyJobFinished(job.getGoalConclusion(), proof);
 		}
 
 	}

@@ -25,11 +25,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ConcurrentMap;
 
 import org.liveontologies.puli.Producer;
 import org.liveontologies.puli.statistics.HasStats;
@@ -45,7 +44,6 @@ import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
@@ -59,8 +57,8 @@ import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainTautology;
 import org.semanticweb.elk.reasoner.stages.PropertyHierarchyCompositionState;
-import org.semanticweb.elk.reasoner.tracing.factories.ClassInferenceBlockingFilter;
 import org.semanticweb.elk.reasoner.tracing.factories.TracingJobListener;
+import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Evictor;
 import org.slf4j.Logger;
@@ -89,16 +87,15 @@ public class TraceState
 			.getLogger(TraceState.class);
 
 	private final Queue<ClassConclusion> toTrace_ = new ConcurrentLinkedQueue<ClassConclusion>();
-	private final Set<ClassConclusion> currentlyTraced_ = new ArrayHashSet<ClassConclusion>();
-	private final Set<IndexedContextRoot> currentlyTracedContexts_ = new ArrayHashSet<IndexedContextRoot>();
+	private final Set<Conclusion> currentlyTraced_ = new ArrayHashSet<Conclusion>();
 
-	private final ConcurrentMap<IndexedContextRoot, ModifiableTracingProof<ClassInference>> tracedContexts_ = new ConcurrentHashMap<IndexedContextRoot, ModifiableTracingProof<ClassInference>>();
+	private final Map<Conclusion, Collection<ClassInference>> tracedContexts_ = new ArrayHashMap<Conclusion, Collection<ClassInference>>();
 
-	private final Evictor<IndexedContextRoot> recentContexts_;
+	private final Evictor<Conclusion> recentContexts_;
 
-	private final ConcurrentMap<ClassConclusion, Collection<ClassInference>> tracedConclusions_ = new ConcurrentHashMap<ClassConclusion, Collection<ClassInference>>();
+	private final Map<Conclusion, Collection<ClassInference>> tracedConclusions_ = new ArrayHashMap<Conclusion, Collection<ClassInference>>();
 
-	private final Evictor<ClassConclusion> recentConclusions_;
+	private final Evictor<Conclusion> recentConclusions_;
 
 	private final Set<ElkAxiom> indexedAxioms_ = new ArrayHashSet<ElkAxiom>();
 
@@ -210,29 +207,8 @@ public class TraceState
 	 * @param conclusion
 	 * @return Whether the queue changed.
 	 */
-	public synchronized boolean toTrace(ClassConclusion conclusion) {
-		final IndexedContextRoot root = conclusion.getTraceRoot();
-		final Iterator<IndexedContextRoot> evictedContexts = recentContexts_
-				.addAndEvict(root, new Predicate<IndexedContextRoot>() {
-					@Override
-					public boolean apply(final IndexedContextRoot root) {
-						return currentlyTracedContexts_.contains(root);
-					}
-				});
-		final Iterator<ClassConclusion> evictedConclusions = recentConclusions_
-				.addAndEvict(conclusion, new Predicate<ClassConclusion>() {
-					@Override
-					public boolean apply(final ClassConclusion conclusion) {
-						return currentlyTraced_.contains(conclusion);
-					}
-				});
-		// Evict. conclusion should not be evicted, due to retainCount above.
-		while (evictedContexts.hasNext()) {
-			tracedContexts_.remove(evictedContexts.next());
-		}
-		while (evictedConclusions.hasNext()) {
-			tracedConclusions_.remove(evictedConclusions.next());
-		}
+	public synchronized boolean toTrace(final ClassConclusion conclusion) {
+		recentConclusions_.add(conclusion);
 		// Check cache.
 		if (tracedConclusions_.get(conclusion) != null) {
 			stats_.nConclusionCacheHits++;
@@ -240,25 +216,34 @@ public class TraceState
 		}
 		// else
 		stats_.nConclusionCacheMisses++;
-		final ModifiableTracingProof<ClassInference> contextInferences = tracedContexts_
-				.get(root);
-		if (contextInferences != null) {
+		final Collection<ClassInference> infs = tracedContexts_.get(conclusion);
+		if (infs != null) {
 			stats_.nContextCacheHits++;
-			final Collection<ClassInference> newInfs = new ArrayList<ClassInference>();
-			final Collection<ClassInference> infs = tracedConclusions_
-					.putIfAbsent(conclusion, newInfs);
-			if (infs == null) {
-				// this thread adds the inferences as the first one
-				newInfs.addAll(contextInferences.getInferences(conclusion));
-			}
+			recentContexts_.add(conclusion);
+			tracedConclusions_.put(conclusion, infs);
 			return false;
 		}
 		// else
+		// Queue up.
 		stats_.nContextCacheMisses++;
 		if (currentlyTraced_.add(conclusion)) {
 			LOGGER_.trace("{}: to trace", conclusion);
-			currentlyTracedContexts_.add(root);
 			toTrace_.add(conclusion);
+		}
+		// Evict.
+		final Iterator<Conclusion> evictedContexts = recentContexts_.evict();
+		final Iterator<Conclusion> evictedConclusions = recentConclusions_
+				.evict(new Predicate<Conclusion>() {
+					@Override
+					public boolean apply(final Conclusion conclusion) {
+						return currentlyTraced_.contains(conclusion);
+					}
+				});
+		while (evictedContexts.hasNext()) {
+			tracedContexts_.remove(evictedContexts.next());
+		}
+		while (evictedConclusions.hasNext()) {
+			tracedConclusions_.remove(evictedConclusions.next());
 		}
 		return true;
 	}
@@ -270,48 +255,31 @@ public class TraceState
 	private final TracingJobListener tracingListener_ = new TracingJobListener() {
 
 		@Override
-		public void notifyJobFinished(final ClassConclusion conclusion,
-				final Iterable<? extends ClassInference> output) {
-
-			final IndexedContextRoot root = conclusion.getTraceRoot();
-
-			ModifiableTracingProof<ClassInference> proof = tracedContexts_
-					.get(root);
-			if (proof == null) {
-				ModifiableTracingProof<ClassInference> newProof = new ModifiableTracingProofImpl<ClassInference>();
-				proof = tracedContexts_.putIfAbsent(root, newProof);
-				if (proof == null) {
-					proof = newProof;
-					final ClassInferenceBlockingFilter filter = new ClassInferenceBlockingFilter(
-							proof);
-					for (final ClassInference inference : output) {
-						filter.produce(inference);
-					}
+		public synchronized void notifyJobFinished(
+				final ClassConclusion conclusion,
+				final ModifiableTracingProof<ClassInference> proof) {
+			for (final Conclusion concl : proof.getAllConclusions()) {
+				final Collection<? extends ClassInference> tracedInfs = proof
+						.getInferences(concl);
+				if (!tracedInfs.isEmpty()) {
+					recentContexts_.add(concl);
+					tracedContexts_.put(concl,
+							new ArrayList<ClassInference>(tracedInfs));
 				}
 			}
-
-			synchronized (proof) {
-				/*
-				 * Different threads may trace the same context for different
-				 * conclusion, so while one is producing the inferences, the
-				 * other should wait.
-				 * 
-				 * If different threads trace the same conclusion, they'll
-				 * synchronize on the same proof, so no more synchronization is
-				 * needed.
-				 */
-				if (!tracedConclusions_.containsKey(conclusion)) {
-					tracedConclusions_.put(conclusion,
-							new ArrayList<ClassInference>(
-									proof.getInferences(conclusion)));
-				}
+			final Collection<? extends ClassInference> tracedInfs = proof
+					.getInferences(conclusion);
+			if (!tracedInfs.isEmpty()) {
+				final Conclusion concl = new TracingInferenceConclusion(
+						tracedInfs.iterator().next());
+				tracedConclusions_.put(concl,
+						new ArrayList<ClassInference>(tracedInfs));
 			}
 
 		}
 
 		public void notifyComputationFinished() {
 			currentlyTraced_.clear();
-			currentlyTracedContexts_.clear();
 		};
 
 	};

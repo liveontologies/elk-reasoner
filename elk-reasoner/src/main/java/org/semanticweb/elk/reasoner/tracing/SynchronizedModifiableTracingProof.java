@@ -22,6 +22,7 @@
 package org.semanticweb.elk.reasoner.tracing;
 
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * A {@link ModifiableTracingProof} in which the access methods are
@@ -50,6 +51,11 @@ public class SynchronizedModifiableTracingProof<I extends TracingInference>
 	@Override
 	public synchronized void clear() {
 		super.clear();
+	}
+
+	@Override
+	public synchronized Set<? extends Conclusion> getAllConclusions() {
+		return super.getAllConclusions();
 	}
 
 }
