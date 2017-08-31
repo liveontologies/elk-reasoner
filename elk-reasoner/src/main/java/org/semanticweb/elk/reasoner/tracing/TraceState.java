@@ -86,16 +86,28 @@ public class TraceState
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(TraceState.class);
 
+	/**
+	 * Conclusions that were submitted for tracing, but their tracing didn't
+	 * start yet.
+	 */
 	private final Queue<ClassConclusion> toTrace_ = new ConcurrentLinkedQueue<ClassConclusion>();
-	private final Set<Conclusion> currentlyTraced_ = new ArrayHashSet<Conclusion>();
+	/**
+	 * Conclusions that were submitted for tracing since the last time the
+	 * tracing computation finished.
+	 */
+	private final Set<Conclusion> inProgress_ = new ArrayHashSet<Conclusion>();
 
-	private final Map<Conclusion, Collection<ClassInference>> tracedContexts_ = new ArrayHashMap<Conclusion, Collection<ClassInference>>();
+	/**
+	 * Traced {@link ClassInference}s.
+	 */
+	private final Map<Conclusion, Collection<ClassInference>> classInferences_ = new ArrayHashMap<Conclusion, Collection<ClassInference>>();
 
-	private final Evictor<Conclusion> recentContexts_;
-
-	private final Map<Conclusion, Collection<ClassInference>> tracedConclusions_ = new ArrayHashMap<Conclusion, Collection<ClassInference>>();
-
-	private final Evictor<Conclusion> recentConclusions_;
+	/**
+	 * Manages eviction from {@link #classInferences_}. Each key added to
+	 * {@link #classInferences_} must be added to this evictor, otherwise it may
+	 * never be evicted.
+	 */
+	private final Evictor<Conclusion> classInferenceEvictor_;
 
 	private final Set<ElkAxiom> indexedAxioms_ = new ArrayHashSet<ElkAxiom>();
 
@@ -112,30 +124,19 @@ public class TraceState
 	// Stats.
 	public class Stats {
 		@Stat
-		public int nContextCacheHits = 0;
+		public int nCacheHits = 0;
 		@Stat
-		public int nContextCacheMisses = 0;
-		@Stat
-		public int nConclusionCacheHits = 0;
-		@Stat
-		public int nConclusionCacheMisses = 0;
+		public int nCacheMisses = 0;
 
 		@ResetStats
 		public void resetStats() {
-			nContextCacheHits = 0;
-			nContextCacheMisses = 0;
-			nConclusionCacheHits = 0;
-			nConclusionCacheMisses = 0;
+			nCacheHits = 0;
+			nCacheMisses = 0;
 		}
 
-		@NestedStats(name = "recentContexts")
-		public Object getRecentContextsStats() {
-			return recentContexts_.getStats();
-		}
-
-		@NestedStats(name = "recentConclusions")
+		@NestedStats(name = "evictor")
 		public Object getRecentConclusionsStats() {
-			return recentConclusions_.getStats();
+			return classInferenceEvictor_.getStats();
 		}
 	}
 
@@ -190,16 +191,10 @@ public class TraceState
 					}
 				});
 
-		Object builder = config
-				.getParameter(ReasonerConfiguration.TRACING_CONTEXT_EVICTOR);
-		LOGGER_.info("{} = {}", ReasonerConfiguration.TRACING_CONTEXT_EVICTOR,
-				builder);
-		this.recentContexts_ = ((Evictor.Builder) builder).build();
-		builder = config
-				.getParameter(ReasonerConfiguration.TRACING_CONCLUSION_EVICTOR);
-		LOGGER_.info("{} = {}",
-				ReasonerConfiguration.TRACING_CONCLUSION_EVICTOR, builder);
-		this.recentConclusions_ = ((Evictor.Builder) builder).build();
+		final Object builder = config
+				.getParameter(ReasonerConfiguration.TRACING_EVICTOR);
+		LOGGER_.info("{}={}", ReasonerConfiguration.TRACING_EVICTOR, builder);
+		this.classInferenceEvictor_ = ((Evictor.Builder) builder).build();
 
 	}
 
@@ -208,42 +203,29 @@ public class TraceState
 	 * @return Whether the queue changed.
 	 */
 	public synchronized boolean toTrace(final ClassConclusion conclusion) {
-		recentConclusions_.add(conclusion);
 		// Check cache.
-		if (tracedConclusions_.get(conclusion) != null) {
-			stats_.nConclusionCacheHits++;
+		if (classInferences_.get(conclusion) != null) {
+			stats_.nCacheHits++;
+			classInferenceEvictor_.add(conclusion);
 			return false;
 		}
 		// else
-		stats_.nConclusionCacheMisses++;
-		final Collection<ClassInference> infs = tracedContexts_.get(conclusion);
-		if (infs != null) {
-			stats_.nContextCacheHits++;
-			recentContexts_.add(conclusion);
-			tracedConclusions_.put(conclusion, infs);
-			return false;
-		}
-		// else
+		stats_.nCacheMisses++;
 		// Queue up.
-		stats_.nContextCacheMisses++;
-		if (currentlyTraced_.add(conclusion)) {
+		if (inProgress_.add(conclusion)) {
 			LOGGER_.trace("{}: to trace", conclusion);
 			toTrace_.add(conclusion);
 		}
 		// Evict.
-		final Iterator<Conclusion> evictedContexts = recentContexts_.evict();
-		final Iterator<Conclusion> evictedConclusions = recentConclusions_
+		final Iterator<Conclusion> evictedConclusions = classInferenceEvictor_
 				.evict(new Predicate<Conclusion>() {
 					@Override
 					public boolean apply(final Conclusion conclusion) {
-						return currentlyTraced_.contains(conclusion);
+						return inProgress_.contains(conclusion);
 					}
 				});
-		while (evictedContexts.hasNext()) {
-			tracedContexts_.remove(evictedContexts.next());
-		}
 		while (evictedConclusions.hasNext()) {
-			tracedConclusions_.remove(evictedConclusions.next());
+			classInferences_.remove(evictedConclusions.next());
 		}
 		return true;
 	}
@@ -262,24 +244,15 @@ public class TraceState
 				final Collection<? extends ClassInference> tracedInfs = proof
 						.getInferences(concl);
 				if (!tracedInfs.isEmpty()) {
-					recentContexts_.add(concl);
-					tracedContexts_.put(concl,
+					classInferenceEvictor_.add(concl);
+					classInferences_.put(concl,
 							new ArrayList<ClassInference>(tracedInfs));
 				}
 			}
-			final Collection<? extends ClassInference> tracedInfs = proof
-					.getInferences(conclusion);
-			if (!tracedInfs.isEmpty()) {
-				final Conclusion concl = new TracingInferenceConclusion(
-						tracedInfs.iterator().next());
-				tracedConclusions_.put(concl,
-						new ArrayList<ClassInference>(tracedInfs));
-			}
-
 		}
 
 		public void notifyComputationFinished() {
-			currentlyTraced_.clear();
+			inProgress_.clear();
 		};
 
 	};
@@ -289,8 +262,7 @@ public class TraceState
 	}
 
 	private void clearClassInferences() {
-		tracedContexts_.clear();
-		tracedConclusions_.clear();
+		classInferences_.clear();
 	}
 
 	private void clearObjectPropertyInferences() {
@@ -333,7 +305,7 @@ public class TraceState
 		@Override
 		protected Collection<? extends ClassInference> defaultVisit(
 				final ClassConclusion conclusion) {
-			final Collection<ClassInference> inferences = tracedConclusions_
+			final Collection<ClassInference> inferences = classInferences_
 					.get(conclusion);
 			if (inferences == null) {
 				throw new ElkRuntimeException(

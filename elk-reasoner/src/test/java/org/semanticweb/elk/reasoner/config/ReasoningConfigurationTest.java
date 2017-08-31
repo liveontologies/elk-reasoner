@@ -52,9 +52,7 @@ public class ReasoningConfigurationTest {
 		assertTrue(config.getParameterNames().contains(
 				ReasonerConfiguration.INCREMENTAL_MODE_ALLOWED));
 		assertTrue(config.getParameterNames().contains(
-				ReasonerConfiguration.TRACING_CONTEXT_EVICTOR));
-		assertTrue(config.getParameterNames().contains(
-				ReasonerConfiguration.TRACING_CONCLUSION_EVICTOR));
+				ReasonerConfiguration.TRACING_EVICTOR));
 		assertTrue(config.getParameterNames().contains(
 				ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR));
 		assertTrue(config.getParameterNames().contains(
@@ -68,9 +66,7 @@ public class ReasoningConfigurationTest {
 		assertEquals(
 				true,
 				config.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_MODE_ALLOWED));
-		Object value = config.getParameter(ReasonerConfiguration.TRACING_CONTEXT_EVICTOR);
-		assertTrue(value instanceof Evictor.Builder);
-		value = config.getParameter(ReasonerConfiguration.TRACING_CONTEXT_EVICTOR);
+		Object value = config.getParameter(ReasonerConfiguration.TRACING_EVICTOR);
 		assertTrue(value instanceof Evictor.Builder);
 		value = config.getParameter(ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR);
 		assertTrue(value instanceof Evictor.Builder);
