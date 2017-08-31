@@ -44,6 +44,7 @@ import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
@@ -90,12 +91,17 @@ public class TraceState
 	 * Conclusions that were submitted for tracing, but their tracing didn't
 	 * start yet.
 	 */
-	private final Queue<ClassConclusion> toTrace_ = new ConcurrentLinkedQueue<ClassConclusion>();
+	private final Queue<IndexedContextRoot> toTrace_ = new ConcurrentLinkedQueue<IndexedContextRoot>();
 	/**
 	 * Conclusions that were submitted for tracing since the last time the
 	 * tracing computation finished.
 	 */
 	private final Set<Conclusion> inProgress_ = new ArrayHashSet<Conclusion>();
+	/**
+	 * Contexts of conclusions that were submitted for tracing since the last
+	 * time the tracing computation finished.
+	 */
+	private final Set<IndexedContextRoot> contextsInProgress_ = new ArrayHashSet<IndexedContextRoot>();
 
 	/**
 	 * Traced {@link ClassInference}s.
@@ -212,9 +218,11 @@ public class TraceState
 		// else
 		stats_.nCacheMisses++;
 		// Queue up.
-		if (inProgress_.add(conclusion)) {
-			LOGGER_.trace("{}: to trace", conclusion);
-			toTrace_.add(conclusion);
+		final IndexedContextRoot root = conclusion.getTraceRoot();
+		inProgress_.add(conclusion);
+		if (contextsInProgress_.add(root)) {
+			LOGGER_.trace("{}: to trace", root);
+			toTrace_.add(root);
 		}
 		// Evict.
 		final Iterator<Conclusion> evictedConclusions = classInferenceEvictor_
@@ -230,7 +238,7 @@ public class TraceState
 		return true;
 	}
 
-	public ClassConclusion pollToTrace() {
+	public IndexedContextRoot pollToTrace() {
 		return toTrace_.poll();
 	}
 
@@ -238,7 +246,7 @@ public class TraceState
 
 		@Override
 		public synchronized void notifyJobFinished(
-				final ClassConclusion conclusion,
+				final IndexedContextRoot root,
 				final ModifiableTracingProof<ClassInference> proof) {
 			for (final Conclusion concl : proof.getAllConclusions()) {
 				final Collection<? extends ClassInference> tracedInfs = proof
@@ -253,6 +261,7 @@ public class TraceState
 
 		public void notifyComputationFinished() {
 			inProgress_.clear();
+			contextsInProgress_.clear();
 		};
 
 	};

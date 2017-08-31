@@ -30,6 +30,7 @@ import org.liveontologies.puli.Producer;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
+import org.semanticweb.elk.reasoner.saturation.SaturationJob;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
@@ -76,7 +77,7 @@ public class SingleContextTracingFactory
 	 * The factory for context saturation with the tracing-enabled rule
 	 * application factory.
 	 */
-	private final ClassExpressionSaturationFactory<SingleContextTracingJob> saturationFactory_;
+	private final ClassExpressionSaturationFactory<SaturationJob<IndexedContextRoot>> saturationFactory_;
 
 	public SingleContextTracingFactory(final TraceState tracingState,
 			final InterruptMonitor interrupter,
@@ -84,7 +85,7 @@ public class SingleContextTracingFactory
 		this.tracingState_ = tracingState;
 		// applying all local rules, saving the inferences using the class
 		// inference producer
-		this.saturationFactory_ = new ClassExpressionSaturationFactory<SingleContextTracingJob>(
+		this.saturationFactory_ = new ClassExpressionSaturationFactory<SaturationJob<IndexedContextRoot>>(
 				new ContextTracingRuleApplicationFactory(interrupter,
 						saturationState, new ThisClassInferenceProducer()),
 				maxWorkers, new ThisClassExpressionSaturationListener());
@@ -117,7 +118,7 @@ public class SingleContextTracingFactory
 
 	public class Engine implements Processor {
 
-		private final ClassExpressionSaturationFactory<SingleContextTracingJob>.Engine saturationEngine_ = saturationFactory_
+		private final ClassExpressionSaturationFactory<SaturationJob<IndexedContextRoot>>.Engine saturationEngine_ = saturationFactory_
 				.getEngine();
 
 		@Override
@@ -127,13 +128,13 @@ public class SingleContextTracingFactory
 					return;
 				}
 				saturationEngine_.process();
-				final ClassConclusion conclusion = tracingState_.pollToTrace();
-				if (conclusion == null) {
+				final IndexedContextRoot root = tracingState_.pollToTrace();
+				if (root == null) {
 					break;
 				}
 				// else
 				saturationEngine_
-						.submit(new SingleContextTracingJob(conclusion));
+						.submit(new SaturationJob<IndexedContextRoot>(root));
 			}
 		}
 
@@ -165,10 +166,10 @@ public class SingleContextTracingFactory
 	}
 
 	private class ThisClassExpressionSaturationListener implements
-			ClassExpressionSaturationListener<SingleContextTracingJob> {
+			ClassExpressionSaturationListener<SaturationJob<IndexedContextRoot>> {
 
 		@Override
-		public void notifyFinished(final SingleContextTracingJob job)
+		public void notifyFinished(final SaturationJob<IndexedContextRoot> job)
 				throws InterruptedException {
 			// all inferences for this job are computed
 			final IndexedContextRoot root = job.getInput();
@@ -179,8 +180,8 @@ public class SingleContextTracingFactory
 			for (final ClassInference inference : tracedInferences_.get(root)) {
 				filter.produce(inference);
 			}
-			tracingState_.getTracingListener()
-					.notifyJobFinished(job.getGoalConclusion(), proof);
+			tracingState_.getTracingListener().notifyJobFinished(job.getInput(),
+					proof);
 		}
 
 	}
