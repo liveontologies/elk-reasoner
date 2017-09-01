@@ -44,6 +44,8 @@ public class OWLAPIDiffClassificationCorrectnessTest
 	static final String[] IGNORE_LIST = {
 			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/DisjointSelf.owl",
 			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/CompositionReflexivityComplex.owl",
+			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/BottomObjectProperty.owl",
+			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/TopObjectProperty.owl",
 		};
 	// @formatter:on
 

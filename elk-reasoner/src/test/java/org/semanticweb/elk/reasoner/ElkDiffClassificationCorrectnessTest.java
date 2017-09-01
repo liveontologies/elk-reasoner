@@ -38,7 +38,12 @@ import org.semanticweb.elk.testing.UrlTestInput;
 public class ElkDiffClassificationCorrectnessTest
 		extends BaseClassificationCorrectnessTest {
 
-	static final String[] IGNORE_LIST = {};
+	// @formatter:off
+	static final String[] IGNORE_LIST = {
+			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/BottomObjectProperty.owl",
+			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/TopObjectProperty.owl",
+		};
+	// @formatter:on
 
 	static {
 		Arrays.sort(IGNORE_LIST);
