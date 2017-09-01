@@ -209,10 +209,10 @@ public class TraceState
 	 * @return Whether the queue changed.
 	 */
 	public synchronized boolean toTrace(final ClassConclusion conclusion) {
+		classInferenceEvictor_.add(conclusion);
 		// Check cache.
 		if (classInferences_.get(conclusion) != null) {
 			stats_.nCacheHits++;
-			classInferenceEvictor_.add(conclusion);
 			return false;
 		}
 		// else
@@ -251,7 +251,8 @@ public class TraceState
 			for (final Conclusion concl : proof.getAllConclusions()) {
 				final Collection<? extends ClassInference> tracedInfs = proof
 						.getInferences(concl);
-				if (!tracedInfs.isEmpty()) {
+				if (!tracedInfs.isEmpty()
+						&& !classInferences_.containsKey(concl)) {
 					classInferenceEvictor_.add(concl);
 					classInferences_.put(concl,
 							new ArrayList<ClassInference>(tracedInfs));
