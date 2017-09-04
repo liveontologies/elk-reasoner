@@ -102,25 +102,26 @@ public class NQEvictorTest {
 			checkEvicted(Arrays.asList(element - 10), evicted);
 		}
 
-		// Exceeding second level capacity evicts elements.
+		// Exceeding second level capacity moves elements to the first level.
 		evicted = evictor.addAndEvict(10);
 		checkNothingEvicted(evicted);
 		evicted = evictor.addAndEvict(11);
 		checkNothingEvicted(evicted);
 		evicted = evictor.addAndEvict(12);
-		checkEvicted(Arrays.asList(1), evicted);
+		checkNothingEvicted(evicted);
+		// So they take place in the first level.
+		evicted = evictor.addAndEvict(20);
+		checkNothingEvicted(evicted);
+		evicted = evictor.addAndEvict(21);
+		checkNothingEvicted(evicted);
+		evicted = evictor.addAndEvict(23);
+		checkEvicted(Arrays.asList(13), evicted);
 
-		// Re-adding elements in the top level evicts nothing ...
+		// Re-adding elements in the top level evicts nothing.
 		evicted = evictor.addAndEvict(2);
 		checkNothingEvicted(evicted);
 		evicted = evictor.addAndEvict(3);
 		checkNothingEvicted(evicted);
-
-		// ... and makes them most recent.
-		evicted = evictor.addAndEvict(13);
-		checkEvicted(Arrays.asList(10), evicted);
-		evicted = evictor.addAndEvict(14);
-		checkEvicted(Arrays.asList(11), evicted);
 
 	}
 
@@ -143,9 +144,9 @@ public class NQEvictorTest {
 		}
 
 		// When capacity exceeded, the elements that are not the 8 most recent
-		// ones are evicted.
+		// ones move to the lower levels and eventually are evicted.
 		evicted = add3Times(evictor, 10);
-		checkEvicted(Arrays.asList(0, 1, 2), evicted);
+		checkEvicted(Arrays.asList(0), evicted);
 
 		// Fill up the capacity again.
 		evicted = add3Times(evictor, 11);
@@ -161,19 +162,18 @@ public class NQEvictorTest {
 		evicted = add3Times(evictor, 5);
 		checkNothingEvicted(evicted);
 
-		// Adding what was evicted exceeds the capacity.
+		// Adding what was evicted exceeds the capacity and evicts the elements
+		// that were in lower levels.
 		evicted = add3Times(evictor, 0);
-		checkEvicted(Arrays.asList(6, 7, 8), evicted);
+		checkEvicted(Arrays.asList(1, 2, 6), evicted);
 
 	}
 
 	private static Iterator<Integer> add3Times(final Evictor<Integer> evictor,
 			final int element) {
-		Iterator<Integer> evicted = null;
-		for (int i = 0; i < 3; i++) {
-			evicted = evictor.addAndEvict(element);
-		}
-		return evicted;
+		evictor.add(element);
+		evictor.add(element);
+		return evictor.addAndEvict(element);
 	}
 
 }

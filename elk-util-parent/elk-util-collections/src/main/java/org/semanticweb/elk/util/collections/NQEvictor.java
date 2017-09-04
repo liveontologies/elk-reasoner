@@ -26,6 +26,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.liveontologies.puli.statistics.Stat;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 
@@ -36,10 +38,8 @@ import com.google.common.base.Predicate;
  * in none of the levels are added to the first one. If there is only one level,
  * this evictor works as {@link RecencyEvictor}.
  * <p>
- * This is straight-forward generalization of the 2Q cache from "2Q: A Low
- * Overhead High Performance Buffer Management Replacement Algorithm" by
- * Theodore Johnson and Dennis Shasha
- * &lt;http://www.vldb.org/conf/1994/P439.PDF&gt;
+ * This is a straight-forward generalization of Segmented LRU cache
+ * &lt;https://en.wikipedia.org/wiki/Cache_replacement_policies#Segmented_LRU_.28SLRU.29&gt;
  * 
  * @author Peter Skocovsky
  *
@@ -94,29 +94,54 @@ public class NQEvictor<E> extends AbstractEvictor<E> {
 	public Iterator<E> evict(final Predicate<E> retain) {
 		Preconditions.checkNotNull(retain);
 
-		final List<E> evicted = new ArrayList<E>();
+		/*
+		 * Elements evicted from some level are added to the lower level. Only
+		 * elements evicted from the first level are actually completely
+		 * evicted.
+		 */
 
-		for (int i = 0; i < capacities_.size(); i++) {
-			final LinkedHashMap<E, Boolean> queue = elements_.get(i);
+		for (int i = capacities_.size() - 1; i > 0; i--) {
+			final LinkedHashMap<E, Boolean> level = elements_.get(i);
+			final LinkedHashMap<E, Boolean> lowerLevel = elements_.get(i - 1);
 			final int capacity = capacities_.get(i);
 			final double loadFactor = loadFactors_.get(i);
 
-			if (queue.size() <= capacity) {
+			if (level.size() <= capacity) {
 				// Evict nothing.
 				continue;
 			}
 			// else
 
 			final int goalCapacity = (int) (capacity * loadFactor);
-			final Iterator<E> iterator = queue.keySet().iterator();
-			while (iterator.hasNext() && queue.size() > goalCapacity) {
+			final Iterator<E> iterator = level.keySet().iterator();
+			while (iterator.hasNext() && level.size() > goalCapacity) {
 				final E element = iterator.next();
-				if (!retain.apply(element)) {
-					evicted.add(element);
-					iterator.remove();
-				}
+				lowerLevel.put(element, true);
+				iterator.remove();
 			}
 
+		}
+
+		final List<E> evicted = new ArrayList<E>();
+
+		final LinkedHashMap<E, Boolean> firstLevel = elements_.get(0);
+		final int capacity = capacities_.get(0);
+		final double loadFactor = loadFactors_.get(0);
+
+		if (firstLevel.size() <= capacity) {
+			// Evict nothing.
+			return evicted.iterator();
+		}
+		// else
+
+		final int goalCapacity = (int) (capacity * loadFactor);
+		final Iterator<E> iterator = firstLevel.keySet().iterator();
+		while (iterator.hasNext() && firstLevel.size() > goalCapacity) {
+			final E element = iterator.next();
+			if (!retain.apply(element)) {
+				evicted.add(element);
+				iterator.remove();
+			}
 		}
 
 		return evicted.iterator();
@@ -266,9 +291,9 @@ public class NQEvictor<E> extends AbstractEvictor<E> {
 					NQEvictor.class.getName()).append("(");
 			for (int i = 0; i < capacities.size(); i++) {
 				if (i > 0) {
-					result.append(", ");
+					result.append(",");
 				}
-				result.append(capacities.get(i)).append(", ")
+				result.append(capacities.get(i)).append(",")
 						.append(loadFactors.get(i));
 			}
 			return result.append(")").toString();
@@ -282,6 +307,17 @@ public class NQEvictor<E> extends AbstractEvictor<E> {
 
 	// Stats.
 	protected class Stats {
+
+		@Stat
+		public String levelSizes() {
+			final StringBuilder result = new StringBuilder(
+					"" + elements_.get(0).size());
+			for (int i = 1; i < elements_.size(); i++) {
+				result.append("_").append(elements_.get(i).size());
+			}
+			return result.toString();
+		}
+
 		// Empty so far.
 	}
 
