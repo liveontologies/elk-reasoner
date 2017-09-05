@@ -4,6 +4,11 @@ git:
   depth: 3
 
 sudo: required
+# New images (Ubuntu Trusty 14.04) do not support oraclejdk7, the following line
+# is a workaround. The line "group: deprecated-2017Q3" does not help.
+# See <https://github.com/travis-ci/travis-ci/issues/7884#issuecomment-308451879>
+# and <https://blog.travis-ci.com/2017-08-29-trusty-image-updates>.
+dist: precise
 
 matrix:
   include:
