@@ -26,14 +26,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.predefined.PredefinedElkEntityFactory;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlNothing;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlThing;
+import org.semanticweb.elk.reasoner.indexing.model.IndexingListener;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ChainableContextInitRule;
@@ -56,12 +56,11 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl
 
 	private final List<OntologyIndex.ChangeListener> listeners_;
 
-	private final List<ModifiableOntologyIndex.IndexingUnsupportedListener> indexingUnsupportedListeners_;
+	private final List<IndexingListener> indexingListeners_ = new ArrayList<IndexingListener>();
 
 	public DirectIndex(final PredefinedElkEntityFactory elkFactory) {
 		super(elkFactory);
 		this.listeners_ = new ArrayList<OntologyIndex.ChangeListener>();
-		this.indexingUnsupportedListeners_ = new ArrayList<ModifiableOntologyIndex.IndexingUnsupportedListener>();
 		// the context root initialization rule is always registered
 		RootContextInitializationRule.addRuleFor(this);
 		// owl:Thing and owl:Nothing always occur
@@ -90,23 +89,24 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl
 			}
 
 		});
-		getOwlNothing().addListener(new CachedIndexedOwlNothing.ChangeListener() {
+		getOwlNothing()
+				.addListener(new CachedIndexedOwlNothing.ChangeListener() {
 
-			@Override
-			public void positiveOccurrenceAppeared() {
-				for (int i = 0; i < listeners_.size(); i++) {
-					listeners_.get(i).positiveOwlNothingAppeared();
-				}
-			}
+					@Override
+					public void positiveOccurrenceAppeared() {
+						for (int i = 0; i < listeners_.size(); i++) {
+							listeners_.get(i).positiveOwlNothingAppeared();
+						}
+					}
 
-			@Override
-			public void positiveOccurrenceDisappeared() {
-				for (int i = 0; i < listeners_.size(); i++) {
-					listeners_.get(i).positiveOwlNothingDisappeared();
-				}
+					@Override
+					public void positiveOccurrenceDisappeared() {
+						for (int i = 0; i < listeners_.size(); i++) {
+							listeners_.get(i).positiveOwlNothingDisappeared();
+						}
 
-			}
-		});
+					}
+				});
 	}
 
 	/* read-only methods required by the interface */
@@ -224,30 +224,21 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl
 	}
 
 	@Override
-	public boolean addIndexingUnsupportedListener(
-			final ModifiableOntologyIndex.IndexingUnsupportedListener listener) {
-		return indexingUnsupportedListeners_.add(listener);
+	public boolean addOccurrenceIndexingListener(
+			final IndexingListener listener) {
+		return indexingListeners_.add(listener);
 	}
 
 	@Override
-	public boolean removeIndexingUnsupportedListener(
-			final ModifiableOntologyIndex.IndexingUnsupportedListener listener) {
-		return indexingUnsupportedListeners_.remove(listener);
+	public boolean removeOccurrenceIndexingListener(
+			final IndexingListener listener) {
+		return indexingListeners_.remove(listener);
 	}
 
 	@Override
-	public void fireIndexingUnsupported(
-			final ModifiableIndexedObject indexedObject,
-			final OccurrenceIncrement increment) {
-		for (final IndexingUnsupportedListener listener : indexingUnsupportedListeners_) {
-			listener.indexingUnsupported(indexedObject, increment);
-		}
-	}
-
-	@Override
-	public void fireIndexingUnsupported(final ElkObject elkObject) {
-		for (final IndexingUnsupportedListener listener : indexingUnsupportedListeners_) {
-			listener.indexingUnsupported(elkObject);
+	public void onIndexing(Occurrence occurrence) {
+		for (final IndexingListener listener : indexingListeners_) {
+			listener.onIndexing(occurrence);
 		}
 	}
 

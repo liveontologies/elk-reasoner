@@ -59,6 +59,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.IndexingListener;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
@@ -71,6 +72,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectInters
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
@@ -115,23 +117,7 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 
 	private final ElkEntityConverter entityConverter_;
 
-	ElkAxiomConverterImpl(PredefinedElkClassFactory elkFactory,
-			ModifiableIndexedAxiomInference.Factory axiomInferenceFactory,
-			ModifiableIndexedObject.Factory positiveFactory,
-			ModifiableIndexedObject.Factory negativeFactory,
-			ElkPolarityExpressionConverter positiveConverter,
-			ElkPolarityExpressionConverter negativeConverter,
-			ElkPolarityExpressionConverter dualConverter,
-			ElkEntityConverter entityConverter) {
-		this.elkFactory_ = elkFactory;
-		this.axiomInferenceFactory_ = axiomInferenceFactory;
-		this.positiveFactory_ = positiveFactory;
-		this.negativeFactory_ = negativeFactory;
-		this.positiveConverter_ = positiveConverter;
-		this.negativeConverter_ = negativeConverter;
-		this.dualConverter_ = dualConverter;
-		this.entityConverter_ = entityConverter;
-	}
+	private final IndexingListener indexingListener_;
 
 	/**
 	 * Creates an {@link ElkAxiomConverter} that uses four
@@ -166,9 +152,9 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	 *            {@link ModifiableIndexedObject}s, such as
 	 *            {@link IndexedClassExpression}s in {@code EquivalentClasses}
 	 *            axioms.
-	 * @param index
-	 *            the {@link ModifiableOntologyIndex} using which conversion is
-	 *            made
+	 * @param indexingListener
+	 *            the {@link IndexingListener} notified about indexed
+	 *            occurrences
 	 * @param producer
 	 *            a {@link Producer} used to record the conversion inferences
 	 */
@@ -177,7 +163,7 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 			ModifiableIndexedObject.Factory positiveFactory,
 			ModifiableIndexedObject.Factory negativeFactory,
 			ModifiableIndexedObject.Factory dualFactory,
-			final ModifiableOntologyIndex index,
+			final IndexingListener indexingListener,
 			Producer<? super IndexedAxiomInference> producer) {
 		this.elkFactory_ = elkFactory;
 		this.axiomInferenceFactory_ = new ModifiableIndexedAxiomInferenceConclusionVisitingFactory(
@@ -186,12 +172,13 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 		this.negativeFactory_ = negativeFactory;
 		this.positiveConverter_ = new ElkPolarityExpressionConverterImpl(
 				ElkPolarity.POSITIVE, elkFactory, positiveFactory,
-				negativeFactory, index);
+				negativeFactory, indexingListener);
 		this.negativeConverter_ = positiveConverter_
 				.getComplementaryConverter();
 		this.dualConverter_ = new ElkPolarityExpressionConverterImpl(elkFactory,
-				dualFactory, index);
+				dualFactory, indexingListener);
 		this.entityConverter_ = new ElkEntityConverterImpl(neutralFactory);
+		this.indexingListener_ = indexingListener;
 	}
 
 	/**
@@ -207,17 +194,18 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	 *            the {@link ModifiableIndexedObject.Factory} that is used to
 	 *            create all {@link ModifiableIndexedObject}s necessary for
 	 *            conversion of {@link ElkAxiom}s.
-	 * @param index
-	 *            the {@link ModifiableOntologyIndex} using which conversion is
-	 *            made
+	 * @param indexingListener
+	 *            the {@link IndexingListener} notified about indexed
+	 *            occurrences
 	 * @param producer
 	 *            a {@link Producer} used to record the conversion inferences
 	 */
 	public ElkAxiomConverterImpl(PredefinedElkClassFactory elkFactory,
 			ModifiableIndexedObject.Factory factory,
-			final ModifiableOntologyIndex index,
+			final IndexingListener indexingListener,
 			Producer<? super IndexedAxiomInference> producer) {
-		this(elkFactory, factory, factory, factory, factory, index, producer);
+		this(elkFactory, factory, factory, factory, factory, indexingListener,
+				producer);
 	}
 
 	/**
@@ -304,6 +292,8 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 
 	@Override
 	public Void visit(ElkObjectPropertyRangeAxiom axiom) {
+		indexingListener_
+				.onIndexing(Occurrence.OCCURRENCE_OF_OBJECT_PROPERTY_RANGE);
 		axiomInferenceFactory_.getElkObjectPropertyRangeAxiomConversion(axiom,
 				axiom.getProperty().accept(negativeConverter_),
 				axiom.getRange().accept(positiveConverter_));
@@ -640,6 +630,8 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 
 	@Override
 	public Void visit(ElkObjectPropertyAssertionAxiom axiom) {
+		indexingListener_
+				.onIndexing(Occurrence.OCCURRENCE_OF_OBJECT_PROPERTY_RANGE);
 		axiomInferenceFactory_.getElkObjectPropertyAssertionAxiomConversion(
 				axiom, axiom.getSubject().accept(negativeConverter_),
 				positiveFactory_.getIndexedObjectSomeValuesFrom(

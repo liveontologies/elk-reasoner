@@ -29,6 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
 
@@ -59,7 +60,8 @@ class CachedIndexedObjectUnionOfImpl extends
 	private static class Initializer {
 		private final List<ModifiableIndexedClassExpression> disjuncts_;
 
-		Initializer(List<? extends ModifiableIndexedClassExpression> disjuncts) {
+		Initializer(
+				List<? extends ModifiableIndexedClassExpression> disjuncts) {
 			this.disjuncts_ = new ArrayList<ModifiableIndexedClassExpression>(
 					2);
 			for (ModifiableIndexedClassExpression disjunct : disjuncts) {
@@ -88,11 +90,6 @@ class CachedIndexedObjectUnionOfImpl extends
 				return false;
 		}
 
-		if (positiveOccurrenceNo == 0 && increment.positiveIncrement > 0) {
-			// first positive occurrence of this expression
-			index.fireIndexingUnsupported(this, increment);
-		}
-
 		positiveOccurrenceNo += increment.positiveIncrement;
 		negativeOccurrenceNo += increment.negativeIncrement;
 
@@ -106,6 +103,11 @@ class CachedIndexedObjectUnionOfImpl extends
 				negativeOccurrenceNo -= increment.negativeIncrement;
 				return false;
 			}
+		}
+
+		for (int i = 0; i < Math.abs(increment.positiveIncrement); i++) {
+			// for each indexed positive occurrence of this expression
+			index.onIndexing(Occurrence.POSITIVE_OCCURRENCE_OF_OBJECT_UNION_OF);
 		}
 		return true;
 	}

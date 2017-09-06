@@ -122,7 +122,8 @@ public class Reasoner extends AbstractReasonerState {
 	 * 
 	 * @param progressMonitor
 	 */
-	public synchronized void setProgressMonitor(ProgressMonitor progressMonitor) {
+	public synchronized void setProgressMonitor(
+			ProgressMonitor progressMonitor) {
 		this.progressMonitor = progressMonitor;
 	}
 
@@ -171,11 +172,11 @@ public class Reasoner extends AbstractReasonerState {
 	 */
 	public synchronized void setConfigurationOptions(
 			ReasonerConfiguration config) {
-		this.workerNo_ = config
-				.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS);
+		this.workerNo_ = config.getParameterAsInt(
+				ReasonerConfiguration.NUM_OF_WORKING_THREADS);
 
-		setAllowIncrementalMode(config
-				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_MODE_ALLOWED));
+		setAllowIncrementalMode(config.getParameterAsBoolean(
+				ReasonerConfiguration.INCREMENTAL_MODE_ALLOWED));
 
 	}
 
@@ -243,12 +244,13 @@ public class Reasoner extends AbstractReasonerState {
 	 */
 	protected TaxonomyNode<ElkClass> getTaxonomyNode(ElkClass elkClass)
 			throws ElkException {
-		TaxonomyNode<ElkClass> node = getTaxonomy().getNode(elkClass);
+		final Taxonomy<ElkClass> taxonomy = getTaxonomy();
+		final TaxonomyNode<ElkClass> node = taxonomy.getNode(elkClass);
 		if (node != null)
 			return node;
 		// else
 		if (allowFreshEntities)
-			return new FreshTaxonomyNode<ElkClass>(elkClass, getTaxonomy());
+			return new FreshTaxonomyNode<ElkClass>(elkClass, taxonomy);
 		// else
 		throw new ElkFreshEntitiesException(elkClass);
 	}
@@ -263,14 +265,15 @@ public class Reasoner extends AbstractReasonerState {
 	 */
 	protected InstanceNode<ElkClass, ElkNamedIndividual> getInstanceNode(
 			ElkNamedIndividual elkNamedIndividual) throws ElkException {
-		InstanceNode<ElkClass, ElkNamedIndividual> node = getInstanceTaxonomy()
+		final InstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy = getInstanceTaxonomy();
+		final InstanceNode<ElkClass, ElkNamedIndividual> node = instanceTaxonomy
 				.getInstanceNode(elkNamedIndividual);
 		if (node != null)
 			return node;
 		// else
 		if (allowFreshEntities)
 			return new FreshInstanceNode<ElkClass, ElkNamedIndividual>(
-					elkNamedIndividual, getInstanceTaxonomy());
+					elkNamedIndividual, instanceTaxonomy);
 		// else
 		throw new ElkFreshEntitiesException(elkNamedIndividual);
 	}
@@ -285,14 +288,15 @@ public class Reasoner extends AbstractReasonerState {
 	 */
 	protected TypeNode<ElkClass, ElkNamedIndividual> getTypeNode(
 			ElkClass elkClass) throws ElkException {
-		TypeNode<ElkClass, ElkNamedIndividual> node = getInstanceTaxonomy()
+		final InstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy = getInstanceTaxonomy();
+		final TypeNode<ElkClass, ElkNamedIndividual> node = instanceTaxonomy
 				.getNode(elkClass);
 		if (node != null)
 			return node;
 		// else
 		if (allowFreshEntities)
 			return new FreshTypeNode<ElkClass, ElkNamedIndividual>(elkClass,
-					getInstanceTaxonomy());
+					instanceTaxonomy);
 		// else
 		throw new ElkFreshEntitiesException(elkClass);
 	}
@@ -308,7 +312,8 @@ public class Reasoner extends AbstractReasonerState {
 	 */
 	protected TaxonomyNode<ElkObjectProperty> getObjectPropertyTaxonomyNode(
 			final ElkObjectProperty elkProperty) throws ElkException {
-		final TaxonomyNode<ElkObjectProperty> node = getObjectPropertyTaxonomy()
+		final Taxonomy<ElkObjectProperty> propertyTaxonomy = getObjectPropertyTaxonomy();
+		final TaxonomyNode<ElkObjectProperty> node = propertyTaxonomy
 				.getNode(elkProperty);
 		if (node != null) {
 			return node;
@@ -316,7 +321,7 @@ public class Reasoner extends AbstractReasonerState {
 		// else
 		if (allowFreshEntities) {
 			return new FreshTaxonomyNode<ElkObjectProperty>(elkProperty,
-					getObjectPropertyTaxonomy());
+					propertyTaxonomy);
 		}
 		// else
 		throw new ElkFreshEntitiesException(elkProperty);
@@ -363,7 +368,7 @@ public class Reasoner extends AbstractReasonerState {
 			return getTaxonomyNode((ElkClass) classExpression);
 		}
 		// else
-		
+
 		return queryEquivalentClasses(classExpression);
 	}
 
@@ -427,7 +432,7 @@ public class Reasoner extends AbstractReasonerState {
 			}
 			// else all nodes
 
-			final Taxonomy<ElkClass> taxonomy = getTaxonomy();
+			final Taxonomy<ElkClass> taxonomy = restoreTaxonomy();
 
 			return TaxonomyNodeUtils.getAllReachable(Operations.map(subNodes,
 					new Operations.Transformation<Node<ElkClass>, TaxonomyNode<ElkClass>>() {
@@ -520,7 +525,7 @@ public class Reasoner extends AbstractReasonerState {
 			}
 			// else all nodes
 
-			final Taxonomy<ElkClass> taxonomy = getTaxonomy();
+			final Taxonomy<ElkClass> taxonomy = restoreTaxonomy();
 
 			return TaxonomyNodeUtils.getAllReachable(Operations.map(superNodes,
 					new Operations.Transformation<Node<ElkClass>, TaxonomyNode<ElkClass>>() {
@@ -597,7 +602,7 @@ public class Reasoner extends AbstractReasonerState {
 	 */
 	public synchronized Set<? extends Node<ElkObjectProperty>> getSubObjectProperties(
 			final ElkObjectProperty property, final boolean direct)
-					throws ElkException {
+			throws ElkException {
 
 		final TaxonomyNode<ElkObjectProperty> queryNode = getObjectPropertyNode(
 				property);
@@ -626,7 +631,7 @@ public class Reasoner extends AbstractReasonerState {
 	 */
 	public synchronized Set<? extends Node<ElkObjectProperty>> getSuperObjectProperties(
 			final ElkObjectProperty property, final boolean direct)
-					throws ElkException {
+			throws ElkException {
 
 		TaxonomyNode<ElkObjectProperty> queryNode = getObjectPropertyNode(
 				property);
@@ -675,7 +680,7 @@ public class Reasoner extends AbstractReasonerState {
 
 		final Set<? extends Node<ElkClass>> subNodes = queryDirectSubClasses(
 				classExpression);
-		final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = getInstanceTaxonomy();
+		final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = restoreInstanceTaxonomy();
 
 		return TaxonomyNodeUtils.collectFromAllReachable(Operations.map(
 				subNodes,
@@ -771,7 +776,8 @@ public class Reasoner extends AbstractReasonerState {
 	public synchronized Set<? extends Node<ElkClass>> getTypes(
 			ElkNamedIndividual elkNamedIndividual, boolean direct)
 			throws ElkException {
-		InstanceNode<ElkClass, ElkNamedIndividual> node = getInstanceNode(elkNamedIndividual);
+		InstanceNode<ElkClass, ElkNamedIndividual> node = getInstanceNode(
+				elkNamedIndividual);
 		return direct ? node.getDirectTypeNodes() : node.getAllTypeNodes();
 	}
 

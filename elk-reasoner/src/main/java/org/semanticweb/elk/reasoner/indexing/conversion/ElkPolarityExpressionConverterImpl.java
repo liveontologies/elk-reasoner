@@ -41,11 +41,13 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.ModifiableIndexedObjectBaseFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.ResolvingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.UpdatingModifiableIndexedObjectFactory;
+import org.semanticweb.elk.reasoner.indexing.model.IndexingListener;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 
 /**
@@ -66,18 +68,18 @@ public class ElkPolarityExpressionConverterImpl extends
 
 	private final ElkPolarityExpressionConverter complementaryConverter_;
 
-	private final ModifiableOntologyIndex index_;
+	private final IndexingListener indexingListener_;
 
 	ElkPolarityExpressionConverterImpl(ElkPolarity polarity,
 			PredefinedElkClassFactory elkFactory,
 			ModifiableIndexedObject.Factory factory,
 			ElkPolarityExpressionConverter complementaryConverter,
-			final ModifiableOntologyIndex index) {
+			final IndexingListener indexingListener) {
 		super(polarity);
 		this.elkFactory_ = elkFactory;
 		this.factory_ = factory;
 		this.complementaryConverter_ = complementaryConverter;
-		this.index_ = index;
+		this.indexingListener_ = indexingListener;
 	}
 
 	/**
@@ -101,14 +103,14 @@ public class ElkPolarityExpressionConverterImpl extends
 			PredefinedElkClassFactory elkFactory,
 			ModifiableIndexedObject.Factory factory,
 			ModifiableIndexedObject.Factory complementaryFactory,
-			final ModifiableOntologyIndex index) {
+			final IndexingListener indexingListener) {
 		super(polarity);
 		this.elkFactory_ = elkFactory;
 		this.factory_ = factory;
 		this.complementaryConverter_ = new ElkPolarityExpressionConverterImpl(
 				polarity.getComplementary(), elkFactory, complementaryFactory,
-				this, index);
-		this.index_ = index;
+				this, indexingListener);
+		this.indexingListener_ = indexingListener;
 	}
 
 	/**
@@ -126,12 +128,12 @@ public class ElkPolarityExpressionConverterImpl extends
 	public ElkPolarityExpressionConverterImpl(
 			PredefinedElkClassFactory elkFactory,
 			ModifiableIndexedObject.Factory dualFactory,
-			final ModifiableOntologyIndex index) {
+			final IndexingListener indexingListener) {
 		super(ElkPolarity.DUAL);
 		this.elkFactory_ = elkFactory;
 		this.factory_ = dualFactory;
 		this.complementaryConverter_ = this;
-		this.index_ = index;
+		this.indexingListener_ = indexingListener;
 	}
 
 	/**
@@ -247,7 +249,7 @@ public class ElkPolarityExpressionConverterImpl extends
 		case 0:
 			return factory_.getIndexedClass(elkFactory_.getOwlNothing());
 		case 1:
-			index_.fireIndexingUnsupported(elkObjectOneOf);
+			indexingListener_.onIndexing(Occurrence.OCCURRENCE_OF_NOMINAL);
 			return elkObjectOneOf.getIndividuals().iterator().next()
 					.accept(this);
 		default:
@@ -284,7 +286,7 @@ public class ElkPolarityExpressionConverterImpl extends
 	@Override
 	public ModifiableIndexedClassExpression visit(
 			ElkDataHasValue elkDataHasValue) {
-		index_.fireIndexingUnsupported(elkDataHasValue);
+		indexingListener_.onIndexing(Occurrence.OCCURRENCE_OF_DATA_HAS_VALUE);
 		return factory_.getIndexedDataHasValue(elkDataHasValue);
 	}
 

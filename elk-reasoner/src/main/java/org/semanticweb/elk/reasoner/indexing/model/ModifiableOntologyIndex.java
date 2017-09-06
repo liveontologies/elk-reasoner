@@ -23,7 +23,6 @@
 package org.semanticweb.elk.reasoner.indexing.model;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ChainableContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
 
@@ -38,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumer
  * 
  */
 public interface ModifiableOntologyIndex
-		extends OntologyIndex, ModifiableIndexedObjectCache {
+		extends OntologyIndex, ModifiableIndexedObjectCache, IndexingListener {
 
 	/**
 	 * Adds a new context initialization for this {@link OntologyIndex}.
@@ -135,55 +134,29 @@ public interface ModifiableOntologyIndex
 			ModifiableIndexedClassExpression definition, ElkAxiom reason);
 
 	/**
-	 * Registers a given {@link IndexingUnsupportedListener} with this
-	 * {@link ModifiableOntologyIndex}
+	 * Registers the given {@link IndexingListener} with this
+	 * {@link ModifiableOntologyIndex}. Calls to methods of this
+	 * {@link ModifiableOntologyIndex} are forwarded to the registered
+	 * listeners.
 	 * 
 	 * @param listener
 	 * @return {@code true} if the operation was successful and {@code false}
 	 *         otherwise; if {@code false} is return, the listener was not
 	 *         registered
 	 */
-	boolean addIndexingUnsupportedListener(
-			IndexingUnsupportedListener listener);
+	boolean addOccurrenceIndexingListener(IndexingListener listener);
 
 	/**
-	 * Removes a given {@link IndexingUnsupportedListener} from this
-	 * {@link ModifiableOntologyIndex}
+	 * Removes the given {@link IndexingListener} from this
+	 * {@link ModifiableOntologyIndex} Calls to methods of this
+	 * {@link ModifiableOntologyIndex} are forwarded to the registered
+	 * listeners.
 	 * 
 	 * @param listener
 	 * @return {@code true} if the operation was successful and {@code false}
 	 *         otherwise; if {@code false} is return, the listener was not
 	 *         removed
 	 */
-	boolean removeIndexingUnsupportedListener(
-			IndexingUnsupportedListener listener);
-
-	/**
-	 * Calls
-	 * {@link IndexingUnsupportedListener#indexingUnsupported(ModifiableIndexedObject, OccurrenceIncrement)}
-	 * on each registered listener with the provided arguments.
-	 * 
-	 * @param indexedObject
-	 * @param increment
-	 */
-	void fireIndexingUnsupported(ModifiableIndexedObject indexedObject,
-			OccurrenceIncrement increment);
-
-	/**
-	 * Calls {@link IndexingUnsupportedListener#indexingUnsupported(ElkObject)}
-	 * on each registered listener with the provided arguments.
-	 * 
-	 * @param elkObject
-	 */
-	void fireIndexingUnsupported(ElkObject elkObject);
-
-	public interface IndexingUnsupportedListener {
-
-		void indexingUnsupported(ModifiableIndexedObject indexedObject,
-				OccurrenceIncrement increment);
-
-		void indexingUnsupported(ElkObject elkObject);
-
-	}
+	boolean removeOccurrenceIndexingListener(IndexingListener listener);
 
 }

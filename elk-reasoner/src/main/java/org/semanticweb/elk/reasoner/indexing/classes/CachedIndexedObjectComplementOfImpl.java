@@ -26,6 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectComplement
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 
@@ -69,11 +70,6 @@ class CachedIndexedObjectComplementOfImpl extends
 				return false;
 		}
 
-		if (negativeOccurrenceNo == 0 && increment.negativeIncrement > 0) {
-			// first negative occurrence of this expression
-			index.fireIndexingUnsupported(this, increment);
-		}
-
 		positiveOccurrenceNo += increment.positiveIncrement;
 		negativeOccurrenceNo += increment.negativeIncrement;
 
@@ -87,6 +83,12 @@ class CachedIndexedObjectComplementOfImpl extends
 				negativeOccurrenceNo -= increment.negativeIncrement;
 				return false;
 			}
+		}
+
+		for (int i = 0; i < Math.abs(increment.negativeIncrement); i++) {
+			// for each indexed negative occurrence of this expression
+			index.onIndexing(
+					Occurrence.NEGATIVE_OCCURRENCE_OF_OBJECT_COMPLEMENT_OF);
 		}
 		return true;
 	}

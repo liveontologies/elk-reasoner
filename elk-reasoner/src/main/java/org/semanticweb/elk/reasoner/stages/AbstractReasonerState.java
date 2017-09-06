@@ -47,6 +47,7 @@ import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerInterrupter;
+import org.semanticweb.elk.reasoner.completeness.IncompletenessManager;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyCheckingState;
 import org.semanticweb.elk.reasoner.indexing.classes.DifferentialIndex;
@@ -67,7 +68,6 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
@@ -83,7 +83,6 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 import org.semanticweb.elk.reasoner.tracing.Conclusion;
-import org.semanticweb.elk.reasoner.tracing.DummyConclusionVisitor;
 import org.semanticweb.elk.reasoner.tracing.TraceState;
 import org.semanticweb.elk.reasoner.tracing.TracingInference;
 import org.semanticweb.elk.reasoner.tracing.TracingProof;
@@ -112,8 +111,6 @@ public abstract class AbstractReasonerState implements TracingProof {
 	 */
 	private final ElkObject.Factory elkFactory_;
 
-	final SaturationState<? extends Context> saturationState;
-
 	/**
 	 * Accumulated statistics regarding produced conclusions and rule
 	 * applications. Stored here because more than one stage can apply inference
@@ -129,9 +126,21 @@ public abstract class AbstractReasonerState implements TracingProof {
 	 */
 	final DifferentialIndex ontologyIndex;
 	/**
+	 * Stores information about occurrences in stated axioms.
+	 */
+	final OccurrencesInStatedAxiomsStore occurrencesInStatedAxiomsStore = new OccurrencesInStatedAxiomsStore();
+	/**
+	 * The source where axioms and changes in ontology can be loaded
+	 */
+	private AxiomLoader axiomLoader_ = null;
+	/**
 	 * Manages information about property hierarchy computation.
 	 */
 	final PropertyHierarchyCompositionState propertyHierarchyCompositionState_;
+	/**
+	 * Maintains the state of saturation.
+	 */
+	final SaturationState<? extends Context> saturationState;
 	/**
 	 * Stores (partial) information about consistency checking computation
 	 */
@@ -153,32 +162,28 @@ public abstract class AbstractReasonerState implements TracingProof {
 	 */
 	final EntailmentQueryState entailmentQueryState_;
 	/**
-	 * Defines reasoning stages and dependencies between them
-	 */
-	final ReasonerStageManager stageManager;
-	/**
 	 * Taxonomy that stores (partial) classification and (partial) realization
 	 * of individuals
 	 */
 	final InstanceTaxonomyState instanceTaxonomyState;
 	/**
-	 * The source where axioms and changes in ontology can be loaded
+	 * Keeps relevant information about tracing
 	 */
-	private AxiomLoader axiomLoader_ = null;
+	private final TraceState traceState_;
+	/**
+	 * Defines reasoning stages and dependencies between them
+	 */
+	final ReasonerStageManager stageManager;
+	/**
+	 * Responsible for monitoring completeness.
+	 */
+	private final IncompletenessManager incompleteness_ = new IncompletenessManager(
+			occurrencesInStatedAxiomsStore);
+
 	/**
 	 * if {@code true}, reasoning will be done incrementally whenever possible
 	 */
 	private boolean allowIncrementalMode_ = true;
-
-	/**
-	 * if the property hierarchy correspond to the loading axioms
-	 */
-	boolean propertyHierarchyUpToDate_ = true;
-
-	/**
-	 * Keeps relevant information about tracing
-	 */
-	private final TraceState traceState_;
 
 	/**
 	 * creates conclusions for tracing
@@ -216,7 +221,8 @@ public abstract class AbstractReasonerState implements TracingProof {
 		this.classExpressionQueryState_ = new ClassExpressionQueryState(config,
 				saturationState, elkFactory, ontologyIndex, factory_);
 		this.entailmentQueryState_ = new EntailmentQueryState(config,
-				saturationState, consistencyCheckingState, factory_);
+				saturationState, consistencyCheckingState, factory_,
+				incompleteness_);
 	}
 
 	public ElkObject.Factory getElkFactory() {
@@ -308,7 +314,7 @@ public abstract class AbstractReasonerState implements TracingProof {
 	 * @return the {@link AxiomLoader} currently registered for loading of
 	 *         axioms or {@code null} if no loader is registered
 	 */
-	public AxiomLoader getAxiomLoader() {
+	AxiomLoader getAxiomLoader() {
 		return this.axiomLoader_;
 	}
 
@@ -316,7 +322,7 @@ public abstract class AbstractReasonerState implements TracingProof {
 	 * @return the {@link ClassQueryLoader} currently registered for loading of
 	 *         class queries or {@code null} if no loader is registered
 	 */
-	public ClassQueryLoader getClassQueryLoader() {
+	ClassQueryLoader getClassQueryLoader() {
 		return classExpressionQueryState_.getQueryLoader(getInterrupter());
 	}
 
@@ -325,7 +331,7 @@ public abstract class AbstractReasonerState implements TracingProof {
 	 *         loading of entailment queries or {@code null} if no loader is
 	 *         registered
 	 */
-	public EntailmentQueryLoader getEntailmentQueryLoader() {
+	EntailmentQueryLoader getEntailmentQueryLoader() {
 		return entailmentQueryState_.getQueryLoader(getInterrupter());
 	}
 
@@ -457,6 +463,19 @@ public abstract class AbstractReasonerState implements TracingProof {
 	}
 
 	/**
+	 * Completes consistency checking stage and the stages it depends on, if
+	 * this has not been done yet.
+	 * 
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
+	 */
+	private void restoreConsistencyCheck() throws ElkException {
+		ruleAndConclusionStats.reset();
+		restoreSaturation();
+		complete(stageManager.consistencyCheckingStage);
+	}
+
+	/**
 	 * Check consistency of the current ontology, if this has not been done yet.
 	 * 
 	 * @return {@code true} if the ontology is inconsistent, that is,
@@ -466,11 +485,39 @@ public abstract class AbstractReasonerState implements TracingProof {
 	 */
 	public synchronized boolean isInconsistent() throws ElkException {
 
-		ruleAndConclusionStats.reset();
-		restoreSaturation();
-		complete(stageManager.consistencyCheckingStage);
+		restoreConsistencyCheck();
 
+		if (!consistencyCheckingState.isInconsistent()) {
+			incompleteness_.getIncompletenessMonitorForClassification()
+					.isIncomplete();
+		}
 		return consistencyCheckingState.isInconsistent();
+	}
+
+	/**
+	 * Complete the taxonomy computation stage and the stages it depends on, if
+	 * it has not been done yet.
+	 * 
+	 * @return the class taxonomy implied by the current ontology
+	 * @throws ElkInconsistentOntologyException
+	 *             if the ontology is inconsistent
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
+	 */
+	protected Taxonomy<ElkClass> restoreTaxonomy()
+			throws ElkInconsistentOntologyException, ElkException {
+
+		ruleAndConclusionStats.reset();
+
+		// also restores saturation and cleans the taxonomy if necessary
+		restoreConsistencyCheck();
+		if (consistencyCheckingState.isInconsistent()) {
+			throw new ElkInconsistentOntologyException();
+		}
+
+		complete(stageManager.classTaxonomyComputationStage);
+
+		return classTaxonomyState.getTaxonomy();
 	}
 
 	/**
@@ -486,15 +533,10 @@ public abstract class AbstractReasonerState implements TracingProof {
 	public synchronized Taxonomy<ElkClass> getTaxonomy()
 			throws ElkInconsistentOntologyException, ElkException {
 
-		ruleAndConclusionStats.reset();
+		restoreTaxonomy();
 
-		// also restores saturation and cleans the taxonomy if necessary
-		if (isInconsistent()) {
-			throw new ElkInconsistentOntologyException();
-		}
-
-		complete(stageManager.classTaxonomyComputationStage);
-
+		incompleteness_.getIncompletenessMonitorForClassification()
+				.isIncomplete();
 		return classTaxonomyState.getTaxonomy();
 	}
 
@@ -553,6 +595,32 @@ public abstract class AbstractReasonerState implements TracingProof {
 	}
 
 	/**
+	 * Completes instance taxonomy computation stage and the stages that it
+	 * depends on, if this has not been done yet.
+	 * 
+	 * @return the instance taxonomy implied by the current ontology
+	 * @throws ElkInconsistentOntologyException
+	 *             if the ontology is inconsistent
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
+	 */
+	protected InstanceTaxonomy<ElkClass, ElkNamedIndividual> restoreInstanceTaxonomy()
+			throws ElkInconsistentOntologyException, ElkException {
+
+		ruleAndConclusionStats.reset();
+
+		// also restores saturation and cleans the taxonomy if necessary
+		restoreConsistencyCheck();
+		if (consistencyCheckingState.isInconsistent()) {
+			throw new ElkInconsistentOntologyException();
+		}
+
+		complete(stageManager.instanceTaxonomyComputationStage);
+
+		return instanceTaxonomyState.getTaxonomy();
+	}
+
+	/**
 	 * Compute the inferred taxonomy of the named classes with instances if this
 	 * has not been done yet.
 	 * 
@@ -563,17 +631,12 @@ public abstract class AbstractReasonerState implements TracingProof {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	public synchronized InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomy()
-			throws ElkException {
+			throws ElkInconsistentOntologyException, ElkException {
 
-		ruleAndConclusionStats.reset();
+		restoreInstanceTaxonomy();
 
-		// also restores saturation and cleans the taxonomy if necessary
-		if (isInconsistent()) {
-			throw new ElkInconsistentOntologyException();
-		}
-
-		complete(stageManager.instanceTaxonomyComputationStage);
-
+		incompleteness_.getIncompletenessMonitorForClassification()
+				.isIncomplete();
 		return instanceTaxonomyState.getTaxonomy();
 	}
 
@@ -641,13 +704,16 @@ public abstract class AbstractReasonerState implements TracingProof {
 
 		ruleAndConclusionStats.reset();
 
-		if (isInconsistent()) {
+		restoreConsistencyCheck();
+		if (consistencyCheckingState.isInconsistent()) {
 			throw new ElkInconsistentOntologyException();
 		}
 
 		LOGGER_.trace("Property hierarchy computation");
 		complete(stageManager.objectPropertyTaxonomyComputationStage);
 
+		incompleteness_.getIncompletenessMonitorForClassification()
+				.isIncomplete();
 		return objectPropertyTaxonomyState.getTaxonomy();
 	}
 
@@ -711,16 +777,17 @@ public abstract class AbstractReasonerState implements TracingProof {
 		classExpressionQueryState_.registerQuery(classExpression);
 		ensureLoading();
 
+		// Complete all stages
+		if (computeInstanceTaxonomy) {
+			restoreInstanceTaxonomy();
+		} else {
+			restoreTaxonomy();
+		}
+
 		if (!classExpressionQueryState_.isIndexed(classExpression)) {
 			return false;
 		}
 
-		// Complete all stages
-		if (computeInstanceTaxonomy) {
-			getInstanceTaxonomy();
-		} else {
-			getTaxonomy();
-		}
 		/*
 		 * If query result is cashed, but there were some changes to the
 		 * ontology, it may not be up to date. Whether it is is checked during
@@ -769,7 +836,17 @@ public abstract class AbstractReasonerState implements TracingProof {
 			throws ElkInconsistentOntologyException, ElkException {
 
 		if (computeQuery(classExpression, false)) {
-			return classExpressionQueryState_.isSatisfiable(classExpression);
+			final boolean result = classExpressionQueryState_
+					.isSatisfiable(classExpression);
+			if (result) {
+				incompleteness_
+						.getIncompletenessMonitorForClassExpressionQuery(
+								classExpressionQueryState_
+										.getOccurrenceStore(classExpression))
+						.isIncomplete();
+			}
+			// If classExpression is unsatisfiable, the result is complete.
+			return result;
 		} else {
 			// classExpression couldn't be indexed; pretend it is a fresh class
 			return true;
@@ -798,8 +875,13 @@ public abstract class AbstractReasonerState implements TracingProof {
 
 			final Node<ElkClass> result = classExpressionQueryState_
 					.getEquivalentClasses(classExpression);
+			incompleteness_
+					.getIncompletenessMonitorForClassExpressionQuery(
+							classExpressionQueryState_
+									.getOccurrenceStore(classExpression))
+					.isIncomplete();
 			if (result == null) {
-				return getTaxonomy().getBottomNode();
+				return classTaxonomyState.getTaxonomy().getBottomNode();
 			} else {
 				return result;
 			}
@@ -832,8 +914,14 @@ public abstract class AbstractReasonerState implements TracingProof {
 
 			final Set<? extends Node<ElkClass>> result = classExpressionQueryState_
 					.getDirectSuperClasses(classExpression);
+			incompleteness_
+					.getIncompletenessMonitorForClassExpressionQuery(
+							classExpressionQueryState_
+									.getOccurrenceStore(classExpression))
+					.isIncomplete();
 			if (result == null) {
-				return getTaxonomy().getBottomNode().getDirectSuperNodes();
+				return classTaxonomyState.getTaxonomy().getBottomNode()
+						.getDirectSuperNodes();
 			} else {
 				return result;
 			}
@@ -841,7 +929,8 @@ public abstract class AbstractReasonerState implements TracingProof {
 		} else {
 			// classExpression couldn't be indexed; pretend it is a fresh class
 
-			return Collections.singleton(getTaxonomy().getTopNode());
+			return Collections
+					.singleton(classTaxonomyState.getTaxonomy().getTopNode());
 		}
 
 	}
@@ -864,10 +953,16 @@ public abstract class AbstractReasonerState implements TracingProof {
 
 		if (computeQuery(classExpression, false)) {
 
-			final Taxonomy<ElkClass> taxonomy = getTaxonomy();
+			final Taxonomy<ElkClass> taxonomy = classTaxonomyState
+					.getTaxonomy();
 
 			final Set<? extends Node<ElkClass>> result = classExpressionQueryState_
 					.getDirectSubClasses(classExpression, taxonomy);
+			incompleteness_
+					.getIncompletenessMonitorForClassExpressionQuery(
+							classExpressionQueryState_
+									.getOccurrenceStore(classExpression))
+					.isIncomplete();
 			if (result == null) {
 				return taxonomy.getBottomNode().getDirectSubNodes();
 			} else {
@@ -877,7 +972,8 @@ public abstract class AbstractReasonerState implements TracingProof {
 		} else {
 			// classExpression couldn't be indexed; pretend it is a fresh class
 
-			return Collections.singleton(getTaxonomy().getBottomNode());
+			return Collections.singleton(
+					classTaxonomyState.getTaxonomy().getBottomNode());
 		}
 
 	}
@@ -900,10 +996,16 @@ public abstract class AbstractReasonerState implements TracingProof {
 
 		if (computeQuery(classExpression, true)) {
 
-			final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = getInstanceTaxonomy();
+			final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = instanceTaxonomyState
+					.getTaxonomy();
 
 			final Set<? extends Node<ElkNamedIndividual>> result = classExpressionQueryState_
 					.getDirectInstances(classExpression, taxonomy);
+			incompleteness_
+					.getIncompletenessMonitorForClassExpressionQuery(
+							classExpressionQueryState_
+									.getOccurrenceStore(classExpression))
+					.isIncomplete();
 			if (result == null) {
 				return taxonomy.getBottomNode().getDirectInstanceNodes();
 			} else {
