@@ -225,7 +225,7 @@ public class CapacityBalancingEvictor<E> extends RecencyEvictor<E> {
 
 		@Override
 		public String toString() {
-			return String.format("%s(%d, %f, %f, %d)",
+			return String.format("%s(%d,%f,%f,%d)",
 					CapacityBalancingEvictor.class.getName(), capacity_,
 					loadFactor_, balance_, balanceAfterNRepeatedQueries_);
 		}

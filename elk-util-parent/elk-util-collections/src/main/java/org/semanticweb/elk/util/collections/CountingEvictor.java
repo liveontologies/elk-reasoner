@@ -152,7 +152,7 @@ public class CountingEvictor<E> extends RecencyEvictor<E> {
 
 		@Override
 		public String toString() {
-			return String.format("%s(%d, %f, %d)",
+			return String.format("%s(%d,%f,%d)",
 					CountingEvictor.class.getName(), capacity_, loadFactor_,
 					evictBeforeAddCount_);
 		}

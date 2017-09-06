@@ -102,6 +102,10 @@ public class RecencyEvictor<E> extends AbstractEvictor<E> {
 		this.capacity_ = capacity;
 	}
 
+	public int size() {
+		return elements_.size();
+	}
+
 	protected static abstract class ProtectedBuilder<B extends ProtectedBuilder<B>> {
 
 		public static final int DEFAULT_CAPACITY = 128;
@@ -187,7 +191,7 @@ public class RecencyEvictor<E> extends AbstractEvictor<E> {
 
 		@Override
 		public String toString() {
-			return String.format("%s(%d, %f)", RecencyEvictor.class.getName(),
+			return String.format("%s(%d,%f)", RecencyEvictor.class.getName(),
 					capacity_, loadFactor_);
 		}
 
@@ -199,6 +203,11 @@ public class RecencyEvictor<E> extends AbstractEvictor<E> {
 		@Stat
 		public int capacity() {
 			return getCapacity();
+		}
+
+		@Stat
+		public int size() {
+			return RecencyEvictor.this.size();
 		}
 
 	}
