@@ -1056,21 +1056,7 @@ public abstract class AbstractReasonerState implements TracingProof {
 		try {
 			// Ensure that classes are saturated.
 			getTaxonomyQuietlyUninterruptibly();
-			final boolean isNotComputed = conclusion
-					.accept(new DummyConclusionVisitor<Boolean>() {
-						@Override
-						protected Boolean defaultVisit(
-								final Conclusion conclusion) {
-							return false;
-						}
-
-						@Override
-						protected Boolean defaultVisit(
-								final ClassConclusion conclusion) {
-							return traceState_.toTrace(conclusion);
-						}
-					});
-			if (isNotComputed) {
+			if (!traceState_.requestInferences(conclusion)) {
 				stageManager.inferenceTracingStage.invalidateRecursive();
 				completeUninterruptibly(stageManager.inferenceTracingStage);
 			}

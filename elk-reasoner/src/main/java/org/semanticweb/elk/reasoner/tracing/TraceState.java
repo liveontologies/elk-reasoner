@@ -24,11 +24,11 @@ package org.semanticweb.elk.reasoner.tracing;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.liveontologies.puli.Producer;
 import org.liveontologies.puli.statistics.HasStats;
@@ -59,13 +59,9 @@ import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPrope
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainTautology;
 import org.semanticweb.elk.reasoner.stages.PropertyHierarchyCompositionState;
 import org.semanticweb.elk.reasoner.tracing.factories.TracingJobListener;
-import org.semanticweb.elk.util.collections.ArrayHashMap;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Evictor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Predicate;
 
 /**
  * A collections of objects for tracing contexts and keeping the relevant
@@ -87,35 +83,21 @@ public class TraceState
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(TraceState.class);
 
-	/**
-	 * Conclusions that were submitted for tracing, but their tracing didn't
-	 * start yet.
-	 */
-	private final Queue<IndexedContextRoot> toTrace_ = new ConcurrentLinkedQueue<IndexedContextRoot>();
-	/**
-	 * Conclusions that were submitted for tracing since the last time the
-	 * tracing computation finished.
-	 */
-	private final Set<Conclusion> inProgress_ = new ArrayHashSet<Conclusion>();
-	/**
-	 * Contexts of conclusions that were submitted for tracing since the last
-	 * time the tracing computation finished.
-	 */
-	private final Set<IndexedContextRoot> contextsInProgress_ = new ArrayHashSet<IndexedContextRoot>();
+	private IndexedContextRoot toTrace_ = null;
 
 	/**
-	 * Traced {@link ClassInference}s.
+	 * Cache of {@link ClassInference}s.
 	 */
-	private final Map<Conclusion, Collection<ClassInference>> classInferences_ = new ArrayHashMap<Conclusion, Collection<ClassInference>>();
+	private final Map<Conclusion, Collection<ClassInference>> classInferencesCache_ = new HashMap<Conclusion, Collection<ClassInference>>();
 
 	/**
-	 * Manages eviction from {@link #classInferences_}. Each key added to
-	 * {@link #classInferences_} must be added to this evictor, otherwise it may
-	 * never be evicted.
+	 * Manages eviction from {@link #classInferencesCache_}. Each key added to
+	 * {@link #classInferencesCache_} must be added to this evictor, otherwise
+	 * it may never be evicted.
 	 */
 	private final Evictor<Conclusion> classInferenceEvictor_;
 
-	private final Set<ElkAxiom> indexedAxioms_ = new ArrayHashSet<ElkAxiom>();
+	private final Set<ElkAxiom> indexedAxioms_ = new HashSet<ElkAxiom>();
 
 	private final ModifiableTracingProof<ObjectPropertyInference> objectPropertyInferences_ = new SynchronizedModifiableTracingProof<ObjectPropertyInference>();
 
@@ -205,44 +187,65 @@ public class TraceState
 	}
 
 	/**
+	 * Requests inferences of a {@link Conclusion}.
+	 * 
 	 * @param conclusion
-	 * @return Whether the queue changed.
+	 * @return {@code true} if they are ready and can be retrieved by
+	 *         {@link #getInferences(Conclusion)}, returns {@code false} if the
+	 *         tracing stage needs to be run before the inferences can be
+	 *         retrieved by {@link #getInferences(Conclusion)}.
 	 */
-	public synchronized boolean toTrace(final ClassConclusion conclusion) {
-		classInferenceEvictor_.add(conclusion);
-		// Check cache.
-		if (classInferences_.get(conclusion) != null) {
-			stats_.nCacheHits++;
+	public synchronized boolean requestInferences(final Conclusion conclusion) {
+		LOGGER_.trace("{}: request inferences", conclusion);
+		return conclusion.accept(requestedConclusionVisitor_);
+	}
+
+	private final Conclusion.Visitor<Boolean> requestedConclusionVisitor_ = new DummyConclusionVisitor<Boolean>() {
+
+		@Override
+		protected Boolean defaultVisit(final Conclusion conclusion) {
+			return true;
+		}
+
+		@Override
+		protected Boolean defaultVisit(final ClassConclusion conclusion) {
+			tracingListener_.lastRequestedConclusion_ = conclusion;
+			classInferenceEvictor_.add(conclusion);
+			// Check cache.
+			final Collection<ClassInference> infs = classInferencesCache_
+					.get(conclusion);
+			if (infs != null) {
+				stats_.nCacheHits++;
+				tracingListener_.inferencesOfLastRequestedConclusion_ = infs;
+				return true;
+			}
+			// else
+			stats_.nCacheMisses++;
+			toTrace_ = conclusion.getTraceRoot();
 			return false;
 		}
-		// else
-		stats_.nCacheMisses++;
-		// Queue up.
-		final IndexedContextRoot root = conclusion.getTraceRoot();
-		inProgress_.add(conclusion);
-		if (contextsInProgress_.add(root)) {
-			LOGGER_.trace("{}: to trace", root);
-			toTrace_.add(root);
-		}
-		// Evict.
-		final Iterator<Conclusion> evictedConclusions = classInferenceEvictor_
-				.evict(new Predicate<Conclusion>() {
-					@Override
-					public boolean apply(final Conclusion conclusion) {
-						return inProgress_.contains(conclusion);
-					}
-				});
-		while (evictedConclusions.hasNext()) {
-			classInferences_.remove(evictedConclusions.next());
-		}
-		return true;
+
+	};
+
+	public synchronized IndexedContextRoot pollToTrace() {
+		final IndexedContextRoot result = toTrace_;
+		toTrace_ = null;
+		return result;
 	}
 
-	public IndexedContextRoot pollToTrace() {
-		return toTrace_.poll();
-	}
+	private class ThisTracingJobListener implements TracingJobListener {
 
-	private final TracingJobListener tracingListener_ = new TracingJobListener() {
+		/**
+		 * The {@link ClassConclusion} that was passed to
+		 * {@link #requestInferences(ClassConclusion)} as the last one.
+		 */
+		private ClassConclusion lastRequestedConclusion_ = null;
+		/**
+		 * Inferences of the {@link ClassConclusion} that was passed to
+		 * {@link #requestInferences(ClassConclusion)} as the last one, if they
+		 * have been cached or computed.
+		 */
+		private Collection<? extends ClassInference> inferencesOfLastRequestedConclusion_ = null;
 
 		@Override
 		public synchronized void notifyJobFinished(
@@ -251,28 +254,33 @@ public class TraceState
 			for (final Conclusion concl : proof.getAllConclusions()) {
 				final Collection<? extends ClassInference> tracedInfs = proof
 						.getInferences(concl);
+				if (concl.equals(lastRequestedConclusion_)) {
+					inferencesOfLastRequestedConclusion_ = tracedInfs;
+				}
 				if (!tracedInfs.isEmpty()
-						&& !classInferences_.containsKey(concl)) {
-					classInferenceEvictor_.add(concl);
-					classInferences_.put(concl,
+						&& !classInferencesCache_.containsKey(concl)) {
+					classInferencesCache_.put(concl,
 							new ArrayList<ClassInference>(tracedInfs));
+					final Iterator<Conclusion> evictedConclusions = classInferenceEvictor_
+							.addAndEvict(concl);
+					while (evictedConclusions.hasNext()) {
+						classInferencesCache_.remove(evictedConclusions.next());
+					}
 				}
 			}
 		}
 
-		public void notifyComputationFinished() {
-			inProgress_.clear();
-			contextsInProgress_.clear();
-		};
+	}
 
-	};
+	private final ThisTracingJobListener tracingListener_ = new ThisTracingJobListener();
 
 	public TracingJobListener getTracingListener() {
 		return tracingListener_;
 	}
 
 	private void clearClassInferences() {
-		classInferences_.clear();
+		classInferencesCache_.clear();
+		tracingListener_.inferencesOfLastRequestedConclusion_ = null;
 	}
 
 	private void clearObjectPropertyInferences() {
@@ -315,14 +323,13 @@ public class TraceState
 		@Override
 		protected Collection<? extends ClassInference> defaultVisit(
 				final ClassConclusion conclusion) {
-			final Collection<ClassInference> inferences = classInferences_
-					.get(conclusion);
-			if (inferences == null) {
+			if (!conclusion.equals(tracingListener_.lastRequestedConclusion_)
+					|| tracingListener_.inferencesOfLastRequestedConclusion_ == null) {
 				throw new ElkRuntimeException(
 						"Conclusion not traced: " + conclusion);
 			}
 			// else
-			return inferences;
+			return tracingListener_.inferencesOfLastRequestedConclusion_;
 		}
 
 		@Override

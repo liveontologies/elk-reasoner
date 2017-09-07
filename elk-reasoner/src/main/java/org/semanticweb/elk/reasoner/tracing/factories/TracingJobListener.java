@@ -37,9 +37,4 @@ public interface TracingJobListener {
 	public void notifyJobFinished(final IndexedContextRoot context,
 			ModifiableTracingProof<ClassInference> proof);
 
-	/**
-	 * called when tracing of all contexts finished.
-	 */
-	public void notifyComputationFinished();
-
 }

@@ -100,7 +100,6 @@ public class SingleContextTracingFactory
 	@Override
 	public void finish() {
 		saturationFactory_.finish();
-		tracingState_.getTracingListener().notifyComputationFinished();
 	}
 
 	@Override
