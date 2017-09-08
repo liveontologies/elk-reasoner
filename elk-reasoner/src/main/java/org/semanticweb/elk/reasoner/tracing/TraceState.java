@@ -21,7 +21,6 @@
  */
 package org.semanticweb.elk.reasoner.tracing;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -88,7 +87,7 @@ public class TraceState
 	/**
 	 * Cache of {@link ClassInference}s.
 	 */
-	private final Map<Conclusion, Collection<ClassInference>> classInferencesCache_ = new HashMap<Conclusion, Collection<ClassInference>>();
+	private final Map<Conclusion, Collection<? extends ClassInference>> classInferencesCache_ = new HashMap<Conclusion, Collection<? extends ClassInference>>();
 
 	/**
 	 * Manages eviction from {@link #classInferencesCache_}. Each key added to
@@ -212,7 +211,7 @@ public class TraceState
 			tracingListener_.lastRequestedConclusion_ = conclusion;
 			classInferenceEvictor_.add(conclusion);
 			// Check cache.
-			final Collection<ClassInference> infs = classInferencesCache_
+			final Collection<? extends ClassInference> infs = classInferencesCache_
 					.get(conclusion);
 			if (infs != null) {
 				stats_.nCacheHits++;
@@ -259,8 +258,7 @@ public class TraceState
 				}
 				if (!tracedInfs.isEmpty()
 						&& !classInferencesCache_.containsKey(concl)) {
-					classInferencesCache_.put(concl,
-							new ArrayList<ClassInference>(tracedInfs));
+					classInferencesCache_.put(concl, tracedInfs);
 					final Iterator<Conclusion> evictedConclusions = classInferenceEvictor_
 							.addAndEvict(concl);
 					while (evictedConclusions.hasNext()) {
