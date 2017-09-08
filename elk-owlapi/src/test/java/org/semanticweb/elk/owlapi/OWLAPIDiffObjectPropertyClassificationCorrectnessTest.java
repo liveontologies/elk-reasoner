@@ -43,7 +43,11 @@ import org.semanticweb.elk.testing.UrlTestInput;
 public class OWLAPIDiffObjectPropertyClassificationCorrectnessTest
 		extends BaseObjectPropertyClassificationCorrectnessTest {
 
-	static final String[] IGNORE_LIST = {};
+	// @formatter:off
+	static final String[] IGNORE_LIST = {
+			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/object_property/ChainWithReflexive.owl",
+		};
+	// @formatter:on
 
 	static {
 		Arrays.sort(IGNORE_LIST);
