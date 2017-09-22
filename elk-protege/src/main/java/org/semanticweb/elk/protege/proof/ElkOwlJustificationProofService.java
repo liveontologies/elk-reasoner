@@ -48,22 +48,23 @@ public class ElkOwlJustificationProofService
 		}
 		// else
 		ElkProver elkProver = new ElkProver(elkReasoner);
-		final Proof<OWLAxiom> OwlProof = Proofs.addAssertedInferences(
-				elkProver.getProof(entailment), getEditorKit()
-						.getOWLModelManager().getActiveOntology().getAxioms());
-		final Proof<Object> proof = Proofs.transform(OwlProof,
-				new Function<OWLAxiom, Object>() {
-					@Override
-					public Object apply(final OWLAxiom input) {
-						return input;
-					}
-				}, new Function<Object, OWLAxiom>() {
-					@Override
-					public OWLAxiom apply(final Object input) {
-						// This is safe, because only OWLAxioms will be queried.
-						return (OWLAxiom) input;
-					}
-				});
+		final Proof<Object> proof = Proofs.addAssertedInferences(
+				Proofs.transform(elkProver.getProof(entailment),
+						new Function<OWLAxiom, Object>() {
+							@Override
+							public Object apply(final OWLAxiom input) {
+								return input;
+							}
+						}, new Function<Object, OWLAxiom>() {
+							@Override
+							public OWLAxiom apply(final Object input) {
+								// This is safe, because only OWLAxioms will be
+								// queried.
+								return (OWLAxiom) input;
+							}
+						}),
+				getEditorKit().getOWLModelManager().getActiveOntology()
+						.getAxioms());
 		InferenceJustifier<Object, ? extends Set<? extends OWLAxiom>> justifier = InferenceJustifiers
 				.transform(InferenceJustifiers.justifyAssertedInferences(),
 						new Function<Object, OWLAxiom>() {
