@@ -24,7 +24,6 @@ package org.semanticweb.elk.util.concurrent.computation;
 import static org.junit.Assert.fail;
 
 import java.util.Queue;
-import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -32,17 +31,12 @@ public class TestInputProcessorFactory extends DelegateInterruptMonitor
 		implements
 		InputProcessorFactory<Integer, TestInputProcessorFactory.Engene> {
 
-	private final int seepInterval_, sleepIntervalDelta_;
-
 	private final Queue<Integer> todo_ = new ConcurrentLinkedQueue<Integer>();
 
 	private final AtomicInteger aggregatedSum_ = new AtomicInteger(0);
 
-	public TestInputProcessorFactory(final InterruptMonitor interrupter,
-			int sleepInterval, int sleepIntervalDelta) {
+	public TestInputProcessorFactory(InterruptMonitor interrupter) {
 		super(interrupter);
-		this.seepInterval_ = sleepInterval;
-		this.sleepIntervalDelta_ = sleepIntervalDelta;
 	}
 
 	@Override
@@ -63,10 +57,6 @@ public class TestInputProcessorFactory extends DelegateInterruptMonitor
 
 		private int sum_ = 0;
 
-		private final Random random = new Random();
-
-		private int sleepCountdown_ = 0;
-
 		@Override
 		public void submit(Integer job) {
 			todo_.add(job);
@@ -81,18 +71,12 @@ public class TestInputProcessorFactory extends DelegateInterruptMonitor
 				if (nextInput == null)
 					return;
 				sum_ += nextInput;
-				sleepCountdown_ -= nextInput * sleepIntervalDelta_;
-				while (sleepCountdown_ <= 0) {
-					sleepCountdown_ += random.nextInt(seepInterval_) + 1;
-					Thread.sleep(1);
-				}
 			}
 		}
 
 		@Override
 		public void finish() {
 			aggregatedSum_.addAndGet(sum_);
-			sum_ = 0;
 			if (!isInterrupted() && !todo_.isEmpty())
 				fail();
 		}

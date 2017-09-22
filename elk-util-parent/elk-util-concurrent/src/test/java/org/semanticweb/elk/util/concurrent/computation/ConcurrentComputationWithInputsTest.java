@@ -30,9 +30,11 @@ import org.junit.Test;
 
 public class ConcurrentComputationWithInputsTest {
 
-	private static int MAX_INPUT = 100;
+	private static int MAX_INPUT = 1000;
 
-	private static int ROUNDS_ = 8;
+	private static int MAX_JOBS = 200;
+
+	private static int ROUNDS_ = 200;
 
 	private static final double INTERRUPTION_CHANCE = 0.15;
 	private static final long INTERRUPTION_INTERVAL_NANOS = 10000l;
@@ -48,8 +50,7 @@ public class ConcurrentComputationWithInputsTest {
 
 	void setup(int round, final InterruptMonitor interrupter) {
 		int workers = random.nextInt(round + 1) + 1;
-		factory_ = new TestInputProcessorFactory(interrupter, MAX_INPUT,
-				workers);
+		factory_ = new TestInputProcessorFactory(interrupter);
 		computation_ = new ConcurrentComputationWithInputs<Integer, TestInputProcessorFactory>(
 				factory_, executor, workers, workers);
 	}
@@ -64,11 +65,10 @@ public class ConcurrentComputationWithInputsTest {
 		int jobs = 1;
 		for (int round = 0; round < ROUNDS_; round++) {
 			setup(round, interrupter);
-			jobs = 1 << random.nextInt(ROUNDS_);
+			jobs = random.nextInt(MAX_JOBS);
 			int sumExpected = 0;
 			if (!computation_.start())
 				fail();
-			int sleepCountdown = 0; // sleep when reaches 0
 			try {
 				for (int j = 0; j < jobs; j++) {
 					int nextInput = random.nextInt(MAX_INPUT) + 1;
@@ -85,20 +85,17 @@ public class ConcurrentComputationWithInputsTest {
 						if (!computation_.start())
 							fail();
 					}
-					sleepCountdown -= nextInput;
-					while (sleepCountdown <= 0) {
-						Thread.sleep(1); // sleeping on average 1ms per input
-						sleepCountdown += random.nextInt(MAX_INPUT) + 1;
-					}
 				}
 				for (;;) {
 					computation_.finish();
-					if (!computation_.isInterrupted())
+					if (!computation_.isInterrupted()) {
 						break;
+					}
 					// else restart
 					interrupter.clearInterrupt();
-					if (!computation_.start())
+					if (!computation_.start()) {
 						fail();
+					}
 				}
 			} catch (InterruptedException fail) {
 				fail();
