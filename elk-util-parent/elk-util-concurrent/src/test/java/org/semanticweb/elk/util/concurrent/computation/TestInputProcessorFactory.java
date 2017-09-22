@@ -21,8 +21,6 @@
  */
 package org.semanticweb.elk.util.concurrent.computation;
 
-import static org.junit.Assert.fail;
-
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -77,8 +75,6 @@ public class TestInputProcessorFactory extends DelegateInterruptMonitor
 		@Override
 		public void finish() {
 			aggregatedSum_.addAndGet(sum_);
-			if (!isInterrupted() && !todo_.isEmpty())
-				fail();
 		}
 
 	}
