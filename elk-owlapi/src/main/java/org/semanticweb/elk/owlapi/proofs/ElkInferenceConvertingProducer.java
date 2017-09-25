@@ -25,7 +25,6 @@ import org.liveontologies.puli.Inference;
 import org.liveontologies.puli.Producer;
 import org.semanticweb.elk.owl.inferences.ElkInference;
 import org.semanticweb.elk.owl.inferences.ElkInferenceProducer;
-import org.semanticweb.elk.owl.inferences.ElkToldAxiom;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
 /**
@@ -45,11 +44,6 @@ public class ElkInferenceConvertingProducer implements ElkInferenceProducer {
 
 	@Override
 	public void produce(ElkInference inference) {
-		if (inference.getName() == ElkToldAxiom.NAME) {
-			// ignore inferences for told axioms
-			return;
-		}
-		// else
 		targetProducer_.produce(new ElkOwlInference(inference));
 	}
 

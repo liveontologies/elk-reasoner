@@ -1,5 +1,7 @@
 package org.semanticweb.elk.owl.inferences;
 
+import org.liveontologies.puli.AssertedConclusionInference;
+
 /*-
  * #%L
  * ELK Proofs Package
@@ -39,7 +41,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  */
 public class ElkToldAxiom extends AbstractElkInference {
 
-	public final static String NAME = "Axiom";
+	public final static String NAME = AssertedConclusionInference.NAME;
 
 	private final ElkAxiom axiom_;
 

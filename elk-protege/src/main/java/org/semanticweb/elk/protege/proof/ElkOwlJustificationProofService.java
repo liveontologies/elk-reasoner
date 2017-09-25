@@ -27,8 +27,7 @@ import java.util.Set;
 
 import org.liveontologies.protege.justification.proof.service.JustificationCompleteProof;
 import org.liveontologies.puli.Inference;
-import org.liveontologies.puli.InferenceJustifier;
-import org.liveontologies.puli.InferenceJustifiers;
+import org.liveontologies.puli.Inferences;
 import org.liveontologies.puli.Proof;
 import org.liveontologies.puli.Proofs;
 import org.semanticweb.elk.owlapi.ElkProver;
@@ -48,35 +47,21 @@ public class ElkOwlJustificationProofService
 		}
 		// else
 		ElkProver elkProver = new ElkProver(elkReasoner);
-		final Proof<Object> proof = Proofs.addAssertedInferences(
-				Proofs.transform(elkProver.getProof(entailment),
-						new Function<OWLAxiom, Object>() {
-							@Override
-							public Object apply(final OWLAxiom input) {
-								return input;
-							}
-						}, new Function<Object, OWLAxiom>() {
-							@Override
-							public OWLAxiom apply(final Object input) {
-								// This is safe, because only OWLAxioms will be
-								// queried.
-								return (OWLAxiom) input;
-							}
-						}),
-				getEditorKit().getOWLModelManager().getActiveOntology()
-						.getAxioms());
-		InferenceJustifier<Object, ? extends Set<? extends OWLAxiom>> justifier = InferenceJustifiers
-				.transform(InferenceJustifiers.justifyAssertedInferences(),
-						new Function<Object, OWLAxiom>() {
-							@Override
-							public OWLAxiom apply(Object input) {
-								/*
-								 * This is safe, because the inferences are
-								 * justified only by OWLAxioms.
-								 */
-								return (OWLAxiom) input;
-							}
-						});
+		final Proof<Object> proof = Proofs.transform(
+				elkProver.getProof(entailment),
+				new Function<OWLAxiom, Object>() {
+					@Override
+					public Object apply(final OWLAxiom input) {
+						return input;
+					}
+				}, new Function<Object, OWLAxiom>() {
+					@Override
+					public OWLAxiom apply(final Object input) {
+						// This is safe, because only OWLAxioms will be
+						// queried.
+						return (OWLAxiom) input;
+					}
+				});
 		return new JustificationCompleteProof() {
 
 			@Override
@@ -92,7 +77,16 @@ public class ElkOwlJustificationProofService
 			@Override
 			public Set<? extends OWLAxiom> getJustification(
 					Inference<Object> inference) {
-				return justifier.getJustification(inference);
+
+				if (Inferences.isAsserted(inference)) {
+					Object conclusion = inference.getConclusion();
+					if (conclusion instanceof OWLAxiom) {
+						return Collections.singleton(
+								(OWLAxiom) inference.getConclusion());
+					}
+				}
+				// else
+				return Collections.emptySet();
 			}
 
 			@Override
