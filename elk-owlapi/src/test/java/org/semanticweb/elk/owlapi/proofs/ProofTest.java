@@ -37,6 +37,7 @@ import org.liveontologies.puli.DynamicProof;
 import org.liveontologies.puli.ProofNode;
 import org.liveontologies.puli.ProofNodes;
 import org.liveontologies.puli.ProofStep;
+import org.liveontologies.puli.Proofs;
 import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
@@ -391,8 +392,7 @@ public class ProofTest {
 			ProofChangeTracker tracker = new ProofChangeTracker();
 			proof.addListener(tracker);
 
-			assertFalse(
-					ProofTestUtils.isDerivable(proof, entailment, ontology));
+			assertFalse(Proofs.isDerivable(proof, entailment));
 
 			// add ax1 and ax2 => ENTAIL
 			owlManager.applyChanges(Arrays.asList(new AddAxiom(ontology, ax1),
@@ -402,29 +402,27 @@ public class ProofTest {
 			changed = tracker.changed();
 			assertEquals(!bufferringMode, changed);
 			assertEquals(!bufferringMode,
-					ProofTestUtils.isDerivable(proof, entailment, ontology));
+					Proofs.isDerivable(proof, entailment));
 			// but always derivable after flush
 			prover.flush();
 			changed |= tracker.changed();
 			assertTrue(changed);
-			assertTrue(ProofTestUtils.isDerivable(proof, entailment, ontology));
+			assertTrue(Proofs.isDerivable(proof, entailment));
 
 			// remove ax1, add ax3, ax4 => NOT ENTAIL
 			owlManager.applyChanges(Arrays.asList(
 					new RemoveAxiom(ontology, ax1), new AddAxiom(ontology, ax3),
 					new AddAxiom(ontology, ax4)));
 
-			// not derivable even in the buffering mode since ontology changed
+			// still derivable only in bufferring mode
 			changed = tracker.changed();
 			assertEquals(!bufferringMode, changed);
-			assertFalse(
-					ProofTestUtils.isDerivable(proof, entailment, ontology));
-			// still not derivable after flush
+			assertEquals(bufferringMode, Proofs.isDerivable(proof, entailment));
+			// always non derivable after flush
 			prover.flush();
 			changed |= tracker.changed();
 			assertTrue(changed);
-			assertFalse(
-					ProofTestUtils.isDerivable(proof, entailment, ontology));
+			assertFalse(Proofs.isDerivable(proof, entailment));
 
 			// add ax5 => ENTAIL
 			owlManager.applyChanges(Arrays.asList(new AddAxiom(ontology, ax5)));
@@ -433,12 +431,12 @@ public class ProofTest {
 			changed = tracker.changed();
 			assertEquals(!bufferringMode, changed);
 			assertEquals(!bufferringMode,
-					ProofTestUtils.isDerivable(proof, entailment, ontology));
+					Proofs.isDerivable(proof, entailment));
 			// but always derivable after flush
 			prover.flush();
 			changed |= tracker.changed();
 			assertTrue(changed);
-			assertTrue(ProofTestUtils.isDerivable(proof, entailment, ontology));
+			assertTrue(Proofs.isDerivable(proof, entailment));
 
 		}
 

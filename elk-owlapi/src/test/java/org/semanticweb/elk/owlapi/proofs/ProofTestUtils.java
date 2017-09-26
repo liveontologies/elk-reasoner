@@ -79,14 +79,7 @@ public class ProofTestUtils {
 
 	public static void provabilityTest(OWLProver prover, final OWLAxiom axiom) {
 		assertTrue(String.format("Entailment %s not derivable!", axiom),
-				isDerivable(prover.getProof(axiom), axiom,
-						prover.getRootOntology()));
-	}
-
-	public static boolean isDerivable(Proof<OWLAxiom> proof,
-			OWLAxiom conclusion, OWLOntology ontology) {
-		return Proofs.isDerivable(proof, conclusion,
-				ontology.getAxioms(Imports.INCLUDED));
+				isDerivable(prover.getProof(axiom), axiom));
 	}
 
 	public static void visitAllSubsumptionsForProofTests(
