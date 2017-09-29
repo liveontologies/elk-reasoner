@@ -40,8 +40,10 @@ import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectIntersecti
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectUnionOf;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlBottomObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlNothing;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlThing;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlTopObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
@@ -83,9 +85,9 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 
 	private final CachedIndexedOwlNothing owlNothing_;
 
-	private final CachedIndexedObjectProperty owlTopObjectProperty_;
+	private final CachedIndexedOwlTopObjectProperty owlTopObjectProperty_;
 
-	private final CachedIndexedObjectProperty owlBottomObjectProperty_;
+	private final CachedIndexedOwlBottomObjectProperty owlBottomObjectProperty_;
 
 	private final List<IndexedObjectCache.ChangeListener> listeners_;
 
@@ -111,9 +113,9 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 				elkFactory.getOwlThing());
 		this.owlNothing_ = new CachedIndexedOwlNothingImpl(
 				elkFactory.getOwlNothing());
-		this.owlTopObjectProperty_ = new CachedIndexedObjectPropertyImpl(
+		this.owlTopObjectProperty_ = new CachedIndexedOwlTopObjectPropertyImpl(
 				elkFactory.getOwlTopObjectProperty());
-		this.owlBottomObjectProperty_ = new CachedIndexedObjectPropertyImpl(
+		this.owlBottomObjectProperty_ = new CachedIndexedOwlBottomObjectPropertyImpl(
 				elkFactory.getOwlBottomObjectProperty());
 		this.listeners_ = new ArrayList<IndexedObjectCache.ChangeListener>();
 		add(owlThing_);
@@ -173,12 +175,12 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 	}
 
 	@Override
-	public CachedIndexedObjectProperty getOwlTopObjectProperty() {
+	public CachedIndexedOwlTopObjectProperty getOwlTopObjectProperty() {
 		return owlTopObjectProperty_;
 	}
 
 	@Override
-	public CachedIndexedObjectProperty getOwlBottomObjectProperty() {
+	public CachedIndexedOwlBottomObjectProperty getOwlBottomObjectProperty() {
 		return owlBottomObjectProperty_;
 	}
 

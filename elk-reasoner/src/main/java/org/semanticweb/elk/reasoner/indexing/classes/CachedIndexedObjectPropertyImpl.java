@@ -43,7 +43,7 @@ import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
  * @author "Yevgeny Kazakov"
  * 
  */
-final class CachedIndexedObjectPropertyImpl
+class CachedIndexedObjectPropertyImpl
 		extends
 		CachedIndexedPropertyChainImpl<CachedIndexedObjectProperty, CachedIndexedObjectProperty>
 		implements CachedIndexedObjectProperty {
@@ -233,7 +233,7 @@ final class CachedIndexedObjectPropertyImpl
 	}
 
 	@Override
-	public final boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
+	public boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
 			OccurrenceIncrement increment) {
 		totalOccurrenceNo += increment.totalIncrement;
 		return true;
