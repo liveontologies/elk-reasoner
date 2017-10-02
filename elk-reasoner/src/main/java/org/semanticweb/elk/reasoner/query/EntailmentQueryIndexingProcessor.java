@@ -27,9 +27,9 @@ import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
+import org.semanticweb.elk.reasoner.indexing.model.IndexingListener;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
-import org.semanticweb.elk.util.logging.LogLevel;
-import org.semanticweb.elk.util.logging.LoggerWrap;
+import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,8 +45,11 @@ public class EntailmentQueryIndexingProcessor extends
 
 	private final String type_;
 
+	private final IndexingListener indexingListener_;
+
 	public EntailmentQueryIndexingProcessor(final ElkObject.Factory elkFactory,
-			final ModifiableOntologyIndex index, final String type) {
+			final ModifiableOntologyIndex index, final String type,
+			final IndexingListener indexingListener) {
 		if (!ADDITION.equals(type) && !REMOVAL.equals(type)) {
 			throw new IllegalArgumentException("type must be one of \""
 					+ ADDITION + "\" or \"" + REMOVAL + "\"!");
@@ -54,6 +57,7 @@ public class EntailmentQueryIndexingProcessor extends
 		this.type_ = type;
 		this.converter_ = new EntailmentQueryConverter(elkFactory, index,
 				ADDITION.equals(type) ? 1 : -1);
+		this.indexingListener_ = indexingListener;
 	}
 
 	@Override
@@ -66,11 +70,8 @@ public class EntailmentQueryIndexingProcessor extends
 		try {
 			return axiom.accept(converter_);
 		} catch (final ElkIndexingUnsupportedException e) {
-			// TODO: messages for user !!!
-			LoggerWrap.log(LOGGER_, LogLevel.WARN,
-					"reasoner.indexing.queryIgnored",
-					e.getMessage() + " Query results may be incomplete: "
-							+ OwlFunctionalStylePrinter.toString(axiom));
+			indexingListener_.onIndexing(
+					Occurrence.OCCURRENCE_OF_UNSUPPORTED_EXPRESSION);
 			return null;
 		}
 	}

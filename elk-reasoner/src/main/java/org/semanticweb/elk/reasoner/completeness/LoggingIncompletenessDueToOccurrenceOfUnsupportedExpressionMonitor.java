@@ -21,43 +21,38 @@
  */
 package org.semanticweb.elk.reasoner.completeness;
 
+import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceStore;
 import org.semanticweb.elk.util.logging.LogLevel;
-import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.slf4j.Logger;
 
-abstract class LoggingIncompletenessDueToSingleOccurrenceMonitor
-		extends IncompletenessDueToSingleOccurrenceMonitor {
+class LoggingIncompletenessDueToOccurrenceOfUnsupportedExpressionMonitor
+		extends LoggingIncompletenessDueToSingleOccurrenceMonitor {
 
-	private final Logger logger_;
-	private final LogLevel logLevel_;
-	private final IncompletenessMessageProvider messageProvider_;
-
-	public LoggingIncompletenessDueToSingleOccurrenceMonitor(
+	public LoggingIncompletenessDueToOccurrenceOfUnsupportedExpressionMonitor(
 			final OccurrenceStore occurrences, final Logger logger,
 			final LogLevel logLevel,
-			final IncompletenessMessageProvider messageProvider) {
-		super(occurrences);
-		this.logger_ = logger;
-		this.logLevel_ = logLevel;
-		this.messageProvider_ = messageProvider;
+			final IncompletenessMessageProvider occurrencePrinter) {
+		super(occurrences, logger, logLevel, occurrencePrinter);
 	}
 
 	@Override
-	protected void onIncompleteness() {
-		if (!LoggerWrap.isEnabledFor(logger_, logLevel_)) {
-			return;
-		}
-		// else
-		final StringBuilder message = new StringBuilder(
-				accept(messageProvider_));
-		message.append("\n");
-		messageProvider_.printOccurrences(occurrences.occursIn(getOccurrence()),
-				message);
+	public Occurrence getOccurrence() {
+		return Occurrence.OCCURRENCE_OF_UNSUPPORTED_EXPRESSION;
+	}
 
-		LoggerWrap.log(logger_, logLevel_, getOccurrence().toString(),
-				message.toString());
+	@Override
+	public <O> O accept(
+			final IncompletenessDueToSingleOccurrenceMonitor.Visitor<O> visitor) {
+		return accept((Visitor<O>) visitor);
+	}
 
+	public <O> O accept(final Visitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	public static interface Visitor<O> {
+		O visit(LoggingIncompletenessDueToOccurrenceOfUnsupportedExpressionMonitor monitor);
 	}
 
 }

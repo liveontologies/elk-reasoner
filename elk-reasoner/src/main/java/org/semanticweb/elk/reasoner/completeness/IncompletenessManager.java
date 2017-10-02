@@ -55,7 +55,13 @@ public class IncompletenessManager {
 				new LoggingIncompletenessDueToOccurrenceOfDataHasValueMonitor(
 						occurrencesInStatedAxiomsStore, LOGGER_, LogLevel.INFO,
 						IncompletenessDueToInStatedAxiomsMessageProvider.INSTANCE),
+				new LoggingIncompletenessDueToOccurrenceOfDisjointUnionMonitor(
+						occurrencesInStatedAxiomsStore, LOGGER_, LogLevel.INFO,
+						IncompletenessDueToInStatedAxiomsMessageProvider.INSTANCE),
 				new LoggingIncompletenessDueToOccurrenceOfNominalMonitor(
+						occurrencesInStatedAxiomsStore, LOGGER_, LogLevel.INFO,
+						IncompletenessDueToInStatedAxiomsMessageProvider.INSTANCE),
+				new LoggingIncompletenessDueToOccurrenceOfUnsupportedExpressionMonitor(
 						occurrencesInStatedAxiomsStore, LOGGER_, LogLevel.INFO,
 						IncompletenessDueToInStatedAxiomsMessageProvider.INSTANCE),
 				new LoggingIncompletenessDueToPositiveOccurrenceOfBottomObjectPropertyMonitor(
@@ -99,6 +105,9 @@ public class IncompletenessManager {
 						occurrencesInQuery, LOGGER_, LogLevel.INFO,
 						messageProvider),
 				new LoggingIncompletenessDueToOccurrenceOfNominalMonitor(
+						occurrencesInQuery, LOGGER_, LogLevel.INFO,
+						messageProvider),
+				new LoggingIncompletenessDueToOccurrenceOfUnsupportedExpressionMonitor(
 						occurrencesInQuery, LOGGER_, LogLevel.INFO,
 						messageProvider),
 				new LoggingIncompletenessDueToPositiveOccurrenceOfBottomObjectPropertyMonitor(

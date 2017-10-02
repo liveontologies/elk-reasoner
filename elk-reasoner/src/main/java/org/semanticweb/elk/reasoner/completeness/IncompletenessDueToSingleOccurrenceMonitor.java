@@ -68,7 +68,9 @@ abstract class IncompletenessDueToSingleOccurrenceMonitor
 			LoggingIncompletenessDueToNegativeOccurrenceOfObjectComplementOfMonitor.Visitor<O>,
 			LoggingIncompletenessDueToNegativeOccurrenceOfTopObjectPropertyMonitor.Visitor<O>,
 			LoggingIncompletenessDueToOccurrenceOfDataHasValueMonitor.Visitor<O>,
+			LoggingIncompletenessDueToOccurrenceOfDisjointUnionMonitor.Visitor<O>,
 			LoggingIncompletenessDueToOccurrenceOfNominalMonitor.Visitor<O>,
+			LoggingIncompletenessDueToOccurrenceOfUnsupportedExpressionMonitor.Visitor<O>,
 			LoggingIncompletenessDueToPositiveOccurrenceOfBottomObjectPropertyMonitor.Visitor<O>,
 			LoggingIncompletenessDueToPositiveOccurrenceOfObjectUnionOfMonitor.Visitor<O> {
 		// Combined interface.

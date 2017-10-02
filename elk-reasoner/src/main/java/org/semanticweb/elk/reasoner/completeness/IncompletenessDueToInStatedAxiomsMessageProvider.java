@@ -41,7 +41,7 @@ class IncompletenessDueToInStatedAxiomsMessageProvider
 	public StringBuilder printOccurrences(
 			final Collection<? extends ElkObject> occursIn,
 			final StringBuilder message) {
-		message.append("occurs in axioms:");
+		message.append("occurrences:");
 		int i = 0;
 		for (final ElkObject elkObject : occursIn) {
 			if (i >= AT_MOST_N_OCCURRENCES_IN_MESSAGE) {
@@ -75,8 +75,20 @@ class IncompletenessDueToInStatedAxiomsMessageProvider
 
 	@Override
 	public String visit(
+			final LoggingIncompletenessDueToOccurrenceOfDisjointUnionMonitor monitor) {
+		return "ELK supports DisjointUnion only partially.";
+	}
+
+	@Override
+	public String visit(
 			final LoggingIncompletenessDueToOccurrenceOfNominalMonitor monitor) {
 		return "ELK supports ObjectOneOf only partially.";
+	}
+
+	@Override
+	public String visit(
+			final LoggingIncompletenessDueToOccurrenceOfUnsupportedExpressionMonitor monitor) {
+		return "Axioms ignored.";
 	}
 
 	@Override

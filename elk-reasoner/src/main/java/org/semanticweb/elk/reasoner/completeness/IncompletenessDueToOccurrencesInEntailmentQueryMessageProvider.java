@@ -75,10 +75,22 @@ class IncompletenessDueToOccurrencesInEntailmentQueryMessageProvider
 
 	@Override
 	public String visit(
+			final LoggingIncompletenessDueToOccurrenceOfDisjointUnionMonitor monitor) {
+		return "ELK supports DisjointUnion only partially.";
+	}
+
+	@Override
+	public String visit(
 			final LoggingIncompletenessDueToOccurrenceOfNominalMonitor monitor) {
 		return "ELK supports ObjectOneOf only partially.";
 	}
 
+	@Override
+	public String visit(
+			final LoggingIncompletenessDueToOccurrenceOfUnsupportedExpressionMonitor monitor) {
+		return "Entailment query ignored.";
+	}
+	
 	@Override
 	public String visit(
 			final LoggingIncompletenessDueToPositiveOccurrenceOfBottomObjectPropertyMonitor monitor) {

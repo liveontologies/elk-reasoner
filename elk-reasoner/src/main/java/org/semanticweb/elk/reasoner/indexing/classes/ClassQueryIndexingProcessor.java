@@ -26,8 +26,8 @@ import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionProcessor;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
-import org.semanticweb.elk.util.logging.LogLevel;
-import org.semanticweb.elk.util.logging.LoggerWrap;
+import org.semanticweb.elk.reasoner.indexing.model.IndexingListener;
+import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,10 +47,14 @@ public class ClassQueryIndexingProcessor
 
 	private final String type_;
 
+	private final IndexingListener indexingListener_;
+
 	public ClassQueryIndexingProcessor(
-			final ElkPolarityExpressionConverter indexer, final String type) {
+			final ElkPolarityExpressionConverter indexer, final String type,
+			final IndexingListener indexingListener) {
 		this.indexer_ = indexer;
 		this.type_ = type;
+		this.indexingListener_ = indexingListener;
 	}
 
 	@Override
@@ -63,11 +67,8 @@ public class ClassQueryIndexingProcessor
 			}
 			elkClassExpression.accept(indexer_);
 		} catch (final ElkIndexingUnsupportedException e) {
-			LoggerWrap.log(LOGGER_, LogLevel.WARN,
-					"reasoner.indexing.queryIgnored",
-					e.getMessage() + " Query results may be incomplete: "
-							+ OwlFunctionalStylePrinter
-									.toString(elkClassExpression));
+			indexingListener_.onIndexing(
+					Occurrence.OCCURRENCE_OF_UNSUPPORTED_EXPRESSION);
 		}
 	}
 

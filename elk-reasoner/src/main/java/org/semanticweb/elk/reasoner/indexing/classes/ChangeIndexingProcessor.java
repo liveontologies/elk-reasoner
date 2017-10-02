@@ -1,8 +1,3 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.indexing.classes;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,14 +19,15 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
-import org.semanticweb.elk.util.logging.LogLevel;
-import org.semanticweb.elk.util.logging.LoggerWrap;
+import org.semanticweb.elk.reasoner.indexing.model.IndexingListener;
+import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,9 +54,13 @@ public class ChangeIndexingProcessor implements ElkAxiomProcessor {
 
 	private final String type_; // deletion or addition
 
-	public ChangeIndexingProcessor(ElkAxiomConverter indexer, String type) {
+	private final IndexingListener indexingListener_;
+
+	public ChangeIndexingProcessor(ElkAxiomConverter indexer, String type,
+			final IndexingListener indexingListener) {
 		this.indexer_ = indexer;
 		this.type_ = type;
+		this.indexingListener_ = indexingListener;
 	}
 
 	@Override
@@ -72,12 +72,8 @@ public class ChangeIndexingProcessor implements ElkAxiomProcessor {
 						+ type_);
 			elkAxiom.accept(indexer_);
 		} catch (ElkIndexingUnsupportedException e) {
-			if (LOGGER_.isWarnEnabled()) {
-				LoggerWrap.log(LOGGER_, LogLevel.WARN,
-						"reasoner.indexing.axiomIgnored",
-						e.getMessage() + " Axiom ignored: "
-								+ OwlFunctionalStylePrinter.toString(elkAxiom));
-			}
+			indexingListener_.onIndexing(
+					Occurrence.OCCURRENCE_OF_UNSUPPORTED_EXPRESSION);
 		}
 	}
 }

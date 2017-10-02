@@ -36,6 +36,10 @@ public enum Occurrence {
 	 */
 	OCCURRENCE_OF_DATA_HAS_VALUE,
 	/**
+	 * DisjointUnion that contains more than one disjunct occurs.
+	 */
+	OCCURRENCE_OF_DISJOINT_UNION,
+	/**
 	 * ObjectOneOf that contains one individual occurs.
 	 */
 	OCCURRENCE_OF_NOMINAL,
@@ -47,6 +51,10 @@ public enum Occurrence {
 	 * ObjectPropertyRange occurs.
 	 */
 	OCCURRENCE_OF_OBJECT_PROPERTY_RANGE,
+	/**
+	 * An expression that is completely unsupported.
+	 */
+	OCCURRENCE_OF_UNSUPPORTED_EXPRESSION,
 	/**
 	 * BottomObjectProperty occurs positively.
 	 */

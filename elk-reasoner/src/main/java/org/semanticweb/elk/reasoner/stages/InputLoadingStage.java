@@ -173,14 +173,14 @@ public class InputLoadingStage extends AbstractReasonerStage {
 					reasoner.occurrencesInStatedAxiomsStore
 							.getPreInsertionVisitor(),
 					new ChangeIndexingProcessor(axiomInserter,
-							ChangeIndexingProcessor.ADDITION),
+							ChangeIndexingProcessor.ADDITION, ontologyIndex_),
 					reasoner.occurrencesInStatedAxiomsStore
 							.getPostInsertionVisitor());
 			this.axiomDeletionProcessor_ = new DecoratingElkAxiomProcessor(
 					reasoner.occurrencesInStatedAxiomsStore
 							.getPreDeletionVisitor(),
 					new ChangeIndexingProcessor(axiomDeleter,
-							ChangeIndexingProcessor.REMOVAL),
+							ChangeIndexingProcessor.REMOVAL, ontologyIndex_),
 					reasoner.occurrencesInStatedAxiomsStore
 							.getPostDeletionVisitor());
 
@@ -192,11 +192,11 @@ public class InputLoadingStage extends AbstractReasonerStage {
 			classQueryInsertionProcessor_ = new ClassQueryIndexingProcessor(
 					new ElkPolarityExpressionConverterImpl(elkFactory,
 							ontologyIndex_, 1),
-					ClassQueryIndexingProcessor.ADDITION);
+					ClassQueryIndexingProcessor.ADDITION, ontologyIndex_);
 			classQueryDeletionProcessor_ = new ClassQueryIndexingProcessor(
 					new ElkPolarityExpressionConverterImpl(elkFactory,
 							ontologyIndex_, -1),
-					ClassQueryIndexingProcessor.REMOVAL);
+					ClassQueryIndexingProcessor.REMOVAL, ontologyIndex_);
 
 		}
 
@@ -205,10 +205,10 @@ public class InputLoadingStage extends AbstractReasonerStage {
 
 			entailmentQueryInserter_ = new EntailmentQueryIndexingProcessor(
 					elkFactory, ontologyIndex_,
-					EntailmentQueryIndexingProcessor.ADDITION);
+					EntailmentQueryIndexingProcessor.ADDITION, ontologyIndex_);
 			entailmentQueryDeleter_ = new EntailmentQueryIndexingProcessor(
 					elkFactory, ontologyIndex_,
-					EntailmentQueryIndexingProcessor.REMOVAL);
+					EntailmentQueryIndexingProcessor.REMOVAL, ontologyIndex_);
 
 		}
 

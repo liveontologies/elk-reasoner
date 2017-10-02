@@ -74,10 +74,6 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChai
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
-import org.semanticweb.elk.util.logging.LogLevel;
-import org.semanticweb.elk.util.logging.LoggerWrap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An implementation of {@link ElkAxiomConverter} that converts {@link ElkAxiom}
@@ -87,13 +83,9 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
- * 
+ * @author Peter Skocovsky
  */
 public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
-
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ElkAxiomConverterImpl.class);
 
 	/**
 	 * The factory for creating entities
@@ -564,11 +556,8 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 			break;
 		default:
 			// indexing only one direction of the equivalence
-			if (LOGGER_.isWarnEnabled()) {
-				LoggerWrap.log(LOGGER_, LogLevel.WARN,
-						"reasoner.indexing.disjointUnion",
-						"ELK supports DisjointUnion only partially. Reasoning might be incomplete!");
-			}
+			indexingListener_
+					.onIndexing(Occurrence.OCCURRENCE_OF_DISJOINT_UNION);
 			defined = (ModifiableIndexedClass) axiom.getDefinedClass()
 					.accept(positiveConverter_);
 			for (int pos = 0; pos < size; pos++) {
