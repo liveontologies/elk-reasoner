@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceStore;
-import org.semanticweb.elk.reasoner.stages.AbstractReasonerState;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.slf4j.Logger;
@@ -35,7 +34,7 @@ import org.slf4j.LoggerFactory;
 public class IncompletenessManager {
 
 	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(AbstractReasonerState.class);
+			.getLogger(IncompletenessManager.class);
 
 	private final IncompletenessMonitor incompletenessDueToStatedAxiomsMonitor_;
 
@@ -46,33 +45,32 @@ public class IncompletenessManager {
 	public IncompletenessManager(
 			final OccurrenceStore occurrencesInStatedAxiomsStore) {
 		this.incompletenessDueToStatedAxiomsMonitor_ = new DelegatingIncompletenessMonitor(
-				new LoggingIncompletenessDueToNegativeOccurrenceOfObjectComplementOfMonitor(
-						occurrencesInStatedAxiomsStore, LOGGER_, LogLevel.INFO,
+				new IncompletenessDueToNegativeOccurrenceOfObjectComplementOfMonitor(
+						occurrencesInStatedAxiomsStore, LogLevel.INFO,
 						IncompletenessDueToInStatedAxiomsMessageProvider.INSTANCE),
-				new LoggingIncompletenessDueToNegativeOccurrenceOfTopObjectPropertyMonitor(
-						occurrencesInStatedAxiomsStore, LOGGER_, LogLevel.INFO,
+				new IncompletenessDueToNegativeOccurrenceOfTopObjectPropertyMonitor(
+						occurrencesInStatedAxiomsStore, LogLevel.INFO,
 						IncompletenessDueToInStatedAxiomsMessageProvider.INSTANCE),
-				new LoggingIncompletenessDueToOccurrenceOfDataHasValueMonitor(
-						occurrencesInStatedAxiomsStore, LOGGER_, LogLevel.INFO,
+				new IncompletenessDueToOccurrenceOfDataHasValueMonitor(
+						occurrencesInStatedAxiomsStore, LogLevel.INFO,
 						IncompletenessDueToInStatedAxiomsMessageProvider.INSTANCE),
-				new LoggingIncompletenessDueToOccurrenceOfDisjointUnionMonitor(
-						occurrencesInStatedAxiomsStore, LOGGER_, LogLevel.INFO,
+				new IncompletenessDueToOccurrenceOfDisjointUnionMonitor(
+						occurrencesInStatedAxiomsStore, LogLevel.INFO,
 						IncompletenessDueToInStatedAxiomsMessageProvider.INSTANCE),
-				new LoggingIncompletenessDueToOccurrenceOfNominalMonitor(
-						occurrencesInStatedAxiomsStore, LOGGER_, LogLevel.INFO,
+				new IncompletenessDueToOccurrenceOfNominalMonitor(
+						occurrencesInStatedAxiomsStore, LogLevel.INFO,
 						IncompletenessDueToInStatedAxiomsMessageProvider.INSTANCE),
-				new LoggingIncompletenessDueToOccurrenceOfUnsupportedExpressionMonitor(
-						occurrencesInStatedAxiomsStore, LOGGER_, LogLevel.INFO,
+				new IncompletenessDueToOccurrenceOfUnsupportedExpressionMonitor(
+						occurrencesInStatedAxiomsStore, LogLevel.INFO,
 						IncompletenessDueToInStatedAxiomsMessageProvider.INSTANCE),
-				new LoggingIncompletenessDueToPositiveOccurrenceOfBottomObjectPropertyMonitor(
-						occurrencesInStatedAxiomsStore, LOGGER_, LogLevel.INFO,
+				new IncompletenessDueToPositiveOccurrenceOfBottomObjectPropertyMonitor(
+						occurrencesInStatedAxiomsStore, LogLevel.INFO,
 						IncompletenessDueToInStatedAxiomsMessageProvider.INSTANCE),
-				new LoggingIncompletenessDueToPositiveOccurrenceOfObjectUnionOfMonitor(
-						occurrencesInStatedAxiomsStore, LOGGER_, LogLevel.INFO,
+				new IncompletenessDueToPositiveOccurrenceOfObjectUnionOfMonitor(
+						occurrencesInStatedAxiomsStore, LogLevel.INFO,
 						IncompletenessDueToInStatedAxiomsMessageProvider.INSTANCE),
-				new LoggingIncompletenessDueToRangeAndPropertyAssertionOccurrencesInStatedAxiomsMonitor(
-						occurrencesInStatedAxiomsStore, LOGGER_,
-						LogLevel.INFO));
+				new IncompletenessDueToRangeAndPropertyAssertionOccurrencesInStatedAxiomsMonitor(
+						occurrencesInStatedAxiomsStore, LogLevel.INFO));
 	}
 
 	/**
@@ -95,27 +93,20 @@ public class IncompletenessManager {
 			final OccurrenceStore occurrencesInQuery,
 			final IncompletenessMessageProvider messageProvider) {
 		return new DelegatingIncompletenessMonitor(
-				new LoggingIncompletenessDueToNegativeOccurrenceOfObjectComplementOfMonitor(
-						occurrencesInQuery, LOGGER_, LogLevel.INFO,
-						messageProvider),
-				new LoggingIncompletenessDueToNegativeOccurrenceOfTopObjectPropertyMonitor(
-						occurrencesInQuery, LOGGER_, LogLevel.INFO,
-						messageProvider),
-				new LoggingIncompletenessDueToOccurrenceOfDataHasValueMonitor(
-						occurrencesInQuery, LOGGER_, LogLevel.INFO,
-						messageProvider),
-				new LoggingIncompletenessDueToOccurrenceOfNominalMonitor(
-						occurrencesInQuery, LOGGER_, LogLevel.INFO,
-						messageProvider),
-				new LoggingIncompletenessDueToOccurrenceOfUnsupportedExpressionMonitor(
-						occurrencesInQuery, LOGGER_, LogLevel.INFO,
-						messageProvider),
-				new LoggingIncompletenessDueToPositiveOccurrenceOfBottomObjectPropertyMonitor(
-						occurrencesInQuery, LOGGER_, LogLevel.INFO,
-						messageProvider),
-				new LoggingIncompletenessDueToPositiveOccurrenceOfObjectUnionOfMonitor(
-						occurrencesInQuery, LOGGER_, LogLevel.INFO,
-						messageProvider));
+				new IncompletenessDueToNegativeOccurrenceOfObjectComplementOfMonitor(
+						occurrencesInQuery, LogLevel.INFO, messageProvider),
+				new IncompletenessDueToNegativeOccurrenceOfTopObjectPropertyMonitor(
+						occurrencesInQuery, LogLevel.INFO, messageProvider),
+				new IncompletenessDueToOccurrenceOfDataHasValueMonitor(
+						occurrencesInQuery, LogLevel.INFO, messageProvider),
+				new IncompletenessDueToOccurrenceOfNominalMonitor(
+						occurrencesInQuery, LogLevel.INFO, messageProvider),
+				new IncompletenessDueToOccurrenceOfUnsupportedExpressionMonitor(
+						occurrencesInQuery, LogLevel.INFO, messageProvider),
+				new IncompletenessDueToPositiveOccurrenceOfBottomObjectPropertyMonitor(
+						occurrencesInQuery, LogLevel.INFO, messageProvider),
+				new IncompletenessDueToPositiveOccurrenceOfObjectUnionOfMonitor(
+						occurrencesInQuery, LogLevel.INFO, messageProvider));
 	}
 
 	/**
@@ -134,10 +125,11 @@ public class IncompletenessManager {
 		monitors.addAll(Arrays.asList(additionalMonitors));
 		return new DelegatingIncompletenessMonitor(monitors) {
 			@Override
-			public boolean isIncomplete() {
-				final boolean result = super.isIncomplete();
+			public boolean logNewIncompletenessReasons(final Logger logger) {
+				final boolean result = super.logNewIncompletenessReasons(
+						logger);
 				if (result) {
-					LoggerWrap.log(LOGGER_, LogLevel.WARN, "Incompleteness",
+					LoggerWrap.log(logger, LogLevel.WARN, "Incompleteness",
 							"Reasoning may be incomplete! See log level INFO for more details.");
 				}
 				return result;
@@ -175,6 +167,10 @@ public class IncompletenessManager {
 				getIncompletenessDueToOccurrencesInQueryMonitor(
 						occurrencesInQuery,
 						IncompletenessDueToOccurrencesInEntailmentQueryMessageProvider.INSTANCE));
+	}
+
+	public void log(final IncompletenessMonitor monitor) {
+		monitor.logNewIncompletenessReasons(LOGGER_);
 	}
 
 }

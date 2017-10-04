@@ -24,21 +24,19 @@ package org.semanticweb.elk.reasoner.completeness;
 import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceStore;
 import org.semanticweb.elk.util.logging.LogLevel;
-import org.slf4j.Logger;
 
-class LoggingIncompletenessDueToPositiveOccurrenceOfBottomObjectPropertyMonitor
-		extends LoggingIncompletenessDueToSingleOccurrenceMonitor {
+class IncompletenessDueToNegativeOccurrenceOfTopObjectPropertyMonitor
+		extends IncompletenessDueToSingleOccurrenceMonitor {
 
-	public LoggingIncompletenessDueToPositiveOccurrenceOfBottomObjectPropertyMonitor(
-			final OccurrenceStore occurrences, final Logger logger,
-			final LogLevel logLevel,
+	public IncompletenessDueToNegativeOccurrenceOfTopObjectPropertyMonitor(
+			final OccurrenceStore occurrences, final LogLevel logLevel,
 			final IncompletenessMessageProvider occurrencePrinter) {
-		super(occurrences, logger, logLevel, occurrencePrinter);
+		super(occurrences, logLevel, occurrencePrinter);
 	}
 
 	@Override
 	public Occurrence getOccurrence() {
-		return Occurrence.POSITIVE_OCCURRENCE_OF_BOTTOM_OBJECT_PROPERTY;
+		return Occurrence.NEGATIVE_OCCURRENCE_OF_TOP_OBJECT_PROPERTY;
 	}
 
 	@Override
@@ -52,7 +50,7 @@ class LoggingIncompletenessDueToPositiveOccurrenceOfBottomObjectPropertyMonitor
 	}
 
 	public static interface Visitor<O> {
-		O visit(LoggingIncompletenessDueToPositiveOccurrenceOfBottomObjectPropertyMonitor monitor);
+		O visit(IncompletenessDueToNegativeOccurrenceOfTopObjectPropertyMonitor monitor);
 	}
 
 }

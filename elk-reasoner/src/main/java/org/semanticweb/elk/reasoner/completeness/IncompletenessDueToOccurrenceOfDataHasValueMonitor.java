@@ -24,16 +24,14 @@ package org.semanticweb.elk.reasoner.completeness;
 import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceStore;
 import org.semanticweb.elk.util.logging.LogLevel;
-import org.slf4j.Logger;
 
-class LoggingIncompletenessDueToOccurrenceOfDataHasValueMonitor
-		extends LoggingIncompletenessDueToSingleOccurrenceMonitor {
+class IncompletenessDueToOccurrenceOfDataHasValueMonitor
+		extends IncompletenessDueToSingleOccurrenceMonitor {
 
-	public LoggingIncompletenessDueToOccurrenceOfDataHasValueMonitor(
-			final OccurrenceStore occurrences, final Logger logger,
-			final LogLevel logLevel,
+	public IncompletenessDueToOccurrenceOfDataHasValueMonitor(
+			final OccurrenceStore occurrences, final LogLevel logLevel,
 			final IncompletenessMessageProvider occurrencePrinter) {
-		super(occurrences, logger, logLevel, occurrencePrinter);
+		super(occurrences, logLevel, occurrencePrinter);
 	}
 
 	@Override
@@ -52,7 +50,7 @@ class LoggingIncompletenessDueToOccurrenceOfDataHasValueMonitor
 	}
 
 	public static interface Visitor<O> {
-		O visit(LoggingIncompletenessDueToOccurrenceOfDataHasValueMonitor monitor);
+		O visit(IncompletenessDueToOccurrenceOfDataHasValueMonitor monitor);
 	}
 
 }

@@ -21,6 +21,8 @@
  */
 package org.semanticweb.elk.reasoner.completeness;
 
+import org.slf4j.Logger;
+
 /**
  * Monitors incompleteness.
  * <p>
@@ -41,5 +43,15 @@ public interface IncompletenessMonitor {
 	 *         when the reasoning is definitely complete.
 	 */
 	boolean isIncomplete();
+
+	/**
+	 * Logs messages about incompleteness reasons that appeared after the last
+	 * time this method was called to the provided logger.
+	 * 
+	 * @param logger
+	 * @return Whether some incompleteness reasons appeared after the last time
+	 *         this method was called.
+	 */
+	boolean logNewIncompletenessReasons(Logger logger);
 
 }

@@ -156,8 +156,9 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 			final boolean result = new InferenceDerivabilityChecker<Entailment>(
 					getEvidence(true)).isDerivable(indexed.getQuery());
 			if (!result) {
-				incompleteness_.getIncompletenessMonitorForEntailmentQuery(
-						getOccurrenceStore(this)).isIncomplete();
+				incompleteness_.log(incompleteness_
+						.getIncompletenessMonitorForEntailmentQuery(
+								getOccurrenceStore(this)));
 			}
 			// If the query is entailed, the result is complete.
 			return result;
@@ -172,8 +173,9 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 			}
 			// else
 
-			incompleteness_.getIncompletenessMonitorForEntailmentQuery(
-					getOccurrenceStore(this)).isIncomplete();
+			incompleteness_.log(
+					incompleteness_.getIncompletenessMonitorForEntailmentQuery(
+							getOccurrenceStore(this)));
 
 			final EntailmentProof inconsistencyEvidence = new InconsistencyProofWrapper(
 					consistencyCheckingState_.getEvidence(onlyOne));

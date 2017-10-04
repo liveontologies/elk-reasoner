@@ -24,16 +24,14 @@ package org.semanticweb.elk.reasoner.completeness;
 import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceStore;
 import org.semanticweb.elk.util.logging.LogLevel;
-import org.slf4j.Logger;
 
-class LoggingIncompletenessDueToOccurrenceOfDisjointUnionMonitor
-		extends LoggingIncompletenessDueToSingleOccurrenceMonitor {
+class IncompletenessDueToOccurrenceOfDisjointUnionMonitor
+		extends IncompletenessDueToSingleOccurrenceMonitor {
 
-	public LoggingIncompletenessDueToOccurrenceOfDisjointUnionMonitor(
-			final OccurrenceStore occurrences, final Logger logger,
-			final LogLevel logLevel,
+	public IncompletenessDueToOccurrenceOfDisjointUnionMonitor(
+			final OccurrenceStore occurrences, final LogLevel logLevel,
 			final IncompletenessMessageProvider occurrencePrinter) {
-		super(occurrences, logger, logLevel, occurrencePrinter);
+		super(occurrences, logLevel, occurrencePrinter);
 	}
 
 	@Override
@@ -52,7 +50,7 @@ class LoggingIncompletenessDueToOccurrenceOfDisjointUnionMonitor
 	}
 
 	public static interface Visitor<O> {
-		O visit(LoggingIncompletenessDueToOccurrenceOfDisjointUnionMonitor monitor);
+		O visit(IncompletenessDueToOccurrenceOfDisjointUnionMonitor monitor);
 	}
 
 }

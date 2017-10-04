@@ -22,6 +22,8 @@
 package org.semanticweb.elk.reasoner.completeness;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
@@ -31,25 +33,27 @@ import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.slf4j.Logger;
 
+import com.google.common.collect.ImmutableSet;
+
 /**
  * Notifies about incompleteness caused by ObjectPropertyAssertion-s and
  * ObjectPropertyRange-s occurring in the ontology together.
  * 
  * @author Peter Skocovsky
  */
-class LoggingIncompletenessDueToRangeAndPropertyAssertionOccurrencesInStatedAxiomsMonitor
+class IncompletenessDueToRangeAndPropertyAssertionOccurrencesInStatedAxiomsMonitor
 		extends IncompletenessDueToOccurrencesMonitor {
 
 	public static final int AT_MOST_N_OCCURRENCES_IN_MESSAGE = 3;
 
-	private final Logger logger_;
 	private final LogLevel logLevel_;
 
-	public LoggingIncompletenessDueToRangeAndPropertyAssertionOccurrencesInStatedAxiomsMonitor(
+	private Set<? extends ElkObject> lastOccursIn_ = Collections.emptySet();
+
+	public IncompletenessDueToRangeAndPropertyAssertionOccurrencesInStatedAxiomsMonitor(
 			final OccurrenceStore occurrencesInStatedAxioms,
-			final Logger logger, final LogLevel logLevel) {
+			final LogLevel logLevel) {
 		super(occurrencesInStatedAxioms);
-		this.logger_ = logger;
 		this.logLevel_ = logLevel;
 	}
 
@@ -62,22 +66,6 @@ class LoggingIncompletenessDueToRangeAndPropertyAssertionOccurrencesInStatedAxio
 		if (rangeOccursIn != null && !rangeOccursIn.isEmpty()
 				&& assertionOccurrsIn != null
 				&& !assertionOccurrsIn.isEmpty()) {
-
-			if (LoggerWrap.isEnabledFor(logger_, logLevel_)) {
-				final StringBuilder message = new StringBuilder(
-						"ELK supports ObjectPropertyAssertion and ObjectPropertyRange in the same ontology only partially.");
-				message.append("\n");
-				message.append("occurrences of ObjectPropertyAssertion:");
-				printOccurrences(assertionOccurrsIn, message);
-				message.append("\n");
-				message.append("occurrences of ObjectPropertyRange:");
-				printOccurrences(rangeOccursIn, message);
-
-				LoggerWrap.log(logger_, logLevel_,
-						"ObjectPropertyAssertionWithObjectPropertyRange",
-						message.toString());
-			}
-
 			return true;
 		}
 		// else
@@ -98,6 +86,53 @@ class LoggingIncompletenessDueToRangeAndPropertyAssertionOccurrencesInStatedAxio
 			i++;
 		}
 		return message;
+	}
+
+	@Override
+	public boolean logNewIncompletenessReasons(final Logger logger) {
+		final Collection<? extends ElkObject> rangeOccursIn = occurrences
+				.occursIn(Occurrence.OCCURRENCE_OF_OBJECT_PROPERTY_RANGE);
+		final Collection<? extends ElkObject> assertionOccurrsIn = occurrences
+				.occursIn(Occurrence.OCCURRENCE_OF_OBJECT_PROPERTY_ASSERTION);
+
+		final ImmutableSet.Builder<ElkObject> currentOccursIn = ImmutableSet
+				.<ElkObject> builder();
+		boolean hasNewOccurrence = false;
+		for (final ElkObject elkObject : rangeOccursIn) {
+			currentOccursIn.add(elkObject);
+			if (!lastOccursIn_.contains(elkObject)) {
+				hasNewOccurrence = true;
+			}
+		}
+		for (final ElkObject elkObject : assertionOccurrsIn) {
+			currentOccursIn.add(elkObject);
+			if (!lastOccursIn_.contains(elkObject)) {
+				hasNewOccurrence = true;
+			}
+		}
+		lastOccursIn_ = currentOccursIn.build();
+
+		if (hasNewOccurrence) {
+
+			if (LoggerWrap.isEnabledFor(logger, logLevel_)) {
+				final StringBuilder message = new StringBuilder(
+						"ELK supports ObjectPropertyAssertion and ObjectPropertyRange in the same ontology only partially.");
+				message.append("\n");
+				message.append("occurrences of ObjectPropertyAssertion:");
+				printOccurrences(assertionOccurrsIn, message);
+				message.append("\n");
+				message.append("occurrences of ObjectPropertyRange:");
+				printOccurrences(rangeOccursIn, message);
+
+				LoggerWrap.log(logger, logLevel_,
+						"ObjectPropertyAssertionWithObjectPropertyRange",
+						message.toString());
+			}
+
+			return true;
+		}
+		// else
+		return false;
 	}
 
 }

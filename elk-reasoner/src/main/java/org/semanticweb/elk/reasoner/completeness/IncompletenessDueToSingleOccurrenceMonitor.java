@@ -21,11 +21,20 @@
  */
 package org.semanticweb.elk.reasoner.completeness;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceStore;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.semanticweb.elk.util.logging.LoggerWrap;
+import org.slf4j.Logger;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Reports incompleteness when particular occurrence (returned by
@@ -41,9 +50,17 @@ import org.semanticweb.elk.reasoner.indexing.model.OccurrenceStore;
 abstract class IncompletenessDueToSingleOccurrenceMonitor
 		extends IncompletenessDueToOccurrencesMonitor {
 
+	private final LogLevel logLevel_;
+	private final IncompletenessMessageProvider messageProvider_;
+
+	private Set<? extends ElkObject> lastOccursIn_ = Collections.emptySet();
+
 	public IncompletenessDueToSingleOccurrenceMonitor(
-			final OccurrenceStore occurrences) {
+			final OccurrenceStore occurrences, final LogLevel logLevel,
+			final IncompletenessMessageProvider messageProvider) {
 		super(occurrences);
+		this.logLevel_ = logLevel;
+		this.messageProvider_ = messageProvider;
 	}
 
 	public abstract Occurrence getOccurrence();
@@ -53,26 +70,52 @@ abstract class IncompletenessDueToSingleOccurrenceMonitor
 		final Collection<? extends ElkObject> occurrsIn = occurrences
 				.occursIn(getOccurrence());
 		if (occurrsIn != null && !occurrsIn.isEmpty()) {
-			onIncompleteness();
 			return true;
 		}
 		// else
 		return false;
 	}
 
-	protected abstract void onIncompleteness();
+	@Override
+	public boolean logNewIncompletenessReasons(final Logger logger) {
+		final ImmutableSet.Builder<ElkObject> currentOccursIn = ImmutableSet
+				.<ElkObject> builder();
+		final List<ElkObject> newOccursIn = new ArrayList<ElkObject>();
+		for (final ElkObject elkObject : occurrences
+				.occursIn(getOccurrence())) {
+			currentOccursIn.add(elkObject);
+			if (!lastOccursIn_.contains(elkObject)) {
+				newOccursIn.add(elkObject);
+			}
+		}
+		lastOccursIn_ = currentOccursIn.build();
+		if (!newOccursIn.isEmpty()) {
+			if (LoggerWrap.isEnabledFor(logger, logLevel_)) {
+				final StringBuilder message = new StringBuilder(
+						accept(messageProvider_));
+				message.append("\n");
+				messageProvider_.printOccurrences(
+						occurrences.occursIn(getOccurrence()), message);
+				LoggerWrap.log(logger, logLevel_, getOccurrence().toString(),
+						message.toString());
+			}
+			return true;
+		}
+		// else
+		return false;
+	}
 
 	public abstract <O> O accept(Visitor<O> visitor);
 
 	public static interface Visitor<O> extends
-			LoggingIncompletenessDueToNegativeOccurrenceOfObjectComplementOfMonitor.Visitor<O>,
-			LoggingIncompletenessDueToNegativeOccurrenceOfTopObjectPropertyMonitor.Visitor<O>,
-			LoggingIncompletenessDueToOccurrenceOfDataHasValueMonitor.Visitor<O>,
-			LoggingIncompletenessDueToOccurrenceOfDisjointUnionMonitor.Visitor<O>,
-			LoggingIncompletenessDueToOccurrenceOfNominalMonitor.Visitor<O>,
-			LoggingIncompletenessDueToOccurrenceOfUnsupportedExpressionMonitor.Visitor<O>,
-			LoggingIncompletenessDueToPositiveOccurrenceOfBottomObjectPropertyMonitor.Visitor<O>,
-			LoggingIncompletenessDueToPositiveOccurrenceOfObjectUnionOfMonitor.Visitor<O> {
+			IncompletenessDueToNegativeOccurrenceOfObjectComplementOfMonitor.Visitor<O>,
+			IncompletenessDueToNegativeOccurrenceOfTopObjectPropertyMonitor.Visitor<O>,
+			IncompletenessDueToOccurrenceOfDataHasValueMonitor.Visitor<O>,
+			IncompletenessDueToOccurrenceOfDisjointUnionMonitor.Visitor<O>,
+			IncompletenessDueToOccurrenceOfNominalMonitor.Visitor<O>,
+			IncompletenessDueToOccurrenceOfUnsupportedExpressionMonitor.Visitor<O>,
+			IncompletenessDueToPositiveOccurrenceOfBottomObjectPropertyMonitor.Visitor<O>,
+			IncompletenessDueToPositiveOccurrenceOfObjectUnionOfMonitor.Visitor<O> {
 		// Combined interface.
 	}
 

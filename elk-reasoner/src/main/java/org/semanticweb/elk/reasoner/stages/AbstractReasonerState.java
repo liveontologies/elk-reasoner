@@ -488,8 +488,8 @@ public abstract class AbstractReasonerState implements TracingProof {
 		restoreConsistencyCheck();
 
 		if (!consistencyCheckingState.isInconsistent()) {
-			incompleteness_.getIncompletenessMonitorForClassification()
-					.isIncomplete();
+			incompleteness_.log(incompleteness_
+					.getIncompletenessMonitorForClassification());
 		}
 		return consistencyCheckingState.isInconsistent();
 	}
@@ -535,8 +535,8 @@ public abstract class AbstractReasonerState implements TracingProof {
 
 		restoreTaxonomy();
 
-		incompleteness_.getIncompletenessMonitorForClassification()
-				.isIncomplete();
+		incompleteness_.log(
+				incompleteness_.getIncompletenessMonitorForClassification());
 		return classTaxonomyState.getTaxonomy();
 	}
 
@@ -635,8 +635,8 @@ public abstract class AbstractReasonerState implements TracingProof {
 
 		restoreInstanceTaxonomy();
 
-		incompleteness_.getIncompletenessMonitorForClassification()
-				.isIncomplete();
+		incompleteness_.log(
+				incompleteness_.getIncompletenessMonitorForClassification());
 		return instanceTaxonomyState.getTaxonomy();
 	}
 
@@ -712,8 +712,8 @@ public abstract class AbstractReasonerState implements TracingProof {
 		LOGGER_.trace("Property hierarchy computation");
 		complete(stageManager.objectPropertyTaxonomyComputationStage);
 
-		incompleteness_.getIncompletenessMonitorForClassification()
-				.isIncomplete();
+		incompleteness_.log(
+				incompleteness_.getIncompletenessMonitorForClassification());
 		return objectPropertyTaxonomyState.getTaxonomy();
 	}
 
@@ -839,11 +839,10 @@ public abstract class AbstractReasonerState implements TracingProof {
 			final boolean result = classExpressionQueryState_
 					.isSatisfiable(classExpression);
 			if (result) {
-				incompleteness_
+				incompleteness_.log(incompleteness_
 						.getIncompletenessMonitorForClassExpressionQuery(
 								classExpressionQueryState_
-										.getOccurrenceStore(classExpression))
-						.isIncomplete();
+										.getOccurrenceStore(classExpression)));
 			}
 			// If classExpression is unsatisfiable, the result is complete.
 			return result;
@@ -875,11 +874,10 @@ public abstract class AbstractReasonerState implements TracingProof {
 
 			final Node<ElkClass> result = classExpressionQueryState_
 					.getEquivalentClasses(classExpression);
-			incompleteness_
+			incompleteness_.log(incompleteness_
 					.getIncompletenessMonitorForClassExpressionQuery(
 							classExpressionQueryState_
-									.getOccurrenceStore(classExpression))
-					.isIncomplete();
+									.getOccurrenceStore(classExpression)));
 			if (result == null) {
 				return classTaxonomyState.getTaxonomy().getBottomNode();
 			} else {
@@ -914,11 +912,10 @@ public abstract class AbstractReasonerState implements TracingProof {
 
 			final Set<? extends Node<ElkClass>> result = classExpressionQueryState_
 					.getDirectSuperClasses(classExpression);
-			incompleteness_
+			incompleteness_.log(incompleteness_
 					.getIncompletenessMonitorForClassExpressionQuery(
 							classExpressionQueryState_
-									.getOccurrenceStore(classExpression))
-					.isIncomplete();
+									.getOccurrenceStore(classExpression)));
 			if (result == null) {
 				return classTaxonomyState.getTaxonomy().getBottomNode()
 						.getDirectSuperNodes();
@@ -958,11 +955,10 @@ public abstract class AbstractReasonerState implements TracingProof {
 
 			final Set<? extends Node<ElkClass>> result = classExpressionQueryState_
 					.getDirectSubClasses(classExpression, taxonomy);
-			incompleteness_
+			incompleteness_.log(incompleteness_
 					.getIncompletenessMonitorForClassExpressionQuery(
 							classExpressionQueryState_
-									.getOccurrenceStore(classExpression))
-					.isIncomplete();
+									.getOccurrenceStore(classExpression)));
 			if (result == null) {
 				return taxonomy.getBottomNode().getDirectSubNodes();
 			} else {
@@ -1001,11 +997,10 @@ public abstract class AbstractReasonerState implements TracingProof {
 
 			final Set<? extends Node<ElkNamedIndividual>> result = classExpressionQueryState_
 					.getDirectInstances(classExpression, taxonomy);
-			incompleteness_
+			incompleteness_.log(incompleteness_
 					.getIncompletenessMonitorForClassExpressionQuery(
 							classExpressionQueryState_
-									.getOccurrenceStore(classExpression))
-					.isIncomplete();
+									.getOccurrenceStore(classExpression)));
 			if (result == null) {
 				return taxonomy.getBottomNode().getDirectInstanceNodes();
 			} else {

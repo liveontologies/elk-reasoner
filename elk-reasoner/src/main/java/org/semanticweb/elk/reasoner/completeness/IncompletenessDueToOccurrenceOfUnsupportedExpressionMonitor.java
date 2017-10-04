@@ -24,21 +24,19 @@ package org.semanticweb.elk.reasoner.completeness;
 import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceStore;
 import org.semanticweb.elk.util.logging.LogLevel;
-import org.slf4j.Logger;
 
-class LoggingIncompletenessDueToOccurrenceOfNominalMonitor
-		extends LoggingIncompletenessDueToSingleOccurrenceMonitor {
+class IncompletenessDueToOccurrenceOfUnsupportedExpressionMonitor
+		extends IncompletenessDueToSingleOccurrenceMonitor {
 
-	public LoggingIncompletenessDueToOccurrenceOfNominalMonitor(
-			final OccurrenceStore occurrences, final Logger logger,
-			final LogLevel logLevel,
+	public IncompletenessDueToOccurrenceOfUnsupportedExpressionMonitor(
+			final OccurrenceStore occurrences, final LogLevel logLevel,
 			final IncompletenessMessageProvider occurrencePrinter) {
-		super(occurrences, logger, logLevel, occurrencePrinter);
+		super(occurrences, logLevel, occurrencePrinter);
 	}
 
 	@Override
 	public Occurrence getOccurrence() {
-		return Occurrence.OCCURRENCE_OF_NOMINAL;
+		return Occurrence.OCCURRENCE_OF_UNSUPPORTED_EXPRESSION;
 	}
 
 	@Override
@@ -52,7 +50,7 @@ class LoggingIncompletenessDueToOccurrenceOfNominalMonitor
 	}
 
 	public static interface Visitor<O> {
-		O visit(LoggingIncompletenessDueToOccurrenceOfNominalMonitor monitor);
+		O visit(IncompletenessDueToOccurrenceOfUnsupportedExpressionMonitor monitor);
 	}
 
 }

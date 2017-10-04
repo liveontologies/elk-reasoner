@@ -57,49 +57,49 @@ class IncompletenessDueToOccurrencesInEntailmentQueryMessageProvider
 
 	@Override
 	public String visit(
-			final LoggingIncompletenessDueToNegativeOccurrenceOfObjectComplementOfMonitor monitor) {
+			final IncompletenessDueToNegativeOccurrenceOfObjectComplementOfMonitor monitor) {
 		return "ELK does not support negative occurrences of ObjectComplementOf.";
 	}
 
 	@Override
 	public String visit(
-			final LoggingIncompletenessDueToNegativeOccurrenceOfTopObjectPropertyMonitor monitor) {
+			final IncompletenessDueToNegativeOccurrenceOfTopObjectPropertyMonitor monitor) {
 		return "ELK does not support negative occurrences of TopObjectProperty.";
 	}
 
 	@Override
 	public String visit(
-			final LoggingIncompletenessDueToOccurrenceOfDataHasValueMonitor monitor) {
+			final IncompletenessDueToOccurrenceOfDataHasValueMonitor monitor) {
 		return "ELK supports DataHasValue only partially.";
 	}
 
 	@Override
 	public String visit(
-			final LoggingIncompletenessDueToOccurrenceOfDisjointUnionMonitor monitor) {
+			final IncompletenessDueToOccurrenceOfDisjointUnionMonitor monitor) {
 		return "ELK supports DisjointUnion only partially.";
 	}
 
 	@Override
 	public String visit(
-			final LoggingIncompletenessDueToOccurrenceOfNominalMonitor monitor) {
+			final IncompletenessDueToOccurrenceOfNominalMonitor monitor) {
 		return "ELK supports ObjectOneOf only partially.";
 	}
 
 	@Override
 	public String visit(
-			final LoggingIncompletenessDueToOccurrenceOfUnsupportedExpressionMonitor monitor) {
+			final IncompletenessDueToOccurrenceOfUnsupportedExpressionMonitor monitor) {
 		return "Entailment query ignored.";
 	}
 	
 	@Override
 	public String visit(
-			final LoggingIncompletenessDueToPositiveOccurrenceOfBottomObjectPropertyMonitor monitor) {
+			final IncompletenessDueToPositiveOccurrenceOfBottomObjectPropertyMonitor monitor) {
 		return "ELK does not support positive occurrences of BottomObjectProperty.";
 	}
 
 	@Override
 	public String visit(
-			final LoggingIncompletenessDueToPositiveOccurrenceOfObjectUnionOfMonitor monitor) {
+			final IncompletenessDueToPositiveOccurrenceOfObjectUnionOfMonitor monitor) {
 		return "ELK does not support positive occurrences of ObjectUnionOf or ObjectOneOf.";
 	}
 

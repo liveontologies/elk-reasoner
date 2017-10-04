@@ -25,8 +25,8 @@ import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 
-interface IncompletenessMessageProvider extends
-		LoggingIncompletenessDueToSingleOccurrenceMonitor.Visitor<String> {
+interface IncompletenessMessageProvider
+		extends IncompletenessDueToSingleOccurrenceMonitor.Visitor<String> {
 
 	StringBuilder printOccurrences(
 			final Collection<? extends ElkObject> occursIn,

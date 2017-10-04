@@ -23,10 +23,11 @@ package org.semanticweb.elk.reasoner.completeness;
 
 import java.util.Arrays;
 
+import org.slf4j.Logger;
+
 /**
- * Delegates the incompleteness check to the provided sub-monitors. Calls all
- * the sub-monitors and reports incompleteness if at least one of them reports
- * incompleteness.
+ * Delegates the incompleteness check to the provided sub-monitors. Reports
+ * incompleteness if at least one of the sub-monitors reports incompleteness.
  * 
  * @author Peter Skocovsky
  */
@@ -46,9 +47,20 @@ class DelegatingIncompletenessMonitor implements IncompletenessMonitor {
 
 	@Override
 	public boolean isIncomplete() {
+		for (final IncompletenessMonitor incompletenessMonitor : incompletenessMonitors_) {
+			if (incompletenessMonitor.isIncomplete()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean logNewIncompletenessReasons(final Logger logger) {
 		boolean result = false;
 		for (final IncompletenessMonitor incompletenessMonitor : incompletenessMonitors_) {
-			result = incompletenessMonitor.isIncomplete() || result;
+			result = incompletenessMonitor.logNewIncompletenessReasons(logger)
+					|| result;
 		}
 		return result;
 	}
