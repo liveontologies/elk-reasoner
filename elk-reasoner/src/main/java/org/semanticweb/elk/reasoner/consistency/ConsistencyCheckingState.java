@@ -29,12 +29,12 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.liveontologies.puli.Proof;
 import org.semanticweb.elk.reasoner.entailments.impl.IndividualInconsistencyEntailsOntologyInconsistencyImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.OntologyInconsistencyImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.OwlThingInconsistencyEntailsOntologyInconsistencyImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.TopObjectPropertyInBottomEntailsOntologyInconsistencyImpl;
-import org.semanticweb.elk.reasoner.entailments.model.Entailment;
-import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
+import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.entailments.model.OntologyInconsistencyEntailmentInference;
 import org.semanticweb.elk.reasoner.indexing.classes.OntologyIndexDummyChangeListener;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
@@ -328,14 +328,15 @@ public class ConsistencyCheckingState {
 	 *            Whether at most one explanation should be returned.
 	 * @return An evidence of entailment of ontology inconsistency.
 	 */
-	public EntailmentProof getEvidence(final boolean atMostOne) {
+	public Proof<? extends EntailmentInference> getEvidence(
+			final boolean atMostOne) {
 
-		return new EntailmentProof() {
+		return new Proof<EntailmentInference>() {
 
 			@SuppressWarnings("unchecked")
 			@Override
 			public Collection<OntologyInconsistencyEntailmentInference> getInferences(
-					final Entailment conclusion) {
+					final Object conclusion) {
 
 				if (!OntologyInconsistencyImpl.INSTANCE.equals(conclusion)) {
 					return Collections.emptyList();
@@ -349,14 +350,13 @@ public class ConsistencyCheckingState {
 				int size = inconsistentIndividuals.size();
 
 				if (isTopObjectPropertyInBottom_) {
-					result = Operations.concat(
-							Operations
-									.<OntologyInconsistencyEntailmentInference> singleton(
-											new TopObjectPropertyInBottomEntailsOntologyInconsistencyImpl(
-													conclusionFactory_
-															.getSubPropertyChain(
-																	topProperty_,
-																	bottomProperty_))),
+					result = Operations.concat(Operations
+							.<OntologyInconsistencyEntailmentInference> singleton(
+									new TopObjectPropertyInBottomEntailsOntologyInconsistencyImpl(
+											conclusionFactory_
+													.getSubPropertyChain(
+															topProperty_,
+															bottomProperty_))),
 							result);
 					size++;
 				}

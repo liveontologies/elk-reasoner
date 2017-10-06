@@ -26,10 +26,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.semanticweb.elk.reasoner.entailments.EntailmentProofUnion;
+import org.liveontologies.puli.Proof;
+import org.liveontologies.puli.Proofs;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
-import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
@@ -40,8 +40,9 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * premises.
  * <p>
  * {@link #getEvidence(boolean, SaturationState, SaturationConclusion.Factory)}
- * combines {@link EntailmentProof}s of the premises and adds
- * {@link EntailmentInference} returned by {@link #getEntailmentInference()}.
+ * combines {@link Proof}s over {@link EntailmentInference}s of the premises and
+ * adds {@link EntailmentInference} returned by
+ * {@link #getEntailmentInference()}.
  * 
  * @author Peter Skocovsky
  *
@@ -88,23 +89,23 @@ public abstract class AbstractEntailmentQueryWithPremises<E extends Entailment, 
 	}
 
 	@Override
-	public <C extends Context> EntailmentProof getEvidence(
+	public <C extends Context> Proof<EntailmentInference> getEvidence(
 			final boolean atMostOne, final SaturationState<C> saturationState,
 			final SaturationConclusion.Factory conclusionFactory)
 			throws ElkQueryException {
 
-		final Collection<EntailmentProof> proofs = new ArrayList<EntailmentProof>();
+		final Collection<Proof<EntailmentInference>> proofs = new ArrayList<Proof<EntailmentInference>>();
 
 		for (final P premise : premises_) {
 			proofs.add(premise.getEvidence(atMostOne, saturationState,
 					conclusionFactory));
 		}
 
-		proofs.add(new EntailmentProof() {
+		proofs.add(new Proof<EntailmentInference>() {
 
 			@Override
 			public Collection<? extends EntailmentInference> getInferences(
-					final Entailment conclusion) {
+					final Object conclusion) {
 
 				if (!getQuery().equals(conclusion)) {
 					return Collections.emptyList();
@@ -116,7 +117,7 @@ public abstract class AbstractEntailmentQueryWithPremises<E extends Entailment, 
 
 		});
 
-		return new EntailmentProofUnion(proofs);
+		return Proofs.union(proofs);
 	}
 
 	/**

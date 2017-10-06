@@ -39,7 +39,7 @@ public class SynchronizedModifiableTracingProof<I extends TracingInference>
 
 	@Override
 	public synchronized Collection<? extends I> getInferences(
-			Conclusion conclusion) {
+			Object conclusion) {
 		return super.getInferences(conclusion);
 	}
 

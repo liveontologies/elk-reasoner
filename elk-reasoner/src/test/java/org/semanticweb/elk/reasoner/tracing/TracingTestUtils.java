@@ -32,6 +32,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.liveontologies.puli.Proof;
 import org.semanticweb.elk.MutableBoolean;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
@@ -42,7 +43,6 @@ import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
-import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
 import org.semanticweb.elk.reasoner.entailments.model.HasReason;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
@@ -131,7 +131,7 @@ public class TracingTestUtils {
 	}
 
 	private static void collectReasons(final Entailment goal,
-			final EntailmentProof evidence,
+			final Proof<? extends EntailmentInference> evidence,
 			final Collection<Conclusion> result) {
 
 		final Set<Entailment> done = new ArrayHashSet<Entailment>();

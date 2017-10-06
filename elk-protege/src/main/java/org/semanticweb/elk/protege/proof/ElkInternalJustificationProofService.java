@@ -21,27 +21,40 @@
  */
 package org.semanticweb.elk.protege.proof;
 
-import org.liveontologies.protege.justification.proof.service.JustificationCompleteProof;
+import java.util.Set;
+
+import org.liveontologies.puli.Inference;
+import org.liveontologies.puli.InferenceJustifier;
+import org.liveontologies.puli.Proof;
 import org.semanticweb.elk.owlapi.ElkReasoner;
+import org.semanticweb.elk.owlapi.proofs.OwlInternalJustifier;
+import org.semanticweb.elk.owlapi.proofs.OwlInternalProof;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
 public class ElkInternalJustificationProofService
 		extends ElkJustificationProofService {
 
+	private final InferenceJustifier<Inference<?>, Set<OWLAxiom>> justifier_ = new OwlInternalJustifier();
+
 	@Override
-	public JustificationCompleteProof computeProof(OWLAxiom entailment) {
+	public Proof<? extends Inference<?>> computeProof(OWLAxiom entailment) {
 		ElkReasoner elkReasoner = getCurrentElkReasoner();
 		if (elkReasoner == null) {
 			return null;
 		}
 		// else
-		return new JustificationCompleteInternalProof(
-				elkReasoner.getInternalReasoner(), entailment);
+		return new OwlInternalProof(elkReasoner.getInternalReasoner(),
+				entailment);
 	}
 
 	@Override
 	public String getName() {
 		return "ELK Internal Proof";
+	}
+
+	@Override
+	public Set<OWLAxiom> getJustification(Inference<?> inference) {
+		return justifier_.getJustification(inference);
 	}
 
 }

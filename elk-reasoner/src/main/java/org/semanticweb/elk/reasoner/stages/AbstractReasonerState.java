@@ -67,7 +67,6 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
@@ -83,7 +82,6 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeFactory;
 import org.semanticweb.elk.reasoner.tracing.Conclusion;
-import org.semanticweb.elk.reasoner.tracing.DummyConclusionVisitor;
 import org.semanticweb.elk.reasoner.tracing.TraceState;
 import org.semanticweb.elk.reasoner.tracing.TracingInference;
 import org.semanticweb.elk.reasoner.tracing.TracingProof;
@@ -1052,11 +1050,15 @@ public abstract class AbstractReasonerState implements TracingProof {
 
 	@Override
 	public Collection<? extends TracingInference> getInferences(
-			final Conclusion conclusion) {
+			final Object conclusion) {
+		if (!(conclusion instanceof Conclusion)) {
+			return Collections.emptySet();
+		}
+		// else
 		try {
 			// Ensure that classes are saturated.
 			getTaxonomyQuietlyUninterruptibly();
-			if (!traceState_.requestInferences(conclusion)) {
+			if (!traceState_.requestInferences((Conclusion) conclusion)) {
 				stageManager.inferenceTracingStage.invalidateRecursive();
 				completeUninterruptibly(stageManager.inferenceTracingStage);
 			}

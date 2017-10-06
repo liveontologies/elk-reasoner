@@ -22,13 +22,14 @@
 package org.semanticweb.elk.protege.proof;
 
 import org.liveontologies.protege.justification.proof.service.JustificationProofService;
+import org.liveontologies.puli.Inference;
 import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 public abstract class ElkJustificationProofService
-		extends JustificationProofService {
+		extends JustificationProofService<Inference<?>> {
 
 	@Override
 	public void initialise() throws Exception {
@@ -37,7 +38,7 @@ public abstract class ElkJustificationProofService
 	@Override
 	public void dispose() throws Exception {
 	}
-	
+
 	@Override
 	public boolean hasProof(OWLAxiom entailment) {
 		return getCurrentElkReasoner() != null;

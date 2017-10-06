@@ -29,7 +29,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.liveontologies.puli.InferenceDerivabilityChecker;
+import org.liveontologies.puli.Proof;
+import org.liveontologies.puli.Proofs;
 import org.semanticweb.elk.loading.AbstractEntailmentQueryLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.loading.EntailmentQueryLoader;
@@ -37,10 +38,9 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyCheckingState;
-import org.semanticweb.elk.reasoner.entailments.EntailmentProofUnion;
 import org.semanticweb.elk.reasoner.entailments.InconsistencyProofWrapper;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
-import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
+import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.query.AbstractProperEntailmentQueryResult;
 import org.semanticweb.elk.reasoner.query.ElkQueryException;
@@ -145,12 +145,12 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 						"Query was not indexed: " + getQuery());
 			}
 			// else
-			return new InferenceDerivabilityChecker<Entailment>(
-					getEvidence(true)).isDerivable(indexed.getQuery());
+			return Proofs.isDerivable(getEvidence(true), indexed.getQuery());
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
-		public EntailmentProof getEvidence(final boolean onlyOne)
+		public Proof<EntailmentInference> getEvidence(final boolean onlyOne)
 				throws ElkQueryException {
 			if (indexed == null) {
 				throw new ElkQueryException(
@@ -158,7 +158,7 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 			}
 			// else
 
-			final EntailmentProof inconsistencyEvidence = new InconsistencyProofWrapper(
+			final Proof<EntailmentInference> inconsistencyEvidence = new InconsistencyProofWrapper(
 					consistencyCheckingState_.getEvidence(onlyOne));
 
 			if (consistencyCheckingState_.isInconsistent() && onlyOne) {
@@ -166,11 +166,10 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 			}
 			// else
 
-			final EntailmentProof entailmentEvidence = indexed
+			final Proof<EntailmentInference> entailmentEvidence = indexed
 					.getEvidence(onlyOne, saturationState_, conclusionFactory_);
 
-			return new EntailmentProofUnion(inconsistencyEvidence,
-					entailmentEvidence);
+			return Proofs.union(inconsistencyEvidence, entailmentEvidence);
 		}
 
 		public synchronized boolean lock() {

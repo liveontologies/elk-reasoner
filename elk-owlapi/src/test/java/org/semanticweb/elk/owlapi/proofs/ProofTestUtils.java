@@ -32,6 +32,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.liveontologies.owlapi.proof.OWLProver;
+import org.liveontologies.puli.Inference;
 import org.liveontologies.puli.InferenceJustifier;
 import org.liveontologies.puli.InferenceJustifiers;
 import org.liveontologies.puli.Proof;
@@ -66,14 +67,14 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
  */
 public class ProofTestUtils {
 
-	public static <C> void provabilityTest(final Proof<C> proof,
-			final C conclusion) {
+	public static void provabilityTest(final Proof<?> proof,
+			final Object conclusion) {
 		assertTrue(String.format("Conclusion %s not derivable!", conclusion),
 				isDerivable(proof, conclusion));
 	}
 
-	public static <C> boolean isDerivable(final Proof<C> proof,
-			final C conclusion) {
+	public static boolean isDerivable(final Proof<?> proof,
+			final Object conclusion) {
 		return Proofs.isDerivable(proof, conclusion);
 	}
 
@@ -163,25 +164,27 @@ public class ProofTestUtils {
 	public static void proofCompletenessTest(final OWLProver prover,
 			final OWLAxiom conclusion, final boolean mustNotBeATautology) {
 		final OWLOntology ontology = prover.getRootOntology();
-		final Proof<OWLAxiom> proof = Proofs.addAssertedInferences(
+		Proof<Inference<OWLAxiom>> proof = Proofs.removeAssertedInferences(
 				prover.getProof(conclusion),
 				ontology.getAxioms(Imports.INCLUDED));
-		final InferenceJustifier<OWLAxiom, ? extends Set<? extends OWLAxiom>> justifier = InferenceJustifiers
+		final InferenceJustifier<Inference<OWLAxiom>, ? extends Set<? extends OWLAxiom>> justifier = InferenceJustifiers
 				.justifyAssertedInferences();
 		proofCompletenessTest(prover, conclusion, conclusion, proof, justifier,
 				mustNotBeATautology);
 	}
 
-	public static <C> void proofCompletenessTest(final OWLProver prover,
-			final OWLAxiom entailment, final C conclusion, final Proof<C> proof,
-			final InferenceJustifier<C, ? extends Set<? extends OWLAxiom>> justifier) {
+	public static <I extends Inference<?>> void proofCompletenessTest(
+			final OWLProver prover, final OWLAxiom entailment,
+			final Object conclusion, final Proof<? extends I> proof,
+			final InferenceJustifier<? super I, ? extends Set<? extends OWLAxiom>> justifier) {
 		proofCompletenessTest(prover, entailment, conclusion, proof, justifier,
 				false);
 	}
 
-	public static <C> void proofCompletenessTest(final OWLProver prover,
-			final OWLAxiom entailment, final C conclusion, final Proof<C> proof,
-			final InferenceJustifier<C, ? extends Set<? extends OWLAxiom>> justifier,
+	public static <I extends Inference<?>> void proofCompletenessTest(
+			final OWLProver prover, final OWLAxiom entailment,
+			final Object conclusion, final Proof<? extends I> proof,
+			final InferenceJustifier<? super I, ? extends Set<? extends OWLAxiom>> justifier,
 			final boolean mustNotBeATautology) {
 
 		final OWLOntology ontology = prover.getRootOntology();

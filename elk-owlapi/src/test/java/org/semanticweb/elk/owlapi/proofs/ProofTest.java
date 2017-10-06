@@ -34,6 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.liveontologies.owlapi.proof.OWLProver;
 import org.liveontologies.puli.DynamicProof;
+import org.liveontologies.puli.Inference;
 import org.liveontologies.puli.ProofNode;
 import org.liveontologies.puli.ProofNodes;
 import org.liveontologies.puli.ProofStep;
@@ -388,7 +389,8 @@ public class ProofTest {
 			final OWLProver prover = OWLAPITestUtils.createProver(
 					OWLAPITestUtils.createReasoner(ontology, bufferringMode));
 			OWLSubClassOfAxiom entailment = factory.getOWLSubClassOfAxiom(a, b);
-			DynamicProof<OWLAxiom> proof = prover.getProof(entailment);
+			DynamicProof<? extends Inference<OWLAxiom>> proof = prover
+					.getProof(entailment);
 			ProofChangeTracker tracker = new ProofChangeTracker();
 			proof.addListener(tracker);
 

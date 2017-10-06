@@ -21,9 +21,10 @@
  */
 package org.semanticweb.elk.reasoner.query;
 
+import org.liveontologies.puli.Proof;
 import org.semanticweb.elk.Lock;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
-import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
+import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 
 /**
  * An {@link EntailmentQueryResult} of a successfully computed query.
@@ -54,7 +55,8 @@ public interface ProperEntailmentQueryResult
 	 * @return An evidence that the queried entailment is entailed.
 	 * @throws ElkQueryException
 	 */
-	EntailmentProof getEvidence(boolean atMostOne) throws ElkQueryException;
+	Proof<EntailmentInference> getEvidence(boolean atMostOne)
+			throws ElkQueryException;
 
 	/**
 	 * Returns the entailment of the query. This should be the root of

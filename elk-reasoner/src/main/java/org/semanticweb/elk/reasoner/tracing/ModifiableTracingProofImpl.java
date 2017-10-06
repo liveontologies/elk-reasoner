@@ -22,12 +22,14 @@
 package org.semanticweb.elk.reasoner.tracing;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
-import org.semanticweb.elk.util.collections.HashListMultimap;
-import org.semanticweb.elk.util.collections.Multimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * An implementation of {@link ModifiableTracingProof} backed by a
@@ -46,12 +48,13 @@ public class ModifiableTracingProofImpl<I extends TracingInference>
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ModifiableTracingProofImpl.class);
 
-	private final Multimap<Conclusion, I> inferenceMap_ = new HashListMultimap<Conclusion, I>();
+	private final Multimap<Conclusion, I> inferenceMap_ = ArrayListMultimap
+			.create();
 
 	@Override
 	public void produce(I inference) {
 		LOGGER_.trace("{}: inference produced", inference);
-		inferenceMap_.add(new TracingInferenceConclusion(inference), inference);
+		inferenceMap_.put(new TracingInferenceConclusion(inference), inference);
 	}
 
 	@Override
@@ -60,9 +63,11 @@ public class ModifiableTracingProofImpl<I extends TracingInference>
 	}
 
 	@Override
-	public Collection<? extends I> getInferences(Conclusion conclusion) {
-		// assumes structural equality and hash of conclusions
-		return inferenceMap_.get(conclusion);
+	public Collection<? extends I> getInferences(Object conclusion) {
+		if (conclusion instanceof Conclusion) {
+			return inferenceMap_.get((Conclusion) conclusion);
+		} // else
+		return Collections.emptySet();
 	}
 
 	@Override
@@ -74,7 +79,7 @@ public class ModifiableTracingProofImpl<I extends TracingInference>
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		for (Conclusion key : inferenceMap_.keySet()) {
-			for (I inf : inferenceMap_.get(key)) {
+			for (TracingInference inf : inferenceMap_.get(key)) {
 				sb.append(inf.toString());
 				sb.append('\n');
 			}

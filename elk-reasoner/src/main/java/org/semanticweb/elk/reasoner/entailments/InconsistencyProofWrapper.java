@@ -25,13 +25,13 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.liveontologies.puli.Inference;
+import org.liveontologies.puli.Proof;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.entailments.impl.OntologyInconsistencyEntailsAnyAxiomImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.OntologyInconsistencyImpl;
 import org.semanticweb.elk.reasoner.entailments.model.AxiomEntailment;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
-import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
 
 /**
  * This class is intended to be a wrapper of the proof returned by
@@ -47,18 +47,18 @@ import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
  * 
  * @author Peter Skocovsky
  */
-public class InconsistencyProofWrapper implements EntailmentProof {
+public class InconsistencyProofWrapper implements Proof<EntailmentInference> {
 
-	private final EntailmentProof inconsistencyEvidence_;
+	private final Proof<? extends EntailmentInference> inconsistencyEvidence_;
 
 	public InconsistencyProofWrapper(
-			final EntailmentProof inconsistencyEvidence) {
+			final Proof<? extends EntailmentInference> inconsistencyEvidence) {
 		this.inconsistencyEvidence_ = inconsistencyEvidence;
 	}
 
 	@Override
 	public Collection<? extends EntailmentInference> getInferences(
-			final Entailment conclusion) {
+			final Object conclusion) {
 		final Collection<? extends Inference<Entailment>> infs = inconsistencyEvidence_
 				.getInferences(OntologyInconsistencyImpl.INSTANCE);
 		if (infs == null || infs.isEmpty()) {
@@ -68,7 +68,11 @@ public class InconsistencyProofWrapper implements EntailmentProof {
 			return Collections.emptyList();
 		}
 		// else
-		return conclusion.accept(GET_INFERENCES);
+		if (conclusion instanceof Entailment) {
+			return ((Entailment) conclusion).accept(GET_INFERENCES);
+		}
+		// else
+		return Collections.emptyList();
 	}
 
 	private final Entailment.Visitor<Collection<? extends EntailmentInference>> GET_INFERENCES = new DefaultEntailmentVisitor<Collection<? extends EntailmentInference>>() {
