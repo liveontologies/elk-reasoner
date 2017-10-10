@@ -41,7 +41,9 @@ public abstract class ElkJustificationProofService
 
 	@Override
 	public boolean hasProof(OWLAxiom entailment) {
-		return getCurrentElkReasoner() != null;
+		final ElkReasoner elkReasoner = getCurrentElkReasoner();
+		return elkReasoner != null && elkReasoner
+				.isEntailmentCheckingSupported(entailment.getAxiomType());
 	}
 
 	/**
