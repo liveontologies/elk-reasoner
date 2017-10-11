@@ -23,11 +23,8 @@ package org.semanticweb.elk.owlapi.proofs;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Set;
 
 import org.liveontologies.puli.Inference;
-import org.liveontologies.puli.InferenceJustifier;
-import org.liveontologies.puli.InferenceJustifiers;
 import org.liveontologies.puli.Inferences;
 import org.liveontologies.puli.Proof;
 import org.semanticweb.elk.exceptions.ElkException;
@@ -41,10 +38,7 @@ import org.semanticweb.elk.reasoner.query.UnsupportedQueryTypeEntailmentQueryRes
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.UnsupportedEntailmentTypeException;
 
-import com.google.common.base.Function;
-
-public class OwlInternalProof implements Proof<Object>,
-		InferenceJustifier<Object, Set<? extends OWLAxiom>> {
+public class OwlInternalProof implements Proof<Inference<Object>> {
 
 	private final OwlConverter owlConverter_ = OwlConverter.getInstance();
 	private final ElkConverter elkConverter_ = ElkConverter.getInstance();
@@ -52,7 +46,6 @@ public class OwlInternalProof implements Proof<Object>,
 	private final OWLAxiom goal_;
 	private final Inference<Object> goalInference_;
 	private final InternalProofExtension proof_;
-	private final InferenceJustifier<Object, ? extends Set<? extends OWLAxiom>> justifier_;
 
 	public OwlInternalProof(final Reasoner reasoner, final OWLAxiom goal) {
 		this.goal_ = goal;
@@ -62,13 +55,6 @@ public class OwlInternalProof implements Proof<Object>,
 		try {
 			this.proof_ = new InternalProofExtension(reasoner,
 					owlConverter_.convert(goal));
-			this.justifier_ = InferenceJustifiers.transform(proof_,
-					new Function<ElkAxiom, OWLAxiom>() {
-						@Override
-						public OWLAxiom apply(final ElkAxiom input) {
-							return elkConverter_.convert(input);
-						}
-					});
 		} catch (final ElkException e) {
 			throw elkConverter_.convert(e);
 		} catch (final ElkRuntimeException e) {
@@ -91,12 +77,6 @@ public class OwlInternalProof implements Proof<Object>,
 		}
 		// else
 		return proof_.getInferences(conclusion);
-	}
-
-	@Override
-	public Set<? extends OWLAxiom> getJustification(
-			Inference<Object> inference) {
-		return justifier_.getJustification(inference);
 	}
 
 	private class InternalProofExtension extends InternalProof {

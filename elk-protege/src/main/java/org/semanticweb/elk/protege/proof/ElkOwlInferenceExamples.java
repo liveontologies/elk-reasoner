@@ -29,8 +29,8 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 
 public class ElkOwlInferenceExamples {
 
-	public static Inference<OWLAxiom> getExample(
-			Inference<OWLAxiom> inference) {
+	public static Inference<? extends OWLAxiom> getExample(
+			Inference<? extends OWLAxiom> inference) {
 		if (inference instanceof ElkOwlInference) {
 			return new ElkOwlInference(ElkInferenceExamples
 					.getExample(((ElkOwlInference) inference).getInput()));

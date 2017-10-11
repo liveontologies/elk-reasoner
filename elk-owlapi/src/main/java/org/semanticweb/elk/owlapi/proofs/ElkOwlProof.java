@@ -24,7 +24,8 @@ package org.semanticweb.elk.owlapi.proofs;
 import java.util.Collection;
 
 import org.liveontologies.puli.BaseProof;
-import org.liveontologies.puli.GenericDynamicProof;
+import org.liveontologies.puli.DynamicProof;
+import org.liveontologies.puli.Proof;
 import org.liveontologies.puli.Proofs;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
@@ -36,7 +37,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owlapi.ElkConverter;
 import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
-import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
+import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.query.EntailmentQueryResult;
 import org.semanticweb.elk.reasoner.query.ProperEntailmentQueryResult;
 import org.semanticweb.elk.reasoner.query.UnsupportedIndexingEntailmentQueryResult;
@@ -44,7 +45,7 @@ import org.semanticweb.elk.reasoner.query.UnsupportedQueryTypeEntailmentQueryRes
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.UnsupportedEntailmentTypeException;
 
-public class ElkOwlProof extends BaseProof<OWLAxiom, ElkOwlInference>
+public class ElkOwlProof extends BaseProof<ElkOwlInference>
 		implements ElkReasoner.ChangeListener {
 
 	private final ElkReasoner elkReasoner_;
@@ -70,7 +71,7 @@ public class ElkOwlProof extends BaseProof<OWLAxiom, ElkOwlInference>
 
 	@Override
 	public synchronized Collection<? extends ElkOwlInference> getInferences(
-			OWLAxiom conclusion) {
+			Object conclusion) {
 		ensureSync();
 		return super.getInferences(conclusion);
 	}
@@ -123,7 +124,7 @@ public class ElkOwlProof extends BaseProof<OWLAxiom, ElkOwlInference>
 						ElkOwlProof.this);
 				final ElkInference.Factory factory = new ElkInferenceOptimizedProducingFactory(
 						producer);
-				final EntailmentProof evidence = properResult
+				final Proof<EntailmentInference> evidence = properResult
 						.getEvidence(false);
 				new ElkProofGenerator(evidence,
 						elkReasoner_.getInternalReasoner(), factory)
@@ -153,9 +154,8 @@ public class ElkOwlProof extends BaseProof<OWLAxiom, ElkOwlInference>
 
 	};
 
-	public static GenericDynamicProof<OWLAxiom, ElkOwlInference> create(
-			ElkReasoner reasoner, OWLAxiom entailment)
-			throws UnsupportedEntailmentTypeException {
+	public static DynamicProof<ElkOwlInference> create(ElkReasoner reasoner,
+			OWLAxiom entailment) throws UnsupportedEntailmentTypeException {
 		if (reasoner == null) {
 			return Proofs.emptyProof();
 		}

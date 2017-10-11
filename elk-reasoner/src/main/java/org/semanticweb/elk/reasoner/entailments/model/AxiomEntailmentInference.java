@@ -37,7 +37,7 @@ public interface AxiomEntailmentInference<A extends ElkAxiom>
 	@Override
 	AxiomEntailment<? extends A> getConclusion();
 
-	public static interface Visito<O>
+	public static interface Visitor<O>
 			extends DerivedClassInclusionEntailsClassAssertionAxiom.Visitor<O>,
 			DerivedClassInclusionEntailsObjectPropertyAssertionAxiom.Visitor<O>,
 			DerivedClassInclusionEntailsObjectPropertyDomainAxiom.Visitor<O>,

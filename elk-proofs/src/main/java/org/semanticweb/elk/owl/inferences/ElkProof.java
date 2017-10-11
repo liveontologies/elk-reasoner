@@ -22,8 +22,7 @@
 package org.semanticweb.elk.owl.inferences;
 
 import org.liveontologies.puli.Proof;
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 
-public interface ElkProof extends Proof<ElkAxiom> {
+public interface ElkProof extends Proof<ElkInference> {
 
 }

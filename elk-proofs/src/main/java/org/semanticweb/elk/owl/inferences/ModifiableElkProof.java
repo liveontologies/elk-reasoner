@@ -22,9 +22,8 @@
 package org.semanticweb.elk.owl.inferences;
 
 import org.liveontologies.puli.ModifiableProof;
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 
 public interface ModifiableElkProof extends ElkProof,
-		ModifiableProof<ElkAxiom, ElkInference>, ElkInferenceProducer {
+		ModifiableProof<ElkInference>, ElkInferenceProducer {
 
 }

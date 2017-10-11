@@ -292,8 +292,12 @@ public class TraceState
 
 	@Override
 	public Collection<? extends TracingInference> getInferences(
-			Conclusion conclusion) {
-		return conclusion.accept(inferenceGetter_);
+			Object conclusion) {
+		if (conclusion instanceof Conclusion) {
+			return ((Conclusion) conclusion).accept(inferenceGetter_);
+		}
+		// else
+		return Collections.emptySet();
 	}
 
 	@Override

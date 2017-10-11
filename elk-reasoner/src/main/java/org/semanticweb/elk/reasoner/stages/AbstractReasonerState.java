@@ -1149,11 +1149,15 @@ public abstract class AbstractReasonerState implements TracingProof {
 
 	@Override
 	public Collection<? extends TracingInference> getInferences(
-			final Conclusion conclusion) {
+			final Object conclusion) {
+		if (!(conclusion instanceof Conclusion)) {
+			return Collections.emptySet();
+		}
+		// else
 		try {
 			// Ensure that classes are saturated.
 			getTaxonomyQuietlyUninterruptibly();
-			if (!traceState_.requestInferences(conclusion)) {
+			if (!traceState_.requestInferences((Conclusion) conclusion)) {
 				stageManager.inferenceTracingStage.invalidateRecursive();
 				completeUninterruptibly(stageManager.inferenceTracingStage);
 			}

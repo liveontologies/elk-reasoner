@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import org.liveontologies.owlapi.proof.OWLProver;
+import org.liveontologies.puli.DynamicProof;
 import org.liveontologies.puli.Inference;
 import org.liveontologies.puli.Proof;
 import org.semanticweb.elk.owlapi.ElkProverFactory;
@@ -74,34 +75,34 @@ public class RetrievingProofsForEntailment {
 		OWLAxiom entailment = getEntailment();
 		
 		// Get the inferences used to prove the entailment 
-		Proof<OWLAxiom> inferences = prover.getProof(entailment);
+		DynamicProof<? extends Inference<OWLAxiom>> proof = prover.getProof(entailment);
 		
 		// Now we can recursively request inferences and their premises. Print them to std.out in this example.
-		unwindProofs(inferences, entailment);
+		unwindProof(proof, entailment);
 
 		// Terminate the worker threads used by the reasoner.
 		prover.dispose();
 	}
 
-	private static <C> void unwindProofs(Proof<C> inferences, C entailment) {
-		// Start recursive unwinding
-		LinkedList<C> toDo = new LinkedList<C>();
-		Set<C> done = new HashSet<C>();
+	private static void unwindProof(Proof<?> proof, Object entailment) {
+		// Start recursive unwinding of conclusions
+		LinkedList<Object> toDo = new LinkedList<Object>();
+		Set<Object> done = new HashSet<Object>();
 		
 		toDo.add(entailment);
 		done.add(entailment);
 		
 		for (;;) {
-			C next = toDo.poll();
+			Object next = toDo.poll();
 			
 			if (next == null) {
 				break;
 			}
 			
-			for (Inference<C> inf : inferences.getInferences(next)) {
+			for (Inference<?> inf : proof.getInferences(next)) {
 				System.out.println(inf);
 				// Recursively unwind premise inferences
-				for (C premise : inf.getPremises()) {
+				for (Object premise : inf.getPremises()) {
 					
 					if (done.add(premise)) {
 						toDo.addFirst(premise);

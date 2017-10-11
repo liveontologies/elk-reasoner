@@ -23,8 +23,9 @@ package org.semanticweb.elk.reasoner.query;
 
 import java.util.Collection;
 
+import org.liveontologies.puli.Proof;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
-import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
+import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
@@ -60,8 +61,8 @@ public interface IndexedEntailmentQuery<E extends Entailment> {
 	 * @return An evidence that the queried entailment is entailed.
 	 * @throws ElkQueryException
 	 */
-	<C extends Context> EntailmentProof getEvidence(boolean atMostOne,
-			SaturationState<C> saturationState,
+	<C extends Context> Proof<EntailmentInference> getEvidence(
+			boolean atMostOne, SaturationState<C> saturationState,
 			SaturationConclusion.Factory conclusionFactory)
 			throws ElkQueryException;
 

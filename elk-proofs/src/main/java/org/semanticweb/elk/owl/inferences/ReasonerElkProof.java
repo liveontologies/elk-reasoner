@@ -22,13 +22,14 @@
 package org.semanticweb.elk.owl.inferences;
 
 import org.liveontologies.puli.ChronologicalProof;
-import org.liveontologies.puli.GenericDynamicProof;
+import org.liveontologies.puli.DynamicProof;
+import org.liveontologies.puli.Proof;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.entailments.model.EntailmentProof;
+import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.query.EntailmentQueryResult;
 import org.semanticweb.elk.reasoner.query.ProperEntailmentQueryResult;
 import org.semanticweb.elk.reasoner.query.UnsupportedIndexingEntailmentQueryResult;
@@ -41,7 +42,7 @@ import org.semanticweb.elk.reasoner.query.UnsupportedQueryTypeEntailmentQueryRes
  * @author Yevgeny Kazakov
  * @author Peter Skocovsky
  */
-public class ReasonerElkProof extends ChronologicalProof<ElkAxiom, ElkInference>
+public class ReasonerElkProof extends ChronologicalProof<ElkInference>
 		implements ModifiableElkProof {
 
 	private final Reasoner reasoner_;
@@ -55,7 +56,7 @@ public class ReasonerElkProof extends ChronologicalProof<ElkAxiom, ElkInference>
 				elkFactory);
 	}
 
-	public static GenericDynamicProof<ElkAxiom, ElkInference> create(
+	public static DynamicProof<ElkInference> create(
 			final Reasoner reasoner, final ElkAxiom goal,
 			final ElkObject.Factory elkFactory) throws ElkException {
 		final ReasonerElkProof proof = new ReasonerElkProof(reasoner, goal,
@@ -77,7 +78,7 @@ public class ReasonerElkProof extends ChronologicalProof<ElkAxiom, ElkInference>
 					throws ElkException {
 
 				try {
-					final EntailmentProof evidence = result.getEvidence(false);
+					final Proof<EntailmentInference> evidence = result.getEvidence(false);
 					new ElkProofGenerator(evidence, reasoner_,
 							inferenceFactory_).generate(result.getEntailment());
 				} finally {

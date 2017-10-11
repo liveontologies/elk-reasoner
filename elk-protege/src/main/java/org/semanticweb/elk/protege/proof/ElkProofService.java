@@ -69,7 +69,8 @@ public class ElkProofService extends ProofService
 	}
 
 	@Override
-	public DynamicProof<OWLAxiom> getProof(final OWLAxiom entailment)
+	public DynamicProof<Inference<? extends OWLAxiom>> getProof(
+			final OWLAxiom entailment)
 			throws UnsupportedEntailmentTypeException {
 		return new DynamicOwlProof(entailment);
 	}
@@ -109,12 +110,12 @@ public class ElkProofService extends ProofService
 
 	}
 
-	private class DynamicOwlProof
-			implements DynamicProof<OWLAxiom>, ChangeListener {
+	private class DynamicOwlProof implements
+			DynamicProof<Inference<? extends OWLAxiom>>, ChangeListener {
 
 		private final OWLAxiom entailment_;
 
-		private DynamicProof<OWLAxiom> proof_;
+		private DynamicProof<? extends Inference<? extends OWLAxiom>> proof_;
 
 		private final Set<DynamicProof.ChangeListener> listeners_ = new HashSet<DynamicProof.ChangeListener>();
 
@@ -142,8 +143,8 @@ public class ElkProofService extends ProofService
 		}
 
 		@Override
-		public Collection<? extends Inference<OWLAxiom>> getInferences(
-				OWLAxiom conclusion) {
+		public Collection<? extends Inference<? extends OWLAxiom>> getInferences(
+				Object conclusion) {
 			return proof_.getInferences(conclusion);
 		}
 
@@ -164,7 +165,8 @@ public class ElkProofService extends ProofService
 	}
 
 	@Override
-	public Inference<OWLAxiom> getExample(Inference<OWLAxiom> inference) {
+	public Inference<? extends OWLAxiom> getExample(
+			Inference<? extends OWLAxiom> inference) {
 		return ElkOwlInferenceExamples.getExample(inference);
 	}
 
