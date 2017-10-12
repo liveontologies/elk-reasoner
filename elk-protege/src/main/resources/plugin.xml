@@ -37,4 +37,9 @@
    <class value="org.semanticweb.elk.protege.proof.ElkInternalJustificationProofService"/>
 </extension>
 
+<extension id="elk.logview" point="org.protege.editor.core.application.ViewComponent">
+   <label value="ELK Log"/>
+   <class value="org.semanticweb.elk.protege.LogViewComponent"/>
+</extension>
+
 </plugin>

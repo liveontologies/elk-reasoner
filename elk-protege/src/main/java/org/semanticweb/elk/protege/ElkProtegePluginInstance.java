@@ -25,7 +25,9 @@
  */
 package org.semanticweb.elk.protege;
 
+import org.protege.editor.core.editorkit.EditorKit;
 import org.protege.editor.core.editorkit.plugin.EditorKitHook;
+import org.protege.editor.core.ui.workspace.Workspace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,9 +36,9 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.filter.ThresholdFilter;
 
 /**
- * Carries out some initialization, e.g. Logback, which we don't want to put into
- * the reasoner factory which could be used outside Protege (for example, in
- * Snow Owl)
+ * Carries out some initialization, e.g. Logback, which we don't want to put
+ * into the reasoner factory which could be used outside Protege (for example,
+ * in Snow Owl)
  * 
  * 
  * @author Pavel Klinov
@@ -49,6 +51,7 @@ public class ElkProtegePluginInstance extends EditorKitHook {
 
 	@Override
 	public void dispose() throws Exception {
+		// Empty.
 	}
 
 	@Override
@@ -56,15 +59,30 @@ public class ElkProtegePluginInstance extends EditorKitHook {
 		Logger logger = LoggerFactory.getLogger(ELK_PACKAGE_);
 		if (logger instanceof ch.qos.logback.classic.Logger) {
 			ch.qos.logback.classic.Logger logbackLogger = (ch.qos.logback.classic.Logger) logger;
-			ProtegeMessageAppender appender = ProtegeMessageAppender.getInstance();
+			final ProtegeMessageAppender appender_ = ProtegeMessageAppender
+					.getInstance();
+			appender_.setShowLog(showLog_);
 			LoggerContext context = logbackLogger.getLoggerContext();
-			appender.setContext(context);
-			logbackLogger.addAppender(appender);
+			appender_.setContext(context);
+			logbackLogger.addAppender(appender_);
 			ThresholdFilter filter = new ThresholdFilter();
-			filter.setLevel(Level.WARN.levelStr);
+			filter.setLevel(Level.INFO.levelStr);
 			filter.start();
-			appender.addFilter(filter);
-			appender.start();
+			appender_.addFilter(filter);
+			appender_.start();
 		}
 	}
+
+	private final Runnable showLog_ = new Runnable() {
+
+		@Override
+		public void run() {
+			final EditorKit editorKit = getEditorKit();
+			final Workspace workspace = editorKit.getWorkspace();
+			workspace.showResultsView("org.semanticweb.elk.elk.logview", true,
+					Workspace.BOTTOM_RESULTS_VIEW);
+		}
+
+	};
+
 }
