@@ -112,9 +112,9 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<owlapi.version>4.2.7</owlapi.version>
-		<puli.version>0.1.0-SNAPSHOT</puli.version>
-		<owlapi-proof.version>0.1.0-SNAPSHOT</owlapi-proof.version>
-		<protege-proof-explanation.version>0.1.0-SNAPSHOT</protege-proof-explanation.version>
+		<puli.version>0.1.0</puli.version>
+		<owlapi-proof.version>0.1.0</owlapi-proof.version>
+		<protege-proof-explanation.version>0.1.0</protege-proof-explanation.version>
 		<!-- try to keep the version low for backward compatibility -->
 		<protege.version>5.0.0</protege.version>
 		<java.required.version>6</java.required.version>
