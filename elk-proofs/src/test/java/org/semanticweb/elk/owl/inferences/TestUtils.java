@@ -52,7 +52,7 @@ public class TestUtils {
 		LOGGER_.debug("Provability test: {}", goal);
 		Proof<ElkInference> elkInferences = ReasonerElkProof.create(reasoner, goal,
 				factory);
-		InferenceDerivabilityChecker<ElkAxiom> checker = new InferenceDerivabilityChecker<ElkAxiom>(
+		InferenceDerivabilityChecker<ElkAxiom, ElkInference> checker = new InferenceDerivabilityChecker<ElkAxiom, ElkInference>(
 				elkInferences);
 		if (!checker.isDerivable(goal)) {
 			throw new AssertionError(String.format("%s: not derivable", goal));

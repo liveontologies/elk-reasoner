@@ -90,7 +90,6 @@ public class AllOntologiesProofTest extends BaseProofTest {
 		final OWLOntology ontology = loadOntology(manifest_.getInput()
 				.getUrl().openStream());
 		final OWLProver prover = OWLAPITestUtils.createProver(ontology);
-		final Set<OWLAxiom> axioms = ontology.getAxioms(Imports.INCLUDED);
 
 		try {
 			prover.precomputeInferences(InferenceType.CLASS_HIERARCHY);
@@ -113,7 +112,7 @@ public class AllOntologiesProofTest extends BaseProofTest {
 												subsumer);
 								assertTrue(String.format(
 										"Entailment %s not derivable!", axiom),
-										Proofs.isDerivable(prover.getProof(axiom), axiom, axioms));
+										Proofs.isDerivable(prover.getProof(axiom), axiom));
 							} catch (Exception e) {
 								throw new RuntimeException(
 										"Exception while running proof test: "
