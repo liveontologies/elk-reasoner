@@ -31,7 +31,8 @@ public class LogViewComponent extends ViewComponent {
 	@Override
 	public void initialise() throws Exception {
 		setLayout(new BorderLayout());
-		add(ProtegeMessageAppender.getInstance().getLogComponent(), BorderLayout.CENTER);
+		add(ElkProtegePluginInstance.ELK_LOG_CONTROLLER.getLogComponent(),
+				BorderLayout.CENTER);
 	}
 
 	@Override

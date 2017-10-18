@@ -49,6 +49,8 @@ public class ElkProtegePluginInstance extends EditorKitHook {
 
 	private static final String ELK_PACKAGE_ = "org.semanticweb.elk";
 
+	public static final LogController ELK_LOG_CONTROLLER = new LogController();
+	
 	@Override
 	public void dispose() throws Exception {
 		// Empty.
@@ -59,14 +61,15 @@ public class ElkProtegePluginInstance extends EditorKitHook {
 		Logger logger = LoggerFactory.getLogger(ELK_PACKAGE_);
 		if (logger instanceof ch.qos.logback.classic.Logger) {
 			ch.qos.logback.classic.Logger logbackLogger = (ch.qos.logback.classic.Logger) logger;
+			ELK_LOG_CONTROLLER.setLogger(logbackLogger);
+			ELK_LOG_CONTROLLER.setOnAppendWhenLogNotVisible(showLog_);
 			final ProtegeMessageAppender appender_ = ProtegeMessageAppender
 					.getInstance();
-			appender_.setShowLog(showLog_);
 			LoggerContext context = logbackLogger.getLoggerContext();
 			appender_.setContext(context);
 			logbackLogger.addAppender(appender_);
 			ThresholdFilter filter = new ThresholdFilter();
-			filter.setLevel(Level.INFO.levelStr);
+			filter.setLevel(Level.WARN.levelStr);
 			filter.start();
 			appender_.addFilter(filter);
 			appender_.start();
