@@ -161,7 +161,8 @@ public class LogController {
 				.getDocument();
 		final Element recordsElement = htmlDocument.getElement("records");
 		while (htmlDocument.getLength() > characterLimit_
-				&& recordsElement.getElementCount() > 0) {
+				&& recordsElement.getElementCount() > 1) {
+			// Leave at least one element.
 			htmlDocument.removeElement(recordsElement.getElement(0));
 		}
 	}

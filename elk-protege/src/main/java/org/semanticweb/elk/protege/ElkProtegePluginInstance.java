@@ -47,7 +47,7 @@ import ch.qos.logback.classic.filter.ThresholdFilter;
  */
 public class ElkProtegePluginInstance extends EditorKitHook {
 
-	private static final String ELK_PACKAGE_ = "org.semanticweb.elk";
+	public static final String ELK_PACKAGE_ = "org.semanticweb.elk";
 
 	public static final LogController ELK_LOG_CONTROLLER = new LogController();
 	
@@ -61,8 +61,11 @@ public class ElkProtegePluginInstance extends EditorKitHook {
 		Logger logger = LoggerFactory.getLogger(ELK_PACKAGE_);
 		if (logger instanceof ch.qos.logback.classic.Logger) {
 			ch.qos.logback.classic.Logger logbackLogger = (ch.qos.logback.classic.Logger) logger;
+			final ElkPreferences prefs = new ElkPreferences().load();
+			logbackLogger.setLevel(Level.toLevel(prefs.logLevel));
 			ELK_LOG_CONTROLLER.setLogger(logbackLogger);
 			ELK_LOG_CONTROLLER.setOnAppendWhenLogNotVisible(showLog_);
+			ELK_LOG_CONTROLLER.setCharacterLimit(prefs.logCharacterLimit);
 			final ProtegeMessageAppender appender_ = ProtegeMessageAppender
 					.getInstance();
 			LoggerContext context = logbackLogger.getLoggerContext();

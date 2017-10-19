@@ -42,17 +42,23 @@ public class ElkPreferences {
 			INCREMENTAL_MODE_KEY = "ELK_INCREMENTAL_MODE",
 			AUTO_SYNCRHONIZATION_KEY = "ELK_AUTO_SYNCHRONIZATION",
 			INLINE_INFERENCES_KEY = "ELK_INLINE_INFERENCES", SIZE = "SIZE",
-			SUPPRESS_ALL_WARNINGS_KEY = "ELK_SUPPRESS_ALL_WARNIGS";
+			SUPPRESS_ALL_WARNINGS_KEY = "ELK_SUPPRESS_ALL_WARNIGS",
+			LOG_LEVEL_KEY = "ELK_LOG_LEVEL",
+			LOG_CHARACTER_LIMIT_KEY = "ELK_LOG_CHARACTER_LIMIT";
 
 	public int numberOfWorkers;
 	public boolean incrementalMode, autoSynchronization, inlineInferences,
 			suppressAllWarnings;
 	public List<String> suppressedWarningTypes;
+	public String logLevel;
+	public int logCharacterLimit;
 
 	private final int defaultNumberOfWorkers_;
 	private final boolean defaultIncrementalMode_, defaultAutoSynchronization_,
 			defaultInlineInferences_, defaultSuppressAllWarnings_;
 	private final List<String> defaultSuppressedWarningTypes_;
+	private final String defaultLogLevel_;
+	private final int defaultLogCharacterLimit_;
 
 	public ElkPreferences() {
 		ReasonerConfiguration elkDefaults = ReasonerConfiguration
@@ -65,6 +71,8 @@ public class ElkPreferences {
 		defaultInlineInferences_ = true;
 		defaultSuppressedWarningTypes_ = new ArrayList<String>();
 		defaultSuppressAllWarnings_ = false;
+		defaultLogLevel_ = "WARN";
+		defaultLogCharacterLimit_ = 80000;
 	}
 
 	private static Preferences getPrefs() {
@@ -87,6 +95,9 @@ public class ElkPreferences {
 				defaultSuppressedWarningTypes_);
 		suppressAllWarnings = prefs.getBoolean(SUPPRESS_ALL_WARNINGS_KEY,
 				defaultSuppressAllWarnings_);
+		logLevel = prefs.getString(LOG_LEVEL_KEY, defaultLogLevel_);
+		logCharacterLimit = prefs.getInt(LOG_CHARACTER_LIMIT_KEY,
+				defaultLogCharacterLimit_);
 		return this;
 	}
 
@@ -100,6 +111,8 @@ public class ElkPreferences {
 		prefs.putBoolean(SUPPRESS_ALL_WARNINGS_KEY, suppressAllWarnings);
 		suppressedWarningTypes = defaultSuppressedWarningTypes_;
 		suppressAllWarnings = defaultSuppressAllWarnings_;
+		prefs.putString(LOG_LEVEL_KEY, logLevel);
+		prefs.putInt(LOG_CHARACTER_LIMIT_KEY, logCharacterLimit);
 		return this;
 	}
 
@@ -108,6 +121,8 @@ public class ElkPreferences {
 		incrementalMode = defaultIncrementalMode_;
 		autoSynchronization = defaultAutoSynchronization_;
 		inlineInferences = defaultInlineInferences_;
+		logLevel = defaultLogLevel_;
+		logCharacterLimit = defaultLogCharacterLimit_;
 		return this;
 	}
 

@@ -30,19 +30,15 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -50,22 +46,17 @@ import javax.swing.JTable;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.table.JTableHeader;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.protege.editor.core.plugin.PluginUtilities;
 import org.protege.editor.core.ui.preferences.PreferencesLayoutPanel;
-import org.protege.editor.core.update.PluginDocumentParseException;
-import org.protege.editor.core.update.PluginInfo;
-import org.protege.editor.core.update.PluginInfoDocumentParser;
-import org.protege.editor.core.update.PluginInstaller;
-import org.protege.editor.core.update.PluginRegistryImpl;
 import org.protege.editor.owl.ui.preferences.OWLPreferencesPanel;
 import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.elk.protege.ElkPreferences;
+import org.semanticweb.elk.protege.ElkProtegePluginInstance;
 import org.semanticweb.elk.protege.ProtegeSuppressedMessages;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Level;
 
 /**
  * UI panel for setting preferences for ELK
@@ -75,11 +66,9 @@ import org.slf4j.LoggerFactory;
  *         pavel.klinov@uni-ulm.de
  * 
  * @author "Yevgeny Kazakov"
+ * @author Peter Skocovsky
  */
 public class ElkPreferencesPanel extends OWLPreferencesPanel {
-
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ElkPreferencesPanel.class);
 
 	private static final long serialVersionUID = -5568211860560307648L;
 
@@ -89,6 +78,10 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 			suppressAllWarningsCheckbox_;
 
 	private WarningTableModel warningTypes_;
+
+	private JComboBox<String> logLevel_;
+
+	private SpinnerNumberModel logCharacterLimitModel_;
 
 	@Override
 	public void initialise() throws Exception {
@@ -206,6 +199,24 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 		suppressAllWarningsCheckbox_.setToolTipText(
 				"If checked, all ELK warnings will be silently ignored; the information about them will still be included above");
 		panel.addGroupComponent(suppressAllWarningsCheckbox_);
+
+		panel.addGroup("Log level");
+		logLevel_ = new JComboBox<>(new String[] { Level.OFF.toString(),
+				Level.ERROR.toString(), Level.WARN.toString(),
+				Level.INFO.toString(), Level.DEBUG.toString(),
+				Level.TRACE.toString(), Level.ALL.toString() });
+		logLevel_.setSelectedItem(prefs.logLevel);
+		logLevel_.setToolTipText(
+				"Messages with level equal to or grater than this level will appear in the log");
+		panel.addGroupComponent(logLevel_);
+
+		panel.addGroup("Maximal number of character in the log");
+		logCharacterLimitModel_ = new SpinnerNumberModel(
+				prefs.logCharacterLimit, 1, Integer.MAX_VALUE, 10);
+		spinner = new JSpinner(logCharacterLimitModel_);
+		spinner.setToolTipText(
+				"The maximal number of characters displayed in the log");
+		panel.addGroupComponent(spinner);
 	}
 
 	@Override
@@ -220,6 +231,9 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 			prefs.suppressedWarningTypes.add(warningTypes_.getWarningTypeAt(i));
 		}
 		prefs.suppressAllWarnings = suppressAllWarningsCheckbox_.isSelected();
+		prefs.logLevel = logLevel_.getSelectedItem().toString();
+		prefs.logCharacterLimit = logCharacterLimitModel_.getNumber()
+				.intValue();
 		prefs.save();
 	}
 
@@ -229,11 +243,20 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 		// preferences
 		OWLReasoner reasoner = getOWLModelManager().getOWLReasonerManager()
 				.getCurrentReasoner();
-		if (!(reasoner instanceof ElkReasoner))
-			return;
-		((ElkReasoner) reasoner)
-				.setConfigurationOptions(ElkPreferences.getElkConfig());
+		if (reasoner instanceof ElkReasoner) {
+			((ElkReasoner) reasoner)
+					.setConfigurationOptions(ElkPreferences.getElkConfig());
+		}
 		ProtegeSuppressedMessages.getInstance().reload();
+		final ElkPreferences prefs = new ElkPreferences().load();
+		final Logger logger = LoggerFactory
+				.getLogger(ElkProtegePluginInstance.ELK_PACKAGE_);
+		if (logger instanceof ch.qos.logback.classic.Logger) {
+			ch.qos.logback.classic.Logger logbackLogger = (ch.qos.logback.classic.Logger) logger;
+			logbackLogger.setLevel(Level.toLevel(prefs.logLevel, Level.WARN));
+		}
+		ElkProtegePluginInstance.ELK_LOG_CONTROLLER
+				.setCharacterLimit(prefs.logCharacterLimit);
 	}
 
 }

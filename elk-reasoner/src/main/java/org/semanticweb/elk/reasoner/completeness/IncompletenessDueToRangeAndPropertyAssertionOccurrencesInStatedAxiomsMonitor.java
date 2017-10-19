@@ -95,6 +95,13 @@ class IncompletenessDueToRangeAndPropertyAssertionOccurrencesInStatedAxiomsMonit
 		final Collection<? extends ElkObject> assertionOccurrsIn = occurrences
 				.occursIn(Occurrence.OCCURRENCE_OF_OBJECT_PROPERTY_ASSERTION);
 
+		if (rangeOccursIn == null || rangeOccursIn.isEmpty()
+				|| assertionOccurrsIn == null || assertionOccurrsIn.isEmpty()) {
+			// Not incomplete for this reason. Next time each reason is new.
+			lastOccursIn_ = Collections.emptySet();
+			return false;
+		}
+
 		final ImmutableSet.Builder<ElkObject> currentOccursIn = ImmutableSet
 				.<ElkObject> builder();
 		boolean hasNewOccurrence = false;
