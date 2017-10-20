@@ -36,7 +36,7 @@ public class LogViewComponent extends ViewComponent {
 	}
 
 	@Override
-	public void dispose() throws Exception {
+	public void dispose() {
 		// Empty.
 	}
 
