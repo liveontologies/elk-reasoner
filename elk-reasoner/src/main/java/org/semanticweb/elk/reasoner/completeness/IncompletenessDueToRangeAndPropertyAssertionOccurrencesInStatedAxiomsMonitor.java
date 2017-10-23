@@ -32,6 +32,8 @@ import org.semanticweb.elk.reasoner.indexing.model.OccurrenceStore;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.slf4j.Logger;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -43,6 +45,9 @@ import com.google.common.collect.ImmutableSet;
  */
 class IncompletenessDueToRangeAndPropertyAssertionOccurrencesInStatedAxiomsMonitor
 		extends IncompletenessDueToOccurrencesMonitor {
+
+	private static final Marker MARKER_ = MarkerFactory
+			.getMarker("ObjectPropertyAssertionWithObjectPropertyRange");
 
 	public static final int AT_MOST_N_OCCURRENCES_IN_MESSAGE = 3;
 
@@ -131,9 +136,7 @@ class IncompletenessDueToRangeAndPropertyAssertionOccurrencesInStatedAxiomsMonit
 				message.append("occurrences of ObjectPropertyRange:");
 				printOccurrences(rangeOccursIn, message);
 
-				LoggerWrap.log(logger, logLevel_,
-						"ObjectPropertyAssertionWithObjectPropertyRange",
-						message.toString());
+				LoggerWrap.log(logger, logLevel_, MARKER_, message.toString());
 			}
 
 			return true;

@@ -60,7 +60,6 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLDataPropertyExpression;
-import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
@@ -89,6 +88,8 @@ import org.semanticweb.owlapi.reasoner.impl.OWLNamedIndividualNode;
 import org.semanticweb.owlapi.util.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
 /**
  * {@link OWLReasoner} interface implementation for ELK {@link Reasoner}
@@ -101,6 +102,8 @@ public class ElkReasoner implements OWLReasoner {
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ElkReasoner.class);
+	private static final Marker MARKER_UNSUPPORTED_METHOD_ = MarkerFactory
+			.getMarker("owlapi.unsupportedMethod");
 
 	// OWL API related objects
 	private final OWLOntology owlOntology_;
@@ -247,7 +250,7 @@ public class ElkReasoner implements OWLReasoner {
 		 * non-persistent settings for ignoring them, we better use only one
 		 * message type to make it easier to ignore them.
 		 */
-		LoggerWrap.log(LOGGER_, LogLevel.WARN, "owlapi.unsupportedMethod",
+		LoggerWrap.log(LOGGER_, LogLevel.WARN, MARKER_UNSUPPORTED_METHOD_,
 				message);
 
 		return new UnsupportedOperationException(message);
@@ -267,7 +270,7 @@ public class ElkReasoner implements OWLReasoner {
 			String method, String reason) {
 		String message = "OWL API reasoner method is not fully implemented: "
 				+ method + ": " + reason;
-		LoggerWrap.log(LOGGER_, LogLevel.WARN, "owlapi.unsupportedMethod",
+		LoggerWrap.log(LOGGER_, LogLevel.WARN, MARKER_UNSUPPORTED_METHOD_,
 				message);
 
 		return new UnsupportedOperationException(message);

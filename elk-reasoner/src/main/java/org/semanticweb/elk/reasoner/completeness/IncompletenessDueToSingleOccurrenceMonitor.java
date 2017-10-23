@@ -33,6 +33,8 @@ import org.semanticweb.elk.reasoner.indexing.model.OccurrenceStore;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.slf4j.Logger;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -52,6 +54,8 @@ abstract class IncompletenessDueToSingleOccurrenceMonitor
 
 	private final LogLevel logLevel_;
 	private final IncompletenessMessageProvider messageProvider_;
+	private final Marker marker_ = MarkerFactory
+			.getMarker(getOccurrence().toString());
 
 	private Set<? extends ElkObject> lastOccursIn_ = Collections.emptySet();
 
@@ -96,8 +100,7 @@ abstract class IncompletenessDueToSingleOccurrenceMonitor
 				message.append("\n");
 				messageProvider_.printOccurrences(
 						occurrences.occursIn(getOccurrence()), message);
-				LoggerWrap.log(logger, logLevel_, getOccurrence().toString(),
-						message.toString());
+				LoggerWrap.log(logger, logLevel_, marker_, message.toString());
 			}
 			return true;
 		}

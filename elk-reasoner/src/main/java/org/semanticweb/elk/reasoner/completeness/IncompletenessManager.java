@@ -30,11 +30,16 @@ import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
 public class IncompletenessManager {
 
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IncompletenessManager.class);
+
+	private static final Marker MARKER_ = MarkerFactory
+			.getMarker("Incompleteness");
 
 	private final IncompletenessMonitor incompletenessDueToStatedAxiomsMonitor_;
 
@@ -129,7 +134,7 @@ public class IncompletenessManager {
 				final boolean result = super.logNewIncompletenessReasons(
 						logger);
 				if (result) {
-					LoggerWrap.log(logger, LogLevel.WARN, "Incompleteness",
+					LoggerWrap.log(logger, LogLevel.WARN, MARKER_,
 							"Reasoning may be incomplete! See log level INFO for more details.");
 				}
 				return result;
