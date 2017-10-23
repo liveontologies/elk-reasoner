@@ -31,7 +31,6 @@ import org.protege.editor.core.ui.preferences.PreferencesLayoutPanel;
 import org.protege.editor.owl.ui.preferences.OWLPreferencesPanel;
 import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.elk.protege.ElkPreferences;
-import org.semanticweb.elk.protege.ProtegeSuppressedMessages;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 public class ElkProofPreferencesPanel extends OWLPreferencesPanel {
@@ -72,7 +71,6 @@ public class ElkProofPreferencesPanel extends OWLPreferencesPanel {
 			return;
 		((ElkReasoner) reasoner)
 				.setConfigurationOptions(ElkPreferences.getElkConfig());
-		ProtegeSuppressedMessages.getInstance().reload();
 	}
 	
 }

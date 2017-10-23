@@ -32,8 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.filter.ThresholdFilter;
 
 /**
  * Carries out some initialization, e.g. Logback, which we don't want to put
@@ -50,7 +48,7 @@ public class ElkProtegePluginInstance extends EditorKitHook {
 	public static final String ELK_PACKAGE_ = "org.semanticweb.elk";
 
 	public static final LogController ELK_LOG_CONTROLLER = new LogController();
-	
+
 	@Override
 	public void dispose() throws Exception {
 		// Empty.
@@ -66,16 +64,6 @@ public class ElkProtegePluginInstance extends EditorKitHook {
 			ELK_LOG_CONTROLLER.setLogger(logbackLogger);
 			ELK_LOG_CONTROLLER.setOnAppendWhenLogNotVisible(showLog_);
 			ELK_LOG_CONTROLLER.setCharacterLimit(prefs.logCharacterLimit);
-			final ProtegeMessageAppender appender_ = ProtegeMessageAppender
-					.getInstance();
-			LoggerContext context = logbackLogger.getLoggerContext();
-			appender_.setContext(context);
-			logbackLogger.addAppender(appender_);
-			ThresholdFilter filter = new ThresholdFilter();
-			filter.setLevel(Level.WARN.levelStr);
-			filter.start();
-			appender_.addFilter(filter);
-			appender_.start();
 		}
 	}
 
