@@ -12,11 +12,6 @@
 	<class value="org.semanticweb.elk.protege.ui.ElkPreferencesPanel"/>
 </extension>
 
-<extension id="elk.init" point="org.protege.editor.core.application.EditorKitHook">
-	<class value="org.semanticweb.elk.protege.ElkProtegePluginInstance"/>
-	<editorKitId value="OWLEditorKit"/>
-</extension>
-
 <extension id="elk.proofs" point="org.liveontologies.protege.explanation.proof.service">
    <name value="ELK"/>
    <class value="org.semanticweb.elk.protege.proof.ElkProofService"/>
@@ -35,11 +30,6 @@
 <extension id="elk.prover" point="org.liveontologies.protege.justification.proof.JustificationProofService">
    <name value="ELK Internal Proof Service"/>
    <class value="org.semanticweb.elk.protege.proof.ElkInternalJustificationProofService"/>
-</extension>
-
-<extension id="elk.logview" point="org.protege.editor.core.application.ViewComponent">
-   <label value="ELK Log"/>
-   <class value="org.semanticweb.elk.protege.LogViewComponent"/>
 </extension>
 
 </plugin>

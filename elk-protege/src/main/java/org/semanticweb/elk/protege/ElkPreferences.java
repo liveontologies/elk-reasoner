@@ -38,20 +38,14 @@ public class ElkPreferences {
 			NUMBER_OF_WORKERS_KEY = "ELK_NUMBER_OF_WORKERS",
 			INCREMENTAL_MODE_KEY = "ELK_INCREMENTAL_MODE",
 			AUTO_SYNCRHONIZATION_KEY = "ELK_AUTO_SYNCHRONIZATION",
-			INLINE_INFERENCES_KEY = "ELK_INLINE_INFERENCES",
-			LOG_LEVEL_KEY = "ELK_LOG_LEVEL",
-			LOG_CHARACTER_LIMIT_KEY = "ELK_LOG_CHARACTER_LIMIT";
+			INLINE_INFERENCES_KEY = "ELK_INLINE_INFERENCES";
 
 	public int numberOfWorkers;
 	public boolean incrementalMode, autoSynchronization, inlineInferences;
-	public String logLevel;
-	public int logCharacterLimit;
 
 	private final int defaultNumberOfWorkers_;
 	private final boolean defaultIncrementalMode_, defaultAutoSynchronization_,
 			defaultInlineInferences_;
-	private final String defaultLogLevel_;
-	private final int defaultLogCharacterLimit_;
 
 	public ElkPreferences() {
 		ReasonerConfiguration elkDefaults = ReasonerConfiguration
@@ -62,8 +56,6 @@ public class ElkPreferences {
 				ReasonerConfiguration.INCREMENTAL_MODE_ALLOWED);
 		defaultAutoSynchronization_ = false;
 		defaultInlineInferences_ = true;
-		defaultLogLevel_ = "WARN";
-		defaultLogCharacterLimit_ = 80000;
 	}
 
 	private static Preferences getPrefs() {
@@ -82,9 +74,6 @@ public class ElkPreferences {
 				defaultAutoSynchronization_);
 		inlineInferences = prefs.getBoolean(INLINE_INFERENCES_KEY,
 				defaultInlineInferences_);
-		logLevel = prefs.getString(LOG_LEVEL_KEY, defaultLogLevel_);
-		logCharacterLimit = prefs.getInt(LOG_CHARACTER_LIMIT_KEY,
-				defaultLogCharacterLimit_);
 		return this;
 	}
 
@@ -94,8 +83,6 @@ public class ElkPreferences {
 		prefs.putBoolean(INCREMENTAL_MODE_KEY, incrementalMode);
 		prefs.putBoolean(AUTO_SYNCRHONIZATION_KEY, autoSynchronization);
 		prefs.putBoolean(INLINE_INFERENCES_KEY, inlineInferences);
-		prefs.putString(LOG_LEVEL_KEY, logLevel);
-		prefs.putInt(LOG_CHARACTER_LIMIT_KEY, logCharacterLimit);
 		return this;
 	}
 
@@ -104,8 +91,6 @@ public class ElkPreferences {
 		incrementalMode = defaultIncrementalMode_;
 		autoSynchronization = defaultAutoSynchronization_;
 		inlineInferences = defaultInlineInferences_;
-		logLevel = defaultLogLevel_;
-		logCharacterLimit = defaultLogCharacterLimit_;
 		return this;
 	}
 

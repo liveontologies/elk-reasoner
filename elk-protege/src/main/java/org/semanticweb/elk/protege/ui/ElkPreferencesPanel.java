@@ -30,7 +30,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
@@ -39,12 +38,7 @@ import org.protege.editor.core.ui.preferences.PreferencesLayoutPanel;
 import org.protege.editor.owl.ui.preferences.OWLPreferencesPanel;
 import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.elk.protege.ElkPreferences;
-import org.semanticweb.elk.protege.ElkProtegePluginInstance;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.classic.Level;
 
 /**
  * UI panel for setting preferences for ELK
@@ -63,10 +57,6 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 	private SpinnerNumberModel numberOfWorkersModel_;
 
 	private JCheckBox incrementalCheckbox_, syncCheckbox_;
-
-	private JComboBox<String> logLevel_;
-
-	private SpinnerNumberModel logCharacterLimitModel_;
 
 	@Override
 	public void initialise() throws Exception {
@@ -102,24 +92,6 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 			}
 		});
 		panel.addGroupComponent(syncCheckbox_);
-
-		panel.addGroup("Log level");
-		logLevel_ = new JComboBox<>(new String[] { Level.OFF.toString(),
-				Level.ERROR.toString(), Level.WARN.toString(),
-				Level.INFO.toString(), Level.DEBUG.toString(),
-				Level.TRACE.toString(), Level.ALL.toString() });
-		logLevel_.setSelectedItem(prefs.logLevel);
-		logLevel_.setToolTipText(
-				"Messages with level equal to or grater than this level will appear in the log");
-		panel.addGroupComponent(logLevel_);
-
-		panel.addGroup("Maximal number of character in the log");
-		logCharacterLimitModel_ = new SpinnerNumberModel(
-				prefs.logCharacterLimit, 1, Integer.MAX_VALUE, 10);
-		spinner = new JSpinner(logCharacterLimitModel_);
-		spinner.setToolTipText(
-				"The maximal number of characters displayed in the log");
-		panel.addGroupComponent(spinner);
 	}
 
 	@Override
@@ -128,9 +100,6 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 		prefs.numberOfWorkers = numberOfWorkersModel_.getNumber().intValue();
 		prefs.incrementalMode = incrementalCheckbox_.isSelected();
 		prefs.autoSynchronization = syncCheckbox_.isSelected();
-		prefs.logLevel = logLevel_.getSelectedItem().toString();
-		prefs.logCharacterLimit = logCharacterLimitModel_.getNumber()
-				.intValue();
 		prefs.save();
 	}
 
@@ -144,15 +113,6 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 			((ElkReasoner) reasoner)
 					.setConfigurationOptions(ElkPreferences.getElkConfig());
 		}
-		final ElkPreferences prefs = new ElkPreferences().load();
-		final Logger logger = LoggerFactory
-				.getLogger(ElkProtegePluginInstance.ELK_PACKAGE_);
-		if (logger instanceof ch.qos.logback.classic.Logger) {
-			ch.qos.logback.classic.Logger logbackLogger = (ch.qos.logback.classic.Logger) logger;
-			logbackLogger.setLevel(Level.toLevel(prefs.logLevel, Level.WARN));
-		}
-		ElkProtegePluginInstance.ELK_LOG_CONTROLLER
-				.setCharacterLimit(prefs.logCharacterLimit);
 	}
 
 }
