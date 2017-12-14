@@ -835,22 +835,23 @@ public abstract class AbstractReasonerState implements TracingProof {
 			final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 
+		final boolean result;
+
 		if (computeQuery(classExpression, false)) {
-			final boolean result = classExpressionQueryState_
-					.isSatisfiable(classExpression);
-			if (result) {
-				incompleteness_.log(incompleteness_
-						.getIncompletenessMonitorForClassExpressionQuery(
-								classExpressionQueryState_
-										.getOccurrenceStore(classExpression)));
-			}
-			// If classExpression is unsatisfiable, the result is complete.
-			return result;
+			result = classExpressionQueryState_.isSatisfiable(classExpression);
 		} else {
 			// classExpression couldn't be indexed; pretend it is a fresh class
-			return true;
+			result = true;
 		}
 
+		// If classExpression is unsatisfiable, the result is complete.
+		if (result) {
+			incompleteness_.log(incompleteness_
+					.getIncompletenessMonitorForClassExpressionQuery(
+							classExpressionQueryState_
+									.getOccurrenceStore(classExpression)));
+		}
+		return result;
 	}
 
 	/**
@@ -870,26 +871,29 @@ public abstract class AbstractReasonerState implements TracingProof {
 			final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 
+		final Node<ElkClass> result;
+
 		if (computeQuery(classExpression, false)) {
 
-			final Node<ElkClass> result = classExpressionQueryState_
+			final Node<ElkClass> r = classExpressionQueryState_
 					.getEquivalentClasses(classExpression);
-			incompleteness_.log(incompleteness_
-					.getIncompletenessMonitorForClassExpressionQuery(
-							classExpressionQueryState_
-									.getOccurrenceStore(classExpression)));
-			if (result == null) {
-				return classTaxonomyState.getTaxonomy().getBottomNode();
+			if (r == null) {
+				result = classTaxonomyState.getTaxonomy().getBottomNode();
 			} else {
-				return result;
+				result = r;
 			}
 
 		} else {
 			// classExpression couldn't be indexed; pretend it is a fresh class
 
-			return new QueryNode<ElkClass>(ElkClassKeyProvider.INSTANCE);
+			result = new QueryNode<ElkClass>(ElkClassKeyProvider.INSTANCE);
 		}
 
+		incompleteness_.log(
+				incompleteness_.getIncompletenessMonitorForClassExpressionQuery(
+						classExpressionQueryState_
+								.getOccurrenceStore(classExpression)));
+		return result;
 	}
 
 	/**
@@ -908,28 +912,31 @@ public abstract class AbstractReasonerState implements TracingProof {
 			final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 
+		final Set<? extends Node<ElkClass>> result;
+
 		if (computeQuery(classExpression, false)) {
 
-			final Set<? extends Node<ElkClass>> result = classExpressionQueryState_
+			final Set<? extends Node<ElkClass>> r = classExpressionQueryState_
 					.getDirectSuperClasses(classExpression);
-			incompleteness_.log(incompleteness_
-					.getIncompletenessMonitorForClassExpressionQuery(
-							classExpressionQueryState_
-									.getOccurrenceStore(classExpression)));
-			if (result == null) {
-				return classTaxonomyState.getTaxonomy().getBottomNode()
+			if (r == null) {
+				result = classTaxonomyState.getTaxonomy().getBottomNode()
 						.getDirectSuperNodes();
 			} else {
-				return result;
+				result = r;
 			}
 
 		} else {
 			// classExpression couldn't be indexed; pretend it is a fresh class
 
-			return Collections
+			result = Collections
 					.singleton(classTaxonomyState.getTaxonomy().getTopNode());
 		}
 
+		incompleteness_.log(
+				incompleteness_.getIncompletenessMonitorForClassExpressionQuery(
+						classExpressionQueryState_
+								.getOccurrenceStore(classExpression)));
+		return result;
 	}
 
 	/**
@@ -948,30 +955,34 @@ public abstract class AbstractReasonerState implements TracingProof {
 			final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 
+		final Set<? extends Node<ElkClass>> result;
+
 		if (computeQuery(classExpression, false)) {
 
 			final Taxonomy<ElkClass> taxonomy = classTaxonomyState
 					.getTaxonomy();
 
-			final Set<? extends Node<ElkClass>> result = classExpressionQueryState_
+			final Set<? extends Node<ElkClass>> r = classExpressionQueryState_
 					.getDirectSubClasses(classExpression, taxonomy);
-			incompleteness_.log(incompleteness_
-					.getIncompletenessMonitorForClassExpressionQuery(
-							classExpressionQueryState_
-									.getOccurrenceStore(classExpression)));
-			if (result == null) {
-				return taxonomy.getBottomNode().getDirectSubNodes();
+
+			if (r == null) {
+				result = taxonomy.getBottomNode().getDirectSubNodes();
 			} else {
-				return result;
+				result = r;
 			}
 
 		} else {
 			// classExpression couldn't be indexed; pretend it is a fresh class
 
-			return Collections.singleton(
+			result = Collections.singleton(
 					classTaxonomyState.getTaxonomy().getBottomNode());
 		}
 
+		incompleteness_.log(
+				incompleteness_.getIncompletenessMonitorForClassExpressionQuery(
+						classExpressionQueryState_
+								.getOccurrenceStore(classExpression)));
+		return result;
 	}
 
 	/**
@@ -990,29 +1001,33 @@ public abstract class AbstractReasonerState implements TracingProof {
 			final ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 
+		final Set<? extends Node<ElkNamedIndividual>> result;
+
 		if (computeQuery(classExpression, true)) {
 
 			final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = instanceTaxonomyState
 					.getTaxonomy();
 
-			final Set<? extends Node<ElkNamedIndividual>> result = classExpressionQueryState_
+			final Set<? extends Node<ElkNamedIndividual>> r = classExpressionQueryState_
 					.getDirectInstances(classExpression, taxonomy);
-			incompleteness_.log(incompleteness_
-					.getIncompletenessMonitorForClassExpressionQuery(
-							classExpressionQueryState_
-									.getOccurrenceStore(classExpression)));
-			if (result == null) {
-				return taxonomy.getBottomNode().getDirectInstanceNodes();
+
+			if (r == null) {
+				result = taxonomy.getBottomNode().getDirectInstanceNodes();
 			} else {
-				return result;
+				result = r;
 			}
 
 		} else {
 			// classExpression couldn't be indexed; pretend it is a fresh class
 
-			return Collections.emptySet();
+			result = Collections.emptySet();
 		}
 
+		incompleteness_.log(
+				incompleteness_.getIncompletenessMonitorForClassExpressionQuery(
+						classExpressionQueryState_
+								.getOccurrenceStore(classExpression)));
+		return result;
 	}
 
 	/**
