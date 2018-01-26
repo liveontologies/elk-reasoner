@@ -40,8 +40,8 @@ import org.semanticweb.owlapi.model.OWLDataHasValue;
  * @param <T>
  *            the type of the wrapped object
  */
-public class ElkDataHasValueWrap<T extends OWLDataHasValue> extends
-		ElkClassExpressionWrap<T> implements ElkDataHasValue {
+public class ElkDataHasValueWrap<T extends OWLDataHasValue>
+		extends ElkClassExpressionWrap<T> implements ElkDataHasValue {
 
 	public ElkDataHasValueWrap(T owlDataHasValue) {
 		super(owlDataHasValue);
@@ -49,12 +49,12 @@ public class ElkDataHasValueWrap<T extends OWLDataHasValue> extends
 
 	@Override
 	public ElkDataPropertyExpression getProperty() {
-		return converter.convert(this.owlObject.getProperty());
+		return converter.convert(getProperty(owlObject));
 	}
 
 	@Override
 	public ElkLiteral getFiller() {
-		return converter.convert(this.owlObject.getFiller());
+		return converter.convert(getFiller(owlObject));
 	}
 
 	@Override

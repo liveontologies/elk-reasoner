@@ -41,21 +41,22 @@ import org.semanticweb.owlapi.model.OWLAnnotationPropertyRangeAxiom;
  *            the type of the wrapped object
  */
 public class ElkAnnotationPropertyRangeAxiomWrap<T extends OWLAnnotationPropertyRangeAxiom>
-		extends ElkAnnotationAxiomWrap<T> implements
-		ElkAnnotationPropertyRangeAxiom {
+		extends ElkAnnotationAxiomWrap<T>
+		implements ElkAnnotationPropertyRangeAxiom {
 
-	public ElkAnnotationPropertyRangeAxiomWrap(T owlAnnotationPropertyRangeAxiom) {
+	public ElkAnnotationPropertyRangeAxiomWrap(
+			T owlAnnotationPropertyRangeAxiom) {
 		super(owlAnnotationPropertyRangeAxiom);
 	}
 
 	@Override
 	public ElkAnnotationProperty getProperty() {
-		return converter.convert(this.owlObject.getProperty());
+		return converter.convert(getProperty(owlObject));
 	}
 
 	@Override
 	public ElkIri getRange() {
-		return converter.convert(this.owlObject.getRange());
+		return converter.convert(getRange(owlObject));
 	}
 
 	@Override

@@ -53,12 +53,12 @@ public class ElkAnnotationAssertionAxiomWrap<T extends OWLAnnotationAssertionAxi
 
 	@Override
 	public ElkAnnotationSubject getSubject() {
-		return converter.convert(owlObject.getSubject());
+		return converter.convert(getSubject(owlObject));
 	}
 
 	@Override
 	public ElkAnnotationProperty getProperty() {
-		return converter.convert(owlObject.getProperty());
+		return converter.convert(getProperty(owlObject));
 	}
 
 	@Override

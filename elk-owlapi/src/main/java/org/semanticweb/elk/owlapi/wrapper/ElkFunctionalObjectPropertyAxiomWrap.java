@@ -39,8 +39,8 @@ import org.semanticweb.owlapi.model.OWLFunctionalObjectPropertyAxiom;
  *            the type of the wrapped object
  */
 public class ElkFunctionalObjectPropertyAxiomWrap<T extends OWLFunctionalObjectPropertyAxiom>
-		extends ElkObjectPropertyAxiomWrap<T> implements
-		ElkFunctionalObjectPropertyAxiom {
+		extends ElkObjectPropertyAxiomWrap<T>
+		implements ElkFunctionalObjectPropertyAxiom {
 
 	public ElkFunctionalObjectPropertyAxiomWrap(
 			T owlFunctionalObjectPropertyAxiom) {
@@ -49,7 +49,7 @@ public class ElkFunctionalObjectPropertyAxiomWrap<T extends OWLFunctionalObjectP
 
 	@Override
 	public ElkObjectPropertyExpression getProperty() {
-		return converter.convert(this.owlObject.getProperty());
+		return converter.convert(getProperty(owlObject));
 	}
 
 	@Override

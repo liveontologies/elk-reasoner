@@ -48,7 +48,7 @@ public class ElkDataMinCardinalityQualifiedWrap<T extends OWLDataMinCardinality>
 
 	@Override
 	public ElkDataRange getFiller() {
-		return converter.convert(this.owlObject.getFiller());
+		return converter.convert(getFiller(owlObject));
 	}
 
 	@Override

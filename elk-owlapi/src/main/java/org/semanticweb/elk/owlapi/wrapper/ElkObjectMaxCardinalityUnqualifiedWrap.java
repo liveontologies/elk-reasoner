@@ -51,12 +51,12 @@ public class ElkObjectMaxCardinalityUnqualifiedWrap<T extends OWLObjectMaxCardin
 
 	@Override
 	public int getCardinality() {
-		return this.owlObject.getCardinality();
+		return getCardinality(owlObject);
 	}
 
 	@Override
 	public ElkObjectPropertyExpression getProperty() {
-		return converter.convert(this.owlObject.getProperty());
+		return converter.convert(getProperty(owlObject));
 	}
 
 	@Override

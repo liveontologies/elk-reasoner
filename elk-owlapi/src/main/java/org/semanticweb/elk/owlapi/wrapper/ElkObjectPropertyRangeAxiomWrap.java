@@ -41,8 +41,8 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyRangeAxiom;
  *            the type of the wrapped object
  */
 public class ElkObjectPropertyRangeAxiomWrap<T extends OWLObjectPropertyRangeAxiom>
-		extends ElkObjectPropertyAxiomWrap<T> implements
-		ElkObjectPropertyRangeAxiom {
+		extends ElkObjectPropertyAxiomWrap<T>
+		implements ElkObjectPropertyRangeAxiom {
 
 	public ElkObjectPropertyRangeAxiomWrap(T owlObjectPropertyRangeAxiom) {
 		super(owlObjectPropertyRangeAxiom);
@@ -50,12 +50,12 @@ public class ElkObjectPropertyRangeAxiomWrap<T extends OWLObjectPropertyRangeAxi
 
 	@Override
 	public ElkObjectPropertyExpression getProperty() {
-		return converter.convert(this.owlObject.getProperty());
+		return converter.convert(getProperty(owlObject));
 	}
 
 	@Override
 	public ElkClassExpression getRange() {
-		return converter.convert(this.owlObject.getRange());
+		return converter.convert(getRange(owlObject));
 	}
 
 	@Override

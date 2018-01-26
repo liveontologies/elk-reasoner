@@ -41,8 +41,8 @@ import org.semanticweb.owlapi.model.OWLAnnotationPropertyDomainAxiom;
  *            the type of the wrapped object
  */
 public class ElkAnnotationPropertyDomainAxiomWrap<T extends OWLAnnotationPropertyDomainAxiom>
-		extends ElkAnnotationAxiomWrap<T> implements
-		ElkAnnotationPropertyDomainAxiom {
+		extends ElkAnnotationAxiomWrap<T>
+		implements ElkAnnotationPropertyDomainAxiom {
 
 	public ElkAnnotationPropertyDomainAxiomWrap(
 			T owlAnnotationPropertyDomainAxiom) {
@@ -51,12 +51,12 @@ public class ElkAnnotationPropertyDomainAxiomWrap<T extends OWLAnnotationPropert
 
 	@Override
 	public ElkAnnotationProperty getProperty() {
-		return converter.convert(this.owlObject.getProperty());
+		return converter.convert(getProperty(owlObject));
 	}
 
 	@Override
 	public ElkIri getDomain() {
-		return converter.convert(this.owlObject.getDomain());
+		return converter.convert(getDomain(owlObject));
 	}
 
 	@Override

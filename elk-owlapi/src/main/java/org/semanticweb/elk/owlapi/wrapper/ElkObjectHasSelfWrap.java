@@ -47,7 +47,7 @@ public class ElkObjectHasSelfWrap<T extends OWLObjectHasSelf> extends
 
 	@Override
 	public ElkObjectPropertyExpression getProperty() {
-		return converter.convert(this.owlObject.getProperty());
+		return converter.convert(getProperty(owlObject));
 	}
 
 	@Override

@@ -51,13 +51,12 @@ public class ElkDataSomeValuesFromWrap<T extends OWLDataSomeValuesFrom> extends
 
 	@Override
 	public List<? extends ElkDataPropertyExpression> getDataPropertyExpressions() {
-		return Collections.singletonList(converter.convert(owlObject
-				.getProperty()));
+		return Collections.singletonList(converter.convert(getProperty(owlObject)));
 	}
 
 	@Override
 	public ElkDataRange getDataRange() {
-		return converter.convert(owlObject.getFiller());
+		return converter.convert(getFiller(owlObject));
 	}
 
 	@Override

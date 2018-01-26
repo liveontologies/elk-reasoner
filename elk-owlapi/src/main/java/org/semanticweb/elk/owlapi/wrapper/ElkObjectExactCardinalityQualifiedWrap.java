@@ -48,7 +48,7 @@ public class ElkObjectExactCardinalityQualifiedWrap<T extends OWLObjectExactCard
 
 	@Override
 	public ElkClassExpression getFiller() {
-		return converter.convert(this.owlObject.getFiller());
+		return converter.convert(getFiller(owlObject));
 	}
 
 	@Override

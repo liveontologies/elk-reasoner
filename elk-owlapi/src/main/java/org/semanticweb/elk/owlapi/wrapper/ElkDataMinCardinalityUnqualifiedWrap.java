@@ -50,12 +50,12 @@ public class ElkDataMinCardinalityUnqualifiedWrap<T extends OWLDataMinCardinalit
 
 	@Override
 	public int getCardinality() {
-		return this.owlObject.getCardinality();
+		return getCardinality(owlObject);
 	}
 
 	@Override
 	public ElkDataPropertyExpression getProperty() {
-		return converter.convert(this.owlObject.getProperty());
+		return converter.convert(getProperty(owlObject));
 	}
 
 	@Override

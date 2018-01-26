@@ -39,16 +39,17 @@ import org.semanticweb.owlapi.model.OWLFunctionalDataPropertyAxiom;
  *            the type of the wrapped object
  */
 public class ElkFunctionalDataPropertyAxiomWrap<T extends OWLFunctionalDataPropertyAxiom>
-		extends ElkDataPropertyAxiomWrap<T> implements
-		ElkFunctionalDataPropertyAxiom {
+		extends ElkDataPropertyAxiomWrap<T>
+		implements ElkFunctionalDataPropertyAxiom {
 
-	public ElkFunctionalDataPropertyAxiomWrap(T owlFunctionalDataPropertyAxiom) {
+	public ElkFunctionalDataPropertyAxiomWrap(
+			T owlFunctionalDataPropertyAxiom) {
 		super(owlFunctionalDataPropertyAxiom);
 	}
 
 	@Override
 	public ElkDataPropertyExpression getProperty() {
-		return converter.convert(this.owlObject.getProperty());
+		return converter.convert(getProperty(owlObject));
 	}
 
 	@Override

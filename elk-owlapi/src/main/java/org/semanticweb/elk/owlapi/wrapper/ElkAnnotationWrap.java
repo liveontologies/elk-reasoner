@@ -47,7 +47,7 @@ public class ElkAnnotationWrap<T extends OWLAnnotation> extends ElkObjectWrap<T>
 
 	@Override
 	public ElkAnnotationProperty getProperty() {
-		return converter.convert(owlObject.getProperty());
+		return converter.convert(getProperty(owlObject));
 	}
 
 	@Override

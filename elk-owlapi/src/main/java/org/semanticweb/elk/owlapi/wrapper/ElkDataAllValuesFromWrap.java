@@ -42,8 +42,8 @@ import org.semanticweb.owlapi.model.OWLDataAllValuesFrom;
  * @param <T>
  *            the type of the wrapped object
  */
-public class ElkDataAllValuesFromWrap<T extends OWLDataAllValuesFrom> extends
-		ElkClassExpressionWrap<T> implements ElkDataAllValuesFrom {
+public class ElkDataAllValuesFromWrap<T extends OWLDataAllValuesFrom>
+		extends ElkClassExpressionWrap<T> implements ElkDataAllValuesFrom {
 
 	public ElkDataAllValuesFromWrap(T owlDataAllValuesFrom) {
 		super(owlDataAllValuesFrom);
@@ -51,13 +51,13 @@ public class ElkDataAllValuesFromWrap<T extends OWLDataAllValuesFrom> extends
 
 	@Override
 	public List<? extends ElkDataPropertyExpression> getDataPropertyExpressions() {
-		return Collections.singletonList(converter.convert(owlObject
-				.getProperty()));
+		return Collections
+				.singletonList(converter.convert(getProperty(owlObject)));
 	}
 
 	@Override
 	public ElkDataRange getDataRange() {
-		return converter.convert(owlObject.getFiller());
+		return converter.convert(getFiller(owlObject));
 	}
 
 	@Override

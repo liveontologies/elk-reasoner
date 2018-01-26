@@ -41,8 +41,8 @@ import org.semanticweb.owlapi.model.OWLDataExactCardinality;
  *            the type of the wrapped object
  */
 public class ElkDataExactCardinalityUnqualifiedWrap<T extends OWLDataExactCardinality>
-		extends ElkClassExpressionWrap<T> implements
-		ElkDataExactCardinalityUnqualified {
+		extends ElkClassExpressionWrap<T>
+		implements ElkDataExactCardinalityUnqualified {
 
 	public ElkDataExactCardinalityUnqualifiedWrap(T owlDataExactCardinality) {
 		super(owlDataExactCardinality);
@@ -50,12 +50,12 @@ public class ElkDataExactCardinalityUnqualifiedWrap<T extends OWLDataExactCardin
 
 	@Override
 	public int getCardinality() {
-		return this.owlObject.getCardinality();
+		return getCardinality(owlObject);
 	}
 
 	@Override
 	public ElkDataPropertyExpression getProperty() {
-		return converter.convert(this.owlObject.getProperty());
+		return converter.convert(getProperty(owlObject));
 	}
 
 	@Override
