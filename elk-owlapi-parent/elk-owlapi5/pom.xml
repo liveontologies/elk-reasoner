@@ -16,16 +16,6 @@
 		<owlapi.version>${owlapi5.version}</owlapi.version>
 	</properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>elk-owlapi</artifactId>
-			<version>${project.version}</version>
-			<classifier>test-resources</classifier>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>
