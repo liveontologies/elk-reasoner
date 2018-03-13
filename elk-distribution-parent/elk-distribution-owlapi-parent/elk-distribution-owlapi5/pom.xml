@@ -16,7 +16,7 @@
 		<owlapi.major.version>5</owlapi.major.version>
 		<owlapi.version>${owlapi5.version}</owlapi.version>
 		<skip>false</skip>
-		<examples.directory>${build.directory}/main/java</examples.directory>
+		<examples.directory>${project.build.directory}/main/java</examples.directory>
 	</properties>
 
 	<dependencies>

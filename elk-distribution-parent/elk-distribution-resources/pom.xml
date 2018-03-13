@@ -90,6 +90,14 @@
 							</resources>
 						</configuration>
 					</execution>
+					<execution>
+						<id>default-resources</id>
+						<!-- adding resources only after they are generated -->
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>resources</goal>
+						</goals>
+					</execution>
 				</executions>
 			</plugin>
 
@@ -136,20 +144,6 @@
 							<announcementFile>announcement.txt</announcementFile>
 							<template>announcement.vm</template>
 						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<!-- included the generated resources -->
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>default-resources</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>resources</goal>
-						</goals>
 					</execution>
 				</executions>
 			</plugin>

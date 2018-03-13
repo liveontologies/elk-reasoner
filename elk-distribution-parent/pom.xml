@@ -25,12 +25,6 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
-					<!-- the plugin used to verify that properties are defined -->
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-enforcer-plugin</artifactId>
-					<version>3.0.0-M1</version>
-				</plugin>
-				<plugin>
 					<!-- the plugin to filter files by expanding the defined properties 
 						with their values; the expanded versions are copied to the target -->
 					<artifactId>maven-resources-plugin</artifactId>
@@ -73,8 +67,10 @@
 					</executions>
 				</plugin>
 				<plugin>
+					<!-- the plugin used to verify that properties are defined -->
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-enforcer-plugin</artifactId>
+					<version>3.0.0-M1</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
