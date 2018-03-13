@@ -1,5 +1,5 @@
 ELK is an ontology reasoner that aims to support the OWL 2 EL profile.
-See ${project.parent.url} for further information.
+See ${elk.wiki} for further information.
 
 ELK Reasoner is Copyright (c) ${project.inceptionYear} - ${currentYear} 
 ${project.organization.name}
@@ -41,7 +41,7 @@ USAGE:
 Usage instructions, including an example program demonstrating how to use ELK
 through OWL API for ontology classification, can be found here:
 
-    ${project.parent.url}wiki/ELK_from_OWL_API  
+    ${elk.wiki}/ELK_from_OWL_API  
     
 Several example programs on how to classify an ontology and how to query the
 reasoner with unnamed class expressions are included here in the folder:

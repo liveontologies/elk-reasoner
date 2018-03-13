@@ -67,6 +67,9 @@
 								</requireProperty>
 								<!-- properties used in README.txt -->
 								<requireProperty>
+									<property>elk.wiki</property>
+								</requireProperty>
+								<requireProperty>
 									<property>project.inceptionYear</property>
 								</requireProperty>
 								<requireProperty>

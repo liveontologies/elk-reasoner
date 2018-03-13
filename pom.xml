@@ -108,6 +108,7 @@
 		<java.required.version>7</java.required.version>
 		<slf4j.version>1.7.12</slf4j.version>
 		<logback.version>1.0.13</logback.version>
+		<elk.wiki>https://github.com/liveontologies/elk-reasoner/wiki</elk.wiki>
 	</properties>
 
 	<dependencyManagement>
