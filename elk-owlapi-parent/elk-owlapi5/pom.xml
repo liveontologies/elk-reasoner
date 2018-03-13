@@ -17,6 +17,27 @@
 		<java.required.version>8</java.required.version>
 	</properties>
 
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-owlapi4</artifactId>
+			<version>${project.version}</version>
+			<classifier>sources</classifier>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-owlapi4</artifactId>
+			<version>${project.version}</version>
+			<classifier>test-sources</classifier>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-owlapi4</artifactId>
+			<version>${project.version}</version>
+			<classifier>test-resources</classifier>
+		</dependency>
+	</dependencies>
+
 	<build>
 		<plugins>
 			<plugin>

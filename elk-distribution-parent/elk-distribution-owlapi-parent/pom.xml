@@ -15,15 +15,10 @@
 
 	<modules>
 		<module>elk-distribution-owlapi-resources</module>
+		<module>elk-distribution-owlapi4</module>
 	</modules>
 
 	<profiles>
-		<profile>
-			<id>java-7+</id>
-			<modules>
-				<module>elk-distribution-owlapi4</module>
-			</modules>
-		</profile>
 		<profile>
 			<id>java-8+</id>
 			<activation>
