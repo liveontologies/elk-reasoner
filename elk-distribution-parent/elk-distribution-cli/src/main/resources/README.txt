@@ -25,20 +25,22 @@ REQUIREMENTS:
 
 Java ${java.required.version} or higher.
 
-USAGE:
-
-Invoking the client without any parameters displays the supported options:
-  
-    java -jar ${elk-cli.filename}.jar
+QUICK START:
 
 To load the ontology from the file ontology.owl, compute its classification
 and store the result in taxonomy.owl, run ELK as follows: 
 
     java -jar ${elk-cli.filename}.jar -i ontology.owl -c -o taxonomy.owl
-	
+
 Without the output parameter ELK will still compute the result but it will
 neither store nor display the result anywhere; this can be used for performance
 experiments.
+
+USAGE:
+
+To display all available options run:
+  
+    java -jar ${elk-cli.filename}.jar -h
 
 You may want to specify further Java parameters for increasing available memory
 for classifying larger ontologies, e.g. by setting
