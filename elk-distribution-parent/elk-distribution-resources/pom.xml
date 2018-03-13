@@ -55,6 +55,13 @@
 						</goals>
 						<configuration>
 							<rules>
+								<!-- properties used in changes.xml -->
+								<requireProperty>
+									<property>release.version</property>
+								</requireProperty>
+								<requireProperty>
+									<property>buildDate</property>
+								</requireProperty>
 								<!-- properties used in announcement.vm -->
 								<requireProperty>
 									<property>developmentTeam</property>

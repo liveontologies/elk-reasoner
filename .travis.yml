@@ -5,7 +5,7 @@ git:
 
 sudo: required
 
-# "dist" is specified for openjdk6 and openjdk6 because the new images (Ubuntu
+# "dist" is specified for openjdk7 because the new images (Ubuntu
 # Trusty 14.04) do not support them. Specifying "group: deprecated-2017Q3" does
 # not help.
 # See <https://github.com/travis-ci/travis-ci/issues/7884#issuecomment-308451879>
@@ -13,8 +13,6 @@ sudo: required
 
 matrix:
   include:
-   - jdk: openjdk6
-     dist: precise
    - jdk: oraclejdk7
      dist: precise
    - jdk: openjdk7

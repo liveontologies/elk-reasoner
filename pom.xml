@@ -105,7 +105,7 @@
 		<protege-proof-explanation.version>0.1.0</protege-proof-explanation.version>
 		<!-- try to keep the version low for backward compatibility -->
 		<protege.version>5.0.0</protege.version>
-		<java.required.version>6</java.required.version>
+		<java.required.version>7</java.required.version>
 		<slf4j.version>1.7.12</slf4j.version>
 		<logback.version>1.0.13</logback.version>
 	</properties>
@@ -257,7 +257,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-changes-plugin</artifactId>
-					<version>2.12</version>
+					<version>2.12.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -383,39 +383,25 @@
 		</plugins>
 	</build>
 
+	<modules>
+		<module>elk-cli</module>
+		<module>elk-distribution-parent</module>
+		<module>elk-ore-parent</module>
+		<module>elk-owl-parent</module>
+		<module>elk-proofs</module>
+		<module>elk-reasoner</module>
+		<module>elk-util-parent</module>
+		<module>elk-owlapi-parent</module>
+	</modules>
+
 	<profiles>
 		<!-- compile only modules for the provided version of java -->
-		<profile>
-			<id>java-6+</id>
-			<activation>
-				<jdk>[1.6,)</jdk>
-			</activation>
-			<modules>
-				<module>elk-cli</module>
-				<module>elk-distribution-parent</module>
-				<module>elk-ore-parent</module>
-				<module>elk-owl-parent</module>
-				<module>elk-proofs</module>
-				<module>elk-reasoner</module>
-				<module>elk-util-parent</module>
-			</modules>
-		</profile>
-		<profile>
-			<id>java-7+</id>
-			<activation>
-				<jdk>[1.7,)</jdk>
-			</activation>
-			<modules>
-				<module>elk-owlapi-parent</module>
-			</modules>
-		</profile>
 		<profile>
 			<id>java-8+</id>
 			<activation>
 				<jdk>[1.8,)</jdk>
 			</activation>
 			<modules>
-				<module>elk-owlapi-parent</module>
 				<module>elk-protege</module>
 			</modules>
 		</profile>

@@ -17,18 +17,11 @@
 	<modules>
 		<module>elk-distribution-resources</module>
 		<module>elk-distribution-cli</module>
+		<module>elk-distribution-owlapi-parent</module>
 	</modules>
 
+
 	<profiles>
-		<profile>
-			<id>java-7+</id>
-			<activation>
-				<jdk>[1.7,)</jdk>
-			</activation>
-			<modules>
-				<module>elk-distribution-owlapi-parent</module>
-			</modules>
-		</profile>
 		<profile>
 			<id>java-8+</id>
 			<activation>

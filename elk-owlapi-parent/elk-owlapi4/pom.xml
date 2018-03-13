@@ -16,7 +16,6 @@
 
 	<properties>
 		<owlapi.version>${owlapi4.version}</owlapi.version>
-		<java.required.version>7</java.required.version>
 	</properties>
 
 	<build>
