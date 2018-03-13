@@ -4,10 +4,8 @@ clone_depth: 3
 environment:
   matrix:
     - JAVA_HOME: C:\Program Files\Java\jdk1.7.0
-      OPTIONS: -pl !elk-protege,!elk-distribution
+      OPTIONS: -pl !:elk-protege,!:elk-distribution-protege
     - JAVA_HOME: C:\Program Files\Java\jdk1.8.0
-    - JAVA_HOME: C:\Program Files\Java\jdk1.8.0
-      OPTIONS: -Powlapi5
 install:
   - cmd: SET PATH=%JAVA_HOME%\bin;%PATH%
 build_script:

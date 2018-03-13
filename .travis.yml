@@ -15,16 +15,14 @@ matrix:
   include:
    - jdk: openjdk6
      dist: precise
-     env: OPTIONS='-pl !elk-owlapi,!elk-owlapi-standalone,!elk-protege,!elk-distribution'
+     env: OPTIONS='-pl !:elk-owlapi-parent,!:elk-owlapi4,!:elk-owlapi5,!:elk-protege,!:elk-distribution-owlapi-parent,!:elk-distribution-owlapi4,!:elk-distribution-owlapi5,!:elk-distribution-protege'
    - jdk: oraclejdk7
      dist: precise
-     env: OPTIONS='-pl !elk-protege,!elk-distribution'
+     env: OPTIONS='-pl !:elk-protege,!:elk-distribution-protege'
    - jdk: openjdk7
-     env: OPTIONS='-pl !elk-protege,!elk-distribution'
+     env: OPTIONS='-pl !:elk-protege,!:elk-distribution-protege'
    - jdk: oraclejdk8
      env: DEPLOY=true
-   - jdk: oraclejdk8
-     env: OPTIONS='-Powlapi5'
 
 install: mvn install -DskipTests=true $OPTIONS
 
