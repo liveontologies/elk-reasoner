@@ -1,0 +1,85 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.semanticweb.elk</groupId>
+		<artifactId>elk-parent</artifactId>
+		<version>0.5.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>elk-distribution-parent</artifactId>
+	<packaging>pom</packaging>
+
+	<name>ELK Distribution Packages</name>
+	<description>The modules for packaging of ELK products and their distribution</description>
+
+	<modules>
+		<module>elk-distribution-resources</module>
+		<module>elk-distribution-owlapi-parent</module>
+		<module>elk-distribution-protege</module>
+		<module>elk-distribution-cli</module>
+	</modules>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<!-- the plugin used to verify that properties are defined -->
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-enforcer-plugin</artifactId>
+					<version>3.0.0-M1</version>
+				</plugin>
+				<plugin>
+					<!-- the plugin to filter files by expanding the defined properties 
+						with their values; the expanded versions are copied to the target -->
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>2.5</version>
+				</plugin>
+				<plugin>
+					<!-- the plugin for sharing resources among maven modules and projects -->
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-remote-resources-plugin</artifactId>
+					<version>1.5</version>
+				</plugin>
+				<plugin>
+					<!-- the plugin used to generate the modified plugin versions, such 
+						as release.version used templates/*.vm and parsedVersion.osgiVersion used 
+						in src/main/update.properties -->
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>build-helper-maven-plugin</artifactId>
+					<version>3.0.0</version>
+					<executions>
+						<execution>
+							<!-- generate the modified plugin versions, such as release.version 
+								used templates/*.vm and parsedVersion.osgiVersion used in src/main/update.properties -->
+							<id>set-osgi-versions</id>
+							<goals>
+								<goal>parse-version</goal>
+							</goals>
+						</execution>
+						<execution>
+							<!-- set the current year from the build timestamp, used in README.txt -->
+							<id>set-current-year</id>
+							<goals>
+								<goal>timestamp-property</goal>
+							</goals>
+							<configuration>
+								<name>currentYear</name>
+								<pattern>yyyy</pattern>
+								<locale>en,US</locale>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-enforcer-plugin</artifactId>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
+	</build>
+
+
+</project>

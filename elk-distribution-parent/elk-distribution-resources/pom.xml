@@ -1,0 +1,181 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.semanticweb.elk</groupId>
+		<artifactId>elk-distribution-parent</artifactId>
+		<version>0.5.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>elk-distribution-resources</artifactId>
+	<name>ELK Common Distribution Resources</name>
+	<description>Contains resources of ELK that are shared among distribution packages</description>
+
+	<properties>
+		<release.version>
+			${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
+		</release.version>
+		<developmentTeam>${project.parent.name} team</developmentTeam>
+	</properties>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>${project.build.directory}/resources</directory>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<!-- set the build date, used in changes.xml -->
+						<id>set-build-date</id>
+						<goals>
+							<goal>timestamp-property</goal>
+						</goals>
+						<configuration>
+							<name>buildDate</name>
+							<pattern>yyyy-MM-dd</pattern>
+							<locale>en,US</locale>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>enforce-property</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<!-- properties used in announcement.vm -->
+								<requireProperty>
+									<property>developmentTeam</property>
+								</requireProperty>
+								<requireProperty>
+									<property>release.version</property>
+								</requireProperty>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<id>filter-changes-xml</id>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/resources/</outputDirectory>
+							<resources>
+								<resource>
+									<!-- filtering of the changes.xml file -->
+									<directory>${basedir}/src/changes</directory>
+									<filtering>true</filtering>
+									<includes>
+										<include>changes.xml</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<!-- the plugin to generate changelog and release announcements -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-changes-plugin</artifactId>
+				<configuration>
+					<!-- the changes filtered source changes file -->
+					<xmlPath>${basedir}/target/resources/changes.xml</xmlPath>
+					<templateDirectory>templates</templateDirectory>
+					<announcementDirectory>${project.build.directory}/resources</announcementDirectory>
+					<developmentTeam>${project.parent.name} team</developmentTeam>
+				</configuration>
+				<executions>
+					<execution>
+						<!-- checking if the changes file is well-formed -->
+						<id>check-changes</id>
+						<phase>test</phase>
+						<goals>
+							<goal>changes-check</goal>
+						</goals>
+					</execution>
+					<execution>
+						<!-- generating of the Changes.txt file -->
+						<id>generate-changes-file</id>
+						<phase>test</phase>
+						<goals>
+							<goal>announcement-generate</goal>
+						</goals>
+						<configuration>
+							<announcementFile>Changes.txt</announcementFile>
+							<template>changes.vm</template>
+						</configuration>
+					</execution>
+					<execution>
+						<!-- generation of the e-mail announcement message announcement.txt -->
+						<id>generate-email-announcement</id>
+						<phase>test</phase>
+						<goals>
+							<goal>announcement-generate</goal>
+						</goals>
+						<configuration>
+							<announcementFile>announcement.txt</announcementFile>
+							<template>announcement.vm</template>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- included the generated resources -->
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>default-resources</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>resources</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- sharing resources -->
+			<plugin>
+				<artifactId>maven-remote-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+						<id>sharing-resources</id>
+						<goals>
+							<goal>bundle</goal>
+						</goals>
+						<configuration>
+							<resourcesDirectory>${project.build.directory}/resources</resourcesDirectory>
+							<includes>
+								<include>**/*.txt</include>
+								<include>**/*.xml</include>
+							</includes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+
+</project>

@@ -1,0 +1,164 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.semanticweb.elk</groupId>
+		<artifactId>elk-distribution-parent</artifactId>
+		<version>0.5.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>elk-distribution-protege</artifactId>
+	<name>ELK Distribution Package for Protege</name>
+	<description>Contains ELK Protege plug-in together with installation and usage instructions</description>
+
+
+	<properties>
+		<elk-protege.assembly-id>elk-protege5-package</elk-protege.assembly-id>
+		<elk-protege.filename>elk-protege-${project.version}</elk-protege.filename>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-protege</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<!-- including shared resources, such as Changes.txt -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-remote-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>process</goal>
+						</goals>
+						<configuration>
+							<resourceBundles>
+								<resourceBundle>${project.groupId}:elk-distribution-resources:${project.version}</resourceBundle>
+							</resourceBundles>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<!-- set additional properties like currentYear -->
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>verify-required-protege-properties</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<!-- properties used in protege-zip.xml -->
+								<requireProperty>
+									<property>elk-protege.assembly-id</property>
+								</requireProperty>
+								<!-- properties used in README.txt -->
+								<requireProperty>
+									<property>project.inceptionYear</property>
+								</requireProperty>
+								<requireProperty>
+									<property>currentYear</property>
+								</requireProperty>
+								<requireProperty>
+									<property>project.organization.name</property>
+								</requireProperty>
+								<requireProperty>
+									<property>java.required.version</property>
+								</requireProperty>
+								<requireProperty>
+									<property>elk-protege.filename</property>
+								</requireProperty>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<!-- the plugin to filter files by expanding the defined properties with 
+					their values; the expanded versions are copied to the target -->
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-update-properties-to-site</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/site/resources</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/src/main/resources/</directory>
+									<filtering>true</filtering>
+									<includes>
+										<include>p5.update.properties</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-changes-plugin</artifactId>
+				<executions>
+					<execution>
+						<!-- generation of the version-info.txt file for Protege auto-update 
+							feature -->
+						<id>generate-protege-version-info</id>
+						<phase>package</phase>
+						<goals>
+							<goal>announcement-generate</goal>
+						</goals>
+						<configuration>
+							<xmlPath>${project.build.directory}/maven-shared-archive-resources/changes.xml</xmlPath>
+							<announcementFile>p5.version-info.txt</announcementFile>
+							<templateDirectory>templates</templateDirectory>
+							<template>version-info.vm</template>
+							<announcementDirectory>${project.build.directory}/site/resources</announcementDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<!-- the plugin for assembling of the distribution zip files; we will 
+					run some test on them, therefore we create them at the generate-test-resources 
+					phase -->
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<!-- creating the distribution archive for elk-protege -->
+						<id>create-protege-zip</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<appendAssemblyId>false</appendAssemblyId>
+							<descriptors>
+								<!-- configuration file describing how to create the archive -->
+								<descriptor>${basedir}/src/assembly/protege-zip.xml</descriptor>
+							</descriptors>
+							<classifier>zip</classifier>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

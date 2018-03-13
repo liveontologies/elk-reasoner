@@ -1,0 +1,139 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.semanticweb.elk</groupId>
+		<artifactId>elk-distribution-parent</artifactId>
+		<version>0.5.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>elk-distribution-cli</artifactId>
+	<name>ELK Distribution Package for Command Line</name>
+	<description>Contains ELK binary and usage instructions from the command line</description>
+
+	<properties>
+		<elk-cli.assembly-id>elk-cli-package</elk-cli.assembly-id>
+		<elk-cli.filename>elk</elk-cli.filename>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-cli</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<!-- including shared resources, such as Changes.txt -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-remote-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>process</goal>
+						</goals>
+						<configuration>
+							<resourceBundles>
+								<resourceBundle>${project.groupId}:elk-distribution-resources:${project.version}</resourceBundle>
+							</resourceBundles>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<!-- set additional properties like currentYear -->
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>verify-required-protege-properties</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<!-- properties used in cli-zip.xml -->
+								<requireProperty>
+									<property>elk-cli.assembly-id</property>
+								</requireProperty>
+								<requireProperty>
+									<property>elk-cli.filename</property>
+								</requireProperty>
+								<!-- properties used in README.txt -->
+								<requireProperty>
+									<property>project.inceptionYear</property>
+								</requireProperty>
+								<requireProperty>
+									<property>currentYear</property>
+								</requireProperty>
+								<requireProperty>
+									<property>project.organization.name</property>
+								</requireProperty>
+								<requireProperty>
+									<property>java.required.version</property>
+								</requireProperty>
+								<requireProperty>
+									<property>elk-cli.filename</property>
+								</requireProperty>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<!-- creating the binary for elk -->
+						<id>create-elk-cli-binary</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<appendAssemblyId>false</appendAssemblyId>
+							<descriptors>
+								<descriptor>src/assembly/jar-with-dependencies.xml</descriptor>
+							</descriptors>
+							<finalName>${elk-cli.filename}</finalName>
+							<archive>
+								<manifestEntries>
+									<Implementation-Version>${project.version}</Implementation-Version>
+									<Implementation-Title>${project.name}</Implementation-Title>
+								</manifestEntries>
+								<manifest>
+									<mainClass>org.semanticweb.elk.cli.Main</mainClass>
+								</manifest>
+							</archive>
+						</configuration>
+					</execution>
+					<execution>
+						<!-- creating the distribution archive for elk-standalone -->
+						<id>create-elk-cli-zip-package</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<appendAssemblyId>false</appendAssemblyId>
+							<descriptors>
+								<descriptor>${basedir}/src/assembly/cli-zip.xml</descriptor>
+							</descriptors>
+							<classifier>zip</classifier>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
