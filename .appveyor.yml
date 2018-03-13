@@ -4,13 +4,12 @@ clone_depth: 3
 environment:
   matrix:
     - JAVA_HOME: C:\Program Files\Java\jdk1.7.0
-      OPTIONS: -pl !:elk-protege,!:elk-distribution-protege
     - JAVA_HOME: C:\Program Files\Java\jdk1.8.0
 install:
   - cmd: SET PATH=%JAVA_HOME%\bin;%PATH%
 build_script:
-  - mvn install -DskipTests=true %OPTIONS%
+  - mvn install -DskipTests=true
 test_script:
-  - mvn test -Dassembly.skipAssembly=true -B %OPTIONS%
+  - mvn test -Dassembly.skipAssembly=true -B
 cache:
   - C:\Users\appveyor\.m2

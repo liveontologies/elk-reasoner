@@ -15,13 +15,30 @@
 
 	<modules>
 		<module>elk-distribution-owlapi-resources</module>
-		<module>elk-distribution-owlapi4</module>
-		<module>elk-distribution-owlapi5</module>
 	</modules>
+
+	<profiles>
+		<profile>
+			<id>java-7+</id>
+			<modules>
+				<module>elk-distribution-owlapi4</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>java-8+</id>
+			<activation>
+				<jdk>[1.8,)</jdk>
+			</activation>
+			<modules>
+				<module>elk-distribution-owlapi5</module>
+			</modules>
+		</profile>
+	</profiles>
 
 	<properties>
 		<owlapi.major.version>4</owlapi.major.version>
 		<owlapi.version>${owlapi4.version}</owlapi.version>
+		<java.required.version>7</java.required.version>
 		<elk.filename>elk-owlapi${owlapi.major.version}-library-${project.version}</elk.filename>
 		<elk-sources.filename>${elk.filename}-sources</elk-sources.filename>
 		<elk-owlapi.assembly-id>elk-owlapi${owlapi.major.version}-package</elk-owlapi.assembly-id>

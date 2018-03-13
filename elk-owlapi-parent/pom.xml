@@ -14,13 +14,30 @@
 	<name>ELK OWL API Bindings</name>
 	<description>ELK bindings for OWL API</description>
 
-	<modules>
-		<module>elk-owlapi4</module>
-		<module>elk-owlapi5</module>
-	</modules>
+	<profiles>
+		<profile>
+			<id>java-7+</id>
+			<activation>
+				<jdk>[1.7,)</jdk>
+			</activation>
+			<modules>
+				<module>elk-owlapi4</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>java-8+</id>
+			<activation>
+				<jdk>[1.8,)</jdk>
+			</activation>
+			<modules>
+				<module>elk-owlapi5</module>
+			</modules>
+		</profile>
+	</profiles>
 
 	<properties>
 		<owlapi.version>${owlapi4.version}</owlapi.version>
+		<java.required.version>7</java.required.version>
 	</properties>
 
 	<dependencies>

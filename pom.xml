@@ -15,17 +15,6 @@
 		<maven>2.2.1</maven>
 	</prerequisites>
 
-	<modules>
-		<module>elk-cli</module>
-		<module>elk-distribution-parent</module>
-		<module>elk-ore-parent</module>
-		<module>elk-owl-parent</module>
-		<module>elk-owlapi-parent</module>
-		<module>elk-proofs</module>
-		<module>elk-protege</module>
-		<module>elk-reasoner</module>
-		<module>elk-util-parent</module>		
-	</modules>
 
 	<scm>
 		<connection>scm:git:https://github.com/liveontologies/elk-reasoner.git</connection>
@@ -395,6 +384,41 @@
 	</build>
 
 	<profiles>
+		<!-- compile only modules for the provided version of java -->
+		<profile>
+			<id>java-6+</id>
+			<activation>
+				<jdk>[1.6,)</jdk>
+			</activation>
+			<modules>
+				<module>elk-cli</module>
+				<module>elk-distribution-parent</module>
+				<module>elk-ore-parent</module>
+				<module>elk-owl-parent</module>
+				<module>elk-proofs</module>
+				<module>elk-reasoner</module>
+				<module>elk-util-parent</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>java-7+</id>
+			<activation>
+				<jdk>[1.7,)</jdk>
+			</activation>
+			<modules>
+				<module>elk-owlapi-parent</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>java-8+</id>
+			<activation>
+				<jdk>[1.8,)</jdk>
+			</activation>
+			<modules>
+				<module>elk-owlapi-parent</module>
+				<module>elk-protege</module>
+			</modules>
+		</profile>
 		<profile>
 			<!-- activated only when staging a release -->
 			<id>release</id>
