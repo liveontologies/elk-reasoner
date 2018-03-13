@@ -50,9 +50,8 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>elk-owlapi</artifactId>
+			<artifactId>elk-owlapi4</artifactId>
 			<version>${project.version}</version>
-			<classifier>${owlapi4.version}</classifier>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
