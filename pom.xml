@@ -100,8 +100,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<owlapi4.version>4.2.7</owlapi4.version>
 		<owlapi5.version>5.1.4</owlapi5.version>
-		<puli.version>0.1.0</puli.version>
-		<owlapi-proof.version>0.1.0</owlapi-proof.version>
 		<protege-proof-explanation.version>0.1.0</protege-proof-explanation.version>
 		<!-- try to keep the version low for backward compatibility -->
 		<protege.version>5.0.0</protege.version>
@@ -114,6 +112,16 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>org.liveontologies</groupId>
+				<artifactId>puli</artifactId>
+				<version>0.1.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.liveontologies</groupId>
+				<artifactId>owlapi-proof</artifactId>
+				<version>0.1.0</version>
+			</dependency>
 			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>

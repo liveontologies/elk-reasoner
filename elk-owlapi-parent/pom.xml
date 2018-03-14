@@ -53,12 +53,10 @@
 		<dependency>
 			<groupId>org.liveontologies</groupId>
 			<artifactId>puli</artifactId>
-			<version>${puli.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.liveontologies</groupId>
 			<artifactId>owlapi-proof</artifactId>
-			<version>${owlapi-proof.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>

@@ -24,16 +24,20 @@
 			<artifactId>elk-owlapi${owlapi.major.version}</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.liveontologies</groupId>
+			<artifactId>puli</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.liveontologies</groupId>
+			<artifactId>owlapi-proof</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-apibinding</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.owlapi</groupId>
-			<artifactId>owlapi-impl</artifactId>
 		</dependency>
 	</dependencies>
 

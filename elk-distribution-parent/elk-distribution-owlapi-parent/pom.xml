@@ -51,6 +51,12 @@
 				<groupId>${project.groupId}</groupId>
 				<artifactId>elk-owlapi${owlapi.major.version}</artifactId>
 				<version>${project.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>net.sourceforge.owlapi</groupId>
+						<artifactId>*</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>net.sourceforge.owlapi</groupId>
@@ -61,12 +67,6 @@
 			<dependency>
 				<groupId>net.sourceforge.owlapi</groupId>
 				<artifactId>owlapi-api</artifactId>
-				<version>${owlapi.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>net.sourceforge.owlapi</groupId>
-				<artifactId>owlapi-impl</artifactId>
 				<version>${owlapi.version}</version>
 				<scope>provided</scope>
 			</dependency>
