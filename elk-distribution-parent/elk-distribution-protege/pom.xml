@@ -61,6 +61,13 @@
 						</goals>
 						<configuration>
 							<rules>
+								<!-- properties used in p5.update.properties -->
+								<requireProperty>
+									<property>protege.update.url</property>
+								</requireProperty>
+								<requireProperty>
+									<property>parsedVersion.osgiVersion</property>
+								</requireProperty>
 								<!-- properties used in protege-zip.xml -->
 								<requireProperty>
 									<property>elk-protege.assembly-id</property>
@@ -101,7 +108,7 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${project.build.directory}/site/resources</outputDirectory>
+							<outputDirectory>${basedir}</outputDirectory>
 							<resources>
 								<resource>
 									<directory>${basedir}/src/main/resources/</directory>
@@ -122,6 +129,7 @@
 					<execution>
 						<!-- generation of the version-info.txt file for Protege auto-update 
 							feature -->
+						<!-- WARNING: not all properties are expanded! (bug?) -->
 						<id>generate-protege-version-info</id>
 						<phase>package</phase>
 						<goals>
@@ -132,7 +140,7 @@
 							<announcementFile>p5.version-info.txt</announcementFile>
 							<templateDirectory>templates</templateDirectory>
 							<template>version-info.vm</template>
-							<announcementDirectory>${project.build.directory}/site/resources</announcementDirectory>
+							<announcementDirectory>${basedir}</announcementDirectory>
 						</configuration>
 					</execution>
 				</executions>

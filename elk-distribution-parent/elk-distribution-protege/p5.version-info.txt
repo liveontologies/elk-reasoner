@@ -1,0 +1,15 @@
+The ELK Reasoner team is pleased to announce 
+        the ELK Protege plug-in 0.5.0 release!
+
+ELK is an ontology reasoner for the OWL 2 EL profile, currently with some 
+limitations. For further information see
+ 
+          http://elk.semanticweb.org/
+
+Changes in this version:
+------------------------
+No detail
+
+
+Have fun!
+- ELK Distribution Package for Protege team

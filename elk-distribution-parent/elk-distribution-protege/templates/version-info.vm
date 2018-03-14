@@ -20,7 +20,7 @@ The ELK Reasoner team is pleased to announce
 ELK is an ontology reasoner for the OWL 2 EL profile, currently with some 
 limitations. For further information see
  
-          ${project.parent.url}
+          ${project.parent.parent.url}
 
 Changes in this version:
 ------------------------
