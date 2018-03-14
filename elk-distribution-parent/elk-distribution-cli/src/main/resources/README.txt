@@ -32,9 +32,9 @@ and store the result in taxonomy.owl, run ELK as follows:
 
     java -jar ${elk-cli.filename}.jar -i ontology.owl -c -o taxonomy.owl
 
-Without the output parameter ELK will still compute the result but it will
-neither store nor display the result anywhere; this can be used for performance
-experiments.
+Without the switch "-o taxonomy.owl" ELK will still compute the result but it
+will neither store nor display the result anywhere; this can be used for 
+performance experiments.
 
 USAGE:
 
@@ -56,3 +56,13 @@ RDF/XML syntax. ELK can only parse ontologies in OWL 2 Functional-Style Syntax.
 OWL ontologies in other formats can be converted into Functional-Style Syntax
 using Protege version 4.1 or higher. To convert a file, open it in Protege and
 save using the menu: File > Save as... > OWL Functional Syntax
+
+ACKNOWLEDGEMENT:
+
+The package ${elk-cli.filename}.jar includes a number of third-party 
+libraries that are distributed under their own terms. The list of these 
+libraries together with applied licenses can be found in 
+
+     ${third-party.filename}.txt
+     
+The description of the licenses are provided in the licenses directory.

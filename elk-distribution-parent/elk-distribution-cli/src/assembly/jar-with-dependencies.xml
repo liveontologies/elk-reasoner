@@ -14,8 +14,7 @@
 	<includeBaseDirectory>false</includeBaseDirectory>
 	<dependencySets>
 		<dependencySet>
-			<unpack>true</unpack>
-			<scope>provided</scope>			
+			<unpack>true</unpack>	
 			<useProjectArtifact>false</useProjectArtifact>
 		</dependencySet>
 	</dependencySets>

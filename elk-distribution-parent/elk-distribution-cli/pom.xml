@@ -15,6 +15,7 @@
 	<properties>
 		<elk-cli.assembly-id>elk-cli-package</elk-cli.assembly-id>
 		<elk-cli.filename>elk</elk-cli.filename>
+		<third-party.filename>THIRD-PARTY</third-party.filename>
 	</properties>
 
 	<dependencies>
@@ -22,7 +23,6 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-cli</artifactId>
 			<version>${project.version}</version>
-			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
@@ -68,6 +68,9 @@
 								<requireProperty>
 									<property>elk-cli.filename</property>
 								</requireProperty>
+								<requireProperty>
+									<property>third-party.filename</property>
+								</requireProperty>
 								<!-- properties used in README.txt -->
 								<requireProperty>
 									<property>elk.wiki</property>
@@ -87,7 +90,35 @@
 								<requireProperty>
 									<property>elk-cli.filename</property>
 								</requireProperty>
+								<requireProperty>
+									<property>third-party.filename</property>
+								</requireProperty>
 							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<configuration>
+					<excludedGroups>${project.groupId}</excludedGroups>
+					<excludedScopes>provided</excludedScopes>
+				</configuration>
+				<executions>
+					<execution>
+						<id>download-third-party-licenses</id>
+						<goals>
+							<goal>download-licenses</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>add-third-party-license-summary</id>
+						<goals>
+							<goal>add-third-party</goal>
+						</goals>
+						<configuration>
+							<thirdPartyFilename>${third-party.filename}.txt</thirdPartyFilename>
 						</configuration>
 					</execution>
 				</executions>

@@ -7,6 +7,12 @@
 		<!-- the type of the archive -->
 		<format>zip</format>
 	</formats>
+	<fileSets>
+		<fileSet>
+			<directory>${project.build.directory}/generated-resources/licenses</directory>
+			<outputDirectory>licenses</outputDirectory>
+		</fileSet>
+	</fileSets>
 	<files>
 		<!-- the additional files to be bundled in the archive -->
 		<file>
@@ -22,6 +28,9 @@
 		</file>
 		<file>
 			<source>${project.build.directory}/${elk-cli.filename}.jar</source>
+		</file>
+		<file>
+			<source>${project.build.directory}/generated-sources/license/${third-party.filename}.txt</source>
 		</file>
 	</files>
 </assembly>
