@@ -31,12 +31,9 @@ Java ${java.required.version} or higher.
 
 INSTALLATION:
 
-To install, place the file 
-
-${elk-protege.filename}.jar 
-
-to the plugins folder of the Protege installation. The plug-in supports Protege
-Auto Update feature which can be used for upgrading to newer versions according
-to the instructions here:
+To install, place all jar files provided in this package in the plugins folder 
+of the Protege installation. The plug-in supports Protege Auto Update feature 
+which can be used for upgrading to newer versions according to the instructions 
+here:
 
     http://protegewiki.stanford.edu/wiki/EnablePluginAutoUpdate

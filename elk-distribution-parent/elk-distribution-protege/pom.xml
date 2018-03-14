@@ -88,9 +88,6 @@
 								<requireProperty>
 									<property>java.required.version</property>
 								</requireProperty>
-								<requireProperty>
-									<property>elk-protege.filename</property>
-								</requireProperty>
 							</rules>
 						</configuration>
 					</execution>
