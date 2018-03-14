@@ -18,6 +18,11 @@
 			<directory>${project.build.directory}/lib</directory>
 			<outputDirectory>lib</outputDirectory>
 		</fileSet>
+		<fileSet>
+			<!-- thrird-party licenses -->
+			<directory>${project.build.directory}/generated-resources/licenses</directory>
+			<outputDirectory>lib/licenses</outputDirectory>
+		</fileSet>
 	</fileSets>
 	<files>
 		<!-- the additional files to be bundled in the archive -->
@@ -38,6 +43,10 @@
 		</file>
 		<file>
 			<source>${project.build.directory}/${elk-sources.filename}.jar</source>
+		</file>
+		<file>
+			<source>${project.build.directory}/generated-sources/license/THIRD-PARTY.txt</source>
+			<outputDirectory>lib/</outputDirectory>
 		</file>
 	</files>
 

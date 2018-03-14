@@ -222,6 +222,31 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<configuration>
+					<excludedGroups>${project.groupId}</excludedGroups>
+					<excludedScopes>provided</excludedScopes>
+				</configuration>
+				<executions>
+					<execution>
+						<id>download-third-party-licenses</id>
+						<goals>
+							<goal>download-licenses</goal>
+						</goals>
+						<configuration>
+							<skipDownloadLicenses>${skip}</skipDownloadLicenses>
+						</configuration>
+					</execution>
+					<execution>
+						<id>add-third-party-license-summary</id>
+						<goals>
+							<goal>add-third-party</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<!-- creating binaries and source jars -->
 				<artifactId>maven-jar-plugin</artifactId>
 				<executions>

@@ -276,7 +276,7 @@
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>license-maven-plugin</artifactId>
-					<version>1.9</version>
+					<version>1.14</version>
 					<configuration>
 						<verbose>false</verbose>
 						<addSvnKeyWords>true</addSvnKeyWords>
