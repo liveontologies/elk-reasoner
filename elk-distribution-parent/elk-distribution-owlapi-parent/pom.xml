@@ -247,48 +247,49 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<!-- creating binaries and source jars -->
-				<artifactId>maven-jar-plugin</artifactId>
+				<!-- creating jar and zip files -->
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<skipAssembly>${skip}</skipAssembly>
+					<appendAssemblyId>false</appendAssemblyId>
+				</configuration>
 				<executions>
 					<execution>
-						<id>create-elk-jar</id>
+						<id>create-elk-classes-jar</id>
 						<goals>
-							<goal>jar</goal>
+							<goal>single</goal>
 						</goals>
+						<phase>package</phase>
 						<configuration>
-							<skipIfEmpty>true</skipIfEmpty>
-							<classesDirectory>${project.build.directory}/elk-classes</classesDirectory>
 							<finalName>${elk.filename}</finalName>
+							<attach>false</attach>
+							<descriptors>
+								<descriptor>${project.build.directory}/maven-shared-archive-resources/elk-classes.xml</descriptor>
+							</descriptors>
 						</configuration>
 					</execution>
 					<execution>
 						<id>create-elk-sources-jar</id>
 						<goals>
-							<goal>jar</goal>
+							<goal>single</goal>
 						</goals>
+						<phase>package</phase>
 						<configuration>
-							<skipIfEmpty>true</skipIfEmpty>
-							<classesDirectory>${project.build.directory}/elk-sources</classesDirectory>
 							<finalName>${elk-sources.filename}</finalName>
+							<attach>false</attach>
+							<descriptors>
+								<descriptor>${project.build.directory}/maven-shared-archive-resources/elk-sources.xml</descriptor>
+							</descriptors>
 						</configuration>
 					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<!-- creating the zip file -->
-				<artifactId>maven-assembly-plugin</artifactId>
-				<executions>
 					<execution>
 						<id>create-owlapi-zip</id>
-						<phase>package</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>
+						<phase>package</phase>
 						<configuration>
-							<skipAssembly>${skip}</skipAssembly>
-							<appendAssemblyId>false</appendAssemblyId>
 							<descriptors>
-								<!-- configuration file describing how to create the archive -->
 								<descriptor>${project.build.directory}/maven-shared-archive-resources/owlapi-zip.xml</descriptor>
 							</descriptors>
 						</configuration>
