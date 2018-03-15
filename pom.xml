@@ -15,7 +15,6 @@
 		<maven>2.2.1</maven>
 	</prerequisites>
 
-
 	<scm>
 		<connection>scm:git:https://github.com/liveontologies/elk-reasoner.git</connection>
 		<developerConnection>scm:git:git@github.com:liveontologies/elk-reasoner.git</developerConnection>
@@ -121,6 +120,11 @@
 				<groupId>org.liveontologies</groupId>
 				<artifactId>owlapi-proof</artifactId>
 				<version>0.1.0</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>18.0</version>
 			</dependency>
 			<dependency>
 				<groupId>junit</groupId>
@@ -373,7 +377,7 @@
 							<goal>analyze-only</goal>
 						</goals>
 						<configuration>
-							<failOnWarning>false</failOnWarning>
+							<failOnWarning>true</failOnWarning>
 						</configuration>
 					</execution>
 				</executions>

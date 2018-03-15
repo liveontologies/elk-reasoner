@@ -24,10 +24,30 @@
 			<artifactId>elk-cli</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<scope>runtime</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>analyze</id>
+						<configuration>
+							<usedDependencies>
+								<usedDependency>${project.groupId}:elk-cli</usedDependency>
+								<usedDependency>org.slf4j:slf4j-log4j12</usedDependency>
+							</usedDependencies>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<!-- including shared resources, such as Changes.txt -->
 				<groupId>org.apache.maven.plugins</groupId>

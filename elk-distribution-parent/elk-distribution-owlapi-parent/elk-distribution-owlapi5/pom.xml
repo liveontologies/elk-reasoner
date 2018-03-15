@@ -56,6 +56,14 @@
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
 					<execution>
+						<id>analyze</id>
+						<configuration>
+							<ignoredUnusedDeclaredDependencies>
+								<usedDependency>${project.groupId}:elk-distribution-owlapi4:*:*</usedDependency>
+							</ignoredUnusedDeclaredDependencies>
+						</configuration>
+					</execution>
+					<execution>
 						<id>unpack-sources</id>
 						<goals>
 							<goal>unpack</goal>
