@@ -37,12 +37,6 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
-					<!-- the plugin to filter files by expanding the defined properties 
-						with their values; the expanded versions are copied to the target -->
-					<artifactId>maven-resources-plugin</artifactId>
-					<version>2.5</version>
-				</plugin>
-				<plugin>
 					<!-- the plugin for sharing resources among maven modules and projects -->
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-remote-resources-plugin</artifactId>
