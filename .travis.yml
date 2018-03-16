@@ -20,6 +20,7 @@ matrix:
    - jdk: openjdk7
    - jdk: oraclejdk8
      env: DEPLOY=true
+   - jdk: oraclejdk9
 
 install: mvn install -DskipTests=true
 
