@@ -1,11 +1,13 @@
 language: java
 
+language: java
+
 git:
   depth: 3
 
 sudo: required
 
-# "dist" is specified for openjdk7 because the new images (Ubuntu
+# "dist" is specified for oraclejdk7 because the new images (Ubuntu
 # Trusty 14.04) do not support them. Specifying "group: deprecated-2017Q3" does
 # not help.
 # See <https://github.com/travis-ci/travis-ci/issues/7884#issuecomment-308451879>

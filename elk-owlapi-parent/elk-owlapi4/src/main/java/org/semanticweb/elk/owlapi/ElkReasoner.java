@@ -700,9 +700,13 @@ public class ElkReasoner implements OWLReasoner {
 		int filled = 0;
 		int version[] = new int[4];
 		if (versionString != null) {
-			splitted = versionString.split("\\.");
-			while (filled < splitted.length) {
-				version[filled] = Integer.parseInt(splitted[filled]);
+			splitted = versionString.replaceAll("[^\\d.]", "").split("\\.");
+			while (filled < splitted.length && filled < version.length) {
+				String part = splitted[filled];
+				if (part.length() > 8) {
+					part = part.substring(0, 8);
+				}
+				version[filled] = Integer.parseInt(part);
 				filled++;
 			}
 		}
@@ -712,6 +716,7 @@ public class ElkReasoner implements OWLReasoner {
 		}
 		return new Version(version[0], version[1], version[2], version[3]);
 	}
+
 
 	@Override
 	public OWLOntology getRootOntology() {
