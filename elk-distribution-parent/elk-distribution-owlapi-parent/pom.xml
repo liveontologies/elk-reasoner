@@ -83,7 +83,6 @@
 		<plugins>
 			<plugin>
 				<!-- including shared resources, such as Changes.txt and README.txt -->
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-remote-resources-plugin</artifactId>
 				<executions>
 					<execution>
@@ -109,7 +108,6 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
 				<configuration>
 					<skip>${skip}</skip>
@@ -161,7 +159,6 @@
 			</plugin>
 			<plugin>
 				<!-- prepare dependencies that should be zipped -->
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<configuration>
 					<overWriteReleases>false</overWriteReleases>

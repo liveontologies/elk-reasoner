@@ -38,7 +38,6 @@
 			<plugins>
 				<plugin>
 					<!-- the plugin for sharing resources among maven modules and projects -->
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-remote-resources-plugin</artifactId>
 					<version>1.5</version>
 				</plugin>
@@ -74,7 +73,6 @@
 				</plugin>
 				<plugin>
 					<!-- the plugin used to verify that properties are defined -->
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-enforcer-plugin</artifactId>
 					<version>3.0.0-M1</version>
 				</plugin>

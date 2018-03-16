@@ -45,7 +45,6 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
 				<executions>
 					<execution>
@@ -110,7 +109,6 @@
 
 			<plugin>
 				<!-- the plugin to generate changelog and release announcements -->
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-changes-plugin</artifactId>
 				<configuration>
 					<!-- the changes filtered source changes file -->
