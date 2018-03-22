@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.indexing.model;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.reasoner.completeness.OccurrenceListener;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ChainableContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
 
@@ -37,7 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumer
  * 
  */
 public interface ModifiableOntologyIndex
-		extends OntologyIndex, ModifiableIndexedObjectCache, IndexingListener {
+		extends OntologyIndex, ModifiableIndexedObjectCache, OccurrenceListener {
 
 	/**
 	 * Adds a new context initialization for this {@link OntologyIndex}.
@@ -133,30 +134,23 @@ public interface ModifiableOntologyIndex
 	boolean tryRemoveDefinition(ModifiableIndexedClass target,
 			ModifiableIndexedClassExpression definition, ElkAxiom reason);
 
+	
 	/**
-	 * Registers the given {@link IndexingListener} with this
-	 * {@link ModifiableOntologyIndex}. Calls to methods of this
-	 * {@link ModifiableOntologyIndex} are forwarded to the registered
-	 * listeners.
+	 * Registers the given {@link OccurrenceListener} with this
+	 * {@link ModifiableOntologyIndex}. The listener will be notified about the
+	 * changes of occurrences maintained by this index.
 	 * 
 	 * @param listener
-	 * @return {@code true} if the operation was successful and {@code false}
-	 *         otherwise; if {@code false} is return, the listener was not
-	 *         registered
 	 */
-	boolean addOccurrenceIndexingListener(IndexingListener listener);
+	void addOccurrenceListener(OccurrenceListener listener);
 
 	/**
-	 * Removes the given {@link IndexingListener} from this
-	 * {@link ModifiableOntologyIndex} Calls to methods of this
-	 * {@link ModifiableOntologyIndex} are forwarded to the registered
-	 * listeners.
+	 * Removes the given {@link OccurrenceListener} from this
+	 * {@link ModifiableOntologyIndex}. After the removal, the listener will no longer receive notifications
+	 * about the changes of occurrences.
 	 * 
 	 * @param listener
-	 * @return {@code true} if the operation was successful and {@code false}
-	 *         otherwise; if {@code false} is return, the listener was not
-	 *         removed
 	 */
-	boolean removeOccurrenceIndexingListener(IndexingListener listener);
-
+	void removeOccurrenceListener(OccurrenceListener listener);
+	
 }

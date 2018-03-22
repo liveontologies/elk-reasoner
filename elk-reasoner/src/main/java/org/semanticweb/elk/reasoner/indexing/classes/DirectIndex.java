@@ -27,13 +27,13 @@ import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkEntityFactory;
+import org.semanticweb.elk.reasoner.completeness.Feature;
+import org.semanticweb.elk.reasoner.completeness.OccurrenceListener;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlNothing;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlThing;
-import org.semanticweb.elk.reasoner.indexing.model.IndexingListener;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ChainableContextInitRule;
@@ -56,7 +56,7 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl
 
 	private final List<OntologyIndex.ChangeListener> listeners_;
 
-	private final List<IndexingListener> indexingListeners_ = new ArrayList<IndexingListener>();
+	private List<OccurrenceListener> occurrenceListeners_ = new ArrayList<OccurrenceListener>();
 
 	public DirectIndex(final PredefinedElkEntityFactory elkFactory) {
 		super(elkFactory);
@@ -224,21 +224,19 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl
 	}
 
 	@Override
-	public boolean addOccurrenceIndexingListener(
-			final IndexingListener listener) {
-		return indexingListeners_.add(listener);
+	public void addOccurrenceListener(OccurrenceListener listener) {
+		occurrenceListeners_.add(listener);
 	}
 
 	@Override
-	public boolean removeOccurrenceIndexingListener(
-			final IndexingListener listener) {
-		return indexingListeners_.remove(listener);
+	public void removeOccurrenceListener(OccurrenceListener listener) {
+		occurrenceListeners_.remove(listener);
 	}
-
+	
 	@Override
-	public void onIndexing(Occurrence occurrence) {
-		for (final IndexingListener listener : indexingListeners_) {
-			listener.onIndexing(occurrence);
+	public void occurrenceChanged(Feature occurrence, int increment) {
+		for (OccurrenceListener listener : occurrenceListeners_) {
+			listener.occurrenceChanged(occurrence, increment);
 		}
 	}
 

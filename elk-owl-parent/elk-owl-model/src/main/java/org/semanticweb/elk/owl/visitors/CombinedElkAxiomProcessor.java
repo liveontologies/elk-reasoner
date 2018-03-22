@@ -1,6 +1,6 @@
 /*-
  * #%L
- * ELK Reasoner Core
+ * ELK OWL Object Interfaces
  * $Id:$
  * $HeadURL:$
  * %%
@@ -19,24 +19,29 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.completeness;
+package org.semanticweb.elk.owl.visitors;
 
-import org.semanticweb.elk.reasoner.indexing.model.OccurrenceStore;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 
 /**
- * Monitors incompleteness based on occurrences in the provided
- * {@link OccurrenceStore}.
+ * Processes axioms with the provided processor and visits them before and after
+ * the processing by the provided visitors.
  * 
  * @author Peter Skocovsky
  */
-abstract class IncompletenessDueToOccurrencesMonitor
-		implements IncompletenessMonitor {
+public class CombinedElkAxiomProcessor implements ElkAxiomProcessor {
 
-	protected final OccurrenceStore occurrences;
+	private final ElkAxiomProcessor[] processors_;
 
-	public IncompletenessDueToOccurrencesMonitor(
-			final OccurrenceStore occurrences) {
-		this.occurrences = occurrences;
+	public CombinedElkAxiomProcessor(ElkAxiomProcessor... proceccors) {
+		this.processors_ = proceccors;
+	}
+
+	@Override
+	public void visit(final ElkAxiom elkAxiom) {
+		for (int pos = 0; pos < processors_.length; pos++) {
+			processors_[pos].visit(elkAxiom);
+		}
 	}
 
 }

@@ -23,9 +23,9 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.reasoner.completeness.Feature;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlTopObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 
 /**
@@ -46,11 +46,12 @@ public class CachedIndexedOwlTopObjectPropertyImpl
 			final ModifiableOntologyIndex index,
 			final OccurrenceIncrement increment) {
 		if (super.updateOccurrenceNumbers(index, increment)) {
-			for (int i = 0; i < Math.abs(increment.negativeIncrement); i++) {
-				// for each indexed negative occurrence of this expression
-				index.onIndexing(
-						Occurrence.NEGATIVE_OCCURRENCE_OF_TOP_OBJECT_PROPERTY);
-			}
+
+			// negative occurrences are unsupported
+			index.occurrenceChanged(
+					Feature.NEGATIVE_OCCURRENCE_OF_TOP_OBJECT_PROPERTY,
+					increment.negativeIncrement);
+
 			return true;
 		}
 		// else

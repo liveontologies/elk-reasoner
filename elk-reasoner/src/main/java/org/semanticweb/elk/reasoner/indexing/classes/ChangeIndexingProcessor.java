@@ -24,10 +24,10 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import org.semanticweb.elk.reasoner.completeness.Feature;
+import org.semanticweb.elk.reasoner.completeness.OccurrenceListener;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
-import org.semanticweb.elk.reasoner.indexing.model.IndexingListener;
-import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,22 +45,17 @@ public class ChangeIndexingProcessor implements ElkAxiomProcessor {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ChangeIndexingProcessor.class);
 
-	/**
-	 * Some predefined types of processing
-	 */
-	public static final String ADDITION = "addition", REMOVAL = "removal";
-
 	private final ElkAxiomConverter indexer_;
 
-	private final String type_; // deletion or addition
+	private final int increment_; // deletion < 0, addition > 0
 
-	private final IndexingListener indexingListener_;
+	private final OccurrenceListener occurrenceTracker_;
 
-	public ChangeIndexingProcessor(ElkAxiomConverter indexer, String type,
-			final IndexingListener indexingListener) {
+	public ChangeIndexingProcessor(ElkAxiomConverter indexer, int increment,
+			final OccurrenceListener indexingListener) {
 		this.indexer_ = indexer;
-		this.type_ = type;
-		this.indexingListener_ = indexingListener;
+		this.increment_ = increment;
+		this.occurrenceTracker_ = indexingListener;
 	}
 
 	@Override
@@ -69,11 +64,12 @@ public class ChangeIndexingProcessor implements ElkAxiomProcessor {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace("$$ indexing "
 						+ OwlFunctionalStylePrinter.toString(elkAxiom) + " for "
-						+ type_);
+						+ (increment_ > 0 ? "addition" : "deletion"));
 			elkAxiom.accept(indexer_);
 		} catch (ElkIndexingUnsupportedException e) {
-			indexingListener_.onIndexing(
-					Occurrence.OCCURRENCE_OF_UNSUPPORTED_EXPRESSION);
+			occurrenceTracker_.occurrenceChanged(
+					Feature.OCCURRENCE_OF_UNSUPPORTED_EXPRESSION,
+					increment_);
 		}
 	}
 }

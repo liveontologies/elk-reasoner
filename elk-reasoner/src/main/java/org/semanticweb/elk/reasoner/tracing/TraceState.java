@@ -141,7 +141,7 @@ public class TraceState
 		// the axiom converter that resolves indexed axioms from the given cache
 		// and additionally saves the inferences that produced them
 		this.elkAxiomConverter_ = new ElkAxiomConverterImpl(elkFactory,
-				new ResolvingModifiableIndexedObjectFactory(index), index,
+				new ResolvingModifiableIndexedObjectFactory(index), index, 0,
 				indexedAxiomInferences_);
 
 		saturationState

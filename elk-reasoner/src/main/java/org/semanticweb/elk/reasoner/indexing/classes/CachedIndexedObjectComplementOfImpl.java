@@ -21,12 +21,12 @@
  */
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import org.semanticweb.elk.reasoner.completeness.Feature;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 
@@ -85,11 +85,11 @@ class CachedIndexedObjectComplementOfImpl extends
 			}
 		}
 
-		for (int i = 0; i < Math.abs(increment.negativeIncrement); i++) {
-			// for each indexed negative occurrence of this expression
-			index.onIndexing(
-					Occurrence.NEGATIVE_OCCURRENCE_OF_OBJECT_COMPLEMENT_OF);
-		}
+		// negative occurrences not supported
+		index.occurrenceChanged(
+				Feature.NEGATIVE_OCCURRENCE_OF_OBJECT_COMPLEMENT_OF,
+				increment.negativeIncrement);
+		
 		return true;
 	}
 

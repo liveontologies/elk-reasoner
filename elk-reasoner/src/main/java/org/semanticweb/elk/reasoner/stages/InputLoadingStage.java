@@ -29,10 +29,12 @@ import org.semanticweb.elk.loading.ClassQueryLoader;
 import org.semanticweb.elk.loading.EntailmentQueryLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.owl.visitors.DecoratingElkAxiomProcessor;
+import org.semanticweb.elk.owl.visitors.CombinedElkAxiomProcessor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionProcessor;
+import org.semanticweb.elk.reasoner.completeness.OccurrenceListener;
+import org.semanticweb.elk.reasoner.completeness.OccurrencesInOntology;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.incremental.AxiomLoadingListener;
 import org.semanticweb.elk.reasoner.indexing.classes.ChangeIndexingProcessor;
@@ -169,20 +171,10 @@ public class InputLoadingStage extends AbstractReasonerStage {
 			axiomDeleter = new NonIncrementalElkAxiomVisitor(axiomDeleter,
 					listener);
 
-			this.axiomInsertionProcessor_ = new DecoratingElkAxiomProcessor(
-					reasoner.occurrencesInStatedAxiomsStore
-							.getPreInsertionVisitor(),
-					new ChangeIndexingProcessor(axiomInserter,
-							ChangeIndexingProcessor.ADDITION, ontologyIndex_),
-					reasoner.occurrencesInStatedAxiomsStore
-							.getPostInsertionVisitor());
-			this.axiomDeletionProcessor_ = new DecoratingElkAxiomProcessor(
-					reasoner.occurrencesInStatedAxiomsStore
-							.getPreDeletionVisitor(),
-					new ChangeIndexingProcessor(axiomDeleter,
-							ChangeIndexingProcessor.REMOVAL, ontologyIndex_),
-					reasoner.occurrencesInStatedAxiomsStore
-							.getPostDeletionVisitor());
+			this.axiomInsertionProcessor_ = new ChangeIndexingProcessor(
+					axiomInserter, 1, ontologyIndex_);
+			this.axiomDeletionProcessor_ = new ChangeIndexingProcessor(
+					axiomDeleter, -1, ontologyIndex_);
 
 		}
 
@@ -192,11 +184,11 @@ public class InputLoadingStage extends AbstractReasonerStage {
 			classQueryInsertionProcessor_ = new ClassQueryIndexingProcessor(
 					new ElkPolarityExpressionConverterImpl(elkFactory,
 							ontologyIndex_, 1),
-					ClassQueryIndexingProcessor.ADDITION, ontologyIndex_);
+					1, ontologyIndex_);
 			classQueryDeletionProcessor_ = new ClassQueryIndexingProcessor(
 					new ElkPolarityExpressionConverterImpl(elkFactory,
 							ontologyIndex_, -1),
-					ClassQueryIndexingProcessor.REMOVAL, ontologyIndex_);
+					-1, ontologyIndex_);
 
 		}
 
@@ -204,11 +196,9 @@ public class InputLoadingStage extends AbstractReasonerStage {
 				&& !entailmentQueryLoader_.isLoadingFinished()) {
 
 			entailmentQueryInserter_ = new EntailmentQueryIndexingProcessor(
-					elkFactory, ontologyIndex_,
-					EntailmentQueryIndexingProcessor.ADDITION, ontologyIndex_);
+					elkFactory, ontologyIndex_, 1, ontologyIndex_);
 			entailmentQueryDeleter_ = new EntailmentQueryIndexingProcessor(
-					elkFactory, ontologyIndex_,
-					EntailmentQueryIndexingProcessor.REMOVAL, ontologyIndex_);
+					elkFactory, ontologyIndex_, -1, ontologyIndex_);
 
 		}
 
@@ -218,50 +208,42 @@ public class InputLoadingStage extends AbstractReasonerStage {
 	@Override
 	public void executeStage() throws ElkException {
 		if (loader_ != null && !loader_.isLoadingFinished()) {
-			final boolean registered = ontologyIndex_
-					.addOccurrenceIndexingListener(
-							reasoner.occurrencesInStatedAxiomsStore);
+			OccurrencesInOntology ontologyFeatures = reasoner
+					.getOccurrencesInOntology();
+			ontologyIndex_.addOccurrenceListener(ontologyFeatures);
 			try {
-				loader_.load(axiomInsertionProcessor_, axiomDeletionProcessor_);
+				loader_.load(
+						new CombinedElkAxiomProcessor(ontologyFeatures,
+								axiomInsertionProcessor_),
+						new CombinedElkAxiomProcessor(ontologyFeatures,
+								axiomDeletionProcessor_));
 			} finally {
-				if (registered) {
-					ontologyIndex_.removeOccurrenceIndexingListener(
-							reasoner.occurrencesInStatedAxiomsStore);
-				}
+				ontologyIndex_.removeOccurrenceListener(ontologyFeatures);
 			}
 		}
 		if (classQueryLoader_ != null
 				&& !classQueryLoader_.isLoadingFinished()) {
-			final boolean registered = ontologyIndex_
-					.addOccurrenceIndexingListener(
-							reasoner.classExpressionQueryState_
-									.getIndexingListener());
+			OccurrenceListener classFeatureListener = reasoner.classExpressionQueryState
+					.getOccurrenceListener();			
+			ontologyIndex_.addOccurrenceListener(classFeatureListener);
 			try {
 				classQueryLoader_.load(classQueryInsertionProcessor_,
 						classQueryDeletionProcessor_);
 			} finally {
-				if (registered) {
-					ontologyIndex_.removeOccurrenceIndexingListener(
-							reasoner.classExpressionQueryState_
-									.getIndexingListener());
-				}
+				ontologyIndex_.removeOccurrenceListener(classFeatureListener);
 			}
 		}
 		if (entailmentQueryLoader_ != null
 				&& !entailmentQueryLoader_.isLoadingFinished()) {
-			final boolean registered = ontologyIndex_
-					.addOccurrenceIndexingListener(
-							reasoner.entailmentQueryState_
-									.getIndexingListener());
+			OccurrenceListener entailmentFeatureListener =
+					reasoner.entailmentQueryState.getOccurrenceListener();
+			ontologyIndex_.addOccurrenceListener(entailmentFeatureListener);
 			try {
 				entailmentQueryLoader_.load(entailmentQueryInserter_,
 						entailmentQueryDeleter_);
 			} finally {
-				if (registered) {
-					ontologyIndex_.removeOccurrenceIndexingListener(
-							reasoner.entailmentQueryState_
-									.getIndexingListener());
-				}
+				ontologyIndex_
+						.removeOccurrenceListener(entailmentFeatureListener);
 			}
 		}
 	}

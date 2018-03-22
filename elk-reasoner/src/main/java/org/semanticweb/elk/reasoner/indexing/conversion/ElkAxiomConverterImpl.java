@@ -50,6 +50,8 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.predefined.ElkPolarity;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
+import org.semanticweb.elk.reasoner.completeness.Feature;
+import org.semanticweb.elk.reasoner.completeness.OccurrenceListener;
 import org.semanticweb.elk.reasoner.indexing.classes.ModifiableIndexedObjectBaseFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.ResolvingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.UpdatingModifiableIndexedObjectFactory;
@@ -59,7 +61,6 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
-import org.semanticweb.elk.reasoner.indexing.model.IndexingListener;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
@@ -72,7 +73,6 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectInters
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 
 /**
@@ -109,7 +109,9 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 
 	private final ElkEntityConverter entityConverter_;
 
-	private final IndexingListener indexingListener_;
+	private final OccurrenceListener occurrenceListener_;
+	
+	private final int increment_;
 
 	/**
 	 * Creates an {@link ElkAxiomConverter} that uses four
@@ -144,9 +146,12 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	 *            {@link ModifiableIndexedObject}s, such as
 	 *            {@link IndexedClassExpression}s in {@code EquivalentClasses}
 	 *            axioms.
-	 * @param indexingListener
-	 *            the {@link IndexingListener} notified about indexed
-	 *            occurrences
+	 * @param occurrenceTracker
+	 *            the {@link OccurrenceListener} used to keep track of
+	 *            problematic occurrences of constructors
+	 * @param increment
+	 *            indicates whether the converted axioms must be inserted (> 0)
+	 *            or deleted (< 0) and with which multiplicity          
 	 * @param producer
 	 *            a {@link Producer} used to record the conversion inferences
 	 */
@@ -155,7 +160,8 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 			ModifiableIndexedObject.Factory positiveFactory,
 			ModifiableIndexedObject.Factory negativeFactory,
 			ModifiableIndexedObject.Factory dualFactory,
-			final IndexingListener indexingListener,
+			OccurrenceListener occurrenceTracker,
+			int increment,
 			Producer<? super IndexedAxiomInference> producer) {
 		this.elkFactory_ = elkFactory;
 		this.axiomInferenceFactory_ = new ModifiableIndexedAxiomInferenceConclusionVisitingFactory(
@@ -164,18 +170,19 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 		this.negativeFactory_ = negativeFactory;
 		this.positiveConverter_ = new ElkPolarityExpressionConverterImpl(
 				ElkPolarity.POSITIVE, elkFactory, positiveFactory,
-				negativeFactory, indexingListener);
+				negativeFactory, occurrenceTracker, increment);
 		this.negativeConverter_ = positiveConverter_
 				.getComplementaryConverter();
 		this.dualConverter_ = new ElkPolarityExpressionConverterImpl(elkFactory,
-				dualFactory, indexingListener);
+				dualFactory, occurrenceTracker, increment);
 		this.entityConverter_ = new ElkEntityConverterImpl(neutralFactory);
-		this.indexingListener_ = indexingListener;
+		this.occurrenceListener_ = occurrenceTracker;
+		this.increment_ = increment;
 	}
 
 	/**
 	 * Creates an {@link ElkAxiomConverter} that uses the given
-	 * {@link ModifiableIndexedObject.Factory}s to create all
+	 * {@link ModifiableIndexedObject.Factory} to create all
 	 * {@link ModifiableIndexedObject} sub-expression of the resulting
 	 * {@link ModifiableIndexedAxiom}s.
 	 * 
@@ -186,17 +193,20 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	 *            the {@link ModifiableIndexedObject.Factory} that is used to
 	 *            create all {@link ModifiableIndexedObject}s necessary for
 	 *            conversion of {@link ElkAxiom}s.
-	 * @param indexingListener
-	 *            the {@link IndexingListener} notified about indexed
-	 *            occurrences
+	 * @param occurrenceTracker
+	 *            the {@link OccurrenceListener} used to keep track of
+	 *            problematic occurrences of constructors
+	 * @param increment
+	 *            indicates whether the converted axioms must be inserted (> 0)
+	 *            or deleted (< 0) and with which multiplicity
 	 * @param producer
 	 *            a {@link Producer} used to record the conversion inferences
 	 */
 	public ElkAxiomConverterImpl(PredefinedElkClassFactory elkFactory,
 			ModifiableIndexedObject.Factory factory,
-			final IndexingListener indexingListener,
+			final OccurrenceListener occurrenceTracker, int increment,
 			Producer<? super IndexedAxiomInference> producer) {
-		this(elkFactory, factory, factory, factory, factory, indexingListener,
+		this(elkFactory, factory, factory, factory, factory, occurrenceTracker, increment,
 				producer);
 	}
 
@@ -216,12 +226,12 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	 * 
 	 * @param index
 	 *            the {@link ModifiableIndexedObjectCache} from which all
-	 *            {@link ModifiableIndexedObject}s are used.
+	 *            {@link ModifiableIndexedObject}s are used.            
 	 */
 	public ElkAxiomConverterImpl(PredefinedElkClassFactory elkFactory,
 			ModifiableOntologyIndex index) {
 		this(elkFactory, new ResolvingModifiableIndexedObjectFactory(index),
-				index, Producer.Dummy.get());
+				index, 0, Producer.Dummy.get());
 	}
 
 	<F extends CachedIndexedObject.Factory & ModifiableIndexedObject.Factory> ElkAxiomConverterImpl(
@@ -236,7 +246,7 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 						OccurrenceIncrement.getNegativeIncrement(increment)),
 				new UpdatingModifiableIndexedObjectFactory(baseFactory, index,
 						OccurrenceIncrement.getDualIncrement(increment)),
-				index, Producer.Dummy.get());
+				index, increment, Producer.Dummy.get());
 	}
 
 	/**
@@ -284,8 +294,8 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 
 	@Override
 	public Void visit(ElkObjectPropertyRangeAxiom axiom) {
-		indexingListener_
-				.onIndexing(Occurrence.OCCURRENCE_OF_OBJECT_PROPERTY_RANGE);
+		occurrenceListener_.occurrenceChanged(
+				Feature.OCCURRENCE_OF_OBJECT_PROPERTY_RANGE, increment_);
 		axiomInferenceFactory_.getElkObjectPropertyRangeAxiomConversion(axiom,
 				axiom.getProperty().accept(negativeConverter_),
 				axiom.getRange().accept(positiveConverter_));
@@ -556,8 +566,8 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 			break;
 		default:
 			// indexing only one direction of the equivalence
-			indexingListener_
-					.onIndexing(Occurrence.OCCURRENCE_OF_DISJOINT_UNION);
+			occurrenceListener_.occurrenceChanged(
+					Feature.OCCURRENCE_OF_DISJOINT_UNION, increment_);
 			defined = (ModifiableIndexedClass) axiom.getDefinedClass()
 					.accept(positiveConverter_);
 			for (int pos = 0; pos < size; pos++) {
@@ -619,8 +629,8 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 
 	@Override
 	public Void visit(ElkObjectPropertyAssertionAxiom axiom) {
-		indexingListener_
-				.onIndexing(Occurrence.OCCURRENCE_OF_OBJECT_PROPERTY_RANGE);
+		occurrenceListener_.occurrenceChanged(
+				Feature.OCCURRENCE_OF_OBJECT_PROPERTY_ASSERTION, increment_);
 		axiomInferenceFactory_.getElkObjectPropertyAssertionAxiomConversion(
 				axiom, axiom.getSubject().accept(negativeConverter_),
 				positiveFactory_.getIndexedObjectSomeValuesFrom(

@@ -37,9 +37,15 @@ import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionProcessor;
+import org.semanticweb.elk.reasoner.completeness.EmptyOccurrenceCounter;
+import org.semanticweb.elk.reasoner.completeness.Feature;
+import org.semanticweb.elk.reasoner.completeness.OccurrenceCounter;
+import org.semanticweb.elk.reasoner.completeness.OccurrenceRegistry;
+import org.semanticweb.elk.reasoner.completeness.OccurrenceListener;
+import org.semanticweb.elk.reasoner.completeness.OccurrenceManager;
+import org.semanticweb.elk.reasoner.completeness.OccurrencesInClassExpressionQuery;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
@@ -48,10 +54,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
-import org.semanticweb.elk.reasoner.indexing.model.IndexingListener;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
-import org.semanticweb.elk.reasoner.indexing.model.OccurrenceStore;
 import org.semanticweb.elk.reasoner.query.ElkQueryException;
 import org.semanticweb.elk.reasoner.query.QueryNode;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputEquivalent;
@@ -69,7 +72,6 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
-import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Evictor;
 import org.semanticweb.elk.util.collections.Operations;
@@ -158,10 +160,11 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 		 */
 		QueryNode<ElkClass> node = null;
 		/**
-		 * How many times an {@link Occurrence} occurs in the query.
+		 * Counts how many times each {@link Feature} occurs in the query.
 		 * {@code null} means no occurrences.
 		 */
-		Map<Occurrence, Integer> occurrences = null;
+		OccurrenceRegistry occurrences = null;
+
 	}
 
 	/**
@@ -303,169 +306,137 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 		// Create query state.
 		state = new QueryState();
 		queried_.put(classExpression, state);
-		toLoad_.offer(classExpression);
+		toLoad_.add(classExpression);
 
 		return true;
 	}
 
-	public IndexingListener getIndexingListener() {
-		return indexingListener_;
+	private final QueryOccurrenceListener occurrenceListener_ = new QueryOccurrenceListener();
+	
+
+	private class QueryOccurrenceListener implements OccurrenceListener {
+
+		private QueryState beingLoaded_ = null;
+
+		@Override
+		public void occurrenceChanged(Feature feature, int increment) {
+			OccurrenceRegistry occurrences = beingLoaded_.occurrences;
+			if (occurrences == null) {
+				occurrences = new OccurrenceRegistry();
+				beingLoaded_.occurrences = occurrences;
+			}
+			occurrences.occurrenceChanged(feature, increment);
+			if (occurrences.isEmpty()) {
+				beingLoaded_.occurrences = null;
+			}
+		}
+
+	}
+
+	public OccurrenceListener getOccurrenceListener() {
+		return occurrenceListener_;
 	}
 
 	@Override
 	public ClassQueryLoader getQueryLoader(final InterruptMonitor interrupter) {
-		return indexingListener_.new Loader(interrupter);
+		return new Loader(interrupter);
 	}
 
-	private final QueryIndexingListener indexingListener_ = new QueryIndexingListener();
-
-	private class QueryIndexingListener implements IndexingListener {
-
-		// Indexing state.
-		private boolean isInsertion_;
-		private QueryState beingIndexed_ = null;
-
-		private void checkStateOnIndexing() throws IllegalStateException {
-			if (beingIndexed_ == null) {
-				throw new IllegalStateException(
-						"Indexing listener notified while no query is being loaded!");
-			}
-		}
-
-		public class Loader extends AbstractClassQueryLoader {
-			public Loader(final InterruptMonitor interrupter) {
-				super(interrupter);
-			}
-
-			@Override
-			public void load(final ElkClassExpressionProcessor inserter,
-					final ElkClassExpressionProcessor deleter)
-					throws ElkLoadingException {
-
-				// First evict and unload.
-				isInsertion_ = false;
-				final Iterator<ElkClassExpression> evicted = queriedEvictor_
-						.evict(doNotEvict_);
-				while (evicted.hasNext()) {
-					final ElkClassExpression classExpression = evicted.next();
-					final QueryState state = queried_.remove(classExpression);
-					if (!state.isLoaded) {
-						continue;
-					}
-					// else
-					beingIndexed_ = state;
-					deleter.visit(classExpression);
-					if (state.indexed != null) {
-						if (state.isComputed) {
-							if (state.node != null) {
-								removeAllRelated(state.indexed, state.node);
-								state.node = null;
-							}
-						}
-						indexed_.remove(state.indexed);
-						state.indexed = null;
-					}
-				}
-
-				/*
-				 * Load all registered queries that are not loaded and assign
-				 * state.indexed if successful.
-				 */
-				isInsertion_ = true;
-				ElkClassExpression classExpression;
-				while ((classExpression = toLoad_.poll()) != null) {
-					final QueryState state = queried_.get(classExpression);
-					if (state == null) {
-						continue;
-					}
-					// else
-
-					beingIndexed_ = state;
-					inserter.visit(classExpression);
-					state.isLoaded = true;
-
-					try {
-						final IndexedClassExpression ice = classExpression
-								.accept(resolvingExpressionConverter_);
-						state.indexed = ice;
-						indexed_.put(state.indexed, state);
-						LOGGER_.trace("query {} indexed as {}", classExpression,
-								ice);
-
-						// Check whether it is computed.
-						final Context context = saturationState_
-								.getContext(state.indexed);
-						if (context != null && context.isInitialized()
-								&& context.isSaturated()
-								&& context.containsConclusion(conclusionFactory_
-										.getContradiction(state.indexed))) {
-							/*
-							 * If the query is unsatisfiable, it is already
-							 * computed ...
-							 */
-							state.isComputed = true;
-							LOGGER_.trace("query computed {}", ice);
-						} else {
-							/*
-							 * ... otherwise we need to compute the equivalent
-							 * and super-classes
-							 */
-							state.isComputed = false;
-						}
-					} catch (final ElkIndexingUnsupportedException e) {
-						state.indexed = null;
-						LOGGER_.trace("query NOT indexed {}", classExpression);
-					}
-
-					if (isInterrupted()) {
-						return;
-					}
-				}
-
-			}
-
-			@Override
-			public boolean isLoadingFinished() {
-				return toLoad_.isEmpty();
-			}
+	
+	private class Loader extends AbstractClassQueryLoader {
+		public Loader(final InterruptMonitor interrupter) {
+			super(interrupter);
 		}
 
 		@Override
-		public void onIndexing(final Occurrence occurrence) {
-			checkStateOnIndexing();
-			if (isInsertion_) {
-				if (beingIndexed_.occurrences == null) {
-					beingIndexed_.occurrences = new ArrayHashMap<Occurrence, Integer>(
-							4);
+		public void load(final ElkClassExpressionProcessor inserter,
+				final ElkClassExpressionProcessor deleter)
+				throws ElkLoadingException {
+
+			// First evict and unload.
+			final Iterator<ElkClassExpression> evicted = queriedEvictor_
+					.evict(doNotEvict_);
+			while (evicted.hasNext()) {
+				final ElkClassExpression classExpression = evicted.next();
+				final QueryState state = queried_.remove(classExpression);
+				if (!state.isLoaded) {
+					continue;
 				}
-				Integer noOccurrences = beingIndexed_.occurrences
-						.get(occurrence);
-				if (noOccurrences == null) {
-					noOccurrences = 0;
-				}
-				noOccurrences++;
-				beingIndexed_.occurrences.put(occurrence, noOccurrences);
-			} else {
-				if (beingIndexed_.occurrences == null) {
-					return;
-				}
-				Integer noOccurrences = beingIndexed_.occurrences
-						.get(occurrence);
-				if (noOccurrences == null) {
-					return;
-				}
-				noOccurrences--;
-				if (noOccurrences <= 0) {
-					beingIndexed_.occurrences.remove(occurrence);
-					if (beingIndexed_.occurrences.isEmpty()) {
-						beingIndexed_.occurrences = null;
+				// else
+				occurrenceListener_.beingLoaded_ = state;
+				deleter.visit(classExpression);
+				if (state.indexed != null) {
+					if (state.isComputed) {
+						if (state.node != null) {
+							removeAllRelated(state.indexed, state.node);
+							state.node = null;
+						}
 					}
-				} else {
-					beingIndexed_.occurrences.put(occurrence, noOccurrences);
+					indexed_.remove(state.indexed);
+					state.indexed = null;
 				}
 			}
+
+			/*
+			 * Load all registered queries that are not loaded and assign
+			 * state.indexed if successful.
+			 */
+			ElkClassExpression classExpression;
+			while ((classExpression = toLoad_.poll()) != null) {
+				final QueryState state = queried_.get(classExpression);
+				if (state == null) {
+					continue;
+				}
+				// else
+
+				occurrenceListener_.beingLoaded_ = state;
+				inserter.visit(classExpression);
+				state.isLoaded = true;
+
+				try {
+					final IndexedClassExpression ice = classExpression
+							.accept(resolvingExpressionConverter_);
+					state.indexed = ice;
+					indexed_.put(state.indexed, state);
+					LOGGER_.trace("query {} indexed as {}", classExpression,
+							ice);
+
+					// Check whether it is computed.
+					final Context context = saturationState_
+							.getContext(state.indexed);
+					if (context != null && context.isInitialized()
+							&& context.isSaturated()
+							&& context.containsConclusion(conclusionFactory_
+									.getContradiction(state.indexed))) {
+						/*
+						 * If the query is unsatisfiable, it is already computed
+						 * ...
+						 */
+						state.isComputed = true;
+						LOGGER_.trace("query computed {}", ice);
+					} else {
+						/*
+						 * ... otherwise we need to compute the equivalent and
+						 * super-classes
+						 */
+						state.isComputed = false;
+					}
+				} catch (final ElkIndexingUnsupportedException e) {
+					state.indexed = null;
+					LOGGER_.trace("query NOT indexed {}", classExpression);
+				}
+
+				if (isInterrupted()) {
+					return;
+				}
+			}
+
 		}
 
+		@Override
+		public boolean isLoadingFinished() {
+			return toLoad_.isEmpty();
+		}
 	}
 
 	private final Predicate<ElkClassExpression> doNotEvict_ = new Predicate<ElkClassExpression>() {
@@ -649,23 +620,16 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 				"Query was not computed yet: " + classExpression);
 	}
 
-	OccurrenceStore getOccurrenceStore(
+	OccurrenceManager getOccurrenceManager(
 			final ElkClassExpression classExpression) {
-		return new OccurrenceStore() {
+		OccurrenceCounter occurrences = queried_
+				.get(classExpression).occurrences;
+		if (occurrences == null) {
+			occurrences = EmptyOccurrenceCounter.get();
+		}
 
-			@Override
-			public Collection<? extends ElkObject> occursIn(
-					final Occurrence occurrence) {
-				final QueryState state = queried_.get(classExpression);
-				if (state == null || state.occurrences == null
-						|| !state.occurrences.containsKey(occurrence)) {
-					return Collections.emptySet();
-				}
-				// else
-				return Collections.singleton(classExpression);
-			}
-
-		};
+		return new OccurrencesInClassExpressionQuery(classExpression,
+				occurrences);
 	}
 
 	/**
