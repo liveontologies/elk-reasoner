@@ -24,34 +24,45 @@ package org.semanticweb.elk.reasoner.completeness;
 import org.slf4j.Logger;
 
 /**
- * Monitors incompleteness.
- * <p>
- * It is not a "completeness" monitor, so that it can be split to a number of
- * partial monitors. Partial monitors usually detect incompleteness, so if they
- * implement this interface, they fulfill the contract. If the contract was
- * "return {@code true} when the reasoning is complete" and a partial monitor
- * detects some particular cause of incompleteness, if it reported that
- * reasoning is not incomplete, it wouldn't mean that it is complete, because
- * there may be other cause monitored by another partial monitor.
+ * Keeps of properties that can cause incompleteness of a reasoning task, for
+ * example, occurrence of some unsupported constructors in the ontology, or
+ * violation of some global restrictions.
  * 
  * @author Peter Skocovsky
+ * @author Yevgeny Kazakov
  */
 public interface IncompletenessMonitor {
 
 	/**
-	 * @return {@code true} when the reasoning may be incomplete; {@code false}
-	 *         when the reasoning is definitely complete.
+	 * @return {@code true} if potential problem that can result in
+	 *         incompleteness has been detected by this
+	 *         {@link IncompletenessMonitor}
 	 */
-	boolean isIncomplete();
+	boolean isIncompletenessDetected();
 
 	/**
-	 * Logs messages about incompleteness reasons that appeared after the last
-	 * time this method was called to the provided logger.
+	 * Prints log messages explaining incompleteness of the results. The
+	 * messages are incremental, that is, only new explanations not reported
+	 * during the previous call of {@link #explainIncompleteness(Logger)} are
+	 * printed. In particular, if this method is called two times immediately
+	 * after another, then the second call will not produce any messages. Also,
+	 * if {@link #isIncompletenessDetected()} returns {@code false}, calling of
+	 * this method does not produce any messages. This has been done to minimize
+	 * log pollution.
 	 * 
 	 * @param logger
-	 * @return Whether some incompleteness reasons appeared after the last time
-	 *         this method was called.
+	 *            the logger using which the messages are printed
 	 */
-	boolean logNewIncompletenessReasons(Logger logger);
+	void explainIncompleteness(Logger logger);
+
+	/**
+	 * @return {@code true} if some new explanations for the incompleteness have
+	 *         been encountered after the last call of
+	 *         {@link #explainIncompleteness(Logger)}, and {@code false}
+	 *         otherwise. This method can be used to detect if
+	 *         {@link #explainIncompleteness(Logger)} would print any messages
+	 *         without calling the letter.
+	 */
+	boolean hasNewExplanation();
 
 }

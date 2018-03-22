@@ -24,10 +24,10 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionProcessor;
+import org.semanticweb.elk.reasoner.completeness.Feature;
+import org.semanticweb.elk.reasoner.completeness.OccurrenceListener;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
-import org.semanticweb.elk.reasoner.indexing.model.IndexingListener;
-import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,20 +41,18 @@ public class ClassQueryIndexingProcessor
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ClassQueryIndexingProcessor.class);
 
-	public static final String ADDITION = "addition", REMOVAL = "removal";
-
 	private final ElkPolarityExpressionConverter indexer_;
 
-	private final String type_;
+	private final int increment_; // deletion < 0, addition > 0
 
-	private final IndexingListener indexingListener_;
+	private final OccurrenceListener occurrenceTracker_;
 
 	public ClassQueryIndexingProcessor(
-			final ElkPolarityExpressionConverter indexer, final String type,
-			final IndexingListener indexingListener) {
+			final ElkPolarityExpressionConverter indexer, final int increment,
+			final OccurrenceListener indexingListener) {
 		this.indexer_ = indexer;
-		this.type_ = type;
-		this.indexingListener_ = indexingListener;
+		this.increment_ = increment;
+		this.occurrenceTracker_ = indexingListener;
 	}
 
 	@Override
@@ -63,12 +61,13 @@ public class ClassQueryIndexingProcessor
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("$$ indexing {} for {}",
 						OwlFunctionalStylePrinter.toString(elkClassExpression),
-						type_);
+						(increment_ > 0 ? "addition" : "deletion"));
 			}
 			elkClassExpression.accept(indexer_);
 		} catch (final ElkIndexingUnsupportedException e) {
-			indexingListener_.onIndexing(
-					Occurrence.OCCURRENCE_OF_UNSUPPORTED_EXPRESSION);
+			occurrenceTracker_.occurrenceChanged(
+					Feature.OCCURRENCE_OF_UNSUPPORTED_EXPRESSION,
+					increment_);
 		}
 	}
 

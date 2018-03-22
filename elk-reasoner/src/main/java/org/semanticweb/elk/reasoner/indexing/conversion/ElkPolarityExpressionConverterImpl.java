@@ -38,16 +38,16 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.owl.predefined.ElkPolarity;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
+import org.semanticweb.elk.reasoner.completeness.Feature;
+import org.semanticweb.elk.reasoner.completeness.OccurrenceListener;
 import org.semanticweb.elk.reasoner.indexing.classes.ModifiableIndexedObjectBaseFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.ResolvingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.UpdatingModifiableIndexedObjectFactory;
-import org.semanticweb.elk.reasoner.indexing.model.IndexingListener;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 
 /**
@@ -68,24 +68,28 @@ public class ElkPolarityExpressionConverterImpl extends
 
 	private final ElkPolarityExpressionConverter complementaryConverter_;
 
-	private final IndexingListener indexingListener_;
+	private final OccurrenceListener occurrenceListener_;
+	
+	private final int increment_;
 
 	ElkPolarityExpressionConverterImpl(ElkPolarity polarity,
 			PredefinedElkClassFactory elkFactory,
 			ModifiableIndexedObject.Factory factory,
 			ElkPolarityExpressionConverter complementaryConverter,
-			final IndexingListener indexingListener) {
+			final OccurrenceListener occurrenceListener,
+			int increment) {
 		super(polarity);
 		this.elkFactory_ = elkFactory;
 		this.factory_ = factory;
 		this.complementaryConverter_ = complementaryConverter;
-		this.indexingListener_ = indexingListener;
+		this.occurrenceListener_ = occurrenceListener;
+		this.increment_ = increment;
 	}
 
 	/**
 	 * Creates an {@link ElkPolarityExpressionConverter} of the given
-	 * {@link ElkPolarity} using two {@link ModifiableIndexedObject.Factory}s for
-	 * creating {@link ModifiableIndexedObject}s of the given polarity and
+	 * {@link ElkPolarity} using two {@link ModifiableIndexedObject.Factory}s
+	 * for creating {@link ModifiableIndexedObject}s of the given polarity and
 	 * complementary polarity respectively.
 	 * 
 	 * @param polarity
@@ -98,19 +102,24 @@ public class ElkPolarityExpressionConverterImpl extends
 	 *            the {@link ModifiableIndexedObject.Factory} used by the
 	 *            complementary converter for creating
 	 *            {@link ModifiableIndexedObject}s of the complementary polarity
+	 * @param increment
+	 *            indicates whether the converted expressions must be inserted
+	 *            (> 0) or deleted (< 0) and with which multiplicity
 	 */
 	public ElkPolarityExpressionConverterImpl(ElkPolarity polarity,
 			PredefinedElkClassFactory elkFactory,
 			ModifiableIndexedObject.Factory factory,
 			ModifiableIndexedObject.Factory complementaryFactory,
-			final IndexingListener indexingListener) {
+			final OccurrenceListener occurrenceTracker,
+			int increment) {
 		super(polarity);
 		this.elkFactory_ = elkFactory;
 		this.factory_ = factory;
 		this.complementaryConverter_ = new ElkPolarityExpressionConverterImpl(
 				polarity.getComplementary(), elkFactory, complementaryFactory,
-				this, indexingListener);
-		this.indexingListener_ = indexingListener;
+				this, occurrenceTracker, increment);
+		this.occurrenceListener_ = occurrenceTracker;
+		this.increment_ = increment;
 	}
 
 	/**
@@ -128,12 +137,14 @@ public class ElkPolarityExpressionConverterImpl extends
 	public ElkPolarityExpressionConverterImpl(
 			PredefinedElkClassFactory elkFactory,
 			ModifiableIndexedObject.Factory dualFactory,
-			final IndexingListener indexingListener) {
+			final OccurrenceListener occurrrenceTracker,
+			int increment) {
 		super(ElkPolarity.DUAL);
 		this.elkFactory_ = elkFactory;
 		this.factory_ = dualFactory;
 		this.complementaryConverter_ = this;
-		this.indexingListener_ = indexingListener;
+		this.occurrenceListener_ = occurrrenceTracker;
+		this.increment_ = increment;
 	}
 
 	/**
@@ -155,7 +166,7 @@ public class ElkPolarityExpressionConverterImpl extends
 				new UpdatingModifiableIndexedObjectFactory(
 						new ModifiableIndexedObjectBaseFactory(), index,
 						OccurrenceIncrement.getDualIncrement(increment)),
-				index);
+				index, increment);
 	}
 
 	/**
@@ -171,7 +182,7 @@ public class ElkPolarityExpressionConverterImpl extends
 			PredefinedElkClassFactory elkFactory,
 			ModifiableOntologyIndex index) {
 		this(elkFactory, new ResolvingModifiableIndexedObjectFactory(index),
-				index);
+				index, 0);
 	}
 
 	@Override
@@ -245,11 +256,14 @@ public class ElkPolarityExpressionConverterImpl extends
 	@Override
 	public ModifiableIndexedClassExpression visit(ElkObjectOneOf elkObjectOneOf) {
 		int size = elkObjectOneOf.getIndividuals().size();
+		if (size > 0) {
+			occurrenceListener_.occurrenceChanged(
+					Feature.OBJECT_ONE_OF, increment_);
+		}
 		switch (size) {
 		case 0:
 			return factory_.getIndexedClass(elkFactory_.getOwlNothing());
-		case 1:
-			indexingListener_.onIndexing(Occurrence.OCCURRENCE_OF_NOMINAL);
+		case 1:			
 			return elkObjectOneOf.getIndividuals().iterator().next()
 					.accept(this);
 		default:
@@ -286,7 +300,7 @@ public class ElkPolarityExpressionConverterImpl extends
 	@Override
 	public ModifiableIndexedClassExpression visit(
 			ElkDataHasValue elkDataHasValue) {
-		indexingListener_.onIndexing(Occurrence.OCCURRENCE_OF_DATA_HAS_VALUE);
+		occurrenceListener_.occurrenceChanged(Feature.OCCURRENCE_OF_DATA_HAS_VALUE, increment_);
 		return factory_.getIndexedDataHasValue(elkDataHasValue);
 	}
 

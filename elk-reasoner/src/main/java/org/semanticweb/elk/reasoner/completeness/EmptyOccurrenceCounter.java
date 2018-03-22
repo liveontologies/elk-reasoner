@@ -1,10 +1,12 @@
+package org.semanticweb.elk.reasoner.completeness;
+
 /*-
  * #%L
  * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2017 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2018 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +21,24 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing.model;
 
 /**
- * Notified when the {@link Occurrence} passed as the parameter is being
- * indexed.
+ * An {@link OccurrenceCounter} that always returns 0 occurrences for every
+ * {@link Feature}
  * 
- * @author Peter Skocovsky
+ * @author Yevgeny Kazakov
  */
-public interface IndexingListener {
+public class EmptyOccurrenceCounter implements OccurrenceCounter {
 
-	void onIndexing(Occurrence occurrence);
+	private static OccurrenceCounter INSTANCE_ = new EmptyOccurrenceCounter();
+
+	@Override
+	public int getOccurrenceCount(Feature occurrence) {
+		return 0;
+	}
+
+	public static OccurrenceCounter get() {
+		return INSTANCE_;
+	}
 
 }

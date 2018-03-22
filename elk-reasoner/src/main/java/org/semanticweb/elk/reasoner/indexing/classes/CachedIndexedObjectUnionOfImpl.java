@@ -24,12 +24,12 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.semanticweb.elk.reasoner.completeness.Feature;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
 
@@ -104,11 +104,12 @@ class CachedIndexedObjectUnionOfImpl extends
 				return false;
 			}
 		}
+		
+		// positive occurrences are unsupported
+		index.occurrenceChanged(
+				Feature.POSITIVE_OCCURRENCE_OF_OBJECT_UNION_OF,
+				increment.positiveIncrement);
 
-		for (int i = 0; i < Math.abs(increment.positiveIncrement); i++) {
-			// for each indexed positive occurrence of this expression
-			index.onIndexing(Occurrence.POSITIVE_OCCURRENCE_OF_OBJECT_UNION_OF);
-		}
 		return true;
 	}
 

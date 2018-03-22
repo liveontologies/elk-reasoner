@@ -94,7 +94,7 @@ public class EntailmentQueryConverter extends
 				OccurrenceIncrement.getNegativeIncrement(increment));
 		this.positiveConverter_ = new ElkPolarityExpressionConverterImpl(
 				ElkPolarity.POSITIVE, elkFactory, positiveFactory,
-				negativeFactory, index);
+				negativeFactory, index, increment);
 		this.negativeConverter_ = positiveConverter_
 				.getComplementaryConverter();
 	}

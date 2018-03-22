@@ -25,11 +25,11 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
+import org.semanticweb.elk.reasoner.completeness.Feature;
+import org.semanticweb.elk.reasoner.completeness.OccurrenceListener;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
-import org.semanticweb.elk.reasoner.indexing.model.IndexingListener;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.model.Occurrence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,25 +39,19 @@ public class EntailmentQueryIndexingProcessor extends
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(EntailmentQueryIndexingProcessor.class);
 
-	public static final String ADDITION = "addition", REMOVAL = "removal";
+	private final int increment_;
 
 	private final EntailmentQueryConverter converter_;
 
-	private final String type_;
-
-	private final IndexingListener indexingListener_;
+	private final OccurrenceListener occurrenceTracker_;
 
 	public EntailmentQueryIndexingProcessor(final ElkObject.Factory elkFactory,
-			final ModifiableOntologyIndex index, final String type,
-			final IndexingListener indexingListener) {
-		if (!ADDITION.equals(type) && !REMOVAL.equals(type)) {
-			throw new IllegalArgumentException("type must be one of \""
-					+ ADDITION + "\" or \"" + REMOVAL + "\"!");
-		}
-		this.type_ = type;
+			final ModifiableOntologyIndex index, final int increment,
+			final OccurrenceListener indexingListener) {
+		this.increment_ = increment;
 		this.converter_ = new EntailmentQueryConverter(elkFactory, index,
-				ADDITION.equals(type) ? 1 : -1);
-		this.indexingListener_ = indexingListener;
+				increment);
+		this.occurrenceTracker_ = indexingListener;
 	}
 
 	@Override
@@ -65,13 +59,15 @@ public class EntailmentQueryIndexingProcessor extends
 			final ElkAxiom axiom) {
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace("$$ indexing {} for {}",
-					OwlFunctionalStylePrinter.toString(axiom), type_);
+					OwlFunctionalStylePrinter.toString(axiom),
+					increment_ > 0 ? "addition" : "removal");
 		}
 		try {
 			return axiom.accept(converter_);
 		} catch (final ElkIndexingUnsupportedException e) {
-			indexingListener_.onIndexing(
-					Occurrence.OCCURRENCE_OF_UNSUPPORTED_EXPRESSION);
+			occurrenceTracker_.occurrenceChanged(
+					Feature.OCCURRENCE_OF_UNSUPPORTED_EXPRESSION,
+					increment_);
 			return null;
 		}
 	}

@@ -78,8 +78,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 				TimeUnit.NANOSECONDS);
 
 		final ElkAxiomProcessor inserter = new ChangeIndexingProcessor(
-				new ElkAxiomConverterImpl(objectFactory, index, 1),
-				ChangeIndexingProcessor.ADDITION, index);
+				new ElkAxiomConverterImpl(objectFactory, index, 1), 1, index);
 		inserter.visit(objectFactory.getEquivalentClassesAxiom(b, c));
 		inserter.visit(objectFactory.getSubClassOfAxiom(a,
 				objectFactory.getObjectSomeValuesFrom(r, b)));
@@ -128,8 +127,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		ConcurrentExecutor executor = ConcurrentExecutors.create("test", 1,
 				TimeUnit.NANOSECONDS);
 		final ElkAxiomProcessor inserter = new ChangeIndexingProcessor(
-				new ElkAxiomConverterImpl(objectFactory, index, 1),
-				ChangeIndexingProcessor.ADDITION, index);
+				new ElkAxiomConverterImpl(objectFactory, index, 1), 1, index);
 
 		inserter.visit(objectFactory.getSubClassOfAxiom(a, b));
 		inserter.visit(objectFactory.getSubClassOfAxiom(a, c));
