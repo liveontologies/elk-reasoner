@@ -81,7 +81,7 @@ public enum Feature {
 	NEGATIVE_OCCURRENCE_OF_OBJECT_COMPLEMENT_OF("ObjectComplementOf",
 			Polarity.NEGATIVE),
 	//
-	NEGATIVE_OCCURRENCE_OF_TOP_OBJECT_PROPERTY("owl:TopObjectProperty",
+	NEGATIVE_OCCURRENCE_OF_TOP_OBJECT_PROPERTY("owl:topObjectProperty",
 			Polarity.NEGATIVE),
 	//
 	OBJECT_ALL_VALUES_FROM("ObjectAllValuesFrom"),
@@ -106,7 +106,7 @@ public enum Feature {
 	//
 	OCCURRENCE_OF_OBJECT_PROPERTY_RANGE("ObjectPropertyRange"),
 	//
-	POSITIVE_OCCURRENCE_OF_BOTTOM_OBJECT_PROPERTY("owl:BottomObjectProperty"),
+	POSITIVE_OCCURRENCE_OF_BOTTOM_OBJECT_PROPERTY("owl:bottomObjectProperty"),
 	//
 	POSITIVE_OCCURRENCE_OF_OBJECT_UNION_OF("ObjectUnionOf",
 			Polarity.POSITIVE),
