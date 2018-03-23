@@ -44,7 +44,7 @@ public class InstanceTaxonomyHasher {
 	 */
 	public static int hash(InstanceTaxonomy<? extends ElkEntity, ? extends ElkEntity> taxonomy) {
 		int typeHash = HashGenerator.combineMultisetHash(true, taxonomy.getNodes(), TypeNodeHasher.INSTANCE);
-		int instanceHash = HashGenerator.combineMultisetHash(true, taxonomy.getInstanceNodes(), InstanceNodeHasher.INSTANCE);
+		int instanceHash = HashGenerator.combineMultisetHash(true, taxonomy.getInstanceNodes(), InstanceNodeHasher.INSTANCE);		
 		return HashGenerator.combineListHash(typeHash, instanceHash);
 	}
 

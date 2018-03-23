@@ -720,6 +720,7 @@ public class ElkAxiomConverterImpl extends NoOpElkAnnotationAxiomConverter<Void>
 
 	@Override
 	public Void visit(ElkObjectPropertyRangeAxiom axiom) {
+		// not fully supported with property assertions
 		occurrenceListener_.occurrenceChanged(
 				Feature.OCCURRENCE_OF_OBJECT_PROPERTY_RANGE, increment_);
 		axiomInferenceFactory_.getElkObjectPropertyRangeAxiomConversion(axiom,
@@ -730,6 +731,9 @@ public class ElkAxiomConverterImpl extends NoOpElkAnnotationAxiomConverter<Void>
 
 	@Override
 	public Void visit(ElkReflexiveObjectPropertyAxiom axiom) {
+		// not fully supported with property chains
+		occurrenceListener_.occurrenceChanged(
+				Feature.REFLEXIVE_OBJECT_PROPERTY, increment_);
 		axiomInferenceFactory_.getElkReflexiveObjectPropertyAxiomConversion(
 				axiom,
 				negativeFactory_.getIndexedClass(elkFactory_.getOwlThing()),

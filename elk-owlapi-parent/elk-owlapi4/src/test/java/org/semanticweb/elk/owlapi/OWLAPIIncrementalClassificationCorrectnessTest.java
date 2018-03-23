@@ -21,11 +21,9 @@
  */
 package org.semanticweb.elk.owlapi;
 
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
+import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.incremental.BaseIncrementalClassificationCorrectnessTest;
 import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
-import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.UrlTestInput;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -42,29 +40,25 @@ public class OWLAPIIncrementalClassificationCorrectnessTest
 	public OWLAPIIncrementalClassificationCorrectnessTest(
 			final TestManifest<UrlTestInput> testManifest) {
 		super(testManifest,
-				new OwlApiIncrementalReasoningTestDelegate<TaxonomyTestOutput<?>>(
+				new OwlApiIncrementalReasoningTestDelegate<ClassTaxonomyTestOutput>(
 						testManifest) {
 
 					@Override
-					public TaxonomyTestOutput<?> getExpectedOutput()
+					public ClassTaxonomyTestOutput getExpectedOutput()
 							throws Exception {
 						LOGGER_.trace(
-								"======= Computing Expected Taxonomy =======");
-						final Taxonomy<ElkClass> taxonomy = getStandardReasoner()
-								.getInternalReasoner().getTaxonomyQuietly();
-						return new TaxonomyTestOutput<Taxonomy<ElkClass>>(
-								taxonomy);
+								"======= Computing Expected Taxonomy =======");						
+						return new ClassTaxonomyTestOutput(
+								getStandardReasoner().getInternalReasoner());
 					}
 
 					@Override
-					public TaxonomyTestOutput<?> getActualOutput()
+					public ClassTaxonomyTestOutput getActualOutput()
 							throws Exception {
 						LOGGER_.trace(
 								"======= Computing Incremental Taxonomy =======");
-						final Taxonomy<ElkClass> taxonomy = getIncrementalReasoner()
-								.getInternalReasoner().getTaxonomyQuietly();
-						return new TaxonomyTestOutput<Taxonomy<ElkClass>>(
-								taxonomy);
+						return new ClassTaxonomyTestOutput(
+								getIncrementalReasoner().getInternalReasoner());
 					}
 
 					@Override

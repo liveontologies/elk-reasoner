@@ -22,15 +22,6 @@
  */
 package org.semanticweb.elk.reasoner;
 
-import java.util.Arrays;
-
-import org.semanticweb.elk.ElkTestUtils;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
-import org.semanticweb.elk.testing.TestUtils;
-import org.semanticweb.elk.testing.UrlTestInput;
-
 /**
  * @author Pavel Klinov
  * 
@@ -39,38 +30,19 @@ import org.semanticweb.elk.testing.UrlTestInput;
 public class ElkDiffRealizationCorrectnessTest
 		extends BaseRealizationCorrectnessTest {
 
-	// @formatter:off
-	static final String[] IGNORE_LIST = {
-			ElkTestUtils.TEST_INPUT_LOCATION + "/realization/AssertionsPropertyRanges.owl",
-		};
-	// @formatter:on
-
-	static {
-		Arrays.sort(IGNORE_LIST);
-	}
-
 	public ElkDiffRealizationCorrectnessTest(
-			final ReasoningTestManifest<InstanceTaxonomyTestOutput<?>> testManifest) {
+			final ReasoningTestManifest<InstanceTaxonomyTestOutput> testManifest) {
 		super(testManifest,
-				new ElkReasoningTestDelegate<InstanceTaxonomyTestOutput<?>>(
+				new ElkReasoningTestDelegate<InstanceTaxonomyTestOutput>(
 						testManifest) {
 
 					@Override
-					public InstanceTaxonomyTestOutput<?> getActualOutput()
+					public InstanceTaxonomyTestOutput getActualOutput()
 							throws Exception {
-						final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = getReasoner()
-								.getInstanceTaxonomyQuietly();
-						return new InstanceTaxonomyTestOutput<InstanceTaxonomy<ElkClass, ElkNamedIndividual>>(
-								taxonomy);
+						return new InstanceTaxonomyTestOutput(getReasoner());
 					}
 
 				});
-	}
-
-	@Override
-	protected boolean ignore(final UrlTestInput input) {
-		return super.ignore(input) || TestUtils.ignore(input,
-				ElkTestUtils.TEST_INPUT_LOCATION, IGNORE_LIST);
 	}
 
 }

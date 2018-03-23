@@ -96,6 +96,8 @@ public enum Feature {
 	//
 	OBJECT_MIN_CARDINALITY("ObjectMinCardinality"),
 	//
+	OBJECT_PROPERTY_CHAIN("ObjectPropertyChain"),
+	//
 	OBJECT_ONE_OF("ObjectOneOf"),
 	//
 	OCCURRENCE_OF_DATA_HAS_VALUE("DataHasValue"),
@@ -108,8 +110,9 @@ public enum Feature {
 	//
 	POSITIVE_OCCURRENCE_OF_BOTTOM_OBJECT_PROPERTY("owl:bottomObjectProperty"),
 	//
-	POSITIVE_OCCURRENCE_OF_OBJECT_UNION_OF("ObjectUnionOf",
-			Polarity.POSITIVE),
+	POSITIVE_OCCURRENCE_OF_OBJECT_UNION_OF("ObjectUnionOf", Polarity.POSITIVE),
+	//
+	REFLEXIVE_OBJECT_PROPERTY("ReflexiveObjectProperty"),
 	//
 	SUB_DATA_PROPERTY_OF("SubDataPropertyOf"),
 	//

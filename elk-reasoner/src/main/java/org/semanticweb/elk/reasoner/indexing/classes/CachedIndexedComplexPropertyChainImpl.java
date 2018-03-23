@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import org.semanticweb.elk.reasoner.completeness.Feature;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
@@ -107,6 +108,11 @@ final class CachedIndexedComplexPropertyChainImpl
 				return false;
 			}
 		}
+		
+		// not fully supported with reflexive properties
+		index.occurrenceChanged(Feature.OBJECT_PROPERTY_CHAIN,
+				increment.totalIncrement);
+		
 		// success!
 		return true;
 	}

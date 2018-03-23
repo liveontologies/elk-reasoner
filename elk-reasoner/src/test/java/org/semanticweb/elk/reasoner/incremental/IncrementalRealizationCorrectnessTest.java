@@ -23,10 +23,7 @@ package org.semanticweb.elk.reasoner.incremental;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.InstanceTaxonomyTestOutput;
-import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.UrlTestInput;
@@ -44,29 +41,23 @@ public class IncrementalRealizationCorrectnessTest
 	public IncrementalRealizationCorrectnessTest(
 			final TestManifest<UrlTestInput> testManifest) {
 		super(testManifest,
-				new ElkIncrementalReasoningTestDelegate<InstanceTaxonomyTestOutput<?>>(
+				new ElkIncrementalReasoningTestDelegate<InstanceTaxonomyTestOutput>(
 						testManifest) {
 
 					@Override
-					public InstanceTaxonomyTestOutput<?> getExpectedOutput()
+					public InstanceTaxonomyTestOutput getExpectedOutput()
 							throws Exception {
 						LOGGER_.trace(
 								"======= Computing Expected Taxonomy =======");
-						final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = getStandardReasoner()
-								.getInstanceTaxonomyQuietly();
-						return new InstanceTaxonomyTestOutput<InstanceTaxonomy<ElkClass, ElkNamedIndividual>>(
-								taxonomy);
+						return new InstanceTaxonomyTestOutput(getStandardReasoner());
 					}
 
 					@Override
-					public InstanceTaxonomyTestOutput<?> getActualOutput()
+					public InstanceTaxonomyTestOutput getActualOutput()
 							throws Exception {
 						LOGGER_.trace(
 								"======= Computing Incremental Taxonomy =======");
-						final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = getIncrementalReasoner()
-								.getInstanceTaxonomyQuietly();
-						return new InstanceTaxonomyTestOutput<InstanceTaxonomy<ElkClass, ElkNamedIndividual>>(
-								taxonomy);
+						return new InstanceTaxonomyTestOutput(getIncrementalReasoner());
 					}
 
 				});

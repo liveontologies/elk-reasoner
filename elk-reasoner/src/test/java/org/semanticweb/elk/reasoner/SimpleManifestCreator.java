@@ -48,7 +48,8 @@ public class SimpleManifestCreator
 			return Collections.emptySet();
 		}
 		return Collections.singleton(
-				new ReasoningTestManifest<Void>(name, urls.get(0), null));
+				new ReasoningTestManifest<ReasoningTestOutput<?>>(name,
+						urls.get(0), null));
 	}
 
 }

@@ -70,7 +70,7 @@ public class BasicTestManifest<I extends TestInput, O>
 		if (expOutput == null ? actualOutput != null
 				: expOutput.hashCode() != actualOutput.hashCode()
 						|| !expOutput.equals(actualOutput)) {
-
+			
 			final StringBuilder message = new StringBuilder(
 					"Actual output is not equal to the expected output");
 			message.append("\nInput: ").append(getInput().getName());

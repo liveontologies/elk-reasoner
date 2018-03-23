@@ -26,12 +26,10 @@ import java.util.Arrays;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.BaseClassificationCorrectnessTest;
+import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
-import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
-import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestUtils;
 import org.semanticweb.elk.testing.UrlTestInput;
@@ -42,10 +40,10 @@ public class OWLAPIDiffClassificationCorrectnessTest
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
+			// OWL API bug see here:
+			// https://github.com/owlcs/owlapi/issues/151
+			// TODO: this seems to have been fixed in OWL API 5
 			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/DisjointSelf.owl",
-			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/CompositionReflexivityComplex.owl",
-			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/BottomObjectProperty.owl",
-			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/TopObjectProperty.owl",
 		};
 	// @formatter:on
 
@@ -54,18 +52,16 @@ public class OWLAPIDiffClassificationCorrectnessTest
 	}
 
 	public OWLAPIDiffClassificationCorrectnessTest(
-			final ReasoningTestManifest<TaxonomyTestOutput<?>> testManifest) {
+			final ReasoningTestManifest<ClassTaxonomyTestOutput> testManifest) {
 		super(testManifest,
-				new OwlApiReasoningTestDelegate<TaxonomyTestOutput<?>>(
+				new OwlApiReasoningTestDelegate<ClassTaxonomyTestOutput>(
 						testManifest) {
 
 					@Override
-					public TaxonomyTestOutput<?> getActualOutput()
+					public ClassTaxonomyTestOutput getActualOutput()
 							throws Exception {
-						final Taxonomy<ElkClass> taxonomy = getReasoner()
-								.getInternalReasoner().getTaxonomyQuietly();
-						return new TaxonomyTestOutput<Taxonomy<ElkClass>>(
-								taxonomy);
+						return new ClassTaxonomyTestOutput(
+								getReasoner().getInternalReasoner()); 
 					}
 
 					@Override
