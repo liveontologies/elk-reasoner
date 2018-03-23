@@ -168,7 +168,7 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 	@SuppressWarnings("unchecked")
 	public MutableTypeNode<T, I> getCreateTypeNode(Collection<T> types) {
 		// check for inconsistency
-		if (types.contains(top.getCanonicalMember())
+		if (bottom != null && types.contains(top.getCanonicalMember())
 				&& types.contains(bottom.getCanonicalMember())) {
 			makeInconsistent();			
 		}
