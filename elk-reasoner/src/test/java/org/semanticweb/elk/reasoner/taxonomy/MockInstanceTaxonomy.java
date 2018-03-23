@@ -58,10 +58,9 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 		extends AbstractInstanceTaxonomy<T, I>
 		implements InstanceTaxonomy<T, I> {
 
-	// Top should be made final, the only problem is inconsistency (when it
-	// holds a reference to Bot)
-	protected ExtremeNode<T, I> top;
-	protected final MockBottomNode bottom;
+	protected final ExtremeNode<T, I> top;
+	protected MockBottomNode bottom;
+	protected MockInstanceNode bottomInstances = null; // will be created if taxonomy is inconsistent
 	protected final Map<TypeNode<T, I>, Set<TypeNode<T, I>>> parentMap = new HashMap<TypeNode<T, I>, Set<TypeNode<T, I>>>();
 	protected final Map<TypeNode<T, I>, Set<TypeNode<T, I>>> childrenMap = new HashMap<TypeNode<T, I>, Set<TypeNode<T, I>>>();
 	protected final Map<Object, TypeNode<T, I>> typeIndex = new HashMap<Object, TypeNode<T, I>>();
@@ -119,13 +118,13 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 	}
 
 	@Override
-	public ExtremeNode<T, I> getTopNode() {
+	public ExtremeNode<T, I> getTopNode() {		
 		return top;
 	}
 
 	@Override
-	public MockBottomNode getBottomNode() {
-		return bottom;
+	public ExtremeNode<T, I> getBottomNode() {
+		return bottom != null ? bottom : top;
 	}
 
 	@Override
@@ -143,11 +142,23 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 		childrenMap.clear();
 		instanceIndex.clear();
 		typeIndex.clear();
-		instanceTypeMap.clear();
-		bottom.addMembers(top);
-		top = bottom;
+		instancesWithoutType = 0;
+		// merge all instances in one node
+		Collection<I> instances = new HashSet<I>(instanceTypeMap.size());
+		for (InstanceNode<T, I> node : getInstanceNodes()) {
+			for (I member : node) {
+				instances.add(member);
+			}
+		}
+		instanceTypeMap.clear();		
+		bottomInstances = new MockInstanceNode(instances, Collections.<TypeNode<T, I>> emptyList());
+		for (I instance : instances) {
+			instanceIndex.put(instanceKeyProvider_.getKey(instance), bottomInstances);
+		}
+		top.addMembers(bottom);
+		bottom = null;
 		// init the only node in the taxonomy
-		initTypeNode(bottom);
+		initTypeNode(top);
 	}
 
 	public boolean isConsistent() {
@@ -159,9 +170,12 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 		// check for inconsistency
 		if (types.contains(top.getCanonicalMember())
 				&& types.contains(bottom.getCanonicalMember())) {
-			makeInconsistent();
-			bottom.addMembers(types);
-			return bottom;
+			makeInconsistent();			
+		}
+		if (bottom == null) {
+			// inconsistent
+			top.addMembers(types);
+			return top;			
 		}
 		// else nodes for some types may already exist
 		MutableTypeNode<T, I> node = null;
@@ -205,18 +219,30 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 
 	public MockInstanceNode getCreateInstanceNode(Collection<I> instances,
 			Collection<TypeNode<T, I>> types) {
-		MockInstanceNode node = instanceIndex.get(
-				instanceKeyProvider_.getKey(instances.iterator().next()));
-
-		if (node == null) {
-			node = new MockInstanceNode(instances, types);
-
-			for (I instance : instances) {
-				instanceIndex.put(instanceKeyProvider_.getKey(instance), node);
+		MockInstanceNode node;
+		if (bottom == null) {			
+			// inconsistent
+			bottomInstances.addMembers(instances);
+			node = bottomInstances;			
+		} else {
+			node = instanceIndex.get(
+					instanceKeyProvider_.getKey(instances.iterator().next()));			
+			if (node != null) {
+				return node;							
 			}
+			// else
+			node = new MockInstanceNode(instances, types);
 		}
 
+		for (I instance : instances) {
+			instanceIndex.put(instanceKeyProvider_.getKey(instance), node);
+		}
 		return node;
+	}
+	
+	public MockInstanceNode getCreateInstanceNode(Collection<I> instances) {
+		return getCreateInstanceNode(instances,
+				Collections.<TypeNode<T, I>> emptyList());
 	}
 
 	protected void remove(TypeNode<T, I> node) {

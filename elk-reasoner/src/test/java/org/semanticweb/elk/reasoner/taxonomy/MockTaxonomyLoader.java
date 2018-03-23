@@ -38,6 +38,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
@@ -147,6 +148,22 @@ public class MockTaxonomyLoader {
 
 			taxonomy.getCreateTypeNode(classes);
 
+			return null;
+		}
+		
+		@Override
+		public Void visit(ElkSameIndividualAxiom axiom) {
+			// a new instance node
+			Set<ElkNamedIndividual> individuals = new HashSet<ElkNamedIndividual>();
+
+			for (ElkIndividual ind : axiom.getIndividuals()) {
+				if (ind instanceof ElkNamedIndividual) {
+					individuals.add((ElkNamedIndividual) ind);
+				}
+			}
+			
+			taxonomy.getCreateInstanceNode(individuals);
+			
 			return null;
 		}
 
