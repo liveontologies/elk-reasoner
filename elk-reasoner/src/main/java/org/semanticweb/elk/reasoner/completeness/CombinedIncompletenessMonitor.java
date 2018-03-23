@@ -35,6 +35,11 @@ import org.slf4j.Logger;
 public class CombinedIncompletenessMonitor implements IncompletenessMonitor {
 
 	/**
+	 * the maximal number of monitors for which to print the explanations
+	 */
+	private final static int EXPLANATION_LIMIT_ = 5;
+
+	/**
 	 * The monitors that are combined
 	 */
 	private final IncompletenessMonitor[] monitors_;
@@ -67,8 +72,18 @@ public class CombinedIncompletenessMonitor implements IncompletenessMonitor {
 
 	@Override
 	public void explainIncompleteness(Logger logger) {
+		int noExplanations = 0;
 		for (IncompletenessMonitor monitor : monitors_) {
-			monitor.explainIncompleteness(logger);
+			if (monitor.hasNewExplanation()) {
+				if (noExplanations++ < EXPLANATION_LIMIT_) {
+					monitor.explainIncompleteness(logger);
+				}
+			}
+		}
+		int notPrinted = (noExplanations - EXPLANATION_LIMIT_);
+		if (notPrinted > 0) {
+			logger.info("{} other potential incompleteness problems ... ",
+					notPrinted);
 		}
 	}
 
