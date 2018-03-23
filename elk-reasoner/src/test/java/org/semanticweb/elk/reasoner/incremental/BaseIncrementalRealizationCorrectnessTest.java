@@ -53,18 +53,18 @@ import org.semanticweb.elk.testing.UrlTestInput;
  */
 @RunWith(PolySuite.class)
 public abstract class BaseIncrementalRealizationCorrectnessTest<A> extends
-		IncrementalReasoningCorrectnessTestWithInterrupts<UrlTestInput, A, InstanceTaxonomyTestOutput<?>, IncrementalReasoningTestWithInterruptsDelegate<A, InstanceTaxonomyTestOutput<?>>> {
+		IncrementalReasoningCorrectnessTestWithInterrupts<UrlTestInput, A, InstanceTaxonomyTestOutput, IncrementalReasoningTestWithInterruptsDelegate<A, InstanceTaxonomyTestOutput>> {
 
 	public BaseIncrementalRealizationCorrectnessTest(
 			final TestManifest<UrlTestInput> testManifest,
-			final IncrementalReasoningTestWithInterruptsDelegate<A, InstanceTaxonomyTestOutput<?>> testDelegate) {
+			final IncrementalReasoningTestWithInterruptsDelegate<A, InstanceTaxonomyTestOutput> testDelegate) {
 		super(testManifest, testDelegate);
 	}
 
 	@Override
 	protected void correctnessCheck(
-			final InstanceTaxonomyTestOutput<?> actualOutput,
-			final InstanceTaxonomyTestOutput<?> expectedOutput)
+			final InstanceTaxonomyTestOutput actualOutput,
+			final InstanceTaxonomyTestOutput expectedOutput)
 			throws ElkException {
 
 		final InstanceTaxonomy<?, ?> expected = expectedOutput.getTaxonomy();

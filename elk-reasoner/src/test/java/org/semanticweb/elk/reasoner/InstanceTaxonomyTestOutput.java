@@ -28,6 +28,7 @@ package org.semanticweb.elk.reasoner;
 import java.io.IOException;
 import java.io.Writer;
 
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
@@ -39,11 +40,18 @@ import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class InstanceTaxonomyTestOutput<T extends InstanceTaxonomy<ElkClass, ElkNamedIndividual>>
-		extends TaxonomyTestOutput<T> {
+public class InstanceTaxonomyTestOutput extends
+		TaxonomyTestOutput<InstanceTaxonomy<ElkClass, ElkNamedIndividual>> {
 
-	public InstanceTaxonomyTestOutput(T taxonomy) {
-		super(taxonomy);
+	public InstanceTaxonomyTestOutput(
+			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy,
+			boolean isComplete) {
+		super(taxonomy, isComplete);
+	}
+
+	public InstanceTaxonomyTestOutput(Reasoner reasoner) throws ElkException {
+		this(reasoner.getInstanceTaxonomyQuietly(),
+				reasoner.isOntologyReasoningComplete());
 	}
 
 	@Override
@@ -53,17 +61,7 @@ public class InstanceTaxonomyTestOutput<T extends InstanceTaxonomy<ElkClass, Elk
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (obj == this) {
-			return true;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		return getTaxonomy()
-				.equals(((TaxonomyTestOutput<?>) obj).getTaxonomy());
+		return (obj instanceof InstanceTaxonomyTestOutput && super.equals(obj));
 	}
 
 	@Override

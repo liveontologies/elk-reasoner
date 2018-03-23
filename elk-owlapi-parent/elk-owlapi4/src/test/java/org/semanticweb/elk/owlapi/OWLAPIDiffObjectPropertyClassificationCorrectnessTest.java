@@ -22,19 +22,12 @@
  */
 package org.semanticweb.elk.owlapi;
 
-import java.util.Arrays;
-
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.ElkTestUtils;
-import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.BaseObjectPropertyClassificationCorrectnessTest;
+import org.semanticweb.elk.reasoner.ObjectPropertyTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
-import org.semanticweb.elk.reasoner.TaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
-import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestUtils;
-import org.semanticweb.elk.testing.UrlTestInput;
 
 /**
  * @author Peter Skocovsky
@@ -43,30 +36,17 @@ import org.semanticweb.elk.testing.UrlTestInput;
 public class OWLAPIDiffObjectPropertyClassificationCorrectnessTest
 		extends BaseObjectPropertyClassificationCorrectnessTest {
 
-	// @formatter:off
-	static final String[] IGNORE_LIST = {
-			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/object_property/ChainWithReflexive.owl",
-		};
-	// @formatter:on
-
-	static {
-		Arrays.sort(IGNORE_LIST);
-	}
-
 	public OWLAPIDiffObjectPropertyClassificationCorrectnessTest(
-			final ReasoningTestManifest<TaxonomyTestOutput<?>> testManifest) {
+			final ReasoningTestManifest<ObjectPropertyTaxonomyTestOutput> testManifest) {
 		super(testManifest,
-				new OwlApiReasoningTestDelegate<TaxonomyTestOutput<?>>(
+				new OwlApiReasoningTestDelegate<ObjectPropertyTaxonomyTestOutput>(
 						testManifest) {
 
 					@Override
-					public TaxonomyTestOutput<?> getActualOutput()
+					public ObjectPropertyTaxonomyTestOutput getActualOutput()
 							throws Exception {
-						final Taxonomy<ElkObjectProperty> taxonomy = getReasoner()
-								.getInternalReasoner()
-								.getObjectPropertyTaxonomyQuietly();
-						return new TaxonomyTestOutput<Taxonomy<ElkObjectProperty>>(
-								taxonomy);
+						return new ObjectPropertyTaxonomyTestOutput(
+								getReasoner().getInternalReasoner());
 					}
 
 					@Override
@@ -75,12 +55,6 @@ public class OWLAPIDiffObjectPropertyClassificationCorrectnessTest
 					}
 
 				});
-	}
-
-	@Override
-	protected boolean ignore(final UrlTestInput input) {
-		return super.ignore(input) || TestUtils.ignore(input,
-				ElkTestUtils.TEST_INPUT_LOCATION, IGNORE_LIST);
 	}
 
 }

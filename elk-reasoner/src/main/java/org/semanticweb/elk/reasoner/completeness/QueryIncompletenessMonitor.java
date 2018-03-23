@@ -59,6 +59,21 @@ public class QueryIncompletenessMonitor extends TopIncompletenessMonitor {
 		return !queryMonitor.isIncompletenessDetected();
 	}
 
+	public static QueryIncompletenessMonitor get(ElkClassExpression query,
+			OntologyIncompletenessMonitor ontologyMonitor,
+			OccurrenceCounter occurrencesInQuery) {
+		return new QueryIncompletenessMonitor(ontologyMonitor,
+				new OccurrencesInClassExpressionQuery(query,
+						occurrencesInQuery));
+	}
+
+	public static QueryIncompletenessMonitor get(ElkAxiom query,
+			OntologyIncompletenessMonitor ontologyMonitor,
+			OccurrenceCounter occurrencesInQuery) {
+		return new QueryIncompletenessMonitor(ontologyMonitor,
+				new OccurrencesInEntailmentQuery(query, occurrencesInQuery));
+	}
+
 	/**
 	 * Checks reasoning completeness for the given query and, if necessary,
 	 * prints messages about incompleteness using the provided logger.

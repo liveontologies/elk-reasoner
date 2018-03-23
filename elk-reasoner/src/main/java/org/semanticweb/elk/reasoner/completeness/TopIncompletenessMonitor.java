@@ -111,10 +111,14 @@ public class TopIncompletenessMonitor extends CombinedIncompletenessMonitor {
 			//
 			Feature.SYMMETRIC_OBJECT_PROPERTY };
 
-	private static final Feature[][] UNSUPPORTED_COMBINATIONS_OF_FEATURES_ = { { //
-			Feature.OCCURRENCE_OF_OBJECT_PROPERTY_RANGE,
-			//
-			Feature.OCCURRENCE_OF_OBJECT_PROPERTY_ASSERTION } };
+	private static final Feature[][] UNSUPPORTED_COMBINATIONS_OF_FEATURES_ = {
+			{ Feature.OCCURRENCE_OF_OBJECT_PROPERTY_RANGE,
+					//
+					Feature.OCCURRENCE_OF_OBJECT_PROPERTY_ASSERTION },
+			// incomplete for property classification
+			{ Feature.REFLEXIVE_OBJECT_PROPERTY,
+					//
+					Feature.OBJECT_PROPERTY_CHAIN }, };
 
 	TopIncompletenessMonitor(OccurrenceManager occurences) {
 		super(getMonitors(occurences));

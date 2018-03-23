@@ -26,44 +26,33 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
-public class TaxonomyTestOutput<T extends Taxonomy<? extends ElkEntity>> {
+public class TaxonomyTestOutput<T extends Taxonomy<?>>
+		extends ReasoningTestOutput<T> {
 
-	private final T taxonomy_;
-
-	public TaxonomyTestOutput(T taxonomy) {
-		this.taxonomy_ = taxonomy;
+	public TaxonomyTestOutput(T taxonomy, boolean isComplete) {
+		super(taxonomy, isComplete);
 	}
 
 	public T getTaxonomy() {
-		return this.taxonomy_;
+		return getResoult();
 	}
 
 	@Override
 	public int hashCode() {
-		return TaxonomyHasher.hash(taxonomy_);
+		return TaxonomyHasher.hash(getTaxonomy());
 	}
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (obj == this) {
-			return true;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		return taxonomy_.equals(((TaxonomyTestOutput<?>) obj).taxonomy_);
+		return (obj instanceof TaxonomyTestOutput<?> && super.equals(obj));
 	}
 
 	protected void dumpTaxonomy(final Writer writer) throws IOException {
-		TaxonomyPrinter.dumpTaxomomy(taxonomy_, writer, false);
+		TaxonomyPrinter.dumpTaxomomy(getTaxonomy(), writer, false);
 	}
 
 	@Override

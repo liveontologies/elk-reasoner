@@ -58,11 +58,11 @@ import org.semanticweb.elk.testing.UrlTestInput;
  */
 @RunWith(PolySuite.class)
 public abstract class BaseRealizationCorrectnessTest extends
-		ReasoningCorrectnessTestWithInterrupts<UrlTestInput, InstanceTaxonomyTestOutput<?>, ReasoningTestManifest<InstanceTaxonomyTestOutput<?>>, ReasoningTestWithOutputAndInterruptsDelegate<InstanceTaxonomyTestOutput<?>>> {
+		ReasoningCorrectnessTestWithInterrupts<UrlTestInput, InstanceTaxonomyTestOutput, ReasoningTestManifest<InstanceTaxonomyTestOutput>, ReasoningTestWithOutputAndInterruptsDelegate<InstanceTaxonomyTestOutput>> {
 
 	public BaseRealizationCorrectnessTest(
-			final ReasoningTestManifest<InstanceTaxonomyTestOutput<?>> testManifest,
-			final ReasoningTestWithOutputAndInterruptsDelegate<InstanceTaxonomyTestOutput<?>> testDelegate) {
+			final ReasoningTestManifest<InstanceTaxonomyTestOutput> testManifest,
+			final ReasoningTestWithOutputAndInterruptsDelegate<InstanceTaxonomyTestOutput> testDelegate) {
 		super(testManifest, testDelegate);
 	}
 
@@ -72,9 +72,9 @@ public abstract class BaseRealizationCorrectnessTest extends
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				ElkTestUtils.TEST_INPUT_LOCATION,
 				BaseRealizationCorrectnessTest.class,
-				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<UrlTestInput, InstanceTaxonomyTestOutput<?>>>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<UrlTestInput, InstanceTaxonomyTestOutput>>() {
 					@Override
-					public Collection<? extends TestManifestWithOutput<UrlTestInput, InstanceTaxonomyTestOutput<?>>> createManifests(
+					public Collection<? extends TestManifestWithOutput<UrlTestInput, InstanceTaxonomyTestOutput>> createManifests(
 							final String name, final List<URL> urls)
 							throws IOException {
 
@@ -98,12 +98,12 @@ public abstract class BaseRealizationCorrectnessTest extends
 											new Owl2FunctionalStyleParserFactory(
 													objectFactory)
 															.getParser(stream));
-
+							
 							return Collections.singleton(
-									new ReasoningTestManifest<InstanceTaxonomyTestOutput<?>>(
+									new ReasoningTestManifest<InstanceTaxonomyTestOutput>(
 											name, urls.get(0),
-											new InstanceTaxonomyTestOutput<InstanceTaxonomy<ElkClass, ElkNamedIndividual>>(
-													expectedTaxonomy)));
+											new InstanceTaxonomyTestOutput(
+													expectedTaxonomy, true)));
 
 						} catch (Owl2ParseException e) {
 							throw new IOException(e);

@@ -819,6 +819,17 @@ public abstract class AbstractReasonerState implements TracingProof {
 		return true;
 	}
 
+	public boolean isOntologyReasoningComplete() {
+		return !ontologyIncompletenessMonitor_.isIncompletenessDetected();
+	}
+	
+	public boolean isQueryReasoningComplete(ElkClassExpression query) {
+		return !QueryIncompletenessMonitor
+				.get(query, ontologyIncompletenessMonitor_,
+						classExpressionQueryState.getOccurrenceCounter(query))
+				.isIncompletenessDetected();
+	}
+	
 	private boolean checkOntologyReasoningCompleteness() {
 		return ontologyIncompletenessMonitor_.checkCompleteness(LOGGER_);
 	}

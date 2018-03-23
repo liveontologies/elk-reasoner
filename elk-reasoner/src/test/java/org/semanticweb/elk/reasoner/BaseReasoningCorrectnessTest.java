@@ -85,7 +85,6 @@ public abstract class BaseReasoningCorrectnessTest<I extends TestInput, O, TM ex
 		delegate_.after();
 	}
 
-	@SuppressWarnings("static-method")
 	protected boolean ignore(I input) {
 		return false;
 	}

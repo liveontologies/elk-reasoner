@@ -22,50 +22,23 @@
  */
 package org.semanticweb.elk.reasoner;
 
-import java.util.Arrays;
-
-import org.semanticweb.elk.ElkTestUtils;
-import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
-import org.semanticweb.elk.testing.TestUtils;
-import org.semanticweb.elk.testing.UrlTestInput;
-
 /**
  * @author Peter Skocovsky
  */
 public class ElkDiffObjectPropertyClassificationCorrectnessTest
 		extends BaseObjectPropertyClassificationCorrectnessTest {
 
-	// @formatter:off
-	static final String[] IGNORE_LIST = {
-			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/object_property/ChainWithReflexive.owl",
-		};
-	// @formatter:on
-
-	static {
-		Arrays.sort(IGNORE_LIST);
-	}
-
 	public ElkDiffObjectPropertyClassificationCorrectnessTest(
-			final ReasoningTestManifest<TaxonomyTestOutput<?>> testManifest) {
-		super(testManifest, new ElkReasoningTestDelegate<TaxonomyTestOutput<?>>(
+			final ReasoningTestManifest<ObjectPropertyTaxonomyTestOutput> testManifest) {
+		super(testManifest, new ElkReasoningTestDelegate<ObjectPropertyTaxonomyTestOutput>(
 				testManifest) {
 
 			@Override
-			public TaxonomyTestOutput<?> getActualOutput() throws Exception {
-				final Taxonomy<ElkObjectProperty> taxonomy = getReasoner()
-						.getObjectPropertyTaxonomyQuietly();
-				return new TaxonomyTestOutput<Taxonomy<ElkObjectProperty>>(
-						taxonomy);
+			public ObjectPropertyTaxonomyTestOutput getActualOutput() throws Exception {
+				return new ObjectPropertyTaxonomyTestOutput(getReasoner());
 			}
 
 		});
-	}
-
-	@Override
-	protected boolean ignore(final UrlTestInput input) {
-		return super.ignore(input) || TestUtils.ignore(input,
-				ElkTestUtils.TEST_INPUT_LOCATION, IGNORE_LIST);
 	}
 
 }
