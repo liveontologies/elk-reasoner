@@ -24,14 +24,32 @@ package org.semanticweb.elk.reasoner.indexing.conversion;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkDataAllValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
+import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinalityUnqualified;
+import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinalityUnqualified;
+import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
+import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityUnqualified;
+import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
+import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinalityUnqualified;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
@@ -59,26 +77,27 @@ import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
  * @author "Yevgeny Kazakov"
  *
  */
-public class ElkPolarityExpressionConverterImpl extends
-		FailingElkPolarityExpressionConverter {
-
-	private final PredefinedElkClassFactory elkFactory_;
-	
-	private final ModifiableIndexedObject.Factory factory_;
+public class ElkPolarityExpressionConverterImpl
+		implements ElkPolarityExpressionConverter {
 
 	private final ElkPolarityExpressionConverter complementaryConverter_;
 
-	private final OccurrenceListener occurrenceListener_;
-	
+	private final PredefinedElkClassFactory elkFactory_;
+
+	private final ModifiableIndexedObject.Factory factory_;
+
 	private final int increment_;
+
+	private final OccurrenceListener occurrenceListener_;
+
+	private final ElkPolarity polarity_;
 
 	ElkPolarityExpressionConverterImpl(ElkPolarity polarity,
 			PredefinedElkClassFactory elkFactory,
 			ModifiableIndexedObject.Factory factory,
 			ElkPolarityExpressionConverter complementaryConverter,
-			final OccurrenceListener occurrenceListener,
-			int increment) {
-		super(polarity);
+			final OccurrenceListener occurrenceListener, int increment) {
+		this.polarity_ = polarity;
 		this.elkFactory_ = elkFactory;
 		this.factory_ = factory;
 		this.complementaryConverter_ = complementaryConverter;
@@ -110,9 +129,8 @@ public class ElkPolarityExpressionConverterImpl extends
 			PredefinedElkClassFactory elkFactory,
 			ModifiableIndexedObject.Factory factory,
 			ModifiableIndexedObject.Factory complementaryFactory,
-			final OccurrenceListener occurrenceTracker,
-			int increment) {
-		super(polarity);
+			final OccurrenceListener occurrenceTracker, int increment) {
+		this.polarity_ = polarity;
 		this.elkFactory_ = elkFactory;
 		this.factory_ = factory;
 		this.complementaryConverter_ = new ElkPolarityExpressionConverterImpl(
@@ -137,14 +155,29 @@ public class ElkPolarityExpressionConverterImpl extends
 	public ElkPolarityExpressionConverterImpl(
 			PredefinedElkClassFactory elkFactory,
 			ModifiableIndexedObject.Factory dualFactory,
-			final OccurrenceListener occurrrenceTracker,
-			int increment) {
-		super(ElkPolarity.DUAL);
+			final OccurrenceListener occurrrenceTracker, int increment) {
+		this.polarity_ = ElkPolarity.DUAL;
 		this.elkFactory_ = elkFactory;
 		this.factory_ = dualFactory;
 		this.complementaryConverter_ = this;
 		this.occurrenceListener_ = occurrrenceTracker;
 		this.increment_ = increment;
+	}
+
+	/**
+	 * Creates an {@link ElkPolarityExpressionConverter} of polarity
+	 * {@link ElkPolarity#DUAL}, which uses
+	 * {@link ResolvingModifiableIndexedObjectFactory} for creating the
+	 * {@link ModifiableIndexedObject}s.
+	 * 
+	 * @param elkFactory
+	 * @param index
+	 */
+	public ElkPolarityExpressionConverterImpl(
+			PredefinedElkClassFactory elkFactory,
+			ModifiableOntologyIndex index) {
+		this(elkFactory, new ResolvingModifiableIndexedObjectFactory(index),
+				index, 0);
 	}
 
 	/**
@@ -169,37 +202,24 @@ public class ElkPolarityExpressionConverterImpl extends
 				index, increment);
 	}
 
-	/**
-	 * Creates an {@link ElkPolarityExpressionConverter} of polarity
-	 * {@link ElkPolarity#DUAL}, which uses
-	 * {@link ResolvingModifiableIndexedObjectFactory} for creating the
-	 * {@link ModifiableIndexedObject}s.
-	 * 
-	 * @param elkFactory
-	 * @param index
-	 */
-	public ElkPolarityExpressionConverterImpl(
-			PredefinedElkClassFactory elkFactory,
-			ModifiableOntologyIndex index) {
-		this(elkFactory, new ResolvingModifiableIndexedObjectFactory(index),
-				index, 0);
-	}
-
 	@Override
 	public ElkPolarityExpressionConverter getComplementaryConverter() {
 		return this.complementaryConverter_;
 	}
 
 	@Override
-	public ModifiableIndexedIndividual visit(
-			ElkNamedIndividual elkNamedIndividual) {
-		return factory_.getIndexedIndividual(elkNamedIndividual);
+	public ElkPolarity getPolarity() {
+		return polarity_;
+	}
+
+	private ElkIndexingUnsupportedFeature unsupported(Feature feature) {
+		return new ElkIndexingUnsupportedFeature(feature);
 	}
 
 	@Override
-	public ModifiableIndexedObjectProperty visit(
-			ElkObjectProperty elkObjectProperty) {
-		return factory_.getIndexedObjectProperty(elkObjectProperty);
+	public ModifiableIndexedIndividual visit(
+			ElkAnonymousIndividual expression) {
+		throw unsupported(Feature.ANONYMOUS_INDIVIDUAL);
 	}
 
 	@Override
@@ -209,10 +229,70 @@ public class ElkPolarityExpressionConverterImpl extends
 
 	@Override
 	public ModifiableIndexedClassExpression visit(
-			ElkObjectHasValue elkObjectHasValue) {
-		return factory_.getIndexedObjectSomeValuesFrom(elkObjectHasValue
-				.getProperty().accept(this), elkObjectHasValue.getFiller()
-				.accept(this));
+			ElkDataAllValuesFrom expression) {
+		throw unsupported(Feature.DATA_ALL_VALUES_FROM);
+	}
+
+	@Override
+	public ModifiableIndexedClassExpression visit(
+			ElkDataExactCardinalityQualified expression) {
+		throw unsupported(Feature.DATA_EXACT_CARDINALITY);
+	}
+
+	@Override
+	public ModifiableIndexedClassExpression visit(
+			ElkDataExactCardinalityUnqualified expression) {
+		throw unsupported(Feature.DATA_EXACT_CARDINALITY);
+	}
+
+	@Override
+	public ModifiableIndexedClassExpression visit(
+			ElkDataHasValue elkDataHasValue) {
+		occurrenceListener_.occurrenceChanged(
+				Feature.OCCURRENCE_OF_DATA_HAS_VALUE, increment_);
+		return factory_.getIndexedDataHasValue(elkDataHasValue);
+	}
+
+	@Override
+	public ModifiableIndexedClassExpression visit(
+			ElkDataMaxCardinalityQualified expression) {
+		throw unsupported(Feature.DATA_MAX_CARDINALITY);
+	}
+
+	@Override
+	public ModifiableIndexedClassExpression visit(
+			ElkDataMaxCardinalityUnqualified expression) {
+		throw unsupported(Feature.DATA_MAX_CARDINALITY);
+	}
+
+	@Override
+	public ModifiableIndexedClassExpression visit(
+			ElkDataMinCardinalityQualified expression) {
+		throw unsupported(Feature.DATA_MIN_CARDINALITY);
+	}
+
+	@Override
+	public ModifiableIndexedClassExpression visit(
+			ElkDataMinCardinalityUnqualified expression) {
+		throw unsupported(Feature.DATA_MIN_CARDINALITY);
+	}
+
+	@Override
+	public ModifiableIndexedClassExpression visit(
+			ElkDataSomeValuesFrom expression) {
+		throw unsupported(Feature.DATA_SOME_VALUES_FROM);
+	}
+
+	@Override
+	public ModifiableIndexedIndividual visit(
+			ElkNamedIndividual elkNamedIndividual) {
+		return factory_.getIndexedIndividual(elkNamedIndividual);
+	}
+
+	@Override
+	public ModifiableIndexedClassExpression visit(
+			ElkObjectAllValuesFrom expression) {
+		throw unsupported(Feature.OBJECT_ALL_VALUES_FROM);
 	}
 
 	@Override
@@ -220,6 +300,31 @@ public class ElkPolarityExpressionConverterImpl extends
 			ElkObjectComplementOf elkObjectComplementOf) {
 		return factory_.getIndexedObjectComplementOf(elkObjectComplementOf
 				.getClassExpression().accept(complementaryConverter_));
+	}
+
+	@Override
+	public ModifiableIndexedClassExpression visit(
+			ElkObjectExactCardinalityQualified expression) {
+		throw unsupported(Feature.OBJECT_EXACT_CARDINALITY);
+	}
+
+	@Override
+	public ModifiableIndexedClassExpression visit(
+			ElkObjectExactCardinalityUnqualified expression) {
+		throw unsupported(Feature.OBJECT_EXACT_CARDINALITY);
+	}
+
+	@Override
+	public ModifiableIndexedClassExpression visit(ElkObjectHasSelf expression) {
+		throw unsupported(Feature.OBJECT_HAS_SELF);
+	}
+
+	@Override
+	public ModifiableIndexedClassExpression visit(
+			ElkObjectHasValue elkObjectHasValue) {
+		return factory_.getIndexedObjectSomeValuesFrom(
+				elkObjectHasValue.getProperty().accept(this),
+				elkObjectHasValue.getFiller().accept(this));
 	}
 
 	@Override
@@ -246,24 +351,47 @@ public class ElkPolarityExpressionConverterImpl extends
 	}
 
 	@Override
-	public ModifiableIndexedClassExpression visit(
-			ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
-		return factory_.getIndexedObjectSomeValuesFrom(elkObjectSomeValuesFrom
-				.getProperty().accept(this), elkObjectSomeValuesFrom
-				.getFiller().accept(this));
+	public ModifiableIndexedObjectProperty visit(
+			ElkObjectInverseOf expression) {
+		throw unsupported(Feature.OBJECT_INVERSE_OF);
 	}
 
 	@Override
-	public ModifiableIndexedClassExpression visit(ElkObjectOneOf elkObjectOneOf) {
+	public ModifiableIndexedClassExpression visit(
+			ElkObjectMaxCardinalityQualified expression) {
+		throw unsupported(Feature.OBJECT_MAX_CARDINALITY);
+	}
+
+	@Override
+	public ModifiableIndexedClassExpression visit(
+			ElkObjectMaxCardinalityUnqualified expression) {
+		throw unsupported(Feature.OBJECT_MAX_CARDINALITY);
+	}
+
+	@Override
+	public ModifiableIndexedClassExpression visit(
+			ElkObjectMinCardinalityQualified expression) {
+		throw unsupported(Feature.OBJECT_MIN_CARDINALITY);
+	}
+
+	@Override
+	public ModifiableIndexedClassExpression visit(
+			ElkObjectMinCardinalityUnqualified expression) {
+		throw unsupported(Feature.OBJECT_MIN_CARDINALITY);
+	}
+
+	@Override
+	public ModifiableIndexedClassExpression visit(
+			ElkObjectOneOf elkObjectOneOf) {
 		int size = elkObjectOneOf.getIndividuals().size();
 		if (size > 0) {
-			occurrenceListener_.occurrenceChanged(
-					Feature.OBJECT_ONE_OF, increment_);
+			occurrenceListener_.occurrenceChanged(Feature.OBJECT_ONE_OF,
+					increment_);
 		}
 		switch (size) {
 		case 0:
 			return factory_.getIndexedClass(elkFactory_.getOwlNothing());
-		case 1:			
+		case 1:
 			return elkObjectOneOf.getIndividuals().iterator().next()
 					.accept(this);
 		default:
@@ -274,6 +402,20 @@ public class ElkPolarityExpressionConverterImpl extends
 			}
 			return factory_.getIndexedObjectUnionOf(disjuncts);
 		}
+	}
+
+	@Override
+	public ModifiableIndexedObjectProperty visit(
+			ElkObjectProperty elkObjectProperty) {
+		return factory_.getIndexedObjectProperty(elkObjectProperty);
+	}
+
+	@Override
+	public ModifiableIndexedClassExpression visit(
+			ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
+		return factory_.getIndexedObjectSomeValuesFrom(
+				elkObjectSomeValuesFrom.getProperty().accept(this),
+				elkObjectSomeValuesFrom.getFiller().accept(this));
 	}
 
 	@Override
@@ -295,13 +437,6 @@ public class ElkPolarityExpressionConverterImpl extends
 			}
 			return factory_.getIndexedObjectUnionOf(disjuncts);
 		}
-	}
-
-	@Override
-	public ModifiableIndexedClassExpression visit(
-			ElkDataHasValue elkDataHasValue) {
-		occurrenceListener_.occurrenceChanged(Feature.OCCURRENCE_OF_DATA_HAS_VALUE, increment_);
-		return factory_.getIndexedDataHasValue(elkDataHasValue);
 	}
 
 }

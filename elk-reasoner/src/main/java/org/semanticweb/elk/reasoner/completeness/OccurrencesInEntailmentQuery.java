@@ -64,20 +64,21 @@ public class OccurrencesInEntailmentQuery implements OccurrenceManager {
 	@Override
 	public void logOccurrences(Feature occurrence, Logger logger) {
 		int count = getOccurrenceCount(occurrence);
-		String occurrences = count == 1 ? "occurrence" : "occurrences";
-		String polarity = "";
-		// unsupported polarities in query should be negated
+		String occurrencesString = count == 1 ? "occurrence" : "occurrences";
+		String polarityString = "";
+		// unsupported polarities in query should be inverted
 		switch (occurrence.getPolarity()) {
 		case POSITIVE:
-			polarity = "negative ";
+			polarityString = "negative ";
 			break;
 		case NEGATIVE:
-			polarity = "positive ";
+			polarityString = "positive ";
 		default:
 			break;
 		}
 		logger.info("{} {}{} of {} found in the entailment query {}", count,
-				polarity, occurrences, occurrence.getConstructor(), query_);
+				polarityString, occurrencesString, occurrence.getConstructor(),
+				query_);
 	}
 
 	@Override

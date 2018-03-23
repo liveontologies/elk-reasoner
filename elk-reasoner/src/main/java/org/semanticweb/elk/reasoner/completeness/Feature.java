@@ -21,8 +21,6 @@
  */
 package org.semanticweb.elk.reasoner.completeness;
 
-import org.semanticweb.elk.owl.predefined.ElkPolarity;
-
 /**
  * A syntactic element, such as a keyword or an entity, occurrences of which are
  * important for completeness of reasoning results.
@@ -31,69 +29,116 @@ import org.semanticweb.elk.owl.predefined.ElkPolarity;
  */
 public enum Feature {
 
-	/**
-	 * ObjectComplementOf occurs negatively.
-	 */
+	//
+	ANONYMOUS_INDIVIDUAL("AnonymousIndividual"),
+	//
+	ASYMMETRIC_OBJECT_PROPERTY("AsymmetricObjectProperty"),
+	//
+	DATA_ALL_VALUES_FROM("DataAllValuesFrom"),
+	//
+	DATA_EXACT_CARDINALITY("DataExactCardinality"),
+	//
+	DATA_MAX_CARDINALITY("DataMaxCardinality"),
+	//
+	DATA_MIN_CARDINALITY("DataMinCardinality"),
+	//
+	DATA_PROPERTY("DataProperty"),
+	//
+	DATA_PROPERTY_ASSERTION("DataPropertyAssertion"),
+	//
+	DATA_PROPERTY_DOMAIN("DataPropertyDomain"),
+	//
+	DATA_PROPERTY_RANGE("DataPropertyRange"),
+	//
+	DATA_SOME_VALUES_FROM("DataSomeValuesFrom"),
+	//
+	DATATYPE("Datatype"),
+	//
+	DATATYPE_DEFINITION("DatatypeDefinition"),
+	//
+	DISJOINT_DATA_PROPERTIES("DisjointDataProperties"),
+	//
+	DISJOINT_OBJECT_PROPERTIES("DisjointObjectProperties"),
+	//
+	EQUIVALENT_DATA_PROPERTIES("EquivalentDataProperties"),
+	//
+	FUNCTIONAL_DATA_PROPERTY("FunctionalDataProperty"),
+	//
+	FUNCTIONAL_OBJECT_PROPERTY("FunctionalObjectProperty"),
+	//
+	HAS_KEY("HasKey"),
+	//
+	INVERSE_FUNCTIONAL_OBJECT_PROPERTY("InverseFunctionalObjectProperty"),
+	//
+	INVERSE_OBJECT_PROPERTIES("InverseObjectProperties"),
+	//
+	IRREFLEXIVE_OBJECT_PROPERTY("IrreflexiveObjectProperty"),
+	//
+	NEGATIVE_DATA_PROPERTY_ASSERTION("NegativeDataPropertyAssertion"),
+	//
+	NEGATIVE_OBJECT_PROPERTY_ASSERTION("NegativeObjectPropertyAssertion"),
+	//
 	NEGATIVE_OCCURRENCE_OF_OBJECT_COMPLEMENT_OF("ObjectComplementOf",
-			ElkPolarity.NEGATIVE),
-	/**
-	 * TopObjectProperty occurs negatively.
-	 */
+			Polarity.NEGATIVE),
+	//
 	NEGATIVE_OCCURRENCE_OF_TOP_OBJECT_PROPERTY("owl:TopObjectProperty",
-			ElkPolarity.NEGATIVE),
-	/**
-	 * DataHasValue occurs.
-	 */
-	OCCURRENCE_OF_DATA_HAS_VALUE("DataHasValue", ElkPolarity.DUAL),
-	/**
-	 * DisjointUnion that contains more than one disjunct occurs.
-	 */
-	OCCURRENCE_OF_DISJOINT_UNION("DisjointUnion", ElkPolarity.DUAL),
-	/**
-	 * ObjectOneOf that contains one individual occurs.
-	 */
-	OBJECT_ONE_OF("ObjectOneOf", ElkPolarity.DUAL),
-	/**
-	 * ObjectPropertyAssertion occurs.
-	 */
-	OCCURRENCE_OF_OBJECT_PROPERTY_ASSERTION("ObjectPropertyAssertion",
-			ElkPolarity.DUAL),
-	/**
-	 * ObjectPropertyRange occurs.
-	 */
-	OCCURRENCE_OF_OBJECT_PROPERTY_RANGE("ObjectPropertyRange",
-			ElkPolarity.DUAL),	
-	/**
-	 * BottomObjectProperty occurs positively.
-	 */
-	POSITIVE_OCCURRENCE_OF_BOTTOM_OBJECT_PROPERTY("owl:BottomObjectProperty",
-			ElkPolarity.DUAL),
-	/**
-	 * ObjectUnionOf or ObjectOneOf that contains more than one individual
-	 * occurs.
-	 */
-	POSITIVE_OCCURRENCE_OF_OBJECT_UNION_OF("owl:ObjectUnionOf",
-			ElkPolarity.POSITIVE),
-	/**
-	 * An expression that is completely unsupported.
-	 */
-	OCCURRENCE_OF_UNSUPPORTED_EXPRESSION("Unsupported Expression",
-			ElkPolarity.DUAL);
+			Polarity.NEGATIVE),
+	//
+	OBJECT_ALL_VALUES_FROM("ObjectAllValuesFrom"),
+	//
+	OBJECT_EXACT_CARDINALITY("ObjectExactCardinality"),
+	//
+	OBJECT_HAS_SELF("ObjectHasSelf"),
+	//
+	OBJECT_INVERSE_OF("ObjectInverseOf"),
+	//
+	OBJECT_MAX_CARDINALITY("ObjectMaxCardinality"),
+	//
+	OBJECT_MIN_CARDINALITY("ObjectMinCardinality"),
+	//
+	OBJECT_ONE_OF("ObjectOneOf"),
+	//
+	OCCURRENCE_OF_DATA_HAS_VALUE("DataHasValue"),
+	//
+	OCCURRENCE_OF_DISJOINT_UNION("DisjointUnion"),
+	//
+	OCCURRENCE_OF_OBJECT_PROPERTY_ASSERTION("ObjectPropertyAssertion"),
+	//
+	OCCURRENCE_OF_OBJECT_PROPERTY_RANGE("ObjectPropertyRange"),
+	//
+	POSITIVE_OCCURRENCE_OF_BOTTOM_OBJECT_PROPERTY("owl:BottomObjectProperty"),
+	//
+	POSITIVE_OCCURRENCE_OF_OBJECT_UNION_OF("ObjectUnionOf",
+			Polarity.POSITIVE),
+	//
+	SUB_DATA_PROPERTY_OF("SubDataPropertyOf"),
+	//
+	SWRL_RULE("SWRLRule"),
+	//
+	SYMMETRIC_OBJECT_PROPERTY("SymmetricObjectProperty");
+
+	public static enum Polarity {
+		POSITIVE, NEGATIVE, ANY
+	}
 
 	private final String constructor_;
 
-	private final ElkPolarity polarity_;
+	private final Polarity polarity_;
 
-	Feature(String constructor, ElkPolarity polarity) {
+	Feature(String constructor, Polarity polarity) {
 		this.constructor_ = constructor;
 		this.polarity_ = polarity;
+	}
+
+	Feature(String constructor) {
+		this(constructor, Polarity.ANY);
 	}
 
 	public String getConstructor() {
 		return constructor_;
 	}
 
-	public ElkPolarity getPolarity() {
+	public Polarity getPolarity() {
 		return polarity_;
 	}
 
@@ -104,9 +149,10 @@ public enum Feature {
 			return "Positive occurrences of " + constructor_;
 		case NEGATIVE:
 			return "Negative occurrences of " + constructor_;
-		default:
+		case ANY:
 			return "Occurrences of " + constructor_;
 		}
+		throw new RuntimeException("Incomplete cases");
 	}
 
 }
