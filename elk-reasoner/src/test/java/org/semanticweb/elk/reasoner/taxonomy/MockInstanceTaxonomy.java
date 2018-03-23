@@ -451,7 +451,7 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 		@Override
 		public void addDirectInstance(InstanceNode<T, I> instance) {
 			// assert instance.getInstanceTaxonomy() == getTaxonomy();
-			assert this != getBottomNode();
+			assert bottom != null || this != bottom;
 
 			if (this != getTopNode()) {
 				if (MockInstanceTaxonomy.this.instanceTypeMap.get(instance).isEmpty()) {
