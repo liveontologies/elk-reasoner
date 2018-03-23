@@ -36,16 +36,13 @@ import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.loading.EntailmentQueryLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
-import org.semanticweb.elk.reasoner.completeness.CombinedOccurrenceManager;
 import org.semanticweb.elk.reasoner.completeness.EmptyOccurrenceCounter;
 import org.semanticweb.elk.reasoner.completeness.Feature;
-import org.semanticweb.elk.reasoner.completeness.IncompletenessMonitor;
+import org.semanticweb.elk.reasoner.completeness.OccurrenceCounter;
 import org.semanticweb.elk.reasoner.completeness.OccurrenceListener;
-import org.semanticweb.elk.reasoner.completeness.OccurrenceManager;
 import org.semanticweb.elk.reasoner.completeness.OccurrenceRegistry;
-import org.semanticweb.elk.reasoner.completeness.OccurrencesInEntailmentQuery;
-import org.semanticweb.elk.reasoner.completeness.OccurrencesInOntology;
-import org.semanticweb.elk.reasoner.completeness.TopIncompletenessMonitor;
+import org.semanticweb.elk.reasoner.completeness.OntologyIncompletenessMonitor;
+import org.semanticweb.elk.reasoner.completeness.QueryIncompletenessMonitor;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyCheckingState;
 import org.semanticweb.elk.reasoner.entailments.InconsistencyProofWrapper;
@@ -103,9 +100,7 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 	 */
 	private final Set<ElkAxiom> lastQueries_ = new ArrayHashSet<ElkAxiom>();
 
-	private final OccurrencesInOntology occurrencesInOntology_;
-
-	private final IncompletenessMonitor baseIncompletenessMonitor_;
+	private final OntologyIncompletenessMonitor ontologyIncompletenessMonitor_;
 
 	/**
 	 * State of the query of a particular axiom. There are two forbidden states:
@@ -170,21 +165,12 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 			return entailed;
 		}
 
-		private void checkEntailmentCompleteness() {
-			if (baseIncompletenessMonitor_.hasNewExplanation()) {
-				baseIncompletenessMonitor_.explainIncompleteness(LOGGER_);
-			}
-			if (baseIncompletenessMonitor_.isIncompletenessDetected()) {
-				// ontology is already incomplete
-				return;
-			}
-			// else
-			TopIncompletenessMonitor.checkCompleteness(
-					new CombinedOccurrenceManager(occurrencesInOntology_,
-							getOccurrenceManager()),
-					LOGGER_);
+		private boolean checkEntailmentCompleteness() {
+			return QueryIncompletenessMonitor.checkQueryReasoningCompleteness(
+					getQuery(), ontologyIncompletenessMonitor_,
+					getOccurrenceCounter(), LOGGER_);
 		}
-
+		
 		@SuppressWarnings("unchecked")
 		@Override
 		public Proof<EntailmentInference> getEvidence(final boolean onlyOne)
@@ -209,10 +195,9 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 			return Proofs.union(inconsistencyEvidence, entailmentEvidence);
 		}
 
-		OccurrenceManager getOccurrenceManager() {
-			return new OccurrencesInEntailmentQuery(getQuery(),
-					occurrences == null ? EmptyOccurrenceCounter.get()
-							: occurrences);
+		OccurrenceCounter getOccurrenceCounter() {
+			return occurrences == null ? EmptyOccurrenceCounter.get()
+					: occurrences;
 		}
 
 		public synchronized boolean lock() {
@@ -249,8 +234,7 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 			final SaturationState<C> saturationState,
 			final ConsistencyCheckingState consistencyCheckingState,
 			final SaturationConclusion.Factory factory,
-			final OccurrencesInOntology occurrencesInOntology,
-			final IncompletenessMonitor baseIncompletenessMonitor) {
+			final OntologyIncompletenessMonitor ontologyIncompletenessMonitor) {
 		this.saturationState_ = saturationState;
 		this.consistencyCheckingState_ = consistencyCheckingState;
 		this.conclusionFactory_ = factory;
@@ -259,8 +243,7 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 		LOGGER_.info("{} = {}", ReasonerConfiguration.ENTAILMENT_QUERY_EVICTOR,
 				builder);
 		this.queriedEvictor_ = ((Evictor.Builder) builder).build();
-		this.occurrencesInOntology_ = occurrencesInOntology;
-		this.baseIncompletenessMonitor_ = baseIncompletenessMonitor;
+		this.ontologyIncompletenessMonitor_ = ontologyIncompletenessMonitor;
 	}
 
 	/**
