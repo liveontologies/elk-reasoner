@@ -49,8 +49,6 @@ public class OWLAPIDiffRealizationCorrectnessTest
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
 			ElkTestUtils.TEST_INPUT_LOCATION + "/realization/AssertionsPropertyRanges.owl",
-			ElkTestUtils.TEST_INPUT_LOCATION + "/realization/Inconsistent.owl",
-			ElkTestUtils.TEST_INPUT_LOCATION + "/realization/MultipleInconsistencies.owl",
 		};
 	// @formatter:on
 
