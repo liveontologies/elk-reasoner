@@ -24,10 +24,9 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
-import org.semanticweb.elk.reasoner.completeness.Feature;
 import org.semanticweb.elk.reasoner.completeness.OccurrenceListener;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverter;
-import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,10 +65,8 @@ public class ChangeIndexingProcessor implements ElkAxiomProcessor {
 						+ OwlFunctionalStylePrinter.toString(elkAxiom) + " for "
 						+ (increment_ > 0 ? "addition" : "deletion"));
 			elkAxiom.accept(indexer_);
-		} catch (ElkIndexingUnsupportedException e) {
-			occurrenceTracker_.occurrenceChanged(
-					Feature.OCCURRENCE_OF_UNSUPPORTED_EXPRESSION,
-					increment_);
+		} catch (ElkIndexingUnsupportedFeature e) {
+			occurrenceTracker_.occurrenceChanged(e.getFeature(), increment_);
 		}
 	}
 }

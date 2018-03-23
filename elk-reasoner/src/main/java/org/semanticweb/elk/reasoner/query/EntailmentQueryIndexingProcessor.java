@@ -25,10 +25,9 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
-import org.semanticweb.elk.reasoner.completeness.Feature;
 import org.semanticweb.elk.reasoner.completeness.OccurrenceListener;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
-import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedFeature;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,10 +63,8 @@ public class EntailmentQueryIndexingProcessor extends
 		}
 		try {
 			return axiom.accept(converter_);
-		} catch (final ElkIndexingUnsupportedException e) {
-			occurrenceTracker_.occurrenceChanged(
-					Feature.OCCURRENCE_OF_UNSUPPORTED_EXPRESSION,
-					increment_);
+		} catch (final ElkIndexingUnsupportedFeature e) {
+			occurrenceTracker_.occurrenceChanged(e.getFeature(), increment_);
 			return null;
 		}
 	}

@@ -122,20 +122,21 @@ public class OccurrencesInOntology
 		if (count == 0) {
 			return;
 		}
-		String occurrences = count == 1 ? "occurrence" : "occurrences";
-		String polarity = "";
+		String occurrencesString = count == 1 ? "occurrence" : "occurrences";
+		String polarityString = "";
 		switch (occurrence.getPolarity()) {
 		case POSITIVE:
-			polarity = "positive ";
+			polarityString = "positive ";
 			break;
 		case NEGATIVE:
-			polarity = "negative ";
+			polarityString = "negative ";
 		default:
 			break;
 		}
 		logger.info(
 				"{} {}{} of {} found in the current ontology. See DEBUG for more detail",
-				count, polarity, occurrences, occurrence.getConstructor());
+				count, polarityString, occurrencesString,
+				occurrence.getConstructor());
 		if (logger.isDebugEnabled()) {
 			Set<ElkAxiom> axioms = getRecentOccurrences(occurrence);
 			for (ElkAxiom axiom : axioms) {

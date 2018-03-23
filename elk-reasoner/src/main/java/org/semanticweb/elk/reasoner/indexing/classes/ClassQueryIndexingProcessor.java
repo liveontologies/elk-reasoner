@@ -24,9 +24,8 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionProcessor;
-import org.semanticweb.elk.reasoner.completeness.Feature;
 import org.semanticweb.elk.reasoner.completeness.OccurrenceListener;
-import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedFeature;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,10 +63,8 @@ public class ClassQueryIndexingProcessor
 						(increment_ > 0 ? "addition" : "deletion"));
 			}
 			elkClassExpression.accept(indexer_);
-		} catch (final ElkIndexingUnsupportedException e) {
-			occurrenceTracker_.occurrenceChanged(
-					Feature.OCCURRENCE_OF_UNSUPPORTED_EXPRESSION,
-					increment_);
+		} catch (final ElkIndexingUnsupportedFeature e) {
+			occurrenceTracker_.occurrenceChanged(e.getFeature(), increment_);
 		}
 	}
 
