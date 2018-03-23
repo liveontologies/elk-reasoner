@@ -22,8 +22,6 @@ package org.semanticweb.elk.reasoner.completeness;
  * #L%
  */
 
-import org.slf4j.Logger;
-
 /**
  * The top level {@link IncompletenessMonitor} aggregating information from all
  * existing {@link IncompletenessMonitor}s.
@@ -32,26 +30,110 @@ import org.slf4j.Logger;
  */
 public class TopIncompletenessMonitor extends CombinedIncompletenessMonitor {
 
-	TopIncompletenessMonitor(OccurrenceManager manager) {
-		super(IncompletenessDueToUnsupportedFeatures.getMonitor(manager));
+	private static final Feature[] UNSUPPORTED_FEATURES_ = {
+			Feature.ANONYMOUS_INDIVIDUAL,
+			//
+			Feature.ASYMMETRIC_OBJECT_PROPERTY,
+			//
+			Feature.DATA_ALL_VALUES_FROM,
+			//
+			Feature.DATA_EXACT_CARDINALITY,
+			//
+			Feature.DATA_MAX_CARDINALITY,
+			//
+			Feature.DATA_MIN_CARDINALITY,
+			//
+			Feature.DATA_PROPERTY,
+			//
+			Feature.DATA_PROPERTY_ASSERTION,
+			//
+			Feature.DATA_PROPERTY_DOMAIN,
+			//
+			Feature.DATA_PROPERTY_RANGE,
+			//
+			Feature.DATA_SOME_VALUES_FROM,
+			//
+			Feature.DATATYPE,
+			//
+			Feature.DATATYPE_DEFINITION,
+			//
+			Feature.DISJOINT_DATA_PROPERTIES,
+			//
+			Feature.DISJOINT_OBJECT_PROPERTIES,
+			//
+			Feature.EQUIVALENT_DATA_PROPERTIES,
+			//
+			Feature.FUNCTIONAL_DATA_PROPERTY,
+			//
+			Feature.FUNCTIONAL_OBJECT_PROPERTY,
+			//
+			Feature.HAS_KEY,
+			//
+			Feature.INVERSE_FUNCTIONAL_OBJECT_PROPERTY,
+			//
+			Feature.INVERSE_OBJECT_PROPERTIES,
+			//
+			Feature.IRREFLEXIVE_OBJECT_PROPERTY,
+			//
+			Feature.NEGATIVE_DATA_PROPERTY_ASSERTION,
+			//
+			Feature.NEGATIVE_OBJECT_PROPERTY_ASSERTION,
+			//
+			Feature.NEGATIVE_OCCURRENCE_OF_OBJECT_COMPLEMENT_OF,
+			//
+			Feature.NEGATIVE_OCCURRENCE_OF_TOP_OBJECT_PROPERTY,
+			//
+			Feature.OBJECT_ALL_VALUES_FROM,
+			//
+			Feature.OBJECT_EXACT_CARDINALITY,
+			//
+			Feature.OBJECT_HAS_SELF,
+			//
+			Feature.OBJECT_INVERSE_OF,
+			//
+			Feature.OBJECT_MAX_CARDINALITY,
+			//
+			Feature.OBJECT_MIN_CARDINALITY,
+			//
+			Feature.OBJECT_ONE_OF,
+			//
+			Feature.OCCURRENCE_OF_DATA_HAS_VALUE,
+			//
+			Feature.OCCURRENCE_OF_DISJOINT_UNION,
+			//
+			Feature.POSITIVE_OCCURRENCE_OF_BOTTOM_OBJECT_PROPERTY,
+			//
+			Feature.POSITIVE_OCCURRENCE_OF_OBJECT_UNION_OF,
+			//
+			Feature.SUB_DATA_PROPERTY_OF,
+			//
+			Feature.SWRL_RULE,
+			//
+			Feature.SYMMETRIC_OBJECT_PROPERTY };
+
+	private static final Feature[][] UNSUPPORTED_COMBINATIONS_OF_FEATURES_ = { { //
+			Feature.OCCURRENCE_OF_OBJECT_PROPERTY_RANGE,
+			//
+			Feature.OCCURRENCE_OF_OBJECT_PROPERTY_ASSERTION } };
+
+	TopIncompletenessMonitor(OccurrenceManager occurences) {
+		super(getMonitors(occurences));
 	}
 
-	@Override
-	public void explainIncompleteness(Logger logger) {
-		if (hasNewExplanation()) {
-			logger.warn(
-					"Reasoning may be incomplete! See INFO for more details.");
-			super.explainIncompleteness(logger);
+	private static IncompletenessMonitor[] getMonitors(
+			OccurrenceManager occurrences) {
+		IncompletenessMonitor[] monitors = new IncompletenessMonitor[UNSUPPORTED_FEATURES_.length
+				+ UNSUPPORTED_COMBINATIONS_OF_FEATURES_.length];
+		int pos = 0;
+		for (Feature feature : UNSUPPORTED_FEATURES_) {
+			monitors[pos++] = new IncompletenessDueToUnsupportedFeatures(
+					occurrences, feature);
 		}
-	}
-
-	public static IncompletenessMonitor getMonitor(OccurrenceManager manager) {
-		return new TopIncompletenessMonitor(manager);
-	}
-
-	public static void checkCompleteness(OccurrenceManager manager,
-			Logger logger) {
-		getMonitor(manager).explainIncompleteness(logger);
+		for (Feature[] combination : UNSUPPORTED_COMBINATIONS_OF_FEATURES_) {
+			monitors[pos++] = new IncompletenessDueToUnsupportedFeatures(
+					occurrences, combination);
+		}
+		return monitors;
 	}
 
 }

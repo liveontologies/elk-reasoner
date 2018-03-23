@@ -620,16 +620,14 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 				"Query was not computed yet: " + classExpression);
 	}
 
-	OccurrenceManager getOccurrenceManager(
+	OccurrenceCounter getOccurrenceCounter(
 			final ElkClassExpression classExpression) {
 		OccurrenceCounter occurrences = queried_
 				.get(classExpression).occurrences;
 		if (occurrences == null) {
 			occurrences = EmptyOccurrenceCounter.get();
 		}
-
-		return new OccurrencesInClassExpressionQuery(classExpression,
-				occurrences);
+		return occurrences;
 	}
 
 	/**
