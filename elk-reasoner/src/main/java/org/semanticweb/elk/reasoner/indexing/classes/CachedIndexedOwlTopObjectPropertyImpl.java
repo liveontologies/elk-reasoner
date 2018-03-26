@@ -49,7 +49,7 @@ public class CachedIndexedOwlTopObjectPropertyImpl
 
 			// negative occurrences are unsupported
 			index.occurrenceChanged(
-					Feature.NEGATIVE_OCCURRENCE_OF_TOP_OBJECT_PROPERTY,
+					Feature.TOP_OBJECT_PROPERTY_NEGATIVE,
 					increment.negativeIncrement);
 
 			return true;
