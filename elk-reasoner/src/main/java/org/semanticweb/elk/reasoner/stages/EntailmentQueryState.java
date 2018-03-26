@@ -41,7 +41,7 @@ import org.semanticweb.elk.reasoner.completeness.Feature;
 import org.semanticweb.elk.reasoner.completeness.OccurrenceCounter;
 import org.semanticweb.elk.reasoner.completeness.OccurrenceListener;
 import org.semanticweb.elk.reasoner.completeness.OccurrenceRegistry;
-import org.semanticweb.elk.reasoner.completeness.OntologyIncompletenessMonitor;
+import org.semanticweb.elk.reasoner.completeness.OntologySatisfiabilityIncompletenessMonitor;
 import org.semanticweb.elk.reasoner.completeness.QueryIncompletenessMonitor;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyCheckingState;
@@ -100,7 +100,7 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 	 */
 	private final Set<ElkAxiom> lastQueries_ = new ArrayHashSet<ElkAxiom>();
 
-	private final OntologyIncompletenessMonitor ontologyIncompletenessMonitor_;
+	private final OntologySatisfiabilityIncompletenessMonitor ontologySatisfiabilityIncompletenessMonitor_;
 
 	/**
 	 * State of the query of a particular axiom. There are two forbidden states:
@@ -167,7 +167,7 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 
 		private boolean checkEntailmentCompleteness() {
 			return QueryIncompletenessMonitor.checkQueryReasoningCompleteness(
-					getQuery(), ontologyIncompletenessMonitor_,
+					getQuery(), ontologySatisfiabilityIncompletenessMonitor_,
 					getOccurrenceCounter(), LOGGER_);
 		}
 		
@@ -234,7 +234,7 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 			final SaturationState<C> saturationState,
 			final ConsistencyCheckingState consistencyCheckingState,
 			final SaturationConclusion.Factory factory,
-			final OntologyIncompletenessMonitor ontologyIncompletenessMonitor) {
+			final OntologySatisfiabilityIncompletenessMonitor ontologySatisfiabilityIncompletenessMonitor) {
 		this.saturationState_ = saturationState;
 		this.consistencyCheckingState_ = consistencyCheckingState;
 		this.conclusionFactory_ = factory;
@@ -243,7 +243,7 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 		LOGGER_.info("{} = {}", ReasonerConfiguration.ENTAILMENT_QUERY_EVICTOR,
 				builder);
 		this.queriedEvictor_ = ((Evictor.Builder) builder).build();
-		this.ontologyIncompletenessMonitor_ = ontologyIncompletenessMonitor;
+		this.ontologySatisfiabilityIncompletenessMonitor_ = ontologySatisfiabilityIncompletenessMonitor;
 	}
 
 	/**

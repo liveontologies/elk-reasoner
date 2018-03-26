@@ -26,6 +26,7 @@ import java.util.List;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.reasoner.completeness.Feature;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlNothing;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
@@ -110,6 +111,10 @@ final class CachedIndexedOwlNothingImpl extends CachedIndexedClassImpl
 			return false;
 		}
 
+		// positive occurrences are unsupported for property classification
+		index.occurrenceChanged(Feature.OWL_NOTHING_POSITIVE,
+				increment.positiveIncrement);
+		
 		return true;
 	}
 

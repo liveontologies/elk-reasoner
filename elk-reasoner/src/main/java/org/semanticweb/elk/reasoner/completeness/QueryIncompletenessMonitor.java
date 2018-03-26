@@ -35,13 +35,15 @@ public class QueryIncompletenessMonitor extends TopIncompletenessMonitor {
 				occurencesInQuery));
 	}
 
-	QueryIncompletenessMonitor(OntologyIncompletenessMonitor ontologyMonitor,
+	QueryIncompletenessMonitor(
+			OntologySatisfiabilityIncompletenessMonitor ontologySatisfiabilityMonitor,
 			OccurrenceManager occurencesInQuery) {
-		this(ontologyMonitor.getOccurrencesInOntology(), occurencesInQuery);
+		this(ontologySatisfiabilityMonitor.getOccurrencesInOntology(),
+				occurencesInQuery);
 	}
 
 	private static boolean checkQueryReasoningCompleteness(ElkObject query,
-			OntologyIncompletenessMonitor ontologyMonitor,
+			OntologySatisfiabilityIncompletenessMonitor ontologyMonitor,
 			OccurrenceManager occurrencesInQuery, Logger logger) {
 		if (!ontologyMonitor.checkCompleteness(logger)) {
 			// general ontology reasoning could be already incomplete
@@ -60,7 +62,7 @@ public class QueryIncompletenessMonitor extends TopIncompletenessMonitor {
 	}
 
 	public static QueryIncompletenessMonitor get(ElkClassExpression query,
-			OntologyIncompletenessMonitor ontologyMonitor,
+			OntologySatisfiabilityIncompletenessMonitor ontologyMonitor,
 			OccurrenceCounter occurrencesInQuery) {
 		return new QueryIncompletenessMonitor(ontologyMonitor,
 				new OccurrencesInClassExpressionQuery(query,
@@ -68,7 +70,7 @@ public class QueryIncompletenessMonitor extends TopIncompletenessMonitor {
 	}
 
 	public static QueryIncompletenessMonitor get(ElkAxiom query,
-			OntologyIncompletenessMonitor ontologyMonitor,
+			OntologySatisfiabilityIncompletenessMonitor ontologyMonitor,
 			OccurrenceCounter occurrencesInQuery) {
 		return new QueryIncompletenessMonitor(ontologyMonitor,
 				new OccurrencesInEntailmentQuery(query, occurrencesInQuery));
@@ -81,7 +83,7 @@ public class QueryIncompletenessMonitor extends TopIncompletenessMonitor {
 	 * @param query
 	 *            the query for which to check incompleteness
 	 * @param ontologyMonitor
-	 *            the main {@link OntologyIncompletenessMonitor}
+	 *            the main {@link OntologySatisfiabilityIncompletenessMonitor}
 	 * @param occurrencesInQuery
 	 *            occurrences of {@link Feature}s in the query
 	 * @param logger
@@ -90,7 +92,7 @@ public class QueryIncompletenessMonitor extends TopIncompletenessMonitor {
 	 */
 	public static boolean checkQueryReasoningCompleteness(
 			ElkClassExpression query,
-			OntologyIncompletenessMonitor ontologyMonitor,
+			OntologySatisfiabilityIncompletenessMonitor ontologyMonitor,
 			OccurrenceCounter occurrencesInQuery, Logger logger) {
 		return checkQueryReasoningCompleteness((ElkObject) query,
 				ontologyMonitor, new OccurrencesInClassExpressionQuery(query,
@@ -105,7 +107,7 @@ public class QueryIncompletenessMonitor extends TopIncompletenessMonitor {
 	 * @param query
 	 *            the query for which to check incompleteness
 	 * @param ontologyMonitor
-	 *            the main {@link OntologyIncompletenessMonitor}
+	 *            the main {@link OntologySatisfiabilityIncompletenessMonitor}
 	 * @param occurrencesInQuery
 	 *            occurrences of {@link Feature}s in the query
 	 * @param logger
@@ -113,7 +115,7 @@ public class QueryIncompletenessMonitor extends TopIncompletenessMonitor {
 	 *         complete and {@code false} otherwise
 	 */
 	public static boolean checkQueryReasoningCompleteness(ElkAxiom query,
-			OntologyIncompletenessMonitor ontologyMonitor,
+			OntologySatisfiabilityIncompletenessMonitor ontologyMonitor,
 			OccurrenceCounter occurrencesInQuery, Logger logger) {
 		return checkQueryReasoningCompleteness((ElkObject) query,
 				ontologyMonitor,

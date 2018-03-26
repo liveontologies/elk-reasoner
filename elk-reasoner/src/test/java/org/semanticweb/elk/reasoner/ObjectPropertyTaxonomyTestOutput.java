@@ -37,7 +37,7 @@ public class ObjectPropertyTaxonomyTestOutput
 	public ObjectPropertyTaxonomyTestOutput(Reasoner reasoner)
 			throws ElkException {
 		this(reasoner.getObjectPropertyTaxonomyQuietly(),
-				reasoner.isOntologyReasoningComplete());
+				reasoner.isObjectPropertyTaxonomyComplete());
 	}
 
 }

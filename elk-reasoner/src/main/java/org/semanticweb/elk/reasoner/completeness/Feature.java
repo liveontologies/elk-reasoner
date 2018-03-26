@@ -61,6 +61,8 @@ public enum Feature {
 	//
 	DATATYPE_DEFINITION("DatatypeDefinition"),
 	//
+	DISJOINT_CLASSES("DisjointClasses"),
+	//
 	DISJOINT_DATA_PROPERTIES("DisjointDataProperties"),
 	//
 	DISJOINT_OBJECT_PROPERTIES("DisjointObjectProperties"),
@@ -89,6 +91,8 @@ public enum Feature {
 	//
 	OBJECT_COMPLEMENT_OF_NEGATIVE("ObjectComplementOf", Polarity.NEGATIVE),
 	//
+	OBJECT_COMPLEMENT_OF_POSITIVE("ObjectComplementOf", Polarity.POSITIVE),
+	//
 	OBJECT_EXACT_CARDINALITY("ObjectExactCardinality"),
 	//
 	OBJECT_HAS_SELF("ObjectHasSelf"),
@@ -108,6 +112,7 @@ public enum Feature {
 	OBJECT_PROPERTY_RANGE("ObjectPropertyRange"),
 	//
 	OBJECT_UNION_OF_POSITIVE("ObjectUnionOf", Polarity.POSITIVE),
+	OWL_NOTHING_POSITIVE("owl:Nothing", Polarity.POSITIVE),
 	//
 	REFLEXIVE_OBJECT_PROPERTY("ReflexiveObjectProperty"),
 	//

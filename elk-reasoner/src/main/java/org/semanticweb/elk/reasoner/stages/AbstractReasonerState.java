@@ -49,7 +49,8 @@ import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerInterrupter;
 import org.semanticweb.elk.reasoner.completeness.IncompletenessMonitor;
 import org.semanticweb.elk.reasoner.completeness.OccurrencesInOntology;
-import org.semanticweb.elk.reasoner.completeness.OntologyIncompletenessMonitor;
+import org.semanticweb.elk.reasoner.completeness.OntologySatisfiabilityIncompletenessMonitor;
+import org.semanticweb.elk.reasoner.completeness.PropertyTaxonomyIncompletenessMonitor;
 import org.semanticweb.elk.reasoner.completeness.QueryIncompletenessMonitor;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyCheckingState;
@@ -177,7 +178,10 @@ public abstract class AbstractReasonerState implements TracingProof {
 	 * The main {@link IncompletenessMonitor} for ontology satisfiability,
 	 * classification and realization tasks
 	 */
-	private final OntologyIncompletenessMonitor ontologyIncompletenessMonitor_ = new OntologyIncompletenessMonitor();
+	private final OntologySatisfiabilityIncompletenessMonitor ontologySatisfiabilityCompletenessMonitor_ = new OntologySatisfiabilityIncompletenessMonitor();
+	
+	private final PropertyTaxonomyIncompletenessMonitor propertyTaxonomyIncompletenessMonitor_ = new PropertyTaxonomyIncompletenessMonitor(
+			ontologySatisfiabilityCompletenessMonitor_); 
 	/**
 	 * if {@code true}, reasoning will be done incrementally whenever possible
 	 */
@@ -220,7 +224,7 @@ public abstract class AbstractReasonerState implements TracingProof {
 				saturationState, elkFactory, ontologyIndex, factory_);
 		this.entailmentQueryState = new EntailmentQueryState(config,
 				saturationState, consistencyCheckingState, factory_,
-				ontologyIncompletenessMonitor_);
+				ontologySatisfiabilityCompletenessMonitor_);
 	}
 
 	public ElkObject.Factory getElkFactory() {
@@ -488,7 +492,7 @@ public abstract class AbstractReasonerState implements TracingProof {
 		boolean isInconsistent = consistencyCheckingState.isInconsistent();
 
 		if (!isInconsistent) {
-			checkOntologyReasoningCompleteness();
+			checkOntologySatisfiabilityCompleteness();
 		}
 
 		return consistencyCheckingState.isInconsistent();
@@ -535,7 +539,7 @@ public abstract class AbstractReasonerState implements TracingProof {
 
 		restoreTaxonomy();
 
-		checkOntologyReasoningCompleteness();
+		checkClassTaxonomyCompleteness();
 
 		return classTaxonomyState.getTaxonomy();
 	}
@@ -635,7 +639,7 @@ public abstract class AbstractReasonerState implements TracingProof {
 
 		restoreInstanceTaxonomy();
 
-		checkOntologyReasoningCompleteness();
+		checkInstanceTaxonomyCompleteness();
 
 		return instanceTaxonomyState.getTaxonomy();
 	}
@@ -712,7 +716,7 @@ public abstract class AbstractReasonerState implements TracingProof {
 		LOGGER_.trace("Property hierarchy computation");
 		complete(stageManager.objectPropertyTaxonomyComputationStage);
 
-		checkOntologyReasoningCompleteness();
+		checkPropertyTaxonomyCompleteness();		
 
 		return objectPropertyTaxonomyState.getTaxonomy();
 	}
@@ -819,24 +823,51 @@ public abstract class AbstractReasonerState implements TracingProof {
 		return true;
 	}
 
-	public boolean isOntologyReasoningComplete() {
-		return !ontologyIncompletenessMonitor_.isIncompletenessDetected();
+	public boolean isOntologySatisfiabilityComplete() {
+		return !ontologySatisfiabilityCompletenessMonitor_
+				.isIncompletenessDetected();
+	}
+	
+	public boolean isClassTaxonomyComplete() {
+		return isOntologySatisfiabilityComplete();
+	}
+	
+	public boolean isInstanceTaxonomyComplete() {
+		return isClassTaxonomyComplete();
+	}
+	
+	public boolean isObjectPropertyTaxonomyComplete() {
+		return !propertyTaxonomyIncompletenessMonitor_
+				.isIncompletenessDetected();
 	}
 	
 	public boolean isQueryReasoningComplete(ElkClassExpression query) {
 		return !QueryIncompletenessMonitor
-				.get(query, ontologyIncompletenessMonitor_,
+				.get(query, ontologySatisfiabilityCompletenessMonitor_,
 						classExpressionQueryState.getOccurrenceCounter(query))
 				.isIncompletenessDetected();
 	}
 	
-	private boolean checkOntologyReasoningCompleteness() {
-		return ontologyIncompletenessMonitor_.checkCompleteness(LOGGER_);
+	private boolean checkOntologySatisfiabilityCompleteness() {
+		return ontologySatisfiabilityCompletenessMonitor_.checkCompleteness(LOGGER_);
+	}
+	
+	private boolean checkClassTaxonomyCompleteness() {
+		return checkOntologySatisfiabilityCompleteness();
+	}
+	
+	private boolean checkInstanceTaxonomyCompleteness() {
+		return checkClassTaxonomyCompleteness();
+	}
+
+	private boolean checkPropertyTaxonomyCompleteness() {
+		return propertyTaxonomyIncompletenessMonitor_
+				.checkCompleteness(LOGGER_);
 	}
 
 	private boolean checkQueryReasoningCompleteness(ElkClassExpression query) {
 		return QueryIncompletenessMonitor.checkQueryReasoningCompleteness(query,
-				ontologyIncompletenessMonitor_,
+				ontologySatisfiabilityCompletenessMonitor_,
 				classExpressionQueryState.getOccurrenceCounter(query), LOGGER_);
 	}
 
@@ -1166,7 +1197,7 @@ public abstract class AbstractReasonerState implements TracingProof {
 	}
 
 	OccurrencesInOntology getOccurrencesInOntology() {
-		return ontologyIncompletenessMonitor_.getOccurrencesInOntology();
+		return ontologySatisfiabilityCompletenessMonitor_.getOccurrencesInOntology();
 	}
 
 	/*---------------------------------------------------

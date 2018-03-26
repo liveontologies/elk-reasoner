@@ -90,6 +90,11 @@ class CachedIndexedObjectComplementOfImpl extends
 				Feature.OBJECT_COMPLEMENT_OF_NEGATIVE,
 				increment.negativeIncrement);
 		
+		// positive occurrences may cause unsatisfiability of properties, which
+		// is currently undetected
+		index.occurrenceChanged(Feature.OBJECT_COMPLEMENT_OF_POSITIVE,
+				increment.positiveIncrement);
+		
 		return true;
 	}
 

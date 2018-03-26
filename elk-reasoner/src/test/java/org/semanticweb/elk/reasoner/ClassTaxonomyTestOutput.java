@@ -35,8 +35,7 @@ public class ClassTaxonomyTestOutput
 	}
 
 	public ClassTaxonomyTestOutput(Reasoner reasoner) throws ElkException {
-		this(reasoner.getTaxonomyQuietly(),
-				reasoner.isOntologyReasoningComplete());
+		this(reasoner.getTaxonomyQuietly(), reasoner.isClassTaxonomyComplete());
 	}
 
 }

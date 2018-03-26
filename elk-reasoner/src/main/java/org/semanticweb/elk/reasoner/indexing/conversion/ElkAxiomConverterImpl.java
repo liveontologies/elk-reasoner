@@ -505,6 +505,8 @@ public class ElkAxiomConverterImpl extends NoOpElkAnnotationAxiomConverter<Void>
 	public Void visit(ElkDisjointClassesAxiom axiom) {
 		indexDisjointMembers(elkDisjointClassesAxiomDisjointnessIndexer, axiom,
 				axiom.getClassExpressions());
+		occurrenceListener_.occurrenceChanged(Feature.DISJOINT_CLASSES,
+				increment_);
 		return null;
 	}
 
