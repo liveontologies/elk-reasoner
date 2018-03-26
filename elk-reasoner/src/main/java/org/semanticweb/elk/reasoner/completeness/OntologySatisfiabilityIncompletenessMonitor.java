@@ -1,5 +1,10 @@
 package org.semanticweb.elk.reasoner.completeness;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
+import org.slf4j.Logger;
+
 /*-
  * #%L
  * ELK Reasoner Core
@@ -22,29 +27,28 @@ package org.semanticweb.elk.reasoner.completeness;
  * #L%
  */
 
-import org.slf4j.Logger;
-
 /**
- * A monitor for checking incompleteness of general ontology reasoning tasks,
- * such as checking satisfiability, computing classification, realization.
+ * A monitor for determining incompleteness of ontology satisfiability checking.
  * 
  * @author Yevgeny Kazakov
  */
-public class OntologyIncompletenessMonitor extends TopIncompletenessMonitor {
+public class OntologySatisfiabilityIncompletenessMonitor
+		extends TopIncompletenessMonitor {
 
-	private final OccurrencesInOntology occurrences_;
+	private final OccurrencesInOntology occurencesInOntology_;
 
-	public OntologyIncompletenessMonitor(OccurrencesInOntology occurrences) {
-		super(occurrences);
-		this.occurrences_ = occurrences;
+	OntologySatisfiabilityIncompletenessMonitor(
+			OccurrencesInOntology occurencesInOntology) {
+		super(occurencesInOntology);
+		this.occurencesInOntology_ = occurencesInOntology;
 	}
 
-	public OntologyIncompletenessMonitor() {
+	public OntologySatisfiabilityIncompletenessMonitor() {
 		this(new OccurrencesInOntology());
 	}
 
 	public OccurrencesInOntology getOccurrencesInOntology() {
-		return occurrences_;
+		return occurencesInOntology_;
 	}
 
 	/**
@@ -58,7 +62,7 @@ public class OntologyIncompletenessMonitor extends TopIncompletenessMonitor {
 	public boolean checkCompleteness(Logger logger) {
 		if (hasNewExplanation()) {
 			logger.warn(
-					"Reasoning results with the current ontology may be incomplete! See INFO for more details.");
+					"Ontology could be unsatisfiable! Reasoning results may be incomplete! See INFO for more details.");
 			explainIncompleteness(logger);
 		}
 		return !isIncompletenessDetected();

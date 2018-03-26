@@ -51,7 +51,7 @@ public class InstanceTaxonomyTestOutput extends
 
 	public InstanceTaxonomyTestOutput(Reasoner reasoner) throws ElkException {
 		this(reasoner.getInstanceTaxonomyQuietly(),
-				reasoner.isOntologyReasoningComplete());
+				reasoner.isClassTaxonomyComplete());
 	}
 
 	@Override

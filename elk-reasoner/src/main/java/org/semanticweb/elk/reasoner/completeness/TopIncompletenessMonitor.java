@@ -1,5 +1,8 @@
 package org.semanticweb.elk.reasoner.completeness;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 /*-
  * #%L
  * ELK Reasoner Core
@@ -23,8 +26,8 @@ package org.semanticweb.elk.reasoner.completeness;
  */
 
 /**
- * The top level {@link IncompletenessMonitor} aggregating information from all
- * existing {@link IncompletenessMonitor}s.
+ * The base {@link IncompletenessMonitor} for checking potential
+ * unsatisfiability based on occurrences of {@link Feature}s.
  * 
  * @author Yevgeny Kazakov
  */
@@ -33,11 +36,7 @@ public class TopIncompletenessMonitor extends CombinedIncompletenessMonitor {
 	private static final Feature[][] UNSUPPORTED_COMBINATIONS_OF_FEATURES_ = {
 			{ Feature.OBJECT_PROPERTY_RANGE,
 					//
-					Feature.OBJECT_PROPERTY_ASSERTION },
-			// incomplete for property classification
-			{ Feature.REFLEXIVE_OBJECT_PROPERTY,
-					//
-					Feature.OBJECT_PROPERTY_CHAIN }, };
+					Feature.OBJECT_PROPERTY_ASSERTION } };
 
 	private static final Feature[] UNSUPPORTED_FEATURES_ = {
 			Feature.ANONYMOUS_INDIVIDUAL,
@@ -120,18 +119,16 @@ public class TopIncompletenessMonitor extends CombinedIncompletenessMonitor {
 			//
 			Feature.TOP_OBJECT_PROPERTY_NEGATIVE };
 
-	private static IncompletenessMonitor[] getMonitors(
+	static Collection<IncompletenessMonitor> getMonitors(
 			OccurrenceManager occurrences) {
-		IncompletenessMonitor[] monitors = new IncompletenessMonitor[UNSUPPORTED_FEATURES_.length
-				+ UNSUPPORTED_COMBINATIONS_OF_FEATURES_.length];
-		int pos = 0;
+		Collection<IncompletenessMonitor> monitors = new ArrayList<>();
 		for (Feature feature : UNSUPPORTED_FEATURES_) {
-			monitors[pos++] = new IncompletenessDueToUnsupportedFeatures(
-					occurrences, feature);
+			monitors.add(new IncompletenessDueToUnsupportedFeatures(occurrences,
+					feature));
 		}
 		for (Feature[] combination : UNSUPPORTED_COMBINATIONS_OF_FEATURES_) {
-			monitors[pos++] = new IncompletenessDueToUnsupportedFeatures(
-					occurrences, combination);
+			monitors.add(new IncompletenessDueToUnsupportedFeatures(occurrences,
+					combination));
 		}
 		return monitors;
 	}

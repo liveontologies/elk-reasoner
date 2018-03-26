@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.completeness;
 
+import java.util.Collection;
+
 /*-
  * #%L
  * ELK Reasoner Core
@@ -46,6 +48,10 @@ public class CombinedIncompletenessMonitor implements IncompletenessMonitor {
 
 	CombinedIncompletenessMonitor(IncompletenessMonitor... monitors) {
 		this.monitors_ = monitors;
+	}
+
+	CombinedIncompletenessMonitor(Collection<IncompletenessMonitor> monitors) {
+		this(monitors.toArray(new IncompletenessMonitor[0]));
 	}
 
 	@Override
