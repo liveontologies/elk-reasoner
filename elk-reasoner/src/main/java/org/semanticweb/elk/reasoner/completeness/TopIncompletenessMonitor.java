@@ -30,14 +30,27 @@ package org.semanticweb.elk.reasoner.completeness;
  */
 public class TopIncompletenessMonitor extends CombinedIncompletenessMonitor {
 
+	private static final Feature[][] UNSUPPORTED_COMBINATIONS_OF_FEATURES_ = {
+			{ Feature.OBJECT_PROPERTY_RANGE,
+					//
+					Feature.OBJECT_PROPERTY_ASSERTION },
+			// incomplete for property classification
+			{ Feature.REFLEXIVE_OBJECT_PROPERTY,
+					//
+					Feature.OBJECT_PROPERTY_CHAIN }, };
+
 	private static final Feature[] UNSUPPORTED_FEATURES_ = {
 			Feature.ANONYMOUS_INDIVIDUAL,
 			//
 			Feature.ASYMMETRIC_OBJECT_PROPERTY,
 			//
+			Feature.BOTTOM_OBJECT_PROPERTY_POSITIVE,
+			//
 			Feature.DATA_ALL_VALUES_FROM,
 			//
 			Feature.DATA_EXACT_CARDINALITY,
+			//
+			Feature.DATA_HAS_VALUE,
 			//
 			Feature.DATA_MAX_CARDINALITY,
 			//
@@ -61,6 +74,8 @@ public class TopIncompletenessMonitor extends CombinedIncompletenessMonitor {
 			//
 			Feature.DISJOINT_OBJECT_PROPERTIES,
 			//
+			Feature.DISJOINT_UNION,
+			//
 			Feature.EQUIVALENT_DATA_PROPERTIES,
 			//
 			Feature.FUNCTIONAL_DATA_PROPERTY,
@@ -79,11 +94,9 @@ public class TopIncompletenessMonitor extends CombinedIncompletenessMonitor {
 			//
 			Feature.NEGATIVE_OBJECT_PROPERTY_ASSERTION,
 			//
-			Feature.NEGATIVE_OCCURRENCE_OF_OBJECT_COMPLEMENT_OF,
-			//
-			Feature.NEGATIVE_OCCURRENCE_OF_TOP_OBJECT_PROPERTY,
-			//
 			Feature.OBJECT_ALL_VALUES_FROM,
+			//
+			Feature.OBJECT_COMPLEMENT_OF_NEGATIVE,
 			//
 			Feature.OBJECT_EXACT_CARDINALITY,
 			//
@@ -97,32 +110,15 @@ public class TopIncompletenessMonitor extends CombinedIncompletenessMonitor {
 			//
 			Feature.OBJECT_ONE_OF,
 			//
-			Feature.OCCURRENCE_OF_DATA_HAS_VALUE,
-			//
-			Feature.OCCURRENCE_OF_DISJOINT_UNION,
-			//
-			Feature.POSITIVE_OCCURRENCE_OF_BOTTOM_OBJECT_PROPERTY,
-			//
-			Feature.POSITIVE_OCCURRENCE_OF_OBJECT_UNION_OF,
+			Feature.OBJECT_UNION_OF_POSITIVE,
 			//
 			Feature.SUB_DATA_PROPERTY_OF,
 			//
 			Feature.SWRL_RULE,
 			//
-			Feature.SYMMETRIC_OBJECT_PROPERTY };
-
-	private static final Feature[][] UNSUPPORTED_COMBINATIONS_OF_FEATURES_ = {
-			{ Feature.OCCURRENCE_OF_OBJECT_PROPERTY_RANGE,
-					//
-					Feature.OCCURRENCE_OF_OBJECT_PROPERTY_ASSERTION },
-			// incomplete for property classification
-			{ Feature.REFLEXIVE_OBJECT_PROPERTY,
-					//
-					Feature.OBJECT_PROPERTY_CHAIN }, };
-
-	TopIncompletenessMonitor(OccurrenceManager occurences) {
-		super(getMonitors(occurences));
-	}
+			Feature.SYMMETRIC_OBJECT_PROPERTY,
+			//
+			Feature.TOP_OBJECT_PROPERTY_NEGATIVE };
 
 	private static IncompletenessMonitor[] getMonitors(
 			OccurrenceManager occurrences) {
@@ -138,6 +134,10 @@ public class TopIncompletenessMonitor extends CombinedIncompletenessMonitor {
 					occurrences, combination);
 		}
 		return monitors;
+	}
+
+	TopIncompletenessMonitor(OccurrenceManager occurences) {
+		super(getMonitors(occurences));
 	}
 
 }

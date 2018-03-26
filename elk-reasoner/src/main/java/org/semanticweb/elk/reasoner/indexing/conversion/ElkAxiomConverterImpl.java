@@ -546,7 +546,7 @@ public class ElkAxiomConverterImpl extends NoOpElkAnnotationAxiomConverter<Void>
 		default:
 			// indexing only one direction of the equivalence
 			occurrenceListener_.occurrenceChanged(
-					Feature.OCCURRENCE_OF_DISJOINT_UNION, increment_);
+					Feature.DISJOINT_UNION, increment_);
 			defined = (ModifiableIndexedClass) axiom.getDefinedClass()
 					.accept(positiveConverter_);
 			for (int pos = 0; pos < size; pos++) {
@@ -675,7 +675,7 @@ public class ElkAxiomConverterImpl extends NoOpElkAnnotationAxiomConverter<Void>
 	@Override
 	public Void visit(ElkObjectPropertyAssertionAxiom axiom) {
 		occurrenceListener_.occurrenceChanged(
-				Feature.OCCURRENCE_OF_OBJECT_PROPERTY_ASSERTION, increment_);
+				Feature.OBJECT_PROPERTY_ASSERTION, increment_);
 		axiomInferenceFactory_.getElkObjectPropertyAssertionAxiomConversion(
 				axiom, axiom.getSubject().accept(negativeConverter_),
 				positiveFactory_.getIndexedObjectSomeValuesFrom(
@@ -722,7 +722,7 @@ public class ElkAxiomConverterImpl extends NoOpElkAnnotationAxiomConverter<Void>
 	public Void visit(ElkObjectPropertyRangeAxiom axiom) {
 		// not fully supported with property assertions
 		occurrenceListener_.occurrenceChanged(
-				Feature.OCCURRENCE_OF_OBJECT_PROPERTY_RANGE, increment_);
+				Feature.OBJECT_PROPERTY_RANGE, increment_);
 		axiomInferenceFactory_.getElkObjectPropertyRangeAxiomConversion(axiom,
 				axiom.getProperty().accept(negativeConverter_),
 				axiom.getRange().accept(positiveConverter_));

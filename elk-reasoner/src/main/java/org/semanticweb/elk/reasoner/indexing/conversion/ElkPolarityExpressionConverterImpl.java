@@ -249,7 +249,7 @@ public class ElkPolarityExpressionConverterImpl
 	public ModifiableIndexedClassExpression visit(
 			ElkDataHasValue elkDataHasValue) {
 		occurrenceListener_.occurrenceChanged(
-				Feature.OCCURRENCE_OF_DATA_HAS_VALUE, increment_);
+				Feature.DATA_HAS_VALUE, increment_);
 		return factory_.getIndexedDataHasValue(elkDataHasValue);
 	}
 

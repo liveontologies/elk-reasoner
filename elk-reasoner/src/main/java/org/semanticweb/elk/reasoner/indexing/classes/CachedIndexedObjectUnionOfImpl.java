@@ -107,7 +107,7 @@ class CachedIndexedObjectUnionOfImpl extends
 		
 		// positive occurrences are unsupported
 		index.occurrenceChanged(
-				Feature.POSITIVE_OCCURRENCE_OF_OBJECT_UNION_OF,
+				Feature.OBJECT_UNION_OF_POSITIVE,
 				increment.positiveIncrement);
 
 		return true;

@@ -48,8 +48,7 @@ public class CachedIndexedOwlBottomObjectPropertyImpl
 		if (super.updateOccurrenceNumbers(index, increment)) {
 
 			// positive occurrences are unsupported
-			index.occurrenceChanged(
-					Feature.POSITIVE_OCCURRENCE_OF_BOTTOM_OBJECT_PROPERTY,
+			index.occurrenceChanged(Feature.BOTTOM_OBJECT_PROPERTY_POSITIVE,
 					increment.positiveIncrement);
 
 			return true;

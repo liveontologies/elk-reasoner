@@ -87,7 +87,7 @@ class CachedIndexedObjectComplementOfImpl extends
 
 		// negative occurrences not supported
 		index.occurrenceChanged(
-				Feature.NEGATIVE_OCCURRENCE_OF_OBJECT_COMPLEMENT_OF,
+				Feature.OBJECT_COMPLEMENT_OF_NEGATIVE,
 				increment.negativeIncrement);
 		
 		return true;

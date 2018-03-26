@@ -34,9 +34,14 @@ public enum Feature {
 	//
 	ASYMMETRIC_OBJECT_PROPERTY("AsymmetricObjectProperty"),
 	//
+	BOTTOM_OBJECT_PROPERTY_POSITIVE("owl:bottomObjectProperty",
+			Polarity.POSITIVE),
+	//
 	DATA_ALL_VALUES_FROM("DataAllValuesFrom"),
 	//
 	DATA_EXACT_CARDINALITY("DataExactCardinality"),
+	//
+	DATA_HAS_VALUE("DataHasValue"),
 	//
 	DATA_MAX_CARDINALITY("DataMaxCardinality"),
 	//
@@ -60,6 +65,8 @@ public enum Feature {
 	//
 	DISJOINT_OBJECT_PROPERTIES("DisjointObjectProperties"),
 	//
+	DISJOINT_UNION("DisjointUnion"),
+	//
 	EQUIVALENT_DATA_PROPERTIES("EquivalentDataProperties"),
 	//
 	FUNCTIONAL_DATA_PROPERTY("FunctionalDataProperty"),
@@ -78,13 +85,9 @@ public enum Feature {
 	//
 	NEGATIVE_OBJECT_PROPERTY_ASSERTION("NegativeObjectPropertyAssertion"),
 	//
-	NEGATIVE_OCCURRENCE_OF_OBJECT_COMPLEMENT_OF("ObjectComplementOf",
-			Polarity.NEGATIVE),
-	//
-	NEGATIVE_OCCURRENCE_OF_TOP_OBJECT_PROPERTY("owl:topObjectProperty",
-			Polarity.NEGATIVE),
-	//
 	OBJECT_ALL_VALUES_FROM("ObjectAllValuesFrom"),
+	//
+	OBJECT_COMPLEMENT_OF_NEGATIVE("ObjectComplementOf", Polarity.NEGATIVE),
 	//
 	OBJECT_EXACT_CARDINALITY("ObjectExactCardinality"),
 	//
@@ -96,21 +99,15 @@ public enum Feature {
 	//
 	OBJECT_MIN_CARDINALITY("ObjectMinCardinality"),
 	//
-	OBJECT_PROPERTY_CHAIN("ObjectPropertyChain"),
-	//
 	OBJECT_ONE_OF("ObjectOneOf"),
 	//
-	OCCURRENCE_OF_DATA_HAS_VALUE("DataHasValue"),
+	OBJECT_PROPERTY_ASSERTION("ObjectPropertyAssertion"),
 	//
-	OCCURRENCE_OF_DISJOINT_UNION("DisjointUnion"),
+	OBJECT_PROPERTY_CHAIN("ObjectPropertyChain"),
 	//
-	OCCURRENCE_OF_OBJECT_PROPERTY_ASSERTION("ObjectPropertyAssertion"),
+	OBJECT_PROPERTY_RANGE("ObjectPropertyRange"),
 	//
-	OCCURRENCE_OF_OBJECT_PROPERTY_RANGE("ObjectPropertyRange"),
-	//
-	POSITIVE_OCCURRENCE_OF_BOTTOM_OBJECT_PROPERTY("owl:bottomObjectProperty"),
-	//
-	POSITIVE_OCCURRENCE_OF_OBJECT_UNION_OF("ObjectUnionOf", Polarity.POSITIVE),
+	OBJECT_UNION_OF_POSITIVE("ObjectUnionOf", Polarity.POSITIVE),
 	//
 	REFLEXIVE_OBJECT_PROPERTY("ReflexiveObjectProperty"),
 	//
@@ -118,23 +115,25 @@ public enum Feature {
 	//
 	SWRL_RULE("SWRLRule"),
 	//
-	SYMMETRIC_OBJECT_PROPERTY("SymmetricObjectProperty");
+	SYMMETRIC_OBJECT_PROPERTY("SymmetricObjectProperty"),
+	//
+	TOP_OBJECT_PROPERTY_NEGATIVE("owl:topObjectProperty", Polarity.NEGATIVE);
 
 	public static enum Polarity {
-		POSITIVE, NEGATIVE, ANY
+		ANY, NEGATIVE, POSITIVE
 	}
 
 	private final String constructor_;
 
 	private final Polarity polarity_;
 
+	Feature(String constructor) {
+		this(constructor, Polarity.ANY);
+	}
+
 	Feature(String constructor, Polarity polarity) {
 		this.constructor_ = constructor;
 		this.polarity_ = polarity;
-	}
-
-	Feature(String constructor) {
-		this(constructor, Polarity.ANY);
 	}
 
 	public String getConstructor() {
