@@ -188,7 +188,7 @@
 				<configuration>
 					<archive>
 						<manifestEntries>
-							<Implementation-Title>${project.parent.name}</Implementation-Title>
+							<Implementation-Title>${project.parent.parent.name}</Implementation-Title>
 							<Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
 							<Implementation-Version>${project.version}.${maven.build.timestamp}</Implementation-Version>
 						</manifestEntries>
