@@ -27,28 +27,32 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
-import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
-public class TaxonomyTestOutput<T extends Taxonomy<?>>
-		extends ReasoningTestOutput<T> {
+public abstract class TaxonomyTestOutput<T extends Taxonomy<?>>
+		implements ReasoningTestOutput<T> {
+
+	private final T taxonomy_;
+
+	private final boolean isComplete_;
 
 	public TaxonomyTestOutput(T taxonomy, boolean isComplete) {
-		super(taxonomy, isComplete);
+		this.taxonomy_ = taxonomy;
+		this.isComplete_ = isComplete;
+	}
+
+	@Override
+	public T getResult() {
+		return taxonomy_;
+	}
+
+	@Override
+	public boolean isComplete() {
+		return isComplete_;
 	}
 
 	public T getTaxonomy() {
-		return getResoult();
-	}
-
-	@Override
-	public int hashCode() {
-		return TaxonomyHasher.hash(getTaxonomy());
-	}
-
-	@Override
-	public boolean equals(final Object obj) {
-		return (obj instanceof TaxonomyTestOutput<?> && super.equals(obj));
+		return getResult();
 	}
 
 	protected void dumpTaxonomy(final Writer writer) throws IOException {
@@ -61,6 +65,9 @@ public class TaxonomyTestOutput<T extends Taxonomy<?>>
 		Writer writer = new StringWriter();
 		try {
 			dumpTaxonomy(writer);
+			if (!isComplete_) {
+				writer.append(" (incomplete)");
+			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

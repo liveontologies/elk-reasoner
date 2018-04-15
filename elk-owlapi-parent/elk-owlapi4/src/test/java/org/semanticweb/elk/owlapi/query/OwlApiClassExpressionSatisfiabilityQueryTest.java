@@ -35,7 +35,6 @@ import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owlapi.OwlApiReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.BaseQueryTest;
-import org.semanticweb.elk.reasoner.query.BaseSatisfiabilityTestOutput;
 import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.reasoner.query.QueryTestManifest;
 import org.semanticweb.elk.reasoner.query.SatisfiabilityTestOutput;
@@ -78,9 +77,8 @@ public class OwlApiClassExpressionSatisfiabilityQueryTest
 					@Override
 					public SatisfiabilityTestOutput getActualOutput()
 							throws Exception {
-						final boolean isSatisfiable = getReasoner()
-								.isSatisfiable(manifest.getInput().getQuery());
-						return new BaseSatisfiabilityTestOutput(isSatisfiable);
+						return new OwlClassExpressionSatisfiabilityTestOutput(
+								getReasoner(), manifest.getInput().getQuery());
 					}
 
 					@Override

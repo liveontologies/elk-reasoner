@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner;
 
+import java.util.Objects;
+
 /*-
  * #%L
  * ELK Reasoner Core
@@ -24,6 +26,7 @@ package org.semanticweb.elk.reasoner;
 
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
 public class ObjectPropertyTaxonomyTestOutput
@@ -38,6 +41,24 @@ public class ObjectPropertyTaxonomyTestOutput
 			throws ElkException {
 		this(reasoner.getObjectPropertyTaxonomyQuietly(),
 				reasoner.isObjectPropertyTaxonomyComplete());
+	}
+
+	@Override
+	public final int hashCode() {
+		return Objects.hash(ObjectPropertyTaxonomyTestOutput.class,
+				// TODO: make direct comparison of mock taxonomy with taxonomy
+				TaxonomyHasher.hash(getTaxonomy()), isComplete());
+	}
+
+	@Override
+	public final boolean equals(final Object obj) {
+		if (obj instanceof ObjectPropertyTaxonomyTestOutput) {
+			ObjectPropertyTaxonomyTestOutput other = (ObjectPropertyTaxonomyTestOutput) obj;
+			return this == obj || (getTaxonomy().equals(other.getTaxonomy())
+					&& isComplete() == other.isComplete());
+		}
+		// else
+		return false;
 	}
 
 }

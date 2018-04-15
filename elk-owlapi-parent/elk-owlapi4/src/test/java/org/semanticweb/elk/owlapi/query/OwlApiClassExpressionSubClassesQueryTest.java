@@ -82,8 +82,7 @@ public class OwlApiClassExpressionSubClassesQueryTest extends
 						final NodeSet<OWLClass> subNodes = getReasoner()
 								.getSubClasses(manifest.getInput().getQuery(),
 										true);
-						return new OwlApiRelatedEntitiesTestOutput<OWLClass>(
-								subNodes);
+						return new OwlSubClassesTestOutput(subNodes, true);
 					}
 
 					@Override

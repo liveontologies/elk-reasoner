@@ -26,23 +26,25 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class EntailmentQueryTestManifest<Q, A>
-		extends QueryTestManifest<Q, EntailmentQueryTestOutput<A>> {
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+
+public class EntailmentQueryTestManifest<Q>
+		extends QueryTestManifest<Q, ElkEntailmentQueryTestOutput> {
 
 	public EntailmentQueryTestManifest(final String name, final URL input,
-			final Q query, final EntailmentQueryTestOutput<A> expectedOutput) {
+			final Q query, final ElkEntailmentQueryTestOutput expectedOutput) {
 		super(name, input, query, expectedOutput);
 	}
 
 	@Override
-	protected void appendDiff(final EntailmentQueryTestOutput<A> actualOutput,
+	protected void appendDiff(final ElkEntailmentQueryTestOutput actualOutput,
 			final StringBuilder result) {
-		final EntailmentQueryTestOutput<A> expOutput = getExpectedOutput();
-		final Map<A, Boolean> expMap = expOutput == null
-				? Collections.<A, Boolean> emptyMap() : expOutput.getOutput();
-		final Map<A, Boolean> actMap = actualOutput == null
-				? Collections.<A, Boolean> emptyMap()
-				: actualOutput.getOutput();
+		final ElkEntailmentQueryTestOutput expOutput = getExpectedOutput();
+		final Map<ElkAxiom, Boolean> expMap = expOutput == null
+				? Collections.<ElkAxiom, Boolean> emptyMap() : expOutput.getResult();
+		final Map<ElkAxiom, Boolean> actMap = actualOutput == null
+				? Collections.<ElkAxiom, Boolean> emptyMap()
+				: actualOutput.getResult();
 		writeMapDiff(expMap, actMap, result);
 	}
 
@@ -75,7 +77,7 @@ public class EntailmentQueryTestManifest<Q, A>
 	}
 
 	@Override
-	protected void appendOutput(final EntailmentQueryTestOutput<A> output,
+	protected void appendOutput(final ElkEntailmentQueryTestOutput output,
 			final StringBuilder result) {
 		// Do not write output!
 	}

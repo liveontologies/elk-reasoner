@@ -27,22 +27,35 @@ import org.semanticweb.owlapi.model.OWLLogicalEntity;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 
 /**
- * ensures that the test results can be compared with {@link #equals(Object)}
+ * A {@link RelatedEntitiesTestOutput} that returns {@link OWLLogicalEntity}s
  * 
  * @author Peter Skocovsky
+ * @author Yevgeny Kazakov
+ * 
+ * @param <E>
+ *            the type of the entities to return
  */
-public class OwlApiRelatedEntitiesTestOutput<E extends OWLLogicalEntity>
+public abstract class OwlApiRelatedEntitiesTestOutput<E extends OWLLogicalEntity>
 		implements RelatedEntitiesTestOutput<E> {
 
 	private final NodeSet<E> related_;
 
-	public OwlApiRelatedEntitiesTestOutput(final NodeSet<E> related) {
+	private final boolean isComplete_;
+
+	public OwlApiRelatedEntitiesTestOutput(final NodeSet<E> related,
+			boolean isComplete) {
 		this.related_ = related;
+		this.isComplete_ = isComplete;
 	}
 
 	@Override
-	public Iterable<? extends Iterable<E>> getRelatedEntities() {
+	public Iterable<? extends Iterable<E>> getResult() {
 		return related_;
+	}
+
+	@Override
+	public boolean isComplete() {
+		return isComplete_;
 	}
 
 	@Override
@@ -50,24 +63,21 @@ public class OwlApiRelatedEntitiesTestOutput<E extends OWLLogicalEntity>
 		return HashGenerator.combinedHashCode(getClass(), related_);
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public boolean equals(final Object obj) {
-		if (obj == null) {
-			return false;
+		if (obj instanceof OwlApiRelatedEntitiesTestOutput<?>) {
+			OwlApiRelatedEntitiesTestOutput<?> other = (OwlApiRelatedEntitiesTestOutput<?>) obj;
+			return this == obj || (related_.equals(other.related_)
+					&& isComplete_ == other.isComplete_);
 		}
-		if (obj == this) {
-			return true;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		return related_.equals(((OwlApiRelatedEntitiesTestOutput) obj).related_);
+		// else
+		return false;
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "(" + related_ + ")";
+		return getClass().getSimpleName() + "(" + related_
+				+ (isComplete_ ? "" : "...") + ")";
 	}
 
 }

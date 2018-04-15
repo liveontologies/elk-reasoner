@@ -27,12 +27,12 @@ package org.semanticweb.elk.reasoner;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Objects;
 
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
-import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 
 /**
@@ -55,13 +55,20 @@ public class InstanceTaxonomyTestOutput extends
 	}
 
 	@Override
-	public int hashCode() {
-		return InstanceTaxonomyHasher.hash(getTaxonomy());
+	public final int hashCode() {
+		return Objects.hash(InstanceTaxonomyTestOutput.class, getTaxonomy(),
+				isComplete());
 	}
 
 	@Override
-	public boolean equals(final Object obj) {
-		return (obj instanceof InstanceTaxonomyTestOutput && super.equals(obj));
+	public final boolean equals(final Object obj) {
+		if (obj instanceof InstanceTaxonomyTestOutput) {
+			InstanceTaxonomyTestOutput other = (InstanceTaxonomyTestOutput) obj;
+			return this == obj || (getTaxonomy().equals(other.getTaxonomy())
+					&& isComplete() == other.isComplete());
+		}
+		// else
+		return false;
 	}
 
 	@Override

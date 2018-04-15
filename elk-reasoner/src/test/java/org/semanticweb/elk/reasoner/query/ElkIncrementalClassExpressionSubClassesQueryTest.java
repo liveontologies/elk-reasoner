@@ -49,23 +49,17 @@ public class ElkIncrementalClassExpressionSubClassesQueryTest extends
 					@Override
 					public RelatedEntitiesTestOutput<ElkClass> getExpectedOutput()
 							throws Exception {
-						final Set<? extends Node<ElkClass>> subNodes = getStandardReasoner()
-								.getSuperClassesQuietly(
-										manifest.getInput().getQuery(),
-										true);
-						return new ElkRelatedEntitiesTestOutput<ElkClass>(
-								subNodes, ElkClassKeyProvider.INSTANCE);
+						return new ElkSubClassesTestOutput(
+								getStandardReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override
 					public RelatedEntitiesTestOutput<ElkClass> getActualOutput()
 							throws Exception {
-						final Set<? extends Node<ElkClass>> subNodes = getIncrementalReasoner()
-								.getSuperClassesQuietly(
-										manifest.getInput().getQuery(),
-										true);
-						return new ElkRelatedEntitiesTestOutput<ElkClass>(
-								subNodes, ElkClassKeyProvider.INSTANCE);
+						return new ElkSubClassesTestOutput(
+								getIncrementalReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override

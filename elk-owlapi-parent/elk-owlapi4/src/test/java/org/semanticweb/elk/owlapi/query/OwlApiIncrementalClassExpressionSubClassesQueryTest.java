@@ -33,7 +33,6 @@ import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestUtils;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 
 @RunWith(PolySuite.class)
@@ -66,21 +65,17 @@ public class OwlApiIncrementalClassExpressionSubClassesQueryTest extends
 					@Override
 					public RelatedEntitiesTestOutput<OWLClass> getExpectedOutput()
 							throws Exception {
-						final NodeSet<OWLClass> subNodes = getStandardReasoner()
-								.getSubClasses(manifest.getInput().getQuery(),
-										true);
-						return new OwlApiRelatedEntitiesTestOutput<OWLClass>(
-								subNodes);
+						return new OwlSubClassesTestOutput(
+								getStandardReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override
 					public RelatedEntitiesTestOutput<OWLClass> getActualOutput()
 							throws Exception {
-						final NodeSet<OWLClass> subNodes = getIncrementalReasoner()
-								.getSubClasses(manifest.getInput().getQuery(),
-										true);
-						return new OwlApiRelatedEntitiesTestOutput<OWLClass>(
-								subNodes);
+						return new OwlSubClassesTestOutput(
+								getIncrementalReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override

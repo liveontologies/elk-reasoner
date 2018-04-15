@@ -1,8 +1,8 @@
-package org.semanticweb.elk.reasoner;
+package org.semanticweb.elk.owlapi.query;
 
 /*-
  * #%L
- * ELK Reasoner Core
+ * ELK OWL API v.4 Binding
  * $Id:$
  * $HeadURL:$
  * %%
@@ -22,24 +22,15 @@ package org.semanticweb.elk.reasoner;
  * #L%
  */
 
-/**
- * A reasoning output with the information about completeness of the result
- * 
- * @author Yevgeny Kazakov
- *
- * @param <R>
- *            the type of the reasoning result
- */
-public interface ReasoningTestOutput<R> {
-	
-	/**
-	 * @return the reasoning result represented by this output
-	 */
-	public R getResult();
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.reasoner.NodeSet;
 
-	/**
-	 * @return the information whether the reasoning result is complete
-	 */
-	public boolean isComplete();
+public abstract class OwlRelatedClassesTestOutput
+		extends OwlApiRelatedEntitiesTestOutput<OWLClass> {
+
+	public OwlRelatedClassesTestOutput(final NodeSet<OWLClass> related,
+			boolean isComplete) {
+		super(related, isComplete);
+	}
 
 }

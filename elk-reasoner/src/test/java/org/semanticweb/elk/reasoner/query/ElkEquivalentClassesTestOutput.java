@@ -23,62 +23,79 @@ package org.semanticweb.elk.reasoner.query;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * ensures that the test results can be compared with {@link #equals(Object)}
  * 
  * @author Peter Skocovsky
+ * @author Yevgeny Kazakov
  */
-public class ElkEquivalentEntitiesTestOutput
+public class ElkEquivalentClassesTestOutput
 		implements EquivalentEntitiesTestOutput<ElkClass> {
 
 	private final List<ElkClass> equivalent_;
 
-	public ElkEquivalentEntitiesTestOutput(
-			final Collection<ElkClass> equivalent) {
+	private final boolean isComplete_;
+
+	public ElkEquivalentClassesTestOutput(final Collection<ElkClass> equivalent,
+			boolean isComplete) {
 		this.equivalent_ = QueryTestUtils.entities2Equalable(equivalent,
 				ElkClassKeyProvider.INSTANCE.getComparator());
+		this.isComplete_ = isComplete;
 	}
 
-	public ElkEquivalentEntitiesTestOutput(final Node<ElkClass> equivalent) {
+	public ElkEquivalentClassesTestOutput(Reasoner reasoner,
+			ElkClassExpression query) throws ElkException {
+		// TODO: get completeness
+		this(reasoner.getEquivalentClassesQuietly(query), true);
+	}
+
+	public ElkEquivalentClassesTestOutput(final Node<ElkClass> equivalent,
+			boolean isComplete) {
 		this.equivalent_ = QueryTestUtils.entities2Equalable(equivalent,
 				ElkClassKeyProvider.INSTANCE.getComparator());
+		this.isComplete_ = isComplete;
 	}
 
 	@Override
-	public Iterable<ElkClass> getEquivalent() {
+	public Iterable<ElkClass> getResult() {
 		return equivalent_;
 	}
 
 	@Override
-	public int hashCode() {
-		return HashGenerator.combinedHashCode(getClass(), equivalent_);
+	public boolean isComplete() {
+		return isComplete_;
 	}
 
 	@Override
-	public boolean equals(final Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (obj == this) {
-			return true;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
+	public final int hashCode() {
+		return Objects.hash(ElkEquivalentClassesTestOutput.class, equivalent_,
+				isComplete_);
+	}
 
-		return equivalent_
-				.equals(((ElkEquivalentEntitiesTestOutput) obj).equivalent_);
+	@Override
+	public final boolean equals(final Object obj) {
+		if (obj instanceof ElkEquivalentClassesTestOutput) {
+			ElkEquivalentClassesTestOutput other = (ElkEquivalentClassesTestOutput) obj;
+			return this == obj || (equivalent_.equals(other.equivalent_)
+					&& isComplete_ == other.isComplete_);
+		}
+		// else
+		return false;
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "(" + equivalent_ + ")";
+		return getClass().getSimpleName() + "(" + equivalent_ + ", "
+				+ (isComplete_ ? "" : "...") + ")";
 	}
 
 }

@@ -27,22 +27,22 @@ import java.util.Arrays;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
-import org.semanticweb.elk.owlapi.ElkProver;
 import org.semanticweb.elk.owlapi.EntailmentTestManifestCreator;
 import org.semanticweb.elk.owlapi.OwlApiReasoningTestDelegate;
+import org.semanticweb.elk.owlapi.query.OwlEntailmentQueryTestOutput;
 import org.semanticweb.elk.reasoner.query.BaseQueryTest;
 import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.reasoner.query.QueryTestManifest;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestUtils;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
+import org.semanticweb.elk.testing.TestUtils;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 
 @RunWith(PolySuite.class)
-public class EntailmentProofTest extends BaseQueryTest<OWLAxiom, Boolean> {
+public class EntailmentProofTest extends BaseQueryTest<OWLAxiom, OwlEntailmentQueryTestOutput> {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
@@ -62,19 +62,12 @@ public class EntailmentProofTest extends BaseQueryTest<OWLAxiom, Boolean> {
 	}
 
 	public EntailmentProofTest(
-			final QueryTestManifest<OWLAxiom, Boolean> manifest) {
-		super(manifest, new OwlApiReasoningTestDelegate<Boolean>(manifest) {
+			final QueryTestManifest<OWLAxiom, OwlEntailmentQueryTestOutput> manifest) {
+		super(manifest, new OwlApiReasoningTestDelegate<OwlEntailmentQueryTestOutput>(manifest) {
 
 			@Override
-			public Boolean getActualOutput() throws Exception {
-
-				final ElkProver prover = getProver();
-
-				final OWLAxiom axiom = manifest.getInput().getQuery();
-
-				ProofTestUtils.provabilityTest(prover, axiom);
-
-				return true;
+			public OwlEntailmentQueryTestOutput getActualOutput() throws Exception {
+				return new OwlEntailmentQueryTestOutput(getProver(), manifest.getInput().getQuery());
 			}
 
 			@Override

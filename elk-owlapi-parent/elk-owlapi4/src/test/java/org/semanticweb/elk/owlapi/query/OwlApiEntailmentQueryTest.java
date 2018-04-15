@@ -40,15 +40,15 @@ import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.reasoner.query.QueryTestManifest;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestUtils;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
+import org.semanticweb.elk.testing.TestUtils;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 
 @RunWith(PolySuite.class)
 public class OwlApiEntailmentQueryTest
-		extends BaseQueryTest<OWLAxiom, Boolean> {
+		extends BaseQueryTest<OWLAxiom, OwlEntailmentQueryTestOutput> {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
@@ -71,12 +71,13 @@ public class OwlApiEntailmentQueryTest
 	}
 
 	public OwlApiEntailmentQueryTest(
-			final QueryTestManifest<OWLAxiom, Boolean> manifest) {
-		super(manifest, new OwlApiReasoningTestDelegate<Boolean>(manifest) {
+			final QueryTestManifest<OWLAxiom, OwlEntailmentQueryTestOutput> manifest) {
+		super(manifest, new OwlApiReasoningTestDelegate<OwlEntailmentQueryTestOutput>(manifest) {
 
 			@Override
-			public Boolean getActualOutput() throws Exception {
-				return getReasoner().isEntailed(manifest.getInput().getQuery());
+			public OwlEntailmentQueryTestOutput getActualOutput() throws Exception {
+						return new OwlEntailmentQueryTestOutput(getReasoner(),
+								manifest.getInput().getQuery());
 			}
 
 			@Override
@@ -87,10 +88,10 @@ public class OwlApiEntailmentQueryTest
 		});
 	}
 
-	public static final ConfigurationUtils.ManifestCreator<QueryTestManifest<OWLAxiom, Boolean>> CLASS_QUERY_TEST_MANIFEST_CREATOR = new ConfigurationUtils.ManifestCreator<QueryTestManifest<OWLAxiom, Boolean>>() {
+	public static final ConfigurationUtils.ManifestCreator<QueryTestManifest<OWLAxiom, OwlEntailmentQueryTestOutput>> ENTAILMENT_QUERY_TEST_MANIFEST_CREATOR = new ConfigurationUtils.ManifestCreator<QueryTestManifest<OWLAxiom, OwlEntailmentQueryTestOutput>>() {
 
 		@Override
-		public Collection<? extends QueryTestManifest<OWLAxiom, Boolean>> createManifests(
+		public Collection<? extends QueryTestManifest<OWLAxiom, OwlEntailmentQueryTestOutput>> createManifests(
 				final String name, final List<URL> urls) throws IOException {
 
 			if (urls == null || urls.size() < 2) {
@@ -124,7 +125,7 @@ public class OwlApiEntailmentQueryTest
 		final Configuration classConfiguration = ConfigurationUtils
 				.loadFileBasedTestConfiguration(
 						ElkTestUtils.TEST_INPUT_LOCATION, BaseQueryTest.class,
-						CLASS_QUERY_TEST_MANIFEST_CREATOR, "owl", "classquery");
+						ENTAILMENT_QUERY_TEST_MANIFEST_CREATOR, "owl", "classquery");
 
 		final Configuration entailmentConfiguration = ConfigurationUtils
 				.loadFileBasedTestConfiguration(

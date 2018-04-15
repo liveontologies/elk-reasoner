@@ -40,12 +40,12 @@ import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
 
 public class EntailmentTestManifestCreator implements
-		ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<Collection<ElkAxiom>>, EntailmentQueryTestOutput<ElkAxiom>>> {
+		ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<Collection<ElkAxiom>>, ElkEntailmentQueryTestOutput>> {
 
 	public static final EntailmentTestManifestCreator INSTANCE = new EntailmentTestManifestCreator();
 
 	@Override
-	public Collection<? extends TestManifestWithOutput<QueryTestInput<Collection<ElkAxiom>>, EntailmentQueryTestOutput<ElkAxiom>>> createManifests(
+	public Collection<? extends TestManifestWithOutput<QueryTestInput<Collection<ElkAxiom>>, ElkEntailmentQueryTestOutput>> createManifests(
 			final String name, final List<URL> urls) throws IOException {
 
 		if (urls == null || urls.isEmpty()) {
@@ -85,9 +85,9 @@ public class EntailmentTestManifestCreator implements
 			}
 
 			return Collections.singleton(
-					new EntailmentQueryTestManifest<Collection<ElkAxiom>, ElkAxiom>(
+					new EntailmentQueryTestManifest<Collection<ElkAxiom>>(
 							name, input, query,
-							new EntailmentQueryTestOutput<ElkAxiom>(output)));
+							new ElkEntailmentQueryTestOutput(output, true)));
 
 		} catch (final Owl2ParseException e) {
 			throw new IOException(e);

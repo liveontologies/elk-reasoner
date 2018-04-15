@@ -21,49 +21,39 @@
  */
 package org.semanticweb.elk.reasoner.query;
 
-import org.semanticweb.elk.util.hashing.HashGenerator;
-
 /**
  * Simple implementation of {@link SatisfiabilityTestOutput}.
  * 
  * @author Peter Skocovsky
  */
-public class BaseSatisfiabilityTestOutput implements SatisfiabilityTestOutput {
+public abstract class BaseSatisfiabilityTestOutput
+		implements SatisfiabilityTestOutput {
 
 	private final boolean isSatisfiable_;
 
-	public BaseSatisfiabilityTestOutput(final boolean isSatisfiable) {
+	private final boolean isComplete_;
+
+	public BaseSatisfiabilityTestOutput(final boolean isSatisfiable,
+			boolean isComplete) {
 		this.isSatisfiable_ = isSatisfiable;
+		this.isComplete_ = isComplete;
 	}
 
 	@Override
-	public boolean isSatisfiable() {
+	public Boolean getResult() {
 		return isSatisfiable_;
 	}
 
 	@Override
-	public int hashCode() {
-		return HashGenerator.combinedHashCode(getClass(), isSatisfiable_);
-	}
-
-	@Override
-	public boolean equals(final Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (obj == this) {
-			return true;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		return isSatisfiable_ == ((SatisfiabilityTestOutput) obj)
-				.isSatisfiable();
+	public boolean isComplete() {
+		return isComplete_;
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "(" + isSatisfiable_ + ")";
+		return getClass().getSimpleName() + "("
+				+ (isSatisfiable_ ? "satisfiable" : "unsatisfiable")
+				+ ((isSatisfiable_ && !isComplete_) ? "?" : "") + ")";
 	}
 
 }

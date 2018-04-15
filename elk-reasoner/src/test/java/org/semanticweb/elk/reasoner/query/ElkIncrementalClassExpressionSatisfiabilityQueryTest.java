@@ -45,19 +45,17 @@ public class ElkIncrementalClassExpressionSatisfiabilityQueryTest extends
 					@Override
 					public SatisfiabilityTestOutput getExpectedOutput()
 							throws Exception {
-						final boolean isSatisfiable = getStandardReasoner()
-								.isSatisfiableQuietly(
-										manifest.getInput().getQuery());
-						return new BaseSatisfiabilityTestOutput(isSatisfiable);
+						return new ElkClassExpressionSatisfiabilityTestOutput(
+								getStandardReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override
 					public SatisfiabilityTestOutput getActualOutput()
 							throws Exception {
-						final boolean isSatisfiable = getIncrementalReasoner()
-								.isSatisfiableQuietly(
-										manifest.getInput().getQuery());
-						return new BaseSatisfiabilityTestOutput(isSatisfiable);
+						return new ElkClassExpressionSatisfiabilityTestOutput(
+								getIncrementalReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override

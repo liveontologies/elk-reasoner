@@ -75,7 +75,7 @@ public class OwlApiIncrementalEntailmentQueryTest
 		final Configuration classConfiguration = ConfigurationUtils
 				.loadFileBasedTestConfiguration(
 						ElkTestUtils.TEST_INPUT_LOCATION, BaseQueryTest.class,
-						OwlApiEntailmentQueryTest.CLASS_QUERY_TEST_MANIFEST_CREATOR,
+						OwlApiEntailmentQueryTest.ENTAILMENT_QUERY_TEST_MANIFEST_CREATOR,
 						"owl", "classquery");
 
 		final Configuration entailmentConfiguration = ConfigurationUtils

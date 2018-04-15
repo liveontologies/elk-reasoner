@@ -48,24 +48,17 @@ public class ElkIncrementalClassExpressionInstancesQueryTest extends
 
 					@Override
 					public RelatedEntitiesTestOutput<ElkNamedIndividual> getExpectedOutput()
-							throws Exception {
-						final Set<? extends Node<ElkNamedIndividual>> subNodes = getStandardReasoner()
-								.getInstancesQuietly(
-										manifest.getInput().getQuery(),
-										true);
-						return new ElkRelatedEntitiesTestOutput<ElkNamedIndividual>(
-								subNodes, ElkIndividualKeyProvider.INSTANCE);
+							throws Exception {						
+						return new ElkInstancesTestOutput(getStandardReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override
 					public RelatedEntitiesTestOutput<ElkNamedIndividual> getActualOutput()
 							throws Exception {
-						final Set<? extends Node<ElkNamedIndividual>> subNodes = getIncrementalReasoner()
-								.getInstancesQuietly(
-										manifest.getInput().getQuery(),
-										true);
-						return new ElkRelatedEntitiesTestOutput<ElkNamedIndividual>(
-								subNodes, ElkIndividualKeyProvider.INSTANCE);
+						return new ElkInstancesTestOutput(
+								getIncrementalReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override

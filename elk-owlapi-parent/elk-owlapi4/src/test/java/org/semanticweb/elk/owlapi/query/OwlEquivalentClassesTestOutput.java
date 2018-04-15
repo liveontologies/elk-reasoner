@@ -21,9 +21,12 @@
  */
 package org.semanticweb.elk.owlapi.query;
 
+import java.util.Objects;
+
+import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.elk.reasoner.query.EquivalentEntitiesTestOutput;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.reasoner.Node;
 
 /**
@@ -31,43 +34,57 @@ import org.semanticweb.owlapi.reasoner.Node;
  * 
  * @author Peter Skocovsky
  */
-public class OwlApiEquivalentEntitiesTestOutput
+public class OwlEquivalentClassesTestOutput
 		implements EquivalentEntitiesTestOutput<OWLClass> {
 
 	private final Node<OWLClass> equivalent_;
 
-	public OwlApiEquivalentEntitiesTestOutput(final Node<OWLClass> equivalent) {
+	private final boolean isComplete_;
+
+	public OwlEquivalentClassesTestOutput(final Node<OWLClass> equivalent,
+			boolean isComplete) {
 		this.equivalent_ = equivalent;
+		this.isComplete_ = isComplete;
+	}
+
+	public OwlEquivalentClassesTestOutput(ElkReasoner reasoner,
+			OWLClassExpression query) {
+		// TODO: completeness
+		this(reasoner.getEquivalentClasses(query), true);
+
 	}
 
 	@Override
-	public Iterable<OWLClass> getEquivalent() {
+	public Iterable<OWLClass> getResult() {
 		return equivalent_;
 	}
 
 	@Override
-	public int hashCode() {
-		return HashGenerator.combinedHashCode(getClass(), equivalent_);
+	public boolean isComplete() {
+		return isComplete_;
 	}
 
 	@Override
-	public boolean equals(final Object obj) {
-		if (obj == null) {
-			return false;
+	public final int hashCode() {
+		return Objects.hash(OwlEquivalentClassesTestOutput.class, equivalent_,
+				isComplete_);
+	}
+
+	@Override
+	public final boolean equals(final Object obj) {
+		if (obj instanceof OwlEquivalentClassesTestOutput) {
+			OwlEquivalentClassesTestOutput other = (OwlEquivalentClassesTestOutput) obj;
+			return this == obj || (equivalent_.equals(other.equivalent_)
+					&& isComplete_ == other.isComplete_);
 		}
-		if (obj == this) {
-			return true;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		return equivalent_
-				.equals(((OwlApiEquivalentEntitiesTestOutput) obj).equivalent_);
+		// else
+		return false;
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "(" + equivalent_ + ")";
+		return getClass().getSimpleName() + "(" + equivalent_ + ", "
+				+ (isComplete_ ? "" : "...") + ")";
 	}
 
 }

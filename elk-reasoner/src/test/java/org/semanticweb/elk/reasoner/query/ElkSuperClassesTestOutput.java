@@ -1,6 +1,4 @@
-package org.semanticweb.elk.reasoner;
-
-import java.util.Objects;
+package org.semanticweb.elk.reasoner.query;
 
 /*-
  * #%L
@@ -24,35 +22,39 @@ import java.util.Objects;
  * #L%
  */
 
+import java.util.Collection;
+import java.util.Objects;
+
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
-import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.reasoner.Reasoner;
 
-public class ClassTaxonomyTestOutput
-		extends TaxonomyTestOutput<Taxonomy<ElkClass>> {
+public class ElkSuperClassesTestOutput extends ElkRelatedClassesTestOutput {
 
-	public ClassTaxonomyTestOutput(Taxonomy<ElkClass> taxonomy,
+	public ElkSuperClassesTestOutput(
+			final Collection<? extends Collection<ElkClass>> superClasses,
 			boolean isComplete) {
-		super(taxonomy, isComplete);
+		super(superClasses, isComplete);
 	}
 
-	public ClassTaxonomyTestOutput(Reasoner reasoner) throws ElkException {
-		this(reasoner.getTaxonomyQuietly(), reasoner.isClassTaxonomyComplete());
+	public ElkSuperClassesTestOutput(Reasoner reasoner,
+			ElkClassExpression query) throws ElkException {
+		// TODO: completeness
+		super(reasoner.getSuperClassesQuietly(query, true), true);
 	}
 
 	@Override
 	public final int hashCode() {
-		return Objects.hash(ClassTaxonomyTestOutput.class,
-				// TODO: make direct comparison of mock taxonomy with taxonomy
-				TaxonomyHasher.hash(getTaxonomy()), isComplete());
+		return Objects.hash(ElkSuperClassesTestOutput.class, getResult(),
+				isComplete());
 	}
 
 	@Override
 	public final boolean equals(final Object obj) {
-		if (obj instanceof ClassTaxonomyTestOutput) {
-			ClassTaxonomyTestOutput other = (ClassTaxonomyTestOutput) obj;
-			return this == obj || (getTaxonomy().equals(other.getTaxonomy())
+		if (obj instanceof ElkSuperClassesTestOutput) {
+			ElkSuperClassesTestOutput other = (ElkSuperClassesTestOutput) obj;
+			return this == obj || (getResult().equals(other.getResult())
 					&& isComplete() == other.isComplete());
 		}
 		// else

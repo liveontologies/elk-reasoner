@@ -25,6 +25,7 @@ import java.util.Collection;
  */
 
 import org.slf4j.Logger;
+import org.slf4j.helpers.NOPLogger;
 
 /**
  * An {@link IncompletenessMonitor} consisting of a combination of several other
@@ -35,7 +36,7 @@ import org.slf4j.Logger;
  * @author Yevgeny Kazakov
  */
 public class CombinedIncompletenessMonitor implements IncompletenessMonitor {
-
+	
 	/**
 	 * the maximal number of monitors for which to print the explanations
 	 */
@@ -83,6 +84,9 @@ public class CombinedIncompletenessMonitor implements IncompletenessMonitor {
 			if (monitor.hasNewExplanation()) {
 				if (noExplanations++ < EXPLANATION_LIMIT_) {
 					monitor.explainIncompleteness(logger);
+				} else {
+					// need to log message to count it as explained
+					monitor.explainIncompleteness(NOPLogger.NOP_LOGGER);
 				}
 			}
 		}

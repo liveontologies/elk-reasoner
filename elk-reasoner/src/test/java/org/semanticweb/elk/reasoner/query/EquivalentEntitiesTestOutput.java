@@ -21,6 +21,8 @@
  */
 package org.semanticweb.elk.reasoner.query;
 
+import org.semanticweb.elk.reasoner.ReasoningTestOutput;
+
 /**
  * A test output of a query for equivalent entities.
  * 
@@ -29,11 +31,12 @@ package org.semanticweb.elk.reasoner.query;
  * @param <E>
  *            the type of entities.
  */
-public interface EquivalentEntitiesTestOutput<E> {
+public interface EquivalentEntitiesTestOutput<E> extends ReasoningTestOutput<Iterable<E>> {
 
 	/**
 	 * @return the equivalent entities.
 	 */
-	Iterable<E> getEquivalent();
+	@Override
+	Iterable<E> getResult();
 
 }

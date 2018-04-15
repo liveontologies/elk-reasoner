@@ -27,60 +27,54 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.taxonomy.model.ComparatorKeyProvider;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
- * ensures that the test results can be compared with {@link #equals(Object)}
+ * A {@link RelatedEntitiesTestOutput} that returns {@link ElkEntity}s
  * 
  * @author Peter Skocovsky
+ * @author Yevgeny Kazakov
+ * 
+ * @param <E>
+ *            the type of the entities to return
  */
-public class ElkRelatedEntitiesTestOutput<E extends ElkEntity>
+public abstract class ElkRelatedEntitiesTestOutput<E extends ElkEntity>
 		implements RelatedEntitiesTestOutput<E> {
 
 	private final Iterable<? extends Iterable<E>> related_;
 
+	private final boolean isComplete_;
+
 	public ElkRelatedEntitiesTestOutput(
 			final Collection<? extends Collection<E>> related,
-			final ComparatorKeyProvider<? super E> keyProvider) {
+			final ComparatorKeyProvider<? super E> keyProvider,
+			boolean isComplete) {
 		this.related_ = QueryTestUtils.related2Equalable(related,
 				keyProvider.getComparator());
+		this.isComplete_ = isComplete;
 	}
 
 	public ElkRelatedEntitiesTestOutput(final Set<? extends Node<E>> related,
-			final ComparatorKeyProvider<? super E> keyProvider) {
+			final ComparatorKeyProvider<? super E> keyProvider,
+			boolean isComplete) {
 		this.related_ = QueryTestUtils.relatedNodes2Equalable(related,
 				keyProvider.getComparator());
+		this.isComplete_ = isComplete;
 	}
 
 	@Override
-	public Iterable<? extends Iterable<E>> getRelatedEntities() {
+	public Iterable<? extends Iterable<E>> getResult() {
 		return related_;
 	}
 
 	@Override
-	public int hashCode() {
-		return HashGenerator.combinedHashCode(getClass(), related_);
-	}
-
-	@SuppressWarnings("rawtypes")
-	@Override
-	public boolean equals(final Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (obj == this) {
-			return true;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-
-		return related_.equals(((ElkRelatedEntitiesTestOutput) obj).related_);
+	public boolean isComplete() {
+		return isComplete_;
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "(" + related_ + ")";
+		return getClass().getSimpleName() + "(" + related_
+				+ (isComplete_ ? "" : "...") + ")";
 	}
 
 }

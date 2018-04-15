@@ -46,7 +46,7 @@ public class QueryTestManifest<Q, O>
 	private static final String LONG_NAME_SUFFIX_ = " ...";
 
 	public QueryTestManifest(final String name, final URL input, final Q query,
-			final O expectedOutput) {
+			final O expectedOutput) {		
 		super(new QueryTestInput<Q>() {
 
 			@Override
