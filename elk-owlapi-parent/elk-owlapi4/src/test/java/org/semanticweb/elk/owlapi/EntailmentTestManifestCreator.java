@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.elk.io.IOUtils;
+import org.semanticweb.elk.owlapi.query.OwlEntailmentQueryTestOutput;
 import org.semanticweb.elk.reasoner.query.QueryTestManifest;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -41,15 +42,15 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 public class EntailmentTestManifestCreator implements
-		ConfigurationUtils.ManifestCreator<QueryTestManifest<OWLAxiom, Boolean>> {
+		ConfigurationUtils.ManifestCreator<QueryTestManifest<OWLAxiom, OwlEntailmentQueryTestOutput>> {
 
 	public static final EntailmentTestManifestCreator INSTANCE = new EntailmentTestManifestCreator();
 
 	@Override
-	public Collection<? extends QueryTestManifest<OWLAxiom, Boolean>> createManifests(
+	public Collection<? extends QueryTestManifest<OWLAxiom, OwlEntailmentQueryTestOutput>> createManifests(
 			final String name, final List<URL> urls) throws IOException {
 
-		final Collection<QueryTestManifest<OWLAxiom, Boolean>> manifests = new ArrayList<QueryTestManifest<OWLAxiom, Boolean>>();
+		final Collection<QueryTestManifest<OWLAxiom, OwlEntailmentQueryTestOutput>> manifests = new ArrayList<QueryTestManifest<OWLAxiom, OwlEntailmentQueryTestOutput>>();
 
 		if (urls == null || urls.isEmpty()) {
 			// No input files. Fail, while something was probably forgotten.
@@ -94,8 +95,11 @@ public class EntailmentTestManifestCreator implements
 
 			// OWL API interface can query only one axiom at once.
 			for (final OWLAxiom axiom : query) {
-				manifests.add(new QueryTestManifest<OWLAxiom, Boolean>(name,
-						input, axiom, output.get(axiom)));
+				manifests.add(
+						new QueryTestManifest<OWLAxiom, OwlEntailmentQueryTestOutput>(
+								name, input, axiom,
+								new OwlEntailmentQueryTestOutput(
+										output.get(axiom), true)));
 			}
 
 			return manifests;

@@ -21,6 +21,8 @@
  */
 package org.semanticweb.elk.reasoner.query;
 
+import org.semanticweb.elk.reasoner.ReasoningTestOutput;
+
 /**
  * A test output of a query for related entities.
  * 
@@ -29,11 +31,13 @@ package org.semanticweb.elk.reasoner.query;
  * @param <E>
  *            the type of entities.
  */
-public interface RelatedEntitiesTestOutput<E> {
+public interface RelatedEntitiesTestOutput<E>
+		extends ReasoningTestOutput<Iterable<? extends Iterable<E>>> {
 
 	/**
 	 * @return the related entities.
 	 */
-	Iterable<? extends Iterable<E>> getRelatedEntities();
+	@Override
+	Iterable<? extends Iterable<E>> getResult();
 
 }

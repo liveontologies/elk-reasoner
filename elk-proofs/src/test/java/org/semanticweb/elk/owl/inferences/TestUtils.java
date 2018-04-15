@@ -45,20 +45,31 @@ public class TestUtils {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(TestUtils.class);
 
+	public static Set<? extends ElkAxiom> getNonDerivable(Reasoner reasoner,
+			Set<? extends ElkAxiom> ontology, ElkObject.Factory factory,
+			ElkAxiom goal) throws ElkException {
+		Proof<ElkInference> elkInferences = ReasonerElkProof.create(reasoner,
+				goal, factory);
+		InferenceDerivabilityChecker<ElkAxiom, ElkInference> checker = new InferenceDerivabilityChecker<ElkAxiom, ElkInference>(
+				elkInferences);
+		if (!checker.isDerivable(goal)) {
+			return null;
+		}
+		Set<? extends ElkAxiom> nonDerivable = checker
+				.getNonDerivableConclusions();
+		return nonDerivable;
+	}
+
 	public static void provabilityTest(Reasoner reasoner,
 			Set<? extends ElkAxiom> ontology, ElkObject.Factory factory,
 			ElkAxiom goal) throws ElkException {
 
 		LOGGER_.debug("Provability test: {}", goal);
-		Proof<ElkInference> elkInferences = ReasonerElkProof.create(reasoner, goal,
-				factory);
-		InferenceDerivabilityChecker<ElkAxiom, ElkInference> checker = new InferenceDerivabilityChecker<ElkAxiom, ElkInference>(
-				elkInferences);
-		if (!checker.isDerivable(goal)) {
+		Set<? extends ElkAxiom> nonDerivable = getNonDerivable(reasoner,
+				ontology, factory, goal);
+		if (nonDerivable == null) {
 			throw new AssertionError(String.format("%s: not derivable", goal));
 		}
-		Set<? extends ElkAxiom> nonDerivable = checker
-				.getNonDerivableConclusions();
 		if (!nonDerivable.isEmpty()) {
 			throw new AssertionError(
 					String.format("%s: not derivable", nonDerivable));

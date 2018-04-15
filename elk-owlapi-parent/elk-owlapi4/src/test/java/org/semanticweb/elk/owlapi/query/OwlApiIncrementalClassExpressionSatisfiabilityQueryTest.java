@@ -26,7 +26,6 @@ import java.util.Arrays;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.owlapi.OwlApiIncrementalReasoningTestDelegate;
-import org.semanticweb.elk.reasoner.query.BaseSatisfiabilityTestOutput;
 import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.reasoner.query.SatisfiabilityTestOutput;
 import org.semanticweb.elk.testing.PolySuite;
@@ -65,17 +64,17 @@ public class OwlApiIncrementalClassExpressionSatisfiabilityQueryTest extends
 					@Override
 					public SatisfiabilityTestOutput getExpectedOutput()
 							throws Exception {
-						final boolean isSatisfiable = getStandardReasoner()
-								.isSatisfiable(manifest.getInput().getQuery());
-						return new BaseSatisfiabilityTestOutput(isSatisfiable);
+						return new OwlClassExpressionSatisfiabilityTestOutput(
+								getStandardReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override
 					public SatisfiabilityTestOutput getActualOutput()
 							throws Exception {
-						final boolean isSatisfiable = getIncrementalReasoner()
-								.isSatisfiable(manifest.getInput().getQuery());
-						return new BaseSatisfiabilityTestOutput(isSatisfiable);
+						return new OwlClassExpressionSatisfiabilityTestOutput(
+								getIncrementalReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override

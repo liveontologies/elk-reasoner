@@ -1,8 +1,5 @@
 package org.semanticweb.elk.reasoner.completeness;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.slf4j.Logger;
 
 /*-

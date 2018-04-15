@@ -28,7 +28,6 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.incremental.ElkIncrementalReasoningTestDelegate;
-import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestManifest;
 
@@ -47,19 +46,17 @@ public class ElkIncrementalClassExpressionEquivalentClassesQueryTest extends
 					@Override
 					public EquivalentEntitiesTestOutput<ElkClass> getExpectedOutput()
 							throws Exception {
-						final Node<ElkClass> equivalent = getStandardReasoner()
-								.getEquivalentClassesQuietly(
-										manifest.getInput().getQuery());
-						return new ElkEquivalentEntitiesTestOutput(equivalent);
+						return new ElkEquivalentClassesTestOutput(
+								getStandardReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override
 					public EquivalentEntitiesTestOutput<ElkClass> getActualOutput()
 							throws Exception {
-						final Node<ElkClass> equivalent = getIncrementalReasoner()
-								.getEquivalentClassesQuietly(
-										manifest.getInput().getQuery());
-						return new ElkEquivalentEntitiesTestOutput(equivalent);
+						return new ElkEquivalentClassesTestOutput(
+								getIncrementalReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override

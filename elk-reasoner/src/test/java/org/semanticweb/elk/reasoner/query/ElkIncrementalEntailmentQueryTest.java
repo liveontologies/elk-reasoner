@@ -42,30 +42,28 @@ import org.semanticweb.elk.testing.TestManifest;
 
 @RunWith(PolySuite.class)
 public class ElkIncrementalEntailmentQueryTest extends
-		BaseIncrementalQueryTest<Collection<ElkAxiom>, ElkAxiom, EntailmentQueryTestOutput<ElkAxiom>> {
+		BaseIncrementalQueryTest<Collection<ElkAxiom>, ElkAxiom, ElkEntailmentQueryTestOutput> {
 
 	public ElkIncrementalEntailmentQueryTest(
 			final TestManifest<QueryTestInput<Collection<ElkAxiom>>> manifest) {
 		super(manifest,
-				new ElkIncrementalReasoningTestDelegate<EntailmentQueryTestOutput<ElkAxiom>>(
+				new ElkIncrementalReasoningTestDelegate<ElkEntailmentQueryTestOutput>(
 						manifest) {
 
 					@Override
-					public EntailmentQueryTestOutput<ElkAxiom> getExpectedOutput()
+					public ElkEntailmentQueryTestOutput getExpectedOutput()
 							throws Exception {
-						final Map<ElkAxiom, EntailmentQueryResult> result = getStandardReasoner()
-								.isEntailed(manifest.getInput().getQuery());
-						return new EntailmentQueryTestOutput<ElkAxiom>(
-								ElkEntailmentQueryTest.resultToOutput(result));
+						return new ElkEntailmentQueryTestOutput(
+								getStandardReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override
-					public EntailmentQueryTestOutput<ElkAxiom> getActualOutput()
+					public ElkEntailmentQueryTestOutput getActualOutput()
 							throws Exception {
-						final Map<ElkAxiom, EntailmentQueryResult> result = getIncrementalReasoner()
-								.isEntailed(manifest.getInput().getQuery());
-						return new EntailmentQueryTestOutput<ElkAxiom>(
-								ElkEntailmentQueryTest.resultToOutput(result));
+						return new ElkEntailmentQueryTestOutput(
+								getIncrementalReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override

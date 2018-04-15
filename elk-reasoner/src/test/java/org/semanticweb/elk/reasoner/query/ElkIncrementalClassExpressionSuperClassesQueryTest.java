@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.query;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
@@ -31,8 +30,6 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.incremental.ElkIncrementalReasoningTestDelegate;
-import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
-import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestUtils;
@@ -69,21 +66,17 @@ public class ElkIncrementalClassExpressionSuperClassesQueryTest extends
 					@Override
 					public RelatedEntitiesTestOutput<ElkClass> getExpectedOutput()
 							throws Exception {
-						final Set<? extends Node<ElkClass>> subNodes = getStandardReasoner()
-								.getSuperClassesQuietly(
-										manifest.getInput().getQuery(), true);
-						return new ElkRelatedEntitiesTestOutput<ElkClass>(
-								subNodes, ElkClassKeyProvider.INSTANCE);
+						return new ElkSuperClassesTestOutput(
+								getStandardReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override
 					public RelatedEntitiesTestOutput<ElkClass> getActualOutput()
 							throws Exception {
-						final Set<? extends Node<ElkClass>> subNodes = getIncrementalReasoner()
-								.getSuperClassesQuietly(
-										manifest.getInput().getQuery(), true);
-						return new ElkRelatedEntitiesTestOutput<ElkClass>(
-								subNodes, ElkClassKeyProvider.INSTANCE);
+						return new ElkSuperClassesTestOutput(
+								getIncrementalReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override

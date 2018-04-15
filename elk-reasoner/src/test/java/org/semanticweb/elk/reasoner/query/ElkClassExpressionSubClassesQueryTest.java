@@ -29,7 +29,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
@@ -38,16 +37,13 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.ElkReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
-import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
-import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
+import org.semanticweb.elk.testing.TestManifestWithOutput;
 
 import com.google.common.collect.ImmutableMap;
-
-import org.semanticweb.elk.testing.TestManifestWithOutput;
 
 @RunWith(PolySuite.class)
 public class ElkClassExpressionSubClassesQueryTest extends
@@ -62,11 +58,8 @@ public class ElkClassExpressionSubClassesQueryTest extends
 					@Override
 					public RelatedEntitiesTestOutput<ElkClass> getActualOutput()
 							throws Exception {
-						final Set<? extends Node<ElkClass>> subNodes = getReasoner()
-								.getSubClassesQuietly(
-										manifest.getInput().getQuery(), true);
-						return new ElkRelatedEntitiesTestOutput<ElkClass>(
-								subNodes, ElkClassKeyProvider.INSTANCE);
+						return new ElkSubClassesTestOutput(getReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override

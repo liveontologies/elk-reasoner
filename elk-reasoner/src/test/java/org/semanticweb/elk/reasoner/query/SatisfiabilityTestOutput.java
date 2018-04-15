@@ -21,16 +21,20 @@
  */
 package org.semanticweb.elk.reasoner.query;
 
+import org.semanticweb.elk.reasoner.ReasoningTestOutput;
+
 /**
  * A test output of a satisfiability check.
  * 
  * @author Peter Skocovsky
+ * @author Yevgeny Kazakov
  */
-public interface SatisfiabilityTestOutput {
+public interface SatisfiabilityTestOutput extends ReasoningTestOutput<Boolean> {
 
 	/**
-	 * @return whether the output is satisfiable.
+	 * @return {@code true} if the output is satisfiable.
 	 */
-	boolean isSatisfiable();
+	@Override
+	Boolean getResult();
 
 }

@@ -56,9 +56,8 @@ public class ElkClassExpressionSatisfiabilityQueryTest
 
 			@Override
 			public SatisfiabilityTestOutput getActualOutput() throws Exception {
-				final boolean isSatisfiable = getReasoner()
-						.isSatisfiableQuietly(manifest.getInput().getQuery());
-				return new BaseSatisfiabilityTestOutput(isSatisfiable);
+				return new ElkClassExpressionSatisfiabilityTestOutput(
+						getReasoner(), manifest.getInput().getQuery());
 			}
 
 			@Override

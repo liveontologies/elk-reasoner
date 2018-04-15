@@ -52,8 +52,6 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIris;
 import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
-import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
-import org.semanticweb.elk.reasoner.taxonomy.ElkIndividualKeyProvider;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
@@ -250,9 +248,10 @@ public class ElkExpectedTestOutputLoader {
 			result.add(
 					new QueryTestManifest<ElkClassExpression, SatisfiabilityTestOutput>(
 							name, input, queryClass,
-							new BaseSatisfiabilityTestOutput(
+							new ElkClassExpressionSatisfiabilityTestOutput(
 									node == null || !node.containsKey(
-											PredefinedElkIris.OWL_NOTHING))));
+											PredefinedElkIris.OWL_NOTHING),
+									true)));
 		}
 
 		return result;
@@ -269,9 +268,9 @@ public class ElkExpectedTestOutputLoader {
 			result.add(
 					new QueryTestManifest<ElkClassExpression, EquivalentEntitiesTestOutput<ElkClass>>(
 							name, input, queryClass,
-							new ElkEquivalentEntitiesTestOutput(node == null
+							new ElkEquivalentClassesTestOutput(node == null
 									? Collections.<ElkClass> emptySet()
-									: node.values())));
+									: node.values(), true)));
 		}
 
 		return result;
@@ -304,8 +303,7 @@ public class ElkExpectedTestOutputLoader {
 			result.add(
 					new QueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>(
 							name, input, queryClass,
-							new ElkRelatedEntitiesTestOutput<ElkClass>(
-									superNodes, ElkClassKeyProvider.INSTANCE)));
+							new ElkSuperClassesTestOutput(superNodes, true)));
 		}
 
 		return result;
@@ -338,8 +336,7 @@ public class ElkExpectedTestOutputLoader {
 			result.add(
 					new QueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>>(
 							name, input, queryClass,
-							new ElkRelatedEntitiesTestOutput<ElkClass>(subNodes,
-									ElkClassKeyProvider.INSTANCE)));
+							new ElkSubClassesTestOutput(subNodes, true)));
 		}
 
 		return result;
@@ -372,15 +369,13 @@ public class ElkExpectedTestOutputLoader {
 			result.add(
 					new QueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkNamedIndividual>>(
 							name, input, queryClass,
-							new ElkRelatedEntitiesTestOutput<ElkNamedIndividual>(
-									instances,
-									ElkIndividualKeyProvider.INSTANCE)));
+							new ElkInstancesTestOutput(instances, true)));
 		}
 
 		return result;
 	}
 
-	public Collection<EntailmentQueryTestManifest<Collection<ElkAxiom>, ElkAxiom>> getEntailmentManifests(
+	public Collection<EntailmentQueryTestManifest<Collection<ElkAxiom>>> getEntailmentManifests(
 			final String name, final URL input) {
 
 		final ElkObject.Factory elkFactory = new ElkObjectBaseFactory();
@@ -512,9 +507,9 @@ public class ElkExpectedTestOutputLoader {
 		// else
 
 		return Collections.singleton(
-				new EntailmentQueryTestManifest<Collection<ElkAxiom>, ElkAxiom>(
+				new EntailmentQueryTestManifest<Collection<ElkAxiom>>(
 						name, input, query,
-						new EntailmentQueryTestOutput<ElkAxiom>(output)));
+						new ElkEntailmentQueryTestOutput(output, true)));
 	}
 
 }

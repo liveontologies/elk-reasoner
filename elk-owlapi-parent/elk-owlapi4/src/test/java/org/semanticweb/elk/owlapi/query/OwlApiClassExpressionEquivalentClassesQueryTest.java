@@ -46,7 +46,6 @@ import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.elk.testing.TestUtils;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 
 @RunWith(PolySuite.class)
@@ -79,11 +78,8 @@ public class OwlApiClassExpressionEquivalentClassesQueryTest extends
 					@Override
 					public EquivalentEntitiesTestOutput<OWLClass> getActualOutput()
 							throws Exception {
-						final Node<OWLClass> equivalent = getReasoner()
-								.getEquivalentClasses(
-										manifest.getInput().getQuery());
-						return new OwlApiEquivalentEntitiesTestOutput(
-								equivalent);
+						return new OwlEquivalentClassesTestOutput(getReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override

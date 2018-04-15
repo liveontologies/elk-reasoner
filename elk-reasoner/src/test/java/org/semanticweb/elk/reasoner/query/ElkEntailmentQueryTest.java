@@ -28,7 +28,6 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,15 +41,14 @@ import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
-
-import com.google.common.collect.ImmutableMap;
-
 import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.elk.testing.TestUtils;
 
+import com.google.common.collect.ImmutableMap;
+
 @RunWith(PolySuite.class)
 public class ElkEntailmentQueryTest extends
-		BaseQueryTest<Collection<ElkAxiom>, EntailmentQueryTestOutput<ElkAxiom>> {
+		BaseQueryTest<Collection<ElkAxiom>, ElkEntailmentQueryTestOutput> {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
@@ -73,18 +71,16 @@ public class ElkEntailmentQueryTest extends
 	}
 
 	public ElkEntailmentQueryTest(
-			final QueryTestManifest<Collection<ElkAxiom>, EntailmentQueryTestOutput<ElkAxiom>> manifest) {
+			final QueryTestManifest<Collection<ElkAxiom>, ElkEntailmentQueryTestOutput> manifest) {
 		super(manifest,
-				new ElkReasoningTestDelegate<EntailmentQueryTestOutput<ElkAxiom>>(
+				new ElkReasoningTestDelegate<ElkEntailmentQueryTestOutput>(
 						manifest) {
 
 					@Override
-					public EntailmentQueryTestOutput<ElkAxiom> getActualOutput()
+					public ElkEntailmentQueryTestOutput getActualOutput()
 							throws Exception {
-						final Map<ElkAxiom, EntailmentQueryResult> result = getReasoner()
-								.isEntailed(manifest.getInput().getQuery());
-						return new EntailmentQueryTestOutput<ElkAxiom>(
-								resultToOutput(result));
+						return new ElkEntailmentQueryTestOutput(getReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override
@@ -105,51 +101,11 @@ public class ElkEntailmentQueryTest extends
 
 				});
 	}
-
-	static Map<ElkAxiom, Boolean> resultToOutput(
-			final Map<ElkAxiom, EntailmentQueryResult> result)
-			throws ElkQueryException {
-		final Map<ElkAxiom, Boolean> output = new HashMap<ElkAxiom, Boolean>();
-		for (final Map.Entry<ElkAxiom, EntailmentQueryResult> e : result
-				.entrySet()) {
-			output.put(e.getKey(), e.getValue().accept(RESULT_VISITOR));
-		}
-		return output;
-	}
-
-	private static final EntailmentQueryResult.Visitor<Boolean, ElkQueryException> RESULT_VISITOR = new EntailmentQueryResult.Visitor<Boolean, ElkQueryException>() {
+	
+	public static final ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<Collection<ElkAxiom>>, ElkEntailmentQueryTestOutput>> CLASS_QUERY_TEST_MANIFEST_CREATOR = new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<Collection<ElkAxiom>>, ElkEntailmentQueryTestOutput>>() {
 
 		@Override
-		public Boolean visit(
-				final ProperEntailmentQueryResult properEntailmentQueryResult)
-				throws ElkQueryException {
-			try {
-				return properEntailmentQueryResult.isEntailed();
-			} finally {
-				properEntailmentQueryResult.unlock();
-			}
-		}
-
-		@Override
-		public Boolean visit(
-				final UnsupportedIndexingEntailmentQueryResult unsupportedIndexingEntailmentQueryResult) {
-			// TODO: this may be an important information for the test
-			return false;
-		}
-
-		@Override
-		public Boolean visit(
-				final UnsupportedQueryTypeEntailmentQueryResult unsupportedQueryTypeEntailmentQueryResult) {
-			// TODO: this may be an important information for the test
-			return false;
-		}
-
-	};
-
-	public static final ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<Collection<ElkAxiom>>, EntailmentQueryTestOutput<ElkAxiom>>> CLASS_QUERY_TEST_MANIFEST_CREATOR = new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<Collection<ElkAxiom>>, EntailmentQueryTestOutput<ElkAxiom>>>() {
-
-		@Override
-		public Collection<? extends TestManifestWithOutput<QueryTestInput<Collection<ElkAxiom>>, EntailmentQueryTestOutput<ElkAxiom>>> createManifests(
+		public Collection<? extends TestManifestWithOutput<QueryTestInput<Collection<ElkAxiom>>, ElkEntailmentQueryTestOutput>> createManifests(
 				final String name, final List<URL> urls) throws IOException {
 
 			if (urls == null || urls.size() < 2) {

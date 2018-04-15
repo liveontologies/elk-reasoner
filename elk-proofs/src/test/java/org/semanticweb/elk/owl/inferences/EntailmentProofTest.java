@@ -38,7 +38,6 @@ import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.reasoner.ElkReasoningTestDelegate;
-import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.query.BaseQueryTest;
 import org.semanticweb.elk.reasoner.query.QueryTestInput;
@@ -50,7 +49,7 @@ import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
 
 @RunWith(PolySuite.class)
-public class EntailmentProofTest extends BaseQueryTest<ElkAxiom, Void> {
+public class EntailmentProofTest extends BaseQueryTest<ElkAxiom, ElkQueryDerivabilityTestOutput> {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
@@ -70,28 +69,21 @@ public class EntailmentProofTest extends BaseQueryTest<ElkAxiom, Void> {
 	}
 
 	public EntailmentProofTest(
-			final QueryTestManifest<ElkAxiom, Void> manifest) {
-		super(manifest, new ElkReasoningTestDelegate<Void>(manifest) {
+			final QueryTestManifest<ElkAxiom, ElkQueryDerivabilityTestOutput> manifest) {
+		super(manifest, new ElkReasoningTestDelegate<ElkQueryDerivabilityTestOutput>(manifest) {
 
 			@Override
-			public Void getActualOutput() throws Exception {
-
-				final Reasoner reasoner = getReasoner();
-
-				TestUtils.provabilityTest(reasoner, null,
-						reasoner.getElkFactory(),
-						manifest.getInput().getQuery());
-
-				return null;
+			public ElkQueryDerivabilityTestOutput getActualOutput() throws Exception {
+				return new ElkQueryDerivabilityTestOutput(getReasoner(), manifest.getInput().getQuery());
 			}
 
 		});
 	}
 
-	private static final ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkAxiom>, Void>> ENTAILMENT_QUERY_TEST_MANIFEST_CREATOR_ = new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkAxiom>, Void>>() {
+	private static final ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkAxiom>, ElkQueryDerivabilityTestOutput>> ENTAILMENT_QUERY_TEST_MANIFEST_CREATOR_ = new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkAxiom>, ElkQueryDerivabilityTestOutput>>() {
 
 		@Override
-		public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkAxiom>, Void>> createManifests(
+		public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkAxiom>, ElkQueryDerivabilityTestOutput>> createManifests(
 				final String name, final List<URL> urls) throws IOException {
 
 			if (urls == null || urls.size() < 2) {
@@ -111,11 +103,14 @@ public class EntailmentProofTest extends BaseQueryTest<ElkAxiom, Void> {
 				final Set<ElkAxiom> query = TestReasonerUtils
 						.loadAxioms(entailedIS);
 
-				final Collection<QueryTestManifest<ElkAxiom, Void>> manifests = new ArrayList<QueryTestManifest<ElkAxiom, Void>>(
+				final Collection<QueryTestManifest<ElkAxiom, ElkQueryDerivabilityTestOutput>> manifests = new ArrayList<QueryTestManifest<ElkAxiom, ElkQueryDerivabilityTestOutput>>(
 						query.size());
 				for (final ElkAxiom axiom : query) {
-					manifests.add(new QueryTestManifest<ElkAxiom, Void>(name,
-							input, axiom, null));
+					manifests.add(
+							new QueryTestManifest<ElkAxiom, ElkQueryDerivabilityTestOutput>(
+									name, input, axiom,
+									new ElkQueryDerivabilityTestOutput(true,
+											true)));
 				}
 
 				return manifests;
