@@ -18,11 +18,14 @@ matrix:
    - jdk: oraclejdk7
      dist: precise
    - jdk: openjdk7
+   - jdk: openjdk8
+   - jdk: oraclejdk8
+     env: OPTIONS=-Peclipse
    - jdk: oraclejdk8
      env: DEPLOY=true
    - jdk: oraclejdk9
 
-install: mvn install -DskipTests=true
+install: mvn install $OPTIONS -DskipTests=true
 
 script: mvn test -Dassembly.skipAssembly=true -B
 
