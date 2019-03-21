@@ -97,11 +97,11 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<owlapi4.version>4.2.7</owlapi4.version>
-		<owlapi5.version>5.1.4</owlapi5.version>
+		<owlapi4.version>4.5.9</owlapi4.version>
+		<owlapi5.version>5.1.10</owlapi5.version>
 		<protege-proof-explanation.version>0.1.0</protege-proof-explanation.version>
 		<!-- try to keep the version low for backward compatibility -->
-		<protege.version>5.0.0</protege.version>
+		<protege.version>5.5.0</protege.version>
 		<java.required.version>7</java.required.version>
 		<slf4j.version>1.7.25</slf4j.version>
 		<logback.version>1.2.3</logback.version>
