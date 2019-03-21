@@ -16,6 +16,8 @@ matrix:
    - jdk: oraclejdk8
      env: DEPLOY=true
    - jdk: oraclejdk9
+   - jdk: oraclejdk11
+   - jdk: openjdk11
 
 install: mvn install $OPTIONS -DskipTests=true
 
