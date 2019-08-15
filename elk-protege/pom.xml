@@ -126,7 +126,6 @@
 						<Export-Package>!*</Export-Package>
 						<Embed-Dependency>*;scope=provided;inline=true</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<Embed-Directory>target/dependency</Embed-Directory>
 						<Embed-StripGroup>true</Embed-StripGroup>
 						<Update-Url>${protege.update.url}/p5.update.properties</Update-Url>
 					</instructions>
@@ -188,7 +187,16 @@
 						</executions>
 						<configuration>
 							<includeScope>provided</includeScope>
-							<outputDirectory>${project.build.directory}/classes</outputDirectory>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.felix</groupId>
+						<artifactId>maven-bundle-plugin</artifactId>
+						<extensions>true</extensions>
+						<configuration>
+							<instructions>
+								<Bundle-ClassPath>target/dependency,.</Bundle-ClassPath>
+							</instructions>
 						</configuration>
 					</plugin>
 				</plugins>
