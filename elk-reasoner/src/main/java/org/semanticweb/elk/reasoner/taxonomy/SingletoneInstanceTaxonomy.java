@@ -39,8 +39,9 @@ import org.semanticweb.elk.util.collections.ArrayHashMap;
 
 /**
  * An {@link InstanceTaxonomy} consisting of a single {@link TypeNode} = top
- * node = bottom node, which has a single {@link InstanceNode}. Typically, this
- * is used to represent an inconsistent {@link InstanceTaxonomy}.
+ * node = bottom node, which has a single {@link InstanceNode} containing all
+ * individuals of this taxonomy. Typically, this is used to represent an
+ * inconsistent {@link InstanceTaxonomy}.
  * 
  * @author "Yevgeny Kazakov"
  * @author Peter Skocovsky
@@ -59,6 +60,8 @@ public class SingletoneInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity
 	/** provides keys that are used for hashing instead of the elkIndividuals */
 	private final ComparatorKeyProvider<? super I> individualKeyProvider_;
 
+	// TODO: get rid of node factory, use instances
+	
 	public SingletoneInstanceTaxonomy(
 			final ComparatorKeyProvider<? super T> keyProvider,
 			final Collection<? extends T> allMembers,

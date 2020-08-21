@@ -84,7 +84,7 @@ public class IncrementalModeSwitchTest {
 
 		loader.add(axASubRB).add(axBSubRC).add(axRCSubD);
 
-		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomyQuietly();
+		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomyQuietly().getValue();
 
 		assertFalse(taxonomy.getNode(A).getAllSuperNodes()
 				.contains(taxonomy.getNode(D)));
@@ -95,7 +95,7 @@ public class IncrementalModeSwitchTest {
 
 		changeLoader.add(axTransR);
 
-		taxonomy = reasoner.getTaxonomyQuietly();
+		taxonomy = reasoner.getTaxonomyQuietly().getValue();
 		// Now A should be a subclass of D since R is transitive
 		assertTrue(taxonomy.getNode(A).getAllSuperNodes()
 				.contains(taxonomy.getNode(D)));

@@ -22,11 +22,10 @@
  */
 package org.semanticweb.elk.reasoner;
 
-import static org.junit.Assume.assumeTrue;
-
 import java.net.URL;
 
 import org.semanticweb.elk.testing.BasicTestManifest;
+import org.semanticweb.elk.testing.DiffableOutput;
 import org.semanticweb.elk.testing.UrlTestInput;
 import org.semanticweb.elk.testing.io.URLTestIO;
 
@@ -40,20 +39,11 @@ import org.semanticweb.elk.testing.io.URLTestIO;
  * @param <O>
  *            the type of the reasoning output
  */
-public class ReasoningTestManifest<O extends ReasoningTestOutput<?>>
+public class ReasoningTestManifest<O extends DiffableOutput<?, O>>
 		extends BasicTestManifest<UrlTestInput, O> {
 
 	public ReasoningTestManifest(final String name, URL input, O expOutput) {
 		super(new URLTestIO(name, input), expOutput);
-	}
-
-	@Override
-	public void compare(final O actualOutput) {
-		assumeTrue(getExpectedOutput().isComplete());
-		if (actualOutput.isComplete()) {
-			super.compare(actualOutput);
-		}
-		// TODO: check inclusion of incomplete results
 	}
 
 }

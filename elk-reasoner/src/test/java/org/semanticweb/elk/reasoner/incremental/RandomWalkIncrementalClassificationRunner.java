@@ -37,9 +37,12 @@ import java.util.List;
 
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.completeness.IncompleteResult;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.testing.Diff;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
@@ -152,7 +155,6 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 						expectedResultHash, finalResultHash);
 			}
 
-			
 			assertTrue(standardReasoner.shutdown());
 
 			LOGGER_.trace("Reverting the changes");
@@ -211,16 +213,33 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 		StringWriter writer = new StringWriter();
 
 		try {
-			writer.write("EXPECTED TAXONOMY:\n");
-			printResult(standardReasoner, writer);
-			writer.write("\nINCREMENTAL TAXONOMY:\n");
-			printResult(testReasoner, writer);
-			writer.flush();
+			writeResultDiff(standardReasoner, testReasoner, writer);
 		} catch (IOException ioe) {
-			// TODO
+			// TODO: do anything?
 		}
 
 		return "Seed: " + seed + "\n" + writer.getBuffer().toString();
+	}
+
+	@SuppressWarnings("static-method")
+	protected void writeResultDiff(Reasoner correctReasoner,
+			Reasoner testReasoner, Writer writer)
+			throws IOException, ElkException {
+		writer.write("TAXONOMY DIFF:\n");
+		Diff.writeDiff(
+				new ClassTaxonomyTestOutput(
+						correctReasoner.getTaxonomyQuietly()),
+				new ClassTaxonomyTestOutput(testReasoner.getTaxonomyQuietly()),
+				writer);
+		writer.flush();
+	}
+
+	protected void printResult(Reasoner reasoner, Logger logger, LogLevel level)
+			throws IOException, ElkException {
+		StringWriter writer = new StringWriter();
+		printResult(reasoner, writer);
+		LoggerWrap.log(logger, level, writer.getBuffer().toString());
+		writer.close();
 	}
 
 	/*
@@ -228,28 +247,23 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 	 * reasoning tasks
 	 */
 	@SuppressWarnings("static-method")
-	protected void printResult(Reasoner reasoner, Logger logger, LogLevel level)
+	protected void printResult(Reasoner reasoner, Writer writer)
 			throws IOException, ElkException {
-		StringWriter writer = new StringWriter();
 
-		printResult(reasoner, writer);
-		LoggerWrap.log(logger, level, "CLASS TAXONOMY");
-		LoggerWrap.log(logger, level, writer.getBuffer().toString());
-
-		writer.close();
-	}
-
-	protected static void printResult(Reasoner reasoner, Writer writer)
-			throws IOException, ElkException {
-		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomyQuietly();
-
-		TaxonomyPrinter.dumpTaxomomy(taxonomy, writer, false);
+		IncompleteResult<? extends Taxonomy<ElkClass>> taxonomy = reasoner
+				.getTaxonomyQuietly();
+		writer.append("CLASS TAXONOMY");
+		if (!taxonomy.isComplete()) {
+			writer.append(" (incomplete)");
+		}
+		TaxonomyPrinter.dumpTaxomomy(taxonomy.getValue(), writer, false);
 		writer.flush();
 	}
 
 	@SuppressWarnings("static-method")
 	protected String getResultHash(Reasoner reasoner) throws ElkException {
-		return TaxonomyPrinter.getHashString(reasoner.getTaxonomyQuietly());
+		return TaxonomyPrinter
+				.getHashString(reasoner.getTaxonomyQuietly().getValue());
 	}
 
 	private int getInitialChangeSize(int changingAxiomsCount) {

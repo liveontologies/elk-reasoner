@@ -21,63 +21,72 @@
  */
 package org.semanticweb.elk.reasoner.query;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.incremental.ElkIncrementalReasoningTestDelegate;
-import org.semanticweb.elk.reasoner.taxonomy.ElkIndividualKeyProvider;
-import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.PolySuite;
+import org.semanticweb.elk.testing.PolySuite.Config;
+import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifest;
 
 import com.google.common.collect.ImmutableMap;
 
 @RunWith(PolySuite.class)
 public class ElkIncrementalClassExpressionInstancesQueryTest extends
-		ElkIncrementalClassExpressionQueryTest<RelatedEntitiesTestOutput<ElkNamedIndividual>> {
+		ElkIncrementalClassExpressionQueryTest<ElkDirectInstancesTestOutput> {
 
 	public ElkIncrementalClassExpressionInstancesQueryTest(
 			final TestManifest<QueryTestInput<ElkClassExpression>> manifest) {
 		super(manifest,
-				new ElkIncrementalReasoningTestDelegate<RelatedEntitiesTestOutput<ElkNamedIndividual>>(
+				new ElkIncrementalReasoningTestDelegate<ElkDirectInstancesTestOutput>(
 						manifest) {
 
 					@Override
-					public RelatedEntitiesTestOutput<ElkNamedIndividual> getExpectedOutput()
-							throws Exception {						
-						return new ElkInstancesTestOutput(getStandardReasoner(),
-								manifest.getInput().getQuery());
+					public ElkDirectInstancesTestOutput getExpectedOutput()
+							throws Exception {
+						ElkClassExpression query = manifest.getInput()
+								.getQuery();
+						return new ElkDirectInstancesTestOutput(query,
+								getStandardReasoner().getInstancesQuietly(query,
+										true));
 					}
 
 					@Override
-					public RelatedEntitiesTestOutput<ElkNamedIndividual> getActualOutput()
+					public ElkDirectInstancesTestOutput getActualOutput()
 							throws Exception {
-						return new ElkInstancesTestOutput(
-								getIncrementalReasoner(),
-								manifest.getInput().getQuery());
+						ElkClassExpression query = manifest.getInput()
+								.getQuery();
+						return new ElkDirectInstancesTestOutput(query,
+								getIncrementalReasoner()
+										.getInstancesQuietly(query, true));
 					}
 
 					@Override
 					protected Map<String, String> additionalConfigIncremental() {
-						return ImmutableMap.<String, String> builder()
-								.put(ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
-										"NQEvictor(0, 0.75)")
-								.build();
+						return ImmutableMap.<String, String> builder().put(
+								ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
+								"NQEvictor(0, 0.75)").build();
 					}
 
 					@Override
 					protected Map<String, String> additionalConfigWithInterrupts() {
-						return ImmutableMap.<String, String> builder()
-								.put(ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
-										"NQEvictor(0, 0.75)")
-								.build();
+						return ImmutableMap.<String, String> builder().put(
+								ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
+								"NQEvictor(0, 0.75)").build();
 					}
 
 				});
+	}
+
+	@Config
+	public static Configuration getConfig()
+			throws IOException, URISyntaxException {
+		return getConfig("getDirectInstances");
 	}
 
 }

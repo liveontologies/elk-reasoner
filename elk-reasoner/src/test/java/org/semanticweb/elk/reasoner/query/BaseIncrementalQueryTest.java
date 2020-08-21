@@ -24,9 +24,10 @@ package org.semanticweb.elk.reasoner.query;
 import org.junit.Assert;
 import org.semanticweb.elk.reasoner.incremental.IncrementalReasoningCorrectnessTestWithInterrupts;
 import org.semanticweb.elk.reasoner.incremental.IncrementalReasoningTestWithInterruptsDelegate;
+import org.semanticweb.elk.testing.DiffableOutput;
 import org.semanticweb.elk.testing.TestManifest;
 
-public abstract class BaseIncrementalQueryTest<Q, A, O>
+public abstract class BaseIncrementalQueryTest<Q, A, O extends DiffableOutput<?, O>>
 		extends
 		IncrementalReasoningCorrectnessTestWithInterrupts<QueryTestInput<Q>, A, O, IncrementalReasoningTestWithInterruptsDelegate<A, O>> {
 
@@ -40,19 +41,38 @@ public abstract class BaseIncrementalQueryTest<Q, A, O>
 	protected void correctnessCheck(final O actualOutput,
 			final O expectedOutput) throws Exception {
 
-		if (expectedOutput == null ? actualOutput != null
-				: !expectedOutput.equals(actualOutput)) {
-
-			// @formatter:off
-			final String message = "Actual output is not equal to the expected output\n"
-					+ "Input: " + getManifest().getInput().getName() + "\n"
-					+ "Expected:\n" + expectedOutput + "\n"
-					+ "Actual:\n" + actualOutput + "\n";
-			// @formatter:on
-
-			Assert.fail(message);
+		boolean actualContainsAllExpected = actualOutput
+				.containsAllElementsOf(expectedOutput);
+		boolean expectedContainsAllActual = expectedOutput
+				.containsAllElementsOf(actualOutput);
+		if (actualContainsAllExpected && expectedContainsAllActual) {
+			return;
 		}
+		// else
+		final StringBuilder message = new StringBuilder(
+				"Actual output is not equal to the expected output:");
+		if (!actualContainsAllExpected) {
+			actualOutput.reportMissingElementsOf(expectedOutput,
+					getOutputListener("< ", message));
+		}
+		if (!expectedContainsAllActual) {
+			expectedOutput.reportMissingElementsOf(actualOutput,
+					getOutputListener("<>", message));
+		}
+		Assert.fail(message.toString());
+	}
 
+	private static <E> DiffableOutput.Listener<E> getOutputListener(
+			final String prefix, final StringBuilder message) {
+		return new DiffableOutput.Listener<E>() {
+
+			@Override
+			public void missing(E element) {
+				message.append('\n');
+				message.append(prefix);
+				message.append(element);
+			}
+		};
 	}
 
 }

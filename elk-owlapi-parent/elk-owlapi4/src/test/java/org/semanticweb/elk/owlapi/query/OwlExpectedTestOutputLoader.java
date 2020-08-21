@@ -33,9 +33,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.elk.owlapi.TestOWLManager;
-import org.semanticweb.elk.reasoner.query.EquivalentEntitiesTestOutput;
+import org.semanticweb.elk.reasoner.query.EmptyTestOutput;
 import org.semanticweb.elk.reasoner.query.QueryTestManifest;
-import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.reasoner.query.SatisfiabilityTestOutput;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -55,9 +54,7 @@ import org.semanticweb.owlapi.model.OWLSameIndividualAxiom;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.impl.OWLClassNode;
-import org.semanticweb.owlapi.reasoner.impl.OWLClassNodeSet;
 import org.semanticweb.owlapi.reasoner.impl.OWLNamedIndividualNode;
-import org.semanticweb.owlapi.reasoner.impl.OWLNamedIndividualNodeSet;
 
 /**
  * @author Peter Skocovsky
@@ -199,24 +196,25 @@ public class OwlExpectedTestOutputLoader {
 		this.instances_ = instances;
 	}
 
-	public Collection<QueryTestManifest<OWLClassExpression, Void>> getNoOutputManifests(
+	public Collection<QueryTestManifest<OWLClassExpression, EmptyTestOutput>> getNoOutputManifests(
 			final String name, final URL input) {
 
-		final List<QueryTestManifest<OWLClassExpression, Void>> result = new ArrayList<QueryTestManifest<OWLClassExpression, Void>>(
+		final List<QueryTestManifest<OWLClassExpression, EmptyTestOutput>> result = new ArrayList<>(
 				queryClasses_.size());
 
 		for (final OWLClassExpression queryClass : queryClasses_) {
-			result.add(new QueryTestManifest<OWLClassExpression, Void>(name,
-					input, queryClass, null));
+			result.add(
+					new QueryTestManifest<OWLClassExpression, EmptyTestOutput>(
+							name, input, queryClass, null));
 		}
 
 		return result;
 	}
 
-	public Collection<QueryTestManifest<OWLClassExpression, SatisfiabilityTestOutput>> getSatisfiabilityManifests(
+	public Collection<QueryTestManifest<OWLClassExpression, SatisfiabilityTestOutput>> getClassSatisfiabilityManifests(
 			final String name, final URL input) {
 
-		final List<QueryTestManifest<OWLClassExpression, SatisfiabilityTestOutput>> result = new ArrayList<QueryTestManifest<OWLClassExpression, SatisfiabilityTestOutput>>(
+		final List<QueryTestManifest<OWLClassExpression, SatisfiabilityTestOutput>> result = new ArrayList<>(
 				queryClasses_.size());
 
 		for (final OWLClassExpression queryClass : queryClasses_) {
@@ -224,7 +222,7 @@ public class OwlExpectedTestOutputLoader {
 			// If the query class is equivalent to bottom, node is NOT null!
 			result.add(
 					new QueryTestManifest<OWLClassExpression, SatisfiabilityTestOutput>(
-							name, input, queryClass,
+							name + " isSatisfiable", input, queryClass,
 							new OwlClassExpressionSatisfiabilityTestOutput(
 									node == null || !node.isBottomNode(),
 									true)));
@@ -233,17 +231,17 @@ public class OwlExpectedTestOutputLoader {
 		return result;
 	}
 
-	public Collection<QueryTestManifest<OWLClassExpression, EquivalentEntitiesTestOutput<OWLClass>>> getEquivalentEntitiesManifests(
+	public Collection<QueryTestManifest<OWLClassExpression, OwlEquivalentClassesTestOutput>> getEquivalentClassesManifests(
 			final String name, final URL input) {
 
-		final List<QueryTestManifest<OWLClassExpression, EquivalentEntitiesTestOutput<OWLClass>>> result = new ArrayList<QueryTestManifest<OWLClassExpression, EquivalentEntitiesTestOutput<OWLClass>>>(
+		final List<QueryTestManifest<OWLClassExpression, OwlEquivalentClassesTestOutput>> result = new ArrayList<>(
 				queryClasses_.size());
 
 		for (final OWLClassExpression queryClass : queryClasses_) {
 			final OWLClassNode node = equivalent_.get(queryClass);
 			result.add(
-					new QueryTestManifest<OWLClassExpression, EquivalentEntitiesTestOutput<OWLClass>>(
-							name, input, queryClass,
+					new QueryTestManifest<OWLClassExpression, OwlEquivalentClassesTestOutput>(
+							name + " getEquivalentClasses", input, queryClass,
 							new OwlEquivalentClassesTestOutput(
 									node == null ? new OWLClassNode() : node,
 									true)));
@@ -252,10 +250,10 @@ public class OwlExpectedTestOutputLoader {
 		return result;
 	}
 
-	public Collection<QueryTestManifest<OWLClassExpression, RelatedEntitiesTestOutput<OWLClass>>> getSuperEntitiesManifests(
+	public Collection<QueryTestManifest<OWLClassExpression, OwlDirectSuperClassesTestOutput>> getDirectSuperClassesManifests(
 			final String name, final URL input) {
 
-		final List<QueryTestManifest<OWLClassExpression, RelatedEntitiesTestOutput<OWLClass>>> result = new ArrayList<QueryTestManifest<OWLClassExpression, RelatedEntitiesTestOutput<OWLClass>>>(
+		final List<QueryTestManifest<OWLClassExpression, OwlDirectSuperClassesTestOutput>> result = new ArrayList<>(
 				queryClasses_.size());
 
 		for (final OWLClassExpression queryClass : queryClasses_) {
@@ -275,20 +273,20 @@ public class OwlExpectedTestOutputLoader {
 					});
 
 			result.add(
-					new QueryTestManifest<OWLClassExpression, RelatedEntitiesTestOutput<OWLClass>>(
-							name, input, queryClass,
-							new OwlSuperClassesTestOutput(new OWLClassNodeSet(
-									new HashSet<Node<OWLClass>>(superNodes)),
+					new QueryTestManifest<OWLClassExpression, OwlDirectSuperClassesTestOutput>(
+							name + " getDirectSuperClasses", input, queryClass,
+							new OwlDirectSuperClassesTestOutput(queryClass,
+									new HashSet<Node<OWLClass>>(superNodes),
 									true)));
 		}
 
 		return result;
 	}
 
-	public Collection<QueryTestManifest<OWLClassExpression, RelatedEntitiesTestOutput<OWLClass>>> getSubEntitiesManifests(
+	public Collection<QueryTestManifest<OWLClassExpression, OwlDirectSubClassesTestOutput>> getDirectSubClassManifests(
 			final String name, final URL input) {
 
-		final List<QueryTestManifest<OWLClassExpression, RelatedEntitiesTestOutput<OWLClass>>> result = new ArrayList<QueryTestManifest<OWLClassExpression, RelatedEntitiesTestOutput<OWLClass>>>(
+		final List<QueryTestManifest<OWLClassExpression, OwlDirectSubClassesTestOutput>> result = new ArrayList<>(
 				queryClasses_.size());
 
 		for (final OWLClassExpression queryClass : queryClasses_) {
@@ -308,20 +306,20 @@ public class OwlExpectedTestOutputLoader {
 					});
 
 			result.add(
-					new QueryTestManifest<OWLClassExpression, RelatedEntitiesTestOutput<OWLClass>>(
-							name, input, queryClass,
-							new OwlSubClassesTestOutput(new OWLClassNodeSet(
-									new HashSet<Node<OWLClass>>(subNodes)),
+					new QueryTestManifest<OWLClassExpression, OwlDirectSubClassesTestOutput>(
+							name + " getDirectSubClasses", input, queryClass,
+							new OwlDirectSubClassesTestOutput(queryClass,
+									new HashSet<Node<OWLClass>>(subNodes),
 									true)));
 		}
 
 		return result;
 	}
 
-	public Collection<QueryTestManifest<OWLClassExpression, RelatedEntitiesTestOutput<OWLNamedIndividual>>> getInstancesManifests(
+	public Collection<QueryTestManifest<OWLClassExpression, OwlDirectInstancesTestOutput>> getDirectInstancesManifests(
 			final String name, final URL input) {
 
-		final List<QueryTestManifest<OWLClassExpression, RelatedEntitiesTestOutput<OWLNamedIndividual>>> result = new ArrayList<QueryTestManifest<OWLClassExpression, RelatedEntitiesTestOutput<OWLNamedIndividual>>>(
+		final List<QueryTestManifest<OWLClassExpression, OwlDirectInstancesTestOutput>> result = new ArrayList<>(
 				queryClasses_.size());
 
 		for (final OWLClassExpression queryClass : queryClasses_) {
@@ -343,12 +341,11 @@ public class OwlExpectedTestOutputLoader {
 					});
 
 			result.add(
-					new QueryTestManifest<OWLClassExpression, RelatedEntitiesTestOutput<OWLNamedIndividual>>(
-							name, input, queryClass,
-							new OwlInstancesTestOutput(
-									new OWLNamedIndividualNodeSet(
-											new HashSet<Node<OWLNamedIndividual>>(
-													instances)),
+					new QueryTestManifest<OWLClassExpression, OwlDirectInstancesTestOutput>(
+							name + " getDirectInstances", input, queryClass,
+							new OwlDirectInstancesTestOutput(queryClass,
+									new HashSet<Node<OWLNamedIndividual>>(
+											instances),
 									true)));
 		}
 
@@ -360,7 +357,7 @@ public class OwlExpectedTestOutputLoader {
 
 		final OWLDataFactory owlFactory = TestOWLManager.getOWLDataFactory();
 
-		final List<OWLAxiom> query = new ArrayList<OWLAxiom>();
+		final List<OWLAxiom> query = new ArrayList<>();
 		final Map<OWLAxiom, Boolean> output = new HashMap<OWLAxiom, Boolean>();
 
 		for (final OWLClassExpression queryClass : queryClasses_) {
@@ -487,14 +484,15 @@ public class OwlExpectedTestOutputLoader {
 		// else
 
 		// OWL API interface can query only one axiom at once.
-		final Collection<QueryTestManifest<OWLAxiom, OwlEntailmentQueryTestOutput>> manifests = new ArrayList<QueryTestManifest<OWLAxiom, OwlEntailmentQueryTestOutput>>(
+		final Collection<QueryTestManifest<OWLAxiom, OwlEntailmentQueryTestOutput>> manifests = new ArrayList<>(
 				query.size());
 		for (final OWLAxiom axiom : query) {
+			boolean axiomProved = output.get(axiom);
 			manifests.add(
 					new QueryTestManifest<OWLAxiom, OwlEntailmentQueryTestOutput>(
-							name, input, axiom,
-							new OwlEntailmentQueryTestOutput(output.get(axiom),
-									true)));
+							name + " isEntailed", input, axiom,
+							new OwlEntailmentQueryTestOutput(axiom, axiomProved,
+									!axiomProved)));
 		}
 		return manifests;
 	}

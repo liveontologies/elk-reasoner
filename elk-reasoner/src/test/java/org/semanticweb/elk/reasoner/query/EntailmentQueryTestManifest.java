@@ -22,9 +22,6 @@
 package org.semanticweb.elk.reasoner.query;
 
 import java.net.URL;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 
@@ -34,52 +31,6 @@ public class EntailmentQueryTestManifest<Q>
 	public EntailmentQueryTestManifest(final String name, final URL input,
 			final Q query, final ElkEntailmentQueryTestOutput expectedOutput) {
 		super(name, input, query, expectedOutput);
-	}
-
-	@Override
-	protected void appendDiff(final ElkEntailmentQueryTestOutput actualOutput,
-			final StringBuilder result) {
-		final ElkEntailmentQueryTestOutput expOutput = getExpectedOutput();
-		final Map<ElkAxiom, Boolean> expMap = expOutput == null
-				? Collections.<ElkAxiom, Boolean> emptyMap() : expOutput.getResult();
-		final Map<ElkAxiom, Boolean> actMap = actualOutput == null
-				? Collections.<ElkAxiom, Boolean> emptyMap()
-				: actualOutput.getResult();
-		writeMapDiff(expMap, actMap, result);
-	}
-
-	private static <K, V> void writeMapDiff(final Map<K, V> expected,
-			final Map<K, V> actual, final StringBuilder result) {
-
-		for (final Entry<K, V> expectedEntry : expected.entrySet()) {
-			final K key = expectedEntry.getKey();
-			final V expectedValue = expectedEntry.getValue();
-			final V actualValue = actual.get(expectedEntry.getKey());
-			if (actualValue == null || !expectedValue.equals(actualValue)) {
-				result.append(key).append(" -> expected: ")
-						.append(expectedValue).append(", actual: ")
-						.append(actualValue).append("\n");
-			}
-		}
-
-		for (final Entry<K, V> actualEntry : actual.entrySet()) {
-			// only keys missing in expected
-			final K key = actualEntry.getKey();
-			final V actualValue = actualEntry.getValue();
-			final V expectedValue = expected.get(actualEntry.getKey());
-			if (expectedValue == null) {
-				result.append(key).append(" -> expected: ")
-						.append(expectedValue).append(", actual: ")
-						.append(actualValue).append("\n");
-			}
-		}
-
-	}
-
-	@Override
-	protected void appendOutput(final ElkEntailmentQueryTestOutput output,
-			final StringBuilder result) {
-		// Do not write output!
 	}
 
 }

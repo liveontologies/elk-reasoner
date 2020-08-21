@@ -31,11 +31,6 @@ package org.semanticweb.elk;
 public interface Lock {
 
 	/**
-	 * @return {@code true} iff the lock is locked.
-	 */
-	boolean isLocked();
-
-	/**
 	 * Decrements the number of times this lock is locked. It becomes unlocked
 	 * when this method is called at least as many times the lock is locked.
 	 * 

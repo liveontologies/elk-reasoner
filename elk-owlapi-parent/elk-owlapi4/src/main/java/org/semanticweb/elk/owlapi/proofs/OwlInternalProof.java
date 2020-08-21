@@ -34,9 +34,7 @@ import org.semanticweb.elk.owlapi.ElkConverter;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.proofs.InternalProof;
 import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.query.UnsupportedQueryTypeEntailmentQueryResult;
 import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.reasoner.UnsupportedEntailmentTypeException;
 
 public class OwlInternalProof implements Proof<Inference<Object>> {
 
@@ -45,7 +43,7 @@ public class OwlInternalProof implements Proof<Inference<Object>> {
 
 	private final OWLAxiom goal_;
 	private final Inference<Object> goalInference_;
-	private final InternalProofExtension proof_;
+	private final InternalProof proof_;
 
 	public OwlInternalProof(final Reasoner reasoner, final OWLAxiom goal) {
 		this.goal_ = goal;
@@ -53,7 +51,7 @@ public class OwlInternalProof implements Proof<Inference<Object>> {
 		this.goalInference_ = Inferences.create("Converting inference", goal,
 				Arrays.asList(convertedGoal));
 		try {
-			this.proof_ = new InternalProofExtension(reasoner,
+			this.proof_ = new InternalProof(reasoner,
 					owlConverter_.convert(goal));
 		} catch (final ElkException e) {
 			throw elkConverter_.convert(e);
@@ -70,30 +68,12 @@ public class OwlInternalProof implements Proof<Inference<Object>> {
 	public Collection<? extends Inference<Object>> getInferences(
 			final Object conclusion) {
 		if (goal_.equals(conclusion)) {
-			@SuppressWarnings("unchecked")
 			final Collection<? extends Inference<Object>> result = Arrays
 					.asList(goalInference_);
 			return result;
 		}
 		// else
 		return proof_.getInferences(conclusion);
-	}
-
-	private class InternalProofExtension extends InternalProof {
-
-		public InternalProofExtension(final Reasoner reasoner,
-				final ElkAxiom goal) throws ElkException {
-			super(reasoner, goal);
-		}
-
-		@Override
-		public Void visit(
-				final UnsupportedQueryTypeEntailmentQueryResult unsupportedQueryType)
-				throws ElkException {
-			throw new UnsupportedEntailmentTypeException(
-					elkConverter_.convert(unsupportedQueryType.getQuery()));
-		}
-
 	}
 
 }

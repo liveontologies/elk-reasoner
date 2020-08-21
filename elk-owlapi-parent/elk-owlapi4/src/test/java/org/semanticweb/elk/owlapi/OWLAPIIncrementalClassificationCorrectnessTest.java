@@ -27,6 +27,8 @@ import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.UrlTestInput;
 import org.semanticweb.owlapi.model.OWLAxiom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Pavel Klinov
@@ -36,6 +38,9 @@ import org.semanticweb.owlapi.model.OWLAxiom;
  */
 public class OWLAPIIncrementalClassificationCorrectnessTest
 		extends BaseIncrementalClassificationCorrectnessTest<OWLAxiom> {
+
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(OWLAPIIncrementalClassificationCorrectnessTest.class);
 
 	public OWLAPIIncrementalClassificationCorrectnessTest(
 			final TestManifest<UrlTestInput> testManifest) {
@@ -47,9 +52,9 @@ public class OWLAPIIncrementalClassificationCorrectnessTest
 					public ClassTaxonomyTestOutput getExpectedOutput()
 							throws Exception {
 						LOGGER_.trace(
-								"======= Computing Expected Taxonomy =======");						
-						return new ClassTaxonomyTestOutput(
-								getStandardReasoner().getInternalReasoner());
+								"======= Computing Expected Taxonomy =======");
+						return new ClassTaxonomyTestOutput(getStandardReasoner()
+								.getInternalReasoner().getTaxonomyQuietly());
 					}
 
 					@Override
@@ -58,7 +63,8 @@ public class OWLAPIIncrementalClassificationCorrectnessTest
 						LOGGER_.trace(
 								"======= Computing Incremental Taxonomy =======");
 						return new ClassTaxonomyTestOutput(
-								getIncrementalReasoner().getInternalReasoner());
+								getIncrementalReasoner().getInternalReasoner()
+										.getTaxonomyQuietly());
 					}
 
 					@Override

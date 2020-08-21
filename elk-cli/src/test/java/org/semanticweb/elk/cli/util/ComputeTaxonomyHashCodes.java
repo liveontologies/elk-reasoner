@@ -72,7 +72,7 @@ public class ComputeTaxonomyHashCodes {
 				Taxonomy<ElkClass> taxonomy = null;
 
 				try {
-					taxonomy = reasoner.getTaxonomy();
+					taxonomy = reasoner.getTaxonomy().getValue();
 				} catch (ElkInconsistentOntologyException e) {
 					return 0;
 				} catch (ElkException e) {
@@ -91,7 +91,7 @@ public class ComputeTaxonomyHashCodes {
 				InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = null;
 
 				try {
-					taxonomy = reasoner.getInstanceTaxonomy();
+					taxonomy = reasoner.getInstanceTaxonomy().getValue();
 				} catch (ElkInconsistentOntologyException e) {
 					return 0;
 				} catch (ElkException e) {
@@ -108,20 +108,20 @@ public class ComputeTaxonomyHashCodes {
 			throws IOException, Owl2ParseException, InterruptedException {
 		File srcDir = new File(path);
 
-		File[] ontFiles = srcDir.listFiles(FileUtils
-				.getExtBasedFilenameFilter("owl"));
-		
+		File[] ontFiles = srcDir
+				.listFiles(FileUtils.getExtBasedFilenameFilter("owl"));
+
 		if (ontFiles == null) {
 			throw new RuntimeException("Not a directory: " + path);
 		}
-		
+
 		for (File ontFile : ontFiles) {
 
 			System.err.println(ontFile.getName());
 
 			// use just one worker to minimize the risk of errors
-			Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-					new FileInputStream(ontFile), 1);
+			Reasoner reasoner = TestReasonerUtils
+					.createTestReasoner(new FileInputStream(ontFile), 1);
 
 			int hash = hasher.hash(reasoner);
 			// create the expected result file

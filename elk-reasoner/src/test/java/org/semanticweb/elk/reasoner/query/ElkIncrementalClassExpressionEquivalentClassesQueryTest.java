@@ -21,61 +21,70 @@
  */
 package org.semanticweb.elk.reasoner.query;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Map;
 
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.incremental.ElkIncrementalReasoningTestDelegate;
 import org.semanticweb.elk.testing.PolySuite;
+import org.semanticweb.elk.testing.PolySuite.Config;
+import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifest;
 
 import com.google.common.collect.ImmutableMap;
 
 @RunWith(PolySuite.class)
 public class ElkIncrementalClassExpressionEquivalentClassesQueryTest extends
-		ElkIncrementalClassExpressionQueryTest<EquivalentEntitiesTestOutput<ElkClass>> {
+		ElkIncrementalClassExpressionQueryTest<ElkEquivalentClassesTestOutput> {
 
 	public ElkIncrementalClassExpressionEquivalentClassesQueryTest(
 			final TestManifest<QueryTestInput<ElkClassExpression>> manifest) {
 		super(manifest,
-				new ElkIncrementalReasoningTestDelegate<EquivalentEntitiesTestOutput<ElkClass>>(
+				new ElkIncrementalReasoningTestDelegate<ElkEquivalentClassesTestOutput>(
 						manifest) {
 
 					@Override
-					public EquivalentEntitiesTestOutput<ElkClass> getExpectedOutput()
+					public ElkEquivalentClassesTestOutput getExpectedOutput()
 							throws Exception {
 						return new ElkEquivalentClassesTestOutput(
-								getStandardReasoner(),
-								manifest.getInput().getQuery());
+								getStandardReasoner()
+										.getEquivalentClassesQuitely(manifest
+												.getInput().getQuery()));
 					}
 
 					@Override
-					public EquivalentEntitiesTestOutput<ElkClass> getActualOutput()
+					public ElkEquivalentClassesTestOutput getActualOutput()
 							throws Exception {
 						return new ElkEquivalentClassesTestOutput(
-								getIncrementalReasoner(),
-								manifest.getInput().getQuery());
+								getIncrementalReasoner()
+										.getEquivalentClassesQuitely(manifest
+												.getInput().getQuery()));
 					}
 
 					@Override
 					protected Map<String, String> additionalConfigIncremental() {
-						return ImmutableMap.<String, String> builder()
-								.put(ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
-										"NQEvictor(0, 0.75)")
-								.build();
+						return ImmutableMap.<String, String> builder().put(
+								ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
+								"NQEvictor(0, 0.75)").build();
 					}
 
 					@Override
 					protected Map<String, String> additionalConfigWithInterrupts() {
-						return ImmutableMap.<String, String> builder()
-								.put(ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
-										"NQEvictor(0, 0.75)")
-								.build();
+						return ImmutableMap.<String, String> builder().put(
+								ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
+								"NQEvictor(0, 0.75)").build();
 					}
 
 				});
+	}
+
+	@Config
+	public static Configuration getConfig()
+			throws IOException, URISyntaxException {
+		return getConfig("getEquivalentClasses");
 	}
 
 }

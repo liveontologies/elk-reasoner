@@ -32,9 +32,7 @@ import java.util.Map;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
-import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.ElkReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.testing.ConfigurationUtils;
@@ -46,36 +44,36 @@ import org.semanticweb.elk.testing.TestManifestWithOutput;
 import com.google.common.collect.ImmutableMap;
 
 @RunWith(PolySuite.class)
-public class ElkClassExpressionInstancesQueryTest extends
-		BaseQueryTest<ElkClassExpression, RelatedEntitiesTestOutput<ElkNamedIndividual>> {
+public class ElkClassExpressionDirectInstancesQueryTest extends
+		BaseQueryTest<ElkClassExpression, ElkDirectInstancesTestOutput> {
 
-	public ElkClassExpressionInstancesQueryTest(
-			final QueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkNamedIndividual>> manifest) {
+	public ElkClassExpressionDirectInstancesQueryTest(
+			final QueryTestManifest<ElkClassExpression, ElkDirectInstancesTestOutput> manifest) {
 		super(manifest,
-				new ElkReasoningTestDelegate<RelatedEntitiesTestOutput<ElkNamedIndividual>>(
+				new ElkReasoningTestDelegate<ElkDirectInstancesTestOutput>(
 						manifest) {
 
 					@Override
-					public RelatedEntitiesTestOutput<ElkNamedIndividual> getActualOutput()
+					public ElkDirectInstancesTestOutput getActualOutput()
 							throws Exception {
-						return new ElkInstancesTestOutput(getReasoner(),
-								manifest.getInput().getQuery());
+						ElkClassExpression query = manifest.getInput()
+								.getQuery();
+						return new ElkDirectInstancesTestOutput(query,
+								getReasoner().getInstancesQuietly(query, true));
 					}
 
 					@Override
 					protected Map<String, String> additionalConfigWithOutput() {
-						return ImmutableMap.<String, String> builder()
-								.put(ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
-										"NQEvictor(0, 0.75)")
-								.build();
+						return ImmutableMap.<String, String> builder().put(
+								ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
+								"NQEvictor(0, 0.75)").build();
 					}
 
 					@Override
 					protected Map<String, String> additionalConfigWithInterrupts() {
-						return ImmutableMap.<String, String> builder()
-								.put(ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
-										"NQEvictor(0, 0.75)")
-								.build();
+						return ImmutableMap.<String, String> builder().put(
+								ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
+								"NQEvictor(0, 0.75)").build();
 					}
 
 				});
@@ -87,10 +85,10 @@ public class ElkClassExpressionInstancesQueryTest extends
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				ElkTestUtils.TEST_INPUT_LOCATION, BaseQueryTest.class,
-				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkNamedIndividual>>>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkClassExpression>, ElkDirectInstancesTestOutput>>() {
 
 					@Override
-					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkNamedIndividual>>> createManifests(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, ElkDirectInstancesTestOutput>> createManifests(
 							final String name, final List<URL> urls)
 							throws IOException {
 
@@ -104,17 +102,10 @@ public class ElkClassExpressionInstancesQueryTest extends
 							return Collections.emptySet();
 						}
 
-						InputStream outputIS = null;
-						try {
-							outputIS = urls.get(1).openStream();
-
+						try (InputStream outputIS = urls.get(1).openStream()) {
 							return ElkExpectedTestOutputLoader.load(outputIS)
 									.getInstancesManifests(name, urls.get(0));
-
-						} finally {
-							IOUtils.closeQuietly(outputIS);
 						}
-
 					}
 
 				}, "owl", "classquery");

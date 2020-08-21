@@ -27,9 +27,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Set;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.semanticweb.elk.exceptions.ElkException;
-import org.semanticweb.elk.loading.EmptyAxiomLoader;
 import org.semanticweb.elk.loading.TestLoader;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -43,80 +43,71 @@ public class ComplexClassQueryTest {
 
 	final ElkObject.Factory objectFactory = new ElkObjectEntityRecyclingFactory();
 
+	private TestLoader loader;
+	private Reasoner reasoner;
+
+	@Before
+	public void initReasoner() {
+		loader = new TestLoader();
+		reasoner = TestReasonerUtils.createTestReasoner(loader);
+	}
+
 	@Test
 	public void testSimpleSubsumption() throws ElkException {
-		TestLoader loader = new TestLoader();
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
-
 		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
 		loader.add(objectFactory.getSubClassOfAxiom(A, B));
-		assertFalse(reasoner.isSatisfiable(objectFactory
-				.getObjectIntersectionOf(A,
-						objectFactory.getObjectComplementOf(B))));
-		assertTrue(reasoner.isSatisfiable(objectFactory
-				.getObjectIntersectionOf(B,
-						objectFactory.getObjectComplementOf(A))));
+		assertFalse(isSatisfiable(objectFactory.getObjectIntersectionOf(A,
+				objectFactory.getObjectComplementOf(B))));
+		assertTrue(isSatisfiable(objectFactory.getObjectIntersectionOf(B,
+				objectFactory.getObjectComplementOf(A))));
 	}
 
 	@Test
 	public void testSatisfiabilityExistential() throws ElkException {
-		TestLoader loader = new TestLoader();
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
-
 		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
 		loader.add(objectFactory.getSubClassOfAxiom(A,
 				objectFactory.getOwlNothing()));
-		ElkObjectProperty R = objectFactory.getObjectProperty(new ElkFullIri(
-				":R"));
-		assertFalse(reasoner.isSatisfiable(objectFactory
-				.getObjectSomeValuesFrom(R, A)));
-		assertTrue(reasoner.isSatisfiable(objectFactory
-				.getObjectSomeValuesFrom(R, B)));
+		ElkObjectProperty R = objectFactory
+				.getObjectProperty(new ElkFullIri(":R"));
+		assertFalse(isSatisfiable(objectFactory.getObjectSomeValuesFrom(R, A)));
+		assertTrue(isSatisfiable(objectFactory.getObjectSomeValuesFrom(R, B)));
 	}
 
 	@Test
 	public void testSatisfiabilityExistentialSubsumption() throws ElkException {
-		TestLoader loader = new TestLoader();
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
-
 		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
 		loader.add(objectFactory.getSubClassOfAxiom(A, B));
-		ElkObjectProperty R = objectFactory.getObjectProperty(new ElkFullIri(
-				":R"));
-		assertFalse(reasoner.isSatisfiable(objectFactory
-				.getObjectIntersectionOf(objectFactory.getObjectSomeValuesFrom(
-						R, A), objectFactory
-						.getObjectComplementOf(objectFactory
-								.getObjectSomeValuesFrom(R, B)))));
-		assertTrue(reasoner.isSatisfiable(objectFactory
-				.getObjectIntersectionOf(objectFactory.getObjectSomeValuesFrom(
-						R, B), objectFactory
-						.getObjectComplementOf(objectFactory
-								.getObjectSomeValuesFrom(R, A)))));
+		ElkObjectProperty R = objectFactory
+				.getObjectProperty(new ElkFullIri(":R"));
+		assertFalse(isSatisfiable(objectFactory.getObjectIntersectionOf(
+				objectFactory.getObjectSomeValuesFrom(R, A),
+				objectFactory.getObjectComplementOf(
+						objectFactory.getObjectSomeValuesFrom(R, B)))));
+		assertTrue(isSatisfiable(objectFactory.getObjectIntersectionOf(
+				objectFactory.getObjectSomeValuesFrom(R, B),
+				objectFactory.getObjectComplementOf(
+						objectFactory.getObjectSomeValuesFrom(R, A)))));
 	}
 
 	@Test
 	public void testSupSubClassConjunction() throws ElkException {
-		TestLoader loader = new TestLoader();
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
-
 		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
 		ElkClass C = objectFactory.getClass(new ElkFullIri(":C"));
-		loader.add(objectFactory.getSubClassOfAxiom(A, B)).add(
-				(objectFactory.getSubClassOfAxiom(B, C)));
+		loader.add(objectFactory.getSubClassOfAxiom(A, B))
+				.add((objectFactory.getSubClassOfAxiom(B, C)));
 
-		Set<? extends Node<ElkClass>> superClasses = reasoner.getSuperClasses(
+		Set<? extends Node<ElkClass>> superClasses = getSuperClasses(
 				objectFactory.getObjectIntersectionOf(B, C), true);
 		assertEquals(1, superClasses.size());
 		for (Node<ElkClass> node : superClasses) {
 			assertTrue(node.contains(C));
 		}
 
-		Set<? extends Node<ElkClass>> subClasses = reasoner.getSubClasses(
+		Set<? extends Node<ElkClass>> subClasses = getSubClasses(
 				objectFactory.getObjectIntersectionOf(B, C), true);
 		assertEquals(1, subClasses.size());
 		for (Node<ElkClass> node : subClasses) {
@@ -127,17 +118,14 @@ public class ComplexClassQueryTest {
 
 	@Test
 	public void testEquivalentClasses() throws ElkException {
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				new EmptyAxiomLoader());
-
 		// empty ontology, query for conjunction
 		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
 		ElkClassExpression queryExpression = objectFactory
 				.getObjectIntersectionOf(A, B);
-		assertEquals(0, reasoner.getEquivalentClasses(queryExpression).size());
+		assertEquals(0, getEquivalentClasses(queryExpression).size());
 		// the following has reproduced Issue 23:
-		assertEquals(0, reasoner.getEquivalentClasses(queryExpression).size());
+		assertEquals(0, getEquivalentClasses(queryExpression).size());
 	}
 
 	/**
@@ -150,9 +138,6 @@ public class ComplexClassQueryTest {
 	 */
 	@Test
 	public void testPartiallySupportedExpression() throws ElkException {
-		TestLoader loader = new TestLoader();
-		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
-
 		final ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
 		final ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
 		final ElkClass C = objectFactory.getClass(new ElkFullIri(":C"));
@@ -165,13 +150,34 @@ public class ComplexClassQueryTest {
 		// negative occurrence of top, so that it is added to composed subsumers
 		loader.add(objectFactory.getSubClassOfAxiom(top, D));
 
-		final Set<? extends Node<ElkClass>> subClasses = reasoner
-				.getSubClasses(query, true);
+		final Set<? extends Node<ElkClass>> subClasses = getSubClasses(query,
+				true);
 		assertEquals(2, subClasses.size());
 		for (final Node<ElkClass> node : subClasses) {
 			assertEquals(1, node.size());
 			assertTrue(node.contains(A) != node.contains(B));
 		}
+	}
+
+	boolean isSatisfiable(ElkClassExpression expression) throws ElkException {
+		return reasoner.isSatisfiable(expression).getValue();
+	}
+
+	Set<? extends Node<ElkClass>> getSuperClasses(
+			ElkClassExpression classExpression, boolean direct)
+			throws ElkException {
+		return reasoner.getSuperClasses(classExpression, direct).getValue();
+	}
+
+	Set<? extends Node<ElkClass>> getSubClasses(
+			ElkClassExpression classExpression, boolean direct)
+			throws ElkException {
+		return reasoner.getSubClasses(classExpression, direct).getValue();
+	}
+
+	Node<ElkClass> getEquivalentClasses(ElkClassExpression classExpression)
+			throws ElkException {
+		return reasoner.getEquivalentClasses(classExpression).getValue();
 	}
 
 }

@@ -32,8 +32,6 @@ import java.util.Map;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
-import org.semanticweb.elk.io.IOUtils;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.ElkReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
@@ -46,39 +44,37 @@ import org.semanticweb.elk.testing.TestManifestWithOutput;
 import com.google.common.collect.ImmutableMap;
 
 @RunWith(PolySuite.class)
-public class ElkClassExpressionSubClassesQueryTest extends
-		BaseQueryTest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>> {
+public class ElkClassExpressionDirectSuperClassesQueryTest
+		extends BaseQueryTest<ElkClassExpression, ElkDirectSuperClassesTestOutput> {
 
-	public ElkClassExpressionSubClassesQueryTest(
-			final QueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>> manifest) {
-		super(manifest,
-				new ElkReasoningTestDelegate<RelatedEntitiesTestOutput<ElkClass>>(
-						manifest) {
+	public ElkClassExpressionDirectSuperClassesQueryTest(
+			final QueryTestManifest<ElkClassExpression, ElkDirectSuperClassesTestOutput> manifest) {
+		super(manifest, new ElkReasoningTestDelegate<ElkDirectSuperClassesTestOutput>(
+				manifest) {
 
-					@Override
-					public RelatedEntitiesTestOutput<ElkClass> getActualOutput()
-							throws Exception {
-						return new ElkSubClassesTestOutput(getReasoner(),
-								manifest.getInput().getQuery());
-					}
+			@Override
+			public ElkDirectSuperClassesTestOutput getActualOutput()
+					throws Exception {
+				ElkClassExpression query = manifest.getInput().getQuery();
+				return new ElkDirectSuperClassesTestOutput(query,
+						getReasoner().getSuperClassesQuietly(query, true));
+			}
 
-					@Override
-					protected Map<String, String> additionalConfigWithOutput() {
-						return ImmutableMap.<String, String> builder()
-								.put(ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
-										"NQEvictor(0, 0.75)")
-								.build();
-					}
+			@Override
+			protected Map<String, String> additionalConfigWithOutput() {
+				return ImmutableMap.<String, String> builder().put(
+						ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
+						"NQEvictor(0, 0.75)").build();
+			}
 
-					@Override
-					protected Map<String, String> additionalConfigWithInterrupts() {
-						return ImmutableMap.<String, String> builder()
-								.put(ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
-										"NQEvictor(0, 0.75)")
-								.build();
-					}
+			@Override
+			protected Map<String, String> additionalConfigWithInterrupts() {
+				return ImmutableMap.<String, String> builder().put(
+						ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
+						"NQEvictor(0, 0.75)").build();
+			}
 
-				});
+		});
 	}
 
 	@Config
@@ -87,10 +83,10 @@ public class ElkClassExpressionSubClassesQueryTest extends
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				ElkTestUtils.TEST_INPUT_LOCATION, BaseQueryTest.class,
-				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkClass>>>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkClassExpression>, ElkDirectSuperClassesTestOutput>>() {
 
 					@Override
-					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkClass>>> createManifests(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, ElkDirectSuperClassesTestOutput>> createManifests(
 							final String name, final List<URL> urls)
 							throws IOException {
 
@@ -104,15 +100,10 @@ public class ElkClassExpressionSubClassesQueryTest extends
 							return Collections.emptySet();
 						}
 
-						InputStream outputIS = null;
-						try {
-							outputIS = urls.get(1).openStream();
-
+						try (InputStream outputIS = urls.get(1).openStream()) {
 							return ElkExpectedTestOutputLoader.load(outputIS)
-									.getSubEntitiesManifests(name, urls.get(0));
-
-						} finally {
-							IOUtils.closeQuietly(outputIS);
+									.getDirectSuperClassesManifests(name,
+											urls.get(0));
 						}
 
 					}

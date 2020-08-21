@@ -38,10 +38,7 @@ import org.semanticweb.elk.owlapi.ElkConverter;
 import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
-import org.semanticweb.elk.reasoner.query.EntailmentQueryResult;
-import org.semanticweb.elk.reasoner.query.ProperEntailmentQueryResult;
-import org.semanticweb.elk.reasoner.query.UnsupportedIndexingEntailmentQueryResult;
-import org.semanticweb.elk.reasoner.query.UnsupportedQueryTypeEntailmentQueryResult;
+import org.semanticweb.elk.reasoner.query.VerifiableQueryResult;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.UnsupportedEntailmentTypeException;
 
@@ -102,10 +99,21 @@ public class ElkOwlProof extends BaseProof<ElkOwlInference>
 		try {
 
 			final ElkAxiom elkAxiom = owlConverter.convert(owlEntailment_);
-			final EntailmentQueryResult result = elkReasoner_
+			final VerifiableQueryResult result = elkReasoner_
 					.getInternalReasoner().isEntailed(elkAxiom);
-			result.accept(ENTAILMENT_QUERY_RESULT_VISITOR);
-
+			try {
+				final ElkInferenceProducer producer = new ElkInferenceConvertingProducer(
+						ElkOwlProof.this);
+				final ElkInference.Factory factory = new ElkInferenceOptimizedProducingFactory(
+						producer);
+				final Proof<EntailmentInference> evidence = result
+						.getEvidence(false);
+				new ElkProofGenerator(evidence,
+						elkReasoner_.getInternalReasoner(), factory)
+								.generate(result.getEntailment());
+			} finally {
+				result.unlock();
+			}
 		} catch (final ElkException e) {
 			throw elkConverter.convert(e);
 		} catch (final ElkRuntimeException e) {
@@ -113,46 +121,6 @@ public class ElkOwlProof extends BaseProof<ElkOwlInference>
 		}
 
 	}
-
-	private final EntailmentQueryResult.Visitor<Void, ElkException> ENTAILMENT_QUERY_RESULT_VISITOR = new EntailmentQueryResult.Visitor<Void, ElkException>() {
-
-		@Override
-		public Void visit(final ProperEntailmentQueryResult properResult)
-				throws ElkException {
-			try {
-				final ElkInferenceProducer producer = new ElkInferenceConvertingProducer(
-						ElkOwlProof.this);
-				final ElkInference.Factory factory = new ElkInferenceOptimizedProducingFactory(
-						producer);
-				final Proof<EntailmentInference> evidence = properResult
-						.getEvidence(false);
-				new ElkProofGenerator(evidence,
-						elkReasoner_.getInternalReasoner(), factory)
-								.generate(properResult.getEntailment());
-				return null;
-			} finally {
-				properResult.unlock();
-			}
-		}
-
-		@Override
-		public Void visit(
-				final UnsupportedIndexingEntailmentQueryResult unsupportedIndexing) {
-			/*
-			 * Indexing of some subexpression of the entailment is not
-			 * supported, so we can generate only empty proof. The warning
-			 * should be logged during loading of the entailment query.
-			 */
-			return null;
-		}
-
-		@Override
-		public Void visit(
-				final UnsupportedQueryTypeEntailmentQueryResult unsupportedQueryType) {
-			throw new UnsupportedEntailmentTypeException(owlEntailment_);
-		}
-
-	};
 
 	public static DynamicProof<ElkOwlInference> create(ElkReasoner reasoner,
 			OWLAxiom entailment) throws UnsupportedEntailmentTypeException {

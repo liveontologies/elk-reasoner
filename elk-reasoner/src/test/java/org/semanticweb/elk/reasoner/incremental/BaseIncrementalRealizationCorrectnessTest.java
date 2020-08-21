@@ -21,21 +21,17 @@
  */
 package org.semanticweb.elk.reasoner.incremental;
 
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
-import java.io.StringWriter;
 import java.net.URISyntaxException;
 
+import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.InstanceTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.SimpleManifestCreator;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
-import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
-import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.testing.ConfigurationUtils;
+import org.semanticweb.elk.testing.DiffableOutput;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
@@ -67,27 +63,39 @@ public abstract class BaseIncrementalRealizationCorrectnessTest<A> extends
 			final InstanceTaxonomyTestOutput expectedOutput)
 			throws ElkException {
 
-		final InstanceTaxonomy<?, ?> expected = expectedOutput.getTaxonomy();
-
-		final InstanceTaxonomy<?, ?> incremental = actualOutput.getTaxonomy();
-
-		if (TaxonomyHasher.hash(expected) != TaxonomyHasher.hash(incremental)
-				|| !expected.equals(incremental)) {
-			StringWriter writer = new StringWriter();
-
-			try {
-				writer.write("EXPECTED TAXONOMY:\n");
-				TaxonomyPrinter.dumpInstanceTaxomomy(expected, writer, false);
-				writer.write("\nINCREMENTAL TAXONOMY:\n");
-				TaxonomyPrinter.dumpInstanceTaxomomy(incremental, writer,
-						false);
-				writer.flush();
-			} catch (IOException ioe) {
-				// TODO
-			}
-
-			fail(writer.getBuffer().toString());
+		boolean actualContainsAllExpected = actualOutput
+				.containsAllElementsOf(expectedOutput);
+		boolean expectedContainsAllActual = expectedOutput
+				.containsAllElementsOf(actualOutput);
+		if (actualContainsAllExpected && expectedContainsAllActual) {
+			return;
 		}
+		// else
+		final StringBuilder message = new StringBuilder(
+				"Actual output is not equal to the expected output:");
+		if (!actualContainsAllExpected) {
+			reportMissing(actualOutput, expectedOutput, "< ", message);
+		}
+		if (!expectedContainsAllActual) {
+			reportMissing(expectedOutput, actualOutput, "> ", message);
+		}
+		Assert.fail(message.toString());
+
+	}
+
+	private static <E, O extends DiffableOutput<E, O>> void reportMissing(
+			O first, O second, final String prefix,
+			final StringBuilder message) {
+		first.reportMissingElementsOf(second, new DiffableOutput.Listener<E>() {
+
+			@Override
+			public void missing(E element) {
+				message.append('\n');
+				message.append(prefix);
+				message.append(element);
+			}
+		});
+
 	}
 
 	@Config

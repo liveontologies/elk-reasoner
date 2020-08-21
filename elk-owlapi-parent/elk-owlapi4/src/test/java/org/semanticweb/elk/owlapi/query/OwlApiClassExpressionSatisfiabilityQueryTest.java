@@ -117,7 +117,7 @@ public class OwlApiClassExpressionSatisfiabilityQueryTest
 							outputIS = urls.get(1).openStream();
 
 							return OwlExpectedTestOutputLoader.load(outputIS)
-									.getSatisfiabilityManifests(name,
+									.getClassSatisfiabilityManifests(name,
 											urls.get(0));
 
 						} finally {

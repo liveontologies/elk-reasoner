@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -33,8 +32,6 @@ import java.util.Map;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
-import org.semanticweb.elk.io.IOUtils;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.ElkReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
@@ -43,61 +40,40 @@ import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
-import org.semanticweb.elk.testing.TestUtils;
 
 import com.google.common.collect.ImmutableMap;
 
 @RunWith(PolySuite.class)
-public class ElkClassExpressionSuperClassesQueryTest extends
-		BaseQueryTest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>> {
+public class ElkClassExpressionDirectSubClassesQueryTest
+		extends BaseQueryTest<ElkClassExpression, ElkDirectSubClassesTestOutput> {
 
-	// @formatter:off
-	static final String[] IGNORE_LIST = {
-			ElkTestUtils.TEST_INPUT_LOCATION + "/query/class/Disjunctions.owl",// Disjuctions not supported
-			ElkTestUtils.TEST_INPUT_LOCATION + "/query/class/OneOf.owl",// Disjuctions not supported
-		};
-	// @formatter:on
+	public ElkClassExpressionDirectSubClassesQueryTest(
+			final QueryTestManifest<ElkClassExpression, ElkDirectSubClassesTestOutput> manifest) {
+		super(manifest, new ElkReasoningTestDelegate<ElkDirectSubClassesTestOutput>(
+				manifest) {
 
-	static {
-		Arrays.sort(IGNORE_LIST);
-	}
+			@Override
+			public ElkDirectSubClassesTestOutput getActualOutput() throws Exception {
+				ElkClassExpression query = manifest.getInput().getQuery();
+				return new ElkDirectSubClassesTestOutput(query,
+						getReasoner().getSubClassesQuietly(query, true));
+			}
 
-	@Override
-	protected boolean ignore(final QueryTestInput<ElkClassExpression> input) {
-		return super.ignore(input) || TestUtils.ignore(input,
-				ElkTestUtils.TEST_INPUT_LOCATION, IGNORE_LIST);
-	}
+			@Override
+			protected Map<String, String> additionalConfigWithOutput() {
+				return ImmutableMap.<String, String> builder().put(
+						ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
+						"NQEvictor(0, 0.75)").build();
+			}
 
-	public ElkClassExpressionSuperClassesQueryTest(
-			final QueryTestManifest<ElkClassExpression, RelatedEntitiesTestOutput<ElkClass>> manifest) {
-		super(manifest,
-				new ElkReasoningTestDelegate<RelatedEntitiesTestOutput<ElkClass>>(
-						manifest) {
+			@Override
+			protected Map<String, String> additionalConfigWithInterrupts() {
+				return ImmutableMap.<String, String> builder().put(
+						ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
+						"NQEvictor(0, 0.75)").build();
+			}
 
-					@Override
-					public RelatedEntitiesTestOutput<ElkClass> getActualOutput()
-							throws Exception {
-						return new ElkSuperClassesTestOutput(getReasoner(),
-								manifest.getInput().getQuery());
-					}
-
-					@Override
-					protected Map<String, String> additionalConfigWithOutput() {
-						return ImmutableMap.<String, String> builder()
-								.put(ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
-										"NQEvictor(0, 0.75)")
-								.build();
-					}
-
-					@Override
-					protected Map<String, String> additionalConfigWithInterrupts() {
-						return ImmutableMap.<String, String> builder()
-								.put(ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
-										"NQEvictor(0, 0.75)")
-								.build();
-					}
-
-				});
+		});
 	}
 
 	@Config
@@ -106,10 +82,10 @@ public class ElkClassExpressionSuperClassesQueryTest extends
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				ElkTestUtils.TEST_INPUT_LOCATION, BaseQueryTest.class,
-				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkClass>>>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkClassExpression>, ElkDirectSubClassesTestOutput>>() {
 
 					@Override
-					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, RelatedEntitiesTestOutput<ElkClass>>> createManifests(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, ElkDirectSubClassesTestOutput>> createManifests(
 							final String name, final List<URL> urls)
 							throws IOException {
 
@@ -123,18 +99,11 @@ public class ElkClassExpressionSuperClassesQueryTest extends
 							return Collections.emptySet();
 						}
 
-						InputStream outputIS = null;
-						try {
-							outputIS = urls.get(1).openStream();
-
+						try (InputStream outputIS = urls.get(1).openStream()) {
 							return ElkExpectedTestOutputLoader.load(outputIS)
-									.getSuperEntitiesManifests(name,
+									.getDirectSubClassesManifests(name,
 											urls.get(0));
-
-						} finally {
-							IOUtils.closeQuietly(outputIS);
 						}
-
 					}
 
 				}, "owl", "classquery");

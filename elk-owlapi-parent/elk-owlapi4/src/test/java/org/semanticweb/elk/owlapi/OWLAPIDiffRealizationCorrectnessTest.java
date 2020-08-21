@@ -48,7 +48,8 @@ public class OWLAPIDiffRealizationCorrectnessTest
 					public InstanceTaxonomyTestOutput getActualOutput()
 							throws Exception {
 						return new InstanceTaxonomyTestOutput(
-								getReasoner().getInternalReasoner());
+								getReasoner().getInternalReasoner()
+										.getInstanceTaxonomyQuietly());
 					}
 
 					@Override

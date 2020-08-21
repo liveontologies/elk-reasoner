@@ -39,7 +39,8 @@ public class ElkDiffRealizationCorrectnessTest
 					@Override
 					public InstanceTaxonomyTestOutput getActualOutput()
 							throws Exception {
-						return new InstanceTaxonomyTestOutput(getReasoner());
+						return new InstanceTaxonomyTestOutput(
+								getReasoner().getInstanceTaxonomyQuietly());
 					}
 
 				});

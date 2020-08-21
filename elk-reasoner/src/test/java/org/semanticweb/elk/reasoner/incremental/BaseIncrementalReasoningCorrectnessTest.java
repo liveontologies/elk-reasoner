@@ -46,7 +46,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInpu
 		extends BaseReasoningCorrectnessTest<I, O, TestManifest<I>, TD> {
 
 	// logger for this class
-	protected static final Logger LOGGER_ = LoggerFactory
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(BaseIncrementalReasoningCorrectnessTest.class);
 
 	private final static int REPEAT_NUMBER = 5;

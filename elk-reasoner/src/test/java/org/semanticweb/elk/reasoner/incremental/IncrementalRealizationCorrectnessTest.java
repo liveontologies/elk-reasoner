@@ -27,6 +27,8 @@ import org.semanticweb.elk.reasoner.InstanceTaxonomyTestOutput;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.UrlTestInput;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Pavel Klinov
@@ -37,6 +39,9 @@ import org.semanticweb.elk.testing.UrlTestInput;
 @RunWith(PolySuite.class)
 public class IncrementalRealizationCorrectnessTest
 		extends BaseIncrementalRealizationCorrectnessTest<ElkAxiom> {
+
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(IncrementalRealizationCorrectnessTest.class);
 
 	public IncrementalRealizationCorrectnessTest(
 			final TestManifest<UrlTestInput> testManifest) {
@@ -49,7 +54,9 @@ public class IncrementalRealizationCorrectnessTest
 							throws Exception {
 						LOGGER_.trace(
 								"======= Computing Expected Taxonomy =======");
-						return new InstanceTaxonomyTestOutput(getStandardReasoner());
+						return new InstanceTaxonomyTestOutput(
+								getStandardReasoner()
+										.getInstanceTaxonomyQuietly());
 					}
 
 					@Override
@@ -57,7 +64,9 @@ public class IncrementalRealizationCorrectnessTest
 							throws Exception {
 						LOGGER_.trace(
 								"======= Computing Incremental Taxonomy =======");
-						return new InstanceTaxonomyTestOutput(getIncrementalReasoner());
+						return new InstanceTaxonomyTestOutput(
+								getIncrementalReasoner()
+										.getInstanceTaxonomyQuietly());
 					}
 
 				});

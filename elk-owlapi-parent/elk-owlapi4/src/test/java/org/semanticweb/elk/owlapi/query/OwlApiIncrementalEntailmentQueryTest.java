@@ -40,24 +40,29 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 
 @RunWith(PolySuite.class)
-public class OwlApiIncrementalEntailmentQueryTest
-		extends BaseIncrementalQueryTest<OWLAxiom, OWLAxiom, Boolean> {
+public class OwlApiIncrementalEntailmentQueryTest extends
+		BaseIncrementalQueryTest<OWLAxiom, OWLAxiom, OwlEntailmentQueryTestOutput> {
 
 	public OwlApiIncrementalEntailmentQueryTest(
 			final TestManifest<QueryTestInput<OWLAxiom>> manifest) {
 		super(manifest,
-				new OwlApiIncrementalReasoningTestDelegate<Boolean>(manifest) {
+				new OwlApiIncrementalReasoningTestDelegate<OwlEntailmentQueryTestOutput>(
+						manifest) {
 
 					@Override
-					public Boolean getExpectedOutput() throws Exception {
-						return getStandardReasoner()
-								.isEntailed(manifest.getInput().getQuery());
+					public OwlEntailmentQueryTestOutput getExpectedOutput()
+							throws Exception {
+						return new OwlEntailmentQueryTestOutput(
+								getStandardReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override
-					public Boolean getActualOutput() throws Exception {
-						return getIncrementalReasoner()
-								.isEntailed(manifest.getInput().getQuery());
+					public OwlEntailmentQueryTestOutput getActualOutput()
+							throws Exception {
+						return new OwlEntailmentQueryTestOutput(
+								getIncrementalReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override

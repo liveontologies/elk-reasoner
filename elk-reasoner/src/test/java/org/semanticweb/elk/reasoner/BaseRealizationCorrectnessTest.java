@@ -32,7 +32,6 @@ import java.util.List;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
-import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
@@ -90,15 +89,13 @@ public abstract class BaseRealizationCorrectnessTest extends
 
 						// input and expected output are OWL ontologies
 						ElkObject.Factory objectFactory = new ElkObjectEntityRecyclingFactory();
-						InputStream stream = null;
-						try {
-							stream = urls.get(1).openStream();
+						try (InputStream stream = urls.get(1).openStream()) {
 							InstanceTaxonomy<ElkClass, ElkNamedIndividual> expectedTaxonomy = MockTaxonomyLoader
 									.load(objectFactory,
 											new Owl2FunctionalStyleParserFactory(
 													objectFactory)
 															.getParser(stream));
-							
+
 							return Collections.singleton(
 									new ReasoningTestManifest<InstanceTaxonomyTestOutput>(
 											name, urls.get(0),
@@ -107,10 +104,7 @@ public abstract class BaseRealizationCorrectnessTest extends
 
 						} catch (Owl2ParseException e) {
 							throw new IOException(e);
-						} finally {
-							IOUtils.closeQuietly(stream);
 						}
-
 					}
 				}, "owl", "instancetaxonomy");
 	}

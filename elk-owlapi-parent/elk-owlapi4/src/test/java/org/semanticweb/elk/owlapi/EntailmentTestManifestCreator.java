@@ -95,11 +95,12 @@ public class EntailmentTestManifestCreator implements
 
 			// OWL API interface can query only one axiom at once.
 			for (final OWLAxiom axiom : query) {
+				boolean isEntailed = output.get(axiom);
 				manifests.add(
 						new QueryTestManifest<OWLAxiom, OwlEntailmentQueryTestOutput>(
 								name, input, axiom,
-								new OwlEntailmentQueryTestOutput(
-										output.get(axiom), true)));
+								new OwlEntailmentQueryTestOutput(axiom,
+										isEntailed, !isEntailed)));
 			}
 
 			return manifests;

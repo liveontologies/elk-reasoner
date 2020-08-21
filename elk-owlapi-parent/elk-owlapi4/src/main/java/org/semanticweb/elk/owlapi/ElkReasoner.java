@@ -45,12 +45,8 @@ import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
-import org.semanticweb.elk.reasoner.query.ElkQueryException;
 import org.semanticweb.elk.reasoner.query.EntailmentQueryConverter;
-import org.semanticweb.elk.reasoner.query.EntailmentQueryResult;
-import org.semanticweb.elk.reasoner.query.ProperEntailmentQueryResult;
-import org.semanticweb.elk.reasoner.query.UnsupportedIndexingEntailmentQueryResult;
-import org.semanticweb.elk.reasoner.query.UnsupportedQueryTypeEntailmentQueryResult;
+import org.semanticweb.elk.reasoner.query.VerifiableQueryResult;
 import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
@@ -280,8 +276,8 @@ public class ElkReasoner implements OWLReasoner {
 			throws FreshEntitiesException, InconsistentOntologyException,
 			ElkException {
 		try {
-			return elkConverter_
-					.convertClassNode(reasoner_.getEquivalentClasses(elkClass));
+			return elkConverter_.convertClassNode(
+					reasoner_.getEquivalentClasses(elkClass).getValue());
 		} catch (ElkException e) {
 			throw elkConverter_.convert(e);
 		}
@@ -292,7 +288,7 @@ public class ElkReasoner implements OWLReasoner {
 			InconsistentOntologyException, ElkException {
 		try {
 			return elkConverter_.convertObjectPropertyNode(
-					reasoner_.getObjectPropertyNode(elkClass));
+					reasoner_.getObjectPropertyNode(elkClass).getValue());
 		} catch (ElkException e) {
 			throw elkConverter_.convert(e);
 		}
@@ -357,7 +353,7 @@ public class ElkReasoner implements OWLReasoner {
 				return;
 			} else if (isBufferingMode_) {
 				// in buffering mode, new changes need to be buffered
-				// separately in order not to mix them with the flushed 
+				// separately in order not to mix them with the flushed
 				// changes that now need to be loaded
 				reasoner_.registerAxiomLoader(bufferedChangesLoader_);
 				bufferedChangesLoader_ = new OwlChangesLoaderFactory(
@@ -514,7 +510,8 @@ public class ElkReasoner implements OWLReasoner {
 		checkInterrupted();
 		try {
 			return elkConverter_.convertClassNode(
-					reasoner_.getEquivalentClasses(owlConverter_.convert(ce)));
+					reasoner_.getEquivalentClasses(owlConverter_.convert(ce))
+							.getValue());
 		} catch (ElkUnsupportedReasoningTaskException e) {
 			throw unsupportedOwlApiMethod(
 					"getEquivalentClasses(OWLClassExpression)", e.getMessage());
@@ -549,9 +546,10 @@ public class ElkReasoner implements OWLReasoner {
 		checkInterrupted();
 		if (pe instanceof OWLObjectProperty) {
 			try {
-				return elkConverter_.convertObjectPropertyNode(
-						reasoner_.getObjectPropertyNode(
-								owlConverter_.convert((OWLObjectProperty) pe)));
+				return elkConverter_.convertObjectPropertyNode(reasoner_
+						.getObjectPropertyNode(
+								owlConverter_.convert((OWLObjectProperty) pe))
+						.getValue());
 			} catch (final ElkUnsupportedReasoningTaskException e) {
 				throw unsupportedOwlApiMethod(
 						"getEquivalentObjectProperties(OWLObjectPropertyExpression)",
@@ -591,7 +589,8 @@ public class ElkReasoner implements OWLReasoner {
 		checkInterrupted();
 		try {
 			return elkConverter_.convertIndividualNodes(
-					reasoner_.getInstances(owlConverter_.convert(ce), direct));
+					reasoner_.getInstances(owlConverter_.convert(ce), direct)
+							.getValue());
 		} catch (ElkUnsupportedReasoningTaskException e) {
 			throw unsupportedOwlApiMethod(
 					"getInstances(OWLClassExpression, boolean)",
@@ -717,7 +716,6 @@ public class ElkReasoner implements OWLReasoner {
 		return new Version(version[0], version[1], version[2], version[3]);
 	}
 
-
 	@Override
 	public OWLOntology getRootOntology() {
 		LOGGER_.trace("getRootOntology()");
@@ -744,7 +742,8 @@ public class ElkReasoner implements OWLReasoner {
 		checkInterrupted();
 		try {
 			return elkConverter_.convertClassNodes(
-					reasoner_.getSubClasses(owlConverter_.convert(ce), direct));
+					reasoner_.getSubClasses(owlConverter_.convert(ce), direct)
+							.getValue());
 		} catch (ElkUnsupportedReasoningTaskException e) {
 			throw unsupportedOwlApiMethod(
 					"getSubClasses(OWLClassExpression, boolean)",
@@ -780,10 +779,11 @@ public class ElkReasoner implements OWLReasoner {
 
 		if (pe instanceof OWLObjectProperty) {
 			try {
-				return elkConverter_.convertObjectPropertyNodes(
-						reasoner_.getSubObjectProperties(
-								owlConverter_.convert((OWLObjectProperty) pe),
-								direct));
+				return elkConverter_
+						.convertObjectPropertyNodes(reasoner_
+								.getSubObjectProperties(owlConverter_.convert(
+										(OWLObjectProperty) pe), direct)
+								.getValue());
 			} catch (final ElkUnsupportedReasoningTaskException e) {
 				throw unsupportedOwlApiMethod(
 						"getSubObjectProperties(OWLObjectPropertyExpression, boolean)",
@@ -806,8 +806,9 @@ public class ElkReasoner implements OWLReasoner {
 		LOGGER_.trace("getSuperClasses(OWLClassExpression, boolean)");
 		checkInterrupted();
 		try {
-			return elkConverter_.convertClassNodes(reasoner_
-					.getSuperClasses(owlConverter_.convert(ce), direct));
+			return elkConverter_.convertClassNodes(
+					reasoner_.getSuperClasses(owlConverter_.convert(ce), direct)
+							.getValue());
 		} catch (ElkUnsupportedReasoningTaskException e) {
 			throw unsupportedOwlApiMethod(
 					"getSuperClasses(OWLClassExpression, boolean)",
@@ -843,10 +844,11 @@ public class ElkReasoner implements OWLReasoner {
 
 		if (pe instanceof OWLObjectProperty) {
 			try {
-				return elkConverter_.convertObjectPropertyNodes(
-						reasoner_.getSuperObjectProperties(
-								owlConverter_.convert((OWLObjectProperty) pe),
-								direct));
+				return elkConverter_
+						.convertObjectPropertyNodes(reasoner_
+								.getSuperObjectProperties(owlConverter_.convert(
+										(OWLObjectProperty) pe), direct)
+								.getValue());
 			} catch (final ElkUnsupportedReasoningTaskException e) {
 				throw unsupportedOwlApiMethod(
 						"getSuperObjectProperties(OWLObjectPropertyExpression, boolean)",
@@ -917,8 +919,8 @@ public class ElkReasoner implements OWLReasoner {
 		LOGGER_.trace("getTypes(OWLNamedIndividual, boolean)");
 		checkInterrupted();
 		try {
-			return elkConverter_.convertClassNodes(
-					reasoner_.getTypes(owlConverter_.convert(ind), direct));
+			return elkConverter_.convertClassNodes(reasoner_
+					.getTypes(owlConverter_.convert(ind), direct).getValue());
 		} catch (ElkUnsupportedReasoningTaskException e) {
 			throw unsupportedOwlApiMethod(
 					"getTypes(OWLNamedIndividual, boolean)", e.getMessage());
@@ -969,37 +971,6 @@ public class ElkReasoner implements OWLReasoner {
 		}
 	}
 
-	private final EntailmentQueryResult.Visitor<Boolean, ElkQueryException> ENTAILMENT_QUERY_RESULT_CONVERTER = new EntailmentQueryResult.Visitor<Boolean, ElkQueryException>() {
-
-		@Override
-		public Boolean visit(final ProperEntailmentQueryResult properResult)
-				throws ElkQueryException {
-			try {
-				return properResult.isEntailed();
-			} finally {
-				properResult.unlock();
-			}
-		}
-
-		@Override
-		public Boolean visit(
-				final UnsupportedIndexingEntailmentQueryResult unsupportedIndexing) {
-			/*
-			 * Returning an incomplete result. The warning should be logged
-			 * during loading.
-			 */
-			return false;
-		}
-
-		@Override
-		public Boolean visit(
-				final UnsupportedQueryTypeEntailmentQueryResult unsupportedQueryType) {
-			throw new UnsupportedEntailmentTypeException(
-					elkConverter_.convert(unsupportedQueryType.getQuery()));
-		}
-
-	};
-
 	@Override
 	public boolean isEntailed(final OWLAxiom owlAxiom)
 			throws ReasonerInterruptedException,
@@ -1009,11 +980,8 @@ public class ElkReasoner implements OWLReasoner {
 		LOGGER_.trace("isEntailed(OWLAxiom)");
 		checkInterrupted();
 		try {
-
 			final ElkAxiom elkAxiom = owlConverter_.convert(owlAxiom);
-			final EntailmentQueryResult result = reasoner_.isEntailed(elkAxiom);
-			return result.accept(ENTAILMENT_QUERY_RESULT_CONVERTER);
-
+			return reasoner_.isEntailed(elkAxiom).entailmentProved();
 		} catch (final ElkUnsupportedReasoningTaskException e) {
 			throw unsupportedOwlApiMethod("isEntailed(OWLAxiom)",
 					e.getMessage());
@@ -1034,10 +1002,10 @@ public class ElkReasoner implements OWLReasoner {
 		checkInterrupted();
 		try {
 
-			final Map<ElkAxiom, EntailmentQueryResult> results = reasoner_
+			Map<ElkAxiom, VerifiableQueryResult> results = reasoner_
 					.isEntailed(owlConverter_.convertAxiomSet(owlAxioms));
-			for (final EntailmentQueryResult result : results.values()) {
-				if (!result.accept(ENTAILMENT_QUERY_RESULT_CONVERTER)) {
+			for (final VerifiableQueryResult result : results.values()) {
+				if (!result.entailmentDisproved()) {
 					return false;
 				}
 			}
@@ -1090,7 +1058,8 @@ public class ElkReasoner implements OWLReasoner {
 		checkInterrupted();
 		try {
 			return reasoner_
-					.isSatisfiable(owlConverter_.convert(classExpression));
+					.isSatisfiable(owlConverter_.convert(classExpression))
+					.getValue();
 		} catch (ElkUnsupportedReasoningTaskException e) {
 			throw unsupportedOwlApiMethod("isSatisfiable(classExpression)",
 					e.getMessage());
@@ -1144,7 +1113,8 @@ public class ElkReasoner implements OWLReasoner {
 	protected class OntologyChangeListener
 			implements OWLOntologyChangeListener {
 		@Override
-		public void ontologiesChanged(List<? extends OWLOntologyChange> changes) {
+		public void ontologiesChanged(
+				List<? extends OWLOntologyChange> changes) {
 			Set<OWLOntology> importClosure = null;
 			for (OWLOntologyChange change : changes) {
 				OWLOntology changedOntology = change.getOntology();

@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.semanticweb.elk.reasoner.query.EmptyTestOutput;
 import org.semanticweb.elk.testing.ConfigurationUtils.ManifestCreator;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.UrlTestInput;
@@ -47,9 +48,8 @@ public class SimpleManifestCreator
 			// No inputs, no manifests.
 			return Collections.emptySet();
 		}
-		return Collections.singleton(
-				new ReasoningTestManifest<ReasoningTestOutput<?>>(name,
-						urls.get(0), null));
+		return Collections.singleton(new ReasoningTestManifest<EmptyTestOutput>(
+				name, urls.get(0), null));
 	}
 
 }

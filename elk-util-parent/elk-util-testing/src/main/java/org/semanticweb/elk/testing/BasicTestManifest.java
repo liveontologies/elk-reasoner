@@ -32,7 +32,7 @@ package org.semanticweb.elk.testing;
  * @param <O>
  *            The type of test output.
  */
-public class BasicTestManifest<I extends TestInput, O>
+public class BasicTestManifest<I extends TestInput, O extends DiffableOutput<?, O>>
 		implements TestManifestWithOutput<I, O> {
 
 	private final I input;
@@ -67,46 +67,39 @@ public class BasicTestManifest<I extends TestInput, O>
 	@Override
 	public void compare(final O actualOutput)
 			throws TestResultComparisonException {
-		if (expOutput == null ? actualOutput != null
-				: expOutput.hashCode() != actualOutput.hashCode()
-						|| !expOutput.equals(actualOutput)) {
-			
-			final StringBuilder message = new StringBuilder(
-					"Actual output is not equal to the expected output");
-			message.append("\nInput: ").append(getInput().getName());
-			appendDiff(actualOutput, message.append("\nDiff:\n"));
-			appendOutput(expOutput, message.append("\nExpected:\n"));
-			appendOutput(actualOutput, message.append("\nActual:\n"));
-
-			throw new TestResultComparisonException(message.toString(),
-					expOutput, actualOutput);
+		boolean actualContainsAllExpected = actualOutput
+				.containsAllElementsOf(expOutput);
+		boolean expectedContainsAllActual = expOutput
+				.containsAllElementsOf(actualOutput);
+		if (actualContainsAllExpected && expectedContainsAllActual) {
+			return;
 		}
+		// else
+		final StringBuilder message = new StringBuilder(
+				"Actual output is not equal to the expected output:");
+		if (!actualContainsAllExpected) {
+			actualOutput.reportMissingElementsOf(expOutput,
+					getPrintingListener("< ", message));
+		}
+		if (!expectedContainsAllActual) {
+			expOutput.reportMissingElementsOf(actualOutput,
+					getPrintingListener("< ", message));
+		}
+		throw new TestResultComparisonException(message.toString(), expOutput,
+				actualOutput);
 	}
 
-	/**
-	 * Writes the difference of {@link #getExpectedOutput()} and the specified
-	 * actual output to the provided {@link StringBuilder}.
-	 * <p>
-	 * Default implementation writes nothing.
-	 * 
-	 * @param actualOutput
-	 * @param result
-	 */
-	protected void appendDiff(final O actualOutput,
-			final StringBuilder result) {
-		// Empty by default.
-	}
+	static <E> DiffableOutput.Listener<E> getPrintingListener(
+			final String prefix, final StringBuilder message) {
+		return new DiffableOutput.Listener<E>() {
 
-	/**
-	 * Writes the specified output to the provided {@link StringBuilder}.
-	 * <p>
-	 * Default implementation writes {@link #toString()} of the output.
-	 * 
-	 * @param output
-	 * @param result
-	 */
-	protected void appendOutput(final O output, final StringBuilder result) {
-		result.append(output);
+			@Override
+			public void missing(E element) {
+				message.append('\n');
+				message.append(prefix);
+				message.append(element);
+			}
+		};
 	}
 
 }

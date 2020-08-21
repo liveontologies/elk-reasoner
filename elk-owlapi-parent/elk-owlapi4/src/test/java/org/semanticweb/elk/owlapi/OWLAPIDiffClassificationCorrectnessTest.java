@@ -60,8 +60,8 @@ public class OWLAPIDiffClassificationCorrectnessTest
 					@Override
 					public ClassTaxonomyTestOutput getActualOutput()
 							throws Exception {
-						return new ClassTaxonomyTestOutput(
-								getReasoner().getInternalReasoner()); 
+						return new ClassTaxonomyTestOutput(getReasoner()
+								.getInternalReasoner().getTaxonomyQuietly());
 					}
 
 					@Override
