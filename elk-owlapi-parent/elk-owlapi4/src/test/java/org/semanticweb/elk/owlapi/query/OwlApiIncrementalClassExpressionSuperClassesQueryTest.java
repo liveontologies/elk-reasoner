@@ -27,17 +27,15 @@ import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.owlapi.OwlApiIncrementalReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.QueryTestInput;
-import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestUtils;
-import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 
 @RunWith(PolySuite.class)
 public class OwlApiIncrementalClassExpressionSuperClassesQueryTest extends
-		OwlApiIncrementalClassExpressionQueryTest<RelatedEntitiesTestOutput<OWLClass>> {
+		OwlApiIncrementalClassExpressionQueryTest<OwlDirectSuperClassesTestOutput> {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
@@ -61,21 +59,21 @@ public class OwlApiIncrementalClassExpressionSuperClassesQueryTest extends
 	public OwlApiIncrementalClassExpressionSuperClassesQueryTest(
 			final TestManifest<QueryTestInput<OWLClassExpression>> manifest) {
 		super(manifest,
-				new OwlApiIncrementalReasoningTestDelegate<RelatedEntitiesTestOutput<OWLClass>>(
+				new OwlApiIncrementalReasoningTestDelegate<OwlDirectSuperClassesTestOutput>(
 						manifest) {
 
 					@Override
-					public RelatedEntitiesTestOutput<OWLClass> getExpectedOutput()
+					public OwlDirectSuperClassesTestOutput getExpectedOutput()
 							throws Exception {
-						return new OwlSuperClassesTestOutput(
+						return new OwlDirectSuperClassesTestOutput(
 								getStandardReasoner(),
 								manifest.getInput().getQuery());
 					}
 
 					@Override
-					public RelatedEntitiesTestOutput<OWLClass> getActualOutput()
+					public OwlDirectSuperClassesTestOutput getActualOutput()
 							throws Exception {
-						return new OwlSuperClassesTestOutput(
+						return new OwlDirectSuperClassesTestOutput(
 								getIncrementalReasoner(),
 								manifest.getInput().getQuery());
 					}

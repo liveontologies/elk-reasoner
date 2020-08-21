@@ -49,7 +49,8 @@ import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
 
 @RunWith(PolySuite.class)
-public class EntailmentProofTest extends BaseQueryTest<ElkAxiom, ElkQueryDerivabilityTestOutput> {
+public class EntailmentProofTest
+		extends BaseQueryTest<ElkAxiom, ElkQueryDerivabilityTestOutput> {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
@@ -70,14 +71,18 @@ public class EntailmentProofTest extends BaseQueryTest<ElkAxiom, ElkQueryDerivab
 
 	public EntailmentProofTest(
 			final QueryTestManifest<ElkAxiom, ElkQueryDerivabilityTestOutput> manifest) {
-		super(manifest, new ElkReasoningTestDelegate<ElkQueryDerivabilityTestOutput>(manifest) {
+		super(manifest,
+				new ElkReasoningTestDelegate<ElkQueryDerivabilityTestOutput>(
+						manifest) {
 
-			@Override
-			public ElkQueryDerivabilityTestOutput getActualOutput() throws Exception {
-				return new ElkQueryDerivabilityTestOutput(getReasoner(), manifest.getInput().getQuery());
-			}
+					@Override
+					public ElkQueryDerivabilityTestOutput getActualOutput()
+							throws Exception {
+						return new ElkQueryDerivabilityTestOutput(getReasoner(),
+								manifest.getInput().getQuery());
+					}
 
-		});
+				});
 	}
 
 	private static final ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkAxiom>, ElkQueryDerivabilityTestOutput>> ENTAILMENT_QUERY_TEST_MANIFEST_CREATOR_ = new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkAxiom>, ElkQueryDerivabilityTestOutput>>() {
@@ -109,7 +114,7 @@ public class EntailmentProofTest extends BaseQueryTest<ElkAxiom, ElkQueryDerivab
 					manifests.add(
 							new QueryTestManifest<ElkAxiom, ElkQueryDerivabilityTestOutput>(
 									name, input, axiom,
-									new ElkQueryDerivabilityTestOutput(true,
+									new ElkQueryDerivabilityTestOutput(axiom,
 											true)));
 				}
 

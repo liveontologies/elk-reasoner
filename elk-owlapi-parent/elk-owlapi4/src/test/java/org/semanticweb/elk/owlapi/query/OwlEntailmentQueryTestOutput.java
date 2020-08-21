@@ -21,12 +21,8 @@
  */
 package org.semanticweb.elk.owlapi.query;
 
-import java.util.Objects;
-
-import org.semanticweb.elk.owlapi.ElkProver;
 import org.semanticweb.elk.owlapi.ElkReasoner;
-import org.semanticweb.elk.owlapi.proofs.ProofTestUtils;
-import org.semanticweb.elk.reasoner.ReasoningTestOutput;
+import org.semanticweb.elk.reasoner.query.IncompleteEntailmentTestOutput;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
 /**
@@ -35,59 +31,25 @@ import org.semanticweb.owlapi.model.OWLAxiom;
  * @author Yevgeny Kazakov
  */
 public class OwlEntailmentQueryTestOutput
-		implements ReasoningTestOutput<Boolean> {
+		extends IncompleteEntailmentTestOutput<OWLAxiom, OwlEntailmentQueryTestOutput> {
 
-	private final boolean isEntailed_;
+	public OwlEntailmentQueryTestOutput(OWLAxiom query,
+			boolean entailmentProved, boolean entailmentDisproved) {
+		if (entailmentProved) {
+			addPositiveEntailment(query);
+		}
+		if (entailmentDisproved) {
+			addNegativeEntailment(query);
+		}
+	}
 
-	private final boolean isComplete_;
-
-	public OwlEntailmentQueryTestOutput(final boolean isEntailed,
-			boolean isComplete) {
-		this.isEntailed_ = isEntailed;
-		this.isComplete_ = isComplete;
+	public OwlEntailmentQueryTestOutput(OWLAxiom query, boolean isEntailed) {
+		this(query, isEntailed, !isEntailed);
 	}
 
 	public OwlEntailmentQueryTestOutput(ElkReasoner reasoner, OWLAxiom query) {
 		// TODO: completeness
-		this(reasoner.isEntailed(query), true);
-	}
-
-	public OwlEntailmentQueryTestOutput(ElkProver prover, OWLAxiom query) {
-		// TODO: completeness
-		this(ProofTestUtils.isDerivable(prover.getProof(query), query), true);
-	}
-
-	@Override
-	public Boolean getResult() {
-		return isEntailed_;
-	}
-
-	@Override
-	public boolean isComplete() {
-		return isComplete_;
-	}
-
-	@Override
-	public final int hashCode() {
-		return Objects.hash(OwlEntailmentQueryTestOutput.class, isEntailed_,
-				isComplete_);
-	}
-
-	@Override
-	public final boolean equals(final Object obj) {
-		if (obj instanceof OwlEntailmentQueryTestOutput) {
-			OwlEntailmentQueryTestOutput other = (OwlEntailmentQueryTestOutput) obj;
-			return this == obj || (isEntailed_ == other.isEntailed_
-					&& isComplete_ == other.isComplete_);
-		}
-		// else
-		return false;
-	}
-
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + "(" + (isEntailed_ ? "" : "not ")
-				+ "entailed" + (!isEntailed_ && !isComplete_ ? "?" : "") + ")";
+		this(query, reasoner.isEntailed(query));
 	}
 
 }

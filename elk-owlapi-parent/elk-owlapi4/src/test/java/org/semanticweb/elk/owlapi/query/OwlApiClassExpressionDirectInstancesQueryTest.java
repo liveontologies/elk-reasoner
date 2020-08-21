@@ -37,7 +37,6 @@ import org.semanticweb.elk.owlapi.OwlApiReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.BaseQueryTest;
 import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.reasoner.query.QueryTestManifest;
-import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
@@ -50,8 +49,8 @@ import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 
 @RunWith(PolySuite.class)
-public class OwlApiClassExpressionInstancesQueryTest extends
-		BaseQueryTest<OWLClassExpression, RelatedEntitiesTestOutput<OWLNamedIndividual>> {
+public class OwlApiClassExpressionDirectInstancesQueryTest extends
+		BaseQueryTest<OWLClassExpression, OwlDirectInstancesTestOutput> {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
@@ -70,19 +69,21 @@ public class OwlApiClassExpressionInstancesQueryTest extends
 				ElkTestUtils.TEST_INPUT_LOCATION, IGNORE_LIST);
 	}
 
-	public OwlApiClassExpressionInstancesQueryTest(
-			final QueryTestManifest<OWLClassExpression, RelatedEntitiesTestOutput<OWLNamedIndividual>> manifest) {
+	public OwlApiClassExpressionDirectInstancesQueryTest(
+			final QueryTestManifest<OWLClassExpression, OwlDirectInstancesTestOutput> manifest) {
 		super(manifest,
-				new OwlApiReasoningTestDelegate<RelatedEntitiesTestOutput<OWLNamedIndividual>>(
+				new OwlApiReasoningTestDelegate<OwlDirectInstancesTestOutput>(
 						manifest) {
 
 					@Override
-					public RelatedEntitiesTestOutput<OWLNamedIndividual> getActualOutput()
+					public OwlDirectInstancesTestOutput getActualOutput()
 							throws Exception {
-						final NodeSet<OWLNamedIndividual> subNodes = getReasoner()
-								.getInstances(manifest.getInput().getQuery(),
-										true);
-						return new OwlInstancesTestOutput(subNodes, true);
+						OWLClassExpression query = manifest.getInput()
+								.getQuery();
+						final NodeSet<OWLNamedIndividual> instances = getReasoner()
+								.getInstances(query, true);
+						return new OwlDirectInstancesTestOutput(query,
+								instances.getNodes(), true);
 					}
 
 					@Override
@@ -99,10 +100,10 @@ public class OwlApiClassExpressionInstancesQueryTest extends
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				ElkTestUtils.TEST_INPUT_LOCATION, BaseQueryTest.class,
-				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLNamedIndividual>>>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLClassExpression>, OwlDirectInstancesTestOutput>>() {
 
 					@Override
-					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLNamedIndividual>>> createManifests(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, OwlDirectInstancesTestOutput>> createManifests(
 							final String name, final List<URL> urls)
 							throws IOException {
 
@@ -121,7 +122,8 @@ public class OwlApiClassExpressionInstancesQueryTest extends
 							outputIS = urls.get(1).openStream();
 
 							return OwlExpectedTestOutputLoader.load(outputIS)
-									.getInstancesManifests(name, urls.get(0));
+									.getDirectInstancesManifests(name,
+											urls.get(0));
 
 						} finally {
 							IOUtils.closeQuietly(outputIS);

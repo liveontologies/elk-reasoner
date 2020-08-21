@@ -25,15 +25,11 @@ import org.liveontologies.puli.ChronologicalProof;
 import org.liveontologies.puli.DynamicProof;
 import org.liveontologies.puli.Proof;
 import org.semanticweb.elk.exceptions.ElkException;
-import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
-import org.semanticweb.elk.reasoner.query.EntailmentQueryResult;
-import org.semanticweb.elk.reasoner.query.ProperEntailmentQueryResult;
-import org.semanticweb.elk.reasoner.query.UnsupportedIndexingEntailmentQueryResult;
-import org.semanticweb.elk.reasoner.query.UnsupportedQueryTypeEntailmentQueryResult;
+import org.semanticweb.elk.reasoner.query.VerifiableQueryResult;
 
 /**
  * A set of inferences necessary to derive a given {@link ElkAxiom}s provided by
@@ -69,44 +65,14 @@ public class ReasonerElkProof extends ChronologicalProof<ElkInference>
 
 	private void generateInferences(final ElkAxiom goal) throws ElkException {
 
-		final EntailmentQueryResult result = reasoner_.isEntailed(goal);
-
-		result.accept(new EntailmentQueryResult.Visitor<Void, ElkException>() {
-
-			@Override
-			public Void visit(final ProperEntailmentQueryResult result)
-					throws ElkException {
-
-				try {
-					final Proof<EntailmentInference> evidence = result.getEvidence(false);
-					new ElkProofGenerator(evidence, reasoner_,
-							inferenceFactory_).generate(result.getEntailment());
-				} finally {
-					result.unlock();
-				}
-
-				return null;
-			}
-
-			@Override
-			public Void visit(
-					final UnsupportedIndexingEntailmentQueryResult result) {
-				/*
-				 * Indexing of some subexpression of the entailment is not
-				 * supported, so we can generate only empty proof. The warning
-				 * should be logged during loading of the entailment query.
-				 */
-				return null;
-			}
-
-			@Override
-			public Void visit(
-					final UnsupportedQueryTypeEntailmentQueryResult result) {
-				throw new ElkRuntimeException(
-						"Cannot check entailment: " + goal);
-			}
-
-		});
+		final VerifiableQueryResult result = reasoner_.isEntailed(goal);
+		try {
+			final Proof<EntailmentInference> evidence = result.getEvidence(false);
+			new ElkProofGenerator(evidence, reasoner_,
+					inferenceFactory_).generate(result.getEntailment());
+		} finally {
+			result.unlock();
+		}
 
 	}
 

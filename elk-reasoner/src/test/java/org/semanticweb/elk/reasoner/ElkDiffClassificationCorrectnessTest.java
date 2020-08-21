@@ -32,15 +32,18 @@ public class ElkDiffClassificationCorrectnessTest
 
 	public ElkDiffClassificationCorrectnessTest(
 			final ReasoningTestManifest<ClassTaxonomyTestOutput> testManifest) {
-		super(testManifest, new ElkReasoningTestDelegate<ClassTaxonomyTestOutput>(
-				testManifest) {
+		super(testManifest,
+				new ElkReasoningTestDelegate<ClassTaxonomyTestOutput>(
+						testManifest) {
 
-			@Override
-			public ClassTaxonomyTestOutput getActualOutput() throws Exception {
-				return new ClassTaxonomyTestOutput(getReasoner());
-			}
+					@Override
+					public ClassTaxonomyTestOutput getActualOutput()
+							throws Exception {
+						return new ClassTaxonomyTestOutput(
+								getReasoner().getTaxonomyQuietly());
+					}
 
-		});
+				});
 	}
 
 }

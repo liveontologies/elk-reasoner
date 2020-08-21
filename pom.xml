@@ -102,7 +102,7 @@
 		<protege-proof-explanation.version>0.1.0</protege-proof-explanation.version>
 		<!-- try to keep the version low for backward compatibility -->
 		<protege.version>5.5.0</protege.version>
-		<java.required.version>7</java.required.version>
+		<java.required.version>8</java.required.version>
 		<slf4j.version>1.7.25</slf4j.version>
 		<logback.version>1.2.3</logback.version>
 		<elk.wiki>https://github.com/liveontologies/elk-reasoner/wiki</elk.wiki>

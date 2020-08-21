@@ -1,12 +1,12 @@
-package org.semanticweb.elk.owlapi.query;
+package org.semanticweb.elk.reasoner.query;
 
 /*-
  * #%L
- * ELK OWL API v.4 Binding
+ * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2018 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2020 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,15 +22,25 @@ package org.semanticweb.elk.owlapi.query;
  * #L%
  */
 
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.reasoner.NodeSet;
+import org.semanticweb.elk.testing.DiffableOutput;
 
-public abstract class OwlRelatedClassesTestOutput
-		extends OwlApiRelatedEntitiesTestOutput<OWLClass> {
+/**
+ * A {@link DiffableOutput} that does not contain any test results
+ * 
+ * @author Yevgeny Kazakov
+ *
+ */
+public class EmptyTestOutput implements DiffableOutput<Void, EmptyTestOutput> {
 
-	public OwlRelatedClassesTestOutput(final NodeSet<OWLClass> related,
-			boolean isComplete) {
-		super(related, isComplete);
+	@Override
+	public boolean containsAllElementsOf(EmptyTestOutput other) {
+		return true;
+	}
+
+	@Override
+	public void reportMissingElementsOf(EmptyTestOutput other,
+			Listener<Void> listener) {
+		// nothing to report
 	}
 
 }

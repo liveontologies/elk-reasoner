@@ -391,14 +391,7 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 		@Override
 		public Set<TypeNode<T, I>> getAllSuperNodes() {
 			Set<TypeNode<T, I>> sups = new HashSet<TypeNode<T, I>>();
-
 			computeSuccessors(this, sups, Direction.UP);
-
-			if (sups.size() > 2) {
-				sups.remove(getTopNode());
-				sups.remove(getBottomNode());
-			}
-
 			return sups;
 		}
 
@@ -725,11 +718,7 @@ public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 				allTypes.addAll(aType.getAllSuperNodes());
 				allTypes.add(aType);
 			}
-
-			if (allTypes.size() > 1) {
-				allTypes.remove(getTopNode());
-			}
-
+			
 			return allTypes;
 		}
 

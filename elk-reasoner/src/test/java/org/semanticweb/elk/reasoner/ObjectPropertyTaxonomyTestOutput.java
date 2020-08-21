@@ -1,14 +1,12 @@
 package org.semanticweb.elk.reasoner;
 
-import java.util.Objects;
-
 /*-
  * #%L
  * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2018 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2020 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,41 +22,45 @@ import java.util.Objects;
  * #L%
  */
 
-import org.semanticweb.elk.exceptions.ElkException;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
+import org.semanticweb.elk.reasoner.completeness.IncompleteResult;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.testing.DiffableOutput;
 
 public class ObjectPropertyTaxonomyTestOutput
-		extends TaxonomyTestOutput<Taxonomy<ElkObjectProperty>> {
+		implements DiffableOutput<ElkAxiom, ObjectPropertyTaxonomyTestOutput> {
+
+	private final TaxonomyEntailment<ElkObjectProperty, Taxonomy<ElkObjectProperty>, TaxonomyEntailment.Listener<ElkObjectProperty>> taxEntailment_;
+
+	private boolean isComplete_;
 
 	public ObjectPropertyTaxonomyTestOutput(
 			Taxonomy<ElkObjectProperty> taxonomy, boolean isComplete) {
-		super(taxonomy, isComplete);
+		this.taxEntailment_ = new TaxonomyEntailment<>(taxonomy);
+		this.isComplete_ = isComplete;
 	}
 
-	public ObjectPropertyTaxonomyTestOutput(Reasoner reasoner)
-			throws ElkException {
-		this(reasoner.getObjectPropertyTaxonomyQuietly(),
-				reasoner.isObjectPropertyTaxonomyComplete());
-	}
-
-	@Override
-	public final int hashCode() {
-		return Objects.hash(ObjectPropertyTaxonomyTestOutput.class,
-				// TODO: make direct comparison of mock taxonomy with taxonomy
-				TaxonomyHasher.hash(getTaxonomy()), isComplete());
+	public ObjectPropertyTaxonomyTestOutput(
+			IncompleteResult<? extends Taxonomy<ElkObjectProperty>> taxonomy) {
+		this(taxonomy.getValue(), taxonomy.isComplete());
 	}
 
 	@Override
-	public final boolean equals(final Object obj) {
-		if (obj instanceof ObjectPropertyTaxonomyTestOutput) {
-			ObjectPropertyTaxonomyTestOutput other = (ObjectPropertyTaxonomyTestOutput) obj;
-			return this == obj || (getTaxonomy().equals(other.getTaxonomy())
-					&& isComplete() == other.isComplete());
+	public boolean containsAllElementsOf(
+			ObjectPropertyTaxonomyTestOutput other) {
+		return !isComplete_ || taxEntailment_.containsEntitiesAndEntailmentsOf(
+				other.taxEntailment_.getTaxonomy());
+	}
+
+	@Override
+	public void reportMissingElementsOf(ObjectPropertyTaxonomyTestOutput other,
+			Listener<ElkAxiom> listener) {
+		if (isComplete_) {
+			taxEntailment_.reportMissingEntitiesAndEntailmentsOf(
+					other.taxEntailment_.getTaxonomy(),
+					new ElkObjectPropertyTaxonomyEntailmentAdapter(listener));
 		}
-		// else
-		return false;
 	}
 
 }

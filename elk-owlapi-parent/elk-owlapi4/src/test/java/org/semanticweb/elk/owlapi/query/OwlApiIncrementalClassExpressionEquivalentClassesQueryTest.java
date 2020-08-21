@@ -26,18 +26,16 @@ import java.util.Arrays;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.owlapi.OwlApiIncrementalReasoningTestDelegate;
-import org.semanticweb.elk.reasoner.query.EquivalentEntitiesTestOutput;
 import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestUtils;
-import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 
 @RunWith(PolySuite.class)
 public class OwlApiIncrementalClassExpressionEquivalentClassesQueryTest extends
-		OwlApiIncrementalClassExpressionQueryTest<EquivalentEntitiesTestOutput<OWLClass>> {
+		OwlApiIncrementalClassExpressionQueryTest<OwlEquivalentClassesTestOutput> {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
@@ -59,11 +57,11 @@ public class OwlApiIncrementalClassExpressionEquivalentClassesQueryTest extends
 	public OwlApiIncrementalClassExpressionEquivalentClassesQueryTest(
 			final TestManifest<QueryTestInput<OWLClassExpression>> manifest) {
 		super(manifest,
-				new OwlApiIncrementalReasoningTestDelegate<EquivalentEntitiesTestOutput<OWLClass>>(
+				new OwlApiIncrementalReasoningTestDelegate<OwlEquivalentClassesTestOutput>(
 						manifest) {
 
 					@Override
-					public EquivalentEntitiesTestOutput<OWLClass> getExpectedOutput()
+					public OwlEquivalentClassesTestOutput getExpectedOutput()
 							throws Exception {
 						return new OwlEquivalentClassesTestOutput(
 								getStandardReasoner(),
@@ -71,7 +69,7 @@ public class OwlApiIncrementalClassExpressionEquivalentClassesQueryTest extends
 					}
 
 					@Override
-					public EquivalentEntitiesTestOutput<OWLClass> getActualOutput()
+					public OwlEquivalentClassesTestOutput getActualOutput()
 							throws Exception {
 						return new OwlEquivalentClassesTestOutput(
 								getIncrementalReasoner(),

@@ -42,7 +42,8 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 
 @RunWith(PolySuite.class)
-public class EntailmentProofTest extends BaseQueryTest<OWLAxiom, OwlEntailmentQueryTestOutput> {
+public class EntailmentProofTest
+		extends BaseQueryTest<OWLAxiom, OwlEntailmentQueryTestOutput> {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
@@ -63,19 +64,27 @@ public class EntailmentProofTest extends BaseQueryTest<OWLAxiom, OwlEntailmentQu
 
 	public EntailmentProofTest(
 			final QueryTestManifest<OWLAxiom, OwlEntailmentQueryTestOutput> manifest) {
-		super(manifest, new OwlApiReasoningTestDelegate<OwlEntailmentQueryTestOutput>(manifest) {
+		super(manifest,
+				new OwlApiReasoningTestDelegate<OwlEntailmentQueryTestOutput>(
+						manifest) {
 
-			@Override
-			public OwlEntailmentQueryTestOutput getActualOutput() throws Exception {
-				return new OwlEntailmentQueryTestOutput(getProver(), manifest.getInput().getQuery());
-			}
+					@Override
+					public OwlEntailmentQueryTestOutput getActualOutput()
+							throws Exception {
+						OWLAxiom query = manifest.getInput().getQuery();
+						boolean isProved = ProofTestUtils.isDerivable(
+								getProver().getProof(query), query);
+						// TODO: handle incomplete results
+						return new OwlEntailmentQueryTestOutput(query, isProved,
+								!isProved);
+					}
 
-			@Override
-			public Class<? extends Exception> getInterruptionExceptionClass() {
-				return ReasonerInterruptedException.class;
-			}
+					@Override
+					public Class<? extends Exception> getInterruptionExceptionClass() {
+						return ReasonerInterruptedException.class;
+					}
 
-		});
+				});
 	}
 
 	@Config

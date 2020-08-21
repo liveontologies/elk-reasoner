@@ -31,19 +31,18 @@ import java.util.List;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
-import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.incremental.ElkIncrementalReasoningTestDelegate;
 import org.semanticweb.elk.testing.ConfigurationUtils;
+import org.semanticweb.elk.testing.DiffableOutput;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
 
 @RunWith(PolySuite.class)
-public abstract class ElkIncrementalClassExpressionQueryTest<O>
+public abstract class ElkIncrementalClassExpressionQueryTest<O extends DiffableOutput<?, O>>
 		extends BaseIncrementalQueryTest<ElkClassExpression, ElkAxiom, O> {
 
 	public ElkIncrementalClassExpressionQueryTest(
@@ -52,17 +51,16 @@ public abstract class ElkIncrementalClassExpressionQueryTest<O>
 		super(manifest, testDelegate);
 	}
 
-	@Config
-	public static Configuration getConfig()
+	static Configuration getConfig(String queryName)
 			throws IOException, URISyntaxException {
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				ElkTestUtils.TEST_INPUT_LOCATION,
 				BaseIncrementalQueryTest.class,
-				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkClassExpression>, Void>>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkClassExpression>, EmptyTestOutput>>() {
 
 					@Override
-					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, Void>> createManifests(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, EmptyTestOutput>> createManifests(
 							final String name, final List<URL> urls)
 							throws IOException {
 
@@ -76,18 +74,14 @@ public abstract class ElkIncrementalClassExpressionQueryTest<O>
 							return Collections.emptySet();
 						}
 
-						InputStream outputIS = null;
-						try {
-							outputIS = urls.get(1).openStream();
-
+						try (InputStream outputIS = urls.get(1).openStream()) {
 							// don't need an expected output for these tests
 							return ElkExpectedTestOutputLoader.load(outputIS)
-									.getNoOutputManifests(name, urls.get(0));
+									.getNoOutputManifests(
+											name + ' ' + queryName,
+											urls.get(0));
 
-						} finally {
-							IOUtils.closeQuietly(outputIS);
 						}
-
 					}
 
 				}, "owl", "classquery");

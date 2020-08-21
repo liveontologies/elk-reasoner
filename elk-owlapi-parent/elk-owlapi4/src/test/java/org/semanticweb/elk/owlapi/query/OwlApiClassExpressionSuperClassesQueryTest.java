@@ -37,20 +37,18 @@ import org.semanticweb.elk.owlapi.OwlApiReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.BaseQueryTest;
 import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.reasoner.query.QueryTestManifest;
-import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.elk.testing.TestUtils;
-import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 
 @RunWith(PolySuite.class)
 public class OwlApiClassExpressionSuperClassesQueryTest extends
-		BaseQueryTest<OWLClassExpression, RelatedEntitiesTestOutput<OWLClass>> {
+		BaseQueryTest<OWLClassExpression, OwlDirectSuperClassesTestOutput> {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
@@ -72,16 +70,16 @@ public class OwlApiClassExpressionSuperClassesQueryTest extends
 	}
 
 	public OwlApiClassExpressionSuperClassesQueryTest(
-			final QueryTestManifest<OWLClassExpression, RelatedEntitiesTestOutput<OWLClass>> manifest) {
+			final QueryTestManifest<OWLClassExpression, OwlDirectSuperClassesTestOutput> manifest) {
 		super(manifest,
-				new OwlApiReasoningTestDelegate<RelatedEntitiesTestOutput<OWLClass>>(
+				new OwlApiReasoningTestDelegate<OwlDirectSuperClassesTestOutput>(
 						manifest) {
 
 					@Override
-					public RelatedEntitiesTestOutput<OWLClass> getActualOutput()
-							throws Exception {						
-						return new OwlSuperClassesTestOutput(getReasoner(),
-								manifest.getInput().getQuery());
+					public OwlDirectSuperClassesTestOutput getActualOutput()
+							throws Exception {
+						return new OwlDirectSuperClassesTestOutput(
+								getReasoner(), manifest.getInput().getQuery());
 					}
 
 					@Override
@@ -98,10 +96,10 @@ public class OwlApiClassExpressionSuperClassesQueryTest extends
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				ElkTestUtils.TEST_INPUT_LOCATION, BaseQueryTest.class,
-				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>>>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLClassExpression>, OwlDirectSuperClassesTestOutput>>() {
 
 					@Override
-					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, RelatedEntitiesTestOutput<OWLClass>>> createManifests(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, OwlDirectSuperClassesTestOutput>> createManifests(
 							final String name, final List<URL> urls)
 							throws IOException {
 
@@ -120,7 +118,7 @@ public class OwlApiClassExpressionSuperClassesQueryTest extends
 							outputIS = urls.get(1).openStream();
 
 							return OwlExpectedTestOutputLoader.load(outputIS)
-									.getSuperEntitiesManifests(name,
+									.getDirectSuperClassesManifests(name,
 											urls.get(0));
 
 						} finally {

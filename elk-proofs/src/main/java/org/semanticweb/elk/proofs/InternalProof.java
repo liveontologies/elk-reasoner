@@ -35,16 +35,12 @@ import org.liveontologies.puli.Inferences;
 import org.liveontologies.puli.ModifiableProof;
 import org.liveontologies.puli.Proof;
 import org.semanticweb.elk.exceptions.ElkException;
-import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.entailments.model.HasReason;
-import org.semanticweb.elk.reasoner.query.EntailmentQueryResult;
-import org.semanticweb.elk.reasoner.query.ProperEntailmentQueryResult;
-import org.semanticweb.elk.reasoner.query.UnsupportedIndexingEntailmentQueryResult;
-import org.semanticweb.elk.reasoner.query.UnsupportedQueryTypeEntailmentQueryResult;
+import org.semanticweb.elk.reasoner.query.VerifiableQueryResult;
 import org.semanticweb.elk.reasoner.tracing.Conclusion;
 import org.semanticweb.elk.reasoner.tracing.TracingInference;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -57,8 +53,7 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  * 
  * @author Peter Skocovsky
  */
-public class InternalProof implements Proof<Inference<Object>>,
-		EntailmentQueryResult.Visitor<Void, ElkException> {
+public class InternalProof implements Proof<Inference<Object>> {
 
 	private final Reasoner reasoner_;
 	private final ElkAxiom goal_;
@@ -69,41 +64,16 @@ public class InternalProof implements Proof<Inference<Object>>,
 			throws ElkException {
 		this.reasoner_ = reasoner;
 		this.goal_ = goal;
-
-		reasoner.isEntailed(goal).accept(this);
-	}
-
-	@Override
-	public Void visit(final ProperEntailmentQueryResult properResult)
-			throws ElkException {
+		VerifiableQueryResult result = reasoner.isEntailed(goal);
+		
 		try {
-			final Entailment entailment = properResult.getEntailment();
+			final Entailment entailment = result.getEntailment();
 			proof_.produce(Inferences.create("Goal inference", goal_,
 					Arrays.asList(entailment)));
-			processEntailment(entailment, properResult.getEvidence(false));
-			return null;
+			processEntailment(entailment, result.getEvidence(false));
 		} finally {
-			properResult.unlock();
+			result.unlock();
 		}
-	}
-
-	@Override
-	public Void visit(
-			final UnsupportedIndexingEntailmentQueryResult unsupportedIndexing)
-			throws ElkException {
-		/*
-		 * Incomplete result, no proof can be provided. The warning should be
-		 * logged during loading.
-		 */
-		return null;
-	}
-
-	@Override
-	public Void visit(
-			final UnsupportedQueryTypeEntailmentQueryResult unsupportedQueryType)
-			throws ElkException {
-		throw new ElkRuntimeException(
-				"Cannot check entailment: " + unsupportedQueryType.getQuery());
 	}
 
 	private void processEntailment(final Entailment goal,

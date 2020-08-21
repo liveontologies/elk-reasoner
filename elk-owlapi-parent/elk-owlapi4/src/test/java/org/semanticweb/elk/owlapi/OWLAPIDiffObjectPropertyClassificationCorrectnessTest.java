@@ -46,7 +46,8 @@ public class OWLAPIDiffObjectPropertyClassificationCorrectnessTest
 					public ObjectPropertyTaxonomyTestOutput getActualOutput()
 							throws Exception {
 						return new ObjectPropertyTaxonomyTestOutput(
-								getReasoner().getInternalReasoner());
+								getReasoner().getInternalReasoner()
+										.getObjectPropertyTaxonomyQuietly());
 					}
 
 					@Override

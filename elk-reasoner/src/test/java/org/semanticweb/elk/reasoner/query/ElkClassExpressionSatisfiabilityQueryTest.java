@@ -32,7 +32,6 @@ import java.util.Map;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
-import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.ElkReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
@@ -40,10 +39,9 @@ import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
+import org.semanticweb.elk.testing.TestManifestWithOutput;
 
 import com.google.common.collect.ImmutableMap;
-
-import org.semanticweb.elk.testing.TestManifestWithOutput;
 
 @RunWith(PolySuite.class)
 public class ElkClassExpressionSatisfiabilityQueryTest
@@ -56,24 +54,22 @@ public class ElkClassExpressionSatisfiabilityQueryTest
 
 			@Override
 			public SatisfiabilityTestOutput getActualOutput() throws Exception {
-				return new ElkClassExpressionSatisfiabilityTestOutput(
-						getReasoner(), manifest.getInput().getQuery());
+				return new SatisfiabilityTestOutput(getReasoner()
+						.isSatisfiableQuitely(manifest.getInput().getQuery()));
 			}
 
 			@Override
 			protected Map<String, String> additionalConfigWithOutput() {
-				return ImmutableMap.<String, String> builder()
-						.put(ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
-								"NQEvictor(0, 0.75)")
-						.build();
+				return ImmutableMap.<String, String> builder().put(
+						ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
+						"NQEvictor(0, 0.75)").build();
 			}
 
 			@Override
 			protected Map<String, String> additionalConfigWithInterrupts() {
-				return ImmutableMap.<String, String> builder()
-						.put(ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
-								"NQEvictor(0, 0.75)")
-						.build();
+				return ImmutableMap.<String, String> builder().put(
+						ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
+						"NQEvictor(0, 0.75)").build();
 			}
 
 		});
@@ -102,18 +98,11 @@ public class ElkClassExpressionSatisfiabilityQueryTest
 							return Collections.emptySet();
 						}
 
-						InputStream outputIS = null;
-						try {
-							outputIS = urls.get(1).openStream();
-
+						try (InputStream outputIS = urls.get(1).openStream()) {
 							return ElkExpectedTestOutputLoader.load(outputIS)
-									.getSatisfiabilityManifests(name,
-											urls.get(0));
-
-						} finally {
-							IOUtils.closeQuietly(outputIS);
+									.getClassExpressionSatisfiabilityTestManifests(
+											name, urls.get(0));
 						}
-
 					}
 
 				}, "owl", "classquery");

@@ -21,20 +21,16 @@
  */
 package org.semanticweb.elk.reasoner.incremental;
 
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
-import java.io.StringWriter;
 import java.net.URISyntaxException;
 
+import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.SimpleManifestCreator;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
-import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
-import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.ConfigurationUtils;
+import org.semanticweb.elk.testing.DiffableOutput;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
@@ -49,6 +45,7 @@ import org.semanticweb.elk.testing.UrlTestInput;
  * 
  *         pavel.klinov@uni-ulm.de
  * @author Peter Skocovsky
+ * @author Yevgeny Kazakov
  */
 @RunWith(PolySuite.class)
 public abstract class BaseIncrementalClassificationCorrectnessTest<A> extends
@@ -64,26 +61,37 @@ public abstract class BaseIncrementalClassificationCorrectnessTest<A> extends
 	protected void correctnessCheck(final ClassTaxonomyTestOutput actualOutput,
 			final ClassTaxonomyTestOutput expectedOutput) throws Exception {
 
-		final Taxonomy<?> expected = expectedOutput.getTaxonomy();
-
-		final Taxonomy<?> incremental = actualOutput.getTaxonomy();
-
-		if (TaxonomyHasher.hash(expected) != TaxonomyHasher.hash(incremental)
-				|| !expected.equals(incremental)) {
-			StringWriter writer = new StringWriter();
-
-			try {
-				writer.write("EXPECTED TAXONOMY:\n");
-				TaxonomyPrinter.dumpTaxomomy(expected, writer, false);
-				writer.write("INCREMENTAL TAXONOMY:\n");
-				TaxonomyPrinter.dumpTaxomomy(incremental, writer, false);
-				writer.flush();
-			} catch (IOException ioe) {
-				// TODO
-			}
-
-			fail(writer.getBuffer().toString());
+		boolean actualContainsAllExpected = actualOutput
+				.containsAllElementsOf(expectedOutput);
+		boolean expectedContainsAllActual = expectedOutput
+				.containsAllElementsOf(actualOutput);
+		if (actualContainsAllExpected && expectedContainsAllActual) {
+			return;
 		}
+		// else
+		final StringBuilder message = new StringBuilder(
+				"Actual output is not equal to the expected output:");
+		if (!actualContainsAllExpected) {
+			reportMissing(actualOutput, expectedOutput, "< ", message);
+		}
+		if (!expectedContainsAllActual) {
+			reportMissing(expectedOutput, actualOutput, "> ", message);
+		}
+		Assert.fail(message.toString());
+	}
+
+	private static <E, O extends DiffableOutput<E, O>> void reportMissing(
+			O first, O second, final String prefix,
+			final StringBuilder message) {
+		first.reportMissingElementsOf(second, new DiffableOutput.Listener<E>() {
+
+			@Override
+			public void missing(E element) {
+				message.append('\n');
+				message.append(prefix);
+				message.append(element);
+			}
+		});
 
 	}
 

@@ -21,81 +21,72 @@
  */
 package org.semanticweb.elk.reasoner.query;
 
-import java.util.Arrays;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Map;
 
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.ElkTestUtils;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.incremental.ElkIncrementalReasoningTestDelegate;
 import org.semanticweb.elk.testing.PolySuite;
+import org.semanticweb.elk.testing.PolySuite.Config;
+import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.TestUtils;
 
 import com.google.common.collect.ImmutableMap;
 
 @RunWith(PolySuite.class)
 public class ElkIncrementalClassExpressionSuperClassesQueryTest extends
-		ElkIncrementalClassExpressionQueryTest<RelatedEntitiesTestOutput<ElkClass>> {
-
-	// @formatter:off
-	static final String[] IGNORE_LIST = {
-			ElkTestUtils.TEST_INPUT_LOCATION + "/query/class/Disjunctions.owl",// Disjuctions not supported
-			ElkTestUtils.TEST_INPUT_LOCATION + "/query/class/OneOf.owl",// Disjuctions not supported
-		};
-	// @formatter:on
-
-	static {
-		Arrays.sort(IGNORE_LIST);
-	}
-
-	@Override
-	protected boolean ignore(final QueryTestInput<ElkClassExpression> input) {
-		return super.ignore(input) || TestUtils.ignore(input,
-				ElkTestUtils.TEST_INPUT_LOCATION, IGNORE_LIST);
-	}
+		ElkIncrementalClassExpressionQueryTest<ElkDirectSuperClassesTestOutput> {
 
 	public ElkIncrementalClassExpressionSuperClassesQueryTest(
 			final TestManifest<QueryTestInput<ElkClassExpression>> manifest) {
 		super(manifest,
-				new ElkIncrementalReasoningTestDelegate<RelatedEntitiesTestOutput<ElkClass>>(
+				new ElkIncrementalReasoningTestDelegate<ElkDirectSuperClassesTestOutput>(
 						manifest) {
 
 					@Override
-					public RelatedEntitiesTestOutput<ElkClass> getExpectedOutput()
+					public ElkDirectSuperClassesTestOutput getExpectedOutput()
 							throws Exception {
-						return new ElkSuperClassesTestOutput(
-								getStandardReasoner(),
-								manifest.getInput().getQuery());
+						ElkClassExpression query = manifest.getInput()
+								.getQuery();
+						return new ElkDirectSuperClassesTestOutput(query,
+								getStandardReasoner()
+										.getSubClassesQuietly(query, true));
 					}
 
 					@Override
-					public RelatedEntitiesTestOutput<ElkClass> getActualOutput()
+					public ElkDirectSuperClassesTestOutput getActualOutput()
 							throws Exception {
-						return new ElkSuperClassesTestOutput(
-								getIncrementalReasoner(),
-								manifest.getInput().getQuery());
+						ElkClassExpression query = manifest.getInput()
+								.getQuery();
+						return new ElkDirectSuperClassesTestOutput(query,
+								getIncrementalReasoner()
+										.getSubClassesQuietly(query, true));
 					}
 
 					@Override
 					protected Map<String, String> additionalConfigIncremental() {
-						return ImmutableMap.<String, String> builder()
-								.put(ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
-										"NQEvictor(0, 0.75)")
-								.build();
+						return ImmutableMap.<String, String> builder().put(
+								ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
+								"NQEvictor(0, 0.75)").build();
 					}
 
 					@Override
 					protected Map<String, String> additionalConfigWithInterrupts() {
-						return ImmutableMap.<String, String> builder()
-								.put(ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
-										"NQEvictor(0, 0.75)")
-								.build();
+						return ImmutableMap.<String, String> builder().put(
+								ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
+								"NQEvictor(0, 0.75)").build();
 					}
 
 				});
+	}
+
+	@Config
+	public static Configuration getConfig()
+			throws IOException, URISyntaxException {
+		return getConfig("getDirectSuperClasses");
 	}
 
 }

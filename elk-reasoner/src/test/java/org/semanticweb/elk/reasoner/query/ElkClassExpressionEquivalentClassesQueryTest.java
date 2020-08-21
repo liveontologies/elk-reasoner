@@ -32,8 +32,6 @@ import java.util.Map;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
-import org.semanticweb.elk.io.IOUtils;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.ElkReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
@@ -47,35 +45,34 @@ import com.google.common.collect.ImmutableMap;
 
 @RunWith(PolySuite.class)
 public class ElkClassExpressionEquivalentClassesQueryTest extends
-		BaseQueryTest<ElkClassExpression, EquivalentEntitiesTestOutput<ElkClass>> {
+		BaseQueryTest<ElkClassExpression, ElkEquivalentClassesTestOutput> {
 
 	public ElkClassExpressionEquivalentClassesQueryTest(
-			final QueryTestManifest<ElkClassExpression, EquivalentEntitiesTestOutput<ElkClass>> manifest) {
+			final QueryTestManifest<ElkClassExpression, ElkEquivalentClassesTestOutput> manifest) {
 		super(manifest,
-				new ElkReasoningTestDelegate<EquivalentEntitiesTestOutput<ElkClass>>(
+				new ElkReasoningTestDelegate<ElkEquivalentClassesTestOutput>(
 						manifest) {
 
 					@Override
-					public EquivalentEntitiesTestOutput<ElkClass> getActualOutput()
+					public ElkEquivalentClassesTestOutput getActualOutput()
 							throws Exception {
 						return new ElkEquivalentClassesTestOutput(
-								getReasoner(), manifest.getInput().getQuery());
+								getReasoner().getEquivalentClassesQuitely(
+										manifest.getInput().getQuery()));
 					}
 
 					@Override
 					protected Map<String, String> additionalConfigWithOutput() {
-						return ImmutableMap.<String, String> builder()
-								.put(ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
-										"NQEvictor(0, 0.75)")
-								.build();
+						return ImmutableMap.<String, String> builder().put(
+								ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
+								"NQEvictor(0, 0.75)").build();
 					}
 
 					@Override
 					protected Map<String, String> additionalConfigWithInterrupts() {
-						return ImmutableMap.<String, String> builder()
-								.put(ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
-										"NQEvictor(0, 0.75)")
-								.build();
+						return ImmutableMap.<String, String> builder().put(
+								ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
+								"NQEvictor(0, 0.75)").build();
 					}
 
 				});
@@ -87,10 +84,10 @@ public class ElkClassExpressionEquivalentClassesQueryTest extends
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				ElkTestUtils.TEST_INPUT_LOCATION, BaseQueryTest.class,
-				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkClassExpression>, EquivalentEntitiesTestOutput<ElkClass>>>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<ElkClassExpression>, ElkEquivalentClassesTestOutput>>() {
 
 					@Override
-					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, EquivalentEntitiesTestOutput<ElkClass>>> createManifests(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<ElkClassExpression>, ElkEquivalentClassesTestOutput>> createManifests(
 							final String name, final List<URL> urls)
 							throws IOException {
 
@@ -103,19 +100,11 @@ public class ElkClassExpressionEquivalentClassesQueryTest extends
 							// No inputs, no manifests.
 							return Collections.emptySet();
 						}
-
-						InputStream outputIS = null;
-						try {
-							outputIS = urls.get(1).openStream();
-
+						try (InputStream outputIS = urls.get(1).openStream()) {
 							return ElkExpectedTestOutputLoader.load(outputIS)
-									.getEquivalentEntitiesManifests(name,
+									.getEquivalentClassesManifests(name,
 											urls.get(0));
-
-						} finally {
-							IOUtils.closeQuietly(outputIS);
 						}
-
 					}
 
 				}, "owl", "classquery");

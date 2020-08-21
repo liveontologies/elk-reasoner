@@ -53,6 +53,8 @@ public class SingletoneTaxonomy<T extends ElkEntity, N extends OrphanTaxonomyNod
 
 	final N node;
 
+	// TODO: let taxonomy implement node directly
+	
 	public SingletoneTaxonomy(
 			final ComparatorKeyProvider<? super T> keyProvider,
 			final Collection<? extends T> allMembers,
@@ -70,9 +72,9 @@ public class SingletoneTaxonomy<T extends ElkEntity, N extends OrphanTaxonomyNod
 	public N getNode(T elkEntity) {
 		if (node.contains(elkEntity)) {
 			return node;
-		} else {
-			return null;
 		}
+		// else
+		return null;
 	}
 
 	@Override

@@ -72,20 +72,23 @@ public class OwlApiEntailmentQueryTest
 
 	public OwlApiEntailmentQueryTest(
 			final QueryTestManifest<OWLAxiom, OwlEntailmentQueryTestOutput> manifest) {
-		super(manifest, new OwlApiReasoningTestDelegate<OwlEntailmentQueryTestOutput>(manifest) {
+		super(manifest,
+				new OwlApiReasoningTestDelegate<OwlEntailmentQueryTestOutput>(
+						manifest) {
 
-			@Override
-			public OwlEntailmentQueryTestOutput getActualOutput() throws Exception {
+					@Override
+					public OwlEntailmentQueryTestOutput getActualOutput()
+							throws Exception {
 						return new OwlEntailmentQueryTestOutput(getReasoner(),
 								manifest.getInput().getQuery());
-			}
+					}
 
-			@Override
-			public Class<? extends Exception> getInterruptionExceptionClass() {
-				return ReasonerInterruptedException.class;
-			}
+					@Override
+					public Class<? extends Exception> getInterruptionExceptionClass() {
+						return ReasonerInterruptedException.class;
+					}
 
-		});
+				});
 	}
 
 	public static final ConfigurationUtils.ManifestCreator<QueryTestManifest<OWLAxiom, OwlEntailmentQueryTestOutput>> ENTAILMENT_QUERY_TEST_MANIFEST_CREATOR = new ConfigurationUtils.ManifestCreator<QueryTestManifest<OWLAxiom, OwlEntailmentQueryTestOutput>>() {
@@ -125,7 +128,8 @@ public class OwlApiEntailmentQueryTest
 		final Configuration classConfiguration = ConfigurationUtils
 				.loadFileBasedTestConfiguration(
 						ElkTestUtils.TEST_INPUT_LOCATION, BaseQueryTest.class,
-						ENTAILMENT_QUERY_TEST_MANIFEST_CREATOR, "owl", "classquery");
+						ENTAILMENT_QUERY_TEST_MANIFEST_CREATOR, "owl",
+						"classquery");
 
 		final Configuration entailmentConfiguration = ConfigurationUtils
 				.loadFileBasedTestConfiguration(

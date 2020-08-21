@@ -6,7 +6,7 @@ package org.semanticweb.elk.owlapi.query;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2018 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2020 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,12 @@ package org.semanticweb.elk.owlapi.query;
  * #L%
  */
 
-import java.util.Objects;
-
 import org.semanticweb.elk.owlapi.ElkReasoner;
-import org.semanticweb.elk.reasoner.query.BaseSatisfiabilityTestOutput;
+import org.semanticweb.elk.reasoner.query.SatisfiabilityTestOutput;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 
 public class OwlClassExpressionSatisfiabilityTestOutput
-		extends BaseSatisfiabilityTestOutput {
+		extends SatisfiabilityTestOutput {
 
 	public OwlClassExpressionSatisfiabilityTestOutput(boolean isSatisfiable,
 			boolean isComplete) {
@@ -40,23 +38,6 @@ public class OwlClassExpressionSatisfiabilityTestOutput
 			OWLClassExpression query) {
 		// TODO: completeness
 		this(reasoner.isSatisfiable(query), true);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(OwlClassExpressionSatisfiabilityTestOutput.class,
-				getResult(), isComplete());
-	}
-
-	@Override
-	public boolean equals(final Object obj) {
-		if (obj instanceof BaseSatisfiabilityTestOutput) {
-			BaseSatisfiabilityTestOutput other = (BaseSatisfiabilityTestOutput) obj;
-			return this == obj || (getResult() == other.getResult()
-					&& isComplete() == other.isComplete());
-		}
-		// else
-		return false;
 	}
 
 }

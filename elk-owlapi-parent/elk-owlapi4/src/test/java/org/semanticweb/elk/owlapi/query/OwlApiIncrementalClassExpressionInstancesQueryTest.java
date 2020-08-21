@@ -27,17 +27,15 @@ import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.owlapi.OwlApiIncrementalReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.QueryTestInput;
-import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestUtils;
 import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 
 @RunWith(PolySuite.class)
 public class OwlApiIncrementalClassExpressionInstancesQueryTest extends
-		OwlApiIncrementalClassExpressionQueryTest<RelatedEntitiesTestOutput<OWLNamedIndividual>> {
+		OwlApiIncrementalClassExpressionQueryTest<OwlDirectInstancesTestOutput> {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
@@ -59,20 +57,21 @@ public class OwlApiIncrementalClassExpressionInstancesQueryTest extends
 	public OwlApiIncrementalClassExpressionInstancesQueryTest(
 			final TestManifest<QueryTestInput<OWLClassExpression>> manifest) {
 		super(manifest,
-				new OwlApiIncrementalReasoningTestDelegate<RelatedEntitiesTestOutput<OWLNamedIndividual>>(
+				new OwlApiIncrementalReasoningTestDelegate<OwlDirectInstancesTestOutput>(
 						manifest) {
 
 					@Override
-					public RelatedEntitiesTestOutput<OWLNamedIndividual> getExpectedOutput()
+					public OwlDirectInstancesTestOutput getExpectedOutput()
 							throws Exception {
-						return new OwlInstancesTestOutput(getStandardReasoner(),
+						return new OwlDirectInstancesTestOutput(
+								getStandardReasoner(),
 								manifest.getInput().getQuery());
 					}
 
 					@Override
-					public RelatedEntitiesTestOutput<OWLNamedIndividual> getActualOutput()
+					public OwlDirectInstancesTestOutput getActualOutput()
 							throws Exception {
-						return new OwlInstancesTestOutput(
+						return new OwlDirectInstancesTestOutput(
 								getIncrementalReasoner(),
 								manifest.getInput().getQuery());
 					}

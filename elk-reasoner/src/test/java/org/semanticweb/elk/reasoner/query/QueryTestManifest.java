@@ -26,18 +26,22 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.semanticweb.elk.testing.BasicTestManifest;
+import org.semanticweb.elk.testing.DiffableOutput;
 
 /**
  * Test manifest for query tests.
  * 
  * @author Peter Skocovsky
+ * @author Yevgeny Kazakov
  *
  * @param <Q>
  *            Type of the query.
+ * @param <E>
+ *            Type of the elements of the test output that are to be compared
  * @param <O>
  *            Type of the test output.
  */
-public class QueryTestManifest<Q, O>
+public class QueryTestManifest<Q, O extends DiffableOutput<?, O>>
 		extends BasicTestManifest<QueryTestInput<Q>, O> {
 
 	private static final Pattern IRI_REGEXP_ = Pattern
@@ -46,7 +50,7 @@ public class QueryTestManifest<Q, O>
 	private static final String LONG_NAME_SUFFIX_ = " ...";
 
 	public QueryTestManifest(final String name, final URL input, final Q query,
-			final O expectedOutput) {		
+			final O expectedOutput) {
 		super(new QueryTestInput<Q>() {
 
 			@Override
@@ -60,7 +64,7 @@ public class QueryTestManifest<Q, O>
 				 */
 				final Matcher matcher = IRI_REGEXP_.matcher(queryName);
 				queryName = matcher.replaceAll("<*$1>");
-				final String testName = name + " " + queryName;
+				final String testName = name + "(" + queryName + ")";
 				final int testNameHash = testName.hashCode();
 				return testName.length() <= MAX_NAME_LENGTH_ ? testName
 						: testName.substring(0,

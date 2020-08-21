@@ -35,10 +35,9 @@ import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
+import org.semanticweb.elk.testing.TestManifest;
 
 import com.google.common.collect.ImmutableMap;
-
-import org.semanticweb.elk.testing.TestManifest;
 
 @RunWith(PolySuite.class)
 public class ElkIncrementalEntailmentQueryTest extends
@@ -54,32 +53,30 @@ public class ElkIncrementalEntailmentQueryTest extends
 					public ElkEntailmentQueryTestOutput getExpectedOutput()
 							throws Exception {
 						return new ElkEntailmentQueryTestOutput(
-								getStandardReasoner(),
-								manifest.getInput().getQuery());
+								getStandardReasoner().isEntailed(
+										manifest.getInput().getQuery()));
 					}
 
 					@Override
 					public ElkEntailmentQueryTestOutput getActualOutput()
 							throws Exception {
 						return new ElkEntailmentQueryTestOutput(
-								getIncrementalReasoner(),
-								manifest.getInput().getQuery());
+								getIncrementalReasoner().isEntailed(
+										manifest.getInput().getQuery()));
 					}
 
 					@Override
 					protected Map<String, String> additionalConfigIncremental() {
-						return ImmutableMap.<String, String> builder()
-								.put(ReasonerConfiguration.ENTAILMENT_QUERY_EVICTOR,
-										"NQEvictor(0, 0.75)")
-								.build();
+						return ImmutableMap.<String, String> builder().put(
+								ReasonerConfiguration.ENTAILMENT_QUERY_EVICTOR,
+								"NQEvictor(0, 0.75)").build();
 					}
 
 					@Override
 					protected Map<String, String> additionalConfigWithInterrupts() {
-						return ImmutableMap.<String, String> builder()
-								.put(ReasonerConfiguration.ENTAILMENT_QUERY_EVICTOR,
-										"NQEvictor(0, 0.75)")
-								.build();
+						return ImmutableMap.<String, String> builder().put(
+								ReasonerConfiguration.ENTAILMENT_QUERY_EVICTOR,
+								"NQEvictor(0, 0.75)").build();
 					}
 
 				});

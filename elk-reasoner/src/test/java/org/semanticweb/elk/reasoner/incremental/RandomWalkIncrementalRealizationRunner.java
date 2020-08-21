@@ -26,17 +26,17 @@ package org.semanticweb.elk.reasoner.incremental;
  */
 
 import java.io.IOException;
-import java.io.StringWriter;
+import java.io.Writer;
 
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.reasoner.InstanceTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.completeness.IncompleteResult;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
-import org.semanticweb.elk.util.logging.LogLevel;
-import org.semanticweb.elk.util.logging.LoggerWrap;
-import org.slf4j.Logger;
+import org.semanticweb.elk.testing.Diff;
 
 /**
  * TODO docs
@@ -45,8 +45,8 @@ import org.slf4j.Logger;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class RandomWalkIncrementalRealizationRunner<T> extends
-		RandomWalkIncrementalClassificationRunner<T> {
+public class RandomWalkIncrementalRealizationRunner<T>
+		extends RandomWalkIncrementalClassificationRunner<T> {
 
 	public RandomWalkIncrementalRealizationRunner(int rounds, int iter,
 			RandomWalkRunnerIO<T> io) {
@@ -54,24 +54,39 @@ public class RandomWalkIncrementalRealizationRunner<T> extends
 	}
 
 	@Override
-	protected void printResult(Reasoner reasoner, Logger logger, LogLevel level)
+	@SuppressWarnings("static-method")
+	protected void writeResultDiff(Reasoner correctReasoner,
+			Reasoner testReasoner, Writer writer)
 			throws IOException, ElkException {
-		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = reasoner
-				.getInstanceTaxonomyQuietly();
-		StringWriter writer = new StringWriter();
-
-		TaxonomyPrinter.dumpInstanceTaxomomy(taxonomy, writer, false);
+		writer.write("TAXONOMY DIFF:\n");
+		Diff.writeDiff(
+				new InstanceTaxonomyTestOutput(
+						correctReasoner.getInstanceTaxonomyQuietly()),
+				new InstanceTaxonomyTestOutput(
+						testReasoner.getInstanceTaxonomyQuietly()),
+				writer);
 		writer.flush();
+	}
 
-		LoggerWrap.log(logger, level, "INSTANCE TAXONOMY");
-		LoggerWrap.log(logger, level, writer.getBuffer().toString());
-		writer.close();
+	@Override
+	protected void printResult(Reasoner reasoner, Writer writer)
+			throws IOException, ElkException {
+
+		IncompleteResult<? extends InstanceTaxonomy<ElkClass, ElkNamedIndividual>> taxonomy = reasoner
+				.getInstanceTaxonomyQuietly();
+		writer.append("INSTANCE TAXONOMY");
+		if (!taxonomy.isComplete()) {
+			writer.append(" (incomplete)");
+		}
+		TaxonomyPrinter.dumpInstanceTaxomomy(taxonomy.getValue(), writer,
+				false);
+		writer.flush();
 	}
 
 	@Override
 	protected String getResultHash(Reasoner reasoner) throws ElkException {
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = reasoner
-				.getInstanceTaxonomyQuietly();
+				.getInstanceTaxonomyQuietly().getValue();
 
 		return TaxonomyPrinter.getInstanceHashString(taxonomy);
 	}

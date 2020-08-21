@@ -1,10 +1,12 @@
-/*
+package org.semanticweb.elk.testing;
+
+/*-
  * #%L
- * ELK Reasoner
+ * ELK Utilities for Testing
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2020 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,25 +21,22 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.query;
-
-import org.semanticweb.elk.reasoner.ReasoningTestOutput;
 
 /**
- * A test output of a query for related entities.
+ * Represents an output that can be compared with other outputs
  * 
- * @author Peter Skocovsky
- *
- * @param <E>
- *            the type of entities.
+ * @author Yevgeny Kazakov
+ * 
+ * @param <O>
+ *            the type of the output which elements can be compared
+ * @param <L>
+ *            the listener using which one can report missing elements
+ * 
  */
-public interface RelatedEntitiesTestOutput<E>
-		extends ReasoningTestOutput<Iterable<? extends Iterable<E>>> {
+public interface Diffable<O, L> {
 
-	/**
-	 * @return the related entities.
-	 */
-	@Override
-	Iterable<? extends Iterable<E>> getResult();
+	boolean containsAllElementsOf(O other);
+
+	void reportMissingElementsOf(O other, L listener);
 
 }

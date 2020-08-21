@@ -47,6 +47,13 @@ public interface ProperEntailmentQueryResult
 	boolean isEntailed() throws ElkQueryException;
 
 	/**
+	 * @return whether checking of the entailment was complete: if both
+	 *         {@link #isEntailed()} and {@link #isComplete()} are {@code false}
+	 *         then the entailment may hold but was not be able to be proved
+	 */
+	boolean isComplete();
+
+	/**
 	 * Explains why the queried entailment is entailed. If it is not entailed,
 	 * the returned proof is empty.
 	 * 

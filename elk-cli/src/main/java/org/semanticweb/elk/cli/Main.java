@@ -137,8 +137,8 @@ public class Main {
 		// input and reasoning tasks
 		if (!options.has(inputFile)
 				|| countOptions(options, satisfiable, classify, realize) != 1) {
-			System.err
-					.println("An input ontology and exactly one reasoning task are required!");
+			System.err.println(
+					"An input ontology and exactly one reasoning task are required!");
 			return;
 		}
 
@@ -153,8 +153,8 @@ public class Main {
 				.getLogger("org.semanticweb.elk");
 
 		if (options.has(logging))
-			allLoggers.setLevel(Level.toLevel(options.valueOf(logging),
-					Level.INFO));
+			allLoggers.setLevel(
+					Level.toLevel(options.valueOf(logging), Level.INFO));
 		if (options.has(verbose))
 			allLoggers.setLevel(Level.DEBUG);
 		if (options.has(Verbose))
@@ -167,8 +167,8 @@ public class Main {
 				.getConfiguration();
 		if (options.has(nWorkers))
 			configuration.setParameter(
-					ReasonerConfiguration.NUM_OF_WORKING_THREADS, options
-							.valueOf(nWorkers).toString());
+					ReasonerConfiguration.NUM_OF_WORKING_THREADS,
+					options.valueOf(nWorkers).toString());
 
 		// create reasoner
 		ReasonerFactory reasoningFactory = new ReasonerFactory();
@@ -186,12 +186,13 @@ public class Main {
 							!inconsistent);
 				}
 			}
-			
+
 			boolean addHash = options.has(printHash);
 
 			if (options.has(classify)) {
-				Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomyQuietly();
-			
+				Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomyQuietly()
+						.getValue();
+
 				if (options.hasArgument(outputFile))
 					writeClassTaxonomyToFile(options.valueOf(outputFile),
 							taxonomy, addHash);
@@ -201,7 +202,7 @@ public class Main {
 
 			if (options.has(realize)) {
 				InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = null;
-				taxonomy = reasoner.getInstanceTaxonomyQuietly();
+				taxonomy = reasoner.getInstanceTaxonomyQuietly().getValue();
 				if (options.hasArgument(outputFile))
 					writeInstanceTaxonomyToFile(options.valueOf(outputFile),
 							taxonomy, addHash);
@@ -226,7 +227,8 @@ public class Main {
 		writer.close();
 	}
 
-	static void writeClassTaxonomyToFile(File file, Taxonomy<ElkClass> taxonomy, boolean printHash)
+	static void writeClassTaxonomyToFile(File file, Taxonomy<ElkClass> taxonomy,
+			boolean printHash)
 			throws IOException, ElkInconsistentOntologyException, ElkException {
 		LOGGER_.info("Writing taxonomy to {}", file);
 
@@ -236,12 +238,13 @@ public class Main {
 	}
 
 	static void writeInstanceTaxonomyToFile(File file,
-			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy, boolean printHash)
+			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy,
+			boolean printHash)
 			throws IOException, ElkInconsistentOntologyException, ElkException {
 		LOGGER_.info("Writing taxonomy with instances to {}", file);
 
-		Statistics
-				.logOperationStart("Writing taxonomy with instances", LOGGER_);
+		Statistics.logOperationStart("Writing taxonomy with instances",
+				LOGGER_);
 		TaxonomyPrinter.dumpInstanceTaxomomyToFile(taxonomy, file.getPath(),
 				printHash);
 		Statistics.logOperationFinish("Writing taxonomy with instances",
@@ -258,8 +261,8 @@ public class Main {
 	static void printTaxonomyHash(
 			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy) {
 		if (LOGGER_.isInfoEnabled()) {
-			LOGGER_.info("Taxonomy hash: "
-					+ Integer.toHexString(InstanceTaxonomyHasher.hash(taxonomy)));
+			LOGGER_.info("Taxonomy hash: " + Integer
+					.toHexString(InstanceTaxonomyHasher.hash(taxonomy)));
 		}
 	}
 

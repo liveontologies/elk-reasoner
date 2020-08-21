@@ -71,14 +71,13 @@ public class ComputeExpectedTaxonomies {
 					@Override
 					public Taxonomy<ElkClass> getTaxonomy(Reasoner reasoner)
 							throws ElkException {
-						return reasoner.getTaxonomyQuietly();
+						return reasoner.getTaxonomyQuietly().getValue();
 					}
 
 					@Override
 					public void dumpTaxonomy(Taxonomy<ElkClass> taxonomy,
 							Writer writer) throws IOException {
-						TaxonomyPrinter.dumpTaxomomy(taxonomy, writer,
-								false);
+						TaxonomyPrinter.dumpTaxomomy(taxonomy, writer, false);
 					}
 				});
 
@@ -87,17 +86,16 @@ public class ComputeExpectedTaxonomies {
 			@Override
 			public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy(
 					Reasoner reasoner) throws ElkException {
-				return reasoner.getInstanceTaxonomyQuietly();
+				return reasoner.getInstanceTaxonomyQuietly().getValue();
 			}
 
 			@SuppressWarnings("unchecked")
 			@Override
 			public void dumpTaxonomy(Taxonomy<ElkClass> taxonomy, Writer writer)
 					throws IOException {
-				TaxonomyPrinter
-						.dumpInstanceTaxomomy(
-								(InstanceTaxonomy<ElkClass, ElkNamedIndividual>) taxonomy,
-								writer, false);
+				TaxonomyPrinter.dumpInstanceTaxomomy(
+						(InstanceTaxonomy<ElkClass, ElkNamedIndividual>) taxonomy,
+						writer, false);
 			}
 		});
 	}
@@ -107,20 +105,20 @@ public class ComputeExpectedTaxonomies {
 			InterruptedException {
 		File srcDir = new File(path);
 
-		File[] ontFiles = srcDir.listFiles(FileUtils
-				.getExtBasedFilenameFilter("owl"));
-		
+		File[] ontFiles = srcDir
+				.listFiles(FileUtils.getExtBasedFilenameFilter("owl"));
+
 		if (ontFiles == null) {
 			throw new RuntimeException("Not a directory: " + path);
 		}
-		
+
 		for (File ontFile : ontFiles) {
 
 			System.err.println(ontFile.getName());
 
 			// use just one worker to minimize the risk of errors
-			Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-					new FileInputStream(ontFile), 1);
+			Reasoner reasoner = TestReasonerUtils
+					.createTestReasoner(new FileInputStream(ontFile), 1);
 
 			Taxonomy<ElkClass> taxonomy = gt.getTaxonomy(reasoner);
 			// create the expected result file

@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.query;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2018 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2020 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,25 +22,35 @@ package org.semanticweb.elk.reasoner.query;
  * #L%
  */
 
-import java.util.Collection;
-import java.util.Set;
-
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 
-public abstract class ElkRelatedClassesTestOutput
-		extends ElkRelatedEntitiesTestOutput<ElkClass> {
+public class EquivalentClassesQueryResult {
 
-	public ElkRelatedClassesTestOutput(
-			final Collection<? extends Collection<ElkClass>> related,
-			boolean isComplete) {
-		super(related, ElkClassKeyProvider.INSTANCE, isComplete);
+	private final ElkClassExpression query_;
+
+	private final Node<ElkClass> equivalentClasses_;
+
+	private final boolean isComplete_;
+
+	public EquivalentClassesQueryResult(ElkClassExpression query,
+			Node<ElkClass> equivalentClasses, boolean isComplete) {
+		this.query_ = query;
+		this.equivalentClasses_ = equivalentClasses;
+		this.isComplete_ = isComplete;
 	}
 
-	public ElkRelatedClassesTestOutput(
-			final Set<? extends Node<ElkClass>> related, boolean isComplete) {
-		super(related, ElkClassKeyProvider.INSTANCE, isComplete);
+	public ElkClassExpression getQuery() {
+		return query_;
+	}
+
+	public Node<ElkClass> getEquivalentClasses() {
+		return equivalentClasses_;
+	}
+
+	public boolean isComplete() {
+		return isComplete_;
 	}
 
 }

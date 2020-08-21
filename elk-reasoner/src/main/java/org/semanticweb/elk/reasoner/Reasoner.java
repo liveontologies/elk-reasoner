@@ -32,6 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.reasoner.completeness.IncompleteResult;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.stages.AbstractReasonerState;
@@ -220,7 +221,6 @@ public class Reasoner extends AbstractReasonerState {
 			LOGGER_.error("ELK reasoner failed to shut down!");
 		}
 		return success;
-
 	}
 
 	/**
@@ -242,17 +242,20 @@ public class Reasoner extends AbstractReasonerState {
 	 * @return the {@link TaxonomyNode} for the given {@link ElkClass}
 	 * 
 	 */
-	protected TaxonomyNode<ElkClass> getTaxonomyNode(ElkClass elkClass)
-			throws ElkException {
-		final Taxonomy<ElkClass> taxonomy = getTaxonomy();
-		final TaxonomyNode<ElkClass> node = taxonomy.getNode(elkClass);
-		if (node != null)
-			return node;
-		// else
-		if (allowFreshEntities)
-			return new FreshTaxonomyNode<ElkClass>(elkClass, taxonomy);
-		// else
-		throw new ElkFreshEntitiesException(elkClass);
+	protected IncompleteResult<? extends TaxonomyNode<ElkClass>> getTaxonomyNode(
+			ElkClass elkClass) throws ElkException {
+		return getTaxonomy().map(taxonomy -> {
+			TaxonomyNode<ElkClass> node = taxonomy.getNode(elkClass);
+			if (node != null) {
+				return node;
+			}
+			// else
+			if (allowFreshEntities) {
+				return new FreshTaxonomyNode<ElkClass>(elkClass, taxonomy);
+			}
+			// else
+			throw new ElkFreshEntitiesException(elkClass);
+		});
 	}
 
 	/**
@@ -263,19 +266,20 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	protected InstanceNode<ElkClass, ElkNamedIndividual> getInstanceNode(
+	protected IncompleteResult<? extends InstanceNode<ElkClass, ElkNamedIndividual>> getInstanceNode(
 			ElkNamedIndividual elkNamedIndividual) throws ElkException {
-		final InstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy = getInstanceTaxonomy();
-		final InstanceNode<ElkClass, ElkNamedIndividual> node = instanceTaxonomy
-				.getInstanceNode(elkNamedIndividual);
-		if (node != null)
-			return node;
-		// else
-		if (allowFreshEntities)
-			return new FreshInstanceNode<ElkClass, ElkNamedIndividual>(
-					elkNamedIndividual, instanceTaxonomy);
-		// else
-		throw new ElkFreshEntitiesException(elkNamedIndividual);
+		return getInstanceTaxonomy().map(tax -> {
+			InstanceNode<ElkClass, ElkNamedIndividual> node = tax
+					.getInstanceNode(elkNamedIndividual);
+			if (node != null)
+				return node;
+			// else
+			if (allowFreshEntities)
+				return new FreshInstanceNode<ElkClass, ElkNamedIndividual>(
+						elkNamedIndividual, tax);
+			// else
+			throw new ElkFreshEntitiesException(elkNamedIndividual);
+		});
 	}
 
 	/**
@@ -286,19 +290,20 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	protected TypeNode<ElkClass, ElkNamedIndividual> getTypeNode(
+	protected IncompleteResult<? extends TypeNode<ElkClass, ElkNamedIndividual>> getTypeNode(
 			ElkClass elkClass) throws ElkException {
-		final InstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy = getInstanceTaxonomy();
-		final TypeNode<ElkClass, ElkNamedIndividual> node = instanceTaxonomy
-				.getNode(elkClass);
-		if (node != null)
-			return node;
-		// else
-		if (allowFreshEntities)
-			return new FreshTypeNode<ElkClass, ElkNamedIndividual>(elkClass,
-					instanceTaxonomy);
-		// else
-		throw new ElkFreshEntitiesException(elkClass);
+		return getInstanceTaxonomy().map(tax -> {
+			final TypeNode<ElkClass, ElkNamedIndividual> node = tax
+					.getNode(elkClass);
+			if (node != null)
+				return node;
+			// else
+			if (allowFreshEntities)
+				return new FreshTypeNode<ElkClass, ElkNamedIndividual>(elkClass,
+						tax);
+			// else
+			throw new ElkFreshEntitiesException(elkClass);
+		});
 	}
 
 	/**
@@ -310,21 +315,22 @@ public class Reasoner extends AbstractReasonerState {
 	 * @return the {@link TaxonomyNode} for the given {@link ElkObjectProperty}
 	 * 
 	 */
-	protected TaxonomyNode<ElkObjectProperty> getObjectPropertyTaxonomyNode(
+	protected IncompleteResult<? extends TaxonomyNode<ElkObjectProperty>> getObjectPropertyTaxonomyNode(
 			final ElkObjectProperty elkProperty) throws ElkException {
-		final Taxonomy<ElkObjectProperty> propertyTaxonomy = getObjectPropertyTaxonomy();
-		final TaxonomyNode<ElkObjectProperty> node = propertyTaxonomy
-				.getNode(elkProperty);
-		if (node != null) {
-			return node;
-		}
-		// else
-		if (allowFreshEntities) {
-			return new FreshTaxonomyNode<ElkObjectProperty>(elkProperty,
-					propertyTaxonomy);
-		}
-		// else
-		throw new ElkFreshEntitiesException(elkProperty);
+		return getObjectPropertyTaxonomy().map(tax -> {
+			final TaxonomyNode<ElkObjectProperty> node = tax
+					.getNode(elkProperty);
+			if (node != null) {
+				return node;
+			}
+			// else
+			if (allowFreshEntities) {
+				return new FreshTaxonomyNode<ElkObjectProperty>(elkProperty,
+						tax);
+			}
+			// else
+			throw new ElkFreshEntitiesException(elkProperty);
+		});
 	}
 
 	/**
@@ -341,7 +347,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public synchronized TaxonomyNode<ElkObjectProperty> getObjectPropertyNode(
+	public synchronized IncompleteResult<? extends TaxonomyNode<ElkObjectProperty>> getObjectPropertyNode(
 			final ElkObjectProperty property) throws ElkException {
 		return getObjectPropertyTaxonomyNode(property);
 	}
@@ -361,15 +367,24 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public synchronized Node<ElkClass> getEquivalentClasses(
+	public synchronized IncompleteResult<? extends Node<ElkClass>> getEquivalentClasses(
 			ElkClassExpression classExpression)
 			throws ElkInconsistentOntologyException, ElkException {
 		if (classExpression instanceof ElkClass) {
 			return getTaxonomyNode((ElkClass) classExpression);
 		}
 		// else
-
 		return queryEquivalentClasses(classExpression);
+	}
+
+	public synchronized IncompleteResult<? extends Node<ElkClass>> getEquivalentClassesQuitely(
+			ElkClassExpression classExpression) throws ElkException {
+		try {
+			return getEquivalentClasses(classExpression);
+		} catch (ElkInconsistentOntologyException e) {
+			// all classes are equivalent
+			return getTaxonomyQuietly().map(tax -> tax.getBottomNode());
+		}
 	}
 
 	/**
@@ -385,13 +400,12 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public synchronized Node<ElkClass> getEquivalentClassesQuietly(
+	public synchronized IncompleteResult<? extends Node<ElkClass>> getEquivalentClassesQuietly(
 			ElkClassExpression classExpression) throws ElkException {
 		try {
 			return getEquivalentClasses(classExpression);
 		} catch (final ElkInconsistentOntologyException e) {
-			// All classes are equivalent to each other, so also to owl:Nothing.
-			return getTaxonomyQuietly().getBottomNode();
+			return getTaxonomyQuietly().map(Taxonomy::getBottomNode);
 		}
 	}
 
@@ -415,46 +429,49 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public synchronized Set<? extends Node<ElkClass>> getSubClasses(
+	public synchronized IncompleteResult<? extends Set<? extends Node<ElkClass>>> getSubClasses(
 			ElkClassExpression classExpression, boolean direct)
 			throws ElkInconsistentOntologyException, ElkException {
 		if (classExpression instanceof ElkClass) {
-			final TaxonomyNode<ElkClass> queryNode = getTaxonomyNode(
-					(ElkClass) classExpression);
-			return direct ? queryNode.getDirectSubNodes()
-					: queryNode.getAllSubNodes();
-		} else {
-
-			final Set<? extends Node<ElkClass>> subNodes = queryDirectSubClasses(
-					classExpression);
-			if (direct) {
-				return subNodes;
-			}
-			// else all nodes
-
-			final Taxonomy<ElkClass> taxonomy = restoreTaxonomy();
-
-			return TaxonomyNodeUtils.getAllReachable(Operations.map(subNodes,
-					new Operations.Transformation<Node<ElkClass>, TaxonomyNode<ElkClass>>() {
-
-						@Override
-						public TaxonomyNode<ElkClass> transform(
-								final Node<ElkClass> node) {
-							return taxonomy.getNode(node.getCanonicalMember());
-						}
-
-					}),
-					new Operations.Functor<TaxonomyNode<ElkClass>, Set<? extends TaxonomyNode<ElkClass>>>() {
-
-						@Override
-						public Set<? extends TaxonomyNode<ElkClass>> apply(
-								final TaxonomyNode<ElkClass> node) {
-							return node.getDirectSubNodes();
-						}
-
-					});
+			return getTaxonomyNode((ElkClass) classExpression)
+					.map(node -> direct ? node.getDirectSubNodes()
+							: node.getAllSubNodes());
 		}
+		// else
+		IncompleteResult<? extends Set<? extends Node<ElkClass>>> incompleteNodes = queryDirectSubClasses(
+				classExpression);
+		if (direct) {
+			return incompleteNodes;
+		}
+		// else all nodes
 
+		final IncompleteResult<? extends Taxonomy<ElkClass>> incompleteTaxonomy = getTaxonomy();
+		boolean isComplete = incompleteNodes.isComplete()
+				&& incompleteTaxonomy.isComplete();
+
+		Set<? extends Node<ElkClass>> nodes = incompleteNodes.getValue();
+		return new IncompleteResult<>(
+				TaxonomyNodeUtils.getAllReachable(Operations.map(nodes,
+						new Operations.Transformation<Node<ElkClass>, TaxonomyNode<ElkClass>>() {
+
+							@Override
+							public TaxonomyNode<ElkClass> transform(
+									final Node<ElkClass> node) {
+								return incompleteTaxonomy.getValue()
+										.getNode(node.getCanonicalMember());
+							}
+
+						}),
+						new Operations.Functor<TaxonomyNode<ElkClass>, Set<? extends TaxonomyNode<ElkClass>>>() {
+
+							@Override
+							public Set<? extends TaxonomyNode<ElkClass>> apply(
+									final TaxonomyNode<ElkClass> node) {
+								return node.getDirectSubNodes();
+							}
+
+						}),
+				isComplete);
 	}
 
 	/**
@@ -475,16 +492,18 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public synchronized Set<? extends Node<ElkClass>> getSubClassesQuietly(
+	public synchronized IncompleteResult<? extends Set<? extends Node<ElkClass>>> getSubClassesQuietly(
 			final ElkClassExpression classExpression, final boolean direct)
 			throws ElkException {
 		try {
 			return getSubClasses(classExpression, direct);
 		} catch (final ElkInconsistentOntologyException e) {
 			// All classes are equivalent to each other, so also to owl:Nothing.
-			final TaxonomyNode<ElkClass> node = getTaxonomyQuietly()
-					.getBottomNode();
-			return direct ? node.getDirectSubNodes() : node.getAllSubNodes();
+			return getTaxonomyQuietly().map(tax -> {
+				TaxonomyNode<ElkClass> node = tax.getBottomNode();
+				return direct ? node.getDirectSubNodes()
+						: node.getAllSubNodes();
+			});
 		}
 	}
 
@@ -508,45 +527,50 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public synchronized Set<? extends Node<ElkClass>> getSuperClasses(
+	public synchronized IncompleteResult<? extends Set<? extends Node<ElkClass>>> getSuperClasses(
 			ElkClassExpression classExpression, boolean direct)
 			throws ElkInconsistentOntologyException, ElkException {
 		if (classExpression instanceof ElkClass) {
-			final TaxonomyNode<ElkClass> queryNode = getTaxonomyNode(
-					(ElkClass) classExpression);
-			return direct ? queryNode.getDirectSuperNodes()
-					: queryNode.getAllSuperNodes();
-		} else {
-
-			final Set<? extends Node<ElkClass>> superNodes = queryDirectSuperClasses(
-					classExpression);
-			if (direct) {
-				return superNodes;
-			}
-			// else all nodes
-
-			final Taxonomy<ElkClass> taxonomy = restoreTaxonomy();
-
-			return TaxonomyNodeUtils.getAllReachable(Operations.map(superNodes,
-					new Operations.Transformation<Node<ElkClass>, TaxonomyNode<ElkClass>>() {
-
-						@Override
-						public TaxonomyNode<ElkClass> transform(
-								final Node<ElkClass> node) {
-							return taxonomy.getNode(node.getCanonicalMember());
-						}
-
-					}),
-					new Operations.Functor<TaxonomyNode<ElkClass>, Set<? extends TaxonomyNode<ElkClass>>>() {
-
-						@Override
-						public Set<? extends TaxonomyNode<ElkClass>> apply(
-								final TaxonomyNode<ElkClass> node) {
-							return node.getDirectSuperNodes();
-						}
-
-					});
+			return getTaxonomyNode((ElkClass) classExpression)
+					.map(n -> direct ? n.getDirectSuperNodes()
+							: n.getAllSuperNodes());
 		}
+		// else
+		IncompleteResult<? extends Set<? extends Node<ElkClass>>> incompleteSuperNodes = queryDirectSuperClasses(
+				classExpression);
+		if (direct) {
+			return incompleteSuperNodes;
+		}
+		// else all nodes
+
+		IncompleteResult<? extends Taxonomy<ElkClass>> incompleteTaxonomy = getTaxonomy();
+		boolean isComplete = incompleteSuperNodes.isComplete()
+				&& incompleteTaxonomy.isComplete();
+		Set<? extends Node<ElkClass>> superNodes = incompleteSuperNodes
+				.getValue();
+
+		return new IncompleteResult<>(
+				TaxonomyNodeUtils.getAllReachable(Operations.map(superNodes,
+						new Operations.Transformation<Node<ElkClass>, TaxonomyNode<ElkClass>>() {
+
+							@Override
+							public TaxonomyNode<ElkClass> transform(
+									final Node<ElkClass> node) {
+								return incompleteTaxonomy.getValue()
+										.getNode(node.getCanonicalMember());
+							}
+
+						}),
+						new Operations.Functor<TaxonomyNode<ElkClass>, Set<? extends TaxonomyNode<ElkClass>>>() {
+
+							@Override
+							public Set<? extends TaxonomyNode<ElkClass>> apply(
+									final TaxonomyNode<ElkClass> node) {
+								return node.getDirectSuperNodes();
+							}
+
+						}),
+				isComplete);
 
 	}
 
@@ -568,17 +592,16 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public synchronized Set<? extends Node<ElkClass>> getSuperClassesQuietly(
+	public synchronized IncompleteResult<? extends Set<? extends Node<ElkClass>>> getSuperClassesQuietly(
 			ElkClassExpression classExpression, boolean direct)
 			throws ElkException {
 		try {
 			return getSuperClasses(classExpression, direct);
 		} catch (final ElkInconsistentOntologyException e) {
 			// All classes are equivalent to each other, so also to owl:Nothing.
-			final TaxonomyNode<ElkClass> node = getTaxonomyQuietly()
-					.getBottomNode();
-			return direct ? node.getDirectSuperNodes()
-					: node.getAllSuperNodes();
+			return getTaxonomyQuietly().map(
+					tax -> direct ? tax.getBottomNode().getDirectSuperNodes()
+							: tax.getBottomNode().getAllSuperNodes());
 		}
 	}
 
@@ -600,15 +623,12 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public synchronized Set<? extends Node<ElkObjectProperty>> getSubObjectProperties(
+	public synchronized IncompleteResult<? extends Set<? extends Node<ElkObjectProperty>>> getSubObjectProperties(
 			final ElkObjectProperty property, final boolean direct)
 			throws ElkException {
-
-		final TaxonomyNode<ElkObjectProperty> queryNode = getObjectPropertyNode(
-				property);
-
-		return (direct) ? queryNode.getDirectSubNodes()
-				: queryNode.getAllSubNodes();
+		return getObjectPropertyNode(property)
+				.map(queryNode -> (direct) ? queryNode.getDirectSubNodes()
+						: queryNode.getAllSubNodes());
 	}
 
 	/**
@@ -629,15 +649,12 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public synchronized Set<? extends Node<ElkObjectProperty>> getSuperObjectProperties(
+	public synchronized IncompleteResult<? extends Set<? extends Node<ElkObjectProperty>>> getSuperObjectProperties(
 			final ElkObjectProperty property, final boolean direct)
 			throws ElkException {
-
-		TaxonomyNode<ElkObjectProperty> queryNode = getObjectPropertyNode(
-				property);
-
-		return (direct) ? queryNode.getDirectSuperNodes()
-				: queryNode.getAllSuperNodes();
+		return getObjectPropertyNode(property)
+				.map(queryNode -> direct ? queryNode.getDirectSuperNodes()
+						: queryNode.getAllSuperNodes());
 	}
 
 	/**
@@ -660,67 +677,78 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public synchronized Set<? extends Node<ElkNamedIndividual>> getInstances(
+	public synchronized IncompleteResult<? extends Set<? extends Node<ElkNamedIndividual>>> getInstances(
 			ElkClassExpression classExpression, boolean direct)
 			throws ElkInconsistentOntologyException, ElkException {
 
 		if (classExpression instanceof ElkClass) {
-			final TypeNode<ElkClass, ElkNamedIndividual> queryNode = getTypeNode(
-					(ElkClass) classExpression);
-			return direct ? queryNode.getDirectInstanceNodes()
-					: queryNode.getAllInstanceNodes();
+			return getTypeNode((ElkClass) classExpression).map(
+					queryNode -> direct ? queryNode.getDirectInstanceNodes()
+							: queryNode.getAllInstanceNodes());
 		}
 
-		final Set<? extends Node<ElkNamedIndividual>> instances = queryDirectInstances(
+		IncompleteResult<? extends Set<? extends Node<ElkNamedIndividual>>> incompleteInstances = queryDirectInstances(
 				classExpression);
+
 		if (direct) {
-			return instances;
+			return incompleteInstances;
 		}
 		// else all instances
+		Set<? extends Node<ElkNamedIndividual>> instances = incompleteInstances
+				.getValue();
+		IncompleteResult<? extends InstanceTaxonomy<ElkClass, ElkNamedIndividual>> incompleteTaxonomy = getInstanceTaxonomy();
+		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = incompleteTaxonomy
+				.getValue();
 
-		final Set<? extends Node<ElkClass>> subNodes = queryDirectSubClasses(
+		IncompleteResult<? extends Set<? extends Node<ElkClass>>> incompleteSubNodes = queryDirectSubClasses(
 				classExpression);
-		final InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = restoreInstanceTaxonomy();
+		Set<? extends Node<ElkClass>> subNodes = incompleteSubNodes.getValue();
 
-		return TaxonomyNodeUtils.collectFromAllReachable(Operations.map(
-				subNodes,
-				new Operations.Transformation<Node<ElkClass>, TypeNode<ElkClass, ElkNamedIndividual>>() {
+		boolean isComplete = incompleteInstances.isComplete()
+				&& incompleteTaxonomy.isComplete()
+				&& incompleteSubNodes.isComplete();
 
-					@Override
-					public TypeNode<ElkClass, ElkNamedIndividual> transform(
-							final Node<ElkClass> node) {
-						return taxonomy.getNode(node.getCanonicalMember());
-					}
-
-				}), Operations.map(instances,
-						new Operations.Transformation<Node<ElkNamedIndividual>, InstanceNode<ElkClass, ElkNamedIndividual>>() {
+		return new IncompleteResult<>(TaxonomyNodeUtils
+				.collectFromAllReachable(Operations.map(subNodes,
+						new Operations.Transformation<Node<ElkClass>, TypeNode<ElkClass, ElkNamedIndividual>>() {
 
 							@Override
-							public InstanceNode<ElkClass, ElkNamedIndividual> transform(
-									final Node<ElkNamedIndividual> node) {
-								return taxonomy.getInstanceNode(
-										node.getCanonicalMember());
+							public TypeNode<ElkClass, ElkNamedIndividual> transform(
+									final Node<ElkClass> node) {
+								return taxonomy
+										.getNode(node.getCanonicalMember());
+							}
+
+						}), Operations.map(instances,
+								new Operations.Transformation<Node<ElkNamedIndividual>, InstanceNode<ElkClass, ElkNamedIndividual>>() {
+
+									@Override
+									public InstanceNode<ElkClass, ElkNamedIndividual> transform(
+											final Node<ElkNamedIndividual> node) {
+										return taxonomy.getInstanceNode(
+												node.getCanonicalMember());
+									}
+
+								}),
+						new Operations.Functor<TypeNode<ElkClass, ElkNamedIndividual>, Set<? extends TypeNode<ElkClass, ElkNamedIndividual>>>() {
+
+							@Override
+							public Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> apply(
+									final TypeNode<ElkClass, ElkNamedIndividual> node) {
+								return node.getDirectSubNodes();
+							}
+
+						},
+						new Operations.Functor<TypeNode<ElkClass, ElkNamedIndividual>, Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>>>() {
+
+							@Override
+							public Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>> apply(
+									final TypeNode<ElkClass, ElkNamedIndividual> node) {
+								return node.getDirectInstanceNodes();
 							}
 
 						}),
-				new Operations.Functor<TypeNode<ElkClass, ElkNamedIndividual>, Set<? extends TypeNode<ElkClass, ElkNamedIndividual>>>() {
-
-					@Override
-					public Set<? extends TypeNode<ElkClass, ElkNamedIndividual>> apply(
-							final TypeNode<ElkClass, ElkNamedIndividual> node) {
-						return node.getDirectSubNodes();
-					}
-
-				},
-				new Operations.Functor<TypeNode<ElkClass, ElkNamedIndividual>, Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>>>() {
-
-					@Override
-					public Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>> apply(
-							final TypeNode<ElkClass, ElkNamedIndividual> node) {
-						return node.getDirectInstanceNodes();
-					}
-
-				});
+				isComplete);
 	}
 
 	/**
@@ -741,17 +769,15 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public synchronized Set<? extends Node<ElkNamedIndividual>> getInstancesQuietly(
+	public synchronized IncompleteResult<? extends Set<? extends Node<ElkNamedIndividual>>> getInstancesQuietly(
 			ElkClassExpression classExpression, boolean direct)
 			throws ElkException {
 		try {
 			return getInstances(classExpression, direct);
 		} catch (final ElkInconsistentOntologyException e) {
 			// All classes are equivalent to each other, so also to owl:Nothing.
-			final TypeNode<ElkClass, ElkNamedIndividual> node = getInstanceTaxonomyQuietly()
-					.getBottomNode();
-			return direct ? node.getDirectInstanceNodes()
-					: node.getAllInstanceNodes();
+			return getInstanceTaxonomyQuietly()
+					.map(tax -> tax.getInstanceNodes());
 		}
 	}
 
@@ -773,12 +799,12 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public synchronized Set<? extends Node<ElkClass>> getTypes(
+	public synchronized IncompleteResult<? extends Set<? extends Node<ElkClass>>> getTypes(
 			ElkNamedIndividual elkNamedIndividual, boolean direct)
 			throws ElkException {
-		InstanceNode<ElkClass, ElkNamedIndividual> node = getInstanceNode(
-				elkNamedIndividual);
-		return direct ? node.getDirectTypeNodes() : node.getAllTypeNodes();
+		return getInstanceNode(elkNamedIndividual)
+				.map(node -> direct ? node.getDirectTypeNodes()
+						: node.getAllTypeNodes());
 	}
 
 	/**
@@ -793,21 +819,34 @@ public class Reasoner extends AbstractReasonerState {
 	 *            the {@link ElkClassExpression} for which to check
 	 *            satisfiability
 	 * @return {@code true} if the given input is satisfiable
+	 * @throws ElkInconsistentOntologyException
+	 *             if the ontology is inconsistent
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public synchronized boolean isSatisfiable(
-			ElkClassExpression classExpression) throws ElkException {
+	public synchronized IncompleteResult<? extends Boolean> isSatisfiable(
+			ElkClassExpression classExpression)
+			throws ElkInconsistentOntologyException, ElkException {
 
 		if (classExpression instanceof ElkClass) {
-			final TaxonomyNode<ElkClass> queryNode = getTaxonomyNode(
-					(ElkClass) classExpression);
-			return !queryNode.contains(getElkFactory().getOwlNothing());
+			return getTaxonomyNode((ElkClass) classExpression)
+					.map(queryNode -> !queryNode
+							.contains(getElkFactory().getOwlNothing()));
 		}
-
+		// else
 		return querySatisfiability(classExpression);
 	}
 
+	public synchronized IncompleteResult<? extends Boolean> isSatisfiableQuitely(
+			ElkClassExpression classExpression)
+			throws ElkInconsistentOntologyException, ElkException {
+		try {
+			return isSatisfiable(classExpression);
+		} catch (ElkInconsistentOntologyException e) {
+			return new IncompleteResult<Boolean>(false, true);
+		}
+	}
+
 	/**
 	 * Check if the given {@link ElkClassExpression} is satisfiable, that is, if
 	 * it can possibly have instances. {@link ElkClassExpression}s are not
@@ -823,13 +862,13 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public synchronized boolean isSatisfiableQuietly(
+	public synchronized IncompleteResult<? extends Boolean> isSatisfiableQuietly(
 			final ElkClassExpression classExpression) throws ElkException {
 		try {
 			return isSatisfiable(classExpression);
 		} catch (final ElkInconsistentOntologyException e) {
 			// Any class is unsatisfiable.
-			return false;
+			return new IncompleteResult<>(false, true);
 		}
 	}
 

@@ -27,17 +27,15 @@ import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.owlapi.OwlApiIncrementalReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.QueryTestInput;
-import org.semanticweb.elk.reasoner.query.RelatedEntitiesTestOutput;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.TestUtils;
-import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 
 @RunWith(PolySuite.class)
 public class OwlApiIncrementalClassExpressionSubClassesQueryTest extends
-		OwlApiIncrementalClassExpressionQueryTest<RelatedEntitiesTestOutput<OWLClass>> {
+		OwlApiIncrementalClassExpressionQueryTest<OwlDirectSubClassesTestOutput> {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
@@ -59,21 +57,21 @@ public class OwlApiIncrementalClassExpressionSubClassesQueryTest extends
 	public OwlApiIncrementalClassExpressionSubClassesQueryTest(
 			final TestManifest<QueryTestInput<OWLClassExpression>> manifest) {
 		super(manifest,
-				new OwlApiIncrementalReasoningTestDelegate<RelatedEntitiesTestOutput<OWLClass>>(
+				new OwlApiIncrementalReasoningTestDelegate<OwlDirectSubClassesTestOutput>(
 						manifest) {
 
 					@Override
-					public RelatedEntitiesTestOutput<OWLClass> getExpectedOutput()
+					public OwlDirectSubClassesTestOutput getExpectedOutput()
 							throws Exception {
-						return new OwlSubClassesTestOutput(
+						return new OwlDirectSubClassesTestOutput(
 								getStandardReasoner(),
 								manifest.getInput().getQuery());
 					}
 
 					@Override
-					public RelatedEntitiesTestOutput<OWLClass> getActualOutput()
+					public OwlDirectSubClassesTestOutput getActualOutput()
 							throws Exception {
-						return new OwlSubClassesTestOutput(
+						return new OwlDirectSubClassesTestOutput(
 								getIncrementalReasoner(),
 								manifest.getInput().getQuery());
 					}

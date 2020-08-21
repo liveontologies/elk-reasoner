@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 public abstract class IncrementalReasoningCorrectnessTestWithInterrupts<I extends TestInput, A, O, TD extends IncrementalReasoningTestWithInterruptsDelegate<A, O>>
 		extends BaseIncrementalReasoningCorrectnessTest<I, A, O, TD> {
 
-	protected static final Logger LOGGER_ = LoggerFactory
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IncrementalReasoningCorrectnessTestWithInterrupts.class);
 
 	private final static double COMPLETE_CHECK_CHANCE = 0.25;

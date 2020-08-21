@@ -52,21 +52,11 @@ public class OwlInternalProofTest {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
-			ElkTestUtils.TEST_INPUT_LOCATION
-					+ "/query/entailment/AssertionRanges.owl", // Ranges not
-																// supported
-																// with
-																// assertions
-			ElkTestUtils.TEST_INPUT_LOCATION
-					+ "/query/entailment/HasValueRanges.owl",// Ranges not
-																// supported
-																// with
-																// ObjectHasValue
+			ElkTestUtils.TEST_INPUT_LOCATION + "/query/entailment/AssertionRanges.owl", // Ranges not supported with assertions
+			ElkTestUtils.TEST_INPUT_LOCATION + "/query/entailment/HasValueRanges.owl",// Ranges not supported with ObjectHasValue
 	};
 	static final String[] IGNORE_COMPLETENESS_LIST = {
-			ElkTestUtils.TEST_INPUT_LOCATION
-					+ "/query/entailment/EmptyOntology.owl",// All entailments
-															// are tautologies.
+			ElkTestUtils.TEST_INPUT_LOCATION + "/query/entailment/EmptyOntology.owl",// All entailments are tautologies.
 	};
 	// @formatter:on
 
@@ -75,14 +65,14 @@ public class OwlInternalProofTest {
 		Arrays.sort(IGNORE_COMPLETENESS_LIST);
 	}
 
-	private final QueryTestManifest<OWLAxiom, Boolean> manifest_;
+	private final QueryTestManifest<OWLAxiom, ?> manifest_;
 
 	private ElkProver prover_ = null;
 	private OWLAxiom query_ = null;
 	private OwlInternalProof adapter_ = null;
 
 	public OwlInternalProofTest(
-			final QueryTestManifest<OWLAxiom, Boolean> manifest) {
+			final QueryTestManifest<OWLAxiom, ?> manifest) {
 		this.manifest_ = manifest;
 	}
 

@@ -21,6 +21,7 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
@@ -52,6 +53,16 @@ public class OrphanInstanceNode<T extends ElkEntity, I extends ElkEntity>
 			ComparatorKeyProvider<? super I> instanceKeyProvider,
 			final OrphanTypeNode<T, I> typeNode) {
 		super(members, size, canonical, instanceKeyProvider);
+		this.typeNode = typeNode;
+		this.instanceKeyProvider_ = instanceKeyProvider;
+	}
+
+	public OrphanInstanceNode(final Collection<? extends I> members,
+			ComparatorKeyProvider<? super I> instanceKeyProvider,
+			final OrphanTypeNode<T, I> typeNode) {
+		super(members, members.size(),
+				Collections.min(members, instanceKeyProvider.getComparator()),
+				instanceKeyProvider);
 		this.typeNode = typeNode;
 		this.instanceKeyProvider_ = instanceKeyProvider;
 	}

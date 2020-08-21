@@ -44,6 +44,7 @@ public class EntailmentTestManifestCreator implements
 
 	public static final EntailmentTestManifestCreator INSTANCE = new EntailmentTestManifestCreator();
 
+	@SuppressWarnings("resource")
 	@Override
 	public Collection<? extends TestManifestWithOutput<QueryTestInput<Collection<ElkAxiom>>, ElkEntailmentQueryTestOutput>> createManifests(
 			final String name, final List<URL> urls) throws IOException {
@@ -63,7 +64,7 @@ public class EntailmentTestManifestCreator implements
 		try {
 
 			final List<ElkAxiom> query = new ArrayList<ElkAxiom>();
-			final Map<ElkAxiom, Boolean> output = new HashMap<ElkAxiom, Boolean>();
+			final Map<ElkAxiom, QueryResult> output = new HashMap<>();
 
 			if (urls.size() >= 2 && urls.get(1) != null) {
 				entailedIS = urls.get(1).openStream();
@@ -71,7 +72,7 @@ public class EntailmentTestManifestCreator implements
 						.loadAxioms(entailedIS);
 				query.addAll(entailed);
 				for (final ElkAxiom elkAxiom : entailed) {
-					output.put(elkAxiom, true);
+					output.put(elkAxiom, new TestQueryResult(elkAxiom, true));
 				}
 			}
 			if (urls.size() >= 3 && urls.get(2) != null) {
@@ -80,14 +81,18 @@ public class EntailmentTestManifestCreator implements
 						.loadAxioms(notEntailedIS);
 				query.addAll(notEntailed);
 				for (final ElkAxiom elkAxiom : notEntailed) {
-					output.put(elkAxiom, false);
+					output.put(elkAxiom, new TestQueryResult(elkAxiom, false));
 				}
 			}
 
-			return Collections.singleton(
-					new EntailmentQueryTestManifest<Collection<ElkAxiom>>(
-							name, input, query,
-							new ElkEntailmentQueryTestOutput(output, true)));
+			try {
+				return Collections.singleton(
+						new EntailmentQueryTestManifest<Collection<ElkAxiom>>(
+								name, input, query,
+								new ElkEntailmentQueryTestOutput(output)));
+			} catch (ElkQueryException e) {
+				throw new RuntimeException(e);
+			}
 
 		} catch (final Owl2ParseException e) {
 			throw new IOException(e);

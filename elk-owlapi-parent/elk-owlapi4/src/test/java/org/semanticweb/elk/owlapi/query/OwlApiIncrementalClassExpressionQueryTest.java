@@ -34,8 +34,10 @@ import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owlapi.OwlApiIncrementalReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.BaseIncrementalQueryTest;
+import org.semanticweb.elk.reasoner.query.EmptyTestOutput;
 import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.testing.ConfigurationUtils;
+import org.semanticweb.elk.testing.DiffableOutput;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
@@ -45,7 +47,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 
 @RunWith(PolySuite.class)
-public abstract class OwlApiIncrementalClassExpressionQueryTest<O>
+public abstract class OwlApiIncrementalClassExpressionQueryTest<O extends DiffableOutput<?, O>>
 		extends BaseIncrementalQueryTest<OWLClassExpression, OWLAxiom, O> {
 
 	public OwlApiIncrementalClassExpressionQueryTest(
@@ -61,10 +63,10 @@ public abstract class OwlApiIncrementalClassExpressionQueryTest<O>
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				ElkTestUtils.TEST_INPUT_LOCATION,
 				BaseIncrementalQueryTest.class,
-				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLClassExpression>, Void>>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLClassExpression>, EmptyTestOutput>>() {
 
 					@Override
-					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, Void>> createManifests(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, EmptyTestOutput>> createManifests(
 							final String name, final List<URL> urls)
 							throws IOException {
 

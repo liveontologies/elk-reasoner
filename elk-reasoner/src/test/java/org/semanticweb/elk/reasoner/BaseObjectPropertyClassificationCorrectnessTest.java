@@ -32,7 +32,6 @@ import java.util.List;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
-import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
@@ -87,9 +86,7 @@ public abstract class BaseObjectPropertyClassificationCorrectnessTest extends
 
 						// input and expected output are OWL ontologies
 						final ElkObject.Factory objectFactory = new ElkObjectEntityRecyclingFactory();
-						InputStream stream = null;
-						try {
-							stream = urls.get(1).openStream();
+						try (InputStream stream = urls.get(1).openStream()) {
 							final Taxonomy<ElkObjectProperty> expectedTaxonomy = MockObjectPropertyTaxonomyLoader
 									.load(objectFactory,
 											new Owl2FunctionalStyleParserFactory(
@@ -104,8 +101,6 @@ public abstract class BaseObjectPropertyClassificationCorrectnessTest extends
 
 						} catch (final Owl2ParseException e) {
 							throw new IOException(e);
-						} finally {
-							IOUtils.closeQuietly(stream);
 						}
 
 					}

@@ -67,7 +67,7 @@ public class ComprehensiveSubsumptionTracingTests implements TracingTests {
 		}
 		// else
 
-		Taxonomy<ElkClass> classTaxonomy = reasoner_.getTaxonomy();
+		Taxonomy<ElkClass> classTaxonomy = reasoner_.getTaxonomy().getValue();
 		/*
 		 * Store a copy of the taxonomy, because it may change during the
 		 * reasoning.

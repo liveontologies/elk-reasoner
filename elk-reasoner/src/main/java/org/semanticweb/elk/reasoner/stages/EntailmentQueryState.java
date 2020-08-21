@@ -49,13 +49,11 @@ import org.semanticweb.elk.reasoner.entailments.InconsistencyProofWrapper;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.query.AbstractProperEntailmentQueryResult;
 import org.semanticweb.elk.reasoner.query.ElkQueryException;
 import org.semanticweb.elk.reasoner.query.EntailmentQueryConverter;
-import org.semanticweb.elk.reasoner.query.EntailmentQueryResult;
 import org.semanticweb.elk.reasoner.query.IndexedEntailmentQuery;
-import org.semanticweb.elk.reasoner.query.UnsupportedIndexingEntailmentQueryResultImpl;
-import org.semanticweb.elk.reasoner.query.UnsupportedQueryTypeEntailmentQueryResultImpl;
+import org.semanticweb.elk.reasoner.query.UnknownQueryResult;
+import org.semanticweb.elk.reasoner.query.VerifiableQueryResult;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -83,7 +81,7 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 	/**
 	 * Maps axioms that were queried to the states of their query.
 	 */
-	private final Map<ElkAxiom, QueryState> queried_ = new ConcurrentHashMap<ElkAxiom, QueryState>();
+	private final Map<ElkAxiom, QueryState> queried_ = new ConcurrentHashMap<ElkAxiom, QueryState>();	
 
 	/**
 	 * Contains axioms that were queried but not loaded.
@@ -112,7 +110,7 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 	 * 
 	 * @author Peter Skocovsky
 	 */
-	private class QueryState extends AbstractProperEntailmentQueryResult {
+	private class QueryState extends UnknownQueryResult implements VerifiableQueryResult {
 		/**
 		 * Whether the queried axiom was loaded (whether it was attempted to
 		 * index it). If this is {@code false}, then {@link #indexed} must be
@@ -121,7 +119,7 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 		boolean isLoaded = false;
 		/**
 		 * Results of indexing of the entailment query. If this is {@code null},
-		 * then {@link #isComputed} must be {@code false}.
+		 * then {@link #isLoaded} must be {@code false}.
 		 */
 		IndexedEntailmentQuery<? extends Entailment> indexed = null;
 		/**
@@ -150,23 +148,21 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 		}
 
 		@Override
-		public boolean isEntailed() throws ElkQueryException {
+		public boolean entailmentProved() throws ElkQueryException {
 			if (indexed == null) {
+				// FIXME: what if the query cannot be indexed?
 				throw new ElkQueryException(
 						"Query was not indexed: " + getQuery());
 			}
 			// else
-			final boolean entailed = Proofs.isDerivable(getEvidence(true),
-					indexed.getQuery());
-			if (!entailed) {
-				checkEntailmentCompleteness();
-			}
-			// If the query is entailed, the result is complete.
-			return entailed;
+			// TODO: cache result?
+			return Proofs.isDerivable(getEvidence(true), indexed.getQuery());
 		}
-
-		private boolean checkEntailmentCompleteness() {
-			return QueryIncompletenessMonitor.checkQueryReasoningCompleteness(
+		
+		@Override
+		public boolean entailmentDisproved() throws ElkQueryException {
+			// TODO: cache result?
+			return !entailmentProved() && QueryIncompletenessMonitor.checkQueryReasoningCompleteness(
 					getQuery(), ontologySatisfiabilityIncompletenessMonitor_,
 					getOccurrenceCounter(), LOGGER_);
 		}
@@ -206,7 +202,9 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 			return wasLocked != isLocked();
 		}
 
-		@Override
+		/**
+		 * @return {@code true} iff the lock is locked.
+		 */
 		public synchronized boolean isLocked() {
 			return lockedCount > 0;
 		}
@@ -344,8 +342,7 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 			 * Load all registered queries that are not loaded and assign
 			 * state.indexed if successful.
 			 */
-			ElkAxiom axiom;
-			while ((axiom = toLoad_.poll()) != null) {
+			for (ElkAxiom axiom; (axiom = toLoad_.poll()) != null;) {
 				final QueryState state = queried_.get(axiom);
 				if (state == null) {
 					continue;
@@ -429,18 +426,16 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 	 *             When some of the axioms was not registered by
 	 *             {@link #registerQueries(Iterable)}.
 	 */
-	Map<ElkAxiom, EntailmentQueryResult> isEntailed(
+	Map<ElkAxiom, VerifiableQueryResult> isEntailed(
 			final Iterable<? extends ElkAxiom> axioms)
 			throws ElkQueryException {
 
-		final Map<ElkAxiom, EntailmentQueryResult> results = new ArrayHashMap<ElkAxiom, EntailmentQueryResult>();
+		final Map<ElkAxiom, VerifiableQueryResult> results = new ArrayHashMap<ElkAxiom, VerifiableQueryResult>();
 
 		for (final ElkAxiom axiom : axioms) {
 			if (!EntailmentQueryConverter
 					.isEntailmentCheckingSupported(axiom.getClass())) {
-				results.put(axiom,
-						new UnsupportedQueryTypeEntailmentQueryResultImpl(
-								axiom));
+				results.put(axiom, new UnknownQueryResult(axiom));
 				continue;
 			}
 			// else
@@ -451,9 +446,7 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 			}
 			// else
 			if (state.indexed == null) {
-				results.put(axiom,
-						new UnsupportedIndexingEntailmentQueryResultImpl(
-								axiom));
+				results.put(axiom, new UnknownQueryResult(axiom));
 				continue;
 			}
 			// else

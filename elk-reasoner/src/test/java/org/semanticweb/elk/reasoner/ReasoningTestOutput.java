@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner;
 
+import org.semanticweb.elk.testing.DiffableOutput;
+
 /*-
  * #%L
  * ELK Reasoner Core
@@ -27,19 +29,24 @@ package org.semanticweb.elk.reasoner;
  * 
  * @author Yevgeny Kazakov
  *
+ * @param <O>
+ *            the type of the entailments of the reasoning result
  * @param <R>
  *            the type of the reasoning result
  */
-public interface ReasoningTestOutput<R> {
-	
+public class ReasoningTestOutput<O, R extends DiffableOutput<O, R>> {
+
+	private final R reasoningResult_;
+
+	public ReasoningTestOutput(R reasoningResult) {
+		this.reasoningResult_ = reasoningResult;
+	}
+
 	/**
 	 * @return the reasoning result represented by this output
 	 */
-	public R getResult();
-
-	/**
-	 * @return the information whether the reasoning result is complete
-	 */
-	public boolean isComplete();
+	public R getReasoningResult() {
+		return reasoningResult_;
+	}
 
 }

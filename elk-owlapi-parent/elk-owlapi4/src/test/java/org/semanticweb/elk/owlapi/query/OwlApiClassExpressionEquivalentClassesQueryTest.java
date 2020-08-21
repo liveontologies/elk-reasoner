@@ -35,7 +35,6 @@ import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owlapi.OwlApiReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.query.BaseQueryTest;
-import org.semanticweb.elk.reasoner.query.EquivalentEntitiesTestOutput;
 import org.semanticweb.elk.reasoner.query.QueryTestInput;
 import org.semanticweb.elk.reasoner.query.QueryTestManifest;
 import org.semanticweb.elk.testing.ConfigurationUtils;
@@ -44,13 +43,12 @@ import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.elk.testing.TestUtils;
-import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 
 @RunWith(PolySuite.class)
 public class OwlApiClassExpressionEquivalentClassesQueryTest extends
-		BaseQueryTest<OWLClassExpression, EquivalentEntitiesTestOutput<OWLClass>> {
+		BaseQueryTest<OWLClassExpression, OwlEquivalentClassesTestOutput> {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
@@ -70,13 +68,13 @@ public class OwlApiClassExpressionEquivalentClassesQueryTest extends
 	}
 
 	public OwlApiClassExpressionEquivalentClassesQueryTest(
-			final QueryTestManifest<OWLClassExpression, EquivalentEntitiesTestOutput<OWLClass>> manifest) {
+			final QueryTestManifest<OWLClassExpression, OwlEquivalentClassesTestOutput> manifest) {
 		super(manifest,
-				new OwlApiReasoningTestDelegate<EquivalentEntitiesTestOutput<OWLClass>>(
+				new OwlApiReasoningTestDelegate<OwlEquivalentClassesTestOutput>(
 						manifest) {
 
 					@Override
-					public EquivalentEntitiesTestOutput<OWLClass> getActualOutput()
+					public OwlEquivalentClassesTestOutput getActualOutput()
 							throws Exception {
 						return new OwlEquivalentClassesTestOutput(getReasoner(),
 								manifest.getInput().getQuery());
@@ -96,10 +94,10 @@ public class OwlApiClassExpressionEquivalentClassesQueryTest extends
 
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				ElkTestUtils.TEST_INPUT_LOCATION, BaseQueryTest.class,
-				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLClassExpression>, EquivalentEntitiesTestOutput<OWLClass>>>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<OWLClassExpression>, OwlEquivalentClassesTestOutput>>() {
 
 					@Override
-					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, EquivalentEntitiesTestOutput<OWLClass>>> createManifests(
+					public Collection<? extends TestManifestWithOutput<QueryTestInput<OWLClassExpression>, OwlEquivalentClassesTestOutput>> createManifests(
 							final String name, final List<URL> urls)
 							throws IOException {
 
@@ -118,7 +116,7 @@ public class OwlApiClassExpressionEquivalentClassesQueryTest extends
 							outputIS = urls.get(1).openStream();
 
 							return OwlExpectedTestOutputLoader.load(outputIS)
-									.getEquivalentEntitiesManifests(name,
+									.getEquivalentClassesManifests(name,
 											urls.get(0));
 
 						} finally {

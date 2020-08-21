@@ -21,22 +21,94 @@
  */
 package org.semanticweb.elk.reasoner.query;
 
-import org.semanticweb.elk.reasoner.ReasoningTestOutput;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.elk.reasoner.completeness.IncompleteResult;
+import org.semanticweb.elk.reasoner.taxonomy.model.Node;
+import org.semanticweb.elk.testing.DiffableOutput;
 
 /**
  * A test output of a query for equivalent entities.
  * 
  * @author Peter Skocovsky
+ * @author Yevgeny Kazakov
  *
  * @param <E>
  *            the type of entities.
+ * @param <O>
+ *            the type of the containers of entities that can be checked for
+ *            inclusions
  */
-public interface EquivalentEntitiesTestOutput<E> extends ReasoningTestOutput<Iterable<E>> {
+public class EquivalentEntitiesTestOutput<E extends ElkEntity, O extends EquivalentEntitiesTestOutput<E, O>>
+		implements DiffableOutput<E, O> {
 
-	/**
-	 * @return the equivalent entities.
-	 */
+	private final Map<ElkIri, ? extends E> members_;
+
+	private final boolean isComplete_;
+
+	public EquivalentEntitiesTestOutput(Map<ElkIri, ? extends E> members,
+			boolean isComplete) {
+		this.members_ = members;
+		this.isComplete_ = isComplete;
+	}
+
+	public EquivalentEntitiesTestOutput(Iterable<? extends E> equivalent,
+			int sizeEstimate, boolean isComplete) {
+		Map<ElkIri, E> members = new HashMap<>(sizeEstimate);
+		members_ = members;
+		for (E member : equivalent) {
+			members.put(member.getIri(), member);
+		}
+		this.isComplete_ = isComplete;
+	}
+
+	public EquivalentEntitiesTestOutput(Collection<? extends E> equivalent,
+			boolean isComplete) {
+		this(equivalent, equivalent.size(), isComplete);
+	}
+
+	public EquivalentEntitiesTestOutput(
+			IncompleteResult<? extends Node<? extends E>> equivalent) {
+		this(equivalent.getValue(), equivalent.getValue().size(),
+				equivalent.isComplete());
+	}
+
+	Map<ElkIri, ? extends E> getMembers() {
+		return this.members_;
+	}
+
+	boolean isComplete() {
+		return isComplete_;
+	}
+
 	@Override
-	Iterable<E> getResult();
+	public boolean containsAllElementsOf(O other) {
+		if (!isComplete()) {
+			return true;
+		}
+		for (ElkIri otherMember : other.getMembers().keySet()) {
+			if (!members_.containsKey(otherMember)) {
+				return false;
+			}
+		}
+		// else all tests passed
+		return true;
+	}
+
+	@Override
+	public void reportMissingElementsOf(O other, Listener<E> listener) {
+		if (!isComplete()) {
+			return;
+		}
+		for (ElkIri otherMember : other.getMembers().keySet()) {
+			if (!members_.containsKey(otherMember)) {
+				listener.missing(other.getMembers().get(otherMember));
+			}
+		}
+	}
 
 }

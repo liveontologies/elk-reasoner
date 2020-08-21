@@ -92,7 +92,8 @@ public class Operations {
 		return (Multimap<S, T>) EMPTY_MULTIMAP;
 	}
 
-	public static <T> Iterable<T> concat(final Iterable<? extends T>... inputs) {
+	public static <T> Iterable<T> concat(
+			final Iterable<? extends T>... inputs) {
 		return concat(Arrays.asList(inputs));
 	}
 
@@ -254,8 +255,9 @@ public class Operations {
 
 			@Override
 			public Iterator<ArrayList<T>> iterator() {
-				return split((Iterable<? extends T>) elements, batchSize)
-						.iterator();
+				Iterable<ArrayList<T>> iterable = split(
+						(Iterable<? extends T>) elements, batchSize);
+				return iterable.iterator();
 			}
 
 			@Override
@@ -405,7 +407,8 @@ public class Operations {
 
 			@Override
 			public Iterator<T> iterator() {
-				return filter(input, condition).iterator();
+				Iterable<T> iterable = filter(input, condition);
+				return iterable.iterator();
 			}
 
 			@Override
@@ -546,7 +549,7 @@ public class Operations {
 			}
 		};
 	}
-	
+
 	public static <I, O> Iterable<O> mapConcat(final Iterable<I> input,
 			final Transformation<? super I, Iterable<O>> transformation) {
 		assert input != null;
@@ -559,7 +562,7 @@ public class Operations {
 			}
 		};
 	}
-	
+
 	public static <I, O> Collection<O> map(final Collection<I> input,
 			final Transformation<? super I, O> transformation) {
 		assert input != null;
@@ -576,11 +579,12 @@ public class Operations {
 				// this is an upper bound
 				return input.size();
 			}
-			
+
 		};
 	}
-	
-	public static <I, O> Iterator<O> map(final Iterator<I> input, final Transformation<? super I, O> transformation) {
+
+	public static <I, O> Iterator<O> map(final Iterator<I> input,
+			final Transformation<? super I, O> transformation) {
 		return new Iterator<O>() {
 			O next;
 			boolean hasNext = advance();
@@ -615,30 +619,30 @@ public class Operations {
 			}
 		};
 	}
-	
-	
-	public static <I, O> Iterator<O> mapConcat(final Iterator<I> input, final Transformation<? super I, Iterable<O>> transformation) {
+
+	public static <I, O> Iterator<O> mapConcat(final Iterator<I> input,
+			final Transformation<? super I, Iterable<O>> transformation) {
 		return new Iterator<O>() {
-			Iterator<O> nextIter = Collections.<O>emptyList().iterator();
-			
+			Iterator<O> nextIter = Collections.<O> emptyList().iterator();
+
 			O next;
-			
+
 			@Override
 			public boolean hasNext() {
 				for (;;) {
 					if (next != null) {
 						return true;
 					}
-					
+
 					if (nextIter.hasNext()) {
 						next = nextIter.next();
 						return true;
 					}
-					
+
 					if (input.hasNext()) {
-						nextIter = transformation.transform(input.next()).iterator();
-					}
-					else {
+						nextIter = transformation.transform(input.next())
+								.iterator();
+					} else {
 						return false;
 					}
 				}
@@ -649,11 +653,11 @@ public class Operations {
 				if (!hasNext()) {
 					throw new NoSuchElementException();
 				}
-				
+
 				O result = next;
-				
+
 				next = null;
-				
+
 				return result;
 			}
 
@@ -664,7 +668,6 @@ public class Operations {
 
 		};
 	}
-	
 
 	/**
 	 * Prints key-value entries present in the first {@link Multimap} but not in
@@ -801,25 +804,25 @@ public class Operations {
 
 		};
 	}
-	
+
 	public static <T> String toString(Iterable<T> iterable) {
 		StringBuilder builder = new StringBuilder();
 		boolean first = true;
-		
+
 		for (T elem : iterable) {
 			String elemStr = elem.toString();
-			
+
 			if (!first && !elemStr.isEmpty()) {
 				builder.append(' ');
 			}
-			
+
 			if (!elemStr.isEmpty()) {
 				builder.append(elemStr);
 			}
 
 			first = false;
 		}
-		
+
 		return builder.toString();
 	}
 

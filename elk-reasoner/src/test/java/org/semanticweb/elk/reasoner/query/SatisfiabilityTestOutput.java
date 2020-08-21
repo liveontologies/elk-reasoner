@@ -21,7 +21,8 @@
  */
 package org.semanticweb.elk.reasoner.query;
 
-import org.semanticweb.elk.reasoner.ReasoningTestOutput;
+import org.semanticweb.elk.reasoner.completeness.IncompleteResult;
+import org.semanticweb.elk.testing.DiffableOutput;
 
 /**
  * A test output of a satisfiability check.
@@ -29,12 +30,36 @@ import org.semanticweb.elk.reasoner.ReasoningTestOutput;
  * @author Peter Skocovsky
  * @author Yevgeny Kazakov
  */
-public interface SatisfiabilityTestOutput extends ReasoningTestOutput<Boolean> {
+public class SatisfiabilityTestOutput
+		implements DiffableOutput<Boolean, SatisfiabilityTestOutput> {
 
-	/**
-	 * @return {@code true} if the output is satisfiable.
-	 */
+	private final boolean isSatisfiable_;
+
+	private final boolean isComplete_;
+
+	public SatisfiabilityTestOutput(boolean isSatisfiable, boolean isComplete) {
+		this.isSatisfiable_ = isSatisfiable;
+		this.isComplete_ = isComplete;
+	}
+
+	public SatisfiabilityTestOutput(
+			IncompleteResult<? extends Boolean> satisfiable) {
+		this(satisfiable.getValue(), satisfiable.isComplete());
+	}
+
 	@Override
-	Boolean getResult();
+	public boolean containsAllElementsOf(SatisfiabilityTestOutput other) {
+		return !isComplete_ || !other.isSatisfiable_ || isSatisfiable_;
+	}
+
+	@Override
+	public void reportMissingElementsOf(SatisfiabilityTestOutput other,
+			Listener<Boolean> listener) {
+		if (containsAllElementsOf(other)) {
+			return;
+		}
+		// else
+		listener.missing(true);
+	}
 
 }

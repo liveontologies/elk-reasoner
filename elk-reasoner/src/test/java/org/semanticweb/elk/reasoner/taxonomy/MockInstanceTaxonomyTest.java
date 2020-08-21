@@ -50,7 +50,10 @@ public class MockInstanceTaxonomyTest {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testTopBotEquivalence() {
-		ElkClass.Factory factory = new ElkObjectEntityRecyclingFactory();// we reuse iri objects
+		ElkClass.Factory factory = new ElkObjectEntityRecyclingFactory();// we
+																			// reuse
+																			// iri
+																			// objects
 		MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = new MockInstanceTaxonomy<ElkClass, ElkNamedIndividual>(
 				factory.getOwlThing(), factory.getOwlNothing(),
 				ElkClassKeyProvider.INSTANCE,
@@ -80,7 +83,10 @@ public class MockInstanceTaxonomyTest {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testForDuplicates() {
-		ElkEntity.Factory factory = new ElkObjectEntityRecyclingFactory();// we reuse iri objects
+		ElkEntity.Factory factory = new ElkObjectEntityRecyclingFactory();// we
+																			// reuse
+																			// iri
+																			// objects
 		MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = new MockInstanceTaxonomy<ElkClass, ElkNamedIndividual>(
 				factory.getOwlThing(), factory.getOwlNothing(),
 				ElkClassKeyProvider.INSTANCE,
@@ -98,12 +104,12 @@ public class MockInstanceTaxonomyTest {
 
 		assertSame(taxonomy.getNode(A1), taxonomy.getNode(A2));
 
-		taxonomy.getCreateInstanceNode(Collections.singleton(a1), Collections
-				.<TypeNode<ElkClass, ElkNamedIndividual>> singleton(taxonomy
-						.getNode(A1)));
-		taxonomy.getCreateInstanceNode(Collections.singleton(a2), Collections
-				.<TypeNode<ElkClass, ElkNamedIndividual>> singleton(taxonomy
-						.getNode(A2)));
+		taxonomy.getCreateInstanceNode(Collections.singleton(a1),
+				Collections.<TypeNode<ElkClass, ElkNamedIndividual>> singleton(
+						taxonomy.getNode(A1)));
+		taxonomy.getCreateInstanceNode(Collections.singleton(a2),
+				Collections.<TypeNode<ElkClass, ElkNamedIndividual>> singleton(
+						taxonomy.getNode(A2)));
 
 		assertSame(taxonomy.getInstanceNode(a1), taxonomy.getInstanceNode(a2));
 	}
@@ -111,21 +117,24 @@ public class MockInstanceTaxonomyTest {
 	@SuppressWarnings({ "unchecked", "rawtypes", "static-method" })
 	@Test
 	public void testMockTaxonomy() {
-		ElkEntity.Factory factory = new ElkObjectEntityRecyclingFactory();// we reuse iri objects
+		ElkEntity.Factory factory = new ElkObjectEntityRecyclingFactory();// we
+																			// reuse
+																			// iri
+																			// objects
 		MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = new MockInstanceTaxonomy<ElkClass, ElkNamedIndividual>(
 				factory.getOwlThing(), factory.getOwlNothing(),
 				ElkClassKeyProvider.INSTANCE,
 				ElkIndividualKeyProvider.INSTANCE);
 
-		assertSame(factory.getOwlThing(), taxonomy.getTopNode()
-				.getCanonicalMember());
-		assertSame(factory.getOwlNothing(), taxonomy.getBottomNode()
-				.getCanonicalMember());
+		assertSame(factory.getOwlThing(),
+				taxonomy.getTopNode().getCanonicalMember());
+		assertSame(factory.getOwlNothing(),
+				taxonomy.getBottomNode().getCanonicalMember());
 		// check subclass relationships between Top and Bot
 		assertSame(taxonomy.getTopNode(), taxonomy.getBottomNode()
 				.getDirectSuperNodes().iterator().next());
-		assertSame(taxonomy.getBottomNode(), taxonomy.getTopNode()
-				.getAllSubNodes().iterator().next());
+		assertSame(taxonomy.getBottomNode(),
+				taxonomy.getTopNode().getAllSubNodes().iterator().next());
 		// add some nodes
 		ElkClass A = factory.getClass(new ElkFullIri("#A"));
 		ElkClass B = factory.getClass(new ElkFullIri("#B"));
@@ -138,37 +147,37 @@ public class MockInstanceTaxonomyTest {
 		assertSame(taxonomy.getNode(B), taxonomy.getNode(C));
 		// check that Top and Bot are returned if there're no other
 		// parents/children
-		assertEquals(Collections.singleton(taxonomy.getTopNode()), taxonomy
-				.getNode(A).getDirectSuperNodes());
-		assertEquals(Collections.singleton(taxonomy.getBottomNode()), taxonomy
-				.getNode(B).getDirectSubNodes());
+		assertEquals(Collections.singleton(taxonomy.getTopNode()),
+				taxonomy.getNode(A).getDirectSuperNodes());
+		assertEquals(Collections.singleton(taxonomy.getBottomNode()),
+				taxonomy.getNode(B).getDirectSubNodes());
 		// add some child to A
 		ElkClass D = factory.getClass(new ElkFullIri("#D"));
 
 		taxonomy.getCreateTypeNode(Collections.singleton(D));
 		taxonomy.getNode(D).addDirectParent(taxonomy.getNode(A));
 
-		assertEquals(Collections.singleton(taxonomy.getNode(A)), taxonomy
-				.getNode(D).getDirectSuperNodes());
-		assertEquals(Collections.singleton(taxonomy.getNode(D)), taxonomy
-				.getNode(A).getDirectSubNodes());
+		assertEquals(Collections.singleton(taxonomy.getNode(A)),
+				taxonomy.getNode(D).getDirectSuperNodes());
+		assertEquals(Collections.singleton(taxonomy.getNode(D)),
+				taxonomy.getNode(A).getDirectSubNodes());
 
 		assertEquals(
 				new HashSet(Arrays.asList(taxonomy.getNode(A),
-						taxonomy.getNode(B))), taxonomy.getTopNode()
-						.getDirectSubNodes());
+						taxonomy.getNode(B))),
+				taxonomy.getTopNode().getDirectSubNodes());
 		assertEquals(
 				new HashSet(Arrays.asList(taxonomy.getNode(D),
-						taxonomy.getNode(B))), taxonomy.getBottomNode()
-						.getDirectSuperNodes());
+						taxonomy.getNode(B))),
+				taxonomy.getBottomNode().getDirectSuperNodes());
 		// instances
 		ElkNamedIndividual a = factory.getNamedIndividual(new ElkFullIri("#a"));
 		ElkNamedIndividual b = factory.getNamedIndividual(new ElkFullIri("#b"));
 		ElkNamedIndividual c = factory.getNamedIndividual(new ElkFullIri("#c"));
 		ElkNamedIndividual d = factory.getNamedIndividual(new ElkFullIri("#d"));
 
-		taxonomy.getCreateInstanceNode(Arrays.asList(a, b),
-				Collections.<TypeNode<ElkClass, ElkNamedIndividual>> emptySet());
+		taxonomy.getCreateInstanceNode(Arrays.asList(a, b), Collections
+				.<TypeNode<ElkClass, ElkNamedIndividual>> emptySet());
 		// should be instances of Top
 		assertEquals(new HashSet(Arrays.asList(taxonomy.getInstanceNode(a))),
 				taxonomy.getTopNode().getDirectInstanceNodes());
@@ -176,22 +185,22 @@ public class MockInstanceTaxonomyTest {
 		assertSame(taxonomy.getTopNode(), taxonomy.getInstanceNode(a)
 				.getDirectTypeNodes().iterator().next());
 
-		taxonomy.getCreateInstanceNode(Arrays.asList(c), Arrays
-				.<TypeNode<ElkClass, ElkNamedIndividual>> asList(taxonomy
-						.getNode(A)));
-		taxonomy.getCreateInstanceNode(Arrays.asList(d), Arrays
-				.<TypeNode<ElkClass, ElkNamedIndividual>> asList(taxonomy
-						.getNode(D)));
+		taxonomy.getCreateInstanceNode(Arrays.asList(c),
+				Arrays.<TypeNode<ElkClass, ElkNamedIndividual>> asList(
+						taxonomy.getNode(A)));
+		taxonomy.getCreateInstanceNode(Arrays.asList(d),
+				Arrays.<TypeNode<ElkClass, ElkNamedIndividual>> asList(
+						taxonomy.getNode(D)));
 		// check types/instances
 		assertEquals(new HashSet(Arrays.asList(taxonomy.getInstanceNode(c))),
 				taxonomy.getNode(A).getDirectInstanceNodes());
 		assertEquals(
 				new HashSet(Arrays.asList(taxonomy.getInstanceNode(c),
-						taxonomy.getInstanceNode(d))), taxonomy.getNode(A)
-						.getAllInstanceNodes());
+						taxonomy.getInstanceNode(d))),
+				taxonomy.getNode(A).getAllInstanceNodes());
 		assertEquals(
 				new HashSet(Arrays.asList(taxonomy.getNode(A),
-						taxonomy.getNode(D))), taxonomy.getInstanceNode(d)
-						.getAllTypeNodes());
+						taxonomy.getNode(D), taxonomy.getTopNode())),
+				taxonomy.getInstanceNode(d).getAllTypeNodes());
 	}
 }

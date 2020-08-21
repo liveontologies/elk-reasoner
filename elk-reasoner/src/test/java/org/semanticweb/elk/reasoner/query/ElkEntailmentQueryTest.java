@@ -33,7 +33,6 @@ import java.util.Map;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
-import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.ElkReasoningTestDelegate;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
@@ -52,10 +51,7 @@ public class ElkEntailmentQueryTest extends
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
-			ElkTestUtils.TEST_INPUT_LOCATION + "/query/class/Disjunctions.owl",// Disjuctions not fully supported
-			ElkTestUtils.TEST_INPUT_LOCATION + "/query/class/OneOf.owl",// Disjuctions not fully supported
 			ElkTestUtils.TEST_INPUT_LOCATION + "/query/class/UnsupportedQueryIndexing.owl",// Unsupported class expression
-			ElkTestUtils.TEST_INPUT_LOCATION + "/query/entailment/AssertionRanges.owl",// Ranges not supported with assertions
 			ElkTestUtils.TEST_INPUT_LOCATION + "/query/entailment/HasValueRanges.owl",// Ranges not supported with ObjectHasValue
 		};
 	// @formatter:on
@@ -79,29 +75,27 @@ public class ElkEntailmentQueryTest extends
 					@Override
 					public ElkEntailmentQueryTestOutput getActualOutput()
 							throws Exception {
-						return new ElkEntailmentQueryTestOutput(getReasoner(),
-								manifest.getInput().getQuery());
+						return new ElkEntailmentQueryTestOutput(getReasoner()
+								.isEntailed(manifest.getInput().getQuery()));
 					}
 
 					@Override
 					protected Map<String, String> additionalConfigWithOutput() {
-						return ImmutableMap.<String, String> builder()
-								.put(ReasonerConfiguration.ENTAILMENT_QUERY_EVICTOR,
-										"NQEvictor(0, 0.75)")
-								.build();
+						return ImmutableMap.<String, String> builder().put(
+								ReasonerConfiguration.ENTAILMENT_QUERY_EVICTOR,
+								"NQEvictor(0, 0.75)").build();
 					}
 
 					@Override
 					protected Map<String, String> additionalConfigWithInterrupts() {
-						return ImmutableMap.<String, String> builder()
-								.put(ReasonerConfiguration.ENTAILMENT_QUERY_EVICTOR,
-										"NQEvictor(0, 0.75)")
-								.build();
+						return ImmutableMap.<String, String> builder().put(
+								ReasonerConfiguration.ENTAILMENT_QUERY_EVICTOR,
+								"NQEvictor(0, 0.75)").build();
 					}
 
 				});
 	}
-	
+
 	public static final ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<Collection<ElkAxiom>>, ElkEntailmentQueryTestOutput>> CLASS_QUERY_TEST_MANIFEST_CREATOR = new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<QueryTestInput<Collection<ElkAxiom>>, ElkEntailmentQueryTestOutput>>() {
 
 		@Override
@@ -117,17 +111,11 @@ public class ElkEntailmentQueryTest extends
 				return Collections.emptySet();
 			}
 
-			InputStream outputIS = null;
-			try {
-				outputIS = urls.get(1).openStream();
-
+			try (InputStream outputIS = urls.get(1).openStream()) {
 				return ElkExpectedTestOutputLoader.load(outputIS)
-						.getEntailmentManifests(name, urls.get(0));
-
-			} finally {
-				IOUtils.closeQuietly(outputIS);
+						.getEntailmentManifests(name + " checkEntailment",
+								urls.get(0));
 			}
-
 		}
 
 	};

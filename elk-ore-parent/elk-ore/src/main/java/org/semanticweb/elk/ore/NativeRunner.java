@@ -48,26 +48,26 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
  *         pavel.klinov@uni-ulm.de
  */
 public class NativeRunner {
-	
+
 	enum Task {
 		CLASSIFICATION {
-		
+
 			@Override
 			public String toString() {
 				return "classification";
 			}
 		},
-		
+
 		CONSISTENCY {
-		
+
 			@Override
 			public String toString() {
 				return "consistency";
 			}
 		},
-		
+
 		REALISATION {
-			
+
 			@Override
 			public String toString() {
 				return "realisation";
@@ -92,10 +92,10 @@ public class NativeRunner {
 		}
 
 		NativeRunner runner = new NativeRunner();
-		
+
 		runner.run(args, task);
 	}
-	
+
 	void run(String[] args, Task task) throws Exception {
 		File input = getOutputFile(args[1]);
 		File output = getOutputFile(args[2]);
@@ -107,12 +107,12 @@ public class NativeRunner {
 		Reasoner reasoner = reasoningFactory.createReasoner(loaderFactory);
 
 		boolean printedStarted = false, printedTime = false;
-		
+
 		long ts = System.currentTimeMillis();
-		
+
 		try {
 			loadOntology(reasoner);
-			
+
 			ts = System.currentTimeMillis();
 
 			System.out.println("Started " + task.toString() + " on " + input);
@@ -120,7 +120,8 @@ public class NativeRunner {
 
 			switch (task) {
 			case CLASSIFICATION:
-				Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomyQuietly();
+				Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomyQuietly()
+						.getValue();
 
 				printTime(ts);
 				printedTime = true;
@@ -129,14 +130,15 @@ public class NativeRunner {
 
 				break;
 			case REALISATION:
-				InstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy = reasoner.getInstanceTaxonomyQuietly();
+				InstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy = reasoner
+						.getInstanceTaxonomyQuietly().getValue();
 
 				printTime(ts);
 				printedTime = true;
 
 				writeInstanceTaxonomyToFile(output, instanceTaxonomy);
 
-				break;				
+				break;
 			case CONSISTENCY:
 				boolean isConsistent = reasoner.isInconsistent();
 
@@ -152,11 +154,12 @@ public class NativeRunner {
 			System.err.println("ELK error: " + e);
 			if (!printedStarted) {
 				ts = System.currentTimeMillis();
-				System.out.println("Started " + task.toString() + " on " + input);				
+				System.out
+						.println("Started " + task.toString() + " on " + input);
 			}
 			if (!printedTime) {
 				printTime(ts);
-			}			
+			}
 		} finally {
 			printCompleted(task, input);
 			reasoner.shutdown();
@@ -164,7 +167,8 @@ public class NativeRunner {
 	}
 
 	protected void loadOntology(Reasoner reasoner) throws ElkException {
-		// no eager loading so it will be done later and included in measurements
+		// no eager loading so it will be done later and included in
+		// measurements
 	}
 
 	private File getOutputFile(String path) {
@@ -191,8 +195,8 @@ public class NativeRunner {
 	}
 
 	private void printTime(long ts) {
-		System.out.println("Operation time: "
-				+ (System.currentTimeMillis() - ts));
+		System.out.println(
+				"Operation time: " + (System.currentTimeMillis() - ts));
 
 	}
 
@@ -226,8 +230,8 @@ public class NativeRunner {
 	}
 
 	static void printHelp() {
-		System.out
-				.println("The system requires the following command line arguments:\n"
+		System.out.println(
+				"The system requires the following command line arguments:\n"
 						+ "* name of the reasoning task, one of: CONSISTENCY, CLASSIFICATION, REALISATION case insensitive\n"
 						+ "* path to the ontology file\n"
 						+ "* path to the output file\n");
