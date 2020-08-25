@@ -51,7 +51,6 @@ public class ElkEntailmentQueryTest extends
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
-			ElkTestUtils.TEST_INPUT_LOCATION + "/query/class/UnsupportedQueryIndexing.owl",// Unsupported class expression
 			ElkTestUtils.TEST_INPUT_LOCATION + "/query/entailment/HasValueRanges.owl",// Ranges not supported with ObjectHasValue
 		};
 	// @formatter:on
@@ -75,8 +74,9 @@ public class ElkEntailmentQueryTest extends
 					@Override
 					public ElkEntailmentQueryTestOutput getActualOutput()
 							throws Exception {
-						return new ElkEntailmentQueryTestOutput(getReasoner()
-								.isEntailed(manifest.getInput().getQuery()));
+						return new ElkEntailmentQueryTestOutput(
+								getReasoner().checkEntailment(
+										manifest.getInput().getQuery()));
 					}
 
 					@Override

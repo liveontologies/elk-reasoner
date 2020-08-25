@@ -39,7 +39,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyDomainAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.predefined.ElkPolarity;
-import org.semanticweb.elk.owl.visitors.DummyElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.entailments.impl.ClassAssertionAxiomEntailmentImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.DifferentIndividualsAxiomEntailmentImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.DisjointClassesAxiomEntailmentImpl;
@@ -51,7 +50,6 @@ import org.semanticweb.elk.reasoner.entailments.impl.SubClassOfAxiomEntailmentIm
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.indexing.classes.ModifiableIndexedObjectBaseFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.UpdatingModifiableIndexedObjectFactory;
-import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
@@ -68,7 +66,7 @@ import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
  * @author Peter Skocovsky
  */
 public class EntailmentQueryConverter extends
-		DummyElkAxiomVisitor<IndexedEntailmentQuery<? extends Entailment>> {
+ElkQueryAxiomIndexingVisitor<IndexedEntailmentQuery<? extends Entailment>> {
 
 	private final ElkObject.Factory elkFactory_;
 	private final ElkPolarityExpressionConverter positiveConverter_;
@@ -97,12 +95,6 @@ public class EntailmentQueryConverter extends
 				negativeFactory, index, increment);
 		this.negativeConverter_ = positiveConverter_
 				.getComplementaryConverter();
-	}
-
-	@Override
-	protected IndexedEntailmentQuery<? extends Entailment> defaultVisit(
-			final ElkAxiom axiom) {
-		throw new ElkIndexingUnsupportedException(axiom);
 	}
 
 	@Override
@@ -262,6 +254,7 @@ public class EntailmentQueryConverter extends
 	 * 
 	 * @param axiomClass
 	 * @return
+	 * 
 	 */
 	public static boolean isEntailmentCheckingSupported(
 			final Class<? extends ElkAxiom> axiomClass) {

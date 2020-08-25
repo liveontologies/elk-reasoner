@@ -1,14 +1,12 @@
 package org.semanticweb.elk.reasoner.completeness;
 
-import java.util.Collections;
-
 /*-
  * #%L
  * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2018 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2020 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +22,7 @@ import java.util.Collections;
  * #L%
  */
 
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;

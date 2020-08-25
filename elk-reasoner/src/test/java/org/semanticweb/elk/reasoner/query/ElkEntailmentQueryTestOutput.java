@@ -30,8 +30,8 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
  * 
  * @author Yevgeny Kazakov
  */
-public class ElkEntailmentQueryTestOutput
-		extends IncompleteEntailmentTestOutput<ElkAxiom, ElkEntailmentQueryTestOutput> {
+public class ElkEntailmentQueryTestOutput extends
+		IncompleteEntailmentTestOutput<ElkAxiom, ElkEntailmentQueryTestOutput> {
 
 	public ElkEntailmentQueryTestOutput(
 			Map<ElkAxiom, ? extends QueryResult> reasoningResult)
@@ -41,8 +41,8 @@ public class ElkEntailmentQueryTestOutput
 				ElkAxiom query = queryResult.getQuery();
 				if (queryResult.entailmentProved()) {
 					addPositiveEntailment(query);
-				}
-				if (queryResult.entailmentDisproved()) {
+				} else if (!queryResult.getIncompletenessMonitor()
+						.isIncompletenessDetected()) {
 					addNegativeEntailment(query);
 				}
 			} finally {

@@ -47,11 +47,11 @@ import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerInterrupter;
 import org.semanticweb.elk.reasoner.completeness.IncompleteResult;
+import org.semanticweb.elk.reasoner.completeness.Incompleteness;
 import org.semanticweb.elk.reasoner.completeness.IncompletenessMonitor;
 import org.semanticweb.elk.reasoner.completeness.OccurrencesInOntology;
 import org.semanticweb.elk.reasoner.completeness.OntologySatisfiabilityIncompletenessMonitor;
 import org.semanticweb.elk.reasoner.completeness.PropertyTaxonomyIncompletenessMonitor;
-import org.semanticweb.elk.reasoner.completeness.QueryIncompletenessMonitor;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyCheckingState;
 import org.semanticweb.elk.reasoner.indexing.classes.DifferentialIndex;
@@ -832,13 +832,6 @@ public abstract class AbstractReasonerState implements TracingProof {
 				.isIncompletenessDetected();
 	}
 
-	public boolean isQueryReasoningComplete(ElkClassExpression query) {
-		return !QueryIncompletenessMonitor
-				.get(query, ontologySatisfiabilityCompletenessMonitor_,
-						classExpressionQueryState.getOccurrenceCounter(query))
-				.isIncompletenessDetected();
-	}
-
 	private boolean checkOntologySatisfiabilityCompleteness() {
 		return ontologySatisfiabilityCompletenessMonitor_
 				.checkCompleteness(LOGGER_);
@@ -858,7 +851,7 @@ public abstract class AbstractReasonerState implements TracingProof {
 	}
 
 	private boolean checkQueryReasoningCompleteness(ElkClassExpression query) {
-		return QueryIncompletenessMonitor.checkQueryReasoningCompleteness(query,
+		return Incompleteness.checkQueryReasoningCompleteness(query,
 				ontologySatisfiabilityCompletenessMonitor_,
 				classExpressionQueryState.getOccurrenceCounter(query), LOGGER_);
 	}
@@ -1074,7 +1067,7 @@ public abstract class AbstractReasonerState implements TracingProof {
 	 *         {@link VerifiableQueryResult} for that axiom.
 	 * @throws ElkException
 	 */
-	public synchronized Map<ElkAxiom, VerifiableQueryResult> isEntailed(
+	public synchronized Map<ElkAxiom, VerifiableQueryResult> checkEntailment(
 			final Iterable<? extends ElkAxiom> axioms) throws ElkException {
 
 		entailmentQueryState.registerQueries(axioms);
@@ -1096,9 +1089,13 @@ public abstract class AbstractReasonerState implements TracingProof {
 	 * @return the {@link VerifiableQueryResult} for the queried axiom.
 	 * @throws ElkException
 	 */
-	public synchronized VerifiableQueryResult isEntailed(final ElkAxiom axiom)
-			throws ElkException {
-		return isEntailed(Collections.singleton(axiom)).get(axiom);
+	public synchronized VerifiableQueryResult checkEntailment(
+			final ElkAxiom axiom) throws ElkException {
+		return checkEntailment(Collections.singleton(axiom)).get(axiom);
+	}
+
+	public boolean isEntailed(final ElkAxiom axiom) throws ElkException {
+		return Incompleteness.getValue(checkEntailment(axiom));
 	}
 
 	/**

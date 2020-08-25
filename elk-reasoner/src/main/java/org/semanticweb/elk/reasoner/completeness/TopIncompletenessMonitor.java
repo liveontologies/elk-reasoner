@@ -119,18 +119,18 @@ public class TopIncompletenessMonitor extends CombinedIncompletenessMonitor {
 			//
 			Feature.TOP_OBJECT_PROPERTY_NEGATIVE };
 
-	static Collection<IncompletenessMonitor> getMonitors(
+	public static Collection<IncompletenessMonitor> getMonitors(
 			OccurrenceManager occurrences) {
-		Collection<IncompletenessMonitor> monitors = new ArrayList<>();
+		Collection<IncompletenessMonitor> result = new ArrayList<>();
 		for (Feature feature : UNSUPPORTED_FEATURES_) {
-			monitors.add(new IncompletenessDueToUnsupportedFeatures(occurrences,
+			result.add(new IncompletenessDueToUnsupportedFeatures(occurrences,
 					feature));
 		}
 		for (Feature[] combination : UNSUPPORTED_COMBINATIONS_OF_FEATURES_) {
-			monitors.add(new IncompletenessDueToUnsupportedFeatures(occurrences,
+			result.add(new IncompletenessDueToUnsupportedFeatures(occurrences,
 					combination));
 		}
-		return monitors;
+		return result;
 	}
 
 	TopIncompletenessMonitor(OccurrenceManager occurences) {

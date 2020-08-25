@@ -46,7 +46,6 @@ import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.entailments.model.HasReason;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.query.UnsupportedIndexingEntailmentQueryResult;
 import org.semanticweb.elk.reasoner.query.VerifiableQueryResult;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
@@ -89,16 +88,15 @@ public class TracingTestUtils {
 
 		final Collection<Conclusion> conclusions = new ArrayList<Conclusion>();
 
-		final VerifiableQueryResult result = reasoner.isEntailed(
+		final VerifiableQueryResult result = reasoner.checkEntailment(
 				elkFactory.getSubClassOfAxiom(subClass, superClass));
 		if (result.entailmentProved()) {
 			collectReasons(result.getEntailment(), result.getEvidence(false),
 					conclusions);
-		} else if (!result.entailmentDisproved()) {
-			// tested entailments must be complete
+		} else if (result.getIncompletenessMonitor()
+				.isIncompletenessDetected()) {
 			throw new ElkRuntimeException(
-					UnsupportedIndexingEntailmentQueryResult.class
-							.getSimpleName());
+					"Tested entailments must be complete!");
 		}
 
 		return conclusions;

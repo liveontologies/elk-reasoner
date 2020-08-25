@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.completeness;
 
+import java.util.ArrayList;
+
 /*-
  * #%L
  * ELK Reasoner Core
@@ -43,10 +45,12 @@ public class PropertyTaxonomyIncompletenessMonitor
 					//
 					Feature.OBJECT_PROPERTY_CHAIN } };
 
-	static Collection<IncompletenessMonitor> getMonitors(
-			OccurrenceManager occurrences) {
-		Collection<IncompletenessMonitor> monitors = OntologySatisfiabilityIncompletenessMonitor
-				.getMonitors(occurrences);
+	static Collection<IncompletenessMonitor> appendMonitors(
+			OntologySatisfiabilityIncompletenessMonitor ontologySatisfiabilityMonitor) {
+		OccurrenceManager occurrences = ontologySatisfiabilityMonitor
+				.getOccurrencesInOntology();
+		Collection<IncompletenessMonitor> monitors = new ArrayList<>();
+		monitors.add(ontologySatisfiabilityMonitor);
 		for (Feature feature : UNSUPPORTED_FEATURES_) {
 			monitors.add(new IncompletenessDueToUnsupportedFeatures(occurrences,
 					feature));
@@ -62,8 +66,7 @@ public class PropertyTaxonomyIncompletenessMonitor
 
 	public PropertyTaxonomyIncompletenessMonitor(
 			OntologySatisfiabilityIncompletenessMonitor ontologySatisfiabilityMonitor) {
-		super(getMonitors(
-				ontologySatisfiabilityMonitor.getOccurrencesInOntology()));
+		super(appendMonitors(ontologySatisfiabilityMonitor));
 		this.ontologySatisfiabilityMonitor_ = ontologySatisfiabilityMonitor;
 	}
 

@@ -1,10 +1,12 @@
+package org.semanticweb.elk.reasoner.completeness;
+
 /*-
  * #%L
  * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2020 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,21 +21,31 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.query;
+
+import org.slf4j.Logger;
 
 /**
- * An {@link EntailmentQueryResult} of a query that is not supported.
+ * An {@link IncompletenessMonitor} that never reports incompleteness. I.e., it
+ * assumes that the result is complete.
  * 
- * @author Peter Skocovsky
+ * @author Yevgeny Kazakov
+ *
  */
-public interface UnsupportedQueryTypeEntailmentQueryResult
-		extends EntailmentQueryResult {
+public class NoIncompletenessMonitor implements IncompletenessMonitor {
 
-	<O, T extends Throwable> O accept(Visitor<O, T> visitor) throws T;
+	@Override
+	public boolean isIncompletenessDetected() {
+		return false;
+	}
 
-	public static interface Visitor<O, T extends Throwable> {
-		O visit(UnsupportedQueryTypeEntailmentQueryResult unsupportedQueryTypeEntailmentQueryResult)
-				throws T;
+	@Override
+	public void explainIncompleteness(Logger logger) {
+		// nothing to explain
+	}
+
+	@Override
+	public boolean hasNewExplanation() {
+		return false;
 	}
 
 }

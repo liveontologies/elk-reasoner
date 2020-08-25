@@ -6,6 +6,8 @@ Prefix(owl: = <http://www.w3.org/2002/07/owl#>)
 
 Ontology(
 
+TransitiveObjectProperty(:T)
+
 SubClassOf(:A ObjectSomeValuesFrom(:T :D))
 
 SubClassOf(:A ObjectSomeValuesFrom(:T :F))

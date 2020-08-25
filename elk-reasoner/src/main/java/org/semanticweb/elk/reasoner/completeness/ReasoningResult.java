@@ -1,10 +1,12 @@
+package org.semanticweb.elk.reasoner.completeness;
+
 /*-
  * #%L
  * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2016 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2020 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,21 +21,26 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.query;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+/**
+ * Represents a possibly incomplete reasoning result
+ * 
+ * @author Yevgeny Kazakov
+ *
+ * @param <R>
+ *            the type of the value of the reasoning result
+ */
+public interface ReasoningResult<R> {
 
-abstract class AbstractEntailmentQueryResult implements EntailmentQueryResult {
+	/**
+	 * @return the value of the reasoning result, such a class taxonomy
+	 */
+	R getValue();
 
-	private final ElkAxiom query_;
-
-	public AbstractEntailmentQueryResult(final ElkAxiom query) {
-		this.query_ = query;
-	}
-
-	@Override
-	public ElkAxiom getQuery() {
-		return query_;
-	}
+	/**
+	 * @return the object using which one can check completeness of reasoning
+	 *         result and output the reasons for possible incompleteness
+	 */
+	IncompletenessMonitor geIncompletenessMonitor();
 
 }

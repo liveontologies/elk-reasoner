@@ -72,7 +72,8 @@ public class EntailmentTestManifestCreator implements
 						.loadAxioms(entailedIS);
 				query.addAll(entailed);
 				for (final ElkAxiom elkAxiom : entailed) {
-					output.put(elkAxiom, new TestQueryResult(elkAxiom, true));
+					output.put(elkAxiom,
+							new CompleteQueryResult(elkAxiom, true));
 				}
 			}
 			if (urls.size() >= 3 && urls.get(2) != null) {
@@ -81,7 +82,8 @@ public class EntailmentTestManifestCreator implements
 						.loadAxioms(notEntailedIS);
 				query.addAll(notEntailed);
 				for (final ElkAxiom elkAxiom : notEntailed) {
-					output.put(elkAxiom, new TestQueryResult(elkAxiom, false));
+					output.put(elkAxiom,
+							new CompleteQueryResult(elkAxiom, false));
 				}
 			}
 
