@@ -685,9 +685,9 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 		final QueryState state = checkComputed(classExpression);
 		if (state.node == null) {
 			return null;
-		} else {
-			return state.node.getDirectSuperNodes();
 		}
+		// else
+		return state.node.getDirectSuperNodes();
 	}
 
 	/**

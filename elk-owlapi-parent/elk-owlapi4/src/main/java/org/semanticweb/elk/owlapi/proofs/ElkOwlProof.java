@@ -100,7 +100,7 @@ public class ElkOwlProof extends BaseProof<ElkOwlInference>
 
 			final ElkAxiom elkAxiom = owlConverter.convert(owlEntailment_);
 			final VerifiableQueryResult result = elkReasoner_
-					.getInternalReasoner().isEntailed(elkAxiom);
+					.getInternalReasoner().checkEntailment(elkAxiom);
 			try {
 				final ElkInferenceProducer producer = new ElkInferenceConvertingProducer(
 						ElkOwlProof.this);

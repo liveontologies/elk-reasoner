@@ -88,7 +88,8 @@ public class OwlInternalProofTest {
 		this.prover_ = OWLAPITestUtils.createProver(ontology);
 
 		this.query_ = manifest_.getInput().getQuery();
-
+		
+		Assume.assumeTrue(prover_.isEntailed(query_)); // excludes incomplete entailments
 		this.adapter_ = new OwlInternalProof(
 				prover_.getDelegate().getInternalReasoner(), query_);
 	}

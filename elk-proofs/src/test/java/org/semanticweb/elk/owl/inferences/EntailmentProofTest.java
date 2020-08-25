@@ -78,8 +78,8 @@ public class EntailmentProofTest
 					@Override
 					public ElkQueryDerivabilityTestOutput getActualOutput()
 							throws Exception {
-						return new ElkQueryDerivabilityTestOutput(getReasoner(),
-								manifest.getInput().getQuery());
+						return new ElkQueryDerivabilityTestOutput(
+								manifest.getInput().getQuery(), true);
 					}
 
 				});

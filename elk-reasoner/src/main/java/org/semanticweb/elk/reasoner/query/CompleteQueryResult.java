@@ -22,18 +22,27 @@ package org.semanticweb.elk.reasoner.query;
  * #L%
  */
 
-import org.liveontologies.puli.Proof;
-import org.liveontologies.puli.Proofs;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.entailments.model.Entailment;
-import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
+import org.semanticweb.elk.reasoner.completeness.IncompletenessMonitor;
+import org.semanticweb.elk.reasoner.completeness.NoIncompletenessMonitor;
 
-public class UnknownQueryResult implements VerifiableQueryResult {
+/**
+ * A complete {@link QueryResult} whose {@link IncompletenessMonitor} always
+ * returns {@code false}
+ * {@link IncompletenessMonitor#isIncompletenessDetected()}
+ * 
+ * @author Yevgeny Kazakov
+ *
+ */
+public class CompleteQueryResult implements QueryResult {
 
 	private final ElkAxiom query_;
 
-	public UnknownQueryResult(ElkAxiom query) {
+	private final boolean isEntailed_;
+
+	public CompleteQueryResult(ElkAxiom query, boolean isEntailed) {
 		this.query_ = query;
+		this.isEntailed_ = isEntailed;
 	}
 
 	@Override
@@ -43,24 +52,12 @@ public class UnknownQueryResult implements VerifiableQueryResult {
 
 	@Override
 	public boolean entailmentProved() throws ElkQueryException {
-		return false;
+		return isEntailed_;
 	}
 
 	@Override
-	public boolean entailmentDisproved() throws ElkQueryException {
-		return true;
-	}
-
-	@Override
-	public Proof<EntailmentInference> getEvidence(boolean atMostOne)
-			throws ElkQueryException {
-		return Proofs.emptyProof();
-	}
-
-	@Override
-	public Entailment getEntailment() throws ElkQueryException {
-		// TODO Auto-generated method stub
-		return null;
+	public IncompletenessMonitor getIncompletenessMonitor() {
+		return new NoIncompletenessMonitor();
 	}
 
 	@Override

@@ -112,6 +112,7 @@ public enum Feature {
 	OBJECT_PROPERTY_RANGE("ObjectPropertyRange"),
 	//
 	OBJECT_UNION_OF_POSITIVE("ObjectUnionOf", Polarity.POSITIVE),
+	//
 	OWL_NOTHING_POSITIVE("owl:Nothing", Polarity.POSITIVE),
 	//
 	REFLEXIVE_OBJECT_PROPERTY("ReflexiveObjectProperty"),
@@ -122,7 +123,70 @@ public enum Feature {
 	//
 	SYMMETRIC_OBJECT_PROPERTY("SymmetricObjectProperty"),
 	//
-	TOP_OBJECT_PROPERTY_NEGATIVE("owl:topObjectProperty", Polarity.NEGATIVE);
+	TOP_OBJECT_PROPERTY_NEGATIVE("owl:topObjectProperty", Polarity.NEGATIVE),
+	//
+	QUERY_ANNOTATION_ASSERTION_AXIOM("AnnotationAssertionAxiom"),
+	//
+	QUERY_ANNOTATION_PROPERTY_DOMAIN_AXIOM("AnnotationPropertyDomainAxiom"),
+	//
+	QUERY_ANNOTATION_PROPERTY_RANGE_AXIOM("AnnotationPropertyRangeAxiom"),
+	//
+	QUERY_SUB_ANNOTATION_PROPERTY_OF_AXIOM("SubAnnotationPropertyOfAxiom"),
+	//
+	QUERY_DATA_PROPERTY_ASSERTION_AXIOM("DataPropertyAssertionAxiom"),
+	//
+	QUERY_NEGATIVE_DATA_PROPERTY_ASSERTION_AXIOM(
+			"NegativeDataPropertyAssertionAxiom"),
+	//
+	QUERY_NEGATIVE_OBJECT_PROPERTY_ASSERTION_AXIOM(
+			"NegativeObjectPropertyAssertionAxiom"),
+	//
+	QUERY_DISJOINT_UNION_AXIOM("DisjointUnionAxiom"),
+	//
+	QUERY_DATA_PROPERTY_DOMAIN_AXIOM("DataPropertyDomainAxiom"),
+	//
+	QUERY_DATA_PROPERTY_RANGE_AXIOM("DataPropertyRangeAxiom"),
+	//
+	QUERY_DISJOINT_DATA_PROPERTIES_AXIOM("DisjointDataPropertiesAxiom"),
+	//
+	QUERY_EQUIVALENT_DATA_PROPERTIES_AXIOM("EquivalentDataPropertiesAxiom"),
+	//
+	QUERY_FUNCTIONAL_DATA_PROPERTY_AXIOM("FunctionalDataPropertyAxiom"),
+	//
+	QUERY_SUB_DATA_PROPERTY_OF_AXIOM("SubDataPropertyOfAxiom"),
+	//
+	QUERY_DATATYPE_DEFINITION_AXIOM("DatatypeDefinitionAxiom"),
+	//
+	QUERY_DECLARATION_AXIOM("DeclarationAxiom"),
+	//
+	QUERY_HAS_KEY_AXIOM("HasKeyAxiom"),
+	//
+	QUERY_ASYMMETRIC_OBJECT_PROPERTY_AXIOM("AsymmetricObjectPropertyAxiom"),
+	//
+	QUERY_DISJOINT_OBJECT_PROPERTIES_AXIOM("DisjointObjectPropertiesAxiom"),
+	//
+	QUERY_EQUIVALENT_OBJECT_PROPERTIES_AXIOM("EquivalentObjectPropertiesAxiom"),
+	//
+	QUERY_FUNCTIONAL_OBJECT_PROPERTY_AXIOM("FunctionalObjectPropertyAxiom"),
+	//
+	QUERY_INVERSE_FUNCTIONAL_OBJECT_PROPERTY_AXIOM(
+			"InverseFunctionalObjectPropertyAxiom"),
+	//
+	QUERY_INVERSE_OBJECT_PROPERTIES_AXIOM("InverseObjectPropertiesAxiom"),
+	//
+	QUERY_IRREFLEXIVE_OBJECT_PROPERTY_AXIOM("IrreflexiveObjectPropertyAxiom"),
+	//
+	QUERY_OBJECT_PROPERTY_RANGE_AXIOM("ObjectPropertyRangeAxiom"),
+	//
+	QUERY_REFLEXIVE_OBJECT_PROPERTY_AXIOM("ReflexiveObjectPropertyAxiom"),
+	//
+	QUERY_SUB_OBJECT_PROPERTY_OF_AXIOM("SubObjectPropertyOfAxiom"),
+	//
+	QUERY_SYMMETRIC_OBJECT_PROPERTY_AXIOM("SymmetricObjectPropertyAxiom"),
+	//
+	QUERY_TRANSITIVE_OBJECT_PROPERTY_AXIOM("TransitiveObjectPropertyAxiom"),
+	//
+	QUERY_SWRL_RULE("SWRLRule");
 
 	public static enum Polarity {
 		ANY, NEGATIVE, POSITIVE

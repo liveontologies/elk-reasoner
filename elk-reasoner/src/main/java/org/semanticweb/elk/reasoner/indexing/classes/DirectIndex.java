@@ -232,9 +232,12 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl
 	public void removeOccurrenceListener(OccurrenceListener listener) {
 		occurrenceListeners_.remove(listener);
 	}
-	
+
 	@Override
 	public void occurrenceChanged(Feature occurrence, int increment) {
+		if (increment == 0) {
+			return;
+		}
 		for (OccurrenceListener listener : occurrenceListeners_) {
 			listener.occurrenceChanged(occurrence, increment);
 		}

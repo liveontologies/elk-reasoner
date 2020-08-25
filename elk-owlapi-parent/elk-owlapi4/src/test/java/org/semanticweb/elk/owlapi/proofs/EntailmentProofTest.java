@@ -71,12 +71,9 @@ public class EntailmentProofTest
 					@Override
 					public OwlEntailmentQueryTestOutput getActualOutput()
 							throws Exception {
-						OWLAxiom query = manifest.getInput().getQuery();
-						boolean isProved = ProofTestUtils.isDerivable(
-								getProver().getProof(query), query);
-						// TODO: handle incomplete results
-						return new OwlEntailmentQueryTestOutput(query, isProved,
-								!isProved);
+						return new OwlEntailmentQueryTestOutput(
+								getProver().getDelegate(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override

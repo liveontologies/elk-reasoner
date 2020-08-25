@@ -22,6 +22,8 @@
 package org.semanticweb.elk.owlapi.query;
 
 import org.semanticweb.elk.owlapi.ElkReasoner;
+import org.semanticweb.elk.reasoner.completeness.IncompletenessMonitor;
+import org.semanticweb.elk.reasoner.completeness.ReasoningResult;
 import org.semanticweb.elk.reasoner.query.IncompleteEntailmentTestOutput;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
@@ -30,8 +32,8 @@ import org.semanticweb.owlapi.model.OWLAxiom;
  * 
  * @author Yevgeny Kazakov
  */
-public class OwlEntailmentQueryTestOutput
-		extends IncompleteEntailmentTestOutput<OWLAxiom, OwlEntailmentQueryTestOutput> {
+public class OwlEntailmentQueryTestOutput extends
+		IncompleteEntailmentTestOutput<OWLAxiom, OwlEntailmentQueryTestOutput> {
 
 	public OwlEntailmentQueryTestOutput(OWLAxiom query,
 			boolean entailmentProved, boolean entailmentDisproved) {
@@ -47,9 +49,19 @@ public class OwlEntailmentQueryTestOutput
 		this(query, isEntailed, !isEntailed);
 	}
 
+	public OwlEntailmentQueryTestOutput(OWLAxiom query, boolean isEntailed,
+			IncompletenessMonitor monitor) {
+		this(query, isEntailed,
+				!isEntailed && !monitor.isIncompletenessDetected());
+	}
+
+	public OwlEntailmentQueryTestOutput(OWLAxiom query,
+			ReasoningResult<Boolean> result) {
+		this(query, result.getValue(), result.geIncompletenessMonitor());
+	}
+
 	public OwlEntailmentQueryTestOutput(ElkReasoner reasoner, OWLAxiom query) {
-		// TODO: completeness
-		this(query, reasoner.isEntailed(query));
+		this(query, reasoner.checkEntailment(query));
 	}
 
 }

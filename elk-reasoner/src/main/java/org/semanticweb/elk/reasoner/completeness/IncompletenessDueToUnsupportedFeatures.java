@@ -46,8 +46,7 @@ class IncompletenessDueToUnsupportedFeatures extends DelegatingOccurrenceManager
 	 */
 	boolean incompletenessExplained_ = false;
 
-	public IncompletenessDueToUnsupportedFeatures(
-			final OccurrenceManager occurrences,
+	IncompletenessDueToUnsupportedFeatures(final OccurrenceManager occurrences,
 			Feature... unsupportedOccurrences) {
 		super(occurrences);
 		this.unsupportedFeatures_ = unsupportedOccurrences;
@@ -96,18 +95,16 @@ class IncompletenessDueToUnsupportedFeatures extends DelegatingOccurrenceManager
 		if (description_ == null) {
 			// lazy initialization
 			StringBuilder descriptionBuilder = new StringBuilder();
-			descriptionBuilder
-					.append("Potential incompleteness due to occurrences of ");
+			descriptionBuilder.append("Potential incompleteness due to ");
 			for (int i = 0; i < unsupportedFeatures_.length; i++) {
 				if (i > 0) {
 					descriptionBuilder.append(" and ");
 				}
-				descriptionBuilder
-						.append(unsupportedFeatures_[i].getConstructor());
+				descriptionBuilder.append(unsupportedFeatures_[i]);
 			}
 			description_ = descriptionBuilder.toString();
 		}
 		return description_;
 	}
-	
+
 }

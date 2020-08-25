@@ -44,8 +44,12 @@ import org.semanticweb.elk.reasoner.ElkUnsupportedReasoningTaskException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
+import org.semanticweb.elk.reasoner.completeness.Incompleteness;
+import org.semanticweb.elk.reasoner.completeness.IncompletenessMonitor;
+import org.semanticweb.elk.reasoner.completeness.ReasoningResult;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.query.EntailmentQueryConverter;
+import org.semanticweb.elk.reasoner.query.QueryResult;
 import org.semanticweb.elk.reasoner.query.VerifiableQueryResult;
 import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
 import org.semanticweb.elk.util.logging.LogLevel;
@@ -971,17 +975,27 @@ public class ElkReasoner implements OWLReasoner {
 		}
 	}
 
-	@Override
-	public boolean isEntailed(final OWLAxiom owlAxiom)
+	public ReasoningResult<Boolean> checkEntailment(final OWLAxiom owlAxiom)
 			throws ReasonerInterruptedException,
 			UnsupportedEntailmentTypeException, TimeOutException,
 			AxiomNotInProfileException, FreshEntitiesException,
 			InconsistentOntologyException {
-		LOGGER_.trace("isEntailed(OWLAxiom)");
-		checkInterrupted();
 		try {
 			final ElkAxiom elkAxiom = owlConverter_.convert(owlAxiom);
-			return reasoner_.isEntailed(elkAxiom).entailmentProved();
+			QueryResult entailment = reasoner_.checkEntailment(elkAxiom);
+			final boolean proved = entailment.entailmentProved();
+			return new ReasoningResult<Boolean>() {
+
+				@Override
+				public Boolean getValue() {
+					return proved;
+				}
+
+				@Override
+				public IncompletenessMonitor geIncompletenessMonitor() {
+					return entailment.getIncompletenessMonitor();
+				}
+			};
 		} catch (final ElkUnsupportedReasoningTaskException e) {
 			throw unsupportedOwlApiMethod("isEntailed(OWLAxiom)",
 					e.getMessage());
@@ -993,6 +1007,17 @@ public class ElkReasoner implements OWLReasoner {
 	}
 
 	@Override
+	public boolean isEntailed(final OWLAxiom owlAxiom)
+			throws ReasonerInterruptedException,
+			UnsupportedEntailmentTypeException, TimeOutException,
+			AxiomNotInProfileException, FreshEntitiesException,
+			InconsistentOntologyException {
+		LOGGER_.trace("isEntailed(OWLAxiom)");
+		checkInterrupted();
+		return Incompleteness.getValue(checkEntailment(owlAxiom));
+	}
+
+	@Override
 	public boolean isEntailed(final Set<? extends OWLAxiom> owlAxioms)
 			throws ReasonerInterruptedException,
 			UnsupportedEntailmentTypeException, TimeOutException,
@@ -1001,11 +1026,10 @@ public class ElkReasoner implements OWLReasoner {
 		LOGGER_.trace("isEntailed(Set<? extends OWLAxiom>)");
 		checkInterrupted();
 		try {
-
 			Map<ElkAxiom, VerifiableQueryResult> results = reasoner_
-					.isEntailed(owlConverter_.convertAxiomSet(owlAxioms));
+					.checkEntailment(owlConverter_.convertAxiomSet(owlAxioms));
 			for (final VerifiableQueryResult result : results.values()) {
-				if (!result.entailmentDisproved()) {
+				if (!Incompleteness.getValue(result)) {
 					return false;
 				}
 			}

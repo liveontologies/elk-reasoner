@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.completeness;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2018 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2020 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,105 +22,20 @@ package org.semanticweb.elk.reasoner.completeness;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.slf4j.Logger;
+public class QueryIncompletenessMonitor extends CombinedIncompletenessMonitor {
 
-public class QueryIncompletenessMonitor extends TopIncompletenessMonitor {
-
-	QueryIncompletenessMonitor(OccurrenceManager occurencesInOntology,
-			OccurrenceManager occurencesInQuery) {
-		super(new CombinedOccurrenceManager(occurencesInOntology,
-				occurencesInQuery));
-	}
-
-	QueryIncompletenessMonitor(
+	public QueryIncompletenessMonitor(
 			OntologySatisfiabilityIncompletenessMonitor ontologySatisfiabilityMonitor,
 			OccurrenceManager occurencesInQuery) {
-		this(ontologySatisfiabilityMonitor.getOccurrencesInOntology(),
-				occurencesInQuery);
-	}
-
-	private static boolean checkQueryReasoningCompleteness(ElkObject query,
-			OntologySatisfiabilityIncompletenessMonitor ontologyMonitor,
-			OccurrenceManager occurrencesInQuery, Logger logger) {
-		if (!ontologyMonitor.checkCompleteness(logger)) {
-			// general ontology reasoning could be already incomplete
-			return false;
-		}
-		// else
-		IncompletenessMonitor queryMonitor = new QueryIncompletenessMonitor(
-				ontologyMonitor, occurrencesInQuery);
-		if (queryMonitor.hasNewExplanation()) {
-			logger.warn(
-					"Reasoning results for the query {} may be incomplete! See INFO for more details.",
-					query);
-			queryMonitor.explainIncompleteness(logger);
-		}
-		return !queryMonitor.isIncompletenessDetected();
-	}
-
-	public static QueryIncompletenessMonitor get(ElkClassExpression query,
-			OntologySatisfiabilityIncompletenessMonitor ontologyMonitor,
-			OccurrenceCounter occurrencesInQuery) {
-		return new QueryIncompletenessMonitor(ontologyMonitor,
-				new OccurrencesInClassExpressionQuery(query,
-						occurrencesInQuery));
-	}
-
-	public static QueryIncompletenessMonitor get(ElkAxiom query,
-			OntologySatisfiabilityIncompletenessMonitor ontologyMonitor,
-			OccurrenceCounter occurrencesInQuery) {
-		return new QueryIncompletenessMonitor(ontologyMonitor,
-				new OccurrencesInEntailmentQuery(query, occurrencesInQuery));
-	}
-
-	/**
-	 * Checks reasoning completeness for the given query and, if necessary,
-	 * prints messages about incompleteness using the provided logger.
-	 * 
-	 * @param query
-	 *            the query for which to check incompleteness
-	 * @param ontologyMonitor
-	 *            the main {@link OntologySatisfiabilityIncompletenessMonitor}
-	 * @param occurrencesInQuery
-	 *            occurrences of {@link Feature}s in the query
-	 * @param logger
-	 * @return {@code true} if the reasoning results are guaranteed to be
-	 *         complete and {@code false} otherwise
-	 */
-	public static boolean checkQueryReasoningCompleteness(
-			ElkClassExpression query,
-			OntologySatisfiabilityIncompletenessMonitor ontologyMonitor,
-			OccurrenceCounter occurrencesInQuery, Logger logger) {
-		return checkQueryReasoningCompleteness((ElkObject) query,
-				ontologyMonitor, new OccurrencesInClassExpressionQuery(query,
-						occurrencesInQuery),
-				logger);
-	}
-
-	/**
-	 * Checks reasoning completeness for the given query and, if necessary,
-	 * prints messages about incompleteness using the provided logger.
-	 * 
-	 * @param query
-	 *            the query for which to check incompleteness
-	 * @param ontologyMonitor
-	 *            the main {@link OntologySatisfiabilityIncompletenessMonitor}
-	 * @param occurrencesInQuery
-	 *            occurrences of {@link Feature}s in the query
-	 * @param logger
-	 * @return {@code true} if the reasoning results are guaranteed to be
-	 *         complete and {@code false} otherwise
-	 */
-	public static boolean checkQueryReasoningCompleteness(ElkAxiom query,
-			OntologySatisfiabilityIncompletenessMonitor ontologyMonitor,
-			OccurrenceCounter occurrencesInQuery, Logger logger) {
-		return checkQueryReasoningCompleteness((ElkObject) query,
-				ontologyMonitor,
-				new OccurrencesInEntailmentQuery(query, occurrencesInQuery),
-				logger);
+		super(ontologySatisfiabilityMonitor, // incompleteness could be already
+												// reported
+				new UnsupportedQueryTypeIncompletenessMonitor(
+						occurencesInQuery),
+				new TopIncompletenessMonitor(new CombinedOccurrenceManager(
+						// additional combination of features to be considered
+						ontologySatisfiabilityMonitor
+								.getOccurrencesInOntology(),
+						occurencesInQuery)));
 	}
 
 }

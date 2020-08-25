@@ -53,7 +53,7 @@ public class ElkIncrementalEntailmentQueryTest extends
 					public ElkEntailmentQueryTestOutput getExpectedOutput()
 							throws Exception {
 						return new ElkEntailmentQueryTestOutput(
-								getStandardReasoner().isEntailed(
+								getStandardReasoner().checkEntailment(
 										manifest.getInput().getQuery()));
 					}
 
@@ -61,7 +61,7 @@ public class ElkIncrementalEntailmentQueryTest extends
 					public ElkEntailmentQueryTestOutput getActualOutput()
 							throws Exception {
 						return new ElkEntailmentQueryTestOutput(
-								getIncrementalReasoner().isEntailed(
+								getIncrementalReasoner().checkEntailment(
 										manifest.getInput().getQuery()));
 					}
 

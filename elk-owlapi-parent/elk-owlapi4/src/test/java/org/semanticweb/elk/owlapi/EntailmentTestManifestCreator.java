@@ -50,7 +50,7 @@ public class EntailmentTestManifestCreator implements
 	public Collection<? extends QueryTestManifest<OWLAxiom, OwlEntailmentQueryTestOutput>> createManifests(
 			final String name, final List<URL> urls) throws IOException {
 
-		final Collection<QueryTestManifest<OWLAxiom, OwlEntailmentQueryTestOutput>> manifests = new ArrayList<QueryTestManifest<OWLAxiom, OwlEntailmentQueryTestOutput>>();
+		final Collection<QueryTestManifest<OWLAxiom, OwlEntailmentQueryTestOutput>> manifests = new ArrayList<>();
 
 		if (urls == null || urls.isEmpty()) {
 			// No input files. Fail, while something was probably forgotten.

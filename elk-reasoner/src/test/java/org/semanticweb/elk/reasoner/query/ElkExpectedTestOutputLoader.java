@@ -421,7 +421,7 @@ public class ElkExpectedTestOutputLoader {
 				final ElkAxiom axiom = elkFactory
 						.getEquivalentClassesAxiom(equivalentClasses);
 				query.add(axiom);
-				output.put(axiom, new TestQueryResult(axiom, true));
+				output.put(axiom, new CompleteQueryResult(axiom, true));
 
 			}
 
@@ -435,11 +435,11 @@ public class ElkExpectedTestOutputLoader {
 				ElkAxiom axiom = elkFactory.getSubClassOfAxiom(queryClass,
 						superClass);
 				query.add(axiom);
-				output.put(axiom, new TestQueryResult(axiom, true));
+				output.put(axiom, new CompleteQueryResult(axiom, true));
 
 				axiom = elkFactory.getSubClassOfAxiom(superClass, queryClass);
 				query.add(axiom);
-				output.put(axiom, new TestQueryResult(axiom, false));
+				output.put(axiom, new CompleteQueryResult(axiom, false));
 
 				if (equivalent != null && !equivalent.isEmpty()) {
 					final List<ElkClassExpression> equivalentClasses = new ArrayList<ElkClassExpression>(
@@ -450,7 +450,7 @@ public class ElkExpectedTestOutputLoader {
 					axiom = elkFactory
 							.getEquivalentClassesAxiom(equivalentClasses);
 					query.add(axiom);
-					output.put(axiom, new TestQueryResult(axiom, false));
+					output.put(axiom, new CompleteQueryResult(axiom, false));
 				}
 
 			}
@@ -464,11 +464,11 @@ public class ElkExpectedTestOutputLoader {
 				ElkAxiom axiom = elkFactory.getSubClassOfAxiom(subClass,
 						queryClass);
 				query.add(axiom);
-				output.put(axiom, new TestQueryResult(axiom, true));
+				output.put(axiom, new CompleteQueryResult(axiom, true));
 
 				axiom = elkFactory.getSubClassOfAxiom(queryClass, subClass);
 				query.add(axiom);
-				output.put(axiom, new TestQueryResult(axiom, false));
+				output.put(axiom, new CompleteQueryResult(axiom, false));
 
 				if (equivalent != null && !equivalent.isEmpty()) {
 					final List<ElkClassExpression> equivalentClasses = new ArrayList<ElkClassExpression>(
@@ -479,7 +479,7 @@ public class ElkExpectedTestOutputLoader {
 					axiom = elkFactory
 							.getEquivalentClassesAxiom(equivalentClasses);
 					query.add(axiom);
-					output.put(axiom, new TestQueryResult(axiom, false));
+					output.put(axiom, new CompleteQueryResult(axiom, false));
 				}
 
 			}
@@ -494,7 +494,7 @@ public class ElkExpectedTestOutputLoader {
 				ElkAxiom axiom = elkFactory.getClassAssertionAxiom(queryClass,
 						instance);
 				query.add(axiom);
-				output.put(axiom, new TestQueryResult(axiom, true));
+				output.put(axiom, new CompleteQueryResult(axiom, true));
 
 				// Find individual that is not an instance.
 				ElkNamedIndividual notInstance = null;
@@ -515,7 +515,7 @@ public class ElkExpectedTestOutputLoader {
 					axiom = elkFactory.getClassAssertionAxiom(queryClass,
 							notInstance);
 					query.add(axiom);
-					output.put(axiom, new TestQueryResult(axiom, false));
+					output.put(axiom, new CompleteQueryResult(axiom, false));
 
 				}
 

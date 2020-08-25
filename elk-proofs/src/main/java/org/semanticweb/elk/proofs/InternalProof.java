@@ -64,10 +64,14 @@ public class InternalProof implements Proof<Inference<Object>> {
 			throws ElkException {
 		this.reasoner_ = reasoner;
 		this.goal_ = goal;
-		VerifiableQueryResult result = reasoner.isEntailed(goal);
+		VerifiableQueryResult result = reasoner.checkEntailment(goal);
 		
 		try {
 			final Entailment entailment = result.getEntailment();
+			if (entailment == null) {
+				// goal is not proved -> empty proof
+				return;
+			}
 			proof_.produce(Inferences.create("Goal inference", goal_,
 					Arrays.asList(entailment)));
 			processEntailment(entailment, result.getEvidence(false));

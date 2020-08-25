@@ -65,7 +65,7 @@ public class ReasonerElkProof extends ChronologicalProof<ElkInference>
 
 	private void generateInferences(final ElkAxiom goal) throws ElkException {
 
-		final VerifiableQueryResult result = reasoner_.isEntailed(goal);
+		final VerifiableQueryResult result = reasoner_.checkEntailment(goal);
 		try {
 			final Proof<EntailmentInference> evidence = result.getEvidence(false);
 			new ElkProofGenerator(evidence, reasoner_,
