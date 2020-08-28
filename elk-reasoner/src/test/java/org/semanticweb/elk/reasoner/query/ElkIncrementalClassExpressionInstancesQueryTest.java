@@ -51,9 +51,8 @@ public class ElkIncrementalClassExpressionInstancesQueryTest extends
 							throws Exception {
 						ElkClassExpression query = manifest.getInput()
 								.getQuery();
-						return new ElkDirectInstancesTestOutput(query,
-								getStandardReasoner().getInstancesQuietly(query,
-										true));
+						return new ElkDirectInstancesTestOutput(
+								getStandardReasoner(), query);
 					}
 
 					@Override
@@ -61,9 +60,8 @@ public class ElkIncrementalClassExpressionInstancesQueryTest extends
 							throws Exception {
 						ElkClassExpression query = manifest.getInput()
 								.getQuery();
-						return new ElkDirectInstancesTestOutput(query,
-								getIncrementalReasoner()
-										.getInstancesQuietly(query, true));
+						return new ElkDirectInstancesTestOutput(
+								getIncrementalReasoner(), query);
 					}
 
 					@Override

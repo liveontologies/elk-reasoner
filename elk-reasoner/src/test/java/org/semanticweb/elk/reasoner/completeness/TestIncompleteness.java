@@ -23,24 +23,25 @@ package org.semanticweb.elk.reasoner.completeness;
  */
 
 /**
- * Represents a possibly incomplete reasoning result
+ * Collection of additional static methods to work with incomplete reasoning
+ * results
  * 
  * @author Yevgeny Kazakov
- *
- * @param <R>
- *            the type of the value of the reasoning result
+ * @see Incompleteness
  */
-public interface ReasoningResult<R> {
+public class TestIncompleteness {
 
 	/**
-	 * @return the value of the reasoning result, such a class taxonomy
+	 * Returns the value of the given {@link IncompleteResult} without producing
+	 * warning messages
+	 * 
+	 * @param <R>
+	 * @param result
+	 * @return the value of the incomplete result without producing any log
+	 *         messages
 	 */
-	R getValue();
-
-	/**
-	 * @return the object using which one can check completeness of reasoning
-	 *         result and output the reasons for possible incompleteness
-	 */
-	IncompletenessMonitor geIncompletenessMonitor();
+	public static <R> R getValue(IncompleteResult<? extends R> result) {
+		return result.getValue();
+	}
 
 }

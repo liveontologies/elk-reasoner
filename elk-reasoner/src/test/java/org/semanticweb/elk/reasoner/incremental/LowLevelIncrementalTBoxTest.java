@@ -60,6 +60,7 @@ import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
+import org.semanticweb.elk.reasoner.completeness.Incompleteness;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -633,7 +634,7 @@ public class LowLevelIncrementalTBoxTest {
 		LOGGER_.trace(
 				"********** Consistency checking after non-incremental change ***********");
 
-		assertFalse(reasoner.isInconsistent());
+		assertFalse(Incompleteness.getValue(reasoner.isInconsistent()));
 
 		// make an incremental change
 
@@ -1311,6 +1312,6 @@ public class LowLevelIncrementalTBoxTest {
 	}
 
 	Taxonomy<ElkClass> getTaxonomy() throws ElkException {
-		return reasoner.getTaxonomy().getValue();
+		return Incompleteness.getValue(reasoner.getTaxonomy());
 	}
 }

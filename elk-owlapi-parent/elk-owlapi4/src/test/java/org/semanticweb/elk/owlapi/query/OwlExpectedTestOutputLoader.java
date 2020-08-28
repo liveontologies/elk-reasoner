@@ -224,8 +224,7 @@ public class OwlExpectedTestOutputLoader {
 					new QueryTestManifest<OWLClassExpression, SatisfiabilityTestOutput>(
 							name + " isSatisfiable", input, queryClass,
 							new OwlClassExpressionSatisfiabilityTestOutput(
-									node == null || !node.isBottomNode(),
-									true)));
+									node == null || !node.isBottomNode())));
 		}
 
 		return result;
@@ -243,8 +242,7 @@ public class OwlExpectedTestOutputLoader {
 					new QueryTestManifest<OWLClassExpression, OwlEquivalentClassesTestOutput>(
 							name + " getEquivalentClasses", input, queryClass,
 							new OwlEquivalentClassesTestOutput(
-									node == null ? new OWLClassNode() : node,
-									true)));
+									node == null ? new OWLClassNode() : node)));
 		}
 
 		return result;
@@ -276,8 +274,7 @@ public class OwlExpectedTestOutputLoader {
 					new QueryTestManifest<OWLClassExpression, OwlDirectSuperClassesTestOutput>(
 							name + " getDirectSuperClasses", input, queryClass,
 							new OwlDirectSuperClassesTestOutput(queryClass,
-									new HashSet<Node<OWLClass>>(superNodes),
-									true)));
+									new HashSet<Node<OWLClass>>(superNodes))));
 		}
 
 		return result;
@@ -309,8 +306,7 @@ public class OwlExpectedTestOutputLoader {
 					new QueryTestManifest<OWLClassExpression, OwlDirectSubClassesTestOutput>(
 							name + " getDirectSubClasses", input, queryClass,
 							new OwlDirectSubClassesTestOutput(queryClass,
-									new HashSet<Node<OWLClass>>(subNodes),
-									true)));
+									new HashSet<Node<OWLClass>>(subNodes))));
 		}
 
 		return result;
@@ -345,8 +341,7 @@ public class OwlExpectedTestOutputLoader {
 							name + " getDirectInstances", input, queryClass,
 							new OwlDirectInstancesTestOutput(queryClass,
 									new HashSet<Node<OWLNamedIndividual>>(
-											instances),
-									true)));
+											instances))));
 		}
 
 		return result;

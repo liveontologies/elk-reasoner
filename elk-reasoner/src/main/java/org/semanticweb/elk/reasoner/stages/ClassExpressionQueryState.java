@@ -39,12 +39,11 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionProcessor;
-import org.semanticweb.elk.reasoner.completeness.EmptyOccurrenceCounter;
 import org.semanticweb.elk.reasoner.completeness.Feature;
-import org.semanticweb.elk.reasoner.completeness.OccurrenceCounter;
-import org.semanticweb.elk.reasoner.completeness.OccurrenceRegistry;
+import org.semanticweb.elk.reasoner.completeness.IncompletenessManager;
+import org.semanticweb.elk.reasoner.completeness.IncompletenessMonitor;
 import org.semanticweb.elk.reasoner.completeness.OccurrenceListener;
-import org.semanticweb.elk.reasoner.completeness.OccurrenceManager;
+import org.semanticweb.elk.reasoner.completeness.OccurrenceRegistry;
 import org.semanticweb.elk.reasoner.completeness.OccurrencesInClassExpressionQuery;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
@@ -123,6 +122,11 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 	private final Set<ElkClassExpression> lastQueries_ = new ArrayHashSet<ElkClassExpression>();
 
 	/**
+	 * A manager to keep track of incompleteness for queries
+	 */
+	private final IncompletenessManager incompletenessManager_;
+
+	/**
 	 * State of the query of a particular class expression. There are four
 	 * forbidden states:
 	 * <ul>
@@ -137,7 +141,7 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 	 * 
 	 * @author Peter Skocovsky
 	 */
-	private static class QueryState {
+	private class QueryState {
 		/**
 		 * Whether the queried class expression was loaded (whether it was
 		 * attempted to index it). If this is {@code false}, then
@@ -163,7 +167,17 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 		 * Counts how many times each {@link Feature} occurs in the query.
 		 * {@code null} means no occurrences.
 		 */
-		OccurrenceRegistry occurrences = null;
+		final OccurrenceRegistry occurrences = new OccurrenceRegistry();
+
+		/**
+		 * An {@link IncompletenessMonitor} for this query
+		 */
+		final IncompletenessMonitor queryMonitor_;
+
+		QueryState(ElkClassExpression query) {
+			this.queryMonitor_ = incompletenessManager_.getQueryMonitor(
+					new OccurrencesInClassExpressionQuery(query, occurrences));
+		}
 
 	}
 
@@ -185,11 +199,13 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 			final SaturationState<C> saturationState,
 			final PredefinedElkClassFactory elkFactory,
 			final ModifiableOntologyIndex ontologyIndex,
-			final ClassInconsistency.Factory conclusionFactory) {
+			final ClassInconsistency.Factory conclusionFactory,
+			final IncompletenessManager incompletenessManager) {
 		this.saturationState_ = saturationState;
 		this.resolvingExpressionConverter_ = new ElkPolarityExpressionConverterImpl(
 				elkFactory, ontologyIndex);
 		this.conclusionFactory_ = conclusionFactory;
+		this.incompletenessManager_ = incompletenessManager;
 		saturationState
 				.addListener(new SaturationStateDummyChangeListener<C>() {
 
@@ -287,32 +303,31 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 	 * methods, e.g., {@link #isSatisfiable(ElkClassExpression)}, will not throw
 	 * {@link ElkQueryException}.
 	 * 
-	 * @param classExpression
+	 * @param query
 	 * @return {@code true} if this is a new query, {@code false} if this class
 	 *         expression has already been registered.
 	 */
-	boolean registerQuery(final ElkClassExpression classExpression) {
+	boolean registerQuery(final ElkClassExpression query) {
 
-		LOGGER_.trace("class expression query registered {}", classExpression);
+		LOGGER_.trace("class expression query registered {}", query);
 
 		lastQueries_.clear();
-		queriedEvictor_.add(classExpression);
-		lastQueries_.add(classExpression);
+		queriedEvictor_.add(query);
+		lastQueries_.add(query);
 
-		QueryState state = queried_.get(classExpression);
+		QueryState state = queried_.get(query);
 		if (state != null) {
 			return false;
 		}
 		// Create query state.
-		state = new QueryState();
-		queried_.put(classExpression, state);
-		toLoad_.add(classExpression);
+		state = new QueryState(query);
+		queried_.put(query, state);
+		toLoad_.add(query);
 
 		return true;
 	}
 
 	private final QueryOccurrenceListener occurrenceListener_ = new QueryOccurrenceListener();
-	
 
 	private class QueryOccurrenceListener implements OccurrenceListener {
 
@@ -320,15 +335,7 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 
 		@Override
 		public void occurrenceChanged(Feature feature, int increment) {
-			OccurrenceRegistry occurrences = beingLoaded_.occurrences;
-			if (occurrences == null) {
-				occurrences = new OccurrenceRegistry();
-				beingLoaded_.occurrences = occurrences;
-			}
-			occurrences.occurrenceChanged(feature, increment);
-			if (occurrences.isEmpty()) {
-				beingLoaded_.occurrences = null;
-			}
+			beingLoaded_.occurrences.occurrenceChanged(feature, increment);
 		}
 
 	}
@@ -342,7 +349,6 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 		return new Loader(interrupter);
 	}
 
-	
 	private class Loader extends AbstractClassQueryLoader {
 		public Loader(final InterruptMonitor interrupter) {
 			super(interrupter);
@@ -620,14 +626,9 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 				"Query was not computed yet: " + classExpression);
 	}
 
-	OccurrenceCounter getOccurrenceCounter(
+	IncompletenessMonitor getIncompletenessMonitor(
 			final ElkClassExpression classExpression) {
-		OccurrenceCounter occurrences = queried_
-				.get(classExpression).occurrences;
-		if (occurrences == null) {
-			occurrences = EmptyOccurrenceCounter.get();
-		}
-		return occurrences;
+		return queried_.get(classExpression).queryMonitor_;
 	}
 
 	/**

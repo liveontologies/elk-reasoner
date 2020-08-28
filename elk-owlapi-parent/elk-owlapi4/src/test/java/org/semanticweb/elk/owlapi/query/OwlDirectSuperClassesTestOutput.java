@@ -31,6 +31,7 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.reasoner.Node;
+import org.semanticweb.owlapi.reasoner.NodeSet;
 
 import uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryImpl;
 
@@ -42,16 +43,21 @@ public class OwlDirectSuperClassesTestOutput extends
 	private final OWLClassExpression query_;
 
 	OwlDirectSuperClassesTestOutput(OWLClassExpression query,
-			Collection<? extends Node<OWLClass>> disjointNodes,
-			boolean isComplete) {
-		super(disjointNodes, isComplete);
+			IncompleteResult<? extends Collection<? extends Node<OWLClass>>> incompleteDisjointNodes) {
+		super(incompleteDisjointNodes);
+		this.query_ = query;
+	}
+
+	OwlDirectSuperClassesTestOutput(OWLClassExpression query,
+			Collection<? extends Node<OWLClass>> disjointNodes) {
+		super(disjointNodes);
 		this.query_ = query;
 	}
 
 	OwlDirectSuperClassesTestOutput(ElkReasoner reasoner,
 			OWLClassExpression query) {
-		// TODO: completeness
-		this(query, reasoner.getSuperClasses(query, true).getNodes(), true);
+		this(query, reasoner.computeSuperClasses(query, true)
+				.map(NodeSet::getNodes));
 	}
 
 	@Override

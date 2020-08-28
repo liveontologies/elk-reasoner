@@ -25,29 +25,37 @@ package org.semanticweb.elk.reasoner.completeness;
 import org.slf4j.Logger;
 
 /**
- * An {@link IncompletenessMonitor} that never reports incompleteness. I.e., it
- * assumes that the result is complete.
+ * A {@link IncompletenessMonitor} that delegates all methods to the provided
+ * {@link IncompletenessMonitor}.
  * 
  * @author Yevgeny Kazakov
  *
  */
-class NoIncompletenessMonitor implements IncompletenessMonitor {
+public class DelegatingIncompletenessMonitor implements IncompletenessMonitor {
 
-	static NoIncompletenessMonitor INSTNANCE = new NoIncompletenessMonitor();
+	private final IncompletenessMonitor delegate_;
+
+	public DelegatingIncompletenessMonitor(IncompletenessMonitor delegate) {
+		this.delegate_ = delegate;
+	}
+
+	public IncompletenessMonitor getDelegate() {
+		return this.delegate_;
+	}
 
 	@Override
 	public boolean isIncompletenessDetected() {
-		return false;
+		return delegate_.isIncompletenessDetected();
 	}
 
 	@Override
 	public void explainIncompleteness(Logger logger) {
-		// nothing to explain
+		delegate_.explainIncompleteness(logger);
 	}
 
 	@Override
 	public boolean hasNewExplanation() {
-		return false;
+		return delegate_.hasNewExplanation();
 	}
 
 }

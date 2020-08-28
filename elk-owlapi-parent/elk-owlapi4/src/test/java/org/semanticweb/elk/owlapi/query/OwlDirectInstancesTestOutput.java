@@ -31,6 +31,7 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.reasoner.Node;
+import org.semanticweb.owlapi.reasoner.NodeSet;
 
 import uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryImpl;
 
@@ -42,16 +43,21 @@ public class OwlDirectInstancesTestOutput extends
 	private final OWLClassExpression query_;
 
 	OwlDirectInstancesTestOutput(OWLClassExpression query,
-			Collection<? extends Node<OWLNamedIndividual>> directInstanceNodes,
-			boolean isComplete) {
-		super(directInstanceNodes, isComplete);
+			IncompleteResult<? extends Collection<? extends Node<OWLNamedIndividual>>> incompleteDirectInstanceNodes) {
+		super(incompleteDirectInstanceNodes);
+		this.query_ = query;
+	}
+
+	OwlDirectInstancesTestOutput(OWLClassExpression query,
+			Collection<? extends Node<OWLNamedIndividual>> directInstanceNodes) {
+		super(directInstanceNodes);
 		this.query_ = query;
 	}
 
 	OwlDirectInstancesTestOutput(ElkReasoner reasoner,
 			OWLClassExpression query) {
-		// TODO: completeness
-		this(query, reasoner.getInstances(query, true).getNodes(), true);
+		this(query,
+				reasoner.computeInstances(query, true).map(NodeSet::getNodes));
 	}
 
 	@Override

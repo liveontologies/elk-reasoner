@@ -27,7 +27,7 @@ import java.util.Arrays;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.reasoner.BaseClassificationCorrectnessTest;
-import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
+import org.semanticweb.elk.reasoner.ElkClassTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
 import org.semanticweb.elk.testing.PolySuite;
@@ -52,16 +52,16 @@ public class OWLAPIDiffClassificationCorrectnessTest
 	}
 
 	public OWLAPIDiffClassificationCorrectnessTest(
-			final ReasoningTestManifest<ClassTaxonomyTestOutput> testManifest) {
+			final ReasoningTestManifest<ElkClassTaxonomyTestOutput> testManifest) {
 		super(testManifest,
-				new OwlApiReasoningTestDelegate<ClassTaxonomyTestOutput>(
+				new OwlApiReasoningTestDelegate<ElkClassTaxonomyTestOutput>(
 						testManifest) {
 
 					@Override
-					public ClassTaxonomyTestOutput getActualOutput()
+					public ElkClassTaxonomyTestOutput getActualOutput()
 							throws Exception {
-						return new ClassTaxonomyTestOutput(getReasoner()
-								.getInternalReasoner().getTaxonomyQuietly());
+						return new ElkClassTaxonomyTestOutput(
+								getReasoner().getInternalReasoner());
 					}
 
 					@Override

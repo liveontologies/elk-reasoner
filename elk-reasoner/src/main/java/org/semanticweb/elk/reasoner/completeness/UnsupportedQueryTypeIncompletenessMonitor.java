@@ -35,7 +35,7 @@ import org.slf4j.Logger;
  * @author Yevgeny Kazakov
  *
  */
-public class UnsupportedQueryTypeIncompletenessMonitor
+class UnsupportedQueryTypeIncompletenessMonitor
 		extends CombinedIncompletenessMonitor {
 
 	private static final Feature[] UNSUPPORTED_FEATURES_ = {

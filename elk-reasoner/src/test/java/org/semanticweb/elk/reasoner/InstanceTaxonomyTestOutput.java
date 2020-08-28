@@ -25,10 +25,12 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.completeness.IncompleteResult;
+import org.semanticweb.elk.reasoner.completeness.IncompleteTestOutput;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.testing.DiffableOutput;
 
@@ -38,35 +40,38 @@ import org.semanticweb.elk.testing.DiffableOutput;
  *         pavel.klinov@uni-ulm.de
  * @author Yevgeny Kazakov
  */
-public class InstanceTaxonomyTestOutput
+public class InstanceTaxonomyTestOutput extends
+		IncompleteTestOutput<InstanceTaxonomy<ElkClass, ElkNamedIndividual>>
 		implements DiffableOutput<ElkAxiom, InstanceTaxonomyTestOutput> {
 
 	private final InstanceTaxonomyEntailment<ElkClass, ElkNamedIndividual, InstanceTaxonomy<ElkClass, ElkNamedIndividual>, InstanceTaxonomyEntailment.Listener<ElkClass, ElkNamedIndividual>> taxEntailment_;
 
-	private boolean isComplete_;
-
 	public InstanceTaxonomyTestOutput(
-			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy,
-			boolean isComplete) {
-		this.taxEntailment_ = new InstanceTaxonomyEntailment<>(taxonomy);
-		this.isComplete_ = isComplete;
+			IncompleteResult<? extends InstanceTaxonomy<ElkClass, ElkNamedIndividual>> incompleteTaxonomy) {
+		super(incompleteTaxonomy);
+		this.taxEntailment_ = new InstanceTaxonomyEntailment<>(getValue());
 	}
 
 	public InstanceTaxonomyTestOutput(
-			IncompleteResult<? extends InstanceTaxonomy<ElkClass, ElkNamedIndividual>> taxonomy) {
-		this(taxonomy.getValue(), taxonomy.isComplete());
+			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy) {
+		super(taxonomy);
+		this.taxEntailment_ = new InstanceTaxonomyEntailment<>(getValue());
+	}
+
+	public InstanceTaxonomyTestOutput(Reasoner reasoner) throws ElkException {
+		this(reasoner.getInstanceTaxonomyQuietly());
 	}
 
 	@Override
 	public boolean containsAllElementsOf(InstanceTaxonomyTestOutput other) {
-		return !isComplete_ || taxEntailment_.containsEntitiesAndEntailmentsOf(
+		return !isComplete() || taxEntailment_.containsEntitiesAndEntailmentsOf(
 				other.taxEntailment_.getTaxonomy());
 	}
 
 	@Override
 	public void reportMissingElementsOf(InstanceTaxonomyTestOutput other,
 			Listener<ElkAxiom> listener) {
-		if (isComplete_) {
+		if (isComplete()) {
 			taxEntailment_.reportMissingEntitiesAndEntailmentsOf(
 					other.taxEntailment_.getTaxonomy(),
 					new ElkInstanceTaxonomyEntailmentAdapter(listener));

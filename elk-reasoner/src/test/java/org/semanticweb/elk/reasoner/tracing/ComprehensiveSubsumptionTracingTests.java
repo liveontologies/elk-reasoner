@@ -33,6 +33,7 @@ import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObject.Factory;
 import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.completeness.TestIncompleteness;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 
@@ -59,7 +60,7 @@ public class ComprehensiveSubsumptionTracingTests implements TracingTests {
 
 	@Override
 	public void accept(TracingTestVisitor visitor) throws Exception {
-		if (reasoner_.isInconsistent()) {
+		if (TestIncompleteness.getValue(reasoner_.isInconsistent())) {
 			Factory elkFactory = reasoner_.getElkFactory();
 			visitor.testSubsumption(elkFactory.getOwlThing(),
 					elkFactory.getOwlNothing());
@@ -67,7 +68,8 @@ public class ComprehensiveSubsumptionTracingTests implements TracingTests {
 		}
 		// else
 
-		Taxonomy<ElkClass> classTaxonomy = reasoner_.getTaxonomy().getValue();
+		Taxonomy<ElkClass> classTaxonomy = TestIncompleteness
+				.getValue(reasoner_.getTaxonomy());
 		/*
 		 * Store a copy of the taxonomy, because it may change during the
 		 * reasoning.

@@ -24,7 +24,7 @@ package org.semanticweb.elk.owlapi;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.reasoner.BaseObjectPropertyClassificationCorrectnessTest;
-import org.semanticweb.elk.reasoner.ObjectPropertyTaxonomyTestOutput;
+import org.semanticweb.elk.reasoner.ElkObjectPropertyTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.stages.ElkInterruptedException;
 import org.semanticweb.elk.testing.PolySuite;
@@ -37,17 +37,16 @@ public class OWLAPIDiffObjectPropertyClassificationCorrectnessTest
 		extends BaseObjectPropertyClassificationCorrectnessTest {
 
 	public OWLAPIDiffObjectPropertyClassificationCorrectnessTest(
-			final ReasoningTestManifest<ObjectPropertyTaxonomyTestOutput> testManifest) {
+			final ReasoningTestManifest<ElkObjectPropertyTaxonomyTestOutput> testManifest) {
 		super(testManifest,
-				new OwlApiReasoningTestDelegate<ObjectPropertyTaxonomyTestOutput>(
+				new OwlApiReasoningTestDelegate<ElkObjectPropertyTaxonomyTestOutput>(
 						testManifest) {
 
 					@Override
-					public ObjectPropertyTaxonomyTestOutput getActualOutput()
+					public ElkObjectPropertyTaxonomyTestOutput getActualOutput()
 							throws Exception {
-						return new ObjectPropertyTaxonomyTestOutput(
-								getReasoner().getInternalReasoner()
-										.getObjectPropertyTaxonomyQuietly());
+						return new ElkObjectPropertyTaxonomyTestOutput(
+								getReasoner().getInternalReasoner());
 					}
 
 					@Override

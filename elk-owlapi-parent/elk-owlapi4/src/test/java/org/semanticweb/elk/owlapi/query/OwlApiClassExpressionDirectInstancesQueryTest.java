@@ -44,8 +44,6 @@ import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.elk.testing.TestUtils;
 import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLNamedIndividual;
-import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 
 @RunWith(PolySuite.class)
@@ -78,12 +76,8 @@ public class OwlApiClassExpressionDirectInstancesQueryTest extends
 					@Override
 					public OwlDirectInstancesTestOutput getActualOutput()
 							throws Exception {
-						OWLClassExpression query = manifest.getInput()
-								.getQuery();
-						final NodeSet<OWLNamedIndividual> instances = getReasoner()
-								.getInstances(query, true);
-						return new OwlDirectInstancesTestOutput(query,
-								instances.getNodes(), true);
+						return new OwlDirectInstancesTestOutput(getReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override

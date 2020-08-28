@@ -39,6 +39,7 @@ import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
+import org.semanticweb.elk.reasoner.completeness.Incompleteness;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
@@ -72,7 +73,7 @@ public class ComputeTaxonomyHashCodes {
 				Taxonomy<ElkClass> taxonomy = null;
 
 				try {
-					taxonomy = reasoner.getTaxonomy().getValue();
+					taxonomy = Incompleteness.getValue(reasoner.getTaxonomy());
 				} catch (ElkInconsistentOntologyException e) {
 					return 0;
 				} catch (ElkException e) {
@@ -91,7 +92,8 @@ public class ComputeTaxonomyHashCodes {
 				InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = null;
 
 				try {
-					taxonomy = reasoner.getInstanceTaxonomy().getValue();
+					taxonomy = Incompleteness
+							.getValue(reasoner.getInstanceTaxonomy());
 				} catch (ElkInconsistentOntologyException e) {
 					return 0;
 				} catch (ElkException e) {

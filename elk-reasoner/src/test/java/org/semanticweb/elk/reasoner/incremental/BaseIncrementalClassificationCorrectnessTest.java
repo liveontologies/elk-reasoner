@@ -27,7 +27,7 @@ import java.net.URISyntaxException;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
-import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
+import org.semanticweb.elk.reasoner.ElkClassTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.SimpleManifestCreator;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.DiffableOutput;
@@ -49,17 +49,17 @@ import org.semanticweb.elk.testing.UrlTestInput;
  */
 @RunWith(PolySuite.class)
 public abstract class BaseIncrementalClassificationCorrectnessTest<A> extends
-		IncrementalReasoningCorrectnessTestWithInterrupts<UrlTestInput, A, ClassTaxonomyTestOutput, IncrementalReasoningTestWithInterruptsDelegate<A, ClassTaxonomyTestOutput>> {
+		IncrementalReasoningCorrectnessTestWithInterrupts<UrlTestInput, A, ElkClassTaxonomyTestOutput, IncrementalReasoningTestWithInterruptsDelegate<A, ElkClassTaxonomyTestOutput>> {
 
 	public BaseIncrementalClassificationCorrectnessTest(
 			final TestManifest<UrlTestInput> testManifest,
-			final IncrementalReasoningTestWithInterruptsDelegate<A, ClassTaxonomyTestOutput> testDelegate) {
+			final IncrementalReasoningTestWithInterruptsDelegate<A, ElkClassTaxonomyTestOutput> testDelegate) {
 		super(testManifest, testDelegate);
 	}
 
 	@Override
-	protected void correctnessCheck(final ClassTaxonomyTestOutput actualOutput,
-			final ClassTaxonomyTestOutput expectedOutput) throws Exception {
+	protected void correctnessCheck(final ElkClassTaxonomyTestOutput actualOutput,
+			final ElkClassTaxonomyTestOutput expectedOutput) throws Exception {
 
 		boolean actualContainsAllExpected = actualOutput
 				.containsAllElementsOf(expectedOutput);

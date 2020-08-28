@@ -56,9 +56,8 @@ public class ElkClassExpressionEquivalentClassesQueryTest extends
 					@Override
 					public ElkEquivalentClassesTestOutput getActualOutput()
 							throws Exception {
-						return new ElkEquivalentClassesTestOutput(
-								getReasoner().getEquivalentClassesQuitely(
-										manifest.getInput().getQuery()));
+						return new ElkEquivalentClassesTestOutput(getReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override

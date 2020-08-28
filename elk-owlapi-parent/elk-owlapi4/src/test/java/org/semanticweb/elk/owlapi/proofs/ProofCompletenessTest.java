@@ -24,18 +24,15 @@ package org.semanticweb.elk.owlapi.proofs;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.liveontologies.owlapi.proof.OWLProver;
-import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
+import org.semanticweb.elk.owlapi.ElkProver;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.TestUtils;
 import org.semanticweb.elk.testing.UrlTestInput;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -53,25 +50,6 @@ import org.semanticweb.owlapi.reasoner.InferenceType;
 @RunWith(PolySuite.class)
 public class ProofCompletenessTest extends BaseProofTest {
 
-	// @formatter:off
-	static final String[] IGNORE_LIST = {
-			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/AssertionDisjoint.owl",
-			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/ConjunctionsComplex.owl",
-			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/DifferentSameIndividual.owl",
-			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/Inconsistent.owl",
-			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/OneOf.owl",
-			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/PropertyRangesHierarchy.owl",
-			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/SameIndividual.owl",
-			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/forest.owl",
-			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/TransitivePropertyChain.owl",
-			ElkTestUtils.TEST_INPUT_LOCATION + "/classification/TransitivityByChain.owl",
-		};
-	// @formatter:on
-
-	static {
-		Arrays.sort(IGNORE_LIST);
-	}
-
 	public ProofCompletenessTest(
 			final TestManifest<UrlTestInput> testManifest) {
 		super(testManifest);
@@ -83,12 +61,6 @@ public class ProofCompletenessTest extends BaseProofTest {
 		assumeTrue(!ignore(manifest_.getInput()));
 	}
 
-	@Override
-	protected boolean ignore(final UrlTestInput input) {
-		return super.ignore(input) || TestUtils.ignore(input,
-				ElkTestUtils.TEST_INPUT_LOCATION, IGNORE_LIST);
-	}
-
 	@Test
 	public void proofCompletenessTest() throws Exception {
 
@@ -97,7 +69,7 @@ public class ProofCompletenessTest extends BaseProofTest {
 		// loading and classifying via the OWL API
 		final OWLOntology ontology = loadOntology(
 				manifest_.getInput().getUrl().openStream());
-		final OWLProver prover = OWLAPITestUtils.createProver(ontology);
+		final ElkProver prover = OWLAPITestUtils.createProver(ontology);
 		try {
 			prover.precomputeInferences(InferenceType.CLASS_HIERARCHY);
 		} catch (final InconsistentOntologyException e) {
@@ -107,8 +79,8 @@ public class ProofCompletenessTest extends BaseProofTest {
 		try {
 			// now do testing
 
-			ProofTestUtils.visitAllSubsumptionsForProofTests(prover, factory,
-					new ProofTestVisitor() {
+			ProofTestUtils.visitAllSubsumptionsForProofTests(
+					prover.getDelegate(), factory, new ProofTestVisitor() {
 
 						@Override
 						public void visit(final OWLClassExpression subsumee,

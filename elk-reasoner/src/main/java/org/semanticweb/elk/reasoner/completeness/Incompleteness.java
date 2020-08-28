@@ -22,8 +22,8 @@ package org.semanticweb.elk.reasoner.completeness;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObject;
+import java.util.Collection;
+
 import org.semanticweb.elk.reasoner.query.ElkQueryException;
 import org.semanticweb.elk.reasoner.query.QueryResult;
 import org.slf4j.Logger;
@@ -35,14 +35,123 @@ public class Incompleteness {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(Incompleteness.class);
 
+	/**
+	 * @return an {@link IncompletenessMonitor} that never reports
+	 *         incompleteness. I.e., it assumes that the result is complete.
+	 */
+	public static IncompletenessMonitor getNoIncompletenessMonitor() {
+		return NoIncompletenessMonitor.INSTNANCE;
+	}
+
+	/**
+	 * @param monitors
+	 * @return an {@link IncompletenessMonitor} consisting of a combination of
+	 *         several other {@link IncompletenessMonitor}s. That is, this
+	 *         monitor detects incompleteness if and only if at least one of the
+	 *         monitors in the combination detects incompleteness.
+	 */
 	public static IncompletenessMonitor combine(
 			IncompletenessMonitor... monitors) {
 		return new CombinedIncompletenessMonitor(monitors);
 	}
 
-	static public <R> R getValue(ReasoningResult<R> result) {
+	/**
+	 * @param monitors
+	 * @return an {@link IncompletenessMonitor} consisting of a combination of
+	 *         several other {@link IncompletenessMonitor}s. That is, this
+	 *         monitor detects incompleteness if and only if at least one of the
+	 *         monitors in the combination detects incompleteness.
+	 * @see #combine(IncompletenessMonitor...)
+	 */
+	public static IncompletenessMonitor combine(
+			Collection<IncompletenessMonitor> monitors) {
+		return new CombinedIncompletenessMonitor(monitors);
+	}
+
+	/**
+	 * Compose the given {@link IncompleteResult}s using a function and
+	 * combining their {@link IncompletenessMonitor}s in the order in which they
+	 * are listed
+	 * 
+	 * @param <RA>
+	 * @param <RB>
+	 * @param <O>
+	 * @param <E>
+	 * @param first
+	 * @param second
+	 * @param fn
+	 * @return the {@link IncompleteResult} whose value is obtained by applying
+	 *         the function to the values of the given
+	 *         {@link IncompleteResult}s, and whose
+	 *         {@link IncompletenessMonitor} is obtained by composing the
+	 *         {@link IncompletenessMonitor}s of the input
+	 * @throws E
+	 */
+	public static <RA, RB, O, E extends Throwable> IncompleteResult<O> compose(
+			IncompleteResult<? extends RA> first,
+			IncompleteResult<? extends RB> second,
+			CheckedBiFunction<RA, RB, O, E> fn) throws E {
+		return new IncompleteResult<O>(
+				fn.apply(first.getValue(), second.getValue()),
+				combine(first.getIncompletenessMonitor(),
+						second.getIncompletenessMonitor()));
+	}
+
+	/**
+	 * Compose the given {@link IncompleteResult}s using a function and
+	 * combining their {@link IncompletenessMonitor}s in the order in which they
+	 * are listed
+	 * 
+	 * @param <RA>
+	 * @param <RB>
+	 * @param <O>
+	 * @param <E>
+	 * @param first
+	 * @param second
+	 * @param third
+	 * @param fn
+	 * @return the {@link IncompleteResult} whose value is obtained by applying
+	 *         the function to the values of the given
+	 *         {@link IncompleteResult}s, and whose
+	 *         {@link IncompletenessMonitor} is obtained by composing the
+	 *         {@link IncompletenessMonitor}s of the input
+	 * @throws E
+	 */
+	public static <RA, RB, RC, O, E extends Throwable> IncompleteResult<O> compose(
+			IncompleteResult<? extends RA> first,
+			IncompleteResult<? extends RB> second,
+			IncompleteResult<? extends RC> third,
+			CheckedTriFunction<RA, RB, RC, O, E> fn) throws E {
+		return new IncompleteResult<O>(
+				fn.apply(first.getValue(), second.getValue(), third.getValue()),
+				combine(first.getIncompletenessMonitor(),
+						second.getIncompletenessMonitor(),
+						third.getIncompletenessMonitor()));
+	}
+
+	@FunctionalInterface
+	public interface CheckedBiFunction<I, J, O, E extends Throwable> {
+		O apply(I first, J second) throws E;
+	}
+
+	@FunctionalInterface
+	public interface CheckedTriFunction<I, J, K, O, E extends Throwable> {
+		O apply(I first, J second, K third) throws E;
+	}
+
+	/**
+	 * Returns the value of an {@link IncompleteResult} while producing the
+	 * necessary log messages about incompleteness
+	 * 
+	 * @param <R>
+	 *            the type of the values of the result
+	 * @param result
+	 *            the {@link IncompleteResult} whose value should be returned
+	 * @return the value of the given {@link IncompleteResult}
+	 */
+	static public <R> R getValue(IncompleteResult<? extends R> result) {
 		R value = result.getValue();
-		IncompletenessMonitor monitor = result.geIncompletenessMonitor();
+		IncompletenessMonitor monitor = result.getIncompletenessMonitor();
 		if (monitor.hasNewExplanation()) {
 			monitor.explainIncompleteness(LOGGER_);
 		}
@@ -63,49 +172,6 @@ public class Incompleteness {
 			queryMonitor.explainIncompleteness(LOGGER_);
 		}
 		return false;
-	}
-
-	private static boolean checkQueryReasoningCompleteness(ElkObject query,
-			OntologySatisfiabilityIncompletenessMonitor ontologyMonitor,
-			OccurrenceManager occurrencesInQuery, Logger logger) {
-		if (!ontologyMonitor.checkCompleteness(logger)) {
-			// general ontology reasoning could be already incomplete
-			return false;
-		}
-		// else
-		IncompletenessMonitor queryMonitor = new QueryIncompletenessMonitor(
-				ontologyMonitor, occurrencesInQuery);
-		if (queryMonitor.hasNewExplanation()) {
-			logger.warn(
-					"Reasoning results for the query {} may be incomplete! See INFO for more details.",
-					query);
-			queryMonitor.explainIncompleteness(logger);
-		}
-		return !queryMonitor.isIncompletenessDetected();
-	}
-
-	/**
-	 * Checks reasoning completeness for the given query and, if necessary,
-	 * prints messages about incompleteness using the provided logger.
-	 * 
-	 * @param query
-	 *            the query for which to check incompleteness
-	 * @param ontologyMonitor
-	 *            the main {@link OntologySatisfiabilityIncompletenessMonitor}
-	 * @param occurrencesInQuery
-	 *            occurrences of {@link Feature}s in the query
-	 * @param logger
-	 * @return {@code true} if the reasoning results are guaranteed to be
-	 *         complete and {@code false} otherwise
-	 */
-	public static boolean checkQueryReasoningCompleteness(
-			ElkClassExpression query,
-			OntologySatisfiabilityIncompletenessMonitor ontologyMonitor,
-			OccurrenceCounter occurrencesInQuery, Logger logger) {
-		return checkQueryReasoningCompleteness((ElkObject) query,
-				ontologyMonitor, new OccurrencesInClassExpressionQuery(query,
-						occurrencesInQuery),
-				logger);
 	}
 
 }

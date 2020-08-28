@@ -47,6 +47,7 @@ import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
+import org.semanticweb.elk.reasoner.completeness.Incompleteness;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
@@ -109,7 +110,7 @@ public class InstanceTaxonomyMemberComparisonTest {
 				final Reasoner reasoner = TestReasonerUtils
 						.createTestReasoner(testInput, 1);
 
-				return reasoner.getInstanceTaxonomy().getValue();
+				return Incompleteness.getValue(reasoner.getInstanceTaxonomy());
 			} catch (IOException e) {
 				return null;
 			}

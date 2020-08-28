@@ -23,21 +23,25 @@ package org.semanticweb.elk.owlapi.query;
  */
 
 import org.semanticweb.elk.owlapi.ElkReasoner;
+import org.semanticweb.elk.reasoner.completeness.IncompleteResult;
 import org.semanticweb.elk.reasoner.query.SatisfiabilityTestOutput;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 
 public class OwlClassExpressionSatisfiabilityTestOutput
 		extends SatisfiabilityTestOutput {
 
-	public OwlClassExpressionSatisfiabilityTestOutput(boolean isSatisfiable,
-			boolean isComplete) {
-		super(isSatisfiable, isComplete);
+	public OwlClassExpressionSatisfiabilityTestOutput(
+			IncompleteResult<? extends Boolean> incompleteIsSatisfiable) {
+		super(incompleteIsSatisfiable);
+	}
+
+	public OwlClassExpressionSatisfiabilityTestOutput(boolean isSatisfiable) {
+		super(isSatisfiable);
 	}
 
 	public OwlClassExpressionSatisfiabilityTestOutput(ElkReasoner reasoner,
 			OWLClassExpression query) {
-		// TODO: completeness
-		this(reasoner.isSatisfiable(query), true);
+		this(reasoner.checkSatisfiability(query));
 	}
 
 }

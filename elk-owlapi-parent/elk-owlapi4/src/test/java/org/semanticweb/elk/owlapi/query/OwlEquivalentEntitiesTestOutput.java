@@ -21,12 +21,10 @@
  */
 package org.semanticweb.elk.owlapi.query;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.completeness.IncompleteResult;
-import org.semanticweb.elk.reasoner.taxonomy.model.Node;
+import org.semanticweb.elk.reasoner.completeness.IncompleteTestOutput;
 import org.semanticweb.elk.testing.DiffableOutput;
 import org.semanticweb.owlapi.model.OWLEntity;
 
@@ -42,37 +40,20 @@ import org.semanticweb.owlapi.model.OWLEntity;
  *            inclusions
  */
 public class OwlEquivalentEntitiesTestOutput<E extends OWLEntity, O extends OwlEquivalentEntitiesTestOutput<E, O>>
+		extends IncompleteTestOutput<Set<? extends E>>
 		implements DiffableOutput<E, O> {
 
-	private final Set<? extends E> members_;
-
-	private final boolean isComplete_;
-
-	public OwlEquivalentEntitiesTestOutput(Set<? extends E> members,
-			boolean isComplete) {
-		this.members_ = members;
-		this.isComplete_ = isComplete;
+	public OwlEquivalentEntitiesTestOutput(
+			IncompleteResult<? extends Set<? extends E>> incompleteMembers) {
+		super(incompleteMembers);
 	}
 
-	public OwlEquivalentEntitiesTestOutput(Iterable<? extends E> equivalent,
-			int sizeEstimate, boolean isComplete) {
-		HashSet<E> members = new HashSet<>(sizeEstimate);
-		members_ = members;
-		equivalent.forEach(m -> members.add(m));
-		this.isComplete_ = isComplete;
-	}
-
-	public OwlEquivalentEntitiesTestOutput(Collection<? extends E> equivalent,
-			boolean isComplete) {
-		this(equivalent, equivalent.size(), isComplete);
+	public OwlEquivalentEntitiesTestOutput(Set<? extends E> members) {
+		super(members);
 	}
 
 	Set<? extends E> getMembers() {
-		return this.members_;
-	}
-
-	boolean isComplete() {
-		return isComplete_;
+		return this.getValue();
 	}
 
 	@Override
@@ -81,7 +62,7 @@ public class OwlEquivalentEntitiesTestOutput<E extends OWLEntity, O extends OwlE
 			return true;
 		}
 		for (E otherMember : other.getMembers()) {
-			if (!members_.contains(otherMember)) {
+			if (!getMembers().contains(otherMember)) {
 				return false;
 			}
 		}
@@ -95,7 +76,7 @@ public class OwlEquivalentEntitiesTestOutput<E extends OWLEntity, O extends OwlE
 			return;
 		}
 		for (E otherMember : other.getMembers()) {
-			if (!members_.contains(otherMember)) {
+			if (!getMembers().contains(otherMember)) {
 				listener.missing(otherMember);
 			}
 		}

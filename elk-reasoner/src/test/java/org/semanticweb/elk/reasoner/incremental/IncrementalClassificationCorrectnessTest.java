@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.incremental;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
+import org.semanticweb.elk.reasoner.ElkClassTaxonomyTestOutput;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.UrlTestInput;
@@ -45,24 +45,24 @@ public class IncrementalClassificationCorrectnessTest
 	public IncrementalClassificationCorrectnessTest(
 			final TestManifest<UrlTestInput> testManifest) {
 		super(testManifest,
-				new ElkIncrementalReasoningTestDelegate<ClassTaxonomyTestOutput>(
+				new ElkIncrementalReasoningTestDelegate<ElkClassTaxonomyTestOutput>(
 						testManifest) {
 
 					@Override
-					public ClassTaxonomyTestOutput getExpectedOutput()
+					public ElkClassTaxonomyTestOutput getExpectedOutput()
 							throws Exception {
 						LOGGER_.trace(
 								"======= Computing Expected Taxonomy =======");
-						return new ClassTaxonomyTestOutput(
+						return new ElkClassTaxonomyTestOutput(
 								getStandardReasoner().getTaxonomyQuietly());
 					}
 
 					@Override
-					public ClassTaxonomyTestOutput getActualOutput()
+					public ElkClassTaxonomyTestOutput getActualOutput()
 							throws Exception {
 						LOGGER_.trace(
 								"======= Computing Incremental Taxonomy =======");
-						return new ClassTaxonomyTestOutput(
+						return new ElkClassTaxonomyTestOutput(
 								getStandardReasoner().getTaxonomyQuietly());
 					}
 

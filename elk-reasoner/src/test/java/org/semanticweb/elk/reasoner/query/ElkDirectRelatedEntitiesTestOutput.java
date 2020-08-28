@@ -26,19 +26,27 @@ import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
+import org.semanticweb.elk.reasoner.completeness.IncompleteResult;
+import org.semanticweb.elk.reasoner.completeness.IncompleteTestOutput;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.DiffableOutput;
 
 public abstract class ElkDirectRelatedEntitiesTestOutput<E extends ElkEntity, O extends ElkDirectRelatedEntitiesTestOutput<E, O>>
+		extends IncompleteTestOutput<Collection<? extends Node<E>>>
 		implements DiffableOutput<ElkAxiom, O> {
 
-	private final ThisElkDirectRelatedEntitiesDiffable<E> diffable_;
+	ElkDirectRelatedEntitiesTestOutput(
+			IncompleteResult<? extends Collection<? extends Node<E>>> incompleteDisjointNodes) {
+		super(incompleteDisjointNodes);
+	}
 
 	ElkDirectRelatedEntitiesTestOutput(
-			Collection<? extends Node<E>> disjointNodes, boolean isComplete) {
-		this.diffable_ = new ThisElkDirectRelatedEntitiesDiffable<>(
-				disjointNodes, isComplete);
+			Collection<? extends Node<E>> disjointNodes) {
+		super(disjointNodes);
 	}
+
+	private final ThisElkDirectRelatedEntitiesDiffable<E> diffable_ = new ThisElkDirectRelatedEntitiesDiffable<>(
+			getValue(), isComplete());
 
 	ThisElkDirectRelatedEntitiesDiffable<E> getDiffable() {
 		return this.diffable_;

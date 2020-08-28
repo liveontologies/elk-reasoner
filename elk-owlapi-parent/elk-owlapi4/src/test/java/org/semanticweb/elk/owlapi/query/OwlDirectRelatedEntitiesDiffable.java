@@ -25,6 +25,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.semanticweb.elk.reasoner.completeness.IncompleteResult;
+import org.semanticweb.elk.reasoner.completeness.IncompleteTestOutput;
 import org.semanticweb.elk.testing.Diffable;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.reasoner.Node;
@@ -42,35 +44,32 @@ import org.semanticweb.owlapi.reasoner.Node;
  *            the type of the output which this output can be compared
  */
 public class OwlDirectRelatedEntitiesDiffable<E extends OWLEntity, O extends OwlDirectRelatedEntitiesDiffable<E, O>>
+		extends IncompleteTestOutput<Collection<? extends Node<E>>>
 		implements Diffable<O, OwlDirectRelatedEntitiesDiffable.Listener<E>> {
 
 	private final Map<E, Node<E>> nodesByMembers_;
 
-	private final boolean isComplete_;
-
-	OwlDirectRelatedEntitiesDiffable(Iterable<? extends Node<E>> disjointNodes,
-			int estimatedSize, boolean isComplete) {
-		nodesByMembers_ = new HashMap<>(estimatedSize);
-		disjointNodes.forEach(n -> n.forEach(e -> nodesByMembers_.put(e, n)));
-		this.isComplete_ = isComplete;
+	OwlDirectRelatedEntitiesDiffable(
+			IncompleteResult<? extends Collection<? extends Node<E>>> incompleteDisjointNodes) {
+		super(incompleteDisjointNodes);
+		nodesByMembers_ = new HashMap<>(getValue().size());
+		getValue().forEach(n -> n.forEach(e -> nodesByMembers_.put(e, n)));
 	}
 
 	OwlDirectRelatedEntitiesDiffable(
-			Collection<? extends Node<E>> disjointNodes, boolean isComplete) {
-		this(disjointNodes, disjointNodes.size(), isComplete);
+			Collection<? extends Node<E>> disjointNodes) {
+		super(disjointNodes);
+		nodesByMembers_ = new HashMap<>(getValue().size());
+		getValue().forEach(n -> n.forEach(e -> nodesByMembers_.put(e, n)));
 	}
 
 	Map<E, Node<E>> getNodesByMembers() {
 		return this.nodesByMembers_;
 	}
 
-	boolean isComplete() {
-		return isComplete_;
-	}
-
 	@Override
 	public boolean containsAllElementsOf(O other) {
-		if (!isComplete_) {
+		if (!isComplete()) {
 			return true;
 		}
 		Map<E, Node<E>> otherNodesByMembers = other.getNodesByMembers();
@@ -106,7 +105,7 @@ public class OwlDirectRelatedEntitiesDiffable<E extends OWLEntity, O extends Owl
 
 	@Override
 	public void reportMissingElementsOf(O other, Listener<E> listener) {
-		if (!isComplete_) {
+		if (!isComplete()) {
 			return;
 		}
 		Map<E, Node<E>> otherNodesByMembers = other.getNodesByMembers();

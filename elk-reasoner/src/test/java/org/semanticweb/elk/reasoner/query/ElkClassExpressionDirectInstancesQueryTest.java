@@ -58,8 +58,8 @@ public class ElkClassExpressionDirectInstancesQueryTest extends
 							throws Exception {
 						ElkClassExpression query = manifest.getInput()
 								.getQuery();
-						return new ElkDirectInstancesTestOutput(query,
-								getReasoner().getInstancesQuietly(query, true));
+						return new ElkDirectInstancesTestOutput(getReasoner(),
+								query);
 					}
 
 					@Override

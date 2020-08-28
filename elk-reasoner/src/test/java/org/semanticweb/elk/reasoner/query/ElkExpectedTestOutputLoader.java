@@ -255,8 +255,7 @@ public class ElkExpectedTestOutputLoader {
 							name + " isSatisfiable", input, queryClass,
 							new SatisfiabilityTestOutput(
 									node == null || !node.containsKey(
-											PredefinedElkIris.OWL_NOTHING),
-									true)));
+											PredefinedElkIris.OWL_NOTHING))));
 		}
 
 		return result;
@@ -275,8 +274,7 @@ public class ElkExpectedTestOutputLoader {
 							name + " getEquivalentClasses", input, queryClass,
 							new ElkEquivalentClassesTestOutput(
 									node == null ? Collections.emptyMap()
-											: node,
-									true)));
+											: node)));
 		}
 
 		return result;
@@ -313,7 +311,7 @@ public class ElkExpectedTestOutputLoader {
 					new QueryTestManifest<ElkClassExpression, ElkDirectSuperClassesTestOutput>(
 							name + " getDirectSuperClasses", input, queryClass,
 							new ElkDirectSuperClassesTestOutput(queryClass,
-									superNodes, true)));
+									superNodes)));
 		}
 
 		return result;
@@ -350,8 +348,8 @@ public class ElkExpectedTestOutputLoader {
 					new QueryTestManifest<ElkClassExpression, ElkDirectSubClassesTestOutput>(
 							name + " getDirectSubClasses", input, queryClass,
 
-							new ElkDirectSubClassesTestOutput(queryClass, subNodes,
-									true)));
+							new ElkDirectSubClassesTestOutput(queryClass,
+									subNodes)));
 		}
 
 		return result;
@@ -390,8 +388,8 @@ public class ElkExpectedTestOutputLoader {
 			result.add(
 					new QueryTestManifest<ElkClassExpression, ElkDirectInstancesTestOutput>(
 							name + " getDirectInstances", input, queryClass,
-							new ElkDirectInstancesTestOutput(queryClass, instances,
-									true)));
+							new ElkDirectInstancesTestOutput(queryClass,
+									instances)));
 		}
 
 		return result;

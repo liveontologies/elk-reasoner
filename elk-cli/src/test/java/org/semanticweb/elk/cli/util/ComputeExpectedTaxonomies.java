@@ -41,6 +41,7 @@ import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
+import org.semanticweb.elk.reasoner.completeness.Incompleteness;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
@@ -71,7 +72,8 @@ public class ComputeExpectedTaxonomies {
 					@Override
 					public Taxonomy<ElkClass> getTaxonomy(Reasoner reasoner)
 							throws ElkException {
-						return reasoner.getTaxonomyQuietly().getValue();
+						return Incompleteness
+								.getValue(reasoner.getTaxonomyQuietly());
 					}
 
 					@Override
@@ -86,7 +88,8 @@ public class ComputeExpectedTaxonomies {
 			@Override
 			public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy(
 					Reasoner reasoner) throws ElkException {
-				return reasoner.getInstanceTaxonomyQuietly().getValue();
+				return Incompleteness
+						.getValue(reasoner.getInstanceTaxonomyQuietly());
 			}
 
 			@SuppressWarnings("unchecked")

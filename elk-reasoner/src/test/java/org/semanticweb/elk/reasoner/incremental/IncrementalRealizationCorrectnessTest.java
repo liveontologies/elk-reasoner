@@ -55,8 +55,7 @@ public class IncrementalRealizationCorrectnessTest
 						LOGGER_.trace(
 								"======= Computing Expected Taxonomy =======");
 						return new InstanceTaxonomyTestOutput(
-								getStandardReasoner()
-										.getInstanceTaxonomyQuietly());
+								getStandardReasoner());
 					}
 
 					@Override
@@ -65,8 +64,7 @@ public class IncrementalRealizationCorrectnessTest
 						LOGGER_.trace(
 								"======= Computing Incremental Taxonomy =======");
 						return new InstanceTaxonomyTestOutput(
-								getIncrementalReasoner()
-										.getInstanceTaxonomyQuietly());
+								getIncrementalReasoner());
 					}
 
 				});

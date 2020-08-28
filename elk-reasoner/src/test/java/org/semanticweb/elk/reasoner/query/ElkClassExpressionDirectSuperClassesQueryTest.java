@@ -44,37 +44,37 @@ import org.semanticweb.elk.testing.TestManifestWithOutput;
 import com.google.common.collect.ImmutableMap;
 
 @RunWith(PolySuite.class)
-public class ElkClassExpressionDirectSuperClassesQueryTest
-		extends BaseQueryTest<ElkClassExpression, ElkDirectSuperClassesTestOutput> {
+public class ElkClassExpressionDirectSuperClassesQueryTest extends
+		BaseQueryTest<ElkClassExpression, ElkDirectSuperClassesTestOutput> {
 
 	public ElkClassExpressionDirectSuperClassesQueryTest(
 			final QueryTestManifest<ElkClassExpression, ElkDirectSuperClassesTestOutput> manifest) {
-		super(manifest, new ElkReasoningTestDelegate<ElkDirectSuperClassesTestOutput>(
-				manifest) {
+		super(manifest,
+				new ElkReasoningTestDelegate<ElkDirectSuperClassesTestOutput>(
+						manifest) {
 
-			@Override
-			public ElkDirectSuperClassesTestOutput getActualOutput()
-					throws Exception {
-				ElkClassExpression query = manifest.getInput().getQuery();
-				return new ElkDirectSuperClassesTestOutput(query,
-						getReasoner().getSuperClassesQuietly(query, true));
-			}
+					@Override
+					public ElkDirectSuperClassesTestOutput getActualOutput()
+							throws Exception {
+						return new ElkDirectSuperClassesTestOutput(
+								getReasoner(), manifest.getInput().getQuery());
+					}
 
-			@Override
-			protected Map<String, String> additionalConfigWithOutput() {
-				return ImmutableMap.<String, String> builder().put(
-						ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
-						"NQEvictor(0, 0.75)").build();
-			}
+					@Override
+					protected Map<String, String> additionalConfigWithOutput() {
+						return ImmutableMap.<String, String> builder().put(
+								ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
+								"NQEvictor(0, 0.75)").build();
+					}
 
-			@Override
-			protected Map<String, String> additionalConfigWithInterrupts() {
-				return ImmutableMap.<String, String> builder().put(
-						ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
-						"NQEvictor(0, 0.75)").build();
-			}
+					@Override
+					protected Map<String, String> additionalConfigWithInterrupts() {
+						return ImmutableMap.<String, String> builder().put(
+								ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR,
+								"NQEvictor(0, 0.75)").build();
+					}
 
-		});
+				});
 	}
 
 	@Config

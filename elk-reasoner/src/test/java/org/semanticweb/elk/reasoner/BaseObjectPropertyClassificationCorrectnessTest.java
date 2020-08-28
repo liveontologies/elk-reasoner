@@ -54,11 +54,11 @@ import org.semanticweb.elk.testing.UrlTestInput;
  */
 @RunWith(PolySuite.class)
 public abstract class BaseObjectPropertyClassificationCorrectnessTest extends
-		ReasoningCorrectnessTestWithInterrupts<UrlTestInput, ObjectPropertyTaxonomyTestOutput, ReasoningTestManifest<ObjectPropertyTaxonomyTestOutput>, ReasoningTestWithOutputAndInterruptsDelegate<ObjectPropertyTaxonomyTestOutput>> {
+		ReasoningCorrectnessTestWithInterrupts<UrlTestInput, ElkObjectPropertyTaxonomyTestOutput, ReasoningTestManifest<ElkObjectPropertyTaxonomyTestOutput>, ReasoningTestWithOutputAndInterruptsDelegate<ElkObjectPropertyTaxonomyTestOutput>> {
 
 	public BaseObjectPropertyClassificationCorrectnessTest(
-			final ReasoningTestManifest<ObjectPropertyTaxonomyTestOutput> testManifest,
-			final ReasoningTestWithOutputAndInterruptsDelegate<ObjectPropertyTaxonomyTestOutput> testDelegate) {
+			final ReasoningTestManifest<ElkObjectPropertyTaxonomyTestOutput> testManifest,
+			final ReasoningTestWithOutputAndInterruptsDelegate<ElkObjectPropertyTaxonomyTestOutput> testDelegate) {
 		super(testManifest, testDelegate);
 	}
 
@@ -68,9 +68,9 @@ public abstract class BaseObjectPropertyClassificationCorrectnessTest extends
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				ElkTestUtils.TEST_INPUT_LOCATION,
 				BaseObjectPropertyClassificationCorrectnessTest.class,
-				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<UrlTestInput, ObjectPropertyTaxonomyTestOutput>>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<UrlTestInput, ElkObjectPropertyTaxonomyTestOutput>>() {
 					@Override
-					public Collection<? extends TestManifestWithOutput<UrlTestInput, ObjectPropertyTaxonomyTestOutput>> createManifests(
+					public Collection<? extends TestManifestWithOutput<UrlTestInput, ElkObjectPropertyTaxonomyTestOutput>> createManifests(
 							final String name, final List<URL> urls)
 							throws IOException {
 
@@ -94,10 +94,10 @@ public abstract class BaseObjectPropertyClassificationCorrectnessTest extends
 															.getParser(stream));
 
 							return Collections.singleton(
-									new ReasoningTestManifest<ObjectPropertyTaxonomyTestOutput>(
+									new ReasoningTestManifest<ElkObjectPropertyTaxonomyTestOutput>(
 											name, urls.get(0),
-											new ObjectPropertyTaxonomyTestOutput(
-													expectedTaxonomy, true)));
+											new ElkObjectPropertyTaxonomyTestOutput(
+													expectedTaxonomy)));
 
 						} catch (final Owl2ParseException e) {
 							throw new IOException(e);

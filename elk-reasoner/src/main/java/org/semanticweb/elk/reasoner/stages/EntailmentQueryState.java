@@ -37,13 +37,12 @@ import org.semanticweb.elk.loading.EntailmentQueryLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.completeness.Feature;
+import org.semanticweb.elk.reasoner.completeness.IncompletenessManager;
 import org.semanticweb.elk.reasoner.completeness.IncompletenessMonitor;
 import org.semanticweb.elk.reasoner.completeness.OccurrenceCounter;
 import org.semanticweb.elk.reasoner.completeness.OccurrenceListener;
 import org.semanticweb.elk.reasoner.completeness.OccurrenceRegistry;
 import org.semanticweb.elk.reasoner.completeness.OccurrencesInEntailmentQuery;
-import org.semanticweb.elk.reasoner.completeness.OntologySatisfiabilityIncompletenessMonitor;
-import org.semanticweb.elk.reasoner.completeness.QueryIncompletenessMonitor;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyCheckingState;
 import org.semanticweb.elk.reasoner.entailments.InconsistencyProofWrapper;
@@ -97,7 +96,10 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 	 */
 	private final Set<ElkAxiom> lastQueries_ = new ArrayHashSet<ElkAxiom>();
 
-	private final OntologySatisfiabilityIncompletenessMonitor ontologySatisfiabilityIncompletenessMonitor_;
+	/**
+	 * A manager to keep track of incompleteness for queries
+	 */
+	private final IncompletenessManager incompletenessManager_;
 
 	/**
 	 * State of the query of a particular axiom. There are two forbidden states:
@@ -115,8 +117,6 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 		 * The query for which the entailment is proved
 		 */
 		private final ElkAxiom query_;
-
-		private final IncompletenessMonitor queryIncompletenessMonitor_;
 
 		/**
 		 * Whether the queried axiom was loaded (whether it was attempted to
@@ -139,12 +139,17 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 		 */
 		OccurrenceRegistry occurrences = new OccurrenceRegistry();
 
+		/**
+		 * An {@link IncompletenessMonitor} for entailment of this query
+		 */
+		private final IncompletenessMonitor queryIncompletenessMonitor_;
+
 		QueryState(ElkAxiom query) {
 			this.query_ = query;
-			this.queryIncompletenessMonitor_ = new QueryIncompletenessMonitor(
-					ontologySatisfiabilityIncompletenessMonitor_,
-					new OccurrencesInEntailmentQuery(getQuery(),
-							getOccurrenceCounter()));
+			this.queryIncompletenessMonitor_ = incompletenessManager_
+					.getQueryMonitor(
+							new OccurrencesInEntailmentQuery(query,
+									occurrences));
 		}
 
 		@Override
@@ -168,7 +173,6 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 				return false;
 			}
 			// else
-			queryIncompletenessMonitor_.explainIncompleteness(LOGGER_);
 			// TODO: cache result?
 			return Proofs.isDerivable(getEvidence(true), indexed.getQuery());
 		}
@@ -184,7 +188,7 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 				throws ElkQueryException {
 			if (indexed == null) {
 				// not indexed => no proof
-				return Proofs.EMPTY_PROOF; 
+				return Proofs.EMPTY_PROOF;
 			}
 			// else
 
@@ -242,7 +246,7 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 			final SaturationState<C> saturationState,
 			final ConsistencyCheckingState consistencyCheckingState,
 			final SaturationConclusion.Factory factory,
-			final OntologySatisfiabilityIncompletenessMonitor ontologySatisfiabilityIncompletenessMonitor) {
+			final IncompletenessManager incompletenessManager) {
 		this.saturationState_ = saturationState;
 		this.consistencyCheckingState_ = consistencyCheckingState;
 		this.conclusionFactory_ = factory;
@@ -251,7 +255,7 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 		LOGGER_.info("{} = {}", ReasonerConfiguration.ENTAILMENT_QUERY_EVICTOR,
 				builder);
 		this.queriedEvictor_ = ((Evictor.Builder) builder).build();
-		this.ontologySatisfiabilityIncompletenessMonitor_ = ontologySatisfiabilityIncompletenessMonitor;
+		this.incompletenessManager_ = incompletenessManager;
 	}
 
 	/**
@@ -408,8 +412,6 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 	 *            Entailment of what axioms is queried.
 	 * @return A map from each queried axiom to the result of entailment query
 	 *         for that axiom.
-	 * @param axioms
-	 * @return
 	 * @throws ElkQueryException
 	 *             When some of the axioms was not registered by
 	 *             {@link #registerQueries(Iterable)}.
