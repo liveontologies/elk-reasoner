@@ -22,20 +22,37 @@ package org.semanticweb.elk.reasoner.completeness;
  * #L%
  */
 
-public class QueryIncompletenessMonitor extends CombinedIncompletenessMonitor {
+/**
+ * A template for creating test outputs for incomplete reasoning results so that
+ * they can be compared with each other.
+ * 
+ * @author Yevgeny Kazakov
+ *
+ * @param <R>
+ */
+public class IncompleteTestOutput<R> {
 
-	public QueryIncompletenessMonitor(
-			OntologySatisfiabilityIncompletenessMonitor ontologySatisfiabilityMonitor,
-			OccurrenceManager occurencesInQuery) {
-		super(ontologySatisfiabilityMonitor, // incompleteness could be already
-												// reported
-				new UnsupportedQueryTypeIncompletenessMonitor(
-						occurencesInQuery),
-				new TopIncompletenessMonitor(new CombinedOccurrenceManager(
-						// additional combination of features to be considered
-						ontologySatisfiabilityMonitor
-								.getOccurrencesInOntology(),
-						occurencesInQuery)));
+	private final R value_;
+
+	private final boolean isComplete_;
+
+	public IncompleteTestOutput(IncompleteResult<? extends R> result) {
+		value_ = result.getValue();
+		isComplete_ = !result.getIncompletenessMonitor()
+				.isIncompletenessDetected();
+	}
+
+	public IncompleteTestOutput(R output) {
+		value_ = output;
+		isComplete_ = true;
+	}
+
+	public R getValue() {
+		return value_;
+	}
+
+	public boolean isComplete() {
+		return isComplete_;
 	}
 
 }

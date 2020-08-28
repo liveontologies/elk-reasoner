@@ -23,8 +23,8 @@ package org.semanticweb.elk.reasoner.query;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.reasoner.completeness.Incompleteness;
 import org.semanticweb.elk.reasoner.completeness.IncompletenessMonitor;
-import org.semanticweb.elk.reasoner.completeness.NoIncompletenessMonitor;
 
 /**
  * A complete {@link QueryResult} whose {@link IncompletenessMonitor} always
@@ -57,7 +57,7 @@ public class CompleteQueryResult implements QueryResult {
 
 	@Override
 	public IncompletenessMonitor getIncompletenessMonitor() {
-		return new NoIncompletenessMonitor();
+		return Incompleteness.getNoIncompletenessMonitor();
 	}
 
 	@Override

@@ -50,18 +50,16 @@ public class ElkIncrementalClassExpressionEquivalentClassesQueryTest extends
 					public ElkEquivalentClassesTestOutput getExpectedOutput()
 							throws Exception {
 						return new ElkEquivalentClassesTestOutput(
-								getStandardReasoner()
-										.getEquivalentClassesQuitely(manifest
-												.getInput().getQuery()));
+								getStandardReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override
 					public ElkEquivalentClassesTestOutput getActualOutput()
 							throws Exception {
 						return new ElkEquivalentClassesTestOutput(
-								getIncrementalReasoner()
-										.getEquivalentClassesQuitely(manifest
-												.getInput().getQuery()));
+								getIncrementalReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override

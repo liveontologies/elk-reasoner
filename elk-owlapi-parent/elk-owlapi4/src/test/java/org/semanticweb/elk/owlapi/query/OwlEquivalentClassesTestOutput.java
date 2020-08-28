@@ -22,6 +22,7 @@
 package org.semanticweb.elk.owlapi.query;
 
 import org.semanticweb.elk.owlapi.ElkReasoner;
+import org.semanticweb.elk.reasoner.completeness.IncompleteResult;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.reasoner.Node;
@@ -34,15 +35,18 @@ import org.semanticweb.owlapi.reasoner.Node;
 public class OwlEquivalentClassesTestOutput extends
 		OwlEquivalentEntitiesTestOutput<OWLClass, OwlEquivalentClassesTestOutput> {
 
-	public OwlEquivalentClassesTestOutput(final Node<OWLClass> equivalent,
-			boolean isComplete) {
-		super(equivalent.getEntities(), isComplete);
+	public OwlEquivalentClassesTestOutput(
+			IncompleteResult<Node<OWLClass>> equivalent) {
+		super(equivalent.map(Node::getEntities));
+	}
+
+	public OwlEquivalentClassesTestOutput(Node<OWLClass> equivalent) {
+		super(equivalent.getEntities());
 	}
 
 	public OwlEquivalentClassesTestOutput(ElkReasoner reasoner,
 			OWLClassExpression query) {
-		// TODO: completeness
-		this(reasoner.getEquivalentClasses(query), true);
+		this(reasoner.computeEquivalentClasses(query));
 	}
 
 }

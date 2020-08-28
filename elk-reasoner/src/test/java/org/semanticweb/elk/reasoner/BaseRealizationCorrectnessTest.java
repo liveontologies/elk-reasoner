@@ -100,7 +100,7 @@ public abstract class BaseRealizationCorrectnessTest extends
 									new ReasoningTestManifest<InstanceTaxonomyTestOutput>(
 											name, urls.get(0),
 											new InstanceTaxonomyTestOutput(
-													expectedTaxonomy, true)));
+													expectedTaxonomy)));
 
 						} catch (Owl2ParseException e) {
 							throw new IOException(e);

@@ -25,32 +25,30 @@ import org.semanticweb.elk.exceptions.ElkException;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.completeness.IncompleteResult;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
-public class ElkObjectPropertyTaxonomyTestOutput extends
-		AbstractTaxonomyTestOutput<ElkObjectProperty, ElkObjectPropertyTaxonomyTestOutput> {
+public class ElkClassTaxonomyTestOutput extends
+		AbstractTaxonomyTestOutput<ElkClass, ElkClassTaxonomyTestOutput> {
 
-	public ElkObjectPropertyTaxonomyTestOutput(
-			IncompleteResult<? extends Taxonomy<ElkObjectProperty>> incompleteTaxonomy) {
+	public ElkClassTaxonomyTestOutput(
+			IncompleteResult<? extends Taxonomy<ElkClass>> incompleteTaxonomy) {
 		super(incompleteTaxonomy);
 	}
 
-	public ElkObjectPropertyTaxonomyTestOutput(
-			Taxonomy<ElkObjectProperty> taxonomy) {
+	public ElkClassTaxonomyTestOutput(Taxonomy<ElkClass> taxonomy) {
 		super(taxonomy);
 	}
 
-	public ElkObjectPropertyTaxonomyTestOutput(Reasoner reasoner)
-			throws ElkException {
-		this(reasoner.getObjectPropertyTaxonomyQuietly());
+	public ElkClassTaxonomyTestOutput(Reasoner reasoner) throws ElkException {
+		this(reasoner.getTaxonomyQuietly());
 	}
 
 	@Override
-	TaxonomyEntailment.Listener<ElkObjectProperty> adapt(
+	org.semanticweb.elk.reasoner.TaxonomyEntailment.Listener<ElkClass> adapt(
 			Listener<ElkAxiom> listener) {
-		return new ElkObjectPropertyTaxonomyEntailmentAdapter(listener);
+		return new ElkClassTaxonomyEntailmentAdapter(listener);
 	}
 
 }

@@ -37,9 +37,10 @@ import java.util.List;
 
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
+import org.semanticweb.elk.reasoner.ElkClassTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.completeness.IncompleteResult;
+import org.semanticweb.elk.reasoner.completeness.TestIncompleteness;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.Diff;
@@ -227,9 +228,10 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 			throws IOException, ElkException {
 		writer.write("TAXONOMY DIFF:\n");
 		Diff.writeDiff(
-				new ClassTaxonomyTestOutput(
+				new ElkClassTaxonomyTestOutput(
 						correctReasoner.getTaxonomyQuietly()),
-				new ClassTaxonomyTestOutput(testReasoner.getTaxonomyQuietly()),
+				new ElkClassTaxonomyTestOutput(
+						testReasoner.getTaxonomyQuietly()),
 				writer);
 		writer.flush();
 	}
@@ -253,17 +255,18 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 		IncompleteResult<? extends Taxonomy<ElkClass>> taxonomy = reasoner
 				.getTaxonomyQuietly();
 		writer.append("CLASS TAXONOMY");
-		if (!taxonomy.isComplete()) {
+		if (taxonomy.getIncompletenessMonitor().isIncompletenessDetected()) {
 			writer.append(" (incomplete)");
 		}
-		TaxonomyPrinter.dumpTaxomomy(taxonomy.getValue(), writer, false);
+		TaxonomyPrinter.dumpTaxomomy(TestIncompleteness.getValue(taxonomy),
+				writer, false);
 		writer.flush();
 	}
 
 	@SuppressWarnings("static-method")
 	protected String getResultHash(Reasoner reasoner) throws ElkException {
-		return TaxonomyPrinter
-				.getHashString(reasoner.getTaxonomyQuietly().getValue());
+		return TaxonomyPrinter.getHashString(
+				TestIncompleteness.getValue(reasoner.getTaxonomyQuietly()));
 	}
 
 	private int getInitialChangeSize(int changingAxiomsCount) {

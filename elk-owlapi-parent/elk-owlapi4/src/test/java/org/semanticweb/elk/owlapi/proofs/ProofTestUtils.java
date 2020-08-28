@@ -41,6 +41,9 @@ import org.liveontologies.puli.pinpointing.InterruptMonitor;
 import org.liveontologies.puli.pinpointing.MinimalSubsetCollector;
 import org.liveontologies.puli.pinpointing.MinimalSubsetEnumerators;
 import org.semanticweb.elk.owl.inferences.TestUtils;
+import org.semanticweb.elk.owlapi.ElkProver;
+import org.semanticweb.elk.owlapi.ElkReasoner;
+import org.semanticweb.elk.reasoner.completeness.TestIncompleteness;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -51,7 +54,6 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.RemoveAxiom;
 import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.reasoner.Node;
-import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 /**
  * TODO this is adapted from {@link TestUtils}, see if we can get rid of
@@ -84,10 +86,10 @@ public class ProofTestUtils {
 	}
 
 	public static void visitAllSubsumptionsForProofTests(
-			final OWLReasoner reasoner, final OWLDataFactory factory,
+			final ElkReasoner reasoner, final OWLDataFactory factory,
 			final ProofTestVisitor visitor) {
 
-		if (!reasoner.isConsistent()) {
+		if (!TestIncompleteness.getValue(reasoner.checkIsConsistent())) {
 			visitor.visit(factory.getOWLThing(), factory.getOWLNothing());
 			return;
 		}
@@ -95,8 +97,9 @@ public class ProofTestUtils {
 		Set<Node<OWLClass>> visited = new HashSet<Node<OWLClass>>();
 		Queue<Node<OWLClass>> toDo = new LinkedList<Node<OWLClass>>();
 
-		toDo.add(reasoner.getTopClassNode());
-		visited.add(reasoner.getTopClassNode());
+		toDo.add(TestIncompleteness.getValue(reasoner.computeTopClassNode()));
+		visited.add(
+				TestIncompleteness.getValue(reasoner.computeTopClassNode()));
 
 		for (;;) {
 			Node<OWLClass> nextNode = toDo.poll();
@@ -134,16 +137,17 @@ public class ProofTestUtils {
 				}
 			}
 			// go one level down
-			for (Node<OWLClass> subNode : reasoner
-					.getSubClasses(nextNode.getRepresentativeElement(), true)) {
+			for (Node<OWLClass> subNode : TestIncompleteness
+					.getValue(reasoner.computeSubClasses(
+							nextNode.getRepresentativeElement(), true))) {
 				if (visited.add(subNode)) {
 					toDo.add(subNode);
 				}
 			}
 
 			for (OWLClass sup : nextNode.getEntities()) {
-				for (Node<OWLClass> subNode : reasoner.getSubClasses(sup,
-						true)) {
+				for (Node<OWLClass> subNode : TestIncompleteness
+						.getValue(reasoner.computeSubClasses(sup, true))) {
 					if (subNode.isBottomNode())
 						continue;
 					for (OWLClass sub : subNode.getEntitiesMinusBottom()) {
@@ -156,12 +160,12 @@ public class ProofTestUtils {
 		}
 	}
 
-	public static void proofCompletenessTest(final OWLProver prover,
+	public static void proofCompletenessTest(final ElkProver prover,
 			final OWLAxiom conclusion) {
 		proofCompletenessTest(prover, conclusion, false);
 	}
 
-	public static void proofCompletenessTest(final OWLProver prover,
+	public static void proofCompletenessTest(final ElkProver prover,
 			final OWLAxiom conclusion, final boolean mustNotBeATautology) {
 		final OWLOntology ontology = prover.getRootOntology();
 		Proof<Inference<OWLAxiom>> proof = Proofs.removeAssertedInferences(
@@ -169,25 +173,25 @@ public class ProofTestUtils {
 				ontology.getAxioms(Imports.INCLUDED));
 		final InferenceJustifier<Inference<OWLAxiom>, ? extends Set<? extends OWLAxiom>> justifier = InferenceJustifiers
 				.justifyAssertedInferences();
-		proofCompletenessTest(prover, conclusion, conclusion, proof, justifier,
-				mustNotBeATautology);
+		proofCompletenessTest(prover.getDelegate(), conclusion, conclusion,
+				proof, justifier, mustNotBeATautology);
 	}
 
 	public static <I extends Inference<?>> void proofCompletenessTest(
-			final OWLProver prover, final OWLAxiom entailment,
+			final ElkReasoner reasoner, final OWLAxiom entailment,
 			final Object conclusion, final Proof<? extends I> proof,
 			final InferenceJustifier<? super I, ? extends Set<? extends OWLAxiom>> justifier) {
-		proofCompletenessTest(prover, entailment, conclusion, proof, justifier,
-				false);
+		proofCompletenessTest(reasoner, entailment, conclusion, proof,
+				justifier, false);
 	}
 
 	public static <I extends Inference<?>> void proofCompletenessTest(
-			final OWLProver prover, final OWLAxiom entailment,
+			final ElkReasoner reasoner, final OWLAxiom entailment,
 			final Object conclusion, final Proof<? extends I> proof,
 			final InferenceJustifier<? super I, ? extends Set<? extends OWLAxiom>> justifier,
 			final boolean mustNotBeATautology) {
 
-		final OWLOntology ontology = prover.getRootOntology();
+		final OWLOntology ontology = reasoner.getRootOntology();
 		final OWLOntologyManager manager = ontology.getOWLOntologyManager();
 
 		// compute repairs
@@ -213,7 +217,8 @@ public class ProofTestUtils {
 
 			manager.applyChanges(deletions);
 
-			final boolean conclusionDerived = prover.isEntailed(entailment);
+			final boolean conclusionDerived = TestIncompleteness
+					.getValue(reasoner.checkEntailment(entailment));
 
 			manager.applyChanges(additions);
 

@@ -49,21 +49,17 @@ public class ElkIncrementalClassExpressionSubClassesQueryTest extends
 					@Override
 					public ElkDirectSubClassesTestOutput getExpectedOutput()
 							throws Exception {
-						ElkClassExpression query = manifest.getInput()
-								.getQuery();
-						return new ElkDirectSubClassesTestOutput(query,
-								getStandardReasoner()
-										.getSubClassesQuietly(query, true));
+						return new ElkDirectSubClassesTestOutput(
+								getStandardReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override
 					public ElkDirectSubClassesTestOutput getActualOutput()
 							throws Exception {
-						ElkClassExpression query = manifest.getInput()
-								.getQuery();
-						return new ElkDirectSubClassesTestOutput(query,
-								getIncrementalReasoner()
-										.getSubClassesQuietly(query, true));
+						return new ElkDirectSubClassesTestOutput(
+								getIncrementalReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override

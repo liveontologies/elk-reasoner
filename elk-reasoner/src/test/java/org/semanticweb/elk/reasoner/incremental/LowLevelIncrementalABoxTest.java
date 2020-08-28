@@ -39,6 +39,7 @@ import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
+import org.semanticweb.elk.reasoner.completeness.Incompleteness;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 
 /**
@@ -77,7 +78,8 @@ public class LowLevelIncrementalABoxTest {
 
 		loader.add(axiInstA).add(axASubB).add(axCSubB);
 
-		taxonomy = reasoner.getInstanceTaxonomyQuietly().getValue();
+		taxonomy = Incompleteness
+				.getValue(reasoner.getInstanceTaxonomyQuietly());
 
 		// Writer writer = new OutputStreamWriter(System.out);
 
@@ -92,7 +94,8 @@ public class LowLevelIncrementalABoxTest {
 		// changeLoader.clear();
 		changeLoader.remove(axASubB);
 
-		taxonomy = reasoner.getInstanceTaxonomyQuietly().getValue();
+		taxonomy = Incompleteness
+				.getValue(reasoner.getInstanceTaxonomyQuietly());
 
 		// TaxonomyPrinter.dumpInstanceTaxomomy(taxonomy, writer, false);
 		// writer.flush();
@@ -220,6 +223,6 @@ public class LowLevelIncrementalABoxTest {
 
 	InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomy()
 			throws ElkException {
-		return reasoner.getInstanceTaxonomyQuietly().getValue();
+		return Incompleteness.getValue(reasoner.getInstanceTaxonomyQuietly());
 	}
 }

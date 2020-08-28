@@ -37,6 +37,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
+import org.semanticweb.elk.reasoner.completeness.TestIncompleteness;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 
 public class ComplexClassQueryTest {
@@ -160,24 +161,27 @@ public class ComplexClassQueryTest {
 	}
 
 	boolean isSatisfiable(ElkClassExpression expression) throws ElkException {
-		return reasoner.isSatisfiable(expression).getValue();
+		return TestIncompleteness.getValue(reasoner.isSatisfiable(expression));
 	}
 
 	Set<? extends Node<ElkClass>> getSuperClasses(
 			ElkClassExpression classExpression, boolean direct)
 			throws ElkException {
-		return reasoner.getSuperClasses(classExpression, direct).getValue();
+		return TestIncompleteness
+				.getValue(reasoner.getSuperClasses(classExpression, direct));
 	}
 
 	Set<? extends Node<ElkClass>> getSubClasses(
 			ElkClassExpression classExpression, boolean direct)
 			throws ElkException {
-		return reasoner.getSubClasses(classExpression, direct).getValue();
+		return TestIncompleteness
+				.getValue(reasoner.getSubClasses(classExpression, direct));
 	}
 
 	Node<ElkClass> getEquivalentClasses(ElkClassExpression classExpression)
 			throws ElkException {
-		return reasoner.getEquivalentClasses(classExpression).getValue();
+		return TestIncompleteness
+				.getValue(reasoner.getEquivalentClasses(classExpression));
 	}
 
 }

@@ -23,8 +23,11 @@ package org.semanticweb.elk.reasoner.query;
 
 import java.util.Map;
 
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.completeness.IncompleteResult;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 
@@ -38,13 +41,18 @@ public class ElkEquivalentClassesTestOutput extends
 		EquivalentEntitiesTestOutput<ElkClass, ElkEquivalentClassesTestOutput> {
 
 	public ElkEquivalentClassesTestOutput(
-			IncompleteResult<? extends Node<ElkClass>> equivalent) {
-		super(equivalent);
+			IncompleteResult<? extends Node<ElkClass>> incompleteMembers) {
+		super(incompleteMembers.map(n -> toMap(n)));
 	}
 
 	public ElkEquivalentClassesTestOutput(
-			Map<ElkIri, ? extends ElkClass> members, boolean isComplete) {
-		super(members, isComplete);
+			Map<ElkIri, ? extends ElkClass> members) {
+		super(members);
+	}
+
+	public ElkEquivalentClassesTestOutput(Reasoner reasoner,
+			ElkClassExpression query) throws ElkException {
+		this(reasoner.getEquivalentClassesQuitely(query));
 	}
 
 }

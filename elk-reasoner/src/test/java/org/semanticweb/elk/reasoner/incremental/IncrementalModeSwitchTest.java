@@ -47,6 +47,7 @@ import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
+import org.semanticweb.elk.reasoner.completeness.Incompleteness;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
 /**
@@ -72,8 +73,8 @@ public class IncrementalModeSwitchTest {
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
 		ElkClass C = objectFactory.getClass(new ElkFullIri(":C"));
 		ElkClass D = objectFactory.getClass(new ElkFullIri(":D"));
-		ElkObjectProperty R = objectFactory.getObjectProperty(new ElkFullIri(
-				":R"));
+		ElkObjectProperty R = objectFactory
+				.getObjectProperty(new ElkFullIri(":R"));
 		ElkAxiom axASubRB = objectFactory.getSubClassOfAxiom(A,
 				objectFactory.getObjectSomeValuesFrom(R, B));
 		ElkAxiom axBSubRC = objectFactory.getSubClassOfAxiom(B,
@@ -84,7 +85,8 @@ public class IncrementalModeSwitchTest {
 
 		loader.add(axASubRB).add(axBSubRC).add(axRCSubD);
 
-		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomyQuietly().getValue();
+		Taxonomy<ElkClass> taxonomy = Incompleteness
+				.getValue(reasoner.getTaxonomyQuietly());
 
 		assertFalse(taxonomy.getNode(A).getAllSuperNodes()
 				.contains(taxonomy.getNode(D)));
@@ -95,7 +97,7 @@ public class IncrementalModeSwitchTest {
 
 		changeLoader.add(axTransR);
 
-		taxonomy = reasoner.getTaxonomyQuietly().getValue();
+		taxonomy = Incompleteness.getValue(reasoner.getTaxonomyQuietly());
 		// Now A should be a subclass of D since R is transitive
 		assertTrue(taxonomy.getNode(A).getAllSuperNodes()
 				.contains(taxonomy.getNode(D)));
@@ -125,10 +127,10 @@ public class IncrementalModeSwitchTest {
 			initialLoader.add(axiom);
 		}
 
-		assertFalse(reasoner.isInconsistent());
+		assertFalse(Incompleteness.getValue(reasoner.isInconsistent()));
 		reasoner.getTaxonomy();
 
-//		System.out.println("===========================================");
+		// System.out.println("===========================================");
 
 		reasoner.setAllowIncrementalMode(true);
 
@@ -139,11 +141,11 @@ public class IncrementalModeSwitchTest {
 			changeLoader.add(add);
 		}
 
-		assertTrue(reasoner.isInconsistent());
+		assertTrue(Incompleteness.getValue(reasoner.isInconsistent()));
 	}
 
-	private List<ElkAxiom> loadAxioms(Reader reader) throws IOException,
-			Owl2ParseException {
+	private List<ElkAxiom> loadAxioms(Reader reader)
+			throws IOException, Owl2ParseException {
 		Owl2Parser parser = new Owl2FunctionalStyleParserFactory()
 				.getParser(reader);
 		final List<ElkAxiom> axioms = new ArrayList<ElkAxiom>();

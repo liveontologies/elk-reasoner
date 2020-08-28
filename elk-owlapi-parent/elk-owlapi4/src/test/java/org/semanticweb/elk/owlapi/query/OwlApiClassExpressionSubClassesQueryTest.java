@@ -43,9 +43,7 @@ import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifestWithOutput;
 import org.semanticweb.elk.testing.TestUtils;
-import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.ReasonerInterruptedException;
 
 @RunWith(PolySuite.class)
@@ -78,12 +76,8 @@ public class OwlApiClassExpressionSubClassesQueryTest extends
 					@Override
 					public OwlDirectSubClassesTestOutput getActualOutput()
 							throws Exception {
-						OWLClassExpression query = manifest.getInput()
-								.getQuery();
-						final NodeSet<OWLClass> subNodes = getReasoner()
-								.getSubClasses(query, true);
-						return new OwlDirectSubClassesTestOutput(query,
-								subNodes.getNodes(), true);
+						return new OwlDirectSubClassesTestOutput(getReasoner(),
+								manifest.getInput().getQuery());
 					}
 
 					@Override

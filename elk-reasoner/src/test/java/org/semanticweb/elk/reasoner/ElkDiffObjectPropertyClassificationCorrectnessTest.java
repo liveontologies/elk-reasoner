@@ -29,15 +29,15 @@ public class ElkDiffObjectPropertyClassificationCorrectnessTest
 		extends BaseObjectPropertyClassificationCorrectnessTest {
 
 	public ElkDiffObjectPropertyClassificationCorrectnessTest(
-			final ReasoningTestManifest<ObjectPropertyTaxonomyTestOutput> testManifest) {
+			final ReasoningTestManifest<ElkObjectPropertyTaxonomyTestOutput> testManifest) {
 		super(testManifest,
-				new ElkReasoningTestDelegate<ObjectPropertyTaxonomyTestOutput>(
+				new ElkReasoningTestDelegate<ElkObjectPropertyTaxonomyTestOutput>(
 						testManifest) {
 
 					@Override
-					public ObjectPropertyTaxonomyTestOutput getActualOutput()
+					public ElkObjectPropertyTaxonomyTestOutput getActualOutput()
 							throws Exception {
-						return new ObjectPropertyTaxonomyTestOutput(
+						return new ElkObjectPropertyTaxonomyTestOutput(
 								getReasoner()
 										.getObjectPropertyTaxonomyQuietly());
 					}

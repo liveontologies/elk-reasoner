@@ -56,11 +56,11 @@ import org.semanticweb.elk.testing.UrlTestInput;
  */
 @RunWith(PolySuite.class)
 public abstract class BaseClassificationCorrectnessTest extends
-		ReasoningCorrectnessTestWithInterrupts<UrlTestInput, ClassTaxonomyTestOutput, ReasoningTestManifest<ClassTaxonomyTestOutput>, ReasoningTestWithOutputAndInterruptsDelegate<ClassTaxonomyTestOutput>> {
+		ReasoningCorrectnessTestWithInterrupts<UrlTestInput, ElkClassTaxonomyTestOutput, ReasoningTestManifest<ElkClassTaxonomyTestOutput>, ReasoningTestWithOutputAndInterruptsDelegate<ElkClassTaxonomyTestOutput>> {
 
 	public BaseClassificationCorrectnessTest(
-			final ReasoningTestManifest<ClassTaxonomyTestOutput> testManifest,
-			final ReasoningTestWithOutputAndInterruptsDelegate<ClassTaxonomyTestOutput> testDelegate) {
+			final ReasoningTestManifest<ElkClassTaxonomyTestOutput> testManifest,
+			final ReasoningTestWithOutputAndInterruptsDelegate<ElkClassTaxonomyTestOutput> testDelegate) {
 		super(testManifest, testDelegate);
 	}
 
@@ -70,9 +70,9 @@ public abstract class BaseClassificationCorrectnessTest extends
 		return ConfigurationUtils.loadFileBasedTestConfiguration(
 				ElkTestUtils.TEST_INPUT_LOCATION,
 				BaseClassificationCorrectnessTest.class,
-				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<UrlTestInput, ClassTaxonomyTestOutput>>() {
+				new ConfigurationUtils.ManifestCreator<TestManifestWithOutput<UrlTestInput, ElkClassTaxonomyTestOutput>>() {
 					@Override
-					public Collection<? extends TestManifestWithOutput<UrlTestInput, ClassTaxonomyTestOutput>> createManifests(
+					public Collection<? extends TestManifestWithOutput<UrlTestInput, ElkClassTaxonomyTestOutput>> createManifests(
 							final String name, final List<URL> urls)
 							throws IOException {
 
@@ -96,10 +96,10 @@ public abstract class BaseClassificationCorrectnessTest extends
 															.getParser(stream));
 
 							return Collections.singleton(
-									new ReasoningTestManifest<ClassTaxonomyTestOutput>(
+									new ReasoningTestManifest<ElkClassTaxonomyTestOutput>(
 											name, urls.get(0),
-											new ClassTaxonomyTestOutput(
-													expectedTaxonomy, true)));
+											new ElkClassTaxonomyTestOutput(
+													expectedTaxonomy)));
 
 						} catch (Owl2ParseException e) {
 							throw new IOException(e);

@@ -71,8 +71,7 @@ public class OwlInternalProofTest {
 	private OWLAxiom query_ = null;
 	private OwlInternalProof adapter_ = null;
 
-	public OwlInternalProofTest(
-			final QueryTestManifest<OWLAxiom, ?> manifest) {
+	public OwlInternalProofTest(final QueryTestManifest<OWLAxiom, ?> manifest) {
 		this.manifest_ = manifest;
 	}
 
@@ -88,8 +87,10 @@ public class OwlInternalProofTest {
 		this.prover_ = OWLAPITestUtils.createProver(ontology);
 
 		this.query_ = manifest_.getInput().getQuery();
-		
-		Assume.assumeTrue(prover_.isEntailed(query_)); // excludes incomplete entailments
+
+		// exclude incomplete entailments
+		Assume.assumeTrue(!prover_.getDelegate().checkEntailment(query_)
+				.getIncompletenessMonitor().isIncompletenessDetected());
 		this.adapter_ = new OwlInternalProof(
 				prover_.getDelegate().getInternalReasoner(), query_);
 	}
@@ -103,7 +104,7 @@ public class OwlInternalProofTest {
 	public void testProofCompleteness() throws Exception {
 		Assume.assumeFalse(TestUtils.ignore(manifest_.getInput(),
 				ElkTestUtils.TEST_INPUT_LOCATION, IGNORE_COMPLETENESS_LIST));
-		ProofTestUtils.proofCompletenessTest(prover_, query_,
+		ProofTestUtils.proofCompletenessTest(prover_.getDelegate(), query_,
 				adapter_.getGoal(), adapter_, new OwlInternalJustifier(), true);
 	}
 

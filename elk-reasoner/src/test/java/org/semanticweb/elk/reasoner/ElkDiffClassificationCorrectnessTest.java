@@ -31,15 +31,15 @@ public class ElkDiffClassificationCorrectnessTest
 		extends BaseClassificationCorrectnessTest {
 
 	public ElkDiffClassificationCorrectnessTest(
-			final ReasoningTestManifest<ClassTaxonomyTestOutput> testManifest) {
+			final ReasoningTestManifest<ElkClassTaxonomyTestOutput> testManifest) {
 		super(testManifest,
-				new ElkReasoningTestDelegate<ClassTaxonomyTestOutput>(
+				new ElkReasoningTestDelegate<ElkClassTaxonomyTestOutput>(
 						testManifest) {
 
 					@Override
-					public ClassTaxonomyTestOutput getActualOutput()
+					public ElkClassTaxonomyTestOutput getActualOutput()
 							throws Exception {
-						return new ClassTaxonomyTestOutput(
+						return new ElkClassTaxonomyTestOutput(
 								getReasoner().getTaxonomyQuietly());
 					}
 

@@ -24,34 +24,45 @@ package org.semanticweb.elk.owlapi.query;
 
 import java.util.Collection;
 
+import org.semanticweb.elk.reasoner.completeness.IncompleteResult;
+import org.semanticweb.elk.reasoner.completeness.IncompleteTestOutput;
 import org.semanticweb.elk.testing.DiffableOutput;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.reasoner.Node;
 
 public abstract class OwlDirectRelatedEntitiesTestOutput<E extends OWLEntity, O extends OwlDirectRelatedEntitiesTestOutput<E, O>>
+		extends IncompleteTestOutput<Collection<? extends Node<E>>>
 		implements DiffableOutput<OWLAxiom, O> {
 
 	private final ThisOwlDirectRelatedEntitiesDiffable<E> diffable_;
 
 	OwlDirectRelatedEntitiesTestOutput(
-			Collection<? extends Node<E>> disjointNodes, boolean isComplete) {
+			IncompleteResult<? extends Collection<? extends Node<E>>> incompleteDisjointNodes) {
+		super(incompleteDisjointNodes);
 		this.diffable_ = new ThisOwlDirectRelatedEntitiesDiffable<>(
-				disjointNodes, isComplete);
+				incompleteDisjointNodes);
 	}
 
-	ThisOwlDirectRelatedEntitiesDiffable<E> getOutput() {
+	OwlDirectRelatedEntitiesTestOutput(
+			Collection<? extends Node<E>> disjointNodes) {
+		super(disjointNodes);
+		this.diffable_ = new ThisOwlDirectRelatedEntitiesDiffable<>(
+				disjointNodes);
+	}
+
+	ThisOwlDirectRelatedEntitiesDiffable<E> getDiffable() {
 		return this.diffable_;
 	}
 
 	@Override
 	public boolean containsAllElementsOf(O other) {
-		return diffable_.containsAllElementsOf(other.getOutput());
+		return diffable_.containsAllElementsOf(other.getDiffable());
 	}
 
 	@Override
 	public void reportMissingElementsOf(O other, Listener<OWLAxiom> listener) {
-		diffable_.reportMissingElementsOf(other.getOutput(),
+		diffable_.reportMissingElementsOf(other.getDiffable(),
 				adaptListener(listener));
 	}
 
@@ -63,9 +74,13 @@ public abstract class OwlDirectRelatedEntitiesTestOutput<E extends OWLEntity, O 
 			OwlDirectRelatedEntitiesDiffable<E, ThisOwlDirectRelatedEntitiesDiffable<E>> {
 
 		ThisOwlDirectRelatedEntitiesDiffable(
-				Collection<? extends Node<E>> disjointNodes,
-				boolean isComplete) {
-			super(disjointNodes, isComplete);
+				IncompleteResult<? extends Collection<? extends Node<E>>> incompleteDisjointNodes) {
+			super(incompleteDisjointNodes);
+		}
+
+		ThisOwlDirectRelatedEntitiesDiffable(
+				Collection<? extends Node<E>> disjointNodes) {
+			super(disjointNodes);
 		}
 	}
 

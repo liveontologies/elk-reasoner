@@ -22,8 +22,8 @@
 package org.semanticweb.elk.owlapi.query;
 
 import org.semanticweb.elk.owlapi.ElkReasoner;
-import org.semanticweb.elk.reasoner.completeness.IncompletenessMonitor;
-import org.semanticweb.elk.reasoner.completeness.ReasoningResult;
+import org.semanticweb.elk.reasoner.completeness.IncompleteResult;
+import org.semanticweb.elk.reasoner.completeness.IncompleteTestOutput;
 import org.semanticweb.elk.reasoner.query.IncompleteEntailmentTestOutput;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
@@ -35,33 +35,41 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 public class OwlEntailmentQueryTestOutput extends
 		IncompleteEntailmentTestOutput<OWLAxiom, OwlEntailmentQueryTestOutput> {
 
-	public OwlEntailmentQueryTestOutput(OWLAxiom query,
-			boolean entailmentProved, boolean entailmentDisproved) {
-		if (entailmentProved) {
+	public OwlEntailmentQueryTestOutput(OWLAxiom query, boolean isEntailed,
+			boolean isComplete) {
+		if (isEntailed) {
 			addPositiveEntailment(query);
-		}
-		if (entailmentDisproved) {
+		} else if (isComplete) {
 			addNegativeEntailment(query);
 		}
 	}
 
-	public OwlEntailmentQueryTestOutput(OWLAxiom query, boolean isEntailed) {
-		this(query, isEntailed, !isEntailed);
-	}
-
-	public OwlEntailmentQueryTestOutput(OWLAxiom query, boolean isEntailed,
-			IncompletenessMonitor monitor) {
-		this(query, isEntailed,
-				!isEntailed && !monitor.isIncompletenessDetected());
+	public OwlEntailmentQueryTestOutput(OWLAxiom query,
+			ThisEntailmentTestOutput isEntailed) {
+		this(query, isEntailed.getValue(), isEntailed.isComplete());
 	}
 
 	public OwlEntailmentQueryTestOutput(OWLAxiom query,
-			ReasoningResult<Boolean> result) {
-		this(query, result.getValue(), result.geIncompletenessMonitor());
+			IncompleteResult<Boolean> isEntailed) {
+		this(query, new ThisEntailmentTestOutput(isEntailed));
 	}
 
 	public OwlEntailmentQueryTestOutput(ElkReasoner reasoner, OWLAxiom query) {
 		this(query, reasoner.checkEntailment(query));
+	}
+
+	static class ThisEntailmentTestOutput
+			extends IncompleteTestOutput<Boolean> {
+
+		public ThisEntailmentTestOutput(
+				IncompleteResult<Boolean> incompleteOutput) {
+			super(incompleteOutput);
+		}
+
+		public ThisEntailmentTestOutput(Boolean output) {
+			super(output);
+		}
+
 	}
 
 }

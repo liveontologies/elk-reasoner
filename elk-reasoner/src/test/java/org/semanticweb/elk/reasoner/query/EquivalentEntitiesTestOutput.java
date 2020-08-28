@@ -21,13 +21,13 @@
  */
 package org.semanticweb.elk.reasoner.query;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.reasoner.completeness.IncompleteResult;
+import org.semanticweb.elk.reasoner.completeness.IncompleteTestOutput;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.testing.DiffableOutput;
 
@@ -44,45 +44,24 @@ import org.semanticweb.elk.testing.DiffableOutput;
  *            inclusions
  */
 public class EquivalentEntitiesTestOutput<E extends ElkEntity, O extends EquivalentEntitiesTestOutput<E, O>>
+		extends IncompleteTestOutput<Map<ElkIri, ? extends E>>
 		implements DiffableOutput<E, O> {
 
-	private final Map<ElkIri, ? extends E> members_;
-
-	private final boolean isComplete_;
-
-	public EquivalentEntitiesTestOutput(Map<ElkIri, ? extends E> members,
-			boolean isComplete) {
-		this.members_ = members;
-		this.isComplete_ = isComplete;
-	}
-
-	public EquivalentEntitiesTestOutput(Iterable<? extends E> equivalent,
-			int sizeEstimate, boolean isComplete) {
-		Map<ElkIri, E> members = new HashMap<>(sizeEstimate);
-		members_ = members;
-		for (E member : equivalent) {
-			members.put(member.getIri(), member);
-		}
-		this.isComplete_ = isComplete;
-	}
-
-	public EquivalentEntitiesTestOutput(Collection<? extends E> equivalent,
-			boolean isComplete) {
-		this(equivalent, equivalent.size(), isComplete);
-	}
-
 	public EquivalentEntitiesTestOutput(
-			IncompleteResult<? extends Node<? extends E>> equivalent) {
-		this(equivalent.getValue(), equivalent.getValue().size(),
-				equivalent.isComplete());
+			IncompleteResult<? extends Map<ElkIri, ? extends E>> incompleteMembers) {
+		super(incompleteMembers);
 	}
 
-	Map<ElkIri, ? extends E> getMembers() {
-		return this.members_;
+	public EquivalentEntitiesTestOutput(Map<ElkIri, ? extends E> members) {
+		super(members);
 	}
 
-	boolean isComplete() {
-		return isComplete_;
+	static <E extends ElkEntity> Map<ElkIri, E> toMap(Node<? extends E> node) {
+		Map<ElkIri, E> result = new HashMap<>(node.size());
+		for (E member : node) {
+			result.put(member.getIri(), member);
+		}
+		return result;
 	}
 
 	@Override
@@ -90,8 +69,8 @@ public class EquivalentEntitiesTestOutput<E extends ElkEntity, O extends Equival
 		if (!isComplete()) {
 			return true;
 		}
-		for (ElkIri otherMember : other.getMembers().keySet()) {
-			if (!members_.containsKey(otherMember)) {
+		for (ElkIri otherMember : other.getValue().keySet()) {
+			if (!getValue().containsKey(otherMember)) {
 				return false;
 			}
 		}
@@ -104,9 +83,9 @@ public class EquivalentEntitiesTestOutput<E extends ElkEntity, O extends Equival
 		if (!isComplete()) {
 			return;
 		}
-		for (ElkIri otherMember : other.getMembers().keySet()) {
-			if (!members_.containsKey(otherMember)) {
-				listener.missing(other.getMembers().get(otherMember));
+		for (ElkIri otherMember : other.getValue().keySet()) {
+			if (!getValue().containsKey(otherMember)) {
+				listener.missing(other.getValue().get(otherMember));
 			}
 		}
 	}

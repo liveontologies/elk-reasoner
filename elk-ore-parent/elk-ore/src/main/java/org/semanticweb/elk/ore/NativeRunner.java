@@ -36,6 +36,7 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
+import org.semanticweb.elk.reasoner.completeness.Incompleteness;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
@@ -120,8 +121,8 @@ public class NativeRunner {
 
 			switch (task) {
 			case CLASSIFICATION:
-				Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomyQuietly()
-						.getValue();
+				Taxonomy<ElkClass> taxonomy = Incompleteness
+						.getValue(reasoner.getTaxonomyQuietly());
 
 				printTime(ts);
 				printedTime = true;
@@ -130,8 +131,8 @@ public class NativeRunner {
 
 				break;
 			case REALISATION:
-				InstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy = reasoner
-						.getInstanceTaxonomyQuietly().getValue();
+				InstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy = Incompleteness
+						.getValue(reasoner.getInstanceTaxonomyQuietly());
 
 				printTime(ts);
 				printedTime = true;
@@ -140,7 +141,8 @@ public class NativeRunner {
 
 				break;
 			case CONSISTENCY:
-				boolean isConsistent = reasoner.isInconsistent();
+				boolean isConsistent = Incompleteness
+						.getValue(reasoner.isInconsistent());
 
 				printTime(ts);
 				printedTime = true;

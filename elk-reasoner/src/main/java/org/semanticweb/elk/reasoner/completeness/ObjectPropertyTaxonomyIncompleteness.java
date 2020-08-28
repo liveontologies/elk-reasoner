@@ -1,7 +1,5 @@
 package org.semanticweb.elk.reasoner.completeness;
 
-import java.util.ArrayList;
-
 /*-
  * #%L
  * ELK Reasoner Core
@@ -26,10 +24,7 @@ import java.util.ArrayList;
 
 import java.util.Collection;
 
-import org.slf4j.Logger;
-
-public class PropertyTaxonomyIncompletenessMonitor
-		extends CombinedIncompletenessMonitor {
+class ObjectPropertyTaxonomyIncompleteness {
 
 	private static final Feature[] UNSUPPORTED_FEATURES_ = {
 			// supported features that may cause unsatisfiability of properties
@@ -46,42 +41,17 @@ public class PropertyTaxonomyIncompletenessMonitor
 					Feature.OBJECT_PROPERTY_CHAIN } };
 
 	static Collection<IncompletenessMonitor> appendMonitors(
-			OntologySatisfiabilityIncompletenessMonitor ontologySatisfiabilityMonitor) {
-		OccurrenceManager occurrences = ontologySatisfiabilityMonitor
-				.getOccurrencesInOntology();
-		Collection<IncompletenessMonitor> monitors = new ArrayList<>();
-		monitors.add(ontologySatisfiabilityMonitor);
+			Collection<IncompletenessMonitor> monitors,
+			OccurrenceManager occurrencesInOntology) {
 		for (Feature feature : UNSUPPORTED_FEATURES_) {
-			monitors.add(new IncompletenessDueToUnsupportedFeatures(occurrences,
-					feature));
+			monitors.add(new IncompletenessDueToUnsupportedFeatures(
+					occurrencesInOntology, feature));
 		}
 		for (Feature[] combination : UNSUPPORTED_COMBINATIONS_OF_FEATURES_) {
-			monitors.add(new IncompletenessDueToUnsupportedFeatures(occurrences,
-					combination));
+			monitors.add(new IncompletenessDueToUnsupportedFeatures(
+					occurrencesInOntology, combination));
 		}
 		return monitors;
-	}
-
-	private final OntologySatisfiabilityIncompletenessMonitor ontologySatisfiabilityMonitor_;
-
-	public PropertyTaxonomyIncompletenessMonitor(
-			OntologySatisfiabilityIncompletenessMonitor ontologySatisfiabilityMonitor) {
-		super(appendMonitors(ontologySatisfiabilityMonitor));
-		this.ontologySatisfiabilityMonitor_ = ontologySatisfiabilityMonitor;
-	}
-
-	public boolean checkCompleteness(Logger logger) {
-		if (!ontologySatisfiabilityMonitor_.checkCompleteness(logger)) {
-			// ontology can be already unsatisfiable
-			return false;
-		}
-		// else
-		if (hasNewExplanation()) {
-			logger.warn(
-					"Object property reasoning may be incomplete! See INFO for more details.");
-			explainIncompleteness(logger);
-		}
-		return !isIncompletenessDetected();
 	}
 
 }

@@ -34,6 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.InstanceTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.completeness.IncompleteResult;
+import org.semanticweb.elk.reasoner.completeness.TestIncompleteness;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.testing.Diff;
@@ -54,17 +55,12 @@ public class RandomWalkIncrementalRealizationRunner<T>
 	}
 
 	@Override
-	@SuppressWarnings("static-method")
 	protected void writeResultDiff(Reasoner correctReasoner,
 			Reasoner testReasoner, Writer writer)
 			throws IOException, ElkException {
 		writer.write("TAXONOMY DIFF:\n");
-		Diff.writeDiff(
-				new InstanceTaxonomyTestOutput(
-						correctReasoner.getInstanceTaxonomyQuietly()),
-				new InstanceTaxonomyTestOutput(
-						testReasoner.getInstanceTaxonomyQuietly()),
-				writer);
+		Diff.writeDiff(new InstanceTaxonomyTestOutput(correctReasoner),
+				new InstanceTaxonomyTestOutput(testReasoner), writer);
 		writer.flush();
 	}
 
@@ -75,18 +71,18 @@ public class RandomWalkIncrementalRealizationRunner<T>
 		IncompleteResult<? extends InstanceTaxonomy<ElkClass, ElkNamedIndividual>> taxonomy = reasoner
 				.getInstanceTaxonomyQuietly();
 		writer.append("INSTANCE TAXONOMY");
-		if (!taxonomy.isComplete()) {
+		if (taxonomy.getIncompletenessMonitor().isIncompletenessDetected()) {
 			writer.append(" (incomplete)");
 		}
-		TaxonomyPrinter.dumpInstanceTaxomomy(taxonomy.getValue(), writer,
-				false);
+		TaxonomyPrinter.dumpInstanceTaxomomy(
+				TestIncompleteness.getValue(taxonomy), writer, false);
 		writer.flush();
 	}
 
 	@Override
 	protected String getResultHash(Reasoner reasoner) throws ElkException {
-		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = reasoner
-				.getInstanceTaxonomyQuietly().getValue();
+		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = TestIncompleteness
+				.getValue(reasoner.getInstanceTaxonomyQuietly());
 
 		return TaxonomyPrinter.getInstanceHashString(taxonomy);
 	}

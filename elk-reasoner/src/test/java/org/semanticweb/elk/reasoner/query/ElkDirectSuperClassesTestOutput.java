@@ -24,10 +24,12 @@ package org.semanticweb.elk.reasoner.query;
 
 import java.util.Collection;
 
+import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.implementation.ElkObjectBaseFactory;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.completeness.IncompleteResult;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 
@@ -39,15 +41,20 @@ public class ElkDirectSuperClassesTestOutput extends
 	private final ElkClassExpression query_;
 
 	ElkDirectSuperClassesTestOutput(ElkClassExpression query,
-			Collection<? extends Node<ElkClass>> disjointNodes,
-			boolean isComplete) {
-		super(disjointNodes, isComplete);
+			IncompleteResult<? extends Collection<? extends Node<ElkClass>>> incompleteDisjointNodes) {
+		super(incompleteDisjointNodes);
 		this.query_ = query;
 	}
 
 	ElkDirectSuperClassesTestOutput(ElkClassExpression query,
-			IncompleteResult<? extends Collection<? extends Node<ElkClass>>> disjointNodes) {
-		this(query, disjointNodes.getValue(), disjointNodes.isComplete());
+			Collection<? extends Node<ElkClass>> disjointNodes) {
+		super(disjointNodes);
+		this.query_ = query;
+	}
+
+	ElkDirectSuperClassesTestOutput(Reasoner reasoner, ElkClassExpression query)
+			throws ElkException {
+		this(query, reasoner.getSuperClassesQuietly(query, true));
 	}
 
 	@Override
