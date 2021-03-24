@@ -27,11 +27,11 @@ import java.util.Collection;
 
 /**
  * The base {@link IncompletenessMonitor} for checking potential
- * unsatisfiability based on occurrences of {@link Feature}s.
+ * incompleteness based on occurrences of {@link Feature}s.
  * 
  * @author Yevgeny Kazakov
  */
-public class TopIncompletenessMonitor extends CombinedIncompletenessMonitor {
+public class TopIncompletenessMonitor extends SomeOfIncompletenessMonitor {
 
 	private static final Feature[][] UNSUPPORTED_COMBINATIONS_OF_FEATURES_ = {
 			{ Feature.OBJECT_PROPERTY_RANGE,

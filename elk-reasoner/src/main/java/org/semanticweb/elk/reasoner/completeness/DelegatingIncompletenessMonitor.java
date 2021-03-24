@@ -49,13 +49,13 @@ public class DelegatingIncompletenessMonitor implements IncompletenessMonitor {
 	}
 
 	@Override
-	public void explainIncompleteness(Logger logger) {
-		delegate_.explainIncompleteness(logger);
+	public void logStatus(Logger logger) {
+		delegate_.logStatus(logger);
 	}
 
 	@Override
-	public boolean hasNewExplanation() {
-		return delegate_.hasNewExplanation();
+	public boolean isStatusChanged() {
+		return delegate_.isStatusChanged();
 	}
 
 }

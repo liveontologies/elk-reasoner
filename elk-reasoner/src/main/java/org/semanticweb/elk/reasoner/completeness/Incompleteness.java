@@ -29,6 +29,11 @@ import org.semanticweb.elk.reasoner.query.QueryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A collection of helper methods to manage incomplete reasoning results
+ * 
+ * @author Yevgeny Kazakov
+ */
 public class Incompleteness {
 
 	// logger for this class
@@ -45,27 +50,54 @@ public class Incompleteness {
 
 	/**
 	 * @param monitors
-	 * @return an {@link IncompletenessMonitor} consisting of a combination of
-	 *         several other {@link IncompletenessMonitor}s. That is, this
-	 *         monitor detects incompleteness if and only if at least one of the
-	 *         monitors in the combination detects incompleteness.
+	 * @return an {@link IncompletenessMonitor} that monitors several other
+	 *         {@link IncompletenessMonitor}s. and reports incompleteness if
+	 *         some of these monitors report incompleteness. The status messages
+	 *         include information about a bounded number of these monitors.
 	 */
-	public static IncompletenessMonitor combine(
+	public static IncompletenessMonitor someOf(
 			IncompletenessMonitor... monitors) {
-		return new CombinedIncompletenessMonitor(monitors);
+		return new SomeOfIncompletenessMonitor(monitors);
 	}
 
 	/**
 	 * @param monitors
-	 * @return an {@link IncompletenessMonitor} consisting of a combination of
-	 *         several other {@link IncompletenessMonitor}s. That is, this
-	 *         monitor detects incompleteness if and only if at least one of the
-	 *         monitors in the combination detects incompleteness.
-	 * @see #combine(IncompletenessMonitor...)
+	 * @return an {@link IncompletenessMonitor} that monitors several other
+	 *         {@link IncompletenessMonitor}s. and reports incompleteness if
+	 *         some of these monitors report incompleteness. The status messages
+	 *         include information about a bounded number of these monitors.
+	 * @see #someOf(IncompletenessMonitor...)
 	 */
-	public static IncompletenessMonitor combine(
+	public static IncompletenessMonitor someOf(
 			Collection<IncompletenessMonitor> monitors) {
-		return new CombinedIncompletenessMonitor(monitors);
+		return new SomeOfIncompletenessMonitor(monitors);
+	}
+
+	/**
+	 * @param monitors
+	 * @return an {@link IncompletenessMonitor} that monitors several other
+	 *         {@link IncompletenessMonitor}s and reports incompleteness if some
+	 *         of these monitors report incompleteness. The status messages
+	 *         include information of monitors until the first monitor that
+	 *         reports incompleteness.
+	 */
+	public static IncompletenessMonitor firstOf(
+			IncompletenessMonitor... monitors) {
+		return new FirstOfIncompletenessMonitor(monitors);
+	}
+
+	/**
+	 * @param monitors
+	 * @return an {@link IncompletenessMonitor} that monitors several other
+	 *         {@link IncompletenessMonitor}s and reports incompleteness if some
+	 *         of these monitors report incompleteness. The status messages
+	 *         include information of monitors until the first monitor that
+	 *         reports incompleteness.
+	 * @see #firstOf(IncompletenessMonitor...)
+	 */
+	public static IncompletenessMonitor firstOf(
+			Collection<IncompletenessMonitor> monitors) {
+		return new FirstOfIncompletenessMonitor(monitors);
 	}
 
 	/**
@@ -93,7 +125,7 @@ public class Incompleteness {
 			CheckedBiFunction<RA, RB, O, E> fn) throws E {
 		return new IncompleteResult<O>(
 				fn.apply(first.getValue(), second.getValue()),
-				combine(first.getIncompletenessMonitor(),
+				firstOf(first.getIncompletenessMonitor(),
 						second.getIncompletenessMonitor()));
 	}
 
@@ -124,7 +156,7 @@ public class Incompleteness {
 			CheckedTriFunction<RA, RB, RC, O, E> fn) throws E {
 		return new IncompleteResult<O>(
 				fn.apply(first.getValue(), second.getValue(), third.getValue()),
-				combine(first.getIncompletenessMonitor(),
+				firstOf(first.getIncompletenessMonitor(),
 						second.getIncompletenessMonitor(),
 						third.getIncompletenessMonitor()));
 	}
@@ -144,34 +176,31 @@ public class Incompleteness {
 	 * necessary log messages about incompleteness
 	 * 
 	 * @param <R>
-	 *            the type of the values of the result
+	 *                   the type of the values of the result
 	 * @param result
-	 *            the {@link IncompleteResult} whose value should be returned
+	 *                   the {@link IncompleteResult} whose value should be
+	 *                   returned
 	 * @return the value of the given {@link IncompleteResult}
 	 */
 	static public <R> R getValue(IncompleteResult<? extends R> result) {
-		R value = result.getValue();
-		IncompletenessMonitor monitor = result.getIncompletenessMonitor();
-		if (monitor.hasNewExplanation()) {
-			monitor.explainIncompleteness(LOGGER_);
-		}
-		return value;
+		result.getIncompletenessMonitor().logStatus(LOGGER_);
+		return result.getValue();
 	}
 
+	/**
+	 * Returns the entailment value of the given {@link QueryResult} while
+	 * producing the necessary log messages about its incompleteness.
+	 * 
+	 * @param result
+	 *                   the {@link QueryResult} whose entailment to be returned
+	 * @return {@code true} if the entailment was proved and {@code false}
+	 *         otherwise
+	 * @throws ElkQueryException
+	 */
 	static public boolean getValue(QueryResult result)
 			throws ElkQueryException {
-		if (result.entailmentProved()) {
-			return true;
-		}
-		// else check for incompleteness
-		IncompletenessMonitor queryMonitor = result.getIncompletenessMonitor();
-		if (queryMonitor.hasNewExplanation()) {
-			LOGGER_.warn(
-					"Cannot determine entailment of the query {}! See INFO for more details.",
-					result.getQuery());
-			queryMonitor.explainIncompleteness(LOGGER_);
-		}
-		return false;
+		result.getIncompletenessMonitor().logStatus(LOGGER_);
+		return result.entailmentProved();
 	}
 
 }

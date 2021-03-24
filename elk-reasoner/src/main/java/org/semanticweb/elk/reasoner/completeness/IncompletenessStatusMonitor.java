@@ -26,10 +26,10 @@ import org.slf4j.Logger;
 
 /**
  * An {@link IncompletenessMonitor} that keeps track of changes in
- * incompleteness status for a given reasoning task. It only reports changes to
- * the completeness of the reasoning task as warnings, i.e., if the reasoning
- * task was complete but becomes incomplete, or if the reasoning task was
- * incomplete and then becomes complete.
+ * incompleteness status for a given {@link IncompletenessMonitor}. It only
+ * reports changes to the completeness of the reasoning task as warnings, i.e.,
+ * if the reasoning task was complete but becomes incomplete, or if the
+ * reasoning task was incomplete and then becomes complete.
  * 
  * @author Yevgeny Kazakov
  *
@@ -37,33 +37,33 @@ import org.slf4j.Logger;
 public class IncompletenessStatusMonitor
 		extends DelegatingIncompletenessMonitor {
 
-	private final String messageIncomple_, messageComplete_;
-	boolean isIncompletenessDetected_ = false;
+	private final String statusMessage_;
+	private boolean isIncompletenessDetected_ = false;
 
 	public IncompletenessStatusMonitor(IncompletenessMonitor delegate,
-			String messageIncomple, String messageComplete) {
+			String statusMessage) {
 		super(delegate);
-		this.messageIncomple_ = messageIncomple;
-		this.messageComplete_ = messageComplete;
+		this.statusMessage_ = statusMessage;
 	}
 
 	@Override
-	public boolean hasNewExplanation() {
-		return isIncompletenessDetected_ != isIncompletenessDetected();
+	public boolean isStatusChanged() {
+		return isIncompletenessDetected_ != isIncompletenessDetected()
+				|| super.isStatusChanged();
 	}
 
 	@Override
-	public void explainIncompleteness(Logger logger) {
-		if (!hasNewExplanation()) {
+	public void logStatus(Logger logger) {
+		if (!isStatusChanged()) {
 			return;
 		}
 		isIncompletenessDetected_ = isIncompletenessDetected();
-		if (isIncompletenessDetected_ && messageIncomple_ != null) {
-			logger.warn(messageIncomple_);
+		if (isIncompletenessDetected_) {
+			logger.warn(statusMessage_);
 		} else {
-			logger.warn(messageComplete_);
+			logger.warn("[Fixed] " + statusMessage_);
 		}
-		super.explainIncompleteness(logger);
+		super.logStatus(logger);
 	}
 
 }

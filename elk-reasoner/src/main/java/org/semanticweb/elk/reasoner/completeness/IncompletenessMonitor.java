@@ -41,28 +41,22 @@ public interface IncompletenessMonitor {
 	boolean isIncompletenessDetected();
 
 	/**
-	 * Prints log messages explaining incompleteness of the results. The
-	 * messages are incremental, that is, only new explanations not reported
-	 * during the previous call of {@link #explainIncompleteness(Logger)} are
-	 * printed. In particular, if this method is called two times immediately
-	 * after another, then the second call will not produce any messages. Also,
-	 * if {@link #isIncompletenessDetected()} returns {@code false}, calling of
-	 * this method does not produce any messages. This has been done to minimize
-	 * log pollution.
+	 * Produces log status messages explaining possible incompleteness of the
+	 * results. The messages are incremental, that is, only changes compared to
+	 * the previous call of {@link #logStatus(Logger)} are printed. In
+	 * particular, if this method is called two times immediately after another,
+	 * then the second call will not produce any messages. This has been done to
+	 * minimize log pollution.
 	 * 
 	 * @param logger
-	 *            the logger using which the messages are printed
+	 *                   the logger using which the messages are printed
 	 */
-	void explainIncompleteness(Logger logger);
+	void logStatus(Logger logger);
 
 	/**
-	 * @return {@code true} if some new explanations for the incompleteness have
-	 *         been encountered after the last call of
-	 *         {@link #explainIncompleteness(Logger)}, and {@code false}
-	 *         otherwise. This method can be used to detect if
-	 *         {@link #explainIncompleteness(Logger)} would print any messages
-	 *         without calling the letter.
+	 * @return {@code true} if calling {@link #logStatus(Logger)} would produce
+	 *         at least one log message and {@code false} otherwise.
 	 */
-	boolean hasNewExplanation();
+	boolean isStatusChanged();
 
 }

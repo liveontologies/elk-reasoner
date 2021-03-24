@@ -25,33 +25,27 @@ import java.util.Collection;
  */
 
 import org.slf4j.Logger;
-import org.slf4j.helpers.NOPLogger;
 
 /**
- * An {@link IncompletenessMonitor} consisting of a combination of several other
- * {@link IncompletenessMonitor}s. That is, this monitor detects incompleteness
- * if and only if at least one of the monitors in the combination detects
- * incompleteness.
+ * An {@link IncompletenessMonitor} that monitors several other
+ * {@link IncompletenessMonitor}s and reports incompleteness if some of these
+ * monitors report incompleteness. The status messages include information of
+ * monitors until the first monitor that reports incompleteness.
  * 
  * @author Yevgeny Kazakov
  */
-public class CombinedIncompletenessMonitor implements IncompletenessMonitor {
-	
-	/**
-	 * the maximal number of monitors for which to print the explanations
-	 */
-	private final static int EXPLANATION_LIMIT_ = 5;
+public class FirstOfIncompletenessMonitor implements IncompletenessMonitor {
 
 	/**
 	 * The monitors that are combined
 	 */
 	private final IncompletenessMonitor[] monitors_;
 
-	CombinedIncompletenessMonitor(IncompletenessMonitor... monitors) {
+	FirstOfIncompletenessMonitor(IncompletenessMonitor... monitors) {
 		this.monitors_ = monitors;
 	}
 
-	CombinedIncompletenessMonitor(Collection<IncompletenessMonitor> monitors) {
+	FirstOfIncompletenessMonitor(Collection<IncompletenessMonitor> monitors) {
 		this(monitors.toArray(new IncompletenessMonitor[0]));
 	}
 
@@ -67,33 +61,25 @@ public class CombinedIncompletenessMonitor implements IncompletenessMonitor {
 	}
 
 	@Override
-	public boolean hasNewExplanation() {
+	public boolean isStatusChanged() {
 		for (IncompletenessMonitor monitor : monitors_) {
-			if (monitor.hasNewExplanation()) {
+			if (monitor.isStatusChanged()) {
 				return true;
 			}
+			if (monitor.isIncompletenessDetected()) {
+				return false;
+			}
 		}
-		// else
 		return false;
 	}
 
 	@Override
-	public void explainIncompleteness(Logger logger) {
-		int noExplanations = 0;
+	public void logStatus(Logger logger) {
 		for (IncompletenessMonitor monitor : monitors_) {
-			if (monitor.hasNewExplanation()) {
-				if (noExplanations++ < EXPLANATION_LIMIT_) {
-					monitor.explainIncompleteness(logger);
-				} else {
-					// need to log message to count it as explained
-					monitor.explainIncompleteness(NOPLogger.NOP_LOGGER);
-				}
+			monitor.logStatus(logger);
+			if (monitor.isIncompletenessDetected()) {
+				return;
 			}
-		}
-		int notPrinted = (noExplanations - EXPLANATION_LIMIT_);
-		if (notPrinted > 0) {
-			logger.info("{} other potential incompleteness problems ... ",
-					notPrinted);
 		}
 	}
 

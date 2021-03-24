@@ -65,7 +65,7 @@ public class OccurrencesInClassExpressionQuery implements OccurrenceManager {
 	public void logOccurrences(Feature occurrence, Logger logger) {
 		int count = getOccurrenceCount(occurrence);
 		String occurrences = count == 1 ? "occurrence" : "occurrences";
-		logger.info("{} {} of {} in found in the queried class expression {}",
+		logger.info("{} {} of {} found in the queried class expression {}",
 				count, occurrences, occurrence.getConstructor(), query_);
 		reportedOccurrences_.add(occurrence);
 	}

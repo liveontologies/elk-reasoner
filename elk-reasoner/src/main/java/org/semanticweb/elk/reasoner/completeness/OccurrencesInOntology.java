@@ -133,7 +133,7 @@ public class OccurrencesInOntology
 			break;
 		}
 		logger.info(
-				"{} {}{} of {} found in the current ontology. See DEBUG for more detail",
+				"{} {}{} of {} found in the current ontology. Enable DEBUG for details",
 				count, polarityString, occurrencesString,
 				occurrence.getConstructor());
 		if (logger.isDebugEnabled()) {

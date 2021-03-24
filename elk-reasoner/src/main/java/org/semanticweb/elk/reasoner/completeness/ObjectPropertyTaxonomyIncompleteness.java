@@ -40,7 +40,7 @@ class ObjectPropertyTaxonomyIncompleteness {
 					//
 					Feature.OBJECT_PROPERTY_CHAIN } };
 
-	static Collection<IncompletenessMonitor> appendMonitors(
+	static Collection<IncompletenessMonitor> appendMonitorsTo(
 			Collection<IncompletenessMonitor> monitors,
 			OccurrenceManager occurrencesInOntology) {
 		for (Feature feature : UNSUPPORTED_FEATURES_) {

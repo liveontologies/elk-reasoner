@@ -26,8 +26,6 @@ import java.util.ArrayList;
 
 import java.util.Collection;
 
-import org.slf4j.Logger;
-
 /**
  * An {@link IncompletenessMonitor} which checks for features that correspond to
  * unsupported query types
@@ -36,10 +34,9 @@ import org.slf4j.Logger;
  *
  */
 class UnsupportedQueryTypeIncompletenessMonitor
-		extends CombinedIncompletenessMonitor {
+		extends SomeOfIncompletenessMonitor {
 
 	private static final Feature[] UNSUPPORTED_FEATURES_ = {
-			// supported features that may cause unsatisfiability of properties
 			//
 			Feature.QUERY_ANNOTATION_ASSERTION_AXIOM,
 			//
@@ -101,7 +98,7 @@ class UnsupportedQueryTypeIncompletenessMonitor
 			//
 			Feature.QUERY_SWRL_RULE };
 
-	static Collection<IncompletenessMonitor> appendMonitors(
+	static Collection<IncompletenessMonitor> getMonitors(
 			OccurrenceManager occurrencesInQuery) {
 		Collection<IncompletenessMonitor> monitors = new ArrayList<>();
 		for (Feature feature : UNSUPPORTED_FEATURES_) {
@@ -113,15 +110,7 @@ class UnsupportedQueryTypeIncompletenessMonitor
 
 	public UnsupportedQueryTypeIncompletenessMonitor(
 			OccurrenceManager occurrencesInQuery) {
-		super(appendMonitors(occurrencesInQuery));
-	}
-
-	@Override
-	public void explainIncompleteness(Logger logger) {
-		if (hasNewExplanation()) {
-			logger.info("\nUnsupported query type:");
-		}
-		super.explainIncompleteness(logger);
+		super(getMonitors(occurrencesInQuery));
 	}
 
 }

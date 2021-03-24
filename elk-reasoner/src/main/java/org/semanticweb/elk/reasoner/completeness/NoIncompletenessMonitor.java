@@ -41,13 +41,13 @@ class NoIncompletenessMonitor implements IncompletenessMonitor {
 	}
 
 	@Override
-	public void explainIncompleteness(Logger logger) {
-		// nothing to explain
+	public boolean isStatusChanged() {
+		return false;
 	}
 
 	@Override
-	public boolean hasNewExplanation() {
-		return false;
+	public void logStatus(Logger logger) {
+		// nothing to explain
 	}
 
 }

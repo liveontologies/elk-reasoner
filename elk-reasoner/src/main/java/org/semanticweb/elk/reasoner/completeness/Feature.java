@@ -217,11 +217,11 @@ public enum Feature {
 	public String toString() {
 		switch (polarity_) {
 		case POSITIVE:
-			return "Positive occurrences of " + constructor_;
+			return "positive occurrences of " + constructor_;
 		case NEGATIVE:
-			return "Negative occurrences of " + constructor_;
+			return "negative occurrences of " + constructor_;
 		case ANY:
-			return "Occurrences of " + constructor_;
+			return "occurrences of " + constructor_;
 		}
 		throw new RuntimeException("Incomplete cases");
 	}

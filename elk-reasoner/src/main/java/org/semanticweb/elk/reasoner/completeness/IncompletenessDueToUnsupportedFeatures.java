@@ -40,11 +40,7 @@ class IncompletenessDueToUnsupportedFeatures extends DelegatingOccurrenceManager
 
 	private String description_;
 
-	/**
-	 * {@code true} if this type of incompleteness was already explained (which
-	 * implies that incompleteness was triggered before)
-	 */
-	boolean incompletenessExplained_ = false;
+	boolean wasIncomplete_ = false;
 
 	IncompletenessDueToUnsupportedFeatures(final OccurrenceManager occurrences,
 			Feature... unsupportedOccurrences) {
@@ -60,35 +56,7 @@ class IncompletenessDueToUnsupportedFeatures extends DelegatingOccurrenceManager
 			}
 		}
 		// else
-		incompletenessExplained_ = false; // explain next time
 		return true;
-	}
-
-	@Override
-	public boolean hasNewExplanation() {
-		if (!isIncompletenessDetected() || incompletenessExplained_) {
-			return false;
-		}
-		for (Feature feature : unsupportedFeatures_) {
-			if (hasNewOccurrencesOf(feature)) {
-				return true;
-			}
-		}
-		// else
-		return false;
-	}
-
-	@Override
-	public void explainIncompleteness(final Logger logger) {
-		if (!hasNewExplanation()) {
-			// nothing new to explain
-			return;
-		}
-		logger.info(getDescription());
-		for (Feature occurrence : unsupportedFeatures_) {
-			super.logOccurrences(occurrence, logger);
-		}
-		incompletenessExplained_ = true;
 	}
 
 	String getDescription() {
@@ -106,5 +74,26 @@ class IncompletenessDueToUnsupportedFeatures extends DelegatingOccurrenceManager
 		}
 		return description_;
 	}
+
+	@Override
+	public boolean isStatusChanged() {
+		return isIncompletenessDetected() != wasIncomplete_;
+	}
+	
+	@Override
+	public void logStatus(Logger logger) {
+		boolean isIncomplete = isIncompletenessDetected();
+		if (wasIncomplete_ == isIncomplete) {
+			// no change
+			return;
+		}
+		wasIncomplete_ = isIncomplete;
+		logger.info((isIncomplete ? "" : "[FIXED] ") + getDescription());
+		if (isIncomplete) {
+			for (Feature occurrence : unsupportedFeatures_) {
+				super.logOccurrences(occurrence, logger);
+			}
+		}
+	}	
 
 }

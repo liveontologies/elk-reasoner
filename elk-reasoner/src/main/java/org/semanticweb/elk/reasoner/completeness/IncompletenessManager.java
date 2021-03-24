@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.completeness;
  */
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * An object that can be used to track of {@link IncompletenessMonitor}s for
@@ -39,46 +38,36 @@ public class IncompletenessManager {
 
 	private final IncompletenessMonitor ontologySatisfiabilityMonitor_,
 			classTaxonomyMonitor_, objectPropertyTaxonomyMonitor_,
-			instanceTaxonomyMonitor_, queryMonitorForOntologySatisfiability_;
+			instanceTaxonomyMonitor_, generalQueryMonitor_;
 
 	public IncompletenessManager(OccurrenceManager occurrencesInOntology) {
 		this.occurrencesInOntology_ = occurrencesInOntology;
 
 		ontologySatisfiabilityMonitor_ = new IncompletenessStatusMonitor(
 				new TopIncompletenessMonitor(occurrencesInOntology),
-				"Ontology satisfiability cannot be checked! See log level INFO for details.",
-				"Ontology satisfiability can now be checked!");
+				"Ontology satisfiability cannot be checked! Enable INFO for details.");
 
-		List<IncompletenessMonitor> objectPropertyTaxonomyMonitors = new ArrayList<>();
-		objectPropertyTaxonomyMonitors.add(new IncompletenessStatusMonitor(
-				ontologySatisfiabilityMonitor_,
-				"Object property inclusions may be incomplete because ontology satisfiability cannot be checked!",
-				null));
-		objectPropertyTaxonomyMonitor_ = new IncompletenessStatusMonitor(
-				Incompleteness.combine(ObjectPropertyTaxonomyIncompleteness
-						.appendMonitors(objectPropertyTaxonomyMonitors,
-								occurrencesInOntology)),
-				"Object property inclusions may be incomplete!",
-				"Object property inclusions are now complete!");
+		objectPropertyTaxonomyMonitor_ = Incompleteness.firstOf(
+				new IncompletenessStatusMonitor(ontologySatisfiabilityMonitor_,
+						"Object property inclusions may be incomplete because ontology satisfiability cannot be checked!"),
+				new IncompletenessStatusMonitor(Incompleteness.firstOf(
+						ObjectPropertyTaxonomyIncompleteness.appendMonitorsTo(
+								new ArrayList<>(), occurrencesInOntology)),
+						"Object property inclusions may be incomplete! Enable INFO for details."));
 
 		classTaxonomyMonitor_ = new IncompletenessStatusMonitor(
 				ontologySatisfiabilityMonitor_,
-				"Class inclusions may be incomplete because ontology satisfiability cannot be checked!",
-				"Class inclusions are now complete!");
+				"Class inclusions may be incomplete because ontology satisfiability cannot be checked!");
 
 		instanceTaxonomyMonitor_ = new IncompletenessStatusMonitor(
 				ontologySatisfiabilityMonitor_,
-				"Instance relations may be incomplete because ontology satisfiability cannot be checked!",
-				"Instance relations are now complete!");
+				"Instance relations may be incomplete because ontology satisfiability cannot be checked!");
 
-		queryMonitorForOntologySatisfiability_ = new IncompletenessStatusMonitor(
+		generalQueryMonitor_ = new IncompletenessStatusMonitor(
 				ontologySatisfiabilityMonitor_,
-				"Query answers may be incomplete because ontology satisfiability cannot be checked!",
-				null);
+				"Query answers may be incomplete because ontology satisfiability cannot be checked!");
 
 	}
-
-	// TODO: append warn messages to each incompleteness monitor
 
 	public IncompletenessMonitor getOntologySatisfiabilityMonitor() {
 		return ontologySatisfiabilityMonitor_;
@@ -98,15 +87,16 @@ public class IncompletenessManager {
 
 	public IncompletenessMonitor getQueryMonitor(
 			OccurrenceManager occurencesInQuery) {
-		List<IncompletenessMonitor> monitors = new ArrayList<>();
-		monitors.add(queryMonitorForOntologySatisfiability_);
-		monitors.add(new UnsupportedQueryTypeIncompletenessMonitor(
-				occurencesInQuery));
-		monitors.add(new TopIncompletenessMonitor(new CombinedOccurrenceManager(
-				occurrencesInOntology_, occurencesInQuery)));
-		return new IncompletenessStatusMonitor(Incompleteness.combine(monitors),
-				"Query answers may be incomplete!",
-				"Query answers are now complete!");
+		return Incompleteness.firstOf(generalQueryMonitor_,
+				new IncompletenessStatusMonitor(
+						Incompleteness.firstOf(
+								new UnsupportedQueryTypeIncompletenessMonitor(
+										occurencesInQuery),
+								new TopIncompletenessMonitor(
+										new CombinedOccurrenceManager(
+												occurrencesInOntology_,
+												occurencesInQuery))),
+						"Query answers may be incomplete! Enable INFO for details."));
 	}
 
 }

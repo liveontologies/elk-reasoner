@@ -39,7 +39,6 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.completeness.Feature;
 import org.semanticweb.elk.reasoner.completeness.IncompletenessManager;
 import org.semanticweb.elk.reasoner.completeness.IncompletenessMonitor;
-import org.semanticweb.elk.reasoner.completeness.OccurrenceCounter;
 import org.semanticweb.elk.reasoner.completeness.OccurrenceListener;
 import org.semanticweb.elk.reasoner.completeness.OccurrenceRegistry;
 import org.semanticweb.elk.reasoner.completeness.OccurrencesInEntailmentQuery;
@@ -204,10 +203,6 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 					.getEvidence(onlyOne, saturationState_, conclusionFactory_);
 
 			return Proofs.union(inconsistencyEvidence, entailmentEvidence);
-		}
-
-		OccurrenceCounter getOccurrenceCounter() {
-			return occurrences;
 		}
 
 		public synchronized boolean lock() {
