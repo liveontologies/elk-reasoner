@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.liveontologies.owlapi.proof.OWLProver;
 import org.liveontologies.puli.DynamicProof;
@@ -195,6 +196,7 @@ public class ProofTest {
 				factory.getOWLSubClassOfAxiom(a, b));
 	}
 
+	@Ignore // empty operands not permitted as of OWL API 5.1.15
 	@Test
 	public void emptyConjunction() throws Exception {
 		OWLOntologyManager owlManager = OWLManager
@@ -229,6 +231,7 @@ public class ProofTest {
 				factory.getOWLSubClassOfAxiom(b, d));
 	}
 
+	@Ignore // empty operands not permitted as of OWL API 5.1.15
 	@Test
 	public void emptyDisjunction() throws Exception {
 		OWLOntologyManager owlManager = OWLManager
@@ -260,6 +263,7 @@ public class ProofTest {
 				factory.getOWLSubClassOfAxiom(b, c));
 	}
 
+	@Ignore // empty operands not permitted as of OWL API 5.1.15
 	@Test
 	public void emptyEnumeration() throws Exception {
 		OWLOntologyManager owlManager = OWLManager
@@ -291,6 +295,7 @@ public class ProofTest {
 				factory.getOWLSubClassOfAxiom(b, c));
 	}
 
+	@Ignore // empty operands not permitted as of OWL API 5.1.15
 	@Test
 	public void emptyDisjointUnion() throws Exception {
 		OWLOntologyManager owlManager = OWLManager

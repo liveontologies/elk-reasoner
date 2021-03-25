@@ -97,13 +97,13 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<owlapi4.version>4.5.9</owlapi4.version>
-		<owlapi5.version>5.1.10</owlapi5.version>
+		<owlapi4.version>4.5.19</owlapi4.version>
+		<owlapi5.version>5.1.17</owlapi5.version>
 		<protege-proof-explanation.version>0.1.0</protege-proof-explanation.version>
 		<!-- try to keep the version low for backward compatibility -->
 		<protege.version>5.5.0</protege.version>
 		<java.required.version>8</java.required.version>
-		<slf4j.version>1.7.25</slf4j.version>
+		<slf4j.version>1.7.30</slf4j.version>
 		<logback.version>1.2.3</logback.version>
 		<elk.wiki>https://github.com/liveontologies/elk-reasoner/wiki</elk.wiki>
 		<protege.update.url>https://raw.githubusercontent.com/liveontologies/elk-reasoner/release/elk-distribution-parent/elk-distribution-protege</protege.update.url>
@@ -129,7 +129,7 @@
 			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
-				<version>4.12</version>
+				<version>4.13.2</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
