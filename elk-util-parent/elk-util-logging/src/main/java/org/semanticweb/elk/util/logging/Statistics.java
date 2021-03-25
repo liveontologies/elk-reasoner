@@ -49,7 +49,7 @@ public class Statistics {
 	 * @param logger
 	 */
 	public static void logOperationStart(String operationName, Logger logger) {
-		logOperationStart(operationName, logger, LogLevel.INFO);
+		logOperationStart(operationName, logger, LogLevel.DEBUG);
 	}
 
 	/**
@@ -82,7 +82,7 @@ public class Statistics {
 	 * @param logger
 	 */
 	public static void logOperationFinish(String operationName, Logger logger) {
-		logOperationFinish(operationName, logger, LogLevel.INFO);
+		logOperationFinish(operationName, logger, LogLevel.DEBUG);
 	}
 
 	/**

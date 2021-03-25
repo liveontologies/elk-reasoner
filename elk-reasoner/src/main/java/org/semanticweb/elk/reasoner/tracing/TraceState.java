@@ -180,7 +180,7 @@ public class TraceState
 
 		final Object builder = config
 				.getParameter(ReasonerConfiguration.TRACING_EVICTOR);
-		LOGGER_.info("{}={}", ReasonerConfiguration.TRACING_EVICTOR, builder);
+		LOGGER_.debug("{}={}", ReasonerConfiguration.TRACING_EVICTOR, builder);
 		this.classInferenceEvictor_ = ((Evictor.Builder) builder).build();
 
 	}

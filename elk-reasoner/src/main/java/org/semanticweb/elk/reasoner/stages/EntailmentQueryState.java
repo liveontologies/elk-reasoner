@@ -247,7 +247,7 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 		this.conclusionFactory_ = factory;
 		final Object builder = config
 				.getParameter(ReasonerConfiguration.ENTAILMENT_QUERY_EVICTOR);
-		LOGGER_.info("{} = {}", ReasonerConfiguration.ENTAILMENT_QUERY_EVICTOR,
+		LOGGER_.debug("{} = {}", ReasonerConfiguration.ENTAILMENT_QUERY_EVICTOR,
 				builder);
 		this.queriedEvictor_ = ((Evictor.Builder) builder).build();
 		this.incompletenessManager_ = incompletenessManager;

@@ -248,7 +248,7 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 
 		final Object builder = config.getParameter(
 				ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR);
-		LOGGER_.info("{} = {}",
+		LOGGER_.debug("{} = {}",
 				ReasonerConfiguration.CLASS_EXPRESSION_QUERY_EVICTOR, builder);
 		this.queriedEvictor_ = ((Evictor.Builder) builder).build();
 	}
