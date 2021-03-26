@@ -132,9 +132,9 @@ public interface InstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 
 	/**
 	 * Instances of this interface registered by
-	 * {@link InstanceTaxonomy#addListener(InstanceTaxonomy.Listener)} will be
-	 * notified about changes to the relations between the instance and type
-	 * nodes.
+	 * {@link InstanceTaxonomy#addInstanceListener(InstanceTaxonomy.Listener)}
+	 * will be notified about changes to the relations between the instance and
+	 * type nodes.
 	 * 
 	 * @author Peter Skocovsky
 	 *

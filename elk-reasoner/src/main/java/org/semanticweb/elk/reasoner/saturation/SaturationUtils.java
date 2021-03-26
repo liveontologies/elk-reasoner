@@ -99,6 +99,7 @@ public class SaturationUtils {
 	 *         returns {@code false}. {@link ClassConclusion.Visitor}s that are
 	 *         {@code null} are ignored.
 	 */
+	@SafeVarargs
 	public static ClassConclusion.Visitor<Boolean> compose(
 			ClassConclusion.Visitor<Boolean>... visitors) {
 		return new ComposedClassConclusionVisitor(removeNulls(visitors));
@@ -112,6 +113,7 @@ public class SaturationUtils {
 	 *         returns {@code false}. {@link ClassInference.Visitor}s that are
 	 *         {@code null} are ignored.
 	 */
+	@SafeVarargs
 	public static ClassInference.Visitor<Boolean> compose(
 			ClassInference.Visitor<Boolean>... visitors) {
 		return new ComposedClassInferenceVisitor(removeNulls(visitors));

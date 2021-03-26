@@ -53,6 +53,8 @@ import org.semanticweb.elk.util.collections.Operations;
  * 
  *         pavel.klinov@uni-ulm.de
  * @author Peter Skocovsky
+ * @param <T> 
+ * @param <I> 
  */
 public class MockInstanceTaxonomy<T extends ElkEntity, I extends ElkEntity>
 		extends AbstractInstanceTaxonomy<T, I>

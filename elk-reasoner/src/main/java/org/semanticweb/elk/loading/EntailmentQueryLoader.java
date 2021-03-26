@@ -39,11 +39,12 @@ public interface EntailmentQueryLoader {
 	 * already loaded queries will not be processed again.
 	 * 
 	 * @param inserter
-	 *            an {@link ElkAxiomVisitor} that inserts the queries
+	 *                     an {@link ElkAxiomVisitor} that inserts the queries
 	 * @param deleter
-	 *            an {@link ElkAxiomVisitor} that deletes the queries
+	 *                     an {@link ElkAxiomVisitor} that deletes the queries
 	 * @throws ElkLoadingException
-	 *             if loading cannot be completed successfully
+	 *                                 if loading cannot be completed
+	 *                                 successfully
 	 */
 	void load(
 			ElkAxiomVisitor<IndexedEntailmentQuery<? extends Entailment>> inserter,
@@ -52,7 +53,8 @@ public interface EntailmentQueryLoader {
 
 	/**
 	 * @return {@code true} if the loading is finished, i.e., calling
-	 *         {@link EntailmentQueryLoader#load()} will have no effect
+	 *         {@link EntailmentQueryLoader#load(ElkAxiomVisitor, ElkAxiomVisitor)}
+	 *         will have no effect
 	 */
 	public boolean isLoadingFinished();
 

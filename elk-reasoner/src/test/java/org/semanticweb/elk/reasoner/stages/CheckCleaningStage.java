@@ -82,8 +82,8 @@ public class CheckCleaningStage extends BasePostProcessingStage {
 			}
 		}
 		// checking sub contexts
-		for (IndexedClassExpression ice : reasoner_
-				.getIndexedClassExpressions()) {
+		for (IndexedClassExpression ice : reasoner_.saturationState
+				.getOntologyIndex().getClassExpressions()) {
 			Context context = reasoner_.saturationState.getContext(ice);
 			if (context == null)
 				continue;

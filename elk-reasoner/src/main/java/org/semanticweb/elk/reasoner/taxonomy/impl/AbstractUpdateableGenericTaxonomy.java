@@ -176,9 +176,9 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 						subNode.getDirectSuperNodes());
 			}
 			return true;
-		} else {
-			return false;
 		}
+		// else
+		return false;
 	}
 
 	protected void addDirectRelation(final UN superNode, final UN subNode) {
@@ -236,9 +236,9 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 				member) == null) {
 			fireMemberForNodeAppeared(member, getBottomNode());
 			return true;
-		} else {
-			return false;
 		}
+		// else
+		return false;
 	}
 
 	@Override
@@ -247,9 +247,9 @@ public abstract class AbstractUpdateableGenericTaxonomy<
 				.remove(getKeyProvider().getKey(member)) != null) {
 			fireMemberForNodeDisappeared(member, getBottomNode());
 			return true;
-		} else {
-			return false;
 		}
+		// else
+		return false;
 	}
 
 	@SuppressWarnings("unchecked")

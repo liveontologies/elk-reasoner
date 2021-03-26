@@ -38,6 +38,8 @@ import org.semanticweb.elk.RandomSeedProvider;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ *         
+ * @param <T> 
  */
 public class IncrementalChangeTracker<T> {
 

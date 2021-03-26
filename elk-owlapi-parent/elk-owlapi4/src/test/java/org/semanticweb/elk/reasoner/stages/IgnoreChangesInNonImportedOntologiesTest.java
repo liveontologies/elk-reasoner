@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.stages;
 
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -58,6 +57,7 @@ public class IgnoreChangesInNonImportedOntologiesTest {
 
 	/**
 	 * Testing correctness of the reasoner with respect to ontology changes
+	 * @throws Exception 
 	 */
 	@Test
 	public void ignoreChangesInNonImportedOntologies() throws Exception {

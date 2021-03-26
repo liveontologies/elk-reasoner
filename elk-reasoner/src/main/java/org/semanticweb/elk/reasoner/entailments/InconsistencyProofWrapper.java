@@ -81,7 +81,7 @@ public class InconsistencyProofWrapper implements Proof<EntailmentInference> {
 		public Collection<? extends EntailmentInference> defaultVisit(
 				final Entailment entailment) {
 			return inconsistencyEvidence_.getInferences(entailment);
-		};
+		}
 
 		@Override
 		public <A extends ElkAxiom> Collection<? extends EntailmentInference> defaultAxiomEntailmentVisit(
@@ -89,7 +89,7 @@ public class InconsistencyProofWrapper implements Proof<EntailmentInference> {
 			return Collections
 					.singleton(new OntologyInconsistencyEntailsAnyAxiomImpl(
 							axiomEntailment));
-		};
+		}
 
 	};
 

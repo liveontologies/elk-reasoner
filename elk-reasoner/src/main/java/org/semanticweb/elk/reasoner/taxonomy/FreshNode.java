@@ -42,10 +42,14 @@ import org.semanticweb.elk.util.collections.Operations;
  */
 public class FreshNode<T extends ElkEntity> implements Node<T> {
 
-	protected final T member;
+	private final T member_;
 
 	public FreshNode(T member) {
-		this.member = member;
+		this.member_ = member;
+	}
+	
+	public T getMember() {
+		return member_;
 	}
 
 	@Override
@@ -55,14 +59,14 @@ public class FreshNode<T extends ElkEntity> implements Node<T> {
 	
 	@Override
 	public Iterator<T> iterator() {
-		return Operations.singletonIterator(member);
+		return Operations.singletonIterator(member_);
 	}
 	
 	@Override
 	public boolean contains(T member) {
 		return member == null
-				? this.member == null
-				: member.getIri().equals(this.member.getIri());
+				? this.member_ == null
+				: member.getIri().equals(this.member_.getIri());
 	}
 	
 	@Override
@@ -72,7 +76,7 @@ public class FreshNode<T extends ElkEntity> implements Node<T> {
 	
 	@Override
 	public T getCanonicalMember() {
-		return member;
+		return member_;
 	}
 
 }

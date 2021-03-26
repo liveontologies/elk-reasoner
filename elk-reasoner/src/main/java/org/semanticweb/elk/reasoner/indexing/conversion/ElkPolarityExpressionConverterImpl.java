@@ -114,13 +114,12 @@ public class ElkPolarityExpressionConverterImpl
 	 * @param polarity
 	 *            the {@link ElkPolarity} associated with this
 	 *            {@link ElkPolarityExpressionConverter}
+	 * @param elkFactory 
 	 * @param factory
 	 *            the {@link ModifiableIndexedObject.Factory} for creating
 	 *            {@link ModifiableIndexedObject}s of the given polarity
-	 * @param complementaryConverter
-	 *            the {@link ModifiableIndexedObject.Factory} used by the
-	 *            complementary converter for creating
-	 *            {@link ModifiableIndexedObject}s of the complementary polarity
+	 * @param complementaryFactory 
+	 * @param occurrenceTracker 
 	 * @param increment
 	 *            indicates whether the converted expressions must be inserted
 	 *            (> 0) or deleted (< 0) and with which multiplicity
@@ -146,10 +145,13 @@ public class ElkPolarityExpressionConverterImpl
 	 * {@link ModifiableIndexedObject.Factory} for creating the
 	 * {@link ModifiableIndexedObject}s (of the dual polarity). This converter
 	 * returns itself as the complementary converter.
+	 * @param elkFactory 
 	 * 
 	 * @param dualFactory
 	 *            {@link ModifiableIndexedObject.Factory} used for creating the
 	 *            {@link ModifiableIndexedObject}s of this converter
+	 * @param occurrrenceTracker 
+	 * @param increment 
 	 * 
 	 */
 	public ElkPolarityExpressionConverterImpl(

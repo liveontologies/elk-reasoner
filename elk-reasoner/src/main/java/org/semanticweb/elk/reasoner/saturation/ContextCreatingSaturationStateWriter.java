@@ -32,6 +32,9 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * @author Pavel Klinov
  *
  *         pavel.klinov@uni-ulm.de
+ * @param <C>
+ *                the type of contexts managed by this
+ *                {@link SaturationStateWriter}
  */
 public interface ContextCreatingSaturationStateWriter<C extends Context>
 		extends SaturationStateWriter<C> {
@@ -39,7 +42,7 @@ public interface ContextCreatingSaturationStateWriter<C extends Context>
 	/**
 	 * 
 	 * @param root
-	 * @return
+	 * @return the context with the given root
 	 */
 	public C getCreateContext(IndexedContextRoot root);
 }

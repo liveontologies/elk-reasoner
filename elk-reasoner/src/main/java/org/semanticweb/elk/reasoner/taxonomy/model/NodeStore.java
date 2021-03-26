@@ -56,9 +56,9 @@ public interface NodeStore<T, N extends Node<T>> {
 	 * Returns the {@link TaxonomyNode} containing the given {@link ElkEntity}
 	 * as a member or {@code null} if the input does not occur in the taxonomy.
 	 * 
-	 * @param elkEntity
-	 *            the {@link ElkEntity} for which to return the
-	 *            {@link TaxonomyNode}
+	 * @param member
+	 *            node member for which to return the {@link TaxonomyNode}
+	 * 
 	 * @return the {@link TaxonomyNode} for the specified input
 	 *         {@link ElkEntity}
 	 */

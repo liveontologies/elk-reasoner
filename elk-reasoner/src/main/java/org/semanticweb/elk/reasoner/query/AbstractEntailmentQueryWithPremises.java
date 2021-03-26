@@ -126,6 +126,6 @@ public abstract class AbstractEntailmentQueryWithPremises<E extends Entailment, 
 	 * @return The collection of {@link EntailmentInference} that entail
 	 *         {@link #getQuery()} from {@link #getPremises()}.
 	 */
-	protected abstract Collection<? extends EntailmentInference> getEntailmentInference();
+	public abstract Collection<? extends EntailmentInference> getEntailmentInference();
 
 }

@@ -33,7 +33,7 @@ public class DelegateInterruptMonitor implements InterruptMonitor {
 	/**
 	 * The {@link InterruptMonitor} that is checked for interruptions.
 	 */
-	protected final InterruptMonitor interrupter_;
+	private final InterruptMonitor interrupter_;
 
 	/**
 	 * @param interrupter

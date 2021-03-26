@@ -39,6 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextIniti
  * 
  * @author "Yevgeny Kazakov"
  */
+@SuppressWarnings("javadoc")
 public class ClassConclusionCounter {
 
 	/**

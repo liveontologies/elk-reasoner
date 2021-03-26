@@ -1,7 +1,6 @@
 package org.semanticweb.elk.matching.conclusions;
 
 import org.semanticweb.elk.matching.inferences.BackwardLinkCompositionMatch1;
-import org.semanticweb.elk.matching.inferences.BackwardLinkCompositionMatch3;
 import org.semanticweb.elk.matching.inferences.BackwardLinkReversedExpandedMatch1;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
 import org.semanticweb.elk.matching.inferences.SubPropertyChainExpandedSubObjectPropertyOfMatch1;

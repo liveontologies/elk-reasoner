@@ -65,6 +65,7 @@ public class ElkReasonerTest {
 
 	/**
 	 * Testing correctness of the reasoner with respect to ontology changes
+	 * @throws Exception 
 	 * 
 	 */
 	@Test
@@ -124,6 +125,7 @@ public class ElkReasonerTest {
 	 * Testing correctness of the reasoner with respect to ontology changes
 	 * 
 	 * removing an axiom ":X is-a :Y"
+	 * @throws Exception 
 	 */
 	@Test
 	public void testRemovingXY() throws Exception {
@@ -196,6 +198,7 @@ public class ElkReasonerTest {
 	 * <p>
 	 * This test is ignored, because as of OWL API 4.1.3 the removal
 	 * of the axiom is broadcasted even though the axiom is not removed.
+	 * @throws Exception 
 	 */
 	@Test
 	public void testRemovingAB() throws Exception {
@@ -264,6 +267,7 @@ public class ElkReasonerTest {
 	 * Testing correctness of the reasoner with respect to ontology changes
 	 * <p>
 	 * removing the import declaration for </impA>
+	 * @throws Exception 
 	 */
 	@Test
 	public void testRemovingImpA() throws Exception {
@@ -333,6 +337,7 @@ public class ElkReasonerTest {
 	 * removing the import declaration for </impA>,
 	 * adding the import declaration for </impB> and removing
 	 * ":Y is-a B:B"
+	 * @throws Exception 
 	 */
 	@Test
 	public void testRemovingImpAAddingImpBRemovingYB() throws Exception {
@@ -406,6 +411,7 @@ public class ElkReasonerTest {
 	
 	/**
 	 * Testing correctness of the reasoner when changes are made to other, imported or not, ontologies
+	 * @throws Exception 
 	 * 
 	 */
 	@Test

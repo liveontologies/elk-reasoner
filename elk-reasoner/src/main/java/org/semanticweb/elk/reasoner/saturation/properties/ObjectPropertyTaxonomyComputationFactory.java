@@ -176,9 +176,9 @@ public class ObjectPropertyTaxonomyComputationFactory
 									final Entry<IndexedObjectProperty, Collection<? extends ElkObjectProperty>> element) {
 								if (indirect.contains(element.getKey())) {
 									return null;
-								} else {
-									return element.getValue();
 								}
+								// else
+								return element.getValue();
 							}
 
 						});

@@ -136,7 +136,8 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			iceValidator_.add(ice);
 		}
 		for (;;) {
-			if (iceValidator_.validate() || contextValidator_.validate())
+			if (iceValidator_.validate() || iopValidator_.validate()
+					|| contextValidator_.validate())
 				continue;
 			break;
 		}

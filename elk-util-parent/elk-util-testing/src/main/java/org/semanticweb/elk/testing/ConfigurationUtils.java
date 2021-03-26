@@ -64,9 +64,10 @@ public class ConfigurationUtils {
 	 *            The input directory.
 	 * @param srcClass
 	 * @param creator
+	 * @param fileExt 
 	 * @param fileExts
 	 *            The file name extensions.
-	 * @return
+	 * @return The loaded configuration
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */

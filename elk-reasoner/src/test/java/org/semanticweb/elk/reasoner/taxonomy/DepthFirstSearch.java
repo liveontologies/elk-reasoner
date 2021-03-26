@@ -39,6 +39,8 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ *         
+ * @param <T> 
  */
 public class DepthFirstSearch<T extends ElkEntity> {
 	// The search direction, up or down the taxonomy

@@ -21,8 +21,6 @@
  */
 package org.semanticweb.elk.util.concurrent.computation;
 
-import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
-
 /**
  * Can never be interrupted. Always returns {@code false} from
  * {@link #isInterrupted()}.

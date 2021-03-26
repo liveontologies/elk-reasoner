@@ -33,7 +33,6 @@
 	<properties>
 		<owlapi.major.version>4</owlapi.major.version>
 		<owlapi.version>${owlapi4.version}</owlapi.version>
-		<java.required.version>7</java.required.version>
 		<elk.filename>elk-owlapi${owlapi.major.version}-library-${project.version}</elk.filename>
 		<elk-sources.filename>${elk.filename}-sources</elk-sources.filename>
 		<elk-owlapi.assembly-id>elk-owlapi${owlapi.major.version}-package</elk-owlapi.assembly-id>

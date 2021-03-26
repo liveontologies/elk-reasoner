@@ -199,6 +199,7 @@ public class TracingSaturationTest {
 		TracingTestUtils.checkTracingCompleteness(a, a1, reasoner);		
 	}
 
+	@SuppressWarnings("static-method")
 	@Test
 	public void testAddingFreshTrivialProperty() throws Exception {
 		final ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();

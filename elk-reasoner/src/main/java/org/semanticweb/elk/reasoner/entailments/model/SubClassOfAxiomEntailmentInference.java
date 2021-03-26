@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.entailments.model;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 
 /**
- * How was {@link SubClassOfAxiom} entailed.
+ * How was {@link ElkSubClassOfAxiom} entailed.
  * 
  * @author Peter Skocovsky
  */

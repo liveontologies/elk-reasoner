@@ -49,6 +49,7 @@ public abstract class ElkObjectListObject<O extends ElkObject> extends
 		return elkObjects_;
 	}
 
+	@SafeVarargs
 	public static <O> List<? extends O> varArgsToList(O firstObject,
 			O secondObject, O... otherObjects) {
 		List<O> objects = new ArrayList<O>(2 + otherObjects.length);
@@ -60,6 +61,7 @@ public abstract class ElkObjectListObject<O extends ElkObject> extends
 		return objects;
 	}
 
+	@SafeVarargs
 	public static <O> List<? extends O> varArgsToList(O firstObject,
 			O... otherObjects) {
 		List<O> objects = new ArrayList<O>(1 + otherObjects.length);

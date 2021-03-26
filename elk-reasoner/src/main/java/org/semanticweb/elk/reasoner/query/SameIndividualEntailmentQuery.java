@@ -55,7 +55,7 @@ public class SameIndividualEntailmentQuery extends
 	}
 
 	@Override
-	protected Collection<? extends EntailmentInference> getEntailmentInference() {
+	public Collection<? extends EntailmentInference> getEntailmentInference() {
 
 		return Collections.singleton(
 				new EntailedEquivalentClassesEntailsSameIndividualAxiomImpl(

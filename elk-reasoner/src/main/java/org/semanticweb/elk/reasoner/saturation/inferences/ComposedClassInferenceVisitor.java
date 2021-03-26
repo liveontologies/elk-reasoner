@@ -56,6 +56,7 @@ public class ComposedClassInferenceVisitor
 	 * @param visitors
 	 *            the {@link ClassInference.Visitor} to be composed
 	 */
+	@SafeVarargs
 	public ComposedClassInferenceVisitor(
 			ClassInference.Visitor<Boolean>... visitors) {
 		this.visitors_ = visitors;

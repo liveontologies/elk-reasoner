@@ -45,6 +45,8 @@ import org.semanticweb.elk.testing.Diff;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ *         
+ * @param <T> 
  */
 public class RandomWalkIncrementalRealizationRunner<T>
 		extends RandomWalkIncrementalClassificationRunner<T> {

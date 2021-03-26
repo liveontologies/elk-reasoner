@@ -75,6 +75,7 @@ public interface ClassConclusionSet {
 	boolean isEmpty();
 
 	/**
+	 * @param subRoot  
 	 * @return {@code true} if the {@link SubClassConclusionSet} corresponding to the
 	 *         given subRoot {@link IndexedObjectProperty} does not contain any
 	 *         {@link SubClassConclusion}.

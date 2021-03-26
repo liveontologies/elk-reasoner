@@ -29,9 +29,6 @@ import org.semanticweb.elk.owl.interfaces.ElkDataPropertyListRestrictionQualifie
  * {@link ElkDataPropertyListRestrictionQualified}.
  * 
  * @author "Yevgeny Kazakov"
- * 
- * @param <O>
- *            the type of the output of this visitor
  */
 public interface ElkDataPropertyListRestrictionQualifiedFilter extends
 		ElkDataAllValuesFromFilter, ElkDataSomeValuesFromFilter {

@@ -92,6 +92,7 @@ public class Operations {
 		return (Multimap<S, T>) EMPTY_MULTIMAP;
 	}
 
+	@SafeVarargs
 	public static <T> Iterable<T> concat(
 			final Iterable<? extends T>... inputs) {
 		return concat(Arrays.asList(inputs));
@@ -715,6 +716,9 @@ public class Operations {
 	 * @author Pavel Klinov
 	 * 
 	 *         pavel.klinov@uni-ulm.de
+	 *         
+	 * @param <I> 
+	 * @param <O> 
 	 */
 	public interface Functor<I, O> {
 
@@ -727,6 +731,8 @@ public class Operations {
 	 * @author Pavel Klinov
 	 *
 	 *         pavel.klinov@uni-ulm.de
+	 * @param <I> 
+	 * @param <O> 
 	 */
 	public interface FunctorEx<I, O> extends Functor<I, O> {
 
@@ -735,6 +741,7 @@ public class Operations {
 		 * because it's primarily used for an efficient implementation of
 		 * {@link Set#contains(Object)}, which takes an Object
 		 * 
+		 * @param element 
 		 * @return Can return null if the transformation is not possible
 		 */
 		public I deapply(Object element);

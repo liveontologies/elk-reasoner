@@ -56,10 +56,6 @@ public class ConclusionEquality implements Conclusion.Visitor<Boolean> {
 			return false;
 		}
 
-		static boolean equals(Object first, Object second) {
-			return first.equals(second);
-		}
-
 		static boolean equals(IndexedObject first, IndexedObject second) {
 			return first == second;
 		}

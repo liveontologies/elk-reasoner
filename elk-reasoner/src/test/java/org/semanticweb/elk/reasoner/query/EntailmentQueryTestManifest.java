@@ -23,8 +23,6 @@ package org.semanticweb.elk.reasoner.query;
 
 import java.net.URL;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-
 public class EntailmentQueryTestManifest<Q>
 		extends QueryTestManifest<Q, ElkEntailmentQueryTestOutput> {
 

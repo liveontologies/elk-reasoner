@@ -27,6 +27,6 @@ package org.semanticweb.elk.owl.parsing.javacc;
  * @author "Yevgeny Kazakov"
  * 
  */
-interface LexerMessage {
+public interface LexerMessage {
 	public void accept(LexerMessageVisitor visitor);
 }

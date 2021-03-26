@@ -111,7 +111,6 @@ public class PropertyInferenceTracingTest {
 				TestReasonerUtils.loadAxioms("tracing/SimpleCompositions.owl"));
 		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
-		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
 		ElkClass d = factory.getClass(new ElkFullIri("http://example.org/D"));
 		ElkClass e = factory.getClass(new ElkFullIri("http://example.org/E"));
 		ElkObjectProperty r = factory.getObjectProperty(new ElkFullIri("http://example.org/R"));
@@ -121,8 +120,7 @@ public class PropertyInferenceTracingTest {
 		ElkObjectProperty hh = factory.getObjectProperty(new ElkFullIri("http://example.org/HH"));
 		ElkObjectProperty rr = factory.getObjectProperty(new ElkFullIri("http://example.org/RR"));
 		ElkObjectProperty t = factory.getObjectProperty(new ElkFullIri("http://example.org/T"));
-		ElkSubObjectPropertyExpression sshh = factory.getObjectPropertyChain(Arrays.asList(ss, hh));
-		ElkSubObjectPropertyExpression rrsshh = factory.getObjectPropertyChain(Arrays.asList(rr, ss, hh));
+		ElkSubObjectPropertyExpression sshh = factory.getObjectPropertyChain(Arrays.asList(ss, hh));		
 		final IndexedPropertyChain sshhIndexed = ReasonerStateAccessor.transform(reasoner, sshh);
 		final IndexedPropertyChain sIndexed = ReasonerStateAccessor.transform(reasoner, s);
 		final IndexedPropertyChain hIndexed = ReasonerStateAccessor.transform(reasoner, h);
@@ -130,7 +128,6 @@ public class PropertyInferenceTracingTest {
 		final IndexedPropertyChain hhIndexed = ReasonerStateAccessor.transform(reasoner, hh);
 		final IndexedPropertyChain rIndexed = ReasonerStateAccessor.transform(reasoner, r);
 		final IndexedPropertyChain rrIndexed = ReasonerStateAccessor.transform(reasoner, rr);
-		final IndexedPropertyChain rrsshhIndexed = ReasonerStateAccessor.transform(reasoner, rrsshh);
 		final IndexedPropertyChain tIndexed = ReasonerStateAccessor.transform(reasoner, t);
 		final IndexedClassExpression aIndexed = ReasonerStateAccessor.transform(reasoner, a);
 		final IndexedClassExpression dIndexed = ReasonerStateAccessor.transform(reasoner, d);

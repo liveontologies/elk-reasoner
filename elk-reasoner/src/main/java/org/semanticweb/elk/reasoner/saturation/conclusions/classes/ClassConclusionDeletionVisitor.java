@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A {@link ClassConclusion.Visitor} that removes the visited
  * {@link ClassConclusion} from the {@link ClassConclusionSet} of the given
- * {@link Reference}. The visit method returns {@link true} if the
+ * {@link Reference}. The visit method returns {@code true} if the
  * {@link ClassConclusionSet} was modified as the result of this operation,
  * i.e., the {@link ClassConclusion} was contained in the
  * {@link ClassConclusionSet}.

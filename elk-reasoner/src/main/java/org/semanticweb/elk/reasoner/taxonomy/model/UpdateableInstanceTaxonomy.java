@@ -95,6 +95,7 @@ public interface UpdateableInstanceTaxonomy<T extends ElkEntity, I extends ElkEn
 	 * Removes the instance node containing the specified member from the
 	 * taxonomy.
 	 * 
+	 * @param instance 
 	 * @param member
 	 *            The member whose instance node should be removed.
 	 * @return <code>true</code> if and only if some node was removed.

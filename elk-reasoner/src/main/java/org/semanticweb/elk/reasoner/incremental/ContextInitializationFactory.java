@@ -306,6 +306,7 @@ class ContextInitializationFactory extends DelegateInterruptMonitor
 
 		@Override
 		public void finish() {
+			// no-op
 		}
 
 		protected abstract boolean isInterrupted();

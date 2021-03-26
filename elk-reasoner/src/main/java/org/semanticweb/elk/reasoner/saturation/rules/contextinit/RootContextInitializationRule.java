@@ -64,7 +64,6 @@ public class RootContextInitializationRule extends
 	 * Add a {@link RootContextInitializationRule} to the given
 	 * {@link ModifiableOntologyIndex}
 	 * 
-	 * @param owlThing
 	 * @param index
 	 * @return {@code true} if the operation was successful and {@code false}
 	 *         otherwise; if {@code false} is returned, the index remains
@@ -78,7 +77,6 @@ public class RootContextInitializationRule extends
 	 * Removes a {@link RootContextInitializationRule} to the given
 	 * {@link ModifiableOntologyIndex}
 	 * 
-	 * @param owlThing
 	 * @param index
 	 * @return {@code true} if the operation was successful and {@code false}
 	 *         otherwise; if {@code false} is returned, the index remains

@@ -71,6 +71,7 @@ public class ReasonerFactory {
 				axiomLoaderFactory, interrupter, stageExecutor, config);
 	}
 
+	@SuppressWarnings("static-method")
 	Reasoner createReasoner(ElkObject.Factory elkFactory,
 			AxiomLoader.Factory axiomLoaderFactory,
 			final ReasonerInterrupter interrupter,
@@ -81,6 +82,7 @@ public class ReasonerFactory {
 		return reasoner;
 	}
 
+	@SuppressWarnings("static-method")
 	public Reasoner createReasoner(final Reasoner reasoner,
 			final ElkObject.Factory elkFactory,
 			final ReasonerConfiguration config) {
@@ -88,19 +90,20 @@ public class ReasonerFactory {
 				reasoner.getStageExecutor(), config);
 	}
 
+	@SuppressWarnings("static-method")
 	public Reasoner createReasoner(final ReasonerConfiguration config) {
 		return createReasoner(DEFAULT_INTERRUPTER, DEFAULT_STAGE_EXECUTOR,
 				config);
 	}
 
-	Reasoner createReasoner(final ReasonerInterrupter interrupter,
+	static Reasoner createReasoner(final ReasonerInterrupter interrupter,
 			final ReasonerStageExecutor stageExecutor,
 			final ReasonerConfiguration config) {
 		return createReasoner(new ElkObjectEntityRecyclingFactory(),
 				interrupter, stageExecutor, config);
 	}
 
-	Reasoner createReasoner(final ElkObject.Factory elkFactory,
+	static Reasoner createReasoner(final ElkObject.Factory elkFactory,
 			final ReasonerInterrupter interrupter,
 			final ReasonerStageExecutor stageExecutor,
 			final ReasonerConfiguration config) {

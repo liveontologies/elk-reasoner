@@ -64,9 +64,9 @@ public class ElkObjectPropertyKeyProvider extends ElkEntityKeyProvider
 
 			if (isOwl0 == isOwl1) {
 				return o1.getIri().compareTo(o2.getIri());
-			} else {
-				return isOwl0 ? -1 : 1;
 			}
+			// else
+			return isOwl0 ? -1 : 1;
 		}
 	};
 

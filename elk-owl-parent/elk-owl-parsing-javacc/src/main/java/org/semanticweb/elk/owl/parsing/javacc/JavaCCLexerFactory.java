@@ -28,6 +28,7 @@ package org.semanticweb.elk.owl.parsing.javacc;
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
+ * @param <T> 
  */
 public interface JavaCCLexerFactory<T> {
 

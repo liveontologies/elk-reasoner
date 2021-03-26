@@ -168,9 +168,9 @@ public abstract class AbstractUpdateableGenericInstanceTaxonomy<T extends ElkEnt
 						instanceNode.getDirectTypeNodes());
 			}
 			return true;
-		} else {
-			return false;
 		}
+		// else
+		return false;
 	}
 
 	private void addDirectType(final UTN typeNode, final UIN instanceNode) {

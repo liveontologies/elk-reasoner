@@ -40,6 +40,10 @@ import org.slf4j.LoggerFactory;
  * 
  *         pavel.klinov@uni-ulm.de
  * @author Peter Skocovsky
+ * @param <I> 
+ * @param <A> 
+ * @param <O> 
+ * @param <TD> 
  */
 @RunWith(PolySuite.class)
 public abstract class BaseIncrementalReasoningCorrectnessTest<I extends TestInput, A, O, TD extends IncrementalReasoningTestDelegate<A, O>>

@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * A {@link ClassConclusion.Visitor} that marks the {@link Context} for the root
  * returned by {@link ClassConclusion#getTraceRoot()} for the visited
  * {@link ClassConclusion}s as not saturated if the {@link ClassConclusion} can
- * potentially be re-derived. The visit method returns always {@link true}.
+ * potentially be re-derived. The visit method returns always {@code true}.
  * 
  * @see ClassConclusion#getTraceRoot()
  * 

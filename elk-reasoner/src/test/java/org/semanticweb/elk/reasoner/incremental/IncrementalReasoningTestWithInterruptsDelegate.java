@@ -38,4 +38,6 @@ public interface IncrementalReasoningTestWithInterruptsDelegate<A, O>
 		extends IncrementalReasoningTestDelegate<A, O>,
 		ReasoningTestWithInterruptsDelegate<O> {
 
+	// combined interface
+	
 }

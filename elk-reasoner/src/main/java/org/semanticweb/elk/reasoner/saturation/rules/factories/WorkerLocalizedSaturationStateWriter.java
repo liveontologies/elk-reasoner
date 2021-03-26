@@ -28,13 +28,16 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 
 /**
- * A {@link SaturationStateWriter} that produces {@link Conclusions} to the
+ * A {@link SaturationStateWriter} that produces {@link ClassInference}s to the
  * {@link WorkerLocalTodo} if they are produced for the root of the currently
  * processed {@link Context} as determined by
  * {@link WorkerLocalTodo#getActiveRoot()}
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <C>
+ *                the type of contexts maintained by this
+ *                {@link SaturationStateWriter}
  */
 public class WorkerLocalizedSaturationStateWriter<C extends Context> extends
 		SaturationStateWriterWrap<C> {

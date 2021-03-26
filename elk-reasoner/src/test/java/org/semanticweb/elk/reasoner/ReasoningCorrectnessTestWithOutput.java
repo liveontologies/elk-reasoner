@@ -36,8 +36,12 @@ import org.semanticweb.elk.testing.TestManifestWithOutput;
  * 
  *         pavel.klinov@uni-ulm.de
  * @author Peter Skocovsky
+ * 
+ * @param <I> 
  * @param <O>
  *            The type of test output.
+ * @param <TM> 
+ * @param <TD> 
  */
 @RunWith(PolySuite.class)
 public abstract class ReasoningCorrectnessTestWithOutput<I extends TestInput, O, TM extends TestManifestWithOutput<I, O>, TD extends ReasoningTestWithOutputDelegate<O>>

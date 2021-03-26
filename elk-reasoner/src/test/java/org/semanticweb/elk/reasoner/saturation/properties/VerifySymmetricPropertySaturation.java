@@ -42,6 +42,7 @@ public class VerifySymmetricPropertySaturation {
 	 * in the saturations for the respective left properties
 	 * 
 	 * @param ipc
+	 * @param hook 
 	 */
 	public static void testLeftCompositions(IndexedPropertyChain ipc,
 			AsymmetricCompositionHook hook) {
@@ -66,6 +67,7 @@ public class VerifySymmetricPropertySaturation {
 	 * in the saturations for the respective right properties
 	 * 
 	 * @param ip
+	 * @param hook 
 	 */
 	public static void testRightCompositions(IndexedObjectProperty ip,
 			AsymmetricCompositionHook hook) {

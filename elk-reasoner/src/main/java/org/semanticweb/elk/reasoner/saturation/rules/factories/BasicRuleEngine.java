@@ -35,6 +35,8 @@ import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
  * {@link SaturationStateWriter}
  * 
  * @author "Yevgeny Kazakov"
+ * 
+ * @param <I> 
  */
 public class BasicRuleEngine<I extends RuleApplicationInput>
 		extends

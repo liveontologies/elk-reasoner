@@ -121,9 +121,9 @@ public class ReverseTaxonomy<T extends ElkEntity> extends AbstractTaxonomy<T> {
 		public ReverseTaxonomyNode apply(final TaxonomyNode<T> node) {
 			if (node == null) {
 				return null;
-			} else {
-				return new ReverseTaxonomyNode(node);
 			}
+			// else
+			return new ReverseTaxonomyNode(node);
 		}
 
 		@SuppressWarnings("unchecked")

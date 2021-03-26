@@ -28,10 +28,7 @@ import org.semanticweb.elk.owl.interfaces.ElkCardinalityRestrictionQualified;
  * Visitor pattern interface for instances of
  * {@link ElkCardinalityRestrictionQualified}.
  * 
- * @author "Yevgeny Kazakov"
- * 
- * @param <O>
- *            the type of the output of this visitor
+ * @author "Yevgeny Kazakov" 
  */
 public interface ElkCardinalityRestrictionQualifiedFilter extends
 		ElkDataExactCardinalityQualifiedFilter,

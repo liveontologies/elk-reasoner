@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.saturation.context;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
@@ -37,7 +36,7 @@ import org.semanticweb.elk.util.collections.chains.Chain;
  * {@link Context} ({@link Context#getRoot()}). The computation is organized in
  * a saturation process where all {@link ClassConclusion}s to which inferences should
  * be applied are added to the "todo" queue using
- * {@link #addConclusion(ClassInference)} and when the rules are applied, they are
+ * {@link #addConclusion(ClassConclusion)} and when the rules are applied, they are
  * repeatedly taken from this queue using {@link #takeToDo()}. The object
  * provides some methods in addition to {@link ClassConclusionSet} to store, test and
  * remove information for {@link ClassConclusion}s in this {@link Context}, and some
@@ -91,9 +90,9 @@ public interface Context extends ClassConclusionSet, ContextPremises {
 
 	/**
 	 * @return {@code true} if all {@link ClassConclusion}s for this {@link Context},
-	 *         as determined by the function
-	 *         {@link ClassConclusion#getSourceRoot(IndexedClassExpression)}, except
-	 *         for {@link SubClassConclusion}s are already computed.
+	 *         that have the same value of
+	 *         {@link ClassConclusion#getTraceRoot()} as {@link Context#getRoot()} 
+	 *         are already computed.
 	 */
 	boolean isSaturated();
 

@@ -22,12 +22,9 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.classes.CachedIndexedComplexPropertyChainImpl;
-import org.semanticweb.elk.reasoner.indexing.classes.CachedIndexedObjectPropertyImpl;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 
 /**
  * A utility class to create indexed objects for other tests
@@ -39,8 +36,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 public class IndexedObjectsCreator {
 
 	public static ModifiableIndexedObjectProperty createIndexedObjectProperty(
-			ModifiableOntologyIndex index, ElkObjectProperty prop,
-			ModifiableIndexedPropertyChain[] toldSubs,
+			ElkObjectProperty prop, ModifiableIndexedPropertyChain[] toldSubs,
 			ModifiableIndexedObjectProperty[] toldSupers) {
 
 		ModifiableIndexedObjectProperty property = new CachedIndexedObjectPropertyImpl(

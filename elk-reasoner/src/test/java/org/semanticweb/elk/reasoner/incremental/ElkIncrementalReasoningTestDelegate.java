@@ -140,6 +140,7 @@ public abstract class ElkIncrementalReasoningTestDelegate<O>
 	 * 
 	 * @return The additional configuration.
 	 */
+	@SuppressWarnings("static-method")
 	protected Map<String, String> additionalConfigIncremental() {
 		return Collections.emptyMap();
 	}
@@ -171,6 +172,7 @@ public abstract class ElkIncrementalReasoningTestDelegate<O>
 	 * 
 	 * @return The additional configuration.
 	 */
+	@SuppressWarnings("static-method")
 	protected Map<String, String> additionalConfigWithInterrupts() {
 		return Collections.emptyMap();
 	}

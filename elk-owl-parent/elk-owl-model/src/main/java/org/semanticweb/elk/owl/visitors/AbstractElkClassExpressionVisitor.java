@@ -56,6 +56,8 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
+ * @param <O>
+ *            the type of the output of this visitor
  */
 public abstract class AbstractElkClassExpressionVisitor<O> implements
 		ElkClassExpressionVisitor<O> {

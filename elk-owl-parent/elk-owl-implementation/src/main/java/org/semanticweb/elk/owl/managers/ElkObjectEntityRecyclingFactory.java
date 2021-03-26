@@ -48,6 +48,7 @@ import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
  * @author "Yevgeny Kazakov"
  * 
  */
+@SuppressWarnings("javadoc")
 public class ElkObjectEntityRecyclingFactory
 		extends ElkObjectDelegatingFactory {
 

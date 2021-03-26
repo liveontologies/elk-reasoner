@@ -183,6 +183,7 @@ public class CapacityBalancingEvictor<E> extends RecencyEvictor<E> {
 			return convertThis();
 		}
 
+		@Override
 		public <E> Evictor<E> build() {
 			return new CapacityBalancingEvictor<E>(balance_,
 					balanceAfterNRepeatedQueries_, loadFactor_, capacity_);

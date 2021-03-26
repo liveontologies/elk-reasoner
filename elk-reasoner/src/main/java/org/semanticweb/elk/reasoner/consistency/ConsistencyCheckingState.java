@@ -211,6 +211,7 @@ public class ConsistencyCheckingState {
 
 	/**
 	 * @param saturationState
+	 * @param propertHierarchyState 
 	 * @return a new {@link ConsistencyCheckingState} associated with the given
 	 *         {@link SaturationState}
 	 */

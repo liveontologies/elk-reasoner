@@ -34,6 +34,7 @@ import org.semanticweb.elk.owl.visitors.ElkObjectPropertyExpressionVisitor;
  * 
  * @author Yevgeny Kazakov
  */
+@SuppressWarnings("javadoc")
 public class ElkObjectPropertyExpressionInvertor implements
 		ElkObjectPropertyExpressionVisitor<ElkObjectPropertyExpression> {
 

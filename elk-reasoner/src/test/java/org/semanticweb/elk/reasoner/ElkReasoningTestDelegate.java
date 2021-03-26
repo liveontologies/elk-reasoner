@@ -65,6 +65,7 @@ public abstract class ElkReasoningTestDelegate<O>
 	 * 
 	 * @return The additional configuration.
 	 */
+	@SuppressWarnings("static-method")
 	protected Map<String, String> additionalConfigWithOutput() {
 		return Collections.emptyMap();
 	}
@@ -89,6 +90,7 @@ public abstract class ElkReasoningTestDelegate<O>
 	 * 
 	 * @return The additional configuration.
 	 */
+	@SuppressWarnings("static-method")
 	protected Map<String, String> additionalConfigWithInterrupts() {
 		return Collections.emptyMap();
 	}

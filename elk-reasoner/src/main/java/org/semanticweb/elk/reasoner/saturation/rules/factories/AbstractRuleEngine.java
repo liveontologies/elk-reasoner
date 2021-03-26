@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  * 
  */
+@SuppressWarnings("javadoc")
 public abstract class AbstractRuleEngine<I extends RuleApplicationInput>
 		extends DelegateInterruptMonitor
 		implements

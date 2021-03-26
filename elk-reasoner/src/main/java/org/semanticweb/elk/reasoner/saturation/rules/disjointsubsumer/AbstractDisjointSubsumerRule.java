@@ -1,7 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer;
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
-
 /*
  * #%L
  * ELK Reasoner

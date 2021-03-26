@@ -35,6 +35,9 @@ package org.semanticweb.elk.reasoner.tracing;
  *         pavel.klinov@uni-ulm.de
  * 
  * @author Yevgeny Kazakov
+ * 
+ * @param <O>
+ *                the type of the inference visitor output
  */
 public interface TraceUnwinder<O> {
 

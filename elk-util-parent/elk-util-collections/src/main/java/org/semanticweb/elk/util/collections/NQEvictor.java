@@ -242,9 +242,9 @@ public class NQEvictor<E> extends AbstractEvictor<E> {
 		 * added, builds {@link NQEvictor} with one level with default capacity
 		 * and load factor.
 		 * 
-		 * @return
+		 * @return The built {@link NQEvictor}
 		 */
-		public <E> Evictor<E> build() {
+		public <E> NQEvictor<E> build() {
 			if (capacities.isEmpty()) {
 				addLevel();
 			}

@@ -112,6 +112,9 @@ import org.semanticweb.elk.owl.iris.ElkFullIri;
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
+ * 
+ * @param <O>
+ *            the type of the output of this visitor
  */
 public abstract class AbstractElkObjectVisitor<O> implements ElkObjectVisitor<O> {
 

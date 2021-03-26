@@ -190,9 +190,9 @@ public class TraceState
 	 * 
 	 * @param conclusion
 	 * @return {@code true} if they are ready and can be retrieved by
-	 *         {@link #getInferences(Conclusion)}, returns {@code false} if the
+	 *         {@link #getInferences(Object)}, returns {@code false} if the
 	 *         tracing stage needs to be run before the inferences can be
-	 *         retrieved by {@link #getInferences(Conclusion)}.
+	 *         retrieved by {@link #getInferences(Object)}.
 	 */
 	public synchronized boolean requestInferences(final Conclusion conclusion) {
 		LOGGER_.trace("{}: request inferences", conclusion);

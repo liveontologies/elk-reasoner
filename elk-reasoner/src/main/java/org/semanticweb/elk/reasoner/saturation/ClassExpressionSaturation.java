@@ -40,6 +40,9 @@ import org.slf4j.LoggerFactory;
  * input collection of {@link IndexedContextRoot}s
  * 
  * @author Yevgeny Kazakov
+ * @param <I>
+ *                the types of {@link IndexedContextRoot}s managed by this
+ *                computation
  * 
  */
 public class ClassExpressionSaturation<I extends IndexedContextRoot>

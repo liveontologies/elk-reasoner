@@ -113,9 +113,9 @@ public abstract class NonBottomGenericTaxonomyNode<
 		if (!directSubNodes_.isEmpty()) {
 			return Collections.unmodifiableSet(taxonomy_.toTaxonomyNodes(
 					directSubNodes_));
-		} else {
-			return Collections.singleton(taxonomy_.getBottomNode());
 		}
+		// else
+		return Collections.singleton(taxonomy_.getBottomNode());
 	}
 
 	@Override

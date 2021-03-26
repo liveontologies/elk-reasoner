@@ -234,6 +234,8 @@ public class SaturatedPropertyChain {
 	 * @param other
 	 *            the {@link SaturatedPropertyChain} with which to compare this
 	 *            {@link SaturatedPropertyChain}
+	 * @param writer
+	 *            the {@link Writer} using which the differences are written
 	 * @throws IOException
 	 */
 	public void dumpDiff(SaturatedPropertyChain other, Writer writer)

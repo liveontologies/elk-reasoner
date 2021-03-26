@@ -47,9 +47,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChai
 
 /**
  * Delegates construction of {@link CachedIndexedObject} to a given
- * {@link CachedIndexedObject.Factory}. Subclasses can redefine the the method
- * {@link #filter(CachedIndexedObject)} which can additionally post-process the
- * created object.
+ * {@link CachedIndexedObject.Factory}.
  * 
  * @author "Yevgeny Kazakov"
  */

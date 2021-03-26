@@ -113,6 +113,7 @@ public class CountingEvictor<E> extends RecencyEvictor<E> {
 			return convertThis();
 		}
 
+		@Override
 		public <E> Evictor<E> build() {
 			return new CountingEvictor<E>(capacity_, evictBeforeAddCount_,
 					loadFactor_);

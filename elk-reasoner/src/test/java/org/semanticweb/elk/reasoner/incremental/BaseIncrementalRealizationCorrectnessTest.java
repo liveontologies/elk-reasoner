@@ -46,6 +46,7 @@ import org.semanticweb.elk.testing.UrlTestInput;
  * 
  *         pavel.klinov@uni-ulm.de
  * @author Peter Skocovsky
+ * @param <A> 
  */
 @RunWith(PolySuite.class)
 public abstract class BaseIncrementalRealizationCorrectnessTest<A> extends

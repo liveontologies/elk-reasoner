@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
  * visited {@link ClassConclusion}s using the provided {@link RuleVisitor} to
  * apply rules and {@link ClassInferenceProducer} to output the
  * {@link ClassConclusion}s of the applied rules. The methods always return
- * {@link true}.
+ * {@code true}.
  * 
  * @author "Yevgeny Kazakov"
  */

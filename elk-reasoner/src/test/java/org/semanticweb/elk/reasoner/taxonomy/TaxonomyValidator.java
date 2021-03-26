@@ -31,6 +31,8 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
+ * 
+ * @param <T> 
  */
 public interface TaxonomyValidator<T extends ElkEntity> {
 

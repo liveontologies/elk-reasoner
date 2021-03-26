@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A {@link ClassConclusion.Visitor} that adds the visited
  * {@link ClassConclusion} to the {@link Context} value of the provided
- * {@link Reference}. The visit method returns {@link true} if the
+ * {@link Reference}. The visit method returns {@code true} if the
  * {@link Context} was modified as the result of this operation, i.e., the
  * {@link ClassConclusion} was not contained in the {@link Context}.
  * Additionally, when inserting {@link ContextInitialization} the

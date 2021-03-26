@@ -33,4 +33,6 @@ public interface ReasoningTestWithOutputAndInterruptsDelegate<O>
 		extends ReasoningTestWithOutputDelegate<O>,
 		ReasoningTestWithInterruptsDelegate<O> {
 
+	// combined interface
+	
 }

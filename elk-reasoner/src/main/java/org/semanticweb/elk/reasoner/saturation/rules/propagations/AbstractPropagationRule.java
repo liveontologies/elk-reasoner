@@ -1,7 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.propagations;
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
-
 /*
  * #%L
  * ELK Reasoner

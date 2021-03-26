@@ -23,18 +23,13 @@ package org.semanticweb.elk.owlapi.proofs;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
-
-import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.liveontologies.puli.Proofs;
-import org.semanticweb.elk.ElkTestUtils;
 import org.semanticweb.elk.owlapi.ElkProver;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.TestUtils;
 import org.semanticweb.elk.testing.UrlTestInput;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;

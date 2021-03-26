@@ -35,6 +35,8 @@ import java.util.Set;
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
+ * @param <Key> 
+ * @param <Value> 
  */
 public class MultimapQueueImpl<Key, Value> implements MultimapQueue<Key, Value> {
 

@@ -51,6 +51,7 @@ import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
  * @author Markus Kroetzsch
  * @author Pavel Klinov
  * 
+ * @param <I>  
  */
 public class RuleApplicationAdditionFactory<I extends RuleApplicationInput>
 		extends

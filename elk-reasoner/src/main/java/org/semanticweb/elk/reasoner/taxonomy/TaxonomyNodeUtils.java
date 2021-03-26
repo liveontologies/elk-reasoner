@@ -148,14 +148,14 @@ public class TaxonomyNodeUtils {
 				node.getDirectInstanceNodes(),
 				new Operations.Functor<GenericTypeNode<T, I, TN, IN>, Set<? extends GenericTypeNode<T, I, TN, IN>>>() {
 					@Override
-					public Set<? extends TN> apply(final GenericTypeNode<T, I, TN, IN> node) {
-						return node.getDirectSubNodes();
+					public Set<? extends TN> apply(final GenericTypeNode<T, I, TN, IN> n) {
+						return n.getDirectSubNodes();
 					}
 				},
 				new Operations.Functor<GenericTypeNode<T, I, TN, IN>, Set<? extends IN>>() {
 					@Override
-					public Set<? extends IN> apply(final GenericTypeNode<T, I, TN, IN> node) {
-						return node.getDirectInstanceNodes();
+					public Set<? extends IN> apply(final GenericTypeNode<T, I, TN, IN> n) {
+						return n.getDirectInstanceNodes();
 					}
 				});
 	}

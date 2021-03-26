@@ -66,7 +66,7 @@ import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
  * @author Peter Skocovsky
  */
 public class EntailmentQueryConverter extends
-ElkQueryAxiomIndexingVisitor<IndexedEntailmentQuery<? extends Entailment>> {
+		ElkQueryAxiomIndexingVisitor<IndexedEntailmentQuery<? extends Entailment>> {
 
 	private final ElkObject.Factory elkFactory_;
 	private final ElkPolarityExpressionConverter positiveConverter_;
@@ -74,11 +74,13 @@ ElkQueryAxiomIndexingVisitor<IndexedEntailmentQuery<? extends Entailment>> {
 
 	/**
 	 * @param elkFactory
-	 *            {@link ElkObject} factory.
+	 *                       {@link ElkObject} factory.
 	 * @param index
-	 *            Indexed queries are inserted into/deleted from this index.
+	 *                       Indexed queries are inserted into/deleted from this
+	 *                       index.
 	 * @param increment
-	 *            How should occurrence counts of indexed object change.
+	 *                       How should occurrence counts of indexed object
+	 *                       change.
 	 */
 	public EntailmentQueryConverter(final ElkObject.Factory elkFactory,
 			final ModifiableOntologyIndex index, final int increment) {
@@ -245,15 +247,9 @@ ElkQueryAxiomIndexingVisitor<IndexedEntailmentQuery<? extends Entailment>> {
 	}
 
 	/**
-	 * One-parameter, public, non-static methods called "visit" and declared in
-	 * this class enumerate subclasses of {@link ElkAxiom} (parameter) for which
-	 * entailment queries are supported. This method returns {@code true} iff
-	 * the subclass of {@link ElkAxiom} specified as the parameter is a
-	 * parameter type of some of these methods, e.g., whether entailment query
-	 * of such an {@link ElkAxiom} is supported.
-	 * 
 	 * @param axiomClass
-	 * @return
+	 * @return {@code true} iff the entailment checking is supported for the
+	 *         {@link ElkAxiom} of the given type and {@code false} otherwise
 	 * 
 	 */
 	public static boolean isEntailmentCheckingSupported(

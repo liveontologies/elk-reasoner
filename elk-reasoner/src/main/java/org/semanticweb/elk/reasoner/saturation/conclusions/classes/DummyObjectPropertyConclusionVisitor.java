@@ -37,6 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
  *         pavel.klinov@uni-ulm.de
  * 
  * @author Yevgeny Kazakov
+ * @param <O> 
  */
 public class DummyObjectPropertyConclusionVisitor<O>
 		implements

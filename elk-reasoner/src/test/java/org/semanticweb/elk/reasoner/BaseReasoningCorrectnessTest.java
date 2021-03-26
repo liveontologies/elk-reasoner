@@ -85,6 +85,10 @@ public abstract class BaseReasoningCorrectnessTest<I extends TestInput, O, TM ex
 		delegate_.after();
 	}
 
+	/**
+	 * @param input  
+	 * @return {@code true} if the input should be ignored
+	 */
 	protected boolean ignore(I input) {
 		return false;
 	}

@@ -64,14 +64,6 @@ public interface ElkDataProperty extends ElkDataPropertyExpression, ElkEntity {
 		 */
 		public ElkDataProperty getDataProperty(ElkIri iri);
 
-		/**
-		 * Create the {@link ElkDataProperty} representing
-		 * owl:BottomDataProperty}.
-		 * 
-		 * @return an {@link ElkDataProperty} corresponding to the input
-		 */
-		public ElkDataProperty getOwlBottomDataProperty();
-
 	}
 
 }

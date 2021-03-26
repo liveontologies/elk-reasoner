@@ -1188,13 +1188,4 @@ public abstract class AbstractReasonerState implements TracingProof {
 		return traceState_;
 	}
 
-	// ////////////////////////////////////////////////////////////////
-	/*
-	 * SOME DEBUG METHODS, FIXME: REMOVE
-	 */
-	// ////////////////////////////////////////////////////////////////
-	@Deprecated
-	public synchronized Collection<? extends IndexedClassExpression> getIndexedClassExpressions() {
-		return ontologyIndex.getClassExpressions();
-	}
 }

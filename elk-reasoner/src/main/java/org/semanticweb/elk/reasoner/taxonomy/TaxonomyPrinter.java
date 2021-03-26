@@ -349,9 +349,9 @@ public class TaxonomyPrinter {
 				if (superEntity instanceof ElkClass) {
 					return factory.getSubClassOfAxiom(cls,
 							(ElkClass) superEntity);
-				} else {
-					return defaultVisit(cls);
 				}
+				// else
+				return defaultVisit(cls);
 			}
 
 			@Override
@@ -359,9 +359,9 @@ public class TaxonomyPrinter {
 				if (superEntity instanceof ElkClass) {
 					return factory.getClassAssertionAxiom(
 							(ElkClass) superEntity, ind);
-				} else {
-					return defaultVisit(ind);
 				}
+				// else
+				return defaultVisit(ind);
 			}
 
 			@Override
@@ -369,9 +369,9 @@ public class TaxonomyPrinter {
 				if (superEntity instanceof ElkObjectProperty) {
 					return factory.getSubObjectPropertyOfAxiom(prop,
 							(ElkObjectProperty) superEntity);
-				} else {
-					return defaultVisit(prop);
 				}
+				// else
+				return defaultVisit(prop);
 			}
 
 		};

@@ -26,6 +26,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
@@ -78,25 +79,27 @@ public class TracingTest {
 	}
 
 	@SuppressWarnings("static-method")
-	protected boolean ignore(TestInput input) {
+	protected boolean ignore(@SuppressWarnings("unused") TestInput input) {
 		return false;
 	}
 
 	@Test
 	public void tracingTest() throws Exception {
-		Reasoner reasoner = TestReasonerUtils
-				.createTestReasoner(manifest.getInput().getUrl().openStream());
+		Reasoner reasoner;
+		try (InputStream stream = manifest.getInput().getUrl().openStream()) {
+			reasoner = TestReasonerUtils.createTestReasoner(stream);
+			try {
+				TracingTests tests = getTracingTests(reasoner);
+				TracingTestVisitor testVisitor = getTracingTestVisitor(
+						reasoner);
 
-		try {
-			TracingTests tests = getTracingTests(reasoner);
-			TracingTestVisitor testVisitor = getTracingTestVisitor(reasoner);
-
-			// visit all subsumptions twice: the second time to ensure
-			// that the proofs are still the same
-			tests.accept(testVisitor);
-			tests.accept(testVisitor);
-		} finally {
-			assertTrue(reasoner.shutdown());
+				// visit all subsumptions twice: the second time to ensure
+				// that the proofs are still the same
+				tests.accept(testVisitor);
+				tests.accept(testVisitor);
+			} finally {
+				assertTrue(reasoner.shutdown());
+			}
 		}
 	}
 
@@ -126,8 +129,7 @@ public class TracingTest {
 					for (final Conclusion conclusion : TracingTestUtils
 							.getDerivedConclusionsForSubsumption(subsumee,
 									subsumer, reasoner)) {
-						TracingProof inferences = reasoner
-								.getProof();
+						TracingProof inferences = reasoner.getProof();
 						TracingProofMetrics proofStats = TracingProofMetrics
 								.getStatistics(inferences, conclusion);
 						boolean provable = proofStats.isProvable();

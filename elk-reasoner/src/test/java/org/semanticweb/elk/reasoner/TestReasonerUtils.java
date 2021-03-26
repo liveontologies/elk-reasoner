@@ -64,11 +64,9 @@ public class TestReasonerUtils {
 	}
 
 	/**
-	 * Created a reasoner that fails on interrupt.
-	 * 
 	 * @param axiomLoaderFactory
 	 * @param config
-	 * @return
+	 * @return a reasoner that fails on interrupt.
 	 */
 	public static Reasoner createTestReasoner(
 			final AxiomLoader.Factory axiomLoaderFactory,
@@ -78,11 +76,9 @@ public class TestReasonerUtils {
 	}
 
 	/**
-	 * Created a reasoner that fails on interrupt.
-	 * 
 	 * @param axiomLoader
 	 * @param config
-	 * @return
+	 * @return a reasoner that fails on interrupt.
 	 */
 	public static Reasoner createTestReasoner(final TestAxiomLoader axiomLoader,
 			final ReasonerConfiguration config) {
@@ -91,10 +87,8 @@ public class TestReasonerUtils {
 	}
 
 	/**
-	 * Created a reasoner that fails on interrupt and uses default config.
-	 * 
 	 * @param axiomLoader
-	 * @return
+	 * @return a reasoner that fails on interrupt and uses default configuration
 	 */
 	public static Reasoner createTestReasoner(
 			final TestAxiomLoader axiomLoader) {
@@ -103,11 +97,9 @@ public class TestReasonerUtils {
 	}
 
 	/**
-	 * Created a reasoner that fails on interrupt. Closes the stream.
-	 * 
 	 * @param stream
 	 * @param config
-	 * @return
+	 * @return a reasoner that fails on interrupt.
 	 */
 	public static Reasoner createTestReasoner(final InputStream stream,
 			final ReasonerConfiguration config) {
@@ -117,11 +109,9 @@ public class TestReasonerUtils {
 	}
 
 	/**
-	 * Created a reasoner that fails on interrupt and uses default config.
-	 * Closes the stream.
-	 * 
 	 * @param stream
-	 * @return
+	 * @return a reasoner that fails on interrupt and uses default
+	 *         configuration.
 	 */
 	public static Reasoner createTestReasoner(final InputStream stream) {
 		return createTestReasoner(stream,
@@ -129,12 +119,10 @@ public class TestReasonerUtils {
 	}
 
 	/**
-	 * Created a reasoner that fails on interrupt and uses specified number of
-	 * workers.
-	 * 
 	 * @param axiomLoaderFactory
 	 * @param maxWorkers
-	 * @return
+	 * @return a reasoner that fails on interrupt and uses specified number of
+	 *         workers
 	 */
 	public static Reasoner createTestReasoner(
 			final AxiomLoader.Factory axiomLoaderFactory,
@@ -148,12 +136,10 @@ public class TestReasonerUtils {
 	}
 
 	/**
-	 * Created a reasoner that fails on interrupt and uses specified number of
-	 * workers.
-	 * 
 	 * @param axiomLoader
 	 * @param maxWorkers
-	 * @return
+	 * @return a reasoner that fails on interrupt and uses specified number of
+	 *         workers.
 	 */
 	public static Reasoner createTestReasoner(final TestAxiomLoader axiomLoader,
 			final int maxWorkers) {
@@ -162,12 +148,11 @@ public class TestReasonerUtils {
 	}
 
 	/**
-	 * Created a reasoner that fails on interrupt and uses specified number of
-	 * workers. Closes the stream.
-	 * 
 	 * @param stream
 	 * @param maxWorkers
-	 * @return
+	 * @return a reasoner that fails on interrupt and uses specified number of
+	 *         workers.
+	 * The input stream will be closed upon loading of axioms.        
 	 */
 	public static Reasoner createTestReasoner(final InputStream stream,
 			final int maxWorkers) {
@@ -182,19 +167,6 @@ public class TestReasonerUtils {
 		final AxiomLoader.Factory axiomLoaderFactory = new Owl2StreamLoader.Factory(
 				new Owl2FunctionalStyleParserFactory(), stream);
 		return createTestReasoner(axiomLoaderFactory, interrupter, config);
-	}
-
-	/**
-	 * Created a reasoner that uses default config.
-	 * 
-	 * @param stream
-	 * @param interrupter
-	 * @return
-	 */
-	public static Reasoner createTestReasoner(final InputStream stream,
-			final ReasonerInterrupter interrupter) {
-		return createTestReasoner(stream, interrupter,
-				ReasonerConfiguration.getConfiguration());
 	}
 
 	public static Reasoner createTestReasoner(
@@ -231,44 +203,43 @@ public class TestReasonerUtils {
 
 	public static Set<? extends ElkAxiom> loadAxioms(String resource)
 			throws Exception {
-		return loadAxioms(TestReasonerUtils.class.getClassLoader()
-				.getResourceAsStream(resource));
+		try (InputStream stream = TestReasonerUtils.class.getClassLoader()
+				.getResourceAsStream(resource)) {
+			return loadAxioms(stream);
+		}
 	}
 
 	public static Set<? extends ElkAxiom> loadAxioms(File file)
 			throws Exception {
-		return loadAxioms(new FileInputStream(file));
+		try (InputStream stream = new FileInputStream(file)) {
+			return loadAxioms(stream);
+		}
 	}
 
 	public static Set<ElkAxiom> loadAxioms(Reader reader)
 			throws IOException, Owl2ParseException {
-		try {
-			Owl2Parser parser = new Owl2FunctionalStyleParserFactory()
-					.getParser(reader);
-			final Set<ElkAxiom> axioms = new HashSet<ElkAxiom>();
+		Owl2Parser parser = new Owl2FunctionalStyleParserFactory()
+				.getParser(reader);
+		final Set<ElkAxiom> axioms = new HashSet<ElkAxiom>();
 
-			parser.accept(new Owl2ParserAxiomProcessor() {
+		parser.accept(new Owl2ParserAxiomProcessor() {
 
-				@Override
-				public void visit(ElkPrefix elkPrefix)
-						throws Owl2ParseException {
-					// ignored
-				}
+			@Override
+			public void visit(ElkPrefix elkPrefix) throws Owl2ParseException {
+				// ignored
+			}
 
-				@Override
-				public void visit(ElkAxiom elkAxiom) throws Owl2ParseException {
-					axioms.add(elkAxiom);
-				}
+			@Override
+			public void visit(ElkAxiom elkAxiom) throws Owl2ParseException {
+				axioms.add(elkAxiom);
+			}
 
-				@Override
-				public void finish() throws Owl2ParseException {
-					// everything is processed immediately
-				}
-			});
+			@Override
+			public void finish() throws Owl2ParseException {
+				// everything is processed immediately
+			}
+		});
 
-			return axioms;
-		} finally {
-			reader.close();
-		}
+		return axioms;
 	}
 }

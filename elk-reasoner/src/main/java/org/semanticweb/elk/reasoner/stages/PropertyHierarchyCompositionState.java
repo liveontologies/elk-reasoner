@@ -68,6 +68,7 @@ public class PropertyHierarchyCompositionState {
 
 	private final Dispatcher dispatcher_ = new Dispatcher() {
 
+		@Override
 		public void firePropertyBecameSaturated(
 				final IndexedPropertyChain chain) {
 			for (final Listener listener : listeners_) {
@@ -75,6 +76,7 @@ public class PropertyHierarchyCompositionState {
 			}
 		}
 
+		@Override
 		public void firePropertyBecameNotSaturated(
 				final IndexedPropertyChain chain) {
 			for (final Listener listener : listeners_) {

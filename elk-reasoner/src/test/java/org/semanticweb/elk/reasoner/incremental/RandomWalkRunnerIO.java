@@ -37,6 +37,8 @@ import org.slf4j.Logger;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ *         
+ * @param <T> 
  */
 public interface RandomWalkRunnerIO<T> {
 

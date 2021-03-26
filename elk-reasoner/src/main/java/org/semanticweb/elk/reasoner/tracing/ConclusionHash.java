@@ -21,7 +21,6 @@
  */
 package org.semanticweb.elk.reasoner.tracing;
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
@@ -69,10 +68,6 @@ public class ConclusionHash
 		return c.hashCode();
 	}
 	
-	private static int hashCode(ElkObject elkObject) {
-		return elkObject.hashCode();
-	}
-
 	private static int hashCode(IndexedObject o) {
 		return o.hashCode();
 	}

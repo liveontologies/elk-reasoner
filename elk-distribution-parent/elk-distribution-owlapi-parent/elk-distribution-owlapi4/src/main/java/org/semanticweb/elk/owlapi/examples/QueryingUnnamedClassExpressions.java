@@ -66,7 +66,8 @@ public class QueryingUnnamedClassExpressions {
 
 		// Create your desired query class expression. In this example we
 		// will query ObjectIntersectionOf(A ObjectSomeValuesFrom(R B)).
-		PrefixManager pm = new DefaultPrefixManager("http://example.org/");
+		PrefixManager pm = new DefaultPrefixManager();
+		pm.setDefaultPrefix("http://example.org/");
 		OWLClass A = dataFactory.getOWLClass(":A", pm);
 		OWLObjectProperty R = dataFactory.getOWLObjectProperty(":R", pm);
 		OWLClass B = dataFactory.getOWLClass(":B", pm);

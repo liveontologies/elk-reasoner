@@ -22,11 +22,12 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.exceptions.ElkException;
+import org.semanticweb.elk.reasoner.tracing.TraceState;
 import org.semanticweb.elk.reasoner.tracing.TracingComputation;
 
 /**
  * Executes {@link TracingComputation} to trace inferences queued in
- * {@link TracingState}
+ * {@link TraceState}
  * 
  * @author Peter Skocovsky
  */

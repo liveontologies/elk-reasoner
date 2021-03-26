@@ -71,6 +71,8 @@ public class ObjectIntersectionFromSecondConjunctRule extends
 	 * 
 	 * @param conjunction
 	 * @param index
+	 * @return {@code true} if the operation is successful and {@code false} if
+	 *         not; if {@code false} is return, the index remains unchanged
 	 */
 	public static boolean addRulesFor(
 			ModifiableIndexedObjectIntersectionOf conjunction,
@@ -88,6 +90,8 @@ public class ObjectIntersectionFromSecondConjunctRule extends
 	 * 
 	 * @param conjunction
 	 * @param index
+	 * @return {@code true} if the operation is successful and {@code false} if
+	 *         not; if {@code false} is return, the index remains unchanged
 	 */
 	public static boolean removeRulesFor(
 			ModifiableIndexedObjectIntersectionOf conjunction,

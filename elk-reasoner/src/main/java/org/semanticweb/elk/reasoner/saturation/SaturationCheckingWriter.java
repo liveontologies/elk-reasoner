@@ -32,6 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
  * @author Pavel Klinov
  * 
  * @author "Yevgeny Kazakov"
+ * @param <C> 
  */
 public class SaturationCheckingWriter<C extends Context> extends
 		SaturationStateWriterWrap<C> {

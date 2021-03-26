@@ -36,6 +36,11 @@ import org.semanticweb.elk.reasoner.entailments.model.SubClassOfAxiomEntailment;
 
 public class DefaultEntailmentVisitor<O> implements Entailment.Visitor<O> {
 
+	/**
+	 * N-OP default visitor
+	 * @param entailment  
+	 * @return {@code null}
+	 */
 	public O defaultVisit(final Entailment entailment) {
 		return null;
 	}

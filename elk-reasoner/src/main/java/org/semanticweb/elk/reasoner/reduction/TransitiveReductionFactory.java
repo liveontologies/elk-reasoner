@@ -136,6 +136,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	 * Creating a new transitive reduction engine for the input ontology index
 	 * and a listener for executing callback functions.
 	 * 
+	 * @param interrupter 
 	 * @param saturationState
 	 *            the saturation state of the reasoner
 	 * @param maxWorkers

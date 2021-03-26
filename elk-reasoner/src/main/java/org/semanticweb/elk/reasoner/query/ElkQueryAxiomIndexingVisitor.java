@@ -75,6 +75,9 @@ import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedFe
  */
 public class ElkQueryAxiomIndexingVisitor<O> implements ElkAxiomVisitor<O> {
 
+	/**
+	 * @param axiom  
+	 */
 	protected O defaultVisit(ElkAxiom axiom) {
 		return null;
 	}

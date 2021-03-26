@@ -48,7 +48,7 @@ public class EmptyImportTest {
 	 * declarations).
 	 * 
 	 * @see <a
-	 *      href="http://code.google.com/p/elk-reasoner/issues/detail?id=7">Issue 7<a>
+	 *      href="http://code.google.com/p/elk-reasoner/issues/detail?id=7">Issue 7</a>
 	 * @throws OWLOntologyCreationException
 	 * @throws URISyntaxException
 	 */

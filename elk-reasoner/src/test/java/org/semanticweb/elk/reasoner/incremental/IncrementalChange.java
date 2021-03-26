@@ -31,6 +31,7 @@ import java.util.List;
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <T> 
  */
 public class IncrementalChange<T> {
 

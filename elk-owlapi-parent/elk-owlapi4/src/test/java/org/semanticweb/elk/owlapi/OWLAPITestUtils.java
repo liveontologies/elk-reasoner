@@ -64,7 +64,7 @@ public class OWLAPITestUtils {
 	 * 
 	 * @param ontology
 	 * @param isBufferingMode
-	 * @return
+	 * @return the reasoner
 	 */
 	public static ElkReasoner createReasoner(final OWLOntology ontology,
 			final boolean isBufferingMode) {
@@ -76,7 +76,7 @@ public class OWLAPITestUtils {
 	 * Created a reasoner that fails on interrupt.
 	 * 
 	 * @param ontology
-	 * @return
+	 * @return the reasoner
 	 */
 	public static ElkReasoner createReasoner(final OWLOntology ontology) {
 		return createReasoner(ontology, false,

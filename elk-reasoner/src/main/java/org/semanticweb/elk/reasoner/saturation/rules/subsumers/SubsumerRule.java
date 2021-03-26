@@ -35,6 +35,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.Rule;
  * {@link SubClassInclusion}s in a {@link Context}
  * 
  * @author "Yevgeny Kazakov"
+ * 
+ * @param <S> 
  */
 public interface SubsumerRule<S extends IndexedClassExpression> extends Rule<S> {
 

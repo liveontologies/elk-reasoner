@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextIniti
  * A {@link ClassConclusion.Visitor} that is composed of several given
  * {@link ClassConclusion.Visitor}s. The visit method of the composed visitor
  * calls the original {@link ClassConclusion.Visitor}s in the specified order
- * and returns {@link true} for the {@link ClassConclusion} if and only all of
+ * and returns {@code true} for the {@link ClassConclusion} if and only all of
  * the {@link ClassConclusion.Visitor}s return {@code true}. The result is
  * evaluated lazily, i.e., if some {@link ClassConclusion.Visitor} returns
  * {@code false}, the subsequent {@link ClassConclusion.Visitor}s are not
@@ -58,7 +58,7 @@ public class ComposedClassConclusionVisitor implements
 	 * Creates a new {@link ClassConclusion.Visitor} that combines several given
 	 * {@link ClassConclusion.Visitor}s. The visit method of the combined
 	 * visitor calls the original {@link ClassConclusion.Visitor}s in the
-	 * specified order and returns {@link true} for the {@link ClassConclusion}
+	 * specified order and returns {@code true} for the {@link ClassConclusion}
 	 * if and only all of the {@link ClassConclusion.Visitor}s return
 	 * {@code true}. The result is evaluated lazily, i.e., if some
 	 * {@link ClassConclusion.Visitor} returns {@code false}, the subsequent
@@ -67,6 +67,7 @@ public class ComposedClassConclusionVisitor implements
 	 * @param visitors
 	 *            the {@link ClassConclusion.Visitor} to be composed
 	 */
+	@SafeVarargs
 	public ComposedClassConclusionVisitor(
 			ClassConclusion.Visitor<Boolean>... visitors) {
 		this.visitors_ = visitors;

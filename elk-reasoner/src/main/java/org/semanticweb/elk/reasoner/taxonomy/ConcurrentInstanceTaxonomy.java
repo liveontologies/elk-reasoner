@@ -188,7 +188,7 @@ public class ConcurrentInstanceTaxonomy
 			final Collection<? extends ElkNamedIndividual> instances) {
 		return individualNodeStore_.getCreateNode(instances, instances.size(),
 				INSTANCE_NODE_FACTORY);
-	};
+	}
 
 	@Override
 	public boolean setCreateDirectTypes(
@@ -224,10 +224,10 @@ public class ConcurrentInstanceTaxonomy
 						instanceNode.getDirectTypeNodes());
 			}
 			return true;
-		} else {
-			return false;
 		}
-	};
+		// else
+		return false;
+	}
 
 	private static void addDirectType(
 			final UpdateableTypeNode.Projection<ElkClass, ElkNamedIndividual> typeNode,
@@ -281,9 +281,9 @@ public class ConcurrentInstanceTaxonomy
 		if (individualNodeStore_.removeNode(instance)) {
 			LOGGER_.trace("removed instance node with member: {}", instance);
 			return true;
-		} else {
-			return false;
 		}
+		// else
+		return false;
 	}
 
 	@Override
@@ -392,9 +392,9 @@ public class ConcurrentInstanceTaxonomy
 		public NonBottomTaxonomyNode<ElkClass> deapply(final Object element) {
 			if (element instanceof UpdateableTypeNodeWrapper) {
 				return ((UpdateableTypeNodeWrapper) element).getNode();
-			} else {
-				return null;
 			}
+			// else
+			return null;
 		}
 
 	};
@@ -417,9 +417,9 @@ public class ConcurrentInstanceTaxonomy
 		public TaxonomyNode<ElkClass> deapply(Object element) {
 			if (element instanceof TypeNodeWrapper) {
 				return ((TypeNodeWrapper) element).getNode();
-			} else {
-				return null;
 			}
+			// else
+			return null;
 		}
 
 	};
@@ -534,6 +534,7 @@ public class ConcurrentInstanceTaxonomy
 					new ConcurrentHashMap<UpdateableInstanceNode.Projection<ElkClass, ElkNamedIndividual>, Boolean>());
 		}
 
+		@Override
 		public NonBottomTaxonomyNode<ElkClass> getNode() {
 			return classNode_;
 		}

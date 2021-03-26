@@ -1,12 +1,12 @@
 package org.semanticweb.elk.reasoner.saturation.context;
 
-/*
+/*-
  * #%L
- * ELK Reasoner
+ * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2021 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ package org.semanticweb.elk.reasoner.saturation.context;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassConclusion;
 
 public interface SubClassConclusionSet {
@@ -61,10 +60,10 @@ public interface SubClassConclusionSet {
 	boolean containsSubConclusion(SubClassConclusion conclusion);
 
 	/**
-	 * @return {@code true} if this {@link SubClassConclusionSet} does not contain
-	 *         any {@link SubClassConclusion}. In this case,
-	 *         {@link #containsSubConclusion(ClassConclusion)} returns {@code false}
-	 *         for every input.
+	 * @return {@code true} if this {@link SubClassConclusionSet} does not
+	 *         contain any {@link SubClassConclusion}. In this case,
+	 *         {@link #containsSubConclusion(SubClassConclusion)} returns
+	 *         {@code false} for every input.
 	 */
 	boolean isEmpty();
 

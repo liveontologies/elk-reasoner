@@ -34,13 +34,11 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.reasoner.DummyProgressMonitor;
-import org.semanticweb.elk.reasoner.indexing.classes.DirectIndex;
 import org.semanticweb.elk.reasoner.indexing.classes.IndexedObjectsCreator;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.properties.VerifySymmetricPropertySaturation.AsymmetricCompositionHook;
 import org.semanticweb.elk.reasoner.stages.PropertyHierarchyCompositionState;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentExecutors;
@@ -59,22 +57,21 @@ public class IndexedPropertyChainSaturationTest {
 	@Test
 	public void testPropertyCompositionSymmetry() {
 		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
-		ModifiableOntologyIndex index = new DirectIndex(factory);
 
 		ModifiableIndexedObjectProperty R1 = IndexedObjectsCreator
-				.createIndexedObjectProperty(index,
+				.createIndexedObjectProperty(
 						factory.getObjectProperty(
 								new ElkFullIri("http://test.com/R1")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] {});
 		ModifiableIndexedObjectProperty R2 = IndexedObjectsCreator
-				.createIndexedObjectProperty(index,
+				.createIndexedObjectProperty(
 						factory.getObjectProperty(
 								new ElkFullIri("http://test.com/R2")),
 						new ModifiableIndexedPropertyChain[] { R1 },
 						new ModifiableIndexedObjectProperty[] {});
 		ModifiableIndexedObjectProperty R3 = IndexedObjectsCreator
-				.createIndexedObjectProperty(index,
+				.createIndexedObjectProperty(
 						factory.getObjectProperty(
 								new ElkFullIri("http://test.com/R3")),
 						new ModifiableIndexedPropertyChain[] { R2 },
@@ -129,63 +126,61 @@ public class IndexedPropertyChainSaturationTest {
 	@Test
 	public void testCyclicCompositions() {
 		ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
-		ModifiableOntologyIndex index = new DirectIndex(factory);
 
 		ModifiableIndexedObjectProperty H = IndexedObjectsCreator
-				.createIndexedObjectProperty(index,
+				.createIndexedObjectProperty(
 						factory.getObjectProperty(
 								new ElkFullIri("http://test.com/H")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] {});
 		// S1 -> S2 -> S3
 		ModifiableIndexedObjectProperty S3 = IndexedObjectsCreator
-				.createIndexedObjectProperty(index,
+				.createIndexedObjectProperty(
 						factory.getObjectProperty(
 								new ElkFullIri("http://test.com/S3")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] {});
 		ModifiableIndexedObjectProperty S2 = IndexedObjectsCreator
-				.createIndexedObjectProperty(index,
+				.createIndexedObjectProperty(
 						factory.getObjectProperty(
 								new ElkFullIri("http://test.com/S2")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] { S3 });
 		ModifiableIndexedObjectProperty S1 = IndexedObjectsCreator
-				.createIndexedObjectProperty(index,
+				.createIndexedObjectProperty(
 						factory.getObjectProperty(
 								new ElkFullIri("http://test.com/S1")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] { S2 });
 		// P1 -> P2 -> P3
 		ModifiableIndexedObjectProperty P3 = IndexedObjectsCreator
-				.createIndexedObjectProperty(index,
+				.createIndexedObjectProperty(
 						factory.getObjectProperty(
 								new ElkFullIri("http://test.com/P3")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] {});
 		ModifiableIndexedObjectProperty P2 = IndexedObjectsCreator
-				.createIndexedObjectProperty(index,
+				.createIndexedObjectProperty(
 						factory.getObjectProperty(
 								new ElkFullIri("http://test.com/P2")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] { P3 });
 		ModifiableIndexedObjectProperty P1 = IndexedObjectsCreator
-				.createIndexedObjectProperty(index,
+				.createIndexedObjectProperty(
 						factory.getObjectProperty(
 								new ElkFullIri("http://test.com/P1")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] { P2 });
 		// S3 -> R, R -> S1, R -> P1
 		ModifiableIndexedObjectProperty R = IndexedObjectsCreator
-				.createIndexedObjectProperty(index,
+				.createIndexedObjectProperty(
 						factory.getObjectProperty(
 								new ElkFullIri("http://test.com/R")),
 						new ModifiableIndexedPropertyChain[] { S3 },
 						new ModifiableIndexedObjectProperty[] { S1, P1 });
 		// R o R -> H
-		ModifiableIndexedPropertyChain RR = IndexedObjectsCreator
-				.createIndexedChain(R, R,
-						new ModifiableIndexedObjectProperty[] { H });
+		IndexedPropertyChain RR = IndexedObjectsCreator.createIndexedChain(R, R,
+				new ModifiableIndexedObjectProperty[] { H });
 		// create the factory and run the computation
 		int maxThreads = Runtime.getRuntime().availableProcessors();
 		PropertyHierarchyCompositionComputation computation = new PropertyHierarchyCompositionComputation(

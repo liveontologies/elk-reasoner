@@ -58,5 +58,7 @@ public interface UpdateableTaxonomyTypeNode<
 		>
 		extends UpdateableTaxonomyNode<T, TN, UTN>,
 		UpdateableTypeNode<T, I, TN, IN, UTN, UIN> {
-	
+
+			// combined interface
+
 }

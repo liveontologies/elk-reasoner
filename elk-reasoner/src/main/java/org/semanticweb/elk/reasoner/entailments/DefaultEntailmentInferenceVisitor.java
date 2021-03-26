@@ -43,6 +43,10 @@ import org.semanticweb.elk.reasoner.entailments.model.TopObjectPropertyInBottomE
 public class DefaultEntailmentInferenceVisitor<O>
 		implements EntailmentInference.Visitor<O> {
 
+	/**
+	 * NO-OP default visitor
+	 * @param entailmentInference  
+	 */
 	protected O defaultVisit(final EntailmentInference entailmentInference) {
 		return null;
 	}

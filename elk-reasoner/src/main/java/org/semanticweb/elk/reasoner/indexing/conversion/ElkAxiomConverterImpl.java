@@ -360,7 +360,7 @@ public class ElkAxiomConverterImpl extends NoOpElkAnnotationAxiomConverter<Void>
 	 * Creates an {@link ElkAxiomConverter} for converting {@link ElkAxiom}s
 	 * that have already been indexed in the given
 	 * {@link ModifiableIndexedObjectCache}. All {@link ModifiableIndexedObject}
-	 * s subexpression of the converted {@link ModifiabledIndexedAxiom}s are
+	 * subexpressions of the converted {@link ModifiableIndexedAxiom}s are
 	 * taken from this {@link ModifiableIndexedObjectCache} as well. The
 	 * provided {@link ModifiableIndexedObjectCache} will not change. The
 	 * converter may not work properly if used with {@link ElkAxiom}s that have

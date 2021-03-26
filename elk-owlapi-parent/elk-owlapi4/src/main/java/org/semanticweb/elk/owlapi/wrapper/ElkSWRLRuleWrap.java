@@ -37,6 +37,9 @@ import org.semanticweb.owlapi.model.SWRLRule;
  * @author Pavel Klinov
  *
  *         pavel.klinov@uni-ulm.de
+ *         
+ * @param <T>
+ *            the type of the wrapped object
  */
 public class ElkSWRLRuleWrap<T extends SWRLRule> extends ElkObjectWrap<T>
 		implements ElkSWRLRule {

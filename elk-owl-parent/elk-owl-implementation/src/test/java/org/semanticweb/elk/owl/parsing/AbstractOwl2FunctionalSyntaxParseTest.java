@@ -144,16 +144,10 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 					.next();
 			// check that the parser created the right number of axioms of each
 			// type
-			Integer expectedCount = getExpectedCount(axiomTypeCounts,
+			int expectedCount = getExpectedCount(axiomTypeCounts,
 					actualEntry.getKey());
 
-			if (expectedCount == null) {
-				if (checkAll) {
-					error = true;
-					dumpAxioms(actualEntry.getValue());
-					System.err.println("Unexpectedly parsed axioms");
-				}
-			} else if (expectedCount.intValue() != actualEntry.getValue()
+			if (expectedCount != actualEntry.getValue()
 					.size()) {
 				error = true;
 				dumpAxioms(actualEntry.getValue());

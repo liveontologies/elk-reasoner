@@ -31,4 +31,6 @@ package org.semanticweb.elk.reasoner.indexing.model;
 public interface CachedIndexedOwlTopObjectProperty
 		extends CachedIndexedObjectProperty {
 
+	// combined interface
+	
 }

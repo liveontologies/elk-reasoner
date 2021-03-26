@@ -36,8 +36,6 @@ import org.semanticweb.elk.testing.DiffableOutput;
  *
  * @param <Q>
  *            Type of the query.
- * @param <E>
- *            Type of the elements of the test output that are to be compared
  * @param <O>
  *            Type of the test output.
  */

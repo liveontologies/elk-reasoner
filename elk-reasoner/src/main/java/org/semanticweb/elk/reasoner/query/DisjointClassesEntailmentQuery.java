@@ -60,7 +60,7 @@ public class DisjointClassesEntailmentQuery extends
 	}
 
 	@Override
-	protected Collection<? extends EntailmentInference> getEntailmentInference() {
+	public Collection<? extends EntailmentInference> getEntailmentInference() {
 
 		final List<SubClassOfAxiomEntailment> premises = new ArrayList<SubClassOfAxiomEntailment>();
 

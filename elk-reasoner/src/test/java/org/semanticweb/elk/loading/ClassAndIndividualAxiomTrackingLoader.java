@@ -23,8 +23,6 @@ package org.semanticweb.elk.loading;
 
 import java.util.List;
 
-import org.semanticweb.elk.loading.AxiomLoader;
-import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.interfaces.ElkAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;

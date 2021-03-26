@@ -148,7 +148,7 @@ public class InstanceTaxonomyState {
 			for (final ElkNamedIndividual elkIndividual : instanceNode) {
 				addToAdd(elkIndividual);
 			}
-		};
+		}
 
 	};
 
