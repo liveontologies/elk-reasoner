@@ -41,7 +41,7 @@ class NoIncompletenessMonitor implements IncompletenessMonitor {
 	}
 
 	@Override
-	public boolean isStatusChanged() {
+	public boolean isStatusChanged(Logger logger) {
 		return false;
 	}
 

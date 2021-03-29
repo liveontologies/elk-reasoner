@@ -56,7 +56,9 @@ public interface IncompletenessMonitor {
 	/**
 	 * @return {@code true} if calling {@link #logStatus(Logger)} would produce
 	 *         at least one log message and {@code false} otherwise.
+	 * @param logger
+	 *            the logger for which change of status is checked
 	 */
-	boolean isStatusChanged();
+	boolean isStatusChanged(Logger logger);
 
 }

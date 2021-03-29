@@ -61,9 +61,9 @@ public class FirstOfIncompletenessMonitor implements IncompletenessMonitor {
 	}
 
 	@Override
-	public boolean isStatusChanged() {
+	public boolean isStatusChanged(Logger logger) {
 		for (IncompletenessMonitor monitor : monitors_) {
-			if (monitor.isStatusChanged()) {
+			if (monitor.isStatusChanged(logger)) {
 				return true;
 			}
 			if (monitor.isIncompletenessDetected()) {

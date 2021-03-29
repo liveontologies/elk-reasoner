@@ -76,12 +76,16 @@ class IncompletenessDueToUnsupportedFeatures extends DelegatingOccurrenceManager
 	}
 
 	@Override
-	public boolean isStatusChanged() {
-		return isIncompletenessDetected() != wasIncomplete_;
+	public boolean isStatusChanged(Logger logger) {
+		return logger.isInfoEnabled()
+				&& isIncompletenessDetected() != wasIncomplete_;
 	}
 	
 	@Override
 	public void logStatus(Logger logger) {
+		if (!logger.isInfoEnabled()) {
+			return;
+		}
 		boolean isIncomplete = isIncompletenessDetected();
 		if (wasIncomplete_ == isIncomplete) {
 			// no change

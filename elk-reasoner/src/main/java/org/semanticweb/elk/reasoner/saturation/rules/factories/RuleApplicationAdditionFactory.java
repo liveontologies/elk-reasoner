@@ -63,7 +63,6 @@ public class RuleApplicationAdditionFactory<I extends RuleApplicationInput>
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	protected ClassInference.Visitor<Boolean> getInferenceProcessor(
 			Reference<Context> activeContext, RuleVisitor<?> ruleVisitor,
 			SaturationStateWriter<? extends Context> writer,

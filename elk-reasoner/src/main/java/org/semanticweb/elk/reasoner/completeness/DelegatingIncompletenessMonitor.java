@@ -54,8 +54,8 @@ public class DelegatingIncompletenessMonitor implements IncompletenessMonitor {
 	}
 
 	@Override
-	public boolean isStatusChanged() {
-		return delegate_.isStatusChanged();
+	public boolean isStatusChanged(Logger logger) {
+		return delegate_.isStatusChanged(logger);
 	}
 
 }

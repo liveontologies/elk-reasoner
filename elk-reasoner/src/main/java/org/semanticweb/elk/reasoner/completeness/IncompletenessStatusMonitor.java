@@ -47,17 +47,23 @@ public class IncompletenessStatusMonitor
 	}
 
 	@Override
-	public boolean isStatusChanged() {
-		return isIncompletenessDetected_ != isIncompletenessDetected()
-				|| super.isStatusChanged();
+	public boolean isStatusChanged(Logger logger) {
+		return logger.isWarnEnabled()
+				&& (isIncompletenessDetected_ != isIncompletenessDetected()
+						|| super.isStatusChanged(logger));
 	}
 
 	@Override
 	public void logStatus(Logger logger) {
-		if (!isStatusChanged()) {
+		if (!logger.isWarnEnabled()) {
 			return;
 		}
-		isIncompletenessDetected_ = isIncompletenessDetected();
+		boolean isIncompletenessDetected = isIncompletenessDetected();
+		if (isIncompletenessDetected_ == isIncompletenessDetected
+				&& !super.isStatusChanged(logger)) {
+			return;
+		}
+		isIncompletenessDetected_ = isIncompletenessDetected;
 		if (isIncompletenessDetected_) {
 			logger.warn(statusMessage_);
 		} else {

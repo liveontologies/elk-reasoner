@@ -88,12 +88,15 @@ public class SomeOfIncompletenessMonitor implements IncompletenessMonitor {
 	}
 
 	@Override
-	public boolean isStatusChanged() {
+	public boolean isStatusChanged(Logger logger) {
+		if (!logger.isInfoEnabled()) {
+			return false;
+		}
 		int countIncompletenessProblems = 0;
 		for (IncompletenessMonitor monitor : monitors_) {
 			if (!monitor.isIncompletenessDetected()
 					|| countIncompletenessProblems++ < explanationLimit_) {
-				if (monitor.isStatusChanged()) {
+				if (monitor.isStatusChanged(logger)) {
 					return true;
 				}
 			}
@@ -103,6 +106,9 @@ public class SomeOfIncompletenessMonitor implements IncompletenessMonitor {
 
 	@Override
 	public void logStatus(Logger logger) {
+		if (!logger.isInfoEnabled()) {
+			return;
+		}
 		int countIncompletenessProblems = 0;
 		for (IncompletenessMonitor monitor : monitors_) {
 			if (!monitor.isIncompletenessDetected()
