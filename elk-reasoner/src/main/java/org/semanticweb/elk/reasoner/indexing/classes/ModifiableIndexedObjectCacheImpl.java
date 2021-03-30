@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexClassExpr
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedIndividual;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectIntersectionOf;
@@ -79,7 +79,7 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 
 	private final EntryCollection<CachedIndexedIndividual> cachedIndividuals_;
 
-	private final CachedIndexedObject.Filter resolver_, inserter_, deleter_;
+	private final CachedIndexedSubObject.Filter resolver_, inserter_, deleter_;
 
 	private final CachedIndexedOwlThing owlThing_;
 
@@ -185,19 +185,19 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 	}
 
 	@Override
-	public <T extends CachedIndexedObject<T>> T resolve(
-			CachedIndexedObject<T> input) {
+	public <T extends CachedIndexedSubObject<T>> T resolve(
+			CachedIndexedSubObject<T> input) {
 		return input.accept(resolver_);
 	}
 
 	@Override
-	public void add(CachedIndexedObject<?> input) {
+	public void add(CachedIndexedSubObject<?> input) {
 		LOGGER_.trace("{}: adding to cache", input);
 		input.accept(inserter_);
 	}
 
 	@Override
-	public void remove(CachedIndexedObject<?> input) {
+	public void remove(CachedIndexedSubObject<?> input) {
 		LOGGER_.trace("{}: removing from cache", input);
 		input.accept(deleter_);
 	}
@@ -212,7 +212,7 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 		return listeners_.remove(listener);
 	}
 
-	private class Resolver_ implements CachedIndexedObject.Filter {
+	private class Resolver_ implements CachedIndexedSubObject.Filter {
 
 		@Override
 		public CachedIndexedClass filter(CachedIndexedClass element) {
@@ -280,7 +280,7 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 
 	}
 
-	private class Inserter_ implements CachedIndexedObject.Filter {
+	private class Inserter_ implements CachedIndexedSubObject.Filter {
 
 		@Override
 		public CachedIndexedClass filter(CachedIndexedClass element) {
@@ -380,7 +380,7 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 
 	}
 
-	private class Deleter_ implements CachedIndexedObject.Filter {
+	private class Deleter_ implements CachedIndexedSubObject.Filter {
 
 		@Override
 		public CachedIndexedClass filter(CachedIndexedClass element) {

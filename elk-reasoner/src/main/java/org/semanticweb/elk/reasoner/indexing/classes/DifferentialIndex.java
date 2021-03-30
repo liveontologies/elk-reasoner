@@ -32,7 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.predefined.PredefinedElkEntityFactory;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedEntity;
@@ -95,9 +95,9 @@ public class DifferentialIndex extends DirectIndex {
 			entityDeletionListener_ = new EntityDeletionListener();
 
 	/**
-	 * Pending deletions of {@link CachedIndexedObject}s
+	 * Pending deletions of {@link CachedIndexedSubObject}s
 	 */
-	private Set<CachedIndexedObject<?>> todoDeletions_;
+	private Set<CachedIndexedSubObject<?>> todoDeletions_;
 
 	/**
 	 * The added and removed initialization {@link Rule}s
@@ -160,7 +160,7 @@ public class DifferentialIndex extends DirectIndex {
 
 	public void initDeletions() {
 		this.removedContextInitRules_ = null;
-		this.todoDeletions_ = new ArrayHashSet<CachedIndexedObject<?>>(1024);
+		this.todoDeletions_ = new ArrayHashSet<CachedIndexedSubObject<?>>(1024);
 		this.removedContextRuleHeadByClassExpressions_ = new ArrayHashMap<ModifiableIndexedClassExpression, ChainableSubsumerRule>(
 				32);
 		this.removedDefinitions_ = new ArrayHashMap<ModifiableIndexedClass, ModifiableIndexedClassExpression>(
@@ -176,7 +176,7 @@ public class DifferentialIndex extends DirectIndex {
 	/* read-write methods */
 
 	@Override
-	public void add(CachedIndexedObject<?> input) {
+	public void add(CachedIndexedSubObject<?> input) {
 		if (!incrementalMode) {
 			super.add(input);
 			return;
@@ -192,7 +192,7 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	@Override
-	public void remove(CachedIndexedObject<?> input) {
+	public void remove(CachedIndexedSubObject<?> input) {
 		if (!incrementalMode) {
 			super.remove(input);
 			return;
@@ -475,7 +475,7 @@ public class DifferentialIndex extends DirectIndex {
 	 * registration
 	 */
 	public void clearDeletedRules() {
-		for (CachedIndexedObject<?> deletion : todoDeletions_) {
+		for (CachedIndexedSubObject<?> deletion : todoDeletions_) {
 			LOGGER_.trace("{}: comitting removal", deletion);
 			super.remove(deletion);
 		}

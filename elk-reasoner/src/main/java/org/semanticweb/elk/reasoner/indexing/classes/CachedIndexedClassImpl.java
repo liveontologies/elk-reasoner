@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClass;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
@@ -99,11 +99,6 @@ class CachedIndexedClassImpl extends
 	}
 
 	@Override
-	public final <O> O accept(IndexedClassExpression.Visitor<O> visitor) {
-		return accept((IndexedClassEntity.Visitor<O>) visitor);
-	}
-
-	@Override
 	public final <O> O accept(IndexedEntity.Visitor<O> visitor) {
 		return accept((IndexedClassEntity.Visitor<O>) visitor);
 	}
@@ -114,7 +109,8 @@ class CachedIndexedClassImpl extends
 	}
 
 	@Override
-	public CachedIndexedClass accept(CachedIndexedClassExpression.Filter filter) {
+	public final CachedIndexedClass accept(
+			CachedIndexedClassEntity.Filter filter) {
 		return filter.filter(this);
 	}
 

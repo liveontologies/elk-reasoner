@@ -23,8 +23,10 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 import org.slf4j.Logger;
@@ -64,18 +66,22 @@ abstract class CachedIndexedComplexClassExpressionImpl<T extends CachedIndexedCo
 	CachedIndexedComplexClassExpressionImpl(int structuralHash) {
 		super(structuralHash);
 	}
-
-	/**
-	 * This method should always return true apart from intermediate steps
-	 * during the indexing.
-	 * 
-	 * @return true if the represented class expression occurs in the ontology
-	 */
+	
 	@Override
-	public final boolean occurs() {
-		return positiveOccurrenceNo > 0 || negativeOccurrenceNo > 0;
+	public boolean occursPositively() {
+		return positiveOccurrenceNo > 0;
 	}
 
+	@Override
+	public boolean occursNegatively() {
+		return negativeOccurrenceNo > 0;
+	}
+
+	@Override
+	public final boolean occurs() {
+		return occursPositively() || occursNegatively();
+	}
+	
 	/**
 	 * @return the string representation for the occurrence numbers of this
 	 *         {@link IndexedClassExpression}
@@ -106,6 +112,16 @@ abstract class CachedIndexedComplexClassExpressionImpl<T extends CachedIndexedCo
 		}
 		checkOccurrenceNumbers();
 		return true;
+	}
+	
+	@Override
+	public final T accept(CachedIndexedClassExpression.Filter filter) {
+		return accept((CachedIndexedComplexClassExpression.Filter) filter);
+	}
+	
+	@Override
+	public final <O> O accept(IndexedClassExpression.Visitor<O> visitor) {
+		return accept((IndexedComplexClassExpression.Visitor<O>) visitor);
 	}
 
 }

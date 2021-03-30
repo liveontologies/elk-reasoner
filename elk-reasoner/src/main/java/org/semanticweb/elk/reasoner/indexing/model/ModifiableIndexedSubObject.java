@@ -28,7 +28,7 @@ package org.semanticweb.elk.reasoner.indexing.model;
  * @author "Yevgeny Kazakov"
  *
  */
-public interface ModifiableIndexedSubObject extends ModifiableIndexedObject {
+public interface ModifiableIndexedSubObject extends ModifiableIndexedObject, IndexedSubObject {
 
 	/**
 	 * Tries to change the number of occurrences of this

@@ -1,5 +1,9 @@
 package org.semanticweb.elk.reasoner.indexing.model;
 
+import java.util.List;
+
+import org.semanticweb.elk.util.hashing.HashGenerator;
+
 /*
  * #%L
  * ELK Reasoner
@@ -23,8 +27,7 @@ package org.semanticweb.elk.reasoner.indexing.model;
  */
 
 /**
- * A {@link ModifiableIndexedSubObject} that can be used for memoization
- * (caching).
+ * A {@link ModifiableIndexedSubObject} to which one can apply filters.
  * 
  * @author "Yevgeny Kazakov"
  *
@@ -32,7 +35,7 @@ package org.semanticweb.elk.reasoner.indexing.model;
  *            the type of the {@link CachedIndexedSubObject}
  */
 public interface CachedIndexedSubObject<T extends CachedIndexedSubObject<T>>
-		extends ModifiableIndexedSubObject, CachedIndexedObject<T> {
+		extends ModifiableIndexedSubObject {
 
 	/**
 	 * A factory for creating instances
@@ -66,6 +69,22 @@ public interface CachedIndexedSubObject<T extends CachedIndexedSubObject<T>>
 
 		// combined interface
 		
+	}
+	
+	/**
+	 * @param filter
+	 * @return the result of applying the filter to this object
+	 */
+	T accept(Filter filter);
+	
+	static class Helper {
+		static int combinedHashCode(Object... objects) {
+			return HashGenerator.combinedHashCode(objects);
+		}
+
+		static int combinedHashCode(List<?> objects) {
+			return HashGenerator.combinedHashCode(objects);
+		}
 	}
 
 }

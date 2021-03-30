@@ -28,13 +28,13 @@ import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
@@ -59,8 +59,8 @@ import org.slf4j.LoggerFactory;
  * 
  */
 abstract class CachedIndexedPropertyChainImpl<T extends CachedIndexedPropertyChain<T> & Entry<T, N>, N>
-		extends CachedIndexedObjectImpl<T, N>
-		implements CachedIndexedPropertyChain<T>, Entry<T, N> {
+		extends CachedIndexedSubObjectImpl<T, N>
+		implements CachedIndexedPropertyChain<T>, ModifiableIndexedPropertyChain, Entry<T, N> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -255,12 +255,12 @@ abstract class CachedIndexedPropertyChainImpl<T extends CachedIndexedPropertyCha
 	}
 
 	@Override
-	public final <O> O accept(IndexedObject.Visitor<O> visitor) {
+	public final <O> O accept(IndexedSubObject.Visitor<O> visitor) {
 		return accept((IndexedPropertyChain.Visitor<O>) visitor);
 	}
 
 	@Override
-	public T accept(CachedIndexedObject.Filter filter) {
+	public final T accept(CachedIndexedSubObject.Filter filter) {
 		return accept((CachedIndexedPropertyChain.Filter) filter);
 	}
 

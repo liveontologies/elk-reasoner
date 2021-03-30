@@ -57,7 +57,7 @@ public interface CachedIndexedObjectHasSelf extends
 
 	}
 	
-	static class Helper extends CachedIndexedObject.Helper {
+	static class Helper extends CachedIndexedSubObject.Helper {
 
 		public static int structuralHashCode(IndexedObjectProperty property) {
 			return combinedHashCode(CachedIndexedObjectHasSelf.class, property);

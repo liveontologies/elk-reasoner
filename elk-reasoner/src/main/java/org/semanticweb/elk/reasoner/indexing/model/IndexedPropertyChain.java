@@ -41,7 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface IndexedPropertyChain extends IndexedObject {
+public interface IndexedPropertyChain extends IndexedSubObject {
 
 	/**
 	 * @return The representations of all {@link ElkObjectProperty}s occurring

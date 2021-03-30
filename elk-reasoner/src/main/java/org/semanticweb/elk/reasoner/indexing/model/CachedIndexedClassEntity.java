@@ -64,4 +64,7 @@ public interface CachedIndexedClassEntity<T extends CachedIndexedClassEntity<T>>
 		// combined interface
 		
 	}
+	
+	T accept(Filter filter);
+	
 }

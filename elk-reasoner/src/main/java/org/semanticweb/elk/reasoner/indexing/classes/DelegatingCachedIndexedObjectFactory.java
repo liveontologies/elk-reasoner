@@ -33,30 +33,29 @@ import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpressionL
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedIndividual;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectUnionOf;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
 
 /**
- * Delegates construction of {@link CachedIndexedObject} to a given
- * {@link CachedIndexedObject.Factory}.
+ * Delegates construction of {@link CachedIndexedSubObject} to a given
+ * {@link CachedIndexedSubObject.Factory}.
  * 
  * @author "Yevgeny Kazakov"
  */
 class DelegatingCachedIndexedObjectFactory implements
-		CachedIndexedObject.Factory {
+		CachedIndexedSubObject.Factory {
 
-	private final CachedIndexedObject.Factory baseFactory_;
+	private final CachedIndexedSubObject.Factory baseFactory_;
 
-	DelegatingCachedIndexedObjectFactory(CachedIndexedObject.Factory baseFactory) {
+	DelegatingCachedIndexedObjectFactory(CachedIndexedSubObject.Factory baseFactory) {
 		this.baseFactory_ = baseFactory;
 	}
 

@@ -59,7 +59,7 @@ public interface CachedIndexedIndividual extends ModifiableIndexedIndividual,
 
 	}
 	
-	static class Helper extends CachedIndexedObject.Helper {
+	static class Helper extends CachedIndexedSubObject.Helper {
 
 		public static int structuralHashCode(ElkNamedIndividual entity) {
 			return combinedHashCode(CachedIndexedIndividual.class,

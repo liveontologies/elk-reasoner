@@ -1,12 +1,12 @@
 package org.semanticweb.elk.reasoner.indexing.model;
 
-/*
+/*-
  * #%L
- * ELK Reasoner
+ * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2021 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,16 +22,20 @@ package org.semanticweb.elk.reasoner.indexing.model;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkObject;
-
 /**
- * Represents occurrences of an {@link ElkObject} in an ontology.
+ * An {@link IndexedObject} that occurs inside axioms.
  * 
  * @author "Yevgeny Kazakov"
- * 
+ *
  */
-public interface IndexedObject {
-
+public interface IndexedSubObject extends IndexedObject {
+	
+	/**
+	 * @return {@code true} if this {@link IndexedObject} occurs in the current
+	 *         ontology
+	 */
+	boolean occurs();
+	
 	/**
 	 * The visitor pattern for instances
 	 * 
@@ -42,14 +46,15 @@ public interface IndexedObject {
 	 */
 	interface Visitor<O>
 			extends
-				IndexedAxiom.Visitor<O>,
-				IndexedSubObject.Visitor<O>,
-				IndexedContextRoot.Visitor<O> {
+				IndexedClassExpression.Visitor<O>,
+				IndexedPropertyChain.Visitor<O>,
+				IndexedEntity.Visitor<O>,
+				IndexedClassExpressionList.Visitor<O> {
 
 		// combined interface
 
 	}
 	
-	<O> O accept(Visitor<O> visitor);
+	<O> O accept(Visitor<O> visitor);	
 
 }

@@ -47,7 +47,7 @@ import org.semanticweb.elk.owl.interfaces.ElkLiteral;
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  */
-public interface IndexedDataHasValue extends IndexedClassExpression {
+public interface IndexedDataHasValue extends IndexedComplexClassExpression {
 
 	/**
 	 * @return the {@link ElkDataProperty} property of the

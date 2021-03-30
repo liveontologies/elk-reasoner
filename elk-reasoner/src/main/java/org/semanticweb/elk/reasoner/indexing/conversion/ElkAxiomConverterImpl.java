@@ -76,7 +76,7 @@ import org.semanticweb.elk.reasoner.completeness.OccurrenceListener;
 import org.semanticweb.elk.reasoner.indexing.classes.ModifiableIndexedObjectBaseFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.ResolvingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.UpdatingModifiableIndexedObjectFactory;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
@@ -244,7 +244,7 @@ public class ElkAxiomConverterImpl extends NoOpElkAnnotationAxiomConverter<Void>
 	private final ModifiableIndexedObject.Factory positiveFactory_,
 			negativeFactory_;
 
-	<F extends CachedIndexedObject.Factory & ModifiableIndexedObject.Factory> ElkAxiomConverterImpl(
+	<F extends CachedIndexedSubObject.Factory & ModifiableIndexedObject.Factory> ElkAxiomConverterImpl(
 			PredefinedElkClassFactory elkFactory, F baseFactory,
 			ModifiableOntologyIndex index, int increment) {
 		this(elkFactory,

@@ -22,9 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.indexing.classes;
 
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedRangeFiller;
@@ -101,13 +101,13 @@ class CachedIndexedObjectSomeValuesFromImpl
 	}
 
 	@Override
-	public final <O> O accept(IndexedClassExpression.Visitor<O> visitor) {
+	public final <O> O accept(IndexedComplexClassExpression.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
 	@Override
-	public CachedIndexedObjectSomeValuesFrom accept(
-			CachedIndexedClassExpression.Filter filter) {
+	public final CachedIndexedObjectSomeValuesFrom accept(
+			CachedIndexedComplexClassExpression.Filter filter) {
 		return filter.filter(this);
 	}
 

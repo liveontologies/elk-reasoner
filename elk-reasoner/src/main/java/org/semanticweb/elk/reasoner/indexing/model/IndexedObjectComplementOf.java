@@ -43,7 +43,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface IndexedObjectComplementOf extends IndexedClassExpression {
+public interface IndexedObjectComplementOf extends IndexedComplexClassExpression {
 
 	/**
 	 * @return the {@link IndexedClassExpression}, negation of which is

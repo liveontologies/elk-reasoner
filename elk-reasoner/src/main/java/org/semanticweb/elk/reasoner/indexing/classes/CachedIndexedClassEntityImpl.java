@@ -24,6 +24,9 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassEntity;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 import org.slf4j.Logger;
@@ -79,6 +82,16 @@ abstract class CachedIndexedClassEntityImpl<T extends CachedIndexedClassEntity<T
 		if (totalOccurrenceNo < 0)
 			throw new ElkUnexpectedIndexingException(toString()
 					+ " has a negative occurrence: " + printOccurrenceNumbers());
+	}
+	
+	@Override
+	public final <O> O accept(IndexedClassExpression.Visitor<O> visitor) {
+		return accept((IndexedClassEntity.Visitor<O>) visitor);
+	}
+
+	@Override
+	public final T accept(CachedIndexedClassExpression.Filter filter) {
+		return accept((CachedIndexedClassEntity.Filter) filter);
 	}
 
 }

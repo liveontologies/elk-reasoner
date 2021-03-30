@@ -250,7 +250,7 @@ class CachedIndexedObjectPropertyImpl
 	}
 
 	@Override
-	public CachedIndexedObjectProperty accept(
+	public final CachedIndexedObjectProperty accept(
 			CachedIndexedPropertyChain.Filter filter) {
 		return filter.filter(this);
 	}

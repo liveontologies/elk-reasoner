@@ -23,10 +23,11 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ExtendedContext;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -51,7 +52,7 @@ import org.semanticweb.elk.util.collections.entryset.EntryCollection;
  *            The type of the elements in the set where this entry is used
  */
 abstract class CachedIndexedClassExpressionImpl<T extends CachedIndexedClassExpression<T> & Entry<T, N>, N>
-		extends CachedIndexedObjectImpl<T, N> implements
+		extends CachedIndexedSubObjectImpl<T, N> implements
 		ModifiableIndexedClassExpression, CachedIndexedClassExpression<T>,
 		Entry<T, N> {
 
@@ -113,15 +114,15 @@ abstract class CachedIndexedClassExpressionImpl<T extends CachedIndexedClassExpr
 	@Override
 	public final <O> O accept(IndexedContextRoot.Visitor<O> visitor) {
 		return accept((IndexedClassExpression.Visitor<O>) visitor);
-	}
-
+	}	
+	
 	@Override
-	public final <O> O accept(IndexedObject.Visitor<O> visitor) {
+	public final <O> O accept(IndexedSubObject.Visitor<O> visitor) {
 		return accept((IndexedClassExpression.Visitor<O>) visitor);
 	}
 
 	@Override
-	public T accept(CachedIndexedObject.Filter filter) {
+	public final T accept(CachedIndexedSubObject.Filter filter) {
 		return accept((CachedIndexedClassExpression.Filter) filter);
 	}
 

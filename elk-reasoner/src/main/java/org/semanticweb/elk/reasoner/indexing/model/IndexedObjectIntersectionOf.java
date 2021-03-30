@@ -43,7 +43,7 @@ package org.semanticweb.elk.reasoner.indexing.model;
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  */
-public interface IndexedObjectIntersectionOf extends IndexedClassExpression {
+public interface IndexedObjectIntersectionOf extends IndexedComplexClassExpression {
 
 	/**
 	 * @return the first conjunction of this {@link IndexedObjectIntersectionOf}
