@@ -22,12 +22,15 @@
  */
 package org.semanticweb.elk.reasoner.indexing.classes;
 
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObject;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedSubObject;
 import org.semanticweb.elk.util.collections.entryset.Entry;
 import org.semanticweb.elk.util.collections.entryset.EntryCollection;
 
 /**
- * Implements {@link CachedIndexedObject} and {@link Entry} so that these
+ * Implements {@link CachedIndexedSubObject} and {@link Entry} so that these
  * objects can be stored in {@link EntryCollection} together with other
  * elements.
  * 
@@ -40,9 +43,9 @@ import org.semanticweb.elk.util.collections.entryset.EntryCollection;
  *            The type of the elements in the set where this entry is used
  * 
  */
-abstract class CachedIndexedObjectImpl<T extends CachedIndexedObject<T> & Entry<T, N>, N>
-		extends IndexedObjectImpl implements CachedIndexedObject<T>,
-		Entry<T, N> {
+abstract class CachedIndexedSubObjectImpl<T extends CachedIndexedSubObject<T> & Entry<T, N>, N>
+		extends IndexedObjectImpl
+		implements CachedIndexedSubObject<T>, ModifiableIndexedSubObject,  Entry<T, N> {
 
 	/**
 	 * The reference to the next element
@@ -51,7 +54,7 @@ abstract class CachedIndexedObjectImpl<T extends CachedIndexedObject<T> & Entry<
 
 	private final int structuralHash_;
 
-	CachedIndexedObjectImpl(int structuralHash) {
+	CachedIndexedSubObjectImpl(int structuralHash) {
 		this.structuralHash_ = structuralHash;
 	}
 
@@ -68,6 +71,11 @@ abstract class CachedIndexedObjectImpl<T extends CachedIndexedObject<T> & Entry<
 	@Override
 	public final int structuralHashCode() {
 		return structuralHash_;
+	}
+
+	@Override
+	public final <O> O accept(IndexedObject.Visitor<O> visitor) {
+		return accept((IndexedSubObject.Visitor<O>) visitor);
 	}
 
 }

@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpressionL
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedIndividual;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectIntersectionOf;
@@ -56,14 +56,14 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedSubObjectPro
 
 /**
  * Implements {@link ModifiableIndexedObject.Factory} and
- * {@link CachedIndexedObject.Factory}. The occurrences of the created objects
+ * {@link CachedIndexedSubObject.Factory}. The occurrences of the created objects
  * are not modified.
  * 
  * @author "Yevgeny Kazakov"
  *
  */
 public class ModifiableIndexedObjectBaseFactory implements
-		ModifiableIndexedObject.Factory, CachedIndexedObject.Factory {
+		ModifiableIndexedObject.Factory, CachedIndexedSubObject.Factory {
 
 	@Override
 	public CachedIndexedClass getIndexedClass(ElkClass elkClass) {

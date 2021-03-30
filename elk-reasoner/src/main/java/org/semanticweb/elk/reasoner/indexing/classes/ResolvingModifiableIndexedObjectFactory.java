@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedDeclarationAxiom;
@@ -54,7 +54,7 @@ public class ResolvingModifiableIndexedObjectFactory
 
 	private final ModifiableIndexedObject.Factory baseFactory_;
 
-	public <F extends CachedIndexedObject.Factory & ModifiableIndexedObject.Factory> ResolvingModifiableIndexedObjectFactory(
+	public <F extends CachedIndexedSubObject.Factory & ModifiableIndexedObject.Factory> ResolvingModifiableIndexedObjectFactory(
 			F baseFactory, ModifiableIndexedObjectCache cache) {
 		super(baseFactory, cache);
 		this.baseFactory_ = baseFactory;

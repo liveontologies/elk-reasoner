@@ -32,19 +32,13 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface IndexedClassExpressionList extends IndexedObject {
+public interface IndexedClassExpressionList extends IndexedSubObject {
 
 	/**
 	 * @return {@link IndexedClassExpression}s occurring in this
 	 *         {@link IndexedClassExpressionList}
 	 */
 	List<? extends IndexedClassExpression> getElements();
-
-	/**
-	 * @return {@code true} if this {@link IndexedClassExpressionList} occurs in
-	 *         the ontology
-	 */
-	boolean occurs();
 	
 	/**
 	 * The visitor pattern for instances

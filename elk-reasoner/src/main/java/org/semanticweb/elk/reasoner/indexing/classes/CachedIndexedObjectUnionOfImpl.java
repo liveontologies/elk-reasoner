@@ -25,9 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.semanticweb.elk.reasoner.completeness.Feature;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectUnionOf;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
@@ -114,13 +114,13 @@ class CachedIndexedObjectUnionOfImpl extends
 	}
 
 	@Override
-	public final <O> O accept(IndexedClassExpression.Visitor<O> visitor) {
+	public final <O> O accept(IndexedComplexClassExpression.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
 	@Override
-	public CachedIndexedObjectUnionOf accept(
-			CachedIndexedClassExpression.Filter filter) {
+	public final CachedIndexedObjectUnionOf accept(
+			CachedIndexedComplexClassExpression.Filter filter) {
 		return filter.filter(this);
 	}
 

@@ -30,20 +30,12 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  * @author "Yevgeny Kazakov"
  *
  */
-public interface IndexedEntity extends IndexedObject {
+public interface IndexedEntity extends IndexedSubObject {
 
 	/**
 	 * @return The {@link ElkEntity} represented by this {@link IndexedEntity}
 	 */
-	ElkEntity getElkEntity();
-
-	/**
-	 * @return {@code true} if this {@link IndexedClassExpression} occurs in the
-	 *         ontology
-	 */
-	boolean occurs();
-
-	String printOccurrenceNumbers();
+	ElkEntity getElkEntity();	
 	
 	/**
 	 * The visitor pattern for instances

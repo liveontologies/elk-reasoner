@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpressionList;
@@ -56,7 +56,7 @@ class NullableModifiableIndexedObjectFactory
 		this(new ModifiableIndexedObjectBaseFactory());
 	}
 
-	<F extends CachedIndexedObject.Factory & ModifiableIndexedObject.Factory> NullableModifiableIndexedObjectFactory(
+	<F extends CachedIndexedSubObject.Factory & ModifiableIndexedObject.Factory> NullableModifiableIndexedObjectFactory(
 			F delegate) {
 		super(delegate);
 		this.delegate_ = delegate;

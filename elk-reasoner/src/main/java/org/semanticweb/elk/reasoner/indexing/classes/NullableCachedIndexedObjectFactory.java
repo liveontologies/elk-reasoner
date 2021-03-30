@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpressionL
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedIndividual;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectIntersectionOf;
@@ -46,18 +46,18 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProper
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
 
 /**
- * A {@link CachedIndexedObject.Factory}, the methods of which can accept
+ * A {@link CachedIndexedSubObject.Factory}, the methods of which can accept
  * {@code null} values for {@link IndexedObject} arguments, in which case it
  * returns {@code null} as the result
  * 
  * @author Yevgeny Kazakov
  */
 class NullableCachedIndexedObjectFactory
-		implements CachedIndexedObject.Factory {
+		implements CachedIndexedSubObject.Factory {
 
-	private final CachedIndexedObject.Factory delegate_;
+	private final CachedIndexedSubObject.Factory delegate_;
 
-	NullableCachedIndexedObjectFactory(CachedIndexedObject.Factory delegate) {
+	NullableCachedIndexedObjectFactory(CachedIndexedSubObject.Factory delegate) {
 		this.delegate_ = delegate;
 	}
 

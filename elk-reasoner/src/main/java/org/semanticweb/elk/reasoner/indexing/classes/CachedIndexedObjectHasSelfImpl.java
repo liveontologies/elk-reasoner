@@ -23,10 +23,10 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.reasoner.completeness.Feature;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
@@ -76,13 +76,13 @@ class CachedIndexedObjectHasSelfImpl extends
 	}
 
 	@Override
-	public final <O> O accept(IndexedClassExpression.Visitor<O> visitor) {
+	public final <O> O accept(IndexedComplexClassExpression.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
 	@Override
-	public CachedIndexedObjectHasSelf accept(
-			CachedIndexedClassExpression.Filter filter) {
+	public final CachedIndexedObjectHasSelf accept(
+			CachedIndexedComplexClassExpression.Filter filter) {
 		return filter.filter(this);
 	}
 

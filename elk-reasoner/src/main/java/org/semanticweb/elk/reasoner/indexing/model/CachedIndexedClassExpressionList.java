@@ -64,7 +64,7 @@ public interface CachedIndexedClassExpressionList
 
 	}
 	
-	static class Helper extends CachedIndexedObject.Helper {
+	static class Helper extends CachedIndexedSubObject.Helper {
 
 		public static int structuralHashCode(
 				List<? extends ModifiableIndexedClassExpression> members) {

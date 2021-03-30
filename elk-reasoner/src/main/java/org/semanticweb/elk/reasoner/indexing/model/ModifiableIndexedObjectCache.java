@@ -33,32 +33,32 @@ public interface ModifiableIndexedObjectCache extends IndexedObjectCache {
 	/**
 	 * 
 	 * @param input
-	 *            an {@link CachedIndexedObject}
-	 * @return a structurally equal {@link CachedIndexedObject} of the same type
+	 *            an {@link CachedIndexedSubObject}
+	 * @return a structurally equal {@link CachedIndexedSubObject} of the same type
 	 *         as the input containing in this {@link IndexedObjectCache} or
 	 *         {@code null} if there is no such an object
 	 */
-	<T extends CachedIndexedObject<T>> T resolve(CachedIndexedObject<T> input);
+	<T extends CachedIndexedSubObject<T>> T resolve(CachedIndexedSubObject<T> input);
 
 	/**
-	 * Adds a given {@link CachedIndexedObject} to this
+	 * Adds a given {@link CachedIndexedSubObject} to this
 	 * {@link IndexedObjectCache}; this method should be used only if no
-	 * {@link CachedIndexedObject} that is structurally equal to the given one
+	 * {@link CachedIndexedSubObject} that is structurally equal to the given one
 	 * occurs in this {@link IndexedObjectCache}
 	 * 
 	 * @param input
-	 *            the {@link CachedIndexedObject} to be added
+	 *            the {@link CachedIndexedSubObject} to be added
 	 */
-	void add(CachedIndexedObject<?> input);
+	void add(CachedIndexedSubObject<?> input);
 
 	/**
 	 * Removes an object structurally equal to the given one from this
 	 * {@link IndexedObjectCache}, if there is such an object
 	 * 
 	 * @param input
-	 *            the {@link CachedIndexedObject} for which to remove the
+	 *            the {@link CachedIndexedSubObject} for which to remove the
 	 *            structurally equal object
 	 */
-	void remove(CachedIndexedObject<?> input);
+	void remove(CachedIndexedSubObject<?> input);
 
 }

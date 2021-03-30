@@ -45,7 +45,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface IndexedObjectUnionOf extends IndexedClassExpression {
+public interface IndexedObjectUnionOf extends IndexedComplexClassExpression {
 
 	/**
 	 * @return the {@link IndexedClassExpression}s representing the disjuncts of

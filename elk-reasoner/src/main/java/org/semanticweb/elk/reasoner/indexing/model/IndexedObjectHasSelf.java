@@ -47,7 +47,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface IndexedObjectHasSelf extends IndexedClassExpression {
+public interface IndexedObjectHasSelf extends IndexedComplexClassExpression {
 
 	/**
 	 * @return The representation of the {@link ElkObjectProperty} that is a

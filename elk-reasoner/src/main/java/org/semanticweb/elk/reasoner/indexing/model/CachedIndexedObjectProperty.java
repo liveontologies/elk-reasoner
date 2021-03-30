@@ -60,7 +60,7 @@ public interface CachedIndexedObjectProperty extends
 
 	}
 	
-	static class Helper extends CachedIndexedObject.Helper {
+	static class Helper extends CachedIndexedSubObject.Helper {
 
 		public static int structuralHashCode(ElkObjectProperty entity) {
 			return combinedHashCode(CachedIndexedObjectProperty.class,

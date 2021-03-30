@@ -45,7 +45,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromEx
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
+public interface IndexedObjectSomeValuesFrom extends IndexedComplexClassExpression {
 
 	/**
 	 * @return The representation of the {@link ElkObjectProperty} that is a

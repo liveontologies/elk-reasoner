@@ -1,6 +1,5 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectCache;
 
@@ -27,7 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectCache;
  */
 
 /**
- * A {@link CachedIndexedObject.Factory} which can only create objects present
+ * A {@link CachedIndexedSubObject.Factory} which can only create objects present
  * in the provided {@link ModifiableIndexedObjectCache}. If there is no
  * structurally equivalent object to the one that should be constructed,
  * {@code null} is returned.
@@ -41,7 +40,7 @@ class ResolvingCachedIndexedObjectFactory
 	private final ModifiableIndexedObjectCache cache_;
 
 	public ResolvingCachedIndexedObjectFactory(
-			CachedIndexedObject.Factory baseFactory,
+			CachedIndexedSubObject.Factory baseFactory,
 			ModifiableIndexedObjectCache cache) {
 		super(baseFactory);
 		this.cache_ = cache;
