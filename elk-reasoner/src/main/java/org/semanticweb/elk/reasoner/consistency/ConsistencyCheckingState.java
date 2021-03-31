@@ -334,7 +334,6 @@ public class ConsistencyCheckingState {
 
 		return new Proof<EntailmentInference>() {
 
-			@SuppressWarnings("unchecked")
 			@Override
 			public Collection<OntologyInconsistencyEntailmentInference> getInferences(
 					final Object conclusion) {

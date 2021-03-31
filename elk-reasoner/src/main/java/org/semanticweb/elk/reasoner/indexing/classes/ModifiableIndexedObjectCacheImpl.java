@@ -144,7 +144,6 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 		return cachedObjectProperties_;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public final Collection<? extends IndexedClassExpression> getClassExpressions() {
 		return Operations.getCollection(
@@ -154,7 +153,6 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 						+ cachedComplexClassExpressions_.size());
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public final Collection<? extends IndexedPropertyChain> getPropertyChains() {
 		return Operations.getCollection(
