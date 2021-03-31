@@ -56,7 +56,6 @@ public class RuleApplicationAdditionUnSaturationFactory
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	protected Visitor<Boolean> getInferenceProcessor(
 			Reference<Context> activeContext, RuleVisitor<?> ruleVisitor,
 			SaturationStateWriter<? extends Context> writer,

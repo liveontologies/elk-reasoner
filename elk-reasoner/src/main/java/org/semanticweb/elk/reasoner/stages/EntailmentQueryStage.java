@@ -65,7 +65,6 @@ class EntailmentQueryStage extends AbstractReasonerStage {
 		final Collection<? extends IndexedClassEntity> consistencyTestEntities = reasoner.consistencyCheckingState
 				.getTestEntitites();
 
-		@SuppressWarnings("unchecked")
 		final Collection<IndexedContextRoot> inputs = Operations.getCollection(
 				Operations.concat(queries, consistencyTestEntities),
 				queries.size() + consistencyTestEntities.size());

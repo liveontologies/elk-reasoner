@@ -80,7 +80,6 @@ public class RuleApplicationAdditionPruningFactory
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	protected Visitor<Boolean> getInferenceProcessor(
 			Reference<Context> activeContext, RuleVisitor<?> ruleVisitor,
 			SaturationStateWriter<? extends ExtendedContext> localWriter,
@@ -94,15 +93,13 @@ public class RuleApplicationAdditionPruningFactory
 										.getClassInferenceCountingVisitor(
 												localStatistics),
 								// checking the conclusion against the main
-								// saturation
-								// state
+								// saturation state
 								new ClassConclusionOccurrenceCheckingVisitor(
 										new RelativizedContextReference(
 												activeContext,
 												mainSaturationState_)),
 								// if all fine, insert the conclusion to the
-								// local
-								// context copies
+								// local context copies
 								new ClassConclusionInsertionVisitor(
 										activeContext, localWriter),
 								// count conclusions used in the rules, if
@@ -115,8 +112,7 @@ public class RuleApplicationAdditionPruningFactory
 										mainSaturationState_, activeContext,
 										ruleVisitor,
 										// the conclusions are produced in both
-										// main and
-										// tracing saturation states
+										// main and tracing saturation states
 										new CombinedConclusionProducer(
 												mainSaturationState_
 														.getContextCreatingWriter(),

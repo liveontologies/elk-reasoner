@@ -91,7 +91,6 @@ public class ContextTracingRuleApplicationFactory extends
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	protected Visitor<Boolean> getInferenceProcessor(
 			Reference<Context> activeContext, RuleVisitor<?> ruleVisitor,
 			final SaturationStateWriter<? extends ExtendedContext> localWriter,

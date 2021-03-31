@@ -23,7 +23,9 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectComplementOf;
@@ -45,6 +47,14 @@ public class DummyIndexedClassExpressionVisitor<O> implements
 	@SuppressWarnings("unused")
 	protected O defaultVisit(IndexedClassExpression element) {
 		return null;
+	}
+	
+	protected O defaultVisit(IndexedComplexClassExpression element) {
+		return defaultVisit((IndexedClassExpression) element);
+	}
+	
+	protected O defaultVisit(IndexedClassEntity element) {
+		return defaultVisit((IndexedClassExpression) element);
 	}
 
 	@Override

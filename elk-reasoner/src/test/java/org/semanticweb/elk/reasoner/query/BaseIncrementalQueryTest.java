@@ -57,7 +57,7 @@ public abstract class BaseIncrementalQueryTest<Q, A, O extends DiffableOutput<?,
 		}
 		if (!expectedContainsAllActual) {
 			expectedOutput.reportMissingElementsOf(actualOutput,
-					getOutputListener("<>", message));
+					getOutputListener("<> ", message));
 		}
 		Assert.fail(message.toString());
 	}

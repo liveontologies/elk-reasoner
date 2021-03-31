@@ -71,7 +71,6 @@ public class IncrementalAdditionInitializationStage
 		return IncrementalStages.ADDITIONS_INIT;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean preExecute() {
 		if (!super.preExecute())
