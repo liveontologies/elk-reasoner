@@ -32,13 +32,13 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class CombinedConclusionProducer implements ClassInferenceProducer {
+public class CombinedClassInferenceProducer implements ClassInferenceProducer {
 
 	private final ClassInferenceProducer firstProducer_;
 
 	private final ClassInferenceProducer secondProducer_;
 
-	public CombinedConclusionProducer(ClassInferenceProducer firstProducer,
+	public CombinedClassInferenceProducer(ClassInferenceProducer firstProducer,
 			ClassInferenceProducer secondProducer) {
 		this.firstProducer_ = firstProducer;
 		this.secondProducer_ = secondProducer;
