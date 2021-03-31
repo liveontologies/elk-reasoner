@@ -34,22 +34,32 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusi
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.RelativizedContextReference;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.TracingRuleApplicationClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference.Visitor;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInferenceConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.CombinedConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.CombinedClassInferenceProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 
 /**
  * A {@link RuleApplicationFactory} that applies rules to
- * {@link ClassConclusion}s currently stored in the {@link Context}s of the
- * {@link SaturationState}. The produced {@link ClassConclusion}s are buffered
- * within the queue of the respective {@link Context} and can be later obtained
- * by {@link Context#takeToDo()}. The content of the {@link Context}s is
- * otherwise not modified. To make sure that all rules are applied, the
+ * {@link ClassConclusion}s for which the {@link Context} with
+ * {@link Context#getRoot()} that is equal
+ * {@link ClassConclusion#getTraceRoot()} is not saturated according to the
+ * {@link SaturationState}. To identify all such {@link ClassConclusion}s, the
+ * conclusion of not saturated contexts are re-derived from the beginning (from
+ * the corresponding {@link ContextInitialization} inferences) by applying only
+ * tracing rules, i.e.,the {@link Rule}s for which {@link Rule#isTracingRule()}
+ * returns {@code true}.
+ * 
+ * The produced {@link ClassConclusion}s are buffered within the queue of the
+ * respective {@link Context} and can be later obtained by
+ * {@link Context#takeToDo()}. The content of the {@link Context}s is otherwise
+ * not modified. To make sure that all rules are applied, the
  * {@link ClassConclusion}s stored in {@link Context}s should be reachable from
- * such {@link Context}s by applying the rules.
+ * such {@link Context}s by applying tracing rules.
  * 
  * @author "Yevgeny Kazakov"
  * @author Pavel Klinov
@@ -113,7 +123,7 @@ public class RuleApplicationAdditionPruningFactory
 										ruleVisitor,
 										// the conclusions are produced in both
 										// main and tracing saturation states
-										new CombinedConclusionProducer(
+										new CombinedClassInferenceProducer(
 												mainSaturationState_
 														.getContextCreatingWriter(),
 												localWriter))),
