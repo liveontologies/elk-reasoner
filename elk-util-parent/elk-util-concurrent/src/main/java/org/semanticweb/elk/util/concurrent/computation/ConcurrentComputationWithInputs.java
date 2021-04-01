@@ -123,11 +123,18 @@ public class ConcurrentComputationWithInputs<I, F extends InputProcessorFactory<
 		return true;
 	}
 
+	/**
+	 * Wakes up a blocked worker waiting for the buffer by offering a poison pill 
+	 */
+	private void wakeUpWorker() {
+		if (buffer_.isEmpty()) {
+			buffer_.offer(poison_pill_);
+		}			
+	}
+	
 	@Override
 	protected synchronized void waitWorkers() throws InterruptedException {
-		if (buffer_.isEmpty())
-			// wake up blocked workers if not done already
-			buffer_.offer(poison_pill_);
+		wakeUpWorker();
 		super.waitWorkers();
 		// remove all poison pills		
 		while (buffer_.peek() == poison_pill_) {
@@ -175,8 +182,6 @@ public class ConcurrentComputationWithInputs<I, F extends InputProcessorFactory<
 					}
 					if (termination || isInterrupted()) {
 						if (buffer_.isEmpty()) {
-							// wake up blocked workers if not done already
-							buffer_.put(poison_pill_);
 							break;
 						}
 						if (isInterrupted()) {
@@ -201,6 +206,7 @@ public class ConcurrentComputationWithInputs<I, F extends InputProcessorFactory<
 				workerException_ = new RuntimeException(
 						"Exception in worker thread: ", e);
 			} finally {
+				wakeUpWorker(); // wake up workers one by one
 				if (workerException_ != null)
 					throw workerException_;
 				inputProcessor.finish();
