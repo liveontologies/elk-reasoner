@@ -36,6 +36,8 @@ public interface IndexedSubObject extends IndexedObject {
 	 */
 	boolean occurs();
 	
+	String printOccurrenceNumbers();
+	
 	/**
 	 * The visitor pattern for instances
 	 * 

@@ -63,6 +63,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSome
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromFirstConjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromSecondConjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.OwlNothingDecompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
 
@@ -289,6 +290,15 @@ public class ConditionalRuleVisitor<O> implements RuleVisitor<O> {
 	public O visit(ObjectUnionFromDisjunctRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
 			ClassInferenceProducer producer) {
+		if (condition_.visit(rule, premise, premises, producer))
+			return visitor_.visit(rule, premise, premises, producer);
+		// else
+		return null;
+	}
+
+	@Override
+	public O visit(OwlNothingDecompositionRule rule, IndexedClass premise,
+			ContextPremises premises, ClassInferenceProducer producer) {
 		if (condition_.visit(rule, premise, premises, producer))
 			return visitor_.visit(rule, premise, premises, producer);
 		// else

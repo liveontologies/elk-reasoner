@@ -28,8 +28,6 @@ import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexClassExpression;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 
 /**
  * Implements {@link CachedIndexedDataHasValue}
@@ -73,15 +71,6 @@ class CachedIndexedDataHasValueImpl
 	@Override
 	public final CachedIndexedDataHasValue structuralEquals(Object other) {
 		return CachedIndexedDataHasValue.Helper.structuralEquals(this, other);
-	}
-
-	@Override
-	public final boolean updateOccurrenceNumbers(
-			final ModifiableOntologyIndex index,
-			OccurrenceIncrement increment) {
-		positiveOccurrenceNo += increment.positiveIncrement;
-		negativeOccurrenceNo += increment.negativeIncrement;
-		return true;
 	}
 
 	@Override

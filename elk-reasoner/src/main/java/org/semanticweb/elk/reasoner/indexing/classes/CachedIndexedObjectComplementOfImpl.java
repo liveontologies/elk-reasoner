@@ -21,6 +21,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import org.semanticweb.elk.RevertibleAction;
 import org.semanticweb.elk.reasoner.completeness.Feature;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectComplementOf;
@@ -62,40 +63,38 @@ class CachedIndexedObjectComplementOfImpl extends
 	}
 
 	@Override
-	public final boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
+	public RevertibleAction getIndexingAction(ModifiableOntologyIndex index,
 			OccurrenceIncrement increment) {
-		if (positiveOccurrenceNo == 0 && increment.positiveIncrement > 0) {
-			// first positive occurrence of this expression
-			if (!ContradictionFromNegationRule.addRulesFor(this, index))
-				return false;
-		}
+		return RevertibleAction.create(
+				() -> positiveOccurrenceNo == 0
+						&& increment.positiveIncrement > 0,
+				() -> ContradictionFromNegationRule.addRulesFor(this, index),
+				() -> ContradictionFromNegationRule.removeRulesFor(this, index))
+				.then(super.getIndexingAction(index, increment))
+				.then(RevertibleAction.create(
+						() -> positiveOccurrenceNo == 0
+								&& increment.positiveIncrement < 0,
+						() -> ContradictionFromNegationRule.removeRulesFor(this,
+								index),
+						() -> ContradictionFromNegationRule.addRulesFor(this,
+								index)))
+				.then(RevertibleAction.create(() -> {
+					index.occurrenceChanged(
+							Feature.OBJECT_COMPLEMENT_OF_NEGATIVE,
+							increment.negativeIncrement);
+					index.occurrenceChanged(
+							Feature.OBJECT_COMPLEMENT_OF_POSITIVE,
+							increment.positiveIncrement);
+					return true;
+				}, () -> {
+					index.occurrenceChanged(
+							Feature.OBJECT_COMPLEMENT_OF_NEGATIVE,
+							-increment.negativeIncrement);
+					index.occurrenceChanged(
+							Feature.OBJECT_COMPLEMENT_OF_POSITIVE,
+							-increment.positiveIncrement);
+				}));
 
-		positiveOccurrenceNo += increment.positiveIncrement;
-		negativeOccurrenceNo += increment.negativeIncrement;
-
-		checkOccurrenceNumbers();
-
-		if (positiveOccurrenceNo == 0 && increment.positiveIncrement < 0) {
-			// no positive occurrences of this expression left
-			if (!ContradictionFromNegationRule.removeRulesFor(this, index)) {
-				// revert all changes
-				positiveOccurrenceNo -= increment.positiveIncrement;
-				negativeOccurrenceNo -= increment.negativeIncrement;
-				return false;
-			}
-		}
-
-		// negative occurrences not supported
-		index.occurrenceChanged(
-				Feature.OBJECT_COMPLEMENT_OF_NEGATIVE,
-				increment.negativeIncrement);
-		
-		// positive occurrences may cause unsatisfiability of properties, which
-		// is currently undetected
-		index.occurrenceChanged(Feature.OBJECT_COMPLEMENT_OF_POSITIVE,
-				increment.positiveIncrement);
-		
-		return true;
 	}
 
 	@Override

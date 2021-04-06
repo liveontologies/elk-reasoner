@@ -22,7 +22,6 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
 import java.util.ArrayList;
-
 import java.util.Collection;
 import java.util.List;
 
@@ -33,7 +32,6 @@ import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexClassExpr
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedIndividual;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectIntersectionOf;
@@ -41,9 +39,8 @@ import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlBottomObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlNothing;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlThing;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlTopObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
@@ -81,9 +78,9 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 
 	private final CachedIndexedSubObject.Filter resolver_, inserter_, deleter_;
 
-	private final CachedIndexedOwlThing owlThing_;
+	private final CachedIndexedClass owlThing_;
 
-	private final CachedIndexedOwlNothing owlNothing_;
+	private final CachedIndexedClass owlNothing_;
 
 	private final CachedIndexedOwlTopObjectProperty owlTopObjectProperty_;
 
@@ -163,12 +160,12 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 	}
 
 	@Override
-	public final CachedIndexedOwlThing getOwlThing() {
+	public final CachedIndexedClass getOwlThing() {
 		return owlThing_;
 	}
 
 	@Override
-	public final CachedIndexedOwlNothing getOwlNothing() {
+	public final CachedIndexedClass getOwlNothing() {
 		return owlNothing_;
 	}
 

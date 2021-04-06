@@ -49,6 +49,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSome
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromFirstConjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromSecondConjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.OwlNothingDecompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
 
@@ -158,6 +159,11 @@ public class RuleApplicationTimer {
 	long timeObjectUnionFromDisjunctRule;
 
 	/**
+	 * timer for {@link OwlNothingDecompositionRule}
+	 */
+	long timeOwlNothingDecompositionRule;
+	
+	/**
 	 * timer for {@link OwlThingContextInitRule}
 	 */
 	long timeOwlThingContextInitRule;
@@ -207,6 +213,7 @@ public class RuleApplicationTimer {
 	 */
 	long timeEquivalentClassSecondFromFirstRule;
 
+
 	/**
 	 * Add the values the corresponding values of the given timer
 	 * 
@@ -222,6 +229,7 @@ public class RuleApplicationTimer {
 		timeSuperClassFromSubClassRule += timer.timeSuperClassFromSubClassRule;
 		timePropagationFromExistentialFillerRule += timer.timePropagationFromExistentialFillerRule;
 		timeObjectUnionFromDisjunctRule += timer.timeObjectUnionFromDisjunctRule;
+		timeOwlNothingDecompositionRule += timer.timeOwlNothingDecompositionRule;
 		timeBackwardLinkChainFromBackwardLinkRule += timer.timeBackwardLinkChainFromBackwardLinkRule;
 		timeReflexiveBackwardLinkCompositionRule += timer.timeReflexiveBackwardLinkCompositionRule;
 		timeNonReflexiveBackwardLinkCompositionRule += timer.timeNonReflexiveBackwardLinkCompositionRule;
@@ -253,6 +261,7 @@ public class RuleApplicationTimer {
 				+ timeSuperClassFromSubClassRule
 				+ timePropagationFromExistentialFillerRule
 				+ timeObjectUnionFromDisjunctRule
+				+ timeOwlNothingDecompositionRule
 				+ timeBackwardLinkChainFromBackwardLinkRule
 				+ timeSubsumerBackwardLinkRule
 				+ timeContradictionOverBackwardLinkRule
@@ -286,8 +295,9 @@ public class RuleApplicationTimer {
 		timeObjectIntersectionFromFirstConjunctRule = 0;
 		timeObjectIntersectionFromSecondConjunctRule = 0;
 		timeSuperClassFromSubClassRule = 0;
-		timePropagationFromExistentialFillerRule = 0;
+		timePropagationFromExistentialFillerRule = 0;		
 		timeObjectUnionFromDisjunctRule = 0;
+		timeOwlNothingDecompositionRule = 0;
 		timeBackwardLinkChainFromBackwardLinkRule = 0;
 		timeSubsumerBackwardLinkRule = 0;
 		timeContradictionOverBackwardLinkRule = 0;

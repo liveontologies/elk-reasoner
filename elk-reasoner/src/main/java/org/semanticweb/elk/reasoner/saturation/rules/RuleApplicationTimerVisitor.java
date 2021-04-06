@@ -63,6 +63,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSome
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromFirstConjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromSecondConjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.OwlNothingDecompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
@@ -202,6 +203,30 @@ class RuleApplicationTimerVisitor<O> implements RuleVisitor<O> {
 	}
 
 	@Override
+	public O visit(EquivalentClassFirstFromSecondRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		timer_.timeEquivalentClassFirstFromSecondRule -= CachedTimeThread
+				.getCurrentTimeMillis();
+		O result = visitor_.visit(rule, premise, premises, producer);
+		timer_.timeEquivalentClassFirstFromSecondRule += CachedTimeThread
+				.getCurrentTimeMillis();
+		return result;
+	}
+
+	@Override
+	public O visit(EquivalentClassSecondFromFirstRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ClassInferenceProducer producer) {
+		timer_.timeEquivalentClassSecondFromFirstRule -= CachedTimeThread
+				.getCurrentTimeMillis();
+		O result = visitor_.visit(rule, premise, premises, producer);
+		timer_.timeEquivalentClassSecondFromFirstRule += CachedTimeThread
+				.getCurrentTimeMillis();
+		return result;
+	}
+
+	@Override
 	public O visit(IndexedClassDecompositionRule rule, IndexedClass premise,
 			ContextPremises premises, ClassInferenceProducer producer) {
 		timer_.timeIndexedClassDecompositionRule -= CachedTimeThread
@@ -321,6 +346,17 @@ class RuleApplicationTimerVisitor<O> implements RuleVisitor<O> {
 	}
 
 	@Override
+	public O visit(OwlNothingDecompositionRule rule, IndexedClass premise,
+			ContextPremises premises, ClassInferenceProducer producer) {
+		timer_.timeOwlNothingDecompositionRule -= CachedTimeThread
+				.getCurrentTimeMillis();
+		O result = visitor_.visit(rule, premise, premises, producer);
+		timer_.timeOwlNothingDecompositionRule += CachedTimeThread
+				.getCurrentTimeMillis();
+		return result;
+	}
+
+	@Override
 	public O visit(OwlThingContextInitRule rule, ContextInitialization premise,
 			ContextPremises premises, ClassInferenceProducer producer) {
 		timer_.timeOwlThingContextInitRule -= CachedTimeThread
@@ -410,30 +446,6 @@ class RuleApplicationTimerVisitor<O> implements RuleVisitor<O> {
 				.getCurrentTimeMillis();
 		O result = visitor_.visit(rule, premise, premises, producer);
 		timer_.timeSuperClassFromSubClassRule += CachedTimeThread
-				.getCurrentTimeMillis();
-		return result;
-	}
-
-	@Override
-	public O visit(EquivalentClassFirstFromSecondRule rule,
-			IndexedClassExpression premise, ContextPremises premises,
-			ClassInferenceProducer producer) {
-		timer_.timeEquivalentClassFirstFromSecondRule -= CachedTimeThread
-				.getCurrentTimeMillis();
-		O result = visitor_.visit(rule, premise, premises, producer);
-		timer_.timeEquivalentClassFirstFromSecondRule += CachedTimeThread
-				.getCurrentTimeMillis();
-		return result;
-	}
-
-	@Override
-	public O visit(EquivalentClassSecondFromFirstRule rule,
-			IndexedClassExpression premise, ContextPremises premises,
-			ClassInferenceProducer producer) {
-		timer_.timeEquivalentClassSecondFromFirstRule -= CachedTimeThread
-				.getCurrentTimeMillis();
-		O result = visitor_.visit(rule, premise, premises, producer);
-		timer_.timeEquivalentClassSecondFromFirstRule += CachedTimeThread
 				.getCurrentTimeMillis();
 		return result;
 	}

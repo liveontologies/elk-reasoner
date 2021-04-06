@@ -86,6 +86,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRul
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromFirstConjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromSecondConjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.OwlNothingDecompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -555,6 +556,14 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			for (IndexedClassExpression ice : rule.getSecondEquivalentMembers()) {
 				iceValidator_.checkNew(ice);
 			}
+			return null;
+		}
+
+		@Override
+		public Void visit(OwlNothingDecompositionRule rule,
+				IndexedClass premise, ContextPremises premises,
+				ClassInferenceProducer producer) {
+			// nothing is stored in the rule
 			return null;
 		}
 

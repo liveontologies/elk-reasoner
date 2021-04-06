@@ -44,7 +44,7 @@ public interface SubsumerDecompositionRuleVisitor<O> {
 	O visit(ComposedFromDecomposedSubsumerRule rule,
 			IndexedClassExpression premise, ContextPremises premises,
 			ClassInferenceProducer producer);
-
+	
 	O visit(IndexedClassDecompositionRule rule, IndexedClass premise,
 			ContextPremises premises, ClassInferenceProducer producer);
 
@@ -64,4 +64,7 @@ public interface SubsumerDecompositionRuleVisitor<O> {
 			IndexedObjectSomeValuesFrom premise, ContextPremises premises,
 			ClassInferenceProducer producer);
 
+	O visit(OwlNothingDecompositionRule rule, IndexedClass premise,
+			ContextPremises premises, ClassInferenceProducer producer);
+	
 }

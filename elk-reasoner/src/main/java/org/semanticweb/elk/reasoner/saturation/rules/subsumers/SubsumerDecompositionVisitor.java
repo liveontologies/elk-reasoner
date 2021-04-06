@@ -75,6 +75,8 @@ public class SubsumerDecompositionVisitor implements
 				premises_, producer_);
 		ComposedFromDecomposedSubsumerRule.getInstance().accept(ruleVisitor_,
 				element, premises_, producer_);
+		OwlNothingDecompositionRule.getInstance().accept(ruleVisitor_, element,
+				premises_, producer_);
 		return null;
 	}
 

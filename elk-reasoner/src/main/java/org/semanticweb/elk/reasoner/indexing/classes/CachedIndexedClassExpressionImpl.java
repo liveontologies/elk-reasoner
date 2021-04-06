@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import org.semanticweb.elk.RevertibleAction;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
@@ -29,6 +31,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.saturation.ExtendedContext;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
@@ -37,6 +41,8 @@ import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.entryset.Entry;
 import org.semanticweb.elk.util.collections.entryset.EntryCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implements {@link LinkedIndexedClassExpression} and {@link Entry} so that
@@ -56,12 +62,79 @@ abstract class CachedIndexedClassExpressionImpl<T extends CachedIndexedClassExpr
 		ModifiableIndexedClassExpression, CachedIndexedClassExpression<T>,
 		Entry<T, N> {
 
+	// logger for events
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(CachedIndexedClassExpressionImpl.class);
+	
 	/**
 	 * The first composition rule assigned to this
 	 * {@link IndexedClassExpression}
 	 */
 	ChainableSubsumerRule compositionRuleHead;
 
+	/**
+	 * This counts how often this object occurred positively. Some indexing
+	 * operations are only needed when encountering objects positively for the
+	 * first time.
+	 */
+	int positiveOccurrenceNo = 0;
+
+	/**
+	 * This counts how often this object occurred negatively. Some indexing
+	 * operations are only needed when encountering objects negatively for the
+	 * first time.
+	 */
+	int negativeOccurrenceNo = 0;
+
+	
+	@Override
+	public boolean occursPositively() {
+		return positiveOccurrenceNo > 0;
+	}
+
+	@Override
+	public boolean occursNegatively() {
+		return negativeOccurrenceNo > 0;
+	}
+
+	@Override
+	public boolean occurs() {
+		return occursPositively() || occursNegatively();
+	}
+	
+	@Override
+	public String printOccurrenceNumbers() {
+		return "[pos=" + positiveOccurrenceNo + "; neg="
+				+ +negativeOccurrenceNo + "]";
+	}
+
+	/**
+	 * verifies that occurrence numbers are not negative
+	 */
+	private void checkOccurrenceNumbers() {
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace(toString() + " occurences: "
+					+ printOccurrenceNumbers());
+		if (positiveOccurrenceNo < 0 || negativeOccurrenceNo < 0)
+			throw new ElkUnexpectedIndexingException(toString()
+					+ " has a negative occurrence: " + printOccurrenceNumbers());
+	}
+	
+	
+	@Override
+	public RevertibleAction getIndexingAction(ModifiableOntologyIndex index,
+			OccurrenceIncrement increment) {
+		return RevertibleAction.create(() -> {
+			positiveOccurrenceNo += increment.positiveIncrement;
+			negativeOccurrenceNo += increment.negativeIncrement;
+			checkOccurrenceNumbers(); // TODO: perhaps return false instead of failing
+			return true;
+		}, () -> {
+			positiveOccurrenceNo -= increment.positiveIncrement;
+			negativeOccurrenceNo -= increment.negativeIncrement;
+		});
+	}
+		
 	/**
 	 * the reference to a {@link Context} assigned to this {@link IndexedObject}
 	 */

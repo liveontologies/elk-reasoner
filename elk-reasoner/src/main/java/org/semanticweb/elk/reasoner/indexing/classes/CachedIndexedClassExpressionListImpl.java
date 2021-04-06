@@ -24,6 +24,8 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 
 import java.util.List;
 
+import org.semanticweb.elk.RevertibleAction;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
@@ -31,6 +33,8 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implements {@link CachedIndexedClassExpressionList}
@@ -43,6 +47,10 @@ class CachedIndexedClassExpressionListImpl
 		implements
 			CachedIndexedClassExpressionList {
 
+	// logger for events
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(CachedIndexedClassExpressionListImpl.class);
+	
 	/**
 	 * The elements of the list
 	 */
@@ -75,16 +83,35 @@ class CachedIndexedClassExpressionListImpl
 		return CachedIndexedClassExpressionList.Helper.structuralEquals(this,
 				other);
 	}
+	
+	@Override
+	public String printOccurrenceNumbers() {
+		return "[all=" + totalOccurrenceNo_ + "]";
+	}
+
+	private void checkTotalOccurrenceNumbers() {
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace(
+					toString() + " occurences: " + printOccurrenceNumbers());
+		if (totalOccurrenceNo_ < 0)
+			throw new ElkUnexpectedIndexingException(
+					toString() + " has a negative total occurrence: "
+							+ printOccurrenceNumbers());
+	}
 
 	@Override
-	public boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
+	public RevertibleAction getIndexingAction(ModifiableOntologyIndex index,
 			OccurrenceIncrement increment) {
-		
-		totalOccurrenceNo_ += increment.totalIncrement;
-		
-		return true;
+		return RevertibleAction.create(() -> {
+			totalOccurrenceNo_ += increment.totalIncrement;
+			checkTotalOccurrenceNumbers(); // TODO: perhaps return false instead
+											// of failing
+			return true;
+		}, () -> {
+			totalOccurrenceNo_ -= increment.totalIncrement;
+		});
 	}
-		
+			
 	@Override
 	public final CachedIndexedClassExpressionList accept(
 			CachedIndexedSubObject.Filter filter) {

@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import org.semanticweb.elk.RevertibleAction;
 import org.semanticweb.elk.reasoner.completeness.Feature;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectHasSelf;
@@ -46,6 +47,8 @@ class CachedIndexedObjectHasSelfImpl extends
 		super(CachedIndexedObjectHasSelf.Helper.structuralHashCode(property));
 		this.property_ = property;
 	}
+	
+	// TODO: support composition rules
 
 	@Override
 	public final ModifiableIndexedObjectProperty getProperty() {
@@ -58,23 +61,19 @@ class CachedIndexedObjectHasSelfImpl extends
 	}
 
 	@Override
-	public final boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
+	public RevertibleAction getIndexingAction(ModifiableOntologyIndex index,
 			OccurrenceIncrement increment) {
-
-		// TODO: support composition rules
-
-		negativeOccurrenceNo += increment.negativeIncrement;
-		positiveOccurrenceNo += increment.positiveIncrement;
-		
-		// negative occurrence unsupported
-		index.occurrenceChanged(
-				Feature.OBJECT_HAS_SELF_NEGATIVE,
-				increment.negativeIncrement);
-		
-		return true;
-
+		return super.getIndexingAction(index, increment)
+				.then(RevertibleAction.create(() -> {
+					index.occurrenceChanged(
+							Feature.OBJECT_HAS_SELF_NEGATIVE,
+							increment.negativeIncrement);
+					return true;
+				}, () -> index.occurrenceChanged(
+						Feature.OBJECT_HAS_SELF_NEGATIVE,
+						-increment.negativeIncrement)));
 	}
-
+	
 	@Override
 	public final <O> O accept(IndexedComplexClassExpression.Visitor<O> visitor) {
 		return visitor.visit(this);

@@ -34,8 +34,6 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedEntity;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 
 /**
  * Implements {@link CachedIndexedObjectProperty}
@@ -230,13 +228,6 @@ class CachedIndexedObjectPropertyImpl
 		}
 		// else not found
 		return -1;
-	}
-
-	@Override
-	public boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
-			OccurrenceIncrement increment) {
-		totalOccurrenceNo += increment.totalIncrement;
-		return true;
 	}
 
 	@Override
