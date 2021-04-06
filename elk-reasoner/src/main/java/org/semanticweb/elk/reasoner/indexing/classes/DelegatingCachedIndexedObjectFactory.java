@@ -33,20 +33,22 @@ import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpressionL
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedIndividual;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectUnionOf;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
 
 /**
  * Delegates construction of {@link CachedIndexedSubObject} to a given
- * {@link CachedIndexedSubObject.Factory}.
+ * {@link CachedIndexedSubObject.Factory}. The constructed instances of 
+ * {@link CachedIndexedSubObject} are subsequently filtered using a
+ * given {@link CachedIndexedSubObject.Filter}.  
  * 
  * @author "Yevgeny Kazakov"
  */
@@ -54,92 +56,82 @@ class DelegatingCachedIndexedObjectFactory implements
 		CachedIndexedSubObject.Factory {
 
 	private final CachedIndexedSubObject.Factory baseFactory_;
+	private final CachedIndexedSubObject.Filter filter_;
 
-	DelegatingCachedIndexedObjectFactory(CachedIndexedSubObject.Factory baseFactory) {
+	DelegatingCachedIndexedObjectFactory(CachedIndexedSubObject.Factory baseFactory, CachedIndexedSubObject.Filter filter) {
 		this.baseFactory_ = baseFactory;
-	}
-
-	/**
-	 * Filters the sub-objects created by the factory; can be overridden in
-	 * subclasses
-	 * 
-	 * @param input
-	 * @return
-	 */
-	@SuppressWarnings("static-method")
-	<T extends CachedIndexedSubObject<T>> T filter(T input) {
-		return input;
+		this.filter_ = filter;
 	}
 
 	@Override
 	public final CachedIndexedClass getIndexedClass(ElkClass elkClass) {
-		return filter(baseFactory_.getIndexedClass(elkClass));
+		return filter_.filter(baseFactory_.getIndexedClass(elkClass));
 	}
 
 	@Override
 	public final CachedIndexedClassExpressionList getIndexedClassExpressionList(
 			List<? extends ModifiableIndexedClassExpression> members) {
-		return filter(baseFactory_.getIndexedClassExpressionList(members));
+		return  filter_.filter(baseFactory_.getIndexedClassExpressionList(members));
 	}
 
 	@Override
 	public final CachedIndexedComplexPropertyChain getIndexedComplexPropertyChain(
 			ModifiableIndexedObjectProperty leftProperty,
 			ModifiableIndexedPropertyChain rightProperty) {
-		return filter(baseFactory_.getIndexedComplexPropertyChain(leftProperty,
+		return filter_.filter(baseFactory_.getIndexedComplexPropertyChain(leftProperty,
 				rightProperty));
 	}
 
 	@Override
 	public final CachedIndexedDataHasValue getIndexedDataHasValue(
 			ElkDataHasValue elkDataHasValue) {
-		return filter(baseFactory_.getIndexedDataHasValue(elkDataHasValue));
+		return filter_.filter(baseFactory_.getIndexedDataHasValue(elkDataHasValue));
 	}
 
 	@Override
 	public final CachedIndexedIndividual getIndexedIndividual(
 			ElkNamedIndividual elkNamedIndividual) {
-		return filter(baseFactory_.getIndexedIndividual(elkNamedIndividual));
+		return filter_.filter(baseFactory_.getIndexedIndividual(elkNamedIndividual));
 	}
 
 	@Override
 	public final CachedIndexedObjectComplementOf getIndexedObjectComplementOf(
 			ModifiableIndexedClassExpression negated) {
-		return filter(baseFactory_.getIndexedObjectComplementOf(negated));
+		return filter_.filter(baseFactory_.getIndexedObjectComplementOf(negated));
 	}
 
 	@Override
 	public final CachedIndexedObjectHasSelf getIndexedObjectHasSelf(
 			ModifiableIndexedObjectProperty property) {
-		return filter(baseFactory_.getIndexedObjectHasSelf(property));
+		return filter_.filter(baseFactory_.getIndexedObjectHasSelf(property));
 	}
 
 	@Override
 	public final CachedIndexedObjectIntersectionOf getIndexedObjectIntersectionOf(
 			ModifiableIndexedClassExpression conjunctA,
 			ModifiableIndexedClassExpression conjunctB) {
-		return filter(baseFactory_.getIndexedObjectIntersectionOf(conjunctA,
+		return filter_.filter(baseFactory_.getIndexedObjectIntersectionOf(conjunctA,
 				conjunctB));
 	}
 
 	@Override
 	public final CachedIndexedObjectProperty getIndexedObjectProperty(
 			ElkObjectProperty elkObjectProperty) {
-		return filter(baseFactory_.getIndexedObjectProperty(elkObjectProperty));
+		return filter_.filter(baseFactory_.getIndexedObjectProperty(elkObjectProperty));
 	}
 
 	@Override
 	public final CachedIndexedObjectSomeValuesFrom getIndexedObjectSomeValuesFrom(
 			ModifiableIndexedObjectProperty property,
 			ModifiableIndexedClassExpression filler) {
-		return filter(baseFactory_.getIndexedObjectSomeValuesFrom(property,
+		return filter_.filter(baseFactory_.getIndexedObjectSomeValuesFrom(property,
 				filler));
 	}
 
 	@Override
 	public final CachedIndexedObjectUnionOf getIndexedObjectUnionOf(
 			List<? extends ModifiableIndexedClassExpression> disjuncts) {
-		return filter(baseFactory_.getIndexedObjectUnionOf(disjuncts));
+		return filter_.filter(baseFactory_.getIndexedObjectUnionOf(disjuncts));
 	}
 
 }

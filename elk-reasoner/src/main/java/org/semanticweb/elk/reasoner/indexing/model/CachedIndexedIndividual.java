@@ -30,8 +30,8 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface CachedIndexedIndividual extends ModifiableIndexedIndividual,
-		CachedIndexedClassExpression<CachedIndexedIndividual>,
+public interface CachedIndexedIndividual
+		extends ModifiableIndexedIndividual, CachedIndexedClassExpression,
 		CachedIndexedClassEntity<CachedIndexedIndividual> {
 
 	/**

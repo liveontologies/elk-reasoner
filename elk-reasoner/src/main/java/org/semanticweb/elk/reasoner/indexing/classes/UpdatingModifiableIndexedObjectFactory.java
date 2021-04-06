@@ -23,7 +23,9 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingException;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedDeclarationAxiom;
@@ -53,12 +55,18 @@ public class UpdatingModifiableIndexedObjectFactory
 		implements ModifiableIndexedObject.Factory {
 
 	private final ModifiableIndexedObject.Factory baseFactory_;
+	
+	private final ModifiableOntologyIndex index_;
+	
+	private final OccurrenceIncrement increment_;
 
 	public <F extends CachedIndexedSubObject.Factory & ModifiableIndexedObject.Factory> UpdatingModifiableIndexedObjectFactory(
 			F baseFactory, ModifiableOntologyIndex index,
 			OccurrenceIncrement increment) {
 		super(baseFactory, index, increment);
 		this.baseFactory_ = baseFactory;
+		this.index_ = index;
+		this.increment_ = increment;
 	}
 
 	@Override
@@ -108,6 +116,26 @@ public class UpdatingModifiableIndexedObjectFactory
 			ModifiableIndexedObjectProperty superProperty) {
 		return update(baseFactory_.getIndexedSubObjectPropertyOfAxiom(
 				originalAxiom, subPropertyChain, superProperty));
+	}
+	
+	<T extends ModifiableIndexedAxiom> T update(T input) {
+		if (increment_.totalIncrement > 0) {
+			for (int i = 0; i < increment_.totalIncrement; i++) {
+				if (!input.addOccurrence(index_))
+					throw new ElkIndexingException(input
+							.toString()
+							+ ": cannot be added to Index!");
+			}
+		}
+		if (increment_.totalIncrement < 0) {
+			for (int i = 0; i < -increment_.totalIncrement; i++) {
+				if (!input.removeOccurrence(index_))
+					throw new ElkIndexingException(input
+							.toString()
+							+ ": cannot be removed from Index!");
+			}
+		}
+		return input;
 	}
 
 }

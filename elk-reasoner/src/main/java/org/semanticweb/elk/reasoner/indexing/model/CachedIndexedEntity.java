@@ -35,10 +35,7 @@ import org.semanticweb.elk.util.collections.entryset.Entry;
  * 
  */
 public interface CachedIndexedEntity<T extends CachedIndexedEntity<T>>
-		extends
-			ModifiableIndexedEntity,
-			CachedIndexedSubObject<T>,
-			Entry<T, T> {
+		extends ModifiableIndexedEntity, CachedIndexedSubObject, Entry<T, T> {
 
 	/**
 	 * A factory for creating instances

@@ -57,9 +57,9 @@ import org.slf4j.LoggerFactory;
  * @param <N>
  *            The type of the elements in the set where this entry is used
  */
-abstract class CachedIndexedClassExpressionImpl<T extends CachedIndexedClassExpression<T> & Entry<T, N>, N>
+abstract class CachedIndexedClassExpressionImpl<T extends CachedIndexedClassExpression & Entry<T, N>, N>
 		extends CachedIndexedSubObjectImpl<T, N> implements
-		ModifiableIndexedClassExpression, CachedIndexedClassExpression<T>,
+		ModifiableIndexedClassExpression, CachedIndexedClassExpression,
 		Entry<T, N> {
 
 	// logger for events
@@ -195,7 +195,7 @@ abstract class CachedIndexedClassExpressionImpl<T extends CachedIndexedClassExpr
 	}
 
 	@Override
-	public final T accept(CachedIndexedSubObject.Filter filter) {
+	public final CachedIndexedSubObject accept(CachedIndexedSubObject.Filter filter) {
 		return accept((CachedIndexedClassExpression.Filter) filter);
 	}
 

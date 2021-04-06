@@ -59,9 +59,9 @@ import org.slf4j.LoggerFactory;
  *            The type of the elements in the set where this entry is used
  * 
  */
-abstract class CachedIndexedPropertyChainImpl<T extends CachedIndexedPropertyChain<T> & Entry<T, N>, N>
+abstract class CachedIndexedPropertyChainImpl<T extends CachedIndexedPropertyChain & Entry<T, N>, N>
 		extends CachedIndexedSubObjectImpl<T, N>
-		implements CachedIndexedPropertyChain<T>, ModifiableIndexedPropertyChain, Entry<T, N> {
+		implements CachedIndexedPropertyChain, ModifiableIndexedPropertyChain, Entry<T, N> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -266,7 +266,7 @@ abstract class CachedIndexedPropertyChainImpl<T extends CachedIndexedPropertyCha
 	}
 
 	@Override
-	public final T accept(CachedIndexedSubObject.Filter filter) {
+	public final CachedIndexedPropertyChain accept(CachedIndexedSubObject.Filter filter) {
 		return accept((CachedIndexedPropertyChain.Filter) filter);
 	}
 

@@ -33,10 +33,8 @@ import org.semanticweb.elk.util.collections.entryset.Entry;
  * @author "Yevgeny Kazakov"
  */
 public interface CachedIndexedClassExpressionList
-		extends
-			ModifiableIndexedClassExpressionList,
-			CachedIndexedSubObject<CachedIndexedClassExpressionList>,
-			Entry<CachedIndexedClassExpressionList, CachedIndexedClassExpressionList> {
+		extends ModifiableIndexedClassExpressionList, CachedIndexedSubObject,
+		Entry<CachedIndexedClassExpressionList, CachedIndexedClassExpressionList> {
 
 	/**
 	 * A factory for creating instances

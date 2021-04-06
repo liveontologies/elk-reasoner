@@ -43,9 +43,9 @@ import org.semanticweb.elk.util.collections.entryset.EntryCollection;
  *            The type of the elements in the set where this entry is used
  * 
  */
-abstract class CachedIndexedSubObjectImpl<T extends CachedIndexedSubObject<T> & Entry<T, N>, N>
+abstract class CachedIndexedSubObjectImpl<T extends CachedIndexedSubObject & Entry<T, N>, N>
 		extends IndexedObjectImpl
-		implements CachedIndexedSubObject<T>, ModifiableIndexedSubObject,  Entry<T, N> {
+		implements CachedIndexedSubObject, ModifiableIndexedSubObject,  Entry<T, N> {
 
 	/**
 	 * The reference to the next element

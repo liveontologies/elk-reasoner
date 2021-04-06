@@ -99,7 +99,7 @@ abstract class CachedIndexedClassEntityImpl<T extends CachedIndexedClassEntity<T
 	}
 
 	@Override
-	public final T accept(CachedIndexedClassExpression.Filter filter) {
+	public final CachedIndexedClassExpression accept(CachedIndexedClassExpression.Filter filter) {
 		return accept((CachedIndexedClassEntity.Filter) filter);
 	}
 

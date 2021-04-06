@@ -45,7 +45,7 @@ abstract class CachedIndexedComplexClassExpressionImpl<T extends CachedIndexedCo
 	}
 	
 	@Override
-	public final T accept(CachedIndexedClassExpression.Filter filter) {
+	public final CachedIndexedComplexClassExpression<?> accept(CachedIndexedClassExpression.Filter filter) {
 		return accept((CachedIndexedComplexClassExpression.Filter) filter);
 	}
 	

@@ -180,19 +180,18 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 	}
 
 	@Override
-	public <T extends CachedIndexedSubObject<T>> T resolve(
-			CachedIndexedSubObject<T> input) {
-		return input.accept(resolver_);
+	public CachedIndexedSubObject.Filter getResolver() {	
+		return this.resolver_;
 	}
 
 	@Override
-	public void add(CachedIndexedSubObject<?> input) {
+	public void add(CachedIndexedSubObject input) {
 		LOGGER_.trace("{}: adding to cache", input);
 		input.accept(inserter_);
 	}
 
 	@Override
-	public void remove(CachedIndexedSubObject<?> input) {
+	public void remove(CachedIndexedSubObject input) {
 		LOGGER_.trace("{}: removing from cache", input);
 		input.accept(deleter_);
 	}

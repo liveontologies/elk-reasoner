@@ -31,11 +31,8 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * 
  * @author "Yevgeny Kazakov"
  *
- * @param <T>
- *            the type of the {@link CachedIndexedSubObject}
  */
-public interface CachedIndexedSubObject<T extends CachedIndexedSubObject<T>>
-		extends ModifiableIndexedSubObject {
+public interface CachedIndexedSubObject extends ModifiableIndexedSubObject {
 
 	/**
 	 * A factory for creating instances
@@ -75,7 +72,7 @@ public interface CachedIndexedSubObject<T extends CachedIndexedSubObject<T>>
 	 * @param filter
 	 * @return the result of applying the filter to this object
 	 */
-	T accept(Filter filter);
+	CachedIndexedSubObject accept(Filter filter);
 	
 	static class Helper {
 		static int combinedHashCode(Object... objects) {
