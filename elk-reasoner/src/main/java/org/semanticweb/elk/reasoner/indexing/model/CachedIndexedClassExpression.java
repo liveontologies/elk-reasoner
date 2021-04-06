@@ -28,11 +28,9 @@ package org.semanticweb.elk.reasoner.indexing.model;
  * 
  * @author "Yevgeny Kazakov"
  *
- * @param <T>
- *            the type of the {@link CachedIndexedClassExpression}
  */
-public interface CachedIndexedClassExpression<T extends CachedIndexedClassExpression<T>>
-		extends CachedIndexedSubObject<T>, ModifiableIndexedClassExpression {
+public interface CachedIndexedClassExpression
+		extends CachedIndexedSubObject, ModifiableIndexedClassExpression {
 
 	/**
 	 * A factory for creating instances
@@ -67,6 +65,6 @@ public interface CachedIndexedClassExpression<T extends CachedIndexedClassExpres
 	}
 
 	
-	T accept(Filter filter);
+	CachedIndexedClassExpression accept(Filter filter);
 
 }

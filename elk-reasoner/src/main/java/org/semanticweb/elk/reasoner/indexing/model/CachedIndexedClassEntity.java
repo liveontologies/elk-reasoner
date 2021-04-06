@@ -32,7 +32,7 @@ package org.semanticweb.elk.reasoner.indexing.model;
  *            the type of the {@link CachedIndexedClassEntity}
  */
 public interface CachedIndexedClassEntity<T extends CachedIndexedClassEntity<T>>
-		extends ModifiableIndexedClassEntity, CachedIndexedClassExpression<T>,
+		extends ModifiableIndexedClassEntity, CachedIndexedClassExpression,
 		CachedIndexedEntity<T> {
 
 	/**
@@ -65,6 +65,6 @@ public interface CachedIndexedClassEntity<T extends CachedIndexedClassEntity<T>>
 		
 	}
 	
-	T accept(Filter filter);
+	CachedIndexedClassEntity<?> accept(Filter filter);
 	
 }

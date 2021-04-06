@@ -31,15 +31,13 @@ package org.semanticweb.elk.reasoner.indexing.model;
 public interface ModifiableIndexedObjectCache extends IndexedObjectCache {
 
 	/**
-	 * 
-	 * @param input
-	 *            an {@link CachedIndexedSubObject}
-	 * @return a structurally equal {@link CachedIndexedSubObject} of the same type
-	 *         as the input containing in this {@link IndexedObjectCache} or
-	 *         {@code null} if there is no such an object
+	 * @return an {@link CachedIndexedSubObject.Filter} that produces
+	 *         structurally equal {@link CachedIndexedSubObject}s contained in
+	 *         this {@link IndexedObjectCache} or {@code null} if there is no
+	 *         such an object
 	 */
-	<T extends CachedIndexedSubObject<T>> T resolve(CachedIndexedSubObject<T> input);
-
+	CachedIndexedSubObject.Filter getResolver();
+	
 	/**
 	 * Adds a given {@link CachedIndexedSubObject} to this
 	 * {@link IndexedObjectCache}; this method should be used only if no
@@ -49,7 +47,7 @@ public interface ModifiableIndexedObjectCache extends IndexedObjectCache {
 	 * @param input
 	 *            the {@link CachedIndexedSubObject} to be added
 	 */
-	void add(CachedIndexedSubObject<?> input);
+	void add(CachedIndexedSubObject input);
 
 	/**
 	 * Removes an object structurally equal to the given one from this
@@ -59,6 +57,6 @@ public interface ModifiableIndexedObjectCache extends IndexedObjectCache {
 	 *            the {@link CachedIndexedSubObject} for which to remove the
 	 *            structurally equal object
 	 */
-	void remove(CachedIndexedSubObject<?> input);
+	void remove(CachedIndexedSubObject input);
 
 }

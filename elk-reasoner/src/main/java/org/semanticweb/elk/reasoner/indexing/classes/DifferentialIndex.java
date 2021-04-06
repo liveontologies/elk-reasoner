@@ -97,7 +97,7 @@ public class DifferentialIndex extends DirectIndex {
 	/**
 	 * Pending deletions of {@link CachedIndexedSubObject}s
 	 */
-	private Set<CachedIndexedSubObject<?>> todoDeletions_;
+	private Set<CachedIndexedSubObject> todoDeletions_;
 
 	/**
 	 * The added and removed initialization {@link Rule}s
@@ -160,7 +160,7 @@ public class DifferentialIndex extends DirectIndex {
 
 	public void initDeletions() {
 		this.removedContextInitRules_ = null;
-		this.todoDeletions_ = new ArrayHashSet<CachedIndexedSubObject<?>>(1024);
+		this.todoDeletions_ = new ArrayHashSet<CachedIndexedSubObject>(1024);
 		this.removedContextRuleHeadByClassExpressions_ = new ArrayHashMap<ModifiableIndexedClassExpression, ChainableSubsumerRule>(
 				32);
 		this.removedDefinitions_ = new ArrayHashMap<ModifiableIndexedClass, ModifiableIndexedClassExpression>(
@@ -176,7 +176,7 @@ public class DifferentialIndex extends DirectIndex {
 	/* read-write methods */
 
 	@Override
-	public void add(CachedIndexedSubObject<?> input) {
+	public void add(CachedIndexedSubObject input) {
 		if (!incrementalMode) {
 			super.add(input);
 			return;
@@ -192,7 +192,7 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	@Override
-	public void remove(CachedIndexedSubObject<?> input) {
+	public void remove(CachedIndexedSubObject input) {
 		if (!incrementalMode) {
 			super.remove(input);
 			return;
@@ -475,7 +475,7 @@ public class DifferentialIndex extends DirectIndex {
 	 * registration
 	 */
 	public void clearDeletedRules() {
-		for (CachedIndexedSubObject<?> deletion : todoDeletions_) {
+		for (CachedIndexedSubObject deletion : todoDeletions_) {
 			LOGGER_.trace("{}: comitting removal", deletion);
 			super.remove(deletion);
 		}

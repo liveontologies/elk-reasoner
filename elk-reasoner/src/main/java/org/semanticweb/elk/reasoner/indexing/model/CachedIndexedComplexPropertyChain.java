@@ -30,10 +30,8 @@ import org.semanticweb.elk.util.collections.entryset.Entry;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface CachedIndexedComplexPropertyChain
-		extends
-		ModifiableIndexedComplexPropertyChain,
-		CachedIndexedPropertyChain<CachedIndexedComplexPropertyChain>,
+public interface CachedIndexedComplexPropertyChain extends
+		ModifiableIndexedComplexPropertyChain, CachedIndexedPropertyChain,
 		Entry<CachedIndexedComplexPropertyChain, CachedIndexedComplexPropertyChain> {
 
 	/**

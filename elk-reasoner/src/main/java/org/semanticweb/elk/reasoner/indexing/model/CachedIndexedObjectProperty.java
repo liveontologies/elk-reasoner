@@ -30,9 +30,8 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface CachedIndexedObjectProperty extends
-		ModifiableIndexedObjectProperty,
-		CachedIndexedPropertyChain<CachedIndexedObjectProperty>,
+public interface CachedIndexedObjectProperty
+		extends ModifiableIndexedObjectProperty, CachedIndexedPropertyChain,
 		CachedIndexedEntity<CachedIndexedObjectProperty> {
 
 	/**

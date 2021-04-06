@@ -24,81 +24,66 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingException;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 
 /**
- * A {@link CachedIndexedSubObject.Factory} that constructs objects using another
- * {@link CachedIndexedSubObject.Factory} and updates the occurrence counts for the
- * constructed objects using the provided {@link OccurrenceIncrement}.
+ * A {@link CachedIndexedSubObject.Factory} that constructs objects using
+ * another {@link CachedIndexedSubObject.Factory} and updates the occurrence
+ * counts for the constructed objects using the provided
+ * {@link OccurrenceIncrement}.
  * 
  * @author "Yevgeny Kazakov"
  * 
  * @see ModifiableIndexedObject#updateOccurrenceNumbers
  */
-class UpdatingCachedIndexedObjectFactory extends
-		DelegatingCachedIndexedObjectFactory {
-
-	private final OccurrenceIncrement increment_;
-
-	private final ModifiableOntologyIndex index_;
+class UpdatingCachedIndexedObjectFactory
+		extends DelegatingCachedIndexedObjectFactory {
 
 	public UpdatingCachedIndexedObjectFactory(
 			CachedIndexedSubObject.Factory baseFactory,
-			ModifiableOntologyIndex index, OccurrenceIncrement increment) {
-		super(baseFactory);
-		this.index_ = index;
-		this.increment_ = increment;
+			final ModifiableOntologyIndex index,
+			final OccurrenceIncrement increment) {
+		super(baseFactory,
+				new DelegatingCachedIndexedObjectFilter(index.getResolver()) {
+
+					private CachedIndexedSubObject filteredElement_;
+
+					@Override
+					<T extends CachedIndexedSubObject> T preFilter(
+							T element) {
+						filteredElement_ = element;
+						return element;
+					}
+
+					@SuppressWarnings("unchecked")
+					@Override
+					<T extends CachedIndexedSubObject> T postFilter(
+							T element) {
+						if (element == null) {
+							element = (T) filteredElement_;
+						}
+						if (!element.occurs()) {
+							index.add(element);
+						}
+						update(element);
+						if (!element.occurs()) {
+							index.remove(element);
+						}
+						return element;
+					}
+
+					<T extends ModifiableIndexedSubObject> T update(T input) {
+						if (!input.getIndexingAction(index, increment).apply())
+							throw new ElkIndexingException(input.toString()
+									+ ": cannot update in Index for "
+									+ increment + " occurrences!");
+						return input;
+					}
+
+				});
 	}
 
-	@Override
-	<T extends CachedIndexedSubObject<T>> T filter(T input) {
-		T result = resolve(input);
-		update(result);
-		if (!result.occurs()) {
-			index_.remove(result);
-		}
-		return result;
-	}
-
-	<T extends CachedIndexedSubObject<T>> T resolve(T input) {
-		T result = index_.resolve(input);
-		if (result == null) {
-			result = input;
-		}
-		if (!result.occurs()) {
-			index_.add(result);
-		}
-		return result;
-	}
-
-	<T extends ModifiableIndexedSubObject> T update(T input) {
-		if (!input.getIndexingAction(index_, increment_).apply())
-			throw new ElkIndexingException(input.toString()
-					+ ": cannot update in Index for " + increment_
-					+ " occurrences!");
-		return input;
-	}
-
-	<T extends ModifiableIndexedAxiom> T update(T input) {
-		if (increment_.totalIncrement > 0) {
-			for (int i = 0; i < increment_.totalIncrement; i++) {
-				if (!input.addOccurrence(index_))
-					throw new ElkIndexingException(input.toString()
-							+ ": cannot be added to Index!");
-			}
-		}
-		if (increment_.totalIncrement < 0) {
-			for (int i = 0; i < -increment_.totalIncrement; i++) {
-				if (!input.removeOccurrence(index_))
-					throw new ElkIndexingException(input.toString()
-							+ ": cannot be removed from Index!");
-			}
-		}
-		return input;
-	}
-	
 }

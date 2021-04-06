@@ -32,7 +32,7 @@ import org.semanticweb.elk.util.collections.entryset.Entry;
  *            the type of the {@link CachedIndexedComplexClassExpression}
  */
 public interface CachedIndexedComplexClassExpression<T extends CachedIndexedComplexClassExpression<T>>
-		extends CachedIndexedClassExpression<T>, IndexedComplexClassExpression,
+		extends CachedIndexedClassExpression, IndexedComplexClassExpression,
 		Entry<T, CachedIndexedComplexClassExpression<?>> {
 
 	/**
@@ -73,7 +73,7 @@ public interface CachedIndexedComplexClassExpression<T extends CachedIndexedComp
 
 	}
 	
-	T accept(Filter filter);
+	CachedIndexedComplexClassExpression<?> accept(Filter filter);
 
 
 }
