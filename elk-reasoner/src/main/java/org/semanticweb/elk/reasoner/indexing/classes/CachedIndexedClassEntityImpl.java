@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import org.semanticweb.elk.RevertibleAction;
+
 /*
  * #%L
  * ELK Reasoner
@@ -41,8 +43,8 @@ import org.slf4j.LoggerFactory;
  *            the type of objects this object can be structurally equal to
  */
 abstract class CachedIndexedClassEntityImpl<T extends CachedIndexedClassEntity<T>>
-		extends CachedIndexedClassExpressionImpl<T, T> implements
-		CachedIndexedClassEntity<T> {
+		extends CachedIndexedClassExpressionImpl<T, T>
+		implements CachedIndexedClassEntity<T> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -56,14 +58,6 @@ abstract class CachedIndexedClassEntityImpl<T extends CachedIndexedClassEntity<T
 	CachedIndexedClassEntityImpl(int structuralHash) {
 		super(structuralHash);
 	}
-	
-	@Override
-	public boolean updateOccurrenceNumbers(final ModifiableOntologyIndex index,
-			OccurrenceIncrement increment) {
-
-		totalOccurrenceNo += increment.totalIncrement;
-		return true;
-	}
 
 	@Override
 	public final boolean occurs() {
@@ -72,18 +66,33 @@ abstract class CachedIndexedClassEntityImpl<T extends CachedIndexedClassEntity<T
 
 	@Override
 	public String printOccurrenceNumbers() {
-		return "[all=" + totalOccurrenceNo + "]";
+		return "[all=" + totalOccurrenceNo + "; pos=" + positiveOccurrenceNo
+				+ "; neg=" + negativeOccurrenceNo + "]";
 	}
 
-	public void checkOccurrenceNumbers() {
+	private void checkTotalOccurrenceNumbers() {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace(toString() + " occurences: "
 					+ printOccurrenceNumbers());
 		if (totalOccurrenceNo < 0)
-			throw new ElkUnexpectedIndexingException(toString()
-					+ " has a negative occurrence: " + printOccurrenceNumbers());
+			throw new ElkUnexpectedIndexingException(
+					toString() + " has a negative total occurrence: "
+							+ printOccurrenceNumbers());
 	}
-	
+
+	@Override
+	public RevertibleAction getIndexingAction(ModifiableOntologyIndex index,
+			OccurrenceIncrement increment) {
+		return RevertibleAction.create(() -> {
+			totalOccurrenceNo += increment.totalIncrement;
+			checkTotalOccurrenceNumbers();
+			return true;
+		}, () -> {
+			totalOccurrenceNo -= increment.totalIncrement;
+		}).then(super.getIndexingAction(index, increment));
+
+	}
+
 	@Override
 	public final <O> O accept(IndexedClassExpression.Visitor<O> visitor) {
 		return accept((IndexedClassEntity.Visitor<O>) visitor);

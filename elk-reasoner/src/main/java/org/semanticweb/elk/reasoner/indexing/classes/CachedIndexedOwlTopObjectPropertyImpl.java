@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import org.semanticweb.elk.RevertibleAction;
+
 /*-
  * #%L
  * ELK Reasoner Core
@@ -42,20 +44,17 @@ public class CachedIndexedOwlTopObjectPropertyImpl
 	}
 
 	@Override
-	public final boolean updateOccurrenceNumbers(
-			final ModifiableOntologyIndex index,
-			final OccurrenceIncrement increment) {
-		if (super.updateOccurrenceNumbers(index, increment)) {
-
-			// negative occurrences are unsupported
-			index.occurrenceChanged(
-					Feature.TOP_OBJECT_PROPERTY_NEGATIVE,
-					increment.negativeIncrement);
-
-			return true;
-		}
-		// else
-		return false;
+	public RevertibleAction getIndexingAction(ModifiableOntologyIndex index,
+			OccurrenceIncrement increment) {
+		return super.getIndexingAction(index, increment)
+				.then(RevertibleAction.create(() -> {
+					index.occurrenceChanged(
+							Feature.TOP_OBJECT_PROPERTY_NEGATIVE,
+							increment.negativeIncrement);
+					return true;
+				}, () -> index.occurrenceChanged(
+						Feature.TOP_OBJECT_PROPERTY_NEGATIVE,
+						-increment.negativeIncrement)));
 	}
 
 }

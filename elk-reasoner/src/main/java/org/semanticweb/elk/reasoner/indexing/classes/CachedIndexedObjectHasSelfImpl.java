@@ -27,8 +27,6 @@ import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 
 /**
  * Implements {@link CachedIndexedObjectSomeValuesFrom}
@@ -45,6 +43,8 @@ class CachedIndexedObjectHasSelfImpl extends
 		super(CachedIndexedObjectHasSelf.Helper.structuralHashCode(property));
 		this.property_ = property;
 	}
+	
+	// TODO: support composition rules
 
 	@Override
 	public final ModifiableIndexedObjectProperty getProperty() {
@@ -55,19 +55,7 @@ class CachedIndexedObjectHasSelfImpl extends
 	public final CachedIndexedObjectHasSelf structuralEquals(Object other) {
 		return CachedIndexedObjectHasSelf.Helper.structuralEquals(this, other);
 	}
-
-	@Override
-	public final boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
-			OccurrenceIncrement increment) {
-
-		// TODO: support composition rules
-
-		negativeOccurrenceNo += increment.negativeIncrement;
-		positiveOccurrenceNo += increment.positiveIncrement;
-		return true;
-
-	}
-
+	
 	@Override
 	public final <O> O accept(IndexedComplexClassExpression.Visitor<O> visitor) {
 		return visitor.visit(this);

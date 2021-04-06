@@ -29,8 +29,6 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkEntityFactory;
 import org.semanticweb.elk.reasoner.completeness.Feature;
 import org.semanticweb.elk.reasoner.completeness.OccurrenceListener;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlNothing;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedOwlThing;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
@@ -66,47 +64,10 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl
 		// owl:Thing and owl:Nothing always occur
 		OccurrenceIncrement addition = OccurrenceIncrement
 				.getNeutralIncrement(1);
-		getOwlThing().updateOccurrenceNumbers(this, addition);
-		getOwlNothing().updateOccurrenceNumbers(this, addition);
-		getOwlTopObjectProperty().updateOccurrenceNumbers(this, addition);
-		getOwlBottomObjectProperty().updateOccurrenceNumbers(this, addition);
-		// register listeners for occurrences
-		getOwlThing().addListener(new CachedIndexedOwlThing.ChangeListener() {
-
-			@Override
-			public void negativeOccurrenceAppeared() {
-				for (int i = 0; i < listeners_.size(); i++) {
-					listeners_.get(i).negativeOwlThingAppeared();
-				}
-			}
-
-			@Override
-			public void negativeOccurrenceDisappeared() {
-				for (int i = 0; i < listeners_.size(); i++) {
-					listeners_.get(i).negativeOwlThingDisappeared();
-				}
-
-			}
-
-		});
-		getOwlNothing()
-				.addListener(new CachedIndexedOwlNothing.ChangeListener() {
-
-					@Override
-					public void positiveOccurrenceAppeared() {
-						for (int i = 0; i < listeners_.size(); i++) {
-							listeners_.get(i).positiveOwlNothingAppeared();
-						}
-					}
-
-					@Override
-					public void positiveOccurrenceDisappeared() {
-						for (int i = 0; i < listeners_.size(); i++) {
-							listeners_.get(i).positiveOwlNothingDisappeared();
-						}
-
-					}
-				});
+		getOwlThing().getIndexingAction(this, addition).apply();		
+		getOwlNothing().getIndexingAction(this, addition).apply();
+		getOwlTopObjectProperty().getIndexingAction(this, addition).apply();
+		getOwlBottomObjectProperty().getIndexingAction(this, addition).apply();
 	}
 
 	/* read-only methods required by the interface */

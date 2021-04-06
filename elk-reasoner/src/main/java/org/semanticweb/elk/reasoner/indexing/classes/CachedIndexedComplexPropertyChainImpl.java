@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import org.semanticweb.elk.RevertibleAction;
 import org.semanticweb.elk.reasoner.completeness.Feature;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedPropertyChain;
@@ -37,8 +38,7 @@ import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
  * @author "Yevgeny Kazakov"
  * 
  */
-final class CachedIndexedComplexPropertyChainImpl
-		extends
+final class CachedIndexedComplexPropertyChainImpl extends
 		CachedIndexedPropertyChainImpl<CachedIndexedComplexPropertyChain, CachedIndexedComplexPropertyChain>
 		implements CachedIndexedComplexPropertyChain {
 
@@ -72,49 +72,45 @@ final class CachedIndexedComplexPropertyChainImpl
 	}
 
 	@Override
-	public final CachedIndexedComplexPropertyChain structuralEquals(Object other) {
+	public final CachedIndexedComplexPropertyChain structuralEquals(
+			Object other) {
 		return CachedIndexedComplexPropertyChain.Helper.structuralEquals(this,
 				other);
 	}
 
 	@Override
-	public final boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
+	public RevertibleAction getIndexingAction(ModifiableOntologyIndex index,
 			OccurrenceIncrement increment) {
+		return RevertibleAction
+				.create(() -> totalOccurrenceNo == 0
+						&& increment.totalIncrement > 0,
+						() -> rightProperty_.addRightChain(this),
+						() -> rightProperty_.removeRightChain(this))
+				.then(RevertibleAction.create(
+						() -> totalOccurrenceNo == 0
+								&& increment.totalIncrement > 0,
+						() -> leftProperty_.addLeftChain(this),
+						() -> leftProperty_.removeLeftChain(this)))
+				.then(super.getIndexingAction(index, increment))
+				.then(RevertibleAction.create(
+						() -> totalOccurrenceNo == 0
+								&& increment.totalIncrement < 0,
+						() -> rightProperty_.removeRightChain(this),
+						() -> rightProperty_.addRightChain(this)))
+				.then(RevertibleAction.create(
+						() -> totalOccurrenceNo == 0
+								&& increment.totalIncrement < 0,
+						() -> leftProperty_.removeLeftChain(this),
+						() -> leftProperty_.addLeftChain(this)))
+				.then(RevertibleAction.create(() -> {
+					index.occurrenceChanged(Feature.OBJECT_PROPERTY_CHAIN,
+							increment.totalIncrement);
+					return true;
+				}, () -> {
+					index.occurrenceChanged(Feature.OBJECT_PROPERTY_CHAIN,
+							-increment.totalIncrement);
+				}));
 
-		if (totalOccurrenceNo == 0 && increment.totalIncrement > 0) {
-			// first occurrence of this expression
-			if (!rightProperty_.addRightChain(this))
-				return false;
-			if (!leftProperty_.addLeftChain(this)) {
-				// revert all changes
-				rightProperty_.removeRightChain(this);
-				return false;
-			}
-		}
-
-		totalOccurrenceNo += increment.totalIncrement;
-
-		if (totalOccurrenceNo == 0 && increment.totalIncrement < 0) {
-			// no occurrences of this conjunction left
-			if (!rightProperty_.removeRightChain(this)) {
-				// revert all changes
-				totalOccurrenceNo -= increment.totalIncrement;
-				return false;
-			}
-			if (!leftProperty_.removeLeftChain(this)) {
-				// revert all changes
-				rightProperty_.addRightChain(this);
-				totalOccurrenceNo -= increment.totalIncrement;
-				return false;
-			}
-		}
-		
-		// not fully supported with reflexive properties
-		index.occurrenceChanged(Feature.OBJECT_PROPERTY_CHAIN,
-				increment.totalIncrement);
-		
-		// success!
-		return true;
 	}
 
 	/**

@@ -76,7 +76,7 @@ class UpdatingCachedIndexedObjectFactory extends
 	}
 
 	<T extends ModifiableIndexedSubObject> T update(T input) {
-		if (!input.updateOccurrenceNumbers(index_, increment_))
+		if (!input.getIndexingAction(index_, increment_).apply())
 			throw new ElkIndexingException(input.toString()
 					+ ": cannot update in Index for " + increment_
 					+ " occurrences!");

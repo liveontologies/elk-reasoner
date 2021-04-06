@@ -27,6 +27,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSome
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromFirstConjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromSecondConjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.OwlNothingDecompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
 import org.semanticweb.elk.util.logging.statistics.AbstractStatistics;
@@ -174,7 +175,11 @@ public class RuleStatistics extends AbstractStatistics {
 		print(printer, ObjectUnionFromDisjunctRule.NAME,
 				ruleCounter.countObjectUnionFromDisjunctRule,
 				ruleTimer.timeObjectUnionFromDisjunctRule);
-
+		
+		print(printer, OwlNothingDecompositionRule.NAME,
+				ruleCounter.countOwlNothingDecompositionRule,
+				ruleTimer.timeOwlNothingDecompositionRule);
+		
 		print(printer, OwlThingContextInitRule.NAME,
 				ruleCounter.countOwlThingContextInitRule,
 				ruleTimer.timeOwlThingContextInitRule);

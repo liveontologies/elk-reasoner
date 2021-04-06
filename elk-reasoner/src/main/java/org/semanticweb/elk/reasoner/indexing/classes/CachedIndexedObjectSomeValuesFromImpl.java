@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import org.semanticweb.elk.RevertibleAction;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexClassExpression;
@@ -75,29 +76,23 @@ class CachedIndexedObjectSomeValuesFromImpl
 	}
 
 	@Override
-	public final boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
+	public RevertibleAction getIndexingAction(ModifiableOntologyIndex index,
 			OccurrenceIncrement increment) {
-
-		if (negativeOccurrenceNo == 0 && increment.negativeIncrement > 0) {
-			// first negative occurrence of this expression
-			if (!PropagationFromExistentialFillerRule.addRuleFor(this, index))
-				return false;
-		}
-
-		negativeOccurrenceNo += increment.negativeIncrement;
-
-		if (negativeOccurrenceNo == 0 && increment.negativeIncrement < 0) {
-			// no negative occurrences of this expression left
-			if (!PropagationFromExistentialFillerRule
-					.removeRuleFor(this, index)) {
-				// revert the changes
-				negativeOccurrenceNo -= increment.negativeIncrement;
-				return false;
-			}
-		}
-		positiveOccurrenceNo += increment.positiveIncrement;
-		return true;
-
+		return RevertibleAction
+				.create(() -> negativeOccurrenceNo == 0
+						&& increment.negativeIncrement > 0,
+						() -> PropagationFromExistentialFillerRule
+								.addRuleFor(this, index),
+						() -> PropagationFromExistentialFillerRule
+								.removeRuleFor(this, index))
+				.then(super.getIndexingAction(index, increment))
+				.then(RevertibleAction.create(
+						() -> negativeOccurrenceNo == 0
+								&& increment.negativeIncrement < 0,
+						() -> PropagationFromExistentialFillerRule
+								.removeRuleFor(this, index),
+						() -> PropagationFromExistentialFillerRule
+								.addRuleFor(this, index)));
 	}
 
 	@Override

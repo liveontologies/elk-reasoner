@@ -102,14 +102,6 @@ public interface OntologyIndex extends IndexedObjectCache {
 
 		void contextInitRuleHeadSet(LinkedContextInitRule rule);
 
-		void negativeOwlThingAppeared();
-
-		void negativeOwlThingDisappeared();
-
-		void positiveOwlNothingAppeared();
-
-		void positiveOwlNothingDisappeared();
-
 	}
 
 }

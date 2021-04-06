@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.model;
 
+import org.semanticweb.elk.RevertibleAction;
+
 /*
  * #%L
  * ELK Reasoner
@@ -28,13 +30,14 @@ package org.semanticweb.elk.reasoner.indexing.model;
  * @author "Yevgeny Kazakov"
  *
  */
-public interface ModifiableIndexedSubObject extends ModifiableIndexedObject, IndexedSubObject {
+public interface ModifiableIndexedSubObject
+		extends ModifiableIndexedObject, IndexedSubObject {
 
 	/**
-	 * Tries to change the number of occurrences of this
-	 * {@link ModifiableIndexedSubObject} in the given
+	 * Returns a {@link RevertibleAction} that tries to change the number of
+	 * occurrences of this {@link ModifiableIndexedSubObject} in the given
 	 * {@link ModifiableOntologyIndex} according to the given
-	 * {@link OccurrenceIncrement}
+	 * {@link OccurrenceIncrement}.
 	 * 
 	 * @param index
 	 *            the {@link ModifiableOntologyIndex} representing the logical
@@ -44,24 +47,24 @@ public interface ModifiableIndexedSubObject extends ModifiableIndexedObject, Ind
 	 *            how many occurrences should be added (if positive) or removed
 	 *            (if negative)
 	 * 
-	 * @return {@code true} if the operation has been successful or
-	 *         {@code false} otherwise. If {@code false} is return, the provided
-	 *         {@link ModifiableOntologyIndex} should not logically change,
-	 *         i.e., it should correspond to the same logical representation of
-	 *         the ontology as before the operation
+	 * @return a {@code RevertibleAction} whose successful application changes
+	 *         the number of occurrences of this
+	 *         {@link ModifiableIndexedSubObject} according to the
+	 *         {@link OccurrenceIncrement}; if the application is not successful
+	 *         the provided {@link ModifiableOntologyIndex} should not logically
+	 *         change, i.e., it should correspond to the same logical
+	 *         representation of the ontology as before the operation
 	 */
-	boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
+	RevertibleAction getIndexingAction(ModifiableOntologyIndex index,
 			OccurrenceIncrement increment);
 
-	interface Factory
-			extends
-				ModifiableIndexedClassExpression.Factory,
-				ModifiableIndexedClassExpressionList.Factory,
-				ModifiableIndexedEntity.Factory,
-				ModifiableIndexedPropertyChain.Factory {
+	interface Factory extends ModifiableIndexedClassExpression.Factory,
+			ModifiableIndexedClassExpressionList.Factory,
+			ModifiableIndexedEntity.Factory,
+			ModifiableIndexedPropertyChain.Factory {
 
 		// combined interface
 
 	}
-	
+
 }

@@ -81,12 +81,6 @@ public class ConsistencyCheckingState {
 	private final IndexedObjectProperty topProperty_;
 
 	/**
-	 * {@code true} if the ontology is consistent due to some syntactic
-	 * sufficient conditions
-	 */
-	private boolean isTriviallyConsistent_ = false;
-
-	/**
 	 * {@code true} if inconsistency is derived for {@code owl:Thing}
 	 */
 	private volatile boolean isOwlThingInconsistent_ = false;
@@ -115,8 +109,7 @@ public class ConsistencyCheckingState {
 		this.topProperty_ = index.getOwlTopObjectProperty();
 		toDoEntities_ = new ConcurrentLinkedQueue<IndexedClassEntity>(
 				index.getIndividuals());
-		toDoEntities_.add(index.getOwlThing());
-		isTriviallyConsistent_ = !index.hasPositiveOwlNothing();
+		toDoEntities_.add(index.getOwlThing());		
 		// listening to changes in the ontology
 		index.addListener(new OntologyIndexDummyChangeListener() {
 
@@ -128,16 +121,6 @@ public class ConsistencyCheckingState {
 			@Override
 			public void individualRemoval(IndexedIndividual ind) {
 				inconsistentIndividuals_.remove(ind);
-			}
-
-			@Override
-			public void positiveOwlNothingAppeared() {
-				isTriviallyConsistent_ = false;
-			}
-
-			@Override
-			public void positiveOwlNothingDisappeared() {
-				isTriviallyConsistent_ = true;
 			}
 
 		});
@@ -249,8 +232,12 @@ public class ConsistencyCheckingState {
 		return size;
 	}
 
+	public boolean isTriviallyConsistent() {
+		return !saturationState_.getOntologyIndex().hasPositiveOwlNothing();
+	}
+	
 	public Collection<? extends IndexedClassEntity> getTestEntitites() {
-		if (isTriviallyConsistent_) {
+		if (isTriviallyConsistent()) {
 			return Collections.emptyList();
 		}
 		int size = pruneToDo();

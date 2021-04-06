@@ -55,24 +55,4 @@ public class OntologyIndexDummyChangeListener
 		// does nothing by default
 	}
 
-	@Override
-	public void negativeOwlThingAppeared() {
-		// does nothing by default
-	}
-
-	@Override
-	public void negativeOwlThingDisappeared() {
-		// does nothing by default
-	}
-
-	@Override
-	public void positiveOwlNothingAppeared() {
-		// does nothing by default
-	}
-
-	@Override
-	public void positiveOwlNothingDisappeared() {
-		// does nothing by default
-	}
-
 }

@@ -26,10 +26,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.semanticweb.elk.RevertibleAction;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
@@ -230,6 +231,7 @@ abstract class CachedIndexedPropertyChainImpl<T extends CachedIndexedPropertyCha
 	 * @return the string representation for the occurrence numbers of this
 	 *         {@link IndexedClassExpression}
 	 */
+	@Override
 	public final String printOccurrenceNumbers() {
 		return "[all=" + totalOccurrenceNo + "]";
 	}
@@ -237,7 +239,7 @@ abstract class CachedIndexedPropertyChainImpl<T extends CachedIndexedPropertyCha
 	/**
 	 * verifies that occurrence numbers are not negative
 	 */
-	public final void checkOccurrenceNumbers() {
+	public final void checkTotalOccurrenceNumbers() {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace(this + " occurences: " + printOccurrenceNumbers());
 		if (totalOccurrenceNo < 0)
@@ -246,14 +248,18 @@ abstract class CachedIndexedPropertyChainImpl<T extends CachedIndexedPropertyCha
 							+ printOccurrenceNumbers());
 	}
 
-	public final boolean updateAndCheckOccurrenceNumbers(
-			ModifiableOntologyIndex index, OccurrenceIncrement increment) {
-		if (!updateOccurrenceNumbers(index, increment))
-			return false;
-		checkOccurrenceNumbers();
-		return true;
+	
+	@Override
+	public RevertibleAction getIndexingAction(ModifiableOntologyIndex index,
+			OccurrenceIncrement increment) {
+		return RevertibleAction.create(() -> {
+			totalOccurrenceNo += increment.totalIncrement;
+			checkTotalOccurrenceNumbers(); // TODO: perhaps return false instead
+											// of failing
+			return true;
+		}, () -> totalOccurrenceNo -= increment.totalIncrement);
 	}
-
+	
 	@Override
 	public final <O> O accept(IndexedSubObject.Visitor<O> visitor) {
 		return accept((IndexedPropertyChain.Visitor<O>) visitor);

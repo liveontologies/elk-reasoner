@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.semanticweb.elk.RevertibleAction;
 import org.semanticweb.elk.reasoner.completeness.Feature;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectUnionOf;
@@ -81,36 +82,28 @@ class CachedIndexedObjectUnionOfImpl extends
 	}
 
 	@Override
-	public final boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
+	public RevertibleAction getIndexingAction(ModifiableOntologyIndex index,
 			OccurrenceIncrement increment) {
-
-		if (negativeOccurrenceNo == 0 && increment.negativeIncrement > 0) {
-			// first negative occurrence of this expression
-			if (!ObjectUnionFromDisjunctRule.addRulesFor(this, index))
-				return false;
-		}
-
-		positiveOccurrenceNo += increment.positiveIncrement;
-		negativeOccurrenceNo += increment.negativeIncrement;
-
-		checkOccurrenceNumbers();
-
-		if (negativeOccurrenceNo == 0 && increment.negativeIncrement < 0) {
-			// no negative occurrences of this expression left
-			if (!ObjectUnionFromDisjunctRule.removeRulesFor(this, index)) {
-				// revert all changes
-				positiveOccurrenceNo -= increment.positiveIncrement;
-				negativeOccurrenceNo -= increment.negativeIncrement;
-				return false;
-			}
-		}
-		
-		// positive occurrences are unsupported
-		index.occurrenceChanged(
-				Feature.OBJECT_UNION_OF_POSITIVE,
-				increment.positiveIncrement);
-
-		return true;
+		return RevertibleAction.create(
+				() -> negativeOccurrenceNo == 0
+						&& increment.negativeIncrement > 0,
+				() -> ObjectUnionFromDisjunctRule.addRulesFor(this, index),
+				() -> ObjectUnionFromDisjunctRule.removeRulesFor(this, index))
+				.then(super.getIndexingAction(index, increment))
+				.then(RevertibleAction.create(
+						() -> negativeOccurrenceNo == 0
+								&& increment.negativeIncrement < 0,
+						() -> ObjectUnionFromDisjunctRule.removeRulesFor(this,
+								index),
+						() -> ObjectUnionFromDisjunctRule.addRulesFor(this,
+								index)))
+				.then(RevertibleAction.create(() -> {
+					index.occurrenceChanged(Feature.OBJECT_UNION_OF_POSITIVE,
+							increment.positiveIncrement);
+					return true;
+				}, () -> index.occurrenceChanged(
+						Feature.OBJECT_UNION_OF_POSITIVE,
+						-increment.positiveIncrement)));
 	}
 
 	@Override

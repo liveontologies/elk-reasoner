@@ -46,6 +46,8 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 public class ContradictionFromOwlNothingRule extends
 		AbstractChainableSubsumerRule {
 
+	// TODO: move to a decomposition rule
+	
 	public static final String NAME = "Owl:Nothing Contradiction Introduction";
 
 	private ContradictionFromOwlNothingRule(ChainableSubsumerRule tail) {

@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import org.semanticweb.elk.RevertibleAction;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexClassExpression;
@@ -36,8 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectio
  * 
  * @author "Yevgeny Kazakov"
  */
-class CachedIndexedObjectIntersectionOfImpl
-		extends
+class CachedIndexedObjectIntersectionOfImpl extends
 		CachedIndexedComplexClassExpressionImpl<CachedIndexedObjectIntersectionOf>
 		implements CachedIndexedObjectIntersectionOf {
 
@@ -64,53 +64,45 @@ class CachedIndexedObjectIntersectionOfImpl
 	}
 
 	@Override
-	public final CachedIndexedObjectIntersectionOf structuralEquals(Object other) {
+	public final CachedIndexedObjectIntersectionOf structuralEquals(
+			Object other) {
 		return CachedIndexedObjectIntersectionOf.Helper.structuralEquals(this,
 				other);
 	}
 
 	@Override
-	public final boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
+	public RevertibleAction getIndexingAction(ModifiableOntologyIndex index,
 			OccurrenceIncrement increment) {
+		return RevertibleAction
+				.create(() -> negativeOccurrenceNo == 0
+						&& increment.negativeIncrement > 0,
+						() -> ObjectIntersectionFromFirstConjunctRule
+								.addRulesFor(this, index),
+						() -> ObjectIntersectionFromFirstConjunctRule
+								.removeRulesFor(this, index))
+				.then(RevertibleAction.create(
+						() -> negativeOccurrenceNo == 0
+								&& increment.negativeIncrement > 0,
+						() -> ObjectIntersectionFromSecondConjunctRule
+								.addRulesFor(this, index),
+						() -> ObjectIntersectionFromSecondConjunctRule
+								.removeRulesFor(this, index)))
+				.then(super.getIndexingAction(index, increment))
+				.then(RevertibleAction.create(
+						() -> negativeOccurrenceNo == 0
+								&& increment.negativeIncrement < 0,
+						() -> ObjectIntersectionFromFirstConjunctRule
+								.removeRulesFor(this, index),
+						() -> ObjectIntersectionFromFirstConjunctRule
+								.addRulesFor(this, index)))
+				.then(RevertibleAction.create(
+						() -> negativeOccurrenceNo == 0
+								&& increment.negativeIncrement < 0,
+						() -> ObjectIntersectionFromSecondConjunctRule
+								.removeRulesFor(this, index),
+						() -> ObjectIntersectionFromSecondConjunctRule
+								.addRulesFor(this, index)));
 
-		if (negativeOccurrenceNo == 0 && increment.negativeIncrement > 0) {
-			if (!ObjectIntersectionFromFirstConjunctRule.addRulesFor(this,
-					index)) {
-				return false;
-			}
-			if (!ObjectIntersectionFromSecondConjunctRule.addRulesFor(this,
-					index)) {
-				// revert all changes
-				ObjectIntersectionFromFirstConjunctRule.removeRulesFor(this,
-						index);
-				return false;
-			}
-		}
-
-		positiveOccurrenceNo += increment.positiveIncrement;
-		negativeOccurrenceNo += increment.negativeIncrement;
-
-		checkOccurrenceNumbers();
-
-		if (negativeOccurrenceNo == 0 && increment.negativeIncrement < 0) {
-			if (!ObjectIntersectionFromFirstConjunctRule.removeRulesFor(this,
-					index)) {
-				// revert all changes
-				positiveOccurrenceNo -= increment.positiveIncrement;
-				negativeOccurrenceNo -= increment.negativeIncrement;
-				return false;
-			}
-			if (!ObjectIntersectionFromSecondConjunctRule.removeRulesFor(this,
-					index)) {
-				// revert all changes
-				ObjectIntersectionFromFirstConjunctRule
-						.addRulesFor(this, index);
-				positiveOccurrenceNo -= increment.positiveIncrement;
-				negativeOccurrenceNo -= increment.negativeIncrement;
-				return false;
-			}
-		}
-		return true;
 	}
 
 	@Override

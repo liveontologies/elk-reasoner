@@ -157,6 +157,11 @@ public class RuleCounter {
 	long countObjectUnionFromDisjunctRule;
 
 	/**
+	 * counter for {@link OwlNothingDecompositionRule}
+	 */
+	long countOwlNothingDecompositionRule;
+	
+	/**
 	 * counter for {@link OwlThingContextInitRule}
 	 */
 	long countOwlThingContextInitRule;
@@ -221,6 +226,7 @@ public class RuleCounter {
 		countSuperClassFromSubClassRule += counter.countSuperClassFromSubClassRule;
 		countPropagationFromExistentialFillerRule += counter.countPropagationFromExistentialFillerRule;
 		countObjectUnionFromDisjunctRule += counter.countObjectUnionFromDisjunctRule;
+		countOwlNothingDecompositionRule += counter.countOwlNothingDecompositionRule;
 		countBackwardLinkChainFromBackwardLinkRule += counter.countBackwardLinkChainFromBackwardLinkRule;
 		countSubsumerBackwardLinkRule += counter.countSubsumerBackwardLinkRule;
 		countContradictionOverBackwardLinkRule += counter.countContradictionOverBackwardLinkRule;
@@ -252,6 +258,7 @@ public class RuleCounter {
 				+ countSuperClassFromSubClassRule
 				+ countPropagationFromExistentialFillerRule
 				+ countObjectUnionFromDisjunctRule
+				+ countOwlNothingDecompositionRule
 				+ countBackwardLinkChainFromBackwardLinkRule
 				+ countSubsumerBackwardLinkRule
 				+ countContradictionOverBackwardLinkRule
@@ -287,6 +294,7 @@ public class RuleCounter {
 		countSuperClassFromSubClassRule = 0;
 		countPropagationFromExistentialFillerRule = 0;
 		countObjectUnionFromDisjunctRule = 0;
+		countOwlNothingDecompositionRule = 0;
 		countBackwardLinkChainFromBackwardLinkRule = 0;
 		countSubsumerBackwardLinkRule = 0;
 		countContradictionOverBackwardLinkRule = 0;

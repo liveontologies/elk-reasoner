@@ -1,12 +1,12 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
-/*
+/*-
  * #%L
- * ELK Reasoner
+ * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2021 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,15 +22,10 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedComplexClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexClassExpression;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implements {@link CachedIndexedComplexClassExpression}.
@@ -44,74 +39,9 @@ abstract class CachedIndexedComplexClassExpressionImpl<T extends CachedIndexedCo
 		extends
 		CachedIndexedClassExpressionImpl<T, CachedIndexedComplexClassExpression<?>>
 		implements CachedIndexedComplexClassExpression<T> {
-
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(CachedIndexedComplexClassExpressionImpl.class);
-
-	/**
-	 * This counts how often this object occurred positively. Some indexing
-	 * operations are only needed when encountering objects positively for the
-	 * first time.
-	 */
-	int positiveOccurrenceNo = 0;
-
-	/**
-	 * This counts how often this object occurred negatively. Some indexing
-	 * operations are only needed when encountering objects negatively for the
-	 * first time.
-	 */
-	int negativeOccurrenceNo = 0;
-
+	
 	CachedIndexedComplexClassExpressionImpl(int structuralHash) {
 		super(structuralHash);
-	}
-	
-	@Override
-	public boolean occursPositively() {
-		return positiveOccurrenceNo > 0;
-	}
-
-	@Override
-	public boolean occursNegatively() {
-		return negativeOccurrenceNo > 0;
-	}
-
-	@Override
-	public final boolean occurs() {
-		return occursPositively() || occursNegatively();
-	}
-	
-	/**
-	 * @return the string representation for the occurrence numbers of this
-	 *         {@link IndexedClassExpression}
-	 */
-	@Override
-	public final String printOccurrenceNumbers() {
-		return "[pos=" + positiveOccurrenceNo + "; neg="
-				+ +negativeOccurrenceNo + "]";
-	}
-
-	/**
-	 * verifies that occurrence numbers are not negative
-	 */
-	public final void checkOccurrenceNumbers() {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(toString() + " occurences: "
-					+ printOccurrenceNumbers());
-		if (positiveOccurrenceNo < 0 || negativeOccurrenceNo < 0)
-			throw new ElkUnexpectedIndexingException(toString()
-					+ " has a negative occurrence: " + printOccurrenceNumbers());
-	}
-
-	final boolean updateAndCheckOccurrenceNumbers(
-			ModifiableOntologyIndex index, OccurrenceIncrement increment) {
-		if (!updateOccurrenceNumbers(index, increment)) {
-			LOGGER_.trace("{}: cannot index!", this);
-			return false;
-		}
-		checkOccurrenceNumbers();
-		return true;
 	}
 	
 	@Override
