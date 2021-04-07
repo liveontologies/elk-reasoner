@@ -37,29 +37,21 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFrom
  * @author "Yevgeny Kazakov"
  * 
  */
-class CachedIndexedObjectComplementOfImpl extends
-		CachedIndexedComplexClassExpressionImpl<CachedIndexedObjectComplementOf>
+class CachedIndexedObjectComplementOfImpl
+		extends CachedIndexedComplexClassExpressionImpl
 		implements CachedIndexedObjectComplementOf {
 
 	private final ModifiableIndexedClassExpression negated_;
 
 	CachedIndexedObjectComplementOfImpl(
 			ModifiableIndexedClassExpression negated) {
-		super(CachedIndexedObjectComplementOf.Helper
-				.structuralHashCode(negated));
+		super(CachedIndexedObjectComplementOf.structuralHashCode(negated));
 		this.negated_ = negated;
 	}
 
 	@Override
 	public final ModifiableIndexedClassExpression getNegated() {
 		return negated_;
-	}
-
-	@Override
-	public final CachedIndexedObjectComplementOf structuralEquals(
-			Object other) {
-		return CachedIndexedObjectComplementOf.Helper.structuralEquals(this,
-				other);
 	}
 
 	@Override

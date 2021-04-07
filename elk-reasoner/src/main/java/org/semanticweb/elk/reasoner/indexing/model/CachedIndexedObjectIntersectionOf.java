@@ -1,5 +1,8 @@
 package org.semanticweb.elk.reasoner.indexing.model;
 
+import org.semanticweb.elk.util.collections.entryset.GenericStructuralObject;
+import org.semanticweb.elk.util.hashing.HashGenerator;
+
 /*
  * #%L
  * ELK Reasoner
@@ -28,9 +31,10 @@ package org.semanticweb.elk.reasoner.indexing.model;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface CachedIndexedObjectIntersectionOf extends
-		ModifiableIndexedObjectIntersectionOf,
-		CachedIndexedComplexClassExpression<CachedIndexedObjectIntersectionOf> {
+public interface CachedIndexedObjectIntersectionOf
+		extends ModifiableIndexedObjectIntersectionOf,
+		CachedIndexedComplexClassExpression,
+		GenericStructuralObject<CachedIndexedObjectIntersectionOf> {
 
 	/**
 	 * A factory for creating instances
@@ -59,31 +63,28 @@ public interface CachedIndexedObjectIntersectionOf extends
 
 	}
 	
-	static class Helper extends CachedIndexedSubObject.Helper {
+	static int structuralHashCode(
+			ModifiableIndexedClassExpression firstConjunct,
+			ModifiableIndexedClassExpression secondConjunct) {
+		return HashGenerator.combinedHashCode(
+				CachedIndexedObjectIntersectionOf.class, firstConjunct,
+				secondConjunct);
+	}
 
-		public static int structuralHashCode(
-				IndexedClassExpression firstConjunct,
-				IndexedClassExpression secondConjunct) {
-			return combinedHashCode(CachedIndexedObjectIntersectionOf.class,
-					firstConjunct, secondConjunct);
+	@Override
+	default CachedIndexedObjectIntersectionOf structuralEquals(Object other) {
+		if (this == other) {
+			return this;
 		}
-
-		public static CachedIndexedObjectIntersectionOf structuralEquals(
-				CachedIndexedObjectIntersectionOf first, Object second) {
-			if (first == second) {
-				return first;
-			}
-			if (second instanceof CachedIndexedObjectIntersectionOf) {
-				CachedIndexedObjectIntersectionOf secondEntry = (CachedIndexedObjectIntersectionOf) second;
-				if (first.getFirstConjunct().equals(
-						secondEntry.getFirstConjunct())
-						&& first.getSecondConjunct().equals(
-								secondEntry.getSecondConjunct()))
-					return secondEntry;
-			}
-			// else
-			return null;
+		if (other instanceof CachedIndexedObjectIntersectionOf) {
+			CachedIndexedObjectIntersectionOf secondEntry = (CachedIndexedObjectIntersectionOf) other;
+			if (getFirstConjunct().equals(secondEntry.getFirstConjunct())
+					&& getSecondConjunct()
+							.equals(secondEntry.getSecondConjunct()))
+				return secondEntry;
 		}
+		// else
+		return null;
 	}
 
 }

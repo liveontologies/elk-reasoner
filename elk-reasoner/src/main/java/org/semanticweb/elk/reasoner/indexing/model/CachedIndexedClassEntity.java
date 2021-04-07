@@ -28,12 +28,9 @@ package org.semanticweb.elk.reasoner.indexing.model;
  * 
  * @author "Yevgeny Kazakov"
  *
- * @param <T>
- *            the type of the {@link CachedIndexedClassEntity}
  */
-public interface CachedIndexedClassEntity<T extends CachedIndexedClassEntity<T>>
-		extends ModifiableIndexedClassEntity, CachedIndexedClassExpression,
-		CachedIndexedEntity<T> {
+public interface CachedIndexedClassEntity extends ModifiableIndexedClassEntity,
+		CachedIndexedClassExpression, CachedIndexedEntity {
 
 	/**
 	 * A factory for creating instances
@@ -65,6 +62,6 @@ public interface CachedIndexedClassEntity<T extends CachedIndexedClassEntity<T>>
 		
 	}
 	
-	CachedIndexedClassEntity<?> accept(Filter filter);
+	CachedIndexedClassEntity accept(Filter filter);
 	
 }

@@ -29,13 +29,10 @@ package org.semanticweb.elk.util.collections.entryset;
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <T>
- *            the type of objects this object can be structurally equal to
- * 
  * @param <N>
  *            the type of the next linked element
  */
-public interface Entry<T extends Entry<T, N>, N> {
+public interface Entry<N> extends StructuralObject {
 
 	/**
 	 * Setting the input element as the next element of the entry.
@@ -53,9 +50,5 @@ public interface Entry<T extends Entry<T, N>, N> {
 	 * @return the next element of the entry
 	 */
 	N getNext();
-
-	T structuralEquals(Object other);
-
-	int structuralHashCode();
 
 }

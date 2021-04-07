@@ -33,14 +33,14 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProper
  * 
  * @author "Yevgeny Kazakov"
  */
-class CachedIndexedObjectHasSelfImpl extends
-		CachedIndexedComplexClassExpressionImpl<CachedIndexedObjectHasSelf>
+class CachedIndexedObjectHasSelfImpl
+		extends CachedIndexedComplexClassExpressionImpl
 		implements CachedIndexedObjectHasSelf {
 
 	private final ModifiableIndexedObjectProperty property_;
 
 	CachedIndexedObjectHasSelfImpl(ModifiableIndexedObjectProperty property) {
-		super(CachedIndexedObjectHasSelf.Helper.structuralHashCode(property));
+		super(CachedIndexedObjectHasSelf.structuralHashCode(property));
 		this.property_ = property;
 	}
 	
@@ -51,11 +51,6 @@ class CachedIndexedObjectHasSelfImpl extends
 		return property_;
 	}
 
-	@Override
-	public final CachedIndexedObjectHasSelf structuralEquals(Object other) {
-		return CachedIndexedObjectHasSelf.Helper.structuralEquals(this, other);
-	}
-	
 	@Override
 	public final <O> O accept(IndexedComplexClassExpression.Visitor<O> visitor) {
 		return visitor.visit(this);

@@ -23,6 +23,7 @@
 package org.semanticweb.elk.util.collections.entryset;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
@@ -134,6 +135,17 @@ public class EntryCollectionTest extends TestCase {
 			}
 			testSetEquality(referenceSet, testSet);
 
+			// randomly iterating and removing
+			Iterator<Int> testSetIterator = testSet.iterator();
+			while (testSetIterator.hasNext()) {
+				Int next = testSetIterator.next();
+				if (generator.nextBoolean()) {
+					testSetIterator.remove();
+					referenceSet.remove(next.getValue());
+				}
+			}			
+			testSetEquality(referenceSet, testSet);
+			
 			testSet.clear();
 			referenceSet.clear();
 			testSetEquality(referenceSet, testSet);
@@ -146,7 +158,7 @@ public class EntryCollectionTest extends TestCase {
 
 	}
 
-	static class Int implements Entry<Int, Int> {
+	static class Int implements Entry<Int>, GenericStructuralObject<Int> {
 
 		private final int value_;
 

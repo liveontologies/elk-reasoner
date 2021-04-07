@@ -42,10 +42,8 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  */
 class CachedIndexedClassExpressionListImpl
-		extends
-			CachedIndexedSubObjectImpl<CachedIndexedClassExpressionList, CachedIndexedClassExpressionList>
-		implements
-			CachedIndexedClassExpressionList {
+		extends CachedIndexedSubObjectImpl<CachedIndexedClassExpressionList>
+		implements CachedIndexedClassExpressionList {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -64,7 +62,7 @@ class CachedIndexedClassExpressionListImpl
 
 	CachedIndexedClassExpressionListImpl(
 			List<? extends ModifiableIndexedClassExpression> members) {
-		super(CachedIndexedClassExpressionList.Helper.structuralHashCode(members));
+		super(CachedIndexedClassExpressionList.structuralHashCode(members));
 		this.elements_ = members;
 	}
 	
@@ -76,12 +74,6 @@ class CachedIndexedClassExpressionListImpl
 	@Override
 	public final List<? extends ModifiableIndexedClassExpression> getElements() {
 		return elements_;
-	}
-
-	@Override
-	public final CachedIndexedClassExpressionList structuralEquals(Object other) {
-		return CachedIndexedClassExpressionList.Helper.structuralEquals(this,
-				other);
 	}
 	
 	@Override

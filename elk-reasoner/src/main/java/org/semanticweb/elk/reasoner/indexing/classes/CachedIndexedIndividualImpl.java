@@ -34,28 +34,23 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedEntity;
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  */
-class CachedIndexedIndividualImpl extends
-		CachedIndexedClassEntityImpl<CachedIndexedIndividual> implements
-		CachedIndexedIndividual {
+class CachedIndexedIndividualImpl
+		extends CachedIndexedClassEntityImpl<CachedIndexedIndividual>
+		implements CachedIndexedIndividual {
 
 	/**
 	 * The represented {@link ElkNamedIndividual}
 	 */
-	private final ElkNamedIndividual elkNamedIndividual_;
+	private final ElkNamedIndividual elkEntity_;
 
-	CachedIndexedIndividualImpl(ElkNamedIndividual entity) {
-		super(CachedIndexedIndividual.Helper.structuralHashCode(entity));
-		this.elkNamedIndividual_ = entity;
+	CachedIndexedIndividualImpl(ElkNamedIndividual elkEntity) {
+		super(CachedIndexedIndividual.structuralHashCode(elkEntity));
+		this.elkEntity_ = elkEntity;
 	}
 
 	@Override
 	public ElkNamedIndividual getElkEntity() {
-		return elkNamedIndividual_;
-	}
-
-	@Override
-	public CachedIndexedIndividual structuralEquals(Object other) {
-		return CachedIndexedIndividual.Helper.structuralEquals(this, other);
+		return elkEntity_;
 	}
 
 	@Override

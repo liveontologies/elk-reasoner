@@ -23,6 +23,9 @@ package org.semanticweb.elk.reasoner.indexing.model;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.util.collections.entryset.Entry;
+import org.semanticweb.elk.util.collections.entryset.GenericStructuralObject;
+import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * A {@link ModifiableIndexedObjectProperty} that can be used for memoization
@@ -32,7 +35,8 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
  */
 public interface CachedIndexedObjectProperty
 		extends ModifiableIndexedObjectProperty, CachedIndexedPropertyChain,
-		CachedIndexedEntity<CachedIndexedObjectProperty> {
+		CachedIndexedEntity, GenericStructuralObject<CachedIndexedObjectProperty>,
+		Entry<CachedIndexedObjectProperty> {
 
 	/**
 	 * A factory for creating instances
@@ -58,29 +62,25 @@ public interface CachedIndexedObjectProperty
 		CachedIndexedObjectProperty filter(CachedIndexedObjectProperty element);
 
 	}
-	
-	static class Helper extends CachedIndexedSubObject.Helper {
+		
+	static int structuralHashCode(ElkObjectProperty elkEntity) {
+		return HashGenerator.combinedHashCode(CachedIndexedObjectProperty.class,
+				elkEntity.getIri());
+	}
 
-		public static int structuralHashCode(ElkObjectProperty entity) {
-			return combinedHashCode(CachedIndexedObjectProperty.class,
-					entity.getIri());
+	@Override
+	default CachedIndexedObjectProperty structuralEquals(Object other) {
+		if (this == other) {
+			return this;
 		}
-
-		public static CachedIndexedObjectProperty structuralEquals(
-				CachedIndexedObjectProperty first, Object second) {
-			if (first == second) {
-				return first;
-			}
-			if (second instanceof CachedIndexedObjectProperty) {
-				CachedIndexedObjectProperty secondEntry = (CachedIndexedObjectProperty) second;
-				if (first.getElkEntity().getIri()
-						.equals(secondEntry.getElkEntity().getIri()))
-					return secondEntry;
-			}
-			// else
-			return null;
+		if (other instanceof CachedIndexedObjectProperty) {
+			CachedIndexedObjectProperty secondEntry = (CachedIndexedObjectProperty) other;
+			if (getElkEntity().getIri()
+					.equals(secondEntry.getElkEntity().getIri()))
+				return secondEntry;
 		}
-
+		// else
+		return null;
 	}
 
 }

@@ -42,11 +42,10 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
  * 
  */
 class CachedIndexedObjectPropertyImpl
-		extends
-		CachedIndexedPropertyChainImpl<CachedIndexedObjectProperty, CachedIndexedObjectProperty>
+		extends CachedIndexedPropertyChainImpl<CachedIndexedObjectProperty>
 		implements CachedIndexedObjectProperty {
 
-	private final ElkObjectProperty property_;
+	private final ElkObjectProperty elkEntity_;
 
 	/**
 	 * Collections of all binary role chains in which this
@@ -76,14 +75,14 @@ class CachedIndexedObjectPropertyImpl
 	 */
 	private ArrayList<ElkAxiom> toldRangesReasons_;
 
-	CachedIndexedObjectPropertyImpl(ElkObjectProperty entity) {
-		super(CachedIndexedObjectProperty.Helper.structuralHashCode(entity));
-		this.property_ = entity;
+	CachedIndexedObjectPropertyImpl(ElkObjectProperty elkEntity) {
+		super(CachedIndexedObjectProperty.structuralHashCode(elkEntity));
+		this.elkEntity_ = elkEntity;
 	}
 
 	@Override
 	public final ElkObjectProperty getElkEntity() {
-		return property_;
+		return elkEntity_;
 	}
 
 	@Override
@@ -124,11 +123,6 @@ class CachedIndexedObjectPropertyImpl
 			return Collections.emptySet();
 		// else
 		return Collections.unmodifiableCollection(leftChains_);
-	}
-
-	@Override
-	public final CachedIndexedObjectProperty structuralEquals(Object other) {
-		return CachedIndexedObjectProperty.Helper.structuralEquals(this, other);
 	}
 
 	@Override

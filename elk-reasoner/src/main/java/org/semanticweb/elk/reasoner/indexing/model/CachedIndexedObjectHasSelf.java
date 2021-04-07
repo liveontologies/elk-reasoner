@@ -1,5 +1,8 @@
 package org.semanticweb.elk.reasoner.indexing.model;
 
+import org.semanticweb.elk.util.collections.entryset.GenericStructuralObject;
+import org.semanticweb.elk.util.hashing.HashGenerator;
+
 /*
  * #%L
  * ELK Reasoner
@@ -29,8 +32,8 @@ package org.semanticweb.elk.reasoner.indexing.model;
  * @author "Yevgeny Kazakov"
  */
 public interface CachedIndexedObjectHasSelf extends
-		ModifiableIndexedObjectHasSelf,
-		CachedIndexedComplexClassExpression<CachedIndexedObjectHasSelf> {
+		ModifiableIndexedObjectHasSelf, CachedIndexedComplexClassExpression,
+		GenericStructuralObject<CachedIndexedObjectHasSelf> {
 
 	/**
 	 * A factory for creating instances
@@ -57,26 +60,23 @@ public interface CachedIndexedObjectHasSelf extends
 
 	}
 	
-	static class Helper extends CachedIndexedSubObject.Helper {
+	static int structuralHashCode(ModifiableIndexedObjectProperty property) {
+		return HashGenerator.combinedHashCode(CachedIndexedObjectHasSelf.class,
+				property);
+	}
 
-		public static int structuralHashCode(IndexedObjectProperty property) {
-			return combinedHashCode(CachedIndexedObjectHasSelf.class, property);
+	@Override
+	default CachedIndexedObjectHasSelf structuralEquals(Object other) {
+		if (this == other) {
+			return this;
 		}
-
-		public static CachedIndexedObjectHasSelf structuralEquals(
-				CachedIndexedObjectHasSelf first, Object second) {
-			if (first == second) {
-				return first;
-			}
-			if (second instanceof CachedIndexedObjectHasSelf) {
-				CachedIndexedObjectHasSelf secondEntry = (CachedIndexedObjectHasSelf) second;
-				if (first.getProperty().equals(secondEntry.getProperty()))
-					return secondEntry;
-			}
-			// else
-			return null;
+		if (other instanceof CachedIndexedObjectHasSelf) {
+			CachedIndexedObjectHasSelf secondEntry = (CachedIndexedObjectHasSelf) other;
+			if (getProperty().equals(secondEntry.getProperty()))
+				return secondEntry;
 		}
-
+		// else
+		return null;
 	}
 
 }

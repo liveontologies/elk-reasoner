@@ -46,7 +46,7 @@ import java.util.NoSuchElementException;
  * @param <E>
  *            the type of entries in the collection
  */
-public class EntryCollection<E extends Entry<?, E>>
+public class EntryCollection<E extends Entry<E>>
 		extends AbstractCollection<E> {
 
 	/**
@@ -243,24 +243,25 @@ public class EntryCollection<E extends Entry<?, E>>
 
 	/**
 	 * Finds and returns the entry in set that is structurally equal to the
-	 * input entry if there is one. Equality of entries is decided using
-	 * {@link Entry#structuralHashCode()} and
-	 * {@link Entry#structuralEquals(Object)} methods.
+	 * input key. Equality of entries is decided using
+	 * {@link GenericStructuralObject#structuralEquals(Object)} and
+	 * {@link GenericStructuralObject#structuralHashCode()} methods.
 	 * 
-	 * @param entry
-	 *            the entry for which the equal entry should be found
+	 * @param key
+	 *            a {@link GenericStructuralObject} using which the required entry
+	 *            should be found
 	 * 
-	 * @return the entry in the set that is equal to the input entry if there is
-	 *         one, or {@code null} otherwise
+	 * @return the entry in the set that is equal to the input key, or
+	 *         {@code null} if there is no such an entry
 	 * 
 	 */
-	public <T extends Entry<T, ?>> T findStructural(Entry<T, ?> entry) {
-		int h = entry.structuralHashCode();
+	public <T extends GenericStructuralObject<T>> T findStructural(T key) {
+		int h = key.structuralHashCode();
 		int i = indexFor(h, buckets.length);
 		T result = null;
 		for (E r = buckets[i]; r != null; r = r.getNext()) {
 			if (r.structuralHashCode() == h
-					&& (result = entry.structuralEquals(r)) != null)
+					&& (result = key.structuralEquals(r)) != null)
 				return result;
 		}
 		// else fail
@@ -269,9 +270,7 @@ public class EntryCollection<E extends Entry<?, E>>
 
 	/**
 	 * Adds the given entry to this collection; the entry is added even if a
-	 * structurally equal entry (modulo {@link Entry#structuralHashCode()} and
-	 * {@link Entry#structuralEquals(Object)}) is already present in the
-	 * collection
+	 * structurally equal entry is already present in the collection
 	 * 
 	 * @param entry
 	 *            the entry to be inserted; it is not allowed to have linked
@@ -293,18 +292,18 @@ public class EntryCollection<E extends Entry<?, E>>
 
 	/**
 	 * Removes and returns the entry in the set that is structurally equal to
-	 * the specified entry. Returns {@code null} if the set contains no such
-	 * entry. Equality of entries is decided using
-	 * {@link Entry#structuralHashCode()} and
-	 * {@link Entry#structuralEquals(Object)} methods.
+	 * the specified key. Equality of entries is decided using
+	 * {@link GenericStructuralObject#structuralEquals(Object)} and
+	 * {@link GenericStructuralObject#structuralHashCode()} methods.
 	 * 
-	 * @param entry
-	 *            the entry that is used for finding the entry to be removed
+	 * @param key
+	 *            a {@link GenericStructuralObject} using which the required entry
+	 *            should be found
 	 * @return the removed entry, or {@code null} if no entry that is equal to
 	 *         the input object is found
 	 */
-	public <T extends Entry<T, ?>> T removeStructural(Entry<T, ?> entry) {
-		int h = entry.structuralHashCode();
+	public <T extends GenericStructuralObject<T>> T removeStructural(T key) {
+		int h = key.structuralHashCode();
 		int i = indexFor(h, buckets.length);
 		E prev = buckets[i];
 		E r = prev;
@@ -313,7 +312,7 @@ public class EntryCollection<E extends Entry<?, E>>
 		while (r != null) {
 			E next = r.getNext();
 			if (r.structuralHashCode() == h
-					&& (result = entry.structuralEquals(r)) != null) {
+					&& (result = key.structuralEquals(r)) != null) {
 				modCount++;
 				if (prev == r)
 					buckets[i] = next;
@@ -333,11 +332,11 @@ public class EntryCollection<E extends Entry<?, E>>
 	/**
 	 * Rehashes the contents of this map into a new array with a new capacity.
 	 * This method is called automatically when the number of entries in this
-	 * set becomes below the {@link #undersize} or above the {@link #oversize}.
+	 * set becomes below {@link #undersize} or above the {@link #oversize}.
 	 * 
-	 * If current capacity is MAXIMUM_CAPACITY, this method does not resize the
-	 * map, but sets threshold to Integer.MAX_VALUE. This has the effect of
-	 * preventing future calls.
+	 * If current capacity is {@value #MAXIMUM_CAPACITY}, this method does not
+	 * resize the map, but sets threshold to {@value #Integer.MAX_VALUE}. This
+	 * has the effect of preventing future calls.
 	 * 
 	 * @param newCapacity
 	 *            the new capacity, MUST be a power of two
@@ -409,16 +408,15 @@ public class EntryCollection<E extends Entry<?, E>>
 	 * 
 	 */
 	private class EntryIterator implements Iterator<E> {
-		E next; // next entry to return
+		E prev, current, next; // the previously, currently, and next to return entries
 		int expectedModCount; // For fast-fail
-		int index; // current slot
-		E current; // current entry
+		int curIndex, nextIndex; // the bucket indexes for the current and next entries		
 
 		EntryIterator() {
 			expectedModCount = modCount;
 			if (size > 0) { // advance to first entry
 				E[] t = buckets;
-				while (index < t.length && (next = t[index++]) == null)
+				while (nextIndex < t.length && (next = t[nextIndex++]) == null)
 					;
 			}
 		}
@@ -436,11 +434,15 @@ public class EntryCollection<E extends Entry<?, E>>
 			if (e == null)
 				throw new NoSuchElementException();
 
+			curIndex = nextIndex;
 			if ((next = e.getNext()) == null) {
 				E[] t = buckets;
-				while (index < t.length && (next = t[index++]) == null)
+				while (nextIndex < t.length && (next = t[nextIndex++]) == null)
 					;
 			}
+			if (current != null) {
+				prev = current;
+			}			
 			current = e;
 			return e;
 		}
@@ -451,9 +453,13 @@ public class EntryCollection<E extends Entry<?, E>>
 				throw new IllegalStateException();
 			if (modCount != expectedModCount)
 				throw new ConcurrentModificationException();
-			EntryCollection.this.removeStructural((Entry<?, ?>) current);
+			if (prev != null && prev.getNext() == current) {
+				prev.setNext(current.getNext());
+			} else {
+				buckets[curIndex - 1] = current.getNext();
+			}
+			size--;
 			current = null;
-			expectedModCount = modCount;
 		}
 
 	}

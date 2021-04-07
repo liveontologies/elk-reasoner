@@ -23,6 +23,9 @@ package org.semanticweb.elk.reasoner.indexing.model;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.util.collections.entryset.Entry;
+import org.semanticweb.elk.util.collections.entryset.GenericStructuralObject;
+import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * A {@link ModifiableIndexedIndividual} that can be used for memoization
@@ -32,7 +35,8 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
  */
 public interface CachedIndexedIndividual
 		extends ModifiableIndexedIndividual, CachedIndexedClassExpression,
-		CachedIndexedClassEntity<CachedIndexedIndividual> {
+		CachedIndexedClassEntity, GenericStructuralObject<CachedIndexedIndividual>,
+		Entry<CachedIndexedIndividual> {
 
 	/**
 	 * A factory for creating instances
@@ -58,29 +62,25 @@ public interface CachedIndexedIndividual
 		CachedIndexedIndividual filter(CachedIndexedIndividual element);
 
 	}
-	
-	static class Helper extends CachedIndexedSubObject.Helper {
+		
+	static int structuralHashCode(ElkNamedIndividual elkEntity) {
+		return HashGenerator.combinedHashCode(CachedIndexedIndividual.class,
+				elkEntity.getIri());
+	}
 
-		public static int structuralHashCode(ElkNamedIndividual entity) {
-			return combinedHashCode(CachedIndexedIndividual.class,
-					entity.getIri());
+	@Override
+	default CachedIndexedIndividual structuralEquals(Object other) {
+		if (this == other) {
+			return this;
 		}
-
-		public static CachedIndexedIndividual structuralEquals(
-				CachedIndexedIndividual first, Object second) {
-			if (first == second) {
-				return first;
-			}
-			if (second instanceof CachedIndexedIndividual) {
-				CachedIndexedIndividual secondEntry = (CachedIndexedIndividual) second;
-				if (first.getElkEntity().getIri()
-						.equals(secondEntry.getElkEntity().getIri()))
-					return secondEntry;
-			}
-			// else
-			return null;
+		if (other instanceof CachedIndexedIndividual) {
+			CachedIndexedIndividual secondEntry = (CachedIndexedIndividual) other;
+			if (getElkEntity().getIri()
+					.equals(secondEntry.getElkEntity().getIri()))
+				return secondEntry;
 		}
-
+		// else
+		return null;
 	}
 
 }

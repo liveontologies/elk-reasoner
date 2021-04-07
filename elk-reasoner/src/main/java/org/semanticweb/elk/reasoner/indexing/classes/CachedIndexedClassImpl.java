@@ -37,9 +37,8 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpress
  * 
  * @author "Yevgeny Kazakov"
  */
-class CachedIndexedClassImpl extends
-		CachedIndexedClassEntityImpl<CachedIndexedClass> implements
-		CachedIndexedClass {
+class CachedIndexedClassImpl extends CachedIndexedClassEntityImpl<CachedIndexedClass>
+		implements CachedIndexedClass {
 
 	/**
 	 * The represented {@link ElkClass}
@@ -58,7 +57,7 @@ class CachedIndexedClassImpl extends
 	private ElkAxiom definitionReason_;
 
 	CachedIndexedClassImpl(ElkClass entity) {
-		super(CachedIndexedClass.Helper.structuralHashCode(entity));
+		super(CachedIndexedClass.structuralHashCode(entity));
 		elkClass_ = entity;
 	}
 
@@ -91,11 +90,6 @@ class CachedIndexedClassImpl extends
 	@Override
 	public void removeDefinition() {
 		this.definition_ = null;
-	}
-
-	@Override
-	public final CachedIndexedClass structuralEquals(Object other) {
-		return CachedIndexedClass.Helper.structuralEquals(this, other);
 	}
 
 	@Override

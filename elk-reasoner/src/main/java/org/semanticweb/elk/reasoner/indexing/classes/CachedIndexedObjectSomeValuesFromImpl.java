@@ -39,8 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromEx
  * @author "Yevgeny Kazakov"
  */
 class CachedIndexedObjectSomeValuesFromImpl
-		extends
-		CachedIndexedComplexClassExpressionImpl<CachedIndexedObjectSomeValuesFrom>
+		extends CachedIndexedComplexClassExpressionImpl
 		implements CachedIndexedObjectSomeValuesFrom {
 
 	private final ModifiableIndexedRangeFillerImpl rangeFiller_;
@@ -48,7 +47,7 @@ class CachedIndexedObjectSomeValuesFromImpl
 	CachedIndexedObjectSomeValuesFromImpl(
 			ModifiableIndexedObjectProperty property,
 			ModifiableIndexedClassExpression filler) {
-		super(CachedIndexedObjectSomeValuesFrom.Helper.structuralHashCode(
+		super(CachedIndexedObjectSomeValuesFrom.structuralHashCode(
 				property, filler));
 		this.rangeFiller_ = new ModifiableIndexedRangeFillerImpl(property,
 				filler);
@@ -67,12 +66,6 @@ class CachedIndexedObjectSomeValuesFromImpl
 	@Override
 	public ModifiableIndexedRangeFiller getRangeFiller() {
 		return rangeFiller_;
-	}
-
-	@Override
-	public final CachedIndexedObjectSomeValuesFrom structuralEquals(Object other) {
-		return CachedIndexedObjectSomeValuesFrom.Helper.structuralEquals(this,
-				other);
 	}
 
 	@Override

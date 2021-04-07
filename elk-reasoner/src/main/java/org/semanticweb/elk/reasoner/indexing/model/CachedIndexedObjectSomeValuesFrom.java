@@ -1,5 +1,8 @@
 package org.semanticweb.elk.reasoner.indexing.model;
 
+import org.semanticweb.elk.util.collections.entryset.GenericStructuralObject;
+import org.semanticweb.elk.util.hashing.HashGenerator;
+
 /*
  * #%L
  * ELK Reasoner
@@ -28,9 +31,10 @@ package org.semanticweb.elk.reasoner.indexing.model;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface CachedIndexedObjectSomeValuesFrom extends
-		ModifiableIndexedObjectSomeValuesFrom,
-		CachedIndexedComplexClassExpression<CachedIndexedObjectSomeValuesFrom> {
+public interface CachedIndexedObjectSomeValuesFrom
+		extends ModifiableIndexedObjectSomeValuesFrom,
+		CachedIndexedComplexClassExpression,
+		GenericStructuralObject<CachedIndexedObjectSomeValuesFrom> {
 
 	/**
 	 * A factory for creating instances
@@ -58,31 +62,26 @@ public interface CachedIndexedObjectSomeValuesFrom extends
 				CachedIndexedObjectSomeValuesFrom element);
 
 	}
-	
-	static class Helper extends CachedIndexedSubObject.Helper {
+		
+	static int structuralHashCode(ModifiableIndexedObjectProperty property,
+			ModifiableIndexedClassExpression filler) {
+		return HashGenerator.combinedHashCode(
+				CachedIndexedObjectSomeValuesFrom.class, property, filler);
+	}
 
-		public static int structuralHashCode(IndexedObjectProperty property,
-				IndexedClassExpression filler) {
-			return combinedHashCode(CachedIndexedObjectSomeValuesFrom.class,
-					property, filler);
+	@Override
+	default CachedIndexedObjectSomeValuesFrom structuralEquals(Object other) {
+		if (this == other) {
+			return this;
 		}
-
-		public static CachedIndexedObjectSomeValuesFrom structuralEquals(
-				CachedIndexedObjectSomeValuesFrom first, Object second) {
-			if (first == second) {
-				return first;
-			}
-			if (second instanceof CachedIndexedObjectSomeValuesFrom) {
-				CachedIndexedObjectSomeValuesFrom secondEntry = (CachedIndexedObjectSomeValuesFrom) second;
-				if (first.getProperty().equals(secondEntry.getProperty())
-						&& first.getFiller().equals(
-								secondEntry.getFiller()))
-					return secondEntry;
-			}
-			// else
-			return null;
+		if (other instanceof CachedIndexedObjectSomeValuesFrom) {
+			CachedIndexedObjectSomeValuesFrom secondEntry = (CachedIndexedObjectSomeValuesFrom) other;
+			if (getProperty().equals(secondEntry.getProperty())
+					&& getFiller().equals(secondEntry.getFiller()))
+				return secondEntry;
 		}
-
+		// else
+		return null;
 	}
 
 }

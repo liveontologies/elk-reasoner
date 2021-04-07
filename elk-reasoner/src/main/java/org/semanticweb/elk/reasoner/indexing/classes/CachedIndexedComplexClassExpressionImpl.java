@@ -31,21 +31,18 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexClassExpression
  * Implements {@link CachedIndexedComplexClassExpression}.
  * 
  * @author "Yevgeny Kazakov"
- *
- * @param <T>
- *            the type of objects this object can be structurally equal to
+ * 
  */
-abstract class CachedIndexedComplexClassExpressionImpl<T extends CachedIndexedComplexClassExpression<T>>
-		extends
-		CachedIndexedClassExpressionImpl<T, CachedIndexedComplexClassExpression<?>>
-		implements CachedIndexedComplexClassExpression<T> {
+abstract class CachedIndexedComplexClassExpressionImpl extends
+		CachedIndexedClassExpressionImpl<CachedIndexedComplexClassExpression>
+		implements CachedIndexedComplexClassExpression {
 	
 	CachedIndexedComplexClassExpressionImpl(int structuralHash) {
 		super(structuralHash);
 	}
 	
 	@Override
-	public final CachedIndexedComplexClassExpression<?> accept(CachedIndexedClassExpression.Filter filter) {
+	public final CachedIndexedComplexClassExpression accept(CachedIndexedClassExpression.Filter filter) {
 		return accept((CachedIndexedComplexClassExpression.Filter) filter);
 	}
 	

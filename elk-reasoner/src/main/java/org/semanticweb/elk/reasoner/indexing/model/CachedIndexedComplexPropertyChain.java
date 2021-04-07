@@ -1,12 +1,12 @@
 package org.semanticweb.elk.reasoner.indexing.model;
 
-/*
+/*-
  * #%L
- * ELK Reasoner
+ * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2021 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ package org.semanticweb.elk.reasoner.indexing.model;
  */
 
 import org.semanticweb.elk.util.collections.entryset.Entry;
+import org.semanticweb.elk.util.collections.entryset.GenericStructuralObject;
+import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * A {@link ModifiableIndexedComplexPropertyChain} that can be used for
@@ -32,7 +34,8 @@ import org.semanticweb.elk.util.collections.entryset.Entry;
  */
 public interface CachedIndexedComplexPropertyChain extends
 		ModifiableIndexedComplexPropertyChain, CachedIndexedPropertyChain,
-		Entry<CachedIndexedComplexPropertyChain, CachedIndexedComplexPropertyChain> {
+		GenericStructuralObject<CachedIndexedComplexPropertyChain>,
+		Entry<CachedIndexedComplexPropertyChain> {
 
 	/**
 	 * A factory for creating instances
@@ -61,32 +64,27 @@ public interface CachedIndexedComplexPropertyChain extends
 		
 	}
 	
-	static class Helper extends CachedIndexedSubObject.Helper {
-
-		public static int structuralHashCode(
-				IndexedObjectProperty leftProperty,
-				IndexedPropertyChain rightProperty) {
-			return combinedHashCode(CachedIndexedComplexPropertyChain.class,
-					leftProperty, rightProperty);
-		}
-
-		public static CachedIndexedComplexPropertyChain structuralEquals(
-				CachedIndexedComplexPropertyChain first, Object second) {
-			if (first == second) {
-				return first;
-			}
-			if (second instanceof CachedIndexedComplexPropertyChain) {
-				CachedIndexedComplexPropertyChain secondEntry = (CachedIndexedComplexPropertyChain) second;
-				if (first.getFirstProperty().equals(
-						secondEntry.getFirstProperty())
-						&& first.getSuffixChain().equals(
-								secondEntry.getSuffixChain()))
-					return secondEntry;
-			}
-			// else
-			return null;
-		}
-
+	static int structuralHashCode(ModifiableIndexedObjectProperty firstProperty,
+			ModifiableIndexedPropertyChain suffixChain) {
+		return HashGenerator.combinedHashCode(
+				CachedIndexedComplexPropertyChain.class, firstProperty,
+				suffixChain);
 	}
 
+	@Override
+	default CachedIndexedComplexPropertyChain structuralEquals(Object second) {
+		if (this == second) {
+			return this;
+		}
+		if (second instanceof CachedIndexedComplexPropertyChain) {
+			CachedIndexedComplexPropertyChain secondEntry = (CachedIndexedComplexPropertyChain) second;
+			if (this.getFirstProperty().equals(secondEntry.getFirstProperty())
+					&& this.getSuffixChain()
+							.equals(secondEntry.getSuffixChain()))
+				return secondEntry;
+		}
+		// else
+		return null;
+	}
+	
 }

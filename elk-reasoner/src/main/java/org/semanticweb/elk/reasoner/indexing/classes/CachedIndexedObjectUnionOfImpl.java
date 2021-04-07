@@ -40,8 +40,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDi
  * @author "Yevgeny Kazakov"
  * 
  */
-class CachedIndexedObjectUnionOfImpl extends
-		CachedIndexedComplexClassExpressionImpl<CachedIndexedObjectUnionOf>
+class CachedIndexedObjectUnionOfImpl
+		extends CachedIndexedComplexClassExpressionImpl
 		implements CachedIndexedObjectUnionOf {
 
 	private final List<ModifiableIndexedClassExpression> disjuncts_;
@@ -52,8 +52,7 @@ class CachedIndexedObjectUnionOfImpl extends
 	}
 
 	private CachedIndexedObjectUnionOfImpl(Initializer init) {
-		super(CachedIndexedObjectUnionOf.Helper
-				.structuralHashCode(init.disjuncts_));
+		super(CachedIndexedObjectUnionOf.structuralHashCode(init.disjuncts_));
 		this.disjuncts_ = init.disjuncts_;
 
 	}
@@ -74,11 +73,6 @@ class CachedIndexedObjectUnionOfImpl extends
 	@Override
 	public final List<ModifiableIndexedClassExpression> getDisjuncts() {
 		return disjuncts_;
-	}
-
-	@Override
-	public final CachedIndexedObjectUnionOf structuralEquals(Object other) {
-		return CachedIndexedObjectUnionOf.Helper.structuralEquals(this, other);
 	}
 
 	@Override

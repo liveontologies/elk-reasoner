@@ -1,14 +1,12 @@
 package org.semanticweb.elk.reasoner.indexing.model;
 
-import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
-
-/*
+/*-
  * #%L
- * ELK Reasoner
+ * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2021 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +22,11 @@ import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
  * #L%
  */
 
+import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
+import org.semanticweb.elk.util.collections.entryset.GenericStructuralObject;
+import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * A {@link ModifiableIndexedDataHasValue} that can be used for memoization
@@ -34,8 +35,8 @@ import org.semanticweb.elk.owl.interfaces.ElkLiteral;
  * @author "Yevgeny Kazakov"
  */
 public interface CachedIndexedDataHasValue extends
-		ModifiableIndexedDataHasValue,
-		CachedIndexedComplexClassExpression<CachedIndexedDataHasValue> {
+		ModifiableIndexedDataHasValue, CachedIndexedComplexClassExpression,
+		GenericStructuralObject<CachedIndexedDataHasValue> {
 
 	/**
 	 * A factory for creating instances
@@ -61,34 +62,28 @@ public interface CachedIndexedDataHasValue extends
 		CachedIndexedDataHasValue filter(CachedIndexedDataHasValue element);
 
 	}
-	
-	static class Helper extends CachedIndexedSubObject.Helper {
-
-		public static int structuralHashCode(ElkDataProperty property,
-				ElkLiteral filler) {
-			return combinedHashCode(CachedIndexedDataHasValue.class,
-					property.getIri(), filler.getLexicalForm());
-		}
-
-		public static CachedIndexedDataHasValue structuralEquals(
-				CachedIndexedDataHasValue first, Object second) {
-			if (first == second) {
-				return first;
-			}
-			if (second instanceof CachedIndexedDataHasValue) {
-				CachedIndexedDataHasValue secondEntry = (CachedIndexedDataHasValue) second;
-				if (first.getRelation().getIri()
-						.equals(secondEntry.getRelation().getIri())
-						&& first.getFiller()
-								.getLexicalForm()
-								.equals(secondEntry.getFiller()
-										.getLexicalForm()))
-					return secondEntry;
-			}
-			// else
-			return null;
-		}
-
+		
+	static int structuralHashCode(ElkDataProperty relation, ElkLiteral filler) {
+		return HashGenerator.combinedHashCode(CachedIndexedDataHasValue.class,
+				relation.getIri(), filler.getLexicalForm());
 	}
+
+	@Override
+	default CachedIndexedDataHasValue structuralEquals(Object second) {
+		if (this == second) {
+			return this;
+		}
+		if (second instanceof CachedIndexedDataHasValue) {
+			CachedIndexedDataHasValue secondEntry = (CachedIndexedDataHasValue) second;
+			if (getRelation().getIri()
+					.equals(secondEntry.getRelation().getIri())
+					&& getFiller().getLexicalForm()
+							.equals(secondEntry.getFiller().getLexicalForm()))
+				return secondEntry;
+		}
+		// else
+		return null;
+	}
+
 
 }
