@@ -51,16 +51,12 @@ import org.slf4j.LoggerFactory;
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <T>
- *            the type of objects this object can be structurally equal to
- * 
  * @param <N>
  *            The type of the elements in the set where this entry is used
  */
-abstract class CachedIndexedClassExpressionImpl<T extends CachedIndexedClassExpression & Entry<T, N>, N>
-		extends CachedIndexedSubObjectImpl<T, N> implements
-		ModifiableIndexedClassExpression, CachedIndexedClassExpression,
-		Entry<T, N> {
+abstract class CachedIndexedClassExpressionImpl<N>
+		extends CachedIndexedSubObjectImpl<N> implements
+		ModifiableIndexedClassExpression, CachedIndexedClassExpression {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory

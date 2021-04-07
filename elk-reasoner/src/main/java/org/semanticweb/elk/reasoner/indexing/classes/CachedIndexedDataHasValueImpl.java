@@ -36,20 +36,17 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexClassExpression
  * 
  */
 class CachedIndexedDataHasValueImpl
-		extends
-			CachedIndexedComplexClassExpressionImpl<CachedIndexedDataHasValue>
-		implements
-			CachedIndexedDataHasValue {
+		extends CachedIndexedComplexClassExpressionImpl
+		implements CachedIndexedDataHasValue {
 
-	private final ElkDataProperty property_;
+	private final ElkDataProperty relation_;
 
 	private final ElkLiteral filler_;
 
-	private CachedIndexedDataHasValueImpl(ElkDataProperty property,
+	private CachedIndexedDataHasValueImpl(ElkDataProperty relation,
 			ElkLiteral filler) {
-		super(CachedIndexedDataHasValue.Helper.structuralHashCode(property,
-				filler));
-		this.property_ = property;
+		super(CachedIndexedDataHasValue.structuralHashCode(relation, filler));
+		this.relation_ = relation;
 		this.filler_ = filler;
 	}
 
@@ -60,17 +57,12 @@ class CachedIndexedDataHasValueImpl
 
 	@Override
 	public final ElkDataProperty getRelation() {
-		return property_;
+		return relation_;
 	}
 
 	@Override
 	public final ElkLiteral getFiller() {
 		return filler_;
-	}
-
-	@Override
-	public final CachedIndexedDataHasValue structuralEquals(Object other) {
-		return CachedIndexedDataHasValue.Helper.structuralEquals(this, other);
 	}
 
 	@Override

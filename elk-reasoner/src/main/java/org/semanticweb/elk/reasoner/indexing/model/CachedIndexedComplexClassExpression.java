@@ -1,12 +1,12 @@
 package org.semanticweb.elk.reasoner.indexing.model;
 
-/*
+/*-
  * #%L
- * ELK Reasoner
+ * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2021 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,12 +28,10 @@ import org.semanticweb.elk.util.collections.entryset.Entry;
  * A non-atomic {@link CachedIndexedClassExpression}, that is, not an
  * {@link CachedIndexedClassEntity}
  *
- * @param <T>
- *            the type of the {@link CachedIndexedComplexClassExpression}
  */
-public interface CachedIndexedComplexClassExpression<T extends CachedIndexedComplexClassExpression<T>>
+public interface CachedIndexedComplexClassExpression
 		extends CachedIndexedClassExpression, IndexedComplexClassExpression,
-		Entry<T, CachedIndexedComplexClassExpression<?>> {
+		Entry<CachedIndexedComplexClassExpression> {
 
 	/**
 	 * A factory for creating instances
@@ -73,7 +71,7 @@ public interface CachedIndexedComplexClassExpression<T extends CachedIndexedComp
 
 	}
 	
-	CachedIndexedComplexClassExpression<?> accept(Filter filter);
+	CachedIndexedComplexClassExpression accept(Filter filter);
 
 
 }

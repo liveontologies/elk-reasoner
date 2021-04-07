@@ -37,14 +37,14 @@ import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
  * 
  * @author "Yevgeny Kazakov"
  */
-class CachedIndexedObjectHasSelfImpl extends
-		CachedIndexedComplexClassExpressionImpl<CachedIndexedObjectHasSelf>
+class CachedIndexedObjectHasSelfImpl
+		extends CachedIndexedComplexClassExpressionImpl
 		implements CachedIndexedObjectHasSelf {
 
 	private final ModifiableIndexedObjectProperty property_;
 
 	CachedIndexedObjectHasSelfImpl(ModifiableIndexedObjectProperty property) {
-		super(CachedIndexedObjectHasSelf.Helper.structuralHashCode(property));
+		super(CachedIndexedObjectHasSelf.structuralHashCode(property));
 		this.property_ = property;
 	}
 	
@@ -53,11 +53,6 @@ class CachedIndexedObjectHasSelfImpl extends
 	@Override
 	public final ModifiableIndexedObjectProperty getProperty() {
 		return property_;
-	}
-
-	@Override
-	public final CachedIndexedObjectHasSelf structuralEquals(Object other) {
-		return CachedIndexedObjectHasSelf.Helper.structuralEquals(this, other);
 	}
 
 	@Override

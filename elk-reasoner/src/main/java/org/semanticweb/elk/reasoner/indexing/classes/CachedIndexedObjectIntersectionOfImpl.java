@@ -37,8 +37,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectio
  * 
  * @author "Yevgeny Kazakov"
  */
-class CachedIndexedObjectIntersectionOfImpl extends
-		CachedIndexedComplexClassExpressionImpl<CachedIndexedObjectIntersectionOf>
+class CachedIndexedObjectIntersectionOfImpl
+		extends CachedIndexedComplexClassExpressionImpl
 		implements CachedIndexedObjectIntersectionOf {
 
 	private final ModifiableIndexedClassExpression firstConjunct_,
@@ -47,7 +47,7 @@ class CachedIndexedObjectIntersectionOfImpl extends
 	CachedIndexedObjectIntersectionOfImpl(
 			ModifiableIndexedClassExpression firstConjunct,
 			ModifiableIndexedClassExpression secondConjunct) {
-		super(CachedIndexedObjectIntersectionOf.Helper.structuralHashCode(
+		super(CachedIndexedObjectIntersectionOf.structuralHashCode(
 				firstConjunct, secondConjunct));
 		this.firstConjunct_ = firstConjunct;
 		this.secondConjunct_ = secondConjunct;
@@ -61,13 +61,6 @@ class CachedIndexedObjectIntersectionOfImpl extends
 	@Override
 	public final ModifiableIndexedClassExpression getSecondConjunct() {
 		return secondConjunct_;
-	}
-
-	@Override
-	public final CachedIndexedObjectIntersectionOf structuralEquals(
-			Object other) {
-		return CachedIndexedObjectIntersectionOf.Helper.structuralEquals(this,
-				other);
 	}
 
 	@Override

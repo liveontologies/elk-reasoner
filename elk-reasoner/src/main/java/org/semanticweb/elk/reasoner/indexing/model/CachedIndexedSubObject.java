@@ -1,9 +1,5 @@
 package org.semanticweb.elk.reasoner.indexing.model;
 
-import java.util.List;
-
-import org.semanticweb.elk.util.hashing.HashGenerator;
-
 /*
  * #%L
  * ELK Reasoner
@@ -32,7 +28,8 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author "Yevgeny Kazakov"
  *
  */
-public interface CachedIndexedSubObject extends ModifiableIndexedSubObject {
+public interface CachedIndexedSubObject
+		extends ModifiableIndexedSubObject {
 
 	/**
 	 * A factory for creating instances
@@ -73,15 +70,5 @@ public interface CachedIndexedSubObject extends ModifiableIndexedSubObject {
 	 * @return the result of applying the filter to this object
 	 */
 	CachedIndexedSubObject accept(Filter filter);
-	
-	static class Helper {
-		static int combinedHashCode(Object... objects) {
-			return HashGenerator.combinedHashCode(objects);
-		}
-
-		static int combinedHashCode(List<?> objects) {
-			return HashGenerator.combinedHashCode(objects);
-		}
-	}
-
+			
 }

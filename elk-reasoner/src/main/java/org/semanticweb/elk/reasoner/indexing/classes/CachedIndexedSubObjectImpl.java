@@ -36,16 +36,13 @@ import org.semanticweb.elk.util.collections.entryset.EntryCollection;
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <T>
- *            the type of objects this object can be structurally equal to
- * 
  * @param <N>
  *            The type of the elements in the set where this entry is used
  * 
  */
-abstract class CachedIndexedSubObjectImpl<T extends CachedIndexedSubObject & Entry<T, N>, N>
-		extends IndexedObjectImpl
-		implements CachedIndexedSubObject, ModifiableIndexedSubObject,  Entry<T, N> {
+abstract class CachedIndexedSubObjectImpl<N> extends IndexedObjectImpl
+		implements CachedIndexedSubObject, ModifiableIndexedSubObject,
+		Entry<N> {
 
 	/**
 	 * The reference to the next element

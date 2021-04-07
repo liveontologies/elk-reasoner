@@ -1,5 +1,8 @@
 package org.semanticweb.elk.reasoner.indexing.model;
 
+import org.semanticweb.elk.util.collections.entryset.GenericStructuralObject;
+import org.semanticweb.elk.util.hashing.HashGenerator;
+
 /*
  * #%L
  * ELK Reasoner
@@ -28,9 +31,10 @@ package org.semanticweb.elk.reasoner.indexing.model;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface CachedIndexedObjectComplementOf extends
-		ModifiableIndexedObjectComplementOf,
-		CachedIndexedComplexClassExpression<CachedIndexedObjectComplementOf> {
+public interface CachedIndexedObjectComplementOf
+		extends ModifiableIndexedObjectComplementOf,
+		CachedIndexedComplexClassExpression,
+		GenericStructuralObject<CachedIndexedObjectComplementOf> {
 
 	/**
 	 * A factory for creating instances
@@ -58,27 +62,24 @@ public interface CachedIndexedObjectComplementOf extends
 
 	}
 	
-	static class Helper extends CachedIndexedSubObject.Helper {
-
-		public static int structuralHashCode(IndexedClassExpression negated) {
-			return combinedHashCode(CachedIndexedObjectComplementOf.class,
-					negated);
-		}
-
-		public static CachedIndexedObjectComplementOf structuralEquals(
-				CachedIndexedObjectComplementOf first, Object second) {
-			if (first == second) {
-				return first;
-			}
-			if (second instanceof CachedIndexedObjectComplementOf) {
-				CachedIndexedObjectComplementOf secondEntry = (CachedIndexedObjectComplementOf) second;
-				if (first.getNegated().equals(secondEntry.getNegated()))
-					return secondEntry;
-			}
-			// else
-			return null;
-		}
-
+	static int structuralHashCode(ModifiableIndexedClassExpression negated) {
+		return HashGenerator.combinedHashCode(
+				CachedIndexedObjectComplementOf.class, negated);
 	}
+
+	@Override
+	default CachedIndexedObjectComplementOf structuralEquals(Object other) {
+		if (this == other) {
+			return this;
+		}
+		if (other instanceof CachedIndexedObjectComplementOf) {
+			CachedIndexedObjectComplementOf secondEntry = (CachedIndexedObjectComplementOf) other;
+			if (getNegated().equals(secondEntry.getNegated()))
+				return secondEntry;
+		}
+		// else
+		return null;
+	}
+
 
 }

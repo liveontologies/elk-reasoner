@@ -1,12 +1,12 @@
 package org.semanticweb.elk.reasoner.indexing.model;
 
-/*
+/*-
  * #%L
- * ELK Reasoner
+ * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2021 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,20 +22,15 @@ package org.semanticweb.elk.reasoner.indexing.model;
  * #L%
  */
 
-import org.semanticweb.elk.util.collections.entryset.Entry;
-
 /**
  * 
  * A {@link ModifiableIndexedEntity} that can be used for memoization (caching).
  * 
  * @author "Yevgeny Kazakov"
- *
- * @param <T>
- *            the type of the {@link CachedIndexedEntity}
  * 
  */
-public interface CachedIndexedEntity<T extends CachedIndexedEntity<T>>
-		extends ModifiableIndexedEntity, CachedIndexedSubObject, Entry<T, T> {
+public interface CachedIndexedEntity
+		extends ModifiableIndexedEntity, CachedIndexedSubObject {
 
 	/**
 	 * A factory for creating instances

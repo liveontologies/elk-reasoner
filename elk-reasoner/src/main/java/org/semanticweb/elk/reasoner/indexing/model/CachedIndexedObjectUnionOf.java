@@ -24,6 +24,9 @@ package org.semanticweb.elk.reasoner.indexing.model;
 
 import java.util.List;
 
+import org.semanticweb.elk.util.collections.entryset.GenericStructuralObject;
+import org.semanticweb.elk.util.hashing.HashGenerator;
+
 /**
  * A {@link ModifiableIndexedObjectUnionOf} that can be used for memoization
  * (caching).
@@ -31,8 +34,8 @@ import java.util.List;
  * @author "Yevgeny Kazakov"
  */
 public interface CachedIndexedObjectUnionOf extends
-		ModifiableIndexedObjectUnionOf,
-		CachedIndexedComplexClassExpression<CachedIndexedObjectUnionOf> {
+		ModifiableIndexedObjectUnionOf, CachedIndexedComplexClassExpression,
+		GenericStructuralObject<CachedIndexedObjectUnionOf> {
 
 	/**
 	 * A factory for creating instances
@@ -59,27 +62,24 @@ public interface CachedIndexedObjectUnionOf extends
 
 	}
 	
-	static class Helper extends CachedIndexedSubObject.Helper {
+	static int structuralHashCode(
+			List<ModifiableIndexedClassExpression> disjuncts) {
+		return HashGenerator.combinedHashCode(CachedIndexedObjectUnionOf.class,
+				disjuncts);
+	}
 
-		public static int structuralHashCode(
-				List<? extends ModifiableIndexedClassExpression> disjuncts) {
-			return combinedHashCode(CachedIndexedObjectUnionOf.class, disjuncts);
+	@Override
+	default CachedIndexedObjectUnionOf structuralEquals(Object other) {
+		if (this == other) {
+			return this;
 		}
-
-		public static CachedIndexedObjectUnionOf structuralEquals(
-				CachedIndexedObjectUnionOf first, Object second) {
-			if (first == second) {
-				return first;
-			}
-			if (second instanceof CachedIndexedObjectUnionOf) {
-				CachedIndexedObjectUnionOf secondEntry = (CachedIndexedObjectUnionOf) second;
-				if (first.getDisjuncts().equals(secondEntry.getDisjuncts()))
-					return secondEntry;
-			}
-			// else
-			return null;
+		if (other instanceof CachedIndexedObjectUnionOf) {
+			CachedIndexedObjectUnionOf secondEntry = (CachedIndexedObjectUnionOf) other;
+			if (getDisjuncts().equals(secondEntry.getDisjuncts()))
+				return secondEntry;
 		}
-
+		// else
+		return null;
 	}
 
 }

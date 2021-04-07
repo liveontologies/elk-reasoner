@@ -39,43 +39,36 @@ import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
  * 
  */
 final class CachedIndexedComplexPropertyChainImpl extends
-		CachedIndexedPropertyChainImpl<CachedIndexedComplexPropertyChain, CachedIndexedComplexPropertyChain>
+		CachedIndexedPropertyChainImpl<CachedIndexedComplexPropertyChain>
 		implements CachedIndexedComplexPropertyChain {
 
-	private final ModifiableIndexedObjectProperty leftProperty_;
+	private final ModifiableIndexedObjectProperty firstProperty_;
 
-	private final ModifiableIndexedPropertyChain rightProperty_;
+	private final ModifiableIndexedPropertyChain suffixChain_;
 
 	/**
 	 * Used for creating auxiliary inclusions during binarization.
 	 * 
-	 * @param leftProperty
-	 * @param rightProperty
+	 * @param firstProperty
+	 * @param suffixChain
 	 */
 	public CachedIndexedComplexPropertyChainImpl(
-			ModifiableIndexedObjectProperty leftProperty,
-			ModifiableIndexedPropertyChain rightProperty) {
-		super(CachedIndexedComplexPropertyChain.Helper.structuralHashCode(
-				leftProperty, rightProperty));
-		this.leftProperty_ = leftProperty;
-		this.rightProperty_ = rightProperty;
+			ModifiableIndexedObjectProperty firstProperty,
+			ModifiableIndexedPropertyChain suffixChain) {
+		super(CachedIndexedComplexPropertyChain.structuralHashCode(
+				firstProperty, suffixChain));
+		this.firstProperty_ = firstProperty;
+		this.suffixChain_ = suffixChain;
 	}
 
 	@Override
 	public final ModifiableIndexedObjectProperty getFirstProperty() {
-		return leftProperty_;
+		return firstProperty_;
 	}
 
 	@Override
 	public final ModifiableIndexedPropertyChain getSuffixChain() {
-		return rightProperty_;
-	}
-
-	@Override
-	public final CachedIndexedComplexPropertyChain structuralEquals(
-			Object other) {
-		return CachedIndexedComplexPropertyChain.Helper.structuralEquals(this,
-				other);
+		return suffixChain_;
 	}
 
 	@Override
@@ -84,24 +77,24 @@ final class CachedIndexedComplexPropertyChainImpl extends
 		return RevertibleAction
 				.create(() -> totalOccurrenceNo == 0
 						&& increment.totalIncrement > 0,
-						() -> rightProperty_.addRightChain(this),
-						() -> rightProperty_.removeRightChain(this))
+						() -> suffixChain_.addRightChain(this),
+						() -> suffixChain_.removeRightChain(this))
 				.then(RevertibleAction.create(
 						() -> totalOccurrenceNo == 0
 								&& increment.totalIncrement > 0,
-						() -> leftProperty_.addLeftChain(this),
-						() -> leftProperty_.removeLeftChain(this)))
+						() -> firstProperty_.addLeftChain(this),
+						() -> firstProperty_.removeLeftChain(this)))
 				.then(super.getIndexingAction(index, increment))
 				.then(RevertibleAction.create(
 						() -> totalOccurrenceNo == 0
 								&& increment.totalIncrement < 0,
-						() -> rightProperty_.removeRightChain(this),
-						() -> rightProperty_.addRightChain(this)))
+						() -> suffixChain_.removeRightChain(this),
+						() -> suffixChain_.addRightChain(this)))
 				.then(RevertibleAction.create(
 						() -> totalOccurrenceNo == 0
 								&& increment.totalIncrement < 0,
-						() -> leftProperty_.removeLeftChain(this),
-						() -> leftProperty_.addLeftChain(this)))
+						() -> firstProperty_.removeLeftChain(this),
+						() -> firstProperty_.addLeftChain(this)))
 				.then(RevertibleAction.create(() -> {
 					index.occurrenceChanged(Feature.OBJECT_PROPERTY_CHAIN,
 							increment.totalIncrement);
@@ -119,8 +112,8 @@ final class CachedIndexedComplexPropertyChainImpl extends
 	 *         this chain or null
 	 */
 	public final IndexedPropertyChain getComposable(IndexedPropertyChain ipc) {
-		return ipc == leftProperty_ ? rightProperty_
-				: (ipc == rightProperty_ ? leftProperty_ : null);
+		return ipc == firstProperty_ ? suffixChain_
+				: (ipc == suffixChain_ ? firstProperty_ : null);
 	}
 
 	@Override

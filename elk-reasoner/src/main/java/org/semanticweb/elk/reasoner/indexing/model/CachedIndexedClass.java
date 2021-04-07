@@ -23,14 +23,18 @@ package org.semanticweb.elk.reasoner.indexing.model;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.util.collections.entryset.Entry;
+import org.semanticweb.elk.util.collections.entryset.GenericStructuralObject;
+import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * A {@link ModifiableIndexedClass} that can be used for memoization (caching).
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface CachedIndexedClass extends ModifiableIndexedClass,
-		CachedIndexedClassEntity<CachedIndexedClass> {
+public interface CachedIndexedClass
+		extends ModifiableIndexedClass, CachedIndexedClassEntity,
+		GenericStructuralObject<CachedIndexedClass>, Entry<CachedIndexedClass> {
 
 	/**
 	 * A factory for creating instances
@@ -55,27 +59,24 @@ public interface CachedIndexedClass extends ModifiableIndexedClass,
 		CachedIndexedClass filter(CachedIndexedClass element);
 
 	}
-			
-	
-	static class Helper extends CachedIndexedSubObject.Helper {
-
-		public static int structuralHashCode(ElkClass entity) {
-			return combinedHashCode(CachedIndexedClass.class, entity.getIri());
-		}
-
-		public static CachedIndexedClass structuralEquals(
-				CachedIndexedClass first, Object second) {
-			if (first == second) {
-				return first;
-			}
-			if (second instanceof CachedIndexedClass) {
-				CachedIndexedClass secondEntry = (CachedIndexedClass) second;
-				if (first.getElkEntity().getIri()
-						.equals(secondEntry.getElkEntity().getIri()))
-					return secondEntry;
-			}
-			return null;
-		}
-
+		
+	static int structuralHashCode(ElkClass entity) {
+		return HashGenerator.combinedHashCode(CachedIndexedClass.class,
+				entity.getIri());
 	}
+
+	@Override
+	default CachedIndexedClass structuralEquals(Object other) {
+		if (this == other) {
+			return this;
+		}
+		if (other instanceof CachedIndexedClass) {
+			CachedIndexedClass secondEntry = (CachedIndexedClass) other;
+			if (getElkEntity().getIri()
+					.equals(secondEntry.getElkEntity().getIri()))
+				return secondEntry;
+		}
+		return null;
+	}
+
 }

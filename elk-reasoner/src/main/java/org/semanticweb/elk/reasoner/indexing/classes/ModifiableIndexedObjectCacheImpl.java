@@ -50,6 +50,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectCache;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.entryset.EntryCollection;
+import org.semanticweb.elk.util.collections.entryset.GenericStructuralObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +65,7 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ModifiableIndexedObjectCacheImpl.class);
 
-	private final EntryCollection<CachedIndexedComplexClassExpression<?>> cachedComplexClassExpressions_;
+	private final EntryCollection<CachedIndexedComplexClassExpression> cachedComplexClassExpressions_;
 
 	private final EntryCollection<CachedIndexedComplexPropertyChain> cachedBinaryPropertyChains_;
 
@@ -90,7 +91,7 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 
 	public ModifiableIndexedObjectCacheImpl(
 			final PredefinedElkEntityFactory elkFactory, int initialSize) {
-		this.cachedComplexClassExpressions_ = new EntryCollection<CachedIndexedComplexClassExpression<?>>(
+		this.cachedComplexClassExpressions_ = new EntryCollection<CachedIndexedComplexClassExpression>(
 				initialSize);
 		this.cachedBinaryPropertyChains_ = new EntryCollection<CachedIndexedComplexPropertyChain>(
 				initialSize);
@@ -298,7 +299,7 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 			return null;
 		}
 
-		private <T extends CachedIndexedComplexClassExpression<T>> T defaultFilter(
+		private <T extends CachedIndexedComplexClassExpression> T defaultFilter(
 				T element) {
 			cachedComplexClassExpressions_.addStructural(element);
 			for (int i = 0; i < listeners_.size(); i++) {
@@ -404,7 +405,7 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 			return result;
 		}
 
-		private <T extends CachedIndexedComplexClassExpression<T>> T defaultFilter(
+		private <T extends GenericStructuralObject<T> & CachedIndexedComplexClassExpression> T defaultFilter(
 				T element) {
 			T result = cachedComplexClassExpressions_.removeStructural(element);
 			if (result != null) {

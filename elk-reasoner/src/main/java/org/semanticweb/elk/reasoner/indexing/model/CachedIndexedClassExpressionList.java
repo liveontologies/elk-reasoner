@@ -25,6 +25,8 @@ package org.semanticweb.elk.reasoner.indexing.model;
 import java.util.List;
 
 import org.semanticweb.elk.util.collections.entryset.Entry;
+import org.semanticweb.elk.util.collections.entryset.GenericStructuralObject;
+import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * A {@link ModifiableIndexedClassExpressionList} that can be used for
@@ -34,7 +36,8 @@ import org.semanticweb.elk.util.collections.entryset.Entry;
  */
 public interface CachedIndexedClassExpressionList
 		extends ModifiableIndexedClassExpressionList, CachedIndexedSubObject,
-		Entry<CachedIndexedClassExpressionList, CachedIndexedClassExpressionList> {
+		GenericStructuralObject<CachedIndexedClassExpressionList>,
+		Entry<CachedIndexedClassExpressionList> {
 
 	/**
 	 * A factory for creating instances
@@ -62,28 +65,25 @@ public interface CachedIndexedClassExpressionList
 
 	}
 	
-	static class Helper extends CachedIndexedSubObject.Helper {
+	static int structuralHashCode(
+			List<? extends ModifiableIndexedClassExpression> members) {
+		return HashGenerator.combinedHashCode(
+				CachedIndexedClassExpressionList.class,
+				HashGenerator.combinedHashCode(members));
+	}
 
-		public static int structuralHashCode(
-				List<? extends ModifiableIndexedClassExpression> members) {
-			return combinedHashCode(CachedIndexedClassExpressionList.class,
-					combinedHashCode(members));
+	@Override
+	default CachedIndexedClassExpressionList structuralEquals(Object other) {
+		if (this == other) {
+			return this;
 		}
-
-		public static CachedIndexedClassExpressionList structuralEquals(
-				CachedIndexedClassExpressionList first, Object second) {
-			if (first == second) {
-				return first;
-			}
-			if (second instanceof CachedIndexedClassExpressionList) {
-				CachedIndexedClassExpressionList secondEntry = (CachedIndexedClassExpressionList) second;
-				if (first.getElements().equals(secondEntry.getElements()))
-					return secondEntry;
-			}
-			// else
-			return null;
+		if (other instanceof CachedIndexedClassExpressionList) {
+			CachedIndexedClassExpressionList secondEntry = (CachedIndexedClassExpressionList) other;
+			if (getElements().equals(secondEntry.getElements()))
+				return secondEntry;
 		}
-
+		// else
+		return null;
 	}
 
 }
