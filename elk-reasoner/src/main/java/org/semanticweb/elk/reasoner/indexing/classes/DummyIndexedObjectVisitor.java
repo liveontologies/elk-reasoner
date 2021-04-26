@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiom;
+
 /*
  * #%L
  * ELK Reasoner
@@ -23,12 +25,13 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectComplementOf;
@@ -38,8 +41,10 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectUnionOf;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedRangeFiller;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiom;
 
 /**
@@ -56,6 +61,22 @@ public class DummyIndexedObjectVisitor<O> implements IndexedObject.Visitor<O> {
 		return null;
 	}
 
+	protected O defaultVisit(IndexedAxiom element) {		
+		return defaultVisit((IndexedObject) element);
+	}
+	
+	protected O defaultVisit(IndexedSubObject element) {
+		return defaultVisit((IndexedObject) element);
+	}
+	
+	protected O defaultVisit(IndexedClassExpression element) {
+		return defaultVisit((IndexedSubObject) element);
+	}
+	
+	protected O defaultVisit(IndexedPropertyChain element) {
+		return defaultVisit((IndexedSubObject) element);
+	}			
+	
 	@Override
 	public O visit(IndexedClass element) {
 		return defaultVisit(element);

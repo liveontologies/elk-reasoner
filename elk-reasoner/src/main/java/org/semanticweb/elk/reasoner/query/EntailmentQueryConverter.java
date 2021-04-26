@@ -48,7 +48,6 @@ import org.semanticweb.elk.reasoner.entailments.impl.ObjectPropertyDomainAxiomEn
 import org.semanticweb.elk.reasoner.entailments.impl.SameIndividualAxiomEntailmentImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.SubClassOfAxiomEntailmentImpl;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
-import org.semanticweb.elk.reasoner.indexing.classes.ModifiableIndexedObjectBaseFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.UpdatingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
@@ -85,13 +84,10 @@ public class EntailmentQueryConverter extends
 	public EntailmentQueryConverter(final ElkObject.Factory elkFactory,
 			final ModifiableOntologyIndex index, final int increment) {
 		this.elkFactory_ = elkFactory;
-		final ModifiableIndexedObjectBaseFactory baseFactory = new ModifiableIndexedObjectBaseFactory();
 		final ModifiableIndexedObject.Factory positiveFactory = new UpdatingModifiableIndexedObjectFactory(
-				baseFactory, index,
-				OccurrenceIncrement.getPositiveIncrement(increment));
+				index, OccurrenceIncrement.getPositiveIncrement(increment));
 		final ModifiableIndexedObject.Factory negativeFactory = new UpdatingModifiableIndexedObjectFactory(
-				baseFactory, index,
-				OccurrenceIncrement.getNegativeIncrement(increment));
+				index, OccurrenceIncrement.getNegativeIncrement(increment));
 		this.positiveConverter_ = new ElkPolarityExpressionConverterImpl(
 				ElkPolarity.POSITIVE, elkFactory, positiveFactory,
 				negativeFactory, index, increment);
