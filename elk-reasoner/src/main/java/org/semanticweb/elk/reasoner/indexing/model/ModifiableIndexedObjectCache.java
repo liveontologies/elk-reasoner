@@ -31,32 +31,39 @@ package org.semanticweb.elk.reasoner.indexing.model;
 public interface ModifiableIndexedObjectCache extends IndexedObjectCache {
 
 	/**
-	 * @return an {@link CachedIndexedSubObject.Filter} that produces
-	 *         structurally equal {@link CachedIndexedSubObject}s contained in
-	 *         this {@link IndexedObjectCache} or {@code null} if there is no
-	 *         such an object
-	 */
-	CachedIndexedSubObject.Filter getResolver();
-	
-	/**
-	 * Adds a given {@link CachedIndexedSubObject} to this
+	 * Adds a given {@link StructuralIndexedSubObject} to this
 	 * {@link IndexedObjectCache}; this method should be used only if no
-	 * {@link CachedIndexedSubObject} that is structurally equal to the given one
-	 * occurs in this {@link IndexedObjectCache}
+	 * {@link StructuralIndexedSubObject} that is structurally equal to the given
+	 * one occurs in this {@link IndexedObjectCache}
 	 * 
 	 * @param input
-	 *            the {@link CachedIndexedSubObject} to be added
+	 *            the {@link StructuralIndexedSubObject} to be added
+	 * 
 	 */
-	void add(CachedIndexedSubObject input);
+	void add(StructuralIndexedSubObject<?> input);
 
 	/**
 	 * Removes an object structurally equal to the given one from this
 	 * {@link IndexedObjectCache}, if there is such an object
 	 * 
 	 * @param input
-	 *            the {@link CachedIndexedSubObject} for which to remove the
+	 *            the {@link StructuralIndexedSubObject} for which to remove the
 	 *            structurally equal object
+	 * 
 	 */
-	void remove(CachedIndexedSubObject input);
+	void remove(StructuralIndexedSubObject<?> input);
+
+	/**
+	 * Returns an object structurally equal to the given occurring in this
+	 * {@link IndexedObjectCache}
+	 * 
+	 * @param input
+	 *            the {@link StructuralIndexedSubObject} to be resolved
+	 * @return an {@link IndexedSubObject} that is structurally equal to the
+	 *         given one occurs in this {@link IndexedObjectCache}, if there is
+	 *         one, or {@code null} if there is no such object
+	 * 
+	 */
+	<T extends StructuralIndexedSubObject<T>> T resolve(T input);
 
 }

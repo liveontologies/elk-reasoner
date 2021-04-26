@@ -39,7 +39,7 @@ public class IndexedObjectsCreator {
 			ElkObjectProperty prop, ModifiableIndexedPropertyChain[] toldSubs,
 			ModifiableIndexedObjectProperty[] toldSupers) {
 
-		ModifiableIndexedObjectProperty property = new CachedIndexedObjectPropertyImpl(
+		ModifiableIndexedObjectProperty property = new StructuralIndexedObjectPropertyEntryImpl(
 				prop);
 
 		for (ModifiableIndexedPropertyChain sub : toldSubs) {
@@ -60,7 +60,7 @@ public class IndexedObjectsCreator {
 			ModifiableIndexedPropertyChain right,
 			ModifiableIndexedObjectProperty[] toldSupers) {
 
-		ModifiableIndexedComplexPropertyChain chain = new CachedIndexedComplexPropertyChainImpl(
+		ModifiableIndexedComplexPropertyChain chain = new StructuralIndexedComplexPropertyChainEntryImpl(
 				left, right);
 
 		for (ModifiableIndexedObjectProperty sup : toldSupers) {

@@ -73,10 +73,8 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.reasoner.completeness.Feature;
 import org.semanticweb.elk.reasoner.completeness.OccurrenceListener;
-import org.semanticweb.elk.reasoner.indexing.classes.ModifiableIndexedObjectBaseFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.ResolvingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.UpdatingModifiableIndexedObjectFactory;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
@@ -244,21 +242,6 @@ public class ElkAxiomConverterImpl extends NoOpElkAnnotationAxiomConverter<Void>
 	private final ModifiableIndexedObject.Factory positiveFactory_,
 			negativeFactory_;
 
-	<F extends CachedIndexedSubObject.Factory & ModifiableIndexedObject.Factory> ElkAxiomConverterImpl(
-			PredefinedElkClassFactory elkFactory, F baseFactory,
-			ModifiableOntologyIndex index, int increment) {
-		this(elkFactory,
-				new UpdatingModifiableIndexedObjectFactory(baseFactory, index,
-						OccurrenceIncrement.getNeutralIncrement(increment)),
-				new UpdatingModifiableIndexedObjectFactory(baseFactory, index,
-						OccurrenceIncrement.getPositiveIncrement(increment)),
-				new UpdatingModifiableIndexedObjectFactory(baseFactory, index,
-						OccurrenceIncrement.getNegativeIncrement(increment)),
-				new UpdatingModifiableIndexedObjectFactory(baseFactory, index,
-						OccurrenceIncrement.getDualIncrement(increment)),
-				index, increment, Producer.Dummy.get());
-	}
-
 	/**
 	 * Creates an {@link ElkAxiomConverter} that uses four
 	 * {@link ModifiableIndexedObject.Factory}s to create all
@@ -359,20 +342,20 @@ public class ElkAxiomConverterImpl extends NoOpElkAnnotationAxiomConverter<Void>
 	/**
 	 * Creates an {@link ElkAxiomConverter} for converting {@link ElkAxiom}s
 	 * that have already been indexed in the given
-	 * {@link ModifiableIndexedObjectCache}. All {@link ModifiableIndexedObject}
-	 * subexpressions of the converted {@link ModifiableIndexedAxiom}s are
-	 * taken from this {@link ModifiableIndexedObjectCache} as well. The
-	 * provided {@link ModifiableIndexedObjectCache} will not change. The
-	 * converter may not work properly if used with {@link ElkAxiom}s that have
-	 * not been indexed in the given {@link ModifiableIndexedObjectCache} (e.g.,
+	 * {@link ModifiableOntologyIndex}. All {@link ModifiableIndexedObject}
+	 * subexpressions of the converted {@link ModifiableIndexedAxiom}s are taken
+	 * from this {@link ModifiableOntologyIndex} as well. The provided
+	 * {@link ModifiableOntologyIndex} will not change. The converter may not
+	 * work properly if used with {@link ElkAxiom}s that have not been indexed
+	 * in the given {@link ModifiableOntologyIndex} (e.g.,
 	 * {@link NullPointerException}s may occur).
 	 * 
 	 * @param elkFactory
 	 *            used to create auxiliary {@link ElkObject}s
 	 * 
 	 * @param index
-	 *            the {@link ModifiableIndexedObjectCache} from which all
-	 *            {@link ModifiableIndexedObject}s are used.            
+	 *            the {@link ModifiableOntologyIndex} from which all
+	 *            {@link ModifiableIndexedObject}s are used.
 	 */
 	public ElkAxiomConverterImpl(PredefinedElkClassFactory elkFactory,
 			ModifiableOntologyIndex index) {
@@ -407,8 +390,16 @@ public class ElkAxiomConverterImpl extends NoOpElkAnnotationAxiomConverter<Void>
 	 */
 	public ElkAxiomConverterImpl(PredefinedElkClassFactory elkFactory,
 			ModifiableOntologyIndex index, int increment) {
-		this(elkFactory, new ModifiableIndexedObjectBaseFactory(), index,
-				increment);
+		this(elkFactory,
+				new UpdatingModifiableIndexedObjectFactory(index,
+						OccurrenceIncrement.getNeutralIncrement(increment)),
+				new UpdatingModifiableIndexedObjectFactory(index,
+						OccurrenceIncrement.getPositiveIncrement(increment)),
+				new UpdatingModifiableIndexedObjectFactory(index,
+						OccurrenceIncrement.getNegativeIncrement(increment)),
+				new UpdatingModifiableIndexedObjectFactory(index,
+						OccurrenceIncrement.getDualIncrement(increment)),
+				index, increment, Producer.Dummy.get());
 	}
 
 	private <A extends ElkAxiom, M extends ElkObject> void indexDisjointMembers(

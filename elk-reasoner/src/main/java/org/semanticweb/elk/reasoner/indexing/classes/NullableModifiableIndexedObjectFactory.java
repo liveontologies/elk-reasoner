@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import java.util.List;
+
 /*-
  * #%L
  * ELK Reasoner Core
@@ -23,17 +25,29 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpressionList;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedComplexPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedDeclarationAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedEntity;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedEquivalentClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObject;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectComplementOf;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectHasSelf;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectPropertyRangeAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedSubObjectPropertyOfAxiom;
@@ -47,19 +61,47 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedSubObjectPro
  *
  */
 class NullableModifiableIndexedObjectFactory
-		extends NullableCachedIndexedObjectFactory
 		implements ModifiableIndexedObject.Factory {
 
 	private final ModifiableIndexedObject.Factory delegate_;
 
-	NullableModifiableIndexedObjectFactory() {
-		this(new ModifiableIndexedObjectBaseFactory());
+	NullableModifiableIndexedObjectFactory(
+			ModifiableIndexedObject.Factory delegate) {
+		this.delegate_ = delegate;
 	}
 
-	<F extends CachedIndexedSubObject.Factory & ModifiableIndexedObject.Factory> NullableModifiableIndexedObjectFactory(
-			F delegate) {
-		super(delegate);
-		this.delegate_ = delegate;
+	@Override
+	public ModifiableIndexedClass getIndexedClass(ElkClass elkClass) {
+		return delegate_.getIndexedClass(elkClass);
+	}
+
+	@Override
+	public ModifiableIndexedClassExpressionList getIndexedClassExpressionList(
+			List<? extends ModifiableIndexedClassExpression> members) {
+		for (ModifiableIndexedClassExpression member : members) {
+			if (member == null) {
+				return null;
+			}
+		}
+		// else
+		return delegate_.getIndexedClassExpressionList(members);
+	}
+
+	@Override
+	public ModifiableIndexedComplexPropertyChain getIndexedComplexPropertyChain(
+			ModifiableIndexedObjectProperty leftProperty,
+			ModifiableIndexedPropertyChain rightProperty) {
+		if (leftProperty == null || rightProperty == null) {
+			return null;
+		}
+		return delegate_.getIndexedComplexPropertyChain(leftProperty,
+				rightProperty);
+	}
+
+	@Override
+	public ModifiableIndexedDataHasValue getIndexedDataHasValue(
+			ElkDataHasValue elkDataHasValue) {
+		return delegate_.getIndexedDataHasValue(elkDataHasValue);
 	}
 
 	@Override
@@ -97,6 +139,49 @@ class NullableModifiableIndexedObjectFactory
 	}
 
 	@Override
+	public ModifiableIndexedIndividual getIndexedIndividual(
+			ElkNamedIndividual elkNamedIndividual) {
+		return delegate_.getIndexedIndividual(elkNamedIndividual);
+	}
+
+	@Override
+	public ModifiableIndexedObjectComplementOf getIndexedObjectComplementOf(
+			ModifiableIndexedClassExpression negated) {
+		if (negated == null) {
+			return null;
+		}
+		// else
+		return delegate_.getIndexedObjectComplementOf(negated);
+	}
+
+	@Override
+	public ModifiableIndexedObjectHasSelf getIndexedObjectHasSelf(
+			ModifiableIndexedObjectProperty property) {
+		if (property == null) {
+			return null;
+		}
+		// else
+		return delegate_.getIndexedObjectHasSelf(property);
+	}
+
+	@Override
+	public ModifiableIndexedObjectIntersectionOf getIndexedObjectIntersectionOf(
+			ModifiableIndexedClassExpression conjunctA,
+			ModifiableIndexedClassExpression conjunctB) {
+		if (conjunctA == null || conjunctB == null) {
+			return null;
+		}
+		// else
+		return delegate_.getIndexedObjectIntersectionOf(conjunctA, conjunctB);
+	}
+
+	@Override
+	public ModifiableIndexedObjectProperty getIndexedObjectProperty(
+			ElkObjectProperty elkObjectProperty) {
+		return delegate_.getIndexedObjectProperty(elkObjectProperty);
+	}
+
+	@Override
 	public ModifiableIndexedObjectPropertyRangeAxiom getIndexedObjectPropertyRangeAxiom(
 			ElkAxiom originalAxiom, ModifiableIndexedObjectProperty property,
 			ModifiableIndexedClassExpression range) {
@@ -106,6 +191,29 @@ class NullableModifiableIndexedObjectFactory
 		// else
 		return delegate_.getIndexedObjectPropertyRangeAxiom(originalAxiom,
 				property, range);
+	}
+
+	@Override
+	public ModifiableIndexedObjectSomeValuesFrom getIndexedObjectSomeValuesFrom(
+			ModifiableIndexedObjectProperty property,
+			ModifiableIndexedClassExpression filler) {
+		if (property == null || filler == null) {
+			return null;
+		}
+		// else
+		return delegate_.getIndexedObjectSomeValuesFrom(property, filler);
+	}
+
+	@Override
+	public ModifiableIndexedObjectUnionOf getIndexedObjectUnionOf(
+			List<? extends ModifiableIndexedClassExpression> disjuncts) {
+		for (ModifiableIndexedClassExpression disjunct : disjuncts) {
+			if (disjunct == null) {
+				return null;
+			}
+		}
+		// else
+		return delegate_.getIndexedObjectUnionOf(disjuncts);
 	}
 
 	@Override

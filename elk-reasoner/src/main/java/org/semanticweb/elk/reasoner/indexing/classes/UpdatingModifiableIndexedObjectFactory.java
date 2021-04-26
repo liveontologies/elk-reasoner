@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2017 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2021 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,24 +22,12 @@ package org.semanticweb.elk.reasoner.indexing.classes;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingException;
-import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpressionList;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedDeclarationAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedDisjointClassesAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedEntity;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObject;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectPropertyRangeAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedSubClassOfAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
+import org.semanticweb.elk.reasoner.indexing.model.StructuralIndexedSubObject;
 
 /**
  * A {@link ModifiableIndexedObject.Factory} that constructs objects using
@@ -51,87 +39,51 @@ import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
  *
  */
 public class UpdatingModifiableIndexedObjectFactory
-		extends UpdatingCachedIndexedObjectFactory
-		implements ModifiableIndexedObject.Factory {
+		extends ModifiableIndexedObjectBaseFactory {
 
-	private final ModifiableIndexedObject.Factory baseFactory_;
-	
 	private final ModifiableOntologyIndex index_;
-	
+
 	private final OccurrenceIncrement increment_;
 
-	public <F extends CachedIndexedSubObject.Factory & ModifiableIndexedObject.Factory> UpdatingModifiableIndexedObjectFactory(
-			F baseFactory, ModifiableOntologyIndex index,
-			OccurrenceIncrement increment) {
-		super(baseFactory, index, increment);
-		this.baseFactory_ = baseFactory;
+	public UpdatingModifiableIndexedObjectFactory(
+			final ModifiableOntologyIndex index,
+			final OccurrenceIncrement increment) {
 		this.index_ = index;
 		this.increment_ = increment;
 	}
 
 	@Override
-	public ModifiableIndexedDeclarationAxiom getIndexedDeclarationAxiom(
-			ElkAxiom originalAxiom, ModifiableIndexedEntity entity) {
-		return update(
-				baseFactory_.getIndexedDeclarationAxiom(originalAxiom, entity));
+	protected <T extends StructuralIndexedSubObject<T>> T filter(T input) {
+		T result = index_.resolve(input);
+		if (result == null) {
+			result = input;
+		}
+		if (!result.occurs()) {
+			index_.add(result);
+		}
+		if (!result.getIndexingAction(index_, increment_).apply())
+			throw new ElkIndexingException(
+					result.toString() + ": cannot update in Index for "
+							+ increment_ + " occurrences!");
+		if (!result.occurs()) {
+			index_.remove(result);
+		}
+		return result;
 	}
 
 	@Override
-	public ModifiableIndexedDisjointClassesAxiom getIndexedDisjointClassesAxiom(
-			ElkAxiom originalAxiom,
-			ModifiableIndexedClassExpressionList members) {
-		return update(baseFactory_.getIndexedDisjointClassesAxiom(originalAxiom,
-				members));
-	}
-
-	@Override
-	public ModifiableIndexedEquivalentClassesAxiom getIndexedEquivalentClassesAxiom(
-			ElkAxiom originalAxiom,
-			ModifiableIndexedClassExpression firstMember,
-			ModifiableIndexedClassExpression secondMember) {
-		return update(baseFactory_.getIndexedEquivalentClassesAxiom(
-				originalAxiom, firstMember, secondMember));
-	}
-
-	@Override
-	public ModifiableIndexedObjectPropertyRangeAxiom getIndexedObjectPropertyRangeAxiom(
-			ElkAxiom originalAxiom, ModifiableIndexedObjectProperty property,
-			ModifiableIndexedClassExpression range) {
-		return update(baseFactory_.getIndexedObjectPropertyRangeAxiom(
-				originalAxiom, property, range));
-	}
-
-	@Override
-	public ModifiableIndexedSubClassOfAxiom getIndexedSubClassOfAxiom(
-			ElkAxiom originalAxiom, ModifiableIndexedClassExpression subClass,
-			ModifiableIndexedClassExpression superClass) {
-		return update(baseFactory_.getIndexedSubClassOfAxiom(originalAxiom,
-				subClass, superClass));
-	}
-
-	@Override
-	public ModifiableIndexedSubObjectPropertyOfAxiom getIndexedSubObjectPropertyOfAxiom(
-			ElkAxiom originalAxiom,
-			ModifiableIndexedPropertyChain subPropertyChain,
-			ModifiableIndexedObjectProperty superProperty) {
-		return update(baseFactory_.getIndexedSubObjectPropertyOfAxiom(
-				originalAxiom, subPropertyChain, superProperty));
-	}
-	
-	<T extends ModifiableIndexedAxiom> T update(T input) {
+	protected <T extends ModifiableIndexedAxiom> T filter(T input) {
 		if (increment_.totalIncrement > 0) {
 			for (int i = 0; i < increment_.totalIncrement; i++) {
 				if (!input.addOccurrence(index_))
-					throw new ElkIndexingException(input
-							.toString()
-							+ ": cannot be added to Index!");
+					throw new ElkIndexingException(
+							input.toString() + ": cannot be added to Index!");
 			}
 		}
 		if (increment_.totalIncrement < 0) {
 			for (int i = 0; i < -increment_.totalIncrement; i++) {
 				if (!input.removeOccurrence(index_))
-					throw new ElkIndexingException(input
-							.toString()
+					throw new ElkIndexingException(input.toString()
 							+ ": cannot be removed from Index!");
 			}
 		}

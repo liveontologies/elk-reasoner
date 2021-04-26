@@ -58,7 +58,6 @@ import org.semanticweb.elk.owl.predefined.ElkPolarity;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
 import org.semanticweb.elk.reasoner.completeness.Feature;
 import org.semanticweb.elk.reasoner.completeness.OccurrenceListener;
-import org.semanticweb.elk.reasoner.indexing.classes.ModifiableIndexedObjectBaseFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.ResolvingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.UpdatingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
@@ -198,8 +197,7 @@ public class ElkPolarityExpressionConverterImpl
 			final PredefinedElkClassFactory elkFactory,
 			final ModifiableOntologyIndex index, final int increment) {
 		this(elkFactory,
-				new UpdatingModifiableIndexedObjectFactory(
-						new ModifiableIndexedObjectBaseFactory(), index,
+				new UpdatingModifiableIndexedObjectFactory(index,
 						OccurrenceIncrement.getDualIncrement(increment)),
 				index, increment);
 	}
