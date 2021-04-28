@@ -114,7 +114,7 @@ public class ReasonerStageManager {
 				reasoner);
 
 		this.entailmentQueryStage = new EntailmentQueryStage(reasoner,
-				propertyHierarchyCompositionComputationStage);
+				consistencyCheckingStage);
 
 	}
 }

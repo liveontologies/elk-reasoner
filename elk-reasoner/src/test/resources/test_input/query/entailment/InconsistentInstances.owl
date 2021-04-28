@@ -5,14 +5,17 @@ Prefix(xsd: = <http://www.w3.org/2001/XMLSchema#>)
 Prefix(owl: = <http://www.w3.org/2002/07/owl#>)
 Ontology(
 
+Annotation(rdfs:label "The ontology is inconsistent because class A is inconsistent")
+
 SubClassOf(:A ObjectSomeValuesFrom(:R :B))
 SubClassOf(:B ObjectSomeValuesFrom(:R :C))
 SubClassOf(:C ObjectSomeValuesFrom(:R :D))
 SubClassOf(:D ObjectSomeValuesFrom(:R :A))
 SubClassOf(:D owl:Nothing)
-ClassAssertion(:A :a)
-ClassAssertion(:A :b)
-ClassAssertion(:A :c)
-ClassAssertion(:A :d)
+Declaration(NamedIndividual(:a))
+Declaration(NamedIndividual(:b))
+Declaration(NamedIndividual(:c))
+Declaration(NamedIndividual(:d))
+ClassAssertion(:A :e)
 
 )
