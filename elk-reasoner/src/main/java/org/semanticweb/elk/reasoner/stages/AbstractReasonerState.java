@@ -512,8 +512,6 @@ public abstract class AbstractReasonerState implements TracingProof {
 	private void restoreTaxonomy()
 			throws ElkInconsistentOntologyException, ElkException {
 
-		ruleAndConclusionStats.reset();
-
 		// also restores saturation and cleans the taxonomy if necessary
 		restoreConsistencyCheck();
 		if (consistencyCheckingState.isInconsistent()) {
@@ -1003,6 +1001,19 @@ public abstract class AbstractReasonerState implements TracingProof {
 				.getIncompletenessMonitor(classExpression));
 	}
 
+	
+	/**
+	 * Complete the entailment checking stage and the stages it depends on, if
+	 * it has not been done yet.
+	 * 
+	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
+	 */
+	private void restoreEntailmentCheck() throws ElkException {
+		restoreConsistencyCheck();
+		complete(stageManager.entailmentQueryStage);
+	}
+	
 	/**
 	 * Decides whether the supplied {@code axioms} are entailed by the currently
 	 * loaded ontology.
@@ -1012,17 +1023,13 @@ public abstract class AbstractReasonerState implements TracingProof {
 	 * @return A map from each queried axiom to the
 	 *         {@link VerifiableQueryResult} for that axiom.
 	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
 	 */
 	public synchronized Map<ElkAxiom, VerifiableQueryResult> checkEntailment(
 			final Iterable<? extends ElkAxiom> axioms) throws ElkException {
 
-		entailmentQueryState.registerQueries(axioms);
-
-		restoreSaturation();
-
-		stageManager.entailmentQueryStage.invalidateRecursive();
-		complete(stageManager.entailmentQueryStage);
-
+		entailmentQueryState.registerQueries(axioms);		
+		restoreEntailmentCheck();
 		return entailmentQueryState.isEntailed(axioms);
 	}
 

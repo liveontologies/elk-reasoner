@@ -24,12 +24,10 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Collection;
 
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
-import org.semanticweb.elk.util.collections.Operations;
 
 /**
  * Stage that saturates contexts necessary to answer the pending entailment
@@ -62,15 +60,9 @@ class EntailmentQueryStage extends AbstractReasonerStage {
 
 		final Collection<IndexedContextRoot> queries = reasoner.entailmentQueryState
 				.getNotSaturatedPositivelyIndexedRoots();
-		final Collection<? extends IndexedClassEntity> consistencyTestEntities = reasoner.consistencyCheckingState
-				.getTestEntitites();
-
-		final Collection<IndexedContextRoot> inputs = Operations.getCollection(
-				Operations.concat(queries, consistencyTestEntities),
-				queries.size() + consistencyTestEntities.size());
 
 		this.computation_ = new ClassExpressionSaturation<IndexedContextRoot>(
-				inputs, reasoner.getProcessExecutor(), workerNo,
+				queries, reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(),
 				new RuleApplicationAdditionFactory<RuleApplicationInput>(
 						reasoner.getInterrupter(), reasoner.saturationState));
