@@ -21,8 +21,8 @@
  */
 package org.semanticweb.elk.reasoner.tracing;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -216,7 +216,7 @@ public class TracingSaturationTest {
 		final ElkObjectProperty r = factory
 				.getObjectProperty(new ElkFullIri("http://example.org/R"));
 
-		final Set<ElkAxiom> initial = new HashSet<ElkAxiom>();
+		final List<ElkAxiom> initial = new ArrayList<ElkAxiom>();
 		initial.add(factory.getSubClassOfAxiom(b, c));
 
 		final Reasoner reasoner = TestReasonerUtils.loadAndClassify(initial);

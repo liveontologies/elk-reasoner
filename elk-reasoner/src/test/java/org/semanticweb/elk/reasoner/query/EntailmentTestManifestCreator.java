@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
@@ -68,7 +67,7 @@ public class EntailmentTestManifestCreator implements
 
 			if (urls.size() >= 2 && urls.get(1) != null) {
 				entailedIS = urls.get(1).openStream();
-				final Set<ElkAxiom> entailed = TestReasonerUtils
+				final List<ElkAxiom> entailed = TestReasonerUtils
 						.loadAxioms(entailedIS);
 				query.addAll(entailed);
 				for (final ElkAxiom elkAxiom : entailed) {
@@ -78,7 +77,7 @@ public class EntailmentTestManifestCreator implements
 			}
 			if (urls.size() >= 3 && urls.get(2) != null) {
 				notEntailedIS = urls.get(2).openStream();
-				final Set<ElkAxiom> notEntailed = TestReasonerUtils
+				final List<ElkAxiom> notEntailed = TestReasonerUtils
 						.loadAxioms(notEntailedIS);
 				query.addAll(notEntailed);
 				for (final ElkAxiom elkAxiom : notEntailed) {

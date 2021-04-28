@@ -27,8 +27,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
@@ -172,11 +172,11 @@ public class TestReasonerUtils {
 	public static Reasoner createTestReasoner(
 			final ReasonerInterrupter interrupter,
 			final ReasonerConfiguration config) {
-		return new ReasonerFactory().createReasoner(interrupter,
+		return ReasonerFactory.createReasoner(interrupter,
 				DEFAULT_STAGE_EXECUTOR, config);
 	}
 
-	public static Reasoner loadAndClassify(Set<? extends ElkAxiom> ontology)
+	public static Reasoner loadAndClassify(List<? extends ElkAxiom> ontology)
 			throws Exception {
 
 		TestChangesLoader initialLoader = new TestChangesLoader();
@@ -196,12 +196,12 @@ public class TestReasonerUtils {
 		return reasoner;
 	}
 
-	public static Set<ElkAxiom> loadAxioms(InputStream stream)
+	public static List<ElkAxiom> loadAxioms(InputStream stream)
 			throws IOException, Owl2ParseException {
 		return loadAxioms(new InputStreamReader(stream));
 	}
 
-	public static Set<? extends ElkAxiom> loadAxioms(String resource)
+	public static List<? extends ElkAxiom> loadAxioms(String resource)
 			throws Exception {
 		try (InputStream stream = TestReasonerUtils.class.getClassLoader()
 				.getResourceAsStream(resource)) {
@@ -209,18 +209,18 @@ public class TestReasonerUtils {
 		}
 	}
 
-	public static Set<? extends ElkAxiom> loadAxioms(File file)
+	public static List<? extends ElkAxiom> loadAxioms(File file)
 			throws Exception {
 		try (InputStream stream = new FileInputStream(file)) {
 			return loadAxioms(stream);
 		}
 	}
 
-	public static Set<ElkAxiom> loadAxioms(Reader reader)
+	public static List<ElkAxiom> loadAxioms(Reader reader)
 			throws IOException, Owl2ParseException {
 		Owl2Parser parser = new Owl2FunctionalStyleParserFactory()
 				.getParser(reader);
-		final Set<ElkAxiom> axioms = new HashSet<ElkAxiom>();
+		final List<ElkAxiom> axioms = new ArrayList<ElkAxiom>();
 
 		parser.accept(new Owl2ParserAxiomProcessor() {
 
