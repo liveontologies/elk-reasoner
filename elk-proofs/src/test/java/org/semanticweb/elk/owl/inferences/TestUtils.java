@@ -21,6 +21,7 @@
  */
 package org.semanticweb.elk.owl.inferences;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.liveontologies.puli.InferenceDerivabilityChecker;
@@ -46,7 +47,7 @@ public class TestUtils {
 			.getLogger(TestUtils.class);
 
 	public static Set<? extends ElkAxiom> getNonDerivable(Reasoner reasoner,
-			Set<? extends ElkAxiom> ontology, ElkObject.Factory factory,
+			Collection<? extends ElkAxiom> ontology, ElkObject.Factory factory,
 			ElkAxiom goal) throws ElkException {
 		Proof<ElkInference> elkInferences = ReasonerElkProof.create(reasoner,
 				goal, factory);
@@ -61,7 +62,7 @@ public class TestUtils {
 	}
 
 	public static void provabilityTest(Reasoner reasoner,
-			Set<? extends ElkAxiom> ontology, ElkObject.Factory factory,
+			Collection<? extends ElkAxiom> ontology, ElkObject.Factory factory,
 			ElkAxiom goal) throws ElkException {
 
 		LOGGER_.debug("Provability test: {}", goal);

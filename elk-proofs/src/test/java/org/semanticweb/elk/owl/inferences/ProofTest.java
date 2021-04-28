@@ -26,8 +26,8 @@ import static org.junit.Assume.assumeTrue;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -90,7 +90,7 @@ public class ProofTest {
 	@Test
 	public void provabilityTest() throws Exception {
 		// to save all loaded axioms
-		final Set<ElkAxiom> ontology = TestReasonerUtils
+		final Collection<ElkAxiom> ontology = TestReasonerUtils
 				.loadAxioms(manifest.getInput().getUrl().openStream());
 		final TestLoader loader = new TestLoader(ontology);
 
@@ -105,7 +105,7 @@ public class ProofTest {
 	}
 
 	private TracingTestVisitor getTestingVisitor(final Reasoner reasoner,
-			final Set<ElkAxiom> ontology) {
+			final Collection<ElkAxiom> ontology) {
 		return new TracingTestVisitor() {
 
 			private final ElkObject.Factory factory_ = new ElkObjectEntityRecyclingFactory();

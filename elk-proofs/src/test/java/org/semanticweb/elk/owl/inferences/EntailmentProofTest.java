@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.ElkTestUtils;
@@ -105,7 +104,7 @@ public class EntailmentProofTest
 			try {
 				entailedIS = urls.get(1).openStream();
 
-				final Set<ElkAxiom> query = TestReasonerUtils
+				final Collection<ElkAxiom> query = TestReasonerUtils
 						.loadAxioms(entailedIS);
 
 				final Collection<QueryTestManifest<ElkAxiom, ElkQueryDerivabilityTestOutput>> manifests = new ArrayList<QueryTestManifest<ElkAxiom, ElkQueryDerivabilityTestOutput>>(
