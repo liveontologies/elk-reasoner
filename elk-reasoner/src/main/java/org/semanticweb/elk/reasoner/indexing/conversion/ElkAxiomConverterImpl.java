@@ -87,7 +87,6 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpress
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObject;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
@@ -170,7 +169,6 @@ public class ElkAxiomConverterImpl extends NoOpElkAnnotationAxiomConverter<Void>
 		@Override
 		public void indexNary(ElkDisjointClassesAxiom axiom,
 				ModifiableIndexedClassExpressionList members) {
-
 			axiomInferenceFactory_
 					.getElkDisjointClassesAxiomNaryConversion(axiom, members);
 		}
@@ -405,9 +403,6 @@ public class ElkAxiomConverterImpl extends NoOpElkAnnotationAxiomConverter<Void>
 	private <A extends ElkAxiom, M extends ElkObject> void indexDisjointMembers(
 			DisjointnessIndexer<A, M> indexer, A axiom,
 			List<? extends M> members) {
-		/* index (possibly implicit) positive occurrence of owl:Nothing */
-		ModifiableIndexedClass indexedOwlNothing = positiveFactory_
-				.getIndexedClass(elkFactory_.getOwlNothing());
 		/*
 		 * for many disjoint members, convert natively
 		 */
@@ -424,6 +419,8 @@ public class ElkAxiomConverterImpl extends NoOpElkAnnotationAxiomConverter<Void>
 		 * otherwise create a binary disjointness axioms for all pairs (first,
 		 * second) where second occurs after the first in the member list
 		 */
+		ModifiableIndexedClass indexedOwlNothing = positiveFactory_
+				.getIndexedClass(elkFactory_.getOwlNothing());
 		for (int firstPos = 0; firstPos < members.size(); firstPos++) {
 			M first = members.get(firstPos);
 			ModifiableIndexedClassExpression firstIndexed = indexer
@@ -489,6 +486,8 @@ public class ElkAxiomConverterImpl extends NoOpElkAnnotationAxiomConverter<Void>
 	public Void visit(ElkDifferentIndividualsAxiom axiom) {
 		indexDisjointMembers(elkDifferentIndividualsAxiomDisjointnessIndexer,
 				axiom, axiom.getIndividuals());
+		occurrenceListener_.occurrenceChanged(Feature.DIFFERENT_INDIVIDUALS,
+				increment_);
 		return null;
 	}
 

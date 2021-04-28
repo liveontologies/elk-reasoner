@@ -1,0 +1,10 @@
+Prefix(: = <http://example.org/>)
+Prefix(rdfs: = <http://www.w3.org/2000/01/rdf-schema#>)
+Prefix(owl: = <http://www.w3.org/2002/07/owl#>)
+Ontology(
+
+Annotation(rdfs:label "testing inconsistency caused by ObjectComplementOf")
+
+SubClassOf(owl:Thing :A)
+SubClassOf(owl:Thing ObjectComplementOf(:A))
+)

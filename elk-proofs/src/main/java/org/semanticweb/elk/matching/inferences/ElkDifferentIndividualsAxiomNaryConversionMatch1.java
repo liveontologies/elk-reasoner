@@ -52,7 +52,7 @@ public class ElkDifferentIndividualsAxiomNaryConversionMatch1 extends
 		List<ElkClassExpression> disjoint = new ArrayList<ElkClassExpression>(
 				size);
 		for (int i = 0; i < size; i++) {
-			disjoint.set(i, factory.getObjectOneOf(different.get(i)));
+			disjoint.add(factory.getObjectOneOf(different.get(i)));
 		}
 		return factory.getIndexedDisjointClassesAxiomMatch2(
 				factory.getIndexedDisjointClassesAxiomMatch1(

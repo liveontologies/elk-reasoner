@@ -231,15 +231,8 @@ public class ConsistencyCheckingState {
 		}
 		return size;
 	}
-
-	public boolean isTriviallyConsistent() {
-		return !saturationState_.getOntologyIndex().hasPositiveOwlNothing();
-	}
 	
 	public Collection<? extends IndexedClassEntity> getTestEntitites() {
-		if (isTriviallyConsistent()) {
-			return Collections.emptyList();
-		}
 		int size = pruneToDo();
 		// since getting the size of the queue is a linear operation,
 		// use the computed size
