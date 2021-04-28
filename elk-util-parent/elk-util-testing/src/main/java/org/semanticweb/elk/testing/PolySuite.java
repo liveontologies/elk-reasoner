@@ -59,6 +59,7 @@ import org.junit.runners.model.TestClass;
  */
 public class PolySuite extends Suite {
 
+	
   // //////////////////////////////
   // Public helper interfaces
 
@@ -110,8 +111,9 @@ public class PolySuite extends Suite {
 		for (final Configuration child : configuration.getChildren()) {
 			runners.add(new PolySuite(klass, child));
 		}
+		int index = 0;
 		for (final TestManifest<?> manifest : configuration.getManifests()) {
-			runners.add(new SingleRunner(klass, manifest, manifest.getName()));
+			runners.add(new SingleRunner(index++, klass, manifest, manifest.getName()));
 		}
 		return runners;
 	}
@@ -148,17 +150,21 @@ public class PolySuite extends Suite {
     }
     return method;
   }
-
+  
+    	
   // //////////////////////////////
   // Helper classes
 
   private static class SingleRunner extends BlockJUnit4ClassRunner {
 
+	static final private int NAME_LENGTH_LIMIT = 100;  
+	private final int index;  
     private final Object testVal;
     private final String testName;
 
-    SingleRunner(Class<?> testClass, Object testVal, String testName) throws InitializationError {
+    SingleRunner(int index, Class<?> testClass, Object testVal, String testName) throws InitializationError {
       super(testClass);
+      this.index = index;
       this.testVal = testVal;
       this.testName = testName;
     }
@@ -169,20 +175,30 @@ public class PolySuite extends Suite {
     }
 
     @Override
-    protected String getName() {
+	protected String getName() {
 		/*
-		 * Replacing the parentheses is a workaround, so that Eclipse
-		 * displays the whole test name. Otherwise Eclipse cuts everything
-		 * before the last '(' and after the last ')'.
+		 * Replacing the parentheses is a workaround, so that Eclipse displays
+		 * the whole test name. Otherwise Eclipse cuts everything before the
+		 * last '(' and after the last ')'.
 		 */
-      return testName.replace('(', '{').replace(')', '}');
-    }
+		String name = testName.replace('(', '{').replace(')', '}');		
+		return truncate(name);
+	}
 
     @Override
     protected String testName(FrameworkMethod method) {
-      return method.getName() + ": " + testName;
+      return truncate(method.getName() + ": " + testName);
     }
 
+	/** truncate long names, preserving inequality if possible */
+	private String truncate(String name) {
+		String suffix = " ..." + index;
+		if (name.length() + suffix.length() > NAME_LENGTH_LIMIT) {			
+			name = name.substring(0, NAME_LENGTH_LIMIT - suffix.length());
+		}
+		return name + suffix;
+	}
+    
     @Override
     protected void validateConstructor(List<Throwable> errors) {
       validateOnlyOneConstructor(errors);
