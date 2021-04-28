@@ -61,6 +61,8 @@ public enum Feature {
 	//
 	DATATYPE_DEFINITION("DatatypeDefinition"),
 	//
+	DIFFERENT_INDIVIDUALS("DifferentIndividuals"),
+	//
 	DISJOINT_CLASSES("DisjointClasses"),
 	//
 	DISJOINT_DATA_PROPERTIES("DisjointDataProperties"),

@@ -55,18 +55,6 @@ public interface OntologyIndex extends IndexedObjectCache {
 	LinkedContextInitRule getContextInitRuleHead();
 
 	/**
-	 * @return {@code true} if {@code owl:Thing} occurs negatively in the
-	 *         ontology represented by this {@link OntologyIndex}
-	 */
-	boolean hasNegativeOwlThing();
-
-	/**
-	 * @return {@code true} if {@code owl:Nothing} occurs positively in the
-	 *         ontology represented by this {@link OntologyIndex}
-	 */
-	boolean hasPositiveOwlNothing();
-
-	/**
 	 * Registers a given {@link ChangeListener} with this {@link OntologyIndex}
 	 * 
 	 * @param listener

@@ -102,16 +102,6 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl
 	}
 
 	@Override
-	public final boolean hasNegativeOwlThing() {
-		return getOwlThing().occursNegatively();
-	}
-
-	@Override
-	public final boolean hasPositiveOwlNothing() {
-		return getOwlNothing().occursPositively();
-	}
-
-	@Override
 	public boolean tryAddDefinition(ModifiableIndexedClass target,
 			ModifiableIndexedClassExpression definition, ElkAxiom reason) {
 		return target.setDefinition(definition, reason);

@@ -22,10 +22,16 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import java.util.Collections;
+
+import org.semanticweb.elk.reasoner.completeness.Feature;
+import org.semanticweb.elk.reasoner.completeness.OccurrencesInOntology;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ReasonerStage} during which consistency of the current ontology is
@@ -35,6 +41,10 @@ import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationIn
  * 
  */
 class ConsistencyCheckingStage extends AbstractReasonerStage {
+	
+	// logger for this class
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(ConsistencyCheckingStage.class);
 
 	/**
 	 * the computation used for this stage
@@ -54,14 +64,31 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	@Override
 	public boolean preExecute() {
 		if (!super.preExecute())
-			return false;
+			return false;		
 		this.computation = new ClassExpressionSaturation<IndexedClassEntity>(
-				reasoner.consistencyCheckingState.getTestEntitites(),
+				isTriviallyConsistent() ? Collections.emptyList()
+						: reasoner.consistencyCheckingState.getTestEntitites(),
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(),
 				new RuleApplicationAdditionFactory<RuleApplicationInput>(
 						reasoner.getInterrupter(), reasoner.saturationState));
 		return true;
+	}
+	
+	boolean isTriviallyConsistent() {
+		OccurrencesInOntology occurrences = reasoner.getOccurrencesInOntology();
+		if (
+		occurrences.getOccurrenceCount(Feature.OWL_NOTHING_POSITIVE) == 0
+				&& occurrences.getOccurrenceCount(Feature.DIFFERENT_INDIVIDUALS) == 0
+				&& occurrences.getOccurrenceCount(Feature.DISJOINT_CLASSES) == 0	
+				&& occurrences.getOccurrenceCount(Feature.DISJOINT_UNION) == 0
+				&& occurrences.getOccurrenceCount(
+						Feature.OBJECT_COMPLEMENT_OF_POSITIVE) == 0) {
+			LOGGER_.debug("The ontology is trivially consistent");
+			return true;
+		}
+		// else
+		return false;
 	}
 
 	@Override
