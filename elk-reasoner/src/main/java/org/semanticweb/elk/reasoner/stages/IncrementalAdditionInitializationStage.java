@@ -40,8 +40,8 @@ import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.classes.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinedClass;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
@@ -79,8 +79,8 @@ public class IncrementalAdditionInitializationStage
 		DifferentialIndex diffIndex = reasoner.ontologyIndex;
 		LinkedContextInitRule changedInitRules = null;
 		Map<? extends IndexedClassExpression, ? extends LinkedSubsumerRule> changedRulesByCE = null;
-		Map<? extends IndexedClass, ? extends IndexedClassExpression> changedDefinitions = null;
-		Map<? extends IndexedClass, ? extends ElkAxiom> changedDefinitionReasons = null;
+		Map<? extends IndexedDefinedClass, ? extends IndexedClassExpression> changedDefinitions = null;
+		Map<? extends IndexedDefinedClass, ? extends ElkAxiom> changedDefinitionReasons = null;
 		Collection<ArrayList<Context>> inputs = Collections.emptyList();
 		ContextCreationListener contextCreationListener = SaturationUtils
 				.addStatsToContextCreationListener(

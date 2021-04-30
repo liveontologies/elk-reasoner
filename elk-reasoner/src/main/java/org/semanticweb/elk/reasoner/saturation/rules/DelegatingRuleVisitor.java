@@ -1,12 +1,12 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
 
-/*
+/*-
  * #%L
- * ELK Reasoner
+ * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2021 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,16 +22,17 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedPredefinedClass;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -160,7 +161,7 @@ public class DelegatingRuleVisitor<O> implements RuleVisitor<O> {
 	}
 
 	@Override
-	public O visit(IndexedClassDecompositionRule rule, IndexedClass premise,
+	public O visit(IndexedClassDecompositionRule rule, IndexedDefinedClass premise,
 			ContextPremises premises, ClassInferenceProducer producer) {
 		return visitor_.visit(rule, premise, premises, producer);
 	}
@@ -229,7 +230,7 @@ public class DelegatingRuleVisitor<O> implements RuleVisitor<O> {
 	}
 
 	@Override
-	public O visit(OwlNothingDecompositionRule rule, IndexedClass premise,
+	public O visit(OwlNothingDecompositionRule rule, IndexedPredefinedClass premise,
 			ContextPremises premises, ClassInferenceProducer producer) {
 		return visitor_.visit(rule, premise, premises, producer);
 	}

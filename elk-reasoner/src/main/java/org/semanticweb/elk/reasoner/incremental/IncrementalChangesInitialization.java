@@ -28,8 +28,8 @@ import java.util.Map;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinedClass;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -57,8 +57,8 @@ public class IncrementalChangesInitialization
 			final InterruptMonitor interrupter,
 			LinkedContextInitRule changedInitRules,
 			Map<? extends IndexedClassExpression, ? extends LinkedSubsumerRule> changedCompositionRules,
-			Map<? extends IndexedClass, ? extends IndexedClassExpression> changedDefinitions,
-			Map<? extends IndexedClass, ? extends ElkAxiom> changedDefinitionReasons,
+			Map<? extends IndexedDefinedClass, ? extends IndexedClassExpression> changedDefinitions,
+			Map<? extends IndexedDefinedClass, ? extends ElkAxiom> changedDefinitionReasons,
 			SaturationState<?> state, ConcurrentExecutor executor,
 			SaturationStatistics stageStats, int maxWorkers,
 			ProgressMonitor progressMonitor) {

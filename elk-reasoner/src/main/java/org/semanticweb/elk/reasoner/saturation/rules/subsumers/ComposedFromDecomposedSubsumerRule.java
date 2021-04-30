@@ -56,7 +56,8 @@ public class ComposedFromDecomposedSubsumerRule extends
 	@Override
 	public void apply(IndexedClassEntity premise, ContextPremises premises,
 			ClassInferenceProducer producer) {
-		producer.produce(new SubClassInclusionComposedEntity(premises.getRoot(), premise));
+		producer.produce(new SubClassInclusionComposedEntity(premises.getRoot(),
+				premise));
 	}
 
 	@Override

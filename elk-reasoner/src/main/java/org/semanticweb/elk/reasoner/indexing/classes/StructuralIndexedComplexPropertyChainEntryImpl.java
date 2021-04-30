@@ -76,23 +76,23 @@ final class StructuralIndexedComplexPropertyChainEntryImpl extends
 	public RevertibleAction getIndexingAction(ModifiableOntologyIndex index,
 			OccurrenceIncrement increment) {
 		return RevertibleAction
-				.create(() -> totalOccurrenceNo == 0
+				.create(() -> !occurs()
 						&& increment.totalIncrement > 0,
 						() -> suffixChain_.addRightChain(this),
 						() -> suffixChain_.removeRightChain(this))
 				.then(RevertibleAction.create(
-						() -> totalOccurrenceNo == 0
+						() -> !occurs()
 								&& increment.totalIncrement > 0,
 						() -> firstProperty_.addLeftChain(this),
 						() -> firstProperty_.removeLeftChain(this)))
 				.then(super.getIndexingAction(index, increment))
 				.then(RevertibleAction.create(
-						() -> totalOccurrenceNo == 0
+						() -> !occurs()
 								&& increment.totalIncrement < 0,
 						() -> suffixChain_.removeRightChain(this),
 						() -> suffixChain_.addRightChain(this)))
 				.then(RevertibleAction.create(
-						() -> totalOccurrenceNo == 0
+						() -> !occurs()
 								&& increment.totalIncrement < 0,
 						() -> firstProperty_.removeLeftChain(this),
 						() -> firstProperty_.addLeftChain(this)))

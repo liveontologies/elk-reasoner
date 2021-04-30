@@ -72,7 +72,7 @@ class ModifiableIndexedObjectSomeValuesFromImpl extends
 	public RevertibleAction getIndexingAction(ModifiableOntologyIndex index,
 			OccurrenceIncrement increment) {
 		return RevertibleAction
-				.create(() -> negativeOccurrenceNo == 0
+				.create(() -> !occursNegatively()
 						&& increment.negativeIncrement > 0,
 						() -> PropagationFromExistentialFillerRule
 								.addRuleFor(this, index),
@@ -80,7 +80,7 @@ class ModifiableIndexedObjectSomeValuesFromImpl extends
 								.removeRuleFor(this, index))
 				.then(super.getIndexingAction(index, increment))
 				.then(RevertibleAction.create(
-						() -> negativeOccurrenceNo == 0
+						() -> !occursNegatively()
 								&& increment.negativeIncrement < 0,
 						() -> PropagationFromExistentialFillerRule
 								.removeRuleFor(this, index),

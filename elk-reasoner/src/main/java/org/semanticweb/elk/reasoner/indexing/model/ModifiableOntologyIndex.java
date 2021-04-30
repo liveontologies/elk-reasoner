@@ -94,12 +94,12 @@ public interface ModifiableOntologyIndex
 
 	/**
 	 * Tries to set the given {@link IndexedClassExpression} as definition for
-	 * the given target {@link ModifiableIndexedClass}. There can be at most one
-	 * definition set for each {@link ModifiableIndexedClass}.
+	 * the given target {@link ModifiableIndexedDefinedClass}. There can be at
+	 * most one definition set for each {@link ModifiableIndexedDefinedClass}.
 	 * 
 	 * @param target
-	 *            the {@link ModifiableIndexedClass} for which to add a new
-	 *            definition
+	 *            the {@link ModifiableIndexedDefinedClass} for which to add a
+	 *            new definition
 	 * @param definition
 	 *            the {@link ModifiableIndexedClassExpression} to be added as
 	 *            the definition
@@ -109,29 +109,29 @@ public interface ModifiableOntologyIndex
 	 * @return {@code true} if the definition was set and {@code false} if this
 	 *         operation was not successful
 	 */
-	boolean tryAddDefinition(ModifiableIndexedClass target,
+	boolean tryAddDefinition(ModifiableIndexedDefinedClass target,
 			ModifiableIndexedClassExpression definition, ElkAxiom reason);
 
 	/**
 	 * Tries to remove the given {@link IndexedClassExpression} from the
-	 * definition of the given target {@link ModifiableIndexedClass}. The
+	 * definition of the given target {@link ModifiableIndexedDefinedClass}. The
 	 * definition is removed if it is set for exactly the given
 	 * {@link IndexedClassExpression}
 	 * 
 	 * @param target
-	 *            the {@link ModifiableIndexedClass} for which to remove the
-	 *            definition
+	 *            the {@link ModifiableIndexedDefinedClass} for which to remove
+	 *            the definition
 	 * @param definition
 	 *            the {@link ModifiableIndexedClassExpression} that was defined
-	 *            for the given {@link ModifiableIndexedClass} and should be now
-	 *            removed
+	 *            for the given {@link ModifiableIndexedDefinedClass} and should
+	 *            be now removed
 	 * @param reason
 	 *            the {@link ElkAxiom} from which the removed definition
 	 *            originates
 	 * @return {@code true} if the definition was removed and {@code false} if
 	 *         this operation was not successful
 	 */
-	boolean tryRemoveDefinition(ModifiableIndexedClass target,
+	boolean tryRemoveDefinition(ModifiableIndexedDefinedClass target,
 			ModifiableIndexedClassExpression definition, ElkAxiom reason);
 
 	

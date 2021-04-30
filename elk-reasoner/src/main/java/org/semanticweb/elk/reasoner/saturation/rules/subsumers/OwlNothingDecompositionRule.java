@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
  */
 
 import org.semanticweb.elk.owl.predefined.PredefinedElkIris;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedPredefinedClass;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfOwlNothing;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
  * 
  */
 public class OwlNothingDecompositionRule extends
-		AbstractSubsumerDecompositionRule<IndexedClass> {
+		AbstractSubsumerDecompositionRule<IndexedPredefinedClass> {
 
 	public static final String NAME = "owl:Nothing Decomposition";
 
@@ -52,7 +52,7 @@ public class OwlNothingDecompositionRule extends
 	}
 
 	@Override
-	public void apply(IndexedClass premise,
+	public void apply(IndexedPredefinedClass premise,
 			ContextPremises premises, ClassInferenceProducer producer) {
 		if (premise.getElkEntity().getIri()
 				.equals(PredefinedElkIris.OWL_NOTHING)) {
@@ -68,7 +68,7 @@ public class OwlNothingDecompositionRule extends
 
 	@Override
 	public void accept(SubsumerDecompositionRuleVisitor<?> visitor,
-			IndexedClass premise, ContextPremises premises,
+			IndexedPredefinedClass premise, ContextPremises premises,
 			ClassInferenceProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 

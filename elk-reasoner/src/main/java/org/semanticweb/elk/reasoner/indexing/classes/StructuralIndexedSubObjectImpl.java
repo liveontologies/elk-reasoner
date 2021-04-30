@@ -22,12 +22,18 @@
  */
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import org.semanticweb.elk.RevertibleAction;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedSubObject;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.indexing.model.StructuralIndexedSubObject;
 import org.semanticweb.elk.util.collections.entryset.Entry;
 import org.semanticweb.elk.util.collections.entryset.EntryCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implements {@link StructuralIndexedSubObject} and {@link Entry} so that these
@@ -46,17 +52,61 @@ abstract class StructuralIndexedSubObjectImpl<T extends StructuralIndexedSubObje
 		extends IndexedObjectImpl implements ModifiableIndexedSubObject,
 		StructuralIndexedSubObject<T>, Entry<N> {
 
+	// logger for events
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(StructuralIndexedSubObjectImpl.class);
+	
 	/**
 	 * The reference to the next element
 	 */
 	private N next_;
 
 	private final int structuralHash_;
+	
+	/**
+	 * This counts how many times this object occurred in the ontology.
+	 */
+	private int totalOccurrenceNo_ = 0;
 
 	StructuralIndexedSubObjectImpl(int structuralHash) {
 		this.structuralHash_ = structuralHash;
 	}
 
+	@Override
+	public final boolean occurs() {
+		return totalOccurrenceNo_ > 0;
+	}
+
+	@Override
+	public String printOccurrenceNumbers() {
+		return "all=" + totalOccurrenceNo_;
+	}
+
+	/**
+	 * verifies that occurrence numbers are not negative
+	 */
+	void checkOccurrenceNumbers() {
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace(
+					toString() + " occurences: " + printOccurrenceNumbers());
+		if (totalOccurrenceNo_ < 0)
+			throw new ElkUnexpectedIndexingException(
+					toString() + " has a negative total occurrence: "
+							+ printOccurrenceNumbers());
+	}	
+	
+	@Override
+	public RevertibleAction getIndexingAction(ModifiableOntologyIndex index,
+			OccurrenceIncrement increment) {
+		return RevertibleAction.create(() -> {
+			totalOccurrenceNo_ += increment.totalIncrement;
+			checkOccurrenceNumbers();
+			return true;
+		}, () -> {
+			totalOccurrenceNo_ -= increment.totalIncrement;
+		});
+	}
+	
 	@Override
 	public final void setNext(N next) {
 		this.next_ = next;

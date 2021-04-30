@@ -26,6 +26,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
@@ -59,19 +60,19 @@ import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
 public class SubClassInclusionExpandedDefinition
 		extends AbstractSubClassInclusionDecomposedInference {
 
-	private final IndexedClass defined_;
+	private final IndexedDefinedClass defined_;
 
 	private final ElkAxiom reason_;
 
 	public SubClassInclusionExpandedDefinition(IndexedContextRoot root,
-			IndexedClass defined, IndexedClassExpression definition,
+			IndexedDefinedClass defined, IndexedClassExpression definition,
 			ElkAxiom reason) {
 		super(root, definition);
 		this.defined_ = defined;
 		this.reason_ = reason;
 	}
 
-	public IndexedClass getDefinedClass() {
+	public IndexedDefinedClass getDefinedClass() {
 		return defined_;
 	}
 

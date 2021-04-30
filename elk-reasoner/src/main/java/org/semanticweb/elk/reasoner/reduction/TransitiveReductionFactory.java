@@ -333,13 +333,19 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				updateTransitiveReductionState(state, candidate);
 			}
 
+			/*
+			 * if owl:Thing does not occur negatively, it does not appear in
+			 * composed subsumers and is equivalent only to itself
+			 * 
+			 */
+			if (state.rootEquivalent.isEmpty()
+					&& owlThing_.equals(state.initiatorJob.getInput())) {
+				state.rootEquivalent.add(owlThing_.getElkEntity());
+			}
+			
 			/* When all candidates are processed, the output is computed */
 			TransitiveReductionOutputEquivalentDirect<R> output = computeOutput(
 					state);
-
-			// if (output.equivalent.isEmpty()) {
-			// LOGGER_.error("{}: empty equivalent class!", output.getRoot());
-			// }
 
 			state.initiatorJob.setOutput(output);
 			listener_.notifyFinished(state.initiatorJob);

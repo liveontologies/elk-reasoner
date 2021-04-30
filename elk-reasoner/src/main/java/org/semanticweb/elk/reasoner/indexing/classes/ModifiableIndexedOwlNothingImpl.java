@@ -26,6 +26,9 @@ import org.semanticweb.elk.RevertibleAction;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.completeness.Feature;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedPredefinedClass;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 
@@ -35,9 +38,11 @@ import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
  * @author Yevgeny Kazakov
  *
  */
-final class OwlNothingImpl extends StructuralIndexedClassEntryImpl {
+final class ModifiableIndexedOwlNothingImpl
+		extends StructuralIndexedClassEntryImpl
+		implements ModifiableIndexedClass, IndexedPredefinedClass {
 
-	OwlNothingImpl(ElkClass entity) {
+	ModifiableIndexedOwlNothingImpl(ElkClass entity) {
 		super(entity);
 	}
 
@@ -51,6 +56,11 @@ final class OwlNothingImpl extends StructuralIndexedClassEntryImpl {
 					return true;
 				}, () -> index.occurrenceChanged(Feature.OWL_NOTHING_POSITIVE,
 						-increment.positiveIncrement)));
+	}
+
+	@Override
+	public <O> O accept(IndexedClassEntity.Visitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 }

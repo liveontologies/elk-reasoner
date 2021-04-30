@@ -24,13 +24,13 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIris;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDeclarationAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObject;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectComplementOf;
@@ -40,6 +40,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectPropertyRangeAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectUnionOf;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedPredefinedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedRangeFiller;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxiom;
@@ -61,15 +62,20 @@ public class IndexedObjectPrinter implements IndexedObject.Visitor<String> {
 	}
 
 	// TODO: parentheses and precedence of symbols
-
+	
 	@Override
-	public String visit(IndexedClass element) {
+	public String visit(IndexedDefinedClass element) {
+		return element.getElkEntity().toString();
+	}
+	
+	@Override
+	public String visit(IndexedPredefinedClass element) {
 		ElkClass entity = element.getElkEntity();
-		if (entity.getIri().equals(PredefinedElkIris.OWL_THING)) {
+		if (PredefinedElkIris.OWL_THING.equals(entity.getIri())) {
 			return "⊤";
 		}
 		// else
-		if (entity.getIri().equals(PredefinedElkIris.OWL_NOTHING)) {
+		if (PredefinedElkIris.OWL_NOTHING.equals(entity.getIri())) {
 			return "⊥";
 		}
 		// else

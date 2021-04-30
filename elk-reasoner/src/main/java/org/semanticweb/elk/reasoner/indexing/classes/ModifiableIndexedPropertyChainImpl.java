@@ -26,21 +26,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.semanticweb.elk.RevertibleAction;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implements {@link ModifiableIndexedClassEntity}.
@@ -57,10 +50,6 @@ abstract class ModifiableIndexedPropertyChainImpl<T extends ModifiableIndexedPro
 		extends StructuralIndexedSubObjectImpl<T, N>
 		implements ModifiableIndexedPropertyChain {
 
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ModifiableIndexedPropertyChainImpl.class);
-
 	// TODO: move to elk-utils-collections
 	private static ArrayList<?> EMPTY_ARRAY_LIST_ = new ArrayList<Object>(0);
 
@@ -68,11 +57,6 @@ abstract class ModifiableIndexedPropertyChainImpl<T extends ModifiableIndexedPro
 	protected static <T> ArrayList<T> emptyArrayList() {
 		return (ArrayList<T>) EMPTY_ARRAY_LIST_;
 	}
-
-	/**
-	 * This counts how often this object occurred in the ontology.
-	 */
-	int totalOccurrenceNo = 0;
 
 	/**
 	 * The {@link SaturatedPropertyChain} object assigned to this
@@ -102,11 +86,6 @@ abstract class ModifiableIndexedPropertyChainImpl<T extends ModifiableIndexedPro
 	ModifiableIndexedPropertyChainImpl(int structuralHash) {
 		super(structuralHash);
 		this.saturated_ = new SaturatedPropertyChain(this);
-	}
-
-	@Override
-	public final boolean occurs() {
-		return totalOccurrenceNo > 0;
 	}
 
 	@Override
@@ -220,40 +199,7 @@ abstract class ModifiableIndexedPropertyChainImpl<T extends ModifiableIndexedPro
 		}
 		return success;
 	}
-
-	/**
-	 * @return the string representation for the occurrence numbers of this
-	 *         {@link IndexedClassExpression}
-	 */
-	@Override
-	public final String printOccurrenceNumbers() {
-		return "[all=" + totalOccurrenceNo + "]";
-	}
-
-	/**
-	 * verifies that occurrence numbers are not negative
-	 */
-	public final void checkTotalOccurrenceNumbers() {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(this + " occurences: " + printOccurrenceNumbers());
-		if (totalOccurrenceNo < 0)
-			throw new ElkUnexpectedIndexingException(
-					this + " has a negative occurrence: "
-							+ printOccurrenceNumbers());
-	}
-
-	
-	@Override
-	public RevertibleAction getIndexingAction(ModifiableOntologyIndex index,
-			OccurrenceIncrement increment) {
-		return RevertibleAction.create(() -> {
-			totalOccurrenceNo += increment.totalIncrement;
-			checkTotalOccurrenceNumbers(); // TODO: perhaps return false instead
-											// of failing
-			return true;
-		}, () -> totalOccurrenceNo -= increment.totalIncrement);
-	}
-	
+		
 	@Override
 	public final <O> O accept(IndexedSubObject.Visitor<O> visitor) {
 		return accept((IndexedPropertyChain.Visitor<O>) visitor);
