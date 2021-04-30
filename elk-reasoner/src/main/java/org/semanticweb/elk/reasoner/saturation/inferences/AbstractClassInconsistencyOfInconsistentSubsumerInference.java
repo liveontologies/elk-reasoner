@@ -28,11 +28,11 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 
 /**
  * A {@link ClassInconsistency} obtained from a
- * {@link SubClassInclusionComposed} premise.
+ * {@link SubClassInclusionDecomposed} premise.
  * 
  * @author Pavel Klinov
  *
@@ -54,9 +54,9 @@ abstract class AbstractClassInconsistencyOfInconsistentSubsumerInference<S exten
 		return getDestination();
 	}
 
-	public final SubClassInclusionComposed getPremise(
-			SubClassInclusionComposed.Factory factory) {
-		return factory.getSubClassInclusionComposed(getOrigin(),
+	public final SubClassInclusionDecomposed getPremise(
+			SubClassInclusionDecomposed.Factory factory) {
+		return factory.getSubClassInclusionDecomposed(getOrigin(),
 				premiseSubsumer_);
 	}
 

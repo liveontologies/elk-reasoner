@@ -25,7 +25,6 @@ package org.semanticweb.elk.matching;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1Watch;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch2;
 import org.semanticweb.elk.matching.inferences.ClassInconsistencyOfObjectComplementOfMatch2;
-import org.semanticweb.elk.matching.inferences.ClassInconsistencyOfOwlNothingMatch1;
 import org.semanticweb.elk.matching.inferences.DisjointSubsumerFromSubsumerMatch2;
 import org.semanticweb.elk.matching.inferences.InferenceMatch.Factory;
 import org.semanticweb.elk.matching.inferences.PropagationGeneratedMatch1;
@@ -58,12 +57,6 @@ class SubClassInclusionComposedMatch2InferenceVisitor extends
 			ClassInconsistencyOfObjectComplementOfMatch2 inferenceMatch2) {
 		factory.getClassInconsistencyOfObjectComplementOfMatch3(inferenceMatch2,
 				child);
-		return null;
-	}
-
-	@Override
-	public Void visit(ClassInconsistencyOfOwlNothingMatch1 inferenceMatch1) {
-		factory.getClassInconsistencyOfOwlNothingMatch2(inferenceMatch1, child);
 		return null;
 	}
 

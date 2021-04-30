@@ -350,7 +350,7 @@ public class InferenceMatchDelegatingFactory implements InferenceMatch.Factory {
 	@Override
 	public ClassInconsistencyOfOwlNothingMatch2 getClassInconsistencyOfOwlNothingMatch2(
 			ClassInconsistencyOfOwlNothingMatch1 parent,
-			SubClassInclusionComposedMatch2 premiseMatch) {
+			SubClassInclusionDecomposedMatch2 premiseMatch) {
 		return filter(mainFactory_
 				.getClassInconsistencyOfOwlNothingMatch2(parent, premiseMatch));
 	}

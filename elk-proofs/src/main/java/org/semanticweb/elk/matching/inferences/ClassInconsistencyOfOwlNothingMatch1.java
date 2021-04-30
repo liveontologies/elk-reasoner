@@ -24,14 +24,14 @@ package org.semanticweb.elk.matching.inferences;
 
 import org.semanticweb.elk.matching.conclusions.ClassInconsistencyMatch1;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
-import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1Watch;
+import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1;
+import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1Watch;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInconsistencyOfOwlNothing;
 
 public class ClassInconsistencyOfOwlNothingMatch1
 		extends AbstractInferenceMatch<ClassInconsistencyOfOwlNothing>
-		implements SubClassInclusionComposedMatch1Watch {
+		implements SubClassInclusionDecomposedMatch1Watch {
 
 	private final IndexedContextRootMatch originMatch_;
 
@@ -52,11 +52,10 @@ public class ClassInconsistencyOfOwlNothingMatch1
 				getParent().getConclusion(factory), getOriginMatch());
 	}
 
-	public SubClassInclusionComposedMatch1 getPremiseMatch(
+	public SubClassInclusionDecomposedMatch1 getPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getSubClassInclusionComposedMatch1(
-				getParent().getPremise(factory), getOriginMatch(),
-				factory.getOwlNothing());
+		return factory.getSubClassInclusionDecomposedMatch1(
+				getParent().getPremise(factory), getOriginMatch());
 	}
 
 	@Override
@@ -66,7 +65,7 @@ public class ClassInconsistencyOfOwlNothingMatch1
 
 	@Override
 	public <O> O accept(
-			SubClassInclusionComposedMatch1Watch.Visitor<O> visitor) {
+			SubClassInclusionDecomposedMatch1Watch.Visitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

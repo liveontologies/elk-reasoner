@@ -768,12 +768,12 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 
 	@Override
 	public Void visit(ClassInconsistencyOfOwlNothingMatch1 inferenceMatch1) {
-		SubClassInclusionComposedMatch1 premiseMatch1 = inferenceMatch1
+		SubClassInclusionDecomposedMatch1 premiseMatch1 = inferenceMatch1
 				.getPremiseMatch(conclusionFactory_);
 		inferences_.add(premiseMatch1, inferenceMatch1);
-		for (SubClassInclusionComposedMatch2 child : hierarchy_
+		for (SubClassInclusionDecomposedMatch2 child : hierarchy_
 				.getChildren(premiseMatch1)) {
-			(new SubClassInclusionComposedMatch2InferenceVisitor(
+			(new SubClassInclusionDecomposedMatch2InferenceVisitor(
 					inferenceFactory_, child)).visit(inferenceMatch1);
 		}
 		return null;

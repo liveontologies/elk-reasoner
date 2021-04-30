@@ -24,7 +24,7 @@ package org.semanticweb.elk.matching.inferences;
 
 import org.semanticweb.elk.matching.conclusions.ClassInconsistencyMatch2;
 import org.semanticweb.elk.matching.conclusions.ConclusionMatchExpressionFactory;
-import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch2;
+import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch2;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 
 public class ClassInconsistencyOfOwlNothingMatch2
@@ -34,7 +34,7 @@ public class ClassInconsistencyOfOwlNothingMatch2
 
 	ClassInconsistencyOfOwlNothingMatch2(
 			ClassInconsistencyOfOwlNothingMatch1 parent,
-			SubClassInclusionComposedMatch2 premiseMatch) {
+			SubClassInclusionDecomposedMatch2 premiseMatch) {
 		super(parent);
 		this.extendedOriginMatch_ = premiseMatch.getExtendedDestinationMatch();
 		checkEquals(premiseMatch, getPremiseMatch(DEBUG_FACTORY));
@@ -44,10 +44,11 @@ public class ClassInconsistencyOfOwlNothingMatch2
 		return extendedOriginMatch_;
 	}
 
-	SubClassInclusionComposedMatch2 getPremiseMatch(
+	SubClassInclusionDecomposedMatch2 getPremiseMatch(
 			ConclusionMatchExpressionFactory factory) {
-		return factory.getSubClassInclusionComposedMatch2(
-				getParent().getPremiseMatch(factory), getExtendedOriginMatch());
+		return factory.getSubClassInclusionDecomposedMatch2(
+				getParent().getPremiseMatch(factory), getExtendedOriginMatch(),
+				factory.getOwlNothing());
 	}
 
 	public ClassInconsistencyMatch2 getConclusionMatch(
@@ -86,7 +87,7 @@ public class ClassInconsistencyOfOwlNothingMatch2
 
 		ClassInconsistencyOfOwlNothingMatch2 getClassInconsistencyOfOwlNothingMatch2(
 				ClassInconsistencyOfOwlNothingMatch1 parent,
-				SubClassInclusionComposedMatch2 premiseMatch);
+				SubClassInclusionDecomposedMatch2 premiseMatch);
 
 	}
 
