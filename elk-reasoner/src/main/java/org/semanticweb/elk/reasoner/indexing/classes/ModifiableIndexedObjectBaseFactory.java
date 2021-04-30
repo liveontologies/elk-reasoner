@@ -76,7 +76,7 @@ public class ModifiableIndexedObjectBaseFactory
 
 	@Override
 	public ModifiableIndexedClass getIndexedClass(ElkClass elkClass) {
-		return filter(new StructuralIndexedClassEntryImpl(elkClass));
+		return filter(new ModifiableIndexedDefinedClassImpl(elkClass));
 	}
 
 	@Override

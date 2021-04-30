@@ -24,18 +24,11 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 
 import java.util.List;
 
-import org.semanticweb.elk.RevertibleAction;
-import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.indexing.model.StructuralIndexedClassExpressionListEntry;
 import org.semanticweb.elk.reasoner.indexing.model.StructuralIndexedSubObject;
 import org.semanticweb.elk.util.hashing.HashGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implements {@link StructuralIndexedClassExpressionListEntry}
@@ -47,20 +40,10 @@ class StructuralIndexedClassExpressionListEntryImpl extends
 		implements
 		StructuralIndexedClassExpressionListEntry<StructuralIndexedClassExpressionListEntryImpl> {
 
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(StructuralIndexedClassExpressionListEntryImpl.class);
-
 	/**
 	 * The elements of the list
 	 */
 	private final List<? extends ModifiableIndexedClassExpression> elements_;
-
-	/**
-	 * Counts how often this {@link IndexedClassExpressionList} occurs in the
-	 * ontology.
-	 */
-	int totalOccurrenceNo_ = 0;
 
 	StructuralIndexedClassExpressionListEntryImpl(
 			List<? extends ModifiableIndexedClassExpression> members) {
@@ -69,41 +52,8 @@ class StructuralIndexedClassExpressionListEntryImpl extends
 	}
 
 	@Override
-	public final boolean occurs() {
-		return totalOccurrenceNo_ > 0;
-	}
-
-	@Override
 	public final List<? extends ModifiableIndexedClassExpression> getElements() {
 		return elements_;
-	}
-
-	@Override
-	public String printOccurrenceNumbers() {
-		return "[all=" + totalOccurrenceNo_ + "]";
-	}
-
-	private void checkTotalOccurrenceNumbers() {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(
-					toString() + " occurences: " + printOccurrenceNumbers());
-		if (totalOccurrenceNo_ < 0)
-			throw new ElkUnexpectedIndexingException(
-					toString() + " has a negative total occurrence: "
-							+ printOccurrenceNumbers());
-	}
-
-	@Override
-	public RevertibleAction getIndexingAction(ModifiableOntologyIndex index,
-			OccurrenceIncrement increment) {
-		return RevertibleAction.create(() -> {
-			totalOccurrenceNo_ += increment.totalIncrement;
-			checkTotalOccurrenceNumbers(); // TODO: perhaps return false instead
-											// of failing
-			return true;
-		}, () -> {
-			totalOccurrenceNo_ -= increment.totalIncrement;
-		});
 	}
 
 	static int structuralHashCode(

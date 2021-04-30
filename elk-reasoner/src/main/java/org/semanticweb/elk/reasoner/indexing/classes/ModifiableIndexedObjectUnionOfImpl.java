@@ -80,13 +80,13 @@ class ModifiableIndexedObjectUnionOfImpl extends
 	public RevertibleAction getIndexingAction(ModifiableOntologyIndex index,
 			OccurrenceIncrement increment) {
 		return RevertibleAction.create(
-				() -> negativeOccurrenceNo == 0
+				() -> !occursNegatively()
 						&& increment.negativeIncrement > 0,
 				() -> ObjectUnionFromDisjunctRule.addRulesFor(this, index),
 				() -> ObjectUnionFromDisjunctRule.removeRulesFor(this, index))
 				.then(super.getIndexingAction(index, increment))
 				.then(RevertibleAction.create(
-						() -> negativeOccurrenceNo == 0
+						() -> !occursNegatively()
 								&& increment.negativeIncrement < 0,
 						() -> ObjectUnionFromDisjunctRule.removeRulesFor(this,
 								index),

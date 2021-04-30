@@ -31,6 +31,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedDataHasValue;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectComplementOf;
@@ -39,6 +40,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectUnionOf;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedPredefinedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObject;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectCache;
@@ -98,9 +100,8 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 		this.cachedIndividuals_ = new EntryCollection<StructuralIndexedIndividualEntry<?>>(
 				initialSize);
 		// predefined entities always occur in the cache
-		this.owlThing_ = new OwlThingImpl(
-				elkFactory.getOwlThing());
-		this.owlNothing_ = new OwlNothingImpl(
+		this.owlThing_ = new ModifiableIndexedOwlThingImpl(elkFactory.getOwlThing());
+		this.owlNothing_ = new ModifiableIndexedOwlNothingImpl(
 				elkFactory.getOwlNothing());
 		this.owlTopObjectProperty_ = new OwlTopObjectPropertyImpl(
 				elkFactory.getOwlTopObjectProperty());
@@ -244,7 +245,12 @@ class ModifiableIndexedObjectCacheImpl implements ModifiableIndexedObjectCache {
 		return input.accept(new IndexedSubObject.Visitor<EntryCollection<?>>() {
 
 			@Override
-			public EntryCollection<?> visit(IndexedClass element) {
+			public EntryCollection<?> visit(IndexedDefinedClass element) {
+				return cachedClasses_;
+			}
+			
+			@Override
+			public EntryCollection<?> visit(IndexedPredefinedClass element) {
 				return cachedClasses_;
 			}
 

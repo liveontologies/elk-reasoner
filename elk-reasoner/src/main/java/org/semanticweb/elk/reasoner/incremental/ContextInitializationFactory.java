@@ -29,8 +29,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinedClass;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
@@ -76,21 +76,21 @@ class ContextInitializationFactory extends DelegateInterruptMonitor
 	private final SaturationState<?> saturationState_;
 	private final ContextInitialization.Factory contextInitFactory_;
 	private final IndexedClassExpression[] changedComposedSubsumers_;
-	private final IndexedClass[] changedDecomposedSubsumers_;
+	private final IndexedDefinedClass[] changedDecomposedSubsumers_;
 	private final LinkedContextInitRule changedContextInitRuleHead_;
 	private final Map<? extends IndexedClassExpression, ? extends LinkedSubsumerRule> changedCompositionRules_;
 	private AtomicInteger compositionRuleHits_ = new AtomicInteger(0);
 	private AtomicInteger decompositionRuleHits_ = new AtomicInteger(0);
 	private final SaturationStatistics stageStatistics_;
 
-	private final SubsumerDecompositionRule<IndexedClass> classDecomposition_;
+	private final SubsumerDecompositionRule<IndexedDefinedClass> classDecomposition_;
 
 	public ContextInitializationFactory(final InterruptMonitor interrupter,
 			SaturationState<?> state,
 			LinkedContextInitRule changedContextInitRuleHead,
 			Map<? extends IndexedClassExpression, ? extends LinkedSubsumerRule> changedCompositionRules,
-			final Map<? extends IndexedClass, ? extends IndexedClassExpression> changedDefinitions,
-			final Map<? extends IndexedClass, ? extends ElkAxiom> changedDefinitionReasons,
+			final Map<? extends IndexedDefinedClass, ? extends IndexedClassExpression> changedDefinitions,
+			final Map<? extends IndexedDefinedClass, ? extends ElkAxiom> changedDefinitionReasons,
 			SaturationStatistics stageStats) {
 		super(interrupter);
 		saturationState_ = state;
@@ -99,25 +99,25 @@ class ContextInitializationFactory extends DelegateInterruptMonitor
 		changedComposedSubsumers_ = new IndexedClassExpression[changedCompositionRules
 				.keySet().size()];
 		changedCompositionRules.keySet().toArray(changedComposedSubsumers_);
-		changedDecomposedSubsumers_ = new IndexedClass[changedDefinitions
+		changedDecomposedSubsumers_ = new IndexedDefinedClass[changedDefinitions
 				.keySet().size()];
 		changedDefinitions.keySet().toArray(changedDecomposedSubsumers_);
 		changedContextInitRuleHead_ = changedContextInitRuleHead;
 		stageStatistics_ = stageStats;
 
 		classDecomposition_ = new IndexedClassDecompositionRule() {
-			private final Map<? extends IndexedClass, ? extends IndexedClassExpression> changedDefinitions_ = changedDefinitions;
+			private final Map<? extends IndexedDefinedClass, ? extends IndexedClassExpression> changedDefinitions_ = changedDefinitions;
 
-			private final Map<? extends IndexedClass, ? extends ElkAxiom> changedDefinitionReasons_ = changedDefinitionReasons;
+			private final Map<? extends IndexedDefinedClass, ? extends ElkAxiom> changedDefinitionReasons_ = changedDefinitionReasons;
 
 			@Override
 			protected IndexedClassExpression getDefinition(
-					IndexedClass premise) {
+					IndexedDefinedClass premise) {
 				return changedDefinitions_.get(premise);
 			}
 
 			@Override
-			protected ElkAxiom getDefinitionReason(IndexedClass premise) {
+			protected ElkAxiom getDefinitionReason(IndexedDefinedClass premise) {
 				return changedDefinitionReasons_.get(premise);
 			}
 		};
@@ -182,7 +182,7 @@ class ContextInitializationFactory extends DelegateInterruptMonitor
 						.size() > changedDecomposedSubsumers_.length >> 2) {
 					// iterate over changes, check subsumers
 					for (int j = 0; j < changedDecomposedSubsumers_.length; j++) {
-						IndexedClass changedIC = changedDecomposedSubsumers_[j];
+						IndexedDefinedClass changedIC = changedDecomposedSubsumers_[j];
 						if (decomposedSubsumers.contains(changedIC)) {
 							applyDecompositionRules(context, changedIC);
 						}
@@ -190,9 +190,9 @@ class ContextInitializationFactory extends DelegateInterruptMonitor
 				} else {
 					// iterate over subsumers, check changes
 					for (IndexedClassExpression changedICE : decomposedSubsumers) {
-						if (changedICE instanceof IndexedClass)
+						if (changedICE instanceof IndexedDefinedClass)
 							applyDecompositionRules(context,
-									(IndexedClass) changedICE);
+									(IndexedDefinedClass) changedICE);
 					}
 				}
 			}
@@ -222,7 +222,7 @@ class ContextInitializationFactory extends DelegateInterruptMonitor
 			}
 
 			private void applyDecompositionRules(Context context,
-					IndexedClass changedICE) {
+					IndexedDefinedClass changedICE) {
 				localDecompositionRuleHits_++;
 				LOGGER_.trace("{}: applying decomposition rules for {}",
 						context, changedICE);

@@ -22,12 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.indexing.classes;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedEntity;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.StructuralIndexedClassEntry;
 import org.semanticweb.elk.reasoner.indexing.model.StructuralIndexedSubObject;
 import org.semanticweb.elk.util.hashing.HashGenerator;
@@ -37,7 +34,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * 
  * @author "Yevgeny Kazakov"
  */
-class StructuralIndexedClassEntryImpl extends
+abstract class StructuralIndexedClassEntryImpl extends
 		ModifiableIndexedClassEntityImpl<StructuralIndexedClassEntryImpl, StructuralIndexedClassEntry<?>>
 		implements
 		StructuralIndexedClassEntry<StructuralIndexedClassEntryImpl> {
@@ -46,17 +43,6 @@ class StructuralIndexedClassEntryImpl extends
 	 * The represented {@link ElkClass}
 	 */
 	private final ElkClass elkClass_;
-
-	/**
-	 * The equivalent {@link ModifiableIndexedClassExpression} if there exists
-	 * one or {@code null} otherwise
-	 */
-	private ModifiableIndexedClassExpression definition_;
-
-	/**
-	 * The {@link ElkAxiom} from which {@link #definition_} originates
-	 */
-	private ElkAxiom definitionReason_;
 
 	StructuralIndexedClassEntryImpl(ElkClass entity) {
 		super(structuralHashCode(entity));
@@ -67,33 +53,7 @@ class StructuralIndexedClassEntryImpl extends
 	public final ElkClass getElkEntity() {
 		return elkClass_;
 	}
-
-	@Override
-	public IndexedClassExpression getDefinition() {
-		return this.definition_;
-	}
-
-	@Override
-	public ElkAxiom getDefinitionReason() {
-		return this.definitionReason_;
-	}
-
-	@Override
-	public boolean setDefinition(ModifiableIndexedClassExpression definition,
-			ElkAxiom reason) {
-		if (definition_ != null)
-			return false;
-		// else
-		this.definition_ = definition;
-		this.definitionReason_ = reason;
-		return true;
-	}
-
-	@Override
-	public void removeDefinition() {
-		this.definition_ = null;
-	}
-
+	
 	static int structuralHashCode(ElkClass entity) {
 		return HashGenerator.combinedHashCode(StructuralIndexedClassEntryImpl.class,
 				entity.getIri());
@@ -116,11 +76,6 @@ class StructuralIndexedClassEntryImpl extends
 	@Override
 	public final <O> O accept(IndexedEntity.Visitor<O> visitor) {
 		return accept((IndexedClassEntity.Visitor<O>) visitor);
-	}
-
-	@Override
-	public final <O> O accept(IndexedClassEntity.Visitor<O> visitor) {
-		return visitor.visit(this);
 	}
 
 	@Override

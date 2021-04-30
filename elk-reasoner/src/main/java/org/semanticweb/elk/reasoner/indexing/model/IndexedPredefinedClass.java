@@ -22,29 +22,25 @@ package org.semanticweb.elk.reasoner.indexing.model;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-
 /**
- * An {@link IndexedClass} that can be modified as a result of updating the
- * {@link ModifiableOntologyIndex} where this object is stored.
+ * An {@link IndexedClass} with a predefined interpretation, such as
+ * {@code owl:Thing} and {@code owl:Nothing}<br>
  * 
  * @author "Yevgeny Kazakov"
- *
  */
-public interface ModifiableIndexedClass
-		extends
-			ModifiableIndexedClassEntity,
-			IndexedClass {
+public interface IndexedPredefinedClass extends IndexedClass {
 
 	/**
-	 * A factory for creating instances
+	 * The visitor pattern for instances
 	 * 
 	 * @author Yevgeny Kazakov
 	 *
+	 * @param <O>
+	 *            the type of the output
 	 */
-	interface Factory {
+	interface Visitor<O> {
 
-		ModifiableIndexedClass getIndexedClass(ElkClass elkClass);
+		O visit(IndexedPredefinedClass element);
 
 	}
 

@@ -22,24 +22,35 @@ package org.semanticweb.elk.reasoner.indexing.model;
  * #L%
  */
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 
 /**
- * Represents occurrences of a {@link ElkClassExpression} that use at least one
- * constructor in an ontology.
+ * An {@link IndexedClass} that may be defined to be equivalent to other
+ * classes<br>
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface IndexedComplexClassExpression
-		extends IndexedClassExpression {	
+public interface IndexedDefinedClass extends IndexedClass {
 
 	/**
-	 * @return {@code true} if this {@link IndexedObject} occurs with the
-	 *         negative polarity in the current ontology, i.e., in the left-hand
-	 *         side of concept inclusions or in complex equivalences
+	 * @return The {@link IndexedClassExpression} corresponding to an
+	 *         {@link ElkClassExpression} defined equivalent to this
+	 *         {@link IndexedDefinedClass} in the ontology. There can be several
+	 *         such equivalent {@link ElkClassExpression}s in the ontology, but
+	 *         at most one of them should be chosen as the definition; the value
+	 *         can be {@code null} if there are no such equivalent
+	 *         {@link ElkClassExpression}s.
 	 */
-	boolean occursNegatively();
-	
+	IndexedClassExpression getDefinition();
+
+	/**
+	 * @return the {@link ElkAxiom} from which the definition of this
+	 *         {@link IndexedClass} originates or {@code null} if this
+	 *         {@link IndexedClass} is not defined.
+	 */
+	ElkAxiom getDefinitionReason();
+
 	/**
 	 * The visitor pattern for instances
 	 * 
@@ -48,19 +59,10 @@ public interface IndexedComplexClassExpression
 	 * @param <O>
 	 *            the type of the output
 	 */
-	interface Visitor<O>
-			extends				
-				IndexedDataHasValue.Visitor<O>,
-				IndexedObjectComplementOf.Visitor<O>,
-				IndexedObjectHasSelf.Visitor<O>,
-				IndexedObjectIntersectionOf.Visitor<O>,
-				IndexedObjectSomeValuesFrom.Visitor<O>,
-				IndexedObjectUnionOf.Visitor<O> {
+	interface Visitor<O> {
 
-		// combined interface
+		O visit(IndexedDefinedClass element);
 
 	}
-	
-	<O> O accept(Visitor<O> visitor);
 
 }

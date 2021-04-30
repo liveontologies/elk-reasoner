@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.RevertibleAction;
 import org.semanticweb.elk.reasoner.completeness.Feature;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectComplementOf;
@@ -44,6 +45,32 @@ class ModifiableIndexedObjectComplementOfImpl extends
 
 	private final ModifiableIndexedClassExpression negated_;
 
+	/**
+	 * This counts how often this object occurred positively. Some indexing
+	 * operations are only needed when encountering objects positively for the
+	 * first time.
+	 */
+	private int positiveOccurrenceNo_ = 0;
+
+	
+	public boolean occursPositively() {
+		return positiveOccurrenceNo_ > 0;
+	}
+	
+	@Override
+	public String printOccurrenceNumbers() {
+		return super.printOccurrenceNumbers() + "; pos=" + positiveOccurrenceNo_;
+	}
+
+	@Override void checkOccurrenceNumbers() {
+		super.checkOccurrenceNumbers();
+		if (positiveOccurrenceNo_ < 0)
+			throw new ElkUnexpectedIndexingException(
+					toString() + " has a negative occurrence: "
+							+ printOccurrenceNumbers());
+	}
+
+	
 	ModifiableIndexedObjectComplementOfImpl(
 			ModifiableIndexedClassExpression negated) {
 		super(structuralHashCode(negated));
@@ -59,13 +86,13 @@ class ModifiableIndexedObjectComplementOfImpl extends
 	public RevertibleAction getIndexingAction(ModifiableOntologyIndex index,
 			OccurrenceIncrement increment) {
 		return RevertibleAction.create(
-				() -> positiveOccurrenceNo == 0
+				() -> !occursPositively()
 						&& increment.positiveIncrement > 0,
 				() -> ContradictionFromNegationRule.addRulesFor(this, index),
 				() -> ContradictionFromNegationRule.removeRulesFor(this, index))
 				.then(super.getIndexingAction(index, increment))
 				.then(RevertibleAction.create(
-						() -> positiveOccurrenceNo == 0
+						() -> !occursPositively()
 								&& increment.positiveIncrement < 0,
 						() -> ContradictionFromNegationRule.removeRulesFor(this,
 								index),

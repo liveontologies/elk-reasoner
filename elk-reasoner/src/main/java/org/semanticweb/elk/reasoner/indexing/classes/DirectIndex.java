@@ -29,8 +29,8 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkEntityFactory;
 import org.semanticweb.elk.reasoner.completeness.Feature;
 import org.semanticweb.elk.reasoner.completeness.OccurrenceListener;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedDefinedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
@@ -102,13 +102,13 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl
 	}
 
 	@Override
-	public boolean tryAddDefinition(ModifiableIndexedClass target,
+	public boolean tryAddDefinition(ModifiableIndexedDefinedClass target,
 			ModifiableIndexedClassExpression definition, ElkAxiom reason) {
 		return target.setDefinition(definition, reason);
 	}
 
 	@Override
-	public boolean tryRemoveDefinition(ModifiableIndexedClass target,
+	public boolean tryRemoveDefinition(ModifiableIndexedDefinedClass target,
 			ModifiableIndexedClassExpression definition, ElkAxiom reason) {
 		if (target.getDefinition() != definition
 				|| !target.getDefinitionReason().equals(reason))

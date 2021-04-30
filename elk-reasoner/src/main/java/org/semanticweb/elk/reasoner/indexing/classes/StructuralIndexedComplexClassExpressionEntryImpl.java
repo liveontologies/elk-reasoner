@@ -1,5 +1,8 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import org.semanticweb.elk.RevertibleAction;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
+
 /*-
  * #%L
  * ELK Reasoner Core
@@ -24,6 +27,8 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.indexing.model.StructuralIndexedComplexClassExpressionEntry;
 
 /**
@@ -39,10 +44,49 @@ abstract class StructuralIndexedComplexClassExpressionEntryImpl<T extends Struct
 		extends
 		ModifiableIndexedClassExpressionImpl<T, StructuralIndexedComplexClassExpressionEntry<?>>
 		implements StructuralIndexedComplexClassExpressionEntry<T> {
+
+	/**
+	 * Counts how often this object occurred negatively. Some indexing
+	 * operations are only needed when encountering objects negatively for the
+	 * first time.
+	 */
+	private int negativeOccurrenceNo_ = 0;
 	
 	StructuralIndexedComplexClassExpressionEntryImpl(int structuralHash) {
 		super(structuralHash);
 	}	
+	
+	@Override
+	public boolean occursNegatively() {
+		return negativeOccurrenceNo_ > 0;
+	}
+	
+	@Override
+	public String printOccurrenceNumbers() {
+		return super.printOccurrenceNumbers() + "; neg="
+				+ negativeOccurrenceNo_;
+	}
+
+	@Override void checkOccurrenceNumbers() {
+		super.checkOccurrenceNumbers();
+		if (negativeOccurrenceNo_ < 0)
+			throw new ElkUnexpectedIndexingException(
+					toString() + " has a negative occurrence: "
+							+ printOccurrenceNumbers());
+	}
+	
+	
+	@Override
+	public RevertibleAction getIndexingAction(ModifiableOntologyIndex index,
+			OccurrenceIncrement increment) {
+		return RevertibleAction.create(() -> {
+			negativeOccurrenceNo_ += increment.negativeIncrement;
+			return true;
+		}, () -> {
+			negativeOccurrenceNo_ -= increment.negativeIncrement;
+		}).then(super.getIndexingAction(index, increment));
+	}
+
 	
 	@Override
 	public final <O> O accept(IndexedClassExpression.Visitor<O> visitor) {

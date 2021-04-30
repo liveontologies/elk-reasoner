@@ -32,7 +32,9 @@ import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedPredefinedClass;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.NonBottomTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
@@ -99,7 +101,13 @@ class TaxonomyCleaningFactory extends DelegateInterruptMonitor
 			private final IndexedClassEntity.Visitor<?> submissionVisitor_ = new IndexedClassEntity.Visitor<Object>() {
 
 				@Override
-				public Object visit(IndexedClass element) {
+				public Object visit(IndexedDefinedClass element) {
+					submitClass(element);
+					return null;
+				}
+				
+				@Override
+				public Object visit(IndexedPredefinedClass element) {
 					submitClass(element);
 					return null;
 				}

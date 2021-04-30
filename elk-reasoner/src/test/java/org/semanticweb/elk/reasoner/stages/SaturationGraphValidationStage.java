@@ -31,15 +31,16 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.classes.DummyIndexedContextRootVisitor;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedPredefinedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedRangeFiller;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
@@ -523,7 +524,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		}
 
 		@Override
-		public Void visit(IndexedClassDecompositionRule rule, IndexedClass premise,
+		public Void visit(IndexedClassDecompositionRule rule, IndexedDefinedClass premise,
 				ContextPremises premises, ClassInferenceProducer producer) {
 			// nothing is stored in the rule
 			return null;
@@ -561,7 +562,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		@Override
 		public Void visit(OwlNothingDecompositionRule rule,
-				IndexedClass premise, ContextPremises premises,
+				IndexedPredefinedClass premise, ContextPremises premises,
 				ClassInferenceProducer producer) {
 			// nothing is stored in the rule
 			return null;

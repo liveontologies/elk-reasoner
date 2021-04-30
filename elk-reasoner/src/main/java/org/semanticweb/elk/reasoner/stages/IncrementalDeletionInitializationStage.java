@@ -30,8 +30,8 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.incremental.IncrementalChangesInitialization;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.classes.DifferentialIndex;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinedClass;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContextInitializationNoPremises;
@@ -66,8 +66,8 @@ public class IncrementalDeletionInitializationStage
 		DifferentialIndex diffIndex = reasoner.ontologyIndex;
 		LinkedContextInitRule changedInitRules = null;
 		Map<? extends IndexedClassExpression, ? extends LinkedSubsumerRule> changedRulesByCE = null;
-		Map<? extends IndexedClass, ? extends IndexedClassExpression> changedDefinitions = null;
-		Map<? extends IndexedClass, ? extends ElkAxiom> changedDefinitionReasons = null;
+		Map<? extends IndexedDefinedClass, ? extends IndexedClassExpression> changedDefinitions = null;
+		Map<? extends IndexedDefinedClass, ? extends ElkAxiom> changedDefinitionReasons = null;
 		Collection<ArrayList<Context>> inputs = Collections.emptyList();
 
 		changedInitRules = diffIndex.getRemovedContextInitRules();

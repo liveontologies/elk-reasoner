@@ -1,14 +1,12 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
-import org.semanticweb.elk.RevertibleAction;
-
-/*
+/*-
  * #%L
- * ELK Reasoner
+ * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2021 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,14 +22,9 @@ import org.semanticweb.elk.RevertibleAction;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassEntity;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implements {@link ModifiableIndexedClassEntity}.
@@ -47,56 +40,13 @@ abstract class ModifiableIndexedClassEntityImpl<T extends ModifiableIndexedClass
 		extends ModifiableIndexedClassExpressionImpl<T, N>
 		implements ModifiableIndexedClassEntity {
 
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ModifiableIndexedClassEntityImpl.class);
-
-	/**
-	 * This counts how many times this object occurred in the ontology.
-	 */
-	protected int totalOccurrenceNo = 0;
-
 	ModifiableIndexedClassEntityImpl(int structuralHash) {
 		super(structuralHash);
 	}
 
 	@Override
-	public final boolean occurs() {
-		return totalOccurrenceNo > 0;
-	}
-
-	@Override
-	public String printOccurrenceNumbers() {
-		return "[all=" + totalOccurrenceNo + "; pos=" + positiveOccurrenceNo
-				+ "; neg=" + negativeOccurrenceNo + "]";
-	}
-
-	private void checkTotalOccurrenceNumbers() {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(toString() + " occurences: "
-					+ printOccurrenceNumbers());
-		if (totalOccurrenceNo < 0)
-			throw new ElkUnexpectedIndexingException(
-					toString() + " has a negative total occurrence: "
-							+ printOccurrenceNumbers());
-	}
-
-	@Override
-	public RevertibleAction getIndexingAction(ModifiableOntologyIndex index,
-			OccurrenceIncrement increment) {
-		return RevertibleAction.create(() -> {
-			totalOccurrenceNo += increment.totalIncrement;
-			checkTotalOccurrenceNumbers();
-			return true;
-		}, () -> {
-			totalOccurrenceNo -= increment.totalIncrement;
-		}).then(super.getIndexingAction(index, increment));
-
-	}
-
-	@Override
 	public final <O> O accept(IndexedClassExpression.Visitor<O> visitor) {
 		return accept((IndexedClassEntity.Visitor<O>) visitor);
-	}
+	}	
 
 }

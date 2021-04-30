@@ -67,14 +67,14 @@ class ModifiableIndexedObjectIntersectionOfImpl extends
 	public RevertibleAction getIndexingAction(ModifiableOntologyIndex index,
 			OccurrenceIncrement increment) {
 		return RevertibleAction
-				.create(() -> negativeOccurrenceNo == 0
+				.create(() -> !occursNegatively()
 						&& increment.negativeIncrement > 0,
 						() -> ObjectIntersectionFromFirstConjunctRule
 								.addRulesFor(this, index),
 						() -> ObjectIntersectionFromFirstConjunctRule
 								.removeRulesFor(this, index))
 				.then(RevertibleAction.create(
-						() -> negativeOccurrenceNo == 0
+						() -> !occursNegatively()
 								&& increment.negativeIncrement > 0,
 						() -> ObjectIntersectionFromSecondConjunctRule
 								.addRulesFor(this, index),
@@ -82,14 +82,14 @@ class ModifiableIndexedObjectIntersectionOfImpl extends
 								.removeRulesFor(this, index)))
 				.then(super.getIndexingAction(index, increment))
 				.then(RevertibleAction.create(
-						() -> negativeOccurrenceNo == 0
+						() -> !occursNegatively()
 								&& increment.negativeIncrement < 0,
 						() -> ObjectIntersectionFromFirstConjunctRule
 								.removeRulesFor(this, index),
 						() -> ObjectIntersectionFromFirstConjunctRule
 								.addRulesFor(this, index)))
 				.then(RevertibleAction.create(
-						() -> negativeOccurrenceNo == 0
+						() -> !occursNegatively()
 								&& increment.negativeIncrement < 0,
 						() -> ObjectIntersectionFromSecondConjunctRule
 								.removeRulesFor(this, index),

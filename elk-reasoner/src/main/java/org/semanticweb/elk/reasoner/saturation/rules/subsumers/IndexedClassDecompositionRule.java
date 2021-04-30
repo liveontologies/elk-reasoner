@@ -23,10 +23,11 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedDefinedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedDefinedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedEquivalentClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusion;
@@ -37,16 +38,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link SubsumerDecompositionRule} that processes an {@link IndexedClass}
+ * A {@link SubsumerDecompositionRule} that processes an {@link IndexedDefinedClass}
  * and produces {@link SubClassInclusion}s for its definition
  * 
- * @see IndexedClass#getDefinition()
+ * @see IndexedDefinedClass#getDefinition()
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
 public class IndexedClassDecompositionRule extends
-		AbstractSubsumerDecompositionRule<IndexedClass> {
+		AbstractSubsumerDecompositionRule<IndexedDefinedClass> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -61,7 +62,7 @@ public class IndexedClassDecompositionRule extends
 		return NAME;
 	}
 
-	public static SubsumerDecompositionRule<IndexedClass> getInstance() {
+	public static SubsumerDecompositionRule<IndexedDefinedClass> getInstance() {
 		return INSTANCE_;
 	}
 
@@ -73,7 +74,7 @@ public class IndexedClassDecompositionRule extends
 			return false;
 		}
 		// else
-		ModifiableIndexedClass definedClass = getDefinedClass(axiom);
+		ModifiableIndexedDefinedClass definedClass = getDefinedClass(axiom);
 		if (definedClass == null) {
 			return false;
 		}
@@ -100,7 +101,7 @@ public class IndexedClassDecompositionRule extends
 			return false;
 		}
 		// else
-		ModifiableIndexedClass definedClass = getDefinedClass(axiom);
+		ModifiableIndexedDefinedClass definedClass = getDefinedClass(axiom);
 		if (definedClass == null) {
 			return false;
 		}
@@ -114,10 +115,10 @@ public class IndexedClassDecompositionRule extends
 		return success;
 	}
 
-	static ModifiableIndexedClass getDefinedClass(ModifiableIndexedEquivalentClassesAxiom axiom) {
+	static ModifiableIndexedDefinedClass getDefinedClass(ModifiableIndexedEquivalentClassesAxiom axiom) {
 		ModifiableIndexedClassExpression firstMember = axiom.getFirstMember();
-		if (firstMember instanceof ModifiableIndexedClass) {
-			return (ModifiableIndexedClass) firstMember;
+		if (firstMember instanceof ModifiableIndexedDefinedClass) {
+			return (ModifiableIndexedDefinedClass) firstMember;
 			
 		}
 		// else
@@ -125,7 +126,7 @@ public class IndexedClassDecompositionRule extends
 	}
 	
 	@Override
-	public void apply(IndexedClass premise, ContextPremises premises,
+	public void apply(IndexedDefinedClass premise, ContextPremises premises,
 			ClassInferenceProducer producer) {
 		IndexedClassExpression definedExpression = getDefinition(premise);
 		if (definedExpression == null)
@@ -141,21 +142,21 @@ public class IndexedClassDecompositionRule extends
 
 	@Override
 	public void accept(SubsumerDecompositionRuleVisitor<?> visitor,
-			IndexedClass premise, ContextPremises premises,
+			IndexedDefinedClass premise, ContextPremises premises,
 			ClassInferenceProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 
 	}
 
 	@SuppressWarnings("static-method")
-	protected IndexedClassExpression getDefinition(IndexedClass premise) {
+	protected IndexedClassExpression getDefinition(IndexedDefinedClass premise) {
 		// by default take from the premise, but it may be overridden, e.g., for
 		// incremental reasoning
 		return premise.getDefinition();
 	}
 
 	@SuppressWarnings("static-method")
-	protected ElkAxiom getDefinitionReason(IndexedClass premise) {
+	protected ElkAxiom getDefinitionReason(IndexedDefinedClass premise) {
 		// by default take from the premise, but it may be overridden, e.g., for
 		// incremental reasoning
 		return premise.getDefinitionReason();
