@@ -80,8 +80,8 @@ class TransitiveReductionState<R extends IndexedClassExpression, J extends Trans
 	 */
 	TransitiveReductionState(J initiatorJob, SaturationState<?> saturationState) {
 		this.initiatorJob = initiatorJob;
-		this.rootEquivalent = new ArrayList<ElkClass>(1);
-		this.prunedSubsumers = new ArrayHashSet<IndexedClass>(8);
+		this.rootEquivalent = new ArrayList<>(1);
+		this.prunedSubsumers = new ArrayHashSet<>(8);
 		Set<IndexedClassExpression> subsumers = saturationState.getContext(
 				initiatorJob.getInput()).getComposedSubsumers();
 		this.subsumerIterator = subsumers.iterator();
