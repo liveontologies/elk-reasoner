@@ -319,7 +319,7 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 	@Override
 	public ClassInconsistencyOfOwlNothingMatch2 getClassInconsistencyOfOwlNothingMatch2(
 			ClassInconsistencyOfOwlNothingMatch1 parent,
-			SubClassInclusionComposedMatch2 premiseMatch) {
+			SubClassInclusionDecomposedMatch2 premiseMatch) {
 		return new ClassInconsistencyOfOwlNothingMatch2(parent, premiseMatch);
 	}
 

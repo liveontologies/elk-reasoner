@@ -28,18 +28,18 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.tracing.Conclusion;
 import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
 
 /**
  * A {@link ClassInference} producing a {@link ClassInconsistency} from
- * {@link SubClassInclusionComposed} with
- * {@link SubClassInclusionComposed#getSubsumer()} equal to
+ * {@link SubClassInclusionDecomposed} with
+ * {@link SubClassInclusionDecomposed#getSubsumer()} equal to
  * {@code owl:Nothing}:<br>
  * 
  * <pre>
- *  [C] ⊑ +⊥
+ *  [C] ⊑ -⊥
  * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
  *  [C] ⊑ 0
  * </pre>

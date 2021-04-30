@@ -1,7 +1,6 @@
 package org.semanticweb.elk.matching.conclusions;
 
 import org.semanticweb.elk.matching.inferences.ClassInconsistencyOfObjectComplementOfMatch2;
-import org.semanticweb.elk.matching.inferences.ClassInconsistencyOfOwlNothingMatch1;
 import org.semanticweb.elk.matching.inferences.DisjointSubsumerFromSubsumerMatch2;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
 import org.semanticweb.elk.matching.inferences.PropagationGeneratedMatch1;
@@ -56,7 +55,6 @@ public interface SubClassInclusionComposedMatch1Watch extends InferenceMatch {
 	 */
 	interface Visitor<O>
 			extends ClassInconsistencyOfObjectComplementOfMatch2.Visitor<O>,
-			ClassInconsistencyOfOwlNothingMatch1.Visitor<O>,
 			DisjointSubsumerFromSubsumerMatch2.Visitor<O>,
 			PropagationGeneratedMatch1.Visitor<O>,
 			SubClassInclusionComposedDefinedClassMatch2.Visitor<O>,
