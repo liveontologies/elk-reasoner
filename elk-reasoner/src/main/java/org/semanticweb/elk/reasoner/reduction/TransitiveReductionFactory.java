@@ -350,9 +350,9 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				for (ElkClass equivalent : output.getEquivalent()) {
 					LOGGER_.trace(root + ": equivalent " + equivalent.getIri());
 				}
-				for (IndexedClass direct : output.directSubsumers.keySet()) {
-					String message = root + ": direct super class " + direct
-							+ ": " + output.directSubsumers.get(direct);
+				for (List<ElkClass> direct : output.getDirectSubsumers()) {
+					String message = root + ": direct super classes : "
+							+ direct;
 					LOGGER_.trace(message);
 				}
 			}
@@ -475,7 +475,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			 */
 			if (state.prunedSubsumers.isEmpty() && !output.getEquivalent()
 					.contains(owlThing_.getElkEntity())) {
-				output.directSubsumers.put(owlThing_, defaultTopOutput_);
+				output.directSubsumers.add(defaultTopOutput_);
 				return output;
 			}
 
@@ -568,7 +568,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 						}
 					}
 				}
-				output.directSubsumers.put(candidate, candidateEquivalent);
+				output.directSubsumers.add(candidateEquivalent);
 				if (LOGGER_.isTraceEnabled()) {
 					LOGGER_.trace("{}: new direct subsumer {} [{}]", root,
 							candidate, candidateEquivalent);
