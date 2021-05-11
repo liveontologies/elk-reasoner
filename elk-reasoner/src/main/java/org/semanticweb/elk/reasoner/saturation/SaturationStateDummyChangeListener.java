@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation;
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
+
 /*
  * #%L
  * ELK Reasoner
@@ -53,6 +55,16 @@ public class SaturationStateDummyChangeListener<C extends Context>
 	@Override
 	public void contextMarkNonSaturated(C context) {
 		// does nothing by default
+	}
+
+	@Override
+	public void conclusionAdded(ClassConclusion conclusion) {
+		// does nothing by default		
+	}
+
+	@Override
+	public void conclusionRemoved(ClassConclusion conclusion) {
+		// does nothing by default		
 	}
 
 }

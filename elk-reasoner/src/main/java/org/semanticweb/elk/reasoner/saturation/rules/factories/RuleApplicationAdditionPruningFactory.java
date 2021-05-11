@@ -110,8 +110,7 @@ public class RuleApplicationAdditionPruningFactory
 												mainSaturationState_)),
 								// if all fine, insert the conclusion to the
 								// local context copies
-								new ClassConclusionInsertionVisitor(
-										activeContext, localWriter),
+								new ClassConclusionInsertionVisitor(localWriter),
 								// count conclusions used in the rules, if
 								// necessary
 								SaturationUtils

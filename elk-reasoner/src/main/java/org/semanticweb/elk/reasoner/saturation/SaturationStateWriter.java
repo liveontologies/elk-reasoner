@@ -65,6 +65,10 @@ public interface SaturationStateWriter<C extends Context>
 	 */
 	public Context pollForActiveContext();
 
+	public boolean addConclusion(ClassConclusion conclusion);
+
+	public boolean removeConclusion(ClassConclusion conclusion);
+	
 	/**
 	 * Marks the {@link Context} with the given {@link IndexedContextRoot} as
 	 * not saturated. That is, after calling of this method,
@@ -80,7 +84,7 @@ public interface SaturationStateWriter<C extends Context>
 	 *         saturated.
 	 */
 	public boolean markAsNotSaturated(IndexedContextRoot root);
-
+	
 	/**
 	 * Removes all assignments of {@link Context}s to {@link IndexedContextRoot}
 	 * s of this {@link SaturationState}. After that,

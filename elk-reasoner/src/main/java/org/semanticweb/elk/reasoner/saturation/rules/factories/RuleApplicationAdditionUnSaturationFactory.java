@@ -71,8 +71,7 @@ public class RuleApplicationAdditionUnSaturationFactory
 												localStatistics),
 								// insert conclusions initializing contexts if
 								// necessary
-								new ContextInitializingClassConclusionInsertionVisitor(
-										activeContext, writer),
+								new ContextInitializingClassConclusionInsertionVisitor(writer),
 								// if new, mark the source context as
 								// unsaturated
 								new ClassConclusionTracingContextUnsaturationVisitor(

@@ -29,6 +29,7 @@ import java.util.Collection;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -244,6 +245,21 @@ public interface SaturationState<C extends Context> {
 		 * @param context
 		 */
 		void contextMarkNonSaturated(C context);
+		
+		
+		/**
+		 * Is triggered immediately after a new conclusion has been added 
+		 * 
+		 * @param conclusion
+		 */
+		void conclusionAdded(ClassConclusion conclusion);
+		
+		/**
+		 * Is triggered immediately after a new conclusion has been removed 
+		 * 
+		 * @param conclusion
+		 */
+		void conclusionRemoved(ClassConclusion conclusion);
 
 	}
 

@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.slf4j.Logger;
@@ -299,6 +300,38 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 		@Override
 		public SaturationState<EC> getSaturationState() {
 			return AbstractSaturationState.this;
+		}
+
+		@Override
+		public boolean addConclusion(ClassConclusion conclusion) {
+			EC context = getContext(conclusion.getDestination());
+			boolean added = context.addConclusion(conclusion);
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("{}: inserting {}: {}", context, conclusion,
+						added ? "success" : "failure");
+			}
+			if (added) {
+				for (int i = 0; i < listeners_.size(); i++) {
+					listeners_.get(i).conclusionAdded(conclusion);
+				}
+			}
+			return added;
+		}
+
+		@Override
+		public boolean removeConclusion(ClassConclusion conclusion) {
+			EC context = getContext(conclusion.getDestination());
+			boolean removed = context.removeConclusion(conclusion);
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("{}: deleting {}: {}", context, conclusion,
+						removed ? "success" : "failure");
+			}
+			if (removed) {
+				for (int i = 0; i < listeners_.size(); i++) {
+					listeners_.get(i).conclusionRemoved(conclusion);
+				}
+			}
+			return removed;
 		}
 
 	}

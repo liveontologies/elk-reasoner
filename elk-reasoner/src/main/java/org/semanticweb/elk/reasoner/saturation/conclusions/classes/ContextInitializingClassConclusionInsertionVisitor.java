@@ -34,7 +34,6 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 import org.semanticweb.elk.reasoner.saturation.inferences.ContextInitializationNoPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubContextInitializationNoPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 
 /**
  * A {@link ClassConclusionInsertionVisitor} that initializes the
@@ -53,26 +52,26 @@ public class ContextInitializingClassConclusionInsertionVisitor
 	 * The producer for {@link ContextInitialization}s and
 	 * {@link SubContextInitialization}s
 	 */
-	private final ClassInferenceProducer producer_;
+	private final SaturationStateWriter<?> writer_;
 
 	public ContextInitializingClassConclusionInsertionVisitor(
-			Reference<Context> contextRef, SaturationStateWriter<?> writer) {
-		super(contextRef, writer);
-		this.producer_ = writer;
+			SaturationStateWriter<?> writer) {
+		super(writer);
+		this.writer_ = writer;
 	}
 
 	@Override
 	protected Boolean defaultVisit(ClassConclusion conclusion) {
-		Context context = get();
-		IndexedContextRoot root = context.getRoot();
+		IndexedContextRoot root = conclusion.getDestination();
+		Context context = writer_.getSaturationState().getContext(root);
 		if (context.isEmpty()) {
-			producer_.produce(new ContextInitializationNoPremises(root));
+			writer_.produce(new ContextInitializationNoPremises(root));
 		}
 		if (conclusion instanceof SubClassConclusion) {
 			IndexedObjectProperty subRoot = ((SubClassConclusion) conclusion)
 					.getSubDestination();
 			if (context.isEmpty(subRoot)) {
-				producer_.produce(
+				writer_.produce(
 						new SubContextInitializationNoPremises(root, subRoot));
 			}
 		}
