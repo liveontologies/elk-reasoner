@@ -1,7 +1,5 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
-import org.semanticweb.elk.RevertibleAction;
-
 /*-
  * #%L
  * ELK Reasoner Core
@@ -24,39 +22,44 @@ import org.semanticweb.elk.RevertibleAction;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassEntity;
+import org.semanticweb.elk.RevertibleAction;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
+import org.semanticweb.elk.reasoner.indexing.model.StructuralIndexedSubObject;
 
 /**
- * Implements {@link ModifiableIndexedClassEntity}.
+ * A {@link StructuralIndexedSubObject} with occurrence counter.
  * 
  * @author "Yevgeny Kazakov"
  * 
  * @param <T>
  *            The type of structured objects this object can be compared with
  * @param <N>
- *            The type of the elements in the set where this entry is used
+ *            The type of the elements in the collection where this entry is
+ *            used
+ * 
  */
-abstract class ModifiableIndexedClassEntityImpl<T extends ModifiableIndexedClassEntityImpl<T, N>, N>
-		extends ModifiableIndexedClassExpressionImpl<T, N>
-		implements ModifiableIndexedClassEntity, HasOccurrenceDefaults {
+abstract class StructuralIndexedSubObjectHasOccurrenceImpl<T extends StructuralIndexedSubObjectHasOccurrenceImpl<T, N>, N>
+		extends StructuralIndexedSubObjectImpl<T, N>
+		implements HasOccurrenceDefaults {
+
+	StructuralIndexedSubObjectHasOccurrenceImpl(int structuralHash) {
+		super(structuralHash);
+	}
 
 	/**
 	 * This counts how many times this object occurred in the ontology.
 	 */
 	private int totalOccurrenceNo_ = 0;
 
-	
-	ModifiableIndexedClassEntityImpl(int structuralHash) {
-		super(structuralHash);
-	}
-	
 	@Override
 	public int getTotalOccurrenceNumber() {
 		return totalOccurrenceNo_;
+	}
+	
+	@Override
+	public String printOccurrenceNumbers() {
+		return HasOccurrenceDefaults.super.printOccurrenceNumbers();
 	}
 
 	@Override
@@ -65,19 +68,9 @@ abstract class ModifiableIndexedClassEntityImpl<T extends ModifiableIndexedClass
 	}
 	
 	@Override
-	public String printOccurrenceNumbers() {
-		return HasOccurrenceDefaults.super.printOccurrenceNumbers();
-	}
-	
-	@Override
 	public RevertibleAction getIndexingAction(ModifiableOntologyIndex index,
 			OccurrenceIncrement increment) {
 		return HasOccurrenceDefaults.super.getIndexingAction(index, increment);
 	}
-
-	@Override
-	public final <O> O accept(IndexedClassExpression.Visitor<O> visitor) {
-		return accept((IndexedClassEntity.Visitor<O>) visitor);
-	}	
 
 }

@@ -51,43 +51,63 @@ abstract class StructuralIndexedComplexClassExpressionEntryImpl<T extends Struct
 	 * first time.
 	 */
 	private int negativeOccurrenceNo_ = 0;
-	
+
+	/**
+	 * This counts how often this object occurred positively. Some indexing
+	 * operations are only needed when encountering objects positively for the
+	 * first time.
+	 */
+	private int positiveOccurrenceNo_ = 0;
+
 	StructuralIndexedComplexClassExpressionEntryImpl(int structuralHash) {
 		super(structuralHash);
-	}	
-	
+	}
+
 	@Override
 	public boolean occursNegatively() {
 		return negativeOccurrenceNo_ > 0;
 	}
+
+	@Override
+	public boolean occursPositively() {
+		return positiveOccurrenceNo_ > 0;
+	}
 	
 	@Override
-	public String printOccurrenceNumbers() {
-		return super.printOccurrenceNumbers() + "; neg="
-				+ negativeOccurrenceNo_;
+	public boolean occurs() {	
+		return occursNegatively() || occursPositively();
 	}
 
-	@Override void checkOccurrenceNumbers() {
-		super.checkOccurrenceNumbers();
+	@Override
+	public String printOccurrenceNumbers() {
+		return "neg=" + negativeOccurrenceNo_ + "; pos="
+				+ positiveOccurrenceNo_;
+	}
+
+	void checkOccurrenceNumbers() {
 		if (negativeOccurrenceNo_ < 0)
 			throw new ElkUnexpectedIndexingException(
 					toString() + " has a negative occurrence: "
 							+ printOccurrenceNumbers());
+		if (positiveOccurrenceNo_ < 0)
+			throw new ElkUnexpectedIndexingException(
+					toString() + " has a negative occurrence: "
+							+ printOccurrenceNumbers());
 	}
-	
-	
+
 	@Override
 	public RevertibleAction getIndexingAction(ModifiableOntologyIndex index,
 			OccurrenceIncrement increment) {
 		return RevertibleAction.create(() -> {
 			negativeOccurrenceNo_ += increment.negativeIncrement;
+			positiveOccurrenceNo_ += increment.positiveIncrement;
 			return true;
 		}, () -> {
 			negativeOccurrenceNo_ -= increment.negativeIncrement;
-		}).then(super.getIndexingAction(index, increment));
+			positiveOccurrenceNo_ -= increment.positiveIncrement;
+		});
 	}
 
-	
 	@Override
 	public final <O> O accept(IndexedClassExpression.Visitor<O> visitor) {
 		return accept((IndexedComplexClassExpression.Visitor<O>) visitor);

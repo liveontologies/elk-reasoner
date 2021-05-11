@@ -30,15 +30,8 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface IndexedComplexClassExpression
-		extends IndexedClassExpression {	
-
-	/**
-	 * @return {@code true} if this {@link IndexedObject} occurs with the
-	 *         negative polarity in the current ontology, i.e., in the left-hand
-	 *         side of concept inclusions or in complex equivalences
-	 */
-	boolean occursNegatively();
+public interface IndexedComplexClassExpression extends IndexedClassExpression,
+		HasNegativeOccurrence, HasPositiveOccurrence {		
 	
 	/**
 	 * The visitor pattern for instances

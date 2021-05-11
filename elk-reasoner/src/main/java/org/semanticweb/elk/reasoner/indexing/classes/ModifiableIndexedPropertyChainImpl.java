@@ -47,7 +47,7 @@ import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain
  * 
  */
 abstract class ModifiableIndexedPropertyChainImpl<T extends ModifiableIndexedPropertyChainImpl<T, N>, N>
-		extends StructuralIndexedSubObjectImpl<T, N>
+		extends StructuralIndexedSubObjectHasOccurrenceImpl<T, N>
 		implements ModifiableIndexedPropertyChain {
 
 	// TODO: move to elk-utils-collections

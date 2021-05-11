@@ -23,32 +23,17 @@ package org.semanticweb.elk.reasoner.indexing.model;
  */
 
 /**
- * An {@link IndexedObject} that occurs inside axioms.
+ * An object that may occur positively in the ontology.
  * 
- * @author "Yevgeny Kazakov"
- *
+ * @author Yevgeny Kazakov
  */
-public interface IndexedSubObject extends IndexedObject, HasOccurrence {
-		
+public interface HasPositiveOccurrence {
+
 	/**
-	 * The visitor pattern for instances
-	 * 
-	 * @author Yevgeny Kazakov
-	 *
-	 * @param <O>
-	 *            the type of the output
+	 * @return {@code true} if this object occurs with the positive polarity in
+	 *         the current ontology, for example, in the right-hand side of
+	 *         concept inclusions or in complex equivalences
 	 */
-	interface Visitor<O>
-			extends
-				IndexedClassExpression.Visitor<O>,
-				IndexedPropertyChain.Visitor<O>,
-				IndexedEntity.Visitor<O>,
-				IndexedClassExpressionList.Visitor<O> {
-
-		// combined interface
-
-	}
-	
-	<O> O accept(Visitor<O> visitor);	
+	boolean occursPositively();
 
 }
