@@ -109,11 +109,9 @@ public class RuleApplicationDeletionFactory
 												.getContextInitRuleHead(),
 										ruleVisitor, writer),
 								// after processing, delete the conclusion
-								new ClassConclusionDeletionVisitor(
-										activeContext),
+								new ClassConclusionDeletionVisitor(writer),
 								// and mark the source context of the conclusion
-								// as
-								// non-saturated
+								// as non-saturated
 								new ClassConclusionTracingContextUnsaturationVisitor(
 										writer)),
 								localStatistics));

@@ -78,7 +78,7 @@ public class RuleApplicationAdditionFactory<I extends RuleApplicationInput>
 								// insert conclusions initializing contexts if
 								// necessary
 								new ContextInitializingClassConclusionInsertionVisitor(
-										activeContext, writer),
+										writer),
 								// if new, check that the source of the
 								// conclusion is
 								// not saturated (this is only needed for

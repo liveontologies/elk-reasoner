@@ -1,6 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
 import org.semanticweb.elk.Reference;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 
 /*
  * #%L
@@ -26,8 +27,6 @@ import org.semanticweb.elk.Reference;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.ClassConclusionSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ClassConclusion.Visitor} that removes the visited
@@ -42,31 +41,18 @@ import org.slf4j.LoggerFactory;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class ClassConclusionDeletionVisitor extends
-		DummyClassConclusionVisitor<Boolean> {
+public class ClassConclusionDeletionVisitor
+		extends DummyClassConclusionVisitor<Boolean> {
 
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ClassConclusionDeletionVisitor.class);
-	
-	private final Reference<? extends ClassConclusionSet> conclusionsRef;
-	
-	public ClassConclusionDeletionVisitor(Reference<? extends ClassConclusionSet> conclusionsRef) {
-		this.conclusionsRef = conclusionsRef;
+	private final SaturationStateWriter<?> writer_;
 
+	public ClassConclusionDeletionVisitor(SaturationStateWriter<?> writer) {
+		this.writer_ = writer;
 	}
 
-	// TODO: make this by combining the visitor in order to avoid overheads when
-	// logging is switched off
 	@Override
 	protected Boolean defaultVisit(ClassConclusion conclusion) {
-		ClassConclusionSet conclusions = conclusionsRef.get();
-		boolean result = conclusions.removeConclusion(conclusion);
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("{}: deleting {}: {}", conclusions, conclusion,
-					result ? "success" : "failure");
-		}
-		return result;
+		return writer_.removeConclusion(conclusion);
 	}
 
 }

@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -41,6 +42,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpress
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateDummyChangeListener;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.DummyNodeStoreListener;
@@ -82,8 +84,8 @@ public class ClassTaxonomyState {
 	 * removed from ontology or their context became not saturated since the
 	 * last completed construction of the taxonomy.
 	 */
-	private final Queue<IndexedClass> toRemove_ = new ConcurrentLinkedQueue<IndexedClass>();
-
+	private final ConcurrentHashMap<IndexedClass,IndexedClass> toRemove_ = new ConcurrentHashMap<>();
+	
 	private final ElkObject.Factory elkFactory_;
 
 	private final OntologyIndex ontologyIndex_;
@@ -113,12 +115,13 @@ public class ClassTaxonomyState {
 
 			@Override
 			public void classAddition(final IndexedClass cls) {
+				LOGGER_.trace("To add: {}", cls);
 				toAdd_.add(cls);
 			}
 
 			@Override
 			public void classRemoval(final IndexedClass cls) {
-				toRemove_.add(cls);
+				toRemove(cls);
 			}
 
 		});
@@ -126,12 +129,21 @@ public class ClassTaxonomyState {
 		saturationState
 				.addListener(new SaturationStateDummyChangeListener<C>() {
 
+					
 					@Override
 					public void contextMarkNonSaturated(final C context) {
-						final IndexedContextRoot root = context.getRoot();
+						contextModified(context.getRoot());
+					}
+
+					@Override
+					public void conclusionAdded(ClassConclusion conclusion) {
+						contextModified(conclusion.getDestination());
+					}					
+					
+					public void contextModified(IndexedContextRoot root) {
 						if (root instanceof IndexedClass) {
 							final IndexedClass cls = (IndexedClass) root;
-							toRemove_.add(cls);
+							toRemove(cls);
 						}
 					}
 
@@ -145,6 +157,14 @@ public class ClassTaxonomyState {
 
 	}
 
+	
+	private void toRemove(IndexedClass cls) {
+		LOGGER_.trace("To remove: {}", cls);
+		if (toRemove_.get(cls) == null) {
+			toRemove_.put(cls, cls);
+		}
+	}
+	
 	public <C extends Context> ClassTaxonomyState(
 			final SaturationState<C> saturationState,
 			final DifferentialIndex ontologyIndex,
@@ -230,12 +250,8 @@ public class ClassTaxonomyState {
 				continue;
 			}
 			// else
-			if (node.equals(taxonomy_.getTopNode())) {
-				iter.remove();
-				continue;
-			}
-			// else
-			if (!node.getDirectSuperNodes().isEmpty()) {
+			if (node.equals(taxonomy_.getTopNode())
+					|| !node.getDirectSuperNodes().isEmpty()) {
 				iter.remove();
 				continue;
 			}
@@ -264,14 +280,14 @@ public class ClassTaxonomyState {
 	}
 
 	/**
-	 * Prunes {@link #toRemove_}.
+	 * Prunes {@link #toRemoveQueue_}.
 	 * <p>
 	 * <strong>{@code taxonomy_} must not be {@code null}!</strong>
 	 * 
-	 * @return The resulting size of {@link #toRemove_}.
+	 * @return The resulting size of {@link #toRemoveQueue_}.
 	 */
 	private int pruneToRemove() {
-		final Iterator<IndexedClass> iter = toRemove_.iterator();
+		final Iterator<IndexedClass> iter = toRemove_.keySet().iterator();
 		int size = 0;
 		while (iter.hasNext()) {
 			final IndexedClass cls = iter.next();
@@ -285,12 +301,7 @@ public class ClassTaxonomyState {
 			 */
 			final TaxonomyNode<ElkClass> node = taxonomy_
 					.getNode(cls.getElkEntity());
-			if (node == null) {
-				iter.remove();
-				continue;
-			}
-			// else
-			if (cls == ontologyIndex_.getOwlNothing()) {
+			if (node == null || cls == ontologyIndex_.getOwlNothing()) {
 				iter.remove();
 				continue;
 			}
@@ -309,12 +320,8 @@ public class ClassTaxonomyState {
 	 *         became not saturated.
 	 */
 	Collection<IndexedClass> getToRemove() {
-		final int size = pruneToRemove();
-		/*
-		 * since getting the size of the queue is a linear operation, use the
-		 * computed size
-		 */
-		return Operations.getCollection(toRemove_, size);
+		pruneToRemove();
+		return toRemove_.keySet();
 	}
 
 	void resetTaxonomy() {

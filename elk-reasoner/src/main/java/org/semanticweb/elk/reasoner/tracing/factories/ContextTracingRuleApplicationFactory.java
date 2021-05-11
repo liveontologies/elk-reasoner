@@ -104,8 +104,7 @@ public class ContextTracingRuleApplicationFactory extends
 						SaturationUtils.compose(
 								// insert the conclusion into the local context
 								// copies
-								new ClassConclusionInsertionVisitor(
-										activeContext, localWriter),
+								new ClassConclusionInsertionVisitor(localWriter),
 								// if the conclusion is new, apply local rules
 								// and produce conclusions to the active (local)
 								// saturation state

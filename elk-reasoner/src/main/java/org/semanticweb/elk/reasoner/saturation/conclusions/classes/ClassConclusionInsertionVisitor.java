@@ -28,8 +28,6 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ClassConclusion.Visitor} that adds the visited
@@ -48,45 +46,27 @@ import org.slf4j.LoggerFactory;
  */
 public class ClassConclusionInsertionVisitor
 		extends
-			DummyClassConclusionVisitor<Boolean> implements Reference<Context> {
-
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ClassConclusionInsertionVisitor.class);
-
-	private final Reference<Context> contextRef_;
+			DummyClassConclusionVisitor<Boolean> {
 
 	private final SaturationStateWriter<?> writer_;
 
-	public ClassConclusionInsertionVisitor(Reference<Context> contextRef,
-			SaturationStateWriter<?> writer) {
-		this.contextRef_ = contextRef;
+	public ClassConclusionInsertionVisitor(SaturationStateWriter<?> writer) {
+
 		this.writer_ = writer;
 	}
-	
-	@Override
-	public Context get() {
-		return contextRef_.get();
-	}
-
-	// TODO: make this by combining the visitor in order to avoid overheads when
-	// logging is switched off
+		
 	@Override
 	protected Boolean defaultVisit(ClassConclusion conclusion) {
-		Context context = get();
-		boolean result = context.addConclusion(conclusion);
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("{}: inserting {}: {}", context, conclusion,
-					result ? "success" : "failure");
-		}
-		return result;
+		return writer_.addConclusion(conclusion);
 	}
 
 	@Override
 	public Boolean visit(ContextInitialization conclusion) {
-		Context context = get();
-		if (context.containsConclusion(conclusion))
+		Context context = writer_.getSaturationState()
+				.getContext(conclusion.getDestination());
+		if (context.containsConclusion(conclusion)) {
 			return false;
+		}
 		// else
 		// Mark context as non-saturated if conclusion was not already
 		// initialized. It is important to mark before we insert, otherwise
