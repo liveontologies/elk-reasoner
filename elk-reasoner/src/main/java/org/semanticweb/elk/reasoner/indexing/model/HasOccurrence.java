@@ -23,32 +23,21 @@ package org.semanticweb.elk.reasoner.indexing.model;
  */
 
 /**
- * An {@link IndexedObject} that occurs inside axioms.
+ * An object which may occur several times in the ontology.
  * 
- * @author "Yevgeny Kazakov"
- *
+ * @author Yevgeny Kazakov
  */
-public interface IndexedSubObject extends IndexedObject, HasOccurrence {
-		
+public interface HasOccurrence {
+
 	/**
-	 * The visitor pattern for instances
-	 * 
-	 * @author Yevgeny Kazakov
-	 *
-	 * @param <O>
-	 *            the type of the output
+	 * @return {@code true} if this object occurs in the current ontology
 	 */
-	interface Visitor<O>
-			extends
-				IndexedClassExpression.Visitor<O>,
-				IndexedPropertyChain.Visitor<O>,
-				IndexedEntity.Visitor<O>,
-				IndexedClassExpressionList.Visitor<O> {
+	boolean occurs();
 
-		// combined interface
-
-	}
-	
-	<O> O accept(Visitor<O> visitor);	
+	/**
+	 * @return the string representing information about the number of
+	 *         occurrences of this object
+	 */
+	String printOccurrenceNumbers();
 
 }

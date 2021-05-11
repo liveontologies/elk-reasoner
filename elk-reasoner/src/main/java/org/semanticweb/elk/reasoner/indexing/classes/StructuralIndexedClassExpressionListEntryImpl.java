@@ -36,7 +36,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author "Yevgeny Kazakov"
  */
 class StructuralIndexedClassExpressionListEntryImpl extends
-		StructuralIndexedSubObjectImpl<StructuralIndexedClassExpressionListEntryImpl, StructuralIndexedClassExpressionListEntry<?>>
+		StructuralIndexedSubObjectHasOccurrenceImpl<StructuralIndexedClassExpressionListEntryImpl, StructuralIndexedClassExpressionListEntry<?>>
 		implements
 		StructuralIndexedClassExpressionListEntry<StructuralIndexedClassExpressionListEntryImpl> {
 

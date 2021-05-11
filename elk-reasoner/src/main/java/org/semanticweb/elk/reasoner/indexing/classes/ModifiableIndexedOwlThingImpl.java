@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.indexing.classes;
 import org.semanticweb.elk.RevertibleAction;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
+import org.semanticweb.elk.reasoner.indexing.model.HasNegativeOccurrence;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPredefinedClass;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClass;
@@ -39,8 +40,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContext
  * 
  */
 final class ModifiableIndexedOwlThingImpl
-		extends StructuralIndexedClassEntryImpl
-		implements ModifiableIndexedClass, IndexedPredefinedClass {
+		extends StructuralIndexedClassEntryImpl implements
+		ModifiableIndexedClass, IndexedPredefinedClass, HasNegativeOccurrence {
 
 	/**
 	 * Some rules depend on whether {@code owl:Thing} occur negatively
@@ -51,6 +52,7 @@ final class ModifiableIndexedOwlThingImpl
 		super(owlThing);
 	}
 
+	@Override
 	public boolean occursNegatively() {
 		return negativeOccurrenceNo_ > 0;
 	}
@@ -62,7 +64,7 @@ final class ModifiableIndexedOwlThingImpl
 	}
 
 	@Override
-	void checkOccurrenceNumbers() {
+	public void checkOccurrenceNumbers() {
 		super.checkOccurrenceNumbers();
 		if (negativeOccurrenceNo_ < 0)
 			throw new ElkUnexpectedIndexingException(
