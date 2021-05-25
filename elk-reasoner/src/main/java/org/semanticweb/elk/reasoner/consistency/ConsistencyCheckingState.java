@@ -137,7 +137,7 @@ public class ConsistencyCheckingState {
 					}
 
 					@Override
-					public void contextMarkNonSaturated(C context) {
+					public void contextMarkedNonSaturated(C context) {
 						IndexedContextRoot root = context.getRoot();
 						if (root instanceof IndexedIndividual) {
 							IndexedIndividual ind = (IndexedIndividual) root;
@@ -150,7 +150,7 @@ public class ConsistencyCheckingState {
 					}
 
 					@Override
-					public void contextMarkSaturated(C context) {
+					public void contextMarkedSaturated(C context) {
 
 						IndexedContextRoot root = context.getRoot();
 						if (!context.containsConclusion(

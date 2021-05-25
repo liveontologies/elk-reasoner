@@ -154,7 +154,7 @@ public class TraceState
 					}
 
 					@Override
-					public void contextMarkNonSaturated(final C context) {
+					public void contextMarkedNonSaturated(C context) {
 						// TODO: remove only affected inferences
 						clearClassInferences();
 						clearIndexedAxiomInferences();

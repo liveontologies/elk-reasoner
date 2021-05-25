@@ -1,21 +1,12 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 
-import org.semanticweb.elk.reasoner.indexing.classes.DummyIndexedContextRootVisitor;
-import org.semanticweb.elk.reasoner.indexing.model.HasNegativeOccurrence;
-import org.semanticweb.elk.reasoner.indexing.model.HasPositiveOccurrence;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexClassExpression;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedRangeFiller;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObject;
-
-/*
+/*-
  * #%L
- * ELK Reasoner
+ * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2021 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +22,14 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObject;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
+import org.semanticweb.elk.reasoner.indexing.classes.DummyIndexedContextRootVisitor;
+import org.semanticweb.elk.reasoner.indexing.model.HasNegativeOccurrence;
+import org.semanticweb.elk.reasoner.indexing.model.HasPositiveOccurrence;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedRangeFiller;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObject;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
@@ -43,34 +41,37 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassConclus
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link ClassConclusion.Visitor} that marks the {@link Context} for the root
- * returned by {@link ClassConclusion#getTraceRoot()} for the visited
- * {@link ClassConclusion}s as not saturated if the {@link ClassConclusion} can
- * potentially be re-derived. The visit method always returns {@code true}.
- * 
- * @see ClassConclusion#getTraceRoot()
+ * Checks necessary conditions for {@link ClassConclusion} to be derived for the
+ * current ontology. The necessary conditions involve, for example, checking if
+ * all {@link IndexedSubObject}s of this {@link ClassConclusion} occur in the
+ * ontology with proper polarities.
  * 
  * @author "Yevgeny Kazakov"
- * 
  */
-public class ClassConclusionTracingContextUnsaturationVisitor
+public class DerivedClassConclusionChecker
 		implements ClassConclusion.Visitor<Boolean> {
+
+	private static final ClassConclusion.Visitor<Boolean> INSTANCE_ = new DerivedClassConclusionChecker();
 
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ClassConclusionTracingContextUnsaturationVisitor.class);
- 
-	
-	private final SaturationStateWriter<?> writer_;
+			.getLogger(DerivedClassConclusionChecker.class);
 
-	public ClassConclusionTracingContextUnsaturationVisitor(
-			SaturationStateWriter<?> writer) {
-		this.writer_ = writer;
+	/**
+	 * Checks the necessary condition for the given {@link ClassConclusion} to
+	 * be derived for the current ontology.
+	 * 
+	 * @param conclusion
+	 * @return {@code false} if conclusion cannot be derived for the current
+	 *         ontology. If {@code true} is returned, however, this still does
+	 *         not mean that conclusion is derivable.
+	 */
+	public static boolean check(ClassConclusion conclusion) {
+		return conclusion.accept(INSTANCE_);
 	}
 
 	private final static IndexedContextRoot.Visitor<Boolean> ROOT_OCCURRENCE_CHECKER_ = new DummyIndexedContextRootVisitor<Boolean>() {
@@ -121,27 +122,25 @@ public class ClassConclusionTracingContextUnsaturationVisitor
 	}
 
 	private boolean log(ClassConclusion conclusion) {
-		LOGGER_.trace("Conclusion could be rederived: {}", conclusion);
+		LOGGER_.trace("Conclusion could be (re)derived: {}", conclusion);
 		return true;
 	}
 
 	protected boolean defaultVisit(ClassConclusion conclusion) {
-		return !occurs(conclusion.getDestination())
-				|| !occurs(conclusion.getTraceRoot())
-				|| writer_.markAsNotSaturated(conclusion.getTraceRoot())
-				|| log(conclusion) || true;
+		return occurs(conclusion.getDestination())
+				&& occurs(conclusion.getTraceRoot()) && log(conclusion);
 	}
 
 	protected boolean defaultVisit(SubClassConclusion conclusion) {
-		return !occurs(conclusion.getSubDestination())
-				|| !occurs(conclusion.getTraceRoot())
-				|| defaultVisit((ClassConclusion) conclusion);
+		return occurs(conclusion.getSubDestination())
+				&& occurs(conclusion.getTraceRoot())
+				&& defaultVisit((ClassConclusion) conclusion);
 	}
 
 	@Override
 	public Boolean visit(BackwardLink conclusion) {
-		return !occurs(conclusion.getRelation())
-				|| !occurs(conclusion.getSource()) || defaultVisit(conclusion);
+		return occurs(conclusion.getRelation())
+				&& occurs(conclusion.getSource()) && defaultVisit(conclusion);
 	}
 
 	@Override
@@ -156,32 +155,32 @@ public class ClassConclusionTracingContextUnsaturationVisitor
 
 	@Override
 	public Boolean visit(DisjointSubsumer conclusion) {
-		return !occurs(conclusion.getDisjointExpressions())
-				|| defaultVisit(conclusion);
+		return occurs(conclusion.getDisjointExpressions())
+				&& defaultVisit(conclusion);
 	}
 
 	@Override
 	public Boolean visit(ForwardLink conclusion) {
-		return !occurs(conclusion.getChain()) || !occurs(conclusion.getTarget())
-				|| defaultVisit(conclusion);
+		return occurs(conclusion.getChain()) && occurs(conclusion.getTarget())
+				&& defaultVisit(conclusion);
 	}
 
 	@Override
 	public Boolean visit(Propagation subConclusion) {
-		return !occurs(subConclusion.getRelation())
-				|| !occursNegatively(subConclusion.getCarry())
-				|| defaultVisit(subConclusion);
+		return occurs(subConclusion.getRelation())
+				&& occursNegatively(subConclusion.getCarry())
+				&& defaultVisit(subConclusion);
 	}
 
 	@Override
 	public Boolean visit(SubClassInclusionComposed conclusion) {
-		return !occursNegatively(conclusion.getSubsumer())
-				|| defaultVisit(conclusion);
+		return occursNegatively(conclusion.getSubsumer())
+				&& defaultVisit(conclusion);
 	}
 
 	@Override
 	public Boolean visit(SubClassInclusionDecomposed conclusion) {
-		return !occurs(conclusion.getSubsumer()) || defaultVisit(conclusion);
+		return occurs(conclusion.getSubsumer()) && defaultVisit(conclusion);
 	}
 
 	@Override

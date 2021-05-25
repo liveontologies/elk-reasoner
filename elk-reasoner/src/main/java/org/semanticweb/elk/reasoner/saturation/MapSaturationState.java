@@ -69,9 +69,7 @@ public class MapSaturationState<EC extends ExtendedContext>
 	@Override
 	void resetContexts() {
 		contextAssignment_.clear();
-		for (int i = 0; i < getChangeListenerCount(); i++) {
-			getChangeListener(i).contextsClear();
-		}
+		notifyContextsClear();
 	}
 
 	@Override
@@ -79,9 +77,7 @@ public class MapSaturationState<EC extends ExtendedContext>
 		EC previous = contextAssignment_.putIfAbsent(context.getRoot(),
 				context);
 		if (previous == null) {
-			for (int i = 0; i < getChangeListenerCount(); i++) {
-				getChangeListener(i).contextAddition(context);
-			}
+			notifyContextAddition(context);
 		}
 		return previous;
 	}
