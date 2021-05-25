@@ -81,9 +81,8 @@ public interface SaturationState<C extends Context> {
 	/**
 	 * @return the value of the counter that is incremented right after a
 	 *         context becomes marked as non-saturated, e.g., as the result of
-	 *         calling
-	 *         {@link SaturationStateWriter#markAsNotSaturated(IndexedContextRoot)}.
-	 *         The value never decreases and is never greater than the value of
+	 *         adding or removing {@link ClassConclusion}s. The value never
+	 *         decreases and is never greater than the value of
 	 *         #getContextSetSaturatedCount().
 	 */
 	int getContextMarkNonSaturatedCount();
@@ -235,7 +234,7 @@ public interface SaturationState<C extends Context> {
 		 * 
 		 * @param context
 		 */
-		void contextMarkSaturated(C context);
+		void contextMarkedSaturated(C context);
 
 		/**
 		 * Is triggered immediately after the given context is marked as
@@ -244,22 +243,20 @@ public interface SaturationState<C extends Context> {
 		 * 
 		 * @param context
 		 */
-		void contextMarkNonSaturated(C context);
+		void contextMarkedNonSaturated(C context);
 		
 		
 		/**
-		 * Is triggered immediately after a new conclusion has been added 
+		 * Is triggered for a context of this {@link SaturationState} a
+		 * {@link ClassConclusion} with the same
+		 * {@link ClassConclusion#getTraceRoot()} as {@link Context#getRoot()}
+		 * has been added or removed while {@link Context#isSaturated()}
+		 * remained {@code true}. This can happen, for example, as a result of
+		 * updating the saturation after changes to the ontology.
 		 * 
-		 * @param conclusion
+		 * @param context
 		 */
-		void conclusionAdded(ClassConclusion conclusion);
-		
-		/**
-		 * Is triggered immediately after a new conclusion has been removed 
-		 * 
-		 * @param conclusion
-		 */
-		void conclusionRemoved(ClassConclusion conclusion);
+		void saturatedContextModified(C context);
 
 	}
 

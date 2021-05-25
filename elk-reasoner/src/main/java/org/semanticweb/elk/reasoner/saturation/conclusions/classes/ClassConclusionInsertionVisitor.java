@@ -60,19 +60,4 @@ public class ClassConclusionInsertionVisitor
 		return writer_.addConclusion(conclusion);
 	}
 
-	@Override
-	public Boolean visit(ContextInitialization conclusion) {
-		Context context = writer_.getSaturationState()
-				.getContext(conclusion.getDestination());
-		if (context.containsConclusion(conclusion)) {
-			return false;
-		}
-		// else
-		// Mark context as non-saturated if conclusion was not already
-		// initialized. It is important to mark before we insert, otherwise
-		// the context can be found initialized and saturated when it is not.
-		writer_.markAsNotSaturated(context.getRoot());
-		return defaultVisit(conclusion);
-	}
-	
 }

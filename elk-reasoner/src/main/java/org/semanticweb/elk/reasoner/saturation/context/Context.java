@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.context;
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
@@ -89,10 +90,12 @@ public interface Context extends ClassConclusionSet, ContextPremises {
 	ClassInference takeToDo();
 
 	/**
-	 * @return {@code true} if all {@link ClassConclusion}s for this {@link Context},
-	 *         that have the same value of
-	 *         {@link ClassConclusion#getTraceRoot()} as {@link Context#getRoot()} 
-	 *         are already computed.
+	 * @return {@code true} if all {@link ClassConclusion}s that have the same
+	 *         value of {@link ClassConclusion#getTraceRoot()} as
+	 *         {@link Context#getRoot()} and {@link SubClassConclusion}s that
+	 *         have the value {@code null} for
+	 *         {@link SubClassConclusion#getTraceSubRoot()} are already
+	 *         computed.
 	 */
 	boolean isSaturated();
 

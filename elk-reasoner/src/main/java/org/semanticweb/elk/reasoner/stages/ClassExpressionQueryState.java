@@ -63,7 +63,6 @@ import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputUnsatisfi
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateDummyChangeListener;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.taxonomy.ElkClassKeyProvider;
@@ -221,13 +220,13 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 
 					
 					@Override
-					public void contextMarkNonSaturated(final C context) {
+					public void contextMarkedNonSaturated(C context) {
 						contextModified(context.getRoot());
 					}
-
+					
 					@Override
-					public void conclusionAdded(ClassConclusion conclusion) {
-						contextModified(conclusion.getDestination());
+					public void saturatedContextModified(C context) {
+						contextModified(context.getRoot());
 					}
 
 					public void contextModified(IndexedContextRoot root) {						

@@ -154,9 +154,7 @@ class ReferenceSaturationState
 			context.getRoot().resetContext();			
 		}
 		contextCount.set(0);
-		for (int i = 0; i < getChangeListenerCount(); i++) {
-			getChangeListener(i).contextsClear();
-		}
+		notifyContextsClear();
 	}
 
 	@Override
@@ -165,9 +163,7 @@ class ReferenceSaturationState
 				.setContextIfAbsent(context);
 		if (previous == null) {
 			contextCount.incrementAndGet();
-			for (int i = 0; i < getChangeListenerCount(); i++) {
-				getChangeListener(i).contextAddition(context);
-			}
+			notifyContextAddition(context);
 		}
 		return previous;
 	}

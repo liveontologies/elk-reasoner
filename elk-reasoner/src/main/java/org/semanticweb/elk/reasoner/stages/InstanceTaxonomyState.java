@@ -118,7 +118,7 @@ public class InstanceTaxonomyState {
 				.addListener(new SaturationStateDummyChangeListener<C>() {
 
 					@Override
-					public void contextMarkNonSaturated(final C context) {
+					public void contextMarkedNonSaturated(C context) {
 						final IndexedContextRoot root = context.getRoot();
 						if (root instanceof IndexedIndividual) {
 							final IndexedIndividual ind = (IndexedIndividual) root;

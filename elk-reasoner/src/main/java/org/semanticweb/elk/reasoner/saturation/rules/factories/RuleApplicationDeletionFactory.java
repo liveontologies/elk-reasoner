@@ -31,7 +31,6 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionDeletionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionOccurrenceCheckingVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.ClassConclusionTracingContextUnsaturationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.RuleApplicationClassConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -109,11 +108,7 @@ public class RuleApplicationDeletionFactory
 												.getContextInitRuleHead(),
 										ruleVisitor, writer),
 								// after processing, delete the conclusion
-								new ClassConclusionDeletionVisitor(writer),
-								// and mark the source context of the conclusion
-								// as non-saturated
-								new ClassConclusionTracingContextUnsaturationVisitor(
-										writer)),
+								new ClassConclusionDeletionVisitor(writer)),
 								localStatistics));
 	}
 }

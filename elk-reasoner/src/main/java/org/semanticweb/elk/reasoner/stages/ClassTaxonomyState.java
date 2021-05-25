@@ -42,7 +42,6 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpress
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateDummyChangeListener;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.DummyNodeStoreListener;
@@ -131,15 +130,15 @@ public class ClassTaxonomyState {
 
 					
 					@Override
-					public void contextMarkNonSaturated(final C context) {
+					public void contextMarkedNonSaturated(C context) {
 						contextModified(context.getRoot());
 					}
 
 					@Override
-					public void conclusionAdded(ClassConclusion conclusion) {
-						contextModified(conclusion.getDestination());
-					}					
-					
+					public void saturatedContextModified(C context) {
+						contextModified(context.getRoot());
+					}
+										
 					public void contextModified(IndexedContextRoot root) {
 						if (root instanceof IndexedClass) {
 							final IndexedClass cls = (IndexedClass) root;
