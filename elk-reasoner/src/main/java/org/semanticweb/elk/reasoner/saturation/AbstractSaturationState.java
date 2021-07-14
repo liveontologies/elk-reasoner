@@ -93,7 +93,7 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 
 	private final ContextFactory<EC> contextFactory;
 
-	private final List<SaturationState.ChangeListener<EC>> listeners_ = new ArrayList<>();
+	private final List<SaturationState.ChangeListener<? super EC>> listeners_ = new ArrayList<>();
 
 	public AbstractSaturationState(OntologyIndex index,
 			ContextFactory<EC> factory) {
@@ -189,12 +189,12 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 	}
 
 	@Override
-	public boolean addListener(SaturationState.ChangeListener<EC> listener) {
+	public boolean addListener(SaturationState.ChangeListener<? super EC> listener) {
 		return listeners_.add(listener);
 	}
 
 	@Override
-	public boolean removeListener(SaturationState.ChangeListener<EC> listener) {
+	public boolean removeListener(SaturationState.ChangeListener<? super EC> listener) {
 		return listeners_.remove(listener);
 	}
 

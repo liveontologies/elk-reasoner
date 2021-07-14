@@ -189,7 +189,7 @@ public interface SaturationState<C extends Context> {
 	 *         otherwise; if {@code false} is return, the listener was not
 	 *         registered
 	 */
-	public boolean addListener(ChangeListener<C> listener);
+	public boolean addListener(ChangeListener<? super C> listener);
 
 	/**
 	 * Removes a given {@link ChangeListener} from this {@link SaturationState}
@@ -199,7 +199,7 @@ public interface SaturationState<C extends Context> {
 	 *         otherwise; if {@code false} is return, the listener was not
 	 *         removed
 	 */
-	public boolean removeListener(ChangeListener<C> listener);
+	public boolean removeListener(ChangeListener<? super C> listener);
 
 	/**
 	 * The listener for changes in {@link SaturationState}
