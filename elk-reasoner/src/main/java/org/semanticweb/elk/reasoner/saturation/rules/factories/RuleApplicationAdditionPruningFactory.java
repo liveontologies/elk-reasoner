@@ -36,9 +36,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.classes.TracingRuleAp
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference.Visitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInferenceConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.CombinedClassInferenceProducer;
+import org.semanticweb.elk.reasoner.saturation.inferences.DummyClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
@@ -54,21 +54,21 @@ import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
  * tracing rules, i.e.,the {@link Rule}s for which {@link Rule#isTracingRule()}
  * returns {@code true}.
  * 
- * The produced {@link ClassConclusion}s are buffered within the queue of the
- * respective {@link Context} and can be later obtained by
- * {@link Context#takeToDo()}. The content of the {@link Context}s is otherwise
- * not modified. To make sure that all rules are applied, the
- * {@link ClassConclusion}s stored in {@link Context}s should be reachable from
- * such {@link Context}s by applying tracing rules.
+ * The produced {@link ClassInference}s whose conclusions do not appear in the
+ * {@link SaturationState} are added to the queue of the respective
+ * {@link Context} and can be later obtained by {@link Context#takeToDo()}. The
+ * content of the {@link Context}s is otherwise not modified. To make sure that
+ * all rules are applied, the {@link ClassConclusion}s stored in
+ * {@link Context}s should be reachable from such {@link Context}s by applying
+ * tracing rules.
  * 
  * @author "Yevgeny Kazakov"
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class RuleApplicationAdditionPruningFactory
-		extends
-			AbstractRuleApplicationFactory<ExtendedContext, RuleApplicationInput> {
+public class RuleApplicationAdditionPruningFactory extends
+		AbstractRuleApplicationFactory<ExtendedContext, RuleApplicationInput> {
 
 	private final SaturationState<? extends Context> mainSaturationState_;
 
@@ -83,49 +83,85 @@ public class RuleApplicationAdditionPruningFactory
 		 * {@link SaturationState} to keep track of {@link Context}s to which
 		 * the rules are already applied.
 		 */
-		super(interrupter, new MapSaturationState<ExtendedContext>(
-				mainSaturationState.getOntologyIndex(),
-				new MainContextFactory()));
+		super(interrupter,
+				new MapSaturationState<ExtendedContext>(
+						mainSaturationState.getOntologyIndex(),
+						new MainContextFactory()));
 		this.mainSaturationState_ = mainSaturationState;
 	}
 
 	@Override
-	protected Visitor<Boolean> getInferenceProcessor(
+	protected ClassInference.Visitor<Boolean> getInferenceProcessor(
 			Reference<Context> activeContext, RuleVisitor<?> ruleVisitor,
 			SaturationStateWriter<? extends ExtendedContext> localWriter,
 			SaturationStatistics localStatistics) {
-		return new ClassInferenceConclusionVisitor<Boolean>(
-				// measuring time, if necessary
-				SaturationUtils.getTimedConclusionVisitor(
-						SaturationUtils.compose(
-								// count processed conclusions, if necessary
-								SaturationUtils
-										.getClassInferenceCountingVisitor(
-												localStatistics),
-								// checking the conclusion against the main
-								// saturation state
-								new ClassConclusionOccurrenceCheckingVisitor(
-										new RelativizedContextReference(
-												activeContext,
-												mainSaturationState_)),
-								// if all fine, insert the conclusion to the
-								// local context copies
-								new ClassConclusionInsertionVisitor(localWriter),
-								// count conclusions used in the rules, if
-								// necessary
-								SaturationUtils
-										.getClassConclusionCountingVisitor(
-												localStatistics),
-								// and apply rules locally
-								new TracingRuleApplicationClassConclusionVisitor(
-										mainSaturationState_, activeContext,
-										ruleVisitor,
-										// the conclusions are produced in both
-										// main and tracing saturation states
-										new CombinedClassInferenceProducer(
+		// keep a reference to the processed inference
+		CurrentClassInference inferenceRef = new CurrentClassInference();
+		return SaturationUtils.compose(inferenceRef,
+				new ClassInferenceConclusionVisitor<Boolean>(
+						// measuring time, if necessary
+						SaturationUtils.getTimedConclusionVisitor(
+								SaturationUtils.compose(
+										// count processed conclusions, if
+										// necessary
+										SaturationUtils
+												.getClassInferenceCountingVisitor(
+														localStatistics),
+										// check if the conclusion appears in
+										// the main saturation state
+										new ClassConclusionOccurrenceCheckingVisitor(
+												new RelativizedContextReference(
+														activeContext,
+														mainSaturationState_)) {
+											@Override
+											protected Boolean defaultVisit(
+													ClassConclusion conclusion) {
+												if (super.defaultVisit(
+														conclusion)) {
+													return true;
+												}
+												// else the inference should be
+												// added to the main saturation
 												mainSaturationState_
-														.getContextCreatingWriter(),
-												localWriter))),
-						localStatistics));
+														.getContextCreatingWriter()
+														.produce(inferenceRef
+																.get());
+												return false;
+											}
+										},
+										// add the conclusion locally
+										new ClassConclusionInsertionVisitor(
+												localWriter),
+										// if new, update conclusion counters,
+										// if necessary
+										SaturationUtils
+												.getClassConclusionCountingVisitor(
+														localStatistics),
+										// and apply the rules
+										new TracingRuleApplicationClassConclusionVisitor(
+												mainSaturationState_,
+												activeContext, ruleVisitor,
+												localWriter)),
+								localStatistics)));
 	}
+
+	public static class CurrentClassInference
+			extends DummyClassInferenceVisitor<Boolean>
+			implements Reference<ClassInference> {
+
+		ClassInference visitedInference_;
+
+		@Override
+		protected Boolean defaultVisit(ClassInference inference) {
+			this.visitedInference_ = inference;
+			return true;
+		}
+
+		@Override
+		public ClassInference get() {
+			return visitedInference_;
+		}
+
+	}
+
 }
