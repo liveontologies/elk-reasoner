@@ -126,8 +126,7 @@ public class ClassExpressionSaturation<I extends IndexedContextRoot>
 				public SaturationJob<I> next() {
 					SaturationJob<I> job = new SaturationJob<I>(
 							inputsIterator.next());
-					if (LOGGER_.isTraceEnabled())
-						LOGGER_.trace(job.getInput() + ": saturation submitted");
+					LOGGER_.trace("{}: saturation submitted", job.getInput());
 					return job;
 				}
 

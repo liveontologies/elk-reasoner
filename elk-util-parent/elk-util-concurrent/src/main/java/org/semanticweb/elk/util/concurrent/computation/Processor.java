@@ -46,7 +46,7 @@ public interface Processor {
 	public void process() throws InterruptedException;
 
 	/**
-	 * Indicate that processing of by this object is finished. This method
+	 * Indicate that processing is finished. This method
 	 * should be eventually called after every call of {@link #process()}. But
 	 * it is not necessary that every call of {@link #process()} should be
 	 * followed by {@link #finish()}. E.g., it can be followed by
