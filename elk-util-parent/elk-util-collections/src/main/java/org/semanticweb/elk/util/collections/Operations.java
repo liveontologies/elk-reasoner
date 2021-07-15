@@ -190,6 +190,33 @@ public class Operations {
 	}
 
 	/**
+	 * @param <T>
+	 * @param first
+	 * @param second
+	 * @return an iterator that iterates that advances the two given iterators
+	 *         at the same time and returns the values of the second iterator
+	 */
+	public static <T> Iterator<T> synchronize(Iterator<?> first,
+			Iterator<? extends T> second) {
+
+		return new Iterator<T>() {
+
+			@Override
+			public boolean hasNext() {
+				return first.hasNext() && second.hasNext();
+			}
+
+			@Override
+			public T next() {
+				first.next();
+				return second.next();
+			}
+
+		};
+
+	}
+	
+	/**
 	 * Splits the input {@link Iterable} on batches with at most given number of
 	 * elements.
 	 * 

@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Collection;
 
 import org.semanticweb.elk.exceptions.ElkException;
+import org.semanticweb.elk.reasoner.BatchListener;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
 import org.semanticweb.elk.reasoner.saturation.context.ContextRootCollection;
@@ -34,8 +35,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationIn
 /**
  * Prunes the set of deleted conclusions by re-deriving those having alternative
  * derivations (name taken from the original paper on the DRed algorithm). Uses
- * a {@link RuleApplicationAdditionPruningFactory} which "fills gaps" in the set of
- * conclusions for each context by deriving the missing conclusions.
+ * a {@link RuleApplicationAdditionPruningFactory} which "fills gaps" in the set
+ * of conclusions for each context by deriving the missing conclusions.
  * 
  * @author Pavel Klinov
  * 
@@ -75,8 +76,17 @@ public class IncrementalOverdeletionPruningStage extends AbstractReasonerStage {
 
 		completion_ = new ClassExpressionSaturation<IndexedContextRoot>(inputs,
 				reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor(), ruleAppFactory);
+				reasoner.getProgressMonitor(), ruleAppFactory, 1024,
+				new BatchListener() {
 
+					@Override
+					public void batchProcessed() {
+						// periodically clean up temporary saturations as they
+						// are used only for tracing and do not share conclusions
+						ruleAppFactory.getSaturationState()
+								.getContextCreatingWriter().resetContexts();
+					}
+				});
 		return true;
 	}
 
@@ -90,8 +100,8 @@ public class IncrementalOverdeletionPruningStage extends AbstractReasonerStage {
 		if (!super.postExecute()) {
 			return false;
 		}
-		reasoner.ruleAndConclusionStats.add(completion_
-				.getRuleAndConclusionStatistics());
+		reasoner.ruleAndConclusionStats
+				.add(completion_.getRuleAndConclusionStatistics());
 		this.completion_ = null;
 		return true;
 	}

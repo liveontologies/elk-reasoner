@@ -26,6 +26,7 @@ import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.semanticweb.elk.reasoner.BatchListener;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
@@ -55,7 +56,7 @@ public class ClassExpressionSaturation<I extends IndexedContextRoot>
 
 	/*
 	 * Takes inputs and uses the default rule application factory and a dummy
-	 * listener
+	 * listener runs without batches
 	 */
 	public ClassExpressionSaturation(Collection<? extends I> inputs,
 			ConcurrentExecutor executor, int maxWorkers,
@@ -64,9 +65,23 @@ public class ClassExpressionSaturation<I extends IndexedContextRoot>
 		this(inputs, executor, maxWorkers, progressMonitor, ruleAppFactory,
 				new DummyClassExpressionSaturationListener<SaturationJob<I>>());
 	}
+	
+	/*
+	 * Takes inputs and uses the default rule application factory and a dummy
+	 * listener, runs in batches
+	 */
+	public ClassExpressionSaturation(Collection<? extends I> inputs,
+			ConcurrentExecutor executor, int maxWorkers,
+			ProgressMonitor progressMonitor,
+			RuleApplicationFactory<?, RuleApplicationInput> ruleAppFactory,
+			int batchSize, BatchListener batchListener) {
+		this(inputs, executor, maxWorkers, progressMonitor, ruleAppFactory,
+				batchSize, batchListener,
+				new DummyClassExpressionSaturationListener<SaturationJob<I>>());
+	}
 
 	/*
-	 * Takes inputs and uses the default rule application factory
+	 * Takes inputs and uses the default rule application factory, runs without batches
 	 */
 	public ClassExpressionSaturation(Collection<? extends I> inputs,
 			ConcurrentExecutor executor, int maxWorkers,
@@ -75,8 +90,24 @@ public class ClassExpressionSaturation<I extends IndexedContextRoot>
 			ClassExpressionSaturationListener<SaturationJob<I>> listener) {
 		super(new TodoJobs<I>(inputs),
 				new ClassExpressionSaturationFactory<SaturationJob<I>>(
-						ruleAppFactory, maxWorkers, listener), executor,
-				maxWorkers, progressMonitor);
+						ruleAppFactory, maxWorkers, listener),
+				executor, maxWorkers, progressMonitor);
+	}
+	
+	/*
+	 * Takes inputs and uses the default rule application factory, runs in batches
+	 */
+	public ClassExpressionSaturation(Collection<? extends I> inputs,
+			ConcurrentExecutor executor, int maxWorkers,
+			ProgressMonitor progressMonitor,
+			RuleApplicationFactory<?, RuleApplicationInput> ruleAppFactory,
+			int batchSize, BatchListener batchListener,
+			ClassExpressionSaturationListener<SaturationJob<I>> listener) {
+		super(new TodoJobs<I>(inputs),
+				new ClassExpressionSaturationFactory<SaturationJob<I>>(
+						ruleAppFactory, maxWorkers, listener),
+				executor, maxWorkers, progressMonitor, batchSize,
+				batchListener);
 	}
 
 	/**
