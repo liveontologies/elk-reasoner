@@ -100,7 +100,7 @@
 		<protege.version>5.5.0</protege.version>
 		<java.required.version>8</java.required.version>
 		<slf4j.version>1.7.30</slf4j.version>
-		<logback.version>1.2.3</logback.version>
+		<logback.version>1.2.9</logback.version>
 		<elk.wiki>https://github.com/liveontologies/elk-reasoner/wiki</elk.wiki>
 		<protege.update.url>https://raw.githubusercontent.com/liveontologies/elk-reasoner/release/elk-distribution-parent/elk-distribution-protege</protege.update.url>
 	</properties>
