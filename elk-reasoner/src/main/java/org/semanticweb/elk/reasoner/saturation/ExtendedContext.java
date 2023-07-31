@@ -35,9 +35,9 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public interface ExtendedContext extends Context {
 
 	/**
-	 * Marks this {@code Context} as saturated. This means that all
-	 * {@link ClassConclusion}s for this {@link Context} that have the same
-	 * value of {@link ClassConclusion#getTraceRoot()} as
+	 * Marks this {@code Context} as saturated or not saturated. Saturated means
+	 * that all {@link ClassConclusion}s for this {@link Context} that have the
+	 * same value of {@link ClassConclusion#getTraceRoot()} as
 	 * {@link Context#getRoot()}, are already computed. This method could be
 	 * used from multiple threads producing consistent result (if the flag is
 	 * changed concurrently by two workers, only one of them returns the
