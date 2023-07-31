@@ -190,7 +190,7 @@ public abstract class ElkIncrementalReasoningTestDelegate<O>
 	public void dumpChangeToLog(final ElkAxiom change, final Logger logger,
 			final LogLevel level) {
 		LoggerWrap.log(logger, level,
-				OwlFunctionalStylePrinter.toString(change) + ": deleted");
+				OwlFunctionalStylePrinter.toString(change));
 	}
 
 	@Override

@@ -43,5 +43,10 @@ public class ReferenceImpl<O> implements ModifiableReference<O> {
 	public void set(O object) {
 		this.object_ = object;
 	}
+	
+	@Override
+	public String toString() {
+		return String.valueOf(object_);
+	}
 
 }

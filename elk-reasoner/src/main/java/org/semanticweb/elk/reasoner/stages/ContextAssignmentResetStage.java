@@ -29,8 +29,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ReasonerStage} ensuring that no context is assigned to
- * {@link IndexedClassExpression}s of the current ontology and that the
- * taxonomies are reset.
+ * {@link IndexedClassExpression}s of the current ontology.
  * 
  * @author "Yevgeny Kazakov"
  * 
