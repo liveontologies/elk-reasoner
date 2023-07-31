@@ -51,15 +51,22 @@ import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
  * @author Markus Kroetzsch
  * @author Pavel Klinov
  * 
- * @param <I>  
+ * @param <I>
  */
 public class RuleApplicationAdditionFactory<I extends RuleApplicationInput>
-		extends
-			AbstractRuleApplicationFactory<Context, I> {
+		extends AbstractRuleApplicationFactory<Context, I> {
 
 	public RuleApplicationAdditionFactory(final InterruptMonitor interrupter,
 			SaturationState<?> saturationState) {
 		super(interrupter, saturationState);
+	}
+
+	protected ClassConclusion.Visitor<Boolean> getPreInsertionHook(
+			Reference<Context> activeContext) {
+		// check that the source of the conclusion is
+		// not saturated (debugging)
+		return new ClassConclusionTracingContextNotSaturatedCheckingVisitor(
+				activeContext, getSaturationState());
 	}
 
 	@Override
@@ -75,16 +82,11 @@ public class RuleApplicationAdditionFactory<I extends RuleApplicationInput>
 								SaturationUtils
 										.getClassInferenceCountingVisitor(
 												localStatistics),
+								getPreInsertionHook(activeContext),
 								// insert conclusions initializing contexts if
 								// necessary
 								new ContextInitializingClassConclusionInsertionVisitor(
 										writer),
-								// if new, check that the source of the
-								// conclusion is
-								// not saturated (this is only needed for
-								// debugging)
-								new ClassConclusionTracingContextNotSaturatedCheckingVisitor(
-										activeContext, getSaturationState()),
 								// count conclusions used in the rules, if
 								// necessary
 								SaturationUtils
