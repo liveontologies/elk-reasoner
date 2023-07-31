@@ -103,12 +103,8 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 		reasoner.ruleAndConclusionStats
 				.add(computation.getRuleAndConclusionStatistics());
 		this.computation = null;
-		// FIXME Obviously needed a better clean-up after inconsistency
-		if (reasoner.consistencyCheckingState.isInconsistent()) {
-			reasoner.classTaxonomyState.resetTaxonomy();
-			reasoner.stageManager.objectPropertyTaxonomyComputationStage
-					.invalidate();
-		}
+		// prunes consistency checking
+		reasoner.consistencyCheckingState.getTestEntitites(); 
 		return true;
 	}
 
