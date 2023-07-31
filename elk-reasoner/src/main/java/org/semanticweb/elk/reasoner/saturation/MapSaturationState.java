@@ -68,8 +68,10 @@ public class MapSaturationState<EC extends ExtendedContext>
 
 	@Override
 	void resetContexts() {
-		contextAssignment_.clear();
-		notifyContextsClear();
+		if (!contextAssignment_.isEmpty()) {
+			contextAssignment_.clear();
+			notifyContextsClear();
+		}
 	}
 
 	@Override

@@ -225,16 +225,16 @@ public class ConsistencyCheckingState {
 			Context context = saturationState_.getContext(next);
 			if (context != null && context.isSaturated()) {
 				itr.remove();
-			} else {
-				size++;
+				continue;
 			}
+			size++;
 		}
 		return size;
 	}
 	
 	public Collection<? extends IndexedClassEntity> getTestEntitites() {
 		int size = pruneToDo();
-		// since getting the size of the queue is a linear operation,
+		// since getting the size of the queue is not a linear operation,
 		// use the computed size
 		return Operations.getCollection(toDoEntities_, size);
 	}
