@@ -183,7 +183,8 @@ public class ReasonerComputationWithInputs<I, F extends InputProcessorFactory<I,
 				return; // batch processing interrupted
 			}
 			batchListener_.batchProcessed();
-		} while (batchCounter_.reset());
+			batchCounter_.reset();
+		} while (todo_.hasNext());
 	}
 	
 	private void processBatch() {
