@@ -364,22 +364,22 @@ public abstract class AbstractReasonerState implements TracingProof {
 	 */
 	public synchronized void ensureLoading() throws ElkException {
 
-		if (!isLoadingFinished()) {
-			if (isIncrementalMode()) {
-				if (!stageManager.incrementalAdditionStage.isCompleted()) {
-					complete(stageManager.incrementalAdditionStage);
-				}
-			} else {
-				if (!stageManager.contextInitializationStage.isCompleted()) {
-					complete(stageManager.contextInitializationStage);
-				}
-			}
-			LOGGER_.trace("Reset axiom loading");
-			stageManager.inputLoadingStage.invalidateRecursive();
-			// Invalidate stages at the beginnings of the dependency chains.
-			stageManager.contextInitializationStage.invalidateRecursive();
-			stageManager.incrementalCompletionStage.invalidateRecursive();
+		if (isLoadingFinished()) {
+			return;
 		}
+
+		// ensure that all pending incremental stages are completed
+		complete(stageManager.incrementalAdditionStage);
+
+		if (!isIncrementalMode()) {
+			// reset saturation
+			complete(stageManager.contextInitializationStage);
+		}
+		LOGGER_.trace("Reset axiom loading");
+		stageManager.inputLoadingStage.invalidateRecursive();
+		// Invalidate stages at the beginnings of the dependency chains.
+		stageManager.contextInitializationStage.invalidateRecursive();
+		stageManager.incrementalCompletionStage.invalidateRecursive();
 
 		complete(stageManager.inputLoadingStage);
 
@@ -406,9 +406,10 @@ public abstract class AbstractReasonerState implements TracingProof {
 			complete(stageManager.contextInitializationStage);
 		}
 
-		if (changed) {
-			stageManager.consistencyCheckingStage.invalidateRecursive();
+		if (!changed) {
+			return;
 		}
+		stageManager.consistencyCheckingStage.invalidateRecursive();
 
 	}
 

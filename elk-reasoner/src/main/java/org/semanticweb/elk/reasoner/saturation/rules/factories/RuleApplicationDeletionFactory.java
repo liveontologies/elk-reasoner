@@ -42,7 +42,7 @@ import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
 /**
  * A {@link RuleApplicationFactory} that deletes the produced
  * {@link ClassConclusion} s from the respective {@link Context} and applies
- * rules, which in turn produce {@link ClassConclusion} s for which this process
+ * rules, which in turn produce {@link ClassConclusion}s for which this process
  * repeats if they have not been processed already. This
  * {@link RuleApplicationFactory} never creates new {@link Context}s.
  * 

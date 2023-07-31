@@ -163,13 +163,10 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 
 	/**
 	 * Creates a new {@link ClassExpressionSaturationFactory} using the given
-	 * {@link RuleApplicationFactory}for applying the rules, the maximal number
+	 * {@link RuleApplicationFactory} for applying the rules, the maximal number
 	 * of workers that can apply the rules concurrently, and
 	 * {@link ClassExpressionSaturationListener} for reporting finished
 	 * saturation jobs.
-	 * 
-	 * saturation state, listener for callback functions, and threshold for the
-	 * number of unprocessed contexts.
 	 * 
 	 * @param ruleAppFactory
 	 *            specifies how the rules are applied to new
@@ -533,7 +530,11 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				countStartedWorkers_.incrementAndGet();
 				countJobsSubmittedUpper_.incrementAndGet();
 				jobsInProgress_.add(nextJob);
-				ruleApplicationEngine_.submit(new RuleApplicationInput(root));
+				if (rootContext == null || !rootContext.isInitialized()) {
+					// if context is assigned and initialized, saturation is already in progress or finished
+					ruleApplicationEngine_
+							.submit(new RuleApplicationInput(root));
+				}
 				ruleApplicationEngine_.process();
 				updateProcessedCounters(
 						countFinishedWorkers_.incrementAndGet());
