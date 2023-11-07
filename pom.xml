@@ -99,7 +99,7 @@
 		<!-- try to keep the version low for backward compatibility -->
 		<protege.version>5.5.0</protege.version>
 		<java.required.version>8</java.required.version>
-		<slf4j.version>1.7.30</slf4j.version>
+		<slf4j.version>2.0.9</slf4j.version>
 		<logback.version>1.2.3</logback.version>
 		<elk.wiki>https://github.com/liveontologies/elk-reasoner/wiki</elk.wiki>
 		<protege.update.url>https://raw.githubusercontent.com/liveontologies/elk-reasoner/release/elk-distribution-parent/elk-distribution-protege</protege.update.url>
@@ -134,7 +134,7 @@
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-log4j12</artifactId>
+				<artifactId>slf4j-reload4j</artifactId>
 				<version>${slf4j.version}</version>
 			</dependency>
 			<dependency>
@@ -143,9 +143,9 @@
 				<version>${slf4j.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>log4j</groupId>
-				<artifactId>log4j</artifactId>
-				<version>1.2.17</version>
+				<groupId>org.apache.logging.log4j</groupId>
+    				<artifactId>log4j-core</artifactId>
+				<version>2.21.1</version>
 			</dependency>
 			<dependency>
 				<groupId>ch.qos.logback</groupId>
