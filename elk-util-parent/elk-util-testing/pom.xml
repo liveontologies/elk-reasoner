@@ -54,7 +54,7 @@
 						<configuration>
 							<usedDependencies>
 								<usedDependency>org.slf4j:slf4j-api</usedDependency>
-								<usedDependency>org.slf4j:slf4j-log4j12</usedDependency>
+								<usedDependency>org.slf4j:slf4j-reload4j</usedDependency>
 							</usedDependencies>
 						</configuration>
 					</execution>

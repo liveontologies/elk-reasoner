@@ -67,8 +67,8 @@
 						<id>analyze</id>
 						<configuration>
 							<usedDependencies>
-								<usedDependency>org.slf4j:slf4j-log4j12</usedDependency>
-								<usedDependencies>log4j:log4j</usedDependencies>
+								<usedDependency>org.slf4j:slf4j-reload4j</usedDependency>
+								<usedDependencies>log4j:log4j-core</usedDependencies>
 							</usedDependencies>
 						</configuration>
 					</execution>
