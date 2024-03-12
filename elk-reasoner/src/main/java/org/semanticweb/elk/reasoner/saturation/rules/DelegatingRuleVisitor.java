@@ -23,15 +23,14 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  */
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
@@ -99,7 +98,7 @@ public class DelegatingRuleVisitor<O> implements RuleVisitor<O> {
 
 	@Override
 	public O visit(ComposedFromDecomposedSubsumerRule rule,
-			IndexedClassEntity premise, ContextPremises premises,
+			IndexedClassExpression premise, ContextPremises premises,
 			ClassInferenceProducer producer) {
 		return visitor_.visit(rule, premise, premises, producer);
 	}

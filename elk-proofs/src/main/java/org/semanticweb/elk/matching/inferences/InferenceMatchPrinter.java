@@ -506,12 +506,12 @@ public class InferenceMatchPrinter implements InferenceMatch.Visitor<String> {
 	}
 
 	@Override
-	public String visit(SubClassInclusionComposedEntityMatch1 inferenceMatch1) {
+	public String visit(SubClassInclusionComposedOfDecomposedMatch1 inferenceMatch1) {
 		return inferenceMatch1.getParent() + " | ";
 	}
 
 	@Override
-	public String visit(SubClassInclusionComposedEntityMatch2 inferenceMatch2) {
+	public String visit(SubClassInclusionComposedOfDecomposedMatch2 inferenceMatch2) {
 		return inferenceMatch2.getParent() + " | ";
 	}
 

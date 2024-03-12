@@ -27,25 +27,23 @@ import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch1Watch;
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
-import org.semanticweb.elk.matching.subsumers.IndexedClassEntityMatch;
 import org.semanticweb.elk.matching.subsumers.SubsumerMatch;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedEntity;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedOfDecomposed;
 
-public class SubClassInclusionComposedEntityMatch1
-		extends AbstractInferenceMatch<SubClassInclusionComposedEntity>
+public class SubClassInclusionComposedOfDecomposedMatch1
+		extends AbstractInferenceMatch<SubClassInclusionComposedOfDecomposed>
 		implements SubClassInclusionDecomposedMatch1Watch {
 
 	private final IndexedContextRootMatch originMatch_;
 
-	private final IndexedClassEntityMatch conclusionSubsumerMatch_;
+	private final SubsumerMatch conclusionSubsumerMatch_;
 
-	SubClassInclusionComposedEntityMatch1(
-			SubClassInclusionComposedEntity parent,
+	SubClassInclusionComposedOfDecomposedMatch1(
+			SubClassInclusionComposedOfDecomposed parent,
 			SubClassInclusionComposedMatch1 conclusionMatch) {
 		super(parent);
 		this.originMatch_ = conclusionMatch.getDestinationMatch();
-		this.conclusionSubsumerMatch_ = conclusionMatch
-				.getSubsumerIndexedClassEntityMatch();
+		this.conclusionSubsumerMatch_ = conclusionMatch.getSubsumerMatch();
 		checkEquals(conclusionMatch, getConclusionMatch(DEBUG_FACTORY));
 	}
 
@@ -53,7 +51,7 @@ public class SubClassInclusionComposedEntityMatch1
 		return originMatch_;
 	}
 
-	public IndexedClassEntityMatch getConclusionSubsumerMatch() {
+	public SubsumerMatch getConclusionSubsumerMatch() {
 		return conclusionSubsumerMatch_;
 	}
 
@@ -91,7 +89,7 @@ public class SubClassInclusionComposedEntityMatch1
 	 */
 	public interface Visitor<O> {
 
-		O visit(SubClassInclusionComposedEntityMatch1 inferenceMatch1);
+		O visit(SubClassInclusionComposedOfDecomposedMatch1 inferenceMatch1);
 
 	}
 
@@ -103,8 +101,8 @@ public class SubClassInclusionComposedEntityMatch1
 	 */
 	public interface Factory {
 
-		SubClassInclusionComposedEntityMatch1 getSubClassInclusionComposedEntityMatch1(
-				SubClassInclusionComposedEntity parent,
+		SubClassInclusionComposedOfDecomposedMatch1 getSubClassInclusionComposedOfDecomposedMatch1(
+				SubClassInclusionComposedOfDecomposed parent,
 				SubClassInclusionComposedMatch1 conclusionMatch);
 
 	}

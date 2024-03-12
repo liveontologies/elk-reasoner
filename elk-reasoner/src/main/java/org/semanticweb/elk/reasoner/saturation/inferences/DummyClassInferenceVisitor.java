@@ -131,7 +131,7 @@ public class DummyClassInferenceVisitor<O>
 	}
 
 	@Override
-	public O visit(SubClassInclusionComposedEntity inference) {
+	public O visit(SubClassInclusionComposedOfDecomposed inference) {
 		return defaultVisit(inference);
 	}
 

@@ -26,8 +26,8 @@ package org.semanticweb.elk.reasoner.saturation.inferences;
  */
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedEntity;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.tracing.Conclusion;
@@ -37,27 +37,27 @@ import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
  * A {@link ClassInference} producing a {@link SubClassInclusionComposed} from a
  * {@link SubClassInclusionDecomposed} with
  * {@link SubClassInclusionDecomposed#getSubsumer()} instance of
- * {@link IndexedEntity}:<br>
+ * {@link IndexedClassExpression}:<br>
  * 
  * <pre>
- *  [C] ⊑ -A
+ *  [C] ⊑ -D
  * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
- *  [C] ⊑ +A
+ *  [C] ⊑ +D
  * </pre>
  * 
  * The parameters can be obtained as follows:<br>
  * 
  * C = {@link #getOrigin()} = {@link #getDestination()}<br>
- * A = {@link #getSubsumer()}<br>
+ * D = {@link #getSubsumer()}<br>
  * 
  * @author "Yevgeny Kazakov"
  *
  */
-public class SubClassInclusionComposedEntity
-		extends AbstractSubClassInclusionComposedInference<IndexedClassEntity> {
+public class SubClassInclusionComposedOfDecomposed
+		extends AbstractSubClassInclusionComposedInference<IndexedClassExpression> {
 
-	public SubClassInclusionComposedEntity(IndexedContextRoot origin,
-			IndexedClassEntity subsumer) {
+	public SubClassInclusionComposedOfDecomposed(IndexedContextRoot origin,
+			IndexedClassExpression subsumer) {
 		super(origin, subsumer);
 	}
 
@@ -103,7 +103,7 @@ public class SubClassInclusionComposedEntity
 	 */
 	public static interface Visitor<O> {
 
-		public O visit(SubClassInclusionComposedEntity inference);
+		public O visit(SubClassInclusionComposedOfDecomposed inference);
 
 	}
 

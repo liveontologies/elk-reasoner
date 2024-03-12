@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  */
 
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectHasSelf;
@@ -116,7 +115,7 @@ public class DummyRuleVisitor<O> implements RuleVisitor<O> {
 
 	@Override
 	public O visit(ComposedFromDecomposedSubsumerRule rule,
-			IndexedClassEntity premise, ContextPremises premises,
+			IndexedClassExpression premise, ContextPremises premises,
 			ClassInferenceProducer producer) {
 		return defaultVisit(rule, premise, premises, producer);
 	}

@@ -135,7 +135,7 @@ public class ClassInferenceConclusionVisitor<O>
 	}
 
 	@Override
-	public O visit(SubClassInclusionComposedEntity inference) {
+	public O visit(SubClassInclusionComposedOfDecomposed inference) {
 		return conclusionVisitor_
 				.visit(inference.getConclusion(conclusionFactory_));
 	}

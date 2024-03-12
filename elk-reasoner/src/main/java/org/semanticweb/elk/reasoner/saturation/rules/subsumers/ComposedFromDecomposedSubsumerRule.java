@@ -1,12 +1,12 @@
 package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
 
-/*
+/*-
  * #%L
- * ELK Reasoner
+ * ELK Reasoner Core
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2024 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,23 +22,23 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionDecomposed;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedEntity;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedOfDecomposed;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 
 /**
  * 
  * A {@link SubsumerDecompositionRule} producing {@link SubClassInclusionComposed} when
- * processing a {@link SubClassInclusionDecomposed} for {@link IndexedClassEntity}
+ * processing a {@link SubClassInclusionDecomposed} for {@link IndexedClassExpression}
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
 public class ComposedFromDecomposedSubsumerRule extends
-		AbstractSubsumerDecompositionRule<IndexedClassEntity> {
+		AbstractSubsumerDecompositionRule<IndexedClassExpression> {
 
 	private static final ComposedFromDecomposedSubsumerRule INSTANCE_ = new ComposedFromDecomposedSubsumerRule();
 
@@ -49,14 +49,14 @@ public class ComposedFromDecomposedSubsumerRule extends
 		return NAME;
 	}
 
-	public static SubsumerDecompositionRule<IndexedClassEntity> getInstance() {
+	public static SubsumerDecompositionRule<IndexedClassExpression> getInstance() {
 		return INSTANCE_;
 	}
 
 	@Override
-	public void apply(IndexedClassEntity premise, ContextPremises premises,
+	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ClassInferenceProducer producer) {
-		producer.produce(new SubClassInclusionComposedEntity(premises.getRoot(), premise));
+		producer.produce(new SubClassInclusionComposedOfDecomposed(premises.getRoot(), premise));
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class ComposedFromDecomposedSubsumerRule extends
 
 	@Override
 	public void accept(SubsumerDecompositionRuleVisitor<?> visitor,
-			IndexedClassEntity premise, ContextPremises premises,
+			IndexedClassExpression premise, ContextPremises premises,
 			ClassInferenceProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}

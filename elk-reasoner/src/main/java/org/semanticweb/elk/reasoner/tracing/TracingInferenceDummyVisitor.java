@@ -43,7 +43,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkOfObjectSom
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagationGenerated;
 import org.semanticweb.elk.reasoner.saturation.inferences.SaturationInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedDefinedClass;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedEntity;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedOfDecomposed;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectUnionOf;
@@ -307,7 +307,7 @@ public class TracingInferenceDummyVisitor<O> implements TracingInference.Visitor
 	}
 
 	@Override
-	public O visit(SubClassInclusionComposedEntity inference) {
+	public O visit(SubClassInclusionComposedOfDecomposed inference) {
 		return defaultVisit(inference);
 	}
 

@@ -198,7 +198,7 @@ public class ComposedClassInferenceVisitor
 	}
 
 	@Override
-	public Boolean visit(SubClassInclusionComposedEntity inference) {
+	public Boolean visit(SubClassInclusionComposedOfDecomposed inference) {
 		for (int i = 0; i < visitors_.length; i++) {
 			if (!visitors_[i].visit(inference))
 				return false;

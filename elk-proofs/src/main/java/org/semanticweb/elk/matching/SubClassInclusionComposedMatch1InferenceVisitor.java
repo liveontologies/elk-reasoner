@@ -25,7 +25,7 @@ package org.semanticweb.elk.matching;
 import org.semanticweb.elk.matching.conclusions.SubClassInclusionComposedMatch1;
 import org.semanticweb.elk.matching.inferences.InferenceMatch;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedDefinedClass;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedEntity;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedOfDecomposed;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedInference;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectSomeValuesFrom;
@@ -50,8 +50,8 @@ class SubClassInclusionComposedMatch1InferenceVisitor extends
 	}
 
 	@Override
-	public Void visit(SubClassInclusionComposedEntity inference) {
-		factory.getSubClassInclusionComposedEntityMatch1(inference, child);
+	public Void visit(SubClassInclusionComposedOfDecomposed inference) {
+		factory.getSubClassInclusionComposedOfDecomposedMatch1(inference, child);
 		return null;
 	}
 

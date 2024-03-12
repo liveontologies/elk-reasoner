@@ -32,7 +32,6 @@ import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.classes.DummyIndexedContextRootVisitor;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.model.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpressionList;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
@@ -516,7 +515,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		@Override
 		public Void visit(ComposedFromDecomposedSubsumerRule rule,
-				IndexedClassEntity premise, ContextPremises premises,
+				IndexedClassExpression premise, ContextPremises premises,
 				ClassInferenceProducer producer) {
 			// nothing is stored in the rule
 			return null;

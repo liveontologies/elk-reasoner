@@ -87,6 +87,8 @@ public class SubsumerDecompositionVisitor implements
 
 	@Override
 	public Void visit(IndexedObjectComplementOf element) {
+		ComposedFromDecomposedSubsumerRule.getInstance().accept(ruleVisitor_,
+				element, premises_, producer_);
 		IndexedObjectComplementOfDecomposition.getInstance().accept(
 				ruleVisitor_, element, premises_, producer_);
 		return null;
@@ -108,6 +110,8 @@ public class SubsumerDecompositionVisitor implements
 
 	@Override
 	public Void visit(IndexedObjectHasSelf element) {
+		ComposedFromDecomposedSubsumerRule.getInstance().accept(ruleVisitor_,
+				element, premises_, producer_);
 		IndexedObjectHasSelfDecomposition.getInstance().accept(ruleVisitor_,
 				element, premises_, producer_);
 		return null;
@@ -115,13 +119,15 @@ public class SubsumerDecompositionVisitor implements
 
 	@Override
 	public Void visit(IndexedObjectUnionOf element) {
-		// not supported
+		ComposedFromDecomposedSubsumerRule.getInstance().accept(ruleVisitor_,
+				element, premises_, producer_);
 		return null;
 	}
 
 	@Override
 	public Void visit(IndexedDataHasValue element) {
-		// not supported
+		ComposedFromDecomposedSubsumerRule.getInstance().accept(ruleVisitor_,
+				element, premises_, producer_);
 		return null;
 	}
 

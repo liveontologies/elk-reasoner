@@ -30,13 +30,13 @@ import org.semanticweb.elk.matching.conclusions.SubClassInclusionDecomposedMatch
 import org.semanticweb.elk.matching.root.IndexedContextRootMatch;
 import org.semanticweb.elk.matching.subsumers.SubsumerMatch;
 
-public class SubClassInclusionComposedEntityMatch2
-		extends AbstractInferenceMatch<SubClassInclusionComposedEntityMatch1> {
+public class SubClassInclusionComposedOfDecomposedMatch2
+		extends AbstractInferenceMatch<SubClassInclusionComposedOfDecomposedMatch1> {
 
 	private final IndexedContextRootMatch extendedOriginMatch_;
 
-	SubClassInclusionComposedEntityMatch2(
-			SubClassInclusionComposedEntityMatch1 parent,
+	SubClassInclusionComposedOfDecomposedMatch2(
+			SubClassInclusionComposedOfDecomposedMatch1 parent,
 			SubClassInclusionDecomposedMatch2 premiseMatch) {
 		super(parent);
 		SubsumerMatch subsumerMatch = premiseMatch.getSubsumerMatch();
@@ -81,7 +81,7 @@ public class SubClassInclusionComposedEntityMatch2
 	 */
 	public interface Visitor<O> {
 
-		O visit(SubClassInclusionComposedEntityMatch2 inferenceMatch2);
+		O visit(SubClassInclusionComposedOfDecomposedMatch2 inferenceMatch2);
 
 	}
 
@@ -93,8 +93,8 @@ public class SubClassInclusionComposedEntityMatch2
 	 */
 	public interface Factory {
 
-		SubClassInclusionComposedEntityMatch2 getSubClassInclusionComposedEntityMatch2(
-				SubClassInclusionComposedEntityMatch1 parent,
+		SubClassInclusionComposedOfDecomposedMatch2 getSubClassInclusionComposedOfDecomposedMatch2(
+				SubClassInclusionComposedOfDecomposedMatch1 parent,
 				SubClassInclusionDecomposedMatch2 premiseMatch);
 
 	}

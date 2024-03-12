@@ -97,15 +97,7 @@ public class ProofTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader);
 
 		try {
-			// reasoner.getTaxonomy();
-			// ElkClass sub = elkFactory.getClass(new ElkFullIri("StiffNeck"));
-			// ElkClass sup = elkFactory
-			// .getClass(new ElkFullIri("PropertyOfPhenomenon"));
-			//
-			// getTestingVisitor(reasoner, ontology).subsumptionTest(sub, sup);
-
 			TracingTests tests = getProvabilityTests(reasoner);
-
 			tests.accept(getTestingVisitor(reasoner, ontology));
 		} finally {
 			reasoner.shutdown();

@@ -94,7 +94,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkOfObjectHas
 import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkOfObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagationGenerated;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedDefinedClass;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedEntity;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedOfDecomposed;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectUnionOf;
@@ -758,18 +758,18 @@ public class InferenceMatchBaseFactory implements InferenceMatch.Factory {
 	}
 
 	@Override
-	public SubClassInclusionComposedEntityMatch1 getSubClassInclusionComposedEntityMatch1(
-			SubClassInclusionComposedEntity parent,
+	public SubClassInclusionComposedOfDecomposedMatch1 getSubClassInclusionComposedOfDecomposedMatch1(
+			SubClassInclusionComposedOfDecomposed parent,
 			SubClassInclusionComposedMatch1 conclusionMatch) {
-		return new SubClassInclusionComposedEntityMatch1(parent,
+		return new SubClassInclusionComposedOfDecomposedMatch1(parent,
 				conclusionMatch);
 	}
 
 	@Override
-	public SubClassInclusionComposedEntityMatch2 getSubClassInclusionComposedEntityMatch2(
-			SubClassInclusionComposedEntityMatch1 parent,
+	public SubClassInclusionComposedOfDecomposedMatch2 getSubClassInclusionComposedOfDecomposedMatch2(
+			SubClassInclusionComposedOfDecomposedMatch1 parent,
 			SubClassInclusionDecomposedMatch2 premiseMatch) {
-		return new SubClassInclusionComposedEntityMatch2(parent, premiseMatch);
+		return new SubClassInclusionComposedOfDecomposedMatch2(parent, premiseMatch);
 	}
 
 	@Override

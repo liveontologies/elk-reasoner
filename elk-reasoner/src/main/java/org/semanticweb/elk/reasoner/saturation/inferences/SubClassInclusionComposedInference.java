@@ -45,7 +45,7 @@ public interface SubClassInclusionComposedInference
 	 */
 	public static interface Visitor<O>
 			extends SubClassInclusionComposedDefinedClass.Visitor<O>,
-			SubClassInclusionComposedEntity.Visitor<O>,
+			SubClassInclusionComposedOfDecomposed.Visitor<O>,
 			SubClassInclusionComposedObjectIntersectionOf.Visitor<O>,
 			SubClassInclusionComposedObjectSomeValuesFrom.Visitor<O>,
 			SubClassInclusionComposedObjectUnionOf.Visitor<O>,

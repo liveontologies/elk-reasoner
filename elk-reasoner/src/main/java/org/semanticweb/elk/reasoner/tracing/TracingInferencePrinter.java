@@ -59,7 +59,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkOfObjectHas
 import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkOfObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.inferences.PropagationGenerated;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedDefinedClass;
-import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedEntity;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedOfDecomposed;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.inferences.SubClassInclusionComposedObjectUnionOf;
@@ -347,7 +347,7 @@ public class TracingInferencePrinter implements TracingInference.Visitor<String>
 	}
 
 	@Override
-	public String visit(SubClassInclusionComposedEntity inference) {
+	public String visit(SubClassInclusionComposedOfDecomposed inference) {
 		return String.format("%s -| %s", inference.getConclusion(factory_),
 				inference.getPremise(factory_));
 	}

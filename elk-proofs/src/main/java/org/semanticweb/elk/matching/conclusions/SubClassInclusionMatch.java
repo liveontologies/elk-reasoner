@@ -1,7 +1,6 @@
 package org.semanticweb.elk.matching.conclusions;
 
 import org.semanticweb.elk.matching.ElkMatchException;
-import org.semanticweb.elk.matching.subsumers.IndexedClassEntityMatch;
 import org.semanticweb.elk.matching.subsumers.IndexedClassMatch;
 import org.semanticweb.elk.matching.subsumers.IndexedIndividualMatch;
 import org.semanticweb.elk.matching.subsumers.IndexedObjectComplementOfMatch;
@@ -103,19 +102,6 @@ public abstract class SubClassInclusionMatch<P>
 
 	private <O> O failSubsumerMatch() {
 		throw new ElkMatchException(getSubsumer(), subsumerMatch_);
-	}
-
-	public IndexedClassEntityMatch getSubsumerIndexedClassEntityMatch() {
-		return subsumerMatch_
-				.accept(new FailingSubsumerMatcher<IndexedClassEntityMatch>() {
-
-					@Override
-					public IndexedClassEntityMatch defaultVisit(
-							IndexedClassEntityMatch match) {
-						return match;
-					}
-
-				});
 	}
 
 	public <O> O accept(final IndexedObjectUnionOfMatchVisitor<O> visitor) {

@@ -1803,7 +1803,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 	}
 
 	@Override
-	public Void visit(SubClassInclusionComposedEntityMatch1 inferenceMatch1) {
+	public Void visit(SubClassInclusionComposedOfDecomposedMatch1 inferenceMatch1) {
 		SubClassInclusionDecomposedMatch1 premiseMatch2 = inferenceMatch1
 				.getPremiseMatch(conclusionFactory_);
 		inferences_.add(premiseMatch2, inferenceMatch1);
@@ -1816,7 +1816,7 @@ class InferenceMatchVisitor implements InferenceMatch.Visitor<Void> {
 	}
 
 	@Override
-	public Void visit(SubClassInclusionComposedEntityMatch2 inferenceMatch2) {
+	public Void visit(SubClassInclusionComposedOfDecomposedMatch2 inferenceMatch2) {
 		inferenceMatch2.getConclusionMatch(conclusionFactory_);
 
 		// no ELK inferences
