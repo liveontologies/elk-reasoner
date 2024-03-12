@@ -99,7 +99,7 @@ public class TopIncompletenessMonitor extends SomeOfIncompletenessMonitor {
 			//
 			Feature.OBJECT_EXACT_CARDINALITY,
 			//
-			Feature.OBJECT_HAS_SELF,
+			Feature.OBJECT_HAS_SELF_NEGATIVE,
 			//
 			Feature.OBJECT_INVERSE_OF,
 			//

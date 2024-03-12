@@ -318,7 +318,9 @@ public class ElkPolarityExpressionConverterImpl
 
 	@Override
 	public ModifiableIndexedClassExpression visit(ElkObjectHasSelf expression) {
-		throw unsupported(Feature.OBJECT_HAS_SELF);
+		return factory_.getIndexedObjectHasSelf(
+				expression.getProperty().accept(this)			
+		);
 	}
 
 	@Override

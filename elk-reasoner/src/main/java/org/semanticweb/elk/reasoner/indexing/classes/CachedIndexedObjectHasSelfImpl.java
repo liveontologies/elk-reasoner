@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.classes;
 
+import org.semanticweb.elk.reasoner.completeness.Feature;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectHasSelf;
 import org.semanticweb.elk.reasoner.indexing.model.CachedIndexedObjectSomeValuesFrom;
@@ -64,6 +65,12 @@ class CachedIndexedObjectHasSelfImpl extends
 
 		negativeOccurrenceNo += increment.negativeIncrement;
 		positiveOccurrenceNo += increment.positiveIncrement;
+		
+		// negative occurrence unsupported
+		index.occurrenceChanged(
+				Feature.OBJECT_HAS_SELF_NEGATIVE,
+				increment.negativeIncrement);
+		
 		return true;
 
 	}

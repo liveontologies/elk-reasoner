@@ -95,7 +95,7 @@ public enum Feature {
 	//
 	OBJECT_EXACT_CARDINALITY("ObjectExactCardinality"),
 	//
-	OBJECT_HAS_SELF("ObjectHasSelf"),
+	OBJECT_HAS_SELF_NEGATIVE("ObjectHasSelf", Polarity.NEGATIVE),
 	//
 	OBJECT_INVERSE_OF("ObjectInverseOf"),
 	//
