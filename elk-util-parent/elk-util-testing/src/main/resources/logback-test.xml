@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration>
+
+<configuration>
+	<import class="ch.qos.logback.classic.encoder.PatternLayoutEncoder" />
+	<import class="ch.qos.logback.classic.filter.ThresholdFilter"/>
+	<import class="ch.qos.logback.core.ConsoleAppender" />
+	<import class="org.semanticweb.elk.testing.FailingAppender" />
+
+	<!-- throw EXCEPTions for messages with level at least ERROR -->
+	<appender name="EXCEPT" class="FailingAppender">
+		<filter class="ThresholdFilter">
+			<level>ERROR</level>
+		</filter>
+	</appender>
+
+	<!-- print messages with at least level WARN to standard error -->
+	<appender name="STDERR" class="ConsoleAppender">
+		<Target>System.err</Target>
+		<encoder class="PatternLayoutEncoder">
+			<pattern>%-5r [%t] %-5p %c %ex - %m%n</pattern>
+		</encoder>
+		<filter class="ThresholdFilter">
+			<level>WARN</level>
+		</filter>
+	</appender>
+
+	<!-- print all remaining messages to standard out -->
+	<appender name="STDOUT" class="ConsoleAppender">
+		<Target>System.out</Target>
+		<encoder class="PatternLayoutEncoder">
+			<pattern>%-5r [%t] %-5p %c %ex - %m%n</pattern>
+		</encoder>
+	</appender>
+
+	<root level="WARN">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="STDERR" />
+		<appender-ref ref="EXCEPT" />
+	</root>
+
+	<!-- uncomment to lift log level for specific loggers -->
+<!--	<logger-->
+<!--		name="org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation"-->
+<!--		level="TRACE">-->
+<!--		<appender-ref ref="STDOUT" />-->
+<!--	</logger>-->
+
+
+</configuration>

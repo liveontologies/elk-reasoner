@@ -25,8 +25,8 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
@@ -41,7 +41,7 @@
 						<configuration>
 							<usedDependencies>
 								<usedDependency>${project.groupId}:elk-cli</usedDependency>
-								<usedDependency>org.slf4j:slf4j-log4j12</usedDependency>
+								<usedDependency>ch.qos.logback:logback-classic</usedDependency>
 							</usedDependencies>
 						</configuration>
 					</execution>

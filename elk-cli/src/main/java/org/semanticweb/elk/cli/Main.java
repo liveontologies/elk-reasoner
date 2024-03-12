@@ -32,7 +32,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.apache.log4j.Level;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
@@ -54,6 +53,7 @@ import org.semanticweb.elk.util.logging.Statistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.qos.logback.classic.Level;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
@@ -105,7 +105,7 @@ public class Main {
 				.withRequiredArg().ofType(Integer.class);
 		OptionSpec<String> logging = parser
 				.acceptsAll(asList("logging", "l"),
-						"logging level for log4j; default INFO")
+						"logging level; default INFO")
 				.withRequiredArg().ofType(String.class).describedAs("level");
 		OptionSpec<Void> verbose = parser.acceptsAll(asList("verbose", "v"),
 				"equivalent to --logging=DEBUG");
@@ -150,7 +150,7 @@ public class Main {
 		}
 		// SLF4J does not allow setting the logging level; we use a concrete
 		// binding
-		org.apache.log4j.Logger allLoggers = org.apache.log4j.Logger
+		ch.qos.logback.classic.Logger allLoggers = (ch.qos.logback.classic.Logger) LoggerFactory
 				.getLogger("org.semanticweb.elk");
 
 		if (options.has(logging))

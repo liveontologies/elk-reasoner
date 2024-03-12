@@ -21,9 +21,9 @@ package org.semanticweb.elk.testing;
  * #L%
  */
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.spi.LoggingEvent;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.Appender;
+import ch.qos.logback.core.AppenderBase;
 
 /**
  * An {@link Appender} that throws {@link LoggingException} on received messages.
@@ -31,21 +31,11 @@ import org.apache.log4j.spi.LoggingEvent;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class FailingAppender extends AppenderSkeleton {
+public class FailingAppender extends AppenderBase<ILoggingEvent> {
 
 	@Override
-	protected void append(LoggingEvent event) {
-		throw new LoggingException(event.getRenderedMessage());
-	}
-
-	@Override
-	public void close() {
-		return;
-	}
-
-	@Override
-	public boolean requiresLayout() {
-		return false;
+	protected void append(ILoggingEvent event) {
+		throw new LoggingException(event.getFormattedMessage());
 	}
 
 }

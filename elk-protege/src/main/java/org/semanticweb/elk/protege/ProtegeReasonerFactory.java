@@ -34,9 +34,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.ReasonerProgressMonitor;
 
 /**
- * Entry point for Protege reasoner plugin. As part of the initialisation, a
- * Log4J appender is registered to create message dialogs for warnings/errors
- * that would otherwise go unnoticed.
+ * Entry point for Protege reasoner plugin.
  * 
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch

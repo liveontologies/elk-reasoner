@@ -25,18 +25,17 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<scope>runtime</scope>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -54,7 +53,6 @@
 						<configuration>
 							<usedDependencies>
 								<usedDependency>org.slf4j:slf4j-api</usedDependency>
-								<usedDependency>org.slf4j:slf4j-log4j12</usedDependency>
 							</usedDependencies>
 						</configuration>
 					</execution>
