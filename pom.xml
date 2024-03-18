@@ -93,8 +93,8 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<owlapi4.version>4.5.19</owlapi4.version>
-		<owlapi5.version>5.1.17</owlapi5.version>
+		<owlapi4.version>4.5.26</owlapi4.version>
+		<owlapi5.version>5.1.20</owlapi5.version>
 		<protege-proof-explanation.version>0.1.0</protege-proof-explanation.version>
 		<!-- try to keep the version low for backward compatibility -->
 		<protege.version>5.5.0</protege.version>
