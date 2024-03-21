@@ -70,6 +70,12 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-util-common</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.liveontologies</groupId>
 			<artifactId>puli</artifactId>
 		</dependency>
