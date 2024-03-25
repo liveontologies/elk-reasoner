@@ -24,7 +24,7 @@ script: mvn test -Dassembly.skipAssembly=true -B
 
 after_success:
   - test "$DEPLOY" = true -a "$TRAVIS_PULL_REQUEST" = false -a "$TRAVIS_BRANCH" = master
-    && mvn source:jar deploy --settings .travis-settings.xml -DskipTests=true -B
+    && mvn source:jar deploy --settings .ci-settings.xml -DskipTests=true -B
 
 env:
   global:
