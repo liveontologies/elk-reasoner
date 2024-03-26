@@ -15,10 +15,6 @@ environment:
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64/
       DEPLOY: 1
-  OSSRH_USERNAME:
-    secure: 64k8xKR++oDsn//bh82FAg==
-  OSSRH_PASSWORD:
-    secure: zcn8sBdPWDa/IVJr+uwUYDkH0YXufEkx9TZendXeu1Y=       
 matrix:
   fast_finish: true
 install:
