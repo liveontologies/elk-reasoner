@@ -2,25 +2,22 @@
 <!DOCTYPE configuration>
 
 <configuration>
-	<import class="ch.qos.logback.classic.encoder.PatternLayoutEncoder" />
-	<import class="ch.qos.logback.classic.filter.ThresholdFilter"/>
-	<import class="ch.qos.logback.core.ConsoleAppender" />
 
 	<!-- print messages with at least level WARN to standard error -->
-	<appender name="STDERR" class="ConsoleAppender">
+	<appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
 		<Target>System.err</Target>
-		<encoder class="PatternLayoutEncoder">
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
 			<pattern>%-5r [%t] %-5p %c %ex - %m%n</pattern>
 		</encoder>
-		<filter class="ThresholdFilter">
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
 			<level>WARN</level>
 		</filter>
 	</appender>
 
 	<!-- print all remaining messages to standard out -->
-	<appender name="STDOUT" class="ConsoleAppender">
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<Target>System.out</Target>
-		<encoder class="PatternLayoutEncoder">
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
 			<pattern>%-5r [%t] %-5p %c %ex - %m%n</pattern>
 		</encoder>
 	</appender>
