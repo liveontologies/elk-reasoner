@@ -23,9 +23,7 @@ package org.semanticweb.elk.owlapi;
  */
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotation;
@@ -121,6 +119,7 @@ import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
+import org.semanticweb.owlapi.apibinding.OWLFunctionalSyntaxFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
@@ -280,66 +279,71 @@ public abstract class AbstractElkObjectConverter
 	abstract OWLObjectPropertyExpression convert(
 			ElkObjectPropertyExpression input);
 
-	Set<OWLClassExpression> toClassExpressionSet(
+	OWLClassExpression[] toClassExpressions(
 			List<? extends ElkClassExpression> input) {
-		Set<OWLClassExpression> result = new HashSet<OWLClassExpression>(
-				input.size());
+		OWLClassExpression[] result = new OWLClassExpression[input.size()];
+		int i = 0;
 		for (ElkClassExpression next : input) {
-			result.add(convert(next));
+			result[i++] = convert(next);
 		}
 		return result;
 	}
 
-	Set<OWLDataPropertyExpression> toDataPropertyExpressionSet(
+	OWLDataPropertyExpression[] toDataPropertyExpressions(
 			List<? extends ElkDataPropertyExpression> input) {
-		Set<OWLDataPropertyExpression> result = new HashSet<OWLDataPropertyExpression>(
-				input.size());
+		OWLDataPropertyExpression[] result = new OWLDataPropertyExpression[
+				input.size()];
+		int i = 0;
 		for (ElkDataPropertyExpression next : input) {
-			result.add(convert(next));
+			result[i++] = convert(next);
 		}
 		return result;
 	}
 
-	Set<OWLDataRange> toDataRangeSet(List<? extends ElkDataRange> input) {
-		Set<OWLDataRange> result = new HashSet<OWLDataRange>(input.size());
-		for (ElkDataRange next : input) {
-			result.add(convert(next));
+	OWLDataRange[] toDataRanges(List<? extends ElkDataRange> input) {
+		OWLDataRange[] result = new OWLDataRange[input.size()];
+		int i = 0;
+		for (ElkDataRange next : input) {			
+			result[i++] = convert(next);
 		}
 		return result;
 	}
 
-	Set<OWLFacetRestriction> toFacetRestrictionSet(
+	OWLFacetRestriction[] toFacetRestrictions(
 			List<? extends ElkFacetRestriction> input) {
-		Set<OWLFacetRestriction> result = new HashSet<OWLFacetRestriction>(
-				input.size());
+		OWLFacetRestriction[] result = new OWLFacetRestriction[
+				input.size()];
+		int i = 0;
 		for (ElkFacetRestriction next : input) {
-			result.add(convert(next));
+			result[i++] = convert(next);
 		}
 		return result;
 	}
 
-	Set<OWLIndividual> toIndividualSet(List<? extends ElkIndividual> input) {
-		Set<OWLIndividual> result = new HashSet<OWLIndividual>(input.size());
+	OWLIndividual[] toIndividuals(List<? extends ElkIndividual> input) {
+		OWLIndividual[] result = new OWLIndividual[input.size()];
+		int i = 0;
 		for (ElkIndividual next : input) {
-			result.add(convert(next));
+			result[i++] = convert(next);
 		}
 		return result;
 	}
 
-	Set<OWLLiteral> toLiteralSet(List<? extends ElkLiteral> input) {
-		Set<OWLLiteral> result = new HashSet<OWLLiteral>(input.size());
+	OWLLiteral[] toLiteralSet(List<? extends ElkLiteral> input) {
+		OWLLiteral[] result = new OWLLiteral[input.size()];
+		int i = 0;
 		for (ElkLiteral next : input) {
-			result.add(convert(next));
+			result[i++] = convert(next);
 		}
 		return result;
 	}
 
-	Set<OWLObjectPropertyExpression> toObjectPropertyExpressionSet(
+	OWLObjectPropertyExpression[] toObjectPropertyExpressions(
 			List<? extends ElkObjectPropertyExpression> input) {
-		Set<OWLObjectPropertyExpression> result = new HashSet<OWLObjectPropertyExpression>(
-				input.size());
+		OWLObjectPropertyExpression[] result = new OWLObjectPropertyExpression[input.size()];
+		int i = 0;
 		for (ElkObjectPropertyExpression next : input) {
-			result.add(convert(next));
+			result[i++] = convert(next);
 		}
 		return result;
 	}
@@ -354,16 +358,17 @@ public abstract class AbstractElkObjectConverter
 		return result;
 	}
 
-	Set<? extends OWLPropertyExpression> toPropertyExpressionSet(
+	OWLPropertyExpression[] toPropertyExpressions(
 			List<? extends ElkObjectPropertyExpression> objectProperties,
 			List<? extends ElkDataPropertyExpression> dataProperties) {
-		Set<OWLPropertyExpression> result = new HashSet<OWLPropertyExpression>(
-				objectProperties.size() + dataProperties.size());
-		for (ElkObjectPropertyExpression property : objectProperties) {
-			result.add(convert(property));
+		OWLPropertyExpression[] result = new OWLPropertyExpression[
+				objectProperties.size() + dataProperties.size()];
+		int i = 0;
+		for (ElkObjectPropertyExpression next : objectProperties) {
+			result[i++] = convert(next);
 		}
-		for (ElkDataPropertyExpression property : dataProperties) {
-			result.add(convert(property));
+		for (ElkDataPropertyExpression next : dataProperties) {
+			result[i++] = convert(next);
 		}
 		return result;
 	}
@@ -376,58 +381,58 @@ public abstract class AbstractElkObjectConverter
 
 	@Override
 	public OWLAnnotation visit(ElkAnnotation annotation) {
-		return owlFactory_.getOWLAnnotation(convert(annotation.getProperty()),
+		return OWLFunctionalSyntaxFactory.Annotation(convert(annotation.getProperty()),
 				convert(annotation.getValue()));
 	}
 
 	@Override
 	public OWLAnnotationAssertionAxiom visit(
 			ElkAnnotationAssertionAxiom axiom) {
-		return owlFactory_.getOWLAnnotationAssertionAxiom(
+		return OWLFunctionalSyntaxFactory.AnnotationAssertion(
 				convert(axiom.getProperty()), convert(axiom.getSubject()),
 				convert(axiom.getValue()));
 	}
 
 	@Override
 	public OWLAnnotationProperty visit(ElkAnnotationProperty expression) {
-		return owlFactory_
-				.getOWLAnnotationProperty(convert(expression.getIri()));
+		return OWLFunctionalSyntaxFactory
+				.AnnotationProperty(convert(expression.getIri()));
 	}
 
 	@Override
 	public OWLAnnotationPropertyDomainAxiom visit(
 			ElkAnnotationPropertyDomainAxiom axiom) {
-		return owlFactory_.getOWLAnnotationPropertyDomainAxiom(
+		return OWLFunctionalSyntaxFactory.AnnotationPropertyDomain(
 				convert(axiom.getProperty()), convert(axiom.getDomain()));
 	}
 
 	@Override
 	public OWLAnnotationPropertyRangeAxiom visit(
 			ElkAnnotationPropertyRangeAxiom axiom) {
-		return owlFactory_.getOWLAnnotationPropertyRangeAxiom(
+		return OWLFunctionalSyntaxFactory.AnnotationPropertyRange(
 				convert(axiom.getProperty()), convert(axiom.getRange()));
 	}
 
 	@Override
 	public OWLAnonymousIndividual visit(ElkAnonymousIndividual expression) {
-		return owlFactory_.getOWLAnonymousIndividual(expression.getNodeId());
+		return OWLFunctionalSyntaxFactory.AnonymousIndividual(expression.getNodeId());
 	}
 
 	@Override
 	public OWLAsymmetricObjectPropertyAxiom visit(
 			ElkAsymmetricObjectPropertyAxiom axiom) {
-		return owlFactory_.getOWLAsymmetricObjectPropertyAxiom(
+		return OWLFunctionalSyntaxFactory.AsymmetricObjectProperty(
 				convert(axiom.getProperty()));
 	}
 
 	@Override
 	public OWLClass visit(ElkClass expression) {
-		return owlFactory_.getOWLClass(convert(expression.getIri()));
+		return OWLFunctionalSyntaxFactory.Class(convert(expression.getIri()));
 	}
 
 	@Override
 	public OWLClassAssertionAxiom visit(ElkClassAssertionAxiom axiom) {
-		return owlFactory_.getOWLClassAssertionAxiom(
+		return OWLFunctionalSyntaxFactory.ClassAssertion(
 				convert(axiom.getClassExpression()),
 				convert(axiom.getIndividual()));
 	}
@@ -440,19 +445,19 @@ public abstract class AbstractElkObjectConverter
 			throw new IllegalArgumentException(
 					"OWLAPI supports only one data property in OWLDataAllValuesFrom");
 		}
-		return owlFactory_.getOWLDataAllValuesFrom(convert(expressions.get(0)),
+		return OWLFunctionalSyntaxFactory.DataAllValuesFrom(convert(expressions.get(0)),
 				convert(expression.getDataRange()));
 	}
 
 	@Override
 	public OWLDataComplementOf visit(ElkDataComplementOf expression) {
-		return owlFactory_.getOWLDataComplementOf(convert(expression));
+		return OWLFunctionalSyntaxFactory.DataComplementOf(convert(expression));
 	}
 
 	@Override
 	public OWLDataExactCardinality visit(
 			ElkDataExactCardinalityQualified expression) {
-		return owlFactory_.getOWLDataExactCardinality(
+		return OWLFunctionalSyntaxFactory.DataExactCardinality(
 				expression.getCardinality(), convert(expression.getProperty()),
 				convert(expression.getFiller()));
 	}
@@ -466,20 +471,20 @@ public abstract class AbstractElkObjectConverter
 
 	@Override
 	public OWLDataHasValue visit(ElkDataHasValue expression) {
-		return owlFactory_.getOWLDataHasValue(convert(expression.getProperty()),
+		return OWLFunctionalSyntaxFactory.DataHasValue(convert(expression.getProperty()),
 				convert(expression.getFiller()));
 	}
 
 	@Override
 	public OWLDataIntersectionOf visit(ElkDataIntersectionOf expression) {
-		return owlFactory_.getOWLDataIntersectionOf(
-				toDataRangeSet(expression.getDataRanges()));
+		return OWLFunctionalSyntaxFactory.DataIntersectionOf(
+				toDataRanges(expression.getDataRanges()));
 	}
 
 	@Override
 	public OWLDataMaxCardinality visit(
 			ElkDataMaxCardinalityQualified expression) {
-		return owlFactory_.getOWLDataMaxCardinality(expression.getCardinality(),
+		return OWLFunctionalSyntaxFactory.DataMaxCardinality(expression.getCardinality(),
 				convert(expression.getProperty()),
 				convert(expression.getFiller()));
 	}
@@ -494,7 +499,7 @@ public abstract class AbstractElkObjectConverter
 	@Override
 	public OWLDataMinCardinality visit(
 			ElkDataMinCardinalityQualified expression) {
-		return owlFactory_.getOWLDataMinCardinality(expression.getCardinality(),
+		return OWLFunctionalSyntaxFactory.DataMinCardinality(expression.getCardinality(),
 				convert(expression.getProperty()),
 				convert(expression.getFiller()));
 	}
@@ -508,32 +513,32 @@ public abstract class AbstractElkObjectConverter
 
 	@Override
 	public OWLDataOneOf visit(ElkDataOneOf expression) {
-		return owlFactory_
-				.getOWLDataOneOf(toLiteralSet(expression.getLiterals()));
+		return OWLFunctionalSyntaxFactory
+				.DataOneOf(toLiteralSet(expression.getLiterals()));
 	}
 
 	@Override
 	public OWLDataProperty visit(ElkDataProperty expression) {
-		return owlFactory_.getOWLDataProperty(convert(expression.getIri()));
+		return OWLFunctionalSyntaxFactory.DataProperty(convert(expression.getIri()));
 	}
 
 	@Override
 	public OWLDataPropertyAssertionAxiom visit(
 			ElkDataPropertyAssertionAxiom axiom) {
-		return owlFactory_.getOWLDataPropertyAssertionAxiom(
+		return OWLFunctionalSyntaxFactory.DataPropertyAssertion(
 				convert(axiom.getProperty()), convert(axiom.getSubject()),
 				convert(axiom.getObject()));
 	}
 
 	@Override
 	public OWLDataPropertyDomainAxiom visit(ElkDataPropertyDomainAxiom axiom) {
-		return owlFactory_.getOWLDataPropertyDomainAxiom(
+		return OWLFunctionalSyntaxFactory.DataPropertyDomain(
 				convert(axiom.getProperty()), convert(axiom.getDomain()));
 	}
 
 	@Override
 	public OWLDataPropertyRangeAxiom visit(ElkDataPropertyRangeAxiom axiom) {
-		return owlFactory_.getOWLDataPropertyRangeAxiom(
+		return OWLFunctionalSyntaxFactory.DataPropertyRange(
 				convert(axiom.getProperty()), convert(axiom.getRange()));
 	}
 
@@ -545,101 +550,101 @@ public abstract class AbstractElkObjectConverter
 			throw new IllegalArgumentException(
 					"OWLAPI supports only one data property in OWLDataSomeValuesFrom");
 		}
-		return owlFactory_.getOWLDataSomeValuesFrom(
+		return OWLFunctionalSyntaxFactory.DataSomeValuesFrom(
 				convert(propertyExpressions.get(0)),
 				convert(expression.getDataRange()));
 	}
 
 	@Override
 	public OWLDatatype visit(ElkDatatype expression) {
-		return owlFactory_.getOWLDatatype(convert(expression.getIri()));
+		return OWLFunctionalSyntaxFactory.Datatype(convert(expression.getIri()));
 	}
 
 	@Override
 	public OWLDatatypeDefinitionAxiom visit(ElkDatatypeDefinitionAxiom axiom) {
-		return owlFactory_.getOWLDatatypeDefinitionAxiom(
+		return OWLFunctionalSyntaxFactory.DatatypeDefinition(
 				convert(axiom.getDatatype()), convert(axiom.getDataRange()));
 	}
 
 	@Override
 	public OWLDatatypeRestriction visit(ElkDatatypeRestriction expression) {
-		return owlFactory_.getOWLDatatypeRestriction(
+		return OWLFunctionalSyntaxFactory.DatatypeRestriction(
 				convert(expression.getDatatype()),
-				toFacetRestrictionSet(expression.getFacetRestrictions()));
+				toFacetRestrictions(expression.getFacetRestrictions()));
 	}
 
 	@Override
 	public OWLDataUnionOf visit(ElkDataUnionOf expression) {
-		return owlFactory_
-				.getOWLDataUnionOf(toDataRangeSet(expression.getDataRanges()));
+		return OWLFunctionalSyntaxFactory
+				.DataUnionOf(toDataRanges(expression.getDataRanges()));
 	}
 
 	@Override
 	public OWLDeclarationAxiom visit(ElkDeclarationAxiom axiom) {
-		return owlFactory_.getOWLDeclarationAxiom(convert(axiom.getEntity()));
+		return OWLFunctionalSyntaxFactory.Declaration(convert(axiom.getEntity()));
 	}
 
 	@Override
 	public OWLDifferentIndividualsAxiom visit(
 			ElkDifferentIndividualsAxiom axiom) {
-		return owlFactory_.getOWLDifferentIndividualsAxiom(
-				toIndividualSet(axiom.getIndividuals()));
+		return OWLFunctionalSyntaxFactory.DifferentIndividuals(
+				toIndividuals(axiom.getIndividuals()));
 	}
 
 	@Override
 	public OWLDisjointClassesAxiom visit(ElkDisjointClassesAxiom axiom) {
-		return owlFactory_.getOWLDisjointClassesAxiom(
-				toClassExpressionSet(axiom.getClassExpressions()));
+		return OWLFunctionalSyntaxFactory.DisjointClasses(
+				toClassExpressions(axiom.getClassExpressions()));
 	}
 
 	@Override
 	public OWLDisjointDataPropertiesAxiom visit(
 			ElkDisjointDataPropertiesAxiom axiom) {
 		return owlFactory_
-				.getOWLDisjointDataPropertiesAxiom(toDataPropertyExpressionSet(
+				.getOWLDisjointDataPropertiesAxiom(toDataPropertyExpressions(
 						axiom.getDataPropertyExpressions()));
 	}
 
 	@Override
 	public OWLDisjointObjectPropertiesAxiom visit(
 			ElkDisjointObjectPropertiesAxiom axiom) {
-		return owlFactory_.getOWLDisjointObjectPropertiesAxiom(
-				toObjectPropertyExpressionSet(
+		return OWLFunctionalSyntaxFactory.DisjointObjectProperties(
+				toObjectPropertyExpressions(
 						axiom.getObjectPropertyExpressions()));
 	}
 
 	@Override
 	public OWLDisjointUnionAxiom visit(ElkDisjointUnionAxiom axiom) {
-		return owlFactory_.getOWLDisjointUnionAxiom(
+		return OWLFunctionalSyntaxFactory.DisjointUnion(
 				convert(axiom.getDefinedClass()),
-				toClassExpressionSet(axiom.getClassExpressions()));
+				toClassExpressions(axiom.getClassExpressions()));
 	}
 
 	@Override
 	public OWLEquivalentClassesAxiom visit(ElkEquivalentClassesAxiom axiom) {
-		return owlFactory_.getOWLEquivalentClassesAxiom(
-				toClassExpressionSet(axiom.getClassExpressions()));
+		return OWLFunctionalSyntaxFactory.EquivalentClasses(
+				toClassExpressions(axiom.getClassExpressions()));
 	}
 
 	@Override
 	public OWLEquivalentDataPropertiesAxiom visit(
 			ElkEquivalentDataPropertiesAxiom axiom) {
-		return owlFactory_.getOWLEquivalentDataPropertiesAxiom(
-				toDataPropertyExpressionSet(
+		return OWLFunctionalSyntaxFactory.EquivalentDataProperties(
+				toDataPropertyExpressions(
 						axiom.getDataPropertyExpressions()));
 	}
 
 	@Override
 	public OWLEquivalentObjectPropertiesAxiom visit(
 			ElkEquivalentObjectPropertiesAxiom axiom) {
-		return owlFactory_.getOWLEquivalentObjectPropertiesAxiom(
-				toObjectPropertyExpressionSet(
+		return OWLFunctionalSyntaxFactory.EquivalentObjectProperties(
+				toObjectPropertyExpressions(
 						axiom.getObjectPropertyExpressions()));
 	}
 
 	@Override
 	public OWLFacetRestriction visit(ElkFacetRestriction restriction) {
-		return owlFactory_.getOWLFacetRestriction(
+		return OWLFunctionalSyntaxFactory.FacetRestriction(
 				OWLFacet.getFacet(convert(restriction.getConstrainingFacet())),
 				convert(restriction.getRestrictionValue()));
 	}
@@ -652,36 +657,36 @@ public abstract class AbstractElkObjectConverter
 	@Override
 	public OWLFunctionalDataPropertyAxiom visit(
 			ElkFunctionalDataPropertyAxiom axiom) {
-		return owlFactory_.getOWLFunctionalDataPropertyAxiom(
+		return OWLFunctionalSyntaxFactory.FunctionalDataProperty(
 				convert(axiom.getProperty()));
 	}
 
 	@Override
 	public OWLFunctionalObjectPropertyAxiom visit(
 			ElkFunctionalObjectPropertyAxiom axiom) {
-		return owlFactory_.getOWLFunctionalObjectPropertyAxiom(
+		return OWLFunctionalSyntaxFactory.FunctionalObjectProperty(
 				convert(axiom.getProperty()));
 	}
 
 	@Override
 	public OWLHasKeyAxiom visit(ElkHasKeyAxiom axiom) {
-		return owlFactory_.getOWLHasKeyAxiom(
+		return OWLFunctionalSyntaxFactory.HasKey(
 				convert(axiom.getClassExpression()),
-				toPropertyExpressionSet(axiom.getObjectPropertyExpressions(),
+				toPropertyExpressions(axiom.getObjectPropertyExpressions(),
 						axiom.getDataPropertyExpressions()));
 	}
 
 	@Override
 	public OWLInverseFunctionalObjectPropertyAxiom visit(
 			ElkInverseFunctionalObjectPropertyAxiom axiom) {
-		return owlFactory_.getOWLInverseFunctionalObjectPropertyAxiom(
+		return OWLFunctionalSyntaxFactory.InverseFunctionalObjectProperty(
 				convert(axiom.getProperty()));
 	}
 
 	@Override
 	public OWLInverseObjectPropertiesAxiom visit(
 			ElkInverseObjectPropertiesAxiom axiom) {
-		return owlFactory_.getOWLInverseObjectPropertiesAxiom(
+		return OWLFunctionalSyntaxFactory.InverseObjectProperties(
 				convert(axiom.getFirstObjectPropertyExpression()),
 				convert(axiom.getSecondObjectPropertyExpression()));
 	}
@@ -689,25 +694,25 @@ public abstract class AbstractElkObjectConverter
 	@Override
 	public OWLIrreflexiveObjectPropertyAxiom visit(
 			ElkIrreflexiveObjectPropertyAxiom axiom) {
-		return owlFactory_.getOWLIrreflexiveObjectPropertyAxiom(
+		return OWLFunctionalSyntaxFactory.IrreflexiveObjectProperty(
 				convert(axiom.getProperty()));
 	}
 
 	@Override
 	public OWLLiteral visit(ElkLiteral expression) {
-		return owlFactory_.getOWLLiteral(expression.getLexicalForm(),
+		return OWLFunctionalSyntaxFactory.Literal(expression.getLexicalForm(),
 				convert(expression.getDatatype()));
 	}
 
 	@Override
 	public OWLNamedIndividual visit(ElkNamedIndividual expression) {
-		return owlFactory_.getOWLNamedIndividual(convert(expression.getIri()));
+		return OWLFunctionalSyntaxFactory.NamedIndividual(convert(expression.getIri()));
 	}
 
 	@Override
 	public OWLNegativeDataPropertyAssertionAxiom visit(
 			ElkNegativeDataPropertyAssertionAxiom axiom) {
-		return owlFactory_.getOWLNegativeDataPropertyAssertionAxiom(
+		return OWLFunctionalSyntaxFactory.NegativeDataPropertyAssertion(
 				convert(axiom.getProperty()), convert(axiom.getSubject()),
 				convert(axiom.getObject()));
 	}
@@ -715,29 +720,29 @@ public abstract class AbstractElkObjectConverter
 	@Override
 	public OWLNegativeObjectPropertyAssertionAxiom visit(
 			ElkNegativeObjectPropertyAssertionAxiom axiom) {
-		return owlFactory_.getOWLNegativeObjectPropertyAssertionAxiom(
+		return OWLFunctionalSyntaxFactory.NegativeObjectPropertyAssertion(
 				convert(axiom.getProperty()), convert(axiom.getSubject()),
 				convert(axiom.getObject()));
 	}
 
 	@Override
 	public OWLObjectAllValuesFrom visit(ElkObjectAllValuesFrom expression) {
-		return owlFactory_.getOWLObjectAllValuesFrom(
+		return OWLFunctionalSyntaxFactory.ObjectAllValuesFrom(
 				convert(expression.getProperty()),
 				convert(expression.getFiller()));
 	}
 
 	@Override
 	public OWLObjectComplementOf visit(ElkObjectComplementOf expression) {
-		return owlFactory_.getOWLObjectComplementOf(
+		return OWLFunctionalSyntaxFactory.ObjectComplementOf(
 				convert(expression.getClassExpression()));
 	}
 
 	@Override
 	public OWLObjectExactCardinality visit(
 			ElkObjectExactCardinalityQualified expression) {
-		return owlFactory_.getOWLObjectExactCardinality(
-				expression.getCardinality(), convert(expression.getProperty()));
+		return OWLFunctionalSyntaxFactory.ObjectExactCardinality(
+				expression.getCardinality(), convert(expression.getProperty()), convert(expression.getFiller()));
 	}
 
 	@Override
@@ -755,15 +760,15 @@ public abstract class AbstractElkObjectConverter
 
 	@Override
 	public OWLObjectHasValue visit(ElkObjectHasValue expression) {
-		return owlFactory_.getOWLObjectHasValue(
+		return OWLFunctionalSyntaxFactory.ObjectHasValue(
 				convert(expression.getProperty()),
 				convert(expression.getFiller()));
 	}
 
 	@Override
 	public OWLObjectIntersectionOf visit(ElkObjectIntersectionOf expression) {
-		return owlFactory_.getOWLObjectIntersectionOf(
-				toClassExpressionSet(expression.getClassExpressions()));
+		return OWLFunctionalSyntaxFactory.ObjectIntersectionOf(
+				toClassExpressions(expression.getClassExpressions()));
 	}
 
 	@Override
@@ -775,7 +780,7 @@ public abstract class AbstractElkObjectConverter
 	@Override
 	public OWLObjectMaxCardinality visit(
 			ElkObjectMaxCardinalityQualified expression) {
-		return owlFactory_.getOWLObjectMaxCardinality(
+		return OWLFunctionalSyntaxFactory.ObjectMaxCardinality(
 				expression.getCardinality(), convert(expression.getProperty()),
 				convert(expression.getFiller()));
 	}
@@ -790,7 +795,7 @@ public abstract class AbstractElkObjectConverter
 	@Override
 	public OWLObjectMinCardinality visit(
 			ElkObjectMinCardinalityQualified expression) {
-		return owlFactory_.getOWLObjectMinCardinality(
+		return OWLFunctionalSyntaxFactory.ObjectMinCardinality(
 				expression.getCardinality(), convert(expression.getProperty()),
 				convert(expression.getFiller()));
 	}
@@ -804,19 +809,19 @@ public abstract class AbstractElkObjectConverter
 
 	@Override
 	public OWLObjectOneOf visit(ElkObjectOneOf expression) {
-		return owlFactory_.getOWLObjectOneOf(
-				toIndividualSet(expression.getIndividuals()));
+		return OWLFunctionalSyntaxFactory.ObjectOneOf(
+				toIndividuals(expression.getIndividuals()));
 	}
 
 	@Override
 	public OWLObjectProperty visit(ElkObjectProperty expression) {
-		return owlFactory_.getOWLObjectProperty(convert(expression.getIri()));
+		return OWLFunctionalSyntaxFactory.ObjectProperty(convert(expression.getIri()));
 	}
 
 	@Override
 	public OWLObjectPropertyAssertionAxiom visit(
 			ElkObjectPropertyAssertionAxiom axiom) {
-		return owlFactory_.getOWLObjectPropertyAssertionAxiom(
+		return OWLFunctionalSyntaxFactory.ObjectPropertyAssertion(
 				convert(axiom.getProperty()), convert(axiom.getSubject()),
 				convert(axiom.getObject()));
 	}
@@ -830,61 +835,61 @@ public abstract class AbstractElkObjectConverter
 	@Override
 	public OWLObjectPropertyDomainAxiom visit(
 			ElkObjectPropertyDomainAxiom axiom) {
-		return owlFactory_.getOWLObjectPropertyDomainAxiom(
+		return OWLFunctionalSyntaxFactory.ObjectPropertyDomain(
 				convert(axiom.getProperty()), convert(axiom.getDomain()));
 	}
 
 	@Override
 	public OWLObjectPropertyRangeAxiom visit(
 			ElkObjectPropertyRangeAxiom axiom) {
-		return owlFactory_.getOWLObjectPropertyRangeAxiom(
+		return OWLFunctionalSyntaxFactory.ObjectPropertyRange(
 				convert(axiom.getProperty()), convert(axiom.getRange()));
 	}
 
 	@Override
 	public OWLObjectSomeValuesFrom visit(ElkObjectSomeValuesFrom expression) {
-		return owlFactory_.getOWLObjectSomeValuesFrom(
+		return OWLFunctionalSyntaxFactory.ObjectSomeValuesFrom(
 				convert(expression.getProperty()),
 				convert(expression.getFiller()));
 	}
 
 	@Override
 	public OWLObjectUnionOf visit(ElkObjectUnionOf expression) {
-		return owlFactory_.getOWLObjectUnionOf(
-				toClassExpressionSet(expression.getClassExpressions()));
+		return OWLFunctionalSyntaxFactory.ObjectUnionOf(
+				toClassExpressions(expression.getClassExpressions()));
 	}
 
 	@Override
 	public OWLReflexiveObjectPropertyAxiom visit(
 			ElkReflexiveObjectPropertyAxiom axiom) {
-		return owlFactory_.getOWLReflexiveObjectPropertyAxiom(
+		return OWLFunctionalSyntaxFactory.ReflexiveObjectProperty(
 				convert(axiom.getProperty()));
 	}
 
 	@Override
 	public OWLSameIndividualAxiom visit(ElkSameIndividualAxiom axiom) {
-		return owlFactory_.getOWLSameIndividualAxiom(
-				toIndividualSet(axiom.getIndividuals()));
+		return OWLFunctionalSyntaxFactory.SameIndividual(
+				toIndividuals(axiom.getIndividuals()));
 	}
 
 	@Override
 	public OWLSubAnnotationPropertyOfAxiom visit(
 			ElkSubAnnotationPropertyOfAxiom axiom) {
-		return owlFactory_.getOWLSubAnnotationPropertyOfAxiom(
+		return OWLFunctionalSyntaxFactory.SubAnnotationPropertyOf(
 				convert(axiom.getSubAnnotationProperty()),
 				convert(axiom.getSuperAnnotationProperty()));
 	}
 
 	@Override
 	public OWLObject visit(ElkSubClassOfAxiom axiom) {
-		return owlFactory_.getOWLSubClassOfAxiom(
+		return OWLFunctionalSyntaxFactory.SubClassOf(
 				convert(axiom.getSubClassExpression()),
 				convert(axiom.getSuperClassExpression()));
 	}
 
 	@Override
 	public OWLSubDataPropertyOfAxiom visit(ElkSubDataPropertyOfAxiom axiom) {
-		return owlFactory_.getOWLSubDataPropertyOfAxiom(
+		return OWLFunctionalSyntaxFactory.SubDataPropertyOf(
 				convert(axiom.getSubDataPropertyExpression()),
 				convert(axiom.getSuperDataPropertyExpression()));
 	}
@@ -897,7 +902,7 @@ public abstract class AbstractElkObjectConverter
 
 					OWLSubObjectPropertyOfAxiom defaultVisit(
 							ElkObjectPropertyExpression subExpression) {
-						return owlFactory_.getOWLSubObjectPropertyOfAxiom(
+						return OWLFunctionalSyntaxFactory.SubObjectPropertyOf(
 								convert(subExpression), convert(axiom
 										.getSuperObjectPropertyExpression()));
 					}
@@ -917,7 +922,7 @@ public abstract class AbstractElkObjectConverter
 					@Override
 					public OWLSubPropertyChainOfAxiom visit(
 							ElkObjectPropertyChain subExpression) {
-						return owlFactory_.getOWLSubPropertyChainOfAxiom(
+						return OWLFunctionalSyntaxFactory.SubPropertyChainOf(
 								toPropertyExpressionList(subExpression
 										.getObjectPropertyExpressions()),
 								convert(axiom
@@ -935,14 +940,14 @@ public abstract class AbstractElkObjectConverter
 	@Override
 	public OWLSymmetricObjectPropertyAxiom visit(
 			ElkSymmetricObjectPropertyAxiom axiom) {
-		return owlFactory_.getOWLSymmetricObjectPropertyAxiom(
+		return OWLFunctionalSyntaxFactory.SymmetricObjectProperty(
 				convert(axiom.getProperty()));
 	}
 
 	@Override
 	public OWLTransitiveObjectPropertyAxiom visit(
 			ElkTransitiveObjectPropertyAxiom axiom) {
-		return owlFactory_.getOWLTransitiveObjectPropertyAxiom(
+		return OWLFunctionalSyntaxFactory.TransitiveObjectProperty(
 				convert(axiom.getProperty()));
 	}
 
