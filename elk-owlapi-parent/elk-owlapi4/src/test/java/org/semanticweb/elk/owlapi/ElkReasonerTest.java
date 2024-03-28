@@ -26,7 +26,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -490,9 +491,11 @@ public class ElkReasonerTest {
 	 * @return the loaded ontology
 	 * @throws URISyntaxException
 	 * @throws OWLOntologyCreationException
+	 * @throws IOException 
 	 */
 	private OWLOntology loadOntology(OWLOntologyManager man, String name)
-			throws URISyntaxException, OWLOntologyCreationException {
+			throws URISyntaxException, OWLOntologyCreationException,
+			IOException {
 
 		final URI ontologyRoot = getClass().getClassLoader()
 				.getResource("ontologies").toURI();
@@ -502,10 +505,10 @@ public class ElkReasonerTest {
 
 		man.setIRIMappers(Collections.singleton(iriMapper));
 
-		final URI mainOntology = getClass().getClassLoader()
-				.getResource("ontologies/" + name).toURI();
-
-		return man.loadOntologyFromOntologyDocument(new File(mainOntology));
+		try (InputStream in = getClass().getClassLoader()
+				.getResourceAsStream("ontologies/" + name)) {
+			return man.loadOntologyFromOntologyDocument(in);
+		}
 
 	}
 

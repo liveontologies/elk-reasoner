@@ -23,7 +23,8 @@ package org.semanticweb.elk.owlapi;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -51,10 +52,11 @@ public class EmptyImportTest {
 	 *      href="http://code.google.com/p/elk-reasoner/issues/detail?id=7">Issue 7</a>
 	 * @throws OWLOntologyCreationException
 	 * @throws URISyntaxException
+	 * @throws IOException 
 	 */
 	@Test
 	public void testImport() throws OWLOntologyCreationException,
-			URISyntaxException {
+			URISyntaxException, IOException {
 
 		OWLOntologyManager man = TestOWLManager.createOWLOntologyManager();
 
@@ -89,9 +91,10 @@ public class EmptyImportTest {
 	 * @return the loaded ontology
 	 * @throws URISyntaxException
 	 * @throws OWLOntologyCreationException
+	 * @throws IOException 
 	 */
 	private OWLOntology loadOntology(OWLOntologyManager man, String name)
-			throws URISyntaxException, OWLOntologyCreationException {
+			throws URISyntaxException, OWLOntologyCreationException, IOException {
 
 		final URI ontologyRoot = getClass().getClassLoader()
 				.getResource("empty_import").toURI();
@@ -100,10 +103,10 @@ public class EmptyImportTest {
 		
 		man.setIRIMappers(Collections.singleton(iriMapper));
 
-		final URI mainOntology = getClass().getClassLoader()
-				.getResource("empty_import/" + name).toURI();
-
-		return man.loadOntologyFromOntologyDocument(new File(mainOntology));
+		try (InputStream in = getClass().getClassLoader()
+				.getResourceAsStream("empty_import/" + name)) {
+			return man.loadOntologyFromOntologyDocument(in);
+		}
 
 	}
 
