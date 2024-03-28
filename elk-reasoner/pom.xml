@@ -14,6 +14,18 @@
 	<name>ELK Reasoner Core</name>
 	<description>The core ELK Reasoner package</description>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>elk-bom</artifactId>
+				<version>${project.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
